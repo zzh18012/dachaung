@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kvfs.local/schemas/evaluation-report.schema.json",
+  "title": "Evaluation Report v1.0",
+  "type": "object",
+  "required": ["report_version", "provenance", "devset", "summary", "per_doc"],
+  "additionalProperties": false,
+  "properties": {
+    "report_version": { "type": "string", "const": "1.0" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "devset": { "$ref": "#/$defs/devset" },
+    "summary": { "$ref": "#/$defs/summary" },
+    "per_doc": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/per_doc" }
+    },
+    "expected_failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/expected_failure_result" }
+    }
+  },
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "required": [
+        "git_commit",
+        "git_dirty",
+        "evaluator_version",
+        "report_version",
+        "parser_name",
+        "parser_version",
+        "dependencies",
+        "max_chars",
+        "run_timestamp_iso"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "git_commit": { "type": ["string", "null"] },
+        "git_dirty": { "type": "boolean" },
+        "evaluator_version": { "type": "string", "minLength": 1 },
+        "report_version": { "type": "string", "minLength": 1 },
+        "parser_name": { "type": "string", "minLength": 1 },
+        "parser_version": { "type": ["string", "null"] },
+        "dependencies": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "null"] }
+        },
+        "max_chars": { "type": "integer", "minimum": 1 },
+        "run_timestamp_iso": { "type": "string", "minLength": 1 }
+      }
+    },
+    "devset": {
+      "type": "object",
+      "required": [
+        "status",
+        "file_count",
+        "content_group_count",
+        "pdf_count",
+        "docx_count",
+        "categories_covered"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["complete", "incomplete"] },
+        "file_count": { "type": "integer", "minimum": 0 },
+        "content_group_count": { "type": "integer", "minimum": 0 },
+        "pdf_count": { "type": "integer", "minimum": 0 },
+        "docx_count": { "type": "integer", "minimum": 0 },
+        "categories_covered": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "counts": { "type": "object" },
+        "success_rates": { "type": "object" },
+        "ratio_macro_averages": { "type": "object" },
+        "silent_drop_total": { "type": ["integer", "null"] }
+      }
+    },
+    "per_doc": {
+      "type": "object",
+      "required": [
+        "doc_id",
+        "source_type",
+        "metrics",
+        "wall_time_seconds"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "doc_id": { "type": "string", "minLength": 1 },
+        "source_type": { "enum": ["pdf", "docx"] },
+        "metrics": { "type": "object" },
+        "wall_time_seconds": {
+          "type": "object",
+          "required": ["total", "parse", "chunk"],
+          "additionalProperties": false,
+          "properties": {
+            "total": { "type": ["number", "null"], "minimum": 0 },
+            "parse": { "type": ["number", "null"], "minimum": 0 },
+            "chunk": { "type": ["number", "null"], "minimum": 0 },
+            "parse_reason": { "type": "string" },
+            "chunk_reason": { "type": "string" }
+          }
+        }
+      }
+    },
+    "expected_failure_result": {
+      "type": "object",
+      "required": ["doc_id", "expected_error_code", "actual_error_code", "matches"],
+      "additionalProperties": false,
+      "properties": {
+        "doc_id": { "type": "string" },
+        "expected_error_code": { "type": "string" },
+        "actual_error_code": { "type": ["string", "null"] },
+        "matches": { "type": "boolean" }
+      }
+    }
+  }
+}

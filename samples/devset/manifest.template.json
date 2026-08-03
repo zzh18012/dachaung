@@ -1,0 +1,33 @@
+{
+  "manifest_version": "1.0",
+  "devset_status": "incomplete",
+  "documents": [
+    {
+      "doc_id": "<DOC-ID>",
+      "path": "samples/private/<filename>.docx",
+      "source_type": "docx",
+      "sha256": "<64-char lowercase hex>",
+      "categories": ["report", "table", "image", "multi-level-heading", "long-paragraph"],
+      "paired_with": "<PAIRED-DOC-ID>",
+      "annotation_file": "samples/private/devset/annotations/<DOC-ID>.json",
+      "expectations": {
+        "element_count_by_type": {
+          "heading": 0,
+          "paragraph": 0,
+          "table": 0,
+          "image": 0,
+          "caption": 0
+        },
+        "required_markers": []
+      }
+    }
+  ],
+  "expected_failures": [
+    {
+      "doc_id": "<ERR-ID>",
+      "path": "samples/private/<badfile>.pdf",
+      "expected_error_code": "<code>",
+      "source_type": "pdf"
+    }
+  ]
+}

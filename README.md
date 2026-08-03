@@ -274,11 +274,13 @@ dachaung-code/
 ├── .gitignore
 ├── README.md
 ├── CLAUDE.md
+├── docs/
+│   └── evaluation.md       # Stage 2 评测方法与基线
 ├── pyproject.toml          # 项目元数据 + 依赖锁定范围
 ├── uv.lock                 # uv 自动生成的精确锁文件
 ├── app/
 │   ├── __init__.py
-│   ├── cli.py              # 命令行入口
+│   ├── cli.py              # 命令行入口（parse / validate）
 │   ├── pipeline.py         # 串联 parse → chunk → validate → write
 │   ├── models.py           # 统一文档模型 dataclass
 │   ├── schema.py           # JSON Schema 加载与校验
@@ -291,12 +293,26 @@ dachaung-code/
 │   └── chunkers/
 │       ├── __init__.py
 │       └── structural.py   # 标题硬边界 + 长度切分
+├── evaluation/             # Stage 2 评测包（不改 parser/chunker）
+│   ├── cli.py              # run / validate-report 子命令
+│   ├── manifest.py         # 清单加载 + 路径校验
+│   ├── metrics.py          # 13 项自动指标
+│   ├── annotation_metrics.py  # chunk_boundary P/R/F1（figure_caption 固定 null）
+│   ├── runner.py           # 串联 process_single → metrics → report
+│   └── report.py           # 聚合 + provenance
 ├── schemas/
-│   └── document.schema.json
+│   ├── document.schema.json       # Stage 1 文档输出
+│   ├── manifest.schema.json       # Stage 2 清单
+│   ├── annotation.schema.json     # Stage 2 标注
+│   └── evaluation-report.schema.json  # Stage 2 报告
 ├── tests/                  # 单元 + 集成测试
 ├── samples/
 │   ├── README.md           # 告诉你该放什么
+│   ├── devset/             # 提交版模板（无真实数据）
+│   │   ├── manifest.template.json
+│   │   └── annotation.template.json
 │   └── private/            # .gitignore；放真实样例（无隐私）
+│       └── devset/         # 评测清单与标注（gitignored）
 └── outputs/                # 输出 JSON，gitignore（.gitkeep 例外）
 ```
 
@@ -311,3 +327,44 @@ dachaung-code/
 - Table Transformer 微调
 - cpp-chunker 加速
 - Web UI
+
+---
+
+## 11. Stage 2：评测方法（pilot baseline / incomplete devset）
+
+> 当前开发集仅 1 对 DOCX+PDF，**数字仅反映这对样例上 fallback parser 的表现，
+> 不代表项目总体准确率**。完整评测方法见 `docs/evaluation.md`。
+
+### 11.1 跑评测
+
+```bash
+.venv/Scripts/python.exe -m evaluation.cli run \
+  --manifest samples/private/devset/manifest.json \
+  --output outputs/evaluation-pilot-baseline.json \
+  --parser fallback \
+  --max-chars 800
+```
+
+退出码：成功 `0`，清单/报告 Schema 错误 `1`，清单文件不存在 `2`。
+
+### 11.2 校验报告
+
+```bash
+.venv/Scripts/python.exe -m evaluation.cli validate-report outputs/evaluation-pilot-baseline.json
+```
+
+成功 `[OK]` 退出 0；失败 `[FAIL]` 退出 1；报告不存在 `2`。
+
+### 11.3 指标概览
+
+报告记录每份文档的 13 项自动指标 + 3 项 figure_caption（固定 null）+ 3 项 chunk_boundary P/R/F1（需人工标注）+ 计时。
+
+详细定义见 `docs/evaluation.md` 第 4 节。所有 null 指标都带 `reason` 字段说明未评测原因。
+
+> ⚠️ `text_preservation_equal / text_char_multiset_*` **只**比较 parser 已提取的 elements 与 chunker 生成的 chunks，用于发现**分块阶段**的丢失/重复/顺序变化；**不能**证明 PDF/DOCX → elements 的解析完整性。后者由 `silent_drop_count` 部分反映（pilot baseline 中 PDF 该项 = 3）。各项 `1.0` **不等于** "fallback 解析准确率 100%"。
+
+### 11.4 隐私
+
+- 原始报告 JSON 仅写到 `outputs/`（已 gitignored），**不提交 git**
+- 私有清单与标注位于 `samples/private/devset/`（已 gitignored）
+- 未来若要提交脱敏 Markdown 汇总，必须经用户单独审阅，且不得包含私有路径、SHA-256、annotator 真实身份、文档正文片段

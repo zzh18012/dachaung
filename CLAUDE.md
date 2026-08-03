@@ -40,7 +40,32 @@ uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.
 
 # 仅校验已生成的 JSON（独立子命令，不要把 JSON 当成 PDF 输入）
 .venv/Scripts/python.exe -m app.cli validate <output.json>
+
+# Stage 2：跑评测（清单驱动）
+.venv/Scripts/python.exe -m evaluation.cli run \
+  --manifest samples/private/devset/manifest.json \
+  --output outputs/evaluation-pilot-baseline.json \
+  --parser fallback --max-chars 800
+
+# Stage 2：校验评测报告
+.venv/Scripts/python.exe -m evaluation.cli validate-report outputs/evaluation-pilot-baseline.json
 ```
+
+## Stage 2 评测规则（当前阶段）
+
+完整方法见 `docs/evaluation.md`。关键不变量：
+
+- 不修改 `app/parsers/*`、`app/chunkers/*`、`app/pipeline.py`（评测只调用，不改算法）
+- 计时只记 total；parse/chunk 未插桩，固定 null + reason=`not_instrumented`，不重复 total
+- 比例指标分母为 0 时返回 null + reason，**不返回 1.0**
+- 聚合按类型分开：counts 求和、success_rates 算 rate、ratio 各项 macro average、silent_drop 求和；**不混合出"综合分数"**
+- `figure_caption_*` 始终 null + `parser_does_not_emit_relations`（本期不引入"最近图片"启发式）
+- `chunk_boundary_*` 一对一匹配，容差 `tolerance_chars`（默认 30）必须在报告中记录
+- manifest 中 `path` 必须相对项目根 + 正斜杠；拒绝绝对路径与反斜杠；解析后必须位于项目根内
+- `silent_drop_count` 必须基于 manifest 的 `expectations.element_count_by_type`；无 expectations → null
+- 报告里写 `devset_status`、`file_count`、`content_group_count`、`pdf_count`、`docx_count`、`categories_covered`；不单看文件数判定完整性
+- 当前 devset 固定 `incomplete`，所有数字称为 "pilot baseline / incomplete devset"，**不代表项目总体准确率**
+- 原始评测报告 JSON 只写到 `outputs/`（gitignored），不提交 git；脱敏汇总需用户单独审阅
 
 ## Parser 选择策略
 

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kvfs.local/schemas/annotation.schema.json",
+  "title": "Human Annotation v1.0",
+  "description": "人工标注文件。annotator 字段在提交版中必须脱敏（如 'initials' 或 'reviewer_a'），不写真实身份。",
+  "type": "object",
+  "required": ["annotation_version", "doc_id"],
+  "additionalProperties": false,
+  "properties": {
+    "annotation_version": { "type": "string", "const": "1.0" },
+    "doc_id": { "type": "string", "minLength": 1 },
+    "annotator": { "type": "string" },
+    "date": { "type": "string", "minLength": 1 },
+    "figure_caption_pairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["figure_marker", "caption_text"],
+        "additionalProperties": false,
+        "properties": {
+          "figure_marker": { "type": "string", "minLength": 1 },
+          "caption_text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "heading_order": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["level", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "level": { "type": "integer", "minimum": 1 },
+          "text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "chunk_boundary_anchors": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/boundary_anchor" }
+    }
+  },
+  "$defs": {
+    "boundary_anchor": {
+      "type": "object",
+      "required": ["marker", "position"],
+      "additionalProperties": false,
+      "properties": {
+        "marker": { "type": "string", "minLength": 1 },
+        "position": { "enum": ["before", "after"] },
+        "reason": { "type": "string" }
+      }
+    }
+  }
+}

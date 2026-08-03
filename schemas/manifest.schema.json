@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kvfs.local/schemas/manifest.schema.json",
+  "title": "Evaluation Manifest v1.0",
+  "description": "开发集清单。所有 path 必须是相对项目根目录的正斜杠相对路径，禁止绝对路径与反斜杠。",
+  "type": "object",
+  "required": ["manifest_version", "devset_status", "documents"],
+  "additionalProperties": false,
+  "properties": {
+    "manifest_version": { "type": "string", "const": "1.0" },
+    "devset_status": { "enum": ["complete", "incomplete"] },
+    "documents": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/document" }
+    },
+    "expected_failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/expected_failure" }
+    }
+  },
+  "$defs": {
+    "document": {
+      "type": "object",
+      "required": ["doc_id", "path", "source_type"],
+      "additionalProperties": false,
+      "properties": {
+        "doc_id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "source_type": { "enum": ["pdf", "docx"] },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "categories": { "type": "array", "items": { "type": "string" } },
+        "paired_with": { "type": "string" },
+        "annotation_file": { "type": "string" },
+        "expectations": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "element_count_by_type": {
+              "type": "object",
+              "additionalProperties": { "type": "integer", "minimum": 0 }
+            },
+            "required_markers": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "expected_failure": {
+      "type": "object",
+      "required": ["doc_id", "path", "expected_error_code"],
+      "additionalProperties": false,
+      "properties": {
+        "doc_id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "expected_error_code": { "type": "string", "minLength": 1 },
+        "source_type": { "enum": ["pdf", "docx", "txt", "other"] }
+      }
+    }
+  }
+}

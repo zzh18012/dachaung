@@ -1,0 +1,20 @@
+{
+  "annotation_version": "1.0",
+  "doc_id": "<DOC-ID>",
+  "annotator": "reviewer_a",
+  "date": "YYYY-MM-DD",
+  "figure_caption_pairs": [
+    {
+      "figure_marker": "<unique substring identifying the figure>",
+      "caption_text": "<caption text>"
+    }
+  ],
+  "heading_order": [
+    {"level": 1, "text": "<heading text>"},
+    {"level": 2, "text": "<subheading text>"}
+  ],
+  "chunk_boundary_anchors": [
+    {"marker": "<unique substring in normalized stream>", "position": "before", "reason": "heading"},
+    {"marker": "<unique substring>", "position": "after", "reason": "long paragraph end"}
+  ]
+}
