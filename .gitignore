@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+
+# Virtual env (project-local)
+.venv/
+
+# Test cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Output artifacts (JSON may contain personal info from real samples)
+outputs/*
+!outputs/.gitkeep
+
+# Sample distribution zip (contains real test fixtures, kept local)
+dachuang-test-samples.zip
+
+# Private test samples: NEVER commit (may contain personal info)
+samples/private/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

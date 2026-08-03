@@ -1,0 +1,23 @@
+[project]
+name = "kvfs-doc-parser"
+version = "0.1.0"
+description = "面向 KVFS 的复合文档解析与结构-语义分块原型（最小闭环）"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+authors = [{ name = "zzh" }]
+dependencies = [
+    "jsonschema>=4.21,<5",
+    "kreuzberg>=4.10,<5",
+    "pdfplumber>=0.11,<0.12",
+    "python-docx>=1.2,<2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0,<9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra"
