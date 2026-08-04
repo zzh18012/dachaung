@@ -4359,3 +4359,55 @@
 - 本 worktree（Round 90 后）：5786 pass / 0 fail / 13 skip（HEAD `7f20219`）
 
 ---
+
+## Round 91（2026-08-05）：候选 DG 之前 — Stage 2 评测方法学不变量
+
+### 做了什么
+- 新建 `tests/test_stage2_evaluation_invariants.py`（38 个测试）覆盖
+  CLAUDE.md 与 `docs/evaluation.md` 中描述的 Stage 2 评测方法学不变量，
+  互补于 per-module 单测（每个 evaluation/* 模块已 edges2 饱和）。
+- 重点覆盖项：
+  - **计时不变量**：parse/chunk 固定 null + reason=`not_instrumented`，
+    total 是数字、不重复 total
+  - **比例指标分母为 0 → null + reason**（不返回 1.0）：
+    - text_preservation_precision/recall
+    - chunk_boundary_precision/recall
+    - figure_caption_*_precision/recall
+  - **figure_caption_* 始终 null + `parser_does_not_emit_relations`**：
+    不引入"最近图片"启发式（reason ≠ `nearest_image_heuristic`）
+  - **chunk_boundary 容差 `tolerance_chars` 在报告中记录**（默认 30）
+  - **manifest path：相对 + 正斜杠**；拒绝绝对路径与反斜杠；解析后必须位于项目根内
+  - **silent_drop_count 基于 expectations.element_count_by_type**：
+    无 expectations → null
+  - **报告 devset 6 字段齐全**：status/file_count/content_group_count/
+    pdf_count/docx_count/categories_covered
+  - **聚合规则**（不混合出"综合分数"）：
+    - counts 求和
+    - success_rates 算 rate（成功数 / 总数）
+    - ratio 各项 macro average（跳过 null）
+    - silent_drop 求和
+  - **outputs/ 已 gitignored**（git check-ignore 验证）
+  - **evaluator_version/report_version 锁定 1.1**（指示线 v2.x 审计目标）
+  - **失败文档仍写入 per_doc**（pipeline_failed=true 时不剔除）
+  - **expected_failures matches 布尔**：成功失败 matches=true，
+    意外失败 matches=false，unexpected_success=false
+  - **报告自校验通过 schema**：runner 输出可被 validate_report 接受
+  - **当前 devset 状态 incomplete**：所有数字称为 "pilot baseline / incomplete devset"
+- 无源码改动。
+
+### 撞墙记录
+- 无：38 个测试一次通过。
+
+### 下一步建议
+- 候选 DG：app/parsers/fallback_parser.py 边角（第三轮）—— 最大文件 630 行
+- 候选 DH：跨模块不一致场景（错误的输入、parser 失败的 details 完整链路）
+- 候选 DI：app/cli.py 边角（第三轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DG（fallback_parser 第三轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 91 后）：5824 pass / 0 fail / 13 skip（HEAD `86a16f4`）
+
+---
