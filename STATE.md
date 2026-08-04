@@ -3217,3 +3217,39 @@
 - 本 worktree（Round 69 后）：3092 pass / 0 fail / 9 skip（HEAD `6861a30`）
 
 ---
+
+## Round 70（2026-08-05）：候选 BY — app/pipeline.py 端到端边角覆盖
+
+### 做了什么
+- 候选 BY：新建 `tests/test_pipeline_edges.py`（86 个测试）覆盖 `app/pipeline.py`（216 行）的深度边角，与已有 `test_pipeline_helpers.py`（45）+ `test_pipeline_errors.py`（47）+ `test_pipeline_integration.py`（21，含 9 skip）互补。
+- 重点覆盖项：
+  - **get_parser** 21 个：6 个 parser（fallback/kreuzberg/markdown/html/text/ipynb）都返 Parser 子类、name/version/parse 一致；空字符串、大小写（FALLBACK/Fallback）、前后空白、前后缀变体都 raises ValueError；ValueError 消息列出全部 6 个支持 parser
+  - **image_output_dir_for** 14 个：返 Path、None 输出返 None、空字符串输出仍返 Path、hash 长度 16/17/15/0 各边界、Unicode hash、特殊字符 hash、str/Path 都接受、嵌套路径、filename-only、格式 'images-<sha16>' 严格
+  - **process_single** 27 个：返 tuple 严格 2 元、file_not_found 各属性（doc=None/errors list/ErrorRecord/code/message/details/path）、unknown_parser 错误码 unexpected_parser_error、unsupported_extension 安全、text_parser 端到端、write_json=False 跳过写入、write_json=True 写入文件、output_path=None 不崩、str 输入路径、默认 parser=fallback、默认 max_chars=800、max_chars 1/0/-1 各不崩、嵌套输出 parent 自动创建、error 字段类型一致、details 含 path
+  - **validate_only** 11 个：返 tuple 严格 2 元、first bool/second str、missing file false（消息含 missing/no such/不存在）、invalid JSON false（消息含 JSON/解析）、directory false、empty file false、str/Path 都接受
+  - **__all__ 导出** 4 个：4 项精确集、match module attributes
+  - **模块导入** 6 个：json/Path 导入、4 个 callable 验证
+  - **错误恢复语义** 4 个：missing file/unknown parser/unsupported ext/max_chars=0 都不抛异常给调用方
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。86 个新测试一次通过。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CF：app/chunkers/structural.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CH：app/hash.py 边角（小模块但可能有边角）
+- 候选 CI：app/models.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 CG（fallback_parser.py 边角第二轮）。理由：
+1. fallback_parser 是默认 parser，覆盖 PDF + DOCX 双 source_type
+2. 含 _classify_pdf_paragraph / _is_heading_style / _image_filename / _save_image / _group_words_to_paragraphs 多个 helper
+3. 与已有 95 个边角测试互补，深入 80 字符阈值、caption 模式、table 渲染、image 处理
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 70 后）：3178 pass / 0 fail / 9 skip（HEAD `779e032`）
+
+---
