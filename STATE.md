@@ -9085,3 +9085,65 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 第六轮可深入 DocumentEntry/Manifest 类、路径解析、expected_failures 等。
 
 ---
+
+## Round 154（2026-08-05）：evaluation/manifest.py 第六轮（edges6）
+
+### 目标
+- 给 evaluation/manifest.py（239 行，已有 base/edges/edges2-5 共 665 测试）补第六轮
+- 深入 frozen dataclass 行为、_is_absolute_like 边界、content_group_count 配对组合、load_manifest 端到端
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges6.py`（130 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 边界**：
+  - 空串、单字符、两字符 → False
+  - POSIX 绝对（/x）、Windows 盘符大小写、Windows 正斜杠、纯 / → True
+  - Windows 盘符无分隔符（C:foo）→ False
+  - 数字开头的"盘符"（1:/foo）→ False
+- **_has_backslash 边界**：
+  - 空、单、多、首/尾 backslash → 正确检测
+- **ManifestError**：Exception 子类、非 ValueError 子类、message 保持、空 message、args
+- **DocumentEntry frozen dataclass**：
+  - 10 个字段精确（doc_id/path_str/resolved_path/source_type/sha256/categories/paired_with/annotation_file_str/annotation_resolved/expectations）
+  - frozen → FrozenInstanceError on setattr
+  - 可 hash、等值比较、repr 含类名
+- **ExpectedFailure frozen dataclass**：
+  - 5 个字段精确（doc_id/path_str/resolved_path/expected_error_code/source_type）
+  - frozen、可 hash、source_type 可为 None
+- **Manifest frozen dataclass**：
+  - 5 个字段（manifest_version/devset_status/documents/expected_failures/project_root）
+  - file_count/pdf_count/docx_count property 精确
+  - content_group_count：空/全 unpaired/全 paired/混合/单向 paired
+  - categories_covered：排序去重、空、list 类型
+- **_resolve_relative_path**：empty/absolute/backslash/outside-project 错误消息、valid 透传、嵌套子目录、点当前目录
+- **_detect_project_root**：file 路径/dir 路径/无 pyproject fallback
+- **load_manifest 端到端**：返回 Manifest、devset_status/documents/categories 默认与透传、缺失文件、str 路径、invalid JSON、project_root 自动/手动
+- **模块结构**：__all__ 5 项精确、imports 完整、docstring 提及不变量
+- **签名深度**：param names、no defaults、return annotations
+- **综合行为**：immutability、实例独立、idempotent、roundtrip
+
+### 撞墙记录
+- **Wall 1**：DocumentEntry 字段数我数 9，实际 10（漏了 annotation_resolved）。修复：改 10。
+- **Wall 2**：devset_status 用 "test" 不在 schema enum（["complete", "incomplete"]）。修复：改 "incomplete"。
+- **Wall 3**：source_type 用 "text" 不在 schema documents enum（["pdf", "docx"]）。修复：改 "pdf"。
+- **Wall 4**：manifest_version 用 "1.1" 与 schema const "1.0" 冲突。修复：改 "1.0"（MANIFEST_VERSION = "1.0"）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 154 后）：12232 pass / 0 fail / 13 skip（HEAD `0241cda`）
+
+### 下一步建议
+- 候选 HR：app/cli.py 第七轮
+- 候选 HS：evaluation/cli.py 第六轮
+- 候选 HT：evaluation/metrics.py 第六轮
+- 候选 HU：evaluation/annotation_metrics.py 第六轮
+- 候选 HV：evaluation/schema.py 第六轮
+- 候选 HW：evaluation/schema_validation.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HS（evaluation/cli.py 第六轮）。cli.py 是评测命令行入口，
+第六轮可深入 argparse 子命令、参数解析、错误处理等。
+
+---
