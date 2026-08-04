@@ -7561,3 +7561,93 @@ structural.py 是结构分块核心算法，第三轮已建立基础，
 错误码匹配、annotation 字段缺漏、compare 逻辑等边界。
 
 ---
+
+## Round 133（2026-08-05）：evaluation/annotation_metrics.py 第五轮（edges5）
+
+### 目标
+- 给 evaluation/annotation_metrics.py（194 行，已有 377 测试）补第五轮 edges
+- 深入 chunk_boundary_prf 算法边界、figure_caption_prf 结构、空白规范化
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges5.py`（80 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 深度**：
+  - 每项 value/reason 字段
+  - 不含 _tolerance_chars / _missing_markers
+  - 三个 dict 对象互不相同
+  - 任意额外 dict 键不影响输出
+  - annotation 含 figures/captions 字段仍 null
+  - 大量 chunks 不影响输出（始终 null）
+- **chunk_boundary_prf 空白规范化**：
+  - chunk text 内双空格 → normalize 后单空格
+  - chunk text 前后空格 → strip
+  - marker 中间空格仍能找到
+  - marker = chunk text 末尾 → 精确匹配
+  - marker = 下个 chunk 开头 + position="before" → 偏移 1
+  - position="before" + tolerance=1 → 匹配
+- **chunk_boundary_prf 单 chunk 边界**：
+  - len(chunks)==1 + anchors 非空 → recall=0.0
+  - len(chunks)==1 + anchors 空 → recall null
+  - chunks=[] + anchors 空 → 全 null
+  - chunks=[] + anchors 非空 → recall=0.0
+- **chunk_boundary_prf missing_markers**：
+  - 部分缺失 → _missing_markers 含缺失项
+  - 全缺失 → 含全部，gt_positions 为空
+  - 全找到 → 无 _missing_markers 字段
+  - 空 marker → 视为缺失
+- **chunk_boundary_prf 一对一贪心匹配**：
+  - 2 predictions + 2 GTs + tolerance=0 → 全匹配
+  - 1 prediction + 2 anchors → 只能匹配 1，recall=0.5
+  - 距离超过 tolerance → 不匹配
+- **_tolerance_chars 字段**：
+  - 始终在 chunk_boundary_prf 输出（document=None/无 annotation/单 chunk/无 anchors/全匹配 五个分支）
+  - value = 传入参数（含负数）
+  - reason = None
+- **document/annotation None 与空 dict 分支**：
+  - document=None → "pipeline_failed"
+  - annotation=None / {} / 0 → "no_annotation"
+  - document 无 chunks 键 → 视为 []
+  - annotation 无 chunk_boundary_anchors 键 → 视为 []
+- **chunk text 在 stream 中找不到**：
+  - 空 chunk text → find 返回 pos，predicted 加 0
+- **f1 计算**：
+  - p/r 都 null → f1 null
+  - p=0/r=0 → denom=0 → f1=0.0（不是 null）
+  - p=0.5/r=1.0 → f1 ≈ 0.667
+  - p=1/3/r=1.0 → f1 ≈ 0.5
+- **不修改输入**：doc/ann 在调用前后相等
+- **模块结构**：
+  - __all__ 是 list，3 项，顺序固定
+  - PARSER_DOES_NOT_EMIT_RELATIONS 是 str
+  - imports 完整（Counter/Any/normalize_text/_null/_ratio）
+  - docstring 提及 figure_caption/chunk_boundary/tolerance/null
+- **签名**：
+  - figure_caption_prf 2 参数（document, annotation），无默认
+  - chunk_boundary_prf 3 参数，tolerance_chars 默认 30
+  - 所有参数 POSITIONAL_OR_KEYWORD
+  - 返回类型注解存在
+- **JSON 可序列化**：figure_caption_prf / chunk_boundary_prf 输出可 json.dumps
+
+### 撞墙记录
+1. test_chunk_boundary_chunk_text_with_double_spaces_normalized：原来
+   marker="beta gamma" position=after → 位置 16，与 predicted=10 偏 6，
+   tolerance=0 不匹配。修复：marker 改为 "alpha beta"，position=after
+   → 位置 10，与 predicted=10 完美匹配。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 133 后）：10420 pass / 0 fail / 13 skip（HEAD `ed5d750`）
+
+### 下一步建议
+- 候选 GL：evaluation/report.py 第五轮
+- 候选 GM：app/parsers/markdown_parser.py 第四轮
+- 候选 GN：app/parsers/html_parser.py 第四轮
+- 候选 GO：app/parsers/ipynb_parser.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GL（evaluation/report.py 第五轮）。report 已有 4 轮，第五轮
+可深入 provenance 字段、summary 聚合、report_version 检查、JSON 序列化。
+
+---
