@@ -956,3 +956,73 @@
 - 本 worktree（Round 15 后）：336 pass / 0 fail / 9 skip（HEAD `053743a`）
 
 ---
+
+## 2026-08-04 — Round 16（kreuzberg parser 覆盖率）
+
+**做了什么**：
+- 完成候选 Q：补 kreuzberg parser 测试覆盖率，新增 15 个测试到 `tests/test_parsers.py`
+- **`_classify_line` 直接单元测试**（6 个）：
+  - markdown `#`/`##`/`######` heading level
+  - 短行（≤80）+ 不以句号结尾 → heading short_line heuristic
+  - 短行 + 句号结尾 → paragraph
+  - 超长行 → paragraph
+  - 空行 → paragraph
+  - 中文句号结尾 → paragraph
+- **`_make_locator` 直接单元测试**（1 个）：pdf page=1 占位 vs docx paragraph_index
+- **`_split_content_to_elements` 直接单元测试**（5 个）：
+  - 双换行分多段
+  - markdown heading
+  - heading + body 在同 block
+  - 空 content / 纯空白
+  - pdf locator 含 page=1
+- **集成测试 warning 细节**（3 个）：
+  - kreuzberg_no_structured_elements warning.details 含 fallback_strategy / source_type
+  - PDF elements 都有 page=1 占位
+  - Document.metadata 保留 kreuzberg_mime_type / kreuzberg_quality_score 字段
+- commit `54eaa3e`，已 push
+
+**worktree 当前状态**：
+- HEAD `54eaa3e`，工作树清洁
+- 测试基线：351 pass / 0 fail / 9 skip（+15 vs Round 15）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 17）
+
+**首要任务**：方向选择
+
+- 候选 T（推荐）：**HTML/Markdown/Text/IPYNB parser 覆盖率**
+  - 现状：test_parsers_html.py / test_parsers_markdown.py / test_parsers_text.py / test_parsers_ipynb.py 已存在
+  - 复杂度：低-中
+  - 价值：边缘 parser 也应保持高覆盖率
+
+- 候选 S：**pipeline 错误处理路径**
+  - 现状：`process_single` 的 warning 汇总 / 错误聚合 / 半成品清理
+  - 复杂度：中
+
+- 候选 U：**schema 校验测试**
+  - 现状：test_schema.py 应该比较完整；source_spans 加入后可能有边角
+  - 复杂度：低
+
+- 候选 V（新提）：**models 测试**
+  - 现状：test_models.py 不知是否完整
+  - 复杂度：低
+
+- 候选 W（新提）：**annotation_metrics 测试**
+  - 现状：test_annotation_metrics.py 在 Round 8 加过几个，可能还有边角
+  - 复杂度：低
+
+- 仍阻塞：候选 J（向量化）、候选 M（evaluator v1.2）、候选 O（docs/*.md）
+
+**建议**：选 T（边缘 parser 覆盖率）。理由：
+1. 已经覆盖了 fallback 和 kreuzberg，HTML/MD/TXT/IPYNB 应跟进
+2. 这些 parser 相对简单，测试成本低
+3. 保持测试网密度，未来修改任一 parser 都能立即发现问题
+
+### 撞墙记录
+- 无新撞墙。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 16 后）：351 pass / 0 fail / 9 skip（HEAD `54eaa3e`）
+
+---
