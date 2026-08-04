@@ -6380,3 +6380,88 @@ edges3 已饱和，但 edges4 仍有空间覆盖 HTMLParser 回调深度。
 - 本 worktree（Round 118 后）：8714 pass / 0 fail / 13 skip（HEAD `7978a34`）
 
 ---
+
+## Round 119（2026-08-05）：evaluation/runner.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_evaluation_runner_edges4.py`（新增，948 行）
+- 目标：`evaluation/runner.py`（227 行，已有 323 测试）
+- 新增测试：81 个
+- 提交：`787fce5`
+
+### 覆盖深度
+- **_load_annotation 第四轮深度**：
+  - 空文件、仅空白文件 → None
+  - JSON object/array/int/bool/null/string 各种类型
+  - 嵌套 dict 深度访问
+  - 中文内容、中文文件名
+  - UTF-8 BOM 头（不被默认 utf-8 解码剥离）→ None
+  - 截断的 JSON 数组 → None
+  - 二进制垃圾 → UnicodeDecodeError（不静默吞）
+- **_process_one 第四轮深度**：
+  - error dict 必含 message/code 字段
+  - 成功后 _per_doc 目录存在
+  - 成功/失败均清理 out_stub
+  - elapsed 非负
+  - image_dir 名 = 'images-' + 16 hex = 23 字符
+  - image_dir 父目录 = _per_doc
+  - parser_version 是非空字符串
+  - document 是 dict（to_dict 转换）含 source_hash
+- **run_evaluation 第四轮深度**：
+  - 全部失败 → parser_version_for_prov 仍 None
+  - 第一个失败第二个成功 → parser_version 来自第二个
+  - 第一个成功第二个失败 → parser_version 来自第一个
+  - tolerance_chars=0 / 负数 不崩溃
+  - 仅有 expected_failures 无 documents → per_doc 空
+  - per_doc / expected_failures 顺序保持
+  - 多次调用幂等（不累积状态）
+  - 输出 indent=2 / ensure_ascii=False
+  - 深层父目录自动创建
+  - 顶层 keys 精确集合
+  - expected_failure matches True/False、actual_code 字段
+  - failed/ok doc 的 metrics.pipeline_success.value
+  - summary.success_rates.pipeline_success.rate 0.0/0.5/1.0
+- **模块结构深度**：
+  - __all__ 是 list、长度 1、精确 ["run_evaluation"]
+  - imports 完整：json/time/Path/Any/process_single/image_output_dir_for/
+    REPORT_VERSION/chunk_boundary_prf/figure_caption_prf/
+    compute_automatic_metrics/aggregate_summary/build_provenance/
+    build_devset_section
+  - 内部 helper callable：_load_annotation/_process_one/run_evaluation
+  - docstring 提及 total / not_instrumented / image
+  - from __future__ import annotations
+- **签名深度**：
+  - manifest/output_path 参数存在
+  - parser_name/max_chars/tolerance_chars 是 KEYWORD_ONLY
+  - 默认值：parser_name="fallback", max_chars=800, tolerance_chars=30
+- 无源码改动。
+
+### 撞墙记录
+1. test_load_annotation_handles_nested_dict：list 索引越界
+   （c=[1,2,{d:e}]，长度 3，index 3 不存在）。修复：改为 index 2。
+2. test_load_annotation_handles_utf8_with_bom：utf-8 默认不解 BOM
+   → JSONDecodeError → None。修复：断言 None。
+3. test_load_annotation_binary_garbage_returns_none：实际抛
+   UnicodeDecodeError（不在 OSError/JSONDecodeError 兜底范围）。
+   修复：改为 raises UnicodeDecodeError。
+4. test_run_evaluation_tolerance_chars_zero：public per_doc 没有
+   _tolerance_chars（被剥离）。修复：改为检查 metrics 中
+   chunk_boundary_precision 存在。
+5. summary.success_rates.pipeline_success.value 不存在：
+   实际结构是 {success_count, total, rate}。修复：改为 rate 字段。
+
+### 下一步建议
+- 候选 FW：evaluation/annotation_metrics.py 第四轮（194 行）
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 FY：app/models.py 第三轮（154 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 FW（evaluation/annotation_metrics.py 第四轮）。
+annotation_metrics 是 PRF 计算核心，194 行，涉及 chunk_boundary_prf、
+figure_caption_prf 等独立函数。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 119 后）：8795 pass / 0 fail / 13 skip（HEAD `787fce5`）
+
+---
