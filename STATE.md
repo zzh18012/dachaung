@@ -2050,3 +2050,39 @@
 - 本 worktree（Round 40 后）：1178 pass / 0 fail / 9 skip（HEAD `0440698`）
 
 ---
+
+## Round 41（2026-08-04）：候选 AT 续 — kreuzberg_parser.py 内部 helper 覆盖
+
+### 做了什么
+- 候选 AT 续：新建 `tests/test_parsers_kreuzberg.py`，新增 53 个测试覆盖 `app/parsers/kreuzberg_parser.py`（246 行）的全部纯函数 helper。
+- 不调用 kreuzberg 库，只测内部算法逻辑。
+- 至此 parser 层全覆盖：base.py / fallback_parser.py / kreuzberg_parser.py / markdown_parser.py / text_parser.py / html_parser.py / ipynb_parser.py。
+- 重点覆盖项：
+  - **常量 + `_HEADING_RE`** 9 个：_SHORT_LINE_MAX=80、_HEADING_RE 是 compiled pattern、h1-h6 匹配、h7 拒、无空格拒、无内容拒、trailing 文本捕获、纯文本不匹配
+  - **`_classify_line`** 15 个：空/whitespace→paragraph、ATX h1/h3→heading + level、ATX 无 heuristic 键、短无句号→heading 启发式、短带 ./。/?/!/！/？→paragraph、长行→paragraph、ATX 优先于 short_line、strip 应用
+  - **`_make_locator`** 6 个：pdf page=1 + 占位符、pdf 忽略 paragraph_index、docx paragraph_index + 启发式标记、docx 无 page、docx index 跟随入参、pdf 始终 page=1
+  - **`_split_content_to_elements`** 18 个：空、单/双段落、ATX heading 提取、短行 heading、heading + body 同 block、heading + 多行 rest 触发 paragraph、paragraph 含 kreuzberg_heuristic、ATX heading 无 heuristic 键、heading confidence=0.6、paragraph confidence=0.5、rest paragraph confidence=0.5、element_id 连续、docx locator 有 paragraph_index、pdf locator page=1 占位、多空行单分隔、block 空白 strip、第二返回值固定空 list
+  - **KreuzbergParser 类** 5 个：name='kreuzberg'、version 字符串、默认 include_document_structure=True、可禁用、继承 Parser
+- 无源码改动。
+
+### 撞墙记录
+- **Wall 1**：docstring 含 `\s+` 字面量 → SyntaxWarning。改为「空白」描述，去掉反斜杠。
+
+### 下一步建议
+- 候选 AS：app/hash.py 内部边角补强（17 → ~25 个测试）
+- 候选 AP：evaluation/runner.py 评测指标聚合边角
+- 候选 AQ：evaluation/manifest.py / annotation.py 边角
+- 候选 AV：app/chunkers/structural.py 已有 40 个，可补 source_element_ids / 长文本极端切分
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AP（evaluation/runner.py）。理由：
+1. parser 层已全覆盖（7 个 parser 全有专门测试）
+2. evaluation 层是另一个独立模块，runner.py 是核心
+3. 评测指标聚合（counts sum、success_rates rate、ratio macro avg）有复杂边角
+4. 之后转 AQ（manifest/annotation）形成 evaluation 层全覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 41 后）：1231 pass / 0 fail / 9 skip（HEAD `0001aee`）
+
+---
