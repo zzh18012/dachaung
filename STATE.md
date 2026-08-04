@@ -2667,3 +2667,41 @@
 - 本 worktree（Round 56 后）：1971 pass / 0 fail / 9 skip（HEAD `063112c`）
 
 ---
+
+## Round 57（2026-08-04）：候选 BN — html_parser 内部边角覆盖
+
+### 做了什么
+- 候选 BN：新建 `tests/test_parsers_html_edges.py`（60 个测试）覆盖 `app/parsers/html_parser.py`（446 行）的模块级常量 + _HTMLDocParser 内部 + HtmlParser 边角，与已有 `test_parsers_html.py`（61 个）互补。
+- 重点覆盖项：
+  - **模块级常量** 10 个：_HTML_EXTENSIONS 是 tuple、_HEADING_LEVELS 是 dict 含 h1-h6、_SKIP_TAGS 是 set 含 script/style/head/title/meta/link/noscript、body tags 不在 SKIP 中、HtmlParser 类属性、是 Parser 子类
+  - **_HTMLDocParser 初始化** 8 个：document_id/elements/warnings 默认值、_section_path/_section_levels 空、_cur_kind=None、各 stack 空、_pre_depth/_blockquote_depth/_table_depth=0、继承 stdlib HTMLParser、4 个 handle 方法可调用
+  - **_detect_html_source_type 边角** 10 个：返 str、dotfile、双扩展名、混合大小写、无 suffix raise、unknown suffix raise、错误消息含 suffix、无 suffix 含 '(无)'、md 拒绝
+  - **_rows_to_md 边角** 5 个：返 str、jagged 用空填充、多列、单列、separator 三横
+  - **HtmlParser 实例复用** 3 个：可解析多文件、无 counter 状态泄漏、单文档 element_id 严格递增
+  - **错误路径 details** 2 个：file_not_found 含 path、unsupported_type 含 suffix
+  - **Document 字段** 4 个：metadata={html: True}、有 elements 时 warnings=[]、空 body 1 个 warning、warning 含非空 reason
+  - **大文件/Unicode/换行** 5 个：1000 段落大文件、UTF-8 emoji+CJK、CRLF、混合 LF/CRLF、单字节文件
+  - **malformed HTML** 6 个：未闭合 tag、自闭合 <br/>、注释忽略、DOCTYPE 忽略、属性含引号 URL、嵌套同级 heading
+  - **schema 通过 + element 字段** 5 个：通过 schema、confidence 固定 0.95、metadata 是 dict、source_locator 含 line、chunks/relations/errors 空
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。60 个新测试一次通过。
+
+### 下一步建议
+- 候选 BO：app/parsers/ipynb_parser.py 内部边角（已有 38 个直接测试）
+- 候选 BP：app/parsers/fallback_parser.py 内部边角（已有 79 个）
+- 候选 BQ：app/parsers/kreuzberg_parser.py 内部边角（已有 53 个）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BO（ipynb_parser 内部边角）。理由：
+1. ipynb_parser 含 cell 解析、kernel 语言检测、JSON 结构处理
+2. 已有 38 个直接测试，仍可补强大文件/notebook 边角
+3. 之后扩展到 BP/BQ 完成所有 parser 内部边角
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 57 后）：2031 pass / 0 fail / 9 skip（HEAD `8c922a8`）
+- 里程碑：突破 2000 passed
+
+---
