@@ -396,3 +396,368 @@ def test_aggregate_does_not_mutate_input():
     snapshot = copy.deepcopy(per_doc)
     aggregate_summary(per_doc)
     assert per_doc == snapshot
+
+
+# ---------- 边角补强（Round 45） ----------
+
+
+# 常量直接单测
+
+
+def test_count_metrics_constant_value():
+    from evaluation.report import _COUNT_METRICS
+    assert _COUNT_METRICS == ("element_count_total",)
+
+
+def test_success_bool_metrics_constant_value():
+    from evaluation.report import _SUCCESS_BOOL_METRICS
+    assert _SUCCESS_BOOL_METRICS == ("pipeline_success",)
+
+
+def test_ratio_metrics_constant_includes_known_metrics():
+    from evaluation.report import _RATIO_METRICS
+    expected = {
+        "schema_valid",
+        "pdf_locator_valid_ratio",
+        "docx_locator_valid_ratio",
+        "image_resource_exists_ratio",
+        "chunk_reference_intact_ratio",
+        "text_preservation_equal",
+        "text_char_multiset_precision",
+        "text_char_multiset_recall",
+        "heading_boundary_compliance",
+        "chunk_boundary_precision",
+        "chunk_boundary_recall",
+        "chunk_boundary_f1",
+    }
+    assert set(_RATIO_METRICS) == expected
+
+
+def test_ratio_metrics_constant_excludes_figure_caption():
+    """figure_caption_* 始终 null，不参与 macro average。"""
+    from evaluation.report import _RATIO_METRICS
+    assert "figure_caption_precision" not in _RATIO_METRICS
+    assert "figure_caption_recall" not in _RATIO_METRICS
+    assert "figure_caption_f1" not in _RATIO_METRICS
+
+
+def test_ratio_metrics_constant_excludes_count_and_silent_drop():
+    from evaluation.report import _RATIO_METRICS
+    assert "element_count_total" not in _RATIO_METRICS
+    assert "silent_drop_count" not in _RATIO_METRICS
+
+
+# get_dependency_versions shape
+
+
+def test_get_dependency_versions_returns_dict():
+    from evaluation.report import get_dependency_versions
+    deps = get_dependency_versions()
+    assert isinstance(deps, dict)
+
+
+def test_get_dependency_versions_has_three_known_packages():
+    from evaluation.report import get_dependency_versions
+    deps = get_dependency_versions()
+    for pkg in ("pdfplumber", "python-docx", "pypdfium2"):
+        assert pkg in deps
+
+
+def test_get_dependency_versions_values_type():
+    """值是 str（已安装）或 None（未安装）。"""
+    from evaluation.report import get_dependency_versions
+    deps = get_dependency_versions()
+    for v in deps.values():
+        assert v is None or isinstance(v, str)
+
+
+# get_git_provenance shape
+
+
+def test_get_git_provenance_returns_dict_with_two_keys(tmp_path: Path):
+    from evaluation.report import get_git_provenance
+    out = get_git_provenance(tmp_path)
+    assert set(out.keys()) == {"git_commit", "git_dirty"}
+
+
+def test_get_git_provenance_in_real_repo_returns_commit():
+    """在当前项目根（git 仓库）跑一次，commit 应是非空字符串。"""
+    from evaluation.report import get_git_provenance
+    project_root = Path(__file__).resolve().parent.parent
+    out = get_git_provenance(project_root)
+    # 在 git 仓库内 → commit 非空，dirty 是 bool
+    assert out["git_commit"] is None or isinstance(out["git_commit"], str)
+    assert isinstance(out["git_dirty"], bool)
+
+
+def test_get_git_provenance_subprocess_failure_safe():
+    """传一个不存在的路径 → subprocess 失败 → commit=None, dirty=True。"""
+    from evaluation.report import get_git_provenance
+    out = get_git_provenance(Path("Z:/nonexistent_path_xyz"))
+    # 不抛异常即合格
+    assert "git_commit" in out
+    assert "git_dirty" in out
+
+
+# build_provenance 字段完整性
+
+
+def test_build_provenance_has_nine_top_level_keys(tmp_path: Path):
+    """provenance 应含 9 个字段。"""
+    out = build_provenance(
+        project_root=tmp_path,
+        parser_name="fallback",
+        max_chars=800,
+        parser_version="v1",
+    )
+    expected_keys = {
+        "git_commit", "git_dirty",
+        "evaluator_version", "report_version",
+        "parser_name", "parser_version",
+        "dependencies", "max_chars", "run_timestamp_iso",
+    }
+    assert set(out.keys()) == expected_keys
+
+
+def test_build_provenance_max_chars_int_type(tmp_path: Path):
+    """max_chars 应被 int() 转换（即便传 float）。"""
+    out = build_provenance(
+        project_root=tmp_path,
+        parser_name="fallback",
+        max_chars=800.0,  # float
+        parser_version=None,
+    )
+    assert out["max_chars"] == 800
+    assert isinstance(out["max_chars"], int)
+
+
+def test_build_provenance_parser_name_passthrough(tmp_path: Path):
+    out = build_provenance(
+        project_root=tmp_path,
+        parser_name="custom_parser",
+        max_chars=800,
+        parser_version=None,
+    )
+    assert out["parser_name"] == "custom_parser"
+
+
+def test_build_provenance_parser_version_passthrough(tmp_path: Path):
+    out = build_provenance(
+        project_root=tmp_path,
+        parser_name="fallback",
+        max_chars=800,
+        parser_version="custom=1.2.3",
+    )
+    assert out["parser_version"] == "custom=1.2.3"
+
+
+def test_build_provenance_run_timestamp_iso_format(tmp_path: Path):
+    """run_timestamp_iso 应是 ISO 8601（含 T 与 timezone）。"""
+    out = build_provenance(
+        project_root=tmp_path,
+        parser_name="fallback",
+        max_chars=800,
+        parser_version=None,
+    )
+    ts = out["run_timestamp_iso"]
+    assert isinstance(ts, str)
+    assert "T" in ts
+    # 应含时区偏移（+HH:MM 或 Z）
+    assert "+" in ts or "-" in ts[-6:] or ts.endswith("Z")
+
+
+def test_build_provenance_evaluator_version_matches_constant(tmp_path: Path):
+    """evaluator_version 来自 EVALUATOR_VERSION（指示线 v1.1，**不要改**）。"""
+    from evaluation import EVALUATOR_VERSION
+    out = build_provenance(
+        project_root=tmp_path,
+        parser_name="fallback",
+        max_chars=800,
+        parser_version=None,
+    )
+    assert out["evaluator_version"] == EVALUATOR_VERSION
+
+
+def test_build_provenance_report_version_matches_constant(tmp_path: Path):
+    from evaluation import REPORT_VERSION
+    out = build_provenance(
+        project_root=tmp_path,
+        parser_name="fallback",
+        max_chars=800,
+        parser_version=None,
+    )
+    assert out["report_version"] == REPORT_VERSION
+
+
+def test_build_provenance_dependencies_subfield(tmp_path: Path):
+    """provenance.dependencies 是 dict（含 pdfplumber/python-docx/pypdfium2）。"""
+    out = build_provenance(
+        project_root=tmp_path,
+        parser_name="fallback",
+        max_chars=800,
+        parser_version=None,
+    )
+    deps = out["dependencies"]
+    assert isinstance(deps, dict)
+    assert "pdfplumber" in deps
+    assert "python-docx" in deps
+    assert "pypdfium2" in deps
+
+
+# build_devset_section 字段完整性
+
+
+def test_build_devset_section_six_keys():
+    from evaluation.report import build_devset_section
+
+    class FakeManifest:
+        devset_status = "incomplete"
+        file_count = 5
+        content_group_count = 3
+        pdf_count = 2
+        docx_count = 3
+        categories_covered = ["report", "table"]
+
+    out = build_devset_section(FakeManifest())
+    expected = {
+        "status", "file_count", "content_group_count",
+        "pdf_count", "docx_count", "categories_covered",
+    }
+    assert set(out.keys()) == expected
+
+
+def test_build_devset_section_passes_through_all_values():
+    from evaluation.report import build_devset_section
+
+    class FakeManifest:
+        devset_status = "complete"
+        file_count = 100
+        content_group_count = 50
+        pdf_count = 30
+        docx_count = 70
+        categories_covered = ["a", "b", "c"]
+
+    out = build_devset_section(FakeManifest())
+    assert out["status"] == "complete"
+    assert out["file_count"] == 100
+    assert out["content_group_count"] == 50
+    assert out["pdf_count"] == 30
+    assert out["docx_count"] == 70
+    assert out["categories_covered"] == ["a", "b", "c"]
+
+
+# aggregate_summary shape
+
+
+def test_aggregate_summary_has_four_top_level_keys():
+    summary = aggregate_summary([])
+    expected = {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
+    assert set(summary.keys()) == expected
+
+
+def test_aggregate_summary_counts_section_includes_element_count_total():
+    summary = aggregate_summary([])
+    assert "element_count_total" in summary["counts"]
+
+
+def test_aggregate_summary_success_rates_includes_pipeline_success():
+    summary = aggregate_summary([])
+    assert "pipeline_success" in summary["success_rates"]
+
+
+def test_aggregate_summary_ratio_macro_averages_includes_all_ratio_metrics():
+    """ratio_macro_averages 应含 _RATIO_METRICS 全部 12 个 key。"""
+    from evaluation.report import _RATIO_METRICS
+    summary = aggregate_summary([])
+    for name in _RATIO_METRICS:
+        assert name in summary["ratio_macro_averages"]
+
+
+def test_aggregate_summary_counts_sum_field_is_int_or_none():
+    summary = aggregate_summary([_make_per_doc()])
+    assert summary["counts"]["element_count_total"]["sum"] == 5
+
+
+def test_aggregate_summary_counts_participating_docs_field():
+    summary = aggregate_summary([_make_per_doc(), _make_per_doc()])
+    assert summary["counts"]["element_count_total"]["participating_docs"] == 2
+
+
+def test_aggregate_summary_success_rate_rate_value():
+    summary = aggregate_summary([_make_per_doc(), _make_per_doc()])
+    rate = summary["success_rates"]["pipeline_success"]["rate"]
+    assert rate == 1.0
+
+
+def test_aggregate_summary_success_rate_total_field():
+    summary = aggregate_summary([_make_per_doc()])
+    assert summary["success_rates"]["pipeline_success"]["total"] == 1
+
+
+def test_aggregate_summary_success_rate_success_count_field():
+    summary = aggregate_summary([_make_per_doc(), _make_per_doc()])
+    assert summary["success_rates"]["pipeline_success"]["success_count"] == 2
+
+
+def test_aggregate_summary_ratio_macro_average_value():
+    """单文档：macro_average = 该文档值。"""
+    summary = aggregate_summary([_make_per_doc()])
+    avg = summary["ratio_macro_averages"]["schema_valid"]["macro_average"]
+    assert avg == 1.0
+
+
+def test_aggregate_summary_ratio_participating_docs_field():
+    summary = aggregate_summary([_make_per_doc(), _make_per_doc()])
+    info = summary["ratio_macro_averages"]["schema_valid"]
+    assert info["participating_docs"] == 2
+
+
+def test_aggregate_summary_ratio_not_evaluated_field():
+    summary = aggregate_summary([_make_per_doc(), _make_per_doc()])
+    info = summary["ratio_macro_averages"]["schema_valid"]
+    assert info["not_evaluated"] == 0
+
+
+def test_aggregate_summary_silent_drop_total_zero_when_all_zero():
+    summary = aggregate_summary([_make_per_doc(), _make_per_doc()])
+    assert summary["silent_drop_total"] == 0
+
+
+def test_aggregate_summary_silent_drop_total_sums():
+    pd1 = _make_per_doc({"silent_drop_count": {"value": 3, "reason": None}})
+    pd2 = _make_per_doc({"silent_drop_count": {"value": 5, "reason": None}})
+    summary = aggregate_summary([pd1, pd2])
+    assert summary["silent_drop_total"] == 8
+
+
+def test_aggregate_summary_silent_drop_total_excludes_null():
+    pd1 = _make_per_doc({"silent_drop_count": {"value": 3, "reason": None}})
+    pd2 = _make_per_doc({"silent_drop_count": {"value": None, "reason": "no_expectations"}})
+    summary = aggregate_summary([pd1, pd2])
+    assert summary["silent_drop_total"] == 3
+
+
+def test_aggregate_summary_empty_list_success_rate_rate_is_none():
+    """空 per_doc → rate 是 None（分母为 0）。"""
+    summary = aggregate_summary([])
+    assert summary["success_rates"]["pipeline_success"]["rate"] is None
+
+
+def test_aggregate_summary_empty_list_success_rate_total_zero():
+    summary = aggregate_summary([])
+    assert summary["success_rates"]["pipeline_success"]["total"] == 0
+
+
+def test_aggregate_summary_empty_list_success_rate_success_count_zero():
+    summary = aggregate_summary([])
+    assert summary["success_rates"]["pipeline_success"]["success_count"] == 0
+
+
+def test_aggregate_summary_empty_list_counts_participating_docs_zero():
+    summary = aggregate_summary([])
+    assert summary["counts"]["element_count_total"]["participating_docs"] == 0
+
+
+def test_aggregate_summary_empty_list_silent_drop_total_none():
+    summary = aggregate_summary([])
+    assert summary["silent_drop_total"] is None
