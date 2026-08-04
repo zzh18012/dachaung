@@ -439,3 +439,616 @@ def test_chunk_id_empty_string_fails():
     doc["chunks"][0]["chunk_id"] = ""
     with pytest.raises(SchemaValidationError):
         validate(doc)
+
+
+# ---------- 边角与缺漏补强（Round 32） ----------
+
+
+# load_schema 边角
+
+
+def test_load_schema_missing_file_raises_filenotfound(tmp_path: Path):
+    """load_schema 对不存在的路径应抛 FileNotFoundError。"""
+    with pytest.raises(FileNotFoundError):
+        load_schema(tmp_path / "nonexistent.schema.json")
+
+
+def test_load_schema_accepts_str_path():
+    """load_schema 接受 str 路径。"""
+    from app.schema import SCHEMA_PATH
+    s = load_schema(str(SCHEMA_PATH))
+    assert s["title"].startswith("KVFS Document")
+
+
+def test_load_schema_returns_independent_dict():
+    """每次 load_schema 应返回新 dict（修改不影响下次）。"""
+    s1 = load_schema()
+    s1["$comment_mutated"] = "x"
+    s2 = load_schema()
+    assert "$comment_mutated" not in s2
+
+
+def test_load_schema_default_path_is_documents_schema():
+    """不传 path 时使用 SCHEMA_PATH。"""
+    s = load_schema()
+    assert "properties" in s
+    assert "elements" in s["properties"]
+
+
+# SchemaValidationError 结构
+
+
+def test_schema_validation_error_default_errors_empty():
+    """SchemaValidationError 不传 errors 时默认空 list。"""
+    e = SchemaValidationError("boom")
+    assert e.errors == []
+    assert str(e) == "boom"
+
+
+def test_schema_validation_error_errors_passed_through():
+    """errors kwarg 应被保留。"""
+    errs = [{"path": ["x"], "message": "m"}]
+    e = SchemaValidationError("boom", errors=errs)
+    assert e.errors is errs
+
+
+def test_validate_errors_attribute_populated_on_failure():
+    """validate 失败时 SchemaValidationError.errors 应有非空 list。"""
+    doc = _pdf_doc()
+    del doc["source_hash"]
+    with pytest.raises(SchemaValidationError) as exc:
+        validate(doc)
+    assert isinstance(exc.value.errors, list)
+    assert len(exc.value.errors) >= 1
+    err0 = exc.value.errors[0]
+    assert "path" in err0
+    assert "message" in err0
+    assert "schema_path" in err0
+
+
+def test_validate_collects_multiple_errors():
+    """validate 应聚合多个错误（不是只第一个）。"""
+    doc = _pdf_doc()
+    # 制造 2 处错误：删 source_hash + 改 document_id 为空
+    del doc["source_hash"]
+    doc["document_id"] = ""
+    with pytest.raises(SchemaValidationError) as exc:
+        validate(doc)
+    assert len(exc.value.errors) >= 2
+
+
+def test_validate_with_custom_schema(tmp_path: Path):
+    """validate 接受临时 schema（不读磁盘默认 schema）。"""
+    custom_schema = {
+        "type": "object",
+        "required": ["x"],
+        "properties": {"x": {"type": "integer"}},
+    }
+    validate({"x": 1}, schema=custom_schema)
+    with pytest.raises(SchemaValidationError):
+        validate({"x": "not int"}, schema=custom_schema)
+
+
+def test_validate_custom_schema_overrides_default():
+    """传 schema=None 应等同于不传。"""
+    doc = _pdf_doc()
+    validate(doc, schema=None)  # 不抛
+
+
+# is_valid 边角
+
+
+def test_is_valid_with_custom_schema():
+    """is_valid 也接受 schema kwarg。"""
+    custom = {"type": "object", "required": ["a"]}
+    assert is_valid({"a": 1}, schema=custom) is True
+    assert is_valid({}, schema=custom) is False
+
+
+def test_is_valid_does_not_raise():
+    """is_valid 应吞掉 SchemaValidationError，不向上抛。"""
+    doc = _pdf_doc()
+    doc["source_hash"] = "bad"
+    # 不应抛
+    result = is_valid(doc)
+    assert result is False
+
+
+# validate_file 边角
+
+
+def test_validate_file_accepts_str_path(tmp_path: Path):
+    """validate_file 接受 str 路径。"""
+    import json
+    p = tmp_path / "out.json"
+    p.write_text(json.dumps(_pdf_doc()), encoding="utf-8")
+    validate_file(str(p))
+
+
+def test_validate_file_invalid_json_raises(tmp_path: Path):
+    """非法 JSON 文件应抛 json.JSONDecodeError（不是 SchemaValidationError）。"""
+    import json
+    p = tmp_path / "broken.json"
+    p.write_text("{not json}", encoding="utf-8")
+    with pytest.raises(json.JSONDecodeError):
+        validate_file(p)
+
+
+def test_validate_file_invalid_content_raises_validation_error(tmp_path: Path):
+    """合法 JSON 但内容不合规 → SchemaValidationError。"""
+    import json
+    p = tmp_path / "bad.json"
+    p.write_text(json.dumps({"wrong": "shape"}), encoding="utf-8")
+    with pytest.raises(SchemaValidationError):
+        validate_file(p)
+
+
+def test_validate_file_with_custom_schema(tmp_path: Path):
+    """validate_file 也接受 schema kwarg。"""
+    import json
+    custom = {"type": "object", "required": ["x"]}
+    p = tmp_path / "out.json"
+    p.write_text(json.dumps({"x": 1}), encoding="utf-8")
+    validate_file(p, schema=custom)
+
+
+# schema keyword 边角：minLength
+
+
+def test_source_path_empty_string_fails():
+    doc = _pdf_doc()
+    doc["source_path"] = ""
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_parser_name_empty_string_fails():
+    doc = _pdf_doc()
+    doc["parser_name"] = ""
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_parser_version_empty_string_fails():
+    doc = _pdf_doc()
+    doc["parser_version"] = ""
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_warning_code_empty_string_fails():
+    doc = _pdf_doc()
+    doc["warnings"].append({"code": "", "reason": "x"})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_warning_reason_empty_string_fails():
+    doc = _pdf_doc()
+    doc["warnings"].append({"code": "x", "reason": ""})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_error_code_empty_string_fails():
+    doc = _pdf_doc()
+    doc["errors"].append({"code": "", "message": "x"})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_error_message_empty_string_fails():
+    doc = _pdf_doc()
+    doc["errors"].append({"code": "x", "message": ""})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_relation_type_empty_string_fails():
+    doc = _pdf_doc()
+    doc["relations"].append({"type": "", "from_id": "e1", "to_id": "e2"})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_relation_from_id_empty_string_fails():
+    doc = _pdf_doc()
+    doc["relations"].append({"type": "next", "from_id": "", "to_id": "e2"})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_relation_to_id_empty_string_fails():
+    doc = _pdf_doc()
+    doc["relations"].append({"type": "next", "from_id": "e1", "to_id": ""})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_element_id_empty_string_fails():
+    doc = _pdf_doc()
+    doc["elements"][0]["element_id"] = ""
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# source_hash pattern 边角
+
+
+def test_source_hash_uppercase_hex_fails():
+    """pattern 是 ^[0-9a-f]{64}$（小写），大写 hex 应拒绝。"""
+    doc = _pdf_doc()
+    doc["source_hash"] = "A" * 64
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_source_hash_too_short_fails():
+    doc = _pdf_doc()
+    doc["source_hash"] = "a" * 63
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_source_hash_too_long_fails():
+    doc = _pdf_doc()
+    doc["source_hash"] = "a" * 65
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_source_hash_with_underscore_fails():
+    doc = _pdf_doc()
+    doc["source_hash"] = "a" * 60 + "_123"  # 非法字符
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# confidence 边界
+
+
+def test_confidence_boundary_zero_passes():
+    doc = _pdf_doc()
+    doc["elements"][0]["confidence"] = 0
+    validate(doc)
+
+
+def test_confidence_boundary_one_passes():
+    doc = _pdf_doc()
+    doc["elements"][0]["confidence"] = 1
+    validate(doc)
+
+
+# bbox 数字类型
+
+
+def test_pdf_locator_bbox_floats_pass():
+    """bbox items 类型是 number，浮点也接受。"""
+    doc = _pdf_doc()
+    doc["elements"][0]["source_locator"] = {
+        "page": 1, "bbox": [10.5, 20.5, 110.5, 220.5]
+    }
+    validate(doc)
+
+
+def test_pdf_locator_bbox_with_strings_fails():
+    """bbox items 必须是 number，字符串不接受。"""
+    doc = _pdf_doc()
+    doc["elements"][0]["source_locator"] = {
+        "page": 1, "bbox": ["a", "b", "c", "d"]
+    }
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# docx_locator 各种合法字段
+
+
+def test_docx_locator_with_paragraph_index_only():
+    doc = _make_doc_with_source_type(
+        "docx", {"paragraph_index": 0}
+    )
+    validate(doc)
+
+
+def test_docx_locator_with_table_indices():
+    doc = _make_doc_with_source_type(
+        "docx", {"table_index": 0, "row_index": 1, "col_index": 2}
+    )
+    validate(doc)
+
+
+def test_docx_locator_with_relationship_id():
+    doc = _make_doc_with_source_type(
+        "docx", {"relationship_id": "rId1"}
+    )
+    validate(doc)
+
+
+def test_docx_locator_with_section_int():
+    doc = _make_doc_with_source_type(
+        "docx", {"section": 0}
+    )
+    validate(doc)
+
+
+def test_docx_locator_with_section_string():
+    doc = _make_doc_with_source_type(
+        "docx", {"section": "main"}
+    )
+    validate(doc)
+
+
+def test_docx_locator_with_run_index():
+    doc = _make_doc_with_source_type(
+        "docx", {"paragraph_index": 0, "run_index": 1}
+    )
+    validate(doc)
+
+
+def test_docx_locator_paragraph_index_negative_fails():
+    """paragraph_index 必须 ≥ 0。"""
+    doc = _make_doc_with_source_type(
+        "docx", {"paragraph_index": -1}
+    )
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_docx_locator_table_index_negative_fails():
+    doc = _make_doc_with_source_type(
+        "docx", {"table_index": -1}
+    )
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_docx_locator_run_index_negative_fails():
+    doc = _make_doc_with_source_type(
+        "docx", {"paragraph_index": 0, "run_index": -1}
+    )
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# source_span 边角
+
+
+def test_source_span_negative_end_fails():
+    """source_span.end 也必须 ≥ 0。"""
+    doc = _pdf_doc()
+    doc["chunks"][0]["source_spans"] = [
+        {"element_id": "e1", "start": 0, "end": -1}
+    ]
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_source_span_element_id_empty_fails():
+    doc = _pdf_doc()
+    doc["chunks"][0]["source_spans"] = [
+        {"element_id": "", "start": 0, "end": 1}
+    ]
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# warning/error details 必须是 object
+
+
+def test_warning_details_array_fails():
+    """warning.details 必须是 object，list 不接受。"""
+    doc = _pdf_doc()
+    doc["warnings"].append({"code": "x", "reason": "y", "details": []})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_warning_details_string_fails():
+    doc = _pdf_doc()
+    doc["warnings"].append({"code": "x", "reason": "y", "details": "wrong"})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_error_details_array_fails():
+    doc = _pdf_doc()
+    doc["errors"].append({"code": "x", "message": "y", "details": []})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_warning_with_valid_details_object_passes():
+    doc = _pdf_doc()
+    doc["warnings"].append({"code": "x", "reason": "y", "details": {"k": "v"}})
+    validate(doc)
+
+
+def test_error_with_valid_details_object_passes():
+    doc = _pdf_doc()
+    doc["errors"].append({"code": "x", "message": "y", "details": {"k": "v"}})
+    validate(doc)
+
+
+# warning/error additionalProperties
+
+
+def test_warning_additional_property_fails():
+    doc = _pdf_doc()
+    doc["warnings"].append({"code": "x", "reason": "y", "extra": True})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_error_additional_property_fails():
+    doc = _pdf_doc()
+    doc["errors"].append({"code": "x", "message": "y", "extra": True})
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# ipynb locator 边角
+
+
+def test_ipynb_locator_with_line_and_section_path():
+    """ipynb locator 可以含 line + section_path（可选字段）。"""
+    doc = _make_doc_with_source_type(
+        "ipynb",
+        {"cell_index": 0, "cell_type": "code", "line": 5, "section_path": "X > Y"}
+    )
+    validate(doc)
+
+
+def test_ipynb_locator_cell_index_negative_fails():
+    """cell_index 必须 ≥ 0。"""
+    doc = _make_doc_with_source_type(
+        "ipynb", {"cell_index": -1, "cell_type": "code"}
+    )
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_ipynb_locator_line_zero_fails():
+    """line 必须 ≥ 1。"""
+    doc = _make_doc_with_source_type(
+        "ipynb", {"cell_index": 0, "cell_type": "code", "line": 0}
+    )
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# document_id 与 schema_version 关键字
+
+
+def test_schema_version_wrong_string_fails():
+    """schema_version 是 const "0.1.0"，其他值都拒。"""
+    doc = _pdf_doc()
+    doc["schema_version"] = "1.0.0"
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_schema_version_non_string_fails():
+    doc = _pdf_doc()
+    doc["schema_version"] = 0.1
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# chunk source_element_ids 边角
+
+
+def test_chunk_source_element_ids_with_empty_string_only_fails():
+    """列表只有 1 个空字符串元素也不行。"""
+    doc = _pdf_doc()
+    doc["chunks"][0]["source_element_ids"] = [""]
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_chunk_source_element_ids_mixed_empty_and_non_empty_fails():
+    """列表里有一个空字符串就拒（即便其他非空）。"""
+    doc = _pdf_doc()
+    doc["chunks"][0]["source_element_ids"] = ["e1", ""]
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# elements/chunks/relations/warnings/errors 类型必须是 array
+
+
+def test_elements_non_array_fails():
+    doc = _pdf_doc()
+    doc["elements"] = {}
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_chunks_non_array_fails():
+    doc = _pdf_doc()
+    doc["chunks"] = "not list"
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+def test_metadata_non_object_fails():
+    doc = _pdf_doc()
+    doc["metadata"] = []
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# content/resource_path 同时缺失 vs 同时存在的语义
+
+
+def test_element_with_only_resource_path_passes():
+    """anyOf 满足一项即可，仅 resource_path 也 OK。"""
+    doc = _pdf_doc()
+    doc["elements"][0]["content"] = None
+    doc["elements"][0]["resource_path"] = "outputs/imgs/e1.png"
+    validate(doc)
+
+
+def test_element_with_only_content_passes():
+    """仅 content（无 resource_path）→ 也 OK。"""
+    doc = _pdf_doc()
+    # e1 已经是这种形态
+    validate(doc)
+
+
+def test_element_with_null_content_and_null_resource_path_fails():
+    """content 和 resource_path 都是 null → anyOf 失败。"""
+    doc = _pdf_doc()
+    doc["elements"][0]["content"] = None
+    doc["elements"][0]["resource_path"] = None
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# locator 非对象
+
+
+def test_pdf_locator_non_object_fails():
+    """source_locator 必须是 object；非 object 在 schema 根层级会被 properties.source_locator:object 拒。"""
+    doc = _pdf_doc()
+    doc["elements"][0]["source_locator"] = "not object"
+    with pytest.raises(SchemaValidationError):
+        validate(doc)
+
+
+# pdf_locator additionalProperties=true（可加自由字段）
+
+
+def test_pdf_locator_with_extra_field_passes():
+    """pdf_locator additionalProperties=true，加自由字段应通过。"""
+    doc = _pdf_doc()
+    doc["elements"][0]["source_locator"] = {
+        "page": 1, "bbox": [0, 0, 10, 10], "extra_meta": "ok"
+    }
+    validate(doc)
+
+
+def test_docx_locator_with_extra_field_passes():
+    """docx_locator additionalProperties=true。"""
+    doc = _make_doc_with_source_type(
+        "docx", {"paragraph_index": 0, "custom": "x"}
+    )
+    validate(doc)
+
+
+# warning.details 和 error.details 既可空 object 也可嵌套
+
+
+def test_warning_details_empty_object_passes():
+    doc = _pdf_doc()
+    doc["warnings"].append({"code": "x", "reason": "y", "details": {}})
+    validate(doc)
+
+
+def test_warning_details_nested_complex_object_passes():
+    doc = _pdf_doc()
+    doc["warnings"].append({
+        "code": "x", "reason": "y",
+        "details": {"k1": [1, 2], "k2": {"deep": True}},
+    })
+    validate(doc)
