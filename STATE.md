@@ -9016,3 +9016,72 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 第六轮可深入 aggregate_summary/build_devset_section/build_provenance/序列化等。
 
 ---
+
+## Round 153（2026-08-05）：evaluation/report.py 第六轮（edges5）
+
+### 目标
+- 给 evaluation/report.py（200 行，已有 base/edges/edges2-4 共 475 测试）补第六轮
+- 深入常量精确性、aggregate_summary 边界、build_provenance 边界、各函数返回结构
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges5.py`（101 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量精确性**：
+  - _RATIO_METRICS 12 项（schema_valid/pdf_locator_valid_ratio/docx_locator_valid_ratio/
+    image_resource_exists_ratio/chunk_reference_intact_ratio/text_preservation_equal/
+    text_char_multiset_precision/text_char_multiset_recall/heading_boundary_compliance/
+    chunk_boundary_precision/chunk_boundary_recall/chunk_boundary_f1）
+  - figure_caption_* 不在 _RATIO_METRICS（始终 null）
+  - _COUNT_METRICS = ("element_count_total",)
+  - _SUCCESS_BOOL_METRICS = ("pipeline_success",)
+  - 全是 tuple、无重复
+- **aggregate_summary 深度**：
+  - 空 list → sum=None / rate=None / silent_drop_total=None / all macro_average=None
+  - value=0 参与（不算 None）
+  - value=None 跳过
+  - missing key 跳过
+  - success_rate = success_count / total（missing key 仍计入 total）
+  - ratio macro average：单值/混合/None 跳过
+  - silent_drop_count：sum + None 跳过 + 0 参与
+  - 4 个顶层 key（counts/success_rates/ratio_macro_averages/silent_drop_total）
+  - 不混 "composite_score"（不混合类型）
+  - ratio_macro_averages 含全部 12 个 _RATIO_METRICS key
+  - 不修改输入、幂等
+- **build_provenance 深度**：
+  - max_chars：float 转 int、负值、零、数字字符串
+  - parser_name 空串/特殊字符
+  - parser_version None/空串
+  - dependencies 含 3 个 key（pdfplumber/python-docx/pypdfium2）
+  - run_timestamp_iso 可解析、有时区偏移
+  - evaluator_version/report_version 与常量一致
+  - 9 个顶层 key 精确
+  - 每次返回新 dict、JSON 可序列化
+- **get_dependency_versions**：3 keys 精确、pdfplumber 非 None、值 str 或 None、新 dict 每次调用
+- **get_git_provenance**：worktree 中 commit 是 40 hex chars、非 git 目录 commit=None dirty=False
+- **build_devset_section**：6 keys 精确、值透传、categories_covered 共享引用、新 dict 每次调用
+- **模块结构**：__all__ 5 项精确、imports 完整、docstring 提及 "聚合"/"不混合"、无 _silence_unused
+- **签名深度**：各函数参数名、无默认值、dict 返回类型注解
+- **综合行为**：idempotent、不修改输入、可独立组合
+
+### 撞墙记录
+- **Wall 1**：非 git 目录测试期望 dirty=True，实际 git status --porcelain 返回非零，
+  bool(False and ...) = False（dirty 默认 True 仅在 except 分支）。修复：改期望为 False。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 153 后）：12102 pass / 0 fail / 13 skip（HEAD `35758a7`）
+
+### 下一步建议
+- 候选 HQ：evaluation/manifest.py 第六轮
+- 候选 HR：app/cli.py 第七轮
+- 候选 HS：evaluation/cli.py 第六轮
+- 候选 HT：evaluation/metrics.py 第六轮
+- 候选 HU：evaluation/annotation_metrics.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HQ（evaluation/manifest.py 第六轮）。manifest.py 是 manifest 加载/校验核心，
+第六轮可深入 DocumentEntry/Manifest 类、路径解析、expected_failures 等。
+
+---
