@@ -3482,3 +3482,58 @@
 - 本 worktree（Round 75 后）：3693 pass / 0 fail / 12 skip（HEAD `6140e4b`）
 
 ---
+
+## Round 76（2026-08-05）：候选 CM — app/parsers/html_parser.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CM：新建 `tests/test_parsers_html_edges2.py`（124 个测试）覆盖
+  `app/parsers/html_parser.py`（446 行）的深度边角，与已有 `test_parsers_html.py`（61）+
+  `test_parsers_html_edges.py`（60）互补。
+- 重点覆盖项：
+  - **模块常量深度** 18 个：_HTML_EXTENSIONS 数量/值、_HEADING_LEVELS 6 项 keys/values、
+    _SKIP_TAGS 7 项 set 含 script/style/head/title/meta/link/noscript 排除 body/p
+  - **_detect_html_source_type** 13 个：.HTML/.HTM 大写接受、double extension、
+    .md/.txt/.docx/无扩展名抛 unsupported_type、ParserError 类型、details.suffix 精确值
+  - **_rows_to_md** 7 个：空 list → ""、单行单列、3 行输出 4 行、separator 数 = 列数、jagged
+  - **_HTMLDocParser 初始状态** 16 个：document_id/elements/warnings/各 stack 默认值、
+    4 个 handle 方法 callable
+  - **SAX 回调深度** 28 个：h1/h6 heading level metadata、p paragraph、ul/ol li ordered
+    + marker metadata、pre → paragraph kind=preformatted、blockquote → paragraph
+    kind=blockquote、table → row_count/col_count/source=html_table、img resource_path
+    + alt metadata、img 无/空/whitespace src 跳过、self-closing img、hr 不创建 element、
+    br 在 paragraph 加空格、script/style/head/title 内容跳过、loose text 成 paragraph、
+    whitespace-only 不创建 element
+  - **section_path** 3 个：h1+h2 嵌套、h1+h2+h1 弹出、preamble 无 section_path
+  - **嵌套 table** 1 个：html_nested_table warning
+  - **confidence** 5 个：heading/paragraph/list_item=0.95、image/table=0.9
+  - **element 字段** 2 个：id 跨类型递增、parent_id 总 None
+  - **parse() 错误路径** 16 个：file_not_found details.path 精确、unsupported_type code、
+    目录 → file_not_found、metadata {"html": True}、parser_name/version、document_id
+    派生、chunks/relations/errors 空、UnicodeDecodeError 回退、空 body/仅 script →
+    html_no_content warning with reason
+  - **locator** 2 个：paragraph/heading 都含 line
+  - **模块结构** 13 个：_StdHTMLParser/Path/Document/Element/WarningRecord/Parser/
+    ParserError/make_document_id 导入、__all__ 含 HtmlParser、parse 签名
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。124 个新测试一次通过。
+
+### 下一步建议
+- 候选 CN：app/parsers/text_parser.py 边角
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CO：app/parsers/ipynb_parser.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CN（app/parsers/text_parser.py 边角）。理由：
+1. text_parser.py 是最简单的纯文本解析器
+2. 含 paragraph splitting、行号、line-based 处理
+3. 与 markdown/html/ipynb 形成 parsers/ 内的 stdlib 实现完整覆盖
+4. 之后 CE/CG/CO 都是第二轮，复杂度更高，更适合后续轮次
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 76 后）：3817 pass / 0 fail / 12 skip（HEAD `9d59a53`）
+
+---
