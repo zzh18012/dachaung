@@ -6101,3 +6101,80 @@ edges3 已饱和，但 edges4 仍有空间覆盖 HTMLParser 回调深度。
 - 本 worktree（Round 115 后）：8329 pass / 0 fail / 13 skip（HEAD `950c774`）
 
 ---
+
+## Round 116（2026-08-05）：app/parsers/text_parser.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_parsers_text_edges4.py`（新增，689 行）
+- 目标：`app/parsers/text_parser.py`（136 行，已有 88 测试）
+- 新增测试：92 个
+- 提交：`b32e5a8`
+
+### 覆盖深度
+- **_split_paragraphs 深度**：
+  - 单字符 paragraph
+  - paragraph 含 tab（保留）/ 仅 tab（视为空）
+  - 单 newline 不切段 / 双 newline 切段
+  - 仅 newline / CR / CRLF 全空 → []
+  - 多 CRLF 全空
+  - 3 段精确 line_no
+  - leading/trailing 空行
+  - 内部空行切段
+  - 行仅空格视为空
+  - 仅空白 → []
+  - 内部 multiple spaces 保留
+  - paragraph 内部 newline 保留
+  - 返回 list of tuples、tuple 长度 2、类型正确
+  - 多段计数
+  - 最大 line_no 正确
+  - 不修改输入
+- **_detect_text_source_type**：.Txt/.Text 混合大小写、.json/.csv/.xml/.yaml 拒、
+  details.suffix 精确（含空）
+- **_TEXT_EXTENSIONS**：= (".txt", ".text")、count=2、is tuple
+- **TextParser.parse 边界**：
+  - empty file → no_content warning
+  - whitespace-only → no_content warning
+  - 仅 newline → no_content warning
+  - 单字符 / 单行 → 一个 element
+  - metadata 仅 text key、值 True
+  - 所有 element type=paragraph、metadata={}
+  - source_locator 仅 line key
+  - 返回 Document 实例、chunks/relations/errors 空
+- **element_id 与 locator**：
+  - id 零填充格式 (e0000/e0001/e0002)
+  - locator line 严格递增
+  - 第一段 line=1
+  - leading blank 后 locator line=N
+- **parse 错误路径**：file_not_found、unsupported_type、
+  text_read_failed（含 details.exception_type）、
+  invalid utf8 → fallback replace
+- **TextParser 类属性**：name/version、instance match class、
+  issubclass(Parser)、parse 签名、docstring
+- **模块结构**：__all__ 精确 1 项、imports 完整（Path/Any/Document/Element/
+  WarningRecord/Parser/ParserError/make_document_id）、
+  模块 docstring 提及 paragraph/extensions、
+  常量同 import 同对象、_split_paragraphs callable + docstring
+- **多实例独立**：两实例不同对象、相同 name/version
+- 无源码改动。
+
+### 撞墙记录
+无。
+
+### 下一步建议
+- 候选 FT：evaluation/metrics.py 第四轮（381 行）
+- 候选 FU：evaluation/manifest.py 第四轮（239 行）
+- 候选 FV：evaluation/runner.py 第四轮（227 行）
+- 候选 FW：evaluation/annotation_metrics.py 第四轮（194 行）
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 FY：app/models.py 第三轮（154 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：所有 parser 已统一到 edges4。下一轮转 evaluation 模块。
+选 FT（evaluation/metrics.py 第四轮）。metrics.py 是评测核心，
+381 行较大，深度空间大。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 116 后）：8421 pass / 0 fail / 13 skip（HEAD `b32e5a8`）
+
+---
