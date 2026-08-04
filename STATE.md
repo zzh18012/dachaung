@@ -4552,3 +4552,61 @@
 - 本 worktree（Round 93 后）：5971 pass / 0 fail / 13 skip（HEAD `185e989`）
 
 ---
+
+## Round 94（2026-08-05）：候选 DI — app/cli.py 边角第三轮
+
+### 做了什么
+- 新建 `tests/test_cli_edges3.py`（97 个测试）第三轮覆盖 `app/cli.py`（535 行）。
+- 重点覆盖项：
+  - **`_emit_structured_error`**：写到 stderr、包含 schema_version/input/errors、
+    extra kwargs 透传到 errors[0]
+  - **`_preview`** 边界：width 1/0/-1、length width-1/width/width+1、
+    tab/newline 折叠、None/"" 返空
+  - **`_load_document_json`**：missing/bad json/directory/valid 四种结果
+  - **`_format_summary`** 字段精确：counts、elements by type（mixed）、
+    element text avg、chunk text min/max、chunk refs min/max、
+    warnings truncation marker、errors displayed、各基础字段
+  - **`_format_elements_list`**：limit=0/-1 全列、parent_id 显示、
+    content=None 不抛、type 对齐到 9 字符、空列表
+  - **`_format_chunks_list`**：spans 展开（含 element_id[start:end]）、
+    空 spans、spans=None 退化为 []、limit truncation、text=None
+  - **`_infer_parser_name`**：大小写混合、未知扩展名、无扩展名、
+    所有 7 种支持类型（pdf/docx/md/markdown/html/htm/txt/text/ipynb）
+  - **`_iter_supported_files`**：recursive 单层 vs 嵌套、空目录、
+    全不支持扩展名、纯目录过滤
+  - **`_relative_output_path`**：suffix 保留、双扩展名（.tar.gz）
+  - **`_build_arg_parser`** 默认值与 choices：
+    - max_chars=800, limit=10, recursive=False
+    - parser choices 限定 6 种
+    - 必填参数（output、input_dir）缺失 → SystemExit
+    - 无 subcommand → SystemExit
+  - **`main()`** 端到端：
+    - inspect --elements --chunks 不抛
+    - inspect --limit 0 全列
+    - inspect non-dict JSON → rc=1
+    - inspect --spans 无 --chunks → 不展示 spans
+  - **`_run_parse_dir`** 失败/边界：
+    - 缺目录 → rc=2
+    - 空目录 → 写 _summary.json，rc=0
+    - 单文件成功 → success=1
+    - 纯不支持扩展名 → 0 files，0 failures
+    - _summary.json 含 schema_version、input_dir、output_dir、
+      recursive、parser_override、max_chars 字段
+- 无源码改动。
+
+### 撞墙记录
+- 无：97 个测试一次通过。
+
+### 下一步建议
+- 候选 DJ：app/chunkers/structural.py 边角（第三轮）
+- 候选 DK：evaluation/runner.py 边角（第三轮）
+- 候选 DL：evaluation/metrics.py 边角（第三轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DJ（structural chunker 第三轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 94 后）：6068 pass / 0 fail / 13 skip（HEAD `bc62466`）
+
+---
