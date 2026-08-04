@@ -3593,3 +3593,68 @@
 - 本 worktree（Round 77 后）：3929 pass / 0 fail / 12 skip（HEAD `8e5afc7`）
 
 ---
+
+## Round 78（2026-08-05）：候选 CO — app/parsers/ipynb_parser.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CO：新建 `tests/test_parsers_ipynb_edges2.py`（144 个测试）覆盖
+  `app/parsers/ipynb_parser.py`（227 行）的深度边角，与已有 `test_parsers_ipynb.py`（65）+
+  `test_parsers_ipynb_edges.py`（114）互补。
+- 重点覆盖项：
+  - **模块常量** 5 个：_IPYNB_EXTENSIONS 1 项 tuple、值/小写/点开头
+  - **_detect_ipynb_source_type** 13 个：.IPYNB/.IpYnB 大写接受、double extension、
+    .JSON/.md/.txt/无扩展名抛 unsupported_type、ParserError 类型、code/details.suffix/message
+  - **_cell_source_to_text** 24 个：str/empty/None/int/float/bool/dict/bytes/tuple/set
+    各输入类型、list[str] join、list 含 int/None/bool/mix/nested list、long list 1000 项、
+    Unicode 中文
+  - **_extract_kernel_language** 15 个：kernelspec.language 优先、kernelspec.name fallback、
+    language_info.name fallback、empty 各级、language 空串/None fallback、含 special chars name
+  - **parse() 错误路径** 17 个：file_not_found code/details.path、unsupported_type code、
+    目录 → file_not_found、ipynb_invalid_json code + exception_type=JSONDecodeError、
+    ipynb_bad_structure（top list/string/int/null、cells dict/string）、
+    ipynb_unsupported_version（nbformat 0/1/2/3）+ details.nbformat
+  - **parse() 成功路径** 16 个：返回 Document、source_hash 精确、document_id 派生、
+    metadata keys full set、chunks/relations/errors 空、source_type/parser_name/version 值
+  - **cell → element 类型** 9 个：markdown cell 产生 heading/paragraph/list_item/table、
+    code cell → paragraph kind=code_cell + language metadata、raw cell → paragraph
+    kind=raw_cell 无 language key
+  - **cell_index** 4 个：第 1 cell = 0、跨类型递增、同 cell 多 sub-element 共享
+  - **element 字段** 4 个：id 跨 cell 递增、4 位 zero-pad、parent_id None、confidence 0.95
+  - **content 处理** 4 个：code/raw content stripped、code multiline source list、
+    markdown cell locator 含 section_path
+  - **warning 路径** 10 个：empty code cell + cell_index、whitespace-only code cell、
+    unknown cell_type + cell_type 详情、cell not dict + cell_index、empty notebook →
+    ipynb_no_content、raw 空静默跳过
+  - **nbformat 边界** 6 个：missing → None、4 minor 0、5 supported、minor missing → None、
+    cells missing → cell_count=0、metadata=None → language=""
+  - **模块结构** 19 个：json/Path/Any/Document/Element/WarningRecord/Parser/ParserError/
+    make_document_id/MarkdownParser 导入、__all__ 含 IpynbParser、parse 签名
+- 无源码改动。
+
+### 撞墙记录
+- 墙 1：`test_extract_kernel_language_none_returns_empty` 假设 None metadata 返 ""。
+  实际 `metadata.get` 在 None 上抛 AttributeError。修复：删掉该测试（parse() 实际通过
+  `nb.get("metadata") or {}` 保护，不会传 None）。
+- 墙 2：`test_extract_kernel_language_kernelspec_not_dict` 假设 kernelspec=str 返 ""。
+  实际 `ks.get` 在 str 上抛 AttributeError。修复：替换为正向测试
+  `test_extract_kernel_language_kernelspec_with_only_name_key`。
+- 墙 3：`test_extract_kernel_language_language_info_not_dict` 类似。修复：替换为正向测试
+  `test_extract_kernel_language_language_info_with_only_name`。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CP：app/parsers/kreuzberg_parser.py 边角（第二轮）
+- 候选 CQ：app/parsers/base.py 边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CQ（app/parsers/base.py 边角）。理由：
+1. base.py 是所有 parser 的基类，含 Parser 抽象、ParserError、make_document_id
+2. 是 parsers/ 模块的核心基础设施
+3. 与已覆盖的 4 种 stdlib parser（markdown/html/text/ipynb）+ fallback/kreuzberg 形成完整覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 78 后）：4073 pass / 0 fail / 12 skip（HEAD `5dc2bc1`）
+
+---
