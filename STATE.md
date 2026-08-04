@@ -8540,3 +8540,80 @@ WarningRecord/ErrorRecord 字段验证。
 第四轮可深入 ParserError 错误码、support 检查、__init__ 子类逻辑等。
 
 ---
+
+## Round 145（2026-08-05）：app/parsers/base.py 第四轮（edges3）
+
+### 目标
+- 给 app/parsers/base.py（95 行，已有 base/edges/edges2 共 265 测试）补第四轮
+- 深入签名、ParserError pickle/copy 行为、Parser 抽象类内部、极端输入
+
+### 改动
+- 新增 `tests/test_parsers_base_edges3.py`（118 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **签名深度**：
+  - ParserError.__init__ 4 参（self/code/message/details），details 默认 None
+  - make_document_id 1 参（source_hash），返回 str
+  - detect_source_type 1 参（path），返回 SourceType
+  - Parser.parse 3 参（self/path/source_hash），无默认值
+  - _silence_unused 0 参
+  - from __future__ → 字符串注解（'None'、'SourceType'、'str'）
+- **ParserError 复杂场景**：
+  - 关键字参数 / 混合位置 / 仅必填位置
+  - pickle.dumps 成功但 pickle.loads 失败（args 仅含 message）
+  - copy.copy / deepcopy 失败（同上原因）
+  - hashable、hash 稳定、可作 dict key
+  - except 块内 raise 保留 __context__
+  - Unicode message、args 含 Unicode
+  - 修改 details 不影响其他实例默认值
+- **Parser 抽象类内部**：
+  - __abstractmethods__ 含 'parse'、count=1
+  - __isabstractmethod__ True
+  - 直接子类未实现 parse 仍抽象
+  - 子类实现 parse 清除抽象标记
+  - 子类 super().parse() 抛 NotImplementedError
+  - 类属性 name/version 类级访问
+  - 继承 ABCMeta、无自定义 __init__
+  - 实例 __dict__ 独立、无实例属性时为空
+- **make_document_id 极端输入**：
+  - 全 0、全 f、混合 hex
+  - bytes 长度 64 → 不抛（格式化 bytes 切片）
+  - None/int → TypeError 或 AttributeError
+  - 第 17 字符及之后不影响结果
+  - 63/65/空 → ValueError 含 'source_hash'
+- **detect_source_type 极端**：
+  - 文件名含空格、多嵌套目录
+  - '.pdf' 单独作为路径 → suffix='' → raise
+  - 大写 .PDF → lower 后识别为 'pdf'
+  - None/bytes/int → TypeError/AttributeError
+  - 'file.pdf?query=val' → raise
+  - 错误 details suffix 含 '.pdff'/'.docxx' 等
+- **_silence_unused**：docstring 含 Literal/SourceType、可多次调用、无副作用
+- **模块 dunder**：__doc__/__file__/__name__、imports、__all__ 4 项
+- **综合行为**：raise from 链、集中捕获、details 引用共享
+
+### 撞墙记录
+- **Wall 1**：pickle.dumps(e) 不抛，但 pickle.loads(e) 失败（Exception 基类 __reduce_ex__ 用 args=("m1",)，__init__ 缺 code）。修复：分开测 dumps 成功、loads 失败。
+- **Wall 2**：copy.copy/deepcopy 同样基于 __reduce_ex__，抛 TypeError。修复：改为 expect TypeError。
+- **Wall 3**：make_document_id 接受 bytes 不抛（bytes 长度 64 通过、切片格式化为 "doc-b'\\x00...'"）。修复：删除该 raises 测试，改为 accepts 测试。
+- **Wall 4**：detect_source_type('.pdf') → Path('.pdf').suffix == '' → raise（不是返回 'pdf'）。修复：改为 expect ParserError。
+- **Wall 5**：detect_source_type('file.PDF') → lower 后 .pdf → 识别成功（不 raise）。修复：删除误测，仅保留识别成功测试。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 145 后）：11405 pass / 0 fail / 13 skip（HEAD `935e56d`）
+
+### 下一步建议
+- 候选 HD：app/parsers/kreuzberg_parser.py 第四轮
+- 候选 HE：evaluation/__init__.py 第四轮
+- 候选 HF：app/parsers/markdown_parser.py 第六轮
+- 候选 HG：app/parsers/html_parser.py 第六轮
+- 候选 HH：app/chunker.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HD（app/parsers/kreuzberg_parser.py 第四轮）。kreuzberg 是可选
+parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_document
+转换、错误路径等。
+
+---
