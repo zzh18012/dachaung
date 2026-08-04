@@ -8473,3 +8473,70 @@ WarningRecord/ErrorRecord 字段验证。
 简单的 parser，第四轮可深入 .txt 读取、空文件、Unicode 编码等。
 
 ---
+
+## Round 144（2026-08-05）：app/parsers/text_parser.py 第四轮（edges5）
+
+### 目标
+- 给 app/parsers/text_parser.py（136 行，已有 base/edges/edges2/edges3/edges4 共 392 测试）补第五轮
+- 深入 _split_paragraphs 算法不变量、TextParser 类属性、parse() 全流程
+
+### 改动
+- 新增 `tests/test_parsers_text_edges5.py`（63 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_TEXT_EXTENSIONS 常量**：元组、含 .txt/.text、count=2
+- **_detect_text_source_type 深度**：
+  - 大小写不敏感（.TXT/.TEXT/.TxT 都识别）
+  - 错误 details 含 suffix 字段
+  - message 含"(无)"（无后缀时）
+- **_split_paragraphs 算法**：
+  - 空、单段、多段（一空行分隔）
+  - 多空行视为同一段落分隔
+  - 首尾空行跳过
+  - 仅空行 → []
+  - 空白行（含 tab/space）视为空行
+  - 连续非空行属同一段落
+  - CRLF/CR → LF 归一化
+  - 段落 strip、tuple 类型 (int, str)
+- **TextParser 类属性**：
+  - name="text"、version="stdlib/0.1.0"
+  - 继承 Parser
+- **parse() 全流程**：
+  - 每段一个 element（type=paragraph）
+  - element_id 后缀 ::e0000
+  - confidence=0.95
+  - source_locator={"line":N}
+  - metadata={}
+  - 空文件 → text_no_content warning
+  - 纯空行 → text_no_content warning
+  - metadata={"text": True}
+  - chunks/relations/errors 默认空列表
+- **编码边界**：CRLF 文件、非法 UTF-8 → errors=replace
+- **错误路径**：file_not_found、unsupported_type、OSError → text_read_failed
+- **模块结构**：__all__=["TextParser"]、imports、docstring
+- **签名深度**：helpers 1 参数、parse 3 参数、无默认值
+- **综合行为**：
+  - 不同 source_hash → 不同 document_id
+  - warning.reason 非空
+  - 不修改输入文件
+
+### 撞墙记录
+无（63 测试全过，0 失败）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 144 后）：11287 pass / 0 fail / 13 skip（HEAD `67ffc20`）
+
+### 下一步建议
+- 候选 HC：app/parsers/base.py 第四轮
+- 候选 HD：app/parsers/kreuzberg_parser.py 第四轮
+- 候选 HE：evaluation/__init__.py 第四轮
+- 候选 HF：app/parsers/markdown_parser.py 第六轮
+- 候选 HG：app/parsers/html_parser.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HC（app/parsers/base.py 第四轮）。base 是 parser 抽象基类，
+第四轮可深入 ParserError 错误码、support 检查、__init__ 子类逻辑等。
+
+---
