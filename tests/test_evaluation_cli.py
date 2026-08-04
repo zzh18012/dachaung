@@ -301,3 +301,101 @@ def test_cli_run_with_expected_failures(project_root: Path):
     assert ef["doc_id"] == "ERR-1"
     assert ef["actual_error_code"] == "pdfplumber_open_failed"
     assert ef["matches"] is True
+
+
+# ---- inspect-doc 子命令 ----
+
+
+def _parse_doc_to_json(project_root: Path, doc_id: str = "TEST-INSPECT") -> Path:
+    """构造一份合法 doc.json，供 inspect-doc 用。"""
+    docx_rel = "samples/test/sample.docx"
+    docx_path = project_root / docx_rel
+    docx_path.parent.mkdir(parents=True)
+    _build_synthetic_docx(docx_path)
+    out_json = project_root / "outputs" / f"{doc_id}.json"
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    # 用 app.cli parse 跑出真实 doc.json（带 source_spans）
+    rc, _, err = _run_cli_app(
+        ["parse", str(docx_path), "-o", str(out_json)], cwd=project_root,
+    )
+    assert rc == 0, f"stderr={err}"
+    return out_json
+
+
+def _run_cli_app(args: list[str], cwd: Path) -> tuple[int, str, str]:
+    """跑 app.cli（不是 evaluation.cli）。"""
+    python = VENV_PYTHON if Path(VENV_PYTHON).is_file() else os.environ.get("PYTHON", "python")
+    env = {
+        **os.environ,
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONPATH": str(PROJECT_ROOT) + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
+    proc = subprocess.run(
+        [python, "-m", "app.cli", *args],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        cwd=str(cwd),
+        env=env,
+    )
+    return proc.returncode, proc.stdout, proc.stderr
+
+
+def test_inspect_doc_basic(project_root: Path):
+    """inspect-doc 打印文档元信息 + metrics 列表。"""
+    doc_json = _parse_doc_to_json(project_root)
+
+    rc, out, err = _run_cli(["inspect-doc", str(doc_json)], cwd=project_root)
+    assert rc == 0, f"stderr={err}"
+    # 元信息
+    assert "file:" in out
+    assert "document_id:" in out
+    assert "source:" in out
+    assert "parser:" in out
+    assert "counts:" in out
+    # metrics 区块
+    assert "metrics:" in out
+    # 关键指标出现
+    assert "pipeline_success" in out
+    assert "schema_valid" in out
+    assert "element_count_total" in out
+    assert "chunk_reference_intact_ratio" in out
+    assert "text_preservation_equal" in out
+
+
+def test_inspect_doc_null_metrics_rendered_with_reason(project_root: Path):
+    """无标注时 chunk_boundary / figure_caption 是 null，应显示 reason。"""
+    doc_json = _parse_doc_to_json(project_root)
+    rc, out, err = _run_cli(["inspect-doc", str(doc_json)], cwd=project_root)
+    assert rc == 0, f"stderr={err}"
+    # chunk_boundary 无标注 → reason=no_annotation
+    assert "chunk_boundary_precision" in out
+    assert "no_annotation" in out
+    # figure_caption 固定 null + parser_does_not_emit_relations
+    assert "figure_caption_precision" in out
+    assert "parser_does_not_emit_relations" in out
+
+
+def test_inspect_doc_missing_file_returns_2(project_root: Path):
+    rc, _, err = _run_cli(
+        ["inspect-doc", str(project_root / "nope.json")], cwd=project_root,
+    )
+    assert rc == 2
+    assert "不存在" in err
+
+
+def test_inspect_doc_bad_json_returns_1(project_root: Path):
+    bad = project_root / "bad.json"
+    bad.write_text("{not valid", encoding="utf-8")
+    rc, _, err = _run_cli(["inspect-doc", str(bad)], cwd=project_root)
+    assert rc == 1
+    assert "JSON 解析失败" in err
+
+
+def test_inspect_doc_top_level_not_object(project_root: Path):
+    arr = project_root / "arr.json"
+    arr.write_text("[1, 2, 3]", encoding="utf-8")
+    rc, _, err = _run_cli(["inspect-doc", str(arr)], cwd=project_root)
+    assert rc == 1
+    assert "顶层不是对象" in err
