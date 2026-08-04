@@ -522,3 +522,483 @@ def test_parse_dir_empty_dir_warns_but_succeeds(tmp_path: Path):
     assert summary["failure"] == 0
 
 
+# ---------- 边角与缺漏补强（Round 33） ----------
+
+
+# argparse 入口校验
+
+
+def test_no_command_returns_2():
+    """argparse required=True 时缺子命令 → rc=2 + stderr。"""
+    rc, out, err = _run_cli([])
+    assert rc != 0
+    assert "command" in err.lower() or "required" in err.lower()
+
+
+def test_unknown_command_returns_2():
+    """未知子命令 → argparse rc=2。"""
+    rc, out, err = _run_cli(["bogus"])
+    assert rc != 0
+
+
+def test_parse_missing_output_returns_2(tmp_path: Path):
+    """parse 缺 -o 必填项 → argparse rc=2。"""
+    src = tmp_path / "doc.md"
+    src.write_text("# T\n", encoding="utf-8")
+    rc, out, err = _run_cli(["parse", str(src)])
+    assert rc != 0
+    assert "--output" in err or "-o" in err
+
+
+def test_parse_invalid_parser_choice_returns_2(tmp_path: Path):
+    """--parser 不在 choices 内 → argparse rc=2。"""
+    src = tmp_path / "doc.md"
+    src.write_text("# T\n", encoding="utf-8")
+    rc, out, err = _run_cli([
+        "parse", str(src), "-o", str(tmp_path / "out.json"),
+        "--parser", "bogus_parser",
+    ])
+    assert rc != 0
+    assert "invalid choice" in err
+
+
+def test_parse_nonexistent_input_returns_1(tmp_path: Path):
+    """输入文件不存在 → rc=1 + 结构化 error JSON。"""
+    missing = tmp_path / "nope.md"
+    out = tmp_path / "out.json"
+    rc, stdout, stderr = _run_cli(["parse", str(missing), "-o", str(out)])
+    assert rc == 1
+    # 结构化 error 写到 stderr
+    err_data = json.loads(stderr)
+    assert err_data["errors"][0]["code"] == "file_not_found"
+    assert str(missing) in err_data["input"]
+
+
+def test_validate_nonexistent_returns_2(tmp_path: Path):
+    """validate 缺输入文件 → rc=2（与 parse 的 rc=1 不同，注意区分）。"""
+    rc, out, err = _run_cli(["validate", str(tmp_path / "nope.json")])
+    assert rc == 2
+    assert "[ERROR] 文件不存在" in err
+
+
+def test_validate_bad_json_returns_1(tmp_path: Path):
+    """validate 拿到非合法 JSON → rc=1。"""
+    bad = tmp_path / "broken.json"
+    bad.write_text("{not json", encoding="utf-8")
+    rc, out, err = _run_cli(["validate", str(bad)])
+    assert rc == 1
+    assert "[FAIL]" in err
+
+
+def test_validate_invalid_content_returns_1(tmp_path: Path):
+    """validate 拿到合法 JSON 但 schema 不合规 → rc=1。"""
+    bad = tmp_path / "wrong_shape.json"
+    bad.write_text(json.dumps({"wrong": "shape"}), encoding="utf-8")
+    rc, out, err = _run_cli(["validate", str(bad)])
+    assert rc == 1
+    assert "[FAIL]" in err
+
+
+def test_validate_valid_file_returns_0(tmp_path: Path):
+    """validate 通过 schema 校验 → rc=0 + [OK]。"""
+    src = tmp_path / "doc.md"
+    src.write_text("# Title\n\nbody.\n", encoding="utf-8")
+    out = tmp_path / "out.json"
+    rc, _, _ = _run_cli(["parse", str(src), "-o", str(out)])
+    assert rc == 0
+    rc, stdout, stderr = _run_cli(["validate", str(out)])
+    assert rc == 0
+    assert "[OK]" in stdout
+
+
+# _iter_supported_files / _relative_output_path / _preview / _load_document_json / _format_* 直接单测
+
+
+def test_iter_supported_files_filters_by_extension(tmp_path: Path):
+    from app.cli import _iter_supported_files
+    (tmp_path / "a.md").write_text("x", encoding="utf-8")
+    (tmp_path / "b.docx").write_bytes(b"x")
+    (tmp_path / "c.unknown").write_text("x", encoding="utf-8")
+    (tmp_path / "d.txt").write_text("x", encoding="utf-8")
+    result = _iter_supported_files(tmp_path, recursive=False)
+    names = sorted(p.name for p in result)
+    assert names == ["a.md", "b.docx", "d.txt"]
+
+
+def test_iter_supported_files_sorted_by_name(tmp_path: Path):
+    from app.cli import _iter_supported_files
+    # 倒序写入
+    for n in ["z.md", "a.md", "m.md"]:
+        (tmp_path / n).write_text("x", encoding="utf-8")
+    result = _iter_supported_files(tmp_path, recursive=False)
+    names = [p.name for p in result]
+    assert names == ["a.md", "m.md", "z.md"]
+
+
+def test_iter_supported_files_recursive_walks_subdir(tmp_path: Path):
+    from app.cli import _iter_supported_files
+    sub = tmp_path / "sub"
+    sub.mkdir()
+    (tmp_path / "top.md").write_text("x", encoding="utf-8")
+    (sub / "nested.md").write_text("y", encoding="utf-8")
+    flat = _iter_supported_files(tmp_path, recursive=False)
+    deep = _iter_supported_files(tmp_path, recursive=True)
+    assert len(flat) == 1
+    assert len(deep) == 2
+
+
+def test_iter_supported_files_skips_directories(tmp_path: Path):
+    """目录（即便叫 x.md）应被 is_file 过滤。"""
+    from app.cli import _iter_supported_files
+    (tmp_path / "weird.md").mkdir()  # 同名目录
+    (tmp_path / "real.md").write_text("x", encoding="utf-8")
+    result = _iter_supported_files(tmp_path, recursive=False)
+    names = [p.name for p in result]
+    assert "weird.md" not in names
+    assert "real.md" in names
+
+
+def test_iter_supported_files_extension_case_insensitive(tmp_path: Path):
+    """大写扩展名也应识别（_EXTENSION_TO_PARSER 用 lower()）。"""
+    from app.cli import _iter_supported_files
+    (tmp_path / "A.MD").write_text("x", encoding="utf-8")
+    result = _iter_supported_files(tmp_path, recursive=False)
+    assert len(result) == 1
+
+
+def test_relative_output_path_basic(tmp_path: Path):
+    from app.cli import _relative_output_path
+    in_dir = tmp_path / "in"
+    out_dir = tmp_path / "out"
+    f = in_dir / "doc.md"
+    result = _relative_output_path(in_dir, f, out_dir)
+    assert result == out_dir / "doc.md.json"
+
+
+def test_relative_output_path_nested(tmp_path: Path):
+    from app.cli import _relative_output_path
+    in_dir = tmp_path / "in"
+    out_dir = tmp_path / "out"
+    f = in_dir / "sub" / "doc.md"
+    result = _relative_output_path(in_dir, f, out_dir)
+    # 嵌套路径保留 + 加 .json 后缀
+    assert "sub" in result.parts
+    assert result.name == "doc.md.json"
+
+
+def test_relative_output_path_with_multiple_dots():
+    """a.b.md 类文件名 → a.b.md.json。"""
+    from app.cli import _relative_output_path
+    from pathlib import Path
+    result = _relative_output_path(
+        Path("in"), Path("in") / "weird.name.md", Path("out")
+    )
+    assert result.name == "weird.name.md.json"
+
+
+def test_preview_none_returns_empty_string():
+    from app.cli import _preview
+    assert _preview(None) == ""
+
+
+def test_preview_empty_string_returns_empty():
+    from app.cli import _preview
+    assert _preview("") == ""
+
+
+def test_preview_short_text_returned_as_is():
+    from app.cli import _preview
+    assert _preview("hello world") == "hello world"
+
+
+def test_preview_collapses_whitespace():
+    from app.cli import _preview
+    assert _preview("hello\n\nworld  foo") == "hello world foo"
+
+
+def test_preview_truncates_when_over_width():
+    from app.cli import _preview
+    text = "word " * 30  # 150 字符
+    result = _preview(text, width=20)
+    assert result.endswith("…")
+    assert len(result) == 20  # width-1 字符 + 省略号
+
+
+def test_preview_at_exact_width_no_truncation():
+    from app.cli import _preview
+    assert _preview("abc", width=3) == "abc"
+
+
+def test_preview_custom_width():
+    from app.cli import _preview
+    assert _preview("hello world foo", width=5) == "hell…"
+
+
+def test_load_document_json_valid(tmp_path: Path):
+    from app.cli import _load_document_json
+    p = tmp_path / "ok.json"
+    p.write_text(json.dumps({"a": 1}), encoding="utf-8")
+    data, err = _load_document_json(p)
+    assert data == {"a": 1}
+    assert err == ""
+
+
+def test_load_document_json_missing(tmp_path: Path):
+    from app.cli import _load_document_json
+    data, err = _load_document_json(tmp_path / "nope.json")
+    assert data is None
+    assert "文件不存在" in err
+
+
+def test_load_document_json_invalid_json(tmp_path: Path):
+    from app.cli import _load_document_json
+    p = tmp_path / "bad.json"
+    p.write_text("{not json", encoding="utf-8")
+    data, err = _load_document_json(p)
+    assert data is None
+    assert "JSON 解析失败" in err
+
+
+def test_format_summary_with_full_doc():
+    from app.cli import _format_summary
+    doc = _synthetic_document()
+    result = _format_summary(doc, Path("/tmp/x.json"))
+    assert "file:" in result
+    assert "schema:      0.1.0" in result
+    assert "elements=3" in result
+    assert "chunks=2" in result
+    assert "heading=1" in result
+    assert "paragraph=2" in result
+    assert "chunk text:" in result
+    assert "chunk refs:" in result
+
+
+def test_format_summary_with_warnings_and_errors():
+    from app.cli import _format_summary
+    doc = _synthetic_document()
+    doc["warnings"] = [
+        {"code": "low_conf", "reason": "ocr fallback"},
+        {"code": "low_conf", "reason": "ocr fallback 2"},
+    ]
+    doc["errors"] = [
+        {"code": "parse_err", "message": "broken"},
+    ]
+    result = _format_summary(doc, Path("/tmp/x.json"))
+    assert "warnings (2)" in result
+    assert "[low_conf] ocr fallback" in result
+    assert "errors (1)" in result
+    assert "[parse_err] broken" in result
+
+
+def test_format_summary_truncates_warning_list_to_5():
+    from app.cli import _format_summary
+    doc = _synthetic_document()
+    doc["warnings"] = [
+        {"code": f"w{i}", "reason": f"r{i}"} for i in range(8)
+    ]
+    result = _format_summary(doc, Path("/tmp/x.json"))
+    assert "+3 more" in result
+
+
+def test_format_summary_with_empty_doc():
+    from app.cli import _format_summary
+    doc = {
+        "schema_version": "0.1.0",
+        "document_id": "d",
+        "source_path": "x",
+        "source_type": "docx",
+        "source_hash": "a" * 64,
+        "parser_name": "test",
+        "parser_version": "0",
+        "elements": [],
+        "chunks": [],
+        "relations": [],
+        "warnings": [],
+        "errors": [],
+        "metadata": {},
+    }
+    result = _format_summary(doc, Path("x.json"))
+    assert "elements=0" in result
+    assert "chunks=0" in result
+    # 无 element 时不打印 element text 行
+    assert "element text:" not in result
+    # 无 chunk 时不打印 chunk text 行
+    assert "chunk text:" not in result
+
+
+def test_format_elements_list_empty():
+    from app.cli import _format_elements_list
+    result = _format_elements_list([], limit=10)
+    assert "elements (0):" in result
+
+
+def test_format_elements_list_with_parent_id():
+    from app.cli import _format_elements_list
+    elements = [
+        {
+            "element_id": "e1", "type": "paragraph",
+            "content": "x", "parent_id": "e0",
+        }
+    ]
+    result = _format_elements_list(elements, limit=10)
+    assert "parent=e0" in result
+
+
+def test_format_elements_list_no_parent_id():
+    from app.cli import _format_elements_list
+    elements = [
+        {"element_id": "e1", "type": "paragraph", "content": "x"}
+    ]
+    result = _format_elements_list(elements, limit=10)
+    assert "parent=" not in result
+
+
+def test_format_elements_list_content_none():
+    from app.cli import _format_elements_list
+    elements = [
+        {"element_id": "e1", "type": "image", "content": None,
+         "resource_path": "x.png"}
+    ]
+    result = _format_elements_list(elements, limit=10)
+    # content None 不应崩
+    assert "image" in result
+    assert "e1" in result
+
+
+def test_format_elements_list_limit_zero_lists_all():
+    from app.cli import _format_elements_list
+    elements = [
+        {"element_id": f"e{i}", "type": "paragraph", "content": str(i)}
+        for i in range(20)
+    ]
+    result = _format_elements_list(elements, limit=0)
+    assert "e0" in result
+    assert "e19" in result
+    assert "+N more" not in result
+    assert "use --limit 0 to see all" not in result
+
+
+def test_format_chunks_list_with_spans():
+    from app.cli import _format_chunks_list
+    chunks = [
+        {
+            "chunk_id": "c1", "text": "hello",
+            "source_element_ids": ["e1"],
+            "source_spans": [
+                {"element_id": "e1", "start": 0, "end": 5},
+                {"element_id": "e2", "start": 10, "end": 15},
+            ],
+        }
+    ]
+    result = _format_chunks_list(chunks, limit=10, show_spans=True)
+    assert "e1[0:5]" in result
+    assert "e2[10:15]" in result
+
+
+def test_format_chunks_list_without_spans_data():
+    from app.cli import _format_chunks_list
+    chunks = [
+        {"chunk_id": "c1", "text": "hi", "source_element_ids": ["e1"]},
+    ]
+    result = _format_chunks_list(chunks, limit=10, show_spans=True)
+    assert "spans: (none)" in result
+
+
+def test_format_chunks_list_show_spans_false_omits_span_lines():
+    from app.cli import _format_chunks_list
+    chunks = [
+        {
+            "chunk_id": "c1", "text": "hi",
+            "source_element_ids": ["e1"],
+            "source_spans": [{"element_id": "e1", "start": 0, "end": 2}],
+        }
+    ]
+    result = _format_chunks_list(chunks, limit=10, show_spans=False)
+    assert "spans:" not in result
+    assert "span:" not in result
+
+
+def test_format_chunks_list_text_none():
+    from app.cli import _format_chunks_list
+    chunks = [
+        {"chunk_id": "c1", "text": None, "source_element_ids": ["e1"]},
+    ]
+    result = _format_chunks_list(chunks, limit=10)
+    # text None 不应崩，chars=0
+    assert "chars=0" in result
+
+
+def test_emit_structured_error_writes_to_stderr(capsys, tmp_path: Path):
+    from app.cli import _emit_structured_error
+    _emit_structured_error(tmp_path / "x.pdf", "code1", "msg1", extra_key="v1")
+    captured = capsys.readouterr()
+    assert captured.out == ""  # nothing on stdout
+    data = json.loads(captured.err)
+    assert data["schema_version"] == "0.1.0"
+    assert data["input"] == str(tmp_path / "x.pdf")
+    assert data["errors"][0]["code"] == "code1"
+    assert data["errors"][0]["message"] == "msg1"
+    assert data["errors"][0]["extra_key"] == "v1"
+
+
+def test_emit_structured_error_no_extra(capsys, tmp_path: Path):
+    from app.cli import _emit_structured_error
+    _emit_structured_error(tmp_path / "x.pdf", "code1", "msg1")
+    captured = capsys.readouterr()
+    data = json.loads(captured.err)
+    assert data["errors"][0] == {"code": "code1", "message": "msg1"}
+
+
+# main() 函数级别测试
+
+
+def test_main_returns_2_for_unknown_command():
+    """main(['bogus']) → argparse rc=2 (SystemExit)。"""
+    from app.cli import main
+    with pytest.raises(SystemExit) as exc:
+        main(["bogus"])
+    assert exc.value.code != 0
+
+
+def test_main_validate_returns_0_for_valid_file(tmp_path: Path):
+    """main(['validate', valid]) → 0。"""
+    from app.cli import main
+    src = tmp_path / "doc.md"
+    src.write_text("# T\n\nbody.\n", encoding="utf-8")
+    out = tmp_path / "out.json"
+    main(["parse", str(src), "-o", str(out)])
+    assert main(["validate", str(out)]) == 0
+
+
+def test_main_inspect_returns_0_for_summary(tmp_path: Path):
+    from app.cli import main
+    p = tmp_path / "doc.json"
+    p.write_text(json.dumps(_synthetic_document()), encoding="utf-8")
+    assert main(["inspect", str(p)]) == 0
+
+
+def test_main_inspect_returns_1_for_top_level_array(tmp_path: Path):
+    """inspect 顶层是数组 → main 返回 1。"""
+    from app.cli import main
+    p = tmp_path / "arr.json"
+    p.write_text("[1,2,3]", encoding="utf-8")
+    assert main(["inspect", str(p)]) == 1
+
+
+def test_main_inspect_returns_2_for_missing_file(tmp_path: Path):
+    from app.cli import main
+    assert main(["inspect", str(tmp_path / "nope.json")]) == 2
+
+
+def test_main_validate_returns_2_for_missing_file(tmp_path: Path):
+    from app.cli import main
+    assert main(["validate", str(tmp_path / "nope.json")]) == 2
+
+
+def test_main_validate_returns_1_for_invalid_content(tmp_path: Path):
+    from app.cli import main
+    p = tmp_path / "wrong.json"
+    p.write_text(json.dumps({"x": 1}), encoding="utf-8")
+    assert main(["validate", str(p)]) == 1
+
+
