@@ -359,3 +359,86 @@ def test_cli_parse_markdown_end_to_end(tmp_path: Path):
     assert data["source_type"] == "markdown"
     assert data["parser_name"] == "markdown"
     assert len(data["elements"]) >= 2
+
+
+# ---------- 内部 helpers（纯函数）----------
+
+from pathlib import Path as _Path  # noqa: E402
+
+from app.parsers.markdown_parser import (  # noqa: E402
+    _detect_md_source_type,
+    _is_pipe_table_start,
+    _rows_to_md,
+    _split_pipe_row,
+)
+
+
+def test_detect_md_source_type_accepts_md_and_markdown():
+    assert _detect_md_source_type(_Path("foo.md")) == "markdown"
+    assert _detect_md_source_type(_Path("foo.markdown")) == "markdown"
+    # 大小写不敏感
+    assert _detect_md_source_type(_Path("FOO.MD")) == "markdown"
+
+
+def test_detect_md_source_type_rejects_other_extensions():
+    with pytest.raises(ParserError) as exc:
+        _detect_md_source_type(_Path("foo.txt"))
+    assert exc.value.code == "unsupported_type"
+
+
+def test_rows_to_md_empty():
+    assert _rows_to_md([]) == ""
+
+
+def test_rows_to_md_single_row():
+    md = _rows_to_md([["a", "b"]])
+    # 表头 + 分隔行，无数据行
+    lines = md.splitlines()
+    assert len(lines) == 2
+    assert "| a | b |" in lines[0]
+    assert "| --- | --- |" in lines[1]
+
+
+def test_rows_to_md_pads_uneven_rows():
+    md = _rows_to_md([["a", "b"], ["c"]])
+    lines = md.splitlines()
+    # 第二行（数据）应该被填充
+    assert lines[2].count("|") == lines[0].count("|")
+    assert "c" in lines[2]
+
+
+def test_split_pipe_row_basic():
+    assert _split_pipe_row("| a | b | c |") == ["a", "b", "c"]
+
+
+def test_split_pipe_row_without_outer_pipes():
+    assert _split_pipe_row("a | b | c") == ["a", "b", "c"]
+
+
+def test_split_pipe_row_strips_cells():
+    assert _split_pipe_row("|  spaced  |  trim  |") == ["spaced", "trim"]
+
+
+def test_split_pipe_row_single_cell():
+    assert _split_pipe_row("| only |") == ["only"]
+
+
+def test_is_pipe_table_start_true_for_valid_table():
+    lines = ["| a | b |", "| --- | --- |", "| 1 | 2 |"]
+    assert _is_pipe_table_start(lines, 0) is True
+
+
+def test_is_pipe_table_start_false_when_no_separator_line():
+    lines = ["| a | b |", "| 1 | 2 |"]  # 缺少 --- 分隔行
+    assert _is_pipe_table_start(lines, 0) is False
+
+
+def test_is_pipe_table_start_false_at_last_line():
+    """最后一行不可能有下一行做分隔。"""
+    lines = ["| a | b |"]
+    assert _is_pipe_table_start(lines, 0) is False
+
+
+def test_is_pipe_table_start_false_for_non_pipe_first_line():
+    lines = ["regular text", "| --- | --- |"]
+    assert _is_pipe_table_start(lines, 0) is False

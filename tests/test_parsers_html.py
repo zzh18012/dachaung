@@ -365,3 +365,41 @@ def test_cli_parse_html_end_to_end(tmp_path: Path):
     assert data["source_type"] == "html"
     assert data["parser_name"] == "html"
     assert len(data["elements"]) >= 2
+
+
+# ---------- 内部 helpers（纯函数）----------
+
+from pathlib import Path as _Path  # noqa: E402
+
+from app.parsers.html_parser import _detect_html_source_type, _rows_to_md  # noqa: E402
+
+
+def test_detect_html_source_type_accepts_html_and_htm():
+    assert _detect_html_source_type(_Path("foo.html")) == "html"
+    assert _detect_html_source_type(_Path("foo.htm")) == "html"
+    # 大小写不敏感
+    assert _detect_html_source_type(_Path("FOO.HTML")) == "html"
+
+
+def test_detect_html_source_type_rejects_other_extensions():
+    with pytest.raises(ParserError) as exc:
+        _detect_html_source_type(_Path("foo.txt"))
+    assert exc.value.code == "unsupported_type"
+
+
+def test_html_rows_to_md_empty():
+    assert _rows_to_md([]) == ""
+
+
+def test_html_rows_to_md_single_row_no_body():
+    md = _rows_to_md([["h1", "h2"]])
+    lines = md.splitlines()
+    assert len(lines) == 2  # header + separator
+    assert "| h1 | h2 |" in lines[0]
+
+
+def test_html_rows_to_md_pads_uneven():
+    md = _rows_to_md([["a", "b", "c"], ["d"]])
+    lines = md.splitlines()
+    # 数据行 d 应被填充到 3 列
+    assert lines[2].count("|") == lines[0].count("|")

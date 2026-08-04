@@ -156,6 +156,37 @@ def test_split_paragraphs_single_chunk_no_trailing_newline():
     assert result[0] == (1, "just text")
 
 
+def test_split_paragraphs_cr_only_line_endings():
+    """老 Mac 风格 \\r（无 \\n）也要被归一化为换行。"""
+    result = _split_paragraphs("line one\rline two\r\rpara two")
+    # \r 归一为 \n：3 行 + 1 空行 + 1 行
+    # "line one" + "line two" 是连续非空行 → 同一段；空行分隔 → "para two" 第二段
+    assert len(result) == 2
+    assert result[0] == (1, "line one\nline two")
+    assert result[1] == (4, "para two")
+
+
+def test_split_paragraphs_trailing_blank_lines_ignored():
+    result = _split_paragraphs("content\n\n\n")
+    assert result == [(1, "content")]
+
+
+def test_split_paragraphs_leading_blank_lines_skipped():
+    """文件开头就有空行不应偏移第一段的行号。"""
+    result = _split_paragraphs("\n\n\nactual content")
+    # 第 4 行才是 actual content
+    assert result == [(4, "actual content")]
+
+
+def test_split_paragraphs_multiple_chunks_line_numbers():
+    result = _split_paragraphs("first\n\nsecond\n\nthird")
+    assert result == [
+        (1, "first"),
+        (3, "second"),
+        (5, "third"),
+    ]
+
+
 # ---------- 错误路径 ----------
 
 
