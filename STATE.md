@@ -357,6 +357,70 @@
 
 ---
 
+## 2026-08-04 — Round 7（batch CLI: parse-dir）
+
+**做了什么**：
+- 完成候选 H：`parse-dir` 子命令，目录批量解析
+- 用法：`parse-dir <input_dir> -o <output_dir> [--recursive] [--parser X] [--max-chars N]`
+- 输出布局：`output_dir/<相对路径>.json`（保留原扩展名 + `.json` 后缀，避免同名冲突）
+  - 例如 `sub/doc.md` → `output_dir/sub/doc.md.json`
+- 顶层 `_summary.json` 记：
+  - 元数据（input_dir / output_dir / recursive / parser_override / max_chars）
+  - 计数（total / success / failure）
+  - 每文件条目（status / parser / elements / chunks / warnings 或 errors 列表）
+- 复用 Round 6 的扩展名自动推断；`--parser` 覆盖
+- 退出码：全成功 0；有失败 1；输入目录缺失 2；空目录（无支持文件）warning + 0
+- 失败时不留半成品 JSON
+- 重构：把 `parse` 逻辑提取为 `_run_parse`，与 `_run_parse_dir` 对称；`main()` 只做 dispatch
+- 修复一处提取 bug（`_run_parse_dir` 函数头在编辑中丢失，已恢复）
+- 新增 6 个 subprocess 测试：混合类型批 / 递归 / 失败计入 summary / 显式 --parser / 缺目录 / 空目录
+- commit `5f783fc`，已 push
+
+**worktree 当前状态**：
+- HEAD `5f783fc`，工作树清洁
+- 测试基线：272 pass / 0 fail / 9 skip（+6 vs Round 6）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 8）
+
+**首要任务**：方向选择
+
+- 候选 A（推荐）：**审计 `evaluation/` + `app/` 找 bug**
+  - 现状：parser 矩阵 + CLI 都到位，但核心评测管线没做过独立审计
+  - 复杂度：中（读 evaluation/metrics.py、report.py、cli.py；找边界 bug）
+  - 价值：保证后续向量化的输入正确；指示线 v2.x 审计也是这块
+  - 不变量：**不**动 `evaluator_version` / `report_version`（指示线在审的目标）
+  - 产出：诊断报告 + 修复 PR
+
+- 候选 I（新提）：**evaluation devset 加入新输入格式**
+  - 现状：评测只跑 PDF/DOCX；markdown / html / text / ipynb 没评测覆盖
+  - 复杂度：中（评测代码可能要小改以支持新 source_type；manifest schema 可能要扩展）
+  - 价值：检验新 parser 的 chunking 质量
+  - 风险：可能触碰 `evaluator_version` —— 走 I 前先确认
+
+- 候选 J（新提）：**向量化基础设施起步**
+  - 现状：CLAUDE.md 明确不做，但自跑线已解锁
+  - 复杂度：高（需 `sentence-transformers` 或类似；5GB 内可装 CPU 版）
+  - 价值：dachuang 目标 4 之一，向量化是 RAG 的核心
+  - 设计要点：新增 `app/embeddings/` 模块；CLI 加 `embed` 子命令；不引入 faiss，先用 numpy
+
+- 候选 D：补 fallback parser 的覆盖率
+- 候选 E：实施 source_spans（独立设计）
+
+**建议**：选 A（evaluation bug 审计）。理由：
+1. 与指示线工作可能形成互补（不冲突，因自跑线不动 evaluator_version）
+2. 输出诊断报告本身就是高价值产物
+3. 为 Round 9+ 的向量化 / 新评测 devset 扫清隐藏 bug
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 7 后）：272 pass / 0 fail / 9 skip（HEAD `5f783fc`）
+
+---
+
 ## 2026-08-04 — Round 1（inspect 子命令 + 测试）
 
 **做了什么**：
