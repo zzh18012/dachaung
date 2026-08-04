@@ -8415,3 +8415,61 @@ WarningRecord/ErrorRecord 字段验证。
 可深入 SHA256 校验、文件 IO 边界、compute_text_hash 等。
 
 ---
+
+## Round 143（2026-08-05）：app/hash.py 第四轮（edges3）
+
+### 目标
+- 给 app/hash.py（24 行，已有 157 测试）补第四轮 edges
+- 深入 SHA-256 标准向量、流式读取、跨函数一致性
+
+### 改动
+- 新增 `tests/test_hash_edges3.py`（45 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **SHA-256 NIST 测试向量**：
+  - 空字符串标准 hash
+  - 单字符 a
+  - "abc" 标准
+  - 长测试向量
+- **hexdigest 格式**：str、64 字符、小写 hex
+- **compute_text_hash 不变量**：
+  - 相同输入 → 相同输出
+  - 不同输入 → 不同输出
+  - Unicode UTF-8 编码
+  - 长文本/空白/换行
+- **compute_file_hash 深度**：
+  - str / Path 都接受
+  - 文件 hash = text hash(文件内容)
+  - 空文件、单字节、二进制、Unicode
+  - 大文件流式（>64KB buffer）
+  - 相同内容相同 hash
+  - 不同内容不同 hash
+- **错误路径**：
+  - missing file → FileNotFoundError
+  - directory → FileNotFoundError
+  - 错误 message 含"不是文件"
+- **模块结构**：imports hashlib/Path，future annotations
+- **签名**：1 参，无默认，返回 str
+- **跨函数一致性**：
+  - file hash == hashlib.sha256(content)
+  - 多次调用结果稳定
+
+### 撞墙记录
+无（hash 模块简单，45 测试全过）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 143 后）：11224 pass / 0 fail / 13 skip（HEAD `e13b3c7`）
+
+### 下一步建议
+- 候选 HB：app/parsers/text_parser.py 第四轮
+- 候选 HC：app/parsers/base.py 第四轮
+- 候选 HD：app/parsers/kreuzberg_parser.py 第四轮
+- 候选 HE：evaluation/__init__.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HB（app/parsers/text_parser.py 第四轮）。text parser 是最
+简单的 parser，第四轮可深入 .txt 读取、空文件、Unicode 编码等。
+
+---
