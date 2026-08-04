@@ -1853,3 +1853,40 @@
 - 本 worktree（Round 35 后）：871 pass / 0 fail / 9 skip（HEAD `3618bc4`）
 
 ---
+
+## Round 36（2026-08-04）：候选 AR — chunker 内部 helper 与集成边角覆盖补强
+
+### 做了什么
+- 候选 AR：扩展 `tests/test_chunker.py`，新增 40 个测试覆盖 `app/chunkers/structural.py` 内部纯函数 helper + 集成边角。
+- 重点覆盖项：
+  - **`_hard_split_with_whitespace_fallback`** 7 个：空串、纯空白、短文本透传、空白边界切分（boundary_after='whitespace'）、无空白 forced_char 兜底、每个 piece <= max_chars、start/end 坐标系
+  - **`_split_long_text`** 9 个：空、纯空白、短文本、strip 后再切、英文句号、中文句号、?! 标点、超长文本、单空格 joiner
+  - **`_SplitPiece`** 2 个：默认 start/end=0、frozen（赋值抛异常）
+  - **`_element_text_with_span`** 6 个：paragraph stripped + start/end 推导、image 返回空、纯空白返回空、无前导空白、仅尾部空白、`_element_text` 兼容方法
+  - **chunker 集成** 9 个：空 doc / 全空 content → 空 chunks、连续 heading 各自独立成 chunk、超长 paragraph 强制切分、long_paragraph_sentence_split strategy、chunk_id 格式（`{doc_id}::c{counter:04d}`）+ 递增、metadata.max_chars / char_count、多 paragraph 合并的 source_spans、source_element_ids 在 _ChunkBuffer 内去重、paragraph→table→paragraph 三段独立、单空格 joiner
+  - **`_SENTENCE_SPLIT_RE`** 3 个：英文 . + 空白、中文 。 + 空白、无空白不切
+  - **`_WHITESPACE_RE`** 1 个：所有空白压成单空格
+  - **`normalize_text`** 3 个：幂等、emoji 保留、全角空格识别
+- 无源码改动。
+
+### 撞墙记录
+- **撞墙 1**：`test_chunk_chunk_id_format` 用了 `document_id=` kwarg，但 `_make_doc` 的形参名是 `doc_id=`。改测：换 kwarg 名。
+- **撞墙 2**：`test_sentence_split_re_splits_on_chinese_period` 用 `"你好。世界"`，但 `_SENTENCE_SPLIT_RE` 的正则是 `(?<=[。！？!?\.])\s+` — 要求句末标点后跟空白才切。中文习惯无空白，所以不切。改测：加空格 `"你好。 世界"`。
+
+### 下一步建议
+- 候选 AK：kreuzberg / markdown / html parser 内部 helper 单测
+- 候选 AP：evaluation/runner.py 评测指标聚合边角
+- 候选 AQ：evaluation/manifest.py / annotation.py 边角
+- 候选 AS：app/hash.py 内部边角（chunk size、二进制读取）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AK（其他 parser 内部 helper）。理由：
+1. fallback parser 已在 Round 30 充分覆盖
+2. markdown / html / ipynb parser 各自的内部 helper 仍缺单测
+3. 与 chunker/pipeline 测试互补，全面覆盖 parser 层
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 36 后）：911 pass / 0 fail / 9 skip（HEAD `b005a82`）
+
+---
