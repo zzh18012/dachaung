@@ -9567,3 +9567,61 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 解析器家族，第六轮可深入 html.parser HTMLParser 子类、section_path、table 提取等。
 
 ---
+
+## Round 163（2026-08-05）：app/parsers/html_parser.py 第六轮（edges6）
+
+### 目标
+- 给 app/parsers/html_parser.py（446 行，已有 base/edges/edges2-5 共 597 测试）补第六轮
+- 深入 _HTMLDocParser SAX 各 handler、跳过栈、嵌套 table、pre/blockquote depth、locator 行为
+
+### 改动
+- 新增 `tests/test_parsers_html_edges6.py`（114 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量精确**：_HTML_EXTENSIONS / _HEADING_LEVELS / _SKIP_TAGS 内容、类型、lowercase
+- **_detect_html_source_type**：details.suffix 精确、message 提及 .html/.htm
+- **_rows_to_md**：empty/单行/双行/uneven/超宽/Unicode/空 cells/separator 固定
+- **_HTMLDocParser 初始状态**：document_id/elements/warnings/_cur_*/_list_stack/_pre_depth/_blockquote_depth/_section_*/_table_*/_skip_stack 全部默认值
+- **继承 stdlib**：issubclass HTMLParser、convert_charrefs=True
+- **SAX handlers**：handle_starttag/endtag/data/startendtag 都存在
+- **标题流程**：h1-h6 level metadata、section_path push/pop/弹栈
+- **段落/loose text**：whitespace-only ignored、loose text 成 paragraph
+- **列表**：ul unordered、ol ordered、marker metadata
+- **pre/blockquote**：metadata.kind="preformatted"/"blockquote"、嵌套 depth 计数
+- **图片**：src+alt/src only/empty src/无 src 各分支、self-closing img
+- **hr/br**：hr 不产 element、br 在 paragraph 内加空格
+- **跳过栈**：script/style/head/title/meta/link/noscript 内容被忽略、跳过后 normal text 恢复
+- **嵌套 table**：触发 html_nested_table warning
+- **空表格**：rows 空 → _rows_to_md 返回 ""，不产 element
+- **col_count**：max of all rows
+- **HtmlParser.parse()**：file_not_found/unsupported_type/metadata={"html":True}
+- **confidence 精确**：heading/paragraph=0.95，table/image=0.9
+- **element_id zero-pad**：4 位 zero-padding
+- **locator**：line 字段、section_path 在 heading 后含自身、无 heading 时不含
+- **char entity**：convert_charrefs 自动转 &amp;/&lt;/&gt;/&#65;
+- **模块结构**：__all__、future annotations、imports、docstring 提及 supported tags 与 nested 限制
+- **签名深度**：parse/_detect_html_source_type/_rows_to_md 参数与返回
+
+### 撞墙记录
+- **Wall 1**：`<script>outer<script>inner</script>still skip</script>` 测试期望 elements 空，
+  实际 html.parser 把 `<script>` 内的 `<script>` 当 CDATA 数据，第一个 `</script>` 关闭外层，
+  之后 `still skip` 成为 loose paragraph，第二个 `</script>` 是孤儿 endtag 无效。修复：测试期望
+  改成"产 1 个 paragraph，content 是 'still skip'"。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 163 后）：13128 pass / 0 fail / 13 skip（HEAD `adf10ff`）
+
+### 下一步建议
+- 候选 IA：app/parsers/ipynb_parser.py 第六轮
+- 候选 IC：app/parsers/text_parser.py 第七轮
+- 候选 ID：app/parsers/fallback.py 第六轮
+- 候选 IE：app/parsers/base.py 第七轮
+- 候选 IF：app/parsers/__init__.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IA（app/parsers/ipynb_parser.py 第六轮）。ipynb 是 notebook 格式，
+第六轮可深入 code/markdown cell 分离、nbformat v4 字段、source 字段类型等。
+
+---
