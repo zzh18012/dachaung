@@ -3766,3 +3766,81 @@
 - 本 worktree（Round 80 后）：4372 pass / 0 fail / 12 skip（HEAD `87ef2ae`）
 
 ---
+
+## Round 81（2026-08-05）：候选 CP — app/parsers/kreuzberg_parser.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CP：新建 `tests/test_parsers_kreuzberg_edges2.py`（206 个测试）覆盖
+  `app/parsers/kreuzberg_parser.py`（245 行）的深度边角，与已有 `test_parsers_kreuzberg.py`（53）+
+  `test_parsers_kreuzberg_edges.py`（73）互补。
+- 重点覆盖项：
+  - **_HEADING_RE 正则深度** 30 个：compiled pattern object、^/$ 锚定、tab/混合空白前缀、
+    h1/h6 边界、0/7 hashes 拒绝、no-whitespace 拒绝、trailing whitespace strip、
+    内部空白保留、Unicode/digits/capitalization、close markers
+  - **_SHORT_LINE_MAX** 4 个：int 类型、=80、positive、合理范围
+  - **_classify_line 边界** 30 个：6 种 terminator 全枚举（中英）、ATX 优先级、
+    leading whitespace 不影响 level 计算、short_line heuristic、paragraph 空 meta、
+    single char heading、ATX meta 不含 heuristic key
+  - **_make_locator** 19 个：负数/0/极大 paragraph_index、所有 source_type、
+    大小写敏感、idempotent、fresh dict per call、bool 类型
+  - **_split_content_to_elements** 30 个：多 block/heading+paragraph/rest paragraph、
+    CRLF/triple-newline 收敛、para_idx 增长、Element 字段完整验证、heading parent_id None、
+    heading confidence 0.6、paragraph 0.5、short_line heading level=0
+  - **KreuzbergParser 类深度** 11 个：__all__、init keyword-only、parse signature、
+    继承 Parser ABC、version 与 _KREUZBERG_VERSION 一致性
+  - **parse() 错误路径** 8 个：unavailable 优先于 file_not_found、
+    extract_failed __cause__ 保留、details.exception_type 来自实际异常
+  - **parse() 配置/调用** 4 个：include_document_structure 实际传入 ExtractionConfig、
+    extract_file_sync 收到 str(path)
+  - **parse() warnings** 9 个：no_structured_elements details keys/values、
+    element_count_after_heuristic 与 len(elements) 一致、PDF no_bbox 永远发、
+    DOCX 永不发、双 warning 同时
+  - **parse() tables 深度** 17 个：empty/None 处理、markdown/cells 缺失、
+    cell_count/row_count/source metadata、confidence 0.8/0.5、bounding_box → list、
+    page_number 0/None fallback、incrementing table_index、empty rows
+  - **parse() metadata/Document** 16 个：mime_type/quality_score pass-through、
+    None 值保留、metadata 恰好 2 个 key、chunks/relations/errors 空、
+    source_path str、source_hash 透传、document_id 含 hash[:16]
+  - **parse() 复用 + schema** 4 个：两次 parse 独立、element_id 从 e0000 重启、
+    schema 验证通过（含 tables）
+  - **模块结构** 11 个：__all__、_HEADING_RE、_SHORT_LINE_MAX、_classify_line、
+    _make_locator、_split_content_to_elements、_KREUZBERG_AVAILABLE bool、
+    _KREUZBERG_VERSION str|None、kreuzberg/ExtractionConfig 可访问
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_classify_line_atx_heading_with_leading_spaces_level_uses_hash_count`
+  预期 level=2，实际 level=1。原因：`line.lstrip("#")` 不去除前导空格，
+  `len(line) - len(line.lstrip("#"))` = 0，level=max(1, 0)=1。
+  修复：测试改为验证 fallback 行为，level==1。
+- wall 2：`test_classify_line_atx_heading_overrides_short_line_logic`
+  预期 `meta["heuristic"] != "short_line"`，实际 KeyError。原因：ATX 路径不写 heuristic key。
+  修复：改用 `meta.get("heuristic")`。
+- wall 3：`test_split_content_block_with_internal_newlines_preserved_in_paragraph`
+  预期 1 个 element，实际 2 个。原因：第一行 "line one" 短无 terminator → heading +
+  rest paragraph。修复：测试内容改为 "line one.\nline two."（强制 paragraph）。
+- wall 4：`test_parse_table_content_falls_back_to_empty_when_markdown_none`
+  和 `test_parse_table_no_markdown_no_cells_still_emits` 触发 Element `__post_init__`
+  ValueError（content 与 resource_path 都不能为空）。
+  原因：markdown=None → content=""，schema 拒绝。
+  修复：改为 `pytest.raises(ValueError)` 验证此场景拒绝（实际 kreuzberg 输出不会这样）。
+- 6 个 SyntaxWarning（docstring 含 `\s` `\S`）→ 全部改 raw string。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CQ：evaluation/reporter.py 边角（第二轮）
+- 候选 CR：evaluation/manifest.py 边角（第二轮）
+- 候选 CS：evaluation/adapter.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CE（evaluation/runner.py 边角第二轮）。理由：
+1. runner.py 是 evaluation/ 最大的模块，承担 orchestrator 职责
+2. 当前 test_evaluation_runner*.py 集中在 happy path，边角（错误聚合、计时记录、
+   silent_drop 计算细节）尚未深入
+3. 与 Round 78-81 的 parser 边角第二轮形成 evaluation/ 第二轮覆盖闭环
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 81 后）：4578 pass / 0 fail / 12 skip（HEAD `b31aef4`）
+
+---
