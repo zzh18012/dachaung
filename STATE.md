@@ -827,3 +827,65 @@
 - 本 worktree（Round 13 后）：316 pass / 0 fail / 9 skip（HEAD `8725911`）
 
 ---
+
+## 2026-08-04 — Round 14（合成测试 fixtures 收敛）
+
+**做了什么**：
+- 完成候选 P：把 3 个测试文件里重复的合成 DOCX/PDF 构造代码收敛到 `tests/_synthetic_docs.py`
+- 新模块提供 5 个 canonical builders：
+  - `build_minimal_docx(path, with_table=False)`：Heading1+Heading2 styles.xml + 1 heading + 1 paragraph + 可选 table
+  - `build_pipeline_docx(path)`：无 styles.xml，pStyle ref + 1 heading + 2 paragraphs（pipeline 集成专用）
+  - `build_docx_with_caption(path)`：无 styles.xml，2 caption + 1 paragraph（caption regex 集成）
+  - `build_empty_docx(path)`：空 body
+  - `build_minimal_pdf(path, text)`：单页文本 PDF
+- 迁移 3 个文件：
+  - `test_parsers.py`：4 个内嵌 builder → import（删 ~155 行）
+  - `test_evaluation_cli.py`：1 个内嵌 builder → import（删 ~48 行）
+  - `test_pipeline_integration.py`：2 个内嵌 builder → import（保留薄 local wrapper 维持 call site 不变，删 ~54 行）
+- 净变化：-230 / +27 行（test 文件）+ 新增 _synthetic_docs.py（~190 行）
+- 不变量保持：316 pass / 0 fail / 9 skip 不变；纯重构无行为变化
+- commit `d875d35`，已 push
+
+**worktree 当前状态**：
+- HEAD `d875d35`，工作树清洁
+- 测试基线：316 pass / 0 fail / 9 skip（与 Round 13 一致，纯 refactor）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 15）
+
+**首要任务**：方向选择
+
+- 候选 R（推荐）：**chunker 覆盖率扩展**
+  - 现状：source_spans 已有 8 个测试；但中英文标点分割、whitespace fallback、heading hard boundary 等分支可能仍有未覆盖
+  - 复杂度：低-中
+  - 价值：chunker 是当前阶段的核心算法，覆盖率应保持高位
+
+- 候选 Q：**kreuzberg parser 覆盖率**
+  - 现状：只有 3 个 kreuzberg 测试
+  - 复杂度：中（kreuzberg 行为不稳定）
+  - 价值：备选 parser 的覆盖率薄弱
+
+- 候选 S：**pipeline 错误处理路径**
+  - 现状：`process_single` 的 warning 汇总 / 错误聚合 / 半成品清理路径
+  - 复杂度：中
+
+- 候选 T（新提）：**HTML/Markdown/Text/IPYNB parser 覆盖率**
+  - 现状：这些 parser 测试可能比 fallback 还薄弱
+  - 复杂度：低-中（行为相对简单）
+  - 价值：边缘 parser 容易被忽视
+
+- 仍阻塞：候选 J（向量化，CLAUDE.md deps 限制）、候选 M（evaluator v1.2，AUTONOMOUS_LOOP.md 硬底线）、候选 O（docs/*.md，CLAUDE.md system instruction）
+
+**建议**：选 R（chunker 覆盖率）。理由：
+1. chunker 是当前阶段最复杂的算法（heading 边界 + 句子分割 + whitespace fallback + 表格隔离 + source_spans 跟踪）
+2. 是 source_spans 的载体，覆盖率高低直接影响后续 v1.2 评估（如果未来解禁）
+3. fixtures 已收敛，新测试成本低
+
+### 撞墙记录
+- 无新撞墙。Round 13/14 的 P 候选顺利完成。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 14 后）：316 pass / 0 fail / 9 skip（HEAD `d875d35`）
+
+---
