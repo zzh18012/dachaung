@@ -2382,3 +2382,47 @@
 - 本 worktree（Round 49 后）：1530 pass / 0 fail / 9 skip（HEAD `f5d20dc`）
 
 ---
+
+## Round 50（2026-08-04）：候选 BC — app/cli.py 内部边角覆盖
+
+### 做了什么
+- 候选 BC：新建 `tests/test_cli_edges.py`（74 个测试）覆盖 `app/cli.py`（535 行）的全部纯函数 + argparse 配置 + 错误路径。
+- 与已有 `test_cli.py`（77 个集成测试）互补，专门测纯函数边角。
+- 重点覆盖项：
+  - **_build_arg_parser** 12 个：prog="app.cli"、4 个子命令存在、parse 默认 max_chars=800 + parser=None、parse-dir recursive=False、inspect 默认 limit=10 + elements/chunks/spans=False、--parser 6 个 choices 完整、无命令/未知命令 SystemExit(2)
+  - **_EXTENSION_TO_PARSER 常量** 7 个：9 个键、5 个 parser 值映射（pdf/docx→fallback, md+markdown→markdown, html+htm→html, txt+text→text, ipynb→ipynb）
+  - **_infer_parser_name** 6 个：大写扩展名 lower 后识别（.PDF/.DOCX/.MD）、未知扩展名→fallback、无扩展名→fallback、混合大小写、dotfile（.gitignore suffix 全名 → fallback）
+  - **_iter_supported_files** 5 个：空目录返 []、过滤不支持扩展名、混扩展名全收、递归子目录、返回 Path 对象
+  - **_relative_output_path** 3 个：root level 文件、无扩展名文件、同名不同扩展名防冲突（保留 suffix 进文件名）
+  - **_preview** 7 个：width=0 边界、短文本直返、纯空白→空、单字符、宽度边界不截、超长加 …、多行 collapse 单行
+  - **_load_document_json** 6 个：空文件 JSONDecodeError、目录 OSError、UTF-8 BOM、合法 dict、JSON 数组根（合法 JSON）、错误消息含路径
+  - **_format_summary** 6 个：chunk 空 text、element 无 type→"?"、warnings > 5 截断含 "more" 标记、errors code+message 渲染、缺 schema_version→"?"、hash 显示前 16 字符 + …
+  - **_format_elements_list** 3 个：缺 element_id→"?"、parent_id=None 不显示 parent 段、limit > count 无 "more" 提示
+  - **_format_chunks_list** 4 个：无 source_element_ids→refs=0、show_spans=True 但无 spans→"(none)"、show_spans 实际渲染、limit=0 全列
+  - **_emit_structured_error** 4 个：extra 字段透传、schema_version="0.1.0" 常量、input 路径 str 化、走 stderr 不走 stdout
+  - **main 入口** 3 个：argv 列表接受、返回 int、inspect 返回 0/1/2
+  - **_run_parse 错误路径** 3 个：缺输入文件→结构化 error JSON + code="file_not_found"、显式 parser 跳过 INFO 日志、自动推断打印 INFO 含推断出的 parser 名
+  - **_run_parse_dir** 5 个：自动创建输出目录、summary total 计数、缺输入目录返 2、summary 含 max_chars、summary 含 recursive
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。74 个新测试一次通过。
+
+### 下一步建议
+- 候选 BD：tests/test_schema.py 边角补强（document schema validation 边角）
+- 候选 BE：app/models.py 边角补强（dataclass field 默认值、frozen 行为、to_dict/from_dict）
+- 候选 BF：tests/test_annotation_metrics.py 边角补强
+- 候选 BG：app/chunkers/structural.py 内部边角（_ChunkBuffer / _split_long_text / _hard_split_with_whitespace_fallback）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BG（structural chunker 内部边角）。理由：
+1. structural.py 是核心算法（388 行），含多个内部 helper
+2. _split_long_text / _hard_split_with_whitespace_fallback / _ChunkBuffer / normalize_text 是分块正确性的基础
+3. 当前测试主要是通过 StructuralChunker.chunk() 验证，缺少各 helper 的直接单测
+4. 之后转 BD/BE 补完剩余模块边角
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 50 后）：1604 pass / 0 fail / 9 skip（HEAD `166461f`）
+
+---
