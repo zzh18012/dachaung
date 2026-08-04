@@ -468,3 +468,81 @@
 
 ---
 
+## 2026-08-04 — Round 8（evaluation 管线审计 + 修复 2 个真实 bug）
+
+**做了什么**：
+- 完成候选 A：审计 `evaluation/*.py` 与测试套件，找到并修复 2 个真实 bug，写诊断报告
+- **Bug 1（chunk_boundary_prf 重复 marker）**：
+  - 现象：`annotation_metrics.chunk_boundary_prf` 中 `stream.find(marker)` 没传起点参数，两个相同 marker 文本的 anchor 都会命中第 1 次出现，导致两个 gt_position 完全相同 → 一对一约束下至多匹配 1 个 → 召回率被错误低估
+  - 修复：维护 `search_from` 游标，每找到一个 marker 后推进到其末尾；下一个 anchor 在剩余 stream 中继续找
+  - 测试：3 个新增（重复 marker × before/after/exhausted 三种场景）
+- **Bug 2（_process_one 返回 Path()）**：
+  - 现象：`runner._process_one` 失败分支写 `image_dir or Path()`，当 image_dir 为 None 时退化成 `Path('.')`（= cwd）。下游 `image_dir.is_dir()` 在 cwd 上几乎总为 True，silently 把 image_base_dir 设成 cwd
+  - 实际无害（失败文档无图片，`_image_resource_ratio` 先 short-circuit 在 `no_image_elements`），但类型契约错误，未来重构易爆雷
+  - 修复：返回类型从 `Path` 改成 `Path | None`；三个 return 都直接 `return image_dir`；调用点改成 `image_dir if (image_dir is not None and image_dir.is_dir()) else None`
+  - 测试：2 个新增（失败路径返回 None / 成功路径返回 Path）
+- **诊断报告**：`docs/evaluation-audit.md`，分类记录"已修的真实 bug / 审计了但不是 bug 的设计选择 / 已识别但未修的小问题 / 不变量复核 / 后续 round 建议"
+- 不变量保持：
+  - `evaluator_version` 与 `report_version` 仍是 `"1.1"`（未触动 `evaluation/__init__.py`）
+  - 没有改 `app/parsers/*`、`app/chunkers/*`、`app/pipeline.py`
+  - 没有改任何 schema 文件
+- commit `6c8277a`，已 push
+
+**审计中复核为"非 bug 的设计选择"**（保留）：
+- aggregate_summary 不出"综合分数"（counts/success_rates/ratio_macro_averages/silent_drop_total 四类分开）
+- 比例指标分母为 0 → null + reason，不返回 1.0
+- figure_caption_* 始终 null + `parser_does_not_emit_relations`
+- 计时只记 total，parse/chunk 未插桩
+- manifest 路径三道闸（相对路径 / 正斜杠 / 位于项目根内）
+- silent_drop_count 必须基于 manifest expectations
+- chunk_boundary 一对一贪心匹配
+
+**已识别但未修的小问题**（留给后续 round）：
+- `evaluation/cli.py --parser` choices 仍只有 fallback/kreuzberg；扩展需要 bump evaluator_version
+- `evaluation/cli.py run` 子命令生成报告后又从磁盘重读校验（低效但安全）
+- `runner._process_one` 的 image_dir 推导硬编码 document_id 格式（应让 pipeline 暴露 image_output_dir）
+- `_chunk_reference_ratio` 的 elem_ids 集合可能含 None（schema 已保证非空，加防御代码反而啰嗦）
+
+**worktree 当前状态**：
+- HEAD `6c8277a`，工作树清洁
+- 测试基线：277 pass / 0 fail / 9 skip（+5 vs Round 7）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 9）
+
+**首要任务**：方向选择
+
+- 候选 J（推荐）：**向量化基础设施起步**
+  - 现状：parser 矩阵 + CLI + 评测管线都稳定，CLAUDE.md 列的 "不做" 范围里有向量化，但自跑线已解锁，可以推进 dachuang 目标 4
+  - 复杂度：高（需要 `sentence-transformers` 或类似，CPU 版 5GB 内可装）
+  - 价值：RAG 核心；自跑线阶段性大跨越
+  - 设计要点：新增 `app/embeddings/` 模块；CLI 加 `embed` 子命令读 chunks → 向量 → numpy .npy；不引入 faiss，先用 numpy 做最简 ANN
+  - 风险：装依赖可能失败 / 大；先 `uv pip install` 试探
+
+- 候选 I：**evaluation devset 加入新输入格式**
+  - 现状：评测只跑 PDF/DOCX，markdown / html / text / ipynb 没评测覆盖
+  - 复杂度：中（需要扩展指标体系如 `markdown_section_path_valid_ratio`，可能要 bump evaluator_version）
+  - 价值：检验新 parser 的 chunking 质量
+  - 不变量冲突：bump evaluator_version 与"指示线 v2.x 审计"目标可能冲突，先确认
+
+- 候选 K（新提）：**pipeline 暴露 image_output_dir**
+  - 现状：`_process_one` 用 document_id 反推 image_dir，硬编码两个约定（document_id 前缀 + image 目录命名）
+  - 复杂度：低（pipeline 增加一个返回值或 Document 增加一个字段）
+  - 价值：根治 Round 8 审计中识别的硬编码问题；为评测准确性铺路
+
+- 候选 D：补 fallback parser 的覆盖率
+- 候选 E：实施 source_spans（独立设计，体积较大）
+
+**建议**：选 J（向量化）。理由：
+1. 大跨越，从解析层进入检索层，dachuang 项目核心
+2. Round 8 已扫清评测隐藏 bug，向量化基线数据更可信
+3. 5GB 内 CPU 版 sentence-transformers 应可装；如失败 fallback 到候选 K
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 8 后）：277 pass / 0 fail / 9 skip（HEAD `6c8277a`）
+
+---
