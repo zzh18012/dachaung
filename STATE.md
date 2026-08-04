@@ -9937,3 +9937,47 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第六轮可深入 parse→chunk→validate 各阶段、错误聚合、structured errors JSON 输出。
 
 ---
+
+## Round 170（2026-08-05）：app/pipeline.py 第七轮（edges7）
+
+### 目标
+- 给 app/pipeline.py（216 行，已有 edges/edges2-6/errors/helpers/integration 共 639 测试）补第七轮
+- 深入 get_parser 各分支、image_output_dir_for、process_single 错误路径、validate_only
+
+### 改动
+- 新增 `tests/test_pipeline_edges7.py`（63 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **get_parser**：6 parser 全覆盖、未知 name 抛 ValueError（消息列出所有支持项）、fallback 接受 image_output_dir、其他 parser 忽略、返回 Parser 子类、每次新实例
+- **image_output_dir_for**：None→None、Path/str 都接受、命名约定 `images-<sha16>`、parent 与 output_path.parent 一致、短 hash 仍按 [:16] 取
+- **process_single**：
+  - 错误路径：file_not_found（details.path）、unknown_parser（兜底 unexpected）、unsupported_type、empty file → no_extracted_elements（details 含 warnings/source_type）
+  - 成功路径：text parser、不写盘也返回 Document、写盘创建 parent dir、write_json=False 不写
+  - keyword-only 参数（parser_name/max_chars/write_json）
+  - 默认值精确（fallback/800/True）
+- **validate_only**：不存在/非法 JSON/返回 (bool, str)
+- **模块结构**：__all__ 4 项、imports 完整（json/Path/Any/StructuralChunker/compute_file_hash/所有 6 parser/SchemaValidationError/validate）、docstring 提及关键不变量
+- **签名深度**：所有公共函数参数名、默认值、keyword-only kind
+- **综合行为**：idempotent、no mutation、长 paragraph 自动分块、不同 parser name 返回不同类实例
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 170 后）：13723 pass / 0 fail / 13 skip（HEAD `3f222b5`）
+
+### 下一步建议
+- 候选 IG：app/chunkers/__init__.py 第六轮
+- 候选 IH：app/models.py 第八轮
+- 候选 IK：app/hash.py 第六轮
+- 候选 IL：app/source_locator.py 第六轮
+- 候选 IN：app/schema.py 第六轮
+- 候选 IO：app/cli.py 第八轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IG（app/chunkers/__init__.py 第六轮）。chunkers/__init__.py 是分块器子包入口，
+第六轮可深入 StructuralChunker re-export、__all__、与其他 chunker 子模块的关系。
+
+---
