@@ -1096,3 +1096,72 @@
 - 本 worktree（Round 17 后）：373 pass / 0 fail / 9 skip（HEAD `32c7f95`）
 
 ---
+
+## 2026-08-04 — Round 18（pipeline 错误路径覆盖）
+
+**做了什么**：
+- 完成候选 S：补 pipeline 错误路径覆盖率，新建 `tests/test_pipeline_errors.py`（13 个测试）
+- **`get_parser`**（3 个）：
+  - 未知 parser 名 → ValueError
+  - 6 个已知名都返回正确类型的 instance
+  - fallback 接收 image_output_dir 参数
+- **`validate_only` 错误路径**（3 个）：
+  - 缺文件 → (False, msg)
+  - 坏 JSON → (False, "JSON 解析失败")
+  - JSON 合法但 schema 不对 → (False, schema 错误)
+- **`process_single` 错误路径**（7 个）：
+  - **`no_extracted_elements`**：合成无 content stream 的最小 PDF，验证 fallback 解析返回 0 elements → 错误码 + warnings/details
+  - **`chunker_failed`**：monkeypatch StructuralChunker.chunk 抛 RuntimeError → 结构化错误 + 无半成品
+  - **`unexpected_parser_error`**：monkeypatch get_parser 注入抛 ValueError 的 parser → 结构化错误含 parser_name
+  - **`write_failed`**：monkeypatch pathlib.Path.open 在写模式抛 OSError → 结构化错误含 path
+  - `write_json=False`：不写盘
+  - `output_path=None`：不写盘
+  - kreuzberg on PDF：不崩溃（即使给不出 bbox）
+- **重要发现**：`process_single` 写盘走 `Path.open` 而非 `builtins.open`；初始 monkeypatch 没生效，改 Path.open 后通过
+- commit `3aab469`，已 push
+
+**worktree 当前状态**：
+- HEAD `3aab469`，工作树清洁
+- 测试基线：386 pass / 0 fail / 9 skip（+13 vs Round 17）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 19）
+
+**首要任务**：方向选择
+
+- 候选 U（推荐）：**schema 校验测试**
+  - 现状：source_spans 加入 schema 后可能有边角；conditional if/then 各分支
+  - 复杂度：低
+
+- 候选 V：**models 测试**
+  - 现状：test_models.py 不知覆盖度
+  - 复杂度：低
+
+- 候选 W：**annotation_metrics 测试**
+  - 复杂度：低
+
+- 候选 X：**evaluation metrics 测试**
+  - 复杂度：低-中
+
+- 候选 Y：**manifest 测试**
+  - 复杂度：低
+
+- 候选 Z（新提）：**chunker 模糊测试 / 不变量测试**
+  - 用各种随机/极端输入验证"不丢不重"不变量
+  - 复杂度：中
+
+- 仍阻塞：候选 J（向量化）、候选 M（evaluator v1.2）、候选 O（docs/*.md）
+
+**建议**：选 U（schema 校验）。理由：
+1. source_spans 加入 schema 是近期最大的 schema 变化
+2. conditional if/then 分支多（pdf/docx/markdown/html/text/ipynb 各不同 source_locator）
+3. schema 校验是写盘前的最后防线，覆盖率应保持高位
+
+### 撞墙记录
+- monkeypatch `builtins.open` 对 `Path.open` 无效：`Path.open` 内部走 `io.open`，绕过 `builtins.open`。改 monkeypatch `pathlib.Path.open` 解决。这是 Round 18 的非trivial 发现。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 18 后）：386 pass / 0 fail / 9 skip（HEAD `3aab469`）
+
+---
