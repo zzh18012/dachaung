@@ -17,6 +17,7 @@ from app.hash import compute_file_hash
 from app.models import Document, ErrorRecord
 from app.parsers import Parser, ParserError
 from app.parsers.fallback_parser import FallbackParser
+from app.parsers.html_parser import HtmlParser
 from app.parsers.kreuzberg_parser import KreuzbergParser
 from app.parsers.markdown_parser import MarkdownParser
 from app.schema import SchemaValidationError, validate
@@ -30,7 +31,9 @@ def get_parser(name: str, image_output_dir: Path | str | None = None) -> Parser:
         return KreuzbergParser()
     if name == "markdown":
         return MarkdownParser()
-    raise ValueError(f"未知 parser: {name}（支持: fallback, kreuzberg, markdown）")
+    if name == "html":
+        return HtmlParser()
+    raise ValueError(f"未知 parser: {name}（支持: fallback, kreuzberg, markdown, html）")
 
 
 def process_single(
