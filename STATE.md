@@ -1026,3 +1026,73 @@
 - 本 worktree（Round 16 后）：351 pass / 0 fail / 9 skip（HEAD `54eaa3e`）
 
 ---
+
+## 2026-08-04 — Round 17（边缘 parser 覆盖率扩展）
+
+**做了什么**：
+- 完成候选 T：补 text/markdown/html parser 测试覆盖率，新增 22 个测试
+- **Text parser**（4 个，加到 `tests/test_parsers_text.py`）：
+  - `_split_paragraphs` 处理 CR-only 换行（老 Mac 风格）
+  - 尾部空行被忽略
+  - 文件开头空行不偏移首段行号
+  - 多段落的 1-indexed 行号正确
+- **Markdown parser helpers**（13 个，加到 `tests/test_parsers_markdown.py`）：
+  - `_detect_md_source_type`：.md/.markdown 大小写不敏感；其他扩展名 raise
+  - `_rows_to_md`：empty / 单行 / 长短不齐填充
+  - `_split_pipe_row`：基础 + 无外 pipe + cell strip + 单 cell
+  - `_is_pipe_table_start`：合法 / 缺分隔行 / 最后一行 / 非 pipe 首行
+- **HTML parser helpers**（5 个，加到 `tests/test_parsers_html.py`）：
+  - `_detect_html_source_type`：.html/.htm 大小写不敏感；其他扩展名 raise
+  - `_rows_to_md`：empty / 单行 / 长短不齐填充
+- IPYNB parser 现有 20 个测试覆盖已较完整，本轮未加新测试
+- commit `32c7f95`，已 push
+
+**worktree 当前状态**：
+- HEAD `32c7f95`，工作树清洁
+- 测试基线：373 pass / 0 fail / 9 skip（+22 vs Round 16）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 18）
+
+**首要任务**：方向选择
+
+- 候选 S（推荐）：**pipeline 错误处理路径**
+  - 现状：`process_single` 的 warning 汇总 / 错误聚合 / 半成品清理 / image_output_dir 处理
+  - 复杂度：中
+  - 价值：pipeline 是端到端核心，错误路径最易回归
+
+- 候选 U：**schema 校验测试**
+  - 现状：source_spans 加入 schema 后可能有边角；conditional if/then 各分支
+  - 复杂度：低
+
+- 候选 V：**models 测试**
+  - 现状：test_models.py 现状不清，可能边角未覆盖
+  - 复杂度：低
+
+- 候选 W：**annotation_metrics 测试**
+  - 现状：Round 8 加过几个重复 marker 测试；可能还有边角
+  - 复杂度：低
+
+- 候选 X（新提）：**evaluation metrics 测试**
+  - 现状：test_metrics.py 应该比较完整，但加 source_spans 后可能有新指标没覆盖
+  - 复杂度：低-中
+
+- 候选 Y（新提）：**manifest 测试**
+  - 现状：test_manifest.py 边角检查
+  - 复杂度：低
+
+- 仍阻塞：候选 J（向量化）、候选 M（evaluator v1.2）、候选 O（docs/*.md）
+
+**建议**：选 S（pipeline 错误路径）。理由：
+1. pipeline 是端到端核心，所有用户都过这一层
+2. warning 聚合 / 半成品清理路径最易回归（之前 Round 8 修过 _process_one 的类似问题）
+3. 覆盖率薄弱风险高
+
+### 撞墙记录
+- 无新撞墙。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 17 后）：373 pass / 0 fail / 9 skip（HEAD `32c7f95`）
+
+---
