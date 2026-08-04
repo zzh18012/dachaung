@@ -8346,3 +8346,72 @@ language-specific 分隔符。
 WarningRecord/ErrorRecord 字段验证。
 
 ---
+
+## Round 142（2026-08-05）：app/models.py 第五轮（edges4）
+
+### 目标
+- 给 app/models.py（154 行，已有 307 测试）补第五轮 edges
+- 深入 dataclass 字段顺序、默认值独立性、to_dict 行为、__post_init__ 边界
+
+### 改动
+- 新增 `tests/test_models_edges4.py`（76 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **SCHEMA_VERSION 常量**：str，值 "0.1.0"
+- **ElementType/SourceType**：
+  - 8 个 element type
+  - 6 个 source type
+- **Element __post_init__**：
+  - empty id raises ValueError
+  - content+resource 都给 OK
+  - content-only / resource-only OK
+  - empty content string 视为 falsy
+  - 默认 confidence=1.0
+  - default_factory metadata 独立 per instance
+- **Element 字段顺序**：element_id/type/source_locator/parent_id/content/resource_path/confidence/metadata
+- **Chunk __post_init__**：
+  - empty id raises
+  - empty text raises
+  - empty source_ids raises
+  - 默认 metadata/source_spans 独立
+- **Chunk 字段顺序**：chunk_id/text/source_element_ids/metadata/source_spans
+- **Relation**：4 字段，默认 metadata 独立
+- **WarningRecord/ErrorRecord**：
+  - to_dict 默认 details=None 时不出现
+  - 字段顺序 code/reason/details 或 code/message/details
+- **Document**：
+  - to_dict 13 个键（schema_version + 12 字段）
+  - 所有 list 字段递归序列化
+  - 默认 metadata 独立
+  - 12 个字段顺序
+- **dataclass 验证**：6 个类都是 dataclass
+- **模块结构**：
+  - 无 __all__（公开 API 通过属性访问）
+  - imports dataclasses/typing
+  - from __future__ import annotations
+  - docstring 提及 dataclass
+- **签名深度**：所有 to_dict 都是 1 参（self）
+- **JSON 序列化**：Element/Chunk/Document 都可 json.dumps
+- **综合**：所有可选字段填充的完整实例
+
+### 撞墙记录
+1. app/models.py 无 __all__ 属性，但测试试图 import __all__ → ImportError。
+   修复：删除 __all__ 测试，改为验证模块无 __all__。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 142 后）：11179 pass / 0 fail / 13 skip（HEAD `7ec0525`）
+
+### 下一步建议
+- 候选 HA：app/hash.py 第四轮
+- 候选 HB：app/parsers/text_parser.py 第四轮
+- 候选 HC：app/parsers/base.py 第四轮
+- 候选 HD：app/parsers/kreuzberg_parser.py 第四轮
+- 候选 HE：evaluation/__init__.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HA（app/hash.py 第四轮）。hash 是简单但关键的模块，第四轮
+可深入 SHA256 校验、文件 IO 边界、compute_text_hash 等。
+
+---
