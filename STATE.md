@@ -8180,3 +8180,81 @@ language-specific 分隔符。
 可深入 process_single 流程、warning 累积、错误处理、document 装配。
 
 ---
+
+## Round 140（2026-08-05）：app/pipeline.py 第五轮（edges5）
+
+### 目标
+- 给 app/pipeline.py（216 行，已有 483 测试）补第五轮 edges
+- 深入 get_parser 工厂、image_output_dir_for、process_single 错误路径、validate_only
+
+### 改动
+- 新增 `tests/test_pipeline_edges5.py`（62 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **get_parser 工厂**：
+  - 6 个 parser（fallback/kreuzberg/markdown/html/text/ipynb）返回对应实例
+  - 全部是 Parser 子类
+  - 未知 name raises ValueError，错误消息列出支持的 parser
+  - image_output_dir 参数（fallback 接受，kreuzberg 忽略）
+- **image_output_dir_for**：
+  - output_path=None → None
+  - 返回 Path 对象
+  - 用 source_hash 前 16 字符
+  - 短 hash 不崩溃
+  - 目录在 output_path.parent 下
+  - 接受 Path 输入
+- **process_single 错误路径**：
+  - input 不存在 → file_not_found
+  - 未知 parser → unexpected_parser_error
+  - text parser 不支持 .pdf → unsupported_type
+  - text parser 成功路径
+  - write_json=False 不写盘
+  - 父目录自动创建
+- **validate_only**：
+  - 文件不存在 → False
+  - 非法 JSON → False
+  - 空文件 → False
+  - 根非 dict → False
+  - 返回 (bool, str) tuple
+- **模块结构**：
+  - __all__ 4 项（get_parser/image_output_dir_for/process_single/validate_only）
+  - imports 完整（json/Path/Any/StructuralChunker/compute_file_hash/Document/ErrorRecord/Parser/ParserError/所有 parser/SchemaValidationError/validate）
+  - from __future__ import annotations
+  - docstring 提及 Pipeline/Schema
+- **签名深度**：
+  - get_parser 2 参（name 必填，image_output_dir 默认 None）
+  - image_output_dir_for 2 参（都必填）
+  - process_single 5 参（input_path 必填，output_path 默认 None，parser_name/max_chars/write_json 都是 keyword-only）
+  - validate_only 1 参（json_path）
+  - 返回类型注解存在
+- **ErrorRecord 类型验证**：
+  - errors 都是 ErrorRecord 实例
+  - 每个 ErrorRecord 含 code/message/details
+- **端到端成功路径**：
+  - text 完整流程：parse → chunk → validate → write JSON
+  - JSON 可解析，含 document_id 和 elements
+  - output_path=None 时 Document 仍返回
+
+### 撞墙记录
+1. test_validate_only_returns_tuple_of_bool_str：fixture tmp_path 未注入
+   （缺参数）。修复：函数加 tmp_path 参数。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 140 后）：11031 pass / 0 fail / 13 skip（HEAD `98ed403`）
+
+### 下一步建议
+- 候选 GX：app/cli.py 第六轮
+- 候选 GY：app/schema.py 第五轮（深度 if/then 分支）
+- 候选 GZ：app/models.py 第五轮
+- 候选 HA：app/hash.py 第四轮
+- 候选 HB：app/parsers/text_parser.py 第四轮
+- 候选 HC：app/parsers/base.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GY（app/schema.py 第五轮）。schema 是 Document 校验核心，
+第五轮可深入 if/then 分支（pdf vs docx）、bbox 校验、enum 值、source_locator
+结构。
+
+---
