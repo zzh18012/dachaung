@@ -1165,3 +1165,77 @@
 - 本 worktree（Round 18 后）：386 pass / 0 fail / 9 skip（HEAD `3aab469`）
 
 ---
+
+## 2026-08-04 — Round 19（schema 校验覆盖率）
+
+**做了什么**：
+- 完成候选 U：补 JSON Schema 校验测试，新增 32 个测试到 `tests/test_schema.py`
+- **`source_spans` 子结构**（7 个）：
+  - 合法 chunk with source_spans 通过
+  - 缺 element_id / start / end → 失败
+  - negative start → 失败（minimum: 0）
+  - source_span additionalProperties:false → 失败
+  - chunk 本身 additionalProperties:false → 失败
+- **各 source_type 的 locator**（10 个）：
+  - 合法 markdown/html/text doc（line locator）
+  - 合法 ipynb doc（cell_index + cell_type）
+  - markdown/html/text locator 必须有 line
+  - ipynb locator 必须有 cell_index 和 cell_type（分开测）
+  - ipynb cell_type enum（markdown/code/raw 合法，其他失败）
+- **element / chunk 约束**（15 个）：
+  - 不合法的 source_type（"csv"）被拒
+  - 不合法的 element type 被拒；8 个合法 type 全通过
+  - confidence 超出 [0, 1] 范围失败
+  - pdf page=0 失败（minimum: 1）
+  - pdf bbox 错误尺寸失败（必须恰好 4 个）
+  - schema_version 改了失败（const）
+  - element additionalProperties:false
+  - relation 缺 required field / 多余字段
+  - warning / error 缺 required field
+  - 空 document_id / chunk_id / source_element_ids item 失败
+- commit `08c4e45`，已 push
+
+**worktree 当前状态**：
+- HEAD `08c4e45`，工作树清洁
+- 测试基线：419 pass / 0 fail / 9 skip（+33 vs Round 18）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 20）
+
+**首要任务**：方向选择
+
+- 候选 V（推荐）：**models 测试**
+  - 现状：test_models.py 现状不清，可能边角未覆盖
+  - 复杂度：低
+
+- 候选 W：**annotation_metrics 测试**
+  - 复杂度：低
+
+- 候选 X：**evaluation metrics 测试**
+  - 复杂度：低-中
+
+- 候选 Y：**manifest 测试**
+  - 复杂度：低
+
+- 候选 Z：**chunker 模糊测试 / 不变量测试**
+  - 复杂度：中
+
+- 候选 AA（新提）：**hash 模块测试**
+  - 现状：app/hash.py 应该很简单
+  - 复杂度：低
+
+- 仍阻塞：候选 J（向量化）、候选 M（evaluator v1.2）、候选 O（docs/*.md）
+
+**建议**：选 V（models 测试）。理由：
+1. models 是数据类不变量的源头
+2. Element 不变量（content/resource_path 至少一非空）、Document 序列化、Chunk to_dict 等可能有边角
+3. 后续轮次继续依赖 models 的强不变量
+
+### 撞墙记录
+- 无新撞墙。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 19 后）：419 pass / 0 fail / 9 skip（HEAD `08c4e45`）
+
+---
