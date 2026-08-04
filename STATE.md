@@ -3096,3 +3096,42 @@
 - 本 worktree（Round 66 后）：2827 pass / 0 fail / 9 skip（HEAD `559065f`）
 
 ---
+
+## Round 67（2026-08-05）：候选 CC — evaluation/schema.py 边角覆盖
+
+### 做了什么
+- 候选 CC：新建 `tests/test_evaluation_schema_edges.py`（80 个测试）覆盖 `evaluation/schema.py`（80 行）的 SCHEMAS_DIR / EvalSchemaError / _schema_path / load_schema / validate / validate_file 全部边角，与已有 `test_evaluation_schema.py`（55 个）互补。
+- 重点覆盖项：
+  - **SCHEMAS_DIR 深度** 6 个：是 Path、is_absolute、parts 无 '..'、父目录存在、name=='schemas'、含 4 个 schema 文件
+  - **EvalSchemaError 深度** 16 个：args[0]=message、args 长度 1（errors 是 kwarg）、str 返 message、repr 含类名、两实例不等、同对象相等、errors 默认 [] 每实例独立、errors=None → []、errors 透传同对象、可 chain from __cause__、可 chain implicit __context__、可作 Exception 捕获、可作 BaseException 捕获、Unicode 消息、空消息、无 message 属性（用 args[0]）
+  - **_schema_path** 7 个：返 Path、existing is_absolute、existing is_file、unknown 错误消息含 name、空 name raises、目录 name raises、'./' 前缀 Path 规范化（仍然能找到）
+  - **load_schema** 9 个：返 dict、确定性 same dict equality、不同 name 不同 dict、无 cache（mutable 隔离）、unknown raises、Unicode 内容（中文注释）、$schema 字段、type=object、properties dict
+  - **validate** 14 个：成功返 None、错误消息含 schema_name、含 "(N 处)"、errors 是 list、errors 非空、每个 error 含 path/message/schema_path、path 是 list、不 mutate instance（成功/失败）、unknown schema raises FileNotFoundError、错误数 >=1、first error 在消息中、annotation minimal 通过、marker 必须 string、position 必须 enum、report minimal 通过、report wrong version rejected
+  - **validate_file** 13 个：str/Path 都接受、missing raises FileNotFoundError、目录 raises FileNotFoundError（非 IsADirectoryError）、非法 JSON raises JSONDecodeError、合法 JSON 不符 schema raises EvalSchemaError、成功返 None、Unicode 文件名、嵌套目录、unknown schema raises、Unicode 内容、空文件 raises、UTF-8 BOM raises JSONDecodeError
+  - **__all__ 导出** 5 个：5 项精确集、list 类型、匹配模块属性、排除 _schema_path
+  - **模块导入** 6 个：不崩、必需属性、Draft202012Validator 可访问、validate/validate_file/load_schema/_schema_path 都 callable
+- 无源码改动。
+
+### 撞墙记录
+- 3 次撞墙：
+  1. **test_schema_path_relative_name_with_dots**：期望 `./manifest.schema.json` raises，但 Path 拼接会规范化 → 仍能找到。修复：改测「正常解析到文件」。
+  2. **test_validate_returns_none_on_success**：用 `{"version": "1", "files": []}` 但 manifest schema 实际 required = `[manifest_version, devset_status, documents]`。修复：用 `_valid_manifest()` helper 提供合法 minimal，全文件 sed 替换。
+  3. **test_validate_annotation_minimal**：用 `{"doc_id": ...}` 但 annotation required = `[annotation_version, doc_id]`。修复：补 `annotation_version: "1.0"`。
+
+### 下一步建议
+- 候选 BW：app/manifest.py 边角（manifest 解析 + categories 字段）
+- 候选 BY：app/pipeline.py 端到端边角
+- 候选 CB：evaluation/manifest.py 边角（评测侧 manifest loader）
+- 候选 CD：evaluation/cli.py 边角（命令行参数解析 + 子命令）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 CD（evaluation/cli.py 边角）。理由：
+1. cli.py 是评测入口的命令行解析层
+2. 边角多：argparse 子命令、--max-chars / --parser / --tolerance-chars 参数、错误退出码、stdout/stderr 输出
+3. 与已覆盖的 runner.py / report.py / metrics.py 形成完整 evaluation 闭环
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 67 后）：2907 pass / 0 fail / 9 skip（HEAD `b144a9f`）
+
+---
