@@ -4307,3 +4307,55 @@
 - 本 worktree（Round 89 后）：5730 pass / 0 fail / 13 skip（HEAD `e40ed40`）
 
 ---
+
+## Round 90（2026-08-05）：候选 DB-DE 之外 — 跨模块端到端不变量
+
+### 做了什么
+- 新建 `tests/test_end_to_end_invariants.py`（56 个测试）覆盖跨模块不变量，
+  互补于已有 per-module 单测（每个模块都已 edges2/edges3 饱和）。
+- 重点覆盖项：
+  - **Parser 端到端**：每个 parser（text/markdown/html/ipynb）端到端产出的 Document
+    都过 schema 校验
+  - **Document 一致性**：to_dict JSON 可序列化、source_hash 与 compute_file_hash 一致、
+    document_id 等于 make_document_id(source_hash)、source_type 一致
+  - **Chunker 不变量**（CLAUDE.md 关键约束）：
+    - 每个 chunk 至少 1 个非空 source_element_ids
+    - 每个 chunk text 非空、chunk_id 唯一
+    - 每个 chunk text 长度 ≤ max_chars
+    - **不丢不重**：normalize(Σ chunk.text) == normalize(Σ element.content)
+    - chunk.source_element_ids 都是 element.element_id 的子集
+  - **各 parser 直接调用**（不经 pipeline）的 schema 一致性
+  - **Pipeline 幂等性**：同输入同 hash/同 chunks；不同输入不同 hash
+  - **JSON 写盘 → 读盘 round-trip**、缩进、UTF-8 不转义、validate_only 通过
+  - **evaluation/runner 兼容性**：合法 manifest + 文档能跑出报告、报告过 schema
+  - **Schema 反向不变量**：to_dict 字段集与 schema required 一致、
+    schema_version=0.1.0、source_hash 64 位小写 hex
+  - **多 parser 一致性**：所有 parser 返回 Document、parse() 后 chunks 必空
+  - **Hash 一致性**：file/text hash 幂等、相同内容相同 hash
+  - **normalize_text 不丢不重**（idempotent、strip、collapse）
+  - **_ChunkBuffer 不变量**：flush 后 parts 清空、counter 推进
+  - **错误传播**：parser 错误变成结构化 ErrorRecord、JSON 可序列化
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_pipeline_output_consumable_by_evaluation_runner` 用 source_type='txt'，
+  manifest schema 限定 source_type ∈ {pdf, docx}，被拒绝。修复：改为 .docx 后缀的
+  伪 docx 文件（fallback_parser 会失败但 runner 应当捕获并继续生成报告）。
+
+### 下一步建议
+- 候选 DF：app/cli.py 边角（第三轮）—— 较大文件 535 行
+- 候选 DG：app/parsers/fallback_parser.py 边角（第三轮）—— 最大文件 630 行
+- 候选 DH：跨模块不一致场景（错误的输入、parser 失败的 details 完整链路）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DG（fallback_parser 第三轮）。理由：
+1. fallback_parser.py 是项目最大文件（630 行），含 PDF + DOCX 双路径
+2. 第二轮（168 测试）仍未覆盖 _parse_pdf / _parse_docx 内部分支深度
+3. 第三轮可补 _classify_pdf_paragraph、_group_words_to_paragraphs、
+   _render_pdf_image_region 错误路径
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 90 后）：5786 pass / 0 fail / 13 skip（HEAD `7f20219`）
+
+---
