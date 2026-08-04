@@ -3253,3 +3253,44 @@
 - 本 worktree（Round 70 后）：3178 pass / 0 fail / 9 skip（HEAD `779e032`）
 
 ---
+
+## Round 71（2026-08-05）：候选 CH — app/hash.py 边角覆盖
+
+### 做了什么
+- 候选 CH：新建 `tests/test_hash_edges.py`（49 个测试，含 3 个 symlink SKIP）覆盖 `app/hash.py`（24 行）的深度边角，与已有 `test_hash.py`（55 个）互补。
+- 重点覆盖项：
+  - **模块结构** 8 个：hashlib/Path 导入、两个函数都存在、无 __all__（hash.py 不导出）、两个 callable
+  - **compute_file_hash 错误类型严格性** 6 个：严格 FileNotFoundError 类型（不是 OSError）、目录 raises、错误消息含路径、空路径字符串/dot/dot-dot 都 raises
+  - **Path normalization** 3 个：'./' 前缀 chdir 后能读、绝对路径、相对路径 chdir 后能读
+  - **流式 chunk 边界** 6 个：1 byte、2 bytes、65534/65536 exact/65538/10 chunks * 65536 各场景匹配 hashlib
+  - **一致性** 3 个：idempotent、连续调用独立、二进制内容匹配 hashlib
+  - **symlink** 3 个（Windows SKIP）：跟随 symlink 算真实 hash、symlink→目录 raises、悬空 symlink raises
+  - **compute_text_hash 输入类型错** 5 个：None/int/bytes/list/dict 都 raises AttributeError（Python `.encode()` 不存在的统一行为）
+  - **与 hashlib 一致性** 6 个：basic、Unicode、empty、long string、newlines、special chars
+  - **跨函数 invariants** 5 个：file 内容 == text → hash 相同（含 Unicode/empty/二进制）
+  - **BOM 字符** 2 个：U+FEFF 是有效 Unicode、有/无 BOM 不同 hash
+  - **64 字符 hex** 2 个：text hash 和 file hash 都返 64 字符 hex（int(h, 16) 不抛）
+  - **大文件流式** 1 个：3+ chunks 不抛
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。3 个 symlink 测试因 Windows 无权限/admin 自动 SKIP（pytest.skip 显式处理）。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CF：app/chunkers/structural.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CI：app/models.py 边角（第二轮）
+- 候选 CJ：app/chunkers/__init__.py 或其他小模块
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 CE（evaluation/runner.py 边角第二轮）。理由：
+1. runner.py 是 Stage 2 评测的核心执行器
+2. 第一轮（Round 62）覆盖了 68 个边角，但 _process_one 的更深层路径（如 manifest.project_root 传递、tolerance_chars 透传到 annotation_metrics、image_base_dir 派生）未覆盖
+3. 与已覆盖的 metrics/annotation_metrics/report.py 形成完整 evaluation 闭环
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 71 后）：3224 pass / 0 fail / 12 skip（HEAD `7e641e3`）
+
+---
