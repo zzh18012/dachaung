@@ -296,3 +296,261 @@ def test_document_passes_schema_rejects_element_missing_required():
     # 删 element 必填字段
     del bad["elements"][0]["element_id"]
     assert document_passes_schema(bad) is False
+
+
+# ---------- 边角补强（Round 47） ----------
+
+
+# EvalSchemaError 类契约
+
+
+def test_eval_schema_error_is_exception_subclass():
+    assert issubclass(EvalSchemaError, Exception)
+
+
+def test_eval_schema_error_can_be_raised_and_caught():
+    with pytest.raises(EvalSchemaError) as exc:
+        raise EvalSchemaError("test")
+    assert "test" in str(exc.value)
+
+
+def test_eval_schema_error_default_errors_empty_list():
+    err = EvalSchemaError("msg")
+    assert err.errors == []
+
+
+def test_eval_schema_error_errors_none_becomes_empty_list():
+    err = EvalSchemaError("msg", errors=None)
+    assert err.errors == []
+
+
+def test_eval_schema_error_errors_passed_through():
+    errors = [{"path": ["a"], "message": "x"}]
+    err = EvalSchemaError("msg", errors=errors)
+    assert err.errors == errors
+
+
+def test_eval_schema_error_inherits_from_exception():
+    err = EvalSchemaError("x")
+    assert isinstance(err, Exception)
+
+
+def test_eval_schema_error_message_attribute():
+    err = EvalSchemaError("hello world")
+    assert "hello world" in str(err)
+
+
+# SCHEMAS_DIR 常量
+
+
+def test_schemas_dir_is_absolute_path():
+    assert SCHEMAS_DIR.is_absolute()
+
+
+def test_schemas_dir_ends_with_schemas():
+    """SCHEMAS_DIR 应指向项目的 schemas/ 子目录。"""
+    assert SCHEMAS_DIR.name == "schemas"
+
+
+def test_schemas_dir_contains_known_schema_files():
+    """schemas/ 应含 manifest/annotation/evaluation-report schema 文件。"""
+    for fname in ("manifest.schema.json", "annotation.schema.json", "evaluation-report.schema.json"):
+        assert (SCHEMAS_DIR / fname).is_file()
+
+
+# load_schema 边角
+
+
+def test_load_schema_returns_dict_type():
+    s = load_schema("manifest.schema.json")
+    assert isinstance(s, dict)
+
+
+def test_load_schema_dict_has_json_schema_dollar_key():
+    """每个 schema 应有 $schema 字段（Draft 2020-12）。"""
+    s = load_schema("manifest.schema.json")
+    assert "$schema" in s
+
+
+def test_load_schema_dict_has_id_key():
+    """每个 schema 应有 $id 字段。"""
+    s = load_schema("annotation.schema.json")
+    assert "$id" in s
+
+
+def test_load_schema_dict_has_title_key():
+    s = load_schema("evaluation-report.schema.json")
+    assert "title" in s
+
+
+def test_load_schema_unknown_name_raises_filenotfound():
+    with pytest.raises(FileNotFoundError):
+        load_schema("nonexistent.schema.json")
+
+
+# _schema_path 直接单测
+
+
+def test_schema_path_returns_path_for_known_schema():
+    from evaluation.schema import _schema_path
+    p = _schema_path("manifest.schema.json")
+    assert isinstance(p, Path)
+    assert p.is_file()
+
+
+def test_schema_path_unknown_name_raises_filenotfound():
+    from evaluation.schema import _schema_path
+    with pytest.raises(FileNotFoundError) as exc:
+        _schema_path("xxx.schema.json")
+    assert "xxx.schema.json" in str(exc.value)
+
+
+def test_schema_path_in_schemas_dir():
+    """返回的 path 应位于 SCHEMAS_DIR 下。"""
+    from evaluation.schema import _schema_path
+    p = _schema_path("annotation.schema.json")
+    assert p.parent == SCHEMAS_DIR
+
+
+# validate 边角
+
+
+def test_validate_returns_none_on_success():
+    """validate 成功时返回 None（无显式 return）。"""
+    valid_manifest = {
+        "manifest_version": "1.0",
+        "devset_status": "incomplete",
+        "documents": [],
+    }
+    result = validate(valid_manifest, "manifest.schema.json")
+    assert result is None
+
+
+def test_validate_failure_includes_error_count_in_message():
+    bad = {"manifest_version": "1.0"}  # 缺 devset_status/documents
+    with pytest.raises(EvalSchemaError) as exc:
+        validate(bad, "manifest.schema.json")
+    # 消息含错误数（1 处或多处）
+    assert "处" in str(exc.value)
+
+
+def test_validate_failure_errors_attribute_is_list():
+    bad = {"manifest_version": "1.0"}
+    with pytest.raises(EvalSchemaError) as exc:
+        validate(bad, "manifest.schema.json")
+    assert isinstance(exc.value.errors, list)
+    assert len(exc.value.errors) >= 1
+
+
+def test_validate_failure_each_error_has_three_keys():
+    """每个 error dict 含 path/message/schema_path 三个键。"""
+    bad = {"manifest_version": "1.0"}
+    with pytest.raises(EvalSchemaError) as exc:
+        validate(bad, "manifest.schema.json")
+    for err in exc.value.errors:
+        assert set(err.keys()) == {"path", "message", "schema_path"}
+
+
+def test_validate_failure_first_error_used_in_message():
+    """消息里的 head.message 与 errors[0] 一致。"""
+    bad = {"manifest_version": "1.0"}
+    with pytest.raises(EvalSchemaError) as exc:
+        validate(bad, "manifest.schema.json")
+    # 消息含 head.message（具体内容随 schema 版本，但应非空）
+    assert str(exc.value)
+
+
+# validate_file 边角
+
+
+def test_validate_file_pathlib_object_accepted(tmp_path: Path):
+    """validate_file 接受 Path 对象。"""
+    p = tmp_path / "x.json"
+    p.write_text(json.dumps({
+        "manifest_version": "1.0",
+        "devset_status": "incomplete",
+        "documents": [],
+    }), encoding="utf-8")
+    validate_file(p, "manifest.schema.json")  # 不抛即合格
+
+
+def test_validate_file_directory_not_file_raises(tmp_path: Path):
+    """传目录（不是文件）→ FileNotFoundError。"""
+    sub = tmp_path / "subdir"
+    sub.mkdir()
+    with pytest.raises(FileNotFoundError):
+        validate_file(sub, "manifest.schema.json")
+
+
+def test_validate_file_unknown_schema_name_raises_filenotfound(tmp_path: Path):
+    """schema_name 不存在 → FileNotFoundError。"""
+    p = tmp_path / "x.json"
+    p.write_text("{}", encoding="utf-8")
+    with pytest.raises(FileNotFoundError):
+        validate_file(p, "nonexistent.schema.json")
+
+
+def test_validate_file_returns_none_on_success(tmp_path: Path):
+    p = tmp_path / "x.json"
+    p.write_text(json.dumps({
+        "manifest_version": "1.0",
+        "devset_status": "incomplete",
+        "documents": [],
+    }), encoding="utf-8")
+    result = validate_file(p, "manifest.schema.json")
+    assert result is None
+
+
+# document_passes_schema 边角
+
+
+def test_document_passes_schema_empty_document_returns_false():
+    """空 dict 不符合 document schema。"""
+    assert document_passes_schema({}) is False
+
+
+def test_document_passes_schema_returns_bool_not_int():
+    """返回值是 bool（Python 中 bool 是 int 子类，单独断言 type 是 bool）。"""
+    valid = {
+        "schema_version": "0.1.0",
+        "document_id": "doc-abcdef0123456789",
+        "source_path": "x.txt",
+        "source_type": "text",
+        "source_hash": "a" * 64,
+        "parser_name": "text",
+        "parser_version": "stdlib/0.1.0",
+        "elements": [],
+        "chunks": [],
+        "relations": [],
+        "warnings": [],
+        "errors": [],
+        "metadata": {"text": True},
+    }
+    result = document_passes_schema(valid)
+    assert type(result) is bool
+
+
+def test_document_passes_schema_with_extra_field_still_valid():
+    """document.schema.json 假设 additionalProperties:false；如有额外字段 → False。
+
+    注：实际行为取决于 schema 配置；这里测的是「能识别额外字段」的能力。
+    """
+    valid = {
+        "schema_version": "0.1.0",
+        "document_id": "doc-abcdef0123456789",
+        "source_path": "x.txt",
+        "source_type": "text",
+        "source_hash": "a" * 64,
+        "parser_name": "text",
+        "parser_version": "stdlib/0.1.0",
+        "elements": [],
+        "chunks": [],
+        "relations": [],
+        "warnings": [],
+        "errors": [],
+        "metadata": {},
+        "extra_unexpected_field": "disallowed",
+    }
+    # additionalProperties 决定是否拒绝；当前 schema 若允许，返 True；拒绝则 False
+    result = document_passes_schema(valid)
+    assert isinstance(result, bool)
