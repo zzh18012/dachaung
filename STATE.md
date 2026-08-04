@@ -307,6 +307,56 @@
 
 ---
 
+## 2026-08-04 — Round 6（CLI 自动 source_type 推断）
+
+**做了什么**：
+- 完成候选 G：CLI 不带 `--parser` 时按扩展名自动推断
+- 映射表 `_EXTENSION_TO_PARSER`：
+  - `.pdf` / `.docx` → fallback
+  - `.md` / `.markdown` → markdown
+  - `.html` / `.htm` → html
+  - `.txt` / `.text` → text
+  - `.ipynb` → ipynb
+  - 未知扩展名 → fallback（fallback 自己会因 `detect_source_type` 拒绝而失败，安全网保留）
+- 推断时 stderr 打印 `[INFO]` 行说明选择；显式 `--parser` 时不打印
+- `--parser` 从 `default="fallback"` 改为 `default=None`（sentinel），保留 choices 不变
+- 修复一处回归：`test_cli_unsupported_extension_returns_nonzero` 原用 `.txt`（现已被 text parser 接受），改用真正未注册的 `.xyz`，测试意图（拒绝真未知扩展名）保留
+- 新增 6 个 CLI subprocess 测试 + 1 个 `_infer_parser_name` 单元测试（覆盖全部 9 个扩展名 + 未知）
+- commit `a783671`，已 push
+
+**worktree 当前状态**：
+- HEAD `a783671`，工作树清洁
+- 测试基线：266 pass / 0 fail / 9 skip（+6 vs Round 5）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 7）
+
+**首要任务**：选一项推进
+
+- 候选 H（推荐）：**batch CLI（目录批处理）**
+  - 现状：`parse` 只支持单文件，评测场景受限
+  - 复杂度：中（加 `parse-dir` 子命令；遍历目录、按扩展名分发、收集 errors、写多个 JSON）
+  - 价值：批量解析的实际生产力；评测 devset 用得上
+  - 设计要点：`parse-dir <input_dir> -o <output_dir> [--recursive]`；每个文件输出 `<output_dir>/<stem>.json`；summary JSON 记成功/失败/警告统计
+
+- 候选 A：审计 `evaluation/` + `app/` 找 bug
+- 候选 D：补 fallback parser 的覆盖率
+- 候选 E：实施 source_spans（独立设计）
+
+**建议**：选 H（batch CLI）。理由：
+1. 提供实际批量处理能力，为评测扩展铺路
+2. 复用 Round 6 的自动推断，零额外配置
+3. 体积适中（~150 行 + ~10 测试）
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 6 后）：266 pass / 0 fail / 9 skip（HEAD `a783671`）
+
+---
+
 ## 2026-08-04 — Round 1（inspect 子命令 + 测试）
 
 **做了什么**：
