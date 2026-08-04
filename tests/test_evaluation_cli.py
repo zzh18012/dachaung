@@ -8,12 +8,13 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-import zipfile
 from pathlib import Path
 
 import pytest
 
 from evaluation.schema import validate_file
+
+from tests._synthetic_docs import build_minimal_docx
 
 
 VENV_PYTHON = str(
@@ -39,43 +40,6 @@ def _run_cli(args: list[str], cwd: Path) -> tuple[int, str, str]:
         env=env,
     )
     return proc.returncode, proc.stdout, proc.stderr
-
-
-def _build_synthetic_docx(path: Path) -> Path:
-    """合成最小 DOCX，含 1 个标题 + 1 个段落（含 styles.xml 让 heading 识别生效）。"""
-    content_types = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-</Types>'''
-    rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>'''
-    doc_rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>'''
-    styles = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:pPr><w:outlineLvl w:val="0"/></w:pPr></w:style>
-</w:styles>'''
-    doc_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    <w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>Chapter 1</w:t></w:r></w:p>
-    <w:p><w:r><w:t>Hello world. This is paragraph one.</w:t></w:r></w:p>
-  </w:body>
-</w:document>'''
-    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", content_types)
-        z.writestr("_rels/.rels", rels)
-        z.writestr("word/_rels/document.xml.rels", doc_rels)
-        z.writestr("word/styles.xml", styles)
-        z.writestr("word/document.xml", doc_xml)
-    return path
 
 
 @pytest.fixture
@@ -117,7 +81,7 @@ def test_cli_run_end_to_end(project_root: Path):
     docx_rel = "samples/test/sample.docx"
     docx_path = project_root / docx_rel
     docx_path.parent.mkdir(parents=True)
-    _build_synthetic_docx(docx_path)
+    build_minimal_docx(docx_path)
 
     manifest = _write_manifest(project_root, docx_rel)
     output = project_root / "outputs" / "report.json"
@@ -174,7 +138,7 @@ def test_cli_run_with_annotation(project_root: Path):
     docx_rel = "samples/test/sample.docx"
     docx_path = project_root / docx_rel
     docx_path.parent.mkdir(parents=True)
-    _build_synthetic_docx(docx_path)
+    build_minimal_docx(docx_path)
 
     # 加一个标注文件
     ann_rel = "annotations/TEST-001.json"
@@ -224,7 +188,7 @@ def test_cli_validate_report_subcommand(project_root: Path):
     docx_rel = "samples/test/sample.docx"
     docx_path = project_root / docx_rel
     docx_path.parent.mkdir(parents=True)
-    _build_synthetic_docx(docx_path)
+    build_minimal_docx(docx_path)
     manifest = _write_manifest(project_root, docx_rel)
     output = project_root / "outputs" / "report.json"
     rc, _, _ = _run_cli(
@@ -311,7 +275,7 @@ def _parse_doc_to_json(project_root: Path, doc_id: str = "TEST-INSPECT") -> Path
     docx_rel = "samples/test/sample.docx"
     docx_path = project_root / docx_rel
     docx_path.parent.mkdir(parents=True)
-    _build_synthetic_docx(docx_path)
+    build_minimal_docx(docx_path)
     out_json = project_root / "outputs" / f"{doc_id}.json"
     out_json.parent.mkdir(parents=True, exist_ok=True)
     # 用 app.cli parse 跑出真实 doc.json（带 source_spans）

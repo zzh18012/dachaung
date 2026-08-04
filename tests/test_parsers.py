@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-import zipfile
 from pathlib import Path
 
 import pytest
@@ -18,91 +17,18 @@ from app.parsers import Parser, ParserError
 from app.parsers.fallback_parser import FallbackParser
 from app.parsers.kreuzberg_parser import KreuzbergParser
 
-
-# ---------- helpers: 合成最小 DOCX ----------
-
-def _build_minimal_docx(tmp_path: Path, with_table: bool = False) -> Path:
-    """用 stdlib zipfile 构造一个最小 DOCX。"""
-    content_types = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-</Types>'''
-    rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>'''
-    doc_rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>'''
-    styles = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:pPr><w:outlineLvl w:val="0"/></w:pPr></w:style>
-  <w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:pPr><w:outlineLvl w:val="1"/></w:pPr></w:style>
-</w:styles>'''
-    body_parts = [
-        '<w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>Chapter 1</w:t></w:r></w:p>',
-        '<w:p><w:r><w:t>Sentence one. Sentence two.</w:t></w:r></w:p>',
-    ]
-    if with_table:
-        body_parts.append(
-            '<w:tbl>'
-            '<w:tr><w:tc><w:p><w:r><w:t>A1</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>B1</w:t></w:r></w:p></w:tc></w:tr>'
-            '<w:tr><w:tc><w:p><w:r><w:t>A2</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>B2</w:t></w:r></w:p></w:tc></w:tr>'
-            '</w:tbl>'
-        )
-    doc_xml = (
-        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
-        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
-        '<w:body>' + ''.join(body_parts) + '</w:body></w:document>'
-    )
-    path = tmp_path / "synthetic.docx"
-    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", content_types)
-        z.writestr("_rels/.rels", rels)
-        z.writestr("word/_rels/document.xml.rels", doc_rels)
-        z.writestr("word/styles.xml", styles)
-        z.writestr("word/document.xml", doc_xml)
-    return path
-
-
-# ---------- helpers: 合成最小 PDF ----------
-
-def _build_minimal_pdf(tmp_path: Path, text: str = "Hello World Chapter 1") -> Path:
-    objs = [
-        b'<< /Type /Catalog /Pages 2 0 R >>',
-        b'<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-        b'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
-    ]
-    stream = b'BT /F1 24 Tf 100 700 Td (' + text.encode('latin-1') + b') Tj ET'
-    objs.append(b'<< /Length ' + str(len(stream)).encode() + b' >>\nstream\n' + stream + b'\nendstream')
-    objs.append(b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>')
-
-    pdf = b'%PDF-1.4\n'
-    offsets = []
-    for i, body in enumerate(objs, start=1):
-        offsets.append(len(pdf))
-        pdf += f'{i} 0 obj\n'.encode() + body + b'\nendobj\n'
-    xref_pos = len(pdf)
-    n = len(objs) + 1
-    pdf += b'xref\n' + f'0 {n}\n'.encode() + b'0000000000 65535 f \n'
-    for off in offsets:
-        pdf += f'{off:010d} 00000 n \n'.encode()
-    pdf += b'trailer\n<< /Size ' + str(n).encode() + b' /Root 1 0 R >>\nstartxref\n'
-    pdf += str(xref_pos).encode() + b'\n%%EOF'
-
-    path = tmp_path / "synthetic.pdf"
-    path.write_bytes(pdf)
-    return path
+from tests._synthetic_docs import (
+    build_docx_with_caption,
+    build_empty_docx,
+    build_minimal_docx,
+    build_minimal_pdf,
+)
 
 
 # ---------- FallbackParser tests ----------
 
 def test_fallback_docx_basic(tmp_path: Path):
-    p = _build_minimal_docx(tmp_path)
+    p = build_minimal_docx(tmp_path / "synthetic.docx")
     doc = FallbackParser().parse(p, source_hash="a" * 64)
     assert isinstance(doc, Document)
     assert doc.source_type == "docx"
@@ -121,7 +47,7 @@ def test_fallback_docx_basic(tmp_path: Path):
 
 
 def test_fallback_docx_with_table(tmp_path: Path):
-    p = _build_minimal_docx(tmp_path, with_table=True)
+    p = build_minimal_docx(tmp_path / "synthetic.docx", with_table=True)
     doc = FallbackParser().parse(p, source_hash="b" * 64)
     tables = [e for e in doc.elements if e.type == "table"]
     assert len(tables) == 1
@@ -131,7 +57,7 @@ def test_fallback_docx_with_table(tmp_path: Path):
 
 
 def test_fallback_pdf_basic(tmp_path: Path):
-    p = _build_minimal_pdf(tmp_path, text="(Hello World Chapter 1)")
+    p = build_minimal_pdf(tmp_path / "synthetic.pdf", text="(Hello World Chapter 1)")
     # 用括号包文本避免 PDF 解析问题
     doc = FallbackParser().parse(p, source_hash="c" * 64)
     assert doc.source_type == "pdf"
@@ -161,7 +87,7 @@ def test_fallback_unsupported_extension(tmp_path: Path):
 
 def test_kreuzberg_docx_returns_document_with_warning(tmp_path: Path):
     """Kreuzberg 实测对 DOCX 给不出 elements，必须产生 kreuzberg_no_structured_elements warning。"""
-    p = _build_minimal_docx(tmp_path)
+    p = build_minimal_docx(tmp_path / "synthetic.docx")
     doc = KreuzbergParser().parse(p, source_hash="f" * 64)
     assert doc.source_type == "docx"
     assert doc.parser_name == "kreuzberg"
@@ -170,7 +96,7 @@ def test_kreuzberg_docx_returns_document_with_warning(tmp_path: Path):
 
 
 def test_kreuzberg_pdf_has_no_bbox_warning(tmp_path: Path):
-    p = _build_minimal_pdf(tmp_path, text="(Hi)")
+    p = build_minimal_pdf(tmp_path / "synthetic.pdf", text="(Hi)")
     doc = KreuzbergParser().parse(p, source_hash="10" * 32)
     warning_codes = [w.code for w in doc.warnings]
     assert "kreuzberg_pdf_no_bbox" in warning_codes
@@ -353,36 +279,8 @@ def test_fallback_pdf_broken_bytes_raises(tmp_path: Path):
 
 # ---------- DOCX caption 集成 ----------
 
-def _build_docx_with_caption(tmp_path: Path) -> Path:
-    """构造含 caption 段落的 DOCX（不带样式，纯段落）。"""
-    content_types = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>'''
-    rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>'''
-    doc_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    <w:p><w:r><w:t>Figure 1. Sample architecture diagram</w:t></w:r></w:p>
-    <w:p><w:r><w:t>Normal paragraph text here.</w:t></w:r></w:p>
-    <w:p><w:r><w:t>表 2 实验结果汇总</w:t></w:r></w:p>
-  </w:body>
-</w:document>'''
-    path = tmp_path / "caption.docx"
-    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", content_types)
-        z.writestr("_rels/.rels", rels)
-        z.writestr("word/document.xml", doc_xml)
-    return path
-
-
 def test_fallback_docx_caption_detection(tmp_path: Path):
-    p = _build_docx_with_caption(tmp_path)
+    p = build_docx_with_caption(tmp_path / "caption.docx")
     doc = FallbackParser().parse(p, source_hash="c" * 64)
     captions = [e for e in doc.elements if e.type == "caption"]
     # 两段 caption（Figure 1. 和 表 2）+ 一段 paragraph
@@ -393,31 +291,8 @@ def test_fallback_docx_caption_detection(tmp_path: Path):
 
 # ---------- DOCX 空文档警告 ----------
 
-def _build_empty_docx(tmp_path: Path) -> Path:
-    content_types = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>'''
-    rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>'''
-    doc_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body></w:body>
-</w:document>'''
-    path = tmp_path / "empty.docx"
-    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", content_types)
-        z.writestr("_rels/.rels", rels)
-        z.writestr("word/document.xml", doc_xml)
-    return path
-
-
 def test_fallback_docx_empty_body_emits_warning(tmp_path: Path):
-    p = _build_empty_docx(tmp_path)
+    p = build_empty_docx(tmp_path / "empty.docx")
     doc = FallbackParser().parse(p, source_hash="e" * 64)
     assert len(doc.elements) == 0
     warning_codes = [w.code for w in doc.warnings]
@@ -439,7 +314,7 @@ def test_render_pdf_image_region_verbose_bad_path(tmp_path: Path):
 
 def test_render_pdf_image_region_verbose_bad_page_index(tmp_path: Path):
     """页号越界 → 返回错误字符串。"""
-    p = _build_minimal_pdf(tmp_path, text="(Hello)")
+    p = build_minimal_pdf(tmp_path / "synthetic.pdf", text="(Hello)")
     out = tmp_path / "out.png"
     err = _render_pdf_image_region_verbose(p, 999, [0.0, 0.0, 100.0, 100.0], out)
     assert err is not None
@@ -448,7 +323,7 @@ def test_render_pdf_image_region_verbose_bad_page_index(tmp_path: Path):
 
 def test_render_pdf_image_region_verbose_degenerate_bbox(tmp_path: Path):
     """退化 bbox（0 size crop）→ 错误字符串，不写文件。"""
-    p = _build_minimal_pdf(tmp_path, text="(Hello)")
+    p = build_minimal_pdf(tmp_path / "synthetic.pdf", text="(Hello)")
     out = tmp_path / "out.png"
     # bbox 全 0 → crop 退化
     err = _render_pdf_image_region_verbose(p, 0, [0.0, 0.0, 0.0, 0.0], out)

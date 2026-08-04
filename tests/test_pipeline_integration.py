@@ -11,7 +11,6 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-import zipfile
 from pathlib import Path
 
 import pytest
@@ -20,6 +19,8 @@ from app.chunkers import normalize_text
 from app.pipeline import process_single, validate_only
 from app.schema import is_valid
 
+from tests._synthetic_docs import build_minimal_pdf, build_pipeline_docx
+
 
 SAMPLES_PRIVATE = Path(__file__).resolve().parent.parent / "samples" / "private"
 
@@ -27,56 +28,13 @@ SAMPLES_PRIVATE = Path(__file__).resolve().parent.parent / "samples" / "private"
 # ---------- 共用合成样例 ----------
 
 def _build_minimal_docx(tmp_path: Path) -> Path:
-    content_types = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>'''
-    rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>'''
-    doc_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    <w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>Chapter 1</w:t></w:r></w:p>
-    <w:p><w:r><w:t>Hello world. This is paragraph one.</w:t></w:r></w:p>
-    <w:p><w:r><w:t>Second paragraph with more content.</w:t></w:r></w:p>
-  </w:body>
-</w:document>'''
-    p = tmp_path / "synthetic.docx"
-    with zipfile.ZipFile(p, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", content_types)
-        z.writestr("_rels/.rels", rels)
-        z.writestr("word/document.xml", doc_xml)
-    return p
+    """Pipeline 集成测试用 DOCX（无 styles.xml，3 段落）。委托到共享模块。"""
+    return build_pipeline_docx(tmp_path / "synthetic.docx")
 
 
 def _build_minimal_pdf(tmp_path: Path, text: str = "Hello Chapter 1 World") -> Path:
-    objs = [
-        b'<< /Type /Catalog /Pages 2 0 R >>',
-        b'<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-        b'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
-    ]
-    stream = b'BT /F1 24 Tf 100 700 Td (' + text.encode('latin-1') + b') Tj ET'
-    objs.append(b'<< /Length ' + str(len(stream)).encode() + b' >>\nstream\n' + stream + b'\nendstream')
-    objs.append(b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>')
-    pdf = b'%PDF-1.4\n'
-    offsets = []
-    for i, body in enumerate(objs, start=1):
-        offsets.append(len(pdf))
-        pdf += f'{i} 0 obj\n'.encode() + body + b'\nendobj\n'
-    xref_pos = len(pdf)
-    n = len(objs) + 1
-    pdf += b'xref\n' + f'0 {n}\n'.encode() + b'0000000000 65535 f \n'
-    for off in offsets:
-        pdf += f'{off:010d} 00000 n \n'.encode()
-    pdf += b'trailer\n<< /Size ' + str(n).encode() + b' /Root 1 0 R >>\nstartxref\n'
-    pdf += str(xref_pos).encode() + b'\n%%EOF'
-    p = tmp_path / "synthetic.pdf"
-    p.write_bytes(pdf)
-    return p
+    """委托到共享模块。"""
+    return build_minimal_pdf(tmp_path / "synthetic.pdf", text=text)
 
 
 # ---------- 合成样例端到端 ----------
