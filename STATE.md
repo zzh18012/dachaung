@@ -6465,3 +6465,87 @@ figure_caption_prf 等独立函数。
 - 本 worktree（Round 119 后）：8795 pass / 0 fail / 13 skip（HEAD `787fce5`）
 
 ---
+
+## Round 120（2026-08-05）：evaluation/annotation_metrics.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_annotation_metrics_edges4.py`（新增，732 行）
+- 目标：`evaluation/annotation_metrics.py`（194 行，已有 310 测试）
+- 新增测试：67 个
+- 提交：`4ef964e`
+
+### 覆盖深度
+- **figure_caption_prf 第四轮**：
+  - 各种 input（None/空 dict/正常 dict）keys 集合精确 3 项
+  - precision/recall/f1 value 全为 None（不允许 falsy）
+  - precision/recall/f1 reason 全为 PARSER_DOES_NOT_EMIT_RELATIONS
+  - idempotent 多次调用
+  - 即使 annotation 含 figure_caption_anchors 仍 null
+  - value 字段 None 类型，reason 字段 str 类型
+- **chunk_boundary_prf tolerance 边界**：
+  - 距离 = tolerance → 匹配
+  - 距离 = tolerance + 1 → 不匹配
+  - tolerance=0：仅精确匹配
+  - tolerance=0：距离 1 不匹配
+- **predicted 数量**：
+  - 2 chunks → 1 predicted
+  - 3 chunks → 2 predicted
+  - 5 chunks → 4 predicted
+- **position 大小写**：
+  - "before" 小写有效
+  - "AFTER" 大写视为 after（else 分支）
+  - "middle" 视为 after
+  - "" 视为 after
+- **chunk text 特殊字符**：
+  - 标点、数字、unicode 中文
+- **算法细节**：
+  - marker 在 stream 中两次出现 → search_from 推进
+  - marker 与 chunk text 部分重叠
+  - chunk.text=None 触发 fallback
+  - marker at stream start/end
+- **多 predicted 多 anchor**：
+  - predicted 多于 anchors → precision < 1.0
+  - anchors 多于 predicted（含 missing）→ recall 1.0
+  - greedy 选最小距离
+  - 一对一匹配：两 anchor 同 predicted → 一个成功
+- **F1 计算**：
+  - 完美匹配 → 1.0
+  - 全无匹配 → null（recall null 时）
+  - p=0.5/r=1.0 → 计算 2pr/(p+r)
+- **不变性**：
+  - 不修改 document/annotation
+  - 多次调用结果一致
+- **模块结构深度**：
+  - PARSER_DOES_NOT_EMIT_RELATIONS 值精确
+  - __all__ 为 list、长度 3、精确 set
+  - imports：Counter/Any/normalize_text/_null/_ratio
+  - figure_caption_prf/chunk_boundary_prf callable
+  - docstring 提及 caption/chunk_boundary/tolerance
+  - from __future__ import annotations
+- **签名深度**：
+  - figure_caption_prf 2 参数（document/annotation，无默认）
+  - chunk_boundary_prf 3 参数（含 tolerance_chars，默认 30）
+- 无源码改动。
+
+### 撞墙记录
+1. test_chunk_boundary_one_to_one_matching_no_double_count：
+   原用 "ab"+"a" 两 marker，但 search_from 推进后第二个 anchor 找不到。
+   修复：改用 "a" before + "l" before 两个不同 marker，gt_positions=[0,2]。
+
+### 下一步建议
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 FY：app/models.py 第三轮（154 行）
+- 候选 FZ：evaluation/schema.py 第三轮（86 行）
+- 候选 GA：evaluation/cli.py 第五轮（243 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：所有 evaluation/* 模块已完成 edges4。下一轮转 app/* 模块。
+选 FX（app/parsers/fallback_parser.py 第五轮）。fallback_parser 是核心
+解析器，630 行最大，深度空间最大。但 5 轮已多，可考虑 FY（app/models.py
+第三轮）作为短轮过渡。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 120 后）：8862 pass / 0 fail / 13 skip（HEAD `4ef964e`）
+
+---
