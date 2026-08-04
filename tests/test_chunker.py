@@ -836,3 +836,251 @@ def test_paragraph_then_long_paragraph_boundary_resets():
     long_chunks_text = " ".join(c.text for c in chunks[1:])
     assert _non_ws(long_chunks_text) == _non_ws(long_text)
 
+
+# ---------- 边角与缺漏补强（Round 28） ----------
+
+
+# normalize_text 直接单测
+
+
+def test_normalize_text_idempotent():
+    """规范化已经是规范化形式时再次规范化应保持不变。"""
+    s = "hello world"
+    assert normalize_text(s) == s
+    s2 = "a"
+    assert normalize_text(s2) == s2
+
+
+def test_normalize_text_mixed_unicode_whitespace():
+    """Unicode 空白（NBSP、em space、tab）应被压成单空格。"""
+    s = "a b c\td"
+    assert normalize_text(s) == "a b c d"
+
+
+def test_normalize_text_only_whitespace_returns_empty():
+    """全是空白 → 空串。"""
+    assert normalize_text("   \t\n\r  ") == ""
+    assert normalize_text("　 ") == ""
+
+
+# StructuralChunker.__init__ 验证
+
+
+def test_structural_chunker_max_chars_minimum_accepted():
+    """max_chars = 32 应被接受（边界值）。"""
+    c = StructuralChunker(max_chars=32)
+    assert c.max_chars == 32
+
+
+def test_structural_chunker_max_chars_below_minimum_rejected():
+    """max_chars = 31 应抛 ValueError。"""
+    with pytest.raises(ValueError, match="max_chars"):
+        StructuralChunker(max_chars=31)
+
+
+def test_structural_chunker_max_chars_zero_rejected():
+    """max_chars = 0 应抛 ValueError。"""
+    with pytest.raises(ValueError):
+        StructuralChunker(max_chars=0)
+
+
+def test_structural_chunker_max_chars_negative_rejected():
+    """负数 max_chars 应抛 ValueError。"""
+    with pytest.raises(ValueError):
+        StructuralChunker(max_chars=-100)
+
+
+def test_structural_chunker_default_max_chars_is_800():
+    """默认 max_chars = 800。"""
+    c = StructuralChunker()
+    assert c.max_chars == 800
+
+
+# _ChunkBuffer 直接单测
+
+
+def test_chunk_buffer_flush_empty_returns_none():
+    from app.chunkers.structural import _ChunkBuffer
+    buf = _ChunkBuffer(document_id="d1")
+    assert buf.flush(strategy="x", max_chars=800) is None
+    assert buf.is_empty()
+
+
+def test_chunk_buffer_flush_whitespace_only_returns_none():
+    """只有空白 parts → flush 时 text.strip() = "" → 返回 None。"""
+    from app.chunkers.structural import _ChunkBuffer
+    buf = _ChunkBuffer(document_id="d1")
+    buf.push_text("   ", "e1", 0, 3)
+    buf.push_text("\t\n", "e1", 3, 5)
+    result = buf.flush(strategy="x", max_chars=800)
+    assert result is None
+
+
+def test_chunk_buffer_length_sums_part_lengths():
+    from app.chunkers.structural import _ChunkBuffer
+    buf = _ChunkBuffer(document_id="d1")
+    assert buf.length() == 0
+    buf.push_text("hello", "e1", 0, 5)
+    assert buf.length() == 5
+    buf.push_text("world", "e2", 0, 5)
+    assert buf.length() == 10
+
+
+def test_chunk_buffer_source_element_ids_deduplicated():
+    """同一 element 引用多次 → source_element_ids 去重，但顺序保留。"""
+    from app.chunkers.structural import _ChunkBuffer
+    buf = _ChunkBuffer(document_id="d1", counter=0)
+    buf.push_text("a", "e1", 0, 1)
+    buf.push_text("b", "e2", 0, 1)
+    buf.push_text("c", "e1", 1, 2)  # e1 再次出现
+    chunk = buf.flush(strategy="x", max_chars=800)
+    assert chunk is not None
+    # 顺序保留，去重
+    assert chunk.source_element_ids == ["e1", "e2"]
+
+
+def test_chunk_buffer_source_spans_preserved_per_part():
+    """每个 part 一条 source_span，即使 element_id 相同。"""
+    from app.chunkers.structural import _ChunkBuffer
+    buf = _ChunkBuffer(document_id="d1", counter=0)
+    buf.push_text("a", "e1", 0, 1)
+    buf.push_text("b", "e1", 5, 6)  # 同 element 不同 span
+    chunk = buf.flush(strategy="x", max_chars=800)
+    assert chunk is not None
+    assert len(chunk.source_spans) == 2
+    assert chunk.source_spans[0] == {"element_id": "e1", "start": 0, "end": 1}
+    assert chunk.source_spans[1] == {"element_id": "e1", "start": 5, "end": 6}
+
+
+def test_chunk_buffer_chunk_id_includes_counter():
+    """chunk_id 格式：{document_id}::c{counter:04d}。"""
+    from app.chunkers.structural import _ChunkBuffer
+    buf = _ChunkBuffer(document_id="doc-xyz", counter=7)
+    buf.push_text("text", "e1", 0, 4)
+    chunk = buf.flush(strategy="x", max_chars=800)
+    assert chunk is not None
+    assert chunk.chunk_id == "doc-xyz::c0007"
+
+
+def test_chunk_buffer_flush_resets_parts():
+    """flush 后 parts 应被清空，复用 buf 时是新开始。"""
+    from app.chunkers.structural import _ChunkBuffer
+    buf = _ChunkBuffer(document_id="d1", counter=0)
+    buf.push_text("first", "e1", 0, 5)
+    buf.flush(strategy="x", max_chars=800)
+    assert buf.is_empty()
+    # 再次 push 不会带上之前的 part
+    buf.push_text("second", "e2", 0, 6)
+    chunk = buf.flush(strategy="y", max_chars=800)
+    assert chunk is not None
+    assert chunk.text == "second"
+    assert chunk.source_element_ids == ["e2"]
+
+
+def test_chunk_buffer_metadata_includes_strategy_and_max_chars():
+    """flush 出来的 chunk 的 metadata 含 strategy / max_chars / char_count。"""
+    from app.chunkers.structural import _ChunkBuffer
+    buf = _ChunkBuffer(document_id="d1", counter=0)
+    buf.push_text("hello", "e1", 0, 5)
+    chunk = buf.flush(strategy="custom_strategy", max_chars=123)
+    assert chunk is not None
+    assert chunk.metadata["strategy"] == "custom_strategy"
+    assert chunk.metadata["max_chars"] == 123
+    assert chunk.metadata["char_count"] == 5
+
+
+# 集成：仅 heading / 仅 image / 已有 chunks 等边角
+
+
+def test_only_headings_each_becomes_own_chunk():
+    """3 个 heading → 至少 3 个 chunk（heading 是硬边界）。"""
+    doc = _make_doc([
+        ("heading", "H1"),
+        ("heading", "H2"),
+        ("heading", "H3"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 3
+    assert [c.text for c in chunks] == ["H1", "H2", "H3"]
+
+
+def test_heading_then_image_then_paragraph():
+    """heading → image（被跳过）→ paragraph：image 不产生 chunk。"""
+    elements = [
+        Element(element_id="d::e0", type="heading", content="Title",
+                source_locator={"paragraph_index": 0}),
+        Element(element_id="d::e1", type="image", resource_path="/tmp/x.png",
+                source_locator={"paragraph_index": 1}),
+        Element(element_id="d::e2", type="paragraph", content="body",
+                source_locator={"paragraph_index": 2}),
+    ]
+    doc = Document(
+        document_id="d", source_path="/tmp/x", source_type="docx",
+        source_hash="a" * 64, parser_name="test", parser_version="0",
+        elements=elements,
+    )
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    # image 不参与，应只剩 heading + paragraph（合在一起因为长度都小）
+    texts = " ".join(c.text for c in chunks)
+    assert "Title" in texts
+    assert "body" in texts
+    # 没有任何 chunk 应包含 resource_path 信息（chunk.text 是 element content，
+    # image 的 content 是 None，不会进入 chunk）
+    for c in chunks:
+        assert "/tmp/x.png" not in c.text
+
+
+def test_chunker_ignores_existing_chunks_field():
+    """Document 已有 chunks 字段时，chunk() 不读旧 chunks，返回新切片。"""
+    doc = _make_doc([("paragraph", "hello world")])
+    # 给 doc 预置一些 chunks（不应影响结果）
+    pre_chunk = Chunk(
+        chunk_id="pre::c0", text="preset",
+        source_element_ids=["d-hash0000000001::e0000"],
+    )
+    doc.chunks = [pre_chunk]
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    # 新 chunks 不应包含 preset
+    assert all(c.chunk_id != "pre::c0" for c in chunks)
+    assert len(chunks) == 1
+    assert chunks[0].text == "hello world"
+
+
+def test_chunk_with_list_item_accumulates_like_paragraph():
+    """list_item 与 paragraph 一样累积到当前 buf。"""
+    doc = _make_doc([
+        ("list_item", "first item"),
+        ("list_item", "second item"),
+        ("list_item", "third item"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    # 三个都应在一个 chunk 里（总长度 << 800）
+    assert len(chunks) == 1
+    assert "first" in chunks[0].text
+    assert "second" in chunks[0].text
+    assert "third" in chunks[0].text
+
+
+def test_caption_treated_as_isolated():
+    """caption 是 isolated 类型（与 table/image 一样单独成 chunk）。"""
+    doc = _make_doc([
+        ("paragraph", "intro"),
+        ("caption", "Figure 1: Diagram"),
+        ("paragraph", "outro"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    # intro 单独成 chunk；caption 单独成 chunk；outro 单独成 chunk
+    assert len(chunks) == 3
+    assert chunks[1].text == "Figure 1: Diagram"
+    assert chunks[1].metadata["strategy"] == "isolated_caption"
+
+
+def test_table_metadata_strategy_is_isolated_table():
+    doc = _make_doc([
+        ("paragraph", "before"),
+        ("table", "| a | b |"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    table_chunk = next(c for c in chunks if "a" in c.text and "b" in c.text)
+    assert table_chunk.metadata["strategy"] == "isolated_table"
+
