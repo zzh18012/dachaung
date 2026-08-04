@@ -2705,3 +2705,48 @@
 - 里程碑：突破 2000 passed
 
 ---
+
+## Round 58（2026-08-04）：候选 BO — ipynb_parser 内部边角覆盖
+
+### 做了什么
+- 候选 BO：新建 `tests/test_parsers_ipynb_edges.py`（114 个测试）覆盖 `app/parsers/ipynb_parser.py`（227 行）的模块级常量 + 内部 helper + IpynbParser 边角，与已有 `test_parsers_ipynb.py`（65 个）互补。
+- 重点覆盖项：
+  - **模块级常量** 7 个：_IPYNB_EXTENSIONS 是 tuple 含 ".ipynb"、IpynbParser 类属性、是 Parser 子类、无构造参数、parse 方法可调用
+  - **_detect_ipynb_source_type 边角** 11 个：返 str、返 "ipynb"、大写/混合大小写、双扩展名、dotfile、拒绝 json/md、无 suffix 含 '(无)'、错误 details 含 suffix、错误消息提到 ipynb
+  - **_cell_source_to_text 类型覆盖** 16 个：str/空串/list/带换行 list/空 list/None/int/float/bool/dict/bytes 全返 ""、含非 str 元素的 list、嵌套 list、空字符串 list、返 str 类型
+  - **_extract_kernel_language 边角** 13 个：kernelspec.language 优先、kernelspec.name fallback、language_info.name fallback、空 metadata、kernelspec=None、空 dict、language 空走 name、language=None 走 name、所有字段空、只 kernelspec 无 language_info、返 str 类型
+  - **IpynbParser 实例复用** 3 个：可解析多文件、无 counter 状态泄漏、单文档 element_id 严格递增
+  - **错误路径完整** 11 个：file_not_found 含 path、unsupported_type 含 suffix、ipynb_invalid_json 含 exception_type、顶层 array/string/null/int 各自 raise ipynb_bad_structure、cells 字段 dict/string 各自 raise、nbformat=3/0 raise unsupported_version
+  - **Document metadata 字段** 8 个：ipynb=True、nbformat=4、nbformat_minor=5、nbformat_minor 缺失=None、cell_count 正确、language 正确、无 kernelspec 时 language=""、5 个 key 完整
+  - **cell 处理细节** 11 个：code metadata.kind=code_cell、raw metadata.kind=raw_cell、code 含 language、raw 无 language key、markdown 子 element 无 kind、code/raw locator 无 line、code/raw content strip、multiline source list concat、markdown section_path、两 markdown cell section_path 独立、空 code cell warning 含 cell_index
+  - **warning 路径** 5 个：whitespace-only code cell warning、unknown cell_type warning、cell 非 dict warning 含 cell_index、unknown cell_type warning 记 cell_type、空 notebook no_content warning
+  - **nbformat 边角** 5 个：nbformat 缺失=None 视为支持、minor=0 工作、nbformat=5 工作、metadata=None 不 crash、cells 缺失当 [] 处理
+  - **大 notebook / Unicode / 字段忽略** 5 个：100 cells 大 notebook、UTF-8 emoji+CJK、outputs 字段忽略、未知字段忽略
+  - **Document 字段完整性** 6 个：chunks/relations/errors 空、source_path/source_hash/parser_name/parser_version 透传、confidence 固定 0.95、parent_id=None
+  - **schema 通过** 2 个：正常 notebook 通过 schema、空 notebook 也通过 schema
+  - **mixed cell 场景** 4 个：混合 cell 数量、markdown 含 heading+list、code 含换行、warning 含非空 reason
+  - **cell_index 单调** 2 个：cell_index 单调非递减、首个 cell_index=0
+- 无源码改动。
+
+### 撞墙记录
+- 1 次撞墙：`test_ipynb_parser_markdown_cell_sub_element_no_kind_metadata` 失败
+  - 期望：markdown cell 的 heading sub-element metadata 是空 dict `{}`
+  - 实际：heading element 有 `{"level": 1}`（来自 MarkdownParser）
+  - 修复：改测试为只检查 `"kind" not in metadata`（保留原有意图但符合实际行为）
+
+### 下一步建议
+- 候选 BP：app/parsers/fallback_parser.py 内部边角（已有 79 个）
+- 候选 BQ：app/parsers/kreuzberg_parser.py 内部边角（已有 53 个）
+- 候选 BR：app/pipeline.py 端到端边角（含错误路径 + 多 parser 切换）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BP（fallback_parser 内部边角）。理由：
+1. fallback_parser 是默认 parser（pdfplumber + python-docx），覆盖率最关键
+2. 已有 79 个直接测试，但模块级常量、纯 helper 函数、错误 details 仍有补强空间
+3. 之后扩展到 BQ 完成所有 parser 内部边角
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 58 后）：2145 pass / 0 fail / 9 skip（HEAD `562b8e8`）
+
+---
