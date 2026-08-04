@@ -9781,3 +9781,45 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 （pdfplumber + python-docx），覆盖最多真实场景，第六轮可深入 PDF/DOCX 各自分支、table/caption/image 提取。
 
 ---
+
+## Round 167（2026-08-05）：app/parsers/fallback_parser.py 第六轮（edges6）
+
+### 目标
+- 给 app/parsers/fallback_parser.py（630 行，已有 base/edges/edges2-5 共 730 测试）补第六轮
+- 深入纯函数（caption 正则、rows_to_markdown、image_filename、classify_pdf_paragraph、group_words、lines_to_para）
+
+### 改动
+- 新增 `tests/test_parsers_fallback_edges6.py`（115 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_CAPTION_RE 正则**：Pattern 对象、IGNORECASE flag、Table/Figure/Fig./表/图 各 prefix、全角数字、各种分隔符（.、/ fullwidth 、/colon/space）、不匹配 normal text
+- **_is_caption**：return bool、empty/None 安全、word in middle 不匹配
+- **_rows_to_markdown**：None→""、int→str、混合类型、Unicode、uneven 补齐、空 cells
+- **_image_filename**：02d zero-pad、ext 切换、doc- 前缀剥离、prefix 参数、index 0/large
+- **_classify_pdf_paragraph**：caption 优先、80 char 临界（heading ↔ paragraph）、各种结尾标点（.。!?！？）、empty/whitespace
+- **_group_words_to_paragraphs**：合成 word dict、同/异行合并、bbox 聚合
+- **_lines_to_para**：empty → text=""、bbox=None；按 x0 排序；bbox=[min(x0),min(top),max(x1),max(bottom)]
+- **FallbackParser 类**：name="fallback"、version 含 pdfplumber/python-docx/pypdfium2、init 签名 (self, image_output_dir=None)、str 转 Path、None 保留
+- **parse 错误**：file_not_found/unsupported_type，details.path 精确
+- **模块结构**：__all__=["FallbackParser"]、try/except optional imports、_PDFPLUMBER_VERSION/_DOCX_VERSION/_PDFIUM_VERSION 常量、docstring 提及 pdfplumber/python-docx/Kreuzberg 限制
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 167 后）：13486 pass / 0 fail / 13 skip（HEAD `a487985`）
+
+### 下一步建议
+- 候选 IC：app/parsers/text_parser.py 第七轮
+- 候选 IE：app/parsers/kreuzberg_parser.py 第六轮
+- 候选 IG：app/chunkers/__init__.py 第六轮
+- 候选 IH：app/models.py 第八轮
+- 候选 IJ：app/chunkers/base.py 第六轮（若有）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IC（app/parsers/text_parser.py 第七轮）。text_parser 是最简单的 parser，
+第七轮可深入 line/word 切分、空行处理、metadata 字段等。
+
+---
