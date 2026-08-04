@@ -9823,3 +9823,58 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第七轮可深入 line/word 切分、空行处理、metadata 字段等。
 
 ---
+
+## Round 168（2026-08-05）：app/parsers/text_parser.py 第六轮（edges6）
+
+### 目标
+- 给 app/parsers/text_parser.py（136 行，已有 base/edges/edges2-5 共 455 测试）补第六轮
+- 深入 _split_paragraphs 换行归一与 _detect_text_source_type details
+
+### 改动
+- 新增 `tests/test_parsers_text_edges6.py`（88 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_TEXT_EXTENSIONS**：精确 (".txt", ".text")
+- **_detect_text_source_type**：大小写、details.suffix 精确、message 提及 .txt/.text
+- **_split_paragraphs**：
+  - empty → []
+  - 单 paragraph / 多 paragraph 分隔
+  - 连续空行视为单一分隔
+  - leading/trailing blank 行 skip
+  - CRLF/CR 归一为 LF
+  - whitespace-only 行视为空行
+  - 仅空白 → []
+  - 连续非空行合并（保留内部 \n）
+  - 1-based 行号
+  - content strip 外部空白、保留内部 \n
+  - idempotent、no mutation
+- **TextParser 类**：name="text"、version="stdlib/0.1.0"、继承 Parser
+- **parse 错误**：file_not_found、unsupported_type
+- **parse metadata**：{"text": True}、source_type="text"
+- **场景**：empty/whitespace-only 触发 text_no_content；CRLF/Unicode/invalid UTF-8（errors=replace）
+- **element_id**：zero-pad 4 位、连续递增
+- **locator**：1-based line
+- **confidence**：0.95 默认、metadata={}
+- **模块结构**：__all__、future annotations、imports、docstring 提及策略与不支持功能
+- **签名深度**：parse/_detect/_split_paragraphs
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 168 后）：13574 pass / 0 fail / 13 skip（HEAD `21fa8ea`）
+
+### 下一步建议
+- 候选 IE：app/parsers/kreuzberg_parser.py 第六轮
+- 候选 IG：app/chunkers/__init__.py 第六轮
+- 候选 IH：app/models.py 第八轮
+- 候选 IK：app/hash.py 第六轮（计算 source_hash 的入口）
+- 候选 IL：app/source_locator.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IE（app/parsers/kreuzberg_parser.py 第六轮）。kreuzberg 是可选 parser 路径，
+第六轮可深入 KreuzbergParser 类、可选 import fallback、版本字符串等。
+
+---
