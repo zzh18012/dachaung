@@ -2550,3 +2550,42 @@
 - 本 worktree（Round 53 后）：1806 pass / 0 fail / 9 skip（HEAD `816ab48`）
 
 ---
+
+## Round 54（2026-08-04）：候选 BK — evaluation/cli.py 边角覆盖
+
+### 做了什么
+- 候选 BK：新建 `tests/test_evaluation_cli_edges.py`（54 个测试）覆盖 `evaluation/cli.py`（243 行）的 argparse 配置 + 边角，与已有 `test_evaluation_cli.py`（48 个）互补。
+- 重点覆盖项：
+  - **_build_parser 详细配置** 13 个：prog="evaluation.cli"、3 个子命令（run/validate-report/inspect-doc）、run 默认 parser=fallback + max_chars=800 + tolerance_chars=30、--parser choices 仅 fallback/kreuzberg、--manifest/--output/input required、无命令/未知命令 SystemExit(2)
+  - **_format_metric 边角** 16 个：int 0/负数/大数、float 0/1/高精度、dict 空/有项、string 值、list 值（fallback default）、None value 含 reason、None 无 reason、对齐宽度 36
+  - **main 返回 int** 3 个：validate/inspect/run 都返 int
+  - **validate-report 错误码** 4 个：missing 2/bad json 1/invalid 1/valid 0
+  - **run 错误码** 3 个：missing manifest 2/bad json 1/invalid content 1
+  - **inspect-doc 错误码** 4 个：missing 2/bad json 1/array root 1/valid 0
+  - **argparse 错误路径** 3 个：未知 parser choice SystemExit(2)、负数 max_chars argparse 接受、tolerance_chars=0 接受
+  - **argv=None 行为** 1 个：main(None) 用 sys.argv
+  - **模块导入无副作用** 5 个：importlib.reload 不崩、main/_build_parser/_format_metric/_run_inspect_doc 都是 callable
+  - **stdout/stderr 输出** 3 个：run 成功 stdout 含 [OK]+devset_status、validate-report 合法 stdout [OK]、validate-report 非法 stderr [FAIL]
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。54 个新测试一次通过。
+
+### 下一步建议
+- 候选 BL：app/parsers/text_parser.py 内部边角
+- 候选 BM：app/parsers/markdown_parser.py 内部边角
+- 候选 BN：app/parsers/html_parser.py 内部边角
+- 候选 BO：app/parsers/ipynb_parser.py 内部边角（已有 38 个直接测试，仍可补强）
+- 候选 BP：app/parsers/fallback_parser.py 内部边角（已有 79 个，仍可补强）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BL（text_parser 内部边角）。理由：
+1. text_parser.py 是最简单的 parser，作为开始
+2. 之后扩展到 BM/BN/BO 完成所有 parser 的内部边角
+3. 至此 evaluation 层 + app/cli + app/schema + app/models + app/hash + app/pipeline + app/chunker 全覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 54 后）：1860 pass / 0 fail / 9 skip（HEAD `6b08aa8`）
+
+---
