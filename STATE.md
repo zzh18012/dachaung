@@ -6860,3 +6860,75 @@ Schema 校验核心，独立于 evaluation/schema，第三轮深度空间仍在�
 - 本 worktree（Round 124 后）：9199 pass / 0 fail / 13 skip（HEAD `c00b412`）
 
 ---
+
+## Round 125（2026-08-05）：app/pipeline.py 第五轮（补 edges3）
+
+### 范围
+- 文件：`tests/test_pipeline_edges3.py`（新增，699 行）
+- 目标：`app/pipeline.py`（216 行，已有 400 测试）
+- 新增测试：83 个
+- 提交：`991ab3e`
+
+### 覆盖深度
+- **get_parser 深度（类型断言）**：
+  - 6 个 parser 名返回对应类型实例
+  - 全部是 Parser 子类
+  - 未知 name → ValueError，消息含完整支持列表
+  - 大小写敏感、空串、含空白均拒
+  - 两次调用返回独立实例
+  - fallback/kreuzberg 接受 image_output_dir 参数
+- **image_output_dir_for 深度**：
+  - None → None；str/Path → Path
+  - 短 hash 截断安全；空 hash name="images-"
+  - name 格式 "images-<16 hex>"
+  - parent 与 output_path.parent 一致
+  - 绝对/相对路径保留输入特性
+  - 一致性：同输入同输出
+- **process_single 签名深度**：
+  - 5 参数（input_path/output_path/parser_name/max_chars/write_json）
+  - parser_name/max_chars/write_json 是 KEYWORD_ONLY
+  - 默认值：output_path=None, parser_name="fallback", max_chars=800, write_json=True
+  - 返回 tuple 注解
+- **validate_only 深度**：
+  - 返回 (bool, str) 元组
+  - 缺文件 → False + 消息含"missing"
+  - 坏 JSON → False + "JSON" 关键字
+  - 不符合 schema → False
+  - 合法 → True + "OK"
+  - str/Path 输入都接受
+- **模块结构**：
+  - imports 完整（json/Path/Any/StructuralChunker/compute_file_hash/
+    Document/ErrorRecord/Parser/ParserError/6 parser 类/
+    SchemaValidationError/validate）
+  - __all__ 4 项精确（get_parser/image_output_dir_for/process_single/validate_only）
+  - 全 public（无 _ 前缀）
+  - docstring 提及 Pipeline/校验
+  - from __future__ import annotations
+- **签名深度**：
+  - get_parser: (name, image_output_dir=None)
+  - image_output_dir_for: (output_path, source_hash) 均必需
+  - process_single: 见上
+  - validate_only: (json_path) → tuple[bool, str]
+- 无源码改动。
+
+### 撞墙记录
+1. test_validate_only_returns_ok_for_valid：构造的 element 缺 parent_id/
+   confidence/metadata 等必需字段。修复：补全 schema 必需字段。
+2. test_image_output_dir_for_output_path_default_none：output_path 是
+   必需参数（无默认）。修复：改为 assert default is empty。
+
+### 下一步建议
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 GA：evaluation/cli.py 第五轮（243 行）
+- 候选 GB：app/chunkers/structural.py 第四轮
+- 候选 GF：app/cli.py 第三轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GF（app/cli.py 第三轮）。cli.py 是用户接口入口，
+第三轮深度空间仍在（subcommand、参数解析、退出码等）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 125 后）：9282 pass / 0 fail / 13 skip（HEAD `991ab3e`）
+
+---
