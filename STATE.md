@@ -8952,3 +8952,67 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 第六轮可深入 run_pilot、单个文件评测、计时、报告装配等。
 
 ---
+
+## Round 152（2026-08-05）：evaluation/runner.py 第六轮（edges6）
+
+### 目标
+- 给 evaluation/runner.py（227 行，已有 base/edges/edges2-5 共 501 测试）补第六轮
+- 深入 run_evaluation report 顶层结构、_process_one 签名、_load_annotation 边界
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges6.py`（68 测试）
+- 仅测试，不动业务代码（仍守 "评测只调用，不改算法"）
+
+### 覆盖要点
+- **_load_annotation 边界补强**：
+  - UTF-8 BOM → json.load(encoding=utf-8) 不剥离 BOM → JSONDecodeError → None
+  - array root、嵌套 dict+array、不修改原文件、不抛异常（invalid/missing）
+  - 幂等、每次返回新 dict（不共享引用）
+  - 签名：path 必填、return dict|None
+- **_process_one 签名**：4 参（doc/output_root/parser_name/max_chars）、无默认、返回 tuple
+- **run_evaluation 签名**：
+  - parser_name/max_chars/tolerance_chars 是 keyword-only
+  - parser_name 默认 "fallback"、max_chars 默认 800、tolerance_chars 默认 30
+  - manifest/output_path 必填、return dict
+- **模块结构**：
+  - __all__ == ["run_evaluation"]
+  - imports：json/time/Path/Any/process_single/image_output_dir_for/REPORT_VERSION
+  - imports：chunk_boundary_prf/figure_caption_prf/compute_automatic_metrics/aggregate_summary/build_devset_section/build_provenance
+  - docstring 提及 total / not_instrumented
+  - 无 _silence_unused 函数
+  - from __future__ import annotations
+- **run_evaluation 端到端**（用 _FakeManifest/_FakeDocEntry 模拟）：
+  - 返回 dict、写盘、JSON 可反序列化
+  - 顶层 keys：report_version/provenance/devset/summary/per_doc/expected_failures
+  - report_version == REPORT_VERSION
+  - provenance.parser_name / max_chars
+  - devset.status / file_count
+  - per_doc[0]：doc_id/metrics/wall_time_seconds
+  - wall_time_seconds.parse/chunk 是 None、parse_reason/chunk_reason == "not_instrumented"
+  - wall_time_seconds.total 是非负 float
+  - expected_failures 空列表（fake manifest 无 expected_failures）
+  - 创建嵌套父目录
+  - summary 含 counts/success_rates/ratio_macro_averages/silent_drop_total
+  - 返回 dict 与落盘 JSON 一致
+- **综合行为**：_load_annotation 幂等、每次新 dict
+
+### 撞墙记录
+- **Wall 1**：UTF-8 BOM 测试期望解析成功，实际 json.load(encoding=utf-8) 不剥 BOM
+  → JSONDecodeError → 返回 None。修复：改为期望 None（与实际行为一致，不改源码）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 152 后）：12001 pass / 0 fail / 13 skip（HEAD `7313394`）
+
+### 下一步建议
+- 候选 HO：evaluation/metrics.py 第六轮
+- 候选 HP：evaluation/report.py 第六轮
+- 候选 HQ：evaluation/manifest.py 第六轮
+- 候选 HR：app/cli.py 第七轮
+- 候选 HS：evaluation/cli.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HP（evaluation/report.py 第六轮）。report.py 是评测报告装配核心，
+第六轮可深入 aggregate_summary/build_devset_section/build_provenance/序列化等。
+
+---
