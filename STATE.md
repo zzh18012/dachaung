@@ -2750,3 +2750,44 @@
 - 本 worktree（Round 58 后）：2145 pass / 0 fail / 9 skip（HEAD `562b8e8`）
 
 ---
+
+## Round 59（2026-08-04）：候选 BP — fallback_parser 内部边角覆盖
+
+### 做了什么
+- 候选 BP：新建 `tests/test_parsers_fallback_edges.py`（95 个测试）覆盖 `app/parsers/fallback_parser.py`（630 行）的纯 helper 边角 + FallbackParser 类契约，与已有 `test_parsers_fallback.py`（79 个）互补。
+- 重点覆盖项：
+  - **_CAPTION_RE 直接测试** 7 个：返 re.Pattern、match 对象/None、IGNORECASE、全角数字、关键词后必须数字、0 数字匹配、多行 match 只看开头
+  - **_is_caption 边角** 8 个：前导空白、tab 分隔、数字 0、大数字、关键词无数、关键词嵌文本不匹配、返 bool 类型
+  - **_rows_to_markdown cell 类型扩展** 10 个：float/bool/dict/list cell、混合类型、3+ body rows、100 body rows、separator 三横、int 0 cell
+  - **_image_filename 边角** 9 个：basic format、index > 99（3 位）、index 0、doc-doc-x（全局 replace）、custom ext、ext 含点、prefix 含数字、无 doc- 前缀
+  - **_save_image 实际写盘** 8 个：嵌套目录创建、返回 Path、文件名格式、目录已存在、同 index 覆盖、空 bytes、大 bytes（10KB）、custom ext
+  - **_classify_pdf_paragraph 80 字符边界** 9 个：== 80 heading、> 80 paragraph、< 80 heading、80 with period、80 with !、中文句号、返 tuple、caption meta、heading meta、paragraph meta 空 dict
+  - **_is_heading_style 边角** 12 个：heading 99、heading 0 clamp、heading -5 clamp、混合大小写、全大写、Subtitle/Normal False、返 tuple、whitespace 边角、空串/纯空白
+  - **_extract_inline_image_rids 边角** 4 个：空 paragraph、返 list、blip outside drawing 不捕获、embed+link embed 优先
+  - **_group_words_to_paragraphs 边角** 4 个：返 list、dict 含 text/bbox、empty input、3 词一行
+  - **_lines_to_para 边角** 6 个：返 dict、empty lines、单行多词、bbox 聚合、min top、max bottom
+  - **FallbackParser 类契约** 10 个：name 是 str、version 是 str、继承 Parser、init 多形态（无参/None/空串/Path/str path）、多实例互不干扰、parse callable
+  - **FallbackParser.parse 错误路径** 5 个：missing pdf/docx、details 含 path、unsupported_type
+- 无源码改动。
+
+### 撞墙记录
+- 2 次撞墙：
+  1. `test_caption_re_ignores_case` 失败：用 "figure 3," 但 regex 分隔符 `[\.、:\s]` 不含逗号。修复：改用 "figure 3."（句点在允许字符内）。
+  2. `test_extract_inline_image_rids_with_drawing_outside_paragraph` 失败：blip 在 w:drawing 外不被捕获（iter(qn("w:drawing")) 严格）。修复：改测试为断言返 []，反映实际行为。
+
+### 下一步建议
+- 候选 BQ：app/parsers/kreuzberg_parser.py 内部边角（已有 53 个）
+- 候选 BR：app/pipeline.py 端到端边角（含错误路径 + 多 parser 切换）
+- 候选 BS：app/chunkers/structural.py（已有 85 个边角，可继续补完）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BQ（kreuzberg_parser 内部边角）。理由：
+1. kreuzberg 是可选 parser（默认走 fallback）
+2. 内部含异常路径 fallback、namespace 检测、metadata 提取，覆盖盲区多
+3. 完成 BQ 后所有 5 个 parser 都有完整边角测试
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 59 后）：2240 pass / 0 fail / 9 skip（HEAD `a265a16`）
+
+---
