@@ -4893,3 +4893,51 @@
 - 本 worktree（Round 99 后）：6500 pass / 0 fail / 13 skip（HEAD `2dedfdb`）
 
 ---
+
+## Round 100（2026-08-05）：候选 DP — evaluation/annotation_metrics.py 第三轮边角
+
+### 触发
+继 Round 99（cli.py 第三轮）后继续自跑。Round 99 建议选 DP，遵守。
+
+### 实现
+- 新增 `tests/test_annotation_metrics_edges3.py`（87 个测试）
+- 覆盖 evaluation/annotation_metrics.py（194 行）的深度路径：
+  - **预测位置生成**：空 chunk text、所有 chunk 文本为空（stream=""）、
+    chunk 文本是另一个的子串、所有 chunk 文本相同
+  - **anchor 深度**：marker 含空格、跨 chunk 边界、混合 before/after、
+    stream 前缀/后缀 marker、marker 比 stream 长、position 大写当 after 处理
+  - **输出 key 集合精确性**：no_document/no_annotation/no_chunks/no_anchors/
+    one_chunk/success-no-missing 各 4 keys，success-with-missing 5 keys
+  - **_tolerance_chars 字段**：严格 int 类型、reason 永远 None、0/极大值/负值
+  - **_missing_markers**：保留 anchor 顺序、部分缺失、全部缺失但 chunks>=2、
+    key 在全部命中时不存在
+  - **算法路径**：greedy 3/3 全匹配、repeated marker search_from 推进、
+    零距离匹配、predicted < chunks-1、有 anchors 但全 missing 的 recall reason
+  - **输入鲁棒性**：chunks=null、anchors=null、marker=null、缺 marker/position 键
+  - **不可变性**：document/annotation 不被修改、无 stdout/stderr 输出
+  - **figure_caption_prf 深度**：3 keys、全部 None value、统一 reason、
+    每次返回新 dict、不修改输入
+  - **模块结构**：__all__ 3 项有序、normalize_text/_null/_ratio 导入、
+    常量属性（小写/无空格/前缀 parser_）
+  - **metric value 类型**：success 时 float-or-None、_tolerance_chars 总是 int
+  - **reason 字符串精确性**：pipeline_failed / no_annotation /
+    no_predicted_boundaries / no_ground_truth_anchors / no_ground_truth_anchors_in_stream
+- 无源码改动。
+
+### 撞墙记录
+- 无：87 个测试一次通过。
+
+### 下一步建议
+- 候选 DQ：evaluation/schema.py 边角（第二轮，若有）
+- 候选 DR：evaluation/report.py 第三轮（已有 124 edges2）
+- 候选 DS：app/chunkers/structural.py 第四轮（已有 77 edges3）
+- 候选 DT：app/parsers/fallback_parser.py 第四轮（已有 79 edges3）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DR（report.py 第三轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 100 后）：6587 pass / 0 fail / 13 skip（HEAD `f7b039d`）
+
+---
