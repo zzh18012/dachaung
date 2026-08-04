@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from app.pipeline import process_single
+from app.pipeline import image_output_dir_for, process_single
 
 from evaluation import REPORT_VERSION
 from evaluation.annotation_metrics import (
@@ -70,15 +70,11 @@ def _process_one(
     )
     elapsed = time.perf_counter() - t0
 
-    # image_output_dir 与 pipeline 内部规则保持一致
+    # image_dir 与 pipeline 内部规则保持一致：直接复用 pipeline 的命名约定 helper，
+    # 不再从 document_id 反推（避免硬编码 document_id 前缀与目录命名两个约定）。
     image_dir: Path | None = None
     if document is not None:
-        # pipeline: out_root / images-{source_hash[:16]}
-        # 我们 out_stub.parent = output_root/_per_doc/，所以 image_dir 是 _per_doc/images-<sha16>/
-        # 用 document_id 反推（document_id = doc-{source_hash[:16]}）
-        did = document.document_id
-        sha16 = did.replace("doc-", "") if did.startswith("doc-") else did
-        image_dir = out_stub.parent / f"images-{sha16}"
+        image_dir = image_output_dir_for(out_stub, document.source_hash)
 
     # 清理 _per_doc 目录（图片留下；空目录留作 image_dir 引用）
     if out_stub.is_file():

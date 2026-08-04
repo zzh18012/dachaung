@@ -44,6 +44,23 @@ def get_parser(name: str, image_output_dir: Path | str | None = None) -> Parser:
     )
 
 
+def image_output_dir_for(
+    output_path: str | Path | None,
+    source_hash: str,
+) -> Path | None:
+    """image 输出目录的命名约定（单一事实源）。
+
+    若给了 output_path，约定为 `output_path.parent / images-<sha16>`；
+    若 output_path 为 None，返回 None（pipeline 不会写盘，也不需要 image 目录）。
+
+    所有需要推导 image 目录的代码（process_single 内部、评测 runner、
+    未来可能的 CLI inspect / batch 工具）都应调本函数，避免散落硬编码。
+    """
+    if output_path is None:
+        return None
+    return Path(output_path).parent / f"images-{source_hash[:16]}"
+
+
 def process_single(
     input_path: str | Path,
     output_path: str | Path | None = None,
@@ -91,12 +108,8 @@ def process_single(
         return None, errors
 
     # 2. 解析
-    # 图片输出目录：若给了 output_path，自动推导为同目录的 <doc_id>/ 子目录
-    image_output_dir: Path | None = None
-    if output_path is not None:
-        out_root = Path(output_path).parent
-        # 用 source_hash 前 16 位作目录名（与 document_id 一致）
-        image_output_dir = out_root / f"images-{source_hash[:16]}"
+    # 图片输出目录：若给了 output_path，按命名约定推导为同目录的 images-<sha16>/ 子目录
+    image_output_dir = image_output_dir_for(output_path, source_hash)
     try:
         parser = get_parser(parser_name, image_output_dir=image_output_dir)
         document = parser.parse(input_p, source_hash=source_hash)
@@ -200,4 +213,4 @@ def validate_only(json_path: str | Path) -> tuple[bool, str]:
         return False, f"JSON 解析失败: {e}"
 
 
-__all__ = ["get_parser", "process_single", "validate_only"]
+__all__ = ["get_parser", "image_output_dir_for", "process_single", "validate_only"]
