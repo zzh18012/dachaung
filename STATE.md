@@ -1447,3 +1447,40 @@
 - 本 worktree（Round 24 后）：517 pass / 0 fail / 9 skip（HEAD `057bad9`）
 
 ---
+
+## Round 25（2026-08-04）：候选 AC — evaluation/schema.py 与 schema_validation.py 全新测试文件
+
+### 做了什么
+- 候选 AC：新建 `tests/test_evaluation_schema.py`，25 个测试覆盖 `evaluation/schema.py` 与 `evaluation/schema_validation.py`。
+- 这两个模块此前**无专属测试**（仅被 cli/report 间接调用）。
+- 重点覆盖项：
+  - **`load_schema`**：4 个已知 schema 都能加载；缺失抛 FileNotFoundError
+  - **`SCHEMAS_DIR`** 常量指向项目 schemas/
+  - **`validate` manifest**：合法返回 None；非法抛 EvalSchemaError + errors 列表；多错误同时收集
+  - **`validate` annotation**：position enum、marker minLength、additionalProperties、required
+  - **`validate` evaluation-report**：version const、缺失 top-level、缺失嵌套 provenance 字段
+  - **`validate_file`**：合法文件、缺失文件、非法 JSON（抛 JSONDecodeError）、非法内容（抛 EvalSchemaError）、str 路径
+  - **`document_passes_schema`**：合法 True、非法 False、返回 bool 类型、错 schema_version、element 缺必填
+- 无源码改动。
+
+### 撞墙记录
+- **撞墙 1**：`_valid_report()` 最初把 devset 的字段写成 `devset_status` 与 `manifest_path`，但 schema 实际要求 `status` 且 `additionalProperties:false` 不允许 `manifest_path`。两次修复后对齐 schema。
+- 不是源码 bug，是测试构造时未对照 schema。
+
+### 下一步建议
+- 候选 AD：`evaluation/report.py` 聚合逻辑测试（aggregate_reports / 各种 summary 字段计算）
+- 候选 AE：`evaluation/runner.py` 主流程测试（process expected_failures 等）
+- 候选 AF：`app/chunkers/structural.py` 内部纯函数补强
+- 候选 AG：`app/cli.py` 子命令的更细致测试（参数解析、退出码）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AD（evaluation/report.py）。理由：
+1. 完成 evaluation/ 模块覆盖率补齐的最后一公里
+2. 聚合逻辑（macro average、counts 求和、silent_drop 求和）有逻辑分支值得测
+3. 纯函数 + 已有 evaluation-report.schema.json 可作校验
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 25 后）：542 pass / 0 fail / 9 skip（HEAD `d07b3dc`）
+
+---
