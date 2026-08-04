@@ -1375,3 +1375,44 @@
 - 本 worktree（Round 22 后）：473 pass / 0 fail / 9 skip（HEAD `301e918`）
 
 ---
+
+## Round 23（2026-08-04）：候选 Y — evaluation/manifest.py 边角覆盖率补强
+
+### 做了什么
+- 候选 Y：扩展 `tests/test_manifest.py`，新增 23 个测试覆盖 `load_manifest` 与内部 helper 的边角路径。
+- 重点覆盖项：
+  - **`_is_absolute_like`** 直接单测：POSIX、Windows 盘符+斜杠、盘符无斜杠、相对路径、空串
+  - **`_has_backslash`** 直接单测
+  - **`_detect_project_root`** 单测：向上找 `pyproject.toml`；找不到时不崩溃
+  - **`annotation_file` 解析**：合法时解析为绝对路径；绝对/反斜杠路径被拒
+  - **`expected_failures` 边角**：路径越界被拒；`source_type` 可选
+  - **`DocumentEntry` 字段**：sha256/categories/paired_with/expectations 填充；默认值（None / 空元组）
+  - **`Manifest` 属性**：`categories_covered` 空与去重；`content_group_count` 全 unpaired；单向配对仍算 1 组
+  - **显式 `project_root` 参数**：覆盖 `pyproject.toml` 探测
+  - **JSON 解析错误** → ManifestError
+  - **schema additionalProperties:false** 在 top-level / document / expected_failure 三层都生效
+  - **schema enum 拒绝**：source_type / doc_id minLength
+- 无源码改动，纯测试加强。
+
+### 撞墙记录
+- **撞墙 1**：`test_detect_project_root_no_pyproject_falls_back_to_dir` 假设找不到 `pyproject.toml` 时回退到 start.parent，但实际函数对不存在的文件路径返回 start 本身。改测：传一个真实存在的文件触发 `cur.is_file()=True` 分支。
+- **撞墙 2**：`test_explicit_project_root_used` 写文件名是 `x.docx`，但 manifest 默认指向 `sample.docx`，校验通过但路径不符。改测：在 project_root 下创建 `sample.docx` 与 manifest 路径对齐。
+- 两次都是测试构造错误，非源码 bug。
+
+### 下一步建议
+- 候选 AA：`app/hash.py` 模块（SHA256 / content addressing）测试
+- 候选 AC：`evaluation/schema.py` 与 `evaluation/schema_validation.py` 测试
+- 候选 AD：`evaluation/report.py` 聚合逻辑测试（aggregate_reports 等）
+- 候选 AE：`evaluation/runner.py` 跑评测主流程的测试（处理 expected_failures 等）
+- 仍阻塞：J（向量化，依赖）、M（evaluator v1.2，硬底线）、O（docs/*.md，系统指令）
+
+**建议**：选 AA（hash 模块）。理由：
+1. hash 是 pipeline 入口的关键基础（content-addressing）
+2. 纯函数、低复杂度、易测试
+3. 之后可以做 AC（schema_validation）补齐 evaluation/ 这一层的覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 23 后）：496 pass / 0 fail / 9 skip（HEAD `eeba61b`）
+
+---
