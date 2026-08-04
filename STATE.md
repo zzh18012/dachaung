@@ -7473,3 +7473,91 @@ structural.py 是结构分块核心算法，第三轮已建立基础，
 - 本 worktree（Round 131 后）：10158 pass / 0 fail / 13 skip（HEAD `b2af63d`）
 
 ---
+
+## Round 132（2026-08-05）：evaluation/metrics.py 第五轮（edges5）
+
+### 目标
+- 给 evaluation/metrics.py（381 行，已有 624 测试）补第五轮 edges
+- 深入 helper 函数边界、Unicode whitespace、bbox 校验、compute_automatic_metrics 全字段
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges5.py`（182 测试）
+- 仅测试，不动业务代码（保持 evaluation/ → app/ 单向依赖）
+
+### 覆盖要点
+- **_null/_ratio/_bool_metric/_int_metric 深度**：
+  - 返回 dict 结构（value/reason 字段）
+  - _bool_metric 接受 Python truthy（不强制 bool 类型）
+  - _int_metric 接受任意 int（含负数）
+  - _ratio 边界（0/1/正常比例）与 NaN 处理
+- **_strip_unicode_whitespace 全 Unicode 空白**：
+  - ASCII whitespace（空格/\t/\n/\r/\f/\v）
+  - NBSP（\xa0）、em space（ ）、en space（ ）
+  - ideographic space（　）
+  - line separator（ ）、paragraph separator（ ）
+  - 中间空白也删除（不只是 strip 两端）
+- **_is_valid_bbox 边界**：
+  - 必须 4 元素
+  - int/float 均可
+  - bool 拒绝（Python bool 是 int 子类）
+  - NaN/Inf 拒绝（math.isfinite 校验）
+  - tuple 拒绝（要求 list）
+- **_pdf_locator_ratio 深度**：
+  - page 必须 int 且 ≥1
+  - bbox 4 类元素要求 bbox（heading/paragraph/caption/list_item）
+  - 非 4 类元素仅要求 page
+- **_docx_locator_ratio 深度**：
+  - 仅校验 structural keys（paragraph_index/element_index 等）
+  - 拒绝 page/bbox（DOCX 不该有）
+- **_image_resource_ratio**：
+  - 用 tmp_path 真实写文件
+  - resource_path 不存在 → 计入无效
+- **_chunk_reference_ratio**：
+  - 空 chunks → ratio=None
+  - 部分匹配（部分 source_element_ids 不存在）→ 比例下降
+- **_text_preservation v1.1 口径 D**：
+  - 删除全部 Unicode 空白后比较
+  - equal = expected_sequence == actual_sequence
+  - precision/recall 用 Counter multiset
+  - 非图像元素参与（image content 当作空）
+- **_heading_boundary_ratio**：
+  - 无 heading → None
+  - 每个 heading 必须独立 chunk
+- **_silent_drop_count**：
+  - expectations.element_count_by_type 必须存在
+  - 无 expectations → None
+  - 比例按类型对比 element_count_by_type 与 expectations
+- **compute_automatic_metrics 综合验证**：
+  - document=None 时返回 14 keys（pipeline_success/error_code/schema_valid + 11 null）
+  - 成功路径所有 14 keys 有值
+  - per-key value/reason 结构正确
+- **模块常量**：
+  - _TEXT_TYPES = 7 项（heading/paragraph/list_item/table/caption/header/footer）
+  - _PDF_BBOX_REQUIRED_TYPES = 4 项
+  - _NOT_EVALUATED 为 list
+- **签名验证**：所有 helper 函数 callable + 参数数
+
+### 撞墙记录
+1. test_strip_unicode_whitespace_mixed：函数实际**删除全部空白**
+   （含中间），不是只 strip 两端。修复：assert "ab\xc1d"。
+2. test_compute_metrics_document_none_13_keys：实际 14 keys
+   （pipeline_success + error_code + schema_valid + 11 个 null 指标）。
+   修复：assert 14 + set 比较。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 132 后）：10340 pass / 0 fail / 13 skip（HEAD `bbf578f`）
+
+### 下一步建议
+- 候选 GK：evaluation/annotation_metrics.py 第五轮
+- 候选 GL：evaluation/report.py 第五轮
+- 候选 GM：app/parsers/markdown_parser.py 第四轮
+- 候选 GN：app/parsers/html_parser.py 第四轮
+- 候选 GO：app/parsers/ipynb_parser.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GK（evaluation/annotation_metrics.py 第五轮）。该模块处
+理 annotation 文件解析与 manifest expect_failure 比对，第五轮可深入
+错误码匹配、annotation 字段缺漏、compare 逻辑等边界。
+
+---
