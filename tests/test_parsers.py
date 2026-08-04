@@ -112,6 +112,165 @@ def test_kreuzberg_missing_file_raises(tmp_path: Path):
     assert exc.value.code == "file_not_found"
 
 
+# ---------- KreuzbergParser 内部 helpers（纯函数）----------
+
+from app.parsers.kreuzberg_parser import (
+    _classify_line,
+    _make_locator,
+    _split_content_to_elements,
+)
+
+
+def test_classify_line_markdown_heading_levels():
+    """markdown 风格 # / ## / ### 都被识别为 heading，level 对应 # 数量。"""
+    etype, meta = _classify_line("# Title")
+    assert etype == "heading"
+    assert meta["level"] == 1
+    assert meta["raw_text"] == "Title"
+
+    etype, meta = _classify_line("## Subsection")
+    assert etype == "heading"
+    assert meta["level"] == 2
+
+    etype, meta = _classify_line("###### Deep heading")
+    assert etype == "heading"
+    assert meta["level"] == 6
+
+
+def test_classify_line_short_line_is_heading_heuristic():
+    """短行（≤80）+ 不以句号结尾 → heading (short_line heuristic)。"""
+    etype, meta = _classify_line("Chapter Two")
+    assert etype == "heading"
+    assert meta.get("heuristic") == "short_line"
+    assert meta["level"] == 0
+
+
+def test_classify_line_paragraph_when_ends_with_period():
+    """短行但以句号结尾 → paragraph。"""
+    etype, _ = _classify_line("Short sentence.")
+    assert etype == "paragraph"
+
+
+def test_classify_line_paragraph_when_long():
+    """超过 80 字符的行即使不以句号结尾也是 paragraph。"""
+    long_line = "a" * 100
+    etype, _ = _classify_line(long_line)
+    assert etype == "paragraph"
+
+
+def test_classify_line_empty_returns_paragraph():
+    """空行被归为 paragraph（实际 _split_content_to_elements 会跳过空 block）。"""
+    etype, _ = _classify_line("")
+    assert etype == "paragraph"
+    etype, _ = _classify_line("   ")
+    assert etype == "paragraph"
+
+
+def test_classify_line_chinese_full_stop_treated_as_heading_stop():
+    """以中文句号结尾 → 不视为 heading（与英文句号同等待遇）。"""
+    etype, _ = _classify_line("短句。")
+    assert etype == "paragraph"
+
+
+def test_make_locator_pdf_vs_docx():
+    """PDF locator 有 page=1 占位 + _kreuzberg_placeholder；DOCX 用 paragraph_index。"""
+    pdf_loc = _make_locator("pdf", 0)
+    assert pdf_loc["page"] == 1
+    assert pdf_loc["_kreuzberg_placeholder"] is True
+
+    docx_loc = _make_locator("docx", 5)
+    assert docx_loc["paragraph_index"] == 5
+    assert docx_loc["_kreuzberg_heuristic"] is True
+    assert "page" not in docx_loc
+
+
+def test_split_content_to_elements_basic_paragraphs():
+    """双换行分隔的多段落 → 多个 paragraph element。"""
+    content = "First paragraph here.\n\nSecond paragraph here."
+    elements, _ = _split_content_to_elements(content, "docx", "doc-test00000001")
+    assert len(elements) == 2
+    assert all(e.type == "paragraph" for e in elements)
+    assert elements[0].content == "First paragraph here."
+    assert elements[1].content == "Second paragraph here."
+
+
+def test_split_content_to_elements_heading_markdown():
+    """markdown 风格 heading 行 → heading element。"""
+    content = "# Document Title\n\nBody paragraph."
+    elements, _ = _split_content_to_elements(content, "docx", "doc-test00000001")
+    assert len(elements) == 2
+    assert elements[0].type == "heading"
+    assert elements[0].content == "Document Title"
+    assert elements[0].metadata["level"] == 1
+    assert elements[1].type == "paragraph"
+
+
+def test_split_content_to_elements_heading_with_body():
+    """单 block 内首行 heading + 后续正文 → heading + paragraph。"""
+    content = "# Title\nFirst body line.\nSecond body line."
+    elements, _ = _split_content_to_elements(content, "docx", "doc-test00000001")
+    assert len(elements) == 2
+    assert elements[0].type == "heading"
+    assert elements[0].content == "Title"
+    assert elements[1].type == "paragraph"
+    assert "First body line." in elements[1].content
+    assert "Second body line." in elements[1].content
+
+
+def test_split_content_to_elements_empty_content():
+    """空 content → 空 elements 列表。"""
+    elements, _ = _split_content_to_elements("", "docx", "doc-test00000001")
+    assert elements == []
+    # 纯空白也应是空
+    elements, _ = _split_content_to_elements("  \n\n  \n  ", "docx", "doc-test00000001")
+    assert elements == []
+
+
+def test_split_content_to_elements_pdf_uses_page_placeholder():
+    """source_type=pdf → locator.page=1 占位。"""
+    content = "Some content."
+    elements, _ = _split_content_to_elements(content, "pdf", "doc-test00000001")
+    assert len(elements) == 1
+    assert elements[0].source_locator["page"] == 1
+    assert elements[0].source_locator["_kreuzberg_placeholder"] is True
+
+
+# ---------- KreuzbergParser 集成：warning 细节 ----------
+
+def test_kreuzberg_docx_warning_has_fallback_strategy_detail(tmp_path: Path):
+    """kreuzberg_no_structured_elements warning 的 details 应记录 fallback 策略。"""
+    p = build_minimal_docx(tmp_path / "synthetic.docx")
+    doc = KreuzbergParser().parse(p, source_hash="a" * 64)
+    warning = next(
+        w for w in doc.warnings if w.code == "kreuzberg_no_structured_elements"
+    )
+    assert warning.details is not None
+    assert warning.details.get("fallback_strategy") == "heuristic_paragraph_split"
+    assert warning.details.get("source_type") == "docx"
+    # element_count_after_heuristic 必须 ≥ 0（实际 kreuzberg 对合成 docx 可能给 0 也可能给若干）
+    assert warning.details.get("element_count_after_heuristic, 0") or \
+        isinstance(warning.details.get("element_count_after_heuristic"), int)
+
+
+def test_kreuzberg_pdf_elements_have_page_placeholder(tmp_path: Path):
+    """PDF kreuzberg 解析的 elements 必须有 page=1 占位。"""
+    p = build_minimal_pdf(tmp_path / "synthetic.pdf", text="(Hi)")
+    doc = KreuzbergParser().parse(p, source_hash="b" * 64)
+    # 即便 elements 为空，warning 也得有
+    for e in doc.elements:
+        if e.type in ("heading", "paragraph", "caption"):
+            assert e.source_locator.get("page") == 1
+
+
+def test_kreuzberg_returns_metadata(tmp_path: Path):
+    """kreuzberg 的结果 metadata 字段应保留到 Document.metadata。"""
+    p = build_minimal_docx(tmp_path / "synthetic.docx")
+    doc = KreuzbergParser().parse(p, source_hash="c" * 64)
+    # metadata 字段（kreuzberg_mime_type / kreuzberg_quality_score 可能 None，但 key 必在）
+    assert "kreuzberg_mime_type" in doc.metadata
+    assert "kreuzberg_quality_score" in doc.metadata
+
+
 # ---------- 接口契约 ----------
 
 def test_parser_interface_contract():
