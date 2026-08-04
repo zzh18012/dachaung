@@ -4610,3 +4610,75 @@
 - 本 worktree（Round 94 后）：6068 pass / 0 fail / 13 skip（HEAD `bc62466`）
 
 ---
+
+## Round 95（2026-08-05）：候选 DJ — structural chunker 第三轮边角
+
+### 做了什么
+- 新建 `tests/test_chunker_edges3.py`（77 个测试）第三轮覆盖
+  `app/chunkers/structural.py`（388 行）。
+- 重点覆盖项：
+  - **`_split_long_text` 累积规则**：多 piece 合并、buf flush 触发、
+    短句+长句混合、空句子跳过、Chinese sentence break、strip 入口
+  - **`_hard_split_with_whitespace_fallback`**：
+    - 纯 ASCII 无空白 → forced_char 切
+    - 前导空白跳过
+    - 单 piece 全空白 → 返空列表
+    - 窗口内有空白 → whitespace 切
+    - 每个 piece.text 长度 ≤ max_chars
+    - piece.text 无 trailing 空白（rstrip）
+    - start/end 坐标在 [0, n] 内
+  - **`_ChunkBuffer.flush`**：
+    - 空 buf 返 None
+    - 纯空白 join 后 strip 为空 → 返 None
+    - chunk_id 含 counter padding
+    - metadata strategy/max_chars/char_count 精确
+    - source_element_ids 去重保序
+    - source_spans 每段一项（同 element 多 span 也展开）
+    - flush 后 parts 清空
+    - text 用单空格连接
+  - **`_element_text_with_span`**：
+    - raw None/empty/纯空白 → ("", 0, 0)
+    - 仅左/仅右/两端空白 → 精确 start/end
+    - 内嵌空白保留
+    - image element → ("", 0, 0)
+  - **`StructuralChunker.chunk` 序列场景**：
+    - 连续 heading → 各自 chunk 起始
+    - heading 在文档开头
+    - table/image/caption 序列 isolated chunk
+    - caption isolated
+    - image element 跳过（不参与分块）
+    - max_chars 边界（exact 不切、+1 触发切）
+    - split_boundary_after metadata 仅在切分时存在
+    - chunk_id 严格递增 + zero padded 4 位
+    - 每个 chunk.text ≤ max_chars
+    - 每个 chunk 至少 1 个非空 source_element_id
+    - 不丢不重：normalize(Σ chunks.text) == normalize(Σ elements.content)
+  - **`StructuralChunker.__init__`**：max_chars 32 最小、< 32 抛 ValueError、默认 800
+  - **`_SplitPiece`** frozen dataclass、默认 start=0/end=0、equality
+  - **`_SENTENCE_SPLIT_RE`**：. + 空白 切、中文 。 + 空白 切、
+    无空白不切、无标点不切
+  - **`_WHITESPACE_RE`**：各种空白匹配、letter 不匹配
+  - **`_HARD_BREAK_LANGS`**：6 元素 tuple、含中英文标点
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_element_text_with_span` 是 StructuralChunker 方法，不是模块级函数。
+- wall 2：Element 要 content 或 resource_path 至少一个非空；测试 None/empty content
+  时需补 resource_path="placeholder"。
+- wall 3：`max_chars=20` 小于最小值 32 → 改用 32 或更大。
+- wall 4：`_SENTENCE_SPLIT_RE` 要求标点后跟 `\s+`，"你好。世界。" 无空白 → 不切。
+- wall 5：raw string `\s+` 在 docstring 中需 `r"""..."""` 避免 SyntaxWarning。
+
+### 下一步建议
+- 候选 DK：evaluation/runner.py 边角（第三轮）
+- 候选 DL：evaluation/metrics.py 边角（第三轮）
+- 候选 DM：evaluation/manifest.py 边角（第三轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DK（evaluation/runner.py 第三轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 95 后）：6145 pass / 0 fail / 13 skip（HEAD `b3c6404`）
+
+---
