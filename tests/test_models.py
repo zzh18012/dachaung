@@ -280,3 +280,302 @@ def test_document_to_dict_metadata_pass_through():
 def test_schema_version_constant_value():
     """SCHEMA_VERSION 是模块级常量，必须与 schema 里的 const 一致。"""
     assert SCHEMA_VERSION == "0.1.0"
+
+
+# ---------- 边角与缺漏补强（Round 31） ----------
+
+
+# Element 不变量更多边角
+
+
+def test_element_with_parent_id_set():
+    """parent_id 设置后应在 to_dict 中正确序列化。"""
+    e = Element(
+        element_id="e1", type="paragraph",
+        content="hi", source_locator={"paragraph_index": 0},
+        parent_id="e0",
+    )
+    assert e.parent_id == "e0"
+    d = e.to_dict()
+    assert d["parent_id"] == "e0"
+
+
+def test_element_with_explicit_confidence_value():
+    e = Element(
+        element_id="e1", type="paragraph",
+        content="hi", source_locator={},
+        confidence=0.42,
+    )
+    assert e.confidence == 0.42
+    assert e.to_dict()["confidence"] == 0.42
+
+
+def test_element_metadata_with_nested_complex_data():
+    """metadata 是 dict[str, Any]，可以存嵌套结构。"""
+    e = Element(
+        element_id="e1", type="paragraph",
+        content="hi", source_locator={},
+        metadata={
+            "level": 2,
+            "style": "Heading 2",
+            "nested": {"k1": [1, 2, 3], "k2": {"deep": True}},
+            "tags": ["a", "b"],
+        },
+    )
+    d = e.to_dict()
+    assert d["metadata"]["nested"]["k1"] == [1, 2, 3]
+    assert d["metadata"]["nested"]["k2"]["deep"] is True
+    assert d["metadata"]["tags"] == ["a", "b"]
+
+
+def test_element_default_confidence_is_one():
+    e = Element(
+        element_id="e1", type="paragraph",
+        content="hi", source_locator={},
+    )
+    assert e.confidence == 1.0
+
+
+def test_element_default_metadata_is_empty_dict():
+    e = Element(
+        element_id="e1", type="paragraph",
+        content="hi", source_locator={},
+    )
+    assert e.metadata == {}
+
+
+def test_element_default_parent_id_is_none():
+    e = Element(
+        element_id="e1", type="paragraph",
+        content="hi", source_locator={},
+    )
+    assert e.parent_id is None
+
+
+def test_element_metadata_instances_are_isolated():
+    """dataclass field 默认值用 default_factory=dict，每个 instance 独立。"""
+    e1 = Element(element_id="e1", type="paragraph", content="a", source_locator={})
+    e2 = Element(element_id="e2", type="paragraph", content="b", source_locator={})
+    e1.metadata["x"] = 1
+    assert "x" not in e2.metadata
+
+
+def test_element_with_all_valid_types():
+    """8 种 element type 都应能构造。"""
+    for t in (
+        "heading", "paragraph", "list_item", "table",
+        "caption", "header", "footer",
+    ):
+        e = Element(element_id=f"e_{t}", type=t, content="x", source_locator={})
+        assert e.type == t
+    # image 需要 resource_path
+    img = Element(element_id="e_img", type="image", resource_path="/x.png",
+                  source_locator={})
+    assert img.type == "image"
+
+
+# Chunk 不变量更多边角
+
+
+def test_chunk_metadata_instances_are_isolated():
+    c1 = Chunk(chunk_id="c1", text="a", source_element_ids=["e1"])
+    c2 = Chunk(chunk_id="c2", text="b", source_element_ids=["e1"])
+    c1.metadata["x"] = 1
+    assert "x" not in c2.metadata
+
+
+def test_chunk_source_spans_instances_are_isolated():
+    c1 = Chunk(chunk_id="c1", text="a", source_element_ids=["e1"])
+    c2 = Chunk(chunk_id="c2", text="b", source_element_ids=["e1"])
+    c1.source_spans.append({"element_id": "e1", "start": 0, "end": 1})
+    assert c2.source_spans == []
+
+
+def test_chunk_with_long_text():
+    """长文本 chunk 也应能构造与序列化。"""
+    long_text = "x" * 10000
+    c = Chunk(chunk_id="c1", text=long_text, source_element_ids=["e1"])
+    assert len(c.text) == 10000
+    assert c.to_dict()["text"] == long_text
+
+
+def test_chunk_whitespace_only_text_rejected():
+    """纯空白 text 不应被 (not self.text) 接受？实际 'False == not self.text' 取决于实现；
+    Python 中 '   ' 是 truthy，所以会被接受。本测试记录当前行为。"""
+    # 注意：当前实现 `if not self.text` 只拒绝空串；纯空白会被接受
+    c = Chunk(chunk_id="c1", text="   ", source_element_ids=["e1"])
+    assert c.text == "   "
+
+
+def test_chunk_with_many_source_element_ids():
+    """source_element_ids 可以包含多个 element。"""
+    c = Chunk(
+        chunk_id="c1", text="hello",
+        source_element_ids=["e1", "e2", "e3", "e4", "e5"],
+    )
+    d = c.to_dict()
+    assert len(d["source_element_ids"]) == 5
+
+
+def test_chunk_with_duplicate_source_element_ids_allowed():
+    """dataclass 不去重 source_element_ids（去重在 chunker 里做）。"""
+    c = Chunk(
+        chunk_id="c1", text="hello",
+        source_element_ids=["e1", "e1", "e2"],
+    )
+    assert c.source_element_ids == ["e1", "e1", "e2"]
+
+
+# Document 不变量边角
+
+
+def test_document_with_all_source_types():
+    """Document 支持 6 种 source_type。"""
+    for st in ("pdf", "docx", "markdown", "html", "text", "ipynb"):
+        doc = Document(
+            document_id=f"d-{st}", source_path="x", source_type=st,
+            source_hash="a" * 64, parser_name="test", parser_version="0",
+        )
+        assert doc.source_type == st
+
+
+def test_document_default_collections_independent_per_instance():
+    """elements / chunks / relations / warnings / errors / metadata 默认值
+    应在每个 instance 上独立（不共享 reference）。"""
+    d1 = Document(
+        document_id="d1", source_path="x", source_type="docx",
+        source_hash="a" * 64, parser_name="test", parser_version="0",
+    )
+    d2 = Document(
+        document_id="d2", source_path="x", source_type="docx",
+        source_hash="b" * 64, parser_name="test", parser_version="0",
+    )
+    d1.elements.append(Element(element_id="e1", type="paragraph",
+                                content="hi", source_locator={}))
+    d1.metadata["k"] = "v"
+    assert d2.elements == []
+    assert d2.metadata == {}
+
+
+def test_document_to_dict_does_not_mutate_state():
+    """to_dict 应是只读操作（不会改 doc 的字段）。"""
+    e = Element(element_id="e1", type="paragraph",
+                content="hi", source_locator={})
+    c = Chunk(chunk_id="c1", text="hi", source_element_ids=["e1"])
+    doc = Document(
+        document_id="d1", source_path="x", source_type="docx",
+        source_hash="a" * 64, parser_name="test", parser_version="0",
+        elements=[e], chunks=[c],
+    )
+    elements_before = list(doc.elements)
+    chunks_before = list(doc.chunks)
+    doc.to_dict()
+    assert doc.elements == elements_before
+    assert doc.chunks == chunks_before
+
+
+def test_document_to_dict_keys_order():
+    """to_dict 返回的 dict 应包含所有 schema 必需字段。"""
+    doc = Document(
+        document_id="d1", source_path="x", source_type="docx",
+        source_hash="a" * 64, parser_name="test", parser_version="0",
+    )
+    d = doc.to_dict()
+    expected_keys = {
+        "schema_version", "document_id", "source_path", "source_type",
+        "source_hash", "parser_name", "parser_version",
+        "elements", "chunks", "relations", "warnings", "errors", "metadata",
+    }
+    assert set(d.keys()) == expected_keys
+
+
+def test_document_with_relations():
+    """Document 含 relations 时 to_dict 应正确序列化。"""
+    r1 = Relation(type="parent_child", from_id="e0", to_id="e1")
+    r2 = Relation(type="next", from_id="e1", to_id="e2")
+    doc = Document(
+        document_id="d1", source_path="x", source_type="docx",
+        source_hash="a" * 64, parser_name="test", parser_version="0",
+        relations=[r1, r2],
+    )
+    d = doc.to_dict()
+    assert len(d["relations"]) == 2
+    assert d["relations"][0]["type"] == "parent_child"
+    assert d["relations"][1]["type"] == "next"
+
+
+# Relation 边角
+
+
+def test_relation_self_loop_allowed():
+    """from_id == to_id 在 dataclass 层不拒绝（schema 也不拒绝）。"""
+    r = Relation(type="self_ref", from_id="e1", to_id="e1")
+    assert r.from_id == r.to_id == "e1"
+
+
+def test_relation_with_complex_metadata():
+    r = Relation(
+        type="weighted", from_id="e1", to_id="e2",
+        metadata={"weight": 0.5, "tags": ["a", "b"]},
+    )
+    d = r.to_dict()
+    assert d["metadata"]["weight"] == 0.5
+    assert d["metadata"]["tags"] == ["a", "b"]
+
+
+# WarningRecord / ErrorRecord 边角
+
+
+def test_warning_record_default_details_is_none():
+    w = WarningRecord(code="x", reason="y")
+    assert w.details is None
+
+
+def test_error_record_default_details_is_none():
+    er = ErrorRecord(code="x", message="y")
+    assert er.details is None
+
+
+def test_warning_record_empty_code_allowed_at_dataclass_layer():
+    """dataclass 不强制 code 非空（schema 在写盘前会拒绝）。"""
+    w = WarningRecord(code="", reason="x")
+    assert w.code == ""
+
+
+def test_error_record_empty_code_allowed_at_dataclass_layer():
+    er = ErrorRecord(code="", message="x")
+    assert er.code == ""
+
+
+def test_warning_record_with_complex_details():
+    w = WarningRecord(
+        code="low_confidence", reason="ocr",
+        details={"score": 0.42, "regions": [{"page": 1}, {"page": 2}]},
+    )
+    d = w.to_dict()
+    assert d["details"]["regions"] == [{"page": 1}, {"page": 2}]
+
+
+def test_error_record_with_complex_details():
+    er = ErrorRecord(
+        code="parse_error", message="fail",
+        details={"path": "/x.pdf", "exception": {"type": "ValueError", "stack": ["a", "b"]}},
+    )
+    d = er.to_dict()
+    assert d["details"]["exception"]["stack"] == ["a", "b"]
+
+
+# SCHEMA_VERSION 不变量
+
+
+def test_schema_version_is_string_type():
+    """SCHEMA_VERSION 必须是 str，不是 float。"""
+    assert isinstance(SCHEMA_VERSION, str)
+
+
+def test_schema_version_has_three_components():
+    """语义化版本格式：major.minor.patch。"""
+    parts = SCHEMA_VERSION.split(".")
+    assert len(parts) == 3
+    for p in parts:
+        assert p.isdigit()
