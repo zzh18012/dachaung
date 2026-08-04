@@ -9674,3 +9674,69 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 的所在，第七轮可深入 Parser 接口契约、ParserError 字段、make_document_id 不变量。
 
 ---
+
+## Round 165（2026-08-05）：app/parsers/base.py 第四轮（edges4）
+
+### 目标
+- 给 app/parsers/base.py（94 行，已有 base/edges/edges2/edges3 共 383 测试）补第四轮
+- 深入 ParserError 字段、make_document_id 不变量、detect_source_type 各分支、Parser 抽象类
+
+### 改动
+- 新增 `tests/test_parsers_base_edges4.py`（91 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **ParserError 深度**：
+  - init 3 参数（code/message/details）、details 默认 None
+  - 不传 details → {}；传 None → {}；传 dict → 原 dict
+  - args = (message,)（super().__init__(message)）
+  - str/repr 格式、code/message 可为空字符串
+  - details dict 在多实例间不共享（每个实例独立 {}）
+  - details 支持嵌套 dict/list value
+  - raise → catch 后属性可读，caught is original
+- **make_document_id**：
+  - 返回 `doc-{first 16 hex}`，长度 20
+  - 64 字符校验：短/长/空 都 raise ValueError
+  - 稳定（同输入同输出）、不同输入不同输出
+  - 真实 SHA-256 hex 输入验证
+- **detect_source_type**：
+  - .pdf/.docx 大小写、Path 对象、双扩展名
+  - 不支持扩展（.txt/.md/.html/.ipynb）触发 unsupported_type
+  - 无扩展名 details.suffix=""
+  - message 提及 .pdf/.docx 与实际 suffix
+- **Parser 抽象类**：
+  - 是 ABC、inspect.isabstract(Parser) 为 True
+  - 不能直接实例化（TypeError）
+  - __abstractmethods__ 含 "parse"
+  - 默认 name="abstract"、version="0.0.0"
+  - 子类未实现 parse → 不能实例化
+  - 子类未覆盖 name → 继承父类
+  - parse.__isabstractmethod__ is True
+- **模块结构**：
+  - __all__ 精确 4 项
+  - imports：ABC/abstractmethod、Path、Any、Literal、Document、SourceType
+  - future annotations
+  - docstring 提及"业务代码"与"kreuzberg/pdfplumber/python-docx"
+  - _silence_unused 存在、可调用、返回 None、no-op
+- **签名深度**：所有公共函数参数名、默认值、返回 annotation
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 165 后）：13331 pass / 0 fail / 13 skip（HEAD `c06dd2d`）
+
+### 下一步建议
+- 候选 IC：app/parsers/text_parser.py 第七轮
+- 候选 ID：app/parsers/fallback.py 第六轮
+- 候选 IF：app/parsers/__init__.py 第六轮
+- 候选 IG：app/chunkers/__init__.py 第六轮
+- 候选 IH：app/parsers/fallback_pdf.py 第六轮
+- 候选 II：app/parsers/fallback_docx.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IF（app/parsers/__init__.py 第六轮）。__init__.py 是 parser 工厂的入口，
+第六轮可深入 get_parser/discover_parsers/registry 等。
+
+---
