@@ -7002,3 +7002,110 @@ fallback_parser 是默认 parser 路径，630 行体量最大，
 - 本 worktree（Round 126 后）：9412 pass / 0 fail / 13 skip（HEAD `aa939c0`）
 
 ---
+
+## Round 127（2026-08-05）：app/parsers/fallback_parser.py 第五轮（edges5）
+
+### 范围
+- 文件：`tests/test_parsers_fallback_edges5.py`（新增，1291 行）
+- 目标：`app/parsers/fallback_parser.py`（630 行，已有 536 测试）
+- 新增测试：194 个
+- 提交：`a4ab7e2`
+
+### 覆盖深度
+- **_CAPTION_RE 模式内容**：
+  - 含 Table/Figure/Fig/表/图 关键字
+  - 含 0-9 与 ０-９（全角）数字范围
+  - 含 ./:/、 分隔符
+  - flags 含 IGNORECASE
+- **_is_caption 多形式覆盖**：
+  - 9 种 caption 形式全 pass（Figure 1./Fig.1/Fig 1/Table 1./表 1./图 1 等）
+  - 数字 0 开头、多位数字、0 数字
+  - 大小写不敏感（FIGURE）
+  - 反例：Table of contents（词后无数字）、中间出现（必须开头）
+- **_classify_pdf_paragraph 深度**：
+  - 空串/纯空白 → paragraph
+  - 81 字符 → paragraph
+  - 80 字符无标点 → heading（level=0）
+  - 80 字符含 . → paragraph
+  - heading meta 含 level + heuristic 两 key
+  - caption 优先级 > heading
+  - 返回 tuple[str, dict]
+- **_image_filename 深度**：
+  - doc-1 → 1, doc-123 → 123, doc-doc-1 → 1（全替换）
+  - 无 doc- 前缀原样保留
+  - index 0/99/100 格式
+  - 自定义 ext
+- **_rows_to_markdown 深度**：
+  - 单元格含 | 与换行符保留
+  - 单行表格（仅 header）= 2 行输出
+  - 1 header + 2 body = 4 行
+  - 分隔行每列一个 ---
+  - int/float/None 转换
+- **_lines_to_para 深度**：
+  - 多行 word 融合
+  - bbox 顺序 [x0, top, x1, bottom]
+  - word 缺 top/bottom 默认 0
+  - 同行 word 按 x0 排序
+- **_group_words_to_paragraphs 深度**：
+  - 空/单 word/同 y 双 word 一段
+  - 返回 list[dict]，每 dict 有 text + bbox
+- **_is_heading_style 深度**：
+  - Title/title/Title 带空白 → (True, 1)
+  - Heading 1/2/10 → (True, 1/2/10)
+  - Heading 无 level → ValueError → (True, 1)
+  - Heading abc → (True, 1)
+  - Heading -1 → (True, 1)（max(1, -1)）
+  - 大小写不敏感
+  - Normal/List Paragraph/Quote → (False, 0)
+- **_extract_inline_image_rids 深度**：
+  - 空 XML → []
+  - 返回 list 类型
+  - 每项是 str
+- **_save_image 深度**：
+  - 返回 Path/写 bytes/多层目录创建/自定义 ext
+  - 文件名格式精确/覆盖/连续 index
+- **FallbackParser class 深度**：
+  - name/version（含 3 个库关键字）
+  - 继承 Parser
+  - __init__ 默认 None/Path/str/空串 → None/两实例独立
+- **FallbackParser.parse 错误路径**：
+  - 缺文件 → ParserError(file_not_found) + details
+  - 目录 → ParserError(file_not_found)
+- **_render_pdf_image_region 兼容包装**：
+  - callable/签名 5 参数/dpi 默认 144/返回注解
+- **模块结构**：
+  - imports 完整（re/Path/Any/Document/Element/WarningRecord/
+    Parser/ParserError/detect_source_type/make_document_id）
+  - 19 个 helper 函数与常量全部存在
+  - __all__ 1 项精确（仅 FallbackParser）
+  - 3 个版本常量（_PDFPLUMBER_VERSION/_PDFIUM_VERSION/_DOCX_VERSION）
+  - docstring 提及 pdfplumber + python-docx
+  - from __future__ import annotations
+- **签名深度**：
+  - 各函数签名/默认值/返回注解精确
+
+### 撞墙记录
+1. test_is_caption_chinese_figure_with_colon：pattern `[\.、:\s]` 只含 ASCII
+   冒号，不含全角 ：。修复：改为 ASCII 冒号。
+2. test_image_filename_multiple_doc_prefix：str.replace 替换所有出现，
+   "doc-doc-1" → "1"（非 "doc-1"）。修复：assert 等于 "image_1_..."。
+3. test_rows_to_markdown_two_body_rows：1 header + 2 body = 4 行（含分隔行），
+   不是 3 行。修复：len == 4。
+
+### 下一步建议
+- 候选 GA：evaluation/cli.py 第五轮（243 行）
+- 候选 GB：app/chunkers/structural.py 第四轮
+- 候选 GH：evaluation/manifest.py 第五轮
+- 候选 GI：evaluation/runner.py 第五轮
+- 候选 GJ：evaluation/metrics.py 第五轮
+- 候选 GK：evaluation/annotation_metrics.py 第五轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GA（evaluation/cli.py 第五轮）。cli.py 是评测入口，
+243 行体量适中，第五轮深度空间仍在（subcommand、退出码、报告格式）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 127 后）：9606 pass / 0 fail / 13 skip（HEAD `a4ab7e2`）
+
+---
