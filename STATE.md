@@ -9424,3 +9424,50 @@ document_passes_schema 调度层，第六轮可深入 schema 校验、错误聚�
 第七轮可深入 parse/validate 子命令、错误处理、parser 选择等。
 
 ---
+
+## Round 160（2026-08-05）：app/cli.py 第七轮（edges6）
+
+### 目标
+- 给 app/cli.py（535 行，已有 base/edges/edges2-5 共 624 测试）补第七轮
+- 深入 _preview/_load_document_json/_format_summary/_format_elements_list/_format_chunks_list/_iter_supported_files/_relative_output_path/_infer_parser_name/_emit_structured_error
+
+### 改动
+- 新增 `tests/test_cli_edges6.py`（123 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_preview 边界**：None/empty/short/边界/超长、换行+连续空白 collapse、unicode、自定义/negative/zero width
+- **_load_document_json**：missing file/invalid JSON/empty file/valid dict/array、返回 tuple、str path
+- **_format_summary**：empty dict、minimal、full、含 warnings（5 个上限）、errors、elements by type、chunk text/refs stats
+- **_format_elements_list**：empty/single/limit 0/limit truncates/missing fields/parent_id
+- **_format_chunks_list**：empty/single/show_spans 空/有数据/不显示、limit truncates、missing fields
+- **_iter_supported_files**：empty/filter by ext/sorted/recursive/non-recursive skip subdirs/uppercase ext/returns list/skips dirs
+- **_relative_output_path**：top-level/nested/deep nested/不同扩展名无冲突
+- **_infer_parser_name**：pdf/docx/md/markdown/html/htm/txt/text/ipynb/unknown/no-suffix/uppercase/mixed
+- **_EXTENSION_TO_PARSER 常量**：9 keys 精确、pdf+docx 都是 fallback、值都是 str
+- **_emit_structured_error**：写到 stderr、含 schema_version/input、code/message、可加 extra fields、JSON 可序列化
+- **模块结构**：无 __all__、imports 完整、future annotations、utf-8 reconfigure、main guard、docstring 提及 parse/validate/inspect
+- **签名深度**：各函数参数名、默认值（width=60、show_spans=False）、返回类型
+- **综合行为**：preview/load/iter/infer/relative_output 都 idempotent
+
+### 撞墙记录
+- **Wall 1**：常量名 `_extension_to_parser` 实际是 `_EXTENSION_TO_PARSER`（全大写）。修复：import 与使用都改。
+- **Wall 2**：`_preview(width=0)` 时 `len(collapsed) <= 0` 为 False，走 truncation 分支返回 `collapsed[:-1] + '…'`，
+  所以 `_preview("hello", width=0) == "hell…"` 而非 `"…"`。修复：改测试期望。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 160 后）：12767 pass / 0 fail / 13 skip（HEAD `afe779c`）
+
+### 下一步建议
+- 候选 HY：app/parsers/markdown_parser.py 第七轮
+- 候选 HZ：app/parsers/html_parser.py 第六轮
+- 候选 IA：app/parsers/ipynb_parser.py 第六轮
+- 候选 IB：app/chunkers/structural.py 第六轮
+- 候选 IC：app/parsers/text_parser.py 第七轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IB（app/chunkers/structural.py 第六轮）。structural.py 是文档分块核心，
+第六轮可深入 normalize_text、heading boundary、chunk 算法等。
+
+---
