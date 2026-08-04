@@ -8839,3 +8839,56 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 第六轮可深入 SchemaValidationError、load_schema、validate 多错误聚合等。
 
 ---
+
+## Round 150（2026-08-05）：app/schema.py 第六轮（edges5）
+
+### 目标
+- 给 app/schema.py（93 行，已有 base/edges/edges2/edges3/edges4 共 536 测试）补第六轮
+- 深入 SCHEMA_PATH 精确性、SchemaValidationError 边界、validate 错误聚合细节
+
+### 改动
+- 新增 `tests/test_schema_edges5.py`（82 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **SCHEMA_PATH**：parent 链、与 app/ 同级、stem/suffix
+- **SchemaValidationError 边界**：
+  - empty message、special chars、Unicode、newline
+  - args length 1、errors default [] / explicit [] / None → []
+  - errors 共享引用、is Exception 子类、非 ValueError 子类
+- **load_schema 深度**：
+  - 默认与显式 SCHEMA_PATH 等价
+  - 路径含 .. 段、最小 {} schema、嵌套 schema、array/string/integer root
+  - directory → FileNotFoundError
+- **validate 错误聚合**：
+  - path 空/字段/嵌套/数组索引
+  - message 是 str、schema_path 是 list
+  - errors count 与 iter_errors 一致
+  - exception message 含 "Schema 校验失败" + "N 处"
+  - empty schema 接受任何输入、不修改 schema/document
+- **is_valid 异常吞咽**：仅 catch SchemaValidationError、返回 bool
+- **validate_file 错误优先级**：FileNotFoundError > JSONDecodeError > SchemaValidationError
+- **Draft202012Validator**：默认 schema 兼容 Draft 2020-12、check_schema 不抛
+- **模块结构 / 签名深度**
+- **综合行为**：validate/is_valid 一致、error count 与 message 一致
+
+### 撞墙记录
+无（82 测试全过）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 150 后）：11839 pass / 0 fail / 13 skip（HEAD `17f9620`）
+
+### 下一步建议
+- 候选 HM：app/pipeline.py 第六轮
+- 候选 HN：evaluation/runner.py 第六轮
+- 候选 HO：evaluation/metrics.py 第六轮
+- 候选 HP：evaluation/report.py 第六轮
+- 候选 HQ：evaluation/manifest.py 第六轮
+- 候选 HR：app/cli.py 第七轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HM（app/pipeline.py 第六轮）。pipeline 是核心业务流，
+第六轮可深入 get_parser、image_output_dir_for、process_single、validate_only。
+
+---
