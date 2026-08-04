@@ -187,6 +187,32 @@ def test_inspect_chunks_with_limit(doc_json: Path):
     assert "+1 more" in out
 
 
+def test_inspect_chunks_spans_flag_without_spans_data(doc_json: Path):
+    """合成 doc_json 不带 source_spans → --spans 显示 (none)。"""
+    rc, out, err = _run_cli(["inspect", str(doc_json), "--chunks", "--spans"])
+    assert rc == 0, f"stderr={err}"
+    assert "span:" not in out  # 没有具体 span 行
+    assert "spans: (none)" in out  # 每个 chunk 都标 (none)
+
+
+def test_inspect_chunks_spans_flag_with_real_pipeline(tmp_path: Path):
+    """跑真实 pipeline（带 source_spans）→ --spans 显示具体 span 行。"""
+    src = tmp_path / "doc.md"
+    src.write_text("# Title\n\nHello world paragraph.\n", encoding="utf-8")
+    out_json = tmp_path / "out.json"
+    rc, _, err = _run_cli(["parse", str(src), "-o", str(out_json)])
+    assert rc == 0, f"stderr={err}"
+
+    rc, out, err = _run_cli(["inspect", str(out_json), "--chunks", "--spans"])
+    assert rc == 0, f"stderr={err}"
+    # 至少有一个具体 span 行
+    assert "span:" in out
+    # span 行格式：span: <element_id>[<start>:<end>]
+    assert "[0:" in out
+    # 不应出现 (none)（pipeline 产出必带 spans）
+    assert "spans: (none)" not in out
+
+
 # ---- inspect: 组合 ----
 
 

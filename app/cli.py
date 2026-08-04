@@ -12,6 +12,7 @@
     python -m app.cli inspect <output.json>
     python -m app.cli inspect <output.json> --elements --chunks
     python -m app.cli inspect <output.json> --elements --limit 5
+    python -m app.cli inspect <output.json> --chunks --spans
 """
 
 from __future__ import annotations
@@ -107,6 +108,11 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--chunks",
         action="store_true",
         help="列出每个 chunk 的一行摘要（id / char 数 / 来源 element 数 / 文本预览）",
+    )
+    ins.add_argument(
+        "--spans",
+        action="store_true",
+        help="与 --chunks 配合：展开每个 chunk 的 source_spans（element_id[start:end]）",
     )
     ins.add_argument(
         "--limit",
@@ -444,7 +450,9 @@ def _format_elements_list(elements: list[dict], limit: int) -> str:
     return "\n".join(lines)
 
 
-def _format_chunks_list(chunks: list[dict], limit: int) -> str:
+def _format_chunks_list(
+    chunks: list[dict], limit: int, show_spans: bool = False,
+) -> str:
     lines: list[str] = [f"chunks ({len(chunks)}):"]
     items = chunks if limit <= 0 else chunks[:limit]
     for c in items:
@@ -455,6 +463,16 @@ def _format_chunks_list(chunks: list[dict], limit: int) -> str:
         lines.append(
             f"  - {cid}  chars={len(text)} refs={len(refs)}  | {preview}"
         )
+        if show_spans:
+            spans = c.get("source_spans") or []
+            if not spans:
+                lines.append("      spans: (none)")
+            else:
+                for sp in spans:
+                    eid = sp.get("element_id", "?")
+                    s = sp.get("start", "?")
+                    e = sp.get("end", "?")
+                    lines.append(f"      span: {eid}[{s}:{e}]")
     if limit > 0 and len(chunks) > limit:
         lines.append(f"  … +{len(chunks) - limit} more (use --limit 0 to see all)")
     return "\n".join(lines)
@@ -497,7 +515,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.chunks:
             out_lines.append("")
             out_lines.append(
-                _format_chunks_list(data.get("chunks") or [], args.limit)
+                _format_chunks_list(
+                    data.get("chunks") or [], args.limit, show_spans=args.spans,
+                )
             )
         print("\n".join(out_lines))
         return 0
