@@ -3716,3 +3716,53 @@
 - 本 worktree（Round 79 后）：4204 pass / 0 fail / 12 skip（HEAD `36cf834`）
 
 ---
+
+## Round 80（2026-08-05）：候选 CG — app/parsers/fallback_parser.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CG：新建 `tests/test_parsers_fallback_edges2.py`（168 个测试）覆盖
+  `app/parsers/fallback_parser.py`（630 行）的深度边角，与已有 `test_parsers_fallback.py`（79）+
+  `test_parsers_fallback_edges.py`（95）互补。
+- 重点覆盖项：
+  - **_CAPTION_RE pattern** 18 个：Table/Figure/Fig/Fig./表/图、不同分隔符
+    （./:/、/空白/tab）、Unicode 全角数字、0/9999 边界、IGNORECASE、不在行首失败
+  - **_is_caption** 14 个：Table/Figure/中文、空/None/无数字/内嵌、leading whitespace、tab
+  - **_rows_to_markdown** 13 个：empty、single cell、2-3 rows/columns、separator format/count、
+    None→""/int/float/bool cell 转换、jagged padded
+  - **_image_filename** 13 个：basic format、default/custom ext、index 边界、doc- prefix strip
+  - **_save_image** 10 个：返 Path、创建 nested dir、写入 bytes、filename format、
+    custom ext、empty/large bytes、existing dir、overwrites、sequential indexes
+  - **_classify_pdf_paragraph** 17 个：caption overrides、各 sentence enders（中英）、
+    80/81 char 边界、empty/whitespace → paragraph、meta keys 精确
+  - **_is_heading_style** 22 个：Title/Heading 各 case、fallback (True,1)、
+    zero/negative clamp、Normal/Body/Subtitle False、Heading5 无空格也接受
+  - **_lines_to_para** 14 个：bbox format、min/max coords、word 缺 top/bottom 默认、
+    words 按 x0 排序
+  - **_group_words_to_paragraphs** 8 个：返 list、empty、single word、3 words same line、
+    dict keys、bbox 是 list of 4 floats
+  - **FallbackParser** 19 个：name="fallback"、version 含 3 个库、inherits Parser、
+    init default/None/empty/path/nested、parse missing file/directory/unsupported type、
+    parse 签名
+  - **模块结构** 16 个：re/Path/Any/Document/Element/WarningRecord/Parser/ParserError/
+    detect_source_type/make_document_id/pdfplumber/docx 都导入、FallbackParser 类、
+    _CAPTION_RE、各 helper 函数都存在
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。168 个新测试一次通过。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CP：app/parsers/kreuzberg_parser.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CP（app/parsers/kreuzberg_parser.py 边角）。理由：
+1. kreuzberg_parser.py 是可选 parser（默认走 fallback），含 sync/async 接口包装
+2. 含 monkeypatch mock 友好的纯函数路径（不依赖 kreuzberg 真实安装）
+3. 与 fallback 形成完整 parser 双实现覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 80 后）：4372 pass / 0 fail / 12 skip（HEAD `87ef2ae`）
+
+---
