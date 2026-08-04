@@ -23,7 +23,7 @@
     "schema_version": { "type": "string", "const": "0.1.0" },
     "document_id": { "type": "string", "minLength": 1 },
     "source_path": { "type": "string", "minLength": 1 },
-    "source_type": { "enum": ["pdf", "docx"] },
+    "source_type": { "enum": ["pdf", "docx", "markdown"] },
     "source_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
     "parser_name": { "type": "string", "minLength": 1 },
     "parser_version": { "type": "string", "minLength": 1 },
@@ -65,6 +65,24 @@
             "items": {
               "properties": {
                 "source_locator": { "$ref": "#/$defs/docx_locator" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "Markdown 文档：source_locator 含 line（≥1），section_path 可选。",
+      "if": {
+        "properties": { "source_type": { "const": "markdown" } },
+        "required": ["source_type"]
+      },
+      "then": {
+        "properties": {
+          "elements": {
+            "items": {
+              "properties": {
+                "source_locator": { "$ref": "#/$defs/markdown_locator" }
               }
             }
           }
@@ -187,6 +205,15 @@
         "row_index": { "type": "integer", "minimum": 0 },
         "col_index": { "type": "integer", "minimum": 0 },
         "relationship_id": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "markdown_locator": {
+      "type": "object",
+      "required": ["line"],
+      "properties": {
+        "line": { "type": "integer", "minimum": 1 },
+        "section_path": { "type": "string" }
       },
       "additionalProperties": true
     }

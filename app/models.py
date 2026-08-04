@@ -14,7 +14,7 @@ SCHEMA_VERSION = "0.1.0"
 ElementType = Literal[
     "heading", "paragraph", "list_item", "table", "image", "caption", "header", "footer"
 ]
-SourceType = Literal["pdf", "docx"]
+SourceType = Literal["pdf", "docx", "markdown"]
 
 
 @dataclass
