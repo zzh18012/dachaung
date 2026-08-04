@@ -1484,3 +1484,41 @@
 - 本 worktree（Round 25 后）：542 pass / 0 fail / 9 skip（HEAD `d07b3dc`）
 
 ---
+
+## Round 26（2026-08-04）：候选 AD — evaluation/report.py 覆盖率补强
+
+### 做了什么
+- 候选 AD：扩展 `tests/test_evaluation_report.py`，新增 20 个测试覆盖 `aggregate_summary` / `build_provenance` / `build_devset_section` 的边角路径。
+- 重点覆盖项：
+  - **`aggregate_summary` 边界**：空 list、counts 全 None、ratio 多值平均、ratio 全 None、partial participation
+  - **ratio 列表成员**：`schema_valid` / `chunk_boundary_*` 在 ratio 里；`figure_caption_*` 不在；`text_preservation_equal` 作为 bool 被当 ratio
+  - **success_rates**：全失败 (rate=0.0)、全通过 (rate=1.0)、空 list (rate=None)
+  - **silent_drop 混合 null**：求和时排除 null
+  - **`aggregate_summary` 不修改输入**（深拷贝对照）
+  - **`get_dependency_versions`**：返回 dict 含 pdfplumber / python-docx / pypdfium2 三个键，值为 str 或 None
+  - **`get_git_provenance`** 非 git 目录 → commit=None，dirty 是 bool（值依赖环境）
+  - **`build_provenance`**：max_chars 转 int；parser_version=None 保留；含 EVALUATOR_VERSION / REPORT_VERSION
+  - **`build_devset_section`** 6 个字段全部填充
+- 无源码改动。
+
+### 撞墙记录
+- **撞墙 1**：`test_get_git_provenance_non_git_dir_returns_none_commit` 假设非 git 目录时 dirty=True（按 docstring 字面），但实际函数在子进程返回非 0 时把 dirty 设为 False（仅异常时才 True）。改测：只断言 commit=None 与 dirty 是 bool。
+- 不是源码 bug，是 docstring 描述与实现细节有微妙差异。
+
+### 下一步建议
+- 候选 AE：`evaluation/runner.py` 主流程测试（处理 expected_failures、metric 装配）
+- 候选 AF：`app/chunkers/structural.py` 内部纯函数补强
+- 候选 AG：`app/cli.py` 子命令更细致的测试
+- 候选 AH：`evaluation/cli.py` 的 `validate-report` 子命令路径
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AE（evaluation/runner.py）。理由：
+1. 完成 evaluation/ 主流程的最后一块
+2. 涉及 expected_failures 处理、metric 装配、annotation 文件加载等复杂逻辑
+3. 可能需要 mock 或小文件 fixtures
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 26 后）：562 pass / 0 fail / 9 skip（HEAD `c9fb270`）
+
+---
