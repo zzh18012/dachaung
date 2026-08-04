@@ -2011,3 +2011,42 @@
 - 本 worktree（Round 39 后）：1099 pass / 0 fail / 9 skip（HEAD `132c3d8`）
 
 ---
+
+## Round 40（2026-08-04）：候选 AT — fallback_parser.py 内部 helper 覆盖
+
+### 做了什么
+- 候选 AT：新建 `tests/test_parsers_fallback.py`，新增 79 个测试覆盖 `app/parsers/fallback_parser.py`（630 行）的全部纯函数 helper。
+- 不需要真实 PDF/DOCX 文件，全部用 synthetic 输入或 lxml 构造 XML。
+- 重点覆盖项：
+  - **`_is_caption` / `_CAPTION_RE`** 15 个：Table/Figure/Fig./Fig、中文 表/图、全宽数字 ０-９、大小写不敏感、分隔符变体（. : 空白 、）、空/None/纯文本拒、regex 是 compiled pattern
+  - **`_rows_to_markdown`** 8 个：空输入、纯表头、1/2 行 body、None→""、int→str、jagged pad、str 返回类型
+  - **`_image_filename`** 6 个：基本格式、2 位零填充、10/99 不额外补 0、剥离 doc- 前缀、自定义扩展、默认 png
+  - **`_group_words_to_paragraphs`** 7 个：空、单词、同行、相邻行同段、大间距分 2 段、bbox 聚合、行内按 x0 排序
+  - **`_lines_to_para`** 4 个：空行→空 text + bbox None、单词、多行拼接顺序、bbox 跨行聚合
+  - **`_classify_pdf_paragraph`** 10 个：空→paragraph、caption、短无句号→heading、短带 ./。/?/!→paragraph、长行→paragraph、caption 优先于 heading、前导空白 strip
+  - **`_is_heading_style`** 15 个：None/空→False、Title→level 1、Heading 1/2/3、whitespace pad、小写、Heading 无 level→1、垃圾后缀→1、Heading 0→clamp 1、Heading -1→clamp 1、Normal/Body/Subtitle→False
+  - **`_extract_inline_image_rids`** 5 个：空 XML→[]、找 r:embed、多图片、r:link 回退、drawing 无 blip→[]（用 lxml 构造 XML）
+  - **FallbackParser 类** 9 个：name='fallback'、version 含三库版本、默认 _image_output_dir=None、str/Path 接受、继承 Parser、missing file raises file_not_found + details
+- 无源码改动。
+
+### 撞墙记录
+- **Wall 1**：`test_classify_pdf_paragraph_caption_overrides_short_line` 输入 "Fig 1"（数字后无分隔符）被 _CAPTION_RE 拒绝（regex 要求数字后跟 `[\.、:\s]`），实际走 heading 路径。改输入为 "Fig 1." 后通过。
+
+### 下一步建议
+- 候选 AT 续：kreuzberg_parser.py 内部 helper（~200 行，类似覆盖）
+- 候选 AS：app/hash.py 内部边角补强
+- 候选 AP：evaluation/runner.py 评测指标聚合边角
+- 候选 AQ：evaluation/manifest.py / annotation.py 边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 kreuzberg_parser.py 内部 helper（候选 AT 续）。理由：
+1. kreuzberg_parser.py ~200 行，是另一个可选 parser
+2. 含 _is_kreuzberg_available / _extract_elements 等可测纯函数
+3. 与 fallback 形成完整 parser 层覆盖（base + 5 个具体 parser 全覆盖）
+4. 之后转入 evaluation 层（AP/AQ）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 40 后）：1178 pass / 0 fail / 9 skip（HEAD `0440698`）
+
+---
