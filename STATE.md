@@ -4132,3 +4132,54 @@
 - 本 worktree（Round 86 后）：5244 pass / 0 fail / 13 skip（HEAD `9c6a0df`）
 
 ---
+
+## Round 87（2026-08-05）：候选 CY — evaluation/schema.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CY：新建 `tests/test_evaluation_schema_edges2.py`（172 个测试）覆盖
+  `evaluation/schema.py`（80 行）+ 3 个 schema 文件的深度边角，与已有
+  `test_evaluation_schema.py`（55）+ `test_evaluation_schema_edges.py`（80）互补。
+- 重点覆盖项：
+  - **SCHEMAS_DIR 常量深度**：Path 类型、绝对路径、目录存在、4 个 schema 文件
+  - **_schema_path 函数**：已知/未知名、空名、子路径不过滤 `../`（已知行为）
+  - **load_schema 函数**：fresh dict each call、修改不持久、`$schema`/`$id`/`title`/
+    `type=object` 在 3 schema 上一致、required/const 字段
+  - **manifest 字段**：const version、enum devset_status、document 子字段
+    （doc_id/path/source_type 必填、sha256 pattern 大小写、paired_with 类型、
+    expectations 子字段 element_count_by_type negative/zero、required_markers
+    非空、expected_failure source_type 4 个 enum 值）
+  - **annotation 字段**：annotator/date 类型、figure_caption_pairs 子字段、
+    heading_order level/text 边界、chunk_boundary_anchors position enum/extra
+  - **report 字段**：provenance 9 字段、git_dirty bool、max_chars minimum、
+    dependencies value null/string 接受、devset 字段、summary additionalProperties、
+    per_doc wall_time_seconds total null/parse_reason/chunk_reason、
+    expected_failure_result matches bool
+  - **validate 算法**：非 dict 实例（list/None/string）、空 dict、不修改输入、
+    多错误计数、错误字段三键（path/message/schema_path）
+  - **validate_file 深度**：str/pathlib/missing/dir/invalid_json/empty_file/
+    invalid_content/unicode_filename/BOM/nested
+  - **EvalSchemaError 类**：subclass、errors 默认/None/透传/writable、args、repr
+  - **__all__ 5 项**、模块结构、签名
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_schema_path_with_subpath_raises_or_resolves_safely` 预期
+  `_schema_path("../app/schema.py")` 抛 FileNotFoundError，实际不抛
+  （SCHEMAS_DIR / "../app/schema.py" 解析到项目根 app/schema.py，文件存在）。
+  修复：测试改为记录现状（_schema_path 不沙箱化相对路径），调用者需传可信输入。
+
+### 下一步建议
+- 候选 CZ：app/pipeline.py 边角（第二轮）
+- 候选 DA：app/schema.py 边角（第二轮）—— 业务 schema
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CZ（app/pipeline.py 边角第二轮）。理由：
+1. pipeline.py 是端到端入口，串联 parser/chunker/validator
+2. 第二轮可补子模块错误传播、WarningRecord 收集、wall_time 字段
+3. 与 Round 87 schema 互补：schema 是契约，pipeline 是执行
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 87 后）：5416 pass / 0 fail / 13 skip（HEAD `99233a8`）
+
+---
