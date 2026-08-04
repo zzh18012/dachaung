@@ -4074,3 +4074,61 @@
 - 本 worktree（Round 85 后）：5151 pass / 0 fail / 13 skip（HEAD `006300f`）
 
 ---
+
+## Round 86（2026-08-05）：候选 CX — evaluation/annotation_metrics.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CX：新建 `tests/test_annotation_metrics_edges2.py`（93 个测试）覆盖
+  `evaluation/annotation_metrics.py`（194 行）的深度边角，与已有
+  `test_annotation_metrics.py`（47）+ `test_annotation_metrics_edges.py`（83）互补。
+- 重点覆盖项：
+  - **模块常量与 __all__**：PARSER_DOES_NOT_EMIT_RELATIONS 取值/字符集/属性、
+    __all__ 3 项完整、模块结构
+  - **figure_caption_prf 不变量**：任意 doc/annotation 形态返回 null、
+    key 顺序、dict 不共享、annotation truthy 各种类型
+  - **chunk_boundary_prf 失败路径**：annotation falsy（[]/0/''）、
+    无 chunks key、单 chunk、tolerance 字段在所有早返回路径都存在
+  - **predicted 边界构造**：2/3 chunk、内部多空格、tab/newline、
+    None/缺 text key 视为空、理论不可达分支（用 monkeypatch 触发）
+  - **anchor 定位**：position 无效值走 after、before/after、Unicode/emoji、
+    search_from 推进（重复 marker 顺序定位）、marker 缺 key、position 缺 key、
+    anchor 额外 key
+  - **一对一贪心匹配**：按距离排序、1v2/2v1 场景、tolerance 边界（`<=`）、
+    负 tolerance、巨大 tolerance
+  - **F1 计算**：完美匹配、半匹配、p=r=0 走 0 分支、p 或 r null
+  - **输出结构**：成功路径/missing_markers 路径 key 集、不修改输入
+  - **稳定性**：10/50 chunk、5 chunk 多 anchor
+  - **签名**：默认 tolerance=30
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_chunk_boundary_greedy_one_pred_two_anchors_closest_wins`
+  用 "ab" marker 在第 2 个 chunk 中找不到（search_from 推进后） → recall=1.0。
+  修复：改为 "abcabc" chunk + 两个 "abc" marker，确保 search_from 推进后能找到。
+- wall 2：`test_chunk_boundary_huge_tolerance_matches_everything_in_range`
+  marker "abc" 在 "a b c"（有空格）中找不到 → gt_positions=[] → precision=0.0
+  而非 0.5。修复：marker 改为 "a"（chunk 中实际存在的子串）。
+- wall 3：`test_chunk_boundary_f1_null_reason_precision_or_recall_not_evaluated`
+  空 anchors 列表触发 `no_ground_truth_anchors` 早返回，不走算法分支。
+  修复：改为有 anchor 但 marker 全找不到，触发 recall null 路径。
+- wall 4：`test_module_has_no_unexpected_public_attrs` 过严，遗漏了
+  `from __future__ import annotations` 等导入名。修复：白名单允许
+  Any/Counter/annotations/normalize_text/_null/_ratio。
+- wall 5：`test_chunk_boundary_real_world_3_chunks_2_anchors_one_mismatch`
+  算错 expected（3 chunk → 2 predicted 而非 1）。修复：precision 改为 0.5。
+
+### 下一步建议
+- 候选 CY：evaluation/schema.py 边角（第二轮）
+- 候选 CZ：app/pipeline.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CY（evaluation/schema.py 边角第二轮）。理由：
+1. schema.py 是评测报告/manifest 的契约保障
+2. 第二轮可补 if/then 条件分支、required 字段、enum 边界
+3. 与 Round 86 互补：annotation_metrics 是行为，schema 是结构
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 86 后）：5244 pass / 0 fail / 13 skip（HEAD `9c6a0df`）
+
+---
