@@ -8775,3 +8775,67 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 第六轮可深入 dataclass 字段、to_dict 序列化、__post_init__ 边界。
 
 ---
+
+## Round 149（2026-08-05）：app/models.py 第六轮（edges5）
+
+### 目标
+- 给 app/models.py（154 行，已有 base/edges/edges2/edges3/edges4 共 383 测试）补第六轮
+- 深入模块结构、Element/Chunk/Relation 特殊值、asdict 行为、round-trip
+
+### 改动
+- 新增 `tests/test_models_edges5.py`（91 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块结构**：imports asdict/field/Optional/Literal/Any、无 __all__、6 个 @dataclass
+- **SCHEMA_VERSION**：0.1.0 X.Y.Z 格式
+- **ElementType/SourceType**：Literal、count 8/6
+- **Element 特殊值**：
+  - resource_path="" 与 content="" 都 falsy → raise
+  - 空白 content/resource_path truthy → OK
+  - confidence int 0/1、float 0.0/1.0
+  - metadata 嵌套/list/int/None/bool
+  - source_locator 空 dict OK、多 key OK
+  - parent_id 默认 None / 显式值
+  - to_dict 每次新 dict、metadata 修改无回流
+- **Chunk 特殊值**：
+  - 空白 text truthy → OK（不 raise）
+  - source_element_ids=[""] OK
+  - metadata 嵌套、source_spans 复杂结构
+- **Relation 特殊值**：
+  - type/from_id/to_id="" 都 OK
+  - metadata 嵌套、to_dict 不共享
+- **WarningRecord vs ErrorRecord 对比**：
+  - 字段名 reason vs message
+  - to_dict 字段集差异
+  - details=None 省略、details={} 保留
+- **Document 特殊值**：
+  - document_id/source_path/source_hash="" 都 OK（无 __post_init__）
+  - to_dict 用同一引用（不复制 metadata）
+  - elements/metadata default_factory 跨实例独立
+- **asdict 对比**：to_dict == asdict
+- **round-trip**：to_dict → 构造器 → 等价
+- **dataclass 字段默认值类型**
+- **综合行为**：6 个 dataclass 都有 to_dict、相同参数相等、不同参数不等
+
+### 撞墙记录
+- **Wall 1**：Chunk text=" " 是 truthy 字符串，`if not self.text` 不拦截。修复：改为不 raise 测试。
+- **Wall 2**：Document.to_dict 用 self.metadata 直接引用（不复制）。修复：改为 is 同一引用测试。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 149 后）：11757 pass / 0 fail / 13 skip（HEAD `abd57be`）
+
+### 下一步建议
+- 候选 HL：app/schema.py 第六轮
+- 候选 HM：app/pipeline.py 第六轮
+- 候选 HN：evaluation/runner.py 第六轮
+- 候选 HO：evaluation/metrics.py 第六轮
+- 候选 HP：evaluation/report.py 第六轮
+- 候选 HQ：evaluation/manifest.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HL（app/schema.py 第六轮）。schema 模块是 JSON Schema 校验核心，
+第六轮可深入 SchemaValidationError、load_schema、validate 多错误聚合等。
+
+---
