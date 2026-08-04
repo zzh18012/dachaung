@@ -7192,3 +7192,111 @@ structural.py 是结构分块核心算法，第三轮已建立基础，
 - 本 worktree（Round 128 后）：9710 pass / 0 fail / 13 skip（HEAD `8648b90`）
 
 ---
+
+## Round 129（2026-08-05）：app/chunkers/structural.py 第五轮（edges5）
+
+### 范围
+- 文件：`tests/test_chunker_edges5.py`（新增，1255 行）
+- 目标：`app/chunkers/structural.py`（388 行，已有 506 测试）
+- 新增测试：175 个
+- 提交：`b276136`
+
+### 覆盖深度
+- **_PART_* 常量值精确**：
+  - _PART_TEXT=0, _PART_ELEMENT_ID=1, _PART_START=2, _PART_END=3
+  - 4 个 distinct，按顺序递增
+- **_SplitPiece 深度**：
+  - is_dataclass / frozen / hashable
+  - boundary_after 三个值（whitespace/forced_char/None）
+  - 默认 start=0/end=0
+  - 字段数 4 + 字段名精确
+- **_SENTENCE_SPLIT_RE pattern 内容**：
+  - compiled pattern / 含中英文标点
+  - 用 lookbehind (?<=)
+  - 中文/英文/混用句子切分
+  - 标点后无空白不切
+- **_HARD_BREAK_LANGS 内容**：
+  - is_tuple / length 6 / exact set
+- **_WHITESPACE_RE 行为**：
+  - pattern `\s+` / sub 各种空白折叠
+- **normalize_text 深度**：
+  - 空串/None/单空白/全空白 → ""
+  - 中英文混合/emoji 保留
+  - idempotent / returns str
+- **_hard_split_with_whitespace_fallback 深度**：
+  - 空/全空白 → []
+  - text < max → 单 piece
+  - text = max → 单 piece
+  - text > max with whitespace → 多 piece，whitespace 边界
+  - text > max no whitespace → forced_char
+  - leading whitespace 跳过
+  - each piece ≤ max_chars
+- **_split_long_text 深度**：
+  - 空/纯空白 → []
+  - 短文本 → 单 piece
+  - exact max_chars → 单 piece
+  - 长 paragraph → 多 piece
+  - 入口 strip
+- **_ChunkBuffer 深度**：
+  - is_dataclass / 默认工厂独立
+  - 字段数 3 + 字段名精确
+  - push_text/length/is_empty/flush 各种场景
+  - flush metadata 含 strategy/max_chars/char_count
+  - source_spans 每项含 element_id/start/end
+  - chunk_id 格式与 counter
+  - dedup source_element_ids 保留首次出现顺序
+- **StructuralChunker.__init__ 深度**：
+  - 默认 800 / 显式 / 32 minimum / 31 拒绝 / 0 拒绝 / 负数拒绝
+  - ValueError message 含 max_chars 值 + "过小"
+- **StructuralChunker.chunk 深度**：
+  - 不同 type 的 strategy 值（sequential/isolated_table/isolated_caption/
+    long_paragraph_sentence_split）
+  - heading 硬边界封口
+  - image element 跳过
+  - 空/纯空白 paragraph 不参与分块
+  - chunk_id 格式与递增
+  - source_spans 含 element_id
+- **_element_text_with_span 深度**：
+  - image / 空 content / None content / 纯空白 → ("",0,0)
+  - lstrip 长度推算 start
+  - 内部空白保留
+- **模块结构深度**：
+  - imports 完整（re/dataclass/field/Any/Chunk/Document/Element）
+  - 4 个常量 + 3 个 dataclass/class + 4 个 helper 全部存在
+  - __all__ 2 项（StructuralChunker + normalize_text）
+  - 全 public（无 _ 前缀）
+  - docstring 提及分块/heading/source_spans
+  - from __future__ import annotations
+- **签名深度**：
+  - normalize_text: (s) → str
+  - StructuralChunker.__init__: (self, max_chars=800)
+  - StructuralChunker.chunk: (self, document) → list[Chunk]
+  - _ChunkBuffer.flush: strategy/max_chars 是 KEYWORD_ONLY
+  - _ChunkBuffer.push_text: (self, text, element_id, start, end)
+
+### 撞墙记录
+1. test_sentence_split_re_split_chinese_sentences：pattern `(?<=[...])\s+`
+   需要空白才切，中文标点直接相邻不切。修复：assert 整段不切。
+2. _make_element helper：Element 的 __post_init__ 要求 content 或
+   resource_path 至少一个非空。修复：空 content 时提供 resource_path="(placeholder)"。
+3. docstring 中含 `\s+` 触发 SyntaxWarning。修复：用 r"""raw string"""。
+
+### 下一步建议
+- 候选 GH：evaluation/manifest.py 第五轮
+- 候选 GI：evaluation/runner.py 第五轮
+- 候选 GJ：evaluation/metrics.py 第五轮
+- 候选 GK：evaluation/annotation_metrics.py 第五轮
+- 候选 GL：evaluation/report.py 第五轮
+- 候选 GM：app/parsers/markdown_parser.py 第四轮
+- 候选 GN：app/parsers/html_parser.py 第四轮
+- 候选 GO：app/parsers/ipynb_parser.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GH（evaluation/manifest.py 第五轮）。manifest 已有 4 轮，
+第五轮可深入 _is_absolute_like/_has_backslash/ManifestError 边角。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 129 后）：9885 pass / 0 fail / 13 skip（HEAD `b276136`）
+
+---
