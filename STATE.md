@@ -2086,3 +2086,37 @@
 - 本 worktree（Round 41 后）：1231 pass / 0 fail / 9 skip（HEAD `0001aee`）
 
 ---
+
+## Round 42（2026-08-04）：候选 AP — evaluation/runner.py 内部 helper 边角覆盖
+
+### 做了什么
+- 候选 AP：扩展 `tests/test_evaluation_runner.py`，新增 37 个测试覆盖 `_load_annotation` / `_process_one` / `run_evaluation` 的边角。
+- 之前 runner.py 已有 19 个端到端测试，本轮补齐纯函数 + 报告字段层边角。
+- 重点覆盖项：
+  - **`_load_annotation`** 9 个新测试：directory→None、显式 None、JSON list 返回 list、nested dict、JSON null、JSON number 顶层、空 object、截断 JSON、二进制垃圾 → UnicodeDecodeError 传播（**契约测试，反映现有行为：encoding=utf-8 不加 errors=replace**）
+  - **`_process_one`** 6 个新测试：error_dict 含 code 字段、failure 时 parser_version=None、success 时 parser_version=str、total_seconds float 非负、创建 `_per_doc/` 目录、成功返回 document_dict 含 elements/chunks、成功时 error=None
+  - **`run_evaluation`** 22 个新测试：wall_time_seconds 结构（total/parse/chunk/reasons 各字段）、doc_id/source_type 保留、空 manifest summary 安全、返回 dict、顶层 6 个 keys、report_version 匹配常量、expected_failures 始终 list、多 doc 顺序保留、expected_failure 4 字段 shape、默认 parser_name=fallback、默认 max_chars=800、默认 tolerance_chars=30、output 写盘、provenance git_commit/git_dirty、evaluator_version 匹配常量、dependencies dict（pdfplumber/python-docx/pypdfium2）、run_timestamp_iso ISO 8601 含 T、devset 字段、per_doc metrics dict、per_doc total float
+- 无源码改动。
+
+### 撞墙记录
+- **Wall 1**：`test_load_annotation_binary_garbage_returns_none` 假设 UnicodeDecodeError 被兜底。实际 `_load_annotation` 的 except 只覆盖 `(OSError, json.JSONDecodeError)`，UnicodeDecodeError 是 ValueError 子类，会传播。改为契约测试 `propagates_unicode_error`，反映现有行为。
+- **Wall 2**：`test_run_evaluation_provenance_includes_project_root` 假设 provenance 含 project_root。实际 build_provenance 输出 git_commit/git_dirty/evaluator_version/report_version/parser_name/parser_version/dependencies/max_chars/run_timestamp_iso 共 9 个字段，无 project_root。改为测 git_commit/git_dirty、evaluator_version、dependencies、run_timestamp_iso。
+
+### 下一步建议
+- 候选 AQ：evaluation/manifest.py / annotation_metrics.py 内部边角
+- 候选 AS：app/hash.py 内部边角补强
+- 候选 AV：evaluation/metrics.py 边角（compute_automatic_metrics 各指标分母为 0 路径）
+- 候选 AW：evaluation/report.py 边角（aggregate_summary / build_devset_section）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AQ（manifest.py 边角）。理由：
+1. manifest.py 是评测层的入口（清单解析），与 runner.py 紧耦合
+2. 含 path 校验、绝对路径拒、反斜杠拒、project_root 范围检查等可测逻辑
+3. annotation_metrics.py 含 chunk_boundary_prf / figure_caption_prf 的边角（no_annotation、no_chunks、no_elements）
+4. 之后转 AV / AW 形成 evaluation 层全覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 42 后）：1268 pass / 0 fail / 9 skip（HEAD `2729c52`）
+
+---
