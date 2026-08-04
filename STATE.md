@@ -4733,3 +4733,61 @@
 - 本 worktree（Round 96 后）：6223 pass / 0 fail / 13 skip（HEAD `9abe935`）
 
 ---
+
+## Round 97（2026-08-05）：候选 DL — evaluation/metrics.py 第三轮边角
+
+### 做了什么
+- 新建 `tests/test_evaluation_metrics_edges3.py`（114 个测试）第三轮覆盖
+  `evaluation/metrics.py`（381 行）。已有 ? + 190 测试。
+- 重点覆盖项（聚焦算法路径与边界）：
+  - **`_pdf_locator_ratio`**：page=0/-1/None/missing、bbox required for text types、
+    table/image 不需 bbox、mixed valid/invalid
+  - **`_docx_locator_ratio`**：page/bbox 拒、各种结构键接受（section/paragraph_index/
+    table_index/run_index/row_index/col_index/relationship_id）、空 loc 拒、
+    missing loc 拒、mixed
+  - **`_is_valid_bbox`**：None/short/long、4 ints/floats/mixed、bool 拒（即使值=0）、
+    string 拒、NaN/Inf/-Inf 拒、tuple/dict 拒、零大小接受、负值接受
+  - **`_image_resource_ratio`**：no images、empty rp、missing rp、existing rp、
+    zero-byte 文件、image_base_dir 拼接 fallback、mixed
+  - **`_chunk_reference_ratio`**：no chunks、empty ids、orphan ids、all valid、
+    partial、None ids
+  - **`_strip_unicode_whitespace`**：empty/no-ws/各种空白类型（NBSP/EM space/
+    ideographic space/line separator/paragraph separator）、BOM 不被识别、
+    emoji 与中文保留
+  - **`_text_preservation`**：full match、partial、both empty、
+    empty expected only、empty actual only、order matters for equal but not
+    for multiset、repeats preserved、multi-element concat、image excluded、
+    ws-only → empty
+  - **`_heading_boundary_ratio`**：no headings、no chunks、all matched、
+    partial、zero matched、heading 非首位置不算
+  - **`_silent_drop_count`**：no expectations、empty expectations、
+    no element_count_by_type、no drop、drop、missing type、multi type sum、
+    actual > expected 无 negative
+  - **`compute_automatic_metrics` pipeline_failed 全 null** + error_code 记录 +
+    schema_valid null + 各指标 reason 正确（pipeline_failed / not_pdf_document /
+    not_docx_document / no_elements / no_image_elements / no_chunks /
+    no_heading_elements / no_expectations）
+  - 返回 dict 含 14 个 keys（pipeline_success + error_code + schema_valid +
+    11 个文档级指标）
+  - 每个 metric 都是 {value, reason} 结构
+  - **`_null`** 长字符串、**`_ratio`** inf/nan、**`_bool_metric`** int/str/list 转换、
+    **`_int_metric`** float truncate
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：U+FEFF (BOM) 在 Python str.isspace() 中返回 False → 不被删除。
+  修复：改为断言 BOM 保留。
+
+### 下一步建议
+- 候选 DM：evaluation/manifest.py 边角（第三轮）
+- 候选 DN：evaluation/report.py 边角（第二轮）
+- 候选 DO：evaluation/schema_validation.py 边角（如有）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DM（manifest.py 第三轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 97 后）：6337 pass / 0 fail / 13 skip（HEAD `f53f861`）
+
+---
