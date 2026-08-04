@@ -464,3 +464,161 @@ def test_I8_identical_input_identical_output():
     chunks1 = chunker.chunk(doc)
     chunks2 = chunker.chunk(doc)
     assert chunks1 == chunks2
+
+
+# ---------- source_spans ----------
+
+
+def test_source_spans_simple_two_paragraphs():
+    """两段都进同一个 chunk：spans 给出每段在 el.content 中的全区间。"""
+    doc = _make_doc([
+        ("paragraph", "Hello world."),
+        ("paragraph", "Another sentence."),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 1
+    spans = chunks[0].source_spans
+    assert len(spans) == 2
+    # 第 1 个 span：覆盖第 1 段全部
+    assert spans[0]["element_id"] == doc.elements[0].element_id
+    assert spans[0]["start"] == 0
+    assert spans[0]["end"] == len("Hello world.")
+    # 第 2 个 span：覆盖第 2 段全部
+    assert spans[1]["element_id"] == doc.elements[1].element_id
+    assert spans[1]["start"] == 0
+    assert spans[1]["end"] == len("Another sentence.")
+
+
+def test_source_spans_heading_is_hard_boundary():
+    """heading 起新 chunk：第 2 chunk 的 spans 含 heading 与下一段。"""
+    doc = _make_doc([
+        ("paragraph", "intro paragraph."),
+        ("heading", "Chapter 2"),
+        ("paragraph", "body of chapter 2."),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 2
+    # 第 1 chunk：只有 intro paragraph
+    assert len(chunks[0].source_spans) == 1
+    assert chunks[0].source_spans[0]["element_id"] == doc.elements[0].element_id
+    # 第 2 chunk：heading + body
+    assert len(chunks[1].source_spans) == 2
+    assert chunks[1].source_spans[0]["element_id"] == doc.elements[1].element_id  # heading
+    assert chunks[1].source_spans[1]["element_id"] == doc.elements[2].element_id  # body
+
+
+def test_source_spans_table_isolated_chunk():
+    """table 单独成 chunk：spans 仅含 table 一项。"""
+    doc = _make_doc([
+        ("paragraph", "before table."),
+        ("table", "| A | B |\n|---|---|\n| 1 | 2 |"),
+        ("paragraph", "after table."),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    table_chunks = [c for c in chunks if "| A | B |" in c.text]
+    assert len(table_chunks) == 1
+    tc = table_chunks[0]
+    assert len(tc.source_spans) == 1
+    assert tc.source_spans[0]["element_id"] == doc.elements[1].element_id
+    table_text = doc.elements[1].content or ""
+    assert tc.source_spans[0]["start"] == 0
+    assert tc.source_spans[0]["end"] == len(table_text)
+
+
+def test_source_spans_long_paragraph_within_element():
+    """超长段落被切：每片 span 都在该 element.content 中，且互不重叠。"""
+    long_text = "Sentence one. " * 50  # 足够长，必被切
+    doc = _make_doc([("paragraph", long_text)])
+    chunks = StructuralChunker(max_chars=80).chunk(doc)
+    assert len(chunks) > 1
+    eid = doc.elements[0].element_id
+    # 每个 chunk 的 span 都指向同一 element
+    for c in chunks:
+        assert len(c.source_spans) == 1
+        assert c.source_spans[0]["element_id"] == eid
+        s, e = c.source_spans[0]["start"], c.source_spans[0]["end"]
+        # 区间在 element.content 范围内
+        assert 0 <= s < e <= len(long_text)
+        # span 对应的 element.content 切片应包含 chunk 的非空白字符序列
+        # （粗校验：span 切片非空）
+        assert long_text[s:e].strip()
+    # 所有 chunk 的 span 区间应当连续且覆盖（允许有空白间隙）
+    span_starts = sorted(c.source_spans[0]["start"] for c in chunks)
+    span_ends = sorted(c.source_spans[0]["end"] for c in chunks)
+    assert span_starts[0] == 0
+    assert span_ends[-1] <= len(long_text)
+
+
+def test_source_spans_element_with_leading_trailing_whitespace():
+    """element.content 有首尾空白时，span 应指向 stripped 部分（不含首尾空白）。"""
+    doc = _make_doc([("paragraph", "  Hello world.  ")])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 1
+    span = chunks[0].source_spans[0]
+    assert span["start"] == 2  # 跳过 2 个前导空格
+    assert span["end"] == 2 + len("Hello world.")
+    # element.content 切片应等于 stripped text
+    assert doc.elements[0].content[span["start"]:span["end"]] == "Hello world."
+
+
+def test_source_spans_chunk_text_alignment():
+    """所有 chunk 的 source_spans 区间内的 element.content 拼接，
+    其非空白字符序列应等于所有 chunk.text 的非空白字符序列。
+
+    这是 source_spans 的核心契约：用 span 切回原始 element.content，
+    能恢复 chunk.text 的非空白内容。
+    """
+    paragraphs = [
+        "First paragraph with several words.",
+        "Second paragraph, also non-trivial.",
+        "Third one ends with period.",
+    ]
+    doc = _make_doc([("paragraph", p) for p in paragraphs])
+    chunks = StructuralChunker(max_chars=50).chunk(doc)
+    assert len(chunks) >= 2
+
+    # 用 span 把每个 chunk 的字符从对应 element.content 里抽出来
+    el_by_id = {e.element_id: e for e in doc.elements}
+    extracted_non_ws_parts = []
+    for c in chunks:
+        for span in c.source_spans:
+            el = el_by_id[span["element_id"]]
+            piece = (el.content or "")[span["start"]:span["end"]]
+            extracted_non_ws_parts.append(_non_ws(piece))
+    extracted = "".join(extracted_non_ws_parts)
+    actual = _non_ws("".join(c.text for c in chunks))
+    assert extracted == actual, (
+        f"span 抽取与 chunk.text 不一致：extracted={extracted!r}, actual={actual!r}"
+    )
+
+
+def test_source_spans_empty_when_no_text():
+    """所有 element 都是空内容 → chunker 不产生任何 chunk（无 spans 可言）。"""
+    # Element 强制要求 content 或 resource_path 之一非空，所以无法真正测试
+    # "all empty"。改成：单 image element，不参与分块。
+    doc = _make_doc([("image", "alt text")])  # image 走 resource_path
+    # 但 _make_doc 用 content 字段；为 image 加 resource_path
+    img = doc.elements[0]
+    doc.elements[0] = Element(
+        element_id=img.element_id, type="image",
+        source_locator=img.source_locator,
+        content=None, resource_path="x.png",
+    )
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert chunks == []
+
+
+def test_source_spans_in_to_dict_output():
+    """Chunk.to_dict() 包含 source_spans 字段，schema 校验通过。"""
+    from app.schema import validate
+
+    doc = _make_doc([("paragraph", "Hello."), ("paragraph", "World.")])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    doc.chunks = chunks
+    d = doc.to_dict()
+    # 校验整体 document schema（含 source_spans 子结构）
+    validate(d)
+    # 第 1 chunk 的 dict 形式确实含 source_spans
+    assert "source_spans" in d["chunks"][0]
+    assert len(d["chunks"][0]["source_spans"]) == 2
+

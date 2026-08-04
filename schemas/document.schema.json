@@ -199,6 +199,10 @@
           "minItems": 1,
           "items": { "type": "string", "minLength": 1 }
         },
+        "source_spans": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/source_span" }
+        },
         "metadata": { "type": "object" }
       },
       "additionalProperties": false
@@ -298,6 +302,16 @@
         "section_path": { "type": "string" }
       },
       "additionalProperties": true
+    },
+    "source_span": {
+      "type": "object",
+      "required": ["element_id", "start", "end"],
+      "properties": {
+        "element_id": { "type": "string", "minLength": 1 },
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
     }
   }
 }

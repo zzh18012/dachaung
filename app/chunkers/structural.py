@@ -1,4 +1,4 @@
-"""基础结构分块器（标题硬边界 + 长度上限 + source_element_ids）。
+"""基础结构分块器（标题硬边界 + 长度上限 + source_element_ids + source_spans）。
 
 规则：
 1. heading element 是硬边界：之前的 chunk 立即封口，新 chunk 从 heading 开始
@@ -7,6 +7,9 @@
 4. 单个 paragraph 自身超 max_chars 时按句子切分；句子也太长就硬切
 5. 每个 chunk 至少记录一个 source_element_id
 6. 不修改文本内容，仅切段（保证"不丢不重"）
+7. 每个 chunk 带 source_spans：每个被引用 element 在其 content 中的字符区间
+   `[start, end)`，便于字符级保留验证。空列表表示该 chunk 不带 span 信息
+   （向后兼容；当前所有路径都会填充）。
 """
 
 from __future__ import annotations
@@ -47,10 +50,15 @@ class _SplitPiece:
     - "forced_char"：piece 结尾是 upper 处固定字符兜底（窗口内无空白）。
     - None：piece 是输入文本的自然结尾（remaining ≤ max_chars）或
       自然句子累积到容量上限而 flush。
+
+    start / end：piece 在传入 _split_long_text 的（已 strip 的）text 中的
+    字符区间 [start, end)。调用方负责把它映射到 element.content 坐标。
     """
 
     text: str
     boundary_after: str | None
+    start: int = 0
+    end: int = 0
 
 
 def _hard_split_with_whitespace_fallback(
@@ -66,6 +74,8 @@ def _hard_split_with_whitespace_fallback(
        - 找到 → piece = text[i:ws_idx].rstrip()；游标跳过 ws_idx 及其后连续空白；
          若仍有非空白文本 boundary_after="whitespace"，否则 None。
        - 未找到 → piece = text[i:upper]，boundary_after="forced_char"。
+
+    每个 piece 的 start/end 在输入 text 坐标系中。
     """
     n = len(text)
     pieces: list[_SplitPiece] = []
@@ -78,7 +88,11 @@ def _hard_split_with_whitespace_fallback(
 
         remaining = n - i
         if remaining <= max_chars:
-            pieces.append(_SplitPiece(text=text[i:n].rstrip(), boundary_after=None))
+            piece_text = text[i:n].rstrip()
+            pieces.append(_SplitPiece(
+                text=piece_text, boundary_after=None,
+                start=i, end=i + len(piece_text),
+            ))
             i = n
             break
 
@@ -97,13 +111,19 @@ def _hard_split_with_whitespace_fallback(
                 next_i += 1
             has_more = next_i < n
             boundary_after = "whitespace" if has_more else None
+            pieces.append(_SplitPiece(
+                text=piece_text, boundary_after=boundary_after,
+                start=i, end=i + len(piece_text),
+            ))
             i = next_i
         else:
             piece_text = text[i:upper]
             boundary_after = "forced_char"
+            pieces.append(_SplitPiece(
+                text=piece_text, boundary_after=boundary_after,
+                start=i, end=i + len(piece_text),
+            ))
             i = upper
-
-        pieces.append(_SplitPiece(text=piece_text, boundary_after=boundary_after))
 
     return pieces
 
@@ -121,59 +141,91 @@ def _split_long_text(text: str, max_chars: int) -> list[_SplitPiece]:
     - chunk 的 boundary_after 取最后一个输入 piece 的值。
     - 自然句子累积到容量上限而 flush → boundary_after 保持 None
       （不写 metadata.split_boundary_after）。
+
+    每个 piece 的 start/end 在输入 text（已 strip）坐标系中。
     """
     text = text.strip()
     if not text:
         return []
     if len(text) <= max_chars:
-        return [_SplitPiece(text=text, boundary_after=None)]
+        return [_SplitPiece(text=text, boundary_after=None, start=0, end=len(text))]
 
     raw_pieces: list[_SplitPiece] = []
+    pos = 0
     for sentence in _SENTENCE_SPLIT_RE.split(text):
         if not sentence:
             continue
+        # 在 text 中从 pos 起找 sentence 的位置（句子之间是 _SENTENCE_SPLIT_RE 匹配的空白）
+        sentence_start = text.find(sentence, pos)
+        if sentence_start < 0:
+            sentence_start = pos  # 防御性 fallback
         if len(sentence) <= max_chars:
-            raw_pieces.append(_SplitPiece(text=sentence, boundary_after=None))
+            raw_pieces.append(_SplitPiece(
+                text=sentence, boundary_after=None,
+                start=sentence_start, end=sentence_start + len(sentence),
+            ))
         else:
-            raw_pieces.extend(
-                _hard_split_with_whitespace_fallback(sentence, max_chars)
-            )
+            sub_pieces = _hard_split_with_whitespace_fallback(sentence, max_chars)
+            for sp in sub_pieces:
+                raw_pieces.append(_SplitPiece(
+                    text=sp.text, boundary_after=sp.boundary_after,
+                    start=sentence_start + sp.start,
+                    end=sentence_start + sp.end,
+                ))
+        pos = sentence_start + len(sentence)
 
     out: list[_SplitPiece] = []
     buf_text = ""
+    buf_start = 0
+    buf_end = 0
     buf_boundary: str | None = None
     for p in raw_pieces:
         sep = 1 if buf_text else 0
         if not buf_text:
             buf_text = p.text
+            buf_start = p.start
+            buf_end = p.end
             buf_boundary = p.boundary_after
         elif len(buf_text) + sep + len(p.text) <= max_chars:
             buf_text = buf_text + " " + p.text
+            buf_end = p.end  # 扩到包含当前 piece（中间的空白也在 [buf_start, buf_end) 内）
             buf_boundary = p.boundary_after
         else:
-            out.append(_SplitPiece(text=buf_text, boundary_after=buf_boundary))
+            out.append(_SplitPiece(
+                text=buf_text, boundary_after=buf_boundary,
+                start=buf_start, end=buf_end,
+            ))
             buf_text = p.text
+            buf_start = p.start
+            buf_end = p.end
             buf_boundary = p.boundary_after
     if buf_text:
-        out.append(_SplitPiece(text=buf_text, boundary_after=buf_boundary))
+        out.append(_SplitPiece(
+            text=buf_text, boundary_after=buf_boundary,
+            start=buf_start, end=buf_end,
+        ))
     return out
+
+
+# _ChunkBuffer.parts 元组的字段索引
+_PART_TEXT = 0
+_PART_ELEMENT_ID = 1
+_PART_START = 2  # 在 element.content 中的字符起始位置
+_PART_END = 3    # 在 element.content 中的字符结束位置（exclusive）
 
 
 @dataclass
 class _ChunkBuffer:
     """累积中的 chunk。flush 时生成 Chunk。"""
     document_id: str
-    parts: list[str] = field(default_factory=list)
-    source_ids: list[str] = field(default_factory=list)
+    parts: list[tuple[str, str, int, int]] = field(default_factory=list)
     counter: int = 0  # 由 chunker 维护，确保 chunk_id 递增
 
-    def push_text(self, text: str, element_id: str) -> None:
-        self.parts.append(text)
-        if element_id not in self.source_ids:
-            self.source_ids.append(element_id)
+    def push_text(self, text: str, element_id: str, start: int, end: int) -> None:
+        self.parts.append((text, element_id, start, end))
 
     def length(self) -> int:
-        return sum(len(p) for p in self.parts)
+        return sum(len(p[_PART_TEXT]) for p in self.parts)
 
     def is_empty(self) -> bool:
         return not self.parts
@@ -181,22 +233,37 @@ class _ChunkBuffer:
     def flush(self, *, strategy: str, max_chars: int) -> Chunk | None:
         if self.is_empty():
             return None
-        text = " ".join(self.parts).strip()
+        text = " ".join(p[_PART_TEXT] for p in self.parts).strip()
         if not text:
             return None
+        # source_element_ids: 保留首次出现顺序去重
+        source_ids: list[str] = []
+        for p in self.parts:
+            eid = p[_PART_ELEMENT_ID]
+            if eid not in source_ids:
+                source_ids.append(eid)
+        # source_spans: 每个 part 一项（同一 element 可能多 span）
+        spans: list[dict[str, Any]] = [
+            {
+                "element_id": p[_PART_ELEMENT_ID],
+                "start": p[_PART_START],
+                "end": p[_PART_END],
+            }
+            for p in self.parts
+        ]
         chunk = Chunk(
             chunk_id=f"{self.document_id}::c{self.counter:04d}",
             text=text,
-            source_element_ids=list(self.source_ids),
+            source_element_ids=source_ids,
             metadata={
                 "strategy": strategy,
                 "max_chars": max_chars,
                 "char_count": len(text),
             },
+            source_spans=spans,
         )
         # 清空，等下次复用
         self.parts.clear()
-        self.source_ids.clear()
         return chunk
 
 
@@ -228,7 +295,7 @@ class StructuralChunker:
                 counter += 1
 
         for el in document.elements:
-            text = self._element_text(el)
+            text, el_start, el_end = self._element_text_with_span(el)
             if not text:
                 continue
 
@@ -236,14 +303,14 @@ class StructuralChunker:
             if el.type in ("table", "image", "caption"):
                 flush()
                 # 单元素 chunk
-                buf.push_text(text, el.element_id)
+                buf.push_text(text, el.element_id, el_start, el_end)
                 flush(strategy=f"isolated_{el.type}")
                 continue
 
             # 2. heading：硬边界（先 flush 当前 buf，heading 进入新 buf）
             if el.type == "heading":
                 flush()
-                buf.push_text(text, el.element_id)
+                buf.push_text(text, el.element_id, el_start, el_end)
                 # heading 之后还会接 paragraph，继续累积
                 continue
 
@@ -267,6 +334,13 @@ class StructuralChunker:
                             text=piece.text,
                             source_element_ids=[el.element_id],
                             metadata=meta,
+                            source_spans=[{
+                                "element_id": el.element_id,
+                                # piece.start/end 在 stripped text 坐标系；
+                                # el_start 是 stripped text 在 el.content 中的偏移
+                                "start": el_start + piece.start,
+                                "end": el_start + piece.end,
+                            }],
                         )
                     )
                     counter += 1
@@ -276,18 +350,39 @@ class StructuralChunker:
             projected = buf.length() + (1 if buf.length() > 0 else 0) + len(text)
             if projected > self.max_chars and not buf.is_empty():
                 flush()
-            buf.push_text(text, el.element_id)
+            buf.push_text(text, el.element_id, el_start, el_end)
 
         flush()
         return chunks
 
-    def _element_text(self, el: Element) -> str:
-        """获取 element 的可分块文本。"""
+    def _element_text_with_span(self, el: Element) -> tuple[str, int, int]:
+        """获取 element 的可分块文本与它在 el.content 中的字符区间。
+
+        返回 (stripped_text, start, end)：
+        - stripped_text = (el.content or "").strip()
+        - start = stripped_text 在 el.content 中的起始字符位置
+        - end = stripped_text 在 el.content 中的结束字符位置（exclusive）
+
+        image element 返回 ("", 0, 0)。
+        """
         if el.type == "image":
             # 图片本身没文本，但 metadata.caption 可以作为 chunk 内容
             # 本阶段不实现图片提取，所以图片 element 不参与分块
-            return ""
-        return (el.content or "").strip()
+            return "", 0, 0
+        raw = el.content or ""
+        if not raw:
+            return "", 0, 0
+        stripped = raw.strip()
+        if not stripped:
+            return "", 0, 0
+        # 用 lstrip 长度推算 stripped 在 raw 中的起点（不依赖 find，避免内容重复时定位错）
+        start = len(raw) - len(raw.lstrip())
+        end = start + len(stripped)
+        return stripped, start, end
+
+    # 兼容旧接口（如有调用方仍想要纯文本）
+    def _element_text(self, el: Element) -> str:
+        return self._element_text_with_span(el)[0]
 
 
 __all__ = ["StructuralChunker", "normalize_text"]

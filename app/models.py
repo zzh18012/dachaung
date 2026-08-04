@@ -53,12 +53,16 @@ class Chunk:
     """分块：表示一段可以独立检索的文本。
 
     `source_element_ids` 至少 1 个，确保可追溯到原始 Element。
+    `source_spans`（可选）给出每个被引用 element 在其 content 中的字符区间
+    `[start, end)`，用于字符级保留验证。空列表表示该 chunk 不带 span 信息
+    （向后兼容旧 chunker 输出）。
     """
 
     chunk_id: str
     text: str
     source_element_ids: list[str]
     metadata: dict[str, Any] = field(default_factory=dict)
+    source_spans: list[dict[str, Any]] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if not self.chunk_id:
