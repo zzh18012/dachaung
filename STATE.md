@@ -5160,3 +5160,85 @@ text_parser.py 136 行 212 tests（1.6 tests/line），仍有 helper 与错误�
 - 本 worktree（Round 104 后）：7019 pass / 0 fail / 13 skip（HEAD `d8377ff`）
 
 ---
+
+## Round 105（2026-08-05）：候选 DX — app/parsers/kreuzberg_parser.py 第三轮边角
+
+### 触发
+继 Round 104（text_parser 第三轮）后继续自跑。
+kreuzberg_parser.py 245 行 332 tests（1.36 tests/line），仍有 helper 与表格错误路径深度可补。
+
+### 实现
+- 新增 `tests/test_parsers_kreuzberg_edges3.py`（145 个测试）
+- 覆盖 app/parsers/kreuzberg_parser.py（245 行）的深度路径：
+  - **`_classify_line` 极端输入**：单字符 `#`/`##`/`######`/`#######`（>6 ATX 上限）
+    走短行启发式、`---`/`***`/`___`/`///`/三反引号/`|||` 全部误判为 heading
+  - **`_classify_line` tab/控制字符**：tab 作 `#` 后 `\s+` 分隔、tab/多空格前导 `#`
+    使 level 退到 1、内部 tab 保留、`# Hello\n` 仍匹配 ATX（`$` 在末换行前）、
+    `\r`/`\r\n`/`\v`/`\f` 各类边界
+  - **`_classify_line` 长度阈值边界**：恰好 80 字符 heading、81 字符 paragraph、
+    strip 影响长度检查、前导空白使行长但 text 短
+  - **`_classify_line` ATX 内部细节**：trailing dots、纯标点 raw_text、
+    内部多空格保留、trailing backslash、unicode 标点、纯数字、`4.2`（heading）vs
+    `42.`（paragraph）
+  - **`_HEADING_RE` 正则边界**：tab 后继、单 `#` 不匹配、7 hashes 不匹配、
+    6 hashes 匹配、纯标点 capture、unicode 单字 capture、Match 对象、锚点
+  - **`_split_content_to_elements` rest 含 ATX**：同 block 内 `# H1\n# H2` →
+    heading H1 + paragraph `# H2`（rest 不再分类）、heading 后多行 rest 内部
+    `\n` 保留、单 `\n` 不构成分隔符、`\r` 不被 `\n\s*\n` 匹配、paragraph
+    内部 newline count 精确
+  - **`_split_content_to_elements` 段落结构**：heading 后空 rest 不 emit、
+    短行 heading + ATX rest → paragraph、whitespace block 过滤、
+    1000 blocks stress（含唯一 ID 验证）、PDF locator 全用 page=1、
+    paragraph_index 递增、heading+rest 共享 incremented idx、
+    ATX heuristic=None / short_line heuristic='short_line'
+  - **`_make_locator` source_type 边界**：None/空/大写 PDF/含空白 PDF/未知 →
+    docx-like locator；negative index 在 docx 透传、PDF 忽略 paragraph_index
+  - **parse content/metadata 边界**：content=None→empty、
+    mime_type=None 透传、quality_score=None 透传、specific 值保留
+  - **parse kreuzberg_elements 边界**：None/[]/truthy 三态的 warning 行为
+  - **parse 表格边界**：cells 有但 markdown=None → ValueError（content 空）、
+    markdown 有但 cells=None → confidence=0.5、cells=[] → falsy、
+    cells=[[], []] → row=2 cell=0 confidence=0.8、
+    PDF bbox tuple → list 化、bbox 空/None → 不加 bbox key、
+    page_number=-1（truthy）保留、page_number=large 保留、
+    docx 多表 table_index 递增、metadata source 总是 'kreuzberg'
+  - **parse 警告顺序**：no_structured_elements 在 pdf_no_bbox 之前、
+    docx 不 emit no_bbox、PDF 含 elements 时只 emit no_bbox、
+    warning details 含 element_count_after_heuristic / source_type
+  - **parse 异常路径**：ValueError/RuntimeError/IOError 各类原异常类型捕获、
+    chained __cause__ 保留、kreuzberg_unavailable 在 file_not_found 之前、
+    unavailable 时 details 空 dict
+  - **Document 不变量**：parser_name=kreuzberg、version 与模块常量一致、
+    chunks/relations/errors 总是空、metadata 仅 2 keys、不同 source_hash
+    产生不同 document_id
+  - **复杂场景**：DOCX/PDF 各自 locator（heading 用 paragraph_index / page=1）
+  - **include_document_structure 参数**：默认 True / 显式 False 都透传到 config
+  - **模块结构**：_HEADING_RE 是 compiled、_SHORT_LINE_MAX=80、
+    _KREUZBERG_AVAILABLE 是 bool、kreuzberg 可用时 _KREUZBERG_IMPORT_ERROR
+    **未定义**、kreuzberg/ExtractionConfig 已 import、所有 import 验证、
+    __init__ keyword-only、parse 签名精确
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_split_content_to_elements("line1\nline2")` 实际产生 2 元素（heading +
+  paragraph），因为 "line1" ≤80 字符无终止符 → 走短行启发式 heading。
+  修复：行末加 `.` 强制走 paragraph 路径
+- wall 2：3 个 SyntaxWarning（`\s` 在 docstring 内非法转义）→ 改用 r-string
+- wall 3：`cells=[["a","b"]]` + `markdown=None` 实际抛 ValueError（Element
+  __post_init__ 校验 content 或 resource_path 必须非空）→ 改测试 expect ValueError
+
+### 下一步建议
+- 候选 DY：app/chunkers/structural.py 第四轮（已有 edges3）
+- 候选 DZ：app/parsers/fallback_parser.py 第四轮（已有 edges3）
+- 候选 EA：evaluation/__init__.py 边角（28 行 14 tests via test_packages_init）
+- 候选 EB：evaluation/cli.py 第四轮（已有 edges3，243 行）
+- 候选 EC：app/cli.py 第四轮（已有 edges3，~250 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DY（structural.py 第四轮，进一步饱和测试密度）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 105 后）：7164 pass / 0 fail / 13 skip（HEAD `9f998c1`）
+
+---
