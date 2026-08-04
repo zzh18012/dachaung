@@ -3370,3 +3370,46 @@
 - 本 worktree（Round 73 后）：3422 pass / 0 fail / 12 skip（HEAD `c9e23f3`）
 
 ---
+
+## Round 74（2026-08-05）：候选 CF — app/chunkers/structural.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CF：新建 `tests/test_chunker_edges2.py`（100 个测试）覆盖 `app/chunkers/structural.py` 的深度边角，与已有 `test_chunker.py`（129）+ `test_chunker_edges.py`（85）互补。
+- 重点覆盖项：
+  - **normalize_text Unicode 空白字符** 22 个：完整覆盖 ASCII（\t\n\r\v\f）、U+00A0 NBSP、U+1680 Ogham、U+2000-U+200A 各种空格、U+2028/U+2029 行/段分隔、U+202F/U+205F/U+3000/U+FEFF；混合多种空白；连续多个；首尾混合 strip；大字符串 idempotent；保留 Unicode letters（中文）；保留 emoji；不改大小写
+  - **_WHITESPACE_RE pattern** 5 个：search 多种混合、sub 压成单空格、不匹配 letters/digits、匹配 Unicode 空白
+  - **_HARD_BREAK_LANGS** 5 个：6 项 tuple、含中英文标点
+  - **_ChunkBuffer 深度** 13 个：default counter=0、push_text+flush 递增 counter、chunk_id 含 document_id、char_count 等于 len(text)、strategy metadata、max_chars metadata、source_element_ids 去重（同 element 多次 push）、flush 返 Chunk、text 用单空格 join、is_empty 三态（initial/push 后/flush 后）
+  - **_SplitPiece 深度** 8 个：text/boundary_after/start/end 字段；boundary_after None 与 explicit；frozen dataclass（FrozenInstanceError）；相等性（同值等、不同 text/start 不等）
+  - **_split_long_text 深度** 7 个：空返 []；whitespace-only 返 []；短返单 piece；exact max_chars 不切；max_chars+1 切；句子分隔；每 piece <= max_chars+5 容差；normalize(join) == normalize(orig)
+  - **_hard_split_with_whitespace_fallback 深度** 7 个：空返 []；whitespace-only 返 []；短返单 piece；whitespace 优先切；无 whitespace forced char 兜底；每 piece <= max_chars；start/end bounds 不溢出
+  - **StructuralChunker 深度** 13 个：default max_chars=800；explicit；minimum=32；<32/0/negative raise ValueError；chunk 返 list；空 doc 返 []；单 paragraph；多 paragraph；heading 硬边界（每个 heading 起新 chunk）；chunk_id 含 document_id；多 chunk chunk_id 唯一；metadata max_chars/char_count；image 无 content 跳过；caption 隔离；table 隔离
+  - **模块导入** 6 个：callable 验证；re/dataclass 模块属性
+- 无源码改动。
+
+### 撞墙记录
+- 墙 1：`ImportError: cannot import name '_Part'` —— structural.py 用的是常量 `_PART_TEXT=0` 等，没有 `_Part` 类。修复：从 import 列表中移除 `_Part`。
+- 墙 2：`TypeError: _ChunkBuffer.flush() takes 1 positional argument but 2 were given` —— flush 签名是 `flush(self, *, strategy: str, max_chars: int)` keyword-only。修复：所有 `b.flush(800)` 改为 `b.flush(strategy="sequential", max_chars=800)`，并加返回值 None 检查。
+- 墙 3：`TypeError: _SplitPiece.__init__() missing 1 required positional argument: 'boundary_after'` —— _SplitPiece 必填 boundary_after。修复：所有构造加 `boundary_after=None`。
+- 墙 4：`NameError: name 'max_chars' is not defined` —— 两个测试循环中引用了不存在的 `max_chars` 变量。修复：硬编码 50 与 10。
+- 墙 5：`UnboundLocalError: cannot access local variable 'i'` —— test_chunker_chunk_id_increments 先在 list comprehension 引用 i 再在 for 循环定义。修复：删掉无用的 elements 列表。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CL：app/parsers/markdown_parser.py 边角
+- 候选 CM：app/parsers/html_parser.py 边角
+- 候选 CN：app/parsers/text_parser.py 边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CL（app/parsers/markdown_parser.py 边角）。理由：
+1. markdown_parser.py 是纯 Python 实现的解析器（无外部依赖）
+2. 含 heading/paragraph/list/blockquote/code_block 处理逻辑，结构清晰
+3. 与已覆盖的 structural.py / cli.py / pipeline.py 形成 app/ 内的核心模块完整闭环
+4. CE（runner.py 第二轮）需要构造完整 manifest+report，复杂度高，更适合留给后续轮次
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 74 后）：3522 pass / 0 fail / 12 skip（HEAD `4ba3456`）
+
+---
