@@ -3844,3 +3844,61 @@
 - 本 worktree（Round 81 后）：4578 pass / 0 fail / 12 skip（HEAD `b31aef4`）
 
 ---
+
+## Round 82（2026-08-05）：候选 CE — evaluation/runner.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CE：新建 `tests/test_evaluation_runner_edges2.py`（120 个测试 + 1 skip）覆盖
+  `evaluation/runner.py`（227 行）的深度边角，与已有 `test_evaluation_runner.py`（59）+
+  `test_evaluation_runner_edges.py`（65）互补。
+- 重点覆盖项：
+  - **_load_annotation 第二轮** 19 个：空文件、仅空白、trailing comma、单引号、
+    注释、JSON 数组/null/integer/float/exponent、嵌套子目录路径、孤立 brace、
+    OSError monkeypatch、emoji、symlink、directory 路径
+  - **_process_one 第二轮** 21 个：5-tuple 类型、document_dict 字段验证、
+    error_dict 详细字段、failure 时 total_seconds 类型、_per_doc 目录创建、
+    out_stub 命名约定、max_chars 边界、parser_name='kreuzberg' 也可调用、
+    两次调用独立计时、image_dir None 严格、PDF source_type、
+    fallback parser_version 含 pdfplumber
+  - **run_evaluation 第二轮** 53 个：summary/provenance/devset 字段、
+    output JSON 可重读、deeply nested output dir、private 字段不泄露、
+    per_doc keys 完整集合、wall_time keys 5 个完整集合、
+    parse/chunk 始终 None、reasons 始终 not_instrumented、
+    doc_id 透传、expected_failure 4 字段集合、多文档顺序保持、
+    parser_version first-non-None wins、mixed success+failure、
+    PDF source_type、devset 字段（status/file_count/pdf_count/docx_count/
+    content_group_count）、provenance git 字段、run_timestamp_iso 修正、
+    project_root 不写入 provenance、tolerance_chars 透传、
+    extreme max_chars/tolerance_chars 不崩
+  - **模块结构** 23 个：__all__、所有 import、signature 验证、
+    keyword-only 参数、默认值验证、return annotation
+  - **不变量** 4 个：report_version 来自 REPORT_VERSION、top-level keys 完整集合
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_run_evaluation_output_root_is_output_path_parent` 用空 manifest，
+  但 _per_doc 目录只在有 documents 时才创建。修复：测试改加一个 doc。
+- wall 2：`devset_status` 字段名错误，实际是 `status`。修复：改为读 `result["devset"]["status"]`。
+- wall 3：`run_timestamp` 字段不存在，实际是 `run_timestamp_iso`。修复。
+- wall 4：`project_root` / `git_branch` 不在 provenance dict 中（前者只是参数，
+  后者根本不存在）。修复：改为 `git_dirty` + `project_root` 不存在的反向断言。
+- wall 5：最后 4 个 test_* 函数忘记加 `tmp_path` 参数 → NameError。修复。
+
+### 下一步建议
+- 候选 CQ：evaluation/reporter.py 边角（第二轮）— 但实际 reporter 模块叫 report.py
+- 候选 CR：evaluation/manifest.py 边角（第二轮）
+- 候选 CS：evaluation/adapter.py（实际叫 metrics.py）边角（第二轮）
+- 候选 CT：evaluation/annotation_metrics.py 边角（第二轮）
+- 候选 CU：evaluation/schema.py / schema_validation.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CR（evaluation/manifest.py 边角第二轮）。理由：
+1. manifest.py 是评测的输入契约（路径校验、path 必须相对项目根、拒绝绝对路径/反斜杠）
+2. 与 runner.py 的入口紧密耦合，第二轮覆盖能闭环 evaluation/ 输入侧
+3. 含大量边界（路径校验、JSON schema、source_type 推断）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 82 后）：4698 pass / 0 fail / 13 skip（HEAD `5ceb688`）
+
+---
