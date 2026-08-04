@@ -47,11 +47,14 @@ def _process_one(
     output_root: Path,
     parser_name: str,
     max_chars: int,
-) -> tuple[dict[str, Any] | None, dict[str, Any] | None, float, str | None, Path]:
+) -> tuple[dict[str, Any] | None, dict[str, Any] | None, float, str | None, Path | None]:
     """跑 process_single，返回 (document_dict, error_dict, total_seconds, parser_version, image_dir)。
 
     使用 write_json=False 但 output_path 给定，使 pipeline 推导出 image_output_dir
     并把图片落盘。返回 image_dir 让 metrics 校验 resource_path 时使用。
+
+    image_dir 在 document 为 None 时也返回 None（而非 Path()——前者会让下游把 cwd
+    当作 image_base_dir，是 bug）。
     """
     # 用 doc_id 作目录名，避免不同 doc 的 images-<sha> 混在一起难以归属
     out_stub = output_root / "_per_doc" / f"{doc.doc_id}.json"
@@ -85,16 +88,16 @@ def _process_one(
             pass
 
     if errors:
-        return None, errors[0].to_dict(), elapsed, None, image_dir or Path()
+        return None, errors[0].to_dict(), elapsed, None, image_dir
     if document is None:
         return (
             None,
             {"code": "unknown", "message": "process_single returned None without errors"},
             elapsed,
             None,
-            image_dir or Path(),
+            image_dir,
         )
-    return document.to_dict(), None, elapsed, document.parser_version, image_dir or Path()
+    return document.to_dict(), None, elapsed, document.parser_version, image_dir
 
 
 def run_evaluation(
@@ -124,7 +127,7 @@ def run_evaluation(
             error=error,
             source_type=doc.source_type,
             expectations=doc.expectations,
-            image_base_dir=image_dir if image_dir.is_dir() else None,
+            image_base_dir=image_dir if (image_dir is not None and image_dir.is_dir()) else None,
         )
 
         annotation = _load_annotation(doc.annotation_resolved)

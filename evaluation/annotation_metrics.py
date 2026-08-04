@@ -115,12 +115,15 @@ def chunk_boundary_prf(
         pos = end + 1  # 跨过空格
 
     # 3. 标注 anchor → stream 位置
+    # 重复 marker 顺序定位：每个 anchor 的搜索起点是上一个 anchor 之后，
+    # 否则两个相同 marker 都会命中第 1 次出现，丢失第 2 个的真实位置。
     gt_positions: list[int] = []
     missing_markers: list[str] = []
+    search_from = 0
     for a in anchors:
         marker = a.get("marker", "")
         position = a.get("position", "after")
-        find_pos = stream.find(marker)
+        find_pos = stream.find(marker, search_from) if marker else -1
         if find_pos < 0:
             missing_markers.append(marker)
             continue
@@ -128,6 +131,9 @@ def chunk_boundary_prf(
             gt_positions.append(find_pos)
         else:  # "after"
             gt_positions.append(find_pos + len(marker))
+        # 推进起点：下一个 anchor 从当前 marker 末尾开始找。
+        # 不允许两个 anchor 共享同一 stream 位置（一对一边界语义）。
+        search_from = find_pos + len(marker)
 
     # 4. 一对一匹配（贪心：按 (|pred - gt|) 升序）
     pairs: list[tuple[int, int, int]] = []  # (distance, pred_idx, gt_idx)

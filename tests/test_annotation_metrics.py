@@ -188,3 +188,93 @@ def test_chunk_boundary_tolerance_recorded_in_output():
     doc = _doc_with_chunks(chunks)
     out = chunk_boundary_prf(doc, None, tolerance_chars=42)
     assert out["_tolerance_chars"]["value"] == 42
+
+
+# ---------- chunk_boundary: 重复 marker（bug 回归） ----------
+
+
+def test_chunk_boundary_repeated_marker_finds_distinct_positions():
+    """两个 anchor 用相同 marker 文本，应分别定位到 stream 中第 1 个和第 2 个出现位置。
+
+    构造：c0 = "the cat"，c1 = "the dog" → stream = "the cat the dog"
+    - "the" 第 1 次出现 at pos 0
+    - "the" 第 2 次出现 at pos 8（"the cat " 长度 8）
+
+    两个 anchor 都用 marker="the" position="before"，期望分别命中 pos 0 与 pos 8。
+    预测边界：c0 末尾 = 7（"the cat" 长度 7）。
+
+    tolerance=2 时：
+    - anchor@0 与 pred@7 距离 7 → 不命中
+    - anchor@8 与 pred@7 距离 1 → 命中
+
+    precision = 1/1 = 1.0
+    recall = 1/2 = 0.5（一个 anchor 命中，一个不命中）
+
+    若 bug 未修：两个 anchor 都定位到 pos 0，距离都是 7，都不命中，
+    recall 会变成 0.0。
+    """
+    chunks = [
+        _chunk("c0", "the cat", ["e0"]),
+        _chunk("c1", "the dog", ["e1"]),
+    ]
+    doc = _doc_with_chunks(chunks)
+    annotation = {
+        "doc_id": "x",
+        "chunk_boundary_anchors": [
+            {"marker": "the", "position": "before", "reason": "first"},
+            {"marker": "the", "position": "before", "reason": "second"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=2)
+    assert out["chunk_boundary_precision"]["value"] == 1.0
+    assert out["chunk_boundary_recall"]["value"] == 0.5
+
+
+def test_chunk_boundary_repeated_marker_after_position():
+    """position="after" 的两个相同 marker 也应分别定位到不同 stream 位置。
+
+    构造：c0 = "X end"，c1 = "Y end"，c2 = "Z end"
+    stream = "X end Y end Z end"（19 字符）
+    预测边界（c0 末尾、c1 末尾）：5、11
+    anchors（两个 "end" after）：第 1 个 end 在 pos 2，after → 5；第 2 个 end 在 pos 8，after → 11
+    → 完美一对一匹配，precision = recall = 1.0
+
+    若 bug 未修：两个 anchor 都定位到 pos 2 → gt_positions = [5, 5]，
+    一对一约束只能命中 1 个，recall = 0.5。
+    """
+    chunks = [
+        _chunk("c0", "X end", ["e0"]),
+        _chunk("c1", "Y end", ["e1"]),
+        _chunk("c2", "Z end", ["e2"]),
+    ]
+    doc = _doc_with_chunks(chunks)
+    annotation = {
+        "doc_id": "x",
+        "chunk_boundary_anchors": [
+            {"marker": "end", "position": "after", "reason": "1st"},
+            {"marker": "end", "position": "after", "reason": "2nd"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=0)
+    assert out["chunk_boundary_precision"]["value"] == 1.0
+    assert out["chunk_boundary_recall"]["value"] == 1.0
+
+
+def test_chunk_boundary_repeated_marker_not_found_after_exhausted():
+    """若相同 marker 出现次数 < anchor 数，多余的 anchor 应进 missing_markers。"""
+    chunks = [
+        _chunk("c0", "once", ["e0"]),
+        _chunk("c1", "twice", ["e1"]),
+    ]
+    # stream = "once twice"，"once" 只出现 1 次
+    doc = _doc_with_chunks(chunks)
+    annotation = {
+        "doc_id": "x",
+        "chunk_boundary_anchors": [
+            {"marker": "once", "position": "after", "reason": "1st"},
+            {"marker": "once", "position": "after", "reason": "2nd-or-missing"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=100)
+    # 第 2 个 "once" 找不到 → 进 missing_markers
+    assert out["_missing_markers"]["value"] == ["once"]
