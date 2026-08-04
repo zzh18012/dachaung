@@ -5308,3 +5308,70 @@ fallback_parser.py 630 行 421 tests（0.67 tests/line），仍有 _parse_docx �
 - 本 worktree（Round 106 后）：7279 pass / 0 fail / 13 skip（HEAD `678e0e6`）
 
 ---
+
+## Round 107（2026-08-05）：候选 EC — app/cli.py 第四轮边角
+
+### 触发
+继 Round 106（fallback_parser 第四轮）后继续自跑。
+app/cli.py 535 行 357 tests（0.67 tests/line），仍有 _load_document_json 非 dict 根、_format_summary 含 relations、_preview CJK 等深度路径未覆盖。
+
+### 实现
+- 新增 `tests/test_cli_edges4.py`（137 个测试）
+- 覆盖 app/cli.py（535 行）的深度路径：
+  - **`_load_document_json`**：null/number/string/bool 根、空对象、空数组、
+    含数据数组、返回 tuple 类型、错误消息含路径、UTF-8 BOM（容忍双行为）
+  - **`_preview`**：CJK unicode 保留、CJK 截断、emoji 保留、特殊字符、
+    `\n`/`\r`/`\v`/`\f` 各类控制字符归一、width=0/1/2 边界、width huge 返回全文、
+    负 width 总是截断
+  - **`_emit_structured_error`**：extra 含 None/nested dict/list/int/bool 值、
+    stdout 空、返回 None
+  - **`_format_summary`**：含 relations data、chunks text=None、
+    chunks 无 source_element_ids、source_hash missing/short/empty、
+    warnings 截断 5（5/6/7 边界）、errors 含 code+message、
+    elements 无 type 用 ?=1、chunks avg 整数格式、chunks refs avg 1 位小数、
+    schema_version 显示、返回 str
+  - **`_format_elements_list`**：所有 key 缺失、长 content 截断、width 边界、
+    limit > count 无 marker、limit=0 全列、parent_id=""省略、返回 str
+  - **`_format_chunks_list`**：返回 str、limit=0 全列、show_spans + no/empty/actual spans、
+    missing chunk_id、text="" → chars=0、limit > count 无 marker
+  - **`_iter_supported_files`**：大写/混合大小写扩展名、空目录、仅 unsupported、
+    返回 list、混合 supported/unsupported、recursive 找子目录、非递归忽略子目录、
+    recursive 跳过目录本身
+  - **`_relative_output_path`**：Windows 反斜杠归一、root 文件、deeply nested、
+    多 dots 文件名、无扩展名文件、返回 Path
+  - **`_infer_parser_name`**：lowercase/uppercase PDF、no extension、
+    unknown extension (csv/json)、dotfile、返回 str
+  - **`_EXTENSION_TO_PARSER`**：count=9、keys 全 lowercase + dot 前缀、
+    values 集合精确、pdf+docx 都映射 fallback、kreuzberg 不在 values
+  - **`_build_arg_parser`**：prog=app.cli、description 含 PDF/DOCX、
+    subparsers required、4 subcommand 存在、--recursive/--parser/--max-chars、
+    inspect --limit 0/-1/int/non-int 边界、返回 ArgumentParser
+  - **`main`**：inspect 不存在文件 rc=2、inspect 仅 summary rc=0、
+    inspect --elements/--chunks/--spans 各种组合、limit 截断 +15 more、
+    limit=0 全列、invalid JSON rc=1、top-level array/string rc=1、
+    validate/parse/parse-dir 各种 rc、unknown command/no command SystemExit
+  - **模块结构**：所有 import (argparse/json/sys/Path/process_single/validate_only)、
+    所有 helper 函数存在、main/_build_arg_parser callable
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_load_document_json` UTF-8 BOM 行为：Python json.load 默认不接受 BOM 前缀，
+  返回 (None, JSONDecodeError)。改测试为容忍双行为（与现有 edges 测试一致）
+- wall 2：`_preview("short", width=0)` 实际返回 "shor…"（不是空字符串），
+  因为 `collapsed[:0-1] + "…"` = `collapsed[:-1] + "…"`。改测试断言 endswith("…")
+
+### 下一步建议
+- 候选 ED：app/pipeline.py 第四轮
+- 候选 EE：app/chunkers/structural.py 第四轮（已有 edges3）
+- 候选 EF：app/schema.py 第四轮
+- 候选 EG：evaluation/__init__.py 边角（28 行 14 tests）
+- 候选 EH：evaluation/cli.py 第四轮（已有 edges3）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 EE（structural.py 第四轮），饱和分块器测试。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 107 后）：7416 pass / 0 fail / 13 skip（HEAD `3c2a910`）
+
+---
