@@ -488,3 +488,312 @@ def test_render_pdf_image_region_verbose_degenerate_bbox(tmp_path: Path):
     err = _render_pdf_image_region_verbose(p, 0, [0.0, 0.0, 0.0, 0.0], out)
     assert err is not None
     assert "crop" in err.lower() or "退化" in err or "size" in err.lower()
+
+
+# ---------- 边角与缺漏补强（Round 30） ----------
+
+
+# _is_heading_style 更多边角
+
+
+def test_is_heading_style_with_whitespace():
+    """含首尾空格的 style 名应被 strip。"""
+    assert _is_heading_style("  Heading 1  ") == (True, 1)
+
+
+def test_is_heading_style_heading_zero_floors_to_one():
+    """Heading 0 → max(1, 0) = 1（heading 级别不能小于 1）。"""
+    assert _is_heading_style("Heading 0") == (True, 1)
+
+
+def test_is_heading_style_heading_negative_floors_to_one():
+    """Heading -1 → int 解析成功 → max(1,-1)=1。"""
+    # 注意：'heading-1' replace 'heading' → '-1'，int('-1')=-1，max(1,-1)=1
+    assert _is_heading_style("heading-1") == (True, 1)
+
+
+def test_is_heading_style_title_case_insensitive():
+    """TITLE / Title / title 都识别。"""
+    assert _is_heading_style("TITLE") == (True, 1)
+    assert _is_heading_style("Title") == (True, 1)
+    assert _is_heading_style("title") == (True, 1)
+
+
+def test_is_heading_style_heading_with_non_numeric_suffix_falls_back_to_one():
+    """Heading ABC → int('ABC') 抛 ValueError → fallback level=1。"""
+    is_h, level = _is_heading_style("HeadingABC")
+    assert is_h is True
+    assert level == 1
+
+
+def test_is_heading_style_normal_not_heading():
+    assert _is_heading_style("Normal") == (False, 0)
+
+
+def test_is_heading_style_empty_string():
+    assert _is_heading_style("") == (False, 0)
+
+
+# _is_caption 更多边角（含 Unicode 全角数字与混合形式）
+
+
+def test_is_caption_full_width_digits():
+    """全角数字 ０１２３ 也应被识别。"""
+    assert _is_caption("Figure ５: Architecture")
+    assert _is_caption("表 ３. 实验结果")
+
+
+def test_is_caption_chinese_with_dot():
+    """中文 '表 3.' 也应识别（'.' 在字符类里）。"""
+    assert _is_caption("表 3. 实验设计")
+
+
+def test_is_caption_dot_after_abbreviation():
+    """Fig.（带缩写点）也应识别。"""
+    assert _is_caption("Fig. 5: diagram")
+    assert _is_caption("Fig 5: diagram")
+
+
+def test_is_caption_no_separator_rejected():
+    """缺分隔符（直接接内容）→ 不识别。"""
+    assert not _is_caption("FigureHello")
+    assert not _is_caption("TableData")
+
+
+def test_is_caption_only_number_rejected():
+    """只有数字（无前缀）→ 不识别。"""
+    assert not _is_caption("5")
+    assert not _is_caption("3.14")
+
+
+def test_is_caption_full_word_required():
+    """'Table' 不能是 'Tabl' 的前缀。"""
+    assert not _is_caption("Tabl 3: x")
+
+
+# _classify_pdf_paragraph 更多边角
+
+
+def test_classify_pdf_paragraph_caption_priority_over_heading():
+    """caption 优先级高于 heading：caption regex 命中应返 caption。"""
+    t, meta = _classify_pdf_paragraph("Figure 5: chart")
+    assert t == "caption"
+    assert meta["heuristic"] == "caption_regex"
+
+
+def test_classify_pdf_paragraph_short_line_with_period_is_paragraph():
+    """短行但以句号结尾 → paragraph。"""
+    t, _ = _classify_pdf_paragraph("End.")
+    assert t == "paragraph"
+
+
+def test_classify_pdf_paragraph_short_line_no_period_is_heading():
+    """短行无句末标点 → heading。"""
+    t, meta = _classify_pdf_paragraph("Section Title")
+    assert t == "heading"
+    assert meta["heuristic"] == "short_line"
+
+
+def test_classify_pdf_paragraph_long_text_is_paragraph():
+    t, _ = _classify_pdf_paragraph(
+        "This is a very long paragraph that exceeds eighty characters "
+        "and should definitely be classified as a paragraph by the heuristic."
+    )
+    assert t == "paragraph"
+
+
+def test_classify_pdf_paragraph_chinese_short_no_period():
+    """中文短行（无中文句号）→ heading。"""
+    t, _ = _classify_pdf_paragraph("章节标题")
+    assert t == "heading"
+
+
+def test_classify_pdf_paragraph_chinese_short_with_period():
+    """中文短行带句号 → paragraph。"""
+    t, _ = _classify_pdf_paragraph("这是一个完整句子。")
+    assert t == "paragraph"
+
+
+# _lines_to_para 直接单测
+
+
+def test_lines_to_para_empty_returns_empty_dict():
+    from app.parsers.fallback_parser import _lines_to_para
+    result = _lines_to_para([])
+    assert result == {"text": "", "bbox": None}
+
+
+def test_lines_to_para_single_line_multiple_words():
+    """单行多 word → text 用空格连接，bbox 横向延伸。"""
+    from app.parsers.fallback_parser import _lines_to_para
+    line = [
+        {"text": "Hello", "x0": 0.0, "x1": 50.0, "top": 10.0, "bottom": 30.0},
+        {"text": "world", "x0": 60.0, "x1": 110.0, "top": 10.0, "bottom": 30.0},
+    ]
+    result = _lines_to_para([line])
+    assert result["text"] == "Hello world"
+    # bbox = [min x0, min top, max x1, max bottom]
+    assert result["bbox"] == [0.0, 10.0, 110.0, 30.0]
+
+
+def test_lines_to_para_two_lines_y_separation():
+    """两行 → text 用空格分隔，bbox 纵向延伸。"""
+    from app.parsers.fallback_parser import _lines_to_para
+    lines = [
+        [{"text": "first", "x0": 0.0, "x1": 30.0, "top": 10.0, "bottom": 25.0}],
+        [{"text": "second", "x0": 0.0, "x1": 40.0, "top": 50.0, "bottom": 65.0}],
+    ]
+    result = _lines_to_para(lines)
+    assert "first" in result["text"]
+    assert "second" in result["text"]
+    # bbox 跨两行
+    assert result["bbox"] == [0.0, 10.0, 40.0, 65.0]
+
+
+def test_lines_to_para_unsorted_words_in_line_sorted_by_x0():
+    """同一行内 word 顺序乱 → 应按 x0 排序后再 join。"""
+    from app.parsers.fallback_parser import _lines_to_para
+    line = [
+        {"text": "world", "x0": 60.0, "x1": 110.0, "top": 10.0, "bottom": 30.0},
+        {"text": "Hello", "x0": 0.0, "x1": 50.0, "top": 10.0, "bottom": 30.0},
+        {"text": "!", "x0": 120.0, "x1": 125.0, "top": 10.0, "bottom": 30.0},
+    ]
+    result = _lines_to_para([line])
+    assert result["text"] == "Hello world !"
+
+
+# _group_words_to_paragraphs 更多聚类场景
+
+
+def test_group_words_three_lines_one_paragraph():
+    """3 行紧贴（行距正常）→ 1 个段落。"""
+    from app.parsers.fallback_parser import _group_words_to_paragraphs
+    words = [
+        {"text": "a", "x0": 0.0, "x1": 10.0, "top": 10.0, "bottom": 22.0},
+        {"text": "b", "x0": 0.0, "x1": 10.0, "top": 30.0, "bottom": 42.0},
+        {"text": "c", "x0": 0.0, "x1": 10.0, "top": 50.0, "bottom": 62.0},
+    ]
+    paragraphs = _group_words_to_paragraphs(words)
+    # 行间距 8px << median height * 1.5 → 应聚合为 1 段
+    assert len(paragraphs) == 1
+
+
+def test_group_words_two_paragraphs_split_by_large_gap():
+    """大行距 → 2 个段落。"""
+    from app.parsers.fallback_parser import _group_words_to_paragraphs
+    # 第一组：top=10, bottom=22；第二组：top=200, bottom=212
+    # gap = 200 - 22 = 178 >> 22*1.5=33 → 拆段
+    words = [
+        {"text": "first", "x0": 0.0, "x1": 30.0, "top": 10.0, "bottom": 22.0},
+        {"text": "second", "x0": 0.0, "x1": 30.0, "top": 200.0, "bottom": 212.0},
+    ]
+    paragraphs = _group_words_to_paragraphs(words)
+    assert len(paragraphs) == 2
+    assert "first" in paragraphs[0]["text"]
+    assert "second" in paragraphs[1]["text"]
+
+
+def test_group_words_words_with_default_top_bottom():
+    """word 缺 top/bottom 字段时，默认 0.0，不应崩溃。"""
+    from app.parsers.fallback_parser import _group_words_to_paragraphs
+    words = [
+        {"text": "x", "x0": 0.0, "x1": 10.0},  # 无 top/bottom
+    ]
+    paragraphs = _group_words_to_paragraphs(words)
+    assert len(paragraphs) == 1
+    assert paragraphs[0]["text"] == "x"
+
+
+# _image_filename 更多边角
+
+
+def test_image_filename_jpg_extension():
+    from app.parsers.fallback_parser import _image_filename
+    # 实际格式：image_<safe_doc>_<prefix>_<idx:02d>.<ext>
+    # safe_doc 是去掉 'doc-' 前缀的 document_id
+    assert _image_filename("doc-x", "img", 0, ext="jpg") == "image_x_img_00.jpg"
+
+
+def test_image_filename_two_digit_index_padding():
+    """index 用 02d 格式（两位补 0）。"""
+    from app.parsers.fallback_parser import _image_filename
+    assert _image_filename("doc-x", "img", 7, ext="png") == "image_x_img_07.png"
+    assert _image_filename("doc-x", "img", 42, ext="png") == "image_x_img_42.png"
+
+
+def test_image_filename_default_ext_is_png():
+    from app.parsers.fallback_parser import _image_filename
+    assert _image_filename("doc-x", "img", 0) == "image_x_img_00.png"
+
+
+def test_image_filename_strips_doc_prefix():
+    """document_id 含 'doc-' 前缀应被剥离。"""
+    from app.parsers.fallback_parser import _image_filename
+    assert _image_filename("doc-abcdef", "p1", 0) == "image_abcdef_p1_00.png"
+
+
+def test_image_filename_without_doc_prefix_preserved():
+    """document_id 不以 'doc-' 开头时原样使用。"""
+    from app.parsers.fallback_parser import _image_filename
+    assert _image_filename("custom-id", "p1", 0) == "image_custom-id_p1_00.png"
+
+
+# _extract_inline_image_rids 直接单测（需要构造 docx XML element）
+
+
+def test_extract_inline_image_rids_no_drawings_returns_empty():
+    """XML element 内没有 <w:drawing> → 返回空 list。"""
+    from app.parsers.fallback_parser import _extract_inline_image_rids
+    from lxml import etree
+
+    p_xml = etree.fromstring(
+        '<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>'
+    )
+    rids = _extract_inline_image_rids(p_xml)
+    assert rids == []
+
+
+def test_extract_inline_image_rids_finds_embedded_blip():
+    """XML 内有 <w:drawing><a:blip r:embed="rId5"/>... → 返回 ['rId5']。"""
+    from app.parsers.fallback_parser import _extract_inline_image_rids
+    from lxml import etree
+
+    xml_str = """<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+      xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <w:r><w:drawing><a:blip r:embed="rId5"/></w:drawing></w:r>
+    </w:p>"""
+    p_xml = etree.fromstring(xml_str)
+    rids = _extract_inline_image_rids(p_xml)
+    assert rids == ["rId5"]
+
+
+def test_extract_inline_image_rids_multiple_drawings():
+    """多个 drawing element → 收集所有 rId。"""
+    from app.parsers.fallback_parser import _extract_inline_image_rids
+    from lxml import etree
+
+    xml_str = """<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+      xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <w:r><w:drawing><a:blip r:embed="rId1"/></w:drawing></w:r>
+      <w:r><w:drawing><a:blip r:embed="rId2"/></w:drawing></w:r>
+    </w:p>"""
+    p_xml = etree.fromstring(xml_str)
+    rids = _extract_inline_image_rids(p_xml)
+    assert rids == ["rId1", "rId2"]
+
+
+def test_extract_inline_image_rids_link_only():
+    """r:link 而非 r:embed 也应被识别。"""
+    from app.parsers.fallback_parser import _extract_inline_image_rids
+    from lxml import etree
+
+    xml_str = """<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+      xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+      <w:r><w:drawing><a:blip r:link="rId7"/></w:drawing></w:r>
+    </w:p>"""
+    p_xml = etree.fromstring(xml_str)
+    rids = _extract_inline_image_rids(p_xml)
+    assert rids == ["rId7"]
