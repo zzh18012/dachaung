@@ -478,3 +478,281 @@ def test_silent_drop_extra_actual_not_counted():
     expectations = {"element_count_by_type": {"heading": 1, "table": 1}}
     m = compute_automatic_metrics(doc, None, "docx", expectations)
     assert m["silent_drop_count"]["value"] == 0
+
+
+# ---------- 边角与缺漏补强（Round 22） ----------
+
+
+# 直接测试内部 helper
+
+
+def test_is_valid_bbox_rejects_non_list():
+    from evaluation.metrics import _is_valid_bbox
+    assert _is_valid_bbox(None) is False
+    assert _is_valid_bbox("0,0,1,1") is False
+    assert _is_valid_bbox((0, 0, 1, 1)) is False  # tuple 不接受
+
+
+def test_is_valid_bbox_rejects_wrong_length():
+    from evaluation.metrics import _is_valid_bbox
+    assert _is_valid_bbox([]) is False
+    assert _is_valid_bbox([0, 0, 1]) is False
+    assert _is_valid_bbox([0, 0, 1, 1, 1]) is False
+
+
+def test_is_valid_bbox_rejects_bool_even_though_int():
+    """bool 是 int 的子类，但 bbox 不应接受 True/False。"""
+    from evaluation.metrics import _is_valid_bbox
+    assert _is_valid_bbox([0, 0, 1, True]) is False
+    assert _is_valid_bbox([False, 0, 0, 1]) is False
+
+
+def test_is_valid_bbox_rejects_nan_and_inf():
+    """NaN / Infinity 不是有限数。"""
+    from evaluation.metrics import _is_valid_bbox
+    assert _is_valid_bbox([0, 0, 1, float("nan")]) is False
+    assert _is_valid_bbox([0, 0, 1, float("inf")]) is False
+    assert _is_valid_bbox([0, 0, float("-inf"), 1]) is False
+
+
+def test_is_valid_bbox_accepts_int_and_float():
+    from evaluation.metrics import _is_valid_bbox
+    assert _is_valid_bbox([0, 0, 100, 200]) is True
+    assert _is_valid_bbox([0.5, 1.5, 10.0, 20.0]) is True
+
+
+def test_strip_unicode_whitespace_removes_all_kinds():
+    """NBSP、em space、en space、ideographic space、line/paragraph separator 都应被删除。"""
+    from evaluation.metrics import _strip_unicode_whitespace
+    # ASCII space + NBSP(U+00A0) + en space(U+2002) + em space(U+2003) + ideographic(U+3000)
+    s = "a b c d e　f"
+    assert _strip_unicode_whitespace(s) == "abcdef"
+    # line separator U+2028, paragraph separator U+2029
+    assert _strip_unicode_whitespace("x y z") == "xyz"
+    # ASCII tabs/newlines
+    assert _strip_unicode_whitespace("\t\r\n h i \n") == "hi"
+
+
+# 各种 null/边界路径
+
+
+def test_pdf_locator_no_elements_returns_null():
+    """没有 elements 时返回 no_elements。"""
+    doc = _pdf_document(elements=[], chunks=[])
+    m = compute_automatic_metrics(doc, None, "pdf", None)
+    assert m["pdf_locator_valid_ratio"]["reason"] == "no_elements"
+
+
+def test_docx_locator_no_elements_returns_null():
+    doc = _docx_document(elements=[], chunks=[])
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["docx_locator_valid_ratio"]["reason"] == "no_elements"
+
+
+def test_docx_locator_rejects_page_or_bbox_keys():
+    """DOCX locator 含 page 或 bbox → 不合规。"""
+    elements = [
+        # 合规：paragraph_index
+        _paragraph("e0", "x", paragraph_index=0),
+        # 不合规：含 page
+        {
+            "element_id": "e1", "type": "paragraph", "content": "y",
+            "resource_path": None, "parent_id": None, "confidence": 1.0,
+            "source_locator": {"paragraph_index": 1, "page": 1},
+            "metadata": {},
+        },
+        # 不合规：含 bbox
+        {
+            "element_id": "e2", "type": "paragraph", "content": "z",
+            "resource_path": None, "parent_id": None, "confidence": 1.0,
+            "source_locator": {"paragraph_index": 2, "bbox": [0, 0, 1, 1]},
+            "metadata": {},
+        },
+    ]
+    doc = _docx_document(elements=elements, chunks=[])
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["docx_locator_valid_ratio"]["value"] == 1 / 3
+
+
+def test_docx_locator_without_structural_keys_invalid():
+    """locator 没有任何 structural key → 不合规。"""
+    elements = [
+        # 合规
+        _paragraph("e0", "x", paragraph_index=0),
+        # locator 是空 dict → 不合规
+        {
+            "element_id": "e1", "type": "paragraph", "content": "y",
+            "resource_path": None, "parent_id": None, "confidence": 1.0,
+            "source_locator": {},
+            "metadata": {},
+        },
+    ]
+    doc = _docx_document(elements=elements, chunks=[])
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["docx_locator_valid_ratio"]["value"] == 0.5
+
+
+def test_pdf_locator_table_type_does_not_require_bbox():
+    """table 不在 _PDF_BBOX_REQUIRED_TYPES 中，page≥1 即合规。"""
+    elements = [
+        # table 有 page 但没 bbox → 仍合规
+        {
+            "element_id": "e0", "type": "table", "content": "x",
+            "resource_path": None, "parent_id": None, "confidence": 1.0,
+            "source_locator": {"page": 1},  # 无 bbox
+            "metadata": {},
+        },
+        # heading 缺 bbox → 不合规
+        _pdf_text_elem("e1", "heading", "h", page=1, bbox=None),
+    ]
+    chunks = []
+    doc = _pdf_document(elements=elements, chunks=chunks)
+    m = compute_automatic_metrics(doc, None, "pdf", None)
+    assert m["pdf_locator_valid_ratio"]["value"] == 0.5
+
+
+def test_image_resource_with_none_path_counts_as_invalid():
+    """resource_path=None 的 image 不应被认为存在。"""
+    elements = [
+        _image("e0", None),  # None
+        _image("e1", None),  # None
+    ]
+    doc = _docx_document(elements=elements, chunks=[])
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    # 2 个 image，0 个有效 → 0.0
+    assert m["image_resource_exists_ratio"]["value"] == 0.0
+
+
+def test_image_resource_with_empty_string_path_invalid():
+    """resource_path='' 的 image 不应被认为存在。"""
+    elements = [_image("e0", "")]
+    doc = _docx_document(elements=elements, chunks=[])
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["image_resource_exists_ratio"]["value"] == 0.0
+
+
+def test_chunk_reference_empty_source_ids_not_valid():
+    """chunk 的 source_element_ids 为空列表 → 该 chunk 不合规。"""
+    elements = [_heading("e0", "h")]
+    chunks = [
+        _chunk("c0", "h", ["e0"]),  # 合规
+        _chunk("c1", "", []),  # 空 → 不合规
+    ]
+    doc = _docx_document(elements=elements, chunks=chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["chunk_reference_intact_ratio"]["value"] == 0.5
+
+
+def test_chunk_reference_none_source_ids_not_valid():
+    """chunk 的 source_element_ids 缺失 → 不合规。"""
+    elements = [_heading("e0", "h")]
+    chunks = [
+        {"chunk_id": "c0", "text": "h", "metadata": {}},  # 没 source_element_ids
+    ]
+    doc = _docx_document(elements=elements, chunks=chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["chunk_reference_intact_ratio"]["value"] == 0.0
+
+
+def test_text_preservation_both_empty_returns_null():
+    """elements 与 chunks 都没文本 → null + empty_expected_and_actual。"""
+    elements = [_image("e0", None)]  # 图片不参与文本
+    chunks = []
+    doc = _docx_document(elements=elements, chunks=chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["text_preservation_equal"]["value"] is True
+    assert m["text_char_multiset_precision"]["reason"] == "empty_expected_and_actual"
+    assert m["text_char_multiset_recall"]["reason"] == "empty_expected_and_actual"
+
+
+def test_text_preservation_empty_actual_non_empty_expected():
+    """expected 非空，actual 空 → precision null(empty_actual)，recall=0.0。"""
+    elements = [_paragraph("e0", "hello")]
+    chunks = []  # actual 是空
+    doc = _docx_document(elements=elements, chunks=chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["text_preservation_equal"]["value"] is False
+    assert m["text_char_multiset_precision"]["reason"] == "empty_actual"
+    # recall: |expected| > 0, common=0 → 0.0
+    assert m["text_char_multiset_recall"]["value"] == 0.0
+
+
+def test_text_preservation_empty_expected_non_empty_actual():
+    """expected 空，actual 非空 → precision=0.0, recall null(empty_expected)。"""
+    elements = [_image("e0", None)]  # 没文本
+    chunks = [_chunk("c0", "stray", ["e0"])]  # 但 chunk 有文本
+    doc = _docx_document(elements=elements, chunks=chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["text_preservation_equal"]["value"] is False
+    assert m["text_char_multiset_precision"]["value"] == 0.0
+    assert m["text_char_multiset_recall"]["reason"] == "empty_expected"
+
+
+def test_heading_boundary_ratio_with_no_chunks_returns_zero():
+    """headings 存在但 chunks 为空 → matched=0 → 0.0（不是 null）。"""
+    elements = [_heading("e0", "h")]
+    doc = _docx_document(elements=elements, chunks=[])
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["heading_boundary_compliance"]["value"] == 0.0
+    assert m["heading_boundary_compliance"]["reason"] is None
+
+
+def test_silent_drop_with_empty_expectations_dict():
+    """expectations={}（空 dict）→ no_expectations。"""
+    elements = [_heading("e0", "h")]
+    doc = _docx_document(elements=elements, chunks=[])
+    m = compute_automatic_metrics(doc, None, "docx", expectations={})
+    assert m["silent_drop_count"]["reason"] == "no_expectations"
+
+
+def test_silent_drop_expectations_without_element_count_by_type():
+    """expectations 存在但没有 element_count_by_type → no_expectations_element_count。"""
+    elements = [_heading("e0", "h")]
+    doc = _docx_document(elements=elements, chunks=[])
+    m = compute_automatic_metrics(
+        doc, None, "docx", expectations={"other_field": "x"}
+    )
+    assert m["silent_drop_count"]["reason"] == "no_expectations_element_count"
+
+
+def test_silent_drop_multiple_types_dropped_sums():
+    """多种类型同时缺 → 求和。"""
+    # actual: 1 heading, 0 table, 0 image
+    elements = [_heading("e0", "h")]
+    doc = _docx_document(elements=elements, chunks=[])
+    # expected: 2 heading, 3 table, 1 image → drops = 1 + 3 + 1 = 5
+    expectations = {
+        "element_count_by_type": {"heading": 2, "table": 3, "image": 1}
+    }
+    m = compute_automatic_metrics(doc, None, "docx", expectations)
+    assert m["silent_drop_count"]["value"] == 5
+
+
+def test_schema_valid_false_when_document_invalid():
+    """document 字段缺失或类型错 → schema_valid=False。"""
+    bad_doc = {
+        "schema_version": "0.1.0",
+        "document_id": "d-bad",
+        # 缺 source_path/source_type/source_hash/parser_name/parser_version
+        "elements": [],
+        "chunks": [],
+        "relations": [],
+        "warnings": [],
+        "errors": [],
+        "metadata": {},
+    }
+    m = compute_automatic_metrics(bad_doc, None, "docx", None)
+    assert m["schema_valid"]["value"] is False
+
+
+def test_pipeline_success_false_when_error_present():
+    """error 非 None 但 document 非 None → pipeline_success=False。"""
+    doc = _docx_document(elements=[], chunks=[])
+    m = compute_automatic_metrics(
+        document=doc,
+        error={"code": "some_error", "message": "x"},
+        source_type="docx",
+        expectations=None,
+    )
+    assert m["pipeline_success"]["value"] is False
+    assert m["error_code"]["value"] == "some_error"
