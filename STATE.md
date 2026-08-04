@@ -4999,3 +4999,56 @@
 - 本 worktree（Round 101 后）：6693 pass / 0 fail / 13 skip（HEAD `0fcc329`）
 
 ---
+
+## Round 102（2026-08-05）：候选 DT — app/parsers/markdown_parser.py 第三轮边角
+
+### 触发
+继 Round 101（html_parser 第三轮）后继续自跑。
+markdown_parser.py 326 行 308 tests（0.94 tests/line），选其为第三轮目标。
+
+### 实现
+- 新增 `tests/test_parsers_markdown_edges3.py`（133 个测试）
+- 覆盖 app/parsers/markdown_parser.py（326 行）的深度路径：
+  - **正则精度**：ATX 需要 `\s+` 后 #、fenced 3+ 字符、ordered `\d+[.)]`、
+    unordered `[-*+]`
+  - **ATX 闭合 #**：`# Hello #` → "Hello"（trailing # 被 strip）
+  - **7 个 # 不匹配** ATX
+  - **主题分隔符变体**：`---` / `***` / `___` / `* * *` / `- - -`
+  - **setext 拒绝**：`text\n===` 保持段落
+  - **列表 marker**：`-` / `*` / `+` / `1.` / `1)` / `99.` / `0.` 全变体
+  - **code fence**：3+ backticks/tildes、2 个不够、language 字段 `python3` 匹配
+    但 `python3.12` 不匹配（`.` 不在 `[\w+-]`）
+  - **blockquote**：`>\s?` 只剥离 1 个空白
+  - **standalone image vs paragraph image**：整行约束
+  - **section_path**：深嵌套、pop on higher level、same-level replaces、
+    preamble 缺失 section_path
+  - **pipe table**：`:---:` alignment 接受、无 separator 不识别为表格
+  - **`_detect_md_source_type`**：大写 MD/MARKDOWN 接受、拒绝 html/txt/no-suffix、
+    错误消息 + code 精确
+  - **`_split_pipe_row`**：edge pipe-only strings、empty cells
+  - **`_is_pipe_table_start`**：last line returns False、no separator returns False
+  - **`_rows_to_md`**：empty input、single row single col、three rows、jagged padding
+  - **pipeline 错误**：file_not_found、unsupported_type、md_read_failed（OS monkey）、
+    invalid UTF-8 fallback
+  - **完整文档 e2e**：emit 全部 7 种 element 类型
+  - **模块结构**：__all__ 精确、_MD_EXTENSIONS 2 项、name/version 值
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`python3.12` 不匹配（`.` 不在 `[\w+-]`）→ 改为 `python3` 测试
+- wall 2：`>    deeply`（4 空格）→ `>\s?` 只剥离 1 个空白，剩 "   deeply"
+- wall 3：3 处 SyntaxWarning（`\s+` 在 docstring）→ 改为 raw string `r"""..."""`
+
+### 下一步建议
+- 候选 DU：app/parsers/kreuzberg_parser.py 第三轮（245 行 332 tests）
+- 候选 DV：app/parsers/ipynb_parser.py 第三轮（227 行 323 tests）
+- 候选 DW：app/parsers/text_parser.py 第三轮（136 行 212 tests）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DV（ipynb_parser.py 第三轮，227 行较大）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 102 后）：6826 pass / 0 fail / 13 skip（HEAD `3dc2728`）
+
+---
