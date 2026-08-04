@@ -1522,3 +1522,36 @@
 - 本 worktree（Round 26 后）：562 pass / 0 fail / 9 skip（HEAD `c9fb270`）
 
 ---
+
+## Round 27（2026-08-04）：候选 AE — evaluation/runner.py 覆盖率补强
+
+### 做了什么
+- 候选 AE：扩展 `tests/test_evaluation_runner.py`，新增 17 个测试覆盖 `_load_annotation` / `_process_one` / `run_evaluation` 的边角路径。
+- 引入 `_FakeManifest` / `_FakeDocEntry` / `_FakeExpectedFailure` 三个 dataclass，让 `run_evaluation` 端到端测试可以在不需要真实 manifest 文件的情况下跑。
+- 重点覆盖项：
+  - **`_process_one`**：成功后清理 out_stub；不支持的扩展名返回 unsupported_type
+  - **`_load_annotation`** 4 种路径：None、缺失、合法 JSON、非法 JSON
+  - **`run_evaluation` 端到端**：空 manifest、单 doc 成功、单 doc 失败（pipeline_failed 蔓延到 metrics）、expected_failure 匹配 / 不匹配、annotation_file 加载、公开 per_doc 不含私有字段、嵌套目录自动创建、报告通过 schema、parser_version / max_chars 进入 provenance
+- 无源码改动。
+
+### 下一步建议
+- 候选 AF：`app/chunkers/structural.py` 内部纯函数补强
+- 候选 AG：`app/cli.py` 子命令更细致的测试
+- 候选 AH：`evaluation/cli.py` 的 `validate-report` 子命令路径
+- 候选 AI：`app/pipeline.py` 其他 helper（`get_parser` 已经测过，但 `image_output_dir_for` 等还有空间）
+- 候选 AJ：在已有大测试基础上加 fuzz / property-based 测试（用 hypothesis 之类的工具，但是依赖会增加）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AF（structural chunker helper 补强）。理由：
+1. `_element_text_with_span` 和 `_split_long_text` 还有一些边界情况
+2. chunker 是"分块不丢不重"承诺的核心算法
+3. 纯函数，无依赖
+
+### 撞墙记录
+- 无新撞墙。17 个新测试一次通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 27 后）：579 pass / 0 fail / 9 skip（HEAD `4e8a43c`）
+
+---
