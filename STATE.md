@@ -7756,3 +7756,68 @@ structural.py 是结构分块核心算法，第三轮已建立基础，
 值、source_locator 结构等。
 
 ---
+
+## Round 135（2026-08-05）：evaluation/schema_validation.py 第二轮（edges2）
+
+### 目标
+- 给 evaluation/schema_validation.py（15 行薄包装，已有 51 测试）补第二轮 edges
+- 模块极小，重点覆盖异常透传、bool 转换、延迟 import、签名深度
+
+### 改动
+- 新增 `tests/test_evaluation_schema_validation_edges2.py`（30 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **异常透传**：
+  - is_valid 抛 ValueError → document_passes_schema 不吞
+  - is_valid 抛 TypeError → 透传
+  - is_valid 不存在 → ImportError（不是 AttributeError）
+- **bool() 转换语义**：
+  - is_valid 返回 1 → True（Python bool 类型）
+  - is_valid 返回 0 → False
+  - is_valid 返回 [] → False
+  - is_valid 返回 ['x'] → True
+  - is_valid 返回 None → False
+  - 返回值 type 是 bool（不是 int）
+- **延迟 import**：
+  - 函数体内 `from app.schema import is_valid`
+  - 模块顶层不 import app.schema（避免循环）
+  - 模块顶层有 from typing import Any
+  - from __future__ import annotations
+- **__all__ 深度**：
+  - 是 list，1 项
+  - 值 = ["document_passes_schema"]
+- **签名深度**：
+  - 1 参数（document），无默认，POSITIONAL_OR_KEYWORD
+  - 返回注解 = bool（或 'bool'）
+- **docstring**：
+  - 函数 docstring 提及 is_valid
+  - 模块 docstring 提及循环依赖
+- **综合**：
+  - 额外键不崩溃
+  - idempotent
+  - 不修改输入
+
+### 撞墙记录
+1. test_document_passes_schema_propagates_attribute_error：实际是
+   ImportError（from import 失败），不是 AttributeError。修复：改异常类型。
+2. test_document_passes_schema_return_annotation_bool：from __future__
+   使注解是字符串 'bool'，不是 bool。修复：assert in (bool, "bool")。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 135 后）：10554 pass / 0 fail / 13 skip（HEAD `e9e5eff`）
+
+### 下一步建议
+- 候选 GM：app/parsers/markdown_parser.py 第四轮
+- 候选 GN：app/parsers/html_parser.py 第四轮
+- 候选 GO：app/parsers/ipynb_parser.py 第四轮
+- 候选 GQ：evaluation/manifest.py 第六轮（更深）
+- 候选 GR：evaluation/cli.py 第六轮（更深）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GM（app/parsers/markdown_parser.py 第四轮）。markdown parser
+是 fallback 之外的另一路径，第四轮可深入 ATX/SET 标题、代码块、列表
+嵌套等。
+
+---
