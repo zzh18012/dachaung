@@ -3055,3 +3055,44 @@
 - 本 worktree（Round 65 后）：2776 pass / 0 fail / 9 skip（HEAD `7738422`）
 
 ---
+
+## Round 66（2026-08-05）：候选 CA — evaluation/schema_validation.py 边角覆盖
+
+### 做了什么
+- 候选 CA：新建 `tests/test_evaluation_schema_validation_edges.py`（51 个测试）覆盖 `evaluation/schema_validation.py`（15 行）的边角。该模块本身极小（一个 `document_passes_schema` 函数 + 延迟 import），但测试覆盖了所有失败模式与跨 source_type 行为。
+- 重点覆盖项：
+  - **模块结构** 5 个：__all__ list/count/contains/match attr、模块顶层无 is_valid/validate/SchemaValidationError 绑定（验证延迟 import 防循环依赖）
+  - **返回类型严格 bool** 4 个：返 bool 类型、True for valid、is True（不是 int 1）、False for invalid 类型
+  - **缺 required 字段** 12 个：每个 required field 单独删（schema_version/document_id/source_path/source_type/parser_name/parser_version/elements/chunks/relations/warnings/errors/metadata）
+  - **字段类型错** 8 个：schema_version=int、source_type 非枚举、source_hash wrong length、elements/chunks not list、metadata not dict、element/chunk 缺 required field
+  - **schema_version 错值** 3 个：9.9.9、空字符串、None
+  - **多余字段容忍** 2 个：additionalProperties=true 实际行为
+  - **PDF vs DOCX locator 差异** 3 个：PDF 含 page+bbox 合法、PDF 缺 page 拒绝、DOCX paragraph_index 合法
+  - **空边角** 3 个：空 dict 拒绝、空 elements/chunks 合法、空 metadata 合法
+  - **大输入稳定性** 3 个：100 elements、100 chunks、10000 char content
+  - **Unicode** 2 个：中文 content、中文 metadata 值
+  - **不 mutate 输入** 2 个：成功路径、失败路径
+  - **模块导入** 3 个：不崩、有必需属性、callable
+- 无源码改动。
+
+### 撞墙记录
+- 1 次撞墙：`test_rejects_pdf_locator_missing_bbox` 失败。看 schema 注释：`bbox 可选`，PDF 只强制 page。修复：改测 `test_rejects_pdf_locator_missing_page`（page 才是 required）。
+
+### 下一步建议
+- 候选 BW：app/manifest.py 边角（manifest 解析 + categories 字段）
+- 候选 BY：app/pipeline.py 端到端边角
+- 候选 CB：evaluation/manifest.py 边角（评测侧 manifest loader）
+- 候选 CC：evaluation/schema.py 边角（评测侧 schema loader）
+- 候选 CD：evaluation/cli.py 边角（命令行参数解析 + 子命令）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 CC（evaluation/schema.py 边角）。理由：
+1. schema.py 含 load_schema/validate/validate_file 多个公共 API
+2. 边角多：schema 缓存、JSON decode 错误、文件不存在、EvalSchemaError 异常路径
+3. 与 schema_validation.py 形成完整 evaluation 校验层覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 66 后）：2827 pass / 0 fail / 9 skip（HEAD `559065f`）
+
+---
