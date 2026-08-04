@@ -315,6 +315,90 @@ def test_text_preservation_excludes_image():
     assert m["text_preservation_equal"]["value"] is True
 
 
+# ---------- text preservation v1.1（口径 D：非空白字符序列）----------
+
+
+def test_text_preservation_whitespace_only_diff_equal():
+    """v1.1：仅空白差异（空格 vs 制表符 vs 换行 vs 全去掉）必须 equal=True。"""
+    elements = [_paragraph("e0", "hello world")]
+    chunks = [_chunk("c0", "hello\tworld", ["e0"])]
+    doc = _docx_document(elements, chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["text_preservation_equal"]["value"] is True
+    assert m["text_char_multiset_precision"]["value"] == 1.0
+    assert m["text_char_multiset_recall"]["value"] == 1.0
+
+
+def test_text_preservation_newline_only_diff_equal():
+    """v1.1：换行 vs 空格 vs 无空白必须视为相等。"""
+    elements = [_paragraph("e0", "alpha\rbeta\ngamma")]
+    chunks = [_chunk("c0", "alphabetagamma", ["e0"])]
+    doc = _docx_document(elements, chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["text_preservation_equal"]["value"] is True
+
+
+def test_text_preservation_unicode_whitespace_equal():
+    """v1.1：Unicode 空白（NBSP U+00A0、表意空格 U+3000）也算空白。"""
+    elements = [_paragraph("e0", "a b　c")]
+    chunks = [_chunk("c0", "abc", ["e0"])]
+    doc = _docx_document(elements, chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["text_preservation_equal"]["value"] is True
+
+
+def test_text_preservation_missing_non_whitespace_char_not_equal():
+    """v1.1：缺失任意非空白字符必须 equal=False 且 recall<1。"""
+    elements = [_paragraph("e0", "hello world")]
+    chunks = [_chunk("c0", "hello orld", ["e0"])]  # 漏了 'w'
+    doc = _docx_document(elements, chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["text_preservation_equal"]["value"] is False
+    assert m["text_char_multiset_precision"]["value"] == 1.0
+    assert m["text_char_multiset_recall"]["value"] < 1.0
+
+
+def test_text_preservation_duplicate_non_whitespace_char_not_equal():
+    """v1.1：重复任意非空白字符必须 equal=False 且 precision<1。"""
+    elements = [_paragraph("e0", "abc")]
+    chunks = [_chunk("c0", "abcabc", ["e0"])]  # 整段重复
+    doc = _docx_document(elements, chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["text_preservation_equal"]["value"] is False
+    assert m["text_char_multiset_precision"]["value"] < 1.0
+    assert m["text_char_multiset_recall"]["value"] == 1.0
+
+
+def test_text_preservation_reorder_non_whitespace_not_equal():
+    """v1.1：非空白字符顺序改变必须 equal=False（多集合可能不变）。"""
+    elements = [_paragraph("e0", "abc def")]
+    chunks = [_chunk("c0", "def abc", ["e0"])]  # 重排
+    doc = _docx_document(elements, chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    # 顺序变了 → equal=False
+    assert m["text_preservation_equal"]["value"] is False
+    # 但多集合相同 → precision=recall=1.0
+    assert m["text_char_multiset_precision"]["value"] == 1.0
+    assert m["text_char_multiset_recall"]["value"] == 1.0
+
+
+def test_text_preservation_mid_token_extra_space_equal():
+    """v1.1：chunker 词内硬切引入的额外空格不再误报（长元素按 max_chars 切片落在词中间）。"""
+    # element "Havelock" 被 chunker 硬切成 "Have" + "lock"
+    # 旧 v1.0：' '.join → "Have lock" 与 "Havelock" 不等，误报
+    # 新 v1.1：删空白后两序列都是 "Havelock"，等
+    elements = [_paragraph("e0", "Havelock")]
+    chunks = [
+        _chunk("c0", "Have", ["e0"]),
+        _chunk("c1", "lock", ["e0"]),
+    ]
+    doc = _docx_document(elements, chunks)
+    m = compute_automatic_metrics(doc, None, "docx", None)
+    assert m["text_preservation_equal"]["value"] is True
+    assert m["text_char_multiset_precision"]["value"] == 1.0
+    assert m["text_char_multiset_recall"]["value"] == 1.0
+
+
 # ---------- heading boundary ----------
 
 

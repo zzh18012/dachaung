@@ -361,7 +361,9 @@ dachaung-code/
 
 详细定义见 `docs/evaluation.md` 第 4 节。所有 null 指标都带 `reason` 字段说明未评测原因。
 
-> ⚠️ `text_preservation_equal / text_char_multiset_*` **只**比较 parser 已提取的 elements 与 chunker 生成的 chunks，用于发现**分块阶段**的丢失/重复/顺序变化；**不能**证明 PDF/DOCX → elements 的解析完整性。后者由 `silent_drop_count` 部分反映（pilot baseline 中 PDF 该项 = 3）。各项 `1.0` **不等于** "fallback 解析准确率 100%"。
+> ⚠️ `text_preservation_equal / text_char_multiset_*` **只**比较 parser 已提取的 elements 与 chunker 生成的 chunks，用于发现**分块阶段**的非空白字符丢失/重复/顺序变化；**不能**证明 PDF/DOCX → elements 的解析完整性。后者由 `silent_drop_count` 部分反映（pilot baseline 中 PDF 该项 = 3）。各项 `1.0` **不等于** "fallback 解析准确率 100%"。
+>
+> 自 evaluator/report v1.1 起，`text_preservation_*` 改为"删除全部 Unicode 空白后的非空白字符有序序列对比"，不再因 chunker 词内硬切引入的额外空格而误报。旧 v1.0 baseline 的 `text_preservation_*` 与新 v1.1 baseline **不可横向比较**；其他指标语义未变。详见 `docs/evaluation.md` 第 4.1.1 节。
 
 ### 11.4 隐私
 

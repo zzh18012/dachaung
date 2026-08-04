@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kvfs.local/schemas/evaluation-report.schema.json",
-  "title": "Evaluation Report v1.0",
+  "title": "Evaluation Report v1.1",
   "type": "object",
   "required": ["report_version", "provenance", "devset", "summary", "per_doc"],
   "additionalProperties": false,
   "properties": {
-    "report_version": { "type": "string", "const": "1.0" },
+    "report_version": { "type": "string", "const": "1.1" },
     "provenance": { "$ref": "#/$defs/provenance" },
     "devset": { "$ref": "#/$defs/devset" },
     "summary": { "$ref": "#/$defs/summary" },

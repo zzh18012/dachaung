@@ -7,6 +7,19 @@
 - 比例指标分母为 0 时返回 null + reason，不返回 1.0
 - text_char_multiset_* 用 Counter（多集合）保留重复字符信息
 - 不修改 document
+
+text_preservation 语义（自 evaluator v1.1 / report v1.1 起）：
+- expected_sequence = ''.join(e.content for e in elements if e.type != 'image')
+                      然后删除全部 Unicode 空白
+- actual_sequence   = ''.join(c.text for c in chunks)
+                      然后删除全部 Unicode 空白
+- equal = (expected_sequence == actual_sequence)
+- precision/recall = Counter 交集 / |actual|、/|expected|
+
+该口径只验证 elements → chunks 阶段的非空白字符不丢不重不乱序；
+它故意忽略空白差异（包括 chunker 词内硬切引入的额外空格、跨 chunk 边界
+丢失的换行、PDF 抽取产生的多余空格等），不验证原始 PDF/DOCX → elements
+的覆盖，也不验证空白排版的精确性。
 """
 
 from __future__ import annotations
@@ -15,8 +28,6 @@ import math
 from collections import Counter
 from pathlib import Path
 from typing import Any
-
-from app.chunkers.structural import normalize_text
 
 # 文本元素类型（参与"不丢不重"文本比对；image 不参与）
 _TEXT_TYPES = ("heading", "paragraph", "list_item", "table", "caption", "header", "footer")
@@ -256,35 +267,56 @@ def _chunk_reference_ratio(
     return _ratio(valid / len(chunks))
 
 
+def _strip_unicode_whitespace(s: str) -> str:
+    """删除全部 Unicode 空白字符；不删除任何非空白字符；不排序。
+
+    使用 str.isspace() 判定空白，覆盖 ASCII 空白与 Unicode 空白
+   （NBSP、em/en space、ideographic space、line/paragraph separator 等）。
+    """
+    return "".join(ch for ch in s if not ch.isspace())
+
+
 def _text_preservation(
     elements: list[dict], chunks: list[dict]
 ) -> dict[str, Any]:
-    """文本保留：完全相等 + 字符多集合 precision/recall。
+    """文本保留（自 v1.1 起口径 D）：非空白字符的有序序列对比。
 
-    image 不参与（chunker._element_text 返回 ""）。
+    - expected_sequence = ''.join(e.content for non-image e) 删除全部 Unicode 空白
+    - actual_sequence   = ''.join(c.text) 删除全部 Unicode 空白
+    - equal             = expected_sequence == actual_sequence
+    - precision/recall  = Counter 多集合交集 / |actual|、/|expected|
+
+    与 v1.0 的差异：v1.0 用 ' '.join 重建全文然后 normalize_text 比对；
+    v1.1 直接删除全部空白后做非空白字符序列对比。两者都试图衡量"不丢不重"，
+    但 v1.1 不再因为 chunker 在词内硬切引入的额外空格而误报。
+
+    该指标能发现非空白字符的丢失、重复、乱序；它故意忽略空白差异，
+    因此不能用于验证空白排版的精确性。若需要空白级精确验证，
+    必须为每个 chunk 增加 source_spans（在 element content 中的字符区间），
+    而不是继续在 source_element_ids 上叠加启发式。
     """
-    expected = " ".join(
+    expected_raw = "".join(
         e.get("content") or ""
         for e in elements
         if e.get("type") != "image"
     )
-    actual = " ".join(c.get("text") or "" for c in chunks)
+    actual_raw = "".join(c.get("text") or "" for c in chunks)
 
-    norm_expected = normalize_text(expected)
-    norm_actual = normalize_text(actual)
+    expected = _strip_unicode_whitespace(expected_raw)
+    actual = _strip_unicode_whitespace(actual_raw)
 
     # 完全相等
-    equal = norm_expected == norm_actual
+    equal = expected == actual
     equal_metric = _bool_metric(equal)
 
     # 字符多集合
-    if not norm_expected and not norm_actual:
+    if not expected and not actual:
         # 都为空：precision/recall 形式上为 1，但语义上"无内容可比"，记 null
         precision_metric = _null("empty_expected_and_actual")
         recall_metric = _null("empty_expected_and_actual")
     else:
-        c_expected = Counter(norm_expected)
-        c_actual = Counter(norm_actual)
+        c_expected = Counter(expected)
+        c_actual = Counter(actual)
         # 多集合交集：每个字符取 min
         common = sum((c_expected & c_actual).values())
         # precision = common / |actual|

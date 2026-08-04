@@ -55,9 +55,9 @@ CLI 子命令设计为清晰分离：`run` 跑评测、`validate-report` 校验�
 | `docx_locator_valid_ratio` | 0-1\|null | DOCX：locator 无 page/bbox，至少一个结构键。null 当无元素 |
 | `image_resource_exists_ratio` | 0-1\|null | image element 的 resource_path 文件实存且 size>0 的占比。null 当无 image |
 | `chunk_reference_intact_ratio` | 0-1\|null | chunk 的 source_element_ids 全部能解析到现存 element 的占比。null 当无 chunk |
-| `text_preservation_equal` | bool | `normalize_text(Σ非image元素content) == normalize_text(Σchunk.text)` |
-| `text_char_multiset_precision` | 0-1\|null | 字符多集合（Counter）交集 / 实际字符总数 |
-| `text_char_multiset_recall` | 0-1\|null | 字符多集合交集 / 期望字符总数 |
+| `text_preservation_equal` | bool | v1.1：删除全部 Unicode 空白后的非空白字符有序序列 `expected_sequence == actual_sequence`（详见下文"文本保留 v1.1 语义"） |
+| `text_char_multiset_precision` | 0-1\|null | v1.1：在去掉空白的非空白字符序列上，Counter 交集 / 实际字符总数 |
+| `text_char_multiset_recall` | 0-1\|null | v1.1：在去掉空白的非空白字符序列上，Counter 交集 / 期望字符总数 |
 | `heading_boundary_compliance` | 0-1\|null | 合规 heading 数 / heading 总数（合规 = 出现在某 chunk 的 source_element_ids[0]）。null 当无 heading |
 | `silent_drop_count` | int\|null | `Σ max(0, expected_count - actual_count)` over types。null 当无 expectations |
 
@@ -69,6 +69,47 @@ CLI 子命令设计为清晰分离：`run` 跑评测、`validate-report` 校验�
 > 重复或顺序变化。它们**不能证明**原始 PDF/DOCX → elements 的解析过程没有漏内容。
 > PDF 的 `silent_drop_count=3`（见第 6 节）正说明源文档到 elements 仍存在漏检 ——
 > 那部分损失**不会**被 text_preservation 系列指标反映。
+
+#### 4.1.1 文本保留 v1.1 语义（自 evaluator/report v1.1 起）
+
+旧 v1.0 的 `text_preservation_equal` 用 `' '.join 重建全文 + normalize_text 比对`，
+对 chunker 在英文词内硬切（长元素按字符数切片时落在词中间）产生的额外空格误报为不等于。
+自 v1.1 起，文本保留改为**非空白字符的有序序列对比**（口径 D）：
+
+```
+expected_sequence = ''.join(e.content for e in elements if e.type != 'image')
+                    然后删除全部 Unicode 空白（用 str.isspace() 判定）
+actual_sequence   = ''.join(c.text for c in chunks)
+                    然后删除全部 Unicode 空白
+text_preservation_equal = (expected_sequence == actual_sequence)
+text_char_multiset_precision = |Counter交集| / |actual|
+text_char_multiset_recall    = |Counter交集| / |expected|
+```
+
+**该指标能发现**：
+- 元素 → chunker 阶段的非空白字符**丢失**（recall < 1，equal=False）；
+- 元素 → chunker 阶段的非空白字符**重复**（precision < 1，equal=False）；
+- 非空白字符的**顺序变化**（equal=False，多集合可能仍相同）。
+
+**该指标故意忽略**：
+- 空格、制表符、换行、Unicode 空白（NBSP、em/en space、表意空格等）的差异；
+- chunker 在词内硬切引入的额外空格（v1.0 误报已消除）；
+- chunker 跨 chunk 边界丢失的换行/缩进。
+
+**该指标不能证明**：
+- 原始 PDF/DOCX → elements 没有漏检（由 `silent_drop_count` 等独立指标反映）；
+- 空白排版被精确保持（如段落间距、缩进、对齐）。
+
+**关于以后如何增加空白级精确验证**：
+若未来需要"chunk 文本在 element 内容中的字符区间级"精确验证，应给每个 chunk 增加
+`source_spans: [{element_id, start, end}]` 字段，让评测器直接校验 chunk 文本与对应
+element content 子串严格相等。**不要**继续在 `source_element_ids` 上叠加启发式
+（如 `prev.source[-1] == next.source[0]` 判断同元素续段）—— 已用 8 份真实文档验证：
+该启发式仅能识别部分续段，仍会引入回归。
+
+**v1.0 → v1.1 不可横向比较**：
+旧 baseline 的 `text_preservation_equal / precision / recall` 与新 baseline 不可
+直接横向比较（口径变了）。其他指标语义未变，可继续比较。
 
 ### 4.2 计时
 
