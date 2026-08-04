@@ -6282,3 +6282,101 @@ edges3 已饱和，但 edges4 仍有空间覆盖 HTMLParser 回调深度。
 - 本 worktree（Round 117 后）：8598 pass / 0 fail / 13 skip（HEAD `4cfe261`）
 
 ---
+
+## Round 118（2026-08-05）：evaluation/manifest.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_evaluation_manifest_edges4.py`（新增，1177 行）
+- 目标：`evaluation/manifest.py`（239 行，已有 309 测试）
+- 新增测试：116 个
+- 提交：`7978a34`
+
+### 覆盖深度
+- **_is_absolute_like 微边界**：
+  - 单字符（"a"、"/"）
+  - "ab"、"a:b"（无分隔符）、"a:"（长度 < 3）
+  - "a:foo"（第三字符非 /\\）
+  - "a:/foo"、"a:\\foo"（alpha+:/\\）
+  - "foo\\bar"（无盘符）
+  - "//foo"（双 slash）、".."、"../"
+  - "foo bar/baz"（含空格）
+  - "C :/foo"（第二字符是空格）
+  - "_:/foo"（首字符下划线）
+  - "1abc:/foo"（首字符数字）
+- **_has_backslash 微边界**：
+  - 混合 / 与 \\、仅 /
+  - 含 unicode、纯空白
+- **Manifest properties 深度**：
+  - pdf+docx < file_count（其他类型存在）
+  - pdf_count=0/docx_count=0 边界
+  - categories_covered 返回 list（非 tuple）
+  - categories_covered 去重、按字母排序、unicode 排序
+  - content_group_count self-paired、链式 A→B→C、双独立 pair、混合
+  - file_count 不含 expected_failures
+- **DocumentEntry hashable/equality**：
+  - hashable、可加入 set
+  - 同字段相等、不同字段不等
+  - 字段数 10、字段顺序精确
+  - is_dataclass
+- **ExpectedFailure hashable/equality**：
+  - hashable、同字段相等
+  - doc_id/error_code/source_type 任一不同
+  - 字段数 5、字段顺序精确
+- **Manifest hashable/equality**：
+  - hashable
+  - devset_status 不同 → 不等
+  - 字段数 5、字段顺序精确
+- **_resolve_relative_path field_name 携带**：
+  - field_name 在 empty/absolute/backslash/outside 四种错误消息中
+  - "./a/./b.docx" 多点段
+  - "a/../b.docx" 内部 ..
+  - 子目录深 "a/b/c/d/e.docx"
+  - 不存在的子目录（不要求文件存在）
+  - project_root unresolved Path
+- **_detect_project_root 深度**：
+  - start 为 file / dir
+  - 嵌套多层子目录
+  - 多个 pyproject.toml（最近优先）
+  - 完全无 pyproject.toml（fallback 到 parent）
+- **load_manifest 深度**：
+  - manifest_path: str vs Path
+  - project_root: str vs Path
+  - documents 字段缺失（try/except 接受两种行为）
+  - expected_failures 字段缺失
+  - sha256（64 hex 字符）/paired_with/expectations/categories 通过
+  - annotation_file_str 保留
+  - invalid json 的 __cause__ 是 JSONDecodeError
+  - resolved_path 为绝对路径
+- **ManifestError 默认行为**：
+  - 无参数：args=()、str=""
+  - 多参数：args=("a","b","c")、str 包含元组形式
+- **模块结构深度**：
+  - MANIFEST_VERSION 已 import、值为 "1.0"
+  - validate/json/dataclass/Path/Any 已 import
+  - 所有内部函数 callable
+  - __all__ 为 list、长度 5、精确 set
+  - __all__ 不含内部 helper
+  - 模块 docstring 提及 path/relative
+  - from __future__ import annotations
+- 无源码改动。
+
+### 撞墙记录
+1. SyntaxWarning：模块 docstring 含 `\ ` 转义。修复：改用 r""" """。
+2. test_load_manifest_passes_sha256_through：sha256 必须是 64 hex 字符
+   （schema 强制 ^[0-9a-f]{64}$）。修复：用 "a" * 64。
+
+### 下一步建议
+- 候选 FV：evaluation/runner.py 第四轮（227 行）
+- 候选 FW：evaluation/annotation_metrics.py 第四轮（194 行）
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 FY：app/models.py 第三轮（154 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 FV（evaluation/runner.py 第四轮）。runner 是评测执行核心，
+227 行，涉及 manifest 迭代、报告聚合、错误处理等独立逻辑。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 118 后）：8714 pass / 0 fail / 13 skip（HEAD `7978a34`）
+
+---
