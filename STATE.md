@@ -9981,3 +9981,44 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第六轮可深入 StructuralChunker re-export、__all__、与其他 chunker 子模块的关系。
 
 ---
+
+## Round 171（2026-08-05）：app/chunkers/__init__.py 第六轮（init_edges）
+
+### 目标
+- 给 app/chunkers/__init__.py（7 行，仅 re-export）补强
+- 深入 __all__、重导出 identity、子模块可导入
+
+### 改动
+- 新增 `tests/test_chunkers_init_edges.py`（29 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **__all__ 精确**：2 项 `["StructuralChunker", "normalize_text"]`、list、无重复
+- **重导出 identity**：pkg.X is structural.X
+- **公共 API 类型**：StructuralChunker 是 class、normalize_text 可调用
+- **子模块可导入**：app.chunkers.structural
+- **模块结构**：docstring、__future__ annotations、from .structural import、__file__ 以 __init__.py 结尾
+- **子包目录**：__init__.py + structural.py
+- **star import**：只导入 __all__ 中的 2 个名字
+- **normalize_text 行为**：idempotent、empty/no-whitespace
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 171 后）：13752 pass / 0 fail / 13 skip（HEAD `cdf3008`）
+
+### 下一步建议
+- 候选 IH：app/models.py 第八轮
+- 候选 IK：app/hash.py 第六轮
+- 候选 IL：app/source_locator.py 第六轮
+- 候选 IN：app/schema.py 第六轮
+- 候选 IO：app/cli.py 第八轮
+- 候选 IP：app/chunkers/structural.py 第八轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IH（app/models.py 第八轮）。models 是数据模型核心，
+第八轮可深入各 dataclass field 默认值、FrozenInstanceError、asdict、to_dict 等。
+
+---
