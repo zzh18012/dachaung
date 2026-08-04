@@ -8075,3 +8075,108 @@ Jupyter notebook JSON，第四轮可深入 cell 类型、source 拼接、metadat
 language-specific 分隔符。
 
 ---
+
+## Round 139（2026-08-05）：app/chunkers/structural.py 第六轮（edges6）
+
+### 目标
+- 给 app/chunkers/structural.py（388 行，已有 681 测试）补第六轮 edges
+- 深入 _SplitPiece/_ChunkBuffer/_split_long_text 算法不变量
+
+### 改动
+- 新增 `tests/test_chunker_edges6.py`（110 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_SplitPiece dataclass**：
+  - 是 dataclass 且 frozen（FrozenInstanceError）
+  - 默认 start=0, end=0
+  - 显式 start/end 透传
+  - 同值相等
+  - 不同 text/boundary 不等
+  - hashable
+- **_hard_split_with_whitespace_fallback 深度**：
+  - 空字符串 → []
+  - 纯空白 → []
+  - text ≤ max_chars → 单 piece，boundary=None
+  - text = max_chars → 单 piece
+  - 无空白 → forced_char
+  - 中间空白 → whitespace
+  - max_chars=1 → 每字符 piece
+- **_split_long_text 深度**：
+  - 空字符串 → []
+  - 纯空白 → []
+  - 先 strip
+  - 单 piece within max
+  - 无句子分隔符 → forced_char
+  - 多短句子合并
+  - 返回 _SplitPiece list
+- **_ChunkBuffer 深度**：
+  - init parts=[] counter=0
+  - is_empty/length 初始
+  - push 增加 length
+  - push 多次累加
+  - flush 空 → None
+  - flush 仅空白 → None
+  - flush 清空 parts
+  - flush chunk_id 格式
+  - flush text 用单空格 join
+  - source_ids 去重（保留首次出现顺序）
+  - metadata strategy/max_chars/char_count
+  - source_spans 一 part 一项
+- **_PART_* 常量**：int 类型，值 0/1/2/3
+- **_SENTENCE_SPLIT_RE/_HARD_BREAK_LANGS/_WHITESPACE_RE**：
+  - 都是 re.Pattern（前两个）/ tuple / re.Pattern
+  - _HARD_BREAK_LANGS 6 项（中英各 3）
+  - _WHITESPACE_RE.pattern = r"\\s+"
+- **normalize_text 深度**：
+  - 空/None → ""
+  - 纯空白 → ""
+  - 内部空白压缩为单空格
+  - tab/newline 处理
+  - strip 两端
+  - 保留标点/Unicode
+- **StructuralChunker.__init__**：
+  - 默认 max_chars=800
+  - max_chars < 32 raises ValueError
+  - max_chars=32 OK
+  - max_chars=0 / 负数 raises
+- **chunk 行为**：
+  - 空 elements → []
+  - 单 paragraph → 单 chunk
+  - heading 硬边界
+  - table 隔离
+  - image element 不参与分块
+  - 长 paragraph 切分
+  - 每 chunk 含 source_element_ids
+  - chunk_id 零填充
+  - metadata 字段（strategy/max_chars/char_count）
+- **_element_text_with_span**：
+  - paragraph → (stripped, start, end)
+  - image → ("", 0, 0)
+  - 前后空白 strip（start/end 反映偏移）
+  - 仅空白 → 空
+  - 旧接口 _element_text 也工作
+- **模块结构**：__all__/imports/docstring
+- **签名**：flush strategy/max_chars keyword-only，init max_chars 默认 800
+- **不变量**：normalize 幂等，_split_long_text 不丢文本，chunker 不丢文本
+
+### 撞墙记录
+1. placeholder import 写法错误（`if False else None` 在 import 语句里非
+   法）。修复：删除占位 import。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 139 后）：10969 pass / 0 fail / 13 skip（HEAD `2f5a925`）
+
+### 下一步建议
+- 候选 GS：app/parsers/fallback_parser.py 第六轮
+- 候选 GT：evaluation/runner.py 第六轮
+- 候选 GU：evaluation/cli.py 第六轮
+- 候选 GW：app/pipeline.py 第五轮
+- 候选 GX：app/cli.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GW（app/pipeline.py 第五轮）。pipeline 是核心入口，第五轮
+可深入 process_single 流程、warning 累积、错误处理、document 装配。
+
+---
