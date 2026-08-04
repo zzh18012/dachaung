@@ -2346,3 +2346,39 @@
 - 本 worktree（Round 48 后）：1489 pass / 0 fail / 9 skip（HEAD `9d1038d`）
 
 ---
+
+## Round 49（2026-08-04）：候选 BA — __init__.py 模块导出契约覆盖
+
+### 做了什么
+- 候选 BA：新建 `tests/test_packages_init.py`（41 个测试）覆盖 4 个 __init__.py 模块的导出契约。
+- 至此所有 Python 包的 __init__.py 都有专门契约测试。
+- 重点覆盖项：
+  - **app/chunkers/__init__.py** 8 个：StructuralChunker / normalize_text 导出存在、__all__ 含两个名字且仅含两个、list 类型、属性匹配、normalize_text 可调用、StructuralChunker 可实例化
+  - **app/parsers/__init__.py** 9 个：Parser / ParserError / make_document_id 导出、__all__ 完整且仅含 3 个名字、Parser 是 ABC 子类、ParserError 是 Exception 子类、make_document_id 接受 hex
+  - **evaluation/__init__.py** 10 个：四个版本常量（EVALUATOR=1.1 / REPORT=1.1 / ANNOTATION=1.0 / MANIFEST=1.0）类型 + 值、__all__ 完整、report_version 与 evaluator_version 一致、annotation 与 manifest 都是 1.0
+  - **子模块路径稳定性** 5 个：`from app.X import Y` 与 `from app.X.sub import Y` 返回同一对象引用（`is` 关系）
+  - **包元数据** 4 个：三个非空 __init__.py 都有 docstring、evaluation docstring 含设计原则关键词（"设计"/"v1."/"manifest"/"annotation"/"version"）
+  - **版本契约** 3 个：四版本元组形式一次性引用、当前阶段固定值（1.1/1.1/1.0/1.0）、元组类型校验
+  - **app/__init__.py** 2 个：模块存在、无强制导出（记录"app 是空包"事实）
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。41 个新测试一次通过。
+
+### 下一步建议
+- 候选 BC：app/cli.py 内部边角（argparse 子命令、退出码、stdout 输出格式）
+- 候选 BD：tests/test_schema.py 边角补强（document schema validation 边角）
+- 候选 BE：app/models.py 边角补强（dataclass field 默认值、frozen 行为）
+- 候选 BF：tests/test_annotation_metrics.py 边角补强（已有但不饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BC（app/cli.py 边角）。理由：
+1. cli.py 是入口点，含 argparse 子命令、退出码逻辑、stderr 输出
+2. 与 test_cli.py（已存在）形成互补，专门测试边角错误路径
+3. 之后转 BD（schema validation 边角）补强 app/schema.py 覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 49 后）：1530 pass / 0 fail / 9 skip（HEAD `f5d20dc`）
+
+---
