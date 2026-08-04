@@ -7109,3 +7109,86 @@ fallback_parser 是默认 parser 路径，630 行体量最大，
 - 本 worktree（Round 127 后）：9606 pass / 0 fail / 13 skip（HEAD `a4ab7e2`）
 
 ---
+
+## Round 128（2026-08-05）：evaluation/cli.py 第五轮（edges5）
+
+### 范围
+- 文件：`tests/test_evaluation_cli_edges5.py`（新增，820 行）
+- 目标：`evaluation/cli.py`（243 行，已有 375 测试）
+- 新增测试：104 个
+- 提交：`8648b90`
+
+### 覆盖深度
+- **_build_parser 深度（subparser 与参数细节）**：
+  - returns ArgumentParser / prog = "evaluation.cli"
+  - description 含 "评测"
+  - 3 个子命令存在（run/validate-report/inspect-doc）
+  - run 必需 --manifest/--output
+  - --parser choices 接受 fallback/kreuzberg，拒绝 unknown
+  - 默认 parser=fallback, max-chars=800, tolerance-chars=30
+  - 自定义 max-chars/tolerance-chars
+  - validate-report 仅位置参数 input
+  - inspect-doc 位置参数 input + --tolerance-chars（默认 30）
+  - command 属性存在
+- **_format_metric 深度（边界情况）**：
+  - None value 无 reason → "null  (None)"
+  - None value 有 reason → "(reason)"
+  - int/float/bool/dict/string 各类型
+  - dict value 排序 by key
+  - float 4 位小数四舍五入
+  - 空 dict metric → null 路径
+  - 多余 key 被忽略
+  - name 不足 36 补足，超 36 不截断
+  - list value 走 default str() 分支
+- **_run_inspect_doc 深度**：
+  - 缺文件 → 2 + stderr ERROR
+  - 坏 JSON → 1
+  - array/string/null/int/bool root → 1
+  - minimal doc → 0
+  - 输出含 file path/counts/metrics header
+  - 缺 source_type → "unknown"
+- **main 退出码矩阵**：
+  - 无命令 → SystemExit 2
+  - 未知命令 → SystemExit 2
+  - inspect-doc 缺文件 → 2
+  - inspect-doc 坏 JSON → 1
+  - inspect-doc 合法 → 0
+  - validate-report 缺文件 → 2
+- **模块结构深度**：
+  - imports 完整（argparse/json/sys/Path/ManifestError/
+    load_manifest/run_evaluation/get_git_provenance/
+    EvalSchemaError/validate_file）
+  - 4 个函数（_build_parser/main/_format_metric/_run_inspect_doc）
+  - helpers 带 _ 前缀，main 是 public
+  - 不定义 __all__
+  - docstring 提及 run/validate-report/inspect-doc/manifest/parser
+  - from __future__ import annotations
+  - __main__ guard 存在
+  - utf-8 reconfigure block 存在
+- **签名深度**：
+  - _build_parser: () → ArgumentParser
+  - _format_metric: (name, metric) → str
+  - _run_inspect_doc: (args) → int
+  - main: (argv=None) → int
+
+### 撞墙记录
+（无 — Round 128 一次通过，104 测试全 pass）
+
+### 下一步建议
+- 候选 GB：app/chunkers/structural.py 第四轮
+- 候选 GH：evaluation/manifest.py 第五轮
+- 候选 GI：evaluation/runner.py 第五轮
+- 候选 GJ：evaluation/metrics.py 第五轮
+- 候选 GK：evaluation/annotation_metrics.py 第五轮
+- 候选 GL：evaluation/report.py 第五轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GB（app/chunkers/structural.py 第四轮）。
+structural.py 是结构分块核心算法，第三轮已建立基础，
+第四轮可深入 chunk_id/source_element_ids/heading 边界等深度路径。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 128 后）：9710 pass / 0 fail / 13 skip（HEAD `8648b90`）
+
+---
