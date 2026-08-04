@@ -3658,3 +3658,61 @@
 - 本 worktree（Round 78 后）：4073 pass / 0 fail / 12 skip（HEAD `5dc2bc1`）
 
 ---
+
+## Round 79（2026-08-05）：候选 CQ — app/parsers/base.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CQ：新建 `tests/test_parsers_base_edges2.py`（131 个测试）覆盖
+  `app/parsers/base.py`（94 行）的深度边角，与已有 `test_parsers_base.py`（50）+
+  `test_parsers_base_edges.py`（113）互补。
+- 重点覆盖项：
+  - **ParserError 类型契约** 10 个：code/message str、details dict、args tuple、
+    str 返 message 不含 code、repr 含 class name
+  - **ParserError 各种 code** 11 个：file_not_found/unsupported_type/unexpected/
+    空串/underscore/dash/Unicode 中文/digits/just digits/long 1000 chars
+  - **ParserError message 边界** 5 个：空/Unicode/newline/special chars/long 10000
+  - **ParserError details 边界** 7 个：default 独立、None→{}、same ref、可修改、
+    nested dict/list/None value
+  - **ParserError 异常链** 5 个：__cause__/__context__、catch as Exception/BaseException、
+    非 ValueError
+  - **ParserError catch 过滤** 2 个：by code、by message contains
+  - **ParserError non-str 输入** 4 个：int/None code 接受、int message 接受、
+    list details 接受（实现不类型检查）
+  - **make_document_id** 18 个：format/doc- prefix/length=20/first 16 chars/
+    deterministic/different hashes/same prefix=same id/返回 str/hex chars/
+    uppercase/mixed/不验证 hex/length 63/65/0 raises ValueError/error type/message
+  - **detect_source_type** 18 个：pdf/docx/uppercase/mixed case value、str/Path
+    接受、double extension、dotfile .pdf raises（pathlib 视为隐藏文件）、rejects
+    txt/md/html/ipynb/no suffix/empty suffix、error code/details.suffix/message
+  - **Parser ABC** 21 个：is ABC、__abstractmethods__ 含 parse、default name/version、
+    cannot instantiate、subclass without parse fails、subclass with parse works、
+    inherits default、override name only/version only/both、parse callable/signature、
+    instance attribute dict 独立
+  - **模块结构** 26 个：ABC/abstractmethod/Path/Any/Literal/Document/SourceType 导入、
+    Parser/ParserError/make_document_id/detect_source_type/_silence_unused 都存在、
+    __all__=list、count=4、exact set、不含 _silence_unused、callable 验证
+- 无源码改动。
+
+### 撞墙记录
+- 墙 1：`test_parser_error_args_empty_with_empty_message` 假设 Exception('') 的 args 是 ()。
+  实际 args 是 ('',)，长度 1。修复：assert e.args == ("",)。
+- 墙 2：`test_detect_source_type_dotfile_pdf` 假设 Path('.pdf').suffix 是 '.pdf'。
+  实际 pathlib 视 '.pdf' 为隐藏文件，suffix 是 ''。修复：assert 抛 ParserError。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CP：app/parsers/kreuzberg_parser.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CG（app/parsers/fallback_parser.py 边角第二轮）。理由：
+1. fallback_parser.py 是默认 parser（pdfplumber + python-docx），是项目的核心实现
+2. 处理 PDF 与 DOCX 两种 source_type 的转换逻辑
+3. 与 base.py 形成"基础设施 + 默认实现"完整覆盖
+4. CE/CP 是第二轮，复杂度高，留给后续
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 79 后）：4204 pass / 0 fail / 12 skip（HEAD `36cf834`）
+
+---
