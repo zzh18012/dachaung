@@ -442,3 +442,322 @@ def test_is_pipe_table_start_false_at_last_line():
 def test_is_pipe_table_start_false_for_non_pipe_first_line():
     lines = ["regular text", "| --- | --- |"]
     assert _is_pipe_table_start(lines, 0) is False
+
+
+# ---------- 边角与缺漏补强（Round 37） ----------
+
+
+# _ATX_HEADING_RE 直接单测
+
+
+def test_atx_heading_re_matches_six_levels():
+    from app.parsers.markdown_parser import _ATX_HEADING_RE
+    for level in range(1, 7):
+        prefix = "#" * level
+        m = _ATX_HEADING_RE.match(f"{prefix} Title")
+        assert m is not None
+        assert len(m.group(1)) == level
+        assert m.group(2) == "Title"
+
+
+def test_atx_heading_re_strips_trailing_hashes():
+    from app.parsers.markdown_parser import _ATX_HEADING_RE
+    m = _ATX_HEADING_RE.match("# Title ###")
+    assert m is not None
+    assert m.group(2) == "Title"
+
+
+def test_atx_heading_re_rejects_seven_hashes():
+    """7 个 # 不在 1-6 范围内（regex 是 `#{1,6}\\s+`，第 7 个 # 不是空白）。"""
+    from app.parsers.markdown_parser import _ATX_HEADING_RE
+    m = _ATX_HEADING_RE.match("####### Too many")
+    assert m is None
+
+
+def test_atx_heading_re_rejects_no_space_after_hashes():
+    from app.parsers.markdown_parser import _ATX_HEADING_RE
+    m = _ATX_HEADING_RE.match("#Title")  # 无空格
+    assert m is None
+
+
+def test_atx_heading_re_matches_inline_content_with_hash():
+    """标题内容可以含 #。"""
+    from app.parsers.markdown_parser import _ATX_HEADING_RE
+    m = _ATX_HEADING_RE.match("# Title #1")
+    assert m is not None
+    assert m.group(2) == "Title #1"
+
+
+# _THEMATIC_RE
+
+
+def test_thematic_re_matches_dash_star_underscore():
+    from app.parsers.markdown_parser import _THEMATIC_RE
+    assert _THEMATIC_RE.match("---")
+    assert _THEMATIC_RE.match("***")
+    assert _THEMATIC_RE.match("___")
+    assert _THEMATIC_RE.match("- - -")
+    assert _THEMATIC_RE.match("*  *  *")
+
+
+def test_thematic_re_rejects_short_strings():
+    from app.parsers.markdown_parser import _THEMATIC_RE
+    assert _THEMATIC_RE.match("-") is None
+    assert _THEMATIC_RE.match("--") is None
+    assert _THEMATIC_RE.match("a-b-c") is None
+
+
+# _FENCED_RE
+
+
+def test_fenced_re_matches_backtick_and_tilde():
+    from app.parsers.markdown_parser import _FENCED_RE
+    assert _FENCED_RE.match("```")
+    assert _FENCED_RE.match("~~~")
+    assert _FENCED_RE.match("````")
+    assert _FENCED_RE.match("~~~~~~")
+
+
+def test_fenced_re_captures_language():
+    from app.parsers.markdown_parser import _FENCED_RE
+    m = _FENCED_RE.match("```python")
+    assert m is not None
+    assert m.group(2) == "python"
+
+
+def test_fenced_re_no_language_empty_string():
+    from app.parsers.markdown_parser import _FENCED_RE
+    m = _FENCED_RE.match("```")
+    assert m is not None
+    assert m.group(2) == ""
+
+
+# _UNORDERED_LIST_RE / _ORDERED_LIST_RE
+
+
+def test_unordered_list_re_matches_dash_star_plus():
+    from app.parsers.markdown_parser import _UNORDERED_LIST_RE
+    assert _UNORDERED_LIST_RE.match("- item")
+    assert _UNORDERED_LIST_RE.match("* item")
+    assert _UNORDERED_LIST_RE.match("+ item")
+
+
+def test_unordered_list_re_captures_content():
+    from app.parsers.markdown_parser import _UNORDERED_LIST_RE
+    m = _UNORDERED_LIST_RE.match("- hello world")
+    assert m is not None
+    assert m.group(1) == "hello world"
+
+
+def test_ordered_list_re_matches_dot_and_paren():
+    from app.parsers.markdown_parser import _ORDERED_LIST_RE
+    assert _ORDERED_LIST_RE.match("1. item")
+    assert _ORDERED_LIST_RE.match("1) item")
+    assert _ORDERED_LIST_RE.match("42. item")
+
+
+def test_ordered_list_re_captures_content():
+    from app.parsers.markdown_parser import _ORDERED_LIST_RE
+    m = _ORDERED_LIST_RE.match("1. hello")
+    assert m is not None
+    assert m.group(1) == "hello"
+
+
+# _BLOCKQUOTE_RE
+
+
+def test_blockquote_re_matches_with_or_without_space():
+    from app.parsers.markdown_parser import _BLOCKQUOTE_RE
+    m1 = _BLOCKQUOTE_RE.match("> hello")
+    assert m1 is not None
+    assert m1.group(1) == "hello"
+    m2 = _BLOCKQUOTE_RE.match(">hello")
+    assert m2 is not None
+    assert m2.group(1) == "hello"
+
+
+# _STANDALONE_IMAGE_RE
+
+
+def test_standalone_image_re_matches_full_line():
+    from app.parsers.markdown_parser import _STANDALONE_IMAGE_RE
+    m = _STANDALONE_IMAGE_RE.match("![alt text](http://example.com/x.png)")
+    assert m is not None
+    assert m.group(1) == "alt text"
+    assert m.group(2) == "http://example.com/x.png"
+
+
+def test_standalone_image_re_rejects_inline_image():
+    """![alt](url) 前面有其他文本 → 不是 standalone。"""
+    from app.parsers.markdown_parser import _STANDALONE_IMAGE_RE
+    assert _STANDALONE_IMAGE_RE.match("text ![alt](url)") is None
+
+
+def test_standalone_image_re_empty_alt_accepted():
+    from app.parsers.markdown_parser import _STANDALONE_IMAGE_RE
+    m = _STANDALONE_IMAGE_RE.match("![](url)")
+    assert m is not None
+    assert m.group(1) == ""
+    assert m.group(2) == "url"
+
+
+# _PIPE_TABLE_ROW_RE / _PIPE_TABLE_SEP_RE
+
+
+def test_pipe_table_row_re_matches_pipe_lines():
+    from app.parsers.markdown_parser import _PIPE_TABLE_ROW_RE
+    assert _PIPE_TABLE_ROW_RE.match("| a | b |")
+    assert _PIPE_TABLE_ROW_RE.match("  | a | b |  ")
+    assert _PIPE_TABLE_ROW_RE.match("|a|b|")
+
+
+def test_pipe_table_row_re_rejects_non_pipe_lines():
+    from app.parsers.markdown_parser import _PIPE_TABLE_ROW_RE
+    assert _PIPE_TABLE_ROW_RE.match("regular text") is None
+
+
+def test_pipe_table_sep_re_matches_separator():
+    from app.parsers.markdown_parser import _PIPE_TABLE_SEP_RE
+    assert _PIPE_TABLE_SEP_RE.match("| --- | --- |")
+    assert _PIPE_TABLE_SEP_RE.match("|:---:|:---:|")
+
+
+# MarkdownParser metadata / element 边角
+
+
+def test_markdown_parser_metadata_has_markdown_true(tmp_path: Path):
+    p = tmp_path / "doc.md"
+    p.write_text("# T\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    assert doc.metadata == {"markdown": True}
+
+
+def test_markdown_parser_element_confidence_is_095(tmp_path: Path):
+    p = tmp_path / "doc.md"
+    p.write_text("# T\n\nparagraph.\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    for el in doc.elements:
+        assert el.confidence == 0.95
+
+
+def test_markdown_parser_element_id_format(tmp_path: Path):
+    p = tmp_path / "doc.md"
+    p.write_text("# T\n\npara.\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    expected_prefix = "doc-" + "a" * 16
+    for i, el in enumerate(doc.elements):
+        assert el.element_id == f"{expected_prefix}::e{i:04d}"
+
+
+def test_markdown_parser_code_block_has_language_metadata(tmp_path: Path):
+    p = tmp_path / "doc.md"
+    p.write_text("```python\nprint(1)\n```\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    code_blocks = [e for e in doc.elements if e.metadata.get("kind") == "code_block"]
+    assert len(code_blocks) == 1
+    assert code_blocks[0].metadata.get("language") == "python"
+
+
+def test_markdown_parser_blockquote_has_kind_metadata(tmp_path: Path):
+    p = tmp_path / "doc.md"
+    p.write_text("> quoted text\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    blockquotes = [e for e in doc.elements if e.metadata.get("kind") == "blockquote"]
+    assert len(blockquotes) == 1
+
+
+def test_markdown_parser_list_item_has_ordered_metadata(tmp_path: Path):
+    p = tmp_path / "doc.md"
+    p.write_text("1. first\n2. second\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    list_items = [e for e in doc.elements if e.type == "list_item"]
+    assert len(list_items) == 2
+    for li in list_items:
+        assert li.metadata.get("ordered") is True
+        assert li.metadata.get("marker") == "ordered"
+
+
+def test_markdown_parser_unordered_list_item_metadata(tmp_path: Path):
+    p = tmp_path / "doc.md"
+    p.write_text("- first\n- second\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    list_items = [e for e in doc.elements if e.type == "list_item"]
+    assert len(list_items) == 2
+    for li in list_items:
+        assert li.metadata.get("ordered") is False
+        assert li.metadata.get("marker") == "unordered"
+
+
+def test_markdown_parser_table_has_row_and_col_count(tmp_path: Path):
+    p = tmp_path / "doc.md"
+    p.write_text("| a | b | c |\n| --- | --- | --- |\n| 1 | 2 | 3 |\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    tables = [e for e in doc.elements if e.type == "table"]
+    assert len(tables) == 1
+    t = tables[0]
+    assert t.metadata.get("row_count") == 2
+    assert t.metadata.get("col_count") == 3
+    assert t.metadata.get("source") == "markdown_pipe_table"
+
+
+def test_markdown_parser_image_element_has_alt_metadata(tmp_path: Path):
+    p = tmp_path / "doc.md"
+    p.write_text("![my image](http://example.com/x.png)\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    images = [e for e in doc.elements if e.type == "image"]
+    assert len(images) == 1
+    assert images[0].metadata.get("alt") == "my image"
+    assert images[0].resource_path == "http://example.com/x.png"
+    assert images[0].content is None
+
+
+def test_markdown_parser_empty_code_block_emits_warning(tmp_path: Path):
+    """空代码块（紧邻的两个 fence）→ md_empty_code_block 警告。"""
+    p = tmp_path / "doc.md"
+    p.write_text("```\n```\n", encoding="utf-8")
+    doc = MarkdownParser().parse(p, source_hash="a" * 64)
+    warning_codes = [w.code for w in doc.warnings]
+    assert "md_empty_code_block" in warning_codes
+
+
+# _detect_md_source_type 边角
+
+
+def test_detect_md_source_type_lowercase_only():
+    """扩展名检查是 lower() 后比较，所以大写 .MD 也会接受。"""
+    from app.parsers.markdown_parser import _detect_md_source_type
+    assert _detect_md_source_type(Path("doc.MD")) == "markdown"
+    assert _detect_md_source_type(Path("doc.MARKDOWN")) == "markdown"
+
+
+def test_detect_md_source_type_unsupported_suffix_raises():
+    from app.parsers.markdown_parser import _detect_md_source_type
+    with pytest.raises(ParserError) as exc:
+        _detect_md_source_type(Path("doc.html"))
+    assert exc.value.code == "unsupported_type"
+
+
+def test_detect_md_source_type_no_suffix_raises():
+    from app.parsers.markdown_parser import _detect_md_source_type
+    with pytest.raises(ParserError):
+        _detect_md_source_type(Path("noext"))
+
+
+# _rows_to_md 边角
+
+
+def test_rows_to_md_two_rows():
+    from app.parsers.markdown_parser import _rows_to_md
+    md = _rows_to_md([["h1", "h2"], ["a", "b"]])
+    lines = md.split("\n")
+    assert len(lines) == 3  # header + separator + 1 body row
+    assert lines[0] == "| h1 | h2 |"
+    assert lines[1] == "| --- | --- |"
+    assert lines[2] == "| a | b |"
+
+
+def test_rows_to_md_jagged_pads_with_empty():
+    from app.parsers.markdown_parser import _rows_to_md
+    md = _rows_to_md([["h1", "h2", "h3"], ["a"]])
+    lines = md.split("\n")
+    assert lines[2] == "| a |  |  |"

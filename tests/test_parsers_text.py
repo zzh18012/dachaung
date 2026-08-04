@@ -282,3 +282,210 @@ def test_cli_parse_text_end_to_end(tmp_path: Path):
     assert data["source_type"] == "text"
     assert data["parser_name"] == "text"
     assert len(data["elements"]) == 2
+
+
+# ---------- 边角与缺漏补强（Round 37） ----------
+
+
+# _detect_text_source_type 直接单测
+
+
+def test_detect_text_source_type_accepts_txt():
+    from app.parsers.text_parser import _detect_text_source_type
+    assert _detect_text_source_type(Path("doc.txt")) == "text"
+
+
+def test_detect_text_source_type_accepts_text():
+    from app.parsers.text_parser import _detect_text_source_type
+    assert _detect_text_source_type(Path("doc.text")) == "text"
+
+
+def test_detect_text_source_type_accepts_uppercase_extensions():
+    """扩展名 lower() 后比较，所以 .TXT 也接受。"""
+    from app.parsers.text_parser import _detect_text_source_type
+    assert _detect_text_source_type(Path("doc.TXT")) == "text"
+    assert _detect_text_source_type(Path("doc.TEXT")) == "text"
+
+
+def test_detect_text_source_type_rejects_markdown():
+    from app.parsers.text_parser import _detect_text_source_type
+    with pytest.raises(ParserError) as exc:
+        _detect_text_source_type(Path("doc.md"))
+    assert exc.value.code == "unsupported_type"
+
+
+def test_detect_text_source_type_rejects_no_suffix():
+    from app.parsers.text_parser import _detect_text_source_type
+    with pytest.raises(ParserError):
+        _detect_text_source_type(Path("noext"))
+
+
+# TextParser metadata / element 边角
+
+
+def test_text_parser_metadata_has_text_true(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    assert doc.metadata == {"text": True}
+
+
+def test_text_parser_element_confidence_is_095(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    for el in doc.elements:
+        assert el.confidence == 0.95
+
+
+def test_text_parser_element_id_format(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    expected_prefix = "doc-" + "a" * 16
+    for i, el in enumerate(doc.elements):
+        assert el.element_id == f"{expected_prefix}::e{i:04d}"
+
+
+def test_text_parser_element_type_is_paragraph(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n\nworld\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    for el in doc.elements:
+        assert el.type == "paragraph"
+
+
+def test_text_parser_element_metadata_is_empty_dict(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    for el in doc.elements:
+        assert el.metadata == {}
+
+
+def test_text_parser_element_parent_id_is_none(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    for el in doc.elements:
+        assert el.parent_id is None
+
+
+def test_text_parser_source_path_preserved(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    assert doc.source_path == str(p)
+
+
+def test_text_parser_source_hash_passed_through(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    custom_hash = "b" * 64
+    doc = TextParser().parse(p, source_hash=custom_hash)
+    assert doc.source_hash == custom_hash
+
+
+def test_text_parser_document_id_derived_from_hash(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    assert doc.document_id == "doc-" + "a" * 16
+
+
+def test_text_parser_chunks_empty_by_default(tmp_path: Path):
+    """parser 只产 elements，chunking 由 pipeline 串接。"""
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    assert doc.chunks == []
+
+
+def test_text_parser_relations_empty_by_default(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    assert doc.relations == []
+
+
+def test_text_parser_errors_empty_by_default(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    assert doc.errors == []
+
+
+# _split_paragraphs 更多边角
+
+
+def test_split_paragraphs_single_chunk_with_trailing_newline():
+    from app.parsers.text_parser import _split_paragraphs
+    result = _split_paragraphs("hello\n")
+    assert len(result) == 1
+    assert result[0][0] == 1  # start_line
+    assert result[0][1] == "hello"
+
+
+def test_split_paragraphs_returns_content_without_trailing_whitespace():
+    from app.parsers.text_parser import _split_paragraphs
+    result = _split_paragraphs("hello   \n")
+    assert result[0][1] == "hello"
+
+
+def test_split_paragraphs_handles_tabs_as_whitespace():
+    from app.parsers.text_parser import _split_paragraphs
+    result = _split_paragraphs("\thello\n")
+    assert len(result) == 1
+    assert result[0][1] == "hello"
+
+
+# TextParser warning 边角
+
+
+def test_text_parser_empty_file_emits_warning(tmp_path: Path):
+    p = _write_text(tmp_path, "empty.txt", "")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    assert len(doc.elements) == 0
+    warning_codes = [w.code for w in doc.warnings]
+    assert "text_no_content" in warning_codes
+
+
+def test_text_parser_whitespace_only_file_emits_warning(tmp_path: Path):
+    p = _write_text(tmp_path, "ws.txt", "   \n\n  \t  \n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    assert len(doc.elements) == 0
+    warning_codes = [w.code for w in doc.warnings]
+    assert "text_no_content" in warning_codes
+
+
+# TextParser 错误路径
+
+
+def test_text_parser_missing_file_raises(tmp_path: Path):
+    with pytest.raises(ParserError) as exc:
+        TextParser().parse(tmp_path / "nope.txt", source_hash="a" * 64)
+    assert exc.value.code == "file_not_found"
+
+
+def test_text_parser_unsupported_extension_raises(tmp_path: Path):
+    p = _write_text(tmp_path, "doc.md", "hello\n")
+    with pytest.raises(ParserError) as exc:
+        TextParser().parse(p, source_hash="a" * 64)
+    assert exc.value.code == "unsupported_type"
+
+
+# TextParser UTF-8 fallback
+
+
+def test_text_parser_invalid_utf8_falls_back_to_replace(tmp_path: Path):
+    """非法 UTF-8 → 用 errors=replace 而不是抛 UnicodeDecodeError。"""
+    p = tmp_path / "bad.txt"
+    p.write_bytes(b"\xff\xfe hello world\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    # 不抛异常，仍能提取 element
+    assert len(doc.elements) >= 1
+
+
+def test_text_parser_name_and_version_constants(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    assert doc.parser_name == "text"
+    assert doc.parser_version == "stdlib/0.1.0"
+
+
+# section_path 缺失（text locator 只有 line）
+
+
+def test_text_parser_locator_only_has_line_key(tmp_path: Path):
+    p = _write_text(tmp_path, "a.txt", "hello\n\nworld\n")
+    doc = TextParser().parse(p, source_hash="a" * 64)
+    for el in doc.elements:
+        assert set(el.source_locator.keys()) == {"line"}
