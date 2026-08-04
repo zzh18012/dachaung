@@ -9381,3 +9381,46 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 document_passes_schema 调度层，第六轮可深入 schema 校验、错误聚合等。
 
 ---
+
+## Round 159（2026-08-05）：evaluation/schema_validation.py 第三轮（edges3）
+
+### 目标
+- 给 evaluation/schema_validation.py（15 行，已有 base/edges/edges2 共 81 测试）补第三轮
+- 深入 document_passes_schema 各分支、模块结构（极简）、签名深度
+
+### 改动
+- 新增 `tests/test_evaluation_schema_validation_edges3.py`（31 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **document_passes_schema 各分支**：
+  - 空 dict / None / str / list / int → False（不抛异常）
+  - 返回 bool 类型、bool 化（源码 `return bool(is_valid(...))`）
+- **模块结构**：
+  - __all__ == ["document_passes_schema"]、单公共名
+  - imports Any、future annotations
+  - docstring 提及"避免 import 循环"
+  - **无 module-level app.schema import**（用延迟 import 避免循环）
+  - 函数体内含 `from app.schema import is_valid`
+- **签名深度**：1 参 document（dict 注解，无默认），返回 bool
+- **综合行为**：idempotent、不修改输入、与 app.schema.is_valid 一致、多类型不抛、含额外 keys 不抛
+
+### 撞墙记录
+- 无（一次跑通）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 159 后）：12644 pass / 0 fail / 13 skip（HEAD `1c365fd`）
+
+### 下一步建议
+- 候选 HX：app/cli.py 第七轮
+- 候选 HY：app/parsers/markdown_parser.py 第七轮
+- 候选 HZ：app/parsers/html_parser.py 第六轮
+- 候选 IA：app/parsers/ipynb_parser.py 第六轮
+- 候选 IB：app/chunkers/structural.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HX（app/cli.py 第七轮）。cli.py 是文档处理命令行入口，
+第七轮可深入 parse/validate 子命令、错误处理、parser 选择等。
+
+---
