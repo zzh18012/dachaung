@@ -5548,3 +5548,79 @@ structural.py 388 行 391 tests（1.01 tests/line），仍有 _ChunkBuffer.flush
 - 本 worktree（Round 109 后）：7614 pass / 0 fail / 13 skip（HEAD `fb6548b`）
 
 ---
+
+## Round 110（2026-08-05）：evaluation/cli.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_evaluation_cli_edges4.py`（新增，823 行）
+- 目标：`evaluation/cli.py`（243 行，已有 97+ 测试，密度 ~5+ 测试/行）
+- 新增测试：95 个
+- 提交：`ffb8f43`
+
+### 覆盖深度
+- **_format_metric int value**：正数/0/大数/负数 渲染（无 .0000 后缀）、
+  reason 缺失用 'ok'
+- **_format_metric float 0.0/1.0 边界**：0.0000/1.0000 渲染、
+  空 reason → 'ok'、中文 reason
+- **_format_metric bool**：True/False 小写渲染、reason 缺失用 'ok'
+- **_format_metric dict value**：sorted by key、空 dict 渲染、
+  int+string 混合、value 含逗号、value 为 None、value 为 bool
+- **_format_metric string value**：含换行、含引号、含 unicode、
+  空 reason → 'ok'
+- **_format_metric name 列宽**：短名 padding 到 36、正好 36 不多加、
+  超过 36 不截断
+- **_run_inspect_doc 缺字段**：source_type 缺 → unknown、
+  elements 缺 → elements=0、chunks 缺 → chunks=0、
+  document_id 缺 → ?、source_path 缺 → ?、
+  parser_name 缺 → ?、parser_version 缺 → v?
+- **_run_inspect_doc elements=null**：metrics.py 无 None 保护，
+  保留现状断言 TypeError
+- **_run_inspect_doc 输入异常**：array/string/null/int/bool 根 → 1、
+  非法 JSON → 1、文件不存在 → 2
+- **_run_inspect_doc _sort_key 排序**：bool 在 null 前、
+  int 在 string 前、int 在 dict 前、同类按字母
+- **_build_parser 默认值**：max-chars=800、tolerance-chars=30、
+  parser=fallback、inspect tolerance-chars=30
+- **_build_parser choices**：kreuzberg 接受、未知 parser 拒绝（SystemExit）
+- **_build_parser 边界**：负 max-chars 接受、0 max-chars 接受、
+  prog="evaluation.cli"、formatter=RawDescriptionHelpFormatter、
+  缺子命令 → SystemExit、未知子命令 → SystemExit、
+  缺参数 → SystemExit
+- **main**：unknown 子命令 → SystemExit(2)、空 argv → SystemExit(2)、
+  argv 为 tuple 也接受
+- **模块结构**：无 __all__、main 有、_build_parser 有、_format_metric 有、
+  _run_inspect_doc 有、main 签名 argv、main 返回 int（注解为 'int'）、
+  imports 完整（argparse/json/sys/Path/load_manifest/ManifestError/
+  run_evaluation/get_git_provenance/validate_file/EvalSchemaError）、
+  utf-8 reconfigure 块、main guard raise SystemExit
+- **docstrings**：模块 docstring 提及 run/validate-report/inspect-doc、
+  _format_metric 有 docstring、_run_inspect_doc 有 docstring
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_run_inspect_doc` 把 elements/chunks 转为局部 []，
+  但传给 compute_automatic_metrics 仍是原 doc；doc 里 elements=null
+  让 metrics.py 内部 len(None) 抛 TypeError。改测试为断言 TypeError
+  以保留现状
+- wall 2：`monkeypatch.setattr(cli_mod, "compute_automatic_metrics", ...)` 
+  失败 — 函数内 import，不在 cli 模块顶层。
+  改为 `monkeypatch.setattr(metrics_mod, ...)` 在源模块替换
+- wall 3：`main` 返回注解是 'int'（字符串）不是 int —
+  模块用了 `from __future__ import annotations`。改断言为 `in (int, "int")`
+
+### 下一步建议
+- 候选 EO：evaluation/runner.py 第四轮（227 行，已有 edges3）
+- 候选 EP：evaluation/manifest.py 第四轮（239 行，已有 edges3）
+- 候选 EQ：evaluation/metrics.py 第四轮（381 行，已有 edges3）
+- 候选 ER：evaluation/report.py 第三轮（200 行，已有 edges2）
+- 候选 ES：evaluation/annotation_metrics.py 第四轮（已有 edges3）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 ER（report.py 第三轮）。它只有 edges2，第三轮空间更大；
+report.py 是评测报告装配核心，深度价值高。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 110 后）：7709 pass / 0 fail / 13 skip（HEAD `ffb8f43`）
+
+---
