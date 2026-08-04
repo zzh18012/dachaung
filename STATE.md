@@ -2833,3 +2833,40 @@
 - 本 worktree（Round 60 后）：2313 pass / 0 fail / 9 skip（HEAD `66865ac`）
 
 ---
+
+## Round 61（2026-08-04）：候选 BT — base.py 边角覆盖
+
+### 做了什么
+- 候选 BT：新建 `tests/test_parsers_base_edges.py`（84 个测试）覆盖 `app/parsers/base.py`（95 行）的 helper / 抽象类边角，与已有 `test_parsers_base.py`（45 个）互补。
+- 重点覆盖项：
+  - **ParserError 类深度边角** 17 个：code/message 类型、args 长度 1、args[0]=message、repr 含类名、str 不含 code、两实例默认不等、同对象相等、可链式 raise（__cause__）、隐式链式（__context__）、details 每实例独立、details 透传同一引用、Unicode message、空 code 接受
+  - **make_document_id 边角** 12 个：返 str、starts with doc-、长度 20、取前 16 字符、确定性、不同前缀不同 id、同前缀同 id、长度 63/65/10/empty raise ValueError、不验证字符集（z*64 接受）、所有 hex 字符
+  - **detect_source_type 边角** 21 个：返 str、pdf/docx 值、大写/混合大小写、dotfile、双扩展名、str 路径、反斜杠路径、forward slashes、拒绝 py/json/xml/csv/html/md/ipynb/txt、details.suffix、无 suffix 含 '(无)'、错误消息含 .pdf/.docx
+  - **Parser 抽象类** 13 个：是 ABC、有 __abstractmethods__ 含 parse、默认 name="abstract"/version="0.0.0"、直接实例化 TypeError、子类无 parse TypeError、子类有 parse 可实例化、子类继承默认、单独 override name/version、parse callable、parse 是 abstractmethod（__isabstractmethod__=True）
+  - **__all__ 导出列表** 5 个：4 个项、是 list、匹配模块属性、count=4、不含 _silence_unused
+  - **_silence_unused 占位函数** 4 个：返 None、无参数、callable、可重复调用
+  - **模块导入无副作用** 3 个：可导入不崩、有 4 个必需属性、有 _silence_unused
+- 无源码改动。
+
+### 撞墙记录
+- 1 次撞墙（关键）：第一版用了 `importlib.reload(app.parsers.base)` 验证导入无副作用，但 reload 会让其他测试中已 import 的 `Parser` / `ParserError` 引用失效，导致下游 46 个测试失败（子类不再被认为是新 Parser 的子类）。
+  - 修复：改用 `importlib.import_module("app.parsers.base")`（不 reload，只重新拿引用），污染消失。
+  - **教训**：跨测试模块的 import 污染必须避免 reload 操作。
+
+### 下一步建议
+- 候选 BR：app/pipeline.py 端到端边角（含错误路径 + 多 parser 切换）
+- 候选 BS：app/chunkers/structural.py 继续补完（已有 85 个边角）
+- 候选 BU：evaluation/runner.py 边角（含 process_single + 聚合逻辑）
+- 候选 BV：app/models.py 继续补完（已有 59 个边角）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BU（evaluation/runner.py 边角）。理由：
+1. runner.py 是 Stage 2 评测的核心，含 process_single + 聚合逻辑
+2. 边角多：比例指标分母 0、计时 null、聚合策略、silent_drop 计数
+3. 覆盖率提升对评测稳定性关键
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 61 后）：2397 pass / 0 fail / 9 skip（HEAD `2ec7a43`）
+
+---
