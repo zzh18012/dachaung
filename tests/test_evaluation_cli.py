@@ -363,3 +363,396 @@ def test_inspect_doc_top_level_not_object(project_root: Path):
     rc, _, err = _run_cli(["inspect-doc", str(arr)], cwd=project_root)
     assert rc == 1
     assert "顶层不是对象" in err
+
+
+# ---------- 边角与缺漏补强（Round 34） ----------
+
+
+# argparse 入口校验
+
+
+def test_no_subcommand_returns_nonzero(project_root: Path):
+    """argparse required=True 时缺子命令 → rc=2。"""
+    rc, out, err = _run_cli([], cwd=project_root)
+    assert rc != 0
+
+
+def test_unknown_subcommand_returns_nonzero(project_root: Path):
+    rc, _, _ = _run_cli(["bogus"], cwd=project_root)
+    assert rc != 0
+
+
+def test_run_invalid_parser_choice_returns_nonzero(project_root: Path):
+    """--parser 不在 choices ('fallback','kreuzberg') 内 → argparse rc!=0。"""
+    manifest = project_root / "manifest.json"
+    manifest.write_text("{}", encoding="utf-8")
+    rc, out, err = _run_cli([
+        "run", "--manifest", str(manifest),
+        "--output", str(project_root / "out.json"),
+        "--parser", "bogus_parser",
+    ], cwd=project_root)
+    assert rc != 0
+    assert "invalid choice" in err
+
+
+def test_run_missing_manifest_arg_returns_nonzero(project_root: Path):
+    """缺 --manifest 必填项 → argparse rc!=0。"""
+    rc, out, err = _run_cli([
+        "run", "--output", str(project_root / "out.json"),
+    ], cwd=project_root)
+    assert rc != 0
+    assert "--manifest" in err or "required" in err.lower()
+
+
+def test_run_missing_output_arg_returns_nonzero(project_root: Path):
+    """缺 --output 必填项 → argparse rc!=0。"""
+    manifest = project_root / "manifest.json"
+    manifest.write_text("{}", encoding="utf-8")
+    rc, out, err = _run_cli([
+        "run", "--manifest", str(manifest),
+    ], cwd=project_root)
+    assert rc != 0
+    assert "--output" in err or "required" in err.lower()
+
+
+def test_run_with_kreuzberg_parser_choice(project_root: Path):
+    """--parser kreuzberg 在 choices 内（即便 kreuzberg 不一定能解析）。"""
+    docx_rel = "samples/test/sample.docx"
+    docx_path = project_root / docx_rel
+    docx_path.parent.mkdir(parents=True)
+    build_minimal_docx(docx_path)
+    manifest = _write_manifest(project_root, docx_rel)
+    output = project_root / "outputs" / "report.json"
+    rc, _, err = _run_cli([
+        "run", "--manifest", str(manifest), "--output", str(output),
+        "--parser", "kreuzberg",
+    ], cwd=project_root)
+    # kreuzberg 适配器存在时 rc=0；如果 import 失败则 rc!=0
+    assert rc != 2  # 不应是 argparse 错误
+
+
+def test_run_with_explicit_max_chars(project_root: Path):
+    """--max-chars 32 也应能跑通（生成多 chunk）。"""
+    docx_rel = "samples/test/sample.docx"
+    docx_path = project_root / docx_rel
+    docx_path.parent.mkdir(parents=True)
+    build_minimal_docx(docx_path)
+    manifest = _write_manifest(project_root, docx_rel)
+    output = project_root / "outputs" / "report.json"
+    rc, _, err = _run_cli([
+        "run", "--manifest", str(manifest), "--output", str(output),
+        "--max-chars", "32",
+    ], cwd=project_root)
+    assert rc == 0, f"stderr={err}"
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert report["provenance"]["max_chars"] == 32
+
+
+def test_run_with_explicit_tolerance_chars(project_root: Path):
+    """--tolerance-chars 50 应能跑通（runner 内部会传递给 chunk_boundary_prf）。
+
+    注：_tolerance_chars 在 public report 序列化时被剥离（schema additionalProperties:false），
+    所以这里只验证 CLI 接受参数 + 报告生成成功。
+    """
+    docx_rel = "samples/test/sample.docx"
+    docx_path = project_root / docx_rel
+    docx_path.parent.mkdir(parents=True)
+    build_minimal_docx(docx_path)
+    manifest = _write_manifest(project_root, docx_rel)
+    output = project_root / "outputs" / "report.json"
+    rc, _, err = _run_cli([
+        "run", "--manifest", str(manifest), "--output", str(output),
+        "--tolerance-chars", "50",
+    ], cwd=project_root)
+    assert rc == 0, f"stderr={err}"
+    # 报告通过 schema 校验（含 chunk_boundary 子结构）
+    validate_file(output, "evaluation-report.schema.json")
+
+
+# validate-report 边角
+
+
+def test_validate_report_bad_json_returns_1(project_root: Path):
+    """validate-report 拿到非合法 JSON → rc=1。"""
+    bad = project_root / "broken.json"
+    bad.write_text("{not json", encoding="utf-8")
+    rc, _, err = _run_cli(["validate-report", str(bad)], cwd=project_root)
+    assert rc == 1
+    assert "JSON 解析失败" in err
+
+
+def test_validate_report_invalid_content_returns_1(project_root: Path):
+    """合法 JSON 但报告不合规 → rc=1。"""
+    bad = project_root / "wrong.json"
+    bad.write_text(json.dumps({"wrong": "shape"}), encoding="utf-8")
+    rc, _, err = _run_cli(["validate-report", str(bad)], cwd=project_root)
+    assert rc == 1
+    assert "[FAIL]" in err
+
+
+# inspect-doc 边角
+
+
+def test_inspect_doc_with_custom_tolerance_chars(project_root: Path):
+    """--tolerance-chars 应被接受（虽然无标注时该指标固定 null）。"""
+    doc_json = _parse_doc_to_json(project_root)
+    rc, _, err = _run_cli([
+        "inspect-doc", str(doc_json), "--tolerance-chars", "100",
+    ], cwd=project_root)
+    assert rc == 0, f"stderr={err}"
+
+
+def test_inspect_doc_with_empty_doc(project_root: Path):
+    """空文档（无 elements/chunks）也能 inspect。"""
+    empty = project_root / "empty.json"
+    empty.write_text(json.dumps({
+        "schema_version": "0.1.0",
+        "document_id": "d-empty",
+        "source_path": "x",
+        "source_type": "docx",
+        "source_hash": "a" * 64,
+        "parser_name": "test",
+        "parser_version": "0",
+        "elements": [],
+        "chunks": [],
+        "relations": [],
+        "warnings": [],
+        "errors": [],
+        "metadata": {},
+    }), encoding="utf-8")
+    rc, out, err = _run_cli(["inspect-doc", str(empty)], cwd=project_root)
+    assert rc == 0, f"stderr={err}"
+    assert "elements=0" in out
+    assert "chunks=0" in out
+
+
+def test_inspect_doc_metrics_sorted_correctly(project_root: Path):
+    """metrics 输出应按 (bool, numeric, dict, null) 分组排序。"""
+    doc_json = _parse_doc_to_json(project_root)
+    rc, out, err = _run_cli(["inspect-doc", str(doc_json)], cwd=project_root)
+    assert rc == 0, f"stderr={err}"
+    # bool 类（pipeline_success=True）应在 numeric 类之前
+    success_line = out.find("pipeline_success")
+    element_count_line = out.find("element_count_total")
+    assert success_line != -1 and element_count_line != -1
+    assert success_line < element_count_line
+
+
+# _format_metric 直接单测
+
+
+def test_format_metric_none_value():
+    from evaluation.cli import _format_metric
+    result = _format_metric("foo", {"value": None, "reason": "no_data"})
+    assert "foo" in result
+    assert "null" in result
+    assert "no_data" in result
+
+
+def test_format_metric_bool_true():
+    from evaluation.cli import _format_metric
+    result = _format_metric("ok_metric", {"value": True, "reason": None})
+    assert "true" in result
+    assert "(ok)" in result
+
+
+def test_format_metric_bool_false():
+    from evaluation.cli import _format_metric
+    result = _format_metric("fail_metric", {"value": False, "reason": None})
+    assert "false" in result
+
+
+def test_format_metric_int_value():
+    from evaluation.cli import _format_metric
+    result = _format_metric("count_metric", {"value": 42, "reason": None})
+    assert "42" in result
+    assert "(ok)" in result
+
+
+def test_format_metric_float_value_formatted():
+    from evaluation.cli import _format_metric
+    result = _format_metric("ratio_metric", {"value": 0.123456, "reason": None})
+    assert "0.1235" in result  # 4 位小数
+
+
+def test_format_metric_dict_value():
+    from evaluation.cli import _format_metric
+    result = _format_metric("counts", {"value": {"heading": 2, "paragraph": 3}, "reason": None})
+    assert "heading=2" in result
+    assert "paragraph=3" in result
+
+
+def test_format_metric_string_value():
+    """value 是字符串时走 default 分支。"""
+    from evaluation.cli import _format_metric
+    result = _format_metric("name", {"value": "fallback", "reason": None})
+    assert "fallback" in result
+
+
+def test_format_metric_with_reason_overrides_default():
+    from evaluation.cli import _format_metric
+    result = _format_metric("ok_metric", {"value": True, "reason": "custom_reason"})
+    # bool 但有自定义 reason → 用 reason 不用默认 'ok'
+    assert "custom_reason" in result
+    assert "(custom_reason)" in result
+    # 默认的 "(ok)" 不应出现
+    assert "(ok)" not in result
+
+
+def test_format_metric_alignment_width():
+    """所有 metric 行的 name 列固定 36 字符宽（format spec {name:36}）。"""
+    from evaluation.cli import _format_metric
+    result = _format_metric("x", {"value": 1, "reason": None})
+    # format is "  {name:36} {value}  ({reason})"
+    # 总前缀（到 value 之前）= 2 (缩进) + 36 (name 区) + 1 (空格) = 39
+    name_part = result.split("1")[0]
+    assert len(name_part) == 39
+
+
+# main() 函数级别
+
+
+def test_main_unknown_command_raises_system_exit():
+    """main(['bogus']) → argparse rc!=0 (SystemExit)。"""
+    from evaluation.cli import main
+    with pytest.raises(SystemExit) as exc:
+        main(["bogus"])
+    assert exc.value.code != 0
+
+
+def test_main_no_command_raises_system_exit():
+    """main([]) → argparse rc!=0 (SystemExit)。"""
+    from evaluation.cli import main
+    with pytest.raises(SystemExit) as exc:
+        main([])
+    assert exc.value.code != 0
+
+
+def test_main_validate_report_returns_2_for_missing_file(tmp_path: Path):
+    from evaluation.cli import main
+    assert main(["validate-report", str(tmp_path / "nope.json")]) == 2
+
+
+def test_main_validate_report_returns_1_for_bad_json(tmp_path: Path):
+    from evaluation.cli import main
+    bad = tmp_path / "broken.json"
+    bad.write_text("{not json", encoding="utf-8")
+    assert main(["validate-report", str(bad)]) == 1
+
+
+def test_main_validate_report_returns_1_for_invalid_content(tmp_path: Path):
+    from evaluation.cli import main
+    bad = tmp_path / "wrong.json"
+    bad.write_text(json.dumps({"x": 1}), encoding="utf-8")
+    assert main(["validate-report", str(bad)]) == 1
+
+
+def test_main_inspect_doc_returns_2_for_missing_file(tmp_path: Path):
+    from evaluation.cli import main
+    assert main(["inspect-doc", str(tmp_path / "nope.json")]) == 2
+
+
+def test_main_inspect_doc_returns_1_for_bad_json(tmp_path: Path):
+    from evaluation.cli import main
+    bad = tmp_path / "broken.json"
+    bad.write_text("{not json", encoding="utf-8")
+    assert main(["inspect-doc", str(bad)]) == 1
+
+
+def test_main_inspect_doc_returns_1_for_top_level_array(tmp_path: Path):
+    from evaluation.cli import main
+    bad = tmp_path / "arr.json"
+    bad.write_text("[1,2,3]", encoding="utf-8")
+    assert main(["inspect-doc", str(bad)]) == 1
+
+
+def test_main_inspect_doc_returns_0_for_valid_doc(tmp_path: Path):
+    from evaluation.cli import main
+    p = tmp_path / "doc.json"
+    p.write_text(json.dumps({
+        "schema_version": "0.1.0",
+        "document_id": "d",
+        "source_path": "x",
+        "source_type": "docx",
+        "source_hash": "a" * 64,
+        "parser_name": "test",
+        "parser_version": "0",
+        "elements": [],
+        "chunks": [],
+        "relations": [],
+        "warnings": [],
+        "errors": [],
+        "metadata": {},
+    }), encoding="utf-8")
+    assert main(["inspect-doc", str(p)]) == 0
+
+
+def test_main_run_returns_2_for_missing_manifest(tmp_path: Path):
+    from evaluation.cli import main
+    assert main([
+        "run", "--manifest", str(tmp_path / "nope.json"),
+        "--output", str(tmp_path / "out.json"),
+    ]) == 2
+
+
+def test_main_run_returns_1_for_bad_manifest(tmp_path: Path):
+    from evaluation.cli import main
+    bad = tmp_path / "bad.json"
+    bad.write_text("{not json", encoding="utf-8")
+    assert main([
+        "run", "--manifest", str(bad),
+        "--output", str(tmp_path / "out.json"),
+    ]) == 1
+
+
+# _build_parser 直接调用
+
+
+def test_build_parser_returns_argparse_parser():
+    from evaluation.cli import _build_parser
+    p = _build_parser()
+    # 三个子命令都已注册
+    sub_actions = [a for a in p._actions if hasattr(a, "choices") and a.choices]
+    # 找到 subparsers action
+    sub_action = next((a for a in p._subparsers._group_actions if hasattr(a, "choices")), None)
+    assert sub_action is not None
+    assert set(sub_action.choices.keys()) == {"run", "validate-report", "inspect-doc"}
+
+
+# run 子命令的端到端输出格式
+
+
+def test_run_outputs_summary_includes_devset_status(project_root: Path):
+    docx_rel = "samples/test/sample.docx"
+    docx_path = project_root / docx_rel
+    docx_path.parent.mkdir(parents=True)
+    build_minimal_docx(docx_path)
+    manifest = _write_manifest(project_root, docx_rel)
+    output = project_root / "outputs" / "report.json"
+    rc, out, err = _run_cli([
+        "run", "--manifest", str(manifest), "--output", str(output),
+    ], cwd=project_root)
+    assert rc == 0, f"stderr={err}"
+    # stdout 应有 devset_status / file_count / groups / pdf / docx
+    assert "devset_status=incomplete" in out
+    assert "file_count=1" in out
+    assert "groups=1" in out
+    assert "pdf=0" in out
+    assert "docx=1" in out
+
+
+def test_run_outputs_summary_includes_git_provenance(project_root: Path):
+    docx_rel = "samples/test/sample.docx"
+    docx_path = project_root / docx_rel
+    docx_path.parent.mkdir(parents=True)
+    build_minimal_docx(docx_path)
+    manifest = _write_manifest(project_root, docx_rel)
+    output = project_root / "outputs" / "report.json"
+    rc, out, err = _run_cli([
+        "run", "--manifest", str(manifest), "--output", str(output),
+    ], cwd=project_root)
+    assert rc == 0, f"stderr={err}"
+    # git_commit 前 12 字符
+    assert "git_commit=" in out
+    # git_dirty=True 或 False
+    assert "git_dirty=" in out
