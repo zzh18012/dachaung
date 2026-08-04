@@ -489,3 +489,387 @@ def test_manifest_extra_field_in_document_rejected(project_root: Path):
     p = _write_manifest(project_root, data)
     with pytest.raises(Exception):
         load_manifest(p)
+
+
+# ---------- 边角补强（Round 43） ----------
+
+
+# ManifestError 类契约
+
+
+def test_manifest_error_is_exception_subclass():
+    from evaluation.manifest import ManifestError
+    assert issubclass(ManifestError, Exception)
+
+
+def test_manifest_error_can_be_raised_and_caught():
+    from evaluation.manifest import ManifestError
+    with pytest.raises(ManifestError) as exc:
+        raise ManifestError("test message")
+    assert "test message" in str(exc.value)
+
+
+# _is_absolute_like 更多边角
+
+
+def test_is_absolute_like_single_char_string():
+    """单字符（不够 3 字符）→ 不可能是 Windows 盘符格式。"""
+    from evaluation.manifest import _is_absolute_like
+    assert _is_absolute_like("a") is False
+    assert _is_absolute_like("C") is False
+
+
+def test_is_absolute_like_two_char_string():
+    from evaluation.manifest import _is_absolute_like
+    assert _is_absolute_like("ab") is False
+    assert _is_absolute_like("C:") is False  # 缺斜杠
+
+
+def test_is_absolute_like_lower_case_drive_letter():
+    """小写盘符也算绝对路径（isalpha() 接受小写）。"""
+    from evaluation.manifest import _is_absolute_like
+    assert _is_absolute_like("c:/x") is True
+    assert _is_absolute_like("d:\\x") is True
+
+
+def test_is_absolute_like_non_alpha_drive_char():
+    """第一位非字母（如数字）→ 不是盘符。"""
+    from evaluation.manifest import _is_absolute_like
+    assert _is_absolute_like("1:/x") is False
+    assert _is_absolute_like("::/x") is False
+
+
+def test_is_absolute_like_dot_relative_path():
+    """./foo 是相对路径（虽然以 . 开头）。"""
+    from evaluation.manifest import _is_absolute_like
+    assert _is_absolute_like("./samples/x.docx") is False
+    assert _is_absolute_like("../samples/x.docx") is False
+
+
+def test_is_absolute_like_just_slash():
+    from evaluation.manifest import _is_absolute_like
+    assert _is_absolute_like("/") is True
+
+
+# _has_backslash 更多边角
+
+
+def test_has_backslash_only_one_backslash_char():
+    from evaluation.manifest import _has_backslash
+    assert _has_backslash("\\") is True
+
+
+def test_has_backslash_forward_slash_returns_false():
+    from evaluation.manifest import _has_backslash
+    assert _has_backslash("a/b") is False
+    assert _has_backslash("/") is False
+
+
+def test_has_backslash_mixed_slashes_returns_true():
+    from evaluation.manifest import _has_backslash
+    assert _has_backslash("a/b\\c") is True
+
+
+# Manifest 数据类 frozen
+
+
+def test_manifest_dataclass_is_frozen():
+    """Manifest 是 frozen dataclass，不能修改属性。"""
+    from evaluation.manifest import Manifest
+    import dataclasses
+    fields = {f.name: f for f in dataclasses.fields(Manifest)}
+    # frozen=True 时所有字段的 setting 都会失败
+    assert all(not f._field_type == "class" for f in dataclasses.fields(Manifest))
+
+
+def test_document_entry_dataclass_is_frozen(project_root: Path):
+    from evaluation.manifest import DocumentEntry
+    import dataclasses
+    # frozen dataclass 实例无法赋值
+    (project_root / "x.docx").write_bytes(b"x")
+    de = DocumentEntry(
+        doc_id="X",
+        path_str="x.docx",
+        resolved_path=project_root / "x.docx",
+        source_type="docx",
+        sha256=None,
+        categories=(),
+        paired_with=None,
+        annotation_file_str=None,
+        annotation_resolved=None,
+        expectations=None,
+    )
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        de.doc_id = "Y"  # type: ignore[misc]
+
+
+def test_expected_failure_dataclass_is_frozen(project_root: Path):
+    from evaluation.manifest import ExpectedFailure
+    import dataclasses
+    ef = ExpectedFailure(
+        doc_id="X",
+        path_str="x.docx",
+        resolved_path=project_root / "x.docx",
+        expected_error_code="file_not_found",
+        source_type=None,
+    )
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        ef.doc_id = "Y"  # type: ignore[misc]
+
+
+# Manifest 属性直接构造（不通过 load_manifest）
+
+
+def test_manifest_file_count_direct():
+    from evaluation.manifest import Manifest, DocumentEntry
+    docs = tuple(
+        DocumentEntry(
+            doc_id=f"D{i}", path_str=f"d{i}.docx", resolved_path=Path(f"d{i}.docx"),
+            source_type="docx", sha256=None, categories=(), paired_with=None,
+            annotation_file_str=None, annotation_resolved=None, expectations=None,
+        )
+        for i in range(5)
+    )
+    m = Manifest(
+        manifest_version="1.0",
+        devset_status="incomplete",
+        documents=docs,
+        expected_failures=(),
+        project_root=Path("."),
+    )
+    assert m.file_count == 5
+
+
+def test_manifest_pdf_count_direct():
+    from evaluation.manifest import Manifest, DocumentEntry
+    docs = tuple(
+        DocumentEntry(
+            doc_id=f"D{i}", path_str=f"d{i}.pdf", resolved_path=Path(f"d{i}.pdf"),
+            source_type="pdf", sha256=None, categories=(), paired_with=None,
+            annotation_file_str=None, annotation_resolved=None, expectations=None,
+        )
+        for i in range(3)
+    )
+    m = Manifest(
+        manifest_version="1.0",
+        devset_status="incomplete",
+        documents=docs,
+        expected_failures=(),
+        project_root=Path("."),
+    )
+    assert m.pdf_count == 3
+    assert m.docx_count == 0
+
+
+def test_manifest_docx_count_direct():
+    from evaluation.manifest import Manifest, DocumentEntry
+    docs = (
+        DocumentEntry(
+            doc_id="D1", path_str="d1.docx", resolved_path=Path("d1.docx"),
+            source_type="docx", sha256=None, categories=(), paired_with=None,
+            annotation_file_str=None, annotation_resolved=None, expectations=None,
+        ),
+        DocumentEntry(
+            doc_id="D2", path_str="d2.docx", resolved_path=Path("d2.docx"),
+            source_type="docx", sha256=None, categories=(), paired_with=None,
+            annotation_file_str=None, annotation_resolved=None, expectations=None,
+        ),
+    )
+    m = Manifest(
+        manifest_version="1.0",
+        devset_status="incomplete",
+        documents=docs,
+        expected_failures=(),
+        project_root=Path("."),
+    )
+    assert m.docx_count == 2
+    assert m.pdf_count == 0
+
+
+def test_manifest_categories_covered_mixed_overlapping():
+    from evaluation.manifest import Manifest, DocumentEntry
+    docs = (
+        DocumentEntry(
+            doc_id="D1", path_str="d1.docx", resolved_path=Path("d1.docx"),
+            source_type="docx", sha256=None, categories=("a", "b", "c"),
+            paired_with=None, annotation_file_str=None, annotation_resolved=None, expectations=None,
+        ),
+        DocumentEntry(
+            doc_id="D2", path_str="d2.docx", resolved_path=Path("d2.docx"),
+            source_type="docx", sha256=None, categories=("b", "c", "d"),
+            paired_with=None, annotation_file_str=None, annotation_resolved=None, expectations=None,
+        ),
+        DocumentEntry(
+            doc_id="D3", path_str="d3.docx", resolved_path=Path("d3.docx"),
+            source_type="docx", sha256=None, categories=("a", "z"),
+            paired_with=None, annotation_file_str=None, annotation_resolved=None, expectations=None,
+        ),
+    )
+    m = Manifest(
+        manifest_version="1.0",
+        devset_status="incomplete",
+        documents=docs,
+        expected_failures=(),
+        project_root=Path("."),
+    )
+    # 合并去重 + 字母排序
+    assert m.categories_covered == ["a", "b", "c", "d", "z"]
+
+
+def test_manifest_categories_covered_empty_when_all_empty():
+    from evaluation.manifest import Manifest, DocumentEntry
+    docs = (
+        DocumentEntry(
+            doc_id="D1", path_str="d1.docx", resolved_path=Path("d1.docx"),
+            source_type="docx", sha256=None, categories=(),
+            paired_with=None, annotation_file_str=None, annotation_resolved=None, expectations=None,
+        ),
+    )
+    m = Manifest(
+        manifest_version="1.0",
+        devset_status="incomplete",
+        documents=docs,
+        expected_failures=(),
+        project_root=Path("."),
+    )
+    assert m.categories_covered == []
+
+
+# _detect_project_root 更多边角
+
+
+def test_detect_project_root_start_is_dir(tmp_path: Path):
+    """start 是目录时不应出错（不切到 parent）。"""
+    from evaluation.manifest import _detect_project_root
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
+    nested = tmp_path / "a" / "b"
+    nested.mkdir(parents=True)
+    found = _detect_project_root(nested)
+    assert found == tmp_path.resolve()
+
+
+def test_detect_project_root_returns_absolute_path(tmp_path: Path):
+    from evaluation.manifest import _detect_project_root
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
+    found = _detect_project_root(tmp_path)
+    assert found.is_absolute()
+
+
+def test_detect_project_root_immediate_directory_with_pyproject(tmp_path: Path):
+    """start 自己就有 pyproject.toml → 直接返回 start。"""
+    from evaluation.manifest import _detect_project_root
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
+    found = _detect_project_root(tmp_path)
+    assert found == tmp_path.resolve()
+
+
+# content_group_count 更多场景
+
+
+def test_content_group_count_chain_pair_counts_correctly(project_root: Path):
+    """A→B→C 链式 paired_with（A 配 B，B 配 C）的边角。
+
+    当前实现：pair_ids 收集 frozenset 去重 → {{A,B}, {B,C}} → 2 组；
+    unpaired 集合 = 文档集合 - 见过的 → 0；总组数 = 2。
+    """
+    (project_root / "samples" / "private").mkdir(parents=True)
+    for n in ("a.docx", "b.docx", "c.docx"):
+        (project_root / "samples" / "private" / n).write_bytes(b"x")
+    data = {
+        "manifest_version": "1.0",
+        "devset_status": "incomplete",
+        "documents": [
+            {"doc_id": "A", "path": "samples/private/a.docx", "source_type": "docx",
+             "paired_with": "B"},
+            {"doc_id": "B", "path": "samples/private/b.docx", "source_type": "docx",
+             "paired_with": "C"},
+            {"doc_id": "C", "path": "samples/private/c.docx", "source_type": "docx",
+             "paired_with": "A"},
+        ],
+    }
+    p = _write_manifest(project_root, data)
+    m = load_manifest(p)
+    # {A,B} + {B,C} + {A,C}（C→A 配对）→ frozenset 去重后还是 {A,B} + {B,C} + {A,C} = 3 组
+    # 注意 unpaired 是 0
+    assert m.content_group_count == 3
+
+
+def test_content_group_count_two_mutual_pairs(project_root: Path):
+    """两组互配：A↔B + C↔D → 2 组。"""
+    (project_root / "samples" / "private").mkdir(parents=True)
+    for n in ("a.docx", "b.docx", "c.docx", "d.docx"):
+        (project_root / "samples" / "private" / n).write_bytes(b"x")
+    data = {
+        "manifest_version": "1.0",
+        "devset_status": "incomplete",
+        "documents": [
+            {"doc_id": "A", "path": "samples/private/a.docx", "source_type": "docx",
+             "paired_with": "B"},
+            {"doc_id": "B", "path": "samples/private/b.docx", "source_type": "docx",
+             "paired_with": "A"},
+            {"doc_id": "C", "path": "samples/private/c.docx", "source_type": "docx",
+             "paired_with": "D"},
+            {"doc_id": "D", "path": "samples/private/d.docx", "source_type": "docx",
+             "paired_with": "C"},
+        ],
+    }
+    p = _write_manifest(project_root, data)
+    m = load_manifest(p)
+    assert m.content_group_count == 2
+
+
+# load_manifest 字段保留
+
+
+def test_load_manifest_preserves_manifest_version(project_root: Path):
+    (project_root / "samples" / "private").mkdir(parents=True)
+    (project_root / "samples" / "private" / "x.docx").write_bytes(b"x")
+    p = _write_manifest(project_root, _basic_valid_manifest())
+    m = load_manifest(p)
+    assert m.manifest_version == "1.0"
+
+
+def test_load_manifest_preserves_devset_status(project_root: Path):
+    (project_root / "samples" / "private").mkdir(parents=True)
+    (project_root / "samples" / "private" / "x.docx").write_bytes(b"x")
+    p = _write_manifest(project_root, _basic_valid_manifest())
+    m = load_manifest(p)
+    assert m.devset_status == "incomplete"
+
+
+def test_load_manifest_empty_documents_list(project_root: Path):
+    """空 documents 列表也应被允许（schema 允许）。"""
+    data = {
+        "manifest_version": "1.0",
+        "devset_status": "incomplete",
+        "documents": [],
+    }
+    p = _write_manifest(project_root, data)
+    m = load_manifest(p)
+    assert m.documents == ()
+    assert m.file_count == 0
+
+
+def test_load_manifest_empty_expected_failures_default(project_root: Path):
+    (project_root / "samples" / "private").mkdir(parents=True)
+    (project_root / "samples" / "private" / "x.docx").write_bytes(b"x")
+    p = _write_manifest(project_root, _basic_valid_manifest())
+    m = load_manifest(p)
+    # 没显式给 expected_failures → schema 允许缺失 → 默认空 tuple
+    assert m.expected_failures == ()
+
+
+def test_load_manifest_path_str_preserved(project_root: Path):
+    (project_root / "samples" / "private").mkdir(parents=True)
+    (project_root / "samples" / "private" / "x.docx").write_bytes(b"x")
+    p = _write_manifest(project_root, _basic_valid_manifest())
+    m = load_manifest(p)
+    assert m.documents[0].path_str == "samples/private/sample.docx"
+
+
+def test_load_manifest_resolved_path_is_absolute(project_root: Path):
+    (project_root / "samples" / "private").mkdir(parents=True)
+    (project_root / "samples" / "private" / "x.docx").write_bytes(b"x")
+    p = _write_manifest(project_root, _basic_valid_manifest())
+    m = load_manifest(p)
+    assert m.documents[0].resolved_path.is_absolute()

@@ -549,3 +549,279 @@ def test_chunk_boundary_tolerance_and_missing_markers_coexist():
     assert out["_tolerance_chars"]["value"] == 15
     assert "_missing_markers" in out
     assert "MISSING" in out["_missing_markers"]["value"]
+
+
+# ---------- 边角补强（Round 43） ----------
+
+
+# PARSER_DOES_NOT_EMIT_RELATIONS 常量
+
+
+def test_parser_does_not_emit_relations_constant_value():
+    """常量字符串值固定（schema 用 reason 字段，不应改变）。"""
+    assert PARSER_DOES_NOT_EMIT_RELATIONS == "parser_does_not_emit_relations"
+
+
+def test_parser_does_not_emit_relations_constant_is_string():
+    assert isinstance(PARSER_DOES_NOT_EMIT_RELATIONS, str)
+
+
+# figure_caption_prf shape
+
+
+def test_figure_caption_prf_returns_three_keys_only():
+    out = figure_caption_prf(document=None, annotation=None)
+    assert set(out.keys()) == {
+        "figure_caption_precision", "figure_caption_recall", "figure_caption_f1",
+    }
+
+
+def test_figure_caption_prf_with_annotation_still_returns_three_keys():
+    """即便 annotation 不为 None，也固定 null（本期不引入启发式）。"""
+    out = figure_caption_prf(
+        document={"chunks": [{"text": "fig"}]},
+        annotation={"figure_caption": [{"fig": "f1", "caption": "c1"}]},
+    )
+    assert set(out.keys()) == {
+        "figure_caption_precision", "figure_caption_recall", "figure_caption_f1",
+    }
+    for v in out.values():
+        assert v["value"] is None
+
+
+def test_figure_caption_prf_keys_have_value_and_reason():
+    """每个 metric 是 dict，含 value/reason 两个键。"""
+    out = figure_caption_prf(document=None, annotation=None)
+    for k, v in out.items():
+        assert "value" in v
+        assert "reason" in v
+
+
+# chunk_boundary_prf 容差极端值
+
+
+def test_chunk_boundary_prf_tolerance_zero_strict_match():
+    """tolerance_chars=0 → 必须严格对齐。"""
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha beta", ["e1"]),
+        _chunk("c2", "gamma delta", ["e2"]),
+    ])
+    # 标注 anchor 放在 "beta" 之后，预测边界（c1 结束位置）正好在 "beta" 之后
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "beta", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=0)
+    assert out["chunk_boundary_precision"]["value"] is not None
+    assert out["chunk_boundary_recall"]["value"] is not None
+
+
+def test_chunk_boundary_prf_tolerance_huge_includes_all():
+    """tolerance_chars 很大 → 所有预测边界都视作匹配。"""
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha beta", ["e1"]),
+        _chunk("c2", "gamma delta", ["e2"]),
+    ])
+    # anchor 在 "delta" 之后，距预测边界（c1 结束）较远
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "delta", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=10000)
+    # 10000 字符容差足以匹配
+    assert out["chunk_boundary_recall"]["value"] == 1.0
+
+
+def test_chunk_boundary_prf_tolerance_negative_treated_as_no_match():
+    """tolerance_chars 负数 → abs(pv - gv) > 负数 永远成立 → 不匹配。
+
+    注：当前实现是 abs(d) <= tolerance，负 tolerance 永远 false。
+    """
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha beta", ["e1"]),
+        _chunk("c2", "gamma delta", ["e2"]),
+    ])
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "beta", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=-1)
+    # 严格不匹配 → matched=0
+    assert out["chunk_boundary_precision"]["value"] == 0.0
+    assert out["chunk_boundary_recall"]["value"] == 0.0
+
+
+# chunk_boundary_prf 默认值与常量
+
+
+def test_chunk_boundary_prf_default_tolerance_is_30():
+    """不传 tolerance_chars → 默认 30。"""
+    doc = _doc_with_chunks([_chunk("c1", "x", ["e1"])])
+    out = chunk_boundary_prf(doc, {"chunk_boundary_anchors": []})
+    assert out["_tolerance_chars"]["value"] == 30
+
+
+# chunk_boundary_prf chunk 边界场景
+
+
+def test_chunk_boundary_prf_three_chunks_two_predicted_boundaries():
+    """3 chunks → 2 个内部预测边界。"""
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha", ["e1"]),
+        _chunk("c2", "beta", ["e2"]),
+        _chunk("c3", "gamma", ["e3"]),
+    ])
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "alpha", "position": "after"},
+            {"marker": "beta", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=2)
+    # 2 预测 vs 2 标注，正好一对一 → 完美匹配
+    assert out["chunk_boundary_precision"]["value"] == 1.0
+    assert out["chunk_boundary_recall"]["value"] == 1.0
+
+
+def test_chunk_boundary_prf_two_chunks_one_predicted_boundary():
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha", ["e1"]),
+        _chunk("c2", "beta", ["e2"]),
+    ])
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "alpha", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=2)
+    # 1 预测 vs 1 标注
+    assert out["chunk_boundary_precision"]["value"] == 1.0
+    assert out["chunk_boundary_recall"]["value"] == 1.0
+
+
+# chunk_boundary_prf f1 计算
+
+
+def test_chunk_boundary_prf_f1_perfect_match():
+    """完美匹配 → p=r=1.0 → f1=1.0。"""
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha", ["e1"]),
+        _chunk("c2", "beta", ["e2"]),
+    ])
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "alpha", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=2)
+    assert out["chunk_boundary_f1"]["value"] == 1.0
+
+
+def test_chunk_boundary_prf_f1_half_match():
+    """2 预测 1 标注 1 匹配：p=0.5, r=1.0 → f1=2*0.5*1/(0.5+1)=2/3≈0.667。"""
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha", ["e1"]),
+        _chunk("c2", "beta", ["e2"]),
+        _chunk("c3", "gamma", ["e3"]),  # 多一个 chunk
+    ])
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "alpha", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=2)
+    p = out["chunk_boundary_precision"]["value"]
+    r = out["chunk_boundary_recall"]["value"]
+    f1 = out["chunk_boundary_f1"]["value"]
+    assert p == 0.5
+    assert r == 1.0
+    assert f1 is not None
+    expected_f1 = 2 * 0.5 * 1.0 / (0.5 + 1.0)
+    assert abs(f1 - expected_f1) < 1e-9
+
+
+# chunk_boundary_prf 缺失 marker
+
+
+def test_chunk_boundary_prf_marker_not_in_stream_goes_to_missing():
+    """marker 不在 stream 中 → 加入 _missing_markers，gt_positions 不增加。"""
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha", ["e1"]),
+        _chunk("c2", "beta", ["e2"]),
+    ])
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "alpha", "position": "after"},
+            {"marker": "NOT_IN_STREAM", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=2)
+    assert "_missing_markers" in out
+    assert "NOT_IN_STREAM" in out["_missing_markers"]["value"]
+
+
+def test_chunk_boundary_prf_no_missing_markers_key_when_all_found():
+    """所有 marker 都找到 → 不出现 _missing_markers 键。"""
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha", ["e1"]),
+        _chunk("c2", "beta", ["e2"]),
+    ])
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "alpha", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=2)
+    assert "_missing_markers" not in out
+
+
+# chunk_boundary_prf tolerance_record
+
+
+def test_chunk_boundary_prf_tolerance_record_always_present_on_success():
+    """成功路径下 _tolerance_chars 总是被记录。"""
+    doc = _doc_with_chunks([
+        _chunk("c1", "alpha", ["e1"]),
+        _chunk("c2", "beta", ["e2"]),
+    ])
+    annotation = {"chunk_boundary_anchors": []}
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=42)
+    assert out["_tolerance_chars"]["value"] == 42
+
+
+def test_chunk_boundary_prf_tolerance_record_present_on_no_document():
+    """document=None 时 _tolerance_chars 也应被记录。"""
+    out = chunk_boundary_prf(None, {"chunk_boundary_anchors": []}, tolerance_chars=15)
+    assert out["_tolerance_chars"]["value"] == 15
+
+
+def test_chunk_boundary_prf_tolerance_record_present_on_no_annotation():
+    """annotation=None 时 _tolerance_chars 也应被记录。"""
+    doc = _doc_with_chunks([_chunk("c1", "x", ["e1"])])
+    out = chunk_boundary_prf(doc, None, tolerance_chars=20)
+    assert out["_tolerance_chars"]["value"] == 20
+
+
+# chunk_boundary_prf 完全空 chunk text
+
+
+def test_chunk_boundary_prf_all_empty_chunk_text():
+    """所有 chunk 的 text 都是空字符串 → norm_chunks 全空 → 拼接 stream 也空。"""
+    doc = _doc_with_chunks([
+        _chunk("c1", "", ["e1"]),
+        _chunk("c2", "", ["e2"]),
+    ])
+    annotation = {
+        "chunk_boundary_anchors": [
+            {"marker": "alpha", "position": "after"},
+        ],
+    }
+    out = chunk_boundary_prf(doc, annotation, tolerance_chars=5)
+    # marker 找不到（stream 空）→ missing_markers 记录
+    assert "_missing_markers" in out
+    # 没崩溃，结果含三个 metric key
+    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
+        assert k in out
