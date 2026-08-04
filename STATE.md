@@ -5052,3 +5052,63 @@ markdown_parser.py 326 行 308 tests（0.94 tests/line），选其为第三轮�
 - 本 worktree（Round 102 后）：6826 pass / 0 fail / 13 skip（HEAD `3dc2728`）
 
 ---
+
+## Round 103（2026-08-05）：候选 DV — app/parsers/ipynb_parser.py 第三轮边角
+
+### 触发
+继 Round 102（markdown_parser 第三轮）后继续自跑。
+ipynb_parser.py 227 行 323 tests（1.4 tests/line），仍有 helper 与
+错误路径深度可补。
+
+### 实现
+- 新增 `tests/test_parsers_ipynb_edges3.py`（105 个测试）
+- 覆盖 app/parsers/ipynb_parser.py（227 行）的深度路径：
+  - **`_cell_source_to_text`**：str/list/None/int/mixed-type list、empty list
+  - **`_extract_kernel_language` 优先级链**：kernelspec.language >
+    kernelspec.name > language_info.name > ""
+  - **`_detect_ipynb_source_type`**：小写/大写/混合大小写接受、拒绝 html/md/no-suffix、
+    `_IPYNB_EXTENSIONS` 精确单项
+  - **nbformat 字段**：3/0/-1 抛 ipynb_unsupported_version、4/5/10 支持、
+    missing 当作支持（metadata.nbformat=None）、minor missing → None
+  - **顶层结构**：list/string/int/null 顶层抛 ipynb_bad_structure、
+    cells 非 list 抛错、cells null/missing 当空
+  - **markdown cell**：多 element emit、locator 含 cell_index + cell_type、
+    两个 cell 各自独立 section_path、warning 透传含 cell_index、
+    table/image sub-element、空 source → ipynb_no_content、source 作为 list
+  - **code cell**：基础 emit、language 来自 kernelspec/language_info、
+    无 metadata 时 language=""、locator 不含 line（仅 cell_index+type）、
+    empty/whitespace-only emit ipynb_empty_code_cell warning 并跳过
+  - **raw cell**：emit kind=raw_cell、content stripped、empty 静默跳过、
+    whitespace-only 静默跳过
+  - **cell 错误**：非 dict cell emit ipynb_bad_cell（含 cell_index）、
+    unknown cell_type emit ipynb_unknown_cell_type（含 cell_type）、
+    missing/null cell_type 默认为 'unknown'
+  - **pipeline 错误**：file_not_found、ipynb_invalid_json、
+    ipynb_read_failed（OS monkey）、unsupported_type
+  - **Document 不变量**：chunks/relations/errors 空、ipynb flag、
+    cell_count metadata、language metadata、source_type=ipynb、
+    parser name/version
+  - **element_id**：跨 cell 连续编号、唯一
+  - **完整 notebook e2e**：emit mixed types（heading/paragraph/list_item）
+  - **模块结构**：__all__ 精确、所有 import、name/version 值
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_extract_kernel_language(None)` 不接受 None（实际调用方用
+  `nb.get('metadata') or {}` 兜底），改测试为 pytest.raises(AttributeError)
+  并增加一个 parse 路径测试验证 None 兜底
+
+### 下一步建议
+- 候选 DW：app/parsers/text_parser.py 第三轮（136 行 212 tests）
+- 候选 DX：app/parsers/kreuzberg_parser.py 第三轮（245 行 332 tests）
+- 候选 DY：app/chunkers/structural.py 第四轮
+- 候选 DZ：app/parsers/fallback_parser.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DW（text_parser.py 第三轮，虽小但 saturate 比率较低）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 103 后）：6931 pass / 0 fail / 13 skip（HEAD `370c67a`）
+
+---
