@@ -8732,3 +8732,46 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 是默认 parser，第三轮可深入 PDF/DOCX 分支、元素构造、warning 细节等。
 
 ---
+
+## Round 148（2026-08-05）：app/hash.py 第五轮（edges4）
+
+### 目标
+- 给 app/hash.py（24 行，已有 base/edges/edges2/edges3 共 202 测试）补第五轮
+- 深入 65536 buffer 边界、函数属性、模块结构
+
+### 改动
+- 新增 `tests/test_hash_edges4.py`（64 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **65536 buffer 边界**：65535/65536/65537/131072/196607/655360 字节精确切片
+- **SHA-256 测试向量**：重复模式、特殊字符、emoji、4-byte UTF-8、null byte、BOM、1MB
+- **函数属性**：__name__/__qualname__/__module__、callable、docstring
+- **模块结构**：__doc__/__name__/__file__、无 __all__、imports、future annotations
+- **顶层 def 仅 2 个**：compute_file_hash / compute_text_hash
+- **签名深度**：POSITIONAL_OR_KEYWORD kind、no varargs
+- **文件路径形式**：relative、dots、double-dot parent、forward slash
+- **错误消息**：含路径名、FileNotFoundError 是 OSError 子类
+- **跨函数一致性**：多文件 / 多字符串与 hashlib 对比
+- **不变量**：idempotent、不修改输入、不修改文件 mtime
+- **综合行为**：file_hash 与 text_hash 同 length / charset / lowercase
+
+### 撞墙记录
+- **Wall 1**：compute_file_hash.__doc__ 是中文（"流式读取..."），不含 "SHA"/"hash" 英文关键词。修复：改为测中文 "流式"/"摘要" 或英文 "hash"。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 148 后）：11666 pass / 0 fail / 13 skip（HEAD `0b2f905`）
+
+### 下一步建议
+- 候选 HK：app/models.py 第六轮
+- 候选 HL：app/schema.py 第六轮
+- 候选 HM：app/pipeline.py 第六轮
+- 候选 HN：evaluation/runner.py 第六轮
+- 候选 HO：evaluation/metrics.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HK（app/models.py 第六轮）。models 是核心数据类，
+第六轮可深入 dataclass 字段、to_dict 序列化、__post_init__ 边界。
+
+---
