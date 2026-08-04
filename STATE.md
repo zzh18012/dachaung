@@ -1814,3 +1814,42 @@
 - 本 worktree（Round 34 后）：837 pass / 0 fail / 9 skip（HEAD `c566e98`）
 
 ---
+
+## Round 35（2026-08-04）：候选 AO — process_single 端到端 + helper 覆盖补强
+
+### 做了什么
+- 候选 AO：扩展 `tests/test_pipeline_errors.py`，新增 34 个测试覆盖 process_single 各种 parser / max_chars / output_path 组合 + Document 字段完整性 + JSON 输出格式。
+- 重点覆盖项：
+  - **6 个 parser 端到端**：markdown / html / text / ipynb 各跑一遍 + 验证 source_type / parser_name / elements 数 / chunks 数
+  - **hash 稳定性** 1 个：同一份输入跑两次 source_hash 一致
+  - **max_chars 边角** 4 个：32（chunker 最小值）、100000（无分块）、800（默认）、低于 32 触发 chunker_failed
+  - **output_path 边角** 2 个：嵌套父目录自动 mkdir、str 类型 input_path 接受
+  - **error details 结构** 3 个：file_not_found.path、schema_validation_failed.validation_errors、no_extracted_elements.warnings + source_type
+  - **validate_only 边角** 3 个：目录（非文件）、str 路径、合法文件返回 (True, "OK")
+  - **get_parser 边角** 4 个：image_output_dir 接受 str、所有 6 个 parser 都有 name / version / parse 属性
+  - **输出 JSON 格式** 4 个：indent=2、UTF-8 编码、ensure_ascii=False（无 \u escape）、pipeline 幂等
+  - **Document 字段** 3 个：metadata 是 dict、relations 默认空 list、warnings 是 list
+  - **unsupported_type** 2 个：fallback 拒绝 .txt、markdown 拒绝 .pdf
+- 无源码改动。
+
+### 撞墙记录
+- **撞墙 1**：`test_process_single_very_small_max_chars` 用 max_chars=10，但 StructuralChunker 强制 max_chars >= 32。改测：用 32（最小值），并新增 `test_process_single_max_chars_below_minimum_yields_chunker_failed` 验证低于最小值的错误路径。
+- **撞墙 2**：`test_process_single_document_metadata_is_empty_dict_by_default` 假设默认 metadata 是空 dict，但 fallback parser 主动填了 `{'fallback': True, 'image_output_dir': None}`。改测：放宽断言为 `isinstance(metadata, dict)`。
+
+### 下一步建议
+- 候选 AK：kreuzberg / markdown / html parser 内部 helper 单测
+- 候选 AP：evaluation/runner.py 评测指标聚合边角（ratio 分母 0 / silent_drop 累加）
+- 候选 AQ：evaluation/manifest.py / annotation.py 边角
+- 候选 AR：app/chunkers/structural.py 内部 _ChunkBuffer / 切句函数边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AR（structural chunker 内部 helper）。理由：
+1. chunker 是 pipeline 第二阶段，直接影响输出 chunk 质量
+2. _ChunkBuffer / _split_long_sentence 是纯函数，易于直接单测
+3. 与 Round 28 互补（Round 28 覆盖 normalize_text / __init__ / 公共路径，本轮覆盖内部 helper）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 35 后）：871 pass / 0 fail / 9 skip（HEAD `3618bc4`）
+
+---
