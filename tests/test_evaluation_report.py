@@ -152,3 +152,247 @@ def test_no_mixed_overall_score():
             for k in v:
                 assert "overall" not in k.lower()
                 assert "total_score" not in k.lower()
+
+
+# ---------- 边角与缺漏补强（Round 26） ----------
+
+
+def test_aggregate_empty_per_doc_results():
+    """空 per_doc list 不应崩溃。"""
+    s = aggregate_summary([])
+    assert s["counts"]["element_count_total"]["sum"] is None
+    assert s["counts"]["element_count_total"]["participating_docs"] == 0
+    # success_rates：total=0 → rate=None
+    sr = s["success_rates"]["pipeline_success"]
+    assert sr["success_count"] == 0
+    assert sr["total"] == 0
+    assert sr["rate"] is None
+    # silent_drop_total：no values → None
+    assert s["silent_drop_total"] is None
+
+
+def test_aggregate_counts_all_none_returns_none_sum():
+    """所有 doc 的 element_count_total 都是 None → sum=None, participating=0。"""
+    per_doc = [
+        _make_per_doc({"element_count_total": {"value": None, "reason": "pipeline_failed"}}),
+        _make_per_doc({"element_count_total": {"value": None, "reason": "pipeline_failed"}}),
+    ]
+    s = aggregate_summary(per_doc)
+    assert s["counts"]["element_count_total"]["sum"] is None
+    assert s["counts"]["element_count_total"]["participating_docs"] == 0
+
+
+def test_aggregate_ratio_macro_average_with_multiple_values():
+    """两个 doc 都给非 null ratio → macro 是算术平均。"""
+    per_doc = [
+        _make_per_doc({"pdf_locator_valid_ratio": {"value": 0.5, "reason": None}}),
+        _make_per_doc({"pdf_locator_valid_ratio": {"value": 1.0, "reason": None}}),
+    ]
+    s = aggregate_summary(per_doc)
+    ratio = s["ratio_macro_averages"]["pdf_locator_valid_ratio"]
+    assert ratio["macro_average"] == 0.75
+    assert ratio["participating_docs"] == 2
+    assert ratio["not_evaluated"] == 0
+
+
+def test_aggregate_ratio_macro_average_all_null():
+    """所有 doc 都给 None → macro=None, participating=0, not_evaluated=N。"""
+    per_doc = [
+        _make_per_doc({"pdf_locator_valid_ratio": {"value": None, "reason": "x"}}),
+        _make_per_doc({"pdf_locator_valid_ratio": {"value": None, "reason": "y"}}),
+    ]
+    s = aggregate_summary(per_doc)
+    ratio = s["ratio_macro_averages"]["pdf_locator_valid_ratio"]
+    assert ratio["macro_average"] is None
+    assert ratio["participating_docs"] == 0
+    assert ratio["not_evaluated"] == 2
+
+
+def test_aggregate_schema_valid_in_ratio_metrics():
+    """schema_valid 同时在 success_rates（_SUCCESS_BOOL_METRICS 没有）
+    和 ratio_macro_averages（在 _RATIO_METRICS 里）。
+    它是 bool，但 macro_average 把 True 当 1.0 / False 当 0.0。"""
+    per_doc = [
+        _make_per_doc({"schema_valid": {"value": True, "reason": None}}),
+        _make_per_doc({"schema_valid": {"value": False, "reason": None}}),
+    ]
+    s = aggregate_summary(per_doc)
+    # ratio 视角：True=1.0, False=0.0 → macro = 0.5
+    assert s["ratio_macro_averages"]["schema_valid"]["macro_average"] == 0.5
+
+
+def test_aggregate_figure_caption_excluded_from_ratio_averages():
+    """figure_caption_* 不在 _RATIO_METRICS 中 → 不应出现在 ratio_macro_averages。"""
+    per_doc = [_make_per_doc()]
+    s = aggregate_summary(per_doc)
+    assert "figure_caption_precision" not in s["ratio_macro_averages"]
+    assert "figure_caption_recall" not in s["ratio_macro_averages"]
+    assert "figure_caption_f1" not in s["ratio_macro_averages"]
+
+
+def test_aggregate_chunk_boundary_in_ratio_metrics():
+    """chunk_boundary_* 在 _RATIO_METRICS 中。"""
+    per_doc = [
+        _make_per_doc({"chunk_boundary_precision": {"value": 0.5, "reason": None}}),
+    ]
+    s = aggregate_summary(per_doc)
+    assert "chunk_boundary_precision" in s["ratio_macro_averages"]
+    assert s["ratio_macro_averages"]["chunk_boundary_precision"]["macro_average"] == 0.5
+
+
+def test_aggregate_text_preservation_equal_treated_as_ratio():
+    """text_preservation_equal 是 bool 但在 ratio 列表里：True=1.0 / False=0.0。"""
+    per_doc = [
+        _make_per_doc({"text_preservation_equal": {"value": True, "reason": None}}),
+        _make_per_doc({"text_preservation_equal": {"value": False, "reason": None}}),
+    ]
+    s = aggregate_summary(per_doc)
+    # (True + False) / 2 → Python: (1 + 0) / 2 = 0.5
+    macro = s["ratio_macro_averages"]["text_preservation_equal"]["macro_average"]
+    assert macro == 0.5
+
+
+def test_aggregate_success_rate_all_fail():
+    per_doc = [
+        _make_per_doc({"pipeline_success": {"value": False, "reason": None}}),
+        _make_per_doc({"pipeline_success": {"value": False, "reason": None}}),
+    ]
+    s = aggregate_summary(per_doc)
+    sr = s["success_rates"]["pipeline_success"]
+    assert sr["success_count"] == 0
+    assert sr["total"] == 2
+    assert sr["rate"] == 0.0
+
+
+def test_aggregate_success_rate_all_pass():
+    per_doc = [_make_per_doc(), _make_per_doc()]
+    s = aggregate_summary(per_doc)
+    sr = s["success_rates"]["pipeline_success"]
+    assert sr["success_count"] == 2
+    assert sr["rate"] == 1.0
+
+
+def test_aggregate_silent_drop_mixed():
+    """silent_drop_count 求和：null 不参与。"""
+    per_doc = [
+        _make_per_doc({"silent_drop_count": {"value": 0, "reason": None}}),
+        _make_per_doc({"silent_drop_count": {"value": 5, "reason": None}}),
+        _make_per_doc({"silent_drop_count": {"value": None, "reason": "no_expectations"}}),
+        _make_per_doc({"silent_drop_count": {"value": 3, "reason": None}}),
+    ]
+    s = aggregate_summary(per_doc)
+    assert s["silent_drop_total"] == 8
+
+
+def test_get_dependency_versions_returns_dict_with_known_packages():
+    from evaluation.report import get_dependency_versions
+    versions = get_dependency_versions()
+    assert isinstance(versions, dict)
+    # 三个包名都应在结果里（值可能是 None，如果未安装）
+    assert "pdfplumber" in versions
+    assert "python-docx" in versions
+    assert "pypdfium2" in versions
+
+
+def test_get_dependency_versions_values_are_str_or_none():
+    from evaluation.report import get_dependency_versions
+    versions = get_dependency_versions()
+    for pkg, ver in versions.items():
+        assert ver is None or isinstance(ver, str)
+
+
+def test_get_git_provenance_non_git_dir_returns_none_commit(tmp_path: Path):
+    """非 git 仓库 → commit=None（dirty 行为依赖 git 子进程，不强断）。"""
+    from evaluation.report import get_git_provenance
+    # tmp_path 不是 git 仓库
+    prov = get_git_provenance(tmp_path)
+    assert prov["git_commit"] is None
+    # git_dirty 是 bool（具体值依赖环境：子进程失败时 True，正常返回非 0 时 False）
+    assert isinstance(prov["git_dirty"], bool)
+
+
+def test_build_provenance_int_converts_max_chars(tmp_path: Path):
+    """max_chars 应被强制转成 int。"""
+    import subprocess
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
+    subprocess.run(["git", "init"], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@t"], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "add", "."], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "commit", " -m", "init"], cwd=str(tmp_path), capture_output=True)
+    prov = build_provenance(tmp_path, parser_name="x", max_chars=800, parser_version=None)
+    assert prov["max_chars"] == 800
+    assert isinstance(prov["max_chars"], int)
+
+
+def test_build_provenance_parser_version_none_handled(tmp_path: Path):
+    """parser_version=None 应在结果里也是 None。"""
+    import subprocess
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
+    subprocess.run(["git", "init"], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@t"], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "add", "."], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "commit", "-m", "init"], cwd=str(tmp_path), capture_output=True)
+    prov = build_provenance(tmp_path, parser_name="x", max_chars=800, parser_version=None)
+    assert prov["parser_version"] is None
+
+
+def test_build_provenance_includes_evaluator_and_report_versions(tmp_path: Path):
+    """provenance 包含 EVALUATOR_VERSION 与 REPORT_VERSION 常量。"""
+    from evaluation import EVALUATOR_VERSION, REPORT_VERSION
+    import subprocess
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
+    subprocess.run(["git", "init"], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@t"], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "add", "."], cwd=str(tmp_path), capture_output=True)
+    subprocess.run(["git", "commit", "-m", "init"], cwd=str(tmp_path), capture_output=True)
+    prov = build_provenance(tmp_path, parser_name="x", max_chars=800, parser_version=None)
+    assert prov["evaluator_version"] == EVALUATOR_VERSION
+    assert prov["report_version"] == REPORT_VERSION
+
+
+def test_build_devset_section_all_fields_populated():
+    from evaluation.report import build_devset_section
+
+    class FakeManifest:
+        devset_status = "complete"
+        file_count = 10
+        content_group_count = 5
+        pdf_count = 4
+        docx_count = 6
+        categories_covered = ["a", "b", "c"]
+
+    d = build_devset_section(FakeManifest())
+    assert d == {
+        "status": "complete",
+        "file_count": 10,
+        "content_group_count": 5,
+        "pdf_count": 4,
+        "docx_count": 6,
+        "categories_covered": ["a", "b", "c"],
+    }
+
+
+def test_aggregate_ratio_macro_average_only_one_doc_participates_out_of_three():
+    """3 个 doc，只有 1 个有非 null 值 → participating=1, not_evaluated=2。"""
+    per_doc = [
+        _make_per_doc({"image_resource_exists_ratio": {"value": 0.7, "reason": None}}),
+        _make_per_doc({"image_resource_exists_ratio": {"value": None, "reason": "no_image_elements"}}),
+        _make_per_doc({"image_resource_exists_ratio": {"value": None, "reason": "no_image_elements"}}),
+    ]
+    s = aggregate_summary(per_doc)
+    ratio = s["ratio_macro_averages"]["image_resource_exists_ratio"]
+    assert ratio["macro_average"] == 0.7
+    assert ratio["participating_docs"] == 1
+    assert ratio["not_evaluated"] == 2
+
+
+def test_aggregate_does_not_mutate_input():
+    """aggregate_summary 不应修改输入的 per_doc_results。"""
+    per_doc = [_make_per_doc()]
+    import copy
+    snapshot = copy.deepcopy(per_doc)
+    aggregate_summary(per_doc)
+    assert per_doc == snapshot
