@@ -9740,3 +9740,44 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第六轮可深入 get_parser/discover_parsers/registry 等。
 
 ---
+
+## Round 166（2026-08-05）：app/parsers/__init__.py 第六轮（init_edges）
+
+### 目标
+- 给 app/parsers/__init__.py（11 行，仅 re-export）补强
+- 深入 __all__、重导出 identity、子模块可导入、所有 Parser 子类继承关系
+
+### 改动
+- 新增 `tests/test_parsers_init_edges.py`（40 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **__all__ 精确**：3 项 `["Parser", "ParserError", "make_document_id"]`、list、无重复
+- **重导出 identity**：pkg.X is base.X（3 个名字都验证）
+- **公共 API 类型**：Parser 是 ABC 类、ParserError 是 Exception 子类、make_document_id 可调用
+- **子模块可导入**：base/fallback_parser/kreuzberg_parser/markdown_parser/html_parser/ipynb_parser/text_parser
+- **Parser 子类继承**：FallbackParser/MarkdownParser/HtmlParser/IpynbParser/TextParser 都 issubclass(Parser)
+- **模块结构**：docstring 提及"业务代码"与"依赖注入/工厂"、__future__ annotations、from .base import
+- **子包目录**：所有 *.py 文件存在
+- **star import**：只导入 __all__ 中的 3 个名字
+
+### 撞墙记录
+- **Wall 1**：测试假设 `app.parsers.fallback`，实际文件名是 `fallback_parser.py`。修复：所有 import 改为
+  `app.parsers.fallback_parser`。同时发现还有 `kreuzberg_parser.py`（之前未列），补到 dir 测试中。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 166 后）：13371 pass / 0 fail / 13 skip（HEAD `8ed89c5`）
+
+### 下一步建议
+- 候选 IC：app/parsers/text_parser.py 第七轮
+- 候选 ID：app/parsers/fallback_parser.py 第六轮
+- 候选 IE：app/parsers/kreuzberg_parser.py 第六轮
+- 候选 IG：app/chunkers/__init__.py 第六轮
+- 候选 IH：app/models.py 第八轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 ID（app/parsers/fallback_parser.py 第六轮）。fallback_parser 是默认 parser 路径
+（pdfplumber + python-docx），覆盖最多真实场景，第六轮可深入 PDF/DOCX 各自分支、table/caption/image 提取。
+
+---
