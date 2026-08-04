@@ -9471,3 +9471,49 @@ document_passes_schema 调度层，第六轮可深入 schema 校验、错误聚�
 第六轮可深入 normalize_text、heading boundary、chunk 算法等。
 
 ---
+
+## Round 161（2026-08-05）：app/chunkers/structural.py 第七轮（edges7）
+
+### 目标
+- 给 app/chunkers/structural.py（388 行，已有 base/edges/edges2-6 共 792 测试）补第七轮
+- 深入 _SplitPiece frozen dataclass、_hard_split_with_whitespace_fallback、_split_long_text、_ChunkBuffer、StructuralChunker.chunk、_element_text_with_span、normalize_text
+
+### 改动
+- 新增 `tests/test_chunker_edges7.py`（118 测试）
+- 仅测试，不动业务代码（不改 parsers/chunkers/pipeline）
+
+### 覆盖要点
+- **常量精确性**：_SENTENCE_SPLIT_RE 编译模式、_HARD_BREAK_LANGS 6 项、_WHITESPACE_RE 模式、_PART_TEXT/ELEMENT_ID/START/END 索引
+- **_SplitPiece frozen dataclass**：4 字段精确、frozen 行为（FrozenInstanceError）、必填字段（text/boundary_after）、start/end 默认 0、hashable、相等性、repr 含类名
+- **_hard_split_with_whitespace_fallback 深度**：empty/short/exactly-max/long-no-ws（forced_char）/long-with-ws（whitespace）/leading-ws/trailing-ws/only-ws/max_chars=1
+- **_split_long_text 深度**：empty/only-ws/shorter-than-max/exactly-max/long-text/multiple-sentences/each-piece-within-max/strip/char-conservation
+- **_ChunkBuffer**：init/push_text/length/is_empty/flush、source_ids dedup、首次出现顺序、one-span-per-part、chunk_id 格式 `{doc_id}::c{counter:04d}`、metadata keys（strategy/max_chars/char_count）、keyword-only flush args
+- **StructuralChunker**：__init__ default 800、custom、too-small raises ValueError（<32）、boundary 32 OK、zero/negative raises
+- **StructuralChunker.chunk 场景**：no elements、single short paragraph、heading creates boundary、table isolated、image skipped、caption isolated、long paragraph split、empty content skipped、chunk_id increments、default sequential strategy
+- **_element_text_with_span**：image/empty/none/whitespace-only/strips/no-strip/leading-only/trailing-only
+- **模块结构**：__all__ 精确 2 项、imports、docstring 提及 heading/spans/no-text-modification
+- **normalize_text edges**：empty/None/no-ws/collapse/strips/mixed/only-ws
+- **综合行为**：normalize 幂等、_SplitPiece immutable、flush-then-flush-None 幂等、no-text-loss
+
+### 撞墙记录
+- **Wall 1**：`_SplitPiece(text="x")` 失败 — `boundary_after` 也是必填字段（无默认值）。修复：所有构造改为
+  `_SplitPiece(text="x", boundary_after=None)`，并把对应"默认值"测试改成"必填字段"测试。
+- **Wall 2**：`_make_el("e1", "paragraph", "")` 触发 `Element.__post_init__` 的 ValueError（content+resource_path
+  至少一项非空）。修复：`_make_el` 在 content 为空时改用 `resource_path="placeholder"` 让 Element 通过校验。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 161 后）：12885 pass / 0 fail / 13 skip（HEAD `7065bee`）
+
+### 下一步建议
+- 候选 HY：app/parsers/markdown_parser.py 第七轮
+- 候选 HZ：app/parsers/html_parser.py 第六轮
+- 候选 IA：app/parsers/ipynb_parser.py 第六轮
+- 候选 IC：app/parsers/text_parser.py 第七轮
+- 候选 ID：app/parsers/fallback.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HY（app/parsers/markdown_parser.py 第七轮）。markdown_parser 是 fallback 路径外的核心
+markdown 处理入口，第七轮可深入 heading 层级、code block、list 等结构。
+
+---
