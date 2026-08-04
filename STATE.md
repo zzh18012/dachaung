@@ -2465,3 +2465,49 @@
 - 本 worktree（Round 51 后）：1689 pass / 0 fail / 9 skip（HEAD `bea827e`）
 
 ---
+
+## Round 52（2026-08-04）：候选 BH — app/models.py 边角覆盖
+
+### 做了什么
+- 候选 BH：新建 `tests/test_models_edges.py`（59 个测试）覆盖 `app/models.py`（154 行）的 6 个 dataclass 边角，与已有 `test_models.py`（55 个）互补。
+- 重点覆盖项：
+  - **SCHEMA_VERSION 深入** 3 个：以 0 开头（0.1.0 阶段）、major.minor.patch 三段、模块常量跨导入保持同一对象
+  - **ElementType/SourceType 字面量** 2 个：8 种 element type 全接受、6 种 source type 全接受
+  - **Element confidence 边界** 5 个：0.0 允许、负数/超 1 dataclass 层允许（schema 拒）、float 类型、int 自动通过
+  - **Element mutable 行为** 4 个：非 frozen 可改属性、可加 metadata、set 时不校验、纯空白 element_id truthy 字符串不拒
+  - **Element to_dict 深拷贝** 3 个：asdict 深拷贝不互相影响、source_locator 透传、返回 8 keys
+  - **Chunk 各种文本/metadata** 5 个：纯 \n / \t 字符 text 不被 dataclass 拒、复杂 metadata 嵌套、复杂 source_spans、to_dict 返回 5 keys
+  - **Chunk mutable 行为** 3 个：可改 text、可设空 text（无 setter 校验）、source_element_ids 必填
+  - **Document to_dict 顺序保留** 5 个：elements/chunks/warnings/errors 顺序保留、to_dict 返回 13 keys、schema_version 与模块常量一致
+  - **Document mutable 行为** 3 个：可改 document_id、可加 elements、metadata 隔离
+  - **Relation 边角** 4 个：to_dict 4 keys、metadata 透传、无 __post_init__、type 自由字符串
+  - **Warning/Error 边角** 8 个：2/3 keys 切换、details=None 时省略字段、复杂嵌套 details 透传
+  - **dataclass 标识** 6 个：6 个 class 都通过 is_dataclass
+  - **to_dict 存在性** 1 个：6 个 class 都有可调用 to_dict
+  - **Element image 强制路径** 3 个：resource_path only OK、to_dict 透传、content+resource_path 同时设置允许
+  - **Document parser** 2 个：parser_name/version 记录、version 复杂字符串
+  - **Document metadata 复杂** 2 个：嵌套数据透传、metadata 实例隔离
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。59 个新测试一次通过。
+
+### 下一步建议
+- 候选 BI：tests/test_schema.py 边角补强（document schema validation 边角）
+- 候选 BJ：app/pipeline.py 内部边角（process_single 错误路径细分）
+- 候选 BK：evaluation/cli.py 边角（argparse + 退出码）
+- 候选 BL：app/parsers/text_parser.py 内部边角
+- 候选 BM：app/parsers/markdown_parser.py 内部边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BJ（app/pipeline.py 内部边角）。理由：
+1. pipeline.py 是核心入口，含 process_single / get_parser / validate_only / image_output_dir_for
+2. test_pipeline_helpers.py 已覆盖基础（image_output_dir_for / get_parser），但 process_single 的细分错误路径仍可补
+3. 包括：各种 ErrorRecord code 的 details 字段完整性、不同 parser 与不同文件类型的组合、CLI 默认参数
+4. 之后转 BI（schema validation 边角）补强校验逻辑
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 52 后）：1748 pass / 0 fail / 9 skip（HEAD `9cdf827`）
+
+---
