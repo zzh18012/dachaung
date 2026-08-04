@@ -4021,3 +4021,56 @@
 - 本 worktree（Round 84 后）：4961 pass / 0 fail / 13 skip（HEAD `24159fe`）
 
 ---
+
+## Round 85（2026-08-05）：候选 CW — evaluation/metrics.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CW：新建 `tests/test_evaluation_metrics_edges2.py`（190 个测试）覆盖
+  `evaluation/metrics.py`（381 行）的深度边角，与已有 `test_metrics.py`（130+）+
+  `test_evaluation_metrics_edges.py`（100+）互补。
+- 重点覆盖项：
+  - **helper 函数**：_null/_ratio/_bool_metric/_int_metric 的 value/reason 字段类型、
+    None 输入、bool/int 取值
+  - **模块常量**：_TEXT_TYPES 7 项完整枚举、_PDF_BBOX_REQUIRED_TYPES 4 项、
+    _NOT_EVALUATED set 类型
+  - **_is_valid_bbox 深度**：4 浮点/整数/混合、3/5 元素、空 list、str/dict/tuple/set/
+    None/bool/inf/-inf/nan
+  - **_pdf_locator_ratio / _docx_locator_ratio**：7 个结构 key 枚举、page/bbox 拒绝、
+    page/bbox 各种无效组合
+  - **_image_resource_ratio**：file 存在/缺失/0 字节/image_base_dir 缺失
+  - **_chunk_reference_ratio**：各分支（empty chunks、chunk 无 source_element_ids、
+    空 list、重复 id、id 不存在）
+  - **_strip_unicode_whitespace**：NBSP/表意空格/em space/en space/tab/newline/CR/
+    FF/VT/line separator/paragraph separator
+  - **_text_preservation**：Counter 精确率/召回率各空集分支、equal bool、空 expected/
+    actual、image 过滤
+  - **_heading_boundary_ratio / _silent_drop_count**：各 reason 分支
+  - **compute_automatic_metrics**：签名、pipeline 失败/成功、error_code KeyError 行为、
+    未知 element 类型、未知/大写 source_type、schema 异常类型
+  - **__all__ 与模块结构**：public 导出、internal 常量不在 __all__
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_text_preservation_image_only` 预期 precision=1.0，
+  实际 0.0。原因：expected="", actual="a"；c_actual 有 1 项 → precision = 0/1 = 0.0，
+  不是 null。修复：测试改为验证 precision=0.0、recall reason=empty_expected。
+- wall 2：`test_compute_metrics_error_code_no_code_key` 预期 value=None，
+  实际抛 KeyError。原因：函数直接索引 error["code"]，无 dict.get 兜底。
+  修复：测试改为验证抛 KeyError。
+
+### 下一步建议
+- 候选 CX：evaluation/annotation_metrics.py 边角（第二轮）
+- 候选 CY：evaluation/schema.py 边角（第二轮）
+- 候选 CZ：app/pipeline.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CX（evaluation/annotation_metrics.py 边角第二轮）。理由：
+1. annotation_metrics.py 是 ground-truth 对比的另一根支柱（与 automatic 互补）
+2. 第二轮可补 annotation 缺失/部分匹配/IB 场景的边角
+3. 与 Round 85 metrics.py 对称闭环 evaluation/ 指标侧
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 85 后）：5151 pass / 0 fail / 13 skip（HEAD `006300f`）
+
+---
