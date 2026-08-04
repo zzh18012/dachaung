@@ -2791,3 +2791,45 @@
 - 本 worktree（Round 59 后）：2240 pass / 0 fail / 9 skip（HEAD `a265a16`）
 
 ---
+
+## Round 60（2026-08-04）：候选 BQ — kreuzberg_parser 内部边角覆盖
+
+### 做了什么
+- 候选 BQ：新建 `tests/test_parsers_kreuzberg_edges.py`（73 个测试）覆盖 `app/parsers/kreuzberg_parser.py`（246 行）的 helper 边角 + 完整 monkeypatch parse 路径，与已有 `test_parsers_kreuzberg.py`（53 个）互补。
+- 重点覆盖项：
+  - **_classify_line 边角** 10 个：返 tuple、heading level 6 边界、7 hashes 拒绝 ATX、尾随空白 strip、短行逗号/分号、80/81 字符精确边界、paragraph meta 空 dict、短行 meta raw_text
+  - **_make_locator 边角** 7 个：返 dict、pdf 2 个 key、docx 2 个 key、pdf page 始终 1、docx paragraph_index 透传 0/99/-1、placeholder/heuristic 值 True
+  - **_split_content_to_elements 边角** 16 个：返 tuple、list 类型、空 content、whitespace only、heading level 6、ATX heading + 多行 rest、CRLF 处理、100 块大输入、element_id 严格递增、pdf/docx locator 差异、paragraph kreuzberg_heuristic meta、ATX heading 无 kreuzberg_heuristic、ATX heading heuristic=None、confidence 0.6/0.5
+  - **KreuzbergParser 类契约** 10 个：name/version 是 str、init 默认 True、显式 True/False、include_document_structure 是 keyword-only、继承 Parser、parse callable
+  - **parse 错误路径 monkeypatch** 5 个：kreuzberg_unavailable（_KREUZBERG_AVAILABLE=False + IMPORT_ERROR raising=False）、missing docx/pdf、details.path、kreuzberg_extract_failed、exception_type 透传
+  - **parse 成功路径 monkeypatch** 10 个：空 content + warning、有 content 启发式切分、PDF kreuzberg_pdf_no_bbox warning、DOCX 无 pdf_no_bbox、kreuzberg.elements 非空不 warn、metadata.mime_type/quality_score 透传、metadata 2 key 完整、tables 处理（cell_count/row_count/source/confidence）、PDF table bbox + page_number=0 fallback to 1、table confidence with/without cells
+  - **Document 字段完整性** 6 个：chunks/relations/errors 空、source_path/hash/name 透传、parser_version 是 str、warning reason 非空、warning details.source_type
+  - **实例复用** 2 个：多文件独立、无 counter 泄漏
+  - **schema 通过** 1 个：parse 结果 is_valid True
+- **里程碑**：至此 6 个 parser（text/markdown/html/ipynb/fallback/kreuzberg）均已有完整边角测试覆盖。
+- 无源码改动。
+
+### 撞墙记录
+- 3 次撞墙：
+  1. `test_split_content_paragraph_meta_has_kreuzberg_heuristic` 失败：用 "plain paragraph"（15 字符）→ 被分类为短行 heading。修复：改用 > 80 字符的 paragraph。
+  2. `test_split_content_confidence_values` 失败：rest 文本 "rest line"（9 字符）被分类为 heading → confidence=0.6。修复：用 > 80 字符的长 paragraph。
+  3. `test_kreuzberg_parser_parse_kreuzberg_unavailable` 失败：`_KREUZBERG_IMPORT_ERROR` 在 ImportError 时才定义，kreuzberg 已安装时该属性不存在。修复：用 `monkeypatch.setattr(..., raising=False)`。
+  4. `test_kreuzberg_parser_parse_with_content_emits_elements` 失败：content "para" 太短被分类为 heading。修复：用更长 paragraph。
+
+### 下一步建议
+- 候选 BR：app/pipeline.py 端到端边角（含错误路径 + 多 parser 切换）
+- 候选 BS：app/chunkers/structural.py 继续补完（已有 85 个边角）
+- 候选 BT：app/parsers/base.py 边角（detect_source_type/make_document_id/Parser 基类）
+- 候选 BU：evaluation/runner.py 边角（含 process_single + 聚合逻辑）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BT（base.py 边角）。理由：
+1. base.py 是所有 parser 的基类，覆盖率最关键
+2. detect_source_type / make_document_id 是公共 API，但只有间接测试
+3. 之后扩展到 BR 完成全部 parser 链路测试
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 60 后）：2313 pass / 0 fail / 9 skip（HEAD `66865ac`）
+
+---
