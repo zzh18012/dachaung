@@ -4941,3 +4941,61 @@
 - 本 worktree（Round 100 后）：6587 pass / 0 fail / 13 skip（HEAD `f7b039d`）
 
 ---
+
+## Round 101（2026-08-05）：候选 DR — app/parsers/html_parser.py 第三轮边角
+
+### 触发
+继 Round 100（annotation_metrics 第三轮）后继续自跑。
+评估各模块覆盖率，发现 html_parser.py 446 行仅 245 tests（0.55 tests/line），
+是最低覆盖率的较大模块，选其为第三轮目标。
+
+### 实现
+- 新增 `tests/test_parsers_html_edges3.py`（106 个测试）
+- 覆盖 app/parsers/html_parser.py（446 行）的深度路径：
+  - **table cell**：th/td 混合、空 cell、内联 tag、未闭合 tr、空 table、
+    multiline cell、header-only table
+  - **pre/blockquote 嵌套**：pre-in-pre、blockquote-in-blockquote、
+    pre-in-blockquote、blockquote-in-pre（不同 depth counter 互不影响）
+  - **list 嵌套**：ul-in-ul、ol/ul siblings、li 不在 list 内（ordered=False）
+  - **heading 边界**：空/whitespace-only 不 emit、同 level 重复 append section_path、
+    h3-then-h1 pop、h4/h5/h6 emit、内联格式
+  - **image 深度**：alt 含 entity（named/numeric/hex）、src 含空白 strip、
+    img 在 paragraph 中触发 flush、连续多 img、duplicate src attrs 后者胜
+  - **字符实体**：numeric/hex/named（&amp;/&lt;/&gt;/&nbsp;）在 5 个 block 上下文中
+  - **warning 代码**：html_nested_table 触发次数、html_no_content 仅 0 elements
+    时触发（包括只含 hr / 只含 comment 的情况）
+  - **_rows_to_md 深度**：空 cell、含 | 的 cell（不转义）、单列多行、jagged 填充、
+    header-only
+  - **locator**：_make_locator_for_current/_inline 在 section_path 存在/缺失时
+  - **pipeline 错误**：html_parse_failed（monkeypatch handler.feed）、
+    html_read_failed（monkeypatch OSError）、invalid UTF-8 fallback 到 replace
+  - **模块常量**：_SKIP_TAGS 完整内容、_HEADING_LEVELS 6 项、_HTML_EXTENSIONS 2 项
+  - **SAX 深度**：<p> in <p> 忽略、skip_stack 数据忽略、kind mismatch close no-op、
+    loose text 触发 paragraph、whitespace-only 忽略、close ul/ol 触发 flush
+  - **_detect_html_source_type**：大写扩展名接受、拒绝 xml/pdf/docx、
+    错误消息含 suffix
+  - **完整 e2e**：复杂文档 emit 7 种 element 类型
+  - **模块结构**：__all__ 精确、所有 import、HtmlParser 继承/name/version
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_rows_to_md([["h"], ["r1"], ["r2"]])` 返回 4 行（1 header + 1 sep +
+  2 body），修正断言为 4
+- wall 2：`<script><script>` 嵌套 — html.parser 把 `<script>` 当作 CDATA 元素，
+  第一个 `</script>` 关闭整个 script（不接受嵌套），后续 `y` 不在 skip 模式 →
+  修正测试以记录此实际行为
+
+### 下一步建议
+- 候选 DS：app/parsers/text_parser.py 边角（第三轮）
+- 候选 DT：app/parsers/markdown_parser.py 边角（第三轮）
+- 候选 DU：app/parsers/kreuzberg_parser.py 边角（第三轮）
+- 候选 DV：app/parsers/ipynb_parser.py 边角（第三轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DT（markdown_parser.py 第三轮，326 行覆盖率较低）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 101 后）：6693 pass / 0 fail / 13 skip（HEAD `0fcc329`）
+
+---
