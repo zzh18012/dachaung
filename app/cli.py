@@ -50,11 +50,11 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parse.add_argument("-o", "--output", required=True, help="输出 JSON 路径")
     parse.add_argument(
         "--parser",
-        choices=("fallback", "kreuzberg", "markdown", "html", "text"),
+        choices=("fallback", "kreuzberg", "markdown", "html", "text", "ipynb"),
         default="fallback",
         help="选择解析器（默认 fallback；kreuzberg 实测对 DOCX 给不出元素结构；"
              "markdown 仅适用于 .md/.markdown；html 仅适用于 .html/.htm；"
-             "text 仅适用于 .txt/.text）",
+             "text 仅适用于 .txt/.text；ipynb 仅适用于 .ipynb）",
     )
     parse.add_argument(
         "--max-chars",
