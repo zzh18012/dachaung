@@ -1977,3 +1977,37 @@
 - 本 worktree（Round 38 后）：1049 pass / 0 fail / 9 skip（HEAD `1b1ae6b`）
 
 ---
+
+## Round 39（2026-08-04）：候选 AU — parsers/base.py 内部 helper 覆盖
+
+### 做了什么
+- 候选 AU：新建 `tests/test_parsers_base.py`，新增 50 个测试覆盖 `app/parsers/base.py` 的全部公共 API。
+- 之前 base.py 是 parser 层基础设施，被 fallback / kreuzberg parser 调用，但只有间接测试。本轮建立直接测试。
+- 重点覆盖项：
+  - **ParserError** 12 个：init/str/Exception 继承、raise 与 catch、details 默认空 dict、details=None → {}、details 每实例独立（验证无共享可变默认）、参数顺序 (code, message, details)
+  - **make_document_id** 12 个：doc- 前缀、取前 16 字符、总长度 20、确定性、不同 hash 不同 id、大写 hex 接受、混合大小写 hex 接受、短/长/空 hash 抛 ValueError、非 hex 64 字符也接受（**契约测试：函数只查长度，不查字符集**）
+  - **detect_source_type** 17 个：.pdf / .docx 接受、.PDF / .DOCX / .Pdf / .Docx 大小写接受、str/Path 接受、.txt/.md/.ipynb/.html 拒、无后缀/空后缀拒、ParserError code=unsupported_type、details 含 suffix、错误消息提及扩展名
+  - **Parser ABC** 9 个：不能直接实例化、类属性 name='abstract'/version='0.0.0' 默认、子类不实现 parse 不能实例化、子类实现 parse 可实例化、子类继承默认 name/version、子类可覆盖 name/version、parse 是 abstractmethod（验证 `__isabstractmethod__`）、子类 parse 返回 Document 完整契约
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。50 个新测试一次通过。
+
+### 下一步建议
+- 候选 AS：app/hash.py 内部边角（17 个测试已存在，可补充 chunk size 边界 / 多种二进制 pattern / surrogate pair）
+- 候选 AT：app/parsers/fallback_parser.py 内部 helper（pdfplumber/python-docx 适配，~600 行）
+- 候选 AP：evaluation/runner.py 评测指标聚合边角
+- 候选 AQ：evaluation/manifest.py / annotation.py 边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AT（fallback_parser.py 内部 helper）。理由：
+1. fallback_parser.py 是默认 parser，~600 行，覆盖率最重要
+2. 含 PDF/DOCX 双路径、辅助函数（_pdfplumber_extract / _docx_extract 等）
+3. 与已覆盖的 markdown/text/html/ipynb 形成完整 parser 层覆盖
+4. 后续再补 AS / AP / AQ
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 39 后）：1099 pass / 0 fail / 9 skip（HEAD `132c3d8`）
+
+---
