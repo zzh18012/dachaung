@@ -8258,3 +8258,91 @@ language-specific 分隔符。
 结构。
 
 ---
+
+## Round 141（2026-08-05）：app/schema.py 第五轮（edges4）
+
+### 目标
+- 给 app/schema.py（93 行，已有 464 测试）补第五轮 edges
+- 深入 SchemaValidationError / load_schema / validate 错误聚合 / validate_file
+
+### 改动
+- 新增 `tests/test_schema_edges4.py`（72 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **SCHEMA_PATH 常量**：
+  - Path 类型
+  - 名字 = document.schema.json
+  - 文件存在
+  - 绝对路径（resolve）
+- **SchemaValidationError 类**：
+  - message 透传
+  - errors 默认空 list
+  - None errors → 空 list
+  - 显式 errors 透传
+  - 是 Exception 子类
+  - args 包含 message
+  - __init__ 3 参数
+- **load_schema 深度**：
+  - 默认从 SCHEMA_PATH 加载
+  - str/Path 都接受
+  - missing file → FileNotFoundError
+  - invalid JSON → JSONDecodeError
+  - empty file → JSONDecodeError
+  - 返回 dict 含 properties
+- **validate 错误聚合**：
+  - 单错误 → errors 含 1 项
+  - 多错误 → 全部收集（3 项）
+  - 每个 error 含 path/message/schema_path
+  - 异常 message 含 "(N 处)"
+  - 用 errors[0] 的 message
+  - schema=None → 用默认 SCHEMA_PATH
+  - 空 schema dict 接受任何输入
+- **is_valid 深度**：
+  - True/False 路径
+  - 无 schema → 用默认
+  - 返回 bool 类型
+  - 不抛异常（吞 SchemaValidationError）
+- **validate_file 深度**：
+  - missing file → FileNotFoundError + "不存在"
+  - invalid JSON → JSONDecodeError
+  - empty file → JSONDecodeError
+  - 显式 schema 工作
+  - str 路径也工作
+- **模块结构**：
+  - __all__ 6 项（SCHEMA_PATH/SchemaValidationError/load_schema/validate/is_valid/validate_file）
+  - imports 完整（json/Path/Any/Draft202012Validator/JSValidationError）
+  - from __future__ import annotations
+  - docstring 提及 JSON Schema
+  - _silence_unused_import helper 存在 + 返回 None
+- **签名深度**：
+  - load_schema 1 参（path 默认 SCHEMA_PATH）
+  - validate 2 参（document 必填，schema 默认 None）
+  - is_valid 2 参（同上）
+  - validate_file 2 参（path 必填，schema 默认 None）
+  - SchemaValidationError.__init__ 3 参
+- **不变量**：
+  - validate vs is_valid 一致
+  - 不修改输入
+
+### 撞墙记录
+1. test_validate_return_annotation_none：from __future__ 使注解为 'None'
+   字符串。修复：assert in (None, "None", empty)。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 141 后）：11103 pass / 0 fail / 13 skip（HEAD `c73f962`）
+
+### 下一步建议
+- 候选 GZ：app/models.py 第五轮
+- 候选 HA：app/hash.py 第四轮
+- 候选 HB：app/parsers/text_parser.py 第四轮
+- 候选 HC：app/parsers/base.py 第四轮
+- 候选 HD：app/parsers/kreuzberg_parser.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GZ（app/models.py 第五轮）。models 是数据类核心，第五轮
+可深入 Document/Element/Chunk/Relation 数据类 to_dict/from_dict、
+WarningRecord/ErrorRecord 字段验证。
+
+---
