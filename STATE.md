@@ -1657,3 +1657,37 @@
 - 本 worktree（Round 30 后）：652 pass / 0 fail / 9 skip（HEAD `1086402`）
 
 ---
+
+## Round 31（2026-08-04）：候选 AM — models.py dataclass 不变量覆盖补强
+
+### 做了什么
+- 候选 AM：扩展 `tests/test_models.py`，新增 26 个测试覆盖 `app/models.py` 中的 dataclass 不变量。
+- 重点覆盖项：
+  - **Element** 9 个边角：parent_id 设置后正确序列化、显式 confidence、嵌套复杂 metadata、默认 confidence=1.0、默认 metadata={}、默认 parent_id=None、metadata per-instance 隔离、所有 8 种合法 type（heading/paragraph/list_item/table/caption/header/footer/image）
+  - **Chunk** 6 个边角：metadata per-instance 隔离、source_spans per-instance 隔离、10000 字长文本、纯空白 text（当前实现接受，记录行为）、5 个 source_element_ids、重复 source_element_ids（dataclass 不去重）
+  - **Document** 5 个边角：所有 6 种 source_type 都能构造、默认 collections per-instance 独立、to_dict 不改变 doc 字段、to_dict 键集合与 schema 必需字段对齐、含 relations 时正确序列化
+  - **Relation** 2 个边角：自环（from_id == to_id）允许、复杂 metadata
+  - **WarningRecord / ErrorRecord** 6 个边角：默认 details=None、空 code 在 dataclass 层允许（schema 在写盘前会拒绝）、嵌套 dict/list details
+  - **SCHEMA_VERSION** 2 个边角：str 类型、三段式语义版本
+- 无源码改动。
+
+### 撞墙记录
+- 无新撞墙。26 个新测试一次通过。
+
+### 下一步建议
+- 候选 AN：app/schema.py 边角（draft 2020-12 各种 keyword：$ref、if/then/else、anyOf、additionalProperties）
+- 候选 AK：kreuzberg / markdown / html parser 内部 helper 单测
+- 候选 AG：CLI 子命令更细致的测试
+- 候选 AH：evaluation/cli.py 的 validate-report 子命令路径
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AN（schema.py 边角）。理由：
+1. JSON Schema 是写盘前的强制不变量门
+2. validate / validate_file 边角（非文件路径、空 JSON、损坏 UTF-8、$ref 解析失败）值得覆盖
+3. 纯函数，无外部依赖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 31 后）：681 pass / 0 fail / 9 skip（HEAD `5706787`）
+
+---
