@@ -3413,3 +3413,72 @@
 - 本 worktree（Round 74 后）：3522 pass / 0 fail / 12 skip（HEAD `4ba3456`）
 
 ---
+
+## Round 75（2026-08-05）：候选 CL — app/parsers/markdown_parser.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CL：新建 `tests/test_parsers_markdown_edges2.py`（171 个测试）覆盖
+  `app/parsers/markdown_parser.py`（326 行）的深度边角，与已有 `test_parsers_markdown.py`（74）+
+  `test_parsers_markdown_edges.py`（63）互补。
+- 重点覆盖项：
+  - **ATX 标题正则深度** 13 个：leading space/tab 失败、单 # 无空格失败、1-6 个 # 边界、
+    7 个 # 失败、trailing # stripped、empty title 失败、标题含中文/emoji/标点
+  - **thematic break 正则** 11 个：---/***/___ 三字符、长串、混合 [-*_]、内部空格、
+    2 字符失败、leading whitespace 失败、trailing text 失败
+  - **fenced code 正则** 13 个：3-4 反引号/波浪号、language 含 +/-、含 / 整体不匹配、
+    无 language 空字符串、2 反引号失败、leading text 失败
+  - **list 正则** 16 个：-/*/+ 标记、1./1) 分隔、tab after marker、空 content 失败、
+    leading space 失败、0/999 数字
+  - **blockquote 正则** 8 个：> 与 >text、空 >、嵌套 >>、leading space 失败
+  - **standalone image 正则** 11 个：空 alt、alt 含空格/特殊字符、URL 含 query/path、
+    trailing text 失败、no ! 前缀失败
+  - **pipe table 正则** 13 个：无外 pipe 不匹配、单 | 失败、sep 含 : 对齐、短 dash 失败、
+    text 不匹配 sep
+  - **_detect_md_source_type** 10 个：.MD/.MARKDOWN 大写接受、.txt/docx 抛 unsupported_type、
+    无扩展名抛、.md dotfile 视为隐藏文件抛（pathlib 行为）
+  - **parse() 错误路径** 20 个：file_not_found details.path 精确、目录 → file_not_found、
+    metadata {"markdown": True}、parser_name/version、document_id 派生、
+    chunks/relations/errors 空、仅主题分隔符 → 空 elements + md_no_content warning、
+    UnicodeDecodeError 回退 errors=replace
+  - **section_path 状态机** 7 个：弹同/高级、跳级不补、preamble 无 section_path、
+    heading 后段落继承、多层嵌套 growing
+  - **element 字段** 4 个：跨类型递增、4 位 zero-pad、parent_id 总 None、confidence 0.95
+  - **段落打断** 8 个：每个特殊起首行（heading/fenced/thematic/unordered/ordered/
+    blockquote/image/table）各打断一次
+  - **多 block 元素** 4 个：3 image、2 code block、2 table、2 blockquote
+  - **code fence 边界** 5 个：未闭合 EOF、空 code block warning、backtick/tilde language
+  - **pipe row / rows_to_md 更深** 6 个：|/||/||| 边界、单行单列也有 separator、
+    3 行输出 4 行、separator 数 = 列数
+  - **模块结构** 18 个：re/Path/Any/Document/Element/WarningRecord/Parser/ParserError/
+    make_document_id 导入、__all__ 含 MarkdownParser、parse 签名 (self, path, source_hash)
+- 无源码改动。
+
+### 撞墙记录
+- 墙 1：`test_fenced_re_with_language_with_dot` 假设 language 含 / . 等字符匹配。
+  实际正则是 `[\w+-]*`，不含 ./ 等。修复：分两个测试 — `c++` 匹配，`text/x-rst` 不匹配。
+- 墙 2：`test_pipe_table_row_re_no_outer_pipes` 假设 `a | b` 匹配。
+  实际 `_PIPE_TABLE_ROW_RE = r"^\s*\|.*\|\s*$"` 要求首尾 |，无外 pipe 不匹配。
+  修复：assert is None。
+- 墙 3：`test_detect_md_source_type_dotfile_md` 假设 `.md` 文件 suffix 是 `.md`。
+  实际 pathlib 视 `.md` 为隐藏文件，suffix 是 `''`。修复：assert 抛 ParserError。
+- 墙 4：SyntaxWarning：`"""```python 后跟字符（无空格）的边界：实际 [\w+-]* 允许字母数字。"""`
+  含 `\w` 转义。修复：用 raw string `r"""..."""`。
+
+### 下一步建议
+- 候选 CM：app/parsers/html_parser.py 边角
+- 候选 CN：app/parsers/text_parser.py 边角
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CO：app/parsers/ipynb_parser.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CM（app/parsers/html_parser.py 边角）。理由：
+1. html_parser.py 是 stdlib HTMLParser 实现，纯 Python 无依赖
+2. 含 SAX 风格状态机（start/end/data），结构与 markdown 类似但有不同边界
+3. 与 markdown/text/ipynb 形成 parsers/ 内的 stdlib 实现完整覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 75 后）：3693 pass / 0 fail / 12 skip（HEAD `6140e4b`）
+
+---
