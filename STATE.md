@@ -3135,3 +3135,41 @@
 - 本 worktree（Round 67 后）：2907 pass / 0 fail / 9 skip（HEAD `b144a9f`）
 
 ---
+
+## Round 68（2026-08-05）：候选 CD — evaluation/cli.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CD：新建 `tests/test_evaluation_cli_edges2.py`（81 个测试）覆盖 `evaluation/cli.py`（243 行）的深度边角，与已有 `test_evaluation_cli.py`（48 个）+ `test_evaluation_cli_edges.py`（54 个）互补。
+- 重点覆盖项：
+  - **_build_parser** 18 个：namespace 属性 command/manifest/output/parser/max_chars/tolerance_chars/input 都存在；默认值 fallback/800/30；自定义 parser/max_chars；负数 max-chars/tolerance-chars 接受；缺 required arg SystemExit(2)；未知 parser SystemExit(2)；缺 command SystemExit(2)
+  - **_format_metric** 17 个：bool true/false 转小写、int 走 default、float 4 位精度（0.123456789→0.1235）、dict 按 key 排序、dict 空 items、None with reason、None no reason → str(None)、list 走 default 分支、tuple default、string、name 占位 36 字符（实测 ab + 35 spaces）、long name 不截断、空 metric dict → null 分支
+  - **main run** 4 个：returns 2 manifest missing、writes [ERROR] to stderr、returns 1 invalid JSON、returns 1 invalid content
+  - **main validate-report** 5 个：returns 0/1/2 各路径、writes [OK] / [FAIL] / [ERROR] 到对应流；合法 report 用 _valid_report() helper 构造
+  - **main inspect-doc** 14 个：top-level int/string/array 都拒绝 returns 1、minimal doc returns 0、写 document_id 行、写 metrics: 头、写 file 路径、写 counts 行、Unicode doc 不崩、负 tolerance_chars 接受、缺 elements/chunks/source_type 都安全
+  - **main 入口** 5 个：unknown command SystemExit(2)、no command SystemExit(2)、run/validate/inspect 都 returns int type
+  - **_run_inspect_doc 直接调用** 2 个：returns int、missing file returns 2
+  - **模块结构** 16 个：argparse/json/sys/Path 导入、ManifestError/load_manifest/get_git_provenance/run_evaluation/EvalSchemaError/validate_file 都可访问、main/_build_parser/_format_metric/_run_inspect_doc 都 callable、模块文件路径正确
+- 无源码改动。
+
+### 撞墙记录
+- 2 次撞墙：
+  1. **test_format_metric_alignment_width_36_chars** 失败：实测 ab 后是 35 spaces（34 padding + 1 字面空格），不是 34。修复：assert 改 35。
+  2. **test_main_validate_report_writes_ok_for_valid** 失败：自构造 report 缺 evaluator_version/timestamp 字段（schema 把这些放在 provenance 子对象内）。修复：从 tests/test_evaluation_schema.py 借来 _valid_report() helper 完整结构。
+
+### 下一步建议
+- 候选 BW：app/manifest.py 边角
+- 候选 BY：app/pipeline.py 端到端边角
+- 候选 CB：evaluation/manifest.py 边角（评测侧 manifest loader）
+- 候选 CE：evaluation/runner.py 边角（第二轮，针对 expected_failures 与 devset 字段更深入）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 CB（evaluation/manifest.py 边角）。理由：
+1. manifest.py 是评测侧 manifest loader，含 ManifestError / categories 字段
+2. 边角多：路径校验（绝对/反斜杠/项目根越界）、expected_failures 解析、devset_status 派生
+3. 与已覆盖的 cli.py / runner.py / schema.py 形成完整 evaluation 入口层
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 68 后）：2988 pass / 0 fail / 9 skip（HEAD `218c36a`）
+
+---
