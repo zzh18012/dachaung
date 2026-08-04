@@ -8677,3 +8677,58 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 评测包入口，第四轮可深入 __all__、版本常量、公共 re-exports 等。
 
 ---
+
+## Round 147（2026-08-05）：evaluation/__init__.py 第一轮（edges）
+
+### 目标
+- 给 evaluation/__init__.py（29 行，已有 test_packages_init.py 17 个 evaluation init 测试）补一轮专用 edges
+- 深入版本常量值/格式/关系、__all__ 顺序、docstring 内容、模块结构、reload 稳定性
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges.py`（69 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **版本常量具体值**：EVALUATOR/REPORT=1.1, ANNOTATION/MANIFEST=1.0
+- **版本格式**：X.Y 数字 regex 匹配
+- **版本关系**：
+  - evaluator==report, annotation==manifest
+  - evaluator != annotation
+  - 去重后两值 {1.1, 1.0}
+- **__all__ 深度**：
+  - list 类型、length 4
+  - 顺序：EVALUATOR/REPORT/ANNOTATION/MANIFEST
+  - no duplicates
+- **Docstring 内容**：
+  - 含"评测"、"设计原则"、"app"、"parser/chunker/pipeline"
+  - 含"null + reason"、"分母为 0"、"total"、"not_instrumented"
+  - 含"版本历史"、"v1.0"、"v1.1"、"text_preservation"、"不可横向比较"
+- **模块结构**：
+  - __name__/__file__ 验证
+  - docstring 长度 > 200
+  - 无 class / def / import 语句（纯常量）
+  - 4 个顶层大写常量赋值
+- **一致性**：report/manifest 子模块引用同一常量
+- **Reload 稳定性**：版本号、__all__、docstring 都不变
+- **from import 与 import 一致**：常量是同一对象
+- **综合行为**：tuple/dict 形式、版本字符串拼接 "1.11.11.01.0"
+
+### 撞墙记录
+无（69 测试全过）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 147 后）：11602 pass / 0 fail / 13 skip（HEAD `afdafc2`）
+
+### 下一步建议
+- 候选 HF：app/parsers/markdown_parser.py 第六轮
+- 候选 HG：app/parsers/html_parser.py 第六轮
+- 候选 HH：app/chunker.py 第六轮
+- 候选 HI：app/parsers/ipynb_parser.py 第六轮
+- 候选 HJ：app/parsers/fallback_parser.py 第三轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HJ（app/parsers/fallback_parser.py 第三轮）。fallback parser
+是默认 parser，第三轮可深入 PDF/DOCX 分支、元素构造、warning 细节等。
+
+---
