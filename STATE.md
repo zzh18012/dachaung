@@ -1776,3 +1776,41 @@
 - 本 worktree（Round 33 后）：801 pass / 0 fail / 9 skip（HEAD `7769253`）
 
 ---
+
+## Round 34（2026-08-04）：候选 AH — evaluation/cli.py 子命令与 helper 覆盖补强
+
+### 做了什么
+- 候选 AH：扩展 `tests/test_evaluation_cli.py`，新增 36 个测试覆盖 argparse 入口、`_format_metric`、main() 函数级别返回码。
+- 重点覆盖项：
+  - **argparse 入口** 8 个：no command / unknown command → rc≠0、--parser 非法 choice / 缺 --manifest / 缺 --output、kreuzberg choice 被接受、--max-chars 记录到 provenance、--tolerance-chars 被接受
+  - **validate-report** 2 个：损坏 JSON → rc=1、合法 JSON 但不合规 → rc=1
+  - **inspect-doc** 3 个：--tolerance-chars 自定义、空文档、metric 排序顺序（bool 在 numeric 之前）
+  - **`_format_metric`** 9 个：None / bool true/false / int / float (4 位小数) / dict / string 各种 value 类型、reason 覆盖默认 'ok'、列对齐宽度（39 字符前缀）
+  - **main() 函数级别** 9 个：unknown command + no command 抛 SystemExit、validate-report / inspect-doc / run 各种返回码
+  - **`_build_parser`** 1 个：3 个子命令全部注册（run / validate-report / inspect-doc）
+  - **run 输出摘要** 2 个：devset_status / file_count / groups / pdf / docx + git_commit / git_dirty
+- 无源码改动。
+
+### 撞墙记录
+- **撞墙 1**：`test_run_with_explicit_tolerance_chars` 一开始假设 `_tolerance_chars` 在 `report.evaluation_params` → KeyError。改：`per_doc.metrics._tolerance_chars` → 仍 KeyError。最终发现 runner.py 把 `_tolerance_chars` 加到 `per_doc_results[i]` 顶层，但 build public_report 时只挑 `doc_id/source_type/metrics/wall_time_seconds` 4 个字段（schema additionalProperties:false）。改测：只验证 CLI 接受参数 + 报告通过 schema 校验。
+- **撞墙 2**：`test_format_metric_with_reason_overrides_default` 第二条断言 `"ok" not in result.split(...)[0]` 失败 — 因为 metric name 是 `ok_metric`，含 "ok"。改测：只断言 `(custom_reason)` 出现、`(ok)` 不出现。
+- **撞墙 3**：`test_format_metric_alignment_width` 算错了 width。实际 format 是 `"  {name:36} {value}"` → 前缀 = 2 + 36 + 1 = 39 字符。改测：`assert len(name_part) == 39`。
+- 三次都是测试断言写错，不是源码 bug。
+
+### 下一步建议
+- 候选 AK：kreuzberg / markdown / html parser 内部 helper 单测
+- 候选 AO：pipeline / process_single 端到端边角（output_path 为空、parser 不可用降级路径）
+- 候选 AP：evaluation/runner.py 评测指标聚合边角（ratio 分母 0 / silent_drop 累加）
+- 候选 AQ：evaluation/manifest.py / annotation.py 边角（resolve_annotation 路径、annotation 缺字段降级）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AO（pipeline 端到端边角）。理由：
+1. process_single 是核心入口，覆盖了 parser/chunker/schema 全链路
+2. parser 不支持扩展名 / 缺输出目录 / 错误恢复路径值得覆盖
+3. 与 Round 28 chunker 测试互补
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 34 后）：837 pass / 0 fail / 9 skip（HEAD `c566e98`）
+
+---
