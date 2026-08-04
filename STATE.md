@@ -2312,3 +2312,37 @@
 - 本 worktree（Round 47 后）：1455 pass / 0 fail / 9 skip（HEAD `c0f7d00`）
 
 ---
+
+## Round 48（2026-08-04）：候选 AS — app/hash.py 内部边角覆盖
+
+### 做了什么
+- 候选 AS：扩展 `tests/test_hash.py`，新增 38 个测试覆盖 `app/hash.py`（25 行）的两个核心函数 `compute_file_hash` / `compute_text_hash` 的全部边角。
+- 重点覆盖项：
+  - **compute_text_hash 类型契约** 10 个：str 类型、非空、已知 SHA256 值（"abc"/空串/"a"）、顺序敏感、大小写敏感、1MB 长字符串稳定、换行符变体区分（\n vs \r\n vs \r）、4-byte UTF-8 emoji、纯 ASCII 与 bytes sha256 一致、concat 不变量（SHA-256 不是 concat 可组合）
+  - **compute_file_hash chunk 边界** 5 个：32KB（半个 chunk）、64KB - 1、128KB（2 完整 chunk）、192KB（3 完整 chunk）、70KB 随机字节
+  - **compute_file_hash 类型契约** 5 个：str 类型、非空、无 _/-（纯 hex）、stable 多次读取、无前后空白
+  - **compute_file_hash 内容/文件名边角** 5 个：文件名含空格、文件名含 Unicode（CJK）、内容全空白、内容修改 → hash 改变、跨函数一致性（file_hash(bytes) == text_hash(utf-8 str)）
+  - **compute_file_hash 错误路径** 5 个：错误消息含路径名、空字符串 raise、目录 raise（tmp_path 与 "."）、连续两文件 hash 无状态泄漏、Path 与 str 路径等价
+- 无源码改动。
+
+### 撞墙记录
+- **Wall 1**：`test_file_hash_cross_function_consistency_with_text_hash` 失败——Windows text mode 默认将 `\n` 写成 `\r\n`，导致 file_hash(bytes) != text_hash(str_with_\n)。改为 `write_bytes(ascii_content.encode("utf-8"))` 用 binary 写盘绕过 CRLF 转换。
+
+### 下一步建议
+- 候选 BA：app/chunkers/__init__.py / app/parsers/__init__.py 边角
+- 候选 BB：evaluation/__init__.py / app/__init__.py 常量
+- 候选 BC：app/cli.py 内部边角（argparse 子命令解析、退出码）
+- 候选 BD：tests/test_schema.py 边角补强（document schema validation）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BA（app/chunkers/__init__.py + app/parsers/__init__.py 边角）。理由：
+1. __init__ 模块常被忽略，但通常导出关键 API / 公共工具
+2. 多数 __init__.py 可能是空的，但需要测试以验证此事实
+3. 之后转 BC（cli.py 边角）覆盖 argparse 解析、退出码、stdout 输出
+4. 至此 evaluation 层 + app/hash + app/pipeline 已全覆盖，再扫剩余小模块
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 48 后）：1489 pass / 0 fail / 9 skip（HEAD `9d1038d`）
+
+---
