@@ -8617,3 +8617,63 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 转换、错误路径等。
 
 ---
+
+## Round 146（2026-08-05）：app/parsers/kreuzberg_parser.py 第六轮（edges5）
+
+### 目标
+- 给 app/parsers/kreuzberg_parser.py（246 行，已有 base/edges/edges2/edges3/edges4 共 599 测试）补第六轮
+- 深入 _HEADING_RE/_SHORT_LINE_MAX/_classify_line/_split_content_to_elements/_make_locator
+
+### 改动
+- 新增 `tests/test_parsers_kreuzberg_edges5.py`（128 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_HEADING_RE 模式深度**：
+  - pattern 是 re.Pattern 对象、含 #{1,6}
+  - ^/$ 锚定、无 MULTILINE/IGNORECASE/VERBOSE
+  - capture group count
+- **_SHORT_LINE_MAX**：=80、int、正数
+- **_classify_line 罕见边界**：
+  - 单字符、80/81 字符边界、emoji、纯数字、CJK 混排
+  - tab、dash、pipe 开头
+  - short with period in middle、level 0/1/6
+- **_make_locator 边界**：
+  - pdf/docx/其他 source_type（else 分支）
+  - 负数 paragraph_index、0、999
+  - keys 集合、placeholder/heuristic True、signature
+- **_split_content_to_elements 复杂场景**：
+  - 2-tuple、second 始终空 list
+  - empty/whitespace only → 空 elements
+  - atx heading + body 同 block → 两 elements
+  - confidence 0.6/0.5、kreuzberg_heuristic metadata
+  - element_ids 0-padded、unique、递增
+  - CRLF/CR、多空行视为单分隔
+  - paragraph_index 递增、pdf 用 page=1
+- **KreuzbergParser 类属性**：
+  - name/version 在 class __dict__
+  - __init__ keyword-only、default True、返回 'None' 字符串
+  - parse 3 参、无默认、返回 'Document' 字符串
+- **模块结构**：__all__、imports、docstring
+- **_KREUZBERG_AVAILABLE/_VERSION**：类型检查
+- **综合行为**：classify/split 一致性、locator 稳定、实例独立
+
+### 撞墙记录
+- **Wall 1**：_HEADING_RE.match('# h1\n# h2') 返回 None（pattern $ 不能在中间换行处匹配且后续还有内容）。修复：改为测试 '# h1' 单行匹配 + '# h1\nextra' 不匹配。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 146 后）：11533 pass / 0 fail / 13 skip（HEAD `36624c3`）
+
+### 下一步建议
+- 候选 HE：evaluation/__init__.py 第四轮
+- 候选 HF：app/parsers/markdown_parser.py 第六轮
+- 候选 HG：app/parsers/html_parser.py 第六轮
+- 候选 HH：app/chunker.py 第六轮
+- 候选 HI：app/parsers/ipynb_parser.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HE（evaluation/__init__.py 第四轮）。evaluation/__init__.py 是
+评测包入口，第四轮可深入 __all__、版本常量、公共 re-exports 等。
+
+---
