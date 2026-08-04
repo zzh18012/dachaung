@@ -3537,3 +3537,59 @@
 - 本 worktree（Round 76 后）：3817 pass / 0 fail / 12 skip（HEAD `9d59a53`）
 
 ---
+
+## Round 77（2026-08-05）：候选 CN — app/parsers/text_parser.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CN：新建 `tests/test_parsers_text_edges2.py`（112 个测试）覆盖
+  `app/parsers/text_parser.py`（136 行）的深度边角，与已有 `test_parsers_text.py`（52）+
+  `test_parsers_text_edges.py`（48）互补。
+- 重点覆盖项：
+  - **模块常量** 5 个：_TEXT_EXTENSIONS 2 项 tuple、值/小写/点开头
+  - **_detect_text_source_type** 15 个：.TXT/.TEXT 大写接受、.TxT 混合大小写接受、
+    .TxF 拒绝、double extension、ParserError 类型、error code/details.suffix/message
+  - **_split_paragraphs 返回类型** 5 个：list、tuple、2 元、(int, str)
+  - **_split_paragraphs 空白处理** 18 个：empty/whitespace-only/newlines-only/
+    tabs-only/CR-only/spaces-only 都返 []、单行无/有 trailing newline、2 段 blank 分隔、
+    多 blank 分隔、内部 newline 保留、leading/trailing strip、CRLF/CR 归一为 LF、
+    混合 CRLF+CR+LF 归一
+  - **_split_paragraphs 行号** 6 个：第 1 段 line 1、leading blank 跳过、strictly
+    increasing、3 段 line=[1,3,5]、多 blank 累加、内部 newline 推进 line counter
+  - **_split_paragraphs 边界** 18 个：单字符、单数字、Unicode 中文/emoji/混合、
+    长字符串 10000 chars、10 段长 paragraph、单 word、含标点/数字/quotes/backslash、
+    idempotent、trailing/leading blank 不增 segment
+  - **parse() 错误路径** 17 个：file_not_found code/details.path 精确、unsupported_type
+    code、目录 → file_not_found、metadata {"text": True}、parser_name="text"、
+    parser_version="stdlib/0.1.0"、document_id 派生、chunks/relations/errors 空、
+    source_path str、source_type="text"、UnicodeDecodeError 回退 errors=replace
+  - **空 elements → text_no_content warning** 3 个：空文件、whitespace-only、
+    reason 是非空 str
+  - **element 字段** 8 个：id 跨多段递增、4 位 zero-pad、parent_id 总 None、
+    confidence 0.95、type 总 paragraph、metadata {} 空、source_locator 仅 line key、
+    line 值精确
+  - **模块结构** 16 个：Path/Any/Document/Element/WarningRecord/Parser/ParserError/
+    make_document_id 导入、__all__ 含 TextParser、parse 签名 (self, path, source_hash)
+- 无源码改动。
+
+### 撞墙记录
+- 墙 1：`test_detect_text_source_type_mixed_case_txt` 测试 `Path("x.TxF")` 应当是 text。
+  实际 .TxF lower() 后是 .txf，不在 _TEXT_EXTENSIONS。修复：删掉错误测试，新增
+  test_detect_text_source_type_txf_rejected 断言抛 ParserError。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CO：app/parsers/ipynb_parser.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CO（app/parsers/ipynb_parser.py 边角）。理由：
+1. ipynb_parser.py 是 JSON-based notebook 解析器（与其他 parser 不同）
+2. 含 cell 类型映射（code/markdown/raw）、source 字段处理、metadata 字段
+3. 与已覆盖的 markdown/html/text 形成 parsers/ 内的 4 种 stdlib 实现完整覆盖
+4. 之后 CE/CG 都是第二轮，更复杂，留给后续轮次
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 77 后）：3929 pass / 0 fail / 12 skip（HEAD `8e5afc7`）
+
+---
