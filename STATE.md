@@ -1932,3 +1932,48 @@
 - 本 worktree（Round 37 后）：974 pass / 0 fail / 9 skip（HEAD `a9f6029`）
 
 ---
+
+## Round 38（2026-08-04）：候选 AK 续 — html + ipynb parser 内部 helper 覆盖补强
+
+### 做了什么
+- 候选 AK 续：扩展 `tests/test_parsers_html.py` 与 `tests/test_parsers_ipynb.py`，新增 68 个测试覆盖常量 + 多个 helper + element/document metadata 边角 + 错误路径。
+- 重点覆盖项（html，30 个新测试）：
+  - **`_detect_html_source_type`** 3 个：大写扩展名接受、未知后缀拒、无后缀拒
+  - **常量** 2 个：_HEADING_LEVELS 含 h1-h6、_SKIP_TAGS 含 script/style
+  - **HtmlParser metadata/element** 6 个：metadata={"html": True}、element_id 格式、document_id 派生、chunks/relations/errors 默认空
+  - **HTML 结构** 10 个：nested list、blockquote + kind、pre + kind、image resource_path、table、skip meta/noscript/link 标签
+  - **`_rows_to_md`** 3 个：空输入、单行无 body、三行含两 body
+  - **HTML 实体** 2 个：numeric `&#65;` → 'A'、named `&amp;` → '&'
+  - **locator** 3 个：section_path 跟踪、heading level metadata、markdown locator 携带 section_path
+  - **边界** 4 个：空 body 警告、非法 UTF-8 用 errors=replace、hr 标签忽略、多空行不创建 element
+- 重点覆盖项（ipynb，38 个新测试）：
+  - **`_detect_ipynb_source_type`** 4 个：.ipynb 接受、大写接受、.json 拒、无后缀拒
+  - **`_cell_source_to_text`** 7 个：str passthrough、空 str、list 拼接、空 list、None、int/float → 空、list 内非 str 元素
+  - **`_extract_kernel_language`** 8 个：kernelspec.language 优先、kernelspec.name 回退、language_info.name 回退、空 metadata、kernelspec=None 不崩、language_info=None 不崩、优先级验证
+  - **metadata/element 边角** 13 个：metadata ipynb=True、nbformat_minor 记录、confidence=0.95、element_id 格式、parent_id None、resource_path None（code）、source_path 保留、source_hash 透传、document_id 派生、chunks/relations/errors 空、name/version 常量
+  - **错误路径** 6 个：top-level not dict、cells not list、cell not dict warning、空 raw cell 静默跳过、code/raw cell 内容 strip、cell_type 缺失 → unknown warning、metadata 空字典、nbformat 缺失按 4+ 处理、markdown cell 仅空白 → no_content、outputs 字段忽略、非法 UTF-8 → UnicodeDecodeError 传播（**契约测试，反映现有行为**）
+- 无源码改动。
+
+### 撞墙记录
+- **Wall 1**：`test_ipynb_parser_invalid_utf8_falls_back_to_replace` 最初假设 IpynbParser 用 `errors=replace`，实际 `p.open("r", encoding="utf-8")` 走 strict 模式，UnicodeDecodeError 不被 JSONDecodeError/OSError 捕获 → 直接传播。改为契约测试 `test_ipynb_parser_invalid_utf8_propagates_unicode_error`，反映实际行为。
+- 其余 67 个新测试一次通过。
+
+### 下一步建议
+- 候选 AP：evaluation/runner.py 评测指标聚合边角（聚合算法、ratio 分母为 0、silent_drop 计算）
+- 候选 AQ：evaluation/manifest.py / annotation.py 边角（manifest 校验、annotation 加载）
+- 候选 AS：app/hash.py 内部边角（chunk size、二进制读取、hash 透传）
+- 候选 AT：app/parsers/fallback_parser.py 内部边角（pdfplumber/python-docx 适配）
+- 候选 AU：app/parsers/base.py 内部边角（make_document_id、Parser 基类契约）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AS（app/hash.py 内部边角）。理由：
+1. hash.py 是基础工具，被 parser/pipeline 多处调用
+2. 模块小（~80 行），单测投入低
+3. SHA256 / chunk size / 二进制读取 / hash 透传都有边角可探
+4. 之后再做候选 AP/AQ（评测层）扩大覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 38 后）：1049 pass / 0 fail / 9 skip（HEAD `1b1ae6b`）
+
+---
