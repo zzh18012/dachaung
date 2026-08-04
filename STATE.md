@@ -5624,3 +5624,98 @@ report.py 是评测报告装配核心，深度价值高。
 - 本 worktree（Round 110 后）：7709 pass / 0 fail / 13 skip（HEAD `ffb8f43`）
 
 ---
+
+## Round 111（2026-08-05）：evaluation/report.py 第三轮（edges3）
+
+### 范围
+- 文件：`tests/test_evaluation_report_edges3.py`（新增，769 行）
+- 目标：`evaluation/report.py`（200 行，已有 edges2）
+- 新增测试：92 个
+- 提交：`a9300d5`
+
+### 覆盖深度
+- **常量深度**：_RATIO_METRICS 顺序（schema_valid 第一、pdf<docx、
+  precision<recall<f1、image<chunk）、唯一性 12、与 _COUNT_METRICS/
+  _SUCCESS_BOOL_METRICS 互斥、不含 silent_drop_count、
+  不含 figure_caption_*；_COUNT_METRICS 单元素 element_count_total；
+  _SUCCESS_BOOL_METRICS 单元素 pipeline_success
+- **get_git_provenance subprocess 输出边界**：
+  - 单/多 trailing newline strip
+  - unicode commit 字符（errors=replace）
+  - stderr 非空不影响 commit 判断
+  - porcelain 仅空白 → not dirty
+  - porcelain 实际内容 → dirty
+  - rev-parse 失败但 porcelain 成功 → commit=None, dirty 真实
+  - rev-parse 成功但 porcelain 失败 → commit 实际，dirty=False
+  - timeout（rev-parse / porcelain 阶段） → commit=None, dirty=True
+  - 多次调用返回新 dict
+  - 仅 git_commit / git_dirty 两 key
+- **get_dependency_versions**：
+  - 多次调用返回新 dict
+  - key 顺序固定（pdfplumber, python-docx, pypdfium2）
+  - 值都是 str 或 None
+  - 无 bool 值
+- **build_provenance**：
+  - run_timestamp_iso 含 'T' 分隔
+  - dependencies 字段存在、是 dict、3 个 entry
+  - parser_name='' 保留
+  - parser_version='' 保留
+  - parser_name unicode 支持
+  - max_chars=1 接受、INT32_MAX 接受
+  - 9 个 key 精确
+  - evaluator_version/report_version 与 evaluation 模块常量一致
+- **build_devset_section**：
+  - _FakeManifest 辅助类
+  - 返回 dict 类型、6 key 精确
+  - status=None 保留
+  - 全 0 计数
+  - status="complete" 保留
+  - categories list 保留
+  - categories=None 保留
+- **aggregate_summary**：
+  - float value in counts
+  - pipeline_success value=1（int）不计为 True
+  - pipeline_success value="true"（str）不计为 True
+  - ratio 0 参与 macro
+  - silent_drop_count float
+  - silent_drop_count 负值
+  - 多次调用幂等（内容相等）
+  - counts 与 silent_drop 不混合
+  - counts 与 success_rates 不混合
+  - 顶层 4 key 精确
+  - 缺 metrics key 抛 KeyError（已知行为）
+  - 1000 docs 性能 sanity
+- **模块结构**：
+  - 模块 docstring 提及聚合规则
+  - imports：subprocess/datetime/Path/Any/EVALUATOR_VERSION/REPORT_VERSION
+  - __all__ 精确 5 项、不含内部常量
+  - 函数 docstring（除 build_provenance）
+  - get_git_provenance docstring 提及失败/null/dirty
+  - aggregate_summary docstring 提及不混合
+  - get_dependency_versions docstring 提及 packages
+  - 5 个函数签名参数数验证
+  - 三个常量是 tuple
+  - 常量同 import 同对象
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`aggregate_summary([{}])` 实际抛 KeyError（已知行为，与 edges2 一致），
+  改测试为断言 KeyError
+- wall 2：`build_provenance` 实际无 docstring，改测试为不强求 docstring
+
+### 下一步建议
+- 候选 ES：evaluation/report.py 第四轮（本轮新增后）
+- 候选 ET：evaluation/runner.py 第四轮（227 行，已有 edges3）
+- 候选 EU：evaluation/manifest.py 第四轮（239 行，已有 edges3）
+- 候选 EV：evaluation/metrics.py 第四轮（381 行，已有 edges3）
+- 候选 EW：app/parsers/kreuzberg_parser.py 第四轮（245 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 EW（kreuzberg_parser.py 第四轮）。它是当前未做 edges4 的 parser
+中较大的，深度价值高。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 111 后）：7801 pass / 0 fail / 13 skip（HEAD `a9300d5`）
+
+---
