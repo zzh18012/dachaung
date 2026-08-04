@@ -1890,3 +1890,45 @@
 - 本 worktree（Round 36 后）：911 pass / 0 fail / 9 skip（HEAD `b005a82`）
 
 ---
+
+## Round 37（2026-08-04）：候选 AK — markdown / text parser 内部 helper 覆盖补强
+
+### 做了什么
+- 候选 AK：扩展 `tests/test_parsers_markdown.py` 与 `tests/test_parsers_text.py`，新增 63 个测试覆盖 7 个正则常量 + 多个 helper + element/document metadata 边角。
+- 重点覆盖项（markdown）：
+  - **正则常量** 19 个：_ATX_HEADING_RE（6 级、trailing # 剥、7 个 # 拒、无空格拒、含 # 内容）、_THEMATIC_RE（-/*/_ 各种组合）、_FENCED_RE（backtick/tilde + 多字符 + 语言捕获）、_UNORDERED_LIST_RE、_ORDERED_LIST_RE、_BLOCKQUOTE_RE、_STANDALONE_IMAGE_RE、_PIPE_TABLE_ROW_RE、_PIPE_TABLE_SEP_RE
+  - **element metadata** 9 个：confidence=0.95、element_id 格式、code_block language、blockquote kind、list_item ordered/unordered、table row/col/source、image alt + resource_path、空 code block 警告
+  - **`_detect_md_source_type`** 3 个：大写扩展名接受、不支持扩展名拒、无扩展名拒
+  - **`_rows_to_md`** 2 个：双行输出、jagged pad
+- 重点覆盖项（text）：
+  - **`_detect_text_source_type`** 5 个：.txt / .text / .TXT / .TEXT 接受、.md / 无扩展名拒
+  - **element/document metadata** 13 个：metadata={"text": True}、confidence=0.95、element_id 格式、type 全是 paragraph、metadata 空 dict、parent_id None、source_path 保留、source_hash 透传、document_id 派生、chunks/relations/errors 默认空
+  - **`_split_paragraphs`** 3 个：trailing newline、trailing 空白 strip、tab 作空白
+  - **warning** 2 个：空文件 / 纯空白文件 → text_no_content
+  - **错误路径** 2 个：missing file → file_not_found、.md → unsupported_type
+  - **UTF-8 fallback** 1 个：非法字节用 errors=replace
+  - **常量** 1 个：name="text"、version="stdlib/0.1.0"
+  - **locator** 1 个：只含 line 键
+- 无源码改动。
+
+### 撞墙记录
+- 无新撞墙。63 个新测试一次通过。
+- 注：删除了一个 docstring 里的 `\`\`\`` 转义（引发 SyntaxWarning）。
+
+### 下一步建议
+- 候选 AK 继续：html / ipynb parser 内部 helper（regex / 段落切分 / cell 处理）
+- 候选 AP：evaluation/runner.py 评测指标聚合边角
+- 候选 AQ：evaluation/manifest.py / annotation.py 边角
+- 候选 AS：app/hash.py 内部边角（chunk size、二进制读取）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AK 续作（html + ipynb parser）。理由：
+1. html parser 446 行，含大量正则与 DOM 处理，覆盖率不足
+2. ipynb parser 227 行，含 cell 类型分类逻辑
+3. 同 Round 37 思路，扩大 parser 层覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 37 后）：974 pass / 0 fail / 9 skip（HEAD `a9f6029`）
+
+---
