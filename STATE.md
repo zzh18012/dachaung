@@ -5915,3 +5915,105 @@ edges3 已饱和，但 edges4 仍有空间覆盖 HTMLParser 回调深度。
 - 本 worktree（Round 113 后）：8067 pass / 0 fail / 13 skip（HEAD `bb343d1`）
 
 ---
+
+## Round 114（2026-08-05）：app/parsers/ipynb_parser.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_parsers_ipynb_edges4.py`（新增，928 行）
+- 目标：`app/parsers/ipynb_parser.py`（227 行，已有 105 测试）
+- 新增测试：116 个
+- 提交：`9c8f715`
+
+### 覆盖深度
+- **_cell_source_to_text 输入边界**：
+  - bool/int/float/None/bytes/dict/tuple/set → ""
+  - list[int]/list[float]/list[bool]/list[None]/list[dict]/nested list
+  - list with newline parts join
+  - empty str/single char/empty list
+  - 返回类型 str
+- **_extract_kernel_language 深度**：
+  - kernelspec.language='' → fall back to name
+  - kernelspec.language='   '（truthy）→ 保留（不 fall back）
+  - 两个都 null → fall back to language_info
+  - kernelspec=None → fall back
+  - language_info.name="" → ""
+  - language_info/kernelspec non-dict → AttributeError（无 type guard）
+  - metadata=None → AttributeError
+  - metadata={} → ""
+  - language overrides name
+  - 返回类型 str
+- **_detect_ipynb_source_type**：.IPYNB/IpYnB 混合大小写、.json/.py 拒、
+  details.suffix 精确
+- **IpynbParser.parse cell source 边界**：
+  - code cell source=null → empty_code_cell warning
+  - raw cell source=null → 静默跳过
+  - markdown cell 缺 source → 0 elements
+  - 空 cells → no_content warning
+  - 全空 code cells → no_content
+- **parse metadata**：
+  - nbformat/nbformat_minor 保留值
+  - missing nbformat → None
+  - missing nbformat_minor → None
+  - cell_count 精确
+  - ipynb=True 标记
+  - 5 个 key 精确
+  - language from kernelspec
+  - empty language when no metadata
+- **parse cell type 边界**：
+  - missing cell_type → unknown warning
+  - cell_type=int → unknown warning
+  - unknown cell_type details（cell_type, cell_index）
+  - code cell text stripped
+  - raw cell text stripped
+  - code cell metadata.kind="code_cell"
+  - raw cell metadata.kind="raw_cell"
+  - code cell metadata.language
+  - markdown cell 类型/locator/cell_index
+  - cell not dict warning details
+  - confidence 0.95（code/raw/markdown 继承）
+- **parse nbformat 边界**：
+  - nbformat=4 supported
+  - nbformat<0 raises unsupported_version
+  - nbformat_minor=-1 supported（不检查）
+  - nbformat=4.0（float）accepted
+- **IpynbParser 类属性**：name/version、instance match、issubclass(Parser)、
+  parse 签名、docstring
+- **模块结构**：__all__ 精确、imports 完整（json/Path/Any/Document/Element/
+  WarningRecord/Parser/ParserError/make_document_id/MarkdownParser）、
+  模块 docstring 提及 markdown + nbformat、常量同 import 同对象、
+  3 个 helper callable、2 个 helper 有 docstring
+- **parse 错误路径**：
+  - file_not_found
+  - unsupported_type
+  - ipynb_invalid_json
+  - ipynb_read_failed
+  - ipynb_bad_structure（array/string cells）
+  - 返回 Document 实例，chunks/relations/errors 为空
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`'   ' or 'py3'` = '   '（whitespace 是 truthy）。
+  改测试期望保留 '   ' 而非 fall back
+- wall 2：`_extract_kernel_language({"kernelspec": "python3"})` 
+  无 type guard，对 str 调 `.get` → AttributeError。
+  改测试为断言 AttributeError
+- wall 3：`_extract_kernel_language({"language_info": "python"})` 同上
+- wall 4：`_extract_kernel_language(None)` 无 None 保护 → AttributeError
+
+### 下一步建议
+- 候选 FH：app/parsers/markdown_parser.py 第四轮（326 行）
+- 候选 FI：app/parsers/text_parser.py 第四轮（136 行）
+- 候选 FJ：app/parsers/fallback_parser.py 第五轮（630 行，已有 edges4）
+- 候选 FK：evaluation/metrics.py 第四轮（381 行）
+- 候选 FL：evaluation/manifest.py 第四轮（239 行）
+- 候选 FM：evaluation/runner.py 第四轮（227 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 FH（markdown_parser.py 第四轮）。它是 ipynb 的依赖，
+统一覆盖；markdown_parser 较大，深度空间大。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 114 后）：8183 pass / 0 fail / 13 skip（HEAD `9c8f715`）
+
+---
