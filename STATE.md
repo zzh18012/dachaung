@@ -665,3 +665,56 @@
 - 本 worktree（Round 10 后）：290 pass / 0 fail / 9 skip（HEAD `7641a86`）
 
 ---
+
+## 2026-08-04 — Round 11（CLI inspect 加 --spans flag）
+
+**做了什么**：
+- 完成候选 N：让 Round 10 的 source_spans 可观察、可调试
+- `app/cli.py inspect` 加 `--spans` flag：
+  - 必须配合 `--chunks` 使用
+  - 每个 chunk 行下展开多行 `span: <element_id>[<start>:<end>]`
+  - 没有 spans 的 chunk 显示 `spans: (none)`
+- `_format_chunks_list` 增加 `show_spans: bool = False` 参数
+- 更新模块 docstring 的用法示例
+- 新增 2 个测试：
+  - `test_inspect_chunks_spans_flag_without_spans_data`：合成 doc 无 spans → 显示 (none)
+  - `test_inspect_chunks_spans_flag_with_real_pipeline`：跑真实 .md parse → 显示具体 span 行
+- 不变量保持：未改 schema/model/chunker/pipeline
+- commit `1355793`，已 push
+
+**worktree 当前状态**：
+- HEAD `1355793`，工作树清洁
+- 测试基线：292 pass / 0 fail / 9 skip（+2 vs Round 10）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 12）
+
+**首要任务**：方向选择
+
+- 候选 M（推荐）：**evaluator v1.2 — 用 source_spans 做字符级 text_preservation**
+  - 现状：source_spans 已就绪 + 可观察，但 evaluator 还在用 v1.1 的"非空白字符序列"妥协口径
+  - 复杂度：中（加新指标 `text_preservation_spans_equal`；旧指标保留为兼容；bump evaluator_version/report_version 到 1.2）
+  - 价值：兑现 Round 8 审计 §2.7 写的"治本方案"；让评测从"忽略空白"升级到"严格字符区间"
+  - 不变量冲突：bump evaluator_version 是合理演进，但与"指示线 v2.x 审计"目标可能冲突；推进前在 commit message 中清晰说明
+  - 风险：bump version 后旧报告校验可能受影响（schema 加 version const）
+
+- 候选 L：**inspect 加 --metrics 模式**
+  - 单文档跑评测指标，不写报告仅 stdout
+  - 开发期快速 sanity check
+
+- 候选 D：补 fallback parser 的覆盖率
+- 候选 J（向量化）：仍因 CLAUDE.md "不增加计划外主要依赖" 阻塞
+
+**建议**：选 M（evaluator v1.2）。理由：
+1. source_spans 是为此而做的；现在收尾兑现价值
+2. 自跑线多次 bump 过 evaluator_version（v1.0→v1.1），演进路径成熟
+3. 完成后 dachuang 评测层进入"字符级精确"阶段，是有里程碑意义的进展
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 11 后）：292 pass / 0 fail / 9 skip（HEAD `1355793`）
+
+---
