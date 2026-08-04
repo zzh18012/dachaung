@@ -233,6 +233,80 @@
 
 ---
 
+## 2026-08-04 — Round 5（Jupyter Notebook parser）
+
+**做了什么**：
+- 完成候选 F：实现 `IpynbParser`（`app/parsers/ipynb_parser.py`，~210 行）
+- 基于 stdlib `json`，无新依赖
+- nbformat 4+ 支持；按 cell_type 分派：
+  - `markdown` cell → 委托 `MarkdownParser._parse_text` 拆为多个 sub-element，保留 cell 内 section_path
+  - `code` cell → 单个 paragraph，`metadata.kind="code_cell"`，`metadata.language` 来自 kernelspec
+  - `raw` cell → 单个 paragraph，`metadata.kind="raw_cell"`
+  - 未知类型 → warning，跳过
+  - 空 code cell → warning，跳过
+- `source_locator = {"cell_index": N, "cell_type": ..., "line": N (可选), "section_path": ... (可选)}`
+- 跨 cell 连续 element_id（最终重新分配 `::e0000`..`::eNNNN`）
+- Document metadata 记 `cell_count` / `language` / `nbformat` / `nbformat_minor`
+- 配套修改：
+  - `app/models.py`：`SourceType` 加 `"ipynb"`
+  - `app/pipeline.py`：`get_parser` 加 `"ipynb"` 分支
+  - `app/cli.py`：`--parser` choices 加 `ipynb`
+  - `schemas/document.schema.json`：`source_type` enum 加 `ipynb`；新增 `ipynb_locator` $def（required: cell_index/cell_type；optional: line/section_path）
+- 新增 20 个测试（`tests/test_parsers_ipynb.py`）：cell 类型分派 / source-as-list 拼接 / locator 结构 / 跨 cell element_id 连续 / 错误路径（缺文件 / 错扩展 / 坏 JSON / nbformat < 4）/ schema 校验 / pipeline + CLI 端到端
+- commit `30925ee`，已 push
+
+**输入格式矩阵**（完成 6/8）：
+- ✅ PDF（fallback）
+- ✅ DOCX（fallback）
+- ✅ Markdown（markdown）
+- ✅ HTML（html）
+- ✅ Plain text（text）
+- ✅ Jupyter Notebook（ipynb）
+- ⏳ reStructuredText
+- ⏳ LaTeX / .tex
+
+**worktree 当前状态**：
+- HEAD `30925ee`，工作树清洁
+- 测试基线：260 pass / 0 fail / 9 skip（+20 vs Round 4）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 6）
+
+**首要任务**：方向调整。parsers 矩阵已覆盖主要输入格式（6/8），追加 RST/LaTeX 边际收益递减。本轮建议换轨：
+
+- 候选 A（推荐）：**审计 `evaluation/` + `app/` 找 bug**
+  - 现状：评测管线 163 测试基线，但没做过系统性 bug 审计
+  - 复杂度：中（需读 evaluation/metrics.py、report.py、cli.py 找边界 bug）
+  - 价值：保证后续向量化的输入正确
+  - 不变量：不动 `evaluator_version` / `report_version`（指示线在审）
+
+- 候选 G（新提）：**CLI 自动 source_type 推断**
+  - 现状：用户必须显式 `--parser markdown/html/text/ipynb`
+  - 复杂度：低（在 cli.py 加个 by-extension dispatcher）
+  - 价值：UX 改进，常见场景默认对
+
+- 候选 H（新提）：**batch CLI（多文件 / 目录）**
+  - 现状：`parse` 只支持单文件
+  - 复杂度：中（加 `parse-dir` 子命令）
+  - 价值：评测 / 批量处理场景的基础
+
+- 候选 D：补 fallback parser 的覆盖率
+- 候选 E：实施 source_spans（独立设计）
+
+**建议**：选 G（CLI 自动 source_type 推断）。理由：
+1. 用户友好（90% 场景不用 `--parser`）
+2. 体积小（~50 行）
+3. 与 Round 7 batch CLI 互补
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 5 后）：260 pass / 0 fail / 9 skip（HEAD `30925ee`）
+
+---
+
 ## 2026-08-04 — Round 1（inspect 子命令 + 测试）
 
 **做了什么**：
