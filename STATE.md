@@ -7300,3 +7300,92 @@ structural.py 是结构分块核心算法，第三轮已建立基础，
 - 本 worktree（Round 129 后）：9885 pass / 0 fail / 13 skip（HEAD `b276136`）
 
 ---
+
+## Round 130（2026-08-05）：evaluation/manifest.py 第五轮（edges5）
+
+### 范围
+- 文件：`tests/test_evaluation_manifest_edges5.py`（新增，1228 行）
+- 目标：`evaluation/manifest.py`（239 行，已有 425 测试）
+- 新增测试：176 个
+- 提交：`9127e38`
+- **里程碑：测试总数突破 10000（10061 pass）**
+
+### 覆盖深度
+- **_is_absolute_like 微边界**：
+  - 空串/单字符/双字符/三字符相对路径
+  - POSIX 绝对 /foo / Windows C:\foo / C:/foo
+  - 大小写盘符
+  - 盘符无分隔符 C:foo
+  - ./foo / ../foo
+  - 数字/下划线/emoji 首字符（非 alpha）
+  - 中文 unicode 首字符（isalpha True → 视为盘符）
+- **_has_backslash 边界**：
+  - 单/多/前/后/仅 backslash
+  - 空串/unicode 无 backslash
+- **ManifestError 深度**：
+  - 继承 Exception，不继承 ValueError/KeyError
+  - args 行为（0/1/多）
+  - raise/except 语义
+  - 不被 ValueError 捕获
+- **DocumentEntry 字段类型精确**：
+  - 10 字段，类型验证（str/Path/tuple/dict/None）
+  - frozen=True，hashable，in set
+  - equality/inequality
+- **ExpectedFailure 字段类型精确**：
+  - 5 字段，类型验证
+  - frozen=True，hashable
+- **Manifest 字段类型精确**：
+  - 5 字段，类型验证
+  - frozen=True，hashable
+  - properties 行为：file_count/pdf_count/docx_count/content_group_count/categories_covered
+- **_resolve_relative_path 深度**：
+  - 正常/子目录/含 ./ 与 ../
+  - field_name 在各种错误消息中
+  - 解析后位于 root 外 → ManifestError
+- **_detect_project_root 深度**：
+  - file/dir 输入
+  - 多 pyproject.toml → 最近优先
+  - 无 pyproject.toml
+- **load_manifest 深度**：
+  - signature/默认值
+  - 缺文件/坏 JSON/version 不匹配
+  - str/Path 输入
+  - 返回 Manifest 实例
+  - 路径解析/categories 转 tuple
+- **模块结构深度**：
+  - imports 完整（json/dataclass/Path/Any/MANIFEST_VERSION/validate）
+  - __all__ 5 项精确（ManifestError/Manifest/DocumentEntry/ExpectedFailure/load_manifest）
+  - 全 public（无 _ 前缀）
+  - 9 个内部 helper 全部 callable
+  - docstring 提及 path/relative/project root
+  - from __future__ import annotations
+- **签名深度**：
+  - 各函数返回注解（bool/Path/Manifest）
+  - load_manifest 双参数与默认值
+  - 5 个 property 的签名
+
+### 撞墙记录
+1. test_is_absolute_like_unicode_first_char：中文字符 .isalpha() 也返回 True，
+   所以 "中:/foo" 会被识别为 Windows 盘符形式（True）。修复：assert True。
+2. test_load_manifest_manifest_version_mismatch_raises：schema enum 校验
+   先于我们代码里的 version 二次校验，所以非 enum 值会被 EvalSchemaError 拦截。
+   修复：改 assert EvalSchemaError。
+
+### 下一步建议
+- 候选 GI：evaluation/runner.py 第五轮
+- 候选 GJ：evaluation/metrics.py 第五轮
+- 候选 GK：evaluation/annotation_metrics.py 第五轮
+- 候选 GL：evaluation/report.py 第五轮
+- 候选 GM：app/parsers/markdown_parser.py 第四轮
+- 候选 GN：app/parsers/html_parser.py 第四轮
+- 候选 GO：app/parsers/ipynb_parser.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GI（evaluation/runner.py 第五轮）。runner 已有 4 轮，
+第五轮可深入 _load_annotation/_process_one/run_evaluation 边角。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 130 后）：10061 pass / 0 fail / 13 skip（HEAD `9127e38`）
+
+---
