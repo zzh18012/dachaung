@@ -372,3 +372,127 @@ def test_parse_explicit_parser_overrides_inference(tmp_path: Path):
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data["parser_name"] == "markdown"
 
+
+# ---- parse-dir 子命令 ----
+
+
+def test_parse_dir_processes_multiple_files(tmp_path: Path):
+    """目录批处理：3 种扩展名 → 3 个 JSON + 1 个 summary。"""
+    in_dir = tmp_path / "input"
+    in_dir.mkdir()
+    (in_dir / "a.md").write_text("# A\n\nBody A.\n", encoding="utf-8")
+    (in_dir / "b.html").write_text("<h1>B</h1><p>Body B.</p>", encoding="utf-8")
+    (in_dir / "c.txt").write_text("Body C paragraph.\n", encoding="utf-8")
+    # 未知扩展名应被忽略
+    (in_dir / "skip.xyz").write_text("ignored", encoding="utf-8")
+
+    out_dir = tmp_path / "out"
+    rc, stdout, stderr = _run_cli(["parse-dir", str(in_dir), "-o", str(out_dir)])
+    assert rc == 0, f"stderr={stderr}"
+    # 3 个 JSON 输出（每个含原扩展名以避免冲突）
+    assert (out_dir / "a.md.json").is_file()
+    assert (out_dir / "b.html.json").is_file()
+    assert (out_dir / "c.txt.json").is_file()
+    # summary
+    summary_path = out_dir / "_summary.json"
+    assert summary_path.is_file()
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    assert summary["total"] == 3
+    assert summary["success"] == 3
+    assert summary["failure"] == 0
+    # 顶层 stdout 有 SUMMARY 行
+    assert "[SUMMARY] 3/3 ok" in stdout
+
+
+def test_parse_dir_recursive(tmp_path: Path):
+    """--recursive 走子目录。"""
+    in_dir = tmp_path / "input"
+    sub = in_dir / "sub"
+    sub.mkdir(parents=True)
+    (in_dir / "top.md").write_text("# Top\n", encoding="utf-8")
+    (sub / "nested.md").write_text("# Nested\n", encoding="utf-8")
+
+    out_dir = tmp_path / "out"
+    # 不带 --recursive：只处理顶层
+    rc, stdout, _ = _run_cli(["parse-dir", str(in_dir), "-o", str(out_dir)])
+    assert rc == 0
+    assert (out_dir / "top.md.json").is_file()
+    assert not (out_dir / "sub" / "nested.md.json").is_file()
+
+    # 带 --recursive：处理子目录
+    out_dir2 = tmp_path / "out2"
+    rc, stdout, _ = _run_cli(["parse-dir", str(in_dir), "-o", str(out_dir2), "--recursive"])
+    assert rc == 0
+    assert (out_dir2 / "top.md.json").is_file()
+    assert (out_dir2 / "sub" / "nested.md.json").is_file()
+
+
+def test_parse_dir_records_failures_in_summary(tmp_path: Path):
+    """失败文件计入 summary.failure 但不阻塞其他文件。"""
+    in_dir = tmp_path / "input"
+    in_dir.mkdir()
+    (in_dir / "ok.md").write_text("# OK\n", encoding="utf-8")
+    # 构造一个会失败的 markdown（虽然 markdown parser 很难失败；改用伪造的 .pdf）
+    (in_dir / "bad.pdf").write_bytes(b"%PDF-1.4\nthis is not valid\n%%EOF")
+
+    out_dir = tmp_path / "out"
+    rc, stdout, stderr = _run_cli(["parse-dir", str(in_dir), "-o", str(out_dir)])
+    # 因有 1 个失败 → rc != 0
+    assert rc != 0
+    # OK 文件仍写出
+    assert (out_dir / "ok.md.json").is_file()
+    # summary 记录
+    summary = json.loads((out_dir / "_summary.json").read_text(encoding="utf-8"))
+    assert summary["total"] == 2
+    assert summary["success"] == 1
+    assert summary["failure"] == 1
+    # failure 条目有 errors
+    fail_entries = [e for e in summary["files"] if e["status"] == "fail"]
+    assert len(fail_entries) == 1
+    assert fail_entries[0]["errors"][0]["code"]  # 错误码非空
+    # bad.pdf 不应留半成品
+    assert not (out_dir / "bad.pdf.json").is_file()
+
+
+def test_parse_dir_explicit_parser_recorded_in_summary(tmp_path: Path):
+    """--parser markdown 时，summary.parser_override 与 per-file parser 都记录为 markdown。
+
+    注：parser 内部仍按自身扩展名白名单校验，所以不能用 .txt 强制 markdown（会失败）；
+    这里用 .md + markdown 验证显式覆盖被记录。
+    """
+    in_dir = tmp_path / "input"
+    in_dir.mkdir()
+    (in_dir / "doc.md").write_text("# Title\n\nBody.\n", encoding="utf-8")
+
+    out_dir = tmp_path / "out"
+    rc, _, stderr = _run_cli([
+        "parse-dir", str(in_dir), "-o", str(out_dir), "--parser", "markdown",
+    ])
+    assert rc == 0, f"stderr={stderr}"
+    summary = json.loads((out_dir / "_summary.json").read_text(encoding="utf-8"))
+    assert summary["parser_override"] == "markdown"
+    assert all(f["parser"] == "markdown" for f in summary["files"])
+    # 输出 JSON 确实是 markdown parser 产出
+    data = json.loads((out_dir / "doc.md.json").read_text(encoding="utf-8"))
+    assert data["parser_name"] == "markdown"
+
+
+def test_parse_dir_missing_dir_returns_2(tmp_path: Path):
+    rc, _, _ = _run_cli(["parse-dir", str(tmp_path / "nope"), "-o", str(tmp_path / "out")])
+    assert rc == 2
+
+
+def test_parse_dir_empty_dir_warns_but_succeeds(tmp_path: Path):
+    """空目录（无支持文件）：warning，rc=0，summary.total=0。"""
+    in_dir = tmp_path / "empty"
+    in_dir.mkdir()
+    out_dir = tmp_path / "out"
+    rc, _, stderr = _run_cli(["parse-dir", str(in_dir), "-o", str(out_dir)])
+    assert rc == 0
+    assert "未发现支持类型的文件" in stderr
+    summary = json.loads((out_dir / "_summary.json").read_text(encoding="utf-8"))
+    assert summary["total"] == 0
+    assert summary["success"] == 0
+    assert summary["failure"] == 0
+
+
