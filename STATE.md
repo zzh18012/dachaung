@@ -2275,3 +2275,40 @@
 - 本 worktree（Round 46 后）：1425 pass / 0 fail / 9 skip（HEAD `a380c80`）
 
 ---
+
+## Round 47（2026-08-04）：候选 AX — evaluation/schema.py + schema_validation.py 边角覆盖
+
+### 做了什么
+- 候选 AX：扩展 `tests/test_evaluation_schema.py`，新增 30 个测试覆盖 `evaluation/schema.py` + `evaluation/schema_validation.py` 的全部边角。
+- 至此 evaluation 层 schema 校验入口全覆盖：load_schema / _schema_path / validate / validate_file / document_passes_schema 都有专门边角测试。
+- 重点覆盖项：
+  - **EvalSchemaError 类契约** 7 个：Exception 子类、raise/catch、默认 errors 空列表、None → []、errors 透传、Exception 实例、message 属性
+  - **SCHEMAS_DIR 常量** 3 个：绝对路径、name == "schemas"、含已知 schema 文件（manifest/annotation/evaluation-report）
+  - **load_schema 边角** 5 个：返回 dict、含 $schema/$id/title、未知名 FileNotFoundError
+  - **`_schema_path` 直接单测** 3 个：返回 Path 对象、未知名 raise（msg 含 schema 名）、在 SCHEMAS_DIR 下（parent 验证）
+  - **validate 边角** 5 个：成功返 None、消息含错误数（"处"）、errors 是 list、每个 error 含 path/message/schema_path 三键、首 error 用于消息
+  - **validate_file 边角** 4 个：Path 对象接受、目录 raise FileNotFoundError、未知 schema name raise、成功返 None
+  - **document_passes_schema 边角** 3 个：空 dict False、返回 type 为 bool（不是 int）、extra field 处理（additionalProperties 决定接受/拒绝）
+- 无源码改动。
+
+### 撞墙记录
+- **Wall 1**：`test_document_passes_schema_returns_bool_not_int` 中 `not isinstance(result, int)` 失败——Python 中 `bool` 是 `int` 的子类，`isinstance(True, int)` 永远为 True。改为 `type(result) is bool`（精确类型检查，忽略子类）。
+
+### 下一步建议
+- 候选 AS：app/hash.py 内部边角补强（17 → ~25 个）
+- 候选 BA：app/chunkers/__init__.py / app/parsers/__init__.py 边角
+- 候选 BB：evaluation/__init__.py 常量
+- 候选 BC：app/__init__.py / app/cli.py 边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AS（app/hash.py 补强）。理由：
+1. hash.py 当前 17 个测试，仍可补强：SHA256 边角、不同 file_size、文本与二进制 hash 区分
+2. hash.py 是基础设施（document_id / source_hash 全靠它），稳定不变
+3. 之后转 BA/BB（__init__ 模块）扫尾所有边角
+4. 至此 evaluation 层（runner/manifest/annotation_metrics/metrics/report/schema）已全覆盖，转回 app/ 层
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 47 后）：1455 pass / 0 fail / 9 skip（HEAD `c0f7d00`）
+
+---
