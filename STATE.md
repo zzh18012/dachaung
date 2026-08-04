@@ -3902,3 +3902,68 @@
 - 本 worktree（Round 82 后）：4698 pass / 0 fail / 13 skip（HEAD `5ceb688`）
 
 ---
+
+## Round 83（2026-08-05）：候选 CR — evaluation/manifest.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CR：新建 `tests/test_evaluation_manifest_edges2.py`（139 个测试）覆盖
+  `evaluation/manifest.py`（239 行）的深度边角，与已有 `test_manifest.py`（90+）+
+  `test_evaluation_manifest_edges.py`（90+）互补。
+- 重点覆盖项：
+  - **_is_absolute_like 第二轮** 26 个：所有 ASCII a-z/A-Z 盘符枚举、
+    所有数字拒绝、Unicode 字母（中.isalpha()=True 通过）、URL scheme、
+    家目录、多点、0/1/2/3 char 边界、前导空白、windows UNC 路径
+  - **_has_backslash 第二轮** 13 个：纯反斜杠、长路径、首尾位置、
+    Unicode+反斜杠、特殊字符无反斜杠
+  - **_resolve_relative_path 第二轮** 16 个：返 Path/absolute、
+    nested subdirs、./ ../.. 处理、单点路径、field_name 错误消息透传、
+    Unicode 文件名、escape root 各种变体
+  - **_detect_project_root 第二轮** 8 个：file/dir input、
+    deeply nested、no pyproject fallback、绝对路径
+  - **Manifest dataclass 第二轮** 9 个：frozen 严格、file_count int、
+    content_group_count 单向 pair/mutual pair/mixed paired+unpaired、
+    categories_covered 跨 doc 去重
+  - **DocumentEntry/ExpectedFailure 第二轮** 7 个：frozen 严格、所有字段、
+    tuple vs list 不可变
+  - **load_manifest 第二轮** 24 个：annotation_file 解析/escape root/
+    backslash/absolute 全部拒绝、str/Path 输入、JSON decode error chained、
+    version mismatch 不可达（schema 先拒绝）、categories→tuple 转换、
+    sha256 必须 64-hex、paired_with 字符串、expectations 透传、
+    full valid manifest、Unicode doc_id
+  - **ManifestError 第二轮** 10 个：isexception、str/repr、args、unicode、
+    chained cause、no cause default、实例不等
+  - **__all__ 与模块结构** 16 个：5 个 public 导出、internal helpers 不在 __all__、
+    MANIFEST_VERSION/validate/json/Path/dataclass import、所有 helper callable
+  - **signature 验证** 5 个：5 个函数参数名/默认值
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_is_absolute_like_unicode_drive_char_rejected` 预期 False，
+  实际 True。原因：Python str.isalpha() 对 Unicode 字母（含中文）返 True。
+  修复：测试改为验证实际行为（True）。
+- wall 2：`test_load_manifest_version_mismatch_raises` 预期 ManifestError，
+  实际 EvalSchemaError。原因：schema const 强制 manifest_version="1.0"，
+  load_manifest 内的 version 检查不可达。修复：改为验证 schema 先拒绝。
+- wall 3：`test_load_manifest_sha256_string` 用 "abc123" 被 schema 拒绝。
+  原因：sha256 必须 `^[0-9a-f]{64}$`。修复：改用 "a"*64。
+- wall 4：`test_load_manifest_full_valid_manifest` 的 paired_with=None 被拒。
+  原因：schema 要求 paired_with 必须是 string（不接受 null）。
+  修复：fixture 中删去 paired_with 字段。
+
+### 下一步建议
+- 候选 CS：evaluation/metrics.py 边角（第二轮）
+- 候选 CT：evaluation/annotation_metrics.py 边角（第二轮）
+- 候选 CU：evaluation/schema.py / schema_validation.py 边角（第二轮）
+- 候选 CV：evaluation/report.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CV（evaluation/report.py 边角第二轮）。理由：
+1. report.py 承担 summary 聚合 + provenance 构造 + devset section 提取
+2. 含 git/datetime/dependencies/aggregate 等多个对外契约
+3. 与 Round 82 的 runner.py 测试互补，闭环 evaluation/ 输出侧
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 83 后）：4837 pass / 0 fail / 13 skip（HEAD `87cf447`）
+
+---
