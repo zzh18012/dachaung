@@ -1416,3 +1416,34 @@
 - 本 worktree（Round 23 后）：496 pass / 0 fail / 9 skip（HEAD `eeba61b`）
 
 ---
+
+## Round 24（2026-08-04）：候选 AA — app/hash.py 全新测试文件
+
+### 做了什么
+- 候选 AA：新建 `tests/test_hash.py`，21 个测试覆盖 `compute_file_hash` 与 `compute_text_hash`。
+- 此前该模块**无专属测试文件**（仅被 pipeline 间接调用过）。
+- 重点覆盖项：
+  - **`compute_text_hash`**：空串、ASCII、Unicode（UTF-8 编码验证）、emoji（4-byte UTF-8）、确定性、空白敏感、输出格式（64 字符小写 hex）
+  - **`compute_file_hash`**：空文件、小文件、大文件（>64KB 流式分块拼接验证）、二进制（含 \\x00 与高位字节）、str 与 Path 输入、缺失文件、目录（`is_file=False`）、chunk 边界（恰好 64KB 与 64KB+1）
+- 无源码改动。
+
+### 下一步建议
+- 候选 AC：`evaluation/schema.py` 与 `evaluation/schema_validation.py` 测试
+- 候选 AD：`evaluation/report.py` 聚合逻辑测试
+- 候选 AE：`evaluation/runner.py` 主流程测试
+- 候选 AF：`app/chunkers/structural.py` 内部纯函数（`_split_long_text` 等还有边角）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AC（evaluation/schema_validation）。理由：
+1. 一脉相承继续 evaluation/ 覆盖率补强
+2. `document_passes_schema` 是 metrics 的依赖（schema_valid 指标调用它）
+3. 纯函数，低复杂度
+
+### 撞墙记录
+- 无新撞墙。21 个测试一次通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 24 后）：517 pass / 0 fail / 9 skip（HEAD `057bad9`）
+
+---
