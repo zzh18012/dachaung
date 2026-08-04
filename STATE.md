@@ -2589,3 +2589,43 @@
 - 本 worktree（Round 54 后）：1860 pass / 0 fail / 9 skip（HEAD `6b08aa8`）
 
 ---
+
+## Round 55（2026-08-04）：候选 BL — text_parser 内部边角覆盖
+
+### 做了什么
+- 候选 BL：新建 `tests/test_parsers_text_edges.py`（48 个测试）覆盖 `app/parsers/text_parser.py`（136 行）的模块级常量 + 内部 helper 边角，与已有 `test_parsers_text.py`（52 个）互补。
+- 重点覆盖项：
+  - **模块级常量** 4 个：_TEXT_EXTENSIONS 是 tuple 含 .txt/.text、全小写、TextParser 类属性 name='text'/version='stdlib/0.1.0'、是 Parser 子类
+  - **TextParser 实例** 2 个：无参数构造、有 parse 方法
+  - **_split_paragraphs 极端边角** 15 个：首尾换行、单字符/单数字、内容内换行、tab 内容（strip 影响）、混合 CRLF/CR/LF、连续空行视为一分隔、空串/纯空白/纯换行返 []、返回 list[tuple[int,str]]、start_line 严格递增
+  - **_detect_text_source_type 边角** 9 个：大小写混合扩展名、双扩展名、dotfile、无扩展名 raise、未知 suffix raise、返 str 类型、error details 含 suffix
+  - **TextParser 实例复用** 3 个：可解析多文件、无 counter 状态泄漏、单文档内 element_id 严格递增（e0000..e0003）
+  - **TextParser 错误路径 details** 2 个：file_not_found 含 path、unsupported_type 含 suffix
+  - **TextParser Document 字段** 5 个：metadata 固定 {text: True}、有 elements 时 warnings=[]、空文件 1 个 warning record、warning 含非空 reason
+  - **TextParser schema 通过 + element 字段** 5 个：通过 schema、confidence 固定 0.95、metadata 空 dict、parent_id=None、source_locator 只含 line
+  - **文件大小边角** 3 个：单字节、10K 行大文件、UTF-8 多字节内容
+  - **_detect_text_source_type 错误消息** 2 个：含 suffix、含 '(无)'
+- 无源码改动。
+
+### 撞墙记录
+- **Wall 1**：`test_split_paragraphs_content_with_tabs` 假设 `\ta\n\tb` → `"\ta\n\tb"`。实际 strip() 把首尾 tab 去了 → `"a\n\tb"`。改测试反映 strip 行为。
+
+### 下一步建议
+- 候选 BM：app/parsers/markdown_parser.py 内部边角
+- 候选 BN：app/parsers/html_parser.py 内部边角
+- 候选 BO：app/parsers/ipynb_parser.py 内部边角（已有 38 个直接测试，仍可补强）
+- 候选 BP：app/parsers/fallback_parser.py 内部边角（已有 79 个，仍可补强）
+- 候选 BQ：app/parsers/kreuzberg_parser.py 内部边角（已有 53 个，仍可补强）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BM（markdown_parser 内部边角）。理由：
+1. markdown_parser 是结构化文本解析的代表
+2. 含 heading/list/code block 等结构识别逻辑
+3. 之后扩展到 BN（html_parser）完成两个文本型 parser 的内部边角
+4. 至此 evaluation 层 + app/cli + app/schema + app/models + app/hash + app/pipeline + app/chunker + text_parser 全覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 55 后）：1908 pass / 0 fail / 9 skip（HEAD `c7e0a09`）
+
+---
