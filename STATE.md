@@ -5112,3 +5112,51 @@ ipynb_parser.py 227 行 323 tests（1.4 tests/line），仍有 helper 与
 - 本 worktree（Round 103 后）：6931 pass / 0 fail / 13 skip（HEAD `370c67a`）
 
 ---
+
+## Round 104（2026-08-05）：候选 DW — app/parsers/text_parser.py 第三轮边角
+
+### 触发
+继 Round 103（ipynb_parser 第三轮）后继续自跑。
+text_parser.py 136 行 212 tests（1.6 tests/line），仍有 helper 与错误路径深度可补。
+
+### 实现
+- 新增 `tests/test_parsers_text_edges3.py`（88 个测试）
+- 覆盖 app/parsers/text_parser.py（136 行）的深度路径：
+  - **`_split_paragraphs`**：empty string、single chunk、multiple blank lines 作分隔、
+    CR/CRLF/LF 归一、混合换行、内部空白保留、tab 内容、首尾空白 strip、
+    递增行号、50 段落 stress、单段落多行
+  - **`_detect_text_source_type`**：小写/大写/混合大小写接受、
+    拒绝 pdf/docx/html/md/ipynb/no-suffix/unknown、
+    错误 code + details 精确、`_TEXT_EXTENSIONS` 精确 2-tuple
+  - **pipeline 错误**：file_not_found、unsupported_type、目录作输入、
+    text_read_failed（OS monkey 含 exception_type）、invalid UTF-8 fallback
+  - **Document 不变量**：source_type=text、parser_name/version、metadata.text=True、
+    source_path 保留、source_hash 透传、document_id 来自 hash、
+    chunks/relations/errors 空
+  - **空文件与 whitespace-only** 都触发 text_no_content warning（含 reason text）；
+    有内容则无 warning
+  - **element 深度**：type 总是 paragraph、confidence=0.95、metadata 空、
+    parent_id None、resource_path None、locator 仅含 line key、
+    element_id 连续（e0000, e0001, ...）且唯一、locator line 1-indexed
+  - **CRLF 归一** 在 parse 路径、unicode/emoji 内容保留
+  - **大文件 stress**：1000 段落和 100KB 单段落
+  - **模块结构**：__all__ 精确、所有 import、Parser 继承、name/version 值
+- 无源码改动。
+
+### 撞墙记录
+- 无：88 个测试一次通过。
+
+### 下一步建议
+- 候选 DX：app/parsers/kreuzberg_parser.py 第三轮（245 行 332 tests）
+- 候选 DY：app/chunkers/structural.py 第四轮
+- 候选 DZ：app/parsers/fallback_parser.py 第四轮
+- 候选 EA：evaluation/__init__.py 边角（28 行 14 tests via test_packages_init）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DX（kreuzberg_parser.py 第三轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 104 后）：7019 pass / 0 fail / 13 skip（HEAD `d8377ff`）
+
+---
