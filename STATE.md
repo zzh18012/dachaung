@@ -4839,3 +4839,57 @@
 - 本 worktree（Round 98 后）：6403 pass / 0 fail / 13 skip（HEAD `fbb3d2c`）
 
 ---
+
+## Round 99（2026-08-05）：候选 DO — evaluation/cli.py 第三轮边角
+
+### 触发
+继 Round 98（manifest 第三轮）后继续自跑。原本建议 DN（report.py 第二轮），
+但 report.py 已有 124 个 edges2 测试覆盖；选 evaluation/cli.py 第三轮
+（base 48 + edges 54 + edges2 81 = 183 已存在）作为更高价值目标。
+
+### 实现
+- 新增 `tests/test_evaluation_cli_edges3.py`（97 个测试）
+- 覆盖 evaluation/cli.py（243 行）的深度路径：
+  - **main() run**：run_evaluation 抛 EvalSchemaError → rc=1（line 107-109）
+  - **main() run**：validate_file 抛 EvalSchemaError post-generation → rc=1
+    （line 113-116）
+  - **main() run**：参数透传 parser_name/max_chars/tolerance_chars 到 run_evaluation
+  - **main() run**：n_ok/n_fail 当 metrics 缺 pipeline_success 时按 0 处理
+  - **main() run**：git_commit[:12] 截断、None → "unknown"
+  - **main() run**：stdout 含 documents=N、成功 X、失败 Y、devset 字段
+  - **main() run**：load_manifest 抛 ManifestError/EvalSchemaError → rc=1
+  - **main() validate-report**：validate_file 抛 FileNotFoundError → rc=2
+    （line 149-151）
+  - **main() validate-report**：validate_file 抛 JSONDecodeError → rc=1
+    （line 152-154）
+  - **_format_metric**：metric 缺 value/reason 键、float NaN/+Inf/-Inf/极小/极大/负值、
+    dict 含 None/bool/字符串值、sorted 排序、空字符串、Unicode、alignment 36 字符
+  - **_run_inspect_doc**：4 个 sort bucket 边界（bool=0, number=1, dict/str=2, null=3）、
+    空 metrics、parser 行缺字段（parser_name/version 各缺一）、source_path 缺、
+    document_id 缺、counts 大数组、source_type=pdf、tolerance_chars 透传、
+    document/annotation/image_base_dir 透传给 compute_automatic_metrics
+  - **_build_parser**：prog/description、subparser 必填、run 4 个 int 参数类型、
+    非法 int 拒绝、未知短 flag 拒绝
+  - **模块级**：__main__ 守卫、utf-8 reconfigure 块、所有 imports
+- 修正：`compute_automatic_metrics` / `figure_caption_prf` / `chunk_boundary_prf`
+  在 cli.py 中是函数内 import，必须 monkeypatch 到源模块
+  (`evaluation.metrics.*` / `evaluation.annotation_metrics.*`)
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`evaluation.cli.compute_automatic_metrics` 不存在（函数内 import）
+  → 改 monkeypatch 路径为 `evaluation.metrics.compute_automatic_metrics`
+
+### 下一步建议
+- 候选 DN：evaluation/report.py 边角（第二轮）— 仍有深度空间
+- 候选 DP：evaluation/annotation_metrics.py 边角（第三轮）
+- 候选 DQ：evaluation/schema.py 边角（第二轮，若有）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DP（annotation_metrics.py 第三轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 99 后）：6500 pass / 0 fail / 13 skip（HEAD `2dedfdb`）
+
+---
