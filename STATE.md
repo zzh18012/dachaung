@@ -5375,3 +5375,72 @@ app/cli.py 535 行 357 tests（0.67 tests/line），仍有 _load_document_json �
 - 本 worktree（Round 107 后）：7416 pass / 0 fail / 13 skip（HEAD `3c2a910`）
 
 ---
+
+## Round 108（2026-08-05）：候选 EE — app/chunkers/structural.py 第四轮边角
+
+### 触发
+继 Round 107（cli 第四轮）后继续自跑。
+structural.py 388 行 391 tests（1.01 tests/line），仍有 _ChunkBuffer.flush 直接调用与 chunk() 集成场景未覆盖。
+
+### 实现
+- 新增 `tests/test_chunker_edges4.py`（115 个测试）
+- 覆盖 app/chunkers/structural.py（388 行）的深度路径：
+  - **`_ChunkBuffer.flush` 直接调用**：空 buf 返回 None、单 part 返回 chunk、
+    whitespace-only text 返回 None、source_element_ids dedup 保序、
+    source_spans 每个 part 一项、chunk_id 格式、metadata strategy/max_chars/char_count、
+    text join 单空格、flush 后清空 parts、二次 flush 返回 None、
+    is_empty/length 默认值、counter/document_id 默认
+  - **`_PART_*` 常量**：_PART_TEXT=0/_PART_ELEMENT_ID=1/_PART_START=2/_PART_END=3
+  - **`_SplitPiece` frozen dataclass**：默认 start/end=0、字段访问、frozen 不可变
+  - **`_hard_split_with_whitespace_fallback` 边界**：whitespace 在 upper/lower 边界、
+    max_chars=1 长 text/含空白、max_chars=32 长 text、whitespace at end、
+    lower==upper 当 max=1、返回 _SplitPiece 列表
+  - **`_split_long_text` 深度**：中英混合 sentence、纯中文短/长（forced_char）、
+    空 sentence 过滤（超长触发）、boundary_after 非空、CJK 短句、
+    返回 list 类型、start/end 非负、max_chars=32 阈值
+  - **`normalize_text`**：纯 CJK 无空白、纯 CJK 含空格、mixed CJK+空白、
+    返回 str、长 string idempotent、纯标点保留、标点含空白、
+    单字符空白输入、数字/特殊字符保留
+  - **`StructuralChunker.__init__` 阈值**：max_chars=33/64/128/32 接受、
+    31 拒绝、huge 接受
+  - **`StructuralChunker.chunk` 集成**：空文档→[]、全 table→isolated chunks、
+    全 image→[]、全 caption→isolated、连续 heading 各自 chunk、
+    heading+paragraph 同 chunk、paragraph+heading 分开、
+    paragraph→table→paragraph 三 chunk、超长 paragraph 分多 chunk、
+    chunk_id 零填充 + 递增、返回 list 类型、text join 单空格、
+    metadata 含 strategy/max_chars/char_count
+  - **`_element_text_with_span` 边界**：内部空白保留、无空白、
+    只 leading/trailing 空白、image 空 tuple、image 有 content 仍空、
+    empty/None/whitespace-only content（需 resource_path 满足 schema）、
+    返回 tuple 三元素、_element_text 旧接口仅返回 text
+  - **模块常量**：_SENTENCE_SPLIT_RE 编译、_HARD_BREAK_LANGS 6 元素 tuple、
+    含中英文句号
+  - **模块结构**：__all__ 精确 2 项、所有 import (re/dataclass/field/Any/Chunk/Document/Element)、
+    所有 helper 函数存在、StructuralChunker 有 chunk/_element_text_with_span/_element_text 方法
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_split_long_text` 当 text 长度 ≤ max_chars 时直接返回单 piece，
+  不走 sentence split。改测试需让 text 超长触发 split 路径
+- wall 2：`normalize_text("  你好\n世界\tend  ")` 实际返回 "你好 世界 end"
+  （不是 "你 好 世 界 end"），因为 CJK 内部无空白不被拆。改测试期望
+- wall 3：`Element(content="", resource_path=None)` 抛 ValueError（schema 要求
+  content 或 resource_path 至少一个非空）。改 helper 支持 resource_path 参数，
+  相关测试加 resource_path
+- wall 4：`StructuralChunker(max_chars=10)` 抛 ValueError（最低 32）。改用 32
+
+### 下一步建议
+- 候选 EF：app/schema.py 第四轮
+- 候选 EG：evaluation/__init__.py 边角（28 行）
+- 候选 EH：evaluation/cli.py 第四轮（已有 edges3）
+- 候选 EI：app/pipeline.py 第四轮
+- 候选 EJ：app/models.py 边角（如果还没有）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 EI（pipeline.py 第四轮），饱和端到端管道测试。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 108 后）：7531 pass / 0 fail / 13 skip（HEAD `d26fa0b`）
+
+---
