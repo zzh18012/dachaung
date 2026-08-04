@@ -2120,3 +2120,50 @@
 - 本 worktree（Round 42 后）：1268 pass / 0 fail / 9 skip（HEAD `2729c52`）
 
 ---
+
+## Round 43（2026-08-04）：候选 AQ — manifest.py + annotation_metrics.py 内部边角
+
+### 做了什么
+- 候选 AQ：扩展 `tests/test_manifest.py`（+30）和 `tests/test_annotation_metrics.py`（+19），共新增 49 个测试。
+- 至此 evaluation 层核心全覆盖：runner.py / manifest.py / annotation_metrics.py 都有专门边角测试。
+- 重点覆盖项（manifest.py）：
+  - **`ManifestError` 类契约** 2 个：is Exception subclass、可 raise/catch
+  - **`_is_absolute_like`** 6 个新边角：单字符、两字符、小写盘符、非字母盘符、`./` 和 `../` 相对路径、纯 `/`
+  - **`_has_backslash`** 3 个：纯反斜杠、正斜杠返 False、混合斜杠
+  - **frozen dataclass** 3 个：Manifest/DocumentEntry/ExpectedFailure 都 frozen，赋值抛 FrozenInstanceError
+  - **Manifest 属性直接构造** 5 个：file_count/pdf_count/docx_count/categories_covered（混合重叠 + 全空）
+  - **`_detect_project_root`** 3 个：start 是目录、返回绝对路径、立即找到 pyproject
+  - **`content_group_count`** 2 个：链式 pair（A→B→C→A → 3 frozenset groups）、两组互配（A↔B + C↔D → 2）
+  - **`load_manifest` 字段保留** 6 个：manifest_version/devset_status/path_str 保留、resolved_path 是绝对路径、空 documents、空 expected_failures 默认
+- 重点覆盖项（annotation_metrics.py）：
+  - **`PARSER_DOES_NOT_EMIT_RELATIONS` 常量** 2 个：值固定字符串、是 str 类型
+  - **`figure_caption_prf` shape** 3 个：返回 3 个 key、有 annotation 仍返 null、每个 metric 含 value+reason
+  - **`chunk_boundary_prf` 容差极端** 3 个：tolerance=0 严格、tolerance=10000 全包含、tolerance=-1 永不匹配
+  - **默认值** 1 个：默认 tolerance=30
+  - **chunk 边界场景** 2 个：3 chunks 2 边界、2 chunks 1 边界
+  - **f1 计算** 2 个：完美匹配 f1=1.0、半匹配 f1≈0.667
+  - **missing_markers** 2 个：marker 不在 stream → _missing_markers；全找到 → 无此键
+  - **`_tolerance_chars` 总存在** 3 个：success/document=None/annotation=None 三条路径都有
+  - **空 chunk text** 1 个：所有 chunk text 空字符串 → stream 也空 → missing_markers 记录
+
+### 撞墙记录
+- 无撞墙。49 个新测试一次通过。
+
+### 下一步建议
+- 候选 AV：evaluation/metrics.py 内部边角（compute_automatic_metrics 各指标分母为 0 / 各 reason）
+- 候选 AW：evaluation/report.py 内部边角（aggregate_summary / build_devset_section / get_dependency_versions）
+- 候选 AS：app/hash.py 内部边角补强
+- 候选 AX：evaluation/schema.py 边角（validate 函数各 schema 名）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AV（evaluation/metrics.py）。理由：
+1. metrics.py 是评测核心，含 compute_automatic_metrics 全部指标计算
+2. 各 metric 的 reason 字段（pipeline_failed / no_chunks / silent_drop 等）需要逐一覆盖
+3. 与已覆盖的 annotation_metrics.py 形成 metrics 全覆盖
+4. 之后转 AW（report.py）完成 evaluation 层
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 43 后）：1317 pass / 0 fail / 9 skip（HEAD `57651f5`）
+
+---
