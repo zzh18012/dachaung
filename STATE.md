@@ -546,3 +546,56 @@
 - 本 worktree（Round 8 后）：277 pass / 0 fail / 9 skip（HEAD `6c8277a`）
 
 ---
+
+## 2026-08-04 — Round 9（pipeline 暴露 image_output_dir_for helper）
+
+**做了什么**：
+- 完成候选 K：根治 Round 8 审计 §3.3 标记的硬编码反推问题
+- 在 `app/pipeline.py` 提取公共 helper `image_output_dir_for(output_path, source_hash) -> Path | None`
+  - 单一事实源：`output_path.parent / images-<sha16>` 命名约定
+  - output_path=None 时返回 None（对齐 pipeline 不写盘场景）
+- `process_single` 内部使用该 helper 替代内联计算
+- `evaluation/runner._process_one` 改用 helper + `document.source_hash`，删掉从 `document_id` 反推 sha16 的代码段
+- 新增 5 个 helper 单元测试（`tests/test_pipeline_helpers.py`）：
+  - 基础命名 / str 路径 / None output_path / 短 hash / 与 process_single 实跑结果一致
+- 不变量保持：
+  - 没有 schema 变更
+  - 没有 parser/chunker 变更
+  - `evaluator_version` / `report_version` 仍是 `"1.1"`
+- commit `89595d2`，已 push
+
+**worktree 当前状态**：
+- HEAD `89595d2`，工作树清洁
+- 测试基线：282 pass / 0 fail / 9 skip（+5 vs Round 8）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 10）
+
+**首要任务**：方向选择
+
+- 候选 E（推荐）：**实施 source_spans**
+  - 现状：被推迟了 9 轮；Round 8 审计中 `_text_preservation` 的 docstring 明确说"若需要空白级精确验证，必须为每个 chunk 增加 source_spans"
+  - 复杂度：高（schema 加 optional 字段；chunker 计算每个 chunk 在 element content 中的字符区间；测试）
+  - 价值：让 chunk 输出带可验证的精确定位；未来评测可以基于 spans 做严格的字符级保留验证
+  - 不变量：只加 optional 字段，向后兼容；不动 evaluator_version / report_version
+
+- 候选 D：补 fallback parser 的覆盖率（PDF/DOCX 各路错误代码）
+- 候选 L（新提）：**inspect 子命令增强**
+  - 给 `app/cli.py inspect` 加 `--metrics` 模式：对单文档跑评测指标（不写报告，仅 stdout）
+  - 价值：开发期快速 sanity check，不用每次构造 manifest
+- 候选 J（向量化）：仍因 CLAUDE.md "不增加计划外主要依赖" 阻塞；如要推进需用户授权 sentence-transformers
+
+**建议**：选 E（source_spans）。理由：
+1. 已推迟 9 轮，技术债时间到了
+2. Round 8 审计明确把它列为"治本方案"
+3. 不需要新依赖
+4. 完成后未来评测能升级到字符级精度（v1.2 baseline）
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 9 后）：282 pass / 0 fail / 9 skip（HEAD `89595d2`）
+
+---
