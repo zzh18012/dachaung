@@ -4183,3 +4183,65 @@
 - 本 worktree（Round 87 后）：5416 pass / 0 fail / 13 skip（HEAD `99233a8`）
 
 ---
+
+## Round 88（2026-08-05）：候选 CZ — app/pipeline.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CZ：新建 `tests/test_pipeline_edges2.py`（118 个测试）覆盖
+  `app/pipeline.py`（216 行）的深度边角，与已有 4 个 pipeline 测试文件
+  （edges/errors/helpers/integration，共 199 测试）互补。
+- 重点覆盖项：
+  - **get_parser 类型边界**：None/int/list/dict name 都抛 ValueError
+  - **get_parser 6 个 parser 实例化**：属性（name/version/parse callable）、
+    image_output_dir 接受但仅 fallback 使用
+  - **image_output_dir_for 深度**：None/Path/str、prefix images-、hash 16 字符截断、
+    父目录继承、不同 hash 不同目录、Unicode hash、相对/绝对路径
+  - **process_single 错误传播**：file_not_found details、未知 parser details
+    （unexpected_parser_error，含 path/parser_name/exception_type）、
+    ParserError details 透传+合并 path、unexpected exception 兜底、
+    chunker_failed、no_extracted_elements（source_type/warnings）、
+    schema_validation_failed（validation_errors 截断到 20）、write_failed（path）
+  - **process_single 执行顺序**：用计数 mock 验证 hash → parser → chunker →
+    empty check → schema → write 各阶段失败时后续不被调用
+  - **process_single 成功路径**：返回 Document 含 chunks/metadata/relations/warnings、
+    source_type='text'、JSON 写盘缩进、parent mkdir、idempotent source_hash、
+    Path/str 输入、max_chars 默认/自定义
+  - **validate_only 返回值语义**：tuple(bool, str)、missing/empty/dir/
+    invalid_json/wrong_shape 全返回 (False, msg)、合法文件返回 (True, 'OK')、不抛错
+  - **__all__ 4 项**、模块结构（imports Document/ErrorRecord/Parser/ParserError/
+    StructuralChunker/validate/SchemaValidationError/compute_file_hash）
+  - **函数签名**（默认值、keyword-only 参数）
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_get_parser_fallback_default_image_output_dir_none` 访问 `p.image_output_dir`
+  → AttributeError。原因：FallbackParser 的属性叫 `_image_output_dir`（私有）。
+  修复：改为访问 `_image_output_dir`。
+- wall 2：`test_get_parser_kreuzberg_ignores_image_output_dir` 预期抛 TypeError。
+  实际不抛：get_parser 接受 image_output_dir 但仅 fallback 使用。
+  修复：测试改为验证"接受但忽略"行为。
+- wall 3：`test_image_output_dir_for_returns_absolute_for_absolute_input` 用 `/tmp/out.json`
+  在 Windows 上 `is_absolute()` 返回 False（POSIX 路径不是 Windows 绝对）。
+  修复：用 pytest tmp_path（已是绝对路径）。
+- wall 4：`test_process_single_document_source_type_txt` 期望 'txt'，实际 'text'
+  （TextParser 用的 source_type 名字）。修复：改为 'text'。
+- wall 5：`test_process_single_no_elements_yields_no_extracted_elements` 中 Document
+  缺 document_id/source_path/parser_name/parser_version。修复：补全必填字段。
+
+### 下一步建议
+- 候选 DA：app/schema.py 边角（第二轮）—— 业务 schema
+- 候选 DB：app/chunkers/structural.py 边角（第二轮）
+- 候选 DC：app/hash.py 边角（第二轮）
+- 候选 DD：app/models.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DA（app/schema.py 边角第二轮）。理由：
+1. app/schema.py 是 Document JSON 的契约保障（与 evaluation/schema.py 平行）
+2. 第二轮可补 if/then 条件分支（PDF/DOCX source_locator）、SchemaValidationError 类
+3. 与 Round 87 eval/schema.py 对称闭环 schema 双侧
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 88 后）：5534 pass / 0 fail / 13 skip（HEAD `fd185cd`）
+
+---
