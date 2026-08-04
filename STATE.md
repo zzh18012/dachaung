@@ -6631,3 +6631,81 @@ figure_caption_prf 等独立函数。
 - 本 worktree（Round 121 后）：8966 pass / 0 fail / 13 skip（HEAD `4837abf`）
 
 ---
+
+## Round 122（2026-08-05）：evaluation/schema.py 第三轮（edges3）
+
+### 范围
+- 文件：`tests/test_evaluation_schema_edges3.py`（新增，679 行）
+- 目标：`evaluation/schema.py`（80 行，已有 358 测试）
+- 新增测试：87 个
+- 提交：`703f713`
+
+### 覆盖深度
+- **SCHEMAS_DIR 常量深度**：
+  - 是 Path 对象、绝对路径、是目录
+  - 名字精确 "schemas"
+  - 包含三个 schema 文件
+  - 父目录含 pyproject.toml
+- **EvalSchemaError 深度**：
+  - args 长度 1、值精确
+  - str(e) 含 message
+  - errors 默认 []、None→[]、[]保持、非空保持
+  - errors 是 list 类型
+  - 不继承 ValueError
+  - 两实例 errors 独立
+  - repr 含类名
+- **_schema_path 深度**：
+  - 返回 Path 对象、绝对路径
+  - 不存在 name → FileNotFoundError
+  - 空 name、subdir、.. 全部拒
+  - 错误消息含路径
+  - 三 schema 文件均可访问
+- **load_schema 深度**：
+  - 返回 dict
+  - 多次调用返回独立 dict 对象
+  - 不存在 schema → FileNotFoundError
+  - schema 含 $schema/$id/type/properties
+- **validate 深度**：
+  - 合法实例返回 None
+  - 错误消息含 schema 名字、错误计数
+  - errors attribute 是 list、每项有 path/message/schema_path 三 key
+  - 各字段类型正确（list/str）
+- **validate_file 深度**：
+  - Path/str 输入都接受
+  - 不存在/目录 → FileNotFoundError
+  - 空文件/坏 JSON → JSONDecodeError
+  - 内容不符合 → EvalSchemaError
+  - unicode 文件名/内容
+  - 错误消息含路径
+- **模块结构**：
+  - imports：json/Path/Any/Draft202012Validator/JSValidationError
+  - 5 个 public 属性 + _schema_path 私有
+  - __all__ 5 项精确，不含内部
+  - 所有 callable
+  - docstring 提及 Schema/manifest/annotation
+  - from __future__ import annotations
+- **签名深度**：
+  - EvalSchemaError.__init__: (self, message, errors=None)
+  - _schema_path/load_schema: 1 参数
+  - validate/validate_file: 2 参数
+  - load_schema 返回注解 dict、validate 返回 None
+- 无源码改动。
+
+### 撞墙记录
+无。
+
+### 下一步建议
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 GA：evaluation/cli.py 第五轮（243 行）
+- 候选 GB：app/chunkers/structural.py 第四轮
+- 候选 GC：app/schema.py 第三轮（独立于 evaluation/schema）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GC（app/schema.py 第三轮）。app/schema.py 是文档 JSON
+Schema 校验核心，独立于 evaluation/schema，第三轮深度空间仍在。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 122 后）：9053 pass / 0 fail / 13 skip（HEAD `703f713`）
+
+---
