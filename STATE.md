@@ -6549,3 +6549,85 @@ figure_caption_prf 等独立函数。
 - 本 worktree（Round 120 后）：8862 pass / 0 fail / 13 skip（HEAD `4ef964e`）
 
 ---
+
+## Round 121（2026-08-05）：app/models.py 第三轮（edges3）
+
+### 范围
+- 文件：`tests/test_models_edges3.py`（新增，817 行）
+- 目标：`app/models.py`（154 行，已有 203 测试）
+- 新增测试：104 个
+- 提交：`4837abf`
+
+### 覆盖深度
+- **SCHEMA_VERSION 精确值**：
+  - = "0.1.0"、is str、3 段
+  - major=0, minor=1, patch=0
+- **ElementType / SourceType Literal**：
+  - typing.get_args 解析
+  - ElementType 8 成员精确集合
+  - SourceType 6 成员精确集合
+- **Element __post_init__**：
+  - content=" "/"\t"/"\n" → truthy → 通过
+  - resource_path=" " → truthy → 通过
+  - content+resource_path 都 None/"" → 抛 ValueError
+  - element_id="\t"/"   " → truthy → 通过
+  - confidence 0.0/1.0 显式
+  - metadata/parent_id 默认与传值
+  - to_dict 8 keys 精确集合
+- **Chunk __post_init__**：
+  - text 单字符 / chunk_id 单字符 / 单 source_element_id
+  - text="\n" 单字符 → 通过
+  - 特殊字符 / unicode 文本
+  - metadata/source_spans 默认值
+  - metadata/source_spans 实例隔离
+  - to_dict 5 keys 精确集合
+- **Relation 深度**：
+  - to_dict 4 keys、默认 metadata={}
+  - from_id/to_id/type 空串接受
+  - unicode ids、metadata 传值
+- **WarningRecord 深度**：
+  - 必填 code/reason、details 默认 None
+  - to_dict 2/3 keys（依 details）
+  - details={} falsy 但 not None → 包含
+- **ErrorRecord 深度**：
+  - 必填 code/message、details 默认 None
+  - to_dict 2/3 keys
+  - details={} → 包含
+- **Document 深度**：
+  - 12 字段（6 必填 + 6 默认）
+  - to_dict 13 keys（含 schema_version）
+  - keys 精确集合
+  - metadata/elements 实例隔离
+- **模块结构**：
+  - imports dataclass/field/asdict/Any/Literal/Optional
+  - SCHEMA_VERSION/ElementType/SourceType 顶层
+  - 6 个 dataclass 类全存在
+  - docstring 提及 dataclass
+  - from __future__ import annotations
+- **dataclass 类属性**：
+  - 所有 6 个类 is_dataclass
+  - 字段数：Element=8, Chunk=5, Relation=4,
+    WarningRecord=3, ErrorRecord=3, Document=12
+- 无源码改动。
+
+### 撞墙记录
+1. test_document_required_fields_count / to_dict_keys_count /
+   field_count：原以为 13 字段（含 schema_version），实际 schema_version
+   是模块常量，Document 类只有 12 字段，to_dict 输出 13 keys（添加
+   schema_version）。修复：13→12（fields），14→13（to_dict keys）。
+
+### 下一步建议
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 FZ：evaluation/schema.py 第三轮（86 行）
+- 候选 GA：evaluation/cli.py 第五轮（243 行）
+- 候选 GB：app/chunkers/structural.py 第四轮（已有 3 轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 FZ（evaluation/schema.py 第三轮）。schema.py 较小（86 行），
+但作为 Schema 校验核心，深度路径仍有空间。短轮过渡后再做 FX。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 121 后）：8966 pass / 0 fail / 13 skip（HEAD `4837abf`）
+
+---
