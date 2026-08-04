@@ -4245,3 +4245,65 @@
 - 本 worktree（Round 88 后）：5534 pass / 0 fail / 13 skip（HEAD `fd185cd`）
 
 ---
+
+## Round 89（2026-08-05）：候选 DA — app/schema.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 DA：新建 `tests/test_schema_edges2.py`（196 个测试）覆盖
+  `app/schema.py`（93 行）+ document.schema.json 的深度边角，与已有
+  `test_schema.py`（117）+ `test_schema_edges.py`（58）互补。
+- 重点覆盖项：
+  - **SCHEMA_PATH 常量深度**：Path 类型、绝对路径、文件存在、文件名
+  - **SchemaValidationError 类**：subclass、errors 默认/None/透传、args、
+    repr、writable attr、异常链 __cause__
+  - **load_schema 函数**：fresh dict、修改不持久、str/Path、missing/dir/
+    invalid_json/empty、unicode filename/content
+  - **validate 默认 schema**：6 个 source_type（pdf/docx/markdown/html/text/ipynb）
+    各一份合法 doc 通过、不修改输入
+  - **validate 顶层字段**：schema_version const、source_hash pattern（大小写/长度/
+    非 hex）、source_type enum 大小写敏感、parser_name/version minLength、
+    metadata any object、根无 additionalProperties 限制
+  - **validate element 字段**：type 8 个 enum、content/resource_path anyOf、
+    confidence [0,1] 边界、parent_id null/string、element_id minLength
+  - **validate PDF source_locator**：page 1+/0/-1/missing、bbox 4 项/3/5/空/
+    字符串、page 字符串拒绝、extra 接受
+  - **validate DOCX source_locator**：minProperties 1、paragraph_index ≥0、
+    section int/str、table_index 负数拒绝、extra 接受
+  - **validate markdown/html/text locator**：line ≥1、section_path 可选、
+    text locator extra 接受
+  - **validate ipynb locator**：cell_index ≥0、cell_type 3 enum、missing 字段拒绝
+  - **validate chunk**：chunk_id/text minLength、source_element_ids minItems 1、
+    source_spans 各字段（start/end ≥0、element_id minLength、extra 拒绝）
+  - **validate relation/warning/error**：required 字段、extra 拒绝、metadata optional
+  - **validate 错误格式**：path/message/schema_path 三键、按 path 排序、消息含 N 处
+  - **validate 自定义 schema**：override 默认、空 schema 接受任何输入
+  - **validate 非 dict 输入**（list/string/None/int）
+  - **is_valid**：True/False 严格 bool、不抛错
+  - **validate_file**：str/Path/missing/dir/invalid_json/empty/invalid_content/
+    unicode filename/content/nested
+  - **_silence_unused_import**：returns None、无参数、callable、不在 __all__
+  - **__all__ 6 项**、模块结构、签名（默认值）
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_validate_top_level_extra_field_rejected` 预期拒绝额外字段，
+  实际接受。原因：document.schema.json 根未设 additionalProperties:false
+  （element/chunk/relation 等子 schema 才设了）。修复：测试改为验证"接受"。
+
+### 下一步建议
+- 候选 DB：app/chunkers/structural.py 边角（第二轮）
+- 候选 DC：app/hash.py 边角（第二轮）
+- 候选 DD：app/models.py 边角（第二轮）
+- 候选 DE：app/parsers/fallback_parser.py 边角（第三轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DB（app/chunkers/structural.py 边角第二轮）。理由：
+1. structural.py 是分块算法的核心（hard boundary + 长 text 切分）
+2. 第二轮可补 _split_long_text 内部分支、_hard_split_with_whitespace_fallback
+3. 与 Round 88 pipeline 互补：pipeline 调用 chunker，chunker 是子模块
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 89 后）：5730 pass / 0 fail / 13 skip（HEAD `e40ed40`）
+
+---
