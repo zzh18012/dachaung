@@ -2914,3 +2914,45 @@
 - 本 worktree（Round 62 后）：2465 pass / 0 fail / 9 skip（HEAD `1635f59`）
 
 ---
+
+## Round 63（2026-08-04）：候选 BZ — evaluation/report.py 边角覆盖
+
+### 做了什么
+- 候选 BZ：新建 `tests/test_evaluation_report_edges.py`（85 个测试）覆盖 `evaluation/report.py`（201 行）的模块常量 / 公共 API 边角，与已有 `test_evaluation_report.py`（75+ 个）互补。
+- 重点覆盖项：
+  - **模块常量深度** 16 个：_RATIO_METRICS 是 tuple、length 12、含 schema_valid/chunk_boundary_*、排除 pipeline_success/element_count_total/silent_drop_count/figure_caption_*；_COUNT_METRICS tuple length 1 排除 silent_drop；_SUCCESS_BOOL_METRICS tuple length 1 排除 schema_valid
+  - **__all__ 导出** 4 个：5 个项、不含内部常量、匹配模块属性
+  - **get_git_provenance** 7 个：返 dict 2 key、commit str|None、dirty bool、不存在目录、真实 repo 40 字符 SHA-1、subprocess failure 安全、OSError 安全
+  - **get_dependency_versions** 8 个：返 dict、mutable、精确 3 key、3 个值都是 str、PackageNotFoundError 安全、generic exception 安全
+  - **build_provenance** 13 个：max_chars float/0/负数/字符串数字 int() 转换、parser_name/version 透传、evaluator/report_version 是 str、timestamp 可 fromisoformat、含 tz、9 个 key 完整
+  - **build_devset_section** 10 个：返 dict、6 key、status/file_count/pdf/docx/content_group/categories 透传、空字段、类型保持
+  - **aggregate_summary counts** 4 个：sum 排除 None value、value=0 参与、空 input sum None、participating 0
+  - **aggregate_summary success_rate** 4 个：半通过 rate=0.5、False 不计成功、None 计 total 不计成功、空 input rate None
+  - **aggregate_summary ratio macro** 4 个：部分 None macro 只算非 None、同值、单 doc、全 None macro=None
+  - **aggregate_summary silent_drop** 2 个：mixed values、value=0 参与求和
+  - **aggregate_summary 不 mutate 输入** 1 个
+  - **aggregate_summary unknown/missing metrics** 3 个：unknown 忽略、缺 metrics key 不崩、缺 value key 不崩
+  - **aggregate_summary 精确字段集** 3 个：12 ratio + 1 success + 1 count
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。85 个新测试一次通过。
+
+### 下一步建议
+- 候选 BV：evaluation/metrics.py 边角（compute_automatic_metrics 各指标分母 0）
+- 候选 BW：evaluation/manifest.py 边角（manifest 解析 + categories）
+- 候选 BX：evaluation/annotation_metrics.py 边角（figure_caption_prf / chunk_boundary_prf）
+- 候选 BY：app/pipeline.py 端到端边角
+- 候选 CA：evaluation/schema_validation.py 边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BV（metrics.py 边角）。理由：
+1. metrics.py 是 Stage 2 评测指标计算核心
+2. 含分母 0/null reason 等多种边角，对评测稳定性关键
+3. 之后扩展到 BW/BX/CA 完成 evaluation 模块全部边角
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 63 后）：2550 pass / 0 fail / 9 skip（HEAD `1e35e2d`）
+
+---
