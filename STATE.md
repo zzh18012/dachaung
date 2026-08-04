@@ -5242,3 +5242,69 @@ kreuzberg_parser.py 245 行 332 tests（1.36 tests/line），仍有 helper 与�
 - 本 worktree（Round 105 后）：7164 pass / 0 fail / 13 skip（HEAD `9f998c1`）
 
 ---
+
+## Round 106（2026-08-05）：候选 DZ — app/parsers/fallback_parser.py 第四轮边角
+
+### 触发
+继 Round 105（kreuzberg_parser 第三轮）后继续自跑。
+fallback_parser.py 630 行 421 tests（0.67 tests/line），仍有 _parse_docx 成功路径与 _parse_pdf 多页集成未覆盖。
+
+### 实现
+- 新增 `tests/test_parsers_fallback_edges4.py`（115 个测试）
+- 覆盖 app/parsers/fallback_parser.py（630 行）的深度路径：
+  - **`_is_caption` 直接调用**：返回类型、空字符串、None、空白、全宽数字、tab 前导、
+    与 _CAPTION_RE 一致性双向验证
+  - **`_CAPTION_RE` 深度**：IGNORECASE 标志、中英文关键字、全宽数字范围、Fig 缩写变体
+  - **`_classify_pdf_paragraph` 优先级**：caption + 长 text 仍 caption、
+    caption meta 仅 heuristic key、中文分号/英文冒号非终止符 → heading、
+    caption 检测在 strip 后路径
+  - **`_group_words_to_paragraphs` 边界**：负 y/x 坐标、阈值 2.9/3.1 行聚类边界、
+    零高度 word、空 text word、行间距大 → 分段、单 word/同 y 双 word
+  - **`_lines_to_para` 边界**：负 x/y 坐标、空行返回 None bbox、空 text word
+  - **`_is_heading_style` 变体**：trailing space、tab 分隔、leading space strip、
+    返回 tuple 类型精确
+  - **`_parse_docx` 成功路径（mock docx.Document + Paragraph/Table）**：
+    单段落 emit、heading style emit（level=1, style name）、caption 文本 emit、
+    **caption 优先于 heading style**、空段落 "(空段落)" + empty=True metadata、
+    paragraph_index 递增、section 恒为 0（实现不递增）、
+    element_id 跨段连续 e0000/e0001/e0002、表格 emit（row/col count, source, table_index）、
+    paragraph → table → paragraph 顺序保留
+  - **`_parse_pdf` 多页集成**：多页 element_id 跨页连续、locator page 正确（1,2,3）、
+    同页 words+tables+images 三种 element、text→table→image 顺序、
+    image bbox 退化（x1≤x0, bottom≤top）跳过、全空触发 pdf_no_text_extracted、
+    返回 tuple 类型、paragraph confidence=0.85、table confidence=0.7、image confidence=0.6
+  - **`FallbackParser.parse()` 端到端（mock _parse_pdf/_parse_docx）**：
+    metadata.fallback=True、image_output_dir None/string/Path、
+    PDF 路由到 _parse_pdf、DOCX 路由到 _parse_docx、
+    image_output_dir 透传、document_id 来自 hash、warnings 透传、
+    chunks/relations/errors 空、source_path 保留、source_hash 透传、parser_name=fallback
+  - **模块结构**：__all__ 仅 FallbackParser、_CAPTION_RE 编译 + IGNORECASE、
+    所有 helper 函数 callable、所有 import 验证、
+    Parser 继承、version 含 3 个关键字、init 默认 None / Path / str 转换、
+    空字符串作 image_output_dir 视为 None
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_classify_pdf_paragraph("图 1")` 返回 heading 不是 caption，因为
+  `_CAPTION_RE` 要求 digit 后必须有 separator `[\.、:\s]`。改测试为 `"图 1."`
+- wall 2：`_parse_docx` 调用 `_extract_inline_image_rids(child)` 需要 child 有 `.iter()`。
+  FakeChild 类没有 .iter()，重构为共享基类 `_FakeXmlChild` 提供 `.iter()` 返回空列表，
+  9 处 FakeChild 与 1 处 PChild/TChild 全部继承
+- wall 3：`test_classify_pdf_paragraph_priority_caption_first` 改 `"图 1"` → `"图 1."`
+
+### 下一步建议
+- 候选 EA：evaluation/__init__.py 边角（28 行 14 tests via test_packages_init）
+- 候选 EB：evaluation/cli.py 第四轮（243 行 ~97 tests via edges3）
+- 候选 EC：app/cli.py 第四轮（535 行 ~100+ tests via edges3）
+- 候选 ED：app/pipeline.py 第四轮
+- 候选 EE：app/chunkers/structural.py 第四轮（已有 edges3）
+- 候选 EF：app/schema.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 EC（app/cli.py 第四轮），饱和 CLI 边界。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 106 后）：7279 pass / 0 fail / 13 skip（HEAD `678e0e6`）
+
+---
