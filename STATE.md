@@ -9333,3 +9333,51 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 第六轮可深入 validate/validate_file 的 schema_name 调度、错误聚合等。
 
 ---
+
+## Round 158（2026-08-05）：evaluation/schema.py 第六轮（edges4）
+
+### 目标
+- 给 evaluation/schema.py（80 行，已有 base/edges/edges2/edges3 共 394 测试）补第六轮
+- 深入 SCHEMAS_DIR 路径、EvalSchemaError 边界、_schema_path 错误、validate 错误聚合细节
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges4.py`（78 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **SCHEMAS_DIR 精确性**：absolute/resolved、parent 是项目根、含 4 个已知 schema
+- **EvalSchemaError 边界**：empty message、特殊字符、args 长度、None errors → empty list、errors 共享引用、init signature 3 参
+- **_schema_path**：返回 Path、unknown raises FileNotFound + 消息、absolute、parent 是 SCHEMAS_DIR
+- **load_schema 深度**：返回 dict（manifest/annotation/evaluation-report）、unknown raises、签名
+- **validate 错误聚合**：
+  - 通过校验返回 None
+  - 单错误 path=[]、property 错误 path 含字段
+  - error message/schema_path 都是 list
+  - errors 长度 == validator.iter_errors 数量
+  - 异常消息含 "Schema"/"校验失败"/"X 处"/schema_name
+  - 不修改 instance
+- **validate_file 错误优先级**：FileNotFound > JSONDecodeError > EvalSchemaError；目录 raises；unknown schema raises
+- **Draft202012Validator 兼容性**：manifest/annotation/evaluation-report schema 都通过 check_schema
+- **模块结构**：__all__ 5 项精确、imports (json/Path/Any/Draft202012Validator/JSValidationError)、docstring 提及与 app/schema 的分离
+- **签名深度**：load_schema/validate/validate_file 参数名、无默认、返回类型注解
+- **综合行为**：idempotent load_schema、validate 与直接 validator 一致、EvalSchemaError 捕获可访问 errors、validate_file 跨多 schema
+
+### 撞墙记录
+- 无（一次跑通）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 158 后）：12613 pass / 0 fail / 13 skip（HEAD `eccbe99`）
+
+### 下一步建议
+- 候选 HW：evaluation/schema_validation.py 第六轮
+- 候选 HX：app/cli.py 第七轮
+- 候选 HY：app/parsers/markdown_parser.py 第七轮
+- 候选 HZ：app/parsers/html_parser.py 第六轮
+- 候选 IA：app/parsers/ipynb_parser.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HW（evaluation/schema_validation.py 第六轮）。schema_validation.py 是
+document_passes_schema 调度层，第六轮可深入 schema 校验、错误聚合等。
+
+---
