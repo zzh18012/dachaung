@@ -1295,3 +1295,43 @@
 - 本 worktree（Round 20 后）：435 pass / 0 fail / 9 skip（HEAD `a90ab0c`）
 
 ---
+
+## Round 21（2026-08-04）：候选 W — annotation_metrics 边角覆盖率补强
+
+### 做了什么
+- 候选 W：扩展 `tests/test_annotation_metrics.py`，新增 14 个测试覆盖 `chunk_boundary_prf` / `figure_caption_prf` 的边角路径。
+- 重点覆盖项：
+  - **空 marker 串** → `_missing_markers` 列表 + recall=null
+  - **`position` 字段缺失** → 默认 `"after"`
+  - **f1 计算**：P=R=0 → f1=0.0（不是 null）；recall=null → f1=null
+  - **document 无 `chunks` 键** → `no_predicted_boundaries`
+  - **默认 tolerance_chars=30**
+  - **f1 = 2PR/(P+R)** 显式数值校验（P=1.0、R=0.5 → f1=2/3）
+  - **贪心按距离匹配**：2 pred × 2 anchor 完美匹配
+  - **一对一约束**：两个 pred 抢一个 anchor，只胜出 1 个
+  - **chunk.text=None** 不应崩溃
+  - **空 dict annotation** → `no_annotation`
+  - **所有 anchor 都找不到** → recall=null + `_missing_markers` 集合
+  - **figure_caption_prf 返回 shape 校验**（3 个键、全部 null + 同一 reason）
+  - **`_tolerance_chars` 与 `_missing_markers` 共存**
+- 无源码改动，纯测试加强。
+
+### 下一步建议
+- 候选 X：`evaluation/metrics.py` 13 项自动指标的覆盖率补强（比 annotation_metrics 复杂度高一档，但同样无 deps 风险）
+- 候选 Y：`evaluation/manifest.py` 加载/校验逻辑的测试
+- 候选 AA：`app/hash.py` 模块（SHA256 / content addressing）测试
+- 仍阻塞：J（向量化，依赖）、M（evaluator v1.2，硬底线）、O（docs/*.md，系统指令）
+
+**建议**：选 X（evaluation/metrics.py）。理由：
+1. 13 项指标里很多分支（PDF 没有 bbox、image_base_dir 处理、table 与 list_item 等分支）
+2. 纯函数 + 已有 evaluation.yml 配置，不引入新依赖
+3. 与 Round 21 一脉相承，可以继续把 evaluation/ 的覆盖率补齐
+
+### 撞墙记录
+- 无新撞墙。所有 14 个新测试一次通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 21 后）：449 pass / 0 fail / 9 skip（HEAD `09a0854`）
+
+---
