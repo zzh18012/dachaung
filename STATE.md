@@ -7821,3 +7821,97 @@ structural.py 是结构分块核心算法，第三轮已建立基础，
 嵌套等。
 
 ---
+
+## Round 136（2026-08-05）：app/parsers/markdown_parser.py 第五轮（edges5）
+
+### 目标
+- 给 app/parsers/markdown_parser.py（326 行，已有 587 测试）补第五轮 edges
+- 深入正则模式行为、section_path 复杂场景、metadata 字段、element_id 格式
+
+### 改动
+- 新增 `tests/test_parsers_markdown_edges5.py`（115 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **正则模式深度**：
+  - _ATX_HEADING_RE：1-6 #，必须空格，trailing # stripped
+  - _THEMATIC_RE：3+ 字符（-* _ 混合），带空格也可
+  - _FENCED_RE：3+ 反引号/波浪号，lang 含 [\w+-]
+  - _UNORDERED_LIST_RE：- * + 三个 marker
+  - _ORDERED_LIST_RE：N. 或 N)，多 digit 也匹配
+  - _BLOCKQUOTE_RE：> 后空格可选
+  - _PIPE_TABLE_SEP_RE：必须 2+ dash，支持 colon 对齐
+  - _STANDALONE_IMAGE_RE：trailing 不允许文字
+- **_rows_to_md 边界**：
+  - 单列两行（header + body）
+  - jagged rows 补空字符串
+  - Unicode 单元格
+- **_split_pipe_row 深度**：
+  - 内部空格保留
+  - 外部空格 strip
+- **_is_pipe_table_start 边界**：
+  - 最后一行（无下一行）→ False
+  - 行匹配但分隔行不匹配 → False
+  - 越界 → False
+- **section_path 复杂场景**：
+  - H1 → H3（跳级）
+  - H1 → H2a → H3 → H2b（H2b 弹出 H3）
+  - H2 → H1（H1 弹出 H2）
+  - body 元素继承 section_path
+  - 无 heading → locator 无 section_path 键
+- **element_id 格式**：
+  - e{idx:04d}（零填充 4 位）
+  - 前缀 = document_id::e0000
+- **confidence 默认**：0.95
+- **解析全流程边界**：
+  - 空文件 → md_no_content warning
+  - 纯 thematic → md_no_content warning
+  - 纯空白 → md_no_content warning
+  - 代码块未闭合 → 收集到 EOF
+  - 空代码块 → md_empty_code_block warning
+- **metadata 字段**：
+  - code block: kind=code_block, language=...
+  - image: alt=...
+  - list_item: marker=ordered/unordered, ordered=True/False
+  - blockquote: kind=blockquote
+  - table: row_count, col_count, source=markdown_pipe_table
+  - heading: level=N
+- **document 字段**：metadata={"markdown": True}，chunks/relations/errors 空
+- **模块结构**：
+  - _MD_EXTENSIONS = (".md", ".markdown")，tuple
+  - __all__ = ["MarkdownParser"]
+  - imports re/Path/Any/Document/Element/WarningRecord/Parser/ParserError/make_document_id
+  - from __future__ import annotations
+  - docstring 提及 ATX/setext/pipe/source_locator
+- **签名**：
+  - parse(self, path, source_hash) → Document
+  - _parse_text(self, text, document_id) → tuple
+  - MarkdownParser 是 Parser 子类
+- **source_locator.line**：
+  - 1-based
+  - 第 3 行内容 → line=3
+  - 跨元素递增
+
+### 撞墙记录
+1. test_fenced_re_lang_with_dot：正则 [\w+-]* 不含 .，整行 "ts.x" 不
+   匹配。修复：改成 test_fenced_re_lang_no_dot，assert is None。
+2. test_markdown_parser_parse_signature_two_params：parse 实际 3 参数
+   （self, path, source_hash）。修复：改 3 参数。
+3. 多处 docstring 含 \s/\w 触发 SyntaxWarning。修复：raw string。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 136 后）：10669 pass / 0 fail / 13 skip（HEAD `aee5044`）
+
+### 下一步建议
+- 候选 GN：app/parsers/html_parser.py 第四轮
+- 候选 GO：app/parsers/ipynb_parser.py 第四轮
+- 候选 GQ：evaluation/manifest.py 第六轮
+- 候选 GR：evaluation/cli.py 第六轮
+- 候选 GS：app/parsers/fallback_parser.py 第六轮（已有第五轮 194 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GN（app/parsers/html_parser.py 第四轮）。html parser 与
+markdown 类似规模，第四轮可深入 tag 嵌套、属性、自闭合标签等。
+
+---
