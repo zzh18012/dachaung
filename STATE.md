@@ -1589,3 +1589,34 @@
 - 本 worktree（Round 28 后）：601 pass / 0 fail / 9 skip（HEAD `3657de8`）— **跨过 600 里程碑**
 
 ---
+
+## Round 29（2026-08-04）：候选 AI — pipeline helpers 覆盖率补强
+
+### 做了什么
+- 候选 AI：扩展 `tests/test_pipeline_helpers.py`，新增 16 个测试覆盖 `image_output_dir_for` / `validate_only` / `get_parser` 的边角路径。
+- 重点覆盖项：
+  - **`image_output_dir_for`**：不同 hash、不同 output_path、17 字符 hash 截到 16、恰好 16 字符、嵌套 parent、文件名无父目录、返回 Path 类型、空 hash 边界
+  - **`validate_only`**：合法 JSON 返回 (True, "OK")、接受 str 路径
+  - **`get_parser`**：每次返回新实例、5 个非 fallback parser 不需要 image_output_dir 也能构造
+- 无源码改动。
+
+### 下一步建议
+- 候选 AG：`app/cli.py` 子命令更细致的测试（参数解析、退出码、stderr 输出）
+- 候选 AH：`evaluation/cli.py` 的 `validate-report` 子命令路径
+- 候选 AK：parser 内部 helper 单测（kreuzberg / markdown 等）
+- 候选 AL：`app/parsers/fallback_parser.py` 的 helper 函数（_is_caption / _classify_pdf_paragraph 等）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AL（fallback parser helpers）。理由：
+1. fallback parser 是默认 parser，覆盖率直接影响主路径可靠性
+2. _is_caption / _classify_pdf_paragraph / _rows_to_markdown 等是纯函数
+3. 不引入新依赖
+
+### 撞墙记录
+- 无新撞墙。16 个新测试一次通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 29 后）：617 pass / 0 fail / 9 skip（HEAD `64ab44a`）
+
+---
