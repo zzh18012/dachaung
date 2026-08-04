@@ -8002,3 +8002,76 @@ Jupyter notebook JSON，第四轮可深入 cell 类型、source 拼接、metadat
 解析。
 
 ---
+
+## Round 138（2026-08-05）：app/parsers/ipynb_parser.py 第五轮（edges5）
+
+### 目标
+- 给 app/parsers/ipynb_parser.py（227 行，已有 544 测试）补第五轮 edges
+- 深入 cell source 归一、kernel language 推断、nbformat 校验、locator
+
+### 改动
+- 新增 `tests/test_parsers_ipynb_edges5.py`（88 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_IPYNB_EXTENSIONS 常量**：tuple，1 项
+- **_detect_ipynb_source_type 深度**：
+  - 大小写不敏感
+  - 拒绝 pdf/html/md/no_suffix
+  - error details suffix 字段
+- **_cell_source_to_text 深度**：
+  - str 直传 / 空 str / list[str] / list[int] / None / int / dict
+  - nbformat 标准（list 含 \n）
+  - nested list str() 化
+- **_extract_kernel_language 深度**：
+  - 优先级：kernelspec.language > kernelspec.name > language_info.name
+  - 空字符串视为 falsy 回落
+  - None metadata → AttributeError（不防御）
+- **IpynbParser 类属性**：name/version/继承 Parser
+- **parse 全流程**：
+  - markdown cell → 多 element（heading/paragraph/list）
+  - code cell → paragraph（kind=code_cell, language 继承）
+  - raw cell → paragraph（kind=raw_cell）
+  - 空 code cell → ipynb_empty_code_cell warning
+  - 空 raw cell → 静默跳过
+  - 未知 cell_type → ipynb_unknown_cell_type warning
+  - 非 dict cell → ipynb_bad_cell warning
+  - 空 notebook → ipynb_no_content warning
+- **nbformat 校验**：
+  - nbformat=3 → ipynb_unsupported_version
+  - nbformat=4/5 → 通过
+  - nbformat 缺失 → None → 通过
+  - 顶层非 dict → ipynb_bad_structure
+  - cells 非 list → ipynb_bad_structure
+  - 非法 JSON → ipynb_invalid_json
+- **locator 深度**：
+  - markdown cell 含 cell_index/cell_type/line/section_path
+  - code cell 含 cell_index/cell_type（无 line）
+  - section_path 仅在 cell 内累积（不跨 cell）
+- **element_id 格式**：e{idx:04d}，confidence 0.95
+- **Document metadata**：ipynb/nbformat/nbformat_minor/cell_count/language
+- **综合**：mixed cell 类型，code/raw text stripped
+- **文件 IO**：file_not_found/unsupported/OSError → read_failed
+- **模块结构**：__all__/imports/docstring
+- **签名**：parse 3 参，helpers 1 参
+
+### 撞墙记录
+1. test_extract_kernel_language_none_metadata：函数不防御 None，会抛
+   AttributeError。修复：pytest.raises(AttributeError)。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 138 后）：10859 pass / 0 fail / 13 skip（HEAD `1afe4f1`）
+
+### 下一步建议
+- 候选 GS：app/parsers/fallback_parser.py 第六轮
+- 候选 GT：evaluation/runner.py 第六轮
+- 候选 GU：evaluation/cli.py 第六轮
+- 候选 GV：app/chunkers/structural.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GV（app/chunkers/structural.py 第六轮）。structural chunker
+已有第五轮，第六轮可深入 _split_long_text 边界、_ChunkBuffer 状态、
+language-specific 分隔符。
+
+---
