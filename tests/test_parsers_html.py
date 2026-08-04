@@ -403,3 +403,306 @@ def test_html_rows_to_md_pads_uneven():
     lines = md.splitlines()
     # 数据行 d 应被填充到 3 列
     assert lines[2].count("|") == lines[0].count("|")
+
+
+# ---------- 边角与缺漏补强（Round 38） ----------
+
+
+# _detect_html_source_type 直接单测
+
+
+def test_detect_html_source_type_accepts_uppercase_extensions():
+    """扩展名 lower() 后比较，.HTML / .HTM 也接受。"""
+    from app.parsers.html_parser import _detect_html_source_type
+    assert _detect_html_source_type(Path("doc.HTML")) == "html"
+    assert _detect_html_source_type(Path("doc.HTM")) == "html"
+
+
+def test_detect_html_source_type_rejects_unknown_suffix():
+    from app.parsers.html_parser import _detect_html_source_type
+    with pytest.raises(ParserError) as exc:
+        _detect_html_source_type(Path("doc.xml"))
+    assert exc.value.code == "unsupported_type"
+
+
+def test_detect_html_source_type_rejects_no_suffix():
+    from app.parsers.html_parser import _detect_html_source_type
+    with pytest.raises(ParserError):
+        _detect_html_source_type(Path("noext"))
+
+
+# 常量
+
+
+def test_heading_levels_constant_has_all_six():
+    from app.parsers.html_parser import _HEADING_LEVELS
+    assert _HEADING_LEVELS == {
+        "h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6,
+    }
+
+
+def test_skip_tags_constant_includes_script_style():
+    from app.parsers.html_parser import _SKIP_TAGS
+    assert "script" in _SKIP_TAGS
+    assert "style" in _SKIP_TAGS
+    assert "head" in _SKIP_TAGS
+    assert "title" in _SKIP_TAGS
+
+
+# HtmlParser metadata / element 边角
+
+
+def test_html_parser_metadata_has_html_true(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><p>hi</p></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    assert doc.metadata.get("html") is True
+
+
+def test_html_parser_element_id_format(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><p>hi</p></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    expected_prefix = "doc-" + "a" * 16
+    for i, el in enumerate(doc.elements):
+        assert el.element_id == f"{expected_prefix}::e{i:04d}"
+
+
+def test_html_parser_document_id_derived_from_hash(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><p>hi</p></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    assert doc.document_id == "doc-" + "a" * 16
+
+
+def test_html_parser_chunks_empty_by_default(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><p>hi</p></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    assert doc.chunks == []
+
+
+def test_html_parser_relations_empty_by_default(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><p>hi</p></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    assert doc.relations == []
+
+
+def test_html_parser_errors_empty_by_default(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><p>hi</p></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    assert doc.errors == []
+
+
+# 各种 HTML 结构边角
+
+
+def test_html_parser_nested_list_inner_items_emitted(tmp_path: Path):
+    """嵌套 ul：内层 li 也应被识别。"""
+    p = tmp_path / "doc.html"
+    p.write_text(
+        "<html><body>"
+        "<ul><li>outer"
+        "<ul><li>inner</li></ul>"
+        "</li></ul>"
+        "</body></html>",
+        encoding="utf-8",
+    )
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    list_items = [e for e in doc.elements if e.type == "list_item"]
+    # 至少识别出 outer 和 inner
+    assert len(list_items) >= 2
+
+
+def test_html_parser_blockquote_with_kind_metadata(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><blockquote>quoted</blockquote></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    blockquotes = [e for e in doc.elements if e.metadata.get("kind") == "blockquote"]
+    assert len(blockquotes) >= 1
+
+
+def test_html_parser_pre_with_kind_metadata(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><pre>code line</pre></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    pre_elements = [e for e in doc.elements if e.metadata.get("kind") == "preformatted"]
+    assert len(pre_elements) >= 1
+
+
+def test_html_parser_image_element_has_resource_path(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text(
+        '<html><body><img src="http://example.com/x.png" alt="alt"></body></html>',
+        encoding="utf-8",
+    )
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    images = [e for e in doc.elements if e.type == "image"]
+    assert len(images) == 1
+    assert images[0].resource_path == "http://example.com/x.png"
+    assert images[0].content is None
+
+
+def test_html_parser_table_emits_table_element(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text(
+        "<html><body><table>"
+        "<tr><th>a</th><th>b</th></tr>"
+        "<tr><td>1</td><td>2</td></tr>"
+        "</table></body></html>",
+        encoding="utf-8",
+    )
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    tables = [e for e in doc.elements if e.type == "table"]
+    assert len(tables) == 1
+
+
+def test_html_parser_skips_meta_tags(tmp_path: Path):
+    """<meta> 在 _SKIP_TAGS 中，应被跳过。"""
+    p = tmp_path / "doc.html"
+    p.write_text(
+        '<html><head><meta charset="utf-8"></head>'
+        '<body><p>visible</p></body></html>',
+        encoding="utf-8",
+    )
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    contents = [e.content for e in doc.elements if e.content]
+    assert all("charset" not in c for c in contents)
+
+
+def test_html_parser_skips_noscript_tags(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text(
+        '<html><body><noscript>JS required</noscript><p>visible</p></body></html>',
+        encoding="utf-8",
+    )
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    contents = [e.content for e in doc.elements if e.content]
+    assert all("JS required" not in c for c in contents)
+
+
+def test_html_parser_skips_link_tags(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text(
+        '<html><head><link rel="stylesheet" href="x.css"></head>'
+        '<body><p>visible</p></body></html>',
+        encoding="utf-8",
+    )
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    contents = [e.content for e in doc.elements if e.content]
+    assert all("stylesheet" not in c for c in contents)
+
+
+# _rows_to_md 多种输入
+
+
+def test_html_rows_to_md_returns_empty_for_empty_list():
+    from app.parsers.html_parser import _rows_to_md
+    assert _rows_to_md([]) == ""
+
+
+def test_html_rows_to_md_single_row_no_body_lines():
+    from app.parsers.html_parser import _rows_to_md
+    md = _rows_to_md([["only", "header"]])
+    lines = md.splitlines()
+    assert len(lines) == 2  # header + separator
+
+
+def test_html_rows_to_md_three_rows_includes_two_body():
+    from app.parsers.html_parser import _rows_to_md
+    md = _rows_to_md([["h"], ["a"], ["b"]])
+    lines = md.splitlines()
+    assert len(lines) == 4
+
+
+# HTML 实体 / 字符引用
+
+
+def test_html_parser_numeric_entity_decoded(tmp_path: Path):
+    """&#65; → 'A'（convert_charrefs=True 自动转换数字实体）。"""
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><p>&#65;</p></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    contents = [e.content for e in doc.elements if e.content]
+    assert any("A" in c for c in contents)
+
+
+def test_html_parser_named_entity_decoded(tmp_path: Path):
+    """&amp; → '&'。"""
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><p>a &amp; b</p></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    contents = [e.content for e in doc.elements if e.content]
+    assert any("a & b" in c for c in contents)
+
+
+# locator 边角
+
+
+def test_html_parser_locator_markdown_carries_section_path(tmp_path: Path):
+    """heading 后的 paragraph locator 应含 section_path。"""
+    p = tmp_path / "doc.html"
+    p.write_text(
+        "<html><body><h1>Title</h1><p>under title</p></body></html>",
+        encoding="utf-8",
+    )
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    paragraphs = [e for e in doc.elements if e.type == "paragraph"]
+    assert len(paragraphs) >= 1
+    p0 = paragraphs[0]
+    assert "section_path" in p0.source_locator
+    assert "Title" in p0.source_locator["section_path"]
+
+
+def test_html_parser_heading_element_emitted_with_level(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><h2>Section</h2></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    headings = [e for e in doc.elements if e.type == "heading"]
+    assert len(headings) == 1
+    assert headings[0].metadata.get("level") == 2
+
+
+def test_html_parser_empty_body_emits_warning(tmp_path: Path):
+    """完全空 body → html_no_content 警告。"""
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    warning_codes = [w.code for w in doc.warnings]
+    assert "html_no_content" in warning_codes
+
+
+def test_html_parser_invalid_utf8_uses_replace(tmp_path: Path):
+    """非法 UTF-8 字节 → 用 errors=replace 而不是抛 UnicodeDecodeError。"""
+    p = tmp_path / "doc.html"
+    p.write_bytes(b"<html><body><p>\xff\xfe hello</p></body></html>")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    assert len(doc.elements) >= 1
+
+
+# hr 标签
+
+
+def test_html_parser_hr_does_not_emit_element(tmp_path: Path):
+    """<hr> 是主题分隔符，被忽略，不产 element。"""
+    p = tmp_path / "doc.html"
+    p.write_text("<html><body><p>before</p><hr><p>after</p></body></html>", encoding="utf-8")
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    contents = [e.content for e in doc.elements if e.content]
+    assert all(c.strip() != "---" for c in contents)
+
+
+# 多个连续空行
+
+
+def test_html_parser_multiple_blank_lines_dont_create_elements(tmp_path: Path):
+    p = tmp_path / "doc.html"
+    p.write_text(
+        "<html><body>\n\n\n<p>only</p>\n\n\n</body></html>",
+        encoding="utf-8",
+    )
+    doc = HtmlParser().parse(p, source_hash="a" * 64)
+    paragraphs = [e for e in doc.elements if e.type == "paragraph"]
+    assert len(paragraphs) == 1

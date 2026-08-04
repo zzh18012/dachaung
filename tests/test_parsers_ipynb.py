@@ -324,3 +324,409 @@ def test_cli_parse_ipynb_end_to_end(tmp_path: Path):
     assert data["source_type"] == "ipynb"
     assert data["parser_name"] == "ipynb"
     assert len(data["elements"]) >= 2
+
+
+# ---------- 边角与缺漏补强（Round 38） ----------
+
+
+# _detect_ipynb_source_type 直接单测
+
+
+def test_detect_ipynb_source_type_accepts_ipynb():
+    from app.parsers.ipynb_parser import _detect_ipynb_source_type
+    assert _detect_ipynb_source_type(Path("notebook.ipynb")) == "ipynb"
+
+
+def test_detect_ipynb_source_type_accepts_uppercase_extension():
+    """扩展名 lower() 后比较，所以 .IPYNB 也接受。"""
+    from app.parsers.ipynb_parser import _detect_ipynb_source_type
+    assert _detect_ipynb_source_type(Path("notebook.IPYNB")) == "ipynb"
+    assert _detect_ipynb_source_type(Path("notebook.Ipynb")) == "ipynb"
+
+
+def test_detect_ipynb_source_type_rejects_json():
+    from app.parsers.ipynb_parser import _detect_ipynb_source_type
+    with pytest.raises(ParserError) as exc:
+        _detect_ipynb_source_type(Path("notebook.json"))
+    assert exc.value.code == "unsupported_type"
+
+
+def test_detect_ipynb_source_type_rejects_no_suffix():
+    from app.parsers.ipynb_parser import _detect_ipynb_source_type
+    with pytest.raises(ParserError):
+        _detect_ipynb_source_type(Path("notebook"))
+
+
+# _cell_source_to_text 直接单测
+
+
+def test_cell_source_to_text_string_passthrough():
+    from app.parsers.ipynb_parser import _cell_source_to_text
+    assert _cell_source_to_text("hello") == "hello"
+
+
+def test_cell_source_to_text_empty_string():
+    from app.parsers.ipynb_parser import _cell_source_to_text
+    assert _cell_source_to_text("") == ""
+
+
+def test_cell_source_to_text_list_of_strings_concatenated():
+    from app.parsers.ipynb_parser import _cell_source_to_text
+    result = _cell_source_to_text(["line1\n", "line2\n", "line3"])
+    assert result == "line1\nline2\nline3"
+
+
+def test_cell_source_to_text_empty_list_returns_empty():
+    from app.parsers.ipynb_parser import _cell_source_to_text
+    assert _cell_source_to_text([]) == ""
+
+
+def test_cell_source_to_text_none_returns_empty():
+    from app.parsers.ipynb_parser import _cell_source_to_text
+    assert _cell_source_to_text(None) == ""
+
+
+def test_cell_source_to_text_int_returns_empty():
+    """非 str/list 类型 → 空字符串。"""
+    from app.parsers.ipynb_parser import _cell_source_to_text
+    assert _cell_source_to_text(42) == ""
+    assert _cell_source_to_text(3.14) == ""
+
+
+def test_cell_source_to_text_list_with_non_string_items():
+    """list 内部元素会被 str() 转换。"""
+    from app.parsers.ipynb_parser import _cell_source_to_text
+    # 纯字符串列表正常拼接
+    assert _cell_source_to_text(["a", "b", "c"]) == "abc"
+
+
+# _extract_kernel_language 直接单测
+
+
+def test_extract_kernel_language_from_kernelspec_language():
+    from app.parsers.ipynb_parser import _extract_kernel_language
+    metadata = {"kernelspec": {"language": "python", "name": "python3"}}
+    assert _extract_kernel_language(metadata) == "python"
+
+
+def test_extract_kernel_language_falls_back_to_kernelspec_name():
+    """kernelspec.language 缺失时，回退到 kernelspec.name。"""
+    from app.parsers.ipynb_parser import _extract_kernel_language
+    metadata = {"kernelspec": {"name": "julia3"}}
+    assert _extract_kernel_language(metadata) == "julia3"
+
+
+def test_extract_kernel_language_falls_back_to_language_info_name():
+    """kernelspec 完全缺失时，回退到 language_info.name。"""
+    from app.parsers.ipynb_parser import _extract_kernel_language
+    metadata = {"language_info": {"name": "r"}}
+    assert _extract_kernel_language(metadata) == "r"
+
+
+def test_extract_kernel_language_empty_metadata_returns_empty():
+    from app.parsers.ipynb_parser import _extract_kernel_language
+    assert _extract_kernel_language({}) == ""
+
+
+def test_extract_kernel_language_none_metadata_returns_empty():
+    """None 入参（实际不会出现，但要稳）。"""
+    from app.parsers.ipynb_parser import _extract_kernel_language
+    # 函数签名是 dict，但 .get 会报错；这里测空 dict 即可
+    assert _extract_kernel_language({}) == ""
+
+
+def test_extract_kernel_language_kernelspec_none_does_not_crash():
+    """metadata.kernelspec 显式为 None → 视作空 dict。"""
+    from app.parsers.ipynb_parser import _extract_kernel_language
+    metadata = {"kernelspec": None}
+    assert _extract_kernel_language(metadata) == ""
+
+
+def test_extract_kernel_language_language_info_none_does_not_crash():
+    """metadata.language_info 显式为 None → 视作空 dict。"""
+    from app.parsers.ipynb_parser import _extract_kernel_language
+    metadata = {"kernelspec": {}, "language_info": None}
+    assert _extract_kernel_language(metadata) == ""
+
+
+def test_extract_kernel_language_prioritizes_kernelspec_language_over_name():
+    """两者都存在时，language 优先。"""
+    from app.parsers.ipynb_parser import _extract_kernel_language
+    metadata = {"kernelspec": {"language": "python", "name": "python3"}}
+    assert _extract_kernel_language(metadata) == "python"
+
+
+# IpynbParser metadata / element 边角
+
+
+def test_ipynb_parser_metadata_has_ipynb_true(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.metadata["ipynb"] is True
+
+
+def test_ipynb_parser_metadata_records_nbformat_minor(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.metadata["nbformat"] == 4
+    assert doc.metadata["nbformat_minor"] == 5
+
+
+def test_ipynb_parser_element_confidence_is_095(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "markdown", "source": "# H\n\ntext", "metadata": {}},
+        {"cell_type": "code", "source": "x=1", "metadata": {}},
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    for el in doc.elements:
+        assert el.confidence == 0.95
+
+
+def test_ipynb_parser_element_id_format(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    expected_prefix = "doc-" + "a" * 16
+    assert doc.elements[0].element_id == f"{expected_prefix}::e0000"
+
+
+def test_ipynb_parser_element_parent_id_is_none(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    for el in doc.elements:
+        assert el.parent_id is None
+
+
+def test_ipynb_parser_element_resource_path_is_none_for_code(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    for el in doc.elements:
+        assert el.resource_path is None
+
+
+def test_ipynb_parser_source_path_preserved(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.source_path == str(p)
+
+
+def test_ipynb_parser_source_hash_passed_through(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    custom_hash = "b" * 64
+    doc = IpynbParser().parse(p, source_hash=custom_hash)
+    assert doc.source_hash == custom_hash
+
+
+def test_ipynb_parser_document_id_derived_from_hash(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.document_id == "doc-" + "a" * 16
+
+
+def test_ipynb_parser_chunks_empty_by_default(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.chunks == []
+
+
+def test_ipynb_parser_relations_empty_by_default(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.relations == []
+
+
+def test_ipynb_parser_errors_empty_by_default(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.errors == []
+
+
+def test_ipynb_parser_name_and_version_constants(tmp_path: Path):
+    p = _write_nb(tmp_path, "a.ipynb", _nb([
+        {"cell_type": "code", "source": "x=1", "metadata": {}}
+    ]))
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.parser_name == "ipynb"
+    assert doc.parser_version == "stdlib/0.1.0"
+
+
+# 错误路径补强
+
+
+def test_ipynb_parser_missing_file_raises(tmp_path: Path):
+    with pytest.raises(ParserError) as exc:
+        IpynbParser().parse(tmp_path / "nope.ipynb", source_hash="a" * 64)
+    assert exc.value.code == "file_not_found"
+
+
+def test_ipynb_parser_top_level_not_dict_raises(tmp_path: Path):
+    """顶层 JSON 是 list 而非 dict。"""
+    p = tmp_path / "bad.ipynb"
+    p.write_text("[1, 2, 3]", encoding="utf-8")
+    with pytest.raises(ParserError) as exc:
+        IpynbParser().parse(p, source_hash="a" * 64)
+    assert exc.value.code == "ipynb_bad_structure"
+
+
+def test_ipynb_parser_cells_not_list_raises(tmp_path: Path):
+    """cells 字段不是数组。"""
+    p = tmp_path / "bad.ipynb"
+    p.write_text(json.dumps({"cells": "not a list", "nbformat": 4}), encoding="utf-8")
+    with pytest.raises(ParserError) as exc:
+        IpynbParser().parse(p, source_hash="a" * 64)
+    assert exc.value.code == "ipynb_bad_structure"
+
+
+def test_ipynb_parser_cell_not_dict_emits_warning(tmp_path: Path):
+    """cell 不是 dict → 跳过并发出 ipynb_bad_cell。"""
+    nb = {
+        "cells": ["not a dict", 42, {"cell_type": "code", "source": "x=1", "metadata": {}}],
+        "metadata": {},
+        "nbformat": 4,
+        "nbformat_minor": 5,
+    }
+    p = _write_nb(tmp_path, "weird.ipynb", nb)
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    codes = [w.code for w in doc.warnings]
+    assert "ipynb_bad_cell" in codes
+    # 第三个 cell 仍被处理
+    assert len(doc.elements) == 1
+
+
+def test_ipynb_parser_empty_raw_cell_skipped_silently(tmp_path: Path):
+    """空 raw cell 不发出 warning（与空 code cell 不同）。"""
+    nb = _nb([
+        {"cell_type": "raw", "source": "   ", "metadata": {}},
+    ])
+    p = _write_nb(tmp_path, "raw.ipynb", nb)
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.elements == []
+    # 没有 ipynb_empty_code_cell（因为是 raw）
+    codes = [w.code for w in doc.warnings]
+    assert "ipynb_empty_code_cell" not in codes
+    # 但会有 ipynb_no_content（最终没 element）
+    assert "ipynb_no_content" in codes
+
+
+def test_ipynb_parser_strip_whitespace_for_code_cell(tmp_path: Path):
+    """code cell 的内容首尾空白被 strip。"""
+    nb = _nb([
+        {"cell_type": "code", "source": "\n\n   print('hi')   \n\n", "metadata": {}},
+    ])
+    p = _write_nb(tmp_path, "ws.ipynb", nb)
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    code = [e for e in doc.elements if e.metadata.get("kind") == "code_cell"][0]
+    assert code.content == "print('hi')"
+
+
+def test_ipynb_parser_strip_whitespace_for_raw_cell(tmp_path: Path):
+    """raw cell 的内容首尾空白被 strip。"""
+    nb = _nb([
+        {"cell_type": "raw", "source": "  raw text  ", "metadata": {}},
+    ])
+    p = _write_nb(tmp_path, "raw2.ipynb", nb)
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    raw = [e for e in doc.elements if e.metadata.get("kind") == "raw_cell"][0]
+    assert raw.content == "raw text"
+
+
+def test_ipynb_parser_default_cell_type_when_missing(tmp_path: Path):
+    """cell 缺失 cell_type 字段 → 视作 unknown → 发 warning。"""
+    nb = _nb([
+        {"source": "text", "metadata": {}},  # 没有 cell_type
+    ])
+    p = _write_nb(tmp_path, "noct.ipynb", nb)
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    codes = [w.code for w in doc.warnings]
+    assert "ipynb_unknown_cell_type" in codes
+
+
+def test_ipynb_parser_metadata_can_be_empty_dict(tmp_path: Path):
+    """notebook 没有 metadata 字段也能解析（language 推断为空）。"""
+    nb = {
+        "cells": [{"cell_type": "code", "source": "x=1", "metadata": {}}],
+        "nbformat": 4,
+        "nbformat_minor": 5,
+    }
+    p = _write_nb(tmp_path, "nohelp.ipynb", nb)
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    # language 是空字符串
+    assert doc.metadata["language"] == ""
+    # code cell 的 language metadata 也是空
+    code = doc.elements[0]
+    assert code.metadata["language"] == ""
+
+
+def test_ipynb_parser_nbformat_missing_treated_as_supported(tmp_path: Path):
+    """nbformat 字段缺失时不算 < 4，按 4+ 处理。"""
+    nb = {
+        "cells": [{"cell_type": "code", "source": "x=1", "metadata": {}}],
+        "metadata": {},
+        "nbformat_minor": 5,
+    }
+    p = _write_nb(tmp_path, "nofmt.ipynb", nb)
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.metadata["nbformat"] is None
+
+
+def test_ipynb_parser_markdown_cell_with_only_whitespace_warns_no_content(tmp_path: Path):
+    """markdown cell 内容为空白 → md parser 自己 warning；最终 ipynb_no_content。"""
+    nb = _nb([
+        {"cell_type": "markdown", "source": "   \n\n  ", "metadata": {}},
+    ])
+    p = _write_nb(tmp_path, "wsmd.ipynb", nb)
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    assert doc.elements == []
+    codes = [w.code for w in doc.warnings]
+    assert "ipynb_no_content" in codes
+
+
+def test_ipynb_parser_outputs_field_ignored(tmp_path: Path):
+    """code cell 的 outputs 字段被丢弃，不出现在 element 中。"""
+    nb = _nb([
+        {
+            "cell_type": "code",
+            "source": "print('hi')",
+            "metadata": {},
+            "outputs": [
+                {"output_type": "stream", "name": "stdout", "text": "hi\n"},
+            ],
+            "execution_count": 1,
+        },
+    ])
+    p = _write_nb(tmp_path, "out.ipynb", nb)
+    doc = IpynbParser().parse(p, source_hash="a" * 64)
+    code = doc.elements[0]
+    assert "hi" in code.content  # 来自 source
+    # outputs 里的 "hi\n" 不会作为单独 element
+    assert len(doc.elements) == 1
+
+
+def test_ipynb_parser_invalid_utf8_propagates_unicode_error(tmp_path: Path):
+    """非法 UTF-8 → json.load 走 fp.read() 时抛 UnicodeDecodeError（ValueError 子类）。
+    当前 parser 没有兜底 UnicodeDecodeError，会向上抛出（行为契约）。"""
+    p = tmp_path / "bad.ipynb"
+    p.write_bytes(b"\xff\xfe{\"cells\": []}")
+    with pytest.raises(UnicodeDecodeError):
+        IpynbParser().parse(p, source_hash="a" * 64)
