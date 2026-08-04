@@ -6709,3 +6709,87 @@ Schema 校验核心，独立于 evaluation/schema，第三轮深度空间仍在�
 - 本 worktree（Round 122 后）：9053 pass / 0 fail / 13 skip（HEAD `703f713`）
 
 ---
+
+## Round 123（2026-08-05）：app/schema.py 第三轮（edges3）
+
+### 范围
+- 文件：`tests/test_schema_edges3.py`（新增，720 行）
+- 目标：`app/schema.py`（93 行，已有 371 测试）
+- 新增测试：93 个
+- 提交：`875f3db`
+
+### 覆盖深度
+- **SCHEMA_PATH 常量**：
+  - 是 Path/绝对路径/是文件
+  - 名字 "document.schema.json"
+  - 父目录 "schemas"、祖父目录含 pyproject.toml
+- **SchemaValidationError 深度**：
+  - args 长度 1、值精确
+  - errors 默认 []、None→[]、[]保持、非空保留
+  - errors 是 list 类型
+  - 不继承 ValueError
+  - 两实例 errors 独立
+  - repr/message attribute
+- **load_schema 深度**：
+  - 返回 dict、独立 dict 每次调用
+  - str/Path 输入都接受
+  - 不存在 → FileNotFoundError（消息含路径）
+  - 无参数用默认 SCHEMA_PATH
+- **validate 深度**：
+  - 成功返回 None
+  - schema=None 用默认
+  - 错误消息含计数
+  - errors list 各项 3 keys（path/message/schema_path）
+  - 类型断言 list/str
+  - 自定义 schema dict 接受
+  - 空 schema 接受任何
+  - sorted by path
+- **is_valid 深度**：
+  - True/False 返回、bool 类型
+  - 不抛 SchemaValidationError
+  - 自定义 schema
+  - schema=None 用默认
+- **validate_file 深度**：
+  - Path/str 输入
+  - 不存在/目录 → FileNotFoundError
+  - 空文件/坏 JSON → JSONDecodeError
+  - 不符合 schema → SchemaValidationError
+  - 自定义 schema
+  - unicode 文件名/内容
+  - 错误消息含路径
+- **_silence_unused_import**：
+  - 无参、返回 None、callable
+  - 在模块但不在 __all__
+  - 名字以 _ 开头
+- **模块结构**：
+  - imports json/Path/Any/Draft202012Validator/JSValidationError
+  - 6 public 属性精确
+  - __all__ 6 项精确
+  - docstring 提及 Schema
+  - from __future__ import annotations
+- **签名深度**：
+  - SchemaValidationError.__init__: (self, message, errors=None)
+  - load_schema/path 默认 SCHEMA_PATH
+  - validate/is_valid/validate_file: 2 参数，schema 默认 None
+  - 返回注解 dict/bool/None
+- 无源码改动。
+
+### 撞墙记录
+无。
+
+### 下一步建议
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 GA：evaluation/cli.py 第五轮（243 行）
+- 候选 GB：app/chunkers/structural.py 第四轮
+- 候选 GD：app/hash.py 第三轮（46 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GD（app/hash.py 第三轮）。hash.py 是文件/文本哈希核心，
+46 行短小，第三轮仍有深度空间（如各种 hash 输入、SHA256 输出格式）。
+作为短轮过渡。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 123 后）：9146 pass / 0 fail / 13 skip（HEAD `875f3db`）
+
+---
