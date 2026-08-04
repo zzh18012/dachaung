@@ -9517,3 +9517,53 @@ document_passes_schema 调度层，第六轮可深入 schema 校验、错误聚�
 markdown 处理入口，第七轮可深入 heading 层级、code block、list 等结构。
 
 ---
+
+## Round 162（2026-08-05）：app/parsers/markdown_parser.py 第六轮（edges6）
+
+### 目标
+- 给 app/parsers/markdown_parser.py（326 行，已有 base/edges/edges2-5 共 702 测试）补第六轮
+- 深入 _detect_md_source_type details、_rows_to_md/_split_pipe_row 边界、_parse_text section_path 与 fence/blockquote/段落吸收
+
+### 改动
+- 新增 `tests/test_parsers_markdown_edges6.py`（129 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_detect_md_source_type**：details 字段精确（suffix==".txt"/""）、message 提及 .md/.markdown 与实际 suffix
+- **_MD_EXTENSIONS**：精确 `(".md",".markdown")`、tuple、小写、点开头
+- **_rows_to_md**：empty/单行/双行/uneven 补齐/最大列宽/空 cells/Unicode/separator 固定 3 dashes
+- **_split_pipe_row**：无 pipe/前后 pipe/连续 pipe/strip cell/empty string
+- **_is_pipe_table_start**：i+1>=len/首行非 pipe/colon separator/无 outer pipe
+- **MarkdownParser 类属性**：name="markdown"、version="stdlib/0.1.0"、继承 Parser
+- **parse() 路径**：不存在 file_not_found、unsupported_type、metadata={"markdown":True}、空文件/thematic-only 触发 md_no_content
+- **_parse_text section_path**：弹栈（H1>H2>H3 → H2）、跳级（H1>H3>H2>H3）
+- **围栏**：未闭合吸到 EOF、空 code block 触发 md_empty_code_block、language 字段、~~~ 围栏
+- **blockquote**：空不产 element、多行合并、strip
+- **段落吸收**：被 table/image/blockquote/fenced/atx/thematic/list 各阻断
+- **element_id/confidence/locator**：4 位 zero-pad、0.95 默认、line 1-based
+- **表格**：row_count/col_count/source metadata、单 header 行、uneven 补齐
+- **图片**：alt/url/content=None、inline image 不被独立提取
+- **列表**：unordered (-,+,*) / ordered (.,)) 各 marker、marker 字段、各 item 独立
+- **模块结构**：__all__、future annotations、imports、docstring 提及 ATX/setext/frontmatter
+- **签名深度**：parse/parse_text/detect_md_source_type/rows_to_md/split_pipe_row/is_pipe_table_start
+
+### 撞墙记录
+- **Wall 1**：测试函数使用 `tmp_path` 但签名忘了加 `tmp_path: Path`，导致 NameError。修复：脚本批量加。
+- **Wall 2**：`make_document_id` 要求 source_hash 长度 64（SHA-256 hex）。修复：所有短 hash 字面量换成 64 字符。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 162 后）：13014 pass / 0 fail / 13 skip（HEAD `3bc0a62`）
+
+### 下一步建议
+- 候选 HZ：app/parsers/html_parser.py 第六轮
+- 候选 IA：app/parsers/ipynb_parser.py 第六轮
+- 候选 IC：app/parsers/text_parser.py 第七轮
+- 候选 ID：app/parsers/fallback.py 第六轮
+- 候选 IE：app/parsers/base.py 第七轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HZ（app/parsers/html_parser.py 第六轮）。html_parser 与 markdown_parser 同属 stdlib
+解析器家族，第六轮可深入 html.parser HTMLParser 子类、section_path、table 提取等。
+
+---
