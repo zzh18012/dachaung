@@ -1620,3 +1620,40 @@
 - 本 worktree（Round 29 后）：617 pass / 0 fail / 9 skip（HEAD `64ab44a`）
 
 ---
+
+## Round 30（2026-08-04）：候选 AL — fallback_parser helpers 覆盖率补强
+
+### 做了什么
+- 候选 AL：扩展 `tests/test_parsers.py`，新增 35 个测试覆盖 `app/parsers/fallback_parser.py` 内部纯函数 helper。
+- 重点覆盖项：
+  - **`_is_heading_style`** 7 个边角：含空格 strip、Heading 0 → 1、Heading -1 → 1、TITLE 大小写不敏感、非数字后缀 fallback、"Normal"/空串 拒绝
+  - **`_is_caption`** 6 个边角：全角数字、中文 + 句点、Fig. 缩写、缺分隔符拒绝、纯数字拒绝、完整单词必需
+  - **`_classify_pdf_paragraph`** 6 个边角：caption 优先级、短句 + 句号 → paragraph、短句无句号 → heading、长文 → paragraph、中文短句有无句号
+  - **`_lines_to_para`** 4 个直接单测：空、单行多 word、双行 bbox 跨度、按 x0 排序
+  - **`_group_words_to_paragraphs`** 3 个聚类场景：3 行聚合、大行距拆段、缺失 top/bottom 字段
+  - **`_image_filename`** 5 个边角：jpg 扩展、02d 索引格式、默认 png、`doc-` 前缀剥离、无 `doc-` 前缀保留
+  - **`_extract_inline_image_rids`** 4 个 XML 测试：无 drawing、r:embed、多 drawing、r:link
+- 无源码改动。
+
+### 撞墙记录
+- **撞墙 1**：`test_is_caption_full_width_digits` 第二条用例用了 `表 ３：实验结果`，`：`（全角冒号）不在 caption regex 的 `[\.、:\s]` 字符类里。改测：换成 `表 ３. 实验结果`（用 `.`）。
+- **撞墙 2**：`_image_filename` 测试一开始假设格式是 `d1_img_000.png`，但实际格式是 `image_<safe_doc>_<prefix>_<idx:02d>.<ext>`（有 `image_` 前缀，且 `doc-` 被剥离，索引是 02d 不是 03d）。改测：按真实格式重写。
+- 两次都是测试构造时未读源码细节，不是源码 bug。
+
+### 下一步建议
+- 候选 AK：kreuzberg / markdown / html parser 内部 helper 单测
+- 候选 AM：models.py 的 Element / Document 不变量更多边角
+- 候选 AN：app/schema.py 边角（draft 2020-12 各种 keyword）
+- 候选 AG：CLI 子命令更细致的测试
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AM（models.py 不变量）。理由：
+1. Element / Document 是数据模型核心
+2. 不变量校验是 source_truth
+3. 纯函数，无依赖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 30 后）：652 pass / 0 fail / 9 skip（HEAD `1086402`）
+
+---
