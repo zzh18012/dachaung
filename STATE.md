@@ -718,3 +718,54 @@
 - 本 worktree（Round 11 后）：292 pass / 0 fail / 9 skip（HEAD `1355793`）
 
 ---
+
+## 2026-08-04 — Round 12（evaluation.cli 加 inspect-doc 子命令）
+
+**做了什么**：
+- 候选 M（evaluator v1.2）被 AUTONOMOUS_LOOP.md 硬底线阻塞（"不动 evaluator_version / report_version"，第 52 行 / 第 140 行），换方向到候选 L
+- 完成候选 L（变形版）：在 `evaluation/cli.py` 加 `inspect-doc` 子命令
+  - 用法：`python -m evaluation.cli inspect-doc <doc.json> [--tolerance-chars 30]`
+  - 加载单文档 JSON，跑全部自动指标 + 标注指标（无标注时是 null），按可读格式 stdout 输出
+  - 开发期 sanity check 用，省去构造 manifest 的开销
+- **架构选择**：放在 `evaluation/cli.py` 而非 `app/cli.py`，保持 app/ 是纯库、evaluation/ 依赖 app/ 的层级（candidate L 原写在 app/cli.py，但层级关注优先）
+- 输出按 metric 类型分组排序：success/bool → ratio → count/dict → null（最后），每行带 reason
+- 新增 5 个 subprocess 测试（`tests/test_evaluation_cli.py`）：
+  - 基础输出含元信息 + metrics / null 指标显示 reason / 缺文件 exit 2 / 坏 JSON exit 1 / 顶层非对象 exit 1
+- 不变量保持：`evaluator_version` / `report_version` 仍是 `"1.1"`
+- commit `6089806`，已 push
+
+**worktree 当前状态**：
+- HEAD `6089806`，工作树清洁
+- 测试基线：297 pass / 0 fail / 9 skip（+5 vs Round 11）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 13）
+
+**首要任务**：方向选择
+
+- 候选 O（新提，推荐）：**docs 整理 + 顶层 README**
+  - 现状：docs/ 只有 evaluation.md（v1.x 设计）+ evaluation-audit.md（Round 8）； newcomers 没有入口
+  - 复杂度：低-中（写 README.md 介绍项目结构、用法、当前阶段；可能加 docs/architecture.md）
+  - 价值：项目阶段性总结；让他人（包括 cron 唤醒的新 agent）能快速进入
+
+- 候选 D：补 fallback parser 的覆盖率（PDF/DOCX 各路错误代码）
+- 候选 P（新提）：**samples/ 加合成测试 fixtures**
+  - 现状：tests 里的合成 DOCX/PDF 在每个测试里都重新构造；可以提到 conftest 或 fixtures 模块
+  - 价值：减少测试代码重复；后续加测试更快
+
+- 候选 J（向量化）：仍因 CLAUDE.md "不增加计划外主要依赖" 阻塞
+- 候选 M（evaluator v1.2）：仍因 AUTONOMOUS_LOOP.md 硬底线阻塞
+
+**建议**：选 O（docs 整理）。理由：
+1. 已经做了 12 轮技术工作，缺少阶段性总结入口
+2. cron 唤醒的新 agent 也需要 README 了解项目状态
+3. 体积小，无技术风险
+
+### 撞墙记录
+- 候选 M（evaluator v1.2）：AUTONOMOUS_LOOP.md 第 52/140 行硬底线禁止改 evaluator_version / report_version。即使 source_spans 已就绪，也不能加新 v1.2 指标。换方向。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 12 后）：297 pass / 0 fail / 9 skip（HEAD `6089806`）
+
+---
