@@ -4483,3 +4483,72 @@
 - 本 worktree（Round 92 后）：5903 pass / 0 fail / 13 skip（HEAD `ef3e509`）
 
 ---
+
+## Round 93（2026-08-05）：候选 DH — 跨模块错误传播场景
+
+### 做了什么
+- 新建 `tests/test_cross_module_inconsistency.py`（68 个测试）覆盖
+  跨模块错误传播路径，互补于 Round 90 的正常路径不变量。
+- 重点覆盖项：
+  - **文件层错误**：
+    - 文件不存在 → ErrorRecord(code=file_not_found, details.path) + Document=None
+    - hash 失败（mock OSError）→ ErrorRecord(code=hash_io_error) + exception_type
+  - **parser 选择错误**：
+    - 未知 parser → ValueError 被 except Exception 兜底成 unexpected_parser_error
+    - get_parser 不存在的名 → ValueError 直接抛（业务调用错误）
+  - **Parser 抛异常 → ErrorRecord 转换**：
+    - ParserError.code → ErrorRecord.code 一致
+    - 意外 Exception → unexpected_parser_error + parser_name 透传
+    - ParserError.details 字典透传到 ErrorRecord.details
+  - **空内容（0 element）**：
+    - no_extracted_elements + warnings 透传
+    - warnings JSON 可序列化
+  - **Schema 校验失败**：
+    - schema_validation_failed + validation_errors 截断 20
+    - 校验失败时不写盘
+  - **写盘失败**：
+    - mock json.dump OSError → write_failed + path
+  - **Chunker 失败**：
+    - mock chunker 抛 → chunker_failed + exception_type
+  - **source_hash 一致性**：
+    - parser 收到与文件匹配的 hash
+    - 同文件 → 同 document_id（幂等）
+    - 不同文件 → 不同 document_id
+  - **ErrorRecord JSON 可序列化**：
+    - 8 个 pipeline 错误码 parametrize 都过
+  - **validate_only 三种结果**：
+    - missing file / bad json / valid json
+  - **image_output_dir_for**：
+    - None 输入 → None
+    - hash[:16] 命名约定
+  - **get_parser 工厂**：6 parser 名 → 正确类
+  - **Bad manifest**：
+    - 缺文件、坏 JSON、绝对路径、反斜杠 都被拒
+  - **chunker 输入不变量**：
+    - source_element_ids 是 element_id 子集
+    - 每个 chunk 至少 1 个非空 source_element_id
+  - **不丢不重**：normalize(Σ chunks.text) == normalize(Σ elements.content)
+  - **chunk_ids 唯一** + **element_ids 唯一**
+  - **ParserError 继承结构**：issubclass(Exception) + 可被 except 捕获
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：未知 parser 实际被 process_single 的 except Exception 兜底，
+  不是直接抛 ValueError（与最初假设相反）。修复：断言被捕获为 unexpected_parser_error。
+- wall 2：fallback parser 默认 parser_name 不接受 .txt；改用 parser_name="text"。
+- wall 3：手构 Document 缺 source_locator.line，schema 不通过；改用 TextParser 真实输出。
+- wall 4：ErrorRecord/WarningRecord 的 details 默认 None（不是空 dict）。
+
+### 下一步建议
+- 候选 DI：app/cli.py 边角（第三轮）—— 535 行
+- 候选 DJ：app/chunkers/structural.py 边角（第三轮）
+- 候选 DK：evaluation/runner.py 边角（第三轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DI（cli.py 第三轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 93 后）：5971 pass / 0 fail / 13 skip（HEAD `185e989`）
+
+---
