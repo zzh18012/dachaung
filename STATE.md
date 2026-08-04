@@ -2511,3 +2511,42 @@
 - 本 worktree（Round 52 后）：1748 pass / 0 fail / 9 skip（HEAD `9cdf827`）
 
 ---
+
+## Round 53（2026-08-04）：候选 BI — app/schema.py 边角覆盖
+
+### 做了什么
+- 候选 BI：新建 `tests/test_schema_edges.py`（58 个测试）覆盖 `app/schema.py`（93 行）的公共 API 边角，与已有 `test_schema.py`（117 个）互补。
+- 重点覆盖项：
+  - **SchemaValidationError 类直接单测** 9 个：Exception 子类、str 表示、raise/catch、默认 errors=[]、None → []、errors 透传同对象引用、args[0] 是 message、链式异常（raise from inner exception）
+  - **SCHEMA_PATH 常量** 5 个：Path 对象、is_absolute、指向 schemas/document.schema.json、文件存在、默认参数行为
+  - **__all__ 导出列表** 3 个：6 个公开 API 完整（SCHEMA_PATH/SchemaValidationError/load_schema/validate/is_valid/validate_file）、list 类型、与模块属性匹配
+  - **load_schema 边角** 10 个：默认返 dict、$schema/$id/title/properties keys、str/Path 都接受、missing file raise、directory raise、非 JSON 文件 raise JSONDecodeError
+  - **validate 行为** 8 个：成功返 None、自定义 schema 通过/拒绝、errors 三键（path/message/schema_path）、消息含错误数（"处"）、errors 按 path 排序、首 error 用于消息、空 dict 多个错误
+  - **is_valid 边角** 9 个：合法返 True、非法返 False、bool 类型、自定义 schema 通过/拒绝、不抛异常（None/str/list 都返 False）
+  - **validate_file 边角** 10 个：Path/str 都接受、missing/directory raise、非 JSON raise、非法内容 raise SchemaValidationError、自定义 schema、成功返 None
+  - **_silence_unused_import 占位函数** 3 个：返 None、无参数、可调用
+  - **Draft202012Validator 直接** 2 个：空 schema 接受任何类型、type-only schema 校验
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。58 个新测试一次通过。
+
+### 下一步建议
+- 候选 BJ：app/pipeline.py 内部边角（process_single 错误路径细分）
+- 候选 BK：evaluation/cli.py 边角
+- 候选 BL：app/parsers/text_parser.py 内部边角
+- 候选 BM：app/parsers/markdown_parser.py 内部边角
+- 候选 BN：app/parsers/html_parser.py 内部边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BK（evaluation/cli.py 边角）。理由：
+1. evaluation/cli.py 是评测入口，含 run/validate-report 子命令
+2. 与 app/cli.py 互补，专门测试评测层 CLI 边角
+3. 评测层已全覆盖核心模块（runner/manifest/metrics/report/schema），但 cli.py 本身边角较少
+4. 之后转 BL/BM/BN 补全各 parser 内部边角
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 53 后）：1806 pass / 0 fail / 9 skip（HEAD `816ab48`）
+
+---
