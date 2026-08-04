@@ -172,6 +172,67 @@
 
 ---
 
+## 2026-08-04 — Round 4（纯文本 parser）
+
+**做了什么**：
+- 完成候选 B++：实现 `TextParser`（`app/parsers/text_parser.py`，~100 行）
+- 策略：按空行（连续 whitespace-only 行）切段，每段一个 paragraph element，保留段内换行
+- 归一换行：CRLF / CR → LF
+- `source_locator = {"line": N}`：1-indexed 行号，指向段首字符所在行；纯文本不需要 section_path
+- 空文件 / 仅空白 → warning `text_no_content`
+- 配套修改：
+  - `app/models.py`：`SourceType` 加 `"text"`
+  - `app/pipeline.py`：`get_parser` 加 `"text"` 分支
+  - `app/cli.py`：`--parser` choices 加 `text`
+  - `schemas/document.schema.json`：`source_type` enum 加 `text`；新增 `text_locator` $def（最小集，仅 line）+ 对应 `if/then`
+- 新增 21 个测试（`tests/test_parsers_text.py`）：基础切分 / 多行段落 / CRLF 归一 / 多空白行行号 / 空文件 / 错误路径 / schema 校验 / pipeline + CLI 端到端
+- 修复一个行号 bug（原 regex 方案漏算 chunk 前的 \n，改用按行扫描）
+- commit `cc754ab`，已 push
+
+**输入格式矩阵**（完成 5/8 常见输入）：
+- ✅ PDF（fallback）
+- ✅ DOCX（fallback）
+- ✅ Markdown（markdown）
+- ✅ HTML（html）
+- ✅ Plain text（text）
+- ⏳ Jupyter Notebook（候选 F）
+- ⏳ reStructuredText
+- ⏳ LaTeX / .tex
+
+**worktree 当前状态**：
+- HEAD `cc754ab`，工作树清洁
+- 测试基线：240 pass / 0 fail / 9 skip（+21 vs Round 3）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 5）
+
+**首要任务**：选一项推进
+
+- 候选 F（推荐）：**Jupyter Notebook (.ipynb) parser**
+  - 现状：parsers 矩阵 5 种已就绪；.ipynb 是数据科学场景高频输入
+  - 复杂度：中（stdlib `json` 解析 nbformat；按 cell 类型分派：code cell → paragraph with kind="code_cell"；markdown cell → 复用 MarkdownParser）
+  - 价值：完成数据科学场景；为评测 devset 增加新源
+  - 设计要点：source_type="ipynb"；source_locator={"cell_index": N, "cell_type": "code"|"markdown", "line": N}
+
+- 候选 A：审计 `evaluation/metrics.py` 找 bug
+- 候选 D：补 fallback parser 的覆盖率
+- 候选 E：实施 source_spans（独立设计）
+
+**建议**：选 F（.ipynb parser）。理由：
+1. 数据科学场景高频，扩展输入矩阵
+2. stdlib `json` 即可解析，无新依赖
+3. 可复用 MarkdownParser 处理 markdown cell，体现 parser 组合
+4. 完成后 Round 6 可换方向（A/D/E）
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 4 后）：240 pass / 0 fail / 9 skip（HEAD `cc754ab`）
+
+---
+
 ## 2026-08-04 — Round 1（inspect 子命令 + 测试）
 
 **做了什么**：
