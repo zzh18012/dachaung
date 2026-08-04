@@ -1084,3 +1084,457 @@ def test_table_metadata_strategy_is_isolated_table():
     table_chunk = next(c for c in chunks if "a" in c.text and "b" in c.text)
     assert table_chunk.metadata["strategy"] == "isolated_table"
 
+
+# ---------- 边角与缺漏补强（Round 36） ----------
+
+
+# _hard_split_with_whitespace_fallback 直接单测
+
+
+def test_hard_split_returns_empty_list_for_empty_string():
+    from app.chunkers.structural import _hard_split_with_whitespace_fallback
+    assert _hard_split_with_whitespace_fallback("", 100) == []
+
+
+def test_hard_split_returns_empty_list_for_whitespace_only():
+    from app.chunkers.structural import _hard_split_with_whitespace_fallback
+    assert _hard_split_with_whitespace_fallback("   \n\t  ", 100) == []
+
+
+def test_hard_split_short_text_returns_single_piece():
+    """len(text) <= max_chars → 单个 piece，boundary_after=None。"""
+    from app.chunkers.structural import _hard_split_with_whitespace_fallback
+    pieces = _hard_split_with_whitespace_fallback("hi", 100)
+    assert len(pieces) == 1
+    assert pieces[0].text == "hi"
+    assert pieces[0].boundary_after is None
+
+
+def test_hard_split_text_with_whitespace_fallback():
+    """超长文本在窗口内找到空白处切，boundary_after='whitespace'。"""
+    from app.chunkers.structural import _hard_split_with_whitespace_fallback
+    text = "word " * 30  # 150 字符
+    pieces = _hard_split_with_whitespace_fallback(text, 50)
+    assert len(pieces) >= 2
+    # 至少有一个 piece 是 whitespace 边界
+    assert any(p.boundary_after == "whitespace" for p in pieces[:-1])
+
+
+def test_hard_split_text_without_whitespace_forces_char_boundary():
+    """无空白的超长文本 → forced_char 兜底。"""
+    from app.chunkers.structural import _hard_split_with_whitespace_fallback
+    text = "a" * 100  # 无空白
+    pieces = _hard_split_with_whitespace_fallback(text, 32)
+    assert len(pieces) >= 3
+    # 中间 piece 应是 forced_char
+    assert any(p.boundary_after == "forced_char" for p in pieces[:-1])
+    # 最后一个 piece 应是 None（自然尾段）
+    assert pieces[-1].boundary_after is None
+
+
+def test_hard_split_each_piece_within_max_chars():
+    """每个 piece 的长度应 <= max_chars。"""
+    from app.chunkers.structural import _hard_split_with_whitespace_fallback
+    text = " ".join(["word"] * 100)  # 长文本
+    pieces = _hard_split_with_whitespace_fallback(text, 40)
+    for p in pieces:
+        assert len(p.text) <= 40
+
+
+def test_hard_split_start_end_in_input_coordinates():
+    """piece.start / piece.end 应在输入 text 坐标系。"""
+    from app.chunkers.structural import _hard_split_with_whitespace_fallback
+    text = "0123456789" * 10  # 100 字符
+    pieces = _hard_split_with_whitespace_fallback(text, 32)
+    assert pieces[0].start == 0
+    assert pieces[-1].end == len(text)
+
+
+# _split_long_text 直接单测
+
+
+def test_split_long_text_empty_string():
+    from app.chunkers.structural import _split_long_text
+    assert _split_long_text("", 100) == []
+
+
+def test_split_long_text_whitespace_only():
+    from app.chunkers.structural import _split_long_text
+    assert _split_long_text("   \n\t  ", 100) == []
+
+
+def test_split_long_text_short_returns_single_piece():
+    from app.chunkers.structural import _split_long_text
+    pieces = _split_long_text("hello world", 100)
+    assert len(pieces) == 1
+    assert pieces[0].text == "hello world"
+    assert pieces[0].boundary_after is None
+
+
+def test_split_long_text_strips_input_first():
+    """strip 后再 split；前导/尾部空白不计入。"""
+    from app.chunkers.structural import _split_long_text
+    pieces = _split_long_text("  hello  ", 100)
+    assert len(pieces) == 1
+    assert pieces[0].text == "hello"
+    assert pieces[0].start == 0  # stripped 坐标
+    assert pieces[0].end == 5
+
+
+def test_split_long_text_with_sentence_breaks():
+    """含句号的文本优先按句子累积。"""
+    from app.chunkers.structural import _split_long_text
+    text = "First sentence. Second sentence. Third one."
+    pieces = _split_long_text(text, 30)
+    assert len(pieces) >= 2
+    for p in pieces:
+        assert len(p.text) <= 30
+
+
+def test_split_long_text_chinese_sentence_breaks():
+    """中文句号 '。' 也应被 _SENTENCE_SPLIT_RE 识别。"""
+    from app.chunkers.structural import _split_long_text
+    text = "第一句话。第二句话。第三句话。"
+    pieces = _split_long_text(text, 10)
+    for p in pieces:
+        assert len(p.text) <= 10
+
+
+def test_split_long_text_question_exclamation_breaks():
+    """? ! 也应被 _SENTENCE_SPLIT_RE 识别。"""
+    from app.chunkers.structural import _SENTENCE_SPLIT_RE
+    text = "What? Yes! No."
+    parts = _SENTENCE_SPLIT_RE.split(text)
+    assert len(parts) >= 2
+
+
+def test_split_long_text_each_piece_within_max_chars():
+    """不管输入多长，每个 piece 都 <= max_chars。"""
+    from app.chunkers.structural import _split_long_text
+    text = "a" * 200 + " " + "b" * 200
+    pieces = _split_long_text(text, 50)
+    assert len(pieces) >= 4
+    for p in pieces:
+        assert len(p.text) <= 50
+
+
+def test_split_long_text_concatenation_uses_single_space():
+    """多 piece 累积时用单空格 joiner。"""
+    from app.chunkers.structural import _split_long_text
+    text = "short1. short2. short3."
+    pieces = _split_long_text(text, 30)
+    if len(pieces) == 1:
+        assert " " in pieces[0].text
+    else:
+        assert any(" " in p.text for p in pieces)
+
+
+# _SplitPiece dataclass
+
+
+def test_split_piece_default_start_end_zero():
+    from app.chunkers.structural import _SplitPiece
+    p = _SplitPiece(text="hi", boundary_after=None)
+    assert p.start == 0
+    assert p.end == 0
+
+
+def test_split_piece_is_frozen():
+    """_SplitPiece 是 frozen dataclass。"""
+    import dataclasses
+    from app.chunkers.structural import _SplitPiece
+    p = _SplitPiece(text="hi", boundary_after=None, start=0, end=2)
+    assert dataclasses.is_dataclass(p)
+    try:
+        p.text = "boom"  # type: ignore[misc]
+        raise AssertionError("应抛 FrozenInstanceError")
+    except (AttributeError, dataclasses.FrozenInstanceError):
+        pass
+
+
+# _element_text_with_span 直接单测
+
+
+def test_element_text_with_span_paragraph_returns_stripped():
+    from app.chunkers.structural import StructuralChunker
+    from app.models import Element
+    chunker = StructuralChunker(max_chars=100)
+    el = Element(
+        element_id="e1", type="paragraph",
+        content="  hello world  ", source_locator={},
+    )
+    text, start, end = chunker._element_text_with_span(el)
+    assert text == "hello world"
+    assert start == 2
+    assert end == 13
+
+
+def test_element_text_with_span_image_returns_empty():
+    from app.chunkers.structural import StructuralChunker
+    from app.models import Element
+    chunker = StructuralChunker(max_chars=100)
+    el = Element(
+        element_id="e1", type="image",
+        resource_path="x.png", source_locator={},
+    )
+    text, start, end = chunker._element_text_with_span(el)
+    assert text == ""
+    assert start == 0
+    assert end == 0
+
+
+def test_element_text_with_span_whitespace_only_returns_empty():
+    from app.chunkers.structural import StructuralChunker
+    from app.models import Element
+    chunker = StructuralChunker(max_chars=100)
+    el = Element(
+        element_id="e1", type="paragraph",
+        content="   \n\t  ", source_locator={},
+    )
+    text, start, end = chunker._element_text_with_span(el)
+    assert text == ""
+    assert start == 0
+    assert end == 0
+
+
+def test_element_text_with_span_no_leading_whitespace():
+    from app.chunkers.structural import StructuralChunker
+    from app.models import Element
+    chunker = StructuralChunker(max_chars=100)
+    el = Element(
+        element_id="e1", type="paragraph",
+        content="hello", source_locator={},
+    )
+    text, start, end = chunker._element_text_with_span(el)
+    assert text == "hello"
+    assert start == 0
+    assert end == 5
+
+
+def test_element_text_with_span_only_trailing_whitespace():
+    from app.chunkers.structural import StructuralChunker
+    from app.models import Element
+    chunker = StructuralChunker(max_chars=100)
+    el = Element(
+        element_id="e1", type="paragraph",
+        content="hello   ", source_locator={},
+    )
+    text, start, end = chunker._element_text_with_span(el)
+    assert text == "hello"
+    assert start == 0
+    assert end == 5
+
+
+def test_element_text_legacy_method_returns_only_text():
+    """_element_text 是兼容方法，只返回 stripped text。"""
+    from app.chunkers.structural import StructuralChunker
+    from app.models import Element
+    chunker = StructuralChunker(max_chars=100)
+    el = Element(
+        element_id="e1", type="paragraph",
+        content="  hello  ", source_locator={},
+    )
+    text = chunker._element_text(el)
+    assert text == "hello"
+
+
+# chunker 各种边界场景
+
+
+def test_chunk_empty_document_returns_empty_list():
+    from app.chunkers.structural import StructuralChunker
+    from app.models import Document
+    doc = Document(
+        document_id="d1", source_path="x", source_type="docx",
+        source_hash="a" * 64, parser_name="test", parser_version="0",
+        elements=[],
+    )
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert chunks == []
+
+
+def test_chunk_all_elements_empty_text_returns_empty():
+    """所有 element content 都是空白 → 无 chunk。"""
+    from app.chunkers.structural import StructuralChunker
+    from app.models import Document, Element
+    doc = Document(
+        document_id="d1", source_path="x", source_type="docx",
+        source_hash="a" * 64, parser_name="test", parser_version="0",
+        elements=[
+            Element(element_id="e1", type="paragraph", content="   ",
+                    source_locator={}),
+            Element(element_id="e2", type="paragraph", content="\n\t",
+                    source_locator={}),
+        ],
+    )
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert chunks == []
+
+
+def test_chunk_consecutive_headings_each_in_own_chunk():
+    """两个连续 heading：第一个 heading flush 后第二个进新 buf → 2 个 chunk。"""
+    doc = _make_doc([
+        ("heading", "Title A"),
+        ("heading", "Title B"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 2
+    assert chunks[0].text == "Title A"
+    assert chunks[1].text == "Title B"
+
+
+def test_chunk_long_paragraph_with_no_sentence_breaks_force_split():
+    """超长 paragraph 无句号 → 走 _split_long_text + _hard_split。"""
+    text = "a" * 200
+    doc = _make_doc([("paragraph", text)])
+    chunks = StructuralChunker(max_chars=50).chunk(doc)
+    assert len(chunks) >= 3
+    for c in chunks:
+        assert len(c.text) <= 50
+
+
+def test_chunk_long_paragraph_strategy_metadata():
+    text = "Sentence one. " * 30
+    doc = _make_doc([("paragraph", text)])
+    chunks = StructuralChunker(max_chars=50).chunk(doc)
+    for c in chunks:
+        assert c.metadata["strategy"] == "long_paragraph_sentence_split"
+
+
+def test_chunk_chunk_id_format():
+    """chunk_id 格式：{document_id}::c{counter:04d}。"""
+    doc = _make_doc([("paragraph", "hello")], doc_id="d-abc123")
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert chunks[0].chunk_id == "d-abc123::c0000"
+
+
+def test_chunk_chunk_id_increments():
+    """多个 chunk 的 counter 应递增（0000, 0001, ...）。"""
+    doc = _make_doc([
+        ("heading", "H1"),
+        ("heading", "H2"),
+        ("heading", "H3"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert [c.chunk_id.split("::")[1] for c in chunks] == ["c0000", "c0001", "c0002"]
+
+
+def test_chunk_metadata_max_chars_recorded():
+    """chunk.metadata 应记录 max_chars。"""
+    doc = _make_doc([("paragraph", "hello")])
+    chunks = StructuralChunker(max_chars=123).chunk(doc)
+    assert chunks[0].metadata["max_chars"] == 123
+
+
+def test_chunk_metadata_char_count_matches_text_length():
+    """chunk.metadata.char_count 应等于 len(chunk.text)。"""
+    doc = _make_doc([("paragraph", "hello world")])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert chunks[0].metadata["char_count"] == len(chunks[0].text)
+
+
+def test_chunk_source_spans_for_multiple_paragraphs():
+    """多 paragraph 合并到一 chunk → 每段一个 span。"""
+    doc = _make_doc([
+        ("paragraph", "first"),
+        ("paragraph", "second"),
+        ("paragraph", "third"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 1
+    spans = chunks[0].source_spans
+    assert len(spans) == 3
+    for s in spans:
+        assert "element_id" in s
+        assert "start" in s
+        assert "end" in s
+
+
+def test_chunk_source_element_ids_deduplication_in_buffer():
+    """同一 element 多次出现 → source_element_ids 去重。"""
+    from app.chunkers.structural import _ChunkBuffer
+    buf = _ChunkBuffer(document_id="d1")
+    buf.push_text("a", "e1", 0, 1)
+    buf.push_text("b", "e1", 0, 1)
+    buf.push_text("c", "e2", 0, 1)
+    chunk = buf.flush(strategy="test", max_chars=100)
+    assert chunk is not None
+    assert chunk.source_element_ids == ["e1", "e2"]
+
+
+def test_chunk_paragraph_then_isolated_then_paragraph():
+    """paragraph → table → paragraph：3 个独立 chunk。"""
+    doc = _make_doc([
+        ("paragraph", "before"),
+        ("table", "| a | b |"),
+        ("paragraph", "after"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 3
+    assert chunks[0].text == "before"
+    assert chunks[1].text == "| a | b |"
+    assert chunks[1].metadata["strategy"] == "isolated_table"
+    assert chunks[2].text == "after"
+
+
+def test_chunk_text_join_uses_single_space():
+    """多 element 累积到一 chunk → text 用单空格 joiner。"""
+    doc = _make_doc([
+        ("paragraph", "first"),
+        ("paragraph", "second"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 1
+    assert chunks[0].text == "first second"
+
+
+# _SENTENCE_SPLIT_RE / _WHITESPACE_RE 直接验证
+
+
+def test_sentence_split_re_splits_on_period():
+    from app.chunkers.structural import _SENTENCE_SPLIT_RE
+    parts = _SENTENCE_SPLIT_RE.split("Hello. World")
+    assert "Hello." in parts
+    assert "World" in parts
+
+
+def test_sentence_split_re_splits_on_chinese_period():
+    """中文句号 + 后续空白 → split（regex 要求句末标点后跟空白）。"""
+    from app.chunkers.structural import _SENTENCE_SPLIT_RE
+    parts = _SENTENCE_SPLIT_RE.split("你好。 世界")
+    assert "你好。" in parts
+    assert "世界" in parts
+
+
+def test_sentence_split_re_no_split_without_whitespace():
+    """句号后无空白不 split。"""
+    from app.chunkers.structural import _SENTENCE_SPLIT_RE
+    parts = _SENTENCE_SPLIT_RE.split("Hello.World")
+    assert parts == ["Hello.World"]
+
+
+def test_whitespace_re_collapse_all_whitespace_to_single_space():
+    from app.chunkers.structural import _WHITESPACE_RE
+    assert _WHITESPACE_RE.sub(" ", "a\nb\tc\r d") == "a b c d"
+
+
+# normalize_text 更多边角
+
+
+def test_normalize_text_idempotent():
+    from app.chunkers.structural import normalize_text
+    s = "hello world"
+    assert normalize_text(normalize_text(s)) == normalize_text(s)
+
+
+def test_normalize_text_emoji_preserved():
+    """emoji 不是空白，应保留。"""
+    from app.chunkers.structural import normalize_text
+    assert normalize_text("hello 🌍 world") == "hello 🌍 world"
+
+
+def test_normalize_text_full_width_space_is_whitespace():
+    """U+3000 全角空格是 whitespace，应被压成单空格。"""
+    from app.chunkers.structural import normalize_text
+    assert normalize_text("a　b") == "a b"
+
