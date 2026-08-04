@@ -1738,3 +1738,41 @@
 - 本 worktree（Round 32 后）：752 pass / 0 fail / 9 skip（HEAD `fbe467e`）
 
 ---
+
+## Round 33（2026-08-04）：候选 AG — app/cli.py 子命令与 helper 覆盖补强
+
+### 做了什么
+- 候选 AG：扩展 `tests/test_cli.py`，新增 49 个测试覆盖 argparse 入口校验、9 个内部 helper、main() 函数级别返回码。
+- 重点覆盖项：
+  - **argparse 入口** 9 个：no command / unknown command → rc≠0、parse 缺 -o / 非法 --parser → rc≠0、parse 输入不存在 → rc=1 + 结构化 error JSON、validate 缺文件 → rc=2、validate 损坏 JSON → rc=1、validate 非合规内容 → rc=1、validate 合法 → rc=0
+  - **`_iter_supported_files`** 5 个：扩展名过滤、按名升序、recursive 走子目录、目录过滤、大写扩展名识别
+  - **`_relative_output_path`** 3 个：基础、嵌套子目录、多 dot 文件名
+  - **`_preview`** 7 个：None/空串/短文本透传、空白归一、超长加省略号、恰好 width 不截断、自定义 width
+  - **`_load_document_json`** 3 个：合法 / 缺文件 / JSON 解析失败
+  - **`_format_summary`** 4 个：完整 doc / 含 warnings+errors / truncate 到 5 / 空 doc
+  - **`_format_elements_list`** 5 个：空、含 parent_id、不含 parent_id、content=None、limit=0 全列
+  - **`_format_chunks_list`** 4 个：带 spans、缺 spans 数据 → "(none)"、show_spans=False 隐藏、text=None → chars=0
+  - **`_emit_structured_error`** 2 个：JSON 写 stderr、含/不含 extra kwargs
+  - **`main()`** 6 个：unknown command 抛 SystemExit、validate/inspect 各种返回码
+- 无源码改动。
+
+### 撞墙记录
+- 无新撞墙。49 个新测试一次通过。
+
+### 下一步建议
+- 候选 AK：kreuzberg / markdown / html parser 内部 helper 单测
+- 候选 AH：evaluation/cli.py 的 validate-report 子命令路径
+- 候选 AO：pipeline / process_single 端到端边角（output_path 为空、parser 不可用降级路径）
+- 候选 AP：evaluation/runner.py 评测指标聚合边角（ratio 分母 0 / silent_drop 累加）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AH（evaluation/cli.py）。理由：
+1. evaluation CLI 是评测系统入口，validate-report 子命令是发布前 gate
+2. argparse 与子命令 dispatch 是 release-quality 必须覆盖的
+3. 与 Round 33 AG 同思路，扩大 CLI 边角覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 33 后）：801 pass / 0 fail / 9 skip（HEAD `7769253`）
+
+---
