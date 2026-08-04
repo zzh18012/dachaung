@@ -248,7 +248,12 @@ def test_cli_corrupt_pdf_returns_nonzero(tmp_path: Path):
 
 
 def test_cli_unsupported_extension_returns_nonzero(tmp_path: Path):
-    bad = tmp_path / "x.txt"
+    """真正不支持的扩展名（.xyz）仍应被所有 parser 拒绝。
+
+    注：`.txt` 在 Round 6 后由 text parser 支持，故改用未注册的 `.xyz`。
+    显式指定 --parser fallback 也会因 detect_source_type 拒绝而失败。
+    """
+    bad = tmp_path / "x.xyz"
     bad.write_text("hello")
     out = tmp_path / "out.json"
     rc, stdout, stderr = _run_cli(["parse", str(bad), "-o", str(out)])

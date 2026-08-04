@@ -45,16 +45,16 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="command", required=True)
 
     # parse 子命令
-    parse = sub.add_parser("parse", help="解析 PDF/DOCX → 统一文档模型 → 分块 → JSON")
-    parse.add_argument("input", help="输入文件路径（PDF/DOCX）")
+    parse = sub.add_parser("parse", help="解析 PDF/DOCX/MD/HTML/TXT/IPYNB → 统一文档模型 → 分块 → JSON")
+    parse.add_argument("input", help="输入文件路径（PDF/DOCX/MD/HTML/TXT/IPYNB）")
     parse.add_argument("-o", "--output", required=True, help="输出 JSON 路径")
     parse.add_argument(
         "--parser",
         choices=("fallback", "kreuzberg", "markdown", "html", "text", "ipynb"),
-        default="fallback",
-        help="选择解析器（默认 fallback；kreuzberg 实测对 DOCX 给不出元素结构；"
-             "markdown 仅适用于 .md/.markdown；html 仅适用于 .html/.htm；"
-             "text 仅适用于 .txt/.text；ipynb 仅适用于 .ipynb）",
+        default=None,
+        help="选择解析器（默认按扩展名自动推断：.pdf/.docx→fallback, "
+             ".md/.markdown→markdown, .html/.htm→html, .txt/.text→text, "
+             ".ipynb→ipynb；kreuzberg 需显式指定）",
     )
     parse.add_argument(
         "--max-chars",
@@ -99,6 +99,24 @@ def _emit_structured_error(input_path: Path, code: str, message: str, **extra) -
         "errors": [{"code": code, "message": message, **(extra or {})}],
     }
     print(json.dumps(err, ensure_ascii=False, indent=2), file=sys.stderr)
+
+
+_EXTENSION_TO_PARSER: dict[str, str] = {
+    ".pdf": "fallback",
+    ".docx": "fallback",
+    ".md": "markdown",
+    ".markdown": "markdown",
+    ".html": "html",
+    ".htm": "html",
+    ".txt": "text",
+    ".text": "text",
+    ".ipynb": "ipynb",
+}
+
+
+def _infer_parser_name(input_path: Path) -> str:
+    """按扩展名推断 parser 名称。未知扩展名回退到 fallback。"""
+    return _EXTENSION_TO_PARSER.get(input_path.suffix.lower(), "fallback")
 
 
 def _preview(text: str | None, width: int = 60) -> str:
@@ -285,10 +303,19 @@ def main(argv: list[str] | None = None) -> int:
             _emit_structured_error(input_path, "file_not_found", f"输入文件不存在: {input_path}")
             return 1
 
+        parser_name = args.parser
+        if parser_name is None:
+            parser_name = _infer_parser_name(input_path)
+            inferred_msg = (
+                f"[INFO] 未指定 --parser，按扩展名 {input_path.suffix or '(无)'} "
+                f"自动选择: {parser_name}"
+            )
+            print(inferred_msg, file=sys.stderr)
+
         document, errors = process_single(
             input_path,
             output_path,
-            parser_name=args.parser,
+            parser_name=parser_name,
             max_chars=args.max_chars,
             write_json=True,
         )

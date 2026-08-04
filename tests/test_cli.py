@@ -279,3 +279,96 @@ def test_inspect_preview_collapses_whitespace(tmp_path: Path):
     assert rc == 0, f"stderr={err}"
     # 预览末尾有省略号
     assert "…" in out
+
+
+# ---- parse 子命令：parser 自动推断 ----
+
+
+def test_infer_parser_by_extension():
+    """_infer_parser_name 按扩展名映射正确。"""
+    from app.cli import _infer_parser_name
+    cases = {
+        "doc.pdf": "fallback",
+        "doc.docx": "fallback",
+        "doc.md": "markdown",
+        "doc.markdown": "markdown",
+        "doc.html": "html",
+        "doc.htm": "html",
+        "doc.txt": "text",
+        "doc.text": "text",
+        "doc.ipynb": "ipynb",
+        # 未知扩展名回退
+        "doc.unknown": "fallback",
+        "noext": "fallback",
+    }
+    for name, expected in cases.items():
+        assert _infer_parser_name(Path(name)) == expected, f"{name} → {expected}"
+
+
+def test_parse_auto_infers_markdown(tmp_path: Path):
+    """不带 --parser 时，.md 文件自动用 markdown parser。"""
+    src = tmp_path / "doc.md"
+    src.write_text("# Title\n\nHello.\n", encoding="utf-8")
+    out = tmp_path / "out.json"
+    rc, stdout, stderr = _run_cli(["parse", str(src), "-o", str(out)])
+    assert rc == 0, f"stderr={stderr}"
+    # stderr 应有 INFO 行说明自动推断
+    assert "自动选择" in stderr
+    assert "markdown" in stderr
+    # 输出确实是 markdown 解析结果
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["source_type"] == "markdown"
+    assert data["parser_name"] == "markdown"
+
+
+def test_parse_auto_infers_html(tmp_path: Path):
+    src = tmp_path / "doc.html"
+    src.write_text("<html><body><h1>Hi</h1></body></html>", encoding="utf-8")
+    out = tmp_path / "out.json"
+    rc, _, stderr = _run_cli(["parse", str(src), "-o", str(out)])
+    assert rc == 0, f"stderr={stderr}"
+    assert "html" in stderr
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["parser_name"] == "html"
+
+
+def test_parse_auto_infers_text(tmp_path: Path):
+    src = tmp_path / "doc.txt"
+    src.write_text("Hello text.\n\nSecond para.\n", encoding="utf-8")
+    out = tmp_path / "out.json"
+    rc, _, stderr = _run_cli(["parse", str(src), "-o", str(out)])
+    assert rc == 0, f"stderr={stderr}"
+    assert "text" in stderr
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["parser_name"] == "text"
+
+
+def test_parse_auto_infers_ipynb(tmp_path: Path):
+    nb = {
+        "cells": [{"cell_type": "markdown", "source": "# T"}],
+        "metadata": {},
+        "nbformat": 4,
+        "nbformat_minor": 5,
+    }
+    src = tmp_path / "doc.ipynb"
+    src.write_text(json.dumps(nb), encoding="utf-8")
+    out = tmp_path / "out.json"
+    rc, _, stderr = _run_cli(["parse", str(src), "-o", str(out)])
+    assert rc == 0, f"stderr={stderr}"
+    assert "ipynb" in stderr
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["parser_name"] == "ipynb"
+
+
+def test_parse_explicit_parser_overrides_inference(tmp_path: Path):
+    """显式 --parser 时，不打印 INFO 行，直接用指定 parser。"""
+    src = tmp_path / "doc.md"
+    src.write_text("# Hi\n", encoding="utf-8")
+    out = tmp_path / "out.json"
+    rc, _, stderr = _run_cli(["parse", str(src), "-o", str(out), "--parser", "markdown"])
+    assert rc == 0, f"stderr={stderr}"
+    # 显式指定时不应有 INFO 行
+    assert "自动选择" not in stderr
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["parser_name"] == "markdown"
+
