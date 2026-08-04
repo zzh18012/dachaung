@@ -46,8 +46,9 @@ except ImportError as _e:  # pragma: no cover
 # ---------- 通用 ----------
 
 # 题注：以 "Table 1." / "Figure 1." / "表 1" / "图 1" 开头的段落
+# 分隔符允许 . 、 : 空白（覆盖英文/中文/学术写法）
 _CAPTION_RE = re.compile(
-    r"^\s*(?:Table|Figure|Fig\.?|表|图)\s*[0-9０-９]+[\.、\s]",
+    r"^\s*(?:Table|Figure|Fig\.?|表|图)\s*[0-9０-９]+[\.、:\s]",
     re.IGNORECASE,
 )
 
