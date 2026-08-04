@@ -7389,3 +7389,87 @@ structural.py 是结构分块核心算法，第三轮已建立基础，
 - 本 worktree（Round 130 后）：10061 pass / 0 fail / 13 skip（HEAD `9127e38`）
 
 ---
+
+## Round 131（2026-08-05）：evaluation/runner.py 第五轮（edges5）
+
+### 范围
+- 文件：`tests/test_evaluation_runner_edges5.py`（新增，1053 行）
+- 目标：`evaluation/runner.py`（227 行，已有 404 测试）
+- 新增测试：97 个
+- 提交：`b2af63d`
+
+### 覆盖深度
+- **_load_annotation 边界**：
+  - 签名（1 参数 + 注解）
+  - None/缺文件/目录/空文件/纯空白 → None
+  - object/array/int/string/null/bool 各种 JSON 类型
+  - 嵌套 dict（修正 list index）
+  - unicode 文件名与内容
+  - 坏 JSON/truncated → None
+- **_process_one 深度**：
+  - 签名（4 参数）
+  - 返回 tuple 5 元素
+  - 失败时 document=None + error 含 code/message
+  - parser_version=None（失败时）
+  - image_dir=None（document None 时）
+  - elapsed >= 0 + float 类型
+  - 创建 _per_doc 目录
+- **run_evaluation 深度**：
+  - 签名（5 参数含 tolerance_chars）
+  - parser_name/max_chars/tolerance_chars 是 KEYWORD_ONLY
+  - 默认 fallback/800/30
+  - 创建输出文件/返回 dict
+  - 报告含 report_version/provenance/devset/summary/per_doc/expected_failures
+  - 创建嵌套输出目录
+  - idempotent
+- **报告字段内容深度**：
+  - provenance 含 parser_name/max_chars/evaluator_version
+  - devset 含 status
+  - summary 含 success_rates
+  - per_doc 各项含 doc_id/source_type/metrics/wall_time_seconds
+  - wall_time_seconds 含 total/parse/chunk + parse_reason/chunk_reason
+  - public per_doc 不含 _ 前缀字段
+  - expected_failures 各项含 4 字段
+  - matches 字段 true/false 与 actual_error_code
+- **时间字段行为**：
+  - elapsed 是 float
+  - wall_time total 是 float
+  - parse/chunk 是 None
+  - parse_reason/chunk_reason 是 "not_instrumented"
+- **模块结构深度**：
+  - imports 完整（json/time/Path/Any/process_single/image_output_dir_for/
+    REPORT_VERSION/chunk_boundary_prf/figure_caption_prf/
+    compute_automatic_metrics/aggregate_summary/build_provenance/
+    build_devset_section）
+  - __all__ 1 项（run_evaluation）
+  - 3 个函数全部 callable
+  - docstring 提及 total/not_instrumented/image/pipeline
+  - from __future__ import annotations
+
+### 撞墙记录
+1. test_load_annotation_nested_dict：list [1,2,{"d":"e"}] 索引 2 才是 dict
+   （我之前写成索引 3，超界）。修复：assert [2]。
+2. test_run_evaluation_signature_four_params：实际有 5 个参数
+   （含 tolerance_chars）。修复：改 5 参数。
+3. test_report_provenance_has_report_version_field：provenance 实际不
+   重复 report_version（在顶层），但含其他字段。修复：换成验证
+   devset_status 不在 provenance 里。
+
+### 下一步建议
+- 候选 GJ：evaluation/metrics.py 第五轮
+- 候选 GK：evaluation/annotation_metrics.py 第五轮
+- 候选 GL：evaluation/report.py 第五轮
+- 候选 GM：app/parsers/markdown_parser.py 第四轮
+- 候选 GN：app/parsers/html_parser.py 第四轮
+- 候选 GO：app/parsers/ipynb_parser.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GJ（evaluation/metrics.py 第五轮）。metrics 已有 4 轮，
+第五轮可深入 _strip_unicode_whitespace/_is_valid_bbox/_null/_ratio
+等 helper 边界与 compute_automatic_metrics 全字段验证。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 131 后）：10158 pass / 0 fail / 13 skip（HEAD `b2af63d`）
+
+---
