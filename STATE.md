@@ -2629,3 +2629,41 @@
 - 本 worktree（Round 55 后）：1908 pass / 0 fail / 9 skip（HEAD `c7e0a09`）
 
 ---
+
+## Round 56（2026-08-04）：候选 BM — markdown_parser 内部边角覆盖
+
+### 做了什么
+- 候选 BM：新建 `tests/test_parsers_markdown_edges.py`（63 个测试）覆盖 `app/parsers/markdown_parser.py`（326 行）的模块级常量 + 内部 helper 边角，与已有 `test_parsers_markdown.py`（74 个）互补。
+- 重点覆盖项：
+  - **模块级常量** 7 个：_MD_EXTENSIONS 是 tuple、全小写、9 个 regex 都是 re.Pattern、MarkdownParser 类属性、是 Parser 子类、无参构造
+  - **_split_pipe_row 边角** 13 个：基本/无外 pipe/单边 pipe/单 cell/空 cell/每 cell strip/3 列/多列/仅 pipe/返 list/返 str/空字符串
+  - **_rows_to_md 边角** 9 个：空 list 返 ""、单行无 body 仍 header+separator、两行、jagged 用空填充、单列、多列、返 str、separator 用 --- 三横
+  - **_is_pipe_table_start 边界** 7 个：最后一行 False、越界 index False、负 index、合法两行 True、第一行非 pipe False、第二行非 separator False、返 bool 类型
+  - **_detect_md_source_type 边角** 6 个：dotfile、双扩展名、返 str、unknown suffix raise、错误消息含 suffix、无扩展名含 '(无)'
+  - **MarkdownParser 实例复用** 3 个：可解析多文件、无 counter 状态泄漏、单文档内 element_id 严格递增
+  - **错误路径 details** 2 个：file_not_found 含 path、unsupported_type 含 suffix
+  - **Document 字段** 4 个：metadata={markdown: True}、有 elements 时 warnings=[]、空文件 1 个 warning、warning 含非空 reason
+  - **大文件/Unicode/换行** 5 个：10K 行大文件、UTF-8 emoji+CJK、CRLF、混合 LF/CRLF/CR、单字节文件
+  - **schema 通过 + element 字段** 6 个：通过 schema、confidence 固定 0.95、metadata 是 dict、source_locator 含 line、chunks/relations/errors 空
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。63 个新测试一次通过。
+
+### 下一步建议
+- 候选 BN：app/parsers/html_parser.py 内部边角
+- 候选 BO：app/parsers/ipynb_parser.py 内部边角（已有 38 个直接测试）
+- 候选 BP：app/parsers/fallback_parser.py 内部边角（已有 79 个）
+- 候选 BQ：app/parsers/kreuzberg_parser.py 内部边角（已有 53 个）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BN（html_parser 内部边角）。理由：
+1. html_parser.py 含 HTMLParser 子类 + 多个 handler 方法
+2. HTML 解析逻辑复杂，边角测试有助于稳定行为
+3. 之后扩展到 BO（ipynb）完成所有文本型 parser 内部边角
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 56 后）：1971 pass / 0 fail / 9 skip（HEAD `063112c`）
+
+---
