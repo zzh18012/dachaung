@@ -6793,3 +6793,70 @@ Schema 校验核心，独立于 evaluation/schema，第三轮深度空间仍在�
 - 本 worktree（Round 123 后）：9146 pass / 0 fail / 13 skip（HEAD `875f3db`）
 
 ---
+
+## Round 124（2026-08-05）：app/hash.py 第三轮（edges2）
+
+### 范围
+- 文件：`tests/test_hash_edges2.py`（新增，450 行）
+- 目标：`app/hash.py`（24 行，已有 104 测试）
+- 新增测试：53 个
+- 提交：`c00b412`
+
+### 覆盖深度
+- **compute_text_hash 输入边界**：
+  - bool True/False（int 子类，无 encode → AttributeError）
+  - int/float/bytearray/memoryview/bytes/list/dict/None 全部拒
+- **极端文本**：
+  - 1MB 长文本（流式不适用但函数应能处理）
+  - null byte / 仅 null byte
+  - 控制字符（0x01-0x1F）
+  - Latin-1 范围（0x80-0xFF）
+  - 全 ASCII（0x00-0x7F）
+  - 4 字节 UTF-8（emoji）
+  - surrogate pair emoji（ZWJ 序列）
+  - 混合 CJK + ASCII
+  - 仅空白、仅标点
+- **compute_file_hash 文件内容边界**：
+  - 全 256 字节值
+  - 全 null 字节
+  - 隐藏文件（. 前缀）
+  - 文件名仅数字
+  - 含扩展名
+  - 每个 byte 值单独文件
+- **跨函数等价性**：
+  - file_hash(file with X) == text_hash(X)
+  - 各种 unicode/CJK/控制字符
+- **稳定性**：
+  - 100 次调用同结果
+- **模块结构**：
+  - hashlib/Path 已 import
+  - 无 __all__ 定义
+  - docstring 提及 SHA / source_hash
+  - from __future__ import annotations
+- **签名深度**：
+  - file_hash: 1 参数 (path: str | Path) → str
+  - text_hash: 1 参数 (text: str) → str
+- **错误消息**：
+  - "hash" 关键字、含路径
+- 无源码改动。
+
+### 撞墙记录
+1. test_file_text_hash_equivalence_control_chars：write_text 在 Windows
+   会翻译换行符（\n → \r\n）。修复：用 write_bytes(content.encode)
+   避免 newline translation。
+
+### 下一步建议
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 GA：evaluation/cli.py 第五轮（243 行）
+- 候选 GB：app/chunkers/structural.py 第四轮
+- 候选 GE：app/pipeline.py 第五轮（216 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GE（app/pipeline.py 第五轮）。pipeline 是核心入口，
+216 行，是各个测试调用的核心函数。第五轮深度空间仍在。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 124 后）：9199 pass / 0 fail / 13 skip（HEAD `c00b412`）
+
+---
