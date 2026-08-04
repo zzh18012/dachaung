@@ -4682,3 +4682,54 @@
 - 本 worktree（Round 95 后）：6145 pass / 0 fail / 13 skip（HEAD `b3c6404`）
 
 ---
+
+## Round 96（2026-08-05）：候选 DK — evaluation/runner.py 第三轮边角
+
+### 做了什么
+- 新建 `tests/test_evaluation_runner_edges3.py`（78 个测试）第三轮覆盖
+  `evaluation/runner.py`（227 行）。已有 59 + 65 + 121 = 245 测试。
+- 重点覆盖项（聚焦报告结构精确字段）：
+  - **报告 top-level 精确 6 keys**：report_version/provenance/devset/summary/
+    per_doc/expected_failures
+  - **provenance 精确 9 keys** + evaluator_version=1.1/report_version=1.1 锁定 +
+    parser_name override + max_chars + dependencies 含 pdfplumber/python-docx/
+    pypdfium2 + ISO 时间戳 + git_commit/git_dirty 类型
+  - **devset 精确 6 keys**：status/file_count/content_group_count/pdf_count/
+    docx_count/categories_covered + 默认值
+  - **summary 精确 4 类**：counts/success_rates/ratio_macro_averages/
+    silent_drop_total + ratio_macro_averages 含 11 个 ratio 指标
+  - **per_doc public 精确 4 keys**：doc_id/source_type/metrics/wall_time_seconds
+    （明确不含 _annotation_present / _tolerance_chars / _missing_markers）
+  - **wall_time_seconds 精确 5 keys**：total/parse/chunk/parse_reason/chunk_reason
+    + parse/chunk None + reason="not_instrumented" + total > 0 when succeeds
+  - **per_doc.metrics 含**：element_count_total / pipeline_success /
+    text_preservation_equal / chunk_boundary_precision / figure_caption_precision
+    + figure_caption value=None + reason=parser_does_not_emit_relations
+  - **expected_failures 精确 4 keys**：doc_id/expected_error_code/actual_error_code/
+    matches + matches=True（match）/False（unexpected success）/False（code mismatch）
+  - **per_doc 顺序与 manifest 一致**
+  - **报告写盘**：能被 json.load 重读、indent=2、ensure_ascii=False
+  - **_process_one 错误路径**：file_not_found + total_seconds + parser_version None +
+    image_dir None + _per_doc 目录创建 + out_stub 清理
+  - **_process_one 成功路径**：document 是 dict + 含 document_id + parser_version 非 None
+  - **_load_annotation**：None/missing/directory/valid JSON/array/UTF-8 BOM
+  - **run_evaluation 防御性**：minimal manifest / unsupported extension / 深层目录 /
+    tolerance_chars default/override
+- 无源码改动。
+
+### 撞墙记录
+- 无：78 个测试一次通过。
+
+### 下一步建议
+- 候选 DL：evaluation/metrics.py 边角（第三轮）
+- 候选 DM：evaluation/manifest.py 边角（第三轮）
+- 候选 DN：evaluation/report.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DL（metrics.py 第三轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 96 后）：6223 pass / 0 fail / 13 skip（HEAD `9abe935`）
+
+---
