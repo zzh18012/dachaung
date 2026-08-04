@@ -9270,3 +9270,66 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 标注指标核心，第六轮可深入 chunk_boundary_prf 容差匹配、figure_caption_prf 启发式等。
 
 ---
+
+## Round 157（2026-08-05）：evaluation/annotation_metrics.py 第六轮（edges6）
+
+### 目标
+- 给 evaluation/annotation_metrics.py（194 行，已有 base/edges/edges2-5 共 457 测试）补第六轮
+- 深入 chunk_boundary_prf 各分支（document None、empty annotation、chunks<2、anchor 0/多、tolerance 边界、before/after、相同 marker 顺序定位）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges6.py`（66 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量**：精确值 + str 类型 + 在 __all__
+- **figure_caption_prf 深度**：
+  - 3 keys 精确（precision/recall/f1）
+  - 全 null、相同 reason
+  - None document、None annotation、both None、真实 doc、annotation 含 relation
+  - 每次返回新 dict、JSON 可序列化
+- **chunk_boundary_prf document None 路径**：3 key null + reason="pipeline_failed" + _tolerance_chars
+- **chunk_boundary_prf empty annotation**：3 key null + reason="no_annotation"
+- **chunk_boundary_prf chunks<2 路径**：
+  - 0 chunks + 有 anchors → recall=_ratio(0.0)（anchors 非空走 _ratio）
+  - 1 chunk + 0 anchors → recall=no_predicted_boundaries（anchors 空走 null）
+  - 1 chunk + 有 anchors → recall=_ratio(0.0)
+- **chunk_boundary_prf 完整匹配路径**：
+  - 完美匹配（precision/recall/f1 = 1.0）
+  - position=before/after
+  - tolerance 边界：within match / beyond miss
+  - partial match：2 chunks + 2 anchors（marker 不重叠）→ 1 match, p=1, r=1/2
+  - multiple chunks + multiple anchors
+  - 相同 marker 顺序定位（不都命中第一次）
+  - tolerance=0 仅精确匹配、tolerance=-1 永远不匹配
+- **_missing_markers 行为**：missing 时添加 key、不 missing 时无 key、空 marker 视为 missing
+- **f1 计算**：p 或 r None → f1 null、p+r=0 → f1=0.0
+- **不修改输入**：document / annotation 都不修改
+- **模块结构**：__all__ 3 项精确、imports (Counter/Any/normalize_text/_null/_ratio)、docstring 提及"启发式"/"一对一"/"tolerance"
+- **签名深度**：figure_caption_prf 2 参无默认、chunk_boundary_prf 3 参 tolerance 默认 30
+- **综合行为**：idempotent、JSON 可序列化
+
+### 撞墙记录
+- **Wall 1**：原期望 0 chunks + 有 anchors 时 recall 是 null，实际 anchors 非空走 `_ratio(0.0)`
+  分支（source code 中 `if not anchors else _ratio(0.0)`）。修复：改期望。
+- **Wall 2**：1 chunk + 0 anchors 时 recall 走 null 分支（`if not anchors` True）。
+  修复：改测试为期望 null。
+- **Wall 3**：partial match 测试用了 3 anchors 在同 stream 中，但 search_from 推进逻辑导致
+  只有第一个 marker 能找到（后续 marker 在已搜过区域）。修复：改为 2 个不重叠的 marker。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 157 后）：12535 pass / 0 fail / 13 skip（HEAD `8d8260f`）
+
+### 下一步建议
+- 候选 HV：evaluation/schema.py 第六轮
+- 候选 HW：evaluation/schema_validation.py 第六轮
+- 候选 HX：app/cli.py 第七轮
+- 候选 HY：app/parsers/markdown_parser.py 第七轮
+- 候选 HZ：app/parsers/html_parser.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HV（evaluation/schema.py 第六轮）。schema.py 是 evaluation 模块的 schema 调度层，
+第六轮可深入 validate/validate_file 的 schema_name 调度、错误聚合等。
+
+---
