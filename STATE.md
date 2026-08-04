@@ -3294,3 +3294,42 @@
 - 本 worktree（Round 71 后）：3224 pass / 0 fail / 12 skip（HEAD `7e641e3`）
 
 ---
+
+## Round 72（2026-08-05）：候选 CI — app/models.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CI：新建 `tests/test_models_edges2.py`（89 个测试）覆盖 `app/models.py`（154 行）的深度边角，与已有 `test_models.py`（55）+ `test_models_edges.py`（59）互补。
+- 重点覆盖项：
+  - **模块结构** 12 个：SCHEMA_VERSION/ElementType/SourceType 常量都存在；imports（dataclass/field/asdict/Any/Literal/Optional）都绑定；无 __all__
+  - **Element 深度** 24 个：parent_id 默认 None、confidence 默认 1.0、metadata 默认 {}、metadata 隔离、to_dict 7 个 key 精确集、source_locator/resource_path/confidence/parent_id 各字段透传、content+resource_path 校验（都 None raises、都给 OK）、whitespace content 是 truthy（不 raise）、Unicode metadata、is_dataclass、to_dict 返新对象（asdict 深拷贝）
+  - **Chunk 深度** 18 个：默认 metadata/source_spans、isolation、to_dict 5 个 key 精确集、source_element_ids=[''] 接受（列表 truthy 即可）、whitespace text 是 truthy（不 raise）、Unicode text、各 __post_init__ 错误路径
+  - **Relation 深度** 8 个：to_dict 4 个 key 精确集（含 metadata，asdict 总返 4）、空字符串字段接受、Unicode type、is_dataclass
+  - **WarningRecord/ErrorRecord** 16 个：details None 时 2 key、非 None 时 3 key（含空 dict）、Unicode、complex details、is_dataclass、mutable
+  - **Document 深度** 19 个：to_dict 13 个 key 精确集、含 SCHEMA_VERSION 常量值、各默认值、metadata 隔离、完整嵌套结构、mutable、**to_dict 共享 metadata 引用（非深拷贝）**、parser_version 复杂字符串、Unicode metadata
+  - **跨 dataclass** 2 个：都有 to_dict 方法、callable
+- 无源码改动。
+
+### 撞墙记录
+- 4 次撞墙：
+  1. **test_element_raises_when_whitespace_content_and_resource_none** 失败：whitespace `"   "` 是 truthy（`bool("   ")` is True），所以 `"   " or None` 返 `"   "` → 不 raise。修复：改测「whitespace 通过」。
+  2. **test_chunk_raises_when_text_whitespace_only** 同上原因。修复：改测「whitespace 通过」。
+  3. **test_relation_to_dict_returns_three_keys_minimum** 失败：Relation.to_dict 用 asdict → 总返 4 个 key（含 metadata 默认 {}）。修复：assert 4 key 精确集。
+  4. **test_document_to_dict_does_not_share_references** 失败：Document.to_dict `"metadata": self.metadata` 直接引用，不深拷贝。修复：改测「共享引用」（反映实际行为，提示调用方需自行 copy）。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CF：app/chunkers/structural.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CK：app/cli.py 边角（业务 CLI）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CK（app/cli.py 边角）。理由：
+1. app/cli.py 是业务 CLI（parse / validate 子命令）
+2. 含 argparse、--parser/--max-chars 选项、退出码、stdout/stderr 输出
+3. 与 evaluation/cli.py 形成完整 CLI 双层（业务 + 评测）覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 72 后）：3313 pass / 0 fail / 12 skip（HEAD `de3ef3f`）
+
+---
