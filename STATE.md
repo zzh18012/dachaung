@@ -3967,3 +3967,57 @@
 - 本 worktree（Round 83 后）：4837 pass / 0 fail / 13 skip（HEAD `87cf447`）
 
 ---
+
+## Round 84（2026-08-05）：候选 CV — evaluation/report.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CV：新建 `tests/test_evaluation_report_edges2.py`（124 个测试）覆盖
+  `evaluation/report.py`（200 行）的深度边角，与已有 `test_evaluation_report.py`（90+）+
+  `test_evaluation_report_edges.py`（65+）互补。
+- 重点覆盖项：
+  - **模块常量** 21 个：_RATIO_METRICS（12 个 metric 完整枚举）、_COUNT_METRICS（1）、
+    _SUCCESS_BOOL_METRICS（1）、不含 figure_caption_*、无重复、tuple 类型
+  - **get_git_provenance 第二轮** 14 个：返 dict/2 键、commit str|None、dirty bool、
+    timeout/FileNotFoundError/SubprocessError 处理、empty stdout/returncode nonzero/
+    porcelain 非空/porcelain 为空 各种场景
+  - **get_dependency_versions 第二轮** 8 个：3 键、所有 str|None、
+    PackageNotFoundError/generic exception 处理、partial failure
+  - **build_provenance 第二轮** 19 个：9 键完整、max_chars int 转换/float 截断/
+    负数/0/large、parser_name/version 透传、timestamp ISO 合法+时区、
+    dependencies 3 键
+  - **build_devset_section 第二轮** 12 个：6 键、各字段透传、types preserved
+  - **aggregate_summary 第二轮** 30 个：4 顶层键、counts/success_rates 各单 metric、
+    ratio_macro_averages 12 metric 完整、极端值（0/1/mixed/null）、
+    silent_drop_total 单值/聚合/含 None/全 None、不修改输入、
+    unknown metrics 忽略、100 docs 性能、空 metrics dict
+  - **__all__ 与模块结构** 13 个：5 个 public 导出、internal 常量不在 __all__、
+    imports 验证
+  - **signature 验证** 4 个：4 个函数参数
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_get_git_provenance_default_dirty_true_when_no_git` 预期 dirty=True，
+  实际 False。原因：subprocess 本身成功（仅 git 返非 0），不进 except 分支；
+  dirty=bool(False and ...)=False。修复：测试改为验证实际行为。
+- wall 2：`test_get_git_provenance_porcelain_returncode_nonzero_dirty_true` 同上。
+- wall 3：`test_aggregate_summary_handles_missing_metrics_field` 预期不抛错，
+  实际 KeyError。原因：函数假定每个 doc 有 'metrics' 字段，不做 dict.get。
+  修复：测试改为验证抛 KeyError。
+
+### 下一步建议
+- 候选 CW：evaluation/metrics.py 边角（第二轮）
+- 候选 CX：evaluation/annotation_metrics.py 边角（第二轮）
+- 候选 CY：evaluation/schema.py 边角（第二轮）
+- 候选 CZ：app/pipeline.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CW（evaluation/metrics.py 边角第二轮）。理由：
+1. metrics.py 是评测指标计算的核心（automatic metrics）
+2. 含 ratio/bool/count 多种 metric 计算，边界（分母为 0、None 输入、image_base_dir 缺失）多
+3. 与 Round 84 report.py 的 summary 聚合互补，闭环 evaluation/ 指标侧
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 84 后）：4961 pass / 0 fail / 13 skip（HEAD `24159fe`）
+
+---
