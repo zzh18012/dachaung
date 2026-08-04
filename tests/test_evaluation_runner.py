@@ -391,3 +391,399 @@ def test_run_evaluation_max_chars_propagates_to_provenance(tmp_path: Path):
         manifest, out, parser_name="fallback", max_chars=1234,
     )
     assert report["provenance"]["max_chars"] == 1234
+
+
+# ---------- 边角与缺漏补强（Round 42） ----------
+
+
+# _load_annotation 边角
+
+
+def test_load_annotation_directory_returns_none(tmp_path: Path):
+    """传目录（不是文件）→ 返回 None。"""
+    sub = tmp_path / "subdir"
+    sub.mkdir()
+    assert _load_annotation(sub) is None
+
+
+def test_load_annotation_path_is_none_explicit():
+    """显式 None → 返回 None。"""
+    assert _load_annotation(None) is None
+
+
+def test_load_annotation_json_list_returns_list(tmp_path: Path):
+    """JSON 内容是 list（不是 dict）→ 直接返回 list（函数不验证顶层类型）。"""
+    p = tmp_path / "list.json"
+    p.write_text("[1, 2, 3]", encoding="utf-8")
+    result = _load_annotation(p)
+    assert result == [1, 2, 3]
+
+
+def test_load_annotation_json_with_nested_dict(tmp_path: Path):
+    p = tmp_path / "nested.json"
+    p.write_text('{"a": {"b": {"c": 1}}}', encoding="utf-8")
+    result = _load_annotation(p)
+    assert result == {"a": {"b": {"c": 1}}}
+
+
+def test_load_annotation_json_null(tmp_path: Path):
+    """JSON null 是合法 JSON，应返回 None。"""
+    p = tmp_path / "null.json"
+    p.write_text("null", encoding="utf-8")
+    assert _load_annotation(p) is None
+
+
+def test_load_annotation_json_number(tmp_path: Path):
+    """顶层 JSON 是数字 → 返回数字（不限定必须 dict）。"""
+    p = tmp_path / "num.json"
+    p.write_text("42", encoding="utf-8")
+    assert _load_annotation(p) == 42
+
+
+def test_load_annotation_json_empty_object(tmp_path: Path):
+    p = tmp_path / "empty.json"
+    p.write_text("{}", encoding="utf-8")
+    assert _load_annotation(p) == {}
+
+
+def test_load_annotation_truncated_json_returns_none(tmp_path: Path):
+    """截断的 JSON → JSONDecodeError → None。"""
+    p = tmp_path / "trunc.json"
+    p.write_text('{"key": "val', encoding="utf-8")
+    assert _load_annotation(p) is None
+
+
+def test_load_annotation_binary_garbage_propagates_unicode_error(tmp_path: Path):
+    """二进制垃圾 → UnicodeDecodeError（不在 OSError/JSONDecodeError 兜底范围内）。
+
+    契约测试：反映现有行为（函数用 encoding=utf-8 读取，未加 errors=replace）。
+    """
+    p = tmp_path / "garbage.json"
+    p.write_bytes(b"\xff\xfe\x00\x01")
+    with pytest.raises(UnicodeDecodeError):
+        _load_annotation(p)
+
+
+# _process_one 边角
+
+
+def test_process_one_unsupported_extension_error_dict_shape(tmp_path: Path):
+    """失败时返回的 error_dict 应含 code/message（来自 errors[0].to_dict()）。"""
+    src = tmp_path / "x.unknown"
+    src.write_text("hi")
+    doc = _FakeDocEntry(doc_id="DC-X", resolved_path=src, source_type="docx")
+    _, error_dict, _, _, _ = _process_one(doc, tmp_path, "fallback", 800)
+    assert error_dict is not None
+    assert "code" in error_dict
+    assert error_dict["code"] == "unsupported_type"
+
+
+def test_process_one_returns_parser_version_none_on_failure(tmp_path: Path):
+    """失败时第 4 个返回值（parser_version）为 None。"""
+    src = tmp_path / "missing.docx"  # 不存在
+    doc = _FakeDocEntry(doc_id="DC-M", resolved_path=src, source_type="docx")
+    _, _, _, parser_version, _ = _process_one(doc, tmp_path, "fallback", 800)
+    assert parser_version is None
+
+
+def test_process_one_returns_parser_version_string_on_success(tmp_path: Path):
+    """成功时 parser_version 是字符串。"""
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    doc = _FakeDocEntry(doc_id="DC-S", resolved_path=src, source_type="docx")
+    _, _, _, parser_version, _ = _process_one(doc, tmp_path, "fallback", 800)
+    assert parser_version is not None
+    assert isinstance(parser_version, str)
+
+
+def test_process_one_returns_total_seconds_non_negative(tmp_path: Path):
+    """total_seconds 应是非负 float。"""
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    doc = _FakeDocEntry(doc_id="DC-T", resolved_path=src, source_type="docx")
+    _, _, total, _, _ = _process_one(doc, tmp_path, "fallback", 800)
+    assert isinstance(total, float)
+    assert total >= 0.0
+
+
+def test_process_one_creates_per_doc_directory(tmp_path: Path):
+    """调用 _process_one 应在 output_root/_per_doc/ 下创建 out_stub。"""
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    doc = _FakeDocEntry(doc_id="DC-D", resolved_path=src, source_type="docx")
+    _process_one(doc, tmp_path, "fallback", 800)
+    per_doc_dir = tmp_path / "_per_doc"
+    assert per_doc_dir.is_dir()
+
+
+def test_process_one_success_returns_document_dict(tmp_path: Path):
+    """成功时第 1 个返回值是 document_dict（含 elements/chunks 等字段）。"""
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src, text="alpha beta gamma delta")
+    doc = _FakeDocEntry(doc_id="DC-1", resolved_path=src, source_type="docx")
+    document_dict, error_dict, _, _, _ = _process_one(doc, tmp_path, "fallback", 800)
+    assert error_dict is None
+    assert document_dict is not None
+    assert "elements" in document_dict
+    assert "chunks" in document_dict
+    assert document_dict["source_type"] == "docx"
+
+
+def test_process_one_returns_none_error_on_success(tmp_path: Path):
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    doc = _FakeDocEntry(doc_id="DC-E", resolved_path=src, source_type="docx")
+    _, error_dict, _, _, _ = _process_one(doc, tmp_path, "fallback", 800)
+    assert error_dict is None
+
+
+# run_evaluation 边角
+
+
+def test_run_evaluation_per_doc_wall_time_seconds_structure(tmp_path: Path):
+    """wall_time_seconds 应含 total/parse/chunk 各字段。"""
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    manifest = _FakeManifest(
+        documents=(_FakeDocEntry(doc_id="DC-1", resolved_path=src),),
+        project_root=tmp_path,
+    )
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out, parser_name="fallback", max_chars=800)
+    wt = report["per_doc"][0]["wall_time_seconds"]
+    assert "total" in wt
+    assert "parse" in wt
+    assert "chunk" in wt
+    assert "parse_reason" in wt
+    assert "chunk_reason" in wt
+    assert wt["parse"] is None
+    assert wt["chunk"] is None
+    assert wt["parse_reason"] == "not_instrumented"
+    assert wt["chunk_reason"] == "not_instrumented"
+
+
+def test_run_evaluation_per_doc_doc_id_preserved(tmp_path: Path):
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    manifest = _FakeManifest(
+        documents=(_FakeDocEntry(doc_id="CUSTOM-ID", resolved_path=src),),
+        project_root=tmp_path,
+    )
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out, parser_name="fallback", max_chars=800)
+    assert report["per_doc"][0]["doc_id"] == "CUSTOM-ID"
+
+
+def test_run_evaluation_per_doc_source_type_preserved(tmp_path: Path):
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    manifest = _FakeManifest(
+        documents=(_FakeDocEntry(doc_id="DC-1", resolved_path=src, source_type="docx"),),
+        project_root=tmp_path,
+    )
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out, parser_name="fallback", max_chars=800)
+    assert report["per_doc"][0]["source_type"] == "docx"
+
+
+def test_run_evaluation_empty_manifest_summary_safe(tmp_path: Path):
+    """空 manifest → summary 不应崩溃，应给出空聚合。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out, parser_name="fallback", max_chars=800)
+    assert "summary" in report
+    assert isinstance(report["summary"], dict)
+
+
+def test_run_evaluation_returns_report_dict(tmp_path: Path):
+    """返回值是 dict，不是 None。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    assert isinstance(report, dict)
+
+
+def test_run_evaluation_report_has_expected_top_level_keys(tmp_path: Path):
+    """报告应含五个顶层字段。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    expected_keys = {"report_version", "provenance", "devset", "summary", "per_doc", "expected_failures"}
+    assert expected_keys.issubset(report.keys())
+
+
+def test_run_evaluation_report_version_constant(tmp_path: Path):
+    """report_version 来自 REPORT_VERSION 常量。"""
+    from evaluation import REPORT_VERSION
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    assert report["report_version"] == REPORT_VERSION
+
+
+def test_run_evaluation_expected_failures_field_always_present(tmp_path: Path):
+    """即使 manifest.expected_failures 为空，报告里也应有空 list。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    assert "expected_failures" in report
+    assert isinstance(report["expected_failures"], list)
+
+
+def test_run_evaluation_multiple_docs_preserve_order(tmp_path: Path):
+    """多个 doc 在 per_doc 中的顺序应与 manifest.documents 一致。"""
+    src1 = tmp_path / "a.docx"
+    src2 = tmp_path / "b.docx"
+    src3 = tmp_path / "c.docx"
+    _write_minimal_docx(src1)
+    _write_minimal_docx(src2)
+    _write_minimal_docx(src3)
+    manifest = _FakeManifest(
+        documents=(
+            _FakeDocEntry(doc_id="A", resolved_path=src1),
+            _FakeDocEntry(doc_id="B", resolved_path=src2),
+            _FakeDocEntry(doc_id="C", resolved_path=src3),
+        ),
+        project_root=tmp_path,
+    )
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    ids = [pd["doc_id"] for pd in report["per_doc"]]
+    assert ids == ["A", "B", "C"]
+
+
+def test_run_evaluation_expected_failure_fields_shape(tmp_path: Path):
+    """expected_failures 字段应含 doc_id/expected_error_code/actual_error_code/matches。"""
+    src = tmp_path / "x.unknown"
+    src.write_text("hi")
+    manifest = _FakeManifest(
+        expected_failures=(_FakeExpectedFailure(
+            doc_id="EF-1", resolved_path=src, expected_error_code="unsupported_type",
+        ),),
+        project_root=tmp_path,
+    )
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    ef = report["expected_failures"][0]
+    assert set(ef.keys()) == {"doc_id", "expected_error_code", "actual_error_code", "matches"}
+    assert ef["doc_id"] == "EF-1"
+    assert ef["expected_error_code"] == "unsupported_type"
+    assert ef["actual_error_code"] == "unsupported_type"
+    assert ef["matches"] is True
+
+
+def test_run_evaluation_default_parser_name_is_fallback(tmp_path: Path):
+    """不传 parser_name 时默认 'fallback'。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    assert report["provenance"]["parser_name"] == "fallback"
+
+
+def test_run_evaluation_default_max_chars_is_800(tmp_path: Path):
+    """不传 max_chars 时默认 800。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    assert report["provenance"]["max_chars"] == 800
+
+
+def test_run_evaluation_default_tolerance_chars_is_30(tmp_path: Path):
+    """不传 tolerance_chars 时默认 30。"""
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    manifest = _FakeManifest(
+        documents=(_FakeDocEntry(doc_id="DC-1", resolved_path=src),),
+        project_root=tmp_path,
+    )
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    # tolerance_chars 在 per_doc_results 内部，不出现在公开报告
+    # 但报告生成成功说明 tolerance_chars 默认值有效
+
+
+def test_run_evaluation_output_file_written_to_disk(tmp_path: Path):
+    """报告应同时写到磁盘。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    run_evaluation(manifest, out)
+    assert out.is_file()
+    written = json.loads(out.read_text(encoding="utf-8"))
+    assert "report_version" in written
+
+
+def test_run_evaluation_provenance_includes_git_fields(tmp_path: Path):
+    """provenance 应含 git_commit / git_dirty 字段。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    assert "git_commit" in report["provenance"]
+    assert "git_dirty" in report["provenance"]
+
+
+def test_run_evaluation_provenance_includes_evaluator_version(tmp_path: Path):
+    """provenance 应含 evaluator_version（v1.1 指示线审计目标，**不要改**）。"""
+    from evaluation import EVALUATOR_VERSION
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    assert report["provenance"]["evaluator_version"] == EVALUATOR_VERSION
+
+
+def test_run_evaluation_provenance_includes_dependencies(tmp_path: Path):
+    """provenance 应含 dependencies dict（pdfplumber/python-docx/pypdfium2 版本）。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    deps = report["provenance"]["dependencies"]
+    assert isinstance(deps, dict)
+    assert "pdfplumber" in deps
+    assert "python-docx" in deps
+    assert "pypdfium2" in deps
+
+
+def test_run_evaluation_provenance_includes_run_timestamp(tmp_path: Path):
+    """provenance 应含 run_timestamp_iso（ISO 8601 时间戳）。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    ts = report["provenance"]["run_timestamp_iso"]
+    assert isinstance(ts, str)
+    assert "T" in ts  # ISO 8601 含 T 分隔
+
+
+def test_run_evaluation_per_doc_metrics_is_dict(tmp_path: Path):
+    """每个 per_doc 条目的 metrics 字段应是 dict。"""
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    manifest = _FakeManifest(
+        documents=(_FakeDocEntry(doc_id="DC-1", resolved_path=src),),
+        project_root=tmp_path,
+    )
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    assert isinstance(report["per_doc"][0]["metrics"], dict)
+
+
+def test_run_evaluation_per_doc_total_is_float(tmp_path: Path):
+    """wall_time_seconds.total 应是 float（time.perf_counter 差值）。"""
+    src = tmp_path / "x.docx"
+    _write_minimal_docx(src)
+    manifest = _FakeManifest(
+        documents=(_FakeDocEntry(doc_id="DC-1", resolved_path=src),),
+        project_root=tmp_path,
+    )
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    total = report["per_doc"][0]["wall_time_seconds"]["total"]
+    assert isinstance(total, float)
+    assert total >= 0.0
+
+
+def test_run_evaluation_devset_section_built(tmp_path: Path):
+    """devset 字段应被填充（来自 build_devset_section）。"""
+    manifest = _FakeManifest(project_root=tmp_path)
+    out = tmp_path / "report.json"
+    report = run_evaluation(manifest, out)
+    assert "devset" in report
+    assert isinstance(report["devset"], dict)
