@@ -599,3 +599,69 @@
 - 本 worktree（Round 9 后）：282 pass / 0 fail / 9 skip（HEAD `89595d2`）
 
 ---
+
+## 2026-08-04 — Round 10（source_spans：字符级可追溯）
+
+**做了什么**：
+- 完成候选 E（推迟 9 轮的技术债）：给每个 chunk 增加 `source_spans`，给出被引用 element 在其 content 中的字符区间
+- **Schema 变更**（向后兼容）：
+  - `chunk` 增加可选字段 `source_spans: array<source_span>`
+  - 新增 `$defs/source_span`：`{element_id: str, start: int ≥0, end: int ≥0}`，`additionalProperties: false`
+- **Chunk model**：增加 `source_spans: list[dict]` 字段，默认空列表
+- **StructuralChunker 重构**：
+  - `_element_text` → `_element_text_with_span`，返回 `(stripped_text, start, end)`，其中 start/end 是 stripped 部分在 `el.content` 中的字符位置（用 `lstrip` 长度推算，不依赖 find 避免内容重复时定位错）
+  - `_ChunkBuffer.push_text` 接收 `(text, element_id, start, end)`；`flush()` 输出 `source_spans` 与 `source_element_ids` 并行
+  - `_SplitPiece` 增加 `start/end`；`_split_long_text` 与 `_hard_split_with_whitespace_fallback` 全程跟踪位置
+  - 长段落切分路径通过 `el_start` 偏移把 piece 位置映射回 `element.content` 坐标
+  - 隔离 chunk（table/image/caption）输出单个 span 覆盖整个 element content
+  - 顺序累积路径每个 push 输出一个 span
+- **8 个新测试**（`tests/test_chunker.py`）：
+  - 两段一个 chunk / heading 硬边界 / table 隔离 / 长段落切分位置正确 / 首尾空白偏移 / 端到端 span→text 还原 / 空 image / to_dict schema 校验
+  - 关键不变量测试 `test_source_spans_chunk_text_alignment`：用 span 把 element.content 切回，其非空白字符序列必须等于 chunk.text 的非空白字符序列
+- 不变量保持：
+  - `evaluator_version` / `report_version` 仍是 `"1.1"`
+  - source_spans 是 optional；旧 chunker 输出（不带 spans）依然 schema 合法
+  - `pipeline.process_single` 签名不变
+  - `chunk_id` / `source_element_ids` 语义不变
+- commit `7641a86`，已 push
+
+**意义**：
+- 未来评测可以升级到字符级精度（v1.2 baseline）：直接用 source_spans 切回 element.content，做严格的"不丢不重"验证，替代当前 `_text_preservation` 的"非空白字符序列"妥协口径
+- chunk 现在能精确定位到 element.content 的字符区间，为 KVFS 集成、向量化精确归属、白盒调试都铺好基础
+
+**worktree 当前状态**：
+- HEAD `7641a86`，工作树清洁
+- 测试基线：290 pass / 0 fail / 9 skip（+8 vs Round 9）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 11）
+
+**首要任务**：方向选择
+
+- 候选 M（新提，推荐）：**evaluator v1.2 — 用 source_spans 做字符级 text_preservation**
+  - 现状：source_spans 已就绪，但 evaluator 还在用 v1.1 的"非空白字符序列"口径
+  - 复杂度：中（加新指标 `text_preservation_spans_equal`；旧指标保留为兼容字段；bump evaluator_version 到 1.2）
+  - 价值：终于兑现 Round 8 审计 §2.7 写的"治本方案"
+  - 不变量冲突：bump evaluator_version 与"指示线 v2.x 审计"目标可能冲突，但自跑线已多次 bump 过（v1.0→v1.1），且这是合理的版本演进
+
+- 候选 N（新提）：**inspect 子命令加 --spans 模式**
+  - 现状：CLI inspect 能看 elements/chunks 但看不到 spans
+  - 复杂度：低（加个 flag，pretty-print spans）
+  - 价值：开发期调试 source_spans 的可视化工具
+
+- 候选 D：补 fallback parser 的覆盖率
+- 候选 L：inspect 加 --metrics 模式（单文档跑评测指标）
+
+**建议**：选 N（inspect --spans）。理由：
+1. 体积小（~30 行 + 几个测试）
+2. 让 source_spans 的实际产出可观察、可调试
+3. M（v1.2 evaluator）可在 Round 12 推进，先把基础工具补齐
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 10 后）：290 pass / 0 fail / 9 skip（HEAD `7641a86`）
+
+---
