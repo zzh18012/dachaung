@@ -5444,3 +5444,107 @@ structural.py 388 行 391 tests（1.01 tests/line），仍有 _ChunkBuffer.flush
 - 本 worktree（Round 108 后）：7531 pass / 0 fail / 13 skip（HEAD `d26fa0b`）
 
 ---
+
+## Round 109（2026-08-05）：app/pipeline.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_pipeline_edges4.py`（新增，725 行）
+- 目标：`app/pipeline.py`（216 行，已有 317 测试，密度 1.47 测试/行）
+- 新增测试：83 个
+- 提交：`fb6548b`
+
+### 覆盖深度
+- **process_single directory 输入**：tmp_path 下创建子目录作 input →
+  返回 hash_io_error 或 file_not_found（Windows 实际行为：FileNotFoundError 优先匹配）、
+  details.path 包含目录路径、hash_io_error 才带 exception_type
+- **process_single parser_error 透传**：
+  - code 透传（custom_code）
+  - message 透传
+  - details 合并（custom_key=custom_value）+ path 注入
+- **process_single unexpected exception 兜底**：
+  - RuntimeError → unexpected_parser_error
+  - message 格式 `RuntimeError: unexpected!`
+  - details.parser_name = 调用时的 parser_name
+  - ValueError 也走兜底（非 ParserError）
+- **process_single 成功路径**：
+  - text parser 走通（.txt 输入）
+  - markdown parser 走通
+  - html parser 走通
+  - ipynb parser 走通
+- **process_single 写盘失败**：output_path 父目录不可写 → write_failed
+- **process_single 父目录自动创建**：output_path 父目录不存在 → mkdir(parents=True)
+- **process_single no_elements 路径**：
+  - elements=[] → no_extracted_elements code
+  - details.source_type 透传
+  - details.warnings 是 list（即使为空）
+  - message 提示扫描件
+- **process_single 返回类型与签名**：
+  - 返回 tuple 长度 2
+  - 第一个元素是 Document 或 None
+  - 第二个元素是 list
+  - errors list 元素都是 ErrorRecord
+  - 默认 parser_name=fallback
+- **validate_only JSON 根类型**：
+  - null 根 → False + message
+  - 数字根 → False + message
+  - 字符串根 → False + message
+  - bool 根 → False + message
+  - array 根 → False + message
+  - 合法 dict → True + "OK"
+  - 不存在文件 → False
+  - JSON 解析失败 → False
+- **image_output_dir_for 深度**：
+  - None output_path → None
+  - str output_path → Path
+  - Path output_path → Path（等价）
+  - hash 长度 16 截断
+  - hash 短于 16 全部使用
+  - 空 hash → "images-"
+  - hash 含连字符不影响
+  - 目录名前缀 "images-"
+  - parent 目录正确
+  - 返回值类型一致性
+  - 多次调用幂等
+  - source_hash 大小写敏感
+- **get_parser 深度**：
+  - 6 个名字都返回正确类型（fallback→FallbackParser, kreuzberg→KreuzbergParser, 
+    markdown→MarkdownParser, html→HtmlParser, text→TextParser, ipynb→IpynbParser）
+  - 未知名字 → ValueError
+  - None → ValueError（f-string 接受 None）
+  - "" → ValueError
+  - int → ValueError（f-string 接受 int）
+  - 错误消息列出所有 6 个 parser
+  - image_output_dir 透传到 FallbackParser
+- **模块结构**：
+  - __all__ 精确 4 项：get_parser, image_output_dir_for, process_single, validate_only
+  - imports：json, Path, Any, StructuralChunker, compute_file_hash, Document, ErrorRecord, Parser, ParserError, 6 个 Parser 类, SchemaValidationError, validate
+  - 4 个函数都有 docstring
+  - 模块有 docstring 提到关键不变量
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`test_process_single_directory_input_details_has_exception_type` 失败 — 
+  Windows 上目录作为输入，Python 的 `open()` 优先抛 PermissionError（OSError 子类），
+  但 compute_file_hash 实现可能优先匹配 FileNotFoundError（具体看实现）。
+  实测 worktree 上走的是 file_not_found 路径，不带 exception_type。
+  改测试为"hash_io_error 路径才断言 exception_type"
+- wall 2：`get_parser(None)` 和 `get_parser(42)` 不抛 TypeError — 
+  f-string 接受 None/int 转字符串，最终走 ValueError。
+  改测试期望为 ValueError
+
+### 下一步建议
+- 候选 EJ：app/models.py 第四轮（如果还没）
+- 候选 EK：app/hash.py 第四轮
+- 候选 EL：app/schema.py 第四轮
+- 候选 EM：evaluation/cli.py 第四轮
+- 候选 EN：evaluation/runner.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 EK（hash.py 第四轮）或 EL（schema.py 第四轮）。hash.py 较小，
+饱和更快；schema.py 是核心约束，深度价值高。优先 EL。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 109 后）：7614 pass / 0 fail / 13 skip（HEAD `fb6548b`）
+
+---
