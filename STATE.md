@@ -45,6 +45,68 @@
 
 ---
 
+## 2026-08-04 — Round 2（Markdown parser）
+
+**做了什么**：
+- 完成候选 B：实现 `MarkdownParser`（`app/parsers/markdown_parser.py`，~330 行）
+- 纯 stdlib 实现的 CommonMark 子集，无新依赖
+- 支持的块类型：
+  - ATX 标题（`#`..`######`，含闭合 `#`）
+  - 段落（空行分隔）
+  - 无序列表（`-`/`*`/`+`）与有序列表（`1.`/`1)`）
+  - 围栏代码块（``` 与 `~~~`），记录 `metadata.language`
+  - 引用块（连续 `>` 行合并）
+  - pipe 表格（`| a | b |` + `|---|---|`）
+  - 独立图片行（`![alt](url)` → `image` element）
+  - 主题分隔符（`---`/`***`/`___`）忽略
+- `source_locator = {"line": N, "section_path": "H1 > H2 ..."}`：跟踪 ATX 标题栈，同级或更高级标题弹出
+- 明确不支持的（docstring 中列出）：setext 标题、嵌套列表、缩进代码块、ref-style 链接、YAML frontmatter、原生 HTML 块、表格列对齐
+- 配套修改：
+  - `app/models.py`：`SourceType` 加 `"markdown"`
+  - `app/pipeline.py`：`get_parser` 加 `"markdown"` 分支
+  - `app/cli.py`：`--parser` choices 加 `markdown`
+  - `schemas/document.schema.json`：`source_type` enum 加 `markdown`；新增 `markdown_locator` $def + 对应 `if/then`
+- 新增 25 个测试（`tests/test_parsers_markdown.py`）：每种块类型、`section_path` 跟踪、行号、错误路径、schema 校验、pipeline 端到端、CLI subprocess 端到端
+- 手动 smoke：合成 12 块 .md → parse → inspect 全通过，0 warning
+- commit `91bdf46`，已 push
+
+**worktree 当前状态**：
+- HEAD `91bdf46`，工作树清洁
+- 测试基线：193 pass / 0 fail / 9 skip（+25 vs Round 1）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 3）
+
+**首要任务**：选一项推进（按价值/可行性排序）
+
+- 候选 B+（推荐）：**HTML parser**
+  - 现状：`app/parsers/` 已有 fallback / kreuzberg / markdown，加入 HTML 让输入格式更完整（dachuang 目标 3）
+  - 复杂度：中-高（HTML 比 Markdown 复杂，但 Python stdlib 自带 `html.parser`，无新依赖）
+  - 设计要点：用 `html.parser.HTMLParser` 走 SAX；按块级元素（h1-h6/p/ul/ol/li/table/pre/blockquote/img）输出 element；`source_locator = {"line": N}`（HTMLParser 提供 `getpos()`）
+
+- 候选 B++：**纯文本 parser**（`.txt`）
+  - 最简单：按空行切段，每段一个 paragraph element
+  - 价值：作为 baseline 对照（chunker 在无结构输入下的行为）
+
+- 候选 D：补 fallback parser 的覆盖率（PDF/DOCX 各路错误代码）
+- 候选 A：审计 `evaluation/metrics.py` 找 bug
+- 候选 E：实施 source_spans（独立设计，体积较大）
+
+**建议**：选 B+（HTML parser）。理由：
+1. 与 markdown parser 同接口，集成成本低
+2. Python stdlib 自带 `html.parser`，无新依赖
+3. 完成后 dachuang 输入格式矩阵：PDF / DOCX / MD / HTML（覆盖大部分文档源）
+4. Round 4 可继续推进 plain text 或换方向（A/D/E）
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 2 后）：193 pass / 0 fail / 9 skip（HEAD `91bdf46`）
+
+---
+
 ## 2026-08-04 — Round 1（inspect 子命令 + 测试）
 
 **做了什么**：
