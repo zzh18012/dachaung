@@ -107,6 +107,71 @@
 
 ---
 
+## 2026-08-04 — Round 3（HTML parser）
+
+**做了什么**：
+- 完成候选 B+：实现 `HtmlParser`（`app/parsers/html_parser.py`，~370 行）
+- 基于 stdlib `html.parser.HTMLParser` 的 SAX 风格状态机，无新依赖
+- 支持的块类型：
+  - 标题 `<h1>`..`<h6>`（含 level 元数据）
+  - 段落 `<p>` 与 body 直接子文本（loose text → paragraph）
+  - `<ul>` / `<ol>` / `<li>`（按最近外层列表决定 ordered）
+  - `<pre>`（保留换行/缩进，metadata.kind="preformatted"）
+  - `<blockquote>`（metadata.kind="blockquote"）；吸收内层 `<p>` 不改类型
+  - `<table>` / `<tr>` / `<td>` / `<th>` → markdown 表格 element
+  - `<img src=...>`（独立 image element，resource_path=src，alt 入 metadata）
+  - `<hr>` 主题分隔符（忽略）
+  - `<br>` 在段落内当作空格
+  - 字符实体（`&amp;` 等）由 `convert_charrefs=True` 自动解码
+- 跳过：`<head>` / `<title>` / `<script>` / `<style>` / `<meta>` / `<link>` / `<noscript>` 内容
+- `source_locator = {"line": N, "section_path": "H1 > H2..."}`：与 markdown parser 一致
+- 嵌套 table：记 warning `html_nested_table`，内层忽略
+- 配套修改：
+  - `app/models.py`：`SourceType` 加 `"html"`
+  - `app/pipeline.py`：`get_parser` 加 `"html"` 分支
+  - `app/cli.py`：`--parser` choices 加 `html`
+  - `schemas/document.schema.json`：`source_type` enum 加 `html`；新增 `html_locator` $def + 对应 `if/then`
+- 新增 26 个测试（`tests/test_parsers_html.py`）：每种块类型、section_path 跟踪、行号、字符实体解码、script/style/head 跳过、错误路径、schema 校验、pipeline + CLI 端到端
+- commit `e455a9c`，已 push
+
+**worktree 当前状态**：
+- HEAD `e455a9c`，工作树清洁
+- 测试基线：219 pass / 0 fail / 9 skip（+26 vs Round 2）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 4）
+
+**首要任务**：选一项推进
+
+- 候选 B++（推荐）：**纯文本 parser**（`.txt`）
+  - 现状：parsers 矩阵已含 fallback / kreuzberg / markdown / html；纯文本是最简单的 baseline
+  - 复杂度：低（按空行切段，每段一个 paragraph element）
+  - 价值：作为 baseline 对照（chunker 在无结构输入下的行为）；覆盖常见 .txt 输入
+  - 设计要点：`source_locator = {"line": N}`；支持 CRLF/LF；空文件 → warning
+
+- 候选 F（新提）：**`.ipynb` Jupyter Notebook parser**
+  - 现状：data science 场景的常见输入，stdlib `json` 即可解析 nbformat
+  - 复杂度：中（code cell + markdown cell 双类型；markdown cell 可嵌套调 MarkdownParser）
+  - 价值：扩展数据科学场景输入
+
+- 候选 D：补 fallback parser 的覆盖率（PDF/DOCX 各路错误代码）
+- 候选 A：审计 `evaluation/metrics.py` 找 bug
+- 候选 E：实施 source_spans（独立设计，体积较大）
+
+**建议**：选 B++（纯文本 parser）。理由：
+1. 与现有 parser 同接口，集成成本低（~50 行）
+2. 提供评测 baseline（无结构输入 → chunker 退化行为）
+3. 完成后 Round 5 可推进 .ipynb（候选 F）或换方向（A/D/E）
+
+### 撞墙记录
+（无）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 3 后）：219 pass / 0 fail / 9 skip（HEAD `e455a9c`）
+
+---
+
 ## 2026-08-04 — Round 1（inspect 子命令 + 测试）
 
 **做了什么**：
