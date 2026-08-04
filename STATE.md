@@ -3173,3 +3173,47 @@
 - 本 worktree（Round 68 后）：2988 pass / 0 fail / 9 skip（HEAD `218c36a`）
 
 ---
+
+## Round 69（2026-08-05）：候选 CB — evaluation/manifest.py 边角覆盖
+
+### 做了什么
+- 候选 CB：新建 `tests/test_evaluation_manifest_edges.py`（104 个测试）覆盖 `evaluation/manifest.py`（239 行）的深度边角，与已有 `tests/test_manifest.py`（64 个）互补。
+- 重点覆盖项：
+  - **_is_absolute_like 深度** 18 个：UNC `\server` 不识别（False）、单 colon `c:foo` False、大小写盘符 `C:\`/`c:\` True、`C:/foo` True、`c:\` 3 字符 True、`c:` 2 字符 False、数字/下划线盘符 False、**Unicode 中文盘符 True**（Python `.isalpha()` 对中文字符返 True）、前导空白不被 strip、just `/` True、just `\` False、`./foo`/`../foo` False、空字符串 False
+  - **_has_backslash 深度** 10 个：单/双反斜杠、末尾、中间、多个、纯 forward slash False、混合、Unicode+反斜杠、空字符串 False
+  - **_resolve_relative_path 直接调用** 10 个：返 Path/absolute、empty raises（错误消息含 field_name）、绝对 POSIX/Windows raises、反斜杠 raises（错误消息含"正斜杠"）、escape root raises、嵌套路径合法、`./foo` 合法、Unicode 文件名合法
+  - **_detect_project_root** 6 个：from file、from dir、nested dir、no-pyproject 不崩、返 Path、absolute
+  - **Manifest 属性** 10 个：frozen、file_count int、pdf_count/docx_count 0/1 切换、categories_covered list/sorted/dedup、content_group_count int/全 unpaired
+  - **DocumentEntry 默认值** 6 个：categories=()、paired_with=None、annotation_*=None、expectations=None、sha256=None
+  - **DocumentEntry 全字段** 1 个：所有字段都填充
+  - **ExpectedFailure dataclass** 5 个：source_type 默认 None、with source_type、doc_id/path_str/resolved_path/expected_error_code 各字段
+  - **load_manifest 深度** 13 个：str/Path 都接受、explicit project_root str/Path、Unicode doc_id、missing file、invalid JSON、version mismatch、returns Manifest、tuple 类型、project_root Path 类型、空 documents
+  - **ManifestError 类深度** 8 个：Exception 子类、str/repr、args[0]、caught as Exception、不等性、Unicode、chaining
+  - **__all__ 导出** 5 个：5 项精确集、排除 4 个内部 helper
+  - **模块导入** 6 个：json/Path 导入、5 个 callable 验证
+  - **复杂 paired_with** 3 个：循环 A↔B（1 group）、自配 A↔A（不崩）、配对不存在 Z（不崩）
+- 无源码改动。
+
+### 撞墙记录
+- 2 次撞墙：
+  1. **test_is_absolute_like_unicode_alpha_drive** 失败：以为 `'中'.isalpha()` 是 False，实际 Python 对中文字符返 True。修复：assert True（中文盘符被识别为绝对路径，是 Python `.isalpha()` 的实际行为）。
+  2. **test_is_absolute_like_leading_whitespace** 失败：`" /foo"` 不以 `/` 开头（以空格开头），startswith 返 False → 函数返 False。修复：assert False。
+  3. 顺手修复 docstring 中的 `\server` SyntaxWarning → 用 raw docstring `r"""..."""`。
+
+### 下一步建议
+- 候选 BW：app/manifest.py 边角（业务侧 manifest，若存在）
+- 候选 BY：app/pipeline.py 端到端边角
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CF：app/chunkers/structural.py 边角（第二轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BY（app/pipeline.py 端到端边角）。理由：
+1. pipeline.py 是业务核心，串联 parser/chunker/schema/validation 四个阶段
+2. 边角多：parser 选择、错误恢复路径、单文件失败、Schema 校验失败
+3. 与已覆盖的 evaluation 层形成完整业务-评测闭环
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 69 后）：3092 pass / 0 fail / 9 skip（HEAD `6861a30`）
+
+---
