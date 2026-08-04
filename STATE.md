@@ -1239,3 +1239,59 @@
 - 本 worktree（Round 19 后）：419 pass / 0 fail / 9 skip（HEAD `08c4e45`）
 
 ---
+
+## 2026-08-04 — Round 20（models 测试覆盖率）
+
+**做了什么**：
+- 完成候选 V：补 models dataclass 测试，新增 17 个测试到 `tests/test_models.py`
+- **Element**（4 个）：
+  - `to_dict` 含所有字段（parent_id/confidence/metadata）
+  - `resource_path` 出现在 to_dict
+  - 空字符串 content 被拒（__post_init__）
+  - content + resource_path 同时存在允许
+- **Chunk**（3 个）：to_dict 含 source_spans、默认 source_spans 空、默认 metadata 空
+- **Relation**（2 个）：to_dict 含 metadata、默认 metadata 空
+- **WarningRecord / ErrorRecord**（3 个）：details=None 时 to_dict 不含 details key；ErrorRecord with details
+- **Document**（4 个）：默认空集合、to_dict 序列化 warnings/errors、metadata 嵌套结构透传、SCHEMA_VERSION 常量值
+- commit `a90ab0c`，已 push
+
+**worktree 当前状态**：
+- HEAD `a90ab0c`，工作树清洁
+- 测试基线：435 pass / 0 fail / 9 skip（+16 vs Round 19）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 21）
+
+**首要任务**：方向选择
+
+- 候选 W（推荐）：**annotation_metrics 测试**
+  - 现状：test_annotation_metrics.py 在 Round 8 加过几个；可能还有边角
+  - 复杂度：低
+
+- 候选 X：**evaluation metrics 测试**
+  - 复杂度：低-中
+
+- 候选 Y：**manifest 测试**
+  - 复杂度：低
+
+- 候选 Z：**chunker 模糊测试**
+  - 复杂度：中
+
+- 候选 AA：**hash 模块测试**
+  - 复杂度：低
+
+- 仍阻塞：候选 J（向量化）、候选 M（evaluator v1.2）、候选 O（docs/*.md）
+
+**建议**：选 W（annotation_metrics）。理由：
+1. Round 8 修过 chunk_boundary_prf 重复 marker bug；现在应该把覆盖率补齐
+2. figure_caption_prf 也要测
+3. 复杂度低，一轮内可完成
+
+### 撞墙记录
+- 无新撞墙。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 20 后）：435 pass / 0 fail / 9 skip（HEAD `a90ab0c`）
+
+---
