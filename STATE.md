@@ -5828,3 +5828,90 @@ edges3 已饱和，但 edges4 仍有空间覆盖 HTMLParser 回调深度。
 - 本 worktree（Round 112 后）：7923 pass / 0 fail / 13 skip（HEAD `d0d933d`）
 
 ---
+
+## Round 113（2026-08-05）：app/parsers/html_parser.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_parsers_html_edges4.py`（新增，1125 行）
+- 目标：`app/parsers/html_parser.py`（446 行，已有 106+ 测试）
+- 新增测试：144 个
+- 提交：`bb343d1`
+
+### 覆盖深度
+- **_rows_to_md 深度**：3 列 2 行 body、separator 用 `---`、cell 含 `|`、
+  jagged padding、空 rows 返回 `""`、单 cell、空 string cell、
+  cell 含 `\n`、全空 rows
+- **模块常量深度**：
+  - _HTML_EXTENSIONS = (".html", ".htm")
+  - _HEADING_LEVELS 6 个、值 1..6、h1/h4/h6 各自映射
+  - _SKIP_TAGS 含 script/style/head/title/meta/link/noscript、count=7
+- **_detect_html_source_type 边界**：html/htm 大小写、无后缀/txt/pdf/docx 拒、
+  ParserError code="unsupported_type"、details.suffix 精确
+- **_HTMLDocParser 实例属性初始化**：14 个字段全部默认值验证、
+  convert_charrefs=True 继承
+- **handle_data 边界**：whitespace-only 不创建 paragraph、
+  loose text 创建 paragraph、skip_stack 中 data 丢弃、
+  连续 data append、空 data 无影响
+- **handle_starttag 边界**：
+  - 未知 inline tag (span/div) 忽略
+  - br 在 None kind 不 append
+  - br 在 paragraph 加 space
+  - img src 缺失/empty/whitespace → 不 emit
+  - img alt 缺失 → ""
+  - skip_stack 嵌套其他 tag 仍 skip
+  - hr flush block
+  - h1-h6 各自启动 heading block
+  - li 标记 ordered/unordered 与 list_stack 协作
+  - pre/blockquote depth 递增（嵌套）
+  - table depth 递增、嵌套 table 警告
+- **handle_startendtag 边界**：img/br/hr 自闭合、未知 tag 回落到 starttag
+- **handle_endtag 边界**：
+  - skip_stack mismatched 不崩
+  - skip_stack matching pop
+  - 无 cur_kind 的 end tag 安全
+  - ul/ol pop list_stack
+  - mismatched ul/ol 不 pop
+  - pre/blockquote depth 递减
+  - 空 table 不 emit element
+  - 有 rows table emit
+- **_flush_block 边界**：None kind noop、空 buffer no emit、
+  whitespace-only no emit、reset 后状态清空
+- **_reset_block 边界**：清空所有字段、多次调用安全
+- **_start_block 边界**：设 kind、清 buffer、flush previous、设 level/ordered
+- **_make_locator 边界**：current/inline 无 section_path、有 section_path
+- **section_path 深度跟踪**：h1+h2、h2+h1 弹出、同级 h1+h1、h3+h2+h1 全 pop
+- **HtmlParser.parse 错误路径**：
+  - UnicodeDecodeError → errors=replace fallback
+  - OSError → ParserError html_read_failed
+  - feed 异常 → ParserError html_parse_failed
+  - close 异常 → ParserError html_parse_failed
+  - file_not_found
+  - unsupported_type
+- **HtmlParser 类属性**：name/version、instance matches class、
+  issubclass、parse 签名
+- **模块结构**：__all__ 精确 1 项、imports 完整、_HTMLDocParser 存在、
+  issubclass stdlib HTMLParser、类/doc_parser 有 docstring
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`source_hash="abc"` 太短 → make_document_id 抛 ValueError。
+  改为 `source_hash="a" * 64`
+- wall 2：模块 `from html.parser import HTMLParser as _StdHTMLParser` 
+  导入别名是 `_StdHTMLParser` 不是 `HTMLParser`。改测试属性名
+
+### 下一步建议
+- 候选 FC：app/parsers/markdown_parser.py 第四轮（326 行）
+- 候选 FD：app/parsers/ipynb_parser.py 第四轮（227 行）
+- 候选 FE：app/parsers/text_parser.py 第四轮（136 行）
+- 候选 FF：evaluation/metrics.py 第四轮（381 行）
+- 候选 FG：evaluation/manifest.py 第四轮（239 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 FD（ipynb_parser.py 第四轮）。它较小、深度容易饱和；
+当前主要 parser 都到 edges4 了，统一化覆盖。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 113 后）：8067 pass / 0 fail / 13 skip（HEAD `bb343d1`）
+
+---
