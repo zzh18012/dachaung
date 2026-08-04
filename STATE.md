@@ -6017,3 +6017,87 @@ edges3 已饱和，但 edges4 仍有空间覆盖 HTMLParser 回调深度。
 - 本 worktree（Round 114 后）：8183 pass / 0 fail / 13 skip（HEAD `9c8f715`）
 
 ---
+
+## Round 115（2026-08-05）：app/parsers/markdown_parser.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_parsers_markdown_edges4.py`（新增，1093 行）
+- 目标：`app/parsers/markdown_parser.py`（326 行，已有 133 测试）
+- 新增测试：146 个
+- 提交：`950c774`
+
+### 覆盖深度
+- **正则编译验证**：9 个正则都是 re.Pattern 实例、都用 ^ 锚定
+- **_detect_md_source_type**：md/markdown 大小写变种、.ipynb/.docx/.pdf 拒、
+  details.suffix 精确（含空 string）
+- **_MD_EXTENSIONS**：= (".md", ".markdown")、count=2
+- **_split_pipe_row 深度**：空 string → ['']、'|||' strip 头尾 → ['','']、
+  单 pipe、leading/trailing pipe、no pipes、strip each cell、
+  unicode 保留、转义反斜杠、返回 list of str
+- **_is_pipe_table_start**：i=-1 / i at last / i beyond length、
+  header not pipe / separator not pipe / basic / alignment separator
+- **_rows_to_md 深度**：single row/col、2 col 3 row、separator count = col、
+  pipe count = col+1 per row、pipe in cell、jagged 3 row、
+  返回 str、空 rows 返回 ""、全空 cell
+- **heading section_path 深度**：2/3 级嵌套、pop on higher level、
+  same level replace、absent before first heading、
+  heading confidence 0.95、paragraph confidence 0.95
+- **code block 深度**：
+  - language c++（[\w+-] 接受）
+  - language f#（含 # 不匹配 → 整体 paragraph）
+  - language python3.10（含 . 不匹配 → 整体 paragraph）
+  - kind="code_block"
+  - unicode content
+  - unclosed at EOF emit
+  - empty 段 warning
+  - tilde fence
+- **thematic break**：no element emit、md_no_content warning、
+  long dashes、mixed chars
+- **standalone image 深度**：url query string、fragment、unicode alt、
+  special chars alt、consecutive images
+- **list item 深度**：unordered/ordered marker metadata、
+  inline markdown preserved、code inline、two items separate
+- **blockquote 深度**：multi-line merged、kind="blockquote"、
+  empty first line、interrupted by paragraph
+- **table 深度**：row_count、col_count、source="markdown_pipe_table"、
+  unicode cells、multiple rows、only header no data、（≥2 列约束）
+- **paragraph 深度**：no trailing newline、interrupted by heading/list/
+  code fence/blockquote/thematic break/image/table
+- **MarkdownParser 类属性**：name/version、instance match class、
+  issubclass(Parser)、parse/_parse_text 签名、docstring
+- **_parse_text 直接调用**：返回 2-tuple、各类型验证、
+  空文本/仅空白 → 空 list、document_id 注入 element_id
+- **parse 错误路径**：file_not_found、unsupported_type、md_read_failed、
+  invalid utf8 fallback、返回 Document 实例、chunks/relations/errors 空、
+  metadata 仅 markdown key
+- **模块结构**：__all__ 精确 1 项、imports 完整（re/Path/Any/Document/
+  Element/WarningRecord/Parser/ParserError/make_document_id）、
+  模块 docstring 提及 ATX/setext/pipe table
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_split_pipe_row("")` 返回 `['']` 不是 `[]`（Python str.split 保留空）
+- wall 2：`_split_pipe_row("|||")` strip 头尾 | 后剩 `|`，split → `['','']`
+- wall 3：fence 正则 `[\w+-]*` 不接受 `#`/`.`，所以 f#/python3.10 不匹配 fence，
+  整体回退为 paragraph
+- wall 4：`_PIPE_TABLE_SEP_RE` 要求至少 2 列（`(\|\s*:?-{2,}:?\s*)+`），
+  单列 `| --- |` 不匹配。改测试用 2 列
+- wall 5：SyntaxWarning `\w` 在 docstring 触发，改 raw string
+
+### 下一步建议
+- 候选 FN：app/parsers/text_parser.py 第四轮（136 行）
+- 候选 FO：app/parsers/fallback_parser.py 第五轮
+- 候选 FP：evaluation/metrics.py 第四轮
+- 候选 FQ：evaluation/manifest.py 第四轮
+- 候选 FR：evaluation/runner.py 第四轮
+- 候选 FS：app/models.py 第三轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 FN（text_parser.py 第四轮）。它是最后未做 edges4 的 parser，
+统一覆盖后转向 evaluation 模块。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 115 后）：8329 pass / 0 fail / 13 skip（HEAD `950c774`）
+
+---
