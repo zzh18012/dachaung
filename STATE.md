@@ -9878,3 +9878,62 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第六轮可深入 KreuzbergParser 类、可选 import fallback、版本字符串等。
 
 ---
+
+## Round 169（2026-08-05）：app/parsers/kreuzberg_parser.py 第六轮（edges6）
+
+### 目标
+- 给 app/parsers/kreuzberg_parser.py（245 行，已有 base/edges/edges2-5 共 717 测试）补第六轮
+- 深入 _classify_line 启发式、_make_locator 分支、_split_content_to_elements 纯函数
+
+### 改动
+- 新增 `tests/test_parsers_kreuzberg_edges6.py`（86 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量**：_HEADING_RE 是 re.Pattern、匹配 markdown 风格 # heading（1-6 级，7 级不匹配）、_SHORT_LINE_MAX=80
+- **_classify_line**：
+  - atx # / ## / ###### heading，level 与 raw_text
+  - short_line（≤80 且无结尾标点）→ heading level=0 heuristic=short_line
+  - 81 chars → paragraph
+  - 结尾标点 . 。 ? ? ! ! → paragraph
+  - empty/whitespace → paragraph meta={}
+  - atx 优先于 short_line
+  - atx 前可有空白
+- **_make_locator**：
+  - pdf → {page:1, _kreuzberg_placeholder:True}（忽略 paragraph_index）
+  - docx → {paragraph_index:N, _kreuzberg_heuristic:True}（忽略 page）
+- **_split_content_to_elements**：
+  - empty → []
+  - 单/多 paragraph 切分（双换行）
+  - heading confidence=0.6、paragraph confidence=0.5
+  - paragraph metadata 含 kreuzberg_heuristic=True
+  - element_id zero-pad 4 位、连续
+  - locator 跟随 source_type（pdf vs docx）
+  - 多空白行视为单一分隔
+  - heading 后接正文（同 block）→ 1 heading + 1 paragraph
+- **KreuzbergParser 类**：name="kreuzberg"、version 字符串、__init__ keyword-only include_document_structure=True、继承 Parser
+- **parse() 错误**：file_not_found（先校验文件）、unsupported_type
+- **模块结构**：__all__、optional import try/except、_KREUZBERG_AVAILABLE/_VERSION 常量、docstring 提及 4.10.2 与"业务代码"
+- **签名深度**：所有公共/内部函数
+
+### 撞墙记录
+- **Wall 1**：测试用 "hello" 期望 paragraph，实际 _classify_line 把短文本判为 heading（short_line heuristic）。
+  修复：单 paragraph 测试改用 >80 字符或带句号的长文本。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 169 后）：13660 pass / 0 fail / 13 skip（HEAD `aa4bd3d`）
+
+### 下一步建议
+- 候选 IG：app/chunkers/__init__.py 第六轮
+- 候选 IH：app/models.py 第八轮
+- 候选 IK：app/hash.py 第六轮
+- 候选 IL：app/source_locator.py 第六轮
+- 候选 IM：app/pipeline.py 第六轮（核心 pipeline）
+- 候选 IN：app/schema.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IM（app/pipeline.py 第六轮）。pipeline 是整个流程的串联入口，
+第六轮可深入 parse→chunk→validate 各阶段、错误聚合、structured errors JSON 输出。
+
+---
