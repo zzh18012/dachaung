@@ -622,3 +622,217 @@ def test_source_spans_in_to_dict_output():
     assert "source_spans" in d["chunks"][0]
     assert len(d["chunks"][0]["source_spans"]) == 2
 
+
+# ---- _element_text_with_span 直接单元测试 ----
+
+
+def _element_span(el: Element) -> tuple[str, int, int]:
+    """调 StructuralChunker._element_text_with_span 的便捷封装。"""
+    return StructuralChunker(max_chars=800)._element_text_with_span(el)
+
+
+def test_element_text_with_span_normal_text():
+    el = Element(element_id="x::e0", type="paragraph", content="hello world",
+                 source_locator={})
+    assert _element_span(el) == ("hello world", 0, 11)
+
+
+def test_element_text_with_span_leading_whitespace():
+    """前导空白不算入 stripped text 的字符范围起点之外。"""
+    el = Element(element_id="x::e0", type="paragraph", content="   hello",
+                 source_locator={})
+    stripped, start, end = _element_span(el)
+    assert stripped == "hello"
+    assert start == 3
+    assert end == 8  # 3 + 5
+
+
+def test_element_text_with_span_trailing_whitespace():
+    el = Element(element_id="x::e0", type="paragraph", content="hello   ",
+                 source_locator={})
+    stripped, start, end = _element_span(el)
+    assert stripped == "hello"
+    assert start == 0
+    assert end == 5
+
+
+def test_element_text_with_span_both_side_whitespace():
+    el = Element(element_id="x::e0", type="paragraph", content="  hi  ",
+                 source_locator={})
+    stripped, start, end = _element_span(el)
+    assert stripped == "hi"
+    assert start == 2
+    assert end == 4
+
+
+def test_element_text_with_span_empty_content():
+    """content="" 但有 resource_path（满足 Element 不变量）。"""
+    el = Element(element_id="x::e0", type="paragraph", content="",
+                 resource_path="placeholder", source_locator={})
+    assert _element_span(el) == ("", 0, 0)
+
+
+def test_element_text_with_span_whitespace_only():
+    el = Element(element_id="x::e0", type="paragraph", content="   \t\n  ",
+                 source_locator={})
+    assert _element_span(el) == ("", 0, 0)
+
+
+def test_element_text_with_span_image_returns_empty():
+    """image element 不参与分块（_element_text_with_span 强制返回空）。"""
+    el = Element(element_id="x::e0", type="image", content=None,
+                 resource_path="/tmp/x.png", source_locator={})
+    assert _element_span(el) == ("", 0, 0)
+
+
+def test_element_text_with_span_none_content():
+    """content=None 但有 resource_path（满足 Element 不变量）。"""
+    el = Element(element_id="x::e0", type="paragraph", content=None,
+                 resource_path="placeholder", source_locator={})
+    assert _element_span(el) == ("", 0, 0)
+
+
+# ---- _split_long_text 边界直接测试 ----
+
+
+def test_split_long_text_empty_string():
+    assert _split_long_text("", 100) == []
+
+
+def test_split_long_text_whitespace_only():
+    assert _split_long_text("   \n\t  ", 100) == []
+
+
+def test_split_long_text_below_max_returns_single_piece():
+    """text ≤ max_chars → 单 piece，boundary_after=None，覆盖 [0, len)。"""
+    pieces = _split_long_text("hello world", 100)
+    assert len(pieces) == 1
+    assert pieces[0].text == "hello world"
+    assert pieces[0].boundary_after is None
+    assert pieces[0].start == 0
+    assert pieces[0].end == 11
+
+
+def test_split_long_text_no_delimiter_no_whitespace_all_forced():
+    """无句子分隔符 + 无空白 → 全 forced_char。"""
+    pieces = _split_long_text("abcdefghij", 3)
+    # 验证所有非末段 piece 都是 forced_char
+    for p in pieces[:-1]:
+        assert p.boundary_after == "forced_char"
+    # 末段是 None
+    assert pieces[-1].boundary_after is None
+    # 不丢字符
+    assert "".join(p.text for p in pieces) == "abcdefghij"
+
+
+def test_split_long_text_multiple_consecutive_delimiters():
+    """连续句子分隔符（"Hello.. World"）只在最后一个 . 后切（要求其后再有空白）。"""
+    pieces = _split_long_text("Hello.. World", 100)
+    # 整体 ≤ max_chars，应当合并为单 piece
+    assert len(pieces) == 1
+    assert pieces[0].text == "Hello.. World"
+
+
+# ---- 集成：caption 隔离 / 连续 heading / heading-then-table / list_item ----
+
+
+def test_caption_is_isolated_chunk():
+    """caption element 单独成 chunk（mirror of I6 for table）。"""
+    doc = _make_doc([
+        ("paragraph", "intro text."),
+        ("caption", "Figure 1. Diagram"),
+        ("paragraph", "outro text."),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    # caption 必须单独成 chunk
+    assert len(chunks) == 3
+    # 中间 chunk 是 caption
+    assert chunks[1].text == "Figure 1. Diagram"
+    assert chunks[1].metadata["strategy"] == "isolated_caption"
+    assert chunks[1].source_element_ids == [doc.elements[1].element_id]
+
+
+def test_consecutive_headings_each_own_chunk():
+    """3 个连续 heading → 3 个独立 chunk（heading 是硬边界）。"""
+    doc = _make_doc([
+        ("heading", "Chapter 1"),
+        ("heading", "Chapter 2"),
+        ("heading", "Chapter 3"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 3
+    assert [c.text for c in chunks] == ["Chapter 1", "Chapter 2", "Chapter 3"]
+
+
+def test_heading_then_table_yields_two_chunks():
+    """heading 紧跟 table → 2 个 chunk（heading + table 各自独立）。"""
+    doc = _make_doc([
+        ("heading", "Title"),
+        ("table", "| a | b |\n|---|---|\n| 1 | 2 |"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    assert len(chunks) == 2
+    assert chunks[0].text == "Title"
+    assert chunks[1].text == "| a | b |\n|---|---|\n| 1 | 2 |"
+    assert chunks[1].metadata["strategy"] == "isolated_table"
+
+
+def test_list_item_treated_as_paragraph():
+    """list_item 走"其他"分支，与 paragraph 一样累积到当前 chunk。"""
+    doc = _make_doc([
+        ("list_item", "first item"),
+        ("list_item", "second item"),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    # 两个 list_item 都应进入同一个 chunk
+    assert len(chunks) == 1
+    assert "first item" in chunks[0].text
+    assert "second item" in chunks[0].text
+    assert len(chunks[0].source_element_ids) == 2
+
+
+def test_table_then_paragraph_buffer_reset():
+    """table 隔离后，新 paragraph 进入新 buf（不与 table 同 chunk）。"""
+    doc = _make_doc([
+        ("paragraph", "before."),
+        ("table", "| a | b |"),
+        ("paragraph", "after."),
+    ])
+    chunks = StructuralChunker(max_chars=800).chunk(doc)
+    # 3 chunks：before-paragraph, table, after-paragraph
+    assert len(chunks) == 3
+    assert chunks[0].text == "before."
+    assert chunks[1].text == "| a | b |"
+    assert chunks[2].text == "after."
+
+
+def test_chunks_preserve_input_order_for_no_loss():
+    """排序不变量：chunks 的非空白拼接 == elements 的非空白拼接（有序）。"""
+    doc = _make_doc([
+        ("heading", "Intro"),
+        ("paragraph", "Sentence one. Sentence two."),
+        ("table", "| x | y |"),
+        ("caption", "Figure 1."),
+        ("paragraph", "Final paragraph here."),
+    ])
+    chunks = StructuralChunker(max_chars=50).chunk(doc)
+    assert_text_preserved(doc, chunks)
+
+
+def test_paragraph_then_long_paragraph_boundary_resets():
+    """短 paragraph + 长 paragraph（超 max_chars）→ 长 paragraph 单独按句切。"""
+    long_text = "Sentence one. Sentence two. Sentence three. Sentence four."
+    doc = _make_doc([
+        ("paragraph", "short intro."),
+        ("paragraph", long_text),
+    ])
+    # max_chars 最小值 32；让长 paragraph（>50 chars）必须切
+    chunks = StructuralChunker(max_chars=32).chunk(doc)
+    # 短 intro 进 chunk 0；长 paragraph 因超长，先 flush buf（emit chunk 0），
+    # 然后自身按句切，至少产生 1 个 chunk
+    assert len(chunks) >= 2
+    assert chunks[0].text == "short intro."
+    # 长 paragraph 切片累计不丢字符
+    long_chunks_text = " ".join(c.text for c in chunks[1:])
+    assert _non_ws(long_chunks_text) == _non_ws(long_text)
+
