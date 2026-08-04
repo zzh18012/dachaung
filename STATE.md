@@ -9625,3 +9625,52 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第六轮可深入 code/markdown cell 分离、nbformat v4 字段、source 字段类型等。
 
 ---
+
+## Round 164（2026-08-05）：app/parsers/ipynb_parser.py 第六轮（edges6）
+
+### 目标
+- 给 app/parsers/ipynb_parser.py（227 行，已有 base/edges/edges2-5 共 632 测试）补第六轮
+- 深入 _cell_source_to_text 类型分支、_extract_kernel_language 多形态、parse() 错误路径与 metadata
+
+### 改动
+- 新增 `tests/test_parsers_ipynb_edges6.py`（112 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_IPYNB_EXTENSIONS**：精确 (".ipynb",) tuple
+- **_detect_ipynb_source_type**：details.suffix 精确、message 提及 .ipynb 与实际 suffix
+- **_cell_source_to_text**：str/list/None/int/dict、空、混合类型、list of non-str 强转
+- **_extract_kernel_language**：kernelspec.language 优先、kernelspec.name fallback、language_info.name fallback、空 metadata、空字段
+- **IpynbParser 类属性**：name="ipynb"、version="stdlib/0.1.0"、继承 Parser
+- **parse() 错误**：file_not_found（details.path）、unsupported_type、ipynb_invalid_json、ipynb_bad_structure（顶层非 dict/cells 非 list）、ipynb_unsupported_version（nbformat<4，details.nbformat）
+- **nbformat 校验**：None 视为合法（不触发 <4 检查）、3/2 触发、4/5 通过
+- **cells 容错**：None/missing → []（再触发 ipynb_no_content）
+- **cell_type 分支**：markdown（委托 MarkdownParser）、code（kind=code_cell，content strip）、raw（kind=raw_cell，content strip）、unknown（ipynb_unknown_cell_type warning）、missing（默认 unknown）
+- **空 cell**：code 空 → ipynb_empty_code_cell warning；raw 空 → 静默 skip
+- **非 dict cell**：ipynb_bad_cell warning，details.cell_index
+- **element_id**：连续重编号（cross-cell），4 位 zero-pad，共享 doc_id 前缀
+- **locator**：cell_index/cell_type/line（markdown line 来自 sub_element）/section_path（markdown 内）
+- **markdown cell 子 warning**：md_empty_code_block 被包装加 cell_index 与"cell #N (markdown)"前缀
+- **Document.metadata**：ipynb=True、nbformat、nbformat_minor、cell_count、language
+- **模块结构**：__all__、future annotations、imports（json/Path/Any/MarkdownParser）、docstring 提及 nbformat/cell types/outputs 丢弃
+- **签名深度**：parse/_detect/_cell_source_to_text/_extract_kernel_language
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 164 后）：13240 pass / 0 fail / 13 skip（HEAD `d9d9c32`）
+
+### 下一步建议
+- 候选 IC：app/parsers/text_parser.py 第七轮
+- 候选 ID：app/parsers/fallback.py 第六轮
+- 候选 IE：app/parsers/base.py 第七轮
+- 候选 IF：app/parsers/__init__.py 第六轮
+- 候选 IG：app/chunkers/__init__.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IE（app/parsers/base.py 第七轮）。base.py 是 Parser 抽象基类与 ParserError/make_document_id
+的所在，第七轮可深入 Parser 接口契约、ParserError 字段、make_document_id 不变量。
+
+---
