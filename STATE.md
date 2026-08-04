@@ -2205,3 +2205,39 @@
 - 本 worktree（Round 44 后）：1360 pass / 0 fail / 9 skip（HEAD `b479bed`）
 
 ---
+
+## Round 45（2026-08-04）：候选 AW — evaluation/report.py 内部边角覆盖
+
+### 做了什么
+- 候选 AW：扩展 `tests/test_evaluation_report.py`，新增 41 个测试覆盖 `evaluation/report.py`（200 行）的全部纯函数 + 常量。
+- 至此 evaluation 层核心全覆盖：runner.py / manifest.py / annotation_metrics.py / metrics.py / report.py 都有专门边角测试。
+- 重点覆盖项：
+  - **常量** 5 个：_COUNT_METRICS==('element_count_total',)、_SUCCESS_BOOL_METRICS==('pipeline_success',)、_RATIO_METRICS 含 12 个 ratio key、_RATIO_METRICS 排除 figure_caption_*、排除 count/silent_drop
+  - **`get_dependency_versions`** 3 个：返回 dict、含 3 个已知包（pdfplumber/python-docx/pypdfium2）、值 str-or-None
+  - **`get_git_provenance`** 3 个：返回 dict 含 2 keys、真实 repo 返回 commit/dirty、subprocess 失败安全（不存在路径不崩）
+  - **`build_provenance`** 8 个：9 个顶层 keys、max_chars int 转换、parser_name/version 透传、run_timestamp_iso ISO 8601 格式、evaluator_version 匹配常量、report_version 匹配常量、dependencies 子字段含 3 包
+  - **`build_devset_section`** 2 个：6 个 keys、所有值透传
+  - **`aggregate_summary`** 20 个：4 个顶层 keys（counts/success_rates/ratio_macro_averages/silent_drop_total）、counts.sum 是 int、counts.participating_docs、success_rates rate/total/success_count、ratio macro_average/participating_docs/not_evaluated、silent_drop_total 求和 + 排除 null、空 list 边角（rate None/total 0/success_count 0/participating_docs 0/silent_drop_total None）
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。41 个新测试一次通过。
+
+### 下一步建议
+- 候选 AX：evaluation/schema.py + evaluation/schema_validation.py 边角
+- 候选 AS：app/hash.py 内部边角补强
+- 候选 AY：app/pipeline.py 内部边角（image_output_dir_for / get_parser / process_single 错误路径）
+- 候选 AZ：app/chunkers/__init__.py 边角（如果有）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AY（app/pipeline.py 内部边角）。理由：
+1. pipeline.py 是核心入口，含 image_output_dir_for / get_parser / process_single
+2. image_output_dir_for 是从 output_path + source_hash 推导图片目录的关键 helper
+3. 与已覆盖的 parser/chunker 形成完整 app/ 层覆盖
+4. 之后转 AX（schema 边角）完成所有模块的边角覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 45 后）：1401 pass / 0 fail / 9 skip（HEAD `2ba1437`）
+
+---
