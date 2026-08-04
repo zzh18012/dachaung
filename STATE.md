@@ -3333,3 +3333,40 @@
 - 本 worktree（Round 72 后）：3313 pass / 0 fail / 12 skip（HEAD `de3ef3f`）
 
 ---
+
+## Round 73（2026-08-05）：候选 CK — app/cli.py 边角覆盖（第二轮）
+
+### 做了什么
+- 候选 CK：新建 `tests/test_cli_edges2.py`（109 个测试）覆盖 `app/cli.py`（535 行）的深度边角，与已有 `test_cli.py`（77）+ `test_cli_edges.py`（74）互补。
+- 重点覆盖项：
+  - **模块结构** 10 个：argparse/json/sys/Path/process_single/validate_only 都绑定；main/_build_arg_parser/_emit_structured_error 都存在；无 __all__
+  - **_build_arg_parser 深度** 37 个：returns ArgumentParser、prog='app.cli'；parse namespace input/output/parser/max_chars；缺必需参数 SystemExit(2)；-o 短 / --output 长；默认 max_chars=800；默认 parser=None；6 个 parser 显式指定各返对应字符串；invalid choice SystemExit(2)；max_chars int 类型、负数接受；parse-dir namespace input_dir/output_dir/recursive/parser/max_chars；--recursive flag；validate/inspect input；inspect elements/chunks/spans flags 各默认 False；limit 默认 10/自定义/负数/0；no command + unknown command 都 SystemExit(2)
+  - **_EXTENSION_TO_PARSER 深度** 13 个：9 个 key 都 lowercase + 以 . 开头；6 个值精确；kreuzberg 不在映射中；所有 value 是 6 个支持 parser 之一
+  - **_infer_parser_name 深度** 24 个：9 个扩展名都返正确 parser；大写/混合大小写接受；未知扩展名/no extension/dotfile/double extension 都返 fallback；返 str 类型
+  - **_iter_supported_files 深度** 10 个：返 list；空 dir 返 []；过滤不支持扩展名；含支持类型；按 name 排序；跳过目录；大小写不敏感 suffix；recursive 走子目录；recursive 嵌套多层
+  - **_relative_output_path 深度** 5 个：root level、嵌套子目录、保留完整 suffix、no extension file、返 Path 类型
+  - **main 深度** 9 个：各 subcommand 返 int；unknown/no command SystemExit(2)；parse missing input 返 1；parse-dir missing input_dir 返 2；6 个函数 callable
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。109 个新测试一次通过。
+
+### 下一步建议
+- 候选 CE：evaluation/runner.py 边角（第二轮）
+- 候选 CF：app/chunkers/structural.py 边角（第二轮）
+- 候选 CG：app/parsers/fallback_parser.py 边角（第二轮）
+- 候选 CL：app/parsers/markdown_parser.py 边角
+- 候选 CM：app/parsers/html_parser.py 边角
+- 候选 CN：app/parsers/text_parser.py 边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 CE（evaluation/runner.py 边角第二轮）。理由：
+1. runner.py 是 Stage 2 评测的核心执行器
+2. Round 62 覆盖 68 个边角，但 _process_one 的更深层路径（manifest.project_root 传递、tolerance_chars 透传到 annotation_metrics、image_base_dir 派生、per_doc 失败聚合）未覆盖
+3. 与已覆盖的 cli.py / metrics.py / annotation_metrics.py / report.py 形成完整 evaluation 闭环
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 73 后）：3422 pass / 0 fail / 12 skip（HEAD `c9e23f3`）
+
+---
