@@ -9147,3 +9147,66 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 第六轮可深入 argparse 子命令、参数解析、错误处理等。
 
 ---
+
+## Round 155（2026-08-05）：evaluation/cli.py 第六轮（edges6）
+
+### 目标
+- 给 evaluation/cli.py（243 行，已有 base/edges/edges2-5 共 479 测试）补第六轮
+- 深入 _format_metric 边界、main() 错误码路径、_run_inspect_doc 行为
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges6.py`（92 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_format_metric 边界**：
+  - None value 无 reason key、empty reason、unicode reason
+  - True/False 无 reason（reasons 默认 "ok"）
+  - float 0.0/0.5/负数/极大数（4 位小数格式）
+  - int 0/负数
+  - dict empty/单 item/多 item 排序
+  - string value 含 reason
+  - name 短/长/36 字符对齐
+- **_build_parser 边界**：
+  - prog == "evaluation.cli"、description 含"评测"
+  - subparsers required=True（无子命令报错）
+  - run choices 精确（fallback/kreuzberg，reject others）
+  - validate-report/inspect-doc 接受单个 positional
+  - inspect-doc tolerance-chars 默认 30 / 自定义
+  - 无命令、未知命令、缺必填参数 → SystemExit
+  - max-chars 类型 int、非 int 报错、负值
+- **main() 错误码路径**：
+  - 无 args → SystemExit
+  - run 缺 manifest 文件 → 2
+  - validate-report 缺文件 → 2、invalid JSON → 1
+  - inspect-doc 缺文件 → 2、invalid JSON → 1、array 顶层 → 1、最小 dict → 0
+  - inspect-doc 打印 file path、metrics header、"?"
+- **_run_inspect_doc 边界**：缺文件/invalid JSON/array/minimal dict/tolerance/elements+chunks
+- **模块结构**：无 __all__、imports 完整（含 get_git_provenance）、utf-8 reconfigure、main guard、docstring 含三个子命令
+- **签名深度**：main argv 默认 None + int 返回、_build_parser 无参、_format_metric name+metric+str、_run_inspect_doc args+int
+- **综合行为**：
+  - _format_metric 幂等、不修改输入
+  - _build_parser 每次返回新 parser
+  - main 端到端 run（mock load_manifest/run_evaluation/validate_file）→ rc=0
+  - main 端到端 run（mock 抛 ManifestError）→ rc=1
+  - main 端到端 run --parser kreuzberg --max-chars 500 --tolerance-chars 10
+
+### 撞墙记录
+- 无（一次跑通）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 155 后）：12324 pass / 0 fail / 13 skip（HEAD `2b25c1f`）
+
+### 下一步建议
+- 候选 HT：evaluation/metrics.py 第六轮
+- 候选 HU：evaluation/annotation_metrics.py 第六轮
+- 候选 HV：evaluation/schema.py 第六轮
+- 候选 HW：evaluation/schema_validation.py 第六轮
+- 候选 HX：app/cli.py 第七轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HT（evaluation/metrics.py 第六轮）。metrics.py 是指标计算核心，
+第六轮可深入 compute_automatic_metrics 各分支、比例指标分母、reason 字段等。
+
+---
