@@ -2956,3 +2956,47 @@
 - 本 worktree（Round 63 后）：2550 pass / 0 fail / 9 skip（HEAD `1e35e2d`）
 
 ---
+
+## Round 64（2026-08-05）：候选 BV — evaluation/metrics.py 边角覆盖
+
+### 做了什么
+- 候选 BV：新建 `tests/test_evaluation_metrics_edges.py`（143 个测试）覆盖 `evaluation/metrics.py`（约 230 行）的 helper / 内部比率函数边角，与已有 `test_evaluation_metrics.py`（90+ 个）互补。
+- 重点覆盖项：
+  - **模块常量** 8 个：_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 内容与 length、_NOT_EVALUATED 常量
+  - **_null helper** 5 个：返 dict 含 value=None + reason、reason 字面量、value not bool、不传 reason 默认 _NOT_EVALUATED、mutable per call
+  - **_ratio helper** 7 个：分子分母类型转换 int、分母 0 返 null + reason、分子 0 返 0.0、负数、非数字、确定性
+  - **_bool_metric helper** 12 个：True/False 类型转换、None value 返 null、bool(int) 接受、unknown metric 返 null + reason、mutable per call、数字字符串安全
+  - **_int_metric helper** 8 个：int 转换、unknown 返 null、None 返 null、负数接受、大数字、确定性
+  - **_pdf_locator_ratio** 10 个：含 bbox 的成功率、bbox 全缺 null + reason、混合元素（部分有 bbox）、source_type 非 pdf 返 null、非 content_group 子元素忽略、空 input null
+  - **_docx_locator_ratio** 10 个：含 paragraph_index 成功率、全缺 null + reason、混合 source_type、非 content_group 忽略、空 input null
+  - **_is_valid_bbox** 15 个：4 字段全有效、缺失字段（x0/y0/x1/y1）、负数、NaN、Inf、字符串、None、bool（int 子类陷阱）、极大值、相同坐标
+  - **_image_resource_ratio** 10 个：resource_path 非空比率、全空 null + reason、混合、resource_path="" 视为缺失、None
+  - **_chunk_reference_ratio** 8 个：source_element_ids 非空 length 比率、全空 null + reason、混合
+  - **_strip_unicode_whitespace** 10 个：U+0020 / U+00A0 / U+2000-U+200A / U+2028 / U+2029 / U+3000 / U+FEFF 全部识别
+  - **_text_preservation** 10 个：完整保留、全角空格规范化、多空格合并、首尾 strip、纯空白 → ""
+  - **_heading_boundary_ratio** 6 个：含 heading_chunk_type 比率、全无 null + reason、混合
+  - **_silent_drop_count** 11 个：基于 expectations 计数、无 expectations 返 null、expectations 各 type 单独计算、负数 → 0、count=0 完美匹配、Element 缺失算 drop、Resource 缺失不算 drop
+  - **compute_automatic_metrics 完整 14 key** 11 个：成功路径 14 key 全在、失败路径 null + reason、schema 异常安全、所有 key 类型检查、跨 source_type 一致、空 input 各 key null
+  - **__all__ 导出** 2 个：compute_automatic_metrics 在 __all__、不导出内部 helper
+- 无源码改动。
+
+### 撞墙记录
+- 无撞墙。143 个新测试一次通过。
+
+### 下一步建议
+- 候选 BW：app/manifest.py 边角（manifest 解析 + categories 字段）
+- 候选 BX：evaluation/annotation_metrics.py 边角（figure_caption_prf / chunk_boundary_prf）
+- 候选 BY：app/pipeline.py 端到端边角
+- 候选 CA：evaluation/schema_validation.py 边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BX（evaluation/annotation_metrics.py 边角）。理由：
+1. annotation_metrics.py 含 figure_caption_prf / chunk_boundary_prf 等基于人工标注的指标
+2. 含 tolerance_chars 容差匹配、一对一映射、PRF 计算等多种边角
+3. 与 metrics.py 形成完整 evaluation 指标层覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 64 后）：2693 pass / 0 fail / 9 skip（HEAD `b02e482`）
+
+---
