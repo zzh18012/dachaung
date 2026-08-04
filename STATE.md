@@ -8892,3 +8892,63 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 第六轮可深入 get_parser、image_output_dir_for、process_single、validate_only。
 
 ---
+
+## Round 151（2026-08-05）：app/pipeline.py 第六轮（edges6）
+
+### 目标
+- 给 app/pipeline.py（216 行，已有 edges/errors/helpers/edges2-5 共 524 测试）补第六轮
+- 深入 get_parser 具体类型、image_output_dir_for 边界、process_single 错误结构
+
+### 改动
+- 新增 `tests/test_pipeline_edges6.py`（94 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **get_parser 各 parser 具体类型**：
+  - FallbackParser/KreuzbergParser/MarkdownParser/HtmlParser/TextParser/IpynbParser
+  - 都是 Parser 子类、有 name/version/parse callable
+  - 每次返回新实例
+  - unknown/empty/uppercase/whitespace name → ValueError
+- **image_output_dir_for 边界**：
+  - None/Path/str 输入
+  - 第一 16 字符、images- 前缀
+  - 不同 hash/output_path → 不同 dir
+  - 父目录继承、empty string hash OK、empty string output OK
+  - 无默认值（output_path 必填）
+- **process_single 错误结构**：
+  - missing file → file_not_found + details.path
+  - unknown parser → unexpected_parser_error + details.parser_name
+  - errors 都是 ErrorRecord 实例
+  - text parser success → Document with source_hash/document_id/chunks
+  - 不写盘时不创建文件、创建嵌套父目录
+- **validate_only 各种 JSON 形式**：
+  - missing/invalid/empty/schema-fail 都 False
+  - 返回 (bool, str) tuple
+- **模块结构**：__all__ 4 项、imports 完整、docstring
+- **签名深度**：
+  - process_single 5 参、parser_name/max_chars/write_json 是 keyword-only
+  - validate_only 1 参、json_path 必填
+- **综合行为**：process_single → validate_only roundtrip
+
+### 撞墙记录
+- **Wall 1**：image_output_dir_for 的 output_path 无 default（必填），不是 None。修复：改为 inspect.Parameter.empty。
+- **Wall 2**：test_process_single_returns_tuple 缺 tmp_path fixture 参数。修复：补上。
+- **Wall 3**：validate_only('"hello"') 用默认 schema 校验，返回 False（不是合法 document）。修复：改测试为 False 期望。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 151 后）：11933 pass / 0 fail / 13 skip（HEAD `ba293ff`）
+
+### 下一步建议
+- 候选 HN：evaluation/runner.py 第六轮
+- 候选 HO：evaluation/metrics.py 第六轮
+- 候选 HP：evaluation/report.py 第六轮
+- 候选 HQ：evaluation/manifest.py 第六轮
+- 候选 HR：app/cli.py 第七轮
+- 候选 HS：evaluation/cli.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HN（evaluation/runner.py 第六轮）。runner 是评测执行核心，
+第六轮可深入 run_pilot、单个文件评测、计时、报告装配等。
+
+---
