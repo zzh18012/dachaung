@@ -889,3 +889,70 @@
 - 本 worktree（Round 14 后）：316 pass / 0 fail / 9 skip（HEAD `d875d35`）
 
 ---
+
+## 2026-08-04 — Round 15（chunker 覆盖率扩展）
+
+**做了什么**：
+- 完成候选 R：补 chunker 覆盖率，新增 20 个测试到 `tests/test_chunker.py`
+- **`_element_text_with_span` 直接单元测试**（8 个）：
+  - normal text、leading/trailing/both-side whitespace 各自的 (start, end) 计算
+  - empty content、whitespace-only、None content（用 resource_path 满足 Element 不变量）
+  - image element 强制返回 ("", 0, 0)
+- **`_split_long_text` 边界直接测试**（5 个）：
+  - empty/whitespace-only 输入
+  - text ≤ max_chars → 单 piece，覆盖 [0, len)
+  - 无句子分隔符 + 无空白 → 全 forced_char
+  - 连续句子分隔符（"Hello.. World"）不切（要求后续有空白）
+- **集成测试**（7 个）：
+  - caption 隔离成 chunk（mirror I6 table 测试）
+  - 连续 3 个 heading → 3 个独立 chunk
+  - heading 紧跟 table → 2 chunks
+  - list_item 走"其他"分支，与 paragraph 一样累积
+  - table 后 paragraph 验证 buf 重置
+  - 混合 element 类型保"不丢不重"不变量
+  - 短 paragraph + 长 paragraph 边界 reset
+- **发现的小问题**（已绕开）：Element 强制要求 `content` 或 `resource_path` 之一非空，所以 empty/None content 测试用 `resource_path="placeholder"` 满足不变量（不算 bug，是 Element 的设计）
+- commit `053743a`，已 push
+
+**worktree 当前状态**：
+- HEAD `053743a`，工作树清洁
+- 测试基线：336 pass / 0 fail / 9 skip（+20 vs Round 14）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 16）
+
+**首要任务**：方向选择
+
+- 候选 Q（推荐）：**kreuzberg parser 覆盖率**
+  - 现状：只有 3 个 kreuzberg 测试（docx/pdf/missing_file）
+  - 复杂度：中（kreuzberg 行为不稳定，需要更仔细的 assertion）
+  - 价值：备选 parser，目前覆盖率薄弱
+
+- 候选 T：**HTML/Markdown/Text/IPYNB parser 覆盖率**
+  - 现状：test_parsers_html.py / test_parsers_markdown.py 等已存在但可能覆盖不全
+  - 复杂度：低-中
+  - 价值：边缘 parser 不应被忽视
+
+- 候选 S：**pipeline 错误处理路径**
+  - 现状：`process_single` 的 warning 汇总 / 错误聚合 / 半成品清理
+  - 复杂度：中
+
+- 候选 U（新提）：**schema 校验测试**
+  - 现状：test_schema.py 应该比较完整，但 source_spans 加入后可能有边角
+  - 复杂度：低
+
+- 仍阻塞：候选 J（向量化）、候选 M（evaluator v1.2）、候选 O（docs/*.md）
+
+**建议**：选 Q（kreuzberg 覆盖率）。理由：
+1. kreuzberg 是项目设计中的可选 parser（虽然默认 fallback），覆盖薄弱风险高
+2. 测试基础设施（fixtures）已收敛，加测试成本低
+3. 如果未来 kreuzberg 升级能给出 elements，需要测试网先就位
+
+### 撞墙记录
+- Element 强制 content/resource_path 非空：test_element_text_with_span_empty_content 测试空 content 时撞这个不变量，已用 resource_path="placeholder" 绕开（这是 Element 的正确不变量，不是 bug）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 15 后）：336 pass / 0 fail / 9 skip（HEAD `053743a`）
+
+---
