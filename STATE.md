@@ -9210,3 +9210,63 @@ parser 适配器，第四轮可深入 kreuzberg 调用、_kreuzberg_elements_to_
 第六轮可深入 compute_automatic_metrics 各分支、比例指标分母、reason 字段等。
 
 ---
+
+## Round 156（2026-08-05）：evaluation/metrics.py 第六轮（edges6）
+
+### 目标
+- 给 evaluation/metrics.py（381 行，已有 base/edges/edges2-5 共 902 测试）补第六轮
+- 深入常量精确性、helper 返回结构、_strip_unicode_whitespace Unicode 边界、_is_valid_bbox 边界、各 ratio 子函数、compute_automatic_metrics 端到端
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges6.py`（145 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量精确性**：
+  - _TEXT_TYPES 7 项（heading/paragraph/list_item/table/caption/header/footer），无 image
+  - _PDF_BBOX_REQUIRED_TYPES 4 项（heading/paragraph/caption/list_item），是 _TEXT_TYPES 子集，无 table
+  - _NOT_EVALUATED == "not_evaluated"
+  - 全 tuple、无重复
+- **helper 返回结构**：
+  - _null/_ratio/_bool_metric/_int_metric 各自 shape
+  - _ratio 强制 float、_bool_metric 强制 bool、_int_metric 强制 int
+  - 每次返回新 dict
+- **_strip_unicode_whitespace 边界**：
+  - ASCII 空白（space/tab/newline/cr/vtab/formfeed）
+  - Unicode 空白（NBSP/em space/en space/ideographic space/line separator/paragraph separator）
+  - 全空白字符串 → 空、不排序、保留 emoji/中文/标点
+- **_is_valid_bbox 边界**：None/空/短/长 list、int/float/mixed、bool 拒绝、NaN/inf/-inf 拒绝、string/tuple 拒绝、零值/负值有效
+- **_pdf_locator_ratio 边界**：empty、no-bbox 类型 page≥1 即可、heading 缺 bbox 无效、page 0/-1/None 无效
+- **_docx_locator_ratio 边界**：含 page/bbox 无效、structural keys（section/paragraph_index/...）、缺失 locator
+- **_chunk_reference_ratio 边界**：empty、unknown id、empty/missing/None ids
+- **_heading_boundary_ratio 边界**：no headings、no chunks、match first id、heading not first、empty ids
+- **_silent_drop_count 边界**：no expectations、empty element_count、matches/exceeds/missing/multiple
+- **compute_automatic_metrics 端到端**：
+  - pipeline_failed → 14 keys 全 null + reason="pipeline_failed"
+  - minimal document (pdf/docx)
+  - element_count_by_type aggregation、missing type → "unknown"
+  - text_preservation: empty/perfect/extra/missing
+  - schema_check_exception → False + exception reason
+  - image_resource_ratio 调用子函数
+- **模块结构**：__all__ == ["compute_automatic_metrics"]、imports (math/Counter/Path/Any)、docstring 提及"不伪造"/"不返回 1.0"/"text_preservation"
+- **签名深度**：5 参 compute_automatic_metrics + 各子函数精确
+- **综合行为**：不修改输入、idempotent、helper 独立
+
+### 撞墙记录
+- **Wall 1**：__all__ 实际存在（["compute_automatic_metrics"]），不是我假设的"无"。修复：改为精确 list。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 156 后）：12469 pass / 0 fail / 13 skip（HEAD `765653c`）
+
+### 下一步建议
+- 候选 HU：evaluation/annotation_metrics.py 第六轮
+- 候选 HV：evaluation/schema.py 第六轮
+- 候选 HW：evaluation/schema_validation.py 第六轮
+- 候选 HX：app/cli.py 第七轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 HU（evaluation/annotation_metrics.py 第六轮）。annotation_metrics.py 是
+标注指标核心，第六轮可深入 chunk_boundary_prf 容差匹配、figure_caption_prf 启发式等。
+
+---
