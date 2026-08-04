@@ -2241,3 +2241,37 @@
 - 本 worktree（Round 45 后）：1401 pass / 0 fail / 9 skip（HEAD `2ba1437`）
 
 ---
+
+## Round 46（2026-08-04）：候选 AY — app/pipeline.py 内部边角覆盖
+
+### 做了什么
+- 候选 AY：扩展 `tests/test_pipeline_helpers.py`，新增 24 个测试覆盖 `app/pipeline.py`（216 行）的 `get_parser` / `image_output_dir_for` / `validate_only` / `process_single` 错误路径边角。
+- 至此 app/ 层核心全覆盖：models / schema / cli / hash / pipeline / chunkers / parsers（base + 6 个具体 parser）都有专门测试。
+- 重点覆盖项：
+  - **`get_parser`** 8 个新测试：未知名称抛 ValueError（消息含未知名）、错误消息列出全部 6 个支持名、fallback + Path image_output_dir、fallback + str image_output_dir（自动转 Path）、6 个支持名都返回 Parser 实例、默认 image_output_dir=None、每次返回新实例（不缓存）、返回的对象有 .name 和 .version 属性
+  - **`image_output_dir_for`** 4 个：目录名前缀 'images-'、显式 Path 对象接受、短 source_hash（<16 字符）取全串、parent 跟随 output_path.parent
+  - **`validate_only`** 5 个：missing file 返回 (False, msg)、invalid JSON 返回 (False, JSON msg)、schema-invalid JSON 返 False、返回 (bool, str) 元组、合法 text document 返 (True, "OK")
+  - **`process_single` 错误路径** 5 个：file_not_found ErrorRecord code+details.path、unknown parser → unexpected_parser_error + details.parser_name、unsupported extension → unsupported_type、默认 parser=fallback（通过返回 doc.parser_name 验证）
+- 无源码改动。
+
+### 撞墙记录
+- **Wall 1**：`test_validate_only_returns_tuple_of_two` 忘记加 `tmp_path: Path` 参数（fixture 注入失败 → NameError）。补上后通过。
+
+### 下一步建议
+- 候选 AX：evaluation/schema.py + evaluation/schema_validation.py 边角
+- 候选 AS：app/hash.py 内部边角补强（17 → ~25 个）
+- 候选 BA：app/chunkers/__init__.py / app/parsers/__init__.py 边角
+- 候选 BB：evaluation/__init__.py 常量
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AX（evaluation/schema.py + schema_validation.py）。理由：
+1. schema.py + schema_validation.py 是评测层 schema 校验入口
+2. validate(name) 函数对各种 schema name（document/manifest/evaluation-report）的边角
+3. document_passes_schema 在 metrics.py 已被调用，应有专门测试
+4. 之后转 AS（hash 补强）+ BA/BB（小模块）完成所有模块边角覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 46 后）：1425 pass / 0 fail / 9 skip（HEAD `a380c80`）
+
+---
