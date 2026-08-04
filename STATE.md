@@ -5719,3 +5719,112 @@ report.py 是评测报告装配核心，深度价值高。
 - 本 worktree（Round 111 后）：7801 pass / 0 fail / 13 skip（HEAD `a9300d5`）
 
 ---
+
+## Round 112（2026-08-05）：app/parsers/kreuzberg_parser.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_parsers_kreuzberg_edges4.py`（新增，757 行）
+- 目标：`app/parsers/kreuzberg_parser.py`（245 行，已有 145+ 测试）
+- 新增测试：122 个
+- 提交：`d0d933d`
+
+### 覆盖深度
+- **_classify_line 纯空白/纯标点**：
+  - 纯 spaces / tabs / newline → paragraph+空 meta
+  - 纯 `...`（含终止符）→ paragraph
+  - 纯 `---===---`（无终止符）→ short_line heading
+  - 纯数字 '123'（无终止符）→ short_line heading
+  - 纯字母 'xyz' → short_line heading
+  - 超长无终止符 → paragraph
+  - # foo # closing marker（raw_text 含 `foo #`）
+  - # **bold** emphasis in heading
+  - # `code` inline code in heading
+  - 短 `xyz` 含 inline code → short_line heading
+  - 终止符！？（ASCII + CJK 全宽）→ paragraph
+  - 连续终止符 ?! → paragraph
+  - 'a.b' 中间句号（不是终止符）→ short_line heading
+  - 'config.json' 同上
+  - 'end.' 末尾句号 → paragraph
+- **_HEADING_RE 正则级别**：
+  - 空 string / 纯 whitespace 不匹配
+  - 单 # 无 \s 不匹配
+  - #text 无 \s 不匹配
+  - 1-6 个 # + space 匹配
+  - 7+ # + space 不匹配
+  - leading whitespace / tab 接受
+  - trailing whitespace strip
+  - 多个 leading space 接受
+  - text 含 punctuation
+  - pattern 以 ^ 开头、$ 结尾
+- **_split_content_to_elements 内容变种**：
+  - CRLF 切割
+  - 仅 \r\r（block.splitlines 切割 → heading + paragraph rest）
+  - 多连续空行
+  - leading / trailing 空行
+  - CJK 文本（短/长）
+  - CJK + ASCII 混合
+  - ATX heading with emphasis in rest
+  - ATX heading with ATX in rest（保留 paragraph 整段）
+  - element_id 零填充递增
+  - heading confidence=0.6
+  - paragraph confidence=0.5
+  - heading rest paragraph confidence=0.5
+  - 返回 2-tuple
+  - 第二返回值始终 []
+  - 空 content → 空 list
+  - 仅 whitespace → 空 list
+  - document_id 注入 element_id
+- **_make_locator 深度**：
+  - pdf page=1
+  - pdf _kreuzberg_placeholder=True
+  - docx paragraph_index
+  - docx _kreuzberg_heuristic=True
+  - pdf 忽略 paragraph_index
+  - docx 忽略 page
+- **KreuzbergParser 类/实例属性**：
+  - name/version 类属性
+  - include_document_structure 默认 True
+  - keyword-only 验证
+  - 两实例独立
+  - parse 方法 callable
+  - 实例属性 = 类属性
+- **模块结构深度**：
+  - _HEADING_RE 是 re.Pattern 实例
+  - _SHORT_LINE_MAX=80（int）
+  - __all__ 精确 1 项
+  - imports：re/Path/Any/Document/Element/WarningRecord/Parser/ParserError/
+    detect_source_type/make_document_id
+  - 三个内部函数 callable
+  - issubclass(KreuzbergParser, Parser)
+  - 类/方法 docstring（除 parse）
+  - 常量同 import 同对象
+- **_classify_line 返回类型**：tuple、str、dict
+- **所有终止符参数化**（6 种）
+- **KreuzbergParser 创建**：无参/True/False keyword、self 第一参数、
+  parse 签名 path + source_hash
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：'para one\r\rpara two' 实际产生 2 个 element（heading + paragraph）
+  而不是 1 个 — block 内 splitlines 也切 \r。改测试为断言 heading + paragraph
+- wall 2：`\n\n\npara` 第一个 block 'para' 短无终止符 → heading
+  而不是 paragraph。改测试期望 heading
+- wall 3：SyntaxWarning - `\s` 在 docstring 中触发 SyntaxWarning。
+  改用 raw string `r"""..."""`
+
+### 下一步建议
+- 候选 EX：app/parsers/html_parser.py 第四轮（446 行，已有 edges3）
+- 候选 EY：app/parsers/markdown_parser.py 第四轮（326 行，已有 edges3）
+- 候选 EZ：app/parsers/ipynb_parser.py 第四轮（227 行，已有 edges3）
+- 候选 FA：app/parsers/text_parser.py 第四轮（136 行，已有 edges3）
+- 候选 FB：evaluation/metrics.py 第四轮（381 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 EX（html_parser.py 第四轮）。html_parser.py 是较大的 parser，
+edges3 已饱和，但 edges4 仍有空间覆盖 HTMLParser 回调深度。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 112 后）：7923 pass / 0 fail / 13 skip（HEAD `d0d933d`）
+
+---
