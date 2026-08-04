@@ -20,6 +20,7 @@ from app.parsers.fallback_parser import FallbackParser
 from app.parsers.html_parser import HtmlParser
 from app.parsers.kreuzberg_parser import KreuzbergParser
 from app.parsers.markdown_parser import MarkdownParser
+from app.parsers.text_parser import TextParser
 from app.schema import SchemaValidationError, validate
 
 
@@ -33,7 +34,9 @@ def get_parser(name: str, image_output_dir: Path | str | None = None) -> Parser:
         return MarkdownParser()
     if name == "html":
         return HtmlParser()
-    raise ValueError(f"未知 parser: {name}（支持: fallback, kreuzberg, markdown, html）")
+    if name == "text":
+        return TextParser()
+    raise ValueError(f"未知 parser: {name}（支持: fallback, kreuzberg, markdown, html, text）")
 
 
 def process_single(
