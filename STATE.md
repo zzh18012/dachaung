@@ -1691,3 +1691,50 @@
 - 本 worktree（Round 31 后）：681 pass / 0 fail / 9 skip（HEAD `5706787`）
 
 ---
+
+## Round 32（2026-08-04）：候选 AN — schema.py helper 与 schema keyword 边角补强
+
+### 做了什么
+- 候选 AN：扩展 `tests/test_schema.py`，新增 71 个测试覆盖 `app/schema.py` 公共 helper 与 `document.schema.json` 各种 draft 2020-12 keyword 边角。
+- 重点覆盖项：
+  - **`load_schema`** 4 个边角：missing file 抛 FileNotFoundError、str path 接受、每次返回独立 dict、默认路径对齐 document schema
+  - **`SchemaValidationError`** 2 个边角：默认 errors 为 []、errors kwarg 透传
+  - **`validate`** 4 个边角：errors attribute 填充、聚合多个错误、custom schema kwarg、schema=None 走默认
+  - **`is_valid`** 2 个边角：custom schema、不向上抛
+  - **`validate_file`** 4 个边角：str path、invalid JSON（JSONDecodeError）、valid JSON 不合规内容、custom schema
+  - **minLength** 10 个字段：source_path / parser_name / parser_version / element_id / warning code+reason / error code+message / relation type+from_id+to_id
+  - **`source_hash`** pattern 4 个边角：大写 hex / 63 字符 / 65 字符 / 含下划线
+  - **`confidence`** 边界：0 和 1 都通过
+  - **bbox** 类型：float 接受、字符串拒绝
+  - **`docx_locator`** 7 个合法字段：paragraph_index / table_index+row+col / relationship_id / section int+string / run_index + 3 个负值拒绝
+  - **`source_span`** 2 个边角：negative end、empty element_id
+  - **`warning.details` / `error.details`** 类型：必须是 object，list/str 拒绝，空 object 通过，嵌套复杂 object 通过
+  - **`warning` / `error` additionalProperties:false** 各 1 个
+  - **`ipynb_locator`** 3 个边角：含 line+section_path 可选字段、cell_index ≥ 0、line ≥ 1
+  - **`schema_version`** 2 个边角：错误字符串、非字符串类型
+  - **`chunk.source_element_ids`** 2 个边角：纯空字符串列表、混合空+非空
+  - **类型校验**：elements / chunks / metadata 必须是 array / object
+  - **`element` anyOf 语义**：仅 content / 仅 resource_path / 都 null 三种情形
+  - **`pdf_locator` / `docx_locator` additionalProperties=true** 各 1 个
+- 无源码改动。
+
+### 撞墙记录
+- 无新撞墙。71 个新测试一次通过。
+
+### 下一步建议
+- 候选 AK：kreuzberg / markdown / html parser 内部 helper 单测
+- 候选 AG：CLI 子命令更细致的测试
+- 候选 AH：evaluation/cli.py 的 validate-report 子命令路径
+- 候选 AO：pipeline / process_single 端到端边角（output_path 为空、parser 不可用降级路径）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AG（CLI 子命令）。理由：
+1. CLI 是用户接口，错误处理最易回归
+2. 子命令组合（parse/validate/run/validate-report）覆盖率直接影响发布质量
+3. argparse exit code / stderr 输出可用 capsys + pytest.raises 验证
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 32 后）：752 pass / 0 fail / 9 skip（HEAD `fbe467e`）
+
+---
