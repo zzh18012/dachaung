@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from typing import Any
 
 from app.models import Chunk, Document, Element
 
@@ -37,44 +38,125 @@ def normalize_text(s: str) -> str:
     return _WHITESPACE_RE.sub(" ", s).strip()
 
 
-def _split_long_text(text: str, max_chars: int) -> list[str]:
-    """把超长文本切成不超过 max_chars 的片段。
+@dataclass(frozen=True)
+class _SplitPiece:
+    """_hard_split_with_whitespace_fallback 与 _split_long_text 的产物。
 
-    优先级：
-    1. 按句子边界（句号、问号、叹号后）
-    2. 句子仍超长则硬切
+    boundary_after 取值：
+    - "whitespace"：piece 结尾是闭区间内最右空白处切开（whitespace 回退）。
+    - "forced_char"：piece 结尾是 upper 处固定字符兜底（窗口内无空白）。
+    - None：piece 是输入文本的自然结尾（remaining ≤ max_chars）或
+      自然句子累积到容量上限而 flush。
     """
-    if len(text) <= max_chars:
-        return [text]
 
-    # 1. 按句子切
-    parts = []
+    text: str
+    boundary_after: str | None
+
+
+def _hard_split_with_whitespace_fallback(
+    text: str, max_chars: int
+) -> list[_SplitPiece]:
+    """把单个句子（已确认 len > max_chars）切成 ≤ max_chars 的 piece 列表。
+
+    每轮：
+    1. 跳过所有前导空白（不产生纯空白 piece）。
+    2. remaining ≤ max_chars 时输出 rstrip 后的自然尾段，boundary_after=None。
+    3. remaining > max_chars 时在闭区间 [i + max_chars//2, i + max_chars]
+       从右向左找 isspace() 字符：
+       - 找到 → piece = text[i:ws_idx].rstrip()；游标跳过 ws_idx 及其后连续空白；
+         若仍有非空白文本 boundary_after="whitespace"，否则 None。
+       - 未找到 → piece = text[i:upper]，boundary_after="forced_char"。
+    """
+    n = len(text)
+    pieces: list[_SplitPiece] = []
+    i = 0
+    while i < n:
+        while i < n and text[i].isspace():
+            i += 1
+        if i >= n:
+            break
+
+        remaining = n - i
+        if remaining <= max_chars:
+            pieces.append(_SplitPiece(text=text[i:n].rstrip(), boundary_after=None))
+            i = n
+            break
+
+        lower = i + max_chars // 2
+        upper = i + max_chars
+        ws_idx = -1
+        for j in range(upper, lower - 1, -1):
+            if text[j].isspace():
+                ws_idx = j
+                break
+
+        if ws_idx != -1:
+            piece_text = text[i:ws_idx].rstrip()
+            next_i = ws_idx + 1
+            while next_i < n and text[next_i].isspace():
+                next_i += 1
+            has_more = next_i < n
+            boundary_after = "whitespace" if has_more else None
+            i = next_i
+        else:
+            piece_text = text[i:upper]
+            boundary_after = "forced_char"
+            i = upper
+
+        pieces.append(_SplitPiece(text=piece_text, boundary_after=boundary_after))
+
+    return pieces
+
+
+def _split_long_text(text: str, max_chars: int) -> list[_SplitPiece]:
+    """把超长 element 文本切成不超过 max_chars 的 piece 列表。
+
+    入口统一 strip；空串或纯空白返回 []。
+    len(text) ≤ max_chars 时返回单个 boundary_after=None 的 piece。
+    否则按 _SENTENCE_SPLIT_RE 句子切，每句超长则调
+    _hard_split_with_whitespace_fallback，最后累积成 ≤ max_chars 的 piece。
+
+    累积规则：
+    - 多 piece 合并用单空格 joiner。
+    - chunk 的 boundary_after 取最后一个输入 piece 的值。
+    - 自然句子累积到容量上限而 flush → boundary_after 保持 None
+      （不写 metadata.split_boundary_after）。
+    """
+    text = text.strip()
+    if not text:
+        return []
+    if len(text) <= max_chars:
+        return [_SplitPiece(text=text, boundary_after=None)]
+
+    raw_pieces: list[_SplitPiece] = []
     for sentence in _SENTENCE_SPLIT_RE.split(text):
         if not sentence:
             continue
-        parts.extend(_hard_split_if_needed(sentence, max_chars))
-
-    # 2. 把句子累积成 ≤ max_chars 的片段
-    out: list[str] = []
-    buf = ""
-    for s in parts:
-        if not buf:
-            buf = s
-        elif len(buf) + 1 + len(s) <= max_chars:
-            buf = buf + " " + s
+        if len(sentence) <= max_chars:
+            raw_pieces.append(_SplitPiece(text=sentence, boundary_after=None))
         else:
-            out.append(buf)
-            buf = s
-    if buf:
-        out.append(buf)
+            raw_pieces.extend(
+                _hard_split_with_whitespace_fallback(sentence, max_chars)
+            )
+
+    out: list[_SplitPiece] = []
+    buf_text = ""
+    buf_boundary: str | None = None
+    for p in raw_pieces:
+        sep = 1 if buf_text else 0
+        if not buf_text:
+            buf_text = p.text
+            buf_boundary = p.boundary_after
+        elif len(buf_text) + sep + len(p.text) <= max_chars:
+            buf_text = buf_text + " " + p.text
+            buf_boundary = p.boundary_after
+        else:
+            out.append(_SplitPiece(text=buf_text, boundary_after=buf_boundary))
+            buf_text = p.text
+            buf_boundary = p.boundary_after
+    if buf_text:
+        out.append(_SplitPiece(text=buf_text, boundary_after=buf_boundary))
     return out
-
-
-def _hard_split_if_needed(text: str, max_chars: int) -> list[str]:
-    """单个句子超过 max_chars 时硬切。"""
-    if len(text) <= max_chars:
-        return [text]
-    return [text[i : i + max_chars] for i in range(0, len(text), max_chars)]
 
 
 @dataclass
@@ -170,19 +252,21 @@ class StructuralChunker:
             if len(text) > self.max_chars:
                 flush()
                 for piece in _split_long_text(text, self.max_chars):
-                    if not piece.strip():
+                    if not piece.text:
                         continue
-                    # 每个 piece 单独成 chunk（因为整段已超长）
+                    meta: dict[str, Any] = {
+                        "strategy": "long_paragraph_sentence_split",
+                        "max_chars": self.max_chars,
+                        "char_count": len(piece.text),
+                    }
+                    if piece.boundary_after is not None:
+                        meta["split_boundary_after"] = piece.boundary_after
                     chunks.append(
                         Chunk(
                             chunk_id=f"{document.document_id}::c{counter:04d}",
-                            text=piece.strip(),
+                            text=piece.text,
                             source_element_ids=[el.element_id],
-                            metadata={
-                                "strategy": "long_paragraph_sentence_split",
-                                "max_chars": self.max_chars,
-                                "char_count": len(piece.strip()),
-                            },
+                            metadata=meta,
                         )
                     )
                     counter += 1
