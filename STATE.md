@@ -2426,3 +2426,42 @@
 - 本 worktree（Round 50 后）：1604 pass / 0 fail / 9 skip（HEAD `166461f`）
 
 ---
+
+## Round 51（2026-08-04）：候选 BG — structural chunker 内部边角覆盖
+
+### 做了什么
+- 候选 BG：新建 `tests/test_chunker_edges.py`（85 个测试）覆盖 `app/chunkers/structural.py`（388 行）的模块级常量 + 内部 helper 边角，与已有 `test_chunker.py`（129 个集成测试）互补。
+- 重点覆盖项：
+  - **模块级常量** 16 个：_SENTENCE_SPLIT_RE / _WHITESPACE_RE 是 re.Pattern 对象、_HARD_BREAK_LANGS 是 tuple 含 6 个标点（3 中 + 3 英）、_PART_TEXT=0 / _PART_ELEMENT_ID=1 / _PART_START=2 / _PART_END=3 互不相同、_SENTENCE_SPLIT_RE 各种分隔行为（句号/问号/叹号 + 空格分隔，无空格不分隔）
+  - **_ChunkBuffer 默认 field** 13 个：counter=0、parts=[]、document_id 字段、parts 每项是 4-tuple、push_text 累积、length 求和、is_empty 状态转移（True→False→True after flush）、flush 文本用单空格 join、返回 Chunk 对象、strategy/max_chars/char_count 写入 metadata
+  - **_SplitPiece dataclass** 8 个：必填 text、默认 start/end=0、显式赋值、frozen=True 不能改属性、boundary_after 三种值（whitespace/forced_char/None）、equality 比较
+  - **_hard_split_with_whitespace_fallback** 7 个：max_chars=32 最小值、前导/尾随空白处理、text = max_chars+1 / 10x max_chars、start/end 在 [0, len) 内、piece.text 与 text[start:end] 一致
+  - **_split_long_text** 10 个：空串/纯空白返 []、短文本单 piece、恰好 == max_chars 单 piece、max_chars+1 必拆、strip 后处理、每 piece ≤ max_chars、合并用单空格、坐标在 stripped text 系
+  - **StructuralChunker.__init__ 边界** 7 个：默认 800、显式赋值、32 OK、31/0/-100/1 都 raise ValueError
+  - **_element_text_with_span** 10 个：content=None/空/全空白都返 ('',0,0)、无空白正常返、前导/尾随/双侧空白偏移计算、image element 强制返空（即使有 content）
+  - **_element_text 兼容方法** 3 个：返 text 字段、空内容返 ''、image 返 ''
+  - **normalize_text 边角** 8 个：空串/纯空白返空、内部空白 collapse、strip 首尾、混空白归一、返 str 类型、None 不 raise（短路返空）、idempotent、保留非空白字符（emoji/CJK）
+
+### 撞墙记录
+- **Wall 1**：`test_element_text_with_span_content_none_returns_empty` 失败——Element dataclass 不允许 content=None + resource_path=None。改为用 image element（自带 resource_path）测试相同行为路径。
+- **Wall 2**：`test_normalize_text_none_input_raises_before_check` 假设 None 会 raise，实际 `if not s` 短路返 ""（合法行为）。改为记录"None 不 raise"。
+- **Wall 3**：`test_chunk_buffer_multiple_flushes_independent_chunks` 假设 buf.counter 在 flush 时自增——实际由外层 StructuralChunker 维护，buf 自身不变。改为比较 source_element_ids 而非 chunk_id。
+- **Wall 4**：SyntaxWarning 因 docstring 含 `\s+` 转义。改写为"标点后有空格"避免反斜杠。
+
+### 下一步建议
+- 候选 BH：app/models.py 边角（Document/Element/Chunk/Relation/WarningRecord/ErrorRecord dataclass）
+- 候选 BI：tests/test_schema.py 边角补强（document schema validation）
+- 候选 BJ：app/pipeline.py 内部边角（process_single 错误路径细分）
+- 候选 BK：evaluation/cli.py 边角
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BH（app/models.py 边角）。理由：
+1. models.py 是数据模型核心（Document/Element/Chunk 等 6 个 dataclass）
+2. 各 dataclass 的 __post_init__ 校验、to_dict/from_dict、frozen 行为需要直接单测
+3. 至此 evaluation 层 + app/chunker + app/parser + app/cli + app/hash 全覆盖，再补 models 完成所有模块边角
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 51 后）：1689 pass / 0 fail / 9 skip（HEAD `bea827e`）
+
+---
