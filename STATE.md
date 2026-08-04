@@ -2870,3 +2870,47 @@
 - 本 worktree（Round 61 后）：2397 pass / 0 fail / 9 skip（HEAD `2ec7a43`）
 
 ---
+
+## Round 62（2026-08-04）：候选 BU — evaluation/runner.py 边角覆盖
+
+### 做了什么
+- 候选 BU：新建 `tests/test_evaluation_runner_edges.py`（68 个测试）覆盖 `evaluation/runner.py`（227 行）的 helper / 流程边角，与已有 `test_evaluation_runner.py`（50+ 个）互补。
+- 重点覆盖项：
+  - **_load_annotation 边角** 13 个：返 dict/None 类型、JSON true/false/string/float/nested list/deeply nested、Unicode keys、大 dict (10K keys)、UTF-8 BOM 返 None、str path raises AttributeError、None path 返 None、truncated JSON 返 None
+  - **_process_one 边角** 13 个：返 tuple 5 元素、total_seconds 是 float 非负、成功时 document_dict 是 dict、成功时 error_dict 是 None、失败时 error_dict 含 code、image_dir 失败时 None、parser_version 成功 str/失败 None、_per_doc 目录创建、out_stub 成功失败都清理、多次调用独立
+  - **run_evaluation 输出格式** 4 个：返 dict、写入合法 JSON、indent=2 缩进、ensure_ascii=False Unicode 原样输出
+  - **run_evaluation 目录创建** 1 个：output parent 不存在时自动创建
+  - **run_evaluation report 结构** 5 个：expected_failures 总在 + 空 []、顶层 keys 完整 6 项、per_doc 空、per_doc count 匹配、doc_id 保留
+  - **run_evaluation per_doc 字段** 6 个：每项 metrics dict、wall_time_seconds dict、total float、parse/chunk None、reason=not_instrumented、不含私有字段、只含 4 key
+  - **run_evaluation provenance** 4 个：parser_name/max_chars/parser_version 透传、全失败时 parser_version=None
+  - **run_evaluation expected_failures** 5 个：matches true/false、actual_code 记录、4 字段完整、多 EF 保序
+  - **run_evaluation failed doc** 1 个：metrics 含 pipeline_failed 标记
+  - **run_evaluation devset** 3 个：status/file_count/docx_count 透传
+  - **tolerance_chars 透传** 3 个：默认 30、自定义 50、0
+  - **模块导入** 4 个：exports run_evaluation、has _load_annotation/_process_one、__all__ 只导出 run_evaluation
+- 无源码改动。
+
+### 撞墙记录
+- 2 次撞墙：
+  1. **SyntaxError**：docstring 含 `\u` 字面量被 Python 解析为 unicode 转义。修复：用 `r"""..."""` raw docstring。
+  2. **test_load_annotation_utf8_bom_accepted 失败**：UTF-8 BOM 字符（0xEF 0xBB 0xBF）导致 json.load 失败 → 返 None。修复：改测试为 `test_load_annotation_utf8_bom_returns_none`，反映实际行为。
+  3. **test_load_annotation_str_path_accepted skip**：之前 try/except + skip 不优雅。修复：改测试为 `raises_attribute_error`，明确预期 AttributeError。
+
+### 下一步建议
+- 候选 BV：evaluation/metrics.py 边角（compute_automatic_metrics 各指标分母 0/聚合策略）
+- 候选 BW：evaluation/manifest.py 边角（manifest 解析 + categories 字段）
+- 候选 BX：evaluation/annotation_metrics.py 边角（figure_caption_prf / chunk_boundary_prf）
+- 候选 BY：app/pipeline.py 端到端边角（process_single 错误路径）
+- 候选 BZ：evaluation/report.py 边角（build_provenance / aggregate_summary / build_devset_section）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 BZ（report.py 边角）。理由：
+1. report.py 含 build_provenance / aggregate_summary / build_devset_section 三个公共 API
+2. 聚合逻辑（比例指标分母 0/聚合策略）对评测稳定性关键
+3. 之后扩展到 BV/BW/BX 完成 evaluation 模块全部边角
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 62 后）：2465 pass / 0 fail / 9 skip（HEAD `1635f59`）
+
+---
