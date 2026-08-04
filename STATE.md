@@ -3000,3 +3000,58 @@
 - 本 worktree（Round 64 后）：2693 pass / 0 fail / 9 skip（HEAD `b02e482`）
 
 ---
+
+## Round 65（2026-08-05）：候选 BX — evaluation/annotation_metrics.py 边角覆盖
+
+### 做了什么
+- 候选 BX：新建 `tests/test_annotation_metrics_edges.py`（83 个测试）覆盖 `evaluation/annotation_metrics.py`（194 行）的 figure_caption_prf / chunk_boundary_prf 全部边角，与已有 `test_annotation_metrics.py`（47 个）互补。
+- 重点覆盖项：
+  - **模块常量与 __all__** 6 个：PARSER_DOES_NOT_EMIT_RELATIONS 字面量与类型、__all__ 是 list 含 3 项、匹配模块属性
+  - **figure_caption_prf 深度** 12 个：返 dict 类型、3 个 key 精确集、所有路径 value=None、reason 常量、每项是 dict、mutable per call、忽略 document/annotation 内容、无额外 key
+  - **chunk_boundary_prf 输出结构** 7 个：返 dict、4 个 key（precision/recall/f1 + _tolerance_chars）、tolerance 默认 30 / 自定义 / 0 / 负数都接受、reason=None
+  - **doc=None 路径** 5 个：所有 metric 返 null + pipeline_failed、忽略 annotation 内容
+  - **no_annotation 路径** 3 个：空 dict / None 都触发 no_annotation
+  - **少于 2 chunks** 4 个：0 chunk + 0 anchor、0 chunk + 有 anchor（recall=0.0）、1 chunk 各路径
+  - **有预测但无 anchor** 2 个：no_ground_truth_anchors reason、annotation 缺字段视为 []
+  - **完美匹配** 3 个：P=R=F1=1.0（marker 恰好接近预测边界）
+  - **position before/after/缺省** 3 个：before 用 marker 起始位置、after 用末尾、缺省 = after
+  - **tolerance_chars 边角** 3 个：0 精确匹配、0 远 anchor 不匹配、负数永不匹配
+  - **missing_markers** 6 个：报告缺失、字段条件出现、reason=None、空 marker 视为缺失、全 miss 时 recall null + reason、全 miss 时 precision=0.0
+  - **多 chunks/anchors 一对一贪心匹配** 3 个：3 chunks 2 预测 → P=0.5/R=1.0；多 anchor 接近同预测 → 贪心；距离排序
+  - **重复 marker 顺序定位** 1 个：search_from 推进，避免两个 anchor 都命中第 1 次出现
+  - **F1 计算** 4 个：P=R=0 → denom=0 → 0.0；正常 2PR/(P+R)；P null → f1 null；P 或 R null → 精确 reason
+  - **normalize_text 集成** 2 个：多空格规范化、首尾 strip
+  - **chunks/anchors 缺省** 3 个：缺字段视为 []、None 视为 []
+  - **输出类型** 3 个：每 metric 是 dict、含 value+reason、precision 是 float|None
+  - **大输入稳定性** 2 个：10 chunks、5 anchors
+  - **Unicode** 2 个：中文 chunk 文本、Unicode marker missing
+  - **空 chunk.text** 2 个：空字符串、None
+  - **tolerance_chars 透传** 2 个：always present in output、所有早返路径都写
+  - **不 mutate 输入** 2 个：document、annotation
+  - **集成** 1 个：figure_caption vs chunk_boundary 字段集 disjoint
+  - **模块导入** 2 个：不崩、有必需属性
+- 无源码改动。
+
+### 撞墙记录
+- 2 次撞墙：
+  1. **test_chunk_boundary_no_ground_truth_when_anchors_field_missing** 失败：annotation={} 是空 dict，被 `not annotation` 检查 → 走 no_annotation 路径。修复：用 `{"doc_id": "x"}` 让 annotation 非空，触发真正的 no_ground_truth_anchors 路径。
+  2. **test_chunk_boundary_does_not_mutate_document** 失败：dict comprehension `{"k": v for k, v in doc.items()}` 写错（"k" 是字面量 key，不是变量）。修复：`{k: v for k, v in doc.items()}`。
+
+### 下一步建议
+- 候选 BW：app/manifest.py 边角（manifest 解析 + categories 字段）
+- 候选 BY：app/pipeline.py 端到端边角
+- 候选 CA：evaluation/schema_validation.py 边角
+- 候选 CB：evaluation/manifest.py 边角（评测侧 manifest loader）
+- 候选 CC：evaluation/schema.py 边角（评测侧 schema）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 CA（evaluation/schema_validation.py 边角）。理由：
+1. schema_validation 是评测的核心守门员，决定 pipeline_failed 标记
+2. 边角多：异常路径、错误消息格式、SchemaError 类型
+3. 与 metrics.py、annotation_metrics.py 形成完整 evaluation 指标层覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 65 后）：2776 pass / 0 fail / 9 skip（HEAD `7738422`）
+
+---
