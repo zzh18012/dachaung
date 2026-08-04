@@ -7651,3 +7651,108 @@ structural.py 是结构分块核心算法，第三轮已建立基础，
 可深入 provenance 字段、summary 聚合、report_version 检查、JSON 序列化。
 
 ---
+
+## Round 134（2026-08-05）：evaluation/report.py 第五轮（edges4）
+
+### 目标
+- 给 evaluation/report.py（200 行，已有 371 测试）补第五轮 edges
+- 深入 provenance/devset/summary 装配与 git/dependency 拉取
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges4.py`（104 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **get_git_provenance 深度**：
+  - 返回 dict 含 git_commit/git_dirty 两个键
+  - 非 git 目录 → commit=None
+  - OSError / TimeoutExpired → commit=None, dirty=True
+  - rev-parse returncode 非 0 → commit=None
+  - rev-parse stdout 空 → commit=None
+  - porcelain 输出非空 → dirty=True
+  - porcelain 输出空 → dirty=False
+- **get_dependency_versions 深度**：
+  - 3 个固定键（pdfplumber/python-docx/pypdfium2）
+  - 值是 str 或 None
+  - 实际环境 pdfplumber 应有版本
+  - PackageNotFoundError → None
+  - 其他异常 → None
+- **build_provenance 深度**：
+  - 9 个键
+  - evaluator_version / report_version 与常量一致
+  - max_chars 转 int（含 str 输入）
+  - run_timestamp_iso 是 str + 可被 datetime.fromisoformat 解析
+  - parser_version None 透传
+- **build_devset_section 深度**：
+  - 6 个键
+  - 各字段从 manifest 属性读取
+  - categories_covered 支持 tuple 和 list
+- **aggregate_summary 顶层结构**：
+  - 4 个顶层键（counts/success_rates/ratio_macro_averages/silent_drop_total）
+  - counts 含 element_count_total，结构 sum+participating_docs
+  - success_rates 含 pipeline_success，结构 success_count+total+rate
+  - ratio_macro_averages 含 12 项，每项 macro_average+participating_docs+not_evaluated
+  - silent_drop_total 顶层
+- **counts 聚合深度**：
+  - participating_docs 0/1/3
+  - 排除 None
+- **success_rates 聚合深度**：
+  - 仅 value is True 计 success（value=1 不计）
+  - total 始终 = len(per_doc)
+- **ratio_macro_averages 聚合深度**：
+  - 1/2 个值 macro
+  - 排除 None
+  - 全 None → macro=None
+  - value=0.0 也参与
+- **silent_drop_total 聚合深度**：
+  - 求和（含 0）
+  - 排除 None
+  - 空 → None
+- **不变量**：
+  - silent_drop 不混入 counts
+  - pipeline_success 不混入 ratios
+  - 无 overall_score
+  - idempotent
+  - 不修改输入
+  - per_doc 无 metrics → KeyError
+- **模块常量**：
+  - _COUNT_METRICS = ("element_count_total",)
+  - _SUCCESS_BOOL_METRICS = ("pipeline_success",)
+  - _RATIO_METRICS 12 项 + 唯一 + 与 count/success 互斥 + 排除 figure_caption
+- **模块结构**：
+  - __all__ list, 5 项
+  - imports 完整（subprocess/datetime/Path/EVALUATOR_VERSION/REPORT_VERSION）
+  - from __future__ import annotations
+  - docstring 提及 聚合/macro
+- **签名**：
+  - get_git_provenance 1 参（project_root）
+  - get_dependency_versions 0 参
+  - build_provenance 4 参，无默认
+  - build_devset_section 1 参（manifest）
+  - aggregate_summary 1 参（per_doc_results）
+  - 返回类型注解存在
+- **JSON 可序列化**
+
+### 撞墙记录
+1. test_aggregate_summary_handles_per_doc_without_metrics_key：实际
+   aggregate_summary 用 r["metrics"] 直接索引（KeyError），不是 .get()。
+   修复：用 pytest.raises(KeyError)。
+2. test_build_devset_section_json_serializable：JSON 序列化时 tuple →
+   list，比较不等。修复：用 list 在 FakeManifest 里。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 134 后）：10524 pass / 0 fail / 13 skip（HEAD `c39f1b0`）
+
+### 下一步建议
+- 候选 GM：app/parsers/markdown_parser.py 第四轮
+- 候选 GN：app/parsers/html_parser.py 第四轮
+- 候选 GO：app/parsers/ipynb_parser.py 第四轮
+- 候选 GP：evaluation/schema_validation.py 第四轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GP（evaluation/schema_validation.py 第四轮）。schema 模块
+负责 Document JSON 校验，第四轮可深入 if/then 分支、bbox 校验、enum
+值、source_locator 结构等。
+
+---
