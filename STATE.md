@@ -4411,3 +4411,75 @@
 - 本 worktree（Round 91 后）：5824 pass / 0 fail / 13 skip（HEAD `86a16f4`）
 
 ---
+
+## Round 92（2026-08-05）：候选 DG — fallback_parser 边角第三轮
+
+### 做了什么
+- 新建 `tests/test_parsers_fallback_edges3.py`（79 个测试），第三轮覆盖
+  `app/parsers/fallback_parser.py`（项目最大文件 630 行，含 PDF + DOCX 双路径）。
+  之前已有 79 + 95 + 168 = 342 测试，本轮聚焦算法深度与错误路径。
+- 重点覆盖项：
+  - **`_group_words_to_paragraphs` 算法深度**：
+    - line cluster 阈值（abs yc diff <= 3.0）
+    - paragraph break 阈值（line 距离 > 1.5 * median_h）
+    - median 行高计算（用例跨多 line）
+    - bbox 精确边界（min/max x0/x1/top/bottom）
+    - missing top/bottom key 不抛错（默认 0.0）
+    - 输入乱序 → 按 yc 升序输出
+  - **`_lines_to_para` 边界**：多行 word → text 用空格连接、
+    bbox 取所有 word 的极值
+  - **`_save_image` OSError**：out_dir 是文件、父路径是文件、
+    深层目录自动创建、bytes 精确写入
+  - **`_extract_inline_image_rids`**：None XML → AttributeError；
+    空 XML → 返回 []
+  - **`_render_pdf_image_region_verbose` 错误路径**（mock pypdfium2）：
+    - pypdfium2 is None → 错误字符串
+    - PdfDocument 打开失败 → "PdfDocument 打开失败"
+    - page[idx] 越界 → "取 page[idx] 失败"
+    - render/to_pil 失败 → "render/to_pil 失败"
+    - crop 退化（x1 <= x0）→ "crop 退化 (0 size)"
+    - PIL save 失败 → "PIL save 失败"
+    - 完整成功 → 返回 None + 文件写出
+    - 旧包装 `_render_pdf_image_region` 成功 True / 失败 False
+  - **`_parse_pdf` 错误路径**（monkeypatch pdfplumber）：
+    - pdfplumber is None → ParserError('pdfplumber_unavailable')
+    - pdfplumber.open 抛 → ParserError('pdfplumber_open_failed')
+    - 空 pages → warnings 含 pdf_no_text_extracted
+    - extract_words 抛 → warning('pdfplumber_word_extract_failed')，继续处理
+    - find_tables 抛 → 该页跳过 table，不抛
+    - image bbox 退化 → 跳过该 image
+    - image render 失败 → warning + image resource_path='(unrendered)'
+    - image_output_dir mkdir 失败 → warning('pdf_image_dir_failed')
+    - 正常 word → paragraph 元素
+    - 正常 table → table 元素 + markdown content
+  - **`_parse_docx` 错误路径**：
+    - docx is None → ParserError('python_docx_unavailable')
+    - docx.Document 打开失败 → ParserError('docx_open_failed')
+    - 空 body → warnings 含 docx_no_content
+  - **`_classify_pdf_paragraph` 临界**：80 chars 边界、各种 endswith 字符
+  - **`_CAPTION_RE` 更多 separator 与 keyword 组合**
+  - **`_is_heading_style` fallback**：'Heading\\t3' → (True, 3)、
+    'HeadingA' → (True, 1) 等
+- 无源码改动。
+
+### 撞墙记录
+- wall 1：`_PDFIUM_IMPORT_ERROR` 仅在 import 失败时定义；环境里成功 import 就没此属性，
+  `monkeypatch.setattr` 报 AttributeError。修复：用 `raising=False` 允许动态补属性。
+- wall 2：`_rows_to_markdown` 表头 None cell → 输出 "|  |"（两个空格）而非 "| |"。
+- wall 3：`'Heading\t3'` strip 后变 '3'，int 成功 → (True, 3) 而非 (True, 1)。
+- wall 4：'Hello World' 同行同 top/bottom → 合并成 11 字短文本，被启发式判 heading
+  而非 paragraph。修复：扩长文本或断言 type ∈ {paragraph, heading}。
+
+### 下一步建议
+- 候选 DH：跨模块不一致场景（错误的输入、parser 失败的 details 完整链路）
+- 候选 DI：app/cli.py 边角（第三轮）—— 535 行
+- 候选 DJ：app/chunkers/structural.py 边角（第三轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DH（跨模块端到端不一致场景），价值高且覆盖错误传播链。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 92 后）：5903 pass / 0 fail / 13 skip（HEAD `ef3e509`）
+
+---
