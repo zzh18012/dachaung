@@ -1335,3 +1335,43 @@
 - 本 worktree（Round 21 后）：449 pass / 0 fail / 9 skip（HEAD `09a0854`）
 
 ---
+
+## Round 22（2026-08-04）：候选 X — evaluation/metrics.py 边角覆盖率补强
+
+### 做了什么
+- 候选 X：扩展 `tests/test_metrics.py`，新增 24 个测试覆盖 `compute_automatic_metrics` 与内部 helper 的边角路径。
+- 重点覆盖项：
+  - **`_is_valid_bbox`** 直接单测：非 list、长度 ≠ 4、bool 子类陷阱、NaN/Infinity 拒绝
+  - **`_strip_unicode_whitespace`** 直接单测：NBSP / em space / en space / ideographic space / U+2028/U+2029 separator / ASCII 制表换行
+  - **PDF/DOCX locator 无 elements** → `no_elements`
+  - **DOCX locator 拒 page/bbox 键**（1/3 合规的混合测试）
+  - **DOCX locator 无 structural key** → 不合规
+  - **PDF table 类型不需要 bbox**（不在 `_PDF_BBOX_REQUIRED_TYPES`）
+  - **image resource**：None/空串路径 → 不合规
+  - **chunk reference**：空 list / 缺失 `source_element_ids` → 不合规
+  - **text_preservation 三种空情形**：both empty / actual empty / expected empty
+  - **heading_boundary_ratio**：headings 存在但无 chunks → 0.0（不是 null）
+  - **silent_drop**：空 expectations dict / 缺 element_count_by_type / 多类型同时缺
+  - **schema_valid = False** 当 document 不通过 schema
+  - **pipeline_success = False** 当 error 非 None（即使 document 也在）
+- 无源码改动，纯测试加强。
+
+### 下一步建议
+- 候选 Y：`evaluation/manifest.py` 加载/校验逻辑的测试（路径校验、相对/绝对路径拒绝、JSON 结构）
+- 候选 AA：`app/hash.py` 模块（SHA256 / content addressing）测试
+- 候选 AB：`app/chunkers/structural.py` 的纯函数 helper（如 `_element_text_with_span` 已部分覆盖，但 `_split_long_text` 还有边角）
+- 仍阻塞：J（向量化，依赖）、M（evaluator v1.2，硬底线）、O（docs/*.md，系统指令）
+
+**建议**：选 Y（manifest 模块）。理由：
+1. 路径校验是安全关键（避免 path traversal、绝对路径泄漏）
+2. 纯函数 + 不需要新依赖
+3. 与 Round 21/22 一脉相承，继续补 evaluation/ 覆盖率
+
+### 撞墙记录
+- 无新撞墙。所有 24 个新测试一次通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 22 后）：473 pass / 0 fail / 9 skip（HEAD `301e918`）
+
+---
