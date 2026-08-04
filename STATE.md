@@ -769,3 +769,61 @@
 - 本 worktree（Round 12 后）：297 pass / 0 fail / 9 skip（HEAD `6089806`）
 
 ---
+
+## 2026-08-04 — Round 13（fallback parser 覆盖率 + caption regex bug fix）
+
+**做了什么**：
+- 候选 O（docs）被 CLAUDE.md system instruction 阻塞（"NEVER create *.md unless explicitly requested"），换方向到候选 D
+- 完成候选 D：补 fallback parser 测试覆盖率 + 修一个 caption regex bug
+  - 加 19 个测试到 `tests/test_parsers.py`，覆盖原本未测的路径
+  - **纯函数 helpers**：`_is_heading_style`（title/heading N/无数字 fallback/empty）、`_is_caption`（中英文各格式 + negative）、`_classify_pdf_paragraph`（caption/heading/paragraph）、`_rows_to_markdown`（empty/single/uneven padding/None cell）、`_image_filename`（命名 pattern）、`_group_words_to_paragraphs`（empty/single/多行聚类）
+  - **错误路径**：`docx_open_failed`（坏字节流）、`pdfplumber_open_failed`（坏字节流）、`docx_no_content` warning（空 body）
+  - **DOCX caption 集成**：构造含 `Figure 1.` / `表 2` 的合成 DOCX，验证 type=caption
+  - **`_render_pdf_image_region_verbose`** 失败路径：bad path / bad page index / 退化 bbox
+- **Bug 发现并修复**：`_CAPTION_RE` 漏了 `:` 分隔符 → `"Figure 5: Architecture"` 不被识别为 caption
+  - 修：在末尾字符类 `[\.、\s]` → `[\.、:\s]`
+  - 影响面：只扩展匹配，原匹配的 caption 仍匹配；不会破坏现有测试
+- commit `8725911`，已 push
+
+**worktree 当前状态**：
+- HEAD `8725911`，工作树清洁
+- 测试基线：316 pass / 0 fail / 9 skip（+19 vs Round 12）
+- main 仍在 `2c35244`（隔离不变量保持）
+
+### 下一步建议（Round 14）
+
+**首要任务**：方向选择
+
+- 候选 P（推荐）：**测试 fixtures 提取**
+  - 现状：`tests/test_parsers.py`、`tests/test_evaluation_cli.py`、`tests/test_cli.py` 都各自重复实现合成 DOCX/PDF 构造
+  - 复杂度：低
+  - 价值：减少重复代码；后续加测试更快；统一合成文档质量
+
+- 候选 Q（新提）：** kreuzberg parser 覆盖率**
+  - 现状：`tests/test_parsers.py` 只有 3 个 kreuzberg 测试
+  - 复杂度：中（kreuzberg 行为不稳定，需要更仔细的 assertion）
+  - 价值：kreuzberg 是默认 parser 之外的备选，覆盖率薄弱
+
+- 候选 R（新提）：**chunker 覆盖率扩展**
+  - 现状：source_spans 已有测试；但句子分割（中英文标点）、whitespace fallback 等分支可能仍有未覆盖
+  - 复杂度：低-中
+
+- 候选 S（新提）：**pipeline 错误处理路径**
+  - 现状：`process_single` 的 warning 汇总 / 错误聚合 / 半成品清理路径
+  - 复杂度：中
+
+- 仍阻塞：候选 J（向量化，CLAUDE.md deps 限制）、候选 M（evaluator v1.2，AUTONOMOUS_LOOP.md 硬底线）、候选 O（docs/*.md，CLAUDE.md system instruction）
+
+**建议**：选 P（fixtures 提取）。理由：
+1. 是当前 4 个测试文件的共同痛点，每加一个新测试都要重写合成 DOCX
+2. 复杂度低，一轮内可完成
+3. 为后续轮次加测试降本
+
+### 撞墙记录
+- 候选 O（docs/*.md）：CLAUDE.md system instruction "NEVER create documentation files (*.md) or README files unless explicitly requested by the User" 阻塞。换方向到 D。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 13 后）：316 pass / 0 fail / 9 skip（HEAD `8725911`）
+
+---
