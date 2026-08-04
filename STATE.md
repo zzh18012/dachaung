@@ -2167,3 +2167,41 @@
 - 本 worktree（Round 43 后）：1317 pass / 0 fail / 9 skip（HEAD `57651f5`）
 
 ---
+
+## Round 44（2026-08-04）：候选 AV — evaluation/metrics.py 内部边角覆盖
+
+### 做了什么
+- 候选 AV：扩展 `tests/test_metrics.py`，新增 43 个测试覆盖 `evaluation/metrics.py`（381 行）的全部内部 helper + compute_automatic_metrics 字段完整性。
+- 重点覆盖项：
+  - **内部 helper 直接单测** 17 个：_null（empty reason 也接受）、_ratio（int→float 转换、0.0/1.0 边界）、_bool_metric（truthy/falsy 强制转换）、_int_metric（float 截断 3.7→3、负数 -2.9→-2）、_TEXT_TYPES 常量（排除 image、含 heading/paragraph/list_item/table/caption）、_PDF_BBOX_REQUIRED_TYPES 常量（排除 table）、_NOT_EVALUATED 常量值
+  - **compute_automatic_metrics shape & 契约** 10 个：返回 14 个顶层 keys（pipeline_success/error_code/schema_valid/element_count_total/element_count_by_type/pdf_locator_valid_ratio/docx_locator_valid_ratio/image_resource_exists_ratio/chunk_reference_intact_ratio/text_preservation_equal/text_char_multiset_precision/text_char_multiset_recall/heading_boundary_compliance/silent_drop_count）、error 存在→pipeline_success False、document None+error None 也 False、error.code 透传、element_count_total int、element_count_by_type dict、chunk_count 通过 ratio 反映、pipeline_failed 时 ratio null、schema_valid False 路径
+  - **`_strip_unicode_whitespace`** 5 个：实际去全部空白（不是 strip），内部空白也删，全空白→空，处理 \xa0 nbsp 与 U+3000 全角空格
+  - **`_is_valid_bbox`** 3 个：四 float 接受、string 元素拒、dict 拒、tuple 拒（仅 list 类型接受）、负数接受
+  - **`_image_resource_ratio`** 2 个：全有效路径→1.0、无 image 元素→null
+  - **`_silent_drop_count`** 3 个：实际满足期望→0、值是 int、无 expectations→null
+  - **`_chunk_reference_ratio`** 2 个：全 chunks 有 ids→1.0、无 chunks→null
+- 无源码改动。
+
+### 撞墙记录
+- **Wall 1**：`test_compute_metrics_returns_all_expected_top_level_keys` 假设 metric key 名（element_count、chunk_count、text_char_multiset_equal、heading_boundary_compliance_ratio 等）。实际名：element_count_total、element_count_by_type、text_preservation_equal、heading_boundary_compliance（无 _ratio 后缀）。改测试用真实 key。
+- **Wall 2**：`test_compute_metrics_element_count_returns_int` 用 m["element_count"] → KeyError。实际 key 是 m["element_count_total"]。
+- **Wall 3**：`test_compute_metrics_schema_check_exception_path` 假设 reason 含 "schema_check_exception"。实际 document_passes_schema 对不完整 document 返 False（不抛异常），reason 为 None。改为只测 value=False。
+- **Wall 4**：`_strip_unicode_whitespace` 函数名误导——实际是**删全部** Unicode 空白（不是 strip 首尾）。`"  hello world  "` → `"helloworld"`。改测试反映实际行为。
+
+### 下一步建议
+- 候选 AW：evaluation/report.py 内部边角（aggregate_summary / build_devset_section / get_dependency_versions / get_git_provenance）
+- 候选 AX：evaluation/schema.py + evaluation/schema_validation.py 边角
+- 候选 AS：app/hash.py 内部边角补强
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AW（evaluation/report.py）。理由：
+1. report.py 含 aggregate_summary（macro avg）、build_devset_section、get_dependency_versions、get_git_provenance 等多个纯函数
+2. aggregate_summary 是最终聚合点，决定报告 summary 字段
+3. 与 metrics.py 形成「指标计算 + 指标聚合」全覆盖
+4. 之后转 AX（schema 边角）完成 evaluation 层全覆盖
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 44 后）：1360 pass / 0 fail / 9 skip（HEAD `b479bed`）
+
+---
