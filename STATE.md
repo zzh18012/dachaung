@@ -1555,3 +1555,37 @@
 - 本 worktree（Round 27 后）：579 pass / 0 fail / 9 skip（HEAD `4e8a43c`）
 
 ---
+
+## Round 28（2026-08-04）：候选 AF — structural chunker 覆盖率补强
+
+### 做了什么
+- 候选 AF：扩展 `tests/test_chunker.py`，新增 27 个测试覆盖 `normalize_text` / `StructuralChunker.__init__` / `_ChunkBuffer` / 各类集成边角。
+- 重点覆盖项：
+  - **`normalize_text` 直接单测**：幂等性、Unicode 空白（NBSP、em space、tab）压成单空格、纯空白输入返回空
+  - **`StructuralChunker.__init__` 验证**：max_chars=32 边界接受、31/0/负数拒绝、默认值 800
+  - **`_ChunkBuffer` 直接单测**（7 个）：空 flush、纯空白 flush、length() 求和、source_element_ids 顺序去重、source_spans per-part、chunk_id 格式、flush 重置 parts、metadata 含 strategy/max_chars/char_count
+  - **集成边角**：纯 heading、heading→image→paragraph（image 不出 chunk）、已有 chunks 字段被忽略、list_item 累积、caption 是 isolated、table metadata strategy
+- 无源码改动。
+
+### 撞墙记录
+- **撞墙 1**：`test_heading_then_image_then_paragraph` 第一版用 `_make_doc` 试图构造 image element 但 `_make_doc` 强制 content，违反 Element 不变量（"content 或 resource_path"）。改测：直接构造 Element 列表，让 image 用 resource_path。
+- 不是源码 bug。
+
+### 下一步建议
+- 候选 AG：`app/cli.py` 子命令更细致的测试（参数解析、退出码、stderr 输出）
+- 候选 AH：`evaluation/cli.py` 的 `validate-report` 子命令路径
+- 候选 AI：`app/pipeline.py` 其他 helper（`image_output_dir_for` 等）
+- 候选 AJ：fuzz / property-based 测试（hypothesis，但需要新依赖）
+- 候选 AK：更多 parser 的内部 helper 单测（kreuzberg 适配器、markdown parser）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 AI（pipeline helper 补强）。理由：
+1. `image_output_dir_for` 等纯函数还可以测
+2. 不引入新依赖
+3. 之后可以做 AG / AH 的 CLI 子命令路径
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 28 后）：601 pass / 0 fail / 9 skip（HEAD `3657de8`）— **跨过 600 里程碑**
+
+---
