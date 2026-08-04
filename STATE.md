@@ -7915,3 +7915,90 @@ structural.py 是结构分块核心算法，第三轮已建立基础，
 markdown 类似规模，第四轮可深入 tag 嵌套、属性、自闭合标签等。
 
 ---
+
+## Round 137（2026-08-05）：app/parsers/html_parser.py 第五轮（edges5）
+
+### 目标
+- 给 app/parsers/html_parser.py（446 行，已有 495 测试）补第五轮 edges
+- 深入模块常量、_HTMLDocParser 状态、handle_data 边界、table 嵌套
+
+### 改动
+- 新增 `tests/test_parsers_html_edges5.py`（102 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块常量深度**：
+  - _HTML_EXTENSIONS = (".html", ".htm")，tuple，2 项
+  - _HEADING_LEVELS = {h1:1, ..., h6:6}，dict，6 项
+  - _SKIP_TAGS = {script, style, head, title, meta, link, noscript}，set，7 项
+- **_detect_html_source_type 深度**：
+  - 大小写不敏感
+  - 拒绝 pdf/docx/md/no_suffix
+  - error details suffix 字段
+- **_rows_to_md 边界**：
+  - 空 / 单行 / 多行 / jagged / Unicode / 宽行
+- **HtmlParser 类属性**：
+  - name="html", version="stdlib/0.1.0"
+  - 继承 Parser
+  - _HTMLDocParser 继承 stdlib HTMLParser
+- **_HTMLDocParser 初始状态**：
+  - elements/warnings 空
+  - _cur_kind None
+  - _table_depth/_pre_depth/_blockquote_depth 0
+  - _section_path/_skip_stack/_list_stack 空
+- **handle_data 行为**：
+  - loose text → paragraph
+  - inside p/pre/blockquote 累积
+  - inside script/style 忽略
+- **嵌套 table warning**：
+  - 内层 table 触发 html_nested_table
+  - 单 table 无 warning
+- **表格 cell 收尾**：
+  - th/td 混合
+  - 未闭合 tr 自动收尾（不崩溃）
+  - row_count/col_count/source 元数据
+  - confidence 0.9
+- **heading 处理**：
+  - h1-h6 level
+  - confidence 0.95
+  - 支持属性（class/id）
+- **list_item**：
+  - ul → unordered marker
+  - ol → ordered marker
+  - 多 li 累积
+- **img 处理**：
+  - standalone 自闭合
+  - 无 src / 空 src 跳过
+  - alt 默认空字符串
+  - confidence 0.9
+- **section_path**：
+  - after h1+h2 = "A > B"
+  - h2 → h1 弹出
+  - 无 heading → 无 section_path 键
+- **element_id 格式**：e{idx:04d}
+- **综合**：复杂文档多个 block 类型
+- **模块结构**：__all__/imports/docstring
+- **签名**：parse 3 参，init 2 参，handle_* 各参数数
+
+### 撞墙记录
+1. test_rows_to_md_wide_row：5 列单行 header 有 6 个 |（不是 6 全文）。
+   修复：用 split("\n")[0].count。
+2. test_table_unclosed_tr_auto_closes：未闭合 tr 的解析行为复杂，只验
+   不崩溃 + table 存在，不验具体内容。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 137 后）：10771 pass / 0 fail / 13 skip（HEAD `4c01a2d`）
+
+### 下一步建议
+- 候选 GO：app/parsers/ipynb_parser.py 第四轮
+- 候选 GS：app/parsers/fallback_parser.py 第六轮
+- 候选 GT：evaluation/runner.py 第六轮
+- 候选 GU：evaluation/cli.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 GO（app/parsers/ipynb_parser.py 第四轮）。ipynb parser 处理
+Jupyter notebook JSON，第四轮可深入 cell 类型、source 拼接、metadata
+解析。
+
+---
