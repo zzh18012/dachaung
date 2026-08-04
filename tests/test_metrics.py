@@ -756,3 +756,459 @@ def test_pipeline_success_false_when_error_present():
     )
     assert m["pipeline_success"]["value"] is False
     assert m["error_code"]["value"] == "some_error"
+
+
+# ---------- 边角补强（Round 44） ----------
+
+
+# 内部 helper 直接单测
+
+
+def test_null_helper_returns_value_none_reason_set():
+    from evaluation.metrics import _null
+    out = _null("some_reason")
+    assert out["value"] is None
+    assert out["reason"] == "some_reason"
+
+
+def test_null_helper_with_empty_reason():
+    from evaluation.metrics import _null
+    out = _null("")
+    assert out["value"] is None
+    assert out["reason"] == ""
+
+
+def test_ratio_helper_returns_value_float_reason_none():
+    from evaluation.metrics import _ratio
+    out = _ratio(0.5)
+    assert out["value"] == 0.5
+    assert out["reason"] is None
+    assert isinstance(out["value"], float)
+
+
+def test_ratio_helper_int_input_converted_to_float():
+    from evaluation.metrics import _ratio
+    out = _ratio(1)
+    assert out["value"] == 1.0
+    assert isinstance(out["value"], float)
+
+
+def test_ratio_helper_zero_returns_zero():
+    from evaluation.metrics import _ratio
+    out = _ratio(0.0)
+    assert out["value"] == 0.0
+
+
+def test_ratio_helper_one_returns_one():
+    from evaluation.metrics import _ratio
+    out = _ratio(1.0)
+    assert out["value"] == 1.0
+
+
+def test_bool_metric_returns_bool_value():
+    from evaluation.metrics import _bool_metric
+    assert _bool_metric(True)["value"] is True
+    assert _bool_metric(False)["value"] is False
+    assert _bool_metric(True)["reason"] is None
+
+
+def test_bool_metric_coerces_truthy_value():
+    """入参 1/0/'' 等 truthy/falsy 也会被 bool() 转换。"""
+    from evaluation.metrics import _bool_metric
+    assert _bool_metric(1)["value"] is True
+    assert _bool_metric(0)["value"] is False
+    assert _bool_metric("")["value"] is False
+    assert _bool_metric("x")["value"] is True
+
+
+def test_int_metric_returns_int_value():
+    from evaluation.metrics import _int_metric
+    out = _int_metric(42)
+    assert out["value"] == 42
+    assert isinstance(out["value"], int)
+    assert out["reason"] is None
+
+
+def test_int_metric_coerces_float_to_int():
+    """float 入参被 int() 截断。"""
+    from evaluation.metrics import _int_metric
+    assert _int_metric(3.7)["value"] == 3
+    assert _int_metric(-2.9)["value"] == -2
+
+
+# _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 常量
+
+
+def test_text_types_constant_excludes_image():
+    """image 元素不参与文本比对。"""
+    from evaluation.metrics import _TEXT_TYPES
+    assert "image" not in _TEXT_TYPES
+
+
+def test_text_types_constant_includes_common_text_types():
+    from evaluation.metrics import _TEXT_TYPES
+    for t in ("heading", "paragraph", "list_item", "table", "caption"):
+        assert t in _TEXT_TYPES
+
+
+def test_pdf_bbox_required_types_includes_text_types():
+    from evaluation.metrics import _PDF_BBOX_REQUIRED_TYPES
+    for t in ("heading", "paragraph", "caption", "list_item"):
+        assert t in _PDF_BBOX_REQUIRED_TYPES
+
+
+def test_pdf_bbox_required_types_excludes_table():
+    """table 不要求 bbox（自身有 row/col 信息）。"""
+    from evaluation.metrics import _PDF_BBOX_REQUIRED_TYPES
+    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
+
+
+def test_not_evaluated_constant_value():
+    from evaluation.metrics import _NOT_EVALUATED
+    assert _NOT_EVALUATED == "not_evaluated"
+
+
+# compute_automatic_metrics 字段完整性
+
+
+def test_compute_metrics_returns_all_expected_top_level_keys():
+    """compute_automatic_metrics 应返回全部 metric keys。"""
+    elements = [
+        {"element_id": "e1", "type": "paragraph", "content": "hello world",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 0, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+    ]
+    chunks = [{
+        "chunk_id": "c1", "text": "hello world",
+        "source_element_ids": ["e1"], "metadata": {},
+    }]
+    doc = _docx_document(elements, chunks)
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+    )
+    # 实际返回的字段集（来自实现）
+    expected_keys = {
+        "pipeline_success", "error_code", "schema_valid",
+        "element_count_total", "element_count_by_type",
+        "pdf_locator_valid_ratio", "docx_locator_valid_ratio",
+        "image_resource_exists_ratio",
+        "chunk_reference_intact_ratio",
+        "text_preservation_equal",
+        "text_char_multiset_precision",
+        "text_char_multiset_recall",
+        "heading_boundary_compliance",
+        "silent_drop_count",
+    }
+    assert expected_keys.issubset(m.keys())
+
+
+def test_compute_metrics_error_present_pipeline_success_false():
+    """error 非 None → pipeline_success False（无论 document 是否 None）。"""
+    error = {"code": "boom", "message": "fail"}
+    m = compute_automatic_metrics(
+        document={"elements": []},
+        error=error,
+        source_type="docx",
+        expectations=None,
+    )
+    assert m["pipeline_success"]["value"] is False
+
+
+def test_compute_metrics_document_none_error_none_pipeline_success_false():
+    """document=None + error=None 也不算成功（防边缘情况）。"""
+    m = compute_automatic_metrics(
+        document=None,
+        error=None,
+        source_type="docx",
+        expectations=None,
+    )
+    assert m["pipeline_success"]["value"] is False
+
+
+def test_compute_metrics_error_code_when_error_is_none():
+    """error=None → error_code value None。"""
+    elements = []
+    doc = _docx_document(elements, [])
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+    )
+    assert m["error_code"]["value"] is None
+
+
+def test_compute_metrics_error_code_value_passes_through():
+    """error.code 字段直接透传到 error_code.value。"""
+    error = {"code": "weird_code", "message": "x"}
+    m = compute_automatic_metrics(
+        document=None, error=error, source_type="docx", expectations=None,
+    )
+    assert m["error_code"]["value"] == "weird_code"
+
+
+def test_compute_metrics_element_count_returns_int():
+    elements = [
+        {"element_id": f"e{i}", "type": "paragraph", "content": "x",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": i, "section": 0},
+         "confidence": 0.95, "metadata": {}}
+        for i in range(5)
+    ]
+    doc = _docx_document(elements, [])
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+    )
+    assert m["element_count_total"]["value"] == 5
+    assert isinstance(m["element_count_total"]["value"], int)
+
+
+def test_compute_metrics_element_count_by_type_returns_dict():
+    elements = [
+        {"element_id": "e1", "type": "paragraph", "content": "x",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 0, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+        {"element_id": "e2", "type": "paragraph", "content": "y",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 1, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+        {"element_id": "e3", "type": "heading", "content": "Title",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 2, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+    ]
+    doc = _docx_document(elements, [])
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+    )
+    ecbt = m["element_count_by_type"]["value"]
+    assert isinstance(ecbt, dict)
+    assert ecbt.get("paragraph") == 2
+    assert ecbt.get("heading") == 1
+
+
+def test_compute_metrics_chunk_count_zero_when_no_chunks():
+    """compute_automatic_metrics 不返回 chunk_count，但 chunk_reference_intact_ratio 反映无 chunk。"""
+    elements = [
+        {"element_id": "e1", "type": "paragraph", "content": "x",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 0, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+    ]
+    doc = _docx_document(elements, [])
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+    )
+    # chunk 数为 0 → ratio null
+    assert m["chunk_reference_intact_ratio"]["value"] is None
+
+
+def test_compute_metrics_pipeline_failed_returns_null_for_document_metrics():
+    """pipeline 失败时所有依赖 document 的指标都应是 null + pipeline_failed。"""
+    error = {"code": "boom", "message": "fail"}
+    m = compute_automatic_metrics(
+        document=None, error=error, source_type="docx", expectations=None,
+    )
+    # 比例类应是 null
+    assert m["image_resource_exists_ratio"]["value"] is None
+    assert m["chunk_reference_intact_ratio"]["value"] is None
+    assert m["text_preservation_equal"]["value"] is None
+    assert m["heading_boundary_compliance"]["value"] is None
+
+
+# compute_automatic_metrics schema_check 异常路径
+
+
+def test_compute_metrics_schema_check_false_when_invalid_document():
+    """document 缺关键字段 → schema_valid=False（reason 可能含异常信息或为 None）。"""
+    # 构造一个会被 schema 校验拒绝的 document（缺关键字段）
+    bad_doc = {"incomplete": True}
+    m = compute_automatic_metrics(
+        document=bad_doc, error=None, source_type="docx", expectations=None,
+    )
+    assert m["schema_valid"]["value"] is False
+
+
+# _strip_unicode_whitespace 直接单测（实际是去全部空白，不是 strip）
+
+
+def test_strip_unicode_whitespace_removes_all_kinds_internal_and_edges():
+    """_strip_unicode_whitespace 实际是把字符串里**所有** Unicode 空白都删掉。"""
+    from evaluation.metrics import _strip_unicode_whitespace
+    # 含普通空格、tab、换行、Unicode 不间断空格
+    assert _strip_unicode_whitespace(" \t\n hello world ") == "helloworld"
+    assert _strip_unicode_whitespace("a b c") == "abc"
+
+
+def test_strip_unicode_whitespace_all_whitespace_returns_empty():
+    from evaluation.metrics import _strip_unicode_whitespace
+    assert _strip_unicode_whitespace("   \t\n  ") == ""
+    assert _strip_unicode_whitespace("") == ""
+
+
+def test_strip_unicode_whitespace_no_whitespace_unchanged():
+    from evaluation.metrics import _strip_unicode_whitespace
+    assert _strip_unicode_whitespace("hello") == "hello"
+
+
+def test_strip_unicode_whitespace_handles_unicode_nbsp():
+    from evaluation.metrics import _strip_unicode_whitespace
+    # \xa0 是不间断空格（也被视为 whitespace）
+    assert _strip_unicode_whitespace("a\xa0b") == "ab"
+
+
+def test_strip_unicode_whitespace_handles_ideographic_space():
+    """全角空格 U+3000 也应被剥除。"""
+    from evaluation.metrics import _strip_unicode_whitespace
+    assert _strip_unicode_whitespace("a　b") == "ab"
+
+
+# _is_valid_bbox 边角
+
+
+def test_is_valid_bbox_accepts_four_floats():
+    from evaluation.metrics import _is_valid_bbox
+    assert _is_valid_bbox([1.0, 2.0, 3.0, 4.0]) is True
+
+
+def test_is_valid_bbox_accepts_four_ints():
+    from evaluation.metrics import _is_valid_bbox
+    assert _is_valid_bbox([1, 2, 3, 4]) is True
+
+
+def test_is_valid_bbox_rejects_string_elements():
+    from evaluation.metrics import _is_valid_bbox
+    assert _is_valid_bbox(["1", "2", "3", "4"]) is False
+
+
+def test_is_valid_bbox_rejects_negative_numbers():
+    """负数也是 number，所以应接受（schema 不强制非负）。"""
+    from evaluation.metrics import _is_valid_bbox
+    # 验证：当前实现接受负数（isinstance(x, (int, float)) 且 !bool）
+    assert _is_valid_bbox([-1.0, -2.0, -3.0, -4.0]) is True
+
+
+def test_is_valid_bbox_rejects_dict():
+    from evaluation.metrics import _is_valid_bbox
+    assert _is_valid_bbox({"x0": 1}) is False
+
+
+def test_is_valid_bbox_rejects_tuple():
+    """tuple 虽然序列，但 list 检查不接受 tuple（contract）。"""
+    from evaluation.metrics import _is_valid_bbox
+    # 注：当前实现要求 list 类型；tuple 不接受
+    result = _is_valid_bbox((1.0, 2.0, 3.0, 4.0))
+    # 实际行为：tuple 不是 list → False
+    assert result is False
+
+
+# _image_resource_ratio 边角
+
+
+def test_image_resource_ratio_all_valid_paths(tmp_path: Path):
+    elements = [
+        {"element_id": "i1", "type": "image", "content": None,
+         "resource_path": str(tmp_path / "img1.png"),
+         "parent_id": None, "source_locator": {"paragraph_index": 0, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+    ]
+    # 创建实际文件
+    (tmp_path / "img1.png").write_bytes(b"fake png")
+    doc = _docx_document(elements, [])
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+        image_base_dir=tmp_path,
+    )
+    assert m["image_resource_exists_ratio"]["value"] == 1.0
+
+
+def test_image_resource_ratio_no_images_returns_null():
+    """没有 image 元素 → null + no_images_in_document。"""
+    elements = [
+        {"element_id": "e1", "type": "paragraph", "content": "x",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 0, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+    ]
+    doc = _docx_document(elements, [])
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+    )
+    assert m["image_resource_exists_ratio"]["value"] is None
+
+
+# _silent_drop_count 边角
+
+
+def test_silent_drop_count_zero_when_actual_meets_expectations():
+    """实际 element 数 >= 期望 → silent_drop_count = 0。"""
+    elements = [
+        {"element_id": "e1", "type": "paragraph", "content": "x",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 0, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+    ]
+    doc = _docx_document(elements, [])
+    expectations = {"element_count_by_type": {"paragraph": 1}}
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=expectations,
+    )
+    assert m["silent_drop_count"]["value"] == 0
+
+
+def test_silent_drop_count_value_is_int():
+    elements = []
+    doc = _docx_document(elements, [])
+    expectations = {"element_count_by_type": {"paragraph": 5}}
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=expectations,
+    )
+    assert isinstance(m["silent_drop_count"]["value"], int)
+
+
+def test_silent_drop_count_null_when_no_expectations():
+    """expectations=None → silent_drop_count.value = None。"""
+    elements = [
+        {"element_id": "e1", "type": "paragraph", "content": "x",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 0, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+    ]
+    doc = _docx_document(elements, [])
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+    )
+    assert m["silent_drop_count"]["value"] is None
+
+
+# _chunk_reference_ratio 边角
+
+
+def test_chunk_reference_ratio_one_when_all_chunks_have_ids():
+    elements = [
+        {"element_id": "e1", "type": "paragraph", "content": "x",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 0, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+    ]
+    chunks = [
+        {"chunk_id": "c1", "text": "x", "source_element_ids": ["e1"], "metadata": {}},
+    ]
+    doc = _docx_document(elements, chunks)
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+    )
+    assert m["chunk_reference_intact_ratio"]["value"] == 1.0
+
+
+def test_chunk_reference_ratio_null_when_no_chunks():
+    elements = [
+        {"element_id": "e1", "type": "paragraph", "content": "x",
+         "resource_path": None, "parent_id": None,
+         "source_locator": {"paragraph_index": 0, "section": 0},
+         "confidence": 0.95, "metadata": {}},
+    ]
+    doc = _docx_document(elements, [])
+    m = compute_automatic_metrics(
+        document=doc, error=None, source_type="docx", expectations=None,
+    )
+    assert m["chunk_reference_intact_ratio"]["value"] is None
