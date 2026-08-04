@@ -4791,3 +4791,51 @@
 - 本 worktree（Round 97 后）：6337 pass / 0 fail / 13 skip（HEAD `f53f861`）
 
 ---
+
+## Round 98（2026-08-05）：候选 DM — evaluation/manifest.py 第三轮边角
+
+### 做了什么
+- 新建 `tests/test_evaluation_manifest_edges3.py`（66 个测试）第三轮覆盖
+  `evaluation/manifest.py`（239 行）。
+- 重点覆盖项：
+  - **`_is_absolute_like`** 所有平台 case：
+    - POSIX `/foo` 绝对
+    - Windows `C:\foo` / `C:/foo` 绝对
+    - `C:foo` drive-relative 不算绝对
+    - 数字盘符 `1:\foo` 不算
+    - UNC `\\server\share` 不算（无盘符）
+    - 单 `/` 绝对、单 `\` 不绝对
+    - `./foo` / `../foo` 相对
+  - **`_has_backslash`**：各种字符串边界
+  - **Manifest dataclass**：frozen + properties 精确算法（file_count / pdf_count /
+    docx_count / categories_covered）+ content_group_count 单向 paired_with 算 1 组
+  - **DocumentEntry**：frozen + 必填字段 + 全字段（含 sha256/categories/paired_with/
+    annotation_resolved/expectations）
+  - **ExpectedFailure**：frozen + source_type 可 None
+  - **`_resolve_relative_path`** 所有错误码（空、绝对、反斜杠、解析越界）+
+    正常相对路径 + `./foo` + 子目录
+  - **`load_manifest`**：missing file、bad JSON、invalid version、valid returns Manifest、
+    with expected_failures、with annotation_file、empty documents、
+    categories 作为 tuple 保留
+  - **`_detect_project_root`**：从子目录向上找 pyproject.toml、
+    无 pyproject fallback、Path 对象输入
+  - **`ManifestError`** 继承 Exception + 可被 raise/捕获
+  - **`__all__`** 含 5 个公开符号
+- 无源码改动。
+
+### 撞墙记录
+- 无：66 个测试一次通过。
+
+### 下一步建议
+- 候选 DN：evaluation/report.py 边角（第二轮）
+- 候选 DO：evaluation/schema_validation.py 边角（如有）
+- 候选 DP：evaluation/annotation_metrics.py 边角（第三轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 DN（report.py 第二轮）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 98 后）：6403 pass / 0 fail / 13 skip（HEAD `fbb3d2c`）
+
+---
