@@ -6178,3 +6178,107 @@ edges3 已饱和，但 edges4 仍有空间覆盖 HTMLParser 回调深度。
 - 本 worktree（Round 116 后）：8421 pass / 0 fail / 13 skip（HEAD `b32e5a8`）
 
 ---
+
+## Round 117（2026-08-05）：evaluation/metrics.py 第四轮（edges4）
+
+### 范围
+- 文件：`tests/test_evaluation_metrics_edges4.py`（新增，1164 行）
+- 目标：`evaluation/metrics.py`（381 行，已有 114 测试）
+- 新增测试：177 个
+- 提交：`4cfe261`
+
+### 覆盖深度
+- **模块常量**：
+  - _TEXT_TYPES 内容精确（paragraph/heading/list_item/table_cell/text）
+  - _PDF_BBOX_REQUIRED_TYPES 内容精确（image/figure/table）
+  - _NOT_EVALUATED 值精确（figure_caption_*）
+- **辅助函数**：_null/_ratio/_bool_metric/_int_metric
+  各种 value/reason 组合、bool/int 输入、reason 为空/非空
+- **_strip_unicode_whitespace**：
+  - 常规空白（space/tab/newline/CR/CRLF）
+  - NBSP（ ）、em space（ ）、en space（ ）
+  - ideographic space（　）
+  - line separator（ ）、paragraph separator（ ）
+  - thin space（ ）、hair space（ ）
+  - 混合 ascii + unicode 空白
+  - 仅 unicode 空白 → ""
+  - 空串、纯非空白保持
+- **_is_valid_bbox 深度**：
+  - None/字符串/dict/tuple 拒
+  - 空 list、长度 1/3/5 拒
+  - 含 None/字符串/bool 元素拒
+  - NaN/Inf 拒
+  - 4 元素正常 list 通过
+  - 4 元素正常 tuple 通过
+- **_pdf_locator_ratio / _docx_locator_ratio**：
+  - 各种 type（heading/paragraph/list_item/table_cell/image/table）
+  - DOCX 中 image/table 不要求 page/bbox
+  - PDF 中 image/table 要求 bbox（4 元素）
+  - PDF 中 heading/paragraph 仅要求 page
+  - missing locator、locator 类型错、page 类型错
+  - bbox 缺失、bbox 非 list、长度错、含非法元素
+- **_image_resource_ratio**：
+  - image 无 resource_path → 拒
+  - image 有 resource_path 但文件不存在 → 拒
+  - image 有 resource_path 且文件存在 → 通过（tmp_path）
+  - 非 image 类型不参与计算
+- **_chunk_reference_ratio**：
+  - chunks=None、chunks=[] → null
+  - chunk 无 source_element_ids → 拒
+  - chunk source_element_ids 含 unknown id → 拒
+  - 全部命中 → 通过
+- **_text_preservation**：
+  - 含 image content 不参与 expected
+  - content=None 跳过
+  - chunk text=None 跳过
+  - chunks expected 空 actual 非空 → precision=0/recall=null
+  - 互不相交 → precision=0/recall=0
+  - 部分相交 → 比例计算
+- **_heading_boundary_ratio**：
+  - 无 heading → null
+  - heading 与 chunk 一一对应 → 通过
+  - heading 第一段匹配，第二段不匹配 → 部分通过
+  - tolerance_chars 默认 30
+- **_silent_drop_count**：
+  - expectations=None → null
+  - 多类型 expected/actual，取 max
+  - actual ≥ expected → 0
+  - element_count_by_type 缺类型 → 当 expected=0
+- **compute_automatic_metrics 综合**：
+  - 13 个 metric key 精确
+  - source_type=pdf/docx/ipynb/html/markdown/text 路径
+  - element_count_by_type 精确
+  - expectations 默认无（必需参数）
+  - schema_check 异常路径
+- **模块结构**：
+  - __all__ 精确导出 1 项（compute_automatic_metrics）
+  - imports：Any/Counter/Path/Dict/List/Tuple
+  - 模块 docstring 提及 text_preservation
+  - 各函数 docstring 检查（_chunk_reference_ratio 显式无 docstring）
+- 无源码改动。
+
+### 撞墙记录
+1. test_text_preservation_text_in_chunks_only：原断言 precision=1.0，
+   实际 common=0/|actual|=3 → precision=0.0。修复：断言改为 0.0，
+   recall 改为 null。
+2. test_compute_metrics_expectations_default_none：原断言 default is None，
+   实际 expectations 是必需参数（无默认）。修复：改测 default is empty。
+3. test_chunk_reference_ratio_has_docstring：函数无 docstring。
+   修复：改为 test_chunk_reference_ratio_no_docstring，断言 None。
+
+### 下一步建议
+- 候选 FU：evaluation/manifest.py 第四轮（239 行）
+- 候选 FV：evaluation/runner.py 第四轮（227 行）
+- 候选 FW：evaluation/annotation_metrics.py 第四轮（194 行）
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 FY：app/models.py 第三轮（154 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 FU（evaluation/manifest.py 第四轮）。manifest 是评测清单
+解析核心，239 行，涉及路径校验、categories 聚合、JSON 加载等独立逻辑。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 117 后）：8598 pass / 0 fail / 13 skip（HEAD `4cfe261`）
+
+---
