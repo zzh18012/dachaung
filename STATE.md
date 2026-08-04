@@ -6932,3 +6932,73 @@ Schema 校验核心，独立于 evaluation/schema，第三轮深度空间仍在�
 - 本 worktree（Round 125 后）：9282 pass / 0 fail / 13 skip（HEAD `991ab3e`）
 
 ---
+
+## Round 126（2026-08-05）：app/cli.py 第五轮（edges5）
+
+### 范围
+- 文件：`tests/test_cli_edges5.py`（新增，1115 行）
+- 目标：`app/cli.py`（535 行，已有 494 测试）
+- 新增测试：130 个
+- 提交：`aa939c0`
+
+### 覆盖深度
+- **_EXTENSION_TO_PARSER 内容精确**：
+  - 9 个扩展名全覆盖（.pdf/.docx/.md/.markdown/.html/.htm/.txt/.text/.ipynb）
+  - pdf→fallback, docx→fallback, md/markdown→markdown,
+    html/htm→html, txt/text→text, ipynb→ipynb
+- **_infer_parser_name 深度**：
+  - 大小写不敏感（.PDF/.MD/.TXT/.IPYNB 等大写）
+  - 无扩展名 → fallback
+  - 未知扩展名（.json/.csv/.xml/.yaml）→ fallback
+- **_iter_supported_files 深度**：
+  - 空目录、仅不支持文件、排序输出
+  - 递归 vs 非递归
+  - 9 个扩展名全覆盖、大小写不敏感
+- **_relative_output_path**：
+  - 顶层、子目录、完整文件名保留
+- **_preview 深度**：
+  - None/空/短文本不截断
+  - 长文本截断带省略号
+  - 宽度边界（exact 宽度不截断、+1 触发截断）
+  - 自定义宽度、空白折叠、unicode
+- **_load_document_json 深度**：
+  - 缺文件/坏 JSON/合法/数组 root/unicode 文件名
+- **_format_summary 深度**：
+  - minimal/缺字段、hash 截断 16 字符
+  - counts/warnings 截断 5 个、errors、avg chars
+- **_format_elements_list 深度**：
+  - 空、limit 截断、limit=0、parent_id 显示
+- **_format_chunks_list 深度**：
+  - 空、基础、spans 显示/不显示、limit 截断
+- **_emit_structured_error 深度**：
+  - stderr 输出、合法 JSON、required keys、extra kwargs
+- **main 退出码**：
+  - validate 成功=0、validate 失败=1、inspect 缺文件=1、参数错误=2
+- **模块结构**：
+  - imports 完整（argparse/json/Path/sys/dataclasses）
+  - helpers 全 callable
+  - docstring 提及 PDF/DOCX/validate/inspect
+- **签名深度**：
+  - main argv 默认 None
+  - 各 helper 参数精确
+
+### 撞墙记录
+（无 — Round 126 一次通过，130 测试全 pass）
+
+### 下一步建议
+- 候选 FX：app/parsers/fallback_parser.py 第五轮（630 行）
+- 候选 GA：evaluation/cli.py 第五轮（243 行）
+- 候选 GB：app/chunkers/structural.py 第四轮
+- 候选 GH：evaluation/manifest.py 第五轮
+- 候选 GI：evaluation/runner.py 第五轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 FX（app/parsers/fallback_parser.py 第五轮）。
+fallback_parser 是默认 parser 路径，630 行体量最大，
+第五轮深度空间仍在（PDF/DOCX 分支、element 字段填充、warning/error 路径）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 126 后）：9412 pass / 0 fail / 13 skip（HEAD `aa939c0`）
+
+---
