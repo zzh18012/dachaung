@@ -12181,3 +12181,42 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KZ 或 KAA，把 evaluation/schema*.py 的覆盖度拉满。
 
 ---
+
+## Round 214 — evaluation/runner.py 第十轮（75 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十轮 edges 测试，覆盖 _load_annotation / _process_one / run_evaluation 的新角度
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges10.py`（75 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 深度**：BOM → None；whitespace-only → None；尾随换行 OK；两个 JSON 对象连写 → None；混合类型数组；深层嵌套；不保持文件句柄；str 路径 → AttributeError
+- **_process_one 深度**：parser_version 在成功时取自 document.parser_version；error 时 None；(None, []) 时 None；多个 errors 取 errors[0]；unknown code 路径；unlink OSError 吞掉；out_stub 不存在时跳过 unlink；doc_id 改变 out_stub 名；total_seconds 随 sleep 增加；mkdir idempotent；完整 64 字符 sha → image_dir[:16]
+- **run_evaluation 多文档 + 顺序**：per_doc 顺序与 manifest 一致；source_type 传播；parser_version 取首个非 None；多个失败跳过；全部失败 → None；image_base_dir None 当 image_dir 不是目录；image_base_dir 使用当目录存在；missing_markers / tolerance_record default；output_path 接受 str；深层目录创建；output_root idempotent
+- **expected_failures 深度**：顺序保留；创建 _per_doc 子目录；actual_error_code 取 errors[0].code；matches 是 bool
+- **报告结构**：report_version 来自 REPORT_VERSION 常量；keys 数量 6/4/9/6
+- **模块结构**：__all__ 长度 1；docstring 提及 image_dir / write_json / per_doc；imports time.perf_counter；run_evaluation/_load_annotation/_process_one 都 callable；signature 各 param kind 精确；future annotations return_annotation 是 str；process_one return_annotation 含 'tuple'
+- **综合**：no_documents 各 section 仍构建；compute_automatic_metrics 每个 doc 调用一次；figure_caption_prf / chunk_boundary_prf 每个 doc 调用一次；tolerance_chars 传播到 chunk_boundary_prf；returned dict == on_disk JSON；_per_dir 在 output_path parent 下
+
+### 撞墙记录
+- 1 fail：test_load_annotation_param_optional_via_union 误以为 path 默认 None；实际 _load_annotation(path: Path | None) 无默认值 → 改为 default is Parameter.empty
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 214 后）：18770 pass / 0 fail / 15 skip（HEAD `ff92dcd`）
+
+### 下一步建议
+- 候选 KE：evaluation/manifest.py 第十轮（239 行）
+- 候选 KD：evaluation/metrics.py 第十轮（381 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KAC：evaluation/cli.py 第十一轮（243 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KE（evaluation/manifest.py 第十轮），240 行的核心 IO 模块。
+
+---
