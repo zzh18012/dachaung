@@ -13984,3 +13984,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE4（evaluation/annotation_metrics.py 第十五轮，194 行）继续推 evaluation。
 
 ---
+## Round 255 — evaluation/annotation_metrics.py 第十五轮（65 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第十五轮 edges 测试，覆盖源码字符串断言（inspect.getsource 含特定 token）、模块/函数 metadata、chunk_boundary_anchors 非列表类型边界、annotation 缺 key 与空 anchors、unicode 文本边界（surrogate pairs/ZWJ sequences/control chars/unicode whitespace）、_tolerance_chars/_missing_markers dict 结构、default tolerance_chars=30、figure_caption_prf 各种输入、chunk list/anchors list 引用不变、模块 namespace identity、签名 introspection、PARSER_DOES_NOT_EMIT_RELATIONS hashability/singleton、normalize TypeError on float/dict/list text、`_` 前缀私有 key 验证
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges15.py`（65 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **chunk_boundary_anchors 非列表类型**：None/int/string/set/dict 都返回 None + reason（不抛错）
+- **annotation 缺 key / 空 anchors list**：缺失 'chunks'/'anchors'/'markers' 任一返回 None + reason；空 anchors list 返回 None + reason
+- **chunk text unicode 边界**：surrogate pairs / ZWJ sequences / 混合 unicode / 控制字符 / unicode whitespace（NBSP/em/en/全角/line sep/para sep/ZWSP）正确处理
+- **_tolerance_chars / _missing_markers dict 结构**：每项是 dict；含 'value' 与 'reason' 两个 key；value 类型正确；reason 是 str；只在 namespace 中以 `_` 开头的两个 key
+- **default tolerance_chars=30**：默认值精确 30；可以是 keyword arg
+- **figure_caption_prf 各种输入**：dict / 非 dict / list / int / None；缺 key 返回 None + reason
+- **chunk list / anchors list 引用不变**：调用前后 list id 不变；不修改输入
+- **模块 namespace identity**：Any / normalize_text / _null / _ratio / Counter identity
+- **签名 introspection**：函数签名返回 inspect.Signature；参数数量；参数名
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：可 hash；singleton（多次访问同一对象）
+- **normalize TypeError**：float/dict/list 文本在 normalize_text 中抛 TypeError
+- **repeated markers 行为**：markers 重复时 chunk_boundary_prf 仍正常返回（去重处理）
+- **chunks text 仅数字**：纯数字文本不抛错；返回 None + reason（无 markers 匹配）
+
+### 撞墙记录
+- 0 fail：65 测试一次性全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 255 后）：22443 pass / 0 fail / 16 skip（HEAD `4816387`）
+
+### 下一步建议
+- 候选 KF4：evaluation/metrics.py 第十五轮（381 行）
+- 候选 KW4：evaluation/report.py 第十六轮（200 行）
+- 候选 KX4：evaluation/cli.py 第十七轮（243 行）
+- 候选 KS4：evaluation/runner.py 第十七轮（227 行）
+- 候选 KZ4：evaluation/schema.py 第十轮（80 行）
+- 候选 KT5：evaluation/manifest.py 第十七轮（239 行）
+- 候选 KE5：evaluation/annotation_metrics.py 第十六轮（194 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KF4（evaluation/metrics.py 第十五轮，381 行）继续推 evaluation。
+
+---
