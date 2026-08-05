@@ -14214,3 +14214,44 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KZ4（evaluation/schema.py 第十轮，80 行）继续推 evaluation。
 
 ---
+## Round 260 — evaluation/schema.py 第十轮（137 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第十轮 edges 测试，覆盖未覆盖的源码 token（5 个 import + 5 个 def/class + Draft202012Validator/iter_errors/sorted/absolute_path/absolute_schema_path/encoding='utf-8'/'Schema 文件不存在'/'校验失败'/'待校验文件不存在'/.resolve()/'不与 app/schema.py 复用' + 不含 print）、模块 docstring 内容、SCHEMAS_DIR 验证（Path 实例/absolute/is_dir/resolved/parent 是项目根/4 个 schema 文件存在）、EvalSchemaError 详细（is Exception/BaseException 子类 + MRO 长度 4 + __init__ 签名 + errors 默认 [] + args()/str()/repr()/hashable/可 raise/except/chained + equality by identity）、_schema_path（返回 Path/raises FileNotFoundError with path/absolute/unicode/spaces）、load_schema（不缓存每次新 dict/4 个 schema 都可加载/含 $schema key）、validate（成功返回 None/失败抛 EvalSchemaError/errors 是 list of dict/每 item 含 path/message/schema_path/排序按 absolute_path/message 含 schema_name + 错误数）、validate_file（接受 str+Path/各错误路径）、模块 namespace 完整性 + __all__ 精确、跨函数一致性
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges10.py`（137 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码 token**：5 个 import + 5 个 def/class + Draft202012Validator(schema)/iter_errors(instance)/sorted()/absolute_path/absolute_schema_path/encoding='utf-8'/'Schema 文件不存在'/'校验失败'/'待校验文件不存在'/.resolve()/'不与 app/schema.py 复用' + 不含 print
+- **模块 docstring**：是 str 长度>10；含 manifest/annotation/evaluation-report；含 '不复用'/'不与'
+- **SCHEMAS_DIR**：Path 实例；is_absolute；is_dir；resolved（无 .. 或 trailing .）；parent 是项目根含 pyproject.toml；4 个 schema 文件都在
+- **EvalSchemaError**：是 Exception/BaseException 子类；MRO 4 items 含 BaseException；__init__ 3 参数 + errors 默认 None；errors=None → []；errors=[] → 替换为新 []；errors=truthy → keep reference；args=(message,)；str/repr/hashable；可 raise/except；可 raise from；equality by identity；errors 属性可写
+- **_schema_path**：返回 Path + absolute；missing → FileNotFoundError with path in message；unicode/spaces name → FileNotFoundError
+- **load_schema**：4 个 schema 都可加载；返回 dict；每次新 dict（不缓存）；含 $schema key；missing → FileNotFoundError
+- **validate**：成功 None；失败 EvalSchemaError；errors 是 list of dict；每 item 含 path/message/schema_path；path/schema_path 是 list；message 是 str；message 含 schema_name + 错误数；按 absolute_path 排序
+- **validate_file**：接受 str+Path；各错误路径（missing/directory/invalid JSON/invalid content）；signature 2 参数
+- **namespace**：所有 5 个 export 在 namespace；json/Path/Draft202012Validator/JSValidationError identity；__all__ 是 list 不是 tuple；5 entries 精确；不含 _schema_path
+- **跨函数**：validate 内部用 load_schema（missing schema → FileNotFoundError）；validate_file 内部用 validate（schema_name 透传）
+
+### 撞墙记录
+- 0 fail：137 测试一次性全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 260 后）：23224 pass / 0 fail / 16 skip（HEAD `4f9883c`）
+
+### 下一步建议
+- 候选 KT5：evaluation/manifest.py 第十七轮（239 行）
+- 候选 KE5：evaluation/annotation_metrics.py 第十六轮（194 行）
+- 候选 KF5：evaluation/metrics.py 第十六轮（381 行）
+- 候选 KW5：evaluation/report.py 第十七轮（200 行）
+- 候选 KX5：evaluation/cli.py 第十八轮（243 行）
+- 候选 KS5：evaluation/runner.py 第十八轮（227 行）
+- 候选 KZ5：evaluation/schema.py 第十一轮（80 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KT5（evaluation/manifest.py 第十七轮，239 行）继续推 evaluation。
+
+---
