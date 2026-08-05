@@ -10695,3 +10695,46 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第七轮可深入行号边界、空白处理、encoding 兜底、文件读取路径。
 
 ---
+
+
+## Round 187（2026-08-05）：app/parsers/text_parser.py 第七轮（edges7）
+
+### 目标
+- 给 app/parsers/text_parser.py（136 行，已有 base/edges/edges2-6 共 543 测试）补第七轮
+- 深入 paragraph 切分逻辑、行号边界、各 encoding 路径
+
+### 改动
+- 新增 `tests/test_parsers_text_edges7.py`（93 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_TEXT_EXTENSIONS 常量**：(".txt", ".text") 2 项
+- **_detect_text_source_type**：.txt/.text/大写/混合都识别、未知/无后缀/.md/.html raise、details 含 suffix（无后缀时 suffix=""）
+- **_split_paragraphs 深度**：empty 返回 []、单行、多行单段（\n join）、多段、CRLF/CR only 归一为 LF、前导空白行跳过、尾随空白行忽略、whitespace-only 行视为 blank、多空行作单分隔、line 号 1-indexed、content strip、idempotent、不修改输入
+- **TextParser 类属性**：name=text、version=stdlib/0.1.0、继承 Parser、parse 签名
+- **parse 错误路径**：missing file（含 path details）、unsupported_type、OSError → text_read_failed（含 exception_type）
+- **parse 行为**：单/多 paragraph、多行单段用 \n join、locator line 1-based、element_id 0-padded 4 位递增、confidence=0.95、metadata={}、parent_id/resource_path=None
+- **parse metadata**：text=True、source_type=text、source_path 是 str、source_hash/parser_name/parser_version 透传
+- **parse 边界**：空文件 → text_no_content warning、whitespace-only → warning、有 content 无 warning、.text 扩展名工作、CRLF/CR only 归一、unicode 内容、非 UTF-8 用 errors=replace 不崩
+- **综合**：复杂多段文档、段内空白保留、50 段长文档、idempotent、不修改原文件
+- **模块结构**：__all__=["TextParser"]、imports（Path/Any/models/base）、docstring 提及策略/扩展名/不支持事项
+
+### 撞墙记录
+- 初版 2 处 fail：source_hash 长度需 = 64（make_document_id 校验），用 "abc123"/"hash1"/"hash2" 会 raise ValueError → 改用 64-char hash
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 187 后）：15247 pass / 0 fail / 13 skip（HEAD `f24260e`）
+
+### 下一步建议
+- 候选 KA：app/parsers/fallback_parser.py 第七轮
+- 候选 KB：app/parsers/base.py 第六轮
+- 候选 KC：app/parsers/kreuzberg_parser.py 第六轮
+- 候选 KD：app/models.py 第六轮
+- 候选 KE：app/schema.py 第七轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 KA（app/parsers/fallback_parser.py 第七轮）。fallback parser 是 PDF/DOCX 的默认路径，
+第七轮可深入 pdfplumber/python-docx 集成、page/bbox 提取、paragraph_index 等。
+
+---
