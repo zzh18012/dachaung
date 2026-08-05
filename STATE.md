@@ -13767,3 +13767,49 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW3（evaluation/report.py 第十五轮，200 行）继续推 evaluation。
 
 ---
+## Round 250 — evaluation/report.py 第十五轮（104 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十五轮 edges 测试，覆盖源码字符串断言、模块/函数 metadata、signature 无 varargs/varkw、__future__ annotations 影响、常量精确（_RATIO_METRICS 12 个/_COUNT_METRICS 1 个/_SUCCESS_BOOL_METRICS 1 个）+ 互不相交 + 总 14 个、build_provenance 9 keys 顺序精确、build_devset_section 6 keys 顺序精确、aggregate_summary 4 top-level keys 顺序精确 + 各 sub-dict 结构精确
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges15.py`（104 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码字符串断言**：含 '_RATIO_METRICS' / '_COUNT_METRICS' / '_SUCCESS_BOOL_METRICS' / 'subprocess.run(' / 'datetime.now().astimezone()' / 'import importlib.metadata' / future annotations / 'dict[str,' / 'EVALUATOR_VERSION' / 'REPORT_VERSION' / 'capture_output=True' / 'timeout=10' / 'silent_drop_total' / 'ratio_macro_averages' / 'success_rates'；不含 '__main__'
+- **模块 metadata**：__file__ 后缀 .py / 含 'report'；__package__=='evaluation'；__name__=='evaluation.report'；subprocess/datetime/Path/Any identity；EVALUATOR_VERSION/REPORT_VERSION is
+- **__all__ 精确**：是 list 不是 tuple；集合精确 5 个；不含私有；不含 _RATIO_METRICS/_COUNT_METRICS/_SUCCESS_BOOL_METRICS；所有名字在命名空间
+- **常量精确**：_COUNT_METRICS 1 个 'element_count_total'；_SUCCESS_BOOL_METRICS 1 个 'pipeline_success'；_RATIO_METRICS 12 个顺序精确；无 figure_caption_*；无 silent_drop_count；3 个常量互不相交；总和 14
+- **函数 metadata**：5 个公开函数 __module__/__qualname__/__name__ 精确；都是 FunctionType；无 varargs/varkw；return_annotation 是 str（__future__）
+- **build_provenance 输出**：9 keys 顺序精确；返回 dict；max_chars 是 int；parser_name 透传；parser_version=None 接受；evaluator_version/report_version 是常量；dependencies 3 keys；run_timestamp_iso 是 str
+- **build_devset_section 输出**：6 keys 顺序精确；返回 dict；categories_covered 透传
+- **aggregate_summary 输出**：4 top-level keys 顺序精确 [counts, success_rates, ratio_macro_averages, silent_drop_total]；counts 1 key；success_rates 1 key；ratio_macro_averages 12 keys；空输入 silent_drop_total=None / counts.sum=None / success rate=None / 每个 ratio macro_average=None
+- **aggregate_summary counts**：sum 是 int；None value 不参与
+- **aggregate_summary success_rates**：rate = successes/total；只 True 计入 success_count；False/None 不计
+- **aggregate_summary ratio_macro_averages**：macro_average = mean；not_evaluated = total - participating
+- **aggregate_summary silent_drop_total**：sum；None 不参与；全 None → None；缺 key → None
+- **get_dependency_versions**：3 keys 集合精确；返回 dict；value 是 str/None；不含 'docx'/'kreuzberg'
+- **get_git_provenance**：返回 2 keys；返回 dict；git_dirty 是 bool；git_commit 是 str/None
+- **aggregate_summary tuple 输入**：tuple 工作；空 tuple 工作；不修改输入
+
+### 撞墙记录
+- 0 fail：104 测试一次性全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 250 后）：21934 pass / 0 fail / 16 skip（HEAD `7e45dfe`）
+
+### 下一步建议
+- 候选 KX3：evaluation/cli.py 第十六轮（243 行）
+- 候选 KS3：evaluation/runner.py 第十六轮（227 行）
+- 候选 KZ3：evaluation/schema.py 第九轮（80 行）
+- 候选 KT4：evaluation/manifest.py 第十六轮（239 行）
+- 候选 KE4：evaluation/annotation_metrics.py 第十五轮（194 行）
+- 候选 KF4：evaluation/metrics.py 第十五轮（381 行）
+- 候选 KW4：evaluation/report.py 第十六轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KX3（evaluation/cli.py 第十六轮，243 行）继续推 evaluation。
+
+---
