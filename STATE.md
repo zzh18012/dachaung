@@ -14078,3 +14078,50 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW4（evaluation/report.py 第十六轮，200 行）继续推 evaluation。
 
 ---
+## Round 257 — evaluation/report.py 第十六轮（147 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十六轮 edges 测试，覆盖未覆盖的源码 token（5 个 helper def + subprocess kwargs + importlib + datetime + version import + participating_docs/not_evaluated/macro_average/silent_drop_total + 不含 overall_score/combined_score/print）、模块 docstring 内容、模块 namespace 完整性、__all__ 类型与精确、常量精确（顺序敏感 + 三组互不相交 + 总和 14）、函数签名 introspection（每个函数参数名/默认/kind）、helper metadata（qualname/module）、aggregate_summary 详细计算（counts/success_rates/ratio_macro_averages/silent_drop_total 边界）、build_devset_section 用 stub Manifest 对象、build_provenance 字段类型验证 + run_timestamp_iso ISO parseable + max_chars int 转换、get_git_provenance 错误路径、get_dependency_versions 验证、cross-check 类型一致性
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges16.py`（147 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码 token**：5 个 helper def 全覆盖；subprocess.run kwargs（capture_output/encoding/errors/timeout）；git status --porcelain；except OSError + subprocess.SubprocessError；import importlib.metadata；3 个包名 + PackageNotFoundError；datetime.now().astimezone().isoformat()；from evaluation import EVALUATOR_VERSION/REPORT_VERSION；participating_docs/not_evaluated/macro_average/silent_drop_total；不含 overall_score/combined_score/print；pypdfium2 注释
+- **模块 docstring**：是 str 长度>30；含 '聚合' 或 'aggregat'；含 counts/success_rates/silent_drop
+- **namespace 完整性**：3 个常量在 namespace；subprocess/datetime 是 identity；EVALUATOR_VERSION/REPORT_VERSION 值相等；__all__ 是 list 不是 tuple；5 个 entry 精确；所有名字在 namespace
+- **常量精确**：3 个都是 tuple；_RATIO_METRICS 顺序精确 12 项；_COUNT_METRICS=['element_count_total']；_SUCCESS_BOOL_METRICS=['pipeline_success']；三组互不相交；总和 14；不含 figure_caption_*；不含 silent_drop_count/element_count_total
+- **签名 introspection**：build_provenance 4 参数名精确 + 无默认 + POSITIONAL_OR_KEYWORD + 无 var args/kw + return str；build_devset_section 1 参数 + 无默认；aggregate_summary 1 参数；get_git_provenance 1 参数；get_dependency_versions 0 参数
+- **helper metadata**：5 个函数 __qualname__/__module__ 精确；都是 FunctionType
+- **aggregate_summary 4 keys 顺序**：counts → success_rates → ratio_macro_averages → silent_drop_total；空 per_doc 时各 sub-dict 结构精确
+- **aggregate_summary 计算**：counts 求和 + 多 doc sum + null 不参与；success_rate 单 true/false/half + None value 不计入 success；ratio_macro_average simple/floats/None 排除；silent_drop_total 求和 + null 排除 + 全 None → None；缺 metric 视为 null；缺 'metrics' key 抛 KeyError；rate=None 当 per_doc 为空；不缓存
+- **build_devset_section stub Manifest**：返回 dict；6 keys 精确顺序；pass-through 各字段；不修改 input；空 categories_covered
+- **build_provenance**：返回 dict；9 keys 精确顺序；EVALUATOR_VERSION/REPORT_VERSION 值匹配；parser_name/version pass-through；max_chars int 转换（接受 str/int）；run_timestamp_iso ISO parseable；dependencies 3 包；git_commit str/None；git_dirty bool；不修改 input
+- **get_git_provenance**：返回 dict 2 keys 顺序；值类型验证；处理不存在目录
+- **get_dependency_versions**：返回 dict；3 keys；值是 str/None；pdfplumber 可解析（项目依赖）；无参数
+- **__all__**：不含 helper 常量；含 5 helpers
+- **cross-check**：aggregate_summary 后 ratio_macro_averages keys == _RATIO_METRICS；counts keys == _COUNT_METRICS；success_rates keys == _SUCCESS_BOOL_METRICS；not_evaluated = total - participating
+
+### 撞墙记录
+- 2 fail → 修复后 0 fail：
+  - `test_aggregate_summary_handles_missing_metrics_key`：aggregate_summary 要求 per_doc 含 'metrics' key（不是 None-safe），改测期望 KeyError
+  - `test_module_namespace_identity_evaluator_version`/`_report_version`：str 'is' 比较可能因 interning 不成立，改用 '==' 比较
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 257 后）：22806 pass / 0 fail / 16 skip（HEAD `0ef415a`）
+
+### 下一步建议
+- 候选 KX4：evaluation/cli.py 第十七轮（243 行）
+- 候选 KS4：evaluation/runner.py 第十七轮（227 行）
+- 候选 KZ4：evaluation/schema.py 第十轮（80 行）
+- 候选 KT5：evaluation/manifest.py 第十七轮（239 行）
+- 候选 KE5：evaluation/annotation_metrics.py 第十六轮（194 行）
+- 候选 KF5：evaluation/metrics.py 第十六轮（381 行）
+- 候选 KW5：evaluation/report.py 第十七轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KX4（evaluation/cli.py 第十七轮，243 行）继续推 evaluation。
+
+---
