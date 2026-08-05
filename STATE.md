@@ -10646,3 +10646,52 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第七轮可深入 code/markdown cell 混排、outputs 提取、nbformat 边界。
 
 ---
+
+
+## Round 186（2026-08-05）：app/parsers/ipynb_parser.py 第七轮（edges7）
+
+### 目标
+- 给 app/parsers/ipynb_parser.py（227 行，已有 base/edges/edges2-6 共 744 测试）补第七轮
+- 深入 cell source 归一、kernel language 推断、各 cell_type 路径、错误码
+
+### 改动
+- 新增 `tests/test_parsers_ipynb_edges7.py`（100 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_IPYNB_EXTENSIONS 常量**：(".ipynb",)，单元素 tuple
+- **_detect_ipynb_source_type**：.ipynb/.IPYNB/.Ipynb 都识别、未知/无后缀/.html raise、details 含 suffix
+- **_cell_source_to_text 深度**：str 直返、list[str] 拼接、list 含非 str 转 str、None/int/dict 返回空、empty list 返回空
+- **_extract_kernel_language 优先级链**：kernelspec.language > kernelspec.name > language_info.name > 空
+- **IpynbParser 类属性**：name=ipynb、version=stdlib/0.1.0、继承 Parser、parse 签名
+- **parse 错误路径**：missing file、unsupported_type、invalid JSON → ipynb_invalid_json、OSError → ipynb_read_failed、顶层非 dict → ipynb_bad_structure、nbformat<4 → ipynb_unsupported_version（含 nbformat details）、cells 非 list → ipynb_bad_structure
+- **parse metadata**：ipynb=True、nbformat、nbformat_minor、cell_count、language
+- **markdown cell**：单 cell 多 element（heading + paragraph）、locator 含 cell_index/cell_type/line/section_path、空 cell 无 warning、source 是 list 也工作
+- **code cell**：kind=code_cell、language 来自 kernel、content stripped、outputs 丢弃、execution_count 丢弃、空 cell warning（含 cell_index）
+- **raw cell**：kind=raw_cell、content stripped、空 cell 跳过无 warning
+- **unknown cell type**：warning 含 cell_index/cell_type
+- **cell not dict**：warning ipynb_bad_cell
+- **element_id 重排**：跳过的 cell 不影响 ID 连续编号、0-padded 4 位
+- **markdown 子 warning 透传**：details 含 cell_index
+- **section_path cell 间隔离**：每个 markdown cell 独立栈
+- **综合**：空 notebook、全空 cell、复杂混排 notebook、idempotent
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 186 后）：15154 pass / 0 fail / 13 skip（HEAD `915529f`）
+
+### 下一步建议
+- 候选 JV：app/parsers/text_parser.py 第七轮
+- 候选 JW：app/parsers/fallback_parser.py 第七轮
+- 候选 JX：app/parsers/base.py 第六轮
+- 候选 JY：app/parsers/kreuzberg_parser.py 第六轮
+- 候选 JZ：app/models.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 JV（app/parsers/text_parser.py 第七轮）。text parser 是最简单的 parser，
+第七轮可深入行号边界、空白处理、encoding 兜底、文件读取路径。
+
+---
