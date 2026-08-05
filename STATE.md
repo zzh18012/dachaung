@@ -11461,3 +11461,60 @@ get_git_provenance 各 OSError 路径。
 第七轮可深入 if/then 条件分支、anyOf、const、enum、自定义错误消息路径、各 source_type 的 locator 校验细节。
 
 ---
+
+## Round 201（2026-08-05）：app/schema.py 第七轮（edges7）
+
+### 目标
+- 给 app/schema.py（94 行，已有 base/edges/edges2-6 共 ~698 测试）补第七轮
+- 深入 SchemaValidationError 异常细节（args、__str__、raise from、errors 默认值 falsy 路径）
+- load_schema 编码（UTF-8 BOM）、目录/符号链接/独立返回 dict
+- validate 多错误排序、错误 path 深度（elements/chunks/warnings/errors/relations 嵌套）
+- is_valid + validate 互验
+- validate_file valid 文件往返、UTF-8 中文内容、自定义 schema 走通
+- 实际 document.schema.json 各 if/then 条件分支：PDF/DOCX/Markdown/HTML/text/ipynb locator
+- $defs 各类型边界（element anyOf、additionalProperties:false、minLength/minimum/minItems/maxItems/const/enum/pattern）
+
+### 改动
+- 新增 `tests/test_schema_edges7.py`（165 测试 + 1 skip）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **SchemaValidationError**：args=("m",)、str==message、repr 含类名、errors 默认 []、errors or [] 对 falsy 值（{}/''/0）归一为 []、truthy int 保留、raise from、可 reraise、可附加属性、errors 可变、可被 except Exception 捕获、不被 except ValueError 捕获、init keyword-only、init signature、isinstance Exception、不继承 ValueError/RuntimeError
+- **SCHEMA_PATH**：Path 对象、str 尾 document.schema.json、parent.name==schemas、parent.parent==dachuang-autonomous、resolve 幂等、read_bytes 首字节 `{`、read_text 首字符 `{`
+- **load_schema**：接受 Path/str、嵌套 dict、array、null、empty object、UTF-8 BOM 抛 JSONDecodeError、目录抛 FileNotFoundError、symlink skip、独立 dict、错误消息含路径、签名默认=SCHEMA_PATH、return annotation 字符串
+- **validate 多错误**：空 schema 不约束、schema=true 接受、schema=false 拒绝、type mismatch、required 缺失、按 absolute_path 排序、嵌套 element/chunk/warning/error/relation 路径、schema_path 含 relations/type、message 含 count 与"处"、首错用于 message
+- **validate 不变性**：返回 None、不改 document、不改 schema、idempotent、errors 中 path/schema_path 都是 list、count ≥ 1
+- **is_valid**：custom schema true/false、default schema valid/invalid、不抛、返回 bool、signature
+- **validate_file**：valid 文件往返、invalid 文件抛、None schema 走默认、default schema 检测 missing required、str path、missing 抛 FileNotFoundError、目录抛、invalid JSON 抛 JSONDecodeError、UTF-8 中文、签名
+- **if/then 条件分支**：PDF locator 缺 page / page=0 / bbox 4 项 OK / bbox 5/3 项 fail；DOCX 空 {} fail / paragraph_index=0 OK / -1 fail；markdown/html/text locator 缺 line fail / line=1 OK / line+section_path OK；ipynb cell_type 缺/无效/negative cell_index fail
+- **element anyOf/additionalProperties**：仅 content OK、仅 resource_path OK、两者共存 OK、都缺 fail、content="" + 无 resource_path fail、额外字段 fail、type enum fail、confidence>1/<0/=0/=1
+- **chunk 边界**：空 source_element_ids / 空 chunk_id / 空 text / 空字符串 element_id / source_spans / source_span 负 start / 缺 end / 额外字段
+- **relation/warning/error 边界**：metadata / 缺 type / 空 type / 额外字段 / details / 缺 reason / 空 reason / 缺 message
+- **顶层字段边界**：schema_version 类型/值、document_id/source_path/parser_name/parser_version 空、source_type unknown、source_hash 大写/短/长/非 hex、elements/chunks/metadata 非数组/非对象、missing required、额外字段允许（顶层无 additionalProperties:false）
+- **模块/Draft202012Validator 互操作**：default schema 通过 Draft202012 check、顶层 required 13 项、allOf 6 分支、$defs 12 项、$schema、$id、title、description、element type enum 8 值、source_type enum 6 值
+- **模块结构**：__all__ iterable/expected/no-dup/all-exported、_silence_unused_import 私有 callable/返回 None、imports（json/Path/Any/Draft202012Validator）
+- **综合行为**：validate→is_valid 一致、full document with all field types 通过、idempotent
+
+### 撞墙记录
+- 5 fail（已修）：
+  - `test_schema_validation_error_caught_as_value_error_no`：错误地用 pytest.raises(TypeError)，实际 raise SchemaValidationError → 改为 raises(SchemaValidationError)
+  - `test_load_schema_signature_return_annotation`：from __future__ annotations 使 annotation 是字符串 → 比较字符串
+  - `test_is_valid_signature`：同上，return_annotation=="bool" 而非 is bool
+  - `test_validate_file_signature`：同上，return_annotation=="None" 而非 is None
+  - `test_validate_error_schema_path_includes_defs`：Draft202012Validator 把 $ref 内联展开，schema_path 不走 $defs 分支 → 改断言含 relations/type
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 201 后）：17147 pass / 0 fail / 15 skip（HEAD `e1baebe`）
+
+### 下一步建议
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1200 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KF/KV/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KM（app/parsers/markdown_parser.py 第八轮）。markdown_parser 是 Markdown 解析核心（326 行 / ~3.7 tests/line），
+第八轮可深入 ATXHeading/ListItem/Table/CodeBlock/FencedCode 各分支、缩进规则、嵌套结构、references 定义。
+
+---
