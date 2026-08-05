@@ -10326,3 +10326,47 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 人工标注指标核心，第七轮可深入 chunk_boundary_prf 容差匹配、figure_caption_prf 各 null reason、_missing_markers 计算。
 
 ---
+
+## Round 179（2026-08-05）：evaluation/annotation_metrics.py 第七轮（edges7）
+
+### 目标
+- 给 evaluation/annotation_metrics.py（194 行，已有 base/edges/edges2-6 共 523 测试）补第七轮
+- 深入 chunk_boundary_prf 一对一匹配语义、anchor position 分支、missing marker 处理、f1 各分支
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges7.py`（56 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **chunk_boundary_prf 一对一匹配**：多预测 1 anchor 只 1 match、1 预测多 anchor 只 1 match、贪心 by distance 排序、used_pred/used_gt 不能 rematch
+- **anchor position 各分支**：before=marker 起始、after=marker 结束、缺省 position 走 after、未知 position 也走 after
+- **missing marker 处理**：marker 在 stream 找不到 → 加入 _missing_markers value 列表、空 marker 也算 missing、1 个 missing 不影响其他 anchor、all missing → recall null "no_ground_truth_anchors_in_stream"
+- **chunk text 边界**：empty chunk text 不抛异常
+- **f1 各分支**：perfect=1.0、half-half=2/3、p null（单 chunk 早期返回）→ reason "no_predicted_boundaries"、r null（marker all missing）→ reason "precision_or_recall_not_evaluated"、denom=0 → _ratio(0.0)
+- **tolerance 透传**：=0 only exact match、off-by-one 不匹配、_tolerance_chars 始终在 result 中
+- **figure_caption_prf**：3 metric reason 都是 PARSER_DOES_NOT_EMIT_RELATIONS、3 keys 精确、orphan relations field 仍 null、无 _tolerance_chars
+- **模块结构**：__all__ 精确 3 项、imports normalize_text/_null/_ratio、docstring 提及启发式/一对一/容差
+- **综合行为**：幂等、每次新 dict、不修改 document/annotation、JSON 可序列化
+
+### 撞墙记录
+- 一次撞墙（2 fail）：
+  - "alpha" 后置 + "lph" 后置：search_from 推进后 "lph" 找不到（只 1 个 gt position）→ recall=1.0，原期望 0.5 错
+  - 单 chunk + anchor 走早期返回路径 → f1 reason 是 "no_predicted_boundaries"（不是 "precision_or_recall_not_evaluated"）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 179 后）：14386 pass / 0 fail / 13 skip（HEAD `4266d61`）
+
+### 下一步建议
+- 候选 IW：app/cli.py 第八轮（535 行 / 747 测试）
+- 候选 IX：app/pipeline.py 第八轮（216 行 / 702 测试）
+- 候选 IY：app/chunkers/structural.py 第八轮（388 行 / 938 测试）
+- 候选 JA：evaluation/schema.py 第二轮（80 行 / 432 测试）
+- 候选 JB：evaluation/schema_validation.py 第二轮（15 行 / 112 测试，已饱和）
+- 候选 JC：app/parsers/* 各第 N 轮（多个 parser 仍有 6-7 轮）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 JA（evaluation/schema.py 第二轮）。schema.py 是评测 Schema 校验入口，
+第二轮可深入 validate/validate_file 各错误路径、EvalSchemaError 字段、各 schema 文件加载。
+
+---
