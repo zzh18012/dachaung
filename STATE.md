@@ -11977,3 +11977,60 @@ get_git_provenance 各 OSError 路径。
 第十轮可深入 _split_long_text/_ChunkBuffer/_hard_split_with_whitespace_fallback 更深层边界。
 
 ---
+
+## 2026-08-05 — Round 210（app/chunkers/structural.py 第十轮）
+
+### 目标
+- 给 app/chunkers/structural.py（388 行，已有 base/edges/edges2-9 共 ~1197 测试）补第十轮
+- _SENTENCE_SPLIT_RE 精确分割行为（中英文标点 / 多空白 / 标点 + 非空白）
+- _HARD_BREAK_LANGS 元组类型 / 内容 / 无重复
+- normalize_text 各空白边界
+- _SplitPiece frozen / 默认值 / 字段类型
+- _hard_split_with_whitespace_fallback 精确 start/end/boundary_after 坐标
+- _split_long_text 多 piece 累积 / 边界
+- _ChunkBuffer.flush 各 strategy / counter / source_spans / 去重
+- StructuralChunker.chunk 各种 element 顺序组合
+- _element_text_with_span 各 content 形态
+- 模块结构 / __all__ / 类继承
+
+### 改动
+- 新增 `tests/test_chunker_edges10.py`（138 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块结构**：__all__ == {StructuralChunker, normalize_text}；imports（re/dataclass/field/Any/Chunk/Document/Element）；docstring 含 heading/max_chars/source_element_id；future annotations；无 _silence_unused_import；4 个内部 helper + 4 个 _PART_* 常量在命名空间
+- **_PART_* 常量**：_PART_TEXT=0, _PART_ELEMENT_ID=1, _PART_START=2, _PART_END=3；4 个互异
+- **_SENTENCE_SPLIT_RE**：是 re.Pattern；中英文标点 + 空白 切分；标点无空白不切；多空白不产生空 sentence（除非首尾）；空字符串返回 [""]
+- **_HARD_BREAK_LANGS**：tuple；6 元素；含中日英 6 个标点（。！？.!?）；全字符串；全单字符；无重复
+- **_WHITESPACE_RE**：是 re.Pattern；匹配 space/tab/LF/CR/VT/FF；多空白 sub 成 1
+- **normalize_text**：empty → ""；纯空白 → ""；多空白压 1；strip 两端；含 Unicode 空白；idempotent
+- **_SplitPiece**：dataclass + frozen；4 字段（text/boundary_after/start/end）；默认 start/end=0；hashable；equality
+- **_hard_split_with_whitespace_fallback**：2 参数；返回 list[_SplitPiece]；短文本 1 piece None；前导空白跳过；forced_char 当窗口无空白；whitespace 当窗口有空白；最后 piece None；trailing whitespace rstripped；start/end 在 [0, n]
+- **_split_long_text**：2 参数；返回 list[_SplitPiece]；空/纯空白 → []；短 → 1 piece None；先 strip；每 piece ≤ max_chars；len==max_chars → 1 piece；len==max_chars+1 → ≥2 piece；坐标在 stripped text 系
+- **_ChunkBuffer**：dataclass 不 frozen；3 字段（document_id/parts/counter）；default_factory 给每实例新 list；push_text 追加 tuple；length=sum(len(text))；is_empty；flush 空返回 None；flush 返回 Chunk；text join space；source_element_ids 去重保序；source_spans 每 part 一项；chunk_id 含 counter 0-pad 4 位；metadata strategy/max_chars/char_count；flush 后清空 parts；whitespace-only text 返回 None
+- **StructuralChunker**：是 class；默认 max_chars=800；min 32；<32/0/负数 raise ValueError；chunk() 返回 list[Chunk]；空 document → [];chunk_id 递增 c0000/c0001/...；table 单独 chunk strategy=isolated_table；image 跳过；caption isolated；heading 硬边界；超长 paragraph 用 long_paragraph_sentence_split；不修改 document
+- **_element_text_with_span**：image → ("",0,0)；paragraph 含 leading/trailing whitespace → stripped + start/end 偏移；whitespace-only → ("",0,0)；multiline content；签名 (self, el) → tuple[str, int, int]
+- **_element_text**：兼容旧接口，返回 stripped text
+
+### 撞墙记录
+- 16 fail：Element 与 Document 缺必需字段（source_locator / source_path / parser_name / parser_version）→ sed 批量加 source_locator={} 与 source_path/parser_name/parser_version
+- 1 SyntaxWarning：docstring 含 `\s+` 被 Python 当 escape → 用 Python 脚本替换为 r-string + 改写描述
+- 1 fail：test_element_text_with_span_none_content_returns_empty 用 content=None 但 Element.__post_init__ 拒绝（要 content 或 resource_path 之一）→ 改成 whitespace-only content 模拟 "effective None"
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 210 后）：18377 pass / 0 fail / 15 skip（HEAD `739af01`）
+
+### 下一步建议
+- 候选 KU：evaluation/schema.py 第 N 轮（待查行数）
+- 候选 KV：evaluation/schema_validation.py 第 N 轮
+- 候选 KW：evaluation/annotation_metrics.py 第 N 轮
+- 候选 KX：evaluation/cli.py 第十轮（243 行 / ~1100 测试）
+- 候选 KY：evaluation/report.py 第九轮（200 行 / ~860 测试）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW（evaluation/annotation_metrics.py 第 N 轮）。annotation_metrics.py 是 chunk_boundary_prf/figure_caption_prf 核心；
+可深入边界 tolerance、最近图片启发式、缺失 annotation 各路径。
+
+---
