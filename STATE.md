@@ -10837,3 +10837,65 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第九轮可深入 schema_version 校验、parse 与 chunk 接缝、warnings 去重、error JSON 输出格式等深度边界。
 
 ---
+
+## Round 190（2026-08-05）：app/cli.py 第八轮（edges8）
+
+### 目标
+- 给 app/cli.py（535 行，已有 base/edges/edges2-7 共 900 测试）补第八轮
+- 深入 _run_parse 成功路径、_run_parse_dir 多文件场景、main() 端到端、format_* 各字段边界
+
+### 改动
+- 新增 `tests/test_cli_edges8.py`（134 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_run_parse 成功路径**：返回 0、写盘、自动推断信息、--max-chars 覆盖、显式 --parser text、失败时不留半成品 JSON
+- **_run_parse_dir 多文件**：全部成功 → 0、任一失败 → 1、summary.files 数量、recursive 子目录遍历、parser override 应用到所有文件、success/failure 计数、file entry 字段（status/input/output/errors）、per-doc JSON 写盘、total == len(files)
+- **main() 端到端**：parse 成功返回 0、parse-dir 成功返回 0、parse --max-chars 参数、parse-dir --recursive
+- **_format_summary 字段边界**：chunks 0 refs、chunk text with newline、element content=None、element type=None → "None=1"、element types sorted、avg chars、min/max/avg chunk lens、warnings +N more、warnings count、errors count、parser_version=None → "vNone"、source_hash short
+- **_format_elements_list**：content empty/None/long truncation、各种 type、+N more message、--limit 0 不显示 more、parent_id empty 不显示、缺 element_id/type → ?
+- **_format_chunks_list**：chars=0、refs=0、text with newline、long text truncation、show_spans 各字段（e1[0:5]/e1[?:5]/e1[0:?]/?[0:5]）、empty spans → (none)、more message、limit 0 lists all
+- **_load_document_json**：OSError 路径（disk error）、嵌套 dict、空 dict
+- **_emit_structured_error extra 类型**：int/list/dict/None/bool/Path（Path → TypeError）
+- **_iter_supported_files**：字母序排序、大小写混合都列出、隐藏文件、recursive 列出全部
+- **_relative_output_path**：简单文件名、suffix 保留、嵌套子目录、深层嵌套
+- **_infer_parser_name**：双 suffix（.tar.gz → fallback）、多点文件名、隐藏文件 .ipynb、仅扩展名（.txt → fallback，因 Path 视为隐藏）
+- **_build_arg_parser**：parse parse-dir 各 6 个 parser choices、inspect 4 flags（spans/elements/chunks/limit）、parse-dir --recursive
+- **_preview**：默认 width=60、returns str、60 chars 不截断、61 chars 截断、不修改原文、newline 折叠、混合空白、省略号单字符
+- **模块结构**：imports（argparse/json/sys/Path/pipeline/future）、utf-8 reconfigure 块、docstring 含 parse/validate/inspect、main guard、无 __all__、_EXTENSION_TO_PARSER 9 keys
+- **idempotent**：infer_parser_name/preview/format_summary/format_elements_list/format_chunks_list 多次调用一致
+
+### 撞墙记录
+- 初版 6 fail：
+  1. element type=None 时 el.get('type', '?') 返回 None（key 存在），type_counts[None]=1 → 改断言到 "None=1"
+  2. parser_version=None 同理 → 改断言到 "vNone"
+  3. Path 不可 JSON 序列化，json.dumps 抛 TypeError → 改测试为 expect TypeError
+  4. Windows Path 排序使用 normcase（大小写不敏感）→ 改测试为 set 比较
+  5. str(Path) on Windows 仍用反斜杠 → 改测试为 parent.name == "sub"
+  6. Path(".txt").suffix == ""（无主干视为隐藏）→ 改测试为 fallback
+- Import 错误：_ExtensionOrStr 是测试文件虚构的、EXTENSION_TO_PARSER 实际是 _EXTENSION_TO_PARSER（带下划线）→ 修正 imports
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 190 后）：15663 pass / 0 fail / 13 skip（HEAD `4475456`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KH：app/parsers/html_parser.py 第八轮（446 行 / 808 测试 = 1.8 tests/line，最低比）
+- 候选 KI：app/parsers/ipynb_parser.py 第八轮（227 行 / 844 测试）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（136 行 / 636 测试）
+- 候选 KK：app/parsers/fallback_parser.py 第八轮（630 行 / 942 测试）
+- 候选 KL：app/models.py 第六轮（154 行 / 554 测试）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / 943 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / 922 测试，含本批）
+- 候选 KO：evaluation/runner.py 第八轮（227 行 / 635 测试）
+- 候选 KP：evaluation/cli.py 第八轮（243 行 / 664 测试）
+- 候选 KQ：evaluation/metrics.py 第八轮（381 行 / 1103 测试）
+- 候选 KR：evaluation/report.py 第七轮（200 行 / 669 测试）
+- 候选 KS：evaluation/manifest.py 第八轮（239 行 / 821 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KH（app/parsers/html_parser.py 第八轮）。html_parser.py 是当前测试/行比例最低的核心 parser（1.8），
+446 行代码有 SAX 复杂状态机（pre/blockquote/table 嵌套、section_path 栈、handle_data 各分支），第八轮可深入未覆盖的内部状态转移。
+
+---
