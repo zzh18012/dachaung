@@ -10109,3 +10109,45 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第六轮可深入 compute_file_hash 各 chunk size、make_document_id 各边界、SHA-256 一致性。
 
 ---
+
+## Round 174（2026-08-05）：evaluation/cli.py 第七轮（edges7）
+
+### 目标
+- 给 evaluation/cli.py（243 行，已有 base/edges/edges2-6 共 571 测试）补第七轮
+- 深入 _build_parser 参数精确集合、_format_metric 各类型分支、main() 各退出码
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges7.py`（93 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser**：3 个 subparser 各自参数精确集合（去除 command/help）、run subparser 5 args（manifest/output required、parser choices fallback+kreuzberg、max_chars/tolerance_chars type=int default）、validate-report 1 arg（input）、inspect-doc 2 args（input、tolerance_chars）、subparsers required=True、prog/description/formatter_class
+- **_format_metric**：None/bool/float/int/str/list/dict 各分支、float .4f 精度、dict 按 key 排序、name padding 36、long name 不截断、bool/float reason 保留（or 'ok'）
+- **_run_inspect_doc**：nonexistent→2、invalid JSON→1、list top→1、empty dict→0、Path 对象接受、str 接受
+- **main()**：no args→SystemExit(2)、unknown command→SystemExit、invalid parser choice→SystemExit(2)、missing required arg→SystemExit、run nonexistent manifest→2、validate-report nonexistent→2、validate-report invalid JSON→1、validate-report schema-invalid→1、validate-report FileNotFoundError→2、inspect-doc 各错误码
+- **模块结构**：无 __all__、future annotations、imports（argparse/json/sys/Path + manifest/report/runner/schema 各 import）、stdout reconfigure 块在 try/except (AttributeError, OSError)、docstring 含 run/validate-report/inspect-doc + sanity
+- **签名**：main(argv: list[str] | None = None) -> int、_build_parser() -> ArgumentParser、_format_metric(name: str, metric: dict) -> str、_run_inspect_doc(args) -> int
+- **综合行为**：build_parser 幂等返回新实例、format_metric 不修改输入、run→validate-report roundtrip、inspect-doc 真实 doc 端到端、--tolerance-chars 透传
+
+### 撞墙记录
+- 一次撞墙（5 fail）：
+  - subparser 参数集合含 'command'（来自 subparsers 父 action）→ 改为排除 command
+  - bool + reason 测试期望 'ok' 覆盖 reason，实际 reason truthy 时保留 → 改为 reason 保留
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 174 后）：14005 pass / 0 fail / 13 skip（HEAD `5acf34c`）
+
+### 下一步建议
+- 候选 IK：app/hash.py 第六轮（24 行 / 266 测试，已饱和）
+- 候选 IR：evaluation/runner.py 第七轮（227 行 / 569 测试）
+- 候选 IS：evaluation/metrics.py 第七轮（381 行 / 951 测试）
+- 候选 IT：evaluation/manifest.py 第七轮（239 行 / 731 测试）
+- 候选 IU：evaluation/report.py 第六轮（200 行 / 576 测试）
+- 候选 IV：evaluation/schema_validation.py 第二轮（15 行 / 112 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IR（evaluation/runner.py 第七轮）。runner.py 是评测主流程入口，
+第七轮可深入 _load_annotation 各异常分支、_process_one image_dir 命名、run_evaluation expected_failures 流程。
+
+---
