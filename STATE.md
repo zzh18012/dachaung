@@ -12813,3 +12813,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW（evaluation/report.py 第十二轮）继续推 evaluation 大文件。
 
 ---
+## Round 229 — evaluation/metrics.py 第十一轮（116 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第十一轮 edges 测试，覆盖模块常量精确内容、_chunk_reference_ratio None 边界、_heading_boundary_ratio first id None、_text_preservation 全 image / 非 str content、_image_resource_ratio 绝对路径、_docx_locator_ratio 7 个 structural key、_pdf_locator_ratio type 不在 BBOX_REQUIRED、_silent_drop_count 多 type 求和、compute_automatic_metrics metric name 集合
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges11.py`（116 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块常量精确内容**：_TEXT_TYPES 7 项（heading/paragraph/list_item/table/caption/header/footer）；_PDF_BBOX_REQUIRED_TYPES 4 项（heading/paragraph/caption/list_item）；_NOT_EVALUATED = "not_evaluated"；都是 tuple；不在 __all__
+- **_chunk_reference_ratio**：elements 含 None element_id（set 含 None）；chunks first id None；duplicate id 在 chunk 内（all() 仍 True）；duplicate element_id 在 elements 内（set 去重）；half valid 比例精确
+- **_heading_boundary_ratio**：chunk first id None 加入 set；heading element_id None 匹配；multiple chunks 同 first id（set 去重）；multiple headings 部分匹配（2/3）
+- **_text_preservation**：全 image type → expected=""；content None → or "" → ""；content int/list → TypeError；text int → TypeError；precision/recall 算法精确（Counter 交集）；dup char in actual/expected
+- **_image_resource_ratio**：image_base_dir 是文件（仍 work）；resource_path 是绝对路径存在/缺失；resource_path 是目录；resource_path="" → falsy；0 字节文件 invalid
+- **_docx_locator_ratio**：7 个 structural key 全在一个 element；relationship_id/section 单独足够；page/bbox 出现 → invalid；unknown key → invalid；empty locator → invalid
+- **_pdf_locator_ratio**：type=None 不在 BBOX_REQUIRED；type=image/table/header/footer 只需 page≥1；type=paragraph/caption/list_item 需 page + bbox；page=0/negative/string/float/bool 边界
+- **_silent_drop_count**：expectations 含未知 key 被忽略；actual 含 expectations 没有的 type 不算；多 type 求和精确；negative expected 不算 drop；zero expected zero actual = 0；value 类型 int
+- **compute_automatic_metrics**：metric name 集合精确（14 keys 成功 / 14 keys 失败）；不含 chunk_boundary_*/figure_caption_*（那些来自 annotation_metrics）；source_type='pdf'/'docx'/'other' locator null 切换；error_code 缺 code 字段 raises KeyError；schema_check_exception path 返回 False + reason 含异常类型名
+- **_strip_unicode_whitespace**：\f (form feed) 删除；\v (vertical tab) 删除；\r 删除；\x00 (null) 保留；\x07 (BEL) 保留；\x1b (ESC) 保留
+- **_is_valid_bbox**：tuple/set/dict 全 reject；complex number 元素 reject；str 元素 reject；None 元素 reject；4 个 0.0 valid；负坐标 valid；4 个最小正 float valid
+
+### 撞墙记录
+- 1 fail（修复）：
+  - test_compute_metrics_failure_path_metric_count：误以为失败路径 13 keys；实际是 14 keys（pipeline_success + error_code + schema_valid + 11 null）→ 改为 expect 14
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 229 后）：20128 pass / 0 fail / 15 skip（HEAD `4b7f2e6`）
+
+### 下一步建议
+- 候选 KW：evaluation/report.py 第十二轮（200 行）
+- 候选 KX：evaluation/cli.py 第十三轮（243 行）
+- 候选 KS：evaluation/runner.py 第十三轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十三轮（239 行）
+- 候选 KE：evaluation/annotation_metrics.py 第十二轮（194 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 候选 KF：evaluation/metrics.py 第十二轮（381 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW（evaluation/report.py 第十二轮）继续推 evaluation 大文件。
+
+---
