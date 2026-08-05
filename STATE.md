@@ -11137,3 +11137,50 @@ manifest 路径校验、warning 累积逻辑、image 输出目录处理。
 第八轮可深入 run / validate-report / --manifest 校验、stdout/stderr 输出格式、exit code、各错误码（manifest invalid / report invalid / parser name unknown）。
 
 ---
+
+## Round 195（2026-08-05）：evaluation/cli.py 第八轮（edges8）
+
+### 目标
+- 给 evaluation/cli.py（243 行，已有 base/edges/edges2-7 共 664 测试）补第八轮
+- 深入 _build_parser prog/description/formatter/required=True、各 subparser help/choices/default
+- main() 各错误码完整矩阵（manifest 缺失/目录/unknown command/parser 非法/negative max-chars）
+- _format_metric 各 value 类型边界（None/bool/float 0.0/int/dict sorted/long name padding/unicode）
+- _run_inspect_doc stdout 输出顺序、metric 排序键、source_type 默认、document_id/parser_name 缺失 fallback
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges8.py`（104 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 深度**：prog=evaluation.cli、description 非空、formatter=RawDescriptionHelpFormatter、subparsers required=True、dest=command、3 个 subcommands、run --manifest/--output required、parser default=fallback choices=(fallback,kreuzberg)、max_chars type=int default=800、tolerance_chars default=30、validate-report input required、inspect-doc input required、help text 含默认值
+- **main 错误码矩阵**：no args SystemExit 2、unknown command SystemExit 2、run missing manifest exit 2 + "[ERROR] 清单不存在"、run manifest directory exit 2、validate-report missing exit 2 + "[ERROR] 报告不存在"、validate-report directory exit 2、validate-report invalid JSON exit 1 + "JSON 解析失败"、validate-report empty file exit 1、validate-report list JSON exit 1、inspect-doc missing exit 2 + "文档不存在"、inspect-doc directory exit 2、inspect-doc invalid JSON exit 1、inspect-doc list JSON exit 1 + "JSON 顶层不是对象"、inspect-doc empty dict exit 0、run invalid --parser choice SystemExit 2、run negative max-chars 通过 argparse 走到 manifest 失败
+- **_format_metric 类型边界**：None→null、True→"true"、False→"false"、True with custom reason、float 0.123456789→"0.1235" 4 decimal、0.0→"0.0000"、1.0→"1.0000"、int 42、int 0、int -5、dict sorted by key、empty dict、dict with str values、dict with None values、dict with bool values、str default branch、list default branch、long name padded to 36、exact 36 char name、over-36 char name、unicode name
+- **_run_inspect_doc 输出**：file/document_id/source/parser/counts/metrics 6 行元信息 + metrics 列表、document_id 缺失→'?'、parser_name 缺失→'v?'、source_type default='unknown'、metric 排序（bool<int<float<dict<null，name 字典序）、null metric 排最后、empty elements/chunks → counts=0、no elements key→默认[]、no chunks key→默认[]、tolerance_chars 传播
+- **模块结构**：imports (argparse/json/sys/Path/ManifestError/load_manifest/get_git_provenance/run_evaluation/EvalSchemaError/validate_file)、各函数签名 (argv default None/name+metric/args)、return annotation (int/str)、所有 callable
+- **idempotency**：_build_parser 两跑独立实例同 prog、_format_metric 同输入同输出、main validate-report missing 两跑同 exit 2
+- **综合行为**：inspect-doc 完整 pipeline、via main with tolerance 50、dict mixed int/str/None/bool、argv=None uses sys.argv、image element inspect
+
+### 撞墙记录
+- 0 fail：第一次跑全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 195 后）：16453 pass / 0 fail / 14 skip（HEAD `de272df`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KI：app/parsers/ipynb_parser.py 第八轮（227 行 / ~1100 测试）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（136 行 / ~900 测试）
+- 候选 KL：app/models.py 第六轮（154 行 / ~800 测试）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1200 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KR：evaluation/report.py 第七轮（200 行 / ~900 测试）
+- 候选 KS：evaluation/manifest.py 第八轮（239 行 / ~1050 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KU：app/schema.py 第七轮（230 行 / ~900 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS（evaluation/manifest.py 第八轮）。manifest.py 是 evaluation/ 唯一未做 8th round 的核心模块（239 行 / ~4.4 tests/line），
+第八轮可深入 path 安全校验（绝对/反斜杠/project_root outside）、expected_failures 加载、annotation_resolved 解析、categories 聚合、manifest schema validation。
+
+---
