@@ -13719,3 +13719,51 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KF3（evaluation/metrics.py 第十四轮，381 行）继续推 evaluation 最大文件。
 
 ---
+## Round 249 — evaluation/metrics.py 第十四轮（152 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第十四轮 edges 测试，覆盖源码字符串断言、模块/函数 metadata、signature 无 varargs/varkw、__future__ annotations 影响、常量精确（_TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES/_NOT_EVALUATED）、_is_valid_bbox 边界、_strip_unicode_whitespace 字符级、_null/_ratio/_bool_metric/_int_metric 不缓存、_image_resource_ratio directory 与 size=0 处理、_chunk_reference_ratio 边界、_silent_drop_count actual>expected 行为、_pdf/_docx_locator_ratio 边界、_text_preservation 空字符串/null reason 精确
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges14.py`（152 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码字符串断言**：含 '_TEXT_TYPES' / '_PDF_BBOX_REQUIRED_TYPES' / '_NOT_EVALUATED' / Counter/Path/math import / future annotations / dict[str, / schema_validation lazy import / 'if actual < exp' / 'v1.1' 注释 / 'math.isfinite'；不含 '__main__'
+- **模块 metadata**：__file__ 后缀 .py / 含 'metrics'；__package__=='evaluation'；__name__=='evaluation.metrics'；Counter/Path/math identity
+- **__all__ 精确**：仅 1 个元素 ['compute_automatic_metrics']；不含 helper；是 list 不是 tuple
+- **常量精确**：_TEXT_TYPES 是 tuple / 7 个元素 / 内容顺序精确 / 无重复；_PDF_BBOX_REQUIRED_TYPES 4 个 / ⊆ _TEXT_TYPES / 排除 table/header/footer；_NOT_EVALUATED == 'not_evaluated'
+- **函数 metadata**：__module__/__qualname__/__name__ 精确；都是 FunctionType；无 varargs/varkw；return_annotation 是 str（来自 __future__）
+- **_null/_ratio/_bool_metric/_int_metric**：每次返回新 dict（不缓存）
+- **_is_valid_bbox 边界**：float/int/混合 接受；bool True/False 拒绝；length 3/5/0 拒绝；tuple/None/str 拒绝；Inf/-Inf/NaN 拒绝；负数/0/大数接受；返回 bool 类型
+- **_strip_unicode_whitespace 字符级**：NBSP/em/en space/全角空格/line separator/paragraph separator 都删除；普通 \t/\n/\r/\f/\v 删除；ZWSP 不算空白（按 Python 行为）；保留非空白字符；空字符串；全空白；bytes raises AttributeError（int 无 isspace）；不排序；返回 str
+- **_image_resource_ratio**：directory 不算 file → invalid；size=0 invalid；size=1 valid；3 个全 valid → 1.0；mixed → 2/3；resource_path key 缺失/空字符串/None 都跳过；无 images → 'no_image_elements'；相对路径 + image_base_dir 拼接
+- **_chunk_reference_ratio**：空 chunks → 'no_chunks'；source_element_ids=[None] 时 None in {None} True；空 list/缺 key → 跳过；partial valid → 0.0；全 valid → 1.0
+- **_silent_drop_count**：actual>expected 不扣（max(0,exp-act)）；actual==expected 0；多类型 sum；expected type missing in actual → drop；no expectations/empty expectations/empty counts 都 null
+- **_pdf_locator_ratio**：空 → 'no_elements'；paragraph/caption/list_item 需 bbox；table/header/footer 不需 bbox；source_locator=None/missing 都 invalid；page float 拒绝；page bool=True 接受（bool 是 int 子类，True==1）
+- **_docx_locator_ratio**：空 → 'no_elements'；7 个 structural key 都单独 valid；含 page 或 bbox → invalid；source_locator=None/missing/empty 都 invalid
+- **_text_preservation**：都空 → 'empty_expected_and_actual'；只 image elements → expected=''；chunk text None → actual=''；element content None → expected=''；返回 dict 3 keys
+- **_heading_boundary_ratio**：无 heading → 'no_heading_elements'；heading 是 chunk 第一个 → valid；不是第一个 → invalid；有 heading 但无 chunks → 0.0（不是 'no_chunks'）；空 source_element_ids 跳过
+- **compute_automatic_metrics**：doc=None 时 14 个 keys；后续 11 metric 都 'pipeline_failed'；不修改输入 document/expectations
+
+### 撞墙记录
+- 1 fail（修复）：
+  - test_strip_unicode_whitespace_bytes_raises_type_error：bytes 迭代给 int，int 无 isspace() → AttributeError（不是 TypeError）→ 改成期望 AttributeError
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 249 后）：21830 pass / 0 fail / 16 skip（HEAD `8ba79be`）
+
+### 下一步建议
+- 候选 KW3：evaluation/report.py 第十五轮（200 行）
+- 候选 KX3：evaluation/cli.py 第十六轮（243 行）
+- 候选 KS3：evaluation/runner.py 第十六轮（227 行）
+- 候选 KZ3：evaluation/schema.py 第九轮（80 行）
+- 候选 KT4：evaluation/manifest.py 第十六轮（239 行）
+- 候选 KE4：evaluation/annotation_metrics.py 第十五轮（194 行）
+- 候选 KF4：evaluation/metrics.py 第十五轮（381 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW3（evaluation/report.py 第十五轮，200 行）继续推 evaluation。
+
+---
