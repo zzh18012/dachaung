@@ -14393,3 +14393,48 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW5（evaluation/report.py 第十七轮，200 行）继续推 evaluation。
 
 ---
+
+## Round 264 — evaluation/report.py 第十七轮（96 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十七轮 edges 测试，覆盖 edges16 未触及的角度：所有 ratio metric 走查（不只 schema_valid）、schema_valid boolean-as-ratio 混合、text_preservation_equal 浮点、chunk_boundary_f1 三种 None/0/0.5、not_evaluated + participating = total、success_count + failure = total、单 doc 全 None、多 doc 同 metric 全 null、metrics 缺失某 metric、空 metrics dict、per_doc 异常（None/int/str/dict-with-non-dict-metric）、build_provenance max_chars=0/-1/布尔、run_timestamp_iso 带 tz offset、parser_name 空串、dependencies 值类型、两次调用独立 dict、build_devset_section 边界（empty status/huge file_count/pdf+docx≠file_count/categories identity）、get_git_provenance 真实跑/异常路径（FileNotFoundError → commit None + dirty True）、get_dependency_versions 异常路径（Exception / PackageNotFoundError）、__all__ 不含 EVALUATOR_VERSION/REPORT_VERSION/subprocess/datetime/Path/Any、_RATIO_METRICS 含 schema_valid/chunk_boundary 三联/text_char_multiset 双联、不含 element_count_total/pipeline_success、源码 token 含 _COUNT_METRICS 循环/_SUCCESS_BOOL_METRICS 循环/_RATIO_METRICS 循环/int(max_chars)/不含 json/os/asyncio/threading/logging、aggregate_summary counts/success_rates/ratio_macro_averages 各自只含对应 metric set、silent_drop_total top-level 不混入子 dict
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges17.py`（96 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **aggregate_summary 深度**：所有 13 个 ratio metric 走查（不只 schema_valid）；schema_valid boolean-as-ratio 混合 True/False/None；text_preservation_equal 浮点混合；chunk_boundary_f1 zero/half/all-none；not_evaluated + participating = total；success_count + (total - success_count) = total；rate=None 当 total=0
+- **aggregate_summary 边界**：单 doc 全 None → 每个 ratio macro_average None + participating 0 + not_evaluated 1；多 doc 同 metric 全 null；某 metric 仅部分 doc 提供；空 metrics dict per_doc；missing 'metrics' key（KeyError）；missing metrics value（TypeError）；per_doc is None（TypeError）；per_doc 是 str（TypeError）；metric value 不是 dict（AttributeError）
+- **build_provenance 深度**：max_chars=0/-1/True/False 都 int() 转换；run_timestamp_iso 带时区偏移；run_timestamp_iso 解析回 datetime；parser_name 空串；dependencies 三 package 值类型；两次调用独立 dict；evaluator/report_version 都是 str
+- **build_devset_section 深度**：empty status；huge file_count；pdf+docx≠file_count（不强制一致）；categories identity 保留；两次调用独立 dict；调用过程不修改 manifest 属性
+- **get_git_provenance 深度**：真实项目根目录返回 40-char hex git_commit；tmp_path 不是 git repo → commit None 或 str、dirty 是 bool；两次调用独立 dict；subprocess.run 至少调 1 次（监控）；FileNotFoundError 异常 → catch → commit None + dirty True
+- **get_dependency_versions 深度**：pypdfium2/python-docx 值类型；两次调用独立但 value 一致；Exception → catch → None；PackageNotFoundError → catch → None
+- **模块 namespace 完整性**：__all__ 不含 EVALUATOR_VERSION/REPORT_VERSION/subprocess/datetime/Path/Any；namespace 有 EVALUATOR_VERSION/REPORT_VERSION/Path/Any；_RATIO_METRICS 含 schema_valid/chunk_boundary 三联/text_char_multiset 双联；_COUNT_METRICS 不含 silent_drop_count；_SUCCESS_BOOL_METRICS 不含 schema_valid
+- **源码 token**：含 for name in _COUNT_METRICS/_SUCCESS_BOOL_METRICS/_RATIO_METRICS 循环、silent_drop_count、pipeline_success、element_count_total、success_count、rate、int(max_chars)；不含 json/os/asyncio/threading/logging
+- **aggregate_summary 不混合类型**：counts 只含 _COUNT_METRICS；success_rates 只含 _SUCCESS_BOOL_METRICS；ratio_macro_averages 只含 _RATIO_METRICS；silent_drop_total 是 top-level key，不在任何子 dict
+
+### 撞墙记录
+- 4 fail → 修复后 0 fail：
+  - `test_aggregate_summary_per_doc_is_none_raises_type_error`：None[X] 抛 TypeError 不是 AttributeError；改 TypeError
+  - `test_aggregate_summary_per_doc_not_dict_raises_attribute_error`：'str'['metrics'] 抛 TypeError 不是 AttributeError；改 TypeError
+  - `test_build_devset_section_does_not_mutate_categories_input`：build_devset_section 直接引用 manifest.categories_covered 到输出 dict，修改输出会修改输入；改为只验证调用过程不修改 manifest 属性
+  - `test_get_git_provenance_in_tmp_path_dirty_is_true`：tmp_path 不是 git repo，git status --porcelain 返回非零，dirty = bool(False and ...) = False；改为断言 dirty 是 bool
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 264 后）：23780 pass / 0 fail / 16 skip（HEAD `c58f072`）
+
+### 下一步建议
+- 候选 KX5：evaluation/cli.py 第十八轮（243 行）
+- 候选 KS5：evaluation/runner.py 第十八轮（227 行）
+- 候选 KZ5：evaluation/schema.py 第十一轮（80 行）
+- 候选 KT6：evaluation/manifest.py 第十八轮（239 行）
+- 候选 KE6：evaluation/annotation_metrics.py 第十七轮（194 行）
+- 候选 KF6：evaluation/metrics.py 第十七轮（381 行）
+- 候选 KW6：evaluation/report.py 第十八轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KX5（evaluation/cli.py 第十八轮，243 行）继续推 evaluation。
+
+---
