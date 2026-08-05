@@ -10370,3 +10370,43 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第二轮可深入 validate/validate_file 各错误路径、EvalSchemaError 字段、各 schema 文件加载。
 
 ---
+
+## Round 180（2026-08-05）：evaluation/schema.py 第五轮（edges5）
+
+### 目标
+- 给 evaluation/schema.py（80 行，已有 base/edges/edges2/edges3/edges4 共 472 测试）补第五轮
+- 深入 SCHEMAS_DIR 路径精确、EvalSchemaError 继承层级、validate_file 错误优先级
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges5.py`（86 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **SCHEMAS_DIR**：路径精确（project_root/schemas）、绝对、resolve 无 ..、is_dir、父目录含 pyproject.toml、3 个 known schema 文件存在
+- **EvalSchemaError**：init 签名 (message, errors=None)、errors 默认 None→[]、透传 errs、super().__init__(message) → args==(message,)、继承 Exception 不继承 ValueError/KeyError、FileNotFoundError 不能捕获
+- **_schema_path**：错误消息含路径、目录也 raise FileNotFoundError、返回绝对 Path
+- **load_schema**：3 个 known schema（manifest/annotation/evaluation-report）都可加载、Draft202012 兼容、含 $schema/properties、每次新 dict
+- **validate**：错误聚合 path/message/schema_path 各类型、消息含 schema_name+count、不修改 instance
+- **validate_file 错误优先级**：FileNotFoundError > JSONDecodeError > EvalSchemaError（用 priority 测试验证）
+- **模块结构**：__all__ 精确 5 项、imports 完整（json/Path/Any/Draft202012Validator/JSValidationError）、docstring 提及不与 app/schema.py 复用
+- **签名**：validate(instance, schema_name)、validate_file(path, schema_name) 都无默认值
+- **综合行为**：幂等、validate/validate_file 一致、EvalSchemaError 多错误保留
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 180 后）：14472 pass / 0 fail / 13 skip（HEAD `1614d03`）
+
+### 下一步建议
+- 候选 IW：app/cli.py 第八轮（535 行 / 747 测试）
+- 候选 IX：app/pipeline.py 第八轮（216 行 / 702 测试）
+- 候选 IY：app/chunkers/structural.py 第八轮（388 行 / 938 测试）
+- 候选 J D：app/parsers/* 各第 N 轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IX（app/pipeline.py 第八轮）。pipeline.py 是处理流程核心，
+第八轮可深入 process_single 各 parser 路径、validate_only 错误聚合、image_output_dir_for 边界。
+
+---
