@@ -12359,3 +12359,43 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KV（evaluation/report.py 第十轮），200 行核心组装模块。
 
 ---
+
+## Round 218 — evaluation/report.py 第十轮（112 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十轮 edges 测试，覆盖 provenance/devset/summary 深度
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges10.py`（112 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量互斥性**：counts ∩ ratios = ∅；counts ∩ success = ∅；success ∩ ratios = ∅；silent_drop 不在 count/ratio；element_count_total 不在 ratio；schema_valid 在 ratio；pipeline_success 不在 ratio
+- **get_git_provenance 深度**：返回 dict 2 keys；callable；POSITIONAL_OR_KEYWORD；无 default；subprocess 调用形式精确（git rev-parse + git status）；TimeoutExpired/OSError/SubprocessError safe；非零 returncode → commit=None；空 stdout → commit=None；strip whitespace；dirty porcelain 非空 True / 空 False
+- **get_dependency_versions 深度**：返回 dict；3 keys exact；str|None；callable；0 params；PackageNotFoundError 处理；其他 Exception 处理；真实 pdfplumber 版本
+- **build_provenance 深度**：4 params POSITIONAL_OR_KEYWORD；9 keys exact；evaluator/report version 常量；max_chars int type/zero/negative/large/str-digits/float-truncate；parser_name unicode/empty；parser_version propagated/None；dependencies 3 keys；run_timestamp_iso parseable/有时区/near now；git_commit str|None；git_dirty bool
+- **build_devset_section 深度**：dict；6 keys；status/file_count/content_group_count/pdf_count/docx_count/categories_covered 都 propagated；empty categories；unicode categories；1 param
+- **aggregate_summary 深度**：dict；4 top keys；counts/success_rates/ratio_keys exact；silent_drop_total None for empty；value=0 参与；value=None skip；metric missing skip；success_rates all/none/skip None/empty；ratio macro with zero/skip None/skip missing/all None；silent_drop with zero/skip None/all None/all zero；idempotent；new dict each call
+- **模块结构**：__all__ exact 5；imports subprocess/datetime/Path/Any/EVALUATOR_VERSION/REPORT_VERSION；EVALUATOR_VERSION/REPORT_VERSION == "1.1"；docstring 提及 counts/success_rates/ratio/silent_drop/不混合；future annotations；_RATIO_METRICS/_COUNT_METRICS/_SUCCESS_BOOL_METRICS 模块级常量存在
+- **综合行为**：full pipeline mixed metrics 完整验证；build_provenance 类型一致性
+
+### 撞墙记录
+- 0 fail：一次通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 218 后）：19151 pass / 0 fail / 15 skip（HEAD `4de31fe`）
+
+### 下一步建议
+- 候选 KAC：evaluation/cli.py 第十一轮（243 行）
+- 候选 KS：evaluation/runner.py 第十一轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十一轮（239 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KAC（evaluation/cli.py 第十一轮），243 行 CLI 入口。
+
+---
