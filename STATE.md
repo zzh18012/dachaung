@@ -11925,3 +11925,55 @@ get_git_provenance 各 OSError 路径。
 第九轮可深入 manifest 加载/expectations 校验/expected_failures 解析各边界。
 
 ---
+
+## 2026-08-05 — Round 209（evaluation/manifest.py 第九轮）
+
+### 目标
+- 给 evaluation/manifest.py（239 行，已有 base/edges/edges2-8 共 ~953 测试）补第九轮
+- 模块结构 / __all__ exact / imports 完整集合
+- ManifestError 类层级 / args 透传
+- DocumentEntry/ExpectedFailure/Manifest 字段类型注解 / frozen
+- _is_absolute_like 穷举边界（多字符盘符 / 单字母无 separator / 1 字符 / Unicode）
+- _has_backslash 边界
+- _resolve_relative_path 返回 Path 实例 / 绝对路径
+- load_manifest project_root 接受 Path/str/None
+- Manifest properties 类型 / 行为
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges9.py`（131 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块结构**：__all__ == {ManifestError, Manifest, DocumentEntry, ExpectedFailure, load_manifest}（list 5 entries）；imports（json/dataclass/Path/Any/MANIFEST_VERSION/validate）；docstring 含相对路径/绝对路径/正斜杠；future annotations；无 _silence_unused_import；4 个内部 helper 在命名空间
+- **ManifestError**：是 class / 是 Exception 子类 / 不是 ValueError/KeyError 子类；可空 args / 多 args 透传；str(e) 返回 message；可被 pytest.raises(ManifestError) 与 pytest.raises(Exception) 捕获
+- **DocumentEntry**：是 dataclass；10 字段（doc_id/path_str/resolved_path/source_type/sha256/categories/paired_with/annotation_file_str/annotation_resolved/expectations）；frozen → setattr 触发 FrozenInstanceError；hashable；equality 按所有字段
+- **ExpectedFailure**：是 dataclass；5 字段（doc_id/path_str/resolved_path/expected_error_code/source_type）；frozen；hashable
+- **Manifest**：是 dataclass；5 字段（manifest_version/devset_status/documents/expected_failures/project_root）；frozen；hashable
+- **Manifest properties**：file_count/pdf_count/docx_count/content_group_count 返回 int；categories_covered 返回 list（sorted + dedup）；empty 时合理默认值
+- **_is_absolute_like**：empty/dot/dotdot/filename/2 字符/3 字符无冒号/drive 无 separator（C:foo）/冒号打头（:/foo）/digit drive/underscore drive 都 False；POSIX 绝对/Windows 盘符（C:\、c:/）/Unicode 字母 drive（中:/foo）True
+- **_has_backslash**：empty/正斜杠/无反斜杠 False；单/多/首/尾反斜杠 True
+- **_resolve_relative_path**：3 参数；返回 Path；返回绝对路径；空/绝对/反斜杠/越界 都抛 ManifestError；field_name 透传到错误消息
+- **_detect_project_root**：1 参数；返回 Path；从文件/目录向上找 pyproject.toml；多 pyproject.toml 链取最近；找不到返回 start
+- **load_manifest**：2 参数；project_root 默认 None；接受 Path/str 两种 manifest_path；project_root 接受 Path/str；文件不存在/JSON 解析失败抛 ManifestError；返回 Manifest 实例；documents/expected_failures 转 tuple；project_root 已 resolve；manifest_version/devset_status 透传
+
+### 撞墙记录
+- 13 fail：_write_manifest 默认 manifest_version="1.1"，但实际 schema const == "1.0"（MANIFEST_VERSION = "1.0"）→ 改默认为 "1.0"
+- 1 fail：full_round_trip 测试给 paired_with=None / sha256=None，schema 要求它们是 string → 改成 omit 字段（schema 中两字段都是 optional）
+- 同步把测试中所有 "1.1" 替换为 "1.0"（包括 Manifest dataclass 构造、断言 m.manifest_version）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 209 后）：18239 pass / 0 fail / 15 skip（HEAD `efd0fab`）
+
+### 下一步建议
+- 候选 KS：evaluation/annotation_metrics.py 第 N 轮（待查行数）
+- 候选 KT：app/chunkers/structural.py 第十轮（388 行 / ~1600 测试）
+- 候选 KU：evaluation/schema.py 第 N 轮
+- 候选 KV：evaluation/schema_validation.py 第 N 轮
+- 候选 KF/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KT（app/chunkers/structural.py 第十轮）。structural.py 是分块核心（388 行 / ~4.1 tests/line），
+第十轮可深入 _split_long_text/_ChunkBuffer/_hard_split_with_whitespace_fallback 更深层边界。
+
+---
