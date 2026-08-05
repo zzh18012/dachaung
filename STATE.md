@@ -10194,3 +10194,48 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第六轮可深入 aggregate_summary 各 metric 类型、build_provenance git 字段、build_devset_section 各 key 精确。
 
 ---
+
+## Round 176（2026-08-05）：evaluation/report.py 第六轮（edges6）
+
+### 目标
+- 给 evaluation/report.py（200 行，已有 base/edges/edges2-5 共 576 测试）补第六轮
+- 深入 get_git_provenance subprocess 参数、get_dependency_versions 包名顺序、aggregate_summary figure_caption 排除
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges6.py`（93 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **get_git_provenance subprocess 参数**：用 patch.object 检查 cwd=str(project_root)、capture_output=True、text=True、encoding=utf-8、errors=replace、timeout=10
+- **get_git_provenance 各 returncode/stdout 分支**：empty stdout→commit None、strip 空白、porcelain returncode!=0 → dirty=False（非 True！）
+- **get_git_provenance 异常路径**：OSError/SubprocessError/TimeoutExpired 都被 (OSError, SubprocessError) 捕获
+- **get_dependency_versions**：包名顺序固定（pdfplumber→python-docx→pypdfium2）、PackageNotFoundError→None、generic Exception→None、只查 3 个包
+- **build_provenance**：9 keys 精确集合、git_commit str|None、git_dirty bool、dependencies dict、max_chars int（接受 float/numeric str）、run_timestamp_iso 含 T 分隔符
+- **aggregate_summary**：figure_caption_precision/recall/f1 显式不在 ratio_macro_averages、未知 metric 忽略、metric 无 value 跳过、negative value 参与、explicit zero 参与
+- **aggregate_summary success_rates**：value=False 不计 success、value=None 不计但 total+1
+- **aggregate_summary keys 精确**：counts/success_rates/ratio_macro_averages/silent_drop_total 4 项
+- **build_devset_section**：categories_covered 引用语义（不去重、保序）
+- **模块注释**：figure_caption 始终 null 不参与 macro average（源码注释明确）、__all__ 5 项
+- **综合行为**：每次新 dict、不修改输入、100 docs 聚合正确
+
+### 撞墙记录
+- 一次撞墙（1 fail）：
+  - 测试期望 porcelain returncode!=0 → dirty=True（默认值），实际 bool(returncode==0 and ...)=False → 改为 dirty=False
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 176 后）：14164 pass / 0 fail / 13 skip（HEAD `7fb9a69`）
+
+### 下一步建议
+- 候选 IS：evaluation/metrics.py 第七轮（381 行 / 951 测试）
+- 候选 IT：evaluation/manifest.py 第七轮（239 行 / 731 测试）
+- 候选 IV：evaluation/schema_validation.py 第二轮（15 行 / 112 测试，已饱和）
+- 候选 IW：app/cli.py 第八轮（535 行 / 747 测试）
+- 候选 IX：app/pipeline.py 第八轮（216 行 / 702 测试）
+- 候选 IY：app/chunkers/structural.py 第八轮（388 行 / 938 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IS（evaluation/metrics.py 第七轮）。metrics.py 是评测指标计算核心，
+第七轮可深入 compute_automatic_metrics 各 metric 边界（None/0/negative/missing 字段）。
+
+---
