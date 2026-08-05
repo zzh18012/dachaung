@@ -12729,3 +12729,48 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE（evaluation/annotation_metrics.py 第十一轮）继续推 evaluation 大文件。
 
 ---
+## Round 227 — evaluation/annotation_metrics.py 第十一轮（89 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第十一轮 edges 测试，覆盖 PARSER_DOES_NOT_EMIT_RELATIONS 常量、figure_caption_prf 输入不变性、chunk_boundary_prf 输入类型边界
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges11.py`（89 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量**：是 str；值精确 == "parser_does_not_emit_relations"；非空；在 __all__ 中
+- **figure_caption_prf 深度**：返回 dict[str, dict]；keys 精确 3 个；所有输入组合（None/{} /present）都返回 null + reason；不依赖 annotation/document 内容；callable；signature；param kinds；no defaults
+- **chunk_boundary_prf 输入类型边界**：document 是 list/str → AttributeError（提供 annotation 触发 document 访问）；annotation 是 list（非空）→ AttributeError；annotation 是空 list → 走 no_annotation 路径；chunks 含 None/str/int 元素 → AttributeError；chunk text 是 int/dict/list → TypeError（normalize_text regex 期望 str）；chunk_boundary_anchors 是 dict/int → AttributeError/TypeError；anchor marker 是 int → TypeError（stream.find 期望 str）；anchor position 是 int/None → 走 else (after) 分支；tolerance_chars 是 str → TypeError
+- **chunk_boundary_prf 算法精确性**：tolerance=0/negative/very large 行为；predicted boundary 在 chunk 末尾；position before/after；last chunk 不贡献边界（N-1）；whitespace/newline/multi-space normalize；marker 含 regex 元字符（按字面匹配）；marker unicode；repeated markers 推进 search_from；missing marker 记入 _missing_markers；all found 时无 _missing_markers key
+- **chunk_boundary_prf _null 路径精确性**：doc=None → pipeline_failed；annotation=None/空 dict → no_annotation；0/1 chunks → no_predicted_boundaries；chunks present no anchors → no_ground_truth_anchors；anchor 缺 marker → 默认 "" → missing；anchor 缺 position → 默认 after；position unknown → after 分支
+- **chunk_boundary_prf 内部 vs 外部 keys**：_tolerance_chars / _missing_markers 以 _ 开头；precision/recall/f1 不以 _ 开头；无 side effects
+- **模块结构**：__all__ exact 3 个；imports Counter/Any/normalize_text/_null/_ratio；docstring 含 chunk_boundary/figure_caption/一对一/tolerance；future annotations；常量计数
+- **签名**：chunk_boundary_prf(document, annotation, tolerance_chars=30) 全部 positional-or-keyword；figure_caption_prf(document, annotation) 无默认
+- **综合**：full perfect match（3 chunks + 2 anchors）；half match（5 chunks + 2 anchors → 2 matches in tolerance）；一对一约束（1 predicted + 2 anchors in tolerance → only 1 match）
+
+### 撞墙记录
+- 6 fail（修复）：
+  - document 是 list/str：annotation=None 触发 early return，从未访问 document.get → 改为提供非空 annotation 触发访问
+  - chunk text 是 int/dict/list：误以为 AttributeError；实际 normalize_text 调用 regex.sub 触发 TypeError → 改为 expect TypeError
+  - one_to_one_constraint：用 marker='abc' 的两个 anchor，search_from 推进导致第二个找不到（missing），实际只 1 anchor 进入 gt_positions；改用 'b' 和 'c' 两个不同 marker 让两个 anchor 都找到
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 227 后）：19925 pass / 0 fail / 15 skip（HEAD `d77ce5c`）
+
+### 下一步建议
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KW：evaluation/report.py 第十二轮（200 行）
+- 候选 KX：evaluation/cli.py 第十三轮（243 行）
+- 候选 KS：evaluation/runner.py 第十三轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十三轮（239 行）
+- 候选 KE：evaluation/annotation_metrics.py 第十二轮（194 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行 — 已饱和）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行 — 已饱和）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KZ（evaluation/schema.py 第六轮）补 evaluation 中等大小文件。
+
+---
