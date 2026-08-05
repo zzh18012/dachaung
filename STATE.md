@@ -11866,3 +11866,62 @@ get_git_provenance 各 OSError 路径。
 第九轮可深入各 ratio/count/success metric 边界、None reason 路径、image_base_dir 各场景。
 
 ---
+
+## 2026-08-05 — Round 208（evaluation/metrics.py 第九轮）
+
+### 目标
+- 给 evaluation/metrics.py（381 行，已有 base/edges/edges2-8 共 ~1239 测试）补第九轮
+- 模块常量精确值（_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED）
+- 构造器签名 + 精确 keys
+- _is_valid_bbox 穷举矩阵（complex/Decimal/tuple/set/dict/generator/NaN/Inf/bool）
+- _pdf_locator_ratio page 类型边界（float/str/bool None）
+- _docx_locator_ratio 结构键 7 个逐一验证
+- _image_resource_ratio 多图片混合 + 空 resource_path
+- _chunk_reference_ratio 各种非 list source_element_ids 形态
+- _text_preservation 各 metric 精确值与 null reason
+- _heading_boundary_ratio chunk first id 重复
+- _silent_drop_count expectations 各形态
+- compute_automatic_metrics 13 metric 名精确集合 + 错误码传播
+- 模块 imports / __all__ / future annotations
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges9.py`（215 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块常量**：_NOT_EVALUATED == "not_evaluated"；_TEXT_TYPES 是 tuple / 7 元素 / 不含 image / 无重复；_PDF_BBOX_REQUIRED_TYPES 是 tuple / 4 元素 / 是 _TEXT_TYPES 子集 / 不含 table/header/footer
+- **构造器签名**：_null/_ratio/_bool_metric/_int_metric 各 1 参数；return_annotation 是 "dict[str, Any]" 字符串（future annotations）
+- **_null**：keys 精确 {value, reason}；value 永远 None；reason 原样保留（含 unicode）
+- **_ratio**：keys 精确 {value, reason}；int 输入被强转 float；不做 0..1 截断（-0.5/1.5 原样返回）；reason 永远 None
+- **_bool_metric**：keys 精确 {value, reason}；int/str 强转 bool（1→True, 0→False, ""→False, "x"→True）；value 是 bool 类型
+- **_int_metric**：keys 精确 {value, reason}；float 强转 int（3.7→3）；bool 强转 int（True→1）；负数保留
+- **_is_valid_bbox**：4 ints/floats/mixed/zero/negative/large finite 都 True；None/[]/[1,2,3]/[1,2,3,4,5]/tuple/set/dict/str/[True,...]/[1,2,3,NaN]/[1,2,3,Inf]/[1,2,3,"4"]/None/complex/generator 都 False
+- **_pdf_locator_ratio**：empty → null + no_elements；page=0/-1/1.5/"1"/None 全无效；page=True 视为 1 有效（bool 是 int 子类）；非 BBOX 类型（image/table/header/footer）只需 page；BBOX 类型无 bbox 或 bbox 损坏无效；source_locator 缺失/None 视为无效
+- **_docx_locator_ratio**：empty → null；section/paragraph_index/run_index/table_index/row_index/col_index/relationship_id 任一单独 valid；page 或 bbox 存在 → invalid；无任何结构键 → invalid；7 个结构键全在仍 valid
+- **_image_resource_ratio**：无 image → null + no_image_elements；image 无/空/None resource_path → ratio=0；存在文件 + 非零字节 → valid；零字节文件 → invalid；image_base_dir 用 Path(rp).name 拼接（不是原 rp）
+- **_chunk_reference_ratio**：chunks 空 → null + no_chunks；chunk source_element_ids 缺失/None/[] → 该 chunk 计 0；未知 id → 计 0；partial invalid → 计 0；elements 缺 element_id → elem_ids 含 None
+- **_strip_unicode_whitespace**：ASCII 空白全删（space/tab/LF/CR/VT/FF）；ZWJ U+200D / soft hyphen U+00AD / BOM U+FEFF 不删（isspace() False）；idempotent
+- **_text_preservation**：both empty → equal=True, precision/recall=null+empty_expected_and_actual；expected empty actual 有 → equal=False, precision=0.0, recall=null+empty_expected；expected 有 actual empty → equal=False, precision=null+empty_actual, recall=0.0；image 不入 expected；content None 视为 ""；reorder → equal=False 但 precision/recall=1.0
+- **_heading_boundary_ratio**：无 heading → null + no_heading_elements；chunk first id 包含 heading id → valid；不是 first → invalid；空 ids/None/缺字段 chunk 跳过；duplicate first ids 不影响（h1 仍只 matched 一次）
+- **_silent_drop_count**：expectations None/{} → null + no_expectations；缺 element_count_by_type → null + no_expectations_element_count；element_count_by_type None/{} → null + no_expectations_element_count；actual ≥ expected → 0；actual < expected → 差值；actual 0 → 全 expected；多 type 求和；int 类型
+- **compute_automatic_metrics**：5 参数全部 positional-or-keyword（无 keyword-only）；image_base_dir 默认 None；返回 dict；失败路径 14 keys 精确集合（pipeline_success/error_code/schema_valid + 11 null metric）；error_code 传播；error_code None on success；schema_valid pipeline_failed reason；所有 null metric pipeline_failed reason；docx/pdf locator 按 source_type null；其他 source_type 两个都 null；不修改输入；image_base_dir 参数传播
+- **模块结构**：__all__ == ["compute_automatic_metrics"]；imports（math/Counter/Path/Any）；docstring 含纯函数/null/text_preservation；future annotations；无 _silence_unused_import；所有 13 个内部 helper 都在命名空间
+
+### 撞墙记录
+- 1 fail：test_pdf_locator_ratio_page_bool_invalid 误以为 page=True 会被拒绝；实际 isinstance(True, int) → True 且 True >= 1 → True，所以 page=True 被接受 → 改成断言 page=True 接受为 1.0（行为记录）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 208 后）：18108 pass / 0 fail / 15 skip（HEAD `de69cec`）
+
+### 下一步建议
+- 候选 KR：evaluation/manifest.py 第九轮（239 行 / ~1100 测试）
+- 候选 KS：evaluation/annotation_metrics.py 第 N 轮（待查行数）
+- 候选 KT：app/chunkers/structural.py 第十轮（388 行 / ~1600 测试）
+- 候选 KF/KV/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KR（evaluation/manifest.py 第九轮）。manifest.py 是清单加载/校验核心（239 行 / ~4.6 tests/line），
+第九轮可深入 manifest 加载/expectations 校验/expected_failures 解析各边界。
+
+---
