@@ -13303,3 +13303,49 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE2（evaluation/annotation_metrics.py 第十三轮）继续推 evaluation 大文件。
 
 ---
+## Round 240 — evaluation/manifest.py 第十四轮（100 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十四轮 edges 测试，覆盖 _is_absolute_like/_has_backslash 深度边界、_resolve_relative_path field_name 透传、dataclass frozen/hashable/equality、load_manifest 各种边界、_detect_project_root、模块结构
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges14.py`（100 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like**：'/' True；'/a' True；'a:b' False；'a:' False；'a:\' True；'a:/' True；'a:foo' False；大小写盘符；digit 盘符 False；2/3 字符边界
+- **_has_backslash**：空字符串 False；纯正斜杠 False；多个反斜杠 True；mixed True
+- **_resolve_relative_path**：field_name 在 empty/absolute/backslash/outside_root 错误消息中；返回绝对路径；在 project_root 内
+- **frozen + hashable + equality**：DocumentEntry/ExpectedFailure/Manifest 三个 dataclass 都验证 frozen/hashable/equality/inequality
+- **fields() 精确**：DocumentEntry 10 字段；ExpectedFailure 5 字段；Manifest 5 字段；字段名精确
+- **Manifest properties 类型**：file_count/pdf_count/docx_count/content_group_count/categories_covered 都返回正确类型
+- **categories_covered**：sorted list；跨文档去重
+- **load_manifest**：返回 Manifest 实例；documents/expected_failures 是 tuple；project_root 绝对路径；categories list 转 tuple；manifest_version 透传；devset_status 透传
+- **Schema 拒绝**：source_type='txt' / devset_status='custom' 都被 schema enum 拒绝
+- **ManifestError**：只继承 Exception；init/repr/args；docstring
+- **_detect_project_root**：无 pyproject / 在父目录 / 返回绝对路径
+- **module __all__**：5 元素顺序精确
+- **签名**：load_manifest/_is_absolute_like/_has_backslash/_resolve_relative_path/_detect_project_root 精确
+
+### 撞墙记录
+- 2 fail（修复）：
+  - test_load_manifest_with_unknown_source_type：以为 source_type='txt' 允许；实际 schema enum 只允许 ['pdf', 'docx'] → 改成 expect EvalSchemaError
+  - test_load_manifest_devset_status_propagated：'custom_status' 不是 enum 值 → 改成用 'complete' 验证透传，并加 schema enum 拒绝测试
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 240 后）：21061 pass / 0 fail / 15 skip（HEAD `63076bc`）
+
+### 下一步建议
+- 候选 KE2：evaluation/annotation_metrics.py 第十三轮（194 行）
+- 候选 KF2：evaluation/metrics.py 第十三轮（381 行）
+- 候选 KW2：evaluation/report.py 第十四轮（200 行）
+- 候选 KX2：evaluation/cli.py 第十五轮（243 行）
+- 候选 KS2：evaluation/runner.py 第十五轮（227 行）
+- 候选 KZ2：evaluation/schema.py 第八轮（80 行）
+- 候选 KT3：evaluation/manifest.py 第十五轮（239 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KE2（evaluation/annotation_metrics.py 第十三轮）继续推 evaluation 大文件。
+
+---
