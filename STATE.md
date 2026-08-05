@@ -14438,3 +14438,49 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KX5（evaluation/cli.py 第十八轮，243 行）继续推 evaluation。
 
 ---
+
+## Round 265 — evaluation/cli.py 第十八轮（133 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第十八轮 edges 测试，覆盖 edges17 未触及的角度：_build_parser 详细（prog/description/formatter_class/subparsers required/dest/choices/run 5 args/validate 1 arg/inspect 2 args/required raises SystemExit/parser choices/default/max-chars type int/tolerance-chars default 30）、_format_metric 每个分支（None/bool True/bool False/bool + reason None→ok/bool + explicit reason/float 4 位小数/int default 分支/int zero/negative int/dict sorted items/empty dict/str default/list default/missing value key/missing reason key/empty dict/name alignment 36）、_run_inspect_doc 详细（input 不存在/invalid JSON/top not dict/top string/minimal dict/missing source_type default unknown/missing elements/missing chunks/elements+chunks 计数/file line/document_id line/source line/parser line/metrics line 顺序/sort bool first/tolerance_chars 透传/default 30/returns 0）、main inspect-doc 路径（not a file/invalid json/list top/tolerance-chars arg）、main validate-report 路径（not a file/invalid json/list top）、main run 错误路径（manifest not file/manifest is directory）、模块源码 token 含 import 详细（runner/manifest/schema/report）/subparsers required=True/RawDescriptionHelpFormatter/max-chars 800/tolerance-chars 30×2/reconfigure stdout+stderr/hasattr/AttributeError+OSError/4 个 def/__name__ == __main__/不含 os/subprocess/logging/asyncio、namespace has argparse/json/sys/Path/main/build_parser/format_metric/run_inspect_doc（callable + FunctionType）、helper metadata（4 个 __module__/__qualname__）、签名 introspection（main 1 参数 argv default None POSITIONAL_OR_KEYWORD；_build_parser 0 参数；_format_metric 2 参数 name+metric 无默认；_run_inspect_doc 1 参数 args 无默认）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges18.py`（133 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 详细**：prog='evaluation.cli'；description 含 '评测'；formatter_class 是 RawDescriptionHelpFormatter；subparsers required=True；dest='command'；3 子命令 run/validate-report/inspect-doc；run 5 个 user action（manifest/output/parser/max_chars/tolerance_chars）；validate 1 个（input）；inspect 2 个（input/tolerance_chars）；required 参数缺 → SystemExit；--parser default fallback；choices ('fallback', 'kreuzberg')；invalid choice → SystemExit；--max-chars default 800 + type=int；invalid type → SystemExit；--tolerance-chars default 30；inspect-doc default 30；input positional；command dest；no command → SystemExit；unknown command → SystemExit
+- **_format_metric 详细**：None value → 'null'；bool True/False → 'true'/'false'；bool + reason None → '(ok)'；bool + explicit reason → '(custom)'；float → 4 位小数（0.123456789 → 0.1235）；float 0.0/1.0；int default 分支；int 0；negative int；dict sorted items（a=1 < b=2 < c=3 顺序）；empty dict；str default；list default；missing value key → null；missing reason key → (None)；empty dict → null；name alignment 36 chars（'  {name:36} null  (x)'）
+- **_run_inspect_doc 详细**：input 不存在 → 2；invalid JSON → 1；top 是 list → 1；top 是 string → 1；minimal dict 返回 0；缺 source_type → 'unknown'；缺 elements → 'elements=0'；缺 chunks → 'chunks=0'；elements=None → TypeError（compute_automatic_metrics 不 None-safe）；有 elements+chunks → 计数正确；输出含 file/document_id/source/parser/counts/metrics 行；metrics 在 counts 之后；bool value 排第一；tolerance_chars 透传；default 30；return 0
+- **main inspect-doc 路径**：not file → 2；invalid JSON → 1；list top → 1；带 --tolerance-chars arg → 0
+- **main validate-report 路径**：not file → 2；invalid JSON → 1；list top → 1
+- **main run 错误路径**：manifest not file → 2；manifest is directory → 2
+- **模块源码 token**：含 from evaluation.runner import run_evaluation / from evaluation.manifest import / load_manifest / ManifestError / from evaluation.schema import / validate_file / EvalSchemaError / from evaluation.report import / get_git_provenance / required=True / RawDescriptionHelpFormatter / default=800 / default=30 (≥2 次) / sys.stdout.reconfigure / sys.stderr.reconfigure / hasattr(sys.stdout, "reconfigure") / AttributeError / OSError / def main / def _build_parser / def _run_inspect_doc / def _format_metric / if __name__ == "__main__" / SystemExit(main())；不含 import os / import subprocess / import logging / asyncio；含 import json / import sys / from pathlib import Path
+- **namespace identity**：hasattr argparse/json/sys/Path/main/_build_parser/_format_metric/_run_inspect_doc；callable + FunctionType（避免 reload 后 is 失败）
+- **helper metadata**：4 个 __module__ == 'evaluation.cli'；4 个 __qualname__（main/_build_parser/_format_metric/_run_inspect_doc）
+- **签名 introspection**：main 1 参数 argv default None POSITIONAL_OR_KEYWORD；无 var args/kw；_build_parser 0 参数；_format_metric 2 参数 name+metric 无默认；_run_inspect_doc 1 参数 args 无默认
+
+### 撞墙记录
+- 2 fail（孤立跑）→ 修复后 0 fail：
+  - `test_format_metric_name_alignment_36_chars`：name 占 36 char，但我算错了字符数（34 padding + 1 literal space = 35，不是 34）；改 35
+  - `test_run_inspect_doc_elements_null_treated_as_empty`：compute_automatic_metrics 直接读 doc['elements']，不 None-safe；改为 expect TypeError
+- 4 fail（全量回归）→ 修复后 0 fail：
+  - `test_module_namespace_has_main`/`_build_parser`/`_format_metric`/`_run_inspect_doc`：其他测试（test_evaluation_cli_edges.py / test_evaluation_cli_edges17.py）调 importlib.reload(evaluation.cli)，reload 后 module 内函数是新对象，与测试文件顶部导入的旧引用 is 不相等；改为 callable + FunctionType 检查，不做 is 比较
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 265 后）：23913 pass / 0 fail / 16 skip（HEAD `ae48e8d`）
+
+### 下一步建议
+- 候选 KS5：evaluation/runner.py 第十八轮（227 行）
+- 候选 KZ5：evaluation/schema.py 第十一轮（80 行）
+- 候选 KT6：evaluation/manifest.py 第十八轮（239 行）
+- 候选 KE6：evaluation/annotation_metrics.py 第十七轮（194 行）
+- 候选 KF6：evaluation/metrics.py 第十七轮（381 行）
+- 候选 KW6：evaluation/report.py 第十八轮（200 行）
+- 候选 KX6：evaluation/cli.py 第十九轮（243 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS5（evaluation/runner.py 第十八轮，227 行）继续推 evaluation。
+
+---
