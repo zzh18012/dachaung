@@ -13671,3 +13671,51 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE3（evaluation/annotation_metrics.py 第十四轮，194 行）继续推 evaluation。
 
 ---
+## Round 248 — evaluation/annotation_metrics.py 第十四轮（86 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第十四轮 edges 测试，覆盖源码字符串断言（inspect.getsource）、模块/函数 metadata、__future__ annotations 影响、bytes/bytearray marker/text TypeError、anchor 缺 key 默认行为、dict subclass / tuple chunks、_tolerance_chars value 类型精确、reason 字符串精确、输出 key 集合精确、签名参数 kind 精确
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges14.py`（86 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码字符串断言（inspect.getsource）**：含 '.find(' / 'normalize_text' / '_null(' / '_ratio(' / 'PARSER_DOES_NOT_EMIT_RELATIONS' / 'marker' / 'anchor' / 'tolerance_chars'；不含 '__main__'；含 'from __future__ import annotations'；含 'dict[str,'；含 'tolerance_chars: int = 30'
+- **模块 metadata**：__file__ 后缀 .py；含 'annotation_metrics'；__package__ == 'evaluation'；__name__ == 'evaluation.annotation_metrics'；__all__ 是 list 不是 tuple；Counter 在命名空间且 is collections.Counter；Counter 在源码 body 中无调用（仅 import）
+- **函数 metadata**：__module__/__qualname__/__name__ 精确；都是 types.FunctionType；无 varargs/varkw；return_annotation 是 str（来自 __future__）含 'dict'
+- **bytes/bytearray marker**：stream.find(bytes) raises TypeError；bytearray 同样；chunk text 是 bytes/bytearray 同样 raises TypeError
+- **anchor 缺 key 默认**：缺 marker → '' → missing_markers；缺 position → 'after' 默认；含 extra unknown key 静默忽略；空 dict {} → '' + 'after' 默认
+- **dict subclass / tuple chunks**：DocSub(dict) 工作；AnnSub(dict) 工作；chunks 是 tuple 工作；chunks 是 generator raises TypeError（len 失败）；chunk_boundary_anchors 是 tuple 工作
+- **PARSER_DOES_NOT_EMIT_RELATIONS 详细**：是 str；值精确 'parser_does_not_emit_relations'；无空格/连字符/点；在 namespace；在 __all__
+- **_tolerance_chars value 类型**：默认 30 是 int；0/-1/99999 都透传 int
+- **输出 keys 集合**：有 missing_markers 时 5 keys；无 missing_markers 时 4 keys；figure_caption_prf 始终 3 keys
+- **figure_caption_prf 详细**：所有 value 是 None；所有 reason 同常量；keys 顺序 [precision, recall, f1]；不修改输入
+- **chunk_boundary_prf 一致性**：不修改 document/annotation
+- **reason 精确**：no_predicted_boundaries / no_ground_truth_anchors / pipeline_failed / no_annotation / no_ground_truth_anchors_in_stream 都精确等值
+- **算法一致性**：stream = normalize_text(' '.join(normalize_text(chunk_text)))；chunks 含 leading/trailing whitespace 正确处理
+- **签名参数 kind**：chunk_boundary_prf 3 个 POSITIONAL_OR_KEYWORD（无 * 分隔）；figure_caption_prf 2 个 POSITIONAL_OR_KEYWORD；tolerance_chars default 30；前 2 个无 default；figure_caption_prf 无 default
+- **边界**：所有 chunks 文本为空字符串；chunks 混入 None text
+
+### 撞墙记录
+- 2 fail（修复）：
+  - test_chunks_generator_exhausted_in_first_iteration：generator 无 len() → 源码 `len(chunks) < 2` raises TypeError → 改测试为期望 TypeError
+  - test_chunk_boundary_prf_param_kinds：tolerance_chars 是 POSITIONAL_OR_KEYWORD（无 * 分隔符），不是 KEYWORD_ONLY → 改为 all POSITIONAL_OR_KEYWORD
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 248 后）：21678 pass / 0 fail / 16 skip（HEAD `d79cd7d`）
+
+### 下一步建议
+- 候选 KF3：evaluation/metrics.py 第十四轮（381 行）
+- 候选 KW3：evaluation/report.py 第十五轮（200 行）
+- 候选 KX3：evaluation/cli.py 第十六轮（243 行）
+- 候选 KS3：evaluation/runner.py 第十六轮（227 行）
+- 候选 KZ3：evaluation/schema.py 第九轮（80 行）
+- 候选 KT4：evaluation/manifest.py 第十六轮（239 行）
+- 候选 KE4：evaluation/annotation_metrics.py 第十五轮（194 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KF3（evaluation/metrics.py 第十四轮，381 行）继续推 evaluation 最大文件。
+
+---
