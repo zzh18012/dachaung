@@ -10022,3 +10022,49 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第八轮可深入各 dataclass field 默认值、FrozenInstanceError、asdict、to_dict 等。
 
 ---
+
+## Round 172（2026-08-05）：app/models.py 第六轮（edges6）
+
+### 目标
+- 给 app/models.py（154 行，已有 base/edges/edges2-5 共 474 测试）补第六轮
+- 深入各 dataclass 字段精确值、__post_init__ 校验、to_dict 行为
+
+### 改动
+- 新增 `tests/test_models_edges6.py`（80 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **SCHEMA_VERSION**：精确 "0.1.0"、X.Y.Z 格式
+- **ElementType Literal**：精确 8 个值（heading/paragraph/list_item/table/image/caption/header/footer）
+- **SourceType Literal**：精确 6 个值（pdf/docx/markdown/html/text/ipynb）
+- **Element dataclass**：8 字段精确名、必填 3 个（element_id/type/source_locator）、可选 5 个、metadata default_factory
+- **Element __post_init__**：empty id、no content+resource、empty content + None resource、only resource、both
+- **Element.to_dict**：返回 dict、含 8 字段、值保留、== asdict
+- **Chunk dataclass**：5 字段、3 必填、metadata/source_spans default_factory、3 个 __post_init__ 校验
+- **Relation dataclass**：4 字段、3 必填、metadata default_factory、to_dict == asdict
+- **WarningRecord dataclass**：3 字段、code/reason 必填、details default None、to_dict 自定义（None details 不含键）
+- **ErrorRecord dataclass**：同 WarningRecord
+- **Document dataclass**：12 字段、6 必填、6 collection default_factory、to_dict 含 schema_version、递归序列化嵌套
+- **模块结构**：无 __all__、future annotations、imports 完整（dataclass/field/asdict/Any/Literal/Optional）、docstring 提及业务代码隔离
+- **综合行为**：Element/Chunk/Relation 的 to_dict == asdict；WarningRecord/ErrorRecord 的 to_dict ≠ asdict（自定义）、metadata 每实例独立
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 172 后）：13832 pass / 0 fail / 13 skip（HEAD `5824857`）
+
+### 下一步建议
+- 候选 IK：app/hash.py 第六轮
+- 候选 IL：app/source_locator.py 第六轮
+- 候选 IN：app/schema.py 第六轮
+- 候选 IO：app/cli.py 第八轮
+- 候选 IP：app/chunkers/structural.py 第八轮
+- 候选 IQ：app/__init__.py 第六轮（app package 入口）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IN（app/schema.py 第六轮）。schema.py 是 JSON Schema 校验入口，
+第六轮可深入 validate/validate_file/SchemaValidationError/各 schema 文件加载。
+
+---
