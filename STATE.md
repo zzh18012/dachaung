@@ -12856,3 +12856,44 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW（evaluation/report.py 第十二轮）继续推 evaluation 大文件。
 
 ---
+## Round 230 — evaluation/report.py 第十二轮（79 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十二轮 edges 测试，覆盖 _RATIO_METRICS/_COUNT_METRICS/_SUCCESS_BOOL_METRICS 精确元组等值、三组互斥、各公共函数返回 dict 的插入顺序、aggregate_summary value 类型在算术中的行为
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges12.py`（79 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量元组精确等值**：_RATIO_METRICS 12 项按精确顺序（schema_valid 排第一、chunk_boundary_f1 排最后、chunk_boundary 三项连续、text_char_multiset 两项连续）；_COUNT_METRICS = ("element_count_total",)；_SUCCESS_BOOL_METRICS = ("pipeline_success",)；三组 pairwise 互斥
+- **get_git_provenance**：返回 dict 按 git_commit → git_dirty 顺序；精确 2 keys 无 extra；subprocess.run 必须以 cwd=str(project_root) / encoding='utf-8' / errors='replace' / capture_output=True / text=True 调用
+- **get_dependency_versions**：返回 dict 按 pdfplumber → python-docx → pypdfium2 顺序；精确 3 keys
+- **build_provenance**：返回 dict 按 9 个 key 顺序（git_commit/git_dirty/evaluator_version/report_version/parser_name/parser_version/dependencies/max_chars/run_timestamp_iso）；empty parser_name/parser_version 原样保留；None parser_version 原样保留；max_chars=0/negative 原样保留；run_timestamp_iso 能被 fromisoformat 解析；evaluator_version/report_version 来自 evaluation 模块常量
+- **build_devset_section**：返回 dict 按 6 个 key 顺序（status/file_count/content_group_count/pdf_count/docx_count/categories_covered）；zero/negative counts 透传；categories 可以是 dict
+- **aggregate_summary top-level**：返回 dict 按 4 个 key 顺序（counts/success_rates/ratio_macro_averages/silent_drop_total）；counts section 1 entry；success_rates section 1 entry；ratio_macro_averages section 12 entries
+- **aggregate_summary value 类型行为**：ratio value=True → 算术中等于 1；ratio value=int/float → 参与 macro；ratio value=0.0（falsy 但 not None）→ 参与；count value=True → sum 中等于 1；count value=False → sum 中等于 0；silent_drop_count value=True → sum 中等于 1；pipeline_success value=1（int）/ 1.0（float）→ is True False → 不计入 success_count
+- **aggregate_summary entry keys**：counts entry 2 keys (sum, participating_docs)；success_rates entry 3 keys (success_count, total, rate)；ratio_macro_averages entry 3 keys (macro_average, participating_docs, not_evaluated)
+- **aggregate_summary not_evaluated**：not_evaluated = total - participating_docs；all participate → 0；none participate → total
+- **module-level 结构**：imports subprocess/datetime/Path/Any/EVALUATOR_VERSION/REPORT_VERSION；__all__ 精确 5 项（不含私有常量）；future annotations；docstring 提到聚合规则
+- **综合**：1 doc 全 metrics set / 2 docs mixed metrics；figure_caption_* 不在 _RATIO_METRICS 中（aggregate 不处理）
+
+### 撞墙记录
+- 0 fail（首次跑过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 230 后）：20207 pass / 0 fail / 15 skip（HEAD `d6de4ff`）
+
+### 下一步建议
+- 候选 KX：evaluation/cli.py 第十三轮（243 行）
+- 候选 KS：evaluation/runner.py 第十三轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十三轮（239 行）
+- 候选 KE：evaluation/annotation_metrics.py 第十二轮（194 行）
+- 候选 KF：evaluation/metrics.py 第十二轮（381 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KX（evaluation/cli.py 第十三轮）继续推 evaluation 大文件。
+
+---
