@@ -14528,3 +14528,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KZ5（evaluation/schema.py 第十一轮，80 行）继续推 evaluation。
 
 ---
+
+## Round 267 — evaluation/schema.py 第十一轮（134 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第十一轮 edges 测试，覆盖 edges10 未触及的角度：EvalSchemaError __init__ 详细（self/message/errors 3 参数；errors default None；message no default；POSITIONAL_OR_KEYWORD；no var_kwargs；errors=None → []；errors=[] → []；errors=list 透传 identity；errors=non-list 透传；str/repr/args；raise/except；mro；__module__/__qualname__；has errors/args attr）、_schema_path 详细（返回 Path/absolute/resolved/existing file/3 个已知 schema 都加载；不存在 → FileNotFoundError 含路径；签名 1 参数 name 无默认 POSITIONAL_OR_KEYWORD；no var args/kw；__module__/__qualname__）、load_schema 详细（返回 dict；两次调用不同 dict 不缓存；3 个已知 schema 都返回 dict；不存在 → FileNotFoundError；签名 1 参数 name 无默认）、validate 详细（签名 2 参数 instance+schema_name 无默认 POSITIONAL_OR_KEYWORD；no var args/kw；return None 或 'None'；valid manifest → return None；invalid → EvalSchemaError；error message 含 schema_name + count + path=；errors attribute 是 list；每个 error 有 path/message/schema_path 都是 list/str/list；sorted by absolute_path；__module__/__qualname__）、validate_file 详细（签名 2 参数 path+schema_name 无默认；接受 str 和 Path；不存在 → FileNotFoundError；invalid JSON → JSONDecodeError；schema 校验失败 → EvalSchemaError；error message 含 path；__module__/__qualname__）、SCHEMAS_DIR 详细（Path 实例/absolute/is_dir/含 3 个已知 schema；parent 是 project root 含 pyproject.toml；name=='schemas'）、namespace 完整性（json/Path/Any/Draft202012Validator/JSValidationError/SCHEMAS_DIR/EvalSchemaError/load_schema/validate/validate_file/_schema_path；__all__ 是 list 不是 tuple；__all__ == 5 entries；__all__ 不含 _schema_path/json/Path/Any/Draft202012Validator/JSValidationError）、源码 token（含 from __future__ import annotations/import json/from pathlib import Path/from typing import Any/from jsonschema import Draft202012Validator/from jsonschema.exceptions import ValidationError as JSValidationError/SCHEMAS_DIR = Path(__file__).resolve().parent.parent / 'schemas'/class EvalSchemaError/super().__init__(message)/self.errors = errors or []/sorted(validator.iter_errors/absolute_path/absolute_schema_path/err.message/head = errors[0]；不含 print/import logging/@lru_cache/functools.cache/asyncio/import subprocess/import os）、docstring 内容（是 str 长度>30；含 manifest/annotation/evaluation-report；含 app/schema.py 或 复用；含 业务 或 评测）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges11.py`（134 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 详细**：__init__ 3 参数 self/message/errors；errors default None；message no default；POSITIONAL_OR_KEYWORD；no var_kwargs；无 args → errors=[]；explicit None → []；explicit []→[]；explicit list 透传 identity；explicit non-list 透传（不强制类型）；str 含 message；repr 含 class name；args == (message,)；raise/catch；mro 含 Exception+BaseException；__module__/__qualname__；has errors+args attr
+- **_schema_path 详细**：返回 Path 对象；is_absolute；resolve() 已应用；is_file；3 个已知 schema（manifest/annotation/evaluation-report）都可加载；不存在 → FileNotFoundError 含完整路径；签名 1 参数 name 无默认 POSITIONAL_OR_KEYWORD；no var args/kw；__module__/__qualname__
+- **load_schema 详细**：返回 dict；两次调用返回不同 dict（不缓存）；3 个已知 schema 都返回 dict；不存在 → FileNotFoundError；签名 1 参数 name 无默认；__module__/__qualname__
+- **validate 详细**：签名 2 参数 instance+schema_name 无默认 POSITIONAL_OR_KEYWORD；no var args/kw；return annotation None 或 'None'；valid manifest instance → return None；invalid → EvalSchemaError；error message 含 schema_name + 处/count + path=；errors attribute 是 list；每个 error 有 path（list）/message（str）/schema_path（list）；sorted by absolute_path（验证 paths == sorted(paths)）；__module__/__qualname__
+- **validate_file 详细**：签名 2 参数 path+schema_name 无默认；接受 str 和 Path 对象；不存在 → FileNotFoundError；invalid JSON → JSONDecodeError；schema 校验失败 → EvalSchemaError；error message 含 path；__module__/__qualname__
+- **SCHEMAS_DIR 详细**：Path 实例；is_absolute；is_dir；含 3 个已知 schema 文件；parent 是 project root（含 pyproject.toml）；name == 'schemas'
+- **namespace 完整性**：json/Path/Any/Draft202012Validator/JSValidationError/SCHEMAS_DIR/EvalSchemaError/load_schema/validate/validate_file/_schema_path 都在 namespace；__all__ 是 list 不是 tuple；5 entries 精确；__all__ 不含 _schema_path/json/Path/Any/Draft202012Validator/JSValidationError
+- **源码 token**：含 from __future__ import annotations、import json、from pathlib import Path、from typing import Any、from jsonschema import Draft202012Validator、from jsonschema.exceptions import ValidationError as JSValidationError、SCHEMAS_DIR 定义（Path(__file__).resolve().parent.parent / 'schemas'）、class EvalSchemaError、super().__init__(message)、self.errors = errors or []、sorted(validator.iter_errors、absolute_path、absolute_schema_path、err.message、head = errors[0]；不含 print/import logging/@lru_cache/functools.cache/asyncio/import subprocess/import os
+- **docstring 内容**：是 str 长度>30；含 manifest/annotation/evaluation-report；含 app/schema.py 或 复用；含 业务 或 评测
+
+### 撞墙记录
+- 3 fail → 修复后 0 fail：
+  - `test_validate_valid_manifest_returns_none`：测试 instance 含 devset 嵌套字段，但 schema 实际是顶层 devset_status + additionalProperties:false → 校验失败；改为顶层 devset_status 字段
+  - `test_validate_file_path_str_accepted`/`test_validate_file_path_pathlib_accepted`：同样问题，devset 嵌套字段不被 schema 接受；改为顶层 devset_status 字段
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 267 后）：24165 pass / 0 fail / 16 skip（HEAD `49abd51`）
+
+### 下一步建议
+- 候选 KT6：evaluation/manifest.py 第十八轮（239 行）
+- 候选 KE6：evaluation/annotation_metrics.py 第十七轮（194 行）
+- 候选 KF6：evaluation/metrics.py 第十七轮（381 行）
+- 候选 KW6：evaluation/report.py 第十八轮（200 行）
+- 候选 KX6：evaluation/cli.py 第十九轮（243 行）
+- 候选 KS6：evaluation/runner.py 第十九轮（227 行）
+- 候选 KZ6：evaluation/schema.py 第十二轮（80 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KT6（evaluation/manifest.py 第十八轮，239 行）继续推 evaluation。
+
+---
