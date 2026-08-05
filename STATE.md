@@ -10280,3 +10280,49 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第七轮可深入 DocumentEntry/ExpectedFailure frozen dataclass 边界、_resolve_relative_path 错误消息、content_group_count 链式配对。
 
 ---
+
+## Round 178（2026-08-05）：evaluation/manifest.py 第七轮（edges7）
+
+### 目标
+- 给 evaluation/manifest.py（239 行，已有 base/edges/edges2-6 共 731 测试）补第七轮
+- 深入 _detect_project_root、content_group_count frozenset 去重、load_manifest optional fields 默认值
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges7.py`（90 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_detect_project_root**：dir/file/ancestor 查找 pyproject.toml、无 pyproject 时回退 cur、返回 Path 类型、resolve()
+- **content_group_count**：self-pairing frozenset([d,d])={d}、bidirectional pair 去重、three-way cycle 3 groups、all_paired、mixed、empty docs、single with missing partner（frozenset 仍包含）各边界
+- **categories_covered**：empty docs → []、单 doc 多 categories、跨 doc set union 去重、字母排序、返回 list、无重复
+- **load_manifest**：schema 校验先于 version mismatch、optional fields 缺失默认（categories → ()、paired_with/sha256/source_type/annotation_file/expectations → None）、annotation_file 解析为 resolved 路径、Manifest 实例化各字段
+- **_resolve_relative_path**：field_name 嵌入错误消息、empty/absolute_posix/absolute_windows/backslash/outside_root 各 reason 文本精确
+- **DocumentEntry/ExpectedFailure/Manifest frozen**：FrozenInstanceError、is_dataclass、字段数（10/5/5）
+- **Manifest properties**：file_count/pdf_count/docx_count 计数正确
+- **ManifestError**：inherits Exception、not ValueError、可被捕获
+- **模块结构**：__all__ 精确 5 项、imports 完整（json/dataclass/Path/Any/MANIFEST_VERSION/validate）、docstring 提及 3 大不变量
+- **签名**：load_manifest(manifest_path, project_root=None)、_resolve_relative_path(path_str, project_root, field_name)
+- **综合行为**：幂等、显式 project_root 跳过 detect、str path 接受、properties 不修改 documents
+
+### 撞墙记录
+- 一次撞墙（2 fail）：
+  - manifest_version="0.0.0" 在 schema 层就被拒（schema 要求 enum["1.0"]）→ 改为期待 EvalSchemaError
+  - DocumentEntry 实际 10 个字段（含 annotation_file_str + annotation_resolved），非 9 → 改为 10
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 178 后）：14330 pass / 0 fail / 13 skip（HEAD `53ece42`）
+
+### 下一步建议
+- 候选 IZ：evaluation/annotation_metrics.py 第七轮（194 行 / 523 测试）
+- 候选 IW：app/cli.py 第八轮（535 行 / 747 测试）
+- 候选 IX：app/pipeline.py 第八轮（216 行 / 702 测试）
+- 候选 IY：app/chunkers/structural.py 第八轮（388 行 / 938 测试）
+- 候选 JA：evaluation/schema.py 第二轮（80 行 / 432 测试）
+- 候选 JB：evaluation/schema_validation.py 第二轮（15 行 / 112 测试，已饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IZ（evaluation/annotation_metrics.py 第七轮）。annotation_metrics.py 是
+人工标注指标核心，第七轮可深入 chunk_boundary_prf 容差匹配、figure_caption_prf 各 null reason、_missing_markers 计算。
+
+---
