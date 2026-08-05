@@ -12897,3 +12897,45 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KX（evaluation/cli.py 第十三轮）继续推 evaluation 大文件。
 
 ---
+## Round 231 — evaluation/cli.py 第十三轮（80 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第十三轮 edges 测试，覆盖 _format_metric 非 dict metric 输入、name 边界、reason 非 str、Counter 类型；_run_inspect_doc source_type 默认/elements/chunks None 传播 TypeError；main 各子命令目录/不存在路径；module subparser 结构
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges13.py`（80 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_format_metric 非 dict metric**：metric=None/int/list/str/tuple/set → 全部 AttributeError（None 没有 .get）
+- **_format_metric name 边界**：name='' 仍能渲染；name 恰好 36 字符不补 padding；name > 36 字符不截断；name 含 unicode/特殊字符原样渲染；name=None raises TypeError；name=int 自动转 str
+- **_format_metric reason 非 str**：reason=int(42)→渲染 '42'；reason=0→falsy→'ok'；reason=''→'ok'；reason=['x']→truthy 渲染 str；reason=None + value=None → '(None)'（无 fallback）；reason=0 + value=None → '(0)'
+- **_format_metric value 类型**：Counter（dict 子类）走 dict 分支；dict 含 int keys sorted 按 int；dict 含 tuple keys 仍能 sort；dict 含 mixed key types raises TypeError；float 0.00001 → '0.0000'；float 1234567.89 → '1234567.8900'；float -0.5 → '-0.5000'；pi → '3.1416'
+- **_run_inspect_doc**：source_type 默认 'unknown'；source_type 显式 'pdf'；elements=None 显式触发 TypeError（compute_automatic_metrics 的 .get 在 key 存在时返回 None，len(None) 失败）；chunks=None 同；tolerance_chars=0/negative/large 都 work；不写盘；stdout 含 'metrics:' / 'file:' / 'document_id:' / 'parser:' header；缺 document_id → '?'
+- **main 路径边界**：validate-report/inspect-doc/run input 是目录 → return 2；input 不存在 → return 2
+- **main argparse**：run 缺 --manifest/--output → SystemExit 2；validate-report/inspect-doc 缺 input → SystemExit 2；无 command → SystemExit 2；prog = 'evaluation.cli'；subparser required=True；dest='command'；3 子命令集合精确
+- **_format_metric 综合行为**：int value=1/0/-5/large → 默认分支；unicode/long string 原样渲染；返回 str 类型；非空；以 '  ' 开头；dict value empty/items/None/bool/negative
+- **module 结构**：description 含 '评测'；_choices_actions 3 个；run/validate-report/inspect-doc 子 parser prog 含自身名
+
+### 撞墙记录
+- 6 fail（修复）：
+  - elements=None / chunks=None 显式：误以为 _run_inspect_doc 局部 normalize 后 metrics 也用 normalized；实际 metrics 接收原始 doc，.get('elements', []) 返回 None → len(None) TypeError → 改为 expect TypeError
+  - module_description_contains_subcommands：description 不含 'run' 字面；改为检查 _choices_actions 长度
+  - run_p/val_p/ins_p.help：ArgumentParser 没有 .help 属性（help 是 subparser action 的属性，不是子 parser 自身）；改为检查 prog 含子命令名
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 231 后）：20287 pass / 0 fail / 15 skip（HEAD `def2d34`）
+
+### 下一步建议
+- 候选 KS：evaluation/runner.py 第十三轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十三轮（239 行）
+- 候选 KE：evaluation/annotation_metrics.py 第十二轮（194 行）
+- 候选 KF：evaluation/metrics.py 第十二轮（381 行）
+- 候选 KW：evaluation/report.py 第十三轮（200 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS（evaluation/runner.py 第十三轮）继续推 evaluation 大文件。
+
+---
