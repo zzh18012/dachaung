@@ -11355,3 +11355,50 @@ get_git_provenance 各 OSError 路径。
 第八轮可深入 _detect_text_source_type、空文件/无后缀/UTF-8 BOM 处理、单 paragraph 边界字符数、line ending 标准化、metadata 字段。
 
 ---
+
+## Round 199（2026-08-05）：app/parsers/text_parser.py 第八轮（edges8）
+
+### 目标
+- 给 app/parsers/text_parser.py（136 行，已有 base/edges/edges2-7 共 ~829 测试）补第八轮
+- 深入 _detect_text_source_type 各 suffix 组合（txt/text/uppercase/mixed/no-suffix）
+- _split_paragraphs 各场景（empty/single line/multi-line/two para/leading-trailing blanks/CR/LF/CRLF 混合/strip/whitespace-only）
+- TextParser.parse 错误矩阵（file_not_found/unsupported_type/no suffix）
+- element 编号/locator/confidence/metadata/resource_path
+
+### 改动
+- 新增 `tests/test_parsers_text_edges8.py`（95 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_TEXT_EXTENSIONS**：(".txt", ".text") 2-tuple
+- **_detect_text_source_type**：txt/text/uppercase TXT/TEXT/mixed case、pdf/ipynb/md/docx 拒绝、no suffix 拒绝（details.suffix="" + message 含 '(无)'）、double extension 取最后段
+- **_split_paragraphs**：empty string、single line、multi-line 单段、two/three paragraph、leading blank lines（line_no 正确）、trailing blank lines、only blank lines、whitespace-only lines skipped、CRLF/CR 各归一为 LF、混合 CR/LF/CRLF 归一、strip 段首尾、保留段内缩进、no trailing newline、single trailing newline、Unicode、emoji、long paragraph（10k chars）、no blank within、10 段、returns list of tuples
+- **TextParser 类**：name="text"/version="stdlib/0.1.0"/inherits Parser/parse signature
+- **parse 错误**：file_not_found/unsupported_type (pdf/md/no suffix)
+- **parse 成功**：text 扩展名、单段/两段、element_id 编号（4-digit zero-padded + 增量 + document_id 前缀）、type=paragraph、locator line、confidence=0.95、parent_id None、metadata empty、resource_path None、return Document、source_type=text、parser_name=text、parser_version=stdlib/0.1.0、chunks=[]、relations=[]、errors=[]、metadata={text:True}、空文件 warning、whitespace-only warning、UTF-8 unicode、invalid UTF-8 errors=replace、CRLF/CR 各归一、连续空行不膨胀段数、strip whitespace、source_path
+- **模块结构**：__all__/imports/签名/callable
+- **idempotency**：detect/split/parse 重复一致
+- **综合行为**：full pipeline 4 段混合空白、保留缩进代码块、单段无换行、Unicode emoji、locator 归一化行号
+
+### 撞墙记录
+- 0 fail：第一次跑全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 199 后）：16891 pass / 0 fail / 14 skip（HEAD `d3f60ab`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KL：app/models.py 第六轮（154 行 / ~800 测试）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1200 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KU：app/schema.py 第七轮（230 行 / ~900 测试）
+- 候选 KV：app/chunkers/base.py 第六轮（仍饱和）
+- 候选 KW：app/hash_utils.py 第六轮（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KL（app/models.py 第六轮）。models.py 是数据模型核心（154 行 / ~3.6 tests/line），
+第六轮可深入 dataclass frozen/Eq/hash 行为、to_dict/from_dict 往返、各字段默认值、Validator 路径。
+
+---
