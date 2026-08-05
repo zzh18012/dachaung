@@ -13940,3 +13940,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KT4（evaluation/manifest.py 第十六轮，239 行）继续推 evaluation。
 
 ---
+## Round 254 — evaluation/manifest.py 第十六轮（134 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十六轮 edges 测试，覆盖源码字符串断言（inspect.getsource 含特定 token）、模块/函数/class metadata、dataclass frozen=True 验证、DocumentEntry/ExpectedFailure/Manifest 字段数与名字精确、_is_absolute_like/_has_backslash 边界、_resolve_relative_path 详细、_detect_project_root 各种场景、Manifest properties（pdf_count/docx_count/categories_covered 排序/case-sensitive/unicode/content_group_count 配对逻辑）、load_manifest 端到端边界
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges16.py`（134 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码字符串断言**：含 'class ManifestError' / 'def _is_absolute_like' / 'def _has_backslash' / '@dataclass(frozen=True)' / 'class DocumentEntry/ExpectedFailure/Manifest' / 'def _resolve_relative_path' / 'def load_manifest' / 'def _detect_project_root' / future annotations / 'pyproject.toml' / 'MANIFEST_VERSION' / 'from evaluation.schema import validate' / 'paired_with' / 'content_group_count' / 'categories_covered' / '.resolve()' / 'relative_to(' / 'field_name'；不含 '__main__'
+- **模块 metadata**：__file__ 后缀 .py / 含 'manifest'；__package__=='evaluation'；__name__=='evaluation.manifest'；json/dataclass/Path/Any/MANIFEST_VERSION identity
+- **__all__ 精确**：是 list 不是 tuple；集合精确 5 个；不含私有；不含 4 个 helper；所有名字在 namespace；4 个 helper 在 namespace
+- **class metadata**：ManifestError/DocumentEntry/ExpectedFailure/Manifest __module__/__qualname__/__name__ 精确；ManifestError mro 长度 4 含 Exception
+- **dataclass frozen 验证**：3 个类都 frozen=True；DocumentEntry 10 字段名顺序精确；ExpectedFailure 5 字段；Manifest 5 字段；都可 hash；frozen 阻止 setattr
+- **函数 metadata**：load_manifest/_is_absolute_like/_has_backslash/_resolve_relative_path/_detect_project_root __module__/__qualname__ 精确；都是 FunctionType；无 varargs/varkw；return_annotation 是 str；load_manifest 2 参数 (manifest_path, project_root)，project_root default None
+- **_is_absolute_like 边界**：相对路径 False；POSIX/Windows 绝对 True；alpha: 后无 / 或 \ False；返回 bool 类型
+- **_has_backslash 边界**：无反斜杠 False；有反斜杠 True；返回 bool 类型
+- **_resolve_relative_path 详细**：返回 Path 绝对路径；子目录 OK；错误 message 含 field_name；outside root raises；unicode 文件名 OK
+- **_detect_project_root 详细**：find pyproject.toml in self/parent；无 pyproject 返回 cur；file start 取 parent；返回绝对路径与 Path 实例
+- **Manifest properties 详细**：pdf_count/docx_count/file_count 计算；categories_covered 排序+唯一+空+case-sensitive+unicode；content_group_count 各种 pair 组合（无 pair=每 1 组；1 pair=1 组；mixed）；返回类型 int/list；每次新 list
+- **ManifestError 行为**：str/repr；可 raise/except；args()
+- **load_manifest 端到端**：missing/directory/invalid JSON/empty file 都 raises；str 路径/project_root 接受；返回 Manifest 实例；documents/expected_failures 是 tuple；project_root 是 Path；manifest_version/devset_status 透传
+
+### 撞墙记录
+- 0 fail：134 测试一次性全过（修复了 1 个 SyntaxWarning：docstring 含 '\ ' 改用 r-string）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 254 后）：22378 pass / 0 fail / 16 skip（HEAD `72fc11a`）
+
+### 下一步建议
+- 候选 KE4：evaluation/annotation_metrics.py 第十五轮（194 行）
+- 候选 KF4：evaluation/metrics.py 第十五轮（381 行）
+- 候选 KW4：evaluation/report.py 第十六轮（200 行）
+- 候选 KX4：evaluation/cli.py 第十七轮（243 行）
+- 候选 KS4：evaluation/runner.py 第十七轮（227 行）
+- 候选 KZ4：evaluation/schema.py 第十轮（80 行）
+- 候选 KT5：evaluation/manifest.py 第十七轮（239 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KE4（evaluation/annotation_metrics.py 第十五轮，194 行）继续推 evaluation。
+
+---
