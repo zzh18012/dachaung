@@ -12220,3 +12220,51 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE（evaluation/manifest.py 第十轮），240 行的核心 IO 模块。
 
 ---
+
+## Round 215 — evaluation/manifest.py 第十轮（98 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十轮 edges 测试，覆盖 properties / dataclass 行为 / load_manifest 传播
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges10.py`（98 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **content_group_count 深度**：0/1/2/3 docs；pair counts as 1；pair+unpaired；单向 pair 仍算 1 组；两个不相交 pair = 2 组；两个 pair + 两个 unpaired = 3 组（实测，pair_ids 算 1，unpaired 算 2）；pair 指向不存在的 doc_id 仍算 1 组；A→B→C 链 = 2 组（不合并）；self pair = 1 组
+- **categories_covered**：list 类型；空 list；docs 无 categories；dedup within/across docs；alphabetical sort；unicode；case-sensitive；每次新 list
+- **pdf_count / docx_count / file_count**：int 类型；只数对应 source_type
+- **Manifest dataclass**：is_dataclass；frozen（FrozenInstanceError）；field count 5；field names exact；equality / inequality；hashable；replace()
+- **DocumentEntry 默认值**：sha256/paired_with/annotation_file_str/annotation_resolved 都是 None；categories 默认 ()；expectations 默认 None；frozen；field count 10；field names exact
+- **ExpectedFailure 默认值**：source_type None；frozen；field count 5；equality
+- **_detect_project_root**：返回 absolute；无 pyproject 时返回 start；文件输入用 parent；深层嵌套；多层 pyproject 取最近
+- **_resolve_relative_path**：深层 dotdot；双斜杠 collapse；末尾斜杠；single dot 等于 root；dotdot 跳出 root raises
+- **load_manifest 传播**：paired_with；sha256；annotation_file（resolved_path 正确）；expectations；categories 转 tuple；categories 默认 ()；expected_failure source_type；expected_failure source_type 默认 None；resolved_path 绝对；path_str 保留原始；annotation_file 跳出 root raises
+- **Schema 边界**：manifest_version 非 1.0 被 Schema const 拒（EvalSchemaError）；devset_status enum 仅 complete/incomplete；additionalProperties False 拒额外键
+- **模块结构**：imports MANIFEST_VERSION/validate；ManifestError 是 Exception 子类；不是 ValueError/KeyError 子类；args 透传；__all__ 不暴露内部 helpers；docstring 提及相对路径/项目根；future annotations
+
+### 撞墙记录
+- 5 fail：
+  1. test_content_group_count_two_pairs_plus_two_unpaired 误算 4；实际 1 pair + 2 unpaired = 3
+  2. test_resolve_relative_path_dotdot_to_root 行为矛盾（.. 跳出 root 必抛）；删除该空函数
+  3. test_load_manifest_manifest_version_mismatch_raises 期望 ManifestError，实际 Schema const="1.0" 先抛 EvalSchemaError
+  4. test_load_manifest_devset_status_variants 用了 schema 不允许的 'partial'/'custom'
+  5. test_load_manifest_extra_top_level_keys_ignored 期望 additionalProperties=True；实际 schema=False → 改为 expect EvalSchemaError
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 215 后）：18868 pass / 0 fail / 15 skip（HEAD `eb28f6f`）
+
+### 下一步建议
+- 候选 KD：evaluation/metrics.py 第十轮（381 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KAC：evaluation/cli.py 第十一轮（243 行）
+- 候选 KS：evaluation/runner.py 第十一轮（227 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KD（evaluation/metrics.py 第十轮），最大单文件 381 行，复杂度高。
+
+---
