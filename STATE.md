@@ -11300,3 +11300,58 @@ get_git_provenance 各 OSError 路径。
 第八轮可深入 cell_index/cell_type/line locator、code/markdown/raw cell 分类、nbformat 各版本兼容、JSON 结构错误处理。
 
 ---
+
+## Round 198（2026-08-05）：app/parsers/ipynb_parser.py 第八轮（edges8）
+
+### 目标
+- 给 app/parsers/ipynb_parser.py（227 行，已有 base/edges/edges2-7 共 844 测试）补第八轮
+- 深入 _cell_source_to_text 各非 str/list 类型 + list 混合 + 多行
+- _extract_kernel_language 各 fallback 优先级（kernelspec.language > kernelspec.name > language_info.name）
+- IpynbParser.parse 完整错误矩阵（bad JSON/OSError/top-level/cells/nbformat）
+- 单 cell 多 element + element_id 编号 + Document metadata 完整字段
+
+### 改动
+- 新增 `tests/test_parsers_ipynb_edges8.py`（117 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_IPYNB_EXTENSIONS**：单元素 tuple (".ipynb",)
+- **_detect_ipynb_source_type**：lowercase/uppercase/mixed case 都接受、double extension 取最后段、unknown suffix raise unsupported_type、no suffix raise + message 含 '(无)'、details.suffix 是空字符串
+- **_cell_source_to_text**：str/empty str/list/multiline list/empty list/list with int/None/dict、None/int/float/dict/tuple/bool 全返回空、multiline str 保留
+- **_extract_kernel_language**：kernelspec.language/kernelspec.name fallback/language 优先于 name/language_info.name/kernelspec 优先于 language_info/empty metadata/None raises AttributeError/kernelspec empty/kernelspec None/无任何 key/all empty/kernelspec empty falls to language_info
+- **IpynbParser 类**：name=ipynb/version=stdlib/0.1.0/inherits Parser/parse signature (self/path/source_hash)
+- **parse 错误矩阵**：file_not_found/unsupported_type/invalid_json (JSONDecodeError)/top-level list/int (bad_structure)/nbformat 3/2 rejected/nbformat None/4/5 accepted/cells not list/cells missing/cells empty/cell not dict (warning)/unknown cell type (warning + details)
+- **parse 各 cell 类型**：markdown cell → multi-elements + locator cell_index/cell_type、code cell → paragraph + metadata kind=code_cell + language、code strips whitespace、code empty warning、raw cell → paragraph + kind=raw_cell、raw strips whitespace、raw empty silently skip
+- **element_id**：4-digit zero-padded、跨 cell 递增、document_id 前缀、5-digit at 10000+
+- **Document metadata**：ipynb=True/nbformat/nbformat_minor/cell_count/language 5 字段、return Document instance、source_type=ipynb/parser_name=ipynb/chunks=[]/relations=[]/errors=[]、element confidence=0.95/parent_id None
+- **多 cell 组合**：mixed cell types、cell_index 跨 skip 保留原 index、markdown heading+paragraph 多 element、markdown sub warning 带 cell_index、code cell list source 拼接
+- **模块结构**：__all__/imports/签名/callable
+- **idempotency**：detect/cell_source/language/parse 重复一致
+- **综合行为**：full pipeline 5 cells、minimal notebook、source list with empty strings、metadata missing kernelspec、metadata None
+
+### 撞墙记录
+- 2 fail（测试 bug）：
+  1. `test_extract_kernel_language_none_metadata`：函数对 None 不防护，直接 .get() → AttributeError；改 expect AttributeError
+  2. `test_parse_metadata_missing_kernelspec`：_make_minimal_notebook 用 `metadata or default`，{} 是 falsy → 被默认值覆盖；改传 truthy 但无 kernelspec 的 dict
+- 修复后 0 fail
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 198 后）：16796 pass / 0 fail / 14 skip（HEAD `075e1a7`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（136 行 / ~900 测试）
+- 候选 KL：app/models.py 第六轮（154 行 / ~800 测试）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1200 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KU：app/schema.py 第七轮（230 行 / ~900 测试）
+- 候选 KV：app/chunkers/base.py 第六轮（仍饱和）
+- 候选 KW：app/hash_utils.py 第六轮（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KJ（app/parsers/text_parser.py 第八轮）。text_parser.py 是当前未做 8th+ round 的最简 parser（136 行 / ~6.6 tests/line），
+第八轮可深入 _detect_text_source_type、空文件/无后缀/UTF-8 BOM 处理、单 paragraph 边界字符数、line ending 标准化、metadata 字段。
+
+---
