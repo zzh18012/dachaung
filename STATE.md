@@ -10151,3 +10151,46 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第七轮可深入 _load_annotation 各异常分支、_process_one image_dir 命名、run_evaluation expected_failures 流程。
 
 ---
+
+## Round 175（2026-08-05）：evaluation/runner.py 第七轮（edges7）
+
+### 目标
+- 给 evaluation/runner.py（227 行，已有 base/edges/edges2-6 共 569 测试）补第七轮
+- 深入 _load_annotation 异常分支、_process_one 错误码与 image_dir、run_evaluation expected_failures 流程
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges7.py`（66 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation**：None/不存在/目录/JSONDecodeError 各分支精确、返回新 dict 每次调用、签名 (path: Path | None) -> dict | None
+- **_process_one**：返回 5 元组、success 路径（document_dict/parser_version/total_seconds/image_dir 类型）、failure 路径（document None + error_dict 非 None + image_dir None）、_per_doc 目录创建、out_stub 成功后清理、签名（4 参数无默认值）
+- **run_evaluation expected_failures**：matches=True/mismatch/no_actual_error/empty 各分支
+- **run_evaluation per_doc 私有字段分离**：公开 per_doc 不含 _annotation_present/_tolerance_chars/_missing_markers、keys 精确 4 项
+- **run_evaluation wall_time_seconds**：5 keys（total/parse/chunk/parse_reason/chunk_reason）、parse/chunk null、reason not_instrumented
+- **run_evaluation 报告结构**：6 顶层 keys、empty manifest 处理、output_path.parent 自动创建、JSON 写盘
+- **run_evaluation keyword-only**：parser_name/max_chars/tolerance_chars 都是 KEYWORD_ONLY
+- **模块结构**：__all__ 精确 ["run_evaluation"]、future annotations、imports（json/time/Path/Any + pipeline/evaluation/annotation_metrics/metrics/report）、docstring 提及 perf_counter/not_instrumented
+- **综合行为**：幂等（同输入两次跑结果一致）、kreuzberg parser 不抛、_per_doc 目录无残留 stub
+
+### 撞墙记录
+- 一次撞墙（2 fail）：
+  - _process_one 的 parser_name/max_chars 实际是必填（无默认值）→ 改为 no_default 测试
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 175 后）：14071 pass / 0 fail / 13 skip（HEAD `2c3e4f6`）
+
+### 下一步建议
+- 候选 IS：evaluation/metrics.py 第七轮（381 行 / 951 测试）
+- 候选 IT：evaluation/manifest.py 第七轮（239 行 / 731 测试）
+- 候选 IU：evaluation/report.py 第六轮（200 行 / 576 测试）
+- 候选 IV：evaluation/schema_validation.py 第二轮（15 行 / 112 测试，已饱和）
+- 候选 IW：app/cli.py 第八轮（535 行 / 747 测试）
+- 候选 IX：app/pipeline.py 第八轮（216 行 / 702 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IU（evaluation/report.py 第六轮）。report.py 是评测报告装配核心，
+第六轮可深入 aggregate_summary 各 metric 类型、build_provenance git 字段、build_devset_section 各 key 精确。
+
+---
