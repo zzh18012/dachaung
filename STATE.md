@@ -13813,3 +13813,44 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KX3（evaluation/cli.py 第十六轮，243 行）继续推 evaluation。
 
 ---
+## Round 251 — evaluation/cli.py 第十六轮（107 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第十六轮 edges 测试，覆盖源码字符串断言（inspect.getsource 含特定 token）、模块/函数 metadata、__future__ annotations 影响、_format_metric 各分支精确（bool/float/dict/int/str/None）、_run_inspect_doc 输出格式精确（file/document_id/source/parser/counts/metrics）、argparse run_p 4 个 argument 的 default 与 required 精确、main 子命令分发返回值、main signature 单参数 argv 默认 None、argparse 错误处理 SystemExit(2)
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges16.py`（107 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码字符串断言**：含 '--manifest'/'--output'/'--parser'/'--max-chars'/'--tolerance-chars'/'fallback'/'kreuzberg'/'default=800'/'default=30'/'add_parser("run"'/'validate-report'/'inspect-doc'/'add_subparsers'/'import argparse'/'def main('/'def _run_inspect_doc('/'def _format_metric('/'choices='/'return 0'/'return 1'/'return 2'/'raise SystemExit(main())'/'if __name__ == "__main__":'
+- **模块 metadata**：__file__ 后缀 .py / 含 'cli'；__package__=='evaluation'；__name__=='evaluation.cli'；argparse/json/sys/Path identity；namespace 含 main/_build_parser/_format_metric/_run_inspect_doc；不含顶层 'run'
+- **函数 metadata**：main/_build_parser/_format_metric/_run_inspect_doc __module__/__qualname__ 精确；都是 FunctionType；main 无 varargs/varkw；_build_parser 无参数；return_annotation 是 str
+- **_format_metric 各分支**：value=None 渲染 'null'；True/False 渲染小写；int/float/dict/str 各分支；float 渲染 4 位小数；dict items 排序；dict 空 items；reason 替换 'ok'；name 字段宽度 36；unicode name；长 name 不截断
+- **argparse 结构**：prog='evaluation.cli'；description 含 '评测 CLI'；run --parser choices=('fallback', 'kreuzberg')；run --parser default='fallback'；run --max-chars default=800；run --tolerance-chars default=30；inspect-doc --tolerance-chars default=30；run --manifest/--output required=True；validate-report/inspect-doc input positional
+- **main signature**：1 个参数 'argv'；POSITIONAL_OR_KEYWORD；默认 None；return annotation 含 'int'
+- **_run_inspect_doc 输出**：含 'file:' / 'document_id:' / 'source:' / 'parser:' / 'counts:' / 'metrics:'；返回 0 成功 / 2 文件不存在 / 1 非法 JSON / 1 非 dict
+- **main 子命令分发**：run 不存在 manifest → 2；validate-report 不存在 → 2；inspect-doc 不存在 → 2
+- **argparse 错误**：未知 --parser choice → SystemExit(2)；--max-chars 非数字 → SystemExit(2)；未知参数 → SystemExit(2)
+- **模块无 __all__**
+
+### 撞墙记录
+- 0 fail：107 测试一次性全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 251 后）：22041 pass / 0 fail / 16 skip（HEAD `e3c090f`）
+
+### 下一步建议
+- 候选 KS3：evaluation/runner.py 第十六轮（227 行）
+- 候选 KZ3：evaluation/schema.py 第九轮（80 行）
+- 候选 KT4：evaluation/manifest.py 第十六轮（239 行）
+- 候选 KE4：evaluation/annotation_metrics.py 第十五轮（194 行）
+- 候选 KF4：evaluation/metrics.py 第十五轮（381 行）
+- 候选 KW4：evaluation/report.py 第十六轮（200 行）
+- 候选 KX4：evaluation/cli.py 第十七轮（243 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS3（evaluation/runner.py 第十六轮，227 行）继续推 evaluation。
+
+---
