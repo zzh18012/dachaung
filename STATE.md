@@ -14301,3 +14301,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE5（evaluation/annotation_metrics.py 第十六轮，194 行）继续推 evaluation。
 
 ---
+## Round 262 — evaluation/annotation_metrics.py 第十六轮（122 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第十六轮 edges 测试，覆盖未覆盖的源码 token（5 个 import + 5 个 reason 字符串 + 3 个函数 def + tolerance_chars/search_from/missing_markers/predicted/normalize_text 调用/' '.join/stream.find/pairs.sort/used_pred+used_gt/f1 公式/denom<=0 检查 + 不含 print）、模块 docstring 内容（figure-caption/chunk boundary/一对一/容差/启发式）、函数签名 introspection（figure_caption_prf 2 参数无默认；chunk_boundary_prf 3 参数 tolerance_chars default 30 + POSITIONAL_OR_KEYWORD）、helper metadata、PARSER_DOES_NOT_EMIT_RELATIONS 详细（值/类型/hashable/singleton）、figure_caption_prf 详细（永远返回 null + reason；与输入无关）、chunk_boundary_prf 算法详细（document=None/None annotation/empty annotation/< 2 chunks/no anchors/perfect match/position before+after/tolerance exact/0/5/4 边界/2 chunks 2 anchors perfect/one-to-one no double counting/repeated markers sequential/missing markers recorded/empty marker treated as not found/position defaults/normalize chunk text/f1 when p or r None/f1 when both zero/f1 半匹配/tolerance record 结构/missing_markers 结构/不修改输入/不缓存）、模块 namespace 完整性 + __all__ 精确、与 evaluation.metrics 协作（_null/_ratio 调用一致）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges16.py`（122 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码 token**：5 个 import + 5 个 reason 字符串（pipeline_failed/no_annotation/no_predicted_boundaries/no_ground_truth_anchors/no_ground_truth_anchors_in_stream/precision_or_recall_not_evaluated）+ 2 个 def + tolerance_chars: int = 30 + search_from/missing_markers/predicted/' '.join(norm_chunks)/stream.find/pairs.sort(key=lambda x: x[0])/used_pred+used_gt/2 * p_val * r_val / denom/if denom <= 0 + 不含 print
+- **模块 docstring**：是 str 长度>30；含 figure-caption/chunk_boundary/一对一/容差/启发式/本期
+- **签名 introspection**：figure_caption_prf 2 参数无默认 + POSITIONAL_OR_KEYWORD；chunk_boundary_prf 3 参数 + tolerance_chars default 30 + POSITIONAL_OR_KEYWORD（无 * separator）+ 无 var args/kw + return str
+- **helper metadata**：2 个函数 __module__/__qualname__ 精确；FunctionType
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：值 'parser_does_not_emit_relations'；是 str；hashable；module singleton
+- **figure_caption_prf**：返回 dict 3 keys；所有 value None + reason=PARSER_DOES_NOT_EMIT_RELATIONS；与输入无关（即使有 doc/annotation）；每 metric dict 含 value+reason
+- **chunk_boundary_prf 算法**：document=None → pipeline_failed；None/empty annotation → no_annotation；< 2 chunks → no_predicted_boundaries + recall=0.0 当有 anchor；no anchors + 有 chunks → no_ground_truth_anchors；perfect match precision=recall=f1=1.0；position before vs after；tolerance_chars exact/0/5/4 边界；2 chunks 2 anchors perfect；一对一匹配 no double counting（precision=0.5 当 2 pred 1 gt）；repeated markers sequential search；missing markers 记录到 _missing_markers；empty marker → -1 → missing + recall null+reason；position defaults to 'after'；normalize chunk text 移除多余空白；f1 当 p/r None → precision_or_recall_not_evaluated；f1 当 both 0 → denom=0 → 0.0；f1 半匹配 (p=1/3, r=1) → 0.5；_tolerance_chars 总在输出；_missing_markers 仅在 missing 时
+- **不修改输入**：document/annotation 不被修改
+- **不缓存**：两次调用返回独立 dict
+- **namespace 完整性**：Counter/Any/normalize_text/_null/_ratio/PARSER_DOES_NOT_EMIT_RELATIONS identity；2 个 export 在 namespace；__all__ 是 list 不是 tuple；3 entries 精确；不含私有
+- **与 metrics 协作**：pipeline_failed 路径用 _null；perfect match 路径用 _ratio
+
+### 撞墙记录
+- 1 fail → 修复后 0 fail：
+  - `test_chunk_boundary_prf_empty_marker_treated_as_not_found`：empty marker → gt=[] → recall null + reason 'no_ground_truth_anchors_in_stream'，不是 0.0；改测期望 None + reason
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 262 后）：23543 pass / 0 fail / 16 skip（HEAD `9c0d49d`）
+
+### 下一步建议
+- 候选 KF5：evaluation/metrics.py 第十六轮（381 行）
+- 候选 KW5：evaluation/report.py 第十七轮（200 行）
+- 候选 KX5：evaluation/cli.py 第十八轮（243 行）
+- 候选 KS5：evaluation/runner.py 第十八轮（227 行）
+- 候选 KZ5：evaluation/schema.py 第十一轮（80 行）
+- 候选 KT6：evaluation/manifest.py 第十八轮（239 行）
+- 候选 KE6：evaluation/annotation_metrics.py 第十七轮（194 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KF5（evaluation/metrics.py 第十六轮，381 行）继续推 evaluation。
+
+---
