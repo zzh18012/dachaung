@@ -14615,3 +14615,43 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE6（evaluation/annotation_metrics.py 第十七轮，194 行）继续推 evaluation。
 
 ---
+
+## Round 269 — evaluation/annotation_metrics.py 第十七轮（98 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第十七轮 edges 测试，覆盖 edges16 未触及的角度：chunk_boundary_prf 算法深度（stream.find 返回 -1 跳过 chunk；norm_chunks 含空字符串 chunk；所有 chunks 全空 → stream 空 → missing_markers；单 chunk → no_predicted_boundaries；position 缺字段默认 'after'；position 'middle' unknown 值 → after 路径；anchor 缺 marker 字段 → marker=''；tolerance_chars 0/negative/huge；multi pred 1 gt greedy closest；1 pred multi gt greedy closest；0 pred 0 gt；3 个相同 marker 顺序 search_from；输出 key 顺序；不修改 document/annotation；两次调用独立 dict）、figure_caption_prf 深度（document 是 dict 也 null；annotation 是 dict 也 null；both dict 仍 null；不修改 document/annotation；两次调用独立；每个 value 是 dict 含 value+reason）、PARSER_DOES_NOT_EMIT_RELATIONS（是 str/hashable/singleton）、namespace 完整性（Counter/Any/normalize_text/_null/_ratio/PARSER_DOES_NOT_EMIT_RELATIONS/figure_caption_prf/chunk_boundary_prf；__all__ 是 list 不是 tuple；3 entries；不含私有 helpers/constants）、签名 introspection（figure_caption_prf 2 参数无默认；chunk_boundary_prf 3 参数 tolerance_chars default 30；POSITIONAL_OR_KEYWORD；no var args/kw）、helper metadata（2 个 __module__/__qualname__；FunctionType）、源码 token 含 from __future__ import annotations/from collections import Counter/from typing import Any/from app.chunkers.structural import normalize_text/from evaluation.metrics import _null, _ratio/PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"/def figure_caption_prf/def chunk_boundary_prf/tolerance_chars: int = 30/used_pred = set()/used_gt = set()/used_pred.add(pi)/used_gt.add(gi)/continue/break/search_from/missing_markers/pairs.sort(key=lambda x: x[0])/2 * p_val * r_val// denom/denom <= 0；不含 print/import logging/import subprocess/import os/asyncio/import json/from pathlib、docstring 含 figure-caption/chunk_boundary/parser/heuristic/一对一/容差
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges17.py`（98 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **chunk_boundary_prf 算法深度**：stream.find 返回 -1 跳过 chunk；norm_chunks 含空字符串；所有 chunks 全空 → stream 空 → missing_markers；单 chunk → no_predicted_boundaries；position 缺字段 → 默认 'after'；position 'middle' → 走 else = after；anchor 缺 marker → marker='' → falsy → find_pos = -1 → missing；tolerance_chars 0 → 必须精确；negative → 永不匹配；huge → 任何距离匹配；2 pred 1 gt greedy → precision=0.5/recall=1.0；1 pred 2 gt greedy → precision=1.0/recall=0.5；0 pred 0 gt → no_predicted_boundaries；3 个相同 marker 顺序 search_from → 全匹配；输出 key 顺序 precision/recall/f1/_tolerance_chars；不修改 document/annotation；两次调用独立 dict
+- **figure_caption_prf 深度**：返回 3 keys；所有 value None + reason=PARSER_DOES_NOT_EMIT_RELATIONS；document 是 dict（含 chunks/elements）也 null；annotation 是 dict（含 figure_caption_relations）也 null；both dict 仍 null；不修改 document/annotation；两次调用独立；每个 value 是 dict 含 value+reason
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：是 str；值精确 'parser_does_not_emit_relations'；hashable（可作 dict key）；module singleton
+- **namespace 完整性**：Counter/Any/normalize_text/_null/_ratio/PARSER_DOES_NOT_EMIT_RELATIONS/figure_caption_prf/chunk_boundary_prf 都在；__all__ 是 list 不是 tuple；3 entries 精确；__all__ 不含 _null/_ratio/Counter/Any/normalize_text
+- **签名 introspection**：figure_caption_prf 2 参数 document+annotation 无默认 POSITIONAL_OR_KEYWORD；no var args/kw；chunk_boundary_prf 3 参数 document+annotation+tolerance_chars default 30；POSITIONAL_OR_KEYWORD；no var args/kw
+- **helper metadata**：figure_caption_prf/chunk_boundary_prf __module__ == 'evaluation.annotation_metrics'；__qualname__ 精确；FunctionType
+- **源码 token**：含 from __future__ import annotations、from collections import Counter、from typing import Any、from app.chunkers.structural import normalize_text、from evaluation.metrics import _null, _ratio、PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"、def figure_caption_prf、def chunk_boundary_prf、tolerance_chars: int = 30、used_pred = set()、used_gt = set()、used_pred.add(pi)、used_gt.add(gi)、continue、break、search_from、missing_markers、pairs.sort(key=lambda x: x[0])、2 * p_val * r_val、/ denom、denom <= 0；不含 print/import logging/import subprocess/import os/asyncio/import json/from pathlib
+- **docstring 内容**：是 str 长度>30；含 figure-caption；含 chunk_boundary 或 分块边界；含 parser+caption 或 relation；含 启发式 或 heuristic；含 一对一 或 one-to-one；含 容差 或 tolerance
+
+### 撞墙记录
+- 0 fail（首次跑通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 269 后）：24433 pass / 0 fail / 16 skip（HEAD `6e98931`）
+
+### 下一步建议
+- 候选 KF6：evaluation/metrics.py 第十七轮（381 行）
+- 候选 KW6：evaluation/report.py 第十八轮（200 行）
+- 候选 KX6：evaluation/cli.py 第十九轮（243 行）
+- 候选 KS6：evaluation/runner.py 第十九轮（227 行）
+- 候选 KZ6：evaluation/schema.py 第十二轮（80 行）
+- 候选 KT7：evaluation/manifest.py 第十九轮（239 行）
+- 候选 KE7：evaluation/annotation_metrics.py 第十八轮（194 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KF6（evaluation/metrics.py 第十七轮，381 行）继续推 evaluation。
+
+---
