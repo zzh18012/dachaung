@@ -13076,3 +13076,49 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KF（evaluation/metrics.py 第十二轮）继续推 evaluation 最大文件。
 
 ---
+## Round 235 — evaluation/metrics.py 第十二轮（119 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第十二轮 edges 测试，覆盖 compute_automatic_metrics dict 插入顺序、_text_preservation 返回顺序、各 helper 类型边界、_is_valid_bbox 各种类型、_strip_unicode_whitespace 特殊空白、document={} 空字典路径
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges12.py`（119 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **compute_automatic_metrics 输出 dict 插入顺序**：success / failure 两路都验证 14 keys 顺序精确
+- **_text_preservation 返回 dict 顺序**：equal, precision, recall
+- **_chunk_reference_ratio**：source_element_ids 是 str → 字符迭代；是 int → TypeError；0/''/None → falsy 当空
+- **_heading_boundary_ratio**：source_element_ids 是 str → 字符首字符加入；int → TypeError；falsy → 跳过
+- **_pdf_locator_ratio / _docx_locator_ratio**：elements=[{}] 缺 source_locator → loc={} → invalid
+- **_pdf_locator_ratio**：header/footer/table/image 类型只需 page≥1（不在 _PDF_BBOX_REQUIRED_TYPES）
+- **_docx_locator_ratio**：paragraph_index / section / table_index+row+col 单独足够
+- **_image_resource_ratio**：image 缺 resource_path / None / '' / 0 都当 falsy
+- **_silent_drop_count**：expectations={} / None / 无 element_count_by_type / None 值都返回 null reason；string expected 触发 TypeError
+- **_is_valid_bbox**：内嵌 list/dict/complex/3-5 元素/极大 finite 都正确判定
+- **_strip_unicode_whitespace**：NBSP/EM/EN/ideographic/line/paragraph separator 都识别为 whitespace；ZWJ 不是 whitespace；emoji 保留
+- **_null/_ratio/_bool_metric/_int_metric**：每次返回新 dict；keys 精确；value 类型精确
+- **compute_automatic_metrics**：document={} 走通空字典路径；source_type 未知 → 两 locator 都 not_pdf/not_docx
+- **_text_preservation**：image 排除；chunk text None/缺键当空；element content None/缺键当空；Counter 交集 min 语义；超集 precision<1
+- **module __all__**：1 个元素；内部 helper 不导出但可访问
+
+### 撞墙记录
+- 0 fail：119 测试一次性通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 235 后）：20626 pass / 0 fail / 15 skip（HEAD `555b504`）
+
+### 下一步建议
+- 候选 KW：evaluation/report.py 第十三轮（200 行）
+- 候选 KX：evaluation/cli.py 第十四轮（243 行）
+- 候选 KS：evaluation/runner.py 第十四轮（227 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 候选 KT2：evaluation/manifest.py 第十四轮（239 行）
+- 候选 KE2：evaluation/annotation_metrics.py 第十三轮（194 行）
+- 候选 KF2：evaluation/metrics.py 第十三轮（381 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW（evaluation/report.py 第十三轮）继续推 evaluation 中型文件。
+
+---
