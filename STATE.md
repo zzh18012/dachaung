@@ -12939,3 +12939,49 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KS（evaluation/runner.py 第十三轮）继续推 evaluation 大文件。
 
 ---
+## Round 232 — evaluation/runner.py 第十三轮（45 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十三轮 edges 测试，覆盖 report top-level dict 插入顺序、per_doc entry / wall_time_seconds / expected_failure entry 插入顺序、_per_doc 目录在 run 后仍存在、_process_one out_stub 清理、parser_version_for_prov 行为
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges13.py`（45 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **report top-level insertion order**：6 个 key 按 report_version → provenance → devset → summary → per_doc → expected_failures 顺序
+- **per_doc entry insertion order**：4 个 key 按 doc_id → source_type → metrics → wall_time_seconds 顺序
+- **wall_time_seconds insertion order**：5 个 key 按 total → parse → chunk → parse_reason → chunk_reason 顺序；parse/chunk 固定 None；reason 固定 'not_instrumented'；total 是 float
+- **expected_failure entry insertion order**：4 个 key 按 doc_id → expected_error_code → actual_error_code → matches 顺序
+- **_per_doc directory**：run 之后 _per_doc 目录仍存在；目录内 .json 文件全清理；多 docs 也只有一个 _per_doc 目录
+- **output_root**：缺失时被创建；已存在时不抛异常
+- **parser_version_for_prov**：first non-None wins；all docs fail → None；first None + second 有值 → second wins
+- **_process_one**：out_stub 在 success 路径被 unlink；out_stub 不存在时不抛；elapsed >= 0；parser_version on success/failure；image_dir is None when document is None；image_dir is Path when document present；document None + no errors → 'unknown' error code
+- **report file**：valid JSON；indent=2（行以 2 space 开头）；ensure_ascii=False（中文不转义）；返回 dict 与写盘内容一致
+- **annotation_resolved**：None → figure_caption null；文件不存在 → null；文件存在（空 dict） → null
+- **tolerance_chars 透传**：显式值（42）/ 默认值（30）都到达 chunk_boundary_prf
+- **max_chars / parser_name 透传**：都到达 process_single
+- **write_json=False**：_process_one 调用 process_single 时永远 write_json=False
+- **devset 透传**：status / file_count / categories_covered 都从 manifest 透传到 report
+
+### 撞墙记录
+- 2 fail（修复）：
+  - tolerance_chars_passed_to_chunk_boundary_prf：误以为 monkeypatch 'evaluation.annotation_metrics.chunk_boundary_prf' 能拦截；实际 runner.py 用 `from evaluation.annotation_metrics import chunk_boundary_prf` 把名字导入本地命名空间，需要 patch 'evaluation.runner.chunk_boundary_prf'
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 232 后）：20332 pass / 0 fail / 15 skip（HEAD `4727a08`）
+
+### 下一步建议
+- 候选 KT：evaluation/manifest.py 第十三轮（239 行）
+- 候选 KE：evaluation/annotation_metrics.py 第十二轮（194 行）
+- 候选 KF：evaluation/metrics.py 第十二轮（381 行）
+- 候选 KW：evaluation/report.py 第十三轮（200 行）
+- 候选 KX：evaluation/cli.py 第十四轮（243 行）
+- 候选 KS：evaluation/runner.py 第十四轮（227 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KT（evaluation/manifest.py 第十三轮）继续推 evaluation 大文件。
+
+---
