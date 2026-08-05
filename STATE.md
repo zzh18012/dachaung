@@ -12520,3 +12520,45 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KU（evaluation/annotation_metrics.py 第十轮）继续推 evaluation 大文件。
 
 ---
+
+## Round 222 — evaluation/annotation_metrics.py 第十轮（40 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第十轮 edges 测试，覆盖大样本/边界值
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges10.py`（40 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 深度**：所有输入相同输出；keys 顺序固定；metric dict keys exact；reason 一致
+- **chunk_boundary_prf 大样本**：10 chunks + 1 anchor at end → recall=1, precision=1/9；1 chunk + 多 anchor → no_predicted；2 anchor 1 missing；2 anchor both missing；tolerance=1；tolerance=0；normalize collapses whitespace；punctuation preserved；unicode；repeated chunk text
+- **anchor position 边界**：empty marker before/after → missing；position='AFTER'（大写）走 else；position='BEFORE' 走 else（不是 before）；position 是 int 走 else
+- **tolerance_chars 写入**：所有路径都写 _tolerance_chars；negative tolerance 无匹配
+- **多 predicted / 多 anchor**：predicted 多 → precision<1；anchors 多+部分 missing → recall 不变；predicted 全 out of tolerance
+- **返回 dict 结构**：内部键以 _ 前缀；metric keys 无 _ 前缀
+- **边界值**：1 chunk + 2 anchors；纯空白 chunk text
+- **模块结构**：__all__ 顺序；normalize_text 来自 app.chunkers.structural；_null/_ratio 来自 evaluation.metrics；docstring 提及一对一
+- **综合**：keys 跨路径一致；no side effects
+
+### 撞墙记录
+- 1 fail：test_chunk_boundary_prf_repeated_chunk_text_two_anchors 误以为两个 anchor 都匹配；实际 num_pred=1（chunk 0 末尾是唯一 boundary），num_gt=2（两个 anchor 都找到），matched=1 → recall=0.5
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 222 后）：19414 pass / 0 fail / 15 skip（HEAD `6ff08f6`）
+
+### 下一步建议
+- 候选 KW：evaluation/report.py 第十一轮（200 行）
+- 候选 KX：evaluation/cli.py 第十二轮（243 行）
+- 候选 KS：evaluation/runner.py 第十二轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十二轮（239 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW（evaluation/report.py 第十一轮）继续推 evaluation 大文件。
+
+---
