@@ -13443,3 +13443,48 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW2（evaluation/report.py 第十四轮，200 行）继续推 evaluation 中型文件。
 
 ---
+## Round 243 — evaluation/report.py 第十四轮（72 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十四轮 edges 测试，覆盖 str project_root 接受、ratio value 边界（>1.0/negative）、per_doc tuple/extra keys、build_devset_section 独立 dict、get_dependency_versions 不缓存、subprocess 调用细节、模块结构精确、签名精确、callable 验证
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges14.py`（72 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **str project_root**：build_provenance/get_git_provenance 接受 str；Path-like __fspath__ 对象
+- **ratio value 边界**：>1.0 仍参与 macro；negative 仍参与；mixed 计算；extreme large 1e6
+- **per_doc_results 类型**：tuple iterable OK；extra keys (doc_id/source_type/errors) 不影响聚合
+- **chunk_boundary metrics**：3 个 metric 都参与 ratio_macro
+- **silent_drop_total float**：2.5+1.5=4.0（float 求和）
+- **count 求和**：negative + positive 混合
+- **build_devset_section**：每次返回新 dict；修改不影响 Manifest；devset_status='complete' 透传；categories_covered tuple；negative counts 透传；duck typing
+- **get_dependency_versions**：每次返回新 dict；修改不影响下次；PackageNotFoundError 与 Exception 都返回 None；monkeypatch 返回特定值
+- **get_git_provenance subprocess**：OSError/SubprocessError 返回 commit=None+dirty=True；两次调用顺序 rev-parse → status；stdout strip whitespace；空白 stdout → None；porcelain 非空 → dirty；returncode 非 0 → dirty=False
+- **build_provenance**：每次新 dict（timestamp 可能不同）；evaluator_version/report_version 常量；dependencies dict；dependencies 每次独立；parser_version 透传；max_chars int 转换；negative/zero max_chars；ISO timestamp parseable
+- **模块结构**：__all__ 是 list 不是 tuple；__all__ 顺序精确 5 元素；Any/subprocess/datetime/Path 在 namespace identity；3 个 constants 是 tuple；3 个 constants pairwise 不交集
+- **签名**：5 个公开函数签名精确
+- **callable**：__all__ 中所有元素都 callable；5 个公开函数都 callable
+- **顶层结构**：aggregate_summary 4 keys 顺序精确；counts/success_rates/silent_drop_total 必有 key；per_doc 含 None value 不参与 success_count 但仍计入 total
+
+### 撞墙记录
+- 0 fail（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 243 后）：21297 pass / 0 fail / 15 skip（HEAD `6161ad1`）
+
+### 下一步建议
+- 候选 KX2：evaluation/cli.py 第十五轮（243 行）
+- 候选 KS2：evaluation/runner.py 第十五轮（227 行）
+- 候选 KZ2：evaluation/schema.py 第八轮（80 行）
+- 候选 KT3：evaluation/manifest.py 第十五轮（239 行）
+- 候选 KE3：evaluation/annotation_metrics.py 第十四轮（194 行）
+- 候选 KF3：evaluation/metrics.py 第十四轮（381 行）
+- 候选 KW3：evaluation/report.py 第十五轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KX2（evaluation/cli.py 第十五轮，243 行）继续推 evaluation。
+
+---
