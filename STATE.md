@@ -12479,3 +12479,44 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KT（evaluation/manifest.py 第十一轮）继续推 evaluation 大文件。
 
 ---
+
+## Round 221 — evaluation/manifest.py 第十一轮（74 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十一轮 edges 测试，覆盖 _is_absolute_like / _has_backslash / load_manifest round-trip
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges11.py`（74 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 穷举**：a:/foo True；Z:\foo True；abc False；abcd False；a:b False；a:.foo False；a:-foo False；中:/foo True（unicode letter）；emoji:/foo False；'' False；'/' True；'//' True；网络路径 // True
+- **_has_backslash 穷举**：返回 bool；中文 path 无 \ False；中文 path 有 \ True；单字符 '\' True；'/' False；长路径无 / 有 \ True；特殊字符
+- **_resolve_relative_path 深度**：深层嵌套目录；unicode 文件名；含空格；含 dot；dotdot 跳出 root raises；多层 dotdot；./ 前缀
+- **_detect_project_root 深度**：immediate parent；grandparent；great-grandparent；no pyproject；innermost 优先
+- **load_manifest 深度**：7 fields round-trip；expected_failure 完整 round-trip；annotation_file 跨目录；unicode filename；schema 拒绝 missing path/doc_id/source_type；schema 拒 unknown source_type；categories 非 list；path 绝对；path backslash；额外字段被拒
+- **Manifest 综合行为**：mixed types；no pdf/docx；only pdf；categories unicode sorted；dedup；all pairs = 2 组
+- **模块结构**：ManifestError 多 args；field.type 都是字符串（future annotations）；具体字段类型注解内容；docstring 提及 path 约束
+
+### 撞墙记录
+- 0 fail：一次通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 221 后）：19374 pass / 0 fail / 15 skip（HEAD `e778fde`）
+
+### 下一步建议
+- 候选 KU：evaluation/annotation_metrics.py 第十轮（194 行）
+- 候选 KW：evaluation/report.py 第十一轮（200 行）
+- 候选 KX：evaluation/cli.py 第十二轮（243 行）
+- 候选 KS：evaluation/runner.py 第十二轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十二轮（239 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KU（evaluation/annotation_metrics.py 第十轮）继续推 evaluation 大文件。
+
+---
