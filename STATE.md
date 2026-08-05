@@ -11518,3 +11518,80 @@ get_git_provenance 各 OSError 路径。
 第八轮可深入 ATXHeading/ListItem/Table/CodeBlock/FencedCode 各分支、缩进规则、嵌套结构、references 定义。
 
 ---
+
+## Round 202（2026-08-05）：app/parsers/markdown_parser.py 第八轮（edges8）
+
+### 目标
+- 给 app/parsers/markdown_parser.py（326 行，已有 base/edges/edges2-7 共 ~943 测试）补第八轮
+- 深入各正则的边界：_ATX_HEADING_RE（7 hashes/tab 分隔/leading space）
+- _THEMATIC_RE（mixed chars/长串）
+- _FENCED_RE（4 backticks/lang+-/lang with space）
+- _UNORDERED_LIST_RE/_ORDERED_LIST_RE（tab 分隔/0/无 dot paren）
+- _BLOCKQUOTE_RE（嵌套 /> > >/> vs 单 / 空格吞 1）
+- _STANDALONE_IMAGE_RE（empty alt/嵌套 URL）
+- _PIPE_TABLE_ROW_RE/_PIPE_TABLE_SEP_RE（colon 对齐/dash 至少 2）
+- _detect_md_source_type（uppercase/MARKDOWN/double ext/(无))
+- _rows_to_md（单 cell/uneven/空 body/Unicode）
+- _split_pipe_row（无 |/空 cell/strip）
+- _is_pipe_table_start（last line/negative index/colon 对齐）
+- MarkdownParser 类属性（name/version/inheritance/signature）
+- parse() 错误矩阵（file_not_found/unsupported_type/UnicodeDecodeError/OSError）
+- parse() 返回值（metadata={markdown:True}/parser_name/version/source_type/source_path）
+- _parse_text section_path 栈语义（同级/降级/升 H1 清栈）
+- _parse_text 段落中断各分支
+- _parse_text fenced code block metadata（kind/language）
+- _parse_text blockquote（连续 > 合并/strip）
+- _parse_text table（row_count/col_count/source）
+
+### 改动
+- 新增 `tests/test_parsers_markdown_edges8.py`（203 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_MD_EXTENSIONS**：(".md", ".markdown") tuple，全小写，前导点
+- **_ATX_HEADING_RE**：1-6 个 # 匹配、7 个不匹配、0 个不匹配、无空白不匹配、trailing # 去除、tab 分隔、Unicode 标题、leading space 不匹配
+- **_THEMATIC_RE**：3 种字符、mixed 实际匹配、2 个/1 个不匹配、长串、leading/trailing space 不匹配、字母不匹配
+- **_FENCED_RE**：3 backticks、4 backticks、3 tildes、lang 含 -/+、lang 空、2 backticks 不匹配、lang 含空格不匹配、混 fence 不匹配
+- **_UNORDERED_LIST_RE**：-/*/+ 三种、无 marker/无 space/dot/数字 不匹配、tab 分隔、多词 content
+- **_ORDERED_LIST_RE**：1./1) 两种、多位数、0、无 dot/paren 不匹配
+- **_BLOCKQUOTE_RE**：> text 与 >text、空 content、嵌套 >>/> > >、\s? 最多吞 1 空格、leading space 不匹配
+- **_STANDALONE_IMAGE_RE**：empty alt、URL 含 path、alt 多词、无闭括弧/无 !/无 [] 不匹配
+- **_PIPE_TABLE_ROW_RE**：必须前导/尾部 |、单 pipe、空 cells
+- **_PIPE_TABLE_SEP_RE**：colon 左/右/两侧、dash < 2 不匹配、字母不匹配、单列不匹配
+- **_is_pipe_table_start**：last line False、negative index、3 列、colon 对齐、返回 bool
+- **_rows_to_md**：空 list、单行（header+sep）、两行、pad short row、pad first short row、单 cell、Unicode、空 cells
+- **_split_pipe_row**：basic、no leading/trailing pipe、无 |、only leading/trailing、strip cells、empty string、returns list、3 cells、empty middle cell
+- **_detect_md_source_type**：md/MARKDOWN/Md mixed、double ext、txt/docx/pdf/no suffix raises、details.suffix 正确、message 含 suffix/`(无)`
+- **MarkdownParser**：name=markdown、version=stdlib/0.1.0、继承 Parser、parse signature、callable
+- **parse() 错误**：file_not_found/unsupported_type/invalid UTF-8 → errors=replace/OSError → md_read_failed
+- **parse() 返回**：Document 类型、metadata={markdown:True}、parser_name=markdown、parser_version、source_type=markdown、source_path 是 str、chunks/relations/errors 空 list
+- **_parse_text section_path 栈**：单 heading、嵌套 2/3 级、同级 pop、降级 pop 多个、回 H1 清栈、paragraph 继承 section_path、无 heading → locator 仅 line
+- **_parse_text 段落中断**：blank line/heading/fenced/thematic/list/blockquote/image/table 各分支
+- **_parse_text 段落多行**：\n join 不合并、strip 外部空白
+- **list_item metadata**：marker=unordered/ordered、ordered bool、content 提取 strip
+- **fenced code metadata**：kind=code_block、language（含空字符串）、empty → warning、no end fence、tilde fence、多行 join
+- **blockquote**：单行/多行 join/breaks at non-quote/strip
+- **table**：row_count + col_count metadata、content 是 markdown str、单 header+sep 也成立
+- **模块结构**：imports（re/Path/Any/Document/Element/WarningRecord/Parser/ParserError/make_document_id）、docstring 含 features 与 unsupported、future annotations
+- **综合行为**：full document 含所有 element types、consecutive H1H2H1H2 section_path、idempotent、element_ids 增量 4-digit zero-padded、confidence=0.95、parent_id=None
+
+### 撞墙记录
+- 2 fail（已修）：
+  - `test_paragraph_breaks_at_fenced_code`：fenced code 本身 type=paragraph，filter 漏掉 → 改用 metadata.kind=None 过滤
+  - `test_paragraph_breaks_at_blockquote`：blockquote 也是 type=paragraph → 同上
+- 3 SyntaxWarning（已修）：docstring 中 `\w` `\s` 未转义 → 改为 r""" """
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 202 后）：17350 pass / 0 fail / 15 skip（HEAD `cdf8fd1`）
+
+### 下一步建议
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KF/KV/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KN（app/pipeline.py 第九轮）。pipeline.py 是编排核心（216 行 / ~5.5 tests/line），
+第九轮可深入 run() 各分支、_run_for_file 错误矩阵、source_hash 计算路径、CLI 入口细节。
+
+---
