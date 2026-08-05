@@ -11716,3 +11716,50 @@ get_git_provenance 各 OSError 路径。
 第九轮可深入 _format_metric 各 type 分支、_run_inspect_doc 输出 ordering、main 错误矩阵边界。
 
 ---
+
+## Round 205（2026-08-05）：evaluation/cli.py 第九轮（edges9）
+
+### 目标
+- 给 evaluation/cli.py（243 行，已有 base/edges/edges2-8 共 ~768 测试）补第九轮
+- 深入 _build_parser 各 argument 属性（type/required/choices/help）
+- main() 完整 exit code 矩阵（0/1/2）+ stderr 消息
+- _format_metric 各种 type/value/reason 组合（None/bool/float/int/dict/string/list/tuple）
+- _run_inspect_doc 输出 ordering（sort_key: bool→0, 数值→1, dict→2, null→3）
+- _run_inspect_doc 各种 metrics 组合 + image element 不崩
+- main validate-report 成功路径（[OK] 打印）
+- 模块结构（imports/__main__/stdout 重配置/no __all__）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges9.py`（106 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser**：prog=evaluation.cli、description 含中文、subparsers dest=command/required=True、3 个 subcommands、run --manifest/--output required、--parser choices=(fallback, kreuzberg)、--max-chars type=int、--tolerance-chars type=int、所有 default、validate-report/inspect-doc positional input、no args errors、signature
+- **_format_metric**：None+reason、None 无 reason（"None" 字面）、bool 小写、bool 默认 'ok'、float 各值（0/1/负/小数截断）、int 各值（0/正/负）、dict 排序、dict int/string 值、空 dict、string、list 走 default、tuple 走 default、name 36 字符 padding、Unicode name、signature、returns str
+- **_run_inspect_doc**：returns 0、打印 file/document_id/source/parser/counts/metrics 各行、metrics 排序 bool 在 null 前、各错误返回码（missing=2/dir=2/invalid json=1/non-dict=1）、empty dict 0、source_type=unknown、--tolerance-chars 参数、image element 不崩、pipeline_success 在输出中、signature
+- **main() 完整 exit 矩阵**：inspect-doc 0/missing 2、validate-report 0/missing 2/dir 2/invalid json 1/empty 1/list 1/invalid schema 1、run missing manifest 2/dir manifest 2/invalid parser argparse 错误、negative max-chars 通过 argparse、no command errors、unknown command errors、stderr [ERROR] 标签、stderr 含文件名
+- **main validate-report 成功路径**：valid report 返回 0、打印 [OK] + 文件名 + Schema 校验
+- **main signature / __main__**：argv default None、returns int、main/_build_parser/_format_metric/_run_inspect_doc callable
+- **模块结构**：imports（argparse/json/sys/Path/manifest/report/runner/schema）、docstring 含 3 subcommands、future annotations、stdout reconfigure 块、__main__ 入口、无 __all__
+
+### 撞墙记录
+- 2 fail（已修）：
+  - `test_main_validate_report_valid_returns_0` 与 `prints_filename`：自构造的报告 JSON 不合法（顶层多了 config/evaluator_version/generated_at；silent_drop_total 类型错）
+    → 改为符合 evaluation-report.schema.json：仅 report_version/provenance/devset/summary/per_doc，provenance 9 字段、silent_drop_total 类型 integer|null（用 0）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 205 后）：17715 pass / 0 fail / 15 skip（HEAD `2b843d6`）
+
+### 下一步建议
+- 候选 KP：evaluation/runner.py 第九轮（227 行 / ~1000 测试）
+- 候选 KQ：evaluation/metrics.py 第九轮（381 行 / ~1200 测试）
+- 候选 KR：evaluation/manifest.py 第九轮（239 行 / ~1100 测试）
+- 候选 KS：evaluation/report.py 第八轮（200 行 / ~700 测试）
+- 候选 KF/KV/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS（evaluation/report.py 第八轮）。report.py 是评测报告组装核心（200 行 / ~3.5 tests/line），
+第八轮可深入 aggregate_summary 各分支、get_git_provenance subprocess 各错误路径、build_provenance 字段集、build_report 完整字段。
+
+---
