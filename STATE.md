@@ -10738,3 +10738,49 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第七轮可深入 pdfplumber/python-docx 集成、page/bbox 提取、paragraph_index 等。
 
 ---
+
+
+## Round 188（2026-08-05）：app/parsers/fallback_parser.py 第七轮（edges7）
+
+### 目标
+- 给 app/parsers/fallback_parser.py（630 行，已有 base/edges/edges2-6 共 845 测试）补第七轮
+- 深入 _CAPTION_RE 实际匹配、_classify_pdf_paragraph 各路径、_lines_to_para/group_words 聚合、_save_image 写盘
+
+### 改动
+- 新增 `tests/test_parsers_fallback_edges7.py`（97 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_CAPTION_RE 实际匹配**：各 prefix（Table/Figure/Fig/表/图）+ 分隔符（./:/、/空格）组合、case insensitive、全角数字、leading whitespace、无数字/无 caption 关键字不匹配、空串不匹配
+- **_is_caption**：None/empty 返回 False、返回 bool
+- **_rows_to_markdown**：empty/None→''/int cell/uneven padding/单 cell/pipe edges/3 dashes separator
+- **_image_filename**：格式 `image_<doc_id_short>_<prefix>_<idx:02d>.<ext>`、doc- 前缀去除、index 2 位 0-padded、custom ext
+- **_classify_pdf_paragraph 各路径**：empty→paragraph、caption→caption+heuristic=caption_regex、short（≤80）无句末标点→heading+heuristic=short_line、short 含 ./。/!/!/？→paragraph、> 80→paragraph、80 边界 heading/81 边界 paragraph、caption 优先级 > short
+- **_lines_to_para**：empty→text=""bbox=None、单 word、多 word 同行、多行合并、bbox 4 元素 [x0/top/x1/bottom]、同行 word 按 x0 排序、bbox 聚合 min/max
+- **_group_words_to_paragraphs**：empty/单 word 返回 list of dict、同 y_center（差 ≤ 3）聚为同行、远 y 仍可同段
+- **_save_image 写盘**：自动 mkdir、写 bytes、文件名用 _image_filename、mkdir parents=True、existing dir 不报错、custom ext
+- **FallbackParser 类属性**：name=fallback、继承 Parser、__init__(image_output_dir=None)、_image_output_dir 私有属性
+- **版本常量**：_PDFPLUMBER_VERSION/_PDFIUM_VERSION/_DOCX_VERSION 存在（None 表示未安装）
+- **模块结构**：__all__=["FallbackParser"]、imports（re/Path/Any/models/base）、docstring 提及 pdfplumber/python-docx/kreuzberg
+
+### 撞墙记录
+- 初版 4 处 fail：
+  1. _classify_pdf_paragraph 用 "Fig 1" 测 caption 优先级，但 regex 要求数字后有分隔符 → 改用 "Fig 1. x"
+  2-4. FallbackParser 属性是 `_image_output_dir`（私有），不是 `image_output_dir` → 改测试断言
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 188 后）：15344 pass / 0 fail / 13 skip（HEAD `d1ef6e8`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮
+- 候选 KG：app/parsers/kreuzberg_parser.py 第六轮
+- 候选 KH：app/models.py 第六轮
+- 候选 KI：app/schema.py 第七轮
+- 候选 KJ：evaluation/cli.py 第八轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 KF（app/parsers/base.py 第六轮）。base.py 定义 Parser 抽象类、ParserError、make_document_id、detect_source_type，
+是所有 parser 的基础，第六轮可深入 detect_source_type 各路径、ParserError 字段、make_document_id 校验。
+
+---
