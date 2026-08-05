@@ -12439,3 +12439,43 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KS（evaluation/runner.py 第十一轮）继续推 evaluation 大文件覆盖。
 
 ---
+
+## Round 220 — evaluation/runner.py 第十一轮（49 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十一轮 edges 测试，覆盖 _load_annotation / _process_one / run_evaluation 的新角度
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges11.py`（49 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 深度**：trailing comma 失败；JSON 注释失败；single quotes 失败；大文件 1000 keys；UTF-8 BOM 失败；UTF-16 编码 → UnicodeDecodeError（不被 except 捕获）；目录 → None；unicode keys；字符串中 escape
+- **_process_one 深度**：image_dir 类型；out_stub.parent mkdir；stub unlink after success；error dict 含 code/message；unknown error message 含 process_single 字样；document.to_dict() 被调用；5 tuple 类型一致
+- **run_evaluation 深度**：报告 keys 顺序；parser_name 传播；max_chars 0/负值；tolerance_chars 0；private keys 不出现在文件；expectations doc；doc_id 传播；ef doc_id 传播；两个 ef 不同 code；3 个 docs 完整 per_doc；no_docs summary present；devset status/categories/pdf_count/docx_count/file_count/content_group_count 都传播
+- **模块结构**：docstring 提及 pipeline/outputs；imports image_output_dir_for；parser_name/max_chars/tolerance_chars KEYWORD_ONLY；manifest/output_path POSITIONAL_OR_KEYWORD；return annotations 含 tuple/None；__all__ 不含 _load_annotation/_process_one
+- **综合行为**：no side effects on manifest；public per_doc 不被修改；run idempotent
+
+### 撞墙记录
+- 2 fail：
+  1. test_load_annotation_utf16_invalid_json 期望 None；实际 UnicodeDecodeError 不被 except 捕 → 改为 expect UnicodeDecodeError
+  2. test_run_evaluation_report_file_does_not_contain_private_keys 漏写 monkeypatch fixture 参数 → 加上
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 220 后）：19300 pass / 0 fail / 15 skip（HEAD `287bd07`）
+
+### 下一步建议
+- 候选 KT：evaluation/manifest.py 第十一轮（239 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KU：evaluation/annotation_metrics.py 第十轮（194 行）
+- 候选 KW：evaluation/report.py 第十一轮（200 行）
+- 候选 KX：evaluation/cli.py 第十二轮（243 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KT（evaluation/manifest.py 第十一轮）继续推 evaluation 大文件。
+
+---
