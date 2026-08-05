@@ -12142,3 +12142,42 @@ get_git_provenance 各 OSError 路径。
 第九轮可深入 aggregate_summary 各 metric 聚合分支、build_provenance 9 字段、build_devset_section 6 字段。
 
 ---
+
+## Round 213 — evaluation/report.py 第九轮（125 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第九轮 edges 测试，覆盖 report 组装、provenance、devset、summary 聚合
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges9.py`（125 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块结构**：__all__ 5 entries（get_git_provenance/get_dependency_versions/build_provenance/build_devset_section/aggregate_summary）；imports（subprocess/datetime/Path/Any/EVALUATOR_VERSION/REPORT_VERSION）；future annotations；无 _silence_unused_import
+- **常量**：_RATIO_METRICS 12 items exact set；_COUNT_METRICS == ("element_count_total",)；_SUCCESS_BOOL_METRICS == ("pipeline_success",)；EVALUATOR_VERSION == "1.1"；REPORT_VERSION == "1.1"
+- **get_git_provenance**：signature；返回 dict；真实 repo commit 40 hex；dirty 是 bool；不存在目录 → None + True；monkeypatch subprocess.run TimeoutExpired → None + True；OSError → None + True；SubprocessError → None + True；UTF-8 decode 错误路径
+- **get_dependency_versions**：3 keys（pdfplumber/python-docx/pypdfium2）；str|None 值；importlib.metadata.package name 正确
+- **build_provenance**：9 keys（evaluator_version/report_version/parser_name/parser_version/max_chars/dependencies/run_timestamp_iso/git/git_dirty）；evaluator/report version 常量；parser_name/version 传播；max_chars int coercion（int/float/str/already-int）；dependencies 3 keys；run_timestamp_iso ISO format + parseable + near now；git commit 40 hex；git_dirty bool
+- **build_devset_section**：_FakeManifest 辅助类；6 keys（devset_status/file_count/content_group_count/pdf_count/docx_count/categories_covered）；所有属性传播；categories_covered list 内容完整
+- **aggregate_summary**：4 top keys（counts/success_rates/ratio_macro_averages/silent_drop_total）；counts 求和；success_rates 算 rate（True/False/None/mixed）；ratio 各项 macro average；silent_drop_total 求和；type 分离（counts 不在 ratios/success_rates）；idempotent；mixed metrics 完整流水线
+
+### 撞墙记录
+- 0 fail：一次通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 213 后）：18695 pass / 0 fail / 15 skip（HEAD `0d79f37`）
+
+### 下一步建议
+- 候选 KZ：evaluation/schema.py 第 N 轮（待查行数）
+- 候选 KAA：evaluation/schema_validation.py 第 N 轮（待查行数）
+- 候选 KAB：evaluation/__init__.py 第 N 轮（小文件）
+- 候选 KC：evaluation/runner.py 第十轮（227 行）
+- 候选 KD：evaluation/metrics.py 第十轮（381 行）
+- 候选 KE：evaluation/manifest.py 第十轮（239 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KZ 或 KAA，把 evaluation/schema*.py 的覆盖度拉满。
+
+---
