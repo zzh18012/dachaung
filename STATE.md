@@ -11184,3 +11184,61 @@ manifest 路径校验、warning 累积逻辑、image 输出目录处理。
 第八轮可深入 path 安全校验（绝对/反斜杠/project_root outside）、expected_failures 加载、annotation_resolved 解析、categories 聚合、manifest schema validation。
 
 ---
+
+## Round 196（2026-08-05）：evaluation/manifest.py 第八轮（edges8）
+
+### 目标
+- 给 evaluation/manifest.py（239 行，已有 base/edges/edges2-7 共 821 测试）补第八轮
+- 深入 _is_absolute_like Windows 盘符边界（digit/underscore/无 separator/单字符/双字符）
+- _has_backslash 单字符/混合路径
+- _resolve_relative_path field_name 透传到错误消息
+- DocumentEntry/ExpectedFailure/Manifest frozen + 10 字段 + properties
+- Manifest.content_group_count 自配对/单向/三向链/混合
+- load_manifest source_type pdf/docx enum 约束 + monkeypatch schema 跳过
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges8.py`（132 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 边界**：empty/单斜杠/POSIX /foo/Windows C:\\/C:/C:foo（无 sep）/lowercase c:\\/单字符 C/双字符 CD/digit 1:\\/underscore _:\\/AB:/`:`/`:/`/相对 ./../z 盘
+- **_has_backslash 边界**：a\\b/单 \\/empty/a/b/混合 a/b\\c/多 \\/只 //////尾 \\abc\\
+- **_resolve_relative_path 错误消息**：field_name 透传（documents[doc_x].path）、empty/absolute/Windows drive/backslash/outside root/nested outside、valid 返回 Path、嵌套子目录/dot 留 root/dotdot 留 root/resolved 无 ./
+- **DocumentEntry frozen**：is_dataclass/frozen setattr raises/10 字段/字段名集合（doc_id/path_str/resolved_path/source_type/sha256/categories/paired_with/annotation_file_str/annotation_resolved/expectations）/equality/hashable/默认值
+- **ExpectedFailure frozen**：is_dataclass/frozen/5 字段/source_type default None/equality/hashable
+- **Manifest frozen + properties**：is_dataclass/frozen/5 字段/file_count empty/3、pdf_count/docx_count/other source_type、content_group_count empty/all-unpaired/双向 pair/单向 pair/self pair/混合/两 disjoint pair/三 chain（不同 frozenset 不合并）、categories_covered empty/single/dedup/sorted/unicode/empty tuple
+- **load_manifest 完整路径**：file not exists/invalid JSON/manifest_version mismatch（monkeypatch validate 跳过 schema）、empty documents/empty EF、one document/categories/paired_with/sha256/annotation_file/expectations、EF source_type 有/无、path outside root/absolute/backslash 各 raise、project_root explicit str、manifest_path as str
+- **_detect_project_root**：from file in root/from nested file/no pyproject（需 file 存在）/directory input/first pyproject in chain
+- **模块结构**：__all__ == [ManifestError/Manifest/DocumentEntry/ExpectedFailure/load_manifest]、imports (json/dataclass/Path/Any/MANIFEST_VERSION/validate)、ManifestError issubclass Exception、各函数签名、callable
+- **idempotency**：_is_absolute_like/_has_backslash/_resolve_relative_path/load_manifest/DocumentEntry 同输入同输出
+- **综合行为**：full pipeline 3 docs + EF + categories + paired_with、properties after load
+
+### 撞墙记录
+- 15 fail（全部测试断言/schema 约束错）：
+  1. `test_document_entry_field_count`：误以为 9 字段，实际 10（漏数 expectations）
+  2. 13 个 load_manifest 测试用 `source_type: "text"`，schema enum 只允许 ["pdf", "docx"]；改用 pdf/docx + 相应后缀
+  3. `test_load_manifest_manifest_version_mismatch`：schema 有 `"const": "1.0"`，会先拒绝 "0.0.0"；monkeypatch validate 跳过 schema 才能测后续 version check
+  4. `test_detect_project_root_no_pyproject_returns_start`：file 不存在 → `cur.is_file()=False` → cur 不取 parent → 返回 file 路径本身而非 parent；先 write_text 让 file 存在
+- 修复后 0 fail
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 196 后）：16585 pass / 0 fail / 14 skip（HEAD `1a88ea9`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KI：app/parsers/ipynb_parser.py 第八轮（227 行 / ~1100 测试）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（136 行 / ~900 测试）
+- 候选 KL：app/models.py 第六轮（154 行 / ~800 测试）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1200 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KR：evaluation/report.py 第七轮（200 行 / ~900 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KU：app/schema.py 第七轮（230 行 / ~900 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KR（evaluation/report.py 第七轮）。report.py 是 evaluation/ 唯一未做 7th+ round 的核心模块（200 行 / ~4.5 tests/line），
+第七轮可深入 aggregate_summary macro average 算法、build_provenance git 信息 fallback、build_devset_section 完整字段、
+get_git_provenance 各 OSError 路径。
+
+---
