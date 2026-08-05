@@ -10959,3 +10959,62 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 bbox 聚合细节、_group_words_to_paragraphs 聚类阈值、_save_image 各错误路径、FallbackParser.parse 各状态。
 
 ---
+
+## Round 192（2026-08-05）：app/parsers/fallback_parser.py 第八轮（edges8）
+
+### 目标
+- 给 app/parsers/fallback_parser.py（630 行，已有 base/edges/edges2-7 共 942 测试，1.5 tests/line 当前最低）补第八轮
+- 直接单元测试模块级私有函数（_is_heading_style/_extract_inline_image_rids/_group_words_to_paragraphs/_lines_to_para/_classify_pdf_paragraph/_render_pdf_image_region_verbose/_image_filename/_save_image/_rows_to_markdown/_CAPTION_RE/_is_caption）
+- 深入 FallbackParser.__init__ 各输入路径
+
+### 改动
+- 新增 `tests/test_parsers_fallback_edges8.py`（193 测试 + 1 skip）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_heading_style 全分支**：Title → (True, 1)、Heading 1-9 → (True, N)、Heading 0/clamped、Heading -1/clamped、Heading no-level → (True, 1)、Heading5 (no space after) → (True, 5)、heading lowercase、HEADING uppercase、garbage suffix → (False, 0)、tab separator、empty string → (False, 0)、None → (False, 0)
+- **_extract_inline_image_rids**：mock FakeBlip/FakeDrawing/FakeXML classes、no blip → []、single blip → [rId1]、multiple blips、blip embed missing r:embed → skip、empty drawings → []
+- **_group_words_to_paragraphs 聚类**：单段（y gap < 3.0 * median_h）、两段（y gap > 1.5 * median_h）、空 list → []、单 word、sorting by y_center then x0、x0 顺序不影响段内
+- **_lines_to_para bbox**：min/max aggregation、missing top → default 0.0、missing bottom → default 0.0、单 line、多 line bbox 包含
+- **_classify_pdf_paragraph 边界**：caption 优先级（starts_with 图/表/Fig/Figure/Table 匹配 _CAPTION_RE）、80 char 不算 short（→ paragraph）、81 char 短 caption、所有 terminators（。/！/？/./!?/!/?）、纯数字短 → caption？还是 short heading
+- **_render_pdf_image_region_verbose unavailable**：pypdfium2 已安装则 skip、unavailable → 返回 str 含 "pypdfium2"
+- **_image_filename**：index 0 → "000"、index 5 → "005"、index 50 → "050"、index 999 → "999"、index 1000 → "1000"（4 digits）、no doc- prefix、3-digit zero-padded
+- **_save_image**：overwrite 已存在文件、custom extension、path 不存在父目录 → 创建、None image 返回错误字符串
+- **_rows_to_markdown**：2x2、1x1、None cell → ""、int cell → str(int)、uneven row lengths、单 row、separator | 包围
+- **FallbackParser.__init__**：Path 输入、str 输入（转 Path）、empty str → Path(".")、None image_output_dir → None、tmp_dir 路径、version 常量
+- **_CAPTION_RE 实际匹配**：图 1 / 图1 / Fig. 1 / Figure 1 / Table 1 / 表 1、separator 空格/无空格、case-insensitive
+- **_is_caption**：直接测试、短文本不长 caption、长文本含关键字 → True
+- **模块结构**：__all__=["FallbackParser"]、imports、try/except pypdfium2 ImportError、docstring 含 PDF/DOCX/fallback、version 常量
+- **内部函数存在性**：_is_heading_style/_extract_inline_image_rids/_group_words_to_paragraphs/_lines_to_para/_classify_pdf_paragraph/_render_pdf_image_region_verbose/_image_filename/_save_image/_rows_to_markdown/_CAPTION_RE/_is_caption/_parse_pdf/_parse_docx/FallbackParser
+
+### 撞墙记录
+- 0 fail：第一次跑全过（193 passed + 1 skipped: pypdfium2 已安装，跳过 unavailable 路径）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 192 后）：16038 pass / 0 fail / 14 skip（HEAD `c3a35cb`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KI：app/parsers/ipynb_parser.py 第八轮（227 行 / ~1037 测试 = 4.6）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（136 行 / ~829 测试 = 6.1）
+- 候选 KL：app/models.py 第六轮（154 行 / ~747 测试 = 4.9）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1136 测试 = 3.5）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1115 测试 = 5.2）
+- 候选 KO：evaluation/runner.py 第八轮（227 行 / ~828 测试 = 3.6）
+- 候选 KP：evaluation/cli.py 第八轮（243 行 / ~857 测试 = 3.5）
+- 候选 KQ：evaluation/metrics.py 第八轮（381 行 / ~1296 测试 = 3.4）
+- 候选 KR：evaluation/report.py 第七轮（200 行 / ~862 测试 = 4.3）
+- 候选 KS：evaluation/manifest.py 第八轮（239 行 / ~1014 测试 = 4.2）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1420 测试 = 3.7）
+- 候选 KU：app/schema.py 第七轮（230 行 / ~836 测试 = 3.6）
+- 候选 KV：app/chunkers/base.py 第六轮（仍饱和）
+- 候选 KW：app/hash_utils.py 第六轮（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KQ（evaluation/metrics.py 第八轮）。metrics.py 是当前测试密度最低的 evaluation/ 文件（3.4），
+381 行有 8 类指标（element_count/type/text_preservation/silent_drop/figure_caption/chunk_boundary/
+coverage/completeness），第八轮可深入 Counter multisector 边界、divisor=0 reason、ratio macro average、
+silent_drop_count manifest expectations 缺失场景。
+
+---
