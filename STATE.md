@@ -13029,3 +13029,50 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE（evaluation/annotation_metrics.py 第十二轮）继续推 evaluation 大文件。
 
 ---
+## Round 234 — evaluation/annotation_metrics.py 第十二轮（81 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第十二轮 edges 测试，覆盖 anchor 元素类型、chunks/anchors None 表现为空、各分支 dict 插入顺序、_missing_markers 结构、空 marker、空 chunk、tolerance_chars 浮点、module __all__ 顺序、函数 docstring 关键词、f1 各路径、签名精确
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges12.py`（81 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **anchor 元素类型**：anchor 是 None/str/int/list/tuple/set 触发 AttributeError；anchor list 第 2 个 None 也抛
+- **chunks/chunk_boundary_anchors = None**：通过 `or []` 走空 list 分支
+- **dict 插入顺序精确**：doc=None/annotation 空/0 chunks/无 anchors/成功无 missing/成功有 missing 共 6 个分支验证 keys 顺序
+- **figure_caption_prf dict 插入顺序**：3 keys 顺序
+- **_missing_markers**：value 是 list；reason 永远 None；多 missing 顺序保留；全 missing 时 recall null
+- **空 marker**：空字符串 + before/after 都进 missing；空 dict anchor → marker="" → missing
+- **predicted boundaries 数量**：2 chunks→1, 3 chunks→2, 4 chunks→3
+- **空 chunk**：第 1 个 chunk 空 → predicted boundary at 0；中间 chunk 空 → predicted boundary at prev end
+- **tolerance_chars**：浮点保留；0 边界不匹配距离 1；1 边界匹配距离 1；所有路径都透传
+- **module __all__**：顺序精确（PARSER_DOES_NOT_EMIT_RELATIONS, figure_caption_prf, chunk_boundary_prf）
+- **module 命名空间**：Counter/_null/_ratio/normalize_text/Any 都在
+- **函数 docstring**：figure_caption_prf 含 null/caption；chunk_boundary_prf 含 normalize/tolerance/precision/recall/anchor/Args
+- **f1 路径**：完全匹配 1.0；半匹配公式；零匹配 denom=0 → 0.0；recall null → f1 null(precision_or_recall_not_evaluated)
+- **一对一约束**：两 anchor 同 marker → 第 2 个 missing；2 predicted + 1 anchor → precision=0.5
+- **签名**：3 参数 + 默认值；2 参数 figure_caption_prf 无默认值
+
+### 撞墙记录
+- 1 fail（修复）：
+  - test_figure_caption_prf_docstring_mentions_caption：以为 docstring 含英文 "caption"；实际是中文 "图表关联" → 改成接受中文 "关联" 或英文 "caption"
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 234 后）：20507 pass / 0 fail / 15 skip（HEAD `fa8f31f`）
+
+### 下一步建议
+- 候选 KF：evaluation/metrics.py 第十二轮（381 行）
+- 候选 KW：evaluation/report.py 第十三轮（200 行）
+- 候选 KX：evaluation/cli.py 第十四轮（243 行）
+- 候选 KS：evaluation/runner.py 第十四轮（227 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 候选 KT2：evaluation/manifest.py 第十四轮（239 行）
+- 候选 KE2：evaluation/annotation_metrics.py 第十三轮（194 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KF（evaluation/metrics.py 第十二轮）继续推 evaluation 最大文件。
+
+---
