@@ -11242,3 +11242,61 @@ manifest 路径校验、warning 累积逻辑、image 输出目录处理。
 get_git_provenance 各 OSError 路径。
 
 ---
+
+## Round 197（2026-08-05）：evaluation/report.py 第七轮（edges7）
+
+### 目标
+- 给 evaluation/report.py（200 行，已有 base/edges/edges2-6 共 669 测试）补第七轮
+- 深入 _RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 常量内容
+- get_git_provenance 各 subprocess 失败路径（timeout/OSError/SubprocessError/non-zero return/empty stdout）
+- get_dependency_versions importlib.metadata 各 PackageNotFoundError 路径
+- build_provenance 9 字段集 + max_chars int 强制
+- aggregate_summary 完整路径（empty/all-fail/mixed/silent drop）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges7.py`（94 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量内容**：_COUNT_METRICS == ('element_count_total',)、_SUCCESS_BOOL_METRICS == ('pipeline_success',)、_RATIO_METRICS 12 项（schema_valid + 8 ratio + chunk_boundary_{precision,recall,f1}）、排除 figure_caption_/element_count_total/silent_drop_count/pipeline_success、tuple 类型
+- **get_git_provenance**：两 keys（git_commit/git_dirty）、真实仓库有 commit、非 git 目录 commit=None dirty=False（subprocess 不抛异常只 non-zero returncode → bool(False and ...)）、OSError safe、SubprocessError safe、TimeoutExpired safe、non-zero returncode 无 commit、empty stdout 无 commit、strip whitespace、porcelain 非空 dirty=True、porcelain 空 dirty=False、status fails dirty=False
+- **get_dependency_versions**：3 keys（pdfplumber/python-docx/pypdfium2）、开发环境都装了、PackageNotFoundError → None、generic Exception → None、部分找到部分未
+- **build_provenance**：9 keys（git_commit/git_dirty/evaluator_version/report_version/parser_name/parser_version/dependencies/max_chars/run_timestamp_iso）、EVALUATOR_VERSION/REPORT_VERSION 常量、parser_name/version 透传、parser_version None、max_chars int 强制（float 截断/str 数字接受/str 字母 ValueError）、timestamp ISO 格式合法且接近 now、dependencies 是 dict
+- **build_devset_section**：6 keys（status/file_count/content_group_count/pdf_count/docx_count/categories_covered）、各字段透传、empty categories、complete status、调用 properties（非字段直接访问）
+- **aggregate_summary**：empty 返回 4 keys（counts/success_rates/ratio_macro_averages/silent_drop_total）、各 empty 子结构、单 doc 所有 metric、count 求和（含 skip None）、success_rate（含 rate 计算 + zero division safe + True strict）、ratio macro average（含 skip None + not_evaluated）、silent_drop_total（含 skip None + all None）、metrics 空 dict 安全、metrics 完全缺失抛 KeyError
+- **模块结构**：__all__ 5 项、imports (subprocess/datetime/Path/Any/EVALUATOR_VERSION/REPORT_VERSION)、各函数签名、return annotation 含 dict、所有 callable
+- **idempotency**：get_dependency_versions/aggregate_summary/build_devset_section 重复一致
+- **综合行为**：full pipeline 3 docs aggregate、build_provenance 真实仓库跑、metrics 空值处理
+
+### 撞墙记录
+- 4 fail（全部测试断言错）：
+  1. `test_get_git_provenance_non_git_directory`：误以为非 git 目录 dirty=True；实际 subprocess 不抛异常只返回非零 code，bool(False and ...) = False
+  2. `test_get_git_provenance_dirty_when_status_fails`：同上，returncode != 0 时 short-circuit False
+  3. `test_build_provenance_max_chars_str_int_coercion`：误以为 int("800") 抛 ValueError；实际 str 数字可被 int() 解析；改用 "abc"
+  4. `test_aggregate_summary_metrics_key_missing`：误以为 aggregate_summary 用 .get(metrics, {})；实际直接 r["metrics"]；改为 expect KeyError + 单独测 metrics={}
+- 修复后 0 fail
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 197 后）：16679 pass / 0 fail / 14 skip（HEAD `4fc069f`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KI：app/parsers/ipynb_parser.py 第八轮（227 行 / ~1100 测试）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（136 行 / ~900 测试）
+- 候选 KL：app/models.py 第六轮（154 行 / ~800 测试）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1200 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KU：app/schema.py 第七轮（230 行 / ~900 测试）
+- 候选 KV：app/chunkers/base.py 第六轮（仍饱和）
+- 候选 KW：app/hash_utils.py 第六轮（仍饱和）
+- 候选 KX：evaluation/schema_validation.py 第六轮（仍饱和）
+- 候选 KY：evaluation/annotation_metrics.py 第六轮（仍饱和）
+- 候选 KZ：evaluation/schema.py 第七轮（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KI（app/parsers/ipynb_parser.py 第八轮）。ipynb_parser.py 是当前未做 8th+ round 的最低密度 parser（227 行 / ~4.6 tests/line），
+第八轮可深入 cell_index/cell_type/line locator、code/markdown/raw cell 分类、nbformat 各版本兼容、JSON 结构错误处理。
+
+---
