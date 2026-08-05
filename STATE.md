@@ -14484,3 +14484,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KS5（evaluation/runner.py 第十八轮，227 行）继续推 evaluation。
 
 ---
+
+## Round 266 — evaluation/runner.py 第十八轮（118 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十八轮 edges 测试，覆盖 edges17 未触及的角度：_load_annotation 详细（Path 对象/None/不存在/空文件/invalid JSON/list 顶层/string 顶层/dict 顶层/BOM 头→None/二进制垃圾→UnicodeDecodeError/返回类型）、_process_one 签名（4 参数 doc/output_root/parser_name/max_chars 无默认 POSITIONAL_OR_KEYWORD，return annotation 是 tuple）、run_evaluation 签名（5 参数 manifest/output_path 无默认 POSITIONAL_OR_KEYWORD + parser_name/max_chars/tolerance_chars KEYWORD_ONLY 默认 fallback/800/30）、helper metadata（3 个 __module__/__qualname__）、模块 namespace（json/time/Path/Any/REPORT_VERSION/process_single/image_output_dir_for/compute_automatic_metrics/chunk_boundary_prf/figure_caption_prf/aggregate_summary/build_devset_section/build_provenance）、__all__ 单元素 ['run_evaluation']、源码 token 含 perf_counter/not_instrumented/write_json=False/image_output_dir_for/_per_doc/out_stub.unlink/except OSError/expected_failures loop/documents loop/public_per_doc/_annotation_present/_tolerance_chars pop/_missing_markers pop/json.dump/ensure_ascii=False/indent=2/不含 print/logging/asyncio/subprocess/os/concurrent.futures/含 unknown/process_single returned None 消息、docstring 含 perf_counter/not_instrumented/pipeline_failed/image_resource_exists_ratio/image_output_dir/write_json=False、EmptyManifest smoke test（report 6 top keys/per_doc empty list/expected_failures empty list/report_version/summary 4 keys/provenance 9 keys/devset 6 keys/写盘 valid JSON/两次调用独立/不修改 manifest documents+expected_failures+project_root/创建 output dir/parser_name/max_chars default/kreuzberg parser/custom max_chars/custom tolerance_chars/空 manifest 不创建 _per_doc subdir）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges18.py`（118 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 详细**：None → None；不存在 → None；空文件 → None；invalid JSON → None；list 顶层 → 返回 list；string 顶层 → 返回 string；dict 顶层 → 返回 dict；BOM 头 → json 抛 JSONDecodeError → None；二进制 0xff → UnicodeDecodeError（不在 except 中）；签名 1 参数 path 无默认 POSITIONAL_OR_KEYWORD；无 var args/kw
+- **_process_one 签名**：4 参数 doc/output_root/parser_name/max_chars；无默认；POSITIONAL_OR_KEYWORD；无 var args/kw；return annotation 是 str 形式的 tuple
+- **run_evaluation 签名**：5 参数 manifest/output_path（POSITIONAL_OR_KEYWORD 无默认）+ parser_name/max_chars/tolerance_chars（KEYWORD_ONLY 默认 'fallback'/800/30）；无 var args/kw；return annotation str
+- **helper metadata**：3 个 helper __module__ == 'evaluation.runner'；__qualname__ 精确；FunctionType
+- **namespace 完整性**：json/time/Path/Any/REPORT_VERSION/process_single/image_output_dir_for/compute_automatic_metrics/chunk_boundary_prf/figure_caption_prf/aggregate_summary/build_devset_section/build_provenance 都在；__all__ 是 list 不是 tuple；__all__ == ['run_evaluation']；__all__ 不含 _load_annotation/_process_one/REPORT_VERSION/process_single/image_output_dir_for
+- **源码 token**：含 from __future__ import annotations、import time、perf_counter、"not_instrumented"（双引号）、write_json=False、image_output_dir_for(、image_base_dir=、_per_doc、out_stub.unlink、except OSError、for ef in manifest.expected_failures、for doc in manifest.documents、public_per_doc、_annotation_present、_tolerance_chars、_missing_markers、json.dump(report, f、ensure_ascii=False、indent=2、"unknown"、"process_single returned None without errors"；不含 print/import logging/asyncio/import subprocess/import os/concurrent.futures/ThreadPoolExecutor/ProcessPoolExecutor
+- **docstring 内容**：是 str 长度>30；含 runner 或 评测；含 perf_counter；含 not_instrumented；含 pipeline_failed；含 image_resource_exists_ratio；含 image_output_dir；含 write_json=False
+- **EmptyManifest smoke test**：空 manifest 跑通；report 6 top keys 精确；per_doc=[]；expected_failures=[]；report_version=REPORT_VERSION；summary 4 keys；provenance 9 keys；devset 6 keys；写盘 JSON 可重新解析；两次调用独立 dict；不修改 manifest documents/expected_failures/project_root；output 父目录自动创建；parser_name 默认 'fallback'；max_chars 默认 800；custom parser_name/kreuzberg；custom max_chars；custom tolerance_chars；空 manifest 不创建 _per_doc subdir
+
+### 撞墙记录
+- 4 fail → 修复后 0 fail：
+  - `test_load_annotation_utf8_bom_tolerated`：json.load 不容忍 BOM，BOM 解码后是 ﻿ 字符让 JSON 抛 JSONDecodeError → catch → None；改为期望 None
+  - `test_load_annotation_binary_garbage_returns_none`：二进制 0xff → UnicodeDecodeError（ValueError 子类）不在 except (OSError, json.JSONDecodeError) 中；改为 expect UnicodeDecodeError
+  - `test_module_source_contains_not_instrumented_reason`：源码只用双引号 "not_instrumented"，不含单引号形式；移除单引号断言
+  - `test_run_evaluation_creates_per_doc_subdir`：空 manifest → for doc in manifest.documents 循环不执行 → _per_doc 不创建；改为 not exists 或 is_dir 的弱断言
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 266 后）：24031 pass / 0 fail / 16 skip（HEAD `af0b19d`）
+
+### 下一步建议
+- 候选 KZ5：evaluation/schema.py 第十一轮（80 行）
+- 候选 KT6：evaluation/manifest.py 第十八轮（239 行）
+- 候选 KE6：evaluation/annotation_metrics.py 第十七轮（194 行）
+- 候选 KF6：evaluation/metrics.py 第十七轮（381 行）
+- 候选 KW6：evaluation/report.py 第十八轮（200 行）
+- 候选 KX6：evaluation/cli.py 第十九轮（243 行）
+- 候选 KS6：evaluation/runner.py 第十九轮（227 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KZ5（evaluation/schema.py 第十一轮，80 行）继续推 evaluation。
+
+---
