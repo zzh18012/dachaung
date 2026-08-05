@@ -12681,3 +12681,51 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KT（evaluation/manifest.py 第十二轮）继续推 evaluation 大文件。
 
 ---
+## Round 226 — evaluation/manifest.py 第十二轮（122 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十二轮 edges 测试，覆盖 _is_absolute_like/_has_backslash 边界、_resolve_relative_path 错误消息、load_manifest str/Path 输入、Manifest properties
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges12.py`（122 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 深度**：bytes/None/int 输入行为；digit/underscore/dot/dash 不是字母；3-char 边界（含 separator 与不含）；lowercase/uppercase alpha；double slash network path（False）；Unicode alpha drive；返回 bool；相对路径/纯文件名/./.gitignore/../foo 都是 False
+- **_has_backslash 深度**：bytes/None 输入 TypeError；empty/only backslash/at start/middle/end/multiple/forward slash only/mixed 都正确判定；返回 bool
+- **_resolve_relative_path 深度**：field_name 出现在 4 种错误消息中（empty/absolute/backslash/outside_root）；返回 Path 对象；resolved 是 absolute；result 在 project_root 内；subdirectory parent 链；explicit ./ 前缀；double slash 折叠；返回 existing file 的 is_file() True；project_root 是 file 时 Path 拼接按 component 工作（不抛错）
+- **load_manifest 深度**：str/Path 双向接受（manifest_path & project_root 都测）；missing file/directory/invalid JSON/empty file 都抛 ManifestError；empty documents/expected_failures 都返回空 tuple；docs + efs 共存；6 个 round-trip（resolved_path/path_str/source_type/categories/paired_with/sha256/annotation_file/expectations）；expected_failure 含/不含 source_type
+- **Manifest properties 深度**：source_type='unknown' 既不算 pdf 也不算 docx；pdf+docx+unknown 混合；categories_covered 每次 new list；case sensitive 排序；空 docs/categories；file_count == len(documents)；5 个 properties 都是 property（不需调用）
+- **dataclass frozen**：Manifest/DocumentEntry/ExpectedFailure 都触发 FrozenInstanceError；replace() 保留其他字段
+- **_detect_project_root 深度**：返回 Path 对象；is_absolute；只有 .git 不识别（只看 pyproject.toml）；多层目录中找最近；signature (start,)
+- **模块结构**：6 个 imports；__all__ exact 5 个名字；__all__ 不含 internal helpers；docstring 提及 invariants；future annotations；ManifestError 是 Exception 子类、不是 RuntimeError 子类；ManifestError init 多种 args 形式
+- **签名**：load_manifest(manifest_path, project_root=None)；_is_absolute_like(path_str)；_has_backslash(path_str)；_resolve_relative_path(path_str, project_root, field_name) - field_name 无默认
+- **综合**：完整 round-trip（2 docs + 2 efs + annotation + expectations + paired_with + sha256 + categories）；3 个 dataclass 字段数（DocumentEntry=10, ExpectedFailure=5, Manifest=5）
+
+### 撞墙记录
+- 14 fail（修复）：
+  - `_is_absolute_like(None)`：误以为抛 TypeError；实际 `if not path_str: return False` 命中（None falsy）→ 改为 expect False
+  - `_is_absolute_like(123)`：误以为抛 TypeError；实际 int 没有 .startswith → AttributeError
+  - `_resolve_relative_path_subdirectory`：parent 链数错（sub/dir/foo.txt 的 parent.parent.parent 才是 root）
+  - `_resolve_relative_path_project_root_can_be_file_parent`：误以为抛 ManifestError；实际 Path 拼接按 component 工作（marker.txt/sub.txt.relative_to(marker.txt) = sub.txt 成功）→ 改为 expect 不抛错
+  - 10 个 load_manifest round-trip 用 source_type='text'（schema enum 只允许 pdf/docx）→ 改为 'pdf'/'docx'；sha256 "x" * 64 是 x 不是 hex → 改为 "a" * 64
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 226 后）：19836 pass / 0 fail / 15 skip（HEAD `8f9b778`）
+
+### 下一步建议
+- 候选 KE：evaluation/annotation_metrics.py 第十一轮（194 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KW：evaluation/report.py 第十二轮（200 行）
+- 候选 KX：evaluation/cli.py 第十三轮（243 行）
+- 候选 KS：evaluation/runner.py 第十三轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十三轮（239 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行 — 已饱和）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行 — 已饱和）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KE（evaluation/annotation_metrics.py 第十一轮）继续推 evaluation 大文件。
+
+---
