@@ -10495,3 +10495,52 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 **建议**：选 IW（app/cli.py 第八轮）。cli.py 是命令行入口，第八轮可深入各子命令错误路径、argparse 行为、退出码细节。
 
 ---
+
+
+## Round 183（2026-08-05）：app/cli.py 第七轮（edges7）
+
+### 目标
+- 给 app/cli.py（535 行，已有 base/edges/edges2-6 共 747 测试）补第七轮
+- 深入 _preview 边界、_load_document_json 错误路径、_format_* 显示规则、main() 错误码
+
+### 改动
+- 新增 `tests/test_cli_edges7.py`（153 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_preview 深度**：None/empty/whitespace 输入、空白归一（多空格/newline/tab/mixed）、CJK 文本宽度按 1 计、width=0/1 边界、width 巨大不切
+- **_load_document_json 深度**：BOM 在 utf-8 下失败、empty 文件、顶层 list/string 合法、返回 tuple 结构
+- **_format_summary 深度**：缺各 key 用 ? 占位、warnings/errors 超 5 截断、elements 按 type 计数、hash 前 16+…、无 warnings/errors 不显示该段
+- **_format_elements_list 深度**：limit<=0 全列、limit 超过显示 +N more、parent_id 显示规则、preview 长内容截断
+- **_format_chunks_list 深度**：show_spans=True 且 spans=[] 显示 (none)、spans 缺 key 也显示 (none)、text=None 当 0 处理
+- **_iter_supported_files 深度**：目录即使带支持后缀也过滤、unsupported 后缀过滤、recursive 包含子目录、大写/混合大小写后缀
+- **_relative_output_path 深度**：嵌套子目录、suffix 保留到文件名、Windows 反斜杠 normalize
+- **_build_arg_parser 深度**：各子命令必填参数缺失 exit 2、各 default 值、unknown command/parser exit 2
+- **_emit_structured_error 深度**：复杂 nested dict extra、code/message 总在、input 序列化为 str、indent=2、无 extra 时只有 code/message
+- **_infer_parser_name 全 9 后缀**：各后缀 → 各 parser、未知 → fallback、无后缀 → fallback、大写/混合大小写
+- **main() 错误路径**：validate missing file exit 2、inspect missing file exit 2、inspect invalid json exit 1、inspect top-level list exit 1、valid doc inspect exit 0、valid doc validate exit 0、invalid doc validate exit 1
+- **main() inspect 各 flag**：--elements、--chunks、--spans、--limit
+- **_run_parse / _run_parse_dir**：missing input exit 1、missing dir exit 2、empty dir exit 0+warn、summary 写盘 schema_version/max_chars/recursive/parser_override/files
+- **_run_parse_dir 单 txt 文件**：success=1 failure=0
+- **模块结构**：所有 _ 前缀 helper 都 callable、_EXTENSION_TO_PARSER 9 项精确
+
+### 撞墙记录
+- 初版 1 处 fail：UTF-8 BOM 在 encoding='utf-8' 下不被剥离，导致 JSON 解析失败。改测试期望失败。
+  （如要支持 BOM 需 encoding='utf-8-sig'，但 cli 用的 'utf-8'，故 BOM 是错误输入。）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 183 后）：14845 pass / 0 fail / 13 skip（HEAD `58241c9`）
+
+### 下一步建议
+- 候选 JG：app/parsers/markdown.py 第七轮
+- 候选 JH：app/parsers/html.py 第七轮
+- 候选 JI：app/parsers/ipynb.py 第七轮
+- 候选 JJ：app/parsers/fallback.py 第七轮
+- 候选 JK：app/models.py 第六轮（如还有 gap）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 JG（app/parsers/markdown.py 第七轮）。markdown parser 是常用入口，
+第七轮可深入 heading 层级识别、code block 处理、list 嵌套、inline format 提取等。
+
+---
