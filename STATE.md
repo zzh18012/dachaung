@@ -14125,3 +14125,45 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KX4（evaluation/cli.py 第十七轮，243 行）继续推 evaluation。
 
 ---
+## Round 258 — evaluation/cli.py 第十七轮（142 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第十七轮 edges 测试，覆盖未覆盖的源码 token（5 个 import + add_subparsers/required=True/prog/description/RawDescriptionHelpFormatter + 3 个子命令名 + 4 个函数 def + if __name__/raise SystemExit + stdout/stderr reconfigure + utf-8/errors='replace' + 4 个 import 子句 + 3 个 args.command 分支 + return 2）、模块 docstring 内容、模块 namespace 完整性（argparse/json/sys/Path identity + 顶层 imports）、函数 metadata（4 个函数 module/qualname + 签名 introspection）、_build_parser 详细（3 subparser actions count + dests + choices + defaults + types + subparser required/dest/choices keys + prog/description/formatter_class）、_format_metric 边界（int/bool/None/dict 排序/empty dict/negative/large int/zero/no reason ok）、_run_inspect_doc 排序与缺字段（缺 source_type/elements/chunks/document_id/source_path/parser_name 各 fallback、None raises TypeError、tolerance_chars 透传）、main 函数错误路径（unknown command/no args/missing manifest/directory manifest/invalid JSON/validate-report 各路径）、模块顶层 reconfigure 行为
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges17.py`（142 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码 token**：4 个 import + 5 个 from-import + 4 个函数 def + 3 个子命令名 + prog/description/required/RawDescriptionHelpFormatter + args.command 三分支 + raise SystemExit + stdout/stderr reconfigure + utf-8/'replace' + if __name__ + return 2
+- **模块 docstring**：是 str 长度>30；含 run/validate-report/inspect-doc；含 sanity check 或 单文档
+- **namespace identity**：argparse/json/sys/Path 是 identity；main/_build_parser/_format_metric/_run_inspect_doc 在 namespace；load_manifest/ManifestError/EvalSchemaError/validate_file/run_evaluation/get_git_provenance 在 namespace；模块无 __all__
+- **函数 metadata**：main argv 参数 default None + POSITIONAL_OR_KEYWORD + return 'int'；_build_parser 0 参数；_format_metric 2 参数 name+metric；_run_inspect_doc 1 参数 args；都 FunctionType；都无 var args/kw
+- **_build_parser 详细**：返回 ArgumentParser；prog='evaluation.cli'；description 非空；formatter_class=RawDescriptionHelpFormatter；顶层 1 个 non-help action（command subparser）；subparser dest='command' + required=True + 3 个 choices keys；run subparser 5 args（manifest/output/parser/max_chars/tolerance_chars）+ parser choices=('fallback','kreuzberg') default 'fallback' + max_chars type int default 800 + tolerance_chars type int default 30；validate-report 1 个 positional arg；inspect-doc 2 个 args + tolerance_chars default 30
+- **_format_metric 边界**：返回 str；含 name；float 4 位小数；int 直接渲染（不格式化为 .0000）；bool True/False 小写；None value 渲染 null+reason；dict value 渲染 items 并按 key 排序；empty dict 仍渲染 (ok)；string value 渲染；0/0.0 正确渲染（不视为 None）；无 reason 时 float/bool/dict/int/str 都用 'ok'；negative float 渲染；large int 渲染
+- **_run_inspect_doc 缺字段**：缺 source_type → 用 'unknown'；缺 elements/chunks → 用 []; 缺 document_id/source_path/parser_name → 用 '?'；elements+chunks 数量正确；排序 bool 优先；tolerance_chars 透传；None elements → TypeError（已知未处理边界）；未知字段不抛错
+- **main 错误路径**：unknown command/no args → SystemExit(2)；validate-report 文件不存在 → rc 2；非 JSON → rc 1；list JSON → rc 1；empty {} → rc 1；inspect-doc 文件不存在 → rc 2；非 JSON → rc 1；run manifest 不存在 → rc 2；manifest 是目录 → rc 2；manifest 非法 JSON → rc 1
+- **整体一致性**：模块可 import；main 可调用；argparse/_SubParsersAction introspection
+
+### 撞墙记录
+- 2 fail → 修复后 0 fail：
+  - `test_build_parser_run_subparser_actions_count`：run subparser 实际有 5 个 args（manifest/output/parser/max_chars/tolerance_chars）不是 4，改期望
+  - `test_run_inspect_doc_handles_none_elements_field`：inspect-doc 不 None-safe（compute_automatic_metrics 在 len(None) 时抛 TypeError），改测期望 TypeError
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 258 后）：22948 pass / 0 fail / 16 skip（HEAD `07e9cbf`）
+
+### 下一步建议
+- 候选 KS4：evaluation/runner.py 第十七轮（227 行）
+- 候选 KZ4：evaluation/schema.py 第十轮（80 行）
+- 候选 KT5：evaluation/manifest.py 第十七轮（239 行）
+- 候选 KE5：evaluation/annotation_metrics.py 第十六轮（194 行）
+- 候选 KF5：evaluation/metrics.py 第十六轮（381 行）
+- 候选 KW5：evaluation/report.py 第十七轮（200 行）
+- 候选 KX5：evaluation/cli.py 第十八轮（243 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS4（evaluation/runner.py 第十七轮，227 行）继续推 evaluation。
+
+---
