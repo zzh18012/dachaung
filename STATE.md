@@ -10784,3 +10784,56 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 是所有 parser 的基础，第六轮可深入 detect_source_type 各路径、ParserError 字段、make_document_id 校验。
 
 ---
+
+## Round 189（2026-08-05）：app/parsers/kreuzberg_parser.py 第七轮（edges7）
+
+### 目标
+- 给 app/parsers/kreuzberg_parser.py（245 行，已有 base/edges/edges2-6 共 803 测试）补第七轮
+- 深入 _HEADING_RE 实际匹配、_classify_line 标点边界、_split_content_to_elements 多 block 行为、_make_locator 源类型矩阵
+
+### 改动
+- 新增 `tests/test_parsers_kreuzberg_edges7.py`（185 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_HEADING_RE 实际匹配**：match/search/fullmatch 返回 Match/None、group(0)/group(1) 类型、capture group 边界（excludes leading whitespace、includes trailing hashes）、量词字符（{1,6}/.*?/\S）出现在 pattern 源码、6 # 上限、7 # 不匹配、hash+space 必须组合
+- **_classify_line 实际行为**：ATX 各 level（1-6）单独覆盖、7 # 退化为 short_line heading、标点 endswith（中间标点不算 terminator，只看末尾）、混合标点（`Hello!World.`）/单字符/单数字、ATX meta 仅含 level+raw_text（无 heuristic）、short_line meta 含 level=0/heuristic=short_line/raw_text
+- **_split_content_to_elements 深度**：element_id 格式 `<doc_id>::e<NNNN>`（4 位 0-padded）、双位数（10/100 blocks）编号、heading+body 同 block 拆 2 element、whitespace-only rest 不加 paragraph、连续 heading 共享 para_idx、heading 在 pdf 用 page=1 locator、block 第一行决定类型、内部换行保留（长第一行触发 paragraph 时）
+- **_make_locator 源类型矩阵**：pdf keys={page, _kreuzberg_placeholder}、docx keys={paragraph_index, _kreuzberg_heuristic}、text/markdown/html/ipynb/unknown 都走 docx-like 分支、pdf page 恒 1、负数 idx 透传、fresh dict each call
+- **_SHORT_LINE_MAX**：值 80、int 类型、用于 _classify_line 阈值（80 heading / 81 paragraph）
+- **KreuzbergParser 类属性**：name/version class attr（instance 一致）、继承 Parser、__init__ keyword-only include_document_structure=True 默认、_include_document_structure 私有、positional arg 报 TypeError、两 instance 独立、__dict__ keys 精确（name/version/parse/__init__）、__mro__ 含 Parser、__module__ 正确、parse 签名 (self, path, source_hash)
+- **模块级常量**：_KREUZBERG_AVAILABLE（bool）、_KREUZBERG_VERSION（None or str）、_SHORT_LINE_MAX（int 80）、_HEADING_RE（re.Pattern）、try/except ImportError 块结构
+- **模块 docstring**：含 kreuzberg/4.10.2/elements/warnings/业务隔离说明
+- **一致性**：classify_line 与 split_content_to_elements 判定一致（ATX heading/paragraph/short_line 三类）、block 第一行决定整块类型
+
+### 撞墙记录
+- 初版 9 fail + 2 SyntaxWarning：
+  1-4. _classify_line 的 endswith 检查只看末尾，"a.b"/"a?b"/"a!b" 中间标点不触发 paragraph → 实际是 short_line heading（修正断言）
+  5. ATX with only punctuation 的 meta 检查写成 `meta["heuristic"] not in meta`，应直接 `"heuristic" not in meta`
+  6-8. split_content "hello"/"hello world" 是短文本无 terminator → heading（confidence 0.6 + short_line meta），不是 paragraph → 改用 100-char 长文本触发 paragraph
+  9. "line1\nline2" 第一行短 → heading，整块 content 是 raw_text "line1"，无内部换行 → 改用长第一行触发 paragraph 保留内部换行
+  10-11. 测试函数 docstring 含 `\s`/`\S` 触发 SyntaxWarning → 改 `r"""..."""` raw docstring
+- 复发：第一次修文件时把 module docstring 重复粘贴，触发 SyntaxError U+FF08 → 删除重复段落
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 189 后）：15529 pass / 0 fail / 13 skip（HEAD `1cc7de6`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和，514 测试 / 94 行）
+- 候选 KG：app/parsers/markdown_parser.py 第八轮（base+edges1-7 共 943 测试 / 326 行）
+- 候选 KH：app/parsers/html_parser.py 第八轮（base+edges1-7 共 808 测试 / 446 行）
+- 候选 KI：app/parsers/ipynb_parser.py 第八轮（base+edges1-7 共 844 测试 / 227 行）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（base+edges1-7 共 636 测试 / 136 行）
+- 候选 KK：app/parsers/fallback_parser.py 第八轮（base+edges1-7 共 942 测试 / 630 行）
+- 候选 KL：app/models.py 第六轮（仍可挖，154 行 / 估计 600+ 测试）
+- 候选 KM：app/chunker_legacy.py 或 chunkers/__init__.py（如有）
+- 候选 KN：app/pipeline.py 第九轮（base+edges1-8 共 788 测试 / 216 行）
+- 候选 KO：evaluation/runner.py 第八轮
+- 候选 KP：evaluation/cli.py 第八轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KN（app/pipeline.py 第九轮）。pipeline.py 是整套数据流的入口，216 行已有 788 测试覆盖，
+第九轮可深入 schema_version 校验、parse 与 chunk 接缝、warnings 去重、error JSON 输出格式等深度边界。
+
+---
