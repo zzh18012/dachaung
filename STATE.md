@@ -10451,3 +10451,47 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第八轮可深入 heading 级别判定、source_element_ids 聚合、normalize_text 边界、空 chunk 处理。
 
 ---
+
+
+## Round 182（2026-08-05）：app/chunkers/structural.py 第八轮（edges8）
+
+### 目标
+- 给 app/chunkers/structural.py（388 行，已有 base/edges/edges2-7 共 939 测试）补第八轮
+- 深入 regex 实际拆分行为、_hard_split 边界、_split_long_text 累积、_ChunkBuffer 多 part 行为
+
+### 改动
+- 新增 `tests/test_chunker_edges8.py`（134 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_SENTENCE_SPLIT_RE 实际拆分**：需标点 + 空白才切（中文句号无空白不切）、各标点（中英文）、无标点不切、空串
+- **_WHITESPACE_RE 实际替换**：单空格/多空格/tab/newline/CRLF/mixed/无空白
+- **_hard_split_with_whitespace_fallback**：whitespace 在 upper/lower 边界、连续空白跳过、max_chars=32 最小、自然结尾 boundary_after=None、whitespace 切开后还有非空白时 boundary_after='whitespace'
+- **_split_long_text 累积与坐标**：累积超限 flush、mixed 长短句、坐标在 stripped text 系、forced_char 边界、保留 normalize 等价
+- **_ChunkBuffer 深度**：length 含 unicode、push_text 多 part、flush dedup 顺序与 span 数量、whitespace-only part 被 strip 后返回 None、dataclass 字段
+- **_SplitPiece 深度**：默认值、frozen setattr raises、equality、repr
+- **模块常量精确值**：_PART_TEXT=0/_PART_ELEMENT_ID=1/_PART_START=2/_PART_END=3、_HARD_BREAK_LANGS 含 6 个标点
+- **StructuralChunker.chunk 行为**：heading/table/image/caption/list_item/unknown 各路径、long_paragraph split、chunk_id 格式与递增、metadata strategy、不丢不重 normalize 验证
+- **_element_text_with_span 深度**：内部空白保留、tab/newline 边界、unicode 内容、image 返回空
+- **normalize_text 深度**：idempotent、unicode、falsy 输入
+- **模块结构**：__all__ 精确 2 项、imports 完整、docstring 提及 heading boundary/不修改/source_spans
+
+### 撞墙记录
+- 初版 3 处 fail：
+  1. _SENTENCE_SPLIT_RE 需 (?<=punct)\s+ 才切，中文句号无空白不切 → 改测试加空白
+  2. leading whitespace 无前置标点时不切 → 改测试期望
+  3. forced_char 硬切不补空白，破坏 normalize 等价 → 改测试用有空白的文本
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 182 后）：14692 pass / 0 fail / 13 skip（HEAD `09322ec`）
+
+### 下一步建议
+- 候选 IW：app/cli.py 第八轮（535 行 / 747 测试）
+- 候选 JE：app/parsers/text.py 第七轮（如还有 gap）
+- 候选 JF：app/parsers/fallback.py 第七轮（如还有 gap）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IW（app/cli.py 第八轮）。cli.py 是命令行入口，第八轮可深入各子命令错误路径、argparse 行为、退出码细节。
+
+---
