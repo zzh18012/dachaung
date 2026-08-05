@@ -13488,3 +13488,51 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KX2（evaluation/cli.py 第十五轮，243 行）继续推 evaluation。
 
 ---
+## Round 244 — evaluation/cli.py 第十五轮（66 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第十五轮 edges 测试，覆盖 _format_metric Counter/dict 特殊键/name unicode/emoji/dict 子类，_build_parser subparser choices 精确，_run_inspect_doc duck typing args，__name__=="__main__" 块，模块无 __all__，argparse 错误退出码
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges15.py`（66 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_format_metric Counter**：Counter（dict 子类）走 dict 分支；空 Counter；带 reason 的 Counter
+- **_format_metric dict 特殊键**：int 键 OK；tuple+str 混合 raises TypeError；int+str 混合 raises；None+str 混合 raises；纯 None/纯 int 键 OK
+- **_format_metric name 边界**：unicode；emoji；newline；tab 都按字面渲染
+- **_format_metric metric 类型**：dict 子类 OK；空 dict → null (None)
+- **_format_metric value 边界**：0.0 → 0.0000；-0.0 → -0.0000；1e-10 → 0.0000（精度丢失）；1e10 → 10000000000.0000
+- **_format_metric reason 边界**：empty string → ok；0 → ok；'0' → 透传；unicode reason
+- **_build_parser subparser**：choices 精确 3 个 {run, validate-report, inspect-doc}；dest='command'；required=True；run 5 user-defined option args；validate 1 positional；inspect 1 positional + 1 user-defined option
+- **_run_inspect_doc duck typing**：自定义类含 .input/.tolerance_chars OK；dict args raises AttributeError；args.input=None raises TypeError
+- **__name__=="__main__" 块**：源码含 '__name__' '"__main__"' 'SystemExit' 'main()'
+- **main 签名**：(argv=None) 单参数；默认 None
+- **模块结构**：无 __all__ 属性；argparse/json/sys/Path identity 在 namespace；main/_build_parser/_format_metric/_run_inspect_doc 在 namespace
+- **函数签名**：_build_parser() 无参；_format_metric(name, metric)；_run_inspect_doc(args)
+- **callable 验证**：4 个公开函数都 callable
+- **prog/description/formatter**：prog='evaluation.cli'；description 含 '评测'；formatter_class=RawDescriptionHelpFormatter
+- **argparse 错误**：run/validate-report/inspect-doc 各自缺参数 → SystemExit(2)；unknown command → SystemExit(2)；no command → SystemExit(2)
+
+### 撞墙记录
+- 2 fail（修复）：
+  - test_build_parser_run_subparser_argument_count_four：以为 5 个 user args；实际 argparse 自动加 -h/--help 也算 option_strings → 改成 a.dest != "help" 过滤
+  - test_build_parser_inspect_subparser_argument_count_two：同样问题 → 同样过滤 help
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 244 后）：21363 pass / 0 fail / 15 skip（HEAD `ef3b2c1`）
+
+### 下一步建议
+- 候选 KS2：evaluation/runner.py 第十五轮（227 行）
+- 候选 KZ2：evaluation/schema.py 第八轮（80 行）
+- 候选 KT3：evaluation/manifest.py 第十五轮（239 行）
+- 候选 KE3：evaluation/annotation_metrics.py 第十四轮（194 行）
+- 候选 KF3：evaluation/metrics.py 第十四轮（381 行）
+- 候选 KW3：evaluation/report.py 第十五轮（200 行）
+- 候选 KX3：evaluation/cli.py 第十六轮（243 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS2（evaluation/runner.py 第十五轮，227 行）继续推 evaluation。
+
+---
