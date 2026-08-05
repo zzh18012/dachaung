@@ -14344,3 +14344,52 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KF5（evaluation/metrics.py 第十六轮，381 行）继续推 evaluation。
 
 ---
+
+## Round 263 — evaluation/metrics.py 第十六轮（141 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第十六轮 edges 测试，进一步覆盖未覆盖的源码 token（14 个 def + 7 个 type tokens + 7 个 docx structural keys + pipeline logic + error messages + counter intersection + chunk_first_ids.add + silent_drop formula + image filter + heading filter + image_resource_path_check + image_size_check + image_isfile_check + except OSError + no print）、模块 docstring 内容（pure function/no mutation/text_preservation/v1.1/Counter/Unicode/image excluded）、函数签名 introspection（14 functions）、helper metadata、constants namespace 完整性、_is_valid_bbox 各 PDF required type、_pdf_locator_ratio 每 text type、_docx_locator_ratio 每 structural key、_image_resource_ratio（image_base_dir filename lookup）、_chunk_reference_ratio（missing/None element_id）、_heading_boundary_ratio（duplicate first id, missing element_id）、_silent_drop_count multiple expected types、_text_preservation（unicode/emoji/control chars/surrogate pairs/ZWJ/precision-recall asymmetry/repeated chars/all image elements/empty chunks）、compute_automatic_metrics（docx/pdf source_type paths, error_code pass-through, no mutation, no shared state, 14 keys consistent）、namespace identity、helper no-caching
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges16.py`（141 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码 token**：14 个 def token + 7 个 type tokens（list[dict]/dict[str, Any]/int/Path | None/str/bool/set）+ 7 个 docx structural keys（paragraph_index/row_index/table_index/list_level/run_index）+ pipeline logic + error messages + counter intersection + chunk_first_ids.add + silent_drop formula + image filter + heading filter + image_resource_path_check + image_size_check + image_isfile_check + except OSError + 不含 print
+- **模块 docstring**：是 str 长度>30；含 pure function/no mutation/text_preservation/v1.1/Counter/Unicode/image excluded
+- **签名 introspection**：14 个函数（_null/_ratio/_is_valid_bbox/_pdf_locator_ratio/_docx_locator_ratio/_image_resource_ratio/_chunk_reference_ratio/_heading_boundary_ratio/_silent_drop_count/_text_preservation/compute_automatic_metrics + 2 helpers + EvaluatorVersion）；参数计数、默认值（None / inspect.Parameter.empty）、POSITIONAL_OR_KEYWORD、无 var args/kw
+- **helper metadata**：14 个 helper __module__/__qualname__ 精确；FunctionType
+- **常量 namespace**：_TEXT_TYPES 7 项精确（heading/paragraph/table/list/header/footer/image）；_PDF_BBOX_REQUIRED_TYPES 4 项精确（heading/paragraph/table/list）；_NOT_EVALUATED 完整；subset 关系；image 不在 evaluated 类型
+- **_is_valid_bbox**：各 PDF required type 走查（heading/paragraph/table/list 都需要 bbox）；非 required type 不调用
+- **_pdf_locator_ratio**：各 text type（heading/paragraph/table/list 需 bbox；header/footer 不需 bbox）
+- **_docx_locator_ratio**：各 structural key（paragraph_index/row_index/table_index/list_level/run_index）
+- **_image_resource_ratio**：image_base_dir filename lookup（绝对路径优先、image_base_dir 兜底）；rp 含 basename 提取
+- **_chunk_reference_ratio**：missing element_id（不计入 denominator）；None element_id（不计入 denominator）
+- **_heading_boundary_ratio**：duplicate first id（只计一次）；missing element_id（不计）
+- **_silent_drop_count**：多 expected types 之和；0 expected → 0
+- **_text_preservation**：unicode/emoji/control chars/surrogate pairs/ZWJ 精度召回不对称（norm 等价但 raw 不等价）/repeated chars/all image elements（分母 0）/empty chunks（chunks=[]→null+reason）
+- **compute_automatic_metrics**：docx source_type 路径；pdf source_type 路径；error_code pass-through；不修改 elements；无共享状态；14 keys 一致（counts/locator_prf 等）
+- **namespace identity**：math/Counter/Path/Any 模块属性 identity
+- **helper no-caching**：两次调用返回独立 dict
+
+### 撞墙记录
+- 1 fail → 修复后 0 fail：
+  - `test_image_resource_ratio_image_base_dir_default_none`：`_image_resource_ratio` 的 `image_base_dir` 无默认值（`inspect.Parameter.empty`，不是 None）；改名 `test_image_resource_ratio_image_base_dir_no_default` 并改断言
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 263 后）：23684 pass / 0 fail / 16 skip（HEAD `9df9b80`）
+
+### 下一步建议
+- 候选 KW5：evaluation/report.py 第十七轮（200 行）
+- 候选 KX5：evaluation/cli.py 第十八轮（243 行）
+- 候选 KS5：evaluation/runner.py 第十八轮（227 行）
+- 候选 KZ5：evaluation/schema.py 第十一轮（80 行）
+- 候选 KT6：evaluation/manifest.py 第十八轮（239 行）
+- 候选 KE6：evaluation/annotation_metrics.py 第十七轮（194 行）
+- 候选 KF6：evaluation/metrics.py 第十七轮（381 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW5（evaluation/report.py 第十七轮，200 行）继续推 evaluation。
+
+---
