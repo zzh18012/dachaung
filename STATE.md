@@ -14571,3 +14571,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KT6（evaluation/manifest.py 第十八轮，239 行）继续推 evaluation。
 
 ---
+
+## Round 268 — evaluation/manifest.py 第十八轮（170 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十八轮 edges 测试，覆盖 edges17 未触及的角度：_is_absolute_like 边界更多（空/'a'/'ab'/'a:'/'a:b'/'a:\\b'/'a:/b'/'1:\\b'/'C:/x'/'c:/x'/'/foo'/'/'/'a/b'/'./foo'/'../foo'/返回 bool）、_has_backslash 边界（空/单 backslash/多 backslash/forward only/mixed/no/返回 bool）、_resolve_relative_path（成功路径返回 Path/空 path 抛错含字段名/POSIX 绝对/Windows drive/backslash/outside root/签名 3 参数/POSITIONAL_OR_KEYWORD/__module__/__qualname__）、_detect_project_root（start 是目录/start 是文件在 root/start 是文件在 subdir/无 pyproject 返回 cur/返回 Path/签名 1 参数）、ManifestError（is Exception/BaseException subclass/mro/__module__/__qualname__/str/args/repr/raise/无 errors attr）、DocumentEntry frozen（setattr 抛 FrozenInstanceError/delattr/is_dataclass/10 fields/字段名顺序/frozen=True/__module__/__qualname__）、ExpectedFailure frozen（同上/5 fields）、Manifest frozen（同上/5 fields）、Manifest property（file_count/pdf_count/docx_count/content_group_count 各种 pairing/categories_covered 去重排序/返回 list 不是 tuple/每次返回新 list）、namespace 完整性（json/dataclass/Path/Any/MANIFEST_VERSION/validate/ManifestError/DocumentEntry/ExpectedFailure/Manifest/load_manifest/_is_absolute_like/_has_backslash/_resolve_relative_path/_detect_project_root；__all__ 是 list 不是 tuple；5 entries；不含私有 helpers/constants）、源码 token（含 from __future__ import annotations/import json/from dataclasses import dataclass/from pathlib import Path/from typing import Any/from evaluation import MANIFEST_VERSION/from evaluation.schema import validate/class ManifestError/@dataclass(frozen=True)/class DocumentEntry/ExpectedFailure/Manifest/@property/manifest_version+MANIFEST_VERSION/relative_to/frozenset；不含 print/import logging/import subprocess/import os/asyncio/abspath/realpath/.read_text(）、docstring（含 相对路径/绝对路径/反斜杠/项目根/本机）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges18.py`（170 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 边界**：空 → False；'a' → False（len<3）；'ab' → False；'a:' → False（len<3）；'a:b' → False（path_str[2] 不在 \\/）；'a:\\b' → True（盘符+backslash）；'a:/b' → True（盘符+slash）；'1:\\b' → False（数字开头）；'C:/x' → True（大写盘符）；'c:/x' → True（小写盘符）；'/foo' → True（POSIX）；'/' → True；'a/b' → False；'./foo' → False；'../foo' → False；返回 bool
+- **_has_backslash 边界**：空 → False；'\\' → True；'a\\b\\c' → True；'a/b/c' → False；'a/b\\c' → True；'foo' → False；返回 bool
+- **_resolve_relative_path**：成功返回 resolved absolute Path；空 path → ManifestError 含字段名+为空；POSIX 绝对 → ManifestError 含字段名+绝对路径；Windows drive → ManifestError；backslash → ManifestError 含字段名+反斜杠；../etc → ManifestError 含字段名+项目根目录之外；签名 3 参数 path_str/project_root/field_name 无默认 POSITIONAL_OR_KEYWORD；no var args/kw；__module__/__qualname__
+- **_detect_project_root**：start 是目录且含 pyproject.toml → 返回该目录；start 是文件 → 取 parent；start 是子目录中文件 → 向上找；无 pyproject.toml → 返回 cur；签名 1 参数 start 无默认；__module__/__qualname__
+- **ManifestError**：is Exception subclass；is BaseException subclass；mro 含 Exception；__module__/__qualname__；str 含 message；args == (message,)；repr 含 class name；raise/catch；catch as Exception；无 errors 属性
+- **DocumentEntry frozen**：setattr → FrozenInstanceError；delattr → FrozenInstanceError；is_dataclass；10 fields；字段名顺序 doc_id/path_str/resolved_path/source_type/sha256/categories/paired_with/annotation_file_str/annotation_resolved/expectations；frozen=True；__module__/__qualname__
+- **ExpectedFailure frozen**：setattr/delattr → FrozenInstanceError；is dataclass；5 fields；字段名顺序 doc_id/path_str/resolved_path/expected_error_code/source_type；frozen=True；__module__/__qualname__
+- **Manifest frozen**：setattr/delattr → FrozenInstanceError；is dataclass；5 fields manifest_version/devset_status/documents/expected_failures/project_root；frozen=True；__module__/__qualname__
+- **Manifest property**：file_count == len(documents)；pdf_count == pdf 数；docx_count == docx 数；content_group_count 无 pairing 时 == file_count；一对配对（d1↔d2+d3）→ 2 组；自配对 d1↔d1 → 1 组；单向配对 d1→d2 → 1 组；空 documents → 0；categories_covered 去重+排序；空 → []；unicode（中文/english）→ 排序后；返回 list 不是 tuple；每次返回新 list
+- **namespace 完整性**：json/dataclass/Path/Any/MANIFEST_VERSION/validate/ManifestError/DocumentEntry/ExpectedFailure/Manifest/load_manifest/_is_absolute_like/_has_backslash/_resolve_relative_path/_detect_project_root 都在；__all__ 是 list 不是 tuple；5 entries 精确；不含私有 helpers/constants
+- **源码 token**：含 from __future__ import annotations、import json、from dataclasses import dataclass、from pathlib import Path、from typing import Any、from evaluation import MANIFEST_VERSION、from evaluation.schema import validate、class ManifestError、@dataclass(frozen=True)、class DocumentEntry/ExpectedFailure/Manifest、@property、manifest_version+MANIFEST_VERSION 检查、relative_to、frozenset；不含 print/import logging/import subprocess/import os/asyncio/abspath/realpath/.read_text(
+- **docstring**：含 相对路径/绝对路径/反斜杠/项目根/本机
+
+### 撞墙记录
+- 0 fail（首次跑通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 268 后）：24335 pass / 0 fail / 16 skip（HEAD `c321f86`）
+
+### 下一步建议
+- 候选 KE6：evaluation/annotation_metrics.py 第十七轮（194 行）
+- 候选 KF6：evaluation/metrics.py 第十七轮（381 行）
+- 候选 KW6：evaluation/report.py 第十八轮（200 行）
+- 候选 KX6：evaluation/cli.py 第十九轮（243 行）
+- 候选 KS6：evaluation/runner.py 第十九轮（227 行）
+- 候选 KZ6：evaluation/schema.py 第十二轮（80 行）
+- 候选 KT7：evaluation/manifest.py 第十九轮（239 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KE6（evaluation/annotation_metrics.py 第十七轮，194 行）继续推 evaluation。
+
+---
