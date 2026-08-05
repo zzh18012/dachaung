@@ -12642,3 +12642,42 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KS（evaluation/runner.py 第十二轮）继续推 evaluation 大文件。
 
 ---
+## Round 225 — evaluation/runner.py 第十二轮（89 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十二轮 edges 测试，覆盖 _load_annotation JSON 标量、_process_one 内部细节、run_evaluation 报告文件格式
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges12.py`（89 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 深度**：JSON 空 dict / 空 list / null / 标量 int/string/true；两个 JSON 对象相连；纯空白；纯文本；只有 `{`；路径含空格/中文；显式 None 输入；深层嵌套；array values；JSON 后额外内容；末尾换行合法
+- **_process_one 深度**：total_seconds 是 float 且非负；image_dir 来自 image_output_dir_for；document=None 时 image_dir=None；error dict 精确 2 keys；unknown error dict 精确 2 keys；out_stub 路径在 _per_doc/<doc_id>.json；parser_name/max_chars/write_json 透传到 process_single
+- **run_evaluation 报告文件**：per_doc 公共 4 keys 精确；wall_time_seconds 5 keys 精确；expected_failures 4 keys 精确；文件用 indent=2；ensure_ascii=False（保留中文）；output_path 接受 str/Path；创建父目录；返回 dict 与文件一致；annotation_resolved 三种状态（存在/缺失/None）；aggregate_summary / build_devset_section / build_provenance 调用验证；内部 per_doc_results 含 3 个私有字段；空 documents 不创建 _per_doc 目录
+- **模块结构**：13 个 imports（json/time/Path/Any/image_output_dir_for/process_single/REPORT_VERSION/chunk_boundary_prf/figure_caption_prf/compute_automatic_metrics/aggregate_summary/build_devset_section/build_provenance）；__all__==["run_evaluation"]；docstring 含 pipeline/total/not_instrumented；future annotations；3 个 callable
+- **签名**：_load_annotation(path)；_process_one(doc, output_root, parser_name, max_chars)；run_evaluation(manifest, output_path, parser_name, max_chars, tolerance_chars) - 后 3 个 keyword-only，默认 fallback/800/30
+- **综合**：两 doc 完整流程；doc + expected_failure 共存；首个 parser_version 进 provenance；报告含 unicode doc_id
+
+### 撞墙记录
+- 1 fail（修复）：test_run_evaluation_idempotent_report_file 误以为两次 run 内容完全一致；实际 run_timestamp_iso + wall_time.total 每次不同 → 改为只验证结构一致 + ts1≠ts2
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 225 后）：19714 pass / 0 fail / 15 skip（HEAD `b24d737`）
+
+### 下一步建议
+- 候选 KT：evaluation/manifest.py 第十二轮（239 行）
+- 候选 KE：evaluation/annotation_metrics.py 第十一轮（194 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KW：evaluation/report.py 第十二轮（200 行）
+- 候选 KX：evaluation/cli.py 第十三轮（243 行）
+- 候选 KS：evaluation/runner.py 第十三轮（227 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行 — 已饱和）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行 — 已饱和）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KT（evaluation/manifest.py 第十二轮）继续推 evaluation 大文件。
+
+---
