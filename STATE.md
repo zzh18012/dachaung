@@ -14167,3 +14167,50 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KS4（evaluation/runner.py 第十七轮，227 行）继续推 evaluation。
 
 ---
+## Round 259 — evaluation/runner.py 第十七轮（139 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十七轮 edges 测试，覆盖未覆盖的源码 token（5 个 import + 3 个函数 def + 5 个 from-import + _per_doc/parse_reason/chunk_reason/doc_id/source_type/metrics/wall_time_seconds/total/expected_failures/provenance/devset/summary/_annotation_present/_tolerance_chars/_missing_markers/image_dir/image_output_dir_for/write_json=False/unknown/mkdir(parents=True, exist_ok=True)/json.dump(ensure_ascii=False, indent=2)/except OSError + 不含 print）、模块 docstring 内容、模块 namespace 完整性（json/time/Path/Any/REPORT_VERSION identity + 7 个 imports）、模块 __all__ 精确（list 不是 tuple，1 个 entry 'run_evaluation'）、函数 metadata（3 个函数 module/qualname + 签名 introspection，run_evaluation keyword-only 标记精确：* separator 后 3 个 KEYWORD_ONLY）、_load_annotation 边界（None/不存在/目录/有效 JSON/无效 JSON/空文件/utf-8 BOM/str 路径 AttributeError）、run_evaluation 报告 6 top-level keys 顺序精确 + 各 sub-dict 结构验证、run_evaluation 不修改 manifest 的 documents/expected_failures/project_root、Stub Manifest 接口验证、kw-only 强制（positional 调用 raises TypeError）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges17.py`（139 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码 token**：5 个 import（json/time/Path/Any/future annotations）+ 3 个函数 def + 5 个 from-import + 关键 token（_per_doc/parse_reason/chunk_reason/doc_id/source_type/metrics/wall_time_seconds/total/expected_failures/provenance/devset/summary/_annotation_present/_tolerance_chars/_missing_markers/image_dir/image_output_dir_for/write_json=False/unknown/mkdir(parents=True, exist_ok=True)/json.dump(ensure_ascii=False, indent=2)/except OSError）+ 不含 print
+- **模块 docstring**：是 str 长度>30；含 total/pipeline/约束
+- **namespace identity**：json/time/Path/Any identity；REPORT_VERSION 值匹配；process_single/image_output_dir_for/compute_automatic_metrics/chunk_boundary_prf/figure_caption_prf/aggregate_summary/build_devset_section/build_provenance 都在 namespace；不含 main
+- **__all__**：是 list 不是 tuple；1 个 entry 'run_evaluation'；不含 helpers
+- **函数 metadata**：_load_annotation 1 参数 path 无默认 + POSITIONAL_OR_KEYWORD + return str；_process_one 4 参数 + POSITIONAL_OR_KEYWORD + return str 含 'tuple'；run_evaluation 5 参数 + manifest/output_path POSITIONAL_OR_KEYWORD + parser_name/max_chars/tolerance_chars KEYWORD_ONLY + 默认 fallback/800/30 + return str；都 FunctionType；都无 var args/kw
+- **_load_annotation 边界**：None/不存在/目录 → None；有效 JSON → dict；无效 JSON/空文件 → None；utf-8 BOM → None（encoding='utf-8' 不剥 BOM）；str 路径 → AttributeError（无 .is_file()）
+- **run_evaluation report 6 keys 顺序**：report_version/provenance/devset/summary/per_doc/expected_failures；report_version 值匹配；各 sub-dict 是正确类型
+- **summary 4 keys**：counts/success_rates/ratio_macro_averages/silent_drop_total；devset 6 keys；provenance 9 keys
+- **provenance 字段值**：parser_name 默认 'fallback'；max_chars 默认 800；parser_version=None 当无 doc
+- **写盘验证**：写 JSON 文件；含 report_version；provenance git_commit str/None；git_dirty bool；可覆盖；可创建嵌套目录
+- **不修改 manifest**：documents/expected_failures/project_root identity 不变
+- **kw-only 强制**：parser_name/max_chars/tolerance_chars 用 positional → TypeError
+- **Stub Manifest**：categories_covered 可 list/tuple；devset_status 透传
+- **空 manifest 不变量**：per_doc=[]/expected_failures=[]；summary silent_drop_total=None；success_rate total=0/rate=None
+
+### 撞墙记录
+- 39 fail → 修复后 0 fail：
+  - `_make_empty_manifest` helper：class body 不能引用同名局部变量 `project_root`，改用 __init__ + closure
+  - `test_load_annotation_param_default_none`：函数签名无 `=None`，default 是 `inspect.Parameter.empty` 不是 None
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 259 后）：23087 pass / 0 fail / 16 skip（HEAD `09db45e`）
+
+### 下一步建议
+- 候选 KZ4：evaluation/schema.py 第十轮（80 行）
+- 候选 KT5：evaluation/manifest.py 第十七轮（239 行）
+- 候选 KE5：evaluation/annotation_metrics.py 第十六轮（194 行）
+- 候选 KF5：evaluation/metrics.py 第十六轮（381 行）
+- 候选 KW5：evaluation/report.py 第十七轮（200 行）
+- 候选 KX5：evaluation/cli.py 第十八轮（243 行）
+- 候选 KS5：evaluation/runner.py 第十八轮（227 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KZ4（evaluation/schema.py 第十轮，80 行）继续推 evaluation。
+
+---
