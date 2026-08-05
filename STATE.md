@@ -11081,3 +11081,59 @@ silent_drop_count manifest expectations 缺失场景。
 manifest 路径校验、warning 累积逻辑、image 输出目录处理。
 
 ---
+
+## Round 194（2026-08-05）：evaluation/runner.py 第八轮（edges8）
+
+### 目标
+- 给 evaluation/runner.py（227 行，已有 base/edges/edges2-7 共 635 测试）补第八轮
+- 深入 _load_annotation 各 JSON value 类型 + monkeypatch process_single 模拟错误路径
+- 验证 run_evaluation public_per_doc 严格剥离私有字段、报告落盘一致、tolerance_chars 传播
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges8.py`（99 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation JSON 多样性**：list/int/string/null/nested dict/empty dict/empty list、BOM（utf-8 不剥 BOM → JSONDecodeError → None）、Unicode 内容、大文件（10k entries）、truncated JSON、extra data、empty file、whitespace only、true/false/float
+- **_process_one monkeypatch 路径**：(None, []) → unknown error、(document, [err]) errors 优先 + parser_version=None、(None, [err1, err2]) 取 first、(document, []) 成功 + parser_version 透传、(None, [err]) image_dir=None、失败时 _per_doc 仍 mkdir、失败路径 out_stub 清理、成功 elapsed>0、process_single 参数透传（parser_name/max_chars/write_json）、out_stub 路径含 doc_id、image_dir 用 image_output_dir_for、unlink OSError 静默
+- **run_evaluation public_per_doc 剥离私有字段**：_annotation_present / _tolerance_chars / _missing_markers 全部移除、4 个公开 keys (doc_id/source_type/metrics/wall_time_seconds)、wall_time_seconds 含 5 keys (total/parse/chunk/parse_reason/chunk_reason)
+- **run_evaluation 报告结构**：6 个顶层 keys (report_version/provenance/devset/summary/per_doc/expected_failures)、report_version == REPORT_VERSION 常量、expected_failures 默认空 list
+- **run_evaluation 空场景**：empty manifest → per_doc=[] expected_failures=[]、无 docs 仅 EF、multiple docs
+- **run_evaluation parser_version_for_prov**：成功时 set、全部失败时 None、多 doc 取首个成功、provenance parser_name/max_chars 透传
+- **run_evaluation 落盘**：file 写入、文件内容与内存对象相等、创建 parent dirs、UTF-8 合法、indent=2
+- **run_evaluation tolerance_chars**：默认 30、自定义 100 接受、签名验证
+- **run_evaluation metrics 完整集**：14 个 pipeline metrics + 4 个 annotation metrics（figure_caption/chunk_boundary）
+- **run_evaluation expected_failures 多场景**：code mismatch、multiple EF、actual_code=None（成功 doc）、actual_code 存在
+- **模块结构**：__all__ == ["run_evaluation"]、imports (json/time/Path/Any/process_single/image_output_dir_for/REPORT_VERSION/chunk_boundary_prf/figure_caption_prf/compute_automatic_metrics/aggregate_summary/build_devset_section/build_provenance)、各函数签名与 callable
+- **idempotency**：_load_annotation 重复一致、run_evaluation 同输入两跑结构一致
+- **综合行为**：text pipeline 完整跑、失败 doc 仍 in per_doc、混合 success/failure、devset/summary/provenance 字段存在、source_type preserved
+
+### 撞墙记录
+- 3 fail（全部测试断言错）：
+  1. `test_load_annotation_with_bom`：误以为 utf-8 会剥 BOM；实际 encoding='utf-8' 不剥 → JSONDecodeError → None
+  2. `test_run_evaluation_file_uses_utf8_with_unicode`：报告里没有 element content（只 metrics），断言 "你好" bytes in raw 不成立；改为验证文件可 UTF-8 解码
+  3. `test_run_evaluation_provenance_present`：provenance 没有 "project_root" key（build_provenance 输出含 evaluator_version/git_commit/dependencies 等）；改断言 evaluator_version
+- 修复后 0 fail
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 194 后）：16349 pass / 0 fail / 14 skip（HEAD `0835d01`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KI：app/parsers/ipynb_parser.py 第八轮（227 行 / ~1100 测试）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（136 行 / ~900 测试）
+- 候选 KL：app/models.py 第六轮（154 行 / ~800 测试）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1200 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KP：evaluation/cli.py 第八轮（243 行 / ~900 测试）
+- 候选 KR：evaluation/report.py 第七轮（200 行 / ~900 测试）
+- 候选 KS：evaluation/manifest.py 第八轮（239 行 / ~1050 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KU：app/schema.py 第七轮（230 行 / ~900 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KP（evaluation/cli.py 第八轮）。cli.py 是 evaluation/ 唯一未做 8th round 的入口（243 行 / ~3.5 tests/line），
+第八轮可深入 run / validate-report / --manifest 校验、stdout/stderr 输出格式、exit code、各错误码（manifest invalid / report invalid / parser name unknown）。
+
+---
