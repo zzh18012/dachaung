@@ -13854,3 +13854,45 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KS3（evaluation/runner.py 第十六轮，227 行）继续推 evaluation。
 
 ---
+## Round 252 — evaluation/runner.py 第十六轮（88 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十六轮 edges 测试，覆盖源码字符串断言、模块/函数 metadata、__future__ annotations 影响、_load_annotation 边界（BOM/unicode 文件名/不同输入）、_process_one 签名精确、run_evaluation keyword-only 标记精确、report 6 top-level keys 顺序精确、写盘 JSON 与返回 dict 一致（含 tuple→list 序列化）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges16.py`（88 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码字符串断言**：含 'process_single' / 'image_output_dir_for' / 'perf_counter' / 'REPORT_VERSION' / 'aggregate_summary' / 'build_devset_section' / 'build_provenance' / 'chunk_boundary_prf' / 'figure_caption_prf' / 'compute_automatic_metrics' / 'not_instrumented' / '_per_doc' / 'parse_reason' / 'chunk_reason' / 'json.dump' / future annotations / 'dict[str,' / 'image_dir' / 'doc_id'；不含 '__main__'
+- **模块 metadata**：__file__ 后缀 .py / 含 'runner'；__package__=='evaluation'；__name__=='evaluation.runner'；json/Path/Any/time identity；REPORT_VERSION is 常量
+- **__all__ 精确**：是 list 不是 tuple；仅 1 个元素 ['run_evaluation']；不含 _load_annotation / _process_one
+- **函数 metadata**：3 个函数 __module__/__qualname__ 精确；都是 FunctionType；无 varargs/varkw；return_annotation 是 str
+- **_load_annotation 边界**：None 输入；missing 文件；directory；valid dict/list；invalid JSON；empty 文件；utf-8 BOM（源码用 'utf-8' 不剥 BOM → JSONDecodeError → None）；unicode 文件名；每次新 dict；接受 Path 对象；signature 1 个参数 'path'
+- **_process_one 签名**：4 个参数 [doc, output_root, parser_name, max_chars]；全 POSITIONAL_OR_KEYWORD；无 default
+- **run_evaluation 签名**：5 个参数；前 2 个 POSITIONAL_OR_KEYWORD；后 3 个 KEYWORD_ONLY；defaults 'fallback'/800/30；前 2 个无 default
+- **run_evaluation 输出结构**：6 top-level keys 顺序精确 [report_version, provenance, devset, summary, per_doc, expected_failures]；report_version==REPORT_VERSION；per_doc/expected_failures 是 list；summary/devset/provenance 是 dict；返回 dict；写盘 JSON 与返回 dict 一致（tuple→list）；多级嵌套目录自动创建；空 manifest → per_doc=[]/expected_failures=[]
+- **namespace**：含 run_evaluation/_load_annotation/_process_one；不含 'main'
+
+### 撞墙记录
+- 2 fail（修复）：
+  - test_load_annotation_utf8_bom：源码用 encoding='utf-8' 不剥 BOM → JSONDecodeError 被捕获 → 返回 None（不是 dict）→ 改成期望 None
+  - test_run_evaluation_file_matches_returned_report：JSON 序列化把 tuple () 转成 list []，所以直接 == 失败；改成 report_normalized = json.loads(json.dumps(report)) 后再比较
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 252 后）：22129 pass / 0 fail / 16 skip（HEAD `6ecd202`）
+
+### 下一步建议
+- 候选 KZ3：evaluation/schema.py 第九轮（80 行）
+- 候选 KT4：evaluation/manifest.py 第十六轮（239 行）
+- 候选 KE4：evaluation/annotation_metrics.py 第十五轮（194 行）
+- 候选 KF4：evaluation/metrics.py 第十五轮（381 行）
+- 候选 KW4：evaluation/report.py 第十六轮（200 行）
+- 候选 KX4：evaluation/cli.py 第十七轮（243 行）
+- 候选 KS4：evaluation/runner.py 第十七轮（227 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KZ3（evaluation/schema.py 第九轮，80 行）继续推 evaluation。
+
+---
