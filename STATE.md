@@ -14255,3 +14255,49 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KT5（evaluation/manifest.py 第十七轮，239 行）继续推 evaluation。
 
 ---
+## Round 261 — evaluation/manifest.py 第十七轮（197 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十七轮 edges 测试，覆盖未覆盖的源码 token（5 个 import + 5 个 class/def + 5 个 property + frozenset/seen/relative_to/resolve/encoding='utf-8'/validate 调用 + 错误 message token + 不含 print）、模块 docstring 内容（path 不变量/安全/绝对路径）、_is_absolute_like alpha check 详细（empty/single char/2 char/3 char/unicode alpha/non-alpha drive）、_has_backslash bool 类型、ManifestError 详细（is Exception/BaseException + MRO 4 + str/repr/args/hashable/equality by identity/不捕获其他 exception）、DocumentEntry/ExpectedFailure/Manifest dataclass 详细（is_dataclass + frozen=True + field count + field names in order + hashable + equality by value + module/qualname）、Manifest properties 详细（file_count/pdf_count/docx_count/categories_covered empty/single/multi/dedup/sorted/case-sensitive/unicode/new list each time、content_group_count 各种 pairing：no pair/one pair mutual/one-way/self-pair/pair-to-nonexistent/pair+unpaired）、_resolve_relative_path 详细（返回 Path/empty/absolute/backslash/outside root/subdir/unicode + 签名）、_detect_project_root 详细（find pyproject/no pyproject/file input/Path instance/absolute）、load_manifest 详细（接受 str path/project_root + 各错误路径 + 返回 Manifest/documents/expected_failures 是 tuple/project_root 是 Path + version mismatch raises EvalSchemaError）、模块 namespace 完整性 + __all__ 精确
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges17.py`（197 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码 token**：5 个 import + 5 个 class/def + 5 个 property + frozenset/seen/relative_to(project_root_resolved)/.resolve()/encoding='utf-8'/validate(data, "manifest.schema.json") + 错误 message token（必须是相对路径/禁止反斜杠/禁止绝对路径/项目根目录之外/manifest_version 不兼容）+ 不含 print
+- **模块 docstring**：是 str 长度>30；含 相对路径/正斜杠/项目根/绝对路径
+- **_is_absolute_like**：empty=False；relative/single char/2 char=False；POSIX /foo=True；Windows C:\\foo / C:/foo=True；lower/upper drive=True；C:foo=False（无 separator）；non-alpha drive=False；unicode alpha=True；返回 bool 类型；FunctionType；签名 1 参数 path_str 无默认
+- **_has_backslash**：empty/no backslash=False；with backslash/multiple/only backslash=True；返回 bool；FunctionType
+- **ManifestError**：是 Exception/BaseException 子类；MRO 4 items 含 Exception + BaseException；可 raise/except；str/repr/args/hashable；equality by identity；不捕获 ValueError
+- **DocumentEntry dataclass**：is_dataclass；frozen=True 阻止 setattr；10 fields 精确顺序；hashable；equality by value；module/qualname
+- **ExpectedFailure dataclass**：is_dataclass；frozen=True；5 fields 精确顺序；hashable；module/qualname
+- **Manifest dataclass**：is_dataclass；frozen=True；5 fields 精确顺序；hashable；module/qualname
+- **Manifest properties**：file_count empty=0/one=1；pdf_count only pdf/mixed；docx_count only docx/zero when only pdf；categories_covered empty=[]/single/multi/dedup/sorted/case-sensitive/unicode/new list each call；content_group_count no pair=each 1 group/one mutual pair=1/one-way pair=1/self-pair=1/pair to nonexistent=1/pair+unpaired=2
+- **_resolve_relative_path**：返回 absolute Path；empty raises with field_name；absolute raises 含 '绝对路径'；backslash raises 含 '反斜杠'；outside root raises 含 '项目根目录之外'；subdir OK；unicode filename OK；签名 3 参数全无默认；FunctionType
+- **_detect_project_root**：找 pyproject.toml；无则返回 start；file input 取 parent；返回 Path + absolute；签名 1 参数；FunctionType
+- **load_manifest**：签名 2 参数 manifest_path + project_root default None + POSITIONAL_OR_KEYWORD；missing/directory/invalid JSON/empty file 都 raises ManifestError；接受 str path/project_root；返回 Manifest 实例；documents/expected_failures 是 tuple；project_root 是 Path；pass-through manifest_version/devset_status；version mismatch raises EvalSchemaError（schema const 校验先失败）
+- **namespace 完整性**：5 个 export 在 namespace；json/Path/MANIFEST_VERSION/validate identity；__all__ 是 list 不是 tuple；5 entries 精确；不含私有 helpers；所有 name 在 namespace
+- **FunctionType**：5 个 helper 都是 FunctionType
+
+### 撞墙记录
+- 1 fail → 修复后 0 fail：
+  - `test_load_manifest_version_mismatch_raises`：schema 中 manifest_version 是 const="1.0"，version "99.99" 先在 schema 失败抛 EvalSchemaError，改测期望 EvalSchemaError
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 261 后）：23421 pass / 0 fail / 16 skip（HEAD `95b5dfd`）
+
+### 下一步建议
+- 候选 KE5：evaluation/annotation_metrics.py 第十六轮（194 行）
+- 候选 KF5：evaluation/metrics.py 第十六轮（381 行）
+- 候选 KW5：evaluation/report.py 第十七轮（200 行）
+- 候选 KX5：evaluation/cli.py 第十八轮（243 行）
+- 候选 KS5：evaluation/runner.py 第十八轮（227 行）
+- 候选 KZ5：evaluation/schema.py 第十一轮（80 行）
+- 候选 KT6：evaluation/manifest.py 第十八轮（239 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KE5（evaluation/annotation_metrics.py 第十六轮，194 行）继续推 evaluation。
+
+---
