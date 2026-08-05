@@ -11018,3 +11018,66 @@ coverage/completeness），第八轮可深入 Counter multisector 边界、divis
 silent_drop_count manifest expectations 缺失场景。
 
 ---
+
+## Round 193（2026-08-05）：evaluation/metrics.py 第八轮（edges8）
+
+### 目标
+- 给 evaluation/metrics.py（381 行，已有 base/edges/edges2-7 共 1103 测试）补第八轮
+- 直接单元测试模块级私有函数和顶层 compute_automatic_metrics 各分支
+- 深入 _is_valid_bbox 拒绝矩阵、_pdf/_docx_locator_ratio locator 多形态、_text_preservation Counter 多集合语义
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges8.py`（212 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **构造器深度**：_null/reason unicode/empty、_ratio int/float/negative/>1、_bool_metric True/False/0/1/""/None/non-empty string、_int_metric zero/negative/float-coerce/bool-coerce
+- **_is_valid_bbox 全面**：4 ints/floats/negatives/3 elements/5 elements/empty/tuple/strings/mixed/bool/single/all-bools/NaN/inf/-inf/None/None-elem/dict
+- **_pdf_locator_ratio**：no_elements null、image page-only、paragraph+page+bbox、paragraph no bbox reject、page=0/-1/None/string/float 全 reject、missing source_locator、source_locator=None、mixed valid/invalid (2/3 ratio)、caption requires bbox、header/table/footer page-only、list_item requires bbox、invalid bbox NaN、all-invalid → 0.0
+- **_docx_locator_ratio**：no_elements null、7 structural keys 矩阵（section/paragraph_index/run_index/table_index/row_index/col_index/relationship_id）、page/bbox key 拒绝、no structural keys 拒绝、empty locator 拒绝、missing locator 拒绝、mixed 1/3、multiple keys one sufficient
+- **_image_resource_ratio**：no_images null、relative + None base_dir → 0.0、filename + base_dir → 1.0、subdir/x.png + base_dir/.name → 1.0、absolute path 忽略 base_dir、3 images mixed 2/3、zero-size 跳过、目录（is_file=False）、OSError caught via monkeypatch、special chars、two-candidates second-ok
+- **_chunk_reference_ratio**：empty chunks null、empty list/missing key/None 跳过、valid id、unknown id、multiple ids all valid、partial invalid、mixed 2/4=0.5、empty elements + empty chunks null、empty elements + non-empty chunks → 0.0
+- **_strip_unicode_whitespace**：ASCII space/tab/newline/CR/FF/VT、NBSP/em/en/thin/hair/ideographic space、LS/PS、narrow NBSP、empty string、all whitespace、no whitespace、preserves 标点/emoji/CJK/digits、mixed kinds
+- **_text_preservation**：equal simple、whitespace ignored、extra chars、missing chars、reorder not equal、duplicate chars（aabb/abab Counter 相同但 sequence 不同）、duplicate mismatch、completely disjoint、both empty null、both whitespace-only null、empty actual / empty expected 各路径、skip image、all images、content None/missing、chunk text None、multiple chunks concat、multiple elements concat、type None treated as text、returns 3 keys
+- **_heading_boundary_ratio**：no headings null、first in chunk、not first（=0.0）、id not in chunks、chunks empty list → 0.0、empty ids → 0.0、multiple headings mixed 2/3、duplicate first ids、only paragraphs null
+- **_silent_drop_count**：no expectations/empty expectations/empty counts、no drop/actual greater、1 drop/multiple drops、unknown type、actual zero、mixed drop/no-drop、returns int_metric
+- **compute_automatic_metrics 顶层**：document=None+error=None、document=None+error with code、error code only、14 metric keys present on failure、minimal valid document、docx locator null for pdf、pdf locator null for docx、other source type both null、no image → null、no chunks → null、no headings → null、no expectations → null、with expectations counts drops、elements missing key defaults []、chunks missing key defaults []、schema_invalid bad doc、schema exception caught (monkeypatch)、error provided with document、by_type unknown/None value、image_base_dir used (keyword)、full text_preservation pipeline
+- **模块结构**：_TEXT_TYPES 7 elements/no image、_PDF_BBOX_REQUIRED_TYPES subset/4 elements/excludes table/header/footer、_NOT_EVALUATED constant、__all__ == ["compute_automatic_metrics"]、imports math/Counter/Path/Any、constants are tuples、compute signature 5 params/image_base_dir default None、all internal function signatures、all callable
+- **idempotency/不变形**：_is_valid_bbox、_strip_unicode_whitespace、_pdf/_docx/_chunk ratio、compute_automatic_metrics 不变 input、image_resource_ratio 不变 input
+- **综合行为**：full pipeline all metric types（heading/paragraph/image/chunks/locator/expectations）、text drop detected、chunk boundary split same chars
+
+### 撞墙记录
+- 4 fail（全部测试断言错，非业务代码 bug）：
+  1. `test_text_preservation_counter_duplicate_chars`：误判 equal=True，实际 "aabb" vs "abab" 是不同字符串（sequence 等值），但 Counter 交集=1.0
+  2. `test_compute_automatic_metrics_by_type_none_value`：dict.get(None, "unknown") 在 key 存在且值为 None 时返回 None（不用 default），所以 by_type[None]=1 而非 by_type["unknown"]
+  3. `test_compute_automatic_metrics_image_base_dir_used`：误用位置参数 img_dir 当 expectations → AttributeError（WindowsPath has no .get）；改用 image_base_dir= 关键字
+  4. `test_full_pipeline_with_all_metric_types`：同样位置参数错；改用 image_base_dir=
+- 修复后 0 fail
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 193 后）：16250 pass / 0 fail / 14 skip（HEAD `556b859`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KI：app/parsers/ipynb_parser.py 第八轮（227 行 / ~1100 测试）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（136 行 / ~900 测试）
+- 候选 KL：app/models.py 第六轮（154 行 / ~800 测试）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1200 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KO：evaluation/runner.py 第八轮（227 行 / ~900 测试）
+- 候选 KP：evaluation/cli.py 第八轮（243 行 / ~900 测试）
+- 候选 KR：evaluation/report.py 第七轮（200 行 / ~900 测试）
+- 候选 KS：evaluation/manifest.py 第八轮（239 行 / ~1050 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KU：app/schema.py 第七轮（230 行 / ~900 测试）
+- 候选 KV：app/chunkers/base.py 第六轮（仍饱和）
+- 候选 KW：app/hash_utils.py 第六轮（仍饱和）
+- 候选 KX：evaluation/schema_validation.py 第六轮（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KO（evaluation/runner.py 第八轮）。runner 是 evaluation/ 第二低密度文件（227 行 / ~3.6 tests/line），
+第八轮可深入 process_single 各错误路径（parser failure/schema failure/chunker failure）、计时 only_total 策略、
+manifest 路径校验、warning 累积逻辑、image 输出目录处理。
+
+---
