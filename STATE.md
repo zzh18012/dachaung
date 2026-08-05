@@ -13349,3 +13349,48 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE2（evaluation/annotation_metrics.py 第十三轮）继续推 evaluation 大文件。
 
 ---
+## Round 241 — evaluation/annotation_metrics.py 第十三轮（58 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第十三轮 edges 测试，覆盖 predicted/gt_positions 算法精确、search_from 推进、chunk_text 算法、greedy 一对一策略、module 导入 identity、docstring algorithm keywords
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges13.py`（58 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **predicted boundary positions**：chunks 各种长度的精确 boundary 位置；最后一个 chunk 不贡献 boundary
+- **gt_positions 算法**：marker before/after 在 start/end 触发；多个 marker 顺序
+- **search_from 推进**：相同 marker 文本不会重复匹配（被消耗后下一个 anchor 走 missing_markers）
+- **chunk_text 算法**：whitespace 归一化；int 输入触发 TypeError（re.sub 拒绝）；None 当空处理
+- **multi-chunk distance/tolerance matching**：远距离 marker 触发 missing；tolerance_chars 边界
+- **stream composition**：unicode / emoji / 多 chunk 都不崩溃
+- **module 导入 identity**：_null/_ratio/normalize_text/Counter 都从源模块直接 import
+- **chunk_boundary_prf docstring**：含 algorithm keywords（normalize/greedy/one-to-one/marker/predicted/ground_truth/anchor/algorithm/args）
+- **figure_caption_prf docstring**：含 parser/relation/null keywords
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：snake_case / lowercase / parser_ 前缀
+- **greedy matching strategy**：closest first；不会 double-assign；duplicate marker 走 missing_markers
+- **module __all__**：3 元素顺序精确
+
+### 撞墙记录
+- 2 fail（修复）：
+  - test_greedy_does_not_double_assign_predicted：alpha marker 已被 search_from 消耗，第二个 anchor 走 missing_markers，不是 double-assign → 改成 precision/recall 都 1.0，'alpha' in _missing_markers
+  - test_chunk_text_with_int_raises_at_normalize：normalize_text 调 re.sub 在 int 输入触发 TypeError（不是 AttributeError）→ 改成 expect TypeError
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 241 后）：21119 pass / 0 fail / 15 skip（HEAD `01772da`）
+
+### 下一步建议
+- 候选 KF2：evaluation/metrics.py 第十三轮（381 行）
+- 候选 KW2：evaluation/report.py 第十四轮（200 行）
+- 候选 KX2：evaluation/cli.py 第十五轮（243 行）
+- 候选 KS2：evaluation/runner.py 第十五轮（227 行）
+- 候选 KZ2：evaluation/schema.py 第八轮（80 行）
+- 候选 KT3：evaluation/manifest.py 第十五轮（239 行）
+- 候选 KE3：evaluation/annotation_metrics.py 第十四轮（194 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KF2（evaluation/metrics.py 第十三轮，381 行）继续推 evaluation 最大文件。
+
+---
