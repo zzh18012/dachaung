@@ -11648,3 +11648,71 @@ get_git_provenance 各 OSError 路径。
 第九轮可深入 _split_text_by_heads、_split_paragraph_by sentences、_split_sentence 长文本边界、source_spans 算法、表/列表元素处理。
 
 ---
+
+## Round 204（2026-08-05）：app/chunkers/structural.py 第九轮（edges9）
+
+### 目标
+- 给 app/chunkers/structural.py（388 行，已有 base/edges/edges2-8 共 ~1044 测试）补第九轮
+- 深入 _WHITESPACE_RE 各类空白（vertical tab/form feed/全角空格 U+3000）
+- normalize_text 边界（empty/单字符/Unicode/不修改入参/signature）
+- _HARD_BREAK_LANGS 元组精确值与无重复
+- _SENTENCE_SPLIT_RE lookbehind 不消耗标点
+- _SplitPiece frozen dataclass/字段默认值/hashable
+- _hard_split_with_whitespace_fallback 边界（len==max_chars/max_chars+1/window 起止/forced_char 路径）
+- _split_long_text 边界（strip 坐标系/拼接不丢字符）
+- _PART_* 常量与 sequential 索引
+- _ChunkBuffer dataclass/push/length/flush/strategy keyword-only
+- StructuralChunker __init__ ValueError 边界（<32/0/负数/1/31）
+- chunk() 综合：空 document/heading/table/image/caption 各分支/累积 flush
+- _element_text_with_span 各内容形态（leading/trailing/multiline/whitespace only）
+- 模块 __all__ / 类属性 / future annotations
+
+### 改动
+- 新增 `tests/test_chunker_edges9.py`（153 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_WHITESPACE_RE**：pattern="\s+"、vertical tab/form feed/mixed/collapses to single space、全角空格 U+3000 也匹配、single whitespace 输入→单空格
+- **normalize_text**：empty→""、only whitespace→""、单字符、strip 两端、compress internal、\n/\t/中文/punct/Unicode 保留、str 返回、不修改入参、signature
+- **_HARD_BREAK_LANGS**：tuple、6 元素、含中英文标点、无重复
+- **_SENTENCE_SPLIT_RE**：pattern 含 lookbehind、不消耗标点、多句切分、无空白不切、中文标点+空白切
+- **_SplitPiece**：dataclass/frozen/4 字段/text+boundary_after 必填/start+end=0 默认/相等/不等/hashable
+- **_hard_split_with_whitespace_fallback**：len==max_chars 单 piece、+1 必切、forced_char 全字母路径、whitespace 在 upper 切、leading whitespace 跳过、trailing rstrip、连续空白跳过、window lower=50、signature、returns list[_SplitPiece]
+- **_split_long_text**：==max 单 piece、+1 切、strip 后单 piece、empty→[]、only whitespace→[]、returns list、offsets 在 stripped 坐标、拼接不丢字符（normalize 等价）、每 piece ≤ max_chars、混合短长句
+- **_PART_***：4 常量值精确、互异、sequential 索引
+- **_ChunkBuffer**：dataclass、3 字段、document_id 必填、parts/counter 默认、独立 per instance、push_text 追加、length 求和、is_empty、flush empty→None、flush only-whitespace→None、flush 返回 Chunk、flush 清空 parts、dedup source_ids、one span per part、text 用单空格 join、metadata strategy/max_chars/char_count、chunk_id 用 document_id::counter、strategy/max_chars keyword-only、init signature
+- **StructuralChunker.__init__**：默认 800、显式参数、<32 raises、==32 OK、0 raises、负数 raises、1 raises、错误消息含值、signature
+- **chunk()**：空 doc→[]、单 paragraph within max、单 paragraph ==max、chunk_id 4-digit zero-padded、增量、heading 触发 flush、heading 首元素无 prior buf、table isolated、image 跳过（_element_text_with_span 返回空）、caption isolated、长 paragraph sentence split、累积 overflow flush、source_spans 填充（sequential + long）、不修改 document elements、文本保留 normalize 等价
+- **_element_text_with_span**：basic、leading/trailing whitespace strip、both ends、only whitespace→empty、empty content→empty、None content→empty、image 强制返回空、multiline 保留 \n、内部空白保留
+- **_element_text**：兼容旧接口、返回 text only、image→empty、whitespace only→empty、strip 外部空白
+- **模块结构**：__all__ exact={StructuralChunker, normalize_text}、no-dup、imports re/dataclass/field/Any/Chunk/Document/Element、docstring 含 heading/max_chars/source_spans 不变量、future annotations、chunk signature
+- **综合行为**：idempotent、full pipeline 含 mixed element types（heading/paragraph/table/caption/list_item）、Unicode+emoji 文本保留
+
+### 撞墙记录
+- 7 fail（已修）：
+  - `test_normalize_text_signature`：future annotations → return_annotation=="str" 字符串
+  - `test_hard_split_consecutive_whitespace_in_input`：错误预期单 piece，实际 2 piece（先 50 a's，后 50 b's，中间空白被吞）
+  - `test_chunk_chunk_id_increments`：max_chars=10 < 32 minimum → ValueError；改用 32 + 更长文本
+  - `test_chunk_accumulated_overflow_flush`：max_chars=20 < 32；改用 32 + 8-char words（每 4 段 flush）
+  - `test_element_text_with_span_empty_content_returns_empty`：Element __post_init__ 拒绝空 content → 改为 whitespace only
+  - `test_element_text_returns_empty_for_empty_content`：同上
+  - `test_chunker_text_preservation_with_unicode_and_emoji`：max_chars=30 < 32 → 改 50
+- 1 SyntaxWarning（已修）：docstring 中 `\s` 未转义 → 改 r""" """
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 204 后）：17609 pass / 0 fail / 15 skip（HEAD `5f6c681`）
+
+### 下一步建议
+- 候选 KO：evaluation/cli.py 第九轮（243 行 / ~1000 测试）
+- 候选 KP：evaluation/runner.py 第九轮（227 行 / ~1000 测试）
+- 候选 KQ：evaluation/metrics.py 第九轮（381 行 / ~1200 测试）
+- 候选 KR：evaluation/manifest.py 第九轮（239 行 / ~1100 测试）
+- 候选 KS：evaluation/report.py 第八轮（200 行 / ~700 测试）
+- 候选 KF/KV/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KO（evaluation/cli.py 第九轮）。evaluation/cli 是 Stage 2 命令入口（243 行 / ~4.1 tests/line），
+第九轮可深入 _format_metric 各 type 分支、_run_inspect_doc 输出 ordering、main 错误矩阵边界。
+
+---
