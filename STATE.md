@@ -12316,3 +12316,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KAA + KAB 双小轮（schema_validation.py 第四轮 + __init__.py 第二轮），把 evaluation 小文件全部拉满。
 
 ---
+
+## Round 217 — evaluation/annotation_metrics.py 第九轮（74 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第九轮 edges 测试，覆盖 chunk_boundary_prf 各分支
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges9.py`（74 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 深度**：3 keys consistent；reason 一致；value None；ignores annotation content；callable；signature 2 params POSITIONAL_OR_KEYWORD；return annotation 是 str
+- **chunk_boundary_prf document/annotation 形态**：document={} 走 no_annotation；document 非空 annotation=None；annotation empty dict；annotation=[] falsy；chunks missing field；chunks zero；chunks one；chunk_boundary_anchors missing；chunk_boundary_anchors None；chunk_boundary_anchors 空列表
+- **tolerance_chars**：default 30；POSITIONAL_OR_KEYWORD；写入 _tolerance_chars 各分支都；tolerance=0；tolerance=-1 等价无匹配
+- **正常路径**：perfect match after marker；before marker；marker inside chunk；within tolerance；exceeds tolerance no match；f1=0 当 p=r=0；f1 半匹配 ≈ 2/3
+- **anchor 字段缺失**：missing marker → '' → missing_markers；missing position 默认 after；unknown position 走 else（after）；anchor not dict → AttributeError
+- **多 anchor**：distinct markers；repeated markers advance search_from；marker not in stream recorded in _missing_markers；no _missing_markers key when all found
+- **返回 dict 结构**：top keys normal/missing_markers/pipeline_failed/no_annotation/no_predicted/no_ground_truth 各路径精确
+- **边界**：chunk text None → empty；missing text field；extra whitespace → normalize；chunks not list → AttributeError；zero chunks；one chunk
+- **字段命名**：metric names exact；internal keys prefixed
+- **模块结构**：__all__ exact 3；imports Counter/Any/normalize_text/_null/_ratio；常量值与类型；docstring 提及 caption/boundary/tolerance；future annotations
+
+### 撞墙记录
+- 1 fail：test_chunk_boundary_prf_chunks_not_a_list 期望函数能跑完；实际 chunks 是 str 时 element 无 .get → AttributeError → 改为 expect AttributeError
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 217 后）：19039 pass / 0 fail / 15 skip（HEAD `0159445`）
+
+### 下一步建议
+- 候选 KV：evaluation/report.py 第十轮（200 行）
+- 候选 KAC：evaluation/cli.py 第十一轮（243 行）
+- 候选 KS：evaluation/runner.py 第十一轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十一轮（239 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KV（evaluation/report.py 第十轮），200 行核心组装模块。
+
+---
