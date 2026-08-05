@@ -13165,3 +13165,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KX（evaluation/cli.py 第十四轮）继续推 evaluation 大文件。
 
 ---
+## Round 237 — evaluation/cli.py 第十四轮（90 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第十四轮 edges 测试，覆盖模块 imports 精确、_format_metric 精度边界与 value/reason 组合、argparse 错误路径、_run_inspect_doc 顶层非 dict、_build_parser 详细结构
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges14.py`（90 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块 imports**：argparse/json/sys/Path/ManifestError/load_manifest/get_git_provenance/run_evaluation/EvalSchemaError/validate_file 都在命名空间
+- **模块结构**：无 __all__；__name__ guard 调用 SystemExit(main())；有 sys.stdout.reconfigure 块
+- **_format_metric 精度**：0.5→0.5000；0.12345→0.1235（rounds）；0.12344→0.1234；0.99995→1.0000；-0.0→-0.0000；pi→3.1416；e→2.7183
+- **_format_metric 组合**：empty dict → null(None)；None+None；None+custom；True+None→(ok)；True+empty→(ok)；True+custom；False+None；False+custom；0 int + empty→(ok)；-5+0→(ok)
+- **列宽 36**：short name padding；36 chars no padding；37 chars 不截断
+- **argparse 错误**：unknown command SystemExit(2)；--help SystemExit(0)；run/validate/inspect --help 都 0；invalid parser choice；non-int max-chars/tolerance-chars；missing required/positional
+- **_run_inspect_doc 返回 int**：0 成功；1 bad JSON / array / string / int 顶层；2 missing file
+- **main 返回 int**：validate-report missing file → 2；inspect-doc missing → 2；run missing manifest → 2
+- **_build_parser 详细**：ArgumentParser 实例；SubParsersAction；3 choices；run 5 args / validate 1 / inspect 2；--parser default=fallback；--max-chars 800；--tolerance-chars 30；type=int；choices 精确
+- **formatter_class RawDescriptionHelpFormatter**；prog evaluation.cli
+- **sort order**：bool 第一行/null 最后一行；_tolerance_chars 在输出中
+- **callable 验证**：4 个 module-level function
+
+### 撞墙记录
+- 0 fail：90 测试一次性通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 237 后）：20811 pass / 0 fail / 15 skip（HEAD `8bf0951`）
+
+### 下一步建议
+- 候选 KS：evaluation/runner.py 第十四轮（227 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 候选 KT2：evaluation/manifest.py 第十四轮（239 行）
+- 候选 KE2：evaluation/annotation_metrics.py 第十三轮（194 行）
+- 候选 KF2：evaluation/metrics.py 第十三轮（381 行）
+- 候选 KW2：evaluation/report.py 第十四轮（200 行）
+- 候选 KX2：evaluation/cli.py 第十五轮（243 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS（evaluation/runner.py 第十四轮）继续推 evaluation 中型文件。
+
+---
