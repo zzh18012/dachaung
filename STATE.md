@@ -13536,3 +13536,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KS2（evaluation/runner.py 第十五轮，227 行）继续推 evaluation。
 
 ---
+## Round 245 — evaluation/runner.py 第十五轮（59 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十五轮 edges 测试，覆盖模块 namespace identity（Any/json/time/Path/REPORT_VERSION）、REPORT_VERSION identity、__all__ 精确、模块源码字符串、_load_annotation OSError 处理、_process_one 错误路径与 image_dir、run_evaluation signature keyword-only 标记
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges15.py`（59 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **namespace identity**：typing.Any / json / time / Path 在 namespace；REPORT_VERSION 在 namespace 且 is evaluation.REPORT_VERSION
+- **__all__**：是 list；精确 ['run_evaluation']；不含 _load_annotation / _process_one；内部 helper 仍可访问
+- **模块源码字符串**：docstring 含 not_instrumented / process_single / image_output_dir / pipeline_failed / per_doc；源码含 not_instrumented / image_output_dir_for( / perf_counter
+- **_load_annotation**：None path → None；不存在 → None；目录 → None；合法 dict/list → 返回；非法 JSON → None；空文件 → None；OSError 时不抛
+- **_load_annotation signature**：(path) 单参；return annotation str 含 dict+None
+- **_process_one signature**：4 参精确；return annotation 5-tuple；所有参数无默认
+- **run_evaluation signature**：5 参精确；3 个 keyword-only（parser_name/max_chars/tolerance_chars）；2 个 positional（manifest/output_path）；默认值精确；return dict
+- **callable**：3 个函数都 callable
+- **端到端**：report 顶层 6 keys 顺序精确；report_version=常量；空 manifest → per_doc/expected_failures=[]；summary 4 keys；devset 6 keys；provenance 9 keys；返回 dict == 文件内容；output_path 自动创建目录
+- **devset 透传**：devset_status='complete'；categories_covered list
+- **process_one 错误路径**：document=None + 无 errors → unknown 错误；errors list 取第一个；创建 _per_doc 子目录；elapsed ≥ 0；image_dir=None on failure；清理 stub 文件
+- **keyword-only 验证**：keyword 参数 OK；默认值 OK
+
+### 撞墙记录
+- 1 fail（修复）：
+  - test_run_evaluation_devset_categories_propagated：多写了逗号 `["math", "science"],` → 变成 tuple → 去掉末尾逗号
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 245 后）：21422 pass / 0 fail / 15 skip（HEAD `7bd7691`）
+
+### 下一步建议
+- 候选 KZ2：evaluation/schema.py 第八轮（80 行）
+- 候选 KT3：evaluation/manifest.py 第十五轮（239 行）
+- 候选 KE3：evaluation/annotation_metrics.py 第十四轮（194 行）
+- 候选 KF3：evaluation/metrics.py 第十四轮（381 行）
+- 候选 KW3：evaluation/report.py 第十五轮（200 行）
+- 候选 KX3：evaluation/cli.py 第十六轮（243 行）
+- 候选 KS3：evaluation/runner.py 第十六轮（227 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KZ2（evaluation/schema.py 第八轮，80 行）继续推 evaluation 最小文件。
+
+---
