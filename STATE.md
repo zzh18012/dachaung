@@ -13625,3 +13625,49 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KT3（evaluation/manifest.py 第十五轮，239 行）继续推 evaluation。
 
 ---
+## Round 247 — evaluation/manifest.py 第十五轮（90 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十五轮 edges 测试，覆盖 namespace identity、__all__ 精确、模块 docstring、ManifestError 详细行为、_is_absolute_like/_has_backslash 边界、_resolve_relative_path 错误消息含字段名、_detect_project_root、DocumentEntry/ExpectedFailure/Manifest dataclass frozen+字段精确、Manifest properties、签名精确
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges15.py`（90 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **namespace identity**：typing.Any / dataclass / Path / json / MANIFEST_VERSION / validate 都 is 源模块/对象
+- **MANIFEST_VERSION**：值 '1.0'；是 str
+- **__all__**：是 list；5 元素顺序精确 [ManifestError, Manifest, DocumentEntry, ExpectedFailure, load_manifest]；无重复；不含私有 helper
+- **模块 docstring**：含 'relative' / 'absolute' / 'backslash' / 'project root'
+- **ManifestError**：继承 Exception 不继承 ValueError；默认无 errors；errors kwarg 透传；message attribute；str/repr；可 raise/except
+- **_is_absolute_like 边界**：空 / 单斜杠 / 反斜杠 / alpha:backslash / alpha:slash / alpha:only / alpha:letter / 数字 colon / 2-3 字符边界
+- **_has_backslash 边界**：空 / 仅正斜杠 / 单反斜杠 / 多反斜杠 / 混合 / 仅反斜杠
+- **_resolve_relative_path 错误消息**：含字段名（empty/absolute/backslash/outside_root）；成功返回绝对路径在 project_root 下；unicode filename
+- **_detect_project_root**：pyproject 在 self/parent；无 pyproject raises；file 起始；返回绝对路径
+- **dataclass frozen**：DocumentEntry / ExpectedFailure / Manifest 都 frozen=True；字段数精确；字段名顺序精确；hashable
+- **Manifest properties**：file_count/pdf_count/docx_count/content_group_count/categories_covered 返回类型
+- **categories_covered**：空 / sorted-unique / case-sensitive / unicode
+- **签名精确**：load_manifest(manifest_path, project_root=None)；_is_absolute_like(name)；_has_backslash(name)；_resolve_relative_path(name, project_root, field_name)；_detect_project_root(path)
+- **callable**：5 个公开 symbol 都 callable
+- **End-to-end**：missing file/directory/invalid JSON raises ManifestError；返回 Manifest 实例；manifest_version 透传；documents 是 tuple；project_root 是 Path
+
+### 撞墙记录
+- 0 fail：90 测试一次性全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 247 后）：21592 pass / 0 fail / 16 skip（HEAD `6ba49ee`）
+
+### 下一步建议
+- 候选 KE3：evaluation/annotation_metrics.py 第十四轮（194 行）
+- 候选 KF3：evaluation/metrics.py 第十四轮（381 行）
+- 候选 KW3：evaluation/report.py 第十五轮（200 行）
+- 候选 KX3：evaluation/cli.py 第十六轮（243 行）
+- 候选 KS3：evaluation/runner.py 第十六轮（227 行）
+- 候选 KZ3：evaluation/schema.py 第九轮（80 行）
+- 候选 KT4：evaluation/manifest.py 第十六轮（239 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KE3（evaluation/annotation_metrics.py 第十四轮，194 行）继续推 evaluation。
+
+---
