@@ -11402,3 +11402,62 @@ get_git_provenance 各 OSError 路径。
 第六轮可深入 dataclass frozen/Eq/hash 行为、to_dict/from_dict 往返、各字段默认值、Validator 路径。
 
 ---
+
+## Round 200（2026-08-05）：app/models.py 第六轮（edges7）
+
+### 目标
+- 给 app/models.py（154 行，已有 base/edges/edges2-5 共 ~554 测试）补第六轮
+- 深入常量与 Literal 类型集合（SCHEMA_VERSION、ElementType、SourceType）
+- 各 dataclass __post_init__ ValueError 边界（empty id / no content+resource / empty source_ids / empty text）
+- 默认值不共享（metadata/source_spans/elements 等 default_factory）
+- WarningRecord/ErrorRecord details=None 路径与 to_dict 省略键
+- Document.to_dict 完整字段集（含 schema_version）+ 嵌套 to_dict
+- 模块结构与签名深度（imports/__all__/signature/callable）
+
+### 改动
+- 新增 `tests/test_models_edges7.py`（91 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量**：SCHEMA_VERSION="0.1.0"；ElementType 8 值集合；SourceType 6 值集合；排除 unknown/section/rtf
+- **Element __post_init__**：empty element_id raises、no content+resource raises（match="必须至少有"）、empty content+no resource raises、only resource_path ok（content=None）、only content ok、both ok
+- **Element 默认**：confidence=1.0、parent_id=None、resource_path=None、metadata={}
+- **Element metadata 不共享**：default_factory=dict 每实例独立
+- **Element to_dict**：8 键集合（element_id/type/source_locator/parent_id/content/resource_path/confidence/metadata）
+- **Element 相等/不等/dataclass/字段数=8**
+- **Chunk __post_init__**：empty chunk_id raises、empty source_ids raises（match="至少要有一个"）、empty text raises（match="文本不能为空"）、None text raises
+- **Chunk 默认**：metadata={}、source_spans=[]，default_factory 独立
+- **Chunk to_dict**：5 键集合（chunk_id/text/source_element_ids/metadata/source_spans）
+- **Relation**：4 键集合、metadata 不共享、dataclass、字段数=4
+- **WarningRecord**：details=None 省略键、details={} 包含键、details={"k":"v"} 包含、默认 None、字段数=3
+- **ErrorRecord**：details=None 省略键、details={} 包含、details={"k":"v"} 包含、默认 None、不等 on message、字段数=3
+- **Document**：默认 lists 全空、metadata={} 不共享、elements 不共享
+- **Document to_dict**：返回 dict、含 schema_version、**13 键**（含 schema_version；schema_version 是 class const，非 dataclass field）
+- **Document 字段数=12**（schema_version 不计入 dataclass fields）
+- **Document to_dict 嵌套**：elements/chunks/warnings/errors/relations 都 .to_dict()，empty lists
+- **Document metadata 引用语义**：to_dict 不深拷贝 metadata，外部修改影响原对象
+- **模块结构**：imports（dataclass/field/asdict/typing）、__all__ 未定义（默认 public 全 importable）、to_dict signatures 全 {"self"}、所有 class callable
+- **idempotency**：element/chunk/document to_dict 重复调用一致
+- **综合行为**：full Document 含所有字段类型、asdict 深拷贝 metadata 嵌套 list
+
+### 撞墙记录
+- 2 fail（已修）：
+  - `test_document_field_count` 期望 13，实际 12（schema_version 是 class const 不算 dataclass field）→ 改 12
+  - `test_document_to_dict_metadata_mutated_not_affecting_source` 期望原对象不变，实际 Document.to_dict 不深拷贝 metadata（外部可变）→ 反向断言
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 200 后）：16982 pass / 0 fail / 14 skip（HEAD `57a5bb7`）
+
+### 下一步建议
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / ~1200 测试）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / ~1200 测试）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KU：app/schema.py 第七轮（230 行 / ~900 测试）
+- 候选 KF/KV/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KU（app/schema.py 第七轮）。schema.py 是 JSON Schema 校验核心（230 行 / ~3.9 tests/line），
+第七轮可深入 if/then 条件分支、anyOf、const、enum、自定义错误消息路径、各 source_type 的 locator 校验细节。
+
+---
