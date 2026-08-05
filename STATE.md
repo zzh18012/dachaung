@@ -13580,3 +13580,48 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KZ2（evaluation/schema.py 第八轮，80 行）继续推 evaluation 最小文件。
 
 ---
+## Round 246 — evaluation/schema.py 第八轮（80 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第八轮 edges 测试，覆盖 namespace identity、__all__ 精确、模块 docstring、EvalSchemaError 详细行为、_schema_path 路径穿越/绝对路径/空名、validate 返回 None / 不修改 instance、validate_file JSONDecodeError 透传、签名精确
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges8.py`（81 测试，1 个 Windows 上 skipped）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **namespace identity**：typing.Any / json / Path / Draft202012Validator / JSValidationError 都 is 源模块
+- **SCHEMAS_DIR 精确**：是 Path；绝对路径；值匹配；目录存在；4 个 schema 文件存在
+- **__all__**：是 list；5 元素顺序精确；无重复；不含私有 _schema_path
+- **模块 docstring**：含 manifest / annotation / evaluation-report；提到不与 app/schema 复用
+- **EvalSchemaError**：继承 Exception；errors 默认 []；errors=None → []；errors=[] → []；errors kwarg 透传（同 list 引用）；errors 可 mutate；message attribute；str/repr；可 raise/except；__init__ 签名 (self, message, errors=None)
+- **_schema_path**：dotdot 路径穿越 raises；subdir raises；.json raises；空 name raises；大写 name Windows 上不抛；error message 含 schema 名字；4 个已知 schema 返回 Path；返回的 Path 在 SCHEMAS_DIR 内；签名精确
+- **load_schema**：返回 dict；不缓存（每次新 dict）；修改不影响下次；4 个已知 schema 都返回 dict 含 $schema；签名精确
+- **validate**：成功返回 None；不修改 instance；错误 message 含 path= / schema_name；errors 每项 3 key；path/schema_path 是 list；签名精确
+- **validate_file**：接受 str/Path；返回 None on success；missing raises；directory raises；invalid JSON raises JSONDecodeError；invalid content raises EvalSchemaError；utf-8 OK；含中文 OK；签名精确
+- **callable**：5 个公开 symbol 都 callable
+- **Draft202012Validator 集成**：load_schema 返回可被 Validator 使用；validate 与直接 Validator 行为一致；4 个 schema 自身合法
+
+### 撞墙记录
+- 3 fail（修复）：
+  - test_schema_path_uppercase_name_raises：Windows 文件系统 case-insensitive，大写名字仍匹配 → 加 skip 标记
+  - test_validate_return_annotation_is_none：from __future__ import annotations 让 return_annotation 是字符串 'None' 不是 None → 改成 `is None or == 'None'`
+  - test_validate_file_return_annotation_is_none：同上
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 246 后）：21502 pass / 0 fail / 16 skip（HEAD `faf5c9f`）
+
+### 下一步建议
+- 候选 KT3：evaluation/manifest.py 第十五轮（239 行）
+- 候选 KE3：evaluation/annotation_metrics.py 第十四轮（194 行）
+- 候选 KF3：evaluation/metrics.py 第十四轮（381 行）
+- 候选 KW3：evaluation/report.py 第十五轮（200 行）
+- 候选 KX3：evaluation/cli.py 第十六轮（243 行）
+- 候选 KS3：evaluation/runner.py 第十六轮（227 行）
+- 候选 KZ3：evaluation/schema.py 第九轮（80 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KT3（evaluation/manifest.py 第十五轮，239 行）继续推 evaluation。
+
+---
