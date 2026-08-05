@@ -12034,3 +12034,61 @@ get_git_provenance 各 OSError 路径。
 可深入边界 tolerance、最近图片启发式、缺失 annotation 各路径。
 
 ---
+
+## 2026-08-05 — Round 211（evaluation/annotation_metrics.py 第八轮）
+
+### 目标
+- 给 evaluation/annotation_metrics.py（194 行，已有 base/edges/edges2-7 共 ~532 测试）补第八轮
+- 模块结构 / __all__ exact / imports
+- PARSER_DOES_NOT_EMIT_RELATIONS 常量值与类型
+- figure_caption_prf 各 document/annotation 组合
+- chunk_boundary_prf document None / annotation falsy / chunks 不足 2 / anchors 缺失
+- chunk_boundary_prf position before/after/unknown/missing
+- chunk_boundary_prf marker missing → _missing_markers
+- chunk_boundary_prf tolerance_chars 传播 + 软匹配
+- chunk_boundary_prf 完美/不对称匹配
+- chunk_boundary_prf 不修改输入 / idempotent / 类型
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges8.py`（82 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块结构**：__all__ == {PARSER_DOES_NOT_EMIT_RELATIONS, figure_caption_prf, chunk_boundary_prf}（list 3 entries）；imports（Counter/Any/normalize_text）；docstring 含 figure_caption/chunk_boundary；future annotations；无 _silence_unused_import
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：是 str；值 == "parser_does_not_emit_relations"；非空；与模块命名空间引用一致
+- **figure_caption_prf**：2 参数（document/annotation）；3 keys 精确（figure_caption_precision/recall/f1）；所有 value=None + reason=parser_does_not_emit_relations；即使 document/annotation 给定仍 null（parser 不出 relation）；idempotent；每 metric 2 keys（value+reason）；不修改输入
+- **chunk_boundary_prf 签名**：3 参数（document/annotation/tolerance_chars）；tolerance_chars 是 POSITIONAL_OR_KEYWORD（不是 keyword-only）；默认 30；返回 dict[str, dict[str, Any]]
+- **document None 路径**：3 metric null + pipeline_failed；含 _tolerance_chars；4 keys 精确
+- **annotation falsy 路径**：None/空 dict/空 list/0 都触发 no_annotation；annotation falsy 时不出现 _missing_markers
+- **chunks < 2 路径**：no chunks/1 chunk/缺 chunks 字段/chunks None 都触发 no_predicted_boundaries；1 chunk + 1 anchor → recall=_ratio(0.0)
+- **anchors 缺失路径**：annotation 非空但缺 chunk_boundary_anchors → no_ground_truth_anchors；anchors None/空 → no_ground_truth_anchors
+- **tolerance_chars 传播**：0/large/42 都写入 _tolerance_chars.value；value 是 int；reason None；2 keys 精确
+- **position 边界**：before 用 marker 起始；after 用 marker 结束；unknown/missing 默认 after
+- **marker missing**：空 marker/marker 不在 stream → 加入 _missing_markers；value 是 list；reason None；全找到时不出现 _missing_markers
+- **完美匹配**：tolerance=0 + 精确位置 → precision/recall/f1=1.0
+- **tolerance 软匹配**：距离 ≤ tolerance → matched；距离 > tolerance → 不 matched
+- **不对称匹配**：多 prediction 少 anchor → precision 减半；多 anchor 少 prediction → recall 减半（受 missing markers 影响）
+- **不变性**：不修改 document/annotation；idempotent；返回新 dict
+- **类型**：每 metric 含 value+reason；precision/recall/f1 value 是 float（已评估时）
+
+### 撞墙记录
+- 2 fail：
+  1. test_chunk_boundary_prf_tolerance_is_keyword_only 误以为 tolerance_chars 是 KEYWORD_ONLY（实际签名 `def chunk_boundary_prf(document, annotation, tolerance_chars=30)` 无 `*` 分隔）→ 改成 POSITIONAL_OR_KEYWORD
+  2. test_chunk_boundary_prf_anchors_missing_key 用 `annotation={}` 但空 dict 走 falsy 路径（no_annotation），不是 no_ground_truth_anchors → 改成 `{"other_field": "x"}`（非空但缺 chunk_boundary_anchors）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 211 后）：18459 pass / 0 fail / 15 skip（HEAD `6c08d05`）
+
+### 下一步建议
+- 候选 KX：evaluation/cli.py 第十轮（243 行 / ~1100 测试）
+- 候选 KY：evaluation/report.py 第九轮（200 行 / ~860 测试）
+- 候选 KZ：evaluation/schema.py 第 N 轮
+- 候选 KAA：evaluation/schema_validation.py 第 N 轮
+- 候选 KF/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KX（evaluation/cli.py 第十轮）。cli.py 是评测命令行入口（243 行 / ~4.5 tests/line），
+第十轮可深入 _build_parser 各 argument、main exit code、_format_metric 各类型。
+
+---
