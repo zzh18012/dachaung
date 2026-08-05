@@ -12092,3 +12092,53 @@ get_git_provenance 各 OSError 路径。
 第十轮可深入 _build_parser 各 argument、main exit code、_format_metric 各类型。
 
 ---
+
+## 2026-08-05 — Round 212（evaluation/cli.py 第十轮）
+
+### 目标
+- 给 evaluation/cli.py（243 行，已有 base/edges/edges2-9 共 ~870 测试）补第十轮
+- 模块结构：__all__ 未定义 / imports 完整集合 / __main__ 块 / sys.stdout.reconfigure
+- _build_parser：run/validate-report/inspect-doc 各 argument 默认值
+- _format_metric：各 reason/value 组合输出格式精确文本
+- _run_inspect_doc：各 metric 类型分组 / 排序
+- main()：validate-report 完整路径（合法/不存在/目录/JSON 解析失败/schema 不合/非 dict）
+- main()：inspect-doc 完整路径（合法/不存在/JSON 失败/非 dict/空 dict/image element）
+- main()：run 失败路径（manifest 不存在/目录/非法 parser/非 int max-chars）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges10.py`（111 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块结构**：__all__ 未定义（CLI 入口）；imports（argparse/json/sys/Path/ManifestError/load_manifest/get_git_provenance/run_evaluation/EvalSchemaError/validate_file）；docstring 含 run/validate-report/inspect-doc + python -m evaluation.cli；future annotations；无 _silence_unused_import；__main__ 块用 __name__ 守卫 + raise SystemExit；含 reconfigure 块
+- **_build_parser**：0 参数；返回 argparse.ArgumentParser；prog == "evaluation.cli"；description 非空；3 个子命令（run/validate-report/inspect-doc）；subparsers dest="command" required
+- **run subparser**：--manifest/--output required；--parser choices=(fallback, kreuzberg) default=fallback；--max-chars type=int default=800；--tolerance-chars type=int default=30
+- **validate-report subparser**：positional input；无 optional args
+- **inspect-doc subparser**：positional input；--tolerance-chars type=int default=30
+- **main()**：argv 默认 None；返回 int；无参数 / 未知命令 → SystemExit
+- **_format_metric**：返回 str；value None → "null (reason)"；bool True/False → lowercase；float → 4 位小数；int 原样；dict 按 key 排序后渲染 k=v；string/list/tuple 走默认分支；name padding 到 36 字符；name 超 36 不截断；unicode name OK；value=None 时不显示 ok；value 非 None 且 reason=None 时显示 ok
+- **_run_inspect_doc**：args 唯一参数；返回 int；callable
+- **main validate-report 路径**：合法 → exit 0 + stdout "[OK] filename"；不存在 → exit 2 + stderr [ERROR]；目录 → exit 2；JSON 失败 → exit 1；空文件 → exit 1；schema 不合 → exit 1 + stderr [FAIL]；非 dict（list）→ exit 1
+- **main inspect-doc 路径**：合法 → exit 0；输出 file/document_id/source/parser/counts 行；metrics 段；bool metric 排在最前；不存在 → exit 2 + stderr [ERROR]；JSON 失败 → exit 1；非 dict → exit 1；空 dict → exit 0（source_type=unknown）；image element 不崩溃；idempotent；stdout/stderr 分流
+- **main run 失败路径**：manifest 不存在 → exit 2 + stderr [ERROR]；manifest 是目录 → exit 2；非法 parser choice → SystemExit 2；非 int max-chars → SystemExit 2；负 max-chars 通过 argparse（manifest 先失败 → exit 2）
+- **main 综合行为**：返回 int；argv 各形式都安全
+
+### 撞墙记录
+- 1 fail：test_build_parser_has_three_subcommands 误以为 validate-report/inspect-doc 只传 cmd 名即可解析；实际两子命令都要求 positional input → 改成每个子命令传完整 minimal args
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 212 后）：18570 pass / 0 fail / 15 skip（HEAD `0d377a1`）
+
+### 下一步建议
+- 候选 KY：evaluation/report.py 第九轮（200 行 / ~860 测试）
+- 候选 KZ：evaluation/schema.py 第 N 轮（待查行数）
+- 候选 KAA：evaluation/schema_validation.py 第 N 轮（待查行数）
+- 候选 KAB：evaluation/__init__.py 第 N 轮（小文件）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KY（evaluation/report.py 第九轮）。report.py 是评测报告组装核心（200 行 / ~4.3 tests/line），
+第九轮可深入 aggregate_summary 各 metric 聚合分支、build_provenance 9 字段、build_devset_section 6 字段。
+
+---
