@@ -12399,3 +12399,43 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KAC（evaluation/cli.py 第十一轮），243 行 CLI 入口。
 
 ---
+
+## Round 219 — evaluation/cli.py 第十一轮（100 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第十一轮 edges 测试，覆盖 _format_metric / _run_inspect_doc / main 各路径
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges11.py`（100 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 深度**：description 精确；add_help 默认 True；allow_abbrev 默认 True；subparsers required；--help 各子命令都 SystemExit
+- **_format_metric 深度**：value=None with specific reason；int 0/负值；very small float → 0.0000；float 0.5 → 0.5000；dict with int/str/0/nested dict/empty string/tuple；list with dict；set/frozenset 走默认；empty reason；name padding 可见；name 超 36 不截断；metric 缺 value/reason key；metric 空 dict；自定义类走默认；value 是 class 走默认
+- **_run_inspect_doc 深度**：signature；return annotation；callable；返回 0；prints filename；prints metrics header；missing file → 2；invalid JSON → 1；non-dict → 1；document_id missing → "?"；parser missing → "v?"
+- **main() validate-report 深度**：valid returns 0 + prints OK；missing → 2；directory → 2；invalid JSON → 1；empty → 1；invalid schema → 1 + [FAIL]；list/int/string/null/bool/float 顶层都 → 1
+- **main() inspect-doc 深度**：empty dict returns 0；prints metrics；source_type unknown when missing；source_type pdf/docx；image element no crash；多 chunks；--tolerance-chars；返回 int；stdout only
+- **main() run 深度**：missing manifest → 2；directory manifest → 2；invalid JSON → 1；invalid parser choice → SystemExit 2；non-int max-chars → SystemExit 2；non-int tolerance-chars → SystemExit 2；missing required args → SystemExit
+- **模块结构**：__main__ block + raise SystemExit；reconfigure block + try/except + AttributeError/OSError；imports 完整；docstring 提及 run/validate-report/inspect-doc/python -m；future annotations；no _silence_unused
+- **综合行为**：no args / unknown command → SystemExit 2；返回 int；custom type 走默认分支
+
+### 撞墙记录
+- 0 fail：一次通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 219 后）：19251 pass / 0 fail / 15 skip（HEAD `a734041`）
+
+### 下一步建议
+- 候选 KS：evaluation/runner.py 第十一轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十一轮（239 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KU：evaluation/annotation_metrics.py 第十轮（194 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS（evaluation/runner.py 第十一轮）继续推 evaluation 大文件覆盖。
+
+---
