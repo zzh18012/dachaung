@@ -10899,3 +10899,63 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 446 行代码有 SAX 复杂状态机（pre/blockquote/table 嵌套、section_path 栈、handle_data 各分支），第八轮可深入未覆盖的内部状态转移。
 
 ---
+
+## Round 191（2026-08-05）：app/parsers/html_parser.py 第八轮（edges8）
+
+### 目标
+- 给 app/parsers/html_parser.py（446 行，已有 base/edges/edges2-7 共 808 测试，1.8 tests/line 全场最低）补第八轮
+- 直接单元测试 _HTMLDocParser 的内部方法（_make_locator_for_current/_emit_image/_flush_block/_reset_block/_start_block）
+- 深入 handle_starttag/endtag/data 各分支
+
+### 改动
+- 新增 `tests/test_parsers_html_edges8.py`（182 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_HTMLDocParser __init__ 状态**：cur_kind=None、cur_buffer=[]、document_id、elements/warnings 是 list、pre/blockquote/table_depth=0、section_path/levels=[]、list/skip_stack=[]、table_rows_stack=[]、cur_start_line/level=0、cur_ordered=False
+- **_make_locator_for_current 直接**：no section → 只 line；with section → 含 section_path "X > Y > Z"；default line=0
+- **_make_locator_for_inline 直接**：uses getpos、no section 不含 section_path key
+- **_reset_block 直接**：clears cur_kind/buffer、resets level/ordered、不动 section_path
+- **_start_block 直接**：sets cur_kind、clears cur_buffer、sets level/ordered、默认 level=0/ordered=False、flush 已有 block、updates cur_start_line
+- **_flush_block 直接**：no kind 是 noop、empty text 不 emit、resets after flush、heading/paragraph/list_item/pre/blockquote 各自 metadata、pre → kind=preformatted、blockquote → kind=blockquote、paragraph 无 metadata、confidence 0.95、heading section_path 弹栈逻辑（>= level 全 pop，相同 level 替换，h1 全 pop，append 新层级）、level=0 → max(1,0)=1
+- **_emit_image 直接**：appends image element、resource_path=src、metadata={alt}、content=None、confidence 0.9、flushes existing block、element_id 递增、locator 用 inline
+- **handle_starttag 各分支**：img dispatch/empty src/missing alt/None alt、br in block/outside、hr flushes、ul/ol push list_stack、li ordered/unordered/no-list-defaults、pre/blockquote nested 不 restart、p in pre/blockquote 忽略、inline tag (b/i/a) 忽略、skip tag push 栈、nested skip、table starts mode、nested table warning + depth 不增
+- **handle_endtag 各分支**：p/heading/li 外面无副作用、pre/blockquote clamped to 0、ul/ol pop list_stack、wrong list tag 不 pop、skip stack pop match、unknown tag noop、table ends mode、pre 嵌套外层才 flush
+- **handle_startendtag 各分支**：img/br/hr/unknown → dispatch to starttag
+- **handle_data 各分支**：in skip stack 忽略、in table cell append、loose text starts paragraph、whitespace only 忽略、in existing block append、各 kind block (heading/list_item/pre/blockquote) 正确 append
+- **_rows_to_md 深度**：2x2、1x1、separator 各列 dashes、single body row、no body rows
+- **_detect_html_source_type 错误细节**：code=unsupported_type、details 含 suffix、no suffix details.suffix=""
+- **HtmlParser 类属性**：name="html"、version="stdlib/0.1.0"、inherits Parser、两实例一致、class attr 不需实例化、不接受 image_output_dir、parse 签名 (self, path, source_hash)
+- **模块常量**：_HEADING_LEVELS 6 keys/values、_SKIP_TAGS 7 set、_HTML_EXTENSIONS 2 tuple
+- **模块结构**：__all__=["HtmlParser"]、imports、docstring 含 supported/skip/unsupported/source_locator
+- **_HTMLDocParser 继承 stdlib**：issubclass(_StdHTMLParser)、convert_charrefs=True、handle_* 方法签名 (self, tag, attrs/data)、init 签名 (self, document_id) 无默认值
+- **内部方法存在性**：_make_locator_for_current/_emit_image/_flush_block/_reset_block/_start_block/_handle_table_inner_start/_handle_table_inner_end
+
+### 撞墙记录
+- 0 fail：第一次跑全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 191 后）：15845 pass / 0 fail / 13 skip（HEAD `1052ab7`）
+
+### 下一步建议
+- 候选 KF：app/parsers/base.py 第六轮（仍饱和）
+- 候选 KI：app/parsers/ipynb_parser.py 第八轮（227 行 / 844 测试 = 3.7）
+- 候选 KJ：app/parsers/text_parser.py 第八轮（136 行 / 636 测试 = 4.7）
+- 候选 KK：app/parsers/fallback_parser.py 第八轮（630 行 / 942 测试 = 1.5）
+- 候选 KL：app/models.py 第六轮（154 行 / 554 测试 = 3.6）
+- 候选 KM：app/parsers/markdown_parser.py 第八轮（326 行 / 943 测试 = 2.9）
+- 候选 KN：app/pipeline.py 第九轮（216 行 / 922 测试 = 4.3）
+- 候选 KO：evaluation/runner.py 第八轮（227 行 / 635 测试 = 2.8）
+- 候选 KP：evaluation/cli.py 第八轮（243 行 / 664 测试 = 2.7）
+- 候选 KQ：evaluation/metrics.py 第八轮（381 行 / 1103 测试 = 2.9）
+- 候选 KR：evaluation/report.py 第七轮（200 行 / 669 测试 = 3.3）
+- 候选 KS：evaluation/manifest.py 第八轮（239 行 / 821 测试 = 3.4）
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / 1227 测试 = 3.2）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KK（app/parsers/fallback_parser.py 第八轮）。fallback_parser 是默认 PDF/DOCX 解析路径，
+630 行 / 1.5 tests/line 是当前测试密度最低的文件，第八轮可深入 _classify_pdf_paragraph 边界、_lines_to_para
+bbox 聚合细节、_group_words_to_paragraphs 聚类阈值、_save_image 各错误路径、FallbackParser.parse 各状态。
+
+---
