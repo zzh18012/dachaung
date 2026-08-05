@@ -10239,3 +10239,44 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第七轮可深入 compute_automatic_metrics 各 metric 边界（None/0/negative/missing 字段）。
 
 ---
+
+## Round 177（2026-08-05）：evaluation/metrics.py 第七轮（edges7）
+
+### 目标
+- 给 evaluation/metrics.py（381 行，已有 base/edges/edges2-6 共 951 测试）补第七轮
+- 深入 _image_resource_ratio 各 OSError/size 0/relative path 分支、_text_preservation multiset 语义、_chunk_reference_ratio 各分支
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges7.py`（76 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_image_resource_ratio**：resource_path 缺失/空/不存在/size 0 各跳过、mixed valid、relative + image_base_dir 拼 .name、image_base_dir=None 时只用原始 Path
+- **_text_preservation**：empty expected/actual 各 precision/recall null 路径、重复字符 min 交集、reorder 改 equal 不改 multiset、image content 不参与 expected、全空白 expected → empty_expected reason
+- **_text_preservation 公式**：precision=common/|actual|、recall=common/|expected|、extra chars in actual → precision<1.0 recall=1.0
+- **_chunk_reference_ratio**：empty chunks → no_chunks、empty elements with chunks → 0.0、source_element_ids=None falsy 跳过、all valid/partial 各 ratio
+- **_silent_drop_count**：negative/zero expected no drop、unexpected type 0 actual、actual > expected → 0
+- **compute_automatic_metrics**：error_code 内联 dict 结构、source_type 非 pdf/docx 各 null reason、pipeline_failed 11 metric keys 全 null + pipeline_failed reason、成功路径 14 keys、element_count_by_type 含 image
+- **模块结构**：__all__ 精确、imports（math/Counter/Path/Any）、docstring 提及 Counter/纯函数/不伪造、helper functions 14 个都存在
+- **综合行为**：每个 helper 幂等、不修改输入、_null/_ratio 互不影响
+
+### 撞墙记录
+- 一次撞墙（1 fail）：
+  - _image_resource_ratio 本身 image_base_dir 无默认值（必填）→ 改为 no_default 测试
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 177 后）：14240 pass / 0 fail / 13 skip（HEAD `ca4a8a9`）
+
+### 下一步建议
+- 候选 IT：evaluation/manifest.py 第七轮（239 行 / 731 测试）
+- 候选 IW：app/cli.py 第八轮（535 行 / 747 测试）
+- 候选 IX：app/pipeline.py 第八轮（216 行 / 702 测试）
+- 候选 IY：app/chunkers/structural.py 第八轮（388 行 / 938 测试）
+- 候选 IZ：evaluation/annotation_metrics.py 第七轮（194 行 / 523 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IT（evaluation/manifest.py 第七轮）。manifest.py 是清单加载核心，
+第七轮可深入 DocumentEntry/ExpectedFailure frozen dataclass 边界、_resolve_relative_path 错误消息、content_group_count 链式配对。
+
+---
