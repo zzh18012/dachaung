@@ -11763,3 +11763,57 @@ get_git_provenance 各 OSError 路径。
 第八轮可深入 aggregate_summary 各分支、get_git_provenance subprocess 各错误路径、build_provenance 字段集、build_report 完整字段。
 
 ---
+
+## Round 206（2026-08-05）：evaluation/report.py 第八轮（edges8）
+
+### 目标
+- 给 evaluation/report.py（200 行，已有 base/edges/edges2-7 共 ~763 测试）补第八轮
+- 深入 _RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 精确内容
+- EVALUATOR_VERSION / REPORT_VERSION 常量值
+- aggregate_summary 各聚合分支（participating_docs/not_evaluated/macro_average）
+- aggregate_summary 多文档混合（部分 None / 部分 valid / 部分缺 metric）
+- get_git_provenance subprocess 各错误路径（OSError/SubprocessError/TimeoutExpired/不存在目录）
+- get_dependency_versions importlib.metadata.PackageNotFoundError
+- build_provenance 9 字段精确值 + max_chars 类型强制（int/float/数字字符串）
+- build_devset_section 6 字段 + TrackingManifest 验证只读属性
+- 模块 imports / __all__ / future annotations
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges8.py`（99 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量元组**：_RATIO_METRICS 是 tuple、12 元素、无重复、含 schema_valid/text_preservation_equal/3 个 chunk_boundary/2 个 locator_ratio、排除 figure_caption；_COUNT_METRICS == ("element_count_total",)；_SUCCESS_BOOL_METRICS == ("pipeline_success",)
+- **版本常量**：EVALUATOR_VERSION / REPORT_VERSION 是 str、非空、值=="1.1"（本 worktree 不动版本号）
+- **aggregate_summary 结构**：4 个 top keys（counts/success_rates/ratio_macro_averages/silent_drop_total）；counts 含 element_count_total；success_rates 含 pipeline_success；ratio_macro_averages 含 12 keys；empty 输入 → silent_drop_total=None、counts sum=None/participating_docs=0、success_rate rate=None/total=0、ratio macro_average=None/participating_docs=0/not_evaluated=0
+- **aggregate_summary count 聚合**：3 doc 30 sum、skip None、skip missing metric、participating_docs 准确
+- **aggregate_summary success_rate**：全成功 rate=1.0、半成功 rate=0.5、全失败 rate=0.0、skip None value 但 total 仍含全部
+- **aggregate_summary ratio macro**：3 doc 0.5 macro、skip None、not_evaluated 准确
+- **aggregate_summary silent_drop**：sum、skip None、0 values 仍 count
+- **aggregate_summary 类型分离**：counts 不含 ratio；success_rates 不含 ratio；ratio 不含 success
+- **get_git_provenance**：返回 dict、keys {git_commit, git_dirty}、real repo commit 是 40 hex、dirty 是 bool、不存在目录 → None+True、OSError/SubprocessError/TimeoutExpired 都安全返回
+- **get_dependency_versions**：返回 dict、3 keys（pdfplumber/python-docx/pypdfium2）、value 是 str|None、dev 环境 pdfplumber 与 python-docx 都装了
+- **build_provenance**：返回 dict、9 keys、evaluator_version 与 report_version 用模块常量、parser_name/version 传播、parser_version=None OK、max_chars int 强制（int/float/数字字符串）、dependencies 是 dict、run_timestamp_iso ISO 8601 含 T、timestamp 在调用时间附近、git_commit/dirty 与 get_git_provenance 一致
+- **build_devset_section**：返回 dict、6 keys、各字段传播、empty categories OK、TrackingManifest 验证只读属性
+- **模块结构**：__all__ 5 entries exact、imports（subprocess/datetime/Path/Any/EVALUATOR_VERSION/REPORT_VERSION）、docstring 含聚合规则、future annotations
+- **综合行为**：idempotent、full pipeline 混合 metrics 正确聚合
+
+### 撞墙记录
+- 0 fail：第一次跑全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 206 后）：17814 pass / 0 fail / 15 skip（HEAD `56dfcd8`）
+
+### 下一步建议
+- 候选 KP：evaluation/runner.py 第九轮（227 行 / ~1000 测试）
+- 候选 KQ：evaluation/metrics.py 第九轮（381 行 / ~1200 测试）
+- 候选 KR：evaluation/manifest.py 第九轮（239 行 / ~1100 测试）
+- 候选 KT：app/chunkers/structural.py 第十轮（388 行 / ~1600 测试）
+- 候选 KF/KV/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KP（evaluation/runner.py 第九轮）。runner.py 是评测运行核心（227 行 / ~4.4 tests/line），
+第九轮可深入 _load_annotation JSON 各分支、_process_one 错误矩阵、run_evaluation 公共/私有字段、报告写盘细节。
+
+---
