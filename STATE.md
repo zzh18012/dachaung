@@ -12774,3 +12774,42 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KZ（evaluation/schema.py 第六轮）补 evaluation 中等大小文件。
 
 ---
+## Round 228 — evaluation/schema.py 第六轮（87 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第六轮 edges 测试，覆盖 EvalSchemaError 错误类型、_schema_path 边界、load_schema 可变性、validate/validate_file 错误优先级
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges6.py`（87 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 深度**：errors 是 tuple/dict/int 输入（truthy 保留原值，falsy → []）；init 接 kwargs；可子类化；str/repr 含 unicode/换行；args 含 message；init 后可写 errors 属性
+- **_schema_path 深度**：空 name（raises 因为 SCHEMAS_DIR/'' 是 dir）；subdir name；dot prefix；返回路径在 SCHEMAS_DIR 下
+- **load_schema 深度**：每个已知 schema 返回可变独立 dict；未知 name raises FileNotFoundError；callable；signature
+- **validate 深度**：instance 类型 list/str/int/None 都 raise EvalSchemaError；空 dict raises；errors 按 path 排序；head message 含首错；callable；signature；无默认值；不修改 instance
+- **validate_file 深度**：BOM 文件 raises JSONDecodeError；trailing comma/single quotes raise；array/int/str/null/bool root JSON 全 raise EvalSchemaError；空文件 raises；优先级（FileNotFoundError > JSONDecodeError > Schema）；成功返回 None；接受 str/Path；目录 raises
+- **模块结构**：__all__ 精确 5 个；imports json/Path/Any/Draft202012Validator/JSValidationError；docstring 提到 schema/与 app 分离；SCHEMAS_DIR 是 Path/absolute/exists；EvalSchemaError 是 Exception 子类带 docstring；_schema_path internal（不在 __all__）
+- **综合**：validate 后 load_schema round-trip；EvalSchemaError 链式 __cause__；try/except/finally raise 传播；复杂嵌套错误路径（documents/0/source_type）；多余 top keys 拒绝；SCHEMAS_DIR 解析（无 .. 或 .）
+
+### 撞墙记录
+- 0 fail（首次跑过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 228 后）：20012 pass / 0 fail / 15 skip（HEAD `e095241`）
+
+### 下一步建议
+- 候选 KW：evaluation/report.py 第十二轮（200 行）
+- 候选 KX：evaluation/cli.py 第十三轮（243 行）
+- 候选 KS：evaluation/runner.py 第十三轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十三轮（239 行）
+- 候选 KE：evaluation/annotation_metrics.py 第十二轮（194 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行 — 已饱和）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行 — 已饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW（evaluation/report.py 第十二轮）继续推 evaluation 大文件。
+
+---
