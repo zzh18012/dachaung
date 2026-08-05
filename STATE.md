@@ -12985,3 +12985,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KT（evaluation/manifest.py 第十三轮）继续推 evaluation 大文件。
 
 ---
+## Round 233 — evaluation/manifest.py 第十三轮（94 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十三轮 edges 测试，覆盖 _is_absolute_like/_has_backslash/_resolve_relative_path 深度边界、Manifest dataclass 字段精确、properties 返回类型、content_group_count 自环/链/环/双向、categories_covered 大小写敏感、ManifestError docstring、load_manifest expectations/annotation_file/paired_with/categories/sha256 透传
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges13.py`（94 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like**：3 字符 alpha+slash / drive+colon；4 字符 drive+path；纯字母；纯数字；字符串第 [0]/[1]/[2] 位
+- **_has_backslash**：mixed slash（forward + back）；纯 forward 不算
+- **_resolve_relative_path**：path_str 同时含正反斜杠；多层 subdir；trailing slash；dot/dotdot 混合
+- **DocumentEntry dataclass fields()**：字段名/类型/默认值精确
+- **ExpectedFailure dataclass fields()**：字段名/类型精确
+- **Manifest dataclass fields()**：6 个字段名精确
+- **Manifest properties**：返回类型（int/list/tuple/Path/Optional[Path]）；每次调用返回新对象
+- **content_group_count**：self-pair（自己跟自己一组）；pair 到不存在的 doc_id；链式 A-B-C；环 A-B-C-A；双向 A↔B（去重）
+- **categories_covered**：case-sensitive sort（"PDF" ≠ "pdf"）；unicode 排序
+- **ManifestError**：docstring 非空；是 Exception 子类
+- **load_manifest**：expectations 含 element_count_by_type / required_markers 透传；annotation_file None；paired_with 透传；categories 透传；sha256 透传；doc_id 重复触发 ManifestError
+- **module __all__**：导出顺序精确
+
+### 撞墙记录
+- 1 fail（修复）：
+  - test_load_manifest_expectations_none：以为 schema 允许 expectations: null 走到 `d.get("expectations")`；实际 manifest.schema.json 定义 expectations 为 `{"type": "object", "additionalProperties": false, ...}` 不允许 null，schema 验证先抛 EvalSchemaError → 改成 expect EvalSchemaError 并加注释说明
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 233 后）：20426 pass / 0 fail / 15 skip（HEAD `5e3155f`）
+
+### 下一步建议
+- 候选 KE：evaluation/annotation_metrics.py 第十二轮（194 行）
+- 候选 KF：evaluation/metrics.py 第十二轮（381 行）
+- 候选 KW：evaluation/report.py 第十三轮（200 行）
+- 候选 KX：evaluation/cli.py 第十四轮（243 行）
+- 候选 KS：evaluation/runner.py 第十四轮（227 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 候选 KT2：evaluation/manifest.py 第十四轮（239 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KE（evaluation/annotation_metrics.py 第十二轮）继续推 evaluation 大文件。
+
+---
