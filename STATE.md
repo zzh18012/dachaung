@@ -11595,3 +11595,56 @@ get_git_provenance 各 OSError 路径。
 第九轮可深入 run() 各分支、_run_for_file 错误矩阵、source_hash 计算路径、CLI 入口细节。
 
 ---
+
+## Round 203（2026-08-05）：app/pipeline.py 第九轮（edges9）
+
+### 目标
+- 给 app/pipeline.py（216 行，已有 edges/edges2-8 + errors/helpers 共 ~767 测试）补第九轮
+- 深入 get_parser 各返回类型、name 属性、错误消息含全部支持 parser 列表
+- image_output_dir_for 各种 source_hash 长度边界（empty/1/15/16/17/64）+ 无 parent 路径
+- process_single 错误矩阵深度：hash_io_error / chunker_failed / write_failed / schema_validation_failed
+- process_single 写盘行为：write_json=False 不写、output_path=None 不写、嵌套 parent mkdir
+- process_single signature：parser_name/max_chars/write_json 是 KEYWORD_ONLY
+- validate_only 各种消息格式（OK / missing / JSON 失败 / Schema 失败）
+- 模块结构与签名深度
+
+### 改动
+- 新增 `tests/test_pipeline_edges9.py`（106 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **get_parser**：每个 name 返回正确类、name 属性、Parser 继承、每次新实例、unknown raises ValueError、错误消息含 6 个支持 parser、含传入名、signature（name/image_output_dir）
+- **image_output_dir_for**：None → None、str/Path 都返回 Path、short hash 取全部、empty hash → 目录名 images-、16 char hash、15 char、1 char、path 无 parent、path 含 parent、deep nested、idempotent、signature
+- **process_single 错误矩阵**：
+  - file_not_found / hash_io_error（monkeypatch compute_file_hash）/ chunker_failed（monkeypatch chunk）
+  - schema_validation_failed（monkeypatch validate）+ validation_errors 截断到前 20 条
+  - write_failed（monkeypatch json.dump）
+  - no_extracted_elements details 含 source_type/warnings、message 含扫描件或 element
+  - unexpected_parser_error details 含 parser_name/path
+- **process_single 写盘**：write_json=False 不写、output_path=None 不写、嵌套 parent mkdir、UTF-8 内容、indent=2、ensure_ascii=False
+- **process_single 不变性**：input file 不变、idempotent
+- **process_single 成功**：text/markdown/html/ipynb 各自成功、默认 fallback、默认 max_chars=800、custom max_chars
+- **process_single signature**：返回 tuple（2 元）、parser_name 是 KEYWORD_ONLY、max_chars/write_json 也是 KEYWORD_ONLY
+- **validate_only**：valid→OK、missing 文件、JSON 失败、Schema 失败、str path、返回 tuple、bool+str 类型、signature
+- **模块结构**：__all__ exact、no-dup、future annotations、imports（json/Path/Any/StructuralChunker/compute_file_hash/Document/ErrorRecord/Parser/ParserError/6 个 parser/validate/SchemaValidationError）、docstring 含不变量、无 _silence_unused_import
+- **综合行为**：full text pipeline 多 chunk、写盘 JSON 通过 validate_only、4 种 parser 全流程产出 schema 合法 JSON
+
+### 撞墙记录
+- 2 fail（已修）：
+  - `test_process_single_write_failed_via_monkeypatch`：monkeypatching Path.open 全局导致 compute_file_hash 读文件也失败 → 改 monkeypatch json.dump
+  - `test_process_single_default_parser_name_is_fallback`：.txt 文件 fallback parser 不支持，返回 None → 改为 signature 默认值断言
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 203 后）：17456 pass / 0 fail / 15 skip（HEAD `2cf74ad`）
+
+### 下一步建议
+- 候选 KT：app/chunkers/structural.py 第九轮（388 行 / ~1450 测试）
+- 候选 KF/KV/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 候选 KO：evaluation/cli.py 第九轮（243 行 / ~1000 测试）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KT（app/chunkers/structural.py 第九轮）。structural chunker 是分块核心（388 行 / ~3.7 tests/line），
+第九轮可深入 _split_text_by_heads、_split_paragraph_by sentences、_split_sentence 长文本边界、source_spans 算法、表/列表元素处理。
+
+---
