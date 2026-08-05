@@ -13208,3 +13208,51 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KS（evaluation/runner.py 第十四轮）继续推 evaluation 中型文件。
 
 ---
+## Round 238 — evaluation/runner.py 第十四轮（73 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十四轮 edges 测试，覆盖 module imports、__all__、_load_annotation 函数、_process_one 返回 tuple 类型、空 manifest 行为、provenance/devset/summary 结构、函数签名
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges14.py`（73 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **module imports**：13 个导入名字都在命名空间
+- **__all__**：1 个元素（run_evaluation）；私有 helper 不导出但可访问
+- **_load_annotation**：path=None / 缺文件 / JSON 无效 / array / empty / 目录 / utf-8 中文 / 不修改输入
+- **_process_one 返回 tuple**：5 元素类型精确（dict|None, dict|None, float, str|None, Path|None）
+- **_process_one error shape**：errors[0].to_dict() 透传；document=None+no errors → 'unknown' code；success 返回 parser_version
+- **_process_one 副作用**：创建 _per_doc 目录
+- **run_evaluation 空 manifest**：6 top keys；per_doc=[]；expected_failures=[]；创建 report 文件；创建 output_root
+- **report_version**：与 REPORT_VERSION 常量一致；写盘文件中也是
+- **写盘格式**：合法 JSON；indent=2（行以 2 空格开头）
+- **provenance/devset/summary**：都是 dict；summary 4 top keys
+- **devset 透传**：status/zero counts/categories 都透传
+- **provenance 透传**：parser_name/max_chars；空 manifest → parser_version=None
+- **default args**：parser_name=fallback；max_chars=800
+- **空 manifest 不创建 _per_doc**（_process_one 不被调用）
+- **返回 dict 与写盘内容一致**
+- **签名**：run_evaluation 5 参数（前 2 positional，后 3 keyword-only）；_process_one 4 参数；_load_annotation 1 参数
+
+### 撞墙记录
+- 1 fail（修复）：
+  - test_run_evaluation_creates_per_doc_directory：误以为空 manifest 也会创建 _per_doc；实际只有 _process_one 被调用才创建 → 改成验证空 manifest 不创建 _per_doc
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 238 后）：20884 pass / 0 fail / 15 skip（HEAD `128c1c1`）
+
+### 下一步建议
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 候选 KT2：evaluation/manifest.py 第十四轮（239 行）
+- 候选 KE2：evaluation/annotation_metrics.py 第十三轮（194 行）
+- 候选 KF2：evaluation/metrics.py 第十三轮（381 行）
+- 候选 KW2：evaluation/report.py 第十四轮（200 行）
+- 候选 KX2：evaluation/cli.py 第十五轮（243 行）
+- 候选 KS2：evaluation/runner.py 第十五轮（227 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KZ（evaluation/schema.py 第七轮）继续推 evaluation 最小文件。
+
+---
