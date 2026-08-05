@@ -12562,3 +12562,42 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW（evaluation/report.py 第十一轮）继续推 evaluation 大文件。
 
 ---
+## Round 223 — evaluation/report.py 第十一轮（109 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十一轮 edges 测试，覆盖常量元组精确内容、subprocess.run 参数验证、build_provenance 类型转换边界
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges11.py`（109 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量元组精确内容**：_RATIO_METRICS 首/尾元素；12 个 ratio name 逐一存在性；figure_caption_* 不在内；doc_id/source_type/wall_time_seconds/error_code 不在内；元组类型不可变；_COUNT_METRICS 与 _SUCCESS_BOOL_METRICS 精确等于单元素元组
+- **get_git_provenance 深度**：subprocess.run 调用 kwargs（encoding/errors/timeout=10/cwd/capture_output/text）；调用次数=2；第一次 cmd=rev-parse、第二次 cmd=status --porcelain；真实仓库返回 40 位 hex；返回 dict JSON 可序列化
+- **get_dependency_versions 深度**：keys 保留插入顺序（pdfplumber→python-docx→pypdfium2）；逐包调用；混合 found/notfound/exception；importlib.metadata 在函数内 import；JSON 可序列化
+- **build_provenance 类型转换边界**：max_chars 从 True/False（int 收为 1/0）；从 None/list/dict 引发 TypeError；从 b'abc' 引发 ValueError；从 b'800' 收为 800；从 '-100' 收为 -100；从 -0.5 收为 0；与 mocked helpers 的集成；dependencies 引用相同 dict；git dict 解构只取 git_commit/git_dirty；evaluator_version 与 evaluation.EVALUATOR_VERSION 是同一对象
+- **build_devset_section 深度**：dict key 插入顺序（status 在前，categories_covered 在后）；categories 为 tuple/set 保留；extra attr 忽略；缺 devset_status/categories 抛 AttributeError；None 值透传；负数 file_count 透传；JSON 可序列化
+- **aggregate_summary 类型边界**：缺 metrics 抛 KeyError；metrics[key]=None 抛 AttributeError；metrics=list 抛 AttributeError；input=None 抛 TypeError；value=True/False（bool 在 sum 中视为 1/0）；negative values 参与；极大浮点；extra metric keys 忽略；返回 entry keys 精确；输入修改不影响输出；空输入返回 12 个 ratio metrics 全 None；not_evaluated=total-participating；零除保护；顶层 key 顺序
+- **综合**：所有 12 ratio metrics 都给值的 macro_average；2 docs all metrics；build_provenance 完整 dict JSON 可序列化；__all__ 名字都是 strings/unique/不含私有常量；顶层 4 keys 顺序
+
+### 撞墙记录
+- 0 fail：一次通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 223 后）：19523 pass / 0 fail / 15 skip（HEAD `88d2283`）
+
+### 下一步建议
+- 候选 KX：evaluation/cli.py 第十二轮（243 行）
+- 候选 KS：evaluation/runner.py 第十二轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十二轮（239 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行 — 已饱和 912 测试/15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行 — 已饱和 69 测试/28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KE：evaluation/annotation_metrics.py 第十一轮（194 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KX（evaluation/cli.py 第十二轮）继续推 evaluation 大文件。
+
+---
