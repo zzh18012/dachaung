@@ -12268,3 +12268,51 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KD（evaluation/metrics.py 第十轮），最大单文件 381 行，复杂度高。
 
 ---
+
+## Round 216 — evaluation/metrics.py 第十轮（97 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第十轮 edges 测试，覆盖 helper 函数 / 各 ratio / compute_automatic_metrics 深度
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges10.py`（97 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_null / _ratio / _bool_metric / _int_metric 深度**：empty string reason；unicode reason；ratio 总 float（即便 int）；ratio NaN/Inf/-0.0；bool_metric with None/list/str/0；int_metric 截断（int(-3.7)=-3）；int_metric string "42"
+- **_is_valid_bbox 深度**：0.0 floats；很小的 floats；极大 finite；-0.0；Inf at each position；NaN at each position；3 finite + 1 NaN；float_max / float_min
+- **_pdf_locator_ratio 深度**：全空 locator；image only 不需要 bbox；10 个 mixed → 0.5；missing locator key；返回 float
+- **_docx_locator_ratio 深度**：locator=None for each；多个结构键仍只算 1；paragraph_index=0 valid；4 mixed elements → 0.5
+- **_image_resource_ratio 深度**：5 个 mixed 3 exist → 0.6；image_base_dir filename 匹配；image_base_dir 取 .name 拼接；都不匹配；0 byte file in base_dir；缺 resource_path key
+- **_chunk_reference_ratio 深度**：duplicate ids in one chunk；同 id 在多个 chunks；element_id=None；chunks=[] → null；chunk missing field
+- **_strip_unicode_whitespace 深度**：中文 ideographic space；em/en space；NBSP；thin space；line/paragraph separator；多种混合；全空白；emoji 保留；digits 保留
+- **_text_preservation 深度**：unicode 内容；多 chunk 拼接保序；reorder 破坏 equal 但 precision/recall 仍 1.0；chunk 间加空白 OK；chunk 重复字符 precision=0.5；chunk 缺字符 recall=0.5；image content 排除；返回 keys exact
+- **_heading_boundary_ratio 深度**：所有 chunks first id 匹配；chunks empty ids；chunk missing field；多个 chunks 同 first id（set 去重）；heading 无 element_id；no chunks
+- **_silent_drop_count 深度**：actual 负数 → drop = exp - actual；actual == exp = 0；actual > exp = 0（max）；unknown expected type 视为 actual=0；多 unknown types 累加
+- **compute_automatic_metrics 深度**：source_type=other → 两 locator null；image_base_dir None 时仍校验字符串原值；不 mutate input；完整 14 keys；failure path 11 个 null metrics 都 reason=pipeline_failed；error dict 无 code 键 → KeyError（行为记录）；by_type 含 image；element_count_total 是 int
+- **模块结构**：__all__ 仅 compute_automatic_metrics；常量类型正确；docstring 提及纯函数/null/text_preservation
+
+### 撞墙记录
+- 2 fail：
+  1. test_is_valid_bbox_max_float 用了 `math.float_max if hasattr(...) else sys.float_info.max` 复杂表达式返回 None → 简化为直接 sys.float_info.max
+  2. test_compute_automatic_metrics_error_with_dict_no_code_key 期望 error_code=None；实际 error["code"] 抛 KeyError → 改为 expect KeyError
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 216 后）：18965 pass / 0 fail / 15 skip（HEAD `b15fce6`）
+
+### 下一步建议
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KAC：evaluation/cli.py 第十一轮（243 行）
+- 候选 KS：evaluation/runner.py 第十一轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十一轮（239 行）
+- 候选 KU：evaluation/annotation_metrics.py 第九轮（194 行）
+- 候选 KV：evaluation/report.py 第十轮（200 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KAA + KAB 双小轮（schema_validation.py 第四轮 + __init__.py 第二轮），把 evaluation 小文件全部拉满。
+
+---
