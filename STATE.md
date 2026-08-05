@@ -14028,3 +14028,53 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KF4（evaluation/metrics.py 第十五轮，381 行）继续推 evaluation。
 
 ---
+## Round 256 — evaluation/metrics.py 第十五轮（216 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第十五轮 edges 测试，覆盖未覆盖的源码字符串 token（含各 helper def + 关键 token）、模块 docstring 长度/内容、compute_automatic_metrics keys 顺序精确、_null/_ratio/_bool_metric/_int_metric dict 字段名精确+顺序、_strip_unicode_whitespace bytes/int/None raises + 多 Unicode 空白字符、_is_valid_bbox 类型边界（tuple/dict/set/string/None/bool/NaN/Inf/-Inf）、_pdf_locator_ratio 边界（page=0/-1/1/True/1.0/string）、_docx_locator_ratio 边界（structural_keys 全检查 + page/bbox 拒绝）、_chunk_reference_ratio 边界（empty/None/duplicate ids）、_heading_boundary_ratio 边界（first-id matching + partial + duplicate headings）、_silent_drop_count 边界（empty expectations + sum across types + actuals 多于 expected）、_image_resource_ratio 边界（empty/zero-size/directory + image_base_dir lookup）、_text_preservation 边界（image filter + missing content + precision/recall 不对称）、compute_automatic_metrics keys 顺序精确、source_type='markdown' 边界、模块 namespace 完整性、helper metadata、不缓存行为
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges15.py`（216 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **源码字符串 token**：13 个 helper def 全覆盖；含 'image_element_filter'/'silent_drop_formula'/'intersection_counter'/'chunk_first_id_assignment'/'image_base_dir_concat'/'isfile_check'/'st_size'/'heading_filter'/'image_filter'/'math_import'/'math_isfinite'/'pipeline_failed'/'no_elements'/'no_chunks'/'no_heading_elements'/'no_image_elements'/'no_expectations'/'pipeline_success_logic'/'pipeline_failed_loop'；不含 'print('
+- **模块 docstring**：是 str 长度>100；含 'text_preservation'；含 '纯函数' 或 'Counter'
+- **__all__ 类型与内容**：是 list 不是 tuple；只有 1 个元素 'compute_automatic_metrics'
+- **namespace 完整性**：14 个函数全在 module namespace；Any identity；math/Counter 在 namespace；非 compute 的函数都 _ 前缀
+- **常量精确**：_TEXT_TYPES 是 tuple 7 项；_PDF_BBOX_REQUIRED_TYPES 是 tuple 4 项；_PDF_BBOX_REQUIRED_TYPES ⊆ _TEXT_TYPES；'image' 不在 _TEXT_TYPES；_NOT_EVALUATED='not_evaluated' 是 str
+- **dict 字段名精确**：4 个 helper 返回 dict 都只有 'value'/'reason' 两 key；顺序 value→reason；可 JSON 序列化
+- **签名 introspection**：compute_automatic_metrics 5 参数名精确；前 4 无默认，image_base_dir 默认 None；POSITIONAL_OR_KEYWORD；无 var args/kw；return_annotation 是 str（future annotations）
+- **_strip_unicode_whitespace**：empty/no-ws/all-ws/pure-NBSP/mixed/中日韩/em space/en space/ideographic space/line sep/para sep/zero-width space（不删）；bytes/int/None raises
+- **_is_valid_bbox**：None/[]/[1,2,3]/[1,2,3,4,5]/tuple/dict/set/string 拒绝；int/float/mixed 接受；True/False 拒绝；NaN/Inf/-Inf 拒绝；None/string in list 拒绝；返回类型 bool
+- **_pdf_locator_ratio**：empty list → no_elements；page=0/-1/1.0/string 拒绝；page=1/True 接受；missing/None locator 拒绝；text-type 缺 bbox 拒绝；text-type + valid bbox 接受；partial=0.5
+- **_docx_locator_ratio**：empty → no_elements；无 structural_keys 拒绝；section/paragraph_index/relationship_id 接受；page/bbox 拒绝；missing/None locator 拒绝；partial=0.5
+- **_chunk_reference_ratio**：empty → no_chunks；empty/None/missing ids 视为空；all-valid → 1.0；duplicate ids 仍 valid
+- **_heading_boundary_ratio**：empty/no-headings → no_heading_elements；no chunks → 0.0；first-id 匹配；非首位置不匹配；empty/None/missing ids 跳过；duplicate headings 全匹配
+- **_silent_drop_count**：None/empty expectations → no_expectations；缺 element_count_by_type → no_expectations_element_count；empty element_count 同；no drop=0；drop N；actuals 多于 expected 不负；sum across types
+- **_image_resource_ratio**：no images → no_image_elements；empty/None/missing rp → 0.0；existing+size>0 → 1.0；zero-size → 0.0；directory → 0.0；image_base_dir filename lookup；partial=0.5；OSError caught
+- **_text_preservation**：empty empty → null+reason；equal=True；identical；image filtered；missing/None content 视为空；missing chunk text 视为空；precision<1 当 extra chars；recall<1 当 missing chars；empty expected + actual nonempty → empty_actual reason；nonempty expected + empty actual → empty_expected reason；ws-only 视为空
+- **compute_automatic_metrics keys 顺序**：14 keys 精确顺序；error_code 取 error['code']；source_type='markdown' → not_pdf_document + not_docx_document；不抛错；不修改 error；每 metric 含 value+reason
+- **helper metadata**：14 个函数 __qualname__/__module__ 精确
+- **不缓存**：4 个 helper 各自返回独立 dict（修改一个不影响其他）
+
+### 撞墙记录
+- 0 fail：216 测试一次性全过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 256 后）：22659 pass / 0 fail / 16 skip（HEAD `223cd30`）
+
+### 下一步建议
+- 候选 KW4：evaluation/report.py 第十六轮（200 行）
+- 候选 KX4：evaluation/cli.py 第十七轮（243 行）
+- 候选 KS4：evaluation/runner.py 第十七轮（227 行）
+- 候选 KZ4：evaluation/schema.py 第十轮（80 行）
+- 候选 KT5：evaluation/manifest.py 第十七轮（239 行）
+- 候选 KE5：evaluation/annotation_metrics.py 第十六轮（194 行）
+- 候选 KF5：evaluation/metrics.py 第十六轮（381 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW4（evaluation/report.py 第十六轮，200 行）继续推 evaluation。
+
+---
