@@ -10544,3 +10544,57 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第七轮可深入 heading 层级识别、code block 处理、list 嵌套、inline format 提取等。
 
 ---
+
+
+## Round 184（2026-08-05）：app/parsers/markdown_parser.py 第七轮（edges7）
+
+### 目标
+- 给 app/parsers/markdown_parser.py（326 行，已有 base/edges/edges2-6 共 831 测试）补第七轮
+- 深入各 regex 实际匹配行为、section_path 跟踪、各 paragraph 停止条件
+
+### 改动
+- 新增 `tests/test_parsers_markdown_edges7.py`（112 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_detect_md_source_type**：大写/混合大小写后缀、未知后缀 raise、无后缀 raise、details 含 suffix
+- **_rows_to_md**：空 list 返回 ""、单 row、多 row padding、列对齐填充、pipe 在 edges、分隔符三横
+- **_split_pipe_row**：leading/trailing pipe 处理、各 cell strip、单 cell、空串、返回 list
+- **_is_pipe_table_start**：i+1 越界 False、首行非 pipe False、分隔行不匹配 False
+- **ATX 标题 regex**：1-6 级匹配、7+ # 不匹配、trailing #、无空格不匹配
+- **围栏代码块**：language 提取、~~~ fence、空内容 warning、无 end fence 吸收到末尾、内容多行 join
+- **主题分隔符 regex**：3+ 字符、更长、含空格、字母不匹配
+- **独立图片行 regex**：整行匹配、空 alt、行后/行前有文本不匹配、url 含路径
+- **列表项 regex**：-/*/+/ 三种无序、有序 ./)、多位数、无空格不匹配
+- **引用块 regex**：> space、>no space、>> nested
+- **section_path 跟踪**：多级累积、同级 pop、更高级 pop 多个、无 heading 不出现、heading 元素本身在栈内
+- **MarkdownParser 类属性**：name=markdown、version=stdlib/0.1.0、继承 Parser、parse 签名
+- **parse 错误路径**：missing file raise ParserError、unsupported_type、OSError → md_read_failed（含 exception_type）
+- **parse 编码**：非 UTF-8 用 errors=replace
+- **段落停止条件**：每个特殊行类型（heading/fenced/thematic/list/blockquote/image/blank）
+- **表格 metadata**：row_count、col_count、source=markdown_pipe_table、content 是 markdown
+- **综合**：复杂文档、空文件/纯空白文件 md_no_content warning、element_id 0-padded、confidence=0.95
+
+### 撞墙记录
+- 初版 7 处 fail：
+  1. _is_pipe_table_start 漏 import → 加到 import 列表
+  2. _rows_to_md 单 column 测试期望 3 行实际 4 行（header + sep + 2 body）→ 修正期望
+  3. _THEMOMIC_RE_MATCH 拼写错误 + 占位 helper 多余 → 删除，直接调 _THEMATIC_RE
+  4. element_ids_zero_padded 用 "para1\npara2"（连续无空行）被识别为单 paragraph → 加空行
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 184 后）：14957 pass / 0 fail / 13 skip（HEAD `5b339da`）
+
+### 下一步建议
+- 候选 JL：app/parsers/html_parser.py 第七轮
+- 候选 JM：app/parsers/ipynb_parser.py 第七轮
+- 候选 JN：app/parsers/text_parser.py 第七轮
+- 候选 JO：app/parsers/fallback_parser.py 第七轮
+- 候选 JP：app/parsers/base.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 JL（app/parsers/html_parser.py 第七轮）。html parser 也是常用入口，
+第七轮可深入 tag 嵌套、attribute 提取、自闭合 tag、entity 解码等。
+
+---
