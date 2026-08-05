@@ -13394,3 +13394,52 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KF2（evaluation/metrics.py 第十三轮，381 行）继续推 evaluation 最大文件。
 
 ---
+## Round 242 — evaluation/metrics.py 第十三轮（106 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第十三轮 edges 测试，覆盖 _pdf_locator_ratio NaN/Inf bbox、_docx_locator_ratio string substring 行为、_image_resource_ratio truthy 非 str、_chunk_reference_ratio None 边界、_heading_boundary_ratio set 去重、_silent_drop_count truthy 非 dict、_text_preservation whitespace-only/disjoint 字符集、_null/_ratio/_bool_metric/_int_metric 边界、compute_automatic_metrics schema_valid reason 格式、模块结构、签名精确
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges13.py`（106 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_pdf_locator_ratio**：bbox 含 NaN/+Inf/-Inf 全 rejected；page=999999999 valid；mixed invalid→valid 计数 1/3；all invalid 0.0；缺 source_locator 键；返回 float 类型
+- **_docx_locator_ratio**：source_locator='sectionparagraph'（string）触发 substring 检查 → valid；'page1'/'abcbboxXYZ' substring 命中 → invalid；'zzzz' 不命中 → invalid；page=0/bbox=None key 存在 → invalid；relationship_id 字符串值；paragraph_index=None 值 OK；7 个 structural_keys 全在；2 个 keys；mixed invalid→valid 1/3；返回 float
+- **_image_resource_ratio**：resource_path=True raises TypeError（bool 不行）；int 1 raises TypeError；3 images 全 valid/全 invalid；element 缺 type 不算 denominator；resource_path 是 Path 对象 OK
+- **_chunk_reference_ratio**：source_element_ids=None；chunk 引用 None；element_id=None 在集合中；all chunks valid；多 ID partial invalid；多 ID all valid
+- **_heading_boundary_ratio**：2 chunks 同 first_id set 去重；heading 无 element_id 键；heading element_id=None；chunks=[] 仍计算 ratio 不返回 null；2 headings 1 match → 0.5
+- **_silent_drop_count**：expectations='abc' raises AttributeError；[] falsy → no_expectations；[1,2] truthy → AttributeError；element_count_by_type=list raises；expected=0/-3 不 drop；actual=0 expected=3 → drop=3；3 type 求和
+- **_text_preservation**：actual whitespace-only → empty_actual；expected whitespace-only → empty_expected；both whitespace-only → empty_expected_and_actual；disjoint 字符集 'abc' vs 'xyz' → precision/recall=0；same chars different counts；unicode chars；image excluded 但 chunk 中包含
+- **Counter 交集**：空 Counter & 任意 = 空
+- **_null 边界**：empty reason；None reason 透传；unicode reason
+- **_ratio 边界**：bool True/False 转 float
+- **_bool_metric 边界**：truthy/falsy 非 bool 输入；list 输入
+- **_int_metric 边界**：bool 输入；float 截断；value 类型是 int 不是 float
+- **compute_automatic_metrics**：error={} falsy → error_code=None；error code 是 string/int 透传；schema_valid exception reason 格式精确 'schema_check_exception:TypeName'；exception 类型名透传；真实 schema_validation 不抛；不修改 image_base_dir；expectations='abc' raises
+- **element_count_by_type**：插入顺序 = element 出现顺序；同 type 累加保持首次位置
+- **模块结构**：__all__ 是 list 不是 tuple；精确 ['compute_automatic_metrics']；Any/math/Counter/Path 在命名空间；_TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES/_NOT_EVALUATED 精确值；subset 关系
+- **签名**：所有 14 个函数签名精确（含参数名顺序）
+
+### 撞墙记录
+- 2 fail（修复）：
+  - test_image_resource_ratio_resource_path_int_one：以为 Path(1) OK；实际 Path(int) raises TypeError → 改成 expect TypeError
+  - test_compute_metrics_does_not_mutate_image_base_dir：把 tmp_path 当成 expectations 参数传了；实际 signature 是 (doc, error, source_type, expectations, image_base_dir=None) → 改成 keyword 参数 image_base_dir=tmp_path
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 242 后）：21225 pass / 0 fail / 15 skip（HEAD `0d73642`）
+
+### 下一步建议
+- 候选 KW2：evaluation/report.py 第十四轮（200 行）
+- 候选 KX2：evaluation/cli.py 第十五轮（243 行）
+- 候选 KS2：evaluation/runner.py 第十五轮（227 行）
+- 候选 KZ2：evaluation/schema.py 第八轮（80 行）
+- 候选 KT3：evaluation/manifest.py 第十五轮（239 行）
+- 候选 KE3：evaluation/annotation_metrics.py 第十四轮（194 行）
+- 候选 KF3：evaluation/metrics.py 第十四轮（381 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW2（evaluation/report.py 第十四轮，200 行）继续推 evaluation 中型文件。
+
+---
