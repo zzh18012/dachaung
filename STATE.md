@@ -12601,3 +12601,44 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KX（evaluation/cli.py 第十二轮）继续推 evaluation 大文件。
 
 ---
+## Round 224 — evaluation/cli.py 第十二轮（102 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第十二轮 edges 测试，覆盖 subparser argument 数量、_format_metric 输出格式精确、_run_inspect_doc print 顺序
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges12.py`（102 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 深度**：run subparser 5 optional args（不含 help）；validate-report 1 positional；inspect-doc 1 positional + 1 optional；manifest/output required；parser/max-chars/tolerance-chars not required；--parser choices=('fallback','kreuzberg')；默认值精确（max_chars=800, tolerance_chars=30）；prog='evaluation.cli'；epilog=None
+- **_format_metric 输出格式精确**：用 Python f-string 构造 expected；None value → `'  {name:36} null  ({reason})'`；bool true/false → `'  {name:36} true/false  (ok)'`；int 0 → `'  {name:36} 0  (ok)'`；float 0.5 → `0.5000`；NaN/Inf fallthrough；bytes/bytearray/complex/range/set/frozenset fallthrough；dict sorted alphabetically；dict 含 int keys；dict 含 negative int values；dict 含 float values；reason 含括号；reason 长字符串；每行 '  ' 开头；name 字段 width=36
+- **_run_inspect_doc 深度**：tolerance_chars=0/negative 不崩；不写文件（mtime 不变）；4 行 header（file/document_id/source/parser/counts）；空行+metrics: 头；elements=N chunks=M 输出；metric 行缩进；缺 parser_name/source_path 显示 '?'；source_type 缺显示 'unknown'；多余 keys 不出错；elements=None 显式触发 TypeError（compute_automatic_metrics 用 `.get('elements', [])` 拿到 None）
+- **main 综合行为**：各 return code 是 int；validate-report 成功路径打印 '[OK]' 到 stdout、'[FAIL]' 到 stderr、'[ERROR]' 到 stderr；完整 inspect-doc 流程验证 stdout
+- **模块结构**：argparse/json/sys/Path/ManifestError/load_manifest/get_git_provenance/run_evaluation/EvalSchemaError/validate_file 都 import；4 个 callable；docstring 含 run/validate-report/inspect-doc；__main__ block 含 SystemExit；reconfigure 块含 utf-8 与 AttributeError/OSError；future annotations
+
+### 撞墙记录
+- 9 fail（修复）：
+  - subparser argument count：未排除 -h/--help action，把 help 也算进 optional → 改为 `a.dest != 'help'` 过滤
+  - _format_metric exact format：手写 expected spaces 数错 → 改用 Python f-string `f"  {'foo':36} ..."` 构造
+  - elements=None 显式：误以为 `or []` 保护 metrics 计算；实际 `_run_inspect_doc` 把原 doc 传给 compute_automatic_metrics，metrics.py 用 `.get('elements', [])` 拿到 None（key 存在）→ len(None) TypeError → 改为 expect TypeError
+  - validate-report OK：构造的报告带了 manifest_version/evaluator_version 顶层 key，schema additionalProperties=false 拒绝 → 移除这两个顶层 key（只保留 report_version）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 224 后）：19625 pass / 0 fail / 15 skip（HEAD `a045fa5`）
+
+### 下一步建议
+- 候选 KS：evaluation/runner.py 第十二轮（227 行）
+- 候选 KT：evaluation/manifest.py 第十二轮（239 行）
+- 候选 KE：evaluation/annotation_metrics.py 第十一轮（194 行）
+- 候选 KZ：evaluation/schema.py 第六轮（80 行）
+- 候选 KAA：evaluation/schema_validation.py 第四轮（15 行 — 已饱和 912 测试/15 行）
+- 候选 KAB：evaluation/__init__.py 第二轮（28 行 — 已饱和 69 测试/28 行）
+- 候选 KW：evaluation/report.py 第十二轮（200 行）
+- 候选 KF/KW：base.py / chunkers/base.py / hash_util.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS（evaluation/runner.py 第十二轮）继续推 evaluation 大文件。
+
+---
