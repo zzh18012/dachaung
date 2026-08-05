@@ -13256,3 +13256,50 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KZ（evaluation/schema.py 第七轮）继续推 evaluation 最小文件。
 
 ---
+## Round 239 — evaluation/schema.py 第七轮（77 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第七轮 edges 测试，覆盖 schema 文件清单、各 schema 结构、EvalSchemaError message 格式、validate({}) 各 schema、有效 manifest 校验、_schema_path/load_schema 行为
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges7.py`（77 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **schemas/ 文件清单**：4 个 schema 文件存在；至少 4 个 *.schema.json；目录内只有 .json
+- **各 schema 结构**：$schema/type=object/properties 都在；4 个 schema 都是合法 Draft 2020-12
+- **EvalSchemaError message 格式**：含 schema_name / '处' / 'path='
+- **EvalSchemaError errors 结构**：每项 path/message/schema_path 3 key；都是 list/str 类型
+- **validate({})**：manifest/annotation/evaluation-report 都拒绝
+- **validate 有效 manifest**：minimal / 1 document / 1 expected_failure 通过
+- **validate extra keys**：additionalProperties=false 拒绝
+- **_schema_path**：返回 Path 在 SCHEMAS_DIR 内；绝对路径；可 open；missing → FileNotFoundError 含 name 和 'schemas'
+- **load_schema**：返回 dict 含 $schema/type；每次新 dict；修改不影响下次
+- **validate_file**：含中文 JSON OK；utf-8 编码；str 路径 OK；成功返回 None
+- **validate 不修改 instance**
+- **EvalSchemaError**：errors 默认 []；mutable；args[0] 是 message；repr 含类名
+- **module __all__**：5 元素顺序精确；_schema_path 不导出但可访问
+- **签名**：load_schema/validate/validate_file/_schema_path/EvalSchemaError.__init__ 精确
+
+### 撞墙记录
+- 2 fail（修复）：
+  - test_validate_multi_errors_count_in_message：以为 bad manifest 缺 3 个 required 字段；实际 expected_failures 有默认值（[]），只缺 2 个 → 改成 >= 2
+  - test_module_schemas_dir_value：直接用 `evaluation.schema.__file__` 但 evaluation 未导入 → 加 `import evaluation.schema`
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 239 后）：20961 pass / 0 fail / 15 skip（HEAD `4cbd85b`）
+
+### 下一步建议
+- 候选 KT2：evaluation/manifest.py 第十四轮（239 行）
+- 候选 KE2：evaluation/annotation_metrics.py 第十三轮（194 行）
+- 候选 KF2：evaluation/metrics.py 第十三轮（381 行）
+- 候选 KW2：evaluation/report.py 第十四轮（200 行）
+- 候选 KX2：evaluation/cli.py 第十五轮（243 行）
+- 候选 KS2：evaluation/runner.py 第十五轮（227 行）
+- 候选 KZ2：evaluation/schema.py 第八轮（80 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KE2（evaluation/annotation_metrics.py 第十三轮）继续推 evaluation 大文件。
+
+---
