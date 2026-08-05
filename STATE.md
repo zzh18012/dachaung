@@ -10410,3 +10410,44 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第八轮可深入 process_single 各 parser 路径、validate_only 错误聚合、image_output_dir_for 边界。
 
 ---
+
+
+## Round 181（2026-08-05）：app/pipeline.py 第八轮（edges8）
+
+### 目标
+- 给 app/pipeline.py（216 行，已有 edges/edges2-7/errors/helpers/integration 共 702 测试）补第八轮
+- 深入 get_parser 各路径、process_single 各错误码、validate_only 各错误消息
+
+### 改动
+- 新增 `tests/test_pipeline_edges8.py`（86 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **get_parser**：大小写敏感（大写/小数/空字符串/前后空格/部分名都 raise ValueError）、各 parser 名返回正确 Parser 子类、image_output_dir str/Path 都接受
+- **image_output_dir_for**：source_hash 长度边界（16/17/15/1/empty/64）、含父目录路径、根路径、Windows 风格反斜杠
+- **process_single 错误码**：file_not_found / unsupported_type / no_extracted_elements / unexpected_parser_error 各路径
+- **process_single 各 parser 成功**：text/markdown/html/ipynb 都返回 document + 写盘
+- **process_single 写盘行为**：indent=2、UTF-8 ensure_ascii=False、mkdir parents=True、write_json=False 跳过写盘
+- **process_single 签名**：keyword-only args、各默认值
+- **validate_only**：合法 doc → (True, 'OK')、各错误消息（missing/json/schema）、str path 也接受
+- **模块结构**：__all__ 精确 4 项、imports 完整、docstring 完整
+- **综合**：幂等、process_single + validate_only roundtrip、kreuzberg parser 名
+
+### 撞墙记录
+- 初版 2 处 fail：合法 doc 用 source_type=text + 空 source_locator，schema 要求 source_locator.line。
+  改用 source_type=docx + paragraph_index=0 + 完整 element 字段（parent_id/confidence/metadata）+ chunk metadata，对齐现有 helpers 测试的 valid_doc 结构。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 181 后）：14558 pass / 0 fail / 13 skip（HEAD `8ae5b8b`）
+
+### 下一步建议
+- 候选 IW：app/cli.py 第八轮（535 行 / 747 测试）
+- 候选 IY：app/chunkers/structural.py 第八轮（388 行 / 938 测试）
+- 候选 JD：app/parsers/* 各第 N 轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IY（app/chunkers/structural.py 第八轮）。structural 是分块核心，
+第八轮可深入 heading 级别判定、source_element_ids 聚合、normalize_text 边界、空 chunk 处理。
+
+---
