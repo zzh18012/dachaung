@@ -10068,3 +10068,44 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第六轮可深入 validate/validate_file/SchemaValidationError/各 schema 文件加载。
 
 ---
+
+## Round 173（2026-08-05）：app/schema.py 第六轮（edges6）
+
+### 目标
+- 给 app/schema.py（93 行，已有 base/edges/edges2-5 共 618 测试）补第六轮
+- 深入 SchemaValidationError、load_schema、validate 各分支
+
+### 改动
+- 新增 `tests/test_schema_edges6.py`（80 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **SCHEMA_PATH**：精确路径（project_root/schemas/document.schema.json）、绝对、resolve 无 ..、文件名/父目录、is_file
+- **SchemaValidationError**：init 签名（message, errors）、errors 默认 None→[]、显式 None/[]/[err]、str==message、args==(message,)、继承 Exception 不继承 ValueError、可被 except 捕获
+- **load_schema**：默认返回 dict、== load_schema(SCHEMA_PATH)、str path、不存在/目录/无效 JSON 抛错、每次返回新 dict、签名仅 path
+- **validate**：空 schema→无错误返回 None、不传 schema 用默认、收集所有错误、path 空/含字段、message 是 str、schema_path 是 list、异常消息含"Schema/校验失败/处"、不修改 document、签名 (document, schema)
+- **is_valid**：true/false/bool 类型、不抛异常、默认 schema、签名、返回 bool
+- **validate_file**：缺失/无效 JSON/str path/目录 各错误路径、签名
+- **默认 schema**：Draft202012Validator.check_schema 通过、$schema/type/properties top keys、type==object、properties 含 document_id/chunks
+- **模块结构**：__all__ 精确 6 项无重复、future annotations、imports json/Path/Any/Draft202012Validator/JSValidationError、docstring 提及业务代码、_silence_unused_import 函数
+- **综合行为**：validate↔is_valid 一致、load_schema 幂等、validate 幂等、load_schema 默认从 SCHEMA_PATH、validate 不修改 schema
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 173 后）：13912 pass / 0 fail / 13 skip（HEAD `9e29465`）
+
+### 下一步建议
+- 候选 IK：app/hash.py 第六轮（158 行，478 测试）
+- 候选 IL：app/source_locator.py 第六轮
+- 候选 IO：app/cli.py 第八轮
+- 候选 IP：app/chunkers/structural.py 第八轮
+- 候选 IQ：app/__init__.py 第六轮（app package 入口）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 IK（app/hash.py 第六轮）。hash.py 是文件哈希入口，
+第六轮可深入 compute_file_hash 各 chunk size、make_document_id 各边界、SHA-256 一致性。
+
+---
