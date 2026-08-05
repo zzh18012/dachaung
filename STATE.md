@@ -10598,3 +10598,51 @@ markdown 处理入口，第七轮可深入 heading 层级、code block、list �
 第七轮可深入 tag 嵌套、attribute 提取、自闭合 tag、entity 解码等。
 
 ---
+
+
+## Round 185（2026-08-05）：app/parsers/html_parser.py 第七轮（edges7）
+
+### 目标
+- 给 app/parsers/html_parser.py（446 行，已有 base/edges/edges2-6 共 711 测试）补第七轮
+- 深入常量精确值、各 tag 处理、表格 cell 边界、字符实体、section_path 跟踪
+
+### 改动
+- 新增 `tests/test_parsers_html_edges7.py`（97 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量精确值**：_HEADING_LEVELS 6 项 h1-h6、_SKIP_TAGS 7 项含 script/style/head/title/meta/link/noscript、_HTML_EXTENSIONS (".html",".htm")
+- **_detect_html_source_type**：.html/.htm/大写/混合大小写都识别、未知/无后缀/.xml raise、details 含 suffix
+- **_rows_to_md**：空 list、单 row、多 row、padding、pipe 在 edges、分隔符三横
+- **HtmlParser 类属性**：name=html、version=stdlib/0.1.0、继承 Parser、parse 签名 (self, path, source_hash)
+- **_HTMLDocParser 结构**：document_id 存储、elements/warnings 初始空、handle_* 方法 callable、继承 stdlib HTMLParser、convert_charrefs=True
+- **<img> 处理**：basic、empty/whitespace src 跳过、missing alt=""、URL 含路径、自闭合、confidence=0.9
+- **<pre>/<blockquote>**：basic、保留 newline、嵌套 depth、<p> 在内被忽略、metadata.kind
+- **<ul>/<ol>/<li>**：basic、ordered/unordered metadata、嵌套 lists、<li> 不在 list 中默认 ordered=False
+- **<br>/<hr>**：br 在 paragraph 加 space、br 外 block 不崩、hr flushes block、hr 单独不崩
+- **表格**：basic（th+td 混合）、th-only、空 cells、空 table 无 element、嵌套 table warning、confidence=0.9、<p> 在 cell 文本收集
+- **loose text**：在 body 直接成 paragraph、全空白无 element、与 <p> 混合
+- **字符实体**：named（&amp;&lt;&gt;）、numeric decimal（&#65;）、numeric hex（&#x41;）、heading/table cell 中
+- **section_path 跟踪**：多级累积、同级 pop、高级 pop 多个、heading 元素本身在栈内、无 heading 不出现
+- **错误路径**：missing file、unsupported_type、OSError → html_read_failed（含 exception_type）
+- **综合**：非 UTF-8 errors=replace、复杂 doc、不规范 markup 不崩、idempotent、element_id 0-padded
+
+### 撞墙记录
+- 无（一次通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 185 后）：15054 pass / 0 fail / 13 skip（HEAD `b73be03`）
+
+### 下一步建议
+- 候选 JQ：app/parsers/ipynb_parser.py 第七轮
+- 候选 JR：app/parsers/text_parser.py 第七轮
+- 候选 JS：app/parsers/fallback_parser.py 第七轮
+- 候选 JT：app/parsers/base.py 第六轮
+- 候选 JU：app/parsers/kreuzberg_parser.py 第六轮
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：选 JQ（app/parsers/ipynb_parser.py 第七轮）。ipynb parser 处理 Jupyter notebook，
+第七轮可深入 code/markdown cell 混排、outputs 提取、nbformat 边界。
+
+---
