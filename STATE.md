@@ -14655,3 +14655,50 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KF6（evaluation/metrics.py 第十七轮，381 行）继续推 evaluation。
 
 ---
+
+## Round 270 — evaluation/metrics.py 第十七轮（161 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第十七轮 edges 测试，覆盖 edges16 未触及的角度：_null/_ratio/_bool_metric/_int_metric 详细（value 类型强制转换/reason 类型/keys 顺序/两次调用独立）、_is_valid_bbox 边界（valid int/float/mixed/太短/太长/空/含 bool/含 inf/含 nan/含 str/None/str/tuple/返回 bool）、_pdf_locator_ratio 边界（空/缺 source_locator/page=0/-1/float/str/text 缺 bbox/text 无效 bbox/text 有效 bbox/non-required 无需 bbox/部分 valid）、_docx_locator_ratio 边界（空/locator 有 page/bbox/structural_key/locator 空字典/locator None/缺/每个 structural_key 单独/部分 valid）、_image_resource_ratio 边界（无 image/全是非 image/image 缺 resource_path/empty resource_path/file not found/file 绝对路径/file 文件名 only/file size=0/部分 valid）、_chunk_reference_ratio 边界（空/elements 空/chunk 缺 source_element_ids/ids=[]/ids=None/id 不存在/部分匹配/all ids 都必须匹配）、_strip_unicode_whitespace 边界（空/无空白/ASCII 空格/\\t\\n\\r/NBSP/em space/ideographic space/line separator/paragraph separator/纯空白/不删非空白/不排序/返回 str）、_text_preservation 边界（both empty/all image/expected empty actual 非空/expected 非空 actual 空/perfect match/部分重叠/repeated chars 顺序不同/extra chars in actual/missing chars in actual/空白被忽略/3 keys 返回）、_heading_boundary_ratio 边界（无 heading/无 chunks/chunk 缺 source_element_ids/ids=[]/perfect match/部分 match/用第一个 id only）、_silent_drop_count 边界（无 expectations/empty expectations/无 element_count_by_type/empty element_count_by_type/actual > expected/actual == expected/actual < expected/多 type 求和/返回 int_metric）、compute_automatic_metrics 边界（document=None+error=None/document+error 都非 None/unknown source_type/pdf/docx 路径/14 keys when not failed/13 keys when failed/不修改 document/不修改 expectations/两次调用独立/schema_check_exception 路径）、namespace 完整性补强（_strip_unicode_whitespace/_bool_metric/_int_metric/math/Counter/Path/_TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES/_NOT_EVALUATED；__all__ == ['compute_automatic_metrics']）、常量精确（_TEXT_TYPES 7 items tuple；_PDF_BBOX_REQUIRED_TYPES 4 items tuple；_NOT_EVALUATED == 'not_evaluated'；subset；image 不在）、源码 token 补强（含 def _strip_unicode_whitespace/.isspace()/math.isfinite/删除全部 Unicode 空白/v1.1 或 v1.0/c_expected & c_actual；不含 print/import logging/import json/import subprocess/asyncio）、docstring（含 纯函数/不修改/text_preservation 或 文本保留）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges17.py`（161 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_null/_ratio/_bool_metric/_int_metric**：value 类型强制（_ratio 强制 float / _bool_metric 强制 bool / _int_metric 强制 int 截断）；reason 类型；keys 顺序 ['value','reason']；两次调用独立 dict；负数输入不验证（_ratio 接受任何 float）
+- **_is_valid_bbox 边界**：valid int list / valid float list / mixed / 太短 / 太长 / 空 / 含 bool（True 是 int 子类但显式排除）/ 含 inf / 含 -inf / 含 nan / 含 str / None / str（不是 list）/ tuple（不是 list）/ 返回 bool
+- **_pdf_locator_ratio 边界**：空 → null+no_elements；缺 source_locator → 0/1=0.0；page=0/-1 → 不计；page=1.0（float）→ 不计；page='1'（str）→ 不计；text 缺 bbox → 不计；text 无效 bbox → 不计；text 有效 bbox → 1.0；non-required（header/footer）无需 bbox；部分 valid → 0.5
+- **_docx_locator_ratio 边界**：空 → null+no_elements；locator 有 page → 不计；有 bbox → 不计；有 structural_key → 1.0；locator 空字典 → 不计；locator None → 不计；缺 source_locator → 不计；每个 structural_key 单独触发；部分 valid → 0.5
+- **_image_resource_ratio 边界**：无 image → null+no_image_elements；非 image only → null；image 缺 resource_path → 0.0；empty resource_path → 0.0；file not found → 0.0；file 绝对路径存在 → 1.0；file 文件名 only + image_base_dir 拼接 → 1.0；file size=0 → 0.0；部分 valid → 0.5
+- **_chunk_reference_ratio 边界**：no_chunks → null+no_chunks；elements=[] → 0.0；chunk 缺 source_element_ids → 0.0；ids=[] → 0.0；ids=None → 0.0；id 不存在 → 0.0；部分 match → 0.5；all ids 都必须匹配（含一个不存在 → 0.0）
+- **_strip_unicode_whitespace 边界**：空 → '';无空白 → 原样；ASCII 空格/\\t\\n\\r → 删；NBSP/em space/ideographic space/line separator/paragraph separator → 都删；纯空白 → '';不删非空白（标点 emoji）；不排序；返回 str
+- **_text_preservation 边界**：both empty → equal=True + precision/recall null+empty_expected_and_actual；all image → expected='' actual='x' → equal=False precision=0.0 recall null+empty_expected；expected empty actual 非空 → equal=False precision=0.0 recall null；expected 非空 actual 空 → equal=False precision null recall=0.0；perfect match → 1.0/1.0；部分重叠 → 2/3；repeated chars 顺序不同 → equal=False 但 counter 相同 → precision/recall=1.0；extra chars → precision=2/3 recall=1.0；missing chars → precision=1.0 recall=2/3；空白被忽略；3 keys 返回
+- **_heading_boundary_ratio 边界**：无 heading → null+no_heading_elements；无 chunks → 0.0；chunk 缺 source_element_ids → 0.0；ids=[] → 0.0；perfect match → 1.0；部分 match → 0.5；用 ids[0]（首元素）only
+- **_silent_drop_count 边界**：无 expectations → null+no_expectations；empty expectations → null+no_expectations；无 element_count_by_type → null+no_expectations_element_count；empty element_count_by_type → null+no_expectations_element_count；actual > expected → 0；actual == expected → 0；actual < expected → 差值；多 type 求和；返回 int_metric
+- **compute_automatic_metrics 边界**：document=None+error=None → pipeline_success=False+error_code value=None；document+error 都非 None → pipeline_success=False；unknown source_type → pdf/docx ratio 都 not_*_document；pdf 路径 → pdf_ratio null+no_elements + docx_ratio null+not_docx_document；docx 路径反之；14 keys when not failed；13 keys when failed（pipeline_failed）；不修改 document；不修改 expectations；两次调用独立；schema_check_exception 路径（monkeypatch document_passes_schema 抛错 → value=False + reason schema_check_exception:ValueError）
+- **namespace 完整性补强**：_strip_unicode_whitespace/_bool_metric/_int_metric/math/Counter/Path/_TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES/_NOT_EVALUATED 都在；__all__ 是 list；__all__ == ['compute_automatic_metrics']
+- **常量精确**：_TEXT_TYPES 7 items tuple（heading/paragraph/list_item/table/caption/header/footer）；_PDF_BBOX_REQUIRED_TYPES 4 items tuple（heading/paragraph/caption/list_item）；_NOT_EVALUATED == 'not_evaluated'；subset 关系；image 不在
+- **源码 token 补强**：含 def _strip_unicode_whitespace/.isspace()/math.isfinite/删除全部 Unicode 空白/v1.1 或 v1.0/c_expected & c_actual；不含 print/import logging/import json/import subprocess/asyncio
+- **docstring**：含 纯函数/不修改/text_preservation 或 文本保留
+
+### 撞墙记录
+- 0 fail（首次跑通过；修复了导入语句的语法错 `_compute_automatic_metrics if False else None` 笔误）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 270 后）：24594 pass / 0 fail / 16 skip（HEAD `5d8deb3`）
+
+### 下一步建议
+- 候选 KW6：evaluation/report.py 第十八轮（200 行）
+- 候选 KX6：evaluation/cli.py 第十九轮（243 行）
+- 候选 KS6：evaluation/runner.py 第十九轮（227 行）
+- 候选 KZ6：evaluation/schema.py 第十二轮（80 行）
+- 候选 KT7：evaluation/manifest.py 第十九轮（239 行）
+- 候选 KE7：evaluation/annotation_metrics.py 第十八轮（194 行）
+- 候选 KF7：evaluation/metrics.py 第十八轮（381 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW6（evaluation/report.py 第十八轮，200 行）继续推 evaluation。
+
+---
