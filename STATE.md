@@ -14702,3 +14702,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW6（evaluation/report.py 第十八轮，200 行）继续推 evaluation。
 
 ---
+
+## Round 271 — evaluation/report.py 第十八轮（55 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十八轮 edges 测试，覆盖 edges17 未触及的角度：aggregate_summary 跨多 metric 组合（一个 doc 同时提供 ratio+count+success+silent_drop；不同 doc 提供 different metrics；macro_average 算术平均精确；macro_average 含 None 项；silent_drop_count 不污染 counts；ratio metric 不污染 counts；count metric 不污染 ratios；两次调用独立 dict；total 等于 len(per_doc)；pipeline_success 含 None 时 rate 计算）、build_provenance max_chars 接受 float/True/False/负 float（int() 截断）；build_provenance 时间戳格式；返回 dict 可 pickle；git_commit str-or-None-40-char；evaluator/report_version 来自 evaluation；max_chars 始终返回 int 类型；build_devset_section duck typing（任意含 6 属性对象）；缺属性 → AttributeError；get_dependency_versions keys 精确；pdfplumber 版本格式；无额外 keys；get_git_provenance 返回 dict 可 pickle；subprocess.run 用 cwd kwarg；returncode 非 0 处理；rev-parse 成功 status 空场景；status 非空 → dirty=True；_RATIO_METRICS 顺序深度（首= schema_valid；尾= chunk_boundary_f1；precision < recall < f1）；_COUNT_METRICS 单元素；_SUCCESS_BOOL_METRICS 单元素；源码 token 含 aggregate 循环/successes/total/sum(values)/len(values)/silent_drop_filter/timeout=10 ≥2/cwd=str(project_root)；不含 async/threading/numpy/pandas；模块 import 顺序（subprocess → datetime → pathlib → typing → evaluation）；docstring 提及 4 类聚合 + participating_docs + not_evaluated；异常路径（空 list 返回 4 keys；unknown metric 忽略；falsy-but-participating 值 0.0/False/0；silent_drop_count=0 参与；pipeline_success=False 计入 total）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges18.py`（55 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **aggregate_summary 跨多 metric 组合**：一个 doc 同时提供 4 类 metric → 4 buckets 都正确分组；不同 doc 提供 different metrics → participating_docs/not_evaluated 各自正确；macro_average = sum/len 算术平均；含 None 值不参与；silent_drop_count 不在 counts；ratio metric 不在 counts；count metric 不在 ratios；两次调用返回独立 dict（不缓存）；total = len(per_doc)（与 metric value 无关）；pipeline_success rate = success_count/total
+- **build_provenance max_chars 类型转换**：max_chars=1.5 → int(1.5)=1；max_chars=-1.7 → int(-1.7)=-1（向 0 截断）；max_chars=True → 1；max_chars=False → 0；max_chars="800" → 800；始终返回 int 类型
+- **build_provenance 输出**：可 pickle；run_timestamp_iso 是 str；git_commit 是 None 或 40-char str；evaluator_version == EVALUATOR_VERSION；report_version == REPORT_VERSION
+- **build_devset_section duck typing**：任意含 6 属性（devset_status/file_count/content_group_count/pdf_count/docx_count/categories_covered）的对象都接受；缺属性 → AttributeError
+- **get_dependency_versions**：keys 精确 == {'pdfplumber', 'python-docx', 'pypdfium2'}；pdfplumber 版本含 '.' 或 None；无额外 keys（len == 3）
+- **get_git_provenance**：返回 dict 可 pickle；subprocess.run 用 cwd kwarg；rev-parse returncode=128 → commit=None；status returncode=128 → dirty=False；rev-parse 成功 + status 空 → dirty=False；status 非空 → dirty=True
+- **_RATIO_METRICS 顺序**：首元素 == 'schema_valid'；尾元素 == 'chunk_boundary_f1'；chunk_boundary_precision 在 chunk_boundary_recall 前；chunk_boundary_recall 在 chunk_boundary_f1 前
+- **_COUNT_METRICS / _SUCCESS_BOOL_METRICS**：均为单元素 list（element_count_total / pipeline_success）
+- **源码 token 补强**：含 'for r in per_doc_results'/'sum('/'successes / total'/'if total else None'/'sum(values) / len(values)'/'r["metrics"].get("silent_drop_count", {})'/'timeout=10'（≥2 次）/'cwd=str(project_root)'；不含 'async '/'await '/'import threading'/'Thread('/'import numpy'/'import pandas'
+- **import 顺序**：subprocess → datetime → pathlib → typing → evaluation（位置递增）
+- **docstring**：提及 counts/success_rates/ratio/silent_drop 4 类；提及 participating（参与）；提及 not_evaluated（不参与/未评估）
+- **异常路径**：空 list 返回 4 keys dict；unknown metric 被忽略（不在任一 bucket）；0.0 是 falsy 但参与 macro average；False 是 falsy 但参与 ratio；0 是 falsy 但参与 counts 求和；silent_drop_count=0 是 falsy 但参与求和；pipeline_success=False → success_count=0/total=1/rate=0.0
+
+### 撞墙记录
+- 0 fail（首次跑通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 271 后）：24649 pass / 0 fail / 16 skip（HEAD `bf3c7a7`）
+
+### 下一步建议
+- 候选 KX6：evaluation/cli.py 第十九轮（243 行）
+- 候选 KS6：evaluation/runner.py 第十九轮（227 行）
+- 候选 KZ6：evaluation/schema.py 第十二轮（80 行）
+- 候选 KT7：evaluation/manifest.py 第十九轮（239 行）
+- 候选 KE7：evaluation/annotation_metrics.py 第十八轮（194 行）
+- 候选 KF7：evaluation/metrics.py 第十八轮（381 行）
+- 候选 KW7：evaluation/report.py 第十九轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KX6（evaluation/cli.py 第十九轮，243 行）继续推 evaluation。
+
+---
