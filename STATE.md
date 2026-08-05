@@ -11817,3 +11817,52 @@ get_git_provenance 各 OSError 路径。
 第九轮可深入 _load_annotation JSON 各分支、_process_one 错误矩阵、run_evaluation 公共/私有字段、报告写盘细节。
 
 ---
+
+## 2026-08-05 — Round 207（evaluation/runner.py 第九轮）
+
+### 目标
+- 给 evaluation/runner.py（227 行，已有 base/edges/edges2-8 共 ~734 测试）补第九轮
+- 深入 _load_annotation 各 JSON 类型与错误路径
+- _process_one 5 元组返回 / image_dir 派生 / output_root 创建 / unlink 各场景
+- run_evaluation 报告结构（6 top keys / per_doc 4 keys / wall_time 5 keys）
+- run_evaluation parser_version 第一个成功文档传播
+- run_evaluation expected_failures matches True/False
+- 报告写盘 UTF-8 / indent=2 / ensure_ascii=False
+- 模块 imports / __all__ / future annotations
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges9.py`（79 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation**：None / 不存在 / 目录 / 合法 dict / 空 dict / list / int / string / null / true / false / float / nested dict / empty dict / empty list / invalid JSON / truncated JSON / extra data / empty file / unicode content / 独立 dict（每次新对象）/ 签名（path 唯一参数）
+- **_process_one**：返回 5 元组（document_dict/error/total/parser_version/image_dir）；成功路径返回 document_dict + parser_version="0.1.0"；errors 路径 document=None + error dict；无 errors 无 document → unknown code；创建 _per_doc 子目录；total_seconds 是非负 float；image_dir 用 image_output_dir_for（前 16 字符 sha）；image_dir None 当 document=None
+- **run_evaluation 报告结构**：返回 dict；keyword-only parser_name/max_chars/tolerance_chars；默认 fallback/800/30；6 top keys（report_version/provenance/devset/summary/per_doc/expected_failures）；report_version 是 str；per_doc 是 list；expected_failures 是 list；summary 4 keys（counts/success_rates/ratio_macro_averages/silent_drop_total）；provenance 9 keys；devset 6 keys
+- **run_evaluation 写盘**：写文件到指定路径；UTF-8 编码；indent=2（含 "\n  "）；ensure_ascii=False（中文不转 \uXXXX）；creates parent dirs；返回 dict 与文件 JSON 一致
+- **run_evaluation per_doc 私有字段**：公开 per_doc 不含 _annotation_present/_tolerance_chars/_missing_markers；4 公开 keys（doc_id/source_type/metrics/wall_time_seconds）；wall_time 5 keys（total/parse/chunk/parse_reason/chunk_reason）；parse+chunk null + reason=not_instrumented；total 非负
+- **run_evaluation provenance 传播**：parser_version 在第一个成功文档后设置；parser_name 传播；max_chars 传播
+- **run_evaluation expected_failures**：empty by default；matches=True 当实际 code 等于 expected；matches=False 当实际成功（actual_code=None）；4 keys（doc_id/expected_error_code/actual_error_code/matches）
+- **模块结构**：__all__ == ["run_evaluation"]；imports（json/time/Path/Any/process_single/image_output_dir_for/REPORT_VERSION/chunk_boundary_prf/figure_caption_prf/compute_automatic_metrics/aggregate_summary/build_devset_section/build_provenance）；docstring 含 total + not_instrumented + 失败；future annotations；无 _silence_unused_import
+
+### 撞墙记录
+- 初版有 1 个 SyntaxError（docstring 含 `\uXXXX` 被 Python 当成 unicode escape 解析失败）→ 改成 raw docstring `r"""..."""`
+- 初版 8 fail：_FakeDocEntry 缺 expectations/annotation_resolved 属性（compute_automatic_metrics 调用需要）→ 在 helper __init__ 加上两属性
+- 初版 image_dir 测试断言 `images-abc1230000000000`（错误地补 0 到 16 字符）→ 实际是 source_hash[:16]，源串不足 16 时即原值（"abc123"）→ 改断言为 `images-abc123`
+- 初版 parser_version_set_on_success 与 expected_failure_mismatch_when_succeeds 用 .txt 文件但 fallback 不支持 .txt（返回 unsupported_type）→ 加 monkeypatch.setattr process_single 返回 _FakeDocument 成功路径
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 207 后）：17893 pass / 0 fail / 15 skip（HEAD `971138e`）
+
+### 下一步建议
+- 候选 KQ：evaluation/metrics.py 第九轮（381 行 / ~1200 测试）
+- 候选 KR：evaluation/manifest.py 第九轮（239 行 / ~1100 测试）
+- 候选 KS：evaluation/annotation_metrics.py 第 N 轮（待查行数）
+- 候选 KT：app/chunkers/structural.py 第十轮（388 行 / ~1600 测试）
+- 候选 KF/KV/KW：base.py / chunkers/base.py / hash_utils.py（仍饱和）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KQ（evaluation/metrics.py 第九轮）。metrics.py 是评测指标核心（381 行 / ~3.1 tests/line），
+第九轮可深入各 ratio/count/success metric 边界、None reason 路径、image_base_dir 各场景。
+
+---
