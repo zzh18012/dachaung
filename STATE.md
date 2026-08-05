@@ -13122,3 +13122,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW（evaluation/report.py 第十三轮）继续推 evaluation 中型文件。
 
 ---
+## Round 236 — evaluation/report.py 第十三轮（95 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十三轮 edges 测试，覆盖 module 常量精确、aggregate_summary 空 list/success_rate/silent_drop/macro_average、build_provenance 类型边界、build_devset_section 各种值、get_git_provenance subprocess 命令精确、函数签名、__all__ 顺序
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges13.py`（95 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **常量精确**：_RATIO_METRICS=12, _COUNT_METRICS=1, _SUCCESS_BOOL_METRICS=1；不互相包含；不含 figure_caption_/_/error_code
+- **aggregate_summary 空 list**：4 top keys；counts element_count_total.sum=None；success_rate rate=None；ratio_macro 全 None；silent_drop_total=None
+- **success_rate**：全 success / 全 fail / 半 / value=None / metric 缺失
+- **silent_drop_total**：全有 / 一 None / 全 0 / 负值 / 缺失 key
+- **ratio_macro_averages 12 keys 顺序**：精确
+- **macro_average**：半参与 / 0.0 参与 / 全参与
+- **build_provenance**：max_chars bool/float/string(ValueError)；parser_name None/int；parser_version int/empty/unicode；EVALUATOR/REPORT_VERSION 常量；run_timestamp_iso 可解析
+- **build_devset_section**：0/负值/tuple/set categories；missing property AttributeError
+- **get_git_provenance**：subprocess 命令精确（rev-parse HEAD + status --porcelain）；commit strip；dirty 检测；returncode!=0 / OSError / SubprocessError fallback；timeout=10；cwd=str
+- **get_dependency_versions**：3 keys；str-or-None；idempotent
+- **签名精确**：5 个函数的参数数量与名字
+- **__all__ 顺序**：5 个元素
+
+### 撞墙记录
+- 0 fail：95 测试一次性通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 236 后）：20721 pass / 0 fail / 15 skip（HEAD `2fbd419`）
+
+### 下一步建议
+- 候选 KX：evaluation/cli.py 第十四轮（243 行）
+- 候选 KS：evaluation/runner.py 第十四轮（227 行）
+- 候选 KZ：evaluation/schema.py 第七轮（80 行）
+- 候选 KT2：evaluation/manifest.py 第十四轮（239 行）
+- 候选 KE2：evaluation/annotation_metrics.py 第十三轮（194 行）
+- 候选 KF2：evaluation/metrics.py 第十三轮（381 行）
+- 候选 KW2：evaluation/report.py 第十四轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KX（evaluation/cli.py 第十四轮）继续推 evaluation 大文件。
+
+---
