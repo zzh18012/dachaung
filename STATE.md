@@ -15110,3 +15110,52 @@ get_git_provenance 各 OSError 路径。
 **建议**：edges20 schema 联动模式可推广到其他模块（report/manifest/metrics 都可以做 schema 交叉验证）。下一轮选 evaluation/annotation_metrics.py 第十九轮，借鉴 edges20 的"实际行为+schema 验证"组合，加新角度（chunk_boundary_prf 多分支组合验证）。
 
 ---
+
+## Round 280 — evaluation/annotation_metrics.py 第十九轮（104 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第十九轮 edges 测试，覆盖 edges18 未触及的角度：**chunk_boundary_prf position 分支**（"before" 走 find_pos；"after"/unknown 走 find_pos + len(marker)）；**完美匹配**（2 chunks + 2 anchors 全在容差内 → P/R/F1=1.0）；**部分匹配**（anchors 多于预测 → recall<1.0；预测多于 anchor → precision<1.0）；**tolerance_chars 边界值**（=0 必须精确；=1 含距离 1；刚好 d==tolerance 算匹配；d>tolerance 不算；tolerance 大就宽松）；**missing_markers 行为**（marker 不在 stream → 加入；空 marker 也加入；list 类型；全找到则无 _missing_markers 字段）；**重复 marker**（search_from 推进避免都命中第 1 次）；**f1=0 when p=r=0**（denom<=0 分支）；**f1 null when recall null**（gt_positions 空 → recall null → f1 null）；**_tolerance_chars 始终在输出**（5 种路径都验证：document_none/annotation_falsy/no_predicted/no_anchors/normal）；**一对一贪心匹配**（按距离排序；用具体 case 验证 pred 不能同时匹配两个 anchor）；**marker 在 chunk 文本内部**（不影响 find）；**最后 chunk 不算边界**（i == len-1 break）；**source-level 关键 token**（30+ 验证：search_from=0 / pairs.sort / used_pred/used_gt set / list[tuple[int,int,int]] / abs(pv-gv) / pairs.append((d,pi,gi)) / used_pred.add(pi) / used_gt.add(gi) / search_from=find_pos+len(marker) / for pi,pv in enumerate(predicted) / for gi,gv in enumerate(gt_positions) / d <= tolerance_chars / p_val/r_val None 检查 / denom <= 0 / 2 * p_val * r_val / denom / position == "before" / find_pos < 0 / stream.find(marker, search_from) / i == len(norm_chunks) - 1 / pos += len(txt) + 1 / stream.find(txt, pos) / pos = end + 1 / c.get("text") or "" / a.get("marker", "") / a.get("position", "after") / missing_markers.append(marker) / gt_positions.append(find_pos) / gt_positions.append(find_pos + len(marker)) / predicted.append(end) / end = find_pos + len(txt)）；**不修改输入**（document/annotation）；**figure_caption_prf 各种输入都返固定 null**（document dict/None/empty；annotation dict/None/empty；不读 document/annotation 字段）；**模块 source 不含 json/print/logging/subprocess/asyncio/threading/os/pathlib/concurrent**；**__all__ 3 entries 顺序精确**；**PARSER_DOES_NOT_EMIT_RELATIONS 常量值/snake_case**；**_null/_ratio 来自 evaluation.metrics**；**normalize_text 来自 app.chunkers.structural**；**3 次调用独立 + 修改输出不影响下次**；**falsy annotation**（{}/None）→ no_annotation；**chunks key 缺失/空 list/单元素** → no_predicted_boundaries；**chunks>=2 + anchors=[]** → no_ground_truth_anchors
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges19.py`（104 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **chunk_boundary_prf position 分支**：before/after/unknown 三种都验证
+- **完美/部分匹配**：2v2 全匹配 P/R/F1=1.0；2v1 recall=0.5；1v2 precision=0.5
+- **tolerance_chars 边界值**：0 / 1 / 大值都验证；d==tolerance 算匹配；d>tolerance 不算
+- **missing_markers**：marker 不在 stream / 空 marker 都加入；list 类型；全找到则无字段
+- **重复 marker**：search_from 推进验证
+- **f1 边界**：p=r=0 → f1=0.0；r_val=None → f1 null
+- **_tolerance_chars 5 路径**：document_none/annotation_falsy/no_predicted/no_anchors/normal 都有
+- **一对一贪心**：用 marker='a' 和 marker='b' 验证 pred 不能同时匹配两个 anchor
+- **marker 在 chunk 内部**：find 仍能工作
+- **最后 chunk 不算边界**：i==len-1 break
+- **source-level**：30+ token 精确验证（含算法关键步骤）
+- **不修改输入**：document/anchor 内容不变
+- **figure_caption_prf**：5 种输入组合都返固定 null；不读字段
+- **模块禁止内容**：json/print/logging/subprocess/asyncio/threading/os/pathlib/concurrent 都不在 source
+- **__all__**：3 entries 顺序精确 [PARSER_DOES_NOT_EMIT_RELATIONS, figure_caption_prf, chunk_boundary_prf]
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：值精确 'parser_does_not_emit_relations'；snake_case；模块身份相同
+- **_null/_ratio/normalize_text 跨模块引用**：模块 namespace 中的引用是 evaluation.metrics._null/_ratio 和 app.chunkers.structural.normalize_text 的同一对象
+- **多次调用独立**：3 次调用结果相等但 dict 不同；修改输出不影响下次
+- **falsy/chunks 缺失/空 list/单元素**：分支都覆盖
+
+### 撞墙记录
+- 2 fail 首次跑（已修复）：
+  - test_chunk_boundary_prf_f1_null_when_precision_null：实际 chunks=[{text:""},{text:""}] 时 stream=""，但 stream.find("", 0)=0（空字符串 find 返 0），所以 predicted=[0]，num_pred=1，precision=_ratio(0.0)（value=0.0 非 None）；改为 test_chunk_boundary_prf_f1_null_when_recall_null，验证 recall null → f1 null
+  - test_chunk_boundary_prf_one_to_one_prevents_double_match：原 markers 'a' 和 'ab'，但 'ab' 从 search_from=1 找不到（'ab' 在 'ab cd' 中只出现一次，位置 0），加入 missing_markers；改为 markers 'a' 和 'b'（'b' 在 search_from=1 处可找到，位置 1）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 280 后）：25819 pass / 0 fail / 16 skip（HEAD `5707bb4`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第十九轮（与 annotation_metrics 看齐）
+  - evaluation/schema.py 第十三轮（最浅的 evaluation 模块）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：edges19 schema 联动模式可继续推广。下一轮选 evaluation/metrics.py 第十九轮（169 测试基础），加 schema 交叉验证 + 多分支组合新角度。
+
+---
