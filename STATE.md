@@ -4,6 +4,46 @@
 
 ---
 
+## Round 343 — evaluation/cli.py 第三十一轮（297 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（约 305 行）加第三十一轮 edges 测试，覆盖 edges29 未触及的角度：**argparse namespace 行为深度**（Namespace type / command 字段 / manifest/output/parser/max_chars/tolerance_chars defaults / type conversion / validate-report input / inspect-doc input+tolerance / kreuzberg choice / SystemExit on errors）；**main 行为深度第三批**（incomplete/complete status / output file write / valid JSON / report_version / max_chars arg / tolerance_chars arg / missing manifest / invalid manifest / validate-report missing+invalid+round-trip / inspect-doc missing+invalid+top-level array+top-level int+empty dict+unicode doc+chunks section+metrics section+custom tolerance）；**_format_metric 行为深度第三批**（None value + reason / None no reason / bool true/false lowercase / int / negative int / zero int / float 4 decimals / dict value / empty dict / unicode reason / long reason / str return / huge int / tiny float）；**_run_inspect_doc 行为深度第三批**（pdf/docx docs / missing file / invalid JSON / top-level array+int / prints file path/document_id/source/parser/counts/metrics label）；**module source forbidden tokens 第五批**（~140 stdlib）；**module source 字符串精确补强**（imports / main block with SystemExit / no yield/async/global/class/decorators / 4 module-level + 1 inner def）；**signatures 精确补强**（main return int / argv default None / build_parser no params / format_metric 2 params no defaults / run_inspect_doc 1 param / no varargs varkw）；**模块整体合理性**（namespace / no __all__ / 4 functions / 3 private / 1 public / no class / callable）；**端到端集成补强**（run with minimal manifest / subdir / stdout includes / validate-report round-trip / inspect-doc / unknown subcommand / no subcommand / invalid parser choice / non-int max_chars / int return types / unicode path）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges30.py`（297 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **argparse namespace 行为深度**：~22 测试
+- **main 行为深度第三批**：~26 测试
+- **_format_metric 行为深度第三批**：~15 测试
+- **_run_inspect_doc 行为深度第三批**：~13 测试
+- **module source forbidden tokens 第五批**：~140 测试（parametrize）
+- **module source 字符串精确补强**：~12 测试
+- **signatures 精确补强**：~12 测试
+- **模块整体合理性**：~10 测试
+- **端到端集成补强**：~14 测试
+
+### 撞墙记录
+- 0 fail 首次跑（297 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 343 后）：36369 pass / 0 fail / 18 skip（HEAD `458763a`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十一轮
+  - evaluation/schema.py 第二十二轮
+  - evaluation/metrics.py 第三十一轮
+  - evaluation/runner.py 第三十二轮
+  - evaluation/manifest.py 第三十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges30 已饱和（argparse namespace 22 + main 行为 26 + format_metric 15 + run_inspect_doc 13 + forbidden 140 + source 12 + signatures 12 + 模块 10 + 端到端 14）。下一轮选 evaluation/annotation_metrics.py 第三十一轮，覆盖 anchor/citation/type 行为深度第三批 + source level 补强。
+
+---
+
 ## Round 342 — evaluation/manifest.py 第三十轮（328 测试）
 
 ### 目标
