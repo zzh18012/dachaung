@@ -4,6 +4,48 @@
 
 ---
 
+## Round 370 — evaluation/cli.py 第三十四轮（135 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第三十四轮 edges 测试，覆盖 edges33 未触及的角度：**_build_parser 行为深度第七批**（fresh parser each call、prog/description、subparsers required=True、subparsers dest=command、3 个子命令）；**argparse Namespace 字段第七批**（run 全字段 str 类型 + parser 默认 fallback + max_chars=800 + tolerance_chars=30 + kreuzberg 选择 + 自定义 max_chars/tolerance_chars + validate-report 仅 input + inspect-doc input+tolerance + 缺失字段验证 parser/max_chars 不存在于 inspect-doc/validate-report）；**_format_metric 行为深度第七批**（None 无 reason 渲染 "(None)" / 空 reason "()" / 有 reason "(reason)" / 渲染 null / bool 大小写 / 4 位小数精度 / dict 负值 / unicode 值 / 多 key 排序 / 空 dict / list default branch / huge int / int 0 / string value with reason / 空 name）；**_run_inspect_doc 行为深度第七批**（sort 顺序 / elements count / chunks count / parser info / source_type / 默认 unknown / returns 0）；**main 路由深度第七批**（--help exit 0 三个子命令 / 无 args 非零退出 / 未知子命令 SystemExit / run/validate-report/inspect-doc 返回 int / run 缺 manifest 返回 2 + stderr 含"清单不存在"）；**module source forbidden tokens 第十批**（os.chmod/chown/execv/fork/kill/mkdir/makedirs/remove/rename/rmdir/unlink + pathlib.Path.rmdir/unlink + eval/exec/compile/globals/locals/vars + memoryview/bytearray + errno + signal.signal + fcntl/termios/tty/pty/winreg/msvcrt/_winapi + re.match/re.sub + shutil.rmtree/tempfile.mkdtemp）；**signatures 第七批**（build_parser 零参 / main argv kind POSITIONAL_OR_KEYWORD + default None / format_metric name+metric kind / run_inspect_doc args kind + 无 default / 4 个函数 no varargs / main no kwargs）；**module 合理性第七批**（docstring 4 keyword：run/validate-report/inspect-doc/python -m evaluation.cli / 无 __all__ / 4 个函数都是 function + __module__ eq / main 块用 raise SystemExit / 无 class 定义）；**端到端集成第七批**（run 全字段 Namespace / validate-report Namespace / inspect-doc Namespace + 自定义 tolerance / 各 --help 输出含特定 flag / unicode 文档 / minimal dict / 最小 manifest 端到端 rc=0）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges34.py`（135 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 行为深度第七批**：9 测试
+- **argparse Namespace 字段第七批**：15 测试
+- **_format_metric 行为深度第七批**：23 测试
+- **_run_inspect_doc 行为深度第七批**：7 测试
+- **main 路由深度第七批**：11 测试
+- **module source forbidden tokens 第十批**：32 测试
+- **signatures 第七批**：12 测试
+- **module 合理性第七批**：15 测试
+- **端到端集成第七批**：11 测试
+
+### 撞墙记录
+- 0 fail 首次跑（135 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 370 后）：43291 pass / 0 fail / 18 skip（HEAD `297c777`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十六轮
+  - evaluation/metrics.py 第三十五轮
+  - evaluation/report.py 第二十四轮
+  - evaluation/runner.py 第三十六轮
+  - evaluation/manifest.py 第三十五轮
+  - evaluation/cli.py 第三十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli edges34 已饱和（_build_parser 9 + Namespace 15 + format_metric 23 + inspect_doc 7 + main 11 + forbidden 32 + signatures 12 + 模块 15 + 端到端 11）。下一轮选 evaluation/annotation_metrics.py 第三十五轮，覆盖 chunk_boundary_prf/figure_caption_prf source level 与边界第八批。
+
+---
+
 ## Round 369 — evaluation/manifest.py 第三十四轮（122 测试）
 
 ### 目标
