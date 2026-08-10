@@ -4,6 +4,57 @@
 
 ---
 
+## Round 304 — evaluation/metrics.py 第二十四轮（128 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二十四轮 edges 测试，覆盖 edges22 未触及的角度：**_ratio 边界值补强**（0.0 / 1.0 / -0.0 不规范化 / int 0 → float 0.0 / 0.5 / inf 不 clamp / -inf / nan 不 clamp）；**_null reason 字符串深度补强**（空字符串 / 长字符串 1000 字符 / unicode 中文 / emoji / 含空格 / 含特殊字符 \\n\\t）；**_bool_metric truthy/falsy 边界补强**（非空 dict / 空列表 / 空 dict / None / 0 int / 0.0 float / 空字符串 / 空 tuple / 非空 list / 非空 string / 非空 tuple 共 11 个 case）；**_int_metric 截断行为补强**（1.9 → 1 / -1.9 → -1 / -0.5 → 0 / 0.999 → 0 / True → 1 / False → 0）；**_TEXT_TYPES 常量深度补强**（tuple / 不可变 / 7 entries 顺序 / 不含 image/unknown / 子集关系 / first=heading / last=footer / _PDF_BBOX_REQUIRED_TYPES 4 entries 顺序）；**compute_automatic_metrics 流程补强**（document None 早 return + 11 metric 全 pipeline_failed / pipeline_success in value field / error_code in value field / error None → null error_code / document={} schema 校验 / schema_check_exception 含类名）；**_pdf_locator_ratio bbox 深度补强**（len=3/5 / str 中混 / bool first / None 中混 / inf / nan / tuple / None 共 9 个 invalid case）；**_docx_locator_ratio structural_keys 单独有效性补强**（section / paragraph_index / run_index / table_index / relationship_id 各 1 个 / page + section 混合 invalid / bbox + paragraph_index 混合 invalid / 空 dict invalid）；**_image_resource_ratio 候选路径补强**（无 base_dir 绝对 rp 1 candidate / 有 base_dir 相对 rp 2 candidates / 有 base_dir 绝对 rp 2 candidates / 空 rp skip / None rp skip / size=0 invalid）；**_chunk_reference_ratio 边界补强**（重复 ids 仍 valid / 空 ids invalid / 未知 id → 0.0 / 缺 key → 0.0）；**_strip_unicode_whitespace Unicode 类别深度补强**（NBSP / em space / en space / ideographic space / line separator / paragraph separator / thin space 共 7 个 + ASCII 标点不删）；**_text_preservation 深度补强**（单字符 / emoji / 中文混合 ASCII / 词内硬切无空白引入）；**_silent_drop_count max(0,) 补强**（actual > expected → 0 / actual == expected → 0 / actual < expected 正数 / 多类型 partial sum / expected 中有但 by_type 中无）；**module source 字符串精确补强**（含 evaluator v1.1 / report v1.1 / 口径 D / v1.0 + ' '.join / v1.1 + 直接删除全部空白）；**module source forbidden tokens 补强**（time/json/csv/pickle/sqlite3/socket/email/html/http/urllib 10 个）；**module source 含 math.isfinite / Counter 交集 / Path(rp) / Path(rp).name / image_base_dir 拼接 共 5 个 source check）；**signatures 精确补强**（4 helper 各 1 param + no default / compute 5 params + image_base_dir default=None + first 4 no default + no varargs/varkw）；**端到端集成补强**（PDF 全 valid bbox / DOCX 全 valid structural_keys / chunks source ids valid / heading at chunk start / 0 drops）；**模块整体合理性**（__all__ 1 entry / compute 是唯一 public callable / 无 class / 无 __main__ / 13 private function / 3 private constant）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges23.py`（128 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_ratio 边界值补强**：8 测试
+- **_null reason 字符串深度补强**：6 测试
+- **_bool_metric truthy/falsy 边界补强**：11 测试
+- **_int_metric 截断行为补强**：6 测试
+- **_TEXT_TYPES 常量深度补强**：9 测试
+- **compute_automatic_metrics 流程补强**：6 测试
+- **_pdf_locator_ratio bbox 深度补强**：9 测试
+- **_docx_locator_ratio structural_keys 单独有效性补强**：8 测试
+- **_image_resource_ratio 候选路径补强**：6 测试
+- **_chunk_reference_ratio 边界补强**：4 测试
+- **_strip_unicode_whitespace Unicode 类别深度补强**：8 测试
+- **_text_preservation 深度补强**：4 测试
+- **_silent_drop_count max(0,) 补强**：5 测试
+- **module source 字符串精确补强**：5 测试
+- **module source forbidden tokens 补强**：10 测试
+- **module source 含 math.isfinite / Counter / Path**：5 测试
+- **signatures 精确补强**：7 测试
+- **端到端集成补强**：5 测试
+- **模块整体合理性**：6 测试
+
+### 撞墙记录
+- 0 fail 首次跑（128 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 304 后）：29359 pass / 0 fail / 16 skip（HEAD `315ec77`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第十六轮
+  - evaluation/runner.py 第二十五轮
+  - evaluation/manifest.py 第二十四轮
+  - evaluation/cli.py 第二十五轮
+  - evaluation/annotation_metrics.py 第二十五轮
+  - evaluation/metrics.py 第二十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges23 已饱和（_ratio/_null/_bool_metric/_int_metric 4 helper 边界 + _TEXT_TYPES 常量深度 + compute 流程 + _pdf_locator bbox 深度 + _docx_locator structural + _image_resource 候选路径 + _chunk_reference 边界 + _strip Unicode 类别 + _text_preservation 深度 + _silent_drop_count max + source 字符串 + forbidden tokens + signatures + 端到端 + 模块整体）。下一轮选 evaluation/schema.py 第十六轮，覆盖 4 个 schema 文件 + EvalSchemaError 行为深度 + load_schema/validate/validate_file 各分支。
+
+---
+
 ## Round 303 — evaluation/annotation_metrics.py 第二十四轮（114 测试）
 
 ### 目标
