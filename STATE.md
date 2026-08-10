@@ -4,6 +4,46 @@
 
 ---
 
+## Round 382 — evaluation/runner.py 第三十七轮（168 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第三十七轮 edges 测试，覆盖 edges35 未触及的角度：**_load_annotation 行为深度第九批**（None/nonexistent/invalid JSON/empty/object/array/number/string/true/null/0/empty_obj/UTF-8 多字节/BOM 失败/truncated/just braces/dir path）；**_process_one 行为深度第九批**（5-tuple 类型 / success 返回 document_dict+None error / errors 非空返回 error dict / document None 无 errors 返回 unknown / total_seconds float / parser_version 透传 / None on error / image_dir None when doc None / Path object when doc 有 / unlinks stub / 创建 _per_doc 子目录 / out_stub 路径正确 / unlink OSError 吞）；**run_evaluation 行为深度第九批**（写盘 / 返回 dict / 一致性 / 6 顶层 keys / report_version 值 / per_doc/expected_failures 空 / 创建父目录 / indent=2 / ensure_ascii=False / str path / keyword args / parser_name 透传 / max_chars 透传 / 单 doc 一条 / 两 doc 顺序 / 私有 keys 不暴露 / per_doc 4 keys / wall_time_seconds 5 keys / parser_version 首成功 / 全失败 None / expected_failure match/no_match/4 keys）；**module source forbidden tokens 第十四批**（os.system/Popen/rmtree/pickle.load/yaml.load/check_call/call/os.popen/compile/eval/exec/sys.exit/exit/quit + unlink 仅 helper + 顶层 no global/class/async/yield/walrus/lambda/print/logging/sleep/hardcoded）；**module source 字符串精确补强第八批**（future annotations + json/time/Path/Any/process_single/image_output_dir_for/REPORT_VERSION/3 annotation_metrics/compute_automatic_metrics/aggregate_summary/build_devset_section/build_provenance imports + 3 module-level functions + time.perf_counter + _per_doc 字面量 + {doc.doc_id} 模板 + no main + docstring mentions total/not_instrumented/pipeline + report_version/provenance/devset/summary/per_doc/expected_failures 顶层 keys + wall_time 5 keys 字面量 + json.dump + ensure_ascii=False + indent=2 + unknown 错误消息 + "unknown" code）；**signatures 第九批**（_load_annotation 1 param + name/kind/annotation/return + _process_one 4 params + names/kinds/no defaults + return tuple + run_evaluation 5 params + names + manifest/output_path POSITIONAL_OR_KEYWORD + 3 KEYWORD_ONLY 默认值 + no varargs/kwargs + return dict[str,Any] + 3 funcs FunctionType + __module__）；**module 合理性第九批**（__all__ = ["run_evaluation"] + dunder file + 3 module functions + no user classes + no top-level call + no module-level constants + docstring present）；**端到端集成第九批**（idempotent / repeated calls / concurrent safe / unicode key+value / array of objects / same content / just brackets / deeply nested / float / sci notation / negative / whitespace / newlines / run_evaluation idempotent / valid report / importable / in __all__ / BOM 失败 / truncated / annotation loads/missing）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges36.py`（168 测试）
+
+### 覆盖要点
+- **_load_annotation 行为深度第九批**：18 测试
+- **_process_one 行为深度第九批**：13 测试
+- **run_evaluation 行为深度第九批**：22 测试
+- **module source forbidden tokens 第十四批**：14 测试
+- **module source 字符串精确补强第八批**：35 测试
+- **signatures 第九批**：22 测试
+- **module 合理性第九批**：11 测试
+- **端到端集成第九批**：23 测试（含 BOM 调整）
+
+### 撞墙记录
+- 1 fail 首次跑：`test_load_annotation_handles_bom` 期望 BOM 被剥除，实际 `encoding="utf-8"`（非 utf-8-sig）会保留 BOM 字符导致 JSON 解析失败 → None
+  - 修复：调整期望为 None，并文档化为何（避免误改 source）
+- 二次跑：168 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 382 后）：45346 pass / 0 fail / 19 skip（HEAD `bab0a2c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第三十六轮
+  - evaluation/manifest.py 第三十六轮
+  - evaluation/annotation_metrics.py 第三十六轮
+  - evaluation/schema.py 第二十八轮
+  - evaluation/metrics.py 第三十七轮
+  - evaluation/report.py 第二十六轮
+  - evaluation/runner.py 第三十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 381 — evaluation/report.py 第二十五轮（170 测试）
 
 ### 目标
