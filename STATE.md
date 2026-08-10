@@ -4,6 +4,52 @@
 
 ---
 
+## Round 300 — evaluation/runner.py 第二十四轮（125 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第二十四轮 edges 测试，覆盖 edges22 未触及的角度：**_load_annotation 行为深度补强**（path None → None；不存在 → None；directory → None；中文/空格 path；invalid JSON → None；signature 1 param + no default + no varargs/varkw；return dict | None；source 含 'path is None' + 'not path.is_file()' + utf-8 + json.load + (OSError, JSONDecodeError) + return None on error）；**_process_one 行为深度补强**（errors 非空 → 5-tuple (None, errors[0].to_dict(), elapsed, None, image_dir)；document None + 无 errors → unknown_error；signature 4 params no default + no varargs/varkw；source 含 out_stub 模板 + parents=True + exist_ok=True + perf_counter 2 处 + process_single + image_output_dir_for + out_stub.is_file/unlink + except OSError + 3 个 return + unknown error message）；**run_evaluation 行为深度补强**（keyword-only 3 params + 默认 fallback/800/30 + no varargs/varkw + return dict；空 manifest 不抛；写盘 loadable；report 6 top-level keys；嵌套输出目录自动创建；source 含 Path(output_path).parent + mkdir + for doc + parser_version tracking + compute_automatic_metrics + _load_annotation + figure_caption_prf + chunk_boundary_prf + metrics.update + pop _tolerance_chars/_missing_markers + per_doc append 6+ keys + for ef + actual_code + matches + build_provenance + build_devset_section + aggregate_summary + public_per_doc 4 keys + report 6 keys + json.dump ensure_ascii=False indent=2 + return report）；**wall_time 结构精确**（5 keys：total/parse/chunk/parse_reason/chunk_reason；parse/chunk None；reason 'not_instrumented'；source 含 5 keys）；**expected_failure 处理深度**（4 keys：doc_id/expected_error_code/actual_error_code/matches；source 含 actual_code = errors[0].code if errors else None + matches = actual_code == expected_error_code + process_single 调用）；**annotation 字段处理深度**（source 含 _annotation_present = annotation is not None + tolerance_record['value'] if tolerance_record else None + missing_markers_record['value'] + chunk_b.pop）；**module __all__ 精确**（1 entry run_evaluation；不包含 _load_annotation/_process_one）；**module imports 顺序**（future → json → time → pathlib → typing → app.pipeline → evaluation 4 个 namespace）；**module namespace 补强**（3 module-level function；9 imported name 含 callable 类型）；**module source forbidden tokens 补强**（os/sys/re/logging/subprocess/asyncio/threading/concurrent/collections/math/datetime/itertools/functools/relative/class/dataclass/yield/async/global/nonlocal/walrus/assert）；**module docstring 深度补强**（含「评测 runner」/「清单」/「pipeline」/「perf_counter」/「not_instrumented」/「image_resource」）；**signatures 精确**（_load_annotation 1 param no default；_process_one 4 params no default + 5-tuple return + no varargs/varkw；run_evaluation 2 positional + 3 keyword-only + 3 defaults + return dict + no varargs/varkw）；**module source level 完整**：_load_annotation source 含 path None check + not is_file + utf-8 + json.load + (OSError, JSONDecodeError) + return None；_process_one source 含 out_stub 模板 + parents/exist_ok + perf_counter 2 处 + process_single + image_output_dir_for + unlink + except OSError + 3 return paths + unknown error message；run_evaluation source 含 output_root mkdir + for doc + parser_version tracking + compute_automatic_metrics 5 kwargs + load_annotation + figure_caption_prf + chunk_boundary_prf + metrics.update + pop + per_doc append 6+ keys + for ef + actual_code + matches + build_provenance 4 kwargs + build_devset_section + aggregate_summary + public_per_doc 4 keys + report 6 keys + json.dump）；**端到端集成**（空 manifest 返 dict；report provenance 9 字段；devset 6 字段；summary 4 字段；evaluator_version 不变；report_version 不变；不修改 manifest）；**模块整体合理性**（无 class；无 __main__；3 module-level function；1 public + 2 private）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges23.py`（125 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 行为深度补强**：16 测试
+- **_process_one 行为深度补强**：15 测试
+- **run_evaluation 行为深度补强**：29 测试
+- **wall_time 结构精确**：2 测试
+- **expected_failure 处理深度**：2 测试
+- **annotation 字段处理深度**：4 测试
+- **module __all__ 精确**：5 测试
+- **module imports 顺序**：11 测试
+- **module namespace 补强**：2 测试
+- **module source forbidden tokens 补强**：22 测试
+- **module docstring 深度补强**：6 测试
+- **端到端集成**：7 测试
+- **模块整体合理性**：5 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  1. `test_end_to_end_no_modification_of_manifest` —— 我误用 `manifest.doc_count`，实际 Manifest 没有这个属性（有 docx_count）。修法：用 len(documents) + len(expected_failures) + file_count 比较。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 300 后）：28788 pass / 0 fail / 16 skip（HEAD `b6a43ac`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第二十三轮
+  - evaluation/cli.py 第二十四轮
+  - evaluation/annotation_metrics.py 第二十四轮
+  - evaluation/metrics.py 第二十四轮
+  - evaluation/schema.py 第十六轮
+  - evaluation/runner.py 第二十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges23 已饱和（_load_annotation 16 + _process_one 15 + run_evaluation 29 + source level 完整 + 端到端）。下一轮选 evaluation/manifest.py 第二十三轮，覆盖 DocumentEntry/ExpectedFailure/Manifest 行为深度补强。
+
+---
+
 ## Round 299 — evaluation/schema.py 第十五轮（183 测试）
 
 ### 目标
