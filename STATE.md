@@ -4,6 +4,43 @@
 
 ---
 
+## Round 385 — evaluation/annotation_metrics.py 第三十六轮（123 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第三十六轮 edges 测试，覆盖 edges35 未触及的角度：**figure_caption_prf 行为深度第九批**（returns dict / 3 keys in order / all null / reason constant / 即便有 doc/annotation/both 仍 null / 每 value 是 dict 含 value+reason / idempotent / no mutate / 接受 empty dict doc+annot / value+reason only 2 keys）；**chunk_boundary_prf 行为深度第九批**（5 branch: document None/无 annot/<2 chunks 无 anchors/<2 chunks 有 anchors/≥2 chunks 无 anchors / 两 chunks 完美匹配 / 容差外不匹配 / 负容差永远不匹配 / 零容差精确匹配 / 3 chunks 2 内部边界 / unknown position 默认 after / position before / Unicode marker / 空 marker falsy → missing / missing marker 记录 / 无 missing_markers 时无 key / 缺 text key / text None / 多余 keys 不影响 / 多 anchors 少 predictions → recall<1 / 多 predictions 少 anchors → precision<1 / idempotent / 不 mutate document / 不 mutate annotation / 返回 dict / 包含 _tolerance_chars / 默认 30）；**module source forbidden tokens 第十二批**（os.system/Popen/rmtree/pickle.load/yaml.load/compile/eval/exec/sys.exit/exit/quit/global + no async/yield/walrus/unlink/remove/logging/sleep/print/open/main block）；**module source 字符串精确补强第七批**（future annotations + Counter/Any/normalize_text/_null/_ratio imports + PARSER_DOES_NOT_EMIT_RELATIONS 字面量 + 2 func defs + normalize_text/null/ratio 调用 + no class + docstring mentions caption/chunk_boundary/tolerance + chunk_boundary_anchors/tolerance_chars/pipeline_failed/no_annotation/no_predicted_boundaries/no_ground_truth_anchors 字面量）；**signatures 第九批**（figure_caption 2 params + names/kinds/no defaults/return dict[str,dict[str,Any]] + chunk_boundary 3 params + names/kinds/tolerance 默认 30/return + 2 funcs FunctionType + __module__ eq）；**module 合理性第九批**（__all__ 3 items + dunder file + name + PARSER_DOES_NOT_EMIT_RELATIONS constant + 2 user functions + no user classes + no top-level call + docstring present）；**端到端集成第九批**（figure_caption 全数据仍 null / 完美匹配 / 部分匹配 / Unicode / missing marker / combined metrics 无 overlap / idempotent / no mutate / kwargs call / positional call）
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges36.py`（123 测试）
+
+### 覆盖要点
+- **figure_caption_prf 行为深度第九批**：13 测试
+- **chunk_boundary_prf 行为深度第九批**：27 测试
+- **module source forbidden tokens 第十二批**：12 测试
+- **module source 字符串精确补强第七批**：23 测试
+- **signatures 第九批**：12 测试
+- **module 合理性第九批**：11 测试
+- **端到端集成第九批**：10 测试
+
+### 撞墙记录
+- 0 fail 首次跑（123 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 385 后）：45814 pass / 0 fail / 19 skip（HEAD `7765165`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十八轮
+  - evaluation/metrics.py 第三十七轮
+  - evaluation/report.py 第二十六轮
+  - evaluation/runner.py 第三十八轮
+  - evaluation/cli.py 第三十七轮
+  - evaluation/manifest.py 第三十七轮
+  - evaluation/annotation_metrics.py 第三十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 384 — evaluation/manifest.py 第三十六轮（178 测试）
 
 ### 目标
