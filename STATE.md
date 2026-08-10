@@ -4,6 +4,47 @@
 
 ---
 
+## Round 361 — evaluation/runner.py 第三十四轮（222 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第三十四轮 edges 测试，覆盖 edges32 未触及的角度：**_load_annotation source level 字符串精确补强第三批**（starts with def / 1 param / -> dict | None / uses path is None / is_file / return None / try except / OSError + JSONDecodeError / open utf-8 / json.load(f) / return json.load(f) / no eval/subprocess/yield/async/global）；**_process_one source level 字符串精确补强第五批**（starts with def / 4 params / returns 5-tuple / out_stub / _per_doc dir / doc.doc_id / mkdir parents / time.perf_counter / process_single / doc.resolved_path / parser_name / max_chars / write_json=False / image_output_dir_for / document.source_hash / image_dir None default / document is not None / unlink out_stub / OSError / errors truthy / errors[0].to_dict / document is None / unknown error message / 5-tuple return / elapsed calc）；**run_evaluation source level 字符串精确补强第五批**（starts with def / 5 params / -> dict / output_root / mkdir / per_doc_results list / parser_version_for_prov / loops documents / loops expected_failures / _process_one / compute_automatic_metrics / source_type / expectations / _load_annotation / figure_caption_prf / chunk_boundary_prf / tolerance_chars / pops _tolerance_chars / pops _missing_markers / metrics.update / image_dir.is_dir / build_provenance / build_devset_section / aggregate_summary / public_per_doc / report dict / report_version REPORT_VERSION / writes json with indent / out_p Path / open w utf-8 / return report / parser_version first / expected_failure_results / appends / actual_code / compares actual/expected / total_seconds wall_time / parse+chunk null / not_instrumented / doc_id / kwargs only）；**module source forbidden tokens 第十一批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime/time/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/importlib/platform）；**module source 字符串精确补强**（docstring mentions runner/pipeline/total/parse/chunk/not_instrumented / 7 imports / no relative / no star / no yield / no async / no walrus / no main / no user class / 3 functions / __all__ 1 entry / no eval/exec/compile）；**signatures 精确补强**（_load_annotation 1 param / _process_one 4 params / run_evaluation 5 params / manifest+output_path no default / parser_name default fallback / max_chars default 800 / tolerance_chars default 30 / 3 keyword-only）；**模块整体合理性补强**（has docstring / __all__ list length 1 / 3 callables / no user classes / name eq / file eq / function module eq / imports json/time/Path/process_single/image_output_dir_for/compute_automatic_metrics/aggregate_summary/build_devset_section/build_provenance/chunk_boundary_prf/figure_caption_prf/REPORT_VERSION）；**端到端集成补强**（_load_annotation None path / nonexistent / valid json / invalid json / empty file / array root / int root / null root / string root / nested dict / does not write / idempotent / no side effects / utf-8 chinese / special chars / huge dict / long array / trailing comma raises / unquoted keys raises / utf-8 BOM / minimal run / writes file / file valid json / report_version correct / per_doc count matches / does not mutate manifest / kwargs only / default kwargs / idempotent structure / creates output root / with expected_failure）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges33.py`（222 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation source level 字符串精确补强第三批**：~16 测试
+- **_process_one source level 字符串精确补强第五批**：~28 测试
+- **run_evaluation source level 字符串精确补强第五批**：~45 测试
+- **module source forbidden tokens 第十一批**：~36 测试
+- **module source 字符串精确补强**：~25 测试
+- **signatures 精确补强**：~12 测试
+- **模块整体合理性补强**：~18 测试
+- **端到端集成补强**：~42 测试（_load_annotation 行为 22 + run_evaluation 行为 12）
+
+### 撞墙记录
+- 1 fail 首次跑：_process_one 实际是 4 个参数（不是 5），5-tuple 是返回值不是参数；改成 4 params
+- 修复后 222 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 361 后）：41228 pass / 0 fail / 18 skip（HEAD `369925b`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十三轮
+  - evaluation/cli.py 第三十四轮
+  - evaluation/annotation_metrics.py 第三十四轮
+  - evaluation/schema.py 第二十五轮
+  - evaluation/metrics.py 第三十四轮
+  - evaluation/report.py 第二十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner edges33 已饱和（_load_annotation source 第三批 + _process_one source 第五批 + run_evaluation source 第五批 + forbidden 36 + signatures + 端到端 42）。下一轮选 evaluation/manifest.py 第三十三轮，覆盖 ManifestLoader/Migration 行为深度与 source 字符串补强第三批。
+
+---
+
 ## Round 360 — evaluation/report.py 第二十二轮（203 测试）
 
 ### 目标
