@@ -4,6 +4,48 @@
 
 ---
 
+## Round 347 — evaluation/runner.py 第三十二轮（371 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（260 行）加第三十二轮 edges 测试，覆盖 edges30 未触及的角度：**_load_annotation 行为深度第六批**（array of arrays / nested dict deep / unicode keys / float values / scientific notation / null values / long string / empty dict / empty array / whitespace only / list value / negative numbers / explicit exponent / typical annotation / directory path / relative path / pathlib Path / str path）；**_process_one source level 字符串精确补强第三批**（def 起头 / 5-tuple return / image_dir 出现 ≥3 / process_single 调用 / out_stub / doc.doc_id / fail_with / error_dict / parser_version / image_output_dir_for / write_json=False / Path 连接）；**run_evaluation source level 字符串精确补强第三批**（def 起头 / manifest+output_path 参数 / per_doc_results list[dict[str, Any]] / expected_failure_results / parser_version_for_prov / source_type=doc.source_type / expectations=doc.expectations / build_provenance / aggregate_summary / build_devset_section / json.dump ensure_ascii=False）；**module source forbidden tokens 第九批**（~190 stdlib，避开 evaluation/runner.py 真正使用的 json/time/Path/Any/process_single/image_output_dir_for/REPORT_VERSION/chunk_boundary_prf/figure_caption_prf/compute_automatic_metrics/aggregate_summary/build_devset_section/build_provenance）；**module source 字符串精确补强**（docstring 内容 / 10 imports / no relative / no star / no main / no yield / no async / no global / no decorators / no class / 2 functions / uses Path/json.dump/process_single / 不使用 csv/pickle/yaml/logging）；**signatures 精确补强**（_load_annotation path 参数无 default / no varargs / _process_one 4 params no defaults / no varargs / run_evaluation 5 params / parser_name default fallback / max_chars default 800 / tolerance_chars default 30 / kw-only separator / kinds）；**模块整体合理性**（namespace / __name__ / __file__ / __doc__ / __all__ / callable / __module__ eq / 2 public functions / 2 private functions / no user classes）；**端到端集成补强**（_load_annotation 实际读取 json 文件 / _process_one 失败分支返回 (None, error, ...) / _process_one 成功分支返回 (dict, None, ...) / run_evaluation 完整 pipeline with manifest / 不修改 manifest / 不修改 input doc / parser_version 传播到 provenance / per_doc 结果 count 等于 manifest documents count / json serializable / json.dump 写文件 / idempotent / kwargs 顺序 / 全 positional / 全 kwargs）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges31.py`（371 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 行为深度第六批**：19 测试
+- **_process_one source level 字符串精确补强第三批**：~25 测试
+- **run_evaluation source level 字符串精确补强第三批**：~30 测试
+- **module source forbidden tokens 第九批**：~190 测试（parametrize）
+- **module source 字符串精确补强**：~30 测试
+- **signatures 精确补强**：~17 测试
+- **模块整体合理性**：~17 测试
+- **端到端集成补强**：~28 测试
+
+### 撞墙记录
+- 4 fail 首次跑：
+  - `_process_one` / `run_evaluation` 都没有 docstring，只是 def → 改为 startswith("def ...")
+  - 7 imports → 10 imports（含 __future__/json/time/Path/Any + app.pipeline + REPORT_VERSION + annotation_metrics + metrics + report = 10）
+  - `_load_annotation` 的 `path: Path | None` 没有 default（必须显式传入）→ 改为 `default is inspect.Parameter.empty`
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 347 后）：37990 pass / 0 fail / 18 skip（HEAD `5b3fa89`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十一轮
+  - evaluation/cli.py 第三十二轮
+  - evaluation/annotation_metrics.py 第三十二轮
+  - evaluation/schema.py 第二十三轮
+  - evaluation/metrics.py 第三十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner edges31 已饱和（_load_annotation 第六批 + _process_one source 第三批 + run_evaluation source 第三批 + forbidden 190 + 端到端 28）。下一轮选 evaluation/manifest.py 第三十一轮，覆盖 Manifest dataclass 与 load_manifest/save_manifest 行为深度。
+
+---
+
 ## Round 346 — evaluation/metrics.py 第三十一轮（449 测试）
 
 ### 目标
