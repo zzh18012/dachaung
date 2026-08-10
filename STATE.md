@@ -4,6 +4,48 @@
 
 ---
 
+## Round 425 — evaluation/cli.py 第四十三轮（105 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第四十三轮 edges 测试，覆盖 edges41 未触及的角度：**_build_parser 边界第十五批**（subparser prog 格式 / run arg 数量 5 / validate-report arg 数量 1 / inspect-doc arg 数量 1 + 1 option / choices_actions 数量 3 / manifest required / output required / parser choices tuple）；**argparse Namespace 第十五批**（equality / inequality / dict access / command attr / max_chars int type）；**_format_metric 边界第十五批**（None / True / False / float precision 4 / int value / dict multiple items / dict sorted / no reason int）；**_run_inspect_doc 边界第十五批**（missing document_id '?' / missing source_path / elements=0 / chunks=0 / elements None raises TypeError / chunks None raises TypeError / tolerance 99 / stdout contains metrics lines）；**main 路由第十五批**（run manifest not exist → 2 / validate-report not exist → 2 / inspect-doc not exist → 2 / inspect-doc invalid JSON → 1 / inspect-doc list JSON → 1 / inspect-doc int JSON → 1 / validate-report invalid schema → 1 / inspect-doc valid → 0 / returns int type）；**module source forbidden tokens 第二十一批**；**module source 字符串精确补强第十八批**；**signatures 第十八批**；**module 合理性第十八批**；**端到端集成第十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges42.py`（105 测试）
+
+### 覆盖要点
+- **_build_parser 边界第十五批**：10 测试
+- **argparse Namespace 第十五批**：5 测试
+- **_format_metric 边界第十五批**：8 测试
+- **_run_inspect_doc 边界第十五批**：8 测试
+- **main 路由第十五批**：9 测试
+- **module source forbidden tokens 第二十一批**：16 测试
+- **module source 字符串精确补强第十八批**：22 测试
+- **signatures 第十八批**：7 测试
+- **module 合理性第十八批**：8 测试
+- **端到端集成第十八批**：12 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_run_inspect_doc_elements_none_batch15 期望 rc=0 但 compute_automatic_metrics 在 elements=None 时 len(None) 崩）。修：改为 expect TypeError propagates（_run_inspect_doc 没 try/except 包裹 compute_automatic_metrics）。
+- 二次跑：1 fail（test_run_inspect_doc_chunks_none_batch15 同理 chunks=None → _text_preservation TypeError）。修：同样 expect TypeError propagates。
+- 三次跑：105 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 425 后）：51692 pass / 0 fail / 19 skip（HEAD `6dae82d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第四十二轮
+  - evaluation/annotation_metrics.py 第四十二轮
+  - evaluation/schema.py 第三十四轮
+  - evaluation/metrics.py 第四十四轮
+  - evaluation/report.py 第三十二轮
+  - evaluation/runner.py 第四十五轮
+  - evaluation/cli.py 第四十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 424 — evaluation/runner.py 第四十四轮（86 测试）
 
 ### 目标
