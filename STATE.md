@@ -4,6 +4,53 @@
 
 ---
 
+## Round 339 — evaluation/schema.py 第二十一轮（326 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第二十一轮 edges 测试，覆盖 edges20 未触及的角度：**EvalSchemaError 行为深度第三批**（errors 默认空 / None 显式 / pickle 支持 / raise from chain / args 属性 / 空 message / repr / errors 可修改）；**_schema_path 行为深度**（parent / name / 不存在 / 错误消息含路径 / 子目录路径 / 字符串表示）；**load_schema 行为深度**（4 个 schema 各返回 dict / 多次返回 fresh dict / 修改不持久 / dict 有 type/$schema 关键字 / JSON 可序列化）；**validate 行为深度**（成功 None / errors 含 3 keys / sorted by absolute_path / 不修改 instance / message 含 schema_name 和处 / 5 种非法 top level / first error message 出现 / unknown schema FileNotFoundError）；**validate_file 行为深度**（str 路径 / Path 路径 / 不存在 / 非 JSON / 子目录 / 返回 None）；**module source forbidden tokens 第四批**（~150 stdlib，去掉与合法 import 冲突的 pathlib/re）；**module source 字符串精确补强**（imports / Draft202012Validator / iter_errors / sorted / flat list / 3 keys per error / errors[0] / raise EvalSchemaError / no yield/async/global/main/decorators / has lambda for sorted key）；**signatures 精确补强**（__init__ 3 params / 4 functions 各自参数）；**模块整体合理性**（namespace / __all__ 5 entries / 4 functions / 1 private / 3 public / 1 class / SCHEMAS_DIR 是 Path/absolute/exists）；**端到端集成补强**（4 schemas round trip / minimal evaluation-report / 多个 errors 收集 / unicode path / 5 种非法 top level for validate_file）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges21.py`（326 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 行为深度第三批**：15 测试
+- **_schema_path 行为深度**：8 测试
+- **load_schema 行为深度**：6 测试
+- **validate 行为深度**：14 测试
+- **validate_file 行为深度**：7 测试
+- **module source forbidden tokens 第四批**：~150 测试（parametrize）
+- **module source 字符串精确补强**：~35 测试
+- **signatures 精确补强**：~20 测试
+- **模块整体合理性**：~25 测试
+- **端到端集成补强**：~20 测试
+
+### 撞墙记录
+- 6 fail 首次跑：
+  - 'pathlib' 是合法 `from pathlib import Path` → 从 forbidden tokens 移除
+  - 're' 是 'future' 子串 → 从 forbidden tokens 移除
+  - schema.py 实际有 4 个模块级 def（_schema_path + 3 public）→ 改为 4
+  - test_module_has_2_private_functions / 2_public_functions 名字与实际数不符 → 改为 1/3
+  - evaluation-report schema 不允许顶层 config 字段，且 provenance 需要 max_chars+run_timestamp_iso → 加上
+  - does_not_modify 测试用 {} 触发错误 → 改成合法 instance
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 339 后）：35038 pass / 0 fail / 18 skip（HEAD `af0fef7`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第三十轮
+  - evaluation/runner.py 第三十一轮
+  - evaluation/manifest.py 第三十轮
+  - evaluation/cli.py 第三十一轮
+  - evaluation/annotation_metrics.py 第三十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema edges21 已饱和（EvalSchemaError 15 + _schema_path 8 + load 6 + validate 14 + validate_file 7 + forbidden 150 + source 35 + signatures 20 + 模块 25 + 端到端 20）。下一轮选 evaluation/metrics.py 第三十轮，覆盖 _ratio/_null/_bool_metric/_int_metric 数学边界第五批与 _text_preservation 边界第二批。
+
+---
+
 ## Round 338 — evaluation/annotation_metrics.py 第三十轮（318 测试）
 
 ### 目标
