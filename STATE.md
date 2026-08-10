@@ -4,6 +4,53 @@
 
 ---
 
+## Round 309 — evaluation/annotation_metrics.py 第二十五轮（68 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第二十五轮 edges 测试，覆盖 edges23 未触及的角度：**_null / _ratio 调用次数补强**（figure_caption_prf 调用 _null 3 次；chunk_boundary_prf 各早 return 路径通过 for loop 调用 _null，source 出现一次但展开为 3）；**stream 构造深度补强**（joins with ' '，normalize after join；norm_chunks 是 list[str]）；**missing_markers 字段深度补强**（multiple markers all added；original strings preserved；empty/None marker treated as missing；absent when no missing）；**数学不变量补强**（f1=0 when either p or r is 0；p==r implies f1==p；matched ≤ min(num_pred, num_gt)；f1 ≤ max(p, r)）；**chunk_boundary_prf 早 return 路径不构造 stream**（pipeline_failed/no_annotation/no_predicted_boundaries 都在 stream 构造之前）；**算法可重现性**（same input → same output deterministic；different tolerance → different result at boundary）；**PARSER_DOES_NOT_EMIT_RELATIONS 常量深度补强**（value precise；referenced in figure_caption_prf；module-level not local）；**module source 字符串精确补强**（含 search_from advance / pairs.sort / used_pred+used_gt / num_pred+num_gt / denom check / type annotations）；**module source forbidden tokens 补强**（time/random/uuid/hashlib/secrets/subprocess/socket/email/html/http/urllib/sqlite3/csv/pickle/tempfile/shutil/glob 17 个）；**module source level 完整补强**（5 分支的 _null 调用模式 + out dict 类型注解 + _tolerance_chars 出现在所有分支）；**端到端集成补强**（document None 路径 / empty annotation + single chunk / tolerance=0 exact match / 无 missing 时不出现 _missing_markers 字段）；**模块整体合理性**（__all__ 3 entries / 2 module-level function / 无 class / 无 __main__）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges24.py`（68 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_null / _ratio 调用次数补强**：5 测试
+- **stream 构造深度补强**：3 测试
+- **missing_markers 字段深度补强**：5 测试
+- **数学不变量补强**：4 测试
+- **chunk_boundary_prf 早 return 路径不构造 stream**：3 测试
+- **算法可重现性**：2 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量深度补强**：3 测试
+- **module source 字符串精确补强**：8 测试
+- **module source forbidden tokens 补强**：17 测试
+- **module source level 完整补强**：6 测试
+- **端到端集成补强**：4 测试
+- **模块整体合理性**：4 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  - `test_chunk_boundary_prf_source_has_5_null_calls_in_pipeline_failed` - source 用 for loop 给 3 个 key 赋 _null，函数体里 _null("pipeline_failed") 只出现 1 次但运行时调用 3 次 → 改为断言 _null + 3 个 key string 同时出现在 section
+  - `test_chunk_boundary_prf_source_has_no_annotation_3_null` - 同上 no_annotation 路径
+- 修复后 68 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 309 后）：29945 pass / 0 fail / 16 skip（HEAD `c6b0280`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第二十五轮
+  - evaluation/schema.py 第十七轮
+  - evaluation/runner.py 第二十六轮
+  - evaluation/manifest.py 第二十五轮
+  - evaluation/cli.py 第二十六轮
+  - evaluation/annotation_metrics.py 第二十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges24 已饱和（_null/_ratio 调用次数 + stream 构造 + missing_markers 字段 + 数学不变量 + 早 return 路径 + 算法可重现性 + 常量深度 + source 字符串精确 + forbidden tokens + source level + 端到端 + 模块整体）。下一轮选 evaluation/metrics.py 第二十五轮，覆盖 _ratio 边界值精确（-0.0/inf/nan）+ compute_automatic_metrics 参数 default 行为深度。
+
+---
+
 ## Round 308 — evaluation/cli.py 第二十五轮（130 测试）
 
 ### 目标
