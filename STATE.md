@@ -4,6 +4,46 @@
 
 ---
 
+## Round 402 — evaluation/report.py 第二十八轮（139 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第二十八轮 edges 测试，覆盖 edges27 未触及的角度：**get_git_provenance 行为深度第十一批**（exception paths：rev-parse raises OSError/SubprocessError/TimeoutExpired / porcelain raises 后 commit 重置 / Generic Exception 不在 except / KeyboardInterrupt 不在 except / 负 returncode / 多行 stdout）；**get_dependency_versions 行为深度第十一批**（ValueError/KeyError/TypeError 被 generic except 捕获 / KeyboardInterrupt 不在 Exception 子类 / iteration order / build metadata / 多行 / empty string / mixed）；**build_provenance 行为深度第十一批**（max_chars=0/negative/float/bool/empty parser_version / timestamp 解析 / keys 顺序 / dependencies dict / huge int）；**build_devset_section 行为深度第十一批**（categories as set / 全 0 / 全 None / negative counts / Unicode status / int status / 输入不 alias）；**aggregate_summary 行为深度第十一批**（negative counts / 0 value / truthy non-True / falsy non-False / silent_drop_total None when all None / silent_drop_total 负 / schema_valid 0.0 被纳入 / 全 docs 有全 metrics / 输入不 alias）；**module source forbidden tokens 第十四批**（16 tokens）；**module source 字符串精确补强第十一批**；**signatures 第十一批**；**module 合理性第十一批**；**端到端集成第十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges28.py`（139 测试）
+
+### 覆盖要点
+- **get_git_provenance 行为深度第十一批**：12 测试
+- **get_dependency_versions 行为深度第十一批**：11 测试
+- **build_provenance 行为深度第十一批**：11 测试
+- **build_devset_section 行为深度第十一批**：10 测试
+- **aggregate_summary 行为深度第十一批**：13 测试
+- **module source forbidden tokens 第十四批**：17 测试
+- **module source 字符串精确补强第十一批**：14 测试
+- **signatures 第十一批**：13 测试
+- **module 合理性第十一批**：15 测试
+- **端到端集成第十一批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_module_uses_future_annotations_batch11 — docstring 超 10 行，head 截短 10 行漏掉 future import）。修复：head 扩到 20 行。第二次跑：139 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 402 后）：48616 pass / 0 fail / 19 skip（HEAD `05f406b`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第四十轮
+  - evaluation/cli.py 第三十九轮
+  - evaluation/manifest.py 第三十九轮
+  - evaluation/annotation_metrics.py 第三十九轮
+  - evaluation/schema.py 第三十一轮
+  - evaluation/metrics.py 第四十一轮
+  - evaluation/report.py 第二十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 401 — evaluation/metrics.py 第四十轮（209 测试）
 
 ### 目标
