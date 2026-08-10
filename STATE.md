@@ -4,6 +4,57 @@
 
 ---
 
+## Round 328 — evaluation/metrics.py 第二十八轮（203 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二十八轮 edges 测试，覆盖 edges26 未触及的角度：**compute_automatic_metrics 边界组合补强**（image in elements+chunks / pipeline_success truthy error / no schema validation inside metrics / output includes schema_valid / consistency / unknown source_type）；**_text_preservation 数学精确**（Counter intersection cases / actual subset of expected / chunk text int 0 / 3 repeats / whitespace only）；**_pdf_locator_ratio 边界组合补强**（all invalid pages / mixed types / float/string page / no locator field / float return）；**_docx_locator_ratio 边界组合补强**（no locator / multiple keys / page+bbox rejection / unknown keys only）；**_image_resource_ratio 边界组合补强**（None base dir / absolute / relative + base_dir / zero size / nonexistent relative）；**_chunk_reference_ratio 边界组合补强**（unknown id / only known / shared id / None element_id / no source_element_ids key）；**_heading_boundary_ratio 边界组合补强**（first id / non-heading first / position 2 / multiple chunks / empty string id）；**_silent_drop_count 边界组合补强**（many types / zero expected / negative actual increases drop / zero expected for some）；**_strip_unicode_whitespace/_is_valid_bbox/_ratio/_null/_bool_metric/_int_metric 数学补强**；**module source 字符串精确补强**（math.isfinite / Counter & / sum patterns / set comprehension / for loops）；**module source forbidden tokens 第三批**（~75 stdlib modules）；**signatures 精确补强**（return annotations for all 14 functions）；**模块整体合理性**（namespace / __all__ / 13 private / 3 constants / no class / no main / no decorators）；**端到端集成补强**（complete PDF/DOCX pipeline / pipeline_failed nulls / expectations / unicode content / empty content / consistent results）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges27.py`（203 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **compute_automatic_metrics 边界组合补强**：6 测试
+- **_text_preservation 数学精确**：8 测试
+- **_pdf_locator_ratio 边界组合补强**：5 测试
+- **_docx_locator_ratio 边界组合补强**：5 测试
+- **_image_resource_ratio 边界组合补强**：5 测试
+- **_chunk_reference_ratio 边界组合补强**：5 测试
+- **_heading_boundary_ratio 边界组合补强**：5 测试
+- **_silent_drop_count 边界组合补强**：5 测试
+- **_strip_unicode_whitespace 数学边界**：6 测试
+- **_is_valid_bbox 数学边界**：9 测试
+- **_ratio/_null/_bool_metric/_int_metric 数学补强**：12 测试
+- **module source 字符串精确补强**：12 测试
+- **module source forbidden tokens 第三批**：~75 测试（parametrize）
+- **signatures 精确补强**：14 测试（return annotations）
+- **模块整体合理性**：7 测试
+- **端到端集成补强**：9 测试
+
+### 撞墙记录
+- 首次跑 4 fail（修复后 0 fail）：
+  - `compute_metrics_schema_valid_with_invalid_document` 假设 elements 非 list 会触发 schema_valid=False，但 metrics 函数不做 schema 校验（schema_validation 模块独立）→ 改成 `pytest.raises(AttributeError)` + 验证 schema_valid key 存在
+  - `text_preservation_actual_subset_of_expected` 计算 "hello world"（空格被 strip）= 10 字符而非 11 → 改成 "hello worlds"（11 字符）
+  - `silent_drop_with_negative_actual_does_not_increase_drop` 假设负数 actual 不增加 drop，但 `max(0, exp - actual)` = `max(0, 0 - (-5))` = 5 → 改成 assert == 5
+  - `e2e_complete_pdf_pipeline` 假设 pdf_locator_valid_ratio == 1.0，但 i1 image 无 source_locator → 2/3 → 修正
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 328 后）：32539 pass / 0 fail / 18 skip（HEAD `40bbeff`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第二十九轮
+  - evaluation/manifest.py 第二十八轮
+  - evaluation/cli.py 第二十九轮
+  - evaluation/annotation_metrics.py 第二十九轮
+  - evaluation/schema.py 第二十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges27 已饱和（compute 边界 6 + 8 helper 各分支 + forbidden 75 + signatures 14 + 模块 7 + 端到端 9）。下一轮选 evaluation/runner.py 第二十九轮。
+
+---
+
 ## Round 327 — evaluation/annotation_metrics.py 第二十八轮（119 测试）
 
 ### 目标
