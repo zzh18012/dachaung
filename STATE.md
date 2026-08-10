@@ -4,6 +4,45 @@
 
 ---
 
+## Round 335 — evaluation/runner.py 第三十轮（206 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第三十轮 edges 测试，覆盖 edges28 未触及的角度：**_load_annotation 行为深度第四批**（nested arrays / mixed types / Unicode keys / Unicode values / BOM bytes / emoji / long string / deeply nested / empty string / only whitespace）；**_process_one source level 字符串精确补强**（out_stub init / parent.mkdir / perf_counter before+after / 3 returns / image_dir init / image_output_dir_for call / try/except OSError/unlink / 5-tuple normal return / unknown code / errors path）；**run_evaluation source level 字符串精确补强**（kwargs only / defaults fallback/800/30 / manifest & output_path params / 2 loops / compute_automatic_metrics / load_annotation / figure_caption_prf / chunk_boundary_prf / metrics.update twice / per_doc_results.append / public_per_doc / report dict init / return report / only one return / json.dump / out_p.open）；**module source forbidden tokens 第四批**（~100 stdlib）；**module source 字符串精确补强**（imports / docstring mentions / no yield/async/global/class/lambda/main/decorators）；**signatures 精确补强**（return types / param kinds / 5 params / keyword-only marker / defaults values）；**模块整体合理性**（namespace / __all__ / 2 private / 1 public / no class / no main）；**端到端集成补强**（no documents / subdir / same dict / indent=2 / default kwargs / devset / provenance / summary / per_doc / expected_failures / max_chars=1 / tolerance_chars=0）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges29.py`（206 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 行为深度第四批**：11 测试
+- **_process_one source level 字符串精确补强**：11 测试
+- **run_evaluation source level 字符串精确补强**：21 测试
+- **module source forbidden tokens 第四批**：~100 测试（parametrize）
+- **module source 字符串精确补强**：22 测试
+- **signatures 精确补强**：12 测试
+- **模块整体合理性**：13 测试
+- **端到端集成补强**：16 测试
+
+### 撞墙记录
+- 0 fail 首次跑（206 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 335 后）：33882 pass / 0 fail / 18 skip（HEAD `829d698`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第二十九轮
+  - evaluation/cli.py 第三十轮
+  - evaluation/annotation_metrics.py 第三十轮
+  - evaluation/schema.py 第二十一轮
+  - evaluation/metrics.py 第三十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner edges29 已饱和（load 11 + process_one source 11 + run_evaluation source 21 + forbidden 100 + source 22 + signatures 12 + 模块 13 + 端到端 16）。下一轮选 evaluation/manifest.py 第二十九轮。
+
+---
+
 ## Round 334 — evaluation/metrics.py 第二十九轮（215 测试）
 
 ### 目标
