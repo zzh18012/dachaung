@@ -15159,3 +15159,53 @@ get_git_provenance 各 OSError 路径。
 **建议**：edges19 schema 联动模式可继续推广。下一轮选 evaluation/metrics.py 第十九轮（169 测试基础），加 schema 交叉验证 + 多分支组合新角度。
 
 ---
+
+## Round 281 — evaluation/metrics.py 第十九轮（168 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（382 行）加第十九轮 edges 测试，覆盖 edges18 未触及的角度：**compute_automatic_metrics 失败场景**（document=None + error=dict → pipeline_success.value=False 不是 None；error_code.value=error['code']；schema_valid null+pipeline_failed；12 null-prone metrics 都 null+pipeline_failed；element_count_by_type 也 null+pipeline_failed）；**成功场景**（pipeline_success=True；error_code.value=None；element_count_total=int_metric(len(elements))；element_count_by_type 是 dict；多 type 计数）；**source_type 分支**（pdf 触发 _pdf_locator_ratio + docx null+not_pdf_document；docx 触发 _docx_locator_ratio + pdf null；unknown 两边都 null）；**_pdf_locator_ratio 详细边界**（0 elements→null；1 valid paragraph+bbox→1.0；page=0/-1/1.5/'1'/None invalid；bool page 实际通过 int 检查；text type 缺 bbox invalid；table/header/footer 不需要 bbox；mixed valid/invalid 比例；source_locator 缺失或 None）；**_docx_locator_ratio 详细边界**（7 个 structural_key 单独验证：section/paragraph_index/run_index/table_index/row_index/col_index/relationship_id；含 page 或 bbox→invalid；无 structural_key→invalid；mixed）；**_is_valid_bbox 详细边界**（not list/tuple/None/short/long 全 False；bool 元素 False；str/None/nan/inf/-inf 元素 False；4 ints/floats/mixed True；zero box True；负坐标 True）；**_image_resource_ratio 详细边界**（无 image→null+no_image_elements；image 无 resource_path→0.0；resource_path=''→0.0；存在文件→1.0；不存在→0.0；0 字节文件→0.0；image_base_dir fallback 拼接；mixed）；**_chunk_reference_ratio 详细边界**（无 chunks→null；all valid；all invalid；空 ids 不算 valid；ids=None 不算；缺 key 不算；mixed；部分有效部分无效 in 一个 chunk→不算）；**_strip_unicode_whitespace 字符级**（ASCII space/tab/newline/CR；NBSP/em space/en space/ideographic space/line separator/paragraph separator 都删；空字符串/纯空白/无空白；保留标点中文 emoji；不排序）；**_text_preservation 详细边界**（都空→null+empty_expected_and_actual；identical→1.0；image 不参与；缺字符/多字符；empty_actual/empty_expected；Counter 交集 min 语义；空白忽略；3 keys 返回；每 metric 是 dict 含 value+reason）；**_heading_boundary_ratio 详细边界**（无 heading→null+no_heading_elements；完美匹配 1.0；无匹配 0.0；partial；空 ids 跳过；ids=None 跳过；只看 first id；多 chunk 都贡献 first id）；**_silent_drop_count 详细边界**（无 expectations→null；空 dict；无 element_count_by_type key；element_count_by_type 空；actual>=exp→0；actual<exp→差值；actual=0；expected type 不在 actual；多类型求和）；**_null/_ratio/_bool_metric/_int_metric 一致性**（_null value None/reason input/2 keys；_ratio value float/reason None/int 转 float；_bool_metric value bool/truthy/falsy；_int_metric value int 非 bool/float 转 int/str digit 转）；**compute_automatic_metrics 集成**（image_base_dir 给定 vs None；expectations 给定 with/without drops；expectations 但无 element_count_by_type）；**schema_valid 异常路径**（monkeypatch document_passes_schema 抛 RuntimeError → value=False + reason 含 schema_check_exception + RuntimeError）；**不修改 document elements/chunks/expectations**；**两次调用独立 + 修改输出不影响下次**；**__all__**；**namespace 完整性**（13 sub-helper + 3 常量 + math/Counter/Path/Any）；**模块 source 不含 re/uuid/random/time/datetime**；**14 个 helper 都是 FunctionType + module identity**；**子函数签名**（每个 helper 参数数 + 名字精确）；**常量精确**（_TEXT_TYPES 7 items / _PDF_BBOX_REQUIRED_TYPES 4 items / subset 关系 / image/table/header/footer 不在）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges19.py`（168 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **失败/成功场景**：pipeline_success.value False/True；error_code 取自 error 或 None；schema_valid 三种状态；12 null-prone metrics
+- **source_type 分支**：pdf/docx/unknown 三种都验证
+- **_pdf_locator_ratio**：15+ 边界场景（含 page type quirk: bool 是 int 子类）
+- **_docx_locator_ratio**：7 个 structural_key + page/bbox 排除 + 无 key + mixed
+- **_is_valid_bbox**：16 边界（list/tuple/None/short/long/bool/str/None/nan/inf/-inf/int/float/mixed/zero/negative）
+- **_image_resource_ratio**：8 场景（无/有 resource_path/empty/exists/nonexistent/0-byte/fallback/mixed）
+- **_chunk_reference_ratio**：8 场景（无/全 valid/全 invalid/空/None/缺 key/mixed/部分）
+- **_strip_unicode_whitespace**：15 场景（ASCII/Unicode 各种空白；非空白保留；不排序）
+- **_text_preservation**：11 场景（都空/identical/image 过滤/缺字符/多字符/empty_actual/empty_expected/Counter 交集/空白忽略/3 keys/dict 结构）
+- **_heading_boundary_ratio**：8 场景（无/完美/无匹配/partial/空 ids/None/first id/multi chunk）
+- **_silent_drop_count**：9 场景（无/空/无 key/空 element_count_by_type/>=/</=0/missing type/多类型求和）
+- **helper 一致性**：_null/_ratio/_bool_metric/_int_metric 类型转换语义
+- **集成场景**：image_base_dir/expectations with drops/expectations without drops
+- **schema_valid 异常路径**：monkeypatch 验证 reason 含 schema_check_exception + RuntimeError
+- **不修改输入**：elements/chunks/expectations 都不变
+- **两次调用独立**：dict 不同；修改不影响下次
+- **__all__ + namespace**：精确
+- **模块禁止内容**：re/uuid/random/time/datetime 都不在
+- **14 个 helper FunctionType + module identity**：所有 helper 都是函数且模块身份正确
+- **子函数签名**：参数数 + 名字精确
+- **常量精确**：3 常量值 + subset 关系
+
+### 撞墙记录
+- 0 fail 首次跑（168 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 281 后）：25987 pass / 0 fail / 16 skip（HEAD `dadbf27`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第二十轮（与 leader 看齐）
+  - evaluation/schema.py 第十三轮
+  - evaluation/cli.py 第二十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges19 已饱和（168 测试）。下一轮选 evaluation/manifest.py 第二十轮（169 测试基础），加 schema 交叉验证 + DocumentEntry/ExpectedFailure 多场景。
+
+---
