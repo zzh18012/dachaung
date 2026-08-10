@@ -4,6 +4,61 @@
 
 ---
 
+## Round 298 — evaluation/metrics.py 第二十三轮（194 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二十三轮 edges 测试，覆盖 edges21 未触及的角度：**4 helper one-liner 行为深度补强**（_null 返独立 dict；_ratio 接受 int/负数不 clamp；_bool_metric 接受 int 0/1 + truthy dict 返 bool 类型；_int_metric 接受 float 截断 + 负数 + str 抛 ValueError + 返 int 类型）；**3 常量精确补强**（_TEXT_TYPES 7 entries 顺序精确 + 不含 image；_PDF_BBOX_REQUIRED_TYPES 4 entries 顺序 + ⊂ _TEXT_TYPES；_NOT_EVALUATED='not_evaluated'；tuples 类型；str 类型）；**compute_automatic_metrics 边界组合补强**（document None + error dict 含 code → pipeline_success=False + error_code=error['code']；document dict + error dict → pipeline_success=False；source_type='unknown' → pdf + docx locator 都 null；source_type='pdf' → docx null；source_type='docx' → pdf null；空 document dict → no_elements/no_chunks；error_code None when no error；返 dict 至少 13 keys）；**schema_valid 行为深度**（document None → null pipeline_failed；document 通过/失败 → bool；value 类型 bool）；**_pdf_locator_ratio 行为深度补强**（elements=[] → null；全 valid/invalid/mixed；page=None/0/-1/'1'(str) → invalid；非文本类型不需 bbox；table 类型 page valid）；**_docx_locator_ratio 行为深度补强**（elements=[] → null；全 valid structural_keys；含 page/bbox → invalid；无 structural_keys → 0.0）；**_is_valid_bbox 行为深度补强**（None/not list/wrong length/bool/str/NaN/Inf/int/float 各分支）；**_image_resource_ratio 行为深度补强**（无 image → null；image 无 resource_path → 0.0；文件存在/size=0/不存在；image_base_dir 拼接；混合 valid+invalid）；**_chunk_reference_ratio 边界补强**（chunks=[] → null；elements=[] chunks 有 ids → 0.0；all valid/partial unknown/empty source ids/None source ids/重复 id）；**_heading_boundary_ratio 边界补强**（无 headings → null；无 chunks → 0.0；perfect/partial match；chunk first id 空字符串不匹配；chunk id 不在 first 位置；set 去重）；**_silent_drop_count 边界补强**（expectations None/{}/no element_count_key/element_count None/{}；by_type={} 全 drop；actual==expected → 0；actual>expected → 0；多类型 partial 求和；返 int）；**_strip_unicode_whitespace 行为深度补强**（ASCII space/tab/newline/NBSP/em space/ideographic space/line separator/paragraph separator；全空白→''；无空白原样；保留 emoji/中文/标点/数字；空字符串）；**_text_preservation 边界补强**（image 不参与；chunks 全空白 → empty_actual；elements 全 image → empty_expected；都空 → empty_expected_and_actual；Counter 取 min；乱序 → equal False 但 P/R=1.0；返 3 keys）；**module imports 顺序**（future → math → collections → pathlib → typing；5 imports 精确；无 os/sys）；**module __all__ 精确**（1 entry compute_automatic_metrics；namespace/callable/identifier）；**module namespace**（4 helper + 9 metric helper + 3 constant + 1 public function）；**module source forbidden tokens 补强**（re/logging/subprocess/asyncio/threading/json/time/datetime/itertools/functools/relative/class/dataclass/yield/async/global/walrus/assert）；**module docstring 深度补强**（含「自动指标」/「纯函数」/「不修改 document」/「text_preservation」/「Counter」/「Unicode 空白」/「v1.1」）；**signatures 精确**（compute_automatic_metrics 5 params + image_base_dir default=None + no varargs/varkw；4 helper 1 param each；9 metric helper 各自签名精确；13 helper 都 no varargs/varkw）；**module source level 完整**（compute_automatic_metrics lazy import + try/except + 11 metric 名 + pipeline_success 计算；_pdf_locator_ratio _PDF_BBOX_REQUIRED_TYPES/_is_valid_bbox 调用；_docx_locator_ratio structural_keys 7 个；_is_valid_bbox math.isfinite；_image_resource_ratio candidates + Path(rp) + stat().st_size + except OSError；_chunk_reference_ratio set comprehension；_strip_unicode_whitespace isspace；_text_preservation Counter + 交集；_heading_boundary_ratio chunk_first_ids + ids[0]；_silent_drop_count max(0, exp-actual) 计算）；**端到端集成**（PDF document 全 metric 都有值；DOCX locator 1.0；image + tmp 文件 → image_resource 1.0；不修改 document/error；含 expectations → silent_drop 计算；缺 code 抛 KeyError）；**模块整体合理性**（__all__ 1 entry；1 public + 13 private + 3 constant；无 class；无 __main__）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges22.py`（194 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **4 helper one-liner 行为深度补强**：13 测试
+- **3 常量精确补强**：7 测试
+- **compute_automatic_metrics 边界组合补强**：8 测试
+- **schema_valid 行为深度**：3 测试
+- **_pdf_locator_ratio 行为深度补强**：8 测试
+- **_docx_locator_ratio 行为深度补强**：5 测试
+- **_is_valid_bbox 行为深度补强**：9 测试
+- **_image_resource_ratio 行为深度补强**：7 测试
+- **_chunk_reference_ratio 边界补强**：7 测试
+- **_heading_boundary_ratio 边界补强**：7 测试
+- **_silent_drop_count 边界补强**：10 测试
+- **_strip_unicode_whitespace 行为深度补强**：14 测试
+- **_text_preservation 边界补强**：8 测试
+- **module imports 顺序**：7 测试
+- **module __all__ 精确**：4 测试
+- **module namespace**：4 测试
+- **module source forbidden tokens 补强**：18 测试
+- **module docstring 深度补强**：7 测试
+- **signatures 精确**：18 测试
+- **module source level 完整**：14 测试
+- **端到端集成**：7 测试
+- **模块整体合理性**：5 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  1. `test_chunk_reference_ratio_empty_source_ids_invalid` —— 我用 `_make_chunk("a", [])` 构造 chunk，但 `_make_chunk` 内 `cids or ["e1"]` 把空 list 替换成 `["e1"]`，导致 source_element_ids 不是 []。修法：直接构造 dict 而不用 helper。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 298 后）：28480 pass / 0 fail / 16 skip（HEAD `ea6b359`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第十五轮
+  - evaluation/runner.py 第二十四轮
+  - evaluation/manifest.py 第二十三轮
+  - evaluation/cli.py 第二十四轮
+  - evaluation/annotation_metrics.py 第二十四轮
+  - evaluation/metrics.py 第二十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges22 已饱和（4 helper + 3 常量 + 11 metric 各分支 + signatures + source level + 端到端）。下一轮选 evaluation/schema.py 第十五轮，覆盖 4 个 schema 文件的 cross-validation 与 EvalSchemaError 行为深度补强。
+
+---
+
 ## Round 297 — evaluation/annotation_metrics.py 第二十三轮（129 测试）
 
 ### 目标
