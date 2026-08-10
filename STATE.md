@@ -4,6 +4,52 @@
 
 ---
 
+## Round 375 — evaluation/runner.py 第三十六轮（159 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第三十六轮 edges 测试，覆盖 edges34 未触及的角度：**_process_one 行为深度第八批**（success path 5-tuple / errors non-empty / document None no errors / image_dir via image_output_dir_for / parser_name & max_chars forwarding / unlink check + OSError swallow / elapsed is float non-negative / out_stub under _per_doc / image_dir Path 类型 / image_dir 在 _per_doc 子树）；**run_evaluation 行为深度第八批**（空 manifest 6 keys / 写盘 indent=2 / 父目录自动创建 / report_version == REPORT_VERSION / per_doc 排除私有 keys / wall_time_seconds 5 keys（total/parse/chunk/parse_reason/chunk_reason）+ parse/chunk None + reason not_instrumented / parser_version 取首 doc / doc 失败 parser_version None / expected_failure matches/no-match/no-errors / per_doc 顺序保留 / stub 清理 / str output_path / 报告 keys 精确 6 / per_doc dict keys 精确 4 / expected_failure keys 精确 4 / provenance parser_name & max_chars 转发 / 中间文档失败不阻塞）；**_load_annotation 行为深度第八批**（目录 / OSError swallow / falsy 0/""/[]/false / 不创建文件 / UTF-8 多字节 / 1000 项大 JSON / 只一个参数）；**module source forbidden tokens 第十三批**（os.system/subprocess.*/shutil.*/pickle/marshal/ctypes/sys.exit/__import__/importlib.import_module/requests/urllib/http/socket/webbrowser/antigravity/this/exit/quit）；**module source 字符串精确补强第七批**（from __future__ + typing.Any + 3 函数 def + no class/async/yield/walrus/global/lambda + image_output_dir_for 调用 + no print/logging/logger + _per_doc 子目录 + 无硬编码绝对路径 + no time.sleep + docstring mentions total/instrumented）；**signatures 精确补强第五批**（KEYWORD_ONLY marker / no var-positional / no var-keyword / FunctionType / __module__ eq / _process_one doc 无 annotation（只是注释））；**模块整体合理性补强第五批**（__all__ 精确 ["run_evaluation"] / file endswith evaluation/runner.py / name eq / 自定义 3 函数 / 5+ import 行 / 无未用 imports / 大写常量来自 imports 非顶层赋值 / 顶层无副作用调用）；**端到端集成补强第五批**（schema validate 通过 / idempotent 除 timestamp / 重复调用稳定 / Unicode key/value / 数组对象混合 / null 数组元素 / float/scientific/negative number / json 前后空白容忍 / 多行 json / 截断 json 返回 None）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges35.py`（159 测试）
+
+### 覆盖要点
+- **_process_one 行为深度第八批**：14 测试
+- **run_evaluation 行为深度第八批**：30+ 测试
+- **_load_annotation 行为深度第八批**：13 测试
+- **module source forbidden tokens 第十三批**：26 测试
+- **module source 字符串精确补强第七批**：22 测试
+- **signatures 精确补强第五批**：12 测试
+- **模块整体合理性补强第五批**：12 测试
+- **端到端集成补强第五批**：20+ 测试
+
+### 撞墙记录
+- 6 fail 首次跑：
+  1. `_FakeManifest` 缺 `devset_status/file_count/content_group_count/pdf_count/docx_count/categories_covered` → 添加 property（用 monkeypatched duck-type）
+  2. `test_signature_process_one_doc_annotation` 期望 annotation 含 "DocumentEntry"，但实际只是 `# DocumentEntry` 注释，annotation is Parameter.empty → 改为 `assert a is inspect.Parameter.empty`
+  3. `test_module_source_no_try_in_run_evaluation_except_in_helpers` 期望 run_evaluation 无 try，但 expected_failures loop 内有 try-except（unlink） → 改为断言 _load_annotation body 只 1 try + 1 except
+  4. `test_module_no_dunder_dict_callables_beyond_imports` 期望非 callable 必须是 str/None/有 __module__，但 import 进来的 `json` 模块是 types.ModuleType 且无 __module__ → 加入 types.ModuleType 到允许类型
+  5. `test_module_constants_only_all` 期望无 str/int 类常量，但 `REPORT_VERSION = "1.1"` 是 import 进来的 → 改为只检查顶层赋值（不允许 `NAME = "..."`）
+  6. `test_e2e_run_evaluation_end_to_end_with_empty_manifest_produces_valid_report` 用 `load_schema(...)` + `validate(report, schema_dict)`，但实际 `validate(instance, schema_name_string)` → 改为 `validate(report, "evaluation-report.schema.json")`
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 375 后）：44034 pass / 0 fail / 19 skip（HEAD `e3db274`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十五轮
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十七轮
+  - evaluation/metrics.py 第三十六轮
+  - evaluation/report.py 第二十五轮
+  - evaluation/runner.py 第三十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges35 已饱和（行为 + source + signature + 模块 + e2e 7 角度）。下一轮选 evaluation/cli.py 第三十五轮，覆盖 _build_parser/_format_metric/_run_inspect_doc/main 行为深度第八批（mock argparse Namespace、stdout 捕获、subcommand routing）。
+
+---
+
 ## Round 374 — evaluation/report.py 第二十四轮（165 测试）
 
 ### 目标
