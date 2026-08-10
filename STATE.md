@@ -4,6 +4,51 @@
 
 ---
 
+## Round 373 — evaluation/metrics.py 第三十五轮（144 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第三十五轮 edges 测试，覆盖 edges33 未触及的角度：**compute_automatic_metrics 行为深度第七批**（image_base_dir + 绝对路径 + 拼接路径 + 14 metric keys 完整 + docx/unknown source_type + 不修改 document/error + idempotent）；**_pdf_locator_ratio 行为深度第七批**（无 source_locator/page=0/-1/字符串/bbox tuple/None/string/非文本类型 skip bbox/partial valid/source_locator=None）；**_docx_locator_ratio 行为深度第七批**（空 locator/only page/bbox rejected/所有 structural key/单个 key/partial）；**_image_resource_ratio 行为深度第七批**（无 image/空 resource_path/不存在/存在/image_base_dir 拼接/partial/0 字节文件）；**_chunk_reference_ratio 行为深度第七批**（空 chunks/空 ids/缺 ids key/non-existent/partial/多 ids 全 valid）；**_text_preservation 行为深度第七批**（双空/单空 expected/actual/whitespace only/perfect match/partial overlap/image 跳过/3 keys 返回）；**_heading_boundary_ratio 行为深度第七批**（无 headings/partial match/无 first id/full match/无 element_id/多 chunk 相同 first id）；**_silent_drop_count 行为深度第七批**（无 expectations/空 expectations/无 element_count/actual>expected/额外 type/混合/返回 int）；**_is_valid_bbox 行为深度第七批**（negative/mixed/tuple/string/None/string element/empty/too short/long/NaN/Inf/-Inf/all zeros/dict rejected）；**_strip_unicode_whitespace 行为深度第七批**（empty/no ws/all ws/internal/NBSP/em space/ideographic space/line separator/paragraph separator/标点保留/返回 str/idempotent）；**module source forbidden tokens 第十批**；**module 合理性第七批**（_TEXT_TYPES 7 项顺序 + _PDF_BBOX_REQUIRED_TYPES 4 项 + _NOT_EVALUATED 值 + tuple 类型 + callable 14 + no user class + docstring 2 keyword）；**端到端集成第七批**（full pdf doc + error dict + None doc 14 null + positional/kwargs + image no bbox + relationship_id + dup chars counter + 3 headings partial）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges34.py`（144 测试）
+
+### 覆盖要点
+- **compute_automatic_metrics 行为深度第七批**：11 测试
+- **_pdf_locator_ratio 行为深度第七批**：8 测试
+- **_docx_locator_ratio 行为深度第七批**：6 测试
+- **_image_resource_ratio 行为深度第七批**：7 测试
+- **_chunk_reference_ratio 行为深度第七批**：6 测试
+- **_text_preservation 行为深度第七批**：8 测试
+- **_heading_boundary_ratio 行为深度第七批**：6 测试
+- **_silent_drop_count 行为深度第七批**：7 测试
+- **_is_valid_bbox 行为深度第七批**：14 测试
+- **_strip_unicode_whitespace 行为深度第七批**：12 测试
+- **module source forbidden tokens 第十批**：31 测试
+- **module 合理性第七批**：15 测试
+- **端到端集成第七批**：9 测试
+
+### 撞墙记录
+- 1 fail 首次跑（forbidden token "pty" 误匹配 "empty" 中的 "pty" 子串）：移除 "pty" 这个 token。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 373 后）：43710 pass / 0 fail / 19 skip（HEAD `ff45326`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第二十四轮
+  - evaluation/runner.py 第三十六轮
+  - evaluation/manifest.py 第三十五轮
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十七轮
+  - evaluation/metrics.py 第三十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges34 已饱和（compute 11 + 8 个 helper 各 6-14 + forbidden 31 + 模块 15 + 端到端 9）。下一轮选 evaluation/report.py 第二十四轮，覆盖 build_provenance/build_devset_section/aggregate_summary 行为深度。
+
+---
+
 ## Round 372 — evaluation/schema.py 第二十六轮（158 + 1 skip 测试）
 
 ### 目标
