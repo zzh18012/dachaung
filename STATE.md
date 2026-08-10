@@ -4,6 +4,50 @@
 
 ---
 
+## Round 391 — evaluation/manifest.py 第三十七轮（216 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第三十七轮 edges 测试，覆盖 edges36 未触及的角度：**_is_absolute_like 数学边界第十批**（empty/slash-only/double/triple drive letter/Unicode drive/digit drive/underscore/dot/dash/各种边界）；**_has_backslash 数学边界第十批**（empty/single/no/starts/ends/unicode/mixed/long string）；**_resolve_relative_path 行为深度第十批**（empty/posix/windows/backslash/dot/double_dot escape/field_name in error/unicode filename/long relative/filename with dots）；**_detect_project_root 行为深度第十批**（returns Path/finds pyproject/walks up/no pyproject/start is file/str input raises/idempotent/deeply nested/first pyproject wins）；**dataclass 行为第十批**（DocumentEntry/ExpectedFailure/Manifest frozen/field count/names/equality/hash/in set/str repr）；**Manifest properties algorithm 行为深度第十批**（file/pdf/docx counts/categories_covered/content_group_count 各种组合/Unicode/empty string category）；**load_manifest malformed data 第十批**（missing/invalid JSON/empty dict/valid minimal/one doc/absolute/backslash/outside root/str input/devset_status complete/categories/paired_with/expected_failures/sha256/annotation_file/expectations/default project_root/correct version/tuple type）；**module source forbidden tokens 第十三批**；**module source 字符串精确补强第八批**；**signatures 第十批**；**module 合理性第十批**；**端到端集成第十批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges37.py`（216 测试）
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第十批**：19 测试
+- **_has_backslash 数学边界第十批**：13 测试
+- **_resolve_relative_path 行为深度第十批**：18 测试
+- **_detect_project_root 行为深度第十批**：10 测试
+- **dataclass 行为第十批**：23 测试
+- **Manifest properties algorithm 行为深度第十批**：21 测试
+- **load_manifest malformed data 第十批**：20 测试
+- **module source forbidden tokens 第十三批**：16 测试
+- **module source 字符串精确补强第八批**：26 测试
+- **signatures 第十批**：25 测试
+- **module 合理性第十批**：14 测试
+- **端到端集成第十批**：11 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_load_manifest_with_sha256_batch10` 使用 "abc123" 但 schema 要求 `^[0-9a-f]{64}$`
+- 修复：改为 "a" * 64（合法 sha256）
+- 二次跑：216 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 391 后）：46878 pass / 0 fail / 19 skip（HEAD `367a2c6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十七轮
+  - evaluation/schema.py 第二十九轮
+  - evaluation/metrics.py 第三十八轮
+  - evaluation/report.py 第二十七轮
+  - evaluation/runner.py 第三十九轮
+  - evaluation/cli.py 第三十八轮
+  - evaluation/manifest.py 第三十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 390 — evaluation/cli.py 第三十七轮（196 测试）
 
 ### 目标
