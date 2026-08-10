@@ -4,6 +4,51 @@
 
 ---
 
+## Round 320 — evaluation/cli.py 第二十七轮（100 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第二十七轮 edges 测试，覆盖 edges25 未触及的角度：**_build_parser 行为深度补强**（help formatter / no conflict / add_help / run help text / validate-report parser / inspect-doc parser / max_chars type=int / inspect-doc input required）；**_format_metric 分支精确补强**（negative float / large float truncation / int 0 / negative int / long name / dict with special chars / dict int values / list value / tuple value / 4 char indent / no value field / no reason field / empty metric）；**_run_inspect_doc 行为深度补强**（no elements/chunks / with image / with metadata / null metrics displayed / pipeline failure metrics）；**main 各路径错误处理补强**（with expected_failures / invalid manifest path form / stdout 含 devset info / stdout 含 git info / validate-report invalid JSON / non-object JSON / inspect-doc empty dict / str input path）；**module source 字符串精确补强**（7 help texts / main 4 path objects / dispatch / per_doc loop / pipeline_success check / 5 print lines / format_metric 5 returns / inspect-doc 6 print lines / compute_automatic_metrics call / figure_caption_prf / chunk_boundary_prf / sort_key / 4 sort buckets / no class / no __all__）；**signatures 精确**（main argv annotation + return int / build_parser 0 params / format_metric annotations / run_inspect_doc no annotation / 4 namespace）；**module 整体合理性**（1 public / 3 private / no class / __main__ 块 / no __all__）；**端到端集成**（run → validate-report 循环 / inspect-doc on pipeline output / missing subcommand exit 2 / invalid subcommand exits）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges26.py`（100 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 行为深度补强**：8 测试
+- **_format_metric 分支精确补强**：13 测试
+- **_run_inspect_doc 行为深度补强**：5 测试
+- **main 各路径错误处理补强**：8 测试
+- **module source forbidden tokens**：25 测试（parametrize）
+- **module source 字符串精确补强**：22 测试
+- **signatures 精确**：8 测试
+- **module 整体合理性**：6 测试
+- **端到端集成**：5 测试
+
+### 撞墙记录
+- 3 fail 首次跑：
+  - `test_build_parser_validate_report_parser_help_text` - validate-report subparser 没有 description（只有 help）→ 改为检查 choices 含 validate-report
+  - `test_build_parser_inspect_doc_parser_help_text` - 同上 → 同样改
+  - `test_module_source_has_inspect_doc_5_print_lines` - 实际 print 用 f-string `"file:        {...}"`，前缀不严格是 `"file:"` → 改为检查 substring `file:`
+- 修复后 100 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 320 后）：31404 pass / 0 fail / 18 skip（HEAD `6671d3e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第二十七轮
+  - evaluation/metrics.py 第二十七轮
+  - evaluation/schema.py 第十九轮
+  - evaluation/runner.py 第二十八轮
+  - evaluation/manifest.py 第二十七轮
+  - evaluation/cli.py 第二十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges26 已饱和（_build_parser formatter/help / _format_metric 边界类型深度 / _run_inspect_doc 元信息 + metrics 显示 / main 各路径错误处理 + stdout 内容 / forbidden tokens / source 字符串精确 / signatures / 端到端 + 模块整体）。下一轮选 evaluation/annotation_metrics.py 第二十七轮。
+
+---
+
 ## Round 319 — evaluation/manifest.py 第二十六轮（112 测试 + 1 skip）
 
 ### 目标
