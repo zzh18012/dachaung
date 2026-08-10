@@ -4,6 +4,55 @@
 
 ---
 
+## Round 355 — evaluation/manifest.py 第三十二轮（289 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第三十二轮 edges 测试，覆盖 edges31 未触及的角度：**_is_absolute_like 数学边界第七批**（控制字符/制表符/换行/引号/空格前缀/NUL/数字前缀/-/./:/希腊字母/西里尔/希伯来/阿拉伯/土耳其语 İ/德语 ß）；**_has_backslash 数学边界第七批**（zero-width joiner/combining mark/BOM/NUL/制表符/换行/CR/vertical tab/form feed/fullwidth solidus/转义序列/pos 0/end）；**_resolve_relative_path 行为深度第二批**（dot only/double dot outside/deep relative/dot dot inside/绝对/反斜杠/返回类型/字段名 in error/路径 in error/resolved in error/whitespace only/filename with spaces）；**_detect_project_root 行为深度第三批**（file input/dir input/nested 5 levels/no pyproject/no pyproject with file/returns Path）；**DocumentEntry dataclass 行为深度第五批**（is_dataclass/frozen/10 fields/fields names/equality/inequality/hashable/hash depends on path/categories default empty/repr）；**ExpectedFailure dataclass 行为深度第五批**（is_dataclass/frozen/5 fields/fields names/equality/hashable/source_type default None/repr）；**Manifest dataclass 行为深度第五批**（is_dataclass/frozen/5 fields/fields names/hashable/repr）；**Manifest properties 算法深度第五批**（content_group_count self-paired/chain paired/with unpaired/all unpaired/categories special chars/categories unicode/dedup same doc/pdf count mixed/docx count mixed/file_count empty/file_count three/categories_covered list/sorted order/empty）；**load_manifest malformed data 第五批**（documents not list/expected_failures not list/missing path/missing expected_failure path/missing expected_error_code/missing devset_status/missing manifest_version/invalid json/empty file/array root/int root/null root/string root/nonexistent file/path absolute/path backslash/path outside root）；**module source forbidden tokens 第七批**（asyncio/threading/concurrent/subprocess/multiprocessing/queue/socket/select/re.match/datetime/time/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/argparse/unittest/pytest/sys/copy/weakref/abc/contextlib/operator/functools/itertools/collections/inspect/importlib/platform）；**module source 字符串精确补强**（docstring/4 stdlib imports/2 evaluation imports/no relative/no star/no main/no yield/no async/no global/no walrus/4 classes/3 frozen dataclass/5 property/ManifestError extends Exception/uses json.load/uses validate/uses MANIFEST_VERSION/uses resolve/uses relative_to/uses isalpha/uses frozenset/__all__ 5 entries/no eval/exec/compile/write/unlink）；**signatures 精确补强**（_is_absolute_like/_has_backslash/_resolve_relative_path/load_manifest/_detect_project_root/ManifestError/DocumentEntry/ExpectedFailure/Manifest init params + no varargs）；**模块整体合理性补强**（has docstring/mentions path/has __all__/__all__ is list/length 5/unique/str entries/namespace 5 callables/helper count/file ends with manifest.py/name eq/imports MANIFEST_VERSION/no classes beyond 4/no functions beyond 5/4 subclass checks/4 __module__ eq）；**端到端集成补强**（does not mutate input/two docs two categories/pdf only/categories unicode/resolved path inside root/subdir/default project root/empty documents+failures/expected_failure with source_type/all optional fields/round trip/returns Manifest instance/manifest error from missing file/idempotent/doc_id uniqueness not required/annotation_resolved for one doc/annotation_resolved none/categories default empty/paired_with default none/sha256 default none/expectations default none/path_str preserved）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges32.py`（289 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第七批**：~21 测试
+- **_has_backslash 数学边界第七批**：~13 测试
+- **_resolve_relative_path 行为深度第二批**：~12 测试
+- **_detect_project_root 行为深度第三批**：~6 测试
+- **DocumentEntry dataclass 行为深度第五批**：~10 测试
+- **ExpectedFailure dataclass 行为深度第五批**：~8 测试
+- **Manifest dataclass 行为深度第五批**：~6 测试
+- **Manifest properties 算法深度第五批**：~13 测试
+- **load_manifest malformed data 第五批**：~19 测试
+- **module source forbidden tokens 第七批**：~60 测试
+- **module source 字符串精确补强**：~30 测试
+- **signatures 精确补强**：~16 测试
+- **模块整体合理性补强**：~24 测试
+- **端到端集成补强**：~24 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  - `re(` 是 `ExpectedFailure(` 的子串（false positive）→ 改成 `re.match`/`re.sub`
+  - `ManifestError.__init__` 实际有 `*args` + `**kwargs`（共 3 个 param）→ 改成 3 个 + 检查 VAR_POSITIONAL/VAR_KEYWORD
+- 修复后 289 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 355 后）：39921 pass / 0 fail / 18 skip（HEAD `922cb6e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第三十三轮
+  - evaluation/annotation_metrics.py 第三十三轮
+  - evaluation/schema.py 第二十四轮
+  - evaluation/metrics.py 第三十三轮
+  - evaluation/report.py 第二十二轮
+  - evaluation/runner.py 第三十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest edges32 已饱和（_is_absolute_like 第七批 + _has_backslash 第七批 + _resolve 第二批 + _detect 第三批 + 3 个 dataclass 第五批 + properties 第五批 + malformed 第五批 + forbidden 60 + signatures + 端到端 24）。下一轮选 evaluation/cli.py 第三十三轮，覆盖 argparse 行为深度与 source 字符串补强。
+
+---
+
 ## Round 354 — evaluation/runner.py 第三十三轮（209 测试）
 
 ### 目标
