@@ -4,6 +4,45 @@
 
 ---
 
+## Round 413 — evaluation/annotation_metrics.py 第四十轮（118 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第四十轮 edges 测试，覆盖 edges39 未触及的角度：**PARSER_DOES_NOT_EMIT_RELATIONS 常量第十三批**（值固定 / 类型 / 不在 __all__ 之外）；**figure_caption_prf 行为深度第十三批**（输入是 None Pair / annotation 为 dict 仍不影响 / 输出可独立修改）；**chunk_boundary_prf 行为深度第十三批**（document=None + tolerance 边界 / annotation=非空 dict 但缺 chunk_boundary_anchors / chunks 缺 text 字段 / chunk text 是 None / chunk text 是非 str）；**算法深度第十三批**（predicted 边界位置 / gt_positions / marker 是空字符串 / position 是 before/after 之外 / 多个相同 marker / greedy 匹配 tie）；**module source forbidden tokens 第十六批**；**module source 字符串精确补强第十三批**；**signatures 第十三批**；**module 合理性第十三批**；**端到端集成第十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges40.py`（118 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量第十三批**：4 测试
+- **figure_caption_prf 行为深度第十三批**：9 测试
+- **chunk_boundary_prf 行为深度第十三批**：23 测试
+- **module source forbidden tokens 第十六批**：16 测试
+- **module source 字符串精确补强第十三批**：19 测试
+- **signatures 第十三批**：12 测试
+- **module 合理性第十三批**：9 测试
+- **端到端集成第十三批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_chunk_boundary_prf_anchors_missing_marker_key_batch13 — marker='' 是 falsy，find_pos=-1 加入 missing，不是定位到 0）。修复：改为验证 precision=0.0、recall=null、'' 在 missing_markers 中。
+- 第二次跑：118 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 413 后）：50244 pass / 0 fail / 19 skip（HEAD `c4750e6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第三十二轮
+  - evaluation/metrics.py 第四十二轮
+  - evaluation/report.py 第三十轮
+  - evaluation/runner.py 第四十三轮
+  - evaluation/cli.py 第四十二轮
+  - evaluation/manifest.py 第四十一轮
+  - evaluation/annotation_metrics.py 第四十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 412 — evaluation/manifest.py 第四十轮（189 测试）
 
 ### 目标
