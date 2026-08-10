@@ -4,6 +4,55 @@
 
 ---
 
+## Round 362 — evaluation/manifest.py 第三十三轮（148 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（230 行）加第三十三轮 edges 测试，覆盖 edges32 未触及的角度：**_is_absolute_like 数学边界第八批**（alpha with diacritic 预组合 / 分解形式 e+combining → False / 三字母小写 drive / 4 字母 colon pos1 / 2 字符输入 / 3 字符 pos2 变体 pipe/dash/dot/alpha/digit/space）；**_has_backslash 数学边界第八批**（长串含/不含 / 位置测试 / 单 backslash）；**_resolve_relative_path 行为深度第三批**（普通路径 / 子目录 / 深子目录 / 包含 ./.. / ./foo / 特殊字符 / 隐藏文件 / Path instance / absolute / 返回 Path / raises with field names）；**_detect_project_root 行为深度第四批**（返回 Path / 默认 cur / 带 file / 找到 pyproject 在 root / 在 parent / 深嵌套）；**DocumentEntry dataclass 行为深度第六批**（10 字段类型全 / 含 categories/sha256/paired_with/annotation/expectations / replace 创建新对象 / eq/neq）；**ExpectedFailure dataclass 行为深度第六批**（字段类型 / source_type 变体 / replace / 全字段设置）；**Manifest dataclass 行为深度第六批**（含 1 doc/expected_failure / replace / immutable）；**Manifest properties 算法深度第六批**（categories 含空字符串/特殊字符/数字/重复 / pdf/docx 计数 / content_group_count 场景）；**load_manifest malformed data 第六批**（document extra field / expected_failure extra field / root extra field / wrong manifest version / invalid path field / devset_status preserved / project_root correct / str manifest path）；**module source forbidden tokens 第八批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime/time/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/importlib/platform）；**module source 字符串精确补强第二批**（@dataclass decorator count / class count / property count / ManifestError docstring / no field(default_factory=)）；**signatures 精确补强第二批**（DocumentEntry init 11 params / ExpectedFailure init 6 params / Manifest init 6 params / field_name str / return annotation）；**模块整体合理性补强第二批**（namespace 无额外 var / instances immutable / Exception subclass / str representation / complex errors）；**端到端集成补强第二批**（3 documents / docx only / 混合 pdf/docx / 多 categories / does not mutate / idempotent / 默认 root 找 pyproject / paired documents / expectations / sha256 / str/Path paths）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges33.py`（148 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第八批**：~11 测试
+- **_has_backslash 数学边界第八批**：~7 测试
+- **_resolve_relative_path 行为深度第三批**：~15 测试
+- **_detect_project_root 行为深度第四批**：~6 测试
+- **DocumentEntry dataclass 行为深度第六批**：~20 测试
+- **ExpectedFailure dataclass 行为深度第六批**：~5 测试
+- **Manifest dataclass 行为深度第六批**：~5 测试
+- **Manifest properties 算法深度第六批**：~10 测试
+- **load_manifest malformed data 第六批**：~10 测试
+- **module source forbidden tokens 第八批**：~36 测试
+- **module source 字符串精确补强第二批**：~5 测试
+- **signatures 精确补强第二批**：~5 测试
+- **模块整体合理性补强第二批**：~5 测试
+- **端到端集成补强第二批**：~12 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  1. `e + combining acute` 分解形式 pos1 是组合符号不是 `:`，函数返回 False（不是 True），改测试期望
+  2. `ManifestError` 是普通 Exception 子类，无 `errors` 属性，不接受 keyword args；改用 positional args 并断言 `err.args[0]/args[1]`
+- 修复后 148 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 362 后）：41376 pass / 0 fail / 18 skip（HEAD `2dbdd9b`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第三十四轮
+  - evaluation/annotation_metrics.py 第三十四轮
+  - evaluation/schema.py 第二十五轮
+  - evaluation/metrics.py 第三十四轮
+  - evaluation/report.py 第二十三轮
+  - evaluation/runner.py 第三十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest edges33 已饱和（_is_absolute_like/_has_backslash 数学边界第八批 + _resolve_relative_path 行为深度第三批 + _detect_project_root 行为深度第四批 + DocumentEntry/ExpectedFailure/Manifest dataclass 行为深度第六批 + properties 算法深度第六批 + load_manifest malformed 第六批 + forbidden tokens 36 + signatures + 端到端 12）。下一轮选 evaluation/cli.py 第三十四轮，覆盖 inspect-doc/validate-report 子命令 source 字符串精确补强与端到端补强。
+
+---
+
 ## Round 361 — evaluation/runner.py 第三十四轮（222 测试）
 
 ### 目标
