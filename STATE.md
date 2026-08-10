@@ -4,6 +4,48 @@
 
 ---
 
+## Round 368 — evaluation/runner.py 第三十五轮（231 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第三十五轮 edges 测试，覆盖 edges33 未触及的角度：**_load_annotation source level 字符串精确补强第四批**（no class/yield/async/walrus/global/lambda / path is None 或 not is_file / 早返回 None / try / with utf-8 / return json.load(f) / except (OSError, JSONDecodeError) / 两个 return None / no eval/exec/compile/subprocess/unlink/write/print）；**_process_one source level 字符串精确补强第六批**（docstring process_single/total_seconds/image_dir/write_json/image_output_dir / out_stub 赋值 / parent.mkdir / t0=time.perf_counter / document,errors=process_single / 5 个传参 / elapsed 计算 / image_dir Path|None / if document is not None / image_output_dir_for 调用 / out_stub.is_file / unlink try-except OSError / if errors / return 5-tuple / if document is None / unknown code/message / 成功 return 5-tuple / no class/yield/async/walrus/global/eval/exec/subprocess/print）；**run_evaluation source level 字符串精确补强第六批**（docstring / output_root=Path.parent / mkdir / per_doc_results list / parser_version_for_prov init / for doc in documents / 5-tuple unpack / parser_version_for_prov 检查 / compute_automatic_metrics 调用 + 5 kwargs / _load_annotation 调用 / figure_caption_prf 调用 / chunk_boundary_prf 调用 / metrics.update 2 次 / tolerance_record+missing_markers_record pop / per_doc_results.append / wall_time_seconds dict 6 keys / _annotation_present / _tolerance_chars / _missing_markers / expected_failure_results list / for ef in expected_failures / out_stub / mkdir / process_single 调用 / unlink 检查 / actual_code / expected_failure_results.append 含 doc_id+expected_error_code+actual_error_code+matches / build_provenance 调用 4 kwargs / build_devset_section / aggregate_summary / public_per_doc list+loop+4 keys / report dict 6 keys / out_p Path / mkdir / open utf-8 / json.dump ensure_ascii=False indent=2 / return report / no class/yield/async/walrus/global/eval/exec）；**_load_annotation 行为深度第七批**（None path / nonexistent / directory / valid json / invalid json / empty file / array/int/string/null roots / Unicode / 不写盘 / idempotent / 返回类型 / trailing comma / unquoted keys）；**module source forbidden tokens 第十二批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/importlib/platform/argparse）；**module source 字符串精确补强第六批**（docstring 6 mentions / future / 6 imports / no relative / no star / no yield/async/walrus/main/class / 3 functions / __all__ 1 / no eval/exec/compile）；**signatures 精确补强第四批**（_load_annotation 1 param + dict|None return / _process_one 4 params + tuple return / run_evaluation 5 params + 3 keyword-only + defaults fallback/800/30 + dict return / 3 个 no varargs）；**模块整体合理性补强第四批**（docstring / __all__ / 3 callables / namespace names / no classes / module name / file endswith / function module eq / function names correct）；**端到端集成补强第四批**（_load_annotation 16 种行为：None/nonexistent/dir/valid/invalid/empty/array/int/string/null/nested/不写盘/idempotent/utf-8 chinese/special chars/trailing comma/unquoted/utf-8 BOM）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges34.py`（231 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation source level 字符串精确补强第四批**：~20 测试
+- **_process_one source level 字符串精确补强第六批**：~35 测试
+- **run_evaluation source level 字符串精确补强第六批**：~45 测试
+- **_load_annotation 行为深度第七批**：~16 测试
+- **module source forbidden tokens 第十二批**：~31 测试
+- **module source 字符串精确补强第六批**：~25 测试
+- **signatures 精确补强第四批**：~16 测试
+- **模块整体合理性补强第四批**：~15 测试
+- **端到端集成补强第四批**：~16 测试
+
+### 撞墙记录
+- 0 fail 首次跑（231 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 368 后）：43034 pass / 0 fail / 18 skip（HEAD `67695e1`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十四轮
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十六轮
+  - evaluation/metrics.py 第三十五轮
+  - evaluation/report.py 第二十四轮
+  - evaluation/runner.py 第三十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner edges34 已饱和（_load_annotation source 第四批 + _process_one source 第六批 + run_evaluation source 第六批 + 行为深度第七批 + forbidden 31 + signatures 16 + 端到端 16）。下一轮选 evaluation/manifest.py 第三十四轮，覆盖 ManifestLoader/Migration 行为深度与 source 字符串补强第四批。
+
+---
+
 ## Round 367 — evaluation/report.py 第二十三轮（253 测试）
 
 ### 目标
