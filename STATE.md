@@ -4,6 +4,45 @@
 
 ---
 
+## Round 417 — evaluation/runner.py 第四十三轮（113 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第四十三轮 edges 测试，覆盖 edges40 未触及的角度：**_load_annotation 边界深度第十四批**（json.JSONDecodeError 子类 ValueError / OSError 子类 PermissionError / 空文件 / 不是 dict 的 JSON / 是 list 的 JSON / JSON int / JSON null / encoding 实参验证 / context manager）；**_process_one 边界深度第十四批**（errors[0].to_dict() 调用 / document None 时 image_dir None / out_stub 父目录创建 / unlink 异常 OSError 不抛 / kwargs 透传 / 5-tuple 元素类型固定）；**run_evaluation 字段深度第十四批**（report 顶层 6 个 key 顺序 / per_doc public keys 严格 4 个 / wall_time_seconds 6 个字段 / image_dir 不是 dir 时 image_base_dir None / parser_version 第一次非空被采用 / parser_version 全 null / expected_failure matches 字段 / tolerance_chars 透传）；**module source forbidden tokens 第十九批**；**module source 字符串精确补强第十六批**；**signatures 第十六批**；**module 合理性第十六批**；**端到端集成第十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges41.py`（113 测试）
+
+### 覆盖要点
+- **_load_annotation 边界深度第十四批**：8 测试
+- **_process_one 边界深度第十四批**：13 测试
+- **run_evaluation 字段深度第十四批**：20 测试
+- **5-tuple 元素类型固定第十四批**：3 测试
+- **module source forbidden tokens 第十九批**：16 测试
+- **module source 字符串精确补强第十六批**：26 测试
+- **signatures 第十六批**：13 测试
+- **module 合理性第十六批**：8 测试
+- **端到端集成第十六批**：10 测试
+
+### 撞墙记录
+- 首次跑：113 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 417 后）：50780 pass / 0 fail / 19 skip（HEAD `09552e0`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第四十二轮
+  - evaluation/manifest.py 第四十一轮
+  - evaluation/annotation_metrics.py 第四十一轮
+  - evaluation/schema.py 第三十三轮
+  - evaluation/metrics.py 第四十三轮
+  - evaluation/report.py 第三十一轮
+  - evaluation/runner.py 第四十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 416 — evaluation/report.py 第三十轮（130 测试）
 
 ### 目标
