@@ -4,6 +4,48 @@
 
 ---
 
+## Round 333 — evaluation/schema.py 第二十轮（184 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第二十轮 edges 测试，覆盖 edges19 未触及的角度：**EvalSchemaError 行为深度**（默认 errors / args / str / repr / None errors / 空列表 errors / 3 errors / falsy 非 None errors / subclass Exception / not subclass ValueError / raise + catch / errors attribute list type）；**_schema_path 行为深度**（returns Path / absolute / FileNotFoundError / 不创建文件 / dot prefix / subdir name）；**load_schema 行为深度**（returns dict / fresh dict / 3 schemas 各可加载 / top level type / missing raises）；**validate 行为深度**（returns None on success / 不修改 instance / invalid raises / errors attribute / first error in message / count in message / errors path list type / errors message str / invalid schema name raises / extra fields allowed）；**validate_file 行为深度**（str/path Path / missing raises / directory raises / invalid JSON raises / invalid content raises / invalid schema name raises / BOM handled / relative path）；**module source forbidden tokens 第三批**（~75 stdlib）；**module source 字符串精确补强**（imports / no JSValidationError raise / docstring mentions / SCHEMAS_DIR / class EvalSchemaError / inherits Exception / no yield/async/global/main/lambda/decorators）；**signatures 精确补强**（return None / dict / Path / 1-2 params / no varargs varkw）；**模块整体合理性**（namespace / __all__ 5 entries / 1 class / 3 public funcs / 1 private helper / SCHEMAS_DIR properties / project root parent / 3 schemas subset）；**端到端集成补强**（3 schemas each check_schema / validate returns None / full round trip / errors json serializable / unicode path / unicode doc_id / propagate EvalSchemaError / reraise / array/string/number/bool/null top-level 拒绝）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges20.py`（184 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 行为深度**：13 测试
+- **_schema_path 行为深度**：6 测试
+- **load_schema 行为深度**：8 测试
+- **validate 行为深度**：11 测试
+- **validate_file 行为深度**：10 测试
+- **module source forbidden tokens 第三批**：~75 测试（parametrize）
+- **module source 字符串精确补强**：21 测试
+- **signatures 精确补强**：9 测试
+- **模块整体合理性**：17 测试
+- **端到端集成补强**：14 测试
+
+### 撞墙记录
+- 首次跑 2 fail：
+  - validate / validate_file 的 return_annotation 是 str "None"（from __future__ 副作用）→ 改成 `is None or == "None"`
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 333 后）：33461 pass / 0 fail / 18 skip（HEAD `36bf24d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第二十九轮
+  - evaluation/runner.py 第三十轮
+  - evaluation/manifest.py 第二十九轮
+  - evaluation/cli.py 第三十轮
+  - evaluation/annotation_metrics.py 第三十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema edges20 已饱和（EvalSchemaError 13 + schema_path 6 + load 8 + validate 11 + validate_file 10 + forbidden 75 + source 21 + signatures 9 + 模块 17 + 端到端 14）。下一轮选 evaluation/metrics.py 第二十九轮。
+
+---
+
 ## Round 332 — evaluation/annotation_metrics.py 第二十九轮（170 测试）
 
 ### 目标
