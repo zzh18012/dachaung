@@ -4,6 +4,52 @@
 
 ---
 
+## Round 337 — evaluation/cli.py 第三十轮（300 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第三十轮 edges 测试，覆盖 edges28 未触及的角度：**argparse action 类型精确**（_SubParsersAction / _StoreAction）；**run subparser 各 argument 配置深度**（required/type/default/choices for manifest/output/parser/max_chars/tolerance_chars）；**validate-report / inspect-doc subparser 深度**（positional required / 无 optional args / inspect-doc 无 max_chars 无 parser）；**_format_metric 字符串精确补强**（36 width / .get / isinstance bool/float/dict / str().lower() / :.4f / sorted / join / or 'ok' / 各种 value 边界）；**_run_inspect_doc source level 字符串精确补强**（imports chunk_boundary_prf/figure_caption_prf/compute_automatic_metrics / is_file / json.load / isinstance dict / 3 returns / doc.get source_type / tolerance_chars= / metrics.update / sorted with key / 6 print labels / _sort_key inner / no class）；**main source level 字符串精确补强**（_build_parser/parse_args/3 command branches/Path/is_file/load_manifest/run_evaluation with 3 kwargs/validate_file/get_git_provenance/3 returns/2 stderr try-except/4 exception types/_run_inspect_doc/no yield/async/global/class/lambda）；**module source forbidden tokens 第四批**（~100 stdlib，去掉与合法 import 冲突的 imp/re）；**module source 字符串精确补强**（imports / sys reconfigure / try/except / 4 module-level def / 1 inner def / no yield/async/global/class/lambda）；**signatures 精确补强**（main argv default None/annotation / build_parser 0 params / format_metric 2 params / run_inspect_doc 1 param / return types）；**模块整体合理性**（namespace / 无 __all__ / 4 functions / 3 private / 1 public / no class / callable）；**端到端集成补强**（run + validate 闭环 / 7 个 run 错误路径 / 6 个 inspect-doc 错误路径 / 不合法 parser 抛 SystemExit / 非整数 max_chars 抛 SystemExit / kreuzberg choice / subdir 自动创建 / stdout 含 documents/devset_status/[OK] / int 返回类型）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges29.py`（300 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **argparse action 类型精确**：7 测试
+- **run subparser 配置深度**：14 测试
+- **validate-report / inspect-doc subparser 深度**：6 测试
+- **_format_metric 字符串精确补强**：26 测试
+- **_run_inspect_doc source level 字符串精确补强**：21 测试
+- **main source level 字符串精确补强**：26 测试
+- **module source forbidden tokens 第四批**：~100 测试（parametrize）
+- **module source 字符串精确补强**：~25 测试
+- **signatures 精确补强**：17 测试
+- **模块整体合理性**：14 测试
+- **端到端集成补强**：24 测试
+
+### 撞墙记录
+- 11 fail 首次跑：
+  - `imp` / `re` 是 `import` / `reconfigure` 的子串 → 从 forbidden tokens 移除
+  - cli.py 有 4 个模块级 def + 1 个 inner def（`_sort_key`），原断言 `== 4` 把 inner 也算进来 → 拆为 4 module-level + 1 inner 两条断言
+  - `main` return_annotation 因 `from __future__ import annotations` 变成 str "int" → 改成 `is int or == "int"`
+  - manifest fixtures 缺 `manifest_version` 字段（schema 必填）+ 多余 `project_root`（schema additionalProperties=false）→ 加 version、删 project_root
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 337 后）：34394 pass / 0 fail / 18 skip（HEAD `2437d95`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十轮
+  - evaluation/schema.py 第二十一轮
+  - evaluation/metrics.py 第三十轮
+  - evaluation/runner.py 第三十一轮
+  - evaluation/manifest.py 第三十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli edges29 已饱和（action 7 + run 14 + subparsers 6 + format_metric 26 + run_inspect_doc 21 + main 26 + forbidden 100 + source 25 + signatures 17 + 模块 14 + 端到端 24）。下一轮选 evaluation/annotation_metrics.py 第三十轮，覆盖 figure_caption_prf/chunk_boundary_prf 算法深度第二批。
+
+---
+
 ## Round 336 — evaluation/manifest.py 第二十九轮（212 测试）
 
 ### 目标
