@@ -4,6 +4,47 @@
 
 ---
 
+## Round 351 — evaluation/schema.py 第二十三轮（226 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第二十三轮 edges 测试，覆盖 edges22 未触及的角度：**EvalSchemaError 行为深度第五批**（message only / empty errors / None errors / one error / many errors / subclass / raised / caught as Exception / caught as EvalSchemaError / errors default empty / errors attribute / message attribute / args / chained cause / unicode / emoji / long message / complex errors dict / repr / equality args / pickle serializable）；**_schema_path 行为深度第三批**（returns Path / all known schemas / unknown raises / error message contains filename / idempotent / under SCHEMAS_DIR / subdirectory / str input / dot prefix / empty string / absolute after resolve）；**load_schema 行为深度第三批**（returns dict / 3 schemas have $schema / type object / $id / title / idempotent / independent dicts / unknown raises / json serializable）；**validate 行为深度第五批**（empty dict fails / list fails / string fails / int fails / None fails / returns None on success / errors list / errors dict structure / message includes schema name / message includes count / annotation minimal / report minimal / chain / not ValueError / invalid schema name）；**validate_file 行为深度第三批**（Path input / str input / nonexistent / str path nonexistent / invalid JSON / invalid instance / invalid schema / unicode / BOM / idempotent / no modify / returns None / array top / string top / int top / large file）；**module source forbidden tokens 第八批**（~60 stdlib / builtin calls，避开合法使用的 json/Path/Any/Draft202012Validator/ValidationError）；**module source 字符串精确补强**（docstring mentions manifest/annotation/evaluation / 6 imports / Draft202012Validator / ValidationError / no relative / no star / no main / no yield / no async / no global / no walrus / no dataclass / uses iter_errors / sorted / no pickle/csv/yaml/logging/argparse/tomllib/inspect imports / SCHEMAS_DIR / .resolve() / .is_file() / .open() / utf-8 / 1 class / 4 functions / 3 public + 1 private / __all__ 5 entries / super().__init__ / self.errors）；**signatures 精确补强**（EvalSchemaError.__init__ 3 params / names / message no default / errors default None；_schema_path 1 param；load_schema 1 param；validate 2 params / names / no defaults；validate_file 2 params / names / no defaults；no varargs）；**模块整体合理性**（namespace 5 names / SCHEMAS_DIR in vars / __name__ / __file__ / docstring / __all__ 5 / contents / SCHEMAS_DIR Path / SCHEMAS_DIR exists / EvalSchemaError class / subclass Exception / callables / no user classes outside EvalSchemaError / __module__ eq）；**端到端集成补强**（real manifest schema / real annotation schema / validate_file round-trip / validate then validate_file / idempotent / does not modify instance / load then validate via Draft202012Validator / propagation through 3 layers / chain _schema_path → load_schema → validate / pathlib Path / str path / extra fields fails / wrong devset_status / wrong manifest_version）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges23.py`（226 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 行为深度第五批**：~22 测试
+- **_schema_path 行为深度第三批**：~11 测试
+- **load_schema 行为深度第三批**：~13 测试
+- **validate 行为深度第五批**：~17 测试
+- **validate_file 行为深度第三批**：~18 测试
+- **module source forbidden tokens 第八批**：~60 测试（parametrize）
+- **module source 字符串精确补强**：~40 测试
+- **signatures 精确补强**：~15 测试
+- **模块整体合理性**：~17 测试
+- **端到端集成补强**：~14 测试
+
+### 撞墙记录
+- 0 fail 首次跑（226 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 351 后）：38952 pass / 0 fail / 18 skip（HEAD `602e394`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第三十二轮
+  - evaluation/runner.py 第三十三轮
+  - evaluation/manifest.py 第三十二轮
+  - evaluation/cli.py 第三十三轮
+  - evaluation/annotation_metrics.py 第三十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema edges23 已饱和（EvalSchemaError 第五批 + _schema_path 第三批 + load_schema 第三批 + validate 第五批 + validate_file 第三批 + forbidden 60 + signatures + 端到端 14）。下一轮选 evaluation/metrics.py 第三十二轮，覆盖 compute_automatic_metrics 行为深度第七批。
+
+---
+
 ## Round 350 — evaluation/annotation_metrics.py 第三十二轮（206 测试）
 
 ### 目标
