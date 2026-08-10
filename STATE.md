@@ -4,6 +4,55 @@
 
 ---
 
+## Round 359 — evaluation/metrics.py 第三十三轮（253 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第三十三轮 edges 测试，覆盖 edges31 未触及的角度：**4 helper source level 字符串精确补强第二批**（_null/_ratio/_bool_metric/_int_metric 各 starts with def / param 类型 / -> dict / 类型转换 / value/reason）；**_pdf_locator_ratio source level 字符串精确补强第二批**（starts with def / 1 param / -> dict / no_elements branch / get source_locator / isinstance page int / page<1 / _PDF_BBOX_REQUIRED_TYPES / _is_valid_bbox / return ratio）；**_docx_locator_ratio source level 字符串精确补强第二批**（starts with def / 1 param / no_elements / 7 structural_keys / page in loc / bbox in loc / any check / return ratio）；**_is_valid_bbox source level 字符串精确补强第二批**（starts with def / 1 param Any / -> bool / isinstance list / len!=4 / isinstance bool / isinstance int float / math.isfinite）；**_image_resource_ratio source level 字符串精确补强第二批**（starts with def / 2 params / no_image_elements / get resource_path / Path(rp) / image_base_dir is not None / is_file / stat().st_size>0 / OSError / candidates list / return ratio）；**_chunk_reference_ratio source level 字符串精确补强第二批**（starts with def / 2 params / no_chunks / elem_ids set / get element_id / get source_element_ids / all check / return ratio）；**_strip_unicode_whitespace source level 字符串精确补强第二批**（starts with def / 1 param s:str / -> str / join / isspace / not ch.isspace / no re.sub）；**_text_preservation source level 字符串精确补强第二批**（starts with def / 2 params / -> dict / _strip_unicode_whitespace / Counter / intersection / join / 3 keys equal/precision/recall）；**_heading_boundary_ratio source level 字符串精确补强第二批**（starts with def / 2 params / -> dict / heading type / no_heading_elements / return ratio）；**_silent_drop_count source level 字符串精确补强第二批**（starts with def / 2 params by_type+expectations / -> dict / no_expectations / _int_metric）；**compute_automatic_metrics source level 字符串精确补强第二批**（starts with def / 5 params / -> dict / pipeline_success / _bool_metric / error_code / document None branch / lazy import schema_validation / try except Exception / schema_check_exception / get elements/chunks / 调用 7 个 helper / pdf docx branches / 11 metric keys for None / return metrics / metrics dict init / _int_metric for count / by_type dict）；**module source forbidden tokens 第七批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/subprocess/re.match/datetime/time/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/importlib/platform）；**module source 字符串精确补强**（docstring mentions 自动指标/text_preservation/Unicode 空白/Counter/v1.1 / 4 imports / 3 constants / no relative / no star / no yield / no async / no walrus / no main / no user class / 14 functions / __all__ 1 entry / no eval/exec/compile/unlink/write）；**signatures 精确补强**（14 函数 signatures / image_base_dir default None / document no default / no varargs）；**模块整体合理性补强**（has docstring / __all__ list length 1 / unique / 14 callables / 3 constants / no user classes / name eq / file eq / text_types tuple length 7 / pdf_bbox tuple length 4 / subset / not_evaluated str / function module eq / constants module builtins）；**端到端集成补强**（compute_metrics minimal pdf/doc / document None / error dict / does not mutate / idempotent / positional / kwargs / docx source_type / unknown source_type / with pdf elements / text_preservation with text/loss / strip_unicode with NBSP/em space/ideographic space / is_valid_bbox valid/negative/floats/invalid len/tuple/bool/nan/inf / pdf_locator no elements/invalid page/negative page / docx_locator no elements/page in loc / chunk_reference no chunks/all valid/partial unknown / image_resource no images / silent_drop no expectations/zero/some/more actual / heading_boundary no chunks/no headings）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges32.py`（253 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **4 helper source level 字符串精确补强第二批**：~17 测试
+- **_pdf_locator_ratio source level 字符串精确补强第二批**：~10 测试
+- **_docx_locator_ratio source level 字符串精确补强第二批**：~10 测试
+- **_is_valid_bbox source level 字符串精确补强第二批**：~8 测试
+- **_image_resource_ratio source level 字符串精确补强第二批**：~13 测试
+- **_chunk_reference_ratio source level 字符串精确补强第二批**：~10 测试
+- **_strip_unicode_whitespace source level 字符串精确补强第二批**：~7 测试
+- **_text_preservation source level 字符串精确补强第二批**：~10 测试
+- **_heading_boundary_ratio source level 字符串精确补强第二批**：~6 测试
+- **_silent_drop_count source level 字符串精确补强第二批**：~5 测试
+- **compute_automatic_metrics source level 字符串精确补强第二批**：~22 测试
+- **module source forbidden tokens 第七批**：~37 测试
+- **module source 字符串精确补强**：~25 测试
+- **signatures 精确补强**：~17 测试
+- **模块整体合理性补强**：~20 测试
+- **端到端集成补强**：~36 测试
+
+### 撞墙记录
+- 2 fail 首次跑：_heading_boundary_ratio 实际没有 no_chunks 分支（没有 chunks 时 ratio=0.0 不是 null）；改成检查 no_heading_elements + ratio 0.0
+- 修复后 253 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 359 后）：40803 pass / 0 fail / 18 skip（HEAD `535eb51`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第二十二轮
+  - evaluation/runner.py 第三十四轮
+  - evaluation/manifest.py 第三十三轮
+  - evaluation/cli.py 第三十四轮
+  - evaluation/annotation_metrics.py 第三十四轮
+  - evaluation/schema.py 第二十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges32 已饱和（11 函数 source level 第二批 + forbidden 37 + signatures + 端到端 36）。下一轮选 evaluation/report.py 第二十二轮，覆盖 aggregate_summary/build_devset_section/build_provenance 行为深度与 source 字符串补强。
+
+---
+
 ## Round 358 — evaluation/schema.py 第二十四轮（185 测试）
 
 ### 目标
