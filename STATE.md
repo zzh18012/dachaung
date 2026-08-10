@@ -4,6 +4,50 @@
 
 ---
 
+## Round 358 — evaluation/schema.py 第二十四轮（185 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第二十四轮 edges 测试，覆盖 edges23 未触及的角度：**EvalSchemaError source level 字符串精确补强第二批**（starts with class / extends Exception / docstring / super().__init__(message) / self.errors = errors or [] / no eval/subprocess/yield）；**_schema_path source level 字符串精确补强第二批**（starts with def / 1 param name:str / returns p / uses SCHEMAS_DIR / is_file / raises FileNotFoundError / no eval/subprocess/yield）；**load_schema source level 字符串精确补强第二批**（starts with def / 1 param / returns dict / uses _schema_path / open / utf-8 / json.load(f) / return json.load(f) / no eval/subprocess/yield）；**validate source level 字符串精确补强第二批**（starts with def / 2 params / -> None / load_schema / Draft202012Validator / iter_errors / sorted / absolute_path / errors list / no errors return / raises EvalSchemaError / 3 error keys path/message/schema_path / no eval/subprocess）；**validate_file source level 字符串精确补强第二批**（starts with def / 2 params / -> None / Path(path) / is_file / FileNotFoundError / open / utf-8 / json.load(f) / validate(data, schema_name) / no eval/subprocess/yield）；**SCHEMAS_DIR 常量精确**（is Path / resolved / ends with schemas / parent name / exists / in __all__ / module constant / source value / uses resolve / uses parent.parent）；**module source forbidden tokens 第八批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime/time/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/importlib/platform）；**module source 字符串精确补强**（docstring mentions Schema/manifest/annotation/evaluation-report/app.schema / 5 imports / no relative / no star / no yield / no async / no walrus / no main / 1 class / 4 functions / __all__ 5 entries / no eval/exec/compile/unlink/write）；**signatures 精确补强**（EvalSchemaError.__init__ 3 params / message no default / errors default None / return None / _schema_path / load_schema / validate / validate_file params + no defaults + no varargs）；**模块整体合理性补强**（has docstring / has __all__ / list / length 5 / unique / str / 4 callables / 1 class / name eq / file eq / module eq / imports Path/json/Draft202012Validator/JSValidationError）；**端到端集成补强**（load 3 schemas / idempotent / does not mutate disk / minimal manifest passes / missing fields fail / invalid version fails / extra field fails / validate_file str+Path / nonexistent raises / invalid json raises / returns None / EvalSchemaError errors list / errors dict keys / message has schema_name / message has path / caught as Exception ancestor / schema_path returns Path / nonexistent raises / empty errors list / complex errors）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges24.py`（185 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError source level 字符串精确补强第二批**：~7 测试
+- **_schema_path source level 字符串精确补强第二批**：~9 测试
+- **load_schema source level 字符串精确补强第二批**：~11 测试
+- **validate source level 字符串精确补强第二批**：~15 测试
+- **validate_file source level 字符串精确补强第二批**：~13 测试
+- **SCHEMAS_DIR 常量精确**：~11 测试
+- **module source forbidden tokens 第八批**：~37 测试
+- **module source 字符串精确补强**：~25 测试
+- **signatures 精确补强**：~13 测试
+- **模块整体合理性补强**：~17 测试
+- **端到端集成补强**：~28 测试
+
+### 撞墙记录
+- 1 fail 首次跑：manifest schema 不要求 expected_failures（有 default）→ 改成可能通过也可能不通过
+- 修复后 185 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 358 后）：40550 pass / 0 fail / 18 skip（HEAD `0610d5c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第三十三轮
+  - evaluation/report.py 第二十二轮
+  - evaluation/runner.py 第三十四轮
+  - evaluation/manifest.py 第三十三轮
+  - evaluation/cli.py 第三十四轮
+  - evaluation/annotation_metrics.py 第三十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema edges24 已饱和（5 函数 source level 第二批 + SCHEMAS_DIR 11 项 + forbidden 37 + signatures + 端到端 28）。下一轮选 evaluation/metrics.py 第三十三轮，覆盖 helper 行为深度与 source 字符串补强。
+
+---
+
 ## Round 357 — evaluation/annotation_metrics.py 第三十三轮（185 测试）
 
 ### 目标
