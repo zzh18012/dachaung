@@ -4,6 +4,52 @@
 
 ---
 
+## Round 422 — evaluation/metrics.py 第四十三轮（149 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第四十三轮 edges 测试，覆盖 edges40 未触及的角度：**模块常量深度第十四批**（_TEXT_TYPES 顺序 / _PDF_BBOX_REQUIRED_TYPES 与 _TEXT_TYPES 交集 / _NOT_EVALUATED 字面量 / 模块级常量数）；**_null / _ratio / _bool_metric / _int_metric 边界第十四批**（返回 dict 结构 / value 类型 / reason 类型 / None vs str / 类型强制）；**compute_automatic_metrics 第十四批**（14 个 keys 顺序 / pipeline_success 逻辑 / error_code 字段 / schema_check_exception 路径 / expectations 含 element_count_by_type 部分覆盖 / 不修改 / 幂等 / 独立 dict）；**_strip_unicode_whitespace 边界第十四批**（全角空格 / 中文 / Tab / 多种 Unicode 空白）；**_is_valid_bbox 边界第十四批**（None / list 长度边界 / 数字 vs 字符串 / NaN / Inf / tuple）；**_pdf_locator_ratio / _docx_locator_ratio 第十四批**（elements list 直传 / source_locator 内 bbox / 缺 elements key / 部分 missing bbox）；**_image_resource_ratio 第十四批**（elements 直传 / image 缺 resource_path / resource_path None / image_base_dir None）；**_chunk_reference_ratio 第十四批**（chunks 缺 source_element_ids / 空列表 / element_id 引用）；**module source forbidden tokens 第十九批**；**module source 字符串精确补强第十六批**；**signatures 第十六批**；**module 合理性第十六批**；**端到端集成第十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges41.py`（149 测试）
+
+### 覆盖要点
+- **模块常量深度第十四批**：11 测试
+- **_null / _ratio / _bool_metric / _int_metric 边界第十四批**：14 测试
+- **compute_automatic_metrics 第十四批**：17 测试
+- **_strip_unicode_whitespace 边界第十四批**：8 测试
+- **_is_valid_bbox 边界第十四批**：11 测试
+- **_pdf_locator_ratio / _docx_locator_ratio 第十四批**：10 测试
+- **_image_resource_ratio 第十四批**：6 测试
+- **_chunk_reference_ratio 第十四批**：6 测试
+- **module source forbidden tokens 第十九批**：16 测试
+- **module source 字符串精确补强第十六批**：25 测试
+- **signatures 第十六批**：13 测试
+- **module 合理性第十六批**：7 测试
+- **端到端集成第十六批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_compute_automatic_metrics_keys_exact_batch14 — 期望 figure_caption_* 但这些是 runner.py 注入的，metrics.py 自身只出 14 个核心 metric + silent_drop_count）。修复：移除 figure_caption_* 期望，加 element_count_total / element_count_by_type。
+- 第二次跑：1 fail（test_pdf_locator_ratio_no_elements_batch14 — 函数签名是 `_pdf_locator_ratio(elements)` 直传 list，不是整个 doc）。修复：改为传 list。
+- 第三次跑：1 fail（test_docx_locator_ratio_no_paragraphs_batch14 — 有 elements 但无 structural_keys 时是 0.0，不是 None）。修复：期望改为 0.0。
+- 第四次跑：149 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 422 后）：51397 pass / 0 fail / 19 skip（HEAD `4ce231f`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第三十一轮
+  - evaluation/runner.py 第四十四轮
+  - evaluation/cli.py 第四十三轮
+  - evaluation/manifest.py 第四十二轮
+  - evaluation/annotation_metrics.py 第四十二轮
+  - evaluation/schema.py 第三十四轮
+  - evaluation/metrics.py 第四十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 421 — evaluation/schema.py 第三十三轮（119 测试）
 
 ### 目标
