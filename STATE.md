@@ -4,6 +4,60 @@
 
 ---
 
+## Round 307 — evaluation/manifest.py 第二十四轮（137 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二十四轮 edges 测试，覆盖 edges23 未触及的角度：**DocumentEntry 行为深度补强**（is_dataclass / frozen=True / dataclasses.fields() 10 个 + 顺序精确 / equality / hashable / no delattr / source 含 10 字段名）；**ExpectedFailure 行为深度补强**（is dataclass / frozen / fields 5 个 + 顺序 / equality / hashable / source 含 5 字段名）；**Manifest 行为深度补强**（is dataclass / frozen / fields 5 个 + 顺序 / source 含 5 字段名 + 5 properties 名）；**content_group_count 算法不变量**（empty=0 / 全 unpaired=file_count / 全 paired=file_count//2 / 单向配对=1 / 混合 = groups+unpaired / ≤ file_count 不变量）；**categories_covered 算法不变量**（sorted list 升序 / empty=[] / dedup / 不修改 documents）；**load_manifest 行为深度补强**（中文路径 / project_root str→Path / project_root Path→resolve / no expected_failures 默认 [] / documents 是 schema required）；**_resolve_relative_path 行为深度补强**（'./foo' / 'foo' / 中文 field_name / emoji field_name / outside root）；**_is_absolute_like 行为深度补强**（'~/foo' False / '  /foo' False / '/' True / '//' True / 'C:' False / 'C:foo' False / 'C:\\' True / '9:/foo' False / 'c:/foo' True）；**_has_backslash 行为深度补强**（'/' False / '\\' True / 'a\\b' True / 'a\\\\b' True / '' False）；**_detect_project_root 行为深度补强**（dir/file 输入 / pyproject 在 cur / parent / 找不到 / signature 1 param）；**ManifestError 行为深度补强**（isinstance Exception / 可 raise+catch / 中文 message / args / no errors attribute / 无自定义 __init__）；**module source 字符串精确补强**（含 frozenset([d.doc_id, d.paired_with]) / dataclass import / @dataclass(frozen=True) 3 次 / MANIFEST_VERSION / pyproject.toml）；**module source forbidden tokens 补强**（socket/email/html/http/urllib/sqlite3/csv/pickle/collections/math/datetime/itertools/functools/time/tempfile/shutil/glob 17 个）；**module imports 精确补强**（7 imports 精确：future/json/dataclasses/pathlib/typing + evaluation 2 行）；**module source 含必要字符串**（Path/dataclass/ManifestError/DocumentEntry/ExpectedFailure）；**module source level 完整补强**（load_manifest 含 Path resolve + is_file + utf-8 + json.load + validate + MANIFEST_VERSION 比较 + for d/for ef + return Manifest；_resolve_relative_path 含 4 处 raise ManifestError + _is_absolute_like + _has_backslash + .resolve() + .relative_to；Manifest.content_group_count 含 frozenset + pair_ids.add）；**signatures 精确补强**（load_manifest 2 params + project_root default=None + return Manifest；_resolve_relative_path 3 params no default；3 helper 1 param each + no varargs/varkw）；**端到端集成补强**（5 documents + 1 expected_failure / annotation_file 存在 → annotation_resolved Path / expectations 保留 / expected_failure source_type 保留 / 不修改 input file）；**模块整体合理性**（__all__ 5 entries / 1 class + 3 dataclass + 5 module-level function / 无 __main__ / 2 imported names）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges24.py`（137 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **DocumentEntry 行为深度补强**：9 测试
+- **ExpectedFailure 行为深度补强**：7 测试
+- **Manifest 行为深度补强**：5 测试
+- **content_group_count 算法不变量**：6 测试
+- **categories_covered 算法不变量**：4 测试
+- **load_manifest 行为深度补强**：6 测试
+- **_resolve_relative_path 行为深度补强**：5 测试
+- **_is_absolute_like 行为深度补强**：9 测试
+- **_has_backslash 行为深度补强**：5 测试
+- **_detect_project_root 行为深度补强**：5 测试
+- **ManifestError 行为深度补强**：6 测试
+- **module source 字符串精确补强**：5 测试
+- **module source forbidden tokens 补强**：17 测试
+- **module imports 精确补强**：7 测试
+- **module source 含必要字符串**：4 测试
+- **module source level 完整补强**：16 测试
+- **signatures 精确补强**：9 测试
+- **端到端集成补强**：5 测试
+- **模块整体合理性**：6 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  - `test_load_manifest_no_documents_default_empty` - schema 把 documents 当 required，缺失先抛 EvalSchemaError（不是 ManifestError）→ 改为 expected_failures 默认空（不是 required）+ 添加 documents 是 schema required 的独立测试
+  - `test_resolve_relative_path_source_has_3_manifest_error_raises` - source 实际有 4 处 raise ManifestError（empty / absolute / backslash / outside-root）→ 改 assertion 为 4
+- 修复后 137 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 307 后）：29747 pass / 0 fail / 16 skip（HEAD `c33d8ad`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第二十五轮
+  - evaluation/annotation_metrics.py 第二十五轮
+  - evaluation/metrics.py 第二十五轮
+  - evaluation/schema.py 第十七轮
+  - evaluation/runner.py 第二十六轮
+  - evaluation/manifest.py 第二十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges24 已饱和（DocumentEntry/ExpectedFailure/Manifest 3 dataclass 行为深度 + content_group_count 算法不变量 + categories_covered 算法 + load_manifest 边界 + _resolve_relative_path 边界 + _is_absolute_like 边界 + _has_backslash + _detect_project_root + ManifestError + source 字符串 + forbidden tokens + imports + source level + signatures + 端到端 + 模块整体）。下一轮选 evaluation/cli.py 第二十五轮，覆盖 _build_parser/_format_metric/_run_inspect_doc/main 4 函数行为深度。
+
+---
+
 ## Round 306 — evaluation/runner.py 第二十五轮（114 测试）
 
 ### 目标
