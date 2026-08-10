@@ -4,6 +4,51 @@
 
 ---
 
+## Round 336 — evaluation/manifest.py 第二十九轮（212 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二十九轮 edges 测试，覆盖 edges28 未触及的角度：**_is_absolute_like 数学边界第四批**（uppercase/lowercase drive / 3 letters with dash/dot/space / single chars / None 短路 / empty / `/` only / `C:` only / `C:\\` / `C:/`）；**_has_backslash 数学边界第四批**（long paths no backslash / mixed separators / digits / special chars / None raises TypeError / empty False）；**DocumentEntry frozen / fields 第二批**（field count 10 / types / equality / inequality / hashable / setattr raises FrozenInstanceError）；**ExpectedFailure frozen / fields 第二批**（5 fields / equality / inequality / frozen）；**Manifest properties 第二批**（5 properties int return types / categories_covered list type）；**content_group_count 算法深度第二批**（self pair counted once / chain 3 paired / paired_with unknown skipped / mixed paired unpaired / two separate pairs）；**categories_covered 第二批**（one doc / disjoint / overlap / unicode / empty）；**load_manifest malformed data 第二批**（unknown key / empty docs / empty expected_failures / 1-2 documents / path must be relative / no backslash / devset_status missing raises）；**module source forbidden tokens 第四批**（~100 stdlib parametrized）；**module source 字符串精确补强**（imports / 3 dataclass / 5 property / no yield/async/lambda/main / resolve_relative_path / load_manifest / detect_project_root / _is_absolute_like / _has_backslash）；**signatures 精确补强**（param counts / annotations / defaults / no varargs varkw / Manifest init 5 params / load_manifest 2 params）；**模块整体合理性**（namespace / __all__ 5 entries / 4 private / 1 public / 4 classes / 3 dataclasses / no main）；**端到端集成补强**（unicode doc_id / 2 docs paired / 2 docs unpaired / 3 categories / load twice equal / Manifest instance / tuples / expectations / no paired_with / no categories / no sha256）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges29.py`（212 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第四批**：12 测试
+- **_has_backslash 数学边界第四批**：6 测试
+- **DocumentEntry frozen / fields 第二批**：~7 测试
+- **ExpectedFailure frozen / fields 第二批**：4 测试
+- **Manifest properties 第二批**：4 测试
+- **content_group_count 算法深度第二批**：5 测试
+- **categories_covered 第二批**：4 测试
+- **load_manifest malformed data 第二批**：9 测试
+- **module source forbidden tokens 第四批**：~100 测试（parametrize）
+- **module source 字符串精确补强**：~18 测试
+- **signatures 精确补强**：8 测试
+- **模块整体合理性**：15 测试
+- **端到端集成补强**：12 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_is_absolute_like_none_raises_typeerror` 假设 None 触发 AttributeError，实际 `_is_absolute_like` 第一支 `if not path_str: return False` 在 `not None` 时短路返回 False
+- 修复：改名为 `test_is_absolute_like_none_returns_false`，断言 `is False`
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 336 后）：34094 pass / 0 fail / 18 skip（HEAD `c5dc940`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第三十轮
+  - evaluation/annotation_metrics.py 第三十轮
+  - evaluation/schema.py 第二十一轮
+  - evaluation/metrics.py 第三十轮
+  - evaluation/runner.py 第三十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest edges29 已饱和（is_absolute_like 12 + has_backslash 6 + DocumentEntry 7 + ExpectedFailure 4 + Manifest properties 4 + content_group_count 5 + categories_covered 4 + load_manifest 9 + forbidden 100 + source 18 + signatures 8 + 模块 15 + 端到端 12）。下一轮选 evaluation/cli.py 第三十轮，覆盖 argparse subcommand 行为深度与 main 返回码组合。
+
+---
+
 ## Round 335 — evaluation/runner.py 第三十轮（206 测试）
 
 ### 目标
