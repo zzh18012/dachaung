@@ -4,6 +4,56 @@
 
 ---
 
+## Round 299 — evaluation/schema.py 第十五轮（183 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第十五轮 edges 测试，覆盖 edges14 未触及的角度：**EvalSchemaError 行为深度补强**（errors=[] 默认；None/()/0 falsy → []；truthy tuple/dict/list 保留；message str 类型；errors list 类型；errors 元素 dict 类型；args 含 message；__str__/__repr__ 行为；raise + catch；raise from 链；init signature 2 params + errors default=None + no varargs/varkw + return None；subclass of Exception 但不继承 ValueError/JSValidationError；source 含 super().__init__ + self.errors = errors or [] + class def）；**_schema_path 行为深度补强**（返 Path；不存在抛 FileNotFoundError；message 含「Schema 文件不存在」+ 路径；signature 1 param no default；no varargs/varkw；source 含 SCHEMAS_DIR + .is_file() + FileNotFoundError）；**load_schema 行为深度补强**（返 dict；$schema key；type=object；3 个 schema 都加载；不存在透传 FileNotFoundError；signature 1 param；source 含 utf-8 + json.load + _schema_path 调用；多次调用返独立 dict）；**validate 行为深度补强**（成功返 None；失败抛 EvalSchemaError；errors 是 list；每个 error dict 含 path/message/schema_path 3 keys 精确；path/schema_path 是 list；message 是 str；不修改 instance；signature 2 params no default + no varargs/varkw；source 含 Draft202012Validator + iter_errors + sorted + absolute_path + absolute_schema_path + head=errors[0] + f-string schema_name + len(errors) + raise EvalSchemaError + load_schema 调用；多个 violation errors count 增加）；**validate_file 行为深度补强**（成功返 None；非法内容抛 EvalSchemaError；str/Path 都接受；不存在/目录抛 FileNotFoundError；signature 2 params no default + no varargs/varkw；source 含 Path(path) + utf-8 + json.load + validate 调用 + .is_file() + FileNotFoundError + 「待校验文件不存在」；invalid JSON 抛 json.JSONDecodeError 不转换）；**Draft202012Validator + JSValidationError 行为深度补强**（namespace 含；都 is class；不互相继承；source 含 alias import）；**module __all__ 完整性补强**（5 entries 顺序精确；namespace；valid identifier；类型 Path/Exception/3 function；_schema_path 不在 __all__；list[str]）；**SCHEMAS_DIR 行为深度补强**（Path/absolute/directory/name='schemas'；含 4 schema；至少 4 .json；无 .py；无子目录；source 含 Path(__file__).resolve() + .parent.parent）；**schema 文件内容深度补强**（4 schema 都用 Draft 2020-12；type=object；required 是 list；3 evaluation schema 顶层 additionalProperties=false（document 在 $defs 内）；manifest 含 documents/expected_failures 顶层 + categories 在 $defs；evaluation-report 含 provenance/devset/summary/per_doc/expected_failures；annotation 含 chunk_boundary_anchors；document 含 elements/chunks）；**module source forbidden tokens 补强**（os/sys/re/logging/subprocess/asyncio/threading/time/datetime/collections/math/itertools/functools/relative/dataclass/yield/async/global/nonlocal/walrus/assert）；**module imports 顺序 + future 补强**（future → json → pathlib → typing → jsonschema 2 个；4 个 import 全；from jsonschema 不用 import as）；**module docstring 深度补强**（含 manifest/annotation/evaluation-report/app/schema.py/业务 vs 评测）；**signatures 精确**（EvalSchemaError.__init__ 2 params + errors default=None；_schema_path/load_schema 1 param；validate/validate_file 2 params；5 callable no varargs/varkw；return type None 或 dict 或 Path）；**module source level 完整**（EvalSchemaError source 含 docstring + class def + super + self.errors；load_schema source 含 docstring + utf-8 + json.load + _schema_path；validate source 含 docstring + Draft202012Validator + iter_errors + sorted + flat.append + for err + if not errors + path/message/schema_path + raise EvalSchemaError；validate_file source 含 docstring + Path(path) + .is_file() + FileNotFoundError + 「待校验文件不存在」 + utf-8 + json.load + validate 调用）；**端到端集成**（load + Draft202012Validator.is_valid happy；validate_file 3 schema happy；cross-schema 失败；errors count 随 violation 增加；validate_file 错误链 + EvalSchemaError.errors 结构化）；**模块整体合理性**（无 main；1 class + 3 public function + 1 private helper + 1 constant）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges15.py`（183 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 行为深度补强**：22 测试
+- **_schema_path 行为深度补强**：10 测试
+- **load_schema 行为深度补强**：14 测试
+- **validate 行为深度补强**：23 测试
+- **validate_file 行为深度补强**：18 测试
+- **Draft202012Validator + JSValidationError**：8 测试
+- **module __all__ 完整性补强**：6 测试
+- **SCHEMAS_DIR 行为深度补强**：10 测试
+- **schema 文件内容深度补强**：15 测试
+- **module source forbidden tokens 补强**：21 测试
+- **module imports 顺序 + future 补强**：8 测试
+- **module docstring 深度补强**：5 测试
+- **signatures 精确**：8 测试
+- **module source level 完整**：10 测试
+- **端到端集成**：7 测试
+- **模块整体合理性**：5 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  1. `test_schema_files_additional_properties_false` —— 我误以为 4 schema 顶层都 `additionalProperties: false`，实际 document.schema.json 顶层不强制（仅在 $defs 内）。修法：3 evaluation schema 顶层强制；document 用 json.dumps 含 'additionalProperties' 字符串验证。
+  2. `test_manifest_schema_has_categories_covered_key` —— 我误以为 manifest 顶层有 `categories_covered`，实际是 `$defs/document` 内有 `categories`（注意单数）。修法：用 json.dumps 查 'categories' 字符串。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 299 后）：28663 pass / 0 fail / 16 skip（HEAD `3346547`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第二十四轮
+  - evaluation/manifest.py 第二十三轮
+  - evaluation/cli.py 第二十四轮
+  - evaluation/annotation_metrics.py 第二十四轮
+  - evaluation/metrics.py 第二十四轮
+  - evaluation/schema.py 第十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges15 已饱和（EvalSchemaError 22 + validate source level + 4 schema 内容深度 + forbidden tokens 21 + signatures + 端到端）。下一轮选 evaluation/runner.py 第二十四轮，覆盖 _load_annotation / _process_one / run_evaluation 行为深度补强。
+
+---
+
 ## Round 298 — evaluation/metrics.py 第二十三轮（194 测试）
 
 ### 目标
