@@ -4,6 +4,47 @@
 
 ---
 
+## Round 416 — evaluation/report.py 第三十轮（130 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第三十轮 edges 测试，覆盖 edges29 未触及的角度：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 元组深度第十三批**（互不相交 / 字段总数 / 元组不可变性 / __all__ 与元组的关系）；**get_git_provenance 异常深度第十三批**（FileNotFoundError 子类 OSError / TimeoutExpired 子类 SubprocessError / r2 returncode != 0 短路 / r2 stdout 仅空白 → dirty False / r.stdout 仅换行 → commit None）；**get_dependency_versions 异常深度第十三批**（PackageNotFoundError 路径 / 其它异常 → None 不抛 / dict 字段固定 3 个）；**build_provenance 字段深度第十三批**（字段顺序固定 / max_chars 负数仍 int 截断 / max_chars float 截断 / parser_version None 透传 / dependencies 引用 get_dependency_versions）；**build_devset_section 字段深度第十三批**（属性读取顺序 / categories_covered 是 list / devset_status 透传不校验）；**aggregate_summary 行为深度第十三批**（schema_valid partial null / multiple count metric docs / pipeline_success 全 False / silent_drop 全 null / silent_drop partial null）；**module source forbidden tokens 第十八批**；**module source 字符串精确补强第十五批**；**signatures 第十五批**；**module 合理性第十五批**；**端到端集成第十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges30.py`（130 测试）
+
+### 覆盖要点
+- **元组深度第十三批**：11 测试
+- **get_git_provenance 异常深度第十三批**：9 测试
+- **get_dependency_versions 异常深度第十三批**：7 测试
+- **build_provenance 字段深度第十三批**：12 测试
+- **build_devset_section 字段深度第十三批**：8 测试
+- **aggregate_summary 行为深度第十三批**：14 测试
+- **module source forbidden tokens 第十八批**：16 测试
+- **module source 字符串精确补强第十五批**：24 测试
+- **signatures 第十五批**：13 测试
+- **module 合理性第十五批**：8 测试
+- **端到端集成第十五批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_get_git_provenance_r2_returncode_nonzero_batch13 — 我以为 r2 returncode != 0 → dirty True，但代码是 `bool(r2.returncode == 0 and r2.stdout.strip())`，短路逻辑：returncode != 0 → dirty=False）。修复：改正期望为 dirty=False 并加注释。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 416 后）：50667 pass / 0 fail / 19 skip（HEAD `1ea52db`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第四十三轮
+  - evaluation/cli.py 第四十二轮
+  - evaluation/manifest.py 第四十一轮
+  - evaluation/annotation_metrics.py 第四十一轮
+  - evaluation/schema.py 第三十三轮
+  - evaluation/metrics.py 第四十三轮
+  - evaluation/report.py 第三十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 415 — evaluation/metrics.py 第四十二轮（151 测试）
 
 ### 目标
