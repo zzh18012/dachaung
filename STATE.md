@@ -4,6 +4,49 @@
 
 ---
 
+## Round 407 — evaluation/schema.py 第三十一轮（133 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第三十一轮 edges 测试，覆盖 edges30 未触及的角度：**EvalSchemaError 行为深度第十一批**（errors None 显式 / errors tuple / errors 空 tuple → list / list 引用共享 / chain 多层 raise from / 复杂嵌套 errors / pickle / args 保留）；**load_schema 行为深度第十一批**（独立 dict / properties key / required key / 各 schema 特定字段 / 不调 validator / unknown 名 / 子目录名）；**validate 行为深度第十一批**（return None / errors 结构 / path 是 list / message 含 schema name / message 含错误数 / 不 mutate instance / 调 load_schema / 创建 Draft202012Validator / 排序 by path）；**validate_file 行为深度第十一批**（str/Path 输入 / 目录 raises / 不存在 raises / 非法 JSON raises JSONDecodeError / 非法数据 raises EvalSchemaError / Unicode filename / return None）；**_schema_path 行为深度第十一批**；**SCHEMAS_DIR 常量深度第十一批**；**module source forbidden tokens 第十五批**；**module source 字符串精确补强第十一批**；**signatures 第十一批**；**module 合理性第十一批**；**端到端集成第十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges31.py`（133 测试）
+
+### 覆盖要点
+- **EvalSchemaError 行为深度第十一批**：11 测试
+- **load_schema 行为深度第十一批**：9 测试
+- **validate 行为深度第十一批**：10 测试
+- **validate_file 行为深度第十一批**：8 测试
+- **_schema_path 行为深度第十一批**：6 测试
+- **SCHEMAS_DIR 常量深度第十一批**：6 测试
+- **module source forbidden tokens 第十五批**：16 测试
+- **module source 字符串精确补强第十一批**：18 测试
+- **signatures 第十一批**：15 测试
+- **module 合理性第十一批**：10 测试
+- **端到端集成第十一批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_load_schema_does_not_call_validator_batch11 — patch 未导入）。修复：from unittest.mock import patch。
+- 第二次跑：1 fail（test_e2e_load_then_validate_annotation_batch11 — annotation schema 字段是 doc_id 不是 document_id，且 additionalProperties=false）。修复：改为 doc_id 且去掉多余字段。
+- 第三次跑：133 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 407 后）：49277 pass / 0 fail / 19 skip（HEAD `a51804b`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第四十一轮
+  - evaluation/report.py 第二十九轮
+  - evaluation/runner.py 第四十一轮
+  - evaluation/cli.py 第四十轮
+  - evaluation/manifest.py 第四十轮
+  - evaluation/annotation_metrics.py 第四十轮
+  - evaluation/schema.py 第三十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 406 — evaluation/annotation_metrics.py 第三十九轮（108 测试）
 
 ### 目标
