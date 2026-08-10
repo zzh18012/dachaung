@@ -15656,15 +15656,61 @@ get_git_provenance 各 OSError 路径。
 
 ### 下一步建议
 - 候选：
-  - evaluation/schema.py 第十四轮
   - evaluation/runner.py 第二十二轮
   - evaluation/manifest.py 第二十二轮
   - evaluation/cli.py 第二十三轮
   - evaluation/annotation_metrics.py 第二十二轮
   - evaluation/metrics.py 第二十二轮
+  - evaluation/schema.py 第十五轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：metrics.py edges21 已饱和。下一轮选 evaluation/schema.py 第十四轮，覆盖 4 个 schema（manifest/annotation/evaluation-report/document）的 cross-validation 与 EvalSchemaError 行为深度。
+**建议**：schema.py edges14 已饱和。下一轮选 evaluation/runner.py 第二十二轮，覆盖 _load_annotation/_process_one/run_evaluation 行为深度。
+
+---
+
+## Round 293 — evaluation/schema.py 第十四轮（149 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第十四轮 edges 测试，覆盖 edges13 未触及的角度：**EvalSchemaError 行为深度**（Exception 子类；默认 errors=[]；errors=None → []；errors falsy tuple → []；errors falsy 0 → []；errors truthy dict 保持；args 只含 message；str 返 message；repr 含 class name；raise + catch；raise from 链；init signature 2 params；init no varargs/varkw；source 含 super().__init__ + self.errors = errors or []）；**_schema_path 行为深度**（返回 Path；不存在抛 FileNotFoundError；message 含「Schema 文件不存在」；signature 1 param no default；source 含 .is_file() + SCHEMAS_DIR）；**load_schema 行为深度**（返回 dict；含 $schema；type=object；annotation/report 同样；不存在透传 FileNotFoundError；signature 1 param；source 含 utf-8 + json.load + _schema_path 调用）；**validate 行为深度**（成功返 None；失败抛 EvalSchemaError；message 含 schema_name + N 处；errors 是 list；每个 error dict 含 path/message/schema_path 3 key 精确；path/schema_path 是 list；message 是 str；不修改 instance；signature 2 params no default；source 含 Draft202012Validator + iter_errors + sorted + absolute_path + absolute_schema_path + 隐式 return）；**validate_file 行为深度**（成功返 None；内容非法抛 EvalSchemaError；str/Path 都接受；不存在抛 FileNotFoundError；目录抛 FileNotFoundError；signature 2 params；source 含 Path(path) + utf-8 + validate 调用 + .is_file()）；**Draft202012Validator import + JSValidationError vs EvalSchemaError**（namespace 含；class identity；source 含 alias import；不互相继承）；**module __all__ 完整性**（5 entries 精确；namespace；valid identifier；类型 Path/Exception/3 function；_schema_path 私有不在 __all__）；**SCHEMAS_DIR 行为深度**（Path/absolute/directory/name='schemas'；含 4 个 schema；至少 4 个 .json；无 .py；无子目录；source 含 Path(__file__).resolve() + .parent.parent）；**schema 文件内容深度**（4 schema 都用 Draft 2020-12；type=object；含 required list；additionalProperties false）；**module source forbidden tokens 补强**（os/sys/re/logging/subprocess/asyncio/threading/time/datetime/collections/math/itertools/functools/star/relative/dataclass/yield/async/global/nonlocal/walrus/assert）；**module imports 顺序 + future annotations**（future → json → pathlib → jsonschema；4 个 import 全）；**module docstring 深度**（manifest/annotation/evaluation-report/app/schema.py 分离/业务 vs 评测）；**端到端集成**（load+Draft202012Validator.is_valid happy path；validate_file 3 个 schema happy；cross-schema 失败；errors count 随 violation 增加）；**模块整体合理性**（无 main 块；1 个 class；4 个 function）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges14.py`（149 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 行为深度**：22 测试（subclass/default errors/None/falsy/truthy/args/str/repr/raise/catch/raise from/signature/source）
+- **_schema_path 行为深度**：8 测试
+- **load_schema 行为深度**：10 测试
+- **validate 行为深度**：18 测试（return/errors structure/keys/types/no mutate/signature/source）
+- **validate_file 行为深度**：11 测试
+- **Draft202012Validator + JSValidationError**：5 测试
+- **module __all__**：7 测试
+- **SCHEMAS_DIR 行为深度**：13 测试
+- **schema 文件内容深度**：8 测试
+- **module source forbidden tokens**：22 测试
+- **module imports 顺序 + future**：9 测试
+- **module docstring 深度**：6 测试
+- **端到端集成**：6 测试
+- **模块整体合理性**：4 测试
+
+### 撞墙记录
+- 0 fail 首次跑（149 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 293 后）：27607 pass / 0 fail / 16 skip（HEAD `62e1517`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第二十二轮
+  - evaluation/manifest.py 第二十二轮
+  - evaluation/cli.py 第二十三轮
+  - evaluation/annotation_metrics.py 第二十二轮
+  - evaluation/metrics.py 第二十二轮
+  - evaluation/schema.py 第十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges14 已饱和（EvalSchemaError 22 测试 + validate source level + 4 schema 内容深度 + forbidden tokens 22）。下一轮选 evaluation/runner.py 第二十二轮，覆盖 _load_annotation/_process_one/run_evaluation 行为深度。
 
 ---
 
