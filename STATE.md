@@ -15473,3 +15473,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：evaluation/* 模块 edges20 已基本饱和（5 个核心模块都到了第二十轮）。下一轮选 evaluation/runner.py 第二十一轮，深度模拟 _load_annotation/_process_one/run_evaluation。
 
 ---
+
+## Round 288 — evaluation/runner.py 第二十一轮（92 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第二十一轮 edges 测试，覆盖 edges20 未触及的角度：**_load_annotation 边界**（path=None/不存在/目录/valid JSON/invalid JSON/empty file/UTF-8 BOM/top-level array/top-level number/两次调用相同内容/二进制内容→UnicodeDecodeError 抛）；**_process_one 行为深度**（failing 返 5-tuple 含 None document；error dict 含 code/message；total_seconds float 非负；创建 _per_doc 目录；清理 out_stub；两次调用独立）；**run_evaluation 集成深度**（mixed success+failure per_doc 长度=总文档数；empty docs + expected_failures；docs + expected_failures 都有；custom tolerance_chars=100/0；writes nonempty file；written file loadable JSON；written file matches returned report；6 top-level keys 精确；top-level keys 顺序精确；不修改 manifest documents/expected_failures/project_root/devset_status）；**run_evaluation 报告写盘细节**（indent=2 多行；ensure_ascii=False 中文不转义；creates output_root if missing）；**module source level 完整**（imports: json/time/pathlib/typing/evaluation imports；不含 logging/subprocess/os/sys/threading/star/relative；_load_annotation source 含 path None check + try/except (OSError, JSONDecodeError) 不含 generic except；_process_one source 含 5-tuple annotation/perf_counter/mkdir/unlink/image_dir logic/unknown error dict/5-tuple return/write_json=False；run_evaluation source 含 keyword-only args/2 处 process_single 调用/2 处 out_stub.is_file 检查/image_dir.is_dir/image_dir is not None/json_dump_with_options/per_doc internal record keys/pop tolerance_missing/public_per_doc construction/6 top-level keys）；**__all__ 与 namespace**（only run_evaluation；私有 helper 在 namespace 不在 __all__；imported helpers 都在 namespace；不直接 import Manifest）；**signatures**（_load_annotation 1 param；_process_one 4 params；run_evaluation 5 params + 3 keyword-only；defaults fallback/800/30）；**module docstring 与 metadata**（mentions pipeline/total/not_instrumented/image；no main block）；**完整端到端 schema 验证**（failing doc + empty manifest + doc+expected_failures 三种都通过 evaluation-report.schema.json）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges21.py`（92 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 边界**：11 场景（None/missing/dir/valid/invalid/empty/BOM/array/number/repeat/binary）
+- **_process_one 行为深度**：7 场景（5-tuple/error dict keys/total float/_per_doc dir/cleanup/independent）
+- **run_evaluation 集成深度**：14 场景（mixed/empty/both/tolerance/writes/file loadable/matches/keys/order/no mutate x4）
+- **报告写盘细节**：3 测试（indent/ensure_ascii/output_root）
+- **module source level**：12 测试（imports + forbidden tokens）
+- **_load_annotation source level**：6 测试
+- **_process_one source level**：8 测试
+- **run_evaluation source level**：9 测试
+- **__all__ 与 namespace**：5 测试
+- **signatures**：6 测试
+- **module docstring 与 metadata**：5 测试
+- **端到端 schema 验证**：3 测试
+
+### 撞墙记录
+- 0 fail 首次跑（92 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 288 后）：26801 pass / 0 fail / 16 skip（HEAD `ffb7774`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第二十一轮（239 行）
+  - evaluation/cli.py 第二十一轮（243 行）
+  - evaluation/annotation_metrics.py 第二十一轮（195 行）
+  - evaluation/metrics.py 第二十一轮（381 行）
+  - evaluation/schema.py 第十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges21 已饱和（边界 + 行为 + 集成 + source level）。下一轮选 evaluation/manifest.py 第二十一轮，深度模拟 load_manifest + DocumentEntry/ExpectedFailure/Manifest frozen 行为 + schema 交叉验证。
+
+---
