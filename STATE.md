@@ -4,6 +4,59 @@
 
 ---
 
+## Round 295 — evaluation/manifest.py 第二十二轮（168 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二十三轮 edges 测试，覆盖 edges21 未触及的角度：**DocumentEntry 10 字段精确**（fields/dataclasses 序列/id_count/类型 str+Path+Optional/int+bool；source 含 @dataclass(frozen=True) + 10 字段名 + 默认值 None/False/0）；**ExpectedFailure 5 字段精确**（fields 序列/id_count/类型 str+bool+Optional+list；source 含 @dataclass(frozen=True) + 5 字段名）；**Manifest 5 字段 + 5 properties 精确**（fields 序列 5 个；manifest_version/file_count/documents/expected_failures/categories_covered 5 字段名；5 properties：annotation_dir_resolved/content_group_count/categories_covered/doc_count/expected_failure_count；source 含 @dataclass(frozen=True) + 5 字段 + 5 @property 函数）；**load_manifest 边界**（happy path 返 Manifest；schema validate 在前；manifest_version check；DocumentEntry build；ExpectedFailure build；Manifest build；frozen=True；reject unknown key 透传 schema；返值不可 hash 但字段可读；不修改 manifest_path 文件内容；write & reload 一致；2 documents + 1 expected_failure 混合；categories_covered 推导；content_group_count 推导）；**_resolve_relative_path 行为深度**（relative path 通过；absolute path raise ManifestError；Windows 盘符 raise；backslash raise；emoji path 通过；中文 path 通过；空 path 抛 schema 先；project_root 外 raise；directory in path 通过；多级 .. 通过；symbol 通过）；**_is_absolute_like 行为深度**（POSIX / 绝对；Windows C:/D:/；UNC \\\\；空字符串 False；纯文件名 False；relative ./；multiple slashes；protocol-like 不识别）；**_has_backslash 行为深度**（forward slash False；mixed slash True；pure backslash True；double backslash True；emoji + backslash True；empty False）；**_detect_project_root 行为深度**（start 含 pyproject.toml → 返 start；parent 含 → 返 parent；3 层向上；不存在 raise；pyproject 内容深度；.git 目录不识别为 project_root）；**ManifestError 行为深度**（Exception 子类；init signature 1 param；args 含 message；str/repr 含 message；raise + catch）；**frozen dataclass 严格**（DocumentEntry/ExpectedFailure/Manifest 都不可 setattr；hashable 如果字段全 hashable）；**module source level 完整**（_resolve_relative_path source 含 .resolve() + relative_to + is_absolute + PosixPath；_is_absolute_like source 含 len() >= 2 and s[1] == ':'；_has_backslash source 含 '\\' in s；_detect_project_root source 含 while + is_dir + pyproject.toml；load_manifest source 含 validate + read_text + json.loads + ManifestError）；**signatures 完整**（_resolve_relative_path 2 params；_is_absolute_like 1 param；_has_backslash 1 param；_detect_project_root 1 param + default cwd；load_manifest 2 params；ManifestError 1 param no default；所有函数 no varargs/varkw）；**module __all__ 完整性**（8 entries；namespace；valid identifier；DocumentEntry/ExpectedFailure/Manifest/ManifestError/load_manifest 5 public；_resolve_relative_path/_is_absolute_like/_has_backslash/_detect_project_root 4 private 不在 __all__）；**端到端集成**（完整 5 文件 manifest 解析；annotation_dir 推导；多 file_count 计数；多 content_group_count 计数；多 categories_covered 推导）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges22.py`（168 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **DocumentEntry 10 字段精确**：14 测试
+- **ExpectedFailure 5 字段精确**：8 测试
+- **Manifest 5 字段 + 5 properties 精确**：14 测试
+- **load_manifest 边界**：22 测试
+- **_resolve_relative_path 行为深度**：14 测试
+- **_is_absolute_like 行为深度**：10 测试
+- **_has_backslash 行为深度**：8 测试
+- **_detect_project_root 行为深度**：9 测试
+- **ManifestError 行为深度**：5 测试
+- **frozen dataclass 严格**：6 测试
+- **module source level 完整**：14 测试
+- **signatures 完整**：14 测试
+- **module __all__ 完整性**：7 测试
+- **端到端集成**：6 测试
+- **module imports 顺序**：5 测试
+- **module docstring 深度**：4 测试
+- **module namespace**：4 测试
+- **模块整体合理性**：4 测试
+
+### 撞墙记录
+- 3 fail 首次跑：
+  1. `test_load_manifest_sha256_uppercase_hex_passes` —— 我误以为 schema 不强制 lowercase，实际 schema pattern 是 `^[0-9a-f]{64}$`（lowercase-only），大写 hex 被 schema reject 先抛 EvalSchemaError。修法：测试改为 expect EvalSchemaError（验证 schema 层拒绝路径生效）。
+  2. `test_load_manifest_manifest_version_0_9_raises` —— 我以为 schema 接受 '0.9' 然后 version-check 拒绝抛 ManifestError，实际 schema const='1.0'，'0.9' 直接被 schema reject 抛 EvalSchemaError，不到 version-check。修法：测试改为 expect EvalSchemaError。
+  3. `test_load_manifest_path_empty_raises` —— 我以为 schema 接受空 path（type 是 string 即可），实际 schema minLength:1 拒绝空 path，先于 _resolve_relative_path。修法：测试改为 expect EvalSchemaError，去掉 _create_doc_files（空 path 无法创建文件）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 295 后）：27935 pass / 0 fail / 16 skip（HEAD `42cc0cb`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第二十三轮
+  - evaluation/annotation_metrics.py 第二十三轮
+  - evaluation/metrics.py 第二十三轮
+  - evaluation/schema.py 第十五轮
+  - evaluation/runner.py 第二十四轮
+  - evaluation/manifest.py 第二十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges22 已饱和（DocumentEntry 10 + ExpectedFailure 5 + Manifest 5+5 properties + 4 helper 行为深度 + source level + frozen 严格 + 端到端）。下一轮选 evaluation/cli.py 第二十三轮，覆盖 argparse 行为深度 + main 函数 source level + 子命令处理。
+
+---
+
 ## 2026-08-04 — Round 0（初始化）
 
 **做了什么**：
