@@ -4,6 +4,47 @@
 
 ---
 
+## Round 400 — evaluation/schema.py 第三十轮（145 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第三十轮 edges 测试，覆盖 edges29 未触及的角度：**EvalSchemaError 行为深度第十批**（chain __cause__ / __context__ / Unicode message / empty message / 各种 errors 形式）；**load_schema 行为深度第十批**（4 schemas 返 dict / unknown raises / 目录 raises / idempotent / independent dict / $schema / type=object / properties / required / 不调 validator）；**validate 行为深度第十批**（更多 schema 与 instance 组合 / error path 结构 / error schema_path / instance 不 mutate）；**validate_file 行为深度第十批**；**_schema_path 行为深度第十批**；**SCHEMAS_DIR 常量深度第十批**；**module source forbidden tokens 第十四批**；**module source 字符串精确补强第十批**；**signatures 第十批**；**module 合理性第十批**；**端到端集成第十批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges30.py`（145 测试）
+
+### 覆盖要点
+- **EvalSchemaError 行为深度第十批**：12 测试
+- **load_schema 行为深度第十批**：11 测试
+- **validate 行为深度第十批**：11 测试
+- **validate_file 行为深度第十批**：10 测试
+- **_schema_path 行为深度第十批**：10 测试
+- **SCHEMAS_DIR 常量深度第十批**：11 测试
+- **module source forbidden tokens 第十四批**：16 测试
+- **module source 字符串精确补强第十批**：15 测试
+- **signatures 第十批**：15 测试
+- **module 合理性第十批**：12 测试
+- **端到端集成第十批**：10 测试
+
+### 撞墙记录
+- 首次跑：145 全通过（无 fail）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 400 后）：48268 pass / 0 fail / 19 skip（HEAD `dc4ec38`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第三十九轮
+  - evaluation/report.py 第二十八轮
+  - evaluation/runner.py 第四十轮
+  - evaluation/cli.py 第三十九轮
+  - evaluation/manifest.py 第三十九轮
+  - evaluation/annotation_metrics.py 第三十九轮
+  - evaluation/schema.py 第三十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 399 — evaluation/annotation_metrics.py 第三十八轮（116 测试）
 
 ### 目标
