@@ -4,6 +4,49 @@
 
 ---
 
+## Round 323 — evaluation/schema.py 第十九轮（142 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第十九轮 edges 测试，覆盖 edges18 未触及的角度：**EvalSchemaError source level 与构造深度**（super().__init__ 在 source / self.errors = errors or [] / 无 try except / 无 return / signature 含 message+errors / errors list 保留 3 项 / args 只含 message / 可被 raise+catch / 可作 Exception 捕获）；**_schema_path source level 与错误消息精确**（p = SCHEMAS_DIR / name / FileNotFoundError f-string / 无内部 import / 错误消息含 name 和"Schema 文件不存在" / 返回 Path.parent == SCHEMAS_DIR / 不创建文件 / dot prefix 处理）；**load_schema 行为深度与 source level**（signature dict[str, Any] / 无 try except（不防 JSONDecodeError）/ 无 cache 机制 / with 语句 / json.load(f) / 4 schemas 都有 $schema 或 type / top-level type=object / 返回可变 dict / 每次返回新 dict）；**validate 行为深度**（source 各步骤精确 / sorted by absolute_path / if not errors return / flat loop / head=errors[0] / raise 含 errors=flat / 成功返回 None / 不修改 instance / empty instance 触发 required 错误 / errors path 是 list / errors message 是 str / head message 在异常消息中 / count in message 匹配 errors 长度 / 不存在 schema 抛 FileNotFoundError）；**validate_file 行为深度**（Path 转换 / encoding utf-8 / pathlib Path / 相对路径 / 目录 not file 抛 FileNotFoundError / BOM 处理 / str path 转 Path）；**module source forbidden tokens 第二批**（29 个 stdlib 模块：copy/pprint/csv/xml/configparser/argparse/inspect/dis/traceback/warnings/weakref/gc/struct/codecs/unicodedata/string/textwrap/difflib/decimal/fractions/statistics/array/queue/types/math/collections/collections.abc/dataclasses/abc）；**module source 字符串精确补强**（docstring 含中文 / 不复用 app/schema.py / from future / 5 imports / jsonschema validator+ValidationError / JSValidationError 仅 import 不使用 / no yield/global/async / 只 1 个 lambda 用于 sort / 无装饰器 / 顶层 class 仅 EvalSchemaError）；**signatures 精确补强**（5 函数全 POSITIONAL_OR_KEYWORD / 无 default / namespace 完整）；**模块整体合理性**（__all__ 是 list / 5 entries 全 str / namespace / 1 class / 3 public functions / 1 private helper / SCHEMAS_DIR 是 Path 实例 + absolute + resolved + parent 是项目根 + 含 4 schemas）；**端到端集成补强**（4 schema 全 load+check_schema+validator / manifest reject invalid version/status / annotation requires doc_id / validate 成功返回 None / round-trip load+validate+write+validate_file / errors JSON 可序列化 / unicode 在 path 和 doc_id / validate_file 透传 EvalSchemaError）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges19.py`（142 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError source level 与构造深度**：11 测试
+- **_schema_path source level 与错误消息精确**：9 测试
+- **load_schema 行为深度与 source level**：11 测试
+- **validate 行为深度（source + 行为）**：16 测试
+- **validate_file 行为深度（路径解析 / 编码）**：9 测试
+- **module source forbidden tokens 第二批**：29 测试（parametrize）
+- **module source 字符串精确补强**：17 测试
+- **signatures 精确补强（kind/annotation 完整）**：16 测试
+- **模块整体合理性**：13 测试
+- **端到端集成补强**：11 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_module_source_has_module_docstring` - 期望 docstring 末尾是 ASCII `.`，实际是中文句号 `。` → 改为 substring 检查 "manifest / annotation / evaluation-report"
+- 修复后 142 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 323 后）：31747 pass / 0 fail / 18 skip（HEAD `a5beeb7`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第二十八轮
+  - evaluation/manifest.py 第二十七轮
+  - evaluation/cli.py 第二十八轮
+  - evaluation/annotation_metrics.py 第二十八轮
+  - evaluation/metrics.py 第二十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema edges19 已饱和（EvalSchemaError source+构造 11 项 + _schema_path 9 项 + load_schema 11 项 + validate source+行为 16 项 + validate_file 9 项 + forbidden 29 项 + source 字符串 17 项 + signatures 16 项 + 模块整体 13 项 + 端到端 11 项）。下一轮选 evaluation/runner.py 第二十八轮，覆盖 _load_annotation + _process_one + run_evaluation 行为深度。
+
+---
+
 ## Round 322 — evaluation/metrics.py 第二十七轮（143 测试）
 
 ### 目标
