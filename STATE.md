@@ -4,6 +4,60 @@
 
 ---
 
+## Round 301 — evaluation/manifest.py 第二十三轮（172 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二十三轮 edges 测试，覆盖 edges22 未触及的角度：**DocumentEntry 行为深度补强**（is_dataclass；frozen=True 严格；10 字段精确顺序；categories 是 tuple；expectations dict | None；annotation_resolved Path | None；equality；no to_dict；source 含 frozen + 10 字段）；**ExpectedFailure 行为深度补强**（is_dataclass；frozen；5 字段精确顺序；source_type 可 None；equality；source 含 frozen + 5 字段）；**Manifest 行为深度补强**（is_dataclass；frozen；5 字段精确；documents/expected_failures 是 tuple；project_root Path；5 properties；source 含 frozen + 5 字段 + 5 @property）；**content_group_count 配对算法深度**（无配对 → doc 数；1 对配对 → 1 group；2 对独立 → 2 groups；单向配对 → frozenset 合并 → 1 group；混合 paired+unpaired）；**categories_covered 算法深度**（空 → []；单 doc 多 categories；多 doc 重复去重；sorted 升序）；**load_manifest 行为深度补强**（path str/Path 都接受；不存在 → ManifestError；invalid JSON → ManifestError + from JSONDecodeError；version mismatch → EvalSchemaError（schema 先）；project_root 默认 None → 自动检测；documents 各默认值；expected_failure source_type 默认 None；annotation_file → annotation_resolved Path；signature 2 params + project_root default=None + no varargs/varkw）；**_resolve_relative_path 行为深度补强**（空 → ManifestError；绝对/反斜杠/越界 → ManifestError；field_name 在错误消息；emoji/中文 path；signature 3 params）；**_is_absolute_like 行为深度补强**（empty/./foo/foo → False；/、/foo、C:\\、C:/、D:/、c:/ → True；9:/foo（digit）、Afoo（no slash）、\\\\server（UNC） → False）；**_has_backslash 行为深度补强**（forward only → False；含 \\ → True；double \\ → True；emoji + \\ → True；空 → False）；**_detect_project_root 行为深度补强**（finds pyproject.toml；walks up；file input → parent；not found → cur；signature 1 param）；**ManifestError 行为深度补强**（subclass Exception；inherit Exception signature (*args, **kwargs)；raise + catch；str/repr/args；不依赖属性）；**frozen dataclass 严格补强**（3 dataclass 都不可 setattr；frozen instance hashable）；**module __all__ 精确**（5 entries 顺序：ManifestError, Manifest, DocumentEntry, ExpectedFailure, load_manifest；不包含私有）；**module imports 顺序**（future → json → dataclasses → pathlib → typing → evaluation 2 个）；**module namespace**（5 public + 4 private + 2 imported）；**module source forbidden tokens 补强**（os/sys/re/logging/subprocess/asyncio/threading/collections/math/datetime/itertools/functools/relative/yield/async/global/nonlocal/walrus/assert）；**module docstring 深度补强**（含「清单加载器」/「相对路径」/「项目根」/「绝对路径」/「反斜杠」）；**signatures 精确**（load_manifest 2 params + project_root default=None + return Manifest；_resolve_relative_path 3 params + return Path；_is_absolute_like/_has_backslash 1 param + return bool；_detect_project_root 1 param + return Path）；**module source level 完整**（DocumentEntry source 10 字段精确名；ExpectedFailure source 5 字段；Manifest source 5 字段 + 5 @property；_resolve_relative_path 含 _is_absolute_like + _has_backslash + .resolve() + .relative_to + 3 处 raise ManifestError；load_manifest 含 Path resolve + is_file + utf-8 + validate + MANIFEST_VERSION 比较 + return Manifest；_detect_project_root 含 pyproject.toml + *cur.parents）；**端到端集成**（5 docs + 1 ef 解析；双向 paired → content_group_count；categories dedup sorted；annotation_resolved Path；pdf_count/docx_count/file_count；expected_failure source_type 保留）；**模块整体合理性**（1 class + 3 dataclass + 5 module-level function + 无 main）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges23.py`（172 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **DocumentEntry 行为深度补强**：10 测试
+- **ExpectedFailure 行为深度补强**：7 测试
+- **Manifest 行为深度补强**：10 测试
+- **content_group_count 配对算法深度**：5 测试
+- **categories_covered 算法深度**：4 测试
+- **load_manifest 行为深度补强**：18 测试
+- **_resolve_relative_path 行为深度补强**：12 测试
+- **_is_absolute_like 行为深度补强**：14 测试
+- **_has_backslash 行为深度补强**：8 测试
+- **_detect_project_root 行为深度补强**：5 测试
+- **ManifestError 行为深度补强**：5 测试
+- **frozen dataclass 严格补强**：4 测试
+- **module __all__ 精确**：5 测试
+- **module imports 顺序**：8 测试
+- **module namespace**：3 测试
+- **module source forbidden tokens 补强**：19 测试
+- **module docstring 深度补强**：5 测试
+- **module source level 完整**：15 测试
+- **端到端集成**：6 测试
+- **模块整体合理性**：5 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  1. `test_manifest_error_init_1_param` —— 我误以为 ManifestError 自定义 __init__ 1 param，实际继承 Exception 的 (*args, **kwargs)（3 params）。修法：assert params[0].name=='self' + len==3。
+  2. `test_manifest_error_no_varargs_varkw` —— 同上，ManifestError 继承 Exception 的 varargs/varkw。修法：assert varargs + varkw 在 kinds 集合里。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 301 后）：28960 pass / 0 fail / 16 skip（HEAD `c423317`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第二十四轮
+  - evaluation/annotation_metrics.py 第二十四轮
+  - evaluation/metrics.py 第二十四轮
+  - evaluation/schema.py 第十六轮
+  - evaluation/runner.py 第二十五轮
+  - evaluation/manifest.py 第二十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges23 已饱和（DocumentEntry 10 + ExpectedFailure 5 + Manifest 5+5 properties + content_group_count 配对算法深度 + load_manifest + 4 helper + signatures + 端到端）。下一轮选 evaluation/cli.py 第二十四轮。
+
+---
+
 ## Round 300 — evaluation/runner.py 第二十四轮（125 测试）
 
 ### 目标
