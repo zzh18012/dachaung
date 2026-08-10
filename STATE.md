@@ -4,6 +4,46 @@
 
 ---
 
+## Round 410 — evaluation/runner.py 第四十二轮（147 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第四十二轮 edges 测试，覆盖 edges39 未触及的角度：**_load_annotation 行为深度第十三批**（path.open 编码 utf-8 / 是 Path 对象 / 不存在 path.is_file → False / None 路径 / json.load 内部 / 是 file 而非 dir / mixed types）；**_process_one 行为深度第十三批**（write_json=False 实参 / out_stub 路径推导 / process_single kwargs 透传 / unlink 失败时不抛 / image_dir None when document None / 5-tuple 顺序固定 / errors[0] 取第一个）；**run_evaluation 行为深度第十三批**（report_version 来自 evaluation / report keys 顺序 / per_doc public keys 严格 4 个 / wall_time_seconds 字段 / _annotation_present 仅在内部 / tolerance_chars 透传到 chunk_boundary_prf / expected_failure matches 字段 / output 写文件 ensure_ascii=False indent=2 / project_root 来自 manifest）；**module source forbidden tokens 第十八批**；**module source 字符串精确补强第十五批**；**signatures 第十五批**；**module 合理性第十五批**；**端到端集成第十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges40.py`（147 测试）
+
+### 覆盖要点
+- **_load_annotation 行为深度第十三批**：15 测试
+- **_process_one 行为深度第十三批**：17 测试
+- **run_evaluation 行为深度第十三批**：26 测试
+- **module source forbidden tokens 第十八批**：16 测试
+- **module source 字符串精确补强第十五批**：21 测试
+- **signatures 第十五批**：14 测试
+- **module 合理性第十五批**：10 测试
+- **端到端集成第十五批**：10 测试
+
+### 撞墙记录
+- 首次跑：SyntaxError（test_run_evaluation_provenance_uses_manifest_project_root_batch13 — 错写 `_StubError()` 为 `_StubError()`，闭括号不匹配）。修复：补正括号。
+- 第二次跑：1 fail（test_module_source_imports_report_helpers_top_level_batch13 — head=30 行截断没到 build_provenance）。修复：扩到 40 行。
+- 第三次跑：147 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 410 后）：49768 pass / 0 fail / 19 skip（HEAD `2315385`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第四十一轮
+  - evaluation/manifest.py 第四十轮
+  - evaluation/annotation_metrics.py 第四十轮
+  - evaluation/schema.py 第三十二轮
+  - evaluation/metrics.py 第四十二轮
+  - evaluation/report.py 第三十轮
+  - evaluation/runner.py 第四十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 409 — evaluation/report.py 第二十九轮（170 测试）
 
 ### 目标
