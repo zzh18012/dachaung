@@ -4,6 +4,45 @@
 
 ---
 
+## Round 332 — evaluation/annotation_metrics.py 第二十九轮（170 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第二十九轮 edges 测试，覆盖 edges27 未触及的角度：**figure_caption_prf 输出 dict 结构精确补强**（3 keys 全 / 同 reason / 全 None / None document / None annotation / 真实 annotation 仍 null / 完全忽略 annotation 内容）；**chunk_boundary_prf 算法精确补强**（empty marker 加入 missing / marker 不在 stream / position 默认 after / position unknown 走 else / anchor extra keys 忽略 / annotation extra keys 忽略 / 多 anchor 同 marker before+after / tolerance_chars 实际值记录 / tolerance_chars 默认 30）；**chunk_boundary_prf 输出结构精确补强**（normal 4 keys / missing_markers 5 keys / each value 2 keys / tolerance=0 / tolerance=-1 / missing_markers 是 list）；**module source forbidden tokens 第三批**（~75 stdlib）；**module source 字符串精确补强**（imports / 常量 / docstring mentions / normalize_text call / join with space / stream normalize / predicted list init / enumerate loop / last chunk break / find_in_stream / find_pos < 0 / pos advance / search_from / marker default / position default / position before branch / pairs init / used_pred/used_gt / distance abs / tolerance compare / pairs sort / matched init / used check / no class/yield/async/decorators / lambda 只在 sort key）；**signatures 精确补强**（figure_caption 2 params / chunk_boundary 3 params + default 30 + int annotation / no varargs varkw）；**模块整体合理性**（namespace / __all__ 3 entries / 2 functions / 1 constant / no class / no main）；**端到端集成补强**（perfect match dict / 空白 normalization / 标点 marker / 3 chunks 2 boundaries / no chunks / 1 chunk / 2 chunks no anchors / missing text key 用 "" / 多次调用一致 / figure_caption proper dict / unicode marker / 5 chunks 1 marker）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges28.py`（170 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 输出 dict 结构精确补强**：7 测试
+- **chunk_boundary_prf 算法精确补强**：9 测试
+- **chunk_boundary_prf 输出结构精确补强**：6 测试
+- **module source forbidden tokens 第三批**：~75 测试（parametrize）
+- **module source 字符串精确补强**：37 测试
+- **signatures 精确补强**：11 测试
+- **模块整体合理性**：9 测试
+- **端到端集成补强**：13 测试
+
+### 撞墙记录
+- 0 fail 首次跑（170 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 332 后）：33277 pass / 0 fail / 18 skip（HEAD `5086325`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十轮
+  - evaluation/metrics.py 第二十九轮
+  - evaluation/runner.py 第三十轮
+  - evaluation/manifest.py 第二十九轮
+  - evaluation/cli.py 第三十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges28 已饱和（figure_caption 7 + chunk_boundary 算法 9 + 输出结构 6 + forbidden 75 + source 37 + signatures 11 + 模块 9 + 端到端 13）。下一轮选 evaluation/schema.py 第二十轮。
+
+---
+
 ## Round 331 — evaluation/cli.py 第二十九轮（183 测试）
 
 ### 目标
