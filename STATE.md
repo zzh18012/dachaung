@@ -4,6 +4,48 @@
 
 ---
 
+## Round 395 — evaluation/report.py 第二十七轮（145 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第二十七轮 edges 测试，覆盖 edges26 未触及的角度：**get_git_provenance 行为深度第十批**（returncode != 0 in rev-parse only / porcelain nonempty / porcelain returncode != 0 with successful rev-parse / rev-parse stdout 仅空白 / porcelain stdout 含换行 / 调用 args / 多次调用 / dict 类型 / 真实 dirty 路径）；**get_dependency_versions 行为深度第十批**；**build_provenance 行为深度第十批**；**build_devset_section 行为深度第十批**；**aggregate_summary 行为深度第十批**；**module source forbidden tokens 第十三批**；**module source 字符串精确补强第十批**；**signatures 第十批**；**module 合理性第十批**；**端到端集成第十批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges27.py`（145 测试）
+
+### 覆盖要点
+- **get_git_provenance 行为深度第十批**：12 测试
+- **get_dependency_versions 行为深度第十批**：10 测试
+- **build_provenance 行为深度第十批**：14 测试
+- **build_devset_section 行为深度第十批**：10 测试
+- **aggregate_summary 行为深度第十批**：14 测试
+- **module source forbidden tokens 第十三批**：16 测试
+- **module source 字符串精确补强第十批**：15 测试
+- **signatures 第十批**：18 测试
+- **module 合理性第十批**：13 测试
+- **端到端集成第十批**：13 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_get_git_provenance_rev_parse_returncode_zero_porcelain_nonzero_batch10` — 错误断言 porcelain returncode != 0 时 dirty=True，实际代码 `bool(r2.returncode == 0 and r2.stdout.strip())` 中 returncode != 0 → 整体 False → dirty=False
+- 修复：校正断言为 dirty=False（returncode != 0 时短路）
+- 二次跑：145 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 395 后）：47551 pass / 0 fail / 19 skip（HEAD `02b933d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十九轮
+  - evaluation/cli.py 第三十八轮
+  - evaluation/manifest.py 第三十八轮
+  - evaluation/annotation_metrics.py 第三十八轮
+  - evaluation/schema.py 第三十轮
+  - evaluation/metrics.py 第三十九轮
+  - evaluation/report.py 第二十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 394 — evaluation/metrics.py 第三十八轮（229 测试）
 
 ### 目标
