@@ -4,6 +4,49 @@
 
 ---
 
+## Round 379 — evaluation/schema.py 第二十七轮（176 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第二十七轮 edges 测试，覆盖 edges26 未触及的角度：**EvalSchemaError 行为深度第七批**（args + str 不含 errors + repr 含 class name + 可 from 链 + errors list 类型 + 可修改 + 复杂 payload + 继承 Exception 全属性 + 无 class-level errors default + init signature keyword options + raise with kwargs + self 参数）；**load_schema 行为深度第七批**（4 schema 各返回 dict + $schema/type=object/$id URL + 不调 validator + 未知扩展名 raise + 目录名 raise + idempotent + 不修改模块状态）；**validate 行为深度第七批**（extra top-level field + wrong version + invalid enum + missing manifest_version + documents/expected_failures not list + missing required eval-report field + eval-report extra field + returns None on success + error message 含 path + 不 mutate on success + idempotent on failure + errors list of dicts + errors path is list + unknown schema raises）；**validate_file 行为深度第七批**（str/Path path + missing/invalid JSON/invalid schema/unknown schema raises + idempotent + 不修改文件 + positional/kwargs）；**_schema_path 行为深度第七批**（returns Path + resolves to SCHEMAS_DIR + unknown raises + directory raises + idempotent + str in error + absolute）；**SCHEMAS_DIR 常量深度第七批**（is Path + absolute + resolved + endswith schemas + 4 JSON files + contains each schema + in module namespace + hashable + in __all__ + value immutable）；**module source forbidden tokens 第十一批**；**module source 字符串精确补强第七批**（future annotations + 5 imports + SCHEMAS_DIR definition + EvalSchemaError class+init+super+self.errors + Draft202012Validator/iter_errors/sorted calls + no main_block/yield/async/walrus/global/top-level lambda/sleep/hardcoded/print/logging/unlink/subprocess + docstring mentions Schema/app.schema + 4 user definitions）；**signatures 第七批**（_schema_path 1 param + load_schema 1 param + validate 2 params + validate_file 2 params + EvalSchemaError __init__ 3 params + all funcs FunctionType + __module__ eq）；**module 合理性第七批**（__all__ exact 5 items + docstring starts with Chinese + file endswith + name eq + 4 user functions + 1 user class + function names exact + no suspicious top-level patterns）；**端到端集成第七批**（load then validate success/failure + validate_file with disk JSON + idempotent + caught as Exception + str representation + errors dict keys + full workflow unknown schema + no unexpected exception + chained from other + str path + full chain manifest workflow + each schema dict has properties + no errors arg + empty errors list + raised in loop + path includes documents index + serializable errors）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges27.py`（176 测试）
+
+### 覆盖要点
+- **EvalSchemaError 行为深度第七批**：12 测试
+- **load_schema 行为深度第七批**：10 测试
+- **validate 行为深度第七批**：16 测试
+- **validate_file 行为深度第七批**：11 测试
+- **_schema_path 行为深度第七批**：7 测试
+- **SCHEMAS_DIR 常量深度第七批**：12 测试
+- **module source forbidden tokens 第十一批**：25 测试
+- **module source 字符串精确补强第七批**：28 测试
+- **signatures 第七批**：22 测试
+- **module 合理性第七批**：13 测试
+- **端到端集成第七批**：20 测试
+
+### 撞墙记录
+- 0 fail 首次跑（176 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 379 后）：44748 pass / 0 fail / 19 skip（HEAD `6b7f8d8`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第三十六轮
+  - evaluation/report.py 第二十五轮
+  - evaluation/runner.py 第三十七轮
+  - evaluation/cli.py 第三十六轮
+  - evaluation/manifest.py 第三十六轮
+  - evaluation/annotation_metrics.py 第三十六轮
+  - evaluation/schema.py 第二十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges27 已饱和（11 角度）。下一轮选 evaluation/metrics.py 第三十六轮，覆盖 compute_automatic_metrics / _pdf_locator_ratio / _docx_locator_ratio / _image_resource_ratio / _chunk_reference_ratio / _text_preservation / _heading_boundary_ratio / _silent_drop_count / _is_valid_bbox / _strip_unicode_whitespace 行为深度第八批。
+
+---
+
 ## Round 378 — evaluation/annotation_metrics.py 第三十五轮（142 测试）
 
 ### 目标
