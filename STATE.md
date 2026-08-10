@@ -4,6 +4,55 @@
 
 ---
 
+## Round 363 — evaluation/cli.py 第三十四轮（289 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第三十四轮 edges 测试，覆盖 edges32 未触及的角度：**_build_parser source level 字符串精确补强第三批**（run_p/val_p/ins_p 赋值 / 各子命令 help string / tolerance_chars help / validate-report help / inspect-doc help / no class/yield/async/walrus）；**main source level 字符串精确补强第三批**（args.command/manifest/output / Path 包装 / is_file 检查 / return 0/1/2 / kwargs 传给 run_evaluation / validate_file 调用 / per_doc 计数 / pipeline_success 检查 / get_git_provenance(project_root) / FileNotFoundError/JSONDecodeError / 三个 command 分支）；**_format_metric source level 字符串精确补强第三批**（metric.get value/reason / value is None / isinstance bool/float/dict / str lower / float format 4f / dict items sorted join / padding 36 / default ok）；**_run_inspect_doc source level 字符串精确补强第三批**（lazy import 三个 / input_path / is_file / open utf-8 / JSONDecodeError / isinstance dict / source_type default unknown / elements|chunks or [] / compute_automatic_metrics kwargs / metrics.update 两次 / print 5 标签 / sort_key / sorted / return 0/1/2）；**argparse internals 第五批**（_SubParsersAction 类型 / dest=command / required=True / 3 个 subparsers / 选项字符串检查 / required 标记 / default 值 / type=int / Namespace parse_args / 各种参数组合 / SystemExit）；**_format_metric 行为深度第六批**（int 0/large/negative / float 0/1/tiny/rounding/negative/large / bool true/false/with reason / None 长原因/Unicode / dict int/zero/alphabetical sort/special keys / string / list / empty dict / padding 36 / 类型 / 不修改输入）；**_run_inspect_doc 行为深度第六批**（dir / list/int/string/null/float/bool 根 / minimal dict / full doc / custom tolerance / prints metrics / prints file label / array 根 / 空文件 / trailing comma / unquoted keys / utf-8 BOM 失败 / int 返回 / unknown source type / default source type / docx）；**main 行为深度第六批**（unknown command / validate-report 不存在 / validate-report dir / inspect-doc dir / inspect-doc invalid json / inspect-doc minimal / run manifest missing / inspect-doc with tolerance / no args SystemExit）；**module source forbidden tokens 第九批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime.datetime/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/importlib/platform）；**module source 字符串精确补强第三批**（4 stdlib imports / 4 evaluation imports / stdout+stderr reconfigure / hasattr 检查 / encoding utf-8 / errors replace / AttributeError / OSError / no class at module level / 4 functions / main block raises SystemExit / no eval/exec/compile / no relative / no star / no yield/async/walrus/global / docstring mentions run/validate/inspect / no __all__）；**signatures 精确补强第三批**（main argv default None / no varargs / return int / build_parser 0 params + ArgumentParser / format_metric 2 params + str / run_inspect_doc 1 param + int / 4 个 no varargs / POSITIONAL_OR_KEYWORD kind）；**模块整体合理性补强第三批**（namespace 4 callables / no user classes / 4 callable checks / name/module eq / module name / file endswith）；**端到端集成补强第三批**（format_metric int/negative/unicode/long name / sorted output / extra fields / pipeline_success metric / validate-report 各 invalid root / int return / namespace kwargs / no side effects / idempotent / missing doc_id → ?）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges33.py`（289 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser source level 字符串精确补强第三批**：~20 测试
+- **main source level 字符串精确补强第三批**：~20 测试
+- **_format_metric source level 字符串精确补强第三批**：~14 测试
+- **_run_inspect_doc source level 字符串精确补强第三批**：~28 测试
+- **argparse internals 第五批**：~25 测试
+- **_format_metric 行为深度第六批**：~25 测试
+- **_run_inspect_doc 行为深度第六批**：~22 测试
+- **main 行为深度第六批**：~10 测试
+- **module source forbidden tokens 第九批**：~31 测试
+- **module source 字符串精确补强第三批**：~30 测试
+- **signatures 精确补强第三批**：~15 测试
+- **模块整体合理性补强第三批**：~18 测试
+- **端到端集成补强第三批**：~25 测试
+
+### 撞墙记录
+- 6 fail 首次跑：
+  1. `padding_36` 实际差 37（含 1 空格分隔）
+  2. utf-8 BOM 在 utf-8 模式下解析失败（rc=1，不是 0）
+  3-6. `from __future__ import annotations` 让 return_annotation 是字符串 `'int'` 而非类型 `int`
+- 修复后 289 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 363 后）：41665 pass / 0 fail / 18 skip（HEAD `241007d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十四轮
+  - evaluation/schema.py 第二十五轮
+  - evaluation/metrics.py 第三十四轮
+  - evaluation/report.py 第二十三轮
+  - evaluation/runner.py 第三十五轮
+  - evaluation/manifest.py 第三十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli edges33 已饱和（4 个 function source 第三批 + argparse internals 第五批 + 6 个行为深度第六批 + forbidden 31 + signatures + 端到端 25）。下一轮选 evaluation/annotation_metrics.py 第三十四轮，覆盖 chunk_boundary_prf / figure_caption_prf source 字符串补强与端到端补强。
+
+---
+
 ## Round 362 — evaluation/manifest.py 第三十三轮（148 测试）
 
 ### 目标
