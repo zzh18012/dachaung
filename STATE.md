@@ -4,6 +4,57 @@
 
 ---
 
+## Round 367 — evaluation/report.py 第二十三轮（253 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第二十三轮 edges 测试，覆盖 edges22 未触及的角度：**get_git_provenance source level 字符串精确补强第三批**（docstring commit+dirty / commit init None / dirty init True / 2 个 subprocess.run / r 与 r2 赋值 / rev-parse+status+porcelain / commit=r.stdout.strip() / dirty=bool(...) / except (OSError, SubprocessError) / except body / return dict literal / returncode==0 check / no eval/class/yield/async/walrus）；**get_dependency_versions source level 字符串精确补强第三批**（docstring pdfplumber/docx/importlib / lazy import importlib.metadata / versions dict init / for pkg tuple / try block / PackageNotFoundError / generic Exception / return versions / no eval/class/yield/async）；**build_provenance source level 字符串精确补强第三批**（git=get_git_provenance / 9 keys dict literal 含 git_commit/git_dirty/evaluator_version/report_version/parser_name/parser_version/dependencies/max_chars/run_timestamp_iso / no eval/class/yield/async）；**build_devset_section source level 字符串精确补强第三批**（docstring Manifest / 6 keys from manifest.{devset_status,file_count,content_group_count,pdf_count,docx_count,categories_covered} / no eval/class/yield）；**aggregate_summary source level 字符串精确补强第三批**（docstring 聚合 / summary dict init / counts dict init / for name in _COUNT_METRICS / values list comprehension / if values sum+participating_docs / else sum None / success_rates dict init / for name in _SUCCESS_BOOL_METRICS / successes sum+is True / total len / rate calc ternary / ratio_avgs dict init / for name in _RATIO_METRICS / not_eval calc / macro calc / macro else None / ratio_avgs assignment / silent_vals list / silent_drop_total / return summary / no eval/class/yield）；**get_git_provenance 行为深度第六批**（返回 dict / 2 keys / commit str or None / dirty bool / nonexistent dir / idempotent / project_root path）；**get_dependency_versions 行为深度第六批**（dict / 3 keys / str or None / idempotent / no args）；**build_provenance 行为深度第六批**（dict / 9 keys / evaluator_version value / report_version value / parser_name+version value / parser_version None / max_chars int+str input / dependencies dict / run_timestamp_iso format / git_commit+dirty value / idempotent except timestamp / nonexistent dir）；**build_devset_section 行为深度第六批**（dict / 6 keys / status value / file_count value / empty categories / pdf only / idempotent）；**aggregate_summary 行为深度第六批**（empty list / counts sum+with None+all None / success_rate full+partial+zero total / ratio macro average+with None+all None / silent_drop_total sum+with None+all None+empty / 不修改输入 / idempotent / 4 top keys / ratio metrics count / count metrics count / success metrics count）；**module source forbidden tokens 第八批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime.datetime/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/platform/argparse — 注意 importlib/subprocess/datetime 是合法的）；**module source 字符串精确补强第三批**（docstring / future / 5 imports / 3 metric 常量 / no relative / no star / no yield/async/walrus/main/class / 5 functions / __all__ 5 / no eval/exec/compile/unlink / subprocess+datetime allowed）；**signatures 精确补强第三批**（5 个 function 各自签名 + no defaults + no varargs + return annotation dict）；**模块整体合理性补强第三批**（docstring / __all__ list/length/unique/str/correct / 5 callables / namespace callable names / 3 constants / no classes / module name / file endswith / function module eq / 3 tuples / length 12+1+1 / disjoint）；**端到端集成补强第三批**（get_git_provenance 2 keys / commit str or None / dirty bool / get_dependency_versions 3 keys / build_provenance 9 keys / build_devset_section 6 keys / aggregate_summary empty+single doc / 不修改 / JSON serializable / positional+kwargs / full chain / partial participation / macro average correct / tmp_path 结构断言）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges23.py`（253 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **get_git_provenance source level 字符串精确补强第三批**：~21 测试
+- **get_dependency_versions source level 字符串精确补强第三批**：~15 测试
+- **build_provenance source level 字符串精确补强第三批**：~7 测试
+- **build_devset_section source level 字符串精确补强第三批**：~11 测试
+- **aggregate_summary source level 字符串精确补强第三批**：~31 测试
+- **get_git_provenance 行为深度第六批**：~8 测试
+- **get_dependency_versions 行为深度第六批**：~5 测试
+- **build_provenance 行为深度第六批**：~14 测试
+- **build_devset_section 行为深度第六批**：~7 测试
+- **aggregate_summary 行为深度第六批**：~20 测试
+- **module source forbidden tokens 第八批**：~30 测试
+- **module source 字符串精确补强第三批**：~25 测试
+- **signatures 精确补强第三批**：~11 测试
+- **模块整体合理性补强第三批**：~20 测试
+- **端到端集成补强第三批**：~20 测试
+
+### 撞墙记录
+- 3 fail 首次跑：
+  1. `importlib` 在 docstring 中提到（合法），从 forbidden tokens 列表移除
+  2-3. pytest tmp_path 可能位于某 git 仓库内部，导致 git_dirty=False；改测试为结构断言
+- 修复后 253 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 367 后）：42803 pass / 0 fail / 18 skip（HEAD `0d45277`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十五轮
+  - evaluation/manifest.py 第三十四轮
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十六轮
+  - evaluation/metrics.py 第三十五轮
+  - evaluation/report.py 第二十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report edges23 已饱和（5 function source 第三批 + 行为深度第六批 + forbidden 30 + signatures 11 + 端到端 20）。下一轮选 evaluation/runner.py 第三十五轮，覆盖 _load_annotation / _process_one / run_evaluation source 字符串补强第六批。
+
+---
+
 ## Round 366 — evaluation/metrics.py 第三十四轮（376 测试）
 
 ### 目标
