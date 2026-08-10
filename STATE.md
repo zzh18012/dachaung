@@ -14789,3 +14789,45 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KS6（evaluation/runner.py 第十九轮，227 行）继续推 evaluation。
 
 ---
+
+## Round 273 — evaluation/runner.py 第十九轮（118 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第十九轮 edges 测试，覆盖 edges18 未触及的角度：_load_annotation source-level token（'path is None or not path.is_file()'/'encoding="utf-8"'/'except (OSError, json.JSONDecodeError)'/'return None' ≥2/'json.load(f)'/'path.open('/不含 print/logging）；_process_one source-level token（'"_per_doc"'/doc.doc_id/'out_stub.parent.mkdir(parents=True, exist_ok=True)'/'time.perf_counter()' ≥2/process_single(/write_json=False/doc.resolved_path/'image_output_dir_for(out_stub, document.source_hash)'/'out_stub.unlink()'/'except OSError:'/'"unknown"'/"process_single returned None without errors"/'errors[0].to_dict()'/'image_dir: Path | None = None'/return ≥3/不含 print/logging/subprocess）；run_evaluation source-level token（'output_root.mkdir(parents=True, exist_ok=True)'/'parser_version_for_prov'/'if parser_version and not parser_version_for_prov:'/'per_doc_results: list[dict[str, Any]] = []'/'for doc in manifest.documents:'/compute_automatic_metrics(/'image_base_dir='/'_load_annotation(doc.annotation_resolved)'/'figure_caption_prf(document, annotation)'/'chunk_boundary_prf(/'tolerance_chars=tolerance_chars'/'metrics.update(' ≥2/'chunk_b.pop("_tolerance_chars", None)'/'chunk_b.pop("_missing_markers", None)'/'"_annotation_present": annotation is not None'/'"_tolerance_chars":'/'"_missing_markers":'/'for ef in manifest.expected_failures:'/ef.resolved_path/'actual_code = errors[0].code if errors else None'/'"matches": actual_code == ef.expected_error_code'/build_provenance(/build_devset_section(manifest)/aggregate_summary(per_doc_results)/'public_per_doc = []'/report 6 keys 字段精确/'json.dump(report, f, ensure_ascii=False, indent=2)'/'"wall_time_seconds":'/'"total": total_seconds'/'"parse": None'/'"chunk": None'/'"parse_reason": "not_instrumented"'/'"chunk_reason": "not_instrumented"'/'return report'/不含 print/logging/subprocess/concurrent.futures）；模块 imports 精确字符串（4 个 evaluation 子模块 import）；import 顺序（__future__→json→time→pathlib→typing→app.pipeline→evaluation→evaluation.annotation_metrics→evaluation.metrics→evaluation.report）；__all__ 精确；namespace has；签名精确（5 params；3 keyword-only；2 positional-or-keyword）；docstring 含 total/perf_counter/not_instrumented/pipeline_failed/image_resource 或 image_output_dir/pipeline；run_evaluation 行为（top-level 6 keys 顺序；empty manifest → per_doc=[]；devset keys；summary 4 buckets；provenance 含 4 必需 keys；expected_failures list；report_version is str；写盘 JSON 可解析；ensure_ascii=False → 无 \u 转义；indent=2 → 含 \n 与 "  "；两次调用独立 dict）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges19.py`（118 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation source token**：含 'path is None or not path.is_file()'/'encoding="utf-8"'/'except (OSError, json.JSONDecodeError)'/'return None' ≥2/'json.load(f)'/'path.open('；不含 print/logging
+- **_process_one source token**：含 '"_per_doc"'/doc.doc_id/'out_stub.parent.mkdir(parents=True, exist_ok=True)'/'time.perf_counter()' ≥2/process_single(/write_json=False/doc.resolved_path/'image_output_dir_for(out_stub, document.source_hash)'/'out_stub.unlink()'/'except OSError:'/'"unknown"'/"process_single returned None without errors"/'errors[0].to_dict()'/'image_dir: Path | None = None'/return ≥3；不含 print/logging/subprocess
+- **run_evaluation source token**：含 output_root mkdir/parser_version_for_prov 收集/per_doc_results list init/documents loop/compute_automatic_metrics 调用/image_base_dir kwarg/_load_annotation 调用/figure_caption_prf 调用/chunk_boundary_prf 调用/metrics.update ≥2/tolerance_record pop/missing_markers pop/_annotation_present field/_tolerance_chars field/_missing_markers field/expected_failures loop/ef.resolved_path/actual_code pattern/matches pattern/build_provenance 调用/build_devset_section 调用/aggregate_summary 调用/public_per_doc loop/report 6 keys 字段精确/json.dump 调用/wall_time_seconds 5 keys（total/parse/chunk/parse_reason/chunk_reason）/return report；不含 print/logging/subprocess/concurrent.futures
+- **模块 imports 精确**：'from app.pipeline import image_output_dir_for, process_single'；'from evaluation import REPORT_VERSION'；'from evaluation.annotation_metrics import' 含 chunk_boundary_prf/figure_caption_prf；'from evaluation.metrics import compute_automatic_metrics'；'from evaluation.report import' 含 aggregate_summary/build_devset_section/build_provenance
+- **import 顺序**：__future__→json→time→pathlib→typing→app.pipeline→evaluation→evaluation.annotation_metrics→evaluation.metrics→evaluation.report 位置递增
+- **__all__ 精确**：m.__all__ == ['run_evaluation']；is list type
+- **namespace**：含 _load_annotation/_process_one/run_evaluation/REPORT_VERSION/time/json/Path/Any；不含 subprocess/logging/os/asyncio/threading
+- **签名精确**：_load_annotation 1 param 名 path；_process_one 4 params（doc/output_root/parser_name/max_chars）；run_evaluation 5 params（manifest/output_path/parser_name/max_chars/tolerance_chars）；3 keyword-only；2 positional-or-keyword
+- **docstring**：含 total/perf_counter/not_instrumented/pipeline_failed/image_resource 或 image_output_dir/pipeline
+- **run_evaluation 行为**：top-level 6 keys 顺序 ['report_version','provenance','devset','summary','per_doc','expected_failures']；empty manifest → per_doc=[]；devset 含 status/file_count；summary 4 buckets（counts/success_rates/ratio_macro_averages/silent_drop_total）；provenance 含 evaluator_version/report_version/parser_name/max_chars；expected_failures 是 list；report_version 是 str == REPORT_VERSION；写盘 JSON 可重新解析；ensure_ascii=False → 无 \u 转义；indent=2 → 含 \n 与 "  "；两次调用独立 dict（per_doc/provenance 不共享）
+
+### 撞墙记录
+- 12 fail 首次跑（已修复）：
+  - test_run_evaluation_signature_param_count_4：实际 5 params（manifest/output_path/parser_name/max_chars/tolerance_chars）；改为 count==5
+  - 11 个 Manifest 构造错误：file_count 等是 property 不是 ctor 参数；用 _make_empty_manifest helper 正确构造 Manifest(manifest_version/devset_status/documents/expected_failures/project_root)
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 273 后）：24867 pass / 0 fail / 16 skip（HEAD `6328ad5`）
+
+### 下一步建议
+- 候选 KZ6：evaluation/schema.py 第十二轮（80 行）
+- 候选 KT7：evaluation/manifest.py 第十九轮（239 行）
+- 候选 KE7：evaluation/annotation_metrics.py 第十八轮（194 行）
+- 候选 KF7：evaluation/metrics.py 第十八轮（381 行）
+- 候选 KW7：evaluation/report.py 第十九轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KZ6（evaluation/schema.py 第十二轮，80 行，最小模块）继续推 evaluation。
+
+---
