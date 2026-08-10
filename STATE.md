@@ -4,6 +4,46 @@
 
 ---
 
+## Round 341 — evaluation/runner.py 第三十一轮（319 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第三十一轮 edges 测试，覆盖 edges29 未触及的角度：**_load_annotation 行为深度第五批**（array/int/string/bool/null top level / huge dict / trailing comma / single quotes / unclosed brace / HTML entities / binary garbage / newlines only / comment / nested 3 levels / unicode escape）；**_process_one source level 字符串精确补强第二批**（out_stub with _per_doc subdir / parent.mkdir / perf_counter for t0 / process_single with 4 kwargs / elapsed diff / image_output_dir_for / isfile before unlink / unlink in try/except OSError / 5-tuple errors path / 5-tuple unknown / 5-tuple normal / image_dir only if document / doc.doc_id+resolved_path / no yield/async/class/global）；**run_evaluation source level 字符串精确补强第二批**（output_root / mkdir / per_doc_results init / parser_version_for_prov init / for doc in documents / _process_one call / 5-tuple unpacked / cache first parser_version / compute_automatic_metrics / image_base_dir isdir check / _load_annotation / figure_caption_prf / chunk_boundary_prf with tolerance / metrics.update twice / pop _tolerance_chars+missing_markers / per_doc_results.append / per_doc_dict 6 keys / expected_failures loop with ef attrs / process_single call / matches field / build_provenance / build_devset_section / aggregate_summary / public_per_doc loop excludes private keys / report dict 6 keys / out_p Path / open w utf8 / json.dump ensure_ascii=False indent=2 / no yield/async/class/global）；**module source forbidden tokens 第五批**（~140 stdlib）；**module source 字符串精确补强**（imports / docstring mentions / no yield/async/global/class/lambda/main/decorators / 3 def / __all__ 1 entry）；**signatures 精确补强**（_load_annotation 1 param / _process_one 4 params / run_evaluation 5 params + keyword-only marker + 3 defaults）；**模块整体合理性**（namespace / __all__ 1 entry / 2 private / 1 public / no class / callable）；**端到端集成补强**（no_documents 8 个角度 / subdir / loadable / indent=2 / ensure_ascii=False / deterministic / max_chars=1 / tolerance=0 / kreuzberg parser / load_annotation 边界）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges30.py`（319 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 行为深度第五批**：15 测试
+- **_process_one source level 字符串精确补强第二批**：17 测试
+- **run_evaluation source level 字符串精确补强第二批**：~50 测试
+- **module source forbidden tokens 第五批**：~140 测试（parametrize）
+- **module source 字符串精确补强**：~22 测试
+- **signatures 精确补强**：~22 测试
+- **模块整体合理性**：13 测试
+- **端到端集成补强**：18 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - summary 实际结构是 counts/success_rates/ratio_macro_averages/silent_drop_total（不是 total_documents/successful/failed）→ 改成断言含 counts/success_rates keys
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 341 后）：35744 pass / 0 fail / 18 skip（HEAD `0b873eb`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十轮
+  - evaluation/cli.py 第三十一轮
+  - evaluation/annotation_metrics.py 第三十一轮
+  - evaluation/schema.py 第二十二轮
+  - evaluation/metrics.py 第三十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner edges30 已饱和（load 15 + process_one source 17 + run_evaluation source 50 + forbidden 140 + source 22 + signatures 22 + 模块 13 + 端到端 18）。下一轮选 evaluation/manifest.py 第三十轮，覆盖 _is_absolute_like / _has_backslash 数学边界第五批与 content_group_count 算法深度第三批。
+
+---
+
 ## Round 340 — evaluation/metrics.py 第三十轮（387 测试）
 
 ### 目标
