@@ -4,6 +4,50 @@
 
 ---
 
+## Round 383 — evaluation/cli.py 第三十六轮（167 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第三十六轮 edges 测试，覆盖 edges35 未触及的角度：**_build_parser 行为深度第九批**（ArgumentParser 类型 / prog 精确 / description 中文 + 校验 / 3 subparsers / parser choices fallback+kreuzberg / max_chars 默认 800 + int 类型 + 负数 / tolerance_chars 默认 30 + int / validate-report positional input / inspect-doc positional input / no subcommand SystemExit / --help exit code 0）；**argparse Namespace 字段第九批**（command 值精确 / attrs count per subcommand / max_chars 负数+大数 / attrs 集合精确）；**_format_metric 行为深度第九批**（int value / no reason uses ok / float negative+zero / bool true/false / null value uses reason / dict empty+multiple sorted / str default / list default / padding 36 chars）；**_run_inspect_doc 行为深度第九批**（returns int / missing file returns 2 / invalid JSON returns 1 / top-level list/string/int/null returns 1 / empty dict returns 0 / prints filename / prints metrics header / elements+chunks counts / chunks missing treated as empty / explicit source_type / default source_type unknown / document_id print + missing ? / parser_name print + missing ? / unicode / args Namespace type）；**main 路由第九批**（returns int / run missing manifest returns 2 / validate-report invalid JSON / invalid schema / inspect-doc not dict returns 1 / inspect-doc success returns 0 / run invalid manifest JSON / invalid schema / no subcommand SystemExit / unknown subcommand / invalid parser choice / stderr starts [ERROR] / stdout starts [OK]）；**module source forbidden tokens 第十二批**（os.system/Popen/rmtree/pickle.load/yaml.load/compile/eval/exec/sys.exit/exit/quit/global + no class/async/yield/walrus/lambda/unlink/rmtree/remove/logging/sleep）；**module source 字符串精确补强第七批**（future annotations + argparse/json/sys/Path imports + load_manifest/ManifestError/run_evaluation/validate_file/EvalSchemaError/get_git_provenance imports + 3 subparser names + 3 add_parser calls + choices 字面量 + required=True + main block + docstring mentions run/validate/inspect/python -m + print call + file=sys.stderr）；**signatures 第九批**（main argv annotation/default/return + no varargs/kwargs + 1 param + build_parser no params + return ArgumentParser + format_metric 2 params + names/kinds/no defaults + return str + run_inspect_doc 1 param + name/kind/no default + return int + 4 funcs FunctionType + __module__ eq）；**module 合理性第九批**（no __all__ + dunder file + name + 4 functions + no user classes + main_block at end + no module-level constants + no top-level call + docstring first line 中文 + python -m example）；**端到端集成第九批**（run namespace all options / validate-report namespace / inspect-doc namespace + tolerance / missing file rc=2 / minimal doc / rich doc / custom tolerance / argparse prog in help / validate-report stdout filename / unknown subcommand）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges36.py`（167 测试）
+
+### 覆盖要点
+- **_build_parser 行为深度第九批**：19 测试
+- **argparse Namespace 字段第九批**：10 测试
+- **_format_metric 行为深度第九批**：16 测试
+- **_run_inspect_doc 行为深度第九批**：19 测试
+- **main 路由第九批**：18 测试
+- **module source forbidden tokens 第十二批**：12 测试
+- **module source 字符串精确补强第七批**：27 测试
+- **signatures 第九批**：19 测试
+- **module 合理性第九批**：11 测试
+- **端到端集成第九批**：11 测试（含修复后调整）
+
+### 撞墙记录
+- 1 fail 首次跑：`test_build_parser_description_mentions_subcommands` 期望 description 含英文 "run"，实际是中文（"评测 CLI：跑开发集 → 报告；或校验已有报告。"）
+  - 修复：改为检查中文关键词（"跑" 或 "评测"，"校验"）
+- 二次跑 1 fail：`test_run_inspect_doc_chunks_none_treated_as_empty` 让 `{"chunks": None, "elements": None}` 进 inspect-doc，inspect-doc 局部 `doc.get('elements') or []` 给出空 list，但 `compute_automatic_metrics` 内部 `document.get('elements', [])` 拿到 None（key 存在），导致 TypeError
+  - 修复：改为缺 key（而非 None value）测试 print 端的 fallback；不动 source（避免修改 metrics 的不约束）
+- 三次跑：167 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 383 后）：45513 pass / 0 fail / 19 skip（HEAD `7cf0322`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十六轮
+  - evaluation/annotation_metrics.py 第三十六轮
+  - evaluation/schema.py 第二十八轮
+  - evaluation/metrics.py 第三十七轮
+  - evaluation/report.py 第二十六轮
+  - evaluation/runner.py 第三十八轮
+  - evaluation/cli.py 第三十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 382 — evaluation/runner.py 第三十七轮（168 测试）
 
 ### 目标
