@@ -4,6 +4,56 @@
 
 ---
 
+## Round 308 — evaluation/cli.py 第二十五轮（130 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第二十五轮 edges 测试，覆盖 edges23 未触及的角度：**_build_parser 行为深度补强**（3 subparsers 顺序 / run 5 args / validate-report 1 positional / inspect-doc 2 args / parser choices fallback+kreuzberg / default 'fallback' / max-chars type=int default=800 / tolerance-chars type=int default=30）；**_format_metric 行为深度补强**（value None/True/False/0.5/1.0/dict empty/dict non-empty/str/list 各分支；reason None → 'ok'；name 字段 36 字符宽）；**_run_inspect_doc 行为深度补强**（exit 0/1/2 各分支；non-dict top level → exit 1；source_type missing → 'unknown'；elements/chunks missing → 0；source 含 sorted + _sort_key + compute_automatic_metrics + figure_caption_prf + chunk_boundary_prf）；**main run 路径行为深度补强**（manifest 不存在 → exit 2；invalid JSON → exit 1；schema reject → exit 1；args.parser/max_chars/tolerance_chars 透传 run_evaluation；成功 stdout 含 [OK]/documents=/devset_status=）；**main validate-report 路径行为深度补强**（input 不存在 → exit 2；invalid JSON → exit 1；schema fail → exit 1；FileNotFoundError → exit 2；成功 stdout 含 [OK]）；**main inspect-doc 路径行为深度补强**（input 不存在 → exit 2；invalid JSON → exit 1；non-dict → exit 1；--tolerance-chars 透传）；**module __all__ 不存在补强**（cli 没 __all__）；**module source forbidden tokens 补强**（os/re/logging/subprocess/asyncio/threading/collections/math/datetime/itertools/functools/socket/email/html/http/urllib/sqlite3/csv/pickle/tempfile/shutil/glob 21 个）；**module source 含必要 imports**（5 stdlib + 4 evaluation）；**module docstring 深度补强**（含 CLI/run/validate-report/inspect-doc/manifest/报告/单文档）；**Windows stdout reconfigure 块补强**（hasattr/sys.stdout.reconfigure/sys.stderr.reconfigure/except (AttributeError, OSError)）；**__main__ 块补强**（含 if __name__ + raise SystemExit(main())）；**signatures 精确补强**（main 1 param argv default=None return int + no varargs/varkw；_build_parser 0 param return ArgumentParser；_format_metric 2 params return str；_run_inspect_doc 1 param return int）；**module source level 完整补强**（main 含 3 subcommand 分支 + Path + is_file + load_manifest + run_evaluation 5 kwargs + validate_file + get_git_provenance + return 0/1/2；_build_parser 含 ArgumentParser + add_subparsers + 3 add_parser；_format_metric 含 5 分支 + 36 宽 + reason or 'ok'；_run_inspect_doc 含 Path + is_file + isinstance dict + compute 5 kwargs + print 6 行 + return 0/1/2）；**端到端集成补强**（CLI run 完整流程 / CLI validate-report 完整流程 / CLI inspect-doc 完整流程）；**模块整体合理性**（4 module-level function + 无 class + __main__ 块 + __all__ 不存在 + Windows stdout 块）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges24.py`（130 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 行为深度补强**：10 测试
+- **_format_metric 行为深度补强**：12 测试
+- **_run_inspect_doc 行为深度补强**：11 测试
+- **main run 路径行为深度补强**：7 测试
+- **main validate-report 路径行为深度补强**：4 测试
+- **main inspect-doc 路径行为深度补强**：5 测试
+- **module __all__ 不存在补强**：2 测试
+- **module source forbidden tokens 补强**：21 测试
+- **module source 含必要 imports**：9 测试
+- **module docstring 深度补强**：7 测试
+- **Windows stdout reconfigure 块补强**：4 测试
+- **__main__ 块补强**：2 测试
+- **signatures 精确补强**：9 测试
+- **module source level 完整补强**：17 测试
+- **端到端集成补强**：3 测试
+- **模块整体合理性**：5 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_main_validate_report_success_stdout_has_ok` - 手构造的 evaluation-report dict 缺很多 required provenance fields（dependencies/run_timestamp_iso 等）→ 改为先 run 生成 valid report 再 validate
+- 修复后 130 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 308 后）：29877 pass / 0 fail / 16 skip（HEAD `778a1f2`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第二十五轮
+  - evaluation/metrics.py 第二十五轮
+  - evaluation/schema.py 第十七轮
+  - evaluation/runner.py 第二十六轮
+  - evaluation/manifest.py 第二十五轮
+  - evaluation/cli.py 第二十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges24 已饱和（_build_parser / _format_metric / _run_inspect_doc / main 4 函数行为深度 + Windows stdout + __main__ + source level + signatures + 端到端 + 模块整体）。下一轮选 evaluation/annotation_metrics.py 第二十五轮，覆盖 figure_caption_prf 始终 null 行为深度 + chunk_boundary_prf 5 分支算法深度补强。
+
+---
+
 ## Round 307 — evaluation/manifest.py 第二十四轮（137 测试）
 
 ### 目标
