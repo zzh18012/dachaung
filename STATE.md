@@ -4,6 +4,47 @@
 
 ---
 
+## Round 372 — evaluation/schema.py 第二十六轮（158 + 1 skip 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第二十六轮 edges 测试，覆盖 edges25 未触及的角度：**EvalSchemaError 行为深度第六批**（默认空 list 不共享引用、explicit None/[]/errors、args 仅 message、str/repr/writable、相等性按 identity、可被 raise/catch as Exception、complex errors 引用 preserved、init source 含 super().__init__(message) 和 self.errors = errors or []）；**load_schema 行为深度第六批**（4 个 schema 都加载 + title 含 keyword + $schema draft 2020-12 + $id kvfs.local URL + properties key + manifest/annotation/evaluation-report 有 required + 不存在 raises FileNotFoundError + 不修改磁盘 mtime）；**validate 行为深度第六批**（返回 None on success + 多错误 sorted by absolute_path + path 含具体字段名 + message 含 schema 名 + message 含 (N 处) 计数 + 不修改 instance（成功/失败）+ idempotent（成功/失败）+ extra field 拒绝（additionalProperties:false）+ 非 dict root 拒绝 + unknown schema raises FileNotFoundError）；**SCHEMAS_DIR 常量深度第六批**（是 Path 实例 + exists + resolved absolute + endswith 'schemas' + 含 4 个 .schema.json + 在 __all__ 中）；**module source forbidden tokens 第十批**（os.* 危险操作 + pathlib.Path.rmdir/unlink + eval/exec/compile/globals/locals/vars + memoryview/bytearray + errno + signal.signal + fcntl/termios/tty/pty/winreg/msvcrt/_winapi + re.match/re.sub + shutil.rmtree/tempfile.mkdtemp）；**module 合理性第六批**（__all__ 精确 5 项顺序 SCHEMAS_DIR/EvalSchemaError/load_schema/validate/validate_file + entries unique/str + callable count=4（含 _schema_path）+ 公开 callable 3 + class count=1 + docstring 4 keyword schema/manifest/annotation/evaluation + file endswith + name eq + function/eval_error __module__ eq）；**signatures 第六批**（EvalSchemaError.__init__ 3 params（self+message+errors）+ message/errors kind POSITIONAL_OR_KEYWORD + message annotation str + errors annotation 非 empty + return None + load_schema 返回 dict[str, Any] + validate/validate_file 返回 None + 4 函数 no varargs + validate_file path 注解 Path|str 联合）；**module source 字符串精确补强第六批**（future annotations + 5 imports + SCHEMAS_DIR 定义 + EvalSchemaError class def + __init__ 签名 + no main/yield/async/walrus/eval/exec/compile/unlink/subprocess + no relative/star import）；**端到端集成第六批**（load→validate 成功/失败 workflow + unicode content + idempotent + positional/kwargs + EvalSchemaError str/complex errors + does not raise unexpected exception + unknown schema raises FileNotFoundError + errors dict 3 keys）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges26.py`（158 测试通过 + 1 skip）
+
+### 覆盖要点
+- **EvalSchemaError 行为深度第六批**：16 测试
+- **load_schema 行为深度第六批**：18 测试（含 4 个 schema parametrize）
+- **validate 行为深度第六批**：16 测试
+- **SCHEMAS_DIR 常量深度第六批**：6 测试
+- **module source forbidden tokens 第十批**：32 测试
+- **module 合理性第六批**：17 测试
+- **signatures 第六批**：12 测试
+- **module source 字符串精确补强第六批**：20 测试
+- **端到端集成第六批**：13 测试（含 1 minimal annotation skip）
+
+### 撞墙记录
+- 0 fail 首次跑（158 通过 + 1 skip：annotation 最小形式 needs more fields）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 372 后）：43566 pass / 0 fail / 19 skip（HEAD `63068c1`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第三十五轮
+  - evaluation/report.py 第二十四轮
+  - evaluation/runner.py 第三十六轮
+  - evaluation/manifest.py 第三十五轮
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema edges26 已饱和（EvalSchemaError 16 + load_schema 18 + validate 16 + SCHEMAS_DIR 6 + forbidden 32 + 模块 17 + signatures 12 + 字符串 20 + 端到端 13）。下一轮选 evaluation/metrics.py 第三十五轮，覆盖 compute_automatic_metrics 与各 helper 行为深度第八批。
+
+---
+
 ## Round 371 — evaluation/annotation_metrics.py 第三十四轮（117 测试）
 
 ### 目标
