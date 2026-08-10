@@ -4,6 +4,46 @@
 
 ---
 
+## Round 406 — evaluation/annotation_metrics.py 第三十九轮（108 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第三十九轮 edges 测试，覆盖 edges38 未触及的角度：**figure_caption_prf 行为深度第十二批**（keys 严格 / keys 顺序 / reason 严格 / 与所有输入独立 / dict 不共享 / annotation 多 anchors / 非 dict 输入 / 常量值）；**chunk_boundary_prf 行为深度第十二批**（更多 branch：document=None+tolerance / annotation=None / empty annotation dict / chunks=[] / 单 chunk + anchors / 2 chunks + 0 anchor / 2 chunks 完美匹配 / position before vs after / tolerance=0 严格 / tolerance 极大 / missing marker / 部分 missing / Unicode marker / empty marker / 3 chunks 2 anchors / 默认 tolerance / 4-5 keys 集合 / negative tolerance / 多 chunk 多 anchor 部分匹配 / 一对一匹配）；**module source forbidden tokens 第十五批**；**module source 字符串精确补强第十二批**；**signatures 第十二批**；**module 合理性第十二批**；**端到端集成第十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges39.py`（108 测试）
+
+### 覆盖要点
+- **figure_caption_prf 行为深度第十二批**：9 测试
+- **chunk_boundary_prf 行为深度第十二批**：26 测试
+- **module source forbidden tokens 第十五批**：14 测试
+- **module source 字符串精确补强第十二批**：18 测试
+- **signatures 第十二批**：9 测试
+- **module 合理性第十二批**：10 测试
+- **端到端集成第十二批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_chunk_boundary_prf_empty_chunks_no_predicted_reason_batch12 — chunks=[] + 有 anchors 时 recall = _ratio(0.0) 不是 null）。修复：分开断言。
+- 第二次跑：1 fail（test_annotation_metrics_source_no_fstring_batch12 — 函数名 figure_caption_prf 包含 f" 字符）。修复：检测 'f{' 真正 f-string 模式。
+- 第三次跑：1 fail（test_e2e_combined_chain_minimal_annotation_batch12 — {} falsy 走 no_annotation 分支）。修复：用 {"other_key": "v"} 让 annotation truthy。
+- 第四次跑：108 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 406 后）：49144 pass / 0 fail / 19 skip（HEAD `fabc65e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第三十一轮
+  - evaluation/metrics.py 第四十一轮
+  - evaluation/report.py 第二十九轮
+  - evaluation/runner.py 第四十一轮
+  - evaluation/cli.py 第四十轮
+  - evaluation/manifest.py 第四十轮
+  - evaluation/annotation_metrics.py 第四十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 405 — evaluation/manifest.py 第三十九轮（155 测试）
 
 ### 目标
