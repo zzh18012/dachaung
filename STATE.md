@@ -4,6 +4,51 @@
 
 ---
 
+## Round 401 — evaluation/metrics.py 第四十轮（209 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第四十轮 edges 测试，覆盖 edges37 未触及的角度：**helpers 行为深度第十批**（_null/_ratio/_bool_metric/_int_metric 更多边界，errors 模式、Unicode reason、None reason、不同 truthy/falsy 值）；**compute_automatic_metrics 行为深度第十批**（返 dict/14 keys/pipeline_success false/true/error extracted/no error/no error_code/不 mutate doc/不 mutate error/idempotent/kwargs/positional/element_count_total/element_count_by_type）；**pdf/docx locator 第十批**（locator 缺失/None/各种 bbox 完整性）；**image_resource_ratio**；**chunk_reference_ratio**；**text_preservation**（Counter 多集差集边界）；**heading_boundary_ratio**；**silent_drop_count**（无 expectations → null）；**_is_valid_bbox**（更多 falsy 类型）；**_strip_unicode_whitespace**（更多 Unicode whitespace 类型）；**module source forbidden tokens 第十四批**；**module source 字符串精确补强第十批**；**signatures 第十批**；**module 合理性第十批**；**端到端集成第十批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges38.py`（209 测试）
+
+### 覆盖要点
+- **helpers 行为深度第十批**：16 测试
+- **compute_automatic_metrics 行为深度第十批**：21 测试
+- **pdf/docx locator 第十批**：20 测试
+- **image_resource_ratio**：10 测试
+- **chunk_reference_ratio**：6 测试
+- **text_preservation**：10 测试
+- **heading_boundary_ratio**：6 测试
+- **silent_drop_count**：10 测试
+- **_is_valid_bbox**：17 测试
+- **_strip_unicode_whitespace**：15 测试
+- **module source forbidden tokens 第十四批**：16 测试
+- **module source 字符串精确补强第十批**：15 测试
+- **signatures 第十批**：15 测试
+- **module 合理性第十批**：10 测试
+- **端到端集成第十批**：10 测试
+
+### 撞墙记录
+- 首次跑：209 全通过（无 fail）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 401 后）：48477 pass / 0 fail / 19 skip（HEAD `517dee2`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第二十八轮
+  - evaluation/runner.py 第四十轮
+  - evaluation/cli.py 第三十九轮
+  - evaluation/manifest.py 第三十九轮
+  - evaluation/annotation_metrics.py 第三十九轮
+  - evaluation/schema.py 第三十一轮
+  - evaluation/metrics.py 第四十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 400 — evaluation/schema.py 第三十轮（145 测试）
 
 ### 目标
