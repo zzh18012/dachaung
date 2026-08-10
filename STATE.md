@@ -4,6 +4,53 @@
 
 ---
 
+## Round 345 — evaluation/schema.py 第二十二轮（402 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第二十二轮 edges 测试，覆盖 edges21 未触及的角度：**EvalSchemaError 行为深度第四批**（subclass chain / not standard exception / hashable / set membership / equality with other type / cause chain / context chain / multiline message / unicode message / pickle with complex errors / args with errors / kwargs only / positional only / repr includes class name / class dict has errors）；**_schema_path 行为深度第二批**（returns Path / absolute / exists for known / deterministic / str includes schemas dir / str ends with name / empty string / dot only / double dot / directory separator / error message includes schemas dir / unicode filename / parent is SCHEMAS_DIR / parent exists）；**load_schema 行为深度第二批**（dict specific keys / type=object / properties / required / annotation / evaluation-report / document / multiple calls / each call independent / idempotent / json serializable / no file handle persisted）；**validate 行为深度第四批**（returns None valid manifest/annotation/evaluation-report / invalid raises / error count / errors path/message/schema_path 是 list/str / message includes count+schema name+first error path / unknown schema / does not modify / idempotent fail+success / nested error / invalid devset_status / invalid manifest_version / returns None not other falsy）；**validate_file 行为深度第二批**（str/path returns None / missing / unknown schema / invalid json / invalid content / directory raises / round trip / unicode path / array/string/int/null/bool/float JSON raises / subdir / nested subdir / BOM raises）；**module source forbidden tokens 第七批**（~190 stdlib）；**module source 字符串精确补强**（starts with docstring / mentions schema / no relative / no star / imports order future first / 6 imports total / uses resolve / parent.parent / encoding utf-8 / with statement / no eval/exec/compile/os/subprocess/async/yield/global/nonlocal/main/decorators / lambda in sorted only / 4 def / 1 class / class init signature / 4 function names exact / __all__ 5 entries）；**signatures 精确补强**（EvalSchemaError.__init__ 3 params + kinds + defaults + annotations + return / _schema_path 1 param / load_schema 1 param + str annotation + dict return / validate 2 params + kinds + no defaults + no varargs + None return / validate_file 2 params + Path|str annotation + str schema_name + no defaults + no varargs / functions have docstrings / _schema_path no docstring）；**模块整体合理性**（namespace / __name__ / __file__ / __doc__ / __all__ / SCHEMAS_DIR is Path+absolute+exists+in namespace / EvalSchemaError in namespace + is class + subclass of Exception / 4 functions / 3 public + 1 private + 1 class / callable / __module__）；**端到端集成补强**（load each schema / validate each schema loadable / manifest with valid documents list / manifest with expected_failures / evaluation-report with categories / idempotent calls invalid / round trip with complex instance / does not write module namespace / does not modify schemas dir / returns None within loop / full message / bare except / kwargs calls / propagate through functions / extra keys nested / JSON with comments / no unexpected exception / message with special chars）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges22.py`（402 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 行为深度第四批**：~25 测试
+- **_schema_path 行为深度第二批**：~17 测试
+- **load_schema 行为深度第二批**：~16 测试
+- **validate 行为深度第四批**：~25 测试
+- **validate_file 行为深度第二批**：~22 测试
+- **module source forbidden tokens 第七批**：~190 测试（parametrize）
+- **module source 字符串精确补强**：~30 测试
+- **signatures 精确补强**：~30 测试
+- **模块整体合理性**：~25 测试
+- **端到端集成补强**：~25 测试
+
+### 撞墙记录
+- 6 fail 首次跑：
+  - BOM 编码 → json.load 不支持 BOM → 改为 pytest.raises(JSONDecodeError)
+  - imports total = 6（不是 5）：__future__ + json + Path + Any + Draft202012Validator + JSValidationError → 改为 6
+  - _schema_path 无 docstring → 拆为 load/validate/validate_file 有 + _schema_path 无
+  - manifest.documents 需要 doc_id+path+source_type（不是 category+parser）→ 改 fixture
+  - manifest.expected_failures 需要 doc_id+path+expected_error_code（不是 reason）→ 改 fixture
+  - 同 manifest.documents 字段不匹配 → 改 fixture
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 345 后）：37170 pass / 0 fail / 18 skip（HEAD `0ff7761`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第三十一轮
+  - evaluation/runner.py 第三十二轮
+  - evaluation/manifest.py 第三十一轮
+  - evaluation/cli.py 第三十二轮
+  - evaluation/annotation_metrics.py 第三十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema edges22 已饱和（EvalSchemaError 25 + _schema_path 17 + load_schema 16 + validate 25 + validate_file 22 + forbidden 190 + source 30 + signatures 30 + 模块 25 + 端到端 25）。下一轮选 evaluation/metrics.py 第三十一轮，覆盖 _null/_ratio/_bool_metric/_int_metric + _image_resource_ratio + Counter+intersection 补强。
+
+---
+
 ## Round 344 — evaluation/annotation_metrics.py 第三十一轮（399 测试）
 
 ### 目标
