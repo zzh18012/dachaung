@@ -4,6 +4,48 @@
 
 ---
 
+## Round 324 — evaluation/runner.py 第二十八轮（145 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第二十八轮 edges 测试，覆盖 edges26 未触及的角度：**_load_annotation 行为深度补强**（BOM 触发 JSONDecodeError → 返回 None / 各种 JSON 顶层类型：dict/array/null/number/string/bool / 多元素 array / 深嵌套 dict / unicode 键 / 浮点值 / 科学计数法 / 负数）；**run_evaluation 输出格式精确补强**（6 个 section 集合不变量 / report_version 与 REPORT_VERSION 常量一致 / 各 section 类型精确 / indent=2 缩进 / ensure_ascii=False / 创建 output_root 父目录）；**_process_one source level 字符串精确补强**（signature 含 doc+output_root+parser_name+max_chars 无 default / out_stub = output_root / "_per_doc" / f"{doc.doc_id}.json" / parent.mkdir parents=True exist_ok=True / perf_counter 调用前后 / process_single 含 write_json=False / image_dir: Path | None = None / image_output_dir_for 调用 / unlink try except OSError / 3 个 return paths / errors path 含 errors[0].to_dict() / document None path 含 "code":"unknown" / 正常 return 含 5-tuple）；**run_evaluation source level 字符串精确补强**（keyword-only marker `*,` / 3 个 keyword args 默认值 / output_root = Path(output_path).parent / per_doc_results list init / parser_version_for_prov init / for doc in manifest.documents / process_one call / parser_version capture logic / compute_automatic_metrics / figure_caption_prf + chunk_boundary_prf / metrics.update × 2 / chunk_b.pop × 2 / per_doc_results.append / for ef in manifest.expected_failures / build_provenance / build_devset_section / aggregate_summary / public_per_doc loop / report dict 含 6 keys / out_p.open w utf-8 / json.dump ensure_ascii=False indent=2 / return report / 只 1 个 return report）；**module source forbidden tokens 第二批**（32 个 stdlib 模块：copy/pprint/csv/xml/configparser/argparse/inspect/dis/traceback/warnings/weakref/gc/struct/codecs/unicodedata/string/textwrap/difflib/decimal/fractions/statistics/array/queue/types/math/collections.abc/dataclasses/abc/re/hashlib/secrets/uuid）；**module source 字符串精确补强**（from future / 5 imports / app.pipeline import / 5 个 evaluation imports / __all__ / no yield/global/async/lambda/class/decorators/__main__ / docstring mentions total/pipeline/metrics/image/perf_counter）；**signatures 精确补强**（load_annotation annotation 完整 + POSITIONAL_OR_KEYWORD / process_one 4 params POSITIONAL_OR_KEYWORD / run_evaluation 5 params：前 2 POSITIONAL_OR_KEYWORD 后 3 KEYWORD_ONLY + 3 个默认值 + 前 2 无 default / 4 namespace）；**模块整体合理性**（__all__ 仅 run_evaluation / 是 list / 全 str / 2 private functions / 1 public function / no class / no main）；**端到端集成补强**（完整 cycle 6 sections / 全 keyword args / devset 含 file_count+categories_covered / summary 是 dict / provenance 含 parser_name / schema 校验通过 / reload 文件 / max_chars=0 / tolerance_chars=0 / unknown parser / empty lists / 两次调用结构等价）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges27.py`（145 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 行为深度补强**：13 测试
+- **run_evaluation 输出格式精确补强**：11 测试
+- **_process_one source level 字符串精确补强**：13 测试
+- **run_evaluation source level 字符串精确补强**：25 测试
+- **module source forbidden tokens 第二批**：32 测试（parametrize）
+- **module source 字符串精确补强**：18 测试
+- **signatures 精确补强**：14 测试
+- **模块整体合理性**：8 测试
+- **端到端集成补强**：12 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_e2e_devset_section_independent_of_documents` - devset section 实际无 devset_status 字段（在 devset 顶层之外）→ 改为检查 file_count + categories_covered
+- 修复后 145 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 324 后）：31892 pass / 0 fail / 18 skip（HEAD `8ab70ea`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第二十七轮
+  - evaluation/cli.py 第二十八轮
+  - evaluation/annotation_metrics.py 第二十八轮
+  - evaluation/metrics.py 第二十八轮
+  - evaluation/runner.py 第二十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner edges27 已饱和（_load_annotation 13 + run_evaluation 输出 11 + _process_one source 13 + run_evaluation source 25 + forbidden 32 + source 字符串 18 + signatures 14 + 模块 8 + 端到端 12）。下一轮选 evaluation/manifest.py 第二十七轮。
+
+---
+
 ## Round 323 — evaluation/schema.py 第十九轮（142 测试）
 
 ### 目标
