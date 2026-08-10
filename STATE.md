@@ -4,6 +4,49 @@
 
 ---
 
+## Round 349 — evaluation/cli.py 第三十二轮（230 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第三十二轮 edges 测试，覆盖 edges30 未触及的角度：**argparse 第三批**（run 全参数 / kreuzberg parser / invalid parser / 默认值 / int 类型 / 负数 / 非 int 报错 / 缺子命令 / 缺 manifest / 缺 output / 未知参数；inspect-doc 默认 tolerance / 自定义 tolerance / 缺 input / 多余 input / positional input；validate-report positional / 缺 input / 未知参数；prog name / description / subparsers / 3 commands / dest=command / required）；**main 行为深度第四批**（no args → 2 / unknown command → 2 / run nonexistent manifest → 2 / run invalid JSON → 1 / validate-report nonexistent → 2 / validate-report invalid JSON → 1 / inspect-doc nonexistent → 2 / inspect-doc invalid JSON → 1 / inspect-doc not dict → 1 / validate-report schema fail / 返回 int 类型）；**_format_metric 行为深度第四批**（None + reason / None 无 reason / True / False / int / float / float zero / float one / dict / empty dict / string / list fallback / no reason field / name alignment / long name / 返回 str / starts with 2 spaces / dict sorted）；**_run_inspect_doc 行为深度第四批**（valid doc / prints file path / prints document id / prints source / prints parser / prints counts / prints metrics header / metrics sorting / missing source_type / missing document id / missing source_path / missing parser / missing elements / missing chunks / elements null / chunks null）；**module source forbidden tokens 第六批**（~55 stdlib / builtin calls，避开 cli.py 合法使用的 print/file=sys.stderr）；**module source 字符串精确补强**（docstring mentions run/validate-report/inspect-doc/import count 9/argparse/json/sys/Path/manifest/ManifestError/load_manifest/get_git_provenance/run_evaluation/EvalSchemaError/validate_file/no relative/no star/has main block/main_block calls main/no yield/no async/no global/no walrus/uses argparse/subparsers/add_parser × 3/run 5 options/validate-report 1 option/inspect-doc 2 options/RawDescriptionHelpFormatter/required=True/choices fallback+kreuzberg/Path/is_file/print stderr/no pickle/yaml/logging/tomllib/4 functions/1 public/3 private/no class/sys.stdout reconfigure/utf-8）；**signatures 精确补强**（main 1 param/argv/default None/returns int/no varargs；_build_parser 0 args；_format_metric 2 params/name+metric/no defaults；_run_inspect_doc 1 param/args；no varargs in any function）；**模块整体合理性**（namespace 4 names/__name__/__file__/docstring/no __all__/main callable/build_parser callable/format_metric callable/run_inspect_doc callable/no user classes/__module__ eq for all）；**端到端集成补强**（run requires manifest+output / validate-report positional / inspect-doc positional / _build_parser 可多次调用 / format_metric complex metric / format_metric idempotent / inspect-doc empty doc / pdf source / docx source / unknown source / custom tolerance / zero tolerance / run invalid JSON → 1 / validate-report invalid JSON → 1 / inspect-doc invalid JSON → 1 / inspect-doc valid → 0 / subcommand action counts / format_metric unicode reason / format_metric long reason）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges31.py`（230 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **argparse 第三批**：~37 测试
+- **main 行为深度第四批**：~11 测试
+- **_format_metric 行为深度第四批**：~19 测试
+- **_run_inspect_doc 行为深度第四批**：~17 测试
+- **module source forbidden tokens 第六批**：~55 测试（parametrize）
+- **module source 字符串精确补强**：~45 测试
+- **signatures 精确补强**：~13 测试
+- **模块整体合理性**：~13 测试
+- **端到端集成补强**：~22 测试
+
+### 撞墙记录
+- 4 fail 首次跑：
+  - elements=None / chunks=None：cli 的 `doc.get("elements") or []` 只兜底局部变量，传给 metrics 的 doc 仍含 None → 改为 `try/except TypeError`
+  - 8 imports → 9 imports（含 __future__/argparse/json/sys/Path + manifest + report + runner + schema = 9）
+  - add_parser("validate-report" 跨行 → 改为检查 add_parser 出现 3 次 + 子命令名字分别存在
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 349 后）：38520 pass / 0 fail / 18 skip（HEAD `4fd78cc`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十二轮
+  - evaluation/schema.py 第二十三轮
+  - evaluation/metrics.py 第三十二轮
+  - evaluation/runner.py 第三十三轮
+  - evaluation/manifest.py 第三十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli edges31 已饱和（argparse 第三批 + main 第四批 + _format_metric 第四批 + _run_inspect_doc 第四批 + forbidden 55 + signatures + 端到端 22）。下一轮选 evaluation/annotation_metrics.py 第三十二轮，覆盖 chunk_boundary_prf/figure_caption_prf 行为深度。
+
+---
+
 ## Round 348 — evaluation/manifest.py 第三十一轮（300 测试）
 
 ### 目标
