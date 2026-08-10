@@ -14877,3 +14877,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KE7（evaluation/annotation_metrics.py 第十八轮，194 行）继续推 evaluation。
 
 ---
+
+## Round 275 — evaluation/annotation_metrics.py 第十八轮（149 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第十八轮 edges 测试，覆盖 edges17 未触及的角度：模块 imports 精确字符串（'from collections import Counter'/'from typing import Any'/'from app.chunkers.structural import normalize_text'/'from evaluation.metrics import _null, _ratio'）；import 顺序（__future__→collections→typing→app.chunkers.structural→evaluation.metrics→PARSER_DOES_NOT_EMIT_RELATIONS）；PARSER_DOES_NOT_EMIT_RELATIONS source-level 定义精确；figure_caption_prf source-level token（'reason = PARSER_DOES_NOT_EMIT_RELATIONS'/'return {' 3 keys 字面量；不含 normalize_text 调用/print/subprocess）；三次 _null 调用产生独立 dict（_null 不缓存）；每个 dict 含 value/reason 2 keys；value is None；reason == PARSER_DOES_NOT_EMIT_RELATIONS；不修改 document/annotation；两次调用独立；chunk_boundary_prf source-level token 详尽（'out: dict[str, dict[str, Any]] = {}'/'if document is None:'/'_null("pipeline_failed")'/_null("no_annotation")/'if not chunks or len(chunks) < 2:'/'norm_chunks = [normalize_text(c.get("text") or "") for c in chunks]'/'joined_raw = " ".join(norm_chunks)'/'stream = normalize_text(joined_raw)'/'predicted: list[int] = []'/'find_pos = stream.find(txt, pos)'/'gt_positions: list[int] = []'/'missing_markers: list[str] = []'/'search_from = 0'/'marker = a.get("marker", "")'/'position = a.get("position", "after")'/'find_pos = stream.find(marker, search_from) if marker else -1'/'pairs: list[tuple[int, int, int]] = []'/'used_pred = set()'/'used_gt = set()'/'d = abs(pv - gv)'/'if d <= tolerance_chars:'/'pairs.append((d, pi, gi))'/'pairs.sort(key=lambda x: x[0])'/'matched = 0'/'used_pred.add(pi)'/'used_gt.add(gi)'/'matched += 1'/'num_pred = len(predicted)'/'num_gt = len(gt_positions)'/'p_val = out["chunk_boundary_precision"]["value"]'/'if p_val is None or r_val is None:'/'denom = p_val + r_val'/'if denom <= 0:'/'2 * p_val * r_val / denom'/'out["_tolerance_chars"] = ...'/'out["_missing_markers"] = ...'/'if missing_markers:'）；6 个 reason 常量精确（'pipeline_failed'/'no_annotation'/'no_predicted_boundaries'/'no_ground_truth_anchors'/'no_ground_truth_anchors_in_stream'/'precision_or_recall_not_evaluated'）；不含 print/logging/subprocess/async/threading/os/json import/silent_drop_count/element_count_total/image_resource/pdf_locator/docx_locator/process_single；算法步骤编号 1./2./3./4./5. 注释存在；__all__ 3 entries 顺序精确；namespace has；helper metadata；签名 introspection 详尽；模块 docstring 含 figure-caption/chunk_boundary/P/R/F1/一对一/容差/parser
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges18.py`（149 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块 imports 精确**：4 个 import 语句精确字符串；import 顺序正确
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：source-level 定义精确；value 精确 'parser_does_not_emit_relations'；类型是 str
+- **figure_caption_prf source token**：含 'reason = PARSER_DOES_NOT_EMIT_RELATIONS'；含 3 keys 字面量；不含 normalize_text/print/subprocess
+- **figure_caption_prf 行为**：三次 _null 调用产生独立 dict；每个 dict 含 value/reason 2 keys；value is None；reason == PARSER_DOES_NOT_EMIT_RELATIONS；不修改 document/annotation；两次调用独立
+- **chunk_boundary_prf source token 详尽**：所有关键代码 token 验证（含 50+ source-level 断言）
+- **6 个 reason 常量精确**：'pipeline_failed'/'no_annotation'/'no_predicted_boundaries'/'no_ground_truth_anchors'/'no_ground_truth_anchors_in_stream'/'precision_or_recall_not_evaluated' 都在源码中
+- **不含禁止内容**：print/logging/subprocess/async/threading/os/json import/silent_drop_count/element_count_total/image_resource/pdf_locator/docx_locator/process_single
+- **算法步骤编号**：1./2./3./4./5. 注释都在
+- **__all__**：3 entries 顺序 ['PARSER_DOES_NOT_EMIT_RELATIONS', 'figure_caption_prf', 'chunk_boundary_prf']；不含 _null/_ratio/normalize_text/Counter/Any
+- **namespace**：含 Counter/Any/normalize_text/_null/_ratio/PARSER_DOES_NOT_EMIT_RELATIONS/figure_caption_prf/chunk_boundary_prf；不含 subprocess/logging/os/asyncio/json/threading/Path
+- **chunk_boundary_prf 行为**：document None → 'pipeline_failed' 三 metric + _tolerance_chars；annotation falsy → 'no_annotation' 三 metric；chunks <2 + 无 anchors → 'no_predicted_boundaries' 三 metric；chunks <2 + 有 anchors → precision/f1 是 'no_predicted_boundaries'，recall 是 _ratio(0.0)；有 chunks 无 anchors → 'no_ground_truth_anchors'；不修改 document/annotation；两次调用独立；_tolerance_chars.value 是 int；_missing_markers.value 是 list；完美匹配 → 1.0/1.0/1.0；无匹配 → 0.0/0.0/0.0；value 类型是 float
+- **helper metadata**：figure_caption_prf/chunk_boundary_prf 都是 FunctionType；__module__ == 'evaluation.annotation_metrics'；__qualname__ 精确
+- **签名 introspection**：figure_caption_prf 2 params（document/annotation）无默认值 positional-or-keyword；chunk_boundary_prf 3 params（document/annotation/tolerance_chars），tolerance_chars 默认 30 positional-or-keyword
+- **docstring**：含 figure-caption/chunk_boundary/P/R/F1/一对一/容差/parser
+
+### 撞墙记录
+- 2 fail 首次跑（已修复）：
+  - test_chunk_boundary_prf_chunks_lt_2_returns_no_predicted_boundaries：chunks <2 + 有 anchors → recall 是 _ratio(0.0)（reason None），不是 'no_predicted_boundaries'；拆成两个测试分别测「无 anchors」和「有 anchors」路径
+  - test_chunk_boundary_prf_chunks_lt_2_with_no_anchors_recall_is_zero_ratio：原意错——「无 anchors」路径 recall 是 _null('no_predicted_boundaries')，「有 anchors」才是 _ratio(0.0)；改名为 _with_anchors_recall_is_zero_ratio 并断言正确分支
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 275 后）：25126 pass / 0 fail / 16 skip（HEAD `eb1c504`）
+
+### 下一步建议
+- 候选 KT7：evaluation/manifest.py 第十九轮（239 行）
+- 候选 KF7：evaluation/metrics.py 第十八轮（381 行）
+- 候选 KW7：evaluation/report.py 第十九轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KT7（evaluation/manifest.py 第十九轮，239 行）继续推 evaluation。
+
+---
