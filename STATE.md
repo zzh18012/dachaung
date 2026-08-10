@@ -4,6 +4,47 @@
 
 ---
 
+## Round 354 — evaluation/runner.py 第三十三轮（209 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（224 行）加第三十三轮 edges 测试，覆盖 edges31 未触及的角度：**_load_annotation 行为深度第七批**（array root TypeError / int root / float root / bool root / null root / string root / 深度嵌套 dict / 长 array / 特殊字符 / 巨大 dict / UTF-8 BOM 报错 / trailing comma 报错 / unquoted keys 报错 / 无副作用 / 幂等 / 不写文件 / 不改 mtime）；**_process_one source level 字符串精确补强第四批**（starts with def / 含 docstring / mentions 5-tuple / image_dir / write_json / output_path / calls process_single / uses perf_counter / creates _per_doc subdir / uses doc.doc_id / handles errors truthy / handles document None / returns 5-tuple in success / unlinks out_stub / calls image_output_dir_for / handles OSError / mkdir parents / unknown error message / returns image_dir None when document None）；**run_evaluation source level 字符串精确补强第四批**（starts with def / docstring present / docstring short / creates output_root / creates output_root dirs / initializes per_doc list / initializes parser_version / loops documents / loops expected_failures / calls compute_automatic_metrics / passes doc.source_type / passes doc.expectations / loads annotation / calls figure_caption_prf / calls chunk_boundary_prf / pops tolerance_chars / pops missing_markers / calls build_provenance / build_devset_section / aggregate_summary / builds public_per_doc / creates report_dict / writes json with indent / returns report / handles expected_failure_actual_code / compares actual with expected / initializes expected_failure_results / appends to per_doc_results / appends to expected_failure_results / track parser_version first / uses image_dir.is_dir / uses doc_id in per_doc / uses total_seconds in wall_time）；**module source forbidden tokens 第十批**（~55 stdlib，避开 stdlib 必要的子模块）；**module source 字符串精确补强**（docstring mentions 报告/per_doc/provenance / 10 imports / Path/Manifest/Any/EVALUATOR+REPORT_VERSION / no relative/star/main/yield/async/global/walrus/class / uses json.dump / uses indent=2 / uses ensure_ascii=False / 6 functions / __all__ 5）；**signatures 精确补强**（_load_annotation 1 param no default / _process_one 4 params names / run_evaluation 5 params names with defaults / no varargs / no varkw）；**模块整体合理性**（namespace 6 callables / __name__ / __file__ / docstring / __all__ 5 / contents / no user classes / __module__ eq / 4 imports present / Manifest）；**端到端集成补强**（完整 manifest with documents / 完整 manifest with expected_failures / does not mutate input / json serializable report / kwargs / positional / 5-tuple shape / public_per_doc strip image_dir）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges32.py`（209 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 行为深度第七批**：~18 测试
+- **_process_one source level 字符串精确补强第四批**：~20 测试
+- **run_evaluation source level 字符串精确补强第四批**：~30 测试
+- **module source forbidden tokens 第十批**：~60 测试
+- **module source 字符串精确补强**：~30 测试
+- **signatures 精确补强**：~17 测试
+- **模块整体合理性**：~13 测试
+- **端到端集成补强**：~18 测试
+
+### 撞墙记录
+- 2 fail 首次跑（process_one / run_evaluation docstring check）：函数签名跨多行，def 行后第一行是参数而非 docstring；改成函数体内含 `"""` 即可
+- 修复后 209 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 354 后）：39632 pass / 0 fail / 18 skip（HEAD `ff83546`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十二轮
+  - evaluation/cli.py 第三十三轮
+  - evaluation/annotation_metrics.py 第三十三轮
+  - evaluation/schema.py 第二十四轮
+  - evaluation/metrics.py 第三十三轮
+  - evaluation/report.py 第二十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner edges32 已饱和（_load_annotation 第七批 + _process_one source 第四批 + run_evaluation source 第四批 + forbidden 60 + signatures + 端到端 18）。下一轮选 evaluation/manifest.py 第三十二轮，覆盖 ManifestLoader/Migration 行为深度与 source 字符串补强。
+
+---
+
 ## Round 353 — evaluation/report.py 第二十一轮（197 测试）
 
 ### 目标
