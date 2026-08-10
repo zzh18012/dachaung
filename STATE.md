@@ -4,6 +4,48 @@
 
 ---
 
+## Round 409 — evaluation/report.py 第二十九轮（170 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第二十九轮 edges 测试，覆盖 edges28 未触及的角度：**subprocess.run call signature 验证第十二批**（cwd/capture_output/text/encoding/errors/timeout 实参 / 二次调用 / 单调用 args 验证 / 编码 utf-8 错误 replace）；**get_git_provenance 行为深度第十二批**（empty stdout 且 returncode 0 / stderr 有内容但不影响 stdout / 多次调用独立 / bool returncode 边界 / r2.stdout 全空白字符）；**get_dependency_versions 行为深度第十二批**（packages 顺序固定 / 容器是 dict / 容器是 dict 不是 OrderedDict / 单个 pkg 失败不影响其他 / importlib.metadata 内部导入验证）；**build_provenance 行为深度第十二批**（dependencies 字段调用 get_dependency_versions / max_chars int 截断 / git_commit 来自 get_git_provenance / EVALUATOR_VERSION 与 REPORT_VERSION 来自 evaluation）；**build_devset_section 行为深度第十二批**（字段映射 status←devset_status / 缺失属性 raises AttributeError / 返回 dict 是浅拷贝 / 字段数量固定）；**aggregate_summary 行为深度第十二批**（metric dict 缺 value 键 / metric value 为字符串 / docs list 中含非 dict 元素 raise / 不修改 input / per_doc 缺 metrics 键 → KeyError / silent_drop_count 部分缺失）；**module source forbidden tokens 第十七批**；**module source 字符串精确补强第十四批**；**signatures 第十四批**；**module 合理性第十四批**；**端到端集成第十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges29.py`（170 测试）
+
+### 覆盖要点
+- **subprocess.run call signature 验证第十二批**：12 测试
+- **get_git_provenance 行为深度第十二批**：10 测试
+- **get_dependency_versions 行为深度第十二批**：11 测试
+- **build_provenance 行为深度第十二批**：13 测试
+- **build_devset_section 行为深度第十二批**：14 测试
+- **aggregate_summary 行为深度第十二批**：20 测试
+- **module source forbidden tokens 第十七批**：12 测试
+- **module source 字符串精确补强第十四批**：21 测试
+- **signatures 第十四批**：13 测试
+- **module 合理性第十四批**：19 测试
+- **端到端集成第十四批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_aggregate_summary_per_doc_missing_metrics_key_batch12 — 期望 AttributeError，实际 KeyError，因为代码用 r["metrics"] 不用 r.get("metrics")）。修复：改为 KeyError。
+- 第二次跑：170 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 409 后）：49621 pass / 0 fail / 19 skip（HEAD `79c8c30`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第四十二轮
+  - evaluation/cli.py 第四十一轮
+  - evaluation/manifest.py 第四十轮
+  - evaluation/annotation_metrics.py 第四十轮
+  - evaluation/schema.py 第三十二轮
+  - evaluation/metrics.py 第四十二轮
+  - evaluation/report.py 第三十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 408 — evaluation/metrics.py 第四十一轮（174 测试）
 
 ### 目标
