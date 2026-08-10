@@ -4,6 +4,48 @@
 
 ---
 
+## Round 364 — evaluation/annotation_metrics.py 第三十四轮（233 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第三十四轮 edges 测试，覆盖 edges32 未触及的角度：**figure_caption_prf source level 字符串精确补强第三批**（reason 赋值 / _null 三次 / 三个 metric key / 无 if 分支 / docstring null / 不引用 chunk_boundary）；**chunk_boundary_prf source level 字符串精确补强第三批**（out dict init / document None / for k in / no_annotation / anchors|chunks get / len<2 / no_predicted_boundaries 赋值 / recall 分支 / no_ground_truth_anchors / norm_chunks 用 normalize_text / joined_raw / stream = normalize / predicted list init / enumerate / break / stream.find / find_pos<0 / pos 跳过 / end = find+len / append / pos = end+1 / gt_positions init / missing_markers init / search_from = 0 / for a in anchors / marker default "" / position default "after" / find ternary / missing append / position before / gt_positions before/after append / search_from advance / pairs init / used_pred/used_gt set / 双 for 循环 / d = abs / tolerance 检查 / pairs append tuple / sort lambda / matched=0 / skip used / used_pred.add / used_gt.add / matched+=1 / num_pred/num_gt / precision 分支 / recall 分支 / f1 p_val r_val / None 检查 / denom 计算 / 公式 / tolerance output / missing_markers output）；**figure_caption_prf 行为深度第六批**（返回类型 / 3 keys / dict 嵌套 / value None / reason 常量 / 各分支输入组合 / idempotent / 不修改输入）；**chunk_boundary_prf 行为深度第六批**（document None + full annotation / tolerance recorded / no_annotation / empty dict falsy / truthy 无 anchors / 显式空 anchors / <2 chunks + 无/有 anchors / position before/after / 重复 marker 顺序匹配 / marker not found / empty marker / missing marker key / missing position key / outside tolerance / partial match / tiny tolerance / zero tolerance no match / f1 when p=0 r>0 / 三 chunks / text None / missing text key / tolerance recorded / 不修改 / dict of dicts / value or reason / idempotent / default tolerance / positional / kwargs / no chunks key / no anchors key / both None）；**module source forbidden tokens 第八批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/importlib/platform/subprocess）；**module source 字符串精确补强第三批**（5 imports / future annotations / PARSER_DOES_NOT_EMIT 常量 / 2 functions / no relative / no star / no yield/async/walrus / no main / no class / no eval/exec/compile / no open/unlink/write/print / no sys/os/json/pathlib/argparse/subprocess/logging / docstring mentions / __all__ 3 entries）；**signatures 精确补强第三批**（figure_caption 2 params / 无默认 / no varargs / POSITIONAL_OR_KEYWORD / chunk_boundary 3 params / tolerance default 30 / no varargs / kinds / return annotation 含 dict / 常量 type/value / alias identity）；**模块整体合理性补强第三批**（docstring / __all__ list/length/unique/str/正确 / 2 callables / namespace 含常量 / no user classes / module name / file endswith / function module eq / function name correct / callable count 2）；**端到端集成补强第三批**（figure_caption 各输入组合 / idempotent / 不修改 / positional / chunk_boundary 不修改 / idempotent / positional / kwargs / default / empty chunks list / no chunks key / no anchors key / dict of dicts / value or reason / full pipeline / 三 chunks partial match / 长 chunk / Unicode / whitespace）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges33.py`（233 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf source level 字符串精确补强第三批**：~9 测试
+- **chunk_boundary_prf source level 字符串精确补强第三批**：~60 测试
+- **figure_caption_prf 行为深度第六批**：~17 测试
+- **chunk_boundary_prf 行为深度第六批**：~30 测试
+- **module source forbidden tokens 第八批**：~31 测试
+- **module source 字符串精确补强第三批**：~32 测试
+- **signatures 精确补强第三批**：~14 测试
+- **模块整体合理性补强第三批**：~18 测试
+- **端到端集成补强第三批**：~22 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`callable(obj)` 包括了导入的 Counter/Any/normalize_text/_null/_ratio，要按 FunctionType + __module__ 过滤
+- 修复后 233 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 364 后）：41898 pass / 0 fail / 18 skip（HEAD `055d985`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十五轮
+  - evaluation/metrics.py 第三十四轮
+  - evaluation/report.py 第二十三轮
+  - evaluation/runner.py 第三十五轮
+  - evaluation/manifest.py 第三十四轮
+  - evaluation/cli.py 第三十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges33 已饱和（figure_caption source 第三批 + chunk_boundary source 60+ + 行为深度第六批 + forbidden 31 + signatures + 端到端 22）。下一轮选 evaluation/schema.py 第二十五轮，覆盖 4 个 schema 的 cross-validation 与 EvalSchemaError 行为深度第七批。
+
+---
+
 ## Round 363 — evaluation/cli.py 第三十四轮（289 测试）
 
 ### 目标
