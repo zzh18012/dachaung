@@ -4,6 +4,49 @@
 
 ---
 
+## Round 397 — evaluation/cli.py 第三十八轮（148 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第三十八轮 edges 测试，覆盖 edges37 未触及的角度：**_build_parser 行为深度第十一批**（add_subparsers dest / required / formatter_class / subparser prog / subparsers 注册）；**argparse Namespace 行为第十一批**（Namespace 比较 / repr / getattr fallback / 字段顺序）；**_format_metric 行为深度第十一批**（padding 精确 / dict 边界 / bool 渲染 / 大小数 / Unicode name 渲染）；**_run_inspect_doc 行为深度第十一批**（JSON 顶层类型分支 / 输出格式 / tolerance 透传 / 字段缺失）；**main 路由第十一批**（返回类型 / 错误码边界 / argv=None / 未知 command）；**module source forbidden tokens 第十四批**；**module source 字符串精确补强第九批**；**signatures 第十一批**；**module 合理性第十一批**；**端到端集成第十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges38.py`（148 测试）
+
+### 覆盖要点
+- **_build_parser 行为深度第十一批**：17 测试
+- **argparse Namespace 行为第十一批**：11 测试
+- **_format_metric 行为深度第十一批**：16 测试
+- **_run_inspect_doc 行为深度第十一批**：15 测试
+- **main 路由第十一批**：10 测试
+- **module source forbidden tokens 第十四批**：16 测试
+- **module source 字符串精确补强第九批**：17 测试
+- **signatures 第十一批**：12 测试
+- **module 合理性第十一批**：10 测试
+- **端到端集成第十一批**：10 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_format_metric_padding_exact_36_chars_batch11` — 错误断言 next_non_space - idx == 36，实际格式 `"  {:36} {}  ({})"` 含分隔空格 → 37
+- 1 fail 二次跑：`test_module_source_has_subcommand_validate_report_batch11` — 错误断言 `sub.add_parser("validate-report"` 同行，实际跨行
+- 修复：padding 测试改为精确切片验证 name field 36 chars宽；validate-report 测试放宽只匹配 token
+- 三次跑：148 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 397 后）：47830 pass / 0 fail / 19 skip（HEAD `f09d4e4`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十八轮
+  - evaluation/annotation_metrics.py 第三十八轮
+  - evaluation/schema.py 第三十轮
+  - evaluation/metrics.py 第三十九轮
+  - evaluation/report.py 第二十八轮
+  - evaluation/runner.py 第四十轮
+  - evaluation/cli.py 第三十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 396 — evaluation/runner.py 第三十九轮（131 测试）
 
 ### 目标
