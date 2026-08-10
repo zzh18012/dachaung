@@ -4,6 +4,48 @@
 
 ---
 
+## Round 389 — evaluation/runner.py 第三十八轮（168 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第三十八轮 edges 测试，覆盖 edges36 未触及的角度：**_load_annotation 行为深度第十批**（whitespace-only / JSON with tabs / escaped Unicode / 各种 nested type / null/bool/float/negative/mixed/emoji/long string/long array/trailing newline/leading newline/special chars/Path object input）；**_process_one 行为深度第十批**（write_json=False 透传 / parser_name 透传 / max_chars 透传 / input_path 透传 / document.to_dict 调用 / errors[0].to_dict 调用 / 多 errors 取首 / image_output_dir_for 调用 / out_stub 父目录创建 / stub 存在 unlink / stub 不存在 silent / perf_counter 调用 / total_seconds 正数）；**run_evaluation 行为深度第十批**（默认 kwargs / 创建 _per_doc 子目录 / 排除 _annotation_present / 排除 _tolerance_chars / 排除 _missing_markers / image_dir 传给 metrics / image_dir None 当不存在 / annotation 加载 / expected_failure no errors actual=None / expected_failure with errors / unlink stub / parser_version first wins / parser_version second succeeds / prf metrics 合并 / tolerance_chars 默认 30 / tolerance_chars 自定义 / aggregate_summary 调用 / build_provenance 调用 / build_devset_section 调用 / 深层 output_root 创建）；**module source forbidden tokens 第十五批**；**module source 字符串精确补强第十批**；**signatures 第十批**；**module 合理性第十批**；**端到端集成第十批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges37.py`（168 测试）
+
+### 覆盖要点
+- **_load_annotation 行为深度第十批**：16 测试
+- **_process_one 行为深度第十批**：13 测试
+- **run_evaluation 行为深度第十批**：20 测试
+- **module source forbidden tokens 第十五批**：11 测试
+- **module source 字符串精确补强第十批**：37 测试
+- **signatures 第十批**：28 测试
+- **module 合理性第十批**：15 测试
+- **端到端集成第十批**：13 测试
+
+### 撞墙记录
+- 2 fails 首次跑：
+  1. `test_run_evaluation_image_dir_passed_to_metrics`：fake metrics 返 `{"pipeline_success": True}`（bool），但 aggregate_summary 期望 `{"value": True}` 结构 → AttributeError
+  2. `test_run_evaluation_annotation_prf_metrics_merged`：同样问题，figure_caption_prf fake 返 float 而非 dict
+- 修复：把所有 fake metric 返回值改为 `{"key": {"value": ..., "reason": ...}}` 结构以匹配真实算法
+- 二次跑：168 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 389 后）：46466 pass / 0 fail / 19 skip（HEAD `584b390`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第三十七轮
+  - evaluation/manifest.py 第三十七轮
+  - evaluation/annotation_metrics.py 第三十七轮
+  - evaluation/schema.py 第二十九轮
+  - evaluation/metrics.py 第三十八轮
+  - evaluation/report.py 第二十七轮
+  - evaluation/runner.py 第三十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 388 — evaluation/report.py 第二十六轮（147 测试）
 
 ### 目标
