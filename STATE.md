@@ -4,6 +4,46 @@
 
 ---
 
+## Round 418 — evaluation/cli.py 第四十二轮（119 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第四十二轮 edges 测试，覆盖 edges40 未触及的角度：**_build_parser 边界深度第十四批**（formatter_class / prog / description 文案 / subparser required=True / subparser dest='command' / 各子命令 positional 名）；**argparse 系统级第十四批**（SystemExit code=2 / 缺 required 参数 / 未知短选项 / 未知长选项 / 非整数 max_chars）；**_format_metric 边界深度第十四批**（int 值 / 字符串值 / 字典嵌套 dict / 大数字 / Unicode reason / 长 name 超 36 / metric 是空 dict）；**_run_inspect_doc 边界深度第十四批**（stdout labels / doc 缺 elements / doc 缺 chunks / elements 是 None / doc 缺 source_type / 输入是 list 而非 dict / 输入是 int 而非 dict）；**main 路由深度第十四批**（schema_invalid → 1 / post-validate fail → 1 / inspect-doc JSON 解析失败 → 1 / validate-report schema 失败 → 1）；**module source forbidden tokens 第二十批**；**module source 字符串精确补强第十七批**；**signatures 第十七批**；**module 合理性第十七批**；**端到端集成第十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges41.py`（119 测试）
+
+### 覆盖要点
+- **_build_parser 边界深度第十四批**：13 测试
+- **argparse 系统级第十四批**：7 测试
+- **_format_metric 边界深度第十四批**：10 测试
+- **_run_inspect_doc 边界深度第十四批**：13 测试
+- **main 路由深度第十四批**：7 测试
+- **module source forbidden tokens 第二十批**：16 测试
+- **module source 字符串精确补强第十七批**：25 测试
+- **signatures 第十七批**：11 测试
+- **module 合理性第十七批**：8 测试
+- **端到端集成第十七批**：10 测试
+
+### 撞墙记录
+- 首次跑：119 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 418 后）：50899 pass / 0 fail / 19 skip（HEAD `2f01c39`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第四十一轮
+  - evaluation/annotation_metrics.py 第四十一轮
+  - evaluation/schema.py 第三十三轮
+  - evaluation/metrics.py 第四十三轮
+  - evaluation/report.py 第三十一轮
+  - evaluation/runner.py 第四十四轮
+  - evaluation/cli.py 第四十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 417 — evaluation/runner.py 第四十三轮（113 测试）
 
 ### 目标
