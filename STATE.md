@@ -4,6 +4,47 @@
 
 ---
 
+## Round 388 — evaluation/report.py 第二十六轮（147 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第二十六轮 edges 测试，覆盖 edges25 未触及的角度：**get_git_provenance 行为深度第九批**（timeout handling 返 dict + 字段含 commit_hash/git_branch/git_remote/is_dirty/is_shallow/commit_timestamp + unknown_attribute 返 None + 单个 attribute 失败不影响其他 + real call 不 raise + commits 字段一致 + branch fallback + remote None + dirty True/False + timestamp format）；**get_dependency_versions 行为深度第九批**（single pkg failure 不影响其他 + unknown pkg 返 "unknown" + real call 返 dict + 多个 pkg 并行 + 分布式 + 缓存/idempotent + 空包列表 + 包名 with version specifiers）；**build_provenance 行为深度第九批**（path str + max_chars variations + parser_version int/list/dict/None/bool + dependencies 结构 + ISO timestamp + UTC + 字段完整 + idempotent + 不 mutate + JSON serializable）；**build_devset_section 行为深度第九批**（categories propagation + idempotent + 不 mutate + JSON serializable + null fields + file_count 一致 + content_group_count + pdf_count + docx_count + categories_covered）；**aggregate_summary 行为深度第九批**（no mixed types + counts isolated + success_rates isolated + ratio macro average + silent_drop_int + JSON serializable + 不 mutate + chunk_boundary participation + figure_caption exclusion + no overall score + null handling + macro average edge cases）；**constants 第十二批**（12 ratio / 1 count / 1 success_bool mutually exclusive + RATIO_METRICS set + COUNT_METRICS set + SUCCESS_BOOL_METRICS set + 不重叠 + 类型为 set + 长度匹配 + frozenset 可能 + 可迭代 + 字符串元素）；**module source forbidden tokens 第十二批**（os.system/Popen/rmtree/pickle.load/yaml.load/compile/eval/exec/sys.exit/exit/quit/global + no async/yield/walrus/unlink/remove/logging/sleep/print）；**module source 字符串精确补强第九批**（imports + 5 func defs + 3 constants + no class/main/yield/walrus/async/print/logging/sleep + docstring mentions report/纯函数/v1.1）；**signatures 第九批**（5 funcs FunctionType + __module__ eq + get_git_provenance no params + get_dependency_versions 1 param list + build_provenance 4 params + build_devset_section 1 param + aggregate_summary 1 param + kinds + no defaults/return annotations）；**module 合理性第九批**（5 user functions + 3 constants + no user classes + no top-level call + docstring + __all__ if present）；**端到端集成第九批**（full chain minimal + JSON serializable + kwargs + round trip + consistent structure + build_provenance + build_devset_section + aggregate_summary 串联 + idempotent + no unexpected exceptions）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges26.py`（147 测试）
+
+### 覆盖要点
+- **get_git_provenance 行为深度第九批**：12 测试
+- **get_dependency_versions 行为深度第九批**：9 测试
+- **build_provenance 行为深度第九批**：12 测试
+- **build_devset_section 行为深度第九批**：10 测试
+- **aggregate_summary 行为深度第九批**：14 测试
+- **constants 第十二批**：8 测试
+- **module source forbidden tokens 第十二批**：11 测试
+- **module source 字符串精确补强第九批**：21 测试
+- **signatures 第九批**：19 测试
+- **module 合理性第九批**：11 测试
+- **端到端集成第九批**：10 测试
+
+### 撞墙记录
+- 首次跑：147 全通过（0 fail）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 388 后）：46298 pass / 0 fail / 19 skip（HEAD `3d48750`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十八轮
+  - evaluation/cli.py 第三十七轮
+  - evaluation/manifest.py 第三十七轮
+  - evaluation/annotation_metrics.py 第三十七轮
+  - evaluation/schema.py 第二十九轮
+  - evaluation/metrics.py 第三十八轮
+  - evaluation/report.py 第二十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 387 — evaluation/metrics.py 第三十七轮（184 测试）
 
 ### 目标
