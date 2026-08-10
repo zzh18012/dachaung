@@ -4,6 +4,47 @@
 
 ---
 
+## Round 378 — evaluation/annotation_metrics.py 第三十五轮（142 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第三十五轮 edges 测试，覆盖 edges34 未触及的角度：**chunk_boundary_prf 行为深度第八批**（2 chunks 完美匹配 after/before + tolerance 容差 + 3 chunks 2 内部边界 + 标注 anchor 多于/少于预测边界 + 负 tolerance + 零 tolerance 精确/off-by-one + anchor 空 marker / 无 marker key + 未知 position 默认 after + Unicode marker + doc 无 chunks key + chunks None/missing text + annotation 空 dict / missing chunk_boundary_anchors key + _tolerance_chars 总在 record 中 + 负 tolerance 在 record + idempotent + 不修改输入 + anchor 含未知 key + f1 when p=r=0/perfect + metric dict 结构 + 3 chunks 无匹配）；**figure_caption_prf 行为深度第八批**（返回 3 metric + 全 reason=PARSER_DOES_NOT_EMIT_RELATIONS + 全 value=None + None doc/annotation + 富 doc/annotation 仍返回 null + 位置参数 + kwargs + idempotent + 不修改输入 + dict of dicts + value+reason 各项 + 忽略 annotation 内容 + 无多余 keys）；**module source forbidden tokens 第十一批**；**module source 字符串精确补强第八批**（4 imports + parser_does_not_emit 常量 + 2 user functions + no class/yield/async/walrus/global/main_block/sleep/hardcoded/print/logging + docstring 4 keyword + normalize_text/_null/_ratio 调用 + 内联 lambda in sort）；**signatures 第八批**（figure_caption_prf 2 params + kinds + no defaults + no varargs/kwargs + chunk_boundary_prf 3 params + tolerance default 30 + kind + PARSER_DOES_NOT_EMIT 常量类型/值 + FunctionType identity + __module__ eq 自身 funcs）；**module 合理性第八批**（__all__ 精确 3 items in order + docstring starts with Chinese + file endswith + name eq + 2 user functions + no user classes + no suspicious top-level patterns + PARSER_DOES_NOT_EMIT_RELATIONS 模块常量）；**端到端集成第八批**（真实 doc + annotation + document None → pipeline_failed + tolerance 在 record + missing markers recorded + partial missing markers + metric dict 结构 + 位置/kwargs 完整调用 + idempotent + 完整链 perfect match + 不修改输入 + Unicode 文本 perfect match）
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges35.py`（142 测试）
+
+### 覆盖要点
+- **chunk_boundary_prf 行为深度第八批**：33 测试
+- **figure_caption_prf 行为深度第八批**：17 测试
+- **module source forbidden tokens 第十一批**：25 测试
+- **module source 字符串精确补强第八批**：26 测试
+- **signatures 第八批**：15 测试
+- **module 合理性第八批**：13 测试
+- **端到端集成第八批**：13 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  1. `test_module_source_no_lambda` 期望源码无 lambda，但实际 `pairs.sort(key=lambda x: x[0])` 是合理内联 lambda → 改为检查"顶层无 lambda 赋值"
+  2. `test_module_function_module_attribute_eq` 期望所有 FunctionType 的 __module__ 都是 evaluation.annotation_metrics，但 imports 进来的 normalize_text 来自 app.chunkers.structural → 改为只检查自身定义的函数（filter __module__ == amod.__name__）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 378 后）：44572 pass / 0 fail / 19 skip（HEAD `4e5b2ff`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十七轮
+  - evaluation/metrics.py 第三十六轮
+  - evaluation/report.py 第二十五轮
+  - evaluation/runner.py 第三十七轮
+  - evaluation/cli.py 第三十六轮
+  - evaluation/manifest.py 第三十六轮
+  - evaluation/annotation_metrics.py 第三十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges35 已饱和（7 角度）。下一轮选 evaluation/schema.py 第二十七轮，覆盖 EvalSchemaError 行为深度第八批 + load_schema 行为深度第八批 + validate 行为深度第八批。
+
+---
+
 ## Round 377 — evaluation/manifest.py 第三十五轮（219 测试）
 
 ### 目标
