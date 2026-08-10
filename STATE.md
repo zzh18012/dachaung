@@ -4,6 +4,47 @@
 
 ---
 
+## Round 357 — evaluation/annotation_metrics.py 第三十三轮（185 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第三十三轮 edges 测试，覆盖 edges31 未触及的角度：**figure_caption_prf source level 字符串精确补强第二批**（starts with def / 2 params / uses PARSER_DOES_NOT_EMIT_RELATIONS / uses _null / returns 3 metrics / returns dict / uses reason var / no subprocess/eval/yield/async/global/walrus/class/open）；**chunk_boundary_prf source level 字符串精确补强第二批**（starts with def / 3 params / tolerance_chars 30 / handles document None / no annotation / no chunks / no anchors / uses normalize_text / Counter / .join / .find / search_from / missing_markers / _tolerance_chars / _missing_markers / 3 metrics / pairs.sort / used_pred used_gt / matched / abs / f1 formula / 7 reasons / get marker/position / position before/after / get chunks / get chunk_boundary_anchors / uses _ratio / no eval/subprocess/yield/async/global/walrus/open）；**chunk_boundary_prf 算法深度第五批**（document None+annotation None / document None+annotation present / document present+annotation None / document present+annotation {} / no chunks+no anchors / one chunk+no anchors / one chunk+with anchors → recall 0.0 / two chunks+no anchors → no_ground_truth_anchors / two chunks+full match → 1.0 / position before / marker not in stream / marker empty string / position default after / outside tolerance / tolerance recorded / three chunks two boundaries / chunk text None / chunk missing text key / anchor missing marker key / anchor missing position key / f1 when precision zero / repeated marker）；**module source forbidden tokens 第七批**（asyncio/threading/concurrent/subprocess/multiprocessing/queue/socket/select/re.match/datetime/time/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/importlib/platform）；**module source 字符串精确补强**（module docstring mentions figure-caption/chunk-boundary/parser/tolerance / 5 imports / no relative / no star / no yield / no async / no walrus / no main / no class / PARSER_DOES_NOT_EMIT constant / 2 functions / __all__ 3 entries / no eval/exec/compile/open/unlink/write）；**signatures 精确补强**（figure_caption 2 params / chunk_boundary 3 params / tolerance default 30 / no defaults for document/annotation / no varargs / return annotations / constant type/value）；**模块整体合理性补强**（has docstring / mentions annotation / has __all__ / __all__ is list / length 3 / unique / str entries / namespace has 2 callables / has constant / no user classes / name eq / file ends with / function module eq）；**端到端集成补强**（figure_caption always 3 metrics / idempotent / chunk_boundary idempotent / does not mutate doc/annotation / positional args / kwargs / default tolerance / full pipeline / empty chunks list / no chunks key / annotation no anchors key / tiny tolerance match / zero tolerance no match / returns dict of dicts / value or reason in each metric）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges32.py`（185 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf source level 字符串精确补强第二批**：~16 测试
+- **chunk_boundary_prf source level 字符串精确补强第二批**：~43 测试
+- **chunk_boundary_prf 算法深度第五批**：~22 测试
+- **module source forbidden tokens 第七批**：~37 测试
+- **module source 字符串精确补强**：~26 测试
+- **signatures 精确补强**：~12 测试
+- **模块整体合理性补强**：~14 测试
+- **端到端集成补强**：~15 测试
+
+### 撞墙记录
+- 1 fail 首次跑：annotation={} 是 falsy → 走 no_annotation 分支；改成传 `{"other_key": "value"}` 让 annotation truthy 但缺 chunk_boundary_anchors
+- 修复后 185 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 357 后）：40365 pass / 0 fail / 18 skip（HEAD `cb2d7fc`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十四轮
+  - evaluation/metrics.py 第三十三轮
+  - evaluation/report.py 第二十二轮
+  - evaluation/runner.py 第三十四轮
+  - evaluation/manifest.py 第三十三轮
+  - evaluation/cli.py 第三十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges32 已饱和（figure_caption source 第二批 + chunk_boundary source 第二批 + 算法深度第五批 + forbidden 37 + signatures + 端到端 15）。下一轮选 evaluation/schema.py 第二十四轮，覆盖 schema cross-validation 与 EvalSchemaError 行为深度。
+
+---
+
 ## Round 356 — evaluation/cli.py 第三十三轮（259 测试）
 
 ### 目标
