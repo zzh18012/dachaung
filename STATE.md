@@ -15552,14 +15552,67 @@ get_git_provenance 各 OSError 路径。
 
 ### 下一步建议
 - 候选：
-  - evaluation/cli.py 第二十一轮（243 行）
   - evaluation/annotation_metrics.py 第二十一轮（195 行）
   - evaluation/metrics.py 第二十一轮（381 行）
   - evaluation/schema.py 第十四轮
   - evaluation/runner.py 第二十二轮
   - evaluation/manifest.py 第二十二轮
+  - evaluation/cli.py 第二十二轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：manifest.py edges21 已饱和（load 集成 + 三 dataclass + 字符级 + 极端 path + source level 完整 + 端到端 schema）。下一轮选 evaluation/cli.py 第二十一轮，覆盖 argparse 子命令（parse/validate/run/validate-report）+ main 入口 + validate-report 入口 + 异常退出码深度。
+**建议**：cli.py edges21 已饱和（exit code 矩阵 + _format_metric value 类型完整 + _run_inspect_doc _sort_key 4 分支 + argparse 元数据 + stdout 模板 + module/source level 完整 + 集成 round-trip）。下一轮选 evaluation/annotation_metrics.py 第二十一轮，覆盖 figure_caption_prf + chunk_boundary_prf 行为深度。
+
+---
+
+## Round 290 — evaluation/cli.py 第二十二轮（178 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第二十二轮 edges 测试，覆盖 edges20 未触及的角度：**main 深度 - run 路径**（manifest 路径是目录 → exit 2；output 已存在覆盖；evaluator_version 不变；report_version 不变；stderr 含「清单加载失败」「清单不存在」；kreuzberg parser 走通；max-chars 0/negative → schema 拒绝 exit 1；tolerance-chars 0 走通；stdout 含完整模板 documents=/成功/失败/devset_status=/file_count=/groups=/pdf=/docx=/git_commit=/git_dirty=；空 manifest → documents=0 成功 0 失败 0）；**main 深度 - validate-report 路径**（目录路径 → exit 2；stderr 含「报告不存在」「报告校验失败」「JSON 解析失败」；成功 stdout 含「通过 evaluation-report Schema 校验」）；**main 深度 - inspect-doc 路径**（目录路径 → exit 2；stderr 含「文档不存在」「JSON 顶层不是对象」；top-level array/string/int/null/float/bool 全部 exit 1）；**main argv 行为深度**（argv=None 空 sys.argv 抛 SystemExit；argv=[] 抛 SystemExit；未知 command 抛；缺 --manifest 抛；validate-report 缺 input 抛；inspect-doc 缺 input 抛）；**_format_metric value 类型完整**（None/True/False/int 0/int 负/float 0.0/float 负/float 1/3 精度/empty dict/non-empty dict sorted/string fallback/list fallback/long float/tuple fallback 16 场景）；**_format_metric 字符串模板精确**（width 36 严格；长 name 不截断；2 leading spaces；返回 str）；**_run_inspect_doc _sort_key 4 分支**（bool→0/int-float→1/dict→2/null→3）；**_run_inspect_doc 输出 ?**（document_id/source_path/parser_name/parser_version 缺失输出 ?）；**_run_inspect_doc source_type 缺失 default unknown**（pdf/docx/html/missing 4 场景）；**_run_inspect_doc 是 module-level 函数**（不是嵌套；1 param；no varargs/varkw；return int）；**_build_parser 元数据深度**（prog=evaluation.cli；description 不空含「评测」；formatter_class=RawDescriptionHelpFormatter；subparsers dest=command required=True；run/validate-report/inspect-doc 三个 sub-parser 存在；run 有 5 个 option；inspect-doc 有 tolerance-chars 无 parser/max-chars；validate-report 无 optional）；**main 不可达 return 2 + main block**（source 含 return 2；3 处 if args.command；return 0/1；argv 默认 None；return int；no varargs/varkw）；**module source level 完整**（import 顺序 argparse→json→sys→pathlib→evaluation；含 hasattr check；含 stdout/stderr reconfigure；含 AttributeError/OSError catch；含 from evaluation 4 个 imports；不含 logging/subprocess/os/re/time/threading/asyncio/concurrent；lazy imports 在 _run_inspect_doc；main block raise SystemExit；__main__ 在末尾；无 __all__；module docstring 含三个子命令名）；**_format_metric signature 与 source level**（2 params；return str；含 metric.get value/reason；含 isinstance bool/float/dict；含 :.4f；含 sorted）；**_run_inspect_doc source level 完整**（input_path.open/json.load/json.JSONDecodeError/isinstance dict/source_type/compute_automatic_metrics/figure_caption_prf/chunk_boundary_prf/_sort_key/file:/document_id:/source:/parser:/counts:/metrics:/return 0）；**stdout/stderr 模板精确**（[OK] 在 stdout；错误消息只在 stderr；成功时 stderr 无 [ERROR]）；**run 集成 round-trip**（run 后可被 validate-report 通过；空 documents 仍合法；devset_status 传播；output 在已存在子目录正常创建）；**inspect-doc 完整集成**（输出含全 6 个 label；counts 显示 elements=N chunks=N；tolerance-chars 0/-1 都 exit 0）；**run_evaluation 内部输出**（stdout git_commit 12 字符 / git_dirty=）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges21.py`（178 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **main 深度 - run**：12 场景（目录/覆盖/版本不变/stderr 文案/kreuzberg/max-chars/tolerance/stdout 模板/空 manifest）
+- **main 深度 - validate-report**：5 场景（目录/stderr 3 种文案/成功模板）
+- **main 深度 - inspect-doc**：7 场景（目录/stderr 5 种顶层类型/无 type dict 走通）
+- **main argv 行为**：6 场景（None/empty/unknown/missing required）
+- **_format_metric value 类型**：16 场景（None/bool/int/float/dict/string/list/tuple 全覆盖）
+- **_format_metric 模板**：4 测试（width 36/long name/leading spaces/return str）
+- **_run_inspect_doc _sort_key**：4 测试（4 分支）
+- **_run_inspect_doc 输出 ?**：7 测试（document_id/source_path/parser_name/version missing + present）
+- **_run_inspect_doc source_type**：4 测试（pdf/docx/html/missing default）
+- **_run_inspect_doc 函数属性**：4 测试（module-level/signature/no varargs/return int）
+- **_build_parser 元数据**：20 测试（prog/description/formatter_class/dest/required/3 sub-parser/各 sub 的 option 矩阵）
+- **main source level**：8 测试（return 2/3 个 if/return 0/1/signature/no varargs/varkw）
+- **module source level**：26 测试（import 顺序/hasattr/reconfigure/catch/4 个 from evaluation/禁止 imports 9 个/lazy imports/main block/__main__ 末尾/__all__/docstring）
+- **_format_metric signature/source**：15 测试（2 params/return str/get value/reason/isinstance 3 种/:.4f/sorted）
+- **_run_inspect_doc source level**：16 测试（open/json.load/JSONDecodeError/isinstance dict/source_type/3 个 metric 调用/_sort_key/6 个 label/return 0）
+- **stdout/stderr 模板**：6 测试（[OK]/错误只在 stderr/成功 stderr 干净）
+- **run 集成 round-trip**：5 测试（可被 validate-report 通过/空 documents/devset 传播/sub dir）
+- **inspect-doc 完整集成**：6 测试（全 6 label/elements=N/chunks=N/最小/tolerance 0/-1）
+- **run_evaluation 内部输出**：2 测试（git_commit 12 字符/git_dirty=）
+
+### 撞墙记录
+- 2 fail 首次跑：
+  1. `test_main_run_with_max_chars_zero` —— argparse 接受 max-chars=0，但 evaluation-report.schema.json 要求 max_chars >= 1。CLI run 在生成报告后自校验失败 → exit 1（不是 0）。修法：assert rc == 1。
+  2. `test_main_run_negative_max_chars_accepted` —— 同上，max-chars=-1 → schema 拒绝 → exit 1。修法：assert rc == 1，并改测试名为 `test_main_run_negative_max_chars_rejected_by_schema`。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 290 后）：27103 pass / 0 fail / 16 skip（HEAD `3aac5cf`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第二十一轮（195 行）
+  - evaluation/metrics.py 第二十一轮（381 行）
+  - evaluation/schema.py 第十四轮
+  - evaluation/runner.py 第二十二轮
+  - evaluation/manifest.py 第二十二轮
+  - evaluation/cli.py 第二十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges21 已饱和（exit code 矩阵 + _format_metric value 类型完整 + _sort_key 4 分支 + argparse 元数据 + module/source level 完整 + 集成 round-trip）。下一轮选 evaluation/annotation_metrics.py 第二十一轮，覆盖 figure_caption_prf + chunk_boundary_prf 行为深度。
 
 ---
