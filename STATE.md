@@ -4,6 +4,56 @@
 
 ---
 
+## Round 377 — evaluation/manifest.py 第三十五轮（219 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第三十五轮 edges 测试，覆盖 edges34 未触及的角度：**_is_absolute_like 数学边界第十批**（Unicode 字母 Python str.isalpha() 语义 → 全角/数学/Devanagari 都被视为 alpha → drive letter / 数字/_ / 标点 不是 alpha / 大小写 drive / 仅斜杠 / tilde / dot / 仅冒号 / emoji）；**_has_backslash 数学边界第十批**（CR/VT/FF 不是 / Unicode set minus U+2216 / Fullwidth reverse solidus U+FF3C 不是 / 真实 backslash 位置）；**_resolve_relative_path 行为深度第五批**（拒绝 dotdot 单层/多层/绝对 POSIX/Windows forward/backward/backslash/empty；接受 current dot/deep subdir/redundant sep/dot segments；返回 absolute Path；Unicode subdir；field name in error；no input modification）；**_detect_project_root 行为深度第六批**（finds pyproject/walks up/file input returns parent/no pyproject default/file without pyproject/Path 对象/absolute/symlinks/idempotent/innermost）；**DocumentEntry / ExpectedFailure / Manifest dataclass 行为深度第八批**（frozen test/eq/ne/defaults/with-values/repr/hash in set/replace returns new instance and preserves other fields）；**Manifest properties 算法深度第八批**（file_count empty/multiple + pdf/docx_count empty/only-docx/only-pdf + categories_covered empty/list/dedup/sorted + content_group_count no-pairing/paired/unidirectional/mixed/two-pairs + return types）；**load_manifest malformed data 第八批**（str/Path manifest_path + returns Manifest + project_root str/Path explicit Path + unicode devset_status 拒绝（enum） + extra top-level keys 拒绝（additionalProperties:false） + empty documents/expected_failures + doc with categories/sha256（64 hex）/paired_with/expectations/annotation_file + ef with/without source_type + doc path outside project/absolute/backslash rejected）；**module source forbidden tokens 第十一批**；**module source 字符串精确补强第六批**（5 imports + 3 @dataclass + ManifestError class + no async/yield/walrus/lambda/sleep/print/logging + docstring mentions relative/absolute/backslash）；**signatures 第六批**（param kinds + no defaults + 5 user functions + ManifestError inherits Exception no custom init + properties are property objects returning correct types）；**模块整体合理性第四批**（__all__ exact 5 items + docstring starts with Chinese + file endswith + name eq + 5 user functions + 4 user classes + no suspicious top-level patterns + 3 @dataclass）；**端到端集成第四批**（minimal valid + two documents + preserves order + resolved paths absolute and inside project + categories dedup + content_group_count paired + devset_status preserved + manifest_version preserved + expected_failure loaded + annotation_file loaded + unicode paths + subdir path + default project_root via pyproject）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges35.py`（219 测试）
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第十批**：18 测试
+- **_has_backslash 数学边界第十批**：10 测试
+- **_resolve_relative_path 行为深度第五批**：16 测试
+- **_detect_project_root 行为深度第六批**：10 测试
+- **DocumentEntry dataclass 行为深度第八批**：20 测试
+- **ExpectedFailure dataclass 行为深度第八批**：11 测试
+- **Manifest dataclass 行为深度第八批**：7 测试
+- **Manifest properties 算法深度第八批**：20 测试
+- **load_manifest malformed data 第八批**：20+ 测试
+- **module source forbidden tokens 第十一批**：26 测试
+- **module source 字符串精确补强第六批**：22 测试
+- **signatures 第六批**：17 测试
+- **模块整体合理性第四批**：13 测试
+- **端到端集成第四批**：17 测试
+
+### 撞墙记录
+- 6 fail 首次跑：
+  1. 3 个 _is_absolute_like Unicode 字母测试期望 False（假设 str.isalpha 不识别 Unicode 字母），但 Python str.isalpha 识别全角/数学/Devanagari 字母 → 改为 True
+  2. `test_load_manifest_unicode_devset_status` 期望中文 devset_status 通过，但 schema enum 只允许 complete/incomplete → 改为 EvalSchemaError 拒绝
+  3. `test_load_manifest_doc_with_sha256` 用 "abc123" 短 sha，但 schema 要求 `^[0-9a-f]{64}$` → 改用 64 字符 hex
+  4. `test_signature_manifest_properties_class_methods` 用 `callable(m.file_count)`，但 property 访问返回值（int），不是 method → 改为检查 `type(m).file_count` 是 property 对象
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 377 后）：44430 pass / 0 fail / 19 skip（HEAD `2b117e3`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十七轮
+  - evaluation/metrics.py 第三十六轮
+  - evaluation/report.py 第二十五轮
+  - evaluation/runner.py 第三十七轮
+  - evaluation/cli.py 第三十六轮
+  - evaluation/manifest.py 第三十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges35 已饱和（13 角度）。下一轮选 evaluation/annotation_metrics.py 第三十五轮，覆盖 figure_caption_prf / chunk_boundary_prf 行为深度第八批。
+
+---
+
 ## Round 376 — evaluation/cli.py 第三十五轮（177 测试）
 
 ### 目标
