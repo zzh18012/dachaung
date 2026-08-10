@@ -4,6 +4,48 @@
 
 ---
 
+## Round 376 — evaluation/cli.py 第三十五轮（177 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第三十五轮 edges 测试，覆盖 edges34 未触及的角度：**_build_parser 行为深度第八批**（invalid choice SystemExit / 负数 max-chars 接受 / 非整 max-chars 拒绝 / required flags / positional inputs / subparser help 文本 / prog 精确 / description 精确 / no-default-choice）；**argparse Namespace 字段第八批**（str 类型验证 / 全属性 / dash-to-underscore 转换）；**_format_metric 行为深度第八批**（int/negative/zero / float 4 位精度 / dict 含 None/bool/string 值 / dict 按 key 排序 / tuple/set fallback / unicode name / 36 字符 padding / 任意输入非空）；**_run_inspect_doc 行为深度第八批**（missing file rc=2 / 非法 JSON rc=1 / top-level 非 dict rc=1 / 空 dict rc=0 / 输出 filename/document_id/source_path/parser_name/source_type / 默认 source_type=unknown / unicode 支持）；**main 路由深度第八批**（validate-report missing/invalid/schema-invalid / inspect-doc 错误路径 / run 缺失/非法/schema 非法 manifest / 未知子命令 / 无子命令 / 非法 parser choice）；**module source forbidden tokens 第十一批**（os.system/subprocess.*/shutil.*/pickle/marshal/ctypes/sys.exit/__import__/importlib/requests/urllib/http/socket/webbrowser/antigravity/this/exit/quit/exec/eval/compile）；**module source 字符串精确补强第六批**（4 imports + 4 user functions + no class/yield/async/walrus/global/lambda/sleep + RawDescriptionHelpFormatter + raise SystemExit(main()) + subparsers required=True + 3 subparsers + choices fallback/kreuzberg + docstring 4 keyword）；**signatures 第八批**（argv annotation list + argv optional + return int + no var-positional + no var-keyword + build_parser no params + format_metric 2 params positional + run_inspect_doc 1 param + FunctionType + __module__ eq）；**module 合理性第八批**（no __all__ + file endswith + name eq + 4 user functions + function names exact + main_block at end + constants from imports + no suspicious top-level patterns + docstring first line）；**端到端集成第八批**（full namespace with all options + validate-report with valid report from main run + missing file + rich doc + custom tolerance + kreuzberg choice + report_version matches + stdout includes devset info + prog in help）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges35.py`（177 测试）
+
+### 覆盖要点
+- **_build_parser 行为深度第八批**：17 测试
+- **argparse Namespace 字段第八批**：8 测试
+- **_format_metric 行为深度第八批**：22 测试
+- **_run_inspect_doc 行为深度第八批**：18 测试
+- **main 路由深度第八批**：14 测试
+- **module source forbidden tokens 第十一批**：29 测试
+- **module source 字符串精确补强第六批**：22 测试
+- **signatures 第八批**：17 测试
+- **module 合理性第八批**：10 测试
+- **端到端集成第八批**：13 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_module_source_has_3_subparsers` 期望 `sub.add_parser("validate-report"` 在源码中精确出现，但实际是 `sub.add_parser(\n    "validate-report", help=...)` 多行形式 → 改为更宽松的 `"validate-report"` 字符串 + `add_parser(` 计数 ≥ 3
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 376 后）：44211 pass / 0 fail / 19 skip（HEAD `625fd03`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十七轮
+  - evaluation/metrics.py 第三十六轮
+  - evaluation/report.py 第二十五轮
+  - evaluation/runner.py 第三十七轮
+  - evaluation/cli.py 第三十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges35 已饱和（build_parser / Namespace / format_metric / inspect_doc / main 路由 / forbidden / source / signatures / 模块 / e2e 10 角度）。下一轮选 evaluation/manifest.py 第三十五轮，覆盖 ManifestError / load_manifest / DocumentEntry/ExpectedFailure/Manifest dataclass 行为深度第八批。
+
+---
+
 ## Round 375 — evaluation/runner.py 第三十六轮（159 测试）
 
 ### 目标
