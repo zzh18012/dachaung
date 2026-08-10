@@ -4,6 +4,52 @@
 
 ---
 
+## Round 426 — evaluation/manifest.py 第四十二轮（139 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第四十二轮 edges 测试，覆盖 edges41 未触及的角度：**_is_absolute_like 边界第十五批**（tilde / question mark / hash / Unicode 全角 / 双点 / 多字符盘符）；**_has_backslash 边界第十五批**（开头单 \ / 结尾单 \ / 多个连续 / 仅一个 / 混合分隔符 / Unicode）；**_resolve_relative_path 异常深度第十五批**（path_str 中间含 .. / project_root 本身含 .. / field_name Unicode / 返回 Path / 返回绝对路径 / 子目录 / 路径含空格 / escape 试图）；**_detect_project_root 异常深度第十五批**（无 pyproject.toml fallback / pyproject.toml 在 parent / 文件输入 / Path 类型 / 多层嵌套）；**Manifest dataclass 第十五批**（相等性 / 不相等 / 字段顺序 / replace / setattr frozen / dataclass 验证 / 字段数）；**Manifest properties 第十五批**（content_group_count 多组 / pdf+docx 与 file 关系 / categories_covered 空 / 排序 / 全未配对 / file_count 与 documents 一致）；**DocumentEntry 字段深度第十五批**（sha256 None / paired_with None / annotation_file_str None / annotation_resolved None / expectations None / categories 空 tuple / 字段数 / path_str 保留）；**ExpectedFailure 字段深度第十五批**（source_type None / 字段数 / 字段顺序 / 无 paired_with / 无 categories / frozen）；**load_manifest 异常深度第十五批**（文件不存在 / 非 JSON / 空 JSON / 数组 JSON / int JSON / str 输入 / str project_root / 缺 documents key）；**module source forbidden tokens 第二十二批**；**module source 字符串精确补强第十九批**；**signatures 第十九批**；**module 合理性第十九批**；**端到端集成第十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges42.py`（139 测试）
+
+### 覆盖要点
+- **_is_absolute_like 边界第十五批**：10 测试
+- **_has_backslash 边界第十五批**：8 测试
+- **_resolve_relative_path 异常深度第十五批**：10 测试
+- **_detect_project_root 异常深度第十五批**：7 测试
+- **Manifest dataclass 第十五批**：7 测试
+- **Manifest properties 第十五批**：6 测试
+- **DocumentEntry 字段深度第十五批**：8 测试
+- **ExpectedFailure 字段深度第十五批**：6 测试
+- **load_manifest 异常深度第十五批**：9 测试
+- **module source forbidden tokens 第二十二批**：16 测试
+- **module source 字符串精确补强第十九批**：25 测试
+- **signatures 第十九批**：7 测试
+- **module 合理性第十九批**：10 测试
+- **端到端集成第十九批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_signature_is_absolute_like_batch15 期望 annotation is str，但 `from __future__ import annotations` 让注解变成字符串 'str'）。修：改为 == "str"。
+- SyntaxWarning：docstring 中 `\ ` 转义无效。修：用 r""" raw docstring。
+- 二次跑：139 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 426 后）：51831 pass / 0 fail / 19 skip（HEAD `b70c831`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第四十二轮
+  - evaluation/schema.py 第三十四轮
+  - evaluation/metrics.py 第四十四轮
+  - evaluation/report.py 第三十二轮
+  - evaluation/runner.py 第四十五轮
+  - evaluation/cli.py 第四十四轮
+  - evaluation/manifest.py 第四十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 425 — evaluation/cli.py 第四十三轮（105 测试）
 
 ### 目标
