@@ -4,6 +4,55 @@
 
 ---
 
+## Round 306 — evaluation/runner.py 第二十五轮（114 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第二十五轮 edges 测试，覆盖 edges23 未触及的角度：**_load_annotation 行为深度补强**（empty file → None / {} → {} / null → None / [1,2,3] list → list / "string" → str / 42 → int；signature 1 param + no default + no varargs/varkw；source 含 except (OSError, json.JSONDecodeError) + path is None + not path.is_file() + utf-8）；**_process_one 5-tuple 边界补强**（signature 4 params + no default + no varargs/varkw；return annotation 是 tuple；source 含 out_stub 模板 + perf_counter 2 处 + process_single 5 kwargs + image_output_dir_for + unlink OSError catch + 3 分支 + unknown error + document.to_dict + parser_version）；**run_evaluation keyword-only 3 params**（前 2 positional + 后 3 keyword-only；default 精确 fallback/800/30；no varargs/varkw；return annotation 是 dict；source 含 * marker）；**wall_time_seconds 内部精确补强**（source 含 6 keys + not_instrumented 出现 2 次）；**expected_failures 处理深度补强**（source 含 for ef 循环 + actual_code ternary + matches value（dict 字面量）+ 4 keys）；**annotation 字段处理深度补强**（source 含 _annotation_present + pop _tolerance_chars + pop _missing_markers + value 提取）；**public_per_doc 构造精确补强**（4 keys doc_id/source_type/metrics/wall_time_seconds + 不含 internal _annotation_present/_tolerance_chars/_missing_markers）；**report 装配顺序补强**（6 top-level keys 顺序精确 + report_version 第一 + expected_failures 最后 + out_p = Path(output_path) + json.dump ensure_ascii=False indent=2）；**module imports 精确补强**（10 imports 精确：future/json/time/pathlib/typing + app.pipeline + evaluation 4 行）；**module source forbidden tokens 补强**（os/sys/re/logging/subprocess/asyncio/threading/collections/math/datetime/socket/email/html/http/urllib/sqlite3/csv/pickle 18 个）；**module source 含必要字符串**（process_single + image_output_dir_for + compute_automatic_metrics + figure_caption_prf + chunk_boundary_prf + build_provenance + build_devset_section + aggregate_summary + REPORT_VERSION 9 个）；**module source level 完整补强**（output_root Path + mkdir + per_doc_results init + parser_version_for_prov init + for doc 循环 + parser_version tracking + compute 5 kwargs + image_base_dir conditional + load_annotation + fig_caption + chunk_boundary + metrics.update 2 处 + per_doc_results.append + build_provenance 4 kwargs + devset call + summary call + out_p mkdir 共 20+ source check）；**module __all__ 补强**（1 entry run_evaluation + namespace + callable + 2 private）；**模块整体合理性**（3 module-level function + 9 imported names + 无 class + 无 __main__）；**module docstring 深度补强**（含 评测 runner / pipeline / time.perf_counter / not_instrumented / image_resource_exists_ratio / per_doc）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges24.py`（114 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 行为深度补强**：12 测试
+- **_process_one 5-tuple 边界补强**：13 测试
+- **run_evaluation keyword-only 3 params**：5 测试
+- **wall_time_seconds 内部精确补强**：2 测试
+- **expected_failures 处理深度补强**：4 测试
+- **annotation 字段处理深度补强**：3 测试
+- **public_per_doc 构造精确补强**：2 测试
+- **report 装配顺序补强**：5 测试
+- **module imports 精确补强**：11 测试
+- **module source forbidden tokens 补强**：18 测试
+- **module source 含必要字符串**：9 测试
+- **module source level 完整补强**：17 测试
+- **module __all__ 补强**：5 测试
+- **模块整体合理性**：4 测试
+- **module docstring 深度补强**：6 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_run_evaluation_source_has_matches_equality` - source 用 dict 字面量 `"matches": actual_code == ef.expected_error_code`，不是单独变量赋值 → 改 assertion 用 dict 形式
+- 修复后 114 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 306 后）：29610 pass / 0 fail / 16 skip（HEAD `a49e3ec`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第二十四轮
+  - evaluation/cli.py 第二十五轮
+  - evaluation/annotation_metrics.py 第二十五轮
+  - evaluation/metrics.py 第二十五轮
+  - evaluation/schema.py 第十七轮
+  - evaluation/runner.py 第二十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges24 已饱和（_load_annotation 行为 + _process_one source + run_evaluation keyword-only + wall_time + expected_failures + annotation 字段 + public_per_doc + report 装配 + imports + forbidden + source 字符串 + source level + __all__ + 整体 + docstring）。下一轮选 evaluation/manifest.py 第二十四轮，覆盖 DocumentEntry/ExpectedFailure/Manifest 3 dataclass 行为深度 + load_manifest/_resolve_relative_path/_is_absolute_like/_has_backslash/_detect_project_root source level。
+
+---
+
 ## Round 305 — evaluation/schema.py 第十六轮（137 测试）
 
 ### 目标
