@@ -4,6 +4,53 @@
 
 ---
 
+## Round 365 — evaluation/schema.py 第二十五轮（276 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第二十五轮 edges 测试，覆盖 edges24 未触及的角度：**_schema_path source level 字符串精确补强第三批**（no class/yield/async/walrus/global/lambda / returns p / uses local var p / 3 statements / error msg format / no eval/exec/compile/print/open/unlink/write/os/sys/subprocess/argparse）；**load_schema source level 字符串精确补强第三批**（docstring / with 语句 / return in with / no class/yield/async/walrus/global/lambda / no eval/exec/compile/print/unlink/write/os/sys/subprocess）；**validate source level 字符串精确补强第三批**（docstring / Draft202012Validator / iter_errors / sorted with lambda / absolute_path / if not errors / return / flat list init / for err in errors / flat.append / 三个 dict key / head = errors[0] / raise EvalSchemaError / message has count+path / no class/yield/async/global/eval/exec/compile/print/unlink/write/os/sys）；**validate_file source level 字符串精确补强第三批**（docstring / p = Path(path) / p.is_file / raises FileNotFoundError / with p.open / data = json.load(f) / validate(data, schema_name) / no class/yield/async/global/eval/exec/compile/print/unlink/write/os/sys）；**EvalSchemaError 行为深度第七批**（isexception / message only / message+errors / errors default None → [] / empty list unchanged / None explicit → [] / try/except / caught as Exception / can raise+catch / errors not shared / args / repr / errors writable / complex errors）；**validate 行为深度第七批**（returns None / missing field / wrong type / extra field / message 含 schema name+path / errors list / errors dict keys / str path / unknown schema raises FileNotFound / 不修改 instance / idempotent / annotation/report schema 调用）；**validate_file 行为深度第七批**（returns None / str+Path path / FileNotFound for missing+dir / invalid JSON / empty file / array/int/string/null roots / EvalSchemaError on invalid content / 不修改 disk / idempotent / unknown schema / positional+kwargs）；**module source forbidden tokens 第七批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/importlib/platform/subprocess/argparse）；**module source 字符串精确补强第三批**（future annotations / 5 imports / 4 stdlib / SCHEMAS_DIR 定义 / EvalSchemaError class / __init__ signature+body / no relative / no star / no yield/async/walrus/main / no user class beyond / 4 functions / __all__ 5 / no eval/exec/compile/unlink/write/print/os/sys / docstring mentions）；**signatures 精确补强第三批**（EvalSchemaError __init__ 3 params / message no default / errors default None / return None / _schema_path 1 param + Path / load_schema 1 param + dict / validate 2 params + None / validate_file 2 params with Path|str + None / 4 个 no varargs）；**模块整体合理性补强第三批**（docstring / __all__ list/length/unique/str/correct / 4 callables / namespace callable names / 1 class / module name / file endswith / function module eq / function names correct / SCHEMAS_DIR module constant + Path + resolved + name=schemas + exists + in __all__ / JSValidationError imported + is JSValidationError）；**端到端集成补强第三批**（3 schemas return dict / idempotent / no mutate disk / minimal manifest passes / empty documents / missing fields fail / invalid version / extra field / returns None / errors list + dict keys / caught as Exception / schema_path returns Path / EvalSchemaError 复杂 errors / str representation / Unicode content / load then validate workflow）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges25.py`（276 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_schema_path source level 字符串精确补强第三批**：~20 测试
+- **load_schema source level 字符串精确补强第三批**：~18 测试
+- **validate source level 字符串精确补强第三批**：~30 测试
+- **validate_file source level 字符串精确补强第三批**：~20 测试
+- **EvalSchemaError 行为深度第七批**：~15 测试
+- **validate 行为深度第七批**：~16 测试
+- **validate_file 行为深度第七批**：~17 测试
+- **module source forbidden tokens 第七批**：~33 测试
+- **module source 字符串精确补强第三批**：~32 测试
+- **signatures 精确补强第三批**：~21 测试
+- **模块整体合理性补强第三批**：~22 测试
+- **端到端集成补强第三批**：~25 测试
+
+### 撞墙记录
+- 15 fail 首次跑：fixtures 误加 `project_root`，但 manifest.schema.json 的 properties 只允许 `manifest_version/devset_status/documents/expected_failures`，触发 additionalProperties 拒绝
+- 修复：批量删除 fixture 中的 `"project_root": "."` 行
+- 修复后 276 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 365 后）：42174 pass / 0 fail / 18 skip（HEAD `421bc78`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第三十四轮
+  - evaluation/report.py 第二十三轮
+  - evaluation/runner.py 第三十五轮
+  - evaluation/manifest.py 第三十四轮
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema edges25 已饱和（4 function source 第三批 + EvalSchemaError/validate/validate_file 行为深度第七批 + forbidden 33 + signatures 21 + 端到端 25）。下一轮选 evaluation/metrics.py 第三十四轮，覆盖 14 个 metric 各分支 source level 补强。
+
+---
+
 ## Round 364 — evaluation/annotation_metrics.py 第三十四轮（233 测试）
 
 ### 目标
