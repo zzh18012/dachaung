@@ -15342,3 +15342,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：schema.py edges13 已深度覆盖 3 schema 的所有违反场景。下一轮选 evaluation/report.py 第二十轮（report 字段 + aggregate_summary + 联动 schema）。
 
 ---
+
+## Round 285 — evaluation/report.py 第二十轮（105 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第二十轮 edges 测试，覆盖 edges19 未触及的角度：**Schema 交叉验证**（build_provenance 输出通过 evaluation-report.schema.json 的 $defs/provenance；build_devset_section 输出通过 $defs/devset；aggregate_summary 输出通过 $defs/summary；get_dependency_versions 输出符合 dependencies schema；end-to-end 拼装完整 report 通过 evaluation-report.schema.json）；**get_git_provenance subprocess.run 深度模拟**（rev-parse 成功+stdout='abc123\n'→commit='abc123'；stdout='\n'/'   '→commit=None；returncode=1→commit=None；status --porcelain 有 'M file.txt'→dirty=True；空 stdout/whitespace→dirty=False；returncode=1→dirty=False；rev-parse 抛 OSError/SubprocessError/TimeoutExpired→commit=None, dirty=True；两次 subprocess.run 调用顺序：先 rev-parse 后 status --porcelain）；**get_dependency_versions 深度模拟**（3 包都找到→values 非 None；PackageNotFoundError→None；RuntimeError 等 Exception→None；keys 顺序精确）；**aggregate_summary 跨多文档混合行为**（counts sum 累加 + participating_docs；partial 参与只算部分；value=None 不参与；value=0 参与；全无 → sum=None；pipeline_success mixed → rate=count_true/total；all True → 1.0；all False → 0.0；value=None → 不算 success 但 total+=1；缺 metric → total 仍 =len(per_doc)；ratio macro_average sum/len；partial 参与；zero value 参与；全 None → macro=None；silent_drop partial sum；全 None → None；全 0 → 0；不修改 input）；**build_provenance 输出深度**（run_timestamp_iso 可解析为 datetime；含时区偏移；两次调用不同；dependencies keys 顺序精确；int(max_chars) 截断 float；int(True)=1；parser_version None/string pass through；evaluator_version/report_version 来自 evaluation 常量；parser_name pass through）；**build_devset_section duck typing 深度**（FakeManifest namespace 对象；缺各属性都抛 AttributeError 含对应名；6 keys 输出；categories_covered pass through）；**模块 source 深度补强**（无 star import；无 exec/eval；无 .open 调用；无 global/nonlocal/walrus/assert；无 relative import；无 class 定义；无 @dataclass）；**_RATIO_METRICS 排他性深度**（与 _COUNT_METRICS/_SUCCESS_BOOL_METRICS 不重叠；无 duplicates）；**build_provenance + aggregate_summary 联动**（key 不冲突；不互相污染）；**异常路径**（per_doc metric value=None 不崩；per_doc 缺 metrics 键 → KeyError；metrics=None → AttributeError；aggregate_summary 不缓存）；**__all__ 深度**（每个名字是 valid identifier；存在于 namespace；callable）；**datetime/Path/subprocess attr identity**；**__all__ 与 namespace 差集**（_RATIO_METRICS 在 namespace 不在 __all__；EVALUATOR_VERSION 同理）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges20.py`（105 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **Schema 交叉验证**：6 场景（provenance/devset/summary/dependencies/end-to-end/get_dependency_versions）
+- **get_git_provenance subprocess.run 模拟**：14 场景（rev-parse 各种 returncode/stdout；status 同理；OSError/SubprocessError/TimeoutExpired；调用顺序）
+- **get_dependency_versions 模拟**：6 场景（all found/all PackageNotFound/partial/general exception/keys order）
+- **aggregate_summary 跨多文档**：21 场景（counts/success_rates/ratio/silent_drop 各种混合）
+- **build_provenance 输出**：14 场景（datetime parse/timezone/two calls/dependencies/max_chars int/parser pass-through/versions from constants）
+- **build_devset_section duck typing**：10 场景（FakeManifest/各属性缺失）
+- **模块 source 补强**：11 测试
+- **常量排他性**：6 测试
+- **联动**：2 测试
+- **异常路径**：4 测试
+- **__all__ 深度**：3 测试
+- **datetime/Path/subprocess identity**：3 测试
+- **namespace 与 __all__ 差集**：3 测试
+
+### 撞墙记录
+- 0 fail 首次跑（105 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 285 后）：26497 pass / 0 fail / 16 skip（HEAD `02274bd`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第二十一轮（228 行）
+  - evaluation/manifest.py 第二十一轮（239 行）
+  - evaluation/cli.py 第二十一轮（243 行）
+  - evaluation/annotation_metrics.py 第二十轮（195 行）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges20 已饱和（Schema 交叉 + subprocess 模拟 + 跨文档聚合）。下一轮继续 evaluation/* 模块第二十一轮，或换 annotation_metrics.py 第二十轮深度联动 annotation schema。
+
+---
