@@ -4,6 +4,47 @@
 
 ---
 
+## Round 404 — evaluation/cli.py 第三十九轮（144 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第三十九轮 edges 测试，覆盖 edges38 未触及的角度：**_build_parser 行为深度第十二批**（subparsers 注册顺序 / 各 prog 名称 / run --parser 默认 / 各 --max-chars/--tolerance-chars 默认 / run 5 个 user-defined args / validate-report 1 positional / inspect-doc 1 positional + 1 optional / 中文 description / help text 含默认值标记）；**argparse Namespace 行为第十二批**（command 字段验证 / 各路径字段 str 类型 / parser kreuzberg / 负数 max_chars / tolerance-chars via kwarg / 各 namespace 字段类型）；**_format_metric 行为深度第十二批**（超长 name / Unicode name / dict empty string value / dict 多 key sorted / int 0 / negative int / negative float / 极大 int / value only no reason / Unicode reason / 输出始终 "  " 前缀 / padded name 严格 36 宽）；**_run_inspect_doc 行为深度第十二批**（BOM 失败 / Unicode filename / Path input / 不存在 / 第一行格式 / 缺字段 '?' / 默认 source_type unknown / 0 counts / elements count / chunks count / invalid json / int 返回类型）；**main 路由第十二批**（manifest load 失败 / run 成功 / report validate 失败 / parser 透传 / validate-report 成功 / validate-report schema fail / inspect-doc dispatch / int 返回类型 / 空 argv SystemExit）；**module source forbidden tokens 第十五批**；**module source 字符串精确补强第十二批**；**signatures 第十二批**；**module 合理性第十二批**；**端到端集成第十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges39.py`（144 测试）
+
+### 覆盖要点
+- **_build_parser 行为深度第十二批**：17 测试
+- **argparse Namespace 行为第十二批**：12 测试
+- **_format_metric 行为深度第十二批**：14 测试
+- **_run_inspect_doc 行为深度第十二批**：13 测试
+- **main 路由第十二批**：12 测试
+- **module source forbidden tokens 第十五批**：13 测试
+- **module source 字符串精确补强第十二批**：18 测试
+- **signatures 第十二批**：11 测试
+- **module 合理性第十二批**：14 测试
+- **端到端集成第十二批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_e2e_module_callable_via_python_m_batch12 — subprocess 默认 GBK 解码 argparse help 失败，result.stdout 为 None）。修复：去掉 text=True，只断言 returncode==0 且 stdout bytes 非空。
+- 第二次跑：144 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 404 后）：48881 pass / 0 fail / 19 skip（HEAD `359155c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十九轮
+  - evaluation/annotation_metrics.py 第三十九轮
+  - evaluation/schema.py 第三十一轮
+  - evaluation/metrics.py 第四十一轮
+  - evaluation/report.py 第二十九轮
+  - evaluation/runner.py 第四十一轮
+  - evaluation/cli.py 第四十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 403 — evaluation/runner.py 第四十轮（121 测试）
 
 ### 目标
