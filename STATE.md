@@ -4,6 +4,44 @@
 
 ---
 
+## Round 424 — evaluation/runner.py 第四十四轮（86 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第四十四轮 edges 测试，覆盖 edges41 未触及的角度：**_load_annotation 行为深度第十五批**（嵌套 dict / 顶层 None / string / number / bool / ValueError 子类）；**_process_one 行为深度第十五批**（image_dir 用 image_output_dir_for / errors 多个取第 1 / no errors no document → unknown / total_seconds 非负 / parser_version 透传 / image_dir None when document None）；**run_evaluation 行为深度第十五批**（多个文档批处理 / 多个 expected_failures / 多种 source_type / summary 4 keys / devset 6 keys / provenance 9 keys / 写文件 / parser_version 第一个被采用 / json round-trip / parser_name 透传 / max_chars 透传）；**module source forbidden tokens 第二十批**；**module source 字符串精确补强第十七批**；**signatures 第十七批**；**module 合理性第十七批**；**端到端集成第十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges42.py`（86 测试）
+
+### 覆盖要点
+- **_load_annotation 行为深度第十五批**：7 测试
+- **_process_one 行为深度第十五批**：6 测试
+- **run_evaluation 行为深度第十五批**：13 测试
+- **module source forbidden tokens 第二十批**：16 测试
+- **module source 字符串精确补强第十七批**：21 测试
+- **signatures 第十七批**：7 测试
+- **module 合理性第十七批**：6 测试
+- **端到端集成第十七批**：10 测试
+
+### 撞墙记录
+- 首次跑：86 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 424 后）：51587 pass / 0 fail / 19 skip（HEAD `e8fd475`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第四十三轮
+  - evaluation/manifest.py 第四十二轮
+  - evaluation/annotation_metrics.py 第四十二轮
+  - evaluation/schema.py 第三十四轮
+  - evaluation/metrics.py 第四十四轮
+  - evaluation/report.py 第三十二轮
+  - evaluation/runner.py 第四十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 423 — evaluation/report.py 第三十一轮（104 测试）
 
 ### 目标
