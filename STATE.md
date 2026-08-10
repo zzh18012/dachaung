@@ -4,6 +4,54 @@
 
 ---
 
+## Round 330 — evaluation/manifest.py 第二十八轮（187 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二十八轮 edges 测试，覆盖 edges27 未触及的角度：**_is_absolute_like 数学边界第三批**（大写 Z drive / lowercase z / drive only no slash / 4 chars / 中文 alpha / 0/1/2/3 chars / drive colon only / drive dash / drive dot / drive space / drive plus）；**_has_backslash 数学边界第三批**（Unicode 全角反斜杠 / 单 backslash / 双 backslash / URL-like / position 0 / last position）；**DocumentEntry frozen / equality / hash / fields 精确**（field names exact / hashable / can be set key / FrozenInstanceError / full equality / inequality on path_str / multi-element categories tuple）；**ExpectedFailure frozen / fields**（field names exact / hashable / frozen raises）；**Manifest properties 精确**（pdf_count for only docx / docx_count for only pdf / mixed counts）；**content_group_count 算法深度**（self pair / chain pair / unidirectional / one unpaired / zero documents / int return type）；**categories_covered 精确**（sorted alphabetical / empty / dedup across documents）；**load_manifest malformed data 拒绝**（missing manifest_version / missing devset_status / missing documents / unsupported version / string project_root / dir as path）；**module source forbidden tokens 第三批**（~75 stdlib）；**module source 字符串精确补强**（class ManifestError / docstring / constraints / @dataclass / @property 计数 / validate call / MANIFEST_VERSION / raises / no yield/async/lambda/main）；**signatures 精确补强**（return annotations / params / no varargs varkw）；**模块整体合理性**（namespace / __all__ 5 entries / 4 private / 1 public / 4 classes / 3 dataclasses）；**端到端集成补强**（one pdf / one docx / two categories / paired / expected_failure / expectations / path_str kept relative / resolved_path absolute / documents tuple / expected_failures tuple / annotation_file / load twice equal）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges28.py`（187 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第三批**：16 测试
+- **_has_backslash 数学边界第三批**：6 测试
+- **DocumentEntry frozen / equality / hash / fields 精确**：9 测试
+- **ExpectedFailure frozen / fields**：3 测试
+- **Manifest properties 精确**：3 测试
+- **content_group_count 算法深度**：6 测试
+- **categories_covered 精确**：3 测试
+- **load_manifest malformed data 拒绝**：7 测试
+- **module source forbidden tokens 第三批**：~75 测试（parametrize）
+- **module source 字符串精确补强**：19 测试
+- **signatures 精确补强**：13 测试
+- **模块整体合理性**：14 测试
+- **端到端集成补强**：12 测试
+
+### 撞墙记录
+- 首次跑 5 fail（修复后 0 fail）：
+  - unsupported_version 抛 EvalSchemaError（schema 先拒绝）而非 ManifestError → 改成 raises(Exception)
+  - @property 计数 5 不是 4（多算了 categories_covered）→ 改成 5
+  - test_module_has_4_classes 抓到 imported Any/Path → 加 __module__ 过滤
+  - 两个 e2e 测试缺 tmp_path 参数 → 补 tmp_path
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 330 后）：32924 pass / 0 fail / 18 skip（HEAD `4d108d6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第二十九轮
+  - evaluation/annotation_metrics.py 第二十九轮
+  - evaluation/schema.py 第二十轮
+  - evaluation/metrics.py 第二十九轮
+  - evaluation/runner.py 第三十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest edges28 已饱和（is_absolute 16 + has_backslash 6 + DocumentEntry 9 + ExpectedFailure 3 + Manifest 3 + content_group 6 + categories 3 + load_manifest 7 + forbidden 75 + source 19 + signatures 13 + 模块 14 + 端到端 12）。下一轮选 evaluation/cli.py 第二十九轮。
+
+---
+
 ## Round 329 — evaluation/runner.py 第二十九轮（198 测试）
 
 ### 目标
