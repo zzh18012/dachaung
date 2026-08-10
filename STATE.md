@@ -4,6 +4,47 @@
 
 ---
 
+## Round 318 — evaluation/runner.py 第二十七轮（96 测试 + 1 skip）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第二十七轮 edges 测试，覆盖 edges25 未触及的角度：**_load_annotation 行为深度补强**（symlink to missing / symlink to valid / large dict / nested dict / string value / int / float / bool / null / utf-8 / empty array / empty file / only whitespace / trailing comma / single quotes / unquoted key / 文件 handle 关闭）；**_process_one signatures 补强**（4 params no default / no varargs/varkw / POSITIONAL_OR_KEYWORD kind）；**run_evaluation 行为深度补强**（creates output with indent / valid json / devset/provenance/summary sections / no documents no failures / parser_name 透传 / max_chars 透传 / tolerance_chars 透传 / output ensure_ascii=False / returns same dict as written / 不变量）；**module source 字符串精确补强**（docstring mentions total/pipeline/per_doc/image_resource / 3 returns in load_annotation / process_one 5 return paths / run_evaluation returns report / output 文件创建 / per_doc loop / public_per_doc loop / parser_version first only）；**signatures 精确补强**（POSITIONAL_OR_KEYWORD kind / keyword marker in source）；**module 整体合理性**（__all__ 1 entry / no class / no __main__ / 2 private functions / 1 public function）；**端到端集成**（empty manifest full cycle / nested output path / keyword-only args / positional only fails / 报告通过 schema validation）；**_process_one 不变量**（unlink in try/except / image_dir None when document None / image_dir 在 errors/unknown/success 三路径都返回）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges26.py`（96 测试 + 1 symlink skip）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 行为深度补强**：17 测试（1 symlink skip）
+- **_process_one signatures 补强**：6 测试
+- **run_evaluation 行为深度补强**：13 测试
+- **module source 字符串精确补强**：17 测试
+- **signatures 精确补强**：2 测试
+- **module 整体合理性**：6 测试
+- **端到端集成**：5 测试
+- **_process_one 不变量**：5 测试
+- **module source forbidden tokens**：27 测试（parametrize）
+
+### 撞墙记录
+- 0 fail 首次跑（96 全通过 + 1 symlink skip）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 318 后）：31192 pass / 0 fail / 17 skip（HEAD `4431cbf`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第二十六轮
+  - evaluation/cli.py 第二十七轮
+  - evaluation/annotation_metrics.py 第二十七轮
+  - evaluation/metrics.py 第二十七轮
+  - evaluation/schema.py 第十九轮
+  - evaluation/runner.py 第二十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges26 已饱和（_load_annotation 文件类型深度 + _process_one 不变量 + run_evaluation keyword-only + source 字符串 + signatures + 端到端 + 模块整体）。下一轮选 evaluation/manifest.py 第二十六轮。
+
+---
+
 ## Round 317 — evaluation/schema.py 第十八轮（117 测试）
 
 ### 目标
