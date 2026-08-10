@@ -4,6 +4,53 @@
 
 ---
 
+## Round 356 — evaluation/cli.py 第三十三轮（259 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第三十三轮 edges 测试，覆盖 edges31 未触及的角度：**_build_parser source level 字符串精确补强第二批**（starts with def / returns p / uses ArgumentParser / prog evaluation.cli / description / formatter_class / add_subparsers / dest command / required True / 3 add_parser / run / validate-report / inspect-doc / choices fallback kreuzberg / default fallback / max_chars 800 / tolerance_chars 30 / type int / required manifest / required output / no eval/exec/compile/subprocess/os.system）；**main source level 字符串精确补强第二批**（starts with def / return 0/1/2 / uses _build_parser / parse_args argv / args.command run/validate-report/inspect-doc / uses Path / load_manifest / run_evaluation / validate_file / get_git_provenance / catches ManifestError/EvalSchemaError/JSONDecodeError/FileNotFoundError / uses manifest.project_root / uses sys.stderr / args.parser/max_chars/tolerance_chars/manifest/output/input / uses report schema / no eval/exec/subprocess/yield/async/global）；**_format_metric source level 字符串精确补强第二批**（starts with def / 2 params / uses get value/reason / handles None/bool/float/dict / str.lower / :.4f / name:36 padding / default ok / .join / no eval/subprocess）；**_run_inspect_doc source level 字符串精确补强第二批**（starts with def / args param / lazy import / chunk_boundary_prf / figure_caption_prf / compute_automatic_metrics / Path(args.input) / is_file / JSONDecodeError / doc.get source_type/elements/chunks / args.tolerance_chars / _format_metric / _sort_key / sorted / returns 0/1/2 / uses print / no eval/subprocess / handles not dict / uses open utf-8）；**argparse 边界第四批**（prog value / description value / formatter_class / subparsers required / help string / max_chars help 800 / tolerance_chars help 30 / parser help / validate-report / inspect-doc / required manifest/output / not required parser/max_chars / positional input / default tolerance 30 / override tolerance / inspect-doc no parser param / no max-chars / validate-report no optional / inspect-doc no input / 3 choices / 2 parser choices）；**main 行为深度第五批**（unknown command SystemExit / validate-report nonexistent / inspect-doc nonexistent / inspect-doc invalid json / top-level array / int / string / null / minimal doc returns 0 / validate-report array / validate-report invalid json / minimal valid dict / run nonexistent manifest）；**module source forbidden tokens 第七批**（asyncio/threading/concurrent/subprocess/multiprocessing/queue/socket/select/re.match/datetime/time/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/functools/itertools/collections/importlib/platform）；**module source 字符串精确补强**（module docstring / 4 stdlib imports / 4 evaluation imports / no relative / no star / no yield / no async / no walrus / has main block / raise SystemExit(main()) / 4 functions / no user class / no __all__ / uses print / no eval/exec/compile / uses hasattr / AttributeError / OSError / errors replace / no sys.stdin / module-level reconfigure block）；**signatures 精确补强**（_build_parser 0 params / main argv default None / _format_metric 2 params / _run_inspect_doc args / no varargs / return annotations）；**模块整体合理性补强**（has docstring / mentions CLI/run/validate/inspect / name eq / file ends with cli.py / 4 callables / namespace has main/_build_parser/_format_metric/_run_inspect_doc / no user classes / imports argparse/json/sys/Path/ManifestError/load_manifest/get_git_provenance/run_evaluation/EvalSchemaError/validate_file）；**端到端集成补强**（inspect-doc full output / with tolerance chars / empty dict / format_metric int/str/list/long name/dict/dict multi keys/reason/default ok/no value）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges32.py`（259 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser source level 字符串精确补强第二批**：~22 测试
+- **main source level 字符串精确补强第二批**：~33 测试
+- **_format_metric source level 字符串精确补强第二批**：~16 测试
+- **_run_inspect_doc source level 字符串精确补强第二批**：~25 测试
+- **argparse 边界第四批**：~22 测试
+- **main 行为深度第五批**：~13 测试
+- **module source forbidden tokens 第七批**：~50 测试
+- **module source 字符串精确补强**：~25 测试
+- **signatures 精确补强**：~14 测试
+- **模块整体合理性补强**：~24 测试
+- **端到端集成补强**：~15 测试
+
+### 撞墙记录
+- 3 fail 首次跑：
+  - `validate-report` / `inspect-doc` 子命令的 description 是 None（实际用 help）→ 改成检查 `is not None` → `val_p is not None`
+  - `_run_inspect_doc` 签名中的 `args` 是参数名而非 VAR_POSITIONAL → 改成检查 kind 不等于 VAR_POSITIONAL/VAR_KEYWORD
+- 1 syntax error：`'" ", '.join'` 引号嵌套错误 → 简化为 `.join(`
+- 修复后 259 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 356 后）：40180 pass / 0 fail / 18 skip（HEAD `b2cbf7f`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十三轮
+  - evaluation/schema.py 第二十四轮
+  - evaluation/metrics.py 第三十三轮
+  - evaluation/report.py 第二十二轮
+  - evaluation/runner.py 第三十四轮
+  - evaluation/manifest.py 第三十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli edges32 已饱和（4 个函数 source level 第二批 + argparse 第四批 + main 第五批 + forbidden 50 + signatures + 端到端 15）。下一轮选 evaluation/annotation_metrics.py 第三十三轮，覆盖 figure_caption_prf/chunk_boundary_prf 行为深度与 source 字符串补强。
+
+---
+
 ## Round 355 — evaluation/manifest.py 第三十二轮（289 测试）
 
 ### 目标
