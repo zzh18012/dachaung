@@ -4,6 +4,50 @@
 
 ---
 
+## Round 398 — evaluation/manifest.py 第三十八轮（177 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第三十八轮 edges 测试，覆盖 edges37 未触及的角度：**_is_absolute_like 数学边界第十一批**（更多 corner cases：whitespace / multi-char drive / 仅 colon / 特殊字符前缀）；**_has_backslash 数学边界第十一批**；**_resolve_relative_path 行为深度第十一批**；**_detect_project_root 行为深度第十一批**；**DocumentEntry/ExpectedFailure/Manifest dataclass 行为第十一批**；**Manifest properties algorithm 第十一批**；**load_manifest malformed data 第十一批**；**module source forbidden tokens 第十四批**；**module source 字符串精确补强第九批**；**signatures 第十一批**；**module 合理性第十一批**；**端到端集成第十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges38.py`（177 测试）
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第十一批**：15 测试
+- **_has_backslash 数学边界第十一批**：10 测试
+- **_resolve_relative_path 行为深度第十一批**：15 测试
+- **_detect_project_root 行为深度第十一批**：6 测试
+- **DocumentEntry/ExpectedFailure/Manifest dataclass 行为第十一批**：18 测试
+- **Manifest properties algorithm 第十一批**：14 测试
+- **load_manifest malformed data 第十一批**：12 测试
+- **module source forbidden tokens 第十四批**：16 测试
+- **module source 字符串精确补强第九批**：17 测试
+- **signatures 第十一批**：14 测试
+- **module 合理性第十一批**：11 测试
+- **端到端集成第十一批**：10 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_resolve_relative_path_str_project_root_batch11` — 函数期望 Path 对象，传 str → TypeError
+- 修复：测试改为期望 TypeError
+- 二次跑：177 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 398 后）：48007 pass / 0 fail / 19 skip（HEAD `f6df3c6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十八轮
+  - evaluation/schema.py 第三十轮
+  - evaluation/metrics.py 第三十九轮
+  - evaluation/report.py 第二十八轮
+  - evaluation/runner.py 第四十轮
+  - evaluation/cli.py 第三十九轮
+  - evaluation/manifest.py 第三十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 397 — evaluation/cli.py 第三十八轮（148 测试）
 
 ### 目标
