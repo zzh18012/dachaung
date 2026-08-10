@@ -4,6 +4,50 @@
 
 ---
 
+## Round 315 — evaluation/annotation_metrics.py 第二十六轮（112 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第二十六轮 edges 测试，覆盖 edges24 未触及的角度：**figure_caption_prf 行为深度**（returns 3 metrics / all null / 同 reason / 忽略 document 内容 / 忽略 annotation 内容 / call count 一致 / returns dict of dict）；**chunk_boundary_prf 算法精确**（default tolerance / document None → pipeline_failed / no annotation → no_annotation / empty annotation falsy 短路 / no chunks → no_predicted_boundaries / 1 chunk → no_predicted + ratio 0 / 1 chunk no anchors → null recall / no anchors → no_ground_truth / perfect match after / perfect match before / tolerance=0 严格 / extra anchor 影响 recall / missing marker field 跟踪 / no missing no field / tolerance 字段各分支 / one-to-one matching / duplicate markers / f1=0 when p=0 / f1=2/3 when p=0.5/r=1 / _tolerance_chars 4 分支 / returns dict / chunks missing field / anchors missing field / anchor no marker field / position default after）；**PARSER_DOES_NOT_EMIT_RELATIONS 常量**（value/type/namespace/在 figure_caption_prf 中引用）；**module source forbidden tokens**（28 个 stdlib）；**module source 必要 imports**（4 stdlib + app.chunkers.structural.normalize_text + evaluation.metrics._null+_ratio）；**module source 字符串精确**（2 函数 def / constant assignment / normalize_text 调用 / docstring marker/position/tolerance_chars / 贪心匹配 / 一对一 / 5 reason 字符串 / search_from advance / pairs.sort / used_pred+used_gt / num_pred+num_gt / denom check / out dict annotation / no __main__ / no class）；**signatures 精确**（2 函数 / param annotations / return annotations / no varargs/varkw）；**namespace 检查**；**module 整体合理性**（__all__ 3 entries / 2 functions / 1 constant / no class / no __main__）；**端到端集成**（full match pipeline / normalize 空白 / 大容差远距离 / figure_caption always null / deterministic / no chunks at all）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges25.py`（112 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 行为深度**：7 测试
+- **chunk_boundary_prf 算法精确**：32 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量**：4 测试
+- **module source forbidden tokens**：28 测试（parametrize）
+- **module source 必要 imports**：5 测试
+- **module source 字符串精确**：20 测试
+- **signatures 精确**：8 测试
+- **namespace 检查**：3 测试
+- **module 整体合理性**：5 测试
+- **端到端集成**：7 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_chunk_boundary_prf_anchors_missing_field` - 空 dict `{}` 触发 falsy 短路（`if not annotation:`），不是 anchors 缺失分支 → 改用 `{"other_field": 1}` 非空 annotation
+- 修复后 112 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 315 后）：30833 pass / 0 fail / 16 skip（HEAD `59f732d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第二十六轮
+  - evaluation/schema.py 第十八轮
+  - evaluation/runner.py 第二十七轮
+  - evaluation/manifest.py 第二十六轮
+  - evaluation/cli.py 第二十七轮
+  - evaluation/annotation_metrics.py 第二十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges25 已饱和（figure_caption_prf 不变量 + chunk_boundary_prf 算法精确各分支 + 容差边界 + 重复 marker + missing_markers 字段 + forbidden tokens + source 字符串 + signatures + 端到端 + 模块整体）。下一轮选 evaluation/metrics.py 第二十六轮，覆盖 _ratio 数学边界（inf/nan/-0.0 不 clamp）+ compute_automatic_metrics 不变量。
+
+---
+
 ## Round 314 — evaluation/cli.py 第二十六轮（133 测试）
 
 ### 目标
