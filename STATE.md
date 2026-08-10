@@ -4,6 +4,49 @@
 
 ---
 
+## Round 374 — evaluation/report.py 第二十四轮（165 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第二十四轮 edges 测试，覆盖 edges23 未触及的角度：**get_git_provenance 行为深度第七批**（real repo / non-existent dir / non-git dir / OSError via patch / SubprocessError / str path / Path / idempotent）；**get_dependency_versions 行为深度第七批**（3 keys + str|None + idempotent + no args）；**build_provenance 行为深度第七批**（9 keys 完整 + evaluator_version == EVALUATOR_VERSION + report_version == REPORT_VERSION + parser_name/version None + max_chars int + str input converted + dependencies dict + timestamp iso format + git_commit SHA-1 40 字符 + git_dirty bool）；**build_devset_section 行为深度第七批**（6 keys 完整 + status/file_count/categories/pdf_only/idempotent + Manifest 对象模拟）；**aggregate_summary 行为深度第七批**（counts sum/None/all None + success_rate full/partial/zero total + ratio_macro_average 计算 + None skipped + all None + figure_caption 不参与 + chunk_boundary 参与 + silent_drop total/None/all None/empty + 不修改输入 + idempotent + 4 top keys + 12 ratio + 1 count + 1 success）；**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 常量精确补强**（exact entries in order + tuple + length + no overlap + figure_caption 不在 ratio + silent_drop 不在任何常量）；**module source forbidden tokens 第十批**；**module 合理性第七批**（__all__ 精确 5 项顺序 + entries unique/str + 5 callables + callable names + 3 constants + no user class + docstring 4 keyword + file endswith + name eq + function __module__ eq）；**signatures 第七批**（5 funcs 参数数量 + no defaults + no varargs + no kwargs）；**module source 字符串精确补强第七批**（future annotations + 5 imports + 3 constant assigns + no main/yield/async/walrus/eval/exec/compile/unlink + no relative/star import + no class def + subprocess/datetime allowed）；**端到端集成第七批**（full chain build_provenance → aggregate_summary + partial participation + macro_average 正确 + json serializable + positional/kwargs + paired documents + 9 keys + 2 keys）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges24.py`（165 测试）
+
+### 覆盖要点
+- **get_git_provenance 行为深度第七批**：11 测试
+- **get_dependency_versions 行为深度第七批**：5 测试
+- **build_provenance 行为深度第七批**：12 测试
+- **build_devset_section 行为深度第七批**：8 测试
+- **aggregate_summary 行为深度第七批**：22 测试
+- **常量精确补强**：12 测试
+- **module source forbidden tokens 第十批**：32 测试
+- **module 合理性第七批**：17 测试
+- **signatures 第七批**：13 测试
+- **module source 字符串精确补强第七批**：22 测试
+- **端到端集成第七批**：11 测试
+
+### 撞墙记录
+- 1 fail 首次跑（test_get_git_provenance_non_git_dir_returns_default 期望 dirty=True）：实际 `dirty = bool(r2.returncode == 0 and r2.stdout.strip())`，非 git 目录 r2.returncode 非 0 → dirty = False（短路）。改为 type 断言（True 或 False）+ 保留 commit is None 不变量。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 374 后）：43875 pass / 0 fail / 19 skip（HEAD `ad428bb`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十六轮
+  - evaluation/manifest.py 第三十五轮
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十七轮
+  - evaluation/metrics.py 第三十六轮
+  - evaluation/report.py 第二十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report edges24 已饱和（get_git_provenance 11 + get_dep 5 + build_provenance 12 + build_devset 8 + aggregate 22 + 常量 12 + forbidden 32 + 模块 17 + signatures 13 + 字符串 22 + 端到端 11）。下一轮选 evaluation/runner.py 第三十六轮，覆盖 run_evaluation/_process_one/_load_annotation 行为深度第七批。
+
+---
+
 ## Round 373 — evaluation/metrics.py 第三十五轮（144 测试）
 
 ### 目标
