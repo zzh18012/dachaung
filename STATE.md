@@ -4,6 +4,54 @@
 
 ---
 
+## Round 405 — evaluation/manifest.py 第三十九轮（155 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第三十九轮 edges 测试，覆盖 edges38 未触及的角度：**_is_absolute_like 数学边界第十二批**（数字开头 / 下划线 / 大小写 alpha / 长度边界 / drive 无分隔符 / 单斜杠 / UNC / `.`/`~` 前缀 / 中文 alpha 触发 True）；**_has_backslash 数学边界第十二批**（empty / 多个反斜杠 / mixed / trailing / leading / Unicode）；**_resolve_relative_path 行为深度第十二批**（Unicode path / Unicode field name / dot path / double dot / 嵌套 / Path 类型 / 逃逸 project_root）；**_detect_project_root 行为深度第十二批**（多层 pyproject / dir 输入 / file 输入 / 无 pyproject fallback）；**DocumentEntry/ExpectedFailure/Manifest dataclass 行为第十二批**（field count 10/5/5 / frozen / hash / equality / repr / 默认 tuple）；**Manifest properties algorithm 第十二批**（pdf/docx count 复杂组合 / unknown source_type / 双向 vs 单向 paired / categories unique sorted）；**load_manifest malformed data 第十二批**（str/Path manifest_path / str/Path project_root / 不存在 / 目录 / 非法 JSON / version mismatch / 返回类型 / tuple 字段）；**module source forbidden tokens 第十五批**；**module source 字符串精确补强第十二批**；**signatures 第十二批**；**module 合理性第十二批**；**端到端集成第十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges39.py`（155 测试）
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第十二批**：11 测试
+- **_has_backslash 数学边界第十二批**：9 测试
+- **_resolve_relative_path 行为深度第十二批**：10 测试
+- **_detect_project_root 行为深度第十二批**：7 测试
+- **DocumentEntry/ExpectedFailure/Manifest dataclass 行为第十二批**：15 测试
+- **Manifest properties algorithm 第十二批**：11 测试
+- **load_manifest malformed data 第十二批**：12 测试
+- **module source forbidden tokens 第十五批**：12 测试
+- **module source 字符串精确补强第十二批**：19 测试
+- **signatures 第十二批**：14 测试
+- **module 合理性第十二批**：15 测试
+- **端到端集成第十二批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_manifest_field_count_6_batch12 — Manifest 实际有 5 个字段不是 6）。修复：改为 5。
+- 第二次跑：1 fail（test_load_manifest_version_mismatch_raises_batch12 — schema 锁 manifest_version="1.0"，"9.9.9" 先走 EvalSchemaError 而非 ManifestError）。修复：改为 expect EvalSchemaError。
+- 第三次跑：1 fail（test_manifest_source_no_class_outside_dataclasses_batch12 — 顶层有 4 个 class 不是 1）。修复：改为正向验证 4 个 class。
+- 第四次跑：1 fail（class 名 split(":") 误把 (Exception): 也切了）。修复：用 regex 提取。
+- 第五次跑：1 fail（test_module_no_top_level_user_constants_batch12 — annotations 和 MANIFEST_VERSION 也算）。修复：排除这俩。
+- 第六次跑：1 fail（test_e2e_load_manifest_with_sha256_batch12 — "abc123" 不匹配 sha256 regex）。修复：用 "a"*64。
+- 第七次跑：155 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 405 后）：49036 pass / 0 fail / 19 skip（HEAD `05ac15c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十九轮
+  - evaluation/schema.py 第三十一轮
+  - evaluation/metrics.py 第四十一轮
+  - evaluation/report.py 第二十九轮
+  - evaluation/runner.py 第四十一轮
+  - evaluation/cli.py 第四十轮
+  - evaluation/manifest.py 第四十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 404 — evaluation/cli.py 第三十九轮（144 测试）
 
 ### 目标
