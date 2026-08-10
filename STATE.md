@@ -4,6 +4,54 @@
 
 ---
 
+## Round 314 — evaluation/cli.py 第二十六轮（133 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第二十六轮 edges 测试，覆盖 edges24 未触及的角度：**_build_parser 行为深度补强**（returns ArgumentParser / prog / description / subparsers required=True / dest=command / 3 subcommands / run 5 args / run manifest required / run output required / run parser default=fallback / parser choices / run max-chars default+type / run tolerance-chars default+type / validate-report 1 positional / inspect-doc 1 positional input / inspect-doc has tolerance-chars）；**_format_metric 分支精确**（None / bool true/false / int fallback / float value/zero/one / dict empty/sorted / str / reason fallback ok / reason present / name 字段宽 36 / returns str）；**_run_inspect_doc 行为深度补强**（missing input / invalid JSON / non-dict / minimal dict 0 / source_type missing → unknown / counts displayed / metrics sorted / null metric displayed）；**main run 路径行为深度补强**（manifest missing → 2 / invalid JSON → 1 / schema reject → 1 / success → 0 + stdout 含 [OK]/documents=/devset_status= / parser args 透传 / invalid parser choice 抛 SystemExit）；**main validate-report 路径行为深度补强**（missing → 2 / invalid JSON → 1 / invalid content → 1 / success → 0 + [OK]）；**main inspect-doc 路径行为深度补强**（missing → 2 / invalid JSON → 1 / non-dict → 1 / success → 0 / --tolerance-chars 透传）；**main 无 subcommand**（抛 SystemExit）；**module source forbidden tokens**（25 个 stdlib）；**module source 必要 imports**（4 stdlib + manifest.ManifestError+load_manifest + report.get_git_provenance + runner.run_evaluation + schema.EvalSchemaError+validate_file）；**module source 字符串精确**（4 函数 def / argparse ArgumentParser / add_subparsers / 3 subcommands / required=True / 3 command branches / load_manifest / run_evaluation / validate_file 2 处 / get_git_provenance / [OK] 评测完成 / [OK] validate-report / 5 format_metric branches / 36 width / reason or ok / Windows reconfigure / except (AttributeError, OSError) / __main__ 块 / no class / no __all__）；**signatures 精确**（main argv default=None return int / no varargs/varkw / _build_parser 0 param return ArgumentParser / _format_metric 2 params return str / _run_inspect_doc 1 param return int）；**namespace 检查**（4 函数）；**module 整体合理性**（4 module-level functions / 3 private / no class / __main__ 块 / no __all__）；**端到端集成**（run → validate-report 循环 / inspect-doc on pipeline output）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges25.py`（133 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 行为深度补强**：17 测试
+- **_format_metric 分支精确**：15 测试
+- **_run_inspect_doc 行为深度补强**：8 测试
+- **main run 路径行为深度补强**：6 测试
+- **main validate-report 路径行为深度补强**：4 测试
+- **main inspect-doc 路径行为深度补强**：5 测试
+- **main 无 subcommand**：1 测试
+- **module source forbidden tokens**：25 测试（parametrize）
+- **module source 必要 imports**：9 测试
+- **module source 字符串精确**：23 测试
+- **signatures 精确**：7 测试
+- **namespace 检查**：4 测试
+- **module 整体合理性**：6 测试
+- **端到端集成**：2 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_module_source_has_3_add_parser_calls` - validate-report 子命令的 add_parser 调用跨多行 + help 参数，源代码里 `sub.add_parser("validate-report"` 不在同一行 → 改为检查 `"validate-report"` 和 `"inspect-doc"` 字符串
+- 修复后 133 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 314 后）：30721 pass / 0 fail / 16 skip（HEAD `1b3584a`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第二十六轮
+  - evaluation/metrics.py 第二十六轮
+  - evaluation/schema.py 第十八轮
+  - evaluation/runner.py 第二十七轮
+  - evaluation/manifest.py 第二十六轮
+  - evaluation/cli.py 第二十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges25 已饱和（_build_parser/_format_metric/_run_inspect_doc/main 4 函数行为深度 + forbidden tokens + source 字符串精确 + signatures + namespace + 端到端 + 模块整体）。下一轮选 evaluation/annotation_metrics.py 第二十六轮，覆盖 figure_caption_prf/chunk_boundary_prf 边界值精确。
+
+---
+
 ## Round 313 — evaluation/manifest.py 第二十五轮（156 测试）
 
 ### 目标
