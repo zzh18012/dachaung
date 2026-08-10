@@ -4,6 +4,59 @@
 
 ---
 
+## Round 322 — evaluation/metrics.py 第二十七轮（143 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二十七轮 edges 测试，覆盖 edges25 未触及的角度：**compute_automatic_metrics 整体行为深度补强**（source_type unknown/empty/pdf/docx 各 locator null + reason 路径 / document+error 同 truthy 时 pipeline_success=False / 14 metric key 集合不变量 / error truthy 但缺 code 字段 → KeyError / element_count_by_type 缺 type 字段默认 unknown / element_count_total 是 int 类型）；**_text_preservation 不变量补强**（empty elements + empty chunks → equal True + precision/recall null empty_expected_and_actual / only image elements + empty chunks → equal True / only image + chunks 有内容 → equal False / chunk 缺 text field → precision null empty_actual / element 缺 content → recall null empty_expected / 返回 dict 3 keys / 重复字符 precision=0.5）；**_silent_drop_count 边界补充**（element_count_by_type=None → no_expectations_element_count / element_count_by_type={} → no_expectations_element_count / 缺 element_count_by_type key → no_expectations_element_count / 多类型 sum 求和 / value=0 仍是 int）；**_pdf/_docx/_image/_strip_unicode/_chunk_reference/_heading_boundary/_silent_drop/_is_valid_bbox source level 字符串精确补强**（isinstance / page<1 / structural_keys 7 个 / try except OSError / candidates list / isspace join / chunk_first_ids / max(0, exp-actual) 隐式 / math.isfinite）；**module source forbidden tokens 第二批**（25 个 stdlib 模块：copy/pprint/json/csv/xml/configparser/argparse/inspect/dis/traceback/warnings/weakref/gc/struct/codecs/unicodedata/string/textwrap/difflib/decimal/fractions/statistics/array/queue/types）；**module source 字符串精确补强**（Counter & 交集 / for e/c loop / pipeline_success and 表达式 / lazy import schema_validation / exception type name / 2 个 return metrics / elements chunks 赋值 / text_metrics unpacking / no yield/global/async/class/__main__）；**signatures 精确**（compute_automatic_metrics 5 params 顺序 + 前 4 无 default + 第 5 image_base_dir=None + POSITIONAL_OR_KEYWORD + 无 varargs/varkw / 13 个 helper 各 param 数量精确 + 名字精确）；**常量精确补强**（_TEXT_TYPES 7 entries tuple / _PDF_BBOX_REQUIRED_TYPES 4 entries tuple / _NOT_EVALUATED 字符串 / subset 关系 / caption 在 TEXT_TYPES 但 image 不在）；**模块整体合理性**（namespace / __all__ 仅 compute_automatic_metrics / 1 public / 13 private function 集合 / 3 private constants 集合）；**端到端集成补强**（DOCX 5 文本类型 + image 全 intact / PDF 全 bbox valid / chunk 引用 heading 在 first position / pipeline_failed 11 metric 全 null pipeline_failed / 混合 page valid/invalid 比例 / DOCX with image real file / expectations with image type / 空白 chunks + 空白 content）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges26.py`（143 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **compute_automatic_metrics 整体行为深度补强**：13 测试
+- **_text_preservation 不变量补强**：7 测试
+- **_silent_drop_count 边界补充**：6 测试
+- **_pdf_locator_ratio source level**：5 测试
+- **_docx_locator_ratio source level**：4 测试
+- **_image_resource_ratio source level**：5 测试
+- **_strip_unicode_whitespace source level**：4 测试
+- **_chunk_reference_ratio source level**：3 测试
+- **_heading_boundary_ratio source level**：4 测试
+- **_silent_drop_count source level**：3 测试
+- **_is_valid_bbox source level**：4 测试
+- **module source forbidden tokens 第二批**：25 测试（parametrize）
+- **module source 字符串精确补强**：19 测试
+- **signatures 精确（compute_automatic_metrics）**：5 测试
+- **signatures 精确（helpers）**：11 测试
+- **常量精确补强**：8 测试
+- **模块整体合理性**：6 测试
+- **端到端集成补强**：9 测试
+
+### 撞墙记录
+- 3 fail 首次跑：
+  - `test_compute_metrics_error_code_with_no_code_field` - `error={}` 是 falsy → `error["code"] if error else None` 短路返回 None，无 KeyError → 改为 `error={"x": 1}` truthy 但缺 code
+  - `test_image_resource_ratio_has_2_params_with_default` - 函数自身 image_base_dir 无 default（default 在 compute_automatic_metrics 调用处）→ 改为 no default
+  - `test_e2e_docx_full_doc_with_all_text_types` - image 元素无 source_locator → 计入 invalid → 5/6≈0.8333 → 给 image 加 relationship_id
+- 修复后 143 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 322 后）：31605 pass / 0 fail / 18 skip（HEAD `2e708e1`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第十九轮
+  - evaluation/runner.py 第二十八轮
+  - evaluation/manifest.py 第二十七轮
+  - evaluation/cli.py 第二十八轮
+  - evaluation/annotation_metrics.py 第二十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges26 已饱和（compute_automatic_metrics 14 metric 不变量 + 7 helper 各 source level + 25 forbidden tokens + signatures + 常量 + 端到端）。下一轮选 evaluation/schema.py 第十九轮，覆盖 schema 文件加载/caching/路径计算/EvalSchemaError 行为深度。
+
+---
+
 ## Round 321 — evaluation/annotation_metrics.py 第二十七轮（58 测试）
 
 ### 目标
