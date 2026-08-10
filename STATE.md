@@ -4,6 +4,57 @@
 
 ---
 
+## Round 366 — evaluation/metrics.py 第三十四轮（376 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（382 行）加第三十四轮 edges 测试，覆盖 edges32 未触及的角度：**compute_automatic_metrics source level 字符串精确补强第三批**（docstring 6 字段 / pipeline_success eq / metrics 赋值 / error_code dict 字面量 / schema_valid 两个 branch / try-except-Exception / 第二次 document None / 11 metric keys / early return / get elements chunks / int_metric for count / by_type dict init+loop+assignment / pdf+docx branches with else not_pdf/not_docx / image_resource call / chunk_reference call / text_preservation 3 metric assignment / heading_boundary call / silent_drop call / final return / no yield/async/walrus/class）；**_null / _ratio / _bool_metric / _int_metric source 第三批**（dict literal / no class / no yield / one-liner 行数）；**_pdf_locator_ratio source 第三批**（docstring page+bbox / valid=0 / for e / loc get / page get / isinstance int / page<1 / PDF_BBOX_REQUIRED_TYPES 调用 / is_valid_bbox 调用 / valid+=1 / _ratio return）；**_docx_locator_ratio source 第三批**（docstring locator / 7 个 structural_keys 字符串 / page in loc / bbox in loc / any 检查）；**_is_valid_bbox source 第三批**（len!=4 / isinstance bool check / isinstance int float / math.isfinite / for v in bbox / return True / no class）；**_image_resource_ratio source 第三批**（docstring image / list comprehension / no_images branch / valid=0 / for img / get resource_path / if not rp / candidates list / image_base_dir concat / ok bool / for p in candidates / try-except OSError / is_file + stat / valid increment / return ratio）；**_chunk_reference_ratio source 第三批**（elem_ids set / for c / ids or empty / all check / return ratio）；**_strip_unicode_whitespace source 第三批**（docstring Unicode / join with generator / not ch.isspace / no re.sub/strip/replace）；**_text_preservation source 第三批**（docstring / expected_raw join + filter image / actual_raw join / strip_unicode 双调用 / equal assignment + bool_metric / Counter init 双 / intersection / empty_both check / precision+recall div zero / else ratio / 3 keys return）；**_heading_boundary_ratio source 第三批**（docstring / list comprehension / no_heading branch / chunk_first_ids set / for c / ids or empty / if ids / add ids[0] / matched sum / return ratio）；**_silent_drop_count source 第三批**（docstring / if not expectations / get element_count_by_type / if not expected_counts / drops=0 / for t exp items / actual get / if actual < exp / drops += / return int_metric）；**行为深度第七批**（_null empty/Unicode reason / _ratio int/zero/negative / _bool_metric truthy/falsy / _int_metric float/negative/str digit / pdf_locator 多种 valid/invalid 组合 / docx_locator 多种 / is_valid_bbox 多种 invalid 类型 / image_resource 多种 valid/invalid / chunk_reference 多种 / strip_unicode 多种 Unicode 空白 + emoji + Chinese + punctuation + numbers / text_preservation equal/loss/empty/image_filtered / heading_boundary 多种 / silent_drop 多种）；**module source forbidden tokens 第八批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/importlib/platform/subprocess/argparse/sys）；**module source 字符串精确补强第三批**（docstring / future / 4 imports / 3 constants / no relative / no star / no yield/async/walrus/main/class / 14 functions / __all__ 1 entry / no eval/exec/compile/unlink/write/print）；**signatures 精确补强第三批**（14 个 function 各自签名 + compute 5 params + image_base_dir default None + no varargs）；**模块整体合理性补强第三批**（docstring / __all__ / 14 callables / 3 constants / no classes / module name / file endswith / text_types 7 entries / pdf_bbox 4 entries / not_evaluated value / pdf_bbox subset of text_types）；**端到端集成补强第三批**（minimal pdf doc / document None / error dict / 不修改 doc/error / idempotent / positional+kwargs / docx+unknown source type / pdf elements / text_preservation / strip_unicode / is_valid_bbox / pdf+docx locator / chunk_reference / image_resource / silent_drop / heading_boundary / full pdf doc with image / 14 metric keys for document None）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges33.py`（376 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **compute_automatic_metrics source level 字符串精确补强第三批**：~37 测试
+- **_null / _ratio / _bool_metric / _int_metric source 第三批**：~10 测试
+- **_pdf_locator_ratio source 第三批**：~15 测试
+- **_docx_locator_ratio source 第三批**：~10 测试
+- **_is_valid_bbox source 第三批**：~8 测试
+- **_image_resource_ratio source 第三批**：~16 测试
+- **_chunk_reference_ratio source 第三批**：~6 测试
+- **_strip_unicode_whitespace source 第三批**：~7 测试
+- **_text_preservation source 第三批**：~16 测试
+- **_heading_boundary_ratio source 第三批**：~10 测试
+- **_silent_drop_count source 第三批**：~10 测试
+- **行为深度第七批**：~75 测试
+- **module source forbidden tokens 第八批**：~33 测试
+- **module source 字符串精确补强第三批**：~25 测试
+- **signatures 精确补强第三批**：~17 测试
+- **模块整体合理性补强第三批**：~20 测试
+- **端到到端集成补强第三批**：~30 测试
+
+### 撞墙记录
+- 1 fail 首次跑：text_preservation 剥空白后 expected="helloworld"(10)，不是 "hello world"(11)；recall = 5/10 = 0.5
+- 修复后 376 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 366 后）：42550 pass / 0 fail / 18 skip（HEAD `9dbe275`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第二十三轮
+  - evaluation/runner.py 第三十五轮
+  - evaluation/manifest.py 第三十四轮
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十六轮
+  - evaluation/metrics.py 第三十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges33 已饱和（compute source 37 + 10 helper source + 行为深度 75 + forbidden 33 + signatures 17 + 端到端 30）。下一轮选 evaluation/report.py 第二十三轮，覆盖 build_provenance / aggregate_summary source 字符串补强。
+
+---
+
 ## Round 365 — evaluation/schema.py 第二十五轮（276 测试）
 
 ### 目标
