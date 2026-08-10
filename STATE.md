@@ -4,6 +4,47 @@
 
 ---
 
+## Round 350 — evaluation/annotation_metrics.py 第三十二轮（206 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第三十二轮 edges 测试，覆盖 edges30 未触及的角度：**figure_caption_prf 行为深度第四批**（3 metric dict / 各 key present / 各 value None / reason 常量精确 / None document / None annotation / both None / 含 elements 仍 null / 含 annotation relations 仍 null / 一致性 / 空字典输入 / 非 dict 输入 / 不依赖 annotation / 不依赖 document）；**chunk_boundary_prf 算法深度第四批**（基本 2 chunks / 3 chunks 2 boundaries / position before / position after / marker 不匹配 / tolerance 0 / tolerance 5 / 重复 markers / marker 远离 predicted / 多 chunks 1 anchor / 1 chunk 9 anchors / Unicode / 特殊字符 / 空 text / 数字 / 标点）；**chunk_boundary_prf 边界组合补强**（chunks 缺 text / text 非字符串 / text=0 / annotation 缺 marker / annotation 缺 position / position 非法 / 含额外键 / 含 metadata / chunks 含额外键 / 负 tolerance / 巨大 tolerance）；**_tolerance_chars 字段验证**（默认 30 / 自定义 / 0 / 负 / reason None / 各分支都返回）；**module source forbidden tokens 第七批**（~60 stdlib / builtin calls，避开合法使用的 Counter / normalize_text / _null / _ratio）；**module source 字符串精确补强**（docstring mentions figure_caption/chunk_boundary/tolerance/null / 5 imports / Counter / Any / normalize_text / _null+_ratio / no relative / no star / no main / no yield / no async / no global / no walrus / no class / uses normalize_text / uses Counter / uses _null / uses _ratio / no pickle/yaml/logging/argparse/tomllib/csv / PARSER_DOES_NOT_EMIT_RELATIONS 常量 / pairs.sort / used_pred / used_gt / stream.find / search_from / missing_markers / 2 functions / function names / has __all__ / 4 branches reason constants）；**signatures 精确补强**（chunk_boundary_prf 3 params / names / no defaults / tolerance default 30 / no varargs；figure_caption_prf 2 params / names / no defaults / no varargs；functions FunctionType）；**模块整体合理性**（namespace 2 callables / constant 在 vars / __name__ / __file__ / docstring / __all__ count 3 / contents / str constant / callables / no user classes / __module__ eq）；**端到端集成补强**（real doc layout / figure_caption always null / idempotent / 不 mutate / json serializable / positional / kwargs / partial kwargs / doc+ann None 返回 dict / 0 chunks / 1 chunk / no anchors / 空字典 annotation / normalize whitespace / marker spans chunks / long stream）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges31.py`（206 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 行为深度第四批**：~20 测试
+- **chunk_boundary_prf 算法深度第四批**：~18 测试
+- **chunk_boundary_prf 边界组合补强**：~13 测试
+- **_tolerance_chars 字段验证**：8 测试
+- **module source forbidden tokens 第七批**：~60 测试（parametrize）
+- **module source 字符串精确补强**：~37 测试
+- **signatures 精确补强**：~12 测试
+- **模块整体合理性**：~14 测试
+- **端到端集成补强**：~21 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - namespace 检查把 str 常量也算 __module__ 匹配 → str 的 __module__ 是 builtins 不是模块 → 拆成 2 个测试（callable 用 __module__ 匹配 + constant 用 vars 检查）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 350 后）：38726 pass / 0 fail / 18 skip（HEAD `6b1d257`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十三轮
+  - evaluation/metrics.py 第三十二轮
+  - evaluation/runner.py 第三十三轮
+  - evaluation/manifest.py 第三十二轮
+  - evaluation/cli.py 第三十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges31 已饱和（figure_caption 第四批 + chunk_boundary 算法第四批 + 边界组合 + tolerance 字段 + forbidden 60 + signatures + 端到端 21）。下一轮选 evaluation/schema.py 第二十三轮，覆盖 EvalSchemaError 行为深度 + 4 个 schema cross-validation。
+
+---
+
 ## Round 349 — evaluation/cli.py 第三十二轮（230 测试）
 
 ### 目标
