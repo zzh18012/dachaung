@@ -4,6 +4,57 @@
 
 ---
 
+## Round 325 — evaluation/manifest.py 第二十七轮（178 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二十七轮 edges 测试，覆盖 edges26 未触及的角度：**_is_absolute_like 行为深度补强**（小写/大写盘符 / 单/双/三字符边界 / colon only / tilde / dotdot / underscore/digit drive / UNC / 2 slashes / C:/ 仅 drive）；**_has_backslash 行为深度补强**（single/middle/start/end/mixed/multiple/empty）；**_resolve_relative_path 行为深度补强**（normal/dot/double_dot_inside/triple_dot_outside/empty/absolute_posix/absolute_windows/backslash/field_name in msg/返回 Path+absolute）；**_detect_project_root 行为深度补强**（with pyproject/no pyproject/Path object/already dir/nearest in tree）；**ManifestError 行为深度补强**（Exception subclass/raise/catch/args/str/unicode/special chars/no extra attributes）；**DocumentEntry/ExpectedFailure/Manifest frozen 补强**（is_dataclass/FrozenInstanceError/字段数 10+5+5/field types/equality/inequality）；**Manifest properties 行为深度补强**（file_count/pdf/docx/categories_covered sorted+dedup/content_group_count 各 pair 算法分支：双向/单向/self-pair/disjoint pairs/属性返回类型）；**load_manifest 行为深度补强**（missing/invalid json/str path/default project root/categories/paired_with/sha256/expectations/annotation_file/expected_failures source_type/invalid path form/outside project/backslash）；**module source forbidden tokens 第二批**（32 个 stdlib 模块）；**module source 字符串精确补强**（imports/class/docstring mentions/no yield/global/async/lambda/main/3 个 @dataclass/@property only）；**signatures 精确补强**（5 函数 + 4 dataclass + ManifestError namespace/no varargs/varkw）；**模块整体合理性**（__all__ 5 entries / 4 classes / 3 dataclasses / 1 public / 4 private）；**端到端集成补强**（完整 3 docs + 1 ef / 3 pdf only / nested paths / categories default empty / resolved path / no ef default empty / tuple types）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges27.py`（178 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 行为深度补强**：19 测试
+- **_has_backslash 行为深度补强**：8 测试
+- **_resolve_relative_path 行为深度补强**：11 测试
+- **_detect_project_root 行为深度补强**：5 测试
+- **ManifestError 行为深度补强**：9 测试
+- **DocumentEntry frozen 补强**：6 测试
+- **ExpectedFailure frozen 补强**：4 测试
+- **Manifest frozen 补强**：5 测试
+- **Manifest properties 行为深度补强**：13 测试
+- **load_manifest 行为深度补强**：14 测试
+- **module source forbidden tokens 第二批**：32 测试（parametrize）
+- **module source 字符串精确补强**：18 测试
+- **signatures 精确补强**：17 测试
+- **模块整体合理性**：8 测试
+- **端到端集成补强**：7 测试
+
+### 撞墙记录
+- 3 fail 首次跑：
+  - `test_manifest_error_source_class_signature` - ManifestError 仅继承 Exception（builtin），inspect.signature 失败 → 改为检查 __init__ is Exception.__init__
+  - `test_document_entry_has_9_fields` - 实际是 10 个字段（doc_id/path_str/resolved_path/source_type/sha256/categories/paired_with/annotation_file_str/annotation_resolved/expectations）→ 改为 10
+  - `test_module_source_no_decorators_other_than_dataclass` - Manifest 有 5 个 @property → 改为允许 @property + @dataclass(frozen=True)
+- 另有 1 个 SyntaxWarning：test_is_absolute_like_just_backslash docstring 含 `\` → 用 r""" raw string
+- 修复后 178 全通过，0 warnings
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 325 后）：32070 pass / 0 fail / 18 skip（HEAD `6b6d1c9`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第二十八轮
+  - evaluation/annotation_metrics.py 第二十八轮
+  - evaluation/metrics.py 第二十八轮
+  - evaluation/runner.py 第二十九轮
+  - evaluation/manifest.py 第二十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest edges27 已饱和（_is_absolute_like 19 + _has_backslash 8 + _resolve 11 + _detect 5 + ManifestError 9 + frozen 15 + properties 13 + load_manifest 14 + forbidden 32 + source 18 + signatures 17 + 模块 8 + 端到端 7）。下一轮选 evaluation/cli.py 第二十八轮。
+
+---
+
 ## Round 324 — evaluation/runner.py 第二十八轮（145 测试）
 
 ### 目标
