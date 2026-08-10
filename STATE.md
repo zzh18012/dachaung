@@ -15656,15 +15656,70 @@ get_git_provenance 各 OSError 路径。
 
 ### 下一步建议
 - 候选：
-  - evaluation/runner.py 第二十二轮
   - evaluation/manifest.py 第二十二轮
   - evaluation/cli.py 第二十三轮
   - evaluation/annotation_metrics.py 第二十二轮
   - evaluation/metrics.py 第二十二轮
   - evaluation/schema.py 第十五轮
+  - evaluation/runner.py 第二十三轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：schema.py edges14 已饱和。下一轮选 evaluation/runner.py 第二十二轮，覆盖 _load_annotation/_process_one/run_evaluation 行为深度。
+**建议**：runner.py edges22 已饱和。下一轮选 evaluation/manifest.py 第二十二轮。
+
+---
+
+## Round 294 — evaluation/runner.py 第二十三轮（160 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第二十三轮 edges 测试，覆盖 edges21 未触及的角度：**_load_annotation 边界补强**（路径含中文 / 含空格 / 大文件 1MB / 多 key dict / 嵌套结构 / Path 对象接受 / None 短路）；**_process_one 行为深度补强**（unknown error 路径 source inspection / 5-tuple return / image_output_dir_for 调用 / parents=True / exist_ok=True / unlink OSError catch / perf_counter 2 处 / write_json=False / doc.doc_id / doc.resolved_path / document.parser_version 返回 / signature 4 params no default）；**run_evaluation 行为深度补强**（public_per_doc 不含 _annotation_present/_tolerance_chars/_missing_markers / public_per_doc 4 keys 精确 / report 6 top-level keys 精确 / report_version 不变 / expected_failures 空 list / per_doc/summary/devset/provenance 类型 / 写盘 indent=2 / 嵌套目录递归创建 / 不修改 manifest）；**wall_time 结构精确**（source 含 total/parse/chunk/parse_reason/chunk_reason/not_instrumented）；**expected_failure 处理**（source 含 4 keys / process_single 直接调用 / out_stub unlink / for ef 循环 / errors[0].code / matches = actual == expected）；**annotation 字段处理**（_load_annotation 调用 / _annotation_present 字段 / annotation is not None / figure_caption_prf + chunk_boundary_prf 调用 / metrics.update fig_caps+chunk_b / pop _tolerance_chars / pop _missing_markers / record value 提取）；**parser_version 处理**（init None / if parser_version and not parser_version_for_prov / parser_version= 传给 build_provenance）；**image_dir 逻辑**（image_dir.is_dir() / image_dir is not None / image_base_dir=）；**report 写盘细节深度**（json.dump ensure_ascii=False / indent=2 / out_p.parent.mkdir / out_p.open utf-8 / returns dict）；**public_per_doc 构造**（[] init / for r in per_doc_results / 4 keys 精确）；**report 装配**（6 keys / build_provenance / build_devset_section / aggregate_summary）；**module imports 完整**（json/time/Path/Any/process_single/image_output_dir_for/REPORT_VERSION/chunk_boundary_prf/figure_caption_prf/compute_automatic_metrics/aggregate_summary/build_devset_section/build_provenance）；**module namespace**（run_evaluation + _load_annotation + _process_one + imported helpers + 不含 Manifest/load_manifest）；**module source forbidden tokens 补强**（logging/subprocess/os/sys/asyncio/threading/concurrent/collections/math/datetime/itertools/functools/re/star/relative）；**module __all__**（1 entry / callable / namespace）；**module docstring 深度**（pipeline/total/not_instrumented/image/per_doc）；**signatures 完整**（_load_annotation 1 param / _process_one 4 params no default / run_evaluation 5 params + 3 keyword-only + 默认值 fallback/800/30 + no varargs/varkw）；**module source level 完整 - 子函数 source**（_load_annotation path is None + utf-8 + json.load + (OSError, JSONDecodeError) + no generic except；_process_one perf_counter + mkdir + unlink + image_dir + 'unknown' + errors[0].to_dict() + document.to_dict() + 5-tuple annotation；run_evaluation keyword-only + process_single + compute_automatic_metrics + doc.* / build_provenance/devset_section/aggregate_summary）；**端到端集成**（空 manifest 不抛 / 写盘 loadable / 通过 schema / provenance 9 字段 / devset 6 字段 / summary 4 字段）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges22.py`（160 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 边界补强**：7 测试（中文/空格/大文件/多 key/嵌套/Path 对象/None 短路）
+- **_process_one 行为深度补强**：13 测试（source level）
+- **run_evaluation 行为深度补强**：16 测试（public_per_doc/report keys/types/写盘/不修改）
+- **wall_time 结构精确**：3 测试
+- **expected_failure 处理**：6 测试
+- **annotation 字段处理**：12 测试
+- **parser_version 处理**：3 测试
+- **image_dir 逻辑**：3 测试
+- **report 写盘细节深度**：5 测试
+- **public_per_doc 构造**：3 测试
+- **report 装配**：3 测试
+- **module imports 完整**：13 测试
+- **module namespace**：9 测试
+- **module source forbidden tokens**：16 测试
+- **module __all__**：4 测试
+- **module docstring 深度**：6 测试
+- **signatures 完整**：11 测试
+- **module source level 完整**：14 测试
+- **端到端集成**：6 测试
+
+### 撞墙记录
+- 4 fail 首次跑：
+  1. `test_load_annotation_dict_with_nested_structure` —— 我自己写的 data `{"a": {"b": {"c": [1, 2, {"d": "e"}]}}}` 中 c list 只有 3 元素（indices 0-2），但我访问 [3]。修法：data 改为 `[1, 2, 3, {"d": "e"}]`。
+  2. `test_run_evaluation_expected_failure_uses_process_single` —— 我误以为 run_evaluation source 含 2 处 process_single，实际只有 1 处（_process_one 内的另 1 处不在 run_evaluation source 范围内）。修法：assert >= 1。
+  3. `test_run_evaluation_expected_failure_out_stub_unlink` —— 同上，run_evaluation source 只有 1 处 out_stub.is_file。修法：assert >= 1。
+  4. `test_load_annotation_signature_path_optional` —— `_load_annotation(path: Path | None)` 没有 default value（必须显式传 None），只是类型注解允许 None。修法：assert default is `inspect.Parameter.empty`。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 294 后）：27767 pass / 0 fail / 16 skip（HEAD `c19443e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第二十二轮
+  - evaluation/cli.py 第二十三轮
+  - evaluation/annotation_metrics.py 第二十二轮
+  - evaluation/metrics.py 第二十二轮
+  - evaluation/schema.py 第十五轮
+  - evaluation/runner.py 第二十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges22 已饱和。下一轮选 evaluation/manifest.py 第二十二轮。
 
 ---
 
