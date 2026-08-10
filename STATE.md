@@ -4,6 +4,52 @@
 
 ---
 
+## Round 384 — evaluation/manifest.py 第三十六轮（178 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第三十六轮 edges 测试，覆盖 edges35 未触及的角度：**_is_absolute_like 数学边界第九批**（empty/`/`/`.`/`..`/windows drive 大小写/混合 separator/c:foo（无分隔符）/ab 不构成盘符/a:b 无 separator/a:/foo 真绝对/a:foo 假绝对/单字符无冒号/普通路径）；**_has_backslash 数学边界第九批**（empty/single backslash/no backslash/mixed/全部 backslash/Unicode 无 backslash/starts/ends）；**_resolve_relative_path 行为深度第九批**（empty raises/absolute raises/backslash raises/正常 relative resolves/返回 Path/.  解析为 root/嵌套多级/field_name 在错误消息/foo/../bar 仍 resolves/../foo 逃出 raises/../../foo 逃出 raises/resolve 后是 absolute）；**_detect_project_root 行为深度第九批**（返回 Path/有 pyproject/向上找/无 pyproject 返回 input/start 是文件/str 输入抛 AttributeError/idempotent）；**DocumentEntry/ExpectedFailure/Manifest dataclass 行为第九批**（is_dataclass/frozen/field count/field names 顺序/equality/inequality/hash/Manifest field count/names/equality）；**Manifest properties algorithm 行为深度第九批**（file_count 0/1/3/pdf_count 0/2/docx_count 0/2/mixed/content_group all_unpaired/bidirectional/single_direction/three_paired/mixed paired+unpaired/categories_empty/single/union/sorted/dedup/returns list/property types）；**load_manifest malformed data 第九批**（missing file/invalid JSON/empty dict schema/minimal valid/one document/absolute path raises/backslash path raises/outside root raises/str input/devset_status complete/categories/paired_with/expected_failure/project_root 正确/auto detect）；**module source forbidden tokens 第十二批**（os.system/Popen/rmtree/pickle.load/yaml.load/compile/eval/exec/sys.exit/exit/quit/global + no async/yield/walrus/lambda/unlink/remove/logging/sleep/print）；**module source 字符串精确补强第七批**（future annotations + 5 imports + ManifestError class + 3 dataclasses + docstring mentions relative/backslash/absolute + no main + no hardcoded path）；**signatures 第九批**（5 funcs param count + names + return types + no defaults + FunctionType + __module__ eq）；**module 合理性第九批**（__all__ 5 items + dunder file + name + ManifestError Exception 子类 + 5 funcs + 4 classes + no top-level call + docstring）；**端到端集成第九批**（minimal manifest/paired documents/annotation file/expectations/idempotent/categories_covered/resolved_path 绝对/categories empty when no docs）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges36.py`（178 测试）
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第九批**：17 测试
+- **_has_backslash 数学边界第九批**：10 测试
+- **_resolve_relative_path 行为深度第九批**：13 测试
+- **_detect_project_root 行为深度第九批**：7 测试
+- **DocumentEntry/ExpectedFailure/Manifest dataclass 行为第九批**：19 测试
+- **Manifest properties algorithm 行为深度第九批**：20 测试
+- **load_manifest malformed data 第九批**：16 测试
+- **module source forbidden tokens 第十二批**：12 测试
+- **module source 字符串精确补强第七批**：17 测试
+- **signatures 第九批**：21 测试
+- **module 合理性第九批**：11 测试
+- **端到端集成第九批**：8 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_detect_project_root_with_str_input` 期望接 str，实际 _detect_project_root 只接 Path（内部 start.resolve() 调用）→ AttributeError
+  - 修复：改为 expect AttributeError，文档化仅接受 Path
+- 2 fail 二/三次跑：`_make_manifest` helper 用 `docs` 参数 vs 测试用 `documents=` / `_make_doc` 没有 `paired_with` kwarg
+  - 修复：调整 helper 参数名为 `documents`/`expected_failures`，`_make_doc` 增加 `paired_with`/`categories`/`expectations` kwarg
+- 四次跑：178 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 384 后）：45691 pass / 0 fail / 19 skip（HEAD `3bf9bb9`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第三十六轮
+  - evaluation/schema.py 第二十八轮
+  - evaluation/metrics.py 第三十七轮
+  - evaluation/report.py 第二十六轮
+  - evaluation/runner.py 第三十八轮
+  - evaluation/cli.py 第三十七轮
+  - evaluation/manifest.py 第三十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 383 — evaluation/cli.py 第三十六轮（167 测试）
 
 ### 目标
