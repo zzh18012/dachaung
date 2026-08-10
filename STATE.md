@@ -4,6 +4,51 @@
 
 ---
 
+## Round 312 — evaluation/runner.py 第二十六轮（121 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第二十六轮 edges 测试，覆盖 edges24 未触及的角度：**_load_annotation 行为深度**（None 短路 / missing file / OSError monkeypatch / invalid JSON / 合法 dict / 空 dict / array 返回 list / str 路径抛 AttributeError / 目录抛 IsADirectoryError→None / 二进制抛 UnicodeDecodeError 不被 catch）；**_load_annotation signatures**（1 param / Path|None annotation / dict|None return / namespace）；**_process_one signatures**（4 params / doc 无 annotation / output_root Path / parser_name str / max_chars int / 5-tuple return type）；**run_evaluation signatures**（5 params / manifest 无 default / output_path 无 default / parser_name='fallback' / max_chars=800 / tolerance_chars=30 / 3 keyword-only / manifest+output_path positional-or-keyword / namespace）；**module source forbidden tokens**（27 个 stdlib）；**module source 必要 imports**（5 stdlib + app.pipeline 2 names + evaluation.REPORT_VERSION + annotation_metrics 2 names + metrics 1 name + report 3 names）；**module source 字符串精确**（3 函数 def / perf_counter / process_single / write_json=False / image_output_dir_for / compute_automatic_metrics / figure_caption_prf / chunk_boundary_prf / metrics.update 2 处 / tolerance_record pop / missing_markers pop / per_doc dict keys / not_instrumented 2 处 / _annotation_present / expected_failures loop / matches equality / build_provenance / build_devset_section / aggregate_summary / report dict 6 keys / json.dump ensure_ascii=False indent=2 / load_annotation try-except / _per_doc subdir / unlink try-except / docstring constraints / no __main__ / no class）；**module 整体合理性**（__all__ 1 entry / 无 class / 无 __main__ / 2 private functions / 1 public function）；**run_evaluation 端到端**（empty documents 创建 output / 6 top keys / per_doc 空 / expected_failures 空 / 创建 parent dir / 文件内容与返回值一致 / keyword args / 创建 per_doc subdir / REPORT_VERSION 不变量）；**_process_one 返回值结构**（5-tuple 类型注解）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges25.py`（121 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_load_annotation 行为深度**：11 测试
+- **_load_annotation signatures**：4 测试
+- **_process_one signatures**：7 测试
+- **run_evaluation signatures**：12 测试
+- **module source forbidden tokens**：27 测试（parametrize）
+- **module source 必要 imports**：10 测试
+- **module source 字符串精确**：35 测试
+- **module 整体合理性**：7 测试
+- **run_evaluation 端到端**：9 测试
+- **_process_one 返回值结构**：1 测试
+- **错误处理深度**：3 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_load_annotation_binary_garbage` - 二进制 utf-8 解码失败抛 UnicodeDecodeError（是 ValueError 子类，不是 OSError），代码 except (OSError, json.JSONDecodeError) 不捕获 → 改为 pytest.raises(UnicodeDecodeError)
+- 修复后 121 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 312 后）：30432 pass / 0 fail / 16 skip（HEAD `9913c96`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第二十五轮
+  - evaluation/cli.py 第二十六轮
+  - evaluation/annotation_metrics.py 第二十六轮
+  - evaluation/metrics.py 第二十六轮
+  - evaluation/schema.py 第十八轮
+  - evaluation/runner.py 第二十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges25 已饱和（_load_annotation 行为深度 + _process_one signatures + run_evaluation signatures + forbidden tokens + source 字符串精确 + 模块整体 + 端到端 + 错误处理）。下一轮选 evaluation/manifest.py 第二十五轮，覆盖 _is_absolute_like/_has_backslash/_resolve_relative_path 行为深度。
+
+---
+
 ## Round 311 — evaluation/schema.py 第十七轮（141 测试）
 
 ### 目标
