@@ -4,6 +4,45 @@
 
 ---
 
+## Round 392 — evaluation/annotation_metrics.py 第三十七轮（137 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第三十七轮 edges 测试，覆盖 edges36 未触及的角度：**figure_caption_prf 行为深度第十批**（dict / 3 keys / order / null / reason constant / with doc / with annot / both / each value is dict / idempotent / no mutate / empty dict / value+reason only / repeated calls / same inputs / chunks in doc / anchors in annot / strict keys）；**chunk_boundary_prf 行为深度第十批**（None document / no annotation / empty annotation / falsy annotation / no chunks / 1 chunk / no anchors / match perfect / tolerance 0 strict / position before / tolerance huge / missing markers / multiple missing / idempotent / no mutate doc / no mutate annot / tolerance record / Unicode marker / correct keys / partial match / 1 chunk no anchors / 1 chunk with anchors / default tolerance 30 / default position / chunk no text / text None / f1 zero / anchor empty / f1 formula / extra whitespace）；**module source forbidden tokens 第十三批**；**module source 字符串精确补强第八批**；**signatures 第十批**；**module 合理性第十批**；**端到端集成第十批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges37.py`（137 测试）
+
+### 覆盖要点
+- **figure_caption_prf 行为深度第十批**：19 测试
+- **chunk_boundary_prf 行为深度第十批**：30 测试
+- **module source forbidden tokens 第十三批**：16 测试
+- **module source 字符串精确补强第八批**：26 测试
+- **signatures 第十批**：16 测试
+- **module 合理性第十批**：15 测试
+- **端到端集成第十批**：12 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_module_constants_count_batch10` 漏掉 `from __future__ import annotations` 注入的 `annotations` _Feature 常量
+- 修复：在 expected set 中加入 "annotations"
+- 二次跑：137 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 392 后）：47015 pass / 0 fail / 19 skip（HEAD `25fa6b6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十九轮
+  - evaluation/metrics.py 第三十八轮
+  - evaluation/report.py 第二十七轮
+  - evaluation/runner.py 第三十九轮
+  - evaluation/cli.py 第三十八轮
+  - evaluation/manifest.py 第三十八轮
+  - evaluation/annotation_metrics.py 第三十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 391 — evaluation/manifest.py 第三十七轮（216 测试）
 
 ### 目标
