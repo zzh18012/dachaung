@@ -4,6 +4,54 @@
 
 ---
 
+## Round 380 — evaluation/metrics.py 第三十六轮（260 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第三十六轮 edges 测试，覆盖 edges34 未触及的角度：**_null/_ratio/_bool_metric/_int_metric helpers 行为**（empty reason + int 转 float + 负 ratio + int 截断 + bool 转换）；**compute_automatic_metrics 行为深度第八批**（returns dict + error-only path + 最小 doc + element_count_total/by_type 返回 int + by_type unknown when no type + pdf/docx locator for matching/non-matching source_type + image_resource no_image + 14 metric keys when doc + silent_drop no expectations vs with expectations + idempotent + no mutate doc/error/expectations + kwargs/positional + dup chars）；**_pdf_locator_ratio 行为深度第八批**（no elements + page=1 valid + negative page invalid + text type requires bbox + image no bbox requirement + partial + source locator None/empty + huge page + float page rejected + bool page subtle）；**_docx_locator_ratio 行为深度第八批**（paragraph_index/section/run_index/table_indices/relationship_id + page/bbox rejected + no structural key rejected + partial + source locator None）；**_image_resource_ratio 行为深度第八批**（no image null + no/empty resource_path + existing/zero-byte file + base_dir + partial + all images present + none image skipped）；**_chunk_reference_ratio 行为深度第八批**（no chunks null + empty elements list + no source_element_ids key + empty source_element_ids + all/partial/missing ids + no elements no chunks）；**_text_preservation 行为深度第八批**（both empty + perfect match + actual missing + expected missing + image skipped + partial overlap + 3 keys + dict structure + no mutate + whitespace ignored + None content/text + idempotent）；**_heading_boundary_ratio 行为深度第八批**（no headings null + no chunks + full match + no match + partial + empty ids + no ids key + heading no element_id + multiple chunks same first id + dict structure）；**_silent_drop_count 行为深度第八批**（no/empty expectations + no/empty element_count + actual more/less than expected + mixed types + actual zero + returns int + dict structure + no mutate inputs）；**_is_valid_bbox 行为深度第八批**（valid 4 ints/floats + mixed int/float + negative + tuple/string/None/empty/too short/too long/string element/None element/bool element/NaN/Inf/-Inf rejected + all zeros valid + dict/set/list-of-tuples rejected）；**_strip_unicode_whitespace 行为深度第八批**（empty + no whitespace + all whitespace + internal + leading/trailing + NBSP/em space/en space/ideographic space/line separator/paragraph separator + preserves non-whitespace/punctuation/unicode letters/emoji + returns str + idempotent + mixed + zero width not stripped + BOM not stripped）；**module source forbidden tokens 第十一批**；**module source 字符串精确补强第八批**（5 imports + 3 constants + 4 helpers + compute_automatic_metrics + 9 sub-functions + no class/async/yield/walrus/global/top-level lambda/sleep/hardcoded/print/logging/subprocess/unlink + docstring mentions text_preservation/pure_function/v1.1）；**signatures 第八批**（5 params for compute + all sub-functions param count + kinds + FunctionType identity + __module__ eq）；**module 合理性第八批**（__all__ exact 1 item + _TEXT_TYPES exact 7 in order + _PDF_BBOX_REQUIRED_TYPES exact 4 + _NOT_EVALUATED value + subset relation + docstring starts with Chinese + 14 user functions + no user classes + no suspicious top-level patterns）；**端到端集成第八批**（full pdf doc + error dict + document None returns 14 nulls + kwargs/positional + image no bbox + docx relationship_id + none elements list + dup chars in actual + three headings partial + full chain keys check + idempotent + no unexpected exceptions + minimal doc returns pipeline_success true）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges35.py`（260 测试）
+
+### 覆盖要点
+- **_null/_ratio/_bool_metric/_int_metric helpers 行为**：13 测试
+- **compute_automatic_metrics 行为深度第八批**：20 测试
+- **_pdf_locator_ratio 行为深度第八批**：12 测试
+- **_docx_locator_ratio 行为深度第八批**：12 测试
+- **_image_resource_ratio 行为深度第八批**：11 测试
+- **_chunk_reference_ratio 行为深度第八批**：9 测试
+- **_text_preservation 行为深度第八批**：13 测试
+- **_heading_boundary_ratio 行为深度第八批**：10 测试
+- **_silent_drop_count 行为深度第八批**：12 测试
+- **_is_valid_bbox 行为深度第八批**：20 测试
+- **_strip_unicode_whitespace 行为深度第八批**：20 测试
+- **module source forbidden tokens 第十一批**：25 测试
+- **module source 字符串精确补强第八批**：25 测试
+- **signatures 第八批**：22 测试
+- **module 合理性第八批**：20 测试
+- **端到端集成第八批**：16 测试
+
+### 撞墙记录
+- 0 fail 首次跑（260 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 380 后）：45008 pass / 0 fail / 19 skip（HEAD `0ea7de6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第二十五轮
+  - evaluation/runner.py 第三十七轮
+  - evaluation/cli.py 第三十六轮
+  - evaluation/manifest.py 第三十六轮
+  - evaluation/annotation_metrics.py 第三十六轮
+  - evaluation/schema.py 第二十八轮
+  - evaluation/metrics.py 第三十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges35 已饱和（16 角度）。下一轮选 evaluation/report.py 第二十五轮，覆盖 get_git_provenance / get_dependency_versions / build_provenance / build_devset_section / aggregate_summary 行为深度第八批。
+
+---
+
 ## Round 379 — evaluation/schema.py 第二十七轮（176 测试）
 
 ### 目标
