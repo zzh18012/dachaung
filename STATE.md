@@ -4,6 +4,57 @@
 
 ---
 
+## Round 311 — evaluation/schema.py 第十七轮（141 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第十七轮 edges 测试，覆盖 edges16 未触及的角度：**EvalSchemaError 实例化深度**（message 保留 / default errors 空 / None → 空 / empty list / errors 引用相同 / isinstance Exception / try 抛出 / catch as Exception / __bases__ == (Exception,)）；**_schema_path 错误消息深度**（含文件名 / 含 Schema 字 / 返回 Path / 绝对路径）；**load_schema 返回类型**（dict / $schema 关键字 / 4 schemas 都是 dict / missing 抛 FileNotFoundError）；**validate 行为深度**（成功 None / 失败 EvalSchemaError / errors 每个 3 keys / path 是 list / message 是 str / 至少 3 errors for empty manifest / message 含 schema 名 / 含 count / 含 path / sorted by absolute_path）；**validate_file 行为深度**（missing input 抛 FileNotFoundError / invalid JSON 抛 JSONDecodeError / str 路径接受 / Path 对象接受 / invalid content 抛 EvalSchemaError / message 含 missing 路径）；**SCHEMAS_DIR 路径计算**（绝对 / Path 实例 / 文件系统存在 / parent 是项目根 / 含 4 schema 文件 / resolved 无 symlink）；**4 schemas cross-validation 深度**（manifest complete/incomplete / 拒绝 invalid devset_status / 拒绝 invalid manifest_version / annotation minimal / 拒绝 missing doc_id / 拒绝 missing annotation_version / document minimal / eval-report missing fields / manifest 不通过 annotation / annotation 不通过 manifest）；**module source forbidden tokens**（28 个 stdlib 模块）；**module source 必要 imports**（5 stdlib + 2 jsonschema）；**module source 字符串精确**（class 定义 / __init__ 签名 / super().__init__ / self.errors 赋值 / SCHEMAS_DIR 赋值 / 4 函数 def / Draft202012Validator 用法 / iter_errors / sorted / flat list / flat.append / head = errors[0] / raise EvalSchemaError / json.load 2 处 / encoding utf-8 / __all__ / docstring / no __main__）；**signatures 精确**（validate 2 params no defaults / load_schema 1 param / validate_file 2 params 含 Path|str 联合 / _schema_path 1 param 返回 Path）；**module 整体合理性**（__all__ 5 entries / 1 class / 3 public functions / 1 private helper / 1 module-level constant / namespace 检查）；**端到端集成**（validate → raise → 检查 errors 格式 / validate_file round-trip / 4 schemas Draft202012 兼容 / errors grow with violations）；**私有 _schema_path 行为深度**（str 接受 / parent == SCHEMAS_DIR）；**错误结构深度**（reraised / args / errors 是 list / repr 含类名）；**验证 schema 检查顺序**（每次 load_schema 不缓存 / 不修改输入 dict / 不修改输入文件）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges17.py`（141 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 实例化深度**：9 测试
+- **_schema_path 错误消息深度**：4 测试
+- **load_schema 返回类型**：4 测试
+- **validate 行为深度**：10 测试
+- **validate_file 行为深度**：6 测试
+- **SCHEMAS_DIR 路径计算**：6 测试
+- **4 schemas cross-validation 深度**：10 测试
+- **module source forbidden tokens**：28 测试（parametrize）
+- **module source 必要 imports**：6 测试
+- **module source 字符串精确**：23 测试
+- **signatures 精确**：11 测试
+- **module 整体合理性**：11 测试
+- **端到端集成**：4 测试
+- **私有 _schema_path 行为深度**：2 测试
+- **错误结构深度**：4 测试
+- **验证 schema 检查顺序**：3 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  - `test_module_has_1_module_level_constant` - 过滤器排除了 Path 实例（不是 builtins 类型）；改为过滤 callable + type + 限定 pathlib 模块或 SCHEMAS_DIR 名字
+  - `test_e2e_validate_file_round_trip` - manifest schema 要求每个 document 含 doc_id，且字段是 categories（不是 category）→ 修正测试数据
+- 修复后 141 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 311 后）：30311 pass / 0 fail / 16 skip（HEAD `2b9eaf7`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第二十六轮
+  - evaluation/manifest.py 第二十五轮
+  - evaluation/cli.py 第二十六轮
+  - evaluation/annotation_metrics.py 第二十六轮
+  - evaluation/metrics.py 第二十六轮
+  - evaluation/schema.py 第十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges17 已饱和（EvalSchemaError 实例化 + _schema_path + load_schema + validate + validate_file + SCHEMAS_DIR + 4 schemas cross + forbidden tokens + source 字符串 + signatures + 端到端 + 模块整体）。下一轮选 evaluation/runner.py 第二十六轮，覆盖 _load_annotation / _process_one / run_evaluation 行为深度。
+
+---
+
 ## Round 310 — evaluation/metrics.py 第二十五轮（225 测试）
 
 ### 目标
