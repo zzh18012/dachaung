@@ -4,6 +4,49 @@
 
 ---
 
+## Round 419 — evaluation/manifest.py 第四十一轮（129 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第四十一轮 edges 测试，覆盖 edges40 未触及的角度：**_is_absolute_like 边界第十四批**（UNC / 小写盘符 / 大写盘符 / 数字开头 / C:foo 无斜杠 / 单字符 / 两字符 / 前导空白 / ./ / 仅 /）；**_has_backslash 边界第十四批**（单独 / 多个连续 / 开头 / 结尾 / 前向斜杠 / 空 / 无分隔符）；**_resolve_relative_path 异常深度第十四批**（str 输入 → TypeError / field_name 在 message 中 / 各类错误 message / 子目录 / 嵌套子目录 / 含空格）；**_detect_project_root 异常深度第十四批**（pyproject 存在/不存在 / dir 类型 start / 嵌套）；**Manifest dataclass 第十四批**（fields count / frozen / hashable / 字段名）；**Manifest properties 第十四批**（categories 去重 / 单向配对 / 空）；**load_manifest 异常深度第十四批**（str/Path 输入 / 不存在 / JSON 失败 / version 不匹配 / Schema 失败抛 EvalSchemaError）；**module source forbidden tokens 第十七批**；**module source 字符串精确补强第十四批**；**signatures 第十四批**；**module 合理性第十四批**；**端到端集成第十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges41.py`（129 测试）
+
+### 覆盖要点
+- **_is_absolute_like 边界第十四批**：12 测试
+- **_has_backslash 边界第十四批**：7 测试
+- **_resolve_relative_path 异常深度第十四批**：9 测试
+- **_detect_project_root 异常深度第十四批**：5 测试
+- **Manifest dataclass 第十四批**：13 测试
+- **Manifest properties 第十四批**：7 测试
+- **load_manifest 异常深度第十四批**：7 测试
+- **module source forbidden tokens 第十七批**：16 测试
+- **module source 字符串精确补强第十四批**：24 测试
+- **signatures 第十四批**：13 测试
+- **module 合理性第十四批**：7 测试
+- **端到端集成第十四批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_resolve_relative_path_str_input_batch14 — 函数代码用 `project_root / path_str`，str 输入会 TypeError）。修复：改为验证该不变量（expects TypeError）。同时修复一个 SyntaxWarning（docstring 中的 `\\server\share` 用 raw string）。
+- 第二次跑：129 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 419 后）：51028 pass / 0 fail / 19 skip（HEAD `207531a`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第四十一轮
+  - evaluation/schema.py 第三十三轮
+  - evaluation/metrics.py 第四十三轮
+  - evaluation/report.py 第三十一轮
+  - evaluation/runner.py 第四十四轮
+  - evaluation/cli.py 第四十三轮
+  - evaluation/manifest.py 第四十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 418 — evaluation/cli.py 第四十二轮（119 测试）
 
 ### 目标
