@@ -4,6 +4,48 @@
 
 ---
 
+## Round 326 — evaluation/cli.py 第二十八轮（147 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第二十八轮 edges 测试，覆盖 edges26 未触及的角度：**_build_parser 行为深度补强**（defaults parser/max_chars/tolerance_chars / subparser dest command / validate-report 单 input / inspect-doc default tolerance / invalid parser choice SystemExit / kreuzberg choice / --manifest --output required / max_chars type int / negative int / 非数字 SystemExit / no subcommand / unknown subcommand）；**_format_metric 行为深度补强**（int/negative int/zero int/zero float/1.0 float/negative float/huge float/tiny float/empty dict/dict one key/dict multi keys sorted/dict str value/dict None value/dict list value/string value/list/tuple/set/unicode/36 chars name/over 36 chars name/returns str/2 space indent/reason fallback ok/reason string/unicode reason）；**_run_inspect_doc 行为深度补强**（returns 0 valid / empty doc / missing file returns 2 / invalid json returns 1 / array top level returns 1 / unknown source type / no source type default / image elements / pilot chunks / pathlib path / displays document_id / parser info / metrics section / sorted bool first）；**main 各路径错误处理补强**（run returns 2 missing manifest / validate-report returns 2 missing / inspect-doc returns 2 missing / validate-report returns 1 invalid json / inspect-doc returns 1 invalid json / array top level / inspect-doc returns 0 / inspect-doc custom tolerance / run with invalid manifest returns 1 / full cycle run returns 0 / unknown subcommand exit 2 / no subcommand exit 2 / str path / returns int）；**module source forbidden tokens 第二批**（31 个 stdlib 模块）；**module source 字符串精确补强**（from future / argparse+json+sys+pathlib / 4 evaluation imports / __main__ block / sys.stdout.reconfigure / try except reconfigure / no yield/global/async/class/decorators/lambda in main / docstring mentions run/validate-report/inspect-doc）；**signatures 精确补强**（main argv list[str] | None default None return int / build_parser 0 params ArgumentParser / format_metric name+metric str / run_inspect_doc args int / kind POSITIONAL_OR_KEYWORD / 4 namespace）；**模块整体合理性**（no __all__ / 1 public main / 3 private helpers / no class）；**端到端集成补强**（run then validate-report cycle / inspect-doc on full doc / validate-report invalid / run with full features / inspect-doc with image / stdout contains counts / validate-report stdout contains path / main returns int type）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges27.py`（147 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 行为深度补强**：18 测试
+- **_format_metric 行为深度补强**：28 测试
+- **_run_inspect_doc 行为深度补强**：14 测试
+- **main 各路径错误处理补强**：16 测试
+- **module source forbidden tokens 第二批**：31 测试（parametrize）
+- **module source 字符串精确补强**：18 测试
+- **signatures 精确补强**：9 测试
+- **模块整体合理性**：4 测试
+- **端到端集成补强**：9 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_e2e_inspect_doc_on_pipeline_output` - 期望 element content "title" 出现在 stdout，但 inspect-doc 不打印 element content → 改为检查 source_type + elements/chunks counts
+- 修复后 147 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 326 后）：32217 pass / 0 fail / 18 skip（HEAD `91f9af1`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第二十八轮
+  - evaluation/metrics.py 第二十八轮
+  - evaluation/runner.py 第二十九轮
+  - evaluation/manifest.py 第二十八轮
+  - evaluation/cli.py 第二十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli edges27 已饱和（_build_parser 18 + _format_metric 28 + _run_inspect_doc 14 + main 16 + forbidden 31 + source 18 + signatures 9 + 模块 4 + 端到端 9）。下一轮选 evaluation/annotation_metrics.py 第二十八轮。
+
+---
+
 ## Round 325 — evaluation/manifest.py 第二十七轮（178 测试）
 
 ### 目标
