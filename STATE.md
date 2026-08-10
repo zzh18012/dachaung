@@ -4,6 +4,57 @@
 
 ---
 
+## Round 340 — evaluation/metrics.py 第三十轮（387 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第三十轮 edges 测试，覆盖 edges28 未触及的角度：**_ratio/_null/_bool_metric/_int_metric 数学边界第五批**（value 类型 / float 转换 / NaN/inf / bool 是 int 子类 / 字符串边界）；**_text_preservation 边界第二批**（precision/recall 计算 / Counter 多集 / actual subset/superset / image 排除 / 全空 / duplicates / 不修改输入）；**_pdf_locator_ratio 边界第二批**（page=0/负数/float/string/locator None/缺 bbox / mixed valid/invalid / image 不需 bbox）；**_docx_locator_ratio 边界第二批**（page / bbox / 7 个 structural keys / table_indices / run_index / mixed valid/invalid）；**_image_resource_ratio 边界第二批**（resource_path None/空 / size=0 文件 / image_base_dir 拼接 / directory / OSError）；**_chunk_reference_ratio 边界第二批**（duplicates / 部分 valid / 全 invalid / element 缺 id）；**_heading_boundary_ratio 边界第二批**（多 chunks/多 headings / chunk 无 ids / heading 不是首 id / dedup）；**_silent_drop_count 边界第二批**（actual>expected / 多类型 partial / extra type ignored / int 类型）；**_strip_unicode_whitespace 第五批**（NBSP/em space/en space/ideographic space/line separator/paragraph separator / Chinese / digits / punctuation）；**_is_valid_bbox 数学边界**（4 floats / mixed / NaN / inf / 负值 / tuple / bool / string / None in list）；**module source forbidden tokens 第五批**（~150 stdlib）；**module source 字符串精确补强**（imports / 3 constants / 14 metric keys / Counter & / set / all / set.add / if actual < exp / no yield/async/global/class/lambda/decorators）；**signatures 精确补强**（13 helpers + compute_automatic_metrics 5 params / no varargs varkw）；**模块整体合理性**（namespace / __all__ 1 entry / 1 public / 13 private / 3 constants / no class）；**端到端集成补强**（minimal pdf / error / expectations no-drop & drop / image elements only / valid locators / invalid locator has_page / 不修改 document / 14 metric keys exact / deterministic / unicode / image_resource with file / json serializable）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges29.py`（387 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_ratio/_null/_bool_metric/_int_metric 数学边界第五批**：~25 测试
+- **_text_preservation 边界第二批**：13 测试
+- **_pdf_locator_ratio 边界第二批**：12 测试
+- **_docx_locator_ratio 边界第二批**：13 测试
+- **_image_resource_ratio 边界第二批**：12 测试
+- **_chunk_reference_ratio 边界第二批**：10 测试
+- **_heading_boundary_ratio 边界第二批**：10 测试
+- **_silent_drop_count 边界第二批**：11 测试
+- **_strip_unicode_whitespace 第五批**：14 测试
+- **_is_valid_bbox 数学边界**：18 测试
+- **module source forbidden tokens 第五批**：~140 测试（parametrize）
+- **module source 字符串精确补强**：~28 测试
+- **signatures 精确补强**：~18 测试
+- **模块整体合理性**：~14 测试
+- **端到端集成补强**：15 测试
+
+### 撞墙记录
+- 5 fail 首次跑：
+  - 误把 placeholder `_compute_metrics_namespace := None,` 留在 import 列表里造成 SyntaxError → 删除
+  - `float("0.5")` 不抛异常 → 改成断言转换成功
+  - `bool("yes")` 返回 True → 改成断言 True
+  - `int("5")` 不抛异常 → 改成断言转换成功
+  - `compute_automatic_metrics(doc, None, "pdf", None, expectations=...)` 重复传 expectations → 改成全 kwargs
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 340 后）：35425 pass / 0 fail / 18 skip（HEAD `95c9de4`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十一轮
+  - evaluation/manifest.py 第三十轮
+  - evaluation/cli.py 第三十一轮
+  - evaluation/annotation_metrics.py 第三十一轮
+  - evaluation/schema.py 第二十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges29 已饱和（4 helper 第五批 25 + text_preservation 13 + 7 helper 各 10-13 + forbidden 140 + source 28 + signatures 18 + 模块 14 + 端到端 15）。下一轮选 evaluation/runner.py 第三十一轮，覆盖 _process_one 与 run_evaluation source level 第三批。
+
+---
+
 ## Round 339 — evaluation/schema.py 第二十一轮（326 测试）
 
 ### 目标
