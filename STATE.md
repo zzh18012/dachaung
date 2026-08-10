@@ -4,6 +4,48 @@
 
 ---
 
+## Round 412 — evaluation/manifest.py 第四十轮（189 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第四十轮 edges 测试，覆盖 edges39 未触及的角度：**_is_absolute_like 数学边界第十三批**（tab/特殊 Unicode first char / 多 colon / 长 UNC / 双字符 C: 无斜杠 / 多字节 alpha first）；**_has_backslash 数学边界第十三批**（escape sequences / 多个连续 / Unicode 反斜杠类似字符）；**_resolve_relative_path 行为深度第十三批**（合法的 ../within / 多层嵌套 / project_root 是 Path 对象验证）；**_detect_project_root 行为深度第十三批**（多层嵌套 pyproject / start 是 dir / 完全找不到时 fallback）；**DocumentEntry/ExpectedFailure/Manifest dataclass 行为第十三批**（更多属性 / hash equal / fields count / pickle 支持）；**Manifest properties algorithm 第十三批**（pdf/docx count mixed / content_group_count 复杂配对 / categories_covered sorted）；**load_manifest malformed data 第十三批**（更多路径类型 / version mismatch 行为 / Schema 校验失败的异常类型）；**module source forbidden tokens 第十六批**；**module source 字符串精确补强第十三批**；**signatures 第十三批**；**module 合理性第十三批**；**端到端集成第十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges40.py`（189 测试）
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第十三批**：20 测试
+- **_has_backslash 数学边界第十三批**：10 测试
+- **_resolve_relative_path 行为深度第十三批**：15 测试
+- **_detect_project_root 行为深度第十三批**：7 测试
+- **DocumentEntry/ExpectedFailure/Manifest dataclass 行为第十三批**：20 测试
+- **Manifest properties algorithm 第十三批**：15 测试
+- **load_manifest malformed data 第十三批**：16 测试
+- **module source forbidden tokens 第十六批**：16 测试
+- **module source 字符串精确补强第十三批**：19 测试
+- **signatures 第十三批**：15 测试
+- **module 合理性第十三批**：12 测试
+- **端到端集成第十三批**：10 测试
+
+### 撞墙记录
+- 首次跑：189 全通过（无撞墙）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 412 后）：50126 pass / 0 fail / 19 skip（HEAD `2cfb0b1`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第四十轮
+  - evaluation/schema.py 第三十二轮
+  - evaluation/metrics.py 第四十二轮
+  - evaluation/report.py 第三十轮
+  - evaluation/runner.py 第四十三轮
+  - evaluation/cli.py 第四十二轮
+  - evaluation/manifest.py 第四十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 411 — evaluation/cli.py 第四十一轮（169 测试）
 
 ### 目标
