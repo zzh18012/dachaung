@@ -4,6 +4,58 @@
 
 ---
 
+## Round 297 — evaluation/annotation_metrics.py 第二十三轮（129 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第二十三轮 edges 测试，覆盖 edges21 未触及的角度：**figure_caption_prf 行为深度补强**（返回 dict 3 key 顺序精确；reason 字面量精确；value=None；value dict 结构 2 keys；多次调用返独立 dict；不读 document/annotation 状态；对 document with elements 返同样结果；document/annotation 都 None 仍返同样结果；PARSER_DOES_NOT_EMIT_RELATIONS 是 str + immutable）；**chunk_boundary_prf 5 个分支精确**（document None + annotation dict → pipeline_failed；document dict + annotation None → no_annotation；annotation {} → no_annotation；annotation truthy 但缺 anchors → no_ground_truth_anchors；document 缺 chunks → no_predicted_boundaries；chunks=[c1] + 无 anchors → no_predicted_boundaries；chunks=[c1] + 有 anchors → no_predicted_boundaries + recall=0.0；chunks=[c1,c2] + 无 anchors → no_ground_truth_anchors）；**tolerance_chars 字段精确**（默认 30；可传 0；可传极大；负数；value 类型 int；reason=None；始终存在）；**anchor 边界补强**（anchor 缺 marker → marker='' → missing_markers；anchor 缺 position → position='after'；position='weird' → fall through to else after；marker 含 unicode 空白；marker 不在 stream；marker 部分匹配；重复 marker search_from 推进）；**stream 构造深度**（单 chunk 不构造；多 chunk 用 ' ' 连接再 normalize；空白 chunk 贡献 0 字符）；**predicted 边界**（length = chunks-1；完美匹配 precision=recall=1.0）；**贪心匹配深度**（0 距离匹配；tolerance=0 严格匹配；tolerance=负数全不匹配；pairs.sort 升序；一对一匹配）；**f1 边界**（both null → null；p null r 值 → null；p 值 r null → null；p+r=0 → 0.0；正常计算 2pr/(p+r)）；**module __all__ 精确**（3 entries 顺序：PARSER_DOES_NOT_EMIT_RELATIONS, figure_caption_prf, chunk_boundary_prf；valid identifier；list[str]）；**module imports 顺序**（5 imports：future → collections → typing → app → evaluation）；**module docstring 深度**（含 figure-caption/chunk_boundary/一对一/容差/启发式）；**module source forbidden tokens 补强**（os/sys/re/logging/subprocess/asyncio/threading/concurrent/math/datetime/itertools/functools/json/relative/class/dataclass/yield/async/global/walrus/assert）；**figure_caption_prf source level 完整**（def 行/2 params/无 tolerance/return dict/3 _null 调用/reason 赋值/3 key 在 return）；**chunk_boundary_prf source level 完整**（def 行/3 params/tolerance_chars=30 默认/5 分支判断/stream 构造 3 步/predicted/gt_positions/search_from/pairs.sort/used_pred+used_gt/matched += 1/3 metric 写/_tolerance_chars/_missing_markers/f1 计算）；**signatures 精确**（figure_caption_prf 2 params no default + no varargs/varkw + return dict；chunk_boundary_prf 3 params tolerance default=30 + return dict）；**module namespace**（2 module-level function；1 constant；5 imported name；无私有 _ 前缀函数）；**端到端集成**（完整 doc + annotation → 真实 P/R/F1；同输入两次一致；不修改 input document；不修改 input annotation；_tolerance_chars int 类型；_missing_markers list[str] 类型）；**模块整体合理性**（无 class 定义；无 __main__ 块；2 module-level function；1 module-level constant）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges22.py`（129 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 行为深度补强**：12 测试
+- **chunk_boundary_prf 5 个分支精确**：8 测试
+- **tolerance_chars 字段精确**：6 测试
+- **anchor 边界补强**：7 测试
+- **stream 构造深度**：3 测试
+- **predicted 边界**：2 测试
+- **贪心匹配深度**：5 测试
+- **f1 边界**：5 测试
+- **module __all__ 精确**：5 测试
+- **module imports 顺序**：6 测试
+- **module docstring 深度**：5 测试
+- **module source forbidden tokens 补强**：20 测试
+- **figure_caption_prf source level 完整**：7 测试
+- **chunk_boundary_prf source level 完整**：15 测试
+- **signatures 精确**：8 测试
+- **module namespace**：4 测试
+- **端到端集成**：6 测试
+- **模块整体合理性**：4 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  1. `test_chunk_boundary_prf_chunks_single_with_anchors` —— 我误以为 `_ratio(0.0)` 返回 `reason='ok'`，实际 `_ratio` 不设 reason → `reason=None`。修法：assert reason is None。
+  2. `test_chunk_boundary_prf_one_pred_matches_nearest_gt` —— 我误以为两个不同 marker 都能匹配同一 stream，实际 search_from 推进让第二个相同/重叠 marker 找不到，导致 num_gt=1 而非 2。修法：用 3 chunks + 2 不同 marker（hello + world），让 search_from 推进后还能找到第二个，构造真正的一对一完美匹配场景。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 297 后）：28286 pass / 0 fail / 16 skip（HEAD `00c98b9`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第二十三轮
+  - evaluation/schema.py 第十五轮
+  - evaluation/runner.py 第二十四轮
+  - evaluation/manifest.py 第二十三轮
+  - evaluation/cli.py 第二十四轮
+  - evaluation/annotation_metrics.py 第二十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges22 已饱和（figure_caption 12 + chunk_boundary 5 分支 + tolerance + anchor + stream + predicted + 贪心 + f1 + signatures + source level 完整 + 端到端）。下一轮选 evaluation/metrics.py 第二十三轮，覆盖 _null/_ratio/_bool_metric/_int_metric 行为深度补强 + 12 个 metric 各分支深度。
+
+---
+
 ## Round 296 — evaluation/cli.py 第二十三轮（222 测试）
 
 ### 目标
