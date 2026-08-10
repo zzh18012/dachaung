@@ -15506,13 +15506,60 @@ get_git_provenance 各 OSError 路径。
 
 ### 下一步建议
 - 候选：
-  - evaluation/manifest.py 第二十一轮（239 行）
   - evaluation/cli.py 第二十一轮（243 行）
   - evaluation/annotation_metrics.py 第二十一轮（195 行）
   - evaluation/metrics.py 第二十一轮（381 行）
   - evaluation/schema.py 第十四轮
+  - evaluation/runner.py 第二十二轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：runner.py edges21 已饱和（边界 + 行为 + 集成 + source level）。下一轮选 evaluation/manifest.py 第二十一轮，深度模拟 load_manifest + DocumentEntry/ExpectedFailure/Manifest frozen 行为 + schema 交叉验证。
+**建议**：manifest.py edges21 已饱和（load_manifest + 三 dataclass 完整 frozen 行为 + 字符级 _is_absolute_like/_has_backslash + _resolve_relative_path 极端 + _detect_project_root 边界 + module/source level 完整 + 端到端 schema 交叉验证）。下一轮选 evaluation/cli.py 第二十一轮，覆盖 argparse 子命令 + main 入口 + validate-report 入口 + 异常退出码深度。
+
+---
+
+## Round 289 — evaluation/manifest.py 第二十一轮（124 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二十一轮 edges 测试，覆盖 edges20 未触及的角度：**load_manifest 完整集成**（含完整字段的 doc + expected_failure 都解析；返回 Manifest 类型；documents/expected_failures 是 tuple；project_root 是 Path 且 resolved；doc 字段 annotation_resolved/file_str 在无 annotation_file 时 None；expected_failure source_type 在无 source_type 时 None；file 不存在抛 ManifestError；目录路径抛）；**Schema 联动**（minimal manifest 通过 manifest.schema.json；schema 在 version 检查前先校验；version 检查在 schema 后）；**dataclass 实例行为**（DocumentEntry/ExpectedFailure/Manifest 三者均支持 replace、asdict、astuple、eq、hash、frozen=True）；**Manifest properties edge cases**（file_count 0/1/N；pdf/docx 计数缺失 source_type；categories_covered 空/排序/去重；content_group_count 自配对/两两配对/全部未配对/零文档）；**_is_absolute_like 字符级深度**（empty/slash/POSIX/Windows/lowercase/Z drive/numeric/short 2 字符/无分隔符/相对/dot/dot-dot 12+ 场景）；**_has_backslash 字符级深度**（empty/纯反斜杠/双反斜杠/正斜杠/混合 8 场景）；**_resolve_relative_path 极端场景**（unicode 路径/含空格/double-slash/dot-slash/within-project-root/escape 路径/绝对路径/反斜杠/empty 字段名出现在 error message）；**_detect_project_root 边界**（找到 pyproject/nested 子目录/no pyproject fallback/file input/dir input）；**ManifestError 行为深度**（Exception 子类/bases/被 except Exception 捕获/str/args/from chain）；**module source level 完整**（imports: dataclasses/json/pathlib/typing/evaluation imports；不含 os/subprocess/logging/relative；3 个 @dataclass(frozen=True)；无其他 class 装饰器）；**load_manifest source level**（signature/resolve/is_file/detect_project_root/json_load/json_decode_error/validate/version_check/2 处 DocumentEntry/ExpectedFailure 循环/return Manifest）；**signatures**（load_manifest/_resolve_relative_path/_is_absolute_like/_has_backslash/_detect_project_root）；**__all__ 与 namespace**（5 个 entries 精确；valid identifiers；私有 helper 在 namespace 不在 __all__；无 process_single/compute_metrics）；**frozen dataclass 严格**（setattr/delattr 抛 FrozenInstanceError；is_dataclass）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges21.py`（124 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **load_manifest 完整集成**：10 场景（all fields/type/tuple/Path resolved/None annotations/None source_type/missing file/dir path）
+- **Schema 联动**：4 测试（minimal passes/schema first/version after）
+- **dataclass 实例行为**：10+ 测试（replace/asdict/astuple/eq/hash for 3 classes）
+- **Manifest properties**：10+ 测试（file_count/pdf/docx/categories/content_group）
+- **_is_absolute_like 字符级深度**：12+ 测试
+- **_has_backslash 字符级深度**：8 测试
+- **_resolve_relative_path 极端**：10 测试
+- **_detect_project_root 边界**：5 测试
+- **ManifestError 行为深度**：6 测试
+- **module source level**：16 测试
+- **load_manifest source level**：10 测试
+- **signatures**：6 测试
+- **__all__ 与 namespace**：6 测试
+- **frozen dataclass 严格**：7 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_load_manifest_with_all_fields` —— manifest.schema.json 要求 `paired_with` 必须是 string，不能传 None。schema 文档允许 optional 但不允许 null。修法：测试数据传 `"d2"` 而非 None。
+- 2 SyntaxWarning：docstring 中 `\` 后跟空格被识别为 invalid escape sequence。修法：把 `\ 或 /` 改为「反斜杠或正斜杠」中文描述。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 289 后）：26925 pass / 0 fail / 16 skip（HEAD `8089531`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第二十一轮（243 行）
+  - evaluation/annotation_metrics.py 第二十一轮（195 行）
+  - evaluation/metrics.py 第二十一轮（381 行）
+  - evaluation/schema.py 第十四轮
+  - evaluation/runner.py 第二十二轮
+  - evaluation/manifest.py 第二十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges21 已饱和（load 集成 + 三 dataclass + 字符级 + 极端 path + source level 完整 + 端到端 schema）。下一轮选 evaluation/cli.py 第二十一轮，覆盖 argparse 子命令（parse/validate/run/validate-report）+ main 入口 + validate-report 入口 + 异常退出码深度。
 
 ---
