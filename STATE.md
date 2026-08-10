@@ -4,6 +4,50 @@
 
 ---
 
+## Round 317 — evaluation/schema.py 第十八轮（117 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第十八轮 edges 测试，覆盖 edges17 未触及的角度：**EvalSchemaError 行为深度**（default args / falsy errors / truthy errors / empty list / inheritance / super().__init__ / message attribute / str / repr）；**_schema_path 错误消息深度**（no extension / wrong extension / correct extension / resolved / 4 schemas resolvable）；**load_schema 异常路径**（4 schemas returns dict / has type keyword / missing raises / same dict each call 不缓存 / invalid JSON raises JSONDecodeError）；**validate 错误结构精确**（top-level path 空 / nested path / schema_path 含 required / message 含 schema name / message 含 count int / errors count matches iter_errors / no extra fields in error dict）；**validate_file 异常路径精确**（missing input raises + path in message / invalid JSON / str path / Path object / invalid content raises / valid annotation / invalid annotation）；**SCHEMAS_DIR 边界**（name = "schemas" / parent = project root / resolved）；**4 schemas cross-validation 深度**（manifest complete/incomplete / with document / with expected_failures / annotation minimal / with chunk_boundary_anchors / document minimal / eval-report requires many fields / cross validate manifest vs annotation / cross validate annotation vs manifest）；**module source forbidden tokens**（27 个 stdlib）；**module source 字符串精确**（docstring / class / init signature / self.errors / SCHEMAS_DIR resolve / is_file check / open / Draft202012Validator / sorted iter_errors / lambda sort key / flat list / 3 keys append / head = errors[0] / raise f-string / validate_file path check / open / __all__ 5 entries）；**signatures 精确**（4 函数 + 1 class namespace / no varargs/varkw）；**module 整体合理性**（__all__ 5 entries / 1 class / 3 public functions / 1 private helper / no __main__）；**端到端集成**（full cycle manifest / validate then get errors format / validate_file round-trip / 4 schemas Draft202012 compatible / 不修改 input dict / 不修改 input file）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges18.py`（117 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **EvalSchemaError 行为深度**：9 测试
+- **_schema_path 错误消息深度**：5 测试
+- **load_schema 异常路径**：5 测试
+- **validate 错误结构精确**：7 测试
+- **validate_file 异常路径精确**：8 测试
+- **SCHEMAS_DIR 边界**：3 测试
+- **4 schemas cross-validation 深度**：10 测试
+- **module source forbidden tokens**：27 测试（parametrize）
+- **module source 字符串精确**：17 测试
+- **signatures 精确**：12 测试
+- **module 整体合理性**：8 测试
+- **端到端集成**：6 测试
+
+### 撞墙记录
+- 0 fail 首次跑（117 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 317 后）：31096 pass / 0 fail / 16 skip（HEAD `120f39e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第二十七轮
+  - evaluation/manifest.py 第二十六轮
+  - evaluation/cli.py 第二十七轮
+  - evaluation/annotation_metrics.py 第二十七轮
+  - evaluation/metrics.py 第二十七轮
+  - evaluation/schema.py 第十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges18 已饱和（EvalSchemaError + _schema_path + load_schema + validate + validate_file + SCHEMAS_DIR + 4 schemas cross + forbidden tokens + source 字符串 + signatures + 端到端 + 模块整体）。下一轮选 evaluation/runner.py 第二十七轮。
+
+---
+
 ## Round 316 — evaluation/metrics.py 第二十六轮（146 测试）
 
 ### 目标
