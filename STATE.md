@@ -4,6 +4,48 @@
 
 ---
 
+## Round 360 — evaluation/report.py 第二十二轮（203 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第二十二轮 edges 测试，覆盖 edges21 未触及的角度：**get_git_provenance source level 字符串精确补强第二批**（starts with def / 1 param / -> dict / subprocess.run / git rev-parse HEAD / git status --porcelain / capture_output=True / text=True / encoding utf-8 / errors replace / timeout=10 / OSError + subprocess.SubprocessError / cwd= / commit/dirty initial values / 2 return keys / returncode check / stdout.strip / bool() for dirty）；**get_dependency_versions source level 字符串精确补强第二批**（starts with def / 0 params / -> dict[str, str | None] / lazy import importlib.metadata / 3 packages / importlib.metadata.version(pkg) / PackageNotFoundError / except Exception / return versions）；**build_provenance source level 字符串精确补强第二批**（starts with def / 4 params / -> dict / calls get_git_provenance + get_dependency_versions / 9 return keys / EVALUATOR_VERSION / REPORT_VERSION / int(max_chars) / datetime.now().astimezone().isoformat() / no eval）；**build_devset_section source level 字符串精确补强第二批**（starts with def / 1 param manifest / -> dict / 6 keys / uses manifest.devset_status/file_count/categories_covered / no eval）；**aggregate_summary source level 字符串精确补强第二批**（starts with def / 1 param / -> dict / 4 top keys / uses 3 metric constants / sum(values) / participating_docs / success_count/total/rate / macro_average / not_evaluated / silent_drop_count/silent_drop_total / get value / r["metrics"] / return summary / summary dict init / 3 for-loops / sum/len macro calc）；**module source forbidden tokens 第七批**（asyncio/threading/concurrent/multiprocessing/queue/socket/select/re.match/datetime.datetime/time/os.system/logging/urllib/http/ctypes/pickle/shutil/tempfile/glob/unittest/pytest/sys.exit/copy/weakref/abc/contextlib/operator/functools/itertools/collections/importlib/platform，注意 subprocess 是合法的）；**module source 字符串精确补强**（docstring mentions provenance/devset/summary/per_doc/aggregate / 5 imports / 3 metric constants / 12 ratio + 1 count + 1 success / no relative / no star / no yield / no async / no walrus / no main / no user class / 5 functions / __all__ 5 entries / no eval/exec/compile / subprocess + datetime allowed / no unlink/write）；**signatures 精确补强**（get_git_provenance 1 / get_dependency_versions 0 / build_provenance 4 params names / build_devset_section 1 / aggregate_summary 1 / no defaults / no varargs）；**模块整体合理性补强**（has docstring / __all__ list length 5 / unique / 5 callables / 3 constants / no user classes / name eq / file eq / function module eq / 3 tuple constants / subsets / EVALUATOR+REPORT_VERSION imports / subprocess+datetime+Path imports）；**端到端集成补强**（get_git_provenance returns 2 keys / commit str or None / dirty is bool / nonexistent dir / get_dependency_versions 3 keys str or None / build_provenance 9 keys / evaluator_version value / max_chars int / str input / run_timestamp_iso format / build_devset_section 6 keys / aggregate_summary empty+one doc / does not mutate / idempotent / positional+kwargs / 12 ratio / 1 count / 1 success / partial participation / macro average correct / json serializable / full chain）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges22.py`（203 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **get_git_provenance source level 字符串精确补强第二批**：~18 测试
+- **get_dependency_versions source level 字符串精确补强第二批**：~10 测试
+- **build_provenance source level 字符串精确补强第二批**：~12 测试
+- **build_devset_section source level 字符串精确补强第二批**：~9 测试
+- **aggregate_summary source level 字符串精确补强第二批**：~24 测试
+- **module source forbidden tokens 第七批**：~37 测试
+- **module source 字符串精确补强**：~30 测试
+- **signatures 精确补强**：~9 测试
+- **模块整体合理性补强**：~22 测试
+- **端到端集成补强**：~32 测试
+
+### 撞墙记录
+- 0 fail 首次跑（203 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 360 后）：41006 pass / 0 fail / 18 skip（HEAD `96a1481`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十四轮
+  - evaluation/manifest.py 第三十三轮
+  - evaluation/cli.py 第三十四轮
+  - evaluation/annotation_metrics.py 第三十四轮
+  - evaluation/schema.py 第二十五轮
+  - evaluation/metrics.py 第三十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report edges22 已饱和（5 函数 source level 第二批 + forbidden 37 + signatures + 端到端 32）。下一轮选 evaluation/runner.py 第三十四轮，覆盖 _load_annotation/_process_one/run_evaluation 行为深度第八批。
+
+---
+
 ## Round 359 — evaluation/metrics.py 第三十三轮（253 测试）
 
 ### 目标
