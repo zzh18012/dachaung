@@ -4,6 +4,47 @@
 
 ---
 
+## Round 421 — evaluation/schema.py 第三十三轮（119 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第三十三轮 edges 测试，覆盖 edges32 未触及的角度：**SCHEMAS_DIR 常量深度第十三批**（值类型 Path / resolve 后绝对 / parent.parent / 含 schemas 后缀 / 内含 3 个 schema 文件）；**EvalSchemaError 行为深度第十三批**（super().__init__ 链 / args 单元素 / errors=None 时默认 [] / errors 默认独立 / pickle 支持 / __cause__ 链 / errors 可写）；**load_schema 行为深度第十三批**（context manager / json.load 调用 / encoding=utf-8 / 不缓存 / 修改不影响下次）；**validate 行为深度第十三批**（返回 None / 抛 EvalSchemaError / errors 含 3 keys / path/schema_path 都是 list / Draft202012Validator / iter_errors 排序 / 不修改 instance / message 含 schema_name 和 path=）；**validate_file 行为深度第十三批**（str/Path 输入 / FileNotFoundError 子类 / JSONDecodeError / encoding=utf-8 / 不返回值）；**_schema_path 行为深度第十三批**（返回 Path / FileNotFoundError 含 path / SCHEMAS_DIR 拼接 / is_file 检查）；**module source forbidden tokens 第十八批**；**module source 字符串精确补强第十五批**；**signatures 第十五批**；**module 合理性第十五批**；**端到端集成第十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges33.py`（119 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 常量深度第十三批**：8 测试
+- **EvalSchemaError 行为深度第十三批**：12 测试
+- **load_schema 行为深度第十三批**：7 测试
+- **validate 行为深度第十三批**：13 测试
+- **validate_file 行为深度第十三批**：9 测试
+- **_schema_path 行为深度第十三批**：5 测试
+- **module source forbidden tokens 第十八批**：16 测试
+- **module source 字符串精确补强第十五批**：21 测试
+- **signatures 第十五批**：11 测试
+- **module 合理性第十五批**：8 测试
+- **端到端集成第十五批**：10 测试
+
+### 撞墙记录
+- 首次跑：119 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 421 后）：51248 pass / 0 fail / 19 skip（HEAD `60bf281`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第四十三轮
+  - evaluation/report.py 第三十一轮
+  - evaluation/runner.py 第四十四轮
+  - evaluation/cli.py 第四十三轮
+  - evaluation/manifest.py 第四十二轮
+  - evaluation/annotation_metrics.py 第四十二轮
+  - evaluation/schema.py 第三十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 420 — evaluation/annotation_metrics.py 第四十一轮（101 测试）
 
 ### 目标
