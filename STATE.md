@@ -4,6 +4,54 @@
 
 ---
 
+## Round 346 — evaluation/metrics.py 第三十一轮（449 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第三十一轮 edges 测试，覆盖 edges29 未触及的角度：**_null/_ratio/_bool_metric/_int_metric 行为深度第六批**（empty reason / unicode / long / special chars / float nan/inf / bool / falsy / int with float truncates / huge int / str numeric）；**_TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES/_NOT_EVALUATED 常量第三批**（7 entries / 4 entries / subset 关系 / 排除 table/header/footer / 排除 image）；**compute_automatic_metrics 行为深度第三批**（error.code 传播 / pipeline_success 不同组合 / schema_valid / 14 metric keys 完整性 / by_type 累计 / image_base_dir None+Path / doc with elements no chunks / 不修改 / idempotent / unknown source_type / expectations None+empty）；**_image_resource_ratio 行为深度第三批**（None resource_path / empty string / no images / 现有文件 / 0 size / image_base_dir / 混合 / OSError continue）；**_chunk_reference_ratio 行为深度第三批**（chunks 空 / 空 ids / None ids / 缺 ids key / 全 valid / 部分 valid / 重复 ids / subset）；**_heading_boundary_ratio 行为深度第三批**（无 headings / 无 chunks / 完美匹配 / 部分 / 无 element_id / 第一个 id / set 去重）；**_silent_drop_count 行为深度第三批**（无 expectations / 空 / no element_count / empty / actual==expected / actual>expected / partial / type 不在 actual / int 类型）；**_is_valid_bbox 行为深度第三批**（4 ints / 4 floats / mixed / negative / zero bbox / 3 / 5 / empty / None / string / dict / tuple / bool true/false / nan / inf / string element / None element / dict element）；**_strip_unicode_whitespace 行为深度第三批**（no whitespace / leading / trailing / both / internal / tab / newline / CR / FF / VT / NBSP / EM space / EN space / ideographic / line sep / paragraph sep / multi types / only whitespace / empty / emoji / 中文 / digits / punctuation / Unicode letters）；**_text_preservation 行为深度第三批**（no elements no chunks / 完美匹配 / chunks 缺 text / elements 缺 content / image ignored / 3 keys / value+reason 结构 / precision != recall / Counter min）；**module source forbidden tokens 第八批**（~190 stdlib）；**module source 字符串精确补强**（docstring 内容 / 5 imports / no relative / no star / no main / no yield / no async / no global / no decorators / no class / 3 constants / 4 one-liners / 9 helpers / no eval/exec/compile/os/subprocess / uses math.isfinite / Counter intersection / isspace / lazy import / try except）；**signatures 精确补强**（compute_automatic_metrics 5 params + names + image_base_dir default None + no varargs + kinds / 4 one-liner signatures / 9 helper signatures / no function has varargs）；**模块整体合理性**（namespace / __name__ / __file__ / __doc__ / __all__ / callable / no user classes / __module__ eq / 14 functions）；**端到端集成补强**（PDF doc with image / DOCX doc / text_preservation real case / silent_drop real case / 不 mutate inputs / error no document / idempotent / json serializable / all kwargs / all positional）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges30.py`（449 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_null/_ratio/_bool_metric/_int_metric 行为深度第六批**：~32 测试
+- **常量第三批**：~22 测试
+- **compute_automatic_metrics 行为深度第三批**：~22 测试
+- **_image_resource_ratio 行为深度第三批**：~10 测试
+- **_chunk_reference_ratio 行为深度第三批**：~10 测试
+- **_heading_boundary_ratio 行为深度第三批**：~10 测试
+- **_silent_drop_count 行为深度第三批**：~12 测试
+- **_is_valid_bbox 行为深度第三批**：~20 测试
+- **_strip_unicode_whitespace 行为深度第三批**：~24 测试
+- **_text_preservation 行为深度第三批**：~10 测试
+- **module source forbidden tokens 第八批**：~190 测试（parametrize）
+- **module source 字符串精确补强**：~30 测试
+- **signatures 精确补强**：~25 测试
+- **模块整体合理性**：~12 测试
+- **端到端集成补强**：~10 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  - 4 imports → 6 imports（lazy import 也算）：限定 module-level only → 5 imports（含 __future__）
+  - 13 functions → 14 functions（4 helpers + 1 main + 9 子函数 = 14）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 346 后）：37619 pass / 0 fail / 18 skip（HEAD `54e3717`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十二轮
+  - evaluation/manifest.py 第三十一轮
+  - evaluation/cli.py 第三十二轮
+  - evaluation/annotation_metrics.py 第三十二轮
+  - evaluation/schema.py 第二十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges30 已饱和（4 helper + 3 常量 + 9 子函数 + compute + forbidden 190 + 端到端 10）。下一轮选 evaluation/runner.py 第三十二轮，覆盖 _load_annotation/_process_one/run_evaluation 行为深度。
+
+---
+
 ## Round 345 — evaluation/schema.py 第二十二轮（402 测试）
 
 ### 目标
