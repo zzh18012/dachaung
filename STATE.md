@@ -4,6 +4,46 @@
 
 ---
 
+## Round 321 — evaluation/annotation_metrics.py 第二十七轮（58 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第二十七轮 edges 测试，覆盖 edges25 未触及的角度：**figure_caption_prf 调用语义深度补强**（任何输入下 3 个 metric 的 value 都 None / reason 永远 PARSER_DOES_NOT_EMIT_RELATIONS / keys 精确三件套 / 支持 kwargs 调用）；**chunk_boundary_prf 算法分支补强**（kwargs / 负数 tolerance 当 0 处理仍匹配距离 0 / 巨大 tolerance 远距离 anchor / 零 chunks + 空 anchors 双 null / 多 chunks 单 anchor 精确比例 / 多预测边界降低 precision / 多 anchors 部分 missing / `_tolerance_chars` 字段 reason 总 None / `_missing_markers` 字段 reason 总 None / 零 chunks 无 anchor 返回 3 metric / 单 chunk 无 anchor 返回 3 metric / anchor 仅给 marker 默认 'after'）；**tolerance_chars 行为深度补强**（5 个早 return 分支都写 _tolerance_chars / 正常匹配路径也写）；**module source 字符串精确补强**（docstring mentions caption/relation/marker/heuristic/greedy/一对一 / normalize_text 用 c.get default / `" ".join(norm_chunks)` / `stream = normalize_text(joined_raw)` / `for i, txt in enumerate(norm_chunks):` / `if i == len(norm_chunks) - 1:` / `stream.find(txt, pos)` / `search_from = 0` / `a.get("marker", "")` / `a.get("position", "after")` / `pairs.sort(key=lambda x: x[0])` / `used_pred = set()` + `used_gt = set()` / `2 * p_val * r_val / denom` / `missing_markers: list[str] = []` / no `__main__` / no class）；**signatures 精确**（chunk_boundary_prf + figure_caption_prf 全 POSITIONAL_OR_KEYWORD / document + annotation 无 default / 3 个 namespace 检查）；**module 整体合理性**（__all__ 3 entries / 2 module-level functions / 1 module-level constant / no class / no `__main__` 块）；**端到端集成补强**（5 chunks 全匹配 p/r/f1=1.0 / 含标点 chunk / 多次运行确定性 / 真实 figure_caption 输入仍 null / 空 marker 加入 missing）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges26.py`（58 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 调用语义深度补强**：4 测试
+- **chunk_boundary_prf 算法分支补强**：12 测试
+- **tolerance_chars 行为深度补强**：2 测试
+- **module source 字符串精确补强**：21 测试
+- **signatures 精确**：9 测试
+- **module 整体合理性**：5 测试
+- **端到端集成补强**：5 测试
+
+### 撞墙记录
+- 首次 collect 报 SyntaxError：line 202 cases 元组 `({"chunks": [{"text": "a"}, {"text": "b"}}, ...)` 缺 `]}` 闭合
+- 修正为 `({"chunks": [{"text": "a"}, {"text": "b"}]}, ...)` 后 58 全通过
+- 0 fail 二次跑
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 321 后）：31462 pass / 0 fail / 18 skip（HEAD `a52e06f`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第二十七轮
+  - evaluation/schema.py 第十九轮
+  - evaluation/runner.py 第二十八轮
+  - evaluation/manifest.py 第二十七轮
+  - evaluation/cli.py 第二十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges26 已饱和（figure_caption_prf 4 调用语义 / chunk_boundary_prf 12 分支 + tolerance / source 21 字符串精确 / 9 signatures / 5 module 整体 / 5 e2e）。下一轮选 evaluation/metrics.py 第二十七轮，覆盖 4 helper + 11 metric 各分支的 source level 与行为深度。
+
+---
+
 ## Round 320 — evaluation/cli.py 第二十七轮（100 测试）
 
 ### 目标
