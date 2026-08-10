@@ -4,6 +4,54 @@
 
 ---
 
+## Round 394 — evaluation/metrics.py 第三十八轮（229 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第三十八轮 edges 测试，覆盖 edges36 未触及的角度：**helpers batch 10**（_null/_ratio/_bool_metric/_int_metric 更多边界）；**compute_automatic_metrics batch 10**（返回 dict / 14 keys / pipeline_success false / true / error extracted / no error / no error_code / 不 mutate doc / 不 mutate error / idempotent / kwargs / positional / element_count_total / element_count_by_type）；**pdf/docx locator batch 10**；**image_resource_ratio batch 10**；**chunk_reference_ratio batch 10**；**text_preservation batch 10**；**heading_boundary_ratio batch 10**；**silent_drop_count batch 10**；**_is_valid_bbox batch 10**；**_strip_unicode_whitespace batch 10**；**module source forbidden tokens 第十三批**；**module source 字符串精确补强第九批**；**signatures 第十批**；**module 合理性第十批**；**端到端集成第十批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges37.py`（229 测试）
+
+### 覆盖要点
+- **helpers batch 10**：12 测试
+- **compute_automatic_metrics batch 10**：14 测试
+- **pdf/docx locator batch 10**：20 测试
+- **image_resource_ratio batch 10**：10 测试
+- **chunk_reference_ratio batch 10**：10 测试
+- **text_preservation batch 10**：11 测试
+- **heading_boundary_ratio batch 10**：10 测试
+- **silent_drop_count batch 10**：10 测试
+- **_is_valid_bbox batch 10**：19 测试
+- **_strip_unicode_whitespace batch 10**：19 测试
+- **module source forbidden tokens 第十三批**：16 测试
+- **module source 字符串精确补强第九批**：14 测试
+- **signatures 第十批**：14 测试
+- **module 合理性第十批**：11 测试
+- **端到端集成第十批**：10 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_text_preservation_missing_chars_in_actual_batch10` — 错误断言 recall=1.0，实际算法 Counter 交集 min=3, |expected|=4 → recall=0.75
+- 1 fail 二次跑：`test_module_no_all_attribute_batch10` — metrics.py 实际有 `__all__ = ["compute_automatic_metrics"]`
+- 修复：校正断言为算法实际值；改为正向断言 __all__ 内容
+- 三次跑：229 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 394 后）：47406 pass / 0 fail / 19 skip（HEAD `be51c7f`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第二十七轮
+  - evaluation/runner.py 第三十九轮
+  - evaluation/cli.py 第三十八轮
+  - evaluation/manifest.py 第三十八轮
+  - evaluation/annotation_metrics.py 第三十八轮
+  - evaluation/schema.py 第三十轮
+  - evaluation/metrics.py 第三十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 393 — evaluation/schema.py 第二十九轮（162 测试）
 
 ### 目标
