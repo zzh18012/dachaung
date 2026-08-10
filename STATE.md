@@ -4,6 +4,49 @@
 
 ---
 
+## Round 415 — evaluation/metrics.py 第四十二轮（151 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第四十二轮 edges 测试，覆盖 edges39 未触及的角度：**模块常量深度第十三批**（_TEXT_TYPES 7 项不含 image / _PDF_BBOX_REQUIRED_TYPES 4 项是 _TEXT_TYPES 子集 / _NOT_EVALUATED 不可变）；**_text_preservation 行为深度第十三批**（equal True/False / precision/recall 相等/部分/超集 / image 排除 / Unicode / 空白忽略 / 空 expected/actual）；**_heading_boundary_ratio 行为深度第十三批**（无 heading / 无 chunks / 完美匹配 / 部分 / 无匹配 / 缺 element_id / 空 source_element_ids / 只取第一个 id）；**_silent_drop_count 行为深度第十三批**（无 expectations / 空 expectations / expected 大于/等于/小于 actual / 多类型）；**compute_automatic_metrics 全流第十三批**（完整 doc 14 keys / pipeline_success true/false / error_code 传播 / schema_check 异常 / document None / source_type pdf/docx/unknown 路由 / 不修改 / 幂等 / 独立 dict）；**module source forbidden tokens 第十七批**；**module source 字符串精确补强第十四批**；**signatures 第十四批**；**module 合理性第十四批**；**端到端集成第十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges40.py`（151 测试）
+
+### 覆盖要点
+- **模块常量深度第十三批**：11 测试
+- **_text_preservation 行为深度第十三批**：15 测试
+- **_heading_boundary_ratio 行为深度第十三批**：11 测试
+- **_silent_drop_count 行为深度第十三批**：11 测试
+- **compute_automatic_metrics 全流第十三批**：17 测试
+- **module source forbidden tokens 第十七批**：16 测试
+- **module source 字符串精确补强第十四批**：24 测试
+- **signatures 第十四批**：13 测试
+- **module 合理性第十四批**：8 测试
+- **端到端集成第十四批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_module_source_future_annotations_top_level_batch13 — metrics.py 顶部 docstring 24 行，`from __future__ import annotations` 在第 25 行，head=20 行截断）。修复：扩到 head=30 行。
+- 第二次跑：1 fail（test_module_uses_future_annotations_batch13 — 同一问题）。修复：扩到 head=30 行。
+- 第三次跑：1 fail（test_e2e_combined_helpers_chain_batch13 — elements 顺序是 abc/Title，expected 序列 abcTitle；chunk text 是 Title abc，actual 序列 Titleabc；不相等）。修复：调换 elements 顺序为 heading/paragraph，expected 序列变为 Titleabc，与 actual 一致。
+- 第四次跑：151 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 415 后）：50537 pass / 0 fail / 19 skip（HEAD `c6f920d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第三十轮
+  - evaluation/runner.py 第四十三轮
+  - evaluation/cli.py 第四十二轮
+  - evaluation/manifest.py 第四十一轮
+  - evaluation/annotation_metrics.py 第四十一轮
+  - evaluation/schema.py 第三十三轮
+  - evaluation/metrics.py 第四十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 414 — evaluation/schema.py 第三十二轮（142 测试）
 
 ### 目标
