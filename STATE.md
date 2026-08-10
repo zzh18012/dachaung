@@ -4,6 +4,57 @@
 
 ---
 
+## Round 310 — evaluation/metrics.py 第二十五轮（225 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二十五轮 edges 测试，覆盖 edges23 未触及的角度：**_ratio / _null / _bool_metric / _int_metric 类型与值精确**（_ratio 不做范围 clamp 接受任意 float 含负数/inf/nan；_null reason 保留；_bool_metric 强制 truthy/falsy；_int_metric 截断 float）；**常量精确**（_TEXT_TYPES 7 entries 是 tuple / _PDF_BBOX_REQUIRED_TYPES 4 entries subset / _NOT_EVALUATED = "not_evaluated"）；**_is_valid_bbox 边界深度**（None / short / long / 4 ints / 4 floats / mixed / bool 拒绝 / string 拒绝 / inf / nan / tuple 拒绝 / 负值 / 0 尺寸）；**_strip_unicode_whitespace Unicode 类别深度**（ASCII spaces / NBSP / em/en space / ideographic space / line/paragraph separator / 不删非空白 / 不排序 / empty / 全空白 / 数字保留 / 中文保留）；**_text_preservation 数学不变量与分支**（empty expected+actual / empty expected only / empty actual only / full match / subset actual / subset expected / 3 keys / image excluded / 空白忽略 expected+actual / 重排 counter 相同 / 重复字符 counter / 部分重复 / missing content / text None）；**_silent_drop_count 两层 null**（no expectations / empty expectations / no element_count / empty element_count / 0 drop / actual more / 部分 drop / 多类型 drop 求和 / expected type 缺失 / 返回 int）；**_chunk_reference_ratio 边界**（no chunks / chunk 无 ids / ids 为 None / all valid / 部分 invalid / all invalid / ids 部分无效 all() False）；**_heading_boundary_ratio 边界**（no headings / no chunks / chunk empty ids / heading 在首位 / heading 在非首位 / 部分 match / 无 ids field）；**_image_resource_ratio 边界**（no images / no resource_path / file exists / file missing / empty file / 部分 match / no base dir / filename fallback）；**_pdf_locator_ratio / _docx_locator_ratio 互斥**（pdf locator no elements / table 类型不需 bbox / paragraph 缺 bbox / paragraph valid bbox / page=0 / page=-1 / page string / locator missing / locator None；docx locator no elements / structural key / page 拒绝 / bbox 拒绝 / 无结构键 / locator missing）；**compute_automatic_metrics 行为深度**（image_base_dir default None / return annotation / no varargs/varkw / 5 params 顺序 / document None 12 null / pipeline_success false when document None / false when error / true when doc+no error / error_code present / error_code None / pdf 模式 docx null / docx 模式 pdf null / other 模式 both null / 返回 dict / 14 keys / element_count_total 0 / element_count_by_type empty / groups / unknown type）；**module source forbidden tokens**（28 个 stdlib 模块禁止）；**module source 必要 imports**（5 stdlib）；**module source 字符串精确**（13 函数 def / 4 one-liner def / 3 constants / image excluded comment / Counter intersection / silent_drop max(0) / v1.1 semantics / 8 个 reason 字符串）；**signatures 精确**（14 function type 检查 / namespace 检查）；**端到端集成**（full docx / full pdf bbox / silent drop with exp / image resource real file）；**模块整体合理性**（__all__ 1 entry / 1 public callable / no class / no __main__ / 13 private functions / 3 private constants）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges24.py`（225 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_ratio / _null / _bool_metric / _int_metric 精确**：22 测试
+- **常量精确**：10 测试
+- **_is_valid_bbox 边界深度**：13 测试
+- **_strip_unicode_whitespace Unicode 类别深度**：14 测试
+- **_text_preservation 数学不变量与分支**：14 测试
+- **_silent_drop_count 两层 null**：10 测试
+- **_chunk_reference_ratio 边界**：9 测试
+- **_heading_boundary_ratio 边界**：7 测试
+- **_image_resource_ratio 边界**：8 测试
+- **_pdf_locator_ratio / _docx_locator_ratio 互斥**：15 测试
+- **compute_automatic_metrics 行为深度**：21 测试
+- **module source forbidden tokens**：28 测试（parametrize）
+- **module source 必要 imports**：5 测试
+- **module source 字符串精确**：22 测试
+- **signatures 精确**：19 测试
+- **端到端集成**：4 测试
+- **模块整体合理性**：6 测试
+
+### 撞墙记录
+- 4 fail 首次跑：
+  - `test_compute_metrics_pdf_yields_pdf_locator_value_docx_null` 等 4 个测试把 reason 名字搞反了（pdf 模式下 docx_locator="not_docx_document"，docx 模式下 pdf_locator="not_pdf_document"）→ 修正四个断言
+- 修复后 225 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 310 后）：30170 pass / 0 fail / 16 skip（HEAD `c32ccfd`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第十七轮
+  - evaluation/runner.py 第二十六轮
+  - evaluation/manifest.py 第二十五轮
+  - evaluation/cli.py 第二十六轮
+  - evaluation/annotation_metrics.py 第二十六轮
+  - evaluation/metrics.py 第二十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges24 已饱和（4 one-liner helper + 3 常量 + 13 函数 + _is_valid_bbox/_strip_unicode_whitespace/_text_preservation/_silent_drop_count/_chunk_reference_ratio/_heading_boundary_ratio/_image_resource_ratio/_pdf_locator_ratio/_docx_locator_ratio 边界深度 + compute_automatic_metrics 行为深度 + forbidden tokens + source 字符串精确 + signatures + 端到端 + 模块整体）。下一轮选 evaluation/schema.py 第十七轮，覆盖 4 个 schema 的 cross-validation 与 EvalSchemaError 行为深度。
+
+---
+
 ## Round 309 — evaluation/annotation_metrics.py 第二十五轮（68 测试）
 
 ### 目标
