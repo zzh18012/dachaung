@@ -4,6 +4,47 @@
 
 ---
 
+## Round 331 — evaluation/cli.py 第二十九轮（183 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第二十九轮 edges 测试，覆盖 edges27 未触及的角度：**_build_parser 配置深度**（prog / description / subparser required=True / 3 subparsers / run 5 args / validate-report 1 arg / inspect-doc 2 args / required flags / parser choices tuple / positional input）；**_format_metric 字符串精确补强**（null 含 reason / null 无 reason 含 (None) / bool true/false 小写 / float 4 位小数 / int 无小数 / dict 按 key 排序 / dict 用 , 连接 / fallback str/list/tuple / reason 覆盖 ok / 各类型 fallback to ok / name 字段宽 36）；**main 退出码矩阵**（each path returns specific code：missing manifest=2 / invalid manifest json=1 / minimal manifest=0 / valid report=0 / invalid report json=1 / inspect-doc minimal=0 / top-level number=1 / top-level string=1 / unknown subcommand SystemExit 2 / no subcommand SystemExit 2）；**main 错误消息内容精确**（[ERROR] / 清单不存在 / 文档不存在 / 清单加载失败 / JSON 解析失败 / 顶层不是对象 / [OK] / documents= / devset_status= / git_commit= / git_dirty= / validate-report stdout 含路径）；**module source forbidden tokens 第三批**（~75 stdlib）；**module source 字符串精确补强**（imports / sys.stdout.reconfigure / sys.stderr.reconfigure / main_block / docstring mentions / no yield/async/class/lambda / 3 main branches / calls run_evaluation / validate_file with schema / return 0/1/2 / format_metric uses .get and isinstance / run_inspect_doc imports / 3 private functions / no class / has main_block）；**signatures 精确补强**（main return int / argv optional / no varargs varkw / build_parser no params return ArgumentParser / format_metric 2 params return str / run_inspect_doc 1 param return int）；**模块整体合理性**（namespace 4 functions / no __all__ / 1 public / 3 private / no class）；**端到端集成补强**（run minimal writes output / parser kreuzberg / max-chars / tolerance-chars / inspect-doc pdf / chunks section / metrics section / custom tolerance / run→validate-report cycle / int returns / str path / sub-dir parents）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges28.py`（183 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 配置深度**：14 测试
+- **_format_metric 字符串精确补强**：17 测试
+- **main 退出码矩阵**：10 测试
+- **main 错误消息内容精确**：11 测试
+- **module source forbidden tokens 第三批**：~75 测试（parametrize）
+- **module source 字符串精确补强**：24 测试
+- **signatures 精确补强**：10 测试
+- **模块整体合理性**：7 测试
+- **端到端集成补强**：15 测试
+
+### 撞墙记录
+- 首次跑 2 fail：
+  - `main(["unknown"])` 和 `main([])` 不返回 rc=2，而是抛 SystemExit(2)（argparse 直接 exit）→ 改成 `pytest.raises(SystemExit)` 检查 code=2
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 331 后）：33107 pass / 0 fail / 18 skip（HEAD `878d55c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第二十九轮
+  - evaluation/schema.py 第二十轮
+  - evaluation/metrics.py 第二十九轮
+  - evaluation/runner.py 第三十轮
+  - evaluation/manifest.py 第二十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli edges28 已饱和（build_parser 14 + format_metric 17 + main 退出码 10 + 错误消息 11 + forbidden 75 + source 24 + signatures 10 + 模块 7 + 端到端 15）。下一轮选 evaluation/annotation_metrics.py 第二十九轮。
+
+---
+
 ## Round 330 — evaluation/manifest.py 第二十八轮（187 测试）
 
 ### 目标
