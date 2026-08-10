@@ -4,6 +4,49 @@
 
 ---
 
+## Round 381 — evaluation/report.py 第二十五轮（170 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第二十五轮 edges 测试，覆盖 edges24 未触及的角度：**get_git_provenance 行为深度第八批**（TimeoutExpired/FileNotFoundError 命中 except / rev-parse 非零/empty/whitespace stdout → commit None / strip whitespace / porcelain clean/dirty/非零 → dirty False / keys 一致 str 类型）；**get_dependency_versions 行为深度第八批**（PackageNotFoundError / generic Exception patch / python-docx 带连字符 / 每次返回 fresh dict / 3 keys 顺序 / 无多余 keys）；**build_provenance 行为深度第八批**（9 keys 顺序 / max_chars int/str/bool 转 / parser_version None/string 保留 / dependencies fresh dict / timestamp 含 T / evaluator+report version 对齐常量）；**build_devset_section 行为深度第八批**（6 keys 顺序 / 全 str 类型 / categories list / 单次调用稳定 / value propagation）；**aggregate_summary 行为深度第八批**（chunk_boundary 参与 / figure_caption 不参与 / silent_drop_all_none/some_none/missing_key / counts 负数 / input+dict not mutated / 4 顶层 keys 顺序 / ratio_macro 12 项 / success_rate all_true/all_false/mixed/missing / not_evaluated 计数 / 不出综合分）；**3 个常量精确补强**（_RATIO_METRICS 12 / _COUNT_METRICS 1 / _SUCCESS_BOOL_METRICS 1 / 互斥无交集 / total 14）；**module source forbidden tokens 第十一批**（os.system/Popen/rmtree/pickle.load/yaml.load/check_call/call/getoutput/os.popen + eval/exec/compile/unlink/remove/kill/terminate/sys.exit/exit/quit）；**module source 字符串精确补强第八批**（subprocess.run call / capture_output=True / encoding=utf-8 / errors=replace / timeout=10 / rev-parse HEAD / status --porcelain / try except OSError+SubprocessError / 3 pkg 字面量 / 不混合 / no main / future annotations / 5 imports / 2 常量字面量）；**signatures 第八批**（5 funcs 返回类型 dict[str, Any] / param kinds + names / no varargs/kwargs / no defaults）；**module 合理性第八批**（__all__ 5 项 list / 5 callable functions / 3 constant tuples / no user classes / docstring mentions macro/counts/silent / file endswith evaluation/report.py / EVALUATOR+REPORT_VERSION 已 import）；**端到端集成第八批**（empty input full chain / json serializable / positional vs kwargs / round trip / 4 top keys 一致 / partial participation complex / paired documents / real call / negative max_chars / zero participation → None macro）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges25.py`（170 测试）
+
+### 覆盖要点
+- **get_git_provenance 行为深度第八批**：11 测试
+- **get_dependency_versions 行为深度第八批**：7 测试
+- **build_provenance 行为深度第八批**：12 测试
+- **build_devset_section 行为深度第八批**：9 测试
+- **aggregate_summary 行为深度第八批**：25 测试
+- **常量精确补强**：14 测试
+- **module source forbidden tokens 第十一批**：22 测试
+- **module source 字符串精确补强第八批**：22 测试
+- **signatures 第八批**：18 测试
+- **module 合理性第八批**：20 测试
+- **端到端集成第八批**：17 测试（含 fix 后补正）
+
+### 撞墙记录
+- 1 fail 首次跑：`test_module_file_ends_with_report_py` 在 Windows 路径用 `r"\\"` 形成两字符 `\\`，不匹配单 backslash 路径
+  - 修复：用 `os.sep` 替代硬编码分隔符
+- 二次跑：170 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 381 后）：45178 pass / 0 fail / 19 skip（HEAD `2fbb3df`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十七轮
+  - evaluation/cli.py 第三十六轮
+  - evaluation/manifest.py 第三十六轮
+  - evaluation/annotation_metrics.py 第三十六轮
+  - evaluation/schema.py 第二十八轮
+  - evaluation/metrics.py 第三十七轮
+  - evaluation/report.py 第二十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 380 — evaluation/metrics.py 第三十六轮（260 测试）
 
 ### 目标
