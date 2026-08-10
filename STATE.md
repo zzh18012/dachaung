@@ -15059,3 +15059,54 @@ get_git_provenance 各 OSError 路径。
 **建议**：评估 saturation。evaluation/* 已达 edges18-19，进一步 edges 边际收益低。可转向 K（schema 加严）或 docs 之外的轻量深化。
 
 ---
+
+## Round 279 — evaluation/runner.py 第二十轮（102 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第二十轮 edges 测试，覆盖 edges19 未触及的角度：**schema 交叉验证**（run_evaluation 实际输出通过 evaluation-report.schema.json，含空 manifest / 单失败 doc / expected_failure / 组合 4 种场景）；**失败文档路径**（DocumentEntry 指向不存在文件 → process_single 返 file_not_found → 12 个 null-prone metrics 全部 null+pipeline_failed；element_count_by_type 也 null+pipeline_failed；error_code.value=='file_not_found'；wall_time 5 keys；total 非 null>=0）；**expected_failures 完整路径**（matches=True/False；字段顺序；多 ef 独立）；**多文档 manifest**（per_doc 长度匹配；summary success_count=0/total=N/rate=0.0；counts participating_docs=0/sum=None；silent_drop_total=None）；**tolerance_chars 传播**（默认 30；KEYWORD_ONLY）；**_annotation_present 行为**（public per_doc 不含 _ 前缀字段；4 keys 精确）；**provenance 字段类型**（9 keys 精确；max_chars 是 int 不是 bool；dependencies 是 dict；parser_name 非空 str；parser_version 在所有失败时 None；evaluator_version/report_version 非 空 str；run_timestamp_iso 非空 str；git_dirty 是 bool；git_commit str-or-None）；**summary 4 buckets 字段类型**（counts/success_rates/ratio_macro_averages 都是 dict；silent_drop_total 是 None-or-int；counts.element_count_total 含 sum+participating_docs；success_rates.pipeline_success 含 success_count+total+rate；ratio_macro_averages 12 项；每项含 macro_average+participating_docs+not_evaluated；空 manifest 全 None/0）；**devset 字段**（6 keys 精确；status enum；file_count int；categories_covered list）；**不修改 manifest**（documents/expected_failures/project_root/devset_status 都不变）；**out_stub 清理**（_per_doc/<doc_id>.json 失败后不留盘）；**写盘后报告 schema 通过 + 无 \u 转义**；**report top-level 字段类型**（6 keys 都是 dict/list 正确类型）；**module source 不含 subprocess/os/logging/concurrent.futures/asyncio/threading**；**__all__ 仍是 ['run_evaluation']**；**_process_one 5-tuple 类型**（失败时 (None, dict, float, None, None)）；**out_stub 失败时被清理；_per_doc 目录被创建**；**_load_annotation 行为补充**（目录→None；None→None；嵌套 dict；非 UTF-8 字节抛 UnicodeDecodeError 不被 catch；source 仅 catch (OSError, json.JSONDecodeError) 不含通用 except）；**devset_status 传播**（complete/incomplete 都能传到 report）；**per_doc source_type/doc_id 传播**；**parser_name/max_chars 默认值与传播**；**14 metrics key 集合 + 6 annotation_metrics key**；**write_json=False 行为**（outputs/ 下不写 per-doc JSON）；**output_path 在嵌套子目录下也能创建并写盘**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges20.py`（102 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **schema 交叉验证**：4 种 manifest 场景（空 / 失败 / expected_failure / 组合）的 report 都通过 evaluation-report.schema.json
+- **失败文档路径**：file_not_found 错误码正确传播到 metrics.error_code.value；12 null-prone metrics 全部 null+pipeline_failed
+- **expected_failures**：matches True/False 都验证；字段顺序精确；多 ef 独立记录
+- **多文档 manifest**：per_doc 长度匹配；summary 数值正确聚合
+- **tolerance_chars**：默认 30；KEYWORD_ONLY；自定义值不报错
+- **provenance**：9 keys 精确集合；6 字段类型严格（int/dict/str/bool/None 等）
+- **summary 4 buckets**：keys 精确；空 manifest 全部 None/0 默认值
+- **devset**：6 keys 精确；status enum；数值字段是 int；list 字段是 list
+- **不修改 manifest**：4 个核心字段引用/值都不变
+- **out_stub 清理**：失败/expected_failure 跑完 _per_doc/<doc_id>.json 都被 unlink
+- **写盘后报告 schema 通过**：从磁盘读回再 schema validate 通过
+- **module source 禁止内容**：runner.py 不直接用 subprocess/os/logging/concurrent.futures/asyncio/threading
+- **__all__**：仍只是 ['run_evaluation']
+- **_process_one 5-tuple 类型**：失败时 (None, dict, float, None, None)；total>=0；out_stub 被清理；_per_doc 被创建
+- **_load_annotation 行为**：目录/None 都返 None；嵌套 dict 加载成功；非 UTF-8 抛 UnicodeDecodeError 不被 catch；source 仅 catch (OSError, json.JSONDecodeError) 不含通用 except
+- **devset/per_doc 传播**：devset_status/source_type/doc_id/parser_name/max_chars 都从输入正确传播
+- **14 metrics key + 6 annotation_metrics key**：失败 doc 的 metrics 含全部预期 keys
+- **write_json=False**：outputs/ 下不写 per-doc JSON
+- **嵌套子目录**：output_path 在 deep/nested/subdir/ 下也能创建
+
+### 撞墙记录
+- 1 fail 首次跑（已修复）：
+  - test_load_annotation_returns_none_for_broken_utf8：UnicodeDecodeError 不是 OSError 子类（属 ValueError），_load_annotation 的 except 不捕获；改为 test_load_annotation_broken_utf8_raises_unicode_decode_error，验证 raises UnicodeDecodeError；并新增 test_load_annotation_only_catches_oserror_and_jsondecodeerror 验证 source 不含通用 except
+- 1 syntax error 首次跑（已修复）：
+  - test_run_evaluation_written_report_no_u_escape_failing 的 docstring 含 '\u' 被 Python 解释为 unicode escape；改为 r""" raw string"""
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 279 后）：25715 pass / 0 fail / 16 skip（HEAD `d0539f8`）
+
+### 下一步建议
+- 候选：
+  - evaluation/* 第二十一轮（schema 联动深化，新角度）
+  - evaluation/annotation_metrics.py 第十九轮（与 metrics.py 看齐）
+  - evaluation/metrics.py 第十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：edges20 schema 联动模式可推广到其他模块（report/manifest/metrics 都可以做 schema 交叉验证）。下一轮选 evaluation/annotation_metrics.py 第十九轮，借鉴 edges20 的"实际行为+schema 验证"组合，加新角度（chunk_boundary_prf 多分支组合验证）。
+
+---
