@@ -4,6 +4,47 @@
 
 ---
 
+## Round 411 — evaluation/cli.py 第四十一轮（169 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第四十一轮 edges 测试，覆盖 edges39 未触及的角度：**_build_parser 行为深度第十三批**（choices 元组 / 各子命令 help 文本含中文 / 默认值类型 / RunParser arg 名 / val_parser positional 名 / ins_parser positional 名 / 错误 --parser 值 raise）；**argparse Namespace 行为第十三批**（attribute 名称 / argparse 内部 type=int 转换 / choices 限制 / Namespace != 比较）；**_format_metric 行为深度第十三批**（padding 行为 / 字典嵌套 / 字典含 None value / 字典含 True value / 字典含 zero value / Unicode key / metric dict 缺 reason / float 精度 4 位 / bool True → true / bool False → false）；**_run_inspect_doc 行为深度第十三批**（stdout 含 file:/document_id:/source:/parser:/counts:/metrics: 行 / tolerance_chars 默认 / 缺 source_type 默认 unknown）；**main 路由第十三批**（run 命令 manifest 不存在 → return 2 / run 命令 manifest 加载失败 → return 1 / validate-report input 不存在 → return 2 / inspect-doc input 不存在 → return 2 / main 无命令 raise SystemExit / run schema_invalid → return 1 / post-validate fail → return 1）；**module source forbidden tokens 第十九批**；**module source 字符串精确补强第十六批**；**signatures 第十六批**；**module 合理性第十六批**；**端到端集成第十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges40.py`（169 测试）
+
+### 覆盖要点
+- **_build_parser 行为深度第十三批**：19 测试
+- **argparse Namespace 行为第十三批**：15 测试
+- **_format_metric 行为深度第十三批**：19 测试
+- **_run_inspect_doc 行为深度第十三批**：19 测试
+- **main 路由第十三批**：14 测试
+- **module source forbidden tokens 第十九批**：16 测试
+- **module source 字符串精确补强第十六批**：21 测试
+- **signatures 第十六批**：14 测试
+- **module 合理性第十六批**：10 测试
+- **端到端集成第十六批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_build_parser_run_description_chinese_batch13 — add_parser(help=...) 不设置 description，仅设 help）。修复：改测 _choices_actions 上的 help 字符串。
+- 第二次跑：169 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 411 后）：49937 pass / 0 fail / 19 skip（HEAD `028abd5`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第四十轮
+  - evaluation/annotation_metrics.py 第四十轮
+  - evaluation/schema.py 第三十二轮
+  - evaluation/metrics.py 第四十二轮
+  - evaluation/report.py 第三十轮
+  - evaluation/runner.py 第四十三轮
+  - evaluation/cli.py 第四十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 410 — evaluation/runner.py 第四十二轮（147 测试）
 
 ### 目标
