@@ -4,6 +4,46 @@
 
 ---
 
+## Round 390 — evaluation/cli.py 第三十七轮（196 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第三十七轮 edges 测试，覆盖 edges36 未触及的角度：**_build_parser 行为深度第十批**（returns ArgumentParser / prog / description 含开发集和报告 / 3 subparsers / run parser choices / 默认值 / type=int 校验 / required 校验 / 各种 --help SystemExit code 0 / unknown arg SystemExit code!=0）；**argparse Namespace 字段第十批**（command 各种值 / manifest 与 output 值 / 6 attrs for run / 2 attrs for validate-report / 3 attrs for inspect-doc / max_chars 负数大数零 / tolerance_chars 零 / 字段顺序 / Namespace 类型）；**_format_metric 行为深度第十批**（int/float/boundary 0/1/negative/huge/高精度 0.1235 / Unicode name / long name / 各种类型 fallback / padding 36 / 空 dict / sorted dict items）；**_run_inspect_doc 行为深度第十批**（int return / missing file 2 / invalid JSON 1 / list/string/int/null top-level 1 / empty dict 0 / prints filename/header/source_path/elements/chunks/source_type parser/document_id/? / Unicode / tolerance 大值零值 / chunk text / Namespace type）；**main 路由第十批**（int returns / 各种错误路径 / 成功路径 run + validate-report / stderr [ERROR]/[FAIL] / SystemExit codes / run --parser kreuzberg / run --max-chars / run --tolerance-chars）；**module source forbidden tokens 第十三批**；**module source 字符串精确补强第八批**；**signatures 第十批**；**module 合理性第十批**；**端到端集成第十批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges37.py`（196 测试）
+
+### 覆盖要点
+- **_build_parser 行为深度第十批**：20 测试
+- **argparse Namespace 字段第十批**：19 测试
+- **_format_metric 行为深度第十批**：22 测试
+- **_run_inspect_doc 行为深度第十批**：24 测试
+- **main 路由第十批**：18 测试
+- **module source forbidden tokens 第十三批**：17 测试
+- **module source 字符串精确补强第八批**：26 测试
+- **signatures 第十批**：22 测试
+- **module 合理性第十批**：12 测试
+- **端到端集成第十批**：12 测试
+
+### 撞墙记录
+- 首次跑：196 全通过（0 fail）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 390 后）：46662 pass / 0 fail / 19 skip（HEAD `f00890a`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第三十七轮
+  - evaluation/annotation_metrics.py 第三十七轮
+  - evaluation/schema.py 第二十九轮
+  - evaluation/metrics.py 第三十八轮
+  - evaluation/report.py 第二十七轮
+  - evaluation/runner.py 第三十九轮
+  - evaluation/cli.py 第三十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 389 — evaluation/runner.py 第三十八轮（168 测试）
 
 ### 目标
