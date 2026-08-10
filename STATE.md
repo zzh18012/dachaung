@@ -4,6 +4,53 @@
 
 ---
 
+## Round 344 — evaluation/annotation_metrics.py 第三十一轮（399 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第三十一轮 edges 测试，覆盖 edges29 未触及的角度：**figure_caption_prf 行为深度第三批**（reason 精确 / value 是 NoneType / reason 是 str / 每个 metric dict 含 value+reason 2 keys / 大量 element/annotation 仍 null / 不寻常 element type 仍 null / dict 子类 / idempotent / 不调用 len）；**chunk_boundary_prf 算法深度第三批**（tolerance 1 边界 / position 非法/None/缺失 fallback after / marker 跨 chunk / marker 是子串 / marker 等于全 stream / marker 在末尾 / marker 在开头 / 无 marker key / 4 chunks 3 anchors / more anchors than pred / more pred than anchors / 单字符 chunk / 长 chunk / chunks key 缺失 / chunks=None / 数字 text / text=0 / 空字符串 text / 大量 extra keys / 多 missing marker / 部分 missing / 重复 marker 3 次 / chunks 空 list / idempotent 3 path）；**chunk_boundary_prf source level 字符串精确补强**（initial out dict / 5 branches / norm_chunks comprehension / joined_raw / predicted list / pos init / gt_positions / missing_markers / search_from advance / pairs list / used_pred used_gt / nested for / abs distance / tolerance compare / add pi gi / p_val r_val / f1 calc / underscore tolerance / underscore missing / break / continue / no print no logging no try no with no async no yield no global no nonlocal）；**module source forbidden tokens 第六批**（~190 stdlib，移除 imp/re/io/typing/struct/chunk 6 个合法子串）；**module source 字符串精确补强**（docstring 内容 / future first / 无相对导入 / 无 star / 无 conditional / 无 eval/exec/compile/globals/locals/open / 2 module def / 1 constant / __all__ exact / def names exact）；**signatures 精确补强**（两个函数 param count/names/order/kinds/annotations/return / no varargs/varkw/keyword-only/positional-only / chunk_boundary tolerance default 30 / chunk_boundary tolerance annotation int / functions have docstrings / docstring mentions tolerance/precision/recall/args/null）；**模块整体合理性**（namespace / __name__ / __file__ / __doc__ / __all__ / callable / FunctionType / __module__ / no class / 2 functions exact / 1 constant）；**端到端集成补强**（真实中文文档布局 / 多 marker / 换行 / tab / Unicode 空白 / int tolerance / json serializable 4 path / 全 kwargs / 全 positional / mixed / 默认 30 边界 / no mutation 3 path / tolerance 0 vs 1 差异 / 负 tolerance / huge tolerance / 多 anchor 确定性）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges30.py`（399 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 行为深度第三批**：~22 测试
+- **chunk_boundary_prf 算法深度第三批**：~50 测试
+- **chunk_boundary_prf source level 第三批**：~32 测试
+- **module source forbidden tokens 第六批**：~190 测试（parametrize）
+- **module source 字符串精确补强**：~22 测试
+- **signatures 精确补强**：~28 测试
+- **模块整体合理性**：~22 测试
+- **端到端集成补强**：~25 测试
+
+### 撞墙记录
+- 4 fail 首次跑：
+  - 'chunk' 是 'chunkers' 子串 → 移除
+  - 'imp' 是 'import' 子串 → 移除
+  - 'io' 是 'annotations' 子串 → 移除
+  - 're' 是 'future' 子串 → 移除
+  - 'struct' 是 'structural' 子串 → 移除
+  - 'typing' 是合法 import → 移除
+  - test_chunk_boundary_greedy_does_not_match_used_pred：marker "a" + "a b" 因 search_from 推进导致 "a b" 找不到 → 改为 1 anchor 设计
+  - test_e2e_chunk_boundary_with_real_doc_layout：1 anchor vs 2 prediction → 改为 2 anchors
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 344 后）：36768 pass / 0 fail / 18 skip（HEAD `0bd866b`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十二轮
+  - evaluation/metrics.py 第三十一轮
+  - evaluation/runner.py 第三十二轮
+  - evaluation/manifest.py 第三十一轮
+  - evaluation/cli.py 第三十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges30 已饱和（figure_caption 22 + chunk_boundary 50 + source level 32 + forbidden 190 + source 字符串 22 + signatures 28 + 模块 22 + 端到端 25）。下一轮选 evaluation/schema.py 第二十二轮，覆盖 4 个 schema cross-validation 与 EvalSchemaError 行为深度。
+
+---
+
 ## Round 343 — evaluation/cli.py 第三十一轮（297 测试）
 
 ### 目标
