@@ -4,6 +4,55 @@
 
 ---
 
+## Round 313 — evaluation/manifest.py 第二十五轮（156 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二十五轮 edges 测试，覆盖 edges24 未触及的角度：**_is_absolute_like 边界深度**（empty / POSIX abs / POSIX rel / Windows drive backslash / forward slash / lowercase/uppercase drive / 短字符串 / C:foo drive-relative / 单字母 / 2 字符 / 3 字符无分隔 / 3 字符 + 斜杠 / 数字 drive / unicode letter drive）；**_has_backslash 边界深度**（empty / 无 / 有 / 仅反斜杠 / trailing / leading / 单字符）；**_resolve_relative_path 各错误分支精确**（empty raises "为空" / 绝对路径 raises "绝对路径" / Windows abs raises / 反斜杠 raises "反斜杠" / 项目根外 raises "项目根目录之外" / 项目根内 succeeds / 返回绝对路径 / dot segments 被消除 / field_name 在 message 中）；**_detect_project_root 行为深度**（找 pyproject / 文件参数从 parent 开始 / 无 pyproject 返回 input / 多级向上 / Path 对象返回 Path）；**ManifestError 实例化**（message 保留 / isinstance Exception / raise / catch / 无自定义 __init__ / __bases__ == (Exception,) / namespace）；**DocumentEntry/ExpectedFailure/Manifest dataclass frozen**（is_dataclass / frozen / field count 10+5+5 / field names）；**Manifest properties 边界**（5 properties 是 property 类型 / empty 时各 properties 返回 0 / categories_covered 返回 list）；**module source forbidden tokens**（28 个 stdlib）；**module source 必要 imports**（5 stdlib + evaluation.MANIFEST_VERSION + schema.validate）；**module source 字符串精确**（class ManifestError / @dataclass(frozen=True) / 3 dataclasses / 5 函数 def / 5 property defs / validate 调用 / manifest_version check / documents loop / expected_failures loop / categories tuple 转换 / paired_with / annotation_file / JSONDecodeError handler / json.load / relative_to / resolve / docstring constraints / no __main__）；**signatures 精确**（load_manifest 2 params + Path|str 联合 / _is_absolute_like / _has_backslash / _resolve_relative_path / _detect_project_root）；**namespace 检查**（8 个）；**module 整体合理性**（__all__ 5 entries / 3 dataclasses + ManifestError 非 dataclass / 4 classes total / 1 public function / 4 private functions / no __main__）；**端到端 load_manifest**（empty documents / 1 document / missing file / invalid JSON / wrong version / expected_failures / categories_covered / str path / explicit project_root / outside root / backslash path）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges25.py`（156 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 边界深度**：16 测试
+- **_has_backslash 边界深度**：7 测试
+- **_resolve_relative_path 各错误分支精确**：9 测试
+- **_detect_project_root 行为深度**：5 测试
+- **ManifestError 实例化**：7 测试
+- **DocumentEntry dataclass**：4 测试
+- **ExpectedFailure dataclass**：4 测试
+- **Manifest dataclass**：10 测试
+- **module source forbidden tokens**：28 测试（parametrize）
+- **module source 必要 imports**：7 测试
+- **module source 字符串精确**：26 测试
+- **signatures 精确**：9 测试
+- **namespace 检查**：8 测试
+- **module 整体合理性**：7 测试
+- **端到端 load_manifest**：11 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_module_has_3_dataclasses` - ManifestError 不是 dataclass（is_dataclass(ManifestError) 返回 False），所以 list comprehension 过滤掉了它；改为只断言 3 个 dataclass，并增加 test_module_has_4_classes_total 单独覆盖 ManifestError
+- 修复后 156 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 313 后）：30588 pass / 0 fail / 16 skip（HEAD `900f41d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第二十六轮
+  - evaluation/annotation_metrics.py 第二十六轮
+  - evaluation/metrics.py 第二十六轮
+  - evaluation/schema.py 第十八轮
+  - evaluation/runner.py 第二十七轮
+  - evaluation/manifest.py 第二十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges25 已饱和（_is_absolute_like + _has_backslash + _resolve_relative_path + _detect_project_root + ManifestError + 3 dataclasses + Manifest properties + forbidden tokens + source 字符串 + signatures + namespace + 端到端 + 模块整体）。下一轮选 evaluation/cli.py 第二十六轮，覆盖 _build_parser/_format_metric/_run_inspect_doc 行为深度。
+
+---
+
 ## Round 312 — evaluation/runner.py 第二十六轮（121 测试）
 
 ### 目标
