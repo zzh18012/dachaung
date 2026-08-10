@@ -4,6 +4,55 @@
 
 ---
 
+## Round 319 — evaluation/manifest.py 第二十六轮（112 测试 + 1 skip）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二十六轮 edges 测试，覆盖 edges25 未触及的角度：**_is_absolute_like 边界补充**（just slash / just backslash / 2 字母 / Y/Z drive / underscore/space drive）；**_has_backslash 边界补充**（两个反斜杠 / 仅 forward slash / 混合）；**_resolve_relative_path 错误消息精确**（field_name 在 message / path 在 message / resolved 在 outside 消息 / double dots normalization / single dot normalization）；**_detect_project_root 边界补充**（Path 对象 / 已是 dir / symlink 输入）；**ManifestError 行为补充**（无 args / 多 args / 空 str）；**DocumentEntry/ExpectedFailure frozen 补强**（每个字段都 frozen）；**Manifest properties 行为深度**（file_count/pdf_count/docx_count 各 mix / content_group_count all unpaired / one pair / mutual pair / categories_covered sorted/duplicates/empty）；**load_manifest 边界补充**（categories per doc / sha256 / paired_with / expectations / annotation_file / expected_failure source_type / project_root str）；**module source forbidden tokens**（28 个 stdlib）；**module source 字符串精确**（docstring mentions path/relative/absolute/反斜杠/项目根 / no __main__）；**signatures 精确**（5 函数 no varargs/varkw / 8 namespace 检查）；**module 整体合理性**（__all__ 5 entries / no __main__ / 4 classes / 3 dataclasses / 1 public / 4 private）；**端到端集成**（full features / pair / default project_root / invalid categories / invalid sha256 pattern）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges26.py`（112 测试 + 1 symlink skip）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 边界补充**：7 测试
+- **_has_backslash 边界补充**：3 测试
+- **_resolve_relative_path 错误消息精确**：5 测试
+- **_detect_project_root 边界补充**：3 测试（1 symlink skip）
+- **ManifestError 行为补充**：3 测试
+- **DocumentEntry frozen**：10 测试
+- **ExpectedFailure frozen**：5 测试
+- **Manifest properties 行为深度**：9 测试
+- **load_manifest 边界补充**：7 测试
+- **module source forbidden tokens**：28 测试（parametrize）
+- **module source 字符串精确**：6 测试
+- **signatures 精确**：13 测试
+- **module 整体合理性**：7 测试
+- **端到端集成**：5 测试
+
+### 撞墙记录
+- 2 fail 首次跑：
+  - `test_manifest_content_group_count_one_pair` - 单向 paired_with 的实际算法：pair_ids={frozenset} → groups=1, seen={"x","y"}, y 在 seen → unpaired=0 → total 1（不是 2）→ 修正断言
+  - `test_e2e_load_manifest_with_full_features` - manifest schema 拒绝 `paired_with: None`（schema 要求 string）→ 移除该字段
+- 修复后 112 全通过 + 1 symlink skip
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 319 后）：31304 pass / 0 fail / 18 skip（HEAD `cce5822`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第二十七轮
+  - evaluation/annotation_metrics.py 第二十七轮
+  - evaluation/metrics.py 第二十七轮
+  - evaluation/schema.py 第十九轮
+  - evaluation/runner.py 第二十八轮
+  - evaluation/manifest.py 第二十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges26 已饱和（_is_absolute_like / _has_backslash / _resolve_relative_path 错误消息 / _detect_project_root / ManifestError / 3 frozen dataclasses / Manifest properties / load_manifest 边界 / forbidden tokens / source 字符串 / signatures / 端到端 + 模块整体）。下一轮选 evaluation/cli.py 第二十七轮。
+
+---
+
 ## Round 318 — evaluation/runner.py 第二十七轮（96 测试 + 1 skip）
 
 ### 目标
