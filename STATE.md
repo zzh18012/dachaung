@@ -4,6 +4,52 @@
 
 ---
 
+## Round 369 — evaluation/manifest.py 第三十四轮（122 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第三十四轮 edges 测试，覆盖 edges33 未触及的角度：**_is_absolute_like 数学边界第九批**（empty / single char alpha / single char slash / single char colon / 2-char / Cyrillic α / Greek α / Han ideograph 中 / Arabic alef أ / underscore / digit 1）；**_has_backslash 数学边界第九批**（empty / only tab / only space / only newline / tab+backslash / newline+backslash / `\\/` / `\\\\`）；**_resolve_relative_path 行为深度第四批**（`"."` 解析为 project_root / subdir with trailing slash / unicode 中文.pdf / 4 层 subdir / 多 dot 文件名 / field_name 在 error msg 中 / resolved 在 project_root 内）；**_detect_project_root 行为深度第五批**（不存在路径 / 目录 / 最近 pyproject.toml 优先 / 文件路径 / 返回 Path 类型 / 无 pyproject 链时返回 cur）；**DocumentEntry / ExpectedFailure / Manifest dataclass 行为深度第七批**（hash 一致 / 作为 dict key / asdict 完整 / astuple 字段顺序 / fields 数量+名称 / replace 保留其他字段 / 作为 set 元素去重）；**Manifest properties 算法深度第七批**（pdf_count 多 / docx_count 多 / pdf+docx=file_count 不变量 / 空 categories / Unicode 排序 / pair 双向 / pair 单向 / 双 pair）；**load_manifest malformed data 第七批**（文件不存在 / 目录 / 空 JSON / trailing comma / root is list / manifest_version 错 / 缺 devset_status / 缺 doc_id / 缺 path）；**module source forbidden tokens 第十批**（os.chmod/chown/execv/fork/kill/mkdir/makedirs/remove/rename/rmdir/unlink + pathlib.Path.rmdir/unlink + Path.rmdir/unlink + eval/exec/compile/globals/locals/vars + memoryview/bytearray + errno + signal.signal + fcntl/termios/tty/pty/winreg/msvcrt/_winapi）；**signatures 第五批**（_is_absolute_like 返回 bool / _has_backslash 返回 bool / _resolve_relative_path 返回 Path / _detect_project_root 返回 Path / ManifestError.__init__ is Exception.__init__ / load_manifest 2 params / project_root default None / Manifest properties 返回 int）；**模块整体合理性第三批**（__all__ 精确 5 项 / module docstring / ManifestError docstring / 源码无 __init__ 覆写 / no module-level mutable state）；**端到端集成第三批**（annotation_file 字段解析 + annotation_resolved / 文档顺序保留 d0..d4 / expected_failures 解析 + source_type / categories 跨文档去重 + 排序 / devset_status=incomplete 保留 / 空 documents+failures / 所有 resolved_path 是绝对路径）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges34.py`（122 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第九批**：12 测试
+- **_has_backslash 数学边界第九批**：8 测试
+- **_resolve_relative_path 行为深度第四批**：7 测试
+- **_detect_project_root 行为深度第五批**：6 测试
+- **DocumentEntry dataclass 行为深度第七批**：7 测试（hash + asdict + astuple + fields + replace）
+- **ExpectedFailure dataclass 行为深度第七批**：6 测试
+- **Manifest dataclass 行为深度第七批**：4 测试
+- **Manifest properties 算法深度第七批**：9 测试
+- **load_manifest malformed data 第七批**：9 测试
+- **module source forbidden tokens 第十批**：32 测试
+- **signatures 第五批**：8 测试
+- **模块整体合理性第三批**：5 测试
+- **端到端集成第三批**：7 测试
+
+### 撞墙记录
+- 0 fail 首次跑（122 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 369 后）：43156 pass / 0 fail / 18 skip（HEAD `e91d350`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - evaluation/schema.py 第二十六轮
+  - evaluation/metrics.py 第三十五轮
+  - evaluation/report.py 第二十四轮
+  - evaluation/runner.py 第三十六轮
+  - evaluation/manifest.py 第三十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest edges34 已饱和（_is_absolute_like 12 + _has_backslash 8 + _resolve_relative_path 7 + _detect_project_root 6 + 3 dataclass hash/asdict/astuple/fields 各 4-7 + properties 9 + load_manifest 9 + forbidden 32 + signatures 8 + 模块 5 + 端到端 7）。下一轮选 evaluation/cli.py 第三十五轮，覆盖 argparse 子命令 / Namespace 字段 / format_metric 行为深度。
+
+---
+
 ## Round 368 — evaluation/runner.py 第三十五轮（231 测试）
 
 ### 目标
