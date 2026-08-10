@@ -4,6 +4,47 @@
 
 ---
 
+## Round 423 — evaluation/report.py 第三十一轮（104 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第三十一轮 edges 测试，覆盖 edges30 未触及的角度：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 元组深度第十四批**（成员唯一性 / 长度 / __contains__ 行为 / 内含特定 key）；**get_git_provenance 行为深度第十四批**（r.stdout 含 trailing whitespace / 多换行 / r2 CRLF / r2 仅 \r / 类型固定）；**get_dependency_versions 行为深度第十四批**（3 个 key / 值类型）；**build_provenance 字段深度第十四批**（9 keys / 调用 get_dependency_versions / 调用 get_git_provenance / parser_name 透传）；**build_devset_section 字段深度第十四批**（6 keys / 返回新 dict / 属性读取顺序）；**aggregate_summary 行为深度第十四批**（multiple ratios / silent_drop 0 vs None / count with float / not_evaluated 计数 / pipeline_success=None 不算 success）；**module source forbidden tokens 第十九批**；**module source 字符串精确补强第十六批**；**signatures 第十六批**；**module 合理性第十六批**；**端到端集成第十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges31.py`（104 测试）
+
+### 覆盖要点
+- **元组深度第十四批**：11 测试
+- **get_git_provenance 行为深度第十四批**：6 测试
+- **get_dependency_versions 行为深度第十四批**：6 测试
+- **build_provenance 字段深度第十四批**：7 测试
+- **build_devset_section 字段深度第十四批**：5 测试
+- **aggregate_summary 行为深度第十四批**：8 测试
+- **module source forbidden tokens 第十九批**：16 测试
+- **module source 字符串精确补强第十六批**：21 测试
+- **signatures 第十六批**：8 测试
+- **module 合理性第十六批**：7 测试
+- **端到端集成第十六批**：10 测试
+
+### 撞墙记录
+- 首次跑：104 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 423 后）：51501 pass / 0 fail / 19 skip（HEAD `00010e0`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第四十四轮
+  - evaluation/cli.py 第四十三轮
+  - evaluation/manifest.py 第四十二轮
+  - evaluation/annotation_metrics.py 第四十二轮
+  - evaluation/schema.py 第三十四轮
+  - evaluation/metrics.py 第四十四轮
+  - evaluation/report.py 第三十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 422 — evaluation/metrics.py 第四十三轮（149 测试）
 
 ### 目标
