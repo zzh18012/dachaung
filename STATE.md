@@ -4,6 +4,49 @@
 
 ---
 
+## Round 386 — evaluation/schema.py 第二十八轮（153 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第二十八轮 edges 测试，覆盖 edges27 未触及的角度：**EvalSchemaError 行为深度第八批**（is Exception 子类 / message only / message+errors / errors None defaults [] / no errors arg / empty errors list / errors attr is list / 可 raise+catch / 可 caught as Exception / repr 含 class name / chain from other / mutable errors / args stored / complex payload / __init__ signature 3 params keyword options）；**load_schema 行为深度第八批**（4 schemas 各返回 dict / unknown raises FileNotFoundError / 目录形式 raises / idempotent / 独立 dict / $schema 字段 / type=object / $id 字段 / 不调 validator / properties 字段 / required 字段）；**validate 行为深度第八批**（成功返 None / 多余 top-level field raises / wrong version raises / invalid enum raises / missing version raises / documents not list raises / expected_failures not list raises / unknown schema raises / 不 mutate / idempotent / error 含 path+schema_name+count / errors list of dicts / errors dict keys path+message+schema_path / errors path is list）；**validate_file 行为深度第八批**（str path / Path object / missing file raises / invalid JSON raises / invalid schema raises / unknown schema raises / idempotent / 不修改文件 / positional / kwargs）；**_schema_path 行为深度第八批**（returns Path / unknown raises / 目录 raises / 绝对路径 / idempotent / resolves to SCHEMAS_DIR / 不读文件内容 / 错误含 path str）；**SCHEMAS_DIR 常量深度第八批**（Path 类型 / absolute / endswith schemas / 4 JSON 文件 / in module namespace / value immutable / parent 是 project root / hashable）；**module source forbidden tokens 第十二批**（os.system/Popen/rmtree/pickle.load/yaml.load/compile/eval/exec/sys.exit/exit/quit/global + no async/yield/walrus/unlink/remove/logging/sleep/print）；**module source 字符串精确补强第八批**（future annotations + 5 imports + SCHEMAS_DIR 字面量 + EvalSchemaError class/init/super/self.errors + 4 func defs + Draft202012Validator/iter_errors/sorted 调用 + no main + docstring mentions schema + no hardcoded path）；**signatures 第八批**（_schema_path 1 param + return Path / load_schema 1 param + return dict[str,Any] / validate 2 params + kinds + no defaults / validate_file 2 params + kinds + no defaults / EvalSchemaError __init__ 3 params + errors default None / 4 funcs FunctionType + __module__ eq）；**module 合理性第八批**（__all__ 5 items + dunder file + name + EvalSchemaError Exception 子类 + 4 user functions + 1 user class + no top-level call + docstring）；**端到端集成第八批**（load+validate success/failure / validate_file round trip / idempotent / caught as Exception / str representation / chained from other / unknown schema FileNotFoundError / no unexpected exception / str path / full chain / each schema has properties）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges28.py`（153 测试）
+
+### 覆盖要点
+- **EvalSchemaError 行为深度第八批**：15 测试
+- **load_schema 行为深度第八批**：14 测试
+- **validate 行为深度第八批**：17 测试
+- **validate_file 行为深度第八批**：11 测试
+- **_schema_path 行为深度第八批**：8 测试
+- **SCHEMAS_DIR 常量深度第八批**：7 测试
+- **module source forbidden tokens 第十二批**：11 测试
+- **module source 字符串精确补强第八批**：21 测试
+- **signatures 第八批**：19 测试
+- **module 合理性第八批**：10 测试
+- **端到端集成第八批**：12 测试
+
+### 撞墙记录
+- 1 fail 首次跑：所有 manifest 数据用 "1.1"，实际 `MANIFEST_VERSION == "1.0"`（schema 严格 enum）
+  - 修复：批量替换 20 处 "1.1" → "1.0"（Edit replace_all 因 indentation 仅匹配 9 处，补 Python 脚本替换全部）
+- 二次跑：153 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 386 后）：45967 pass / 0 fail / 19 skip（HEAD `5ab38fa`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第三十七轮
+  - evaluation/report.py 第二十六轮
+  - evaluation/runner.py 第三十八轮
+  - evaluation/cli.py 第三十七轮
+  - evaluation/manifest.py 第三十七轮
+  - evaluation/annotation_metrics.py 第三十七轮
+  - evaluation/schema.py 第二十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 385 — evaluation/annotation_metrics.py 第三十六轮（123 测试）
 
 ### 目标
