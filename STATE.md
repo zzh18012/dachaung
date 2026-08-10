@@ -15300,3 +15300,45 @@ get_git_provenance 各 OSError 路径。
 **建议**：evaluation/* 全模块 edges12-20 已基本饱和。下一轮可向 schema.py 第十三轮（小文件精读）或 report.py 第二十轮（深度联动 metrics）推进。
 
 ---
+
+## Round 284 — evaluation/schema.py 第十三轮（188 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第十三轮 edges 测试，覆盖 edges12 未触及的角度：**manifest schema 深度违反**（manifest_version="2.0"/"1.1"/int/缺字段；devset_status="unknown"/"COMPLETE"/缺字段；documents 非 array/缺字段；document 缺 doc_id/path/source_type；source_type="txt"/"html"；doc_id 空 string；sha256 大写/63 char/65 char/non-hex/empty string 全失败，64 lowercase 通过；expectations.element_count_by_type 含负数/string/float；required_markers items 空 string；top-level/document/expectations additionalProperties=false；expected_failure 缺 doc_id/path/expected_error_code；source_type="xml" 失败 / "other" 通过；expected_failure additionalProperties）；**annotation schema 深度违反**（annotation_version="2.0"；缺 doc_id；doc_id empty；top-level additionalProperties；figure_caption_pairs items 缺 figure_marker/caption_text；marker empty；items additionalProperties；heading_order level 0/负数/non-int；text empty；缺 level/text；items additionalProperties；chunk_boundary_anchors items 缺 marker/position；position 非 enum；marker empty；items additionalProperties；含 reason 通过）；**evaluation-report schema 深度违反**（report_version="1.0"/"2.0"/缺字段；provenance 缺 git_commit/git_dirty/evaluator_version/max_chars/run_timestamp_iso；git_dirty 非 bool；max_chars 0/负数/float；evaluator_version empty string；additionalProperties；devset 缺 status；status="unknown"；file_count/pdf_count 负数；categories_covered non-string items；devset additionalProperties；per_doc 缺 doc_id/source_type/metrics/wall_time_seconds；source_type="txt"；wall_time_seconds 缺 total/parse/chunk；total 负数；per_doc additionalProperties；expected_failure_result 缺 doc_id/matches；matches 非 bool；additionalProperties；report top-level additionalProperties；report 缺 provenance/devset/summary/per_doc）；**跨 schema 交叉验证**（annotation→manifest/report 失败；manifest→annotation/report 失败；report→manifest/annotation 失败；每个 dict 在自己 schema 下通过）；**多错误排序行为**（多错误返回 list；errors sorted by absolute_path；head=errors[0]；message 含 "(N 处)" 且 N=len(errors)）；**validate_file 行为深度**（目录而非文件 → FileNotFoundError；二进制内容 → JSONDecodeError；UTF-8 BOM → JSONDecodeError；top-level array/number/string/null/boolean 全失败；Path object 与 str 都接受；不存在路径失败；未知 schema name 失败）；**EvalSchemaError 与 jsonschema.ValidationError 关系**（不是 ValidationError 子类；不能被 except JSValidationError 捕获；errors 字段 message/path/schema_path 与 jsonschema 原始输出一致）；**模块 source 补强**（精确 import 字符串；不含 jsonschema_p；future annotations 在 json 之前；不含 relative import/walrus/async/yield/global/nonlocal/class decorator/assert statement；__all__ 5 entries 都是 valid identifier 且都存在于 namespace）；**函数签名深度**（validate/load_schema/validate_file/_schema_path 各 param 数量与默认；EvalSchemaError.__init__ 3 params 含 self/message/errors，errors 默认 None）；**EvalSchemaError 实例化深度**（kwargs-only；errors=None→[]；errors=()→[]；errors=truthy dict 透传；args 只含 message）；**实际 schema 字段深度**（manifest/annotation/evaluation-report 各 required 精确列表；additionalProperties 设置；$defs 含哪些；document/expected_failure/provenance/devset/summary/per_doc required；boundary_anchor position enum；document sha256 pattern；expected_failure source_type enum 含 4 项；evaluation-report provenance 9 字段；per_doc 4 字段；summary additionalProperties=true；3 schema 都用 Draft 2020-12）；**validate 隔离行为**（两次调用 errors list 独立；每次都 load_schema 不缓存；不修改 input；失败也不修改 input）；**SCHEMAS_DIR 行为深度**（resolved；is_dir；含 document.schema.json；至少 4 个 schema；不含 .py/.txt/.md；每个文件 valid JSON；每个文件含 $schema 字段；每个文件 type=object）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges13.py`（188 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **manifest 违反**：~30 场景（manifest_version/devset_status/documents/document 缺字段/source_type/sha256 pattern/expectations/required_markers/additionalProperties）
+- **annotation 违反**：~22 场景（annotation_version/doc_id/figure_caption_pairs/heading_order/chunk_boundary_anchors）
+- **evaluation-report 违反**：~35 场景（report_version/provenance 9 字段/devset 6 字段/per_doc 4 字段+wall_time/expected_failure_result）
+- **跨 schema**：6 交叉场景 + 1 各自通过
+- **多错误排序**：4 场景
+- **validate_file 行为**：11 场景
+- **EvalSchemaError vs ValidationError**：4 关系测试
+- **模块 source 补强**：17 字符串/不存在测试
+- **函数签名**：6 测试
+- **EvalSchemaError 实例化**：8 测试
+- **schema 字段深度**：16 测试
+- **validate 隔离**：4 测试
+- **SCHEMAS_DIR 行为**：10 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_validate_function_return_annotation_is_none`：`from __future__ import annotations` 让 return_annotation 是字符串 'None' 而非 type(None)。修复：assert return_annotation in (type(None), "None")
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 284 后）：26392 pass / 0 fail / 16 skip（HEAD `7c8a086`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第二十轮（200 行）
+  - evaluation/schema.py 第十四轮（更深度联动 + 边界）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges13 已深度覆盖 3 schema 的所有违反场景。下一轮选 evaluation/report.py 第二十轮（report 字段 + aggregate_summary + 联动 schema）。
+
+---
