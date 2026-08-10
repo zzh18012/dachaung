@@ -4,6 +4,48 @@
 
 ---
 
+## Round 408 — evaluation/metrics.py 第四十一轮（174 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第四十一轮 edges 测试，覆盖 edges38 未触及的角度：**helpers 行为深度第十二批**（_null 三段式 / _ratio None 分子 / _ratio None 分母 / _ratio 0 分子 / _ratio 0 分母 / _ratio 整数比 / _ratio float 比 / _bool_metric 三元组 / _int_metric 三元组 / _int_metric None reason / _null reason 验证）；**compute_automatic_metrics 行为深度第十二批**（doc+error 都设 / image-only elements / element 无 type / source_type=unknown / 空 chunks / 单 chunk 完美）；**pdf/docx locator 第十二批**；**_is_valid_bbox 第十二批**（dict/tuple/string/None 输入 / inf/nan/negative-inf / bool 值 / 长度 3/5/空）；**_strip_unicode_whitespace 第十二批**（NBSP U+00A0 / EM SPACE U+2003 / EN SPACE U+2002 / ideographic space U+3000 / line separator U+2028 / paragraph separator U+2029 / BOM U+FEFF 非空白 / vertical tab / form feed）；**image_resource_ratio 第十二批**（OSError 静默）；**chunk_reference_ratio 第十二批**；**module source forbidden tokens 第十六批**；**module source 字符串精确补强第十三批**；**signatures 第十三批**；**module 合理性第十三批**；**端到端集成第十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges39.py`（174 测试）
+
+### 覆盖要点
+- **helpers 行为深度第十二批**：20 测试
+- **compute_automatic_metrics 行为深度第十二批**：12 测试
+- **pdf/docx locator 第十二批**：15 测试
+- **_is_valid_bbox 第十二批**：15 测试
+- **_strip_unicode_whitespace 第十二批**：15 测试
+- **image_resource_ratio 第十二批**：7 测试
+- **chunk_reference_ratio 第十二批**：6 测试
+- **module source forbidden tokens 第十六批**：28 测试
+- **module source 字符串精确补强第十三批**：22 测试
+- **signatures 第十三批**：14 测试
+- **module 合理性第十三批**：13 测试
+- **端到端集成第十三批**：10 测试
+
+### 撞墙记录
+- 首次跑：174 全通过（无撞墙）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 408 后）：49451 pass / 0 fail / 19 skip（HEAD `26d8906`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第三十轮
+  - evaluation/runner.py 第四十二轮
+  - evaluation/cli.py 第四十一轮
+  - evaluation/manifest.py 第四十轮
+  - evaluation/annotation_metrics.py 第四十轮
+  - evaluation/schema.py 第三十二轮
+  - evaluation/metrics.py 第四十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 407 — evaluation/schema.py 第三十一轮（133 测试）
 
 ### 目标
