@@ -4,6 +4,43 @@
 
 ---
 
+## Round 399 — evaluation/annotation_metrics.py 第三十八轮（116 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第三十八轮 edges 测试，覆盖 edges37 未触及的角度：**figure_caption_prf 行为深度第十一批**（dict 类型 / value+reason 结构 / 与 annotation/doc 无关 / idempotent / key order）；**chunk_boundary_prf 行为深度第十一批**（更多 branch：marker 缺失 / Unicode marker / position 边界 / tolerance 负数 / chunk text 缺失 / 多 chunk 多 anchor / _missing_markers 触发 / 默认 vs 自定义 tolerance）；**module source forbidden tokens 第十四批**；**module source 字符串精确补强第九批**；**signatures 第十一批**；**module 合理性第十一批**；**端到端集成第十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges38.py`（116 测试）
+
+### 覆盖要点
+- **figure_caption_prf 行为深度第十一批**：11 测试
+- **chunk_boundary_prf 行为深度第十一批**：26 测试
+- **module source forbidden tokens 第十四批**：16 测试
+- **module source 字符串精确补强第九批**：14 测试
+- **signatures 第十一批**：11 测试
+- **module 合理性第十一批**：11 测试
+- **端到端集成第十一批**：10 测试
+
+### 撞墙记录
+- 首次跑：116 全通过（无 fail）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 399 后）：48123 pass / 0 fail / 19 skip（HEAD `7c35288`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第三十轮
+  - evaluation/metrics.py 第三十九轮
+  - evaluation/report.py 第二十八轮
+  - evaluation/runner.py 第四十轮
+  - evaluation/cli.py 第三十九轮
+  - evaluation/manifest.py 第三十九轮
+  - evaluation/annotation_metrics.py 第三十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 398 — evaluation/manifest.py 第三十八轮（177 测试）
 
 ### 目标
