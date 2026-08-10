@@ -14964,3 +14964,53 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KF7（evaluation/metrics.py 第十八轮，381 行）继续推 evaluation。
 
 ---
+
+## Round 277 — evaluation/metrics.py 第十八轮（169 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第十八轮 edges 测试，覆盖 edges17 未触及的角度：模块 imports 精确字符串（'import math'/'from collections import Counter'/'from pathlib import Path'/'from typing import Any'）；import 顺序；_null source（'return {"value": None, "reason": reason}'）；_ratio source（'return {"value": float(value), "reason": None}'；不含 int(value)）；_bool_metric source（'return {"value": bool(value), "reason": None}'）；_int_metric source（'return {"value": int(value), "reason": None}'）；常量精确（_TEXT_TYPES 7 items tuple；_PDF_BBOX_REQUIRED_TYPES 4 items tuple；_NOT_EVALUATED == 'not_evaluated'；subset 关系；image 不在；table/header/footer 不在 PDF_BBOX）；常量 source 定义精确；compute_automatic_metrics source 详尽（metrics init/pipeline_success 表达式/_bool_metric 调用/error_code 赋值/document is None 检查/11 metric names loop/schema_valid 分支/延迟 schema_validation import/try+except+exception type 名/elements+chunks 获取/_int_metric 调用/by_type loop + 7 keys/source_type 分支/各 sub-function 调用/return metrics）；_pdf_locator_ratio source（empty check/locator get/page int 检查/continue/_PDF_BBOX_REQUIRED_TYPES 引用/bbox get/_is_valid_bbox 调用/return _ratio）；_docx_locator_ratio source（7 structural_keys 精确/page or bbox 检查/any structural_key 检查）；_is_valid_bbox source（list + len 4 检查/bool 检查/int+float 检查/isfinite 检查/return True）；_image_resource_ratio source（images comprehension/no_images check/rp get/not rp check/candidates list/image_base_dir 检查/is_file + size 检查/OSError catch）；_chunk_reference_ratio source（no_chunks check/elem_ids set comprehension/ids get/all 检查）；_strip_unicode_whitespace source（'return "".join(ch for ch in s if not ch.isspace())'；不含 s.strip()/.replace()）；_text_preservation source（expected_raw join/content get/image filter/actual_raw join/strip 调用/equal 检查/empty both check/Counter 交集/empty_actual check/empty_expected check/3 keys return）；_heading_boundary_ratio source（headings comprehension/no_headings check/chunk_first_ids set/ids[0]/matched sum/return ratio）；_silent_drop_count source（no_expectations check/expected_counts get/no_expected_counts check/drops init/items loop/actual<exp check/return int_metric）；__all__ 精确（['compute_automatic_metrics']）；namespace 完整（4 helpers + compute + 9 sub-helpers + 3 constants + math/Counter/Path/Any；不含 subprocess/logging/json/os/asyncio/threading）；模块 source 不含 print/logging/subprocess/async/threading/json/os/process_single(调用)/figure_caption/chunk_boundary；compute_automatic_metrics 不修改 document/expectations；两次调用独立 dict；keys count when failed=14/when succeeded=14；keys exact set；helper metadata（14 个 FunctionType；__module__ == 'evaluation.metrics'）；签名 introspection（5 params；image_base_dir 默认 None；document/error 无默认；no var args/kwargs）；docstring 含 纯函数/不修改/text_preservation/不丢不重/Counter/v1.1/空白
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges18.py`（169 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块 imports 精确**：4 import 语句精确；import 顺序 __future__→math→collections→pathlib→typing
+- **_null source**：'return {"value": None, "reason": reason}'；signature 1 param name reason
+- **_ratio source**：'return {"value": float(value), "reason": None}'；不含 int(value)；signature 1 param
+- **_bool_metric source**：'return {"value": bool(value), "reason": None}'
+- **_int_metric source**：'return {"value": int(value), "reason": None}'
+- **常量精确**：_TEXT_TYPES 7 items tuple；_PDF_BBOX_REQUIRED_TYPES 4 items tuple；_NOT_EVALUATED == 'not_evaluated'；subset 关系；image/table/header/footer 不在 PDF_BBOX；source 定义精确
+- **compute_automatic_metrics source**：所有关键 token 验证（30+ source-level 断言）
+- **_pdf_locator_ratio source**：所有 9 个关键 token 精确
+- **_docx_locator_ratio source**：7 structural_keys 精确；page or bbox 检查；any structural_key 检查
+- **_is_valid_bbox source**：所有 6 个关键 token 精确
+- **_image_resource_ratio source**：所有 9 个关键 token 精确
+- **_chunk_reference_ratio source**：所有 4 个关键 token 精确
+- **_strip_unicode_whitespace source**：'return "".join(ch for ch in s if not ch.isspace())'；不含 s.strip()/.replace()
+- **_text_preservation source**：所有 12+ 关键 token 精确
+- **_heading_boundary_ratio source**：所有 6 个关键 token 精确
+- **_silent_drop_count source**：所有 7 个关键 token 精确
+- **__all__**：['compute_automatic_metrics'] 单元素 list
+- **namespace**：4 helpers + compute + 9 sub-helpers + 3 constants + math/Counter/Path/Any 都在；不含 subprocess/logging/json/os/asyncio/threading
+- **不含禁止内容**：print/logging/subprocess/async/threading/json/os/process_single 调用/figure_caption/chunk_boundary 都不在 source 中
+- **compute_automatic_metrics 行为**：不修改 document/expectations；两次调用独立 dict；返回 dict type；keys count=14（failed+succeeded 都 14）；keys exact set 验证
+- **helper metadata**：14 个 helper 都是 FunctionType；__module__ == 'evaluation.metrics'
+- **签名 introspection**：compute_automatic_metrics 5 params（document/error/source_type/expectations/image_base_dir）；image_base_dir 默认 None；document/error 无默认；no var args/kwargs
+- **docstring**：含 纯函数/不修改/text_preservation/不丢不重/Counter/v1.1/空白
+
+### 撞墙记录
+- 1 fail 首次跑（已修复）：
+  - test_module_source_does_not_contain_process_single：docstring 含 'process_single 返回的 Document.to_dict()' 字符串，断言失败；改为 test_module_source_does_not_contain_process_single_call，检查 'process_single(' 调用而非字符串
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 277 后）：25464 pass / 0 fail / 16 skip（HEAD `15f2328`）
+
+### 下一步建议
+- 候选 KW7：evaluation/report.py 第十九轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KW7（evaluation/report.py 第十九轮，200 行）继续推 evaluation。
+
+---
