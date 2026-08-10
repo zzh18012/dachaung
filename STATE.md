@@ -15605,14 +15605,65 @@ get_git_provenance 各 OSError 路径。
 
 ### 下一步建议
 - 候选：
-  - evaluation/annotation_metrics.py 第二十一轮（195 行）
   - evaluation/metrics.py 第二十一轮（381 行）
   - evaluation/schema.py 第十四轮
   - evaluation/runner.py 第二十二轮
   - evaluation/manifest.py 第二十二轮
   - evaluation/cli.py 第二十三轮
+  - evaluation/annotation_metrics.py 第二十二轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：cli.py edges21 已饱和（exit code 矩阵 + _format_metric value 类型完整 + _sort_key 4 分支 + argparse 元数据 + module/source level 完整 + 集成 round-trip）。下一轮选 evaluation/annotation_metrics.py 第二十一轮，覆盖 figure_caption_prf + chunk_boundary_prf 行为深度。
+**建议**：cli.py edges21 已饱和。下一轮选 evaluation/annotation_metrics.py 第二十一轮，覆盖 figure_caption_prf + chunk_boundary_prf 行为深度。
+
+---
+
+## Round 291 — evaluation/annotation_metrics.py 第二十二轮（142 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第二十二轮 edges 测试，覆盖 edges20 未触及的角度：**figure_caption_prf 行为深度**（document=None / annotation=None / 二者都 None；不读 doc 也不读 annotation 但仍走 reason；每次调用产生新 dict；3 个 key 精确；reason 是 PARSER_DOES_NOT_EMIT_RELATIONS；无 tolerance/missing_markers 字段；不修改输入）；**chunk_boundary_prf document/annotation 边界**（document=None / annotation=None / annotation={} / annotation 缺 chunk_boundary_anchors / annotation chunk_boundary_anchors=[]）；**chunk_boundary_prf chunks 边界**（document 缺 chunks key / chunks=[] / chunks=[c1] / chunks=[c1, c2] / 多 chunks）；**chunk_boundary_prf anchors 字段缺失 default**（anchor 缺 marker 默认 "" / anchor 缺 position 默认 "after" / position="before" / position="after" / position=无效字符串 default after）；**chunk_boundary_prf 算法深度**（重复 marker search_from 推进；部分 marker 找到部分找不到 → missing_markers；所有 marker 找不到 → 全 missing；无 missing → 不出现 _missing_markers 字段）；**chunk_boundary_prf 一对一贪心**（1v2 只匹配 1 个；2v1 只匹配 1 个；pairs.sort by 距离升序）；**chunk_boundary_prf f1 计算**（perfect 1.0；zero denominator 0.0；precision null → f1 null；recall null → f1 null；value 在 [0,1]）；**chunk_boundary_prf _tolerance_chars 字段**（默认 30；自定义 100；zero；negative；reason 始终 None；5 个分支都写）；**算法可重现性 + no side effects**（同输入两次结果相同；不修改 doc；不修改 annotation）；**figure_caption_prf source level 完整**（含 def/docstring/reason 赋值/3 个 _null 调用/3 个 figure_caption_* key/不读 inputs/signature 2 params/no default args）；**chunk_boundary_prf source level 完整**（含 def/tolerance 默认 30/5+ 个 return 分支/pipeline_failed/no_annotation/no_predicted_boundaries/no_ground_truth_anchors/no_ground_truth_anchors_in_stream/precision_or_recall_not_evaluated/document is None/not annotation/norm_chunks/stream join/normalize_text/predicted/gt_positions/missing_markers/search_from init+advance/pairs/tolerance 检查/pairs.sort lambda/used_pred+used_gt/matched+=1/f1 计算 2*denom/_missing_markers 条件 append/signature 3 params/tolerance 默认 30/no varargs/varkw）；**PARSER_DOES_NOT_EMIT_RELATIONS 常量深度**（值/类型/in namespace/in __all__/在 figure_caption source/是 module-level）；**imports 深度**（Counter/Any/normalize_text/_null _ratio/from evaluation.metrics）；**module source forbidden tokens 补强**（os.path/sys.exit/print/open/pathlib/math/itertools/functools/eval/exec/star/relative）；**module docstring 深度**（present/figure-caption/chunk_boundary/一对一/tolerance_chars/人工标注/parser 说明）；**__all__ 完整性**（3 entries 精确/在 namespace/valid identifier/callable or str/私有 helper 不在 __all__）；**端到端集成**（两个 metric 一起调用/output merge 到 dict/中文 chunks/emoji chunks/含大量空白 chunks normalize）；**边界组合**（doc None+ann None pipeline_failed / doc dict+ann None no_annotation / doc dict+ann empty no_annotation / 1 chunk+ann anchors no_predicted / 2 chunks+no anchors no_gt）；**output 字段类型严格**（value int/float/None；reason str/None；output dict；each metric dict；tolerance_chars int；missing_markers list）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges21.py`（142 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 行为深度**：9 测试
+- **chunk_boundary document/annotation 边界**：6 测试
+- **chunk_boundary chunks 边界**：6 测试
+- **chunk_boundary anchors 字段缺失**：5 测试
+- **chunk_boundary 算法深度**：5 测试
+- **chunk_boundary 一对一贪心**：3 测试
+- **chunk_boundary f1 计算**：4 测试
+- **chunk_boundary _tolerance_chars 字段**：6 测试
+- **算法可重现性 + no side effects**：3 测试
+- **figure_caption source level**：10 测试
+- **chunk_boundary source level**：23 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量**：6 测试
+- **imports 深度**：8 测试
+- **module source forbidden tokens 补强**：12 测试
+- **module docstring 深度**：7 测试
+- **__all__ 完整性**：6 测试
+- **端到端集成**：6 测试
+- **边界组合**：5 测试
+- **output 字段类型严格**：6 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_chunk_boundary_prf_f1_precision_null_when_no_pred` —— chunks=[c1]（少于 2）走 no_predicted_boundaries 分支，该分支把 f1 直接设为 no_predicted_boundaries reason（不是 precision_or_recall_not_evaluated）。修法：assert reason == "no_predicted_boundaries"。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 291 后）：27245 pass / 0 fail / 16 skip（HEAD `3c06df9`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第二十一轮（381 行）
+  - evaluation/schema.py 第十四轮
+  - evaluation/runner.py 第二十二轮
+  - evaluation/manifest.py 第二十二轮
+  - evaluation/cli.py 第二十三轮
+  - evaluation/annotation_metrics.py 第二十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges21 已饱和。下一轮选 evaluation/metrics.py 第二十一轮（381 行最大模块），覆盖 _text_preservation/_is_valid_bbox/_pdf_locator_ratio/_docx_locator_ratio/_chunk_reference_ratio/_heading_boundary_ratio/_silent_drop_count/_strip_unicode_whitespace/compute_automatic_metrics 行为深度。
 
 ---
