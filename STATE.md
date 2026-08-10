@@ -15209,3 +15209,49 @@ get_git_provenance 各 OSError 路径。
 **建议**：metrics.py edges19 已饱和（168 测试）。下一轮选 evaluation/manifest.py 第二十轮（169 测试基础），加 schema 交叉验证 + DocumentEntry/ExpectedFailure 多场景。
 
 ---
+
+## Round 282 — evaluation/manifest.py 第二十轮（118 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第二十轮 edges 测试，覆盖 edges19 未触及的角度：**load_manifest 完整文档场景**（empty documents；single/two documents；含 sha256/categories/paired_with/annotation_file/expectations 各种字段；含 expected_failures；expected_failure 含 source_type vs 不含；docx source_type；doc_id/path_str/resolved_path 传播；resolved_path 是绝对路径）；**load_manifest schema 失败场景**（缺 documents 键；documents 非 list；document 缺 doc_id/path/source_type；source_type 错 enum；额外字段；sha256 格式错；devset_status 错 enum；top-level 额外字段；expected_failure 缺 doc_id/path/expected_error_code）；**manifest_version 兼容性**（1.0 通过；2.0/1.1/非 str 都失败）；**JSON 解析失败**（invalid/empty/top-level-array 都抛 ManifestError 或 EvalSchemaError）；**DocumentEntry/ExpectedFailure/Manifest frozen**（setattr/delattr raises FrozenInstanceError；eq 相同值；hashable；可作 set 元素）；**Manifest properties 多场景**（file_count 0/1/N；pdf_count when no pdf；docx_count when no docx；categories_covered empty/merged/dedup/list 类型；content_group_count 0/unpaired/paired-bidirectional/paired-unidirectional/mixed）；**_is_absolute_like 字符级**（'/' / 'C:/' / 'C:\\' / lowercase drive / 'D:foo' 不 abs / relative / filename / empty / dot / double-dot；返回 bool）；**_has_backslash 字符级**（forward only / with backslash / mixed / just backslash / empty / no path；返回 bool）；**_resolve_relative_path 多场景**（normal/unicode/spaces/multi-slash/path escape/just filename/subdir；错误信息含字段名）；**_detect_project_root**（找 pyproject.toml；向上找父；找不到 fallback；输入是文件取 parent）；**模块 source 不含禁止 imports**（os/sys/logging/subprocess/asyncio/threading/concurrent/time/re）；**ManifestError 语义**（caught as Exception；str 含 message；no_args 也可；不接 errors kwarg）；**dataclass 类型 + field 数**（DocumentEntry 10 / ExpectedFailure 5 / Manifest 5）；**__all__ 5 entries 精确顺序**；**load_manifest 不修改磁盘文件**；**两次调用独立**；**project_root 默认 vs 显式**（None→detect；explicit 覆盖）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges20.py`（118 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **load_manifest 多场景**：13 场景（empty/single/two/sha256/categories/paired/annotation/expectations/expected_failures/ef_source_type/ef_no_source_type/docx_source_type/doc_id/path_str/resolved_path）
+- **schema 失败**：13 场景（缺 documents/documents 非 list/缺 doc_id/path/source_type/错 source_type/额外字段/sha256 格式/错 devset_status/top-level 额外/expected_failure 缺 doc_id/path/code）
+- **manifest_version**：4 场景（1.0 通过；2.0/1.1/非 str 失败）
+- **JSON 解析**：3 场景（invalid/empty/top-level array）
+- **frozen dataclass**：DocumentEntry/ExpectedFailure/Manifest 都验 setattr/delattr/eq/hash/set
+- **Manifest properties**：file_count/pdf_count/docx_count/categories_covered/content_group_count 多场景（含 paired 双向/单向/mixed）
+- **_is_absolute_like**：12 字符级场景
+- **_has_backslash**：7 字符级场景
+- **_resolve_relative_path**：8 场景（含 path traversal 防护）
+- **_detect_project_root**：4 场景（find pyproject/find parent/no pyproject fallback/file input）
+- **模块禁止 imports**：os/sys/logging/subprocess/asyncio/threading/concurrent/time/re 都不在
+- **ManifestError 语义**：caught as Exception；str 含 message；no_args 可；不接 errors kwarg
+- **dataclass field count**：DocumentEntry 10 / ExpectedFailure 5 / Manifest 5
+- **__all__ 5 entries 精确顺序**
+- **不修改磁盘文件**：load_manifest 不动 manifest.json
+- **两次调用独立**：不同 Manifest 对象，相等
+- **project_root**：默认 detect vs 显式 override
+
+### 撞墙记录
+- 0 fail 首次跑（118 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 282 后）：26105 pass / 0 fail / 16 skip（HEAD `dcfc1a5`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第二十轮（243 行）
+  - evaluation/schema.py 第十三轮（80 行）
+  - evaluation/report.py 第二十轮（200 行）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：edges20 schema 联动模式持续推广。下一轮选 evaluation/cli.py 第二十轮，加 schema 联动 + argparse 子命令深度场景。
+
+---
