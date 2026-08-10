@@ -4,6 +4,46 @@
 
 ---
 
+## Round 371 — evaluation/annotation_metrics.py 第三十四轮（117 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第三十四轮 edges 测试，覆盖 edges33 未触及的角度：**chunk_boundary_prf 行为深度第七批**（3 chunks 3 anchors 部分 match / weird position 默认 after / empty first chunk / marker at end of stream / marker with whitespace / two anchors same marker sequential / position before / missing_marker record / anchors=None / chunks=None / one chunk + anchors → recall=0 / tolerance=0 + exact match / huge tolerance / 不修改 document/annotation）；**figure_caption_prf 行为深度第七批**（三 metric constant reason / 忽略 document chunks 和 annotation figure_caption_relations / idempotent / 不修改输入 / positional/kwargs / 返回 dict type）；**module source forbidden tokens 第十批**（os.chmod/chown/execv/fork/kill/mkdir/makedirs/remove/rename/rmdir/unlink + pathlib.Path.rmdir/unlink + eval/exec/compile/globals/locals/vars + memoryview/bytearray + errno + signal.signal + fcntl/termios/tty/pty/winreg/msvcrt/_winapi + re.match/re.sub + shutil.rmtree/tempfile.mkdtemp）；**signatures 第七批**（chunk_boundary_prf 三参 kind + doc annotation + tolerance annotation、figure_caption_prf 两参 kind、no varargs/kwargs、PARSER_DOES_NOT_EMIT_RELATIONS type+value）；**module 合理性第七批**（__all__ 精确 3 项顺序、entries unique/str、callable count=2、names 正确、docstring 3 keyword chunk_boundary/figure_caption/一对一、file endswith、name eq、function __module__ eq、no user class）；**module source 字符串精确补强第七批**（future annotations + 5 imports + constant assign + no main/yield/async/walrus/eval/exec/compile/subprocess/unlink/open/print + no relative/star import + no class def）；**端到端集成第七批**（full match position before/after、3 chunks + 1 anchor tolerance=0 不匹配、idempotent、positional args、tolerance recorded、各种 None/空 配置的 reason 验证）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges34.py`（117 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **chunk_boundary_prf 行为深度第七批**：16 测试
+- **figure_caption_prf 行为深度第七批**：7 测试
+- **module source forbidden tokens 第十批**：32 测试
+- **signatures 第七批**：12 测试
+- **module 合理性第七批**：15 测试
+- **module source 字符串精确补强第七批**：21 测试
+- **端到端集成第七批**：14 测试
+
+### 撞墙记录
+- 1 fail 首次跑（test_chunk_boundary_prf_two_anchors_same_marker_sequential_match 期望 recall=0.5，实际 1.0）：两个 anchor 用相同 marker "aa"，但 stream="aa aa bb" 中两个 "aa" 出现在 pos 0 和 3，gt_positions=[2, 5]，predicted=[2, 5]，匹配两两，recall=1.0 不是 0.5。修正期望。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 371 后）：43408 pass / 0 fail / 18 skip（HEAD `5736db5`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十六轮
+  - evaluation/metrics.py 第三十五轮
+  - evaluation/report.py 第二十四轮
+  - evaluation/runner.py 第三十六轮
+  - evaluation/manifest.py 第三十五轮
+  - evaluation/cli.py 第三十五轮
+  - evaluation/annotation_metrics.py 第三十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges34 已饱和（chunk_boundary 16 + figure_caption 7 + forbidden 32 + signatures 12 + 模块 15 + 字符串 21 + 端到端 14）。下一轮选 evaluation/schema.py 第二十六轮，覆盖 EvalSchemaError 行为深度与 manifest/annotation/evaluation-report/document schema cross-validation。
+
+---
+
 ## Round 370 — evaluation/cli.py 第三十四轮（135 测试）
 
 ### 目标
