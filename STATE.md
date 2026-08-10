@@ -15385,3 +15385,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：report.py edges20 已饱和（Schema 交叉 + subprocess 模拟 + 跨文档聚合）。下一轮继续 evaluation/* 模块第二十一轮，或换 annotation_metrics.py 第二十轮深度联动 annotation schema。
 
 ---
+
+## Round 286 — evaluation/annotation_metrics.py 第二十轮（91 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第二十轮 edges 测试，覆盖 edges19 未触及的角度：**Schema 联动**（chunk_boundary_prf 输出 keys 都在 _RATIO_METRICS；输出含 _tolerance_chars；value 在 [0,1] 范围；_missing_markers 出现条件；metric dict keys 精确；value/reason 类型）；**算法深度（normalize_text edge cases）**（chunks 文本含多空格/tab/换行/unicode whitespace/前后空格 都被 normalize 折叠；chunk text=None 视为空 string；chunk 缺 text 键视为空 string）；**marker 特殊字符**（含空格/标点/等于整个 stream/比 stream 长/子串多次出现 search_from 推进）；**position 混合 before+after**（多 anchor 部分 before 部分 after 混合匹配；同一 marker before+after；mixed position greedy 按距离）；**数值边界**（tolerance=0 精确匹配/错位 1 不匹配；tolerance 负数永不匹配；极大 tolerance 全匹配；num_pred=1/num_gt=1 → P=R=F1=1.0；num_pred=2/num_gt=1 → P=0.5/R=1.0/F1=0.667；num_pred=1/num_gt=2 → P=1.0/R=0.5/F1=0.667）；**输出严格类型**（顶层 dict；metric dict 含 value+reason；value 类型 float/None；reason 类型 str/None；reason 在已知集合中）；**figure_caption_prf source level 完整**（含 def/reason=PARSER_DOES_NOT_EMIT_RELATIONS/3 个 _null 调用；不含 normalize_text/stream/pairs/tolerance_chars/search_from；无 if/for 循环；return dict 含 3 keys）；**module source 补强**（PARSER_DOES_NOT_EMIT_RELATIONS 精确字符串；from app.chunkers.structural import normalize_text；from evaluation.metrics import _null, _ratio；from collections import Counter；不含 os/sys/logging/subprocess/json/star import/relative import/class/dataclass/global/walrus/async/yield）；**PARSER_DOES_NOT_EMIT_RELATIONS 常量深度**（值精确；类型 str；在 namespace；在 __all__；figure_caption_prf 输出 reason 与之一致）；**figure_caption_prf 行为深度**（returns dict with 3 keys；all values null；不读 document；不读 annotation；各种输入都返回固定输出；returns new dict each call）；**chunk_boundary_prf source level 完整补强**（含 tolerance_default=30；含 6 个 reason 字符串；含 missing_markers.append/_missing_markers；含 norm_chunks 构造；含 stream join；含 predicted construction；含 search_from init/advance；含 pairs construction；含 used_pred/used_gt；含 pairs.sort；含 f1 calculation）；**端到端 Schema 联动**（chunk_boundary_prf 输出可作为 metrics 字段加入 evaluation-report）；**算法可重复性**（同输入多次结果一致；不修改 input）；**__all__ 与 namespace 完整性**（3 entries 精确顺序；每个名字是 valid identifier；私有 helper _null/_ratio 在 namespace 不在 __all__；normalize_text 同理）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges20.py`（91 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **Schema 联动**：7 场景（_RATIO_METRICS/tolerance/value range/missing_markers/metric keys/value-reason types）
+- **算法深度（normalize_text）**：6 场景（多空格/tab/换行/unicode/strip/None/缺 text）
+- **marker 特殊字符**：5 场景（含空格/标点/等于 stream/超长/多次出现）
+- **position 混合**：3 场景（mixed before+after/same marker 双 position/greedy by distance）
+- **数值边界**：8 场景（tolerance 0/0/负数/极大；P/R/F1 各种比例）
+- **输出严格类型**：4 场景（dict/metric keys/types/known reasons）
+- **figure_caption_prf source level**：6 测试（def/reason/null calls/无算法 token/无循环/return dict）
+- **module source 补强**：17 测试（imports/constants/forbidden tokens）
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：5 测试
+- **figure_caption_prf 行为深度**：6 测试
+- **chunk_boundary_prf source level 完整**：18 测试（所有 reason 字符串/算法 token）
+- **端到端 Schema 联动**：1 测试
+- **算法可重复性**：2 测试（deterministic/no side effects）
+- **__all__ 与 namespace**：5 测试
+
+### 撞墙记录
+- 0 fail 首次跑（91 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 286 后）：26588 pass / 0 fail / 16 skip（HEAD `c477162`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第二十一轮（228 行）
+  - evaluation/manifest.py 第二十一轮（239 行）
+  - evaluation/cli.py 第二十一轮（243 行）
+  - evaluation/metrics.py 第二十轮（382 行）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges20 已饱和（Schema 联动 + 算法深度模拟）。下一轮选 evaluation/metrics.py 第二十轮（382 行，深度联动 schema + 各 helper 多场景）。
+
+---
