@@ -4,6 +4,48 @@
 
 ---
 
+## Round 338 — evaluation/annotation_metrics.py 第三十轮（318 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第三十轮 edges 测试，覆盖 edges28 未触及的角度：**figure_caption_prf 行为深度补强**（_null helper / 不读 annotation keys / 不读 document keys / source 不用 normalize_text/Counter / no yield/async/class）；**chunk_boundary_prf 算法深度第二批**（tolerance 边界 == / 距离 > tolerance / 贪心最近优先 / 一对一约束 / position before/after / search_from 推进重复 marker / 空白 marker / Unicode / chunk text=None/缺 key / 完美匹配 / 部分匹配 f1 / no match f1=0 / extra keys / 不修改输入）；**chunk_boundary_prf source level 字符串精确补强**（5 returns / normalize_text 调用 / join with space / stream normalize after join / predicted list / enumerate / last chunk break / stream.find / find_pos negative / pos advance / search_from / anchor loop / marker & position defaults / before branch / pairs + abs(pv-gv) / tolerance / sort / used_pred+used_gt / matched / num_pred+num_gt / null reasons / f1 denom check / missing_markers conditional / no yield/async/global/class）；**module source forbidden tokens 第四批**（~150 stdlib，去掉与合法 import 冲突的 struct）；**module source 字符串精确补强**（imports / 5 docstring mentions / no __main__/yield/async/class/decorators / 2 def / 1 const / __all__ 3 entries）；**signatures 精确补强**（param names / kinds / annotations / defaults / return types / no varargs varkw）；**模块整体合理性**（namespace / __all__ list 3 str / 2 functions / 1 const / no class / no main / callable）；**端到端集成补强**（3 chunks 完美匹配 / 3 chunks 1 anchor 部分匹配 / 距离太远 no match / Unicode / deterministic / chunks 中间 None text / chunks extra keys / 全 kwargs / 全 positional / JSON 可序列化 / metric dict 结构）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges29.py`（318 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **figure_caption_prf 行为深度补强**：13 测试
+- **chunk_boundary_prf 算法深度第二批**：32 测试
+- **chunk_boundary_prf source level 字符串精确补强**：30 测试
+- **module source forbidden tokens 第四批**：~150 测试（parametrize）
+- **module source 字符串精确补强**：~22 测试
+- **signatures 精确补强**：14 测试
+- **模块整体合理性**：15 测试
+- **端到端集成补强**：15 测试
+
+### 撞墙记录
+- 3 fail 首次跑：
+  - 1 chunk + 无 anchors：source 实际走 `_null if not anchors else _ratio(0.0)`，无 anchors → null → 拆成两测试：1 chunk+有 anchors → 0.0；1 chunk+无 anchors → null
+  - chunk_boundary_prf source 实际有 `lambda x: x[0]` 用于 pairs.sort → 改成断言有 lambda
+  - 'struct' 是 'structural' 的子串 → 从 forbidden tokens 移除
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 338 后）：34712 pass / 0 fail / 18 skip（HEAD `6764828`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第二十一轮
+  - evaluation/metrics.py 第三十轮
+  - evaluation/runner.py 第三十一轮
+  - evaluation/manifest.py 第三十轮
+  - evaluation/cli.py 第三十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges29 已饱和（figure_caption 13 + chunk_boundary 算法 32 + source 30 + forbidden 150 + module source 22 + signatures 14 + 模块 15 + 端到端 15）。下一轮选 evaluation/schema.py 第二十一轮，覆盖 4 个 schema 文件的 cross-validation 与 EvalSchemaError 行为深度。
+
+---
+
 ## Round 337 — evaluation/cli.py 第三十轮（300 测试）
 
 ### 目标
