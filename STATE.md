@@ -4,6 +4,56 @@
 
 ---
 
+## Round 303 — evaluation/annotation_metrics.py 第二十四轮（114 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第二十四轮 edges 测试，覆盖 edges22 未触及的角度：**anchor position 取值深度补强**（position='before' → marker 起始位置；'after' → marker 结束位置；缺失 key / None / '' / 0 / 'BEFORE' / 'before ' / 'unknown' 全部走 'after' 分支）；**anchor marker 位置深度补强**（marker 在 stream 开头 find_pos=0；末尾 find_pos=len-len；中间；长度等于/大于 stream 长度）；**chunk.text 边界值补强**（缺失 key / None / '' / 纯空白 / 含 emoji / 含换行符）；**predict 算法深度补强**（1/2/3/4 chunks → 0/1/2/3 predict）；**多 anchor 顺序定位深度补强**（相同 marker 重复 2/3 次 search_from 推进；marker 顺序逆序仍按 stream 顺序定位）；**数学不变量**（0≤P≤1 / 0≤R≤1 / 0≤F1≤1 / matched≤min(num_pred,num_gt) / F1≤max(P,R) / P=R 时 F1=P / P=1 R=1 → F1=1 / P=0 或 R=0 → F1=0）；**tolerance_chars 极端值深度**（1 字符 / 等于 stream 长度 / 10**6 全部匹配）；**PARSER_DOES_NOT_EMIT_RELATIONS 常量深度补强**（is str + 值精确 + hashable + __all__ 第一个 + module-level 非 imported + module 唯一常量）；**module source 字符串精确补强**（含「一对一」「容差」「最近图片」「启发式」「规范化全文流」+ PARSER_DOES_NOT_EMIT_RELATIONS = "..." 赋值）；**module source forbidden tokens 补强**（os/sys/re/logging/subprocess/asyncio/threading/math/datetime/itertools/functools 11 个）；**module source 含必要 imports**（future/collections.Counter/typing.Any/normalize_text/_null,_ratio 5 个）；**chunk_boundary_prf source level 完整补强**（norm_chunks 推导 / joined_raw / stream normalize / predicted init+循环+break+find+neg-skip+end+append+pos-advance / gt_positions+missing_markers+search_from init / for a in anchors / marker+position get / before 分支 / else 分支 / pairs.sort / matched+used_pred+used_gt / tolerance_chars=30 默认 共 22 个 source check）；**figure_caption_prf source level 完整补强**（reason 赋值 / return dict 3 key / 3 处 _null(reason) / no tolerance_chars）；**signatures 精确补强**（figure_caption 2 params / chunk_boundary 3 params + default=30 / no varargs/varkw / return annotation 是 string）；**端到端集成补强**（4 chunks 3 anchors P=R=F1=1 / 1 matched 1 missing recall=1 / 不修改 input chunks / 不修改 input anchors / 重复调用一致 / tolerance 在 output 记录 / 全 found 时无 _missing_markers 字段）；**模块整体合理性**（2 module-level function + 无 class + 无 __main__ + __all__ 3 entries 顺序 + entries 在 namespace + entries callable/constant + 5 imported names）
+
+### 改动
+- 新增 `tests/test_annotation_metrics_edges23.py`（114 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **anchor position 取值深度补强**：9 测试
+- **anchor marker 位置深度补强**：5 测试
+- **chunk.text 边界值补强**：6 测试
+- **predict 算法深度补强**：4 测试
+- **多 anchor 顺序定位深度补强**：3 测试
+- **数学不变量**：9 测试
+- **tolerance_chars 极端值深度**：3 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量深度补强**：6 测试
+- **module source 字符串精确补强**：6 测试
+- **module source forbidden tokens 补强**：11 测试
+- **module source 含必要 imports**：5 测试
+- **chunk_boundary_prf source level 完整补强**：22 测试
+- **figure_caption_prf source level 完整补强**：4 测试
+- **signatures 精确补强**：7 测试
+- **端到端集成补强**：7 测试
+- **模块整体合理性**：7 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_parser_does_not_emit_relations_only_module_constant` - `getattr(m, n).__module__` 在 str 常量上 AttributeError → 改为 isinstance(obj, str) 优先判断 + callable 才查 __module__
+- 修复后 114 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 303 后）：29231 pass / 0 fail / 16 skip（HEAD `b5c7b2c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第二十四轮
+  - evaluation/schema.py 第十六轮
+  - evaluation/runner.py 第二十五轮
+  - evaluation/manifest.py 第二十四轮
+  - evaluation/cli.py 第二十五轮
+  - evaluation/annotation_metrics.py 第二十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges23 已饱和（position 取值 / marker 位置 / chunk.text 边界 / predict 算法 / 多 anchor 顺序 / 数学不变量 / tolerance 极端 / 常量深度 / source 字符串 / forbidden tokens / source level / 端到端 / 模块整体）。下一轮选 evaluation/metrics.py 第二十四轮，覆盖 9 个 metric helper 各自边界 + _TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES 常量深度。
+
+---
+
 ## Round 302 — evaluation/cli.py 第二十四轮（157 测试）
 
 ### 目标
