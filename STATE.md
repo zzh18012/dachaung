@@ -4,6 +4,57 @@
 
 ---
 
+## Round 334 — evaluation/metrics.py 第二十九轮（215 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二十九轮 edges 测试，覆盖 edges27 未触及的角度：**compute_automatic_metrics 边界组合补强第二批**（pipeline_failed 11 metrics null / 2 pipeline metrics / pipeline_failed with error code / unknown source_type / docx_source skips pdf / pdf_source skips docx）；**_text_preservation 数学精确补强**（4+ repeats / unicode chars / empty chunk text / no chunks / no text elements）；**_pdf_locator_ratio / _docx_locator_ratio 空元素** list 处理；**_image_resource_ratio directory / no image elements / absolute paths**；**_chunk_reference_ratio / _heading_boundary_ratio empty chunks**；**_silent_drop_count empty expected_counts / no expectations key**；**_strip_unicode_whitespace 数学边界补强**（emoji sequence / mixed / 1-2 spaces / 各类 ASCII whitespace）；**_is_valid_bbox 数学补强**（4 int ones / huge ints / string element / None element / dict / list / bool 显式拒绝）；**_ratio / _null / _bool_metric / _int_metric 数学补强**（huge float / tiny / negative / NaN / inf / empty reason / unicode reason / dict truthy / list / float input / bool false）；**module source forbidden tokens 第四批**（~100 stdlib，去掉与合法 import 冲突的 math/re/io/imp/os/inspect/site/sha/string/stat/subprocess/sched/reprlib/quopri 等）；**module source 字符串精确补强**（imports / math.isfinite / Counter & / sum pattern / isinstance / any / is_file+stat / set / chunk_first_ids / silent_drop items+max(0 / no yield/async/global/main/class/decorators/lambda）；**signatures 精确补强**（5 params / image_base_dir default None / 13 helpers signatures）；**模块整体合理性**（namespace / __all__ / 1 public / 13 private / 3 constants / no class / no main / no decorators）；**端到端集成补强**（complete PDF/DOCX pipeline / pipeline_failed / unicode content / empty content / consistent results / image count / chunk count）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges28.py`（215 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **compute_automatic_metrics 边界组合补强第二批**：6 测试
+- **_text_preservation 数学精确补强**：5 测试
+- **_pdf_locator_ratio / _docx_locator_ratio 空元素**：2 测试
+- **_image_resource_ratio directory / elements**：3 测试
+- **_chunk_reference_ratio / _heading_boundary_ratio empty chunks**：4 测试
+- **_silent_drop_count empty expected_counts**：2 测试
+- **_strip_unicode_whitespace 数学边界补强**：10 测试
+- **_is_valid_bbox 数学补强**：9 测试
+- **_ratio / _null / _bool_metric / _int_metric 数学补强**：14 测试
+- **module source forbidden tokens 第四批**：~100 测试（parametrize）
+- **module source 字符串精确补强**：22 测试
+- **signatures 精确补强**：17 测试
+- **模块整体合理性**：11 测试
+- **端到端集成补强**：9 测试
+
+### 撞墙记录
+- 首次跑 11 fail（修复后 0 fail）：
+  - pipeline_success reason 是 None 不是 "pipeline_failed"（只有 11 个 null metrics 才有 "pipeline_failed"）→ 删除该断言
+  - _text_preservation empty 用 reason "empty_actual" / "empty_expected" / "empty_expected_and_actual"（不是 no_chunk_text / no_text_in_elements）→ 改 reason
+  - _is_valid_bbox 显式拒绝 bool（line 214-215 `if isinstance(v, bool): return False`）→ 改 expect False
+  - forbidden tokens 含 math/re/io/imp 等合法 import 子串 → 从列表移除
+  - sum_for_common 实际是 `sum((c_expected & c_actual).values())` 不是 `sum(common.values())` → 改 substring
+  - compute_automatic_metrics 实际有 5 params（含 expectations）→ 改成 5 params
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 334 后）：33676 pass / 0 fail / 18 skip（HEAD `629c870`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十轮
+  - evaluation/manifest.py 第二十九轮
+  - evaluation/cli.py 第三十轮
+  - evaluation/annotation_metrics.py 第三十轮
+  - evaluation/schema.py 第二十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges28 已饱和（compute 6 + text_preservation 5 + locators 5 + image/chunk/heading/silent 9 + strip 10 + bbox 9 + ratio/null/bool/int 14 + forbidden 100 + source 22 + signatures 17 + 模块 11 + 端到端 9）。下一轮选 evaluation/runner.py 第三十轮。
+
+---
+
 ## Round 333 — evaluation/schema.py 第二十轮（184 测试）
 
 ### 目标
