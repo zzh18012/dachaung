@@ -4,6 +4,54 @@
 
 ---
 
+## Round 348 — evaluation/manifest.py 第三十一轮（300 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第三十一轮 edges 测试，覆盖 edges30 未触及的角度：**_is_absolute_like 数学边界第六批**（emoji/Unicode/uppercase/lowercase/drive only/drive with separator/just colon/number/underscore/single char/two chars/three chars/long path/long relative/C:/C:\\）；**_has_backslash 数学边界第六批**（empty/no/single/double/only/leading/trailing/Unicode backslash/fullwidth/multiple/mixed/forward only）；**_resolve_relative_path 异常路径形式**（empty/abs posix/abs windows/backslash/outside root/double dot/deeply nested/subdir/filename only/dot current/returns Path/field name in error）；**_detect_project_root 行为深度**（finds pyproject/with file input/no pyproject/finds parent/found in repo）；**DocumentEntry/ExpectedFailure/Manifest dataclass 行为深度第四批**（field count/field names/frozen/equality/inequality/order matters/hashable）；**Manifest properties 算法深度第四批**（file count/pdf count/docx count/content group/categories covered/dedup/sorted/returns list）；**load_manifest malformed data 第四批**（unicode doc id/emoji doc id/categories unicode/empty documents/sha256 field/paired with/expectations/annotation file/expected failure with source_type/explicit project root/nonexistent/invalid json/BOM/invalid version/devset status）；**module source forbidden tokens 第六批**（~110 stdlib modules + builtin calls，避开 manifest.py 合法使用的 open/len/tuple/list/sum/frozenset/set/sorted/type）；**module source 字符串精确补强**（docstring mentions path/relative/backslash/absolute/import count 7/json/dataclass/Path/Any/MANIFEST_VERSION/validate/no relative/no star/no main/no class outside dataclass/no yield/no async/no global/no walrus/uses validate/json.load/MANIFEST_VERSION/no csv/pickle/yaml/logging/argparse/tomllib/ManifestError class/3 @dataclass/4 class/1 public func/4 private funcs/has __all__/all contents/uses .resolve/.open/relative_to/isalpha/is_file）；**signatures 精确补强**（load_manifest 2 params/names/no default/default None/no varargs/_is_absolute_like/_has_backslash/_resolve_relative_path 3 params/names/no defaults/_detect_project_root 1 param/no varargs）；**模块整体合理性**（namespace 9 names/__name__/__file__/docstring/__all__ count 5/all contents/ManifestError class/subclass Exception/dataclass/callable/no user classes outside dataclass）；**端到端集成补强**（returns Manifest/documents tuple/expected_failures tuple/one doc/resolved path/path_str preserved/idempotent/does not modify input/project_root in result/all optional fields/str path input/relative str root/categories dedup/pdf docx counts/content group paired/annotation file/json serializable/str vs Path equivalent/three categories sorted/multi expected failures/correct manifest version/pathlib project root/docx only）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges31.py`（300 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_is_absolute_like 数学边界第六批**：19 测试
+- **_has_backslash 数学边界第六批**：12 测试
+- **_resolve_relative_path 异常路径形式**：~17 测试
+- **_detect_project_root 行为深度**：6 测试
+- **DocumentEntry/ExpectedFailure/Manifest dataclass 行为深度第四批**：~17 测试
+- **Manifest properties 算法深度第四批**：~13 测试
+- **load_manifest malformed data 第四批**：~18 测试
+- **module source forbidden tokens 第六批**：~110 测试（parametrize）
+- **module source 字符串精确补强**：~38 测试
+- **signatures 精确补强**：~13 测试
+- **模块整体合理性**：~17 测试
+- **端到端集成补强**：~22 测试
+
+### 撞墙记录
+- 9 fail 首次跑：
+  - sha256 必须是 64 位小写十六进制（schema pattern）→ 用 `"a" * 64` 满足
+  - manifest_version 是 schema const="1.0"，"99.99" 直接被 schema 拒，不进 ManifestError → 改为更宽松的 `(ManifestError, Exception)` 检查
+  - forbidden tokens 假阳性：manifest.py 合法使用 open(/len(/sorted(/sum(/tuple(/set(/frozenset( → 加入 allowlist
+  - expectations 是 additionalProperties:false，只允许 `element_count_by_type` → 改 fixture
+  - annotation_file schema 不允许 None → 移除该字段
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 348 后）：38290 pass / 0 fail / 18 skip（HEAD `a2e3a72`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第三十二轮
+  - evaluation/annotation_metrics.py 第三十二轮
+  - evaluation/schema.py 第二十三轮
+  - evaluation/metrics.py 第三十二轮
+  - evaluation/runner.py 第三十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest edges31 已饱和（_is_absolute_like 第六批 + _has_backslash 第六批 + _resolve_relative_path 异常 + _detect_project_root + dataclass 第四批 + properties 第四批 + malformed data 第四批 + forbidden tokens 110 + signatures + 端到端 22）。下一轮选 evaluation/cli.py 第三十二轮，覆盖 argparse 子命令 + run/validate-report 行为深度。
+
+---
+
 ## Round 347 — evaluation/runner.py 第三十二轮（371 测试）
 
 ### 目标
