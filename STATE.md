@@ -4,6 +4,47 @@
 
 ---
 
+## Round 396 — evaluation/runner.py 第三十九轮（131 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第三十九轮 edges 测试，覆盖 edges37 未触及的角度：**_load_annotation 行为深度第十一批**（JSON array / number / null / bool / empty object / empty array / deep nested / BOM / 相对路径 / directory path / 多种异常分支）；**_process_one 行为深度第十一批**（返回 5-tuple 类型 / parser_version 透传 / image_dir 推导 / mkdir idempotent / stub unlink 失败 silent / 透传 kwargs 各字段 / elapsed 时间正向）；**run_evaluation 行为深度第十一批**（report_version / public per_doc 结构 / private keys 剥离顺序 / expected_failures 流程细节 / parser_version 累积规则 / tolerance / missing_markers 写入 / public_per_doc 不含私有字段 / 空 manifest / 全 expected_failures）；**module source forbidden tokens 第十四批**；**module source 字符串精确补强第十一批**；**signatures 第十一批**；**module 合理性第十一批**；**端到端集成第十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges38.py`（131 测试）
+
+### 覆盖要点
+- **_load_annotation 行为深度第十一批**：18 测试
+- **_process_one 行为深度第十一批**：15 测试
+- **run_evaluation 行为深度第十一批**：18 测试
+- **module source forbidden tokens 第十四批**：16 测试
+- **module source 字符串精确补强第十一批**：15 测试
+- **signatures 第十一批**：17 测试
+- **module 合理性第十一批**：12 测试
+- **端到端集成第十一批**：10 测试
+
+### 撞墙记录
+- 1 fail 首次跑：`test_load_annotation_json_with_bom_batch11` — 错误断言 json.load 自动跳过 BOM，实际 BOM 让 JSONDecodeError → None
+- 1 fail 二次跑：`test_e2e_run_evaluation_default_kwargs_batch11` — 空 manifest 时 process_single 不被调用，captured 为空
+- 修复：BOM 测试改为断言返回 None；默认 kwargs 测试给 manifest 加一个 doc
+- 三次跑：131 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 396 后）：47682 pass / 0 fail / 19 skip（HEAD `813ed66`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第三十八轮
+  - evaluation/manifest.py 第三十八轮
+  - evaluation/annotation_metrics.py 第三十八轮
+  - evaluation/schema.py 第三十轮
+  - evaluation/metrics.py 第三十九轮
+  - evaluation/report.py 第二十八轮
+  - evaluation/runner.py 第四十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 395 — evaluation/report.py 第二十七轮（145 测试）
 
 ### 目标
