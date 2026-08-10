@@ -4,6 +4,57 @@
 
 ---
 
+## Round 316 — evaluation/metrics.py 第二十六轮（146 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二十六轮 edges 测试，覆盖 edges24 未触及的角度：**数学边界值精确（_ratio 不 clamp）**（正负 inf / nan / 极小 / 极大 / 0.0 / -0.0 / -inf-1=-inf / inf nan 不设 reason）；**_null/_bool_metric/_int_metric 调用语义深度**（long reason / unicode reason / special chars / 2 keys / list truthy/falsy / dict / None / 实际 bool 类型 / int floor / 负数 truncate / int("5")=5 / int("abc") raises / 实际 int 类型 / bool 输入）；**_text_preservation Counter 交集精确**（min per char / no overlap / one-sided / only image / chunk.text=0 falsy → ""）；**_silent_drop_count 负数 actual 不计 drop**（surplus 不算 / type in actual not in expected ignored / 混合 drop+surplus / int 类型）；**compute_automatic_metrics schema_valid 异常路径**（document_passes_schema try-except / value 是 bool）；**_image_resource_ratio 异常路径**（oserror try/except / no resource / empty resource）；**_pdf_locator_ratio 边界补充**（paragraph invalid bbox / caption+heading+list_item with bbox / table/header/footer no bbox needed / mixed validity）；**_docx_locator_ratio 边界补充**（7 structural keys 各自 valid / page alone rejected / bbox alone rejected / partial）；**_is_valid_bbox 补充**（dict / set / generator / 4 strings / 4 None / bool 位置 2 / 极大数）；**_strip_unicode_whitespace 补充**（form feed / vertical tab / carriage return / emoji / 数字标点 / 单字符 / 单空白）；**_chunk_reference_ratio 补充**（None ids / empty string ids / 多 chunk）；**_heading_boundary_ratio 补充**（multiple headings 部分 match / chunk 首元素是 heading / no heading in elements）；**_image_resource_ratio 补充**（all missing / mixed）；**module source forbidden tokens**（27 个 stdlib）；**module source 字符串精确**（compute_automatic_metrics signature / image_base_dir default / metrics dict init / pipeline_success assignment / 14 metric keys / document None loop 10 keys / schema validation lazy import / try-except / Counter 交集 / no __main__）；**signatures 精确**（14 函数 namespace）；**模块整体合理性**（__all__ 1 entry / 13 private functions / 3 private constants / no class / no __main__）；**端到端集成**（docx 2 chunks full match / pipeline failed nulls / image real file / expectations no drop / expectations drop）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges25.py`（146 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **数学边界值精确（_ratio 不 clamp）**：10 测试
+- **_null/_bool_metric/_int_metric 调用语义深度**：18 测试
+- **_text_preservation Counter 交集精确**：5 测试
+- **_silent_drop_count 负数 actual 不计 drop**：5 测试
+- **compute_automatic_metrics schema_valid 异常路径**：3 测试
+- **_image_resource_ratio 异常路径**：5 测试
+- **_pdf_locator_ratio 边界补充**：8 测试
+- **_docx_locator_ratio 边界补充**：4 测试
+- **_is_valid_bbox 补充**：7 测试
+- **_strip_unicode_whitespace 补充**：7 测试
+- **_chunk_reference_ratio 补充**：3 测试
+- **_heading_boundary_ratio 补充**：3 测试
+- **module source forbidden tokens**：27 测试（parametrize）
+- **module source 字符串精确**：12 测试
+- **signatures 精确 namespace**：14 测试
+- **模块整体合理性**：6 测试
+- **端到端集成**：5 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_int_metric_with_string_number_raises` - int("5")=5 不抛 ValueError（Python 行为）→ 拆为两个测试：int("5")=5 + int("abc") raises ValueError
+- 修复后 146 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 316 后）：30979 pass / 0 fail / 16 skip（HEAD `7537e8d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第十八轮
+  - evaluation/runner.py 第二十七轮
+  - evaluation/manifest.py 第二十六轮
+  - evaluation/cli.py 第二十七轮
+  - evaluation/annotation_metrics.py 第二十七轮
+  - evaluation/metrics.py 第二十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges25 已饱和（_ratio 数学边界 + 4 helper 调用语义 + Counter 交集 + silent_drop 负数 + schema_valid 异常 + locator/bbox/whitespace/reference/heading/image 边界深度 + source 字符串精确 + signatures + 端到端 + 模块整体）。下一轮选 evaluation/schema.py 第十八轮，覆盖 EvalSchemaError 行为深度。
+
+---
+
 ## Round 315 — evaluation/annotation_metrics.py 第二十六轮（112 测试）
 
 ### 目标
