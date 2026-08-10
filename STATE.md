@@ -14746,3 +14746,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KX6（evaluation/cli.py 第十九轮，243 行）继续推 evaluation。
 
 ---
+
+## Round 272 — evaluation/cli.py 第十九轮（100 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第十九轮 edges 测试，覆盖 edges18 未触及的角度：_format_metric 精确字符串（'  ' 前缀；None value 用字面量 'null'；None reason fallback 'ok' 字面量；float .4f 精确格式：0.0000/1.0000/-0.5000；dict value ', ' 分隔；dict value sorted by key；str(value).lower() for bool；str value 走 fallback str(value)；list value 走 fallback；name:36 不截断；return str type）、_run_inspect_doc _sort_key 详细（输出含 'counts:' 标签；counts 行 'elements=N chunks=N'；'metrics:' header；file 行用 input_path；6 行顺序 file→document_id→source→parser→counts→metrics；counts 与 metrics 间空行；不同类型 metric 排序）、_run_inspect_doc lazy imports（figure_caption_prf/chunk_boundary_prf/compute_automatic_metrics 都在函数内 import；compute_automatic_metrics 调用含 image_base_dir=None；metrics.update ≥2 次）、main argv=None（走 sys.argv → SystemExit；空 list → SystemExit；返回类型是 int）、argparse _SubParsersAction 类型精确（first action 是 _HelpAction；choices.keys == {run, validate-report, inspect-doc}；choices 值是 ArgumentParser）、模块 source token（含 'choices=("fallback", "kreuzberg")'/'sys.stdout.reconfigure(encoding="utf-8", errors="replace")'/'hasattr(sys.stdout, "reconfigure")'/'清单不存在'/'清单加载失败'/'报告未通过 Schema 校验'/'evaluation-report.schema.json' ≥2 次/'.is_file()' ≥3 次/'[OK] 评测完成'/'通过 evaluation-report Schema 校验'/'return 2' ≥3/'return 1' ≥3/无 'return 3'/无负数 return；含 run_evaluation/load_manifest/validate_file/get_git_provenance 调用；含 ManifestError/EvalSchemaError import；不含 subprocess/logging/async/threading/os/shutil/tempfile）、模块 import 顺序（argparse→json→sys→pathlib→evaluation.manifest→evaluation.report→evaluation.runner→evaluation.schema 位置递增；4 个 evaluation 子模块 import 语句精确）、模块 docstring（提及 run/validate-report/inspect-doc/python -m evaluation.cli/sanity 或 开发期）、main 错误打印用 sys.stderr（run manifest missing/validate-report missing/inspect-doc missing）、_format_metric 与 _run_inspect_doc 联动（每行 metric 输出 '  ' 前缀；含 doc_id/source_path/parser_name 字段值显示）、_build_parser 详细（prog=='evaluation.cli' 精确；description 含 评测/校验/报告；formatter_class is RawDescriptionHelpFormatter；conflict_handler=='error'；add_help 默认 True；allow_abbrev is True；3 subparser 的 prog 含各自 name）、__main__ 块（含 SystemExit(main())；位于模块底部）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges19.py`（100 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_format_metric 精确字符串**：所有输出 '  ' 前缀；None value 用 'null' 字面量；None value + reason=None 不 fallback 'ok'；bool/int/dict/float value + reason=None 用 'ok' fallback；float 0.0→'0.0000'/1.0→'1.0000'/0.123456→'0.1235'/-0.5→'-0.5000'；dict value 用 ', ' 分隔按 key sorted；bool True→'true'（小写）；str value→str(value) fallback；list value→str([1,2,3]) fallback；name:36 不截断；返回 str
+- **_run_inspect_doc _sort_key 详细**：输出含 'counts:'/'metrics:' 标签；'elements=N chunks=N' 格式；file 行用 input_path；6 行顺序（file→document_id→source→parser→counts→metrics）位置递增；counts 与 metrics 间空行；不同 value 类型 metric 排序
+- **_run_inspect_doc lazy imports**：figure_caption_prf/chunk_boundary_prf/compute_automatic_metrics 都在函数内 import；compute_automatic_metrics 调用含 image_base_dir=None；metrics.update 调用 ≥2 次（figure_caption + chunk_boundary）
+- **main argv=None**：main(None) 走 sys.argv → SystemExit；main([]) → SystemExit；返回类型是 int（0/1/2）
+- **argparse _SubParsersAction**：first action 是 _HelpAction；_SubParsersAction 单一；choices.keys == {run, validate-report, inspect-doc}；choices 值都是 ArgumentParser；run subparser 有 help 字符串
+- **source token 补强**：含 'choices=("fallback", "kreuzberg")'/'sys.stdout.reconfigure(encoding="utf-8", errors="replace")'/'hasattr(sys.stdout, "reconfigure")'；含 '清单不存在'/'清单加载失败'/'报告未通过 Schema 校验'；含 'evaluation-report.schema.json' ≥2；含 '.is_file()' ≥3；含 '[OK] 评测完成'/'通过 evaluation-report Schema 校验'；含 'return 2' ≥3/'return 1' ≥3；不含 'return 3'/'return -1'/'return -2'；含 run_evaluation/load_manifest/validate_file/get_git_provenance 调用；含 ManifestError/EvalSchemaError；不含 subprocess/logging/async/threading/os/shutil/tempfile
+- **import 顺序**：argparse→json→sys→pathlib→evaluation.manifest→evaluation.report→evaluation.runner→evaluation.schema 位置递增；4 个 evaluation 子模块 import 语句精确（'from evaluation.manifest import ManifestError, load_manifest'/'from evaluation.report import get_git_provenance'/'from evaluation.runner import run_evaluation'/'from evaluation.schema import EvalSchemaError, validate_file'）
+- **docstring**：提及 run/validate-report/inspect-doc/python -m evaluation.cli/sanity 或 开发期
+- **main 错误打印用 sys.stderr**：run manifest missing/validate-report missing/inspect-doc missing 都打印到 stderr；run manifest missing 时 stdout 为空
+- **联动**：每行 metric 输出 '  ' 前缀；doc_id='abc-123'/source_path='/some/path.pdf'/parser_name='fallback' v1.0 都在输出中显示
+- **_build_parser**：prog=='evaluation.cli'；description 含 评测/校验/报告；formatter_class is RawDescriptionHelpFormatter；conflict_handler=='error'；add_help 默认 True（_HelpAction 单一）；allow_abbrev is True；3 subparser 的 prog 含各自 name
+- **__main__ 块**：含 SystemExit(main())；位于 main 函数定义之后
+
+### 撞墙记录
+- 0 fail（首次跑通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 272 后）：24749 pass / 0 fail / 16 skip（HEAD `56ba52c`）
+
+### 下一步建议
+- 候选 KS6：evaluation/runner.py 第十九轮（227 行）
+- 候选 KZ6：evaluation/schema.py 第十二轮（80 行）
+- 候选 KT7：evaluation/manifest.py 第十九轮（239 行）
+- 候选 KE7：evaluation/annotation_metrics.py 第十八轮（194 行）
+- 候选 KF7：evaluation/metrics.py 第十八轮（381 行）
+- 候选 KW7：evaluation/report.py 第十九轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KS6（evaluation/runner.py 第十九轮，227 行）继续推 evaluation。
+
+---
