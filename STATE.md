@@ -4,6 +4,58 @@
 
 ---
 
+## Round 302 — evaluation/cli.py 第二十四轮（157 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第二十四轮 edges 测试，覆盖 edges22 未触及的角度：**_build_parser 行为深度补强**（5 个 --manifest/--output/--parser/--max-chars 选项 + 2 个 positional 都是 argparse._StoreAction 实例；has help；formatter_class is RawDescriptionHelpFormatter；description 含「评测 CLI」；3 subparsers）；**_format_metric 行为深度补强**（value None/True/False/0.5/0/empty dict/nested dict/list/tuple/string；中文 name；空 name 模板；int 0 走 float() 后变 0.0）；**_run_inspect_doc 行为深度补强**（invalid utf-8 → UnicodeDecodeError 不捕获；unicode escape \uXXXX；empty dict counts 全 0；missing document_id/source_path/parser_name/parser_version → 输出 '?'；negative float；unicode reason）；**main 深度 - run 路径补强**（中文 manifest 路径；带空格路径；中文 output 路径；--parser → provenance；--max-chars → provenance；--tolerance-chars 不进 provenance；args 顺序无关；evaluator_version 常量；report_version 常量）；**main 深度 - validate-report 路径补强**（中文路径；空 dict；missing provenance；missing devset）；**main 深度 - inspect-doc 路径补强**（中文路径；空 dict；only source_type）；**module __all__ 不存在补强**；**module source forbidden tokens 补强**（os/sys/re/subprocess/collections/math/datetime/asyncio/threading）；**module source 含必要 imports**（future/argparse/json/sys/pathlib/typing/evaluation 4 个）；**module docstring 深度补强**（含「CLI」/「子命令」/「run」/「validate-report」/「inspect-doc」）；**Windows stdout reconfigure 块**（hasattr 检查 + reconfigure 调用）；**__main__ 块**；**signatures 精确**（main 1 param + return int；_build_parser 0 param + return ArgumentParser；_format_metric 2 params + return str；_run_inspect_doc 1 param + return int）；**module source level 完整**（main 含 3 subcommand 分支；_build_parser 含 3 add_parser；_format_metric 含 None/bool/float/dict/list/str 6 分支；_run_inspect_doc 含 json.load + compute_automatic_metrics + _format_metric）；**端到端集成**；**模块整体合理性**（4 module-level function + 1 main + 无 class）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges23.py`（157 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_build_parser 行为深度补强**：13 测试
+- **_format_metric 行为深度补强**：14 测试
+- **_run_inspect_doc 行为深度补强**：14 测试
+- **main 深度 - run 路径补强**：18 测试
+- **main 深度 - validate-report 路径补强**：8 测试
+- **main 深度 - inspect-doc 路径补强**：6 测试
+- **module __all__ 不存在**：3 测试
+- **module source forbidden tokens**：12 测试
+- **module source 含必要 imports**：6 测试
+- **module docstring 深度**：6 测试
+- **Windows stdout reconfigure 块**：3 测试
+- **__main__ 块**：3 测试
+- **signatures 精确**：8 测试
+- **module source level 完整**：18 测试
+- **端到端集成**：10 测试
+- **模块整体合理性**：5 测试
+
+### 撞墙记录
+- 8 fail 首次跑：
+  - 6 个 `_StoreAction.action` AttributeError → 改用 `isinstance(action, argparse._StoreAction)`（Action 实例无 .action 属性）
+  - 1 个 docstring `\uXXXX` 被 Python 当 unicode escape 解析 → 改成 raw string `r"""..."""`
+  - 1 个 invalid utf-8 cli 未 try/except → 改成 `with pytest.raises(UnicodeDecodeError)`
+- 修复后 157 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 302 后）：29117 pass / 0 fail / 16 skip（HEAD `699617b`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第二十四轮
+  - evaluation/metrics.py 第二十四轮
+  - evaluation/schema.py 第十六轮
+  - evaluation/runner.py 第二十五轮
+  - evaluation/manifest.py 第二十四轮
+  - evaluation/cli.py 第二十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges23 已饱和（_build_parser / _format_metric / _run_inspect_doc / main 4 函数 + Windows stdout reconfigure + __main__ + source level 完整 + 端到端）。下一轮选 evaluation/annotation_metrics.py 第二十四轮，覆盖 figure_caption_prf 始终 null 行为深度 + chunk_boundary_prf 5 分支算法深度。
+
+---
+
 ## Round 301 — evaluation/manifest.py 第二十三轮（172 测试）
 
 ### 目标
