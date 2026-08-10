@@ -4,6 +4,46 @@
 
 ---
 
+## Round 403 — evaluation/runner.py 第四十轮（121 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第四十轮 edges 测试，覆盖 edges38 未触及的角度：**_load_annotation 行为深度第十二批**（Unicode filename / 巨大 integer / 科学计数 / NaN / Infinity / duplicate keys / 仅 whitespace / array of objects / string-only value）；**_process_one 行为深度第十二批**（mkdir idempotent / unlink OSError silent / elapsed type float / parser_version None 透传 / kwargs forwarded / image_dir 透传 source_hash / errors[0].to_dict() / out_stub 路径推导）；**run_evaluation 行为深度第十二批**（writes JSON / report_version 严格 / public per_doc 4 keys / 无私有字段 / tolerance_chars 透传 / parser_version first wins / expected_failure matches / 默认值 / 自动创建 parent dir / doc_id 与 source_type 透传）；**module source forbidden tokens 第十五批**；**module source 字符串精确补强第十二批**；**signatures 第十二批**；**module 合理性第十二批**；**端到端集成第十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges39.py`（121 测试）
+
+### 覆盖要点
+- **_load_annotation 行为深度第十二批**：12 测试
+- **_process_one 行为深度第十二批**：12 测试
+- **run_evaluation 行为深度第十二批**：17 测试
+- **module source forbidden tokens 第十五批**：13 测试
+- **module source 字符串精确补强第十二批**：20 测试
+- **signatures 第十二批**：13 测试
+- **module 合理性第十二批**：12 测试
+- **端到端集成第十二批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_run_evaluation_kwargs_overrides_defaults_batch12 — 空 manifest 不调 process_single，process_kwargs 没被记录）。修复：给 manifest 一个 doc。
+- 第二次跑：1 fail（test_runner_source_no_fstring_batch12 — runner 实际用了 f-string 拼 doc_id）。修复：测试改为正向验证 runner 使用 f-string。
+- 第三次跑：121 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 403 后）：48737 pass / 0 fail / 19 skip（HEAD `24d4b75`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第三十九轮
+  - evaluation/manifest.py 第三十九轮
+  - evaluation/annotation_metrics.py 第三十九轮
+  - evaluation/schema.py 第三十一轮
+  - evaluation/metrics.py 第四十一轮
+  - evaluation/report.py 第二十九轮
+  - evaluation/runner.py 第四十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 402 — evaluation/report.py 第二十八轮（139 测试）
 
 ### 目标
