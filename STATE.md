@@ -15429,3 +15429,47 @@ get_git_provenance 各 OSError 路径。
 **建议**：annotation_metrics.py edges20 已饱和（Schema 联动 + 算法深度模拟）。下一轮选 evaluation/metrics.py 第二十轮（382 行，深度联动 schema + 各 helper 多场景）。
 
 ---
+
+## Round 287 — evaluation/metrics.py 第二十轮（121 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二十轮 edges 测试，覆盖 edges19 未触及的角度：**Schema 联动**（compute_automatic_metrics 输出可作为 evaluation-report.schema.json 的 per_doc[i].metrics 字段；14 keys 都有 value+reason；element_count_by_type.value 是 dict；error_code.value 是 str 或 None）；**_text_preservation Counter 多集合深度**（identical → 1.0/1.0；actual subset → P=1.0/R=0.5；actual superset → P=0.5/R=1.0；disjoint → 0.0/0.0；重复字符 aaa vs aa → P=1.0/R=2/3 或反向；Counter 交集取 min；image 不参与；element/chunk 缺 content/text → 视为空 string；多 element 顺序拼接顺序敏感）；**_is_valid_bbox 混合类型**（全 int/全 float/int+float 混合；bool 元素；全 0；负数；极大 finite；nan/inf/-inf；complex/str/tuple/dict/None；len 3/5/empty list）；**_pdf_locator_ratio 混合**（text 缺 bbox/table 不需要 bbox/header/footer 不需要/caption/list_item 需要；source_locator 缺/None/empty dict；mixed types；page 0/-1/float）；**_docx_locator_ratio structural_keys 组合**（only section/only paragraph_index/page makes invalid/bbox makes invalid/multiple keys/empty locator/None locator；7 个 key 各自 valid；mixed valid+invalid）；**_chunk_reference_ratio 边界**（empty source_element_ids/None/missing；unknown id；known+unknown id；empty elements+chunks；partial；all valid）；**_heading_boundary_ratio 边界**（no chunks；empty source_element_ids；first id only；dedup；partial match；no headings）；**_silent_drop_count 边界**（empty expectations dict/None；empty/None/missing element_count_by_type；actual==expected → 0；actual>expected → 0；missing type；extra type；multi-type partial drop）；**_strip_unicode_whitespace 字符级深度**（preserves non-ws/removes all ASCII ws/empty/all ws/digits+punct；returns str）；**模块 source level 完整补强**（future annotations 顶；import math/Counter/Path；不含 logging/json/subprocess/os/star/relative；compute_automatic_metrics 含 14 metric key 字面量；_null/_ratio/_bool_metric/_int_metric 各 1 行；_docx_locator_ratio 含 7 structural_keys 字面量；_pdf_locator_ratio 引用 _PDF_BBOX_REQUIRED_TYPES）；**compute_automatic_metrics 集成场景**（full document all metrics values；unknown source_type；error 缺 'code' → KeyError；image elements 文件检查；不修改 document/error 输入）；**__all__ 与 namespace 完整性**（只 1 entry；valid identifier；私有 helper 都在 namespace 不在 __all__）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges20.py`（121 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **Schema 联动**：4 测试
+- **_text_preservation Counter 深度**：14 场景
+- **_is_valid_bbox 混合类型**：19 场景
+- **_pdf_locator_ratio 混合**：14 场景
+- **_docx_locator_ratio structural_keys**：11 场景
+- **_chunk_reference_ratio 边界**：8 场景
+- **_heading_boundary_ratio 边界**：7 场景
+- **_silent_drop_count 边界**：10 场景
+- **_strip_unicode_whitespace**：6 测试
+- **模块 source level 补强**：22 测试
+- **compute_automatic_metrics 集成**：6 测试
+- **__all__ 与 namespace**：3 测试
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_strip_unicode_whitespace_removes_all_ascii_whitespace`：测试输入含 'a b\tc\nd\re\f'，期望 'abcd' 但实际 'abcde'（'e' 是非空白字符，被保留）。修复：期望改为 'abcde'
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 287 后）：26709 pass / 0 fail / 16 skip（HEAD `56a202a`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第二十一轮（228 行）
+  - evaluation/manifest.py 第二十一轮（239 行）
+  - evaluation/cli.py 第二十一轮（243 行）
+  - evaluation/annotation_metrics.py 第二十一轮
+  - evaluation/schema.py 第十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：evaluation/* 模块 edges20 已基本饱和（5 个核心模块都到了第二十轮）。下一轮选 evaluation/runner.py 第二十一轮，深度模拟 _load_annotation/_process_one/run_evaluation。
+
+---
