@@ -4,6 +4,66 @@
 
 ---
 
+## Round 352 — evaluation/metrics.py 第三十二轮（274 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第三十二轮 edges 测试，覆盖 edges30 未触及的角度：**_null/_ratio/_bool_metric/_int_metric 行为深度第七批**（reason 0/Unicode/emoji/long/idempotent；ratio 0/1/negative/huge/tiny/idempotent；bool true/false；int 0/positive/negative/huge；reason 实际是 None 不是 "ok"）；**_TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES/_NOT_EVALUATED 常量第四批**（tuple 不是 set；_TEXT_TYPES 7 entries 含 table/header/footer；_PDF_BBOX 4 entries；_NOT_EVALUATED 是 str "not_evaluated"）；**compute_automatic_metrics 行为深度第四批**（None document+error / document only / error only / unknown source / pdf / docx / empty doc / full pdf doc / full docx doc / image_base_dir / does not mutate / idempotent / expectations variants / error code field / 14 metric keys 真实名字）；**_image_resource_ratio 行为深度第四批**（无 image / 缺 resource_path / 现有文件 / 不存在文件 / 混合 / image_base_dir None）；**_chunk_reference_ratio 行为深度第四批**（empty chunks / empty elements / all valid / partial 一个 unknown 整个 chunk invalid / 全 invalid / 缺 source_element_ids / 空 ids / 重复 ids）；**_heading_boundary_ratio 行为深度第四批**（无 headings / 无 chunks / 完美匹配 / 部分 / 无匹配 / 多 chunks first id only）；**_silent_drop_count 行为深度第四批**（无 expectations / 空 / 无 element_count / 空 element_count / actual==expected / actual>expected / actual<expected / multi type / 返回 int）；**_is_valid_bbox 行为深度第四批**（4 ints / 4 floats / mixed / negative / zero / 3 / 5 / empty / None / string / dict / tuple（False）/ bool True/False / nan / inf / string element / None element）；**_strip_unicode_whitespace 行为深度第四批**（无空白 / leading / trailing / both / internal 删除所有空白 / tab / newline / CR / FF / VT / NBSP / EM space / EN space / ideographic / line sep / paragraph sep / 全空白 / empty / emoji / 中文）；**_text_preservation 行为深度第四批**（无 elements 无 chunks → equal True / 完美匹配 / chunks 缺 text / elements 缺 content / image ignored / 3 keys equal/precision/recall / value+reason 结构 / normalize whitespace）；**_pdf_locator_ratio 行为深度第四批**（empty / no required types / all page+bbox / 缺 page / 缺 bbox / partial / invalid page=0；source_locator 子 dict）；**_docx_locator_ratio 行为深度第四批**（empty / no paragraph / with paragraph_index / 缺 index / 缺 structural_locator / partial）；**module source forbidden tokens 第九批**（~60 stdlib）；**module source 字符串精确补强**（5 imports / math/Counter/Path/Any / no relative/star/main/yield/async/global/walrus/class / uses math.isfinite / 14 functions / 1 public + 13 private）；**signatures 精确补强**（compute 5 params / image_base_dir default None / 4 one-liner signatures / 9 helper signatures）；**模块整体合理性**（namespace 14 / __name__ / __file__ / __all__ = ["compute_automatic_metrics"] / no user classes）；**端到端集成补强**（full pdf doc / full docx doc / does not mutate / idempotent / error no document → False / json serializable / all kwargs / all positional / text_preservation real case / silent_drop real case）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges31.py`（274 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **_null/_ratio/_bool_metric/_int_metric 行为深度第七批**：~30 测试
+- **常量第四批**：~14 测试
+- **compute_automatic_metrics 行为深度第四批**：~22 测试
+- **_image_resource_ratio 行为深度第四批**：6 测试
+- **_chunk_reference_ratio 行为深度第四批**：9 测试
+- **_heading_boundary_ratio 行为深度第四批**：6 测试
+- **_silent_drop_count 行为深度第四批**：9 测试
+- **_is_valid_bbox 行为深度第四批**：18 测试
+- **_strip_unicode_whitespace 行为深度第四批**：21 测试
+- **_text_preservation 行为深度第四批**：8 测试
+- **_pdf_locator_ratio 行为深度第四批**：7 测试
+- **_docx_locator_ratio 行为深度第四批**：7 测试
+- **module source forbidden tokens 第九批**：~60 测试
+- **module source 字符串精确补强**：~22 测试
+- **signatures 精确补强**：~17 测试
+- **模块整体合理性**：~7 测试
+- **端到端集成补强**：~11 测试
+
+### 撞墙记录
+- 37 fail 首次跑（多数因 metric key / dataclass 结构错认）：
+  - _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 是 tuple 不是 set → 改 isinstance 检查
+  - _NOT_EVALUATED 是 str "not_evaluated"，不是 set → 改值检查
+  - metric keys 真实名（pdf_locator_valid_ratio 不是 pdf_locator_coverage 等）→ 全部对照实际改
+  - _text_preservation 返回 'equal'/'precision'/'recall' 不是 'text_preservation_*'
+  - _silent_drop_count 第一个参数是 by_type: dict 不是 elements: list
+  - _pdf_locator_ratio / _docx_locator_ratio 读 e.get("source_locator")，需要包一层
+  - _is_valid_bbox(tuple) 返回 False（要求 list）
+  - _chunk_reference_ratio 用 all()，partial 一个 unknown → 整个 chunk invalid → 0.0 不是 0.5
+  - _strip_unicode_whitespace("a  b") = "ab" 不是 "a  b"（删全部空白，不只是 leading/trailing）
+  - _ratio/_bool_metric/_int_metric reason 是 None 不是 "ok"
+  - __all__ 存在：["compute_automatic_metrics"]
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 352 后）：39226 pass / 0 fail / 18 skip（HEAD `38d5d5e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第三十三轮
+  - evaluation/manifest.py 第三十二轮
+  - evaluation/cli.py 第三十三轮
+  - evaluation/annotation_metrics.py 第三十三轮
+  - evaluation/schema.py 第二十四轮
+  - evaluation/report.py 第十九轮（之前没单独测过）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges31 已饱和（4 helper 第七批 + 常量第四批 + compute 第四批 + 9 子函数第四批 + forbidden 60 + signatures + 端到端 11）。下一轮选 evaluation/runner.py 第三十三轮。
+
+---
+
 ## Round 351 — evaluation/schema.py 第二十三轮（226 测试）
 
 ### 目标
