@@ -14921,3 +14921,46 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KT7（evaluation/manifest.py 第十九轮，239 行）继续推 evaluation。
 
 ---
+
+## Round 276 — evaluation/manifest.py 第十九轮（169 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第十九轮 edges 测试，覆盖 edges18 未触及的角度：模块 imports 精确字符串（'import json'/'from dataclasses import dataclass'/'from pathlib import Path'/'from typing import Any'/'from evaluation import MANIFEST_VERSION'/'from evaluation.schema import validate'）；import 顺序；ManifestError source-level（class 定义 + docstring '清单加载或校验失败' + 不含 __init__ + 不含 print + bases==(Exception,)）；_is_absolute_like source-level token（'if not path_str:'/'path_str.startswith("/")'/'len(path_str) >= 3'/'path_str[1] == ":"'/'path_str[0].isalpha()'/'path_str[2] in ("\\\\", "/")'/'return True' ≥2/'return False'；返回 bool；__qualname__ 精确）；_has_backslash source-level（'return "\\\\" in path_str' 单行；返回 bool）；DocumentEntry/ExpectedFailure/Manifest source-level（@dataclass(frozen=True) 装饰器 + class 定义 + fields 顺序精确 + field count 精确 + frozen setattr/delattr raises）；Manifest properties source-level（file_count 'return len(self.documents)'；pdf_count 'd.source_type == "pdf"'；docx_count 'd.source_type == "docx"'；content_group_count 含 set[frozenset]/unpaired/groups/seen.update/return groups + unpaired；categories_covered 含 s.update + return sorted(s)）；_resolve_relative_path source-level（'if not path_str:'/'为空'/'if _is_absolute_like'/'禁止绝对路径'/'if _has_backslash'/'禁止反斜杠'/'(project_root / path_str).resolve()'/'resolved.relative_to(project_root_resolved)'/'except ValueError:'/'项目根目录之外'/'return resolved'；不含 print）；load_manifest source-level（'p = Path(manifest_path).resolve()'/'if not p.is_file():'/'清单文件不存在'/'if project_root is None:'/'_detect_project_root(p)'/'Path(project_root).resolve()'/'open("r", encoding="utf-8")'/'data = json.load(f)'/'except json.JSONDecodeError as e:'/'清单 JSON 解析失败'/'validate(data, "manifest.schema.json")'/'data.get("manifest_version") != MANIFEST_VERSION'/'manifest_version 不兼容'/'documents: list[DocumentEntry] = []'/'failures: list[ExpectedFailure] = []'/'return Manifest('；不含 print/logging/subprocess/async）；_detect_project_root source-level（'cur = start.resolve()'/'if cur.is_file():'/'cur = cur.parent'/'for parent in [cur, *cur.parents]:'/'pyproject.toml'/'return parent'/'return cur'；不含 print）；__all__ 5 entries 顺序精确；namespace has（MANIFEST_VERSION/validate/ManifestError/Manifest/DocumentEntry/ExpectedFailure/load_manifest + 4 helpers；不含 subprocess/logging/os/asyncio/threading）；模块 source 不含 print/logging/subprocess/async/threading/os/read_text/write_text/silent_drop_count/compute_automatic_metrics/image_resource/process_single；load_manifest 实际加载 minimal manifest 返回 Manifest 实例；不存在的文件 → ManifestError 含 '清单文件不存在'；invalid JSON → ManifestError 含 '清单 JSON 解析失败'；manifest_version 不匹配 → ManifestError 或 EvalSchemaError；两次调用返回独立 Manifest；签名 introspection（5 个 helper 都精确）；docstring 含相对路径/正斜杠/绝对路径/反斜杠/项目根；helper metadata（5 个 FunctionType + 4 个 dataclass）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges19.py`（169 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块 imports 精确**：6 个 import 语句精确字符串；import 顺序 __future__→json→dataclasses→pathlib→typing→evaluation→evaluation.schema
+- **ManifestError source-level**：'class ManifestError(Exception):' + docstring '清单加载或校验失败' + 不含 __init__ + 不含 print + bases==(Exception,)；is Exception+BaseException subclass；__module__/__qualname__ 精确；raise+catch 行为
+- **_is_absolute_like source-level**：所有 7 个关键 token 精确；return True ≥2；return False；返回 bool；__qualname__ 精确
+- **_has_backslash source-level**：'return "\\\\" in path_str' 单行函数；返回 bool
+- **DocumentEntry/ExpectedFailure/Manifest source-level**：@dataclass(frozen=True) 装饰器 + class 定义；fields 顺序精确；field count 精确（DocumentEntry 10 / ExpectedFailure 5 / Manifest 5）；frozen setattr/delattr raises FrozenInstanceError
+- **Manifest properties source-level**：5 properties 体内关键 token 都验证；返回类型 int/int/int/int/list
+- **_resolve_relative_path source-level**：所有 11 个关键 token 精确；不含 print；成功路径返回 Path；空 path → ManifestError 含 '为空'；absolute → '禁止绝对路径'；backslash → '禁止反斜杠'
+- **load_manifest source-level**：所有 20+ 个关键 token 精确；不含 print/logging/subprocess/async
+- **_detect_project_root source-level**：所有 7 个关键 token 精确；不含 print；实际找到/找不到 pyproject.toml 都返回 Path
+- **__all__ 5 entries 顺序**：ManifestError → Manifest → DocumentEntry → ExpectedFailure → load_manifest；不含 4 个 helper / MANIFEST_VERSION
+- **namespace**：含 MANIFEST_VERSION（== evaluation.MANIFEST_VERSION）；validate（is evaluation.schema.validate）；5 dataclass+function；4 helper；不含 subprocess/logging/os/asyncio/threading
+- **不含禁止内容**：print/logging/subprocess/async/threading/os/read_text/write_text/silent_drop_count/compute_automatic_metrics/image_resource/process_single 都不在 source 中
+- **load_manifest 行为**：minimal manifest 返回 Manifest 实例（manifest_version/devset_status/documents/expected_failures/project_root 正确）；不存在的文件 → ManifestError 含 '清单文件不存在'；invalid JSON → ManifestError 含 '清单 JSON 解析失败'；不匹配 version → ManifestError 或 EvalSchemaError；两次调用返回独立 Manifest 但 == 相等
+- **签名 introspection**：_is_absolute_like 1 param name path_str；_has_backslash 1 param；_resolve_relative_path 3 params（path_str/project_root/field_name）；load_manifest 2 params（manifest_path/project_root 默认 None）；_detect_project_root 1 param name start
+- **docstring**：含相对路径/正斜杠/绝对路径/反斜杠/项目根
+- **helper metadata**：5 个 helper 都是 FunctionType；Manifest/DocumentEntry/ExpectedFailure 都是 type；ManifestError 是 type
+
+### 撞墙记录
+- 0 fail（首次跑通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 276 后）：25295 pass / 0 fail / 16 skip（HEAD `325b453`）
+
+### 下一步建议
+- 候选 KF7：evaluation/metrics.py 第十八轮（381 行）
+- 候选 KW7：evaluation/report.py 第十九轮（200 行）
+- 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：选 KF7（evaluation/metrics.py 第十八轮，381 行）继续推 evaluation。
+
+---
