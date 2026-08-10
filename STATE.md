@@ -4,6 +4,57 @@
 
 ---
 
+## Round 387 — evaluation/metrics.py 第三十七轮（184 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第三十七轮 edges 测试，覆盖 edges35 未触及的角度：**_null/_ratio/_bool_metric/_int_metric helpers 行为第九批**（returns dict / value 类型转换 / reason 透传 / unicode reason / int→float / float→int 截断 / bool 0/1 / negative int / 0 边界）；**compute_automatic_metrics 行为深度第九批**（returns dict / pipeline_success 各种组合 / error_code from error / document None 返 14 keys / kwargs / 不 mutate doc+error / idempotent）；**pdf/docx locator 行为深度第九批**（PDF bbox present/missing / DOCX locator 各种字段 / source_type 不匹配）；**image_resource_ratio 行为深度第九批**（no image null / 有 resource_path 无 base_dir / 有 base_dir / missing / 空 / None / partial）；**chunk_reference_ratio 行为深度第九批**（no chunks no elements / valid ids / missing ids → 0.0 / no key → 0.0 / empty ids → 0.0 / all valid）；**text_preservation 行为深度第九批**（both empty / perfect match / image skipped / missing text / 3 keys / Unicode）；**heading_boundary_ratio 行为深度第九批**（no chunks / no heading elements / full match / partial）；**silent_drop_count 行为深度第九批**（no expectations / no element_count / empty / actual more / actual less）；**_is_valid_bbox 行为深度第九批**（4 ints/floats/mixed/negative/all zeros/tuple/string/None/empty/too short/too long/string element/None element/bool element/dict/set/list-of-tuples）；**_strip_unicode_whitespace 行为深度第九批**（empty/no whitespace/all/internal/leading-trailing/NBSP/em space/en space/ideographic space/line separator/paragraph separator/punctuation/unicode letters/emoji/returns str/idempotent/mixed/zero width not stripped/BOM not stripped）；**module source forbidden tokens 第十二批**；**module source 字符串精确补强第九批**（imports + 3 constants + 4 helpers + compute_automatic_metrics + 9 sub-functions + no class/main/yield/walrus/async/print/logging/sleep + docstring mentions text_preservation/纯函数/v1.1）；**signatures 第九批**（compute 5 params + names/kinds/image_base_dir default None + no defaults + return dict + 6 helpers FunctionType + __module__ eq）；**module 合理性第九批**（__all__ 1 item + _TEXT_TYPES 7 / _PDF_BBOX_REQUIRED_TYPES 4 / _NOT_EVALUATED value + subset relation + docstring 中文 + 14 user functions + no user classes + no top-level call）；**端到端集成第九批**（full pdf doc + error dict + document None returns 14 nulls + kwargs/positional + image no bbox + docx relationship_id + none elements list + dup chars + three headings partial + full chain keys check + idempotent + no unexpected exceptions + minimal doc returns pipeline_success true）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges36.py`（184 测试）
+
+### 覆盖要点
+- **helpers 行为第九批**：20 测试
+- **compute_automatic_metrics 行为深度第九批**：13 测试
+- **pdf/docx locator 行为深度第九批**：4 测试
+- **image_resource_ratio 行为深度第九批**：7 测试
+- **chunk_reference_ratio 行为深度第九批**：6 测试
+- **text_preservation 行为深度第九批**：6 测试
+- **heading_boundary_ratio 行为深度第九批**：4 测试
+- **silent_drop_count 行为深度第九批**：5 测试
+- **_is_valid_bbox 行为深度第九批**：18 测试
+- **_strip_unicode_whitespace 行为深度第九批**：19 测试
+- **module source forbidden tokens 第十二批**：11 测试
+- **module source 字符串精确补强第九批**：23 测试
+- **signatures 第九批**：16 测试
+- **module 合理性第九批**：11 测试
+- **端到端集成第九批**：14 测试
+
+### 撞墙记录
+- 3 fails 首次跑：
+  1. `test_compute_metrics_returns_5_keys_when_document_none`：实际返 14 keys（所有 metric 都返 null + pipeline_failed）
+  2. `test_compute_metrics_chunks_reference_missing_element_ids`：单 chunk 含 missing id → 整 chunk invalid（0.0），不是部分
+  3. `test_compute_metrics_empty_element_count_in_expectations`：空 expectations dict → null（无可对比）
+- 二次跑 1 fail：`test_is_valid_bbox_tuple` → tuple 被 reject（实际只接受 list）
+- 修复：调整期望以匹配实际算法行为，不动 source（避免修改 metrics 的不变量）
+- 三次跑：184 全通过
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 387 后）：46151 pass / 0 fail / 19 skip（HEAD `85774d0`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第二十六轮
+  - evaluation/runner.py 第三十八轮
+  - evaluation/cli.py 第三十七轮
+  - evaluation/manifest.py 第三十七轮
+  - evaluation/annotation_metrics.py 第三十七轮
+  - evaluation/schema.py 第二十九轮
+  - evaluation/metrics.py 第三十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 386 — evaluation/schema.py 第二十八轮（153 测试）
 
 ### 目标
