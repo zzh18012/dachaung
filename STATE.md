@@ -15255,3 +15255,48 @@ get_git_provenance 各 OSError 路径。
 **建议**：edges20 schema 联动模式持续推广。下一轮选 evaluation/cli.py 第二十轮，加 schema 联动 + argparse 子命令深度场景。
 
 ---
+
+## Round 283 — evaluation/cli.py 第二十轮（99 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第二十轮 edges 测试，覆盖 edges19 未触及的角度：**main exit code run 子命令**（成功=0；缺 manifest=2；JSON malformed=1；schema 失败=1；写入 output 文件；stdout success；stderr error；parser=fallback 默认；parser=kreuzberg；自定义 max_chars；自定义 tolerance；invalid choice→SystemExit；缺 args→SystemExit）；**main exit code validate-report**（成功=0；缺 input=2；malformed=1；schema 失败=1；写入 stdout 成功；stderr error；非 dict top-level=1）；**main exit code inspect-doc**（成功=0；缺 input=2；malformed=1；非 dict=1；写入 stdout 成功；stderr error；排序输出）；**sub-parser 参数验证**（--manifest required；--output required；--parser choices=('fallback','kreuzberg')；--parser 默认 'fallback'；--max-chars type=int 默认 800；--tolerance-chars type=int 默认 30；validate-report input positional；inspect-doc input positional）；**build_parser 结构**（3 subcommands；required=True；bad input→SystemExit）；**_format_metric edge cases**（长 name 对齐 36 字符；padding；empty dict；int with reason；negative int）；**_run_inspect_doc 排序**（bool first；null last；缺 key 不报错）；**Windows stdout reconfigure 块**（sys.platform='win32' 路径触发；非 win32 路径跳过；AttributeError caught；返回值 None）；**main return type always int**（成功/失败/异常都返回 int）；**模块禁止 imports**（logging/subprocess/asyncio/threading/concurrent/os/re/time/datetime 都不在）；**__all__ not defined**；**模块 docstring 内容**；**模块 imports 精确字符串**；**_run_inspect_doc lazy imports**（运行时才 import）；**main block uses SystemExit**；**stdout vs stderr 严格分离**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges20.py`（99 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **main exit code run**：12 场景（成功/缺 manifest/malformed/schema fail/writes file/stdout/stderr/parser choices/parser default/max_chars/tolerance/SystemExit）
+- **main exit code validate-report**：8 场景（成功/缺 input/malformed/schema fail/stdout/stderr/non dict/正确版本号）
+- **main exit code inspect-doc**：10 场景（成功/缺 input/malformed/non dict/stdout/stderr/排序/格式化）
+- **sub-parser 参数**：13 场景（required/choices/defaults/positionals/no_help_action）
+- **build_parser 结构**：3 subcommands + required=True + SystemExit on bad input
+- **_format_metric**：5 场景（长 name/padding/empty dict/int with reason/negative int）
+- **_run_inspect_doc 排序**：bool first/null last/缺 key 不报错
+- **Windows stdout reconfigure**：4 场景（win32 触发/non-win32 跳过/AttributeError caught/None return）
+- **main return type**：3 场景（成功/失败/异常都返回 int）
+- **模块禁止 imports**：logging/subprocess/asyncio/threading/concurrent/os/re/time/datetime 都不在
+- **__all__ not defined**
+- **模块 docstring 内容**：5 项关键 token
+- **模块 imports 精确字符串**：8 项关键 import
+- **_run_inspect_doc lazy imports**：3 项（manifest/schema/report 都在函数内 import）
+- **main block uses SystemExit**
+- **stdout vs stderr 严格分离**：3 场景
+
+### 撞墙记录
+- 1 fail 首次跑：
+  - `test_build_parser_validate_report_no_optional_args`：argparse 自动加的 -h/--help 不等于 `["-h"]`，过滤失效。修复：用 `not set(a.option_strings).issubset({"-h", "--help"})` 替代 `!= ["-h"]`
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 283 后）：26204 pass / 0 fail / 16 skip（HEAD `2f200b5`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第十三轮（80 行）
+  - evaluation/report.py 第二十轮（200 行）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：evaluation/* 全模块 edges12-20 已基本饱和。下一轮可向 schema.py 第十三轮（小文件精读）或 report.py 第二十轮（深度联动 metrics）推进。
+
+---
