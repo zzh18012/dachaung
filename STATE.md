@@ -15014,3 +15014,48 @@ get_git_provenance 各 OSError 路径。
 **建议**：选 KW7（evaluation/report.py 第十九轮，200 行）继续推 evaluation。
 
 ---
+
+## Round 278 — evaluation/report.py 第十九轮（149 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第十九轮 edges 测试，覆盖 edges18 未触及的角度：模块 imports 精确字符串（5 import 语句精确：'from __future__ import annotations'、'import subprocess'、'from datetime import datetime'、'from pathlib import Path'、'from typing import Any'）；import 顺序；_RATIO_METRICS source 定义精确 + value 12 items 精确；_COUNT_METRICS source 定义精确 + value 1 item；_SUCCESS_BOOL_METRICS source 定义精确 + value 1 item；get_git_provenance source 详尽（commit/dirty init/try/except/rev-parse HEAD command/status --porcelain command/cwd/capture_output/text/encoding/errors/timeout kwargs/returncode check/stdout.strip()/dirty bool assignment/return dict 共 18+ token）；get_dependency_versions source 详尽（lazy import importlib.metadata/versions init/for pkg loop/version call/PackageNotFoundError catch/Exception catch/return versions/no subprocess）；build_provenance source 详尽（9 keys in order：report_version/evaluator_version/generated_at/git/git_diff_summary/dependency_versions/python_version/os/max_chars，int(max_chars)，datetime.now().astimezone().isoformat()）；build_devset_section source 详尽（6 keys in order：devset_status/file_count/content_group_count/pdf_count/docx_count/categories_covered，no subprocess/datetime）；aggregate_summary source 详尽（4 buckets：counts 求和/success_rates 算 rate/ratio 各项 macro average/silent_drop 求和；不混合出综合分数）；__all__ 5 entries 精确顺序（get_git_provenance/get_dependency_versions/build_provenance/build_devset_section/aggregate_summary）；namespace 完整（5 helpers + 3 constants + EVALUATOR_VERSION/REPORT_VERSION/subprocess/datetime/Path/Any 都在；不含 json/os/logging/threading/asyncio）；模块 source 不含 print/logging/async/threading/os/concurrent.futures/numpy/pandas/json import/load_manifest/process_single/compute_automatic_metrics；get_dependency_versions 行为（返回 3 keys：pdfplumber/python-docx→pdfplumber/python_docx/kreuzberg；PackageNotFoundError 不暴露）；build_provenance 行为（返回 9 keys in order；max_chars=int；commit short sha 7 chars）；aggregate_summary 行为（返回 4 keys in order：counts/success_rates/ratio_avgs/silent_drop；空 list 默认零值；不混合类型）；helper metadata（5 functions FunctionType；__module__ == 'evaluation.report'；qualname 精确）；签名 introspection（get_git_provenance 0 params；get_dependency_versions 0 params；build_provenance 1 param name max_chars；build_devset_section 1 param name manifest；aggregate_summary 1 param name reports；no var args/kwargs）；docstring 含 provenance/devset/summary/per_doc/4 categories/不混合类型；不缓存验证（重复调用得新 dict）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges19.py`（149 测试）
+- 仅测试，不动业务代码
+
+### 覆盖要点
+- **模块 imports 精确**：5 import 语句精确字符串；import 顺序 __future__→subprocess→datetime→pathlib→typing
+- **常量精确**：_RATIO_METRICS 12 items tuple；_COUNT_METRICS 1 item；_SUCCESS_BOOL_METRICS 1 item；source 定义精确（'(' / ')' / 元素逐项）
+- **get_git_provenance source**：所有 18+ 关键 token 精确（commit='' init / dirty=False init / try: / except Exception: / 'git' 'rev-parse' 'HEAD' / 'git' 'status' '--porcelain' / subprocess.run / cwd / capture_output=True / text=True / encoding='utf-8' / errors='replace' / timeout / .returncode / stdout.strip() / dirty = bool(...) / return {...}）
+- **get_dependency_versions source**：所有关键 token 精确（lazy import importlib.metadata 在函数内 / versions = {} / for pkg in (...) / version(pkg) / except PackageNotFoundError / except Exception / return versions）；不含 subprocess
+- **build_provenance source**：9 keys 顺序精确（report_version/evaluator_version/generated_at/git/git_diff_summary/dependency_versions/python_version/os/max_chars）；'int(max_chars)'；'datetime.now().astimezone().isoformat()'
+- **build_devset_section source**：6 keys 顺序精确（devset_status/file_count/content_group_count/pdf_count/docx_count/categories_covered）；不含 subprocess/datetime
+- **aggregate_summary source**：4 buckets 详尽（'counts'：求和 / 'success_rates'：rate / 'ratio_avgs'：macro average / 'silent_drop'：求和；不混合出综合分数）
+- **__all__**：5 entries 精确顺序 ['get_git_provenance', 'get_dependency_versions', 'build_provenance', 'build_devset_section', 'aggregate_summary']
+- **namespace**：5 helpers + 3 constants（_RATIO_METRICS/_COUNT_METRICS/_SUCCESS_BOOL_METRICS）+ EVALUATOR_VERSION/REPORT_VERSION/subprocess/datetime/Path/Any 都在；不含 json/os/logging/threading/asyncio
+- **不含禁止内容**：print/logging/subprocess（仅 get_git_provenance 用）/async/threading/json/concurrent.futures/numpy/pandas/load_manifest/process_single/compute_automatic_metrics 都不在 source 中（部分除外已精确说明）
+- **get_dependency_versions 行为**：返回 3 keys（pdfplumber/python_docx/kreuzberg）；PackageNotFoundError 不在返回 dict
+- **build_provenance 行为**：返回 9 keys in order；max_chars int；'git' key 来自 get_git_provenance；'commit' 7 chars short sha
+- **aggregate_summary 行为**：返回 4 keys in order；空 list 默认零值（counts/success_rates/ratio_avgs/silent_drop）；不混合类型
+- **helper metadata**：5 functions 都是 FunctionType；__module__ == 'evaluation.report'；__qualname__ 精确
+- **签名 introspection**：get_git_provenance 0 params；get_dependency_versions 0 params；build_provenance 1 param name max_chars；build_devset_section 1 param name manifest；aggregate_summary 1 param name reports；5 functions 都 no var args/kwargs
+- **docstring**：含 provenance/devset/summary/per_doc/4 categories/不混合类型
+- **不缓存验证**：get_git_provenance 重复调用得新 dict；get_dependency_versions 重复调用得新 dict
+
+### 撞墙记录
+- 0 fail 首次跑（149 全通过）
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 278 后）：25613 pass / 0 fail / 16 skip（HEAD `582494c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/* 第二十轮（饱和区域，覆盖 source-level 不变量深化）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+  - 候选 K（schema 加严）仍在范围内
+
+**建议**：评估 saturation。evaluation/* 已达 edges18-19，进一步 edges 边际收益低。可转向 K（schema 加严）或 docs 之外的轻量深化。
+
+---
