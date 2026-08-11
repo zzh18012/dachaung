@@ -4,6 +4,48 @@
 
 ---
 
+## Round 473 — evaluation/cli.py 第五十轮（114 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第五十轮 edges 测试，覆盖 edges48 未触及的角度：**_build_parser 第二十二批**（subparser 数量 / dest='command' / required=True / prog='evaluation.cli' / run 无 positional / validate-report 1 positional / inspect-doc 1 positional / 各 default 值 / 非法 parser choice SystemExit）；**_format_metric 第二十二批**（name 极长 / 空 dict / list value / 0.0 渲染 / 1.0 with reason / int with reason / 大 int / 单 key dict / false with reason）；**_run_inspect_doc 第二十二批**（缺 document_id/source_path/parser_name / 非 dict JSON / JSONDecodeError / 文件不存在 / tolerance 透传 / 有 elements 无 chunks / 无 elements 无 chunks）；**main 第二十二批**（manifest 不存在 / run_evaluation EvalSchemaError / validate_file EvalSchemaError / validate-report 不存在 / validate-report JSONDecodeError / validate-report EvalSchemaError / 返回 int / 无子命令 SystemExit / --parser 透传 / pipeline_success 计数 / git_commit 截断）；**module source forbidden tokens 第三十八批**；**module source 字符串精确补强第三十四批**；**signatures 第三十四批**；**module 合理性第三十四批**；**端到端集成第三十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges49.py`（114 测试）
+
+### 覆盖要点
+- **_build_parser 第二十二批**：12 测试
+- **_format_metric 第二十二批**：9 测试
+- **_run_inspect_doc 第二十二批**：9 测试
+- **main 第二十二批**：12 测试
+- **module source forbidden tokens 第三十八批**：17 测试
+- **module source 字符串精确补强第三十四批**：15 测试
+- **signatures 第三十四批**：6 测试
+- **module 合理性第三十四批**：12 测试
+- **端到端集成第三十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_module_does_not_import_evaluation_runner_top_level_side_effect_batch22`：误以为 `run_evaluation(\n` 是顶层调用，实际是在 main() 内的合法调用。修法：改成验证 `from evaluation.runner import` 是顶层 import（不在函数内）。
+- 修复后：114 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 473 后）：57320 pass / 0 fail / 20 skip（HEAD `7d5e95e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第四十轮
+  - evaluation/manifest.py 第四十九轮
+  - evaluation/annotation_metrics.py 第四十九轮
+  - evaluation/metrics.py 第五十一轮
+  - evaluation/report.py 第三十九轮
+  - evaluation/runner.py 第五十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges49 已饱和（subparser 数量 + dest + 各 default + main 错误路径全检）。下一轮选 evaluation/schema.py 第四十轮，覆盖 SCHEMAS_DIR / EvalSchemaError / _schema_path / load_schema / validate / validate_file 的更多边界。
+
+---
+
 ## Round 472 — evaluation/runner.py 第五十一轮（107 测试）
 
 ### 目标
