@@ -4,6 +4,48 @@
 
 ---
 
+## Round 448 — evaluation/annotation_metrics.py 第四十五轮（87 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第四十五轮 edges 测试，覆盖 edges44 未触及的角度：**figure_caption_prf 行为深度第十八批**（keys count/names / all null / reason constant / None document / None annotation / both None / dict structure / idempotent / 含 figure 的真 document 仍 null）；**chunk_boundary_prf 边界第十八批**（document None / document None no annotation / document with None annotation / 空 dict annotation 视为 falsy / document with chunks no anchors / chunks missing / single chunk / annotation 缺 chunk_boundary_anchors / no chunks no anchors）；**chunk_boundary_prf 算法第十八批**（predicted positions 多 chunk / tolerance 0 fail / position before/after / default position / 多 anchor 同 marker 顺序定位 / search_from 推进 / f1 perfect / f1 zero match / 3 chunks 2 boundaries）；**chunk_boundary_prf missing_markers 第十八批**（marker 不在 stream / 多 missing / 空 marker / no missing no field）；**_tolerance_chars 行为深度第十八批**（默认 30 / 自定义 / 0 / 大值 / document None 也在 dict / reason None）；**module source forbidden tokens 第三十二批**；**module source 字符串精确补强第二十八批**；**signatures 第二十八批**；**module 合理性第二十八批**；**端到端集成第二十八批**（normalize_text 影响 stream / Unicode / chunk missing text / doc with extra keys / annotation with extra keys / figure+chunk 组合）
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges45.py`（87 测试）
+
+### 覆盖要点
+- **figure_caption_prf 第十八批**：10 测试
+- **chunk_boundary_prf 边界第十八批**：9 测试
+- **chunk_boundary_prf 算法第十八批**：10 测试
+- **chunk_boundary_prf missing_markers 第十八批**：4 测试
+- **_tolerance_chars 第十八批**：6 测试
+- **module source forbidden tokens 第三十二批**：18 测试
+- **module source 字符串精确补强第二十八批**：11 测试
+- **signatures 第二十八批**：3 测试
+- **module 合理性第二十八批**：9 测试
+- **端到端集成第二十八批**：7 测试
+
+### 撞墙记录
+- 0 fail 首次跑（87 全通过）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 448 后）：54300 pass / 0 fail / 19 skip（HEAD `3c81f3d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第三十七轮
+  - evaluation/metrics.py 第四十七轮
+  - evaluation/report.py 第三十五轮
+  - evaluation/runner.py 第四十八轮
+  - evaluation/cli.py 第四十七轮
+  - evaluation/manifest.py 第四十六轮
+  - evaluation/annotation_metrics.py 第四十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges45 已饱和（figure_caption 10 + chunk_boundary 边界 9 + 算法 10 + missing_markers 4 + tolerance 6 + 端到端 7）。下一轮选 evaluation/schema.py 第三十七轮，覆盖 4 个 schema 的 cross-validation 与 EvalSchemaError 行为深度。
+
+---
+
 ## Round 447 — evaluation/manifest.py 第四十五轮（129 测试）
 
 ### 目标
