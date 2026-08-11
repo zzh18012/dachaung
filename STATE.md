@@ -4,6 +4,52 @@
 
 ---
 
+## Round 505 — evaluation/metrics.py 第五十五轮（166 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第五十五轮 edges 测试，覆盖 edges52 未触及的角度：**_strip_unicode_whitespace 第二十七批**（ASCII 空白 / tab / newline / CR / FF / VT / NBSP / em/en space / 全角 / line/paragraph separator / empty / only whitespace / 无空白 / 混合 / 标点保留 / emoji 保留 / 顺序保留）；**_is_valid_bbox 第二十七批**（4 ints / 4 floats / 混合 / 负数 / 0 / True / False / str / nan / inf / -inf / len 3 / len 5 / empty / None / tuple / dict / str）；**_text_preservation 第二十七批**（image excluded / content None / chunk text None / 多余空白 / NBSP / emoji / unicode / 缺字符 / 多字符 / 都空 / 三 key / 顺序敏感）；**_silent_drop_count 第二十七批**（no expectations / 空 dict / 缺 element_count_by_type / 空 element_count_by_type / actual>expected / actual==expected / actual<expected / 缺 type / 多 type / 多余 type 忽略 / int 返回）；**_heading_boundary_ratio 第二十七批**（no headings / no chunks / chunks 空 source_ids / chunks 无 source_ids key / perfect / heading 不在首 / 多 headings partial / perfect / heading 无 element_id）；**_chunk_reference_ratio 第二十七批**（no chunks / chunks 无 source_ids / 空 source_ids / perfect / partial / 全 missing / 部分缺失 source_ids）；**_image_resource_ratio 第二十七批**（no images / no resource_path / empty resource_path / 文件不存在 / 文件存在 / 空文件 0 字节 / image_base_dir 拼接 / OSError 容错 / 混合）；**_pdf_locator_ratio 第二十七批**（no elements / page=0 / 负数 / float / string / text 缺 bbox / 非 text 不需 bbox / perfect / 无 source_locator / source_locator=None）；**_docx_locator_ratio 第二十七批**（no elements / paragraph_index / table_index / section / 拒 page / 拒 bbox / 无结构键 / 混合 / 无 source_locator / relationship_id）；**module source forbidden tokens 第四十三批**；**module source 字符串精确补强第三十九批**；**signatures 第三十九批**；**module 合理性第三十九批**；**端到端集成第三十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges53.py`（166 测试）
+
+### 覆盖要点
+- **_strip_unicode_whitespace 第二十七批**：19 测试
+- **_is_valid_bbox 第二十七批**：18 测试
+- **_text_preservation 第二十七批**：12 测试
+- **_silent_drop_count 第二十七批**：11 测试
+- **_heading_boundary_ratio 第二十七批**：9 测试
+- **_chunk_reference_ratio 第二十七批**：7 测试
+- **_image_resource_ratio 第二十七批**：9 测试
+- **_pdf_locator_ratio 第二十七批**：10 测试
+- **_docx_locator_ratio 第二十七批**：10 测试
+- **module source forbidden tokens 第四十三批**：15 测试
+- **module source 字符串精确补强第三十九批**：14 测试
+- **signatures 第三十九批**：14 测试
+- **module 合理性第三十九批**：11 测试
+- **端到端集成第三十九批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。166 全通过；全量回归 61280 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 505 后）：61280 pass / 0 fail / 22 skip（HEAD `cd8f4cd`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第四十三轮
+  - evaluation/runner.py 第五十六轮
+  - evaluation/cli.py 第五十五轮
+  - evaluation/schema.py 第四十五轮
+  - evaluation/manifest.py 第五十四轮
+  - evaluation/annotation_metrics.py 第五十四轮
+  - evaluation/metrics.py 第五十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges53 已饱和（166 测试 / 9 个子函数全覆盖）。下一轮换目标，可选 evaluation/report.py 第四十三轮或 evaluation/runner.py 第五十六轮。
+
+---
+
 ## Round 504 — evaluation/annotation_metrics.py 第五十三轮（97 测试）
 
 ### 目标
