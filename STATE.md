@@ -4,6 +4,47 @@
 
 ---
 
+## Round 444 — evaluation/report.py 第三十四轮（107 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第三十四轮 edges 测试，覆盖 edges33 未触及的角度：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 元组深度第十七批**（schema_valid 在 ratio / 不在 success / pipeline_success 不在 ratio / 各 metric 子集 / 三元组 disjoint）；**get_git_provenance 行为深度第十七批**（project_root 是文件/不存在 / stdout 多换行 / 多次调用独立 / value 类型）；**get_dependency_versions 行为深度第十七批**（无 IO / 不抛 timeout / 部分失败 / unknown 异常 / keys count 3）；**build_provenance 字段深度第十七批**（max_chars 负数 / parser_name 空 / dependencies not None / timestamp 含时区 / 9 keys）；**build_devset_section 字段深度第十七批**（returns dict / 6 keys 正确 / status string / categories list / 不调 setter）；**aggregate_summary 行为深度第十七批**（mixed metrics / counts sum with None / silent_drop 0/multi / success rate 0/full / 单 participant / key 匹配 _RATIO_METRICS）；**module source forbidden tokens 第三十三批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges34.py`（107 测试）
+
+### 覆盖要点
+- **元组深度第十七批**：13 测试
+- **get_git_provenance 第十七批**：7 测试
+- **get_dependency_versions 第十七批**：5 测试
+- **build_provenance 第十七批**：7 测试
+- **build_devset_section 第十七批**：7 测试
+- **aggregate_summary 第十七批**：11 测试
+- **module source forbidden tokens 第三十三批**：18 测试
+- **module source 字符串精确补强第三十批**：17 测试
+- **signatures 第三十批**：6 测试
+- **module 合理性第三十批**：9 测试
+- **端到端集成第三十批**：9 测试
+
+### 撞墙记录
+- 首次跑：107 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 444 后）：53905 pass / 0 fail / 19 skip（HEAD `eef6589`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第四十七轮
+  - evaluation/cli.py 第四十六轮
+  - evaluation/manifest.py 第四十五轮
+  - evaluation/annotation_metrics.py 第四十五轮
+  - evaluation/schema.py 第三十七轮
+  - evaluation/metrics.py 第四十七轮
+  - evaluation/report.py 第三十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 443 — evaluation/metrics.py 第四十六轮（133 测试）
 
 ### 目标
