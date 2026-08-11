@@ -4,6 +4,47 @@
 
 ---
 
+## Round 501 — evaluation/cli.py 第五十四轮（113 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第五十四轮 edges 测试，覆盖 edges52 未触及的角度：**_build_parser 第二十六批**（--manifest required missing SystemExit / --output required missing / --parser invalid choice / --max-chars 非数字 / --tolerance-chars 非数字 / 无命令 / subparser dest=command / subparser required=True / 严格 3 子命令 / validate-report positional input / inspect-doc positional input / inspect-doc tolerance-chars default=30 / 自定义值 / run 全参数 / prog 命名 / --max-chars 负数 int 接受 / fallback 严格）；**_format_metric 第二十六批**（value=0 int / 0.0 float / True / False / None+reason=None / str / int / dict sorted / empty dict / name padded 36 / large float / dict 含特殊字符 / 缺 value key）；**_run_inspect_doc 第二十六批**（input 是目录 → 2 / JSON 顶层 list → 1 / int → 1 / 空文件 → 1 / tolerance_chars 透传 / compute_automatic_metrics kwargs / metric 排序 / source_type 缺失 default unknown / 返回 0 / 打印 filename）；**main 第二十六批**（manifest 不存在 → 2 / ManifestError → 1 / validate_file 失败 → 1 / run_evaluation EvalSchemaError → 1 / validate-report 不存在 → 2 / JSONDecodeError → 1 / 成功 → 0 / EvalSchemaError → 1 / 委托 inspect-doc / 未知命令 SystemExit / 返回 int / 打印 summary）；**module source forbidden tokens 第四十二批**；**module source 字符串精确补强第三十八批**；**signatures 第三十八批**；**module 合理性第三十八批**；**端到端集成第三十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges53.py`（113 测试）
+
+### 覆盖要点
+- **_build_parser 第二十六批**：16 测试
+- **_format_metric 第二十六批**：14 测试
+- **_run_inspect_doc 第二十六批**：10 测试
+- **main 第二十六批**：14 测试
+- **module source forbidden tokens 第四十二批**：15 测试
+- **module source 字符串精确补强第三十八批**：16 测试
+- **signatures 第三十八批**：11 测试
+- **module 合理性第三十八批**：10 测试
+- **端到端集成第三十八批**：8 测试
+
+### 撞墙记录
+- 首次跑：0 fail。113 全通过；全量回归 60765 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 501 后）：60765 pass / 0 fail / 22 skip（HEAD `850b746`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第四十四轮
+  - evaluation/manifest.py 第五十三轮
+  - evaluation/annotation_metrics.py 第五十三轮
+  - evaluation/metrics.py 第五十五轮
+  - evaluation/report.py 第四十三轮
+  - evaluation/runner.py 第五十六轮
+  - evaluation/cli.py 第五十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges53 已饱和。下一轮选 evaluation/schema.py 第四十四轮。
+
+---
+
 ## Round 500 — evaluation/runner.py 第五十五轮（109 测试）
 
 ### 目标
