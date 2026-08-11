@@ -4,52 +4,47 @@
 
 ---
 
-## Round 461 — evaluation/manifest.py 第四十七轮（154 测试）
+## Round 462 — evaluation/annotation_metrics.py 第四十七轮（101 测试）
 
 ### 目标
-- 给 `evaluation/manifest.py`（240 行）加第四十七轮 edges 测试，覆盖 edges46 未触及的角度：**_is_absolute_like 行为第二十批**（仅 / / 仅 c: / c:/  / c:\ / 前导空白 / Unicode / 多字符 drive / 仅冒号 / digit drive / 空串）；**_has_backslash 行为第二十批**（单 \ / 仅反斜杠 / 无反斜杠 / 空串 / 仅正斜杠 / 混合 / 连续）；**_resolve_relative_path 行为第二十批**（.. / 内 root / 空格名 / 长路径 / 末尾斜杠 / Unicode / 空 / 错误含 field_name / 绝对 POSIX / 返回绝对）；**_detect_project_root 行为第二十批**（start 是文件 / 无 pyproject / 最近 pyproject / str path / 返回绝对 / 用 resolve）；**Manifest dataclass 行为第二十批**（frozen / 字段数 5 / 字段顺序 / 字段类型 / hashable / equality / inequality / 无 default）；**Manifest properties 行为第二十批**（categories_covered 排序+去重 / source_type=other / no pairs / paired both ways / paired one way / file_count 0）；**DocumentEntry 行为第二十批**（frozen / 10 字段 / 字段顺序 / equality / inequality / hashable None / unhashable dict / 无 default / paired_with）；**ExpectedFailure 行为第二十批**（frozen / 5 字段 / 字段顺序 / source_type None / equality / hashable / 无 default）；**load_manifest 行为第二十批**（documents 默认空 / expected_failures 默认空 / categories / paired_with / sha256 64 hex / expectations / annotation_file / annotation_file 错误 / project_root as str / returns Manifest / 路径越界 / 路径含 \ / 文件不存在 / invalid JSON / expected_failure / devset_status 透传）；**module source forbidden tokens 第三十五批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
+- 给 `evaluation/annotation_metrics.py`（195 行）加第四十七轮 edges 测试，覆盖 edges46 未触及的角度：**figure_caption_prf 行为第二十批**（3 metrics / value 全 None / reason constant / None 输入 / 部分输入 / 忽略 doc 内容 / 忽略 annotation 内容）；**chunk_boundary_prf 边界第二十批**（document None / annotation None / annotation 空 dict / 无 chunks 无 anchors / 单 chunk 无 anchors / 单 chunk 有 anchors / 多 chunk 无 anchors）；**chunk_boundary_prf 算法第二十批**（perfect match / partial match / no match / tolerance 0 / tolerance huge / position before / multiple anchors one-to-one）；**missing_markers 行为第二十批**（记录 / 无 field / 空 marker / marker 不在 stream）；**_tolerance_chars 行为第二十批**（output 字段 / 默认 30 / 0 / 负数 / document None）；**PARSER_DOES_NOT_EMIT_RELATIONS 常量行为第二十批**（值 / 类型 / 不可变）；**module source forbidden tokens 第三十五批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
 
 ### 改动
-- 新增 `tests/test_evaluation_manifest_edges47.py`（154 测试）
+- 新增 `tests/test_evaluation_annotation_metrics_edges47.py`（101 测试）
 
 ### 覆盖要点
-- **_is_absolute_like 第二十批**：10 测试
-- **_has_backslash 第二十批**：7 测试
-- **_resolve_relative_path 第二十批**：10 测试
-- **_detect_project_root 第二十批**：6 测试
-- **Manifest dataclass 第二十批**：8 测试
-- **Manifest properties 第二十批**：7 测试
-- **DocumentEntry 第二十批**：9 测试
-- **ExpectedFailure 第二十批**：7 测试
-- **load_manifest 第二十批**：16 测试
+- **figure_caption_prf 第二十批**：7 测试
+- **chunk_boundary_prf 边界第二十批**：7 测试
+- **chunk_boundary_prf 算法第二十批**：7 测试
+- **missing_markers 第二十批**：4 测试
+- **_tolerance_chars 第二十批**：5 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量第二十批**：3 测试
 - **module source forbidden tokens 第三十五批**：18 测试
-- **module source 字符串精确补强第三十批**：18 测试
-- **signatures 第三十批**：6 测试
-- **module 合理性第三十批**：11 测试
+- **module source 字符串精确补强第三十批**：13 测试
+- **signatures 第三十批**：4 测试
+- **module 合理性第三十批**：12 测试
 - **端到端集成第三十批**：7 测试
 
 ### 撞墙记录
-- 首次跑：2 fails
-  - `test_load_manifest_documents_default_empty_batch20`：manifest.schema.json 要求 `documents` 字段存在（即使为空）。修法：补 documents=[]。
-  - `test_load_manifest_with_sha256_batch20`：sha256 必须 64 位 hex。修法：用 64 位 hex 字符串。
-- 同时清理了文档字符串里的 `\ ` 转义警告（SyntaxWarning: invalid escape sequence '\ '）。
-- 修复后：154 全通过。
+- 0 fail 首次跑（101 全通过）。
 
 ### 测试基线
 - main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
-- 本 worktree（Round 461 后）：55841 pass / 0 fail / 19 skip（HEAD `f3c7edc`）
+- 本 worktree（Round 462 后）：55942 pass / 0 fail / 19 skip（HEAD `67cb0ab`）
 
 ### 下一步建议
 - 候选：
-  - evaluation/schema.py 第三十九轮
-  - evaluation/annotation_metrics.py 第四十七轮
   - evaluation/metrics.py 第四十九轮
   - evaluation/report.py 第三十七轮
   - evaluation/runner.py 第五十轮
   - evaluation/cli.py 第四十九轮
+  - evaluation/schema.py 第三十九轮
+  - evaluation/manifest.py 第四十八轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：manifest.py edges47 已饱和（_is_absolute_like 10 + _has_backslash 7 + _resolve 10 + _detect 6 + 3 dataclass 深入 + 16 load_manifest）。下一轮选 evaluation/annotation_metrics.py 第四十七轮，覆盖 figure_caption_prf / chunk_boundary_prf 算法更深入。
+**建议**：annotation_metrics.py edges47 已饱和（figure_caption 7 + chunk_boundary 边界 7 + 算法 7 + missing 4 + tolerance 5 + 常量 3）。下一轮选 evaluation/metrics.py 第四十九轮，进一步覆盖 compute_automatic_metrics 更深的边界。
+
+---
 
 ---
 
