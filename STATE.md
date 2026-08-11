@@ -4,6 +4,45 @@
 
 ---
 
+## Round 427 — evaluation/annotation_metrics.py 第四十二轮（92 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第四十二轮 edges 测试，覆盖 edges41 未触及的角度：**figure_caption_prf 边界第十五批**（document None / annotation None / 都 None / 独立性 / 常量引用一致 / 多次一致 / 空 dict）；**chunk_boundary_prf 边界第十五批**（都 None / chunks 空 list / anchors 含 None 抛 AttributeError / Unicode 全角 / 混合 position / 高容差全员命中 / 容差 0 严格 / 容差 0 mismatch）；**chunk_boundary_prf 算法第十五批**（重复 marker 顺序 / 3 chunks 2 边界 / 单 chunk 无边界 / missing marker / 空 marker 视为 missing / 2 anchors 1 预测）；**PARSER_DOES_NOT_EMIT_RELATIONS 第十五批**（值 / str 类型 / 模块属性 / 在 __all__ / 不可变）；**module source forbidden tokens 第二十三批**；**module source 字符串精确补强第二十批**；**signatures 第二十批**；**module 合理性第二十批**；**端到端集成第二十批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges42.py`（92 测试）
+
+### 覆盖要点
+- **figure_caption_prf 边界第十五批**：7 测试
+- **chunk_boundary_prf 边界第十五批**：9 测试
+- **chunk_boundary_prf 算法第十五批**：6 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第十五批**：5 测试
+- **module source forbidden tokens 第二十三批**：16 测试
+- **module source 字符串精确补强第二十批**：24 测试
+- **signatures 第二十批**：7 测试
+- **module 合理性第二十批**：9 测试
+- **端到端集成第二十批**：10 测试（含 5-case parametrize）
+
+### 撞墙记录
+- 首次跑：92 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 427 后）：51923 pass / 0 fail / 19 skip（HEAD `106f86c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第三十四轮
+  - evaluation/metrics.py 第四十四轮
+  - evaluation/report.py 第三十二轮
+  - evaluation/runner.py 第四十五轮
+  - evaluation/cli.py 第四十四轮
+  - evaluation/manifest.py 第四十三轮
+  - evaluation/annotation_metrics.py 第四十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 426 — evaluation/manifest.py 第四十二轮（139 测试）
 
 ### 目标
