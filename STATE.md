@@ -4,6 +4,46 @@
 
 ---
 
+## Round 431 — evaluation/runner.py 第四十五轮（91 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第四十五轮 edges 测试，覆盖 edges42 未触及的角度：**_load_annotation 行为深度第十六批**（None / 不存在 / 目录 / BOM / 多行 JSON / 大文件 / 返回类型 / OSError / JSONDecodeError / list JSON）；**_process_one 行为深度第十六批**（5-tuple / image_dir 用 helper / unlink OSError 静默 / errors 多个取第 1 / no errors no document unknown / total_seconds 非负 / parser_version 透传 / image_dir None when document None）；**run_evaluation 行为深度第十六批**（report 6 keys / per_doc 公开 4 keys / wall_time 6 keys / parser_version 第一个非空 / max_chars 透传 / 写文件 / json round-trip / parser_name 透传 / tolerance_chars 透传给 chunk_boundary_prf）；**module source forbidden tokens 第二十六批**；**module source 字符串精确补强第二十三批**；**signatures 第二十三批**；**module 合理性第二十三批**；**端到端集成第二十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges43.py`（91 测试）
+
+### 覆盖要点
+- **_load_annotation 行为深度第十六批**：10 测试
+- **_process_one 行为深度第十六批**：8 测试
+- **run_evaluation 行为深度第十六批**：10 测试
+- **module source forbidden tokens 第二十六批**：16 测试
+- **module source 字符串精确补强第二十三批**：24 测试
+- **signatures 第二十三批**：6 测试
+- **module 合理性第二十三批**：8 测试
+- **端到端集成第二十三批**：10 测试（其中 1 个含 4 case 子断言）
+
+### 撞墙记录
+- 首次跑：1 fail（test_load_annotation_bom_encoded_batch16 期望成功，但 encoding="utf-8" 不剥 BOM，json.load 失败）。修：改期望为返回 None。
+- 二次跑：1 fail（test_run_evaluation_tolerance_chars_in_per_doc_batch16 patch 路径错——应 patch evaluation.runner.chunk_boundary_prf 而非 evaluation.annotation_metrics.chunk_boundary_prf，因为 runner 用 from import 把名字绑定到自身命名空间）。修：改 patch 路径。
+- 三次跑：91 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 431 后）：52393 pass / 0 fail / 19 skip（HEAD `b157f1f`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第四十四轮
+  - evaluation/manifest.py 第四十三轮
+  - evaluation/annotation_metrics.py 第四十三轮
+  - evaluation/schema.py 第三十五轮
+  - evaluation/metrics.py 第四十五轮
+  - evaluation/report.py 第三十三轮
+  - evaluation/runner.py 第四十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 430 — evaluation/report.py 第三十二轮（112 测试）
 
 ### 目标
