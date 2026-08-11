@@ -4,6 +4,47 @@
 
 ---
 
+## Round 437 — evaluation/report.py 第三十三轮（130 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第三十三轮 edges 测试，覆盖 edges32 未触及的角度：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 元组深度第十六批**（顺序 / 唯一性 / 不重叠 / 不含 silent_drop_count / 不含 element_count_by_type / 不含 error_code / 不含 figure_caption_*）；**get_git_provenance 行为深度第十六批**（returncode=128 / stdout 含非 ASCII / Empty stdout / OSError / SubprocessError / timeout / dirty 仅空白 / dirty 含 paths / 两次 subprocess 调用）；**get_dependency_versions 行为深度第十六批**（三个固定 key / 值类型 / 多次一致 / dict 可序列化 / PackageNotFound / 未知异常）；**build_provenance 字段深度第十六批**（max_chars str/float 强转 / parser_name 任意 / parser_version None / dependencies 嵌套 dict / 9 keys / timestamp 可解析）；**build_devset_section 字段深度第十六批**（manifest 任意属性 / 6 keys / 不修改 / 空categories / 0 counts）；**aggregate_summary 行为深度第十六批**（空 list / 全 counts None / success_rate total=0 / 单 participant / not_evaluated / silent_drop partial / 4 sections）；**module source forbidden tokens 第三十二批**；**module source 字符串精确补强第二十九批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges33.py`（130 测试）
+
+### 覆盖要点
+- **元组深度第十六批**：16 测试
+- **get_git_provenance 第十六批**：10 测试
+- **get_dependency_versions 第十六批**：9 测试
+- **build_provenance 第十六批**：10 测试
+- **build_devset_section 第十六批**：7 测试
+- **aggregate_summary 第十六批**：14 测试
+- **module source forbidden tokens 第三十二批**：17 测试（含 subprocess / no_network）
+- **module source 字符串精确补强第二十九批**：23 测试
+- **signatures 第二十九批**：6 测试
+- **module 合理性第二十九批**：10 测试
+- **端到端集成第二十九批**：10 测试
+
+### 撞墙记录
+- 首次跑：130 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 437 后）：53108 pass / 0 fail / 19 skip（HEAD `e555695`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第四十六轮
+  - evaluation/cli.py 第四十五轮
+  - evaluation/manifest.py 第四十四轮
+  - evaluation/annotation_metrics.py 第四十四轮
+  - evaluation/schema.py 第三十六轮
+  - evaluation/metrics.py 第四十六轮
+  - evaluation/report.py 第三十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 436 — evaluation/metrics.py 第四十五轮（170 测试）
 
 ### 目标
