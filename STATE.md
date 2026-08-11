@@ -4,6 +4,51 @@
 
 ---
 
+## Round 489 — evaluation/manifest.py 第五十一轮（136 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第五十一轮 edges 测试，覆盖 edges50 未触及的角度：**_is_absolute_like 第二十四批**（空 / 单字符 / 仅盘符无 slash / drive+slash / 大小写盘符 / 反斜杠 / ./ 与 ../ 不算绝对）；**_has_backslash 第二十四批**（空 / 单 / 多 / 开头 / 末尾 / 仅正斜杠）；**_resolve_relative_path 第二十四批**（空 / 绝对 / 反斜杠 / 越界 / 合法 / 嵌套 / ./ 不抛 / 字段名错误消息 / idempotent / 返回 Path / resolved absolute）；**_detect_project_root 第二十四批**（返回 Path / 目录输入 / 文件输入 / 嵌套选最近 / 无 pyproject fallback / resolved）；**Manifest properties 第二十四批**（file_count / pdf_count / docx_count / content_group_count unpaired/paired/mixed / categories_covered sorted+unique / frozen / hashable）；**DocumentEntry 第二十四批**（必填 / equality / inequality / hashable / categories tuple / frozen / expectations None / annotation_resolved None / path_str 保留）；**ExpectedFailure 第二十四批**（source_type None / 显式 / frozen / hashable / equality / 必填）；**load_manifest 第二十四批**（文件不存在 / JSON 失败 / version 不兼容 / 合法空 / str path / default project_root / devset_status 透传 / documents 解析 / expected_failures 解析 / 绝对路径拒 / 反斜杠拒 / annotation_file resolved / 返回 Manifest）；**module source forbidden tokens 第三十九批**；**module source 字符串精确补强第三十五批**；**signatures 第三十五批**；**module 合理性第三十五批**；**端到端集成第三十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges51.py`（136 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第二十四批**：12 测试
+- **_has_backslash 第二十四批**：7 测试
+- **_resolve_relative_path 第二十四批**：12 测试
+- **_detect_project_root 第二十四批**：6 测试
+- **Manifest properties 第二十四批**：12 测试
+- **DocumentEntry 第二十四批**：9 测试
+- **ExpectedFailure 第二十四批**：7 测试
+- **load_manifest 第二十四批**：14 测试
+- **module source forbidden tokens 第三十九批**：17 测试
+- **module source 字符串精确补强第三十五批**：15 测试
+- **signatures 第三十五批**：8 测试
+- **module 合理性第三十五批**：12 测试
+- **端到端集成第三十五批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fails，136 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 489 后）：59445 pass / 0 fail / 22 skip（HEAD `f84c8f9`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第五十一轮
+  - evaluation/metrics.py 第五十三轮
+  - evaluation/report.py 第四十一轮
+  - evaluation/runner.py 第五十四轮
+  - evaluation/cli.py 第五十三轮
+  - evaluation/schema.py 第四十三轮
+  - evaluation/manifest.py 第五十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges51 已饱和（_is_absolute_like/_has_backslash/_resolve_relative_path/_detect_project_root/Manifest/DocumentEntry/ExpectedFailure/load_manifest 全检 + 17 forbidden tokens + 15 source + 8 signatures + 12 sanity + 7 e2e）。下一轮选 evaluation/annotation_metrics.py 第五十一轮，覆盖 figure_caption_prf/chunk_boundary_prf/PARSER_DOES_NOT_EMIT_RELATIONS 第二十四批未触及角度。
+
+---
+
 ## Round 488 — evaluation/schema.py 第四十二轮（122 测试）
 
 ### 目标
