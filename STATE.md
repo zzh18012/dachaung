@@ -4,6 +4,56 @@
 
 ---
 
+## Round 477 — evaluation/metrics.py 第五十一轮（190 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（382 行）加第五十一轮 edges 测试，覆盖 edges48 未触及的角度：**构造子第二十三批**（_null/_ratio/_bool_metric/_int_metric 各类型 / idempotent / int→float / bool→truthy）；**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十三批**（tuple 类型 / 数量 / subset / 排除 image / 各项内容）；**_strip_unicode_whitespace 第二十三批**（NBSP / em space / en space / ideographic space / line sep / paragraph sep / 全空白 / 无空白 / 空串 / 纯数字 / 混合）；**compute_automatic_metrics 第二十三批**（error overrides / error_code 字段 / schema_valid 异常 / doc=None 全 null / element_count_by_type 不同 type / 缺 type 字段 → 'unknown'）；**_pdf_locator_ratio 第二十三批**（page=1 valid / page=0 invalid / float page / str page / paragraph+valid bbox / paragraph+invalid bbox / no locator / locator None / negative page / no elements）；**_docx_locator_ratio 第二十三批**（paragraph_index valid / page 拒 / bbox 拒 / 无 structural key / mixed / section valid / no elements）；**_is_valid_bbox 第二十三批**（科学计数法 / 负数 / 0 / 大数 / mix int+float / None / str / 空 list / 5 项 / 返回 bool）；**_image_resource_ratio 第二十三批**（no_image_elements / 空 path / 缺 path / 不存在 / 文件存在 / size=0 / image_base_dir 帮助找到 / partial valid）；**_chunk_reference_ratio 第二十三批**（no chunks / empty elements / all valid / all invalid / partial / 缺 ids key / 空 ids / 多 ids / 多 ids 部分无效）；**_text_preservation 第二十三批**（重复字符 / 顺序变化 / 中文 / emoji / image 排除 / chunk 多 / chunk 少 / expected 空 / actual 空 / 3 keys 返回）；**_heading_boundary_ratio 第二十三批**（no heading / perfect / no chunks / partial / heading 不在首位 / heading 无 element_id / 多 heading 多 chunk）；**_silent_drop_count 第二十三批**（no expectations / empty expectations / empty key / perfect / drop / actual 多于 expected / multiple types / unknown type / int value）；**module source forbidden tokens 第三十八批**；**module source 字符串精确补强第三十四批**；**signatures 第三十四批**；**module 合理性第三十四批**；**端到端集成第三十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges49.py`（190 测试）
+
+### 覆盖要点
+- **构造子第二十三批**：13 测试
+- **_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十三批**：15 测试
+- **_strip_unicode_whitespace 第二十三批**：12 测试
+- **compute_automatic_metrics 第二十三批**：7 测试
+- **_pdf_locator_ratio 第二十三批**：10 测试
+- **_docx_locator_ratio 第二十三批**：7 测试
+- **_is_valid_bbox 第二十三批**：10 测试
+- **_image_resource_ratio 第二十三批**：8 测试
+- **_chunk_reference_ratio 第二十三批**：9 测试
+- **_text_preservation 第二十三批**：10 测试
+- **_heading_boundary_ratio 第二十三批**：7 测试
+- **_silent_drop_count 第二十三批**：10 测试
+- **module source forbidden tokens 第三十八批**：17 测试
+- **module source 字符串精确补强第三十四批**：15 测试
+- **signatures 第三十四批**：6 测试
+- **module 合理性第三十四批**：12 测试
+- **端到端集成第三十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_text_preservation_empty_expected_only_batch23`：误以为 precision 在 expected 空时是 None；实际 precision 分母=|actual|（非 0），所以 precision=0.0；只有 recall 分母=|expected|=0 才 null。修法：调整断言。
+- 修复后：190 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 477 后）：57881 pass / 0 fail / 20 skip（HEAD `8a045aa`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第三十九轮
+  - evaluation/runner.py 第五十二轮
+  - evaluation/cli.py 第五十一轮
+  - evaluation/schema.py 第四十一轮
+  - evaluation/manifest.py 第五十轮
+  - evaluation/annotation_metrics.py 第五十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges49 已饱和（构造子 + 7 类 type 常量 + 12 个 ratio 函数全检）。下一轮选 evaluation/report.py 第三十九轮，覆盖 _RATIO_METRICS / aggregate_summary 更多边界。
+
+---
+
 ## Round 476 — evaluation/annotation_metrics.py 第四十九轮（109 测试）
 
 ### 目标
