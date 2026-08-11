@@ -4,6 +4,48 @@
 
 ---
 
+## Round 497 — evaluation/annotation_metrics.py 第五十二轮（86 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第五十二轮 edges 测试，覆盖 edges51 未触及的角度：**figure_caption_prf 第二十五批**（3 keys 顺序 / value dict 2 keys / 不读 chunks / 不读 annotation pairs / 多次返回独立 dict / value None 但 reason 非 None / 双 dict 输入 / 无 mutation）；**chunk_boundary_prf 第二十五批**（3 chunks 单中间边界 / anchor position 默认 after / marker 含空格 / marker 等于 chunk text / tolerance=1 严格 / predicted 等于 gt / 空 anchors / 空 chunks / chunk 无 text / 多空格 normalize / unicode / f1 zero branch / tolerance_chars 记录 / _missing_markers 条件存在 / annotation 无 anchors key / 无 mutation）；**PARSER_DOES_NOT_EMIT_RELATIONS 第二十五批**（自等 / 在 __all__ / hashable / value / type str / immutable）；**module source forbidden tokens 第四十一批**；**module source 字符串精确补强第三十七批**；**signatures 第三十七批**；**module 合理性第三十七批**；**端到端集成第三十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges52.py`（86 测试）
+
+### 覆盖要点
+- **figure_caption_prf 第二十五批**：8 测试
+- **chunk_boundary_prf 第二十五批**：19 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第二十五批**：6 测试
+- **module source forbidden tokens 第四十一批**：16 测试
+- **module source 字符串精确补强第三十七批**：15 测试
+- **signatures 第三十七批**：8 测试
+- **module 合理性第三十七批**：7 测试
+- **端到端集成第三十七批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_chunk_boundary_annotation_dict_without_anchors_key_batch25`：误用空 dict `{}` 作为 annotation。实际：`if not annotation:` 早返回 no_annotation（空 dict 是 falsy）。修法：用 `{"other_field": "value"}`（非空 dict）绕过早返回，进入 anchors=[] 分支。
+- 修复后：86 全通过；全量回归 60312 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 497 后）：60312 pass / 0 fail / 22 skip（HEAD `822e56d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第五十四轮
+  - evaluation/report.py 第四十二轮
+  - evaluation/runner.py 第五十五轮
+  - evaluation/cli.py 第五十四轮
+  - evaluation/schema.py 第四十四轮
+  - evaluation/manifest.py 第五十三轮
+  - evaluation/annotation_metrics.py 第五十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges52 已饱和（8 + 19 + 6 + 16 + 15 + 8 + 7 + 7）。下一轮选 evaluation/metrics.py 第五十四轮。
+
+---
+
 ## Round 496 — evaluation/manifest.py 第五十二轮（114 测试）
 
 ### 目标
