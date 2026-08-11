@@ -4,6 +4,51 @@
 
 ---
 
+## Round 495 — evaluation/schema.py 第四十三轮（109 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第四十三轮 edges 测试，覆盖 edges42 未触及的角度：**SCHEMAS_DIR 第二十三批**（drive / parent.name / 三 schema 文件大小 > 0 / 目录非空 / 可哈希 / 不在 tmp / 在项目根下 / evaluation/ 下无 schemas/）；**EvalSchemaError 第二十三批**（str/repr / errors default 不共享 / args / dict 引用 / raise/except / Exception 捕获 / errors 始终 list / message 通过 args[0]）；**_schema_path 第二十三批**（返回类型 / 一致性 / str 含 schemas / 以 .json 结尾 / 不存在 message 含文件名 / 目录非 file / 文件名含空格）；**load_schema 第二十三批**（返回 dict / type=object / properties 字段 / 不修改源文件 / 幂等 / 未知 name 抛 FileNotFoundError / 三个 schema 都可加载且互异）；**validate 第二十三批**（未知 schema_name 透传 / 空 dict 校验 manifest / 成功返回 None / 不修改 instance / errors 是新 list / errors[i] 含 path/message/schema_path / list/string instance 抛错 / message 含计数 / message 含 schema_name）；**validate_file 第二十三批**（str/Path 等价 / 不存在 message 含路径 / 不修改文件 / BOM 抛 JSONDecodeError / 大文件可加载 / 非 JSON / 空文件 / UTF-16）；**module source forbidden tokens 第四十一批**；**module source 字符串精确补强第三十七批**；**signatures 第三十七批**；**module 合理性第三十七批**；**端到端集成第三十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges43.py`（109 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 第二十三批**：10 测试
+- **EvalSchemaError 第二十三批**：9 测试
+- **_schema_path 第二十三批**：7 测试
+- **load_schema 第二十三批**：7 测试
+- **validate 第二十三批**：12 测试
+- **validate_file 第二十三批**：8 测试
+- **module source forbidden tokens 第四十一批**：16 测试
+- **module source 字符串精确补强第三十七批**：15 测试
+- **signatures 第三十七批**：8 测试
+- **module 合理性第三十七批**：10 测试
+- **端到端集成第三十七批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_validate_file_large_payload_batch23`：误以为 manifest 的 document 含 `category` 字段。实际 schema 严格 additionalProperties=false，document 只允许 doc_id/path/source_type/sha256/categories/paired_with/annotation_file/expectations。修法：去掉 `category`。
+- 修复后：109 全通过；全量回归 60112 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 495 后）：60112 pass / 0 fail / 22 skip（HEAD `1282e06`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第五十二轮
+  - evaluation/annotation_metrics.py 第五十二轮
+  - evaluation/metrics.py 第五十四轮
+  - evaluation/report.py 第四十二轮
+  - evaluation/runner.py 第五十五轮
+  - evaluation/cli.py 第五十四轮
+  - evaluation/schema.py 第四十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges43 已饱和（10 + 9 + 7 + 7 + 12 + 8 + 16 + 15 + 8 + 10 + 7）。下一轮选 evaluation/manifest.py 第五十二轮或 evaluation/annotation_metrics.py 第五十二轮。
+
+---
+
 ## Round 494 — evaluation/cli.py 第五十三轮（104 测试）
 
 ### 目标
