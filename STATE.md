@@ -4,6 +4,49 @@
 
 ---
 
+## Round 435 — evaluation/schema.py 第三十五轮（106 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第三十五轮 edges 测试，覆盖 edges34 未触及的角度：**SCHEMAS_DIR 常量深度第十五批**（resolved absolute / 三个 schema 文件 / parent 含 pyproject / 含 evaluation/ / 含 app/ / str endswith /schemas）；**EvalSchemaError 行为深度第十五批**（默认 init 必传 message / pickle / errors 复用同 list / is subclass / caught as Exception）；**load_schema 行为深度第十五批**（properties 存在 / 返回 dict / idempotent / distinct / dot prefix 也可解析）；**validate 行为深度第十五批**（成功返回 None / 多错误全捕获 / 未知 schema 抛 FileNotFoundError / 不修改 instance / 空 dict / message format / errors keys 正确）；**validate_file 行为深度第十五批**（utf-8 / Unicode / 返回 None / 多次调用 idempotent / invalid schema name）；**_schema_path 行为深度第十五批**（str concat / Path instance / 完整路径 / 空字符串 / message format / 三个 schema 全 valid）；**module source forbidden tokens 第三十批**（含 no_subprocess 验证）；**module source 字符串精确补强第二十七批**；**signatures 第二十七批**；**module 合理性第二十七批**；**端到端集成第二十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges35.py`（106 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 常量深度第十五批**：6 测试
+- **EvalSchemaError 行为深度第十五批**：7 测试
+- **load_schema 行为深度第十五批**：8 测试
+- **validate 行为深度第十五批**：7 测试
+- **validate_file 行为深度第十五批**：5 测试
+- **_schema_path 行为深度第十五批**：6 测试
+- **module source forbidden tokens 第三十批**：17 测试（含 no_subprocess）
+- **module source 字符串精确补强第二十七批**：22 测试
+- **signatures 第二十七批**：7 测试
+- **module 合理性第二十七批**：10 测试
+- **端到端集成第二十七批**：11 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_eval_schema_error_default_init_batch15 期望不传 message 也能实例化，但实际 `__init__` 要求 message 必传）。修：改成期望 TypeError。
+- 二次跑：1 fail（test_load_schema_dot_prefix_batch15 期望 FileNotFoundError，但 Path 拼接会规范化 `./`）。修：改成期望返回 dict。
+- 三次跑：106 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 435 后）：52808 pass / 0 fail / 19 skip（HEAD `01ecadb`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第四十五轮
+  - evaluation/report.py 第三十三轮
+  - evaluation/runner.py 第四十六轮
+  - evaluation/cli.py 第四十五轮
+  - evaluation/manifest.py 第四十四轮
+  - evaluation/annotation_metrics.py 第四十四轮
+  - evaluation/schema.py 第三十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 434 — evaluation/annotation_metrics.py 第四十三轮（92 测试）
 
 ### 目标
