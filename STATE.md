@@ -4,6 +4,50 @@
 
 ---
 
+## Round 475 — evaluation/manifest.py 第四十九轮（138 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第四十九轮 edges 测试，覆盖 edges48 未触及的角度：**_is_absolute_like 第二十二批**（空字符串 / 仅盘符无分隔符 / 数字盘符 / 大小写 / 多斜杠 / 中间冒号）；**_has_backslash 第二十二批**（空 / 单字母 / 中间 / 末尾 / 多个 / 混合）；**_resolve_relative_path 第二十二批**（'a/./b' / 多级子目录 / 空路径 / unresolved project_root / 'a/..' / 三斜杠 / .hidden 文件名）；**_detect_project_root 第二十二批**（多 pyproject 选最近 / 向上走完 / 绝对路径 / symlink 路径）；**Manifest properties 第二十二批**（self-pair / 全 unpaired / 空 docs / categories 排序 / categories dedup / file_count 0 / pdf_count 全 docx / Manifest frozen）；**DocumentEntry 第二十二批**（hashable / frozen / 字段数 10 / 字段名顺序）；**ExpectedFailure 第二十二批**（字段类型 / source_type optional / 不等性）；**load_manifest 第二十二批**（空文件 / 纯空白 / list 顶层 / 额外字段 / 缺 devset_status / 错误 devset_status / 多 categories / field_name 在错误消息内 / required_markers / frozen）；**module source forbidden tokens 第三十七批**；**module source 字符串精确补强第三十三批**；**signatures 第三十三批**；**module 合理性第三十三批**；**端到端集成第三十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges49.py`（138 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第二十二批**：11 测试
+- **_has_backslash 第二十二批**：8 测试
+- **_resolve_relative_path 第二十二批**：8 测试
+- **_detect_project_root 第二十二批**：4 测试
+- **Manifest properties 第二十二批**：9 测试
+- **DocumentEntry 第二十二批**：8 测试
+- **ExpectedFailure 第二十二批**：6 测试
+- **load_manifest 第二十二批**：12 测试
+- **module source forbidden tokens 第三十七批**：17 测试
+- **module source 字符串精确补强第三十三批**：15 测试
+- **signatures 第三十三批**：6 测试
+- **module 合理性第三十三批**：12 测试
+- **端到端集成第三十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fails，138 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 475 后）：57582 pass / 0 fail / 20 skip（HEAD `4816f1c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第四十九轮
+  - evaluation/metrics.py 第五十一轮
+  - evaluation/report.py 第三十九轮
+  - evaluation/runner.py 第五十二轮
+  - evaluation/cli.py 第五十一轮
+  - evaluation/schema.py 第四十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges49 已饱和（路径校验 + 数据类 frozen + load_manifest 错误路径全检）。下一轮选 evaluation/annotation_metrics.py 第四十九轮，覆盖 figure_caption_prf / chunk_boundary_prf 的更多边界。
+
+---
+
 ## Round 474 — evaluation/schema.py 第四十轮（124 测试）
 
 ### 目标
