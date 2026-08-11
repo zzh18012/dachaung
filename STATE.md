@@ -4,6 +4,48 @@
 
 ---
 
+## Round 445 — evaluation/runner.py 第四十七轮（73 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第四十七轮 edges 测试，覆盖 edges44 未触及的角度：**_load_annotation 行为深度第十七批**（str path / Path 对象 / Unicode 文件名 / 0 字节文件 JSON 解析失败 → None / 多次调用幂等 / nested dict / array / 传目录返回 None）；**_process_one 行为深度第十七批**（output_root 不存在自动创建 / doc_id 含空格 / doc_id Unicode / image_output_dir_for 调用参数 (out_stub, source_hash) / process_single 抛异常传播 / 返回 5-tuple / elapsed 非负）；**run_evaluation 行为深度第十七批**（manifest.project_root 透传 build_provenance / 多个 expected_failures / report_version == REPORT_VERSION 常量 / 只写一个 json 不污染 working dir / 多个 documents 顺序保留 / summary section 含 counts+success_rates / per_doc metrics ≥14 / output_path parent 不存在自动建）；**module source forbidden tokens 第三十一批**（pty.spawn/commands.getoutput/paramiko/fabric.api/ftplib/smtplib/telnetlib/webbrowser.open/socket.socket/asyncio.open_connection/multiprocessing.Process/threading.Thread/ctypes.CDLL/pickle.dumps/shutil.rmtree/sys.exit + no subprocess + no network）；**module source 字符串精确补强第二十七批**（from __future__ import annotations / 评测 runner docstring / import time/json/Path/typing/Any/pipeline/annotation_metrics/metrics/report/run_evaluation/__all__）；**signatures 第二十七批**（_load_annotation 1 param / _process_one 4 params / run_evaluation 5 params 含 keyword_only + defaults）；**module 合理性第二十七批**（__all__ 1 entry / callable / 不 import pickle/marshal/shelve / 不反向依赖 evaluation.cli）；**端到端集成第二十七批**（full round trip / load_annotation round trip / valid JSON / returns == file / expected_failure happy / devset section / 空 manifest）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges45.py`（73 测试）
+
+### 覆盖要点
+- **_load_annotation 第十七批**：8 测试
+- **_process_one 第十七批**：7 测试
+- **run_evaluation 第十七批**：9 测试
+- **module source forbidden tokens 第三十一批**：18 测试
+- **module source 字符串精确补强第二十七批**：13 测试
+- **signatures 第二十七批**：5 测试
+- **module 合理性第二十七批**：7 测试
+- **端到端集成第二十七批**：8 测试
+
+### 撞墙记录
+- 首次跑：1 fail
+  - `test_run_evaluation_uses_project_root_for_provenance_batch17`：`build_provenance` 用 kwargs 调用而非位置参数，`args` 是空 tuple → IndexError。修法：用 `kwargs.get("project_root") == tmp_path or (args and args[0] == tmp_path)`。
+- 修复后：73 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 445 后）：53978 pass / 0 fail / 19 skip（HEAD `9facb2f`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第四十六轮
+  - evaluation/manifest.py 第四十五轮
+  - evaluation/annotation_metrics.py 第四十五轮
+  - evaluation/schema.py 第三十七轮
+  - evaluation/metrics.py 第四十七轮
+  - evaluation/report.py 第三十五轮
+  - evaluation/runner.py 第四十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges45 已饱和（_load_annotation 8 + _process_one 7 + run_evaluation 9 + 端到端 8）。下一轮选 evaluation/cli.py 第四十六轮，覆盖 argparse 子命令 / Namespace / _choices_actions / build_parser 等行为深度。
+
+---
+
 ## Round 444 — evaluation/report.py 第三十四轮（107 测试）
 
 ### 目标
