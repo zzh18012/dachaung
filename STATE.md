@@ -4,6 +4,51 @@
 
 ---
 
+## Round 502 — evaluation/schema.py 第四十四轮（107 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第四十四轮 edges 测试，覆盖 edges43 未触及的角度：**EvalSchemaError 第二十四批**（errors=None 默认 / errors=[] / errors 非空 / tuple 接受 / message str 透传 / 继承 Exception / raise/catch / args / repr / errors 默认是 list / args[0] / Exception catch）；**_schema_path 第二十四批**（返回 Path / 不存在 FileNotFoundError / parent==SCHEMAS_DIR / 三个 schema 都可加载 / 复杂名 / 目录非 file / SCHEMAS_DIR 常量值 / SCHEMAS_DIR 是目录 / 含三个 schema 文件）；**load_schema 第二十四批**（dict 返回 / 含 schema 关键字 / 幂等 / 缺失抛 / 非法 JSON / 三 schema 可加载 / 各 schema 有 properties / utf-8 编码）；**validate 第二十四批**（成功 None / 失败抛 EvalSchemaError / message 含数量 / errors list / errors 三 key / path list / schema_path list / message str / 多错误计数 / 排序 / head error message）；**validate_file 第二十四批**（str path 接受 / Path 接受 / 缺失抛 / 非法 JSON 抛 / 内容非法抛 / 空文件抛 / 目录抛 / utf-8 unicode）；**module source forbidden tokens 第四十二批**；**module source 字符串精确补强第三十八批**；**signatures 第三十八批**；**module 合理性第三十八批**；**端到端集成第三十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges44.py`（107 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第二十四批**：12 测试
+- **_schema_path 第二十四批**：9 测试
+- **load_schema 第二十四批**：10 测试
+- **validate 第二十四批**：11 测试
+- **validate_file 第二十四批**：8 测试
+- **module source forbidden tokens 第四十二批**：15 测试
+- **module source 字符串精确补强第三十八批**：12 测试
+- **signatures 第三十八批**：9 测试
+- **module 合理性第三十八批**：13 测试
+- **端到端集成第三十八批**：8 测试
+
+### 撞墙记录
+- 首次跑：2 fails（逐个修复）：
+  - `test_schemas_dir_constant_value_batch24`：误算 path 深度，多加了一层 .parent。实际：test 文件在 tests/ → parent=tests/，parent.parent=项目根。修法：去掉一层 .parent。
+  - `test_module_source_contains_errors_default_none_batch24`：误断言 `errors=None` 在源码。实际签名是 `errors: list[dict[str, Any]] | None = None`（带 annotation）。修法：改为 `= None` 且 `errors` 都在源码。
+- 修复后：107 全通过；全量回归 60872 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 502 后）：60872 pass / 0 fail / 22 skip（HEAD `ca1669a`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第五十三轮
+  - evaluation/annotation_metrics.py 第五十三轮
+  - evaluation/metrics.py 第五十五轮
+  - evaluation/report.py 第四十三轮
+  - evaluation/runner.py 第五十六轮
+  - evaluation/cli.py 第五十五轮
+  - evaluation/schema.py 第四十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges44 已饱和。下一轮选 evaluation/manifest.py 第五十三轮。
+
+---
+
 ## Round 501 — evaluation/cli.py 第五十四轮（113 测试）
 
 ### 目标
