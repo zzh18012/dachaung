@@ -4,6 +4,51 @@
 
 ---
 
+## Round 481 — evaluation/schema.py 第四十一轮（129 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第四十一轮 edges 测试，覆盖 edges40 未触及的角度：**SCHEMAS_DIR 第二十一批**（绝对路径 / parent 是 absolute / basename / exists / 含 manifest/annotation/evaluation-report schema / resolve canonical / str 末尾 / sibling to evaluation/）；**EvalSchemaError 第二十一批**（errors None 默认 [] / errors=[] / errors 保留引用 / Exception 子类 / str/repr / raise/except / args）；**_schema_path 第二十一批**（返回 Path / 文件存在 / 在 SCHEMAS_DIR 内 / FileNotFoundError 含文件名 / 接受 str / 多次一致 / 目录名拒）；**load_schema 第二十一批**（返回 dict / $schema 字段 / properties / 多次等价 / 不存在抛 / annotation type / evaluation-report properties）；**validate 第二十一批**（合法通过 / 非法抛 / errors count / 3 keys 严格 / message 含 schema_name / 含"处" / 不修改 instance / 排序 / None 返回）；**validate_file 第二十一批**（str/Path 等价 / FileNotFoundError / JSONDecodeError / EvalSchemaError / 内部调 validate / 多次一致 / UTF-8 中文）；**module source forbidden tokens 第三十七批**；**module source 字符串精确补强第三十三批**；**signatures 第三十三批**；**module 合理性第三十三批**；**端到端集成第三十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges41.py`（129 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 第二十一批**：10 测试
+- **EvalSchemaError 第二十一批**：10 测试
+- **_schema_path 第二十一批**：8 测试
+- **load_schema 第二十一批**：7 测试
+- **validate 第二十一批**：9 测试
+- **validate_file 第二十一批**：9 测试
+- **module source forbidden tokens 第三十七批**：17 测试
+- **module source 字符串精确补强第三十三批**：15 测试
+- **signatures 第三十三批**：7 测试
+- **module 合理性第三十三批**：12 测试
+- **端到端集成第三十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails：
+  - `test_validate_file_utf8_with_chinese_batch21`：manifest schema `additionalProperties: false` 不允许 `category` 字段（只允许 `categories` 数组）。修法：sed 把 `"category": "..."` → `"categories": ["..."]`。
+  - `test_e2e_validate_round_trip_annotation_batch21`：annotation schema 字段是 `figure_caption_pairs` + `chunk_boundary_anchors`（不是 `figure_captions` + `chunk_anchors`），且顶层是 `doc_id` 不是 `document_id`。修法：对齐 schema。
+- 修复后：129 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 481 后）：58386 pass / 0 fail / 21 skip（HEAD `161e047`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第五十轮
+  - evaluation/annotation_metrics.py 第五十轮
+  - evaluation/metrics.py 第五十二轮
+  - evaluation/report.py 第四十轮
+  - evaluation/runner.py 第五十三轮
+  - evaluation/cli.py 第五十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges41 已饱和（SCHEMAS_DIR / EvalSchemaError / _schema_path / load_schema / validate / validate_file 全检）。下一轮选 evaluation/manifest.py 第五十轮，覆盖 _is_absolute_like / _has_backslash / _resolve_relative_path / _detect_project_root / Manifest properties / DocumentEntry / ExpectedFailure / load_manifest 第二十二批未触及角度。
+
+---
+
 ## Round 480 — evaluation/cli.py 第五十一轮（121 测试）
 
 ### 目标
