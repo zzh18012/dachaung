@@ -4,6 +4,53 @@
 
 ---
 
+## Round 429 — evaluation/metrics.py 第四十四轮（159 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第四十四轮 edges 测试，覆盖 edges41 未触及的角度：**module 常量第十五批**（_NOT_EVALUATED 值 / _TEXT_TYPES tuple 不可变 / _PDF_BBOX_REQUIRED_TYPES 长度 4 / 子集关系 / 含 caption / 排除 image）；**_null / _ratio / _bool_metric / _int_metric 边界第十五批**（空 reason / Unicode reason / 0.0 / 1.0 / 负值 / float 强转 / bool 强转 / int 强转）；**compute_automatic_metrics 第十五批**（document None + error 非空 / present no error / source_type unknown / 无 expectations / 无 image_base_dir / 不修改 document / 不修改 expectations / 14 keys 准确）；**_strip_unicode_whitespace 第十五批**（NBSP / em space / 全角空格 / line separator / paragraph separator / emoji 保留 / 中文保留 / 空字符串 / 全空白 / NUL 字符）；**_is_valid_bbox 第十五批**（None / 0-length / 5-length / tuple / 4 字符串 / 4 None / 嵌套 list / 4 ints / 4 floats / bool 拒绝 / NaN / Inf）；**_pdf_locator_ratio 第十五批**（no elements / 无 type / page 字符串 / page 0 / page -1 / bbox tuple / 部分合法）；**_docx_locator_ratio 第十五批**（no elements / 含 page / 含 bbox / paragraph_index / section / table indices / 无结构键）；**_image_resource_ratio 第十五批**（no images / 无 resource_path / 空字符串 / 不存在文件 / 存在文件 / image_base_dir 拼接 / 0 字节文件）；**_chunk_reference_ratio 第十五批**（no chunks / 空 ids / 缺引用 / 完美匹配 / 部分匹配）；**_text_preservation 第十五批**（both empty / 完美 / image 排除 / 缺字符 / 多字符 / 顺序不同 / 空白忽略）；**_heading_boundary_ratio 第十五批**（无 heading / chunk 无 ids / 完美匹配 / 部分匹配 / heading 非首）；**_silent_drop_count 第十五批**（无 expectations / 空 / 空 element_count_by_type / actual>expected / 完美 / 多类型 / expected type 缺失）；**module source forbidden tokens 第二十四批**；**module source 字符串精确补强第二十一批**；**signatures 第二十一批**；**module 合理性第二十一批**；**端到端集成第二十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges42.py`（159 测试）
+
+### 覆盖要点
+- **module 常量第十五批**：7 测试
+- **_null / _ratio / _bool_metric / _int_metric 边界第十五批**：12 测试
+- **compute_automatic_metrics 第十五批**：8 测试
+- **_strip_unicode_whitespace 第十五批**：10 测试
+- **_is_valid_bbox 第十五批**：12 测试
+- **_pdf_locator_ratio 第十五批**：7 测试
+- **_docx_locator_ratio 第十五批**：7 测试
+- **_image_resource_ratio 第十五批**：7 测试
+- **_chunk_reference_ratio 第十五批**：5 测试
+- **_text_preservation 第十五批**：7 测试
+- **_heading_boundary_ratio 第十五批**：5 测试
+- **_silent_drop_count 第十五批**：7 测试
+- **module source forbidden tokens 第二十四批**：16 测试
+- **module source 字符串精确补强第二十一批**：24 测试
+- **signatures 第二十一批**：7 测试
+- **module 合理性第二十一批**：8 测试
+- **端到端集成第二十一批**：10 测试
+
+### 撞墙记录
+- 首次跑：159 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 429 后）：52190 pass / 0 fail / 19 skip（HEAD `87a7824`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第三十二轮
+  - evaluation/runner.py 第四十五轮
+  - evaluation/cli.py 第四十四轮
+  - evaluation/manifest.py 第四十三轮
+  - evaluation/annotation_metrics.py 第四十三轮
+  - evaluation/schema.py 第三十五轮
+  - evaluation/metrics.py 第四十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 428 — evaluation/schema.py 第三十四轮（108 测试）
 
 ### 目标
