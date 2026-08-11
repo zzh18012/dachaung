@@ -4,53 +4,50 @@
 
 ---
 
-## Round 457 — evaluation/metrics.py 第四十八轮（156 测试）
+## Round 458 — evaluation/report.py 第三十六轮（134 测试）
 
 ### 目标
-- 给 `evaluation/metrics.py`（381 行）加第四十八轮 edges 测试，覆盖 edges45 未触及的角度：**构造子（_null/_ratio/_bool_metric/_int_metric）行为第十九批**；**_TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES 性质第十九批**；**_strip_unicode_whitespace 第十九批**（form feed / vertical tab / carriage return / null char / emoji ZWJ）；**compute_automatic_metrics 行为第十九批**（pipeline_success 用 is None / error_dict 无 code / schema 异常路径 / image-only / image_base_dir 类型）；**_pdf_locator_ratio 边界第十九批**（page float / negative / string / bool trick / mixed）；**_docx_locator_ratio 边界第十九批**（page None / only page key / only bbox key / only section）；**_is_valid_bbox 第十九批**（tuple 拒绝 / negative numbers / mixed int float / complex / NaN / inf / bool trick）；**_image_resource_ratio 第十九批**（no resource_path / empty string / base_dir fallback / abs path 优先 / OSError swallowed）；**_chunk_reference_ratio 第十九批**（strings/ints/mixed / first unknown / key missing / None ids）；**_text_preservation 第十九批**（content None / chunk text None / image only / reversed text / duplicate chars）；**_heading_boundary_ratio 第十九批**（heading no element_id / first id None / empty string id / dedup）；**_silent_drop_count 第十九批**（expected zero / negative / actual more than expected / mixed types / empty dict）；**module source forbidden tokens 第三十四批**；**module source 字符串精确补强第二十九批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
+- 给 `evaluation/report.py`（201 行）加第三十六轮 edges 测试，覆盖 edges35 未触及的角度：**_RATIO_METRICS/_COUNT_METRICS/_SUCCESS_BOOL_METRICS 行为第十九批**（count exact / first item / no duplicates / pairwise disjoint / 不含 figure_caption / 不含 silent_drop_count / 不含 error_code / 不含 element_count_by_type）；**get_git_provenance 行为第十九批**（commit trimmed / commit None when empty stdout / non-zero returncode / dirty with untracked / empty status / SubprocessError / 调用两次 / cwd str 化）；**get_dependency_versions 行为第十九批**（3 keys / importlib 内部 import / PackageNotFound / generic Exception / 真实 pdfplumber 版本）；**build_provenance 行为第十九批**（9 keys exact / max_chars coerce / negative / parser_name+version passthrough / timestamp parseable / dependencies is dict / 调用 get_git_provenance）；**build_devset_section 行为第十九批**（6 keys exact / status/file_count/categories passthrough / 真实 Manifest dataclass / 额外字段忽略）；**aggregate_summary 行为第十九批**（4 top keys / counts some none / success_rate no docs / success_rate all none / mixed ratio macro / silent_drop negative / extra metrics ignored / order independent）；**module source forbidden tokens 第三十四批**（subprocess 允许）；**module source 字符串精确补强第二十九批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
 
 ### 改动
-- 新增 `tests/test_evaluation_metrics_edges46.py`（156 测试）
+- 新增 `tests/test_evaluation_report_edges36.py`（134 测试）
 
 ### 覆盖要点
-- **构造子第十九批**：15 测试
-- **_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第十九批**：8 测试
-- **_strip_unicode_whitespace 第十九批**：7 测试
-- **compute_automatic_metrics 第十九批**：9 测试
-- **_pdf_locator_ratio 边界第十九批**：7 测试
-- **_docx_locator_ratio 边界第十九批**：7 测试
-- **_is_valid_bbox 第十九批**：9 测试
-- **_image_resource_ratio 第十九批**：6 测试
-- **_chunk_reference_ratio 第十九批**：6 测试
-- **_text_preservation 第十九批**：5 测试
-- **_heading_boundary_ratio 第十九批**：4 测试
-- **_silent_drop_count 第十九批**：5 测试
+- **metric 常量第十九批**：13 测试
+- **get_git_provenance 第十九批**：8 测试
+- **get_dependency_versions 第十九批**：8 测试
+- **build_provenance 第十九批**：12 测试
+- **build_devset_section 第十九批**：8 测试
+- **aggregate_summary 第十九批**：15 测试
 - **module source forbidden tokens 第三十四批**：18 测试
-- **module source 字符串精确补强第二十九批**：13 测试
+- **module source 字符串精确补强第二十九批**：17 测试
 - **signatures 第二十九批**：5 测试
 - **module 合理性第二十九批**：9 测试
 - **端到端集成第二十九批**：7 测试
 
 ### 撞墙记录
-- 首次跑：1 fail
-  - `test_strip_unicode_vertical_tab_batch19`：我误把 "a	vb" 当成 	+"v"+"b"（v 是字母），实际应该是 "a	b"。修法：更正字符串。
-- 修复后：156 全通过。
+- 首次跑：2 fails
+  - `test_get_git_provenance_calls_subprocess_twice_batch19`：subprocess.run 被替换后无 call_count 属性，应该 patch 时存 mock 对象。修法：用 `with patch(...) as mock_run` 后 assert mock_run.call_count。
+  - `test_build_devset_section_with_real_manifest_object_batch19`：Manifest 实际 fields 没有 `annotation_path`，而是 `project_root`。修法：用 project_root=Path('.')。
+- 修复后：134 全通过。
 
 ### 测试基线
 - main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
-- 本 worktree（Round 457 后）：55325 pass / 0 fail / 19 skip（HEAD `3f0c19c`）
+- 本 worktree（Round 458 后）：55459 pass / 0 fail / 19 skip（HEAD `f74e581`）
 
 ### 下一步建议
 - 候选：
-  - evaluation/report.py 第三十六轮
   - evaluation/runner.py 第四十九轮
   - evaluation/cli.py 第四十八轮
   - evaluation/manifest.py 第四十七轮
   - evaluation/schema.py 第三十九轮
   - evaluation/annotation_metrics.py 第四十七轮
+  - evaluation/metrics.py 第四十九轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：metrics.py edges46 已饱和（构造子 15 + 常量 8 + strip 7 + compute 9 + 7 个 ratio/bbox 边界深入）。下一轮选 evaluation/report.py 第三十六轮，覆盖 aggregate_summary / build_provenance / get_dependency_versions 更深入行为。
+**建议**：report.py edges36 已饱和（metric 常量 13 + git provenance 8 + dependency 8 + build_provenance 12 + devset 8 + aggregate 15）。下一轮选 evaluation/runner.py 第四十九轮，覆盖 run_evaluation / _process_one / _load_annotation 更深入行为。
+
+---
 
 ---
 
