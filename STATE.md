@@ -4,6 +4,48 @@
 
 ---
 
+## Round 466 — evaluation/cli.py 第四十九轮（114 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第四十九轮 edges 测试，覆盖 edges47 未触及的角度：**_build_parser 行为深度第二十一批**（RawDescriptionHelpFormatter / run 5 个 optional / validate-report positional / inspect-doc input 必填 / run --manifest/--output 必填 / 缺省子命令 SystemExit / max-chars type=int / 负数）；**_format_metric 行为深度第二十一批**（tuple / 负 float / unicode / 空格 name / 大字典 / 数字字符串 key / None reason / true / false / int 0）；**_run_inspect_doc 行为深度第二十一批**（完整元信息 / 排序顺序 / pipeline_success / chunk_boundary_* / figure_caption_* / metrics 表头 / 返 0 / file: 行 / source_type 默认）；**main 行为深度第二十一批**（调 validate_file / devset_status 打印 / git_dirty / unknown commit / [OK] 打印 / FileNotFoundError / EvalSchemaError / ManifestError / tolerance_chars 透传 / inspect-doc 路由）；**module source forbidden tokens 第三十七批**；**module source 字符串精确补强第三十三批**；**signatures 第三十三批**；**module 合理性第三十三批**；**端到端集成第三十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges48.py`（114 测试）
+
+### 覆盖要点
+- **_build_parser 行为深度第二十一批**：11 测试
+- **_format_metric 行为深度第二十一批**：10 测试
+- **_run_inspect_doc 行为深度第二十一批**：9 测试
+- **main 行为深度第二十一批**：10 测试
+- **module source forbidden tokens 第三十七批**：17 测试
+- **module source 字符串精确补强第三十三批**：16 测试
+- **signatures 第三十三批**：7 测试
+- **module 合理性第三十三批**：10 测试
+- **端到端集成第三十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail
+  - `test_module_no_top_level_code_except_if_main_batch21`：module 顶层有中文 docstring 行（'用法：'），不在允许前缀内。修法：改为只检测 FORBIDDEN_TOKENS 全局变量。
+- 修复后：114 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 466 后）：56410 pass / 0 fail / 19 skip（HEAD `14411a0`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第三十九轮
+  - evaluation/manifest.py 第四十八轮
+  - evaluation/annotation_metrics.py 第四十八轮
+  - evaluation/metrics.py 第五十轮
+  - evaluation/report.py 第三十八轮
+  - evaluation/runner.py 第五十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges48 已饱和（_build_parser 11 + _format_metric 10 + _run_inspect_doc 9 + main 10）。下一轮选 evaluation/schema.py 第三十九轮，深入 load_schema/validate_file 边界（路径 / SCHEMAS_DIR / 异常覆盖）。
+
+---
+
 ## Round 465 — evaluation/runner.py 第五十轮（108 测试）
 
 ### 目标
