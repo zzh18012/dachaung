@@ -4,6 +4,55 @@
 
 ---
 
+## Round 447 — evaluation/manifest.py 第四十五轮（129 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第四十五轮 edges 测试，覆盖 edges44 未触及的角度：**_is_absolute_like 行为深度第十八批**（空 string / 单字符 / 两字符 / 盘符无分隔 / 数字+colon / Unicode alpha / 单 / / ./foo / ../foo / 单 \\）；**_has_backslash 行为深度第十八批**（无 / 单 / 多 / only / 末尾 / 开头 / 空 / 混合）；**_resolve_relative_path 行为深度第十八批**（normal / dot normalized / double-dot normalized / 不修改 root / error field_name in message / error path in message / 返回 Path / outside root / empty / backslash）；**_detect_project_root 行为深度第十八批**（start is file / start is dir / no pyproject fallback cur / finds grandparent / 返回 Path）；**Manifest dataclass 第十八批**（frozen / hashable / equality / 字段数 5 / 字段名顺序 / tuple 类型）；**Manifest properties 第十八批**（file_count empty/docs / pdf_count / docx_count / categories_covered sorts / dedup / content_group_count unpaired / paired / mixed）；**DocumentEntry 第十八批**（frozen / hashable / equality / 字段数 10 / 字段名 / categories tuple）；**ExpectedFailure 第十八批**（frozen / hashable / equality / 字段数 5 / source_type optional）；**load_manifest 行为深度第十八批**（str path / str project_root / not found / invalid JSON / version mismatch / 多 documents / 多 expected_failures / categories default / paired_with / path 绝对 / path backslash / path outside root / 返回 Manifest）；**module source forbidden tokens 第三十二批**；**module source 字符串精确补强第二十八批**；**signatures 第二十八批**；**module 合理性第二十八批**；**端到端集成第二十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges45.py`（129 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第十八批**：10 测试
+- **_has_backslash 第十八批**：8 测试
+- **_resolve_relative_path 第十八批**：10 测试
+- **_detect_project_root 第十八批**：5 测试
+- **Manifest dataclass 第十八批**：7 测试
+- **Manifest properties 第十八批**：9 测试
+- **DocumentEntry 第十八批**：6 测试
+- **ExpectedFailure 第十八批**：5 测试
+- **load_manifest 第十八批**：13 测试
+- **module source forbidden tokens 第三十二批**：18 测试
+- **module source 字符串精确补强第二十八批**：18 测试
+- **signatures 第二十八批**：6 测试
+- **module 合理性第二十八批**：8 测试
+- **端到端集成第二十八批**：8 测试
+
+### 撞墙记录
+- 首次跑：2 fails
+  - `test_load_manifest_version_mismatch_raises_batch18`：schema enum 强制 manifest_version=="1.0"，0.9 在 schema 阶段就抛 EvalSchemaError，不会到 ManifestError 的版本检查。修法：用 `pytest.raises((ManifestError, EvalSchemaError))`。
+  - `test_load_manifest_path_outside_root_rejected_batch18`：documents 的 source_type schema enum 只允许 ['pdf', 'docx']（expected_failures 才有 'txt'/'other'），用 'other' 在 schema 阶段就抛。修法：改用 'pdf'。
+- 修复后：129 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 447 后）：54213 pass / 0 fail / 19 skip（HEAD `67876d9`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第四十五轮
+  - evaluation/schema.py 第三十七轮
+  - evaluation/metrics.py 第四十七轮
+  - evaluation/report.py 第三十五轮
+  - evaluation/runner.py 第四十八轮
+  - evaluation/cli.py 第四十七轮
+  - evaluation/manifest.py 第四十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges45 已饱和（_is_absolute_like 10 + _has_backslash 8 + _resolve_relative_path 10 + dataclass/properties/entries 完整）。下一轮选 evaluation/annotation_metrics.py 第四十五轮，覆盖 figure_caption_prf / chunk_boundary_prf 行为深度。
+
+---
+
 ## Round 446 — evaluation/cli.py 第四十六轮（106 测试）
 
 ### 目标
