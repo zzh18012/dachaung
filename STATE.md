@@ -4,22 +4,27 @@
 
 ---
 
-## Round 456 — evaluation/schema.py 第三十八轮（115 测试）
+## Round 457 — evaluation/metrics.py 第四十八轮（156 测试）
 
 ### 目标
-- 给 `evaluation/schema.py`（81 行）加第三十八轮 edges 测试，覆盖 edges37 未触及的角度：**SCHEMAS_DIR 常量深度第十八批**（resolve idempotent / is_dir / parent has pyproject / glob *.schema.json 后缀稳定 / glob 两次稳定 / parts 含 schemas / 与 app.schema.SCHEMA_PATH 父等）；**EvalSchemaError 行为深度第十八批**（args 携带 message / args 不含 errors / str 不含 errors / errors 始终是 list / equality 基于 args / pickle 往返 / hashable / 嵌套 raise __cause__ / message attr）；**_schema_path 行为深度第十八批**（FileNotFoundError 类型 / message 含 Schema 字 / 拒绝 SCHEMAS_DIR 外路径 / 接受 str / 返回存在文件 / 无缓存 / 返回绝对）；**load_schema 行为深度第十八批**（returns dict / 与磁盘等价 / 不缓存 / 接受短名 / 拒绝无后缀 / 拒绝空串）；**validate 行为深度第十八批**（success 返回 NoneType / 单错误有 path / 多错误全部 / message 含 Schema / first error 与 errors[0] 一致 / 非 dict instance 仍校验 / 不修改 errors）；**validate_file 行为深度第十八批**（str→Path / 不存在抛 FileNotFoundError / JSONDecodeError 不包装 / 与 validate 等价 / 接受 Path / 目录抛错）；**4 个 schema 内容第十八批**（manifest_version 锁 1.0 / evaluation-report required 4 keys / annotation required doc_id+version / document 独立于 evaluation-report）；**module source forbidden tokens 第三十四批**；**module source 字符串精确补强第二十九批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
+- 给 `evaluation/metrics.py`（381 行）加第四十八轮 edges 测试，覆盖 edges45 未触及的角度：**构造子（_null/_ratio/_bool_metric/_int_metric）行为第十九批**；**_TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES 性质第十九批**；**_strip_unicode_whitespace 第十九批**（form feed / vertical tab / carriage return / null char / emoji ZWJ）；**compute_automatic_metrics 行为第十九批**（pipeline_success 用 is None / error_dict 无 code / schema 异常路径 / image-only / image_base_dir 类型）；**_pdf_locator_ratio 边界第十九批**（page float / negative / string / bool trick / mixed）；**_docx_locator_ratio 边界第十九批**（page None / only page key / only bbox key / only section）；**_is_valid_bbox 第十九批**（tuple 拒绝 / negative numbers / mixed int float / complex / NaN / inf / bool trick）；**_image_resource_ratio 第十九批**（no resource_path / empty string / base_dir fallback / abs path 优先 / OSError swallowed）；**_chunk_reference_ratio 第十九批**（strings/ints/mixed / first unknown / key missing / None ids）；**_text_preservation 第十九批**（content None / chunk text None / image only / reversed text / duplicate chars）；**_heading_boundary_ratio 第十九批**（heading no element_id / first id None / empty string id / dedup）；**_silent_drop_count 第十九批**（expected zero / negative / actual more than expected / mixed types / empty dict）；**module source forbidden tokens 第三十四批**；**module source 字符串精确补强第二十九批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
 
 ### 改动
-- 新增 `tests/test_evaluation_schema_edges38.py`（115 测试）
+- 新增 `tests/test_evaluation_metrics_edges46.py`（156 测试）
 
 ### 覆盖要点
-- **SCHEMAS_DIR 第十八批**：7 测试
-- **EvalSchemaError 第十八批**：9 测试
-- **_schema_path 第十八批**：7 测试
-- **load_schema 第十八批**：6 测试
-- **validate 第十八批**：7 测试
-- **validate_file 第十八批**：6 测试
-- **4 个 schema 内容第十八批**：4 测试
+- **构造子第十九批**：15 测试
+- **_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第十九批**：8 测试
+- **_strip_unicode_whitespace 第十九批**：7 测试
+- **compute_automatic_metrics 第十九批**：9 测试
+- **_pdf_locator_ratio 边界第十九批**：7 测试
+- **_docx_locator_ratio 边界第十九批**：7 测试
+- **_is_valid_bbox 第十九批**：9 测试
+- **_image_resource_ratio 第十九批**：6 测试
+- **_chunk_reference_ratio 第十九批**：6 测试
+- **_text_preservation 第十九批**：5 测试
+- **_heading_boundary_ratio 第十九批**：4 测试
+- **_silent_drop_count 第十九批**：5 测试
 - **module source forbidden tokens 第三十四批**：18 测试
 - **module source 字符串精确补强第二十九批**：13 测试
 - **signatures 第二十九批**：5 测试
@@ -27,27 +32,27 @@
 - **端到端集成第二十九批**：7 测试
 
 ### 撞墙记录
-- 首次跑：3 fails
-  - `test_schemas_dir_equals_manifest_module_dir_batch18`：evaluation/manifest.py 没有 SCHEMAS_DIR 常量。修法：改成与 app.schema.SCHEMA_PATH.parent 比较。
-  - `test_evaluation_report_schema_has_required_top_keys_batch18`：evaluation-report.schema.json 实际 required 是 ['report_version', 'provenance', 'devset', 'summary', 'per_doc']，不含 'generated_at'。修法：调整期望 keys。
-  - `test_e2e_validate_with_known_good_manifest_batch18`：manifest schema additionalProperties=false，'category' 字段不允许。修法：去掉 category。
-  - `test_e2e_validate_annotation_known_good_batch18`：annotation schema 实际 properties 不含 expected_element_count/figure_caption_relations/chunk_boundaries（而是 figure_caption_pairs 等）。修法：用真实存在的字段（annotator/date）。
-- 修复后：115 全通过。
+- 首次跑：1 fail
+  - `test_strip_unicode_vertical_tab_batch19`：我误把 "a	vb" 当成 	+"v"+"b"（v 是字母），实际应该是 "a	b"。修法：更正字符串。
+- 修复后：156 全通过。
 
 ### 测试基线
 - main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
-- 本 worktree（Round 456 后）：55169 pass / 0 fail / 19 skip（HEAD `8765108`）
+- 本 worktree（Round 457 后）：55325 pass / 0 fail / 19 skip（HEAD `3f0c19c`）
 
 ### 下一步建议
 - 候选：
-  - evaluation/metrics.py 第四十八轮
   - evaluation/report.py 第三十六轮
   - evaluation/runner.py 第四十九轮
   - evaluation/cli.py 第四十八轮
   - evaluation/manifest.py 第四十七轮
+  - evaluation/schema.py 第三十九轮
+  - evaluation/annotation_metrics.py 第四十七轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：schema.py edges38 已饱和（7+9+7+6+7+6+4+18+13+5+9+7）。下一轮选 evaluation/metrics.py 第四十八轮，覆盖 compute_automatic_metrics 更深入边界。
+**建议**：metrics.py edges46 已饱和（构造子 15 + 常量 8 + strip 7 + compute 9 + 7 个 ratio/bbox 边界深入）。下一轮选 evaluation/report.py 第三十六轮，覆盖 aggregate_summary / build_provenance / get_dependency_versions 更深入行为。
+
+---
 
 ---
 
