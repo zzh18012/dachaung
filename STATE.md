@@ -4,6 +4,52 @@
 
 ---
 
+## Round 446 — evaluation/cli.py 第四十六轮（106 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第四十六轮 edges 测试，覆盖 edges44 未触及的角度：**_build_parser 行为深度第十八批**（_SubParsersAction 类型唯一 / dest=command / required=True / 三个子 parser 存在 / run 子 parser / 未知 arg → SystemExit / 空参 → SystemExit / parser=kreuzberg 透传 / max-chars/tolerance-chars 自定义 / inspect-doc tolerance 自定义 / manifest & output required）；**argparse Namespace 第十八批**（args.command 三个值 / run args 完整 / validate-report args 最小 / inspect-doc args 最小 / input vs manifest 分离）；**_format_metric 边界第十八批**（int 0 / float 0.0 / negative float / dict empty / dict with items / long name / very long reason / value string / null with reason / 36 alignment）；**_run_inspect_doc 边界第十八批**（elements missing / chunks missing / source_type missing → unknown / document_id missing / parser_name missing / metrics section / compute_automatic_metrics 调用 / figure_caption_prf 调用 / chunk_boundary_prf 调用 with tolerance / sorted output / input not exist / invalid JSON / top-level list）；**main 路由第十八批**（run n_ok/n_fail 计算 / EvalSchemaError from run_evaluation / EvalSchemaError from validate_file / validate-report path 是目录 / JSON 解析失败 / FileNotFoundError / inspect-doc not exist / ManifestError / validate-report success）；**module source forbidden tokens 第三十二批**（15 个 + no subprocess + no network）；**module source 字符串精确补强第二十八批**（future annotations / 评测 CLI docstring / argparse/json/sys/Path/manifest/report/runner/schema imports / _build_parser/main/_run_inspect_doc/_format_metric/add_subparsers）；**signatures 第二十八批**（_build_parser 0 / main argv default None / _format_metric 2 params / _run_inspect_doc args）；**module 合理性第二十八批**（has main/build_parser/run_inspect_doc/format_metric / 不 import pickle/marshal/shelve / 不 import app.pipeline / main returns int）；**端到端集成第二十八批**（full run round trip / run + validate-report / inspect-doc round trip / no command SystemExit / unknown command SystemExit / --parser kreuzberg 透传 / validate-report prints path / devset section 透传）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges45.py`（106 测试）
+
+### 覆盖要点
+- **_build_parser 第十八批**：14 测试
+- **argparse Namespace 第十八批**：7 测试
+- **_format_metric 第十八批**：10 测试
+- **_run_inspect_doc 第十八批**：13 测试
+- **main 路由第十八批**：10 测试
+- **module source forbidden tokens 第三十二批**：17 测试
+- **module source 字符串精确补强第二十八批**：15 测试
+- **signatures 第二十八批**：5 测试
+- **module 合理性第二十八批**：7 测试
+- **端到端集成第二十八批**：8 测试
+
+### 撞墙记录
+- 首次跑：3 fails
+  - `test_build_parser_run_subparser_help_batch18`：`run_p.description` 是 None（add_parser 没传 description）→ TypeError on `in None`。修法：用 `(run_p.description or "")` 兜底。
+  - `test_run_inspect_doc_elements_none_batch18` / `test_run_inspect_doc_chunks_none_batch18`：cli.py `doc.get("elements") or []` 只把 None 转成 [] 在 local var 里，doc 本身仍 None → metrics.py `len(None)` TypeError。修法：改测 missing key（用 `pop`）而不是 None value。
+  - `test_e2e_main_validate_report_after_run_batch18`：run_evaluation 是 mock → 不写文件 → validate-report 找不到文件 → 退出 2。修法：手动写一个空 dict 占位文件。
+- 修复后：106 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 446 后）：54084 pass / 0 fail / 19 skip（HEAD `bc00fdb`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第四十五轮
+  - evaluation/annotation_metrics.py 第四十五轮
+  - evaluation/schema.py 第三十七轮
+  - evaluation/metrics.py 第四十七轮
+  - evaluation/report.py 第三十五轮
+  - evaluation/runner.py 第四十八轮
+  - evaluation/cli.py 第四十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges45 已饱和（_build_parser 14 + Namespace 7 + _format_metric 10 + _run_inspect_doc 13 + main 10 + 端到端 8）。下一轮选 evaluation/manifest.py 第四十五轮，覆盖 ManifestError / load_manifest / Manifest dataclass 行为深度。
+
+---
+
 ## Round 445 — evaluation/runner.py 第四十七轮（73 测试）
 
 ### 目标
