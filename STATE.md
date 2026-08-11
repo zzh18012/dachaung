@@ -4,6 +4,54 @@
 
 ---
 
+## Round 499 — evaluation/report.py 第四十二轮（124 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第四十二轮 edges 测试，覆盖 edges41 未触及的角度：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十六批**（全 str 类型 / 12+1+1 entries 严格 / 互不相交 / hashable）；**get_git_provenance 第二十六批**（Path 接受 / returncode 非 0 / stdout 仅空白 / porcelain 非空 dirty=True / porcelain 空 dirty=False / porcelain returncode 非 0 dirty=False / OSError fallback / TimeoutExpired fallback）；**get_dependency_versions 第二十六批**（3 keys 严格 / 值类型 / 顺序 / importlib 调用 / PackageNotFound / 其它异常）；**build_provenance 第二十六批**（max_chars str 强制 int / max_chars=0 / max_chars 负数 / parser_version None/""/str / 9 keys 严格 / evaluator_version == EVALUATOR_VERSION / report_version == REPORT_VERSION / git 字段透传 / run_timestamp_iso 可解析 / dependencies dict / 调用一次）；**build_devset_section 第二十六批**（6 keys 严格 / status complete/incomplete / 空 categories / 全属性透传 / 不 mutate）；**aggregate_summary 第二十六批**（empty / count 0 显式 / count None / 两 doc 求和 / pipeline_success all true/all false/mixed / schema_valid 混合 / silent_drop 混合 / silent_drop 全 None / silent_drop 0 显式 / ratio 全 None / 4 keys 严格 / counts 1 key / success_rates 1 key / ratio_macro_averages 12 keys / key 集合匹配 _RATIO_METRICS / 不 mutate / 缺 metrics key raises KeyError）；**module source forbidden tokens 第四十二批**；**module source 字符串精确补强第三十八批**；**signatures 第三十八批**；**module 合理性第三十八批**；**端到端集成第三十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges42.py`（124 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十六批**：11 测试
+- **get_git_provenance 第二十六批**：10 测试
+- **get_dependency_versions 第二十六批**：6 测试
+- **build_provenance 第二十六批**：14 测试
+- **build_devset_section 第二十六批**：6 测试
+- **aggregate_summary 第二十六批**：20 测试
+- **module source forbidden tokens 第四十二批**：16 测试
+- **module source 字符串精确补强第三十八批**：19 测试
+- **signatures 第三十八批**：9 测试
+- **module 合理性第三十八批**：10 测试
+- **端到端集成第三十八批**：8 测试
+
+### 撞墙记录
+- 首次跑：3 fails（逐个修复）：
+  - `test_get_git_provenance_porcelain_returncode_nonzero_dirty_true_batch26`：误以为 porcelain returncode 非 0 → dirty=True。实际：实现 `dirty = bool(r2.returncode == 0 and r2.stdout.strip())`，returncode 非 0 直接 False。修法：改为 expect dirty=False 并重命名 test。
+  - `test_aggregate_summary_missing_metrics_key_safe_batch26`：误以为缺 metrics key 会安全跳过。实际：实现直接 `r["metrics"]` 访问，KeyError。修法：改为 `pytest.raises(KeyError)`。
+  - `test_module_source_no_typing_class_imports_batch26`：误断言 `from typing import` 不在源码。实际：`from typing import Any` 在源码顶部。修法：改为正向断言 `from typing import Any` 在源码。
+  - 第 4 次：`test_e2e_build_provenance_with_real_subprocess_batch26`：误以为 tmp_path 非 git 目录 → dirty=True。实际：subprocess 不抛异常时 dirty = bool(False and ...) = False。修法：改为 expect dirty=False 并加注释。
+- 修复后：124 全通过；全量回归 60543 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 499 后）：60543 pass / 0 fail / 22 skip（HEAD `2d80eeb`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第五十五轮
+  - evaluation/cli.py 第五十四轮
+  - evaluation/schema.py 第四十四轮
+  - evaluation/manifest.py 第五十三轮
+  - evaluation/annotation_metrics.py 第五十三轮
+  - evaluation/metrics.py 第五十五轮
+  - evaluation/report.py 第四十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges42 已饱和。下一轮选 evaluation/runner.py 第五十五轮。
+
+---
+
 ## Round 498 — evaluation/metrics.py 第五十四轮（107 测试）
 
 ### 目标
