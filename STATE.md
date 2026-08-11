@@ -4,6 +4,52 @@
 
 ---
 
+## Round 488 — evaluation/schema.py 第四十二轮（122 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第四十二轮 edges 测试，覆盖 edges41 未触及的角度：**SCHEMAS_DIR 第二十二批**（绝对路径 / parent 是项目根 / basename / 含 manifest+annotation+evaluation-report / str 含 schemas / resolve idempotent / 与 app/schema.py 不复用）；**EvalSchemaError 第二十二批**（errors=None 默认 [] / errors=[] 显式 / list 引用保留 / 多 errors / Exception 子类 / args / str / raise/except / 独立实例 / message 属性）；**_schema_path 第二十二批**（返回 Path / 是 file / str 含 name / 不存在抛 FileNotFoundError 含文件名 / 目录抛 FileNotFoundError / idempotent / parent=SCHEMAS_DIR / 三 schema 都可定位）；**load_schema 第二十二批**（返回 dict / $schema 字段 / properties 字段 / type=object / 不存在抛 / idempotent / annotation+evaluation-report 加载）；**validate 第二十二批**（合法 None 返回 / 非法抛 / errors count / message 含 schema_name+校验失败+path / 不修改 instance / 排序 / None 拒 / list 拒 / 处数 / path/message/schema_path 字段 / additionalProperties 拒 / 版本常量 / status enum）；**validate_file 第二十二批**（str/Path 等价 / 不存在抛 FileNotFoundError 含中文 / JSONDecodeError / EvalSchemaError / 调 validate / idempotent / 中文 content / UTF-8 BOM 拒）；**module source forbidden tokens 第三十八批**；**module source 字符串精确补强第三十四批**；**signatures 第三十四批**；**module 合理性第三十四批**；**端到端集成第三十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges42.py`（122 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 第二十二批**：10 测试
+- **EvalSchemaError 第二十二批**：11 测试
+- **_schema_path 第二十二批**：9 测试
+- **load_schema 第二十二批**：8 测试
+- **validate 第二十二批**：17 测试
+- **validate_file 第二十二批**：10 测试
+- **module source forbidden tokens 第三十八批**：16 测试
+- **module source 字符串精确补强第三十四批**：15 测试
+- **signatures 第三十四批**：8 测试
+- **module 合理性第三十四批**：12 测试
+- **端到端集成第三十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails：
+  - `test_schemas_dir_parent_parent_is_project_root_batch22`：误以为 SCHEMAS_DIR.parent.parent 是项目根。实际 SCHEMAS_DIR = `<project>/schemas/`，parent 是 `<project>/`（项目根），parent.parent 是 `Desktop/`。修法：改为 `SCHEMAS_DIR.parent` 含 pyproject.toml。
+  - `test_module_no_global_mutables_batch22`：误以为顶层只允许 SCHEMAS_DIR。实际还有 `__all__ = [...]` 赋值。修法：assert names == ["SCHEMAS_DIR", "__all__"]。
+- 修复后：122 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 488 后）：59309 pass / 0 fail / 22 skip（HEAD `a6f6ef5`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第五十一轮
+  - evaluation/annotation_metrics.py 第五十一轮
+  - evaluation/metrics.py 第五十三轮
+  - evaluation/report.py 第四十一轮
+  - evaluation/runner.py 第五十四轮
+  - evaluation/cli.py 第五十三轮
+  - evaluation/schema.py 第四十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges42 已饱和（SCHEMAS_DIR/EvalSchemaError/_schema_path/load_schema/validate/validate_file 全检 + 16 forbidden tokens + source level 16 + signatures 8 + e2e 7）。下一轮选 evaluation/manifest.py 第五十一轮，覆盖 _is_absolute_like/_has_backslash/_resolve_relative_path/_detect_project_root/Manifest/DocumentEntry/ExpectedFailure/load_manifest 第二十四批未触及角度。
+
+---
+
 ## Round 487 — evaluation/cli.py 第五十二轮（108 测试）
 
 ### 目标
