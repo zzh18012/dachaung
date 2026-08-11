@@ -4,6 +4,45 @@
 
 ---
 
+## Round 438 — evaluation/runner.py 第四十六轮（100 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第四十六轮 edges 测试，覆盖 edges43 未触及的角度：**_load_annotation 行为深度第十六批**（path None / 不存在 / valid / BOM 失败 / multiline / large / OSError / JSONDecodeError / list JSON / 空文件 / null JSON）；**_process_one 行为深度第十六批**（成功 5-tuple / document dict / parser_version / total_seconds float / errors[0].to_dict / unknown error / image_dir None / unlink silent / 正确 args / image_dir 返回）；**run_evaluation 行为深度第十六批**（返回 dict / 6 keys / 写文件 / JSON valid / 同 file / per_doc 空 / max_chars 透传 / tolerance_chars 透传 / parser_version first kept / wall_time 6 keys / per_doc 4 keys / 创建 parent dir / expected_failure matches/no_match/no_errors）；**module source forbidden tokens 第三十批**（含 no_subprocess / no_network）；**module source 字符串精确补强第二十七批**；**signatures 第二十七批**；**module 合理性第二十七批**；**端到端集成第二十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges44.py`（100 测试）
+
+### 覆盖要点
+- **_load_annotation 第十六批**：12 测试
+- **_process_one 第十六批**：10 测试
+- **run_evaluation 第十六批**：17 测试
+- **module source forbidden tokens 第三十批**：18 测试（含 no_subprocess + no_network）
+- **module source 字符串精确补强第二十七批**：23 测试
+- **signatures 第二十七批**：6 测试
+- **module 合理性第二十七批**：8 测试
+- **端到端集成第二十七批**：8 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_e2e_run_evaluation_with_failed_doc_batch16 未 mock _load_annotation，导致 MagicMock 被 json.load）。修：补上 `patch("evaluation.runner._load_annotation", return_value=None)`。
+- 二次跑：100 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 438 后）：53208 pass / 0 fail / 19 skip（HEAD `6f08f36`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第四十五轮
+  - evaluation/manifest.py 第四十四轮
+  - evaluation/annotation_metrics.py 第四十四轮
+  - evaluation/schema.py 第三十六轮
+  - evaluation/metrics.py 第四十六轮
+  - evaluation/report.py 第三十四轮
+  - evaluation/runner.py 第四十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 437 — evaluation/report.py 第三十三轮（130 测试）
 
 ### 目标
