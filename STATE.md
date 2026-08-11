@@ -4,48 +4,46 @@
 
 ---
 
-## Round 458 — evaluation/report.py 第三十六轮（134 测试）
+## Round 459 — evaluation/runner.py 第四十九轮（107 测试）
 
 ### 目标
-- 给 `evaluation/report.py`（201 行）加第三十六轮 edges 测试，覆盖 edges35 未触及的角度：**_RATIO_METRICS/_COUNT_METRICS/_SUCCESS_BOOL_METRICS 行为第十九批**（count exact / first item / no duplicates / pairwise disjoint / 不含 figure_caption / 不含 silent_drop_count / 不含 error_code / 不含 element_count_by_type）；**get_git_provenance 行为第十九批**（commit trimmed / commit None when empty stdout / non-zero returncode / dirty with untracked / empty status / SubprocessError / 调用两次 / cwd str 化）；**get_dependency_versions 行为第十九批**（3 keys / importlib 内部 import / PackageNotFound / generic Exception / 真实 pdfplumber 版本）；**build_provenance 行为第十九批**（9 keys exact / max_chars coerce / negative / parser_name+version passthrough / timestamp parseable / dependencies is dict / 调用 get_git_provenance）；**build_devset_section 行为第十九批**（6 keys exact / status/file_count/categories passthrough / 真实 Manifest dataclass / 额外字段忽略）；**aggregate_summary 行为第十九批**（4 top keys / counts some none / success_rate no docs / success_rate all none / mixed ratio macro / silent_drop negative / extra metrics ignored / order independent）；**module source forbidden tokens 第三十四批**（subprocess 允许）；**module source 字符串精确补强第二十九批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
+- 给 `evaluation/runner.py`（228 行）加第四十九轮 edges 测试，覆盖 edges46 未触及的角度：**_load_annotation 行为第十九批**（str path AttributeError / None / 不存在 / 数组 JSON / OSError 被 swallow / UTF-8 BOM 拒绝 / 嵌套 dict / 空 dict / 空文件）；**_process_one 行为第十九批**（_per_doc 目录创建 / errors[0].to_dict / no document no errors 返回 unknown / document 成功路径 / image_dir None when no document / elapsed 非负 / image_output_dir_for 仅在 doc 存在时调用 / unlink OSError 被 swallow）；**run_evaluation 行为第十九批**（metrics 含 figure_caption_* / metrics 含 chunk_boundary_* / public per_doc 不含 _ 前缀 / wall_time parse_reason+chunk_reason 固定 not_instrumented / parser_version 来自第一个成功 doc / 无 doc 时 None / 6 top keys / report_version 来自 REPORT_VERSION 常量 / per_doc 顺序保留 / ensure_ascii=False / image_dir 用作 image_base_dir / image_dir 非目录时 None / expected_failures 写入报告 / 父目录创建）；**module source forbidden tokens 第三十四批**；**module source 字符串精确补强第二十九批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
 
 ### 改动
-- 新增 `tests/test_evaluation_report_edges36.py`（134 测试）
+- 新增 `tests/test_evaluation_runner_edges47.py`（107 测试）
 
 ### 覆盖要点
-- **metric 常量第十九批**：13 测试
-- **get_git_provenance 第十九批**：8 测试
-- **get_dependency_versions 第十九批**：8 测试
-- **build_provenance 第十九批**：12 测试
-- **build_devset_section 第十九批**：8 测试
-- **aggregate_summary 第十九批**：15 测试
-- **module source forbidden tokens 第三十四批**：18 测试
+- **_load_annotation 第十九批**：11 测试
+- **_process_one 第十九批**：8 测试
+- **run_evaluation 第十九批**：16 测试
+- **module source forbidden tokens 第三十四批**：17 测试
 - **module source 字符串精确补强第二十九批**：17 测试
 - **signatures 第二十九批**：5 测试
-- **module 合理性第二十九批**：9 测试
+- **module 合理性第二十九批**：11 测试
 - **端到端集成第二十九批**：7 测试
 
 ### 撞墙记录
-- 首次跑：2 fails
-  - `test_get_git_provenance_calls_subprocess_twice_batch19`：subprocess.run 被替换后无 call_count 属性，应该 patch 时存 mock 对象。修法：用 `with patch(...) as mock_run` 后 assert mock_run.call_count。
-  - `test_build_devset_section_with_real_manifest_object_batch19`：Manifest 实际 fields 没有 `annotation_path`，而是 `project_root`。修法：用 project_root=Path('.')。
-- 修复后：134 全通过。
+- 首次跑：2 fails（同一根因）
+  - `test_process_one_errors_returns_first_error_dict_batch19` 等：runner.py 顶层 `from app.pipeline import process_single` 把名字绑定到 runner 模块，patch `app.pipeline.process_single` 不生效。修法：patch `evaluation.runner.process_single` / `evaluation.runner.image_output_dir_for` / `evaluation.runner.compute_automatic_metrics` / `evaluation.runner.figure_caption_prf` / `evaluation.runner.chunk_boundary_prf`。
+- 修复后：107 全通过。
 
 ### 测试基线
 - main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
-- 本 worktree（Round 458 后）：55459 pass / 0 fail / 19 skip（HEAD `f74e581`）
+- 本 worktree（Round 459 后）：55566 pass / 0 fail / 19 skip（HEAD `75c3a4e`）
 
 ### 下一步建议
 - 候选：
-  - evaluation/runner.py 第四十九轮
   - evaluation/cli.py 第四十八轮
   - evaluation/manifest.py 第四十七轮
   - evaluation/schema.py 第三十九轮
   - evaluation/annotation_metrics.py 第四十七轮
   - evaluation/metrics.py 第四十九轮
+  - evaluation/report.py 第三十七轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：report.py edges36 已饱和（metric 常量 13 + git provenance 8 + dependency 8 + build_provenance 12 + devset 8 + aggregate 15）。下一轮选 evaluation/runner.py 第四十九轮，覆盖 run_evaluation / _process_one / _load_annotation 更深入行为。
+**建议**：runner.py edges47 已饱和（load_annotation 11 + process_one 8 + run_evaluation 16）。下一轮选 evaluation/cli.py 第四十八轮，覆盖 _build_parser / _format_metric / _run_inspect_doc / main 更深入行为。
+
+---
 
 ---
 
