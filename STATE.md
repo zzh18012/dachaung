@@ -4,6 +4,53 @@
 
 ---
 
+## Round 482 — evaluation/manifest.py 第五十轮（143 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第五十轮 edges 测试，覆盖 edges49 未触及的角度：**_is_absolute_like 第二十三批**（大/小写盘符 / 非 Latin 字母 / 数字盘符 / 下划线 / 单/双字符 / 仅斜杠 / x:/ x:\\）；**_has_backslash 第二十三批**（多反斜杠 / 开头 / 末尾 / 单一 / 混合 / 仅空格）；**_resolve_relative_path 第二十三批**（field_name 透传 / . 相对 / 嵌套 / 返回绝对 / 错误含 resolved / 空字符串 / .. 单级 / 内部 ..）；**_detect_project_root 第二十三批**（返回 Path / 文件输入 / 选最近 pyproject / 无 pyproject fallback / 目录输入）；**Manifest properties 第二十三批**（pdf/docx 互斥 / 0 documents / categories 排序 / empty list / 去重 / 单向 pair / 两个独立 / frozen）；**DocumentEntry 第二十三批**（必填字段无默认 / equality / inequality / hashable / path_str 类型 / categories tuple / frozen）；**ExpectedFailure 第二十三批**（source_type 可 None / frozen / hashable / equality / inequality）；**load_manifest 第二十三批**（version 不兼容 / doc_id 在错误 / annotation_file resolved / annotation_file 在错误 / categories→tuple / expected_failures resolved / expected_failure doc_id 在错误 / 调 validate / str path / 返回 Manifest / 默认 project_root）；**module source forbidden tokens 第三十八批**；**module source 字符串精确补强第三十四批**；**signatures 第三十四批**；**module 合理性第三十四批**；**端到端集成第三十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges50.py`（143 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第二十三批**：10 测试
+- **_has_backslash 第二十三批**：8 测试
+- **_resolve_relative_path 第二十三批**：8 测试
+- **_detect_project_root 第二十三批**：5 测试
+- **Manifest properties 第二十三批**：8 测试
+- **DocumentEntry 第二十三批**：7 测试
+- **ExpectedFailure 第二十三批**：6 测试
+- **load_manifest 第二十三批**：12 测试
+- **module source forbidden tokens 第三十八批**：17 测试
+- **module source 字符串精确补强第三十四批**：15 测试
+- **signatures 第三十四批**：7 测试
+- **module 合理性第三十四批**：17 测试
+- **端到端集成第三十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails：
+  - `test_document_entry_required_fields_no_default_batch23`：误以为有默认值的字段（如 sha256）会有 default。实际 frozen dataclass 所有字段都必填（注解 `str | None` 不是默认值）。修法：改为断言所有字段无默认。
+  - `test_expected_failure_default_source_type_is_none_batch23`：同上，source_type 必填。修法：改为显式传 None。
+- 修复后：143 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 482 后）：58529 pass / 0 fail / 21 skip（HEAD `2d57b4c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第五十轮
+  - evaluation/metrics.py 第五十二轮
+  - evaluation/report.py 第四十轮
+  - evaluation/runner.py 第五十三轮
+  - evaluation/cli.py 第五十二轮
+  - evaluation/schema.py 第四十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges50 已饱和（_is_absolute_like / _has_backslash / _resolve_relative_path / _detect_project_root / Manifest / DocumentEntry / ExpectedFailure / load_manifest 全检）。下一轮选 evaluation/annotation_metrics.py 第五十轮，覆盖 figure_caption_prf / chunk_boundary_prf / PARSER_DOES_NOT_EMIT_RELATIONS 第二十二批未触及角度。
+
+---
+
 ## Round 481 — evaluation/schema.py 第四十一轮（129 测试）
 
 ### 目标
