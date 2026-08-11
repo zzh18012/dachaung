@@ -4,6 +4,49 @@
 
 ---
 
+## Round 493 — evaluation/runner.py 第五十四轮（103 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第五十四轮 edges 测试，覆盖 edges51 未触及的角度：**_load_annotation 第二十四批**（null/true/false/string/scientific/大整数/嵌套 10 层/emoji/unicode escape/前导空白/BOM+JSON/CRLF/孤立 `{`/孤立 `}`/JSON 后跟内容/空字符串/嵌套数组/混合类型）；**_process_one 第二十四批**（out_stub 命名约定/mkdir 顺序/elapsed 非负/process_single 仅一次/parser_name/max_chars 关键字/返回 5-tuple 类型/image_dir 独立于 parser_version/resolved_path 第一位置参数）；**run_evaluation 第二十四批**（build_provenance 参数精确/build_devset_section 接 manifest/aggregate_summary 接 list/compute_metrics 每文档调一次/figure_caption_prf 每文档调一次/chunk_boundary_prf 每文档调一次/multiple expected_failures/expected_failure 成功解析/utf-8 编码/output_root mkdir/透传 parser_name/max_chars/剥除私有字段/annotation present/absent/None/overwrite existing/顺序保留）；**module source forbidden tokens 第四十一批**；**module source 字符串精确补强第三十七批**；**signatures 第三十七批**；**module 合理性第三十七批**；**端到端集成第三十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges52.py`（103 测试）
+
+### 覆盖要点
+- **_load_annotation 第二十四批**：17 测试
+- **_process_one 第二十四批**：10 测试
+- **run_evaluation 第二十四批**：19 测试
+- **module source forbidden tokens 第四十一批**：16 测试
+- **module source 字符串精确补强第三十七批**：15 测试
+- **signatures 第三十七批**：8 测试
+- **module 合理性第三十七批**：10 测试
+- **端到端集成第三十七批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails：
+  - `test_load_annotation_nested_10_levels_batch24`：误用 `{{{{...}}}}` 字符串拼接（不是合法 JSON，相邻 `{` 必须有 key）。修法：用 `payload = 1; for _ in range(10): payload = {"n": payload}` 构造真正的 10 层嵌套 dict。
+  - `test_run_evaluation_output_root_mkdir_called_batch24`：`patch("pathlib.Path.mkdir")` 完全替换 mkdir，导致下游 `out_p.open("w")` 因目录不存在而 FileNotFoundError。修法：改用 `tracking_mkdir` wraps 模式，记录调用 + 透传到真实 `Path.mkdir`。
+- 修复后：103 全通过；全量回归 59899 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 493 后）：59899 pass / 0 fail / 22 skip（HEAD `215cb75`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第五十三轮
+  - evaluation/schema.py 第四十三轮
+  - evaluation/manifest.py 第五十二轮
+  - evaluation/annotation_metrics.py 第五十二轮
+  - evaluation/metrics.py 第五十四轮
+  - evaluation/report.py 第四十二轮
+  - evaluation/runner.py 第五十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges52 已饱和（_load_annotation 17 + _process_one 10 + run_evaluation 19 + 16 forbidden + 15 source + 8 sig + 10 sanity + 7 e2e）。下一轮选 evaluation/cli.py 第五十三轮。
+
+---
+
 ## Round 492 — evaluation/report.py 第四十一轮（123 测试）
 
 ### 目标
