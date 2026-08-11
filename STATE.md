@@ -4,6 +4,46 @@
 
 ---
 
+## Round 432 — evaluation/cli.py 第四十四轮（106 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第四十四轮 edges 测试，覆盖 edges42 未触及的角度：**_build_parser 边界第十六批**（prog / description / epilog / 5 args 顺序 / 默认值 / choices_actions）；**argparse Namespace 第十六批**（command attr / dict access / SystemExit / format_help / unknown command）；**_format_metric 边界第十六批**（负值 / 大浮点 / dict 多键 / Unicode reason / name 长度 / int / 空 dict）；**_run_inspect_doc 边界第十六批**（缺 elements / 缺 chunks / source_type=docx / parser 信息 / file 路径 / document_id / metrics header / counts）；**main 路由第十六批**（run with kreuzberg / bad max_chars / extra arg / unknown subcommand / no args / manifest invalid JSON / valid inspect-doc / returns int）；**module source forbidden tokens 第二十七批**；**module source 字符串精确补强第二十四批**；**signatures 第二十四批**；**module 合理性第二十四批**；**端到端集成第二十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges43.py`（106 测试）
+
+### 覆盖要点
+- **_build_parser 边界第十六批**：10 测试
+- **argparse Namespace 第十六批**：5 测试
+- **_format_metric 边界第十六批**：8 测试
+- **_run_inspect_doc 边界第十六批**：8 测试
+- **main 路由第十六批**：10 测试
+- **module source forbidden tokens 第二十七批**：16 测试
+- **module source 字符串精确补强第二十四批**：24 测试
+- **signatures 第二十四批**：7 测试
+- **module 合理性第二十四批**：8 测试
+- **端到端集成第二十四批**：10 测试
+
+### 撞墙记录
+- 首次跑：106 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 432 后）：52499 pass / 0 fail / 19 skip（HEAD `4cd2b14`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第四十三轮
+  - evaluation/annotation_metrics.py 第四十三轮
+  - evaluation/schema.py 第三十五轮
+  - evaluation/metrics.py 第四十五轮
+  - evaluation/report.py 第三十三轮
+  - evaluation/runner.py 第四十六轮
+  - evaluation/cli.py 第四十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 431 — evaluation/runner.py 第四十五轮（91 测试）
 
 ### 目标
