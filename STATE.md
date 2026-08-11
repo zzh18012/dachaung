@@ -4,6 +4,56 @@
 
 ---
 
+## Round 498 — evaluation/metrics.py 第五十四轮（107 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第五十四轮 edges 测试，覆盖 edges51 未触及的角度：**构造子第二十六批**（_null reason 透传 / _null 返回 2 keys / _ratio 0/0.5/1 透传 / _bool True/False / _int 0/正整数 / 多次返回独立 dict）；**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十六批**（tuple / subset 关系 / 不变 / hashable / element-wise str）；**_NOT_EVALUATED 第二十六批**（值 / 在 __all__ / hashable / 类型）；**compute_automatic_metrics 第二十六批**（error_code 透传 / pipeline_success False / 不 mutate input / pdf + docx 两路 / image_base_dir 透传）；**_pdf_locator_ratio via metrics 第二十六批**（page=0 无效 / page 负数 / page 浮点 / text+bbox 完整 / text 缺 bbox）；**_docx_locator_ratio via metrics 第二十六批**（paragraph_index / table_index / 拒 page / 拒 bbox / 无结构键）；**_image_resource_ratio via metrics 第二十六批**（无 image elements / 缺 resource_path / 空 elements）；**_chunk_reference_ratio via metrics 第二十六批**（无 source_ids / 空 chunks / 部分 missing）；**_text_preservation via metrics 第二十六批**（image 排除 / 完美 / chunk 缺 text）；**_heading_boundary_ratio via metrics 第二十六批**（无 headings / 无 chunks ratio=0 / 完美匹配）；**_silent_drop_count via metrics 第二十六批**（无 expectations / 零 drop / 永不为负）；**module source forbidden tokens 第四十一批**；**module source 字符串精确补强第三十七批**；**signatures 第三十七批**；**module 合理性第三十七批**；**端到端集成第三十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges52.py`（107 测试）
+
+### 覆盖要点
+- **构造子第二十六批**：10 测试
+- **_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十六批**：8 测试
+- **_NOT_EVALUATED 第二十六批**：4 测试
+- **compute_automatic_metrics 第二十六批**：10 测试
+- **_pdf_locator_ratio via metrics 第二十六批**：5 测试
+- **_docx_locator_ratio via metrics 第二十六批**：5 测试
+- **_image_resource_ratio via metrics 第二十六批**：3 测试
+- **_chunk_reference_ratio via metrics 第二十六批**：3 测试
+- **_text_preservation via metrics 第二十六批**：3 测试
+- **_heading_boundary_ratio via metrics 第二十六批**：3 测试
+- **_silent_drop_count via metrics 第二十六批**：3 测试
+- **module source forbidden tokens 第四十一批**：16 测试
+- **module source 字符串精确补强第三十七批**：15 测试
+- **signatures 第三十七批**：8 测试
+- **module 合理性第三十七批**：7 测试
+- **端到端集成第三十七批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_heading_boundary_no_chunks_batch26`：误以为有 heading 但 chunks=[] 时返回 reason=`no_chunks`。实际：函数只对 `not headings` 早返回 `no_heading_elements`，有 heading 但无 chunks 直接走 `_ratio(matched / len(headings))` = `_ratio(0/1)` = 0.0，reason=None。修法：改为断言 `value == 0.0` 且 `reason is None`。
+- 修复后：107 全通过；全量回归 60419 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 498 后）：60419 pass / 0 fail / 22 skip（HEAD `fc72379`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第四十二轮
+  - evaluation/runner.py 第五十五轮
+  - evaluation/cli.py 第五十四轮
+  - evaluation/schema.py 第四十四轮
+  - evaluation/manifest.py 第五十三轮
+  - evaluation/annotation_metrics.py 第五十三轮
+  - evaluation/metrics.py 第五十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges52 已饱和。下一轮选 evaluation/report.py 第四十二轮。
+
+---
+
 ## Round 497 — evaluation/annotation_metrics.py 第五十二轮（86 测试）
 
 ### 目标
