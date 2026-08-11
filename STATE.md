@@ -4,6 +4,52 @@
 
 ---
 
+## Round 485 — evaluation/report.py 第四十轮（141 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第四十轮 edges 测试，覆盖 edges39 未触及的角度：**_RATIO_METRICS 内容 第二十四批**（12 entries 严格 / tuple / iterable / 不可变 / hashable / 含 schema_valid+chunk_boundary_f1 / excludes figure_caption / ordered / __name__ / 顺序一致）；**_COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十四批**（1 entry each / element_count_total / pipeline_success / 互不相交 / subset 检查 / 顺序 / 唯一）；**get_git_provenance 第二十四批**（git 目录 / 非 git 目录 commit=None dirty=False / OSError → dirty=True / SubprocessError → dirty=True / TimeoutExpired → dirty=True / 返回 keys 严格 / 类型 / 多次一致 / 多 git 调用）；**get_dependency_versions 第二十四批**（pdfplumber/python-docx/pypdfium2 keys / value 是 str 或 None / 3 keys / importlib.metadata / 多次一致 / key 顺序 / ModuleNotFoundError 处理）；**build_provenance 第二十四批**（9 keys 严格 / git_commit 来自 git / git_dirty 来自 git / evaluator_version / report_version / parser_name 透传 / parser_version=None / dependencies dict / max_chars int / run_timestamp_iso 含时区）；**build_devset_section 第二十四批**（6 keys / status/file_count/content_group_count/pdf_count/docx_count/categories_covered / 透传 / 属性只读 / 类型一致 / null 处理）；**aggregate_summary 第二十四批**（4 top keys / counts 求和 / success_rates rate 计算 / ratio_macro macro_average / silent_drop_total 求和 / 空列表 / 多种 mix / null 不参与 / counts sum+participating_docs / success_rates 3 fields / ratio 3 fields / silent_drop_total None）；**module source forbidden tokens 第四十批**（subprocess.run 允许 / subprocess.Popen 允许 / 但仍禁 logging/asyncio/threading/concurrent/re/time/datetime/itertools/functools/os/sys/json/star/relative import/class/yield/global/walrus）；**module source 字符串精确补强第三十六批**；**signatures 第三十六批**；**module 合理性第三十六批**；**端到端集成第三十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges40.py`（141 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 内容 第二十四批**：10 测试
+- **_COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十四批**：9 测试
+- **get_git_provenance 第二十四批**：9 测试
+- **get_dependency_versions 第二十四批**：7 测试
+- **build_provenance 第二十四批**：11 测试
+- **build_devset_section 第二十四批**：6 测试
+- **aggregate_summary 第二十四批**：16 测试
+- **module source forbidden tokens 第四十批**：16 测试
+- **module source 字符串精确补强第三十六批**：15 测试
+- **signatures 第三十六批**：8 测试
+- **module 合理性第三十六批**：12 测试
+- **端到端集成第三十六批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_get_git_provenance_non_git_dir_batch24`：误以为非 git 目录 dirty=True（按 docstring "失败时 commit=null, dirty=true"）。实际：git 命令以非零退出码返回（不是抛 OSError），r2.returncode!=0 → `dirty = bool(False and ...) = False`，覆盖初始 True。修法：改为 `assert out["git_dirty"] is False`，并在 docstring 注明 docstring 与实现不一致的实现行为。
+- 修复后：141 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 485 后）：58971 pass / 0 fail / 21 skip（HEAD `38ef1a7`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第五十三轮
+  - evaluation/cli.py 第五十二轮
+  - evaluation/schema.py 第四十二轮
+  - evaluation/manifest.py 第五十一轮
+  - evaluation/annotation_metrics.py 第五十一轮
+  - evaluation/metrics.py 第五十三轮
+  - evaluation/report.py 第四十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges40 已饱和（_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS / get_git_provenance / get_dependency_versions / build_provenance / build_devset_section / aggregate_summary 全检 + subprocess 允许补丁）。下一轮选 evaluation/runner.py 第五十三轮，覆盖 _load_annotation/_process_one/run_evaluation 第二十三批未触及角度。
+
+---
+
 ## Round 484 — evaluation/metrics.py 第五十二轮（190 测试）
 
 ### 目标
