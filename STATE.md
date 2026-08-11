@@ -4,6 +4,50 @@
 
 ---
 
+## Round 467 — evaluation/schema.py 第三十九轮（128 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第三十九轮 edges 测试，覆盖 edges38 未触及的角度：**SCHEMAS_DIR 常量深度第十九批**（name=='schemas' / is_absolute / 4 个 schema 子文件存在性 / parent 含 evaluation 目录 / glob ≥4）；**EvalSchemaError 行为深度第十九批**（repr / str 等于 message / 是 Exception 子类 / 三种 errors 入参 / raise from None / errors 默认不共享 / args 是 tuple）；**_schema_path 行为深度第十九批**（返回值 .name / 多次相等 / 4 个真实 schema / 拒绝 .py / 拒绝无后缀 / parent 是 SCHEMAS_DIR）；**load_schema 行为深度第十九批**（4 schema 都加载 / 含 $schema / 修改返回值不影响下次 / round-trip / Draft202012Validator 兼容）；**validate 行为深度第十九批**（不修改 instance / errors 含 schema_path / message 含"处" / 排序 / 返回 None / annotation/report 空 dict 失败）；**validate_file 行为深度第十九批**（utf-8 BOM 拒绝 / 绝对路径 / int 顶层失败 / list 顶层失败 / 空文件 / 真实 annotation / 返 None）；**module source forbidden tokens 第三十五批**；**module source 字符串精确补强第三十一批**；**signatures 第三十一批**；**module 合理性第三十一批**；**端到端集成第三十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges39.py`（128 测试 + 1 skip）
+
+### 覆盖要点
+- **SCHEMAS_DIR 常量深度第十九批**：10 测试
+- **EvalSchemaError 行为深度第十九批**：10 测试
+- **_schema_path 行为深度第十九批**：8 测试
+- **load_schema 行为深度第十九批**：5 测试
+- **validate 行为深度第十九批**：9 测试
+- **validate_file 行为深度第十九批**：8 测试
+- **module source forbidden tokens 第三十五批**：17 测试
+- **module source 字符串精确补强第三十一批**：16 测试
+- **signatures 第三十一批**：6 测试
+- **module 合理性第三十一批**：12 测试
+- **端到端集成第三十一批**：8 测试
+
+### 撞墙记录
+- 首次跑：1 fail
+  - `test_schema_path_rejects_uppercase_variant_batch19`：Windows 文件系统大小写不敏感，`MANIFEST.SCHEMA.JSON` 实际能找到。修法：改为 skip。
+- 修复后：128 pass / 1 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 467 后）：56538 pass / 0 fail / 20 skip（HEAD `dae62fb`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第四十八轮
+  - evaluation/annotation_metrics.py 第四十八轮
+  - evaluation/metrics.py 第五十轮
+  - evaluation/report.py 第三十八轮
+  - evaluation/runner.py 第五十一轮
+  - evaluation/cli.py 第五十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges39 已饱和（SCHEMAS_DIR 10 + EvalSchemaError 10 + _schema_path 8 + load_schema 5 + validate 9 + validate_file 8）。下一轮选 evaluation/manifest.py 第四十八轮，深入 load_manifest/_resolve_relative_path 边界。
+
+---
+
 ## Round 466 — evaluation/cli.py 第四十九轮（114 测试）
 
 ### 目标
