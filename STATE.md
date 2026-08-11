@@ -4,6 +4,46 @@
 
 ---
 
+## Round 452 — evaluation/runner.py 第四十八轮（90 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第四十八轮 edges 测试，覆盖 edges45 未触及的角度：**_load_annotation 行为深度第十八批**（None path / 不存在 / 目录 / valid JSON / invalid JSON / 0 byte / array value / nested dict / Unicode / 不抛异常 / signature）；**_process_one 行为深度第十八批**（out_stub 清理 / 创建 _per_doc / errors[0] / no document + no errors → unknown / parser_version 透传 / image_dir None for failed / elapsed 是 float / 5-tuple / doc_id 在 out_stub / 异常传播）；**run_evaluation 行为深度第十八批**（output_root 创建 / wall_time 结构 / public per_doc 不含 private 字段 / expected_failure matches True/False/no actual / parser_version 来自第 1 个 doc / expected_failure out_stub 清理 / returns same as file / 6 top keys / report_version constant / summary 结构 / doc_id order）；**module source forbidden tokens 第三十二批**；**module source 字符串精确补强第二十八批**；**signatures 第二十八批**；**module 合理性第二十八批**；**端到端集成第二十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges46.py`（90 测试）
+
+### 覆盖要点
+- **_load_annotation 第十八批**：11 测试
+- **_process_one 第十八批**：10 测试
+- **run_evaluation 第十八批**：13 测试
+- **module source forbidden tokens 第三十二批**：18 测试
+- **module source 字符串精确补强第二十八批**：16 测试
+- **signatures 第二十八批**：5 测试
+- **module 合理性第二十八批**：9 测试
+- **端到端集成第二十八批**：8 测试
+
+### 撞墙记录
+- 0 fail 首次跑（90 全通过）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 452 后）：54782 pass / 0 fail / 19 skip（HEAD `44e4ab8`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第四十七轮
+  - evaluation/manifest.py 第四十六轮
+  - evaluation/annotation_metrics.py 第四十六轮
+  - evaluation/schema.py 第三十八轮
+  - evaluation/metrics.py 第四十八轮
+  - evaluation/report.py 第三十六轮
+  - evaluation/runner.py 第四十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md)
+
+**建议**：runner.py edges46 已饱和（_load_annotation 11 + _process_one 10 + run_evaluation 13）。下一轮选 evaluation/cli.py 第四十七轮，覆盖 _build_parser / main / _run_inspect_doc 行为深度。
+
+---
+
 ## Round 451 — evaluation/report.py 第三十五轮（124 测试）
 
 ### 目标
