@@ -4,6 +4,47 @@
 
 ---
 
+## Round 441 — evaluation/annotation_metrics.py 第四十四轮（100 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第四十四轮 edges 测试，覆盖 edges43 未触及的角度：**figure_caption_prf 边界第十七批**（doc None / ann None / 任何输入都返回 3 key / value 永远 None / 不读 document / 不读 annotation / 不修改输入 / 没 pipeline_failed 分支 / idempotent / 返回 dict）；**chunk_boundary_prf 边界第十七批**（doc None / annotation empty dict / annotation None / 无 chunks key / empty chunks / 单 chunk / 2 chunks 无 anchor / 2 chunks 有 anchor）；**chunk_boundary_prf 算法第十七批**（完美匹配 / tolerance=0 / off-by-one / tolerance too small / position before / position unknown / partial match / 多 anchors / f1=0 / f1=1 / 默认 tolerance / 不修改输入）；**chunk_boundary_prf missing_markers 第十七批**（marker 不存在 / 空 marker / None marker / 缺 marker key / 多 missing / 都找到时无 key / 重复 marker）；**PARSER_DOES_NOT_EMIT_RELATIONS 第十七批**（值 / str 类型 / 在 namespace / 在 all / 在 figure_caption 引用 / 不变性）；**module source forbidden tokens 第三十三批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges44.py`（100 测试）
+
+### 覆盖要点
+- **figure_caption_prf 边界第十七批**：10 测试
+- **chunk_boundary_prf 边界第十七批**：11 测试
+- **chunk_boundary_prf 算法第十七批**：12 测试
+- **chunk_boundary_prf missing_markers 第十七批**：7 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第十七批**：6 测试
+- **module source forbidden tokens 第三十三批**：18 测试（含 no_subprocess + no_network）
+- **module source 字符串精确补强第三十批**：18 测试
+- **signatures 第三十批**：5 测试
+- **module 合理性第三十批**：8 测试
+- **端到端集成第三十批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_chunk_boundary_prf_position_before_batch17 期望 tolerance=0 也匹配，但 stream="abc def" 中 "def" 起始在 4 而 predicted=3，差 1）。修：把 tolerance 改成 1。
+- 二次跑：100 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 441 后）：53551 pass / 0 fail / 19 skip（HEAD `7b2f2fd`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第三十六轮
+  - evaluation/metrics.py 第四十六轮
+  - evaluation/report.py 第三十四轮
+  - evaluation/runner.py 第四十七轮
+  - evaluation/cli.py 第四十六轮
+  - evaluation/manifest.py 第四十五轮
+  - evaluation/annotation_metrics.py 第四十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 440 — evaluation/manifest.py 第四十四轮（130 测试）
 
 ### 目标
