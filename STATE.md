@@ -4,6 +4,48 @@
 
 ---
 
+## Round 479 — evaluation/runner.py 第五十二轮（115 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第五十二轮 edges 测试，覆盖 edges49 未触及的角度：**_load_annotation 第二十二批**（BOM+invalid JSON / 二进制内容 / Unicode 转义 / nested / list 顶层 / null / 数字顶层 / 字符串顶层 / True 顶层 / 目录路径 / 符号链接）；**_process_one 第二十二批**（out_stub 路径构造 / process_single kwargs 透传 / write_json=False / 5-tuple 返回 / image_dir None when document None / image_dir Path / error to_dict / unlink 缺文件 / elapsed 非负）；**run_evaluation 第二十二批**（per_doc 顺序 / image_base_dir 选择性传入 / annotation 缺失 / _tolerance_chars 缺失 / _missing_markers 默认 [] / parser_version 锁定 / 全失败 None / public per_doc 4 字段 / metrics 三源合并 / 深嵌套 output_root / expected_failure unlink OSError / expected_failure mismatch / 返回 dict / source_type 透传 / expectations 透传 / parser_name+max_chars 透传 expected_failure / out_stub 路径）；**module source forbidden tokens 第三十八批**；**module source 字符串精确补强第三十四批**；**signatures 第三十四批**；**module 合理性第三十四批**；**端到端集成第三十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges50.py`（115 测试 + 1 skip）
+
+### 覆盖要点
+- **_load_annotation 第二十二批**：11 测试
+- **_process_one 第二十二批**：10 测试
+- **run_evaluation 第二十二批**：21 测试
+- **module source forbidden tokens 第三十八批**：17 测试
+- **module source 字符串精确补强第三十四批**：15 测试
+- **signatures 第三十四批**：7 测试
+- **module 合理性第三十四批**：12 测试
+- **端到端集成第三十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails：
+  - `test_load_annotation_binary_content_returns_none_batch22`：bytes(range(256)) 含 0x80+ 非 UTF-8 字节 → UnicodeDecodeError（ValueError 子类），未被 (OSError, JSONDecodeError) 捕获。修法：改 `pytest.raises(UnicodeDecodeError)`。
+  - `test_run_evaluation_image_base_dir_passed_when_dir_exists_batch22`：mock process_single 返回 (None, []) → document None → image_dir 直接是 None，不会调 image_output_dir_for。修法：让 mock 返回真实 document_mock 让 image_output_dir_for 被调用。
+- 修复后：115 全通过，1 skipped（symlink on Windows）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 479 后）：58136 pass / 0 fail / 21 skip（HEAD `376e56c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第五十一轮
+  - evaluation/schema.py 第四十一轮
+  - evaluation/manifest.py 第五十轮
+  - evaluation/annotation_metrics.py 第五十轮
+  - evaluation/metrics.py 第五十二轮
+  - evaluation/report.py 第四十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges50 已饱和（_load_annotation / _process_one / run_evaluation 各 11 类边界全检）。下一轮选 evaluation/cli.py 第五十一轮，覆盖 _build_parser / _format_metric / _run_inspect_doc / main 第二十二批未触及角度。
+
+---
+
 ## Round 478 — evaluation/report.py 第三十九轮（140 测试）
 
 ### 目标
