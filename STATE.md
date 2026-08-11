@@ -4,6 +4,54 @@
 
 ---
 
+## Round 433 — evaluation/manifest.py 第四十三轮（111 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第四十三轮 edges 测试，覆盖 edges42 未触及的角度：**_is_absolute_like 边界第十六批**（单字符 / 多字符 / 双字母 / Z: A: 盘符 / 全角字符 / NUL / 3 字符盘符）；**_has_backslash 边界第十六批**（全角反斜杠 / 控制字符 / NUL / 仅 \\ / 双 \\ / 混合）；**_resolve_relative_path 异常深度第十六批**（深度嵌套 / Unicode / project_root trailing slash / 不检查文件存在 / message 含 field_name）；**_detect_project_root 异常深度第十六批**（不存在 start / 多 pyproject.toml 取最近 / parents 遍历 / 无 pyproject fallback）；**Manifest dataclass 第十六批**（`in` 操作 / repr / hash / dict key / setattr 其它字段 / delattr frozen）；**Manifest properties 第十六批**（pdf+docx+file 关系 / 复杂配对 / categories dedupe）；**DocumentEntry 第十六批**（所有可选字段 / 字段顺序 / hashable / equality）；**ExpectedFailure 第十六批**（hashable / equality / 与 DocumentEntry 区分 / repr）；**load_manifest 异常深度第十六批**（annotation_file 越界 / expected_failures 路径越界 / 反斜杠 / 绝对路径 / 返回类型）；**module source forbidden tokens 第二十八批**；**module source 字符串精确补强第二十五批**；**signatures 第二十五批**；**module 合理性第二十五批**；**端到端集成第二十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges43.py`（111 测试）
+
+### 覆盖要点
+- **_is_absolute_like 边界第十六批**：10 测试
+- **_has_backslash 边界第十六批**：6 测试
+- **_resolve_relative_path 异常深度第十六批**：6 测试
+- **_detect_project_root 异常深度第十六批**：4 测试
+- **Manifest dataclass 第十六批**：6 测试
+- **Manifest properties 第十六批**：3 测试
+- **DocumentEntry 第十六批**：4 测试
+- **ExpectedFailure 第十六批**：5 测试
+- **load_manifest 异常深度第十六批**：5 测试
+- **module source forbidden tokens 第二十八批**：16 测试
+- **module source 字符串精确补强第二十五批**：22 测试
+- **signatures 第二十五批**：5 测试
+- **module 合理性第二十五批**：7 测试
+- **端到端集成第二十五批**：11 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_is_absolute_like_full_width_drive_batch16 期望 False，但 Ｃ 的 isalpha() 是 True）。修：改期望为 True 并解释。
+- 二次跑：1 fail（test_signature_manifest_error_init_optional_errors_batch16 期望 errors 参数，但 ManifestError 没自定义 __init__）。修：改为检查 errors 不在 parameters 中。
+- 三次跑：1 fail（test_module_constants_in_namespace_batch16 期望 MANIFEST_VERSION 不在 mmod.vars，但 import 会绑入）。修：改为检查它在 vars 中且值匹配。
+- 四次跑：1 fail（schema 不允许 source_type="unknown"，仅允许 pdf/docx/txt/other）。修：改用 "other"。
+- 五次跑：111 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 433 后）：52610 pass / 0 fail / 19 skip（HEAD `b1a814c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第四十三轮
+  - evaluation/schema.py 第三十五轮
+  - evaluation/metrics.py 第四十五轮
+  - evaluation/report.py 第三十三轮
+  - evaluation/runner.py 第四十六轮
+  - evaluation/cli.py 第四十五轮
+  - evaluation/manifest.py 第四十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 432 — evaluation/cli.py 第四十四轮（106 测试）
 
 ### 目标
