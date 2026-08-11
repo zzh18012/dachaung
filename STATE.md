@@ -4,6 +4,48 @@
 
 ---
 
+## Round 428 — evaluation/schema.py 第三十四轮（108 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第三十四轮 edges 测试，覆盖 edges33 未触及的角度：**SCHEMAS_DIR 常量深度第十四批**（含 3 个 schema 文件 / 路径分段 / 与 evaluation/__init__.py 同根 / 是 PurePath 子类）；**EvalSchemaError 行为深度第十四批**（__str__ / args / __repr__ / 修改 errors / None vs [] / __cause__ 链）；**load_schema 行为深度第十四批**（三个 schema name / 返回 dict / 新实例 / $schema 或 $id / properties）；**validate 行为深度第十四批**（schema name 错抛 FileNotFoundError / flat 结构稳定性 / 不修改 instance / message 含 schema_name 与 path= / 成功返回 None）；**validate_file 行为深度第十四批**（返回 None / 透传 EvalSchemaError / 透传 JSONDecodeError / str 与 Path 输入）；**_schema_path 行为深度第十四批**（拼接 / 不读文件 / message 含 path / 子目录失败）；**module source forbidden tokens 第十九批**；**module source 字符串精确补强第十六批**；**signatures 第十六批**；**module 合理性第十六批**；**端到端集成第十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges34.py`（108 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 常量深度第十四批**：7 测试
+- **EvalSchemaError 行为深度第十四批**：8 测试
+- **load_schema 行为深度第十四批**：8 测试
+- **validate 行为深度第十四批**：8 测试
+- **validate_file 行为深度第十四批**：6 测试
+- **_schema_path 行为深度第十四批**：6 测试
+- **module source forbidden tokens 第十九批**：16 测试
+- **module source 字符串精确补强第十六批**：24 测试
+- **signatures 第十六批**：6 测试
+- **module 合理性第十六批**：10 测试
+- **端到端集成第十六批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_schemas_dir_is_purepath_subclass_batch14 用了 PurePath 但未导入）。修：from pathlib import Path, PurePath。
+- 二次跑：108 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 428 后）：52031 pass / 0 fail / 19 skip（HEAD `9e93b13`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第四十四轮
+  - evaluation/report.py 第三十二轮
+  - evaluation/runner.py 第四十五轮
+  - evaluation/cli.py 第四十四轮
+  - evaluation/manifest.py 第四十三轮
+  - evaluation/annotation_metrics.py 第四十三轮
+  - evaluation/schema.py 第三十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 427 — evaluation/annotation_metrics.py 第四十二轮（92 测试）
 
 ### 目标
