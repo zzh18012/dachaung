@@ -4,6 +4,46 @@
 
 ---
 
+## Round 500 — evaluation/runner.py 第五十五轮（109 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第五十五轮 edges 测试，覆盖 edges52 未触及的角度：**_load_annotation 第二十五批**（int 42/0/-7 / float 3.14 / scientific 1.5e3 / -2.5E-2 / NaN / Infinity / 单引号非法 / trailing comma 非法 / 嵌套数组 / 空数组 / 空对象 / path 为目录返回 None / path=None / OSError 容错 / BOM 在前导空白后非法）；**_process_one 第二十五批**（5-tuple 严格类型 / errors 多元素时只取 [0] / document=None no errors 返回 unknown 代码 / unlink OSError 静默 / out_stub 命名 _per_doc/<doc_id>.json / write_json=False 必传 / parser_name 关键字 / max_chars 关键字 / elapsed 非负 / image_dir 在 document=None 时 None）；**run_evaluation 第二十五批**（empty documents / empty expected_failures / per_doc 顺序匹配 manifest / wall_time_seconds 5 keys / public_per_doc 无私有字段 / public_per_doc 4 keys / parser_version 取首个非 None / 全失败时 None / expected_failure matches 字段 / expected_failure 无 error actual=None matches=False / compute_metrics 每文档调用一次 / figure_caption 每文档调用 / chunk_boundary 每文档调用 / report 6 keys / report_version 常量 / UTF-8 输出 / str path 接受）；**module source forbidden tokens 第四十二批**；**module source 字符串精确补强第三十八批**；**signatures 第三十八批**；**module 合理性第三十八批**；**端到端集成第三十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges53.py`（109 测试）
+
+### 覆盖要点
+- **_load_annotation 第二十五批**：17 测试
+- **_process_one 第二十五批**：12 测试
+- **run_evaluation 第二十五批**：18 测试
+- **module source forbidden tokens 第四十二批**：16 测试
+- **module source 字符串精确补强第三十八批**：16 测试
+- **signatures 第三十八批**：13 测试
+- **module 合理性第三十八批**：12 测试
+- **端到端集成第三十八批**：8 测试
+
+### 撞墙记录
+- 首次跑：0 fail。109 全通过；全量回归 60652 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 500 后）：60652 pass / 0 fail / 22 skip（HEAD `51f5404`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第五十四轮
+  - evaluation/schema.py 第四十四轮
+  - evaluation/manifest.py 第五十三轮
+  - evaluation/annotation_metrics.py 第五十三轮
+  - evaluation/metrics.py 第五十五轮
+  - evaluation/report.py 第四十三轮
+  - evaluation/runner.py 第五十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges53 已饱和。下一轮选 evaluation/cli.py 第五十四轮。
+
+---
+
 ## Round 499 — evaluation/report.py 第四十二轮（124 测试）
 
 ### 目标
