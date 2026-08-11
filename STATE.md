@@ -4,6 +4,46 @@
 
 ---
 
+## Round 504 — evaluation/annotation_metrics.py 第五十三轮（97 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第五十三轮 edges 测试，覆盖 edges52 未触及的角度：**figure_caption_prf 第二十六批**（empty doc+annotation / doc None+annotation dict / doc dict+annotation None / 新 dict / keys 顺序 / value None / 不读 chunks / 不读 annotation 字段 / 仅 3 个 key）；**chunk_boundary_prf 第二十六批**（tolerance=0 严格 / 负数 / 大数 / 空 marker / position=before/after/default / annotation 有其它 key 但无 anchors / chunk 无 text key / text=None / 多 chunks 无 anchors / 2 chunks 1 anchor / extra anchor / 不 mutate / 返回 dict / _tolerance_chars 字段 / doc None / annotation={} / 完美匹配 P/R/F1 / 重复 marker / missing marker）；**PARSER_DOES_NOT_EMIT_RELATIONS 第二十六批**（value / type / 在 __all__ / hashable / 被 figure_caption_prf 使用 / immutable）；**module source forbidden tokens 第四十二批**；**module source 字符串精确补强第三十八批**；**signatures 第三十八批**；**module 合理性第三十八批**；**端到端集成第三十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges53.py`（97 测试）
+
+### 覆盖要点
+- **figure_caption_prf 第二十六批**：9 测试
+- **chunk_boundary_prf 第二十六批**：23 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第二十六批**：6 测试
+- **module source forbidden tokens 第四十二批**：14 测试
+- **module source 字符串精确补强第三十八批**：15 测试
+- **signatures 第三十八批**：11 测试
+- **module 合理性第三十八批**：10 测试
+- **端到端集成第三十八批**：9 测试
+
+### 撞墙记录
+- 首次跑：0 fail。97 全通过；全量回归 61114 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 504 后）：61114 pass / 0 fail / 22 skip（HEAD `73c3c1c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第五十五轮
+  - evaluation/report.py 第四十三轮
+  - evaluation/runner.py 第五十六轮
+  - evaluation/cli.py 第五十五轮
+  - evaluation/schema.py 第四十五轮
+  - evaluation/manifest.py 第五十四轮
+  - evaluation/annotation_metrics.py 第五十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges53 已饱和。下一轮选 evaluation/metrics.py 第五十五轮。
+
+---
+
 ## Round 503 — evaluation/manifest.py 第五十三轮（145 测试）
 
 ### 目标
