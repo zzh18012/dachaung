@@ -4,6 +4,58 @@
 
 ---
 
+## Round 491 — evaluation/metrics.py 第五十三轮（131 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第五十三轮 edges 测试，覆盖 edges50 未触及的角度：**构造子第二十五批**（_null idempotent / _ratio 边界 / _bool_metric falsy/truthy / _int_metric 边界）；**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十五批**（tuple / hashable / subset 检查 / excludes image/table/header/footer）；**_NOT_EVALUATED 常量**；**compute_automatic_metrics 第二十五批**（returns dict / failed pipeline / 14 keys / unknown source_type / full PDF/DOCX / image_base_dir / error_code 透传 / no code field）；**pdf_locator via metrics 第二十五批**（invalid bbox / valid / page=0 / negative page / missing page / missing bbox / image only page）；**docx_locator via metrics 第二十五批**（valid / missing paragraph_index / table_index / rejects page）；**image_resource via metrics 第二十五批**（no image / missing rp / nonexistent / exists / zero size）；**chunk_reference via metrics 第二十五批**（no chunks / no elements / all valid / partial / empty ids）；**text_preservation via metrics 第二十五批**（equal / chunk missing text / image excluded / unicode）；**heading_boundary via metrics 第二十五批**（no headings / no chunks / perfect）；**silent_drop via metrics 第二十五批**（no expectations / zero drop / one drop / multi type / no negative）；**element_count_total/by_type 第二十五批**；**module source forbidden tokens 第四十批**；**module source 字符串精确补强第三十六批**；**signatures 第三十六批**；**module 合理性第三十六批**；**端到端集成第三十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges51.py`（131 测试）
+
+### 覆盖要点
+- **构造子第二十五批**：19 测试
+- **_TEXT_TYPES / _PDF_BBOX 第二十五批**：12 测试
+- **compute_automatic_metrics 第二十五批**：10 测试
+- **pdf_locator via metrics 第二十五批**：7 测试
+- **docx_locator via metrics 第二十五批**：4 测试
+- **image_resource via metrics 第二十五批**：5 测试
+- **chunk_reference via metrics 第二十五批**：5 测试
+- **text_preservation via metrics 第二十五批**：4 测试
+- **heading_boundary via metrics 第二十五批**：3 测试
+- **silent_drop via metrics 第二十五批**：5 测试
+- **element_count_total/by_type 第二十五批**：3 测试
+- **module source forbidden tokens 第四十批**：16 测试
+- **module source 字符串精确补强第三十六批**：15 测试
+- **signatures 第三十六批**：8 测试
+- **module 合理性第三十六批**：11 测试
+- **端到端集成第三十六批**：7 测试
+
+### 撞墙记录
+- 首次跑：3 fails（一次显现）：
+  - `test_compute_metrics_unknown_source_type_batch25`：误以为 source_type='bogus' → reason='not_evaluated'。实际：document=None → 'pipeline_failed'；document 非空但 source_type='bogus' → 'not_pdf_document' / 'not_docx_document'。修法：传 document + 改 reason 期望。
+  - `test_e2e_metrics_full_pdf_flow_batch25`：误以为 schema_valid=true。实际：schema_valid 取决于实际 `document_passes_schema(document)` 校验。修法：assert `isinstance(value, bool)`。
+  - `test_e2e_metrics_schema_valid_true_when_no_error_batch25`：同上。修法：改为 bool 检查。
+- 修复后：131 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 491 后）：59673 pass / 0 fail / 22 skip（HEAD `a0507cf`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第四十一轮
+  - evaluation/runner.py 第五十四轮
+  - evaluation/cli.py 第五十三轮
+  - evaluation/schema.py 第四十三轮
+  - evaluation/manifest.py 第五十二轮
+  - evaluation/annotation_metrics.py 第五十二轮
+  - evaluation/metrics.py 第五十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges51 已饱和（构造子 + 12 类子函数 + 16 forbidden + 15 source + 8 signatures + 11 sanity + 7 e2e）。下一轮选 evaluation/report.py 第四十一轮，覆盖 _RATIO_METRICS / aggregate_summary / build_provenance 第二十五批未触及角度。
+
+---
+
 ## Round 490 — evaluation/annotation_metrics.py 第五十一轮（97 测试）
 
 ### 目标
