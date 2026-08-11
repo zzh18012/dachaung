@@ -4,44 +4,48 @@
 
 ---
 
-## Round 459 — evaluation/runner.py 第四十九轮（107 测试）
+## Round 460 — evaluation/cli.py 第四十八轮（121 测试）
 
 ### 目标
-- 给 `evaluation/runner.py`（228 行）加第四十九轮 edges 测试，覆盖 edges46 未触及的角度：**_load_annotation 行为第十九批**（str path AttributeError / None / 不存在 / 数组 JSON / OSError 被 swallow / UTF-8 BOM 拒绝 / 嵌套 dict / 空 dict / 空文件）；**_process_one 行为第十九批**（_per_doc 目录创建 / errors[0].to_dict / no document no errors 返回 unknown / document 成功路径 / image_dir None when no document / elapsed 非负 / image_output_dir_for 仅在 doc 存在时调用 / unlink OSError 被 swallow）；**run_evaluation 行为第十九批**（metrics 含 figure_caption_* / metrics 含 chunk_boundary_* / public per_doc 不含 _ 前缀 / wall_time parse_reason+chunk_reason 固定 not_instrumented / parser_version 来自第一个成功 doc / 无 doc 时 None / 6 top keys / report_version 来自 REPORT_VERSION 常量 / per_doc 顺序保留 / ensure_ascii=False / image_dir 用作 image_base_dir / image_dir 非目录时 None / expected_failures 写入报告 / 父目录创建）；**module source forbidden tokens 第三十四批**；**module source 字符串精确补强第二十九批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
+- 给 `evaluation/cli.py`（243 行）加第四十八轮 edges 测试，覆盖 edges46 未触及的角度：**_build_parser 行为第二十批**（prog / description / subparser dest / required / --parser choices / default fallback / invalid choice SystemExit / --max-chars type int / --max-chars default 800 / --tolerance-chars default 30 / inspect-doc positional / validate-report positional）；**_format_metric 行为第二十批**（value=0/0.0/1.0/negative int/empty dict/many dict items/dict sorted alpha/string/empty string/long reason/reason overrides ok/width 36）；**_run_inspect_doc 行为第二十批**（document_id 缺省 ?/source_path 缺省 ?/parser 缺省 ? v?/elements=None 触发 TypeError（已知 bug）/chunks=None 触发 TypeError/metrics count/sorted bool first/top-level array/string/int returns 1/file not exist/invalid json/tolerance chars）；**main 行为第二十批**（run 全参数 / validate-report 文件不存在/invalid JSON / manifest 不存在 / manifest load error / run_evaluation EvalSchemaError / unknown command SystemExit / load_manifest 调用 / 输出 documents=N / validate_file EvalSchemaError）；**module source forbidden tokens 第三十五批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
 
 ### 改动
-- 新增 `tests/test_evaluation_runner_edges47.py`（107 测试）
+- 新增 `tests/test_evaluation_cli_edges47.py`（121 测试）
 
 ### 覆盖要点
-- **_load_annotation 第十九批**：11 测试
-- **_process_one 第十九批**：8 测试
-- **run_evaluation 第十九批**：16 测试
-- **module source forbidden tokens 第三十四批**：17 测试
-- **module source 字符串精确补强第二十九批**：17 测试
-- **signatures 第二十九批**：5 测试
-- **module 合理性第二十九批**：11 测试
-- **端到端集成第二十九批**：7 测试
+- **_build_parser 第二十批**：13 测试
+- **_format_metric 第二十批**：12 测试
+- **_run_inspect_doc 第二十批**：14 测试
+- **main 第二十批**：11 测试
+- **module source forbidden tokens 第三十五批**：18 测试
+- **module source 字符串精确补强第三十批**：17 测试
+- **signatures 第三十批**：5 测试
+- **module 合理性第三十批**：11 测试
+- **端到端集成第三十批**：7 测试
 
 ### 撞墙记录
-- 首次跑：2 fails（同一根因）
-  - `test_process_one_errors_returns_first_error_dict_batch19` 等：runner.py 顶层 `from app.pipeline import process_single` 把名字绑定到 runner 模块，patch `app.pipeline.process_single` 不生效。修法：patch `evaluation.runner.process_single` / `evaluation.runner.image_output_dir_for` / `evaluation.runner.compute_automatic_metrics` / `evaluation.runner.figure_caption_prf` / `evaluation.runner.chunk_boundary_prf`。
-- 修复后：107 全通过。
+- 首次跑：2 fails
+  - `test_format_metric_aligned_width_36_batch20`：split('1')[0] 在两行 name 不同时不能直接比较（短 name 行的 split 会从空格处先切）。修法：用 split('  1')[0] 比 len。
+  - `test_run_inspect_doc_elements_none_batch20` / `chunks_none`：cli.py 中 `doc.get("elements") or []` 只改本地变量，doc 本身仍是 None，传给 compute_automatic_metrics 后 `len(None)` TypeError（已知 bug）。修法：用 `pytest.raises(TypeError)` 替代 rc==0。
+- 修复后：121 全通过。
 
 ### 测试基线
 - main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
-- 本 worktree（Round 459 后）：55566 pass / 0 fail / 19 skip（HEAD `75c3a4e`）
+- 本 worktree（Round 460 后）：55687 pass / 0 fail / 19 skip（HEAD `3630e12`）
 
 ### 下一步建议
 - 候选：
-  - evaluation/cli.py 第四十八轮
   - evaluation/manifest.py 第四十七轮
   - evaluation/schema.py 第三十九轮
   - evaluation/annotation_metrics.py 第四十七轮
   - evaluation/metrics.py 第四十九轮
   - evaluation/report.py 第三十七轮
+  - evaluation/runner.py 第五十轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：runner.py edges47 已饱和（load_annotation 11 + process_one 8 + run_evaluation 16）。下一轮选 evaluation/cli.py 第四十八轮，覆盖 _build_parser / _format_metric / _run_inspect_doc / main 更深入行为。
+**建议**：cli.py edges47 已饱和（build_parser 13 + format_metric 12 + inspect_doc 14 + main 11）。下一轮选 evaluation/manifest.py 第四十七轮，覆盖 Manifest/DocumentEntry/ExpectedFailure dataclass + load_manifest 更深入边界。
+
+---
 
 ---
 
