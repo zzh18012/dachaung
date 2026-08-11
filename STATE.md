@@ -4,6 +4,56 @@
 
 ---
 
+## Round 484 — evaluation/metrics.py 第五十二轮（190 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第五十二轮 edges 测试，覆盖 edges49 未触及的角度：**构造子第二十四批**（_null empty reason / 重复调用 / _ratio 负数 / 极小值 / 大值 / _bool_metric None/empty/nonempty / _int_metric 负数/0 / 构造子 dict 字段一致）；**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十四批**（无重复 / 是 tuple / iterable / hashable / subset / excludes image / excludes table/header/footer）；**_strip_unicode_whitespace 第二十四批**（vertical tab / form feed / carriage return / 全空白 / 无空白 / 空串 / digits / 标点 / 中文 / emoji / NBSP / em space）；**compute_automatic_metrics 第二十四批**（unknown source_type / image_base_dir 默认 / error_only / error_code None / 返回 dict / 14 keys / 0 elements / pipeline_failed 11+ nulls）；**_pdf_locator_ratio 第二十四批**（无 locator / None locator / page=0 / page<0 / paragraph 无 bbox / paragraph 有 bbox / image 只 page / mixed）；**_docx_locator_ratio 第二十四批**（table_index / section / paragraph_index / locator None / empty locator / 无 key / 拒 page / 拒 bbox / mixed）；**_is_valid_bbox 第二十四批**（None / str / dict / set / tuple / 3 items / 5 items / bool inside / all int / all float / nan / inf）；**_image_resource_ratio 第二十四批**（无 rp / 空 rp / 不存在 / 存在 / 0 size / mixed / no image / image_base_dir 帮助）；**_chunk_reference_ratio 第二十四批**（无 chunks / 空 chunks / 空 elements / 缺 ids key / 空 ids / 全 valid / 部分 valid / 多 ids 全 valid / 多 ids 部分无效）；**_text_preservation 第二十四批**（empty both / 相同 / actual 空 / expected 空 / image 排除 / 3 keys / 重复字符）；**_heading_boundary_ratio 第二十四批**（无 headings / 无 chunks / 无 first id / 完美 / 部分 / 无 element_id / chunks 缺 first id）；**_silent_drop_count 第二十四批**（无 exp / empty exp / 无 element_count key / empty element_count / 无 drop / full drop / 部分 / actual>expected / 多 type / unknown type）；**module source forbidden tokens 第三十九批**；**module source 字符串精确补强第三十五批**；**signatures 第三十五批**；**module 合理性第三十五批**；**端到端集成第三十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges50.py`（190 测试）
+
+### 覆盖要点
+- **构造子第二十四批**：13 测试
+- **_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十四批**：10 测试
+- **_strip_unicode_whitespace 第二十四批**：11 测试
+- **compute_automatic_metrics 第二十四批**：8 测试
+- **_pdf_locator_ratio 第二十四批**：8 测试
+- **_docx_locator_ratio 第二十四批**：9 测试
+- **_is_valid_bbox 第二十四批**：12 测试
+- **_image_resource_ratio 第二十四批**：8 测试
+- **_chunk_reference_ratio 第二十四批**：9 测试
+- **_text_preservation 第二十四批**：7 测试
+- **_heading_boundary_ratio 第二十四批**：7 测试
+- **_silent_drop_count 第二十四批**：10 测试
+- **module source forbidden tokens 第三十九批**：17 测试
+- **module source 字符串精确补强第三十五批**：15 测试
+- **signatures 第三十五批**：8 测试
+- **module 合理性第三十五批**：12 测试
+- **端到端集成第三十五批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_strip_unicode_whitespace_vertical_tab_batch24`：误用 "a\tvb" 字面（含字母 v），实际想要 "a\vb"（vertical tab）。修法：去掉中间多余字符。
+- 修复后：190 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 484 后）：58830 pass / 0 fail / 21 skip（HEAD `230a361`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第四十轮
+  - evaluation/runner.py 第五十三轮
+  - evaluation/cli.py 第五十二轮
+  - evaluation/schema.py 第四十二轮
+  - evaluation/manifest.py 第五十一轮
+  - evaluation/annotation_metrics.py 第五十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges50 已饱和（构造子 + 12 类子函数全检）。下一轮选 evaluation/report.py 第四十轮，覆盖 _RATIO_METRICS / aggregate_summary / build_provenance 第二十三批未触及角度。
+
+---
+
 ## Round 483 — evaluation/annotation_metrics.py 第五十轮（111 测试）
 
 ### 目标
