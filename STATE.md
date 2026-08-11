@@ -4,6 +4,48 @@
 
 ---
 
+## Round 442 — evaluation/schema.py 第三十六轮（114 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第三十六轮 edges 测试，覆盖 edges35 未触及的角度：**SCHEMAS_DIR 常量深度第十六批**（is_dir / resolve 幂等 / parent 项目根 / parent 含 evaluation app tests schemas / str endswith / 至少 3 schema 文件）；**EvalSchemaError 行为深度第十六批**（args 单元素 / errors=None vs [] / errors 默认空 / errors 给定 / raise with from / pickle / errors 独立）；**load_schema 行为深度第十六批**（idempotent / 修改不持久 / 三个 distinct / subdir 拒绝 / properties 存在 / documents 存在）；**validate 行为深度第十六批**（成功 None / 多错误 / path/message/schema_path 类型 / message 含 count / annotation schema 完整 / evaluation-report 最小路径 / extra fields 拒绝）；**validate_file 行为深度第十六批**（path str/Path / BOM 失败 / idempotent / 不存在 / invalid JSON / 不修改文件）；**_schema_path 行为深度第十六批**（concat / Path / subdir 拒绝 / Unicode / empty / message format / 三个 valid）；**module source forbidden tokens 第三十一批**；**module source 字符串精确补强第二十七批**；**signatures 第二十七批**；**module 合理性第二十七批**；**端到端集成第二十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges36.py`（114 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 第十六批**：9 测试
+- **EvalSchemaError 第十六批**：11 测试
+- **load_schema 第十六批**：8 测试
+- **validate 第十六批**：11 测试
+- **validate_file 第十六批**：8 测试
+- **_schema_path 第十六批**：7 测试
+- **module source forbidden tokens 第三十一批**：18 测试（含 no_subprocess + no_network）
+- **module source 字符串精确补强第二十七批**：17 测试
+- **signatures 第二十七批**：6 测试
+- **module 合理性第二十七批**：10 测试
+- **端到端集成第二十七批**：10 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_validate_invalid_returns_errors_batch16 期望 ≥ 4 错误，但 manifest schema 只有 3 个 required 字段）。修：改成 ≥ 3。
+- 二次跑：114 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 442 后）：53665 pass / 0 fail / 19 skip（HEAD `0462787`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第四十六轮
+  - evaluation/report.py 第三十四轮
+  - evaluation/runner.py 第四十七轮
+  - evaluation/cli.py 第四十六轮
+  - evaluation/manifest.py 第四十五轮
+  - evaluation/annotation_metrics.py 第四十五轮
+  - evaluation/schema.py 第三十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 441 — evaluation/annotation_metrics.py 第四十四轮（100 测试）
 
 ### 目标
