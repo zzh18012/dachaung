@@ -4,6 +4,54 @@
 
 ---
 
+## Round 496 — evaluation/manifest.py 第五十二轮（114 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第五十二轮 edges 测试，覆盖 edges51 未触及的角度：**_is_absolute_like 第二十五批**（Cyrillic 盘符 / 数字开头 / UNC 路径 / home ~/foo / ':' only / a:b / 长 relative / idempotent）；**_has_backslash 第二十五批**（tab / newline / 混合 / leading / trailing / unicode）；**_resolve_relative_path 第二十五批**（深层 / 单 `.` / unicode / 多 `/` / trailing / Path 实例 / idempotent）；**_detect_project_root 第二十五批**（多层向上 / 无 pyproject fallback / 已在根 / 目录输入 / 多 pyproject 选最近 / Path 实例）；**Manifest properties 第二十五批**（0 docs / 100 docs / pdf+docx==file_count / unicode categories / paired chain / list 返回 / Path project_root）；**DocumentEntry 第二十五批**（sha256 / 单 element categories / paired_with / annotation_resolved / path_str 不 normalize / annotation_file_str / expectations dict）；**ExpectedFailure 第二十五批**（必填 / source_type None / source_type string / hashable / frozen / equality）；**load_manifest 第二十五批**（sha256 透传 / categories 透传 / paired_with 透传 / expected_failure 无 source_type / annotation_file 反斜杠拒 / expectations 透传 / ../ 越界 / manifest_version 透传 / version 不兼容 / 非 JSON / 文件不存在 / project_root resolved）；**module source forbidden tokens 第四十一批**；**module source 字符串精确补强第三十七批**；**signatures 第三十七批**；**module 合理性第三十七批**；**端到端集成第三十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges52.py`（114 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第二十五批**：8 测试
+- **_has_backslash 第二十五批**：6 测试
+- **_resolve_relative_path 第二十五批**：7 测试
+- **_detect_project_root 第二十五批**：6 测试
+- **Manifest properties 第二十五批**：7 测试
+- **DocumentEntry 第二十五批**：7 测试
+- **ExpectedFailure 第二十五批**：6 测试
+- **load_manifest 第二十五批**：14 测试
+- **module source forbidden tokens 第四十一批**：16 测试
+- **module source 字符串精确补强第三十七批**：15 测试
+- **signatures 第三十七批**：8 测试
+- **module 合理性第三十七批**：9 测试
+- **端到端集成第三十七批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails：
+  - `test_detect_project_root_no_pyproject_returns_input_dir_batch25`：误以为 file 不存在时 cur 会被切到 parent。实际：`cur.is_file()` 对不存在文件返回 False，cur 保持 file path。修法：期望 `(deep / "file.txt").resolve()`。
+  - `test_load_manifest_incompatible_version_raises_batch25`：误以为 manifest_version="2.0" 会触发代码中的 version 检查。实际：schema 用 enum 限定 manifest_version="1.0"，validate 先抛 EvalSchemaError。修法：用 `(ManifestError, EvalSchemaError)` 元组 + 检查 message 含 manifest_version 或 '1.0'。
+- 修复后：114 全通过；全量回归 60226 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 496 后）：60226 pass / 0 fail / 22 skip（HEAD `fb796bf`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第五十二轮
+  - evaluation/metrics.py 第五十四轮
+  - evaluation/report.py 第四十二轮
+  - evaluation/runner.py 第五十五轮
+  - evaluation/cli.py 第五十四轮
+  - evaluation/schema.py 第四十四轮
+  - evaluation/manifest.py 第五十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges52 已饱和（8 + 6 + 7 + 6 + 7 + 7 + 6 + 14 + 16 + 15 + 8 + 9 + 7）。下一轮选 evaluation/annotation_metrics.py 第五十二轮或 evaluation/metrics.py 第五十四轮。
+
+---
+
 ## Round 495 — evaluation/schema.py 第四十三轮（109 测试）
 
 ### 目标
