@@ -4,6 +4,46 @@
 
 ---
 
+## Round 439 — evaluation/cli.py 第四十五轮（113 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第四十五轮 edges 测试，覆盖 edges43 未触及的角度：**_build_parser 边界第十七批**（prog / description / formatter / subparsers required / 三个子命令 / run defaults / parser choices / 缺参数报错 / unknown command）；**argparse Namespace 第十七批**（多参数组合 / inspect-doc args / validate-report args / command attr / type）；**_format_metric 边界第十七批**（dict value / 空 dict / int / 负数 / None+reason / bool true/false / float 0/1/负数 / long name / str value）；**_run_inspect_doc 边界第十七批**（input 不存在 / JSON null/list / doc 缺 elements/chunks / source_type 默认 / tolerance 透传）；**main 路由第十七批**（run manifest 不存在/加载失败/成功 / validate-report 不存在/JSON 失败/schema 失败 / unknown command）；**module source forbidden tokens 第三十三批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges44.py`（113 测试）
+
+### 覆盖要点
+- **_build_parser 第十七批**：15 测试
+- **argparse Namespace 第十七批**：5 测试
+- **_format_metric 第十七批**：14 测试
+- **_run_inspect_doc 第十七批**：12 测试
+- **main 路由第十七批**：10 测试
+- **module source forbidden tokens 第三十三批**：18 测试（含 no_subprocess / no_network）
+- **module source 字符串精确补强第三十批**：21 测试
+- **signatures 第三十批**：6 测试
+- **module 合理性第三十批**：6 测试
+- **端到端集成第三十批**：9 测试
+
+### 撞墙记录
+- 首次跑：113 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 439 后）：53321 pass / 0 fail / 19 skip（HEAD `007b80f`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第四十四轮
+  - evaluation/annotation_metrics.py 第四十四轮
+  - evaluation/schema.py 第三十六轮
+  - evaluation/metrics.py 第四十六轮
+  - evaluation/report.py 第三十四轮
+  - evaluation/runner.py 第四十七轮
+  - evaluation/cli.py 第四十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 438 — evaluation/runner.py 第四十六轮（100 测试）
 
 ### 目标
