@@ -4,6 +4,55 @@
 
 ---
 
+## Round 454 — evaluation/manifest.py 第四十六轮（105 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第四十六轮 edges 测试，覆盖 edges45 未触及的角度：**_is_absolute_like 行为深度第十九批**（lowercase/uppercase/mixed drive / 3 chars no colon / 3 chars no separator / long relative / just drive letter）；**_has_backslash 行为深度第十九批**（multiple consecutive / mixed with forward slash / only spaces）；**_resolve_relative_path 行为深度第十九批**（multi-level / single file / Unicode filename / drive letter rejected / inside root / field_name in error）；**_detect_project_root 行为深度第十九批**（start with pyproject / deep nested / returns absolute / string path）；**Manifest dataclass 第十九批**（field types / hashable 含 tuple / inequality / no defaults）；**Manifest properties 第十九批**（categories empty / pdf/docx zero / self-paired / one-way paired）；**DocumentEntry 第十九批**（all fields / equality / inequality / hashable with hashable fields / unhashable with dict）；**ExpectedFailure 第十九批**（source_type 'other'/'txt' / inequality / field count）；**load_manifest 行为深度第十九批**（returns Manifest / str path / Unicode doc_id / annotation_resolved / annotation_file_str / expectations passthrough / sha256 / invalid JSON trailing comma / categories default / special chars doc_id / no source_type expected_failure / devset complete）；**module source forbidden tokens 第三十三批**；**module source 字符串精确补强第三十一批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges46.py`（105 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第十九批**：7 测试
+- **_has_backslash 第十九批**：4 测试
+- **_resolve_relative_path 第十九批**：7 测试
+- **_detect_project_root 第十九批**：4 测试
+- **Manifest dataclass 第十九批**：4 测试
+- **Manifest properties 第十九批**：5 测试
+- **DocumentEntry 第十九批**：5 测试
+- **ExpectedFailure 第十九批**：4 测试
+- **load_manifest 第十九批**：12 测试
+- **module source forbidden tokens 第三十三批**：18 测试
+- **module source 字符串精确补强第三十一批**：16 测试
+- **signatures 第二十九批**：5 测试
+- **module 合理性第二十九批**：7 测试
+- **端到端集成第二十九批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails
+  - `test_manifest_no_default_values_batch19`：dataclasses 用 `dataclasses.MISSING` sentinel 表示无 default，不是 `inspect.Parameter.empty`。修法：用 `dataclasses.MISSING` 比较。
+  - `test_document_entry_hashable_with_all_fields_batch19`：expectations 字段是 dict → 不可 hash。修法：拆成两个测试（expectations=None 时 hashable + expectations=dict 时 unhashable）。
+- 修复后：105 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 454 后）：54981 pass / 0 fail / 19 skip（HEAD `4d766e2`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第四十六轮
+  - evaluation/schema.py 第三十八轮
+  - evaluation/metrics.py 第四十八轮
+  - evaluation/report.py 第三十六轮
+  - evaluation/runner.py 第四十九轮
+  - evaluation/cli.py 第四十八轮
+  - evaluation/manifest.py 第四十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges46 已饱和（_is_absolute_like 7 + _has_backslash 4 + _resolve_relative_path 7 + dataclass/properties/entries 深入）。下一轮选 evaluation/annotation_metrics.py 第四十六轮，覆盖 chunk_boundary_prf / figure_caption_prf 更深入行为。
+
+---
+
 ## Round 453 — evaluation/cli.py 第四十七轮（94 测试）
 
 ### 目标
