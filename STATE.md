@@ -4,6 +4,45 @@
 
 ---
 
+## Round 465 — evaluation/runner.py 第五十轮（108 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第五十轮 edges 测试，覆盖 edges47 未触及的角度：**_load_annotation 第二十批**（int/bool/null/float/str 顶层 / 目录被拒 / 大整数 / 深度嵌套 / 数组混合 / 转义字符）；**_process_one 第二十批**（write_json=False / parser_name 透传 / max_chars 透传 / out_stub 用 doc_id 命名 / image_output_dir_for 入参 / stub 清理 / perf_counter 配对 / 5-tuple 返回 / errors 优先于 unknown）；**run_evaluation 第二十批**（parser_version 持久 / falsy 跳过 / image_base_dir 优先级 / expected_failure 单独 stub / stub 清理 / public per_doc 严格 4 字段 / indent=2 输出 / provenance 透传 parser_name+max_chars / 多 expected_failure）；**module source forbidden tokens 第三十六批**；**module source 字符串精确补强第三十二批**；**signatures 第三十二批**；**module 合理性第三十二批**；**端到端集成第三十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges48.py`（108 测试）
+
+### 覆盖要点
+- **_load_annotation 第二十批**：10 测试
+- **_process_one 第二十批**：11 测试
+- **run_evaluation 第二十批**：13 测试
+- **module source forbidden tokens 第三十六批**：17 测试
+- **module source 字符串精确补强第三十二批**：16 测试
+- **signatures 第三十二批**：6 测试
+- **module 合理性第三十二批**：12 测试
+- **端到端集成第三十二批**：8 测试
+
+### 撞墙记录
+- 首次跑：0 fails，108 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 465 后）：56296 pass / 0 fail / 19 skip（HEAD `c829f9e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第四十九轮
+  - evaluation/schema.py 第三十九轮
+  - evaluation/manifest.py 第四十八轮
+  - evaluation/annotation_metrics.py 第四十八轮
+  - evaluation/metrics.py 第五十轮
+  - evaluation/report.py 第三十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges48 已饱和（_load_annotation 10 + _process_one 11 + run_evaluation 13 + 多批 source 字符串）。下一轮选 evaluation/cli.py 第四十九轮，深入 _build_parser 子命令注册与 _format_metric 对齐细节。
+
+---
+
 ## Round 464 — evaluation/report.py 第三十七轮（122 测试）
 
 ### 目标
