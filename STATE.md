@@ -4,6 +4,49 @@
 
 ---
 
+## Round 451 — evaluation/report.py 第三十五轮（124 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第三十五轮 edges 测试，覆盖 edges34 未触及的角度：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 元组深度第十八批**（count 12/1/1 / 不含 pipeline_success / 不含 element_count / 元组 disjoint / 都是 string）；**get_git_provenance 行为深度第十八批**（返 dict / keys count 2 / value 类型 / nonexistent root / file as root / mock success / mock dirty / mock rev-parse 失败 / mock subprocess 异常 / OSError）；**get_dependency_versions 行为深度第十八批**（返 dict / keys count 3 / contents / value 类型 / no timeout / PackageNotFoundError / unknown Exception）；**build_provenance 字段深度第十八批**（返 dict / keys count 9 / keys names / evaluator_version constant / report_version constant / parser_name / parser_version None / max_chars 负数 / string int / 0 / dependencies dict / timestamp ISO / timezone / parser_name empty）；**build_devset_section 字段深度第十八批**（返 dict / keys count 6 / status string / file_count / pdf/docx / categories list / 不调 setter / complete status）；**aggregate_summary 行为深度第十八批**（empty / silent_drop empty/zero/multi/with null / success_rate full/zero / counts sum/with null / ratio macro avg / all null / 4 top keys / 所有 _RATIO_METRICS 都在）；**module source forbidden tokens 第三十二批**；**module source 字符串精确补强第二十八批**；**signatures 第二十八批**；**module 合理性第二十八批**；**端到端集成第二十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges35.py`（124 测试）
+
+### 覆盖要点
+- **元组深度第十八批**：14 测试
+- **get_git_provenance 第十八批**：10 测试
+- **get_dependency_versions 第十八批**：7 测试
+- **build_provenance 第十八批**：15 测试
+- **build_devset_section 第十八批**：10 测试
+- **aggregate_summary 第十八批**：13 测试
+- **module source forbidden tokens 第三十二批**：18 测试
+- **module source 字符串精确补强第二十八批**：15 测试
+- **signatures 第二十八批**：5 测试
+- **module 合理性第二十八批**：11 测试
+- **端到端集成第二十八批**：7 测试
+
+### 撞墙记录
+- 0 fail 首次跑（124 全通过）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 451 后）：54692 pass / 0 fail / 19 skip（HEAD `b7ec00b`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第四十八轮
+  - evaluation/cli.py 第四十七轮
+  - evaluation/manifest.py 第四十六轮
+  - evaluation/annotation_metrics.py 第四十六轮
+  - evaluation/schema.py 第三十八轮
+  - evaluation/metrics.py 第四十八轮
+  - evaluation/report.py 第三十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges35 已饱和（元组 14 + get_git_provenance 10 + get_dependency_versions 7 + build_provenance 15 + build_devset_section 10 + aggregate_summary 13）。下一轮选 evaluation/runner.py 第四十八轮，继续 _process_one / run_evaluation 行为深度。
+
+---
+
 ## Round 450 — evaluation/metrics.py 第四十七轮（148 测试）
 
 ### 目标
