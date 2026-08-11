@@ -4,6 +4,52 @@
 
 ---
 
+## Round 492 — evaluation/report.py 第四十一轮（123 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第四十一轮 edges 测试，覆盖 edges40 未触及的角度：**_RATIO_METRICS 第二十五批**（排除 figure_caption_* / silent_drop / pipeline_success / element_count_total / 含 schema_valid / chunk_boundary_* / text_char_multiset_* / tuple / 12 entries / hashable / no duplicates）；**_COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十五批**（1 entry each / 互不相交 / 类型）；**get_git_provenance 第二十五批**（encoding param / errors replace / timeout=10 / cwd param / returns dict / keys / commit stripped / commit empty / dirty with porcelain / clean when empty）；**get_dependency_versions 第二十五批**（importlib.metadata / 包不存在 / 顺序 / 3 keys）；**build_provenance 第二十五批**（max_chars int 强制 / parser_version=None 透传 / 9 keys 严格 / dependencies 来自 get_dependency_versions / run_timestamp_iso / EVALUATOR_VERSION / REPORT_VERSION）；**build_devset_section 第二十五批**（6 keys 严格 / 透传所有属性 / frozen manifest）；**aggregate_summary 第二十五批**（empty / 单 doc / 全 null / counts sum / counts skips null / success_rates rate / ratio macro / ratio skips null / silent_drop_total None / silent_drop partial null / all 12 ratio metrics present / no count metrics / all success metrics / returns dict）；**module source forbidden tokens 第四十一批**（subprocess.allowed / datetime.allowed via from-import）；**module source 字符串精确补强第三十七批**；**signatures 第三十七批**；**module 合理性第三十七批**；**端到端集成第三十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges41.py`（123 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 第二十五批**：11 测试
+- **_COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十五批**：8 测试
+- **get_git_provenance 第二十五批**：8 测试
+- **get_dependency_versions 第二十五批**：7 测试
+- **build_provenance 第二十五批**：11 测试
+- **build_devset_section 第二十五批**：6 测试
+- **aggregate_summary 第二十五批**：16 测试
+- **module source forbidden tokens 第四十一批**：16 测试（含 `test_module_source_uses_from_datetime_import_batch25`）
+- **module source 字符串精确补强第三十七批**：15 测试
+- **signatures 第三十七批**：8 测试
+- **module 合理性第三十七批**：11 测试
+- **端到端集成第三十七批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_module_source_forbidden_tokens_batch25`：FORBIDDEN_TOKENS 包含 `"import datetime"`，但 `from datetime import datetime` 含子串 `import datetime`，substring 匹配假阳性。修法：删除 `"import datetime"` 与 `"from datetime import date"` 两项，新增 `test_module_source_uses_from_datetime_import_batch25` 显式允许 from-import 风格。
+- 修复后：123 全通过；全量回归 59796 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 492 后）：59796 pass / 0 fail / 22 skip（HEAD `41e4d84`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第五十四轮
+  - evaluation/cli.py 第五十三轮
+  - evaluation/schema.py 第四十三轮
+  - evaluation/manifest.py 第五十二轮
+  - evaluation/annotation_metrics.py 第五十二轮
+  - evaluation/metrics.py 第五十四轮
+  - evaluation/report.py 第四十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges41 已饱和（_RATIO/_COUNT/_SUCCESS + get_git_provenance + get_dependency_versions + build_provenance + build_devset_section + aggregate_summary + 16 forbidden + 15 source + 8 signatures + 11 sanity + 7 e2e）。下一轮选 evaluation/runner.py 第五十四轮或 evaluation/cli.py 第五十三轮。
+
+---
+
 ## Round 491 — evaluation/metrics.py 第五十三轮（131 测试）
 
 ### 目标
