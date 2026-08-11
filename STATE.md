@@ -4,45 +4,55 @@
 
 ---
 
-## Round 462 — evaluation/annotation_metrics.py 第四十七轮（101 测试）
+## Round 463 — evaluation/metrics.py 第四十九轮（124 测试）
 
 ### 目标
-- 给 `evaluation/annotation_metrics.py`（195 行）加第四十七轮 edges 测试，覆盖 edges46 未触及的角度：**figure_caption_prf 行为第二十批**（3 metrics / value 全 None / reason constant / None 输入 / 部分输入 / 忽略 doc 内容 / 忽略 annotation 内容）；**chunk_boundary_prf 边界第二十批**（document None / annotation None / annotation 空 dict / 无 chunks 无 anchors / 单 chunk 无 anchors / 单 chunk 有 anchors / 多 chunk 无 anchors）；**chunk_boundary_prf 算法第二十批**（perfect match / partial match / no match / tolerance 0 / tolerance huge / position before / multiple anchors one-to-one）；**missing_markers 行为第二十批**（记录 / 无 field / 空 marker / marker 不在 stream）；**_tolerance_chars 行为第二十批**（output 字段 / 默认 30 / 0 / 负数 / document None）；**PARSER_DOES_NOT_EMIT_RELATIONS 常量行为第二十批**（值 / 类型 / 不可变）；**module source forbidden tokens 第三十五批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
+- 给 `evaluation/metrics.py`（381 行）加第四十九轮 edges 测试，覆盖 edges46 未触及的角度：**构造子第二十批**（_null 类型 / _ratio NaN+inf+huge / _bool_metric None+dict+list / _int_metric float+str+None）；**_TEXT_TYPES 唯一性 + 具体值**；**_strip_unicode_whitespace 第二批**（单 char / 数字 / 字母 / tab / newline）；**compute_automatic_metrics 第二十批**（source_type=docx/pdf 切换 / no chunks / no heading / no image / element_count_by_type / unknown type / silent_drop）；**_pdf_locator_ratio 第二批**（no locator key / empty dict / text no bbox）；**_docx_locator_ratio 第二批**（empty / image type / mixed）；**_is_valid_bbox 第二批**（decimal str / 5 items / dict / set）；**_image_resource_ratio 第二十批**（Path object / no image / image 计入分母）；**_chunk_reference_ratio 第二十批**（mixed valid invalid / all empty ids / duplicates）；**_text_preservation 第二十批**（image excluded / table/caption/header/footer/list_item included）；**_heading_boundary_ratio 第二十批**（2 headings / one matched / chunks empty ids）；**_silent_drop_count 第二十批**（no element_count key / actual more / no text type in by_type）；**module source forbidden tokens 第三十五批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
 
 ### 改动
-- 新增 `tests/test_evaluation_annotation_metrics_edges47.py`（101 测试）
+- 新增 `tests/test_evaluation_metrics_edges47.py`（124 测试）
 
 ### 覆盖要点
-- **figure_caption_prf 第二十批**：7 测试
-- **chunk_boundary_prf 边界第二十批**：7 测试
-- **chunk_boundary_prf 算法第二十批**：7 测试
-- **missing_markers 第二十批**：4 测试
-- **_tolerance_chars 第二十批**：5 测试
-- **PARSER_DOES_NOT_EMIT_RELATIONS 常量第二十批**：3 测试
-- **module source forbidden tokens 第三十五批**：18 测试
-- **module source 字符串精确补强第三十批**：13 测试
-- **signatures 第三十批**：4 测试
-- **module 合理性第三十批**：12 测试
+- **构造子第二十批**：13 测试
+- **常量与 strip_unicode**：8 测试
+- **compute_automatic_metrics 第二十批**：9 测试
+- **_pdf_locator_ratio 第二批**：3 测试
+- **_docx_locator_ratio 第二批**：3 测试
+- **_is_valid_bbox 第二批**：4 测试
+- **_image_resource_ratio 第二十批**：3 测试
+- **_chunk_reference_ratio 第二十批**：3 测试
+- **_text_preservation 第二十批**：6 测试
+- **_heading_boundary_ratio 第二十批**：3 测试
+- **_silent_drop_count 第二十批**：3 测试
+- **module source forbidden tokens 第三十五批**：17 测试
+- **module source 字符串精确补强第三十批**：11 测试
+- **signatures 第三十批**：8 测试
+- **module 合理性第三十批**：11 测试
 - **端到端集成第三十批**：7 测试
 
 ### 撞墙记录
-- 0 fail 首次跑（101 全通过）。
+- 首次跑：2 fails
+  - `test_int_metric_with_string_int_batch20`：int('5') 实际成功（Python 行为），不抛 ValueError。修法：拆为正常成功 + 非数字 str 才抛。
+  - `test_e2e_compute_metrics_full_pdf_doc_batch20`：schema_valid 依赖 document_passes_schema，简化 fixture 可能 False。修法：去掉 schema_valid=True 断言。
+- 修复后：124 全通过。
 
 ### 测试基线
 - main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
-- 本 worktree（Round 462 后）：55942 pass / 0 fail / 19 skip（HEAD `67cb0ab`）
+- 本 worktree（Round 463 后）：56066 pass / 0 fail / 19 skip（HEAD `a97123d`）
 
 ### 下一步建议
 - 候选：
-  - evaluation/metrics.py 第四十九轮
   - evaluation/report.py 第三十七轮
   - evaluation/runner.py 第五十轮
   - evaluation/cli.py 第四十九轮
   - evaluation/schema.py 第三十九轮
   - evaluation/manifest.py 第四十八轮
+  - evaluation/annotation_metrics.py 第四十八轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：annotation_metrics.py edges47 已饱和（figure_caption 7 + chunk_boundary 边界 7 + 算法 7 + missing 4 + tolerance 5 + 常量 3）。下一轮选 evaluation/metrics.py 第四十九轮，进一步覆盖 compute_automatic_metrics 更深的边界。
+**建议**：metrics.py edges47 已饱和（构造子 13 + 常量 8 + compute 9 + 多个 ratio 深入）。下一轮选 evaluation/report.py 第三十七轮，进一步覆盖 aggregate_summary 边界。
+
+---
 
 ---
 
