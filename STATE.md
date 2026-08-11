@@ -4,36 +4,42 @@
 
 ---
 
-## Round 455 — evaluation/annotation_metrics.py 第四十六轮（73 测试）
+## Round 456 — evaluation/schema.py 第三十八轮（115 测试）
 
 ### 目标
-- 给 `evaluation/annotation_metrics.py`（195 行）加第四十六轮 edges 测试，覆盖 edges45 未触及的角度：**figure_caption_prf 第十九批**（keys constant / complete doc+annotation / reason independent of input / same dict for different inputs / value+reason keys only）；**chunk_boundary_prf 边界第十九批**（doc with extra fields / annotation with extra fields / chunks key missing / annotation None / annotation empty dict）；**chunk_boundary_prf 算法第十九批**（3 chunks 2 boundaries / all mismatch / partial match / tolerance 0 strict / tolerance large / f1 perfect / f1 half）；**chunk_boundary_prf missing_markers 第十九批**（empty marker / marker not in stream / multiple missing / no missing no field）；**_tolerance_chars 第十九批**（negative / in output with no document / in output with no annotation / default 30）；**module source forbidden tokens 第三十三批**；**module source 字符串精确补强第三十一批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
+- 给 `evaluation/schema.py`（81 行）加第三十八轮 edges 测试，覆盖 edges37 未触及的角度：**SCHEMAS_DIR 常量深度第十八批**（resolve idempotent / is_dir / parent has pyproject / glob *.schema.json 后缀稳定 / glob 两次稳定 / parts 含 schemas / 与 app.schema.SCHEMA_PATH 父等）；**EvalSchemaError 行为深度第十八批**（args 携带 message / args 不含 errors / str 不含 errors / errors 始终是 list / equality 基于 args / pickle 往返 / hashable / 嵌套 raise __cause__ / message attr）；**_schema_path 行为深度第十八批**（FileNotFoundError 类型 / message 含 Schema 字 / 拒绝 SCHEMAS_DIR 外路径 / 接受 str / 返回存在文件 / 无缓存 / 返回绝对）；**load_schema 行为深度第十八批**（returns dict / 与磁盘等价 / 不缓存 / 接受短名 / 拒绝无后缀 / 拒绝空串）；**validate 行为深度第十八批**（success 返回 NoneType / 单错误有 path / 多错误全部 / message 含 Schema / first error 与 errors[0] 一致 / 非 dict instance 仍校验 / 不修改 errors）；**validate_file 行为深度第十八批**（str→Path / 不存在抛 FileNotFoundError / JSONDecodeError 不包装 / 与 validate 等价 / 接受 Path / 目录抛错）；**4 个 schema 内容第十八批**（manifest_version 锁 1.0 / evaluation-report required 4 keys / annotation required doc_id+version / document 独立于 evaluation-report）；**module source forbidden tokens 第三十四批**；**module source 字符串精确补强第二十九批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
 
 ### 改动
-- 新增 `tests/test_evaluation_annotation_metrics_edges46.py`（73 测试）
+- 新增 `tests/test_evaluation_schema_edges38.py`（115 测试）
 
 ### 覆盖要点
-- **figure_caption_prf 第十九批**：5 测试
-- **chunk_boundary_prf 边界第十九批**：5 测试
-- **chunk_boundary_prf 算法第十九批**：7 测试
-- **chunk_boundary_prf missing_markers 第十九批**：4 测试
-- **_tolerance_chars 第十九批**：4 测试
-- **module source forbidden tokens 第三十三批**：18 测试
-- **module source 字符串精确补强第三十一批**：12 测试
-- **signatures 第二十九批**：3 测试
+- **SCHEMAS_DIR 第十八批**：7 测试
+- **EvalSchemaError 第十八批**：9 测试
+- **_schema_path 第十八批**：7 测试
+- **load_schema 第十八批**：6 测试
+- **validate 第十八批**：7 测试
+- **validate_file 第十八批**：6 测试
+- **4 个 schema 内容第十八批**：4 测试
+- **module source forbidden tokens 第三十四批**：18 测试
+- **module source 字符串精确补强第二十九批**：13 测试
+- **signatures 第二十九批**：5 测试
 - **module 合理性第二十九批**：9 测试
 - **端到端集成第二十九批**：7 测试
 
 ### 撞墙记录
-- 0 fail 首次跑（73 全通过）。
+- 首次跑：3 fails
+  - `test_schemas_dir_equals_manifest_module_dir_batch18`：evaluation/manifest.py 没有 SCHEMAS_DIR 常量。修法：改成与 app.schema.SCHEMA_PATH.parent 比较。
+  - `test_evaluation_report_schema_has_required_top_keys_batch18`：evaluation-report.schema.json 实际 required 是 ['report_version', 'provenance', 'devset', 'summary', 'per_doc']，不含 'generated_at'。修法：调整期望 keys。
+  - `test_e2e_validate_with_known_good_manifest_batch18`：manifest schema additionalProperties=false，'category' 字段不允许。修法：去掉 category。
+  - `test_e2e_validate_annotation_known_good_batch18`：annotation schema 实际 properties 不含 expected_element_count/figure_caption_relations/chunk_boundaries（而是 figure_caption_pairs 等）。修法：用真实存在的字段（annotator/date）。
+- 修复后：115 全通过。
 
 ### 测试基线
 - main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
-- 本 worktree（Round 455 后）：55054 pass / 0 fail / 19 skip（HEAD `2e30a0f`）
+- 本 worktree（Round 456 后）：55169 pass / 0 fail / 19 skip（HEAD `8765108`）
 
 ### 下一步建议
 - 候选：
-  - evaluation/schema.py 第三十八轮
   - evaluation/metrics.py 第四十八轮
   - evaluation/report.py 第三十六轮
   - evaluation/runner.py 第四十九轮
@@ -41,7 +47,9 @@
   - evaluation/manifest.py 第四十七轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：annotation_metrics.py edges46 已饱和（figure_caption_prf 5 + chunk_boundary_prf 边界 5 + 算法 7 + missing_markers 4 + _tolerance_chars 4）。下一轮选 evaluation/schema.py 第三十八轮，覆盖 schema 加载/校验更深入行为。
+**建议**：schema.py edges38 已饱和（7+9+7+6+7+6+4+18+13+5+9+7）。下一轮选 evaluation/metrics.py 第四十八轮，覆盖 compute_automatic_metrics 更深入边界。
+
+---
 
 ---
 
