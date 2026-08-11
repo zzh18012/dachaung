@@ -4,6 +4,52 @@
 
 ---
 
+## Round 487 — evaluation/cli.py 第五十二轮（108 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第五十二轮 edges 测试，覆盖 edges50 未触及的角度：**_build_parser 第二十四批**（prog / description / subparser dest+required / 三个 choices / run --manifest required / run --output required / parser choices / parser default fallback / max_chars 默认 800 / tolerance_chars 默认 30 / val positional input / ins positional input / ins --tolerance-chars 默认+自定义 / 子命令互斥 / max_chars 接受负数）；**_format_metric 第二十四批**（None / True / False / 0.5 float / int / dict / string / list / reason 缺失 fallback 'ok' / name 36 字符 padding / 负数 / 0 / 空 dict）；**_run_inspect_doc 第二十四批**（文件不存在 / 非 JSON / JSON 但非 dict / 空 doc / 完整 doc header / tolerance_chars 透传 / metric 排序 bool→num→str→None / string metric 排序）；**main 第二十四批**（未知子命令 SystemExit / 无参 SystemExit / run manifest 不存在 return 2 / run load_manifest 失败 return 1 / run run_evaluation EvalSchemaError return 1 / run validate_file EvalSchemaError return 1 / run 成功 return 0 + 摘要 / val 文件不存在 2 / val 校验失败 1 / val JSON 失败 1 / val 成功 0 / ins 委托 / run --parser kreuzberg 透传）；**module source forbidden tokens 第四十批**；**module source 字符串精确补强第三十六批**；**signatures 第三十六批**；**module 合理性第三十六批**；**端到端集成第三十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges51.py`（108 测试）
+
+### 覆盖要点
+- **_build_parser 第二十四批**：16 测试
+- **_format_metric 第二十四批**：13 测试
+- **_run_inspect_doc 第二十四批**：8 测试
+- **main 第二十四批**：14 测试
+- **module source forbidden tokens 第四十批**：16 测试
+- **module source 字符串精确补强第三十六批**：15 测试
+- **signatures 第三十六批**：7 测试
+- **module 合理性第三十六批**：12 测试
+- **端到端集成第三十六批**：7 测试
+
+### 撞墙记录
+- 首次跑：5 fails（一次显现）：
+  - syntax error：误写 `for v in node.value,`（多余的逗号使 for 不完整）。修法：去掉循环，直接 `v = node.value`。
+  - patch target 错误：`evaluation.cli.compute_automatic_metrics` / `figure_caption_prf` / `chunk_boundary_prf` 在 cli.py 内是 lazy import（函数体内 from import），模块顶层 namespace 没有这些 attribute。修法：改为 `evaluation.metrics.compute_automatic_metrics` 等源模块路径。
+  - 2 个 manifest fixture 缺 `devset_status`：load_manifest 在到达 run_evaluation 前就抛 schema error。修法 1：mock load_manifest 返回 MagicMock（EvalSchemaError 测试）；修法 2：sed 批量给所有 manifest fixture 加 `"devset_status": "incomplete"`（成功路径测试）。
+  - source 字符串断言：`sub.add_parser("validate-report"` 不在 source 中（cli.py 中是跨行调用 `sub.add_parser(\n    "validate-report", ...)`）。修法：拆为 `sub.add_parser(` 与 `"validate-report"` 两个独立断言。
+- 修复后：108 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 487 后）：59187 pass / 0 fail / 22 skip（HEAD `6666c8a`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第四十二轮
+  - evaluation/manifest.py 第五十一轮
+  - evaluation/annotation_metrics.py 第五十一轮
+  - evaluation/metrics.py 第五十三轮
+  - evaluation/report.py 第四十一轮
+  - evaluation/runner.py 第五十四轮
+  - evaluation/cli.py 第五十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges51 已饱和（_build_parser 16 角度 + _format_metric 全类型 + _run_inspect_doc 排序逻辑 + main 所有错误码 + forbidden tokens 16 + source 16 + signatures + e2e）。下一轮选 evaluation/schema.py 第四十二轮，覆盖 SCHEMAS_DIR/EvalSchemaError/_schema_path/load_schema/validate/validate_file 第二十二批未触及角度。
+
+---
+
 ## Round 486 — evaluation/runner.py 第五十三轮（108 测试）
 
 ### 目标
