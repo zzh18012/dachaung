@@ -4,6 +4,48 @@
 
 ---
 
+## Round 480 — evaluation/cli.py 第五十一轮（121 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第五十一轮 edges 测试，覆盖 edges49 未触及的角度：**_build_parser 第二十三批**（formatter_class / --parser choices 严格 fallback+kreuzberg / --max-chars type=int / --tolerance-chars type=int / --manifest 缺失 / --output 缺失 / validate-report 1 positional / inspect-doc 1 positional / inspect-doc --tolerance-chars type=int / 主 parser description / 子 parser help / run 5 actions）；**_format_metric 第二十三批**（value=None → null / bool True / bool False + None / 负 float / int 0 / dict 多 key 排序 / str value / 负 int / dict 含 None value / dict 含 bool value）；**_run_inspect_doc 第二十三批**（有 chunks / 打印 file path / 打印 document_id / 打印 source_type / 打印 parser 信息 / 调用 compute_automatic_metrics / 调用 figure_caption_prf / 排序 bool 先于 num / null 最后 / str 中间 / rc=0）；**main 第二十三批**（run 成功打印 OK / devset 信息 / validate-report 成功 / validate-report FileNotFoundError / --max-chars 透传 / --tolerance-chars 透传 / ManifestError / EvalSchemaError / 0 documents / inspect-doc via main / inspect-doc --tolerance-chars via main / 未知 command / 真实非法 JSON 文件）；**module source forbidden tokens 第三十九批**；**module source 字符串精确补强第三十五批**；**signatures 第三十五批**；**module 合理性第三十五批**；**端到端集成第三十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges50.py`（121 测试）
+
+### 覆盖要点
+- **_build_parser 第二十三批**：12 测试
+- **_format_metric 第二十三批**：10 测试
+- **_run_inspect_doc 第二十三批**：11 测试
+- **main 第二十三批**：14 测试
+- **module source forbidden tokens 第三十九批**：17 测试
+- **module source 字符串精确补强第三十五批**：15 测试
+- **signatures 第三十五批**：8 测试
+- **module 合理性第三十五批**：12 测试
+- **端到端集成第三十五批**：6 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_build_parser_subparser_run_help_text_batch23`：误以为 ArgumentParser 有 `.help` 属性，实际没有（help 是 add_parser 的参数，不存为属性）。修法：改为检查 description 或 prog 后缀。
+- 修复后：121 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 480 后）：58257 pass / 0 fail / 21 skip（HEAD `417d3f6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第四十一轮
+  - evaluation/manifest.py 第五十轮
+  - evaluation/annotation_metrics.py 第五十轮
+  - evaluation/metrics.py 第五十二轮
+  - evaluation/report.py 第四十轮
+  - evaluation/runner.py 第五十三轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges50 已饱和（_build_parser / _format_metric / _run_inspect_doc / main 各 12 类边界全检）。下一轮选 evaluation/schema.py 第四十一轮，覆盖 SCHEMAS_DIR / EvalSchemaError / _schema_path / load_schema / validate / validate_file 第二十批未触及角度。
+
+---
+
 ## Round 479 — evaluation/runner.py 第五十二轮（115 测试）
 
 ### 目标
