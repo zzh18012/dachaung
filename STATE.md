@@ -4,6 +4,55 @@
 
 ---
 
+## Round 503 — evaluation/manifest.py 第五十三轮（145 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第五十三轮 edges 测试，覆盖 edges52 未触及的角度：**_is_absolute_like 第二十六批**（empty / `/` only / `C:` only / `1:foo` / `:foo` / UNC / unicode alpha / POSIX / C:/foo / 相对 / `.` / `..`）；**_has_backslash 第二十六批**（only / 多 / mixed / 无 / empty / leading / trailing）；**_resolve_relative_path 第二十六批**（empty raises / absolute raises / backslash raises / `.` / `./foo` / 内部 `.` / `..` raises / unicode / nested / Path 返回 / field name 在错误中）；**DocumentEntry 第二十六批**（frozen / hashable / equality / required fields / categories tuple / empty tuple / sha256 None/str / is_dataclass）；**ExpectedFailure 第二十六批**（frozen / hashable / equality / source_type None/str / required / is_dataclass）；**Manifest properties 第二十六批**（file_count empty/three / pdf_count / 不数其它 / categories_covered sorted/empty/unique / content_group_count 各情形 / project_root 类型 / is_dataclass / hashable / frozen）；**load_manifest 第二十六批**（minimal / 默认 project_root / 显式 project_root / version mismatch / missing file / invalid JSON / 缺 documents key / 缺 expected_failures key / categories 聚合 / sha256 透传 / paired_with 透传 / annotation_file 透传 / annotation_resolved / expectations 透传 / expected_failure 透传 / path backslash rejected / path absolute rejected / path outside root rejected / path_str 不 normalize / 返回 Manifest / str path 接受）；**_detect_project_root 第二十六批**（with pyproject / 无 pyproject 返回 input / file input / nearest pyproject / Path 返回）；**module source forbidden tokens 第四十二批**；**module source 字符串精确补强第三十八批**；**signatures 第三十八批**；**module 合理性第三十八批**；**端到端集成第三十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges53.py`（145 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第二十六批**：12 测试
+- **_has_backslash 第二十六批**：7 测试
+- **_resolve_relative_path 第二十六批**：11 测试
+- **DocumentEntry 第二十六批**：10 测试
+- **ExpectedFailure 第二十六批**：7 测试
+- **Manifest properties 第二十六批**：15 测试
+- **load_manifest 第二十六批**：22 测试
+- **_detect_project_root 第二十六批**：5 测试
+- **module source forbidden tokens 第四十二批**：12 测试
+- **module source 字符串精确补强第三十八批**：15 测试
+- **signatures 第三十八批**：10 测试
+- **module 合理性第三十八批**：12 测试
+- **端到端集成第三十八批**：8 测试
+
+### 撞墙记录
+- 首次跑：3 fails（逐个修复）：
+  - `test_load_manifest_no_expected_failures_key_batch26`：误以为 schema 要 expected_failures 必填。实际：required 只列了 manifest_version / devset_status / documents。修法：改为期望成功，`expected_failures == ()`。
+  - `test_load_manifest_sha256_propagated_batch26`：用了 `deadbeef`（短串）→ schema 限制 `^[0-9a-f]{64}$`。修法：用 `"a" * 64`。
+  - `test_e2e_load_manifest_with_full_document_batch26`：同上 sha256 问题。修法：用 `"b" * 64`。
+- 修复后：145 全通过；全量回归 61017 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 503 后）：61017 pass / 0 fail / 22 skip（HEAD `70c1045`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第五十三轮
+  - evaluation/metrics.py 第五十五轮
+  - evaluation/report.py 第四十三轮
+  - evaluation/runner.py 第五十六轮
+  - evaluation/cli.py 第五十五轮
+  - evaluation/schema.py 第四十五轮
+  - evaluation/manifest.py 第五十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges53 已饱和。下一轮选 evaluation/annotation_metrics.py 第五十三轮。
+
+---
+
 ## Round 502 — evaluation/schema.py 第四十四轮（107 测试）
 
 ### 目标
