@@ -4,6 +4,53 @@
 
 ---
 
+## Round 443 — evaluation/metrics.py 第四十六轮（133 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第四十六轮 edges 测试，覆盖 edges43 未触及的角度：**_null / _ratio / _bool_metric / _int_metric 边界第十七批**（return dict key 严格 2 个 / 不同输入类型 / 多次调用一致）；**compute_automatic_metrics 第十七批**（document 缺 elements/chunks key / source_type 大小写 / image_base_dir 真实目录 / error_code dict 结构 / 不修改 error/expectations）；**_strip_unicode_whitespace 第十七批**（NBSP / EM space / 全角 / line/paragraph separator / 长字符串 / emoji / tab / form feed）；**_is_valid_bbox 第十七批**（4 个相同值 / 全 0 / 全负 / 全 float / 大值 / 3-5 元素 / dict / set / generator / empty / None）；**_pdf_locator_ratio 第十七批**（page 1+/999/0 / heading caption 完整/缺 bbox / image 无 locator / page 字符串/float）；**_docx_locator_ratio 第十七批**（单一结构键 / 多键组合 / 字符串值 / 无结构键）；**_image_resource_ratio 第十七批**（image 缺字段 / image_base_dir 是文件 / Unicode 文件名 / 含空格 / filename 拼接）；**_chunk_reference_ratio 第十七批**（chunk 缺 source_ids / element_id None / 混合 ids / 全 valid）；**_text_preservation 第十七批**（多 chunk 拼接 / 中文 / emoji / 空白 / return dict）；**_heading_boundary_ratio 第十七批**（多 heading / partial / no chunks / first id matches / first id not heading）；**_silent_drop_count 第十七批**（字符串 count 抛 TypeError / zero actual / negative drop / mix / type not in expected）；**module source forbidden tokens 第三十一批**；**module source 字符串精确补强第二十七批**；**signatures 第二十七批**；**module 合理性第二十七批**；**端到端集成第二十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges44.py`（133 测试）
+
+### 覆盖要点
+- **_null / _ratio / _bool_metric / _int_metric 第十七批**：10 测试
+- **compute_automatic_metrics 第十七批**：10 测试
+- **_strip_unicode_whitespace 第十七批**：9 测试
+- **_is_valid_bbox 第十七批**：11 测试
+- **_pdf_locator_ratio 第十七批**：8 测试
+- **_docx_locator_ratio 第十七批**：7 测试
+- **_image_resource_ratio 第十七批**：6 测试
+- **_chunk_reference_ratio 第十七批**：5 测试
+- **_text_preservation 第十七批**：5 测试
+- **_heading_boundary_ratio 第十七批**：5 测试
+- **_silent_drop_count 第十七批**：5 测试
+- **module source forbidden tokens 第三十一批**：18 测试
+- **module source 字符串精确补强第二十七批**：11 测试
+- **signatures 第二十七批**：7 测试
+- **module 合理性第二十七批**：8 测试
+- **端到端集成第二十七批**：9 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_silent_drop_string_count_batch17 期望 `_silent_drop_count` 处理字符串 count，但实际抛 TypeError）。修：改成期望 TypeError。
+- 二次跑：133 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 443 后）：53798 pass / 0 fail / 19 skip（HEAD `e3cb06e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第三十四轮
+  - evaluation/runner.py 第四十七轮
+  - evaluation/cli.py 第四十六轮
+  - evaluation/manifest.py 第四十五轮
+  - evaluation/annotation_metrics.py 第四十五轮
+  - evaluation/schema.py 第三十七轮
+  - evaluation/metrics.py 第四十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 442 — evaluation/schema.py 第三十六轮（114 测试）
 
 ### 目标
