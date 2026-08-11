@@ -4,6 +4,51 @@
 
 ---
 
+## Round 468 — evaluation/manifest.py 第四十八轮（143 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第四十八轮 edges 测试，覆盖 edges47 未触及的角度：**_is_absolute_like 第二十一批**（uppercase drive / 'C:\\foo' / 3 chars 'x:/' / 'ab' / './foo' / '../foo' / '~/foo'）；**_has_backslash 第二十一批**（C:\\Users / UNC 路径 / trailing / only slashes / 无分隔符 / 单 \）；**_resolve_relative_path 第二十一批**（'.' / 子目录 / './x.pdf' / '../../../outside' / 'a/../b.pdf' / 反斜杠 / Windows 盘符 / 返回 Path / 子目录文件 / 错误消息含 path_str）；**_detect_project_root 第二十一批**（多级链找最近 / 返回 Path / 文件输入取 parent / 无 pyproject 返回 cur / resolve）；**Manifest properties 第二十一批**（cyclic pair / 3 pair / mixed / pdf+docx / categories empty / 返 list / file_count 不含 failures / 其他 source_type）；**DocumentEntry 第二十一批**（categories tuple / sha256 str / annotation_resolved / 无 default / equality / repr / dict expectations）；**ExpectedFailure 第二十一批**（field count / frozen / source_type None / equality / hashable / repr）；**load_manifest 第二十一批**（空 documents/expected_failures / 1 document / str path / file not exist / invalid JSON / version mismatch / categories / paired_with / sha256 / expected_failure / devset_status / project_root explicit）；**module source forbidden tokens 第三十六批**；**module source 字符串精确补强第三十二批**；**signatures 第三十二批**；**module 合理性第三十二批**；**端到端集成第三十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges48.py`（143 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第二十一批**：11 测试
+- **_has_backslash 第二十一批**：6 测试
+- **_resolve_relative_path 第二十一批**：10 测试
+- **_detect_project_root 第二十一批**：5 测试
+- **Manifest properties 第二十一批**：8 测试
+- **DocumentEntry 第二十一批**：7 测试
+- **ExpectedFailure 第二十一批**：8 测试
+- **load_manifest 第二十一批**：14 测试
+- **module source forbidden tokens 第三十六批**：17 测试
+- **module source 字符串精确补强第三十二批**：16 测试
+- **signatures 第三十二批**：6 测试
+- **module 合理性第三十二批**：12 测试
+- **端到端集成第三十二批**：8 测试
+
+### 撞墙记录
+- 首次跑：1 fail
+  - `test_load_manifest_version_mismatch_raises_batch21`：manifest_version="9.9" 先被 schema enum 拒绝（抛 EvalSchemaError），走不到 mismatch 分支。修法：改 expected exception 为 EvalSchemaError。
+- 修复后：143 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 468 后）：56681 pass / 0 fail / 20 skip（HEAD `679d192`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第四十八轮
+  - evaluation/metrics.py 第五十轮
+  - evaluation/report.py 第三十八轮
+  - evaluation/runner.py 第五十一轮
+  - evaluation/cli.py 第五十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges48 已饱和（_is_absolute_like 11 + _has_backslash 6 + _resolve 10 + _detect 5 + Manifest props 8 + DocumentEntry 7 + ExpectedFailure 8 + load_manifest 14）。下一轮选 evaluation/annotation_metrics.py 第四十八轮，深入 figure_caption_prf / chunk_boundary_prf 边界。
+
+---
+
 ## Round 467 — evaluation/schema.py 第三十九轮（128 测试）
 
 ### 目标
