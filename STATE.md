@@ -4,46 +4,54 @@
 
 ---
 
-## Round 460 — evaluation/cli.py 第四十八轮（121 测试）
+## Round 461 — evaluation/manifest.py 第四十七轮（154 测试）
 
 ### 目标
-- 给 `evaluation/cli.py`（243 行）加第四十八轮 edges 测试，覆盖 edges46 未触及的角度：**_build_parser 行为第二十批**（prog / description / subparser dest / required / --parser choices / default fallback / invalid choice SystemExit / --max-chars type int / --max-chars default 800 / --tolerance-chars default 30 / inspect-doc positional / validate-report positional）；**_format_metric 行为第二十批**（value=0/0.0/1.0/negative int/empty dict/many dict items/dict sorted alpha/string/empty string/long reason/reason overrides ok/width 36）；**_run_inspect_doc 行为第二十批**（document_id 缺省 ?/source_path 缺省 ?/parser 缺省 ? v?/elements=None 触发 TypeError（已知 bug）/chunks=None 触发 TypeError/metrics count/sorted bool first/top-level array/string/int returns 1/file not exist/invalid json/tolerance chars）；**main 行为第二十批**（run 全参数 / validate-report 文件不存在/invalid JSON / manifest 不存在 / manifest load error / run_evaluation EvalSchemaError / unknown command SystemExit / load_manifest 调用 / 输出 documents=N / validate_file EvalSchemaError）；**module source forbidden tokens 第三十五批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
+- 给 `evaluation/manifest.py`（240 行）加第四十七轮 edges 测试，覆盖 edges46 未触及的角度：**_is_absolute_like 行为第二十批**（仅 / / 仅 c: / c:/  / c:\ / 前导空白 / Unicode / 多字符 drive / 仅冒号 / digit drive / 空串）；**_has_backslash 行为第二十批**（单 \ / 仅反斜杠 / 无反斜杠 / 空串 / 仅正斜杠 / 混合 / 连续）；**_resolve_relative_path 行为第二十批**（.. / 内 root / 空格名 / 长路径 / 末尾斜杠 / Unicode / 空 / 错误含 field_name / 绝对 POSIX / 返回绝对）；**_detect_project_root 行为第二十批**（start 是文件 / 无 pyproject / 最近 pyproject / str path / 返回绝对 / 用 resolve）；**Manifest dataclass 行为第二十批**（frozen / 字段数 5 / 字段顺序 / 字段类型 / hashable / equality / inequality / 无 default）；**Manifest properties 行为第二十批**（categories_covered 排序+去重 / source_type=other / no pairs / paired both ways / paired one way / file_count 0）；**DocumentEntry 行为第二十批**（frozen / 10 字段 / 字段顺序 / equality / inequality / hashable None / unhashable dict / 无 default / paired_with）；**ExpectedFailure 行为第二十批**（frozen / 5 字段 / 字段顺序 / source_type None / equality / hashable / 无 default）；**load_manifest 行为第二十批**（documents 默认空 / expected_failures 默认空 / categories / paired_with / sha256 64 hex / expectations / annotation_file / annotation_file 错误 / project_root as str / returns Manifest / 路径越界 / 路径含 \ / 文件不存在 / invalid JSON / expected_failure / devset_status 透传）；**module source forbidden tokens 第三十五批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
 
 ### 改动
-- 新增 `tests/test_evaluation_cli_edges47.py`（121 测试）
+- 新增 `tests/test_evaluation_manifest_edges47.py`（154 测试）
 
 ### 覆盖要点
-- **_build_parser 第二十批**：13 测试
-- **_format_metric 第二十批**：12 测试
-- **_run_inspect_doc 第二十批**：14 测试
-- **main 第二十批**：11 测试
+- **_is_absolute_like 第二十批**：10 测试
+- **_has_backslash 第二十批**：7 测试
+- **_resolve_relative_path 第二十批**：10 测试
+- **_detect_project_root 第二十批**：6 测试
+- **Manifest dataclass 第二十批**：8 测试
+- **Manifest properties 第二十批**：7 测试
+- **DocumentEntry 第二十批**：9 测试
+- **ExpectedFailure 第二十批**：7 测试
+- **load_manifest 第二十批**：16 测试
 - **module source forbidden tokens 第三十五批**：18 测试
-- **module source 字符串精确补强第三十批**：17 测试
-- **signatures 第三十批**：5 测试
+- **module source 字符串精确补强第三十批**：18 测试
+- **signatures 第三十批**：6 测试
 - **module 合理性第三十批**：11 测试
 - **端到端集成第三十批**：7 测试
 
 ### 撞墙记录
 - 首次跑：2 fails
-  - `test_format_metric_aligned_width_36_batch20`：split('1')[0] 在两行 name 不同时不能直接比较（短 name 行的 split 会从空格处先切）。修法：用 split('  1')[0] 比 len。
-  - `test_run_inspect_doc_elements_none_batch20` / `chunks_none`：cli.py 中 `doc.get("elements") or []` 只改本地变量，doc 本身仍是 None，传给 compute_automatic_metrics 后 `len(None)` TypeError（已知 bug）。修法：用 `pytest.raises(TypeError)` 替代 rc==0。
-- 修复后：121 全通过。
+  - `test_load_manifest_documents_default_empty_batch20`：manifest.schema.json 要求 `documents` 字段存在（即使为空）。修法：补 documents=[]。
+  - `test_load_manifest_with_sha256_batch20`：sha256 必须 64 位 hex。修法：用 64 位 hex 字符串。
+- 同时清理了文档字符串里的 `\ ` 转义警告（SyntaxWarning: invalid escape sequence '\ '）。
+- 修复后：154 全通过。
 
 ### 测试基线
 - main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
-- 本 worktree（Round 460 后）：55687 pass / 0 fail / 19 skip（HEAD `3630e12`）
+- 本 worktree（Round 461 后）：55841 pass / 0 fail / 19 skip（HEAD `f3c7edc`）
 
 ### 下一步建议
 - 候选：
-  - evaluation/manifest.py 第四十七轮
   - evaluation/schema.py 第三十九轮
   - evaluation/annotation_metrics.py 第四十七轮
   - evaluation/metrics.py 第四十九轮
   - evaluation/report.py 第三十七轮
   - evaluation/runner.py 第五十轮
+  - evaluation/cli.py 第四十九轮
   - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
 
-**建议**：cli.py edges47 已饱和（build_parser 13 + format_metric 12 + inspect_doc 14 + main 11）。下一轮选 evaluation/manifest.py 第四十七轮，覆盖 Manifest/DocumentEntry/ExpectedFailure dataclass + load_manifest 更深入边界。
+**建议**：manifest.py edges47 已饱和（_is_absolute_like 10 + _has_backslash 7 + _resolve 10 + _detect 6 + 3 dataclass 深入 + 16 load_manifest）。下一轮选 evaluation/annotation_metrics.py 第四十七轮，覆盖 figure_caption_prf / chunk_boundary_prf 算法更深入。
+
+---
 
 ---
 
