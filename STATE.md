@@ -4,6 +4,53 @@
 
 ---
 
+## Round 436 — evaluation/metrics.py 第四十五轮（170 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第四十五轮 edges 测试，覆盖 edges42 未触及的角度：**_null / _ratio / _bool_metric / _int_metric 边界第十六批**（None / True / 1.0 / 负数 / 浮点截断 / 零长 reason / 大整数）；**compute_automatic_metrics 第十六批**（error empty dict / source_type=txt/other / chunks 空 / elements 空 / schema 异常 / 不修改 document 字段顺序 / image_base_dir 真实路径）；**_strip_unicode_whitespace 第十六批**（empty / all WS / all non-WS / NUL / ZWSP 非空白）；**_is_valid_bbox 第十六批**（inf / nan / mixed / True bool / 字符串数字）；**_pdf_locator_ratio 第十六批**（all valid / all invalid / locator None / heading 无 bbox / image 不要求 bbox）；**_docx_locator_ratio 第十六批**（relationship_id / section 多键 / locator None / 空 dict / 含 page+bbox+section → invalid）；**_image_resource_ratio 第十六批**（tmp file 真实路径 / 空文件 / 不存在 / image_base_dir 拼接）；**_chunk_reference_ratio 第十六批**（chunks None ids / 重复 id / extra ids / 空元素集）；**_text_preservation 第十六批**（reversed / subset / Counter 交集 / chunks 空 / elements 全 image）；**_heading_boundary_ratio 第十六批**（chunk 多 ids / heading 无 element_id / 多 heading 同 chunk）；**_silent_drop_count 第十六批**（actual > expected / 多类型 / expectations=None / 空 dict / element_count_by_type=None）；**module source forbidden tokens 第三十一批**；**module source 字符串精确补强第二十八批**；**signatures 第二十八批**；**module 合理性第二十八批**；**端到端集成第二十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges43.py`（170 测试）
+
+### 覆盖要点
+- **_null / _ratio / _bool_metric / _int_metric 边界第十六批**：16 测试
+- **compute_automatic_metrics 第十六批**：13 测试
+- **_strip_unicode_whitespace 第十六批**：8 测试
+- **_is_valid_bbox 第十六批**：9 测试
+- **_pdf_locator_ratio 第十六批**：9 测试
+- **_docx_locator_ratio 第十六批**：8 测试
+- **_image_resource_ratio 第十六批**：8 测试
+- **_chunk_reference_ratio 第十六批**：5 测试
+- **_text_preservation 第十六批**：7 测试
+- **_heading_boundary_ratio 第十六批**：5 测试
+- **_silent_drop_count 第十六批**：7 测试
+- **module source forbidden tokens 第三十一批**：17 测试（含 no_subprocess + no_network）
+- **module source 字符串精确补强第二十八批**：23 测试
+- **signatures 第二十八批**：14 测试
+- **module 合理性第二十八批**：10 测试
+- **端到端集成第二十八批**：11 测试
+
+### 撞墙记录
+- 首次跑：1 fail（test_compute_metrics_error_empty_dict_batch16 期望空 error dict 触发 pipeline_success=True，但代码用 `error is None` 而非 truthy 判断）。修：改成期望 pipeline_success=False（但 error_code value 仍是 None，因为 `error["code"] if error` 用 truthy）。
+- 二次跑：170 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 436 后）：52978 pass / 0 fail / 19 skip（HEAD `722e7de`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第三十三轮
+  - evaluation/runner.py 第四十六轮
+  - evaluation/cli.py 第四十五轮
+  - evaluation/manifest.py 第四十四轮
+  - evaluation/annotation_metrics.py 第四十四轮
+  - evaluation/schema.py 第三十六轮
+  - evaluation/metrics.py 第四十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 435 — evaluation/schema.py 第三十五轮（106 测试）
 
 ### 目标
