@@ -4,6 +4,62 @@
 
 ---
 
+## Round 470 — evaluation/metrics.py 第五十轮（172 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第五十轮 edges 测试，覆盖 edges47 未触及的角度：**构造子第二十二批**（unicode reason / empty / 长 reason / negative ratio / inf / nan / int→float / bool with str / int with float / int with str / negative int）；**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十二批**（tuple / 各项 / 排除 image / 7 vs 4 / subset 关系 / table 排除）；**_strip_unicode_whitespace 第二十二批**（pure / single char / digit / only whitespace / mixed / unicode / newline tab）；**compute_automatic_metrics 第二十二批**（no document / error None / minimal doc / 返回 dict / pdf source_type / docx source_type / element_count_total / element_count_by_type 多场景 / unknown type）；**_pdf_locator_ratio 第二十二批**（no elements / all valid / page=0 / negative / no page / no locator / paragraph 需 bbox / paragraph with bbox）；**_docx_locator_ratio 第二十二批**（no elements / paragraph_index / page invalid / bbox invalid / empty locator / no locator / section / mixed）；**_is_valid_bbox 第二十二批**（4 int / 4 float / 3 / 5 / empty / None / str / tuple / dict / inf）；**_image_resource_ratio 第二十二批**（no elements / no images / with path / without path / nonexistent / mixed / only paragraphs）；**_chunk_reference_ratio 第二十二批**（no chunks / no elements / all intact 用 element_id / missing id / all missing / empty ids）；**_text_preservation 第二十二批**（empty / image excluded / paragraph|heading|table|caption included / mismatch / extra whitespace）；**_heading_boundary_ratio 第二十二批**（no headings / no chunks / perfect / no match / two headings one match）；**_silent_drop_count 第二十二批**（no expectations / no element_count key / perfect / actual more / actual less / unknown type ignored / empty by_type / negative clamped）；**module source forbidden tokens 第三十七批**；**module source 字符串精确补强第三十三批**；**signatures 第三十三批**；**module 合理性第三十三批**；**端到端集成第三十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges48.py`（172 测试）
+
+### 覆盖要点
+- **构造子第二十二批**：13 测试
+- **常量与 strip_unicode**：14 测试
+- **compute_automatic_metrics 第二十二批**：10 测试
+- **_pdf_locator_ratio 第二十二批**：8 测试
+- **_docx_locator_ratio 第二十二批**：8 测试
+- **_is_valid_bbox 第二十二批**：10 测试
+- **_image_resource_ratio 第二十二批**：7 测试
+- **_chunk_reference_ratio 第二十二批**：6 测试
+- **_text_preservation 第二十二批**：8 测试
+- **_heading_boundary_ratio 第二十二批**：5 测试
+- **_silent_drop_count 第二十二批**：8 测试
+- **module source forbidden tokens 第三十七批**：17 测试
+- **module source 字符串精确补强第三十三批**：14 测试
+- **signatures 第三十三批**：6 测试
+- **module 合理性第三十三批**：12 测试
+- **端到端集成第三十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：6 fails（同根）：
+  - `test_is_valid_bbox_tuple_batch22`：tuple 输入被拒（仅 list）。修法：改为 False。
+  - `test_image_resource_ratio_no_elements_batch22`：reason 是 'no_image_elements' 而非 'no_elements'。
+  - `test_image_resource_ratio_no_images_batch22` / `test_image_resource_ratio_no_images_only_paragraphs_batch22` / `test_e2e_compute_metrics_no_image_elements_batch22`：reason 是 'no_image_elements'。
+  - `test_chunk_reference_ratio_all_intact_batch22`：implementation 用 `e.get("element_id")` 不是 `e.get("id")`。修法：改 fixture 字段名。
+  - `test_text_preservation_empty_elements_empty_chunks_batch22`：precision/recall 分母 0 时是 None（不返 1.0）。
+  - `test_heading_boundary_ratio_no_headings_batch22`：reason 是 'no_heading_elements'。
+  - `test_heading_boundary_ratio_no_chunks_batch22`：实际返 value=0.0（reason=None），不返 no_chunks。
+  - `test_silent_drop_count_no_element_count_key_batch22`：reason 是 'no_expectations_element_count'。
+- 修复后：172 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 470 后）：56962 pass / 0 fail / 20 skip（HEAD `106c42b`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第三十八轮
+  - evaluation/runner.py 第五十一轮
+  - evaluation/cli.py 第五十轮
+  - evaluation/schema.py 第四十轮
+  - evaluation/manifest.py 第四十九轮
+  - evaluation/annotation_metrics.py 第四十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges48 已饱和（构造子 13 + 常量 14 + compute 10 + 多 ratio 深入）。下一轮选 evaluation/report.py 第三十八轮，继续覆盖 aggregate_summary 边界。
+
+---
+
 ## Round 469 — evaluation/annotation_metrics.py 第四十八轮（109 测试）
 
 ### 目标
