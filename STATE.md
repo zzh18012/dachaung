@@ -4,6 +4,51 @@
 
 ---
 
+## Round 478 — evaluation/report.py 第三十九轮（140 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第三十九轮 edges 测试，覆盖 edges38 未触及的角度：**_RATIO_METRICS 内容 第二十三批**（12 项 / tuple 类型 / 顺序 / 各项内容 / 子集关系）；**_COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十三批**（element_count_total 唯一 / pipeline_success 唯一 / tuple 类型 / 数量 / 互不相交）；**get_git_provenance 第二十三批**（HEAD short / dirty 检测 / .git 缺失 / 2 keys / commit 7 字符以上 / 一致返回 / project_root=None / ProjectRoot 类型 / 跨调用）；**get_dependency_versions 第二十三批**（pdfplumber / python-docx importlib / 3 keys / None 返回 / 类型 dict / version 字符串）；**build_provenance 第二十三批**（9 keys / timestamp ISO / parser_name / max_chars int / parser_version 可选 / git_provenance 嵌套 / dependency_versions 嵌套 / eval_framework_version / evaluation_tool_versions）；**build_devset_section 第二十三批**（6 keys / devset_status / file_count / content_group_count / pdf/docx count / categories_covered list / 空 manifest）；**aggregate_summary 第二十三批**（4 top keys / counts 求和 / success_rates rate / ratio macro / silent_drop_total / 空 list / 缺 metrics key / chunk_b 提取 tolerance_chars / 缺 ratios / count_total 0 / silent_drop None / silent_drop 无 expectations / success all True / success all False / success mixed）；**module source forbidden tokens 第三十九批**（subprocess.run 允许，移除；保留 os.system / eval / exec / __import__ 等）；**module source 字符串精确补强第三十五批**；**signatures 第三十五批**；**module 合理性第三十五批**；**端到端集成第三十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges39.py`（140 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 内容 第二十三批**：15 测试
+- **_COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十三批**：9 测试
+- **get_git_provenance 第二十三批**：9 测试
+- **get_dependency_versions 第二十三批**：7 测试
+- **build_provenance 第二十三批**：11 测试
+- **build_devset_section 第二十三批**：6 测试
+- **aggregate_summary 第二十三批**：16 测试
+- **module source forbidden tokens 第三十九批**：15 测试
+- **module source 字符串精确补强第三十五批**：15 测试
+- **signatures 第三十五批**：6 测试
+- **module 合理性第三十五批**：12 测试
+- **端到端集成第三十五批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_signature_build_provenance_parser_version_optional_batch23`：误以为 `parser_version` 默认 None，实际是必填（无默认值，annotation 为 `str | None`）。修法：改为 `p.default is inspect.Parameter.empty` + 检查 annotation。
+- 修复后：140 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 478 后）：58021 pass / 0 fail / 20 skip（HEAD `e373a90`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第五十二轮
+  - evaluation/cli.py 第五十一轮
+  - evaluation/schema.py 第四十一轮
+  - evaluation/manifest.py 第五十轮
+  - evaluation/annotation_metrics.py 第五十轮
+  - evaluation/metrics.py 第五十二轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges39 已饱和（_RATIO_METRICS / aggregate_summary / git_provenance / dependency_versions / build_provenance / build_devset_section 全检）。下一轮选 evaluation/runner.py 第五十二轮，覆盖 _load_annotation / _process_one / run_evaluation 第二十二批未触及角度。
+
+---
+
 ## Round 477 — evaluation/metrics.py 第五十一轮（190 测试）
 
 ### 目标
