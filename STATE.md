@@ -4,6 +4,58 @@
 
 ---
 
+## Round 450 — evaluation/metrics.py 第四十七轮（148 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第四十七轮 edges 测试，覆盖 edges44 未触及的角度：**_null/_ratio/_bool_metric/_int_metric 行为深度第十八批**（dict 结构 / value 类型 / reason 类型 / 边界值 0/1/-1）；**_TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES 常量第十八批**（count / contents / 不含 'image' / subset / 不含 table/header/footer）；**compute_automatic_metrics 边界第十八批**（返 14 keys / document None 多 metric null / error dict with code / error dict without code → KeyError / pipeline_success / image_resource / chunk_reference / expectations silent_drop / 多种 locator）；**_strip_unicode_whitespace 行为深度第十八批**（NBSP/em/en/ideographic/line/paragraph / 混合 ASCII+Unicode / 全空白 / 保留 emoji/中文/标点/数字 / 无空白 / 空 string）；**_is_valid_bbox 行为深度第十八批**（valid / int / len 3 / len 5 / empty / None / str / 含 str element / bool / NaN / Infinity）；**_pdf_locator_ratio 第十八批**（empty / all valid / invalid bbox / no source_locator / non text type / page=0）；**_docx_locator_ratio 第十八批**（empty / all valid / missing keys）；**_image_resource_ratio 第十八批**（no image / missing resource_path / file exists / not exist / mixed / zero size）；**_chunk_reference_ratio 第十八批**（empty chunks / all intact / partial unknown / empty source ids / repeated ids）；**_text_preservation 第十八批**（empty / perfect / image excluded / missing chunk / 3 keys）；**_heading_boundary_ratio 第十八批**（no heading / no chunk / all match / partial / dedup）；**_silent_drop_count 第十八批**（no expectations / empty / zero drop / more actual / partial drop / missing in actual）；**module source forbidden tokens 第三十二批**；**module source 字符串精确补强第二十八批**；**signatures 第二十八批**；**module 合理性第二十八批**；**端到端集成第二十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges45.py`（148 测试）
+
+### 覆盖要点
+- **helpers 第十八批**：20 测试
+- **常量精确第十八批**：6 测试
+- **compute_automatic_metrics 第十八批**：10 测试
+- **_strip_unicode_whitespace 第十八批**：14 测试
+- **_is_valid_bbox 第十八批**：11 测试
+- **_pdf_locator_ratio 第十八批**：6 测试
+- **_docx_locator_ratio 第十八批**：3 测试
+- **_image_resource_ratio 第十八批**：6 测试
+- **_chunk_reference_ratio 第十八批**：5 测试
+- **_text_preservation 第十八批**：5 测试
+- **_heading_boundary_ratio 第十八批**：5 测试
+- **_silent_drop_count 第十八批**：6 测试
+- **module source forbidden tokens 第三十二批**：18 测试
+- **module source 字符串精确补强第二十八批**：11 测试
+- **signatures 第二十八批**：6 测试
+- **module 合理性第二十八批**：8 测试
+- **端到端集成第二十八批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails
+  - `test_pdf_locator_ratio_all_valid_batch18` 等：代码读 `e.get("source_locator")` 而非 `e.get("locator")`。修法：把测试 fixture 改为 `source_locator`。
+  - `test_text_preservation_empty_batch18` 等：_text_preservation 返 keys 是 `equal/precision/recall`，外层包装为 `text_preservation_equal/precision/recall` 在 compute_automatic_metrics 里完成。修法：直接测内部 key 名。
+- 修复后：148 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 450 后）：54568 pass / 0 fail / 19 skip（HEAD `5510f80`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第三十五轮
+  - evaluation/runner.py 第四十八轮
+  - evaluation/cli.py 第四十七轮
+  - evaluation/manifest.py 第四十六轮
+  - evaluation/annotation_metrics.py 第四十六轮
+  - evaluation/schema.py 第三十八轮
+  - evaluation/metrics.py 第四十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges45 已饱和（4 helper + 3 常量 + 12 metric 各分支 + source level 完整 + 端到端）。下一轮选 evaluation/report.py 第三十五轮，覆盖 build_provenance / get_git_provenance 行为深度。
+
+---
+
 ## Round 449 — evaluation/schema.py 第三十七轮（120 测试）
 
 ### 目标
