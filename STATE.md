@@ -4,6 +4,51 @@
 
 ---
 
+## Round 440 — evaluation/manifest.py 第四十四轮（130 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第四十四轮 edges 测试，覆盖 edges43 未触及的角度：**_is_absolute_like 边界第十七批**（empty / 空白字符 / 长度=2 / 三字符无分隔符 / UNC 路径 / tab / 换行 / emoji / 大小写盘符）；**_has_backslash 边界第十七批**（empty / 单/双 / 混合 / 全角 / 末尾 / 开头）；**_resolve_relative_path 异常深度第十七批**（基础 / dot dot / 链式 dot dot / 空 / 绝对 / 反斜杠 / field_name 在消息 / 无扩展名 / dot prefix）；**_detect_project_root 异常深度第十七批**（从文件 / 从目录 / 无 pyproject / 嵌套取最近）；**Manifest dataclass 第十七批**（frozen / hash / setattr / delattr / equality / repr / set / dict key）；**Manifest properties 第十七批**（pdf/docx count / categories dedupe+排序 / content_group_count 配对算法）；**DocumentEntry 第十七批**（10 fields / frozen / hashable / equality / repr）；**ExpectedFailure 第十七批**（source_type None / 5 fields）；**load_manifest 异常深度第十七批**（file not exists / invalid JSON / version mismatch / explicit project_root / documents / expected_failures）；**module source forbidden tokens 第三十三批**；**module source 字符串精确补强第三十批**；**signatures 第三十批**；**module 合理性第三十批**；**端到端集成第三十批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges44.py`（130 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第十七批**：12 测试
+- **_has_backslash 第十七批**：8 测试
+- **_resolve_relative_path 第十七批**：10 测试
+- **_detect_project_root 第十七批**：5 测试
+- **Manifest dataclass 第十七批**：8 测试
+- **Manifest properties 第十七批**：7 测试
+- **DocumentEntry 第十七批**：6 测试
+- **ExpectedFailure 第十七批**：5 测试
+- **load_manifest 第十七批**：7 测试
+- **module source forbidden tokens 第三十三批**：18 测试（含 no_subprocess + no_network）
+- **module source 字符串精确补强第三十批**：22 测试
+- **signatures 第三十批**：7 测试
+- **module 合理性第三十批**：10 测试
+- **端到端集成第三十批**：9 测试
+
+### 撞墙记录
+- 首次跑：130 passed + 1 warning（UNC path 测试 docstring 含 `\ `）。修：把 docstring 改成 raw string r"""..."""。
+- 二次跑：130 全通过，无 warning。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 440 后）：53451 pass / 0 fail / 19 skip（HEAD `6a0a5a3`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第四十四轮
+  - evaluation/schema.py 第三十六轮
+  - evaluation/metrics.py 第四十六轮
+  - evaluation/report.py 第三十四轮
+  - evaluation/runner.py 第四十七轮
+  - evaluation/cli.py 第四十六轮
+  - evaluation/manifest.py 第四十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+---
+
 ## Round 439 — evaluation/cli.py 第四十五轮（113 测试）
 
 ### 目标
