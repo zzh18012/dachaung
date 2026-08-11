@@ -4,6 +4,49 @@
 
 ---
 
+## Round 486 — evaluation/runner.py 第五十三轮（108 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第五十三轮 edges 测试，覆盖 edges50 未触及的角度：**_load_annotation 第二十三批**（whitespace only / 单 BOM / 双 BOM / trailing comma / 单引号 / JSON 注释 / 长 payload / 路径含空格 / 路径含中文 / UTF-16 BE/LE 返回 None / 目录 / None path / 缺文件 / symlink 跟随 / 空 dict / 空 array / 负数 / 浮点）；**_process_one 第二十三批**（process_single OSError 传播 / ValueError 传播 / (None, []) → unknown / (None, [e1,e2]) → errors[0] / to_dict 调用一次 / mkdir 参数 / image_dir 仅 document 非空时计算 / unlink 缺文件 / unlink OSError 静默 / 5-tuple / parser_version 透传 / parser_name 关键字 / elapsed float / document.to_dict 调用）；**run_evaluation 第二十三批**（空 manifest / 第一个 doc parser_version 锁定 / 所有 doc 失败 / annotation_present 影响 / tolerance_chars 默认 30 / 自定义 50 / per_doc 字段精确 / wall_time_seconds 结构 / output_path 嵌套父目录 / JSON dump 格式 / report_version / return value 与文件一致 / 6 top keys / expected_failure 字段 / actual_error_code None / devset section 字段）；**module source forbidden tokens 第三十九批**（含 no subprocess / no argparse / no eval/exec / no network / no pickle/shutil/tempfile）；**module source 字符串精确补强第三十五批**；**signatures 第三十五批**；**module 合理性第三十五批**；**端到端集成第三十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges51.py`（108 测试）
+
+### 覆盖要点
+- **_load_annotation 第二十三批**：19 测试
+- **_process_one 第二十三批**：14 测试
+- **run_evaluation 第二十三批**：17 测试
+- **module source forbidden tokens 第三十九批**：19 测试
+- **module source 字符串精确补强第三十五批**：15 测试
+- **signatures 第三十五批**：8 测试
+- **module 合理性第三十五批**：12 测试
+- **端到端集成第三十五批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails：
+  - `test_load_annotation_utf16_be_raises_batch23`：误以为 UTF-16 BE 字节会抛 UnicodeDecodeError。实际：ASCII 范围内的 UTF-16 BE 字节（NUL + ASCII 配对）能被 UTF-8 解码（虽然得到 '\\x00{\\x00"...'），随后 json.load 失败 → JSONDecodeError → None。修法：改为 `assert _load_annotation(p) is None`。
+  - `test_module_constants_no_module_level_mutables_batch23`：手工按行扫描 docstring 时漏掉中文行。修法：用 `ast.parse(source)` 直接检 top-level Assign 节点，所有 target.id 必须 == "__all__"。
+- 修复后：108 全通过（1 skip Windows 不支持 symlink）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 486 后）：59079 pass / 0 fail / 22 skip（HEAD `9426f45`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第五十二轮
+  - evaluation/schema.py 第四十二轮
+  - evaluation/manifest.py 第五十一轮
+  - evaluation/annotation_metrics.py 第五十一轮
+  - evaluation/metrics.py 第五十三轮
+  - evaluation/report.py 第四十一轮
+  - evaluation/runner.py 第五十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges51 已饱和（_load_annotation 多编码/JSON 边界 / _process_one 错误传播与 image_dir 条件 / run_evaluation 字段精确 + 容差锁定）。下一轮选 evaluation/cli.py 第五十二轮，覆盖 _build_parser/_format_metric/_run_inspect_doc/main 第二十四批未触及角度。
+
+---
+
 ## Round 485 — evaluation/report.py 第四十轮（141 测试）
 
 ### 目标
