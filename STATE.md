@@ -4,6 +4,48 @@
 
 ---
 
+## Round 453 — evaluation/cli.py 第四十七轮（94 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第四十七轮 edges 测试，覆盖 edges45 未触及的角度：**_build_parser 行为深度第十九批**（_actions count / run subparser actions count / validate-report / inspect-doc / 含 --manifest/--output/--parser option / positional 必填 / 全 options 解析）；**argparse Namespace 行为深度第十九批**（manifest/output/input/tolerance values / command 字段）；**_format_metric 边界第十九批**（int 正数 / dict 单项 / dict 多项 / 短 name / 长 name / 缺 value / 缺 reason / 完整 / 返 str）；**_run_inspect_doc 边界第十九批**（输出 file path / document_id / source_type / counts / parser info / tolerance 透传 / metrics 排序 / 返 int / invalid top-level str/int）；**main 路由第十九批**（run 写文件 / 多 doc n_ok+n_fail / validate-report EvalSchemaError / success 输出 path / inspect-doc success / invalid JSON / 不存在 / no subcommand SystemExit）；**module source forbidden tokens 第三十三批**；**module source 字符串精确补强第三十一批**；**signatures 第二十九批**；**module 合理性第二十九批**；**端到端集成第二十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges46.py`（94 测试）
+
+### 覆盖要点
+- **_build_parser 第十九批**：10 测试
+- **argparse Namespace 第十九批**：6 测试
+- **_format_metric 第十九批**：9 测试
+- **_run_inspect_doc 第十九批**：10 测试
+- **main 路由第十九批**：8 测试
+- **module source forbidden tokens 第三十三批**：17 测试
+- **module source 字符串精确补强第三十一批**：15 测试
+- **signatures 第二十九批**：5 测试
+- **module 合理性第二十九批**：6 测试
+- **端到端集成第二十九批**：8 测试
+
+### 撞墙记录
+- 0 fail 首次跑（94 全通过）。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 453 后）：54876 pass / 0 fail / 19 skip（HEAD `cc6e1f4`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第四十六轮
+  - evaluation/annotation_metrics.py 第四十六轮
+  - evaluation/schema.py 第三十八轮
+  - evaluation/metrics.py 第四十八轮
+  - evaluation/report.py 第三十六轮
+  - evaluation/runner.py 第四十九轮
+  - evaluation/cli.py 第四十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges46 已饱和（_build_parser 10 + Namespace 6 + _format_metric 9 + _run_inspect_doc 10 + main 8）。下一轮选 evaluation/manifest.py 第四十六轮，覆盖 ManifestError / load_manifest 更深入边界。
+
+---
+
 ## Round 452 — evaluation/runner.py 第四十八轮（90 测试）
 
 ### 目标
