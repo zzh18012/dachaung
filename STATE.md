@@ -4,6 +4,48 @@
 
 ---
 
+## Round 464 — evaluation/report.py 第三十七轮（122 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第三十七轮 edges 测试，覆盖 edges36 未触及的角度：**_RATIO_METRICS 内容第二十一批**（含 12 项完整 tuple / chunk_boundary_f1 在末尾 / 非字符串元素拒绝 / Tuple 类型 / 等于 _COUNT_METRICS 不相交 / 无 None / 可迭代）；**get_git_provenance 边界第二十一批**（non-git dir / git dir / subprocess 失败 / TimeoutExpired / CalledProcessError / 2 字段返回 / 类型）；**get_dependency_versions 边界第二十一批**（PackageNotFoundError / None 值 / 3 包名 / 字典访问 / 类型）；**build_provenance 边界第二十一批**（9 字段 / parser_version None / max_chars 透传 / parser_name 透传 / git None 兼容）；**build_devset_section 边界第二十一批**（6 字段 / file_count 等于 documents 长度 / categories 计算 / docx+pdf 计数 / status 透传）；**aggregate_summary 第二十一批**（4 顶层 key / counts 求和 / success_rates 算 rate / ratio macro avg / silent_drop 求和 / 空输入 / 单 doc / 多 doc）；**module source forbidden tokens 第三十五批**；**module source 字符串精确补强第三十一批**；**signatures 第三十一批**；**module 合理性第三十一批**；**端到端集成第三十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges37.py`（122 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 内容第二十一批**：13 测试
+- **get_git_provenance 边界第二十一批**：8 测试
+- **get_dependency_versions 边界第二十一批**：6 测试
+- **build_provenance 边界第二十一批**：7 测试
+- **build_devset_section 边界第二十一批**：9 测试
+- **aggregate_summary 边界第二十一批**：13 测试
+- **module source forbidden tokens 第三十五批**：17 测试
+- **module source 字符串精确补强第三十一批**：13 测试
+- **signatures 第三十一批**：6 测试
+- **module 合理性第三十一批**：12 测试
+- **端到端集成第三十一批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fails，122 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 464 后）：56188 pass / 0 fail / 19 skip（HEAD `79b80d9`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第五十轮
+  - evaluation/cli.py 第四十九轮
+  - evaluation/schema.py 第三十九轮
+  - evaluation/manifest.py 第四十八轮
+  - evaluation/annotation_metrics.py 第四十八轮
+  - evaluation/metrics.py 第五十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges37 已饱和（_RATIO_METRICS 13 + get_git_provenance 8 + get_dependency_versions 6 + build_provenance 7 + build_devset_section 9 + aggregate_summary 13）。下一轮选 evaluation/runner.py 第五十轮，深入 _process_one 边界（encoding / error_categories / annotation_path None / output_root 创建）。
+
+---
+
 ## Round 463 — evaluation/metrics.py 第四十九轮（124 测试）
 
 ### 目标
