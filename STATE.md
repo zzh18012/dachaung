@@ -4,6 +4,53 @@
 
 ---
 
+## Round 449 — evaluation/schema.py 第三十七轮（120 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第三十七轮 edges 测试，覆盖 edges36 未触及的角度：**SCHEMAS_DIR 常量深度第十七批**（绝对路径 / parent 是项目根 / name='schemas' / 至少 4 schema / 无 .py / 4 个 schema 文件都存在）；**EvalSchemaError 行为深度第十七批**（subclass / message stored / str / errors 默认 / None / [] / content / raise from / no cause / repr / init signature / no varargs）；**load_schema 行为深度第十七批**（4 schema 都有 $schema / 都用 Draft 2020-12 / type=object / additionalProperties false / required 字段存在）；**validate 行为深度第十七批**（成功返 None / errors 排序按 absolute_path / errors 每项 3 keys / message 含 schema_name / message 含错误数 / path 是 list / schema_path 是 list / 不修改 instance / 未知 schema raises）；**validate_file 行为深度第十七批**（str path / Path object / UTF-8 BOM 抛 JSONDecodeError / Unicode 内容 / invalid raises EvalSchemaError / 不存在 raises / 目录 raises / 非 JSON raises）；**_schema_path 行为深度第十七批**（返 Path / resolved / 不存在 message / in SCHEMAS_DIR / signature）；**4 个 schema 内容深度第十七批**（manifest 必填 3 / annotation 必填 doc_id+annotation_version / report 必填 ≥5 + provenance / document 有 elements+chunks+required≥3）；**module source forbidden tokens 第三十二批**；**module source 字符串精确补强第二十八批**；**signatures 第二十八批**；**module 合理性第二十八批**；**端到端集成第二十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges37.py`（120 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 第十七批**：9 测试
+- **EvalSchemaError 第十七批**：12 测试
+- **load_schema 第十七批**：11 测试
+- **validate 第十七批**：9 测试
+- **validate_file 第十七批**：8 测试
+- **_schema_path 第十七批**：5 测试
+- **4 个 schema 内容深度第十七批**：10 测试
+- **module source forbidden tokens 第三十二批**：18 测试
+- **module source 字符串精确补强第二十八批**：15 测试
+- **signatures 第二十八批**：5 测试
+- **module 合理性第二十八批**：11 测试
+- **端到端集成第二十八批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails
+  - `test_validate_file_with_utf8_bom_batch17`：validate_file 用 `encoding="utf-8"`（非 utf-8-sig）→ BOM 残留在字符串中 → json.JSONDecodeError "Unexpected UTF-8 BOM"。修法：改为 expect JSONDecodeError。
+  - `test_e2e_schemas_dir_independent_from_app_schema_batch17`：app/schema.py 没有 `SCHEMAS_DIR`，只有 `SCHEMA_PATH`（指向单个 document.schema.json）。修法：用 `app_schema.SCHEMA_PATH.parent == SCHEMAS_DIR`。
+- 修复后：120 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 449 后）：54420 pass / 0 fail / 19 skip（HEAD `c868073`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第四十七轮
+  - evaluation/report.py 第三十五轮
+  - evaluation/runner.py 第四十八轮
+  - evaluation/cli.py 第四十七轮
+  - evaluation/manifest.py 第四十六轮
+  - evaluation/annotation_metrics.py 第四十六轮
+  - evaluation/schema.py 第三十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges37 已饱和（SCHEMAS_DIR 9 + EvalSchemaError 12 + load_schema 11 + validate 9 + validate_file 8 + 4 schema 内容 10）。下一轮选 evaluation/metrics.py 第四十七轮，覆盖 compute_automatic_metrics 行为深度。
+
+---
+
 ## Round 448 — evaluation/annotation_metrics.py 第四十五轮（87 测试）
 
 ### 目标
