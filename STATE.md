@@ -4,6 +4,48 @@
 
 ---
 
+## Round 472 — evaluation/runner.py 第五十一轮（107 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第五十一轮 edges 测试，覆盖 edges48 未触及的角度：**_load_annotation 第二十一批**（GBK 编码 / BOM / 空文件 / 纯空白 / 多 JSON 对象 / 尾随逗号 / 单引号 / 注释 / 大 JSON / 不存在 / None 输入）；**_process_one 第二十一批**（mkdir 参数 / source_hash None / to_dict 调用一次 / document=None 走 unknown / elapsed 类型 / parser_version 来源 / 错误时 parser_version None / unlink 吃 OSError）；**run_evaluation 第二十一批**（output_root mkdir / json.dump ensure_ascii / indent=2 / report_version 常量 / devset 透传 manifest / summary 来自 aggregate / provenance 透传 parser_version+project_root / chunk_b pop _ 前缀 / 内部 _annotation_present / wall_time_seconds 5 字段 / expected_failure 4 字段 / 无错误时 actual None）；**module source forbidden tokens 第三十七批**；**module source 字符串精确补强第三十三批**；**signatures 第三十三批**；**module 合理性第三十三批**；**端到端集成第三十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges49.py`（107 测试）
+
+### 覆盖要点
+- **_load_annotation 第二十一批**：11 测试
+- **_process_one 第二十一批**：8 测试
+- **run_evaluation 第二十一批**：13 测试
+- **module source forbidden tokens 第三十七批**：17 测试
+- **module source 字符串精确补强第三十三批**：15 测试
+- **signatures 第三十三批**：6 测试
+- **module 合理性第三十三批**：12 测试
+- **端到端集成第三十三批**：8 测试
+
+### 撞墙记录
+- 首次跑：2 fails（同根 + 1 不同）：
+  - `test_load_annotation_invalid_encoding_returns_none_batch21`：UnicodeDecodeError 是 ValueError 子类，不被 `(OSError, json.JSONDecodeError)` 捕获 → 传播。修法：改断言为 `pytest.raises(UnicodeDecodeError)`。
+  - `test_run_evaluation_chunk_b_pops_tolerance_chars_key_batch21`：metrics 结构是嵌套 `{"value": 1.0, "reason": None}`，写测试时直接放 float 会触发 `aggregate_summary` 的 `AttributeError: 'float' object has no attribute 'get'`。修法：把 fake_chunk_b 的 metric value 包成嵌套 dict。
+- 修复后：107 全通过。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 472 后）：57206 pass / 0 fail / 20 skip（HEAD `3e5be4f`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第五十轮
+  - evaluation/schema.py 第四十轮
+  - evaluation/manifest.py 第四十九轮
+  - evaluation/annotation_metrics.py 第四十九轮
+  - evaluation/metrics.py 第五十一轮
+  - evaluation/report.py 第三十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges49 已饱和（_load_annotation 编码场景 + _process_one 内部细节 + run_evaluation 装配链路）。下一轮选 evaluation/cli.py 第五十轮，覆盖 _build_parser / _format_metric / _run_inspect_doc / main 的更多边界。
+
+---
+
 ## Round 471 — evaluation/report.py 第三十八轮（137 测试）
 
 ### 目标
