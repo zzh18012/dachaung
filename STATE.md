@@ -4,6 +4,39 @@
 
 ---
 
+## Round 561 — evaluation/schema.py 第五十三轮（75 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第五十三轮 edges 测试，覆盖 edges51 未触及的角度（第三十二批）：**EvalSchemaError**（super init with kwargs / complex errors / empty message / catch as ValueError / str preserves unicode/ascii/newline/tab messages）；**SCHEMAS_DIR**（resolved / in project root / 含三个 schema）；**_schema_path**（string argument / returns absolute / file not found error message）；**load_schema**（manifest/annotation/eval_report 都有 properties+required / all type=object）；**validate**（str schema_name / errors sorted by path / message contains path / message contains count / head error message / 不 mutate input / 不 mutate schema on repeat）；**validate_file**（Path object / returns None / invalid raises / annotation schema / eval-report schema / 不 mutate file）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges52.py`（75 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第三十二批**：5 测试
+- **SCHEMAS_DIR 第三十二批**：3 测试
+- **_schema_path 第三十二批**：3 测试
+- **load_schema 第三十二批**：6 测试
+- **validate 第三十二批**：7 测试
+- **validate_file 第三十二批**：6 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：12 测试
+- **signatures 第四十九批**：8 测试
+- **module 合理性第四十九批**：6 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：annotation.schema.json 不允许 figure_caption_anchors → 移除该字段
+
+### 测试基线
+- 总数：66612 passed, 22 skipped, 0 failed（358.75s）
+- 较上轮 +75（66537 → 66612）
+
+### 下一步建议
+- 下一轮选 evaluation/report.py 第五十一轮（继续 edges 加强 build_provenance / aggregate_summary）
+
+---
+
 ## Round 560 — evaluation/metrics.py 第六十二轮（113 测试）
 
 ### 目标
