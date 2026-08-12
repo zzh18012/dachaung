@@ -4,6 +4,49 @@
 
 ---
 
+## Round 520 — evaluation/report.py 第四十五轮（102 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第四十五轮 edges 测试，覆盖 edges44 未触及的角度：**_RATIO_METRICS 第二十九批**（顺序固定 / 不含 silent_drop / 不含 element_count / unique / tuple 类型 / 含 text_char_multiset / image_resource / chunk_reference）；**get_git_provenance 第二十九批**（commit 含换行 strip / trailing 空白 strip / stderr 非空但 returncode=0 / dirty 单行 / dirty 多行 / SubprocessError / 第二次成功但 stdout 空 / 不修改输入）；**get_dependency_versions 第二十九批**（返回 dict 而非 list / 顺序与源码一致 / 三 key / idempotent / 无参数）；**build_provenance 第二十九批**（max_chars float→int / max_chars bool / parser_name unicode / parser_version 空 str / dependencies dict / evaluator_version 1.1 / report_version 1.1 / run_timestamp_iso 含 tz / 除 timestamp 外 idempotent）；**build_devset_section 第二十九批**（categories 空 / status unicode / 负数透传 / idempotent / pdf+docx 透传）；**aggregate_summary 第二十九批**（counts 全 null / mixed null+int / success rate 计算 / 全 False rate=0 / ratio 单 doc / ratio macro average / ratio 全 null / silent_drop 负值 / silent_drop 全 null / not_evaluated 计算 / 不修改输入 / 4 个 top key）；**module source forbidden tokens 第四十六批**（subprocess 允许）；**module source 字符串精确补强第四十二批**（含 module docstring / counts comment / silent_drop_count / 不混合类型 / subprocess.run / capture_output / encoding utf-8 / errors replace / timeout=10 / porcelain / participating_docs / not_evaluated / macro_average）；**signatures 第四十二批**（9 项）；**module 合理性第四十二批**（8 项）；**端到端集成第四十二批**（含真实 git repo / 完整 pilot / roundtrip / idempotent / 3 packages / empty per_doc）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges45.py`（102 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 第二十九批**：12 测试
+- **get_git_provenance 第二十九批**：9 测试
+- **get_dependency_versions 第二十九批**：6 测试
+- **build_provenance 第二十九批**：10 测试
+- **build_devset_section 第二十九批**：5 测试
+- **aggregate_summary 第二十九批**：13 测试
+- **module source forbidden tokens 第四十六批**：12 测试
+- **module source 字符串精确补强第四十二批**：13 测试
+- **signatures 第四十二批**：9 测试
+- **module 合理性第四十二批**：8 测试
+- **端到端集成第四十二批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。102 全通过；全量回归 62684 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 520 后）：62684 pass / 0 fail / 22 skip（HEAD `903ea15`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第五十八轮
+  - evaluation/cli.py 第五十七轮
+  - evaluation/schema.py 第四十七轮
+  - evaluation/manifest.py 第五十六轮
+  - evaluation/annotation_metrics.py 第五十六轮
+  - evaluation/metrics.py 第五十八轮
+  - evaluation/report.py 第四十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges45 已饱和。下一轮选 evaluation/runner.py 第五十八轮。
+
+---
+
 ## Round 519 — evaluation/metrics.py 第五十七轮（110 测试）
 
 ### 目标
