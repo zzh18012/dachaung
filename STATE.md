@@ -4,6 +4,52 @@
 
 ---
 
+## Round 538 — evaluation/manifest.py 第五十八轮（100 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第五十八轮 edges 测试，覆盖 edges57 未触及的角度：**ManifestError 第三十一批**（多 args / str 只 message / 不被 ValueError catch / module-level class）；**_is_absolute_like 第三十一批**（unicode 字母盘符 / 空格 / 多冒号 / hash / Z 盘 / 单字符）；**_has_backslash 第三十一批**（tab / newline / unicode / 仅 forward / mixed）；**DocumentEntry 第三十一批**（annotation_resolved Path / paired_with str / expectations 嵌套 dict / 默认 categories 空 / 字段类型 / 含 paired 的 eq）；**ExpectedFailure 第三十一批**（source_type str / neq differ / source_type 不等）；**Manifest 第三十一批**（devset_status 任意 string / project_root Path / documents tuple / expected_failures tuple / categories 多类 / categories 无重复 / file_count 0）；**_resolve_relative_path 第三十一批**（长路径 / unicode / 幂等 / 绝对路径 / 多层目录）；**load_manifest 第三十一批**（annotation_file 越界 / expectations 透传 / 双 doc / paired docs / 不修改 / sha256）；**_detect_project_root 第三十一批**（深嵌套 / starts at root / 幂等 / 返回存在）；**module source forbidden tokens 第四十八批**；**module source 字符串精确补强第四十四批**；**signatures 第四十四批**；**module 合理性第四十四批**；**端到端集成第四十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges58.py`（100 测试）
+
+### 覆盖要点
+- **ManifestError 第三十一批**：4 测试
+- **_is_absolute_like 第三十一批**：6 测试
+- **_has_backslash 第三十一批**：5 测试
+- **DocumentEntry 第三十一批**：6 测试
+- **ExpectedFailure 第三十一批**：4 测试
+- **Manifest 第三十一批**：7 测试
+- **_resolve_relative_path 第三十一批**：5 测试
+- **load_manifest 第三十一批**：6 测试
+- **_detect_project_root 第三十一批**：4 测试
+- **module source forbidden tokens 第四十八批**：12 测试
+- **module source 字符串精确补强第四十四批**：17 测试
+- **signatures 第四十四批**：7 测试
+- **module 合理性第四十四批**：9 测试
+- **端到端集成第四十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。100 全通过；全量回归 64349 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 538 后）：64349 pass / 0 fail / 22 skip（HEAD `8e9f605`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第五十八轮
+  - evaluation/metrics.py 第六十轮
+  - evaluation/report.py 第四十八轮
+  - evaluation/runner.py 第六十一轮
+  - evaluation/cli.py 第六十轮
+  - evaluation/schema.py 第五十轮
+  - evaluation/manifest.py 第五十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges58 已饱和。下一轮选 evaluation/annotation_metrics.py 第五十八轮。
+
+---
+
 ## Round 537 — evaluation/schema.py 第四十九轮（81 测试）
 
 ### 目标
