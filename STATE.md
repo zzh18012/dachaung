@@ -4,6 +4,36 @@
 
 ---
 
+## Round 542 — evaluation/runner.py 第六十一轮（74 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第六十一轮 edges 测试，覆盖 edges58 未触及的角度：**_load_annotation 第三十一批**（path 是目录 / array root / int root / string root / 空 file / 非 JSON / nested / OSError 不抛）；**_process_one 第三十一批**（unlink out_stub / 父目录创建 / write_json=False / 5 元组 / image_dir 路径 / elapsed float）；**run_evaluation 第三十一批**（空 documents / 文件内容匹配 / report_version / public_per_doc keys set / 不含私有 key / expected_failures 空 / 含 errors / 无 errors / 真 document / 不修改 manifest / parser_name / max_chars）；**module source forbidden tokens 第四十九批**；**module source 字符串精确补强第四十五批**；**signatures 第四十五批**（_load_annotation / _process_one / run_evaluation keyword-only / defaults）；**module 合理性第四十五批**；**端到端集成第四十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges59.py`（74 测试）
+
+### 覆盖要点
+- **_load_annotation 第三十一批**：9 测试
+- **_process_one 第三十一批**：6 测试
+- **run_evaluation 第三十一批**：12 测试
+- **module source forbidden tokens 第四十九批**：9 测试
+- **module source 字符串精确补强第四十五批**：17 测试
+- **signatures 第四十五批**：7 测试
+- **module 合理性第四十五批**：8 测试
+- **端到端集成第四十五批**：6 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：64772 passed, 22 skipped, 0 failed（495.66s）
+- 较上轮 +74（64698 → 64772）
+
+### 下一步建议
+- 下一轮选 evaluation/cli.py 第六十轮（继续 edges59 加强 _build_parser / _format_metric / _run_inspect_doc / main）
+
+---
+
 ## Round 541 — evaluation/report.py 第四十八轮（118 测试）
 
 ### 目标
