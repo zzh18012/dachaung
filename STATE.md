@@ -4,6 +4,47 @@
 
 ---
 
+## Round 529 — evaluation/cli.py 第五十八轮（79 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第五十八轮 edges 测试，覆盖 edges56 未触及的角度：**_build_parser 第三十批**（prog / formatter / run --manifest required / --output required / validate-report positional required / inspect-doc positional required / --parser 不 required / --max-chars 不 required / --tolerance-chars 不 required）；**_format_metric 第三十批**（value=None reason=ok / reason=None / 0.5 → :.4f / value=1 / dict 单项 / 缺 value / 缺 reason / 负 int）；**_run_inspect_doc 第三十批**（metrics 区块 / zero counts / 不存在 stderr / invalid JSON / tolerance_chars 透传 / 返回 int）；**main 第三十批**（inspect-doc 成功 / 不存在 / validate-report 不存在 / invalid JSON / run 不存在 manifest / 返回 int / 无 args SystemExit）；**module source forbidden tokens 第四十八批**；**module source 字符串精确补强第四十四批**（含 module docstring / main argv / 函数定义 / utf-8 reconfigure / sys.stdout / 三个 command branch）；**signatures 第四十四批**；**module 合理性第四十四批**；**端到端集成第四十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges57.py`（79 测试）
+
+### 覆盖要点
+- **_build_parser 第三十批**：9 测试
+- **_format_metric 第三十批**：8 测试
+- **_run_inspect_doc 第三十批**：6 测试
+- **main 第三十批**：7 测试
+- **module source forbidden tokens 第四十八批**：12 测试
+- **module source 字符串精确补强第四十四批**：13 测试
+- **signatures 第四十四批**：9 测试
+- **module 合理性第四十四批**：8 测试
+- **端到端集成第四十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。79 全通过；全量回归 63508 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 529 后）：63508 pass / 0 fail / 22 skip（HEAD `dcb1c45`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第四十八轮
+  - evaluation/manifest.py 第五十七轮
+  - evaluation/annotation_metrics.py 第五十七轮
+  - evaluation/metrics.py 第五十九轮
+  - evaluation/report.py 第四十七轮
+  - evaluation/runner.py 第六十轮
+  - evaluation/cli.py 第五十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges57 已饱和。下一轮选 evaluation/schema.py 第四十八轮。
+
+---
+
 ## Round 528 — evaluation/runner.py 第五十九轮（74 测试）
 
 ### 目标
