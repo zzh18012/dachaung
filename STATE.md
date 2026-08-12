@@ -4,6 +4,36 @@
 
 ---
 
+## Round 570 — evaluation/runner.py 第六十五轮（91 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第六十五轮 edges 测试，覆盖 edges62 未触及的角度（第三十五批）：**_load_annotation**（None input / nonexistent file / directory / invalid JSON / OSError 模拟 / 含 anchor 数据 / 大数据 1000 anchors / returns dict / emoji+中文+换行）；**_process_one**（5-tuple / errors dict / unknown error 无 doc 无 errors / document dict 成功 / elapsed float / 创建 _per_doc / doc_id in stub / calls process_single / 传 resolved_path / unlink existing stub / unlink OSError swallowed / image_dir computed / image_dir None when doc None）；**run_evaluation**（创建 output dir / writes REPORT_VERSION / 5 top keys / empty per_doc / empty expected_failures / 创建 _per_doc 当 docs present / 不创建 _per_doc 当 docs empty / first parser_version / parser_name / max_chars / expected_failure matches / expected_failure no errors actual None / per_doc 有 doc_id+source_type / per_doc wall_time / summary present / devset present）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges63.py`（91 测试）
+
+### 覆盖要点
+- **_load_annotation 第三十五批**：9 测试
+- **_process_one 第三十五批**：13 测试
+- **run_evaluation 第三十五批**：18 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：22 测试
+- **signatures 第四十九批**：5 测试
+- **module 合理性第四十九批**：7 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：`*)` 字符串断言错误（实际是 `*,` 后跟参数）→ 改为 `*,\n    parser_name` 模式
+
+### 测试基线
+- 总数：67595 passed, 22 skipped, 0 failed（360.93s）
+- 较上轮 +91（67504 → 67595）
+
+### 下一步建议
+- 下一轮选 evaluation/cli.py 第六十四轮（继续 edges 加强 _build_parser / main / _format_metric / _run_inspect_doc）
+
+---
+
 ## Round 569 — evaluation/report.py 第五十二轮（132 测试）
 
 ### 目标
