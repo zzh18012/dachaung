@@ -4,6 +4,39 @@
 
 ---
 
+## Round 555 — evaluation/report.py 第五十轮（115 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第五十轮 edges 测试，覆盖 edges49 未触及的角度（第三十一批）：**_RATIO_METRICS**（count=12 / 含 schema_valid/text_preservation_equal / 含 chunk_boundary_* / figure_caption_* 不在内 / is tuple / 与 count/success 不重叠）；**_COUNT_METRICS**（is tuple / 1 entry / element_count_total）；**_SUCCESS_BOOL_METRICS**（is tuple / 1 entry / pipeline_success）；**get_git_provenance**（returns dict / subprocess cwd / timeout=10 / encoding utf-8 / errors replace / capture_output / 第一命令 rev-parse / 第二命令 status --porcelain / commit 成功 / commit 失败 / dirty / clean / status fail → dirty=False / OSError / SubprocessError / TimeoutExpired）；**get_dependency_versions**（returns dict / 3 packages / values str|None）；**build_provenance**（keys / evaluator_version / report_version / parser_name / parser_version None / max_chars int / negative / zero / str_to_int / run_timestamp_iso / dependencies present / unicode parser_name）；**build_devset_section**（keys / passes status / passes categories_covered）；**aggregate_summary**（empty / silent_drop_total null no data / all pipeline fail / all success / mixed / counts summed / counts None skipped / counts no data / ratio macro / ratio None skipped / silent_drop_total / silent_drop None skipped / no input rate null）；**module source forbidden tokens 第五十三批**（subprocess 合法保留）；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges50.py`（115 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第三十一批**：14 测试
+- **get_git_provenance 第三十一批**：17 测试
+- **get_dependency_versions 第三十一批**：2 测试
+- **build_provenance 第三十一批**：12 测试
+- **build_devset_section 第三十一批**：3 测试
+- **aggregate_summary 第三十一批**：14 测试
+- **module source forbidden tokens 第五十三批**：13 测试（参数化）
+- **module source 字符串精确补强第四十九批**：20 测试
+- **signatures 第四十九批**：10 测试
+- **module 合理性第四十九批**：8 测试
+- **端到端集成第四十九批**：4 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：66070 passed, 22 skipped, 0 failed（787.88s）
+- 较上轮 +115（65955 → 66070）
+
+### 下一步建议
+- 下一轮选 evaluation/runner.py 第六十三轮（继续 edges 加强 _load_annotation / _process_one / run_evaluation）
+
+---
+
 ## Round 554 — evaluation/schema.py 第五十二轮（96 测试）
 
 ### 目标
