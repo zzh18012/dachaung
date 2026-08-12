@@ -4,6 +4,49 @@
 
 ---
 
+## Round 526 — evaluation/metrics.py 第五十八轮（133 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第五十八轮 edges 测试，覆盖 edges55 未触及的角度：**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED 第三十批**（内容精确 / 不重叠 / subset 关系 / tuple 类型 / str 类型）；**基础构造器 第三十批**（2 keys / value None / reason None / float value / bool 强转 / int 强转 / 负数）；**compute_automatic_metrics 第三十批**（14 个 metric / keys set / pipeline_success True/False / error_code / schema exception path / pdf/docx/unknown source_type）；**_pdf_locator_ratio 第三十批**（page=0 / 负数 / bbox 3 个值 / NaN / Inf / 无 locator）；**_docx_locator_ratio 第三十批**（含 page / 含 bbox / 无结构键 / 7 结构键）；**_is_valid_bbox 第三十批**（bool 元素 / NaN / Inf / -Inf / 正确 / 全 int / 混合 / 零值 / 负值）；**_image_resource_ratio 第三十批**（无 rp / 空 str / 0 size 文件 / 不存在 / returns dict）；**_chunk_reference_ratio 第三十批**（无 key / 空 list / 全 valid / partial）；**_strip_unicode_whitespace 第三十批**（NBSP / em space / en space / ideographic / line sep / paragraph sep / 无空白 / 空 / 全空白）；**_text_preservation 第三十批**（perfect / unicode / partial match Counter 交集 / 空 image element / 3 keys）；**_heading_boundary_ratio 第三十批**（heading 无 element_id / 多 heading / 无 heading / 全匹配）；**_silent_drop_count 第三十批**（无 expectations / 空 dict / 空 element_count_by_type / actual>expected / sum across types）；**module source forbidden tokens 第四十七批**；**module source 字符串精确补强第四十三批**（19 项）；**signatures 第四十三批**；**module 合理性第四十三批**；**端到端集成第四十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges56.py`（133 测试）
+
+### 覆盖要点
+- **常量与基础构造器**：21 测试
+- **compute_automatic_metrics 第三十批**：9 测试
+- **_pdf_locator_ratio / _docx_locator_ratio / _is_valid_bbox**：21 测试
+- **_image_resource_ratio / _chunk_reference_ratio**：9 测试
+- **_strip_unicode_whitespace / _text_preservation**：14 测试
+- **_heading_boundary_ratio / _silent_drop_count**：9 测试
+- **module source forbidden tokens 第四十七批**：12 测试
+- **module source 字符串精确补强第四十三批**：19 测试
+- **signatures 第四十三批**：9 测试
+- **module 合理性第四十三批**：8 测试
+- **端到端集成第四十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。133 全通过；全量回归 63277 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 526 后）：63277 pass / 0 fail / 22 skip（HEAD `3d22bd6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第四十六轮
+  - evaluation/runner.py 第五十九轮
+  - evaluation/cli.py 第五十八轮
+  - evaluation/schema.py 第四十八轮
+  - evaluation/manifest.py 第五十七轮
+  - evaluation/annotation_metrics.py 第五十七轮
+  - evaluation/metrics.py 第五十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges56 已饱和。下一轮选 evaluation/report.py 第四十六轮。
+
+---
+
 ## Round 525 — evaluation/annotation_metrics.py 第五十六轮（77 测试）
 
 ### 目标
