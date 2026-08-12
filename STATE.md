@@ -4,6 +4,50 @@
 
 ---
 
+## Round 509 — evaluation/schema.py 第四十五轮（98 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第四十五轮 edges 测试，覆盖 edges44 未触及的角度：**EvalSchemaError 第二十五批**（errors 是 set / errors 是 dict / errors 是 None 二次访问 / super().__init__ 调用链 / str(e) vs args / 等价比较 / picklable / 修改 errors 后续 / unicode message / 不继承 ValueError/KeyError）；**_schema_path 第二十五批**（名称带子目录 / .. / 绝对路径 / SCHEMAS_DIR 是 Path / name 是 PathLike / name 是空字符串 / 三个 schema 都能加载 / message 含路径）；**load_schema 第二十五批**（dict 返回 / $schema key / idempotent / modification safe / 文件不存在 / annotation / evaluation-report）；**validate 第二十五批**（成功 None / 失败消息含 schema_name / 含 count / errors plain dict / path 是 list / schema_path 是 list / 未知 schema name → FileNotFoundError / instance 非 dict 4 种 / errors 内容字段）；**validate_file 第二十五批**（str path / Path 对象 / 不存在 / 非 JSON / JSON 不符合 schema / 顶层 list / 顶层 string / 顶层 null / 顶层 int）；**module source forbidden tokens 第四十三批**（13 项）；**module source 字符串精确补强第三十九批**（12 项）；**signatures 第三十九批**（8 项）；**module 合理性第三十九批**（9 项）；**端到端集成第三十九批**（7 项）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges45.py`（98 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第二十五批**：13 测试
+- **_schema_path 第二十五批**：10 测试
+- **load_schema 第二十五批**：7 测试
+- **validate 第二十五批**：11 测试
+- **validate_file 第二十五批**：9 测试
+- **module source forbidden tokens 第四十三批**：12 测试
+- **module source 字符串精确补强第三十九批**：12 测试
+- **signatures 第三十九批**：8 测试
+- **module 合理性第三十九批**：9 测试
+- **端到端集成第三十九批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_e2e_validate_full_manifest_batch25`：误以为 manifest schema 允许 expectations 含 `should_have_chunks`。实际：`expectations.additionalProperties=false`，仅允许 `element_count_by_type` 与 `required_markers`。修法：用 `required_markers` 替换 `should_have_chunks`；`test_e2e_validate_invalid_sha256_short_batch25` 同步修改。
+- 修复后：98 全通过；全量回归 61659 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 509 后）：61659 pass / 0 fail / 22 skip（HEAD `e859651`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第五十四轮
+  - evaluation/annotation_metrics.py 第五十四轮
+  - evaluation/metrics.py 第五十六轮
+  - evaluation/report.py 第四十四轮
+  - evaluation/runner.py 第五十七轮
+  - evaluation/cli.py 第五十六轮
+  - evaluation/schema.py 第四十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges45 已饱和。下一轮选 evaluation/manifest.py 第五十四轮。
+
+---
+
 ## Round 508 — evaluation/cli.py 第五十五轮（116 测试）
 
 ### 目标
