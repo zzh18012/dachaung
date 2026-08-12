@@ -4,6 +4,36 @@
 
 ---
 
+## Round 556 — evaluation/runner.py 第六十三轮（86 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第六十三轮 edges 测试，覆盖 edges60 未触及的角度（第三十三批）：**_load_annotation**（none path / missing file / valid file / invalid JSON / directory / OSError / signature / return annotation / dict value / empty dict）；**_process_one**（signature / return annotation / creates _per_doc dir / unlinks stub after / returns 5-tuple / returns document dict on success / returns error dict on fail / unknown error / total_seconds float / image_dir None when document None）；**run_evaluation**（signature / keyword-only / defaults / return annotation / empty manifest / report_version / writes output / creates output_root / per_doc empty / summary keys / provenance keys / devset keys / expected_failures empty / parser_name / max_chars）；**module source forbidden tokens 第五十三批**（subprocess 合法保留）；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**（含 successful/failed doc + expected_failures + wall_time + 排除私有 keys）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges61.py`（86 测试）
+
+### 覆盖要点
+- **_load_annotation 第三十三批**：10 测试
+- **_process_one 第三十三批**：10 测试
+- **run_evaluation 第三十三批**：14 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：20 测试
+- **signatures 第四十九批**：4 测试
+- **module 合理性第四十九批**：7 测试
+- **端到端集成第四十九批**：6 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：66156 passed, 22 skipped, 0 failed（809.78s）
+- 较上轮 +86（66070 → 66156）
+
+### 下一步建议
+- 下一轮选 evaluation/cli.py 第六十二轮（继续 edges 加强 _build_parser / _format_metric / _run_inspect_doc / main）
+
+---
+
 ## Round 555 — evaluation/report.py 第五十轮（115 测试）
 
 ### 目标
