@@ -4,6 +4,42 @@
 
 ---
 
+## Round 565 — evaluation/manifest.py 第六十二轮（118 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第六十二轮 edges 测试，覆盖 edges61 未触及的角度（第三十五批）：**DocumentEntry**（frozen / equality / hashable / 10 字段 / 字段名 / repr）；**ExpectedFailure**（default source_type None / with source_type / 5 字段 / 字段名 / frozen / hashable）；**Manifest**（5 字段 / 字段名 / file_count / pdf_count+docx_count 独立 / empty cases / categories_covered empty / content_group_count empty / frozen / properties doc count 独立）；**_is_absolute_like**（just slash / dot slash / double dot slash / Z drive upper+lower / 2 chars / 1 char / empty）；**_has_backslash**（mixed separators / only forward / single backslash / pure backslash path / empty）；**_resolve_relative_path**（in project root / subdir / dot only / one level up inside / message contains field+path / arrow for escape）；**load_manifest**（missing file / str path / str project_root / mismatch version / annotation_file / annotation_resolved None / expectations None / sha256 None / paired_with None / categories empty tuple / expected_failure with source_type / expected_failure default source_type None / documents tuple / expected_failures tuple / invalid json / backslash raises / absolute raises）；**_detect_project_root**（no pyproject / Path arg / resolves symlinks / file parent）；**ManifestError**（inherits Exception / message preserved / no args / multiple args）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges62.py`（118 测试）
+
+### 覆盖要点
+- **DocumentEntry 第三十五批**：7 测试
+- **ExpectedFailure 第三十五批**：6 测试
+- **Manifest 第三十五批**：9 测试
+- **_is_absolute_like 第三十五批**：8 测试
+- **_has_backslash 第三十五批**：5 测试
+- **_resolve_relative_path 第三十五批**：6 测试
+- **load_manifest 第三十五批**：18 测试
+- **_detect_project_root 第三十五批**：4 测试
+- **ManifestError 第三十五批**：4 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：18 测试
+- **signatures 第四十九批**：8 测试
+- **module 合理性第四十九批**：8 测试
+- **端到端集成第四十九批**：4 测试
+
+### 撞墙记录
+- 0 fails 首跑
+
+### 测试基线
+- 总数：66973 passed, 22 skipped, 0 failed（356.07s）
+- 较上轮 +118（66855 → 66973）
+
+### 下一步建议
+- 下一轮选 evaluation/annotation_metrics.py 第六十轮（继续 edges 加强 figure_caption_prf / chunk_boundary_prf / PARSER_DOES_NOT_EMIT_RELATIONS 常量）
+
+---
+
 ## Round 564 — evaluation/cli.py 第六十三轮（97 测试）
 
 ### 目标
