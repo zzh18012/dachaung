@@ -4,6 +4,39 @@
 
 ---
 
+## Round 568 — evaluation/schema.py 第五十四轮（130 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第五十四轮 edges 测试，覆盖 edges52 未触及的角度（第三十三批）：**EvalSchemaError**（inherits Exception / not ValueError / not KeyError / errors default empty / errors None / 3 errors / special chars / args preserved / caught with bare except / raised and caught / repr class name / message param required）；**SCHEMAS_DIR**（is Path / basename / parent / resolves same）；**_schema_path**（manifest / annotation / eval_report / subdir name / dot prefix / returns Path / string in error / returns existing file）；**load_schema**（type=object 三 schema / returns dict / does not mutate disk / idempotent / missing raises FileNotFoundError / $schema field）；**validate**（manifest correct / invalid version / invalid devset_status / document missing field / expected_failure missing / annotation correct / annotation missing version/doc_id / annotation with anchors / anchor invalid position / eval-report invalid / errors path list / errors message str / errors schema_path list / head error in msg / head path in msg / count in msg / does not mutate / invalid schema name / returns None on success）；**validate_file**（str path / Path / returns None / missing raises FileNotFoundError / directory raises / invalid JSON / invalid content / does not mutate / annotation / annotation with anchors / eval-report invalid / unknown schema / idempotent）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges53.py`（130 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第三十三批**：12 测试
+- **SCHEMAS_DIR 第三十三批**：4 测试
+- **_schema_path 第三十三批**：8 测试
+- **load_schema 第三十三批**：9 测试
+- **validate 第三十三批**：21 测试
+- **validate_file 第三十三批**：13 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：26 测试
+- **signatures 第四十九批**：9 测试
+- **module 合理性第四十九批**：12 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：`./manifest.schema.json` Path join 会规范化 → 文件实际存在 → 改为正向断言
+
+### 测试基线
+- 总数：67372 passed, 22 skipped, 0 failed（355.78s）
+- 较上轮 +130（67242 → 67372）
+
+### 下一步建议
+- 下一轮选 evaluation/report.py 第五十二轮（继续 edges 加强 build_provenance / aggregate_summary）
+
+---
+
 ## Round 567 — evaluation/metrics.py 第六十三轮（182 测试）
 
 ### 目标
