@@ -4,6 +4,56 @@
 
 ---
 
+## Round 512 — evaluation/metrics.py 第五十六轮（138 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第五十六轮 edges 测试，覆盖 edges53 未触及的角度：**_null/_ratio/_bool_metric/_int_metric 第二十八批**（返回结构 / 类型 / 边界值 / 类型转换）；**compute_automatic_metrics 第二十八批**（document None + error None / error code 透传 / source_type unknown（需 document） / 13 metric key 完整 / document 空字典 / 含 elements）；**_pdf_locator_ratio 第二十八批**（empty / page=0 / page=-1 / page=None / page 缺失 / image only / paragraph 无 bbox / paragraph 有 bbox / 无 locator key）；**_docx_locator_ratio 第二十八批**（empty / 含 page / 含 bbox / paragraph_index / section / relationship_id / 全无 / 无 locator key）；**_is_valid_bbox 第二十八批**（None / str / dict / 短 / 长 / bool / inf / nan / str 混入 / valid float / valid int / 负值）；**_image_resource_ratio 第二十八批**（无 image / 无 resource_path / 空 resource_path / 文件存在 / 不存在 / 大小 0 / 混合）；**_chunk_reference_ratio 第二十八批**（无 chunks / 单匹配 / 不匹配 / 部分 / 无 ids / 空 ids / 多 id 全匹配 / 多 id 部分）；**_strip_unicode_whitespace 第二十八批**（NBSP / em space / ideographic space / line separator / paragraph separator / 零宽不删 / empty / 全空白）；**_text_preservation 第二十八批**（empty / 纯空白 / image content 忽略 / chunk.text=None / content=None / 部分）；**_heading_boundary_ratio 第二十八批**（无 heading / 匹配 / 不匹配 / 部分 / chunk 空 ids / 第一个非目标）；**_silent_drop_count 第二十八批**（无 expectations / 空 / 空 element_count_by_type / 0 drop / actual > expected / 部分 / int 类型）；**module source forbidden tokens 第四十五批**（12 项）；**module source 字符串精确补强第四十一批**（12 项）；**signatures 第四十一批**（8 项）；**module 合理性第四十一批**（8 项）；**端到端集成第四十一批**（7 项）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges54.py`（138 测试）
+
+### 覆盖要点
+- **_null/_ratio/_bool_metric/_int_metric 第二十八批**：12 测试
+- **compute_automatic_metrics 第二十八批**：8 测试
+- **_pdf_locator_ratio 第二十八批**：9 测试
+- **_docx_locator_ratio 第二十八批**：9 测试
+- **_is_valid_bbox 第二十八批**：12 测试
+- **_image_resource_ratio 第二十八批**：7 测试
+- **_chunk_reference_ratio 第二十八批**：9 测试
+- **_strip_unicode_whitespace 第二十八批**：8 测试
+- **_text_preservation 第二十八批**：6 测试
+- **_heading_boundary_ratio 第二十八批**：6 测试
+- **_silent_drop_count 第二十八批**：7 测试
+- **module source forbidden tokens 第四十五批**：12 测试
+- **module source 字符串精确补强第四十一批**：12 测试
+- **signatures 第四十一批**：8 测试
+- **module 合理性第四十一批**：8 测试
+- **端到端集成第四十一批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_compute_metrics_source_type_unknown_batch28`：误以为 document=None + source_type='unknown' 会得到 `not_pdf_document` reason。实际：document=None 时实现走 early return 分支，所有 metric（含 locator）都是 `pipeline_failed`；`not_pdf_document` 只在 source_type != pdf 且 document 非 None 时返回。修法：把 document 改为 `{}` 让代码进入实际计算分支。
+- 修复后：138 全通过；全量回归 61991 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 512 后）：61991 pass / 0 fail / 22 skip（HEAD `4676117`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第四十四轮
+  - evaluation/runner.py 第五十七轮
+  - evaluation/cli.py 第五十六轮
+  - evaluation/schema.py 第四十六轮
+  - evaluation/manifest.py 第五十五轮
+  - evaluation/annotation_metrics.py 第五十五轮
+  - evaluation/metrics.py 第五十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges54 已饱和。下一轮选 evaluation/report.py 第四十四轮。
+
+---
+
 ## Round 511 — evaluation/annotation_metrics.py 第五十四轮（73 测试）
 
 ### 目标
