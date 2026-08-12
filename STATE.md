@@ -4,6 +4,41 @@
 
 ---
 
+## Round 541 — evaluation/report.py 第四十八轮（118 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第四十八轮 edges 测试，覆盖 edges47 未触及的角度：**_RATIO_METRICS 第三十二批**（count=12 / first / last / index）；**_COUNT_METRICS 第三十二批**（count=1 / first / disjoint）；**_SUCCESS_BOOL_METRICS 第三十二批**（count=1 / disjoint）；**get_git_provenance 第三十二批**（not a repo / TimeoutExpired / OSError / first fails second clean / first success second dirty / first returns empty）；**get_dependency_versions 第三十二批**（三 package / PackageNotFound / 其他 Exception / idempotent）；**build_provenance 第三十二批**（keys set / max_chars int / parser_name / parser_version / evaluator_version / report_version / timestamp iso / max_chars string to int）；**build_devset_section 第三十二批**（keys set / status / all values / returns dict）；**aggregate_summary 第三十二批**（single doc / 三 docs mixed / all-None macro / macro 计算 / silent_drop mix / silent_drop None / counts no participating / zero total / top-level keys / idempotent / no input mod）；**module source forbidden tokens 第四十九批**（不含 subprocess 因合法）；**module source 字符串精确补强第四十五批**；**signatures 第四十五批**；**module 合理性第四十五批**；**端到端集成第四十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges48.py`（118 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 第三十二批**：12 测试
+- **_COUNT_METRICS 第三十二批**：4 测试
+- **_SUCCESS_BOOL_METRICS 第三十二批**：4 测试
+- **get_git_provenance 第三十二批**：7 测试
+- **get_dependency_versions 第三十二批**：7 测试
+- **build_provenance 第三十二批**：10 测试
+- **build_devset_section 第三十二批**：5 测试
+- **aggregate_summary 第三十二批**：13 测试
+- **module source forbidden tokens 第四十九批**：9 测试（subprocess 允许）
+- **module source 字符串精确补强第四十五批**：22 测试
+- **signatures 第四十五批**：7 测试
+- **module 合理性第四十五批**：8 测试
+- **端到端集成第四十五批**：6 测试
+
+### 撞墙记录
+- 1 fail 首跑：`get_git_provenance` 在非 git 目录下：git status --porcelain returncode=128 但无异常 → dirty=False（不是 docstring 注释暗示的 True）。修正测试期望
+
+### 测试基线
+- 总数：64698 passed, 22 skipped, 0 failed（472.05s）
+- 较上轮 +118（64580 → 64698）
+
+### 下一步建议
+- 下一轮选 evaluation/runner.py 第六十一轮（继续 edges59 加强 run_evaluation / report assembly / provenance）
+
+---
+
 ## Round 540 — evaluation/metrics.py 第五十九轮（160 测试）
 
 ### 目标
