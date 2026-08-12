@@ -4,6 +4,51 @@
 
 ---
 
+## Round 540 — evaluation/metrics.py 第五十九轮（160 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（382 行）加第五十九轮 edges 测试，覆盖 edges57 未触及的角度：**_TEXT_TYPES 第三十二批**；**_PDF_BBOX_REQUIRED_TYPES 第三十二批**；**_NOT_EVALUATED 第三十二批**；**构造器第三十二批**（_null / _ratio / _bool_metric / _int_metric 边界）；**compute_automatic_metrics 第三十二批**（error code only / image_base_dir / expectations None / 不修改 chunks）；**_pdf_locator_ratio 第三十二批**（page=0 / 负数 / bbox bool / bbox NaN / table 不需 bbox）；**_docx_locator_ratio 第三十二批**（空字典 / 单 key / 含 page+bbox）；**_is_valid_bbox 第三十二批**（长度 / 全 True / 字符串 / NaN / inf / -inf）；**_image_resource_ratio 第三十二批**（rp None / 空 str / size=0 / 绝对路径）；**_chunk_reference_ratio 第三十二批**（element_id 缺 / 空 string / 重复引用）；**_strip_unicode_whitespace 第三十二批**（NBSP / em / en / ideographic / line sep / paragraph sep / zero-width 非空白）；**_text_preservation 第三十二批**（仅 image / chunk 缺 text / image 不参与 multiset）；**_heading_boundary_ratio 第三十二批**（heading 缺 id / chunk 首 id 不存在 / 多 chunk 同 first）；**_silent_drop_count 第三十二批**（expected=0 / actual>expected / 多类型 drop）；**module source forbidden tokens 第四十九批**；**module source 字符串精确补强第四十五批**；**signatures 第四十五批**；**module 合理性第四十五批**；**端到端集成第四十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges58.py`（160 测试）
+
+### 覆盖要点
+- **_TEXT_TYPES 第三十二批**：10 测试
+- **_PDF_BBOX_REQUIRED_TYPES 第三十二批**：8 测试
+- **_NOT_EVALUATED 第三十二批**：4 测试
+- **构造器第三十二批**：12 测试
+- **compute_automatic_metrics 第三十二批**：8 测试
+- **_pdf_locator_ratio 第三十二批**：6 测试
+- **_docx_locator_ratio 第三十二批**：6 测试
+- **_is_valid_bbox 第三十二批**：12 测试
+- **_image_resource_ratio 第三十二批**：7 测试
+- **_chunk_reference_ratio 第三十二批**：5 测试
+- **_strip_unicode_whitespace 第三十二批**：9 测试
+- **_text_preservation 第三十二批**：6 测试
+- **_heading_boundary_ratio 第三十二批**：5 测试
+- **_silent_drop_count 第三十二批**：5 测试
+- **module source forbidden tokens 第四十九批**：12 测试
+- **module source 字符串精确补强第四十五批**：21 测试
+- **signatures 第四十五批**：11 测试
+- **module 合理性第四十五批**：8 测试
+- **端到端集成第四十五批**：6 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  - `_PDF_BBOX_REQUIRED_TYPES[-1]` 实际是 "list_item" 不是 "caption"
+  - `image_resource_exists_ratio` 在 image 元素存在但文件不存在时返回 0.0 而非 null
+  - 1 fail 第二跑：text_preservation element 顺序与 chunk 顺序需对齐才能 equal=True
+  - 全部修复
+
+### 测试基线
+- 总数：64580 passed, 22 skipped, 0 failed（572.40s）
+- 较上轮 +160（64420 → 64580）
+
+### 下一步建议
+- 下一轮选 evaluation/report.py 第四十八轮（继续 edges48 加强 _RATIO_METRICS / _COUNT_METRICS / get_git_provenance / aggregate_summary）
+
+---
+
 ## Round 539 — evaluation/annotation_metrics.py 第五十八轮（71 测试）
 
 ### 目标
