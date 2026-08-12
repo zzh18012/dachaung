@@ -4,6 +4,56 @@
 
 ---
 
+## Round 519 — evaluation/metrics.py 第五十七轮（110 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第五十七轮 edges 测试，覆盖 edges54 未触及的角度：**基础构造器 第二十九批**（null/ratio/bool/int 返回 2 keys / 各种 reason / 范围边界 / 多次调用独立 / 大数）；**compute_automatic_metrics 第二十九批**（自定义错误码 / docx 含 elements / pdf 无 elements / schema 异常路径 / 多 source_type）；**_pdf_locator_ratio 第二十九批**（page 为 string/float/True/list/dict / 全图片含 page）；**_docx_locator_ratio 第二十九批**（7 个结构化 key 全有 / 多个 key / 零值 / None 值）；**_is_valid_bbox 第二十九批**（list 含 None / tuple / 字符串 list / 混合类型 / 极大极小 / 零值）；**_image_resource_ratio 第二十九批**（全存在 / int resource_path / Path 对象 / 非 image element / dict 返回）；**_chunk_reference_ratio 第二十九批**（全无 id / 重复 id / element 无 id key / ids 含 None）；**_strip_unicode_whitespace 第二十九批**（tab/newline/CR/FF/VT/混合/无空白）；**_text_preservation 第二十九批**（完美匹配 / unicode / 顺序敏感 / expected 全空白 / actual 全空白）；**_heading_boundary_ratio 第二十九批**（多 heading+chunk / heading 无 element_id / chunks 空 / dict 返回）；**_silent_drop_count 第二十九批**（actual==expected / actual>expected / 单类型 / 多类型 / int 值）；**module source forbidden tokens 第四十六批**（12 项）；**module source 字符串精确补强第四十二批**（12 项）；**signatures 第四十二批**（7 项）；**module 合理性第四十二批**（8 项）；**端到端集成第四十二批**（7 项）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges55.py`（110 测试）
+
+### 覆盖要点
+- **基础构造器 第二十九批**：10 测试
+- **compute_automatic_metrics 第二十九批**：7 测试
+- **_pdf_locator_ratio 第二十九批**：6 测试
+- **_docx_locator_ratio 第二十九批**：4 测试
+- **_is_valid_bbox 第二十九批**：7 测试
+- **_image_resource_ratio 第二十九批**：5 测试
+- **_chunk_reference_ratio 第二十九批**：4 测试
+- **_strip_unicode_whitespace 第二十九批**：7 测试
+- **_text_preservation 第二十九批**：5 测试
+- **_heading_boundary_ratio 第二十九批**：4 测试
+- **_silent_drop_count 第二十九批**：5 测试
+- **module source forbidden tokens 第四十六批**：12 测试
+- **module source 字符串精确补强第四十二批**：12 测试
+- **signatures 第四十二批**：7 测试
+- **module 合理性第四十二批**：8 测试
+- **端到端集成第四十二批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_signature_is_valid_bbox_return_bool_batch29`：误以为 `sig.return_annotation is bool`。实际：模块 `from __future__ import annotations` 让所有注解变成字符串，`return_annotation == "bool"`（str）。修法：改为字符串比较。同时修 `test_signature_strip_unicode_whitespace_return_str_batch29`。
+- 修复后：110 全通过；全量回归 62582 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 519 后）：62582 pass / 0 fail / 22 skip（HEAD `b3ade4e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第四十五轮
+  - evaluation/runner.py 第五十八轮
+  - evaluation/cli.py 第五十七轮
+  - evaluation/schema.py 第四十七轮
+  - evaluation/manifest.py 第五十六轮
+  - evaluation/annotation_metrics.py 第五十六轮
+  - evaluation/metrics.py 第五十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges55 已饱和。下一轮选 evaluation/report.py 第四十五轮。
+
+---
+
 ## Round 518 — evaluation/annotation_metrics.py 第五十五轮（61 测试）
 
 ### 目标
