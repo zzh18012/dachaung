@@ -4,6 +4,55 @@
 
 ---
 
+## Round 524 — evaluation/manifest.py 第五十六轮（111 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（239 行）加第五十六轮 edges 测试，覆盖 edges55 未触及的角度：**ManifestError 第二十九批**（继承 / 抛出捕获 / 特殊字符 message / unicode message / signature）；**_is_absolute_like 第二十九批**（大写盘符 / 小写盘符 / 数字开头 / 第 2 字符非冒号 / 第 3 字符非 \ 或 / / 长度<3 / 空 / relative）；**_has_backslash 第二十九批**（仅反斜杠 / 路径中 / 多个 / 无 / 空）；**DocumentEntry 第二十九批**（is_dataclass / 10 字段 / 字段名集合 / frozen / hashable）；**ExpectedFailure 第二十九批**（is_dataclass / 5 字段 / 字段名 / frozen / hashable）；**Manifest 第二十九批**（is_dataclass / 5 字段 / frozen / hashable / properties 类型 / categories_covered sorted+unique / file_count=0 / pdf_count=0）；**_resolve_relative_path 第二十九批**（空 / 绝对 / 反斜杠 / 越界 / 合法 / 子目录 / message 含 field_name / 返回 Path）；**load_manifest 第二十九批**（不存在 / 目录 / 无效 JSON / 版本不兼容（schema enum）/ 路径越界 / 返回 Manifest / 默认 project_root / 显式 project_root）；**_detect_project_root 第二十九批**（有 pyproject / 无 fallback / 起始文件 / 返回 Path / 返回 absolute）；**module source forbidden tokens 第四十六批**；**module source 字符串精确补强第四十二批**；**signatures 第四十二批**；**module 合理性第四十二批**；**端到端集成第四十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges56.py`（111 测试）
+
+### 覆盖要点
+- **ManifestError 第二十九批**：6 测试
+- **_is_absolute_like 第二十九批**：8 测试
+- **_has_backslash 第二十九批**：5 测试
+- **DocumentEntry 第二十九批**：5 测试
+- **ExpectedFailure 第二十九批**：5 测试
+- **Manifest 第二十九批**：9 测试
+- **_resolve_relative_path 第二十九批**：8 测试
+- **load_manifest 第二十九批**：8 测试
+- **_detect_project_root 第二十九批**：5 测试
+- **module source forbidden tokens 第四十六批**：12 测试
+- **module source 字符串精确补强第四十二批**：13 测试
+- **signatures 第四十二批**：8 测试
+- **module 合理性第四十二批**：9 测试
+- **端到端集成第四十二批**：7 测试
+
+### 撞墙记录
+- 首次跑：2 fails：
+  - `test_document_entry_eleven_fields_batch29`：误以为 DocumentEntry 有 11 字段，实际 10（path_str/resolved_path/annotation_file_str/annotation_resolved 四个独立字段）。修法：改为 10。
+  - `test_load_manifest_version_mismatch_raises_batch29`：误以为 manifest_version='999.0' 走 ManifestError 分支。实际：schema 用 enum 限制 manifest_version='1.0'，'999.0' 在 schema 层就被拒（EvalSchemaError）。修法：改为 expect EvalSchemaError。
+- 修复后：111 全通过；全量回归 63067 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 524 后）：63067 pass / 0 fail / 22 skip（HEAD `056f5b1`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第五十六轮
+  - evaluation/metrics.py 第五十八轮
+  - evaluation/report.py 第四十六轮
+  - evaluation/runner.py 第五十九轮
+  - evaluation/cli.py 第五十八轮
+  - evaluation/schema.py 第四十八轮
+  - evaluation/manifest.py 第五十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges56 已饱和。下一轮选 evaluation/annotation_metrics.py 第五十六轮。
+
+---
+
 ## Round 523 — evaluation/schema.py 第四十七轮（90 测试）
 
 ### 目标
