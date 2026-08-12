@@ -4,6 +4,53 @@
 
 ---
 
+## Round 508 — evaluation/cli.py 第五十五轮（116 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第五十五轮 edges 测试，覆盖 edges53 未触及的角度：**_build_parser 第二十七批**（默认值精确 / choices 顺序 / -h/--help SystemExit(0) / 大数字 / +前缀 / prog / description / 各 subparser description=None / help 文本 / required=True）；**_format_metric 第二十七批**（value=1.0/0.0/-1.5 / value={} / value={single} / reason="" / reason=None / value=int 0/1 / value=list / value=tuple / name padding 严格 36 / value=None + reason None）；**_run_inspect_doc 第二十七批**（JSON 顶层 null/bool/int/float/string/list / doc={} 空对象 / 缺 source_type / 缺 elements / 缺 chunks / tolerance=0 / tolerance 负数 / 文件不存在 / 目录 / metrics 标题 / file 标题 / counts 标题）；**main 第二十七批**（inspect-doc 三种返回码 / validate-report 三种返回码 / run manifest 不存在 → 2 / 无子命令 → SystemExit / 返回 int 类型）；**module source forbidden tokens 第四十四批**（13 项）；**module source 字符串精确补强第四十批**（prog / description / subparser / choices / SystemExit / reconfigure / 错误前缀）；**signatures 第四十批**（_build_parser/_format_metric/_run_inspect_doc/main 参数与默认值）；**module 合理性第四十批**（imports / __future__ / return code ∈ {0,1,2} / 无 __all__）；**端到端集成第四十批**（valid inspect-doc / tolerance 透传 / validate-report 不存在 / --help / 未知子命令 / --parser invalid）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges54.py`（116 测试）
+
+### 覆盖要点
+- **_build_parser 第二十七批**：21 测试
+- **_format_metric 第二十七批**：14 测试
+- **_run_inspect_doc 第二十七批**：18 测试
+- **main 第二十七批**：13 测试
+- **module source forbidden tokens 第四十四批**：13 测试
+- **module source 字符串精确补强第四十批**：12 测试
+- **signatures 第四十批**：8 测试
+- **module 合理性第四十批**：10 测试
+- **端到端集成第四十批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_build_parser_run_subparser_help_text_batch27`：误以为 `add_parser("run", help=...)` 会把 help 文本同时设为 subparser 的 `description`。实际：`description` 默认 None，help 只在父 parser 的 choices 帮助里显示。修法：改为 `run_p.description is None`，并新增 _ChoicesPseudoAction 间接验证。
+- 第二次跑：1 fail：
+  - `test_module_source_contains_validate_report_subparser_batch27`：源码里 `sub.add_parser(\n    "validate-report", ...)` 跨行，子串 `'sub.add_parser("validate-report"'` 不匹配。修法：拆为 `"validate-report"` + `"add_parser"` 两个独立断言。
+- 第三次跑：1 fail：
+  - `test_module_source_contains_inspect_doc_subparser_batch27`：同样的跨行问题。修法同上。
+- 修复后：116 全通过；全量回归 61561 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 508 后）：61561 pass / 0 fail / 22 skip（HEAD `659ec79`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第四十五轮
+  - evaluation/manifest.py 第五十四轮
+  - evaluation/annotation_metrics.py 第五十四轮
+  - evaluation/metrics.py 第五十六轮
+  - evaluation/report.py 第四十四轮
+  - evaluation/runner.py 第五十七轮
+  - evaluation/cli.py 第五十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges54 已饱和。下一轮选 evaluation/schema.py 第四十五轮。
+
+---
+
 ## Round 507 — evaluation/runner.py 第五十六轮（84 测试）
 
 ### 目标
