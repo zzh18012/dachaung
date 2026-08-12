@@ -4,6 +4,36 @@
 
 ---
 
+## Round 549 — evaluation/runner.py 第六十二轮（67 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第六十二轮 edges 测试，覆盖 edges59 未触及的角度：**_load_annotation 第三十二批**（chunk_boundary_anchors / nested / boolean / float / null）；**_process_one 第三十二批**（first error of multiple / document None no errors / to_dict / image_dir None when document None）；**run_evaluation 第三十二批**（report keys / provenance keys / devset keys / summary keys / expected_failure keys / 2 documents / first parser_version / creates _per_doc / creates output_root）；**module source forbidden tokens 第五十批**；**module source 字符串精确补强第四十六批**；**signatures 第四十六批**；**module 合理性第四十六批**；**端到端集成第四十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges60.py`（67 测试）
+
+### 覆盖要点
+- **_load_annotation 第三十二批**：5 测试
+- **_process_one 第三十二批**：4 测试
+- **run_evaluation 第三十二批**：10 测试
+- **module source forbidden tokens 第五十批**：9 测试
+- **module source 字符串精确补强第四十六批**：19 测试
+- **signatures 第四十六批**：7 测试
+- **module 合理性第四十六批**：8 测试
+- **端到端集成第四十六批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：`test_run_evaluation_creates_per_doc_subdir_batch32` 在空 documents 时 _per_doc 目录不会被创建。改成含 documents 的 manifest 来验证目录创建
+
+### 测试基线
+- 总数：65415 passed, 22 skipped, 0 failed（487.12s）
+- 较上轮 +67（65348 → 65415）
+
+### 下一步建议
+- 下一轮选 evaluation/cli.py 第六十一轮（继续 edges60 加强 _build_parser / _format_metric / _run_inspect_doc / main）
+
+---
+
 ## Round 548 — evaluation/report.py 第四十九轮（83 测试）
 
 ### 目标
