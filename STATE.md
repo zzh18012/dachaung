@@ -4,6 +4,46 @@
 
 ---
 
+## Round 567 — evaluation/metrics.py 第六十三轮（182 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（382 行）加第六十三轮 edges 测试，覆盖 edges61 未触及的角度（第三十六批）：**_null / _ratio / _bool_metric / _int_metric**（no args raises / fresh dict / int one / float string raises / int digit / float huge / float inf raises / None raises / list truthy / falsy）；**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED**（count 7/4 / subset relation / caption in both / table header footer asymmetry / image not in / not_evaluated value）；**_pdf_locator_ratio**（mixed valid/invalid / all invalid page / missing bbox / missing locator / locator None / image no bbox / table no bbox）；**_docx_locator_ratio**（paragraph_index / section / relationship_id / table_row_col / run_index / with page rejected / with bbox rejected / no structural keys / missing locator）；**_is_valid_bbox**（4 ints / 4 floats / mixed / 3 elements / 5 elements / bool / nan / inf / string / None / tuple）；**_image_resource_ratio**（missing rp / empty rp / none rp / existing file / empty file / image_base_dir lookup / mixed）；**_chunk_reference_ratio**（partial invalid / mixed valid invalid / chunk with empty ids / missing ids field / no chunks / no elements）；**_strip_unicode_whitespace**（nbsp / em space / ideographic / line separator / paragraph separator / digits / special / chinese / empty / only whitespace / no whitespace）；**_text_preservation**（equal simple / equal extra char / image excluded / whitespace ignored / missing content / chunk missing text / element missing type / precision half / recall half / does not mutate）；**_heading_boundary_ratio**（no chunks / no headings / no ids / empty ids / heading not first id / multiple headings partial）；**_silent_drop_count**（no expectations / empty expectations / no element_count_by_type / empty element_count_by_type / actual more than expected / partial drop / int metric / no drop）；**compute_automatic_metrics**（returns dict / 14 keys pipeline failed / keys when success / error_code present / error_code None when success / unknown source type / pdf locator / docx locator / with expectations）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**（含 11 个 reason 常量校验）；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges62.py`（182 测试）
+
+### 覆盖要点
+- **_null / _ratio / _bool_metric / _int_metric 第三十六批**：12 测试
+- **_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED 第三十六批**：9 测试
+- **_pdf_locator_ratio 第三十六批**：7 测试
+- **_docx_locator_ratio 第三十六批**：9 测试
+- **_is_valid_bbox 第三十六批**：11 测试
+- **_image_resource_ratio 第三十六批**：7 测试
+- **_chunk_reference_ratio 第三十六批**：6 测试
+- **_strip_unicode_whitespace 第三十六批**：11 测试
+- **_text_preservation 第三十六批**：10 测试
+- **_heading_boundary_ratio 第三十六批**：6 测试
+- **_silent_drop_count 第三十六批**：8 测试
+- **compute_automatic_metrics 第三十六批**：10 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：32 测试
+- **signatures 第四十九批**：16 测试
+- **module 合理性第四十九批**：9 测试
+- **端到端集成第四十九批**：4 测试
+
+### 撞墙记录
+- 1 fail 首跑：text_preservation_equal 检查 elements 顺序拼接 vs chunks 顺序拼接，element 顺序与 chunk 顺序不一致 → 调整 element 顺序使两者匹配
+- 1 fail 二跑：schema_valid 在最小 doc 上为 False（缺必填字段）→ 移除 schema_valid 断言
+
+### 测试基线
+- 总数：67242 passed, 22 skipped, 0 failed（364.07s）
+- 较上轮 +182（67060 → 67242）
+
+### 下一步建议
+- 下一轮选 evaluation/schema.py 第五十四轮（继续 edges 加强 EvalSchemaError / _schema_path / validate / validate_file）
+
+---
+
 ## Round 566 — evaluation/annotation_metrics.py 第六十轮（87 测试）
 
 ### 目标
