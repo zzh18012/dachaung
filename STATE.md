@@ -4,6 +4,50 @@
 
 ---
 
+## Round 506 — evaluation/report.py 第四十三轮（81 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第四十三轮 edges 测试，覆盖 edges42 未触及的角度：**aggregate_summary 第二十七批**（counts/ratio 不混 / silent_drop 独立 / figure_caption 排除 / pipeline_success 在 success_rates / 全 metric 类型同时 / 负数 value / 100 doc 性能 / empty rate=None / 返回 dict）；**build_provenance 第二十七批**（parser_name 透传 / timestamp 含时区 / dependencies 三 key / value None key 保留 / evaluator_version str / report_version str / max_chars 各种 cast / 9 keys 严格 / True cast 到 1）；**build_devset_section 第二十七批**（categories 是 list / status 透传 / 大数字 / 0 counts / 不读 project_root）；**get_git_provenance 第二十七批**（subprocess.run 两次 / cwd 透传 / encoding/errors/timeout/capture_output/text 参数）；**get_dependency_versions 第二十七批**（version 三次调用 / 单包失败不影响其它 / 第一包异常捕获 / dict 不共享）；**module source forbidden tokens 第四十三批**；**module source 字符串精确补强第三十九批**；**signatures 第三十九批**；**module 合理性第三十九批**；**端到端集成第三十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges43.py`（81 测试）
+
+### 覆盖要点
+- **aggregate_summary 第二十七批**：10 测试
+- **build_provenance 第二十七批**：9 测试
+- **build_devset_section 第二十七批**：5 测试
+- **get_git_provenance 第二十七批**：7 测试
+- **get_dependency_versions 第二十七批**：4 测试
+- **module source forbidden tokens 第四十三批**：12 测试
+- **module source 字符串精确补强第三十九批**：11 测试
+- **signatures 第三十九批**：7 测试
+- **module 合理性第三十九批**：8 测试
+- **端到端集成第三十九批**：8 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_build_provenance_max_chars_always_int_batch27`：误以为 `int(True) == 800`。实际：Python 中 `int(True) == 1`（bool 是 int 子类）。修法：拆为两个测试，正常值仍 expect 800，True 单独 expect 1。
+- 修复后：81 全通过；全量回归 61361 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 506 后）：61361 pass / 0 fail / 22 skip（HEAD `8c696f3`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第五十六轮
+  - evaluation/cli.py 第五十五轮
+  - evaluation/schema.py 第四十五轮
+  - evaluation/manifest.py 第五十四轮
+  - evaluation/annotation_metrics.py 第五十四轮
+  - evaluation/metrics.py 第五十六轮
+  - evaluation/report.py 第四十四轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges43 已饱和。下一轮选 evaluation/runner.py 第五十六轮。
+
+---
+
 ## Round 505 — evaluation/metrics.py 第五十五轮（166 测试）
 
 ### 目标
