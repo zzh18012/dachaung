@@ -4,6 +4,47 @@
 
 ---
 
+## Round 518 — evaluation/annotation_metrics.py 第五十五轮（61 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第五十五轮 edges 测试，覆盖 edges54 未触及的角度：**figure_caption_prf 第二十八批**（document list / annotation set / idempotent / 无副作用 / 3 keys / 真实 document）；**chunk_boundary_prf 第二十八批**（5 chunks / position 非法值 / 空 marker + before / unicode marker / annotation 额外 key / chunk text=None / anchor 缺 position / 三相同 marker 顺序 / 无 chunks key / 1 match 1 missing / document None 不含 _missing_markers）；**module source forbidden tokens 第四十五批**（12 项）；**module source 字符串精确补强第四十一批**（12 项含 P/R/F1 reason 集合）；**signatures 第四十一批**（4 项）；**module 合理性第四十一批**（8 项）；**端到端集成第四十一批**（7 项）
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges55.py`（61 测试）
+
+### 覆盖要点
+- **figure_caption_prf 第二十八批**：6 测试
+- **chunk_boundary_prf 第二十八批**：12 测试
+- **module source forbidden tokens 第四十五批**：12 测试
+- **module source 字符串精确补强第四十一批**：12 测试
+- **signatures 第四十一批**：4 测试
+- **module 合理性第四十一批**：8 测试
+- **端到端集成第四十一批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_e2e_chunk_boundary_prf_multiple_chunks_multiple_anchors_batch28`：误以为 tolerance=0 时所有预测都匹配。实际：4 chunks → 3 个预测边界 [5, 11, 15]，2 个 anchor gt 位置 [5, 12]，tolerance=0 时只有 |5-5|=0 匹配 → precision=1/3, recall=1/2。修法：调整期望值为 1/3 与 1/2。
+- 修复后：61 全通过；全量回归 62472 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 518 后）：62472 pass / 0 fail / 22 skip（HEAD `507fa3d`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第五十七轮
+  - evaluation/report.py 第四十五轮
+  - evaluation/runner.py 第五十八轮
+  - evaluation/cli.py 第五十七轮
+  - evaluation/schema.py 第四十七轮
+  - evaluation/manifest.py 第五十六轮
+  - evaluation/annotation_metrics.py 第五十六轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges55 已饱和。下一轮选 evaluation/metrics.py 第五十七轮。
+
+---
+
 ## Round 517 — evaluation/manifest.py 第五十五轮（86 测试）
 
 ### 目标
