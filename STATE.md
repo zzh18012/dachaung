@@ -4,6 +4,39 @@
 
 ---
 
+## Round 554 — evaluation/schema.py 第五十二轮（96 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第五十二轮 edges 测试，覆盖 edges50 未触及的角度（第三十一批）：**EvalSchemaError**（独立 errors list / no args 抛 TypeError / empty errors list / errors 属性可写 / module class）；**SCHEMAS_DIR**（is Path / absolute / ends with 'schemas' / parent has pyproject / 含三个 schema 文件）；**_schema_path**（existing / missing / returns Path / in SCHEMAS_DIR / name）；**load_schema**（returns dict / manifest+annotation+eval_report 都 type=object / missing raises / idempotent）；**validate**（empty dict 失败 / 无效 schema name / 完整 manifest+annotation 通过 / errors attr / message 含 schema name / count / error item structure）；**validate_file**（valid / invalid / missing / str path / invalid JSON / str schema name）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges51.py`（96 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第三十一批**：9 测试
+- **SCHEMAS_DIR 第三十一批**：7 测试
+- **_schema_path 第三十一批**：5 测试
+- **load_schema 第三十一批**：6 测试
+- **validate 第三十一批**：10 测试
+- **validate_file 第三十一批**：6 测试
+- **module source forbidden tokens 第五十三批**：13 测试（参数化）
+- **module source 字符串精确补强第四十九批**：18 测试
+- **signatures 第四十九批**：9 测试
+- **module 合理性第四十九批**：8 测试
+- **端到端集成第四十九批**：6 测试
+
+### 撞墙记录
+- 1 fail 首跑：`EvalSchemaError()` 无 message 抛 TypeError（message 必填）→ 改为 pytest.raises(TypeError)
+
+### 测试基线
+- 总数：65955 passed, 22 skipped, 0 failed（781.10s）
+- 较上轮 +96（65859 → 65955）
+
+### 下一步建议
+- 下一轮选 evaluation/report.py 第五十轮（继续 edges 加强 _RATIO_METRICS / get_git_provenance / build_provenance / aggregate_summary）
+
+---
+
 ## Round 553 — evaluation/metrics.py 第六十一轮（161 测试）
 
 ### 目标
