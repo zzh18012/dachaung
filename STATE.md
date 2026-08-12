@@ -4,6 +4,43 @@
 
 ---
 
+## Round 551 — evaluation/manifest.py 第六十轮（119 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第六十轮 edges 测试，覆盖 edges59 未触及的角度：**_is_absolute_like 第三十三批**（single letter / digit drive / colon no slash / just slash / lowercase drive / z drive / relative with dot）；**_has_backslash 第三十三批**（empty / single / multiple / mixed）；**DocumentEntry 第三十三批**（field count / names / frozen / default empty / equality）；**ExpectedFailure 第三十三批**（field count / names / frozen / source_type optional / equality）；**Manifest 第三十三批**（field count / names / frozen / file_count 0/3 / pdf+docx count / categories_covered sorted+empty / content_group_count unpaired/pair/mixed/unidirectional）；**_resolve_relative_path 第三十三批**（normal / empty / absolute POSIX / absolute Windows / backslash / escape / nested / dot relative）；**load_manifest 第三十三批**（nonexistent / invalid JSON / schema invalid / version mismatch / empty documents / one document no optionals / annotation_file / expected_failure no/with source_type / returns Manifest / str path / str project_root）；**_detect_project_root 第三十三批**（from file / from dir / walks up / no pyproject）；**module source forbidden tokens 第五十一批**；**module source 字符串精确补强第四十七批**（含所有 import 行 + properties）；**signatures 第四十七批**；**module 合理性第四十七批**；**端到端集成第四十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges60.py`（119 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第三十三批**：10 测试
+- **_has_backslash 第三十三批**：6 测试
+- **DocumentEntry 第三十三批**：5 测试
+- **ExpectedFailure 第三十三批**：5 测试
+- **Manifest 第三十三批**：10 测试
+- **_resolve_relative_path 第三十三批**：8 测试
+- **load_manifest 第三十三批**：12 测试
+- **_detect_project_root 第三十三批**：4 测试
+- **module source forbidden tokens 第五十一批**：11 测试（参数化）
+- **module source 字符串精确补强第四十七批**：25 测试
+- **signatures 第四十七批**：7 测试
+- **module 合理性第四十七批**：9 测试
+- **端到端集成第四十七批**：7 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  - `test_signature_manifest_error_no_params_batch33`：ManifestError 继承 Exception 无 inspect 签名 → 改为通过实例化验证
+  - `test_e2e_manifest_full_documents_batch33`：sha256 必须匹配 `^[0-9a-f]{64}$` → 改为 "a"*64
+
+### 测试基线
+- 总数：65613 passed, 22 skipped, 0 failed（533.72s）
+- 较上轮 +119（65494 → 65613）
+
+### 下一步建议
+- 下一轮选 evaluation/annotation_metrics.py 第六十轮（继续 edges60 加强 figure_caption_prf / chunk_boundary_prf / PARSER_DOES_NOT_EMIT_RELATIONS）
+
+---
+
 ## Round 550 — evaluation/cli.py 第六十一轮（79 测试）
 
 ### 目标
