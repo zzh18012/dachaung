@@ -4,6 +4,36 @@
 
 ---
 
+## Round 573 — evaluation/annotation_metrics.py 第六十一轮（105 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第六十一轮 edges 测试，覆盖 edges62 未触及的角度（第三十六批）：**PARSER_DOES_NOT_EMIT_RELATIONS**（no spaces / no hyphens / is str / is module level）；**figure_caption_prf**（value 字段 None / reason 字段 / doc None / annotation None / both None / empty dict / 不 mutate / 大文档）；**chunk_boundary_prf**（doc None 时 4 keys / no annotation 时 4 keys / no chunks 时 4 keys / no anchors 时 4 keys / tolerance -1 / tolerance 0 / 1 chunk + 1 anchor / 1 chunk + 0 anchors / chunk text 空 / None / missing text key / anchor missing marker / anchor missing position / position=before / 2 anchors 1 pred / 3 chunks 1 anchor / 不 mutate annotation / anchor 含额外字段 / unknown position 值 / unicode marker / marker 在 chunk 内重复 / 2 chunks 相同 text / 2 anchors 1 missing / 全 missing / chunk text 多余空白 / 含 newline / 0 match 时 P=R=F1=0 / returns dict in all paths / negative tolerance 不崩溃 / huge tolerance 不崩溃）；**module source forbidden tokens 第五十五批**；**module source 字符串精确补强第五十一批**；**signatures 第五十一批**；**module 合理性第五十一批**；**端到端集成第五十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges63.py`（105 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第三十六批**：4 测试
+- **figure_caption_prf 第三十六批**：8 测试
+- **chunk_boundary_prf 第三十六批**：27 测试
+- **module source forbidden tokens 第五十五批**：14 测试（参数化）
+- **module source 字符串精确补强第五十一批**：25 测试
+- **signatures 第五十一批**：9 测试
+- **module 合理性第五十一批**：10 测试
+- **端到端集成第五十一批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：第二个 anchor 用 'a' marker，search_from 推进后找不到（在 pos=0 但 search_from=3 已过）→ 实际是 missing → num_gt=1, R=1.0（不是 0.5）→ 改为 R=1.0 + missing_markers 断言
+
+### 测试基线
+- 总数：67953 passed, 22 skipped, 0 failed（359.36s）
+- 较上轮 +105（67848 → 67953）
+
+### 下一步建议
+- 下一轮选 evaluation/metrics.py 第六十八轮（继续 edges 加强 compute_automatic_metrics / _null / _ratio）
+
+---
+
 ## Round 572 — evaluation/manifest.py 第六十三轮（142 测试）
 
 ### 目标
