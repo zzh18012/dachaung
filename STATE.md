@@ -4,6 +4,36 @@
 
 ---
 
+## Round 546 — evaluation/annotation_metrics.py 第五十九轮（84 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第五十九轮 edges 测试，覆盖 edges58 未触及的角度：**PARSER_DOES_NOT_EMIT_RELATIONS 第三十二批**（module 顶层 / value 精确 / is string / hashable / in __all__）；**figure_caption_prf 第三十二批**（3 keys / all None / 固定 reason / document None / annotation 空 dict / 独立 dict / 不修改输入）；**chunk_boundary_prf 第三十二批**（returns dict / keys count / document None / no annotation / empty annotation / one chunk / no anchors with chunks / perfect match / tolerance 0 / tolerance huge / missing marker 记录 / missing marker recall null / position before / 2 chunks 1 match / f1 perfect / f1 zero recall / no input mod / idempotent / whitespace）；**module source forbidden tokens 第四十九批**；**module source 字符串精确补强第四十五批**；**signatures 第四十五批**；**module 合理性第四十五批**；**端到端集成第四十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges59.py`（84 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第三十二批**：5 测试
+- **figure_caption_prf 第三十二批**：7 测试
+- **chunk_boundary_prf 第三十二批**：20 测试
+- **module source forbidden tokens 第四十九批**：12 测试
+- **module source 字符串精确补强第四十五批**：17 测试
+- **signatures 第四十五批**：8 测试
+- **module 合理性第四十五批**：8 测试
+- **端到端集成第四十五批**：7 测试
+
+### 撞墙记录
+- 1 fail 首跑：`test_chunk_boundary_prf_position_before_batch32` 期望 tolerance=0 匹配，但 chunk 0 "abc" 结束位置=3，"def" 起始位置=4，距离=1 > 0 → 不匹配。改成 tolerance=1 让距离=1 ≤ 1 匹配
+
+### 测试基线
+- 总数：65164 passed, 22 skipped, 0 failed（490.75s）
+- 较上轮 +84（65080 → 65164）
+
+### 下一步建议
+- 下一轮选 evaluation/metrics.py 第六十轮（继续 edges59 加强 _pdf_locator_ratio / _docx_locator_ratio / _text_preservation）
+
+---
+
 ## Round 545 — evaluation/manifest.py 第五十九轮（115 测试）
 
 ### 目标
