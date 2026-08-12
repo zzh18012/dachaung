@@ -4,6 +4,36 @@
 
 ---
 
+## Round 552 — evaluation/annotation_metrics.py 第六十轮（85 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第六十轮 edges 测试，覆盖 edges59 未触及的角度：**PARSER_DOES_NOT_EMIT_RELATIONS 第三十三批**（used by figure_caption / lowercase / no spaces / startswith / length）；**figure_caption_prf 第三十三批**（signature / return annotation / keys order / value field / reason field / value+reason only / annotation w/ anchors / document w/ figures / not a method）；**chunk_boundary_prf 第三十三批**（signature / default tolerance=30 / return annotation / document None → pipeline_failed / document None → tolerance key / annotation None/empty → no_annotation / 1 chunk no anchors / 1 chunk w/ anchors → recall=0.0 / 2 chunks no anchors / perfect match / position before / tolerance=0 / tolerance too loose → missing_markers / duplicate markers / tolerance key / 3 chunks 2 boundaries / more anchors / more predictions / f1 calc / zero match / returns dict / chunk no text / no mutate / negative tolerance / 0 chunks / position default after）；**module source forbidden tokens 第五十二批**；**module source 字符串精确补强第四十八批**；**signatures 第四十八批**；**module 合理性第四十八批**；**端到端集成第四十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges60.py`（85 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第三十三批**：5 测试
+- **figure_caption_prf 第三十三批**：9 测试
+- **chunk_boundary_prf 第三十三批**：30 测试
+- **module source forbidden tokens 第五十二批**：13 测试（参数化）
+- **module source 字符串精确补强第四十八批**：16 测试
+- **signatures 第四十八批**：4 测试
+- **module 合理性第四十八批**：5 测试
+- **端到端集成第四十八批**：4 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：65698 passed, 22 skipped, 0 failed（514.95s）
+- 较上轮 +85（65613 → 65698）
+
+### 下一步建议
+- 下一轮选 evaluation/metrics.py 第六十一轮（继续 edges60 加强 _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / 各类 ratio 函数）
+
+---
+
 ## Round 551 — evaluation/manifest.py 第六十轮（119 测试）
 
 ### 目标
