@@ -4,6 +4,48 @@
 
 ---
 
+## Round 530 — evaluation/schema.py 第四十八轮（77 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第四十八轮 edges 测试，覆盖 edges47 未触及的角度：**EvalSchemaError 第二十八批**（generator errors / 空 generator / message 含换行 / errors 含中文 / 继承链 / 循环 raise / args 只含 message）；**_schema_path 第二十八批**（name 含 / 目录组件 / 返回 Path / 在 SCHEMAS_DIR 下 / message 含全路径）；**load_schema 第二十八批**（三 schema 文件 size > 0 / 三 schema 含 properties / 不修改文件 / 两次加载返回独立 dict）；**validate 第二十八批**（errors 排序 / messages 非空 / message 含 count+path / message 含 schema name / instance 含 unicode / unknown property 抛错）；**validate_file 第二十八批**（utf-8-sig BOM 失败 / 多层嵌套目录 / 大 manifest / 调用两次 / 不修改文件）；**module source forbidden tokens 第四十六批**；**module source 字符串精确补强第四十二批**（含 module docstring / SCHEMAS_DIR / .resolve() / _schema_path / EvalSchemaError class / iter_errors / absolute_path / load_schema / validate / validate_file / utf-8 / Draft202012Validator）；**signatures 第四十二批**；**module 合理性第四十二批**；**端到端集成第四十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges48.py`（77 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第二十八批**：7 测试
+- **_schema_path 第二十八批**：4 测试
+- **load_schema 第二十八批**：8 测试
+- **validate 第二十八批**：6 测试
+- **validate_file 第二十八批**：5 测试
+- **module source forbidden tokens 第四十六批**：12 测试
+- **module source 字符串精确补强第四十二批**：12 测试
+- **signatures 第四十二批**：8 测试
+- **module 合理性第四十二批**：8 测试
+- **端到端集成第四十二批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。77 全通过；全量回归 63585 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 530 后）：63585 pass / 0 fail / 22 skip（HEAD `cf520e6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第五十七轮
+  - evaluation/annotation_metrics.py 第五十七轮
+  - evaluation/metrics.py 第五十九轮
+  - evaluation/report.py 第四十七轮
+  - evaluation/runner.py 第六十轮
+  - evaluation/cli.py 第五十九轮
+  - evaluation/schema.py 第四十九轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges48 已饱和。下一轮选 evaluation/manifest.py 第五十七轮。
+
+---
+
 ## Round 529 — evaluation/cli.py 第五十八轮（79 测试）
 
 ### 目标
