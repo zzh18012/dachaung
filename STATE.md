@@ -4,6 +4,38 @@
 
 ---
 
+## Round 564 — evaluation/cli.py 第六十三轮（97 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第六十三轮 edges 测试，覆盖 edges61 未触及的角度（第三十五批）：**_build_parser**（subparser prog / formatter_class / 各 help 文本 / type=int 校验 / validate-report 无 optional / inspect-doc 无 --parser/--max-chars / subparsers required=True / 各 subparser 含 -h--help）；**_format_metric**（huge int / negative int / bool True/False with reason / value None no reason / dict unicode keys / dict with 0 / dict negative / dict one item / float with reason overrides ok / int zero with reason / name long / name short / reason unicode）；**_run_inspect_doc**（empty source_type→unknown / docx / missing document_id / missing source_path / chunk count 透传 / prints schema_valid / silent_drop_count / metric order bool first / chunk_boundary_f1 / tolerance_chars 透传）；**main**（validate-report corrupt JSON / invalid content / directory / manifest schema fail rc=1 / run valid manifest rc=0 + [OK] / kreuzberg choice accepted / run no args after / only manifest / inspect-doc no input / validate-report no input）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges62.py`（97 测试）
+
+### 覆盖要点
+- **_build_parser 第三十五批**：16 测试
+- **_format_metric 第三十五批**：15 测试
+- **_run_inspect_doc 第三十五批**：11 测试
+- **main 第三十五批**：11 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：16 测试
+- **signatures 第四十九批**：5 测试
+- **module 合理性第四十九批**：8 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：`?)` 字符串断言错误（实际 `document_id: ?` 无 `)`）→ 改为 `document_id: ?`
+- 1 fail 二跑：`sub.add_parser("validate-report"` 是多行调用单行断言失败 → 拆分为 `add_parser(` + `"validate-report"` 两个独立断言
+
+### 测试基线
+- 总数：66855 passed, 22 skipped, 0 failed（359.54s）
+- 较上轮 +97（66758 → 66855）
+
+### 下一步建议
+- 下一轮选 evaluation/manifest.py 第六十二轮（继续 edges 加强 DocumentEntry / ExpectedFailure / Manifest dataclass / _is_absolute_like / _has_backslash）
+
+---
+
 ## Round 563 — evaluation/runner.py 第六十四轮（64 测试）
 
 ### 目标
