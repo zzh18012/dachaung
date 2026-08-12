@@ -4,6 +4,43 @@
 
 ---
 
+## Round 574 — evaluation/metrics.py 第六十八轮（164 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（382 行）加第六十八轮 edges 测试，覆盖 edges62 未触及的角度（第三十七批）：**_null/_ratio/_bool_metric/_int_metric**（dict 2 keys / value None / empty string reason / unicode reason / zero / negative float / inf / nan / string bool / dict bool / negative int / bool is int / negative float truncation）；**_is_valid_bbox**（4 int / 4 float / mixed / bool rejected / 3 elements / 5 elements / empty / None / string / tuple / nan / inf / strings in list / None in list）；**_strip_unicode_whitespace**（empty / no ws / all ws / NBSP / em space / ideographic space / preserves order / 不删 digits/punct / line separator / paragraph separator）；**_pdf_locator_ratio**（empty / single valid heading / text missing bbox / non-text no bbox / zero page / negative page / missing locator / None locator / page string / page float / page bool / mixed）；**_docx_locator_ratio**（empty / paragraph_index / table_index / relationship_id / page invalid / bbox invalid / no structural keys / empty locator / missing locator / None locator）；**_image_resource_ratio**（no elements / no images / missing path / empty path / existing file / nonexistent file / image_base_dir / empty file / mixed）；**_chunk_reference_ratio**（no chunks / all valid / missing id / empty ids / missing key / None ids / partial valid / elements without id）；**_text_preservation**（empty both / equal simple / extra in actual / missing in actual / image excluded / unicode / with whitespace / chunk text None / missing text / element missing content / wrong order）；**_heading_boundary_ratio**（no headings / perfect match / not first / empty chunks / multiple partial / missing ids）；**_silent_drop_count**（no expectations / empty expectations / no element_count key / empty element_count / actual>expected / actual=expected / actual<expected / multiple types / expected type missing）；**module source forbidden tokens 第五十六批**；**module source 字符串精确补强第五十二批**；**signatures 第五十二批**；**module 合理性第五十二批**；**端到端集成第五十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges63.py`（164 测试）
+
+### 覆盖要点
+- **_null/_ratio/_bool_metric/_int_metric 第三十七批**：13 测试
+- **_is_valid_bbox 第三十七批**：14 测试
+- **_strip_unicode_whitespace 第三十七批**：10 测试
+- **_pdf_locator_ratio 第三十七批**：12 测试
+- **_docx_locator_ratio 第三十七批**：10 测试
+- **_image_resource_ratio 第三十七批**：9 测试
+- **_chunk_reference_ratio 第三十七批**：8 测试
+- **_text_preservation 第三十七批**：11 测试
+- **_heading_boundary_ratio 第三十七批**：6 测试
+- **_silent_drop_count 第三十七批**：10 测试
+- **module source forbidden tokens 第五十六批**：14 测试（参数化）
+- **module source 字符串精确补强第五十二批**：25 测试
+- **signatures 第五十二批**：8 测试
+- **module 合理性第五十二批**：10 测试
+- **端到端集成第五十二批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：`_image_resource_ratio` 的 image_base_dir 参数是 required positional（无 default）→ 改为 `inspect.Parameter.empty`
+
+### 测试基线
+- 总数：68117 passed, 22 skipped, 0 failed（366.90s）
+- 较上轮 +164（67953 → 68117）
+
+### 下一步建议
+- 下一轮选 evaluation/schema.py 第五十五轮（继续 edges 加强 EvalSchemaError / SCHEMAS_DIR / load_schema / validate / validate_file）
+
+---
+
 ## Round 573 — evaluation/annotation_metrics.py 第六十一轮（105 测试）
 
 ### 目标
