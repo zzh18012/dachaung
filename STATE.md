@@ -4,6 +4,49 @@
 
 ---
 
+## Round 522 — evaluation/cli.py 第五十七轮（95 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第五十七轮 edges 测试，覆盖 edges55 未触及的角度：**_build_parser 第二十九批**（prog/description/formatter_class/subparsers required+dest/三 subcommand/--parser choices/--max-chars type=int/--tolerance-chars type=int/默认值/positional/无命令报错）；**_format_metric 第二十九批**（负 float / dict 多 key / 空 dict / 大 int / 0 int / 0.0 float / true/false 小写 / string value / unicode name / 36 字符对齐）；**_run_inspect_doc 第二十九批**（source_type 默认 unknown / elements/chunks 默认 / 返回码 0 / 不存在文件 / 无效 JSON / 顶层 array/string/number / 输出含 metrics: 与 file: 与 counts:）；**main 第二十九批**（inspect-doc 不存在 / validate-report 不存在 / run 不存在 manifest / 返回 int / 无命令 / 无效 manifest 返回 1）；**module source forbidden tokens 第四十七批**（含 'w' 字符串禁用）；**module source 字符串精确补强第四十三批**（含 module docstring / 函数定义 / imports / required=True / reconfigure / main block）；**signatures 第四十三批**；**module 合理性第四十三批**；**端到端集成第四十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges56.py`（95 测试）
+
+### 覆盖要点
+- **_build_parser 第二十九批**：15 测试
+- **_format_metric 第二十九批**：11 测试
+- **_run_inspect_doc 第二十九批**：12 测试
+- **main 第二十九批**：7 测试
+- **module source forbidden tokens 第四十七批**：12 测试
+- **module source 字符串精确补强第四十三批**：13 测试
+- **signatures 第四十三批**：9 测试
+- **module 合理性第四十三批**：8 测试
+- **端到端集成第四十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_e2e_inspect_doc_full_run_batch29`：误以为输出是 `parser: fallback v1.0`。实际：实现用 `f"parser:      {name} v{version}"`（6 空格对齐），不是 1 空格。修法：改为断言 `"fallback v1.0"`。
+- 修复后：95 全通过；全量回归 62866 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 522 后）：62866 pass / 0 fail / 22 skip（HEAD `87cbe64`）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第四十七轮
+  - evaluation/manifest.py 第五十六轮
+  - evaluation/annotation_metrics.py 第五十六轮
+  - evaluation/metrics.py 第五十八轮
+  - evaluation/report.py 第四十六轮
+  - evaluation/runner.py 第五十九轮
+  - evaluation/cli.py 第五十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges56 已饱和。下一轮选 evaluation/schema.py 第四十七轮。
+
+---
+
 ## Round 521 — evaluation/runner.py 第五十八轮（87 测试）
 
 ### 目标
