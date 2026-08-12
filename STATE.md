@@ -4,6 +4,52 @@
 
 ---
 
+## Round 531 — evaluation/manifest.py 第五十七轮（106 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第五十七轮 edges 测试，覆盖 edges56 未触及的角度：**ManifestError 第三十批**（args 只含 message / 多次 raise / 字典 message / 继承链 / 不是 ValueError / str == message / chained from inner）；**_is_absolute_like 第三十批**（长字符串带盘符 / 双字母 / 仅斜杠 / ../ 开头 / ~/ 开头 / CC: 双盘符）；**_has_backslash 第三十批**（同时含 / 与 \\ / 中段 / 末尾 / 起始 / 仅 forward）；**DocumentEntry 第三十批**（eq / neq / repr / sha256 None 保留 / categories tuple / expectations dict）；**ExpectedFailure 第三十批**（source_type None 默认 / eq / repr / hash 一致 / expected_error_code str）；**Manifest 第三十批**（file_count == len / pdf+docx = file / unpaired content_group_count / hash 一致 / 仅 docx / 仅 pdf / categories empty / documents tuple）；**_resolve_relative_path 第三十批**（./ 前缀 / 多层 .. / message 含 resolved / 返回 absolute / 子目录嵌套 / 幂等）；**load_manifest 第三十批**（manifest_path str / project_root str / 缺 documents / 缺 devset_status / document 缺 doc_id / 不修改文件 / 幂等 / categories 透传）；**_detect_project_root 第三十批**（祖父级含 pyproject / 多个 pyproject 选最近 / 幂等 / 文件起始 / 返回存在目录）；**module source forbidden tokens 第四十七批**；**module source 字符串精确补强第四十三批**（含 module docstring / 路径不变量 / ManifestError doc / dataclass 装饰器 / 函数定义 / Windows 盘符注释 / 各 property / pair_ids）；**signatures 第四十三批**；**module 合理性第四十三批**；**端到端集成第四十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges57.py`（106 测试）
+
+### 覆盖要点
+- **ManifestError 第三十批**：7 测试
+- **_is_absolute_like 第三十批**：6 测试
+- **_has_backslash 第三十批**：5 测试
+- **DocumentEntry 第三十批**：6 测试
+- **ExpectedFailure 第三十批**：5 测试
+- **Manifest 第三十批**：8 测试
+- **_resolve_relative_path 第三十批**：6 测试
+- **load_manifest 第三十批**：8 测试
+- **_detect_project_root 第三十批**：5 测试
+- **module source forbidden tokens 第四十七批**：12 测试
+- **module source 字符串精确补强第四十三批**：13 测试
+- **signatures 第四十三批**：8 测试
+- **module 合理性第四十三批**：9 测试
+- **端到端集成第四十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。106 全通过；全量回归 63691 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 531 后）：63691 pass / 0 fail / 22 skip（HEAD `4ae20a5`）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第五十七轮
+  - evaluation/metrics.py 第五十九轮
+  - evaluation/report.py 第四十七轮
+  - evaluation/runner.py 第六十轮
+  - evaluation/cli.py 第五十九轮
+  - evaluation/schema.py 第四十九轮
+  - evaluation/manifest.py 第五十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges57 已饱和。下一轮选 evaluation/annotation_metrics.py 第五十七轮。
+
+---
+
 ## Round 530 — evaluation/schema.py 第四十八轮（77 测试）
 
 ### 目标
