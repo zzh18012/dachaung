@@ -4,6 +4,45 @@
 
 ---
 
+## Round 553 — evaluation/metrics.py 第六十一轮（161 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（382 行）加第六十一轮 edges 测试，覆盖 edges59 未触及的角度（第三十四批）：**_null / _ratio / _bool_metric / _int_metric**（构造器各种语义）；**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED**（常量值与关系）；**compute_automatic_metrics**（returns dict / failed pipeline 14 keys / no error+no doc / minimal doc / pdf/docx cross-evaluation / no images / no chunks / no headings / no expectations / zero drop / drop 计数）；**_pdf_locator_ratio**（no elements / text no bbox / image no bbox req / page 0 / no page）；**_docx_locator_ratio**（no elements / page invalid / paragraph_index / table_index / section / mixed）；**_is_valid_bbox**（list/floats/too short/long/bool/string/None/tuple/nan/inf）；**_image_resource_ratio**（no images / no resource_path / exists / missing / mixed / base_dir filename only / empty file size=0）；**_chunk_reference_ratio**（no chunks / empty ids / no field / valid / invalid / partial / multi-all / multi-partial）；**_strip_unicode_whitespace**（empty / no ws / all ws / NBSP / em space / ideographic / preserves order / mixed）；**_text_preservation**（three keys / empty both / perfect / ignores ws / excludes image / partial recall / extra precision）；**_heading_boundary_ratio**（no headings / no chunks / first id match / not match / partial）；**_silent_drop_count**（no expectations / empty / empty counts / zero / excess / missing type / multi type）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges60.py`（161 测试）
+
+### 覆盖要点
+- **_null / _ratio / _bool_metric / _int_metric 第三十四批**：10 测试
+- **_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED 第三十四批**：8 测试
+- **compute_automatic_metrics 第三十四批**：15 测试
+- **_pdf_locator_ratio 第三十四批**：6 测试
+- **_docx_locator_ratio 第三十四批**：6 测试
+- **_is_valid_bbox 第三十四批**：10 测试
+- **_image_resource_ratio 第三十四批**：7 测试
+- **_chunk_reference_ratio 第三十四批**：8 测试
+- **_strip_unicode_whitespace 第三十四批**：8 测试
+- **_text_preservation 第三十四批**：7 测试
+- **_heading_boundary_ratio 第三十四批**：5 测试
+- **_silent_drop_count 第三十四批**：7 测试
+- **module source forbidden tokens 第五十三批**：12 测试（参数化）
+- **module source 字符串精确补强第四十九批**：24 测试
+- **signatures 第四十九批**：16 测试
+- **module 合理性第四十九批**：6 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：`pty` 是 `empty` 的子串 → 移除 pty from FORBIDDEN_TOKENS
+
+### 测试基线
+- 总数：65859 passed, 22 skipped, 0 failed（482.86s）
+- 较上轮 +161（65698 → 65859）
+
+### 下一步建议
+- 下一轮选 evaluation/schema.py 第五十二轮（继续 edges 加强 validate / load_schema / EvalSchemaError）
+
+---
+
 ## Round 552 — evaluation/annotation_metrics.py 第六十轮（85 测试）
 
 ### 目标
