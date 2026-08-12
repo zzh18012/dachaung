@@ -4,6 +4,55 @@
 
 ---
 
+## Round 533 — evaluation/metrics.py 第五十九轮（133 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第五十九轮 edges 测试，覆盖 edges56 未触及的角度：**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第三十一批**（长度 / hashable / unique / 索引位置）；**基础构造器 第三十一批**（null reason 是 str / ratio 边界 / bool 空 str / int 边界）；**compute_automatic_metrics 第三十一批**（error 无 message / no_error_no_document / pipeline_failed 全 null / element_count_by_type 多类型 / 带 chunks / 不修改 / 幂等）；**_pdf_locator_ratio 第三十一批**（page float / page str / all valid / mixed / table no bbox / empty list）；**_docx_locator_ratio 第三十一批**（empty / locator None / partial / relationship_id_only / section_only）；**_is_valid_bbox 第三十一批**（5 值 / tuple / None / str 元素 / 全 0 / 负数）；**_image_resource_ratio 第三十一批**（no images / base_dir None / partial / all / absolute）；**_chunk_reference_ratio 第三十一批**（no chunks / ids with None / partial / empty ids / no ids key / all valid）；**_strip_unicode_whitespace 第三十一批**（vertical tab / form feed / file separator / null char / tab / CR / 混合）；**_text_preservation 第三十一批**（image excluded / unicode / 大小写 / empty actual / empty expected / both empty / equal）；**_heading_boundary_ratio 第三十一批**（second in chunk / no ids / no headings / multiple/multiple / half）；**_silent_drop_count 第三十一批**（actual>expected / actual=expected / multiple types / no expectations / empty / empty element_count / int 返回）；**module source forbidden tokens 第四十八批**；**module source 字符串精确补强第四十四批**；**signatures 第四十四批**；**module 合理性第四十四批**；**端到端集成第四十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges57.py`（133 测试）
+
+### 覆盖要点
+- **_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第三十一批**：7 测试
+- **基础构造器 第三十一批**：8 测试
+- **compute_automatic_metrics 第三十一批**：7 测试
+- **_pdf_locator_ratio 第三十一批**：6 测试
+- **_docx_locator_ratio 第三十一批**：5 测试
+- **_is_valid_bbox 第三十一批**：6 测试
+- **_image_resource_ratio 第三十一批**：5 测试
+- **_chunk_reference_ratio 第三十一批**：6 测试
+- **_strip_unicode_whitespace 第三十一批**：7 测试
+- **_text_preservation 第三十一批**：7 测试
+- **_heading_boundary_ratio 第三十一批**：5 测试
+- **_silent_drop_count 第三十一批**：7 测试
+- **module source forbidden tokens 第四十八批**：12 测试
+- **module source 字符串精确补强第四十四批**：20 测试
+- **signatures 第四十四批**：10 测试
+- **module 合理性第四十四批**：8 测试
+- **端到端集成第四十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。133 全通过；全量回归 63901 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 533 后）：63901 pass / 0 fail / 22 skip（HEAD `8556a61`）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第四十七轮
+  - evaluation/runner.py 第六十轮
+  - evaluation/cli.py 第五十九轮
+  - evaluation/schema.py 第四十九轮
+  - evaluation/manifest.py 第五十八轮
+  - evaluation/annotation_metrics.py 第五十八轮
+  - evaluation/metrics.py 第六十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges57 已饱和。下一轮选 evaluation/report.py 第四十七轮。
+
+---
+
 ## Round 532 — evaluation/annotation_metrics.py 第五十七轮（77 测试）
 
 ### 目标
