@@ -4,6 +4,36 @@
 
 ---
 
+## Round 563 — evaluation/runner.py 第六十四轮（64 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第六十四轮 edges 测试，覆盖 edges61 未触及的角度（第三十四批）：**_load_annotation**（complex nested data / Path attr / unicode content / empty file → None / null top-level → None / list top-level / int top-level）；**_process_one**（parser_name 传给 pipeline / max_chars 传给 pipeline / write_json=False / parser_version 从 doc / out_stub 在 _per_doc 下 / unlink 不存在的 stub 不抛）；**run_evaluation**（接受 Path / 接受 str / 创建 _per_doc 子目录 / 第一个 parser_version 写入 provenance / expected_failure 匹配 / mismatch / no_error / summary 在 / provenance 在）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges62.py`（64 测试）
+
+### 覆盖要点
+- **_load_annotation 第三十四批**：7 测试
+- **_process_one 第三十四批**：6 测试
+- **run_evaluation 第三十四批**：10 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化，subprocess 在 runner 也属 forbidden）
+- **module source 字符串精确补强第四十九批**：15 测试
+- **signatures 第四十九批**：3 测试
+- **module 合理性第四十九批**：7 测试
+- **端到端集成第四十九批**：4 测试
+
+### 撞墙记录
+- 0 fails 首跑
+
+### 测试基线
+- 总数：66758 passed, 22 skipped, 0 failed（354.37s）
+- 较上轮 +64（66694 → 66758）
+
+### 下一步建议
+- 下一轮选 evaluation/cli.py 第六十三轮（继续 edges 加强 _build_parser / main / _format_metric / _run_inspect_doc）
+
+---
+
 ## Round 562 — evaluation/report.py 第五十一轮（82 测试）
 
 ### 目标
