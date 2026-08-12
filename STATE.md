@@ -4,6 +4,49 @@
 
 ---
 
+## Round 513 — evaluation/report.py 第四十四轮（93 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第四十四轮 edges 测试，覆盖 edges43 未触及的角度：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十八批**（长度精确 / 内容 / 顺序 / 不重叠）；**get_git_provenance 第二十八批**（returncode=1 + stdout 空 / stdout 空 str / TimeoutExpired / OSError / 返回 dict / 两个 key）；**get_dependency_versions 第二十八批**（3 个 key / 类型 / idempotent / PackageNotFound / 一般异常）；**build_provenance 第二十八批**（max_chars=0/负 / parser_version None / parser_name 空 / 时间戳含时区 / 可解析 ISO / evaluator_version/report_version 常量 / 9 keys）；**build_devset_section 第二十八批**（6 keys / 透传 / 0 counts / 大数字 / categories 透传）；**aggregate_summary 第二十八批**（1000 docs 性能 / 多 metric / counts/ratio/silent_drop 同时 / empty / 4 top keys / silent_drop 混合）；**module source forbidden tokens 第四十五批**（11 项；subprocess 允许）；**module source 字符串精确补强第四十一批**（12 项）；**signatures 第四十一批**（6 项）；**module 合理性第四十一批**（8 项）；**端到端集成第四十一批**（7 项）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges44.py`（93 测试）
+
+### 覆盖要点
+- **常量集合 第二十八批**：13 测试
+- **get_git_provenance 第二十八批**：8 测试
+- **get_dependency_versions 第二十八批**：7 测试
+- **build_provenance 第二十八批**：9 测试
+- **build_devset_section 第二十八批**：6 测试
+- **aggregate_summary 第二十八批**：6 测试
+- **module source forbidden tokens 第四十五批**：12 测试（含 subprocess 允许的特殊断言）
+- **module source 字符串精确补强第四十一批**：12 测试
+- **signatures 第四十一批**：6 测试
+- **module 合理性第四十一批**：8 测试
+- **端到端集成第四十一批**：7 测试
+
+### 撞墙记录
+- 0 fail 首次通过；全量回归 62084 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 513 后）：62084 pass / 0 fail / 22 skip（HEAD `d3fd604`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第五十七轮
+  - evaluation/cli.py 第五十六轮
+  - evaluation/schema.py 第四十六轮
+  - evaluation/manifest.py 第五十五轮
+  - evaluation/annotation_metrics.py 第五十五轮
+  - evaluation/metrics.py 第五十七轮
+  - evaluation/report.py 第四十五轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges44 已饱和。下一轮选 evaluation/runner.py 第五十七轮。
+
+---
+
 ## Round 512 — evaluation/metrics.py 第五十六轮（138 测试）
 
 ### 目标
