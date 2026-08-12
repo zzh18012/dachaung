@@ -4,6 +4,36 @@
 
 ---
 
+## Round 559 — evaluation/annotation_metrics.py 第六十一轮（72 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第六十一轮 edges 测试，覆盖 edges60 未触及的角度（第三十四批）：**PARSER_DOES_NOT_EMIT_RELATIONS**（value / is str / in __all__）；**figure_caption_prf**（returns dict / keys exact / all null values / all reasons const / 不 mutate / module func）；**chunk_boundary_prf 一对一匹配**（greedy match / no duplicate pred match / no duplicate gt match / partial within tolerance / partial outside tolerance / position before/after / marker empty / marker missing key / position missing key / chunk text missing / 不 mutate doc/ann / tolerance key / negative tolerance / no chunks with anchors / 1 chunk no anchors recall null / doc None pipeline_failed / annotation None/empty/empty anchors / returns dict）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges61.py`（72 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第三十四批**：3 测试
+- **figure_caption_prf 第三十四批**：6 测试
+- **chunk_boundary_prf 第三十四批**：21 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：12 测试
+- **signatures 第四十九批**：5 测试
+- **module 合理性第四十九批**：5 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：66424 passed, 22 skipped, 0 failed（864.94s）
+- 较上轮 +72（66352 → 66424）
+
+### 下一步建议
+- 下一轮选 evaluation/metrics.py 第六十二轮（继续 edges 加强 _strip_unicode_whitespace / _text_preservation 边界）
+
+---
+
 ## Round 558 — evaluation/manifest.py 第六十一轮（91 测试）
 
 ### 目标
