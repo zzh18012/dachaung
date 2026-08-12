@@ -4,6 +4,46 @@
 
 ---
 
+## Round 528 — evaluation/runner.py 第五十九轮（74 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第五十九轮 edges 测试，覆盖 edges56 未触及的角度：**_load_annotation 第二十九批**（list/number/string/null/true/false 顶层 / nested dict / invalid JSON / 截断 JSON / 多次调用 / 不修改 path）；**_process_one 第二十九批**（wall_time 非负 / image_dir Path / document dict 返回 / doc_id 用于 path / _per_doc 子目录 / max_chars 透传 / parser_name 透传 / write_json=False）；**run_evaluation 第二十九批**（tolerance_chars 透传到 chunk_boundary_prf / public_per_doc 无私有 key / 写合法 JSON / 通过 evaluation-report schema / 含 provenance / 多 doc / 多 expected_failures / 无 doc）；**module source forbidden tokens 第四十七批**（'"w"' 与 unlink 允许）；**module source 字符串精确补强第四十三批**（含 module docstring / pipeline_failed / not_instrumented / _per_doc / image_dir / _annotation_present / _tolerance_chars / _missing_markers / imports）；**signatures 第四十三批**；**module 合理性第四十三批**；**端到端集成第四十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges57.py`（74 测试）
+
+### 覆盖要点
+- **_load_annotation 第二十九批**：12 测试
+- **_process_one 第二十九批**：8 测试
+- **run_evaluation 第二十九批**：9 测试
+- **module source forbidden tokens 第四十七批**：12 测试
+- **module source 字符串精确补强第四十三批**：12 测试
+- **signatures 第四十三批**：7 测试
+- **module 合理性第四十三批**：8 测试
+- **端到端集成第四十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。74 全通过；全量回归 63429 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 528 后）：63429 pass / 0 fail / 22 skip（HEAD `f6e79e6`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第五十八轮
+  - evaluation/schema.py 第四十八轮
+  - evaluation/manifest.py 第五十七轮
+  - evaluation/annotation_metrics.py 第五十七轮
+  - evaluation/metrics.py 第五十九轮
+  - evaluation/report.py 第四十七轮
+  - evaluation/runner.py 第六十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges57 已饱和。下一轮选 evaluation/cli.py 第五十八轮。
+
+---
+
 ## Round 527 — evaluation/report.py 第四十六轮（78 测试）
 
 ### 目标
