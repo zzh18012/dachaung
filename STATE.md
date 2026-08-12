@@ -4,6 +4,39 @@
 
 ---
 
+## Round 562 — evaluation/report.py 第五十一轮（82 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第五十一轮 edges 测试，覆盖 edges50 未触及的角度（第三十二批）：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS**（first/last specific entries / 各 ratio metric 都在内 / count+success 各 1 entry）；**get_git_provenance**（cwd str / text=True / git_dirty bool / git_commit str|None / no args first call / call count 2）；**get_dependency_versions**（三个 package key 各存在）；**build_provenance**（parser_version string / unicode / max_chars int / run_timestamp_iso parseable / dependencies 3 packages / evaluator_version value / report_version value）；**build_devset_section**（status value / devset complete）；**aggregate_summary**（三个 main sections / counts per-metric / success_rates per-metric / ratio_macro per-metric / silent_drop_total null / 不 mutate input / missing metrics key → KeyError）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges51.py`（82 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第三十二批**：11 测试
+- **get_git_provenance 第三十二批**：6 测试
+- **get_dependency_versions 第三十二批**：3 测试
+- **build_provenance 第三十二批**：7 测试
+- **build_devset_section 第三十二批**：2 测试
+- **aggregate_summary 第三十二批**：7 测试
+- **module source forbidden tokens 第五十三批**：13 测试（参数化）
+- **module source 字符串精确补强第四十九批**：15 测试
+- **signatures 第四十九批**：5 测试
+- **module 合理性第四十九批**：8 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：aggregate_summary 对缺 metrics key 的 result 抛 KeyError（不静默吞错）→ 改为 pytest.raises
+
+### 测试基线
+- 总数：66694 passed, 22 skipped, 0 failed（358.31s）
+- 较上轮 +82（66612 → 66694）
+
+### 下一步建议
+- 下一轮选 evaluation/runner.py 第六十四轮（继续 edges 加强 _load_annotation / _process_one / run_evaluation）
+
+---
+
 ## Round 561 — evaluation/schema.py 第五十三轮（75 测试）
 
 ### 目标
