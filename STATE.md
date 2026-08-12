@@ -4,6 +4,39 @@
 
 ---
 
+## Round 576 — evaluation/runner.py 第六十六轮（110 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第六十六轮 edges 测试，覆盖 edges63 未触及的角度（第三十六批）：**_load_annotation**（str path raises AttributeError / list top-level / string top-level / int top-level / null top-level / empty array value / unicode path / BOM / empty file / 不 mutate file）；**_process_one**（5-tuple / unknown error code / errors dict / creates _per_doc / stub cleaned up / calls process_single / passes resolved_path / passes parser_name / passes max_chars / passes write_json=False / float elapsed / image_dir None when doc None / unlink OSError swallowed）；**run_evaluation**（writes REPORT_VERSION / returns dict / creates output dir / 5 top keys / empty per_doc / empty expected_failures / _per_doc 创建当 docs / 不创建当 empty / first parser_version / parser_name in provenance / max_chars in provenance / expected_failure match / no match / actual None / per_doc has doc_id+source_type / wall_time structure / summary present / devset present / writes file to disk / default parser_name fallback / default max_chars 800 / default tolerance 30 / keyword-only args）；**module source forbidden tokens 第五十八批**；**module source 字符串精确补强第五十四批**；**signatures 第五十四批**；**module 合理性第五十四批**；**端到端集成第五十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges64.py`（110 测试）
+
+### 覆盖要点
+- **_load_annotation 第三十六批**：10 测试
+- **_process_one 第三十六批**：13 测试
+- **run_evaluation 第三十六批**：22 测试
+- **module source forbidden tokens 第五十八批**：14 测试（参数化）
+- **module source 字符串精确补强第五十四批**：26 测试
+- **signatures 第五十四批**：12 测试
+- **module 合理性第五十四批**：8 测试
+- **端到端集成第五十四批**：5 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. MagicMock 的 devset_status 等属性非 JSON serializable → 在 _make_manifest_mock 中显式设置所有 build_devset_section 用到的属性
+  2. 空 manifest 时 process_single 不被调用 → call_args 为 None → 给默认参数测试加 doc
+  3. "pipeline_failed" 字符串在 runner 源码 docstring 里 → 改为正向断言
+
+### 测试基线
+- 总数：68354 passed, 22 skipped, 0 failed（373.78s）
+- 较上轮 +110（68244 → 68354）
+
+### 下一步建议
+- 下一轮选 evaluation/report.py 第五十三轮（继续 edges 加强 _RATIO_METRICS / get_git_provenance / build_provenance / aggregate_summary）
+
+---
+
 ## Round 575 — evaluation/schema.py 第五十五轮（127 测试）
 
 ### 目标
