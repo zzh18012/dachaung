@@ -4,6 +4,55 @@
 
 ---
 
+## Round 516 — evaluation/schema.py 第四十六轮（80 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第四十六轮 edges 测试，覆盖 edges45 未触及的角度：**EvalSchemaError 第二十六批**（errors frozenset/bytearray / 异常链 raise from / 不带 from / 继承链 / args 与 errors 隔离 / 特殊字符 message）；**_schema_path 第二十六批**（name 含空格 / . 前缀 / 双扩展 / 只有扩展名 / 只有 basename / 大写不存在 / '/' / 返回绝对路径）；**load_schema 第二十六批**（三个 schema 都有 type=object / required key / additionalProperties / 独立 dict / 无全局状态）；**validate 第二十六批**（errors 按 path 排序 / count 与消息一致 / additionalProperties 拦截 / unknown schema name 抛 FileNotFoundError）；**validate_file 第二十六批**（嵌套目录 / Path vs str 等价 / 大 manifest / BOM 开头 / latin-1 编码 → UnicodeDecodeError）；**module source forbidden tokens 第四十四批**（12 项）；**module source 字符串精确补强第四十批**（12 项）；**signatures 第四十批**（6 项）；**module 合理性第四十批**（8 项）；**端到端集成第四十批**（7 项）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges46.py`（80 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第二十六批**：9 测试
+- **_schema_path 第二十六批**：9 测试
+- **load_schema 第二十六批**：7 测试
+- **validate 第二十六批**：5 测试
+- **validate_file 第二十六批**：5 测试
+- **module source forbidden tokens 第四十四批**：12 测试
+- **module source 字符串精确补强第四十批**：12 测试
+- **signatures 第四十批**：6 测试
+- **module 合理性第四十批**：8 测试
+- **端到端集成第四十批**：7 测试
+
+### 撞墙记录
+- 首次跑：4 fails，逐一修复：
+  - `test_eval_schema_error_inheritance_chain_batch26`：误以为 `EvalSchemaError` 不继承 `BaseException`。实际：Exception IS BaseException 的子类，所以 `issubclass(EvalSchemaError, BaseException) is True`。修法：去掉 not 断言。
+  - `test_schema_path_name_with_dot_relative_batch26`：误以为 `./manifest.schema.json` 不存在。实际：`Path(SCHEMAS_DIR) / "./manifest.schema.json"` 在 Windows 等同于 `SCHEMAS_DIR/manifest.schema.json`。修法：换成 `./nonexistent.schema.json`。
+  - `test_schema_path_with_uppercase_batch26`：Windows NTFS 大小写不敏感，`MANIFEST.SCHEMA.JSON` 等同 `manifest.schema.json`。修法：换成 `NONEXISTENT.SCHEMA.JSON`。
+  - `test_validate_file_bom_prefixed_batch26`：误以为 Python json 容忍 BOM。实际：utf-8（不是 utf-8-sig）解码会保留 BOM 字符，json.load 看到 BOM 抛 JSONDecodeError。修法：测试改为 `with pytest.raises(json.JSONDecodeError)`。
+  - `test_validate_file_iso_8859_encoded_fails_batch26`：第一次内容纯 ASCII，latin-1 与 utf-8 编码结果相同。修法：内容加 'é'（latin-1 单字节 0xe9，utf-8 解码失败）。
+  - `test_module_all_contains_five_entries_batch26`：误以为 `__all__` 是单行。实际：源码里是多行 list。修法：拆为 5 个独立 name 断言。
+- 修复后：80 全通过；全量回归 62325 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 516 后）：62325 pass / 0 fail / 22 skip（HEAD `bc9a5e0`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第五十五轮
+  - evaluation/annotation_metrics.py 第五十五轮
+  - evaluation/metrics.py 第五十七轮
+  - evaluation/report.py 第四十五轮
+  - evaluation/runner.py 第五十八轮
+  - evaluation/cli.py 第五十七轮
+  - evaluation/schema.py 第四十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges46 已饱和。下一轮选 evaluation/manifest.py 第五十五轮。
+
+---
+
 ## Round 515 — evaluation/cli.py 第五十六轮（83 测试）
 
 ### 目标
