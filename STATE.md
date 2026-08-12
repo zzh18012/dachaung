@@ -4,6 +4,44 @@
 
 ---
 
+## Round 572 — evaluation/manifest.py 第六十三轮（142 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第六十三轮 edges 测试，覆盖 edges62 未触及的角度（第三十六批）：**DocumentEntry**（字段类型 / sha256 None / categories 默认空 tuple / paired_with None / annotation_resolved None / expectations None / 完整字段 / str representation）；**ExpectedFailure**（完整构造 / repr / 中文 doc_id / equality / inequality）；**Manifest properties**（pdf_count only / docx_count only / 混合 source_types / content_group_count 3 unpaired / 1 pair / pair+unpaired / categories_covered sorted / dedup / 5 字段 / hashable / equality / inequality different status / repr）；**_is_absolute_like / _has_backslash**（tilde / just colon / colon slash / alpha colon no slash / alpha colon backslash / forward slash / lowercase / digit / underscore / normal relative / single char / double backslash / trailing）；**_resolve_relative_path**（empty raises / field name in error / backslash msg contains field / returns Path / 绝对路径在 root 内被拒 / dotdot to inside / 3 levels up inside）；**load_manifest**（devset_status incomplete/complete / returns Manifest / manifest_version 匹配常量 / resolve 调用 / 缺 documents key 抛错 / 缺 expected_failures key 不抛 / categories list → tuple / sha256 完整 / expectations / expected_failure resolved_path / path_str / annotation_resolved inside root / annotation absolute / backslash / escape outside / expected_failure escape / document escape / JSON array / string / int / null 顶层 / directory path / no project_root）；**_detect_project_root**（nested pyproject / two pyprojects / no pyproject / param only）；**ManifestError**（with cause / not KeyError / not ValueError / not TypeError / can raise+catch / caught as Exception）；**module source forbidden tokens 第五十四批**；**module source 字符串精确补强第五十批**；**signatures 第五十批**；**module 合理性第五十批**；**端到端集成第五十批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges63.py`（142 测试）
+
+### 覆盖要点
+- **DocumentEntry 第三十六批**：9 测试
+- **ExpectedFailure 第三十六批**：5 测试
+- **Manifest properties 第三十六批**：13 测试
+- **_is_absolute_like / _has_backslash 第三十六批**：13 测试
+- **_resolve_relative_path 第三十六批**：7 测试
+- **load_manifest 第三十六批**：26 测试
+- **_detect_project_root 第三十六批**：4 测试
+- **ManifestError 第三十六批**：6 测试
+- **module source forbidden tokens 第五十四批**：14 测试（参数化）
+- **module source 字符串精确补强第五十批**：25 测试
+- **signatures 第五十批**：8 测试
+- **module 合理性第五十批**：11 测试
+- **端到端集成第五十批**：5 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. schema 要求 documents 必填（不能缺） → 改为 expect EvalSchemaError
+  2. expectations 不允许 total_chunks（只允许 element_count_by_type 和 required_markers）→ 改为只用 element_count_by_type
+  3. ManifestError 没有自定义 __init__，inspect.signature 在 builtin type 上失败 → 改为 `__init__ is Exception.__init__` 断言
+
+### 测试基线
+- 总数：67848 passed, 22 skipped, 0 failed（369.00s）
+- 较上轮 +142（67706 → 67848）
+
+### 下一步建议
+- 下一轮选 evaluation/annotation_metrics.py 第六十一轮（继续 edges 加强 figure_caption_prf / chunk_boundary_prf）
+
+---
+
 ## Round 571 — evaluation/cli.py 第六十四轮（111 测试）
 
 ### 目标
