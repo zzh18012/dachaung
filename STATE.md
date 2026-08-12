@@ -4,6 +4,40 @@
 
 ---
 
+## Round 543 — evaluation/cli.py 第六十轮（97 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第六十轮 edges 测试，覆盖 edges58 未触及的角度：**_build_parser 第三十二批**（prog / description / formatter / 三 subcommand / required / choices / type int / positional）；**_format_metric 第三十二批**（None 无 reason / None 有 reason / True/False lower / int / 0 / float 精度 / 空 dict / 单 item dict / 三 item / 负 int / 长 name / string / list / 1.0 / reason-or-ok 语义）；**_run_inspect_doc 第三十二批**（dir / 空 file / 非 JSON / full doc / no chunks / no elements / 排序 None 最后 / tolerance 传递）；**main 第三十二批**（无 args / invalid parser choice / 缺 manifest / 缺 output / nonexistent validate / nonexistent inspect / unknown subcommand / validate-report valid returns 0/1/2 / invalid JSON returns 1 / dict input / list input / path 是目录 returns 2）；**module source forbidden tokens 第四十九批**；**module source 字符串精确补强第四十五批**（含 RawDescriptionHelpFormatter / subparsers / subcommands / validate_file / load_manifest / run_evaluation 调用）；**signatures 第四十五批**；**module 合理性第四十五批**；**端到端集成第四十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges59.py`（97 测试）
+
+### 覆盖要点
+- **_build_parser 第三十二批**：11 测试
+- **_format_metric 第三十二批**：17 测试
+- **_run_inspect_doc 第三十二批**：9 测试
+- **main 第三十二批**：12 测试
+- **module source forbidden tokens 第四十九批**：9 测试
+- **module source 字符串精确补强第四十五批**：21 测试
+- **signatures 第四十五批**：8 测试
+- **module 合理性第四十五批**：7 测试
+- **端到端集成第四十五批**：6 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  - 模块未 import argparse（在函数里用了 argparse._SubParsersAction）→ 在顶部加 import argparse
+  - `_format_metric` 当 value 非 None 但 reason 给了字符串 → 用 reason 字符串（reason or 'ok'），不是直接用 'ok'
+  - 全部修复
+
+### 测试基线
+- 总数：64869 passed, 22 skipped, 0 failed（499.79s）
+- 较上轮 +97（64772 → 64869）
+
+### 下一步建议
+- 下一轮选 evaluation/schema.py 第五十轮（继续 edges50 加强 EvalSchemaError / _schema_path / load_schema / validate / validate_file）
+
+---
+
 ## Round 542 — evaluation/runner.py 第六十一轮（74 测试）
 
 ### 目标
