@@ -4,6 +4,42 @@
 
 ---
 
+## Round 575 — evaluation/schema.py 第五十五轮（127 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第五十五轮 edges 测试，覆盖 edges53 未触及的角度（第三十四批）：**EvalSchemaError**（not TypeError/AttributeError/RuntimeError / errors attribute present / unicode message / empty dict errors / nested dict errors / str returns message only / 2-arg init / init signature / errors None → empty list / can chain cause / 公开方法继承自 BaseException）；**SCHEMAS_DIR**（is_absolute / exists / contains manifest/annotation/eval-report / parent contains pyproject）；**_schema_path**（absolute path / two dots / trailing slash / only extension / empty string / space in name / return absolute / dot segment resolves / two dots up segment）；**load_schema**（unicode chars in file / manifest required keys / annotation required keys / eval-report required keys / additionalProperties false / annotation version const / idempotent dict / returns fresh dict）；**validate**（minimal valid / complete status / additionalProperty rejected / documents array required / invalid devset status / case sensitive / annotation minimal / doc_id minLength / chunk_boundary_anchors valid / position invalid / marker empty / error count in msg / error path in msg / errors list path format / 不 mutate input / unknown schema raises / returns None on success）；**validate_file**（str path / Path path / missing raises / directory raises / invalid JSON / invalid content / returns None / annotation / 不 mutate disk / unknown schema / idempotent / empty json object）；**module source forbidden tokens 第五十七批**；**module source 字符串精确补强第五十三批**；**signatures 第五十三批**；**module 合理性第五十三批**；**端到端集成第五十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges54.py`（127 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第三十四批**：13 测试
+- **SCHEMAS_DIR 第三十四批**：6 测试
+- **_schema_path 第三十四批**：10 测试
+- **load_schema 第三十四批**：8 测试
+- **validate 第三十四批**：18 测试
+- **validate_file 第三十四批**：13 测试
+- **module source forbidden tokens 第五十七批**：14 测试（参数化）
+- **module source 字符串精确补强第五十三批**：25 测试
+- **signatures 第五十三批**：8 测试
+- **module 合理性第五十三批**：10 测试
+- **端到端集成第五十三批**：5 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. EvalSchemaError 继承了 BaseException 的 add_note/with_traceback → 改为断言它们都来自 BaseException
+  2. `manifest.schema.json/` Path 拼接会去除尾斜杠，文件实际存在 → 改为正向断言
+  3. `(len(errors)` 应是 `{len(errors)}`（f-string）
+
+### 测试基线
+- 总数：68244 passed, 22 skipped, 0 failed（364.56s）
+- 较上轮 +127（68117 → 68244）
+
+### 下一步建议
+- 下一轮选 evaluation/runner.py 第六十六轮（继续 edges 加强 _load_annotation / _process_one / run_evaluation）
+
+---
+
 ## Round 574 — evaluation/metrics.py 第六十八轮（164 测试）
 
 ### 目标
