@@ -4,6 +4,39 @@
 
 ---
 
+## Round 569 — evaluation/report.py 第五十二轮（132 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第五十二轮 edges 测试，覆盖 edges51 未触及的角度（第三十三批）：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS**（count 12 / 含 text_preservation / text_char_multiset_* / heading_boundary_compliance / chunk_boundary_* / 不含 figure_caption_* / 不含 element_count_total / 不含 pipeline_success / silent_drop_count 不在 count metrics / schema_valid 不在 bool metrics）；**get_git_provenance**（subprocess OSError / TimeoutExpired / 第一命令失败 / 空 stdout / commit str / dirty repo / clean repo / returns 2 keys / timeout=10 / capture_output / encoding utf-8 + errors replace）；**get_dependency_versions**（returns dict / 3 keys / values str|None / PackageNotFoundError 模拟 / generic exception 模拟）；**build_provenance**（returns dict / 9 keys / parser_name / parser_version None / max_chars int 强转 / negative / run_timestamp_iso parseable / evaluator_version / report_version / dependencies dict / dependencies keys / git commit value via mock）；**build_devset_section**（returns dict / 6 keys / status / file_count / content_group_count / pdf_count / docx_count / categories_covered / empty categories）；**aggregate_summary**（empty list / 4 keys / counts element_count_total / no other in counts / success_rates pipeline_success / no other in success_rates / counts sum int / counts skip null / success rate mixed / all true rate=1 / ratio macro average / ratio macro with null / silent_drop sum / silent_drop with null / silent_drop all null / 不 mutate / missing metrics KeyError）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges52.py`（132 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第三十三批**：14 测试
+- **get_git_provenance 第三十三批**：11 测试
+- **get_dependency_versions 第三十三批**：7 测试
+- **build_provenance 第三十三批**：12 测试
+- **build_devset_section 第三十三批**：9 测试
+- **aggregate_summary 第三十三批**：18 测试
+- **module source forbidden tokens 第五十三批**：13 测试（参数化，subprocess 合法保留）
+- **module source 字符串精确补强第四十九批**：26 测试
+- **signatures 第四十九批**：6 测试
+- **module 合理性第四十九批**：11 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：parser_version 是 required positional（无 default）→ 改为 inspect.Parameter.empty
+
+### 测试基线
+- 总数：67504 passed, 22 skipped, 0 failed（364.46s）
+- 较上轮 +132（67372 → 67504）
+
+### 下一步建议
+- 下一轮选 evaluation/runner.py 第六十五轮（继续 edges 加强 _load_annotation / _process_one / run_evaluation）
+
+---
+
 ## Round 568 — evaluation/schema.py 第五十四轮（130 测试）
 
 ### 目标
