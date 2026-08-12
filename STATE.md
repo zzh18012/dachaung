@@ -4,6 +4,48 @@
 
 ---
 
+## Round 527 — evaluation/report.py 第四十六轮（78 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第四十六轮 edges 测试，覆盖 edges45 未触及的角度：**get_git_provenance 第三十批**（2 次 subprocess / 第一次 rev-parse HEAD / 第二次 status --porcelain / cwd=str / capture_output / text / timeout=10 / encoding=utf-8 / errors=replace）；**get_dependency_versions 第三十批**（3 次 importlib.metadata 调用 / 顺序与代码一致 / 3 个不同包名）；**build_provenance 第三十批**（max_chars 强转 / dependencies 独立 / parser_name 特殊字符 / parser_version unicode / 3 个 deps key / git_commit str|None / git_dirty bool）；**build_devset_section 第三十批**（各 count=0 / categories 单 item / status='incomplete'）；**aggregate_summary 第三十批**（counts 单 doc / success_rate 含失败 / ratio 混合 null / silent_drop 含负值 / pipeline_success null 不计 success_count）；**module source forbidden tokens 第四十八批**（subprocess 允许）；**module source 字符串精确补强第四十四批**（含 pdfplumber/python-docx/pypdfium2 字符串）；**signatures 第四十四批**；**module 合理性第四十四批**；**端到端集成第四十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges46.py`（78 测试）
+
+### 覆盖要点
+- **get_git_provenance 第三十批**：9 测试
+- **get_dependency_versions 第三十批**：5 测试
+- **build_provenance 第三十批**：7 测试
+- **build_devset_section 第三十批**：6 测试
+- **aggregate_summary 第三十批**：6 测试
+- **module source forbidden tokens 第四十八批**：12 测试
+- **module source 字符串精确补强第四十四批**：12 测试
+- **signatures 第四十四批**：7 测试
+- **module 合理性第四十四批**：8 测试
+- **端到端集成第四十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。78 全通过；全量回归 63355 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 527 后）：63355 pass / 0 fail / 22 skip（HEAD `25d660f`）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第五十九轮
+  - evaluation/cli.py 第五十八轮
+  - evaluation/schema.py 第四十八轮
+  - evaluation/manifest.py 第五十七轮
+  - evaluation/annotation_metrics.py 第五十七轮
+  - evaluation/metrics.py 第五十九轮
+  - evaluation/report.py 第四十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges46 已饱和。下一轮选 evaluation/runner.py 第五十九轮。
+
+---
+
 ## Round 526 — evaluation/metrics.py 第五十八轮（133 测试）
 
 ### 目标
