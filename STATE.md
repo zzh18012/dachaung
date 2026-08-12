@@ -4,6 +4,36 @@
 
 ---
 
+## Round 566 — evaluation/annotation_metrics.py 第六十轮（87 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第六十轮 edges 测试，覆盖 edges61 未触及的角度（第三十五批）：**PARSER_DOES_NOT_EMIT_RELATIONS**（exact value / underscore / startswith parser / endswith relations / in module namespace / in __all__）；**figure_caption_prf**（3 keys only / keys order / value structure / value is None / complex annotation / unicode doc / idempotent / ignores annotation content / same dict shape）；**chunk_boundary_prf**（returns tolerance always / default tolerance 30 / zero tolerance exact/no match / large tolerance / multi chunk multi anchor / f1 zero when p zero / f1 normal / f1 half / missing marker added / partial missing / no missing no key / position after default / two anchors same marker / doc none / annotation none / dict type / chunks missing key / annotation missing anchors / unicode chunks / long marker / does not mutate / idempotent）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**（含 5 个 reason 常量校验）；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges62.py`（87 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第三十五批**：6 测试
+- **figure_caption_prf 第三十五批**：9 测试
+- **chunk_boundary_prf 第三十五批**：26 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：19 测试
+- **signatures 第四十九批**：5 测试
+- **module 合理性第四十九批**：6 测试
+- **端到端集成第四十九批**：4 测试
+
+### 撞墙记录
+- 1 fail 首跑：`two_anchors_same_marker` 中误以为 missing anchor 仍计入 num_gt（实际不计）→ 修正 R 期望为 1.0
+
+### 测试基线
+- 总数：67060 passed, 22 skipped, 0 failed（360.23s）
+- 较上轮 +87（66973 → 67060）
+
+### 下一步建议
+- 下一轮选 evaluation/metrics.py 第六十三轮（继续 edges 加强 _strip_unicode_whitespace / _text_preservation / _silent_drop_count 等内部函数）
+
+---
+
 ## Round 565 — evaluation/manifest.py 第六十二轮（118 测试）
 
 ### 目标
