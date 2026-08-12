@@ -4,6 +4,39 @@
 
 ---
 
+## Round 577 — evaluation/report.py 第五十三轮（135 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第五十三轮 edges 测试，覆盖 edges52 未触及的角度（第三十四批）：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS**（first is schema_valid / last is chunk_boundary_f1 / is tuple / 含 pdf/docx locator / image / chunk_reference / count 1 / success_bool count 1 / 不含 silent_drop / 不含 pipeline_success in count / 不含 element_count in success_bool）；**get_git_provenance**（2 keys / default dirty=True / commit str / dirty when status nonempty / clean if porcelain empty / commit None when returncode nonzero / commit None when stdout empty / TimeoutExpired / cwd param / capture_output / encoding utf-8 + errors replace / timeout 10）；**get_dependency_versions**（returns dict / 3 keys / values str|None / PackageNotFoundError 模拟 / generic exception 模拟）；**build_provenance**（returns dict / 9 keys / parser_name / parser_version None / parser_version str / max_chars int 强转 / negative / run_timestamp_iso parseable / evaluator_version / report_version / dependencies dict / dependencies keys / git commit value via mock）；**build_devset_section**（returns dict / 6 keys / status / file_count / content_group_count / pdf_count / docx_count / categories_covered / empty categories）；**aggregate_summary**（empty list / 4 keys / counts element_count_total / counts skip null / counts all null / success_rates pipeline / all true rate=1 / empty rate=None / ratio macro average / ratio macro with null / ratio all null / silent_drop sum / silent_drop with null / silent_drop all null / 不 mutate / missing metrics KeyError）；**module source forbidden tokens 第五十九批**；**module source 字符串精确补强第五十五批**；**signatures 第五十五批**；**module 合理性第五十五批**；**端到端集成第五十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges53.py`（135 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第三十四批**：15 测试
+- **get_git_provenance 第三十四批**：13 测试
+- **get_dependency_versions 第三十四批**：5 测试
+- **build_provenance 第三十四批**：13 测试
+- **build_devset_section 第三十四批**：9 测试
+- **aggregate_summary 第三十四批**：16 测试
+- **module source forbidden tokens 第五十九批**：13 测试（参数化，subprocess 合法保留）
+- **module source 字符串精确补强第五十五批**：30 测试
+- **signatures 第五十五批**：8 测试
+- **module 合理性第五十五批**：10 测试
+- **端到端集成第五十五批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：parser_version 是 required positional（无 default value），annotation 是 'str | None' → 改为 inspect.Parameter.empty
+
+### 测试基线
+- 总数：68489 passed, 22 skipped, 0 failed（366.36s）
+- 较上轮 +135（68354 → 68489）
+
+### 下一步建议
+- 下一轮选 evaluation/cli.py 第六十五轮（继续 edges 加强 _build_parser / main / _format_metric / _run_inspect_doc）
+
+---
+
 ## Round 576 — evaluation/runner.py 第六十六轮（110 测试）
 
 ### 目标
