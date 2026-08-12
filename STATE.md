@@ -4,6 +4,48 @@
 
 ---
 
+## Round 514 — evaluation/runner.py 第五十七轮（78 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第五十七轮 edges 测试，覆盖 edges54 未触及的角度：**_load_annotation 第二十七批**（dict 含 list/nested null/float/int/unicode escape/NaN/datetime-like str/深层嵌套/注释/尾逗号/单引号/emoji key）；**_process_one 第二十七批**（5-tuple 结构 / 各位置类型 / errors 多个取第一个 / out_stub.parent 目录创建）；**run_evaluation 第二十七批**（返回 dict / 写文件 / 6 top keys / per_doc empty / expected_failures empty / REPORT_VERSION 常量 / 嵌套 output dir / 合法 JSON / ensure_ascii=False / indent=2）；**module source forbidden tokens 第四十五批**（12 项，含 wb 与 subprocess.run 禁止）；**module source 字符串精确补强第四十一批**（12 项）；**signatures 第四十一批**（7 项含 keyword-only）；**module 合理性第四十一批**（10 项）；**端到端集成第四十一批**（7 项）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges55.py`（78 测试）
+
+### 覆盖要点
+- **_load_annotation 第二十七批**：12 测试
+- **_process_one 第二十七批**：9 测试
+- **run_evaluation 第二十七批**：10 测试
+- **module source forbidden tokens 第四十五批**：12 测试
+- **module source 字符串精确补强第四十一批**：12 测试
+- **signatures 第四十一批**：7 测试
+- **module 合理性第四十一批**：10 测试
+- **端到端集成第四十一批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_load_annotation_deeply_nested_batch27`：测试构造 `nested = "x"` 然后 wrap 成 `{"k": x}`，但 `x`（不带引号）不是合法 JSON 值，json 解析失败。修法：起始值改为 `null`（合法 JSON 值），wrap 后是 `{"k": {"k": ... {"k": null}...}}`，10 层嵌套合法。
+- 修复后：78 全通过；全量回归 62162 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 514 后）：62162 pass / 0 fail / 22 skip（HEAD `c0469b0`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第五十六轮
+  - evaluation/schema.py 第四十六轮
+  - evaluation/manifest.py 第五十五轮
+  - evaluation/annotation_metrics.py 第五十五轮
+  - evaluation/metrics.py 第五十七轮
+  - evaluation/report.py 第四十五轮
+  - evaluation/runner.py 第五十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges55 已饱和。下一轮选 evaluation/cli.py 第五十六轮。
+
+---
+
 ## Round 513 — evaluation/report.py 第四十四轮（93 测试）
 
 ### 目标
