@@ -4,6 +4,50 @@
 
 ---
 
+## Round 537 — evaluation/schema.py 第四十九轮（81 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第四十九轮 edges 测试，覆盖 edges48 未触及的角度：**EvalSchemaError 第二十九批**（errors dict key / 大 list / message emoji / 嵌套 raise from inner / 多实例独立 / 可 pickle / args 只含 message）；**_schema_path 第二十九批**（含 ../ / 多个点 / 长文件名 / 无扩展名 / message 含全路径）；**load_schema 第二十九批**（三 schema 都是 dict / 独立 dict / 幂等 / type=object）；**validate 第二十九批**（errors count 与 message 一致 / 头 error 在 message / 空 errors 不抛 / errors 排序 / unknown property / 返回 None / error 含 path/message/schema_path 3 key）；**validate_file 第二十九批**（Path vs str 等价 / 大 manifest / 多次调用 / 不修改 / 目录抛 FileNotFoundError / 幂等）；**module source forbidden tokens 第四十七批**；**module source 字符串精确补强第四十三批**；**signatures 第四十三批**；**module 合理性第四十三批**；**端到端集成第四十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges49.py`（81 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第二十九批**：7 测试
+- **_schema_path 第二十九批**：5 测试
+- **load_schema 第二十九批**：5 测试
+- **validate 第二十九批**：7 测试
+- **validate_file 第二十九批**：6 测试
+- **module source forbidden tokens 第四十七批**：12 测试
+- **module source 字符串精确补强第四十三批**：14 测试
+- **signatures 第四十三批**：9 测试
+- **module 合理性第四十三批**：9 测试
+- **端到端集成第四十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail（`test_e2e_validate_with_valid_annotation_batch29` 用了不存在的 `chunk_boundary_anchors` key，annotation.schema.json 要求 `doc_id`）。
+- 修正：改为最小合法 annotation `{"annotation_version": "1.0", "doc_id": "d1"}`。
+- 二次跑：0 fail。81 全通过；全量回归 64249 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 537 后）：64249 pass / 0 fail / 22 skip（HEAD `a86ac9e`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第五十八轮
+  - evaluation/annotation_metrics.py 第五十八轮
+  - evaluation/metrics.py 第六十轮
+  - evaluation/report.py 第四十八轮
+  - evaluation/runner.py 第六十一轮
+  - evaluation/cli.py 第六十轮
+  - evaluation/schema.py 第五十轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges49 已饱和。下一轮选 evaluation/manifest.py 第五十八轮。
+
+---
+
 ## Round 536 — evaluation/cli.py 第五十九轮（90 测试）
 
 ### 目标
