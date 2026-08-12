@@ -4,6 +4,38 @@
 
 ---
 
+## Round 544 — evaluation/schema.py 第五十轮（96 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第五十轮 edges 测试，覆盖 edges49 未触及的角度：**EvalSchemaError 第三十批**（default errors / explicit None / str repr / 继承 Exception / 可 raise / args 只 message / 多实例独立）；**_schema_path 第三十批**（returns Path / 不存在 / message 含 filename / 子目录 / 幂等）；**load_schema 第三十批**（returns dict / required / idempotent / 独立 dict / nonexistent 抛 FileNotFoundError）；**validate 第三十批**（空 dict / returns None / message 含 schema_name / 含 error count / sorted by path / unknown top key / errors 结构 / invalid manifest_version / invalid devset_status / annotation minimum / annotation missing doc_id / report empty）；**validate_file 第三十批**（valid manifest / path str / nonexistent / directory / invalid JSON / invalid content / no modification / idempotent / large manifest / annotation）；**module source forbidden tokens 第四十八批**；**module source 字符串精确补强第四十四批**（含 errors or [] / sorted）；**signatures 第四十四批**；**module 合理性第四十四批**；**端到端集成第四十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges50.py`（96 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第三十批**：8 测试
+- **_schema_path 第三十批**：5 测试
+- **load_schema 第三十批**：7 测试
+- **validate 第三十批**：12 测试
+- **validate_file 第三十批**：10 测试
+- **module source forbidden tokens 第四十八批**：12 测试
+- **module source 字符串精确补强第四十四批**：16 测试
+- **signatures 第四十四批**：9 测试
+- **module 合理性第四十四批**：9 测试
+- **端到端集成第四十四批**：8 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：64965 passed, 22 skipped, 0 failed（501.55s）
+- 较上轮 +96（64869 → 64965）
+
+### 下一步建议
+- 下一轮选 evaluation/manifest.py 第五十九轮（继续 edges59 加强 Manifest / DocumentEntry / ExpectedFailure / load_manifest）
+
+---
+
 ## Round 543 — evaluation/cli.py 第六十轮（97 测试）
 
 ### 目标
