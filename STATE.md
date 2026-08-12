@@ -4,6 +4,41 @@
 
 ---
 
+## Round 548 — evaluation/report.py 第四十九轮（83 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第四十九轮 edges 测试，覆盖 edges48 未触及的角度：**_RATIO_METRICS 第三十三批**（含 schema_valid / text_preservation / heading_boundary / 顺序 / tuple type）；**_COUNT_METRICS 第三十三批**；**_SUCCESS_BOOL_METRICS 第三十三批**；**get_git_provenance 第三十三批**（default dirty=True / 第一次成功第二次失败 / subprocess.run 调用参数验证 / status 第二次调用）；**get_dependency_versions 第三十三批**（dict / 3 packages / Value 错误也 catch）；**build_provenance 第三十三批**（unicode parser_name / max_chars 负数 / 0 / dependencies 调用 / git provenance 调用）；**build_devset_section 第三十三批**（完整属性透传）；**aggregate_summary 第三十三批**（all pipeline_fail / one success / counts partial / ratio partial / silent_drop partial / chunk_boundary in macro / figure_caption NOT in macro / empty input / 不抛 on missing metric）；**module source forbidden tokens 第五十批**；**module source 字符串精确补强第四十六批**；**signatures 第四十六批**；**module 合理性第四十六批**；**端到端集成第四十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges49.py`（83 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 第三十三批**：5 测试
+- **_COUNT_METRICS 第三十三批**：2 测试
+- **_SUCCESS_BOOL_METRICS 第三十三批**：2 测试
+- **get_git_provenance 第三十三批**：4 测试
+- **get_dependency_versions 第三十三批**：3 测试
+- **build_provenance 第三十三批**：5 测试
+- **build_devset_section 第三十三批**：2 测试
+- **aggregate_summary 第三十三批**：9 测试
+- **module source forbidden tokens 第五十批**：9 测试
+- **module source 字符串精确补强第四十六批**：19 测试
+- **signatures 第四十六批**：8 测试
+- **module 合理性第四十六批**：8 测试
+- **端到端集成第四十六批**：7 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：65348 passed, 22 skipped, 0 failed（491.66s）
+- 较上轮 +83（65265 → 65348）
+
+### 下一步建议
+- 下一轮选 evaluation/runner.py 第六十二轮（继续 edges60 加强 _load_annotation / _process_one / run_evaluation）
+
+---
+
 ## Round 547 — evaluation/metrics.py 第六十轮（101 测试）
 
 ### 目标
