@@ -4,6 +4,42 @@
 
 ---
 
+## Round 545 — evaluation/manifest.py 第五十九轮（115 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第五十九轮 edges 测试，覆盖 edges58 未触及的角度：**ManifestError 第三十二批**（inherits Exception / str / no args / caught as Exception / specifically caught / module-level）；**_is_absolute_like 第三十二批**（D 盘 / E 盘 / Y 盘 / 相对 colon 无 slash / 仅 / / 仅 colon / unicode alpha / 长度 < 3 / 数字非 alpha）；**_has_backslash 第三十二批**（empty / single / two / forward only / mixed）；**DocumentEntry 第三十二批**（dataclass / frozen / 10 fields / field names / eq / hashable）；**ExpectedFailure 第三十二批**（dataclass / frozen / 5 fields / field names / eq）；**Manifest 第三十二批**（dataclass / 5 fields / file_count / pdf_count / docx_count / categories_covered sorted+unique / content_group_count 各种 paired 组合）；**_resolve_relative_path 第三十二批**（empty / absolute / backslash / 越界 / simple / nested / idempotent）；**load_manifest 第三十二批**（nonexistent / directory / invalid JSON / explicit project_root / no documents / two documents / categories / paired / no modification / expected_failures / invalid version / backslash path）；**_detect_project_root 第三十二批**（from file / from dir / nested / 无 pyproject）；**module source forbidden tokens 第四十八批**；**module source 字符串精确补强第四十四批**；**signatures 第四十四批**；**module 合理性第四十四批**；**端到端集成第四十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges59.py`（115 测试）
+
+### 覆盖要点
+- **ManifestError 第三十二批**：6 测试
+- **_is_absolute_like 第三十二批**：9 测试
+- **_has_backslash 第三十二批**：5 测试
+- **DocumentEntry 第三十二批**：6 测试
+- **ExpectedFailure 第三十二批**：5 测试
+- **Manifest 第三十二批**：9 测试
+- **_resolve_relative_path 第三十二批**：7 测试
+- **load_manifest 第三十二批**：12 测试
+- **_detect_project_root 第三十二批**：4 测试
+- **module source forbidden tokens 第四十八批**：12 测试
+- **module source 字符串精确补强第四十四批**：18 测试
+- **signatures 第四十四批**：5 测试
+- **module 合理性第四十四批**：9 测试
+- **端到端集成第四十四批**：6 测试
+
+### 撞墙记录
+- 1 warning 首跑：docstring 含 `\ ` 引起 SyntaxWarning → 加 r 前缀修复
+
+### 测试基线
+- 总数：65080 passed, 22 skipped, 0 failed（472.90s）
+- 较上轮 +115（64965 → 65080）
+
+### 下一步建议
+- 下一轮选 evaluation/annotation_metrics.py 第五十九轮（继续 edges59 加强 chunk_boundary_prf / figure_caption_prf）
+
+---
+
 ## Round 544 — evaluation/schema.py 第五十轮（96 测试）
 
 ### 目标
