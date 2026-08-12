@@ -4,6 +4,48 @@
 
 ---
 
+## Round 535 — evaluation/runner.py 第六十轮（80 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（227 行）加第六十轮 edges 测试，覆盖 edges57 未触及的角度：**_load_annotation 第三十批**（path None / 不存在 / BOM 失败 / 大 JSON / path str / dict list value）；**_process_one 第三十批**（errors 非空返 first error dict / parser_version 透传 / image_dir None when document None / 5 元组 / write_json=False 显式 / unlink out_stub）；**run_evaluation 第三十批**（默认 parser_name/max_chars/tolerance_chars / output_root 创建 / report 顶层 6 key / expected_failure matches true/false / actual None when no errors / per_doc item 4 key / wall_time 5 key / parse/chunk None / first parser_version / 幂等 / 返回 dict）；**module source forbidden tokens 第四十八批**（'"w"' 与 unlink 允许）；**module source 字符串精确补强第四十四批**（含 module docstring / pipeline_failed / not_instrumented / imports / 函数定义 / _per_doc / image_dir / image_output_dir_for / perf_counter / json.dump / ensure_ascii=False / _tolerance_chars）；**signatures 第四十四批**（含 KEYWORD_ONLY 验证）；**module 合理性第四十四批**；**端到端集成第四十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges58.py`（80 测试）
+
+### 覆盖要点
+- **_load_annotation 第三十批**：6 测试
+- **_process_one 第三十批**：6 测试
+- **run_evaluation 第三十批**：15 测试
+- **module source forbidden tokens 第四十八批**：10 测试
+- **module source 字符串精确补强第四十四批**：19 测试
+- **signatures 第四十四批**：10 测试
+- **module 合理性第四十四批**：8 测试
+- **端到端集成第四十四批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail（`test_signature_run_evaluation_params_count_batch30` 漏算 3 个 keyword-only 参数）。
+- 修正：参数列表改为 `["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]`。
+- 二次跑：0 fail。80 全通过；全量回归 64078 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 535 后）：64078 pass / 0 fail / 22 skip（HEAD `a0461fd`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第五十九轮
+  - evaluation/schema.py 第四十九轮
+  - evaluation/manifest.py 第五十八轮
+  - evaluation/annotation_metrics.py 第五十八轮
+  - evaluation/metrics.py 第六十轮
+  - evaluation/report.py 第四十八轮
+  - evaluation/runner.py 第六十一轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges58 已饱和。下一轮选 evaluation/cli.py 第五十九轮。
+
+---
+
 ## Round 534 — evaluation/report.py 第四十七轮（97 测试）
 
 ### 目标
