@@ -4,6 +4,37 @@
 
 ---
 
+## Round 571 — evaluation/cli.py 第六十四轮（111 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第六十四轮 edges 测试，覆盖 edges62 未触及的角度（第三十六批）：**_build_parser**（root positional / subparser description / validate-report positional / inspect-doc positional / inspect-doc no --output / root description / run count 5 long options / parser choices fallback first / kreuzberg second / count 2 / subparsers dest=command / 3 choices / choices keys）；**_format_metric**（int with reason / zero no reason / negative zero float / one int / dict one kv / dict mixed types / dict negative / dict float / dict zero / true/false lowercase / dict two items / None with no reason）；**_run_inspect_doc**（no chunks key / no elements key / unicode chunk text / tolerance through main / prints parser_name / prints parser_version / prints document_id / prints source_path / metric count / returns 0 minimal docx）；**main**（corrupt manifest JSON / invalid manifest schema / --help rc=0 / run --help / validate-report --help / inspect-doc --help / invalid subcommand rc=2 / unknown short arg / `--` only / inspect-doc missing rc=2 / validate-report missing rc=2 / max-chars 0 / tolerance-chars 0）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges63.py`（111 测试）
+
+### 覆盖要点
+- **_build_parser 第三十六批**：13 测试
+- **_format_metric 第三十六批**：13 测试
+- **_run_inspect_doc 第三十六批**：10 测试
+- **main 第三十六批**：13 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化，subprocess 在 cli 模块内是禁止的）
+- **module source 字符串精确补强第四十九批**：25 测试
+- **signatures 第四十九批**：9 测试
+- **module 合理性第四十九批**：8 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：`_run_inspect_doc` 不打印 chunk 文本，仅打印 metadata → 改为断言 `elements=1 chunks=1`
+
+### 测试基线
+- 总数：67706 passed, 22 skipped, 0 failed（368.02s）
+- 较上轮 +111（67595 → 67706）
+
+### 下一步建议
+- 下一轮选 evaluation/manifest.py 第六十三轮（继续 edges 加强 _is_absolute_like / _has_backslash / DocumentEntry / ExpectedFailure / Manifest）
+
+---
+
 ## Round 570 — evaluation/runner.py 第六十五轮（91 测试）
 
 ### 目标
