@@ -4,6 +4,41 @@
 
 ---
 
+## Round 558 — evaluation/manifest.py 第六十一轮（91 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第六十一轮 edges 测试，覆盖 edges60 未触及的角度（第三十四批）：**_is_absolute_like**（digit/underscore drive / a:/foo / uppercase / lowercase z / double slash / tilde / just colon）；**_has_backslash**（tab / slash / double / trailing / leading）；**Manifest.content_group_count**（两个单向 pair / self paired / chain / pair+unpaired）；**Manifest.pdf_count/docx_count**（only docx/pdf / mixed / unknown type）；**Manifest.categories_covered**（single / dedup / unicode / empty string）；**_resolve_relative_path**（normal / double dot / escape deep / field name in empty/absolute/backslash msgs）；**load_manifest**（with categories/paired_with/sha256/expectations / path_str preserved / resolved_path absolute / 2 documents / project_root preserved）；**_detect_project_root**（no file param / file in same dir / walks up multiple levels / file in subdir）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges61.py`（91 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第三十四批**：8 测试
+- **_has_backslash 第三十四批**：5 测试
+- **Manifest.content_group_count 第三十四批**：4 测试
+- **Manifest.pdf_count/docx_count 第三十四批**：4 测试
+- **Manifest.categories_covered 第三十四批**：4 测试
+- **_resolve_relative_path 第三十四批**：6 测试
+- **load_manifest 第三十四批**：10 测试
+- **_detect_project_root 第三十四批**：4 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：15 测试
+- **signatures 第四十九批**：6 测试
+- **module 合理性第四十九批**：8 测试
+- **端到端集成第四十九批**：5 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：66352 passed, 22 skipped, 0 failed（811.04s）
+- 较上轮 +91（66261 → 66352）
+
+### 下一步建议
+- 下一轮选 evaluation/annotation_metrics.py 第六十一轮（继续 edges 加强 chunk_boundary_prf 一对一匹配）
+
+---
+
 ## Round 557 — evaluation/cli.py 第六十二轮（105 测试）
 
 ### 目标
