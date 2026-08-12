@@ -4,6 +4,48 @@
 
 ---
 
+## Round 507 — evaluation/runner.py 第五十六轮（84 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第五十六轮 edges 测试，覆盖 edges53 未触及的角度：**_load_annotation 第二十六批**（BOM 单独 / UTF-16 非法 / 多 BOM / 前导 \x00 / 单独引号 / 数字精度 / 浮点 / -0.0 / Unicode key / emoji / 嵌套 10 层）；**_process_one 第二十六批**（tuple 不可变 / 多次调用独立 / out_stub.parent 创建顺序 / process_single 单次调用 / image_dir 来自 image_output_dir_for / unlink 成功路径 / unlink 错误路径）；**run_evaluation 第二十六批**（报告 JSON 输出格式 / wall_time_seconds 类型 / per_doc 字段不变 / expected_failure 输出位置 / 多 expected_failures / indent=2 / ensure_ascii=False / devset 6 keys / provenance 9 keys / summary 4 keys / 返回 dict / 嵌套 output dir / image_dir 处理）；**module source forbidden tokens 第四十三批**；**module source 字符串精确补强第三十九批**；**signatures 第三十九批**；**module 合理性第三十九批**；**端到端集成第三十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges54.py`（84 测试）
+
+### 覆盖要点
+- **_load_annotation 第二十六批**：12 测试
+- **_process_one 第二十六批**：7 测试
+- **run_evaluation 第二十六批**：15 测试
+- **module source forbidden tokens 第四十三批**：13 测试
+- **module source 字符串精确补强第三十九批**：12 测试
+- **signatures 第三十九批**：10 测试
+- **module 合理性第三十九批**：8 测试
+- **端到端集成第三十九批**：7 测试
+
+### 撞墙记录
+- 首次跑：1 fail：
+  - `test_load_annotation_utf16_invalid_batch26`：误以为 UTF-16 字节会触发 JSONDecodeError 被 catch 返回 None。实际：实现 `with path.open("r", encoding="utf-8")` 会在 read 阶段抛 `UnicodeDecodeError`（ValueError 子类），而 except 只 catch `(OSError, json.JSONDecodeError)`，所以 UnicodeDecodeError 向外抛出。修法：测试改为 `with pytest.raises(UnicodeDecodeError)`，断言实现的真实行为而非期望行为。
+- 修复后：84 全通过；全量回归 61445 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 507 后）：61445 pass / 0 fail / 22 skip（HEAD `fdd0f41`）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第五十五轮
+  - evaluation/schema.py 第四十五轮
+  - evaluation/manifest.py 第五十四轮
+  - evaluation/annotation_metrics.py 第五十四轮
+  - evaluation/metrics.py 第五十六轮
+  - evaluation/report.py 第四十四轮
+  - evaluation/runner.py 第五十七轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges54 已饱和。下一轮选 evaluation/cli.py 第五十五轮。
+
+---
+
 ## Round 506 — evaluation/report.py 第四十三轮（81 测试）
 
 ### 目标
