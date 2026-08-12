@@ -4,6 +4,47 @@
 
 ---
 
+## Round 547 — evaluation/metrics.py 第六十轮（101 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（382 行）加第六十轮 edges 测试，覆盖 edges58 未触及的角度：**_TEXT_TYPES 第三十三批**；**_PDF_BBOX_REQUIRED_TYPES 第三十三批**；**_NOT_EVALUATED 第三十三批**；**构造器第三十三批**（keys count / set）；**compute_automatic_metrics 第三十三批**（no doc no error / error no code / image but no file / no image elements / chunks no elements / no chunks / keys count / schema invalid doc）；**_pdf_locator_ratio 第三十三批**（no elements / text valid bbox / heading no bbox / caption valid / image no bbox req）；**_docx_locator_ratio 第三十三批**（table_index / row col / mixed 1/3）；**_is_valid_bbox 第三十三批**（bool type / floats / ints / mixed）；**_image_resource_ratio 第三十三批**（base_dir None / dict / keys count）；**_chunk_reference_ratio 第三十三批**（no chunks null / dict）；**_strip_unicode_whitespace 第三十三批**（empty / all whitespace / no ws）；**_text_preservation 第三十三批**（3 keys / perfect / partial recall 2/3）；**_heading_boundary_ratio 第三十三批**（dict / no heading null）；**_silent_drop_count 第三十三批**（no expectations / empty expectations / empty expected_counts null / dict）；**module source forbidden tokens 第五十批**；**module source 字符串精确补强第四十六批**；**signatures 第四十六批**；**module 合理性第四十六批**；**端到端集成第四十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges59.py`（101 测试）
+
+### 覆盖要点
+- **_TEXT_TYPES 第三十三批**：3 测试
+- **_PDF_BBOX_REQUIRED_TYPES 第三十三批**：2 测试
+- **_NOT_EVALUATED 第三十三批**：1 测试
+- **构造器第三十三批**：5 测试
+- **compute_automatic_metrics 第三十三批**：8 测试
+- **_pdf_locator_ratio 第三十三批**：5 测试
+- **_docx_locator_ratio 第三十三批**：4 测试
+- **_is_valid_bbox 第三十三批**：4 测试
+- **_image_resource_ratio 第三十三批**：3 测试
+- **_chunk_reference_ratio 第三十三批**：2 测试
+- **_strip_unicode_whitespace 第三十三批**：4 测试
+- **_text_preservation 第三十三批**：3 测试
+- **_heading_boundary_ratio 第三十三批**：3 测试
+- **_silent_drop_count 第三十三批**：4 测试
+- **module source forbidden tokens 第五十批**：12 测试
+- **module source 字符串精确补强第四十六批**：18 测试
+- **signatures 第四十六批**：5 测试
+- **module 合理性第四十六批**：8 测试
+- **端到端集成第四十六批**：7 测试
+
+### 撞墙记录
+- 1 fail 首跑：`compute_automatic_metrics_schema_valid_with_invalid_doc_batch33` 用 `{"elements": "not_list"}` 触发 elements 迭代崩。改成缺 element_id 的合法结构以触发 schema_valid=False 而不导致迭代 crash
+
+### 测试基线
+- 总数：65265 passed, 22 skipped, 0 failed（487.68s）
+- 较上轮 +101（65164 → 65265）
+
+### 下一步建议
+- 下一轮选 evaluation/report.py 第四十九轮（继续 edges49 加强 _RATIO_METRICS / get_git_provenance / aggregate_summary）
+
+---
+
 ## Round 546 — evaluation/annotation_metrics.py 第五十九轮（84 测试）
 
 ### 目标
