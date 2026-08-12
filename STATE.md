@@ -4,6 +4,36 @@
 
 ---
 
+## Round 539 — evaluation/annotation_metrics.py 第五十八轮（71 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第五十八轮 edges 测试，覆盖 edges57 未触及的角度：**PARSER_DOES_NOT_EMIT_RELATIONS 第三十一批**（module 顶层 / 引用相同 / 不空 / 含 underscore）；**figure_caption_prf 第三十一批**（document 含 caption / document 含 table / annotation 含 list value / 多次调用独立 / 完整 dict / figure_caption_pairs）；**chunk_boundary_prf 第三十一批**（tolerance 负数 / position 任意字符串 / 5 chunks / chunk 含空 text / chunk 无 text key / 多个 missing_markers / _tolerance_chars int / anchor 在 stream 起始 / 两个相同 anchor / 不修改输入）；**module source forbidden tokens 第四十八批**；**module source 字符串精确补强第四十四批**；**signatures 第四十四批**；**module 合理性第四十四批**；**端到端集成第四十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges58.py`（71 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第三十一批**：4 测试
+- **figure_caption_prf 第三十一批**：6 测试
+- **chunk_boundary_prf 第三十一批**：10 测试
+- **module source forbidden tokens 第四十八批**：12 测试
+- **module source 字符串精确补强第四十四批**：16 测试
+- **signatures 第四十四批**：8 测试
+- **module 合理性第四十四批**：8 测试
+- **端到端集成第四十四批**：7 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：64420 passed, 22 skipped, 0 failed（488.64s）
+- 较上轮 +71（64349 → 64420）
+
+### 下一步建议
+- 下一轮选 evaluation/metrics.py 第六十轮（继续 edges59 加强 _is_valid_bbox / constructors / compute_automatic_metrics 等区域）
+
+---
+
 ## Round 538 — evaluation/manifest.py 第五十八轮（100 测试）
 
 ### 目标
