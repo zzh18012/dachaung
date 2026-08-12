@@ -4,6 +4,46 @@
 
 ---
 
+## Round 532 — evaluation/annotation_metrics.py 第五十七轮（77 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第五十七轮 edges 测试，覆盖 edges56 未触及的角度：**PARSER_DOES_NOT_EMIT_RELATIONS 第三十批**（与字符串等值 / 大小写敏感 / 含下划线 / snake_case / str 不可变）；**figure_caption_prf 第三十批**（annotation 是 list / annotation None / document 含 caption / 3 个独立 key 顺序 / 空 chunks / 两次独立 dict / figure_caption_relations）；**chunk_boundary_prf 第三十批**（tolerance 大值含远距离 anchor / position="before" / anchor 缺 marker → missing_markers / anchor 缺 position default after / 2 anchors 1 predicted / 1 anchor 2 predicted / 重复 marker 顺序定位 / 中文 chunks / missing_markers list 类型 / _tolerance_chars reason None / pipeline_failed 仍记录 tolerance / no_annotation 仍记录 tolerance / F1 P=null / 0 chunks + anchors R=0.0）；**module source forbidden tokens 第四十七批**；**module source 字符串精确补强第四十三批**（含 module docstring / chunk_boundary / figure-caption / 常量定义 / 函数定义 / 一对一 / 容差 / imports / reason 常量 / search_from / missing_markers）；**signatures 第四十三批**；**module 合理性第四十三批**；**端到端集成第四十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges57.py`（77 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第三十批**：5 测试
+- **figure_caption_prf 第三十批**：7 测试
+- **chunk_boundary_prf 第三十批**：15 测试
+- **module source forbidden tokens 第四十七批**：12 测试
+- **module source 字符串精确补强第四十三批**：14 测试
+- **signatures 第四十三批**：8 测试
+- **module 合理性第四十三批**：8 测试
+- **端到端集成第四十三批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。77 全通过；全量回归 63768 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 532 后）：63768 pass / 0 fail / 22 skip（HEAD `cb1372c`）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第五十九轮
+  - evaluation/report.py 第四十七轮
+  - evaluation/runner.py 第六十轮
+  - evaluation/cli.py 第五十九轮
+  - evaluation/schema.py 第四十九轮
+  - evaluation/manifest.py 第五十八轮
+  - evaluation/annotation_metrics.py 第五十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges57 已饱和。下一轮选 evaluation/metrics.py 第五十九轮。
+
+---
+
 ## Round 531 — evaluation/manifest.py 第五十七轮（106 测试）
 
 ### 目标
