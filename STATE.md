@@ -4,6 +4,48 @@
 
 ---
 
+## Round 523 — evaluation/schema.py 第四十七轮（90 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（80 行）加第四十七轮 edges 测试，覆盖 edges46 未触及的角度：**EvalSchemaError 第二十七批**（默认 errors=[] / 空 list / truthy / 空 message / str(e) 只 message / __cause__ None / repr / is Exception / except Exception 捕获）；**_schema_path 第二十七批**（返回 Path / absolute / .. 路径 / 多 . in name / 消息含路径 / 三 schema 都存在）；**load_schema 第二十七批**（返回 dict / 非空 / idempotent / 独立对象 / evaluation-report 加载 / annotation 加载 / unknown 抛）；**validate 第二十七批**（空 dict 3 错误 / errors 三 key / 合法 None / message 含 schema name + path + error count / invalid source_type / valid manifest / evaluation-report schema）；**validate_file 第二十七批**（返回 None / Path vs str / 目录抛 / 无效 JSON 抛 JSONDecodeError / 无效数据抛 EvalSchemaError / unknown schema 抛 / 不修改输入）；**module source forbidden tokens 第四十五批**；**module source 字符串精确补强第四十一批**（含 module docstring / errors param / errors or [] / Draft202012Validator / absolute_path）；**signatures 第四十一批**；**module 合理性第四十一批**；**端到端集成第四十一批**（含 SCHEMAS_DIR glob）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges47.py`（90 测试）
+
+### 覆盖要点
+- **EvalSchemaError 第二十七批**：9 测试
+- **_schema_path 第二十七批**：8 测试
+- **load_schema 第二十七批**：7 测试
+- **validate 第二十七批**：9 测试
+- **validate_file 第二十七批**：9 测试
+- **module source forbidden tokens 第四十五批**：12 测试
+- **module source 字符串精确补强第四十一批**：12 测试
+- **signatures 第四十一批**：9 测试
+- **module 合理性第四十一批**：9 测试
+- **端到端集成第四十一批**：7 测试
+
+### 撞墙记录
+- 首次跑：0 fail。90 全通过；全量回归 62956 pass / 0 fail / 22 skip。
+
+### 测试基线
+- main：163 pass / 0 fail / 0 skip（HEAD `2c35244`）
+- 本 worktree（Round 523 后）：62956 pass / 0 fail / 22 skip（HEAD `7759164`）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第五十六轮
+  - evaluation/annotation_metrics.py 第五十六轮
+  - evaluation/metrics.py 第五十八轮
+  - evaluation/report.py 第四十六轮
+  - evaluation/runner.py 第五十九轮
+  - evaluation/cli.py 第五十八轮
+  - evaluation/schema.py 第四十八轮
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges47 已饱和。下一轮选 evaluation/manifest.py 第五十六轮。
+
+---
+
 ## Round 522 — evaluation/cli.py 第五十七轮（95 测试）
 
 ### 目标
