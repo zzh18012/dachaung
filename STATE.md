@@ -4,6 +4,37 @@
 
 ---
 
+## Round 557 — evaluation/cli.py 第六十二轮（105 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第六十二轮 edges 测试，覆盖 edges60 未触及的角度（第三十四批）：**_build_parser**（prog / description / run subparser manifest+output required / parser choices / 各 default 值 / validate-report positional / inspect-doc has tolerance / run subparser 5 options）；**_format_metric**（None w/ reason / 0 int / 0 float / 1.0 / negative float / dict multi / dict sorted / empty dict / true / false / name alignment / str fallback / list fallback）；**_run_inspect_doc**（missing / directory / invalid JSON / top-level list/int / minimal valid / prints metrics label / pipeline_success / file path / counts / parser info）；**main**（inspect-doc missing/dir / validate-report missing / run missing manifest / run invalid manifest JSON / unknown subcommand / no args / extra args / invalid parser choice / non-int max_chars / negative max_chars / negative tolerance）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges61.py`（105 测试）
+
+### 覆盖要点
+- **_build_parser 第三十四批**：12 测试
+- **_format_metric 第三十四批**：13 测试
+- **_run_inspect_doc 第三十四批**：10 测试
+- **main 第三十四批**：14 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：20 测试
+- **signatures 第四十九批**：7 测试
+- **module 合理性第四十九批**：7 测试
+- **端到端集成第四十九批**：7 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：66261 passed, 22 skipped, 0 failed（815.62s）
+- 较上轮 +105（66156 → 66261）
+
+### 下一步建议
+- 下一轮选 evaluation/manifest.py 第六十一轮（继续 edges 加强 _is_absolute_like / _has_backslash / Manifest properties）
+
+---
+
 ## Round 556 — evaluation/runner.py 第六十三轮（86 测试）
 
 ### 目标
