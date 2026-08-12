@@ -4,6 +4,47 @@
 
 ---
 
+## Round 560 — evaluation/metrics.py 第六十二轮（113 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（382 行）加第六十二轮 edges 测试，覆盖 edges60 未触及的角度（第三十五批）：**_null / _ratio / _bool_metric / _int_metric**（unicode reason / long reason / negative / huge value / int zero / string truthy / empty string falsy / bool to int / negative float truncation）；**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES**（tuple immutable / caption 同时在两个 / table/header/footer 在 TEXT / table 不在 PDF_BBOX / header/footer 不在 PDF_BBOX / not_evaluated 常量）；**compute_automatic_metrics**（unknown source / image_base_dir None/doc/empty/path / docx source / error code only / no code KeyError）；**_pdf_locator_ratio**（list_item/caption 需 bbox / negative page / float page / string page / no locator）；**_docx_locator_ratio**（bbox invalid / relationship_id / run_index / row_col / empty / no locator / page+paragraph invalid）；**_is_valid_bbox**（negative / huge / mixed int float / None element / all zeros）；**_image_resource_ratio**（empty string / None / dir / 2 images 1 missing）；**_chunk_reference_ratio**（no ids field / empty list / empty elements / all valid）；**_strip_unicode_whitespace**（line separator / paragraph separator / vertical tab / form feed / carriage return / digits only / special chars / chinese）；**_text_preservation**（image only / text only with empty chunks / unicode / chunk only / content None）；**_heading_boundary_ratio**（multiple chunks match / no headings / no ids / empty ids）；**_silent_drop_count**（other keys / actual exceeds / expected zero / multi partial drop / returns int_metric）；**module source forbidden tokens 第五十三批**；**module source 字符串精确补强第四十九批**；**signatures 第四十九批**；**module 合理性第四十九批**；**端到端集成第四十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges61.py`（113 测试）
+
+### 覆盖要点
+- **构造器 第三十五批**：9 测试
+- **_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED 第三十五批**：8 测试
+- **compute_automatic_metrics 第三十五批**：6 测试
+- **_pdf_locator_ratio 第三十五批**：8 测试
+- **_docx_locator_ratio 第三十五批**：7 测试
+- **_is_valid_bbox 第三十五批**：5 测试
+- **_image_resource_ratio 第三十五批**：4 测试
+- **_chunk_reference_ratio 第三十五批**：4 测试
+- **_strip_unicode_whitespace 第三十五批**：8 测试
+- **_text_preservation 第三十五批**：5 测试
+- **_heading_boundary_ratio 第三十五批**：4 测试
+- **_silent_drop_count 第三十五批**：5 测试
+- **module source forbidden tokens 第五十三批**：14 测试（参数化）
+- **module source 字符串精确补强第四十九批**：8 测试
+- **signatures 第四十九批**：7 测试
+- **module 合理性第四十九批**：7 测试
+- **端到端集成第四十九批**：4 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  - `test_compute_error_no_code_batch35`：error dict 没 code 时是 KeyError → 改为 pytest.raises
+  - `test_text_preservation_chunk_only_batch35`：expected 空时 common=0，precision=0/3=0.0（不是 1.0）→ 修正预期
+
+### 测试基线
+- 总数：66537 passed, 22 skipped, 0 failed（693.56s）
+- 较上轮 +113（66424 → 66537）
+
+### 下一步建议
+- 下一轮选 evaluation/schema.py 第五十三轮（继续 edges 加强 validate / validate_file / load_schema）
+
+---
+
 ## Round 559 — evaluation/annotation_metrics.py 第六十一轮（72 测试）
 
 ### 目标
