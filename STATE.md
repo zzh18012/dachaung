@@ -4,6 +4,39 @@
 
 ---
 
+## Round 578 — evaluation/cli.py 第六十五轮（109 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第六十五轮 edges 测试，覆盖 edges63 未触及的角度（第三十七批）：**_build_parser**（prog value / 3 subparsers / run default parser / default max_chars / default tolerance / all options / inspect-doc default tolerance / custom tolerance / invalid parser choice / no subcommand required / missing manifest / missing output）；**_format_metric**（int 1 / int negative / float zero / 1/3 / full / bool true / bool false / dict one kv / dict multi sorted / dict unicode / dict empty / None with reason / None no reason / long name alignment）；**_run_inspect_doc**（returns 0 / missing file rc=2 / invalid json rc=1 / list top-level rc=1 / prints file path / prints metrics header / prints elements count / prints chunks count / prints default document_id / default source_path / default parser）；**main**（run missing manifest / invalid json / invalid schema / validate-report missing / invalid json / invalid content / inspect-doc missing / invalid json / success / run full mock / kreuzberg parser / max-chars 1 / tolerance-chars 0）；**module source forbidden tokens 第六十批**；**module source 字符串精确补强第五十六批**；**signatures 第五十六批**；**module 合理性第五十六批**；**端到端集成第五十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges64.py`（109 测试）
+
+### 覆盖要点
+- **_build_parser 第三十七批**：13 测试
+- **_format_metric 第三十七批**：14 测试
+- **_run_inspect_doc 第三十七批**：11 测试
+- **main 第三十七批**：13 测试
+- **module source forbidden tokens 第六十批**：14 测试（参数化）
+- **module source 字符串精确补强第五十六批**：26 测试
+- **signatures 第五十六批**：6 测试
+- **module 合理性第五十六批**：6 测试
+- **端到端集成第五十六批**：5 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. max_chars=0 不符合 schema（minimum=1）→ 改为 max_chars=1
+  2. subprocess 调用 `python -m evaluation.cli --help`：默认 python 无 jsonschema；Windows 默认 GBK 解码失败 → 改用 .venv/Scripts/python.exe + encoding=utf-8 + errors=replace
+
+### 测试基线
+- 总数：68598 passed, 22 skipped, 0 failed（372.35s）
+- 较上轮 +109（68489 → 68598）
+
+### 下一步建议
+- 下一轮选 evaluation/manifest.py 第六十四轮（继续 edges 加强 DocumentEntry / ExpectedFailure / Manifest / load_manifest）
+
+---
+
 ## Round 577 — evaluation/report.py 第五十三轮（135 测试）
 
 ### 目标
