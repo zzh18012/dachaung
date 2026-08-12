@@ -4,6 +4,37 @@
 
 ---
 
+## Round 550 — evaluation/cli.py 第六十一轮（79 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第六十一轮 edges 测试，覆盖 edges59 未触及的角度：**_build_parser 第三十三批**（actions / subparsers dest=command / run/validate-report/inspect-doc 子命令存在 / --max-chars help / inspect-doc input required）；**_format_metric 第三十三批**（negative float / dict negative / zero / negative int w/ reason / bool w/ reason / huge int）；**_run_inspect_doc 第三十三批**（top-level int/string/null → return 1 / document_id / source_path / parser_name present）；**main 第三十三批**（inspect-doc 目录 return 2 / validate-report 目录 return 2 / 多余 positional SystemExit / run --unknown SystemExit / 负数 max-chars 接受 / 负数 tolerance-chars 接受）；**module source forbidden tokens 第五十批**；**module source 字符串精确补强第四十六批**（含 RawDescriptionHelpFormatter / file=sys.stderr / 各 import 行）；**signatures 第四十六批**；**module 合理性第四十六批**；**端到端集成第四十六批**（含完整 PDF/DOCX doc → docx_locator_valid_ratio）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges60.py`（79 测试）
+
+### 覆盖要点
+- **_build_parser 第三十三批**：7 测试
+- **_format_metric 第三十三批**：8 测试
+- **_run_inspect_doc 第三十三批**：6 测试
+- **main 第三十三批**：7 测试
+- **module source forbidden tokens 第五十批**：9 测试
+- **module source 字符串精确补强第四十六批**：22 测试
+- **signatures 第四十六批**：7 测试
+- **module 合理性第四十六批**：7 测试
+- **端到端集成第四十六批**：7 测试
+
+### 撞墙记录
+- 无（首跑 0 fails）
+
+### 测试基线
+- 总数：65494 passed, 22 skipped, 0 failed（522.89s）
+- 较上轮 +79（65415 → 65494）
+
+### 下一步建议
+- 下一轮选 evaluation/manifest.py 第六十轮（继续 edges60 加强 _is_absolute_like / _has_backslash / DocumentEntry/ExpectedFailure/Manifest dataclass / _detect_project_root）
+
+---
+
 ## Round 549 — evaluation/runner.py 第六十二轮（67 测试）
 
 ### 目标
