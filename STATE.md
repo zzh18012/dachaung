@@ -4,6 +4,39 @@
 
 ---
 
+## Round 601 — evaluation/schema.py 第六轮（125 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第六轮 edges 测试，覆盖 edges55 未触及的角度（第三十六批）：**SCHEMAS_DIR**（is Path / 已 resolved / 名为 schemas / parent 存在 / 源码含定义 / 可读）；**_schema_path**（callable / 返回 Path / 缺失文件抛 FileNotFoundError / 绝对路径 / signature / annotation / return）；**load_schema**（callable / 返回 dict / manifest 含 properties / 缺失文件抛 / annotation / evaluation-report / signature / return / 不缓存 / idempotent）；**validate**（callable / signature / annotations / 空 dict 抛 / 最小合法 / 未知 schema 名抛 / EvalSchemaError.errors 是 list / errors 含 path/message/schema_path / message 含 schema 名 / message 含错误数 / message 含 path= / 合法不抛 / 成功返回 None）；**validate_file**（callable / signature / 缺失文件抛 FileNotFoundError / 无效 JSON 抛 / 合法最小 / str 路径 / 成功返回 None / annotation / 内部调 validate）；**EvalSchemaError**（is Exception / 默认 errors 空 / with errors / None errors / message passthrough / 可抛 / 可作为 Exception 捕获 / errors 可写 / signature / errors 默认 None / message no default / module level）；**module source forbidden tokens 第六十批**；**module source 字符串精确补强第五十六批**；**signatures 第五十六批**；**module 合理性 第五十六批**（含 AST 检查只有一个类）；**端到端集成 第五十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges56.py`（125 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 第三十六批**：6 测试
+- **_schema_path 第三十六批**：7 测试
+- **load_schema 第三十六批**：10 测试
+- **validate 第三十六批**：17 测试
+- **validate_file 第三十六批**：10 测试
+- **EvalSchemaError 第三十六批**：12 测试
+- **module source forbidden tokens 第六十批**：14 测试（参数化）
+- **module source 字符串精确补强第五十六批**：21 测试
+- **signatures 第五十六批**：8 测试
+- **module 合理性 第五十六批**：17 测试
+- **端到端集成 第五十六批**：5 测试
+
+### 撞墙记录
+- 0 fails 首跑
+
+### 测试基线
+- 总数：71497 passed, 22 skipped, 0 failed（397.70s）
+- 较上轮 +125（71372 → 71497）
+
+### 下一步建议
+- 下一轮选 evaluation/cli.py 第六十七轮（继续 edges 加强 _build_parser / main / _run_inspect_doc 边界）
+
+---
+
 ## Round 600 — evaluation/manifest.py 第六十八轮（189 测试）
 
 ### 目标
