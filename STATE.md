@@ -4,6 +4,36 @@
 
 ---
 
+## Round 580 — evaluation/annotation_metrics.py 第六十二轮（100 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（194 行）加第六十二轮 edges 测试，覆盖 edges63 未触及的角度（第三十七批）：**PARSER_DOES_NOT_EMIT_RELATIONS**（exact value / starts with parser / ends with relations / lower only / 4 underscores）；**figure_caption_prf**（3 keys / all reason same / idempotent / list annotation / huge annotation / doc with chunks field / does not call normalize_text）；**chunk_boundary_prf**（default tolerance 30 / custom 15 / tolerance 1 / tolerance at exact boundary / tolerance just below / single char chunks / 3 chunks 2 preds 2 anchors / 4 chunks 3 preds 1 anchor / 4 chunks 3 preds 3 anchors / position int / position None / annotation empty dict / annotation 0 / annotation '' / chunks None / no chunks key / marker empty string / f1 zero zero / f1 0.5/1.0 / marker at end / marker at start / two preds one anchor within tolerance / 不 mutate doc / 不 mutate chunks list / 不调用 normalize_text when doc None / 不调用 normalize_text when no annotation / 调用 normalize_text 在真实路径 / idempotent / JSON serializable / 长 unicode chunks）；**module source forbidden tokens 第六十一批**；**module source 字符串精确补强第五十七批**；**signatures 第五十七批**；**module 合理性第五十七批**；**端到端集成第五十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges64.py`（100 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第三十七批**：5 测试
+- **figure_caption_prf 第三十七批**：7 测试
+- **chunk_boundary_prf 第三十七批**：30 测试
+- **module source forbidden tokens 第六十一批**：14 测试（参数化）
+- **module source 字符串精确补强第五十七批**：20 测试
+- **signatures 第五十七批**：7 测试
+- **module 合理性第五十七批**：10 测试
+- **端到端集成第五十七批**：5 测试
+
+### 撞墙记录
+- 0 fails 首跑（一次性通过）
+
+### 测试基线
+- 总数：68826 passed, 22 skipped, 0 failed（395.60s）
+- 较上轮 +100（68726 → 68826）
+
+### 下一步建议
+- 下一轮选 evaluation/metrics.py 第六十九轮（继续 edges 加强 _null / _ratio / _text_preservation / _image_resource_ratio 等纯函数）
+
+---
+
 ## Round 579 — evaluation/manifest.py 第六十四轮（128 测试）
 
 ### 目标
