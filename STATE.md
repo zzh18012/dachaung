@@ -4,6 +4,47 @@
 
 ---
 
+## Round 663 — evaluation/runner.py 第九十二轮（83 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第九十二轮 edges 测试，补强 edges74 未触及的角度（第四十九批）：**_load_annotation 多种路径**（None / 不存在文件 / 合法文件 / 非法 JSON / UTF-8 BOM / 空文件 / 目录 / OSError）；**_process_one 多场景**（成功 5-tuple / errors 非空 → document None / document None no errors → unknown / image_dir None when document None / elapsed 正数）；**run_evaluation 完整流程 + private 字段**（per_doc 含 _ 私有键 / public 4 keys / report_version / 6 top keys / 写文件 / 创建嵌套目录 / wall_time_seconds 5 keys 结构 / annotation_present False / expected_failures 匹配 / 不匹配 / 无 errors）；**模块源码补强**（json/time/Path/Any/pipeline/REPORT_VERSION/annotation_metrics/metrics/report imports / __all__ / docstring 关键词 / perf_counter / write_json=False / ensure_ascii=False / image_output_dir_for 调用 / unknown 字符串 / process_single returned None 字符串 / json.dump / .to_dict()）；**AST 结构补强**（3 函数 / 函数名顺序 / 无 ClassDef / 无 AsyncFunctionDef / module docstring / 10 import / 1 top-level Assign / _load_annotation 1 try + open call / _process_one perf_counter + 多 return + 1 try / run_evaluation 3 for + 1 with + json.dump + return report + report dict / _load_annotation ≥2 return None / 无 Global/Nonlocal/Delete）；**forbidden tokens 第一百三十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges75.py`（83 测试）
+
+### 覆盖要点
+- **_load_annotation 多种路径**：8 测试
+- **_process_one 多场景**：5 测试
+- **run_evaluation 完整流程 + private 字段**：11 测试
+- **模块源码补强**：22 测试
+- **AST 结构补强**：20 测试
+- **forbidden tokens 第一百三十三批**：17 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `test_run_evaluation_*_batch49`：MagicMock 的 manifest 字段（devset_status/file_count 等）会自动返回 MagicMock 子对象，json.dump 时无法序列化。修复：构建 `_make_full_manifest` helper 显式设置所有 devset 字段。
+  2. `test_ast_load_annotation_returns_none_two_places_batch49`：原来只检查 `func.body` 直接 return，但 return 在 if/except 内部。改为用 ast.walk 整个函数。
+
+### 测试基线
+- 总数：77766 passed, 22 skipped, 0 failed（422.83s）
+- 较上轮 +83（77683 → 77766）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第九十三轮（继续 edges 加强 anchor position 校验）
+  - evaluation/cli.py 第九十四轮（继续 edges 加强 _run_inspect_doc 嵌套行为）
+  - evaluation/schema.py 第九十五轮（继续 edges 加强 validate errors 多层嵌套）
+  - evaluation/__init__.py 第十轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十三轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十一轮（继续 edges 加强）
+  - evaluation/report.py 第九十二轮（继续 edges 加强）
+  - evaluation/runner.py 第九十三轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges75 已饱和（_load_annotation 8 + _process_one 5 + run_evaluation 11 + AST 20 + forbidden tokens）。下一轮选 evaluation/annotation_metrics.py 第九十三轮，覆盖 anchor position 校验 + tolerance_chars 边界。
+
+---
+
 ## Round 662 — evaluation/report.py 第九十一轮（96 测试）
 
 ### 目标
