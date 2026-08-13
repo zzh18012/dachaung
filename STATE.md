@@ -4,6 +4,40 @@
 
 ---
 
+## Round 624 — evaluation/annotation_metrics.py 第八十八轮（56 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第八十八轮 edges 测试，补强 edges69 未触及的角度（第四十四批）：**chunk_boundary_prf anchor 缺字段**（缺 marker → marker="" 走特殊路径 / 缺 position → 默认 'after' / position='middle' → 走 else（after）分支 / position='before' 用 marker 起始）；**tolerance 极端值**（tolerance=0 严格匹配 / tolerance=0 no match / tolerance=1000 极宽松）；**多 chunks 多 anchors 不平衡**（5 anchors vs 2 preds → P=1.0 R=0.4 / 1 anchor vs 3 preds → P=1/3 R=1.0）；**stream.find 找不到 txt**（text=None → 兜底 pos+=len(txt)+1）；**3 个重复 marker 顺序定位**；**figure_caption_prf 多次调用**（结果完全一致 / 无副作用）；**chunk_boundary_prf 无副作用**；**_tolerance_chars 始终在所有路径**（pipeline_failed/no_annotation/no_pred/no_ground_truth/main 都有）；**precision/recall null 不同组合**；**模块源码字符串精确**（marker / position before+after / greedy or 贪心 / used_pred+used_gt / normalize_text / search_from / missing_markers / stream.find / 各 reason 字符串）；**__all__ 3 entries**；**AST 结构**（2 functions / 2 assigns / chunk_boundary_prf 内 for≥3 + If≥4 / 无 try/while/async/class / future 是第二个）；**forbidden tokens 第九十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges70.py`（56 测试）
+
+### 覆盖要点
+- **chunk_boundary_prf anchor 缺字段**：4 测试
+- **tolerance 极端值**：3 测试
+- **多 chunks 多 anchors 不平衡**：3 测试（含 stream.find 找不到 txt）
+- **3 个重复 marker**：1 测试
+- **figure_caption_prf + chunk_boundary_prf 无副作用**：3 测试
+- **_tolerance_chars 始终在**：1 测试
+- **precision/recall null 组合**：1 测试
+- **模块源码字符串**：13 测试
+- **__all__**：5 测试
+- **AST 结构**：11 测试
+- **forbidden tokens**：10 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_chunk_boundary_prf_more_anchors_than_preds_batch44`：实现按 stream 顺序推进 search_from，anchor 必须按 marker 在 stream 中出现顺序排列，否则后续 marker 找不到（gt_positions 会少于 anchors.length）。改为按 stream 顺序排列 anchor。
+
+### 测试基线
+- 总数：74097 passed, 22 skipped, 0 failed（700.99s）
+- 较上轮 +56（74041 → 74097）
+
+### 下一步建议
+- 下一轮到 evaluation/cli.py 第八十九轮（继续 edges 加强 _build_parser / main / inspect-doc 边界）
+
+---
+
 ## Round 623 — evaluation/runner.py 第八十七轮（55 测试）
 
 ### 目标
