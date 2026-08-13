@@ -4,6 +4,49 @@
 
 ---
 
+## Round 604 — evaluation/metrics.py 第七十二轮（196 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第七十二轮 edges 测试，补强 edges66 未触及的角度（第四十一批）：**_null / _ratio / _bool_metric / _int_metric**（签名 / 返回结构 / 边界值 / None reason 透传 / 0.0/1.0 ratio / True/False / int 直接包装）；**_NOT_EVALUATED / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES**（内容固定 / 长度 / 元素检查）；**_is_valid_bbox**（None / 缺 keys / 多 keys / 顺序错 / 非数字 / NaN / Inf / inf / bool / 字符串 / tuple / list / 完整）；**_strip_unicode_whitespace**（empty / ASCII / Unicode / 全部空格 / 单空格 / 多行 / tab / NBSP / zero-width）；**_pdf_locator_ratio**（empty / None / page only / bbox only / 都缺 / 都有 / bbox 无效但有 / NaN）；**_docx_locator_ratio**（empty / None / page only / bbox only / index only / 都缺 / 含 page/bbox 被拒 / negative index 接受）；**_image_resource_ratio**（empty / 无 image / 含 image 无 resource / 含 image with resource / 多 image ratio）；**_chunk_reference_ratio**（empty / 无 element_id / 多 source_element_ids / 全部引用 / 部分引用）；**_text_preservation**（empty+empty=equal True / image-only expected+actual 空时 → empty_expected / 完整匹配 / 丢失 / 重复 / 乱序 / 大小写差异）；**_heading_boundary_ratio**（no headings → no_heading_elements / chunks 空 / chunk 无 source_element_ids / chunk 引用非 heading / 完全对齐 / 部分对齐）；**_silent_drop_count**（empty by_type / exp=0 actual=0 / exp>actual / exp=actual / exp<actual / 多类型聚合）；**compute_automatic_metrics**（基础签名 / error 短路 / pipeline_failed reason / 空 elements / 完整运行 / image_base_dir=None）；**module source forbidden tokens 第七十五批**；**module source 字符串精确补强第六十六批**（含 _strip_unicode_whitespace 定义 / 不 import normalize_text）；**signatures**；**module 合理性**；**端到端集成**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges67.py`（196 测试）
+
+### 覆盖要点
+- **基础辅助函数**：16 测试
+- **常量**：6 测试
+- **_is_valid_bbox**：13 测试
+- **_strip_unicode_whitespace**：9 测试
+- **_pdf_locator_ratio**：8 测试
+- **_docx_locator_ratio**：8 测试
+- **_image_resource_ratio**：8 测试
+- **_chunk_reference_ratio**：8 测试
+- **_text_preservation**：12 测试
+- **_heading_boundary_ratio**：10 测试
+- **_silent_drop_count**：9 测试
+- **compute_automatic_metrics**：10 测试
+- **module source forbidden tokens**：15 测试
+- **module source 字符串精确**：18 测试
+- **signatures**：8 测试
+- **module 合理性**：9 测试
+- **端到端集成**：9 测试
+
+### 撞墙记录
+- 4 fail 首跑（均签名/实现口径错配）：
+  1. `from app.chunkers.structural import normalize_text` 实际不存在（v1.1 用 `_strip_unicode_whitespace`）→ 改测 `def _strip_unicode_whitespace(` + 断言不 import normalize_text
+  2. `_silent_drop_count` 首参是 `by_type`（dict[str, int]）不是 `elements`（list）→ 改签名断言
+  3. `_image_resource_ratio` 的 `image_base_dir` 是必填（无默认）→ 改断言 `inspect.Parameter.empty`
+  4. （此前 round 内多轮修复：`_docx_locator_ratio(elements)` 单参；`_image_resource_ratio(elements, image_base_dir)`；`_chunk_reference_ratio(elements, chunks)`；`_text_preservation([], [])` 返回 equal=True；`_heading_boundary_ratio` no headings reason = `no_heading_elements`）
+
+### 测试基线
+- 总数：71924 passed, 22 skipped, 0 failed（400.01s）
+- 较上轮 +196（71728 → 71924）
+
+### 下一步建议
+- 下一轮到 evaluation/manifest.py 第七十三轮（继续 edges 加强 _is_absolute_like / _resolve_relative_path / DocumentEntry / ExpectedFailure / Manifest 边界）
+
+---
+
 ## Round 603 — evaluation/__init__.py 第二轮（90 测试）
 
 ### 目标
