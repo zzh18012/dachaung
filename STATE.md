@@ -4,6 +4,48 @@
 
 ---
 
+## Round 639 — evaluation/runner.py 第八十九轮（71 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第八十九轮 edges 测试，补强 edges71 未触及的角度（第四十七批）：**_load_annotation 各种路径**（None / 不存在 / 是目录 / 有效 JSON / JSONDecodeError / OSError 兜底 / utf-8 中文 / 空文件 / JSON 数组 / 返回类型）；**_process_one 多种路径**（成功路径 5-tuple / errors 非空 / document None 兜底 unknown / 创建 _per_doc 目录 / 删除 out_stub / unlink OSError 吞掉 / image_dir None when document None / 返回 tuple 长度）；**run_evaluation 写盘 ensure_ascii=False**（中文不转义 / 创建嵌套父目录 / report_version 1.1 / 6 keys）；**run_evaluation per_doc_results 私有字段**（_annotation_present / wall_time_seconds 5 keys 含 not_instrumented）；**run_evaluation public_per_doc 字段**（无 _ 私有 / 4 keys）；**run_evaluation expected_failures 路径**（matches True / matches False / actual_code None / 4 keys）；**run_evaluation parser_version 透传**（第一个非 None wins / 全 None → None）；**模块源码补强**（not_instrumented / image_output_dir_for / process_single / compute_automatic_metrics / figure_caption_prf / chunk_boundary_prf / aggregate_summary / ensure_ascii=False / perf_counter / pipeline_failed / unknown code / not_instrumented reason）；**AST 结构补强**（3 函数 / _load_annotation 1 try + handler Tuple(2) / _process_one ≥3 if + try in if / run_evaluation ≥3 for + 1 with + return Name "report" / 无 ClassDef / module docstring / _process_one 3 return）；**forbidden tokens 第一百零九批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges72.py`（71 测试）
+
+### 覆盖要点
+- **_load_annotation 各种路径**：10 测试
+- **_process_one 多种路径**：8 测试
+- **run_evaluation 写盘 ensure_ascii=False**：5 测试
+- **run_evaluation per_doc_results 私有字段**：4 测试
+- **run_evaluation expected_failures 路径**：4 测试
+- **run_evaluation parser_version 透传**：2 测试
+- **模块源码补强**：12 测试
+- **AST 结构补强**：11 测试
+- **forbidden tokens 第一百零九批**：15 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_process_one_success_path_batch47`：patch 路径错误。runner.py 用 `from app.pipeline import process_single`，模块级名字已绑定到 evaluation.runner 命名空间，patch `app.pipeline.process_single` 不影响 runner 内部引用。改用 sed 全量替换为 `evaluation.runner.process_single` / `evaluation.runner.image_output_dir_for`。
+
+### 测试基线
+- 总数：75574 passed, 22 skipped, 0 failed（405.99s）
+- 较上轮 +71（75503 → 75574）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第九十轮（继续 edges 加强 chunk_boundary_prf 顺序匹配 + figure_caption_prf null）
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter + _sort_key）
+  - evaluation/schema.py 第九十二轮（继续 edges 加强 EvalSchemaError pickle + const vs enum）
+  - evaluation/__init__.py 第七轮（继续 edges 加强 4 常量属性 + 模块 __loader__/__spec__）
+  - evaluation/metrics.py 第八十九轮（继续 edges 加强 14 metrics keys + pipeline_failed）
+  - evaluation/manifest.py 第八十八轮（继续 edges 加强 frozen dataclass 边界）
+  - evaluation/report.py 第八十九轮（继续 edges 加强 _RATIO_METRICS 子集）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges72 已饱和（_load_annotation 10 边界 + _process_one 8 路径 + run_evaluation ensure_ascii=False + private/public per_doc + expected_failures + parser_version 透传 + AST 完整结构 + forbidden tokens）。下一轮选 evaluation/annotation_metrics.py 第九十轮，覆盖 chunk_boundary_prf 顺序匹配 search_from 更新 + figure_caption_prf 始终 null + chunk_boundary tolerance/missing_markers 内部字段。
+
+---
+
 ## Round 638 — evaluation/report.py 第八十八轮（103 测试）
 
 ### 目标
