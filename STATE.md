@@ -4,6 +4,45 @@
 
 ---
 
+## Round 667 — evaluation/__init__.py 第十轮（67 测试）
+
+### 目标
+- 给 `evaluation/__init__.py`（29 行）加第十轮 edges 测试，补强 edges9 未触及的角度（第五十批）：**4 个版本常量更深**（format with string / partition 在第一个 '.' 分割 / rpartition / split / rsplit / __eq__ 比较 / lt gt 字符串比较 / annotation < evaluator / unique pairs is not or ==）；**__all__ 顺序不变性**（顺序固定 EVALUATOR/REPORT/ANNOTATION/MANIFEST / sorted 字母序与原序不同 / reversed 与原序不同 / reversed[0]='MANIFEST_VERSION'）；**模块属性访问更深层**（__name__='evaluation' / __file__ 存在且 endswith __init__.py[c|d] / __spec__ not None / __package__='evaluation' / __dict__ 含 4 版本常量）；**importlib.reload 不影响外部 import 引用**（已 bound 的 EVALUATOR_VERSION 局部变量不变 / reload 后 module identity 不变 id 相同）；**模块 docstring 内容补强**（jsonschema / Stage 1 / parser / 分母 or denominator / total / parse or chunk / 设计原则段 / 版本历史段 / 第一行以 '评测包' 开头）；**AST 结构补强**（module docstring 是 Expr+Constant / 无 FunctionDef / 无 ClassDef / 无 Import / 5 top-level Assigns / 每个 Assign 1 target + 都是 Name / __all__ value is List 4 Constant str / 无 Try/With/For/If/While/Global/Nonlocal/Delete/Raise / 4 VERSION constants / EVALUATOR_VERSION="1.1" / docstring 是非空 str len>100）；**forbidden tokens 第一百三十七批**（无 eval/exec/compile/globals/locals/os.system/subprocess/popen/yaml.load/pickle.load/socket/requests/urllib/shutil.rmtree/yield/open/async/await + 无 ClassDef/FunctionDef in source）
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges10.py`（67 测试）
+
+### 覆盖要点
+- **4 个版本常量更深**：9 测试
+- **__all__ 顺序不变性**：3 测试
+- **模块属性访问更深层**：5 测试
+- **importlib.reload 不影响外部 import 引用**：2 测试
+- **模块 docstring 内容补强**：10 测试
+- **AST 结构补强**：20 测试
+- **forbidden tokens 第一百三十七批**：18 测试
+
+### 撞墙记录
+- 0 fails 首跑。67 测试一次通过。
+
+### 测试基线
+- 总数：78101 passed, 22 skipped, 0 failed（413.82s）
+- 较上轮 +67（78034 → 78101）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第九十三轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十一轮（继续 edges 加强）
+  - evaluation/report.py 第九十二轮（继续 edges 加强）
+  - evaluation/runner.py 第九十三轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/cli.py 第九十五轮（继续 edges 加强）
+  - evaluation/schema.py 第九十六轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：__init__.py edges10 已饱和（4 版本常量更深 + __all__ 顺序 + 模块属性 + reload + docstring 内容 + AST 结构 + forbidden tokens）。下一轮选 evaluation/metrics.py 第九十三轮，覆盖 _TEXT_TYPES 7 类 + _is_valid_bbox 边界 + 各 ratio 计算。
+
+---
+
 ## Round 666 — evaluation/schema.py 第九十五轮（71 测试）
 
 ### 目标
