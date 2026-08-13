@@ -4,6 +4,43 @@
 
 ---
 
+## Round 603 — evaluation/__init__.py 第二轮（90 测试）
+
+### 目标
+- 给 `evaluation/__init__.py`（28 行）加第二轮 edges 测试，补强 init_edges 未触及的角度：**版本常量补强**（X.Y 格式 / only digits+dot / starts with digit / no spaces / no newlines / no leading zero）；**与 schema 一致性**（evaluation-report schema 含 evaluator_version / report_version / manifest schema 含 manifest_version / annotation schema 含 annotation_version）；**__all__ 补强**（no extra entries / no subpackages / 只含 str）；**模块属性**（hasattr / in dir）；**模块源码结构**（assignments / __all__ / docstring / 设计原则 / 版本历史 / v1.0 / v1.1 / 不依赖 / text_preservation / 不修改 / 不伪造 / 分母 / not_instrumented / 只记 total / 不可横向比较）；**AST 结构检查**（no class / no function / no import / exactly 5 assigns / module docstring / only Expr+Assign）；**模块文件**（in evaluation dir / parent is evaluation / name=evaluation / package=evaluation）；**__all__ 顺序**（first/last/indices）；**版本组合**（pair equal / pair differ / two distinct values / 1.1 > 1.0）；**reload 后保持**；**与其它模块一致**（report/runner 使用 EVALUATOR_VERSION / cli 不硬编码）；**docstring 完整性**（中文开头 / 含章节 / 列出 ≥4 条原则 / 解释 v1.0→v1.1 / 警告 baseline 不兼容）；**JSON 序列化**；**forbidden tokens**
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges2.py`（90 测试）
+
+### 覆盖要点
+- **版本常量补强**：15 测试
+- **与 schema 一致性**：4 测试
+- **__all__ 补强**：3 测试
+- **模块属性**：8 测试
+- **模块源码结构**：18 测试
+- **AST 结构检查**：6 测试
+- **模块文件**：4 测试
+- **__all__ 顺序**：6 测试
+- **版本组合**：6 测试
+- **reload**：5 测试
+- **与其它模块一致**：5 测试
+- **docstring 完整性**：5 测试
+- **JSON 序列化**：2 测试
+- **综合**：3 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. evaluation-report schema 用 $defs.provenance（不是 properties.provenance），导致 evaluator_version 字段查找路径错 → 改用 $defs.provenance.properties
+
+### 测试基线
+- 总数：71728 passed, 22 skipped, 0 failed（389.64s）
+- 较上轮 +90（71638 → 71728）
+
+### 下一步建议
+- 下一轮回到 evaluation/metrics.py 第七十二轮（继续 edges 加强 _pdf_locator_ratio / _is_valid_bbox 边界）
+
+---
+
 ## Round 602 — evaluation/cli.py 第六十七轮（141 测试）
 
 ### 目标
