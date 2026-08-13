@@ -4,6 +4,47 @@
 
 ---
 
+## Round 581 — evaluation/metrics.py 第六十九轮（159 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第六十九轮 edges 测试，覆盖 edges63 未触及的角度（第三十八批）：**_null / _ratio / _bool_metric / _int_metric**（callable / returns dict / value field float / value field int / value field bool / int input → float / int('123') 合法 / int('abc') raises）；**_NOT_EVALUATED / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES**（exact value / no spaces / 7 text types / 4 pdf types / caption in both / image in neither / subset relation）；**_is_valid_bbox**（callable / zero values / negative / very large / bool False rejected）；**_strip_unicode_whitespace**（callable / preserves unicode / tab / CR / form feed / vertical tab / thin space / hair space）；**_pdf_locator_ratio**（caption / list_item / caption no bbox / table page only / image page only / returns float / huge page）；**_docx_locator_ratio**（section / run_index / extra keys with page invalid / unknown keys / all structural keys）；**_image_resource_ratio**（callable / None rp / absolute path existing / image_base_dir with absolute / image_base_dir with relative / all invalid / 不 mutate）；**_chunk_reference_ratio**（callable / None element_id / chunk ids with None / 3 chunks partial / 不 mutate）；**_text_preservation**（3 keys / value+reason each / single char / duplicate chars / image excluded but other present / only image / chunk empty string / both empty after strip / long text / 不 mutate）；**_heading_boundary_ratio**（callable / multiple chunks same first / 3 headings 2 match / unknown first id / heading no element_id / 不 mutate）；**_silent_drop_count**（callable / actual zero / returns int / unicode type / negative expected / 3 types one drop）；**compute_automatic_metrics**（callable / doc none 7 keys / pipeline false / error code none / schema valid reason / error dict / minimal doc / pdf locator calculated / docx locator null for pdf source / docx locator calculated / pdf locator null for docx source / silent drop with exp / silent drop null no exp）；**module source forbidden tokens 第六十二批**；**module source 字符串精确补强第五十八批**；**signatures 第五十八批**；**module 合理性第五十八批**；**端到端集成第五十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges64.py`（159 测试）
+
+### 覆盖要点
+- **_null / _ratio / _bool_metric / _int_metric 第三十八批**：18 测试
+- **_NOT_EVALUATED / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第三十八批**：13 测试
+- **_is_valid_bbox 第三十八批**：5 测试
+- **_strip_unicode_whitespace 第三十八批**：9 测试
+- **_pdf_locator_ratio 第三十八批**：7 测试
+- **_docx_locator_ratio 第三十八批**：5 测试
+- **_image_resource_ratio 第三十八批**：7 测试
+- **_chunk_reference_ratio 第三十八批**：5 测试
+- **_text_preservation 第三十八批**：10 测试
+- **_heading_boundary_ratio 第三十八批**：6 测试
+- **_silent_drop_count 第三十八批**：6 测试
+- **compute_automatic_metrics 第三十八批**：12 测试
+- **module source forbidden tokens 第六十二批**：14 测试（参数化）
+- **module source 字符串精确补强第五十八批**：21 测试
+- **signatures 第五十八批**：9 测试
+- **module 合理性第五十八批**：10 测试
+- **端到端集成第五十八批**：5 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `int("123")` 不抛 ValueError（合法返回 123）→ 改为正向 assert + 新增 `int("abc")` 测试覆盖 ValueError
+  2. metrics.py 文档字符串提到 `normalize_text`（v1.0 历史口径）→ 改为检查 `import normalize_text` 不存在
+
+### 测试基线
+- 总数：68985 passed, 22 skipped, 0 failed（417.16s）
+- 较上轮 +159（68826 → 68985）
+
+### 下一步建议
+- 下一轮选 evaluation/schema_validation.py 第六十轮（继续 edges 加强 document_passes_schema / JSON Schema 加载等）
+
+---
+
 ## Round 580 — evaluation/annotation_metrics.py 第六十二轮（100 测试）
 
 ### 目标
