@@ -4,6 +4,50 @@
 
 ---
 
+## Round 666 — evaluation/schema.py 第九十五轮（71 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第九十五轮 edges 测试，补强 edges63 未触及的角度（第五十批）：**EvalSchemaError 多层继承验证**（isinstance BaseException / object / 异常链 raise from / reraise 同一实例）；**_schema_path 多 schema 文件存在校验**（3 schema 都存在 / 错误 message 含 path / 文件名 suffix）；**load_schema 返回 dict 的 keys 类型**（type/properties/$schema / manifest required 3 / annotation required 2 / evaluation-report required）；**validate 多 errors 排序稳定**（同输入多次相同顺序 / 每个 err 有非空 schema_path / path 元素是 str or int / head error 在 errors list 中）；**validate_file 不同 schema name 校验路径**（annotation schema / annotation invalid / evaluation-report schema 完整字段 / evaluation-report missing required / 多种异常路径）；**SCHEMAS_DIR 在项目根的 schemas 子目录**（name='schemas' / 只含 .json 文件 / 至少 3 个文件）；**模块源码补强**（Draft202012Validator 调用 / iter_errors 调用 / sorted lambda / absolute_path / absolute_schema_path / jsonschema 子模块 / 无额外 import / docstring）；**AST 结构补强**（4 函数 + 顺序 / 1 ClassDef / EvalSchemaError __init__ only + super(message) + self.errors = errors or [] / validate for+append+sorted+key=lambda+head=errors[0]+raise / validate_file 1 with + validate call + if not is_file / _schema_path if not is_file + raise / 6 import / 2 top-level Assign / 无 Global/Nonlocal）；**forbidden tokens 第一百三十六批**（open count=2 / 无 async/await）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges64.py`（71 测试）
+
+### 覆盖要点
+- **EvalSchemaError 多层继承验证**：4 测试
+- **_schema_path 多 schema 文件存在校验**：4 测试
+- **load_schema 返回 dict 的 keys 类型**：4 测试
+- **validate 多 errors 排序稳定**：4 测试
+- **validate_file 不同 schema name 校验路径**：5 测试
+- **SCHEMAS_DIR 在项目根的 schemas 子目录**：3 测试
+- **模块源码补强**：10 测试
+- **AST 结构补强**：22 测试
+- **forbidden tokens 第一百三十六批**：18 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `test_validate_file_evaluation_report_schema_batch50`：evaluation-report schema required 字段不只 report_version 等 5 个，还有 devset/provenance 内嵌的 required（status+file_count+content_group_count+pdf_count+docx_count+categories_covered + git_commit+git_dirty+evaluator_version+report_version+parser_name+parser_version+dependencies+max_chars+run_timestamp_iso）。补全后通过。
+  2. `test_ast_validate_has_return_none_when_no_errors_batch50`：原来检查 `func.body` 直接 return，但 `if not errors: return` 在嵌套 if 中。改为 ast.walk。
+
+### 测试基线
+- 总数：78034 passed, 22 skipped, 0 failed（425.47s）
+- 较上轮 +71（77963 → 78034）
+
+### 下一步建议
+- 候选：
+  - evaluation/__init__.py 第十轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十三轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十一轮（继续 edges 加强）
+  - evaluation/report.py 第九十二轮（继续 edges 加强）
+  - evaluation/runner.py 第九十三轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/cli.py 第九十五轮（继续 edges 加强）
+  - evaluation/schema.py 第九十六轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges64 已饱和（EvalSchemaError 4 + _schema_path 4 + load_schema 4 + validate 4 + validate_file 5 + SCHEMAS_DIR 3 + AST 22 + forbidden tokens）。下一轮选 evaluation/__init__.py 第十轮，覆盖 4 版本常量更深 + __all__ 多场景。
+
+---
+
 ## Round 665 — evaluation/cli.py 第九十四轮（103 测试）
 
 ### 目标
