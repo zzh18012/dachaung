@@ -4,6 +4,46 @@
 
 ---
 
+## Round 596 — evaluation/metrics.py 第七十一轮（143 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第七十一轮 edges 测试，覆盖 edges65 未触及的角度（第四十批）：**_null / _ratio / _bool_metric / _int_metric**（None reason / int reason / no mutate / very small / very large / reason always None / negative zero / scientific notation string raises / hex string raises）；**_NOT_EVALUATED / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES**（list_item / heading / paragraph / exact set / no header / no footer / 7 distinct kinds）；**_is_valid_bbox**（mixed int float / extreme int / nested list / dict inside / True only / one bool）；**_strip_unicode_whitespace**（emoji preserved / digits+punctuation / chinese punctuation / long text / returns str）；**_pdf_locator_ratio**（string page / float page / bool True page / bool False page / negative / paragraph no bbox / dict instance / has value reason / no mutate）；**_docx_locator_ratio**（empty elements null / all invalid / no mutate / has value reason）；**_image_resource_ratio**（callable / no images null / no mutate / has value reason）；**_chunk_reference_ratio**（callable / no mutate / has value reason / value zero）；**_text_preservation**（callable / no mutate / image only / 3 keys / value reason / float or None）；**_heading_boundary_ratio**（callable / returns dict / has value reason / value zero）；**_silent_drop_count**（callable / returns dict / has value reason / value zero / no mutate）；**compute_automatic_metrics**（minimal doc / image element / mixed elements / patched schema True / patched schema False / idempotent / expectations no drop / expectations has drop / signature 5 params / image_base_dir default / various annotations）；**module source forbidden tokens 第六十九批**；**module source 字符串精确补强第六十五批**；**signatures 第六十五批**；**module 合理性 第六十五批**；**端到端集成 第六十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges66.py`（143 测试）
+
+### 覆盖要点
+- **_null / _ratio / _bool_metric / _int_metric 第四十批**：12 测试
+- **_NOT_EVALUATED / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第四十批**：7 测试
+- **_is_valid_bbox 第四十批**：6 测试
+- **_strip_unicode_whitespace 第四十批**：5 测试
+- **_pdf_locator_ratio 第四十批**：9 测试
+- **_docx_locator_ratio 第四十批**：4 测试
+- **_image_resource_ratio 第四十批**：4 测试
+- **_chunk_reference_ratio 第四十批**：4 测试
+- **_text_preservation 第四十批**：6 测试
+- **_heading_boundary_ratio 第四十批**：4 测试
+- **_silent_drop_count 第四十批**：5 测试
+- **compute_automatic_metrics 第四十批**：16 测试
+- **module source forbidden tokens 第六十九批**：14 测试（参数化）
+- **module source 字符串精确补强第六十五批**：21 测试
+- **signatures 第六十五批**：14 测试
+- **module 合理性 第六十五批**：10 测试（含 AST 顶层代码检查）
+- **端到端集成 第六十五批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `compute_automatic_metrics` 对 image-only + chunks 空 → reason `empty_expected_and_actual`（非 `empty_expected`，因为 actual 也空）→ 改 expect
+
+### 测试基线
+- 总数：70757 passed, 22 skipped, 0 failed（395.18s）
+- 较上轮 +143（70614 → 70757）
+
+### 下一步建议
+- 下一轮选 evaluation/report.py 第五十六轮（继续 edges 加强 aggregate_summary / build_devset_section 边界）
+
+---
+
 ## Round 595 — evaluation/annotation_metrics.py 第六十四轮（112 测试）
 
 ### 目标
