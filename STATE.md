@@ -4,6 +4,41 @@
 
 ---
 
+## Round 597 — evaluation/report.py 第五十六轮（152 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第五十六轮 edges 测试，覆盖 edges55 未触及的角度（第四十一批）：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS**（no duplicates / disjoint pairwise / chunk_boundary 三项相邻 / text_char_multiset 两项相邻 / 不含 figure_caption_* / 不含 chunk_boundary_specificity）；**get_git_provenance**（signature / OSError 捕获 / FileNotFoundError / TimeoutExpired / returncode nonzero / stdout 全空白 / stripped / dirty porcelain returncode nonzero 短路 / timeout=10 / cwd 传递 / capture_output=True）；**get_dependency_versions**（no params / dict return / 3 keys / values str/None / PackageNotFoundError / generic Exception / value returned / 源码含三个包名）；**build_provenance**（4 params / 9 keys / parser_version None 透传 / max_chars float→int / max_chars 数字字符串转换 / max_chars 非数字 ValueError / evaluator_version constant / report_version constant / run_timestamp_iso parses / dependencies dict / git_dirty on exception）；**build_devset_section**（6 keys exact / content_group_count / pdf_count / docx_count / categories tuple / categories dict / None raises / int status / no mutate / idempotent / json serializable）；**aggregate_summary**（4 keys / counts 1 key / success_rates 1 key / ratio keys match / 1000 docs / participating_docs / mixed values / None only / silent_drop missing / silent_drop zero / silent_drop negative / no mutate / tuple input / generator raises TypeError / new dict each call / one participating / json serializable）；**module source forbidden tokens 第七十批**；**module source 字符串精确补强第六十六批**；**signatures 第六十六批**；**module 合理性 第六十六批**；**端到端集成 第六十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges56.py`（152 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第四十一批**：16 测试
+- **get_git_provenance 第四十一批**：18 测试
+- **get_dependency_versions 第四十一批**：10 测试
+- **build_provenance 第四十一批**：14 测试
+- **build_devset_section 第四十一批**：12 测试
+- **aggregate_summary 第四十一批**：20 测试
+- **module source forbidden tokens 第七十批**：13 测试（参数化）
+- **module source 字符串精确补强第六十六批**：24 测试
+- **signatures 第六十六批**：14 测试
+- **module 合理性 第六十六批**：11 测试
+- **端到端集成 第六十六批**：5 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `porcelain returncode nonzero` 我误以为短路后 dirty=True，实际 `bool(False and X) = False` → 改 expect False
+  2. generator 输入触发 TypeError（`len(generator)` 报错）→ 改为 expect TypeError
+
+### 测试基线
+- 总数：70909 passed, 22 skipped, 0 failed（390.96s）
+- 较上轮 +152（70757 → 70909）
+
+### 下一步建议
+- 下一轮选 evaluation/runner.py 第六十七轮（继续 edges 加强 run_evaluation / _load_annotation 边界）
+
+---
+
 ## Round 596 — evaluation/metrics.py 第七十一轮（143 测试）
 
 ### 目标
