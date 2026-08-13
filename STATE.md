@@ -4,6 +4,54 @@
 
 ---
 
+## Round 638 — evaluation/report.py 第八十八轮（103 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第八十八轮 edges 测试，补强 edges60 未触及的角度（第四十七批）：**_RATIO_METRICS 子集属性**（text_* 三项 / chunk_* 四项 / locator 两项 / image / heading / schema_valid 在首位 / chunk_boundary_f1 在末位 / chunk_reference_intact_ratio 在 text_* 之前 / chunk_boundary_* 在 text_* 之后）；**_COUNT_METRICS / _SUCCESS_BOOL_METRICS 单元素性质**（tuple 类型 / 单元素 / 三组 disjoint）；**aggregate_summary counts 边界**（全 None 跳过 / value=0 参与 / 负数求和 / 缺 element_count_total key 跳过 / 缺 value key 跳过）；**aggregate_summary success_rates bool 严格性**（True 严格判定 1 不算 True / None 跳过 / 全 False / 空 / 3 选 1 rate 0.333）；**aggregate_summary ratio 各项独立 null**（partial participation / 全 null / macro 计算 / 总共 12 keys / summary 4 个 top keys）；**aggregate_summary silent_drop 各种**（全 None / partial / 全 0 / 空 / 缺 key）；**get_git_provenance 多种 mock 路径**（commit 前后空白 strip / strip 后空 → None / returncode != 0 / dirty status 非空 / dirty status returncode != 0 → False / OSError 第一/二次 / TimeoutExpired）；**get_dependency_versions 各种异常路径**（keys 精确 / 值类型 / PackageNotFoundError / generic Exception / 返回 dict）；**build_provenance max_chars int 强制转换**（int / str 转 int / parser_version None / 有值 / evaluator_version / run_timestamp_iso ISO 含 T / 9 个 keys）；**build_devset_section 全字段映射**（passthrough / 6 keys / 直接属性读）；**模块源码补强**（求和 / macro average / not_evaluated / figure_caption / importlib.metadata / subprocess.run / cwd=str / capture_output / timeout=10 / pypdfium2 / python-docx / pdfplumber）；**AST 结构补强**（5 函数 / 4 顶层 Assign（含 __all__）/ _RATIO_METRICS Tuple 12 elts / _COUNT_METRICS Tuple 1 elt / _SUCCESS_BOOL_METRICS Tuple 1 elt / get_git_provenance 1 try + 1 handler Tuple(2) / aggregate_summary ≥5 Subscript + 4 个 summary 赋值 / build_provenance return Dict / build_devset_section return Dict / 无 ClassDef / module docstring）；**forbidden tokens 第一百零八批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges61.py`（103 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 子集属性**：12 测试
+- **_COUNT_METRICS / _SUCCESS_BOOL_METRICS 单元素**：7 测试
+- **aggregate_summary counts 边界**：5 测试
+- **aggregate_summary success_rates bool 严格性**：5 测试
+- **aggregate_summary ratio 各项独立 null**：5 测试
+- **aggregate_summary silent_drop 各种**：5 测试
+- **get_git_provenance 多种 mock 路径**：8 测试
+- **get_dependency_versions 各种异常路径**：5 测试
+- **build_provenance max_chars int 强制转换**：7 测试
+- **build_devset_section 全字段映射**：3 测试
+- **模块源码补强**：12 测试
+- **AST 结构补强**：14 测试
+- **forbidden tokens 第一百零八批**：14 测试
+
+### 撞墙记录
+- 3 fail 首跑：
+  1. `test_ratio_metrics_chunks_after_text_batch47`：假设错误——chunk_reference_intact_ratio 在 idx 4，比 text_* (5,6,7) 早。改为：chunk_reference_intact_ratio 在 text_preservation_equal 之前 / chunk_boundary_* 在 text_char_multiset_recall 之后。
+  2. `test_git_provenance_dirty_status_returncode_nonzero_batch47`：实现是 `bool(returncode==0 and stdout.strip())`，returncode != 0 时短路为 False（不进 except），dirty 计算为 False，不是默认 True。改为断言 False。
+  3. `test_ast_top_level_assigns_count_batch47`：实际 4 个（3 个常量 Tuple + 1 个 __all__）。改为 4。
+
+### 测试基线
+- 总数：75503 passed, 22 skipped, 0 failed（414.05s）
+- 较上轮 +103（75400 → 75503）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第八十九轮（继续 edges 加强 _process_one unlink OSError + _load_annotation JSONDecodeError）
+  - evaluation/annotation_metrics.py 第九十轮（继续 edges 加强 chunk_boundary_prf 顺序匹配 + figure_caption_prf null）
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter + _sort_key）
+  - evaluation/schema.py 第九十二轮（继续 edges 加强 EvalSchemaError pickle + const vs enum）
+  - evaluation/__init__.py 第七轮（继续 edges 加强 4 常量属性 + 模块 __loader__/__spec__）
+  - evaluation/metrics.py 第八十九轮（继续 edges 加强 14 metrics keys + pipeline_failed）
+  - evaluation/manifest.py 第八十八轮（继续 edges 加强 frozen dataclass 边界）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges61 已饱和（_RATIO_METRICS 子集 + counts/success/ratio/silent_drop 各种边界 + git_provenance 8 mock 路径 + dependency_versions 异常 + build_provenance max_chars 转换 + build_devset_section passthrough + AST 完整结构 + forbidden tokens）。下一轮选 evaluation/runner.py 第八十九轮，覆盖 _process_one 5-tuple 返回 + _load_annotation (OSError, JSONDecodeError) + run_evaluation 写盘 ensure_ascii=False + AST 结构。
+
+---
+
 ## Round 637 — evaluation/manifest.py 第八十七轮（76 测试）
 
 ### 目标
