@@ -4,6 +4,50 @@
 
 ---
 
+## Round 647 — evaluation/runner.py 第九十轮（57 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第九十轮 edges 测试，补强 edges72 未触及的角度（第四十八批）：**_load_annotation 更多边界**（额外 keys / null / string / number / boolean / nested dict / UTF-8 BOM 触发 JSONDecodeError 返回 None）；**_process_one image_dir 路径计算**（使用 source_hash 通过 image_output_dir_for / out_stub 路径是 `_per_doc/<doc_id>.json` / process_single 调用参数正确 / elapsed 正数）；**run_evaluation annotation_present 透传**（None 时 False / 加载到时 True）；**run_evaluation metrics.update 链**（compute_automatic_metrics + figure_caption_prf + chunk_boundary_prf 三源合并）；**run_evaluation tolerance_record / missing_markers_record 处理**（chunk_b 返回的 _tolerance_chars 被 pop 到 per_doc / missing_markers 缺失默认 []）；**run_evaluation image_base_dir 推导**（image_dir.is_dir() True 时传入 / False 时 None / document None 时 None）；**模块源码补强**（_per_doc / doc_id / image_dir / chunk_reason / parse_reason / wall_time_seconds / provenance / devset / summary / expected_failures / public_per_doc / image_base_dir）；**AST 结构补强**（3 函数 / run_evaluation 3 top-level for + 1 with + 1 dump call / _process_one perf_counter ≥2 + return ≥3 / _load_annotation 1 open call / 无 ClassDef / 无 AsyncFunctionDef / module docstring）；**forbidden tokens 第一百一十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges73.py`（57 测试）
+
+### 覆盖要点
+- **_load_annotation 更多边界**：7 测试
+- **_process_one image_dir 路径计算**：4 测试
+- **run_evaluation annotation_present 透传**：2 测试
+- **run_evaluation metrics.update 链**：1 测试
+- **run_evaluation tolerance_record / missing_markers_record 处理**：2 测试
+- **run_evaluation image_base_dir 推导**：3 测试
+- **模块源码补强**：12 测试
+- **AST 结构补强**：13 测试
+- **forbidden tokens 第一百一十七批**：15 测试
+
+### 撞墙记录
+- 2 fail 首跑：
+  1. `test_load_annotation_bom_batch48`：UTF-8 BOM 不会被 open 默认 strip，json.loads 直接抛 JSONDecodeError → 返回 None（不是 strip 后解析成功）。
+  2. `test_run_evaluation_metrics_merged_from_three_sources_batch48`：runner.py 通过 `from evaluation.metrics import compute_automatic_metrics` / `from evaluation.annotation_metrics import chunk_boundary_prf, figure_caption_prf` 把名字绑定到 `evaluation.runner` 命名空间。patch `evaluation.metrics.compute_automatic_metrics` 不影响 runner 内部引用。改 patch `evaluation.runner.compute_automatic_metrics` / `evaluation.runner.figure_caption_prf` / `evaluation.runner.chunk_boundary_prf`（全文件替换所有出现）。
+
+### 测试基线
+- 总数：76298 passed, 22 skipped, 0 failed（420.20s）
+- 较上轮 +57（76241 → 76298）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第九十一轮（继续 edges 加强 chunk_boundary_prf 重复 marker）
+  - evaluation/cli.py 第九十二轮（继续 edges 加强 inspect-doc _sort_key 输出顺序）
+  - evaluation/schema.py 第九十三轮（继续 edges 加强 EvalSchemaError 子类化）
+  - evaluation/__init__.py 第八轮（继续 edges 加强 monkeypatch + importlib.reload）
+  - evaluation/metrics.py 第九十一轮（继续 edges 加强 compute pipeline_failed 14 keys）
+  - evaluation/manifest.py 第八十九轮（继续 edges 加强 Unicode drive letters）
+  - evaluation/report.py 第九十轮（继续 edges 加强 aggregate 混合）
+  - evaluation/runner.py 第九十一轮（继续 edges 加强 errors JSON 输出）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges73 已饱和（_load_annotation 7 边界 + _process_one image_dir 4 路径 + annotation_present 透传 + metrics.update 三源合并 + tolerance/missing_markers pop + image_base_dir 推导 + AST 完整 + forbidden tokens）。下一轮选 evaluation/annotation_metrics.py 第九十一轮，覆盖 chunk_boundary_prf 重复 marker 完整路径 + figure_caption_prf 边界。
+
+---
+
 ## Round 646 — evaluation/report.py 第八十九轮（67 测试）
 
 ### 目标
