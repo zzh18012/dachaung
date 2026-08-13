@@ -4,6 +4,50 @@
 
 ---
 
+## Round 627 — evaluation/__init__.py 第五轮（104 测试）
+
+### 目标
+- 给 `evaluation/__init__.py`（29 行）加第五轮 edges 测试，补强 edges4 未触及的角度（第四十五批）：**模块对象属性**（__name__=="evaluation" / __package__=="evaluation" / __file__ 绝对路径 + 真实存在 + 末尾 __init__.py / __loader__ 非 None / __spec__ 非 None / __spec__.name=="evaluation" / __builtins__ 存在 / __path__ 是 list + 至少 1 个目录 / __name__ != "__main__"）；**sys.modules 一致性**（sys.modules["evaluation"] is evaluation / 二次 import 同一对象）；**dir/vars**（dir 含 4 常量 + __all__ / vars 含 4 常量 / vars(__all__) 4 entries / vars(evaluation) is evaluation.__dict__）；**模块 hashable 但不能 pickle**（hash 返回 int / pickle.dumps 抛 TypeError / import 同 id）；**常量 hashable**（4 个 hash 都是 int / 同字符串字面量同 hash / 可做 dict key / set 自动去重到 2 元素）；**版本字符串结构**（点数 1 / 首尾都是数字 / 无字母 / 无下划线 / 无 dash / 无空格 / 无 a-f / split "." / major=1 minor=1 or 0）；**__all__ entries 在 __dict__**（每个 entry 在 __dict__ / 不是 callable / 是 str 类型 / count=4 / unique / 长度≥3 / 全大写+下划线 / 都以 _VERSION 结尾）；**模块源码字符串精确**（4 个 `X_VERSION = "x.x"` 字面量 / 设计原则 4 句 / 版本历史 v1.0+v1.1 / text_preservation / normalize_text / not_instrumented / __all__ = [ / 4 个名字 / 无相对 import / 无顶层 import os/sys/json/pathlib/typing）；**AST 结构**（首节点 docstring / 无 future import / 4 个 _VERSION 赋值 / 1 个 __all__ 赋值 / __all__ 是 List of Constant str / 最后节点是 __all__ 赋值 / 顶层无 class/function/for/while/if/try/with / 总节点 6 / 节点类型顺序 Expr×1 + Assign×5 / 每个 Assign 单 target）；**forbidden tokens 第九十七批**（eval/exec/compile/globals/locals/os.system/popen/yaml.load/pickle.load + class/def/async/yield/lambda/walrus 关键字）
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges5.py`（104 测试）
+
+### 覆盖要点
+- **模块对象属性**：12 测试
+- **sys.modules 一致性**：2 测试
+- **dir/vars**：5 测试
+- **模块 hashable / pickle**：3 测试
+- **常量 hash + id**：7 测试
+- **版本字符串结构**：16 测试
+- **__all__ entries in __dict__**：8 测试
+- **模块源码字符串**：14 测试
+- **AST 结构**：17 测试
+- **forbidden tokens 第九十七批**：15 测试
+- **综合**：6 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_module_picklable_batch45`：模块对象在 CPython 不能 pickle（TypeError: cannot pickle 'module' object）。改为 `pytest.raises(TypeError)`。
+
+### 测试基线
+- 总数：74335 passed, 22 skipped, 0 failed（404.50s）
+- 较上轮 +104（74231 → 74335）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第八十五轮（继续 edges 加强 _ratio/_null helper + Counter 行为）
+  - evaluation/manifest.py 第八十六轮（继续 edges 加强 _is_absolute_like Unicode 边界）
+  - evaluation/report.py 第八十七轮（继续 edges 加强 _RATIO_METRICS 12 项顺序）
+  - evaluation/runner.py 第八十八轮（继续 edges 加强 _process_one 错误聚合）
+  - evaluation/annotation_metrics.py 第八十九轮（继续 edges 加强 chunk_boundary_prf 顺序匹配）
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter）
+  - evaluation/schema.py 第九十一轮（继续 edges 加强 EvalSchemaError pickle）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：__init__.py edges5 已饱和（模块对象属性 + 4 常量 hash/id + 字符串结构 + AST 完整 + forbidden tokens）。下一轮选 evaluation/metrics.py 第八十五轮，覆盖 _ratio/_null/_bool_metric/_int_metric 4 helper 的更多边界 + Counter 行为 + math 模块边界。
+
+---
+
 ## Round 626 — evaluation/schema.py 第九十轮（71 测试）
 
 ### 目标
