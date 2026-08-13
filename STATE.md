@@ -4,6 +4,43 @@
 
 ---
 
+## Round 600 — evaluation/manifest.py 第六十八轮（189 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第六十八轮 edges 测试，覆盖 edges66 未触及的角度（第四十批）：**_is_absolute_like**（callable / 仅 / / UNC 路径不识别 / 三字母无分隔符 / Windows 盘符正反斜杠 / 大小写盘符 / a:b 相对路径 / Unicode 字母算 alpha / 空格 / 数字 / 下划线）；**_has_backslash**（callable / 空字符串 / 仅反斜杠 / 无反斜杠 / 混合分隔符 / 多反斜杠）；**_resolve_relative_path**（valid / empty / 绝对 / Windows 盘符 / 反斜杠 / 项目根外 / ./合法 / 深层嵌套 / 返回绝对路径 / signature / no defaults）；**DocumentEntry**（dataclass / 10 字段 / 字段名 / frozen / sha256 可空 / categories 默认空 / categories 带值 / paired_with / annotation_resolved / expectations / 相等 / 不等 / hashable / 不 hashable 含 dict）；**ExpectedFailure**（dataclass / 5 字段 / 字段名 / frozen / source_type 可空 / source_type str / expected_error_code / 相等 / 不等 / hashable）；**Manifest properties**（dataclass / 5 字段 / 字段名 / frozen / file_count empty/three / pdf_count / docx_count / pdf+docx / 非 pdf/docx 不计 / categories_covered 排序 / categories_covered 空 / 返回 list / content_group_count 多种情况 / 单向 pair / devset_status / project_root / 相等 / hashable / documents 是 tuple / expected_failures 是 tuple / manifest_version）；**ManifestError**（is Exception / default message / with message / 可抛 / 可作为 Exception 捕获 / module level）；**_detect_project_root**（callable / 有 pyproject / 无 pyproject / file input / 深层嵌套）；**load_manifest**（callable / 缺失文件 / 无效 JSON / str path / 返回 Manifest / devset_status / manifest_version / documents count / resolved_path / categories / project_root / expected_failures / annotation_file / expectations / paired_with / wrong version / auto detect / 绝对路径 raise / 反斜杠 raise / 项目根外 raise / signature / project_root default None / manifest_path no default）；**module source forbidden tokens 第七十三批**；**module source 字符串精确补强第六十九批**；**signatures 第六十九批**；**module 合理性 第六十九批**（含 AST 检查）；**端到端集成 第六十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges67.py`（189 测试）
+
+### 覆盖要点
+- **_is_absolute_like 第四十批**：12 测试
+- **_has_backslash 第四十批**：6 测试
+- **_resolve_relative_path 第四十批**：12 测试
+- **DocumentEntry 第四十批**：19 测试
+- **ExpectedFailure 第四十批**：11 测试
+- **Manifest properties 第四十批**：24 测试
+- **ManifestError 第四十批**：6 测试
+- **_detect_project_root 第四十批**：5 测试
+- **load_manifest 第四十批**：22 测试
+- **module source forbidden tokens 第七十三批**：14 测试（参数化）
+- **module source 字符串精确补强第六十九批**：27 测试
+- **signatures 第六十九批**：12 测试
+- **module 合理性 第六十九批**：15 测试
+- **端到端集成 第六十九批**：4 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `_is_absolute_like("中:/x")` 我以为非 ASCII 字母不算 alpha，实际 Python `str.isalpha()` 对 Unicode 字母返回 True → 改 expect True
+
+### 测试基线
+- 总数：71372 passed, 22 skipped, 0 failed（388.50s）
+- 较上轮 +189（71183 → 71372）
+
+### 下一步建议
+- 下一轮选 evaluation/schema.py 第六轮（继续 edges 加强 validate / EvalSchemaError 边界）
+
+---
+
 ## Round 599 — evaluation/annotation_metrics.py 第六十五轮（132 测试）
 
 ### 目标
