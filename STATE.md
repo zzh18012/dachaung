@@ -4,6 +4,46 @@
 
 ---
 
+## Round 674 — evaluation/schema.py 第九十六轮（107 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第九十六轮 edges 测试，补强 edges64 未触及的角度（第五十一批）：**EvalSchemaError 更深**（message only / errors list / errors 默认 [] / repr 含类名 / isinstance Exception / args 元组 / raise no from __cause__ is None / raise with from / str 不含 errors / raise and caught）；**_schema_path 边界**（返回 Path / 不存在 raise FileNotFoundError / 错误 message 含完整路径 / 目录名失败 / 3 个合法 schema）；**load_schema 边界**（manifest / annotation / evaluation-report 返回 dict / manifest 有 $schema 或 type + properties / annotation 有 doc_id 属性 / 不存在 schema raise FileNotFoundError）；**validate 多场景**（manifest valid / manifest missing required / annotation valid / annotation invalid / evaluation-report valid / evaluation-report invalid / 成功返回 None / EvalSchemaError.errors 是 list of dicts / message 含 count / message 含 schema_name）；**validate_file 多场景**（manifest / annotation / evaluation-report valid / missing file FileNotFoundError / JSONDecodeError / Schema failure / str 路径 / Path 对象）；**SCHEMAS_DIR 路径**（is Path / is_dir / name='schemas' / parent 是项目根 / 含 3 schema 文件 / 至少 3 files / 只 .json 文件）；**模块源码补强**（json/Path/Any imports / Draft202012Validator+JSValidationError imports / SCHEMAS_DIR 定义 / EvalSchemaError class / super().__init__(message) / self.errors = errors or [] / Draft202012Validator call / iter_errors call / sorted lambda / absolute_path+absolute_schema_path / with open / docstring / __all__ 5 entries）；**AST 结构补强**（4 函数 + 顺序 / 1 ClassDef / EvalSchemaError 1 method __init__ / super call / self.errors assign / 无 AsyncFunctionDef / 6 imports / module docstring / 2 module-level Assigns / SCHEMAS_DIR 定义 / __all__ List 5 / validate 1 for + sorted lambda + raise / validate_file 1 with + validate call + if not is_file / _schema_path if not is_file + raise / load_schema 1 with / 无 Global/Nonlocal / 无 module-level With / 无 While/Delete / 无 ImportStar）；**forbidden tokens 第一百四十四批**（open count=2 / 无 async/await / 无 yield）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges65.py`（107 测试）
+
+### 覆盖要点
+- **EvalSchemaError 更深**：10 测试
+- **_schema_path 边界**：5 测试
+- **load_schema 边界**：6 测试
+- **validate 多场景**：11 测试
+- **validate_file 多场景**：8 测试
+- **SCHEMAS_DIR 路径**：9 测试
+- **模块源码补强**：17 测试
+- **AST 结构补强**：25 测试
+- **forbidden tokens 第一百四十四批**：17 测试
+
+### 撞墙记录
+- 0 fails 首跑。107 测试一次通过。
+
+### 测试基线
+- 总数：78850 passed, 22 skipped, 0 failed（417.89s）
+- 较上轮 +107（78743 → 78850）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十二轮（继续 edges 加强）
+  - evaluation/report.py 第九十三轮（继续 edges 加强）
+  - evaluation/runner.py 第九十四轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十五轮（继续 edges 加强）
+  - evaluation/cli.py 第九十六轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges65 已饱和（EvalSchemaError 10 + _schema_path 5 + load_schema 6 + validate 11 + validate_file 8 + SCHEMAS_DIR 9 + 模块源码 17 + AST 25 + forbidden 17）。下一轮选 evaluation/metrics.py 第九十四轮，覆盖 _strip_unicode_whitespace 更细 / Counter & 多集合 / text_preservation 等。
+
+---
+
 ## Round 673 — evaluation/cli.py 第九十五轮（108 测试）
 
 ### 目标
