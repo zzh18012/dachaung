@@ -4,6 +4,40 @@
 
 ---
 
+## Round 619 — evaluation/__init__.py 第四轮（115 测试）
+
+### 目标
+- 给 `evaluation/__init__.py`（28 行）加第四轮 edges 测试，补强 edges3 未触及的角度（第四十四批）：**4 个版本常量精确值**（EVALUATOR=REPORT="1.1" / ANNOTATION=MANIFEST="1.0" / 2 个 distinct）；**版本常量精确类型**（isinstance str / not int / not bool / not None / truthy）；**版本字符串操作**（split / replace / upper / lower / 长度 3 / no alpha upper==lower）；**版本大小比较**（"1.1" > "1.0" / 字符串 indexing / slice / negative index）；**hashable + pickleable**（hash / pickle roundtrip / set membership / dict key）；**__all__**（4 entries exact / 顺序与源码一致 / 是 list / 可变 / no dunder / 全大写 / imported to namespace）；**模块属性**（dir 含 4 个版本 + __all__ + __doc__ / evaluation.X == imported X）；**模块文件**（ends __init__.py / parent=evaluation / name=evaluation / package=evaluation / exists / size < 2KB）；**模块源码字符串精确**（设计原则 / 版本历史 / v1.0 / v1.1 / text_preservation / not_instrumented / 不修改 / 不伪造 / 分母 / 不可横向比较 / normalize_text / 4 个 assignment 字符串精确）；**AST 结构**（无 class/function/import/try/for/while/with/async/if / 有 docstring / 5 个 assigns / first=EVALUATOR / last=__all__ / 顶层只 Expr+Assign）；**reload 后保持**（4 个版本 + __all__ + docstring）；**JSON 序列化**（单值 / dict / list / roundtrip）；**forbidden tokens 第八十九批**；**综合**（首字符 isdigit / concat / repeat / join roundtrip / f-string / str/repr）
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges4.py`（115 测试）
+
+### 覆盖要点
+- **版本常量精确值 + 类型**：16 测试
+- **版本字符串操作 + 比较**：12 测试
+- **hashable + pickleable**：4 测试
+- **__all__**：12 测试
+- **模块属性**：10 测试
+- **模块文件**：7 测试
+- **模块源码字符串**：14 测试
+- **AST 结构**：13 测试
+- **reload**：6 测试
+- **JSON 序列化**：4 测试
+- **forbidden tokens**：10 测试
+- **综合**：7 测试
+
+### 撞墙记录
+- 0 fail 首跑通过
+
+### 测试基线
+- 总数：73725 passed, 22 skipped, 0 failed（719.25s）
+- 较上轮 +115（73610 → 73725）
+
+### 下一步建议
+- 下一轮到 evaluation/metrics.py 第八十四轮（继续 edges 加强 compute_automatic_metrics / _text_preservation / _heading_boundary_ratio 边界）
+
+---
+
 ## Round 618 — evaluation/schema.py 第八十二轮（92 测试）
 
 ### 目标
