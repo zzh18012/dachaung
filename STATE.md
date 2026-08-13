@@ -4,6 +4,41 @@
 
 ---
 
+## Round 583 — evaluation/report.py 第五十四轮（137 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第五十四轮 edges 测试，覆盖 edges53 未触及的角度（第三十五批）：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS**（len 12 / no duplicates / all strings / disjoint sets / contains text_preservation_equal / 不含 figure_caption / count==1 / success_bool==1）；**get_git_provenance**（timeout / OSError / FileNotFoundError / rev-parse 失败 / stdout 空 / status 失败 / clean status / strip whitespace / timeout=10 / cwd=str / capture_output=True / encoding=utf-8 / errors=replace）；**get_dependency_versions**（returns dict / 3 packages / values str|None / PackageNotFoundError / generic Exception / normal path）；**build_provenance**（returns dict / 9 keys / parser_name / parser_version None|str / max_chars int / negative / run_timestamp_iso parseable / evaluator_version / report_version / dependencies dict / 3 dep keys / idempotent）；**build_devset_section**（returns dict / 6 keys / status / file_count / pdf_count / docx_count / content_group_count / categories_covered / empty categories / unicode categories）；**aggregate_summary**（returns dict / 4 keys / empty counts / empty success_rates / empty silent_drop / counts skip null / counts sum / success all true / all false / mixed / null as false / ratio macro simple / skip null / all null / silent_drop sum / skip null / all null / 不 mutate）；**module source forbidden tokens 第五十九批**（subprocess 合法保留）；**module source 字符串精确补强第五十五批**；**signatures 第五十五批**；**module 合理性 第五十五批**；**端到端集成 第五十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges54.py`（137 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第三十五批**：19 测试
+- **get_git_provenance 第三十五批**：13 测试
+- **get_dependency_versions 第三十五批**：6 测试
+- **build_provenance 第三十五批**：13 测试
+- **build_devset_section 第三十五批**：11 测试
+- **aggregate_summary 第三十五批**：18 测试
+- **module source forbidden tokens 第五十九批**：14 测试（参数化，subprocess 合法保留）
+- **module source 字符串精确补强第五十五批**：20 测试
+- **signatures 第五十五批**：10 测试
+- **module 合理性 第五十五批**：10 测试
+- **端到端集成 第五十五批**：5 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `bool(r2.returncode == 0 and r2.stdout.strip())` 当 returncode != 0 时 → `bool(False and X)` = False（不是 True）→ 修正注释与断言
+  2. `parser_version` 是 required positional（无默认值），annotation 是 'str | None' → 改用 `inspect.Parameter.empty`
+
+### 测试基线
+- 总数：69185 passed, 22 skipped, 0 failed（408.77s）
+- 较上轮 +137（69048 → 69185）
+
+### 下一步建议
+- 下一轮选 evaluation/runner.py 第六十七轮（继续 edges 加强 _load_annotation / _process_one / run_evaluation）
+
+---
+
 ## Round 582 — evaluation/schema_validation.py 第四轮（63 测试）
 
 ### 目标
