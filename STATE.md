@@ -4,6 +4,54 @@
 
 ---
 
+## Round 653 — evaluation/manifest.py 第八十九轮（131 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第八十九轮 edges 测试，补强 edges73 未触及的角度（第四十八批）：**_is_absolute_like Unicode 字母**（中文/日文/韩文/俄文/阿拉伯文 drive 通过 / emoji drive 拒绝）；**_is_absolute_like 数字与特殊字符**（数字/下划线/点/dash drive 拒绝 / 空字符串 / 只有冒号 / 1 字符 / 2 字符 / 3 字符无分隔符 / 3 字符 dash）；**_has_backslash 多位置**（开头/结尾/中间/多个/只 \\ / 无 / 空 / 全正斜杠）；**_resolve_relative_path 错误信息精确**（field_name 出现在 empty/absolute/backslash/outside_root 错误中 / 成功返回绝对路径 / 在 root 内）；**load_manifest project_root**（detect / 显式 Path / 显式 str / 文件不存在 / 无效 JSON）；**load_manifest expected_failures 多字段组合**（含 source_type / 缺 source_type / 多 expected_failures / 无 expected_failures key）；**Manifest property 完整性**（categories_covered 空/排序去重 / pdf_count / docx_count / file_count / content_group_count 全 unpaired / 双向配对 / 单向配对 / 混合 / 双对 / 双对 + unpaired）；**_detect_project_root 多场景**（pyproject / 文件输入 / 无 pyproject / 嵌套深）；**DocumentEntry frozen 完整性**（10 字段全 FrozenInstanceError）；**ExpectedFailure frozen 完整性**（5 字段）；**Manifest frozen 完整性**（5 字段）；**ManifestError 抛出场景**（is Exception / raise+catch / str / 无 errors 属性 / args）；**模块源码补强**（json/dataclass/Path/Any/MANIFEST_VERSION/validate import / 4 class / 3 frozen=True / 绝对路径/反斜杠/项目根 docstring / 5 @property / __all__ 5 entries / relative_to / is_file）；**AST 结构补强**（5 函数 / 4 ClassDef / 无 AsyncFunctionDef / module docstring / DocumentEntry 10 AnnAssign / ExpectedFailure 5 / Manifest 5 / Manifest 5 @property / ManifestError 0 methods / load_manifest ≥2 for + ≥1 try / _resolve_relative_path ≥1 try + ≥3 if / _is_absolute_like ≥3 if / _detect_project_root 1 for + ≥2 if / 1 Assign / 7 import）；**forbidden tokens 第一百二十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges74.py`（131 测试）
+
+### 覆盖要点
+- **_is_absolute_like Unicode 字母**：6 测试
+- **_is_absolute_like 数字与特殊字符**：10 测试
+- **_has_backslash 多位置**：8 测试
+- **_resolve_relative_path 错误信息精确**：7 测试
+- **load_manifest project_root**：5 测试
+- **load_manifest expected_failures 多字段组合**：4 测试
+- **Manifest property 完整性**：10 测试
+- **_detect_project_root 多场景**：4 测试
+- **DocumentEntry frozen 完整性**：10 测试
+- **ExpectedFailure frozen 完整性**：5 测试
+- **Manifest frozen 完整性**：5 测试
+- **ManifestError 抛出场景**：5 测试
+- **模块源码补强**：19 测试
+- **AST 结构补强**：18 测试
+- **forbidden tokens 第一百二十三批**：15 测试
+
+### 撞墙记录
+- 无失败首跑。
+
+### 测试基线
+- 总数：76916 passed, 22 skipped, 0 failed（414.47s）
+- 较上轮 +131（76785 → 76916）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第九十轮（继续 edges 加强 aggregate 混合）
+  - evaluation/runner.py 第九十一轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十二轮（继续 edges 加强 anchor 多字段组合）
+  - evaluation/cli.py 第九十三轮（继续 edges 加强 run 子命令完整路径）
+  - evaluation/schema.py 第九十四轮（继续 edges 加强 validate errors 排序稳定性）
+  - evaluation/__init__.py 第九轮（继续 edges 加强 monkeypatch 链）
+  - evaluation/metrics.py 第九十二轮（继续 edges 加强 _image_resource_ratio 多路径）
+  - evaluation/manifest.py 第九十轮（继续 edges 加强 annotation_file 解析）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges74 已饱和（_is_absolute_like Unicode 16 + _has_backslash 8 + _resolve_relative_path 错误信息 7 + load_manifest project_root/expected_failures 9 + Manifest property 10 + _detect_project_root 4 + frozen 20 + ManifestError 5 + AST 完整 + forbidden tokens）。下一轮选 evaluation/report.py 第九十轮，覆盖 aggregate 混合 + get_dependency_versions mock。
+
+---
+
 ## Round 652 — evaluation/metrics.py 第九十一轮（144 测试）
 
 ### 目标
