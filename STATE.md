@@ -4,6 +4,48 @@
 
 ---
 
+## Round 656 — evaluation/annotation_metrics.py 第九十二轮（60 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十二轮 edges 测试，补强 edges73 未触及的角度（第四十八批）：**chunk_boundary_prf anchor 多字段组合**（多 anchor 不同 marker / 同 marker 不同 position / anchor 含 id+label+note 额外 keys 被忽略）；**chunk_boundary_prf 更深路径**（chunks=2 / chunks=10 / stream 多空白 normalize / 3 anchor 1 预测但 search_from 推进使第 3 个 missing）；**chunk_boundary_prf _missing_markers 多 marker**（2 missing / 1 missing 1 found / position=after missing）；**tolerance=0 完美匹配 / 完全不匹配**；**figure_caption_prf 不依赖任何输入字段**（接受任意 dict / 不访问 document 或 annotation / 不调用 normalize_text）；**模块源码补强**（_null/_ratio 调用 / 6 个 reason 字符串 / Counter import 但不调用 / denom 计算 / 2*p*r/denom / pairs.sort / predicted.append / gt_positions.append / missing_markers.append / used_pred+used_gt / docstring 提到 parser）；**AST 结构补强**（gt_positions/predicted/pairs init / ≥5 Assign / ≥2 AugAssign / search_from Assign / matched += 1 / used_pred+used_gt = set() / 无 ClassDef / 无 AsyncFunctionDef / module docstring / 2 top-level Assign / 5 import）；**forbidden tokens 第一百二十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges74.py`（60 测试）
+
+### 覆盖要点
+- **chunk_boundary_prf anchor 多字段组合**：3 测试
+- **chunk_boundary_prf 更深路径**：4 测试
+- **chunk_boundary_prf _missing_markers 多 marker**：3 测试
+- **tolerance=0 完美匹配 / 完全不匹配**：2 测试
+- **figure_caption_prf 不依赖任何输入字段**：3 测试
+- **模块源码补强**：17 测试
+- **AST 结构补强**：13 测试
+- **forbidden tokens 第一百二十六批**：15 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_chunk_boundary_gt_more_than_pred_batch48`：错误假设第 3 个 anchor (BBBB after) gt_pos=9。实际 search_from 顺序推进：anchor1 后 search_from=4，anchor2 (BBBB before) 在 5 找到后 search_from=9，anchor3 (BBBB after) find("BBBB", 9)=-1 → 计入 missing_markers，不进 gt_positions。所以 num_gt=2，recall=0.5（不是 1/3）。改正后通过。
+
+### 测试基线
+- 总数：77146 passed, 22 skipped, 0 failed（414.68s）
+- 较上轮 +60（77086 → 77146）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第九十三轮（继续 edges 加强 run 子命令完整路径）
+  - evaluation/schema.py 第九十四轮（继续 edges 加强 validate errors 排序稳定性）
+  - evaluation/__init__.py 第九轮（继续 edges 加强 monkeypatch 链）
+  - evaluation/metrics.py 第九十二轮（继续 edges 加强 _image_resource_ratio 多路径）
+  - evaluation/manifest.py 第九十轮（继续 edges 加强 annotation_file 解析）
+  - evaluation/report.py 第九十一轮（继续 edges 加加强 build_provenance 时间戳）
+  - evaluation/runner.py 第九十二轮（继续 edges 加加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十三轮（继续 edges 加加强 anchor position 校验）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges74 已饱和（anchor 多字段组合 3 + 更深路径 4 + _missing_markers 3 + tolerance=0 边界 2 + figure_caption_prf 不依赖输入 3 + AST 完整 + forbidden tokens）。下一轮选 evaluation/cli.py 第九十三轮，覆盖 run 子命令完整路径 + main 行为分支。
+
+---
+
 ## Round 655 — evaluation/runner.py 第九十一轮（77 测试）
 
 ### 目标
