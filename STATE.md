@@ -4,6 +4,37 @@
 
 ---
 
+## Round 609 — evaluation/cli.py 第七十三轮（141 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第七十三轮 edges 测试，补强 edges67 未触及的角度（第四十一批）：**_build_parser 子命令选项精确**（prog=evaluation.cli / description / formatter_class=RawDescriptionHelpFormatter / run --manifest/--output/--parser/--max-chars/--tolerance-chars / validate-report input / inspect-doc input + --tolerance-chars / choices=fallback,kreuzberg / 默认值 / required 校验 / unknown raises / help raises）；**_format_metric**（None+reason / None no reason / True/False / int / 0 / negative / float / 0.0 / 1.0 / dict / sorted dict / empty dict / string / list / unicode name / long name / alignment 36 / bool with reason）；**_run_inspect_doc**（missing file rc=2 / invalid JSON rc=1 / top-level array rc=1 / top-level int rc=1 / top-level string rc=1 / empty dict rc=0 / full dict rc=0 / prints file path / document_id / default '?' / elements count / chunks count / parser info / 不写文件 / 幂等 / Unicode content）；**main**（no args raises / unknown raises / run missing manifest rc=2 / validate-report missing rc=2 / inspect-doc missing rc=2 / validate-report invalid rc=1 / inspect-doc invalid rc=1 / inspect-doc empty rc=0 / validate-report empty dict rc=1 / run with valid manifest rc=0 / run with load_manifest failure rc=1）；**module source 字符串精确**；**AST 结构**（含 main guard 检查）；**module 合理性**；**端到端集成**；**forbidden tokens 第八十批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges68.py`（141 测试）
+
+### 覆盖要点
+- **_build_parser**：30 测试
+- **_format_metric**：23 测试
+- **_run_inspect_doc**：19 测试
+- **main**：17 测试
+- **module source 字符串精确**：27 测试
+- **AST 结构**：6 测试
+- **module 合理性**：7 测试
+- **端到端集成**：3 测试
+- **forbidden tokens**：14 测试
+
+### 撞墙记录
+- 0 fail（一次通过）
+
+### 测试基线
+- 总数：72648 passed, 22 skipped, 0 failed（397.97s）
+- 较上轮 +141（72507 → 72648）
+
+### 下一步建议
+- 下一轮到 evaluation/schema.py 第七十四轮（继续 edges 加强 EvalSchemaError / _schema_path / load_schema / validate / validate_file 边界）
+
+---
+
 ## Round 608 — evaluation/annotation_metrics.py 第七十二轮（114 测试）
 
 ### 目标
