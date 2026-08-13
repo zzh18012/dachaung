@@ -4,6 +4,40 @@
 
 ---
 
+## Round 614 — evaluation/report.py 第七十八轮（113 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第七十八轮 edges 测试，补强 edges57 未触及的角度（第四十三批）：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS tuple 类型与不可变性**（TypeError on item assignment）；**长度精确**（_RATIO_METRICS=12 / _COUNT_METRICS=1 / _SUCCESS_BOOL_METRICS=1）；**三集合不相交**（disjoint pairwise）；**_RATIO_METRICS first/last**（schema_valid / chunk_boundary_f1）；**_RATIO_METRICS exact set**（12 元素精确）；**get_git_provenance 签名**（1 param / POSITIONAL_OR_KEYWORD / no default / return annotation dict）；**subprocess 调用参数检验**（timeout=10 / cwd=str(project_root) / capture_output=True / encoding=utf-8 / errors=replace）；**get_git_provenance 行为**（commit strip / whitespace-only → None / returncode nonzero → None / dirty True/False / OSError/SubprocessError/TimeoutExpired 兜底）；**get_dependency_versions 签名**（0 params）；**get_dependency_versions 返回**（3 keys exact / values None|str / PackageNotFoundError / Exception 兜底）；**build_provenance**（4 params POSITIONAL_OR_KEYWORD / 9 keys / max_chars int / parser_name passthrough / parser_version None / dependencies dict / run_timestamp_iso fromisoformat / evaluator_version=report_version=1.1）；**build_devset_section**（1 param / 6 keys / duck-typed FakeManifest）；**aggregate_summary 多种组合**（empty / 0 参与不 None 过滤 / 非严格 True 不计入 success / ratio 0 参与 / mixed / silent_drop None 跳过 / idempotent / field order）；**__all__ 5 entries**；**模块源码字符串精确**（不混合类型 / counts / success_rates / ratio_macro_averages / silent_drop_count）；**AST 结构**（无 class / 5 functions / 4 assigns / 无 try/for/while/with/async / 至少 4 imports / future 是第二个）；**forbidden tokens 第八十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges58.py`（113 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS tuple 与 disjoint**：16 测试
+- **get_git_provenance 签名 + subprocess 参数 + 行为**：18 测试
+- **get_dependency_versions**：8 测试
+- **build_provenance**：11 测试
+- **build_devset_section**：4 测试
+- **aggregate_summary**：21 测试
+- **__all__**：5 测试
+- **模块结构**：7 测试
+- **AST 结构**：12 测试
+- **forbidden tokens**：10 测试
+- **端到端集成**：1 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_ast_from_future_first_batch43` 期望顶层第一个是 `ast.ImportFrom`，但实际第一个是 `ast.Expr`（module docstring），`from __future__` 在第二个位置 → 改为 first=Expr / second=ImportFrom + module=="__future__"
+
+### 测试基线
+- 总数：73286 passed, 22 skipped, 0 failed（668.95s）
+- 较上轮 +113（73173 → 73286）
+
+### 下一步建议
+- 下一轮到 evaluation/runner.py 第七十九轮（继续 edges 加强 _load_annotation / _process_one / run_evaluation 边界）
+
+---
+
 ## Round 613 — evaluation/manifest.py 第七十七轮（86 测试）
 
 ### 目标
