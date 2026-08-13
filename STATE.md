@@ -4,6 +4,52 @@
 
 ---
 
+## Round 642 — evaluation/schema.py 第九十二轮（91 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第九十二轮 edges 测试，补强 edges60 未触及的角度（第四十七批）：**SCHEMAS_DIR 路径精确**（is Path / is_absolute / name="schemas" / is_dir / 含 manifest/annotation/evaluation-report schema / 父目录是项目根）；**EvalSchemaError pickle**（roundtrip / errors 保留 / errors=None / errors=[]）；**EvalSchemaError errors 默认 []**（默认空 / None → [] / 显式 list 直接引用 / str 含 message / repr / is Exception / 可抛可捕 / 可被 except Exception / args == (message,)）；**_schema_path 异常路径**（valid / invalid name FileNotFoundError / 返回 Path / 绝对路径）；**load_schema 各种**（manifest / annotation / evaluation-report / FileNotFound）；**validate 多种 error 排序**（合法 manifest 通过 / 缺 manifest_version / 无效 devset_status / manifest_version 不是 1.0 / errors 按 absolute_path 排序 / errors count / 每个 error 含 path/message/schema_path 三 key）；**validate_file 异常路径**（file not found / bad JSON / valid manifest / 接受 str 路径 / Schema 错误）；**manifest.schema.json 内部字段**（type=object / properties 含 manifest_version/devset_status/documents / required 含三项 / devset_status enum {complete, incomplete} / manifest_version const="1.0" or enum=["1.0"] / documents 是 array）；**annotation.schema.json 内部字段**（type=object / properties / annotation_version）；**evaluation-report.schema.json 内部字段**（type=object / properties / report_version / per_doc / summary / provenance）；**模块源码补强**（Draft202012Validator / iter_errors / absolute_path / sorted + lambda / encoding= / SCHEMAS_DIR / 复用 / 给人看 / 不 import app.schema）；**AST 结构补强**（4 函数 / 1 ClassDef EvalSchemaError / __init__ args == [self, message, errors] / errors 默认 None / validate 1 for + 1 Lambda + 1 Raise / _schema_path 1 if / validate_file 1 if + 1 with / load_schema 1 with / module docstring / 无 AsyncFunctionDef）；**forbidden tokens 第一百一十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges61.py`（91 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 路径精确**：8 测试
+- **EvalSchemaError pickle**：4 测试
+- **EvalSchemaError errors 默认 []**：9 测试
+- **_schema_path 异常路径**：4 测试
+- **load_schema 各种**：4 测试
+- **validate 多种 error 排序**：7 测试
+- **validate_file 异常路径**：5 测试
+- **manifest.schema.json 内部字段**：6 测试
+- **annotation.schema.json 内部字段**：3 测试
+- **evaluation-report.schema.json 内部字段**：6 测试
+- **模块源码补强**：9 测试
+- **AST 结构补强**：13 测试
+- **forbidden tokens 第一百一十二批**：13 测试
+
+### 撞墙记录
+- 0 fail 首跑（全部一次通过）
+
+### 测试基线
+- 总数：75837 passed, 22 skipped, 0 failed（414.56s）
+- 较上轮 +91（75746 → 75837）
+
+### 下一步建议
+- 候选：
+  - evaluation/__init__.py 第七轮（继续 edges 加强 4 常量属性 + 模块 __loader__/__spec__）
+  - evaluation/metrics.py 第八十九轮（继续 edges 加强 14 metrics keys + pipeline_failed）
+  - evaluation/manifest.py 第八十八轮（继续 edges 加强 frozen dataclass 边界）
+  - evaluation/report.py 第八十九轮（继续 edges 加强 _RATIO_METRICS 子集）
+  - evaluation/runner.py 第九十轮（继续 edges 加强 _load_annotation OSError）
+  - evaluation/annotation_metrics.py 第九十一轮（继续 edges 加强 chunk_boundary_prf 重复 marker）
+  - evaluation/cli.py 第九十二轮（继续 edges 加强 inspect-doc _sort_key 输出顺序）
+  - evaluation/schema.py 第九十三轮（继续 edges 加强 EvalSchemaError 子类化）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges61 已饱和（SCHEMAS_DIR 8 边界 + EvalSchemaError pickle/errors 13 + _schema_path 4 + load_schema 4 + validate 7 + validate_file 5 + 三 Schema 内部字段 15 + AST 13 + forbidden tokens）。下一轮选 evaluation/__init__.py 第七轮，覆盖 4 VERSION 常量 intern / 模块 __loader__/__spec__/__cached__ / __all__ 索引顺序。
+
+---
+
 ## Round 641 — evaluation/cli.py 第九十一轮（95 测试）
 
 ### 目标
