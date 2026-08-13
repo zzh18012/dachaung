@@ -4,6 +4,43 @@
 
 ---
 
+## Round 616 — evaluation/annotation_metrics.py 第八十轮（77 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第八十轮 edges 测试，补强 edges68 未触及的角度（第四十三批）：**PARSER_DOES_NOT_EMIT_RELATIONS 常量**（值 / 类型 / __all__ 中是 identifier 不是 value / module attr）；**figure_caption_prf 签名**（2 params POSITIONAL_OR_KEYWORD / no defaults / dict return）；**figure_caption_prf 行为**（3 keys exact / 全部 value=None / reason 全部相同 / 忽略 document / 忽略 annotation / idempotent / 无内部标记 _tolerance_chars）；**chunk_boundary_prf 签名**（3 params / default tolerance=30）；**chunk_boundary_prf pipeline_failed 路径**（document=None → reason=pipeline_failed / _tolerance_chars 透传）；**chunk_boundary_prf no_annotation 路径**（None / 空 dict / 0 falsy / 全部 reason=no_annotation）；**chunk_boundary_prf no_predicted_boundaries 路径**（empty chunks / 1 chunk no anchors / 1 chunk with anchors → recall=0.0 而非 null）；**chunk_boundary_prf no_ground_truth_anchors 路径**（2 chunks no anchors）；**chunk_boundary_prf 一对一匹配**（perfect match / outside tolerance / tolerance=50 容许更大距离 / 2 chunks 2 anchors / greedy 1-to-1 1 pred 1 anchor → P=0.5 R=1.0）；**position before/after 区别**；**missing_markers 报告字段**（marker 找不到 → 加入 list；找到则 key 不存在）；**_tolerance_chars 始终在返回 dict 中**（pipeline_failed / no_annotation / no_pred 各路径都有）；**重复 marker 顺序定位**（2 个相同 marker 各匹配第 1/2 次出现 → recall=1.0）；**f1 计算**（denom=0 → 0.0；P=0.5 R=1.0 → F1≈0.667）；**模块源码字符串精确**（PARSER_DOES_NOT_EMIT_RELATIONS / normalize_text / _null_ratio / greedy/贪心 / tolerance_chars / no_predicted_boundaries / no_ground_truth_anchors / pipeline_failed / no_annotation / missing_markers）；**__all__ 3 entries**；**AST 结构**（2 functions：figure_caption_prf/chunk_boundary_prf / 2 assigns / 无 class/try/for/while/async / future 是第二个）；**forbidden tokens 第八十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges69.py`（77 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：4 测试
+- **figure_caption_prf 签名 + 行为**：11 测试
+- **chunk_boundary_prf 签名**：4 测试
+- **chunk_boundary_prf pipeline_failed / no_annotation**：6 测试
+- **chunk_boundary_prf no_predicted_boundaries / no_ground_truth**：5 测试
+- **chunk_boundary_prf 一对一匹配 + tolerance**：7 测试
+- **missing_markers**：2 测试
+- **_tolerance_chars 始终在**：4 测试
+- **chunk_boundary_prf 重复 marker + f1**：3 测试
+- **模块源码字符串**：10 测试
+- **__all__**：4 测试
+- **AST 结构**：10 测试
+- **forbidden tokens**：10 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `test_parser_does_not_emit_relations_in_all_batch43`：__all__ 里是 identifier `PARSER_DOES_NOT_EMIT_RELATIONS`（key name），不是它的字符串值 `"parser_does_not_emit_relations"`。改为同时检查两者。
+  2. `test_chunk_boundary_prf_no_chunks_batch43`：0 chunks + 1 anchor → recall 返回 _ratio(0.0)（reason=None），而非 null。改为断言 value==0.0。
+
+### 测试基线
+- 总数：73437 passed, 22 skipped, 0 failed（709.15s）
+- 较上轮 +77（73360 → 73437）
+
+### 下一步建议
+- 下一轮到 evaluation/cli.py 第八十一轮（继续 edges 加强 _build_parser / main / _format_metric / _run_inspect_doc 边界）
+
+---
+
 ## Round 615 — evaluation/runner.py 第七十九轮（74 测试）
 
 ### 目标
