@@ -4,6 +4,44 @@
 
 ---
 
+## Round 677 — evaluation/runner.py 第九十四轮（69 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第九十四轮 edges 测试，补强 edges76 未触及的角度（第五十二批）：**_load_annotation 多种成功路径**（空 dict / 含 chunk_boundary_anchors / 含 doc_id / dict type）；**_process_one 多场景**（多个 errors 取第一个 / image_dir 在 document 存在时正确推导 / image_output_dir_for 不调 当 None / out_stub 在 `_per_doc/{doc_id}.json` / elapsed 是 float）；**run_evaluation 完整流程**（含 annotation_file 的文档 / multiple docs / parser_version 取首个成功 / annotation_present True / annotation=None）；**run_evaluation expected_failures 多场景**（多个失败 / 期望失败但实际成功 / 期望成功但实际失败 / result keys）；**run_evaluation JSON 写盘**（ensure_ascii=False / indent=2 / creates parent dirs）；**模块源码补强**（_per_doc 目录命名 / image_output_dir_for import / annotation_present / tolerance_chars / chunk_boundary_prf+figure_caption_prf / document.to_dict / errors[0].to_dict / process_single 调用 2 次 / compute_automatic_metrics import / json.dump kwargs / unknown_message / out_stub unlink / image_dir is_dir check / write_json=False 出现 2 次 / __all__ 1 export）；**AST 结构补强**（3 函数 / 函数名顺序 _load_annotation/_process_one/run_evaluation / 无 ClassDef / if errors / if document is None / 3 for in body / for iter targets / 1 with / per_doc_results.append / summary=aggregate_summary / module docstring / 无 AsyncFunctionDef / 无 Global/Nonlocal / 无 module-level With / 无 ImportStar）；**forbidden tokens 第一百四十七批**（no eval/exec/compile/globals/locals/os.system/subprocess/popen/yaml.load/pickle.load/socket/requests/urllib/shutil.rmtree/yield/async/await, open count=2）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges77.py`（69 测试）
+
+### 覆盖要点
+- **_load_annotation 多种成功路径**：4 测试
+- **_process_one 多场景**：5 测试
+- **run_evaluation 完整流程**：6 测试
+- **run_evaluation expected_failures 多场景**：4 测试
+- **run_evaluation JSON 写盘**：3 测试
+- **模块源码补强**：17 测试
+- **AST 结构补强**：15 测试
+- **forbidden tokens 第一百四十七批**：15 测试
+
+### 撞墙记录
+- 0 fails 首跑。69 测试一次通过。
+
+### 测试基线
+- 总数：79058 passed, 22 skipped, 0 failed（434.33s）
+- 较上轮 +69（78989 → 79058）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第九十五轮（继续 edges 加强）
+  - evaluation/cli.py 第九十六轮（继续 edges 加强）
+  - evaluation/schema.py 第九十七轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十三轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges77 已饱和（_load_annotation 多种成功 / _process_one 多场景 / run_evaluation 完整流程 + expected_failures + JSON 写盘 + 模块源码 + AST 15 + forbidden 15）。下一轮选 evaluation/annotation_metrics.py 第九十五轮，覆盖 PARSER_DOES_NOT_EMIT_RELATIONS 常量 / figure_caption 一对一锚定 / chunk_boundary_prf 顺序 search_from / silent_drop 推导 更深路径。
+
+---
+
 ## Round 676 — evaluation/report.py 第九十三轮（71 测试）
 
 ### 目标
