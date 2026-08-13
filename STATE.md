@@ -4,6 +4,52 @@
 
 ---
 
+## Round 630 — evaluation/report.py 第八十七轮（123 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第八十七轮 edges 测试，补强 edges59 未触及的角度（第四十五批）：**_RATIO_METRICS 12 entries 顺序**（count=12 / first=schema_valid / last=chunk_boundary_f1 / 精确顺序 / 都是 str / unique / 是 tuple / 无 figure_caption_ / 含 text_char_multiset / 含 chunk_boundary 三项）；**_COUNT_METRICS / _SUCCESS_BOOL_METRICS 精确**（值 / tuple / count / 与 _RATIO 不重叠）；**get_git_provenance 失败兜底**（OSError 第一次抛 / SubprocessError / TimeoutExpired / 第一次失败第二次成功 → commit=None dirty=True / 成功 clean / 成功 dirty / rev-parse fail 但 status ok / keys / 返回 dict / 类型检查）；**get_dependency_versions**（返回 dict / 3 keys / 值类型 None 或 str）；**build_provenance 字段精确**（9 keys / evaluator_version=1.1 / report_version=1.1 / parser_name / parser_version / parser_version None / max_chars int / max_chars 强制 int 转换 / run_timestamp_iso 可解析 / dependencies / git 字段来自 helper）；**build_devset_section 字段映射**（6 keys / status / file_count / pdf_count / docx_count / content_group_count / categories_covered）；**aggregate_summary 各种**（空 → counts/success_rates/ratio/silent_drop_total / counts 求和 / counts skip None / success_rates all success / all fail / half / None value / ratio macro simple / ratio skip None / ratio all None / silent_drop sum / silent_drop skip None / silent_drop 0 计入 / 12 ratio entries / 1 count entry / 1 success_rate entry）；**模块源码字符串精确**（聚合规则文档 / 5 import / 5 def 签名 / subprocess.run + capture_output + encoding=utf-8 + errors=replace + timeout=10 / rev-parse HEAD / status --porcelain / importlib.metadata / PackageNotFoundError / 3 packages）；**__all__**（5 entries exact order / callable / unique）；**AST 结构**（5 顶层 functions / function names 顺序 / 无 class / 无 async / 首节点 docstring / 第二 future / get_git_provenance 1 try + 1 handler tuple OSError+SubprocessError / aggregate_summary 3 显式 for / get_dependency_versions 1 for + 1 try in for / build_provenance 调用 get_git_provenance + get_dependency_versions）；**forbidden tokens 第一百批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges60.py`（123 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 12 entries**：10 测试
+- **_COUNT_METRICS / _SUCCESS_BOOL_METRICS**：8 测试
+- **get_git_provenance 失败兜底**：12 测试
+- **get_dependency_versions**：2 测试
+- **build_provenance 字段精确**：12 测试
+- **build_devset_section 字段映射**：7 测试
+- **aggregate_summary 各种**：19 测试
+- **模块源码字符串**：21 测试
+- **__all__**：4 测试
+- **AST 结构**：13 测试
+- **forbidden tokens 第一百批**：15 测试
+
+### 撞墙记录
+- 3 fail 首跑：
+  1. `test_ast_get_git_provenance_try_excepts_batch45`：subprocess.SubprocessError 在 AST 中是 ast.Attribute（attr="SubprocessError"），不是 ast.Name。改为同时支持 Name.id 和 Attribute.attr。
+  2. `test_ast_aggregate_summary_has_for_loops_batch45`：silent_drop 用列表推导式（ast.GeneratorExp），不是 ast.For。改为断言 == 3。
+  3. `test_ast_get_dependency_versions_has_try_batch45`：try 在 for 循环内部，直接遍历 func.body 找不到。改用 ast.walk。
+
+### 测试基线
+- 总数：74745 passed, 22 skipped, 0 failed（409.12s）
+- 较上轮 +123（74622 → 74745）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第八十八轮（继续 edges 加强 _process_one unlink OSError）
+  - evaluation/annotation_metrics.py 第八十九轮（继续 edges 加强 chunk_boundary_prf 顺序匹配）
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter）
+  - evaluation/schema.py 第九十一轮（继续 edges 加强 EvalSchemaError pickle）
+  - evaluation/__init__.py 第六轮（继续 edges 加强 4 常量属性）
+  - evaluation/metrics.py 第八十六轮（继续 edges 加强 helper 行为）
+  - evaluation/manifest.py 第八十七轮（继续 edges 加强 _is_absolute_like Unicode）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges60 已饱和（_RATIO_METRICS 12 项顺序 + get_git_provenance 失败兜底各种 + build_provenance 字段 + build_devset_section 字段 + aggregate_summary 各种边界 + source + AST 完整 + forbidden tokens）。下一轮选 evaluation/runner.py 第八十八轮，覆盖 _process_one unlink OSError 兜底 + run_evaluation JSON 写盘细节 + _load_annotation 编码处理。
+
+---
+
 ## Round 629 — evaluation/manifest.py 第八十六轮（137 测试）
 
 ### 目标
