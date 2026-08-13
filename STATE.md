@@ -4,6 +4,44 @@
 
 ---
 
+## Round 607 — evaluation/runner.py 第七十一轮（114 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第七十一轮 edges 测试，补强 edges67 未触及的角度（第四十三批）：**_load_annotation 边界**（None / 缺失文件 / 目录 / 空 JSON / 仅空白 / 无效 JSON / OSError / 嵌套复杂 / list 顶层 / string 顶层 / number 顶层 / 幂等）；**_load_annotation 签名**；**_process_one 签名 + 行为**（成功 5 元组 / errors 非空返 errors[0] / document=None 无 errors 返 unknown / total 是 float / 创建 _per_doc 目录 / unlink stub / 调 process_single 时 write_json=False）；**run_evaluation 签名**（parser_name/max_chars/tolerance_chars keyword-only + 默认值）；**run_evaluation 报告结构**（report_version / top-level keys / 写文件 / 自动创建父目录 / indent=2）；**per_doc**（无内部 markers / doc_id / source_type / metrics / wall_time_seconds 含 total+parse+chunk+parse_reason+chunk_reason=not_instrumented / keys 固定）；**expected_failures**（empty / matches=True / mismatch / actual=None / keys 固定）；**module source 字符串精确**；**AST 结构**；**module 合理性**；**端到端集成**；**forbidden tokens 第七十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges68.py`（114 测试）
+
+### 覆盖要点
+- **_load_annotation**：15 测试
+- **_process_one 签名**：7 测试
+- **_process_one 行为**：8 测试
+- **run_evaluation 签名**：9 测试
+- **run_evaluation 报告结构**：5 测试
+- **per_doc 内部 markers 剥离**：1 测试
+- **per_doc 字段**：4 测试
+- **expected_failures**：5 测试
+- **module source 字符串精确**：24 测试
+- **AST 结构**：5 测试
+- **module 合理性**：13 测试
+- **端到端集成**：4 测试
+- **forbidden tokens**：14 测试
+
+### 撞墙记录
+- 2 fail 首跑（均 mock 配置错配）：
+  1. doc mock 的 annotation_resolved 是 MagicMock → _load_annotation 在 MagicMock 上 .is_file()=truthy → json.load(MagicMock) → TypeError → 改 patch `_load_annotation` 返回 None
+  2. doc mock 缺 source_type → JSON 序列化 MagicMock 报错 → _make_doc_mock 加默认 source_type/expectations/annotation_resolved
+- 还修正：`per_doc_has_metrics` / `wall_time_seconds` / `keys` 三个测试需提供 docs（empty manifest → empty per_doc → IndexError）→ 改为 docs=[_make_doc_mock()]
+
+### 测试基线
+- 总数：72393 passed, 22 skipped, 0 failed（401.91s）
+- 较上轮 +114（72279 → 72393）
+
+### 下一步建议
+- 下一轮到 evaluation/annotation_metrics.py 第七十二轮（继续 edges 加强 figure_caption_prf / chunk_boundary_prf / PARSER_DOES_NOT_EMIT_RELATIONS 边界）
+
+---
+
 ## Round 606 — evaluation/report.py 第七十轮（165 测试）
 
 ### 目标
