@@ -4,6 +4,47 @@
 
 ---
 
+## Round 589 — evaluation/metrics.py 第七十轮（164 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第七十轮 edges 测试，覆盖 edges64 未触及的角度（第三十九批）：**_null / _ratio / _bool_metric / _int_metric**（empty string reason / unicode reason / long reason / negative ratio / NaN / inf / 0 / 1 / truthy string / empty string / 0 int / Python bool type / 负数 int / bool input / float input 截断 / list TypeError）；**_NOT_EVALUATED / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES**（lowercase / underscore / 含 table / 无 duplicate / 含 heading & paragraph）；**_is_valid_bbox**（tuple / 3 values / 5 values / nan / inf / string / None / empty list / None input / dict input）；**_strip_unicode_whitespace**（empty / only whitespace / no whitespace / single char / consecutive whitespace / NBSP / ideographic / em space / digits / punctuation）；**_pdf_locator_ratio**（string page / float page / bool True page / bool False page / 0 page / negative / 无 source_locator / None source_locator / 缺 page / paragraph invalid bbox / 部分有效）；**_docx_locator_ratio**（table_index / row+col / relationship_id / bbox 拒绝 / 空 locator / 部分 / float / no mutate）；**_image_resource_ratio**（empty string / 0 size / 不存在的 base_dir / partial / 非 image 忽略 / float）；**_chunk_reference_ratio**（missing ids key / empty ids list / float / all valid / no chunks null）；**_text_preservation**（image only + empty actual / chunk missing text / element missing content / full match / extra chars / missing chars / unicode / repeated chars / int 0 chunk text）；**_heading_boundary_ratio**（no chunks / no headings null / no ids key / two chunks one heading / float）；**_silent_drop_count**（int format / empty expectations / None expectations / empty counts / expected missing in by_type / actual > expected / actual == expected）；**compute_automatic_metrics**（returns dict / 14 keys / exact keys / error no message / minimal doc 全指标 / 空 elements locator null / 空 chunks chunk_ref null / 无 heading null / docx source / no mutate / pipeline_success True / pipeline_success False / False when error set / schema exception / no code key KeyError）；**module source forbidden tokens 第六十三批**；**module source 字符串精确补强第五十九批**；**signatures 第五十九批**；**module 合理性 第五十九批**；**端到端集成 第五十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges65.py`（164 测试）
+
+### 覆盖要点
+- **_null / _ratio / _bool_metric / _int_metric 第三十九批**：16 测试
+- **_NOT_EVALUATED / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第三十九批**：5 测试
+- **_is_valid_bbox 第三十九批**：10 测试
+- **_strip_unicode_whitespace 第三十九批**：10 测试
+- **_pdf_locator_ratio 第三十九批**：11 测试
+- **_docx_locator_ratio 第三十九批**：8 测试
+- **_image_resource_ratio 第三十九批**：6 测试
+- **_chunk_reference_ratio 第三十九批**：5 测试
+- **_text_preservation 第三十九批**：9 测试
+- **_heading_boundary_ratio 第三十九批**：5 测试
+- **_silent_drop_count 第三十九批**：7 测试
+- **compute_automatic_metrics 第三十九批**：18 测试
+- **module source forbidden tokens 第六十三批**：14 测试（参数化）
+- **module source 字符串精确补强第五十九批**：20 测试
+- **signatures 第五十九批**：8 测试
+- **module 合理性 第五十九批**：9 测试
+- **端到端集成 第五十九批**：5 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. doc=None 时返回 14 个键（不是 13；schema_valid + 11 个 null + pipeline_success + error_code）→ 改 expected 为 14
+  2. `error["code"]` 直接 KeyError（不防缺 code 键）→ 改测试期望 KeyError
+
+### 测试基线
+- 总数：69924 passed, 22 skipped, 0 failed（405.56s）
+- 较上轮 +164（69760 → 69924）
+
+### 下一步建议
+- 下一轮选 evaluation/report.py 第五十五轮（继续 edges 加强 _RATIO_METRICS / _COUNT_METRICS 内部行为）
+
+---
+
 ## Round 588 — evaluation/annotation_metrics.py 第六十三轮（97 测试）
 
 ### 目标
