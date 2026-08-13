@@ -4,6 +4,46 @@
 
 ---
 
+## Round 631 — evaluation/runner.py 第八十八轮（94 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第八十八轮 edges 测试，补强 edges70 未触及的角度（第四十五批）：**_load_annotation 各种边界**（None / 不存在 / OSError / JSONDecodeError / 空文件 / 空对象 / 中文 / array / null / nested / 返回 dict 或 None）；**_process_one 错误路径**（errors 非空返回第一个 error_dict / document None 无 errors → unknown code / image_dir None when document None / image_dir set when document present / 返回 5-tuple / total_seconds 非负 float / parser_version None when error / parser_version from doc / unlink OSError 静默 / unlink skip when stub not exists / 调用 process_single 关键字参数 / 创建 _per_doc 子目录）；**run_evaluation 完整路径**（report 6 keys / report_version=1.1 / per_doc count / per_doc 4 keys public / wall_time 5 keys / wall_time parse/chunk null + reason not_instrumented / expected_failures matches 计算 / expected_failure no_error actual_code=None matches=False / wrong_code matches=False / parser_version first only / image_dir 是目录传给 metrics / image_dir 不是目录传 None / 创建 output 父目录 / 写有效 JSON / tolerance_chars 默认 30 / 返回 dict / 空 documents 不调用 process_single）；**模块源码字符串精确**（跑评测主流程 / 跑 process_single / not_instrumented / 4 个 import / unlink / _per_doc / time.perf_counter / json.dump / ensure_ascii=False / indent=2 / 3 个 def 签名 / REPORT_VERSION import / unknown error message）；**__all__**（1 entry / callable）；**AST 结构**（顶层无 class / 3 functions / function names 顺序 / 无 async / 无 for/while / 首节点 docstring / 第二 future / _load_annotation 1 try / _process_one 子树有 try / run_evaluation 2 for / 调用 _process_one + compute_automatic_metrics + build_provenance + aggregate_summary + build_devset_section + json.dump / _process_one 用 perf_counter）；**forbidden tokens 第一百零一批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges71.py`（94 测试）
+
+### 覆盖要点
+- **_load_annotation 各种边界**：11 测试
+- **_process_one 错误路径**：12 测试
+- **run_evaluation 完整路径**：19 测试
+- **模块源码字符串**：19 测试
+- **__all__**：3 测试
+- **AST 结构**：19 测试
+- **forbidden tokens 第一百零一批**：15 测试
+- **综合**：6 测试
+
+### 撞墙记录
+- 0 fail 首次跑（94 全通过）
+
+### 测试基线
+- 总数：74839 passed, 22 skipped, 0 failed（401.31s）
+- 较上轮 +94（74745 → 74839）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第八十九轮（继续 edges 加强 chunk_boundary_prf 顺序匹配）
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter）
+  - evaluation/schema.py 第九十一轮（继续 edges 加强 EvalSchemaError pickle）
+  - evaluation/__init__.py 第六轮（继续 edges 加强 4 常量属性）
+  - evaluation/metrics.py 第八十六轮（继续 edges 加强 helper 行为）
+  - evaluation/manifest.py 第八十七轮（继续 edges 加强 _is_absolute_like Unicode）
+  - evaluation/report.py 第八十八轮（继续 edges 加强 _RATIO_METRICS 12 项顺序）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges71 已饱和（_load_annotation 11 边界 + _process_one 错误路径 12 + run_evaluation 完整路径 19 + source + AST 完整 + forbidden tokens）。下一轮选 evaluation/annotation_metrics.py 第八十九轮，覆盖 figure_caption_prf 始终 null + chunk_boundary_prf 顺序匹配深度。
+
+---
+
 ## Round 630 — evaluation/report.py 第八十七轮（123 测试）
 
 ### 目标
