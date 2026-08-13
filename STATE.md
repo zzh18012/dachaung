@@ -4,6 +4,39 @@
 
 ---
 
+## Round 598 — evaluation/runner.py 第六十七轮（142 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第六十七轮 edges 测试，覆盖 edges66 未触及的角度（第四十二批）：**_load_annotation**（None returns None / 目录返回 None / 复杂嵌套 object / UTF-8 BOM 返回 None / 中文 keys / 大 JSON / JSONDecodeError / 空数组空 dict / idempotent / 不持有文件 / 非 utf-8 字节抛 UnicodeDecodeError）；**_process_one**（5-tuple 返回 / 成功路径 / errors 路径 / unknown 路径 / 创建 _per_doc 目录 / unlink stub / unlink 失败静默 / 传参正确 / total 是 float / image_output_dir_for 调用 / document None 时 image_dir None / idempotent）；**run_evaluation**（kw-only / 默认值 / 创建 output parent / 写合法 JSON / 按 documents 顺序 / 按 expected_failures / 调用 build_provenance / 调用 aggregate_summary / 调用 build_devset_section / 调用 compute_automatic_metrics / 调用 figure_caption_prf / 调用 chunk_boundary_prf 传 tolerance / 首个 parser_version 传播 / 保留首个 parser_version / image_base_dir 设/不设/None / _load_annotation 每文档调用 / per_doc 4 keys / wall_time 5 keys / expected_failure 创建 _per_doc / unlink stub / 返回 dict / report 文件内容匹配）；**module source forbidden tokens 第七十一批**；**module source 字符串精确补强第六十七批**；**signatures 第六十七批**；**module 合理性 第六十七批**；**端到端集成 第六十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges67.py`（142 测试）
+
+### 覆盖要点
+- **_load_annotation 第四十二批**：13 测试
+- **_process_one 第四十二批**：14 测试
+- **run_evaluation 第四十二批**：26 测试
+- **module source forbidden tokens 第七十一批**：14 测试（参数化）
+- **module source 字符串精确补强第六十七批**：37 测试
+- **signatures 第六十七批**：14 测试
+- **module 合理性 第六十七批**：13 测试
+- **端到端集成 第六十七批**：4 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. UTF-8 BOM（encoding=utf-8 而非 utf-8-sig）→ JSONDecodeError → None（我以为能解析）→ 改 expect None
+  2. 非 utf-8 字节 → UnicodeDecodeError（ValueError 子类，不被 OSError 捕获）→ 改 expect UnicodeDecodeError
+  3. `MagicMock()` 作 document 触发 compute_automatic_metrics 内 `len(MagicMock elements)=0` → ZeroDivisionError → 改为传 `{}` 真实 dict
+
+### 测试基线
+- 总数：71051 passed, 22 skipped, 0 failed（397.04s）
+- 较上轮 +142（70909 → 71051）
+
+### 下一步建议
+- 下一轮选 evaluation/annotation_metrics.py 第六十五轮（继续 edges 加强 figure_caption_prf / chunk_boundary_prf 边界）
+
+---
+
 ## Round 597 — evaluation/report.py 第五十六轮（152 测试）
 
 ### 目标
