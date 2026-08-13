@@ -4,6 +4,37 @@
 
 ---
 
+## Round 623 — evaluation/runner.py 第八十七轮（55 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第八十七轮 edges 测试，补强 edges69 未触及的角度（第四十四批）：**_process_one errors 多种路径**（2 errors 返回 first / unlink OSError 兜底 / unlink 当 stub 不存在跳过 / image_dir 在 document 成功时返回 / total_seconds 非负）；**run_evaluation 多文档**（3 docs 遍历 / parser_version 只取第一个成功 doc / image_dir not dir → image_base_dir=None / image_dir is dir → 传 Path）；**run_evaluation JSON 写盘细节**（ensure_ascii=False / indent=2 / json.dump 调用 / utf-8 可读）；**_load_annotation 多种输入**（unicode / BOM / array 顶层 / null 顶层）；**模块源码字符串精确**（跑评测主流程 / 跑 process_single / image_dir / not_instrumented / from app.pipeline import / from evaluation.metrics import / from evaluation.report import / from evaluation.annotation_metrics import / _per_doc / image_output_dir_for / time.perf_counter）；**__all__ 1 entry**；**AST 结构**（3 functions / run_evaluation 内 for 循环≥2 / _process_one 内 try≥1（嵌套用 ast.walk） / _load_annotation 内 try=1 / future 是第二个 / 模块顶层无 open() 调用）；**forbidden tokens 第九十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges70.py`（55 测试）
+
+### 覆盖要点
+- **_process_one errors 多种路径**：5 测试
+- **run_evaluation 多文档 + JSON 写盘**：8 测试
+- **_load_annotation 多种输入**：4 测试
+- **模块源码字符串**：14 测试
+- **__all__**：3 测试
+- **AST 结构**：11 测试
+- **forbidden tokens**：10 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `test_ast_process_one_has_try_in_body_batch44`：try 嵌套在 if 里，直接遍历 process_func.body 抓不到 → 改用 ast.walk 遍历整个子树
+  2. `test_source_no_open_w_mode_batch44`：run_evaluation 内部确实需要 `out_p.open("w", ...)` 写报告 JSON，不能禁止 → 改为只检查模块顶层（非函数体内）无 open() 调用
+
+### 测试基线
+- 总数：74041 passed, 22 skipped, 0 failed（709.16s）
+- 较上轮 +55（73986 → 74041）
+
+### 下一步建议
+- 下一轮到 evaluation/annotation_metrics.py 第八十八轮（继续 edges 加强 chunk_boundary_prf 边界）
+
+---
+
 ## Round 622 — evaluation/report.py 第八十六轮（66 测试）
 
 ### 目标
