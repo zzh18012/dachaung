@@ -4,6 +4,53 @@
 
 ---
 
+## Round 643 — evaluation/__init__.py 第七轮（98 测试）
+
+### 目标
+- 给 `evaluation/__init__.py`（29 行）加第七轮 edges 测试，补强 edges6 未触及的角度（第四十八批）：**4 VERSION 常量 intern 与 is 检查**（字面量 intern / EVALUATOR==REPORT 同值 / EVALUATOR!=ANNOTATION / REPORT!=MANIFEST / ANNOTATION==MANIFEST / str 方法 upper/lower/isdigit/replace / startswith 数字 / dot 位置 1）；**4 VERSION 常量 monkeypatch 临时修改**（setattr + 还原 / 全部 setattr / 还原后值恢复）；**模块 __dict__ 内容精确**（含 4 VERSION + __all__ / VERSION 值精确 / 类型 str / __all__ 是 list / 长度 ≥5）；**模块 __file__ 路径精确**（endswith __init__.py / 绝对路径 / 存在 / 父目录 evaluation / 父父是项目根）；**模块 __package__ / __name__**（都 == "evaluation" / package == name）；**模块属性 dict 可序列化**（VERSION dict JSON roundtrip / __all__ JSON roundtrip）；**VERSION 常量类型注解**（type is str / not None / 非空）；**__all__ 与 dir() 差集**（__all__ ⊆ dir / 4 entries / dir 含 dunder + 4 VERSION）；**模块 spec 是否原生 SourceFileLoader**（origin str / endswith __init__.py / loader 有 exec_module / submodule_search_locations 是 list / endswith evaluation）；**模块 docstring 内容精确字节**（length > 100 / v1.1 / v1.0 / 口径 D / 不可横向比较 / 词内硬切 / 其它指标语义未变 / not_instrumented / 不返回 1.0 / 不伪造 / 第一行 "评测包"）；**模块源码补强**（4 VERSION 字面量 / 无 class / 无 def / 无 import / 起始是 docstring）；**AST 结构补强**（6 顶层 / body[0] docstring Expr / body[1..4] Assign / body[5] __all__ Assign / 4 VERSION targets names / values 是 Constant / 各 VERSION 值精确 / __all__ targets Name / value List / 4 elts Constant str / 各 elt 值精确 / 无 Import / 无 ClassDef / 无 FunctionDef / 无控制流）；**forbidden tokens 第一百一十三批**；**综合**（reimport 不破坏 sys.modules / 在 sys.modules / 4-tuple 计数 / set 去重）
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges7.py`（98 测试）
+
+### 覆盖要点
+- **4 VERSION 常量 intern 与 is 检查**：8 测试
+- **4 VERSION 常量 monkeypatch**：3 测试
+- **模块 __dict__ 内容精确**：7 测试
+- **模块 __file__ 路径精确**：5 测试
+- **模块 __package__ / __name__**：3 测试
+- **模块属性 dict 可序列化**：2 测试
+- **VERSION 常量类型注解**：6 测试
+- **__all__ 与 dir() 差集**：4 测试
+- **模块 spec SourceFileLoader**：5 测试
+- **模块 docstring 内容精确字节**：11 测试
+- **模块源码补强**：8 测试
+- **AST 结构补强**：16 测试
+- **forbidden tokens 第一百一十三批**：17 测试
+- **综合**：4 测试
+
+### 撞墙记录
+- 0 fail 首跑（全部一次通过）
+
+### 测试基线
+- 总数：75935 passed, 22 skipped, 0 failed（404.98s）
+- 较上轮 +98（75837 → 75935）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第八十九轮（继续 edges 加强 14 metrics keys + pipeline_failed）
+  - evaluation/manifest.py 第八十八轮（继续 edges 加强 frozen dataclass 边界）
+  - evaluation/report.py 第八十九轮（继续 edges 加强 _RATIO_METRICS 子集）
+  - evaluation/runner.py 第九十轮（继续 edges 加强 _load_annotation OSError）
+  - evaluation/annotation_metrics.py 第九十一轮（继续 edges 加强 chunk_boundary_prf 重复 marker）
+  - evaluation/cli.py 第九十二轮（继续 edges 加强 inspect-doc _sort_key 输出顺序）
+  - evaluation/schema.py 第九十三轮（继续 edges 加强 EvalSchemaError 子类化）
+  - evaluation/__init__.py 第八轮（继续 edges 加强 monkeypatch + importlib.reload）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：__init__.py edges7 已饱和（4 VERSION intern + monkeypatch + __dict__ + __file__ + __package__/__name__ + 序列化 + 类型 + __all__/dir + spec + docstring 字节级 + AST 完整 16 + forbidden tokens）。下一轮选 evaluation/metrics.py 第八十九轮，覆盖 compute_automatic_metrics 14 keys 完整 + pipeline_failed 14 null + _text_preservation Counter + _pdf_locator_ratio bool。
+
+---
+
 ## Round 642 — evaluation/schema.py 第九十二轮（91 测试）
 
 ### 目标
