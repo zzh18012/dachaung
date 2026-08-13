@@ -4,6 +4,48 @@
 
 ---
 
+## Round 635 — evaluation/__init__.py 第六轮（85 测试）
+
+### 目标
+- 给 `evaluation/__init__.py`（29 行）加第六轮 edges 测试，补强 edges5 未触及的角度（第四十六批）：**模块 __doc__ 内容精确**（present + str / 含"设计原则" / "不依赖任何 app/*" / "不修改 parser / chunker / pipeline" / "缺数据时填 null + reason" / "不返回 1.0" / "not_instrumented" / "版本历史" v1.0+v1.1 / "text_preservation" / "normalize_text" / "不可横向比较" / 以 "评测包" 开头）；**模块 __loader__**（非 None / 有 load_module 或 exec_module）；**模块 __spec__ 各字段**（name / origin 末尾 __init__.py / loader 非 None / submodule_search_locations 非空）；**模块 __cached__**（present / 末尾 .pyc）；**4 常量 intern**（str 类型 / 同字面量 / 与字面量相等 / 字符串拼接 / 乘法 / format / split major+minor）；**__all__ 检查**（无私有名 / 无 dunder / 无模块名 / 长度 ≥10 / 都含 VERSION / 第一项 EVALUATOR_VERSION / 最后 MANIFEST_VERSION / index 0-3 精确）；**模块源码字符串补强**（v1.0/v1.1 描述 / 口径 D / 词内硬切 / 其他指标语义未变 / 4 个字面量精确 / 不返回 1.0 / 不伪造 / 无 def / 无 class / 无 import os/sys/subprocess）；**AST 结构补强**（总节点 6 / 前 5 是 Expr+Assign×4 / version target names 顺序 / version values 是 str Constant / __all__ target 是 Name / __all__ value 是 List / List 4 个 Constant str / List values 顺序 / 无 imports / 无 class / 无 function / 无 control flow）；**forbidden tokens 第一百零五批**；**综合**（4 常量迭代检查 / map to names / __package__ / 4 种 import 方式 / str immutable 抛 TypeError）
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges6.py`（85 测试）
+
+### 覆盖要点
+- **模块 __doc__ 内容精确**：12 测试
+- **模块 __loader__**：2 测试
+- **模块 __spec__ 各字段**：4 测试
+- **模块 __cached__**：2 测试
+- **4 常量 intern**：8 测试
+- **__all__ 检查**：10 测试
+- **模块源码字符串补强**：16 测试
+- **AST 结构补强**：12 测试
+- **forbidden tokens 第一百零五批**：15 测试
+- **综合**：4 测试
+
+### 撞墙记录
+- 0 fail 首次跑（85 全通过）
+
+### 测试基线
+- 总数：75236 passed, 22 skipped, 0 failed（405.94s）
+- 较上轮 +85（75151 → 75236）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第八十六轮（继续 edges 加强 helper 行为）
+  - evaluation/manifest.py 第八十七轮（继续 edges 加强 _is_absolute_like Unicode）
+  - evaluation/report.py 第八十八轮（继续 edges 加强 _RATIO_METRICS 12 项顺序）
+  - evaluation/runner.py 第八十九轮（继续 edges 加强 _process_one unlink OSError）
+  - evaluation/annotation_metrics.py 第九十轮（继续 edges 加强 chunk_boundary_prf 顺序匹配）
+  - evaluation/cli.py 第九十二轮（继续 edges 加强 _build_parser formatter）
+  - evaluation/schema.py 第九十二轮（继续 edges 加强 EvalSchemaError pickle）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：__init__.py edges6 已饱和（__doc__ 12 内容 + __loader__/__spec__/__cached__ + 4 常量 intern + __all__ 索引精确 + AST 12 节点检查 + forbidden tokens）。下一轮选 evaluation/metrics.py 第八十六轮，覆盖 4 helper 类型转换边界 + Counter 行为深度。
+
+---
+
 ## Round 634 — evaluation/schema.py 第九十一轮（123 测试）
 
 ### 目标
