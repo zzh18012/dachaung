@@ -4,6 +4,55 @@
 
 ---
 
+## Round 640 — evaluation/annotation_metrics.py 第九十轮（77 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十轮 edges 测试，补强 edges71 未触及的角度（第四十七批）：**PARSER_DOES_NOT_EMIT_RELATIONS 常量属性**（str 类型 / 值精确 / immutable）；**figure_caption_prf 输入各种边界**（None/None / dict+dict / 完整 dict / 一致性 / 返回 dict of dicts / 无额外 key）；**chunk_boundary_prf document None 路径**（pipeline_failed reason / _tolerance_chars 仍存在 / 无 _missing_markers / 4 keys）；**chunk_boundary_prf annotation None/空**（None → no_annotation / {} → no_annotation / 缺 chunk_boundary_anchors key → no_ground_truth_anchors）；**chunk_boundary_prf chunks < 2 路径**（empty + 有 anchors → recall=0.0 不是 null / single + anchors / 缺 chunks key / single + no anchors → null）；**chunk_boundary_prf search_from 顺序定位**（重复 marker 命中第 N 次 / missing marker 加入 _missing_markers / 全找到 → 无 _missing_markers key）；**chunk_boundary_prf tolerance_chars 透传**（default 30 / custom 50 / 0 / -1 / reason None）；**chunk_boundary_prf position before/after**（before=marker 起始 / after=marker 末尾 / 无效 position 默认 after / 缺 position 默认 after）；**chunk_boundary_prf 一对一贪心匹配**（perfect 1.0 / partial 0.5 / no match / f1 perfect / precision null when no predicted）；**chunk_boundary_prf 完整 document**（含 chunks + metadata / chunk text None / chunk 缺 text key）；**模块源码补强**（parser 当前不输出 / chunk_boundary / tolerance_chars / normalize_text / 一对一 / search_from / missing_markers / no_ground_truth_anchors / pipeline_failed / no_annotation / no_predicted_boundaries / 启发式）；**AST 结构补强**（2 函数 / 2 顶层 Assign（含 __all__）/ chunk_boundary_prf ≥6 if + ≥3 for + 嵌套 for + Lambda sort key + ≥4 return（ast.walk）/ figure_caption_prf return Dict / 无 ClassDef / module docstring）；**forbidden tokens 第一百一十批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges72.py`（77 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量属性**：3 测试
+- **figure_caption_prf 输入各种边界**：5 测试
+- **chunk_boundary_prf document None 路径**：4 测试
+- **chunk_boundary_prf annotation None/空**：3 测试
+- **chunk_boundary_prf chunks < 2 路径**：5 测试
+- **chunk_boundary_prf search_from 顺序定位**：3 测试
+- **chunk_boundary_prf tolerance_chars 透传**：5 测试
+- **chunk_boundary_prf position before/after**：4 测试
+- **chunk_boundary_prf 一对一贪心匹配**：5 测试
+- **chunk_boundary_prf 完整 document**：3 测试
+- **模块源码补强**：12 测试
+- **AST 结构补强**：10 测试
+- **forbidden tokens 第一百一十批**：15 测试
+
+### 撞墙记录
+- 3 fail 首跑：
+  1. `test_chunk_boundary_chunks_empty_batch47`：实现是 `recall = _null if not anchors else _ratio(0.0)`，有 anchors 时 recall 是 0.0 不是 null。改为单独检查 recall=0.0。
+  2. `test_chunk_boundary_chunks_missing_key_batch47`：同上，有 anchors → recall=0.0。
+  3. `test_ast_chunk_boundary_returns_dict_batch47`：早 return 在 if 内部，`func.body` 只看到 1 个 return。改用 `ast.walk(func)` 找全部 return，断言 ≥4。
+
+### 测试基线
+- 总数：75651 passed, 22 skipped, 0 failed（416.63s）
+- 较上轮 +77（75574 → 75651）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter + _sort_key + catch 链）
+  - evaluation/schema.py 第九十二轮（继续 edges 加强 EvalSchemaError pickle + const vs enum）
+  - evaluation/__init__.py 第七轮（继续 edges 加强 4 常量属性 + 模块 __loader__/__spec__）
+  - evaluation/metrics.py 第八十九轮（继续 edges 加强 14 metrics keys + pipeline_failed）
+  - evaluation/manifest.py 第八十八轮（继续 edges 加强 frozen dataclass 边界）
+  - evaluation/report.py 第八十九轮（继续 edges 加强 _RATIO_METRICS 子集）
+  - evaluation/runner.py 第九十轮（继续 edges 加强 _load_annotation OSError）
+  - evaluation/annotation_metrics.py 第九十一轮（继续 edges 加强 chunk_boundary_prf 重复 marker）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges72 已饱和（PARSER_DOES_NOT_EMIT_RELATIONS 常量 + figure_caption_prf 输入无关 + chunk_boundary 7 类早返回路径 + search_from 重复 marker + tolerance 透传 + position before/after + 一对一贪心 + AST 嵌套 for + Lambda + forbidden tokens）。下一轮选 evaluation/cli.py 第九十一轮，覆盖 _build_parser RawDescriptionHelpFormatter + _sort_key 嵌套函数 + 子命令 catch 链。
+
+---
+
 ## Round 639 — evaluation/runner.py 第八十九轮（71 测试）
 
 ### 目标
