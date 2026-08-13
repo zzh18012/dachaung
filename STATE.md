@@ -4,6 +4,52 @@
 
 ---
 
+## Round 645 — evaluation/manifest.py 第八十八轮（100 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第八十八轮 edges 测试，补强 edges72 未触及的角度（第四十八批）：**ManifestError 子类化与抛出**（is Exception / 可抛可捕 / args / 无 errors 属性 / str / repr / raise from cause）；**_is_absolute_like 数字与特殊字符**（数字 drive / 下划线 drive / 只有冒号 / 2 字符不够长 / 单 / 是绝对 / /// 三斜杠 / \\\\server UNC 不是 / 中文 drive 是 isalpha / 日文 drive 是 isalpha）；**_has_backslash 多次出现**（多个 / 只有 \\ / 开头 / 结尾 / 无 / 空 / 全正斜杠）；**_resolve_relative_path 复杂场景**（中文路径 / 深嵌套 / ./foo / a/b/../c 合法 / ../ 跨根 / 空字符串 / POSIX 绝对 / Windows 绝对 / 反斜杠）；**load_manifest 异常路径**（文件不存在 / JSON 解析失败 / Schema 失败（const "1.0"）/ version 不兼容（mock MANIFEST_VERSION）/ document path 绝对 / 反斜杠 / 跨根）；**load_manifest documents 多种字段组合**（全字段 / 最小字段 / 多 documents + counts）；**load_manifest expected_failures 完整**（全字段 / 无 source_type / 默认空 tuple）；**Manifest property 边界**（file_count / pdf_count / docx_count / pdf+docx != total / content_group_count 各种 / categories_covered 排序去重）；**_detect_project_root 多种场景**（有 pyproject / 嵌套子目录找父 / 无 pyproject 返回 curdir / 文件输入自动取 parent）；**模块源码补强**（关键不变量 / path 字段 / 正斜杠 / 项目根目录 / frozen=True / @dataclass / ManifestError docstring / 无硬编码路径）；**AST 结构补强**（5 函数 / 4 ClassDef / DocumentEntry 10 AnnAssign / ExpectedFailure 5 / Manifest 5 / Manifest 5 @property / ManifestError 0 methods / load_manifest ≥2 for + ≥1 try / _resolve_relative_path 1 try + ≥3 if / _detect_project_root 1 for / 3 @dataclass 装饰器 / 无 AsyncFunctionDef / module docstring）；**forbidden tokens 第一百一十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges73.py`（100 测试）
+
+### 覆盖要点
+- **ManifestError 子类化与抛出**：8 测试
+- **_is_absolute_like 数字与特殊字符**：9 测试
+- **_has_backslash 多次出现**：7 测试
+- **_resolve_relative_path 复杂场景**：9 测试
+- **load_manifest 异常路径**：7 测试
+- **load_manifest documents 多种字段组合**：3 测试
+- **load_manifest expected_failures 完整**：3 测试
+- **Manifest property 边界**：11 测试
+- **_detect_project_root 多种场景**：4 测试
+- **模块源码补强**：8 测试
+- **AST 结构补强**：16 测试
+- **forbidden tokens 第一百一十五批**：15 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_ast_document_entry_field_count_batch48`：实际 10 个字段（doc_id / path_str / resolved_path / source_type / sha256 / categories / paired_with / annotation_file_str / annotation_resolved / expectations），不是 9。改为 10。
+
+### 测试基线
+- 总数：76174 passed, 22 skipped, 0 failed（408.78s）
+- 较上轮 +100（76074 → 76174）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第八十九轮（继续 edges 加强 _RATIO_METRICS 子集）
+  - evaluation/runner.py 第九十轮（继续 edges 加强 _load_annotation OSError）
+  - evaluation/annotation_metrics.py 第九十一轮（继续 edges 加强 chunk_boundary_prf 重复 marker）
+  - evaluation/cli.py 第九十二轮（继续 edges 加强 inspect-doc _sort_key 输出顺序）
+  - evaluation/schema.py 第九十三轮（继续 edges 加强 EvalSchemaError 子类化）
+  - evaluation/__init__.py 第八轮（继续 edges 加强 monkeypatch + importlib.reload）
+  - evaluation/metrics.py 第九十轮（继续 edges 加强 compute pipeline_failed 14 keys）
+  - evaluation/manifest.py 第八十九轮（继续 edges 加强 Unicode drive letters）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges73 已饱和（ManifestError 8 + _is_absolute_like Unicode 数字 9 + _has_backslash 7 + _resolve_relative_path 复杂 9 + load_manifest 7 异常 + 3 documents 字段 + 3 expected_failures + Manifest 11 property + _detect_project_root 4 + AST 16 + forbidden tokens）。下一轮选 evaluation/report.py 第八十九轮，继续 _RATIO_METRICS 子集 + aggregate_summary 边界 + AST 结构。
+
+---
+
 ## Round 644 — evaluation/metrics.py 第八十九轮（139 测试）
 
 ### 目标
