@@ -4,6 +4,51 @@
 
 ---
 
+## Round 650 — evaluation/schema.py 第九十三轮（87 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第九十三轮 edges 测试，补强 edges61 未触及的角度（第四十八批）：**EvalSchemaError 子类化与构造**（继承 Exception / errors 默认 [] / errors 显式 None / errors 显式 list / super().__init__ / str/repr / raise+catch / catch as Exception / errors 属性可写 / errors 可选）；**_schema_path 边界**（manifest / annotation / evaluation-report / 不存在 → FileNotFoundError / 返回 Path / 嵌套名称）；**load_schema 边界**（返回 dict / 有 properties / 重复加载独立 dict / 不存在抛错）；**validate 成功路径**（manifest 最小 / annotation 最小 / 返回 None）；**validate 失败路径**（抛 EvalSchemaError / errors 按 absolute_path 排序 / errors flat 结构含 path/message/schema_path / message 含 schema_name / message 含数量 / head 是 errors[0]）；**validate_file 路径处理**（Path / str / 不存在 → FileNotFoundError / 无效 JSON → JSONDecodeError / 无效 instance → EvalSchemaError / 多次幂等）；**SCHEMAS_DIR 常量**（是 Path / 存在 / 含 3 个 schema 文件）；**模块源码补强**（jsonschema / Draft202012Validator / JSValidationError / sorted lambda / __all__ / class EvalSchemaError / FileNotFoundError / super().__init__ / encoding utf-8 / 与 app/schema.py 分开 / errors 默认签名 / errors or [] / resolve() + "schemas"）；**AST 结构补强**（4 函数 / 1 ClassDef / EvalSchemaError __init__ / 无 AsyncFunctionDef / module docstring / validate 1 for + 1 lambda + raise + return / validate_file open call / _schema_path is_file call / ≥4 import / 2 Assign / super().__init__ 调用）；**forbidden tokens 第一百二十批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges62.py`（87 测试）
+
+### 覆盖要点
+- **EvalSchemaError 子类化与构造**：11 测试
+- **_schema_path 边界**：6 测试
+- **load_schema 边界**：6 测试
+- **validate 成功路径**：3 测试
+- **validate 失败路径**：7 测试
+- **validate_file 路径处理**：6 测试
+- **SCHEMAS_DIR 常量**：4 测试
+- **模块源码补强**：13 测试
+- **AST 结构补强**：16 测试
+- **forbidden tokens 第一百二十批**：15 测试
+
+### 撞墙记录
+- 2 fail 首跑：
+  1. `test_validate_annotation_minimal_batch48`：annotation.schema.json required 是 `doc_id` 不是 `document_id`。改正后通过。
+  2. `test_ast_top_level_functions_count_batch48`：实际 4 个函数（_schema_path / load_schema / validate / validate_file），不是 3。改正 4 后通过。
+
+### 测试基线
+- 总数：76550 passed, 22 skipped, 0 failed（420.22s）
+- 较上轮 +87（76463 → 76550）
+
+### 下一步建议
+- 候选：
+  - evaluation/__init__.py 第八轮（继续 edges 加强 monkeypatch + importlib.reload）
+  - evaluation/metrics.py 第九十一轮（继续 edges 加强 compute pipeline_failed 14 keys）
+  - evaluation/manifest.py 第八十九轮（继续 edges 加强 Unicode drive letters）
+  - evaluation/report.py 第九十轮（继续 edges 加强 aggregate 混合）
+  - evaluation/runner.py 第九十一轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十二轮（继续 edges 加强 anchor 多字段组合）
+  - evaluation/cli.py 第九十三轮（继续 edges 加强 run 子命令完整路径）
+  - evaluation/schema.py 第九十四轮（继续 edges 加加强 validate errors 排序稳定性）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges62 已饱和（EvalSchemaError 11 子类化 + _schema_path 6 + load_schema 6 + validate 成功 3 + 失败 7 + validate_file 6 + SCHEMAS_DIR 4 + AST 完整 + forbidden tokens）。下一轮选 evaluation/__init__.py 第八轮，覆盖 monkeypatch + importlib.reload + 4 个版本常量稳定性。
+
+---
+
 ## Round 649 — evaluation/cli.py 第九十二轮（86 测试）
 
 ### 目标
