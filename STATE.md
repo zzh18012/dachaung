@@ -4,6 +4,41 @@
 
 ---
 
+## Round 579 — evaluation/manifest.py 第六十四轮（128 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第六十四轮 edges 测试，覆盖 edges63 未触及的角度（第三十七批）：**DocumentEntry**（无可选字段 / 全可选 / 空 doc_id / 空 path_str / unicode doc_id / 无效 source_type / categories 重复 / expectations 嵌套 dict / docx source_type）；**ExpectedFailure**（空 doc_id / unicode path / 长 error code / 空 error code / 全 source_types / doc_id != path_str）；**Manifest properties**（file_count 10 / pdf_count 5 / docx_count 7 / categories unicode / content_group_count all paired 3 pairs / pdf_count 0 when all docx / devset_status complete / equality with documents）；**_is_absolute_like / _has_backslash**（POSIX 根 / Windows C:\\ / C:/ / 仅反斜杠 / 中间反斜杠 / drive letter 单字母 / unicode 路径 / 多字符 drive / 空字符串）；**_resolve_relative_path**（返回绝对 / 子目录 / 含 dots 文件名 / 含 spaces / unicode / drive backslash / drive forward / 中间 backslash / double dot 文件名 / 不创建文件）；**load_manifest**（空 documents / 空 expected_failures / complete status / 无效 devset_status / missing doc_id / missing path / missing source_type / 无效 source_type / sha256 短 / sha256 大写 / sha256 小写合法 / paired_with / expected_failure missing path / missing code / 无效 source_type / txt source_type / other source_type / 不修改磁盘 / idempotent / unicode categories / str path 参数）；**_detect_project_root**（从 start 找 .git / 父目录链 / 找不到回 fallback / 返回 Path）；**ManifestError**（继承 Exception / 无 __init__ / raise 捕获 / message str）；**module source forbidden tokens 第六十一批**；**module source 字符串精确补强第五十七批**；**signatures 第五十七批**；**module 合理性第五十七批**；**端到端集成第五十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges64.py`（128 测试）
+
+### 覆盖要点
+- **DocumentEntry 第三十七批**：9 测试
+- **ExpectedFailure 第三十七批**：6 测试
+- **Manifest properties 第三十七批**：9 测试
+- **_is_absolute_like / _has_backslash 第三十七批**：11 测试
+- **_resolve_relative_path 第三十七批**：10 测试
+- **load_manifest 第三十七批**：22 测试
+- **_detect_project_root 第三十七批**：4 测试
+- **ManifestError 第三十七批**：4 测试
+- **module source forbidden tokens 第六十一批**：14 测试（参数化）
+- **module source 字符串精确补强第五十七批**：20 测试
+- **signatures 第五十七批**：7 测试
+- **module 合理性第五十七批**：10 测试
+- **端到端集成第五十七批**：5 测试
+
+### 撞墙记录
+- 0 fails 首跑（一次性通过）
+
+### 测试基线
+- 总数：68726 passed, 22 skipped, 0 failed（383.47s）
+- 较上轮 +128（68598 → 68726）
+
+### 下一步建议
+- 下一轮选 evaluation/annotation_metrics.py 第六十二轮（继续 edges 加强 compute_chunk_reference / compute_figure_caption / compute_text_preservation 等纯函数）
+
+---
+
 ## Round 578 — evaluation/cli.py 第六十五轮（109 测试）
 
 ### 目标
