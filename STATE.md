@@ -4,6 +4,44 @@
 
 ---
 
+## Round 671 — evaluation/runner.py 第九十三轮（82 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第九十三轮 edges 测试，补强 edges75 未触及的角度（第五十一批）：**_load_annotation 多场景**（None 输入 / 文件不存在 / JSON 解析失败 / OSError / 成功返回 dict / 返回类型 / 无参 TypeError）；**_process_one 控制流**（errors 非空返回 errors[0].to_dict / document None 返回 unknown error / 正常返回 / image_dir None 当 document None / unlink OSError 容错 / 创建 _per_doc 目录 / 返回 5-tuple）；**run_evaluation 完整流程**（empty manifest / writes json file / report 6 keys / per_doc 4 keys / metrics ≥14 keys / expected_failures 路径 matches=True+False / parser_version 取自首 doc / 创建 output_root / image_dir 是 dir 传给 compute / image_dir 不存在 None / compute 参数透传 source_type+expectations）；**模块源码补强**（json/time/Path/Any imports / process_single+image_output_dir_for / REPORT_VERSION / annotation_metrics / metrics / report helpers / not_instrumented / perf_counter / write_json=False / image_output_dir_for / unknown 错误码 / ensure_ascii=False / indent=2 / tolerance_chars / docstring / __all__ 1 entry）；**AST 结构补强**（3 函数 + 顺序 / 无 ClassDef / 无 AsyncFunctionDef / 10 imports / module docstring / __all__ 1 entry List / _load_annotation 1 try + 1 with + 3 return / _process_one 1 try + 3 return / run_evaluation 3 for + 1 with + 1 return / 无 Global/Nonlocal/Delete/While / 顶层无 Raise / 无 ImportStar）；**forbidden tokens 第一百四十一批**（open count=2 / 无 async/await / 无 yield）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges76.py`（82 测试）
+
+### 覆盖要点
+- **_load_annotation 多场景**：7 测试
+- **_process_one 控制流**：7 测试
+- **run_evaluation 完整流程**：12 测试
+- **模块源码补强**：20 测试
+- **AST 结构补强**：21 测试
+- **forbidden tokens 第一百四十一批**：16 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_ast_process_one_has_4_return_batch51`：实际只有 3 个 return（errors / None / 末尾）→ 改为 ==3。
+
+### 测试基线
+- 总数：78551 passed, 22 skipped, 0 failed（420.65s）
+- 较上轮 +82（78469 → 78551）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/cli.py 第九十五轮（继续 edges 加强）
+  - evaluation/schema.py 第九十六轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十二轮（继续 edges 加强）
+  - evaluation/report.py 第九十三轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges76 已饱和（_load_annotation + _process_one + run_evaluation 完整路径 + 模块源码 20 + AST 21 + forbidden 16）。下一轮选 evaluation/annotation_metrics.py 第九十四轮，覆盖 figure_caption_prf / chunk_boundary_prf / _ratio / 各 reason 常量。
+
+---
+
 ## Round 670 — evaluation/report.py 第九十二轮（101 测试）
 
 ### 目标
