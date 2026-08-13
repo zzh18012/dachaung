@@ -4,6 +4,56 @@
 
 ---
 
+## Round 668 — evaluation/metrics.py 第九十三轮（153 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第九十三轮 edges 测试，补强 edges74 未触及的角度（第五十一批）：**_strip_unicode_whitespace 更细**（form feed / vertical tab / next line NEL / BOM 非 isspace → 保留 / thin space / hair space / narrow no-break space / 全角 ideographic space / line separator / paragraph separator / 多连续空白 / 全空白返回空串 / 空串 / 无空白保留 / 不排序 / 标点保留）；**Counter 多集合交集**（min per char / disjoint / equal multiset / repeats / zero in one）；**_text_preservation 边界**（expected 空 actual 非空 / actual 空 expected 非空 / 都非空 equal / case sensitive / partial overlap / image excluded / content None / text None）；**_heading_boundary_ratio 边界**（chunks 同 first id 去重 / heading 无 element_id / chunks 全空 ids / 多对一首元素规则 / 无 headings）；**_silent_drop_count 边界**（expectations None / 空 dict / element_count_by_type None / element_count_by_type 空 / actual > expected → 0 / actual == expected → 0 / actual < expected / 多类型 sum / expected 类型缺失 → 0 / int 类型）；**_is_valid_bbox 角**（tuple/set/dict/str 拒绝 / mixed int+float / 全 0 / 负数 / inf/-inf/nan 拒绝 / bool 拒绝 / 字符串数字拒绝 / None / 5 元素 / 3 元素）；**_chunk_reference_ratio 角**（全空 ids / partial missing / all missing / element_id None 仍可匹配 / partial valid all() / no chunks）；**_image_resource_ratio 角**（no images / rp None / rp 空串 / 0-size 文件 / rp 存在非零 / image_base_dir None / partial）；**_null/_ratio/_bool_metric/_int_metric 类型与值**；**compute_automatic_metrics 完整路径**（pipeline_failed 14 metrics / schema exception 分支不同类型 / full doc pdf / full doc docx / error 路径 / no error no doc）；**模块常量更细**（_TEXT_TYPES 7 / _PDF_BBOX_REQUIRED_TYPES 4 subset / _NOT_EVALUATED 值 / tuple 类型 / image 不在 _TEXT_TYPES）；**模块源码补强**（Counter import / math.isfinite / Counter & / _strip_unicode_whitespace / 口径 D / image / 多 reason 字符串 / pipeline_failed / no_elements / no_chunks / no_image_elements / no_heading_elements / no_expectations / not_pdf_document / not_docx_document / empty_expected_and_actual / schema_check_exception）；**AST 结构补强**（14 函数 / 函数名顺序 / 无 ClassDef / 无 AsyncFunctionDef / 无 Global / 无 Nonlocal / 无 ImportStar / module docstring / 4 top-level Assigns / assign target names / _TEXT_TYPES Tuple 7 / _PDF_BBOX_REQUIRED_TYPES Tuple 4 / _NOT_EVALUATED Constant / __all__ List 1 Constant / 5 imports / compute_automatic_metrics 1 try / 多 For / _silent_drop_count 1 For / _image_resource_ratio ≥2 For / _strip_unicode_whitespace join / _text_preservation Counter & / _is_valid_bbox math.isfinite / try locations（compute + image_ratio）/ 无 With/While/Delete/Raise）；**forbidden tokens 第一百三十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges75.py`（153 测试）
+
+### 覆盖要点
+- **_strip_unicode_whitespace 更细**：17 测试
+- **Counter 多集合交集**：5 测试
+- **_text_preservation 边界**：8 测试
+- **_heading_boundary_ratio 边界**：5 测试
+- **_silent_drop_count 边界**：10 测试
+- **_is_valid_bbox 角**：15 测试
+- **_chunk_reference_ratio 角**：6 测试
+- **_image_resource_ratio 角**：7 测试
+- **_null / _ratio / _bool_metric / _int_metric**：7 测试
+- **compute_automatic_metrics 完整路径**：7 测试
+- **模块常量更细**：9 测试
+- **模块源码补强**：17 测试
+- **AST 结构补强**：25 测试
+- **forbidden tokens 第一百三十八批**：16 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. `test_strip_byte_order_mark_batch51`：BOM (U+FEFF) 不被 isspace() 视为空白 → 改为验证 BOM 保留。
+  2. `test_strip_all_whitespace_returns_empty_batch51`：测试字符串末尾含 BOM → 移除 BOM。
+  3. `test_compute_metrics_pipeline_failed_returns_14_metrics_batch51`：error_code 的 reason 是 None（非 str），单独抽出检查。
+- 1 fail 二跑：
+  4. `test_ast_no_try_in_other_functions_batch51`：_image_resource_ratio 也有 1 个 try（OSError 容错）→ 改为 try locations 验证。
+
+### 测试基线
+- 总数：78254 passed, 22 skipped, 0 failed（421.91s）
+- 较上轮 +153（78101 → 78254）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第九十一轮（继续 edges 加强）
+  - evaluation/report.py 第九十二轮（继续 edges 加强）
+  - evaluation/runner.py 第九十三轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/cli.py 第九十五轮（继续 edges 加强）
+  - evaluation/schema.py 第九十六轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges75 已饱和（_strip_unicode_whitespace 17 + Counter 5 + text_preservation 8 + heading_boundary 5 + silent_drop 10 + is_valid_bbox 15 + chunk_reference 6 + image_ratio 7 + 类型构造器 7 + compute_automatic_metrics 7 + 模块常量 9 + 模块源码 17 + AST 25 + forbidden 16）。下一轮选 evaluation/manifest.py 第九十一轮，覆盖 Manifest dataclass / _is_absolute_like / content_group_count 等。
+
+---
+
 ## Round 667 — evaluation/__init__.py 第十轮（67 测试）
 
 ### 目标
