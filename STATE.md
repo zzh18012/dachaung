@@ -4,6 +4,52 @@
 
 ---
 
+## Round 637 — evaluation/manifest.py 第八十七轮（76 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第八十七轮 edges 测试，补强 edges71 未触及的角度（第四十六批）：**_is_absolute_like 更多 Unicode 与符号组合**（`~/foo` / `::` / `C:f` 3 字符无分隔符 / `C:/x` 4 字符 / `C:\\` / `C:/` 正好 3 字符 / `./foo` / `\\` 单反斜杠 / `\\\\foo` 双反斜杠 / `🚀:` 非 isalpha / `-:` 非 isalpha / `Z:` `z:` 大小写字母）；**_has_backslash 更多组合**（单反斜杠 / 多正斜杠 / 混合 / Unicode / emoji）；**DocumentEntry/ExpectedFailure/Manifest dataclass repr/str/match_args/dict-key**（frozen dataclass hashable）；**Manifest content_group_count 边界**（链式配对 A→B,B→C,C→A = 3 组 frozenset / 自配对 A→A = 1 / 配对目标缺失 / categories_covered Unicode 中英文排序 / repr / match_args / dict-key）；**_resolve_relative_path 跨盘符**（纯 `../` / `./file` 解析 / 嵌套 a/b/file.pdf / 子目录逃逸 `a/../../etc`）；**load_manifest 完整 documents**（含 sha256 64hex + categories / annotation_file 解析 / paired_with content_group_count=1 / expectations dict / devset_status complete）；**_detect_project_root**（嵌套文件带 pyproject / 无 pyproject 返回 cur）；**模块源码字符串补强**（关键不变量 / 正斜杠 / 项目根目录 / 本机绝对路径 / ManifestError docstring / _resolve_relative_path docstring / content_group_count docstring / 无硬编码路径）；**AST 结构补强**（_resolve_relative_path 多 if + 1 try / load_manifest 2+ for 循环 / Manifest 类 5 个 @property / DocumentEntry 装饰 @dataclass(frozen=True) / ManifestError 无方法）；**forbidden tokens 第一百零七批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges72.py`（76 测试）
+
+### 覆盖要点
+- **_is_absolute_like 更多 Unicode 与符号组合**：11 测试
+- **_has_backslash 更多组合**：5 测试
+- **DocumentEntry repr/str/match_args/dict-key**：5 测试
+- **ExpectedFailure repr/str/match_args/dict-key**：4 测试
+- **Manifest property 边界**：8 测试
+- **_resolve_relative_path 跨盘符**：4 测试
+- **load_manifest 完整 documents**：5 测试
+- **_detect_project_root**：2 测试
+- **模块源码补强**：8 测试
+- **AST 结构补强**：6 测试
+- **forbidden tokens 第一百零七批**：15 测试
+- **综合**：3 测试
+
+### 撞墙记录
+- 2 fail 首跑：
+  1. `test_document_entry_immutable_categories_batch46`：tuple 本身没有 append 方法 → AttributeError（frozen dataclass 不阻止 attribute lookup，只阻止 setattr）。改为 `d.categories = ("c",)` 才会触发 FrozenInstanceError。
+  2. `test_load_manifest_one_document_batch46`：sha256 必须匹配 `^[0-9a-f]{64}$`，`"abc"` 被 schema 拒绝。改为 `"a" * 64`。
+
+### 测试基线
+- 总数：75400 passed, 22 skipped, 0 failed（408.77s）
+- 较上轮 +76（75324 → 75400）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第八十八轮（继续 edges 加强 _RATIO_METRICS 12 项顺序 + get_git_provenance AST）
+  - evaluation/runner.py 第八十九轮（继续 edges 加强 _process_one unlink OSError + _load_annotation JSONDecodeError）
+  - evaluation/annotation_metrics.py 第九十轮（继续 edges 加强 chunk_boundary_prf 顺序匹配 + figure_caption_prf null）
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter + _sort_key）
+  - evaluation/schema.py 第九十二轮（继续 edges 加强 EvalSchemaError pickle + const vs enum）
+  - evaluation/__init__.py 第七轮（继续 edges 加强 4 常量属性 + 模块 __loader__/__spec__）
+  - evaluation/metrics.py 第八十八轮（继续 edges 加强 14 metrics keys + pipeline_failed）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges72 已饱和（frozen dataclass hashable + content_group_count 链式 + sha256 校验 + _resolve_relative_path 跨盘符 + AST frozen=True 检测）。下一轮选 evaluation/report.py 第八十八轮，覆盖 aggregate_summary silent_drop_count list comprehension 边界 + _RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 常量精确性。
+
+---
+
 ## Round 636 — evaluation/metrics.py 第八十六轮（88 测试）
 
 ### 目标
