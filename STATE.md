@@ -4,6 +4,38 @@
 
 ---
 
+## Round 618 — evaluation/schema.py 第八十二轮（92 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第八十二轮 edges 测试，补强 edges57 未触及的角度（第四十三批）：**SCHEMAS_DIR**（isinstance Path / exists / is_dir / name=='schemas' / 含 3 个 schema 文件 / source 含 Path(__file__).resolve()）；**_schema_path 签名**（1 param POSITIONAL_OR_KEYWORD / no default / return Path）；**_schema_path 行为**（返回 Path / 不存在 → FileNotFoundError 含 "Schema 文件不存在" / 空名字 / "."目录名 / 错误消息含路径）；**load_schema 签名**（1 param / dict return）；**load_schema 行为**（manifest/annotation/evaluation-report 三个 schema 都加载返回 dict / 不存在 → FileNotFoundError / utf-8 编码 / 调用 _schema_path）；**validate 签名**（2 params POSITIONAL_OR_KEYWORD / return None）；**validate 行为**（valid manifest 不抛 / 缺 required → EvalSchemaError / devset_status='partial' 拒绝 / errors 是 list / errors[i] 含 path/message/schema_path / 错误消息含 "校验失败" / 使用 Draft202012Validator / sorted by absolute_path）；**validate_file 签名**（2 params）；**validate_file 行为**（不存在 → FileNotFoundError "待校验文件不存在" / str path / Path path / invalid JSON → JSONDecodeError / schema fail → EvalSchemaError / utf-8 / 调用 validate）；**EvalSchemaError**（继承 Exception / 不继承 ValueError/TypeError / 默认 errors=[] / errors=None → [] / errors=[] / errors=list / 顺序保留 / message 透传 / repr 含类名 / 可被 catch / 可被 Exception catch / errors writable / __init__ 签名 (self, message, errors) / errors 默认 None）；**__all__ 5 entries**；**模块源码字符串精确**（不与 app/schema.py 复用 / jsonschema / Draft202012Validator / errors or [] / SCHEMAS_DIR = / 长度>30 docstring）；**AST 结构**（1 class：EvalSchemaError / 4 functions：_schema_path/load_schema/validate/validate_file / EvalSchemaError 有 __init__ / 无 try/for/while/async / future 是第二个）；**forbidden tokens 第八十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges58.py`（92 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR**：8 测试
+- **_schema_path**：8 测试
+- **load_schema**：8 测试
+- **validate**：11 测试
+- **validate_file**：8 测试
+- **EvalSchemaError**：17 测试
+- **__all__**：5 测试
+- **模块源码字符串**：7 测试
+- **AST 结构**：12 测试
+- **forbidden tokens**：10 测试
+
+### 撞墙记录
+- 0 fail 首跑通过
+
+### 测试基线
+- 总数：73610 passed, 22 skipped, 0 failed（664.71s）
+- 较上轮 +92（73518 → 73610）
+
+### 下一步建议
+- 下一轮到 evaluation/__init__.py 第四轮（继续 edges 加强 EVALUATOR_VERSION/REPORT_VERSION/ANNOTATION_VERSION/MANIFEST_VERSION/__all__ 边界）
+
+---
+
 ## Round 617 — evaluation/cli.py 第八十一轮（81 测试）
 
 ### 目标
