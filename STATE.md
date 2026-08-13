@@ -4,6 +4,50 @@
 
 ---
 
+## Round 655 — evaluation/runner.py 第九十一轮（77 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第九十一轮 edges 测试，补强 edges73 未触及的角度（第四十八批）：**_load_annotation 更多错误路径**（目录而非文件 / OSError → None / 成功返回 dict）；**_process_one errors 路径**（errors 非空 + document 非空 → 仍走 errors 路径返回 None / errors 非空 + document None / 无 errors 无 document → unknown / 成功路径 / elapsed 正数 / image_dir 推导 / unlink 失败 silent）；**run_evaluation expected_failures 完整流程**（成功匹配 / 不匹配 / 无 errors → actual_code None）；**run_evaluation report JSON 写盘内容**（写到 output_path / 6 top keys / report_version 来自常量 / 创建嵌套 output_root）；**run_evaluation wall_time_seconds 完整结构**（5 keys / parse/chunk null / reasons not_instrumented / total float）；**run_evaluation per_doc 完整字段**（内部含 _ 私有键 / public 无 _ 私有键 / annotation_present False / tolerance_chars 默认 30 / 自定义 99 / missing_markers 默认 [] / parser_version 取第一个成功）；**模块源码补强**（json/time/Path/Any/pipeline/process_single/image_output_dir_for/REPORT_VERSION/chunk_boundary_prf/figure_caption_prf/compute_automatic_metrics/aggregate_summary/build_provenance/build_devset_section imports / perf_counter / not_instrumented / pipeline_failed / unknown / write_json=False / ensure_ascii=False / __all__ run_evaluation）；**AST 结构补强**（3 函数 / 无 ClassDef / 无 AsyncFunctionDef / module docstring / _load_annotation 1 try + 1 open call / _process_one perf_counter + ≥3 return + ≥1 try / run_evaluation ≥3 for + ≥1 with + json.dump + return report Name / 10 import / 1 Assign）；**forbidden tokens 第一百二十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges74.py`（77 测试）
+
+### 覆盖要点
+- **_load_annotation 更多错误路径**：3 测试
+- **_process_one errors 路径**：9 测试
+- **run_evaluation expected_failures 完整流程**：3 测试
+- **run_evaluation report JSON 写盘内容**：4 测试
+- **run_evaluation wall_time_seconds 完整结构**：1 测试
+- **run_evaluation per_doc 完整字段**：7 测试
+- **模块源码补强**：21 测试
+- **AST 结构补强**：14 测试
+- **forbidden tokens 第一百二十五批**：15 测试
+
+### 撞墙记录
+- 2 fail 首跑：
+  1. `test_process_one_errors_returns_error_dict_batch48`：errors 路径无论 document 是否非空，都强制返回 document=None（实现：`if errors: return None, errors[0].to_dict(), ...`）。改正断言 document is None。
+  2. `test_run_evaluation_wall_time_seconds_structure_batch48`：_make_doc 未设置 source_type，MagicMock 自动属性返回 MagicMock child，json.dump 失败。改 _make_doc 设置 source_type="pdf" / annotation_resolved=None / expectations=None。
+
+### 测试基线
+- 总数：77086 passed, 22 skipped, 0 failed（419.21s）
+- 较上轮 +77（77009 → 77086）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第九十二轮（继续 edges 加强 anchor 多字段组合）
+  - evaluation/cli.py 第九十三轮（继续 edges 加强 run 子命令完整路径）
+  - evaluation/schema.py 第九十四轮（继续 edges 加强 validate errors 排序稳定性）
+  - evaluation/__init__.py 第九轮（继续 edges 加强 monkeypatch 链）
+  - evaluation/metrics.py 第九十二轮（继续 edges 加强 _image_resource_ratio 多路径）
+  - evaluation/manifest.py 第九十轮（继续 edges 加强 annotation_file 解析）
+  - evaluation/report.py 第九十一轮（继续 edges 加加强 build_provenance 时间戳）
+  - evaluation/runner.py 第九十二轮（继续 edges 加加强 errors JSON 输出）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner.py edges74 已饱和（_load_annotation 3 + _process_one 9 路径 + expected_failures 3 + report JSON 写盘 4 + wall_time 5 keys + per_doc 完整字段 7 + AST 完整 + forbidden tokens）。下一轮选 evaluation/annotation_metrics.py 第九十二轮，覆盖 anchor 多字段组合 + chunk_boundary_prf 更深路径。
+
+---
+
 ## Round 654 — evaluation/report.py 第九十轮（93 测试）
 
 ### 目标
