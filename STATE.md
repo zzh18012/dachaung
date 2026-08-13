@@ -4,6 +4,48 @@
 
 ---
 
+## Round 679 — evaluation/cli.py 第九十六轮（108 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第九十六轮 edges 测试，补强 edges76 未触及的角度（第五十三批）：**_build_parser 边界**（prog 含点 / subparsers dest='command' / run+inspect-doc 都有 tolerance-chars / run 5 optional args / validate-report input / inspect-doc input）；**main run 完整成功路径详细**（[OK] 评测完成 / pipeline_success 统计 n_ok+n_fail / devset 输出 keys status+file_count+groups+pdf+docx / git keys git_commit 前 12 + git_dirty / validate_file 失败 return 1 / manifest 不存在 return 2 / ManifestError return 1 / EvalSchemaError return 1）；**main validate-report 完整成功**（[OK] + 文件名 / 不存在 return 2 / EvalSchemaError return 1 / FileNotFoundError return 2 / JSONDecodeError return 1）；**main inspect-doc 详细**（file/document_id/source/parser/counts/metrics 标签 / elements+chunks 计数 / source_type 默认 unknown / document_id 默认 ? / parser 默认 ? v? / 不存在 return 2 / JSON 解析失败 return 1 / 顶层非 dict return 1）；**_format_metric 边界**（大 int / 负数 / 0 / 空 dict / dict 多 key 排序 / dict 含 None value / value None + reason / bool true/false 小写 / float 4 位小数 / float 0）；**_run_inspect_doc _sort_key**（null 排最后）；**模块源码补强**（4 imports / 4 evaluation imports / sys.stdout.reconfigure / encoding=utf-8 / errors=replace / main 签名 / _sort_key 嵌套 / sorted / dest=command / required=True / RawDescriptionHelpFormatter / __main__ SystemExit / 3 subparsers / choices fallback+kreuzberg / reconfigure 3 次 / manifest_path.is_file / input_path.is_file / input_path.open with）；**AST 结构补强**（4 函数 + 顺序 / 无 ClassDef/AsyncFunctionDef / 2 module-level If / module docstring / main 3 command If / main 4 try / main ≥7 return / build_parser add_subparsers dest+required / build_parser 3 add_parser / _run_inspect_doc 1 nested FunctionDef _sort_key / _run_inspect_doc sorted 调用 / _run_inspect_doc ≥7 print / _run_inspect_doc 1 with / _format_metric ≥4 return + JoinedStr / 无 ImportStar/Global/Nonlocal/While）；**forbidden tokens 第一百四十九批**（no eval/exec/compile/globals/locals/os.system/subprocess/popen/yaml.load/pickle.load/socket/requests/urllib/shutil.rmtree/yield/async/await, open count=1）
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges77.py`（108 测试）
+
+### 覆盖要点
+- **_build_parser 边界**：9 测试
+- **main run 完整成功路径详细**：10 测试
+- **main validate-report 完整成功**：6 测试
+- **main inspect-doc 详细**：8 测试
+- **_format_metric 边界**：12 测试
+- **_run_inspect_doc _sort_key**：1 测试
+- **模块源码补强**：24 测试
+- **AST 结构补强**：22 测试
+- **forbidden tokens 第一百四十九批**：16 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  - `test_source_has_3_subparsers_batch52`：`sub.add_parser("validate-report"` 跨行（val_p = ... 多行调用）。Fix：断言 `"validate-report"` 字面量本身存在。
+  - `test_source_has_2_stderr_writes_for_reconfigure_batch52`：实际 count == 3（hasattr + stdout.reconfigure + stderr.reconfigure）。Fix：==3。
+  - `test_ast_build_parser_add_subparsers_batch52`：错用 `isinstance(n.name, str)` 在 Expr 上 → AttributeError。Fix：先 `isinstance(n, ast.FunctionDef)` 再访问 .name。
+
+### 测试基线
+- 总数：79265 passed, 22 skipped, 0 failed（430.23s）
+- 较上轮 +108（79157 → 79265）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第九十七轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十三轮（继续 edges 加强）
+  - evaluation/report.py 第九十四轮（继续 edges 加强）
+  - evaluation/runner.py 第九十五轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli edges77 已饱和（_build_parser 边界 / main run 完整路径详细 / validate-report / inspect-doc / _format_metric 12 / _sort_key / 模块源码 24 / AST 22 / forbidden 16）。下一轮选 evaluation/schema.py 第九十七轮，覆盖 EvalSchemaError / validate_file / load_schema_dict / get_schema_path 更深路径。
+
+---
+
 ## Round 678 — evaluation/annotation_metrics.py 第九十五轮（99 测试）
 
 ### 目标
