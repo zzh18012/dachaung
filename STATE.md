@@ -4,6 +4,55 @@
 
 ---
 
+## Round 632 — evaluation/annotation_metrics.py 第八十九轮（89 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第八十九轮 edges 测试，补强 edges70 未触及的角度（第四十五批）：**PARSER_DOES_NOT_EMIT_RELATIONS 常量**（值 / str / 在 __all__ 中是 identifier 不是 value）；**figure_caption_prf 各种**（3 个 null keys / 都是 null reason=PARSER_DOES_NOT_EMIT_RELATIONS / document None / annotation None / both None / empty dicts / 返回 dict / reason 跨调用一致 / 无下划线 key）；**chunk_boundary_prf document None**（reason=pipeline_failed / tolerance_recorded / 默认 30）；**chunk_boundary_prf annotation 缺失**（None / 空 dict / 视为 falsy / reason=no_annotation）；**chunk_boundary_prf 少于 2 chunks**（0 chunk + anchors → recall=0.0 ratio / 0 chunk + 0 anchors → null / 1 chunk + 0 anchors / 1 chunk + anchors → recall=0.0）；**chunk_boundary_prf 有 chunks 无 anchors**（reason=no_ground_truth_anchors）；**chunk_boundary_prf 完美匹配**（within tolerance / outside tolerance / position=before / position=before within tolerance）；**chunk_boundary_prf marker 缺失**（marker 不在 stream → missing_markers / marker="" → missing / 无 missing 不出 _missing_markers key）；**chunk_boundary_prf f1 计算**（precision null → f1 null / zero denom → 0.0 / tolerance=0 完美）；**chunk_boundary_prf 重复 marker**（stream order search_from 推进）；**chunk_boundary_prf _tolerance_chars 始终在输出**（所有 4 个分支都有）；**模块源码字符串精确**（约定文档 / 4 import / 5 def + 1 常量字面量 / tolerance 默认 30 / 5 个 reason 字符串 / search_from / missing_markers / normalize_text / position before/after）；**__all__**（3 entries exact order / importable / unique / 首项是常量 identifier）；**AST 结构**（无 class / 2 functions / function names 顺序 / 无 async / 首节点 docstring / 第二 future / figure_caption_prf 函数体短 ≤4 / chunk_boundary_prf 有 for≥3 + if≥4 + 调用 normalize_text + 调用 _null + 调用 _ratio + stream.find）；**forbidden tokens 第一百零二批 + lambda 在 sort key 中合法**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges71.py`（89 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量**：3 测试
+- **figure_caption_prf 各种**：9 测试
+- **chunk_boundary_prf document None**：3 测试
+- **chunk_boundary_prf annotation 缺失**：4 测试
+- **chunk_boundary_prf 少于 2 chunks**：4 测试
+- **chunk_boundary_prf 有 chunks 无 anchors**：1 测试
+- **chunk_boundary_prf 完美匹配**：5 测试
+- **chunk_boundary_prf marker 缺失**：3 测试
+- **chunk_boundary_prf f1 计算**：3 测试
+- **chunk_boundary_prf 重复 marker**：1 测试
+- **chunk_boundary_prf _tolerance_chars**：2 测试
+- **chunk_boundary_prf 返回 dict**：2 测试
+- **模块源码字符串**：18 测试
+- **__all__**：5 测试
+- **AST 结构**：12 测试
+- **forbidden tokens + lambda**：15 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_source_no_lambda_batch45`：源码中 `pairs.sort(key=lambda x: x[0])` 用了 lambda，是合法用法。改为断言源码包含 lambda 表达式。
+
+### 测试基线
+- 总数：74928 passed, 22 skipped, 0 failed（403.48s）
+- 较上轮 +89（74839 → 74928）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter）
+  - evaluation/schema.py 第九十一轮（继续 edges 加强 EvalSchemaError pickle）
+  - evaluation/__init__.py 第六轮（继续 edges 加强 4 常量属性）
+  - evaluation/metrics.py 第八十六轮（继续 edges 加强 helper 行为）
+  - evaluation/manifest.py 第八十七轮（继续 edges 加强 _is_absolute_like Unicode）
+  - evaluation/report.py 第八十八轮（继续 edges 加强 _RATIO_METRICS 12 项顺序）
+  - evaluation/runner.py 第八十九轮（继续 edges 加强 _process_one unlink OSError）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges71 已饱和（PARSER_DOES_NOT_EMIT_RELATIONS 常量 + figure_caption_prf 始终 null + chunk_boundary_prf 所有分支 + 重复 marker stream order + _tolerance_chars 始终在 + source + AST 完整 + forbidden tokens）。下一轮选 evaluation/cli.py 第九十一轮，覆盖 _build_parser formatter + main 各种错误处理 + _run_inspect_doc 排序逻辑。
+
+---
+
 ## Round 631 — evaluation/runner.py 第八十八轮（94 测试）
 
 ### 目标
