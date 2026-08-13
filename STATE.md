@@ -4,6 +4,36 @@
 
 ---
 
+## Round 593 — evaluation/cli.py 第六十六轮（108 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第六十六轮 edges 测试，覆盖 edges65 未触及的角度（第三十九批）：**_build_parser**（no args raises / --help / run --help / validate-report --help / inspect-doc --help / unknown command / run without manifest / run without output / full args / all args / invalid parser choice / invalid max-chars / validate-report with input / without input / inspect-doc with input / with tolerance / without input / description / prog value）；**_format_metric**（None / True / False / int / 0 int / float / dict / empty dict / string fallback / reason fallback / unicode reason / return str / long name / alignment width）；**_run_inspect_doc**（missing file / invalid json / top-level list / int / string / empty dict / metrics header / file path / document_id / source_type / elements count / chunks count / parser info / signature / return int）；**main**（no args / unknown command / run missing manifest / validate-report missing / inspect-doc missing / invalid json / callable / unknown flag / signature / argv default / return int）；**module source forbidden tokens 第六十六批**；**module source 字符串精确补强第六十二批**；**module 合理性 第六十二批**；**端到端集成 第六十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges66.py`（108 测试）
+
+### 覆盖要点
+- **_build_parser 第三十九批**：18 测试
+- **_format_metric 第三十九批**：14 测试
+- **_run_inspect_doc 第三十九批**：16 测试
+- **main 第三十九批**：14 测试
+- **module source forbidden tokens 第六十六批**：14 测试（参数化）
+- **module source 字符串精确补强第六十二批**：20 测试
+- **module 合理性 第六十二批**：9 测试
+- **端到端集成 第六十二批**：5 测试
+
+### 撞墙记录
+- 0 fails 首跑
+
+### 测试基线
+- 总数：70351 passed, 22 skipped, 0 failed（1241.53s）
+- 较上轮 +108（70243 → 70351）
+
+### 下一步建议
+- 下一轮选 evaluation/manifest.py 第六十六轮（继续 edges 加强 DocumentEntry / ExpectedFailure 内部行为）
+
+---
+
 ## Round 592 — evaluation/runner.py 第六十六轮（95 测试）
 
 ### 目标
