@@ -4,6 +4,35 @@
 
 ---
 
+## Round 582 — evaluation/schema_validation.py 第四轮（63 测试）
+
+### 目标
+- 给 `evaluation/schema_validation.py`（16 行）加第四轮 edges 测试，覆盖 base/edges/edges2/edges3（共 81+ 测试）未触及的角度（第四批）：**document_passes_schema 输入类型**（tuple / set / bytes / float / bool True / bool False / 0 / 负 int / frozenset）；**dict 内容**（None values / nested dict / list value / unicode keys / int keys / long value / deeply nested）；**行为**（callable / 最小合法 doc / 多次 idempotent / 不 mutate 嵌套 / 严格 bool 类型 / 纯函数）；**模块结构**（行数 < 30 / 含文档 / 无 class / 无 for while / 无 try except / 无 if else / 含"延迟 import" / 含 bool() / 含 return / 含 module docstring / 只有一个用户定义函数 / 函数体提到 is_valid 或 schema）；**签名深度**（POSITIONAL_OR_KEYWORD / 无 var_positional / 无 var_keyword / 参数数量 1 / 参数名严格为 document）；**综合行为**（huge dict 不抛 / unicode 不抛 / 特殊字符不抛 / circular ref 安全 / 空字符串 / 随机顺序一致 / 嵌套 list / null value / empty list / empty dict）；**module source forbidden tokens**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_validation_edges4.py`（63 测试）
+
+### 覆盖要点
+- **document_passes_schema 输入类型 第四批**：9 测试
+- **dict 内容 第四批**：7 测试
+- **行为 第四批**：6 测试
+- **模块结构 第四批**：13 测试
+- **签名深度 第四批**：5 测试
+- **综合行为 第四批**：10 测试
+- **module source forbidden tokens 第四批**：14 测试（参数化）
+
+### 撞墙记录
+- 1 fail 首跑：`vars(mod)` 包含 `Any`（typing 类型，callable 但不是函数）→ 改用 `inspect.isfunction()` 过滤
+
+### 测试基线
+- 总数：69048 passed, 22 skipped, 0 failed（410.99s）
+- 较上轮 +63（68985 → 69048）
+
+### 下一步建议
+- 下一轮选 evaluation/report.py 第五十四轮（继续 edges 加强 build_provenance / aggregate_summary / get_git_provenance）
+
+---
+
 ## Round 581 — evaluation/metrics.py 第六十九轮（159 测试）
 
 ### 目标
