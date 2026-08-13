@@ -4,6 +4,40 @@
 
 ---
 
+## Round 608 — evaluation/annotation_metrics.py 第七十二轮（114 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第七十二轮 edges 测试，补强 edges67 未触及的角度（第四十四批）：**PARSER_DOES_NOT_EMIT_RELATIONS 边界**（isidentifier / islower / isprintable / isascii / no uppercase / starts/ends with letter / underscore count=4）；**figure_caption_prf**（document None / annotation None / 两个都 None / 两个都 some（仍返 null）/ 内部 dict keys 固定 / 返回新对象 / 不缓存）；**chunk_boundary_prf 签名**（tolerance_chars 默认 30 / document/annotation 必填）；**chunk_boundary_prf 边界**（document=None → pipeline_failed / annotation empty → no_annotation / annotation 无 chunk_boundary_anchors key / 单 chunk + 无 anchors → no_predicted_boundaries / 单 chunk + 有 anchors → recall=0.0）；**tolerance_chars 记录**（0 / 负值 / 大值 / 所有分支都记录）；**正常匹配**（完美 / position=before / position 缺省 / 无匹配 / 部分匹配 / 一对一 / marker 找不到 → missing_markers / 空 marker / 重复 marker 顺序定位）；**5 元组结构**（最少 4 keys / 最多 5 keys / _tolerance_chars value int / reason None / _missing_markers reason None）；**module source 字符串精确**；**AST 结构**（含 PARSER_DOES_NOT_EMIT_RELATIONS 顶层 Assign）；**module 合理性**；**端到端集成**；**forbidden tokens 第七十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges68.py`（114 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS**：8 测试
+- **figure_caption_prf**：12 测试
+- **chunk_boundary_prf 签名**：6 测试
+- **chunk_boundary_prf 边界条件**：10 测试
+- **_tolerance_chars 总存在**：5 测试
+- **正常匹配**：11 测试
+- **5 元组结构**：5 测试
+- **module source 字符串精确**：22 测试
+- **AST 结构**：6 测试
+- **module 合理性**：13 测试
+- **端到端集成**：4 测试
+- **forbidden tokens**：14 测试
+
+### 撞墙记录
+- 0 fail（一次通过）
+
+### 测试基线
+- 总数：72507 passed, 22 skipped, 0 failed（393.14s）
+- 较上轮 +114（72393 → 72507）
+
+### 下一步建议
+- 下一轮到 evaluation/cli.py 第七十三轮（继续 edges 加强 _build_parser / _format_metric / _run_inspect_doc / main 边界）
+
+---
+
 ## Round 607 — evaluation/runner.py 第七十一轮（114 测试）
 
 ### 目标
