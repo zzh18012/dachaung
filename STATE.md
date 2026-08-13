@@ -4,6 +4,36 @@
 
 ---
 
+## Round 613 — evaluation/manifest.py 第七十七轮（86 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第七十七轮 edges 测试，补强 edges68 未触及的角度（第四十三批）：**DocumentEntry 字段**（10 个字段 / frozen / asdict / replace / fields() 顺序 / 字段类型校验 / Optional 检查 / 默认值 / hashable）；**ExpectedFailure 字段**（5 个字段 / frozen / source_type Optional / asdict round trip / replace 单字段 / hashable / 不含其他字段）；**Manifest 字段**（5 个字段 / frozen / documents tuple / expected_failures tuple / project_root Path / asdict 类型）；**Manifest.content_group_count**（链式 pair：d1↔d2, d2↔d3 不塌缩为 1 组，正确为 2 组 / frozenset dedup / 孤立 doc 算 1 组 / 空算 0 组）；**ManifestError 继承**（isinstance Exception / NOT subclass of ValueError/TypeError/KeyError / 直接 raise / catch by Exception）；**_is_absolute_like 边界**（UNC `\\\\server\\share` / 双斜杠 `//server/share` / tilde `~/foo` / 3 字符 drive letter / Unicode drive letter `δ:/x` / 小于 3 字符 + 无分隔符 → False）；**_has_backslash**；**_resolve_relative_path**（unicode 文件名 `héllo.pdf` / emoji `📄.pdf` / 多点 `a.b.c.pdf` / 路径逃逸 `../foo` → 拒绝 / 绝对路径 → 拒绝 / 正常相对路径 / 字段名透传错误消息）；**module source forbidden tokens 第八十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges69.py`（86 测试）
+
+### 覆盖要点
+- **DocumentEntry / ExpectedFailure / Manifest dataclass**：18 测试
+- **Manifest.content_group_count**：8 测试
+- **ManifestError 继承**：5 测试
+- **_is_absolute_like 边界**：12 测试
+- **_resolve_relative_path**：16 测试
+- **Manifest / DocumentEntry 互动**：8 测试
+- **签名 / 模块结构**：10 测试
+- **forbidden tokens**：9 测试
+
+### 撞墙记录
+- 0 fail 首跑通过
+
+### 测试基线
+- 总数：73173 passed, 22 skipped, 0 failed（693.29s）
+- 较上轮 +86（73087 → 73173）
+
+### 下一步建议
+- 下一轮到 evaluation/report.py 第七十八轮（继续 edges 加强 aggregate_summary / get_git_provenance / get_dependency_versions 边界）
+
+---
+
 ## Round 612 — evaluation/metrics.py 第七十六轮（140 测试）
 
 ### 目标
