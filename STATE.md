@@ -4,6 +4,45 @@
 
 ---
 
+## Round 676 — evaluation/report.py 第九十三轮（71 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第九十三轮 edges 测试，补强 edges65 未触及的角度（第五十二批）：**常量完整性**（tuple 不可变 / 3 类 metric 不重叠 / 不混淆类别）；**get_git_provenance subprocess 调用**（2 次 subprocess.run + 命令行 + cwd + kwargs / 默认 dirty=True / 默认 commit=None / 返回 2 keys dict）；**get_dependency_versions 实际行为**（pdfplumber 真实版本 / python-docx 版本 / 无额外 key）；**build_provenance 完整字段**（git_commit/git_dirty from helper / dependencies dict / 负数 max_chars / parser_name/version 记录 / timestamp 接近当前）；**build_devset_section**（6 keys / uses manifest attributes）；**aggregate_summary 多 metric 类型**（success+schema 独立 / counts vs success 不混淆 / all None / all same value / rate all fail / rate all success / missing metric / silent_drop 单 doc / 4 keys / counts with 0 int）；**模块源码补强**（_RATIO_METRICS 文档 / figure_caption 始终 null / 不混合类型 / counts 求和 / success_rates / silent_drop / 函数顺序）；**AST 结构补强**（4 Assigns + targets / _COUNT_METRICS Tuple 1 elt / _SUCCESS_BOOL_METRICS Tuple 1 elt / aggregate_summary 3 for in body / for target ast.Name / build_provenance Dict 9 keys / build_devset_section Dict 6 keys / get_git_provenance 1 try except OSError + subprocess.SubprocessError / 无 ClassDef / 无 AsyncFunctionDef / module docstring / 无 ImportStar）；**forbidden tokens 第一百四十六批**（open count=0 / subprocess ≥3 / 无 async/await / 无 yield）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges66.py`（71 测试）
+
+### 覆盖要点
+- **常量完整性**：7 测试
+- **get_git_provenance subprocess 调用**：6 测试
+- **get_dependency_versions 实际行为**：3 测试
+- **build_provenance 完整字段**：5 测试
+- **build_devset_section**：2 测试
+- **aggregate_summary 多 metric 类型**：10 测试
+- **模块源码补强**：7 测试
+- **AST 结构补强**：15 测试
+- **forbidden tokens 第一百四十六批**：16 测试
+
+### 撞墙记录
+- 0 fails 首跑。71 测试一次通过。
+
+### 测试基线
+- 总数：78989 passed, 22 skipped, 0 failed（421.95s）
+- 较上轮 +71（78918 → 78989）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/runner.py 第九十四轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十五轮（继续 edges 加强）
+  - evaluation/cli.py 第九十六轮（继续 edges 加强）
+  - evaluation/schema.py 第九十七轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges66 已饱和（常量完整性 + subprocess 调用 + 实际 dependency 版本 + aggregate_summary 多类型 + 模块源码 + AST 15 + forbidden 16）。下一轮选 evaluation/runner.py 第九十四轮，覆盖 _load_annotation / _process_one / run_evaluation 更深路径。
+
+---
+
 ## Round 675 — evaluation/manifest.py 第九十二轮（68 测试）
 
 ### 目标
