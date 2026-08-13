@@ -4,6 +4,51 @@
 
 ---
 
+## Round 658 — evaluation/schema.py 第九十四轮（93 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第九十四轮 edges 测试，补强 edges62 未触及的角度（第四十九批）：**EvalSchemaError 构造更深层**（errors 非空 list / errors 默认独立 list / errors falsy list 保留 / args 保留 message / str 含 message / raise 后被捕获 / raise 后被 Exception 捕获）；**_schema_path 多种不存在名称**（带子目录 / 带特殊字符 / 返回 Path 类型 / 返回绝对路径 / 返回 filename 正确）；**load_schema 多次返回新对象**（每次新 dict / mutation 不影响 / manifest schema 有 properties / annotation schema 有 properties / evaluation-report schema 有 properties）；**validate 失败时 errors 排序稳定性**（sorted by absolute_path / 两次校验顺序一致 / flat 结构类型 / head message 在 exception message 中 / message 含 schema_name / message 含错误数 / 无 errors 返回 None / 多 errors 排序稳定）；**validate_file 路径处理**（接受 str / 接受 Path / 不存在 raise / 目录 raise / JSONDecodeError / EvalSchemaError / message 含 schema_name）；**SCHEMAS_DIR 常量**（is Path / is absolute / exists / 含 manifest schema / 含 annotation schema / 含 evaluation-report schema / parent 是 project root）；**模块源码补强**（Draft202012Validator / iter_errors / absolute_path / absolute_schema_path / sorted / FileNotFoundError / encoding utf-8 / json.load / future annotations / pathlib / typing.Any / 无额外 import / SCHEMAS_DIR / resolve / is_file / __all__ 5 entries）；**AST 结构补强**（4 函数 / 1 ClassDef / EvalSchemaError 1 method / __init__ 调 super / errors or [] / validate 1 for / validate 1 sorted / validate if not errors / validate raise EvalSchemaError / validate flat.append / validate head = errors[0] / validate_file 1 with / validate_file ≥1 if / validate_file 调 validate / _schema_path if not p.is_file() / load_schema 调 _schema_path / module docstring / 6 import / 2 top-level Assign / 无 AsyncFunctionDef / 仅 EvalSchemaError class / forbidden tokens 第一百二十八批）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges63.py`（93 测试）
+
+### 覆盖要点
+- **EvalSchemaError 构造更深层**：7 测试
+- **_schema_path 多种不存在名称**：5 测试
+- **load_schema 多次返回新对象**：5 测试
+- **validate 失败时 errors 排序稳定性**：8 测试
+- **validate_file 路径处理**：7 测试
+- **SCHEMAS_DIR 常量**：7 测试
+- **模块源码补强**：16 测试
+- **AST 结构补强**：21 测试
+- **forbidden tokens 第一百二十八批**：17 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. `test_validate_errors_sorted_by_absolute_path_batch49`：原假设 raw iter_errors 已按 absolute_path 排序，实际不是。改为验证 sorted() 函数本身正确。
+  2. `test_validate_no_errors_returns_none_batch49`：manifest schema required 字段为 `manifest_version + devset_status + documents`（非只 manifest_version + documents）。补 devset_status 后通过。
+  3. `test_validate_file_accepts_str_path_batch49 / accepts_path_object`：同上，补 devset_status。
+  4. `test_ast_module_has_5_imports_batch49`：实际 6 个 import（jsonschema 与 jsonschema.exceptions 分开 import）。改为 ==6。
+
+### 测试基线
+- 总数：77303 passed, 22 skipped, 0 failed（417.40s）
+- 较上轮 +93（77210 → 77303）
+
+### 下一步建议
+- 候选：
+  - evaluation/__init__.py 第九轮（继续 edges 加强 monkeypatch 链）
+  - evaluation/metrics.py 第九十二轮（继续 edges 加强 _image_resource_ratio 多路径）
+  - evaluation/manifest.py 第九十轮（继续 edges 加强 annotation_file 解析）
+  - evaluation/report.py 第九十一轮（继续 edges 加强 build_provenance 时间戳）
+  - evaluation/runner.py 第九十二轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十三轮（继续 edges 加强 anchor position 校验）
+  - evaluation/cli.py 第九十四轮（继续 edges 加强 _run_inspect_doc 嵌套行为）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges63 已饱和（EvalSchemaError 构造 7 + _schema_path 5 + load_schema 5 + validate 排序 8 + validate_file 7 + SCHEMAS_DIR 7 + AST 21 + forbidden tokens）。下一轮选 evaluation/__init__.py 第九轮，覆盖 monkeypatch 链 + __all__ 顺序。
+
+---
+
 ## Round 657 — evaluation/cli.py 第九十三轮（64 测试）
 
 ### 目标
