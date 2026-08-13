@@ -4,6 +4,45 @@
 
 ---
 
+## Round 620 — evaluation/metrics.py 第八十四轮（108 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第八十四轮 edges 测试，补强 edges68 未触及的角度（第四十四批）：**_null / _ratio / _bool_metric / _int_metric**（dict 结构 / 类型 / 透传 / bool truthy/falsy / int float 截断 / ValueError on str）；**常量**（_TEXT_TYPES 7 个 / _PDF_BBOX_REQUIRED_TYPES 4 个 / subset 关系 / _NOT_EVALUATED）；**_strip_unicode_whitespace**（empty / no ws / ascii space / tab / newline / NBSP / em space / ideographic space / U+200B not stripped / preserves order / only ws → empty / punctuation）；**_text_preservation**（empty+empty → equal=True + precision=null+empty_expected_and_actual / empty_actual → precision=null+empty_actual / empty_expected → recall=null / equal=True case / equal=False / partial overlap precision/recall / ignores image / strips whitespace / 3 keys）；**_heading_boundary_ratio**（no_headings → null / no chunks → 0.0 / perfect match → 1.0 / partial → 0.5 / no match / chunk no ids）；**_silent_drop_count**（no expectations / empty dict / no element_count / empty count / actual=expected → 0 / actual<expected / actual>expected → 0 / sums across types / missing type in actual / extra type in actual）；**compute_automatic_metrics pipeline_failed**（14 metrics total / pipeline_success=False / error_code=None / schema_valid=pipeline_failed / 11 个后续指标 null+pipeline_failed）；**error_code 透传**（error['code'] → value / missing code → KeyError）；**schema_valid**（passes / fails / exception → schema_check_exception:TypeName）；**source_type 分支**（pdf / docx / unknown html）；**element_count_total + by_type**（计数 / unknown type 兜底）；**__all__ 1 entry**；**模块源码字符串精确**；**AST 结构**；**forbidden tokens 第九十批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges69.py`（108 测试）
+
+### 覆盖要点
+- **_null / _ratio / _bool_metric / _int_metric**：16 测试
+- **常量**：9 测试
+- **_strip_unicode_whitespace**：12 测试
+- **_text_preservation**：10 测试
+- **_heading_boundary_ratio**：6 测试
+- **_silent_drop_count**：10 测试
+- **compute_automatic_metrics pipeline_failed + error_code**：6 测试
+- **schema_valid**：3 测试
+- **source_type 分支**：3 测试
+- **element_count**：3 测试
+- **__all__**：2 测试
+- **模块源码字符串**：9 测试
+- **AST 结构**：8 测试
+- **forbidden tokens**：10 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. `test_compute_pipeline_failed_returns_12_metrics_batch44`：实际返回 14 个 keys（pipeline_success + error_code + schema_valid + 11 个 null 后续），不是 12 → 改为 14
+  2. `test_compute_with_no_error_code_batch44`：实现是 `error["code"]`（严格索引，不存在 → KeyError），不是 .get() → 改为 pytest.raises(KeyError)
+  3. `test_compute_schema_valid_passes_batch44`：用 MagicMock 作 document，`document.get("elements", [])` 返回 MagicMock（truthy），进入 `_pdf_locator_ratio` 非空分支后 `valid / len(elements)` 除零 → 改用真实 dict `{"elements": [], "chunks": []}`
+
+### 测试基线
+- 总数：73833 passed, 22 skipped, 0 failed（745.08s）
+- 较上轮 +108（73725 → 73833）
+
+### 下一步建议
+- 下一轮到 evaluation/manifest.py 第八十五轮（继续 edges 加强 load_manifest / Manifest.from_dict / DocumentEntry 校验 边界）
+
+---
+
 ## Round 619 — evaluation/__init__.py 第四轮（115 测试）
 
 ### 目标
