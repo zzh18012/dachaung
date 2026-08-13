@@ -4,6 +4,41 @@
 
 ---
 
+## Round 594 — evaluation/manifest.py 第六十六轮（151 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第六十六轮 edges 测试，覆盖 edges65 未触及的角度（第三十九批）：**DocumentEntry**（all fields / equality / inequality / hashable / repr / frozen categories / field type hints）；**ExpectedFailure**（all fields / source_type optional / equality / 5 fields / field names / frozen / hashable / repr）；**Manifest properties**（file_count 多 doc / pdf_count 0 / docx_count 0 / categories sorting / dedup / returns list / devset_status / project_root / frozen / content_group_count 多种情况 / expected_failures 字段 / tuple 类型 / hashable / equality / repr）；**_is_absolute_like / _has_backslash**（empty / single slash / unix root / windows lowercase / uppercase / no separator / digit first / unicode / relative / dot / dot-dot / present / absent / only / multiple / leading / trailing）；**_resolve_relative_path**（returns Path / subdir / filename / dot segments / outside root / absolute / backslash / empty / unicode / no existing required / field_name in error）；**load_manifest**（str path / Path object / nonexistent / invalid json / incompatible version / absolute path / backslash / idempotent / empty / one pdf one docx / categories / paired_with / expectations / annotation_file / expected_failures / project_root str）；**_detect_project_root**（with pyproject / fallback / with file input / returns Path / signature）；**ManifestError**（subclass / raise / catch / message / args / unicode / long message）；**module source forbidden tokens 第六十七批**；**module source 字符串精确补强第六十三批**；**signatures 第六十三批**；**module 合理性 第六十三批**；**端到端集成 第六十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges66.py`（151 测试）
+
+### 覆盖要点
+- **DocumentEntry 第三十九批**：7 测试
+- **ExpectedFailure 第三十九批**：8 测试
+- **Manifest properties 第三十九批**：18 测试
+- **_is_absolute_like / _has_backslash 第三十九批**：17 测试
+- **_resolve_relative_path 第三十九批**：11 测试
+- **load_manifest 第三十九批**：17 测试
+- **_detect_project_root 第三十九批**：5 测试
+- **ManifestError 第三十九批**：7 测试
+- **module source forbidden tokens 第六十七批**：14 测试（参数化）
+- **module source 字符串精确补强第六十三批**：22 测试
+- **signatures 第六十三批**：9 测试
+- **module 合理性 第六十三批**：11 测试
+- **端到端集成 第六十三批**：5 测试
+
+### 撞墙记录
+- 0 fails 首跑（修正了一处 typo："source_type":pdf → "source_type": "pdf"）
+
+### 测试基线
+- 总数：70502 passed, 22 skipped, 0 failed（1266.26s）
+- 较上轮 +151（70351 → 70502）
+
+### 下一步建议
+- 下一轮选 evaluation/annotation_metrics.py 第六十四轮（继续 edges 加强 figure_caption_prf / chunk_boundary_prf）
+
+---
+
 ## Round 593 — evaluation/cli.py 第六十六轮（108 测试）
 
 ### 目标
