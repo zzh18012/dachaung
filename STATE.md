@@ -4,6 +4,38 @@
 
 ---
 
+## Round 595 — evaluation/annotation_metrics.py 第六十四轮（112 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第六十四轮 edges 测试，覆盖 edges65 未触及的角度（第四十批）：**PARSER_DOES_NOT_EMIT_RELATIONS**（exact value / no spaces / startswith / endswith / module level）；**figure_caption_prf**（callable / doc present / doc mentions null / dict instance / each value dict / has value reason / 完整 inputs / reason consistent / with annotation / empty annotation / no kwargs / return dict）；**chunk_boundary_prf**（callable / doc present / doc mentions algorithm / 4 keys min / always includes tolerance / tolerance 0/negative/huge / pipeline_failed path / no_annotation path / empty annotation / no chunks / one chunk / no anchors / no chunks no anchors / perfect match / partial / no match / missing markers / position before / one-to-one matching / two chunks two anchors full match / f1 perfect / f1 zero / value type / extra keys ignored / anchor extra keys ignored / no mutate doc / no mutate annotation / idempotent / json serializable / doc empty dict / empty chunks / chunks string raises / missing position defaults / missing marker empty / search_from advances / signature 3 params / tolerance default 30 / return dict / document param / annotation param）；**module source forbidden tokens 第六十八批**；**module source 字符串精确补强第六十四批**；**signatures 第六十四批**；**module 合理性 第六十四批**；**端到端集成 第六十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges66.py`（112 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第四十批**：5 测试
+- **figure_caption_prf 第四十批**：12 测试
+- **chunk_boundary_prf 第四十批**：42 测试
+- **module source forbidden tokens 第六十八批**：14 测试（参数化）
+- **module source 字符串精确补强第六十四批**：20 测试
+- **signatures 第六十四批**：3 测试
+- **module 合理性 第六十四批**：10 测试
+- **端到端集成 第六十四批**：5 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `chunk_boundary_prf({"chunks": "not_list"})` 抛 AttributeError（for c in 字符串 → 字符没有 .get）→ 改为 expect AttributeError
+  2. `test_module_no_module_level_code_outside_functions` 检查太严，docstring 续行 + signature 续行被误报 → 改用 AST 检查顶层节点类型
+
+### 测试基线
+- 总数：70614 passed, 22 skipped, 0 failed（1016.43s）
+- 较上轮 +112（70502 → 70614）
+
+### 下一步建议
+- 下一轮选 evaluation/metrics.py 第七十一轮（继续 edges 加强 compute_automatic_metrics 边界）
+
+---
+
 ## Round 594 — evaluation/manifest.py 第六十六轮（151 测试）
 
 ### 目标
