@@ -4,6 +4,40 @@
 
 ---
 
+## Round 590 — evaluation/report.py 第五十五轮（142 测试）
+
+### 目标
+- 给 `evaluation/report.py`（200 行）加第五十五轮 edges 测试，覆盖 edges54 未触及的角度（第三十六批）：**_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS**（is tuple / first element / last element / contains xxx / does not contain xxx / len=12 / len=1）；**get_git_provenance**（callable / returns dict / 2 keys / SubprocessError / str or None / bool dirty / normal clean / normal dirty / whitespace-only commit / cwd param / capture_output param / timeout=10 / encoding=utf-8）；**get_dependency_versions**（callable / contains three / only three keys / partial failure / 不 raise / 无参数）；**build_provenance**（returns git_commit / git_dirty / dependencies / max_chars str input / zero / T / timezone / str evaluator / str report / signature）；**build_devset_section**（callable / signature / default / complete / file_count 0/huge / pdf+docx=file / unicode status / int categories / return dict）；**aggregate_summary**（callable / signature / empty all macros None / counts missing field / counts metrics missing raises KeyError / zero included / success rate variations / ratio macro variations / silent drop / no mutate / return dict / macro float or None）；**module source forbidden tokens 第六十四批**；**module source 字符串精确补强第六十批**；**signatures 第六十批**；**module 合理性 第六十批**；**端到端集成 第六十批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges55.py`（142 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第三十六批**：22 测试
+- **get_git_provenance 第三十六批**：12 测试
+- **get_dependency_versions 第三十六批**：8 测试
+- **build_provenance 第三十六批**：11 测试
+- **build_devset_section 第三十六批**：10 测试
+- **aggregate_summary 第三十六批**：24 测试
+- **module source forbidden tokens 第六十四批**：13 测试（参数化）
+- **module source 字符串精确补强第六十批**：22 测试
+- **signatures 第六十批**：7 测试
+- **module 合理性 第六十批**：11 测试
+- **端到端集成 第六十批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `aggregate_summary([{}])` 抛 KeyError（直接 `r["metrics"]` 访问，不防缺 metrics 键）→ 改测试期望 KeyError
+
+### 测试基线
+- 总数：70066 passed, 22 skipped, 0 failed（405.73s）
+- 较上轮 +142（69924 → 70066）
+
+### 下一步建议
+- 下一轮选 evaluation/schema_validation.py 第十轮（继续 edges 加强 document_passes_schema 内部行为）
+
+---
+
 ## Round 589 — evaluation/metrics.py 第七十轮（164 测试）
 
 ### 目标
