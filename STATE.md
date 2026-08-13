@@ -4,6 +4,57 @@
 
 ---
 
+## Round 644 — evaluation/metrics.py 第八十九轮（139 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第八十九轮 edges 测试，补强 edges71 未触及的角度（第四十八批）：**_TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED 常量属性**（7 项 / 4 项 / 都是 tuple / PDF ⊆ TEXT / value=not_evaluated / 无 image）；**_null / _ratio / _bool_metric / _int_metric 工厂函数**（返回 dict / value 类型精确 / 接受 int/str 转换）；**compute_automatic_metrics 各种 document/error 组合**（document None 14 keys / 全 pipeline_failed null / error None+doc None / error code 透传 / schema 异常 reason）；**compute_automatic_metrics 完整 document**（14 keys / pipeline_success True / element_count_total / by_type / pdf→not_docx / docx→not_pdf / no_chunks / no_image）；**_pdf_locator_ratio 各种元素**（empty / all valid / 缺 page / 文本缺 bbox / image 无需 bbox / 负 page / bool page=1 valid）；**_docx_locator_ratio 各种 locator**（empty / 有 page 无效 / 有 bbox 无效 / paragraph_index / table_index / 无 structural key）；**_is_valid_bbox 各种 bbox**（valid / floats / 错长度 / tuple 拒绝 / bool 拒绝 / str 拒绝 / nan/inf 拒绝 / None / 空列表）；**_image_resource_ratio 各种 image**（no images / missing resource_path / 空字符串 / None / 现有文件 → 1.0 / 0 字节文件 → 0.0 / 混合 0.5 / OSError 吞掉）；**_chunk_reference_ratio 各种 chunks**（no chunks / all valid / missing id / partial / empty ids / 缺 key）；**_strip_unicode_whitespace 各种字符**（ASCII 空格 / NBSP / em space / ideographic space / \n\t / 空 / 全空白 / 无空白 / 保序 / 中文）；**_text_preservation 各种**（empty_both / perfect / missing char / extra char / reorder not equal but counter same / image excluded / whitespace insensitive）；**_heading_boundary_ratio 各种**（no heading / no chunks → 0.0 / perfect / partial / wrong first id）；**_silent_drop_count 各种**（no expectations / empty / no element_count key / empty element_count / 0 drop / actual less / multi-type 求和 / missing type 全 drop / extra type 忽略）；**模块源码补强**（纯函数 / 不修改 document / v1.1 / v1.0 / 口径 D / Counter / pipeline_failed / 不返回 1.0 / not_evaluated / 词内硬切）；**AST 结构补强**（14 函数 / 4 顶层 Assign（含 __all__）/ _TEXT_TYPES Tuple 7 elts / _PDF_BBOX_REQUIRED_TYPES Tuple 4 / _NOT_EVALUATED Constant / compute ≥1 for + ≥3 if / _is_valid_bbox ≥4 if（ast.walk）/ _text_preservation Counter Call ≥2 / _silent_drop_count 1 for / 无 ClassDef / module docstring / _image_resource_ratio ≥1 try）；**forbidden tokens 第一百一十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges72.py`（139 测试）
+
+### 覆盖要点
+- **常量属性**：9 测试
+- **工厂函数**：10 测试
+- **compute_automatic_metrics document None / error**：5 测试
+- **compute_automatic_metrics 完整 document**：9 测试
+- **_pdf_locator_ratio 各种元素**：7 测试
+- **_docx_locator_ratio 各种 locator**：6 测试
+- **_is_valid_bbox 各种 bbox**：10 测试
+- **_image_resource_ratio 各种 image**：9 测试
+- **_chunk_reference_ratio 各种 chunks**：6 测试
+- **_strip_unicode_whitespace 各种字符**：10 测试
+- **_text_preservation 各种**：7 测试
+- **_heading_boundary_ratio 各种**：5 测试
+- **_silent_drop_count 各种**：9 测试
+- **模块源码补强**：10 测试
+- **AST 结构补强**：13 测试
+- **forbidden tokens 第一百一十四批**：15 测试
+
+### 撞墙记录
+- 2 fail 首跑：
+  1. `test_ast_constants_count_batch48`：实际 4 个（3 常量 + __all__）。改为 4。
+  2. `test_ast_is_valid_bbox_has_multiple_if_batch48`：3 个 if 嵌套在 for 内部，`func.body` 只看到 1 个 if。改用 `ast.walk(func)` 找全部，断言 ≥4。
+
+### 测试基线
+- 总数：76074 passed, 22 skipped, 0 failed（415.14s）
+- 较上轮 +139（75935 → 76074）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第八十八轮（继续 edges 加强 frozen dataclass 边界）
+  - evaluation/report.py 第八十九轮（继续 edges 加强 _RATIO_METRICS 子集）
+  - evaluation/runner.py 第九十轮（继续 edges 加强 _load_annotation OSError）
+  - evaluation/annotation_metrics.py 第九十一轮（继续 edges 加强 chunk_boundary_prf 重复 marker）
+  - evaluation/cli.py 第九十二轮（继续 edges 加强 inspect-doc _sort_key 输出顺序）
+  - evaluation/schema.py 第九十三轮（继续 edges 加强 EvalSchemaError 子类化）
+  - evaluation/__init__.py 第八轮（继续 edges 加强 monkeypatch + importlib.reload）
+  - evaluation/metrics.py 第九十轮（继续 edges 加强 compute pipeline_failed 14 keys）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges72 已饱和（常量 9 + 工厂 10 + compute 14 + 5 helper 各种边界 + _strip_unicode_whitespace Unicode 覆盖 + _text_preservation v1.1 Counter + _silent_drop 9 边界 + AST 完整 + forbidden tokens）。下一轮选 evaluation/manifest.py 第八十八轮，继续 DocumentEntry/ExpectedFailure/Manifest frozen dataclass 边界 + AST 类结构。
+
+---
+
 ## Round 643 — evaluation/__init__.py 第七轮（98 测试）
 
 ### 目标
