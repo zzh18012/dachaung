@@ -4,6 +4,45 @@
 
 ---
 
+## Round 605 — evaluation/manifest.py 第六十九轮（190 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第六十九轮 edges 测试，补强 edges67 未触及的角度（第四十一批）：**_is_absolute_like 多字节盘符**（中文 / 日文 / 韩文 / Cyrillic / Arabic → True；emoji / 数字 / 空格 / _ / - → False）；**_is_absolute_like 边界长度**（len 1/2/3 + 第三字符非分隔符）；**_has_backslash**（empty / 单 / 多 / 末尾 / 开头 / 仅反斜杠 + 签名）；**_resolve_relative_path**（深层 / ./foo / 末尾 / / foo/../bar / 字段名透传到所有错误消息 / 错误消息含 path_str）；**DocumentEntry 默认值**（sha256/paired_with/annotation_file_str/annotation_resolved/expectations 全 None）；**DocumentEntry frozen + equality + hash + repr**；**ExpectedFailure 默认 source_type=None + frozen**；**Manifest file/pdf/docx/content_group/categories 边界（empty）+ 配对复杂场景 + self_pair + frozen + equality**；**_detect_project_root**（从文件 / 从目录 / 嵌套 / 无 pyproject 退回）；**load_manifest**（默认 project_root / 缺 expected_failures / devset_status=partial 拒绝 / str path 接受 / 字段缺失→EvalSchemaError / sha256 必须 64 hex / categories / paired_with / sha256 / annotation_file / expectations）；**ManifestError**；**module source 字符串精确**；**AST 结构**（顶层无 for/while/with/try / 三个 dataclass + ManifestError / 5 个函数 / 无 async / 顶层只允许 Expr/Import/ImportFrom/ClassDef/FunctionDef/Assign）；**module 合理性**；**端到端集成**；**forbidden tokens 第七十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges68.py`（190 测试）
+
+### 覆盖要点
+- **_is_absolute_like 多字节盘符 + 边界**：22 测试
+- **_has_backslash**：8 测试
+- **_resolve_relative_path**：11 测试
+- **DocumentEntry**：18 测试
+- **ExpectedFailure**：6 测试
+- **Manifest**：14 测试
+- **_detect_project_root**：6 测试
+- **load_manifest**：19 测试
+- **ManifestError**：6 测试
+- **module source 字符串精确**：31 测试
+- **AST 结构**：6 测试
+- **module 合理性**：19 测试
+- **端到端集成**：4 测试
+- **forbidden tokens**：14 测试
+
+### 撞墙记录
+- 3 fail 首跑（均 schema/AST 实际口径错配）：
+  1. `devset_status='partial'` schema 只允许 complete/incomplete → 改测 schema 拒绝 partial
+  2. `sha256='deadbeef'` schema 要求 `^[0-9a-f]{64}$` → 改为 `"a" * 64` / `"f" * 64`
+  3. AST 顶层节点未考虑 `import json`（ast.Import）→ 加入允许列表
+
+### 测试基线
+- 总数：72114 passed, 22 skipped, 0 failed（399.56s）
+- 较上轮 +190（71924 → 72114）
+
+### 下一步建议
+- 下一轮到 evaluation/report.py 第七十轮（继续 edges 加强 _RATIO_METRICS / _COUNT_METRICS / aggregate_summary / get_git_provenance 边界）
+
+---
+
 ## Round 604 — evaluation/metrics.py 第七十二轮（196 测试）
 
 ### 目标
