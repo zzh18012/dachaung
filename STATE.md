@@ -4,6 +4,48 @@
 
 ---
 
+## Round 657 — evaluation/cli.py 第九十三轮（64 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第九十三轮 edges 测试，补强 edges73 未触及的角度（第四十八批）：**main run 子命令完整路径**（manifest 加载失败 / run_evaluation EvalSchemaError / validate_file 失败 / 成功路径打印 / unknown commit）；**main validate-report 完整路径**（成功 / EvalSchemaError / FileNotFoundError / JSONDecodeError）；**main inspect-doc 完整路径**（成功 / 文件不存在）；**_format_metric 边界**（int vs float / 0 值 / 负数 / dict 单 key / dict 字母排序 / dict 混合类型 / bool false）；**_sort_key 优先级**（pass-through 测试）；**main --parser kreuzberg 透传 / 默认 max_chars 800**；**模块源码补强**（argparse/sys/Path/run_evaluation/load_manifest/validate_file/get_git_provenance imports / 3 subcommands / return 2 多次 / return 1 多次 / return 0 / file=sys.stderr / [OK] 评测完成）；**AST 结构补强**（4 函数 / 无 ClassDef / 无 AsyncFunctionDef / main ≥5 return / _format_metric JoinedStr / _run_inspect_doc nested _sort_key / _build_parser ≥5 add_argument / add_subparsers / module top-level if reconfigure / if main / 9 import / module docstring / main ≥3 try）；**forbidden tokens 第一百二十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges74.py`（64 测试）
+
+### 覆盖要点
+- **main run 子命令完整路径**：5 测试
+- **main validate-report 完整路径**：4 测试
+- **main inspect-doc 完整路径**：2 测试
+- **_format_metric 边界**：7 测试
+- **_sort_key 优先级**：1 测试
+- **main 参数透传**：2 测试
+- **模块源码补强**：12 测试
+- **AST 结构补强**：14 测试
+- **forbidden tokens 第一百二十七批**：17 测试
+
+### 撞墙记录
+- 无（首跑 64/64 全部通过）
+
+### 测试基线
+- 总数：77210 passed, 22 skipped, 0 failed（410.22s）
+- 较上轮 +64（77146 → 77210）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第九十四轮（继续 edges 加强 validate errors 排序稳定性）
+  - evaluation/__init__.py 第九轮（继续 edges 加强 monkeypatch 链）
+  - evaluation/metrics.py 第九十二轮（继续 edges 加强 _image_resource_ratio 多路径）
+  - evaluation/manifest.py 第九十轮（继续 edges 加强 annotation_file 解析）
+  - evaluation/report.py 第九十一轮（继续 edges 加强 build_provenance 时间戳）
+  - evaluation/runner.py 第九十二轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十三轮（继续 edges 加强 anchor position 校验）
+  - evaluation/cli.py 第九十四轮（继续 edges 加强 _run_inspect_doc 嵌套行为）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges74 已饱和（run/validate-report/inspect-doc 完整路径 + _format_metric 7 边界 + AST + forbidden tokens）。下一轮选 evaluation/schema.py 第九十四轮，覆盖 validate errors 排序稳定性 + load_schema 多路径。
+
+---
+
 ## Round 656 — evaluation/annotation_metrics.py 第九十二轮（60 测试）
 
 ### 目标
