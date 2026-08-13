@@ -4,6 +4,52 @@
 
 ---
 
+## Round 628 — evaluation/metrics.py 第八十五轮（150 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第八十五轮 edges 测试，补强 edges69 未触及的角度（第四十五批）：**4 helper 返回类型精确**（_null/_ratio/_bool_metric/_int_metric 返回 dict / 字段类型精确 / _ratio 接受 int 变 float / _bool_metric 接受 int 变 bool / _int_metric 接受 float 截断 / _int_metric 接受 bool True→1 / _ratio 接受 bool True→1.0 False→0.0）；**常量精确**（_TEXT_TYPES 是 tuple 含 7 项 / _PDF_BBOX_REQUIRED_TYPES 是 tuple 含 4 项 / subset 关系 / _NOT_EVALUATED == "not_evaluated" / 都 unique / 都是 str / paragraph/heading 在 _TEXT_TYPES / image 不在 _TEXT_TYPES / 4 个 PDF 类型都在）；**_is_valid_bbox 各种边界**（标准 list / int list / tuple 拒绝 / set 拒绝 / dict 拒绝 / 空 / 短 / 长 / bool 元素 / NaN / Inf / -Inf / None / str / 全 0 / 负数 / 混合 int+float / None 元素 / str 元素）；**_strip_unicode_whitespace**（返回 str / 空字符串 / 不变 / 全空白 / 保留标点 / 保留数字 / 保留 emoji / 保留中文 / NBSP / EM SPACE / IDEOGRAPHIC SPACE / 链式调用）；**_pdf_locator_ratio 各种**（page=0 / page<0 / page=True 用 image 类型避免 bbox 要求 / page="1" / 无 locator / locator=None / 文本类型缺 bbox / image 不需要 bbox / 混合 valid+invalid）；**_docx_locator_ratio 各种**（section / paragraph_index / relationship_id / 有 page 拒绝 / 有 bbox 拒绝 / 空 locator / 无 locator / 混合）；**_chunk_reference_ratio 各种**（全 valid / 全 invalid / 空 ids / None ids / 缺 ids key / 多 ids 部分 / 多 ids 全 valid / 空 chunks no_chunks / dedup）；**source level 精确**（_heading_boundary_ratio 用 ids[0] / _silent_drop_count 用 by_type.get + sum + items() / _image_resource_ratio 用 is_file + stat().st_size + OSError + resource_path + image_base_dir / compute 用 document.get + error["code"] 严格索引 + 延迟 import + try/except + schema_check_exception + not_pdf_document + not_docx_document + pipeline_failed + pipeline_success + 14 个 metric key）；**模块源码字符串精确**（设计原则 / text_preservation v1.1 / 4 个 import / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED 字面量 / 4 个 helper def 签名 / compute def 签名）；**__all__**（1 entry / callable）；**AST 结构**（顶层 14 functions / 无 class / 无 async / 首节点 docstring / 第二 future / 第三 import math / compute 内有 return + for / _is_valid_bbox 用 isinstance + math.isfinite / _strip_unicode_whitespace 用 isspace + join）；**forbidden tokens 第九十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges70.py`（150 测试）
+
+### 覆盖要点
+- **4 helper 返回类型精确**：16 测试
+- **常量精确**：10 测试
+- **_is_valid_bbox 各种边界**：20 测试
+- **_strip_unicode_whitespace**：12 测试
+- **_pdf_locator_ratio 各种**：9 测试
+- **_docx_locator_ratio 各种**：9 测试
+- **_chunk_reference_ratio 各种**：9 测试
+- **source level 精确**：19 测试
+- **模块源码字符串**：14 测试
+- **__all__**：3 测试
+- **AST 结构**：11 测试
+- **forbidden tokens 第九十八批**：14 测试
+- **综合**：4 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_pdf_locator_ratio_page_bool_true_batch45`：用 paragraph 类型但缺 bbox，触发 _PDF_BBOX_REQUIRED_TYPES 的 bbox 校验导致 invalid。改为用 image 类型（不在 _PDF_BBOX_REQUIRED_TYPES 中），只校验 page。
+
+### 测试基线
+- 总数：74485 passed, 22 skipped, 0 failed（405.31s）
+- 较上轮 +150（74335 → 74485）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第八十六轮（继续 edges 加强 _is_absolute_like Unicode 边界 + DocumentEntry 字段）
+  - evaluation/report.py 第八十七轮（继续 edges 加强 _RATIO_METRICS 12 项顺序）
+  - evaluation/runner.py 第八十八轮（继续 edges 加强 _process_one unlink OSError）
+  - evaluation/annotation_metrics.py 第八十九轮（继续 edges 加强 chunk_boundary_prf 顺序匹配）
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter）
+  - evaluation/schema.py 第九十一轮（继续 edges 加强 EvalSchemaError pickle）
+  - evaluation/__init__.py 第六轮（继续 edges 加强 4 常量属性）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges70 已饱和（4 helper 类型 + 3 常量 + bbox 20 边界 + Unicode 12 边界 + 各 ratio 9 边界 + source + AST 完整 + forbidden tokens）。下一轮选 evaluation/manifest.py 第八十六轮，覆盖 _is_absolute_like Unicode 边界 + DocumentEntry/ExpectedFailure/Manifest 字段深度。
+
+---
+
 ## Round 627 — evaluation/__init__.py 第五轮（104 测试）
 
 ### 目标
