@@ -4,6 +4,44 @@
 
 ---
 
+## Round 587 — evaluation/manifest.py 第六十五轮（141 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第六十五轮 edges 测试，覆盖 edges64 未触及的角度（第三十八批）：**DocumentEntry**（is dataclass / frozen / 10 fields / field names / optional default None / categories default () / full construction / equality / inequality / hashable / repr）；**ExpectedFailure**（is dataclass / frozen / 5 fields / field names / source_type optional / full construction / equality / hashable）；**Manifest properties**（mixed types correct / pdf_count zero when all docx / categories sorted / categories dedup / categories empty / content_group_count unpaired / paired / mixed / devset_status complete / devset_status incomplete / frozen / project_root value）；**_is_absolute_like / _has_backslash**（unix root / unix root only / windows backslash / windows forward / lowercase drive / relative path / single char / two chars / drive no separator / number first / unicode first isalpha True / backslash present / absent / empty / only backslash / multiple）；**_resolve_relative_path**（returns absolute / subdir / filename only / dot segments / outside root rejected / absolute rejected / backslash rejected / empty rejected / unicode / not require existing）；**load_manifest**（empty documents / empty expected_failures omitted / devset complete / one document / one docx / categories / paired_with / expectations / annotation_file / expected_failures / nonexistent file / invalid json / incompatible version / absolute path rejected / str path / idempotent / project_root default detection）；**_detect_project_root**（with pyproject / from file / fallback to cur / returns Path）；**ManifestError**（is Exception / can raise / can catch as Exception / message preserved / no custom init / unicode message）；**module source forbidden tokens 第六十二批**；**module source 字符串精确补强第五十八批**；**signatures 第五十八批**；**module 合理性 第五十八批**；**端到端集成 第五十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges65.py`（141 测试）
+
+### 覆盖要点
+- **DocumentEntry 第三十八批**：11 测试
+- **ExpectedFailure 第三十八批**：8 测试
+- **Manifest properties 第三十八批**：12 测试
+- **_is_absolute_like / _has_backslash 第三十八批**：16 测试
+- **_resolve_relative_path 第三十八批**：10 测试
+- **load_manifest 第三十八批**：19 测试
+- **_detect_project_root 第三十八批**：4 测试
+- **ManifestError 第三十八批**：6 测试
+- **module source forbidden tokens 第六十二批**：14 测试（参数化）
+- **module source 字符串精确补强第五十八批**：20 测试
+- **signatures 第五十八批**：8 测试
+- **module 合理性 第五十八批**：10 测试
+- **端到端集成 第五十八批**：5 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. `"中".isalpha()` 返回 True（Python str.isalpha 支持 Unicode 字母）→ 改 assertion 为 True
+  2. schema manifest_version 是 const "1.0"，先于代码层版本检查抛 EvalSchemaError → 改为 (ManifestError, EvalSchemaError)
+  3. Unicode 类别排序按 code point（教程 U+6559 < 高级 U+9AD8）→ 改 expected 顺序为 ["API", "教程", "高级"]
+
+### 测试基线
+- 总数：69663 passed, 22 skipped, 0 failed（407.45s）
+- 较上轮 +141（69522 → 69663）
+
+### 下一步建议
+- 下一轮选 evaluation/annotation_metrics.py 第六十三轮（继续 edges 加强 figure_caption_prf / chunk_boundary_prf）
+
+---
+
 ## Round 586 — evaluation/schema.py 第六十轮（115 测试）
 
 ### 目标
