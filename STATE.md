@@ -4,6 +4,48 @@
 
 ---
 
+## Round 675 — evaluation/manifest.py 第九十二轮（68 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第九十二轮 edges 测试，补强 edges76 未触及的角度（第五十二批）：**Manifest properties 更深**（单向配对算 1 组 / pair chain / 多 pair 同向 / 仅 unpaired / pair_makes_2_seen_excludes_unpaired / case_sensitive categories / 数字 category / 多 doc 同 category）；**_resolve_relative_path 路径混合**（./foo 合法 / foo/../bar 合法 / ../foo 越界 raise / 多级子目录 / 文件名 only）；**_is_absolute_like 更多 Unicode**（Latin Extended / 西里尔 / 韩文 / 日文假名）；**_detect_project_root**（深嵌套 / 返回 Path 类型 / 目录输入）；**load_manifest 完整成功路径**（含 documents + expected_failures + annotation_file）；**load_manifest annotation_file**（不存在文件不抛异常 / 绝对路径 raise / 反斜杠 raise / 无 annotation_file None）；**load_manifest expected_failures**（完整字段 / 无 source_type 默认 None）；**DocumentEntry annotation_resolved**（默认 None / 设 Path）；**dataclass 字段数**（DocumentEntry 10 / ExpectedFailure 5 / Manifest 5）；**模块源码补强**（dataclass import / 3 frozen=True / ManifestError docstring / 无 mutation methods / path 形式规则 docstring / 项目根 note）；**AST 结构补强**（3 dataclass decorator frozen=True / ManifestError extends Exception / DocumentEntry 10 AnnAssign / ExpectedFailure 5 AnnAssign / Manifest 5 AnnAssign / Manifest 5 property functions / load_manifest 2 positional + 1 default / _resolve_relative_path 3 args / 无 AsyncFunctionDef / 无 ImportStar / 无 module-level With / 无 Global/Nonlocal）；**forbidden tokens 第一百四十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges77.py`（68 测试）
+
+### 覆盖要点
+- **Manifest properties 更深**：9 测试
+- **_resolve_relative_path 路径混合**：5 测试
+- **_is_absolute_like 更多 Unicode**：4 测试
+- **_detect_project_root**：3 测试
+- **load_manifest 完整成功路径**：7 测试
+- **DocumentEntry annotation_resolved**：2 测试
+- **dataclass 字段数**：3 测试
+- **模块源码补强**：6 测试
+- **AST 结构补强**：13 测试
+- **forbidden tokens 第一百四十五批**：16 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_load_manifest_annotation_file_missing_batch52`：_resolve_relative_path 只校验路径形式，不校验文件存在 → 改为验证 resolved Path 不存在。
+
+### 测试基线
+- 总数：78918 passed, 22 skipped, 0 failed（435.13s）
+- 较上轮 +68（78850 → 78918）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/report.py 第九十三轮（继续 edges 加强）
+  - evaluation/runner.py 第九十四轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十五轮（继续 edges 加强）
+  - evaluation/cli.py 第九十六轮（继续 edges 加强）
+  - evaluation/schema.py 第九十七轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges77 已饱和（properties 更深 + Unicode + load_manifest 完整路径 + dataclass 字段 + AST 13 + forbidden 16）。下一轮选 evaluation/__init__.py 第十一轮，覆盖更多版本常量场景 + __all__ 行为。
+
+---
+
 ## Round 674 — evaluation/schema.py 第九十六轮（107 测试）
 
 ### 目标
