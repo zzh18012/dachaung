@@ -4,6 +4,51 @@
 
 ---
 
+## Round 648 — evaluation/annotation_metrics.py 第九十一轮（79 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十一轮 edges 测试，补强 edges72 未触及的角度（第四十八批）：**figure_caption_prf 函数纯净性**（两次调用相等 / 接受 MagicMock / 三键固定顺序 / _null reason 完全相同 / 函数体不访问输入参数）；**chunk_boundary_prf 重复 marker 完整路径**（3 个相同 marker / 不会丢失第 2 个 / search_from 推进验证）；**chunk_boundary_prf tolerance 边界**（d == tolerance inclusive / tolerance 巨大 / tolerance = 1 严格）；**chunk_boundary_prf 算法核心**（predicted = N-1 / pos 推进 = end + 1 / text=None 时 find "" 处理）；**chunk_boundary_prf f1 计算分支**（denom == 0 → f1=0.0 / 完美匹配 / 半匹配 F1=2/3 / precision null → f1 null）；**chunk_boundary_prf 一对一贪心**（2 pred 1 anchor / 2 anchor 1 pred / 按 distance 升序 match）；**chunk_boundary_prf 异常输入**（annotation 是非空 list → AttributeError / tolerance float / anchor 无 marker key → falsy → missing_markers / marker 显式空字符串）；**模块源码补强**（__future__ / Counter / typing.Any / normalize_text / _null,_ratio / __all__ 3 entries / list[tuple] / break / continue / normalize_text( 调用 / search_from / 6 个 reason 字符串 / docstring 关键词）；**AST 结构补强**（2 函数 / 无 ClassDef / 无 AsyncFunctionDef / module docstring / chunk_boundary default=30 / figure_caption 无 default / chunk_boundary ≥5 return / lambda sort / enumerate 调用 / abs 调用 / break / continue / ≥4 for / nested for / pipeline_failed in src / 2 个 Assign / 5 个 ImportFrom）；**forbidden tokens 第一百一十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges73.py`（79 测试）
+
+### 覆盖要点
+- **figure_caption_prf 函数纯净性**：5 测试
+- **chunk_boundary_prf 重复 marker 完整路径**：3 测试
+- **chunk_boundary_prf tolerance 边界**：3 测试
+- **chunk_boundary_prf 算法核心**：3 测试
+- **chunk_boundary_prf f1 计算分支**：4 测试
+- **chunk_boundary_prf 一对一贪心**：3 测试
+- **chunk_boundary_prf 异常输入**：4 测试
+- **模块源码补强**：20 测试
+- **AST 结构补强**：17 测试
+- **forbidden tokens 第一百一十八批**：15 测试（含新增 open / pathlib / requests / urllib / socket / shutil.rmtree 6 个）
+
+### 撞墙记录
+- 2 fail 首跑：
+  1. `test_chunk_boundary_annotation_is_list_not_dict_batch48`：空 list `[]` 是 falsy → 进入 `no_annotation` 分支直接返回，不会触发 `.get` AttributeError。改为非空 list `["non_empty"]` → truthy → 进入 `.get` → AttributeError。
+  2. `test_chunk_boundary_anchor_missing_marker_key_batch48`：源码 `find_pos = stream.find(marker, search_from) if marker else -1`，空字符串 marker 是 falsy → find_pos = -1 → 计入 `_missing_markers`（而不是 find "" 返回 0）。同 fix 用于 `test_chunk_boundary_anchor_marker_empty_string_batch48`。
+
+### 测试基线
+- 总数：76377 passed, 22 skipped, 0 failed（418.69s）
+- 较上轮 +79（76298 → 76377）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第九十二轮（继续 edges 加强 inspect-doc _sort_key 输出顺序）
+  - evaluation/schema.py 第九十三轮（继续 edges 加强 EvalSchemaError 子类化）
+  - evaluation/__init__.py 第八轮（继续 edges 加强 monkeypatch + importlib.reload）
+  - evaluation/metrics.py 第九十一轮（继续 edges 加强 compute pipeline_failed 14 keys）
+  - evaluation/manifest.py 第八十九轮（继续 edges 加强 Unicode drive letters）
+  - evaluation/report.py 第九十轮（继续 edges 加强 aggregate 混合）
+  - evaluation/runner.py 第九十一轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十二轮（继续 edges 加强 anchor 多字段组合）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges73 已饱和（figure_caption 纯净性 5 + 重复 marker 完整路径 + tolerance 边界 + 算法核心 + f1 计算分支 + 一对一贪心 + 异常输入 + AST 完整 + forbidden tokens 扩展）。下一轮选 evaluation/cli.py 第九十二轮，覆盖 inspect-doc _sort_key 输出顺序 + _format_metric 边界。
+
+---
+
 ## Round 647 — evaluation/runner.py 第九十轮（57 测试）
 
 ### 目标
