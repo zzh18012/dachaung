@@ -4,6 +4,43 @@
 
 ---
 
+## Round 611 — evaluation/__init__.py 第三轮（148 测试）
+
+### 目标
+- 给 `evaluation/__init__.py`（28 行）加第三轮 edges 测试，补强 init_edges2 未触及的角度（第四十三批）：**版本常量字符级**（major/minor 字符 / dot 在 index 1 / first+last char digit / 长度 3 / split count=2 / upper==lower / strip / replace / concat / repeat / indexing / negative indexing / slice / join round trip）；**版本常量类型**（isinstance str / not int / not bool / not None / truthy）；**hashable + pickleable**（hash / pickle round trip / set membership / dict key）；**__all__**（顺序 / 唯一 indices / 无重复 / entries are str / entries exist as attrs / 可被 import / count=4 / no extra / 不含其他模块 / 不含 dunder / 不含 lowercase）；**模块属性**（in dir / type str / match imported / 读不抛）；**模块源码结构**（顺序 EVALUATOR→REPORT→ANNOTATION→MANIFEST / 含设计原则 / 版本历史 / v1.0/v1.1 / text_preservation / 不修改 / 不伪造 / 不依赖 / 分母 / not_instrumented / 不可横向比较 / 硬切 / normalize_text / 4 个 assignment 字符串精确）；**AST 结构**（no class/function/import/async/loop/with/try/if / exactly 5 assigns / has docstring / 顶层只 Expr+Assign / EVALUATOR 是 first / __all__ 是 last）；**模块文件**（ends with __init__.py / parent=evaluation / name=evaluation / package=evaluation / exists / size>0 / size<2KB）；**reload 后保持**（4 个版本 + __all__ + docstring）；**版本组合**（pair equal / pair differ / 2 distinct / 1.1>1.0 / set 含 "1.1" 和 "1.0"）；**JSON 序列化**；**docstring 完整性**；**综合**（forbidden tokens / __all__ 是 list 不是 tuple/set / 可变 list / docstring length>200）
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges3.py`（148 测试）
+
+### 覆盖要点
+- **版本常量字符级**：20 测试
+- **版本常量类型**：8 测试
+- **hashable + pickleable**：7 测试
+- **版本常量字符串操作**：12 测试
+- **__all__**：13 测试
+- **模块属性**：8 测试
+- **模块源码结构**：22 测试
+- **AST 结构**：13 测试
+- **模块文件**：7 测试
+- **reload**：6 测试
+- **版本组合**：8 测试
+- **JSON 序列化**：4 测试
+- **docstring 完整性**：8 测试
+- **综合**：12 测试
+
+### 撞墙记录
+- 1 fail（仅在完整套件里出现，单文件跑通过）：
+  1. `test_module_attributes_match_imported_batch43` 用 `is` 比较模块属性和 import 绑定。完整套件中其他文件的 reload 测试触发了 module 重载，重载后 evaluation.EVALUATOR_VERSION 是新 string 对象（"1.1" 非 identifier 所以不 intern），与文件顶部 `from evaluation import EVALUATOR_VERSION` 的旧 string 对象不同。改用 `==` 比较值。
+
+### 测试基线
+- 总数：72947 passed, 22 skipped, 0 failed（635.22s）
+- 较上轮 +148（72799 → 72947）
+
+### 下一步建议
+- 下一轮到 evaluation/metrics.py 第七十六轮（继续 edges 加强 _strip_unicode_whitespace / _pdf_locator_ratio / _docx_locator_ratio 边界）
+
+---
+
 ## Round 610 — evaluation/schema.py 第七十四轮（151 测试）
 
 ### 目标
