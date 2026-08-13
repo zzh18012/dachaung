@@ -4,6 +4,48 @@
 
 ---
 
+## Round 633 — evaluation/cli.py 第九十一轮（100 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第九十一轮 edges 测试，补强 edges70 未触及的角度（第四十五批）：**_build_parser 各 subparser 参数**（prog="evaluation.cli" / description 含"评测 CLI" / _SubParsersAction dest=command required=True / run --parser choices fallback+kreuzberg / run --max-chars 默认 800 / run --tolerance-chars 默认 30 / 自定义 max-chars / 自定义 tolerance-chars / required manifest / required output / validate-report 接 input / inspect-doc 接 input + 默认 tolerance / 自定义 tolerance / 无 command → SystemExit / 未知 command → SystemExit / 3 choices / formatter_class=RawDescriptionHelpFormatter）；**main run 各种错误**（manifest 不存在 rc=2 / ManifestError rc=1 / EvalSchemaError from load_manifest rc=1 / 成功路径含 documents=N 成功 N 失败 N devset_status + git_commit[:12] + git_dirty / 多 doc 统计正确 / git_commit None → 'unknown' / EvalSchemaError from run_evaluation rc=1 / EvalSchemaError from validate_file rc=1）；**main validate-report 各种错误**（不存在 rc=2 / 成功 [OK] + Schema 校验 / EvalSchemaError rc=1 [FAIL] / FileNotFoundError rc=2 / JSONDecodeError rc=1）；**main inspect-doc 各种错误**（不存在 rc=2 / JSONDecodeError rc=1 / 顶层非 dict rc=1 / 成功输出 metrics:）；**_format_metric 各种**（null+reason / bool True → "true" + "ok" / bool False → "false" / float 4 位小数 / int / dict value 排序 / bool 带自定义 reason 仍走 bool 分支 / float + reason / str value / 负 float / 0.0 / 长 name / 返回 str / 36 字符 padding）；**_run_inspect_doc 排序**（输出含 metrics: 标题）；**模块源码字符串精确**（subcommands docstring / sys.stdout reconfigure / 5 import / dest="command" / required=True / fallback+kreuzberg / prog / RawDescriptionHelpFormatter / 4 def 签名 / _sort_key / 无标注 null 注释）；**模块无 __all__**；**AST 结构**（4 顶层 functions / function names 顺序 / 无 class / 无 async / main 内 if≥3 + try≥3 / _run_inspect_doc 内嵌 _sort_key 函数 / _format_metric if≥3 / 末尾 if __name__ == "__main__" / 首节点 docstring / 第二 future / _build_parser 用 add_subparsers + add_parser）；**forbidden tokens 第一百零三批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges71.py`（100 测试）
+
+### 覆盖要点
+- **_build_parser 各 subparser 参数**：20 测试
+- **main run 各种错误**：8 测试
+- **main validate-report 各种错误**：5 测试
+- **main inspect-doc 各种错误**：4 测试
+- **_format_metric 各种**：15 测试
+- **_run_inspect_doc 排序**：1 测试
+- **模块源码字符串**：22 测试
+- **模块无 __all__**：1 测试
+- **AST 结构**：14 测试
+- **forbidden tokens 第一百零三批**：14 测试
+
+### 撞墙记录
+- 0 fail 首次跑（100 全通过）
+
+### 测试基线
+- 总数：75028 passed, 22 skipped, 0 failed（411.42s）
+- 较上轮 +100（74928 → 75028）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第九十一轮（继续 edges 加强 EvalSchemaError pickle）
+  - evaluation/__init__.py 第六轮（继续 edges 加强 4 常量属性）
+  - evaluation/metrics.py 第八十六轮（继续 edges 加强 helper 行为）
+  - evaluation/manifest.py 第八十七轮（继续 edges 加强 _is_absolute_like Unicode）
+  - evaluation/report.py 第八十八轮（继续 edges 加强 _RATIO_METRICS 12 项顺序）
+  - evaluation/runner.py 第八十九轮（继续 edges 加强 _process_one unlink OSError）
+  - evaluation/annotation_metrics.py 第九十轮（继续 edges 加强 chunk_boundary_prf 顺序匹配）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges71 已饱和（_build_parser 20 边界 + main 3 subcommand 错误处理 + _format_metric 15 边界 + source + AST 完整 + forbidden tokens）。下一轮选 evaluation/schema.py 第九十一轮，覆盖 EvalSchemaError pickle 边界 + validate 多个错误聚合 + validate_file 编码处理。
+
+---
+
 ## Round 632 — evaluation/annotation_metrics.py 第八十九轮（89 测试）
 
 ### 目标
