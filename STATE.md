@@ -4,6 +4,45 @@
 
 ---
 
+## Round 606 — evaluation/report.py 第七十轮（165 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第七十轮 edges 测试，补强 edges56 未触及的角度（第四十二批）：**_RATIO_METRICS 元素固定 + 顺序 + 排除项**（不含 figure_caption_*/silent_drop_count/element_count_total/pipeline_success；first=schema_valid, last=chunk_boundary_f1；12 个成员精确列出）；**_COUNT_METRICS / _SUCCESS_BOOL_METRICS 单元素固定**；**get_git_provenance 失败路径**（OSError / SubprocessError / TimeoutExpired → commit=None + dirty=True；rev-parse returncode!=0 → commit=None；rev-parse stdout 空/仅空白 → commit=None；porcelain returncode!=0 短路 → dirty=False；porcelain stdout 仅空白 → dirty=False）；**get_dependency_versions**（PackageNotFoundError → None；generic Exception → None；mixed；3 keys 固定）；**build_provenance**（字段类型 + keys + EVALUATOR_VERSION/REPORT_VERSION 一致；max_chars 字符串→int；parser_version=None；run_timestamp_iso ISO 8601 含 T + 可 fromisoformat 解析）；**build_devset_section**（全字段透传 + 签名）；**aggregate_summary counts**（empty / all None / 0 参与 / missing field / 部分参与）；**success_rates**（全 True / 全 False / empty / missing field / None value）；**ratio_macro_averages**（empty / all None / 0.0 参与 / macro 正确性 / 全 metrics 在）；**silent_drop_total**（empty / all None / 0 参与 / 求和正确性 / missing field）；**结构 + 幂等 + 签名**；**module source 字符串精确**；**AST 结构**；**module 合理性**；**端到端集成**；**forbidden tokens 第七十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges57.py`（165 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 元素 + 顺序**：21 测试
+- **_COUNT_METRICS / _SUCCESS_BOOL_METRICS**：4 测试
+- **get_git_provenance 失败路径**：17 测试
+- **get_dependency_versions**：7 测试
+- **build_provenance**：13 测试
+- **build_devset_section**：10 测试
+- **aggregate_summary counts**：6 测试
+- **aggregate_summary success_rates**：5 测试
+- **aggregate_summary ratio_macro_averages**：5 测试
+- **aggregate_summary silent_drop_total**：5 测试
+- **aggregate_summary 结构 / 幂等**：5 测试
+- **module source 字符串精确**：30 测试
+- **AST 结构**：5 测试
+- **module 合理性**：19 测试
+- **端到端集成**：3 测试
+- **forbidden tokens**：13 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `porcelain returncode != 0` 实现是 `bool(r2.returncode == 0 and r2.stdout.strip())` 短路 and → dirty=False（不是 True）→ 改 expect False
+
+### 测试基线
+- 总数：72279 passed, 22 skipped, 0 failed（390.09s）
+- 较上轮 +165（72114 → 72279）
+
+### 下一步建议
+- 下一轮到 evaluation/runner.py 第七十一轮（继续 edges 加强 _load_annotation / _process_one / run_evaluation 边界）
+
+---
+
 ## Round 605 — evaluation/manifest.py 第六十九轮（190 测试）
 
 ### 目标
