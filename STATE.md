@@ -4,6 +4,51 @@
 
 ---
 
+## Round 629 — evaluation/manifest.py 第八十六轮（137 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第八十六轮 edges 测试，补强 edges70 未触及的角度（第四十五批）：**_is_absolute_like Unicode 盘符**（空 / POSIX / POSIX root / 相对 / ./ / ../ / Windows \\ / Windows / / 小写盘符 / C:foo 无分隔符不算 / 单字符 / 单冒号 / 两字符 / Unicode 盘符 é:/中文:/日文 / 数字盘符不算 / 下划线盘符不算 / 空格盘符不算 / pathlib root）；**_has_backslash 各种**（simple / none / empty / only / double / at_end / at_start / forward_only）；**DocumentEntry frozen/hash/eq**（frozen / hashable / eq / inequal / in_set / asdict / replace / fields count 10 / field names / default categories is tuple）；**ExpectedFailure frozen/hash/eq**（frozen / hashable / eq / fields count 5 / field names / replace / source_type 可为 None）；**Manifest frozen/hash/property**（frozen / hashable / fields count 5 / field names / file_count empty+3 / pdf_count / docx_count / 非 pdf/docx 类型不计 / content_group_count all unpaired + all paired + mixed + 单向配对 / categories_covered sorted+dedup+empty+returns list）；**_resolve_relative_path 各种错误**（空 / POSIX 绝对 / Windows 绝对 / 反斜杠 / 跨根 / 成功 / 返回 Path / 解析为绝对）；**_detect_project_root 各种**（从文件 / 从目录 / 返回 Path / 无 pyproject.toml 回退）；**load_manifest 各种失败**（FileNotFoundError / JSONDecodeError / Schema / version_mismatch via Schema enum / 成功空 documents / 含 expected_failures / path 反斜杠 / path 绝对 / 接受 str 路径）；**模块源码字符串精确**（不变量 / dataclass import / json import / pathlib import / evaluation MANIFEST_VERSION import / evaluation.schema validate import / ManifestError class / 4 个 @dataclass frozen / 5 个 def 签名 / 5 个 @property）；**__all__**（5 entries exact order / importable / unique）；**AST 结构**（4 顶层 classes / class names 顺序 / 5 顶层 functions / function names 顺序 / 无 async / 首节点 docstring / 第二 future / Manifest 5 properties / DocumentEntry/ExpectedFailure 无方法 / ManifestError 继承 Exception / _is_absolute_like 用 startswith+isalpha / load_manifest 内 try+for×2）；**forbidden tokens 第九十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges71.py`（137 测试）
+
+### 覆盖要点
+- **_is_absolute_like 各种**：20 测试
+- **_has_backslash 各种**：8 测试
+- **DocumentEntry frozen**：10 测试
+- **ExpectedFailure frozen**：7 测试
+- **Manifest frozen + property**：18 测试
+- **_resolve_relative_path 各种错误**：8 测试
+- **_detect_project_root 各种**：4 测试
+- **load_manifest 各种失败**：9 测试
+- **模块源码字符串**：21 测试
+- **__all__**：4 测试
+- **AST 结构**：18 测试
+- **forbidden tokens 第九十九批**：14 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_ast_top_level_functions_count_batch45`：注释错（写 4，实际 5：_is_absolute_like / _has_backslash / _resolve_relative_path / load_manifest / _detect_project_root）。修正为 5。
+
+### 测试基线
+- 总数：74622 passed, 22 skipped, 0 failed（400.83s）
+- 较上轮 +137（74485 → 74622）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第八十七轮（继续 edges 加强 _RATIO_METRICS 12 项顺序）
+  - evaluation/runner.py 第八十八轮（继续 edges 加强 _process_one unlink OSError）
+  - evaluation/annotation_metrics.py 第八十九轮（继续 edges 加强 chunk_boundary_prf 顺序匹配）
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter）
+  - evaluation/schema.py 第九十一轮（继续 edges 加强 EvalSchemaError pickle）
+  - evaluation/__init__.py 第六轮（继续 edges 加强 4 常量属性）
+  - evaluation/metrics.py 第八十六轮（继续 edges 加强 helper 行为）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges71 已饱和（_is_absolute_like Unicode 盘符 + _has_backslash 8 边界 + 3 dataclass frozen/hash/eq + Manifest properties 各种场景 + _resolve_relative_path 8 边界 + _detect_project_root 4 边界 + load_manifest 9 边界 + source + AST 完整 + forbidden tokens）。下一轮选 evaluation/report.py 第八十七轮，覆盖 _RATIO_METRICS 12 项顺序 + aggregate_summary 行为 + get_git_provenance 错误兜底。
+
+---
+
 ## Round 628 — evaluation/metrics.py 第八十五轮（150 测试）
 
 ### 目标
