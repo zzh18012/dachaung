@@ -4,6 +4,42 @@
 
 ---
 
+## Round 617 — evaluation/cli.py 第八十一轮（81 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第八十一轮 edges 测试，补强 edges68 未触及的角度（第四十三批）：**_build_parser 签名**（0 params / 返回 ArgumentParser / prog / description）；**subparsers required=True**（无 subcommand 时 SystemExit）；**3 个 subcommands**（run/validate-report/inspect-doc）；**run subcommand args**（--manifest required / --output required / --parser choices / --max-chars type=int / --tolerance-chars / defaults=fallback/800/30）；**validate-report + inspect-doc positional input + inspect-doc --tolerance-chars default=30**；**main 签名**（argv=None / int return）；**_format_metric 签名 + 各分支**（None / bool True/False / float / dict / int / str / reason None → 'ok'）；**_run_inspect_doc 签名**（args POSITIONAL_OR_KEYWORD / int return）；**_run_inspect_doc 行为**（file not found → 2 / invalid JSON → 1 / top not dict → 1 / 成功打印 doc_id+counts）；**main validate-report 路径**（file not found → 2 / JSONDecodeError → 1 / EvalSchemaError → 1 / 成功 → 0）；**main run 路径**（manifest not found → 2 / ManifestError → 1 / EvalSchemaError from run_evaluation → 1 / 自校验失败 → 1 / 成功 → 0）；**main inspect-doc 路径**（dispatch to _run_inspect_doc）；**模块源码字符串精确**（add_subparsers / "run" / "validate-report" / "inspect-doc" / required=True / fallback+kreuzberg / reconfigure / __main__+SystemExit）；**模块无 __all__**；**AST 结构**（4 functions：_build_parser/main/_format_metric/_run_inspect_doc / 顶层有 If main guard / 无 class/try/for/while/async / future 是第二个）；**forbidden tokens 第八十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges69.py`（81 测试）
+
+### 覆盖要点
+- **_build_parser**：17 测试
+- **main 签名**：3 测试
+- **_format_metric**：13 测试
+- **_run_inspect_doc**：8 测试
+- **main validate-report**：4 测试
+- **main run**：5 测试
+- **main inspect-doc**：1 测试
+- **模块源码字符串**：8 测试
+- **__all__ 不存在**：1 测试
+- **AST 结构**：10 测试
+- **forbidden tokens**：10 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. `test_main_validate_report_schema_fail_batch43`：用 catch-all Exception 不会触发 cli 的 except EvalSchemaError 分支，错误会传播出来 → 改用真实的 EvalSchemaError
+  2. `test_main_run_manifest_error_batch43`：cli 在 load_manifest 之前先检查 manifest_path.is_file()，"any.json" 不存在直接 return 2 而非触发 load_manifest → 改为 tmp_path 写真实文件 + 用 ManifestError
+  3. `test_main_run_schema_fail_batch43`：同理，cli except 只捕获 EvalSchemaError，generic Exception 会逃逸 → 改为 EvalSchemaError
+
+### 测试基线
+- 总数：73518 passed, 22 skipped, 0 failed（686.00s）
+- 较上轮 +81（73437 → 73518）
+
+### 下一步建议
+- 下一轮到 evaluation/schema.py 第八十二轮（继续 edges 加强 SCHEMAS_DIR / _schema_path / load_schema / validate / validate_file / EvalSchemaError 边界）
+
+---
+
 ## Round 616 — evaluation/annotation_metrics.py 第八十轮（77 测试）
 
 ### 目标
