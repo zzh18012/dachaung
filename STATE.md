@@ -4,6 +4,36 @@
 
 ---
 
+## Round 602 — evaluation/cli.py 第六十七轮（141 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第六十七轮 edges 测试，覆盖 edges66 未触及的角度（第四十批）：**_build_parser**（returns ArgumentParser / prog / description / has subparsers / no args raises / unknown command raises / help raises / run/validate-report/inspect-doc 子命令 / parser choices / 默认值 / 自定义值 / 必填参数 / callable / no params / return annotation）；**_format_metric**（callable / signature / None+reason / None no reason / true/false / int / zero int / negative / float / float zero/one / dict / empty dict / string / list / unicode name / bool with reason / long name / returns str / alignment / dict sorted）；**_run_inspect_doc**（callable / signature / 缺失文件 rc=2 / 无效 JSON rc=1 / 顶层数组 rc=1 / 顶层 int/string rc=1 / 空 dict rc=0 / metrics header / file path / document_id / source_type / elements count / chunks count / parser info / 默认 '?' / 不写文件 / idempotent / 完整文档 / Unicode 文档）；**main**（callable / signature / argv default / return annotation / no args raises / unknown raises / run missing manifest rc=2 / validate-report missing rc=2 / inspect-doc missing rc=2 / invalid JSON rc=1 / 合法 validate-report rc=0 / schema 不合 rc=1 / run with valid manifest / run with load_manifest 失败 rc=1 / inspect-doc with empty dict rc=0）；**module source forbidden tokens 第七十四批**；**module source 字符串精确补强第七十批**；**module 合理性 第七十批**（含 AST）；**端到端集成 第七十批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges67.py`（141 测试）
+
+### 覆盖要点
+- **_build_parser 第四十批**：28 测试
+- **_format_metric 第四十批**：24 测试
+- **_run_inspect_doc 第四十批**：22 测试
+- **main 第四十批**：18 测试
+- **module source forbidden tokens 第七十四批**：14 测试（参数化）
+- **module source 字符串精确补强第七十批**：23 测试
+- **module 合理性 第七十批**：12 测试
+- **端到端集成 第七十批**：5 测试
+
+### 撞墙记录
+- 0 fails 首跑
+
+### 测试基线
+- 总数：71638 passed, 22 skipped, 0 failed（391.83s）
+- 较上轮 +141（71497 → 71638）
+
+### 下一步建议
+- 下一轮选 evaluation/__init__.py 第二轮（继续 edges 加强 EVALUATOR_VERSION / REPORT_VERSION / MANIFEST_VERSION 等常量）
+
+---
+
 ## Round 601 — evaluation/schema.py 第六轮（125 测试）
 
 ### 目标
