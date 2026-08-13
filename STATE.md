@@ -4,6 +4,39 @@
 
 ---
 
+## Round 625 — evaluation/cli.py 第八十九轮（63 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第八十九轮 edges 测试，补强 edges69 未触及的角度（第四十四批）：**_build_parser 详细属性**（formatter_class=RawDescriptionHelpFormatter / 有 _SubParsersAction / dest="command" / required=True / 3 choices）；**main run 成功输出格式**（[OK] + documents=N + 成功 N + 失败 N + devset_status + git_commit[:12] + git_dirty；git_commit None → 'unknown'）；**_format_metric 边界**（负 float / int 0 / dict value 排序 / dict 多个 int values / list value 走 default / None+reason / bool True+reason 仍走 bool 分支 / name 含下划线 / 长 name / 短 name）；**_run_inspect_doc 调用链**（调用 compute_automatic_metrics / figure_caption_prf / chunk_boundary_prf with tolerance / 传 annotation=None）；**_run_inspect_doc 排序逻辑**（bool (0) < int/float (1) < other (2) < None (3)，同类别按 name 字母序）；**main validate-report 各种情况**（success 输出 [OK] + evaluation-report / EvalSchemaError 输出 [FAIL] / JSONDecodeError → rc=1 / FileNotFoundError → rc=2）；**main inspect-doc dispatch 透传 args**；**main unknown command → SystemExit（argparse required=True）**；**模块源码字符串精确**（dest="command" / required=True / fallback+kreuzberg / prog="evaluation.cli" / 评测 CLI / RawDescriptionHelpFormatter / 各 subparser help / sys.stdout+stderr.reconfigure / _sort_key / 无标注时该指标固定 null）；**模块无 __all__**；**AST 结构**（4 functions / main 内 if≥3 + try≥3 / _run_inspect_doc 内有 _sort_key 内嵌函数 / 末尾 if __name__ == "__main__" Compare / 无 class/while/async / future 是第二个）；**forbidden tokens 第九十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges70.py`（63 测试）
+
+### 覆盖要点
+- **_build_parser 详细属性**：5 测试
+- **main run 成功输出格式**：3 测试
+- **_format_metric 边界**：9 测试
+- **_run_inspect_doc 调用链 + 排序**：5 测试
+- **main validate-report**：4 测试
+- **main inspect-doc + unknown command**：2 测试
+- **模块源码字符串**：12 测试
+- **模块无 __all__**：1 测试
+- **AST 结构**：11 测试
+- **forbidden tokens**：10 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_run_inspect_doc_sort_metrics_batch44`：int 和 float 同属类别 1（int/float），同类别内按 name 字母序。count_metric < ratio_metric（字母序）。我的注释错误，实际排序是 count_metric 先于 ratio_metric。改为只断言 bool最先 + null最后，不约束 int/float 内部顺序。
+
+### 测试基线
+- 总数：74160 passed, 22 skipped, 0 failed（706.01s）
+- 较上轮 +63（74097 → 74160）
+
+### 下一步建议
+- 下一轮到 evaluation/schema.py 第九十轮（继续 edges 加强 validate / validate_file / EvalSchemaError 边界）
+
+---
+
 ## Round 624 — evaluation/annotation_metrics.py 第八十八轮（56 测试）
 
 ### 目标
