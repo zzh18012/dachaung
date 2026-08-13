@@ -4,6 +4,45 @@
 
 ---
 
+## Round 659 — evaluation/__init__.py 第九轮（72 测试）
+
+### 目标
+- 给 `evaluation/__init__.py`（29 行）加第九轮 edges 测试，补强 edges8 未触及的角度（第四十九批）：**4 个版本常量更深层比较**（与不相关版本不匹配 / sorted 排序 / bytes 表示 / repr / 拼接 / count / index）；**__all__ 列表更深层**（每个元素是 str / 无重复 / 与 dir() 名称匹配 / getattr 可访问 / 在 __dict__ 中）；**模块属性访问边界**（getattr 默认值 / hasattr False / dir 含版本常量 / dir 含 __doc__/__all__/__name__）；**importlib.reload 不改变值**（4 常量保留 / __all__ 保留 / docstring 保留）；**模块 docstring 内容补强**（v1.0/v1.1/口径 D/词内硬切/app 依赖/text_preservation/not_instrumented/null+reason/非空/开头中文）；**AST 结构补强**（4 Assign + 1 __all__ = 5 / __all__ 4 元素都是 Constant str / EVALUATOR_VERSION/REPORT_VERSION/ANNOTATION_VERSION/MANIFEST_VERSION 各自 Assign / 无 FunctionDef / 无 ClassDef / 无 Import / 无 Try/With/For/If / 每个 Assign 1 target）；**forbidden tokens 第一百二十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges9.py`（72 测试）
+
+### 覆盖要点
+- **4 个版本常量更深层比较**：10 测试
+- **__all__ 列表更深层**：6 测试
+- **模块属性访问边界**：8 测试
+- **importlib.reload 不改变值**：4 测试
+- **模块 docstring 内容补强**：10 测试
+- **AST 结构补强**：19 测试
+- **forbidden tokens 第一百二十九批**：16 测试
+
+### 撞墙记录
+- 无（首跑 72/72 全部通过）
+
+### 测试基线
+- 总数：77375 passed, 22 skipped, 0 failed（406.58s）
+- 较上轮 +72（77303 → 77375）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第九十二轮（继续 edges 加强 _image_resource_ratio 多路径）
+  - evaluation/manifest.py 第九十轮（继续 edges 加强 annotation_file 解析）
+  - evaluation/report.py 第九十一轮（继续 edges 加强 build_provenance 时间戳）
+  - evaluation/runner.py 第九十二轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十三轮（继续 edges 加强 anchor position 校验）
+  - evaluation/cli.py 第九十四轮（继续 edges 加强 _run_inspect_doc 嵌套行为）
+  - evaluation/schema.py 第九十五轮（继续 edges 加强 validate errors 多层嵌套）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：__init__.py edges9 已饱和（4 常量更深层 10 + __all__ 6 + 模块属性 8 + reload 4 + docstring 10 + AST 19 + forbidden tokens）。下一轮选 evaluation/metrics.py 第九十二轮，覆盖 _image_resource_ratio 多路径 + _pdf_locator_ratio 多类型。
+
+---
+
 ## Round 658 — evaluation/schema.py 第九十四轮（93 测试）
 
 ### 目标
