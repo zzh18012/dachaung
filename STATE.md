@@ -4,6 +4,37 @@
 
 ---
 
+## Round 585 — evaluation/cli.py 第六十六轮（118 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（243 行）加第六十六轮 edges 测试，覆盖 edges64 未触及的角度（第三十八批）：**_build_parser**（callable / 返回 ArgumentParser / description 含"评测" / 3 个子命令 / run required manifest / run required output / --max-chars 必须 int / --tolerance-chars 必须 int / subparsers dest=command / subparsers required=True / 3 choices / inspect-doc 接受 positional / validate-report 接受 positional / -m 不是 --manifest 短形式）；**_format_metric**（callable / 返回 str / int / 负 int / float zero / 1/3 / full / bool true / bool false / dict 单 kv / dict 多 kv 排序 / dict unicode / dict empty / None with reason / None no reason / 长 name / unicode name / string value fall-through）；**_run_inspect_doc**（missing file rc=2 / invalid json rc=1 / list top-level rc=1 / int top-level rc=1 / string top-level rc=1 / empty dict rc=0 / minimal valid rc=0 / prints file path / prints document_id / prints metrics header / prints elements count / prints chunks count / prints parser info / 自定义 tolerance）；**main**（run missing manifest rc=2 / invalid manifest json rc=1 / invalid manifest schema rc=1 / validate-report missing rc=2 / invalid json rc=1 / invalid content rc=1 / inspect-doc missing rc=2 / invalid json rc=1 / success rc=0 / no subcommand SystemExit / run full success / kreuzberg parser / max-chars 1 / reports counts）；**module source forbidden tokens 第六十一批**；**module source 字符串精确补强第五十七批**；**signatures 第五十七批**；**module 合理性 第五十七批**；**端到端集成 第五十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges65.py`（118 测试）
+
+### 覆盖要点
+- **_build_parser 第三十八批**：14 测试
+- **_format_metric 第三十八批**：19 测试
+- **_run_inspect_doc 第三十八批**：14 测试
+- **main 第三十八批**：13 测试
+- **module source forbidden tokens 第六十一批**：14 测试（参数化）
+- **module source 字符串精确补强第五十七批**：20 测试
+- **signatures 第五十七批**：8 测试
+- **module 合理性 第五十七批**：10 测试
+- **端到端集成 第五十七批**：5 测试
+
+### 撞墙记录
+- 0 fails 首跑（一次性通过）
+
+### 测试基线
+- 总数：69407 passed, 22 skipped, 0 failed（401.61s）
+- 较上轮 +118（69289 → 69407）
+
+### 下一步建议
+- 下一轮选 evaluation/schema.py 第六十轮（继续 edges 加强 EvalSchemaError / validate_file / SCHEMAS_DIR 等）
+
+---
+
 ## Round 584 — evaluation/runner.py 第六十七轮（104 测试）
 
 ### 目标
