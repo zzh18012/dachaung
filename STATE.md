@@ -4,6 +4,48 @@
 
 ---
 
+## Round 670 — evaluation/report.py 第九十二轮（101 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第九十二轮 edges 测试，补强 edges64 未触及的角度（第五十一批）：**常量完整内容**（_RATIO_METRICS 12 项 / 不含 figure_caption / 不含 silent_drop / 不含 element_count / tuple 类型 / _COUNT_METRICS 单项 / _SUCCESS_BOOL_METRICS 单项）；**get_git_provenance 失败路径**（OSError raise / subprocess.SubprocessError raise / nonzero returncode / 空输出 / 成功 / dirty 检测 / status 失败时 dirty=False 短路）；**get_dependency_versions**（返回 dict / 3 keys / 值 str or None / PackageNotFoundError 处理 / 通用 Exception 处理）；**build_provenance**（9 keys / max_chars int 转换 / parser_version 可 None / EVALUATOR_VERSION='1.1' / REPORT_VERSION='1.1' / run_timestamp_iso 可 fromisoformat / dependencies dict）；**build_devset_section**（6 keys / status complete+incomplete）；**aggregate_summary 多场景**（empty counts/success_rate/ratio_macro/silent_drop / success_count 比例 / counts sum int / counts 跳过 None / counts 全 None / ratio macro partial null / silent_drop sum / silent_drop 全 null / silent_drop partial null / success_count null 不算成功 / ratio int+float 混合）；**模块源码补强**（subprocess/datetime/Path/Any imports + EVALUATOR+REPORT_VERSION / docstring 关键词 / counts/success_rates/ratio_macro_averages / silent_drop_total / 不混合 / __all__ 5 entries / timeout=10 / encoding utf-8 / errors replace / capture_output / astimezone iso / pdfplumber+python-docx+pypdfium2）；**AST 结构补强**（5 函数 + 顺序 / 无 ClassDef / 无 AsyncFunctionDef / 6 imports / 4 module-level Assigns / module docstring / __all__ Assign / get_git_provenance 1 try / get_dependency_versions 1 for + 1 try 多 except / build_provenance 调 get_git_provenance + get_dependency_versions / aggregate_summary 3 显式 For 在 body / build_devset_section returns Dict 6 keys / 无 With/While/Global/Nonlocal/Delete / 顶层无 Raise / 无 ImportStar）；**forbidden tokens 第一百四十批**（subprocess ≥3 出现 / open count=0 / 无 async/await / 无 yield）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges65.py`（101 测试）
+
+### 覆盖要点
+- **常量完整内容**：8 测试
+- **get_git_provenance 失败路径**：7 测试
+- **get_dependency_versions**：5 测试
+- **build_provenance**：9 测试
+- **build_devset_section**：2 测试
+- **aggregate_summary 多场景**：13 测试
+- **模块源码补强**：17 测试
+- **AST 结构补强**：23 测试
+- **forbidden tokens 第一百四十批**：17 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `test_ast_has_3_module_level_assigns_batch51`：实际 4 个 Assign（_RATIO_METRICS + _COUNT_METRICS + _SUCCESS_BOOL_METRICS + __all__）→ 改为 ==4。
+  2. `test_ast_aggregate_summary_has_no_explicit_for_batch51`：实际有 3 个显式 for 在 body（for name in _COUNT_METRICS 等）→ 改为 ==3。
+
+### 测试基线
+- 总数：78469 passed, 22 skipped, 0 failed（424.78s）
+- 较上轮 +101（78368 → 78469）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第九十三轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/cli.py 第九十五轮（继续 edges 加强）
+  - evaluation/schema.py 第九十六轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十二轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges65 已饱和（常量完整 + get_git_provenance 失败路径 + get_dependency_versions + build_provenance + build_devset_section + aggregate_summary 多场景 + 模块源码 17 + AST 23 + forbidden 17）。下一轮选 evaluation/runner.py 第九十三轮，覆盖 _load_annotation / _process_one / run_evaluation。
+
+---
+
 ## Round 669 — evaluation/manifest.py 第九十一轮（114 测试）
 
 ### 目标
