@@ -4,6 +4,51 @@
 
 ---
 
+## Round 664 — evaluation/annotation_metrics.py 第九十三轮（94 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十三轮 edges 测试，补强 edges74 未触及的角度（第四十九批）：**chunk_boundary_prf tolerance_chars 边界**（极大值 / 负数 / 默认 30 / 恰好等于 d / d=tolerance+1）；**chunk_boundary_prf anchor marker 含 Unicode**（中文 / 中文完美 / 日文 / emoji）；**chunk_boundary_prf anchor position 缺省/非法**（无 position key 默认 after / position=left 走 else 即 after / right 同 / before vs after 不同）；**chunk_boundary_prf 多 marker 多 anchor 贪心**（最近优先 / tie breaking / 多 anchor 同 marker 顺序定位）；**chunk_boundary_prf predicted stream 不存在**（chunk 文本含 newline 被 normalize）；**chunk_boundary_prf chunks 边界**（缺 text key / text None / 空 list / document {} / document None）；**chunk_boundary_prf f1 计算分支**（perfect / 零分母 / half-half）；**figure_caption_prf 不依赖任何输入**（None document / None annotation / 都 None / 空 dict / 真实 chunks+captions 仍 null）；**模块源码补强**（Counter/Any/normalize_text/_null,_ratio imports / PARSER_DOES_NOT_EMIT_RELATIONS / __all__ / docstring / normalize_text 调用 / pairs.sort / used_pred+used_gt / 多 append / 6 reason 字符串 / search_from / 2*p*r/denom / p_val+r_val / denom<=0）；**AST 结构补强**（2 函数 / 函数名顺序 / 无 ClassDef / 无 AsyncFunctionDef / module docstring / 5 import / 2 top-level Assign / figure_caption_prf 1 return 0 if / chunk_boundary_prf ≥5 return + ≥4 for + 嵌套 for + ≥6 if + pairs.sort lambda + ≥2 AugAssign + 1 break + ≥2 continue + 0 try / 多 keys in dict / 无 Global/Nonlocal/ClassDef）；**forbidden tokens 第一百三十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges75.py`（94 测试）
+
+### 覆盖要点
+- **chunk_boundary_prf tolerance_chars 边界**：5 测试
+- **chunk_boundary_prf anchor marker 含 Unicode**：4 测试
+- **chunk_boundary_prf anchor position 缺省/非法**：4 测试
+- **chunk_boundary_prf 多 marker 多 anchor 贪心**：3 测试
+- **chunk_boundary_prf predicted stream 不存在**：1 测试
+- **chunk_boundary_prf chunks 边界**：5 测试
+- **chunk_boundary_prf f1 计算分支**：3 测试
+- **figure_caption_prf 不依赖任何输入**：5 测试
+- **模块源码补强**：26 测试
+- **AST 结构补强**：22 测试
+- **forbidden tokens 第一百三十四批**：18 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_ast_chunk_boundary_has_pairs_sort_lambda_batch49`：`pairs.sort(key=lambda ...)` 中 lambda 是 keyword arg（`keywords[0]`），不是 positional arg（`args[0]`）。改为检查 `keywords[0].arg == "key"` + `isinstance(keywords[0].value, Lambda)`。
+
+### 测试基线
+- 总数：77860 passed, 22 skipped, 0 failed（413.83s）
+- 较上轮 +94（77766 → 77860）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第九十四轮（继续 edges 加强 _run_inspect_doc 嵌套行为）
+  - evaluation/schema.py 第九十五轮（继续 edges 加强 validate errors 多层嵌套）
+  - evaluation/__init__.py 第十轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十三轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十一轮（继续 edges 加强）
+  - evaluation/report.py 第九十二轮（继续 edges 加强）
+  - evaluation/runner.py 第九十三轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十四轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges75 已饱和（tolerance 5 + Unicode 4 + position 4 + 贪心 3 + chunks 5 + f1 3 + figure_caption 5 + AST 22 + forbidden tokens）。下一轮选 evaluation/cli.py 第九十四轮，覆盖 _run_inspect_doc 嵌套行为 + _format_metric 更多类型。
+
+---
+
 ## Round 663 — evaluation/runner.py 第九十二轮（83 测试）
 
 ### 目标
