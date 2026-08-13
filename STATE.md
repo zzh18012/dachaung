@@ -4,6 +4,45 @@
 
 ---
 
+## Round 621 — evaluation/manifest.py 第八十五轮（87 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第八十五轮 edges 测试，补强 edges69 未触及的角度（第四十四批）：**load_manifest 签名**（2 params POSITIONAL_OR_KEYWORD / project_root default None / return Manifest）；**load_manifest 错误路径**（file not found → ManifestError "清单文件不存在" / invalid JSON → ManifestError "JSON 解析失败" / Schema 失败 → EvalSchemaError / version mismatch 走 Schema enum 先于 code check → schema rejection）；**load_manifest documents 解析**（1 document success / path escape → 项目根目录之外 / absolute path → 绝对路径 / backslash → 反斜杠）；**load_manifest expected_failures**（无 source_type → None / 有 source_type）；**categories_covered 排序**（z,y,x,a → a,x,y,z）；**paired docs content_group_count=1**；**_detect_project_root**（找 pyproject.toml / 从 file 起向上 / 无 pyproject → start）；**_resolve_relative_path 字段名透传**（empty / absolute / backslash / escape 都带 field_x）；**_is_absolute_like 边界**（POSIX / Windows \\ / Windows / / 相对 / 空 / tilde / short / UNC starts \\\\ → False / Unicode drive letter δ:）；**_has_backslash**（yes/no/empty）；**ManifestError 继承**（isinstance Exception / 不继承 ValueError/TypeError / message / catchable as Exception）；**DocumentEntry/ExpectedFailure/Manifest dataclass**（field count 10/5/5 / frozen / replace / asdict 保留 tuple）；**Manifest properties**（file_count / pdf_count / docx_count / categories_covered empty / content_group_count no_paired=1）；**__all__ 5 entries**；**模块源码字符串精确**；**AST 结构**（4 classes：ManifestError/DocumentEntry/ExpectedFailure/Manifest / 5 functions / Manifest 有 5 个 @property / future 是第二个）；**forbidden tokens 第九十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges70.py`（87 测试）
+
+### 覆盖要点
+- **load_manifest 签名 + 错误路径**：9 测试
+- **load_manifest documents 解析**：7 测试
+- **load_manifest expected_failures**：2 测试
+- **categories_covered + paired**：2 测试
+- **_detect_project_root**：4 测试
+- **_resolve_relative_path**：5 测试
+- **_is_absolute_like 边界**：9 测试
+- **_has_backslash**：3 测试
+- **ManifestError**：5 测试
+- **DocumentEntry / ExpectedFailure / Manifest dataclass**：7 测试
+- **Manifest properties**：4 测试
+- **__all__**：4 测试
+- **模块源码字符串**：8 测试
+- **AST 结构**：10 测试
+- **forbidden tokens**：10 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `test_load_manifest_version_mismatch_batch44`：用 "9.9" 触发 schema enum 拒绝（schema 里 const="1.0"），未到 code 比对路径。改为 expect EvalSchemaError + 加 monkeypatch 测试 happy path。
+  2. `test_document_entry_asdict_batch44`：`asdict()` 不把 tuple 转 list（保留 tuple 类型）。改 expect == ("a","b")。
+
+### 测试基线
+- 总数：73920 passed, 22 skipped, 0 failed（753.63s）
+- 较上轮 +87（73833 → 73920）
+
+### 下一步建议
+- 下一轮到 evaluation/report.py 第八十六轮（继续 edges 加强 _RATIO_METRICS / build_provenance / aggregate_summary 边界）
+
+---
+
 ## Round 620 — evaluation/metrics.py 第八十四轮（108 测试）
 
 ### 目标
