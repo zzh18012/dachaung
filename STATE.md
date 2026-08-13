@@ -4,6 +4,48 @@
 
 ---
 
+## Round 626 — evaluation/schema.py 第九十轮（71 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第九十轮 edges 测试，补强 edges58 未触及的角度（第四十四批）：**SCHEMAS_DIR 父目录结构**（parent 含 pyproject.toml / 只含 .json 文件 / 解析为绝对路径）；**_schema_path 错误消息含完整路径**（FileNotFoundError 含 "schemas" + "missing.json" / 返回 Path.parent.name == "schemas" / source 用 SCHEMAS_DIR / name 拼接）；**load_schema 各 schema 内容**（manifest/annotation/evaluation-report 都 type=object 或 properties / manifest required 含 manifest_version+devset_status+documents / evaluation-report 含 required）；**validate 详细行为**（成功返回 None / 顶层非 dict → EvalSchemaError / list/string/int/None 各自抛 / devset_status complete/incomplete 通过 / partial 抛 / 缺 devset_status 抛 / errors 非空 / 每个 error 的 path 是 list / schema_path 是 list / message 是 str）；**validate_file 详细**（成功 None / 不存在含"待校验文件不存在"+路径 / JSONDecodeError 透传 / 调用 validate with dict / 接受 Path 对象 / 接受 str）；**EvalSchemaError 各种**（默认 errors=[] / 关键字参数 errors= / 位置参数 errors / catchable 含具体消息 / raise from 链式 / try 块内多次抛 / args 含 message / pickle 往返保留类型+消息）；**模块源码字符串精确**（不与 app/schema.py 复用 / 业务输出+评测元数据 / from jsonschema import Draft202012Validator / JSValidationError or ValidationError / class EvalSchemaError(Exception): / self.errors = errors or [] / 4 个 def 签名精确）；**__all__ 精确顺序 + 可导入**；**AST 结构**（EvalSchemaError 在 SCHEMAS_DIR 之后 load_schema 之前 / EvalSchemaError 只有 __init__ / __init__ 调 super().__init__ / validate 内有 sorted / validate 内有 iter_errors / validate 内有 raise / 模块顶层无 for/while/async/with / future 是第二个节点）；**forbidden tokens 第九十六批**（eval/exec/compile/globals/locals/os.system/popen/yaml.load/pickle.load + 含 json.load）
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges59.py`（71 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 父目录结构**：3 测试
+- **_schema_path 详细**：3 测试
+- **load_schema 各 schema 内容**：5 测试
+- **validate 详细**：14 测试
+- **validate_file 详细**：6 测试
+- **EvalSchemaError 各种**：8 测试
+- **模块源码字符串**：10 测试
+- **__all__**：2 测试
+- **AST 结构**：10 测试
+- **forbidden tokens 第九十六批**：10 测试
+
+### 撞墙记录
+- 0 fail 首次跑（71 全通过）
+
+### 测试基线
+- 总数：74231 passed, 22 skipped, 0 failed（538.22s）
+- 较上轮 +71（74160 → 74231）
+
+### 下一步建议
+- 候选：
+  - evaluation/__init__.py 第五轮（继续 edges 加强 EVALUATOR_VERSION/REPORT_VERSION/ANNOTATION_VERSION/MANIFEST_VERSION 常量 + __all__ 顺序）
+  - evaluation/metrics.py 第八十五轮（继续 edges 加强 _TEXT_TYPES/_PDF_BBOX_REQUIRED_TYPES 边界）
+  - evaluation/manifest.py 第八十六轮（继续 edges 加强 _is_absolute_like Unicode / DocumentEntry 字段）
+  - evaluation/report.py 第八十七轮（继续 edges 加强 _RATIO_METRICS/_COUNT_METRICS 聚合）
+  - evaluation/runner.py 第八十八轮（继续 edges 加强 _process_one unlink OSError）
+  - evaluation/annotation_metrics.py 第八十九轮（继续 edges 加强 chunk_boundary_prf 顺序匹配）
+  - evaluation/cli.py 第九十一轮（继续 edges 加强 _build_parser formatter）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：schema.py edges59 已饱和（SCHEMAS_DIR/_schema_path/load_schema/validate/validate_file/EvalSchemaError 行为 + source + AST + forbidden tokens 完整）。下一轮选 evaluation/__init__.py 第五轮，覆盖 4 个常量精确值 + __all__ 顺序 + 模块源码字符串 + AST 结构。
+
+---
+
 ## Round 625 — evaluation/cli.py 第八十九轮（63 测试）
 
 ### 目标
