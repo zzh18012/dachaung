@@ -4,6 +4,40 @@
 
 ---
 
+## Round 610 — evaluation/schema.py 第七十四轮（151 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第七十四轮 edges 测试，补强 edges56 未触及的角度（第四十二批）：**SCHEMAS_DIR resolve / 父目录 / 含三个 schema 文件 / 模块属性**；**_schema_path**（缺失文件错误消息含路径 / 空名字 / 目录名字 `.`）；**load_schema**（manifest 含 properties + required / annotation / evaluation-report / 修改隔离 / 签名）；**validate**（多 errors / errors keys 完整 / 错误消息含 schema_name + 数量 + path / complete/incomplete devset / documents / 返回 None）；**validate_file**（str path / 顶层 list / int / string → EvalSchemaError / 调用 validate / 幂等）；**EvalSchemaError**（默认 errors 空 / None errors / 空 list errors / isinstance Exception / raise+catch / errors writable / 多 errors 顺序保留 / repr 含类名）；**module source 字符串精确**；**signatures**；**AST 结构**（顶层无 for/while/with/try / 只 1 个 class / 4 个 function）；**module 合理性**；**端到端集成**；**forbidden tokens 第八十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges57.py`（151 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR**：9 测试
+- **_schema_path**：10 测试
+- **load_schema**：12 测试
+- **validate**：20 测试
+- **validate_file**：14 测试
+- **EvalSchemaError**：18 测试
+- **module source 字符串精确**：20 测试
+- **signatures**：8 测试
+- **module 合理性**：16 测试
+- **AST 结构**：6 测试
+- **端到端集成**：5 测试
+- **forbidden tokens**：14 测试
+
+### 撞墙记录
+- 0 fail（一次通过）
+
+### 测试基线
+- 总数：72799 passed, 22 skipped, 0 failed（405.72s）
+- 较上轮 +151（72648 → 72799）
+
+### 下一步建议
+- 下一轮到 evaluation/__init__.py 第三轮（继续 edges 加强版本常量 + __all__ + AST 边界）
+
+---
+
 ## Round 609 — evaluation/cli.py 第七十三轮（141 测试）
 
 ### 目标
