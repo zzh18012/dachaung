@@ -4,6 +4,52 @@
 
 ---
 
+## Round 669 — evaluation/manifest.py 第九十一轮（114 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第九十一轮 edges 测试，补强 edges75 未触及的角度（第五十一批）：**_is_absolute_like 更细**（Unicode 字母盘符 isalpha / 数字盘符拒绝 / 下划线盘符拒绝 / '/' 单字符 / 'a' 单字符 / 'a:' 2 字符 / 'a:b' 3 字符无斜杠 / 'a:/b' / 空串 / './foo' '../foo' '~/foo'）；**_has_backslash 边界**（仅反斜杠 / 反斜杠+正斜杠 / 开头 / 结尾 / 多个 / 空串 / normal）；**Manifest dataclass 自动行为**（is_dataclass / frozen + setattr raise FrozenInstanceError / auto __eq__ / hashable / repr 含类名）；**DocumentEntry 自动行为**（frozen / auto eq equal+not equal / repr）；**ExpectedFailure**（frozen / auto eq / source_type 默认 None）；**Manifest properties 复杂场景**（empty file_count/pdf_count/docx_count/categories_covered / categories_covered sorted union / dedup / self-reference 配对算 1 组 / chain pair 2 组 / 复杂 6 文档 4 组 / pdf+docx 混合计数）；**_resolve_relative_path 字段名传递**（空串 raise message 含 field_name / 绝对路径 / 反斜杠 / 路径遍历 / 成功返回 Path / 多级子目录）；**load_manifest 完整路径**（missing file / invalid JSON / version mismatch → Schema EvalSchemaError / 无 documents key → EvalSchemaError / expected_failure 缺 path → EvalSchemaError / document 缺 path → EvalSchemaError）；**_detect_project_root**（向上找 pyproject.toml / 找不到返回 parent / 目录起始）；**模块源码补强**（dataclass/json/Path/Any/MANIFEST_VERSION/validate imports / ManifestError class / 3 frozen dataclass / __all__ 5 entries / 配对 docstring / 正反斜杠 / 项目根 / relative_to / .resolve / categories_covered / frozenset）；**AST 结构补强**（5 函数 + 顺序 / 4 ClassDef + 顺序 / 3 dataclass decorator frozen=True / ManifestError 无 decorator / Manifest 5 property / property decorator / categories_covered sorted / content_group frozenset / load_manifest 1 try / 2 for / _resolve_relative_path 1 try / 7 imports / module docstring / 无 AsyncFunctionDef / 无 Global/Nonlocal / 1 With / 无 While / 无 Delete / 顶层无 Raise / __all__ Assign 5 List）；**forbidden tokens 第一百三十九批**（open count=1 / 无 async/await / 无 yield）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges76.py`（114 测试）
+
+### 覆盖要点
+- **_is_absolute_like 更细**：11 测试
+- **_has_backslash 边界**：7 测试
+- **Manifest dataclass 自动行为**：5 测试
+- **DocumentEntry 自动行为**：5 测试
+- **ExpectedFailure**：3 测试
+- **Manifest properties 复杂场景**：10 测试
+- **_resolve_relative_path 字段名传递**：6 测试
+- **load_manifest 完整路径**：6 测试
+- **_detect_project_root**：3 测试
+- **模块源码补强**：17 测试
+- **AST 结构补强**：24 测试
+- **forbidden tokens 第一百三十九批**：17 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `test_load_manifest_version_mismatch_batch51`：manifest_version 用 const: "1.0"，schema 先抛 EvalSchemaError。改为预期 EvalSchemaError。
+  2. `test_load_manifest_expected_failure_no_path_batch51`：schema 校验 expected_failures[].path required → EvalSchemaError。改为预期 EvalSchemaError。
+  3. `test_load_manifest_document_no_path_batch51`：同上 → EvalSchemaError。
+
+### 测试基线
+- 总数：78368 passed, 22 skipped, 0 failed（424.75s）
+- 较上轮 +114（78254 → 78368）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第九十二轮（继续 edges 加强）
+  - evaluation/runner.py 第九十三轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/cli.py 第九十五轮（继续 edges 加强）
+  - evaluation/schema.py 第九十六轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges76 已饱和（_is_absolute_like 11 + _has_backslash 7 + dataclass 自动行为 + properties 复杂场景 + _resolve_relative_path + load_manifest + _detect_project_root + 模块源码 17 + AST 24 + forbidden 17）。下一轮选 evaluation/report.py 第九十二轮，覆盖 aggregate_summary / _RATIO_METRICS / build_provenance 等。
+
+---
+
 ## Round 668 — evaluation/metrics.py 第九十三轮（153 测试）
 
 ### 目标
