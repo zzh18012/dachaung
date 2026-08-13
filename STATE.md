@@ -4,6 +4,37 @@
 
 ---
 
+## Round 612 — evaluation/metrics.py 第七十六轮（140 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第七十六轮 edges 测试，专门补强 `_is_valid_bbox / _pdf_locator_ratio / _docx_locator_ratio` 等核心子函数（第四十二批）：**_is_valid_bbox 类型拒绝**（set/frozenset/dict/bytes/bytearray/generator/tuple/string/None）；**_is_valid_bbox 长度边界**（3/4/5/0）；**_is_valid_bbox 元素值**（True/False bool / 字符串数字 / NaN / Inf / -Inf / complex / None / 0 / negative / very large / very small）；**_pdf_locator_ratio**（image/table/header/footer/unknown 不需 bbox；heading/paragraph/caption/list_item 需 bbox；page=0/-1/string/True/float/None 拒绝；locator=None/missing 都当空 dict；partial mixed ratio）；**_docx_locator_ratio**（7 个 structural key：relationship_id/section/paragraph_index/run_index/table_index/row_index/col_index；page/bbox 出现即拒绝；未知 key/空 locator 拒绝；index 值不校验类型/范围）；**_PDF_BBOX_REQUIRED_TYPES / _TEXT_TYPES / _NOT_EVALUATED 常量**（精确值 + 子集关系）；**_null / _ratio / _bool_metric / _int_metric 补强**（返回 dict 结构 + 类型转换 + bool truthy/falsy + int float 截断 + ValueError）；**_strip_unicode_whitespace 补强**（NBSP / em space 删除；U+200B zero-width space 是 format 字符不删除）；**端到端集成**；**forbidden tokens 第八十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges68.py`（140 测试）
+
+### 覆盖要点
+- **_is_valid_bbox 类型拒绝 + 边界**：30 测试
+- **_pdf_locator_ratio**：21 测试
+- **_docx_locator_ratio**：22 测试
+- **常量**：13 测试
+- **_null / _ratio / _bool_metric / _int_metric**：15 测试
+- **_strip_unicode_whitespace**：18 测试
+- **端到端集成**：3 测试
+- **forbidden tokens**：14 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `U+200B zero-width space` 实际不是 Python isspace() 空白（是 format 字符），实现不删除 → 改 expect "不删除"
+
+### 测试基线
+- 总数：73087 passed, 22 skipped, 0 failed（640.76s）
+- 较上轮 +140（72947 → 73087）
+
+### 下一步建议
+- 下一轮到 evaluation/manifest.py 第七十七轮（继续 edges 加强 DocumentEntry/ExpectedFailure/Manifest 字段边界）
+
+---
+
 ## Round 611 — evaluation/__init__.py 第三轮（148 测试）
 
 ### 目标
