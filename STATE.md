@@ -4,6 +4,39 @@
 
 ---
 
+## Round 586 — evaluation/schema.py 第六十轮（115 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第六十轮 edges 测试，覆盖 edges54 未触及的角度（第三十五批）：**SCHEMAS_DIR**（is Path / is absolute / exists / 含 manifest schema / 含 annotation schema / 含 evaluation-report schema / name=="schemas" / under project root）；**_schema_path**（existing file / 返回 Path / missing raises FileNotFoundError / subdir / empty string）；**load_schema**（manifest / annotation / evaluation-report 返回 dict / 含 $schema / 含 $id / missing raises / idempotent / 不 cache）；**validate**（callable / empty dict 不抛非 EvalSchemaError / invalid raises / 成功返回 None / error.errors 非空 / 每个 error 含 path / message / schema_path / error message 含 schema_name / 含 count / 不 mutate input / 含 extra keys）；**validate_file**（callable / missing raises FileNotFoundError / invalid json raises JSONDecodeError / invalid content raises EvalSchemaError / str path / 成功返回 None / 不 mutate file / unicode path）；**EvalSchemaError**（subclass Exception / callable / 无参数 TypeError / 1 arg / 2 args / errors=None / errors=[] / errors=dict / 可 raise catch / 可 catch as Exception / errors 可写 / repr 含类名 / unicode message / long message / inherits args）；**module source forbidden tokens 第五十九批**；**module source 字符串精确补强第五十五批**；**signatures 第五十五批**；**module 合理性 第五十五批**；**端到端集成 第五十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges55.py`（115 测试）
+
+### 覆盖要点
+- **SCHEMAS_DIR 第三十五批**：8 测试
+- **_schema_path 第三十五批**：5 测试
+- **load_schema 第三十五批**：8 测试
+- **validate 第三十五批**：12 测试
+- **validate_file 第三十五批**：9 测试
+- **EvalSchemaError 第三十五批**：15 测试
+- **module source forbidden tokens 第五十九批**：14 测试（参数化）
+- **module source 字符串精确补强第五十五批**：20 测试
+- **signatures 第五十五批**：10 测试
+- **module 合理性 第五十五批**：10 测试
+- **端到端集成 第五十五批**：5 测试
+
+### 撞墙记录
+- 1 fail 首跑：`sig.return_annotation` 在 `from __future__ import annotations` 下是字符串 `'None'`（不是 singleton None）→ 改用 `in (None, "None")` 兼容两种形式
+
+### 测试基线
+- 总数：69522 passed, 22 skipped, 0 failed（407.60s）
+- 较上轮 +115（69407 → 69522）
+
+### 下一步建议
+- 下一轮选 evaluation/manifest.py 第六十五轮（继续 edges 加强 DocumentEntry / ExpectedFailure / Manifest / load_manifest）
+
+---
+
 ## Round 585 — evaluation/cli.py 第六十六轮（118 测试）
 
 ### 目标
