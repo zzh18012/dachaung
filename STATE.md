@@ -4,6 +4,57 @@
 
 ---
 
+## Round 652 — evaluation/metrics.py 第九十一轮（144 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第九十一轮 edges 测试，补强 edges72 未触及的角度（第四十八批）：**compute_automatic_metrics pipeline_failed 14 keys 精确**（键集合精确 / pipeline_success+error_code 例外 / error_code 来自 error["code"] / source_type 不影响 pipeline_failed 路径）；**compute_automatic_metrics schema_check_exception 路径**（mock 抛 ValueError/RuntimeError → schema_valid=False + reason 含 exception 类型名 / 成功路径 True/False）；**compute_automatic_metrics 成功路径主键**（pipeline_success=True / element_count_total / element_count_by_type / 缺 type 计入 unknown）；**_pdf_locator_ratio 精度**（empty / page=True 通过 / page=0 拒绝 / page=-1 拒绝 / 文本类型缺 bbox / 文本类型有 bbox / 缺 source_locator）；**_docx_locator_ratio 精度**（含 page 拒绝 / 含 bbox 拒绝 / 无 structural_keys 拒绝 / paragraph_index / section / table_indices / relationship_id）；**_is_valid_bbox 严格**（True/False 元素拒绝 / 字符串 / NaN / inf / None / tuple / 长度 3 / 长度 5 / 合法 int / 合法 float / None arg / string arg）；**_chunk_reference_ratio 边界**（chunks 空 / chunk 缺 source_element_ids / 空 source_element_ids / 全匹配 / 部分匹配 / 多 id 全匹配 / 多 id 部分匹配）；**_text_preservation 边界**（都空 / expected 空 actual 非空 / 反之 / 完美匹配 / image 排除 / Unicode 空白 strip / 重复字符 Counter / chunk 缺 text）；**_heading_boundary_ratio 边界**（无 heading / 无 chunks → 0.0 不 null / 完美匹配 / heading 不是 chunk 首元素 / 部分匹配）；**_silent_drop_count 边界**（无 expectations / 空 expectations / 无 element_count_by_type / 空 element_count_by_type / no drops / actual=expected / 部分丢失 / actual 缺类型 / 多类型混合）；**_strip_unicode_whitespace 边界**（ASCII space / NBSP / em space / ideographic space / line separator / paragraph separator / newline+tab / 空 / 全空白 / 无空白 / 保序 / 保大小写）；**模块常量**（_TEXT_TYPES 7 / _PDF_BBOX_REQUIRED_TYPES 4 且子集 / _NOT_EVALUATED）；**_null/_ratio/_bool_metric/_int_metric**（_null / _ratio float / _ratio int→float / _bool_metric int→bool / _int_metric float→int 截断 / _int_metric str 抛 ValueError）；**模块源码补强**（math/Counter/Path/Any / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED / pipeline_failed / not_pdf_document / not_docx_document / no_chunks / no_image_elements / no_heading_elements / no_expectations / empty_actual / empty_expected / empty_expected_and_actual / no_elements / no_expectations_element_count / schema_check_exception / v1.1）；**AST 结构补强**（compute ≥2 return / _is_valid_bbox ≥3 if / _text_preservation 嵌套 if / 无 ClassDef / 无 AsyncFunctionDef / module docstring / 4 Assign / __all__ 1 entry / 14 函数 / 5 import / _silent_drop_count has for / _strip_unicode_whitespace uses join）；**forbidden tokens 第一百二十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges73.py`（144 测试）
+
+### 覆盖要点
+- **compute_automatic_metrics pipeline_failed 14 keys 精确**：4 测试
+- **compute_automatic_metrics schema_check_exception 路径**：4 测试
+- **compute_automatic_metrics 成功路径主键**：4 测试
+- **_pdf_locator_ratio 精度**：7 测试
+- **_docx_locator_ratio 精度**：7 测试
+- **_is_valid_bbox 严格**：13 测试
+- **_chunk_reference_ratio 边界**：7 测试
+- **_text_preservation 边界**：9 测试
+- **_heading_boundary_ratio 边界**：5 测试
+- **_silent_drop_count 边界**：10 测试
+- **_strip_unicode_whitespace 边界**：12 测试
+- **模块常量**：3 测试
+- **_null/_ratio/_bool_metric/_int_metric**：9 测试
+- **模块源码补强**：21 测试
+- **AST 结构补强**：12 测试
+- **forbidden tokens 第一百二十二批**：15 测试
+
+### 撞墙记录
+- 2 fail 首跑：
+  1. 语法错误：`["missing"]]}` 多了一个 `]`。改为 `["missing"]},`。
+  2. `test_ast_module_top_level_import_count_batch48`：实际 5 个 import（含 `from __future__ import annotations`），不是 4。改正 5 后通过。
+
+### 测试基线
+- 总数：76785 passed, 22 skipped, 0 failed（409.96s）
+- 较上轮 +144（76641 → 76785）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第八十九轮（继续 edges 加强 Unicode drive letters）
+  - evaluation/report.py 第九十轮（继续 edges 加强 aggregate 混合）
+  - evaluation/runner.py 第九十一轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十二轮（继续 edges 加强 anchor 多字段组合）
+  - evaluation/cli.py 第九十三轮（继续 edges 加强 run 子命令完整路径）
+  - evaluation/schema.py 第九十四轮（继续 edges 加强 validate errors 排序稳定性）
+  - evaluation/__init__.py 第九轮（继续 edges 加强 monkeypatch 链）
+  - evaluation/metrics.py 第九十二轮（继续 edges 加加强 _image_resource_ratio 多路径）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges73 已饱和（compute pipeline_failed 14 keys 精确 + schema_check_exception + _pdf/_docx_locator 严格 + _is_valid_bbox 13 严格 + _chunk_reference 7 + _text_preservation 9 + _heading_boundary 5 + _silent_drop 10 + _strip_unicode 12 + AST 完整 + forbidden tokens）。下一轮选 evaluation/manifest.py 第八十九轮，覆盖 Unicode drive letters + Manifest property 完整性。
+
+---
+
 ## Round 651 — evaluation/__init__.py 第八轮（91 测试）
 
 ### 目标
