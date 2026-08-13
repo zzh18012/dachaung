@@ -4,6 +4,37 @@
 
 ---
 
+## Round 599 — evaluation/annotation_metrics.py 第六十五轮（132 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第六十五轮 edges 测试，覆盖 edges66 未触及的角度（第四十三批）：**PARSER_DOES_NOT_EMIT_RELATIONS**（exact value / no spaces / is str / module level / in source / used by figure_caption / in __all__ / lowercase）；**figure_caption_prf**（dict doc / dict annotation / int inputs / list inputs / each value None / each reason / idempotent / no mutate / 3 keys / no extra keys / reason consistent / signature）；**chunk_boundary_prf**（document None pipeline_failed / document None includes tolerance / empty dict no annotation / annotation empty list / annotation zero / no chunks with anchors recall=0 / one chunk / two chunks no anchors / perfect match / position before / before with tolerance / unknown position defaults to after / empty marker skipped / marker not in stream recorded / no missing markers no key / tolerance zero / tolerance negative / tolerance huge / tolerance float / always returns tolerance / predicted search_from advances / anchor search_from advances / 3 chunks 2 anchors / chunk empty text / whitespace only / normalize collapses whitespace / f1 zero when p zero / f1 perfect / f1 zero when both zero / one-to-one matching / idempotent / no mutate doc / no mutate ann / 3 params / tolerance default 30 / return dict / chunks string raises AttributeError / at least 4 keys / at most 5 keys / missing marker list / extra anchor keys ignored / extra doc keys ignored / anchor default marker empty / anchor default position after / unicode marker）；**module source forbidden tokens 第七十二批**；**module source 字符串精确补强第六十八批**；**signatures 第六十八批**；**module 合理性 第六十八批**（含 AST 检查）；**端到端集成 第六十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges67.py`（132 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 第四十三批**：8 测试
+- **figure_caption_prf 第四十三批**：14 测试
+- **chunk_boundary_prf 第四十三批**：42 测试
+- **module source forbidden tokens 第七十二批**：14 测试（参数化）
+- **module source 字符串精确补强第六十八批**：24 测试
+- **signatures 第六十八批**：8 测试
+- **module 合理性 第六十八批**：14 测试
+- **端到端集成 第六十八批**：4 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `chunk_boundary_prf({"chunks": "abc"}, {"chunk_boundary_anchors": []})` 不抛 AttributeError，因为空 anchors 走 early return（no_ground_truth_anchors）→ 改为传非空 anchors 触发 `c.get("text")` 迭代
+
+### 测试基线
+- 总数：71183 passed, 22 skipped, 0 failed（387.26s）
+- 较上轮 +132（71051 → 71183）
+
+### 下一步建议
+- 下一轮选 evaluation/manifest.py 第六十八轮（继续 edges 加强 Manifest dataclass / load 边界）
+
+---
+
 ## Round 598 — evaluation/runner.py 第六十七轮（142 测试）
 
 ### 目标
