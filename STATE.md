@@ -4,6 +4,51 @@
 
 ---
 
+## Round 636 — evaluation/metrics.py 第八十六轮（88 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第八十六轮 edges 测试，补强 edges70 未触及的角度（第四十六批）：**compute_automatic_metrics 完整 document 输入**（完整 PDF/DOCX document / source_type unknown / source_type 空字符串 / expectations None / 空 dict / 无 element_count_by_type / 完整匹配 silent_drop=0 / drops 多个 / image_base_dir None / image_base_dir 真实目录 / 14 keys / pipeline_failed 14 keys / element_count_by_type 值 / unknown type 缺 type key / error_dict 透传 code / error_dict 缺 code 抛 KeyError）；**_image_resource_ratio 多种 image**（无 image → null / image 缺 resource_path → 0.0 / 空 resource_path → 0.0 / None resource_path → 0.0 / 现有文件 → 1.0 / 0 字节文件 → 0.0 / 相对路径 + base_dir / 混合 valid+invalid → 0.5）；**_silent_drop_count 各种 expectations**（None / 空 dict / 无 element_count_by_type / actual>expected → 0 / multi-type partial drop 求和 / expected type missing in actual → 全 drop / extra type in actual 忽略 / int 类型 / 0 drop）；**_heading_boundary_ratio 各种**（no_heading → null / no chunks → ratio(0.0) 不是 null / perfect / partial 0.5 / no match 0.0 / first chunk id used / first chunk id wrong / empty ids）；**_text_preservation Counter 行为**（perfect match / chunked text 切词加空格仍 equal / missing char / extra char / reordered → equal False 但 Counter 相同 / image excluded / empty+empty / 3 keys）；**_pdf_locator_ratio 多种元素**（empty → null / all text with bbox / one missing bbox → 0.5 / caption needs bbox / list_item needs bbox / table no bbox needed / returns float ratio）；**_docx_locator_ratio 多种 locator**（empty → null / run_index / table_index / row+col_index / 无 structural key → 0.0）；**模块源码补强**（纯函数 / 不修改 document / text_preservation v1.1 / v1.0 normalize_text / 不伪造）；**AST 结构补强**（_text_preservation 用 Counter / _chunk_reference_ratio 用 set comprehension / _image_resource_ratio 用 ListComp / _silent_drop_count 用 .get / _pdf_locator_ratio 用 isinstance）；**forbidden tokens 第一百零六批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges71.py`（88 测试）
+
+### 覆盖要点
+- **compute_automatic_metrics 完整 document**：18 测试
+- **_image_resource_ratio 多种 image**：8 测试
+- **_silent_drop_count 各种 expectations**：10 测试
+- **_heading_boundary_ratio 各种**：9 测试
+- **_text_preservation Counter 行为**：8 测试
+- **_pdf_locator_ratio 多种元素**：7 测试
+- **_docx_locator_ratio 多种 locator**：6 测试
+- **模块源码补强**：5 测试
+- **AST 结构补强**：5 测试
+- **forbidden tokens 第一百零六批**：15 测试
+- **综合**：3 测试
+
+### 撞墙记录
+- 2 fail 首跑：
+  1. `test_heading_boundary_ratio_no_chunks_returns_null_batch46`：实际 chunks=[] 但有 headings 时返回 ratio(0.0)，不是 null（实现只检查 headings 是否为空）。改为断言 value==0.0。
+  2. `test_ast_chunk_reference_ratio_uses_set_batch46`：实际 elem_ids = `{e.get(...) for e in elements}` 是 set comprehension（ast.SetComp），不是 ast.Set。改为支持 SetComp 或 set() Call。
+
+### 测试基线
+- 总数：75324 passed, 22 skipped, 0 failed（414.11s）
+- 较上轮 +88（75236 → 75324）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第八十七轮（继续 edges 加强 _is_absolute_like Unicode）
+  - evaluation/report.py 第八十八轮（继续 edges 加强 _RATIO_METRICS 12 项顺序）
+  - evaluation/runner.py 第八十九轮（继续 edges 加强 _process_one unlink OSError）
+  - evaluation/annotation_metrics.py 第九十轮（继续 edges 加强 chunk_boundary_prf 顺序匹配）
+  - evaluation/cli.py 第九十二轮（继续 edges 加强 _build_parser formatter）
+  - evaluation/schema.py 第九十二轮（继续 edges 加强 EvalSchemaError pickle）
+  - evaluation/__init__.py 第七轮（继续 edges 加强 4 常量属性）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges71 已饱和（compute 完整 document 18 边界 + 各 ratio helper 边界 + Counter 行为 + source + AST 完整 + forbidden tokens）。下一轮选 evaluation/manifest.py 第八十七轮，覆盖 DocumentEntry/ExpectedFailure/Manifest frozen dataclass 边界 + _resolve_relative_path 各种错误。
+
+---
+
 ## Round 635 — evaluation/__init__.py 第六轮（85 测试）
 
 ### 目标
