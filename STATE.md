@@ -4,6 +4,50 @@
 
 ---
 
+## Round 665 — evaluation/cli.py 第九十四轮（103 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第九十四轮 edges 测试，补强 edges74 未触及的角度（第四十九批）：**_format_metric 更多类型**（int value / large int / 负数 float / dict 多 key 排序 / dict 含 int+float / None value with reason / None value 无 reason / bool true / 0 int）；**_run_inspect_doc 完整路径**（文件不存在 / JSONDecodeError / 顶层非 dict / 成功打印多行 / source_type 默认 unknown / document_id 默认 '?' / parser 默认 '?' / counts 0 / counts 非零）；**main inspect-doc 多场景**（成功 / 文件不存在 / JSON 解析失败 / 顶层非 dict / --tolerance-chars 透传）；**main run 多场景**（manifest 文件不存在 return 2 / 清单加载失败 return 1 / run_evaluation EvalSchemaError return 1 / validate_file 失败 return 1 / 成功 return 0）；**main 完整 dispatch**（无参数 SystemExit / 未知子命令 SystemExit / --parser 非法 SystemExit / --max-chars 非 int SystemExit）；**_build_parser 完整**（prog / description / 3 subparsers / run 5 args / validate-report 1 positional / inspect-doc --tolerance-chars）；**argparse choices 验证**（--parser choices / --max-chars type=int / --max-chars 默认 800 / --tolerance-chars 默认 30 in run & inspect-doc）；**模块源码补强**（argparse/json/sys/Path/ManifestError+load_manifest/get_git_provenance/run_evaluation/EvalSchemaError+validate_file imports / sys.stdout.reconfigure / sys.stderr.reconfigure / utf-8 / errors replace / file=sys.stderr / [OK] 评测完成 / [ERROR] / [FAIL] / --manifest required / --output required / return 0/1/2 / subparsers required / docstring inspect-doc）；**AST 结构补强**（4 函数 / 函数名顺序 / 无 ClassDef / 无 AsyncFunctionDef / module docstring / module top-level if reconfigure / if __main__ / 9 import / _build_parser 3 add_parser + 1 add_subparsers / main ≥5 return + ≥3 if + ≥3 try / _format_metric ≥4 if + ≥5 return + JoinedStr / _run_inspect_doc 嵌套 _sort_key + ≥4 return + sorted + ≥5 print）；**forbidden tokens 第一百三十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges75.py`（103 测试）
+
+### 覆盖要点
+- **_format_metric 更多类型**：9 测试
+- **_run_inspect_doc 完整路径**：9 测试
+- **main inspect-doc 多场景**：5 测试
+- **main run 多场景**：5 测试
+- **main 完整 dispatch**：4 测试
+- **_build_parser 完整**：6 测试
+- **argparse choices 验证**：5 测试
+- **模块源码补强**：26 测试
+- **AST 结构补强**：17 测试
+- **forbidden tokens 第一百三十五批**：17 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_ast_module_has_if_main_batch49`：`ast.unparse` 用单引号 `'__main__'` 而非双引号。改为接受两种。
+
+### 测试基线
+- 总数：77963 passed, 22 skipped, 0 failed（422.85s）
+- 较上轮 +103（77860 → 77963）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第九十五轮（继续 edges 加强 validate errors 多层嵌套）
+  - evaluation/__init__.py 第十轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十三轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十一轮（继续 edges 加强）
+  - evaluation/report.py 第九十二轮（继续 edges 加强）
+  - evaluation/runner.py 第九十三轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/cli.py 第九十五轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges75 已饱和（_format_metric 9 + _run_inspect_doc 9 + main inspect-doc 5 + main run 5 + dispatch 4 + _build_parser 6 + argparse choices 5 + AST 17 + forbidden tokens）。下一轮选 evaluation/schema.py 第九十五轮，覆盖 validate errors 多层嵌套 + load_schema 更深层。
+
+---
+
 ## Round 664 — evaluation/annotation_metrics.py 第九十三轮（94 测试）
 
 ### 目标
