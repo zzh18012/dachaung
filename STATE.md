@@ -4,6 +4,55 @@
 
 ---
 
+## Round 661 — evaluation/manifest.py 第九十轮（96 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第九十轮 edges 测试，补强 edges74 未触及的角度（第四十九批）：**_is_absolute_like 边界补充**（混合大小写盘符 / 单字符后冒号无斜杠 / 仅冒号 / ../foo 相对 / 仅 / / 2 字符 / 数字 drive）；**_has_backslash 多场景**（多位置 / 仅反斜杠 / 无反斜杠 / UNC 双反斜杠）；**_resolve_relative_path 字段名传递**（错误 message 含 field_name 完整路径 4 种错误）；**load_manifest annotation_file 完整流程**（缺失 / 存在合法 / 绝对路径 raise / 反斜杠 raise / project_root 外 raise）；**Manifest content_group_count 复杂场景**（全 unpaired / 2 组双向 / 单向配对 / 空）；**Manifest categories_covered 多场景**（空 / 单文档单 category / union / dedup / 排序 / 缺 categories field）；**_detect_project_root 多种起始路径**（深嵌套 / 文件 / 无 pyproject / 返回绝对路径）；**DocumentEntry frozen 多字段 setattr**（doc_id / source_type / categories）；**ExpectedFailure frozen 多字段**（doc_id / expected_error_code）；**Manifest frozen 多字段**（documents / devset_status）；**hashable 检查**（DocumentEntry + Manifest）；**模块源码补强**（json/dataclass/Path/Any/MANIFEST_VERSION/validate imports / __all__ 5 entries / docstring 关键词 / 4 ClassDef / DocumentEntry 10 fields / ExpectedFailure 5 fields / Manifest 5 fields + 5 properties）；**AST 结构补强**（5 函数 / 4 ClassDef / class_names 顺序 / 无 AsyncFunctionDef / module docstring / 7 import / load_manifest 多 for + try + 多 if / _resolve_relative_path 多 if + try + 多 raise / _is_absolute_like 3 returns / _detect_project_root 1 for + 2 if / Manifest property file_count/categories_covered/content_group_count / DocumentEntry+Manifest @dataclass(frozen=True) decorator）；**forbidden tokens 第一百三十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges75.py`（96 测试）
+
+### 覆盖要点
+- **_is_absolute_like 边界补充**：8 测试
+- **_has_backslash 多场景**：3 测试
+- **_resolve_relative_path 字段名传递**：5 测试
+- **load_manifest annotation_file 完整流程**：5 测试
+- **Manifest content_group_count 复杂场景**：4 测试
+- **Manifest categories_covered 多场景**：6 测试
+- **_detect_project_root 多种起始路径**：4 测试
+- **DocumentEntry frozen 多字段 setattr**：3 测试
+- **ExpectedFailure frozen 多字段**：2 测试
+- **Manifest frozen 多字段**：2 测试
+- **hashable 检查**：2 测试
+- **模块源码补强**：18 测试
+- **AST 结构补强**：19 测试
+- **forbidden tokens 第一百三十一批**：17 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `test_content_group_count_all_unpaired_batch49` 等：`_build_manifest` helper 缺省 path key。修复 helper 用 doc_id + source_type 自动构造 path。
+  2. `test_ast_module_has_5_imports_batch49`：实际 7 个 import（json/dataclass/Path/Any + __future__/MANIFEST_VERSION/validate）。改为 ==7。
+
+### 测试基线
+- 总数：77587 passed, 22 skipped, 0 failed（420.48s）
+- 较上轮 +96（77491 → 77587）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第九十一轮（继续 edges 加强 build_provenance 时间戳）
+  - evaluation/runner.py 第九十二轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十三轮（继续 edges 加强 anchor position 校验）
+  - evaluation/cli.py 第九十四轮（继续 edges 加强 _run_inspect_doc 嵌套行为）
+  - evaluation/schema.py 第九十五轮（继续 edges 加强 validate errors 多层嵌套）
+  - evaluation/__init__.py 第十轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十三轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十一轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest.py edges75 已饱和（_is_absolute_like 8 + _has_backslash 3 + _resolve_relative 5 + annotation_file 5 + content_group 4 + categories 6 + _detect 4 + frozen 多字段 + hashable 2 + AST 19 + forbidden tokens）。下一轮选 evaluation/report.py 第九十一轮，覆盖 build_provenance 时间戳 + aggregate_summary 多路径。
+
+---
+
 ## Round 660 — evaluation/metrics.py 第九十二轮（116 测试）
 
 ### 目标
