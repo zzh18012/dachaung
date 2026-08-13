@@ -4,6 +4,48 @@
 
 ---
 
+## Round 678 — evaluation/annotation_metrics.py 第九十五轮（99 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十五轮 edges 测试，补强 edges76 未触及的角度（第五十三批）：**stream.find 失败路径**（部分 chunk text 找不到时跳过 / 所有 chunk 空 text / text 含前导后随空白 normalize 后仍匹配 / text None 兜底 ""）；**贪心匹配排序**（distance 升序 / 一对一约束 / used_pred 阻塞第二个 anchor）；**search_from 推进**（重复 marker 出现两次，两个 anchor 都能找到不同位置）；**特殊 marker**（含空格 / 含标点 / 含中文 / chunk text 子串）；**f1 计算分支**（chunks<2 走 no_predicted_boundaries / p_val/r_val null 走 precision_or_recall_not_evaluated / p=r=1.0 f1=1.0 / p=0.5 r=1.0 f1≈0.667）；**_missing_markers 多个**（全找不到 / 部分找不到 / value 是 list / reason 是 None）；**_tolerance_chars 数据完整性**（reason=None / 始终 dict / value=0 / value=巨大）；**figure_caption_prf 边界**（document 含 chunks / annotation 含 anchors / 跨调用一致 / 同 keys / value 始终 None / 输入独立性）；**PARSER_DOES_NOT_EMIT_RELATIONS 更深**（含下划线 / 全小写 / AST Assign Constant）；**模块源码补强**（norm_chunks list comp / joined_raw / stream / predicted list / pos init / search_from init / pairs 类型注解 / used_pred set / used_gt set / matched counter / num_pred num_gt / p_val r_val / denom branch / missing_markers append/init / gt_positions init / search_from 推进 / position before/after 分支 / no_ground_truth_anchors_in_stream / precision_or_recall_not_evaluated）；**AST 结构补强**（__future__ annotations / collections Counter / typing Any / app.chunkers.structural normalize_text / evaluation.metrics _null+ratio / figure_caption 2 args 无 default / chunk_boundary 3 args tolerance_chars=30 default / 返回 dict[str, dict[str, Any]] / For target Name/Tuple / enumerate / abs / set / continue count / break count / return out count / 无 ClassDef/Async/Global/Nonlocal/With/Try/While/Raise/Delete/ImportStar / module docstring / 2 Assigns / __all__ List 3）；**forbidden tokens 第一百四十八批**（no eval/exec/compile/globals/locals/os.system/subprocess/popen/yaml.load/pickle.load/socket/requests/urllib/shutil.rmtree/yield/async/await, open count=0）
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges77.py`（99 测试）
+
+### 覆盖要点
+- **stream.find 失败路径**：4 测试
+- **贪心匹配排序**：3 测试
+- **search_from 推进**：1 测试
+- **特殊 marker**：4 测试
+- **f1 计算分支**：4 测试
+- **_missing_markers 多个**：4 测试
+- **_tolerance_chars 数据完整性**：4 测试
+- **figure_caption_prf 边界**：6 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 更深**：3 测试
+- **模块源码补强**：22 测试
+- **AST 结构补强**：28 测试
+- **forbidden tokens 第一百四十八批**：16 测试
+
+### 撞墙记录
+- 1 fail 首跑：`test_chunk_boundary_f1_when_p_null_batch52` 误以为 1-chunk 走 precision_or_recall_not_evaluated 路径，实际走 chunks<2 直接 no_predicted_boundaries。Fix：拆分为 2 测试，分别覆盖 chunks<2 路径（reason=no_predicted_boundaries）与 p_val/r_val null 路径（reason=precision_or_recall_not_evaluated）。
+
+### 测试基线
+- 总数：79157 passed, 22 skipped, 0 failed（422.38s）
+- 较上轮 +99（79058 → 79157）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第九十六轮（继续 edges 加强）
+  - evaluation/schema.py 第九十七轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十三轮（继续 edges 加强）
+  - evaluation/report.py 第九十四轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges77 已饱和（stream.find 失败 / 贪心匹配 / search_from / 特殊 marker / f1 多分支 / _missing_markers / _tolerance_chars / figure_caption 边界 / 模块源码 22 / AST 28 / forbidden 16）。下一轮选 evaluation/cli.py 第九十六轮，覆盖 argparse subcommand / Namespace / choices / RawDescriptionHelpFormatter / process_single_kwargs / validate_report 更深路径。
+
+---
+
 ## Round 677 — evaluation/runner.py 第九十四轮（69 测试）
 
 ### 目标
