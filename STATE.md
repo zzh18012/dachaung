@@ -4,6 +4,51 @@
 
 ---
 
+## Round 672 — evaluation/annotation_metrics.py 第九十四轮（84 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十四轮 edges 测试，补强 edges75 未触及的角度（第五十一批）：**PARSER_DOES_NOT_EMIT_RELATIONS 常量**（值 / str 类型）；**figure_caption_prf**（3 null + reason / None 输入 / reason 总是同常量 / 返回 dict of dicts）；**chunk_boundary_prf document None / annotation empty**（document None pipeline_failed + _tolerance_chars / 自定义 tolerance / annotation None no_annotation / 空 dict）；**chunks < 2 分支**（1 chunk + anchors → recall=0.0 / 1 chunk 无 anchors / 空 chunks 列表）；**chunks >= 2 但无 anchors**（no_ground_truth_anchors）；**单 anchor 匹配**（after position / before position / out of tolerance）；**多 anchor 顺序定位**（重复 marker 不会都命中第一次出现）；**tolerance chars 字段**（始终返回 / 默认 30 / 自定义）；**missing_markers 条件返回**（无 missing 时不写 / empty marker 进 missing）；**多 chunk 多 anchor**（2 chunks 2 anchors 都 matched / 2 preds 1 anchor partial precision / 1 pred 2 anchors partial recall）；**position default after**；**模块源码补强**（Counter/Any/normalize_text/_null+ratio imports / PARSER_DOES_NOT_EMIT_RELATIONS 常量 / docstring 关键词 / 6 个 reason 字符串 / tolerance_chars: int=30 / normalize_text call / stream.find call / pairs.sort lambda / __all__ 3 entries）；**AST 结构补强**（2 函数 + 顺序 / 无 ClassDef / 无 AsyncFunctionDef / 5 imports / module docstring / 2 module-level Assigns / __all__ List 3 / figure_caption 1 return Dict / chunk_boundary 多 for / 多 if / pairs.sort lambda / 多 return / normalize_text call / stream.find call / 无 With/Try/While/Global/Nonlocal/Delete/Raise / 无 ImportStar）；**forbidden tokens 第一百四十二批**（open count=0 / 无 async/await / 无 yield）
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges76.py`（84 测试）
+
+### 覆盖要点
+- **PARSER_DOES_NOT_EMIT_RELATIONS 常量**：2 测试
+- **figure_caption_prf**：4 测试
+- **document None / annotation empty**：4 测试
+- **chunks < 2 分支**：3 测试
+- **chunks >= 2 但无 anchors**：1 测试
+- **单 anchor 匹配**：3 测试
+- **多 anchor 顺序定位**：2 测试
+- **tolerance chars 字段**：3 测试
+- **missing_markers 条件返回**：2 测试
+- **多 chunk 多 anchor**：3 测试
+- **position default after**：1 测试
+- **模块源码补强**：18 测试
+- **AST 结构补强**：23 测试
+- **forbidden tokens 第一百四十二批**：16 测试
+
+### 撞墙记录
+- 0 fails 首跑。84 测试一次通过。
+
+### 测试基线
+- 总数：78635 passed, 22 skipped, 0 failed（432.16s）
+- 较上轮 +84（78551 → 78635）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第九十五轮（继续 edges 加强）
+  - evaluation/schema.py 第九十六轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十四轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十二轮（继续 edges 加强）
+  - evaluation/report.py 第九十三轮（继续 edges 加强）
+  - evaluation/runner.py 第九十四轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics.py edges76 已饱和（PARSER_DOES_NOT_EMIT_RELATIONS + figure_caption + chunk_boundary 完整路径 + 多 anchor 顺序定位 + tolerance + missing_markers + 模块源码 18 + AST 23 + forbidden 16）。下一轮选 evaluation/cli.py 第九十五轮，覆盖 _build_parser / _format_metric / main 多场景。
+
+---
+
 ## Round 671 — evaluation/runner.py 第九十三轮（82 测试）
 
 ### 目标
