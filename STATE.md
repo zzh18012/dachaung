@@ -4,6 +4,37 @@
 
 ---
 
+## Round 592 — evaluation/runner.py 第六十六轮（95 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第六十六轮 edges 测试，覆盖 edges65 未触及的角度（第三十八批）：**_load_annotation**（dev null / JSON array / JSON int / JSON string / JSON bool / JSON null / JSON float / permission error / is_file 前置 / signature / path 必填 / annotation / return type / empty file）；**_process_one**（signature 4 params / 5-tuple / errors 路径 / 创建 _per_doc 目录 / unlinks out_stub / image_dir None when doc None / elapsed 非负 / unknown error）；**run_evaluation**（signature 5 params / 各默认值 / keyword-only / positional-or-keyword / 创建 output dir / returns dict / 6 顶层 keys / report_version 常量 / indent=2 写盘 / 每个 doc 调用一次 / per_doc 含 4 keys / 排除内部状态 / wall_time 6 keys / expected_failures 处理 / mismatch / no_errors actual None / empty manifest）；**module source forbidden tokens 第六十五批**；**module source 字符串精确补强第六十一批**；**module 合理性 第六十一批**；**端到端集成 第六十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges66.py`（95 测试）
+
+### 覆盖要点
+- **_load_annotation 第三十八批**：14 测试
+- **_process_one 第三十八批**：11 测试
+- **run_evaluation 第三十八批**：22 测试
+- **module source forbidden tokens 第六十五批**：14 测试（参数化）
+- **module source 字符串精确补强第六十一批**：20 测试
+- **module 合理性 第六十一批**：9 测试
+- **端到端集成 第六十一批**：5 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `_load_annotation` 的 `path` 参数注解是 `Path | None` 但无默认值（required positional）→ 改为 `inspect.Parameter.empty`
+  2. `_make_manifest_mock` 缺 `devset_status` 等字段，build_devset_section 访问 MagicMock 属性返回 MagicMock，JSON 序列化失败 → 显式设置 6 个 devset 字段
+
+### 测试基线
+- 总数：70243 passed, 22 skipped, 0 failed（1257.75s）
+- 较上轮 +95（70148 → 70243）
+
+### 下一步建议
+- 下一轮选 evaluation/cli.py 第六十六轮（继续 edges 加强 _build_parser / _main 内部行为）
+
+---
+
 ## Round 591 — evaluation/schema_validation.py 第十轮（82 测试）
 
 ### 目标
