@@ -4,6 +4,51 @@
 
 ---
 
+## Round 646 — evaluation/report.py 第八十九轮（67 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第八十九轮 edges 测试，补强 edges61 未触及的角度（第四十八批）：**aggregate_summary 多文档混合**（counts + success + ratio + silent 完整混合 / 单文档 / 100 文档全成功 / 重复 doc_id）；**aggregate_summary 极端边界**（empty metrics dict / value only 无 reason / 未知 key 跳过 / falsey 0/0.0/"" 不算 True / "True" 字符串不算）；**get_git_provenance stdout 含特殊字符**（含 \n / 只 \n / status 只空白 / status 含 tab）；**get_dependency_versions mock importlib 失败**（混合找到 + PackageNotFoundError / 特定 ValueError / 返回正确 keys）；**build_provenance 字段精确**（9 字段全 / 顺序 / max_chars 透传 / parser_name=kreuzberg / dependencies 3 subkeys）；**build_devset_section 边界**（complete / 空 documents / 多 categories）；**aggregate_summary silent_drop 与 counts 区别**（不在 _COUNT_METRICS / 不在 _SUCCESS_BOOL_METRICS / 不在 _RATIO_METRICS / 独立 silent_drop_total）；**aggregate counts 只对 element_count_total**；**模块源码补强**（不混合类型 / success_rates / ratio_macro_averages / silent_drop_total / participating_docs / 无 expectations / pypdfium2 模块本身没有 __version__ / importlib.metadata.version / PackageNotFoundError / run_timestamp_iso / isoformat）；**AST 结构补强**（aggregate_summary return Name + 3 内层 for + get_git_provenance 2 subprocess.run / get_dependency_versions 1 for + ≥1 try / build_provenance 调用 get_git_provenance + get_dependency_versions / build_devset_section return / 无 ClassDef / module docstring / 3 个 tuple literal Assign / 无 AsyncFunctionDef）；**forbidden tokens 第一百一十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges62.py`（67 测试）
+
+### 覆盖要点
+- **aggregate_summary 多文档混合**：4 测试
+- **aggregate_summary 极端边界**：5 测试
+- **get_git_provenance stdout 特殊字符**：4 测试
+- **get_dependency_versions mock 失败**：3 测试
+- **build_provenance 字段精确**：5 测试
+- **build_devset_section 边界**：3 测试
+- **aggregate silent_drop 与 counts 区别**：4 测试
+- **aggregate counts 只对 element_count_total**：2 测试
+- **模块源码补强**：11 测试
+- **AST 结构补强**：11 测试
+- **forbidden tokens 第一百一十六批**：15 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. 函数名 `test_source_contains_无 expectations_batch48` 含空格，Python 语法错误。改名为 `test_source_contains_no_expectations_phrase_batch48`。
+
+### 测试基线
+- 总数：76241 passed, 22 skipped, 0 failed（418.96s）
+- 较上轮 +67（76174 → 76241）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第九十轮（继续 edges 加强 _load_annotation OSError）
+  - evaluation/annotation_metrics.py 第九十一轮（继续 edges 加强 chunk_boundary_prf 重复 marker）
+  - evaluation/cli.py 第九十二轮（继续 edges 加强 inspect-doc _sort_key 输出顺序）
+  - evaluation/schema.py 第九十三轮（继续 edges 加强 EvalSchemaError 子类化）
+  - evaluation/__init__.py 第八轮（继续 edges 加强 monkeypatch + importlib.reload）
+  - evaluation/metrics.py 第九十轮（继续 edges 加强 compute pipeline_failed 14 keys）
+  - evaluation/manifest.py 第八十九轮（继续 edges 加强 Unicode drive letters）
+  - evaluation/report.py 第九十轮（继续 edges 加强 aggregate 混合）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges62 已饱和（aggregate 混合 4 + 极端边界 5 + git stdout 特殊字符 4 + dependency_versions mock 失败 3 + build_provenance 9 字段精确 + build_devset_section 边界 + silent_drop vs counts 区别 + AST 完整 + forbidden tokens）。下一轮选 evaluation/runner.py 第九十轮，覆盖 _process_one 多路径 + run_evaluation per_doc_results 完整。
+
+---
+
 ## Round 645 — evaluation/manifest.py 第八十八轮（100 测试）
 
 ### 目标
