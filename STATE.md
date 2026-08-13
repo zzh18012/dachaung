@@ -4,6 +4,39 @@
 
 ---
 
+## Round 584 — evaluation/runner.py 第六十七轮（104 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第六十七轮 edges 测试，覆盖 edges64 未触及的角度（第三十七批）：**_load_annotation**（None input / nonexistent file / directory / valid dict / invalid json / unicode content / nested dict / large json / extra whitespace / extra newline / 返回 dict 或 None / utf-8 encoding）；**_process_one**（5-tuple type hint / out_stub path format / creates parent dir / success returns document dict / image_dir when document present / unlinks existing stub / 不调 to_dict when errors / unknown error code）；**run_evaluation**（writes REPORT_VERSION / returns dict / writes file to disk / creates output parent dir / 6 top keys / empty documents empty per_doc / default parser_name / custom parser_name / default max_chars / custom max_chars / default tolerance_chars / custom tolerance_chars / per_doc has doc_id / source_type / metrics / wall_time_seconds / wall_time parse/chunk null / reasons not_instrumented / provenance parser_name / max_chars / expected_failure match / no match / no errors actual None / summary present / devset present / keyword-only args）；**module source forbidden tokens 第六十批**；**module source 字符串精确补强第五十六批**；**signatures 第五十六批**；**module 合理性 第五十六批**；**端到端集成 第五十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges65.py`（104 测试）
+
+### 覆盖要点
+- **_load_annotation 第三十七批**：12 测试
+- **_process_one 第三十七批**：9 测试
+- **run_evaluation 第三十七批**：26 测试
+- **module source forbidden tokens 第六十批**：14 测试（参数化）
+- **module source 字符串精确补强第五十六批**：20 测试
+- **signatures 第五十六批**：9 测试
+- **module 合理性 第五十六批**：10 测试
+- **端到端集成 第五十六批**：5 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  1. `_process_one` 在空 manifest 时不被调用 → call_args=None → 给 manifest 加 documents
+  2. `chunk_boundary_prf` 同样在空 manifest 时不调用 → 加 documents
+  3. `_load_annotation(path: Path | None)` 的 path 是 required positional（annotation 是 'Path | None' 但无默认值）→ 改用 `inspect.Parameter.empty`
+
+### 测试基线
+- 总数：69289 passed, 22 skipped, 0 failed（409.58s）
+- 较上轮 +104（69185 → 69289）
+
+### 下一步建议
+- 下一轮选 evaluation/cli.py 第六十六轮（继续 edges 加强 _build_parser / _format_metric / _run_inspect_doc / main）
+
+---
+
 ## Round 583 — evaluation/report.py 第五十四轮（137 测试）
 
 ### 目标
