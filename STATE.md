@@ -4,6 +4,48 @@
 
 ---
 
+## Round 649 — evaluation/cli.py 第九十二轮（86 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第九十二轮 edges 测试，补强 edges72 未触及的角度（第四十八批）：**_format_metric 更多类型分支**（dict / int / str / None / bool with reason / float 精度 / 空 dict / dict 多 keys 排序 / name 36 字符填充）；**_run_inspect_doc 输出顺序**（_sort_key 优先级 0/1/2/3）；**_run_inspect_doc 完整路径**（metrics_count / tolerance 透传 / 无 chunks 无 elements）；**_run_inspect_doc 元信息打印**（file path / document_id / 默认 '?' / source_path / parser_name+version / 默认 'v?'）；**_run_inspect_doc 错误路径**（文件不存在 / JSON 解析失败 / 顶层 list/string/int/null 非 dict）；**_build_parser 边界**（无子命令 / run 缺 --manifest/--output / --parser 非法 choice / validate-report 缺 input / inspect-doc 缺 input / --max-chars 类型 / tolerance 默认 30 / parser 默认 fallback / max_chars 默认 800 / --max-chars 非数字）；**main argv 行为**（无 argv 走 sys.argv / validate-report 不存在 / run manifest 不存在）；**模块源码补强**（argparse/sys/json/Path import / RawDescriptionHelpFormatter / reconfigure / add_subparsers / required=True / choices / ManifestError/EvalSchemaError/validate_file/JSONDecodeError / 3 个子命令 / return 2）；**AST 结构补强**（4 函数 / 无 ClassDef / 无 AsyncFunctionDef / module docstring / main ≥5 return / _format_metric ≥4 if / _run_inspect_doc nested _sort_key + ≥4 return / _build_parser 3 add_parser / 模块顶部 if reconfigure / if main / ≥5 import / _format_metric 全部 return JoinedStr f-string）；**forbidden tokens 第一百一十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges73.py`（86 测试）
+
+### 覆盖要点
+- **_format_metric 更多类型分支**：9 测试
+- **_run_inspect_doc 输出顺序**：4 测试
+- **_run_inspect_doc 元信息打印**：6 测试
+- **_run_inspect_doc 错误路径**：6 测试
+- **_build_parser 边界**：13 测试
+- **main argv 行为**：3 测试
+- **模块源码补强**：18 测试
+- **AST 结构补强**：12 测试
+- **forbidden tokens 第一百一十九批**：15 测试
+
+### 撞墙记录
+- 无失败首跑。
+
+### 测试基线
+- 总数：76463 passed, 22 skipped, 0 failed（407.42s）
+- 较上轮 +86（76377 → 76463）
+
+### 下一步建议
+- 候选：
+  - evaluation/schema.py 第九十三轮（继续 edges 加强 EvalSchemaError 子类化）
+  - evaluation/__init__.py 第八轮（继续 edges 加强 monkeypatch + importlib.reload）
+  - evaluation/metrics.py 第九十一轮（继续 edges 加强 compute pipeline_failed 14 keys）
+  - evaluation/manifest.py 第八十九轮（继续 edges 加强 Unicode drive letters）
+  - evaluation/report.py 第九十轮（继续 edges 加强 aggregate 混合）
+  - evaluation/runner.py 第九十一轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十二轮（继续 edges 加强 anchor 多字段组合）
+  - evaluation/cli.py 第九十三轮（继续 edges 加强 run 子命令完整路径）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：cli.py edges73 已饱和（_format_metric 9 类型分支 + _run_inspect_doc 输出顺序 + 元信息 + 错误路径 + _build_parser 13 边界 + main argv + AST 完整 + forbidden tokens）。下一轮选 evaluation/schema.py 第九十三轮，覆盖 EvalSchemaError 子类化 + validate_file 边界。
+
+---
+
 ## Round 648 — evaluation/annotation_metrics.py 第九十一轮（79 测试）
 
 ### 目标
