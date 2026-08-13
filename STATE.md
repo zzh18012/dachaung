@@ -4,6 +4,48 @@
 
 ---
 
+## Round 651 — evaluation/__init__.py 第八轮（91 测试）
+
+### 目标
+- 给 `evaluation/__init__.py`（29 行）加第八轮 edges 测试，补强 edges7 未触及的角度（第四十八批）：**4 个版本常量语义稳定**（EVALUATOR==REPORT / ANNOTATION==MANIFEST / hashable / set 去重 / len 3 / 字符串方法 split/replace/startswith/endswith / upper / 不可变 TypeError）；**__all__ 列表精确**（顺序 / 4 entries / str 类型 / 唯一 / 在 module 中存在 / 是 list 不是 tuple）；**模块属性访问**（getattr 4 个版本 / getattr 缺失 AttributeError / getattr default / hasattr / dir 包含 4 个版本 + __all__）；**importlib.reload 稳定性**（reload 后 4 版本仍是原值 / __all__ 仍是原 list / module id 不变）；**模块 docstring 内容**（设计原则 / parser/chunker / null+reason / 版本历史 / text_preservation / v1.0 v1.1 / 不可比较 baseline）；**模块元信息**（__file__ endswith __init__.py / __package__ / __name__ / __spec__.name / __dict__ 包含 4 版本 + __all__ 是 list + 值匹配常量）；**模块源码补强**（4 版本常量定义 / __all__ / 无 app import / 无 class / 无 def / 不伪造 / 不修改 / total / not_instrumented / 不返回 1.0 / v1.0 v1.1 / 词内硬切 / 口径 D）；**AST 结构补强**（无 FunctionDef / 无 ClassDef / 无 AsyncFunctionDef / 无 Import / module docstring / 5 Assign / __all__ 4 str entries / 4 版本 str Constant）；**forbidden tokens 第一百二十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_init_edges8.py`（91 测试）
+
+### 覆盖要点
+- **4 个版本常量语义稳定**：8 测试
+- **__all__ 列表精确**：6 测试
+- **模块属性访问**：10 测试
+- **importlib.reload 稳定性**：4 测试
+- **模块 docstring 内容**：8 测试
+- **模块元信息**：7 测试
+- **模块源码补强**：20 测试
+- **AST 结构补强**：9 测试
+- **forbidden tokens 第一百二十一批**：19 测试（含 raise / open / async / await）
+
+### 撞墙记录
+- 无失败首跑。
+
+### 测试基线
+- 总数：76641 passed, 22 skipped, 0 failed（410.24s）
+- 较上轮 +91（76550 → 76641）
+
+### 下一步建议
+- 候选：
+  - evaluation/metrics.py 第九十一轮（继续 edges 加强 compute pipeline_failed 14 keys）
+  - evaluation/manifest.py 第八十九轮（继续 edges 加强 Unicode drive letters）
+  - evaluation/report.py 第九十轮（继续 edges 加强 aggregate 混合）
+  - evaluation/runner.py 第九十一轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十二轮（继续 edges 加强 anchor 多字段组合）
+  - evaluation/cli.py 第九十三轮（继续 edges 加强 run 子命令完整路径）
+  - evaluation/schema.py 第九十四轮（继续 edges 加强 validate errors 排序稳定性）
+  - evaluation/__init__.py 第九轮（继续 edges 加强 monkeypatch 链）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：__init__.py edges8 已饱和（4 版本 8 稳定性 + __all__ 6 + getattr/hasattr/dir 10 + reload 4 + docstring 8 + 元信息 7 + AST 完整 + forbidden tokens）。下一轮选 evaluation/metrics.py 第九十一轮，覆盖 compute_automatic_metrics pipeline_failed 14 keys + _is_valid_bbox 严格性。
+
+---
+
 ## Round 650 — evaluation/schema.py 第九十三轮（87 测试）
 
 ### 目标
