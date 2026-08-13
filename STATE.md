@@ -4,6 +4,49 @@
 
 ---
 
+## Round 662 — evaluation/report.py 第九十一轮（96 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第九十一轮 edges 测试，补强 edges63 未触及的角度（第四十九批）：**get_git_provenance 多种响应**（rev-parse 成功+status 空 / status 非空 dirty / rev-parse 失败 / rev-parse stdout 空 / status 失败 returncode!=0 / status 仅空白 strip 后空 / TimeoutExpired → SubprocessError / OSError / 返回 dict 2 keys）；**get_dependency_versions 多场景**（返回 dict / value 类型 / PackageNotFoundError → None / 通用 Exception → None）；**build_provenance 完整字段**（9 keys / evaluator_version=1.1 / report_version=1.1 / max_chars 是 int / max_chars 字符串转 int / parser_name 透传 / parser_version None / run_timestamp_iso 是 ISO 格式）；**build_devset_section 完整字段**（6 keys / status 透传 / categories_covered 透传）；**aggregate_summary 多场景**（empty / counts 求和 / counts skip None / success rate 0/1/0.5 / null value 不算 success 但算 total / ratio macro avg / ratio with null not_evaluated / silent_drop 求和 / silent_drop skip null / 4 top keys / 12 ratio metrics / figure_caption 不在 _RATIO_METRICS）；**模块源码补强**（subprocess/datetime/Path/Any/EVALUATOR+REPORT imports / __all__ 5 entries / docstring 关键词 / _RATIO_METRICS 12 entries / _COUNT_METRICS / _SUCCESS_BOOL_METRICS / timeout=10 / capture_output / encoding utf-8 / errors replace / isoformat / astimezone / subprocess.run / rev-parse HEAD / status --porcelain / importlib.metadata / PackageNotFoundError / 3 个 pkg 字符串）；**AST 结构补强**（5 函数 / 函数名顺序 / 无 ClassDef / 无 AsyncFunctionDef / module docstring / 6 import / 4 top-level Assign / get_git_provenance 2 subprocess.run 调用 + 1 try + OSError+SubprocessError / get_dependency_versions 内部 import + 1 try 2 handlers / build_provenance 9 keys return dict / aggregate_summary 3 个 ast.For + list comprehension ≥2 + summary[...] 4 assignments + sum）；**forbidden tokens 第一百三十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges64.py`（96 测试）
+
+### 覆盖要点
+- **get_git_provenance 多种响应**：8 测试
+- **get_dependency_versions 多场景**：4 测试
+- **build_provenance 完整字段**：9 测试
+- **build_devset_section 完整字段**：3 测试
+- **aggregate_summary 多场景**：13 测试
+- **模块源码补强**：26 测试
+- **AST 结构补强**：16 测试
+- **forbidden tokens 第一百三十二批**：17 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  1. `test_ast_build_provenance_has_return_dict_batch49`：`ast.unparse` 用单引号 `'key'` 而非双引号 `"key"`。改为接受两种。
+  2. `test_ast_aggregate_summary_has_dict_assignments_batch49`：同上，`summary['counts']` 而非 `summary["counts"]`。改为接受两种。
+
+### 测试基线
+- 总数：77683 passed, 22 skipped, 0 failed（421.26s）
+- 较上轮 +96（77587 → 77683）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第九十二轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十三轮（继续 edges 加强 anchor position 校验）
+  - evaluation/cli.py 第九十四轮（继续 edges 加强 _run_inspect_doc 嵌套行为）
+  - evaluation/schema.py 第九十五轮（继续 edges 加强 validate errors 多层嵌套）
+  - evaluation/__init__.py 第十轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十三轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十一轮（继续 edges 加强）
+  - evaluation/report.py 第九十二轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report.py edges64 已饱和（git_provenance 8 + dep_versions 4 + build_provenance 9 + devset_section 3 + aggregate_summary 13 + AST 16 + forbidden tokens）。下一轮选 evaluation/runner.py 第九十二轮，覆盖 errors JSON 输出 + per_doc private 字段。
+
+---
+
 ## Round 661 — evaluation/manifest.py 第九十轮（96 测试）
 
 ### 目标
