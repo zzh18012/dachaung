@@ -4,6 +4,36 @@
 
 ---
 
+## Round 615 — evaluation/runner.py 第七十九轮（74 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第七十九轮 edges 测试，补强 edges68 未触及的角度（第四十三批）：**_load_annotation 签名 + 行为**（None/missing/dir/valid JSON/JSONDecodeError/OSError/utf-8 encoding）；**_process_one 签名**（4 params POSITIONAL_OR_KEYWORD/no defaults/return annotation tuple）；**_process_one 行为**（5 tuple/成功返回 doc dict/errors 返回 first error to_dict/document None 无 errors → unknown code/image_dir None when document None/creates _per_doc dir/unlinks stub/passes write_json=False）；**run_evaluation 签名**（5 params，parser_name/max_chars/tolerance_chars keyword-only，defaults=fallback/800/30）；**run_evaluation 报告结构**（6 keys exact：report_version/provenance/devset/summary/per_doc/expected_failures）；**per_doc 字段**（4 keys：doc_id/source_type/metrics/wall_time_seconds）；**public per_doc 不含内部标记**（无 _annotation_present/_tolerance_chars/_missing_markers）；**wall_time_seconds 子字段**（total/parse/chunk/parse_reason/chunk_reason + parse/chunk=None + reason=not_instrumented）；**expected_failures 字段**（doc_id/expected_error_code/actual_error_code/matches）；**expected_failure matches**（success → actual=None/matches=False）；**run_evaluation 写盘**（创建 json / 创建父目录）；**parser_version 透传**（成功 → "9.9.9"；失败 → None）；**tolerance_chars 传给 chunk_boundary_prf**；**模块源码字符串精确**（not_instrumented/process_single/image_output_dir_for/compute_automatic_metrics/time.perf_counter/unlink/_per_doc）；**__all__ 1 entry**；**AST 结构**（3 functions：_load_annotation/_process_one/run_evaluation / 无 class/try/for/while/async / future 是第二个）；**forbidden tokens 第八十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges69.py`（74 测试）
+
+### 覆盖要点
+- **_load_annotation**：9 测试
+- **_process_one 签名 + 行为**：12 测试
+- **run_evaluation 签名**：5 测试
+- **run_evaluation 行为 + 报告结构**：17 测试
+- **模块源码字符串**：7 测试
+- **__all__**：4 测试
+- **AST 结构**：10 测试
+- **forbidden tokens**：10 测试
+
+### 撞墙记录
+- 0 fail 首跑通过
+
+### 测试基线
+- 总数：73360 passed, 22 skipped, 0 failed（702.14s）
+- 较上轮 +74（73286 → 73360）
+
+### 下一步建议
+- 下一轮到 evaluation/annotation_metrics.py 第八十轮（继续 edges 加强 figure_caption_prf / chunk_boundary_prf 边界）
+
+---
+
 ## Round 614 — evaluation/report.py 第七十八轮（113 测试）
 
 ### 目标
