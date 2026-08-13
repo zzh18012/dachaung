@@ -4,6 +4,40 @@
 
 ---
 
+## Round 622 — evaluation/report.py 第八十六轮（66 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第八十六轮 edges 测试，补强 edges58 未触及的角度（第四十四批）：**_RATIO_METRICS 索引精确**（0=schema_valid / 1=pdf_locator_valid_ratio / 5=text_preservation_equal / 11=chunk_boundary_f1 / -1=chunk_boundary_f1 / 12=IndexError）；**_RATIO_METRICS 排除项**（无 figure_caption_* / silent_drop_count / element_count_total / pipeline_success / text_char_multiset_f1）；**_COUNT_METRICS / _SUCCESS_BOOL_METRICS**（length 1 / schema_valid 不在 success_bool）；**get_git_provenance 行为细节**（commit/dirty 独立 / 第一次抛 OSError → catch 后 return，第二次不调 / 用 calls 计数验证）；**get_dependency_versions**（idempotent / 3 packages 硬编码 / importlib.metadata / PackageNotFoundError catch / Exception catch / 局部 import 不在顶层）；**build_provenance timestamp**（ISO 格式 / 有 tz / 两次调用 keys 相同）；**build_devset_section**（field order 6 keys / categories passthrough）；**aggregate_summary 边界**（missing metrics key → KeyError / metrics empty dict / metric dict missing value key / silent_drop missing value / stable order / negative value / large value / ratio negative）；**模块源码字符串精确**（# counts / # success_rates / macro average / # silent_drop_count / figure_caption）；**__all__ 顺序固定**；**AST 结构**（无 class/try/for/while/with/async / 所有函数有 return annotation / future 是第二个 / 模块 docstring / 4 个 assigns）；**forbidden tokens 第九十二批**；**端到端集成**（混合成功/失败 doc）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges59.py`（66 测试）
+
+### 覆盖要点
+- **_RATIO_METRICS 索引 + 排除项**：15 测试
+- **_COUNT_METRICS / _SUCCESS_BOOL_METRICS**：4 测试
+- **get_git_provenance 行为细节**：3 测试
+- **get_dependency_versions**：6 测试
+- **build_provenance timestamp**：3 测试
+- **build_devset_section**：2 测试
+- **aggregate_summary 边界**：9 测试
+- **模块源码字符串**：5 测试
+- **__all__**：1 测试
+- **AST 结构**：10 测试
+- **forbidden tokens**：10 测试
+- **端到端集成**：1 测试（实际还有些散在前面）
+
+### 撞墙记录
+- 0 fail 首跑通过
+
+### 测试基线
+- 总数：73986 passed, 22 skipped, 0 failed（699.11s）
+- 较上轮 +66（73920 → 73986）
+
+### 下一步建议
+- 下一轮到 evaluation/runner.py 第八十七轮（继续 edges 加强 _process_one / run_evaluation 边界）
+
+---
+
 ## Round 621 — evaluation/manifest.py 第八十五轮（87 测试）
 
 ### 目标
