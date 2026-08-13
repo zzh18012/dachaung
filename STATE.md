@@ -4,6 +4,36 @@
 
 ---
 
+## Round 591 — evaluation/schema_validation.py 第十轮（82 测试）
+
+### 目标
+- 给 `evaluation/schema_validation.py`（16 行）加第十轮 edges 测试，覆盖 edges4 未触及的角度（第五批）：**document_passes_schema 输入类型**（memoryview / range / bytearray / complex / iterator / generator / class instance / function / module / type）；**dict 内容**（tuple keys / frozenset / set / callable value / inf / nan / self-referential / long key / long value）；**行为**（Python 内置 bool / 100 次调用 / 一致 with is_valid / 接受 keyword document / 拒绝 unknown kwargs / 拒绝多位置参数 / 一致 False for invalid）；**模块结构**（lines count / has __all__ / len 1 / docstring present + mentions schema + mentions avoid / no class / no loops / no try / no conditional / only one function / future annotations / typing Any / lazy import inside function / uses bool cast / has return / no isinstance check / no module-level app.schema）；**签名深度**（one param / named document / POSITIONAL_OR_KEYWORD / no default / dict annotation / bool return / no VAR_POSITIONAL / no VAR_KEYWORD）；**module source forbidden tokens 第五批**；**端到端集成 第五批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_validation_edges5.py`（82 测试）
+
+### 覆盖要点
+- **document_passes_schema 输入类型 第五批**：10 测试
+- **document_passes_schema dict 内容 第五批**：9 测试
+- **document_passes_schema 行为 第五批**：7 测试
+- **模块结构 第五批**：22 测试
+- **签名深度 第五批**：8 测试
+- **module source forbidden tokens 第五批**：14 测试（参数化）
+- **端到端集成 第五批**：12 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `document_passes_schema(document={})` 不抛 TypeError（document 是 POSITIONAL_OR_KEYWORD 可按关键字传）→ 改为两个测试：一个验证关键字合法，一个验证未知关键字抛 TypeError
+
+### 测试基线
+- 总数：70148 passed, 22 skipped, 0 failed（541.02s）
+- 较上轮 +82（70066 → 70148）
+
+### 下一步建议
+- 下一轮选 evaluation/runner.py 第六十六轮（继续 edges 加强 _process_one 内部行为）
+
+---
+
 ## Round 590 — evaluation/report.py 第五十五轮（142 测试）
 
 ### 目标
