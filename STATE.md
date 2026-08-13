@@ -4,6 +4,51 @@
 
 ---
 
+## Round 660 — evaluation/metrics.py 第九十二轮（116 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第九十二轮 edges 测试，补强 edges73 未触及的角度（第四十九批）：**_pdf_locator_ratio 更深路径**（混合 valid/invalid / 4 种 text 类型 + valid bbox / NaN bbox / page None / page 负数 / image 类型不需要 bbox / header/footer 不需要 bbox / 无 source_locator key）；**_docx_locator_ratio 更深路径**（locator None / 含 page+bbox / relationship_id / section+page 共存 / table+row+col / run_index / 未知 key / 混合）；**_image_resource_ratio 更深路径**（resource_path 含子目录 / 仅文件名 + image_base_dir / size=0 失败 / 绝对路径 / 空字符串 / 无 resource_path key / 无 image elements）；**_chunk_reference_ratio 更深路径**（重复 element_id / 多 chunk 同 id / None source_element_ids / 部分 valid / 含 None id）；**_text_preservation Unicode 空白更深层**（NBSP / em space / en space / ideographic space / 混合 / line separator / paragraph separator / image 排除 / 文本增加 / 文本丢失）；**_heading_boundary_ratio 边界**（无 element_id / chunks 空 ids / 多 heading / 多 ids 取第一 / 无 headings）；**_silent_drop_count 边界**（空 dict element_count / expectations 空 dict / by_type 全覆盖 / actual>expected / 混合 / 无 element_count_by_type key）；**compute_automatic_metrics schema_check_exception 类型分支**（ValueError / TypeError / RuntimeError）；**模块源码补强**（_TEXT_TYPES 7 种 / _PDF_BBOX_REQUIRED_TYPES 4 种 / _NOT_EVALUATED / math+Counter+Path+Any+future imports / docstring v1.0 v1.1 / 词内硬切 / math.isfinite / 11 reason 字符串 / __all__ 1 entry）；**AST 结构补强**（14 函数 / 无 ClassDef / 无 AsyncFunctionDef / module docstring / 5 import / 4 top-level Assign / compute_automatic_metrics 多 if 多 return / _pdf_locator for+continue / _docx_locator for+continue / _is_valid_bbox 4+ if / _text_preservation 嵌套 if-else + Counter / _silent_drop 1 for + 1 AugAssign / _strip_unicode_whitespace join+isspace / _image_ratio 2+ for + 1 try / _chunk_reference set comprehension / _heading_boundary set + sum）；**forbidden tokens 第一百三十批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges74.py`（116 测试）
+
+### 覆盖要点
+- **_pdf_locator_ratio 更深路径**：8 测试
+- **_docx_locator_ratio 更深路径**：8 测试
+- **_image_resource_ratio 更深路径**：7 测试
+- **_chunk_reference_ratio 更深路径**：5 测试
+- **_text_preservation Unicode 空白更深层**：10 测试
+- **_heading_boundary_ratio 边界**：5 测试
+- **_silent_drop_count 边界**：6 测试
+- **compute_automatic_metrics schema_check_exception 类型分支**：3 测试
+- **模块源码补强**：25 测试
+- **AST 结构补强**：19 测试
+- **forbidden tokens 第一百三十批**：17 测试
+
+### 撞墙记录
+- 1 fail 首跑：
+  1. `test_compute_metrics_schema_check_*_batch49`：document_passes_schema 是函数内部 import（`from evaluation.schema_validation import document_passes_schema`），不是 metrics 模块级属性。修复 patch 路径为 `evaluation.schema_validation.document_passes_schema`（3 个测试一起改）。
+
+### 测试基线
+- 总数：77491 passed, 22 skipped, 0 failed（418.25s）
+- 较上轮 +116（77375 → 77491）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第九十轮（继续 edges 加强 annotation_file 解析）
+  - evaluation/report.py 第九十一轮（继续 edges 加强 build_provenance 时间戳）
+  - evaluation/runner.py 第九十二轮（继续 edges 加强 errors JSON 输出）
+  - evaluation/annotation_metrics.py 第九十三轮（继续 edges 加强 anchor position 校验）
+  - evaluation/cli.py 第九十四轮（继续 edges 加强 _run_inspect_doc 嵌套行为）
+  - evaluation/schema.py 第九十五轮（继续 edges 加强 validate errors 多层嵌套）
+  - evaluation/__init__.py 第十轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十三轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics.py edges74 已饱和（_pdf_locator 8 + _docx_locator 8 + _image 7 + _chunk_reference 5 + _text_preservation 10 + _heading 5 + _silent_drop 6 + schema exception 3 + AST 19 + forbidden tokens）。下一轮选 evaluation/manifest.py 第九十轮，覆盖 annotation_file 解析 + content_group_count 多向配对。
+
+---
+
 ## Round 659 — evaluation/__init__.py 第九轮（72 测试）
 
 ### 目标
