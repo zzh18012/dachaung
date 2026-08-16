@@ -4,6 +4,111 @@
 
 ---
 
+## Round 691 — evaluation/runner.py 第九十七轮（48 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第九十七轮 edges 测试，补强 edges78 未触及的角度（第五十七批）：**annotation 流向**（annotation_resolved 真文件 → figure/chunk prf 收 dict / None 透传 / 损坏文件降级 None / chunk_boundary_prf 收 tolerance_chars=77 与默认 30）；**metrics.update 覆盖顺序**（fig_caps 先 / chunk_b 后 → 同名 key chunk_b 胜 / 三来源合并 keys）；**compute_automatic_metrics kwargs**（error dict 透传 / expectations 透传 / document=None）；**expected_failures 流程细节**（process_single 收 ef.resolved_path + `_per_doc/{doc_id}.json` + write_json=False / unlink OSError 容错 / 3 个 ef 依序 / 创建 _per_doc 目录）；**_process_one 计时**（patch perf_counter 序列 1.0→2.5 → elapsed 1.5 / 恰好调用 2 次）；**image_dir 推导**（image_output_dir_for 收 out_stub + document.source_hash）；**源码补强**（out_p.open("w") / json.dump 一行 3 kwargs / mkdir 4 处 / image_base_dir 三元 / tolerance_record 条件 / unlink 2 处 / fig_caps 在 chunk_b 之前）；**AST 补强**（perf_counter 2 调用 / pop 顺序 tolerance 先 / report Dict 6 keys 顺序 / kwonly 默认 fallback-800-30 / public dict 4 keys / 无 Assert / ef 循环先于 provenance）；**forbidden tokens 第一百六十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges79.py`（48 测试）
+
+### 撞墙记录
+- 1 fail 首跑：`.mkdir(parents=True, exist_ok=True)` 全模块出现 4 处（_process_one / ef 循环 / output_root / out_p.parent），预判 2 错。
+
+### 下一步建议
+- 继续轮换：evaluation/cli.py 第九十八轮 / evaluation/annotation_metrics.py 第九十七轮 / evaluation/schema.py 第九十九轮。
+
+---
+
+## Round 690 — evaluation/report.py 第九十六轮（57 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第九十六轮 edges 测试，补强 edges67 未触及的角度（第五十六批）：**get_dependency_versions mock 矩阵**（version 正常返回 3 次 / PackageNotFoundError → 全 None / 泛型 Exception → 全 None / 三包不同结局混合 / 调用顺序 pdfplumber-python-docx-pypdfium2 / 每次新 dict）；**get_git_provenance 更细**（commit strip 尾换行 / dirty True/False 语义 / cwd=str(root) / capture_output+text+encoding+errors kwargs / 第二次 run 抛 OSError 仍兜底 / 双 returncode≠0 → dirty False（bool 短路））；**aggregate_summary 混合独立**（单 doc 四类指标并存互不干扰 / success value=1(int) 不算（is True 严格）/ value="yes" 不算 / ratio int value 参与 / not_evaluated=total-participating 精确 / 12 ratio 名单顺序精确 / 空 results 全 12 项 None+0+0）；**build_provenance 细节**（git_dirty True 透传 / 40 字符 commit 透传 / max_chars "800" 字符串转 int / dependencies 来自 helper 且只调 1 次）；**源码补强**（is True 字面 / rate 条件 / macro 表达式 / silent_drop 条件 / except 双层（versions[pkg]=None 出现 2 次）/ type: ignore / stdout.strip() or None / dirty bool 表达式）；**AST 补强**（_RATIO_METRICS 首 schema_valid 尾 chunk_boundary_f1 / 函数级 import importlib.metadata / 1 Try 2 handlers / summary 4 个 Subscript 赋值顺序 / except Tuple unparse 双元素 / 3 个 For 迭代目标 / build_provenance 首调 get_git_provenance）；**forbidden tokens 第一百六十批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges68.py`（57 测试）
+
+### 撞墙记录
+- 2 fail 首跑：summary[key] 的 Subscript 取 key 要用 `.slice.value`（`.value` 是容器名）；except 元组含 Attribute（subprocess.SubprocessError）→ 用 ast.unparse。
+
+### 下一步建议
+- runner edges79（Round 691 已做）。
+
+---
+
+## Round 689 — evaluation/manifest.py 第九十五轮（67 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第九十五轮 edges 测试，补强 edges78 未触及的角度（第五十六批）：**content_group_count 语义矩阵**（双向配对 1 组 / 单向配对也 1 组 / A→B+B→C 传递不合并 → 2 组 / 自配对 frozenset 单元素 1 组 / paired_with 空串算未配对 / 1 对+2 未配对=3 / 空清单 0 / 全未配对 3）；**load_manifest 错误消息细节**（path 逃逸含 `documents[d1].path` / annotation_file 字段名 / `expected_failures[ef1].path` / 版本不匹配含双版本号（patch MANIFEST_VERSION 触发，schema const 先拦 9.9）/ 不存在含 resolve 路径 / JSON 解析失败前缀 / 反斜杠含"正斜杠" / 绝对路径含"绝对路径"）；**端到端更多**（categories → tuple / expectations dict 原样 / sha256+paired_with+annotation 默认 None / project_root 传 str / status complete / a/../b.pdf 收敛仍在根内 / annotation_file 解析路径）；**_is_absolute_like 更多**（单字母盘符 a:\\b True / AB:/x False / 1:/x False / 空格盘符 False / //server UNC True / ~/ False / a:b 第三字符非斜杠 False）；**_resolve_relative_path 更多**（a/./b.py / a//b.py 双斜杠 / 相对 project_root 传入 / 自定义字段名进错误消息）；**properties 数值**（mixed 3 docs 2 pdf 1 docx / categories 排序去重）；**AST/源码补强**（frozenset([d.doc_id, d.paired_with]) / seen.update / sorted(s) / data.get 双默认 / [cur, *cur.parents] / except ValueError / 单向也算一组注释 / 5 个 property 顺序 / dataclass Call 装饰器三连）；**forbidden tokens 第一百五十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges79.py`（67 测试）
+
+### 撞墙记录
+- 3 fail 首跑：manifest_version "9.9" 先被 schema const 拦截（EvalSchemaError 非 ManifestError）→ 改 patch `evaluation.manifest.MANIFEST_VERSION`；ast.unparse 输出单引号（`if d.get('annotation_file'):`）。
+
+### 下一步建议
+- report edges68（Round 690 已做）。
+
+---
+
+## Round 688 — evaluation/metrics.py 第九十五轮（90 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第九十五轮 edges 测试，补强 edges76 未触及的角度（第五十五批）：**compute_automatic_metrics 组合矩阵**（error 与 document 同时非 None / document 缺 elements / 缺 chunks key / expectations 空 dict / source_type 非 pdf docx 双 null / 空 document 全链路 / 14 keys 固定顺序）；**_chunk_reference_ratio 更深**（element 缺 element_id 时 None 入 set、chunk 引 [None] 命中 / ids 字符串按字符迭代失效 / 半 valid 0.5 / 空 ids falsy）；**_heading_boundary_ratio 更深**（两 heading 同 id 均 matched / 第二位不算 / chunks 空 → 0.0 非 null / None id matched / 两 chunk 同首 id）；**_strip_unicode_whitespace 更深**（全角空格 / NBSP / 行分隔 / 段分隔 / 零宽空格保留 / ASCII 全套 / em space）；**_is_valid_bbox 更深**（bool 值拒绝 / int+float 混合 / 1e308 大有限数 / -inf / set / generator）；**_text_preservation 更深**（expected 全空白+actual 非空 / 反向 / 乱序 equal False 但 P/R=1.0 / aab vs abb 2/3 / image content 忽略 / None content+text / 大小写敏感 / 多余字符 precision<1）；**helpers dict 形状**（4 helper 恰好 {"value","reason"} / 非 null reason None / ratio 强转 float）；**_pdf_locator_ratio 数值**（2/3 / 空 / table 不需 bbox / caption 需要）；**源码补强**（ids and all 一行 / chunk_first_ids.add / matched sum genexp / drops += / v1.1 口径 D / 误报注释 / source_spans / Counter 交集 / 延迟 import / schema_check_exception / docx 7 结构键 / is_file+st_size）；**AST 补强**（chunk_reference 1 SetComp / strip 1 GeneratorExp / text_preservation return 3 keys / heading 1 ListComp + set() / bbox 4 If / compute null loop / by_type 累积 / image try OSError / 无 Lambda / __all__ 1）；**forbidden tokens 第一百五十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges77.py`（90 测试）
+
+### 撞墙记录
+- 2 fail 首跑：bbox 大数测试把 `2e308` 写进列表（字面溢出为 inf）→ 改两个 1e308；_is_valid_bbox 实际 4 个 If（头部 isinstance/len 1 + 循环内 3），预判 3 错。
+
+### 测试基线
+- 总数：80180 passed, 22 skipped, 0 failed（438.45s，连同 Round 687 一起跑）
+- 较上轮 +185（79995 → 80180；687 +95 / 688 +90）
+- Round 687（schema edges67，95 测试）无单独全量，含于本次基线。
+
+### 下一步建议
+- 继续轮换：evaluation/manifest.py 第九十五轮（Round 689 已做）/ evaluation/report.py 第九十六轮（Round 690 已做）/ evaluation/runner.py 第九十七轮（Round 691 已做）/ evaluation/cli.py 第九十八轮。
+
+---
+
+## Round 687 — evaluation/schema.py 第九十八轮（95 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第九十八轮 edges 测试（第五十五批），本轮聚焦 **Schema 文件内容级校验**（此前轮次只测 loader/validator 行为，未系统断言 3 个 schema 文件的内部约束）：**manifest.schema.json 内容**（manifest_version const "1.0" 拒 2.0/数字 / devset_status enum / documents required / 空数组 OK / expected_failures 可省略 / document required 3 项 / path minLength 1 / source_type enum 拒 txt / sha256 `^[0-9a-f]{64}$` 拒大写拒短 / document+顶层 additionalProperties false / categories 字符串数组 / expected_failure required 3 项）；**annotation.schema.json 内容**（annotation_version const / doc_id minLength / boundary_anchor marker minLength + position enum 拒 middle + extra key 拒 + reason 可选 / heading_order level minimum 1 拒 0 / figure_caption_pairs 2 required / annotator+date / 顶层 extra 拒）；**evaluation-report.schema.json 内容**（report_version const "1.1" 拒 "1.0" / provenance 9 required / max_chars minimum 1 拒 0 / dependencies 值 string|null 拒 int / per_doc required 4 / wall_time required 3 + additionalProperties 拒 extra / ef_result required 4 拒缺 matches / summary 内部无 required 空 dict OK / silent_drop_total 接受 int / 顶层 extra 拒）；**validate 多错误细节**（flat 长度==message count / path 含数组索引（'documents',0,'source_type'）/ schema_path 非空）；**端到端最小合法实例**（3 schema 全通过 + 带空 per_doc/expected_failures 的完整 report）；**EvalSchemaError 细节**（str 含 message / args 单元素 / errors 默认不共享 / kwarg 保留）；**load_schema 无缓存**（两次加载相等但非同对象 / 修改隔离）；**validate_file 端到端**（3 个最小实例落盘校验）；**源码+AST 补强**（flat dict 3 字面 keys / sorted lambda body 是 list Call / raise 1 位置参数+errors 关键字 / validate_file body[1] 是 Path(path) 转换 / __all__ 精确顺序 / 函数内无 import）；**forbidden tokens 第一百五十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges67.py`（95 测试）
+
+### 撞墙记录
+- 3 fail 首跑：absolute_path 包含属性名（('documents',0,'source_type') 非裸索引）；raise 是 1 位置参数+1 关键字参数（不是 2 位置）；validate_file body[0] 是 docstring Expr，Path 转换在 body[1]。
+
+### 下一步建议
+- metrics edges77（Round 688 已做）。
+
+---
+
+## Round 686 — evaluation/cli.py 第九十七轮（75 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第九十七轮 edges 测试，补强 edges77 未触及的角度（第五十四批）：**_build_parser 完整默认值**（run 5 参数默认 fallback/800/30 / choices 元组 / inspect-doc input positional / run 拒多余 positional / validate-report 无可选参数 / 3 个子命令 help 文案）；**main 无子命令/未知命令 SystemExit**；**main run 输出格式细节**（documents=4 + 成功 3 失败 1 / documents=0 / git_commit 截断 12 位 / None → unknown / git_dirty=True）；**main run 参数传递**（parser_name kreuzberg / max_chars 1200 / tolerance_chars 55 / 默认 fallback 800 30）；**main validate-report 优先级**（is_file 先于 validate_file，缺文件 rc=2 且不调用 validate）；**main inspect-doc metrics 输出**（null reason / bool 小写 true / float 0.5000 / tolerance-chars 88 传给 chunk_boundary_prf）；**_format_metric 更多类型**（str/list value / 长名对齐 / 恒返回 str / bool+reason / int 无 reason → (ok)）；**源码补强**（prog=/description= / 各 help 文案 / stderr ≥8 / return 1 ≥6 / return 2 ≥4 / type=int ==3 / choices kwarg / json.load / metrics.update ==2）；**AST 补强**（8 个 add_argument / 3 command compare / main 末尾 return 2 / _sort_key 4 return / _format_metric 5 return / inspect-doc 2 个函数级 import / 首模块 If 是 reconfigure / 末模块 If 是 __main__）；**forbidden tokens 第一百五十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges78.py`（75 测试）
+
+### 撞墙记录
+- 1 fail 首跑：inspect-doc 的 doc JSON 需要 `"source_type": "pdf"` 顶层字段，否则 pdf_locator_valid_ratio 走 not_pdf_document 分支出不了 0.5000。
+
+### 测试基线
+- 总数：79995 passed, 22 skipped, 0 failed（445.48s）
+- 较上轮 +75（79920 → 79995）
+
+### 下一步建议
+- schema 内容级校验（Round 687 已做）。
+
+---
+
 ## Round 685 — evaluation/annotation_metrics.py 第九十六轮（71 测试）
 
 ### 目标
