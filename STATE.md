@@ -4,6 +4,50 @@
 
 ---
 
+## Round 682 — evaluation/manifest.py 第九十三轮（110 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第九十三轮 edges 测试，补强 edges77 未触及的角度（第五十三批）：**_is_absolute_like 更深**（单字符 / 2 字符 / 盘符后无斜杠 / 盘符小写 / 非字母+冒号 / 只有斜杠 / 空字符串 / 中文盘符 isalpha True）；**_has_backslash 边界**（单个 / 多个 / 开头 / 结尾 / 不含 / 空）；**_resolve_relative_path 更多异常路径**（空 raise / 绝对 raise / Windows 盘符 raise / 反斜杠 raise / ../ 越界 raise / 深层越界 raise / 子目录合法 / ./ 前缀合法 / 返回绝对 Path / 不存在的文件也合法）；**_detect_project_root 更深**（项目根本身 / evaluation/ 嵌套 / 文件输入 / 无 pyproject 回退 cur / 有 pyproject 向上找）；**load_manifest 更多场景**（不存在 raise / JSON 失败 raise / schema 失败 raise / version 不匹配 schema 先拦 / documents 空 ok / 无 expected_failures key ok / 完整字段传递 sha256+categories+paired_with+expectations / expected_failure 无 source_type / annotation_file resolved / 返回 Manifest / str 路径 / 默认 project_root 自动检测）；**DocumentEntry frozen**（赋值 raise / 等值 / 不等值 / repr / is_dataclass / 10 fields）；**ExpectedFailure frozen**（赋值 raise / 等值 / is_dataclass / 5 fields）；**Manifest frozen**（赋值 raise / is_dataclass / 5 fields / properties 不受 freeze 影响）；**模块源码补强**（6 imports / 6 docstring / __all__ 5 / 3 个 @dataclass(frozen=True) / 模块 docstring 3 不变量）；**AST 结构补强**（4 ClassDef + 3 dataclass Call decorator frozen=True / DocumentEntry 10 AnnAssign / ExpectedFailure 5 / Manifest 5 / Manifest 5 property / ManifestError extends Exception / _resolve_relative_path 3 If + 1 Try + raise ManifestError / load_manifest 2 For + 1 With + 1 Try + validate call / _detect_project_root 1 For + 2 If / 5 顶层函数顺序 / 无 Async/ImportStar/Global/Nonlocal / __all__ List 5）；**forbidden tokens 第一百五十二批**（no eval/exec/compile/globals/locals/os.system/subprocess/popen/yaml.load/pickle.load/socket/requests/urllib/shutil.rmtree/yield/async/await, open count=1）
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges78.py`（110 测试）
+
+### 覆盖要点
+- **_is_absolute_like 更深**：11 测试
+- **_has_backslash 边界**：6 测试
+- **_resolve_relative_path 更多异常路径**：10 测试
+- **_detect_project_root 更深**：5 测试
+- **load_manifest 更多场景**：14 测试
+- **DocumentEntry frozen**：6 测试
+- **ExpectedFailure frozen**：4 测试
+- **Manifest frozen**：4 测试
+- **模块源码补强**：16 测试
+- **AST 结构补强**：18 测试
+- **forbidden tokens 第一百五十二批**：16 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  - `test_ast_3_dataclass_decorators_batch52`：`@dataclass(frozen=True)` 是 Call(func=Name('dataclass')) 不是 Attribute。Fix：匹配 Call + func Name id='dataclass'，并断言 frozen=True keyword。
+  - `test_ast_manifest_5_fields_batch52`：误在 FunctionDef 上访问 .target → AttributeError。Fix：只统计 cls.body 直接子级的 AnnAssign。
+- push 时 GitHub 连接失败（Connection reset / 443 不通），本地 commit 完成后待网络恢复重推。
+
+### 测试基线
+- 总数：79656 passed, 22 skipped, 0 failed（463.90s）
+- 较上轮 +110（79546 → 79656）
+
+### 下一步建议
+- 候选：
+  - evaluation/report.py 第九十四轮（继续 edges 加强）
+  - evaluation/runner.py 第九十五轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十六轮（继续 edges 加强）
+  - evaluation/cli.py 第九十七轮（继续 edges 加强）
+  - evaluation/schema.py 第九十八轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：manifest edges78 已饱和（_is_absolute_like 11 / _has_backslash 6 / _resolve_relative_path 10 / _detect_project_root 5 / load_manifest 14 / 3 个 frozen dataclass 14 / 模块源码 16 / AST 18 / forbidden 16）。下一轮选 evaluation/report.py 第九十四轮，覆盖 aggregate_summary / build_provenance / get_git_provenance 更深路径。
+
+---
+
 ## Round 681 — evaluation/metrics.py 第九十四轮（162 测试）
 
 ### 目标
