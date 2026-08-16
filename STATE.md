@@ -4,6 +4,86 @@
 
 ---
 
+## Round 727 — evaluation/cli.py 第一百零三轮（29 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第一百零三轮 edges 测试，补强 edges81/82/83 未触及的角度（第九十二批）：**validate_file 行为级捕获**（(output_path, schema 名) 二元组）；**load_manifest 收到 Path 类型**；**inspect-doc 真实全量运行**（21 行指标、首行 pipeline_success true、末行 silent_drop_count null、metrics: 头位置、file: 行 8 空格）；**_format_metric 空 metric → "null  (None)"（reason 缺省被插值）**；**main(argv=None) 走 sys.argv**；**argparse 拒绝补全**（缺 --output / 缺 input / 未知子命令）；**守卫行**（__main__ / AttributeError,OSError）；**AST**（main Compare4·BoolOp1·Call37 / inspect Tuple6 / format JoinedStr12）；**forbidden tokens 第一百九十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges84.py`（29 测试）
+
+### 撞墙记录
+- 0 fail 首跑（真实 inspect 输出行数/顺序先探针）。
+
+### 下一步建议
+- annotation_metrics edges84（Round 728）。
+
+---
+
+## Round 726 — evaluation/runner.py 第二百零二轮（32 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第二百零二轮 edges 测试，补强 edges81/82/83 未触及的角度（第九十一批）：**image_base_dir 仅在 image_dir.is_dir() 时传入**（逐 doc 捕获：存在目录→Path、ghost→None）；**metrics 恰为 compute ∪ fig ∪ chunk 三方并集**；**中文 reason 原样落盘**（ensure_ascii=False + 无 \u 转义 + indent=2）；**深层输出路径自动建目录**；**per_doc 顺序 = manifest 顺序**；**重复 doc_id 双份都跑**；**ef stub 被 ps 落盘后清理**；**_load_annotation 非法 JSON → None**；**AST**（run_evaluation For3·With1·Dict5·Call26）；**源码补强**（mkdir×4 / metrics.update×2 / json.dump×1）；**forbidden tokens 第一百九十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges84.py`（32 测试）
+
+### 撞墙记录
+- 0 fail 首跑（image_base_dir 分支用 fake_helper 首次返回真目录、再次返回 ghost 区分）。
+
+### 下一步建议
+- cli edges84（Round 727 已做）。
+
+---
+
+## Round 725 — evaluation/report.py 第二百零一轮（41 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第二百零一轮 edges 测试，补强 edges71/72 未触及的角度（第九十批）：**aggregate_summary 空输入全矩阵**（rate None / 12 ratio 全 null not_evaluated 0）；**成功判定严格 is True**（value=1 不计数）；**指标键缺失 → not_evaluated**；**macro 精确 0.5**；**silent 0 值保留**；**get_dependency_versions 真实运行**（3 键 + 版本样式）；**get_git_provenance rc 分支**（rev-parse rc1 / porcelain 空 vs 非空 / stdout strip）；**evaluator_version/report_version 锁定 "1.1"**；**run_timestamp_iso 可解析带时区**；**build_devset_section 真实 Manifest**（2 pdf+1 docx+categories / 空全零）；**AST 五函数结构**；**forbidden tokens 第一百九十五批**（subprocess 为本模块合法用法不排除）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges73.py`（41 测试）
+
+### 撞墙记录
+- 3 fail 首跑：git fake 分发用 cmd[0]，实际 cmd=["git","rev-parse",...]，应判 cmd[1]。
+
+### 下一步建议
+- runner edges84（Round 726 已做）。
+
+---
+
+## Round 724 — evaluation/manifest.py 第二百零一轮（56 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第二百零一轮 edges 测试，补强 edges82/83 未触及的角度（第八十九批）：**_is_absolute_like 深矩阵**（"ä:/x" 非盘符字母也过（isalpha 现状）/"C:x" 无斜杠拒/"AB:/x" 双字母拒/"1:/x" 数字拒）；**content_group_count 链式不传递合并**（a→b,b→c → 2 组非 1 组）；**paired_with="" 视为未配对**；**三角配对 frozenset 去重 → 2 组**；**devset_status "complete" 可加载**；**annotation_file 空串过 schema 但 falsy → 不解析（现状）**；**expectations 未知键 / 顶层 null → EvalSchemaError**；**三类逃逸 field 名精确**；**四类 raise 行为消息**；**_detect_project_root 无 pyproject 兜底**；**str 入参转换**；**AST 五函数 + 5 property 名单**；**forbidden tokens 第一百九十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges84.py`（56 测试）
+
+### 撞墙记录
+- 1 fail 首跑：path="" 被 schema minLength 1 先拦（EvalSchemaError），代码 "为空" 分支只能直调触达——改为断言 schema 层拦截并记录该发现。
+
+### 下一步建议
+- report edges73（Round 725 已做）。
+
+---
+
+## Round 723 — evaluation/metrics.py 第二百零一轮（77 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二百零一轮 edges 测试，补强 edges80/81 未触及的角度（第八十八批）：**_is_valid_bbox 直测矩阵**（bool 拒/inf 拒/nan 拒/tuple 拒/len3·5 拒/负数过（无符号约束））；**page=True 被接受**（bool ⊂ int 且 True>=1，现状记录）/ **page=1.0 float 拒**；**2/3 精确比例**；**docx 七结构键逐一直测**；**source_type "txt" 双 locator null**；**error={"code":None} / error={} → success False 但 error_code None**；**image rp falsy 三态 / base_dir 拼接候选救回 / 绝对路径直查 / 半对 0.5**；**chunk ids 空三态 / 重复 id 全在集**；**_strip_unicode_whitespace 直测**（NBSP/全角/U+2028；\x00 保留）；**heading 仅首位匹配**；**silent_drop 期望含未出现类型 / 超额不负**；**构造器强制转换**；**_TEXT_TYPES 是死常量**（源码仅 1 次）；**AST 九子函数结构**；**forbidden tokens 第一百九十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges82.py`（77 测试）
+
+### 撞墙记录
+- 0 fail 首跑（矩阵行为先探针：page=True 通过、bbox 负数通过均验证后入测）。
+
+### 下一步建议
+- manifest edges84（Round 724 已做）。
+
+---
+
 ## Round 722 — evaluation/schema.py 第一百零四轮（42 测试）
 
 ### 目标
