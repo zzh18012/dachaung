@@ -4,6 +4,107 @@
 
 ---
 
+## Round 701 — evaluation/schema.py 第一百轮（65 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第一百轮 edges 测试，补强 edges68 未触及的角度（第六十六批）——**annotation / evaluation-report 内容级校验矩阵**：**annotation**（最小合法 / version const 1.0 / doc_id 空串 / 顶层多余键 / annotator 空串合法（无 minLength）/ date 空串拒 / figure_caption_pairs 项四变体 / heading_order 项五变体（level 0·1.5 拒）/ boundary_anchor 六变体（position left 拒·reason 可选）/ 全字段合法）；**evaluation-report**（最小合法（provenance 9 键+devset 6 键+summary+per_doc []）/ report_version const **1.1**（"1.0" 拒）/ provenance 六变体（git_dirty 布尔·max_chars 0·1.5 拒·dependencies 数值拒 null 可·时间戳空串拒）/ devset 四变体 / per_doc 七变体（wall_time 缺 chunk·多余键·total 负数拒·metrics 任意对象可）/ expected_failures 三变体（matches 非布尔拒）/ summary additionalProperties true 多余键可）；**forbidden tokens 第一百七十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges69.py`（65 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- metrics 第九十七轮（Round 702）/ manifest 第九十七轮。
+
+---
+
+## Round 700 — evaluation/annotation_metrics.py 第九十八轮（55 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十八轮 edges 测试，补强 edges79 未触及的角度（第六十五批）：**_tolerance_chars 五条返回路径全部携带**（document None / no annotation / chunks<2 / no anchors / 正常路径，值 42 透传）；**missing markers 语义**（缺 marker 先于命中不阻塞后续搜索 / 超出出现次数的重复 marker 第二次记 missing（search_from 推进）/ 全 missing → recall null + f1 precision_or_recall_not_evaluated / 显式空串 marker）；**贪心匹配细节**（两 pred 争一 gt 最近者胜（d=1 vs d=4 → P=0.5 R=1）/ 等距 tie 按 pred 顺序稳定取第一个）；**normalize_text 生效**（chunk 内三空格收敛后 marker 命中 / 未规范化 marker 进 missing / 大小写敏感）；**缺键语义**（annotation 缺 chunk_boundary_anchors 键 → no_ground_truth_anchors / document 缺 chunks 键 → no_predicted_boundaries + recall 0.0）；**figure_caption_prf None/None**；**常量**（PARSER_DOES_NOT_EMIT_RELATIONS 值 / __all__ 3 项精确 unparse）；**源码补强**（两守卫 / 两 or [] / chunks<2 条件 / norm 列表推导 / joined_raw 空格连接 / stream 二次规范化 / break 注释 / pairs.sort / search_from 推进 / 空 marker 短路 / f1 reason / missing 条件 / _tolerance_chars 赋值恰 5 处 / Counter import）；**AST 补强**（5 个 Return / 7 个 For / 局部变量名单 / figure_caption 单 Return 3 键 / 模块函数名单）；**forbidden tokens 第一百七十批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges80.py`（55 测试）
+
+### 撞墙记录
+- 0 fail 首跑（写前推演了 tie 的 stream 位置计算）。
+
+### 下一步建议
+- schema 第一百轮（Round 701 已做）。
+
+---
+
+## Round 699 — evaluation/cli.py 第九十九轮（51 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第九十九轮 edges 测试，补强 edges79 未触及的角度（第六十四批）：**_build_parser 结构**（prog=evaluation.cli / run 默认 fallback-800-30 / --parser choices 拒绝 nope → SystemExit 2 / 无子命令 → 2 / 缺 --manifest → 2 / inspect-doc --tolerance-chars 77 / validate-report 位置参数名 input）；**main run kwargs 流转**（--parser kreuzberg + --max-chars 500 + --tolerance-chars 77 全部透传 run_evaluation）；**run 输出 n_ok/n_fail**（2 docs 1 成功 1 失败 → "documents=2（成功 1，失败 1）" + commit[:12] + git_dirty=True）；**validate-report FAIL 路径**（validate_file 抛 EvalSchemaError → [FAIL] rc1 / 抛 FileNotFoundError → rc2）；**inspect-doc**（--tolerance-chars 77 流转 chunk_boundary_prf / 打印指标行数 == compute+fig+chunk 键并集数）；**_format_metric 全分支**（null (reason) / true·false (ok) / float 0.3333 / int 0 / dict 带 reason / str 通用）；**源码补强**（add_subparsers 行 / choices 元组 / n_fail 行 / 成功失败文案 / isinstance 守卫 / sorted key / 两个 metrics.update / reconfigure except 元组 / type: ignore[attr-defined]）；**AST 补强**（add_parser 3 名字顺序 / add_argument 恰 8 / default=30 出现 2 次 / validate-report 分支 3 handler 顺序 / 模块级 2 个 If（reconfigure+__main__）/ run 分支 3 kwargs）；**forbidden tokens 第一百六十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges80.py`（51 测试）
+
+### 撞墙记录
+- 4 fail 首跑：monkeypatch.setattr 不收 side_effect/return_value → 包 MagicMock；模块级 If 有 2 个（reconfigure + __main__）非 1。
+
+### 下一步建议
+- annotation_metrics edges80（Round 700 已做）。
+
+---
+
+## Round 698 — evaluation/runner.py 第九十八轮（52 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第九十八轮 edges 测试，补强 edges79 未触及的角度（第六十三批）：**_load_annotation 深挖**（目录 → None / JSON 数组原样返回 list / 空文件 → None / BOM 文件 → None）；**_process_one 四分支**（errors 非空取 errors[0].to_dict / document+errors 并存 → image_dir 仍返回 / 双 None → {"code": "unknown"} / 成功 → to_dict+parser_version+image_dir 与 image_output_dir_for 一致）；**unlink out_stub**（fake process_single 落盘 → 调用后删除 / _per_doc 目录创建）；**run_evaluation doc 循环全链路**（mock _process_one → 公共 per_doc 4 键 / wall_time 5 键精确 / 内部 3 字段不进公共 / 输出文件 JSON == 返回 dict / str output_path 可用）；**parser_version_for_prov 首个非 None 胜**（1.0 先 / None 先取 9 / 全 None → None）；**image_base_dir 门控**（目录透传 / 非目录 None / None 透传）；**expected_failures 形状**（matches True/False 两态）；**源码补强**（image_dir 注解 / if document is not None / image_output_dir_for 调用 / unknown 消息 / errors[0].to_dict / parser_version 首个条件 / _annotation_present / matches 表达式 / actual_code 三元 / 公共 4 键字面）；**AST 补强**（_load_annotation Or+except 元组 / _process_one 3 个 Return 全 5 元组（嵌套 If 须 ast.walk）/ 3 个 append（internal 7 键·ef 4 键·public 4 键）/ app.pipeline ImportFrom 双名 / 三个循环顺序）；**forbidden tokens 第一百六十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges80.py`（52 测试）
+
+### 撞墙记录
+- 2 fail 预修正：_process_one 的 3 个 return 有 2 个嵌套在 If 内（func.body 只 1 个）→ 改 ast.walk；run_evaluation 有 3 个 append（含 ef）非 2。
+- 网络间歇：GitHub 443 连不上，多轮后重试成功。
+
+### 测试基线
+- 总数：80763 passed, 22 skipped, 0 failed（454.74s，连同 Rounds 696/697 一起跑）
+- 较上轮 +175（80588 → 80763；696 +72 / 697 +51 / 698 +52）
+
+### 下一步建议
+- cli edges80（Round 699 已做）/ annotation_metrics edges80（Round 700 已做）/ schema edges69（Round 701 已做）。
+
+---
+
+## Round 697 — evaluation/report.py 第九十七轮（51 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第九十七轮 edges 测试，补强 edges68 未触及的角度（第六十二批）：**aggregate_summary 数值精度**（0.5/None/1.0 → macro 0.75 participating 2 not_eval 1 / True+False → 0.5 / 单值 1.0 / value 0.0 参与 / metrics 缺键 → not_evaluated）；**success_rates total 计入失败文档**（True/True/False → 2/3）；**counts value 0 参与**（0/5/None → sum 5 participating 2）；**figure_caption_* 不进 ratio_macro_averages**；**silent_drop_total**（None/3/0 → 3 / 全 None → None / [0,0] → 0）；**build_devset_section stub**（6 键透传）；**build_provenance 完整形状**（9 键 / evaluator·report_version 绑定 evaluation 常量且固定 "1.1" / run_timestamp_iso 可 fromisoformat 且 tz-aware / max_chars int("800")）；**get_git_provenance 真实仓库**（commit 40 hex 或 None / dirty bool）；**源码补强**（rev-parse·status 两条命令 / strip or None / dirty bool 表达式 / dirty: bool = True / timeout=10 恰 2 / datetime 一行 / int(max_chars) / 两个常量元组精确 / figure_caption 注释 / rate 三元）；**AST 补强**（_RATIO_METRICS unparse 精确 12 项 / 3 个模块常量（排除 __all__）/ build_provenance 9 键顺序 / 依赖 for 元组 / aggregate 3 个 summary 赋值 / devset 6 键 / commit AnnAssign）；**forbidden tokens 第一百六十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges69.py`（51 测试）
+
+### 撞墙记录
+- 1 fail 首跑：模块级下划线常量过滤要把 `__all__` 排除（startswith("__")）。
+
+### 下一步建议
+- runner edges80（Round 698 已做）。
+
+---
+
+## Round 696 — evaluation/manifest.py 第九十六轮（72 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第九十六轮 edges 测试，补强 edges79 未触及的角度（第六十一批）：**Schema 拒绝矩阵经 load_manifest**（顶层多余键 / 缺 documents / devset_status 坏值 / doc 缺 doc_id·doc_id 空串 / document source_type txt 不在枚举（ef 才有 txt/other）/ sha256 非 64hex / doc 多余键 / expectations 多余键 / element_count_by_type 负数 / required_markers 空串项 / ef 缺 expected_error_code / ef source_type 坏值 / documents 非数组 / EvalSchemaError 不包装成 ManifestError）；**ExpectedFailure 往返**（source_type txt·other 合法保留 / 缺省 None / expected_error_code 透传 / 多 ef 保序 tuple）；**文件实存不检查**（ghost document·ef 路径照常加载）；**frozen dataclass**（FrozenInstanceError × 3 / fields 名单 10-5-5 精确 / entries 可 hash）；**_detect_project_root**（嵌套文件起点 / 深层目录 / 找不到 pyproject 返回起点目录或祖先）；**_is_absolute_like 更多**（é:/x Unicode 盘符 True / "C:" 两字符 False / "/" 与 "//" / 恰 3 字符 C:\\·C:/）；**_resolve_relative_path "."** → 根本身；**最小空清单全属性零值 / 全 docx pdf_count=0 / 全字段文档往返**；**源码补强**（import 两行 / 为空消息 / relative_to / get 双默认 / frozenset / sorted / 反斜杠一行（测试串需 4 反斜杠）/ open encoding / validate 调用 / 版本双段）；**AST 补强**（4 个 ClassDef（ManifestError 无装饰器）× frozen=True / detect root starred parents / load_manifest Try 1 handler from e / __all__ 精确 / _resolve_relative_path 3 参数无默认 / Manifest 5 property 顺序 / _is_absolute_like 4 Return / ManifestError bases）；**forbidden tokens 第一百六十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges80.py`（72 测试）
+
+### 撞墙记录
+- 1 fail 首跑：tree.body 有 4 个 ClassDef（含无装饰器的 ManifestError）→ 名单加 ManifestError 且断言其无装饰器。
+
+### 下一步建议
+- report edges69（Round 697 已做）/ runner edges80（Round 698 已做）。
+
+---
+
 ## Round 695 — evaluation/metrics.py 第九十六轮（67 测试）
 
 ### 目标
@@ -31,8 +132,12 @@
 ### 撞墙记录
 - 3 fail 首跑：evaluation-report.schema.json 无 description（只断言 manifest+annotation）；错误计数解析用 ASCII 括号（消息是 `校验失败 (N 处)：`）；_schema_path 无 docstring（body[0] 是 Assign 非 Expr）。
 
+### 测试基线
+- 总数：80588 passed, 22 skipped, 0 failed（433.26s，连同 Round 695 一起跑）
+- 较上轮 +126（80462 → 80588；694 +59 / 695 +67）
+
 ### 下一步建议
-- metrics edges78（Round 695 已做）。
+- metrics edges78（Round 695 已做）/ manifest edges80（Round 696 已做）。
 
 ---
 
