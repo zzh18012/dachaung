@@ -166,6 +166,7 @@
 
 ## 基线记录
 
+- 81844 passed + 22 skipped（Round 719-722 回归，b67e7gr28，459.12s）
 - 81660 passed + 22 skipped（Round 714-718 回归，bh2k8vzx0，450.44s）
 - 81482 passed + 22 skipped（Round 710-713 回归，bvyq0kb4z，458.91s）
 - 81310 passed + 22 skipped（Round 706-709 回归，bbik27bfa，453.72s）
