@@ -4,6 +4,79 @@
 
 ---
 
+## Round 705 — evaluation/runner.py 第九十九轮（33 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第九十九轮 edges 测试，补强 edges80 未触及的角度（第七十批）：**标注端到端**（annotation 含 anchors → 公共 per_doc 的 chunk_boundary_precision/recall == 1.0（stream "第一章 第二章" pred 3 == anchor after 3）/ figure_caption_precision null）；**报告落盘 ensure_ascii=False**（中文 doc_id 原样、无 \u 转义）；**ef 循环 kwargs 流转**（process_single 收 parser_name/max_chars/write_json=False）；**doc 循环 _process_one 默认 fallback/800 位置参数捕获**；**不同 doc_id 的 stub 路径互异**；**unlink OSError 容错**（patch Path.unlink 抛 OSError → matches False + stub 保留）；**嵌套输出目录自动创建**；**_load_annotation 合法 dict**；**源码补强**（两循环行 / public_per_doc 初始化 / per_doc_results 注解 / expected_failures 键 / json.dump ensure_ascii）；**AST 补强**（run_evaluation 3 个 AnnAssign（public_per_doc 是普通 Assign）/ _load_annotation 3 Return / 模块 import 精确名单）；**forbidden tokens 第一百七十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges81.py`（33 测试）
+
+### 撞墙记录
+- 2 fail 首跑：ensure_ascii 测试原依赖 annotation marker 出现在报告——报告公共条目不含 chunk 文本，改用中文 doc_id；AnnAssign 期望 4 个实际 3 个（public_per_doc = [] 无注解）。
+
+### 下一步建议
+- cli 第一百轮（Round 706）/ annotation_metrics 第九十九轮。
+
+---
+
+## Round 704 — evaluation/report.py 第九十八轮（38 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第九十八轮 edges 测试，补强 edges69 未触及的角度（第六十九批）：**aggregate 边界**（重复 doc_id 不去重 / 未知指标忽略 / 部分 doc 缺 pipeline_success → success 不计但 total 计 / 浮点 count 参与求和（现状）/ ratio 超 1 不截断（现状））；**_RATIO_METRICS 跨模块不变量**（减 compute 产出键恰剩 3 个 chunk_boundary_* / 不含 figure_caption_* / compute 全部指标名 ⊆ _RATIO_METRICS）；**空清单精确形状**（success_count 0/total 0/rate None + silent_drop_total None）；**get_dependency_versions 真实运行**（3 包名单 / pdfplumber 必有版本 / 每次新 dict）；**get_git_provenance 命令序列**（rev-parse → status --porcelain / dirty 输出 True）；**build_devset_section 真实 manifest 端到端**（6 键精确）；**源码补强**（from evaluation 双常量 / subprocess.run 四 kwargs / summary 4 段 key 顺序 / counts 双分支）；**AST 补强**（aggregate 3 个 ListComp / get_git_provenance 2 个 subprocess.run / build_provenance git 在前）；**forbidden tokens 第一百七十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges70.py`（38 测试）
+
+### 撞墙记录
+- 1 fail 首跑：AST 找 subprocess 调用时嵌套 Attribute 无 value.id → 加 isinstance 守卫。
+
+### 下一步建议
+- runner edges81（Round 705 已做）。
+
+---
+
+## Round 703 — evaluation/manifest.py 第九十七轮（45 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第九十七轮 edges 测试，补强 edges80 未触及的角度（第六十八批），附 evaluation/__init__ 常量契约：**包常量**（EVALUATOR_VERSION/REPORT_VERSION 1.1、ANNOTATION_VERSION/MANIFEST_VERSION 1.0、__all__ 4 项）；**_has_backslash 混合**（a\b/c、a/b\、纯正斜杠、空串）；**load_manifest 路径形式**（str 传入 / 相对路径 chdir / 子目录 manifest + 父 project_root）；**_detect_project_root 不存在文件起点**；**文档细节**（annotation_file 与 path 同名 / unicode 子目录 / expectations 单键两态 / categories 空列表 → 空 tuple / docs 与 efs 交错独立 / sha256 合法 hex / 多类别去重排序）；**错误消息含字段与值**；**源码补强**（__init__ 四常量字面 / 版本历史段 / manifest 不 import ANNOTATION_VERSION / docstring 不变量）；**AST 补强**（__init__ 4 Assign 顺序 + __all__ 精确 unparse / _has_backslash 单 Return）；**forbidden tokens 第一百七十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges81.py`（45 测试）
+
+### 撞墙记录
+- 预修复 1 处：json.dumps 无 encoding kwarg → ensure_ascii=False + write_text(encoding="utf-8")。0 fail 首跑。
+
+### 下一步建议
+- report edges70（Round 704 已做）。
+
+---
+
+## Round 702 — evaluation/metrics.py 第九十七轮（59 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第九十七轮 edges 测试，补强 edges78 未触及的角度（第六十七批）：**compute document=None 全键集与顺序**（14 键 / pipeline_success False / error_code 透传 code 与 None）；**_silent_drop_count**（{} expectations 二级 null / expected<actual 不计负 / 多类型求和 / 缺类型按 0）；**_text_preservation 不对称空**（expected 空 → precision 0.0 + recall null / actual 空 → 反向 / 全 image → 双 null empty_expected_and_actual 但 equal True / image content 不计 expected）；**_is_valid_bbox**（tuple/str/长度 3·5·0/inf/NaN 拒 / 负数可 / bool 拒）；**_strip_unicode_whitespace**（U+200B 保留（isspace False）/ U+2028 删（isspace True））；**_pdf_locator_ratio page 类型**（str/float/0/-1 拒 / True 通过（bool 是 int 子类，现状））；**_docx_locator_ratio 结构键**（run/table/row/col/section 五键参数化 / 只 page 拒）；**heading/chunk_reference 细节**（heading 缺 element_id 不匹配 / chunk 空 ids 不计 / chunk 缺键无效 / all() 语义）；**element_count_by_type 显式 None 键**；**AST 补强**（_TEXT_TYPES 7 项 unparse / _PDF_BBOX_REQUIRED_TYPES 4 项 / 模块常量顺序 / compute 前两个下标赋值）；**forbidden tokens 第一百七十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges79.py`（59 测试）
+
+### 撞墙记录
+- U+200B/U+2028 字面量进源码导致 SyntaxError（U+2028 是真行分隔符；Edit 匹配不了不可见字符；heredoc 会把 \u 转义吃掉）→ 用 chr(0x200B)/chr(0x2028) 构造。0 fail 首跑。
+
+### 下一步建议
+- manifest edges81（Round 703 已做）。
+
+---
+
+## 基线记录
+
+- 80934 passed + 22 skipped（Round 699-701 回归，btiff8wvo，473.76s）
+- 80763 passed + 22 skipped（Round 696-698 回归）
+- 80588 passed + 22 skipped（Round 694-695 回归）
+- 80462 passed + 22 skipped（Round 692-693 回归）
+
+---
+
 ## Round 701 — evaluation/schema.py 第一百轮（65 测试）
 
 ### 目标
