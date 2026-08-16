@@ -4,6 +4,54 @@
 
 ---
 
+## Round 730 — evaluation/metrics.py 第二百零二轮（27 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第二百零二轮 edges 测试，补强 edges80-82 未触及的角度（第九十五批）：**未守卫路径现状记录**（chunks=None → TypeError、element type=None → by_type {None: 1}、error 缺 "code" → KeyError）；**多集合精确分数**（"aab" vs "abb" → P=R=2/3、equal False；"ab" vs "abab" → P=0.5 R=1.0）；**heading element_id None → 0.0**（None 不在 id 集）；**_text_preservation([], []) → equal True + 双 null**；**image-only elements → expected 空**（image 不进 expected）；**源码补强**（口径 D / 每个字符取 min / Counter 导入 / 故意忽略空白差异 / _NOT_EVALUATED 定义未用 count==1）；**forbidden tokens 第二百批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges83.py`（27 测试）
+
+### 撞墙记录
+- 0 fail 首跑（全部数字先探针验证）。
+
+### 下一步建议
+- manifest edges85（Round 731）。
+
+---
+
+## Round 729 — evaluation/schema.py 第一百零五轮（35 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第一百零五轮 edges 测试，补强 edges70-72 未触及的角度（第九十四批）：**非 dict 实例**（字符串 → 根路径 [] 单错误）；**空 dict vs manifest → 3 错误全在 []**、message 含 "(3 处)"；**flat errors 可 json.dumps**（含 int path 元素）；**annotation schema 结构锁**（annotation_version const "1.0" / anchor 必填 marker+position —— 与 metrics 的 .get 缺省补偿跨模块对照 / position 枚举 before·after / heading_order level minimum 1 / figure_caption_pairs 双 minLength / 根 additionalProperties false / heading_order 元素 extra key 拒绝）；**三个 $id 均含 kvfs.local**；**_schema_path 直查 == SCHEMAS_DIR / name + 绝对路径**；**__all__ 五元素精确**；**EvalSchemaError.__init__ AST**（1 Assign·2 Call·1 默认参数）；**forbidden tokens 第一百九十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges73.py`（35 测试）
+
+### 撞墙记录
+- 0 fail 首跑（schema 行为先探针，const/minLength/enum 逐项验证）。
+
+### 下一步建议
+- metrics edges83（Round 730 已做）。
+
+---
+
+## Round 728 — evaluation/annotation_metrics.py 第二百零三轮（28 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第二百零三轮 edges 测试，补强 edges81-83 未触及的角度（第九十三批）：**巨大容差（1e9）仍一对一**（2 pred 1 anchor → P=0.5 R=1.0）；**负容差精确命中也不匹配**（d=0 <= -1 假 → P=R=f1=0.0 全 ratio）；**marker 跨 chunk 边界**（"B C" 含拼接空格）可找到；**3 pred 1 anchor → P=1/3**；**_missing_markers 键不存在/存在语义**（全找到时键不存在、丢失时 value 列表）；**normalize_text 依赖性**（monkeypatch 恒等后原样双空格 marker 可找到 / 单空格找不到 → 双向验证）；**figure_caption 三 null 键序**；**__all__ 三元素精确名单**；**源码补强**（一对一 / tolerance_chars / 必须在报告中明确记录）；**forbidden tokens 第一百九十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges84.py`（28 测试）
+
+### 撞墙记录
+- 0 fail 首跑（跨边界 marker 的 stream 拼接位置先推算再探针确认）。
+
+### 下一步建议
+- schema edges73（Round 729 已做）。
+
+---
+
 ## Round 727 — evaluation/cli.py 第一百零三轮（29 测试）
 
 ### 目标
@@ -246,6 +294,7 @@
 
 ## 基线记录
 
+- 82079 passed + 22 skipped（Round 723-727 回归，bg9bjm2le，457.90s）
 - 81844 passed + 22 skipped（Round 719-722 回归，b67e7gr28，459.12s）
 - 81660 passed + 22 skipped（Round 714-718 回归，bh2k8vzx0，450.44s）
 - 81482 passed + 22 skipped（Round 710-713 回归，bvyq0kb4z，458.91s）
