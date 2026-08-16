@@ -4,6 +4,86 @@
 
 ---
 
+## Round 722 — evaluation/schema.py 第一百零四轮（42 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第一百零四轮 edges 测试，补强 edges70/edges71 未触及的角度（第八十七批）：**最小合法报告全 schema 通过**；**三错误按 absolute_path 字典序排序**（devset < per_doc < summary，head 取最浅）；**单错误完整 message 格式**（"(1 处)：'summary' is a required property @ path=[]"）；**flat 条目 schema_path 记录**；**EvalSchemaError 默认 errors=[] / is errs / args**；**load_schema 无缓存新 dict / 路径遍历无守卫（../ 可加载，现状）/ BOM·非法 JSON → JSONDecodeError 直接冒泡**；**validate_file str 路径 / 目录 FileNotFoundError**；**三 schema 均 draft 2020-12**；**AST**（validate If1·For1·Lambda1 / validate_file Return0 / 类 Call2 / 模块 Raise3）；**forbidden tokens 第一百九十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges72.py`（42 测试）
+
+### 撞墙记录
+- 0 fail 首跑（排序行为与遍历行为先探针验证）。
+
+### 下一步建议
+- metrics 第二百零一轮（Round 723）。
+
+---
+
+## Round 721 — evaluation/annotation_metrics.py 第二百零二轮（47 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第二百零二轮 edges 测试，补强 edges81/edges82 未触及的角度（第八十六批）：**figure_caption_prf 完全忽略参数**（任意输入固定 null 三键）；**chunk 数量四象限**（1/0 chunk × 有无 anchors，recall 0.0 ratio vs 全 null）；**annotation [] falsy 走 no_annotation**；**空 marker / 缺 marker 键 → _missing_markers ['']**；**position 缺省 = after**；**贪心一对一近者抢占**（P=0.5 R=1.0 f1=2/3）；**tolerance=0 d=1 不匹配 → P=R=f1=0.0（denom<=0 分支）**；**search_from 防共享**（anchors [ab,b] / [b,ab] 交叠一对一）；**None-text chunk 产 pred=0 且 pos 前移使后续 find 落空（P=R=1.0 现状）**；**marker 必须匹配规范化文本**（双空格找不到）；**_tolerance_chars 五路径全记录**；**AST**（chunk_boundary_prf If15·For7·Return5·Continue3·Break1·Subscript37）；**forbidden tokens 第一百九十一批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges83.py`（47 测试）
+
+### 撞墙记录
+- 2 fail 首跑：(1) annotation `{}` falsy 走 no_annotation 而非 no_ground_truth_anchors，改用 `{"chunk_boundary_anchors": []}`；(2) None-text chunk 使 pos 前移，"ab"（位置 0）find 不到 → 只剩 1 个 pred，P=R=1.0 而非预期的 0.5。
+
+### 下一步建议
+- schema edges72（Round 722 已做）。
+
+---
+
+## Round 720 — evaluation/cli.py 第一百零二轮（52 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第一百零二轮 edges 测试，补强 edges81/edges82 未触及的角度（第八十五批）：**run 成功 stdout 全字段**（documents=3（成功 1，失败 2）/ devset 五字段 / git_commit[:12]）；**git_commit None → unknown**；**kwargs 透传**（kreuzberg/100/5 + load_manifest 收 Path + get_git_provenance 收 project_root）；**load_manifest 抛 ManifestError·EvalSchemaError → rc 1**；**run_evaluation 抛·validate_file 自校验抛 → rc 1**；**manifest 是目录 → rc 2**；**validate-report 四分支**（FAIL rc1 / FileNotFoundError rc2 / JSONDecode rc1 / OK）；**inspect-doc 元信息缺省（? / v? / type unknown）/ 顶层数组拒 / tolerance 透传（patch 源模块）**；**_format_metric 六分支精确串（36 空格对齐）**；**argparse 拒绝**；**AST**（main If5·Try4·Return12 / 模块级 If2·Try0）；**forbidden tokens 第一百九十批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges83.py`（52 测试）
+
+### 撞墙记录
+- 9 fail 首跑：(1) _format_metric 对齐是 36 空格（35 padding + 1 分隔），我写 33；(2) "报告校验失败：" 全角冒号后无空格；(3) lambda setdefault 返回真值 tuple 传给 metrics.update；(4) strip 后 startswith 不适用 bool 分支（前缀是 name+padding）；(5) 解包变量名写错。全部修复后 52/52。
+
+### 下一步建议
+- annotation_metrics edges83（Round 721 已做）。
+
+---
+
+## Round 719 — evaluation/runner.py 第二百零一轮（43 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第二百零一轮 edges 测试，补强 edges81/edges82 未触及的角度（第八十四批）：**process_single 抛异常不被捕获直接冒泡**；**elapsed 真实计时（sleep 0.05）**；**多 errors 只取 errors[0].to_dict()**；**document None 无 errors → "unknown"+固定 message**；**image_dir 走 image_output_dir_for(out_stub, source_hash)**；**stub 被 pipeline 写出后清理 / Windows 句柄下 unlink PermissionError 被吞（现状）**；**e2e error doc 公共指标**；**parser_version 首个非空进 provenance（None→后补 / 先到先得）**；**annotation 真实加载+tolerance 透传**；**私有键 pop 不泄漏**；**ef match/mismatch + stub 清理 + _per_doc 共享**；**_load_annotation 目录返回 None / OSError 吞**；**AST**（三函数 If/Try/Return/AnnAssign）；**forbidden tokens 第一百八十九批**
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges83.py`（43 测试）
+
+### 撞墙记录
+- 0 fail 首跑（write_json=False 实为 4 处：2 代码 + 2 docstring，先探针）。
+
+### 下一步建议
+- cli edges83（Round 720 已做）。
+
+---
+
+## Round 718 — evaluation/report.py 第二百轮（32 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第二百轮 edges 测试，补强 edges71 未触及的角度（第八十三批）：**真实 compute 输出喂 aggregate**（document None ×2 → success rate 0.0 / 12 ratio 全 null not_evaluated 2）；**合法 doc（mock schema 过）→ success 1 rate 1.0**；**counts 值 0 仍参与 / ratio 值 0.0 仍参与**；**成功率精确分数 1/3**；**participating + not_evaluated == len(docs) 全 12 键不变量**；**build_provenance max_chars float 截断（7.9→7）/ str "800"→800**；**get_git_provenance 真实仓库运行（40-hex 或 None）**；**三元组字面 unparse**；**AST**（aggregate 8 下标赋值 / build_devset 6 键 / dv AnnAssign）；**forbidden tokens 第一百八十八批**
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges72.py`（32 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- runner edges83（Round 719 已做）。
+
+---
+
 ## Round 717 — evaluation/manifest.py 第九十九轮（36 测试）
 
 ### 目标
@@ -86,6 +166,7 @@
 
 ## 基线记录
 
+- 81660 passed + 22 skipped（Round 714-718 回归，bh2k8vzx0，450.44s）
 - 81482 passed + 22 skipped（Round 710-713 回归，bvyq0kb4z，458.91s）
 - 81310 passed + 22 skipped（Round 706-709 回归，bbik27bfa，453.72s）
 - 81109 passed + 22 skipped（Round 702-705 回归，b68nimwpn，455.17s）
