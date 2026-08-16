@@ -4,6 +4,49 @@
 
 ---
 
+## Round 685 — evaluation/annotation_metrics.py 第九十六轮（71 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十六轮 edges 测试，补强 edges77 未触及的角度（第五十四批）：**端到端数值矩阵**（3 chunks 2 anchors 全 matched / tolerance 变化下 matched 变化（tol=1 不中 → tol=3 中）/ pred 空但 anchors 存在 recall=0.0 / 4 chunks 3 preds 1 anchor precision≈1/3）；**贪心冲突矩阵**（交叉距离最小优先 / 两 pred 抢同一 anchor 一对一 / 距离并列 sorted 稳定）；**normalize 语义**（连续空白合一 / 全空白 chunk → 空串 / 前后空白 strip）；**position 未知值**（'middle' / None → 默认 after 分支）；**特殊 marker**（数字 / emoji / 混合字母标点）；**marker 多次出现**（3 次出现 2 个 anchor 顺序取前 2）；**输出 key 集合**（document None 分支 / no_annotation 分支 / chunks<2 分支 / missing_markers 分支 / 正常分支 各自 keys）；**figure_caption_prf 输出再校验**（恰好 3 keys / 无 chunk_boundary 前缀 / reason 同一常量 / 3 个 reason 一致）；**PARSER_DOES_NOT_EMIT_RELATIONS 唯一性**（模块仅 1 个大写常量 Assign）；**模块源码补强**（算法步骤 1-5 注释 / tolerance 必须记录 / 不引入启发式 / before/after 文档 / marker 定义 / search_from 注释 / 一对一注释）；**AST 结构补强**（1 个 ListComp（norm_chunks）/ gt_positions+predicted 类型注解 / pairs.sort lambda x[0] Subscript / 7 个 For（2 早返回 for k + 5 主循环）/ out 初始化 / 5 个 return out / 无 ClassDef/Async/Try/With/While/Raise/Global/Nonlocal / 2 函数）；**forbidden tokens 第一百五十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges78.py`（71 测试）
+
+### 覆盖要点
+- **端到端数值矩阵**：4 测试
+- **贪心冲突矩阵**：3 测试
+- **normalize 语义**：3 测试
+- **position 未知值**：2 测试
+- **特殊 marker**：3 测试
+- **marker 多次出现**：1 测试
+- **输出 key 集合**：5 测试
+- **figure_caption_prf 输出再校验**：4 测试
+- **PARSER_DOES_NOT_EMIT_RELATIONS 唯一性**：1 测试
+- **模块源码补强**：11 测试
+- **AST 结构补强**：17 测试
+- **forbidden tokens 第一百五十五批**：17 测试
+
+### 撞墙记录
+- 1 fail 首跑：`test_ast_chunk_boundary_5_for_loops_batch52` 实际 7 个 For（2 个早返回分支各有一个 `for k in (...)` + 5 个主循环）。Fix：==7。
+- Round 684 的 push 之前遇 GitHub 不通，本轮 push 时恢复，连同 684/685 一起推上。
+
+### 测试基线
+- 总数：79920 passed, 22 skipped, 0 failed（404.68s）
+- 较上轮 +71（79849 → 79920）
+
+### 下一步建议
+- 候选：
+  - evaluation/cli.py 第九十七轮（继续 edges 加强）
+  - evaluation/schema.py 第九十八轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十五轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十四轮（继续 edges 加强）
+  - evaluation/report.py 第九十五轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：annotation_metrics edges78 已饱和（数值矩阵 4 / 贪心 3 / normalize 3 / position 2 / 特殊 marker 3 / key 集合 5 / figure_caption 4 / 源码 11 / AST 17 / forbidden 17）。下一轮选 evaluation/cli.py 第九十七轮，覆盖 main / _build_parser / _format_metric / _run_inspect_doc 更深路径。
+
+---
+
 ## Round 684 — evaluation/runner.py 第九十五轮（93 测试）
 
 ### 目标
