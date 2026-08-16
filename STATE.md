@@ -4,6 +4,48 @@
 
 ---
 
+## Round 683 — evaluation/report.py 第九十四轮（100 测试）
+
+### 目标
+- 给 `evaluation/report.py`（201 行）加第九十四轮 edges 测试，补强 edges66 未触及的角度（第五十三批）：**get_git_provenance 更深**（rev-parse returncode 非 0 → commit None / porcelain returncode 非 0 → dirty False（短路）/ commit stdout 只有空白 → None / porcelain stdout 空白 → False / OSError fallback / TimeoutExpired fallback / 返回 2 keys / 2 次 subprocess.run 命令行断言 / timeout=10 kwarg）；**get_dependency_versions 更深**（3 keys / value str 或 None / pdfplumber 已装 / python-docx 已装 / dict 类型）；**build_provenance 更深**（max_chars int / parser_version None 保留 / 9 keys / evaluator_version+report_version 来自包 / timestamp 含时区 + 可 fromisoformat / parser_name 记录）；**aggregate_summary counts 更深**（value=0 参与 / None 不参与 / 全 None / 空列表 / 缺 metric key）；**success_rates 更深**（空 rate None / 全失败 0.0 / 全成功 1.0 / half 0.5 / value None 算失败）；**ratio macro 更深**（部分 null not_evaluated / 全 null macro None / macro 精确 0.75 / participating+not_evaluated==total / 12 keys / 0.0 值参与）；**silent_drop_total 更深**（全 None → None / 部分 None 求和 / 空 → None / 0 值）；**build_devset_section 更深**（6 keys / status 透传 / counts / categories 透传不排序——排序在 Manifest property 内）；**模块源码补强**（6 imports / _RATIO_METRICS 12 不含 figure_caption 含 chunk_boundary / _COUNT_METRICS 1 / _SUCCESS_BOOL_METRICS 1 / git 命令行 / timeout=10 出现 2 次 / int(max_chars) / astimezone / 3 依赖包名 / importlib.metadata note / 不混合类型 docstring / __all__ 5）；**AST 结构补强**（5 函数 + 顺序 / 4 Assigns / _RATIO_METRICS Tuple 12 / get_git_provenance 1 Try + except Tuple + 2 subprocess.run / build_provenance 1 return Dict 9 / build_devset_section 1 return Dict 6 / aggregate_summary 3 显式 For + 4 summary keys / 无 ClassDef/Async/While/Raise / __all__ List 5）；**forbidden tokens 第一百五十三批**（no eval/exec/compile/globals/locals/os.system/Popen/popen/yaml.load/pickle.load/socket/requests/urllib/shutil.rmtree/yield/async/await, open count=0）
+
+### 改动
+- 新增 `tests/test_evaluation_report_edges67.py`（100 测试）
+
+### 覆盖要点
+- **get_git_provenance 更深**：9 测试
+- **get_dependency_versions 更深**：5 测试
+- **build_provenance 更深**：7 测试
+- **aggregate_summary counts 更深**：5 测试
+- **success_rates 更深**：5 测试
+- **ratio macro 更深**：6 测试
+- **silent_drop_total 更深**：4 测试
+- **build_devset_section 更深**：4 测试
+- **模块源码补强**：18 测试
+- **AST 结构补强**：19 测试
+- **forbidden tokens 第一百五十三批**：17 测试
+
+### 撞墙记录
+- 1 fail 首跑：`test_devset_section_categories_sorted_batch52` 误以为 build_devset_section 内排序，实际只透传（排序在 Manifest.categories_covered property 内）。Fix：断言透传原顺序。
+- Round 682 的 push 当时遇 GitHub 443 不通，本轮 push 时网络恢复，连同 682/683 一起推上。
+
+### 测试基线
+- 总数：79756 passed, 22 skipped, 0 failed（445.65s）
+- 较上轮 +100（79656 → 79756）
+
+### 下一步建议
+- 候选：
+  - evaluation/runner.py 第九十五轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十六轮（继续 edges 加强）
+  - evaluation/cli.py 第九十七轮（继续 edges 加强）
+  - evaluation/schema.py 第九十八轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十五轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：report edges67 已饱和（get_git_provenance 9 / dependency 5 / build_provenance 7 / counts 5 / success 5 / ratio 6 / silent_drop 4 / devset 4 / 模块源码 18 / AST 19 / forbidden 17）。下一轮选 evaluation/runner.py 第九十五轮，覆盖 _load_annotation / _process_one / run_evaluation 更深路径。
+
+---
+
 ## Round 682 — evaluation/manifest.py 第九十三轮（110 测试）
 
 ### 目标
