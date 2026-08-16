@@ -4,6 +4,38 @@
 
 ---
 
+## Round 693 — evaluation/annotation_metrics.py 第九十七轮（54 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十七轮 edges 测试，补强 edges78 未触及的角度（第五十九批）：**doc/annotation 形状边界**（chunk 缺 text key / chunks 是 tuple / chunk_boundary_anchors=None → no_ground_truth / anchor 缺 marker 记空串进 missing / anchor 缺 position 默认 after / annotation falsy 变体 0-""-[]-False / 空 dict）；**chunks<2 分支细节**（chunks=[]+anchors 空 → recall null / chunks=[]+anchors 非空 → recall 0.0）；**tolerance 边界**（恰好等于距离命中 / 负数 → P=R=f1=0.0 非 null / 0 精确匹配）；**f1 数值验证**（全 matched 1.0 / P=2/3 R=1 → f1=0.8 / 双 0 → denom 0 → 0.0）；**search_from 推进语义**（相同 marker before+after 两次出现 / 前缀 marker ab 与 abc 顺序定位）；**全空 text chunks**（stream="" → predicted 恰 1 个 0 位置）；**_missing_markers 多个按序**；**figure_caption_prf 参数无关**（truthy 参数同样 3 nulls）；**源码补强**（normalize_text 从 app.chunkers.structural import / _null+_ratio import / f1 公式 / denom<=0 / chunks<2 条件 / search_from 推进 / used_pred+used_gt / 本期不引入注释）；**AST 补强**（pairs.sort key kwarg / 恰 1 个 Break / marker 默认 ''+position 默认 'after' / missing_markers.append / 4 个早返回 If（body[-1] 是 Return）/ 3 参数 1 默认 30）；**forbidden tokens 第一百六十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges79.py`（54 测试）
+
+### 撞墙记录
+- 3 fail 首跑：_prf helper 签名是位置参数 tol；func.body 有 8 个 If（4 早返回 + num_pred/num_gt/p_val/missing 4 个）→ 用 body[-1] isinstance Return 过滤；chunk_boundary_prf 是 3 参数（document/annotation/tolerance_chars）非 2。
+
+### 下一步建议
+- schema 第九十九轮 / metrics 第九十六轮 / manifest 第九十六轮。
+
+---
+
+## Round 692 — evaluation/cli.py 第九十八轮（56 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第九十八轮 edges 测试，补强 edges78 未触及的角度（第五十八批）：**main run 错误路径**（manifest 缺失 stderr"[ERROR] 清单不存在"+rc2 / ManifestError→rc1 / EvalSchemaError→rc1 / run_evaluation EvalSchemaError→"报告未通过 Schema 校验"rc1 / validate_file 自校验失败→rc1）；**main run 输出全字段**（devset_status/file_count/groups/pdf/docx 透传 / devset 空时 None 输出）；**validate-report 更多**（坏 JSON→rc1 / 输入是目录→rc2 / 通过 stdout [OK] / schema 名精确）；**inspect-doc 更多**（顶层数组→"顶层不是对象"rc1 / 坏 JSON→rc1 / 缺文件→rc2 / 缺 document_id·source_path·parser→'?' / elements/chunks or [] / chunk_boundary_prf 默认 tolerance 30 / figure_caption_prf 收 None / 指标输出分类排序 bool(0)<数值(1)<dict(2)<null(3)）；**_format_metric dict 排序**（sorted items / 空 dict / 名字宽 36）；**源码补强**（RawDescriptionHelpFormatter / required=True 恰 3 / except (ManifestError, EvalSchemaError) / pipeline_success is True / [:12] 截断 / elements or [] / _sort_key 4 个元组返回 / usage docstring / sanity check）；**AST 补强**（run 分支 return 序列 [2,1,1,1,0] / validate-report [2,1,2,1,0] / inspect-doc return Call / 末尾 2 / 2 个函数级 ImportFrom / dict 分支 sorted(value.items()) / 3 个 command 分支顺序 / 嵌套 _sort_key / raise SystemExit(main())）；**forbidden tokens 第一百六十二批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges79.py`（56 测试）
+
+### 撞墙记录
+- 5 fail 首跑：elements=None 击穿 metrics len()（非 CLI 契约）→ 改显式 []；error_code 成功时 value None 属 null(3) 类 → 排序断言改用 docx_locator（pdf 文档时 null）；main 常量 return 需按分支顺序取（ast.walk 是 BFS）；sorted() 参数是 value.items() Call 非 Attribute；If 的 comparator 在 n.test 非 n。
+
+### 下一步建议
+- annotation_metrics edges79（Round 693 已做）。
+
+---
+
 ## Round 691 — evaluation/runner.py 第九十七轮（48 测试）
 
 ### 目标
@@ -15,8 +47,12 @@
 ### 撞墙记录
 - 1 fail 首跑：`.mkdir(parents=True, exist_ok=True)` 全模块出现 4 处（_process_one / ef 循环 / output_root / out_p.parent），预判 2 错。
 
+### 测试基线
+- 总数：80352 passed, 22 skipped, 0 failed（440.05s，连同 Rounds 689/690 一起跑）
+- 较上轮 +172（80180 → 80352；689 +67 / 690 +57 / 691 +48）
+
 ### 下一步建议
-- 继续轮换：evaluation/cli.py 第九十八轮 / evaluation/annotation_metrics.py 第九十七轮 / evaluation/schema.py 第九十九轮。
+- 继续轮换：evaluation/cli.py 第九十八轮（Round 692 已做）/ evaluation/annotation_metrics.py 第九十七轮（Round 693 已做）/ evaluation/schema.py 第九十九轮。
 
 ---
 
