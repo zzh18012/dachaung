@@ -4,6 +4,52 @@
 
 ---
 
+## Round 681 — evaluation/metrics.py 第九十四轮（162 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第九十四轮 edges 测试，补强 edges75 未触及的角度（第五十三批）：**_text_preservation 更深**（Counter & 交集精确 min / 单字符 equal / Unicode 顺序不同 p=r=1 / 空 content element / empty_actual / empty_expected / both empty 各分支 reason）；**_pdf_locator_ratio 更深**（page bool/string/0/负数/大数 / text type 无 bbox 拒绝 / image 无 bbox 接受 / locator None / locator 空 dict / 缺 page / 混合 2/3）；**_docx_locator_ratio 更深**（locator None / 空 dict / 有 page 拒绝 / 有 bbox 拒绝 / 7 个 structural key parametrize / 多 key 共存 / unknown key 拒绝）；**_is_valid_bbox 更深**（长度 3/5 / 全 int / 全 float / mixed / 字符串 / None / 嵌套 list / inf / nan / 负数接受 / tuple 拒绝）；**_image_resource_ratio 更深**（no_image / 无 resource_path / 空 rp / 存在文件 / 0-size / image_base_dir 文件名 / 绝对 rp / mixed 1/3）；**_chunk_reference_ratio 更深**（no_chunks / 全 valid / element_id 重复 / ids 含 None / ids None / ids 空 list）；**_heading_boundary_ratio 更深**（no_headings / heading 无 element_id / first id None / perfect / partial）；**_silent_drop_count 更深**（None / 无 element_count / 空 dict / 多 type 求和 / type 不在 actual / actual>expected / ==）；**compute_automatic_metrics 更深**（pipeline_failed 14 keys 集合 / 全 null reason / error_code value / error_code None / schema_valid pipeline_failed / source_type other / docx 路径 / 14 metrics count / pipeline_success True / expectations None）；**_null/_ratio/_bool_metric/_int_metric**（dict 结构 / float 转换 / bool 转换 / int 转换）；**模块源码补强**（_TEXT_TYPES 7 + tuple / _PDF_BBOX_REQUIRED_TYPES 4 + tuple / _NOT_EVALUATED / 6 imports / v1.1 docstring / 12 个 reason 字符串 / __all__ 1 entry / 函数签名 / 延迟 import schema）；**AST 结构补强**（14 函数 + 顺序 / 无 ClassDef/Async / 4 Assigns / __all__ List 1 / _TEXT_TYPES Tuple / _PDF_BBOX_REQUIRED Tuple / pdf_locator 1 For / docx_locator 1 For / _is_valid_bbox 1 For / _image_resource 2 For + 1 Try / chunk_reference 1 For / _text_preservation 3 If + 2 Counter calls / heading_boundary 1 For / _silent_drop 3 If + 1 For / compute_metrics if document is None + ≥14 metric assigns / 无 ImportStar/Global/Nonlocal/With/While/Raise/Delete）；**forbidden tokens 第一百五十一批**（no eval/exec/compile/globals/locals/os.system/subprocess/popen/yaml.load/pickle.load/socket/requests/urllib/shutil.rmtree/yield/async/await, open count=0）
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges76.py`（162 测试）
+
+### 覆盖要点
+- **_text_preservation 更深**：7 测试
+- **_pdf_locator_ratio 更深**：11 测试
+- **_docx_locator_ratio 更深**：9 测试（含 7 parametrize）
+- **_is_valid_bbox 更深**：12 测试
+- **_image_resource_ratio 更深**：8 测试
+- **_chunk_reference_ratio 更深**：6 测试
+- **_heading_boundary_ratio 更深**：5 测试
+- **_silent_drop_count 更深**：7 测试
+- **compute_automatic_metrics 更深**：10 测试
+- **_null/_ratio/_bool/_int metric**：7 测试
+- **模块源码补强**：34 测试
+- **AST 结构补强**：26 测试
+- **forbidden tokens 第一百五十一批**：16 测试
+
+### 撞墙记录
+- 2 fails 首跑：
+  - `test_ast_text_preservation_has_multiple_if_batch52`：实际 3 个 If（not expected and not actual / sum_actual==0 / sum_expected==0），误以为 ≥4。Fix：==3。
+  - `test_ast_silent_drop_has_2_if_batch52`：实际 3 个 If（not expectations / not expected_counts / actual < exp），误以为 2。Fix：==3。
+- 另：一次后台全量回归被中断（exit 4），重跑一次全绿。
+
+### 测试基线
+- 总数：79546 passed, 22 skipped, 0 failed（448.99s）
+- 较上轮 +162（79384 → 79546）
+
+### 下一步建议
+- 候选：
+  - evaluation/manifest.py 第九十三轮（继续 edges 加强）
+  - evaluation/report.py 第九十四轮（继续 edges 加强）
+  - evaluation/runner.py 第九十五轮（继续 edges 加强）
+  - evaluation/annotation_metrics.py 第九十六轮（继续 edges 加强）
+  - evaluation/cli.py 第九十七轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：metrics edges76 已饱和（_text_preservation 7 / _pdf_locator 11 / _docx_locator 9 / _is_valid_bbox 12 / _image_resource 8 / _chunk_reference 6 / _heading_boundary 5 / _silent_drop 7 / compute 10 / 4 构造器 7 / 模块源码 34 / AST 26 / forbidden 16）。下一轮选 evaluation/manifest.py 第九十三轮，覆盖 Manifest dataclass / load_manifest / _resolve_relative_path / _detect_project_root 更深路径。
+
+---
+
 ## Round 680 — evaluation/schema.py 第九十七轮（119 测试）
 
 ### 目标
