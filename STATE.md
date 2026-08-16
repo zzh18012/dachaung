@@ -4,6 +4,98 @@
 
 ---
 
+## Round 717 — evaluation/manifest.py 第九十九轮（36 测试）
+
+### 目标
+- 给 `evaluation/manifest.py`（240 行）加第九十九轮 edges 测试，补强 edges82 未触及的角度（第八十二批）：**版本不兼容死分支激活**（monkeypatch MANIFEST_VERSION="2.0" → schema 过但代码比对抛"清单=1.0 代码=2.0"）；**_detect_project_root 嵌套向上查找**（c 下清单 → b 的 pyproject）；**BOM 字节 → JSON 解析失败 / 顶层数组 → EvalSchemaError（非 ManifestError）/ 缺文件消息**；**现状记录**（ghost 路径不查存在性照常加载 / 重复 doc_id 允许双份）；**doc 全可选字段一次回读**；**ef 完整回读**（source_type txt/other 枚举边界）；**点段路径**（./a.pdf 与 sub//x.pdf 均解析）；**AST 补强**（三类字段数 10/5/5 精确名单 / load_manifest 3 Raise+1 With+1 Try+4 If）；**forbidden tokens 第一百八十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_manifest_edges83.py`（36 测试）
+
+### 撞墙记录
+- 0 fail 首跑（字段名单先探针验证）。
+
+### 下一步建议
+- report 第二百轮（Round 718）。
+
+---
+
+## Round 716 — evaluation/metrics.py 第九十九轮（37 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第九十九轮 edges 测试，补强 edges80 未触及的角度（第八十一批）：**合法全量 doc 14 键全值矩阵**（count 1/by_type/pdf 1.0/docx null not_docx/image null no_image/chunk_ref 1.0/equal True/P=R=1.0/heading null/silent null）；**error 与 document 并存**（pipeline_success False + error_code 取值 + 其余照算）；**空 elements → 双 ratio null no_elements**；**image-only + 非空 chunk**（precision 0.0/recall null empty_expected）；**chunk 缺 text / element content None**；**by_type 缺 type → unknown**；**chunk id 类型严格**（int 1 vs str "1" 不匹配）；**expectations None 与 {} 同 reason**；**源码补强**（valid += 1 ×4 / not elements ×2 / not chunks ×1 / ids or [] ×2）；**AST 补强**（pdf If4·Continue2 / docx If3·Continue2·GenExp1 / chunk_ref If2·Return2 / silent Return3 / heading ListComp1·GenExp1）；**forbidden tokens 第一百八十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges81.py`（37 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- manifest edges83（Round 717 已做）。
+
+---
+
+## Round 715 — evaluation/schema.py 第一百零二轮（41 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第一百零二轮 edges 测试，补强 edges70 未触及的角度（第八十批）：**evaluation-report per_doc 变体**（source_type txt 拒 / doc_id 空串拒 / wall_time total null 可）；**summary silent_drop_total 1.5 拒**；**ef doc_id 空串可**（无 minLength，与 per_doc 对比）；**provenance evaluator_version 空串拒**；**annotation 变体**（空 anchors 可 / heading level bool 拒 / date 无 format 约束（"2024-13-99" 可，现状）/ anchor reason 非字符串拒 / 仅必填+全空数组可）；**validate() 直跑 document.schema.json**（合法过/缺 source_hash 抛）；**四 schema type object + $id 互异 + EvalSchemaError → Exception**；**AST 补强**（validate 单 JoinedStr（隐式拼接合并）/ EvalSchemaError bases [Exception] / __init__ 参数默认 / docstring 有无矩阵）；**forbidden tokens 第一百八十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges71.py`（41 测试）
+
+### 撞墙记录
+- 1 fail 首跑：两段 f-string 隐式拼接在 AST 里合成一个 JoinedStr。
+
+### 下一步建议
+- metrics edges81（Round 716 已做）。
+
+---
+
+## Round 714 — evaluation/annotation_metrics.py 第二百轮（32 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第二百轮 edges 测试，补强 edges81 未触及的角度（第七十九批）：**多 chunk pred 位置**（内部空格 chunk "AA AA"+"BB" → pred=[5] before BB gt=6 d=1）；**三 chunk 双 pred 单 anchor**（mid anchor 命中 pred2 → P=0.5 R=1.0 f1=2/3）；**重复 marker 两次出现都找到**（search_from 推进 → 三 chunk 两 anchor 各自 d=1 命中 → P=R=1.0）；**anchor 位置 0**（before "A" stream 首位 gt=0）；**空标注精确 4 键相等**；**源码补强**（四个容器 AnnAssign / used 双集合 / pos 两式 / num_pred·num_gt / break 注释行 / for k 元组循环 ×2）；**AST 补强**（chunk_boundary_prf 15 If·7 For / 4 个 Tuple for-target / 5 个 AnnAssign 名单）；**forbidden tokens 第一百八十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges82.py`（32 测试）
+
+### 撞墙记录
+- 1 fail 首跑：重复 marker 用例最初用 2 chunk——只有 1 个 pred，recall 必为 0.5；改 3 chunk 后双 anchor 都命中。
+
+### 下一步建议
+- schema edges71（Round 715 已做）。
+
+---
+
+## Round 713 — evaluation/cli.py 第一百零一轮（38 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第一百零一轮 edges 测试，补强 edges81 未触及的角度（第七十八批）：**_build_parser 直测**（run 默认 fallback/800/30 / inspect-doc 默认 30 / validate-report 位置参数 / prog+description / args.command 类型）；**argparse 类型拒绝**（--parser 大写 / --max-chars "abc" / --tolerance-chars 1.5 → 全 exit 2）；**_format_metric 精确输出串**（null / true·false 两分支 :36 对齐字面量）；**main 终极 return 2 死分支**（mock _build_parser 注入 bogus command）；**inspect-doc docx 文档**（type=docx / docx_locator 行 / 指标行 ≥15）；**stderr/stdout 分离**（run 成功 err 空 / inspect-doc 成功 err 空）；**源码补强**（file=sys.stderr ×11 / print() 空行 / metrics: 行 / sorted keys / SystemExit / 元信息 print 字面）；**AST 补强**（_format_metric 5 Return / 内嵌 _sort_key / main 1 GenExp·0 For / 模块 import 9 项名单）；**forbidden tokens 第一百八十三批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges82.py`（38 测试）
+
+### 撞墙记录
+- 0 fail 首跑（stderr 计数先探针）。
+
+### 下一步建议
+- annotation_metrics edges82（Round 714 已做）。
+
+---
+
+## 基线记录
+
+- 81482 passed + 22 skipped（Round 710-713 回归，bvyq0kb4z，458.91s）
+- 81310 passed + 22 skipped（Round 706-709 回归，bbik27bfa，453.72s）
+- 81109 passed + 22 skipped（Round 702-705 回归，b68nimwpn，455.17s）
+- 80934 passed + 22 skipped（Round 699-701 回归，btiff8wvo，473.76s）
+- 80763 passed + 22 skipped（Round 696-698 回归）
+- 80588 passed + 22 skipped（Round 694-695 回归）
+- 80462 passed + 22 skipped（Round 692-693 回归）
+
+---
+
 ## Round 712 — evaluation/runner.py 第二百轮（33 测试）
 
 ### 目标
