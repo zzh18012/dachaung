@@ -4,6 +4,48 @@
 
 ---
 
+## Round 707 — evaluation/annotation_metrics.py 第九十九轮（38 测试）
+
+### 目标
+- 给 `evaluation/annotation_metrics.py`（195 行）加第九十九轮 edges 测试，补强 edges80 未触及的角度（第七十二批）：**position 数学**（before=marker 起点 gt=5 / after=marker 终点 gt=9，容差 1 下 before 命中 after 不命中）；**tolerance 边界**（d==5 容差 5 命中 / 容差 4 不命中 / 负容差全不中 → P=R=f1=0.0）；**一 pred 两 gt**（贪心取 d=0 → P=1.0 R=0.5 f1=2/3）；**chunk 缺 text**（or "" → 空 chunk 仍产生 pred 位置 0）；**全空 stream + marker 找不到**（precision 0.0 / recall null no_ground_truth_anchors_in_stream / f1 null / _missing_markers 精确值）；**_missing_markers 键出现条件**（全找到 → 键不存在 / 部分缺失 → recall 仍按找到的算 1.0）；**figure_caption_prf 参数无关性**（任意非 None 参数 == None/None 输出）；**源码补强**（5 个 append / d <= tolerance / matched += 1 / used 集合 / search_from 推进式 / marker·position 默认值 / f1 denom 分支）；**AST 补强**（Lambda 1 / IfExp 2 / Break 1 / Continue 3 / append 多重集 / abs 1 / search_from 2 赋值）；**forbidden tokens 第一百七十七批**
+
+### 改动
+- 新增 `tests/test_evaluation_annotation_metrics_edges81.py`（38 测试）
+
+### 撞墙记录
+- 1 fail 首跑：after 位置算错（marker "BBBB" 长 4 → gt=9 非 7，d=5 非 3）→ 容差边界改为 5/4。
+
+### 下一步建议
+- schema 第一百零一轮（Round 708）/ metrics 第九十八轮。
+
+---
+
+## Round 706 — evaluation/cli.py 第一百轮（54 测试）
+
+### 目标
+- 给 `evaluation/cli.py`（244 行）加第一百轮 edges 测试，补强 edges80 未触及的角度（第七十一批）：**run 成功全链路**（真实 load_manifest → mocked run_evaluation → [OK] 输出全字段（documents=2（成功 1，失败 1）/ devset_status / groups / pdf docx / git_commit 12 位 / git_dirty））；**run 失败路径**（清单不存在 rc2 / manifest_version 不符 rc1 / run_evaluation 抛 EvalSchemaError rc1 / 自校验失败 rc1）；**git_commit None → unknown**；**负数 --max-chars 原样透传**（现状记录）；**validate-report 成功 rc0 / JSONDecodeError rc1**；**inspect-doc 错误路径**（不存在 rc2 / 坏 JSON rc1 / 顶层数组 rc1）+ 元信息行 + 指标排序（bool 组 < 数字组 < null 组）+ 空 doc 默认 type=unknown；**argparse 行为**（--help exit 0 / 未知子命令 exit 2 / 缺 --output exit 2）；**_format_metric 补充**（负浮点 -0.5000 / 空 dict / 多键 dict 排序 / str+ok）；**AST 补强**（main 11 Return 计数 0×2/1×5/2×4 / 三 command 常量顺序 / isinstance 链 bool-float-dict / inspect-doc 函数级双 import / main 默认 None）；**forbidden tokens 第一百七十六批**
+
+### 改动
+- 新增 `tests/test_evaluation_cli_edges81.py`（54 测试）
+
+### 撞墙记录
+- 0 fail 首跑（AST 计数写前用脚本预验证）。
+
+### 下一步建议
+- annotation_metrics edges81（Round 707 已做）。
+
+---
+
+## 基线记录
+
+- 81109 passed + 22 skipped（Round 702-705 回归，b68nimwpn，455.17s）
+- 80934 passed + 22 skipped（Round 699-701 回归，btiff8wvo，473.76s）
+- 80763 passed + 22 skipped（Round 696-698 回归）
+- 80588 passed + 22 skipped（Round 694-695 回归）
+- 80462 passed + 22 skipped（Round 692-693 回归）
+
+---
+
 ## Round 705 — evaluation/runner.py 第九十九轮（33 测试）
 
 ### 目标
