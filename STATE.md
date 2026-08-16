@@ -4,6 +4,45 @@
 
 ---
 
+## Round 684 — evaluation/runner.py 第九十五轮（93 测试）
+
+### 目标
+- 给 `evaluation/runner.py`（228 行）加第九十五轮 edges 测试，补强 edges77 未触及的角度（第五十三批）：**_load_annotation 更深**（None path / 不存在 / OSError（Path.open patch）/ JSONDecodeError / 目录 is_file False / 合法 JSON / 空 obj / 空文件 JSONDecodeError）；**_process_one 更深**（document None + errors 空 → unknown dict / 多 errors 取第一个 / image_dir None 当 document None / elapsed 非负 float / 成功返回 doc dict + parser_version + image_dir / 创建 _per_doc 目录 / unlink OSError 容错 / out_stub 命名 `_per_doc/{doc_id}.json` / process_single kwargs parser_name+max_chars+write_json）；**run_evaluation 完整流程更深**（per_doc 无私有字段 `_annotation_present` 等 / per_doc 4 公共 keys / wall_time_seconds 5 keys parse+chunk None + not_instrumented / expected_failure matches True / mismatch False / 实际成功 actual None + matches False / tolerance + missing_markers 从 chunk_b pop 不进 metrics / parser_version 取第一个非 None / 跳过 None 取后续 / report 6 keys / 写盘内容 == 返回值 / json.dump kwargs ensure_ascii=False + indent=2 / image_dir 非 is_dir → image_base_dir None / is_dir → 传入）；**模块源码补强**（time import / pipeline 2 imports / REPORT_VERSION / annotation_metrics 2 / metrics 1 / report 3 helpers / _per_doc 命名 / write_json=False 出现 4 次（2 代码 + 2 docstring）/ not_instrumented 3 次 / perf_counter / except OSError 2 次 / unknown message / _annotation_present 字段 / else [] 默认 / 模块 docstring 不修改 pipeline / __all__ 1）；**AST 结构补强**（3 函数 + 顺序 / 10 imports / _load_annotation 1 With + 1 Try + 3 Return / _process_one process_single+image_output_dir_for call + 3 Return + 4 If + 1 Try / run_evaluation 3 For + 1 With + 3 kwonly args + pop 2 私有 key + report 6 keys + per_doc_results.append + public_per_doc.append）；**forbidden tokens 第一百五十四批**（no eval/exec/compile/globals/locals/os.system/subprocess/popen/yaml.load/pickle.load/socket/requests/urllib/shutil.rmtree/yield/async/await, open count=2）
+
+### 改动
+- 新增 `tests/test_evaluation_runner_edges78.py`（93 测试）
+
+### 覆盖要点
+- **_load_annotation 更深**：8 测试
+- **_process_one 更深**：10 测试
+- **run_evaluation 完整流程更深**：17 测试
+- **模块源码补强**：21 测试
+- **AST 结构补强**：21 测试
+- **forbidden tokens 第一百五十四批**：16 测试
+
+### 撞墙记录
+- 3 fails 首跑：
+  - `test_load_annotation_oserror_returns_none_batch52`：patch builtins.open 不影响 Path.open。Fix：patch `pathlib.Path.open`。
+  - `test_source_write_json_false_twice_batch52`：出现 4 次（2 处代码 + 2 处 docstring 提及）。Fix：==4。
+  - `test_source_not_instrumented_twice_batch52`：出现 3 次（模块 docstring 1 + parse_reason 1 + chunk_reason 1）。Fix：==3。
+
+### 测试基线
+- 总数：79849 passed, 22 skipped, 0 failed（433.96s）
+- 较上轮 +93（79756 → 79849）
+
+### 下一步建议
+- 候选：
+  - evaluation/annotation_metrics.py 第九十六轮（继续 edges 加强）
+  - evaluation/cli.py 第九十七轮（继续 edges 加强）
+  - evaluation/schema.py 第九十八轮（继续 edges 加强）
+  - evaluation/metrics.py 第九十五轮（继续 edges 加强）
+  - evaluation/manifest.py 第九十四轮（继续 edges 加强）
+  - 仍阻塞：J（向量化）、M（evaluator v1.2）、O（docs/*.md）
+
+**建议**：runner edges78 已饱和（_load_annotation 8 / _process_one 10 / run_evaluation 17 / 模块源码 21 / AST 21 / forbidden 16）。下一轮选 evaluation/annotation_metrics.py 第九十六轮，继续覆盖 chunk_boundary_prf 贪心 / search_from / tolerance 等更深路径。
+
+---
+
 ## Round 683 — evaluation/report.py 第九十四轮（100 测试）
 
 ### 目标
