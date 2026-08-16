@@ -4,6 +4,38 @@
 
 ---
 
+## Round 695 — evaluation/metrics.py 第九十六轮（67 测试）
+
+### 目标
+- 给 `evaluation/metrics.py`（381 行）加第九十六轮 edges 测试，补强 edges77 未触及的角度（第六十批）：**compute schema 校验集成**（完整合法 document（过 schemas/document.schema.json 全部 required：schema_version 0.1.0/hash 64 hex/element 8 键/chunk 4 键/relations-warnings-errors-metadata）→ schema_valid True / 删 source_type → False / patch document_passes_schema 抛 ValueError·KeyError → False + `schema_check_exception:ValueError`·`:KeyError` / patch 返回 True → True）；**_image_resource_ratio candidates 顺序**（绝对路径第一候选命中 / 纯文件名第二候选 base_dir 拼接救回 / 双失败 0.0 / rp None / rp 空串 / 混合 1/3 / 0 字节文件无效）；**_docx_locator_ratio 数值**（2/3 / relationship_id 单键 / bbox 拒 / page 即使有结构键也拒 / locator 缺失 / 空清单 no_elements）；**_pdf_locator_ratio 类型矩阵**（heading/list_item 需 bbox / header·footer·table 不需 / page+bbox 合法）；**element_count_by_type**（缺 type → unknown / 多类型精确计数 + total）；**_text_preservation**（混合 Unicode 空白 NBSP+全角+tab 全删 / emoji 多集合 P=R=1 但 equal False）；**helpers**（_null reason 引用 / _bool_metric / _int_metric 0 / _ratio 边界）；**子函数快速回归**（_is_valid_bbox bool 拒 / _strip_unicode_whitespace / _chunk_reference_ratio ghost id 1/3 / _heading_boundary_ratio 首元素限定 0.5）；**源码补强**（candidates.append 条件 / schema_check_exception f-string / by_type.get(t,0)+1 / e.get("type","unknown") / images 列表推导 / _PDF_BBOX_REQUIRED_TYPES 用法 / structural any）；**AST 补强**（candidates AnnAssign 精确 unparse / 3 个 metric 变量 / compute 恰 2 个 Return（1 个嵌套在 if 内，须用 ast.walk）/ pdf·docx ratio `if not elements:` / __all__ 精确 / compute 恰 1 个 Try）；**forbidden tokens 第一百六十五批**
+
+### 改动
+- 新增 `tests/test_evaluation_metrics_edges78.py`（67 测试）
+
+### 撞墙记录
+- 0 fail（写前预读源码修正 3 处：_valid_document 需全字段才过 schema；compute 的 Return 嵌套在 if 内须用 ast.walk；删未用 import）。
+
+### 下一步建议
+- manifest 第九十六轮 / report 第九十七轮 / runner 第九十八轮。
+
+---
+
+## Round 694 — evaluation/schema.py 第九十九轮（59 测试）
+
+### 目标
+- 给 `evaluation/schema.py`（81 行）加第九十九轮 edges 测试，补强 edges67 未触及的角度（第五十九批续）——**Schema 文件结构级校验**：**$id/$schema 统一性**（三 schema $id 前缀 `https://kvfs.local/schemas/` 且以文件名结尾 / 全部 Draft 2020-12 / 全部有 title / manifest+annotation 有 description（evaluation-report 无））；**$defs 引用结构**（manifest documents·expected_failures items 是 $ref 且 $defs 恰 2 项 / report $defs 恰 5 项名单 / annotation anchors $ref boundary_anchor 且 $defs 仅 1 项）；**Draft202012Validator.check_schema** 三 schema 全通过；**validate 拒绝非 dict 顶层**（list/str/int/float/None/bool 全部 EvalSchemaError 且 errors[0] path==[]）；**大清单 100 documents 通过**；**_schema_path 边界名**（空串/纯空格/含换行 → FileNotFoundError / 返回值 parent==SCHEMAS_DIR）；**load_schema 4 文件**（含 document.schema.json，均 type object）/ SCHEMAS_DIR 恰 4 个 json；**validate_file**（目录 → FileNotFoundError / 坏 schema 名 / 校验内容不看文件名）；**head 一致性**（errors[0].message ∈ str(e) / 数量解析一致（ASCII 括号））；**源码补强**（SCHEMAS_DIR 一行定义 / iter_errors+sorted / flat append 三键顺序 / errors or [] / 两个 FileNotFoundError 消息前缀 / no errors return）；**AST 补强**（_schema_path body=[Assign,If(Raise Call)] 无 docstring / load_schema 末 With encoding='utf-8' / validate 恰 1 个 append Call / validate_file 恰 1 个 Raise / imports 精确 6 模块 / 全模块无 IfExp）；**forbidden tokens 第一百六十四批**
+
+### 改动
+- 新增 `tests/test_evaluation_schema_edges68.py`（59 测试）
+
+### 撞墙记录
+- 3 fail 首跑：evaluation-report.schema.json 无 description（只断言 manifest+annotation）；错误计数解析用 ASCII 括号（消息是 `校验失败 (N 处)：`）；_schema_path 无 docstring（body[0] 是 Assign 非 Expr）。
+
+### 下一步建议
+- metrics edges78（Round 695 已做）。
+
+---
+
 ## Round 693 — evaluation/annotation_metrics.py 第九十七轮（54 测试）
 
 ### 目标
@@ -15,8 +47,12 @@
 ### 撞墙记录
 - 3 fail 首跑：_prf helper 签名是位置参数 tol；func.body 有 8 个 If（4 早返回 + num_pred/num_gt/p_val/missing 4 个）→ 用 body[-1] isinstance Return 过滤；chunk_boundary_prf 是 3 参数（document/annotation/tolerance_chars）非 2。
 
+### 测试基线
+- 总数：80462 passed, 22 skipped, 0 failed（439.98s，连同 Round 692 一起跑）
+- 较上轮 +110（80352 → 80462；692 +56 / 693 +54）
+
 ### 下一步建议
-- schema 第九十九轮 / metrics 第九十六轮 / manifest 第九十六轮。
+- schema 第九十九轮（Round 694 已做）/ metrics 第九十六轮（Round 695 已做）/ manifest 第九十六轮。
 
 ---
 
