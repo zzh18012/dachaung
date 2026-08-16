@@ -4,6 +4,166 @@
 
 ---
 
+## Round 740 — evaluation/runner.py 第二百零四轮（25 测试）
+
+### 目标
+- 补强 edges84/85 未触及的角度（第一百零五批）：**output_path 字符串内部 Path() 转换**；**公开 per_doc 恰 4 键**；**磁盘 JSON == 内存 dict 往返一致**；**落盘无 BOM（首字节 '{'）**；**真仓库 git_commit 40 位十六进制**；**同一 doc_id 同时在 documents 与 expected_failures**（两次 process_single、stub 同名先后清理、ef 行 matches False）；**_load_annotation OSError 分支**（monkeypatch json.load）；**forbidden tokens 第二百一十批**
+
+### 改动
+- 新增对应 edges 测试文件（25 测试）
+
+### 撞墙记录
+- 0 fail 首跑（磁盘==内存与撞名行为先探针）。
+
+### 下一步建议
+- cli edges86（Round 741）。
+
+---
+
+## Round 739 — evaluation/report.py 第二百零三轮（27 测试）
+
+### 目标
+- 补强 edges73/74 未触及的角度（第一百零四批）：**TimeoutExpired（SubprocessError 子类）→ (None, True)**；**rev-parse rc0 但 stdout 空 → commit None**；**porcelain rc!=0 且 rev-parse 成功 → dirty False（现状记录）**；**_RATIO_METRICS[0] 是 schema_valid**；**counts 多文档求和**；**ratio 不做 [0,1] 截断（1.5 原样、负值参与平均）**；**文档存在但缺 metric → rate 0.0（与零文档 None 对照）**；**devset 配对组（a↔b + c → groups 2）**；**forbidden tokens 第二百零九批**
+
+### 改动
+- 新增对应 edges 测试文件（27 测试）
+
+### 撞墙记录
+- 0 fail 首跑（git status rc!=0 → dirty False 的怪癖先探针确认）。
+
+### 下一步建议
+- runner edges86（Round 740 已做）。
+
+---
+
+## Round 738 — evaluation/manifest.py 第二百零三轮（33 测试）
+
+### 目标
+- 补强 edges83-85 未触及的角度（第一百零三批）：**校验顺序**（C:\foo 触发绝对路径分支先于反斜杠；UNC \\server\share 走反斜杠分支）；**"." 与 "./a.pdf" 合法**；**project_root 带 /.. 段被 resolve 归一**；**相对 manifest_path 随 CWD 解析**；**不存在文件消息含已解析绝对路径**；**顶层非对象 JSON（[]/"hello"/42）被 schema 层拦下**；**DocumentEntry 带 expectations dict 不可 hash（frozen dataclass 语义）**；**两次 load 相等但非同一对象**；**forbidden tokens 第二百零八批**
+
+### 改动
+- 新增对应 edges 测试文件（33 测试）
+
+### 撞墙记录
+- 0 fail 首跑（heredoc 会吞反斜杠转义，盘符样例改用 -c 单引号验证）。
+
+### 下一步建议
+- report edges75（Round 739 已做）。
+
+---
+
+## Round 737 — evaluation/metrics.py 第二百零三轮（30 测试）
+
+### 目标
+- 补强 edges82/83 未触及的角度（第一百零二批）：**schema_check_exception 分支**（monkeypatch document_passes_schema 抛错 → False + reason）；**真 schema_valid True**（完整合法 DOCX 文档 schema_version 0.1.0/parent_id/confidence/metadata 全字段，复用 test_schema.py 模板）；**真 False**（schema_version 违反 const，形状仍合法可继续算指标）；**未守卫路径**（error 真值字符串 → TypeError；expectations 真值字符串 → AttributeError）；**error code 空串保留**；**None-id 怪癖**（elements 与 chunk 引用同为 None → 1.0）；**type None 参与文本保留**；**_PDF_BBOX_REQUIRED_TYPES 精确四元组**；**构造器布尔强转**；**forbidden tokens 第二百零七批**
+
+### 改动
+- 新增对应 edges 测试文件（30 测试）
+
+### 撞墙记录
+- 1 fail 修 1 次：elements="notalist" 会让 schema_valid 之后的循环 AttributeError，改用 schema_version="9.9" 违反 const（形状合法）。
+
+### 下一步建议
+- manifest edges86（Round 738 已做）。
+
+---
+
+## Round 736 — evaluation/schema.py 第一百零六轮（48 测试）
+
+### 目标
+- 补强 edges72/73 未触及的角度（第一百零一批）：**manifest schema 结构锁**（devset_status 枚举/sha256 pattern 大写与短拒/document 元素 additionalProperties false/document source_type 仅 pdf·docx 而 expected_failure 允许 txt·other/expectations.element_count_by_type 值必须 integer≥0/expectations 额外键拒/required_markers minLength/paired_with 空串合法）；**report schema 结构锁**（report_version const "1.1"/provenance 额外键拒/max_chars minimum 1/dependencies 值 string|null/devset 计数 minimum 0/**summary additionalProperties true 与根 false 对照**/wall_time 额外键拒 + total minimum 0/per_doc 额外键拒 + doc_id minLength/**ef matches 必须 boolean（int 1 拒 —— bool ⊂ int 在 jsonschema 不成立）**/per_doc 缺 wall_time 错误路径精确）；**evaluation/__init__ 版本常量锁（1.0/1.1/1.1/1.0）+ __all__ 四元素**；**forbidden tokens 第二百零六批**
+
+### 改动
+- 新增对应 edges 测试文件（48 测试）
+
+### 撞墙记录
+- 1 fail 修 1 次：flat path 无 isinstance/str 转换（int 索引原样保留），源码断言改为现状记录。
+
+### 下一步建议
+- metrics edges84（Round 737 已做）。
+
+---
+
+## Round 735 — evaluation/annotation_metrics.py 第二百零四轮（27 测试）
+
+### 目标
+- 补强 edges83/84 未触及的角度（第一百批）：**重复 marker 顺序定位**（两个相同 "X" 各自命中第 1/第 2 次出现 → P=R=1.0）；**顺序推进副作用**（后一个 anchor 无法命中更早的覆盖 marker → missing）；**position 非 before/after（"middle"）→ else 按 after**；**纯空白 chunk 仍产出边界**；**容差精确边界 d==tol 命中、d==tol+1 不命中**；**find 失败回退分支**（stateful monkeypatch normalize 使拼接流删掉 chunk 文本 → num_pred=0、P null、R 0.0、f1 precision_or_recall_not_evaluated）；**_null/_ratio 与 metrics 跨模块同一对象**；**AST**；**forbidden tokens 第二百零五批**
+
+### 改动
+- 新增对应 edges 测试文件（27 测试）
+
+### 撞墙记录
+- 0 fail 首跑（回退分支用闭包计数器构造不对称 normalize）。
+
+### 下一步建议
+- schema edges74（Round 736 已做）。
+
+---
+
+## Round 734 — evaluation/cli.py 第一百零四轮（33 测试）
+
+### 目标
+- 补强 edges82-84 未触及的角度（第九十九批）：**_format_metric 补角**（list 值走通用分支/dict 按 key 排序/int 42 不走浮点格式/0.0→"0.0000"/1→"0.3333"/负浮点/bool+reason → reason 胜过 'ok'）；**argparse**（kreuzberg 接受、bogus 拒、--max-chars 非数字拒、--help 与 run --help exit 0）；**inspect-doc 现状记录**（恒传 error=None → error 键文档仍 pipeline_success true；_tolerance_chars 未被 pop 混入指标行 —— run 路径会 pop）；**BOM → rc1**；**缺文件 → rc2**；**validate-report happy path stdout 精确/FileNotFoundError → rc2**；**forbidden tokens 第二百零四批**
+
+### 改动
+- 新增对应 edges 测试文件（33 测试）
+
+### 撞墙记录
+- 1 fail 修 1 次：run --help 输出子命令帮助不含主描述 "评测 CLI"，断言改参数化 marker。
+
+### 下一步建议
+- annotation_metrics edges85（Round 735 已做）。
+
+---
+
+## Round 733 — evaluation/runner.py 第二百零三轮（35 测试）
+
+### 目标
+- 补强 edges82-84 未触及的角度（第九十八批）：**_load_annotation**（目录→None/合法文件→原样 dict/None 路径→None）；**_process_one errors 优先级**（document 与 errors 同时非空 → errors 胜出）；**process_single 精确 kwargs**；**_per_doc 目录在 stub 未落盘时也创建**；**零文档 manifest**（报告 6 键、双空列表、_per_doc 不创建、**磁盘无 tolerance 键 —— _tolerance_chars 只进内部 per_doc_results 公开层剥离，现状记录**）；**ef-only 精确结果 + kwargs 与文档循环一致**；**ef 无错误 → matches False**；**wall_time 恰 6 键**；**forbidden tokens 第二百零三批**
+
+### 改动
+- 新增对应 edges 测试文件（35 测试）
+
+### 撞墙记录
+- 0 fail 首跑（零文档 ef-only 结构先探针）。
+
+### 下一步建议
+- cli edges85（Round 734 已做）。
+
+---
+
+## Round 732 — evaluation/report.py 第二百零二轮（37 测试）
+
+### 目标
+- 补强 edges72/73 未触及的角度（第九十七批）：**rev-parse rc!=0 + porcelain rc==0 空组合 → (None, False)**；**subprocess.run 抛 OSError → (None, True)**；**依赖版本异常分支**（PackageNotFoundError/通用 Exception → 全 None）；**_RATIO_METRICS 精确 12 项** + schema_valid 在列 + figure_caption 不在列；**figure_caption 有值也不进 ratio_macro_averages（行为级）**；**counts 值 0 保留**；**success 混合 1/2 rate 0.5**；**键在但值 None → not_evaluated（与缺键区分）**；**全 null silent_drop（有文档）→ None**；**build_provenance**（max_chars 800.7→800/"800"→800/parser_version 透传/9 键精确/时间戳 fromisoformat 往返）；**真仓库 commit/dirty 与 subprocess 实测一致**；**forbidden tokens 第二百零二批**
+
+### 改动
+- 新增对应 edges 测试文件（37 测试）
+
+### 撞墙记录
+- 1 fail 修 1 次：误留死断言条件表达式行，删除。
+
+### 下一步建议
+- runner edges85（Round 733 已做）。
+
+---
+
+## Round 731 — evaluation/manifest.py 第二百零二轮（43 测试）
+
+### 目标
+- 补强 edges81-84 未触及的角度（第九十六批）：**MANIFEST_VERSION 值锁 "1.0" + monkeypatch 后不兼容分支可达 + 消息精确**；**BOM 清单 → ManifestError（"Unexpected UTF-8 BOM"）**；**死变量 all_paired 赋值+.add 共 2 处从未被读（现状）**；**schema 不查 doc_id 唯一（重复双份都加载）**；**loader 不 stat（ghost 深层路径照常解析）**；**_is_absolute_like 补角**（数字盘符/长度 2/冒号后无斜杠/双正斜杠中段）；**逃逸错误字段名**（expected_failures[ef1].path / documents[d1].annotation_file）；**直接构造 Manifest**（零文档全 0/self-pair frozenset 单元素 1 组/ghost 配对 2 组/txt 两零/file 1）；**三个 dataclass frozen**；**forbidden tokens 第二百零一批**
+
+### 改动
+- 新增对应 edges 测试文件（43 测试）
+
+### 撞墙记录
+- 0 fail 首跑（全部行为先探针，含死变量计数）。
+
+### 下一步建议
+- report edges74（Round 732 已做）。
+
+---
+
 ## Round 730 — evaluation/metrics.py 第二百零二轮（27 测试）
 
 ### 目标
@@ -294,6 +454,7 @@
 
 ## 基线记录
 
+- 82392 passed + 22 skipped（Round 731-736 回归 + 收集期间落盘的 737-739，b0y191o6d，471.78s；82079 + 223 + 90）
 - 82079 passed + 22 skipped（Round 723-727 回归，bg9bjm2le，457.90s）
 - 81844 passed + 22 skipped（Round 719-722 回归，b67e7gr28，459.12s）
 - 81660 passed + 22 skipped（Round 714-718 回归，bh2k8vzx0，450.44s）
