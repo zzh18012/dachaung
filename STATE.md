@@ -4,6 +4,55 @@
 
 ---
 
+## Round 1079 — evaluation/metrics.py 第五百二十三轮（21 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges132.py`（batch278，edges 第四百五十五批，forbidden 第五百五十批）。
+- 新角度（中段 heading 的结构保证：heading 恒居 chunk 首）：intro 段 + add_heading("Late Title", level=1) + 两段的真实文档——mc 200 下 chunks[0] 的 source_element_ids 恰为 [intro e0000]（intro 独占一 chunk，预算远未用尽）、chunks[1] 以 heading id 打头——**heading 强制 chunk 断开且恒 LEAD 其 chunk**；由此 heading_boundary_compliance 在真实管线恒可达 1.0（mc 200 与 mc 40 双预算同 1.0），0.0 分支只能靠手工合成板触达；无 heading 对照 → null no_heading_elements。
+
+---
+
+## Round 1078 — evaluation/schema.py 第五百二十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_schema_edges124.py`（batch277，edges 第四百五十四批，forbidden 第五百四十九批）。
+- 新角度（manifest 闭仓 + document 元素类型枚举名册）：manifest.schema.json 两个 def 均 additionalProperties: false——真实 load_manifest 对 document 条目多塞 "note" 键即拒（'Additional properties are not allowed'）；def 层 required 名册 document [doc_id, path, source_type]、expected_failure [doc_id, path, expected_error_code]；**元素类型枚举 8 值全名册** [heading, paragraph, list_item, table, image, caption, header, footer]——header/footer/list_item 合法但 fallback parser 从不产出（未达枚举值首锁）；真实文档元素 type 改 "header"/"footer" 照过 schema。
+
+---
+
+## Round 1077 — evaluation/annotation_metrics.py 第五百二十一轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges135.py`（batch276，edges 第四百五十三批，forbidden 第五百四十八批）。
+- 新角度（真实双图双题注板：占位符/题注各自成 chunk + CJK marker 逐字命中）：图+题注交替 doc（无正文段）真实切分 4 chunk 恰为 ['(空段落)', 'Figure 1: ...', '(空段落)', '图 2 ...']——图片占位符与题注**各自独立成 chunk**（image 无文本、caption 短文本互不相并），3 条预测边界；英文锚 "Figure 1:" before → P 1/3 / R 1.0 / F1 0.5；**CJK 锚 "图 2" 数字完全相同**——中文 marker 在规范化流里逐字 find 命中；双锚 → P 2/3 / R 1.0 / F1 0.8（1/3→2/3 命中阶梯），missing 恒空。
+
+---
+
+## Round 1076 — evaluation/cli.py 第五百二十轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges134.py`（batch275，edges 第四百五十二批，forbidden 第五百四十七批）。
+- 新角度（inspect-doc 渲染真实双图双题注文档）：双图双题注（一英一中）文档 JSON——counts 行 "elements=6 chunks=4"（6 元素切成 4 chunk 的真实形态）；dict 分支按码点排序渲染 **caption 排首**："caption=2, image=2, paragraph=2"；**figure_caption 三项在"最接近能用"的文档上仍 null parser_does_not_emit_relations**——文档里图片与题注文本俱在、指标依然全黑（关系不由 parser 发出，不启发式凑合），该不变量的最强真实对照；heading_boundary null no_heading_elements（题注不是 heading）。
+
+---
+
+## Round 1075 — evaluation/runner.py 第五百一十九轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges134.py`（batch274，edges 第四百五十一批，forbidden 第五百四十六批）。
+- 新角度（孪生文档的内容寻址图片目录坍缩）：三份嵌图 docx——twin1 与 twin2 **内容逐字节相同**（同文同图）→ 同 source_hash → 落进**同一个** images-<sha> 目录同一文件名（同内容覆盖无害）；other 内容不同 → 独立目录——**3 docs → 2 files / 2 dirs**，图片落盘是内容寻址的、与 doc_id 无关；坍缩对指标透明：三文档 image ratio 全 1.0、success {3, 3, 1.0}；文件名内嵌 sha 前缀 image_<sha16>_para1_00.png。
+
+---
+
+## Round 1074 — evaluation/report.py 第五百一十八轮（21 测试）
+
+- 文件：`tests/test_evaluation_report_edges123.py`（batch273，edges 第四百五十批，forbidden 第五百四十五批 report 变体）。
+- 新角度（多文档 silent 求和的真实 run：3+2+null → 5）：三份真实 docx 不同 expectations——d1 期望 5 段 silent 3、d2 期望 4 段 silent 2、d3 无 expectations null——**逐文档 silent 三态同屏 [3, 2, None]**，汇总 silent_drop_total **5**（null 不参与、非零值逐个相加）；同板 counts {sum 6, participating 3} 与 success {3, 3, 1.0}——silent 参与度（2/3）与 counts 参与度（3/3）在同一 run 分道。
+
+---
+
+## Round 1073 — evaluation/manifest.py 第五百一十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges133.py`（batch272，edges 第四百四十九批，forbidden 第五百四十一批）。
+- 新角度（caption 期望的精确/过索/欠索 + CJK 分类排序）：expectations 带 **caption 类型**——{caption 2} 精确 → silent {0}；{caption 3} 过索 → silent 1（题注也能造 silent drop）；{caption 1} 欠索 → silent 0（实际多于期望不告警——单向性）；categories ["图类","Alpha"] → covered ["Alpha","图类"]（CJK 与 ASCII 混排仍按码点排序）。
+
+---
+
 ## Round 1072 — evaluation/metrics.py 第五百一十六轮（23 测试）
 
 - 文件：`tests/test_evaluation_metrics_edges131.py`（batch271，edges 第四百四十八批，forbidden 第五百四十三批）。
@@ -53,10 +102,14 @@
 
 ---
 
-## 回归基线 90520（第 22 次精确命中）
+## 回归基线 90679（第 23 次精确命中）
 
-- btdldmddh（R1065 后启动）实测 **90520 passed, 22 skipped（523.22s）**，与预测 90520（90360 + R1059-1065 七轮 160）**分毫不差**——第 22 次连续精确命中。
-- 下一回归 bfpwvysgs（R1072 后启动）：预测 **90679**（90520 + R1066-1072 七轮 23+23+22+22+22+24+23=159）。
+- bfpwvysgs（R1072 后启动）实测 **90679 passed, 22 skipped（526.28s）**，与预测 90679（90520 + R1066-1072 七轮 159）**分毫不差**——第 23 次连续精确命中。
+- 下一回归 bbuk3mpoj（R1079 后启动）：预测 **90830**（90679 + R1073-1079 七轮 22+21+21+22+22+22+21=151）。
+
+---
+
+## 回归基线 90520（第 22 次精确命中）
 
 ---
 
