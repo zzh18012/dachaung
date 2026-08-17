@@ -4,10 +4,64 @@
 
 ---
 
-## 回归基线（Round 892-898 全量）
+## 回归基线（Round 899-911 全量）
 
-- **86555 passed + 22 skipped**（459.45s / 07:39，任务 bdcrpxcfd，覆盖至 R898）。与预测 86356 + 199（R892-898 新增）精确吻合，全绿。
-- 下一轮全量预期 ≈ **86860**（86555 + R899-911 新增 305：manifest109 26 + report98 25 + runner109 23 + cli109 22 + annotation110 24 + schema98 26 + metrics107 24 + manifest110 23 + report99 23 + runner110 23 + cli110 21 + annotation111 20 + schema99 25）。
+- **86860 passed + 22 skipped**（783.46s / 13:03，任务 b7kznezf4，覆盖至 R911）。与预测 86555 + 305（R899-911 新增）精确吻合，全绿。
+- 下一轮全量预期 ≈ **87060**（86860 + R912-918 新增 200：metrics108 31 + manifest111 30 + report100 29 + runner111 24 + cli111 27 + annotation112 27 + schema101 32）。
+
+---
+
+## Round 918 — evaluation/schema.py 第三百六十二轮（32 测试）
+
+- 文件：`tests/test_evaluation_schema_edges101.py`（batch116，forbidden tokens 第三百八十八批）。
+- 新角度：evaluation-report 顶层 required 恰 5 项（expected_failures 可选）但顶层封闭；$defs 五名；per_doc def required 4 + 封闭 + 内联 wall_time_seconds（required 仅三计时、reason 可选、[number,null] minimum 0）；metrics prop 仅 {"type": "object"}（指标值无 Schema 约束的宽松现状）；expected_failure_result 全形（actual_error_code 双类型、matches boolean）；devset def required 6 + categories_covered string 数组；三 schema 全部 draft 2020-12 + 顶层封闭；EvalSchemaError 默认 errors []；load_schema 未知名 → "Schema 文件不存在"；validate_file 缺文件 → "待校验文件不存在"；坏 JSON → JSONDecodeError 冒出；多错误按 absolute_path 排序且重复路径保留（() 恒首）。
+- 下一步：metrics edges109（Round 919）。
+
+---
+
+## Round 917 — evaluation/annotation_metrics.py 第三百六十一轮（27 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges112.py`（batch115，forbidden tokens 第三百八十七批）。
+- 新角度：空 marker → `if marker else -1` 分支进 _missing_markers [""]；anchor 缺 position 键默认 "after"、非法值 "weird" 也走 after；before-anchor 推进 search_from 后遮蔽 ["AB" before, "B" after] → B missing 全 0.0；tolerance_chars=-5 → d<=负 永不成立全 0.0 且 _tolerance_chars 原样 -5；annotation 真值缺 anchors 键 → no_ground_truth_anchors 三连；单 chunk + 有 anchors → recall 0.0 而 precision/F1 null；全失配 → denom<=0 → F1 0.0 非 null；document None → pipeline_failed + _tolerance_chars 7。
+
+---
+
+## Round 916 — evaluation/cli.py 第三百六十轮（27 测试）
+
+- 文件：`tests/test_evaluation_cli_edges111.py`（batch114，forbidden tokens 第三百八十六批）。
+- 新角度：run 成功完整 5 行块（git_commit 前 12 字符截断）；run/validate-report 传目录各自 rc 2；validate-report 坏 JSON rc 1；inspect-doc 顶层 "elements": null → TypeError 未捕获（get(key,[]) 只救缺键、or [] 只护 counts 行且永远到不了）；inspect 非 UTF-8 → UnicodeDecodeError；_format_metric float {:.4f} 与 string 兜底分支；inspect 四组排序（bool→数值 _ 先排→dict→null）+ error_code null 行 reason 原样 "(None)"。
+- 踩坑：metrics 排序 probe 里 "elements": null 直接把 inspect 炸了（TypeError），拆成第二次 probe 才拿到 A8/A9。
+
+---
+
+## Round 915 — evaluation/runner.py 第三百五十九轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges111.py`（batch113，forbidden tokens 第三百八十五批）。
+- 新角度：provenance parser_version 先到先得（"1.1"/"2.2" → "1.1"；首 doc 失败 None 次 doc "2.2" → "2.2"）；ef 循环 (None, []) → actual None + matches False；ef stub 落盘后 unlink（跑完 stub 消失、_per_doc 目录留存）；报告落盘 JSON 与返回 dict roundtrip 相等；_load_annotation 目录 → None、显式 None → None。
+- 踩坑：src.count("write_json=False") 实为 4（2 次调用 + 模块/函数 docstring 各 1 处），首跑 2 的断言改 4。
+
+---
+
+## Round 914 — evaluation/report.py 第三百五十八轮（29 测试）
+
+- 文件：`tests/test_evaluation_report_edges100.py`（batch112，forbidden tokens 第三百八十四批，report 变体 subprocess.run 恰 2）。
+- 新角度：git 三态（r2 rc1 即便 stdout 非空 → dirty False，returncode 主导；r1 stdout 全空白 → commit None）；deps 双异常路径（PackageNotFoundError 与通用 Exception 都归 None）；aggregate rows 完全缺键安全过滤（sum 4/participating 1）；ratio 值 0.0 参与（falsy 陷阱，not_evaluated 3）；silent_drop [2,None,3] → 5；EVALUATOR_VERSION/REPORT_VERSION 双 "1.1" 锁死；ratio 聚合键完整 12 项有序 + _RATIO_METRICS 元组全序。
+
+---
+
+## Round 913 — evaluation/manifest.py 第三百五十七轮（30 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges111.py`（batch111，forbidden tokens 第三百八十三批）。
+- 新角度：manifest_version "2.0" → schema const "1.0" 先拦截（EvalSchemaError），load_manifest 版本不兼容 ManifestError 分支实为死代码；schema documents items $ref #/$defs/document + $defs 两名；_is_absolute_like 十值矩阵（CC:/1:/C:x/UNC → False；c:\\x 小写盘符 → True）；sha256 显式 null → EvalSchemaError；ghost 配对/自配对 → 1 组；categories [""] 放行；file/pdf/docx 3/2/1 + doc 路径不查存在性；annotation_file 绝对路径与 ef 路径逃逸的完整字段名；清单路径是目录 → "清单文件不存在"；_detect_project_root 文件起点。
+- 踩坑：heredoc 里 `\\` 仍被传输层折叠（两次踩），探针一律用 chr(92) 构造反斜杠。
+
+---
+
+## Round 912 — evaluation/metrics.py 第三百五十六轮（31 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges108.py`（batch110，forbidden tokens 第三百八十二批）。
+- 新角度：document 与 error 并存 → success False 但 element_count_total/schema_valid 照常算（下游只看 document）；error 缺 "code" → KeyError；document_passes_schema 抛异常 → schema_check_exception:RuntimeError；_strip_unicode_whitespace 删 NBSP/全角/U+2028/U+2029/制表换行但保留零宽 U+200B；image ratio 四分位 0.25（裸文件名靠 base_dir 拼接、零字节无效）；文本保留空侧双向不对称（image-only → precision 0.0/recall null；反向 → precision null/recall 0.0）；expectations 真值空 counts → no_expectations_element_count；silent_drop 只累计正差 (3-1)+(2-0)=4；pdf header 类型 page-only 无 bbox → 1.0。
+- 备注：会话开头发现上一段摘要虚报 R912-916 已完成——git log 核实 HEAD 实为 R911，按真实状态从 R912 重跑；顺手清理 tests/ 下无主 manifest.json 残留物。
 
 ---
 
