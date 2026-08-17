@@ -4,6 +4,62 @@
 
 ---
 
+## 回归基线（Round 1003-1016 全量）
+
+- **89286 passed + 22 skipped**（760.30s / 12:40，任务 bkfnxpx7r，覆盖至 R1009）。与预测 89129 + 157（R1003-1009 新增 [metrics121 21 + manifest124 23 + report113 23 + runner124 22 + cli124 20 + annotation125 22 + schema114 26]）精确吻合，连续第十四次命中，全绿。
+- 下一轮全量预期 ≈ **89439**（89286 + R1010-1016 新增 153：metrics122 23 + manifest125 21 + report114 21 + runner125 20 + cli125 22 + annotation126 22 + schema115 24）。
+
+---
+
+## Round 1016 — evaluation/schema.py 第四百六十轮（24 测试）
+
+- 文件：`tests/test_evaluation_schema_edges115.py`（batch214，edges 第三百九十二批，forbidden 第四百八十六批）。
+- 新角度：错误按 absolute_path **数值**排序——12 个坏 doc 路径 ('documents', 0..11) 严格数值序（索引 2 在 10 前，字符串排序会得 "10"<"2"）；annotation 锚点张力三态：空 marker "'' should be non-empty"（算法侧 R1015 只防御性吞掉，schema 直接拒）、缺 position required（算法默认 "after" 对合法标注不可达）、"middle" enum 拒；**双空格 marker schema 合法但算法找不到**（validate PASS + chunk_boundary_prf missing 同锁）；annotation kitchen-sink 全字段通过。
+
+---
+
+## Round 1015 — evaluation/annotation_metrics.py 第四百五十九轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges126.py`（batch213，edges 第三百九十一批，forbidden 第四百八十五批）。
+- 新角度（marker 搜索机制）：anchor 乱序 → search_from 推进吞掉靠前 marker（"apple" 在流里却进 missing_markers，P/R/F1 仍全 1.0）；空 marker "" 直接进 missing（if marker else -1）；未规范化 marker（双空格）流已 normalize → 找不到 → recall null no_ground_truth_anchors_in_stream + precision 0.0；tolerance=0 时 d=0 精确命中仍算（<= 含边界），P 0.5 / R 1.0 / F1 2/3。
+
+---
+
+## Round 1014 — evaluation/cli.py 第四百五十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges125.py`（batch212，edges 第三百九十批，forbidden 第四百八十四批）。
+- 新角度（跨工件误喂回合）：评测报告 JSON 喂 inspect-doc → rc 0，三处 "?" 回退同屏（document_id/source/parser），type=unknown；**pipeline_success true 与 schema_valid false 同屏共存**；error_code null 的 reason None 渲染成 "(None)"；空 dict 指标 element_count_by_type 行内无 "="；21 行指标四桶次序 bool→数值→dict→null 全锁；文档 JSON 喂 validate-report → rc 1 [FAIL] 6 处首错 report_version required。
+
+---
+
+## Round 1013 — evaluation/runner.py 第四百五十七轮（20 测试）
+
+- 文件：`tests/test_evaluation_runner_edges125.py`（batch211，edges 第三百八十九批，forbidden 第四百八十三批）。
+- 新角度：document 与 errors 同时非空 → _process_one 走 errors 分支丢弃 document.parser_version（"pv-hidden" 被吞 → provenance.parser_version None）；ef 循环 process_single 抛异常 → RuntimeError 原样传播、报告文件不落盘（ef 循环在写盘前，无兜底）。
+
+---
+
+## Round 1012 — evaluation/report.py 第四百五十六轮（21 测试）
+
+- 文件：`tests/test_evaluation_report_edges114.py`（batch210，edges 第三百八十八批，forbidden 第四百八十二批）。
+- 新角度（生产者 → Schema 端到端回合）：空文档集（build_provenance + build_devset_section + aggregate_summary([])）与全指标管线（compute_automatic_metrics + figure_caption_prf + chunk_boundary_prf 共 20 键 metrics + wall_time 5 键）两种真实生产者组装的报告均通过 evaluation-report.schema.json；20 键 = 14 自动 + 3 figure + 3 boundary（_tolerance_chars 已剥离）。
+
+---
+
+## Round 1011 — evaluation/manifest.py 第四百五十五轮（21 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges125.py`（batch209，edges 第三百八十七批，forbidden 第四百八十一批）。
+- 新角度（manifest → report 跨模块流锁）：中文 doc_id "中文d" 合法加载且经 runner 流入 per_doc 原样保留（顺序不排序）；跨类型配对（pdf↔docx）+ 三类别并集 → categories_covered ['a','b','c']、content_group_count 1；report.devset 六键整体 == manifest 属性直通。
+
+---
+
+## Round 1010 — evaluation/metrics.py 第四百五十四轮（23 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges122.py`（batch208，edges 第三百八十六批，forbidden 第四百八十批）。
+- 新角度：header 带坏 bbox（"bad"）→ pdf_locator 仍 1.0（豁免类型完全不看 bbox）vs caption 只给 page 无 bbox → 0.0（强制类型）——同款 locator 两种命运；resource_path 带子目录 "sub/img.png" 而文件只在 base/img.png → basename 回退拼接命中（Path(rp).name 丢目录）；docx 结构键单键即有效（relationship_id / run_index / table_index+row+col 三连各 1.0）。
+
+---
+
 ## 回归基线（Round 996-1009 全量）
 
 - **89129 passed + 22 skipped**（741.88s / 12:21，任务 bzrpm6bar，覆盖至 R1002）。与预测 88963 + 166（R996-1002 新增 [metrics120 24 + manifest123 23 + report112 24 + runner123 26 + cli123 22 + annotation124 22 + schema113 25]）精确吻合，连续第十三次命中，全绿。
