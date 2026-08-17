@@ -4,10 +4,186 @@
 
 ---
 
-## 回归基线（Round 812-821 全量）
+## 回归基线（Round 822-833 全量）
 
-- **84680 passed + 22 skipped**（468.20s / 07:48）。与预测 84433 + 247（R812-821 新增）精确吻合，全绿。
-- 下一轮全量预期 ≈ 84814（84680 + R822-826 的 23+26+22+20+21 = 112，R827+ 另计）。
+- **84969 passed + 22 skipped**（466.24s / 07:46）。与预测 84680 + 289（R822-833 新增：23+26+22+20+21+24+23+24+25+26+30+25）精确吻合，全绿。
+- 下一轮全量预期 ≈ 85050（84969 + R834-837 的 26+29+36+26 = 117，R838+ 另计）。
+
+---
+
+## Round 837 — evaluation/report.py 第二百八十一轮（26 测试）
+
+### 目标
+- 补强 edges88 未触及的角度（第二百一十一批）：**临时 git 仓库直测 get_git_provenance（clean → 40 位 commit + dirty False；untracked → dirty True）**；pdfplumber 真实版本以数字开头；success rate 2/2 → 1.0；silent_drop 混合 [None, 3] → 3；_COUNT_METRICS 单元素元组；max_chars -2.5 → -2 向零截断；forbidden tokens 第三百零七批
+
+### 改动
+- 新增 tests/test_evaluation_report_edges89.py（26 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- runner edges100（Round 838）。
+
+---
+
+## Round 836 — evaluation/manifest.py 第二百八十轮（36 测试）
+
+### 目标
+- 补强 edges99 未触及的角度（第二百一十批）：**_is_absolute_like 八态直测表**；_resolve_relative_path 空串直测（绕过 schema）；_detect_project_root 三态（pyproject 命中 / 回退起点 / 文件取父）；load_manifest 默认 root 检测；垃圾 JSON → ManifestError；目录当清单；annotation_file / ef.path 逃逸字段名进错误消息；DocumentEntry frozen 不可写；forbidden tokens 第三百零六批
+
+### 改动
+- 新增 tests/test_evaluation_manifest_edges100.py（36 测试）
+
+### 撞墙记录
+- 1 fail 首跑：frozen 测试里 `"paired_with": None` 与 `"sha256": "abc"` 均被 schema 拒（paired_with 出现即须 string；sha256 有 64 位 hex pattern）→ 去掉两个可选字段，改断言默认 None。
+
+### 下一步建议
+- report edges89（Round 837 已做）。
+
+---
+
+## Round 835 — evaluation/metrics.py 第二百七十九轮（29 测试）
+
+### 目标
+- 补强 edges97 未触及的角度（第二百零九批）：**schema 校验抛异常 → value False + reason "schema_check_exception:ValueError"**；error dict 缺 code → KeyError；双空 → P/R null 但 equal True；单侧空两方向；乱序 "ab" vs "ba" → equal False 且 P=R=1.0；silent_drop 超额交付 → 0 非 null；expectations 无 element_count_by_type → no_expectations_element_count；heading 非首 → 0.0；空 ids chunk 半分；NBSP+全角空格剥离；forbidden tokens 第三百零五批
+
+### 改动
+- 新增 tests/test_evaluation_metrics_edges98.py（29 测试）
+
+### 撞墙记录
+- 0 fail 首跑（NBSP 字面量经 python repr 核对为 \xa0　）。
+
+### 下一步建议
+- manifest edges100（Round 836 已做）。
+
+---
+
+## Round 834 — evaluation/schema.py 第二百七十八轮（26 测试）
+
+### 目标
+- 补强 edges87 未触及的角度（第二百零八批）：**load_schema 未知名称 → FileNotFoundError**；validate 对未知 schema 穿透；EvalSchemaError 默认 errors == []；**多错误按 absolute_path 排序（devset_status 先于 manifest_version，与书写序无关）**；message 头部「(N 处)」；validate(None) → "None is not of type 'object'"；load_schema 每次新 dict；垃圾文本 → JSONDecodeError 穿透；const schema_path 三段；forbidden tokens 第三百零四批
+
+### 改动
+- 新增 tests/test_evaluation_schema_edges88.py（26 测试）
+
+### 撞墙记录
+- 1 fail 首跑：const 错误 message 是 **期望值** "'1.0' was expected" 而非收到的 '9' → 修正断言。
+
+### 下一步建议
+- metrics edges98（Round 835 已做）。
+
+---
+
+## Round 833 — evaluation/annotation_metrics.py 第二百七十七轮（25 测试）
+
+### 目标
+- 补强 edges98 未触及的角度（第二百零七批）：**before/after 位置语义对照（before tol=1 命中 1.0 / after 同 tol 未命中 0.0）**；全部 marker 缺失 → precision 0.0 非 null、recall null=no_ground_truth_anchors_in_stream、f1 null=precision_or_recall_not_evaluated；p=r=0.0 → denom<=0 → f1 显式 0.0；tolerance 0 精确命中；\n/\t 规范化流匹配；多缺失 marker 顺序保留；forbidden tokens 第三百零三批
+
+### 改动
+- 新增 tests/test_evaluation_annotation_metrics_edges99.py（25 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- schema edges88（Round 834 已做）。
+
+---
+
+## Round 832 — evaluation/cli.py 第二百七十六轮（30 测试）
+
+### 目标
+- 补强 edges98 未触及的角度（第二百零六批）：**_format_metric 全分支直测（float 4 位 / bool 小写 / null 带 reason / dict 排序 / 负 int / 字符串兜底）**；run 三态（run_evaluation 抛错 rc1 / 自校验失败 rc1 / 成功统计行 + git 前 12 位）；inspect-doc 五行头 + --tolerance-chars 9 透传 _tolerance_chars 行；无子命令 / --parser 非法 → SystemExit 2；forbidden tokens 第三百零二批
+
+### 改动
+- 新增 tests/test_evaluation_cli_edges99.py（30 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- annotation_metrics edges99（Round 833 已做）。
+
+---
+
+## Round 831 — evaluation/runner.py 第二百七十五轮（26 测试）
+
+### 目标
+- 补强 edges98 未触及的角度（第二百零五批）：**_load_annotation 直测四态（None / 不存在 / 合法 JSON 直传 / 空文件）**；**tolerance_chars 真实传播（锚点距边界 5 字符：tol=2 全 0.0、tol=9 全 1.0）**；ef 多错误取 errors[0].code；深层输出目录 a/b/c 自动创建；forbidden tokens 第三百零一批
+
+### 改动
+- 新增 tests/test_evaluation_runner_edges99.py（26 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- cli edges99（Round 832 已做）。
+
+---
+
+## Round 830 — evaluation/report.py 第二百七十四轮（25 测试）
+
+### 目标
+- 补强 edges87 未触及的角度（第二百零四批）：**_RATIO_METRICS 恰 12 项（首 schema_valid 尾 chunk_boundary_f1）**；aggregate_summary([]) 全空形态；pipeline_success 全 False → rate 0.0 非 null；per_doc 缺 metrics 键 → KeyError；build_devset_section 键序 6 项 + 值直传；依赖版本恰 3 键 str-or-None；build_provenance parser 直传（含 None）；forbidden tokens 第三百批
+
+### 改动
+- 新增 tests/test_evaluation_report_edges88.py（25 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- runner edges99（Round 831 已做）。
+
+---
+
+## Round 829 — evaluation/manifest.py 第二百七十三轮（24 测试）
+
+### 目标
+- 补强 edges98 未触及的角度（第二百零三批）：**UNC 路径绕过绝对路径检测但被反斜杠拦截**；波浪号 ~/x.pdf 不展开（parent.name == "~"）；URL 形 http://x 原样加载；doc_id "my doc" 含空格保留；悬空 paired_with="ghost" → 1 组/1 文件；两组互配 → 2 组/4 文件；forbidden tokens 第二百九十九批
+
+### 改动
+- 新增 tests/test_evaluation_manifest_edges99.py（24 测试）
+
+### 撞墙记录
+- 1 fail 首跑：源码断言带了前导引号 `'"必须使用正斜杠'`，实际该文本在 f-string 内（前有 {field_name}）→ 去掉引号改断言裸文案。
+
+### 下一步建议
+- report edges88（Round 830 已做）。
+
+---
+
+## Round 828 — evaluation/metrics.py 第二百七十二轮（23 测试）
+
+### 目标
+- 补强 edges96 未触及的角度（第二百零二批）：**多类型 silent_drop 求和（paragraph 1/2 + heading 0/2 → 2）**；expectations 传 truthy 字符串 → 'str' object has no attribute 'get'（现状记录）；by_type 首见插入序非字母序；image 只需 page → 1.0；schema_valid 校验返回 False → value False + reason None；forbidden tokens 第二百九十八批
+
+### 改动
+- 新增 tests/test_evaluation_metrics_edges97.py（23 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- manifest edges99（Round 829 已做）。
+
+---
+
+## Round 827 — evaluation/schema.py 第二百七十一轮（24 测试）
+
+### 目标
+- 补强 edges86 未触及的角度（第二百零一批）：**SCHEMAS_DIR 清单恰 4 文件**；三个评测 Schema $id 均 https://kvfs.local/schemas/<name>；report_version float 1.1 同 path 双错（type+const）；validate_file 收 str 路径；forbidden tokens 第二百九十七批
+
+### 改动
+- 新增 tests/test_evaluation_schema_edges87.py（24 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- metrics edges97（Round 828 已做）。
 
 ---
 
@@ -23,7 +199,7 @@
 - 0 fail 首跑。
 
 ### 下一步建议
-- schema edges87（Round 827）。
+- schema edges87（Round 827 已做）。
 
 ---
 
