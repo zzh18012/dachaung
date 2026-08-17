@@ -4,6 +4,114 @@
 
 ---
 
+## 回归基线（Round 961-974 全量）
+
+- **88475 passed + 22 skipped**（806.69s / 13:26，任务 bxhv2ehqb，覆盖至 R974）。与预测 88161 + 314（R961-974 新增）精确吻合，连续第十次命中，全绿。
+- 下一轮全量预期 ≈ **88801**（88475 + R975-988 新增 326：R975-981 共 166 [metrics117 25 + manifest120 26 + report109 24 + runner120 22 + cli120 22 + annotation121 23 + schema110 24] + R982-988 共 160 [metrics118 24 + manifest121 23 + report110 23 + runner121 22 + cli121 22 + annotation122 21 + schema111 25]）。
+
+---
+
+## Round 988 — evaluation/schema.py 第四百三十二轮（25 测试）
+
+- 文件：`tests/test_evaluation_schema_edges111.py`（batch186，edges 第三百六十四批，forbidden tokens 第四百五十八批）。
+- 新角度（report schema def 细节）：最小合法报告整体通过；provenance.max_chars minimum 1 → 0 被拒（与 CLI 收 --max-chars -800 跨模块张力）；summary 是全 schema 唯一 additionalProperties true 的 def；wall_time_seconds 只 required 3 键、total -0.5 违 minimum 0；ef_result doc_id 空串合法（与 manifest minLength 1 不对称）；per_doc source_type "txt" 拒；report_version const "'1.1' was expected"。
+
+---
+
+## Round 987 — evaluation/annotation_metrics.py 第四百三十一轮（21 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges122.py`（batch185，edges 第三百六十三批，forbidden tokens 第四百五十七批）。
+- 新角度：marker 单空格 " " 命中 chunk 分隔符 → P/R/F1 全 1.0；3 chunks 中位锚 P 0.5 / R 1.0 / F1 = 0.6666666666666666 精确浮点锁定；tolerance_chars 传 float 0.5（签名 int 但运行时照收）→ 距 0 命中距 1 不命中。
+
+---
+
+## Round 986 — evaluation/cli.py 第四百三十轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges121.py`（batch184，edges 第三百六十二批，forbidden tokens 第四百五十六批）。
+- 新角度：main([]) → argparse required 子命令 SystemExit code 2；--parser kreuzberg 与 --max-chars -800（负数照收）原样透传 run_evaluation kwargs；inspect-doc --tolerance-chars 7 → 泄漏键渲染 "7  (ok)"；_format_metric 直测 list 值 "[1, 2]  (ok)" 与 bool 小写 "true  (ok)"。
+
+---
+
+## Round 985 — evaluation/runner.py 第四百二十九轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges121.py`（batch183，edges 第三百六十一批，forbidden tokens 第四百五十五批）。
+- 新角度：标注端到端（annotation_file → chunk_boundary_prf 用真实 anchors → 公开报告 per_doc.metrics 1.0）；嵌套输出目录 sub/dir 自动创建；落盘格式 indent=2 + ensure_ascii=False（中文 category 原样非 \u 转义）；报告顶层恰 6 键有序。
+- 踩坑：`"sub" / "dir"` 字符串除法 TypeError，改正斜杠字符串。
+
+---
+
+## Round 984 — evaluation/report.py 第四百二十八轮（23 测试）
+
+- 文件：`tests/test_evaluation_report_edges110.py`（batch182，edges 第三百六十批，forbidden tokens 第四百五十四批）。
+- 新角度：_COUNT_METRICS / _SUCCESS_BOOL_METRICS 精确元组（与 _RATIO_METRICS 12 项合成三表全锁定）；pipeline_success value=1（int truthy 非 True）→ `is True` 身份检查不计 → success_count 0；element_count_total value=True → bool 进 sum 算 1（同一家族两处相反）；get_git_provenance 非 git 恰 2 键；schema_valid False 参与 macro → 0.0。
+
+---
+
+## Round 983 — evaluation/manifest.py 第四百二十七轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges121.py`（batch181，edges 第三百五十九批，forbidden tokens 第四百五十三批）。
+- 新角度：annotation_file 绝对路径/反斜杠 → 错误字段名 "documents[d1].annotation_file"；expected_failures path 绝对 → 字段名 "expected_failures[ef1].path"（ef 分支首次锁定）；同一 doc_id 双列表共存（resolved_path 相等、ef source_type 默认 None）；expectations 子 dict 原样透传。
+- 踩坑：反斜杠错误行是独立 f-string 行（无 raise 前缀），针线需去掉前缀。
+
+---
+
+## Round 982 — evaluation/metrics.py 第四百二十六轮（24 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges118.py`（batch180，edges 第三百五十八批，forbidden tokens 第四百五十二批）。
+- 新角度：header/footer 不在 _PDF_BBOX_REQUIRED_TYPES → 仅 page 有效（bbox 豁免家族补全）；page float 1.0 → isinstance(int) 拒（与 bool True 绕过成对照）；docx locator 含 bbox 键即拒；chunk 空 ids → 0.5；heading element_id None 与 chunk 首 id None 相等命中（None==None 怪癖）；图片 base_dir 拼接命中 + 零字节文件 st_size>0 拒 → 0.5。
+
+---
+
+## Round 981 — evaluation/schema.py 第四百二十五轮（24 测试）
+
+- 文件：`tests/test_evaluation_schema_edges110.py`（batch179，edges 第三百五十七批，forbidden tokens 第四百五十一批）。
+- 新角度：MS 字符串属性形状（annotation_file / paired_with 均仅 {"type": "string"}，解释 R976 空串放行）；source_type enum 不对称 document 2 值 vs expected_failure 4 值 [pdf, docx, txt, other]；expectations 负计数 "-1 is less than the minimum of 0"（5 层深路径）；required_markers 空串；devset_status "partial"；ef 空 code。
+
+---
+
+## Round 980 — evaluation/annotation_metrics.py 第四百二十四轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges121.py`（batch178，edges 第三百五十六批，forbidden tokens 第四百五十批）。
+- 新角度：两条 null 短路路径都返回恰 4 键（3 指标 + _tolerance_chars，无 _missing_markers）；逆序 anchors → search_from 只前进 → _missing_markers ["AB"] 但 P/R 仍 1.0；空 text chunk 仍产边界（find("") 返回 pos）；tolerance 0 全距离>0 → P=R=0 → f1 走 denom<=0 分支 0.0；同 marker 双 anchor 静默缩分母（num_gt 1 非 2）。
+
+---
+
+## Round 979 — evaluation/cli.py 第四百二十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges120.py`（batch177，edges 第三百五十五批，forbidden tokens 第四百四十九批）。
+- 新角度：run 成功 [OK] 4 行块（documents=N（成功 X，失败 Y）、devset 5 字段、git_commit 截前 12 字符）；validate-report 成功行；inspect-doc 泄漏内部键 _tolerance_chars（runner pop 而 inspect 不 pop）→ "30  (ok)" 且 _missing_markers 不出现；四桶排序锁位 bool→数值→dict→null。
+- 踩坑：[OK] 评测完成 print 是多行 f-string 带 \n，针线需含 "\\n"。
+
+---
+
+## Round 978 — evaluation/runner.py 第四百二十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges120.py`（batch176，edges 第三百五十四批，forbidden tokens 第四百四十八批）。
+- 新角度：(None, [])（无文档无错误）→ code "unknown" + message "process_single returned None without errors"；document 与 errors 并存 → image_dir 在 errors 检查前已按 source_hash 计算 → 错误五元组仍携带 images-abc123；ef matches 双路（码分歧 False / 一致 True）。
+
+---
+
+## Round 977 — evaluation/report.py 第四百二十一轮（24 测试）
+
+- 文件：`tests/test_evaluation_report_edges109.py`（batch175，edges 第三百五十三批，forbidden tokens 第四百四十七批）。
+- 新角度：build_provenance 9 键精确有序（首次整表）；真 git 仓库行为对：干净仓库 commit 40 位 hex + dirty=False、未跟踪文件 → dirty=True（非 git 目录 dirty=False 构造缺陷复现）；silent_drop [0, None] → 求和保持 0；summary 顶层恰 4 键；schema_valid 在 _RATIO_METRICS 但不在 _SUCCESS_BOOL_METRICS。
+
+---
+
+## Round 976 — evaluation/manifest.py 第四百二十轮（26 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges120.py`（batch174，edges 第三百五十二批，forbidden tokens 第四百四十六批）。
+- 新角度：UNC 前缀 //server → startswith("/") 拦；"a:foo" 盘符冒号无斜杠 → 非 absolute-like 但 resolve() 保持盘符相对 → 落根外二次拦（"a:foo → a:foo"）；穿越 "samples/../../outside.txt" 拒 / "samples/../b.pdf" 放行；尾斜杠目录照常载入；annotation_file "" → falsy 跳过解析（str="" 但 resolved=None）；链式配对 2 组、三角配对 3 组。
+
+---
+
+## Round 975 — evaluation/metrics.py 第四百一十九轮（25 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges117.py`（batch173，edges 第三百五十一批，forbidden tokens 第四百四十五批）。
+- 新角度：bool 不对称 page=True 绕过 isinstance(int)（bool 是 int）而 bbox 内 True 被 _is_valid_bbox 显式拒 → 0.5；type 显式 None vs 键缺失分歧（by_type 键 None 与 "unknown" 并存）；docx 结构键 section=None 值无视 → 1.0；image 携带 content 不参与文本比对；仅 image + chunks text None → equal True + P/R null；expectations 计数传字符串 "2" → TypeError（锁定）；乱序 "AB"/"BA" → equal False 但 P/R 双 1.0。
+
+---
+
 ## 回归基线（Round 954-960 全量）
 
 - **88161 passed + 22 skipped**（821.83s / 13:41，任务 bpfu0gyen，覆盖至 R960）。与预测 87984 + 177（R954-960 新增）精确吻合，连续第九次命中，全绿。
