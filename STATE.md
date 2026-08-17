@@ -4,6 +4,62 @@
 
 ---
 
+## 回归基线（Round 1010-1023 全量）
+
+- **89439 passed + 22 skipped**（747.13s / 12:27，任务 bupyg9h13，覆盖至 R1016）。与预测 89286 + 153（R1010-1016 新增 [metrics122 23 + manifest125 21 + report114 21 + runner125 20 + cli125 22 + annotation126 22 + schema115 24]）精确吻合，连续第十五次命中，全绿。
+- 下一轮全量预期 ≈ **89582**（89439 + R1017-1023 新增 143：metrics123 21 + manifest126 21 + report115 21 + runner126 20 + cli126 20 + annotation127 20 + schema116 20）。
+
+---
+
+## Round 1023 — evaluation/schema.py 第四百六十七轮（20 测试）
+
+- 文件：`tests/test_evaluation_schema_edges116.py`（batch221，edges 第三百九十九批，forbidden 第四百九十三批）。
+- 新角度：per_doc 开闭不对称（行为面）——metrics prop 仅 {"type": "object"} → 报告塞任意 bogus 指标键照过 RS，而 per_doc 自身 additionalProperties false 多一顶层键即拒；validate_file 标量载荷 [] / 42 / null / "str" → 全走 EvalSchemaError "is not of type 'object'"（非 JSONDecodeError）。
+
+---
+
+## Round 1022 — evaluation/annotation_metrics.py 第四百六十六轮（20 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges127.py`（batch220，edges 第三百九十八批，forbidden 第四百九十二批）。
+- 新角度（missing_markers 细部）：多 marker 缺失按 anchor 列表序保序（["zz1","aa2"] 非排序）、找到的照常匹配 P/R 1.0；空 marker 排首位不推进 search_from（假值直接 -1 不触碰 find）→ 后续 apple 从 0 起找到、missing 仅 [""]——与 R1015 乱序吞 marker 成对照：空串无害、真 marker 有害。
+
+---
+
+## Round 1021 — evaluation/cli.py 第四百六十五轮（20 测试）
+
+- 文件：`tests/test_evaluation_cli_edges126.py`（batch219，edges 第三百九十七批，forbidden 第四百九十一批）。
+- 新角度（绝对 resource_path 回合）：inspect-doc 无 image_base_dir 全靠 rp 原值——绝对路径是唯一让比率 >0 的途径：一条绝对真实 + 一条相对缺失 → 0.5000 渲染；单条绝对缺失 → 0.0000（有 image 元素但全失效 ≠ no_image_elements null）。
+
+---
+
+## Round 1020 — evaluation/runner.py 第四百六十四轮（20 测试）
+
+- 文件：`tests/test_evaluation_runner_edges126.py`（batch218，edges 第三百九十六批，forbidden 第四百九十批）。
+- 新角度（真实 images 目录端到端）：fake process_single 预建 _per_doc/images-<source_hash>/ 落真实 img1.png → d1 image_resource 1.0 / d2（不同 hash 目录未建）0.0 同屏（真目录 × 真 metrics 组合此前未锁）；run 后 _per_doc 残留恰 ["images-ab12cd34"]（stub 已 unlink、images 目录按设计留下）。
+
+---
+
+## Round 1019 — evaluation/report.py 第四百六十三轮（21 测试）
+
+- 文件：`tests/test_evaluation_report_edges115.py`（batch217，edges 第三百九十五批，forbidden 第四百八十九批）。
+- 新角度（12 指标分歧矩阵回合）：三文档 [None, 0.0, 1.0] 铺满全部 12 个 ratio 指标 → 每项 macro 0.5 / participating 2 / not_evaluated 1 一次锁；figure_caption_* 不进 ratio_macro_averages；counts sum 5、success 2/3、silent 2 三类不混；整份分歧报告照过 RS。
+
+---
+
+## Round 1018 — evaluation/manifest.py 第四百六十二轮（21 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges126.py`（batch216，edges 第三百九十四批，forbidden 第四百八十八批）。
+- 新角度（expectations + annotation 双注线同文档回合）：同一文档双 wiring → per_doc 同时出 silent_drop 1 与 chunk_boundary P/R 双 1.0、figure_caption 仍 null——三线共存不互扰；邻文档双 null 同屏。
+
+---
+
+## Round 1017 — evaluation/metrics.py 第四百六十一轮（21 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges123.py`（batch215，edges 第三百九十三批，forbidden 第四百八十七批）。
+- 新角度：七文本类型 page-only 矩阵 → pdf_locator 精确 3/7（豁免 3 类 vs 强制 4 类）；expectations.element_count_by_type 含 None → actual < exp TypeError（无守卫现状记录，第三个未守卫路径）；heading 在 chunk 内第二位（ids[1]）→ heading_boundary 0.0（首元素规则）。
+
+---
+
 ## 回归基线（Round 1003-1016 全量）
 
 - **89286 passed + 22 skipped**（760.30s / 12:40，任务 bkfnxpx7r，覆盖至 R1009）。与预测 89129 + 157（R1003-1009 新增 [metrics121 21 + manifest124 23 + report113 23 + runner124 22 + cli124 20 + annotation125 22 + schema114 26]）精确吻合，连续第十四次命中，全绿。
