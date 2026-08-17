@@ -4,10 +4,63 @@
 
 ---
 
-## 回归基线（Round 899-911 全量）
+## 回归基线（Round 912-918 全量）
 
-- **86860 passed + 22 skipped**（783.46s / 13:03，任务 b7kznezf4，覆盖至 R911）。与预测 86555 + 305（R899-911 新增）精确吻合，全绿。
-- 下一轮全量预期 ≈ **87060**（86860 + R912-918 新增 200：metrics108 31 + manifest111 30 + report100 29 + runner111 24 + cli111 27 + annotation112 27 + schema101 32）。
+- **87060 passed + 22 skipped**（774.60s / 12:54，任务 bviourk82，覆盖至 R918）。与预测 86860 + 200（R912-918 新增）精确吻合，全绿。
+- 下一轮全量预期 ≈ **87246**（87060 + R919-925 新增 186：metrics109 31 + manifest112 28 + report101 26 + runner112 25 + cli112 25 + annotation113 25 + schema102 26）。
+
+---
+
+## Round 925 — evaluation/schema.py 第三百六十九轮（26 测试）
+
+- 文件：`tests/test_evaluation_schema_edges102.py`（batch123，forbidden tokens 第三百九十五批）。
+- 新角度：annotation 顶层 required 恰 [annotation_version, doc_id]（chunk_boundary_anchors 可选）；boundary_anchor 全形（marker minLength 1、position 纯 enum 无 type、reason 可选、封闭）；chunk def required 4 + chunk_id/text minLength 1 + source_spans 可选 $ref；document metadata 仅 {"type": "object"}、13 props 与 13 required 全必填一致；validate 合法返回 None；errors 条目键序 [path, message, schema_path]；SCHEMAS_DIR 恰 4 文件；validate_file 接受 str 路径。
+- 下一步：metrics edges110（Round 926）。
+
+---
+
+## Round 924 — evaluation/annotation_metrics.py 第三百六十八轮（25 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges113.py`（batch122，edges 第三百批里程碑，forbidden tokens 第三百九十四批）。
+- 新角度：大小写敏感——normalize_text 保留大小写，marker "ab" 在流 "AB CD" 找不到 → missing（反向印证大写命中）；距离平局按生成顺序破（preds [2,4] 争 gt [3] → pi=0 胜 → P 0.5 R 1.0；preds [3] 争 gts [1,5] → gi=0 胜 → P 1.0 R 0.5，F1 均 2/3）；输出键序完整命中 4 键 / 有缺失 5 键（_missing_markers 居末）；figure_caption 键序 + PARSER 常量值；anchors 传字符串逐字符迭代 → AttributeError。
+- 踩坑：normalize_text 是否小写化记错（实测保留大小写），首轮 probe 两个 case 假设反了，重探后修正。
+
+---
+
+## Round 923 — evaluation/cli.py 第三百六十七轮（25 测试）
+
+- 文件：`tests/test_evaluation_cli_edges112.py`（batch121，forbidden tokens 第三百九十三批）。
+- 新角度：run 三 kwargs 全透传（kreuzberg + max_chars 555 + tolerance -3，负容差 argparse 照收）；--max-chars abc → SystemExit 2；validate-report 合法 JSON 形状不符 → rc 1 "[FAIL]"；inspect 顶层 list/string/42 三形态 → "JSON 顶层不是对象"；--output 父路径是文件 → FileExistsError 冒出（run_evaluation mkdir，cli 无兜底）。
+- 踩坑：source 断言漏写 f-string 前缀（print(f"[ERROR] 文档不存在: …)），首跑补 f 后全过。
+
+---
+
+## Round 922 — evaluation/runner.py 第三百六十六轮（25 测试）
+
+- 文件：`tests/test_evaluation_runner_edges112.py`（batch120，forbidden tokens 第三百九十二批）。
+- 新角度：_process_one 的 process_single 抛异常 → 冒出但 _per_doc 目录已建（mkdir 先于调用）；(doc, errors) 并存 → runner 层丢弃 doc 只留 errors[0]（与 metrics 层照算形成对照——丢弃发生在 _process_one）；单 chunk + 缺失 marker → no_predicted_boundaries 早退先于 marker 搜索 → _missing_markers 记 []；两 chunk + 缺失 marker → 记 ["ZZZ"]；wall_time total 真实 float >= 0；公开 per_doc 恰 4 键（_annotation_present 不外泄）；ef 循环异常同样冒出。
+- 踩坑：_run_with_ann 辅助函数初版引用模块级 doc_obj（测试内赋值是局部变量会 NameError），改为参数传入。
+
+---
+
+## Round 921 — evaluation/report.py 第三百六十五轮（26 测试）
+
+- 文件：`tests/test_evaluation_report_edges101.py`（batch119，forbidden tokens 第三百九十一批，report 变体 subprocess.run 恰 2）。
+- 新角度：build_provenance max_chars 800.0 → int 800、-5 原样；ratio 聚合遇 bool True 按整数 1 入算（[True, 0.5] → macro 0.75）；success 严格 `is True`（value 1 不计入 → 1/2=0.5）；counts True + 2 → 3；get_git_provenance 接受 str root；三版本常量分层（MANIFEST 1.0 / EVALUATOR 1.1 / REPORT 1.1）；devset categories_covered property 每次新 list + 6 键序。
+
+---
+
+## Round 920 — evaluation/manifest.py 第三百六十四轮（28 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges112.py`（batch118，forbidden tokens 第三百九十批）。
+- 新角度：_resolve_relative_path 直调空串 → "f 为空"（字段名透传）；"./a.pdf" 与 "x/../a.pdf" 归一放行；ghost annotation 照常加载（存在性推迟到 runner）；DocumentEntry/Manifest 冻结赋值 → FrozenInstanceError；ef source_type 默认 None/透传；重复 doc_id 双条均载（无唯一性）；project_root 不存在目录照常解析（resolve 非严格）；缺 ef 键 → ()；categories_covered 每次新 list。
+
+---
+
+## Round 919 — evaluation/metrics.py 第三百六十三轮（31 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges109.py`（batch117，forbidden tokens 第三百八十九批）。
+- 新角度：_PDF_BBOX_REQUIRED_TYPES 边界（caption/list_item 无 bbox → 0.0，table 免 → 1.0）；docx 仅 run_index → 1.0、出现 bbox 即无效；chunk ids [None] 撞 element_id None → 假命中 1.0（None==None 怪癖）；chunk 缺 ids 键 → 0.0；heading None↔None → 1.0；resource_path int → TypeError；绝对路径存在 base_dir None → 1.0；缺 content 键 + 空 text → equal True 但 P/R null empty_expected_and_actual；source_type "markdown" 双 null；docx 空 elements 交叉 null。
 
 ---
 
