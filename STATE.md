@@ -4,10 +4,202 @@
 
 ---
 
-## 回归基线（Round 822-833 全量）
+## 回归基线（Round 834-843 全量）
 
-- **84969 passed + 22 skipped**（466.24s / 07:46）。与预测 84680 + 289（R822-833 新增：23+26+22+20+21+24+23+24+25+26+30+25）精确吻合，全绿。
-- 下一轮全量预期 ≈ 85050（84969 + R834-837 的 26+29+36+26 = 117，R838+ 另计）。
+- **85235 passed + 22 skipped**（473.70s / 07:53）。与预测 84969 + 266（R834-843 新增，实际逐文件 collect 复核为 266）精确吻合，全绿。
+- 下一轮全量预期 ≈ 85352（85235 + R844-849 的 24+24+23+23+23+25 = 142，R850+ 另计）。
+
+---
+
+## Round 849 — evaluation/metrics.py 第二百九十三轮（25 测试）
+
+### 目标
+- 补强 edges99 未触及的角度（第二百二十三批）：**构造器四件套直测（_ratio(1) 强转 float、_bool_metric(1) 强转 True、_int_metric(True) 强转 1）**；_TEXT_TYPES 恰 7 含 table / _PDF_BBOX_REQUIRED_TYPES 恰 4 不含 table（双面锁定）；heading 为第二 chunk 首元素 → 1.0；document=None+error → 11 项 pipeline_failed + error_code "E"；_strip_unicode_whitespace 直测；图片绝对 rp 无 base_dir 直接命中；forbidden tokens 第三百一十九批
+
+### 改动
+- 新增 tests/test_evaluation_metrics_edges100.py（25 测试）
+
+### 撞墙记录
+- 1 fail 首跑：`"\x1d".isspace()` 在 Python 为 **True**（Group Separator 算空白，被删除）→ 改断言删空 + 用 \x00（NUL）当非空白保留例。
+
+### 下一步建议
+- manifest edges102（Round 850）。
+
+---
+
+## Round 848 — evaluation/schema.py 第二百九十二轮（23 测试）
+
+### 目标
+- 补强 edges89 未触及的角度（第二百二十二批，probe 实证）：**report 顶层 required 恰 5 项（expected_failures 可选）**；缺 summary → path=[]；provenance 缺 parser_name → path=["provenance"]；per_doc 条目缺 doc_id → path=["per_doc",0]；**报告 ef 条目不接受 path 键**（additionalProperties + 三字段 required）；forbidden tokens 第三百一十八批
+
+### 改动
+- 新增 tests/test_evaluation_schema_edges90.py（23 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- metrics edges100（Round 849 已做）。
+
+---
+
+## Round 847 — evaluation/annotation_metrics.py 第二百九十一轮（23 测试）
+
+### 目标
+- 补强 edges101 未触及的角度（第二百二十一批）：3 chunk 2 边界 tol=0 全精确 1.0；**容差边界等值（d=2 时 tol=2 命中含等、tol=1 未命中）**；**锚顺序依赖（先标 "CD" 再标 "AB" → "AB" 在流中存在却 missing）**；部分缺失只列后者；P=1/R=0.5 形态（第二锚 d=4 出界）；forbidden tokens 第三百一十七批
+
+### 改动
+- 新增 tests/test_evaluation_annotation_metrics_edges102.py（23 测试）
+
+### 撞墙记录
+- 设计期修正：P=1/R=0.5 例原用 marker "D" 作第二锚，但 search_from 推进后找不到 → 换 "E"（d=4 出容差）。
+
+### 下一步建议
+- schema edges90（Round 848 已做）。
+
+---
+
+## Round 846 — evaluation/cli.py 第二百九十轮（23 测试）
+
+### 目标
+- 补强 edges100 未触及的角度（第二百二十批）：_format_metric 名字超 36 不截断；run --parser kreuzberg 显式透传；inspect-doc 负 tolerance 接受；未知子命令 SystemExit 2；run 成功 stderr 为空；forbidden tokens 第三百一十六批
+
+### 改动
+- 新增 tests/test_evaluation_cli_edges101.py（23 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- annotation_metrics edges102（Round 847 已做）。
+
+---
+
+## Round 845 — evaluation/runner.py 第二百八十九轮（24 测试）
+
+### 目标
+- 补强 edges100 未触及的角度（第二百一十九批）：**报告顶层键序恰 6 项 + report_version 恒 1.1**；wall_time 完整 5 键形态；per_doc 键序恰 4 项；空 manifest 不建 _per_doc 目录；**ef 的 process_single 收 stub 路径 _per_doc/f1.json（位置参数捕获）**；单 doc summary counts sum=2 集成；forbidden tokens 第三百一十五批
+
+### 改动
+- 新增 tests/test_evaluation_runner_edges101.py（24 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- cli edges101（Round 846 已做）。
+
+---
+
+## Round 844 — evaluation/report.py 第二百八十八轮（24 测试）
+
+### 目标
+- 补强 edges89 未触及的角度（第二百一十八批）：ratio 值 False 参与 macro → 0.0；figure_caption_* 不在 _RATIO_METRICS；counts [-5,3] → sum -2；max_chars 传 str "800" 被 int() 接受；**build_devset_section 接真实 load_manifest 产物（集成）**；**get_git_provenance 传文件路径 → cwd 非法 → OSError 异常分支 dirty=True**；forbidden tokens 第三百一十四批
+
+### 改动
+- 新增 tests/test_evaluation_report_edges90.py（24 测试）
+
+### 撞墙记录
+- 1 fail 首跑：git 传文件路径预期 dirty=False，实际 NotADirectoryError 走异常分支 → dirty=True（docstring「失败时 dirty=true」唯一兑现处）→ 修正断言并注释。
+
+### 下一步建议
+- runner edges101（Round 845 已做）。
+
+---
+
+## Round 843 — evaluation/manifest.py 第二百八十七轮（25 测试）
+
+### 目标
+- 补强 edges100 未触及的角度（第二百一十七批）：pdf/docx 混合计数 2+1；**链式配对 d1→d2→d3 → 2 组**；devset_status "complete" 透传；无 ef 键 → 空元组；path_str 保留 "./samples/a.pdf" 原样；两 doc 同文件 → 2 文件 2 组；source_type 与扩展名解耦；forbidden tokens 第三百一十三批
+
+### 改动
+- 新增 tests/test_evaluation_manifest_edges101.py（25 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- report edges90（Round 844 已做）。
+
+---
+
+## Round 842 — evaluation/metrics.py 第二百八十六轮（27 测试）
+
+### 目标
+- 补强 edges98 未触及的角度（第二百一十六批）：page float 1.5 不渗漏（isinstance(int) 拦截）；bbox 含 inf → isfinite 拦截；bbox 四纯 float 合法；**图片空文件（0 字节）→ st_size>0 拦截 → 0.0**；两图一实一空 → 0.5；ghost 引用 → 0.0；docx 仅 relationship_id → 1.0；docx 空 locator → 0.0；elements 显式 None → TypeError；forbidden tokens 第三百一十二批
+
+### 改动
+- 新增 tests/test_evaluation_metrics_edges99.py（27 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- manifest edges101（Round 843 已做）。
+
+---
+
+## Round 841 — evaluation/schema.py 第二百八十五轮（26 测试）
+
+### 目标
+- 补强 edges88 未触及的角度（第二百一十五批）：document.schema.json 的 $id；**annotation additionalProperties=false 错误报在父路径 []（"Additional properties are not allowed ('zz_extra' was unexpected)"）**；**anchor items 必有 position（marker 反而不 required）**；同 doc 多字段错误按路径排序（doc_id→path→source_type）；两 doc 错误 doc0 先于 doc1；validate 成功返回 None；forbidden tokens 第三百一十一批
+
+### 改动
+- 新增 tests/test_evaluation_schema_edges89.py（26 测试）
+
+### 撞墙记录
+- 3 fail 首跑（anchor 形态按 schema 直觉写错）：roundtrip 锚缺 "position" → 补上；additionalProperties 断言路径写成 ["zz_extra"] → 实际父路径 []；「空对象锚合法」预期反了 → 改为断言缺 position 报错。追加 1 fail（Draft202012 措辞 "are not allowed ('x' was unexpected)" 非 "were not allowed"）→ 新 commit 修正（且发现 pytest|tail 管道掩盖退出码致首 commit 带着失败测试入库，后续每轮以 tail -1 输出人工确认为 0 failed 再提交）。
+
+### 下一步建议
+- metrics edges99（Round 842 已做）。
+
+---
+
+## Round 840 — evaluation/annotation_metrics.py 第二百八十四轮（23 测试）
+
+### 目标
+- 补强 edges99 未触及的角度（第二百一十四批）：**预测侧平局 (d,pi,gi) 先 pi=0 → P 0.5/R 1.0/F1 2/3**；**贪心非最优（可完美匹配但先吃近对 → 1 匹配 → 全 0.5）**；**空 chunk 中间位 quirk（join 双空格被压掉、find("")=pos 出边界、末 chunk 丢边界）**；position 未知字符串走 else=after；figure_caption 对富标注仍 null；forbidden tokens 第三百一十批
+
+### 改动
+- 新增 tests/test_evaluation_annotation_metrics_edges101.py（23 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- schema edges89（Round 841 已做）。
+
+---
+
+## Round 839 — evaluation/cli.py 第二百八十三轮（24 测试）
+
+### 目标
+- 补强 edges99 未触及的角度（第二百一十三批）：**run 参数捕获（--parser 默认 fallback、--max-chars 555、--tolerance-chars 9 透传）**；inspect-doc source_path 存在行；parser_version 缺失 → "fallback v?"；空文档 counts 0/0；**排序中段（bool < 数值 < dict < null 相对位置）**；inspect 目录输入 rc2；forbidden tokens 第三百零九批
+
+### 改动
+- 新增 tests/test_evaluation_cli_edges100.py（24 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- annotation_metrics edges101（Round 840 已做）。
+
+---
+
+## Round 838 — evaluation/runner.py 第二百八十二轮（24 测试）
+
+### 目标
+- 补强 edges99 未触及的角度（第二百一十二批）：_process_one 失败路径直测（(None,[err]) → image_dir None + err.to_dict()；(None,[]) → "unknown"）；per_doc 含 figure_caption 三连 null（runner 级装配）；**合法标注空 anchors → no_ground_truth_anchors 透传**；**image_dir 目录存在才传 image_base_dir（现造 x.png → ratio 1.0）**；build_provenance kwargs 捕获（project_root/parser_name/max_chars/首个 parser_version）；forbidden tokens 第三百零八批
+
+### 改动
+- 新增 tests/test_evaluation_runner_edges100.py（24 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- cli edges100（Round 839 已做）。
 
 ---
 
