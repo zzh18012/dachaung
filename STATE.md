@@ -4,11 +4,60 @@
 
 ---
 
-## 回归基线（Round 1024-1037 全量）
+## Round 1044 — evaluation/metrics.py 第四百八十八轮（23 测试）
 
-- **89891 passed + 22 skipped**（501.28s / 8:21，任务 bgy81dnix，覆盖至 R1037）。与预测 89732 + 159（R1031-1037 新增 [metrics125 22 + manifest128 23 + report117 22 + runner128 21 + cli128 25 + annotation129 21 + schema118 25]）精确吻合，连续第十八次命中，全绿。
-- 前一基线 89732（b0av3p15c，504.73s，覆盖至 R1030）。
-- 下一轮全量预期 ≈ **89891 + R1038-1044 新增**（metrics126 起第 482 轮循环）。
+- 文件：`tests/test_evaluation_metrics_edges127.py`（batch242，edges 第四百二十批，forbidden 第五百一十五批）。
+- 新角度（真实 parser 产物直喂 + 因果更正）：metrics 126 轮全部手工构造 document，本批 process_single 真实解析 python-docx 文档后 to_dict() 直喂 compute_automatic_metrics；真实 locator 形状 {"paragraph_index": 0, "section": 0}（0 基索引 + section 双键同现）；**因果更正**——edges126 板 0.75 的真因是 table 带 page 键（docx 侧禁 page/bbox），非 idx 0，本批以真实双 idx 0 → ratio 1.0 更正（键在场即有效，无 >= 1 下限）；真实 silent_drop 三变体（欠供 3 / 过供触底 0 / 类型缺席 2）；同屏因果对照（真实板 1.0 vs page 键板 0.0）。
+
+---
+
+## Round 1043 — evaluation/schema.py 第四百八十七轮（24 测试）
+
+- 文件：`tests/test_evaluation_schema_edges119.py`（batch241，edges 第四百一十九批，forbidden 第五百一十四批）。
+- 新角度（真实报告单点突变矩阵）：真实 docx 穿真实管线产出报告（per_doc metrics 恰 20 键）作基底，四单键突变各恰 1 错、路径精确——devset.status→"bogus" enum 错 @ ['devset','status']；per_doc[0].source_type→"txt" enum 错 @ ['per_doc',0,'source_type']（含数组下标）；provenance 删 parser_name required 错 @ ['provenance']；summary.silent_drop_total→"x" 类型错（'integer','null' 联合）。此前 schema 测试全用手工最小 payload（常并发多错），edges75 的 run_evaluation 报告是 patch 空板。
+
+---
+
+## Round 1042 — evaluation/annotation_metrics.py 第四百八十六轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges130.py`（batch240，edges 第四百一十八批，forbidden 第五百一十三批）。
+- 新角度（marker 顺序依赖 + raw/normalized 不对称）：逆序 anchor 对 [DEF-after, ABC-after] → DEF 先命中推进 search_from 后 ABC missing，但 P/R/F1 全 1.0（吞没静默藏 missing、分数无感，与 edges129 同 marker 复制家族正交）；marker 不 normalize / stream normalize 不对称三角——尾空格 "ABC " 借 join 空格命中（全 1.0）、双空格 "ABC  D" 永不命中（P 0.0/R null/F1 null）、chunk 文本 \n\n 与 \t 压成单空格后单空格 marker 照常命中；raw 空白 chunk 板单 pred 双 gt 争用 → P 1.0/R 0.5/F1 0.6666666666666666。
+
+---
+
+## Round 1041 — evaluation/cli.py 第四百八十五轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges129.py`（batch239，edges 第四百一十七批，forbidden 第五百一十二批）。
+- 新角度（--max-chars 旗标翻转真实 docx 结局）：同一真实文件仅改旗标 50 → 全绿 / 30 → 真实结构分块器 chunker_failed；真实管线失败时 CLI run 仍退出 0（结构化失败是一次成功的评测），计数行翻转（成功 1，失败 0 → 成功 0，失败 1），stderr 恒空；失败管线产出的报告仍过 RS 且 validate-report 对同一报告 rc 0 PASS——报告合法性与管线成败正交。
+
+---
+
+## Round 1040 — evaluation/runner.py 第四百八十四轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges129.py`（batch238，edges 第四百一十六批，forbidden 第五百一十一批）。
+- 新角度（真实 docx 穿透真实 process_single 全链）：此前 runner 测试 107/125 patch 掉 process_single、其余喂 b"x" 伪字节；真实 python-docx 文档穿未打补丁管线（fallback parser → 结构分块 → 校验 → 指标 → 报告 RS）首次在 runner 层锁定——mc 50 全绿板（pipeline/schema_valid True、element_count_total 2、docx_locator 1.0、text_preservation True、报告过 RS）；同板加 annotation → 两段合并单 chunk 无预测边界（P/F1 null no_predicted_boundaries + R 0.0）；mc 30/25 真实结构分块器小上限失败（error_code chunker_failed、element_count_total/schema_valid 双 null pipeline_failed、汇总 rate 0.0）。
+
+---
+
+## Round 1039 — evaluation/report.py 第四百八十三轮（23 测试）
+
+- 文件：`tests/test_evaluation_report_edges118.py`（batch237，edges 第四百一十五批，forbidden 第五百一十批）。
+- 新角度（真实生产者 → 真实聚合者全管线）：此前 aggregate_summary 测试全部手工构造 metrics dict；本批 compute_automatic_metrics + figure_caption_prf + chunk_boundary_prf（_tolerance_chars pop 后）真实产出 20 键 metrics 喂聚合。三文档异构（pdf 带 expectations / docx / 纯 error）：counts sum 3 participating 2、success 2/3、silent 2 同屏；pdf/docx 定位通道分离经真实指标验证（各 1.0/1/2）；chunk_boundary_f1 全 0 参与 → macro None；figure_caption_* 三键不在 _RATIO_METRICS（12 键闭集）。
+
+---
+
+## Round 1038 — evaluation/metrics.py 第四百八十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges126.py`（batch236，edges 第四百一十四批，forbidden 第五百零九批）。
+- 新角度（docx 混合定位板 + schema-指标张力）：四元素 docx 板（idx 0/idx 2/heading idx 5/table page-only）单次调用 docx_locator 0.75——**注：R1044 已更正因果——0.75 真因是 table 带 page 键，idx 0 实为有效**；schema-指标张力（schema_valid True 而 locator 计无效并存）；heading first-id 0.0 与 pdf_locator null not_pdf_document 镜像同屏。
+
+---
+
+## 回归基线（Round 1038-1044 全量）
+
+- **90050 passed + 22 skipped**（514.32s / 8:34，任务 bi0dbrp1i，覆盖至 R1044）。与预测 89891 + 159（R1038-1044 新增 [metrics126 22 + report118 23 + runner129 23 + cli129 22 + annotation130 22 + schema119 24 + metrics127 23]）精确吻合，连续第十九次命中，全绿。
+- 前一基线 89891（bgy81dnix，501.28s，覆盖至 R1037）。
+- 下一轮全量预期 ≈ **90050 + R1045 起新循环新增**（manifest129 起第 489 轮循环；R1045 23 + R1046 22 + R1047 22 + R1048 21 已知 +49，R1049 起待计）。
 
 ---
 
