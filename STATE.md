@@ -4,6 +4,55 @@
 
 ---
 
+## Round 1092 — evaluation/schema.py 第五百三十六轮（22 测试）
+
+- 文件：`tests/test_evaluation_schema_edges126.py`（batch291，edges 第四百六十八批，forbidden 第五百六十三批）。
+- 新角度（chunk 不变量 schema 执法 + 报告 def 梯度收口）：**chunk source_element_ids 空列表即拒 "[] should be non-empty"**——CLAUDE.md"每 chunk 非空 source_element_ids"不变量由 minItems 执法（真实文档变异路径首锁）；confidence 下界 -0.1 → "less than the minimum of 0"（edges112 只锁上界）；metadata title 置 None 照过（nullable）；**evaluation-report 三 def 梯度**：devset 闭仓 + required 6、provenance 闭仓 + required 9、**summary 既无 required 也 additionalProperties True——全开暗仓**（报告 schema 第四种纪律形态）。
+
+---
+
+## Round 1091 — evaluation/annotation_metrics.py 第五百三十五轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges137.py`（batch290，edges 第四百六十七批，forbidden 第五百六十二批）。
+- 新角度（marker 空白形态 + 多缺失锚序 + 流尾 after 膝盖）：marker " BBB " 首尾单空格照命中（marker 不 strip、单空格形态流里真实存在）；"BBB  mid" 双空格即 missing（edges118 TAB 变体的空白孪生）；**多缺失保锚序** [X1, X2, X3]——命中 BBB 夹中间不打断；**流尾 after 膝盖**：末 chunk 40 字符整段做 marker → gt 落流尾、d=40——tol 30 全 0.0（找到但无一命中）、tol 50 全 1.0。
+
+---
+
+## Round 1090 — evaluation/cli.py 第五百三十四轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges136.py`（batch289，edges 第四百六十六批，forbidden 第五百六十一批）。
+- 新角度（heading 度量渲染点亮 + complete 真跑过验）：真实 heading 文档 inspect-doc——"  heading_boundary_compliance          1.0000  (ok)" 渲染层首次点亮（edges134 只见过 null）；dict 行 "heading=1, paragraph=2" heading 码点排首；counts "elements=3 chunks=2"（R1079 强制断点形态浮出 CLI）；**complete 真跑过验**——devset_status complete 真实 run 报告 validate-report rc 0 [OK]（edges30 只验 run rc 0）。
+
+---
+
+## Round 1089 — evaluation/runner.py 第五百三十三轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges136.py`（batch288，edges 第四百六十五批，forbidden 第五百六十批）。
+- 新角度（heading 文本锚点 + 标注身份端到端不设防）：锚 marker "Late Title"（heading 元素文本）——heading 恒 LEAD 其 chunk（R1079 结构保证）→ gt 恰落强制断点 → P/R/F1 全 1.0，标题锚天然零距离；**annotation doc_id 端到端不校验**——doc_id 写 "WRONG-ID" 照常生效全 1.0（runner 129 行拿到就用）；对照：无标注 → boundary null no_annotation 而 heading_boundary_compliance 仍 1.0（heading 度量不依赖标注通道）。
+
+---
+
+## Round 1088 — evaluation/report.py 第五百三十二轮（21 测试）
+
+- 文件：`tests/test_evaluation_report_edges125.py`（batch287，edges 第四百六十四批，forbidden 第五百五十九批 report 变体）。
+- 新角度（退化 run 的报告形态三联）：**空清单 12 项 macro 全同形**——documents [] 真实 run 的 ratio_macro_averages 恰 12 键、值集合只有 {null, 0, 0} 一种；**ef-only 板**——per_doc []、ef 条目四键 matches True、success {0, 0, rate None}（ef 命中不点亮 pipeline 成功账）；**仓外 provenance**——tmp 非 git 仓 → git_commit None / git_dirty False、fallback parser_version None、max_chars 如实入档。
+
+---
+
+## Round 1087 — evaluation/manifest.py 第五百三十一轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges135.py`（batch286，edges 第四百六十三批，forbidden 第五百五十八批）。
+- 新角度（ef 条目闭仓名册 + devset_status 枚举双值）：**ef 条目没有 annotation_file / expectations 通道**——塞任一即拒 "Additional properties are not allowed"（标注与期望是 document 账本专属）；expected_error_code 空串 → "'' should be non-empty"；**devset_status 是枚举 ['complete', 'incomplete']**——"whatever" 拒；**"complete" 照收并经真实 run 流入报告 devset.status == "complete"**（语料库全程未用过的另一半）。
+
+---
+
+## Round 1086 — evaluation/metrics.py 第五百三十轮（22 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges133.py`（batch285，edges 第四百六十二批，forbidden 第五百五十七批）。
+- 新角度（图片双候选解析 + 多类型 silent 混账算术）：**image_resource_exists_ratio 双候选**——候选一 Path(rp) 原样（相对即 CWD 相对，chdir 后无 base_dir 也命中）；候选二 image_base_dir / **basename**（丢目录）——resource_path 带子目录时文件落 base 直下 → 1.0（候选二救场）、只在子目录 → 0.0；**多类型 silent 混账**：{para 2, heading 5} 对实际 {3, 1} → silent 4（under 每类型原谅、over 逐类型相加）。
+
+---
+
 ## Round 1085 — evaluation/schema.py 第五百二十九轮（24 测试）
 
 - 文件：`tests/test_evaluation_schema_edges125.py`（batch284，edges 第四百六十一批，forbidden 第五百五十六批）。
@@ -141,6 +190,13 @@
 
 - 文件：`tests/test_evaluation_manifest_edges132.py`（batch265，edges 第四百四十二批，forbidden 第五百三十七批）。
 - 新角度（图片通路的清单可追溯性）：expectations 带 **image 类型**首次走真实 run——{image 1, paragraph 3} 精确相抵 → silent {0}、total 0；过索 image 2 → silent 1（图片也能造 silent drop）；"(空段落)" 占位符标注锚经 run_evaluation 全 1.0（直调层结论整装复现）；无 categories 时 devset.categories_covered 是**空列表**（[] 而非 null）。
+
+---
+
+## 回归基线 90964（第 25 次精确命中）
+
+- b4c5eq4rd（R1085 后启动）实测 **90964 passed, 22 skipped（540.79s）**，与预测 90964（90830 + R1080-1085 六轮 134）**分毫不差**——第 25 次连续精确命中。
+- 下一回归 bh8aag9v7（R1092 后启动）：预测 **91117**（90964 + R1086-1092 七轮 22+23+21+21+22+22+22=153）。
 
 ---
 
