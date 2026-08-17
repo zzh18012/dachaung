@@ -4,6 +4,65 @@
 
 ---
 
+## 回归基线（Round 989-1000 全量）
+
+- **88801 passed + 22 skipped**（784.51s / 13:04，任务 bm15ipl5z，覆盖至 R988）。与预测 88475 + 326 精确吻合，连续第十一次命中。
+- **88963 passed + 22 skipped**（751.42s / 12:31，任务 bm959m5co，覆盖至 R995）。与预测 88801 + 162（R989-995 新增 [metrics119 22 + manifest122 23 + report111 22 + runner122 20 + cli122 22 + annotation123 22 + schema112 31]）精确吻合，连续第十二次命中，全绿。
+- 下一轮全量预期 ≈ **89287**（88963 + R996-1002 新增 324：R996-1000 已知 [metrics120 24 + manifest123 23 + report112 24 + runner123 26 + cli123 22] = 119 + R1001-1002 待定）。
+
+---
+
+## Round 995 — evaluation/schema.py 第四百三十九轮（31 测试）
+
+- 文件：`tests/test_evaluation_schema_edges112.py`（batch193，edges 第三百七十一批，forbidden 第四百六十五批）。
+- 新角度（document.schema.json 行为面）：allOf 恰 6 分支；pdf_locator 的 bbox 竟可选（只给 page 照常 VALID）；ipynb 缺 cell_type / enum 拒 "python" / "raw" 合法；docx_locator 空 {} → "{} should be non-empty"；bbox 字符串项与 3 项分别拒；confidence 1.5 超 maximum；source_hash 大写 hex 拒；schema_version const；element 双空串 anyOf 拒。
+- 踩坑：element 必填键实为 element_id/type/**parent_id**/**source_locator**/**confidence**/metadata（locator 键名不是 locator，confidence 是必填）。
+
+---
+
+## Round 994 — evaluation/annotation_metrics.py 第四百三十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges123.py`（batch192，edges 第三百七十批，forbidden 第四百六十四批）。
+- 新角度：marker "B C" 跨 chunk 分隔符照常命中；双空格/换行被 normalize_text 压成单空格命中；d == tolerance 闭区间含等号命中、tol-1 即 0.0。
+
+---
+
+## Round 993 — evaluation/cli.py 第四百三十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges122.py`（batch191，edges 第三百六十九批，forbidden 第四百六十三批）。
+- 新角度：run 后 validate_file FileNotFoundError 不在 catch 列表 → 原样上抛（崩溃非 rc 码）；inspect-doc 空文件 rc 1 "JSON 解析失败: Expecting value"；顶层字符串 '"hello"' rc 1 "JSON 顶层不是对象"；空 dict rc 0 "elements=0 chunks=0"。
+
+---
+
+## Round 992 — evaluation/runner.py 第四百三十六轮（20 测试）
+
+- 文件：`tests/test_evaluation_runner_edges122.py`（batch190，edges 第三百六十八批，forbidden 第四百六十二批）。
+- 新角度：process_single 抛异常无 try/except 兜底 → RuntimeError 传播且报告不落盘；ef 文档实际成功 → actual_error_code None、matches False（None != 期望码）。
+
+---
+
+## Round 991 — evaluation/report.py 第四百三十五轮（22 测试）
+
+- 文件：`tests/test_evaluation_report_edges111.py`（batch189，edges 第三百六十七批，forbidden 第四百六十一批）。
+- 新角度：per_doc 缺 "metrics" 键 → KeyError 'metrics'（.get 只在内层用）；importlib.metadata.version 抛通用 Exception → 三包全 None；3 文档 1 成功 → rate 精确 1/3；ratio_macro_averages 键序 == _RATIO_METRICS 元组序。
+- 踩坑：needle 'r["metrics"].get(name, {}).get("value")' 实际出现 **5** 次（counts/ratio/silent 各处 comprehension）。
+
+---
+
+## Round 990 — evaluation/manifest.py 第四百三十四轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges122.py`（batch188，edges 第三百六十六批，forbidden 第四百六十批）。
+- 新角度：BOM 清单 → ManifestError "Unexpected UTF-8 BOM"（对照 BOM 标注静默落 None）；顶层 JSON 数组 → EvalSchemaError "[] is not of type 'object'"；categories 元组保留重复 ('a','a') 而 covered 集合去重；project_root 传 str 照常；波浪号路径当普通目录名放行。
+
+---
+
+## Round 989 — evaluation/metrics.py 第四百三十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges119.py`（batch187，edges 第三百六十五批，forbidden 第四百五十九批）。
+- 新角度：schema_check_exception 捕 ValueError 类名；空 error dict {} 为 falsy → error_code None（与 {"code":...} 传值分歧）；resource_path 绝对路径直取；document/error 双 None 基线 13 指标。
+
+---
+
 ## 回归基线（Round 961-974 全量）
 
 - **88475 passed + 22 skipped**（806.69s / 13:26，任务 bxhv2ehqb，覆盖至 R974）。与预测 88161 + 314（R961-974 新增）精确吻合，连续第十次命中，全绿。
