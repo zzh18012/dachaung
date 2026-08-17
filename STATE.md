@@ -4,11 +4,60 @@
 
 ---
 
-## 回归基线（Round 1017-1030 全量）
+## 回归基线（Round 1024-1037 全量）
 
-- **89732 passed + 22 skipped**（504.73s / 8:24，任务 b0av3p15c，覆盖至 R1030）。与预测 89582 + 150（R1024-1030 新增 [metrics124 20 + manifest127 20 + report116 20 + runner127 21 + cli127 23 + annotation128 23 + schema117 23]）精确吻合，连续第十七次命中，全绿。
-- 前一基线 89582（bwn6xw7de，818.08s，覆盖至 R1023）。
-- 下一轮全量预期 ≈ **89732 + R1031-1037 新增**（metrics125 起第 475 轮循环）。
+- **89891 passed + 22 skipped**（501.28s / 8:21，任务 bgy81dnix，覆盖至 R1037）。与预测 89732 + 159（R1031-1037 新增 [metrics125 22 + manifest128 23 + report117 22 + runner128 21 + cli128 25 + annotation129 21 + schema118 25]）精确吻合，连续第十八次命中，全绿。
+- 前一基线 89732（b0av3p15c，504.73s，覆盖至 R1030）。
+- 下一轮全量预期 ≈ **89891 + R1038-1044 新增**（metrics126 起第 482 轮循环）。
+
+---
+
+## Round 1037 — evaluation/schema.py 第四百八十一轮（25 测试）
+
+- 文件：`tests/test_evaluation_schema_edges118.py`（batch235，edges 第四百一十三批，forbidden 第五百零八批）。
+- 新角度（3×3 跨 schema 矩阵收尾）：edges117 锁过 annotation 行后补齐四格——report→manifest 4 错、report→annotation 3 错、manifest→report 6 错、manifest→annotation 3 错；annotation required 集恰 2 键（annotation_version/doc_id）；全矩阵规律：对角线 PASS、非对角线恰 1 个 addl 错、required 错数 = 目标 required 数（3/5/2）。
+
+---
+
+## Round 1036 — evaluation/annotation_metrics.py 第四百八十轮（21 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges129.py`（batch234，edges 第四百一十二批，forbidden 第五百零七批）。
+- 新角度（分母极端 + 吞没两方向）：10 chunk 单 anchor → P 1/9 精确浮点 0.1111111111111111 + F1 浮点工件 0.19999999999999998（≠0.2）；后缀延伸吞没 [AB, ABC] → ABC missing（与 edges111 前缀遮蔽成方向互补）；9 个重复 marker 大批发被 search_from 连环推进折叠成单有效 anchor（8 missing、P/R/F1 全 1.0——一对一镜像 9R/1P 不可达，吞没先于匹配）。
+
+---
+
+## Round 1035 — evaluation/cli.py 第四百七十九轮（25 测试）
+
+- 文件：`tests/test_evaluation_cli_edges128.py`（batch233，edges 第四百一十一批，forbidden 第五百零六批）。
+- 新角度（五类型真实文档 inspect-doc 全屏合流）：与 R1014/R1028 误喂全家福成镜像——全真值表头四行 + 四桶全真值同屏（bool true/true/false、数值 4 位小数 1.0000/0.8000/0.0000/整数 5、dict 五键字母序逗号 join、null 9 行各带 reason）；precision 0.8000 与 intact 1.0000 与 text_preservation false 三分裂。
+
+---
+
+## Round 1034 — evaluation/runner.py 第四百七十八轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges128.py`（batch232，edges 第四百一十批，forbidden 第五百零五批）。
+- 新角度（_per_doc 三方生命周期合流）：doc stub 与 ef stub 双双 unlink、仅 images-<hash 前 16 字符> 目录留下（目录名截 32 位 hash 之半）；图片比率与目录存在性解耦（images 目录真实存在但无 image 元素 → null no_image_elements，元素驱动）；wall_time 五键结构 + ef matches True 同屏。
+
+---
+
+## Round 1033 — evaluation/report.py 第四百七十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_report_edges117.py`（batch231，edges 第四百零九批，forbidden 第五百零四批）。
+- 新角度（全 summary 离散板单次聚合）：3 行 metrics 板 12 ratio 各持不同参与签名（participating 0/1/2/3 全出现、not_evaluated 恒等式）；float 工件锁定 cb_f1 0.6000000000000001（≠0.6）、recall 0.6666666666666666、True/False 参与 macro 得 0.5；counts 半参与（5+None+7→12/2）、success 2/3、silent [2,0,None]→2 同屏。
+
+---
+
+## Round 1032 — evaluation/manifest.py 第四百七十六轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges128.py`（batch230，edges 第四百零八批，forbidden 第五百零三批）。
+- 新角度（富 manifest 单次加载合流）：documents 列表序保持文件序（[d2,d1,d3]）；倒指配对（d2 先出现 paired_with 指向后出的 d1）content_group_count 仍 2；categories 跨文档交错去重排序；path 内部 "./"（samples/./a.pdf）path_str 原样保留且 resolved 与干净路径等价（edges101 只锁过前缀变体）。
+
+---
+
+## Round 1031 — evaluation/metrics.py 第四百七十五轮（22 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges125.py`（batch229，edges 第四百零七批，forbidden 第五百零二批）。
+- 新角度（五类型异构单调用合流）：schema_valid True + pdf_locator 0.8（paragraph page-only 唯一失分）+ silent 3（超额供给类型贡献 0）+ ecbt 全 5 键 + heading 1.0（ids[0]）+ intact 1.0 + image 0.0 同屏；page-only 五类型横扫 list_item/heading/paragraph 0.0 vs image/table 1.0（bbox 豁免类含 image，与 R1017 七文本类型矩阵互补）。
 
 ---
 
