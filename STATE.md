@@ -4,6 +4,34 @@
 
 ---
 
+## Round 1065 — evaluation/metrics.py 第五百零九轮（23 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges130.py`（batch264，edges 第四百四十一批，forbidden 第五百三十六批）。
+- 新角度（真实 image 元素指标板 + 磁盘状态因果对）：真实嵌图 docx 直跑 compute——ecbt {paragraph 3, image 1}/ect 4/docx_locator 1.0（image locator 的 rel 族键不 invalidate）；image ratio 在 image_base_dir=None 下仍 1.0（绝对 resource_path 使 base dir 形同虚设，与 inspect-doc 口径一致）；**磁盘状态因果对**——同一 doc dict，PNG 在盘 1.0、unlink 0.0、截断 0 字节也 0.0（存在性检查 `is_file() and st_size > 0`，空文件等同缺失）；"(空段落)" 占位符 type=paragraph 与真实文本同权计入保持性账本（全绿）。
+
+---
+
+## Round 1064 — evaluation/schema.py 第五百零八轮（22 测试）
+
+- 文件：`tests/test_evaluation_schema_edges122.py`（batch263，edges 第四百四十批，forbidden 第五百三十五批）。
+- 新角度（真实 image 元素 vs anyOf 双通道）：真实嵌图产物过 document.schema（image locator 四键 {paragraph_index, section, relationship_id, target_partname}——docx_locator 开放性延伸到 rel 族键）；**anyOf 违例原始面目**——双剥 content+resource_path → 恰 1 错 @ ['elements',2]，message 以实例 repr 开头、"is not valid under any of the given schemas" 收尾，schema_path 恰 [...,'items','anyOf']；OR 语义——content 单独在场即恢复通过。
+
+---
+
+## Round 1063 — evaluation/annotation_metrics.py 第五百零七轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges133.py`（batch262，edges 第四百三十九批，forbidden 第五百三十四批）。
+- 新角度（"(空段落)" 占位符作标注锚，真实嵌图文档）：mc 80 双 chunk 板 marker "(空段落)" before → 全 1.0（parser 合成占位符成为合法 gold 边界）；mc 40 下占位符**独立成 chunk**（chunks[2] == "(空段落)"，单锚 P 0.25/R 1.0/F1 0.4）；**单 chunk 早退对 marker 存在性全盲**——<2 chunk 分支不做匹配，锚里混入不存在的 PNGIMAGE 也不进 missing（键缺席）、R 固定 0.0；零锚对照三 null（R 也 null）——R 0.0 vs null 分界在"有无锚"。
+
+---
+
+## Round 1062 — evaluation/cli.py 第五百零六轮（24 测试）
+
+- 文件：`tests/test_evaluation_cli_edges132.py`（batch261，edges 第四百三十八批，forbidden 第五百三十三批）。
+- 新角度（inspect-doc 渲染真实嵌图文档 JSON）：inspect-doc 固定 image_base_dir=None 但绝对 resource_path 照亮图片 ratio 1.0000 (ok)——与 runner 口径一致；**`_tolerance_chars` 伪指标泄漏**（runner pop、inspect-doc 不 pop，按 int 组渲染 "30 (ok)"）；dict 分支真实首用（element_count_by_type → "image=1, paragraph=3"）；null 组排尾 + reason=None 字面渲染 "(None)"（error_code）；parser 行 "fallback v" 直连版本串。
+
+---
+
 ## Round 1061 — evaluation/runner.py 第五百零五轮（22 测试）
 
 - 文件：`tests/test_evaluation_runner_edges132.py`（batch260，edges 第四百三十七批，forbidden 第五百三十二批）。
@@ -28,7 +56,7 @@
 ## 回归基线 90360（第 21 次精确命中）
 
 - baipnpws2（R1051 后启动）实测 **90360 passed, 22 skipped（515.07s）**，与预测 90360（90206 + R1052-1058 七轮 23+22+22+21+22+23+21=154）**分毫不差**——第 21 次连续精确命中。
-- 下一回归：R1065 后启动，预测 = 90360 + R1059-1065 七轮实测之和（R1059=22、R1060=24、R1061=22 已定，余待写）。
+- 下一回归 btdldmddh（R1065 后启动）：预测 **90520**（90360 + R1059-1065 七轮 22+24+22+24+23+22+23=160）。
 
 ---
 
