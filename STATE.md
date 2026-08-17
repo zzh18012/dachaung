@@ -4,6 +4,132 @@
 
 ---
 
+## Round 1061 — evaluation/runner.py 第五百零五轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges132.py`（batch260，edges 第四百三十七批，forbidden 第五百三十二批）。
+- 新角度（**真实嵌入图片**走通全链路，corpus 首次 add_picture）：手工构造 1x1 PNG（struct+zlib 零新依赖）嵌入 docx → image_resource_exists_ratio {1.0, None} + summary {1.0,1,0}——图片指标首次用真实磁盘文件点亮；落盘真相 `_per_doc/images-<sha>/image_<sha8>_para1_00.png`（images 目录直接在 _per_doc 下）且字节与构造 PNG 逐字节相等（blob 原样透传）；承载段同时产 "(空段落)" 文本元素 + image 元素（content None/resource_path 非 null/paragraph_index 同为 1）；image 计入 element_count_total（4）。
+
+---
+
+## Round 1060 — evaluation/report.py 第五百零四轮（24 测试）
+
+- 文件：`tests/test_evaluation_report_edges121.py`（batch259，edges 第四百三十六批，forbidden 第五百三十一批 report 变体）。
+- 新角度（好+坏同列 documents 真实混合板，参与语义三分）：corrupt docx 以**普通 document** 入场（edges119 走 ef 被排除）——success_rates total 数所有文档（2→rate 0.5）、counts 只数非 None（{sum 2, participating 1}）、ratio macro 只数非 null；12 个 ratio 指标同 run 按 participation 精确 6/6 分半（六项 {1.0,1,1} / 六项 {None,0,2}）——三种 null 成因同屏（pipeline_failed / 源类型门控 pdf_locator / 结构缺失 image+heading+boundary）；corrupt 的 error_code 是 **metrics 成员**非顶层键；per_doc 保 manifest 序。
+
+---
+
+## Round 1059 — evaluation/manifest.py 第五百零三轮（22 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges131.py`（batch258，edges 第四百三十五批，forbidden 第五百三十批）。
+- 新角度（清单字段 → 报告字段全链路可追溯）：一次真实 run 让 manifest 可选字段的下游效果全部显形——expectations {paragraph 5} → per-doc silent {3,None} → 汇总 silent_drop_total 3；真实标注（marker "CCC third" before）→ boundary P/R/F1 全 1.0；categories ["zeta","alpha"] → devset.categories_covered 排序 ["alpha","zeta"]；devset 六键全屏真实值锁定；加载、运行、聚合三段贯穿。
+
+---
+
+## 回归基线 90360（第 21 次精确命中）
+
+- baipnpws2（R1051 后启动）实测 **90360 passed, 22 skipped（515.07s）**，与预测 90360（90206 + R1052-1058 七轮 23+22+22+21+22+23+21=154）**分毫不差**——第 21 次连续精确命中。
+- 下一回归：R1065 后启动，预测 = 90360 + R1059-1065 七轮实测之和（R1059=22、R1060=24、R1061=22 已定，余待写）。
+
+---
+
+## Round 1058 — evaluation/metrics.py 第五百零二轮（21 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges129.py`（batch256，edges 第四百三十四批，forbidden 第五百二十九批）。
+- 新角度（markdown 装饰的上游起源 + 合并 chunk 保持性）：table 元素的 element.content 在 parser 阶段就已是 markdown（"| cell one |\n| --- |"，原始 cell 文本不复存在）——装饰在分块上游、chunker 只透传；正因装饰上游，保持性全绿（multiset P/R 1.0 + preservation True + intact 1.0）；heading+paragraph 两元素 mc 200 合并单 chunk（单空格 join），source_element_ids 双在场——多元素一 chunk 真实形态。
+
+---
+
+## Round 1057 — evaluation/schema.py 第五百零一轮（23 测试）
+
+- 文件：`tests/test_evaluation_schema_edges121.py`（batch255，edges 第四百三十三批，forbidden 第五百二十八批）。
+- 新角度（locator 定义的严格性倒挂）：document.schema 两 locator def 均 additionalProperties: true——docx_locator 只要求 minProperties 1、pdf_locator 只要求 page，**跨族键不禁**（docx 元素带 page/bbox 照过 schema 而 metrics 计无效——schema 宽指标严在 def 层与真实文档双重锁死）；真实三类型 docx 解析产物过 document.schema；pdf 分支正要求（改 source_type 后每元素一条 page required 错）；真实基底 chunk 空引用恰 1 错 "[] should be non-empty"。
+
+---
+
+## Round 1056 — evaluation/annotation_metrics.py 第五百轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges132.py`（batch254，edges 第四百三十二批，forbidden 第五百二十七批）。
+- 新角度（markdown 表格锚 + 真实文本精确膝关节）：标注 marker "| cell" before 直接命中 parser 渲染的 markdown 文本 → 全 1.0（锚对渲染后形态工作）；真实文本精确膝关节——marker "AAA first" after → gt 9/pred 25/距离恰 16，tol 15 全 0.0、tol 16 全 1.0（真实文本 d=|len(chunk)-len(marker)| 代数验算）；完整 marker（== chunk 文本）d=0 任意容差全 1.0（膝关节消失对照）。
+
+---
+
+## Round 1055 — evaluation/cli.py 第四百九十九轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges131.py`（batch253，edges 第四百三十一批，forbidden 第五百二十六批）。
+- 新角度（--max-chars 地板膝关节 31/32）：StructuralChunker 绝对地板 max_chars >= 32（< 32 抛 ValueError "max_chars 过小"）——31 → chunker_failed（成功 0，失败 1）、32 → 成功，rc 均 0；地板与文档内容无关（10+11 字符小文档内容远低于 31 在 mc 31 照样失败，失败读旗标不读内容）；此前 R1041 用 50/30 两点、本批锁死精确膝。
+
+---
+
+## Round 1054 — evaluation/runner.py 第四百九十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges131.py`（batch252，edges 第四百三十批，forbidden 第五百二十五批）。
+- 新角度（双真实 docx 并跑：成功而无残骸）：两份真实 python-docx 文档（3 类型富板 + 2 段素板）同 run 双成功；成功路径 _per_doc **空**（doc stub 双 unlink、真实 docx 无图片 → 无 images 目录——与 R1034 patch 板留 images-<hash16> 正交、与 R1047 失败路径空目录成因互为镜像："写了又删" vs "从未写"）；汇总屏 counts {sum 5, participating 2}、rate {2,2,1.0}、docx_locator {1.0,2,0}；报告 RS 有效。
+
+---
+
+## Round 1053 — evaluation/report.py 第四百九十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_report_edges120.py`（batch251，edges 第四百二十九批，forbidden 第五百二十四批）。
+- 新角度（聚合键闭包：20 进 14 出余 6）：真实三类型 docx 全 run 的 per_doc metrics 恰 20 键全名册首锁（含 text_char_multiset_precision/recall）；汇总触达 14 键（ra 12 + counts 1 + success_rates 1），**余 6 键**（element_count_by_type、error_code、figure_caption_*、silent_drop_count）任何 section 不出席；silent_drop_count 不进 dict 但直喂顶层 silent_drop_total（真实欠供 3 → total 3）；真实 heading_boundary_compliance 1.0 流入 ra。
+
+---
+
+## Round 1052 — evaluation/manifest.py 第四百九十六轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges130.py`（batch250，edges 第四百二十八批，forbidden 第五百二十三批）。
+- 新角度（真实互配对 + 富标注全字段 + 加载器内容盲区）：真实好 docx 与真实损坏 docx 互为 paired_with——加载器只看存在性不看内容（损坏文件照常入册）；互配对 content_group_count 1；双真值 sha256 同时逐字往返；富标注文件（annotator/date/heading_order/figure_caption_pairs/anchors 带 reason——annotation schema 全 6 合法字段用齐）过 RS；annotation_resolved 单侧接线（d1 有 d2 None）；categories 三值并集排序。
+
+---
+
+## Round 1051 — evaluation/metrics.py 第四百九十五轮（23 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges128.py`（batch249，edges 第四百二十七批，forbidden 第五百二十二批）。
+- 新角度（真实三类型异构板）：真实 add_heading / 两段 / add_table 穿真实 parser——heading 真实分类 "heading"（paragraph_index 0）、table 分类 "table"（**table_index** 0——该结构键首次以真实产物出现）；ecbt {heading 1, paragraph 2, table 1} + total 4；heading_boundary_compliance 1.0（first-id 规则以真实文档满足，此前 0.0 板全是手造）；真实 table 渲染成 markdown chunk（"| cell one |"）；paragraph_index 与 table_index 两族结构键混合板 docx_locator 1.0。
+
+---
+
+## Round 1050 — evaluation/schema.py 第四百九十四轮（23 测试）
+
+- 文件：`tests/test_evaluation_schema_edges120.py`（batch248，edges 第四百二十六批，forbidden 第五百二十一批）。
+- 新角度（schema 判决与管线判决同 dict 分裂）：_load_annotation 只 json.load 从不 validate——同一份 position "bogus" 标注 schema 拒绝（恰 1 错 enum ['before','after'] @ anchors[0].position）而真实管线照收并以 after 语义算出 P/R/F1 全 1.0，两判决同屏；坏 JSON 标注与缺席标注文件同一静默降级（pipeline True + boundary 三键 null no_annotation，真实文件基线）。
+
+---
+
+## Round 1049 — evaluation/annotation_metrics.py 第四百九十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges131.py`（batch247，edges 第四百二十五批，forbidden 第五百二十批）。
+- 新角度（真实 docx × 真实分块 × 真实 anchor 金路径）：annotation 测试 130 轮全手工 chunks，本批 process_single 真实解析 3 段 docx 用真实分块器在两 mc 下切分（mc 55/60 → 2 chunk、mc 40/50 → 3 chunk）；金路径 2 chunk 板 P/R/F1 全 1.0（真实切分点与真实标注容差内重合，非手造文本首次）；欠预测板 3 chunk → P 0.5 / R 1.0 / F1 0.6666666666666666；真实文档 figure_caption_* 三键全 parser_does_not_emit_relations。
+
+---
+
+## Round 1048 — evaluation/cli.py 第四百九十二轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges130.py`（batch246，edges 第四百二十四批，forbidden 第五百一十九批）。
+- 新角度（ef 结果对 CLI 表面全静默）：真实好 docx + 真实损坏 docx（ef）期望码错（E_PARSE_FAIL）与对（docx_open_failed）两次 run CLI 表面完全相同——rc 0、stderr 空、documents=1（成功 1，失败 0）、stdout 无 matches 无 f1；匹配与否只在报告 JSON 可见；documents 计数行只数 documents 条目（两文件参与表面恒 documents=1）；注意 stdout "False" 子串来自 git_dirty=False。
+
+---
+
+## Round 1047 — evaluation/runner.py 第四百九十一轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges130.py`（batch245，edges 第四百二十三批，forbidden 第五百一十八批）。
+- 新角度（同一损坏 docx 双角色镜像）：同一真实损坏 docx 作 document → per_doc 1 条（docx_open_failed、pipeline False、双 null pipeline_failed、rate 0.0）+ ef 空；作 expected_failure → per_doc 空 + ef matches True——同一文件两条互为镜像的记账通道；真实解析失败不写任何东西：_per_doc 两角色下都空（与 R1034 成功路径留 images-<hash16> 正交）；失败路径 wall_time 仍五键（计时与成败正交）。
+
+---
+
+## Round 1046 — evaluation/report.py 第四百九十轮（22 测试）
+
+- 文件：`tests/test_evaluation_report_edges119.py`（batch244，edges 第四百二十二批，forbidden 第五百一十七批）。
+- 新角度（真实损坏 docx 的 ef 契约）：真实损坏 docx 穿真实管线 actual_error_code 是 **'docx_open_failed'**（无 E_ 前缀的真实码命名空间首次锁定）；E_PARSE_FAIL 期望 → matches False（E_ 假设系统性失败）；期望恰为真实码 → matches True（schema 对 expected_error_code 只要求 minLength 1）；真实混合 run 汇总屏：ef 不计入 success total（total 1 只数 documents）、counts {sum, participating}、定位通道分离互为镜像、ra 恰 12 键。
+
+---
+
+## Round 1045 — evaluation/manifest.py 第四百八十九轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges129.py`（batch243，edges 第四百二十一批，forbidden 第五百一十六批）。
+- 新角度（真实 docx + 真 sha256 + 嵌套自动根复合）：manifest 测试 128 轮全伪字节/假 sha 串，本批首次真实 python-docx 文档 + hashlib 真值 sha256（64 位 hex 逐字往返）；清单放嵌套子目录不传 project_root → _detect_project_root 向上爬到 pyproject.toml 根，resolved/annotation 双锚定；九字段全量入口单次加载逐属性锁定；categories 元组保序 ('beta','alpha') 而 categories_covered 排序 ['alpha','beta'] 同屏；paired_with 指向缺席 d2 → content_group_count 1。
+
+---
+
 ## Round 1044 — evaluation/metrics.py 第四百八十八轮（23 测试）
 
 - 文件：`tests/test_evaluation_metrics_edges127.py`（batch242，edges 第四百二十批，forbidden 第五百一十五批）。
@@ -53,13 +179,15 @@
 
 ---
 
-## 回归基线（Round 1038-1044 全量）
+## 回归基线（Round 1045-1051 全量）
 
-- **90050 passed + 22 skipped**（514.32s / 8:34，任务 bi0dbrp1i，覆盖至 R1044）。与预测 89891 + 159（R1038-1044 新增 [metrics126 22 + report118 23 + runner129 23 + cli129 22 + annotation130 22 + schema119 24 + metrics127 23]）精确吻合，连续第十九次命中，全绿。
-- 前一基线 89891（bgy81dnix，501.28s，覆盖至 R1037）。
-- 下一轮全量预期 ≈ **90050 + R1045 起新循环新增**（manifest129 起第 489 轮循环；R1045 23 + R1046 22 + R1047 22 + R1048 21 已知 +49，R1049 起待计）。
+- **90206 passed + 22 skipped**（516.23s / 8:36，任务 b4cycy1s9，覆盖至 R1051）。与预测 90050 + 156（R1045-1051 新增 [manifest129 23 + report119 22 + runner130 22 + cli130 21 + annotation131 22 + schema120 23 + metrics128 23]）精确吻合，连续第二十次命中，全绿。
+- 前一基线 90050（bi0dbrp1i，514.32s，覆盖至 R1044）。
+- 下一轮全量预期 ≈ **90206 + 154 = 90360**（R1052-1058 新增 [manifest130 23 + report120 22 + runner131 22 + cli131 21 + annotation132 22 + schema121 23 + metrics129 21]）。
 
 ---
+
+## 回归基线（Round 1038-1044 全量）
 
 ## Round 1037 — evaluation/schema.py 第四百八十一轮（25 测试）
 
