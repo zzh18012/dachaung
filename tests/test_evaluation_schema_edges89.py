@@ -69,8 +69,8 @@ def test_annotation_extra_top_key_rejected_batch55():
                  "annotation.schema.json")
     first = ei.value.errors[0]
     assert first["path"] == []
-    assert first["message"] == \
-        "Additional properties ('zz_extra') were not allowed"
+    assert first["message"] == "Additional properties are not " \
+        "allowed ('zz_extra' was unexpected)"
 
 
 def test_annotation_anchor_requires_position_batch55():
