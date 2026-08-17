@@ -4,6 +4,64 @@
 
 ---
 
+## 回归基线（Round 940-946 全量）
+
+- **87804 passed + 22 skipped**（802.21s / 13:22，任务 b5jj95zsu，覆盖至 R946）。与预测 87626 + 178（R940-946 新增）精确吻合，连续第七次命中，全绿。
+- 下一轮全量预期 ≈ **87984**（87804 + R947-953 新增 180：metrics113 25 + manifest116 28 + report105 28 + runner116 24 + cli116 24 + annotation117 25 + schema106 26）。
+
+---
+
+## Round 953 — evaluation/schema.py 第三百九十七轮（26 测试）
+
+- 文件：`tests/test_evaluation_schema_edges106.py`（batch151，edges 第三百二十九批，forbidden tokens 第四百二十三批）。
+- 新角度（Schema 顶层结构 + errors 结构）：三 Schema 顶层键序（MS/AS 九键含 description；RS 八键无 description）；required 清单（MS 3 项；RS 5 项——expected_failures 不必填，解释 cli 最小合法报告；AS [annotation_version, doc_id]——anchors 不必填）；AS 封闭 + boundary_anchor.position enum [before, after] + marker minLength 1；EvalSchemaError.errors 扁平三键 [path, message, schema_path]（缺两必填 → 2 处、字母序 devset_status 先）；排序按 absolute_path（devset 先于 provenance）；null 实例 "None is not of type 'object'"；[] 实例 "[] is not of type 'object'"；load_schema 未知名 FileNotFoundError 精确消息。
+
+---
+
+## Round 952 — evaluation/annotation_metrics.py 第三百九十六轮（25 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges117.py`（batch150，edges 第三百二十八批，forbidden tokens 第四百二十二批）。
+- 新角度：全部 marker 命中 → _missing_markers 键不出现（恰四键）；混合命中/缺失 → _missing_markers 追加最后且缺失不计分母（P/R/F1 全 1.0）；最近匹配贪心（preds [2,5] gt 3 → 距离对 (1,p0)/(2,p1) → p0 胜出 P 0.5 R 1.0）；chunk 缺 text 键 → 空串仍产出预测边界（P 0.5）；同 marker before/before（流 "ABX XAB" 1 预测 vs 2 标注 → P 1.0/R 0.5/F1 2/3）；空 marker "" → find 短路 -1 → 进 _missing_markers、recall null no_ground_truth_anchors_in_stream。
+
+---
+
+## Round 951 — evaluation/cli.py 第三百九十五轮（24 测试）
+
+- 文件：`tests/test_evaluation_cli_edges116.py`（batch149，edges 第三百二十七批，forbidden tokens 第四百二十一批）。
+- 新角度：run 清单路径是目录 → is_file False → rc 2 "[ERROR] 清单不存在"；validate-report 目录 → rc 2 "[ERROR] 报告不存在"；inspect-doc JSON 顶层数组 → rc 1 "[ERROR] JSON 顶层不是对象"；inspect-doc 完整头部五行精确（document_id/source_path/parser_name/parser_version 全给值）；负容差 --tolerance-chars -5 原样透传（"_tolerance_chars -5 (ok)" 渲染）；run --parser kreuzberg --max-chars 500 --tolerance-chars 11 → kwargs 三项精确透传。
+- 踩坑：source 断言 `doc.get('parser_name', '?')` 在 f-string 内用单引号，首探写成双引号失败。
+
+---
+
+## Round 950 — evaluation/runner.py 第三百九十四轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges116.py`（batch148，edges 第三百二十六批，forbidden tokens 第四百二十批）。
+- 新角度：expected_failures 实跑（文件不存在 → actual_error_code "file_not_found" 小写、与 "E_FILE_NOT_FOUND" 不匹配 matches False、四键形状）；报告落盘 round-trip 全等 + 嵌套输出目录自动创建；报告六键有序 + per_doc 四键（无内部字段泄漏）；annotation 文件内容为 JSON 数组 [] → _load_annotation 返回 []（非 None）→ 下游 chunk_boundary reason 是 no_annotation（falsy 先于 anchors 检查）；parser_version 传播首个非 None 生效（[None, "9.9"] → "9.9"）。
+- 踩坑：probe 里 patch build_provenance 用 `lambda **k: k` 返回含 Path 的 kwargs → json.dump 炸 WindowsPath 不可序列化，改回可序列化 dict。
+
+---
+
+## Round 949 — evaluation/report.py 第三百九十三轮（28 测试）
+
+- 文件：`tests/test_evaluation_report_edges105.py`（batch147，edges 第三百二十五批，forbidden tokens 第四百一十九批，subprocess.run 恰 2）。
+- 新角度：bool False 参与 ratio macro（不是 None 不过滤，[False, True] → macro 0.5 participating 2）；同批 null 值过滤（[0.5, None] → macro 0.5 / participating 1 / not_evaluated 1）；空 per_doc 全形状（rate {0,0,None}、counts {None,0}、silent None、ratio 12 键全 None）；pipeline False → rate 0.0；subprocess.run 抛 OSError → {None, True} 兜底；build_provenance max_chars "800" → int 800 + 9 键序；deps 恰 3 键全非 None；silent [2,None,3] → 5、全 None → None；_RATIO_METRICS 恰 12 项 figure 不在内 + 首 3 项 + _COUNT/_SUCCESS 单项元组 + __all__ 5 项。
+
+---
+
+## Round 948 — evaluation/manifest.py 第三百九十二轮（28 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges116.py`（batch146，edges 第三百二十四批，forbidden tokens 第四百一十八批）。
+- 新角度：空 documents 合法（五计数全零）；自配对 paired_with=自身 → frozenset([d,d])={d} → 1 文档 1 组；单向配对 A→B → B 被吸收 2 文档仍 1 组；重复 doc_id schema 不查重（file_count 2）；path 空串被 schema minLength 先拦（"should be non-empty @ path=['documents', 0, 'path']"）；annotation_file 反斜杠 → 字段名含 doc_id；manifest_version "0.9" 被 schema const 先拦（"'1.0' was expected"）；categories_covered 跨文档并集排序 + 条目 categories 保留原始元组序 + sha256/paired_with/annotation_file_str 默认 None；devset_status "complete" 合法；ef 无 source_type → None 默认。
+
+---
+
+## Round 947 — evaluation/metrics.py 第三百九十一轮（25 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges113.py`（batch145，edges 第三百二十三批，forbidden tokens 第四百一十七批）。
+- 新角度：by_type 插入序 = 类型首次出现序（[paragraph, heading, table] 值 {2,1,1}）；失败文档仍输出 14 键完整骨架 + error_code reason 恒 None（即便有错误也不写 reason 的构造怪癖）+ schema_valid/silent_drop reason "pipeline_failed"；仅 image 元素（无 content）+ 空 chunks → equal True + P/R null empty_expected_and_actual；docx locator 含 page 键 → 立即无效（即使 section 也在）0.0；pdf table 类型免 bbox（仅 page 3 → 1.0）；resource_path 指向目录 → is_file False → 0.0。
+
+---
+
 ## 回归基线（Round 933-939 全量）
 
 - **87626 passed + 22 skipped**（788.69s / 13:08，任务 bno3x4zpe，覆盖至 R939）。与预测 87428 + 198（R933-939 新增）精确吻合，连续第六次命中，全绿。
