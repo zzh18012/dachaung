@@ -4,6 +4,48 @@
 
 ---
 
+## Round 1070 — evaluation/annotation_metrics.py 第五百一十四轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges134.py`（batch269，edges 第四百四十六批，forbidden 第五百四十一批）。
+- 新角度（跨接缝 marker 的 before/after 几何不对称膝关节）：流 "AB C" 接缝 2、marker "B C" 跨缝——**before** gt=起点 1（偏移 1）→ 膝盖 tol 1；**after** gt=终点 4（偏移 2，pre+post 双侧计入）→ 膝盖 tol 2——同一 marker 两位置膝盖差一格；tol 0 只收精确重合（对照 marker "B" after 终点恰落接缝 d=0 任意容差全 1.0）；双接缝板 "D E" 可找到但距最近预测 2、"C D" 不存在进 _missing_markers——同板找到/缺失双态。edges115 跨缝只验可找到（tol 10^9）、edges123 膝盖用素 marker，缝上不对称首锁。
+
+---
+
+## Round 1069 — evaluation/cli.py 第五百一十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges133.py`（batch268，edges 第四百四十五批，forbidden 第五百四十批）。
+- 新角度（自定义容差伪指标显示 + CLI 对 chunker-ef 静默）：inspect-doc --tolerance-chars 7 → 泄漏的 `_tolerance_chars` 行渲染 7（旗标值流入显示）、boundary 仍 null no_annotation；CLI run mc 31 双账本板 rc 0、stdout 只报 "documents=1（成功 0，失败 1）"、"chunker_failed" 字样完全不出现（CLI 对 ef 命中静默在新错误码下复现）；报告文件 ef matches True + d1 error_code chunker_failed 双在场；validate-report [OK]。
+
+---
+
+## Round 1068 — evaluation/runner.py 第五百一十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges133.py`（batch267，edges 第四百四十四批，forbidden 第五百三十九批）。
+- 新角度（ef 编码 chunker_failed：matches 随 max_chars 翻转）：ef 此前只锁 parse 族；本批 ef 期望 chunker_failed——同文件同清单 mc 31 → matches True、mc 200 → actual None matches False（地板 31/32 在 ef 通道同样生效）；**一文件双账本**——mc 31 下 good.docx 同时以 document 与 ef 入场：document 账本 pipeline False/error_code chunker_failed/ect null/rate 0.0，ef 账本 matches True，互不干扰。
+
+---
+
+## Round 1067 — evaluation/report.py 第五百一十一轮（23 测试）
+
+- 文件：`tests/test_evaluation_report_edges122.py`（batch266，edges 第四百四十三批，forbidden 第五百三十八批 report 变体）。
+- 新角度（参与度三层塔：全/半/零）：富板（heading+嵌图+标注+expectations）对素板同 run——12 ratio 指标分三层：全参与 2/2 五项、半参与 1/1 六项（image 真图点亮 1.0 素板 null no_image_elements；heading 富有素无；boundary 富有锚素无）、零参与 0/2（pdf_locator 门控）；silent 混账 d1 {0}+d2 {None no_expectations} → total **0 而非 None**（0 参与求和）；counts {sum 7, participating 2}（富板 5 = heading1+para3+image1 + 素板 2）。
+
+---
+
+## Round 1066 — evaluation/manifest.py 第五百一十轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges132.py`（batch265，edges 第四百四十二批，forbidden 第五百三十七批）。
+- 新角度（图片通路的清单可追溯性）：expectations 带 **image 类型**首次走真实 run——{image 1, paragraph 3} 精确相抵 → silent {0}、total 0；过索 image 2 → silent 1（图片也能造 silent drop）；"(空段落)" 占位符标注锚经 run_evaluation 全 1.0（直调层结论整装复现）；无 categories 时 devset.categories_covered 是**空列表**（[] 而非 null）。
+
+---
+
+## 回归基线 90520（第 22 次精确命中）
+
+- btdldmddh（R1065 后启动）实测 **90520 passed, 22 skipped（523.22s）**，与预测 90520（90360 + R1059-1065 七轮 160）**分毫不差**——第 22 次连续精确命中。
+- 下一回归：R1072 后启动，预测 = 90520 + R1066-1072 七轮实测之和（R1066=23、R1067=23、R1068=22、R1069=22、R1070=22 已定，R1071-1072 待写）。
+
+---
+
 ## Round 1065 — evaluation/metrics.py 第五百零九轮（23 测试）
 
 - 文件：`tests/test_evaluation_metrics_edges130.py`（batch264，edges 第四百四十一批，forbidden 第五百三十六批）。
@@ -56,7 +98,7 @@
 ## 回归基线 90360（第 21 次精确命中）
 
 - baipnpws2（R1051 后启动）实测 **90360 passed, 22 skipped（515.07s）**，与预测 90360（90206 + R1052-1058 七轮 23+22+22+21+22+23+21=154）**分毫不差**——第 21 次连续精确命中。
-- 下一回归 btdldmddh（R1065 后启动）：预测 **90520**（90360 + R1059-1065 七轮 22+24+22+24+23+22+23=160）。
+- 后续 btdldmddh 预测 90520（90360 + R1059-1065 七轮 160）亦精确命中（见上）。
 
 ---
 
