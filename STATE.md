@@ -4,6 +4,34 @@
 
 ---
 
+## Round 1106 — evaluation/schema.py 第五百五十轮（22 测试）
+
+- 文件：`tests/test_evaluation_schema_edges128.py`（batch305，edges 第四百八十二批，forbidden 第五百七十七批）。
+- 新角度（errors / warnings / relations 三 def 首锁）：**errors 裸条目拒绝**——[{"bogus": 1}] → "'code' is a required property @ path=['errors', 0]"（required [code, message]）；**warning 键名分歧**——warnings 塞 errors 正形 {code, message} 仍拒 "'reason' is a required property"——required [code, reason]：error/warning 非孪生，第二键 reason 非 message（键名陷阱首锁）；**relations 裸条目拒绝**——"'type' is a required property"（required [type, from_id, to_id]）；**正形照过**——errors 与 relations 正形（含同元素自指 from_id==to_id）双双通过。
+
+---
+
+## Round 1105 — evaluation/annotation_metrics.py 第五百四十九轮（21 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges139.py`（batch304，edges 第四百八十一批，forbidden 第五百七十六批）。
+- 新角度（换行孪生 / 全空串流 / tol 0 刀锋）：**换行 marker 即 missing**——"BBB\nmid" 流已规范化 marker 原样查找 → missing（空白家族第三孪生：TAB edges118、双空格 R1091、换行本批）；**全空串 chunk 流**——chunks ["","",""] → marker 必 missing 但空 chunk 仍产预测边界（位置 0）→ P 0.0 reason None / R null no_ground_truth / F1 null 三件套；**tol 0 刀锋**——marker 恰在 chunk 1 末尾：after gt 恰落边界 d=0 → tol 0 三元组全 1.0（≤ 含等号最紧实证）、before 差 4 字符全 0.0。
+
+---
+
+## Round 1104 — evaluation/cli.py 第五百四十八轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges138.py`（batch303，edges 第四百八十批，forbidden 第五百七十五批）。
+- 新角度（kreuzberg 真跑端到端 + 双 parser 指标等价）：**kreuzberg 真跑首锁**——--parser kreuzberg 对真实 docx 走完整管线 → rc 0 + success {1,1,1.0} + ect 2 + provenance parser_version "4.10.2"（旧 cli kreuzberg 测试全是 mock 捕参 edges112 或合成 dict edges34）；**双 parser 指标等价**——同一文档 fallback/kreuzberg 大四指标值完全一致（ect 2 / docx_loc 1.0 / chunk_ref 1.0 / text_eq True），差异只在 provenance；**kreuzberg 报告过验**——report schema parser_name 接受 "kreuzberg"。
+
+---
+
+## Round 1103 — evaluation/runner.py 第五百四十七轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges138.py`（batch302，edges 第四百七十九批，forbidden 第五百七十四批）。
+- 新角度（双通道同文档 / 复用确定性 / 裸文件名输出）：**双通道同文档**——annotation_file + expectations 同挂一 doc：silent 3（期望通道）与 boundary null no_predicted_boundaries（标注通道 mc 200 合并）并存，两通道互不干扰（单通道均已锁，同屏首锁）；**manifest 复用确定性**——同一 load_manifest 对象连跑两次 summary 逐字相等（与 edges18"不同 dict 不缓存"互补）；小板换 mc 40 summary 仍相等（微文档不敏感）但 provenance 如实记 40——参数入档与聚合脱钩；**裸文件名输出**——Path("bare.json") → output_root Path(".") 照常 mkdir 写 CWD。
+
+---
+
 ## 回归基线 91272（第 27 次精确命中）
 
 - bg0h43nkg：91272 passed, 22 skipped（548.68s）——预测 91117 + R1093-1099（22+23+23+21+22+22+22=155）= 91272，精确命中。
