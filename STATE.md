@@ -4,10 +4,60 @@
 
 ---
 
-## 回归基线（Round 1010-1023 全量）
+## 回归基线（Round 1017-1030 全量）
 
-- **89439 passed + 22 skipped**（747.13s / 12:27，任务 bupyg9h13，覆盖至 R1016）。与预测 89286 + 153（R1010-1016 新增 [metrics122 23 + manifest125 21 + report114 21 + runner125 20 + cli125 22 + annotation126 22 + schema115 24]）精确吻合，连续第十五次命中，全绿。
-- 下一轮全量预期 ≈ **89582**（89439 + R1017-1023 新增 143：metrics123 21 + manifest126 21 + report115 21 + runner126 20 + cli126 20 + annotation127 20 + schema116 20）。
+- **89732 passed + 22 skipped**（504.73s / 8:24，任务 b0av3p15c，覆盖至 R1030）。与预测 89582 + 150（R1024-1030 新增 [metrics124 20 + manifest127 20 + report116 20 + runner127 21 + cli127 23 + annotation128 23 + schema117 23]）精确吻合，连续第十七次命中，全绿。
+- 前一基线 89582（bwn6xw7de，818.08s，覆盖至 R1023）。
+- 下一轮全量预期 ≈ **89732 + R1031-1037 新增**（metrics125 起第 475 轮循环）。
+
+---
+
+## Round 1030 — evaluation/schema.py 第四百七十四轮（23 测试）
+
+- 文件：`tests/test_evaluation_schema_edges117.py`（batch228，edges 第四百零六批，forbidden 第五百零一批）。
+- 新角度（同一载荷三 schema 判定矩阵）：合法 annotation 实例对 annotation RS 通过、对 manifest RS 恰 4 错（3 required + 1 additionalProperties 点名标注专属键）、对 evaluation-report RS 恰 6 错（5 required + 1 additionalProperties）——顺带锁死 required 集：manifest 只 3 必填、report 只 5 必填（expected_failures 两边皆可选）；全部错误 path 均为 []。
+
+---
+
+## Round 1029 — evaluation/annotation_metrics.py 第四百七十三轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges128.py`（batch227，edges 第四百零五批，forbidden 第五百批）。
+- 新角度（五机制单次调用合流 + 容差硬膝跳）：5 anchor 一份标注同时触发近界一对一挤掉、跨块远端 d=3 命中、真 missing、search_from 顺序吞没（missing ["ZZZ","AAA"] 按标注序）、P 1.0 与 R 2/3、F1 恰 0.8；同梯子容差轴 tol∈{0,1,2}→(0.5,1/3,0.4) vs tol≥3→(1.0,2/3,0.8) 只有一级膝跳（d 集 {0,1,3} 决定）；_tolerance_chars 原样回显 0。
+
+---
+
+## Round 1028 — evaluation/cli.py 第四百七十二轮（23 测试）
+
+- 文件：`tests/test_evaluation_cli_edges127.py`（batch226，edges 第四百零四批，forbidden 第四百九十八批）。
+- 新角度（跨工件误喂第二、三路）：manifest JSON 喂 inspect-doc rc 0 四行表头全 "?" 回退 + 21 指标行；annotation JSON 喂 inspect-doc 文件带 doc_id "d1" 却渲染 document_id: ?（键名 doc_id≠document_id 错位）；误喂路径 --tolerance-chars 9 照常透传；manifest 喂 validate-report rc 1 [FAIL] 6 处与文档误喂（R1014）殊途同归（错误输出走 stderr）。
+
+---
+
+## Round 1027 — evaluation/runner.py 第四百七十一轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges127.py`（batch225，edges 第四百零三批，forbidden 第四百九十七批）。
+- 新角度（全量报告 RS 合法性组合）：双接线 doc（真标注 + expectations）与 expected_failures 同 manifest 同次 run 产出报告通过 evaluation-report.schema.json——edges121 真标注无 ef、edges20/21 有 ef 无 annotation、edges103 两者都有但 summary 被打桩无法过 RS；四路非空信号同屏（boundary P 1.0 + silent_drop 3 + ef matches True + silent_total 3 + boundary macro 1.0）。
+
+---
+
+## Round 1026 — evaluation/report.py 第四百七十轮（20 测试）
+
+- 文件：`tests/test_evaluation_report_edges116.py`（batch224，edges 第四百零二批，forbidden 第四百九十六批）。
+- 新角度（结构与序）：summary 顶层四键插入序精确 [counts, success_rates, ratio_macro_averages, silent_drop_total]、12 ratio 键按 _RATIO_METRICS 元组序；空输入 aggregate_summary([]) 全量深快照一次 dict == 锁（12 ratio 全 None/0/0 + counts 双 None/0 + success 0/0/None + silent None）。
+
+---
+
+## Round 1025 — evaluation/manifest.py 第四百六十九轮（20 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges127.py`（batch223，edges 第四百零一批，forbidden 第四百九十五批）。
+- 新角度（ef source_type 语义）：ef 条目带 source_type "pdf" 不进计数（pdf_count 0 / docx_count 1 / file_count 1——计数只看 documents 段）；ef source_type enum ["pdf","docx","txt","other"] 宽于 documents——"txt" 合法加载、"video" 被拒（"is not one of"）。
+
+---
+
+## Round 1024 — evaluation/metrics.py 第四百六十八轮（20 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges124.py`（batch222，edges 第四百批，forbidden 第四百九十四批）。
+- 新角度（schema_valid 完全委托 document.schema.json 严格性）：手工 chunk 带 char_count → chunk def additionalProperties false 拒 + metadata required → schema_valid False；同款换 metadata → True。doc + error 双非空带内容版：pipeline_success False + error_code 照记 E_PARTIAL + 全量 14 键指标照算同屏。
 
 ---
 
