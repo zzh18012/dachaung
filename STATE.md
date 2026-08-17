@@ -4,6 +4,48 @@
 
 ---
 
+## Round 1085 — evaluation/schema.py 第五百二十九轮（24 测试）
+
+- 文件：`tests/test_evaluation_schema_edges125.py`（batch284，edges 第四百六十一批，forbidden 第五百五十六批）。
+- 新角度（document.schema 严格性梯度：顶层开、def 层闭）：真实文档顶层加 "note" 键照过（顶层 additionalProperties 未设）——同一文档 elements[i] 或 chunks[i] 加 "note" 即拒（element/chunk 两 def 均闭仓）——至此三张 schema 梯度合拢：manifest 处处闭、report metrics 暗仓、document 顶开 def 闭；顶层 required 13 键全名册、element def required 6 键名册 [element_id, type, parent_id, source_locator, confidence, metadata]；**load_schema 无缓存**——两次调用不同对象、改动不泄漏。
+
+---
+
+## Round 1084 — evaluation/annotation_metrics.py 第五百二十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges136.py`（batch283，edges 第四百六十批，forbidden 第五百五十五批）。
+- 新角度（annotation 身份键不设防 + 锚序支配出现分配）：annotation doc_id "other" 对 document_id "d" 照常生效、doc_id 键整个缺失也照常——身份对齐完全交给上游 manifest；**锚序支配 marker 出现位置分配**：[CCC, BBB, BBB] 三锚——CCC 先消费中段，第一个 BBB 找到第三 chunk 的 BBB（第一 chunk 的 BBB 未被消费也被跳过），第二个 BBB 耗尽进 missing ['BBB']——P 2/3 / R 1.0 / F1 0.8；anchor 非 dict（字符串）直接 AttributeError 崩——schema 守门、此处不兜底。
+
+---
+
+## Round 1083 — evaluation/cli.py 第五百二十七轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges135.py`（batch282，edges 第四百五十九批，forbidden 第五百五十四批）。
+- 新角度（run 子命令 tolerance 旗标真值翻转）：**CLI run --tolerance-chars 7** 在 straddle 板（marker 距最近预测边界落在 (7, 30]）→ 报告文件 P/R/F1 全 0.0；缺省 30 同板 → 0.5 / 1.0 / 0.6666666666666666——基础测试只验旗标跑通，此处同板两容差报告文件值整体翻转；run stdout "documents=1（成功 1，失败 0）" + devset 行；validate-report 对全 0.0 报告照过（0.0 是合法 value）。
+
+---
+
+## Round 1082 — evaluation/runner.py 第五百二十六轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges135.py`（batch281，edges 第四百五十八批，forbidden 第五百五十三批）。
+- 新角度（tolerance_chars 真值翻转 + 公开指标面名册）：同板同锚（marker "w5" 距最近预测边界在 (7, 30]）——tol 7 → P/R/F1 全 0.0，tol 30 → P 0.5 / R 1.0 / F1 0.6666666666666666——run_evaluation 的容差不只透传（edges114 只验内部行伪指标），同一真实板两容差指标值整体翻转；宏观 R 随之翻转 {0.0, 1 参} vs {1.0, 1 参}；**公开 metrics 面 20 键全名册**（sorted == 精确比对）、_tolerance_chars/_missing_markers 不泄漏。
+
+---
+
+## Round 1081 — evaluation/report.py 第五百二十五轮（22 测试）
+
+- 文件：`tests/test_evaluation_report_edges124.py`（batch280，edges 第四百五十七批，forbidden 第五百五十二批 report 变体）。
+- 新角度（真实标注板驱动的 boundary 三元组宏观分歧）：四文档板（mc 40）——d1 双锚全 1.0、d2 中段 marker 全 0.0、d3 无标注全 null、d4 短段并单 chunk **P/F1 null no_predicted_boundaries 而 R 0.0**（recall 只需 gt 不需 predicted）；**宏观三元组参与度分歧**：P {0.5, 2 参} / R {1/3, **3 参**} / F1 {0.5, 2 参}——d4 只进 R 的分母；真实值混账（1.0+0.0）均值 0.5。
+
+---
+
+## Round 1080 — evaluation/manifest.py 第五百二十四轮（24 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges134.py`（batch279，edges 第四百五十六批，forbidden 第五百五十一批）。
+- 新角度（heading/未产出类型期望 + 清单退化形态）：expectations 带 **heading 类型**——{heading 1, paragraph 3} 精确 → silent {0}；{heading 2} 过索 → silent 1；**未产出类型全额跌落**——{list_item 2} → silent 2、{table 1, header 1} → silent 2（枚举合法但 parser 从不产出，期望几份全 silent）；**element_count_by_type 内层键自由**——bogus_type 照过（与 edges84 外层闭仓两层纪律对照：外闭内开）；documents: [] 退化 run——success {0, 0, rate null}、counts {sum null}、silent None；**doc_id 不查重**——两条 dup 照收两条同名 per_doc。
+
+---
+
 ## Round 1079 — evaluation/metrics.py 第五百二十三轮（21 测试）
 
 - 文件：`tests/test_evaluation_metrics_edges132.py`（batch278，edges 第四百五十五批，forbidden 第五百五十批）。
@@ -102,10 +144,14 @@
 
 ---
 
-## 回归基线 90679（第 23 次精确命中）
+## 回归基线 90830（第 24 次精确命中）
 
-- bfpwvysgs（R1072 后启动）实测 **90679 passed, 22 skipped（526.28s）**，与预测 90679（90520 + R1066-1072 七轮 159）**分毫不差**——第 23 次连续精确命中。
-- 下一回归 bbuk3mpoj（R1079 后启动）：预测 **90830**（90679 + R1073-1079 七轮 22+21+21+22+22+22+21=151）。
+- bbuk3mpoj（R1079 后启动）实测 **90830 passed, 22 skipped（524.37s）**，与预测 90830（90679 + R1073-1079 七轮 151）**分毫不差**——第 24 次连续精确命中。
+- 下一回归 b4c5eq4rd（R1085 后启动）：预测 **90964**（90830 + R1080-1085 六轮 24+22+21+21+22+24=134）。
+
+---
+
+## 回归基线 90679（第 23 次精确命中）
 
 ---
 
