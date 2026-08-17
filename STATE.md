@@ -4,6 +4,63 @@
 
 ---
 
+## 回归基线（Round 947-953 全量）
+
+- **87984 passed + 22 skipped**（794.25s / 13:14，任务 bhntea7bs，覆盖至 R953）。与预测 87804 + 180（R947-953 新增）精确吻合，连续第八次命中，全绿。
+- 下一轮全量预期 ≈ **88161**（87984 + R954-960 新增 177：metrics114 27 + manifest117 26 + report106 24 + runner117 22 + cli117 27 + annotation118 25 + schema107 26）。
+
+---
+
+## Round 960 — evaluation/schema.py 第四百零四轮（26 测试）
+
+- 文件：`tests/test_evaluation_schema_edges107.py`（batch158，edges 第三百三十六批，forbidden tokens 第四百三十批）。
+- 新角度（def 级清单第二批）：AS 顶层恰 7 属性（含 annotator/date/figure_caption_pairs/heading_order 四个可选）；chunk_boundary_anchors array + $ref boundary_anchor；MS document def 8 属性 required 3 + source_type enum [pdf, docx]；MS expected_failure def 4 属性 required 3（source_type 可选）；RS provenance def required 9 项有序 + 封闭；RS devset def 6 属性 + status enum；RS summary def 恰 4 属性；RS per_doc def 4 属性 + metrics 仅 {"type": "object"} 开放；RS 顶层 expected_failures 存在（array + $ref）但不在 required。
+
+---
+
+## Round 959 — evaluation/annotation_metrics.py 第四百零三轮（25 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges118.py`（batch157，edges 第三百三十五批，forbidden tokens 第四百二十九批）。
+- 新角度：tolerance_chars=0 精确命中（P 0.5/R 1.0）与 0 + marker 缺失（P 0.0 + R null）；巨容差 10**9 一对一封顶（matched=min(pred,gt) → P 1.0/R 2/3）；position 非法值 "middle" 走 else = after 语义；anchor 额外键忽略；anchor 缺 position 默认 after；marker 原样查找（含 TAB 的 marker 在规范化流找不到 → _missing_markers）。
+- 踩坑：NBSP 字面量经 heredoc/Write 多轮易损坏（bash 反斜杠处理 + repr 混淆），改用 TAB 字面量并按行号手术修复；source 断言 used_pred 是 `= set()` 无类型注解。
+
+---
+
+## Round 958 — evaluation/cli.py 第四百零二轮（27 测试）
+
+- 文件：`tests/test_evaluation_cli_edges117.py`（batch156，edges 第三百三十四批，forbidden tokens 第四百二十八批）。
+- 新角度：run 错误出口矩阵（清单 Schema 失败 rc 1 "清单加载失败"；run_evaluation 抛 EvalSchemaError rc 1 "生成的报告未通过 Schema 校验"；validate_file 抛 rc 1 "报告自校验失败"）；inspect-doc 文件不存在 rc 2 / 非法 JSON rc 1；validate-report 非法 JSON rc 1；_format_metric 字符串值（E_PARSE）与 int 值（5）走通用分支 "  {name:36} {value}  (ok)"。
+
+---
+
+## Round 957 — evaluation/runner.py 第四百零一轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges117.py`（batch155，edges 第三百三十三批，forbidden tokens 第四百二十七批）。
+- 新角度：内部键不泄漏（_tolerance_chars/_missing_markers 被 pop；per_doc 恰四键无下划线键）；缺失 marker 不进分母（anchors [AB 命中, ZZ 缺失] + chunks 2 → P/R/F1 全 1.0）；输出根派生（output 在 sub/ → sub/_per_doc/ 创建且跑完为空）；tolerance_chars=11 全程透传。
+
+---
+
+## Round 956 — evaluation/report.py 第四百轮（24 测试）
+
+- 文件：`tests/test_evaluation_report_edges106.py`（batch154，edges 第三百三十二批，forbidden tokens 第四百二十六批，subprocess.run 恰 2）。
+- 新角度：counts 跳过 null（[5,None,3] → {8,2}）；指标键缺失 = null（{7,1}）；bool True 参与 ratio macro 按 1 计（[True,0.5] → 0.75）；非 git 目录怪癖——status rc≠0 → dirty = bool(rc==0 and …) = False，非 git 目录反而自称"干净"（锁定现状）；build_devset_section 六键有序（接受任意属性对象）；run_timestamp_iso 可 fromisoformat 且带 tz；evaluator/report_version 锁 1.1/1.1。
+
+---
+
+## Round 955 — evaluation/manifest.py 第三百九十九轮（26 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges117.py`（batch153，edges 第三百三十一批，forbidden tokens 第四百二十五批）。
+- 新角度：根检测向上走（清单在 sub/、pyproject 在 tmp → root=tmp）；无 pyproject → 根退化为清单目录；清单不存在 "清单文件不存在: <绝对路径>"；非法 JSON "清单 JSON 解析失败: "；Manifest frozen（赋值抛 FrozenInstanceError）；"./samples/a.pdf" 与 "samples/../samples/a.pdf" 放行且 path_str 原样保留；annotation_file 合法 → annotation_resolved 绝对路径。
+
+---
+
+## Round 954 — evaluation/metrics.py 第三百九十八轮（27 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges114.py`（batch152，edges 第三百三十批，forbidden tokens 第四百二十四批）。
+- 新角度：heading_boundary 语义（heading 是 chunk 首元素才算：首 1.0/中间 0.0/2h1m 0.5/无 heading null no_heading_elements）；单侧空不对称（elements 有 chunks 空 → eq False + P null empty_actual + R 0.0；反向镜像）；silent_drop 混合多类型求和（{para 5, table 1, heading 2} vs {para 3, table 1} → 4）；[None] 引用怪癖（element 缺 element_id + chunk [None] → 计有效 1.0）；type "footnote" 与缺 type（"unknown"）免 bbox、by_type 记原样。
+
+---
+
 ## 回归基线（Round 940-946 全量）
 
 - **87804 passed + 22 skipped**（802.21s / 13:22，任务 b5jj95zsu，覆盖至 R946）。与预测 87626 + 178（R940-946 新增）精确吻合，连续第七次命中，全绿。
