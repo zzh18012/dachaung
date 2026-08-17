@@ -4,6 +4,34 @@
 
 ---
 
+## 回归基线 91117（第 26 次精确命中）
+
+- bh8aag9v7：91117 passed, 22 skipped（540.07s）——预测 90964 + R1086-1092（22+23+21+21+22+22+22=153）= 91117，精确命中。
+- 下一轮预测起点：91117 + R1093-1099 之和（R1093=22、R1094=23、R1095=23 已定，R1096-1099 待跑）。
+
+---
+
+## Round 1095 — evaluation/report.py 第五百三十九轮（23 测试）
+
+- 文件：`tests/test_evaluation_report_edges126.py`（batch294，edges 第四百七十一批，forbidden 第五百六十六批 report 变体）。
+- 新角度（aggregate_summary 单元缝回归：False 的双重身份 + null/缺席不可辨 + 名册门禁）：**False 入宏作 0**——text_preservation_equal [1.0, False] → macro 0.5/participating 2（bool False 非 null，作数值 0 进算术平均）；**null 与缺席不可辨**——[0.5 有值, null 带 reason, 键整缺] → {0.5, 1, 2}（null-value 与 absent-key 同落 not_evaluated）；**bogus_metric 键被无视**——三区名册门禁不透传自定义键；**False 双重身份**——单文档双 False 同入 success {0,1,0.0} 与 ratio {0.0,1,0} 两本账；参与度算术 5 文档 {0.625, 2, 3}。
+
+---
+
+## Round 1094 — evaluation/manifest.py 第五百三十八轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges136.py`（batch293，edges 第四百七十批，forbidden 第五百六十五批）。
+- 新角度（鬼影路径全链路：加载照收 / 运行才爆）：**load_manifest 不查存在性**——samples/ghost.docx 不存在照常返回（存在性执法在 run 侧）；**鬼影文档三件套**——pipeline_success False / error_code 'file_not_found' / element_count_total null+pipeline_failed；**鬼影 ef 期望命中**——expected file_not_found → 4-key entry matches True（缺失是被预期的失败）；**期望错码即失配**——expected docx_open_failed → matches False（missing ≠ corrupt）；**混合板半成功率**——good+ghost → success {1, 2, 0.5}、codes [None, 'file_not_found']。
+
+---
+
+## Round 1093 — evaluation/metrics.py 第五百三十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges134.py`（batch292，edges 第四百六十九批，forbidden 第五百六十四批）。
+- 新角度（真实文档变异四联：引用鬼影 / 定位失格 / 双侧文本镜像）：**chunk 引用鬼影**——chunks[0].source_element_ids 改 ["ghost-id"] → chunk_reference_intact_ratio 直接 0.0（单 chunk 全坏即全坏，all-or-nothing 而非按引用数摊薄）；**element 定位失格**——elements[0].source_locator 置 {} → docx_locator_valid_ratio 0.5（按元素摊薄 1/2，与引用侧 all-or-nothing 粒度对照）；**插入镜像**——chunk text 尾接 "EXTRA" → equal False + multiset P 0.9 / R 1.0（多出字符只伤 precision）；**删除镜像**——改 "short" → P 1.0 / R 0.1111111111111111（插入/删除恰好互换 P 与 R 伤侧）。
+
+---
+
 ## Round 1092 — evaluation/schema.py 第五百三十六轮（22 测试）
 
 - 文件：`tests/test_evaluation_schema_edges126.py`（batch291，edges 第四百六十八批，forbidden 第五百六十三批）。
