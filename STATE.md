@@ -4,10 +4,62 @@
 
 ---
 
-## 回归基线（Round 926-932 全量）
+## 回归基线（Round 933-939 全量）
 
-- **87428 passed + 22 skipped**（807.98s / 13:27，任务 bjmycbpwn，覆盖至 R932）。与预测 87246 + 182（R926-932 新增）精确吻合，连续第五次命中，全绿。
-- 下一轮全量预期 ≈ **87626**（87428 + R933-939 新增 198：metrics111 30 + manifest114 30 + report103 27 + runner114 27 + cli114 31 + annotation115 26 + schema104 27）。
+- **87626 passed + 22 skipped**（788.69s / 13:08，任务 bno3x4zpe，覆盖至 R939）。与预测 87428 + 198（R933-939 新增）精确吻合，连续第六次命中，全绿。
+- 下一轮全量预期 ≈ **87804**（87626 + R940-946 新增 178：metrics112 30 + manifest115 27 + report104 24 + runner115 22 + cli115 23 + annotation116 25 + schema105 27）。
+
+---
+
+## Round 946 — evaluation/schema.py 第三百九十轮（27 测试）
+
+- 文件：`tests/test_evaluation_schema_edges105.py`（batch144，edges 第三百二十二批，forbidden tokens 第四百一十六批）。
+- 新角度（Schema 结构性事实第二批）：$defs 清单（manifest 2 / report 5 / annotation 1，wall_time_seconds 内联不在 $defs）；manifest expectations def 全形（封闭、element_count_by_type {integer, min 0}、required_markers minLength 1）；三 $id 均 https://kvfs.local/schemas/<文件名>；wall_time 内联 def（required 3、封闭、total/parse [number,null] min 0）；efr def（required 4、matches boolean、actual_error_code [string,null]）；per_doc def 与 items $ref wiring；boundary_anchor def（required 2、恰 3 属性）；SCHEMAS_DIR 4 文件名；顶层字符串 "is not of type 'object'"。
+- 下一步：metrics edges113（Round 947）。
+
+---
+
+## Round 945 — evaluation/annotation_metrics.py 第三百八十九轮（25 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges116.py`（batch143，edges 第三百二十一批，forbidden tokens 第四百一十五批）。
+- 新角度：预测位置在规范化空间计算（chunk "A\nB" → "A B"，边界 3 与 marker "B" after gt 3 精确重合全 1.0）；chunk 首尾空白剥掉后与无空白同界；chunk 内多空格折叠成单空格（marker "A B" 命中）；anchors 空列表 [] 与显式 None 同一 no_ground_truth_anchors 分支；__all__ 三项有序；单 chunk 早退分支也带自定义 _tolerance_chars 11（P null no_predicted_boundaries / R 0.0）。
+
+---
+
+## Round 944 — evaluation/cli.py 第三百八十八轮（23 测试）
+
+- 文件：`tests/test_evaluation_cli_edges115.py`（batch142，edges 第三百二十批，forbidden tokens 第四百一十四批）。
+- 新角度：validate-report 最小合法报告（provenance 9 必填 + devset 6 必填 + summary/per_doc 空）→ rc 0 精确消息；inspect 空文档四行（file 8 空格 / counts 0/0 / by_type 空字典渲染 ljust(36)+"   (ok)" / chunk_reference null (no_chunks)）；main() 缺 argv 读 sys.argv（monkeypatch frobnicate → SystemExit 2）；run 成功 git 行（git_commit None → 'unknown' 兜底；40 位截前 12 位）。
+- 踩坑：mock run_evaluation 后 output 文件不存在 → 自校验 FileNotFoundError 会冒出，需同 mock validate_file；source 断言 git 行 f-string 内含 6 个对齐空格首探漏写。
+
+---
+
+## Round 943 — evaluation/runner.py 第三百八十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges115.py`（batch141，edges 第三百一十九批，forbidden tokens 第四百一十三批）。
+- 新角度：_process_one 直测两态五元组（(None,[]) → {code: unknown} 合成错误 + elapsed≥0 + pv/idir None；成功 → to_dict + pv 透传 + image_dir == image_output_dir_for(stub, hash) 且目录不创建）；image_base_dir 门控（spy kwarg：目录缺 → None、目录在 → 该目录）；ef 用 .code 属性而非 to_dict（E_PARSE vs OTHER 实证）+ 空 documents 恰调 1 次。
+- 踩坑：source 断言 needle 丢了收尾 "}"（源码 "...errors"},带大括号），码点级 diff 才定位。
+
+---
+
+## Round 942 — evaluation/report.py 第三百八十六轮（24 测试）
+
+- 文件：`tests/test_evaluation_report_edges104.py`（batch140，edges 第三百一十八批，forbidden tokens 第四百一十二批，subprocess.run 恰 2）。
+- 新角度：空 metrics 行语义（缺 pipeline_success 键 → 不计成功但占分母 {0,1,0.0}；counts {None,0}；ratio {None,0,1}；silent None）；未知指标键忽略；int 值 [1,0] → macro 0.5；入参行不改（纯读）；_COUNT/_SUCCESS 元组恰各 1；真实仓库 get_git_provenance（40 位 hex + bool + 2 键）。
+
+---
+
+## Round 941 — evaluation/manifest.py 第三百八十五轮（27 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges115.py`（batch139，edges 第三百一十七批，forbidden tokens 第四百一十一批）。
+- 新角度：盘符相对分区（他盘 "Z:x" resolve 原样 → 逃逸拒绝 "Z:x → Z:x"；数字 "2:/x" 非字母不算绝对但解析逃逸同样拒绝）；ef 反斜杠字段名；ef ghost 文件照常加载 + source_type None；categories [1,2] → schema 双报；document 条目与顶层两层封闭（foo/extra_top 拒绝）；devset_status "complete" 合法；expectations 子树透传。
+
+---
+
+## Round 940 — evaluation/metrics.py 第三百八十四轮（30 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges112.py`（batch131 批次顺延 batch138，edges 第三百一十六批，forbidden tokens 第四百一十批）。
+- 新角度：真正过 app Schema 的完整文档 → schema_valid True（schema_version "0.1.0" + 64 位 source_hash + element/chunk 全字段），仅缺 source_hash → False 非 exception；_is_valid_bbox 六型全拒（bool 元素/5 元/数字字符串/NaN/inf/非 list，参数化）；image 元素 content 不进 expected（P 0.0 / R null empty_expected 不对称）；顺序分叉 BA vs AB（equal False 而 multiset P=R=1.0）；NBSP/表意空格删除；双 None 基线。
 
 ---
 
