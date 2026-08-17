@@ -4,6 +4,34 @@
 
 ---
 
+## 回归基线 91272（第 27 次精确命中）
+
+- bg0h43nkg：91272 passed, 22 skipped（548.68s）——预测 91117 + R1093-1099（22+23+23+21+22+22+22=155）= 91272，精确命中。
+- 下一轮预测起点：91272 + R1100-1106 之和（R1100=22、R1101=22、R1102=22 已定，R1103-1106 待跑）。
+
+---
+
+## Round 1102 — evaluation/report.py 第五百四十六轮（22 测试）
+
+- 文件：`tests/test_evaluation_report_edges127.py`（batch301，edges 第四百七十八批，forbidden 第五百七十三批 report 变体）。
+- 新角度（parser_version 落穿 + 数值截断 + 写读全等）：**parser_version 落穿**——bad.docx（无版本）在前 + good 在后 → provenance.parser_version 取自 good（"首个成功文档"语义，失败跳过版本向后落穿，行为首锁）；**全失败板版本 None**——落穿到底无所获；**float max_chars 截断**——build_provenance 传 200.9 → int() 强转 200；**写出即读回全等**——run_evaluation 返回 dict 与落盘 JSON reload == 全等（float wall_time、嵌套 reason 序列化无损）。
+
+---
+
+## Round 1101 — evaluation/manifest.py 第五百四十五轮（22 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges137.py`（batch300，edges 第四百七十七批，forbidden 第五百七十二批）。
+- 新角度（dotdot 内敛 / 声明失配照跑 / 大写十六进制 / 无根落 CWD）：**dotdot 内敛照收**——"sub/../samples/g.docx" 接受，path_str 逐字保留 dotdot、resolved_path 归一化到根内（判定看 resolve() 终点不看字符串形状）；**声明失配照跑**——source_type 声明 pdf、文件实为真 docx → run success True + pdf_locator 0.0（声明型 gate 只影响度量不拦截解析，与 R1100 互证）；**大写 sha256 拒绝**——"A"*64 长度对大小写错，regex 显式小写；**无 project_root 落 CWD**——load_manifest 缺省以 CWD 为根。
+
+---
+
+## Round 1100 — evaluation/metrics.py 第五百四十四轮（22 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges135.py`（batch299，edges 第四百七十六批，forbidden 第五百七十一批）。
+- 新角度（source_type 参数门控 + 引用存在性 + 零期望原谅）：**跨型门控全闭**——docx 产物 + source_type 参数 "pdf" → pdf_locator_valid_ratio 0.0（docx 形 locator 无 page 键）+ docx_locator null not_docx_document（度量按参数分型）；**混合 pdf 比例 0.5**——一个 element 换 {page, bbox} 后跨型视角按元素摊薄；**重复引用照 intact 1.0**——[id0, id0] 存在性满足（非唯一性检查，R1093 ghost 的存在性孪生）；**零期望原谅**——{paragraph 2, table 0} → silent 0（从未出现但期望也为 0 的类型 max(0,0-0)=0）。
+
+---
+
 ## Round 1099 — evaluation/schema.py 第五百四十三轮（22 测试）
 
 - 文件：`tests/test_evaluation_schema_edges127.py`（batch298，edges 第四百七十五批，forbidden 第五百七十批）。
