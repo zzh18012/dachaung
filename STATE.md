@@ -4,6 +4,34 @@
 
 ---
 
+## Round 1099 — evaluation/schema.py 第五百四十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_schema_edges127.py`（batch298，edges 第四百七十五批，forbidden 第五百七十批）。
+- 新角度（source_type 翻转的行为面：allOf if/then 单向执法）：**pdf 翻转拒绝**——真实 docx 文档翻 source_type 为 "pdf"（locator 仍 docx 形）→ "'page' is a required property" **2 处**（每 element 一处，paths ['elements',0/1,'source_locator']）——allOf if/then 行为首锁（edges112/121 只做 def 内省）；**pdf 正形照过**——翻转后 locator 换 {page, bbox} 通过；**docx 宽容纳 pdf 形**——docx 塞 {page, bbox} 照过（docx_locator additionalProperties True + minProperties 1，陌生键满足 ≥1——执法不对称：pdf 侧 required 咬合、docx 侧只数键）；**空 locator schema 拒绝带 path**——{} → "{} should be non-empty" + e.errors[0] path 完整——与 R1093 metrics 视角（ratio 0.5）互为表里。
+
+---
+
+## Round 1098 — evaluation/annotation_metrics.py 第五百四十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges138.py`（batch297，edges 第四百七十四批，forbidden 第五百六十九批）。
+- 新角度（跨块标记 / 空串锚 / position 语义载荷 / 双现仲裁）：**跨块标记照命中**——"para graph" 横跨两 chunk 不 missing、P/R 1.0（stream 空格 join，块边界在标记中间不打断查找）；**空串 marker 即 missing [""]**——find guard 落空 → P 0.0 / R null / F1 null（行为首锁，R1084 只锁源码行）；**position 语义载荷**——marker "BBBBB" 恰在 chunk 末尾、tol 1：before 全 0.0 vs after 0.5/1.0/0.667（before/after 差一个 len(marker)，紧容差下分野）；**双现同名仲裁**——[BBB, BBB] 双锚两次真实出现（search_from 顺序推进各得其所）→ 无 missing、P/R/F1 全 0.5（一对一贪心配对下两 gt 争一边界）。
+
+---
+
+## Round 1097 — evaluation/cli.py 第五百四十一轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges137.py`（batch296，edges 第四百七十三批，forbidden 第五百六十八批）。
+- 新角度（CLI 失败路径四盲区：逃逸 / 常量 / 分歧 / 裸条目）：**PermissionError 逃逸**——run --output 指向已存在目录 → main 不捕获直接炸出（结构化错误纪律只覆盖清单侧，输出路径误用是唯一非结构化失败通道）；**report_version 常量违例**——"9.9" → rc 1 + "校验失败 (1 处)：'1.1' was expected @ path=['report_version']"（[FAIL] 走 **stderr**）；**版本分歧容忍**——top "9.9" + provenance "1.1" → 仍恰 1 处（provenance.report_version 自由字符串，const 只铡 top）；**per_doc 裸条目拒绝**——[{"bogus_key": 1}] → rc 1 + "'doc_id' is a required property @ path=['per_doc', 0]"（per_doc def 闭仓的 CLI 行为面）。
+
+---
+
+## Round 1096 — evaluation/runner.py 第五百四十轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges137.py`（batch295，edges 第四百七十二批，forbidden 第五百六十七批）。
+- 新角度（同一文件的账本双重奏）：**同一路径双 doc_id**——good.docx 挂 d1/d2 → per_doc 两条 metrics 逐字相等（确定性）、counts {sum 4, participating 2} **语料层双计**（manifest 不查路径重复）、success {2,2,1.0}、devset file_count 照 2 记；**双角色同屏**——bad.docx 既作 document 又作 expected_failure 同一 run → per_doc 1 条 docx_open_failed + ef matches True + success {0,1,0.0}（edges130 是 either/or，同屏首锁）；**深嵌套输出目录**——output "deep/nested/r.json" parents=True 自建、报告落盘。
+
+---
+
 ## 回归基线 91117（第 26 次精确命中）
 
 - bh8aag9v7：91117 passed, 22 skipped（540.07s）——预测 90964 + R1086-1092（22+23+21+21+22+22+22=153）= 91117，精确命中。
