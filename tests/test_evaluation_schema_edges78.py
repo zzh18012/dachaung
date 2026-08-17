@@ -112,9 +112,15 @@ def test_error_class_truthy_string_errors_batch54():
 # ---------- evaluation/__init__ 公开名 ----------
 
 def test_evaluation_init_public_names_batch54():
-    assert [n for n in dir(evaluation) if not n.startswith("_")] == [
-        "ANNOTATION_VERSION", "EVALUATOR_VERSION", "MANIFEST_VERSION",
-        "REPORT_VERSION", "schema"]
+    # dir() 受 import 顺序污染（任何 import evaluation.X 都会挂属性），
+    # 公开 API 契约以 __all__ 为准
+    assert list(evaluation.__all__) == [
+        "EVALUATOR_VERSION", "REPORT_VERSION",
+        "ANNOTATION_VERSION", "MANIFEST_VERSION"]
+    assert evaluation.EVALUATOR_VERSION == "1.1"
+    assert evaluation.REPORT_VERSION == "1.1"
+    assert evaluation.ANNOTATION_VERSION == "1.0"
+    assert evaluation.MANIFEST_VERSION == "1.0"
 
 
 # ---------- 源码补强 ----------
