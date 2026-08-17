@@ -4,10 +4,61 @@
 
 ---
 
-## 回归基线（Round 912-918 全量）
+## 回归基线（Round 919-925 全量）
 
-- **87060 passed + 22 skipped**（774.60s / 12:54，任务 bviourk82，覆盖至 R918）。与预测 86860 + 200（R912-918 新增）精确吻合，全绿。
-- 下一轮全量预期 ≈ **87246**（87060 + R919-925 新增 186：metrics109 31 + manifest112 28 + report101 26 + runner112 25 + cli112 25 + annotation113 25 + schema102 26）。
+- **87246 passed + 22 skipped**（759.41s / 12:39，任务 bvfnybyid，覆盖至 R925）。与预测 87060 + 186（R919-925 新增）精确吻合，连续第四次命中，全绿。
+- 下一轮全量预期 ≈ **87428**（87246 + R926-932 新增 182：metrics110 29 + manifest113 25 + report102 25 + runner113 21 + cli113 25 + annotation114 27 + schema103 30）。
+
+---
+
+## Round 932 — evaluation/schema.py 第三百七十六轮（30 测试）
+
+- 文件：`tests/test_evaluation_schema_edges103.py`（batch130，edges 第三百零八批，forbidden tokens 第四百零二批）。
+- 新角度：load_schema 不缓存（相等非同一）；ghost 名 FileNotFoundError 含 SCHEMAS_DIR 绝对路径；validate_file 传目录 → "待校验文件不存在: <目录>"；坏 JSON → JSONDecodeError 冒出；annotation 顶层字段实证（必需 annotation_version + doc_id，"document_id" 是 additionalProperties 被拒）；5 错误排序与 flat 键序（[] required 先于 [] additionalProperties，schema_path 末尾 ["items", "required"]）；validate 每次 load_schema（patch 计数 2）；annotation_version "9.9" → "'1.0' was expected"；position "sideways" → 枚举消息；合法最小实例 validate / validate_file(str) 双 None。
+- 踩坑：probe 把顶层字段名记成 document_id（实为 doc_id），首轮断言 len==5 按错误字段造的实例算成 3，改用 probe 原实例后修正；另一处字符串断言拼接丢空格。
+- 下一步：metrics edges111（Round 933）。
+
+---
+
+## Round 931 — evaluation/annotation_metrics.py 第三百七十五轮（27 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges114.py`（batch129，edges 第三百零七批，forbidden tokens 第四百零一批）。
+- 新角度：重复 marker 顺序定位（流 "AB AB" 两 after-anchor → gt [2,5]、pred [2] → P 1.0 R 0.5 F1 2/3）；空首 chunk 怪癖（"" find 返回 0 → 预测边界在位置 0，仍全 1.0）；缺失 marker 不推进 search_from（[ZZZ 缺, AB 中] → R 1.0 + _missing_markers 只含 ZZZ）；marker 本身不规范化（含 \t 找不到、空格版命中）；全部 marker 缺失不对称（P 0.0 而 R null no_ground_truth_anchors_in_stream、F1 null）；容差边界含等号（d=1 tol=1 中/tol=0 不中；marker "D" before 造 d=2：tol=2 中/tol=1 不中）；三连重复 chunk pred [2,5] 精确对齐全 1.0；figure_caption_prf 无视实参；chunks 键缺失/None + 有 anchor → P null、R 0.0。
+
+---
+
+## Round 930 — evaluation/cli.py 第三百七十四轮（25 测试）
+
+- 文件：`tests/test_evaluation_cli_edges113.py`（batch128，edges 第三百零六批，forbidden tokens 第四百批）。
+- 新角度：argparse 三种 SystemExit 2（run 缺必选参数 stderr 含 "--manifest, --output"、--manifest 缺值、未知子命令 frobnicate usage 含三命令名）；run 相对路径清单不存在 → rc 2 "[ERROR] 清单不存在: m.json"（chdir 验证相对路径原样打印）；inspect --tolerance-chars -5 → 指标行负值原样入表（ljust(36) 构造）；--tolerance-chars abc → SystemExit 2；inspect 全字段头 4 行真实值（document_id/source/parser v1.2/counts）。
+
+---
+
+## Round 929 — evaluation/runner.py 第三百七十三轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges113.py`（batch127，forbidden tokens 第三百九十九批）。
+- 新角度：内部 metrics dict 末 6 键序（figure_caption 三连在前、chunk_boundary 三连在后）；公开 per_doc metrics 与内部行同一对象（引用传递）；report["provenance"] 是 build_provenance 返回值原对象；报告 ensure_ascii=False（"中文" 原生 UTF-8 非 \u 转义、文件末字符 "}"）；空清单真实聚合（per_doc []、counts sum None/participating 0、success rate None 分母 0、devset 全 0）。
+
+---
+
+## Round 928 — evaluation/report.py 第三百七十二轮（25 测试）
+
+- 文件：`tests/test_evaluation_report_edges102.py`（batch126，forbidden tokens 第三百九十八批）。
+- 新角度：git 命令 TimeoutExpired → except (OSError, SubprocessError) → {None, True}；aggregate_summary 缺 "metrics" 键 → KeyError 直接冒出；ratio 混合 [0.0,1.0,None,0.5] → macro 0.5/participating 3/not_evaluated 1；summary 顶层四键序；dependencies 透传；__all__ 五项有序；schema_valid 仅在 _RATIO_METRICS、pipeline_success 仅在 _SUCCESS_BOOL_METRICS（互斥）。
+
+---
+
+## Round 927 — evaluation/manifest.py 第三百七十一轮（25 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges113.py`（batch125，forbidden tokens 第三百九十七批）。
+- 新角度：annotation_file 反斜杠 → ManifestError（"必须使用正斜杠"）；"../x.json" 逃逸根；expected_failures 绝对路径 → "必须是相对路径"；DocumentEntry.path_str 原样保留 "./samples/a.pdf"（raw 保存 resolved 才归一）；categories 元组保留重复 ("a","a")（去重只在 categories_covered）；两次加载值相等非同一对象；manifest_version JSON 数字 1.0 → "(2 处)"（type + const 双报）；顶层数组 → "is not of type 'object'"。
+
+---
+
+## Round 926 — evaluation/metrics.py 第三百七十轮（29 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges110.py`（batch124，edges 第三百零二批，forbidden tokens 第三百九十六批）。
+- 新角度：_strip_unicode_whitespace 控制字符分区（\x1c/\x1f Python isspace True 被删、\x00 保留 → "a\x1cb\x00c\x1fde" → "ab\x00cde"）；四构造器直测（_ratio(True)→1.0 float、_int_metric(3.9)→3 截断、_bool_metric 真值、_null 原样）；heading set 去重（两 chunk 首 id 同 h1 → 1.0）；type "Image" 大写不识别 → no_image_elements；空 elements + 引用 e1 → 0.0；expectations ghost_type → 按实际 0 计入 drop 2；document 传 list → AttributeError。
 
 ---
 
