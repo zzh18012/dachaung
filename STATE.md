@@ -4,6 +4,20 @@
 
 ---
 
+## Round 1072 — evaluation/metrics.py 第五百一十六轮（23 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges131.py`（batch271，edges 第四百四十八批，forbidden 第五百四十三批）。
+- 新角度（真实 caption 分型 + 双图全局计数器）：parser 的 _CAPTION_RE 在真实 docx 上生效——"Figure 1: ..." → type **caption**（corpus 首次产出 caption 类型元素）；中文分支 "图 1 ..." / "表 2 ..." 同样 caption、无编号前缀保持 paragraph；**双图同 doc** image_counter 是文档级全局计数（para0_00.png 与 para2_01.png——前缀随段落、序号跨段累加）双图 ratio 1.0；ecbt 三分 {paragraph 2, image 2, caption 2}、ect 6；题注文本同权计入保持性（全绿）。
+
+---
+
+## Round 1071 — evaluation/schema.py 第五百一十五轮（24 测试）
+
+- 文件：`tests/test_evaluation_schema_edges123.py`（batch270，edges 第四百四十七批，forbidden 第五百四十二批）。
+- 新角度（同一报告的严格性倒挂：ef 闭仓 vs metrics 暗仓）：evaluation-report.schema 的 **per_doc.metrics 是素 object**（def 层字面 {"type": "object"}）——value 塞字符串/对象、reason 塞 int、删 reason、加陌生指标键全部放行，但 metrics 本身 required（pop 即拒）；同报告 **expected_failures 条目闭仓**——additionalProperties: false（多键即拒）、matches 强类型 bool（"yes" → not of type boolean）、actual_error_code required——一份报告两套纪律：结构键守门、度量值放任。
+
+---
+
 ## Round 1070 — evaluation/annotation_metrics.py 第五百一十四轮（22 测试）
 
 - 文件：`tests/test_evaluation_annotation_metrics_edges134.py`（batch269，edges 第四百四十六批，forbidden 第五百四十一批）。
@@ -42,7 +56,7 @@
 ## 回归基线 90520（第 22 次精确命中）
 
 - btdldmddh（R1065 后启动）实测 **90520 passed, 22 skipped（523.22s）**，与预测 90520（90360 + R1059-1065 七轮 160）**分毫不差**——第 22 次连续精确命中。
-- 下一回归：R1072 后启动，预测 = 90520 + R1066-1072 七轮实测之和（R1066=23、R1067=23、R1068=22、R1069=22、R1070=22 已定，R1071-1072 待写）。
+- 下一回归 bfpwvysgs（R1072 后启动）：预测 **90679**（90520 + R1066-1072 七轮 23+23+22+22+22+24+23=159）。
 
 ---
 
