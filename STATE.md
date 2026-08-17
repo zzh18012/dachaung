@@ -4,10 +4,170 @@
 
 ---
 
-## 回归基线（Round 790-803 全量）
+## 回归基线（Round 804-811 全量）
 
-- **84229 passed + 22 skipped**（451.44s / 07:31）。与预测 83895 + 334（R790-803 新增）精确吻合，全绿。
-- 下一轮全量预期 ≈ 84305（84229 + R804-806 的 23+22+32 = 77，R807+ 另计）。
+- **84433 passed + 22 skipped**（470.24s / 07:50）。与预测 84229 + 204（R804-811 新增）精确吻合，全绿。
+- 下一轮全量预期 ≈ 84560（84433 + R812-816 的 24+30+25+25+23 = 127，R817+ 另计）。
+
+---
+
+## Round 816 — evaluation/report.py 第二百六十轮（23 测试）
+
+### 目标
+- 补强 edges85 未触及的角度（第一百八十批）：**真跑本 worktree provenance（commit 40-hex + dirty bool）**；**success rate 1/3 精确**；**evaluator_version/report_version 锁死 1.1/1.1（版本守卫）**；**aggregate 每次全新 dict**；**counts 负值 -5 不裁剪**；源码锁 _COUNT_METRICS/_SUCCESS_BOOL_METRICS；forbidden tokens 第二百八十六批
+
+### 改动
+- 新增 tests/test_evaluation_report_edges86.py（23 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- runner edges97（Round 817）。
+
+---
+
+## Round 815 — evaluation/manifest.py 第二百五十九轮（25 测试）
+
+### 目标
+- 补强 edges96 未触及的角度（第一百七十九批）：**反斜杠拒绝消息（字段名 documents[d1].path）**；**越根 ../outside.pdf 拒绝（消息含原始串）**；**"samples/./a.pdf" resolve 归一合法**；**不存在的文档文件照常加载（存在性留给 runner）**；**ef 与 document 同 doc_id 双双加载**；**顶层额外键 EvalSchemaError**；**manifest_version "2.0" → schema const 先于兼容性 ManifestError（后者对错版本不可达）**；forbidden tokens 第二百八十五批
+
+### 改动
+- 新增 tests/test_evaluation_manifest_edges97.py（25 测试）
+
+### 撞墙记录
+- 1 fail：源码断言写了跨行 raise 的完整一行（实际 raise 与 f-string 分行）→ 改断 f-string 片段。
+
+### 下一步建议
+- report edges86（Round 816 已做）。
+
+---
+
+## Round 814 — evaluation/metrics.py 第二百五十八轮（25 测试）
+
+### 目标
+- 补强 edges94 未触及的角度（第一百七十八批）：**docx "page": None 键存在即拒（0.0）vs {"section": None} 键存在即收（1.0，键存在语义两面）**；**pdf page 0 拒 / 10**9 收（无上界）**；**两 chunk 重复引用同一 element 双计 1.0**；**多集合重复 AA vs AAA → P 2/3 / R 1.0 / equal False**；**反斜杠 rp + image_base_dir 按 name 兜底命中 1.0**；forbidden tokens 第二百八十四批
+
+### 改动
+- 新增 tests/test_evaluation_metrics_edges95.py（25 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- manifest edges97（Round 815 已做）。
+
+---
+
+## Round 813 — evaluation/schema.py 第二百五十七轮（30 测试）
+
+### 目标
+- 补强 edges84 未触及的角度（第一百七十七批）：**annotation.schema.json 行为面**——极简 2 键合法、annotator 任意串、version const、doc_id minLength、顶层封闭、anchor 可选 reason 键、marker "" 行为拒、heading level 0/字符串拒、caption_text "" 拒；**validate 收 list 实例 "is not of type 'object'"**；**validate_file 收目录 FileNotFoundError**；forbidden tokens 第二百八十三批
+
+### 改动
+- 新增 tests/test_evaluation_schema_edges85.py（30 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- metrics edges95（Round 814 已做）。
+
+---
+
+## Round 812 — evaluation/annotation_metrics.py 第二百五十六轮（24 测试）
+
+### 目标
+- 补强 edges95 未触及的角度（第一百七十六批）：**全命中时 _missing_markers 键不存在**；**document None → pipeline_failed + _tolerance_chars 仍带**；**3-chunk 精确算术（pred [1,3]、gt 3、tol 0 第二边界精确命中 P 0.5/R 1.0/F1 2/3）**；**marker "" 直接判 missing [""]**；**空 chunk 文本也产出预测边界**；**before/after 混合 d=2 平局 → 贪心稳定取列表靠前者（P 1.0/R 0.5）**；forbidden tokens 第二百八十二批
+
+### 改动
+- 新增 tests/test_evaluation_annotation_metrics_edges96.py（24 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- schema edges85（Round 813 已做）。
+
+---
+
+## Round 811 — evaluation/cli.py 第二百五十五轮（25 测试）
+
+### 目标
+- 补强 edges95 未触及的角度（第一百七十五批）：**inspect-doc --tolerance-chars 77 透传且 _tolerance_chars 键泄漏进输出行（runner pop、inspect-doc 不 pop）**；**指标类排序行为面（首行 pipeline_success / 末行 silent_drop_count）**；**顶层非对象 "[1,2]" → rc 1**；**run 清单不存在 rc 2 / schema 失败 rc 1**；**inspect-doc / validate-report FNF rc 2 各自文案**；forbidden tokens 第二百八十一批
+
+### 改动
+- 新增 tests/test_evaluation_cli_edges96.py（25 测试）
+
+### 撞墙记录
+- 1 fail：源码断言漏了 f-string 前缀（实际是 f"[ERROR] 清单不存在..."）→ 补 f 前缀。
+
+### 下一步建议
+- annotation_metrics edges96（Round 812 已做）。
+
+---
+
+## Round 810 — evaluation/runner.py 第二百五十四轮（25 测试）
+
+### 目标
+- 补强 edges95 未触及的角度（第一百七十四批）：**parser_version 首个非空优先（"1.0"+"2.0"→"1.0"；None+"2.0"→"2.0"）**；**process_single (None, []) → code "unknown" 兜底**；**损坏 annotation JSON → _load_annotation 吞 JSONDecodeError → no_annotation**；**落盘 per_doc 仅 4 公开键（内部三键不外泄）**；**落盘与返回 report 全等 round-trip**；**expected_failures 空清单仍带键**；forbidden tokens 第二百八十批
+
+### 改动
+- 新增 tests/test_evaluation_runner_edges96.py（25 测试）
+
+### 撞墙记录
+- 0 fail 首跑（probe 首版 _prov 吞了 kwargs → 改捕获式）。
+
+### 下一步建议
+- cli edges96（Round 811 已做）。
+
+---
+
+## Round 809 — evaluation/report.py 第二百五十三轮（23 测试）
+
+### 目标
+- 补强 edges84 未触及的角度（第一百七十三批）：**非 git 目录真跑 → {commit None, dirty False}（docstring "失败时 dirty=true" 只对 exception 路径成立）**；**summary 顶层 4 键全序**；**未知指标任何 section 不出现**；**provenance 时间戳 astimezone 带 tz、fromisoformat 可回解**；**max_chars 555.9 截断 555**；forbidden tokens 第二百七十九批
+
+### 改动
+- 新增 tests/test_evaluation_report_edges85.py（23 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- runner edges96（Round 810 已做）。
+
+---
+
+## Round 808 — evaluation/manifest.py 第二百五十二轮（27 测试）
+
+### 目标
+- 补强 edges95 未触及的角度（第一百七十二批）：**重复 doc_id 双载（schema 无 uniqueKey）**；**自配对 frozenset 去重 → 1 文档 1 组**；**单向配对 seen 吸收 → 2 文档 1 组**；**空清单 + complete 全 0**；**categories entry 保序 vs 属性排序**；**annotation_file ""（schema 放行、falsy → resolved None、原样存 ""）**；**str 清单路径等价**；**documents source_type txt 拒（enum 只收 pdf/docx）**；**expectations 透传**；forbidden tokens 第二百七十八批
+
+### 改动
+- 新增 tests/test_evaluation_manifest_edges96.py（27 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- report edges85（Round 809 已做）。
+
+---
+
+## Round 807 — evaluation/metrics.py 第二百五十一轮（27 测试）
+
+### 目标
+- 补强 edges93 未触及的角度（第一百七十一批）：**成功路径 14 键全序锁定**；**error 与 document 并存 → pipeline_success False 但下游照算（早退只看 document is None）**；**source_type "PDF" 大写 → 双 null**；**page=True 布尔漏过（bool 是 int 子类；bbox 显式拒 bool、page 检查没有）**；**table 无 bbox 合法（_PDF_BBOX_REQUIRED_TYPES 不含 table/header/footer）**；**缺 type 键 → "unknown" 桶**；**content/text None → equal True + empty_expected_and_actual**；**双 heading 一命中 0.5**；**image 无 resource_path → 0.0 非 null**；forbidden tokens 第二百七十七批
+
+### 改动
+- 新增 tests/test_evaluation_metrics_edges94.py（27 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- manifest edges96（Round 808 已做）。
 
 ---
 
