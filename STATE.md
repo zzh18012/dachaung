@@ -4,6 +4,63 @@
 
 ---
 
+## 回归基线（Round 996-1009 全量）
+
+- **89129 passed + 22 skipped**（741.88s / 12:21，任务 bzrpm6bar，覆盖至 R1002）。与预测 88963 + 166（R996-1002 新增 [metrics120 24 + manifest123 23 + report112 24 + runner123 26 + cli123 22 + annotation124 22 + schema113 25]）精确吻合，连续第十三次命中，全绿。
+- 下一轮全量预期 ≈ **89286**（89129 + R1003-1009 新增 157：metrics121 21 + manifest124 23 + report113 23 + runner124 22 + cli124 20 + annotation125 22 + schema114 26）。
+
+---
+
+## Round 1009 — evaluation/schema.py 第四百五十三轮（26 测试）
+
+- 文件：`tests/test_evaluation_schema_edges114.py`（batch207，edges 第三百八十五批，forbidden 第四百七十九批）。
+- 新角度（document.schema.json allOf 分支行为面）：6 分支 const 序 [pdf,docx,markdown,html,text,ipynb] 全 if+then；markdown locator line 合法且开放（附加键 OK）；html 缺 line 拒；text line=0 违 minimum 1；pdf 分支给 docx 键 → 'page' required；**docx locator 同时带 page+paragraph_index 合法（schema 不禁 page，而 metrics._docx_locator_ratio 判无效——跨模块张力）**；relation 用 from/to → 'from_id' required；warning 缺 reason 拒。
+
+---
+
+## Round 1008 — evaluation/annotation_metrics.py 第四百五十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges125.py`（batch206，edges 第三百八十四批，forbidden 第四百七十八批）。
+- 新角度：负容差 -1 → P/R/F1 三 0.0（分母仍在）；全空 chunks ["",""] 三键三态（P 0.0 / R null no_ground_truth_anchors_in_stream / F1 null）；同界 mixed before/after 双锚贪心全 1.0；远端双锚 tol=2 → P=1/3、R=1/2、F1 精确 0.4。
+
+---
+
+## Round 1007 — evaluation/cli.py 第四百五十一轮（20 测试）
+
+- 文件：`tests/test_evaluation_cli_edges124.py`（batch205，edges 第三百八十三批，forbidden 第四百七十七批）。
+- 新角度（inspect 输出分歧可见性）：elements=0+chunks=1 → chunk_ref 0.0000（非 null）+ precision 0.0000 / recall null empty_expected 单侧分歧同屏；docx 文档 docx_locator 1.0000 与 pdf_locator null not_pdf 同屏。
+- 踩坑：跨行隐式字符串拼接必须加括号（`assert ("a" "b") in x`），否则 IndentationError。
+
+---
+
+## Round 1006 — evaluation/runner.py 第四百五十轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges124.py`（batch204，edges 第三百八十二批，forbidden 第四百七十六批）。
+- 新角度（双循环捕获对照）：documents 循环 stub "d1.json" vs ef 循环 stub "ef1.json"；两循环 process_single kwargs 完全一致（parser_name/max_chars=777/write_json=False）；成功文档 to_dict 恰调 1 次；wall_time total 恒 float ≥0。
+
+---
+
+## Round 1005 — evaluation/report.py 第四百四十九轮（23 测试）
+
+- 文件：`tests/test_evaluation_report_edges113.py`（batch203，edges 第三百八十一批，forbidden 第四百七十五批）。
+- 新角度（分歧矩阵 + 版本一致性）：4 文档 [None,0.0,0.5,1.0] → macro 0.5/participating 3/not_eval 1（**键缺失与值 None 等价**）；silent [None,0,2,缺键] → 2；counts → sum 7 participating 2；rate 0.25；EVALUATOR/REPORT_VERSION 在 __init__/report/runner 三处同值 "1.1"。
+
+---
+
+## Round 1004 — evaluation/manifest.py 第四百四十八轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges124.py`（batch202，edges 第三百八十批，forbidden 第四百七十四批）。
+- 新角度：ef UNC "//server/x.pdf" 拒（expected_failures[e1].path 字段名）；文件尾斜杠 "samples/a.pdf/" 照常加载且 path_str 原样保留；ef doc_id 中文合法；sha256 "abc" schema pattern 拒；annotation_file 中文合法。
+
+---
+
+## Round 1003 — evaluation/metrics.py 第四百四十七轮（21 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges121.py`（batch201，edges 第三百七十九批，forbidden 第四百七十三批）。
+- 新角度：中文重排 equal False + P/R 双 1.0（重排只在 equal 可见）；emoji round-trip equal True；DOCX 复合矩阵（heading/docx loc 1.0、image 0.0、silent 1、pdf null、by_type 三键）一次锁。
+
+---
+
 ## 回归基线（Round 989-1000 全量）
 
 - **88801 passed + 22 skipped**（784.51s / 13:04，任务 bm15ipl5z，覆盖至 R988）。与预测 88475 + 326 精确吻合，连续第十一次命中。
