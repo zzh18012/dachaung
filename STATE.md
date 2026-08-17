@@ -4,6 +4,123 @@
 
 ---
 
+## 回归基线（Round 844-855 全量）
+
+- **85522 passed + 22 skipped**（470.50s / 07:50）。与预测 85235 + 287（R844-855 新增）精确吻合，全绿。
+- 下一轮全量预期 ≈ 85754（85522 + R856-864 新增 232：metrics101 24 + manifest103 22 + report92 27 + runner103 21 + cli103 26 + annotation104 23 + schema92 28 + metrics102 35 + manifest104 24→实际 26，按 26 计 232）。
+- 已于 R864 后启动后台全量（b0f07ntjf），覆盖 R856-864。
+
+---
+
+## Round 870 — evaluation/metrics.py 第三百一十四轮（26 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges103.py`（batch68，forbidden tokens 第三百四十批）。
+- 新角度：多 heading 对齐 1.0 / 部分对齐 0.5；resource_path 指向目录 → 无效；image rp None → 无效；silent_drop 多类型只累计缺口；expectations 传 truthy 字符串 → AttributeError 现状锁定；document 与 error 并存（pipeline_success False 但指标照算）；"aab" vs "abb" 多集合 P=R=2/3 且 equal False。
+- 下一步：manifest edges105（Round 871）。
+
+---
+
+## Round 869 — evaluation/schema.py 第三百一十三轮（27 测试）
+
+- 文件：`tests/test_evaluation_schema_edges93.py`（batch67，forbidden tokens 第三百三十九批）。
+- 新角度：document $defs/element required 恰 6 项（content 不在 required）；chunk/relation/warning/error/pdf_locator required 集合；manifest documents 条目缺 path → 错误落父路径 ["documents", 0]；EvalSchemaError.errors 保留传入列表身份；SCHEMAS_DIR 恰 4 个 json；validate 未知 Schema 名 / validate_file 传目录 → FileNotFoundError。
+- 备注：commit 时遇 index.lock 瞬态（并发 push），确认无 git 进程后 lock 已消失，重试成功。
+
+---
+
+## Round 868 — evaluation/annotation_metrics.py 第三百一十二轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges105.py`（batch66，forbidden tokens 第三百三十八批）。
+- 新角度：首 chunk 空文本 pred 落 0 位（tol 2 全 1.0 / tol 0 全 0.0）；"CD" before 夹在 pred [2,5] 之间 tol 1 只中近端 P 0.5 R 1.0 F1 2/3；marker 流起始 before gt=0；巨容差 1000 下一对一约束仍生效。
+
+---
+
+## Round 867 — evaluation/cli.py 第三百一十一轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges104.py`（batch65，forbidden tokens 第三百三十七批）。
+- 新角度：全真实链路 roundtrip（仅 process_single 打桩的 run_evaluation 产出报告 → validate-report 真实 Schema 校验 rc0 [OK]）；篡改 expected_failures 条目缺 required 字段 → rc1 [FAIL] + "required property"；--tolerance-chars 0 → "0  (ok)" 行；stdout/stderr reconfigure utf-8 源码块。
+
+---
+
+## Round 866 — evaluation/runner.py 第三百一十轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges104.py`（batch64，forbidden tokens 第三百三十六批）。
+- 新角度：_load_annotation 直调（JSON 数组文件 → [] falsy 非 None / dict 透传）；两文档同源文件 → process_single 恰调 2 次；wall_time parse/chunk None + "not_instrumented" + total 非负 float；失败文档 compute_automatic_metrics 完整 kwargs 捕获（image_base_dir None、expectations 透传）；build_provenance 哨兵透传 + 真实 devset file_count。
+
+---
+
+## Round 865 — evaluation/report.py 第三百零九轮（26 测试）
+
+- 文件：`tests/test_evaluation_report_edges93.py`（batch63，forbidden tokens 第三百三十五批）。
+- 新角度：跟踪文件被修改（非 untracked）→ dirty True；空清单 devset 全零；pipeline_success 值 None 计入 total 不计入 success_count；counts [3,4] sum 7；ratio [1.0,0.5,0.0] macro 0.5；silent [2,None,3] → 5；EVALUATOR_VERSION/REPORT_VERSION 锁 "1.1"；max_chars bool True → 1。
+
+---
+
+## Round 864 — evaluation/manifest.py 第三百零八轮（26 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges104.py`（batch62，forbidden tokens 第三百三十四批）。
+- 新角度：manifest_version "0.9" 先被 Schema const 拦下（EvalSchemaError，版本不兼容分支不可达）；dot-dot 逃出根；自指配对 d1→d1 → 1 组；共指同一目标 → 2 组；annotation_file "" schema 放行 + falsy 跳过解析；CJK categories 排序；ExpectedFailure 五字段；project_root 解析后返回。
+
+---
+
+## Round 863 — evaluation/metrics.py 第三百零七轮（35 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges102.py`（batch61，forbidden tokens 第三百三十三批）。
+- 新角度：成功路径指标键恰 14；docx 结构键 7 种 parametrize；PDF 非 bbox 类型（header/image）仅 page 有效；resource_path 裸文件名 + base_dir 兜底命中/未命中；image content 不参与文本保留；content None + 空文本双空；CJK 保留；bbox tuple/5 元素无效；element_count_by_type 空 dict → no_expectations_element_count。
+
+---
+
+## Round 862 — evaluation/schema.py 第三百零六轮（28 测试）
+
+- 文件：`tests/test_evaluation_schema_edges92.py`（batch60，forbidden tokens 第三百三十二批）。
+- 新角度：annotation 顶层 required 2 + addProps False；boundary_anchor $defs 形状；report per_doc $defs required 4 + addProps False；wall_time required [total,parse,chunk]；两 Schema $defs 名称集合；annotation 顶层多余键 path=[]；devset_status 枚举错 + schema_path 尾 "enum"；validate_file str 路径 / FNF。
+
+---
+
+## Round 861 — evaluation/annotation_metrics.py 第三百零五轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges104.py`（batch59，forbidden tokens 第三百三十一批）。
+- 新角度：重复 marker 顺序定位（P 2/3 R 1.0 F1 0.8）；marker 在规范化流定位（多空格归一）；document None 早退也带 _tolerance_chars；空 marker "" 落 _missing_markers；负容差精确命中也失配全 0.0。
+
+---
+
+## Round 860 — evaluation/cli.py 第三百零四轮（26 测试）
+
+- 文件：`tests/test_evaluation_cli_edges103.py`（batch58，forbidden tokens 第三百三十批）。
+- 新角度：validate-report 真实垃圾 JSON rc1；inspect 垃圾 JSON / 顶层 list rc1；缺 document_id/source_path/parser_name → "?" 默认；run --manifest 目录 rc2；成功输出 devset 详情行 + git_dirty False；null 指标整体排非 null 之后。
+
+---
+
+## Round 859 — evaluation/runner.py 第三百零三轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges103.py`（batch57，forbidden tokens 第三百二十九批）。
+- 新角度：aggregate_summary 收到的内部行带 _annotation_present/_tolerance_chars/_missing_markers（公开 per_doc 已剥离）；ef matches True/False/actual None 三态 + 四键有序；ensure_ascii=False CJK doc_id 落盘字面字符。
+- 踩坑：ann.json 写在 _mk 建 proj 目录之前 → FileNotFoundError；把 annotation 移进 _mk 参数解决。
+
+---
+
+## Round 858 — evaluation/report.py 第三百零二轮（27 测试）
+
+- 文件：`tests/test_evaluation_report_edges92.py`（batch56，forbidden tokens 第三百二十八批）。
+- 新角度：counts 0 值参与；success `is True` 严格（int 1 不算）；ratio 0.0 参与 + not_evaluated；silent 0 → 0 / 全 None → None；build_provenance pv None + max_chars 0；get_git_provenance 收 str；__all__ 5 项有序。
+- 踩坑：source 断言写成 dict 字面量形式，实际是赋值语句 `summary["silent_drop_total"] = ...`，修正。
+
+---
+
+## Round 857 — evaluation/manifest.py 第三百零一轮（22 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges103.py`（batch55，forbidden tokens 第三百二十七批）。
+- 新角度：str 清单路径；三角互指 d1→d2→d3→d1 → frozenset 三组 → 3 组（环不折叠）；annotation 子目录解析；categories 大小写敏感排序 ["A","_","b"]。
+
+---
+
+## Round 856 — evaluation/metrics.py 第三百轮（24 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges101.py`（batch55，forbidden tokens 第三百二十六批）。
+- 新角度：error_code 成功 null；page 字符串挡；ids 字符串逐字符迭代 0.0；silent_drop 字符串期望 TypeError；额外键忽略；空 elements total 0 + by_type {}。
+
+---
+
 ## 回归基线（Round 834-843 全量）
 
 - **85235 passed + 22 skipped**（473.70s / 07:53）。与预测 84969 + 266（R834-843 新增，实际逐文件 collect 复核为 266）精确吻合，全绿。
