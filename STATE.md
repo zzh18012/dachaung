@@ -4,11 +4,196 @@
 
 ---
 
-## 回归基线（Round 844-855 全量）
+## 回归基线（Round 879-890 全量）
 
-- **85522 passed + 22 skipped**（470.50s / 07:50）。与预测 85235 + 287（R844-855 新增）精确吻合，全绿。
-- 下一轮全量预期 ≈ 85754（85522 + R856-864 新增 232：metrics101 24 + manifest103 22 + report92 27 + runner103 21 + cli103 26 + annotation104 23 + schema92 28 + metrics102 35 + manifest104 24→实际 26，按 26 计 232）。
-- 已于 R864 后启动后台全量（b0f07ntjf），覆盖 R856-864。
+- **86356 passed + 22 skipped**（462.23s / 07:42，任务 b8etma79l，覆盖至 R890）。与预测 86086 + 270（R879-890 新增 12 文件）精确吻合，全绿。
+- 下一轮全量预期 ≈ **86504**（86356 + R892-896 新增 148：manifest108 29 + report97 30 + runner108 26 + cli108 29 + metrics106 34）。
+- 备注：R891（metrics 槽位）在 continuation 中被误报为已完成、实际未发生（无 commit、无文件），由 R896 补齐 metrics 槽位；编号 891 永久跳过。
+
+---
+
+## Round 896 — evaluation/metrics.py 第三百四十轮（34 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges106.py`（batch94，forbidden tokens 第三百六十六批）。
+- 新角度：heading element_id None 与 chunk 首引用 None 互匹配 → 1.0；docx locator 含 page=None 键（存在即无效）→ 0.0；元素缺 type 键落 "unknown" 桶；pdf 无 locator → 0.0（elements 非空不 null）；_is_valid_bbox 矩阵（bool 混入/inf/字符串/tuple/len3 全 False，浮点合法）；chunk source_element_ids [] → 半分；重复 element_id 集合去重仍匹配；空白差异 equal（"A  B\n" vs "AB" → True + P=R=1.0）；expectations 计数值为字符串 → TypeError 现状锁定。
+- 下一步：annotation_metrics edges109（Round 897）。
+
+---
+
+## Round 895 — evaluation/cli.py 第三百三十九轮（29 测试）
+
+- 文件：`tests/test_evaluation_cli_edges108.py`（batch93，forbidden tokens 第三百六十五批）。
+- 新角度：--parser choices 限定 fallback/kreuzberg（非法值 SystemExit 2）；kreuzberg 透传 run_evaluation kwargs；validate-report 成功行完整文本；inspect-doc 头 5 行缺省全 "?"；--tolerance-chars 透传 chunk_boundary_prf（运行时 import 也可 patch）；_format_metric int/dict(sorted)/bool False 三分支；main([]) → SystemExit 2；manifest Schema 不过 → rc1 "清单加载失败"。
+- 踩坑：`{name:36}` 与 `{value}` 之间有一个分隔空格，首跑 3 个 padding 断言差一空格，修正后 29 全过。
+
+---
+
+## Round 894 — evaluation/runner.py 第三百三十八轮（26 测试）
+
+- 文件：`tests/test_evaluation_runner_edges108.py`（batch92，forbidden tokens 第三百六十四批）。
+- 新角度：标注文件内容为 JSON 字符串 '"x"' → chunk_boundary_prf 处 AttributeError 未防护直接冒出；标注 null → _annotation_present False 但单 chunk 文档 _tolerance_chars 仍记 30、_missing_markers []；报告顶层键序恰 6 项；落盘 indent=2；失败文档 wall_time 6 键完整；tolerance_chars=7 透传 kwarg；figure_caption_prf 位置参数 (doc_dict, None)；公开 per_doc 键序 4 项。
+- 下一步：cli edges108（Round 895）。
+
+---
+
+## Round 893 — evaluation/report.py 第三百三十七轮（30 测试）
+
+- 文件：`tests/test_evaluation_report_edges97.py`（batch91，forbidden tokens 第三百六十三批，report 变体 subprocess.run 计 2）。
+- 新角度：get_dependency_versions 键序三依赖 + 混合缺失（pypdfium2 PackageNotFoundError → None 其余有值）；get_git_provenance 两条命令精确序列 + cwd/timeout 10 kwargs；rev-parse rc=1 而 porcelain 干净 → commit None + dirty False；rev-parse rc=0 但 stdout 空 → or None 分支；counts 浮点求和 3.5 透传；success 分母=全部文档（缺 metric 键也计入）；ratio 值为 bool（True/False 非 None）参与 macro → 0.5；_COUNT/_SUCCESS 元组常量；build_devset_section 键序 6；build_provenance max_chars "5" → int 5；run_timestamp_iso 可 fromisoformat 回解析且带时区。
+- 下一步：runner edges108（Round 894）。
+
+---
+
+## Round 892 — evaluation/manifest.py 第三百三十六轮（29 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges108.py`（batch90，forbidden tokens 第三百六十二批）。
+- 新角度：层级顺序——空 path / 坏 sha256 由 Schema 先拦（EvalSchemaError，minLength/pattern ^[0-9a-f]{64}$）；"C:\x.pdf" 绝对路径检查先于反斜杠（报"禁止绝对路径"）；POSIX "/etc/x" 绝对；相对反斜杠各自报错；annotation_file " "（纯空白）被接受且 annotation_resolved 非 None；垃圾 JSON → ManifestError "清单 JSON 解析失败"；缺省 project_root → 清单所在目录（向上无 pyproject.toml）；单向配对 d1→d2（d2 沉默）content_group_count==1（目标被吞并）；categories 去重排序 ["a","b","c"]；devset_status "complete" 透传；清单文件不存在 → ManifestError。
+- 下一步：report edges97（Round 893）。
+
+---
+
+## Round 890 — evaluation/schema.py 第三百三十四轮（22 测试）
+
+- 文件：`tests/test_evaluation_schema_edges96.py`（batch88，forbidden tokens 第三百六十批）。
+- 新角度：boundary_anchor position enum 恰 ["before","after"]、marker type string + minLength 1；document source_type enum 六值；chunk $defs additionalProperties False；report provenance(9)/devset(6) properties 与 required 同集。
+- 下一步：manifest edges108（Round 892；891 槽位因 continuation 误报跳过）。
+
+---
+
+## Round 889 — evaluation/annotation_metrics.py 第三百三十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges108.py`（batch87，forbidden tokens 第三百五十九批）。
+- 新角度：重复 marker 第二次找不到只算 missing 不减 recall（全 1.0 + _missing_markers 记录）；marker 等于整条 stream → after 落末尾 gt=5（tol 0 全 0.0 / tol 3 命中）；marker 不归一化——stream 归一后空格 marker 命中、制表符 marker missing（recall null no_ground_truth_anchors_in_stream + f1 null precision_or_recall_not_evaluated）。
+- 踩坑：两处算术首跑错（gt=5 非 2；missing 时 recall/f1 是 null 非 0.0），probe 修正后全过。
+
+---
+
+## Round 888 — evaluation/cli.py 第三百三十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges107.py`（batch86，forbidden tokens 第三百五十八批）。
+- 新角度：run 输出块四行结构（[OK]/documents/devset/git 行首 6 空格锁定 + git_dirty=True）；inspect-doc counts 两种内容并存（elements=2 chunks=1）；validate-report 对 {} → rc1（顶层 required 5 项缺失）；run --tolerance-chars 缺省 30 / --max-chars 缺省 800 透传 kwargs。
+
+---
+
+## Round 887 — evaluation/runner.py 第三百三十一轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges107.py`（batch85，forbidden tokens 第三百五十七批）。
+- 新角度：parser_name "kreuzberg" 透传 process_single kwargs（含 write_json False）；fake 内 sleep 0.02 → wall_time total 严格 > 0.005；全失败 _per_doc 目录仍被创建；成功无标注 per_doc metrics 恰 20 键（14+3+3，内部键已弹出）；process_single 调用顺序 docs 先于 ef（按 out_stub 文件名序）。
+
+---
+
+## Round 886 — evaluation/report.py 第三百三十轮（22 测试）
+
+- 文件：`tests/test_evaluation_report_edges96.py`（头注笔误第二百六十批，应为第二百六十一批，保留）。
+- 新角度：三组 metric 名（_COUNT/_SUCCESS/_RATIO）互不相交；ratio/success 键插入顺序 == 元组顺序；100 文档规模 sanity（counts sum 550、rate 1.0）。
+
+---
+
+## Round 885 — evaluation/manifest.py 第三百二十九轮（22 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges107.py`（batch84，forbidden tokens 第三百五十六批）。
+- 新角度："C:foo.pdf" 盘符相对被 pathlib 吸收（resolved == proj/foo.pdf）；expectations 每次 load 新鲜（身份断言首跑错，改为跨序列化隔离断言）；manifest_version 透传；pdf↔docx 互配 1 组。
+
+---
+
+## Round 884 — evaluation/metrics.py 第三百二十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges105.py`（batch83，forbidden tokens 第三百五十五批）。
+- 新角度：image 空 rp 混合 0.5；table/list_item 参与文本比对；bool 期望 True-0 → drop 1；缺 chunks 键 → no_chunks + empty_actual precision null + recall 0.0。
+
+---
+
+## Round 883 — evaluation/schema.py 第三百二十七轮（26 测试）
+
+- 文件：`tests/test_evaluation_schema_edges95.py`（batch82，forbidden tokens 第三百五十四批）。
+- 新角度：4 个 schema 参数化 $id（https://kvfs.local/schemas/<name>）与 $schema（2020-12）；annotation props 7；report props 6；per_doc props==required；devset_status enum 直取。
+
+---
+
+## Round 882 — evaluation/annotation_metrics.py 第三百二十六轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges107.py`（batch81，forbidden tokens 第三百五十三批）。
+- 新角度：span marker "B C" after tol 2 → 1.0；返回键序 [precision, recall, f1, _tolerance_chars]；空格 marker gt=space_pos+1（tol 1 命中 / tol 0 miss）；float tolerance 1.5 透传；单 chunk 早退三件套。
+- 踩坑：空格 marker 算术（gt=3 非 2）首跑错，probe 修正。
+
+---
+
+## Round 881 — evaluation/cli.py 第三百二十五轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges106.py`（batch80，forbidden tokens 第三百五十二批）。
+- 新角度：run 统计 int 1 计入失败（is True 严格）；inspect by_type 排序 "paragraph=1, table=1" 集成；缺 --manifest → SystemExit 2。
+
+---
+
+## Round 880 — evaluation/runner.py 第三百二十四轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges106.py`（batch79，forbidden tokens 第三百五十一批）。
+- 新角度：_load_annotation 目录 → None；errors 胜过 document（doc 被丢弃）；垃圾标注 → no_annotation；process_single 异常无守卫直接冒出（RuntimeError）；盘上 JSON == 返回 report 深相等。
+
+---
+
+## Round 879 — evaluation/report.py 第三百二十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_report_edges95.py`（batch78，forbidden tokens 第三百五十批）。
+- 新角度：metrics[name] 为 int → AttributeError；build_provenance 全真跑 9 键 + tmp 非 git → commit None；_RATIO_METRICS 12 项唯一；缺 metric → {"sum": None, "participating_docs": 0}。
+
+---
+
+## Round 878 — evaluation/manifest.py 第三百二十二轮（24 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges106.py`（batch77，forbidden tokens 第三百四十九批）。
+- 新角度：paired_with "" falsy → 未配对 1 组；doc path 目录被接受（无存在性检查）；ef path 不存在被接受；Manifest frozen（FrozenInstanceError）；MANIFEST_VERSION == "1.0"；CJK 子目录路径。
+
+---
+
+## Round 877 — evaluation/metrics.py 第三百二十一轮（24 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges104.py`（batch76，forbidden tokens 第三百四十八批）。
+- 新角度：image 分母只算 image 元素；None element_id 引用 quirk（[None] vs {None} → 1.0）；_int_metric(2.9) → 2 / (-0.9) → 0；source_type "txt" 双 locator null；"\x0b" isspace True 被剥；零期望无 drop。
+
+---
+
+## Round 876 — evaluation/schema.py 第三百二十轮（25 测试）
+
+- 文件：`tests/test_evaluation_schema_edges94.py`（batch75，forbidden tokens 第三百四十七批）。
+- 新角度：document props == required（13）；doc $defs 12 名集；manifest $defs 2 + document def required 3 + addProps False；ef def required 3；manifest props 4；report summary def 无 required 自由；validate_file annotation OK。
+
+---
+
+## Round 875 — evaluation/annotation_metrics.py 第三百一十九轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges106.py`（batch74，forbidden tokens 第三百四十六批）。
+- 新角度：chunk 边缘空白归一（" AB "+"CD" → 边界 2）；三重 marker "AB"×3（gts [2,5,8] vs preds [2,5] → P 1.0 R 2/3 F1 0.8）；标注缺 anchors 键（但含其他键）→ no_ground_truth_anchors；anchor 多余键不再校验；figure_caption_prf(None, None) 三件套。
+- 踩坑：单 chunk 早退源码断言（循环体 vs 三条独立赋值）首跑错，修正。
+
+---
+
+## Round 874 — evaluation/cli.py 第三百一十八轮（23 测试）
+
+- 文件：`tests/test_evaluation_cli_edges105.py`（batch73，forbidden tokens 第三百四十五批）。
+- 新角度：inspect-doc docx（docx_locator 1.0000 / pdf null not_pdf_document / type=docx）；真实 schema_validation 路径 → schema_valid false；error_code "null  (None)" f-string quirk；0 字节 manifest rc1；--max-chars "abc" → SystemExit 2 "invalid int value"。
+
+---
+
+## Round 873 — evaluation/runner.py 第三百一十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges105.py`（batch72，forbidden tokens 第三百四十四批）。
+- 新角度：_ps_writing_stub fake 写 out_stub → _process_one unlink；全跑后 _per_doc 目录空（doc+ef 双 stub 清理）；parser_version_for_prov 取首个成功（先败后成 → "9.9"）；first-wins（"1.1" vs "2.2" → "1.1"）。
+- 踩坑：两处 tuple 字面量缺尾逗号（单元素非 tuple）首跑 unpack 失败，修正。
+
+---
+
+## Round 872 — evaluation/report.py 第三百一十六轮（22 测试）
+
+- 文件：`tests/test_evaluation_report_edges94.py`（batch71，forbidden tokens 第三百四十三批）。
+- 新角度：counts False 值参与（sum 3）；ratio 字符串 "0.5" → sum TypeError；importlib.metadata.version 三依赖全 PackageNotFoundError → 全 None；subprocess TimeoutExpired → {git_commit: None, git_dirty: True}（patch.object(report_mod.subprocess, "run")）。
+
+---
+
+## Round 871 — evaluation/manifest.py 第三百一十五轮（24 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges105.py`（batch70，forbidden tokens 第三百四十二批）。
+- 新角度：悬空混合配对 → 2 组；annotation dot-dot 越界报错带字段名；重复 doc_id 被接受；内部 dot-dot "samples/../samples/a.pdf" 归一（path_str 保留、resolved 规范）；sha256 64-hex 透传；ef 不计入 file_count/pdf_count。
 
 ---
 
