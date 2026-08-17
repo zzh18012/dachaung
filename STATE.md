@@ -4,10 +4,62 @@
 
 ---
 
-## 回归基线（Round 919-925 全量）
+## 回归基线（Round 926-932 全量）
 
-- **87246 passed + 22 skipped**（759.41s / 12:39，任务 bvfnybyid，覆盖至 R925）。与预测 87060 + 186（R919-925 新增）精确吻合，连续第四次命中，全绿。
-- 下一轮全量预期 ≈ **87428**（87246 + R926-932 新增 182：metrics110 29 + manifest113 25 + report102 25 + runner113 21 + cli113 25 + annotation114 27 + schema103 30）。
+- **87428 passed + 22 skipped**（807.98s / 13:27，任务 bjmycbpwn，覆盖至 R932）。与预测 87246 + 182（R926-932 新增）精确吻合，连续第五次命中，全绿。
+- 下一轮全量预期 ≈ **87626**（87428 + R933-939 新增 198：metrics111 30 + manifest114 30 + report103 27 + runner114 27 + cli114 31 + annotation115 26 + schema104 27）。
+
+---
+
+## Round 939 — evaluation/schema.py 第三百八十三轮（27 测试）
+
+- 文件：`tests/test_evaluation_schema_edges104.py`（batch137，edges 第三百一十五批，forbidden tokens 第四百零九批）。
+- 新角度（直接读三个 Schema 文件的结构性事实）：三 Schema 全过 Draft202012Validator.check_schema；顶层均含 $schema/$id，report 第 6 键 additionalProperties、manifest/annotation 第 6 键 required；manifest document def required 恰 [doc_id, path, source_type] + 封闭 + 恰 8 属性；devset_status 纯 enum [complete, incomplete]；paired_with 恰 {"type": "string"}；documents 传字符串 → "is not of type 'array'"；report provenance def required 恰 9 项与 build_provenance 输出一一对应；summary def 无 required 恰 4 属性；EvalSchemaError 语义（Exception 子类、errors 保留、str 即 message）。
+- 下一步：metrics edges112（Round 940）。
+
+---
+
+## Round 938 — evaluation/annotation_metrics.py 第三百八十二轮（26 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges115.py`（batch136，edges 第三百一十四批，forbidden tokens 第四百零八批）。
+- 新角度：同 marker before+after 双 anchor（before 消费唯一出现 → after missing ["AB"]，但 R/P 仍 1.0）；跨接缝 marker "B C" 能找到（gt 1 vs pred 2 d=1 命中）；双空格 marker 在单空格流 missing；document 无 elements 键照常（只读 chunks）；annotation 多余键忽略；空尾 chunk 不产生边界全 1.0；首 chunk text None ≡ 空串；dup marker + search_from 耗尽（chunks AB/CDEF/G 双 "CDEF" → 第二个 missing、preds [2,7] 争唯一 gt [3] → P 0.5 / R 1.0）。
+
+---
+
+## Round 937 — evaluation/cli.py 第三百八十一轮（31 测试）
+
+- 文件：`tests/test_evaluation_cli_edges114.py`（batch135，edges 第三百一十三批，forbidden tokens 第四百零七批）。
+- 新角度：_format_metric 直测六型（int / float 带 partial reason "0.5000  (partial)" / bool 小写 true / dict 按 key 排序 "a=1, b=2" / null 保留 reason / str 走兜底分支，{name:36} 精确构造）；argparse 默认值直测（run fallback/800/30、inspect 30、prog "evaluation.cli"）；inspect 缺字段头四行（document_id "?" / source "? type=unknown" / parser "? v?"）；指标四层排序全序 21 项（bool 3 → 数值 7 含 _tolerance_chars 混入且下划线排最前 → dict 1 → null 10）；_tolerance_chars 行 "…ljust(36) + " 30  (ok)""；source_type unknown → 双 locator 均 not_*_document。
+
+---
+
+## Round 936 — evaluation/runner.py 第三百八十轮（27 测试）
+
+- 文件：`tests/test_evaluation_runner_edges114.py`（batch134，edges 第三百一十二批，forbidden tokens 第四百零六批）。
+- 新角度：_load_annotation 直测五态（None/缺文件/坏 JSON/目录 → None，合法 → dict）；wall_time_seconds 五键全序；内部 per_doc 行七键全序（经 aggregate spy）与公开行四键；报告顶层六键全序；tolerance_chars=7 → 内部行 7 且 metrics 中键已 pop（缺省 30）；_missing_markers 缺省 []；有效标注 _annotation_present True；坏 JSON 标注 → no_annotation；_per_doc 生命周期（空清单不创建、有文档则建且运行后为空）。
+- 踩坑：_per_doc 缺失测试首轮被同 tmp 早前运行污染（目录已存在），隔离输出目录后重探确认。
+
+---
+
+## Round 935 — evaluation/report.py 第三百七十九轮（27 测试）
+
+- 文件：`tests/test_evaluation_report_edges103.py`（batch133，edges 第三百一十一批，forbidden tokens 第四百零五批，report 变体 subprocess.run 恰 2）。
+- 新角度：ratio_macro_averages 键序与 _RATIO_METRICS 元组完全一致（12 项）；counts 混合 [5,None,7] → sum 12/participating 2；silent_drop 混合 [2,None,3] → 5；build_provenance 九键全序 + 值穿透；rev-parse rc 0 空输出 → `strip() or None` → commit None；porcelain 纯空白 → dirty False；rev-parse rc 128 与 porcelain 干净独立（None/False）；get_dependency_versions 恰三键序；run_timestamp_iso 可 fromisoformat 且带时区。
+
+---
+
+## Round 934 — evaluation/manifest.py 第三百七十八轮（30 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges114.py`（batch132，edges 第三百一十批，forbidden tokens 第四百零四批）。
+- 新角度：content_group_count 配对四态（双向 1 / 单向 1 / 链 d1→d2→d3 → 2 相交 frozenset 各一组 / 自配对+未配对 → 2）；混合计数 pdf1+docx1；默认根探测（tmp 链无 pyproject → 回退清单目录）；str 清单路径与 str 根；JSON 语法错 → "清单 JSON 解析失败"；盘符相对 "C:foo" 不逃逸（pathlib 当普通段 → 根/foo）；UNC //srv 拒绝；sha256 空串 → 正则拒绝；categories_covered 排序新列表。
+- 踩坑：source_type 受 schema enum 限制（仅 pdf/docx），"txt" 案例不可测。
+
+---
+
+## Round 933 — evaluation/metrics.py 第三百七十七轮（30 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges111.py`（batch131，edges 第三百零九批，forbidden tokens 第四百零三批）。
+- 新角度：成功文档 metrics 恰 14 键全序锁定；page=True（bool 是 int 子类）通过 → 1.0、page=1.0 float → 0.0；docx 结构键只查在场不查值（{"section": None} → 1.0，无 locator → 0.0）；image 0 字节文件不算存在 + base_dir 文件名第二候选命中 → 0.5；纯空白双侧 equal True 但 P/R null empty_expected_and_actual；AAB vs ABB → P=R=2/3；chunk ids [] 与 None 均无效；元素缺 type → "unknown" 桶；silent_drop 负向不计 + expectations 空矩阵三态。
 
 ---
 
