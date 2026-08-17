@@ -4,6 +4,111 @@
 
 ---
 
+## 回归基线（Round 954-960 全量）
+
+- **88161 passed + 22 skipped**（821.83s / 13:41，任务 bpfu0gyen，覆盖至 R960）。与预测 87984 + 177（R954-960 新增）精确吻合，连续第九次命中，全绿。
+- 下一轮全量预期 ≈ **88475**（88161 + R961-974 新增 314：R961-967 共 161 [metrics115 23 + manifest118 23 + report107 24 + runner118 22 + cli118 22 + annotation119 23 + schema108 24] + R968-974 共 153 [metrics116 22 + manifest119 22 + report108 20 + runner119 21 + cli119 21 + annotation120 22 + schema109 25]）。
+
+---
+
+## Round 974 — evaluation/schema.py 第四百一十八轮（25 测试）
+
+- 文件：`tests/test_evaluation_schema_edges109.py`（batch172，edges 第三百五十批，forbidden tokens 第四百四十四批）。
+- 新角度：三张 Schema 的 $id 统一为 `https://kvfs.local/schemas/<文件名>`；boundary_anchor def 细节：position enum 拒绝 "middle"（与 annotation_metrics 把 middle 当 after 形成张力）、缺 position → required 错误 @ ['chunk_boundary_anchors', 0]、额外键 → additionalProperties 拒绝、marker "" → minLength 拒绝、reason ""（无 minLength）合法；doc_id "" → 恰 1 错。
+
+---
+
+## Round 973 — evaluation/annotation_metrics.py 第四百一十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges120.py`（batch171，edges 第三百四十九批，forbidden tokens 第四百四十三批）。
+- 新角度：chunks 显式 None → `or []` 兜底 → P null no_predicted_boundaries + R 0.0；annotation 携带 figure_caption_pairs/heading_order/annotator/date 全被忽略（只读 chunk_boundary_anchors）；anchors 传 dict → dict 真值绕过 or [] → 迭代产出键 str → a.get 崩 AttributeError（锁定现状）；position before 距 2 命中 1.0。
+
+---
+
+## Round 972 — evaluation/cli.py 第四百一十六轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges119.py`（batch170，edges 第三百四十八批，forbidden tokens 第四百四十二批）。
+- 新角度：--max-chars/--tolerance-chars 传非 int → argparse invalid int rc 2；paragraph 无 bbox → pdf_locator_valid_ratio 0.0000 渲染；null + reason None 渲染怪癖 "null  (None)"（通用 null 分支无 or 'ok' 兜底）；by_type 单类型 "paragraph=1  (ok)"。
+
+---
+
+## Round 971 — evaluation/runner.py 第四百一十五轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges119.py`（batch169，edges 第三百四十七批，forbidden tokens 第四百四十一批）。
+- 新角度：per_doc 保持 manifest documents 顺序（[zeta, alpha] 不重排）；失败文档指标恰 20 键、尾 6 键序 [figure_caption P/R/F1, chunk_boundary P/R/F1]；figure 恒 parser_does_not_emit_relations vs boundary pipeline_failed 的分歧；汇总 pipeline_success rate {0, 2, 0.0}；_process_one 错误路径五元组（err 全量透传 to_dict、parser_version/image_dir None）。
+
+---
+
+## Round 970 — evaluation/report.py 第四百一十四轮（20 测试）
+
+- 文件：`tests/test_evaluation_report_edges108.py`（batch168，edges 第三百四十六批，forbidden tokens 第四百四十批）。
+- 新角度：_RATIO_METRICS 全量 12 项精确有序清单（第一次整表锁定：schema_valid → pdf/docx locator → image → chunk_ref → text_equal → text P/R → heading → chunk_boundary P/R/F1）；三包依赖版本号 x.y.z 数字点分正则；本批 forbidden 附带 subprocess.run 恰 2。
+
+---
+
+## Round 969 — evaluation/manifest.py 第四百一十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges119.py`（batch167，edges 第三百三十五批，forbidden tokens 第四百三十九批）。
+- 新角度：ghost 路径照常载入（存在性留给 runner/ef 阶段）；DocumentEntry 与 Manifest 全层 frozen（赋值抛 FrozenInstanceError）；sha256 "xyz" → schema 正则先拦 "@ path=['documents', 0, 'sha256']"。
+
+---
+
+## Round 968 — evaluation/metrics.py 第四百一十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges116.py`（batch166，edges 第三百四十四批，forbidden tokens 第四百三十八批）。
+- 新角度：element 缺 source_locator → pdf/docx locator 双 0.0；error 与 document 并存 → pipeline_success False 但指标照算；expectations 两级为空 → 各自 reason；overcount 恒 0。
+
+---
+
+## Round 967 — evaluation/schema.py 第四百一十一轮（24 测试）
+
+- 文件：`tests/test_evaluation_schema_edges108.py`（batch165，edges 第三百四十三批，forbidden tokens 第四百三十七批）。
+- 新角度：三张 Schema title 分别 "Evaluation Manifest v1.0" / "Evaluation Report v1.1" / "Human Annotation v1.0" 且 $schema URI 相同；AS 可选属性形状（annotator 无 minLength、date minLength 1、heading_order level minimum 1、figure_caption_pairs 双 minLength）；MS expectations def 无 required；全 def additionalProperties false 封闭映射。
+
+---
+
+## Round 966 — evaluation/annotation_metrics.py 第四百一十轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges119.py`（batch164，edges 第三百四十二批，forbidden tokens 第四百三十六批）。
+- 新角度：marker 大小写敏感；分支顺序 no-chunks 优先于 no-anchors（双缺 → P null no_predicted_boundaries）；有 anchors 无 chunks → R 0.0；负容差永不匹配；CJK 码点语义。
+
+---
+
+## Round 965 — evaluation/cli.py 第四百零九轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges118.py`（batch163，edges 第三百四十一批，forbidden tokens 第四百三十五批）。
+- 新角度：--parser 非法值 → argparse choices rc 2；source_type 缺失 → "unknown"；float 值恒 4 位小数渲染；dict 指标 sorted items 渲染。
+
+---
+
+## Round 964 — evaluation/runner.py 第四百零八轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges118.py`（batch162，edges 第三百四十批，forbidden tokens 第四百三十四批）。
+- 新角度：BOM 开头 annotation JSON 静默落 None；ef garbage content → 实际错误 "pdfplumber_open_failed"；空 manifest 报告 Schema 合法；wall_time 非负 float。
+
+---
+
+## Round 963 — evaluation/report.py 第四百零七轮（24 测试）
+
+- 文件：`tests/test_evaluation_report_edges107.py`（batch161，edges 第三百三十九批，forbidden tokens 第四百三十三批）。
+- 新角度：清单字段透传；越界 ratio 值照常平均不截断（[2.0, -1.0] → 0.5）；纯函数（无文件写入）；缺依赖三包全 None；summary 键序；0/1 值宏平均。
+
+---
+
+## Round 962 — evaluation/manifest.py 第四百零六轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges118.py`（batch160，edges 第三百三十八批，forbidden tokens 第四百三十二批）。
+- 新角度：_is_absolute_like 七态矩阵（BS = chr(92) 构造反斜杠）；_has_backslash；参数已 str 化；ghost paired_with 计 2 组；unicode categories 码点排序；sha256 透传。
+
+---
+
+## Round 961 — evaluation/metrics.py 第四百零五轮（23 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges115.py`（batch159，edges 第三百三十七批，forbidden tokens 第四百三十一批）。
+- 新角度：负 float bbox 合法、tuple bbox 被拒；resource_path 空/缺失 → 0.0；混合图片 0.5；U+3000 被 strip（chr(0x3000) 构造）。
+
+---
+
 ## 回归基线（Round 947-953 全量）
 
 - **87984 passed + 22 skipped**（794.25s / 13:14，任务 bhntea7bs，覆盖至 R953）。与预测 87804 + 180（R947-953 新增）精确吻合，连续第八次命中，全绿。
