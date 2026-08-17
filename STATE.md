@@ -4,6 +4,62 @@
 
 ---
 
+## Round 1113 — evaluation/report.py 第五百五十七轮（20 测试）
+
+- 文件：`tests/test_evaluation_report_edges128.py`（batch312，edges 第四百八十九批，forbidden 第五百八十五批报告变体）。
+- 新角度（双 parser 指标层全等 / summary 宽严分歧）：**双 parser 指标层全等**——同 manifest 真跑 fallback/kreuzberg → summary 与 per_doc.metrics 两 dict 逐字相等 + devset 相等，parser 差异止步 provenance（parser_version "4.10.2"）；**summary 宽严分歧**——summary.counts 塞 {"bogus": "garbage-string"} 照过（counts/success_rates/ratio 三键 schema 只 type object 内层不设防），silent_drop_total 塞串拒 "'not-an-int' is not of type 'integer', 'null'"——四键唯一强类型，宽严同屏首锁。首跑修 1 处：per_doc 含 wall_time 逐跑浮动 → 改比 metrics dict。
+
+---
+
+## Round 1112 — evaluation/annotation_metrics.py 第五百五十六轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges140.py`（batch311，edges 第四百八十八批，forbidden 第五百八十四批）。
+- 新角度（position 缺省家族全归 after）：**position 裸串等 after**——"bogus" 输出与显式 after 全 dict 相等（实现 `if position == "before" else after`，非 before 一律 after，裸串首锁）；**缺键等 after**——a.get("position", "after") 缺省即 after；**int 123 等 after**——类型不校验；**before 反差**——tol 0 刀锋板 after 全 1.0 / before 全 0.0 / 家族全员 = after。
+
+---
+
+## Round 1111 — evaluation/cli.py 第五百五十五轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges139.py`（batch310，edges 第四百八十七批，forbidden 第五百八十三批）。
+- 新角度（跨 schema 拒收 / inspect 零校验 / CLI 容差真值）：**manifest 喂 validate-report**——合法清单对报告 schema 六错齐发 rc 1 + [FAIL] + "'report_version' is a required property @ path=[]"（跨 schema 拒收首锁）；**inspect-doc 零校验**——评测报告 JSON 喂 inspect-doc rc 0 照跑 type=unknown/elements=0/document_id: ?——与 run 的两重 schema 纪律分歧；**CLI 容差真值翻转**——--tolerance-chars 0 vs 30 真跑 f1 0.0 vs 0.6667（旧锁 mock 捕参，本批真值入报告）。首跑修 1 处：CLI 默认 --max-chars 800 合并单 chunk → 补 --max-chars 200。
+
+---
+
+## Round 1110 — evaluation/runner.py 第五百五十四轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges139.py`（batch309，edges 第四百八十六批，forbidden 第五百八十二批）。
+- 新角度（容差沉默 / 双通道 stub 清理 / 容差达聚合层）：**容差沉默**——tol 0/30 两跑公开报告 json.dumps 全文不含 "tolerance"——私有 _tolerance_chars 剥离且 provenance 不记（全 blob 首锁，旧锁只查 per_doc 单键）；**双通道 stub 清理**——documents d1 + ef1 全跑后 _per_doc 目录留存、两 stub 双双 unlink（ef 通道 inline 清理首锁）；**容差达聚合层**——marker 距边界 10 字符：tol 0 全 miss、tol 30 P 0.5/R 1.0/F1 0.6667，summary macro 同幅翻转而 counts 逐字相等。
+
+---
+
+## Round 1109 — evaluation/schema.py 第五百五十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_schema_edges129.py`（batch308，edges 第四百八十五批，forbidden 第五百八十一批）。
+- 新角度（element/chunk 闭包 / 根开放分歧 / 闭包地图）：**element 裸键拒绝**——elements[0] 塞 bogus_key → "Additional properties are not allowed" @ ['elements', 0]（element def additionalProperties False 裸键首锁）；**chunk 裸键拒绝**——同消息 @ ['chunks', 0]；**根开放分歧**——文档根塞 bogus_root 照过——根无 additionalProperties，同一动作根被收 def 被拒；**闭包地图**——六 def（element/chunk/error/warning/relation/source_span）全部闭包、根开放。
+
+---
+
+## Round 1108 — evaluation/manifest.py 第五百五十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges138.py`（batch307，edges 第四百八十四批，forbidden 第五百七十九批）。
+- 新角度（sha256 不验文件 / ef 撞 id / expectations 封闭）：**sha256 不验实文件**——真实 docx + "b"*64（合法 hex 内容必假）照常加载原样入档——loader 不读文件内容比对（ghost path 已证存在性不查，本批证哈希不查）；**ef 撞 documents id**——d1 双账并存同 id 不同文件（loader 不查跨账唯一）；**expectations 封闭**——bogus_key 拒 "Additional properties are not allowed" @ ['documents', 0, 'expectations']（首锁）；**双类型期望原样**——{paragraph 3, table 1} 原样入档。
+
+---
+
+## Round 1107 — evaluation/metrics.py 第五百五十一轮（22 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges136.py`（batch306，edges 第四百八十三批，forbidden 第五百七十八批）。
+- 新角度（schema-metrics 分歧 / heading 合规查 id / pdf bbox 豁免）：**schema-metrics 分歧**——docx locator 塞 {page, bbox} → document.schema.json 照过但 docx_locator_valid_ratio 0.5——_docx_locator_ratio 拒页键，同一突变两本账分歧；**heading 合规查 id 不查文本**——三段 heading 块 ids [e0001, e0002] compliance 1.0，反转 ids → 0.0（只看 source_element_ids[0]）；**pdf bbox 类型豁免**——paragraph page+bbox + image page-only → ratio 1.0（bbox 只对 heading/paragraph/caption/list_item 强制）；caption page-only → 0.5 豁免名单外。首跑修 2 处：metrics 的 content 是裸串非 dict。
+
+---
+
+## 回归基线 91423（第 28 次精确命中）
+
+- bs8ft8d1x 后台回归 91423 passed, 22 skipped（541.80s）——与预测 91272 + 151 = 91423 精确一致，第 28 连中。
+- 累计：90964 → 91117 → 91272 → 91423。下一基线预测：91423 + R1107-1113（22+22+22+21+21+22+20=150）= 91573。
+
+---
+
 ## Round 1106 — evaluation/schema.py 第五百五十轮（22 测试）
 
 - 文件：`tests/test_evaluation_schema_edges128.py`（batch305，edges 第四百八十二批，forbidden 第五百七十七批）。
