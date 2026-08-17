@@ -4,11 +4,106 @@
 
 ---
 
-## 回归基线（Round 879-890 全量）
+## 回归基线（Round 892-898 全量）
 
-- **86356 passed + 22 skipped**（462.23s / 07:42，任务 b8etma79l，覆盖至 R890）。与预测 86086 + 270（R879-890 新增 12 文件）精确吻合，全绿。
-- 下一轮全量预期 ≈ **86504**（86356 + R892-896 新增 148：manifest108 29 + report97 30 + runner108 26 + cli108 29 + metrics106 34）。
-- 备注：R891（metrics 槽位）在 continuation 中被误报为已完成、实际未发生（无 commit、无文件），由 R896 补齐 metrics 槽位；编号 891 永久跳过。
+- **86555 passed + 22 skipped**（459.45s / 07:39，任务 bdcrpxcfd，覆盖至 R898）。与预测 86356 + 199（R892-898 新增）精确吻合，全绿。
+- 下一轮全量预期 ≈ **86860**（86555 + R899-911 新增 305：manifest109 26 + report98 25 + runner109 23 + cli109 22 + annotation110 24 + schema98 26 + metrics107 24 + manifest110 23 + report99 23 + runner110 23 + cli110 21 + annotation111 20 + schema99 25）。
+
+---
+
+## Round 911 — evaluation/schema.py 第三百五十五轮（25 测试）
+
+- 文件：`tests/test_evaluation_schema_edges99.py`（batch109，forbidden tokens 第三百八十一批）。
+- 新角度：document 顶层 required 恰 13 项有序（schema_version 首）且顶层开放（addProps 未设）；pdf_locator page integer min 1 + bbox array items number min/maxItems 4 + def 开放；docx_locator props 恰 7 结构键；manifest 顶层封闭；annotation_version const "1.0"；provenance 六属性类型（dependencies 自由 string|null 映射 / max_chars integer min 1 / run_timestamp_iso minLength 1 / git_commit 双类型 / git_dirty boolean / parser_name minLength 1）；summary def 四属性类型化 + 开放 + 无 required。
+- 下一步：metrics edges108（Round 912）。
+
+---
+
+## Round 910 — evaluation/annotation_metrics.py 第三百五十四轮（20 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges111.py`（batch108，forbidden tokens 第三百八十批）。
+- 新角度：前缀 marker 遮蔽——anchors [B-after, AB-after]，B 命中后 search_from=2，"AB" 只在 pos 0 → missing（指标仍全 1.0 + _missing_markers ["AB"]）；贪心最近——preds [2,4] 争 gt [2]（tol 5）距离 0 者胜 → P 0.5 R 1.0 F1 2/3。
+
+---
+
+## Round 909 — evaluation/cli.py 第三百五十三轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges110.py`（batch107，forbidden tokens 第三百七十九批）。
+- 新角度：inspect-doc 对 report 形 JSON 照跑（type=unknown、counts 全 0、pipeline_success true 怪癖——document 非 None 即成功）；ef-only manifest → "documents=0（成功 0，失败 0）"；--help SystemExit 0 + usage 含 prog。
+
+---
+
+## Round 908 — evaluation/runner.py 第三百五十二轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges110.py`（batch106，forbidden tokens 第三百七十八批）。
+- 新角度：_load_annotation 非 UTF-8 字节 → UnicodeDecodeError 未捕获冒出（except 只接 OSError/JSONDecodeError）；空 dict 标注不对称——_annotation_present True 但 chunk 三指标 no_annotation；tolerance_chars=9 真实路径内部行记录；fake 建 image 目录 → compute_automatic_metrics 收到非 None image_base_dir。
+- 踩坑：_load_annotation 无 docstring，sanity 断言首跑错删除后全过。
+
+---
+
+## Round 907 — evaluation/report.py 第三百五十一轮（23 测试）
+
+- 文件：`tests/test_evaluation_report_edges99.py`（batch105，forbidden tokens 第三百七十七批，report 变体）。
+- 新角度：get_git_provenance cwd 不存在 → OSError 捕获 {None, True}；build_devset_section 接真实 load_manifest 产物（categories 真实 list）；_RATIO_METRICS 尾三项；全 False → rate 0.0（非 None）；aggregate_summary 不改传入行。
+
+---
+
+## Round 906 — evaluation/manifest.py 第三百五十轮（23 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges110.py`（batch104，forbidden tokens 第三百七十六批）。
+- 新角度：BOM 头清单 → ManifestError "清单 JSON 解析失败"（Unexpected UTF-8 BOM）；大写 sha256 64 位 → 不匹配 ^[0-9a-f]{64}$；互指配对 d1↔d2 → 1 组；project_root 传 str 被接受；expectations 深层透传；categories 转 tuple。
+
+---
+
+## Round 905 — evaluation/metrics.py 第三百四十九轮（24 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges107.py`（batch103，forbidden tokens 第三百七十五批）。
+- 新角度：pdf page=True（bool 是 int 子类）→ 有效 1.0；page=1.0 float → 0.0；docx paragraph_index=None → 键存在即 1.0；chunk ids 传字符串 "e1" → 按字符迭代 0.0；content int → "".join TypeError 未防护；chunk ids None → heading 0.0。
+
+---
+
+## Round 904 — evaluation/schema.py 第三百四十八轮（26 测试）
+
+- 文件：`tests/test_evaluation_schema_edges98.py`（batch102，forbidden tokens 第三百七十四批）。
+- 新角度：element type enum 八值 + 属性类型矩阵（parent_id/content [string,null]、confidence number、metadata object）；chunk.source_element_ids array minItems 1 + items string minLength 1；annotation 三数组 items 形状（$ref / 封闭 figure_marker+caption_text / 封闭 level+text）；report_version const "1.1" 且顶层拒绝 evaluator_version（只在 provenance 内）；最小合法 report 6 键通过；多错误 message 只含首个 + "3 处"、.errors 全 3 条。
+- 踩坑：err["path"] 转 tuple 后顶层是 () 不是 []，首跑断言错修正。
+
+---
+
+## Round 903 — evaluation/annotation_metrics.py 第三百四十七轮（24 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges110.py`（batch101，forbidden tokens 第三百七十三批）。
+- 新角度：before 整流 marker gt=0（tol 2 全 1.0 / tol 1 全 0.0）；重复内容 chunks ["AB","AB"] + 同 marker 两次 → P 1.0 R 0.5；距离恰等容差命中（<=）超一档 miss；anchors 传 dict → AttributeError；全空白 chunks → P 0.0 + R null + _missing_markers；chunks None → no_predicted 三件套（recall 0.0）。
+
+---
+
+## Round 902 — evaluation/cli.py 第三百四十六轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges109.py`（batch100，forbidden tokens 第三百七十二批）。
+- 新角度：inspect-doc 指标行恰 21 行（含 _tolerance_chars——inspect 不弹出该键）；行序 bool 组前三 + int 组 "_tolerance_chars" 第四（"_" < 小写字母）+ null 组殿后；负容差 -5 原样渲染；run_evaluation 抛 EvalSchemaError → rc1（与自校验失败分支区分）。
+- 踩坑：_sort_key 内变量名是 v 不是 value，源码断言首跑错修正。
+
+---
+
+## Round 901 — evaluation/runner.py 第三百四十五轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges109.py`（batch99，forbidden tokens 第三百七十一批）。
+- 新角度：_process_one 直接三分支（成功含 image_dir 推导 / errors 胜出但 doc 对象仍在时 image_dir 照常推导——仅 document None 才 None / code "unknown" 完整 message）；两文档标注独立性 [False, True]；嵌套输出目录自动创建。
+- 踩坑：errors 与 doc 并存时 image_dir 非 None（我误设 None），首跑错修正。
+
+---
+
+## Round 900 — evaluation/report.py 第三百四十四轮（25 测试）
+
+- 文件：`tests/test_evaluation_report_edges98.py`（batch98，forbidden tokens 第三百七十批，report 变体）。
+- 新角度：真实环境三依赖全装（非空 str）；真实非 git 目录 → {None, False}；aggregate_summary([]) 全形状精确（顶层键序 + ratio 组 12 项首三序）；success 字符串 "true" 不计数 → rate 0.0；not_evaluated 计数；build_provenance 键序九项。
+
+---
+
+## Round 899 — evaluation/manifest.py 第三百四十三轮（26 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges109.py`（batch97，forbidden tokens 第三百六十九批）。
+- 新角度：manifest document source_type enum 恰 [pdf, docx]（与 document schema 六值跨 Schema 分歧）；"markdown" 被拒；categories int / expectations 字符串 / ef 空错误码 / devset_status "done" 各自 Schema 报错；DocumentEntry 五缺省全 None/()；_detect_project_root 向上探测（无 pyproject → 清单目录；上级有 → 上级）。
 
 ---
 
