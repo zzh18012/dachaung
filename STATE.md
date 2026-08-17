@@ -4,6 +4,182 @@
 
 ---
 
+## Round 775 — evaluation/runner.py 第二百一十九轮（24 测试）
+
+### 目标
+- 补强 edges88-90 未触及的角度（第一百三十九批）：**错误记录透传**（errors[0].to_dict() 原样成 error dict）；**parser_version 空串跳过**（falsy 不占位、第二 doc 的 pv 进 provenance）；**ef-only manifest**（documents 空但 EF 循环 mkdir 仍建 _per_doc —— 与双空 manifest 不创建对照）；**ef 解析无错**（actual None → matches False）；**ef 多错误取首**（errors[0].code）；**wall_time 五键完整形态**；**annotation 文件顶层列表 → AttributeError 未守卫**（json 合法但形状错）；**forbidden tokens 第二百四十五批**
+
+### 改动
+- 新增对应 edges 测试文件（24 测试）
+
+### 撞墙记录
+- 0 fail 首跑（#1 探针 lambda 忘包 tuple 一次报错，修正后全过）。
+
+### 下一步建议
+- cli edges91（Round 776）。
+
+---
+
+## Round 774 — evaluation/report.py 第二百一十八轮（27 测试）
+
+### 目标
+- 补强 edges77-79 未触及的角度（第一百三十八批）：**git rc!=0 路径 dirty=False**（bool(rc==0 and stdout) —— docstring "失败时 dirty=true" 只覆盖异常路径，双 rc128 → {None, False}）；**rev-parse ok + porcelain rc128 → commit 保留 dirty False**；**TimeoutExpired → 异常路径全默认**；**summary 外层键序 4 键**；**tuple 输入可聚合**；**build_provenance 键序 9 键**；**get_dependency_versions 兜底 except Exception 全 None**；**版本常量锁定 1.1**；**counts 值 "5" → sum TypeError 未守卫**；**forbidden tokens 第二百四十四批**
+
+### 改动
+- 新增对应 edges 测试文件（27 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- runner edges91（Round 775 已做）。
+
+---
+
+## Round 773 — evaluation/manifest.py 第二百一十七轮（30 测试）
+
+### 目标
+- 补强 edges87-90 未触及的角度（第一百三十七批）：**根自动探测集成**（tmp/sub/m.json → 向上找 pyproject.toml → root=tmp）；**manifest_path 传 str 可用**；**paired_with int → type string 拒**；**doc_id 空串 → minLength 1 拒**；**宽松路径三形式全接受**（双斜杠 / "./" 前缀 / "samples/../samples" 环回，Path 折叠后同一路径且 path_str 保留原文）；**expectations 空 count dict 原样存储**；**ef 空码拒**；**ef 缺 source_type → None**；**顶层 [] 拒**；**全字段 document 映射**（sha256/元组化 categories/paired_with/expectations/complete 透传）；**forbidden tokens 第二百四十三批**
+
+### 改动
+- 新增对应 edges 测试文件（30 测试）
+
+### 撞墙记录
+- 探针 #11 括号错一次（rm 链在失败时已删文件），重写后全过。
+
+### 下一步建议
+- report edges80（Round 774 已做）。
+
+---
+
+## Round 772 — evaluation/metrics.py 第二百一十六轮（30 测试）
+
+### 目标
+- 补强 edges86-88 未触及的角度（第一百三十六批）：**缺 type 键 → by_type "unknown"**；**未知 type "custom" 参与文本保留**（v1.1 只排除 image，_TEXT_TYPES 是 v1.0 遗物不在判定里）；**content None → or "" 参与拼接**；**chunk text None → precision null empty_actual / recall 0.0 / equal False**；**双 heading 一命中 → 0.5 参与**；**有 heading 无 chunks → 0.0 参与**（该函数不查 no_chunks，chunk_ref 同输入 null 对照）；**resource_path 空串跳过 → 0.0**；**bbox nan/inf → isfinite 拒**；**bbox 豁免类型**（table/header/footer/image 仅 page 有效 1.0，caption 无 bbox 0.0）；**markers-only expectations → no_expectations_element_count**；**forbidden tokens 第二百四十二批**
+
+### 改动
+- 新增对应 edges 测试文件（30 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- manifest edges91（Round 773 已做）。
+
+---
+
+## Round 771 — evaluation/schema.py 第二百一十五轮（25 测试）
+
+### 目标
+- 补强 edges76-78 未触及的角度（第一百三十五批）：**三错误前缀排序**（['documents',0] < ['documents',0,'source_type'] < ['documents',1]，消息 "(3 处)"）；**required 缺失 flat 行**（schema_path==['required']、path==[]）；**SCHEMAS_DIR 恰 4 文件**（document.schema.json 同居 schemas/）；**validate_file str 路径**；**report 顶层 required 恰 5 键**（expected_failures 可选！）；**wall_time 5 属性键**（chunk_reason/parse_reason 纯 string，total/parse/chunk [number,null]）；**per_doc addProps False + metrics 定义仅 {"type":"object"} 自由形**；**forbidden tokens 第二百四十一批**
+
+### 改动
+- 新增对应 edges 测试文件（25 测试）
+
+### 撞墙记录
+- 0 fail 首跑（探针 #13 metrics["additionalProperties"] KeyError 一次，修正路径后全过）。
+
+### 下一步建议
+- metrics edges89（Round 772 已做）。
+
+---
+
+## Round 770 — evaluation/annotation_metrics.py 第二百一十四轮（30 测试）
+
+### 目标
+- 补强 edges87-89 未触及的角度（第一百三十四批）：**figure_caption 完全无视参数**（(None,None) 与带内容输出逐字节相同）；**1 pred 对 2 anchor 等距 → matched 1 → P=1.0 R=0.5 F1=2/3**（一个预测不能命中两个标注）；**_tolerance_chars 每个早退分支都在场**（负 -5 原样记录不校验）；**同一缺失 marker 两 anchor → missing ["Y","Y"]**；**空 marker "" → missing [""] + recall null no_ground_truth_anchors_in_stream（P 仍 0.0 参与）**；**双空格 marker 在规范化流找不到、规范化形式精确命中**；**P=0 且 R=0 → F1=_ratio(0.0) 非 null**；**尾部空 chunk 的前边界仍计**；**position="middle" → else 按 after 语义**；**forbidden tokens 第二百四十批**
+
+### 改动
+- 新增对应 edges 测试文件（30 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- schema edges79（Round 771 已做）。
+
+---
+
+## Round 769 — evaluation/cli.py 第二百一十三轮（28 测试）
+
+### 目标
+- 补强 edges88-89 未触及的角度（第一百三十三批）：**run 成功块完整五行**（documents=2（成功 1，失败 1）+ devset 行 + git_commit[:12]）；**run 自校验两分支**（EvalSchemaError → rc1 "报告自校验失败"；FileNotFoundError → 未捕获直接传播 —— run 自校验只捕 EvalSchemaError，与 validate-report 的 FNF 分支不对称，现状记录）；**validate-report FNF 分支 rc2**；**inspect-doc --tolerance-chars 55 透传**（函数内 import → patch annotation_metrics 命名空间）；**缺 source_type → type=unknown + 双 locator null**；**_format_metric**（null+reason None → "null  (None)" 原样渲染 reason 不落 ok；bool 小写 true/false；int 42）；**--help SystemExit 0 + usage**；**forbidden tokens 第二百三十九批**
+
+### 改动
+- 新增对应 edges 测试文件（28 测试）
+
+### 撞墙记录
+- 1 fail：locator 行断言少两个前导空格（probe 打印时 strip 掉了），补 "  " 前缀后全过。
+
+### 下一步建议
+- annotation_metrics edges90（Round 770 已做）。
+
+---
+
+## Round 768 — evaluation/runner.py 第二百一十二轮（27 测试）
+
+### 目标
+- 补强 edges88-89 未触及的角度（第一百三十二批）：**_load_annotation 六态**（None/不存在/目录/非法 JSON/BOM 吞掉/合法 dict）；**_process_one (None,[]) 未守卫分支**（code "unknown" + message "process_single returned None without errors" + image_dir None）；**内部记录捕获**（patch aggregate_summary 截获：annotation 在场 _annotation_present True/tol 77 透传/公共 per_doc 恰 4 键；缺席时真实 chunk_boundary_prf 仍记默认 30）；**fig/chunk 收到同一 annotation 对象**（is 同一性）；**空 manifest**（6 键序 + rate None + _per_doc 不创建）；**输出文件与返回 dict 严格相等**；**forbidden tokens 第二百三十八批**
+
+### 改动
+- 新增对应 edges 测试文件（27 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- cli edges90（Round 769 已做）。
+
+---
+
+## Round 767 — evaluation/report.py 第二百一十一轮（32 测试）
+
+### 目标
+- 补强 edges77-78 未触及的角度（第一百三十一批）：**counts 值 0 参与**（0 is not None → {"sum":0,"participating_docs":1}，与缺键/None 的全空对照）；**success total 无条件**（metrics 完全缺 pipeline_success → total 仍 1、rate 0.0）；**ratio 混合 1.0/None/0.0 → macro 0.5 participating 2**；**silent_drop [0] → 0 非 None**（列表非空短路）；**git 不存在 cwd → OSError 全默认**；**rev-parse rc0 空白 stdout → commit None（strip or None）+ porcelain 干净 dirty False（两命令独立）**；**devset 键序 6 键**；**max_chars float 1.9 → int 截断 1**；**timestamp 可 fromisoformat 且带 tzinfo**；**rate 1/3 精确 float**；**依赖版本三键有序全 str**；**forbidden tokens 第二百三十七批**
+
+### 改动
+- 新增对应 edges 测试文件（32 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- runner edges90（Round 768 已做）。
+
+---
+
+## Round 766 — evaluation/manifest.py 第二百一十轮（37 测试）
+
+### 目标
+- 补强 edges87-89 未触及的角度（第一百三十批）：**sha256 pattern 双拒**（64 大写 A / 63 a）；**expectations 精确结构**（required_markers 空串 / count 负数 / 1.5 float / 未知键）；**documents source_type "txt" 拒**（enum 两值 vs ef 四值对照）；**devset_status int 拒**；**content_group_count 拓扑**（ghost 引用仍成组 / 自引用 singleton / a→b→c 链 2 组 / a↔b 互指 frozenset 去重 1 组）；**直接 Manifest txt 计数**（file 1 pdf 0 docx 0）；**BOM → ManifestError "Unexpected UTF-8 BOM"**（open 用 utf-8 非 utf-8-sig）；**frozen 双向**（setattr FrozenInstanceError / replace 可用）；**annotation 越根字段名**；**直接 _resolve_relative_path("") → "f 为空"（schema minLength 1 使 load_manifest 路径不可达此分支）**；**ef 反斜杠字段名**；**forbidden tokens 第二百三十六批**
+
+### 改动
+- 新增对应 edges 测试文件（37 测试）
+
+### 撞墙记录
+- 1 fail（18 个 source 测试）：清理死代码时误删 `import evaluation.manifest as man_mod`，_src() NameError；恢复 import 后全过。
+
+### 下一步建议
+- report edges79（Round 767 已做）。
+
+---
+
+## Round 765 — evaluation/metrics.py 第二百零九轮（28 测试）
+
+### 目标
+- 补强 edges83-87 未触及的角度（第一百二十九批）：**resource_path 指向已存在目录 → is_file False → 0.0**；**元组 source_element_ids ("e1",) 与列表同待遇 → 1.0**；**未守卫 TypeError 家族**（content int / chunk text int ≥2 chunk / elements 键显式 None / expectations 计数字符串 "2"）；**source_type "txt" → pdf/docx 双指标同时 null**（not_pdf_document/not_docx_document）；**element 无 source_locator 键 → 0.0**；**DOCX locator page 键存在优先拒（relationship_id 也不救）**；**bbox 单元素 bool [1,True,3,4] → 第二元素拒整条**；**forbidden tokens 第二百三十五批**
+
+### 改动
+- 新增对应 edges 测试文件（28 测试）
+
+### 撞墙记录
+- 0 fail 首跑。
+
+### 下一步建议
+- manifest edges90（Round 766 已做）。
+
+---
+
 ## Round 764 — evaluation/schema.py 第一百零九轮（30 测试）
 
 ### 目标
@@ -838,6 +1014,7 @@
 
 ## 基线记录
 
+- 83414 passed + 22 skipped + 1 failed（Round 757-771 回归，b5eb8wzd5，452.97s；82972 + 442 实跑）。失败是 R764 的 evaluation/__init__ 公开名测试：dir() 受 import 顺序污染（任何 import evaluation.X 都挂属性），已改按 __all__ 判定并提交修复（下轮起等效 83415 全绿）。
 - 82972 passed + 22 skipped（Round 749-756 回归，bfz0hd7jn，465.54s；82714 + 258）
 - 82714 passed + 22 skipped（Round 740-748 回归，bxlne3sfw，464.24s；82392 + 322）
 - 82392 passed + 22 skipped（Round 731-736 回归 + 收集期间落盘的 737-739，b0y191o6d，471.78s；82079 + 223 + 90）
