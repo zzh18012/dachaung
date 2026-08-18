@@ -4,6 +4,70 @@
 
 ---
 
+## 回归基线 92447（第 35 次：collect-only 锚定法首次精确命中）
+
+- bj1b6y2nq 后台回归 **92447 passed + 22 skipped（0 failed，614.31s）**——树态 = R1154 提交后。预测 92447 = 92398 collected + 71（R1152-1154）− 22 skipped **精确命中**——锚定法取代旧逐轮累加公式。
+- 累计（passed）：92002 → 92156 → 92333 → 92447。
+- 下次预测：92447 + 115（R1155 25 + R1156 23 + R1157 22 + R1158 23 + R1159 22）= **92562**。
+
+---
+
+## Round 1159 — evaluation/runner.py 第六百零三轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges175.py`（batch357，edges 第五百三十一批，forbidden 第六百三十一批）。
+- 新角度（跨页劈裂表格）：**网格跨页成双表**——网格线分两页 → 每页各自认表、各挂本页 locator（跨页不合并首锁）；**元素按页交错**——[heading p1, table p1, heading p2, table p2]（与同页"全文前置"对照）；**块序交替**——[sequential, isolated_table] ×2。首跑全绿。
+
+---
+
+## Round 1158 — evaluation/runner.py 第六百零二轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges174.py`（batch356，edges 第五百三十批，forbidden 第六百三十批）。
+- 新角度（双表夹文 / 单行表）：**表格元素居后**——同页 2 网格 4 段文字 → 文本元素全前、表格殿后；**单行表 header-only markdown**——1 行 2 列网格 → "| A1 | B1 |\n| --- | --- |" 无数据行；**双表夹文仍分流**——5 chunks（3 seq + 2 iso）；**P 分母 = 块数 − 1**——marker 命中 1/4 界 → P 0.25 / R 1.0 / F1 0.4。首跑全绿。
+
+---
+
+## Round 1157 — evaluation/runner.py 第六百零一轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges173.py`（batch355，edges 第五百二十九批，forbidden 第六百二十九批）。
+- 新角度（多锚一对一 / anchor 文档序）：**同界双锚只配一对**——after+before 指同界 → P/R/F1 全 0.5；**乱序 anchor 判失**——marker 列于前文之后 → 顺序搜索判 missing → P 0.5/R 1.0/F1 0.667（anchor 须按文档序，真跑首锁）；**三锚双中**——P 1.0/R 0.667/F1 0.8（分数值真跑首锁）。源码实证 search_from 推进与贪心一对一配对语义。首跑全绿。
+
+---
+
+## Round 1156 — evaluation/runner.py 第六百轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges172.py`（batch354，edges 第五百二十八批，forbidden 第六百二十八批）。
+- 新角度（异构三文档 devset）：**文+表+图三板汇总**——element_count_total {sum 4, participating 3}、success 3/3；**image_resource_exists_ratio 真跑 1.0**——真嵌入图资源落盘（runner 级首锁），文/表板 null no_image_elements；**macro 分层** {1.0, 参 1, 免 2}；**全中 expectations 零 drop**；图板超计 → drop 1。首跑全绿。
+
+---
+
+## Round 1155 — evaluation/cli.py 第五百九十九轮（25 测试）
+
+- 文件：`tests/test_evaluation_cli_edges143.py`（batch353，edges 第五百二十七批，forbidden 第六百二十七批）。
+- 新角度（表格 PDF 的 CLI 链）：**run stdout 汇总行**——"[OK] 评测完成" + "documents=1（成功 1，失败 0）" + "pdf=1 docx=0"（成功汇总行首锁）；**inspect-doc counts 行**——"counts:      elements=2 chunks=2"；**--tolerance-chars 传导刀锋**——CLI tol 30 → F1 0.0、tol 31 → 1.0（容差经 CLI 全链首锁）。首跑全绿。
+
+---
+
+## Round 1154 — evaluation/runner.py 第五百九十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges171.py`（batch352，edges 第五百二十六批，forbidden 第六百二十六批）。
+- 新角度（隔离优先于 max_chars / 末尾无边界）：**超限表格整体成块**——49 字符表格 markdown @32 → 单 isolated_table 不劈（隔离通道绕过长度上限首锁）；**超限 caption 整体成块**——71 字符 @32；**末尾无边界**——marker 落流绝对末尾 → P/R/F1 全 0.0（末块后无预测边界首锁）。首跑全绿。
+
+---
+
+## Round 1153 — evaluation/runner.py 第五百九十七轮（25 测试）
+
+- 文件：`tests/test_evaluation_runner_edges170.py`（batch351，edges 第五百二十五批，forbidden 第六百二十五批）。
+- 新角度（DOCX 真标题样式 × 容差刀锋）：**Heading 1/2 真样式**——metadata {'level', 'style', 'empty'}（runner 级首锁，历史 DOCX 板全 Normal）；**heading 软边界合并**——每 heading 与其后段落合块、heading_boundary_compliance 仍 1.0；**容差刀锋 30/31**——marker 距块界恰 31 字：tol 30 → 0.0、tol 31 → 1.0（闭区间容差边界首锁）。首跑全绿。
+
+---
+
+## Round 1152 — evaluation/runner.py 第五百九十六轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges169.py`（batch350，edges 第五百二十四批，forbidden 第六百二十四批）。
+- 新角度（三列网格 / 表内 marker 失配）：**2×3 网格真表**——col_count 3 首锁（历史网格全 2 列）；**六格字单 heading**——两行格字纵向 25pt 差仍同流合并；**跨行 span marker** "C1 A2" → F1 1.0；**表内 markdown marker 不中界**——"| A2 | B2 |" 命中文本但非块界 → P/R/F1 全 0.0（matched-but-mid-chunk 首锁）。首跑全绿。
+
+---
+
 ## 回归基线 92333（第 34 次：全绿零 flaky）
 
 - bc3qqq7t2 后台回归 **92333 passed + 22 skipped（0 failed，604.54s）**——R1146 修复后首个满载全绿回归。树态 = R1149 提交后（92355 collected）。
