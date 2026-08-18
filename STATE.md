@@ -4,6 +4,42 @@
 
 ---
 
+## 回归基线 93758（第 45 次：总数精确命中）
+
+- b87m4juiq 后台回归 **93758 passed + 0 failed + 22 skipped（609.47s）**——树态 = R1208 提交后。**与预测 93758 精确吻合，连续第十次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758。
+- 下次预测：93758 + 106（R1209 25 + R1210 24 + R1211 27 + R1212 30）= **93864**（第 46 次回归在 R1212 提交后启动）。
+
+---
+
+## Round 1212 — evaluation/cli.py 第六百四十八轮（30 测试）
+
+- 文件：`tests/test_evaluation_cli_edges152.py`（batch410，edges 第五百八十四批，forbidden 第五百七十四批）。
+- 新角度（空夹页板 CLI 全链 / 仓外 provenance）：**空夹页 run**——rc 0、成功 1/1、by_type {paragraph: 2}；**双锚 macro**——"page" ×2 → P 0.6667 / R 1.0 / F1 0.8；**仓外 provenance**——manifest 在 OS temp 无 .git 上溯 → "git_commit=unknown git_dirty=False"；**inspect counts**——mc60 → "elements=2 chunks=4"；**null 族渲染**——hbc no_heading_elements、silent_drop no_expectations、cb_f1 no_annotation。首跑全绿。
+
+---
+
+## Round 1211 — evaluation/runner.py 第六百四十九轮（27 测试）
+
+- 文件：`tests/test_evaluation_runner_edges214.py`（batch409，edges 第五百八十三批，forbidden 第六百八十一批）。
+- 新角度（空夹页透明 / 转义括号解码）：**空夹页透明**——3 页中页 2 空白 → 2 个 paragraph、locator 页码 [1, 3]（空页不产元素不占序）；**转义括号解码**——Tj `\( \)` → "(escaped parens)"（marker 可含括号）；**四块结构**——mc60 每行一块各 1 源；**三界锚**——"here." 1/3/1.0/0.5、"page" ×2 → 2/3/1.0/0.8、流尾 "follows."（距末界 34 > 30）→ 全 0.0。首跑全绿。
+
+---
+
+## Round 1210 — evaluation/metrics.py 第五百五十九轮（24 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges138.py`（batch408，edges 第五百八十二批，forbidden 第六百八十批）。
+- 新角度（caption 要 bbox / header 不算题 / 混型静默丢）：**caption 要 bbox**——[header 免, footer 带, caption 免] → locator 2/3（caption 需 bbox 而 header 不需）；**footer 单独免 bbox**——page-only → 1.0；**header 不算题**——header-only 即便 chunk 首 → hbc null no_heading_elements；**混型静默丢**——{caption: 3, header: 1} vs 实 {caption: 1} → 3。首跑全绿。
+
+---
+
+## Round 1209 — evaluation/schema.py 第五百六十五轮（25 测试）
+
+- 文件：`tests/test_evaluation_schema_edges131.py`（batch407，edges 第五百八十一批，forbidden 第六百七十九批）。
+- 新角度（locator 跨键容让 / 真文档变异）：**PDF locator 容让 DOCX 键**——加 paragraph_index 照过（locator 无封闭约束，与 metrics 层成两层对照）；**footnote 不在枚举**——schema 层根本进不来；**bbox 字符串项**——4 错首错 'a' 落 bbox/0；**source_element_ids 空表/整数项**——"should be non-empty" / "not of type 'string'"；**page 字符串**——"'1' is not of type 'integer'"。首跑全绿。
+
+---
+
 ## 回归基线 93630（第 44 次：总数精确命中）
 
 - bxf3074w4 后台回归 **93630 passed + 0 failed + 22 skipped（621.10s）**——树态 = R1203 提交后。**与预测 93630 精确吻合，连续第九次命中，无 flake 全绿**。
