@@ -4,6 +4,49 @@
 
 ---
 
+## 回归基线 93630（第 44 次：总数精确命中）
+
+- bxf3074w4 后台回归 **93630 passed + 0 failed + 22 skipped（621.10s）**——树态 = R1203 提交后。**与预测 93630 精确吻合，连续第九次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630。
+- 下次预测：93630 + 128（R1204 25 + R1205 32 + R1206 25 + R1207 22 + R1208 24）= **93758**（第 45 次回归在 R1208 提交后启动）。
+
+---
+
+## Round 1208 — evaluation/report.py 第五百六十一轮（24 测试）
+
+- 文件：`tests/test_evaluation_report_edges130.py`（batch406，edges 第五百八十批，forbidden 第六百七十八批）。
+- 新角度（同 doc_id 不去重 / 数值不设防 / 壳形即失败）：**同 doc_id 不去重**——两条同名 → counts 求和 7 / 2 篇、success 1/2、macro 0.75；**负值透传**——ect -3 → -3、ratio -0.5 → macro -0.5（无钳位）；**浮点 counts**——4.7 原样求和；**壳形即失败**——pipeline_success 给裸 dict（无 value 键）→ 按失败 {0, 2, 0.0}（包装契约首锁）；**空 metrics 条目**——四键 summary + 0/2/0.0。首跑全绿。
+
+---
+
+## Round 1207 — evaluation/manifest.py 第五百六十轮（22 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges140.py`（batch405，edges 第五百七十九批，forbidden 第六百七十七批）。
+- 新角度（doc_id 形式自由 / 派生键输入回拒）：**doc_id 含空格斜杠照收**——"a b/c" 仅 minLength 约束（路径反斜杠禁令不外溢到 doc_id）；**派生键输入回拒**——清单里写 categories_covered（loader 派生字段）→ 顶层封闭回拒；**source_type 必填**——"'source_type' is a required property"；**source_type 枚举**——'txt' → "not one of ['pdf', 'docx']"。踩坑：manifest.py open( 计 1 非 guessed 2（首跑 1 failed 后改正全绿）。
+
+---
+
+## Round 1206 — evaluation/cli.py 第六百四十七轮（25 测试）
+
+- 文件：`tests/test_evaluation_cli_edges151.py`（batch404，edges 第五百七十八批，forbidden 第五百七十三批）。
+- 新角度（并排双表板 CLI 全链）：**双表 run**——rc 0、by_type {heading: 1, table: 2}；**stdout 汇总**——"documents=1（成功 1，失败 0）" + "pdf=1 docx=0"；**inspect counts**——"elements=3 chunks=3"；**by_type 行**——"heading=1, table=2  (ok)"；**hbc 行**——"1.0000  (ok)"；**自产自校** rc 0。首跑全绿。
+
+---
+
+## Round 1205 — evaluation/runner.py 第六百四十八轮（32 测试）
+
+- 文件：`tests/test_evaluation_runner_edges213.py`（batch403，edges 第五百七十七批，forbidden 第六百七十六批）。
+- 新角度（并排双表不合并 / Tj 前后空白归一）：**并排双表**——左格网（x 10..110）与右格网（x 200..300）同 y 带 → 两个独立 table（x 空档阻断表合并首锁）；格字双现为单条 heading "LA LB RA RB LC LD RC RD"；**三块结构**——[heading seq, 左表 iso, 右表 iso]；**双界锚半查**——单锚 P 0.5 / R 1.0 / F1 2/3；重复 "LA"（heading 与 md1 双现）→ 0.5/0.5/0.5；**Tj 前后空白归一**——"(  Hello   padded   world  )" → "Hello padded world"。首跑全绿。
+
+---
+
+## Round 1204 — evaluation/annotation_metrics.py 第五百六十四轮（25 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges142.py`（batch402，edges 第五百七十六批，forbidden 第六百七十五批）。
+- 新角度（容差精确界 30/31 / 重复 chunk 文本）：**容差精确界**——距界恰 30 → 全 1.0（≤ 含等）、31 → 全 0.0（edges137 锁过 40/50 宽距，本次锁贴界两侧）；**中间值容差**——tol=7：距 30 偏离、距 2 命中 + _tolerance_chars 回显 7；**重复 chunk 文本**——SAME×3 → 2 预测界 + 2 顺流同 marker 锚全中（find 从 pos 前进不回头）；**before 贴界**——第二 chunk 起始 before 锚 → 1.0。首跑全绿。
+
+---
+
 ## 回归基线 93541（第 43 次：总数精确命中）
 
 - bo2zy7qd0 后台回归 **93541 passed + 0 failed + 22 skipped（612.52s）**——树态 = R1200 提交后。**与预测 93541 精确吻合，连续第八次命中，无 flake 全绿**。
