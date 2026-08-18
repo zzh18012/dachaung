@@ -4,13 +4,56 @@
 
 ---
 
-## 回归基线 95124（第 53 次：总数精确命中）
+## 回归基线 95332（第 54 次：总数精确命中）
 
-- be26l4b2y 后台回归 **95124 passed + 0 failed + 22 skipped（1001.47s）**——树态 = R1260 提交后。**与预测 95124 精确吻合，连续第十八次命中，无 flake 全绿**。
-- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405 → 94542 → 94718 → 94901 → 95124。
-- 下次预测：95124 + 208（R1261 38 + R1262 34 + R1263 37 + R1264 33 + R1265 33 + R1266 33）= **95332**（第 54 次回归在 R1266 提交后启动，R1267 不在其内；再下次 = 95332 + R1267 30 = 95362 起算）。
+- bpgvqx7l3 后台回归 **95332 passed + 0 failed + 22 skipped（1528.31s）**——树态 = R1272 提交后。**与预测 95332 精确吻合，连续第十九次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405 → 94542 → 94718 → 94901 → 95124 → 95332。
+- 下次预测：95332 + 67（R1273 34 + R1274 33）= **95399**（第 55 次回归 blt018jrj 在 R1274 提交后启动，R1275 不在其内；再下次 = 95399 + R1275 37 + R1276 29 + R1277 37 + R1278 34 = 95536 起算）。
 
 ---
+
+## Round 1278 — evaluation/metrics.py 第五百六十九轮（34 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges148.py`（batch476，edges 第六百五十批，forbidden 第七百三十八批，open 0）。
+- 新角度（pdf_locator 分母全类型 / bbox 四类型门控）：**半降 0.5**——真 combo 板单元素 pop bbox/page、bbox 短 3、bbox 字符串项 → 全恰 0.5（真板部分降级首锁，前史仅手造板 0.0/1.0 两端）；**page 全类型必查**——header/image/footer 改型后 pop page 仍 0.5（分母不挑型首锁）；**bbox 门控豁免**——header/image + 坏 bbox → 1.0（非 bbox 类型免查）vs caption + 同 bbox → 0.5；**双元素全灭 0.0**；**hbc 随型消失**——heading 改 header → no_heading_elements。首跑全绿。
+
+---
+
+## Round 1277 — evaluation/annotation_metrics.py 第五百八十四轮（37 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges153.py`（batch475，edges 第六百四十九批，forbidden 第七百三十七批，open 0）。
+- 新角度（句包格 tol 微翻转谱 / 回退阈值）：**d 谱翻转点**——W0/W2 d 7、W1 d 14、W13 d 16、W59 d 32 各自 tol-1 漏 / tol 恰中（五点翻转谱首锁，d 32 最宽）；**d 0 格心**——heading 与 Word3 tol 0 即中；**双锚竞争**——W2+W3 tol 0/7 均 P 1/15 / R 0.5 / F1 2/17；**回退阈值 tol 21**——W2 第二近界 80 距 21 → tol 21 双中 P 2/15 / R 1.0（R 0.5→1.0 单点翻转首锁）。首跑全绿。
+
+---
+
+## Round 1276 — evaluation/report.py 第五百七十轮（29 测试）
+
+- 文件：`tests/test_evaluation_report_edges139.py`（batch474，edges 第六百四十八批，forbidden 第七百三十六批，open 0）。
+- 新角度（标注存在性差分 / 聚合参与翻转）：**标注差分路径集首锁**——同 manifest 同 mc32 有无标注两跑全树对比 → 恰 17 条叶路径不同（cbp/cbr/cbf per-doc value+reason 六条 + 聚合三键×三 metric 九条 + wall_time + 时间戳）；**聚合参与翻转**——无标注 {macro None, participating 0, not_evaluated 1} ↔ 有标注 {macro 1/15, participating 1, not_evaluated 0}；**mc 翻转同标注**——Word3 锚 mc32 → P 1/15 vs mc100 → P 1/5（p32×3==p100 首锁）。首跑全绿。
+
+---
+
+## Round 1275 — evaluation/schema.py 第五百七十五轮（37 测试）
+
+- 文件：`tests/test_evaluation_schema_edges141.py`（batch473，edges 第六百四十七批，forbidden 第七百三十五批，open 2）。
+- 新角度（confidence 全谱 / parent_id 无引用完整性）：**confidence 上界**——1.01/2.0 → "greater than the maximum of 1"（前史仅下界，上界首锁）；**闭区间**——恰 0 与恰 1 均 VALID（含端首锁）；**parent_id 无引用完整性**——跨文档串 / 自引用 / 空串全 VALID（schema 不查存在性首锁）；**文档级 metadata 开放**——嵌套杂值 extra key VALID + pop required + int not object。首跑全绿。
+
+---
+
+## Round 1274 — evaluation/cli.py 第六百六十轮（33 测试）
+
+- 文件：`tests/test_evaluation_cli_edges164.py`（batch472，edges 第六百四十六批，forbidden 第五百八十六批，open 1）。
+- 新角度（combo 板跨 CLI 链 / inspect-doc 全表）：**parse → inspect-doc 链**——app.cli parse OK 行 (elements=2, chunks=16, warnings=0) → evaluation.cli inspect-doc 'counts: elements=2 chunks=16' 跨 CLI 计数一致首锁；**inspect-doc 无标注全表**——chunk_boundary_* 三键 null (no_annotation) 同现；**多键 ect 序**——'heading=1, paragraph=1'；**run 带标注**——Word3 锚 rc 0 + cbp 1/15；**validate-report 通关**。首跑一修（image 行 pad 差 4 空格）。
+
+---
+
+## Round 1273 — evaluation/runner.py 第六百六十三轮（34 测试）
+
+- 文件：`tests/test_evaluation_runner_edges228.py`（batch471，edges 第六百四十五批，forbidden 第七百三十三批，open 2）。
+- 新角度（mc32 句包格子 / 贪心回退 / 容差越界）：**模 4 对齐格**——469 字长段 15 界，Word3/7/11 句尾与界恰 d 0（每 4 句对齐首锁）；**三锚全中**——P 3/15=0.2 / R 1.0 / F1 0.33333333333333337（≠1/3 浮点误差首锁）；**四锚**——P 4/15 / F1 0.4210526315789474（≠8/19）；**贪心回退**——Word3 抢界 108 后 Word2 回退界 80 (d 21) 仍中 → 双双命中非竞争；**d 32 越界**——Word59 句尾距界恰 32 > tol 30 → 全 0.0。首跑一修（_evaluate_single 应为 _process_one）。
+
+---
+
 
 ## Round 1271 — evaluation/annotation_metrics.py 第五百八十三轮（29 测试）
 
