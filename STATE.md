@@ -4,6 +4,14 @@
 
 ---
 
+## 回归基线 92333（第 34 次：全绿零 flaky）
+
+- bc3qqq7t2 后台回归 **92333 passed + 22 skipped（0 failed，604.54s）**——R1146 修复后首个满载全绿回归。树态 = R1149 提交后（92355 collected）。
+- 预测 92247 偏低：旧公式按轮次累加漏计（逐轮手记数有 ±1 级漂移），改用 **--collect-only 锚定法**——当前树（含 R1150/R1151）collect-only = **92398**；下次回归预测 = 92398 - 22 skipped + 后续新增轮次测试数。
+- 累计（passed）：90964 → 91117 → 91272 → 91423 → 91573 → 91760 → 91869 → 92002 → 92156 → 92333。
+
+---
+
 ## Round 1151 — evaluation/runner.py 第五百九十五轮（21 测试）
 
 - 文件：`tests/test_evaluation_runner_edges168.py`（batch349，edges 第五百二十三批，forbidden 第六百二十三批）。
