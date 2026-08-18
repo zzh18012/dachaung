@@ -4,11 +4,88 @@
 
 ---
 
-## 回归基线 94901（第 52 次：总数精确命中）
+## 回归基线 95124（第 53 次：总数精确命中）
 
-- bs6s3llug 后台回归 **94901 passed + 0 failed + 22 skipped（1035.49s）**——树态 = R1252 提交后。**与预测 94901 精确吻合，连续第十七次命中，无 flake 全绿**。
-- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405 → 94542 → 94718 → 94901。
-- 下次预测：94901 + 223（R1253 28 + R1254 30 + R1255 28 + R1256 27 + R1257 26 + R1258 27 + R1259 27 + R1260 30）= **95124**（第 53 次回归在 R1260 提交后启动，覆盖 R1253-R1260 八轮）。
+- be26l4b2y 后台回归 **95124 passed + 0 failed + 22 skipped（1001.47s）**——树态 = R1260 提交后。**与预测 95124 精确吻合，连续第十八次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405 → 94542 → 94718 → 94901 → 95124。
+- 下次预测：95124 + 208（R1261 38 + R1262 34 + R1263 37 + R1264 33 + R1265 33 + R1266 33）= **95332**（第 54 次回归在 R1266 提交后启动，R1267 不在其内；再下次 = 95332 + R1267 30 = 95362 起算）。
+
+---
+
+## Round 1271 — evaluation/annotation_metrics.py 第五百八十三轮（29 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges152.py`（batch469，edges 第六百四十三批，forbidden 第七百三十一批，open 0）。
+- 新角度（mc98 双界竞争 / d1 微翻转）：**双界板**——3 块 [29, 80, 18] → 2 界 29/110；**para before d 1**——始 111 距界 110 恰 1 → tol 0 漏 / tol 1 中 P 0.5 / R 1.0 / F1 2/3；**para after mc 翻转**——尾 129 距界 110 恰 19 → tol 30 命中（mc200 时漏）；**heading/para 竞争同界**——d 0 与 d 1 争界 110 → heading 胜 → P 0.5 / R 0.5 / F1 0.5（贪心竞争首锁）；**三锚**——P 1.0 / R 2/3 / F1 0.8。首跑全绿。
+
+---
+
+## Round 1270 — evaluation/report.py 第五百六十九轮（34 测试）
+
+- 文件：`tests/test_evaluation_report_edges138.py`（batch468，edges 第六百四十二批，forbidden 第七百三十批，open 0）。
+- 新角度（mc98/mc200 报告差分）：**差分路径集首锁**——同 manifest+标注两跑 mc98/mc200 全树对比 → 恰 7 条叶路径不同（cbr/cbf per-doc + 聚合 + max_chars + 时间戳 + wall_time.total），其余全同；**metrics 除界全同**；**wall_time 五键形**——parse/chunk null + not_instrumented + total float（未插桩形首锁）。首跑两修（wall_time 键形猜单键实为五键；round-trip 测试自构 bug）。
+
+---
+
+## Round 1269 — evaluation/schema.py 第五百七十四轮（34 测试）
+
+- 文件：`tests/test_evaluation_schema_edges140.py`（batch467，edges 第六百四十一批，forbidden 第七百二十九批，open 2）。
+- 新角度（mc98 板多错聚合 / 源列表项型检）：**源列表项型检**——["id", 5, "id2"] → "5 is not of type 'string'" @ 索引 1（items 型检索引路径首锁）；**双错精确计数**——"(2 处)：" + len==2 + 两条独立 message/path（前史全 >=1 松界）；**三错跨节**——chunks×2 + elements×1 → "(3 处)" len==3；**non-empty 消息**——[] / "" 精确。首跑全绿。
+
+---
+
+## Round 1268 — evaluation/cli.py 第六百五十九轮（30 测试）
+
+- 文件：`tests/test_evaluation_cli_edges163.py`（batch466，edges 第六百四十批，forbidden 第五百八十五批，open 1）。
+- 新角度（--max-chars 参数化 CLI 链）：**cbr 经 CLI 翻转**——--max-chars 200 → 报告 cbr 0.5；98 → 1.0；**provenance max_chars 记录**——200/98 分别入档；**inspect 块数行翻转**——"chunks=2"（mc200）vs "chunks=3"（mc98）；**stdout 双跑同形**。首跑全绿。
+
+---
+
+## Round 1267 — evaluation/runner.py 第六百六十二轮（30 测试）
+
+- 文件：`tests/test_evaluation_runner_edges227.py`（batch465，edges 第六百三十九批，forbidden 第七百二十八批，open 2）。
+- 新角度（同标注异 mc 经 runner）：**mc 200 半配**——2 块 1 界 caption 消耗 → cbr 0.5 / cbf 2/3；**mc 98 全配**——3 块 2 界 29/110，caption 尾 29 与 heading 尾 110 均 d 0 → 全 1.0；**mc 翻转召回**——同 manifest+标注仅 max_chars 变 → 召回 0.5 → 1.0（runner 级 mc 效应首锁）；**不变量**——counts/ecbt 跨 mc 同。首跑一修（ann 目录 mkdir exist_ok）。
+
+---
+
+## Round 1266 — evaluation/metrics.py 第五百六十七轮（33 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges146.py`（batch464，edges 第六百三十八批，forbidden 第七百二十七批，open 0）。
+- 新角度（mc 99/98/32 三档翻转 / 元素原子过冲）：**mc 99 恰容**——99 字符合并块 == max_chars → 2 块（≤ 含等号首锁）；**mc 98 翻转**——3 块 [29, 80, 18] srcs [1,1,1]；**mc 32 原子过冲**——heading 单元素 80 > 32 不可拆 → 过冲 48（块形同 mc98 首锁）；**指标跨 mc 不变**——ecbt/hbc/tpe/multiset/intact 三档全同。首跑全绿。
+
+---
+
+## Round 1265 — evaluation/annotation_metrics.py 第五百八十二轮（33 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges151.py`（batch463，edges 第六百三十七批，forbidden 第七百二十六批，open 0）。
+- 新角度（隔离 caption 界几何 / 81 距翻转）：**caption 恰界 d 0**——isolated_caption 独块 → 块界 29 == caption 尾 29 → after 锚 tol 0 全 1.0；**before d 29 翻转**——tol 28 漏 / 29 全中；**heading 内嵌 d 81 翻转**——tol 80 漏 / 81 全中；**para 前后双 miss**——d 82 / 流尾；**双锚半配**——P 1.0 / R 0.5 / F1 2/3。首跑全绿。
+
+---
+
+## Round 1264 — evaluation/report.py 第五百六十八轮（33 测试）
+
+- 文件：`tests/test_evaluation_report_edges137.py`（batch462，edges 第六百三十六批，forbidden 第七百二十五批，open 0）。
+- 新角度（报告各节插入序）：**summary 四键插入序首锁**——['counts','success_rates','ratio_macro_averages','silent_drop_total']（前史全 set 等值）；**per_doc metrics 20 键插入序**——磁盘序列化后仍保序；**ratio 12 键插入序**（edges135 锁 sorted 集）；**devset 六键插入序 + 精确值**（空 categories 首锁）；**部分参与聚合经报告**——hbc {1.0, 2, 2}。首跑全绿。
+
+---
+
+## Round 1263 — evaluation/schema.py 第五百七十三轮（37 测试）
+
+- 文件：`tests/test_evaluation_schema_edges139.py`（batch461，edges 第六百三十五批，forbidden 第七百二十四批，open 2）。
+- 新角度（混排板 metadata 必备而开放）：**caption 型枚举拒绝**——"captions" → 八型全列枚举串首锁 + "" 同拒；**metadata 必备**——元素/块 pop → required（chunks[0] 首锁）；**metadata 型检**——None/[] → not object；**metadata 开放世界**——level "zero"/99/-1、heuristic 5、strategy 5、char_count "29"、zzz 键全 VALID；**混排板结构值**——caption_regex / level 0 short_line / isolated_caption+sequential。首跑全绿。
+
+---
+
+## Round 1262 — evaluation/cli.py 第六百五十八轮（34 测试）
+
+- 文件：`tests/test_evaluation_cli_edges162.py`（batch460，edges 第六百三十四批，forbidden 第五百八十四批，open 1）。
+- 新角度（异类型板 CLI 全链 / 多键 ect 行）：**四文档 stdout**——"documents=4（成功 4，失败 0）"；**多键 ect 行首锁**——"caption=1, heading=1, paragraph=1 (ok)"（逗号连接多类型，前史全单键）；**三元素两块行**——"elements=3 chunks=2"；**hbc 值行 1.0000 与 null 行对照**。首跑一修（_doc 返回 Path 未转 str）。
+
+---
+
+## Round 1261 — evaluation/runner.py 第六百六十一轮（38 测试）
+
+- 文件：`tests/test_evaluation_runner_edges226.py`（batch459，edges 第六百三十九批之前第六百三十三批，forbidden 第七百二十三批，open 2）。
+- 新角度（异类型文档板 / 选择性 hbc 参与）：**三文档不相交类型板**——figcap {caption:1} / hh80 {heading:1} / qq {paragraph:1}；**选择性 hbc 参与**——4 板中 2 参与 2 排除 → {macro 1.0, participating 2, not_evaluated 2}（部分参与聚合首锁）；**同页混排板**——gap 40 三行 → [caption, heading, paragraph]，caption 独块 srcs [1,2]。首跑全绿。
 
 ---
 
