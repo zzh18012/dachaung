@@ -4,6 +4,34 @@
 
 ---
 
+## Round 1125 — evaluation/runner.py 第五百六十九轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges144.py`（batch324，edges 第五百零一批，forbidden 第五百九十七批）。
+- 新角度（全通道全家桶真跑）：**单文档四通道并发**——一个 docx 同时挂内嵌图片（add_picture 1x1 PNG）+ annotation（marker）+ expectations（paragraph 5）+ ef ghost，一次 run_evaluation 四通道全活：image ratio 1.0（真图落盘实存）、F1 0.6667、silent_drop 2、ef matches True——分通道旧锁各自单测，同板并发首锁；**images 目录真落盘**——_per_doc/images-<sha>/image_<sha>_para1_00.png 完整路径约定（sha 随 docx 构建时间变，只锁模式）。首跑修 1 处：images 目录在 _per_doc 内不在输出旁，glob 改嵌套。
+
+---
+
+## Round 1124 — evaluation/runner.py 第五百六十八轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges143.py`（batch323，edges 第五百批，forbidden 第五百九十六批）。
+- 新角度（负容差真跑）：**负容差全零**——tolerance_chars=-5 真跑 P/R/F1 三通道全 {0.0, reason None}，精确命中也判失配（runner 层首锁；直调层旧锁 edges104/112）；**tol 0 对照**——同板 0.5/1.0/0.6667，0 与负数的分界不是更严而是全灭；**负容差报告照过 Schema**——非法语义不产生非法报告。
+
+---
+
+## Round 1123 — evaluation/runner.py 第五百六十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges142.py`（batch322，edges 第四百九十九批，forbidden 第五百九十五批）。
+- 新角度（expectations 通道真跑精确值）：**缺口计数**——真实 docx（2 段落）挂 {paragraph: 5} → silent_drop_count 3 + total 3（旧锁 edges11 用 Fake 只断言键存在，真跑精确值首锁）；**盈余不计负**——{paragraph: 1} → 0 + 0；**缺席类型计缺口**——{paragraph: 1, table: 2} → 2 + 2；**无 expectations 双 null**——per-doc null no_expectations + total null。
+
+---
+
+## 回归基线 91760（第 30 次精确命中）
+
+- bkg7p950x 后台回归 91760 passed, 22 skipped（567.88s）——与预测 91573 + 187 = 91760 精确一致，第 30 连中。
+- 累计：90964 → 91117 → 91272 → 91423 → 91573 → 91760。
+
+---
+
 ## Round 1122 — evaluation/cli.py 第五百六十六轮（20 测试）
 
 - 文件：`tests/test_evaluation_cli_edges141.py`（batch321，edges 第四百九十八批，forbidden 第五百九十四批）。
