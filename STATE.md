@@ -4,6 +4,34 @@
 
 ---
 
+## Round 1151 — evaluation/runner.py 第五百九十五轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges168.py`（batch349，edges 第五百二十三批，forbidden 第六百二十三批）。
+- 新角度（跨源标注 devset 汇总）：**双源双标注全命中**——真文本 PDF + 真 DOCX 各挂 marker（劈点恰 d=0）→ 两 doc F1 皆 1.0，summary chunk_boundary_f1 macro {1.0, participating 2, not_evaluated 0}（跨源宏平均首锁）；**locator 分源参评**——pdf_locator 参 1 免 1、docx_locator 参 1 免 1——混合 devset 各指标只计本源文档。首跑全绿。
+
+---
+
+## Round 1150 — evaluation/cli.py 第五百九十四轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges142.py`（batch348，edges 第五百二十二批，forbidden 第六百二十二批）。
+- 新角度（真文本 PDF 的 CLI 全链）：**run 真文本 PDF**——手写 BT/Tj 文本 PDF 经 CLI main run → rc 0、success 1/1（旧 CLI 成功链全用 docx 板，真 PDF 成功行首锁）；**自产自校**——同一报告再走 validate-report → rc 0 + [OK]；**inspect-doc 真元素**——同板 inspect-doc rc 0 输出含真实指标行。首跑修 4 处（success total、main 计数、inspect-doc 位置参数形状、输出断言）。
+
+---
+
+## Round 1149 — evaluation/runner.py 第五百九十二轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges167.py`（batch347，edges 第五百二十一批，forbidden 第六百二十一批）。
+- 新角度（双表格 / 旋转页）：**双网格双表**——同页两个独立网格 → 2 个 table 元素 + 2 个 isolated_table 块（表格检测各自独立首锁）；**跨网格格字同流**——两格内 a/b 纵向同高 → 合并单 heading "a b"（文本合并无视网格归属）；**旋转页照常抽取**——/Rotate 90 页文本照出、locator 1.0。首跑全绿。
+
+---
+
+## Round 1148 — evaluation/runner.py 第五百九十一轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges166.py`（batch346，edges 第五百二十一批，forbidden 第六百二十批）。
+- 新角度（表格分隔不切文本流）：**表格上下文本合块**——表上方句子与表下方句子跨表合并进同一 chunk（表格只隔离自身，2 chunks [sequential 双源, isolated_table] 首锁）；**近距格字并入上句**——格内 E1/F1 与上方句子纵向近距 → 同一 heading "Sentence above the table. E1 F1"；**空行表格 markdown**——仅首行有字 → 第二行空串单元格 "|  |  |" 收尾。首跑全绿。
+
+---
+
 ## Round 1147 — evaluation/runner.py 第五百九十轮（21 测试）
 
 - 文件：`tests/test_evaluation_runner_edges165.py`（batch345，edges 第五百二十批，forbidden 第六百一十九批）。
