@@ -4,11 +4,60 @@
 
 ---
 
-## 回归基线 94718（第 51 次：总数精确命中）
+## 回归基线 94901（第 52 次：总数精确命中）
 
-- bumx17w9w 后台回归 **94718 passed + 0 failed + 22 skipped（958.31s）**——树态 = R1246 提交后。**与预测 94718 精确吻合，连续第十六次命中，无 flake 全绿**。
-- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405 → 94542 → 94718。
-- 下次预测：94718 + 183（R1247 30 + R1248 34 + R1249 29 + R1250 32 + R1251 30 + R1252 28）= **94901**（第 52 次回归在 R1252 提交后启动，R1253 不在其内；再下次 = 94901 + R1253 28 = 94929 起算）。
+- bs6s3llug 后台回归 **94901 passed + 0 failed + 22 skipped（1035.49s）**——树态 = R1252 提交后。**与预测 94901 精确吻合，连续第十七次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405 → 94542 → 94718 → 94901。
+- 下次预测：94901 + 223（R1253 28 + R1254 30 + R1255 28 + R1256 27 + R1257 26 + R1258 27 + R1259 27 + R1260 30）= **95124**（第 53 次回归在 R1260 提交后启动，覆盖 R1253-R1260 八轮）。
+
+---
+
+## Round 1260 — evaluation/metrics.py 第五百六十六轮（30 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges145.py`（batch458，edges 第六百三十二批，forbidden 第七百二十二批，open 0）。
+- 新角度（PDF 段落启发式分类边界全像）：**长度界 80/81**——无句号行 80 字符 → heading，81 → paragraph（`len <= 80` 精确界首锁）；**句尾标点压倒长度**——"?"/"!" 结尾 → paragraph（与 "." 同终结）；**caption 正则优先**——"Figure 1 …"/"Table 2 …" 带句号也 caption（caption > heading 次序首锁）；**无数字不成 caption**——"Figure something else" → heading；**caption 入 bbox 必备型**——caption 元素 pdf_locator 1.0（_PDF_BBOX_REQUIRED_TYPES 含 caption 真板显形首锁）；**hbc 对照**——len80 板 1.0 / len81 板 null no_heading_elements。首跑全绿。
+
+---
+
+## Round 1259 — evaluation/annotation_metrics.py 第五百八十一轮（27 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges150.py`（batch457，edges 第六百三十一批，forbidden 第七百二十一批）。
+- 新角度（双页板 mc60 过冲块 / 单界一对一耗尽）：**过冲块**——mc60 下 wg31 → chunk1 61 字符（元素粒度探出 max_chars 1 字符首锁），块界 61 非 60；**seam d 20 翻转**——首现收尾 41，距界 61 恰 20 → tol 19 漏 / tol 20 全 1.0；**单界一对一耗尽**——双 "Lower" 锚：唯一界被首个 gt 消耗 → P 1.0 / R 0.5 / F1 2/3；tol 升 22（两 gt 均入程）值不变（界不重复配首锁）。首跑全绿。
+
+---
+
+## Round 1258 — evaluation/report.py 第五百六十七轮（27 测试）
+
+- 文件：`tests/test_evaluation_report_edges136.py`（batch456，edges 第六百三十批，forbidden 第七百二十批，open 0）。
+- 新角度（报告序列化往返 / 键序 / 容差缺席）：**往返相等**——盘上 r.json 读回 == run_evaluation 返回值；**文件键序**——['report_version','provenance','devset','summary','per_doc','expected_failures']（插入序非字母序首锁）；**per_doc 保 manifest 序**——wg31 在 wg30 前 → 同序；**provenance 九键**——dependencies/evaluator_version/git_commit/git_dirty/max_chars/parser_name/parser_version/report_version/run_timestamp_iso；**容差公开缺席**——"tolerance_chars" 全报告无串（metrics 内也剥）；**标注板 chunk_boundary**——简化 ks 板 P 0.5 / R 1.0 / F1 2/3。首跑一断言修（F1 猜 0.5，实测 2/3）。
+
+---
+
+## Round 1257 — evaluation/schema.py 第五百七十二轮（26 测试）
+
+- 文件：`tests/test_evaluation_schema_edges138.py`（batch455，edges 第六百二十九批，forbidden 第七百一十九批，open 2）。
+- 新角度（双页真板第二元素路径 / 非唯一性负空间）：**幽灵页合法**——page 99（仅 2 页 PDF）→ VALID（schema 不交验页数首锁）；**element_id 非唯一合法**；**块源重复/悬空合法**——唯一性/完整性归 intact 指标，schema 不管；**第二元素路径**——page 变异落 ['elements',1,...]（前史全 elements 0 首锁）+ message 精确（'2' not integer / page required / 0 < minimum 1）。首跑全绿。
+
+---
+
+## Round 1256 — evaluation/cli.py 第六百五十七轮（27 测试）
+
+- 文件：`tests/test_evaluation_cli_edges161.py`（batch454，edges 第六百二十八批，forbidden 第五百八十三批，open 1）。
+- 新角度（双页对 CLI 全链）：**双页对板**——wg30（行距 30 合并）+ wg31（行距 31 分裂）双 PDF manifest；**stdout 计数行**——"counts:      elements=4 chunks=1"；**ect 并排**——"element_count_by_type                paragraph=4  (ok)"；**inspect null 行**——null reason 精确呈现。首跑全绿。
+
+---
+
+## Round 1255 — evaluation/runner.py 第六百六十轮（28 测试）
+
+- 文件：`tests/test_evaluation_runner_edges225.py`（batch453，edges 第六百二十七批，forbidden 第七百一十八批，open 2）。
+- 新角度（双页 × 行距网格）：**wg30 合并**——gap 30 同页合并 → 双页各 1 元素，pages [1,2]，chunk 跨页合 1（srcs 2）；**wg31 分裂**——gap 31 → 4 元素 pages [1,1,2,2]（chunk 跨页仍合，srcs 4）；**runner ect [2,4]**——sum {6, 2}；page 边界永不合并（页内 ≤30 才合）首锁。首跑全绿。
+
+---
+
+## Round 1254 — evaluation/metrics.py 第五百六十五轮（30 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges144.py`（batch452，edges 第六百二十六批，forbidden 第七百一十七批，open 0）。
+- 新角度（双页 PDF 基板）：**pages [1,2]**——双页板元素页序精确；**同 bbox y**——双页同 y 内容 bbox 相同；**跨页 chunk 合并**——两元素 1 chunk（srcs 2）；**metadata 无 page 键**。首跑全绿。
 
 ---
 
