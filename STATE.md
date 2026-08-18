@@ -4,6 +4,63 @@
 
 ---
 
+## 回归基线 93014（第 39 次：锚定法五连中·修正后命中）
+
+- brsp7tkvc 后台回归 **93014 passed + 22 skipped（0 failed，595.19s）**——树态 = R1179 提交后。预测 93014 = 92856 + 158**精确命中**（初写 92992 漏计 R1179 的 22，回归完成前修正为 93014，`7f7b7fb`）。
+- 累计（passed）：92333 → 92447 → 92562 → 92719 → 92856 → 93014。
+- 下次预测：93014 + 164（R1180 24 + R1181 23 + R1182 24 + R1183 24 + R1184 22 + R1185 23 + R1186 24）= **93178**（第 40 次回归在 R1186 提交后启动，含其 24 测试）。
+
+---
+
+## Round 1186 — evaluation/runner.py 第六百三十轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges198.py`（batch384，edges 第五百五十八批，forbidden 第六百五十八批）。
+- 新角度（双栏逐行合流 / 句内预算切）：**双栏逐行合并**——同 y 左右两栏文本合并为单元素 "L R"（单空格连接、无栏感知，PDF 逐行合流首锁）；**101 字元素句内切**——合并行 101 > 100 → 句界切 [52, 48]、96 字行整块保留 → chunks [52, 48, 96] 各 1 源；**行尾锚三态**——"here now." after P 0.5 / R 1.0 / F1 2/3、"layout."（流尾无界）全 0.0、双锚 0.5/0.5/0.5（半命中组合值首锁）。首跑全绿。
+
+---
+
+## Round 1185 — evaluation/runner.py 第六百二十九轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges197.py`（batch383，edges 第五百五十七批，forbidden 第六百五十七批）。
+- 新角度（题下 caption 的类先于序）：**caption 在格下**——格区物理高于 caption 但元素序 [heading, caption, table]（文本类按 y 序先行、表格殿后，类先于序 vs y 序的裁决首锁）；**格字双现**——格内文字既成独立 heading 又入表 markdown；**三块布局** [seq, iso_caption, iso_table]；**caption 尾锚** → P 0.5 / R 1.0 / F1 2/3。首跑全绿。
+
+---
+
+## Round 1184 — evaluation/cli.py 第六百二十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges147.py`（batch382，edges 第五百五十六批，forbidden 第五百五十六批）。
+- 新角度（样式板 CLI 全链）：**样式板 run**——Title/Heading 9/Quote/Subtitle/Normal 五段 DOCX 经 CLI → rc 0、by_type {heading: 2, paragraph: 3}（深级题与 Title 特判经 CLI 通道首锁）；**inspect-doc counts 行** "counts:      elements=5 chunks=2"；**自产自校** rc 0。首跑全绿。
+
+---
+
+## Round 1183 — evaluation/runner.py 第六百二十七轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges196.py`（batch381，edges 第五百五十五批，forbidden 第六百五十五批）。
+- 新角度（多 Tj 字节级拼接 / 三题板）：**多 Tj 无自动空格**——(Hello ) Tj (World) Tj → "Hello World"（源空格保留）、(NoSpace) Tj (Glued) Tj → "NoSpaceGlued"（无自动插空，字节级拼接首锁）；**三行皆题**各成独立块；**中界锚** "World"/"Glued" 各单挂 P 0.5 / R 1.0 / F1 2/3、双挂全 1.0。首跑全绿。
+
+---
+
+## Round 1182 — evaluation/runner.py 第六百二十六轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges195.py`（batch380，edges 第五百五十四批，forbidden 第六百五十四批）。
+- 新角度（Title/深级题样式分级）：**Title→题级 1**、**Heading 9→题级 9**（max(1,N) 保底）、Quote/Subtitle→段；**两块布局**——题块 1 源 + 四段合流块 4 源；**流首锚** "Title" before → 全 1.0（流首 22 ≤ 30 容差）、"here" after → 全 1.0。首跑全绿。
+
+---
+
+## Round 1181 — evaluation/runner.py 第六百二十五轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges194.py`（batch379，edges 第五百五十三批，forbidden 第六百五十三批）。
+- 新角度（损坏输入分类学）：**坏 DOCX**（非 zip）→ docx_open_failed（PackageNotFoundError）；**坏 PDF**（无 /Root）→ pdfplumber_open_failed（PdfminerException）——open 层与 extract 层两类失败分野首锁；**双坏 devset** success {0, 2, 0.0}、counts {None, 0}；**CLI 存活** rc 0 且报告仍过 Schema。修正一处：CLI 测试误把 Manifest 对象当路径传参，改回文件路径后全绿。
+
+---
+
+## Round 1180 — evaluation/runner.py 第六百二十四轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges193.py`（batch378，edges 第五百五十二批，forbidden 第六百五十二批）。
+- 新角度（页眉页脚不可见 / 缺锚 reason 三态）：**页眉页脚隐形**——header/footer 文字不进元素流、不占 paragraph_index（body-only 提取首锁）；**缺锚**——marker 不在流中 → P {0.0} / R {null, no_ground_truth_anchors_in_stream} / F1 {null, precision_or_recall_not_evaluated}（reason 三态首锁）；**一存一缺**——缺失锚被静默丢弃 → 全 1.0。修正一处：split 板第二段漏加（只在分支内），移出后全绿。
+
+---
+
 ## 回归基线 92856（第 38 次：锚定法四连中）
 
 - b3qt4l6xo 后台回归 **92856 passed + 22 skipped（0 failed，598.09s）**——树态 = R1172 提交后。预测 92856 = 92719 + 137（R1167-1172）**精确命中**。
