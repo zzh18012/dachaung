@@ -4,6 +4,63 @@
 
 ---
 
+## 回归基线 94718（第 51 次：总数精确命中）
+
+- bumx17w9w 后台回归 **94718 passed + 0 failed + 22 skipped（958.31s）**——树态 = R1246 提交后。**与预测 94718 精确吻合，连续第十六次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405 → 94542 → 94718。
+- 下次预测：94718 + 183（R1247 30 + R1248 34 + R1249 29 + R1250 32 + R1251 30 + R1252 28）= **94901**（第 52 次回归在 R1252 提交后启动，R1253 不在其内；再下次 = 94901 + R1253 28 = 94929 起算）。
+
+---
+
+## Round 1253 — evaluation/annotation_metrics.py 第五百八十轮（28 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges149.py`（batch451，edges 第六百二十五批，forbidden 第七百一十六批）。
+- 新角度（同文档异 chunking 锚几何 / 三界分母）：**mc45 板结构**——4 块 [标题独块，段+占位，表格，尾+节] srcs [1,2,1,3]；**三界分母新值**——单锚 tol 0 → P 1/3 / R 1.0 / F1 0.5（分母 3 首锁）；**标题锚 d 0**——mc45 标题独块 → 标题 after 恰界 1（mc120 合并板此锚漏的对照）；**双锚 tol 21 翻转**——tol 20 → P 1/3 / F1 0.4，tol 21 → P 2/3 / R 1.0 / F1 0.8；**mc60 板**——3 块 srcs [3,1,3] → 双锚 tol 0 全 0.5。首跑全绿。
+
+---
+
+## Round 1252 — evaluation/cli.py 第六百五十六轮（28 测试）
+
+- 文件：`tests/test_evaluation_cli_edges160.py`（batch450，edges 第六百二十四批，forbidden 第五百八十二批）。
+- 新角度（三文档梯度板 CLI 全链）：**stdout 三文档行**——"documents=3（成功 3，失败 0）" + devset "file_count=3 groups=3 pdf=3 docx=0"；**per-doc ect [1,3,2]**——行距梯度在 CLI 报告并排；**summary sum 6**；**inspect 反差行**——"elements=3 chunks=1"；**inspect null 带因行**——"heading_boundary_compliance null (no_heading_elements)" 与 "chunk_boundary_f1 null (no_annotation)"（inspect 层 null reason 呈现首锁）。首跑全绿。
+
+---
+
+## Round 1251 — evaluation/runner.py 第六百五十九轮（30 测试）
+
+- 文件：`tests/test_evaluation_runner_edges224.py`（batch449，edges 第六百二十三批，forbidden 第七百一十五批）。
+- 新角度（三文档 gap 梯度清单全像）：**首块 3 文档板**——all30 + all31 + mixed → per-doc ect 恰 [1, 3, 2]；**summary sum 6**——1+3+2 / participating 3；**devset 三行**——file_count 3 / groups 3 / pdf 3 / docx 0；**hbc 三不参评**——{None, 0, 3}；**public per_doc 恰 4 键**——doc_id / metrics / source_type / wall_time_seconds（无 document 键首锁）。首跑全绿。
+
+---
+
+## Round 1250 — evaluation/metrics.py 第五百六十四轮（32 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges143.py`（batch448，edges 第六百二十二批，forbidden 第七百一十四批）。
+- 新角度（三行板逐对行距分组 / 合并 bbox 跨度算术）：**全 gap 30**——三行 → 单元素合并；**全 gap 31**——恰 3 元素；**混合 30/31**——逐对分组 → 2 元素（成对阈值非全文档首锁）；**bbox 高度算术**——单行 12 / 两行 42 / 三行 72（= 12 + 30×(行数−1)，合并 bbox 跨行首锁）。首跑全绿。
+
+---
+
+## Round 1249 — evaluation/schema.py 第五百七十一轮（29 测试）
+
+- 文件：`tests/test_evaluation_schema_edges137.py`（batch447，edges 第六百二十一批，forbidden 第七百一十三批）。
+- 新角度（真 PDF gap 板 locator 负空间 / 闭世界键）：**bbox 可省**——pop bbox → VALID（仅 page 必需首锁）；**bbox 反序合法**；**page 下界 1**——page 0/-2 → "minimum of 1"（与 paragraph_index 下界 0 字段对照）；**bbox 过短**——3 项 → "too short"；**元素/块闭世界**——zzz → additionalProperties 拒；chunk_index 非块键；**metadata 顶层必需**。首跑全绿。
+
+---
+
+## Round 1248 — evaluation/report.py 第五百六十六轮（34 测试）
+
+- 文件：`tests/test_evaluation_report_edges135.py`（batch446，edges 第六百二十批，forbidden 第七百一十二批）。
+- 新角度（双无标题 PDF 板零参评聚合全像）：**hbc 零参评**——{None, 0, 2}（键不消失，与 edges134 {1.0, 1, 1} 对照）；**四种 null reason 同板**——no_heading_elements / no_annotation / no_image_elements / not_docx_document；**零参评下 12 ratio 键仍在**；**figure 家族不对称**——precision/recall/f1 为 null + parser_does_not_emit_relations，attachment_rate 键缺席。一次修正（figure_caption_precision 实为 null 在场）后全绿。
+
+---
+
+## Round 1247 — evaluation/annotation_metrics.py 第五百七十九轮（30 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges148.py`（batch445，edges 第六百一十九批，forbidden 第七百一十一批）。
+- 新角度（真板锚点方位/距离全像）：**尾块收尾锚漏**——流尾非预测界 → tol 30 仍全 0.0（与 edges146 d 0 恒中对照）；**段尾 d 6 翻转**——tol 5 漏 / tol 6 中；**表格内 "R" d 8 翻转**——tol 7 漏 / tol 8 中；**before d 5 翻转**——真板 before 阈值首锁；**流首 before 漏**。首跑全绿。
+
+---
+
 ## 回归基线 94542（第 50 次：总数精确命中）
 
 - bhskbyhqz 后台回归 **94542 passed + 0 failed + 22 skipped（859.84s）**——树态 = R1239 提交后。**与预测 94542 精确吻合，连续第十五次命中，无 flake 全绿**。
