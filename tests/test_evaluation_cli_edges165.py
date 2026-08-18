@@ -30,8 +30,17 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 import evaluation.cli as cli_mod
 from evaluation.cli import main
+
+
+@pytest.fixture(autouse=True)
+def _restore_argv():
+    saved = sys.argv
+    yield
+    sys.argv = saved
 
 
 def _wrap(s: bytes) -> bytes:
