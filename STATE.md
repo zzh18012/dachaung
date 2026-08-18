@@ -4,6 +4,82 @@
 
 ---
 
+## Round 1147 — evaluation/runner.py 第五百九十轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges165.py`（batch345，edges 第五百二十批，forbidden 第六百一十九批）。
+- 新角度（标注 × 表格 markdown 通道）：**表格 markdown 可作 marker**——真画线表格板 marker "| C1 | D1 |" after 恰落 heading/表格块交界 d=0 → P/R/F1 全 1.0——标注匹配不限于自然文本，表格 markdown 进拼接流（首锁）；**缺失 marker 形**——P 0.0 / R null no_ground_truth_anchors_in_stream（真跑实证修正猜测的 reason 串）。首跑修 1 处。
+
+---
+
+## Round 1146 — 修复 edges134 孪生 docx 偶发（维护轮）
+
+- bu0heiff6 满载回归 1 failed：`test_twin_docs_share_image_dir_batch274`。根因：两次独立 python-docx 构建内嵌 dcterms 创建时间戳，跨秒边界时 twin1/twin2 sha 分叉 → 3 目录 ≠ 断言 2（隔离重跑 5/5 过，时间依赖型 flaky）。修复：twin2 改为复制 twin1 字节全等（内容寻址语义不变）。连跑 6 次全绿。
+
+---
+
+## Round 1145 — evaluation/runner.py 第五百八十九轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges164.py`（batch344，edges 第五百一十九批，forbidden 第六百一十八批）。
+- 新角度（跨页文表混排排序）：**每页先文后表**——页 1 纯文本、页 2 网格+格内文字 → els 恰 [paragraph p1, heading p2, table p2]（跨页混排排序首锁）；**heading 断开前段**——页 1 段落与页 2 heading 不合块：3 chunks，heading 强制 flush 把跨页文本切开。
+
+---
+
+## Round 1144 — evaluation/runner.py 第五百八十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges163.py`（batch343，edges 第五百二十批之前序，forbidden 第六百一十七批）。
+- 新角度（无字网格 / 次页表格）：**无字网格仍产表**——纯 re/S 网格无文字 → table 元素 markdown 空串单元格 "|  |  |…"——rows 非空不跳过（首锁）；**次页表格保号**——页 1 空白、页 2 网格+文字 → els 全 page 2。首跑修 1 处：同行双字符合并单 heading（期望从 [h,h,t] 改 [h,t]）。
+
+---
+
+## Round 1143 — evaluation/runner.py 第五百八十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges162.py`（batch342，edges 第五百一十九批序，forbidden 第六百一十六批）。
+- 新角度（真画线表格 / 句界劈块）：**真画线表格**——re/S 网格 + 格内文字 → pdfplumber 认表：table 元素 markdown 全文 + bbox + {row_count 2, col_count 2, source pdfplumber}（真表格通道首锁）；**isolated_table 单块**；**格内文字双计 heading**；**句界劈块**——3 句 76 字符 @ 40 → 恰 3 块每块一句。
+
+---
+
+## Round 1142 — evaluation/runner.py 第五百八十六轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges161.py`（batch341，edges 第五百一十八批，forbidden 第六百一十五批）。
+- 新角度（无白界 forced_char 劈块真跑）：**81 连 k @ 50 → 2 块 [50, 31]**——forced_char 硬切恰在 max_chars，strategy long_paragraph_sentence_split（runner 级真 PDF 首锁；chunker 直调层旧锁）；**硬切不丢字**——text_equal True + chunk_ref 1.0；**语义修正**——60 连 A @ 30 崩因是构造器地板 max_chars>=32 而非无白界本身。
+
+---
+
+## Round 1141 — evaluation/runner.py 第五百八十五轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges160.py`（batch340，edges 第五百一十七批，forbidden 第六百一十四批）。
+- 新角度（heading 分类边界 / 句读结尾 / 空白折叠）：**80/81 一字符分界**——恰 80 无句读 → heading、81 → paragraph（阈值两端精确锁）；**叹号问号结尾**——!/ ? 与句号同属句读集合；**内部空白折叠**——双空格字面串 → parse 层折单空格，chunk 继承（首锁）。
+
+---
+
+## Round 1140 — evaluation/runner.py 第五百八十四轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges159.py`（batch339，edges 第五百一十六批，forbidden 第六百一十三批）。
+- 新角度（纵向距离分段 / 无文本标注）：**远距双 run 分段**——同页 y=290/y=10 → 2 个 paragraph（与 edges150 近距合并对照，纵向距离是分段依据，首锁）；**双段合块**——分段不分块 1 chunk 双源；**无文本标注态**——image-only 板挂 marker → P null no_predicted_boundaries / R 0.0（图片通道首锁）。
+
+---
+
+## Round 1139 — evaluation/runner.py 第五百八十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges158.py`（batch338，edges 第五百一十五批，forbidden 第六百一十二批）。
+- 新角度（图片多实例 / image 型 expectations）：**同页双图双元素**——同一 Im0 画两次 → 2 image 元素 bbox 恰 [10,50,40,80]/[100,50,130,80]——XObject 复用不合并（首锁）；**空白页图片保号**——页 1 空内容流页 2 图 → 元素 page 2；**image 型 expectations**——{image:3} 配真实 2 → drop 1（旧锁全是 paragraph/table/heading 键）。
+
+---
+
+## Round 1138 — evaluation/runner.py 第五百八十二轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges157.py`（batch337，edges 第五百一十四批，forbidden 第六百一十一批）。
+- 新角度（真嵌入图片 XObject 通道）：**图片元素真定位**——手写 Image XObject（Do 操作符 50×50 cm 矩阵）→ image 元素 + bbox [10,30,60,80] 直接来自 cm 矩阵（真图片数据首锁）；**图片不参与分块**——纯图板 chunks 空；**零块不等于失败**——success True（no_extracted_elements 只属零元素板）；**零块指标语义**——chunk_ref null no_chunks + text_equal True；**图文同页共存**——图不切块不吞文。
+
+---
+
+## 回归基线 92157（第 33 次：总数精确命中 + 1 flaky）
+
+- bu0heiff6 后台回归 92156 passed + 1 failed（601.75s）——总数 92157 与预测 92002 + 155 = 92157 精确一致，但 edges134 孪生 docx 测试时间依赖型偶发（隔离 5/5 过），根因与修复见 Round 1146。记为"总数精确 + 1 flaky"。
+- 累计（passed）：90964 → 91117 → 91272 → 91423 → 91573 → 91760 → 91869 → 92002 → 92156。
+
+---
+
 ## Round 1137 — evaluation/runner.py 第五百八十一轮（23 测试）
 
 - 文件：`tests/test_evaluation_runner_edges156.py`（batch336，edges 第五百一十三批，forbidden 第六百一十批）。
