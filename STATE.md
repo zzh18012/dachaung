@@ -4,6 +4,63 @@
 
 ---
 
+## 回归基线 92856（第 38 次：锚定法四连中）
+
+- b3qt4l6xo 后台回归 **92856 passed + 22 skipped（0 failed，598.09s）**——树态 = R1172 提交后。预测 92856 = 92719 + 137（R1167-1172）**精确命中**。
+- 累计（passed）：92156 → 92333 → 92447 → 92562 → 92719 → 92856。
+- 下次预测：92856 + 136（R1173 24 + R1174 22 + R1175 22 + R1176 22 + R1177 24 + R1178 22）= **92992**。
+
+---
+
+## Round 1179 — evaluation/runner.py 第六百二十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges192.py`（batch377，edges 第五百五十一批，forbidden 第六百五十一批）。
+- 新角度（空 PDF / 混合成败 devset）：**空 PDF 失败通道**——pdf_no_text_extracted 警告（与 DOCX 侧 docx_no_content 成镜像首锁）；**混合成败聚合**——success {1, 2, 0.5}、counts 只算好文档；**失败文档不评**——计入 not_evaluated；**error_code 分流** bad= no_extracted_elements / good=null。首跑全绿。
+
+---
+
+## Round 1178 — evaluation/runner.py 第六百二十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges191.py`（batch376，edges 第五百五十批，forbidden 第六百五十批）。
+- 新角度（空 DOCX 退化失败通道）：**管道级失败**——零段落零表格 → doc=None + errors[no_extracted_elements]（首锁）；**指标全 null**——pipeline_failed 全指标 null 通道；**聚合失败语义**——counts sum None 且 participating 0；**CLI 存活**——失败不崩 CLI、报告仍过 Schema。首跑全绿。
+
+---
+
+## Round 1177 — evaluation/runner.py 第六百二十一轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges190.py`（batch375，edges 第五百四十九批，forbidden 第六百四十九批）。
+- 新角度（题前超大段的分块层级）：**题独占块**——heading(18) + 超长段(225>200)：题自成 sequential 块、段独立 long_paragraph_sentence_split [180, 44]（两级机制叠加首锁）；**句界白空间切**（与 edges161 forced_char 成对照）；**双界锚**各单挂 P 0.5 / R 1.0 / F1 2/3、双挂全 1.0；compliance 保 1.0。首跑全绿。
+
+---
+
+## Round 1176 — evaluation/runner.py 第六百二十轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges189.py`（batch374，edges 第五百四十八批，forbidden 第六百四十八批）。
+- 新角度（预算溢出元素界冲刷）：**溢出冲刷在元素界**——142+139（和 282>200）→ 2 chunks 各 1 源恰 142/139（预算冲刷 vs forced 硬切两级机制首锁）；**三段 103/102/103** 各独立成块（accumulate-overflow 元素级）；**重复锚有序配对**——两个 "sixteen." 锚吃下前两现 → 全 1.0（与 edges185 单锚首现落空成镜像）。修正一处：测试板漏传 triple=True 首跑 1 failed，补上后全绿。
+
+---
+
+## Round 1175 — evaluation/cli.py 第六百一十九轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges146.py`（batch373，edges 第五百四十七批，forbidden 第六百四十七批）。
+- 新角度（跨页流板的 CLI 全链）：**跨页流板 run**——两页四段单 PDF 经 CLI → rc 0、by_type {paragraph: 4}；**inspect-doc 跨页 counts 行** "counts:      elements=4 chunks=1"（4 元素 1 块、页界不分块的 CLI 可观测）；**自产自校** rc 0。首跑全绿。
+
+---
+
+## Round 1174 — evaluation/runner.py 第六百一十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges188.py`（batch372，edges 第五百四十六批，forbidden 第六百四十六批）。
+- 新角度（连排双题 / 尾题收块）：**连排双题**——H1 后紧跟 H2 → [seq("H One"), seq("H Two"+正文)]（题对题也触发软界首锁）；**尾题收块**——heading 收尾自成末块；**compliance 恒 1.0** 双证（题永居块首的结构不变量）。首跑全绿。
+
+---
+
+## Round 1173 — evaluation/runner.py 第六百一十七轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges187.py`（batch371，edges 第五百四十五批，forbidden 第六百四十五批）。
+- 新角度（跨页文本流 / 页界即题界）：**跨页同流**——两页各两段纯文本 → 单 sequential 块 4 源（页界不清空顺序缓冲区首锁）；**页界即题界**——页 2 首 heading → 块界恰落页界；**short_line 题元数据** {level: 0, heuristic: short_line}（runner 级全管道首锁）；**双侧锚皆中**全 1.0。首跑全绿。
+
+---
+
 ## 回归基线 92719（第 37 次：锚定法三连中）
 
 - brqd0j1yo 后台回归 **92719 passed + 22 skipped（0 failed，627.30s）**——树态 = R1166 提交后。预测 92719 = 92562 + 157（R1160-1166）**精确命中**。
