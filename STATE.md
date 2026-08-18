@@ -4,6 +4,49 @@
 
 ---
 
+## 回归基线 94405（第 49 次：总数精确命中）
+
+- bialnizaj 后台回归 **94405 passed + 0 failed + 22 skipped（606.80s）**——树态 = R1234 提交后。**与预测 94405 精确吻合，连续第十四次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405。
+- 下次预测：94405 + 137（R1235 29 + R1236 29 + R1237 27 + R1238 23 + R1239 29）= **94542**（第 50 次回归在 R1239 提交后启动）。
+
+---
+
+## Round 1239 — evaluation/report.py 第五百六十五轮（29 测试）
+
+- 文件：`tests/test_evaluation_report_edges134.py`（batch437，edges 第六百一十一批，forbidden 第七百零五批）。
+- 新角度（混合真板单清单聚合全像）：**12 ratio 键全锁**——DOCX 水槽板 + PDF 40 词板单清单真实跑，summary 恰 12 键（真实数据驱动，前史全手造条目）；**locator 分源参评聚合**——pdf/docx_locator 各 {1.0, 1, 1} 镜像；**hbc 单参评**——仅 DOCX 有 heading → {1.0, 1, 1}；**counts 跨源求和**——ect 7+1 = 8 / participating 2。首跑全绿。
+
+---
+
+## Round 1238 — evaluation/annotation_metrics.py 第五百七十七轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges146.py`（batch436，edges 第六百一十批，forbidden 第七百零四批）。
+- 新角度（水槽真板三块锚）：**占位 after 单锚**——"(空段落)" after → 首现恰收尾 chunk1 → d 0，1 锚 2 界 → P 0.5 / R 1.0 / F1 2/3（与 edges133 before 全 1.0 成方位对照）；**双占位 after 全中**——同锚 ×2 前移 pos 两处真身各中一界 → 全 1.0（文档真含两处占位，同串双锚非标注错误首锁）；**表格尾锚**——"--- |" after → 表格 markdown 收尾恰界 2 → d 0。首跑全绿。
+
+---
+
+## Round 1237 — evaluation/metrics.py 第五百六十二轮（27 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges141.py`（batch435，edges 第六百零九批，forbidden 第七百零三批）。
+- 新角度（真板 expectations/悬空/透传）：**精确三类型**——{heading 1, paragraph 5, table 1} → drop 0；**欠计钳 0**——paragraph 3 < 5 → 0；**从未发射类型**——caption 1 → drop 1；**真板悬空**——chunk2 指向不存在 id → intact 2/3（历史悬空全手造板）；**error 透传不噬元素指标**——DOCX 变体 ect 7 / docx_loc 1.0 照出。首跑全绿。
+
+---
+
+## Round 1236 — evaluation/cli.py 第六百五十三轮（29 测试）
+
+- 文件：`tests/test_evaluation_cli_edges157.py`（batch434，edges 第六百零八批，forbidden 第五百七十九批）。
+- 新角度（水槽板 CLI 全链）：**三类型 by_type 行**——"heading=1, paragraph=5, table=1"（逗号拼接多类型格式首锁）；**counts 行**——"elements=7 chunks=3"；**hbc 1.0000 行**；**docx 文档的 pdf_locator null 行**（not_pdf_document 源反转）；**stdout devset 行**——pdf=0 docx=1。首跑全绿。
+
+---
+
+## Round 1235 — evaluation/runner.py 第六百五十六轮（29 测试）
+
+- 文件：`tests/test_evaluation_runner_edges221.py`（batch433，edges 第六百零七批，forbidden 第七百零二批）。
+- 新角度（DOCX 厨房水槽板交互组合网）：**七元素四形态混排**——heading + 正文 + 空白占位 + table + run 拼接 + 分节占位 + 节 2 段；**双源占位同文**——"   " 与分节符插入同为 "(空段落)"（idx 2 与 5）；**paragraph_index 跳过表**——段族 0-5 连续，表走 table_index 0；**三块交互**——标题前向合并组 / 表隔离块 / 尾段跨节合并组（e0004-e0006 横跨分节符首锁）。首跑 1 failed（占位 idx 误写 4，实为 5）后修正全绿。
+
+---
+
 ## 回归基线 94159（第 48 次：总数精确命中）
 
 - b3r65fahn 后台回归 **94159 passed + 0 failed + 22 skipped（638.88s）**——树态 = R1224 提交后。**与预测 94159 精确吻合，连续第十三次命中，无 flake 全绿**。
