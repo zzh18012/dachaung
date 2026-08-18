@@ -4,6 +4,55 @@
 
 ---
 
+## Round 1137 — evaluation/runner.py 第五百八十一轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges156.py`（batch336，edges 第五百一十三批，forbidden 第六百一十批）。
+- 新角度（三类型混排 / heading 型 expectations）：**caption→heading→paragraph 三页混排**——恰 2 chunks（isolated_caption + sequential 合并块），硬界在前软界在后复合行为首锁；**heading 型 expectations**——{heading: 2} 配真实 1 heading → silent_drop 1（旧锁全是 paragraph/table 键）；**混合类型 locator 1.0**；**heading 居第二块仍 compliance 1.0**。
+
+---
+
+## Round 1136 — evaluation/runner.py 第五百八十轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges155.py`（batch335，edges 第五百一十二批，forbidden 第六百零九批）。
+- 新角度（heading 软界 / caption 硬界对照）：**heading 与后段合并**——页 1 heading + 页 2 paragraph → 恰 1 chunk sequential，source_element_ids 双元素——heading 是软边界不隔离（首锁）；**caption 硬隔离**——同构板换 Figure 前缀 caption → 2 chunks isolated_caption + sequential 各自单源——强制 flush 独立成块（首锁）；runner 级双板 by_type 与 compliance 对照。
+
+---
+
+## Round 1135 — evaluation/runner.py 第五百七十九轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges154.py`（batch334，edges 第五百一十一批，forbidden 第六百零八批）。
+- 新角度（真 PDF heading / caption 分类通道）：**短行无句读 → heading**——35 字符独行 → heading + {level 0, heuristic short_line}，runner 级 heading_boundary_compliance 首次真值 1.0（真 PDF 板脱离 null）；**超长 heading 不劈**——35 字符 heading 配 max_chars 32 → 恰 1 整块 sequential——heading 分支优先于长文劈块（首锁）；**Figure 前缀 → caption**——caption_regex + isolated_caption 单块。分类规则：≤80 字符且不以句读结尾 → heading（同页 run 先合并再分类）。
+
+---
+
+## Round 1134 — evaluation/runner.py 第五百七十八轮（20 测试）
+
+- 文件：`tests/test_evaluation_runner_edges153.py`（batch333，edges 第五百一十批，forbidden 第六百零七批）。
+- 新角度（括号转义文本 × 标注通道）：**括号 marker 精确命中**——PDF 字面串 \(paren\) 解出真括号，marker "(paren)" after 恰落 30 字符白界劈点 d=0 → P/R/F1 全 1.0（转义文本进标注匹配首锁）；**单块无边界态**——同板合一块 → P null no_predicted_boundaries / R 0.0 / F1 null。附带实证 chunker 硬地板 max_chars≥32（构造器抛"过小"）。
+
+---
+
+## Round 1133 — evaluation/runner.py 第五百七十七轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges152.py`（batch332，edges 第五百零九批，forbidden 第六百零六批）。
+- 新角度（PDF 文本操作符三态）：**单 BT 多 Tj 合并**——同一 BT/ET 块内两个 Tj → 恰 1 paragraph（run 归并不要求独立 BT 块，首锁）；**TJ 数组操作符**——[(Tee) 20 (Jay) -10 ( arr.)] TJ → "TeeJay arr."（字距数字忽略、子串拼接，首锁）；**首尾空白剥除**——padded 字面串 → content 剥首尾留内部；runner 级 TJ 板全胜。
+
+---
+
+## Round 1132 — evaluation/runner.py 第五百七十六轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges151.py`（batch331，edges 第五百零八批，forbidden 第六百零五批）。
+- 新角度（PDF 字面串转义 / 无白界长词）：**括号转义往返**——\\( \\) 解回真实括号，转义文本全链路不丢（runner 级 success + text_equal True）；**无白界长词崩**——60 连 A 无空白词配 max_chars 30 → chunker_failed"max_chars 过小"（白界优先的直接后果：没有白界就没有切点，宁可崩不硬切，首锁）；**长词恰容不崩**——max_chars 60 → 1 chunk 全量。
+
+---
+
+## 回归基线 92002（第 32 次精确命中）
+
+- b4kwepw9h 后台回归 92002 passed, 22 skipped（620.73s）——与预测 91869 + 133 = 92002 精确一致，第 32 连中。
+- 累计：90964 → 91117 → 91272 → 91423 → 91573 → 91760 → 91869 → 92002。
+
+---
+
 ## Round 1131 — evaluation/runner.py 第五百七十五轮（22 测试）
 
 - 文件：`tests/test_evaluation_runner_edges150.py`（batch330，edges 第五百零七批，forbidden 第六百零四批）。
