@@ -4,11 +4,90 @@
 
 ---
 
-## 回归基线 95332（第 54 次：总数精确命中）
+## 回归基线 95588（第 55 次：算术精确命中，1 例瞬态失败）
 
-- bpgvqx7l3 后台回归 **95332 passed + 0 failed + 22 skipped（1528.31s）**——树态 = R1272 提交后。**与预测 95332 精确吻合，连续第十九次命中，无 flake 全绿**。
-- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405 → 94542 → 94718 → 94901 → 95124 → 95332。
-- 下次预测：95332 + 67（R1273 34 + R1274 33）= **95399**（第 55 次回归 blt018jrj 在 R1274 提交后启动，R1275 不在其内；再下次 = 95399 + R1275 37 + R1276 29 + R1277 37 + R1278 34 = 95536 起算）。
+- blt018jrj 后台回归 **1 failed + 95587 passed + 22 skipped（1576.83s）**——树态 = R1274 提交后。**前次预测 95399 基准算错**：第 54 次树实为 R1266 而非 R1272；正确算术 = 95332 + 256（R1267 30 + R1268 30 + R1269 34 + R1270 34 + R1271 29 + R1272 32 + R1273 34 + R1274 33）= **95588 总数精确命中**。
+- **1 例失败为瞬态**：lastfailed/nodeids 缓存受并发 focused 跑污染（299 条陈旧项、幽灵条目 test_timestamp_differs_between_calls_batch55 不存在于任何文件）；10 个现存候选逐一重跑全过；不可复现。教训：回归启动**不得** `| tail` 截断输出。
+- 累计（总数）：93014 → … → 95332 → 95588。
+- 第 56 次预测（bjzen4gvi，R1285 提交后启动，全日志 reg56.log）：95588 + 325（R1275 37 + R1276 29 + R1277 37 + R1278 34 + R1279 30 + R1280 32 + R1281 34 + R1282 29 + R1283 34 + R1284 29）+ 30（R1285）= **95943**。
+
+---
+
+## Round 1290 — evaluation/metrics.py 第五百七十一轮（31 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges150.py`（batch488，edges 第六百六十二批，forbidden 第七百四十九批，open 0）。
+- 新角度（真实图片板 metrics 全貌）：**元素序**——图片 Do 先画但元素序 [heading, paragraph, image]（文本 y 序在前、图片追加末尾首锁）；**图片元素体**——content None + metadata {tag None, srcsize [2,2], extracted_to_disk True}；**locator 几何**——cm 变换 10 500 → bbox [10.0, 250.0, 110.0, 300.0]（top-down 换算首锁）；**图片不产块**——chunks 仍 16 / ecbt 三键 / ect 3；**irer 真渲染**——1.0 且 resource_path 真在盘、断链 → 0.0（磁盘存在性实检首锁）；**文本面无扰**——tpe/crir/msp/msr/hbc/plvr 全 1.0。首跑全绿。
+
+---
+
+## Round 1289 — evaluation/annotation_metrics.py 第五百八十六轮（33 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges155.py`（batch487，edges 第六百六十一批，forbidden 第七百四十八批，open 0）。
+- 新角度（mc100 晶格几何）：**边界系**——6 块 → 预测边界 [80, 174, 270, 366, 462] 共 5 条 → P 分母 5（0.2，区别于 mc32 的 1/15）；**d 谱翻转**——W3 d 28（27/28）、W10 d 16（15/16）、W30 d 48（47/48）、W59 d 88（87/88 末锚远距首锁）；**HEAD before d 80 跨 mc 不变**——流首几何与分块粒度解耦首锁；**F1 浮点痕** 0.33333333333333337；**双锚** W3+W10 tol 60 → (0.4, 1.0, 0.5714285714285715)。首跑全绿。
+
+---
+
+## Round 1288 — evaluation/report.py 第五百七十二轮（31 测试）
+
+- 文件：`tests/test_evaluation_report_edges141.py`（batch486，edges 第六百六十批，forbidden 第七百四十七批，open 0）。
+- 新角度（期望板差分 15 路 / mc 不变面）：**期望增面**——combo expectations 精确 vs fig {caption: 2} → 恰 15 路差分 = edges140 13 路 BOARD_DIFF ⊕ sdc value + summary.silent_drop_total；**sdt 直挂 summary**——非 counts 子键（键位首锁）0 vs 1；**mc 不变面**——同板 mc32 vs mc100 → 全报告差分恰 3 路（wall_time total + provenance.max_chars + 时间戳）；per_doc metrics 整 dict 相等、success/counts/devset 全等（16→5 块计数无关首锁）。首跑 12 挂（漏 import json），补 import 后全绿。
+
+---
+
+## Round 1287 — evaluation/schema.py 第五百七十八轮（30 测试）
+
+- 文件：`tests/test_evaluation_schema_edges143.py`（batch485，edges 第六百五十九批，forbidden 第七百四十六批，open 2）。
+- 新角度（bbox 上界 / locator 开放 / 翻转不对称 / 布尔置信 / relation 变异）：**bbox 过长**——5/6 项 → "is too long"（上界首锁，补 edges137 过短侧）；**pdf_locator 开放**——额外键 zoom VALID；**翻转不对称**——PDF 文档翻 source_type=docx 保留 page/bbox locator → VALID（docx_locator 开放收纳；edges127 反向 docx→pdf 拒绝的补侧首锁）；**布尔置信**——confidence True/False → "is not of type 'number'"（bool 非 number 语义首锁）；**relation 变异**——额外键/空 from_id/缺 type 拒 + 最小三元 VALID。首跑全绿。
+
+---
+
+## Round 1286 — evaluation/cli.py 第六百六十七轮（32 测试）
+
+- 文件：`tests/test_evaluation_cli_edges166.py`（batch484，edges 第六百五十八批，forbidden 第五百八十八批，open 1）。
+- 新角度（三态 null 谱系 CLI 全链 / 公共报告面剥除）：**空锚 CLI**——run rc 0 + trio 全 no_ground_truth_anchors（CLI 端到端首锁）；**缺标注文件 CLI 静默**——rc 0 + [OK] 仍打印 + 与无键同因；**absent 第三态**——三态共 4 种 reason 字符串 CLI 端到端；**公共面剥除**——per_doc 条目恰 4 键；_annotation_present/_tolerance_chars/_missing_markers 全不出现在公共报告；"tolerance" 子串全报告缺席；**tol 7 对 null 无效**。首跑 2 挂（reasons 集合混入 None + validate 路径双后缀），修正后全绿。
+
+---
+
+## Round 1285 — evaluation/runner.py 第六百六十五轮（30 测试）
+
+- 文件：`tests/test_evaluation_runner_edges230.py`（batch483，edges 第六百五十七批，forbidden 第七百四十四批，open 2）。
+- 新角度（边界指标三态零税 / 标注文件缺失降级）：**空锚列表**——标注在场但 [] → cbp/cbr/cbf 全 null + no_ground_truth_anchors（区别于 _in_stream 变体；cbp null 而非 0.0 三分支首锁）；**标注文件缺失**——manifest 指向不存在 ann/gone.json → 静默按无标注 → 全 no_annotation（缺失降级首锁）；**聚合三态**——{None, 0, 1}。首跑全绿。
+
+---
+
+## Round 1284 — evaluation/metrics.py 第五百七十轮（29 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges149.py`（batch482，edges 第六百五十六批，forbidden 第七百四十三批，open 0）。详见文件 docstring（单字符编辑三分不对称 / 悬空引用分数）。
+
+---
+
+## Round 1283 — evaluation/annotation_metrics.py 第五百八十五轮（34 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges154.py`（batch481，edges 第六百五十五批，forbidden 第七百四十二批，open 0）。详见文件 docstring（before 位句包格 / 混位竞争）。
+
+---
+
+## Round 1282 — evaluation/report.py 第五百七十一轮（29 测试）
+
+- 文件：`tests/test_evaluation_report_edges140.py`（batch480，edges 第六百五十四批，forbidden 第七百四十一批，open 0）。详见文件 docstring（板型差分 13 路径 / hbc 聚合参与翻转）。
+
+---
+
+## Round 1281 — evaluation/schema.py 第五百七十六轮（34 测试）
+
+- 文件：`tests/test_evaluation_schema_edges142.py`（batch479，edges 第六百五十三批，forbidden 第七百四十批，open 2）。详见文件 docstring（entry 不对称 / chunk 五键）。
+
+---
+
+## Round 1280 — evaluation/cli.py 第六百六十一轮（32 测试）
+
+- 文件：`tests/test_evaluation_cli_edges165.py`（batch478，edges 第六百五十二批，forbidden 第五百八十七批，open 1）。详见文件 docstring（fig 板 / inspect 两段排序）。
+
+---
+
+## Round 1279 — evaluation/runner.py 第六百六十四轮（30 测试）
+
+- 文件：`tests/test_evaluation_runner_edges229.py`（batch477，edges 第六百五十一批，forbidden 第七百三十三批，open 2）。详见文件 docstring（混合参与 / expectations sdc 差分）。
 
 ---
 
