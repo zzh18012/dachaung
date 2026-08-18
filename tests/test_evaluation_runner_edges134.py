@@ -21,6 +21,7 @@ from __future__ import annotations
 import inspect
 import io
 import json
+import shutil
 import struct
 import zlib
 
@@ -55,7 +56,11 @@ def _run(tmp_path):
                                              encoding="utf-8")
     (tmp_path / "samples").mkdir()
     _build(tmp_path / "samples" / "twin1.docx", "twin")
-    _build(tmp_path / "samples" / "twin2.docx", "twin")
+    # 两次独立构建会因 docx 内嵌创建时间戳跨秒而 sha 分叉
+    # （满负载下偶发），复制保证孪生字节全等
+    shutil.copyfile(
+        tmp_path / "samples" / "twin1.docx",
+        tmp_path / "samples" / "twin2.docx")
     _build(tmp_path / "samples" / "other.docx", "other")
     mf = tmp_path / "m.json"
     mf.write_text(json.dumps({
