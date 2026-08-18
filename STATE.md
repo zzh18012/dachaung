@@ -4,6 +4,77 @@
 
 ---
 
+## Round 1122 — evaluation/cli.py 第五百六十六轮（20 测试）
+
+- 文件：`tests/test_evaluation_cli_edges141.py`（batch321，edges 第四百九十八批，forbidden 第五百九十四批）。
+- 新角度（双 main 调用链 / 重跑覆盖）：**run → validate-report 链**——同进程两次 main()：先 run 真实 docx 板产报告 rc 0，再 validate-report 同文件 rc 0 + [OK]——CLI 自产自校闭环（首锁；runner 层 API 版同轮前批 edges141）；**重跑覆盖不累积**——同一 output 连跑两次 rc 0，per_doc 仍 1 条（整体覆盖不追加），覆盖后 validate-report 照过——重跑幂等（首锁）。
+- 本轮 metrics/manifest/report 三模块轮转位全数饱和（大小写、空串、贪心、detect_root、ghost 配对、exact version 全有旧锁），按 R1109 纪律改投 cli。
+
+---
+
+## Round 1121 — evaluation/runner.py 第五百六十五轮（21 测试）
+
+- 文件：`tests/test_evaluation_runner_edges141.py`（batch320，edges 第四百九十七批，forbidden 第五百九十三批）。
+- 新角度（真实运行产物回环三锁）：**产物过报告 Schema**——真实 docx 板（含 ef ghost）run_evaluation → 输出 JSON 直接过 evaluation-report.schema.json（旧锁只测手拼报告）；**返回值与落盘全等**——返回 dict == json.loads(文件)，内存/磁盘视图零漂移（首锁）；**产物过 validate-report CLI**——main 校验 rc 0 + [OK]，评测自产报告经自家 CLI 零告警（runner 层首锁）。
+
+---
+
+## Round 1120 — evaluation/schema.py 第五百六十四轮（21 测试）
+
+- 文件：`tests/test_evaluation_schema_edges130.py`（batch319，edges 第四百九十六批，forbidden 第五百九十二批）。
+- 新角度（Schema 元校验 / 引用完整性清点）：**check_schema 四连过**——四个 Schema 全过 Draft202012Validator.check_schema——Schema 本身是合法 2020-12 文档（首锁；旧锁全在 instance 侧）；**check_schema 负对照**——{"type": 123} 抛 SchemaError，证明元校验真咬人；**$ref 完整性清点**——annotation 1 / document 12 / evaluation-report 5 / manifest 2 处引用全解析到本 Schema $defs，零悬空（首锁）。
+
+---
+
+## Round 1119 — evaluation/annotation_metrics.py 第五百六十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges141.py`（batch318，edges 第四百九十五批，forbidden 第五百九十一批）。
+- 新角度（marker 定位三重字面性）：**大小写敏感**——流 "AAA bbb"、marker "aaa" → missing + P 0.0 + R null（str.find 字节级精确，首锁）；**marker 不规范化**——chunk "A  B" 流侧折叠成 "A B"，marker 原样带双空格 → missing；对照单空格 marker 全 1.0——流侧 normalize、marker 侧原样不对称（首锁）；**内嵌 marker 被前锚消费**——流 "AB CD" 锚 ["AB" after, "B" before]："B" 唯一出现位在 "AB" 内但 search_from 已过 → missing ["B"]，已定位锚照常 d=0 匹配全 1.0——缺失 marker 不入 recall 分母（首锁）。
+
+---
+
+## Round 1118 — evaluation/cli.py 第五百六十二轮（21 测试）
+
+- 文件：`tests/test_evaluation_cli_edges140.py`（batch317，edges 第四百九十四批，forbidden 第五百九十批）。
+- 新角度（第三工件误喂 / 真实 parser 档案）：**annotation 喂 validate-report**——标注 JSON → rc 1 + [FAIL] + 6 处 + 'report_version'（misfeed 家族第三工件，edges125 文档 JSON、edges127 manifest 已锁，标注首锁）；**manifest 喂 inspect-doc**——清单 JSON → rc 0 照跑 type=unknown/elements=0（inspect 零校验再添一工件，清单首锁）；**真实 kreuzberg 档案打印**——真跑 kreuzberg 产 doc JSON 喂 inspect-doc → "parser:      kreuzberg v4.10.2" 精确上屏（真实 parser_name + 版本号）。
+
+---
+
+## 回归基线 91573（第 29 次精确命中）
+
+- bzu7d61y2 后台回归 91573 passed, 22 skipped（549.19s）——与预测 91423 + 150 = 91573 精确一致，第 29 连中。
+- 累计：90964 → 91117 → 91272 → 91423 → 91573。下一基线预测：91573 + R1114-1122（21+21+20+20+21+22+21+21+20=187）= 91760。
+
+---
+
+## Round 1117 — evaluation/runner.py 第五百六十一轮（20 测试）
+
+- 文件：`tests/test_evaluation_runner_edges140.py`（batch316，edges 第四百九十三批，forbidden 第五百八十九批）。
+- 新角度（共享标注分歧行 / doc_id 不校验）：**共享标注分歧行**——两文档挂同一 annotation_file，marker "AAA" 只在 d1 流中 → d1 {P 0.5 / R 1.0 / F1 0.6667}、d2 {P 0.0 / R null no_ground_truth_anchors_in_stream / F1 null}——同一标注文件在不同文档流上各自求值（manifest 侧共享已锁 edges139，本批锁运行时分歧行）；**annotation doc_id 不校验**——标注 doc_id "zzz-matches-nothing" 匹配零文档 → 两文档 F1 同 0.6667——runner 从不比对 annotation.doc_id 与文档 id（首锁）。
+
+---
+
+## Round 1116 — evaluation/report.py 第五百六十轮（20 测试）
+
+- 文件：`tests/test_evaluation_report_edges129.py`（batch315，edges 第四百九十二批，forbidden 第五百八十八批报告变体）。
+- 新角度（reason 通道聚合全忽略 / metrics-only 条目）：**reason 通道全忽略**——value True 带 reason "whatever" → success {1,1,1.0}；ect 4 带 "noise" → {4,1}；ratio 0.25 带 reason → macro 0.25——三家族只读 value，reason 聚合层丢弃（True-with-reason 首锁，旧锁只测 reason None 正形）；**metrics-only 条目**——per_doc 条目只有 metrics 键 → 聚合照常（aggregate 只读 r["metrics"]，条目壳不设防，首锁）。
+
+---
+
+## Round 1115 — evaluation/manifest.py 第五百五十九轮（21 测试）
+
+- 文件：`tests/test_evaluation_manifest_edges139.py`（batch314，edges 第四百九十一批，forbidden 第五百八十七批）。
+- 新角度（目录当路径 / 共享标注）：**annotation_file 是目录**——"anns" 真实目录照常加载且 is_dir()（形式校验只查形式不查类型，annotation 通道目录首锁；runner 侧 is_file 检查静默降级 no_annotation）；**ef path 是目录**——"anns" 照载 is_dir()（目录变体首锁）；**两文档共享一个 annotation_file**——两 annotation_resolved 完全相等，loader 不查归属（同一标注可复用到任意多文档）。首跑修 1 处：anns 目录 mkdir 时机。
+
+---
+
+## Round 1114 — evaluation/metrics.py 第五百五十八轮（21 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges137.py`（batch313，edges 第四百九十批，forbidden 第五百八十六批）。
+- 新角度（文本保留口径 D 三畸变）：**全文加倍**——chunks 文本 ×2 → P 0.5 / R 1.0；**截半**——t[:len//2] → P 1.0 / R 0.48148148148148145；**清空（有 chunk）**——P null empty_actual / R 0.0——三通道对加倍/截半/清空的判别力首锁（指标名 text_char_multiset_precision/recall）。
+
+---
+
 ## Round 1113 — evaluation/report.py 第五百五十七轮（20 测试）
 
 - 文件：`tests/test_evaluation_report_edges128.py`（batch312，edges 第四百八十九批，forbidden 第五百八十五批报告变体）。
