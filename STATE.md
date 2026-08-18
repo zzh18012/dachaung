@@ -4,6 +4,35 @@
 
 ---
 
+## 回归基线 93541（第 43 次：总数精确命中）
+
+- bo2zy7qd0 后台回归 **93541 passed + 0 failed + 22 skipped（612.52s）**——树态 = R1200 提交后。**与预测 93541 精确吻合，连续第八次命中，无 flake 全绿**。
+- 累计（总数）：92856 → 93014 → 93178 → 93287 → 93417 → 93541。
+- 下次预测：93541 + 89（R1201 31 + R1202 26 + R1203 32）= **93630**（第 44 次回归在 R1203 提交后启动）。
+
+---
+
+## Round 1203 — evaluation/runner.py 第六百四十七轮（32 测试）
+
+- 文件：`tests/test_evaluation_runner_edges212.py`（batch401，edges 第五百七十五批，forbidden 第六百七十四批）。
+- 新角度（横线不成表 / 同基线混字号顶部序）：**横线不成表**——两条全宽横线（无竖线）夹文字不成 table，走 short_line heading（表检测需列结构首锁）；**题向后阻断向前合**——[段独行, 题+段合流 48 字 2 源]，mc200 仍 2 块（阻断与预算无关）；**同基线混字号**——12pt "Hello " 与 24pt "World" 同基线 → 行内字符按字形顶排序："World Hello"（大字顶更高先排，x 序让位首锁）；**单块 null 锚**——混合板单 chunk → 锚走 no_predicted_boundaries；重复 band. ×2 → 第二个距界 50 > 30 → R 0.5。修正一处（mc200 长度 48 算成 49），首跑 1 failed 后改正全绿。
+
+---
+
+## Round 1202 — evaluation/cli.py 第六百四十六轮（26 测试）
+
+- 文件：`tests/test_evaluation_cli_edges150.py`（batch400，edges 第五百七十四批，forbidden 第五百七十二批）。
+- 新角度（max-chars 下界经 CLI / 同位双图检查）：**mc31 经 CLI rc 0**——--max-chars 31 触发 chunker_failed（分块器下界 max_chars ≥ 32），单文档失败是数据不是 CLI 错：rc 0 + "documents=1（成功 0，失败 1）" + success rate 0.0；**mc32 下界成功**——成功 1 / by_type {paragraph: 2, image: 2}；**失败报告可校验**——validate-report 对 mc31 报告 [OK] rc 0；**同位双图 inspect**——counts elements=4 chunks=2 + image_resource_exists_ratio 1.0000 + by_type image=2, paragraph=2。首跑全绿。
+
+---
+
+## Round 1201 — evaluation/runner.py 第六百四十五轮（31 测试）
+
+- 文件：`tests/test_evaluation_runner_edges211.py`（batch399，edges 第五百七十三批，forbidden 第六百七十三批）。
+- 新角度（同位双图 / 图不阻断合流）：**同位双图不去重**——两 image XObject 画在同一 cm 矩形 → 两个独立 image 元素、bbox 完全相同 [50, 120, 80, 150]、资源双份（_p1_00.png / _p1_01.png）；**y 夹图仍殿后**——图在两段文本之间（y 650）但元素序 [段, 段, 图, 图]；**图不阻断合流**——元素序被图隔开的两段仍合一块（2 源），与表阻断成对照；**近界锚全容差**——流长 57，任意 marker 距界 ≤ 28 < 30 → 全 1.0；重复 marker 一对一 → R 0.5。踩坑：to_dict 的 resource_path 是 str 不是 Path（首跑 1 failed 后改正全绿）。
+
+---
+
 ## 回归基线 93417（第 42 次：总数精确命中）
 
 - b5ey4zssj 后台回归 **93417 passed + 0 failed + 22 skipped（605.36s）**——树态 = R1195 提交后。**与预测 93417 精确吻合，连续第七次命中，本次无 flake 全绿**。
