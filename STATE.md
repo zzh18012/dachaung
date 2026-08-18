@@ -4,6 +4,49 @@
 
 ---
 
+## 回归基线 93417（第 42 次：总数精确命中）
+
+- b5ey4zssj 后台回归 **93417 passed + 0 failed + 22 skipped（605.36s）**——树态 = R1195 提交后。**与预测 93417 精确吻合，连续第七次命中，本次无 flake 全绿**。
+- 累计（总数）：92719 → 92856 → 93014 → 93178 → 93287 → 93417。
+- 下次预测：93417 + 124（R1196 25 + R1197 24 + R1198 25 + R1199 24 + R1200 26）= **93541**（第 43 次回归在 R1200 提交后启动）。
+
+---
+
+## Round 1200 — evaluation/runner.py 第六百四十四轮（26 测试）
+
+- 文件：`tests/test_evaluation_runner_edges210.py`（batch398，edges 第五百七十二批，forbidden 第六百七十二批）。
+- 新角度（纯空白行的透明性）：**空白行全透明**——紧距板与无空行板产物完全相同（单合并段；空白行既不成元素也不断段，y 间距按内容行计首锁）；**远距正常分离**——40pt 间距仍两元素（分离源于距不源于空白行）；**流尾锚零界**——"blank." after → 全 0.0；双锚 → P 1.0 / R 0.5 / F1 2/3。首跑全绿。
+
+---
+
+## Round 1199 — evaluation/cli.py 第六百四十三轮（24 测试）
+
+- 文件：`tests/test_evaluation_cli_edges149.py`（batch397，edges 第五百七十一批，forbidden 第五百七十一批）。
+- 新角度（旋转板 CLI 全链）：**旋转板 run**——倒序串 "eniL detatoR" + 隐形串 + 两页四题经 CLI → rc 0、by_type {heading: 4}（旋转/隐形通道经 CLI 首锁）；**inspect-doc counts 行**——"counts:      elements=4 chunks=4"；**stdout 汇总**——"documents=1（成功 1，失败 0）" + "pdf=1 docx=0"；**自产自校** rc 0。首跑全绿。
+
+---
+
+## Round 1198 — evaluation/runner.py 第六百四十二轮（25 测试）
+
+- 文件：`tests/test_evaluation_runner_edges209.py`（batch396，edges 第五百七十批，forbidden 第六百七十批）。
+- 新角度（字号盲合流 / 宽距分离）：**近距字号盲合**——20pt 行 + 12pt 行 y 差 15 → 合单 paragraph（字号不参与行聚类）；**宽距分离**——y 差 40 → [heading, paragraph]（20pt 大字无特判仍走 short_line）；**预算切两块** max_chars 50 → [23, 44] 各 1 源；锚 words → 1.0s、流尾 title. → 0.0s、双锚 → P 1.0 / R 0.5。首跑全绿。
+
+---
+
+## Round 1197 — evaluation/runner.py 第六百四十一轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges208.py`（batch395，edges 第五百六十九批，forbidden 第六百六十九批）。
+- 新角度（DOCX 巨词硬切的镜像）：**无白界硬切**——131 个 W 无空白段 → chunks [100, 31] 恰在 max_chars 处劈开（与 edges161 的 PDF forced_char 成镜像，DOCX 通道标签 long_paragraph_sentence_split）；**四块结构** [seq 45, lps 100, lps 31, seq 40] 各 1 源；**流尾锚零界**——"word ends." after → 全 0.0。首跑全绿。
+
+---
+
+## Round 1196 — evaluation/runner.py 第六百四十轮（25 测试）
+
+- 文件：`tests/test_evaluation_runner_edges207.py`（batch394，edges 第五百六十八批，forbidden 第六百六十八批）。
+- 新角度（超链接文本透传 / 容差三明治）：**hyperlink 文本透传**——w:hyperlink 内 w:t 经 python-docx 1.2.0 的 paragraph.text 原样入流（"Hidden Link Text" 内联不丢）；**容差三明治**——同段两中位锚："Hidden" after（距界 24 ≤ 30）→ 全 1.0 vs "Before" after（距界 40 > 30）→ 全 0.0（容差界两侧对照首锁）；**一命中一偏离** [Before, link.] → P 1.0 / R 0.5 / F1 2/3。首跑全绿。
+
+---
+
 ## 回归基线 93287（第 41 次：总数命中 + 1 环境性 flake）
 
 - bnx7cvaf2 后台回归 **93286 passed + 1 failed + 22 skipped（603.99s）**——树态 = R1190 提交后。**收集总数 93287 = 预测精确命中**（93286 + 1 failed）。
