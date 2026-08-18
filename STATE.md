@@ -4,6 +4,49 @@
 
 ---
 
+## 回归基线 93864（第 46 次：总数精确命中）
+
+- bd2ecaahi 后台回归 **93864 passed + 0 failed + 22 skipped（628.78s）**——树态 = R1212 提交后。**与预测 93864 精确吻合，连续第十一次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864。
+- 下次预测：93864 + 126（R1213 26 + R1214 24 + R1215 27 + R1216 25 + R1217 24）= **93990**（第 47 次回归在 R1217 提交后启动）。
+
+---
+
+## Round 1217 — evaluation/schema.py 第五百六十六轮（24 测试）
+
+- 文件：`tests/test_evaluation_schema_edges132.py`（batch415，edges 第五百八十九批，forbidden 第六百八十七批）。
+- 新角度（引用无完整性 / 元数据类型 / 空文本 / 重复 ID 容让）：**悬空引用照过**——source_element_ids 指向 "nope" → VALID（schema 不做引用完整性）；**重复 element_id 照过**——无唯一性约束；**metadata 列表**——"[] is not of type 'object'"；**chunk 空文本**——"'' should be non-empty"；**content/resource 双空**——anyOf 回拒 path elements/0；**负耗时照过**——parse_time_ms -5 VALID。首跑全绿。
+
+---
+
+## Round 1216 — evaluation/report.py 第五百六十二轮（25 测试）
+
+- 文件：`tests/test_evaluation_report_edges131.py`（batch414，edges 第五百八十八批，forbidden 第六百八十六批）。
+- 新角度（布尔求和 / 字符串崩 / 裸 None / 严格 True）：**布尔求和**——True+True → sum 2；**字符串崩**——ect "7" → TypeError（counts 无类型设防）；**裸 None 不评**——ratio _v(None) 无 reason → 照路由 not_evaluated；**严格 True**——_v(1) 与 _v("yes") 皆 truthy → 0/2/0.0（仅字面 True 计成功）。首跑全绿。
+
+---
+
+## Round 1215 — evaluation/cli.py 第六百四十九轮（27 测试）
+
+- 文件：`tests/test_evaluation_cli_edges153.py`（batch413，edges 第五百八十七批，forbidden 第五百七十五批）。
+- 新角度（多节 DOCX 板 CLI 全链）：**docx run**——rc 0、by_type {heading: 3, paragraph: 4}；**stdout**——"pdf=0 docx=1"；**inspect counts**——"elements=7 chunks=3"；**docx locator 行**——"1.0000  (ok)"；**pdf locator 对照**——"null  (not_pdf_document)"。首跑全绿。
+
+---
+
+## Round 1214 — evaluation/runner.py 第六百五十轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges215.py`（batch412，edges 第五百八十六批，forbidden 第六百八十五批）。
+- 新角度（多节 DOCX 编号标题 / 节断空段）：**节断空段**——add_section 落一个 content="(空段落)" 的 paragraph；**section 恒 0**——节后 pidx 连续（5、6）但 section 仍 0；**标题三块**——mc120 [10 字 1 源, 54 字 2 源, 93 字 4 源]；**hbc 1.0**——三块首源全 heading；**双锚半查**——"sub." ×2 → P/R/F1 全 0.5。首跑全绿。
+
+---
+
+## Round 1213 — evaluation/annotation_metrics.py 第五百七十三轮（26 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges143.py`（batch411，edges 第五百八十五批，forbidden 第六百八十四批）。
+- 新角度（单块内重叠锚 / 跨界 marker / marker 不归一）：**单块内重叠锚**——"AAAA" + "AA" ×2 → gt [2,4] → P 1.0 / R 0.5 / F1 2/3（贪心取 d0 弃 d2）；**跨界 marker**——"A B" 含 join 空格 → after/before 全 1.0、tol=0 全 0.0；**marker 不归一**——"A  B" 双空格找不到 → _missing_markers；**全空白块**——2 块 → P 0.0 非 None。首跑全绿。
+
+---
+
 ## 回归基线 93758（第 45 次：总数精确命中）
 
 - b87m4juiq 后台回归 **93758 passed + 0 failed + 22 skipped（609.47s）**——树态 = R1208 提交后。**与预测 93758 精确吻合，连续第十次命中，无 flake 全绿**。
