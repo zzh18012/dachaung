@@ -4,6 +4,63 @@
 
 ---
 
+## 回归基线 93990（第 47 次：总数精确命中）
+
+- b324im0o9 后台回归 **93990 passed + 0 failed + 22 skipped（629.74s）**——树态 = R1217 提交后。**与预测 93990 精确吻合，连续第十二次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990。
+- 下次预测：93990 + 169（R1218 24 + R1219 23 + R1220 25 + R1221 24 + R1222 22 + R1223 23 + R1224 28）= **94159**（第 48 次回归在 R1224 提交后启动）。
+
+---
+
+## Round 1224 — evaluation/schema.py 第五百六十七轮（28 测试）
+
+- 文件：`tests/test_evaluation_schema_edges133.py`（batch422，edges 第五百九十六批，forbidden 第六百九十三批）。
+- 新角度（source_type 枚举跨层宽窄 / 定位分支）：**文档枚举宽于清单**——document schema 收 [pdf, docx, markdown, html, text, ipynb]，manifest 只收 [pdf, docx]（跨层对照）；**非 pdf/docx 全要定位键**——markdown/html/text → "'line' is a required property"、ipynb → 2 错首错 "'cell_index' is a required property"；**元素封闭**——"foo" → Additional properties 回拒；**空元素表容让**。踩坑：probe 输出 tail 截断误判 markdown/html VALID（首跑 2 failed 后改正全绿）。
+
+---
+
+## Round 1223 — evaluation/report.py 第五百六十三轮（23 测试）
+
+- 文件：`tests/test_evaluation_report_edges132.py`（batch421，edges 第五百九十五批，forbidden 第六百九十二批）。
+- 新角度（值在场优先 / None 带因跳过）：**count None 带因跳过**——_v(3) + _v(None, reason) → sum 3 / participating 1；**ratio 值在场优先**——_v(0.5, "partial") 带 reason 仍计数（值非 None 即参评，reason 只是注记）；**silent 全 None** → total None。首跑全绿。
+
+---
+
+## Round 1222 — evaluation/runner.py 第六百五十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges217.py`（batch420，edges 第五百九十四批，forbidden 第六百九十一批）。
+- 新角度（标题启发变体 / 极端 y / 跨页前向合并）：**标题启发**——大小写不参与判定（小写 30 字符短行同 heading）、句号阻断、冒号不阻断；**极端 y 双收**——y 799 → bbox y0 −8.5 仍收且 locator 1.0、y 0 → 790.5；**跨页前向合并**——mc400 第三块 85 字符 3 源横跨页 1 与页 2。首跑全绿。
+
+---
+
+## Round 1221 — evaluation/annotation_metrics.py 第五百七十四轮（24 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges144.py`（batch419，edges 第五百九十三批，forbidden 第六百九十批）。
+- 新角度（非法 position 默认 after / 大小写敏感 / 同词双位锚）：**非法 position 默认 after**——"middle" 在 tol 17 区分板上与 after 同 1.0、与 before 异 0.0（仅 "before" 特判）；**大小写敏感**——"aaa" 对 "AAA BBB" → _missing_markers；**同词双位锚**——"AA" before+after → P 1.0 / R 0.5 / F1 2/3；**容让未知键**。首跑全绿。
+
+---
+
+## Round 1220 — evaluation/cli.py 第六百五十轮（25 测试）
+
+- 文件：`tests/test_evaluation_cli_edges154.py`（batch418，edges 第五百九十二批，forbidden 第五百七十六批）。
+- 新角度（xref 错位自愈板 CLI 全链）：**自愈 run**——rc 0、成功 1/1；**inspect counts**——"elements=1 chunks=1"（单元素单块最小档）；**by_type/total/ref_intact 行**各锁。首跑全绿。
+
+---
+
+## Round 1219 — evaluation/runner.py 第六百五十一轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges216.py`（batch417，edges 第五百九十一批，forbidden 第六百八十九批）。
+- 新角度（xref 偏移错位自愈）：**xref 全错位自愈**——全部 xref 项偏移 +7、startxref +13 → 照样恢复出 1 个 paragraph（区别于无 /Root 崩溃路径）；**per_doc 四键**——wall_time 是五键 dict：parse/chunk 各 None + not_instrumented、total float（计时只记 total 契约）。踩坑：wall_time 实为 dict 非 number（首跑 1 failed 后按 CLAUDE.md 契约改正全绿）。
+
+---
+
+## Round 1218 — evaluation/metrics.py 第五百六十轮（24 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges139.py`（batch416，edges 第五百九十批，forbidden 第六百八十八批）。
+- 新角度（悬空引用算 intact / 错误通道旁路 / hbc 分母）：**悬空引用 0.0**——chunk 指向不存在元素 → intact 0.0（schema 照过（edges132 锁）与 metrics 捕获成跨层对照）；**半悬空 0.5**；**错误通道旁路**——error dict 直传 → element/locator 照算、error_code 回显；**hbc 分母是题**——纯段块不进分母。首跑全绿。
+
+---
+
 ## 回归基线 93864（第 46 次：总数精确命中）
 
 - bd2ecaahi 后台回归 **93864 passed + 0 failed + 22 skipped（628.78s）**——树态 = R1212 提交后。**与预测 93864 精确吻合，连续第十一次命中，无 flake 全绿**。
