@@ -4,6 +4,63 @@
 
 ---
 
+## 回归基线 92562（第 36 次：锚定法两连中）
+
+- bbwyvcgna 后台回归 **92562 passed + 22 skipped（0 failed，612.02s）**——树态 = R1159 提交后。预测 92562 = 92447 + 115（R1155-1159）**精确命中**。
+- 累计（passed）：92156 → 92333 → 92447 → 92562。
+- 下次预测：92562 + 157（R1160 22 + R1161 23 + R1162 23 + R1163 23 + R1164 22 + R1165 22 + R1166 22）= **92719**。
+
+---
+
+## Round 1166 — evaluation/cli.py 第六百一十轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges144.py`（batch364，edges 第五百三十八批，forbidden 第六百三十八批）。
+- 新角度（五型 PDF 板的 CLI 全链）：**五型板 run**——by_type 五键齐经 CLI 通道（CLI 五型首锁）；**inspect-doc 五型 counts 行**——"counts:      elements=5 chunks=4"；**自产自校** rc 0。首跑全绿。
+
+---
+
+## Round 1165 — evaluation/runner.py 第六百零九轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges181.py`（batch363，edges 第五百三十七批，forbidden 第六百三十七批）。
+- 新角度（五型板三界标注 / 流首容差窗）：**三界全中**——caption 尾/段落尾/heading 尾三锚各恰落块界 → P/R/F1 全 1.0；**before 锚命中前界**——"Ga Gb" before → P 1/3；**流首容差窗**——"Figure 3:" before GT 落流起点，距第 1 界 26 字 ≤ 30 命中、tol 20 则 0.0（首有容差窗、尾无，与 edges171 末尾无边界成镜像）。首跑全绿。
+
+---
+
+## Round 1164 — evaluation/runner.py 第六百零八轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges180.py`（batch362，edges 第五百三十六批，forbidden 第六百三十六批）。
+- 新角度（PDF 五型同页全通道）：**五型同页**——caption+paragraph+heading+table+image 单 PDF 页 → elements 恰五型各一（PDF 侧五型首锁，与 edges177 DOCX 五型对照）；**类别序 text→table→image**；**heading 软界切前段**——4 chunks、image 无块。首跑全绿。
+
+---
+
+## Round 1163 — evaluation/runner.py 第六百零七轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges179.py`（batch361，edges 第五百三十五批，forbidden 第六百三十五批）。
+- 新角度（合并单元格 / 分节符幻影段）：**合并单元格文本重复列**——merge 后行遍历回显两格 "| MergedWide | MergedWide |"、col_count 仍 2（首锁）；**分节符幻影空段**——add_section() 引入 "(空段落)" 元素、后续段落 section 仍 0（分节不升号）；**跨节文本同流**——三段单 chunk 3 源。首跑全绿。
+
+---
+
+## Round 1162 — evaluation/runner.py 第六百零六轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges178.py`（batch360，edges 第五百三十四批，forbidden 第六百三十四批）。
+- 新角度（空段落占位符 / 五型标注）：**空段落占位符**——python-docx 空段 → content "(空段落)" + empty True（首锁）；**占位符入块**——占位文本进 chunk 拼接；**占位符可作 marker**——marker "(空段落)" 恰落块界 → P/R/F1 全 1.0（奇观首锁）；**五型双 marker 全中** + 五型 expectations 零 drop。首跑全绿。
+
+---
+
+## Round 1161 — evaluation/runner.py 第六百零五轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges177.py`（batch359，edges 第五百三十三批，forbidden 第六百三十三批）。
+- 新角度（DOCX 五型混排全通道）：**五型文档序**——heading+paragraph+内嵌图+caption+table 单 DOCX 按文档序五型各一（首锁）；**内嵌图真元素**——rId9 + /word/media/image1.png + byte_size 67 + extracted_to_disk True；**Figure 前缀 caption**（DOCX 侧首锁）；**图片不产块**。首跑全绿。
+
+---
+
+## Round 1160 — evaluation/runner.py 第六百零四轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges176.py`（batch358，edges 第五百三十二批，forbidden 第六百三十二批）。
+- 新角度（DOCX 真表格通道）：**python-docx add_table 真跑**——markdown + {source: python-docx}（DOCX 表格 runner 级首锁）；**文档序不重排**——DOCX 按文档序 [paragraph, table, paragraph]，与 PDF "文本前置" 对照；**DOCX 表格切文本流**——3 chunks，修正 edges166 的 PDF 板解读：表格确会 flush 顺序缓冲。首跑全绿。
+
+---
+
 ## 回归基线 92447（第 35 次：collect-only 锚定法首次精确命中）
 
 - bj1b6y2nq 后台回归 **92447 passed + 22 skipped（0 failed，614.31s）**——树态 = R1154 提交后。预测 92447 = 92398 collected + 71（R1152-1154）− 22 skipped **精确命中**——锚定法取代旧逐轮累加公式。
