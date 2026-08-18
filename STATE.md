@@ -4,6 +4,63 @@
 
 ---
 
+## 回归基线 94542（第 50 次：总数精确命中）
+
+- bhskbyhqz 后台回归 **94542 passed + 0 failed + 22 skipped（859.84s）**——树态 = R1239 提交后。**与预测 94542 精确吻合，连续第十五次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159 → 94405 → 94542。
+- 下次预测：94542 + 176（R1240 25 + R1241 24 + R1242 23 + R1243 24 + R1244 27 + R1245 26 + R1246 27）= **94718**（第 51 次回归在 R1246 提交后启动）。
+
+---
+
+## Round 1246 — evaluation/cli.py 第六百五十五轮（27 测试）
+
+- 文件：`tests/test_evaluation_cli_edges159.py`（batch444，edges 第六百一十八批，forbidden 第五百八十一批）。
+- 新角度（行距阈值对双文档 CLI）：**双文档 run**——g30 + g31 单清单 → "documents=2（成功 2，失败 0）"、per-doc ect 1 / 2（阈值对在 CLI 报告并排首锁）；**summary sum 3**——跨文档求和 1+2 / participating 2；**counts 反差行**——"elements=2 chunks=1"（元素多于块的 inspect 行首锁）；**stdout devset 行**——pdf=2 docx=0。首跑全绿。
+
+---
+
+## Round 1245 — evaluation/runner.py 第六百五十八轮（26 测试）
+
+- 文件：`tests/test_evaluation_runner_edges223.py`（batch443，edges 第六百一十七批，forbidden 第七百一十批）。
+- 新角度（行距阈值 runner 可见性 / 真实 PDF hbc）：**阈值对 runner 呈现**——同板 gap 30 vs 31 → ect 1 vs 2（解析层阈值在 runner 指标层显形首锁）；**真实 PDF hbc 1.0**——"SECTION OVERVIEW" 启发式判 heading → 合并块首 id → hbc 1.0 + summary macro {1.0, 1, 0}（DOCX 真 heading 之外的 PDF 启发式变体首锁）；**wall_time 五键契约**——PDF 板复证 parse/chunk None + not_instrumented。首跑全绿。
+
+---
+
+## Round 1244 — evaluation/metrics.py 第五百六十三轮（27 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges142.py`（batch442，edges 第六百一十六批，forbidden 第七百零九批）。
+- 新角度（行距 30/31 阈值 / 真实 PDF 启发式标题喂 hbc）：**行距 30 合并**——gap 30 → 单元素拼接（fallback 行分组阈值下沿首锁）；**行距 31 分列**——gap 31 → 恰 2 元素（阈值精确翻转）；**真实 PDF hbc 因果链**——"SECTION OVERVIEW" 被启发式判 heading → hbc 1.0（分类喂指标首锁，DOCX 真 heading 的 PDF 变体）。首跑全绿。
+
+---
+
+## Round 1243 — evaluation/annotation_metrics.py 第五百七十八轮（24 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges147.py`（batch441，edges 第六百一十五批，forbidden 第七百零八批）。
+- 新角度（第二占位锚精确距离 21 阈值翻转）：**d 恰 21**——chunk3 前缀 "Tail run split (空段落)" 20 字符 + join 空格 1；**tol 20 漏**——F1 0.5；**tol 21 中**——F1 1.0（翻转点首锁，真板最紧距离锁）；**单锚 tol 0 不受累**——仅第一锚 → P 0.5 / R 1.0 / F1 2/3。首跑全绿。
+
+---
+
+## Round 1242 — evaluation/cli.py 第六百五十四轮（23 测试）
+
+- 文件：`tests/test_evaluation_cli_edges158.py`（batch440，edges 第六百一十四批，forbidden 第五百八十批）。
+- 新角度（标注板 + 容差归零敏感性）：**tol 0 劈开双锚对**——双 "(空段落)" after 锚第二处距界 2 约 21 字符 → tol 0 漏 → P/R/F1 全 0.5（容差敏感性真板首锁）；**默认 tol 30 全中**——同板无 flag → 全 1.0（21 ≤ 30）；**标注报告过 validate-report**。首跑全绿。
+
+---
+
+## Round 1241 — evaluation/runner.py 第六百五十七轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges222.py`（batch439，edges 第六百一十三批，forbidden 第七百零七批）。
+- 新角度（标注文件全链 runner）：**annotation_file 注入**——manifest 带 annotation_file 的水槽板经 run_evaluation 全链 → 双占位锚全 1.0；**per_doc 顶层 tolerance_chars 2 / missing_markers []**；**public 版剥下划线键**。首跑全绿。
+
+---
+
+## Round 1240 — evaluation/schema.py 第五百七十轮（25 测试）
+
+- 文件：`tests/test_evaluation_schema_edges136.py`（batch438，edges 第六百一十二批，forbidden 第七百零六批）。
+- 新角度（DOCX 板 locator 负空间）：**去 table_index 合法**——表格 locator 双键任一即可；**section 字符串 "0" 合法**——coerce 型；**chunk text "   " 合法**——字面非空；**paragraph_index -1 拒**——minimum 0；**table_index 0.5 拒**——integer；**table 双 None 拒**——anyOf @ elements 3。首跑全绿。
+
+---
+
 ## 回归基线 94405（第 49 次：总数精确命中）
 
 - bialnizaj 后台回归 **94405 passed + 0 failed + 22 skipped（606.80s）**——树态 = R1234 提交后。**与预测 94405 精确吻合，连续第十四次命中，无 flake 全绿**。
