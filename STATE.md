@@ -4,6 +4,56 @@
 
 ---
 
+## 回归基线 92719（第 37 次：锚定法三连中）
+
+- brqd0j1yo 后台回归 **92719 passed + 22 skipped（0 failed，627.30s）**——树态 = R1166 提交后。预测 92719 = 92562 + 157（R1160-1166）**精确命中**。
+- 累计（passed）：92156 → 92333 → 92447 → 92562 → 92719。
+- 下次预测：92719 + 137（R1167 23 + R1168 23 + R1169 22 + R1170 23 + R1171 23 + R1172 23）= **92856**。
+
+---
+
+## Round 1172 — evaluation/runner.py 第六百一十六轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges186.py`（batch370，edges 第五百四十四批，forbidden 第六百四十四批）。
+- 新角度（caption 正则变体）：**五变体全 caption**——表 1 / 图２（全角）/ fig 3（小写）/ Table7 后置空格（数字后空格即满足分隔类，反直觉刀口）/ Fig.4（点分隔）；**黏字脱轨**——"Table7x" 正则失配 → DOCX 无 short_line 兜底 → paragraph（PDF 专属 short_line 的两源差异首锁）；**容差内两锚**——"digit" after 距界恰 30 与 "glued" before 距 24 均命中 → P 0.2 / R 1.0 / F1 0.33333333333333337（浮点尾差原样锁）。首跑全绿。
+
+---
+
+## Round 1171 — evaluation/runner.py 第六百一十五轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges185.py`（batch369，edges 第五百四十三批，forbidden 第六百四十三批）。
+- 新角度（DOCX 列表样式流）：**列表即段落**——List Bullet / List Number → type=paragraph、style 原样入 metadata（列表不成独立型首锁）；**列表全流**——intro+2 bullet+2 numbered 五段同 sequential 块 5 源；**重复 marker 首现**——"item." 两现、顺序搜索取首现 → GT 落块中距界 > tol → 全 0.0（首现语义首锁）；**题界命中** "two." after → 全 1.0。首跑全绿。
+
+---
+
+## Round 1170 — evaluation/runner.py 第六百一十四轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges184.py`（batch368，edges 第五百四十二批，forbidden 第六百四十二批）。
+- 新角度（跨源五型 devset 聚合）：**PDF+DOCX 五型同 devset**——element_count_total {sum: 10, docs: 2}、pipeline_success {2, 2, 1.0}（跨源聚合首锁）；**定位率按源分流**——pdf_locator macro {1.0, 1 参与, 1 未评}、docx 镜像（分母只算同源文档）；**devset 元数据**——categories_covered []（无 categories 字段时空列表）；**chunk_boundary 全未评** {null, 0, 2}。首跑全绿。
+
+---
+
+## Round 1169 — evaluation/cli.py 第六百一十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_cli_edges145.py`（batch367，edges 第五百四十一批，forbidden 第六百四十一批）。
+- 新角度（DOCX 五型板 CLI 全链）：**五型板 run**——heading/paragraph/image/caption/table 单 DOCX 经 CLI → rc 0、by_type 五键齐（DOCX 通道五型首锁，与 edges144 PDF 侧对照）；**inspect-doc counts 行** "counts:      elements=5 chunks=3"；**自产自校** rc 0。首跑全绿。
+
+---
+
+## Round 1168 — evaluation/runner.py 第六百一十二轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges183.py`（batch366，edges 第五百四十批，forbidden 第六百四十批）。
+- 新角度（同页双图绘制序 / 零预测界）：**双图绘制序**——同页两 image 元素序 = 内容流绘制序，与垂直位置无关（高先画→高图先列、低先画→低图先列，与文本 y 序成对照首锁）；**双图无块**——两图均不产 chunk；**image_resource 双图 1.0**；**零预测界**——单 chunk（N-1=0）挂锚 → P/F1 null + no_predicted_boundaries、R 仍 0.0（P/F1 分母为 0 走 null 通道而 R 分母是 GT 数，首锁）。首跑全绿。
+
+---
+
+## Round 1167 — evaluation/runner.py 第六百一十一轮（23 测试）
+
+- 文件：`tests/test_evaluation_runner_edges182.py`（batch365，edges 第五百三十九批，forbidden 第六百三十九批）。
+- 新角度（DOCX 双表 table_index 计数器）：**双表元素序**——表 A / 段落 / 表 B → [table, paragraph, table] 文档序、table_index 0/1 跨表递增、段落仍 paragraph_index 0（段落计数独立于表首锁）；**双表三块** [isolated_table, sequential, isolated_table]；**中间段落界** "tables." after → P 0.5 / R 1.0 / F1 2/3；**流首无界** "A1" before → 全 0.0。首跑全绿。
+
+---
+
 ## 回归基线 92562（第 36 次：锚定法两连中）
 
 - bbwyvcgna 后台回归 **92562 passed + 22 skipped（0 failed，612.02s）**——树态 = R1159 提交后。预测 92562 = 92447 + 115（R1155-1159）**精确命中**。
