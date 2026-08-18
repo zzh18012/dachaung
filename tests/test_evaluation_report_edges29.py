@@ -313,13 +313,16 @@ def test_get_git_provenance_value_types_batch12():
 
 
 def test_get_git_provenance_dict_mutation_does_not_propagate_batch12():
-    """修改返回 dict 不影响后续调用。"""
+    """修改返回 dict 不影响后续调用。
+
+    不比较两次调用的 git_commit 相等：HEAD 可能在两次调用之间
+    被并发 git 操作改变（后台回归与提交并行的实测 flake 来源）。
+    """
     out1 = get_git_provenance(Path("."))
-    original_commit = out1["git_commit"]
     out1["git_commit"] = "tampered"
     out1["extra"] = "x"
     out2 = get_git_provenance(Path("."))
-    assert out2["git_commit"] == original_commit
+    assert out2["git_commit"] != "tampered"
     assert "extra" not in out2
 
 
