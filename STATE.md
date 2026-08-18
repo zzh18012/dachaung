@@ -4,6 +4,55 @@
 
 ---
 
+## Round 1131 — evaluation/runner.py 第五百七十五轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges150.py`（batch330，edges 第五百零七批，forbidden 第六百零四批）。
+- 新角度（单页内 run 合并 / 段内白界劈块）：**双 run 合并**——同页两个 BT/Tj run（不同 Td y）→ 恰 1 个 paragraph "Run one. Run two." page 1（fallback 同页多 run 归并首锁）；**段内白界三态**——209 字符 30 词一行：max_chars 100 → 3 chunks 首块 97、150 → 2 chunks 首块 146、300 → 1 chunk 全量 + text_preservation_equal True——白界优先不越限的精确切割位首锁。首跑修 1 处：元素字段是 content 不是 text。
+
+---
+
+## Round 1130 — evaluation/runner.py 第五百七十四轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges149.py`（batch329，edges 第五百零六批，forbidden 第六百零三批）。
+- 新角度（真 PDF 标注通道）：**真 PDF 边界精确命中**——双页文本 PDF max_chars 33 劈两块，marker "First page body." after 恰在块界 d=0 → P/R/F1 全 1.0（旧标注全 docx 板，真 PDF 标注首锁）；**容差翻转真 PDF 版**——"Second page body." before 落界后 1 字符（拼接空格）：tol 0 全 0.0、tol 30 全 1.0；**figure_caption 真 PDF 板仍 null**。源码计数断言转向 per_doc=12 / expected_failure=5。
+
+---
+
+## Round 1129 — evaluation/runner.py 第五百七十三轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges148.py`（batch328，edges 第五百零五批，forbidden 第六百零二批）。
+- 新角度（空白页跳过保号 / 三页归属）：**空白首页跳过保号**——第 1 页无文字、2/3 页有 → 元素 pages 恰 [2, 3]（空白页不产元素但页码不重排，首锁）；**三页归属**——三页各一句 → 3 个 paragraph pages [1,2,3] + max_chars 200 合 1 chunk；**三页小上限崩**——同板 max_chars 12 → chunker_failed（短页拼流无白界可劈，probe 实证 5/8/10/12 全崩）。源码计数断言：def 数恰 3。
+
+---
+
+## Round 1128 — evaluation/runner.py 第五百七十二轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges147.py`（batch327，edges 第五百零四批，forbidden 第六百批）。
+- 新角度（双页 PDF 阈值三态）：**真页码归属**——双页文本 PDF 直跑 process_single → 2 个 paragraph pages 恰 [1, 2]（真实翻页数据首锁）；**max_chars 33/34/30 三态**——34 字符拼流：33 劈 2 块 success、34 合 1 块、30 直接 chunker_failed（一字符之隔两种命运 + 下界崩，三态全谱首锁）。本轮打通多页 PDF 构造器：页对象 3+2*i、内容 4+2*i、字体 3+2*n_pages 防撞号、endstream 后必须带尾随空格否则 pdfminer 流报废。
+
+---
+
+## Round 1127 — evaluation/runner.py 第五百七十一轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges146.py`（batch326，edges 第五百零三批，forbidden 第五百九十九批）。
+- 新角度（真文本 PDF 全胜行）：**手写带文字 PDF**——BT/Tj 操作符画 "Hello PDF world." → fallback 真解析出 1 个 paragraph（真 page 1 + 真 bbox）——旧测试 PDF 全是空白版（no_extracted_elements），成功行首锁；**九指标精确值**——success True / error null / ect 1 / pdf_locator 1.0 / docx null not_docx_document / chunk_ref 1.0 / text_equal True / multiset P R 1.0 / heading null no_heading_elements 全家一次锁齐；产物照过报告 Schema。
+
+---
+
+## Round 1126 — evaluation/runner.py 第五百七十轮（22 测试）
+
+- 文件：`tests/test_evaluation_runner_edges145.py`（batch325，edges 第五百零二批，forbidden 第五百九十八批）。
+- 新角度（混合源 devset 全景）：**配对文档 devset 精确值**——DOCX+PDF 配对（paired_with 双向、cat-a/cat-b）→ devset 汇总恰 {incomplete, 2, 1, 1, 1, [cat-a, cat-b]}（首锁）；**空白 PDF 失败行**——无文字对象 PDF → success False + no_extracted_elements + 指标全家 null pipeline_failed；**summary 三态**——success {1,2,0.5} + pdf_locator macro null/0/2（失败文档 null 不进分母）。累计破 91k。
+
+---
+
+## 回归基线 91869（第 31 次精确命中）
+
+- bww8zgjhq 后台回归 91869 passed, 22 skipped（594.42s）——与预测 91760 + 109 = 91869 精确一致，第 31 连中。
+- 累计：90964 → 91117 → 91272 → 91423 → 91573 → 91760 → 91869。
+
+---
+
 ## Round 1125 — evaluation/runner.py 第五百六十九轮（22 测试）
 
 - 文件：`tests/test_evaluation_runner_edges144.py`（batch324，edges 第五百零一批，forbidden 第五百九十七批）。
