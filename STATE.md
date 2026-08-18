@@ -4,11 +4,67 @@
 
 ---
 
+## 回归基线 94159（第 48 次：总数精确命中）
+
+- b3r65fahn 后台回归 **94159 passed + 0 failed + 22 skipped（638.88s）**——树态 = R1224 提交后。**与预测 94159 精确吻合，连续第十三次命中，无 flake 全绿**。
+- 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990 → 94159。
+- R1225-R1231 增量：165（R1225 23 + R1226 24 + R1227 25 + R1228 23 + R1229 24 + R1230 24 + R1231 22）→ 当前树态 **94324**。
+
+---
+
+## Round 1231 — evaluation/schema.py 第五百六十八轮（22 测试）
+
+- 文件：`tests/test_evaluation_schema_edges134.py`（batch429，edges 第六百零三批，forbidden 第六百九十九批）。
+- 新角度（根路径必填 / 类型档 / 空 ID）：**chunks 缺键**——pop "chunks" → "'chunks' is a required property" @ []（根空表路径首锁）；**chunks 换 dict**——{} → "not of type 'array'"；**document_id 空串**——"'' should be non-empty"；**content 换 int**——元素 anyOf 回拒首错 path ["elements", 0]。首跑全绿。
+
+---
+
+## Round 1230 — evaluation/runner.py 第六百五十四轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges219.py`（batch428，edges 第六百零二批，forbidden 第六百九十八批）。
+- 新角度（最小预算均劈 / 五块同源）：**mc32 均劈**——159 字符单段 → 5 块每块恰 31 字符，切点 w07|w08、w15|w16、w23|w24、w31|w32；**五块同源**——全部 source_element_ids == [e0000]；**roundtrip 不丢**；**多界锚全中**——w07/w23 after 两锚对四界 → P 0.5 / R 1.0 / F1 2/3。首跑全绿。
+
+---
+
+## Round 1229 — evaluation/report.py 第五百六十四轮（24 测试）
+
+- 文件：`tests/test_evaluation_report_edges133.py`（batch427，edges 第六百零一批，forbidden 第六百九十七批）。
+- 新角度（success 桶独占 / 布尔进 ratio 桶 / 裸值崩）：**success 桶独占**——schema_valid/text_preservation_equal 布尔不进 success_rates；**布尔进 ratio 桶**——True+False → macro 0.5；**零值照计**——ect _v(0) → sum 0 / participating 1；**裸值崩**——metrics 直接给 True → AttributeError（包装契约靠崩强制）。首跑全绿。
+
+---
+
+## Round 1228 — evaluation/annotation_metrics.py 第五百七十五轮（23 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges145.py`（batch426，edges 第六百批里程碑，forbidden 第六百九十六批）。
+- 新角度（流首锚 / 三锚争两界 / 空格 marker）：**流首锚贴界两侧**——"AAA" before → gt 0，tol 0 全 0.0 / tol 5 全 1.0；**三锚争两界**——一对一封顶 2 中 → P 1.0 / R 2/3 / F1 0.8；**巨容差不救缺锚**——tol 10⁹ + marker 不在流中照旧 missing + R None；**空格 marker**——join 空格本身作 marker → 全 1.0。首跑全绿。
+
+---
+
+## Round 1227 — evaluation/cli.py 第六百五十一轮（25 测试）
+
+- 文件：`tests/test_evaluation_cli_edges155.py`（batch425，edges 第五百九十九批，forbidden 第五百七十七批）。
+- 新角度（单长行板 CLI 全链）：**劈块 run**——mc60 长行 → rc 0、ect 1、success 1/1；**stdout 汇总**——"documents=1（成功 1，失败 0）"；**inspect counts**——"counts:      elements=1 chunks=3"；**multiset 双 1.0 行**。首跑全绿。
+
+---
+
+## Round 1226 — evaluation/runner.py 第六百五十三轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges218.py`（batch424，edges 第五百九十八批，forbidden 第六百九十五批）。
+- 新角度（长行劈块）：**mc60 三块**——159 字符段落 → [59, 59, 39]，切点 w14|w15、w29|w30 空白界；**三块同源** [e0000]；**roundtrip join == content**。首跑全绿。
+
+---
+
+## Round 1225 — evaluation/metrics.py 第五百六十一轮（23 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges140.py`（batch423，edges 第五百九十七批，forbidden 第六百九十四批）。
+- 新角度（multiset 对称）：**顺序无关**——AB+CD vs DCBA → P/R 双 1.0 而 preservation False；**多字符差**——额外字符 → P 2/3；缺失 → R 2/3。首跑全绿。
+
+---
+
 ## 回归基线 93990（第 47 次：总数精确命中）
 
 - b324im0o9 后台回归 **93990 passed + 0 failed + 22 skipped（629.74s）**——树态 = R1217 提交后。**与预测 93990 精确吻合，连续第十二次命中，无 flake 全绿**。
 - 累计（总数）：93014 → 93178 → 93287 → 93417 → 93541 → 93630 → 93758 → 93864 → 93990。
-- 下次预测：93990 + 169（R1218 24 + R1219 23 + R1220 25 + R1221 24 + R1222 22 + R1223 23 + R1224 28）= **94159**（第 48 次回归在 R1224 提交后启动）。
 
 ---
 
