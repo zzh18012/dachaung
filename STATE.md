@@ -4,6 +4,50 @@
 
 ---
 
+## 回归基线 93287（第 41 次：总数命中 + 1 环境性 flake）
+
+- bnx7cvaf2 后台回归 **93286 passed + 1 failed + 22 skipped（603.99s）**——树态 = R1190 提交后。**收集总数 93287 = 预测精确命中**（93286 + 1 failed）。
+- 唯一 failed：`test_evaluation_report_edges29.py::test_get_git_provenance_dict_mutation_does_not_propagate_batch12`——两次活体 `get_git_provenance` 调用比较 git_commit 相等，而回归期间自跑线并发 commit 改了 HEAD（环境性 flake，单独重跑即过）。已除颤（`056df2b`）：改为断言篡改值不传播，不再比较两次活体 HEAD。
+- 累计（总数）：92562 → 92719 → 92856 → 93014 → 93178 → 93287。
+- 下次预测：93287 + 130（R1191 27 + R1192 27 + R1193 26 + R1194 26 + R1195 24）= **93417**（第 42 次回归在 R1195 提交后启动，除颤不改计数）。
+
+---
+
+## Round 1195 — evaluation/runner.py 第六百三十九轮（24 测试）
+
+- 文件：`tests/test_evaluation_runner_edges206.py`（batch393，edges 第五百六十七批，forbidden 第六百六十七批）。
+- 新角度（跨页续表 / 页内类先于序）：**表不跨页续**——两页各一格网 → 两个独立 table 元素（表检测按页首锁）；**页内类先于序**——元素序 [题 p1, 段 p1, 表 p1, 题 p2, 段 p2, 表 p2]（页为外键、页内文本先于表，全局 text-then-table 的页级修正首锁）；**四块交错** [seq 2 源, iso 表, seq 2 源, iso 表]；**重复锚双现**——"grid." ×1 → P 1/3 / R 1.0 / F1 0.5、×2 顺流 → P 2/3 / R 1.0 / F1 0.8。首跑全绿。
+
+---
+
+## Round 1194 — evaluation/runner.py 第六百三十八轮（26 测试）
+
+- 文件：`tests/test_evaluation_runner_edges205.py`（batch392，edges 第五百六十六批，forbidden 第六百六十六批）。
+- 新角度（连字符换行不去连）：**无去连字符**——行尾 "inter-" 与次行 "national" 合流为 "inter- national"（不拼回 international 首锁）；**三行一段** 131 字；**中段锚两级偏离**——"inter-"（距界 103）与 "documents."（距界 65）皆全 0.0；**锚序敏感**——[here, inter] 丢弃 → 1.0s、[inter, here] → P 1.0 / R 0.5 / F1 2/3。首跑全绿。
+
+---
+
+## Round 1193 — evaluation/runner.py 第六百三十七轮（26 测试）
+
+- 文件：`tests/test_evaluation_runner_edges204.py`（batch391，edges 第五百六十五批，forbidden 第六百六十五批）。
+- 新角度（参差表格的空格补齐）：**4 列头 2 列体**——markdown 全 4 列、下行 "| W1 |  | W2 |  |"（跨列文字落首列、余列补空首锁）；**格字双现** heading "H1 H2 H3 H4 W1 W2"；**row/col 计数** {2, 4}。修正一处：双锚预期误算（2 块仅 1 预测界 → 命中即 P 1.0 而非 0.5），首跑 2 failed 后改正全绿。
+
+---
+
+## Round 1192 — evaluation/runner.py 第六百三十六轮（27 测试）
+
+- 文件：`tests/test_evaluation_runner_edges203.py`（batch390，edges 第五百六十四批，forbidden 第六百六十四批）。
+- 新角度（旋转文本整串倒序 / 隐形文本照提）：**90° 旋转倒序**——Tm 0 1 -1 0 → "Rotated Line" 提取为 "eniL detatoR"（全串逐字符反转首锁）；**3 Tr 隐形照提**（渲染模式被忽略）；**0 Tr 复位**；**四题四块跨两页**——3 预测界 → P 1/3 新值型；双锚顺流 2/3 / F1 0.8、逆流丢弃 1/3。首跑全绿。
+
+---
+
+## Round 1191 — evaluation/runner.py 第六百三十五轮（27 测试）
+
+- 文件：`tests/test_evaluation_runner_edges202.py`（batch389，edges 第五百六十三批，forbidden 第六百六十三批）。
+- 新角度（hex 字串 / TJ 数移 / 正数左移倒序）：**hex Tj 解码**——<48656C6C6F> → "Hello"；**TJ 小数无效**——± 小位移只改坐标不改字；**TJ 正数左移倒序**——[(Big) 3000 (Gap)] → "GapBig"（正数 = 左移 36pt，后段跑到前段左侧 → char x 排序整段倒序首锁）；**三题三块**，双锚全 1.0。首跑全绿。
+
+---
+
 ## 回归基线 93178（第 40 次：锚定法六连中）
 
 - bh83k9kdm 后台回归 **93178 passed + 22 skipped（0 failed，604.96s）**——树态 = R1186 提交后。预测 93178 = 93014 + 164（R1180-1186）**精确命中**。
