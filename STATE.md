@@ -4,6 +4,42 @@
 
 ---
 
+## 回归基线 93178（第 40 次：锚定法六连中）
+
+- bh83k9kdm 后台回归 **93178 passed + 22 skipped（0 failed，604.96s）**——树态 = R1186 提交后。预测 93178 = 93014 + 164（R1180-1186）**精确命中**。
+- 累计（passed）：92447 → 92562 → 92719 → 92856 → 93014 → 93178。
+- 下次预测：93178 + 109（R1187 28 + R1188 26 + R1189 29 + R1190 26）= **93287**（第 41 次回归在 R1190 提交后启动，含其 26 测试）。
+
+---
+
+## Round 1190 — evaluation/runner.py 第六百三十四轮（26 测试）
+
+- 文件：`tests/test_evaluation_runner_edges201.py`（batch388，edges 第五百六十二批，forbidden 第六百六十二批）。
+- 新角度（DOCX 嵌套表格的静默丢文）：**嵌套表不可见**——cell(0,0).add_table 造嵌套表 → N1/N2 完全不进元素流（document.tables 只列顶层 + cell.text 只取段落，双层滤除首锁）；**期望差即静默丢**——expectations {table: 2}（人计嵌套）→ silent_drop 1、{table: 1} → 0；**嵌套文锚不可寻**——"N1" → R no_ground_truth_anchors_in_stream 三态；"table." after → P 0.5 / R 1.0 / F1 2/3。首跑全绿。
+
+---
+
+## Round 1189 — evaluation/cli.py 第六百三十三轮（29 测试）
+
+- 文件：`tests/test_evaluation_cli_edges148.py`（batch387，edges 第五百六十一批，forbidden 第五百六十一批）。
+- 新角度（无文本格图板的 inspect-doc 全景）：**counts 行** "counts:      elements=2 chunks=1"；**by_type 行** "image=1, table=1"（键排序 + dict 型排 numeric 后）；**null reason 全景**——no_annotation / not_docx_document / parser_does_not_emit_relations / no_heading_elements / no_expectations 五 reason 同屏、error_code 的 reason None 打 "(None)"；**排序三段** bool → numeric/dict → null（索引序首锁）；**parser 行** fallback vpdfplumber=0.11.10；**run 通道** rc 0 + validate rc 0。首跑全绿。
+
+---
+
+## Round 1188 — evaluation/runner.py 第六百三十二轮（26 测试）
+
+- 文件：`tests/test_evaluation_runner_edges200.py`（batch386，edges 第五百六十批，forbidden 第六百六十批）。
+- 新角度（栏交叠字符交错 / 锚序敏感）：**交叠栏字符交错**——左栏宽过右栏 x 起点 → pdfplumber 按 char x 排序 → "now." 与 "Right" 交错成 "nRoiwgh.t"（字节级交错首锁）；**越界字符仍提取**——行 2 x1 623.6 > MediaBox 600 照常入流；**同界双锚异值**——"too." → 全 1.0、"nRoiwgh.t"（距界 43 > 30）→ 全 0.0；**锚序敏感**——[too, mangled] 顺序搜索把流中靠前的 mangled 静默丢弃 → 全 1.0、倒序 → P 1.0 / R 0.5 / F1 2/3（顺序搜索语义首锁）。首跑全绿。
+
+---
+
+## Round 1187 — evaluation/runner.py 第六百三十一轮（28 测试）
+
+- 文件：`tests/test_evaluation_runner_edges199.py`（batch385，edges 第五百五十九批，forbidden 第六百五十九批）。
+- 新角度（格图无文页的成功通道）：**零文本仍成功**——格 + 图、无任何 Tj → errors []（与 edges192 空内容失败通道对照：pdf_no_text_extracted 只在零元素时触发首锁）；**元素序 [table, image]**、图 content None + resource_path 落盘；**唯一块是表 markdown** "|  |  |\\n| --- | --- |"；**表内锚零预测界**——"---" 命中表 markdown 但单块 → P/F1 no_predicted_boundaries / R 0.0；**no_heading_elements**——零题文档 compliance reason 首锁。首跑全绿。
+
+---
+
 ## 回归基线 93014（第 39 次：锚定法五连中·修正后命中）
 
 - brsp7tkvc 后台回归 **93014 passed + 22 skipped（0 failed，595.19s）**——树态 = R1179 提交后。预测 93014 = 92856 + 158**精确命中**（初写 92992 漏计 R1179 的 22，回归完成前修正为 93014，`7f7b7fb`）。
