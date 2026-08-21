@@ -4,6 +4,105 @@
 
 ---
 
+## 第 58 次回归已启动（树态 = R1311 提交后）
+
+- 预测：96285 + R1297(33)+R1298(30)+R1299(31)+R1300(30)+R1301(32)+R1302(33)+R1303(29)+R1304(28)+R1305(38)+R1306(33)+R1307(31)+R1308(35)+R1309(34)+R1310(35)+R1311(36) = 96285 + 488 = **96773**。
+- 全日志 `outputs/regression-58th.log` 未截断；结果落地后补记。
+
+---
+
+## Round 1311 — evaluation/schema.py 第五百八十二轮（36 测试）
+
+- 文件：`tests/test_evaluation_schema_edges147.py`（batch509，edges 第六百八十三批，forbidden 第七百五十八批，open 2）。
+- 新角度（document.schema.json 真文档变异面）：**sei 非空链**——[] 与 [""] 双拒（每 chunk 非空 source_element_ids 不变量 schema 级首锁）；**srctype→locator if/then 耦合**——docx 基板改 text/markdown/html → 'line' required、改 pdf → 'page' required、改 ipynb → cell_index+cell_type required（source_type 驱动 locator 必填首锁，多 error 全收集）；**docx locator 宽容**——pdf 形 {page,bbox} 附加键 VALID；**srctype 宽枚举**——document 级 6 值 [pdf,docx,markdown,html,text,ipynb] 区别 manifest 严域；**element type 8 值枚举**；paragraph_index '3' 非整数拒。首跑 2 挂（误以为 if/then 不存在 + enum 写错 'txt'），probe 纠正后全绿。
+
+---
+
+## Round 1310 — evaluation/cli.py 第六百七十一轮（35 测试）
+
+- 文件：`tests/test_evaluation_cli_edges170.py`（batch508，edges 第六百八十二批，forbidden 第五百九十二批，open 1）。
+- 新角度（真 DOCX inspect-doc 头部 / null 原因渲染）：**头部五行**——file:/document_id: doc- 前缀/source: type=docx/parser: fallback vpdfplumber=/counts: elements=2 chunks=11（DOCX 文档 JSON inspect 首锁）；**locator 分型行**——dlvr 1.0000 (ok) + plvr null (not_pdf_document) 同面板；**error_code (None)**——null 分支渲染原始 reason 不落 'ok'（`return f"  {name:36} null  ({reason})"` 与其余分支 or 'ok' 不对称首锁）；**cbp 三连 null** no_annotation；**run 行**——devset_status=complete + pdf=0 docx=1；**文档不存在**——rc 2 + [ERROR]。inspect-doc 实参是文档 JSON 非报告 JSON（--doc-id 不存在）。
+
+---
+
+## Round 1309 — evaluation/runner.py 第六百六十九轮（34 测试）
+
+- 文件：`tests/test_evaluation_runner_edges234.py`（batch507，edges 第六百八十一批，forbidden 第七百五十七批，open 2）。
+- 新角度（真 DOCX 混合 devset / complete 状态 / 未知 ef 文档）：**complete 透传**——devset.status "complete"；**混合计数**——{file 3, group 2, pdf 2, docx 1}（docx_count 非零首锁）；**locator 分型三态**——pdf 文档 dlvr=not_docx_document / docx 文档 plvr=not_pdf_document / 坏文档双键 pipeline_failed，宏 {1.0, 1 参与, 2 未评}；**docx 抽取面**——python-docx heading+paragraph → ecbt {heading:1, paragraph:1} + tpe True + dlvr 1.0；**未知 ef 文档**——doc_id 不在 documents → actual file_not_found（非 None 首锁）+ matches False；ef 混合 [True, False] 保序。首次全绿（python-docx 造真 DOCX 入板）。
+
+---
+
+## Round 1308 — evaluation/metrics.py 第五百七十四轮（35 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges153.py`（batch506，edges 第六百八十批，forbidden 第七百五十六批，open 0）。
+- 新角度（无标题板 hbc 空值面 / sdc 逐型钳制）：**无标题板**——单 LONG 段落 mc32 → elements 恰 [paragraph]、15 块全 long_paragraph_sentence_split（无 sequential 首块）；**hbc 空值**——{None, no_heading_elements}（heading 面分母 0 → null 不 1.0 首锁）；**sdc 逐型求和**——{heading:5, paragraph:3} → 5；**负向钳制**——{heading:0,paragraph:0}→0、{heading:1}→0、{paragraph:1}→0（逐型 max(0, exp-actual) 首锁）；**缺型全丢**——{image:4} → 4（actual 0 计）；**空 ecbt**——no_expectations_element_count；无 expectations 键——no_expectations。
+
+---
+
+## Round 1307 — evaluation/annotation_metrics.py 第五百八十九轮（31 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges158.py`（batch505，edges 第六百七十九批，forbidden 第七百五十五批，open 0）。
+- 新角度（marker 定位严苛面 / position 默认分支）：**大小写敏感**——'word3.' 小写 → 全 missing 三元组（str.find 原样匹配首锁）；**空 marker**——'' falsy 守卫 → find 跳过 → 同 missing 三元组（不误定位于 0）；**position 非枚举值**——'middle'/'during' 落 else → 与 after 全等；**position 键缺失**——a.get 默认 'after'；**'AFTER' 大写**——非 'before' → after 分支；**混板不毒化**——好+小写/好+空同板坏 anchor 静默丢、好 anchor 仍评；好+zzz 实为双 gt（cbp 2/15, f1 4/17）。首跑 1 挂（zzz 位置不丢 anchor 而是双 gt），probe 修正后全绿。
+
+---
+
+## Round 1306 — evaluation/report.py 第五百七十五轮（33 测试）
+
+- 文件：`tests/test_evaluation_report_edges144.py`（batch504，edges 第六百七十八批，forbidden 第七百五十四批，open 0）。
+- 新角度（失败文档聚合排除面）：**比例排除**——好锚定 + 坏 PDF → cbp {1/15, 1 参与, 1 未评}；plvr/tpe 同形 {1.0, 1, 1}（失败文档入 not_evaluated 不入分母首锁）；**双未评键**——dlvr/irer {None, 0, 2} 且恰此两键 not_evaluated==2；**12 键无 figure_caption**——ratio_macro_averages 恰 12 键，figure_caption_* 不入聚合但 per_doc 有值；**counts 排除**——ect {sum 2, participating 1}；**sdt 排除**——好 heading:2 → sdc 1、坏 heading:5 → null/pipeline_failed → silent_drop_total 恰 1（失败文档期望不膨胀丢落首锁）；success {1, 2, 0.5}；报告过 Schema。首跑 1 挂（silent_drop_total 是裸整数非 dict），修正后全绿。
+
+---
+
+## Round 1305 — evaluation/schema.py 第五百八十一轮（38 测试）
+
+- 文件：`tests/test_evaluation_schema_edges146.py`（batch503，edges 第六百七十七批，forbidden 第七百五十三批，open 2）。
+- 新角度（manifest.schema.json 运行时变异面）：**ef 条目严闭**——额外键/缺 path/空码三拒；**enum 不对称**——ef.source_type 宽域 [pdf,docx,txt,other]（other VALID）vs documents.source_type 严域 [pdf,docx]（txt/other 均拒）；**sha256 模式**——短串/大写均拒；**expectations 闭包**——额外键拒、{} VALID；**边界态**——documents [] VALID（minItems 0）、ef 缺键/[] 均 VALID、categories 空串项 VALID 无 minLength、int 项拒；**根闭包**——顶层额外键 @ []。首跑全绿。
+
+---
+
+## Round 1304 — evaluation/cli.py 第六百七十轮（28 测试）
+
+- 文件：`tests/test_evaluation_cli_edges169.py`（batch502，edges 第六百七十六批，forbidden 第五百九十一批，open 1）。
+- 新角度（真坏文件 CLI 链 / 全败清单）：**混合成败行**——好+坏 PDF + ef 命中 → rc 0 + "documents=2（成功 1，失败 1）"；**ef 报告过 Schema**；**全败 rc 仍 0**——仅坏 PDF 清单 → [OK] + "documents=1（成功 0，失败 1）"（run 退出码反映清单处理而非文档成败首锁）；**全败报告面**——success {0,1,0.0}、ecbt null/pipeline_failed、报告仍过 Schema。含 autouse _restore_argv。首跑 2 挂（报告名双后缀 r_mbad.json.json 又犯——"r_%s" 修正），全绿。
+
+---
+
+## Round 1303 — evaluation/runner.py 第六百六十八轮（29 测试）
+
+- 文件：`tests/test_evaluation_runner_edges233.py`（batch501，edges 第六百七十五批，forbidden 第七百五十二批，open 2）。
+- 新角度（categories/paired_with devset 语义 / 真文件 expected_failures）：**categories 并集排序**——{beta,alpha}∪{alpha,gamma} → [alpha,beta,gamma]；**paired_with 组折叠**——3 文档 1 对 → group_count 2；**真坏文件 ef 命中**——非 PDF 字节 → actual pdfplumber_open_failed + matches True（真文件全链首锁）；**期望落空**——好文档列 ef → actual None + matches False；**失败文档指标面**——error_code 有值 + success False + ect/tpe null/pipeline_failed；报告过 Schema。首跑全绿。
+
+---
+
+## Round 1302 — evaluation/metrics.py 第五百七十三轮（33 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges152.py`（batch500，edges 第六百七十四批，forbidden 第七百五十一批，open 0）。
+- 新角度（双标题板 heading 分块几何）：**mc10000 双块不合一**——h1+h2+段落 → 2 块 [h1] 与 [h2+段落 550]（标题强制开新块，heading-first 不变量首锁）；**块 1 合并体**——text 550 = 80+1+469、ids [e0001,e0002]、spans 精确；**hbc 双标题全中**——1.0（双 mc 皆同）；**mc32 晶格**——17 块首三 [80,80,27]、strategies [sequential,sequential,long_paragraph_sentence_split]；**sdc 标题面**——{heading:2,paragraph:1}→0、{heading:3}→1。首跑全绿。
+
+---
+
+## Round 1301 — evaluation/annotation_metrics.py 第五百八十八轮（32 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges157.py`（batch499，edges 第六百七十三批，forbidden 第七百五十批，open 0）。
+- 新角度（多 token marker 几何）：**双 token marker**——"Word3. Word4." after gt 115 / before gt 102（d 7 与 d 6 非对称翻转点首锁）；pred 可落 marker 跨度内部；**双空格/tab marker**——whitespace 归一化后 marker 变形 → 全 missing 三元组。清理 _wrap 误写 hack 后全绿。
+
+---
+
+## Round 1300 — evaluation/report.py 第五百七十四轮（30 测试）
+
+- 文件：`tests/test_evaluation_report_edges143.py`（batch498，edges 第六百七十二批，forbidden 第七百四十九批，open 0）。
+- 新角度（异构宏平均）：**异构 cbp 8/15**——d1 锚定 1/15 + d2 短板 15/15 → 宏 8/15 精确；**dshort 完美三连**——(1.0,1.0,1.0)；**counts 键集**——set(summary.counts) == {element_count_total}（chunk_count 不存在首锁）。首跑 1 挂（KeyError chunk_count），改键集断言后全绿。
+
+---
+
+## Round 1299 — evaluation/schema.py 第五百八十轮（31 测试）
+
+- 文件：`tests/test_evaluation_schema_edges145.py`（batch497，edges 第六百七十一批，forbidden 第七百四十八批，open 2）。
+- 新角度（跨元素 span 合并 / mc100 晶格）：**mc10000 两段合体**——块 1 spans [(::e0000,0,80),(::e0001,0,469)]；**mc100 span 晶格**——[1]×6；**_within_content 语义边界**——swap/dup/end999 全 VALID（schema 宽容面）。首跑全绿。
+
+---
+
+
 ## 回归基线 96285（第 57 次：0 失败；96285 = 95943 + 342 精确对账）
 
 - 后台回归（65956s ≈ 18.3h）**96285 passed + 22 skipped + 0 failed**——树态 = R1296 提交后。
