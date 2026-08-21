@@ -4,6 +4,134 @@
 
 ---
 
+## 回归基线 97354（第 59 次：0 失败；97354 = 96773 + 581 精确命中）
+
+- 后台回归（1113.55s ≈ 18.6min，与轮次并行 CPU 争用）**97354 passed + 22 skipped + 0 failed**——树态 = R1329 提交后。
+- 对账：58 次总数 96773 + R1312(32)+R1313(31)+R1314(36)+R1315(31)+R1316(30)+R1317(35)+R1318(33)+R1319(30)+R1320(31)+R1321(32)+R1322(30)+R1323(37)+R1324(39)+R1325(31)+R1326(27)+R1327(29)+R1328(35)+R1329(32) = 96773 + 581 = **97354 精确命中**（连续第二十二次总数命中）。
+- 累计（总数）：93014 → … → 95943 → 96285 → 96773 → 97354。
+- 第 60 次预测：97354 + 34（R1330）+27（R1331）+30（R1332）+28（R1333）+29（R1334）+34（R1335）+30（R1336）+30（R1337）+31（R1338）+27（R1339）+26（R1340）+34（R1341）+30（R1342）+30（R1343）+30（R1344）+27（R1345）+26（R1346）= 97354 + 503 = **97857** 起算。
+
+---
+
+## Round 1346 — evaluation/cli.py 第六百七十七轮（26 测试）
+
+- 文件：`tests/test_evaluation_cli_edges176.py`（batch544，edges 第七百一十八批，forbidden 第五百九十八批，open 1）。
+- 新角度（docx-only ef 走 CLI run）：**docx 行**——devset 行 'pdf=0 docx=1'（docx-only 板首锁）；**ef 命中透传**——nope.docx expected file_not_found → matches true（CLI 全链 ef 首锁）；**rc 0 四行**——报告落盘 + 成功 1/1。首跑全绿。
+
+---
+
+## Round 1345 — evaluation/runner.py 第六百七十五轮（27 测试）
+
+- 文件：`tests/test_evaluation_runner_edges240.py`（batch543，edges 第七百一十七批，forbidden 第七百八十七批，open 2）。
+- 新角度（标注 doc_id 错配不核 / 标注文件缺失）：**doc_id 错配照常**——annotation doc_id 'WRONG-ID' vs manifest g1 → cbp 照常 1/14 HIT（runner 不交叉核对 doc_id 首锁）；**标注文件缺失**——annotation_file 指向不存在文件 → cbp {None, no_annotation}；**缺失不致败**——error None、pipeline_success True、schema_valid True（缺标注仅豁免不失败首锁）。首跑全绿。
+
+---
+
+## Round 1344 — evaluation/metrics.py 第五百八十轮（30 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges159.py`（batch542，edges 第七百一十六批，forbidden 第七百八十六批，open 0）。
+- 新角度（空板 / 空文本 / 假图片资源 / 跨文档引用）：**空 doc 面**——无元素无 chunk → ecbt {}、ect 0、tpe True（空真）、crir {None, no_chunks}（新 reason 首锁）；**空文本分母**——双空字符串 → tcmp/tcmr 均 {None, empty_expected_and_actual}（新 reason 首锁）；**图片无资源**——resource_path null → irer 0.0；**图片坏路径**——不存在文件 → irer 0.0；**跨文档引用**——sei 指向其他 document id → crir 0.0。首跑全绿。
+
+---
+
+## Round 1343 — evaluation/annotation_metrics.py 第五百九十五轮（30 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges164.py`（batch541，edges 第七百一十五批，forbidden 第七百八十五批，open 0）。
+- 新角度（抽取流边界 / 单 chunk 无预测 / unicode）：**匹配流=抽取文本**——marker 'BT'（PDF 内容流前缀但抽取文本无）→ missing trio（流非原始 content stream 首锁）；**regex 字符字面**——marker '(Word3.' 含括号 → 照样字面 find → missing；**跨空格 marker**——'Word3. Word4' 双词整段 → HIT {1/14, 1.0, 2/15}；**单 chunk 无预测**——docx mc800 单 chunk → cbp/f1 {None, no_predicted_boundaries} + cbr {0.0, None}（新 reason 首锁）；**unicode 命中/未命中**——中文 marker 同样走无预测面。跑前删除未实证的 before 断言，首跑全绿。
+
+---
+
+## Round 1342 — evaluation/report.py 第五百八十一轮（30 测试）
+
+- 文件：`tests/test_evaluation_report_edges150.py`（batch540，edges 第七百一十四批，forbidden 第七百八十四批，open 0）。
+- 新角度（多级标题 docx / complete 状态透传）：**三级标题板**——level 1/2/3 各一 + 三段 → ecbt {heading:3, paragraph:3}、ect 6；**hbc 满分**——多级标题不扰 heading boundary 合规 {1.0, None}；**complete 透传**——manifest devset_status 'complete' → devset.status 'complete'（首次非 incomplete 锁）；**单 docx 计数**——file 1 / docx 1 / pdf 0 / groups 1。首跑全绿。
+
+---
+
+## Round 1341 — evaluation/schema.py 第五百八十七轮（34 测试）
+
+- 文件：`tests/test_evaluation_schema_edges152.py`（batch539，edges 第七百一十三批，forbidden 第七百八十三批，open 2）。
+- 新角度（report 深层 strict/loose 分裂）：**per_doc strict**——source_type 枚举 ['pdf','docx']、wall_time 必含 parse+total 闭 5 键；**metrics/ratio/success/counts 全 loose**——内层条目无必填键、额外键放行；**ef entry 闭 + matches 必填**。首跑全绿。
+
+---
+
+## Round 1340 — evaluation/cli.py 第六百七十六轮（26 测试）
+
+- 文件：`tests/test_evaluation_cli_edges175.py`（batch538，edges 第七百一十二批，forbidden 第五百九十七批，open 1）。
+- 新角度（--tolerance-chars 渲染）：**tol 10**——行含 tolerance_chars=10；**tol 0**——行含 tolerance_chars=0；**validate-report/inspect 缺参路径**——rc 2 + [ERROR]。首跑全绿。
+
+---
+
+## Round 1339 — evaluation/runner.py 第六百七十四轮（27 测试）
+
+- 文件：`tests/test_evaluation_runner_edges239.py`（batch537，edges 第七百一十一批，forbidden 第七百八十二批，open 2）。
+- 新角度（tolerance_chars 全链）：**kwarg 端到端**——run_evaluation(..., tolerance_chars=N) → per_doc cb 指标随 N 翻转；**报告无 'tolerance' 字样**——JSON 全文不含；**_per_doc 目录空**——ef stub 不落盘。首跑全绿。
+
+---
+
+## Round 1338 — evaluation/metrics.py 第五百七十九轮（31 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges158.py`（batch536，edges 第七百一十批，forbidden 第七百八十一批，open 0）。
+- 新角度（手工 dict 板保真分裂）：**reorder**——"ba"/"ab" → tpe False 但 tcmp/tcmr 1.0；**extra**——"abx" → tcmp 2/3、tcmr 1.0；**missing**——少 "a" → tcmp 1.0、tcmr 0.5；**whitespace**——"a b" vs "ab" → tpe True（normalize 归一）。首跑全绿。
+
+---
+
+## Round 1337 — evaluation/annotation_metrics.py 第五百九十四轮（30 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges163.py`（batch535，edges 第七百九批，forbidden 第七百八十批，open 0）。
+- 新角度（容差翻转）：**Word1 tol0 ZERO vs tol30 HIT14**（容差敏感性纠正——edges162 的不敏感是恰好重合）；**Word3 稳定**——边界精确重合双容差同值；**MIX 争用**——[Word1,Word3] → {1/14, 0.5, 0.125}（一对一边界争用首锁）；used_pred/used_gt 源码锁。首跑全绿。
+
+---
+
+## Round 1336 — evaluation/report.py 第五百八十轮（30 测试）
+
+- 文件：`tests/test_evaluation_report_edges149.py`（batch534，edges 第七百零八批，forbidden 第七百七十九批，open 0）。
+- 新角度（空 devset 全 null 面）：documents [] → counts {sum: null, participating_docs: 0}；success {0, 0, rate: null}（不返 1.0）；sdt None；12 比例全 {None, 0, 0}；devset 全零；报告 schema 带 null 仍 VALID。修正 "wall_time_seconds" 源码锁（在 runner 非 report）→ __all__ 导出锁。首跑挂 1 后全绿。
+
+---
+
+## Round 1335 — evaluation/schema.py 第五百八十四轮（34 测试）
+
+- 文件：`tests/test_evaluation_schema_edges151.py`（batch533，edges 第七百零七批，forbidden 第七百七十八批，open 2）。
+- 新角度（chunk/element 键集与 anyOf）：**chunk 5 键闭**、**element 8 键闭**；**sei 非空**——[] 与 [''] 双拒；**anyOf 双 null**——content+resource_path 皆 null → 完整实例 repr 前缀消息（endswith 修正）；**paragraph+level 拒**（additionalProperties）。首跑挂 1 后全绿。
+
+---
+
+## Round 1334 — evaluation/cli.py 第六百七十五轮（29 测试）
+
+- 文件：`tests/test_evaluation_cli_edges174.py`（batch532，edges 第七百零六批，forbidden 第五百九十六批，open 1）。
+- 新角度（run 子命令成功面）：**四行输出**——[OK] 评测完成：<path> / documents=1（成功 1，失败 0）/ devset_status=incomplete file_count=1 groups=1 pdf=1 docx=0 / git_commit=unknown git_dirty=False（CLI 渲染 None 为 unknown 首锁）；**缺 manifest**——rc 2 + [ERROR] 清单不存在。进程内 main() + redirect 模式定型。首跑全绿。
+
+---
+
+## Round 1333 — evaluation/runner.py 第六百七十三轮（28 测试）
+
+- 文件：`tests/test_evaluation_runner_edges238.py`（batch531，edges 第七百零五批，forbidden 第七百七十七批，open 2）。
+- 新角度（manifest 级 ef 三态）：**命中**——matches true；**错码**——expected parse_error vs actual file_not_found → matches false；**垃圾 PDF**——actual pdfplumber_open_failed；**报告往返**——on_disk JSON == 返回 dict。probe 发现 ef 参数不在签名而在 manifest（expected_failures_path TypeError 纠偏）。首跑全绿。
+
+---
+
+## Round 1332 — evaluation/metrics.py 第五百七十八轮（30 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges157.py`（batch530，edges 第七百零四批，forbidden 第七百七十六批，open 0）。
+- 新角度（locator 面板）：**plvr 阶梯**——strip page（留 bbox）或 strip bbox（留 page）→ 0.5；双空 → 0.0 + schema_valid {False, None}（首锁）；**dlvr 2/3**——3 定位器去一；**locator 形状**——pdf {page,bbox} vs docx {paragraph_index, section}。首跑全绿。
+
+---
+
+## Round 1331 — evaluation/annotation_metrics.py 第五百九十三轮（27 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges162.py`（batch529，edges 第七百零三批，forbidden 第七百七十五批，open 0）。
+- 新角度（输出面与容差）：**4 键输出**——{_tolerance_chars, cb_f1, cb_precision, cb_recall}；**_tolerance_chars 回显**；**Word3 不敏感**——恰重合双容差同值 {1/14, 1.0, 2/15}。set 比较遇 dict 不可哈希 → 引用比较循环修正。首跑挂 1 后全绿。
+
+---
+
+## Round 1330 — evaluation/report.py 第五百七十九轮（34 测试）
+
+- 文件：`tests/test_evaluation_report_edges148.py`（batch528，edges 第七百零二批，forbidden 第七百七十四批，open 0）。
+- 新角度（provenance 面板）：**git_commit None + git_dirty False**（非 git tmp root）；**版本双 1.1**；**时间戳可解析**——fromisoformat 带 tz；**版本不对称**——parser_version 字符串 vs dependencies 字典。首跑全绿。
+
+---
+
 ## 回归基线 96773（第 58 次：0 失败；96773 = 96285 + 488 精确命中）
 
 - 后台回归（1007.64s ≈ 16.8min）**96773 passed + 22 skipped + 0 failed**——树态 = R1311 提交后。
@@ -11,6 +139,132 @@
 - argv 教训持续守恒：R1297-R1311 全部 CLI 文件（edges169/170/171）自带 autouse `_restore_argv` → 全绿。
 - 累计（总数）：93014 → … → 95943 → 96285 → 96773。
 - 第 59 次预测：96773 + 33（R1312）+ 31（R1313）+ 36（R1314）+ 31（R1315）+ 30（R1316）+ 35（R1317）+ 33（R1318）+ 30（R1319）= 96773 + 259 = **97032** 起算（R1320 起按提交轮次累加）。
+
+---
+
+## Round 1329 — evaluation/schema.py 第五百八十五轮（32 测试）
+
+- 文件：`tests/test_evaluation_schema_edges150.py`（batch527，edges 第七百零一批，forbidden 第七百七十三批，open 2）。
+- 新角度（manifest 面 / error entry 三元组）：manifest documents 严域 2 枚举；**error entry 恰三元** {message, path, schema_path}（schema_path ["additionalProperties"] 首锁）；**未知 schema 名**——FileNotFoundError "Schema 文件不存在"；**partial doc 10 必填错全收集**——names [chunks, elements, errors, metadata, parser_name, parser_version, relations, schema_version, source_hash, warnings]；真文档 13 根键。首跑挂 2（计数 8→10 + 名单）后全绿。
+
+---
+
+## Round 1328 — evaluation/cli.py 第六百七十四轮（35 测试）
+
+- 文件：`tests/test_evaluation_cli_edges173.py`（batch526，edges 第七百批，forbidden 第五百九十五批，open 1）。
+- 新角度（1P 无标注 inspect 全景 / validate-report 双态）：inspect-doc 头部全景（1P PDF 板）；**validate-report good**——rc 0 + `[OK] <abs> 通过 evaluation-report Schema 校验`；**bad**——rc 1 + "[FAIL] " + 报告校验失败 + version 消息（'1.1' was expected @ path=['report_version']）。首跑挂 1（猜 [ERROR] 前缀）后全绿。
+
+---
+
+## Round 1327 — evaluation/runner.py 第六百七十二轮（29 测试）
+
+- 文件：`tests/test_evaluation_runner_edges237.py`（batch525，edges 第六百九十九批，forbidden 第七百七十二批，open 2）。
+- 新角度（METRICS_20 枚举 / 重复 doc_id）：**20 键指标集常量锁**；figure_caption 三连 null（parser_does_not_emit_relations 不变量）；**重复 doc_id 双收**（无去重首锁）；dependencies 精确字典 {pdfplumber 0.11.10, python-docx 1.2.0, pypdfium2 5.12.1}。首跑全绿。
+
+---
+
+## Round 1326 — evaluation/metrics.py 第五百七十七轮（27 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges156.py`（batch524，edges 第六百九十八批，forbidden 第七百七十一批，open 0）。
+- 新角度（篡改 dict 板保真失败面）：combo PDF corrupt chunk text → tcmp 0.9692671394799054 / tcmr 0.8367346938775511；2-chunk docx → 0.8421052631578947 / 0.41025641025641024；crir 阶梯 15/16=0.9375、双坏 0.875。源码锁反斜杠续行改括号隐式拼接（_PDF_BBOX_REQUIRED_TYPES 元组）。首跑挂 1 后全绿。
+
+---
+
+## Round 1325 — evaluation/annotation_metrics.py 第五百九十二轮（31 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges161.py`（batch523，edges 第六百九十七批，forbidden 第七百七十批，open 0）。
+- 新角度（锚点 reason-extra 容忍 / 大小写 / 重复幂等）：anchor 额外键容忍；"AFTER" position 非精确 before → after 分支；**重复 marker 幂等** PAIR={2/15, 1.0, 4/17}；docx 双锚 {1.0, 0.5, 2/3}；absent anchors key → or [] → 三连 {None, no_ground_truth_anchors}。首跑挂 1（heading_order 单独面误判）后全绿。
+
+---
+
+## Round 1324 — evaluation/report.py 第五百七十八轮（39 测试）
+
+- 文件：`tests/test_evaluation_report_edges147.py`（batch522，edges 第六百九十六批，forbidden 第七百六十九批，open 0）。
+- 新角度（三文档异构聚合）：combo g.pdf + 1P h.pdf + image docx d1 三板聚合面；subprocess 源码锁改 count==2（get_git_provenance 合法调用）。首跑挂 1 后全绿。
+
+---
+
+## Round 1323 — evaluation/schema.py 第五百八十四轮（37 测试）
+
+- 文件：`tests/test_evaluation_schema_edges149.py`（batch521，edges 第六百九十五批，forbidden 第七百六十八批，open 2）。
+- 新角度（report-schema 变异面）：`_base()`（1P PDF 板 run_evaluation 报告）+ _rej/_acc 模式；version 常量/必填/per_doc 各面键集锁。首跑挂 2 后全绿。
+
+---
+
+## Round 1322 — evaluation/cli.py 第六百七十三轮（30 测试）
+
+- 文件：`tests/test_evaluation_cli_edges172.py`（batch520，edges 第六百九十四批，forbidden 第五百九十四批，open 1）。
+- 新角度（image docx inspect / JSON 错误路径）：image docx 板 inspect-doc 面；JSON 解析错误路径。首跑全绿。
+
+---
+
+## Round 1321 — evaluation/runner.py 第六百七十一轮（32 测试）
+
+- 文件：`tests/test_evaluation_runner_edges236.py`（batch519，edges 第六百九十三批，forbidden 第七百六十七批，open 2）。
+- 新角度（rich devset / irer 参与 / sha unverified）：丰富 manifest 面聚合；irer 参与文档数；sha unverified 面。首跑全绿。
+
+---
+
+## Round 1320 — evaluation/metrics.py 第五百七十六轮（31 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges155.py`（batch518，edges 第六百九十二批，forbidden 第七百六十六批，open 0）。
+- 新角度（真 docx 内嵌图片）：真 docx embedded image 板的 irer/ecc 面。首跑全绿。
+
+---
+
+## Round 1319 — evaluation/annotation_metrics.py 第五百九十一轮（30 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges160.py`（batch517，edges 第六百九十一批，forbidden 第七百六十五批，open 0）。
+- 新角度（批量锚点部分命中 / 字面 find）：bulk anchor 部分命中面；marker 字面 find（非 regex）。首跑全绿。
+
+---
+
+## Round 1318 — evaluation/report.py 第五百七十七轮（33 测试）
+
+- 文件：`tests/test_evaluation_report_edges146.py`（batch516，edges 第六百九十批，forbidden 第七百六十四批，open 0）。
+- 新角度（跨类型异构 macro）：pdf+docx 混板 macro average 参与文档分裂（pdf-only 指标 docx not_evaluated）。首跑全绿。
+
+---
+
+## Round 1317 — evaluation/schema.py 第五百八十三轮（35 测试）
+
+- 文件：`tests/test_evaluation_schema_edges148.py`（batch515，edges 第六百八十九批，forbidden 第七百六十三批，open 2）。
+- 新角度（annotation schema 声明严格性）：annotation.schema.json 声明键闭集/必填面。首跑全绿。
+
+---
+
+## Round 1316 — evaluation/cli.py 第六百七十二轮（30 测试）
+
+- 文件：`tests/test_evaluation_cli_edges171.py`（batch514，edges 第六百八十八批，forbidden 第五百九十三批，open 1）。
+- 新角度（PDF inspect faces / tolerance 透传）：--tolerance-chars CLI→runner 透传链；1P PDF inspect 各面。首跑全绿。
+
+---
+
+## Round 1315 — evaluation/runner.py 第六百七十轮（31 测试）
+
+- 文件：`tests/test_evaluation_runner_edges235.py`（batch513，edges 第六百八十七批，forbidden 第七百六十二批，open 2）。
+- 新角度（docx 锚定 cbp / 缺文件 doc / 双 ef）：docx 锚定 cbp 全链；缺文件 doc error 面；manifest 双 expected_failures。首跑全绿。
+
+---
+
+## Round 1314 — evaluation/metrics.py 第五百七十五轮（36 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges154.py`（batch512，edges 第六百八十六批，forbidden 第七百六十一批，open 0）。
+- 新角度（metrics 级真 docx）：绕过 runner 直调 compute_automatic_metrics 的真 docx 面。首跑全绿。
+
+---
+
+## Round 1313 — evaluation/annotation_metrics.py 第五百九十轮（31 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges159.py`（batch511，edges 第六百八十五批，forbidden 第七百六十批，open 0）。
+- 新角度（1P 板几何 / 尾锚不对称）：1P PDF 板 chunk 几何常量；尾部锚点 after/before 不对称面。首跑全绿。
+
+---
+
+## Round 1312 — evaluation/report.py 第五百七十六轮（32 测试）
+
+- 文件：`tests/test_evaluation_report_edges145.py`（batch510，edges 第六百八十四批，forbidden 第七百五十九批，open 0）。
+- 新角度（无标题板 hbc 排除 / 跨文档 sdt 求和）：无 heading 文档 hbc not_evaluated 排除；silent_drop_count 跨文档求和面。首跑全绿。
 
 ---
 
