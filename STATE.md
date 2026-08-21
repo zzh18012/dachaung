@@ -4,6 +4,16 @@
 
 ---
 
+## 回归基线 96285（第 57 次：0 失败；96285 = 95943 + 342 精确对账）
+
+- 后台回归（65956s ≈ 18.3h）**96285 passed + 22 skipped + 0 failed**——树态 = R1296 提交后。
+- 对账：56 次总数 95943（树态实为 R1285 后）+ R1286(32)+R1287(30)+R1288(31)+R1289(33)+R1290(31)+R1291(29)+R1292(27)+R1293(27)+R1294(29)+R1295(36)+R1296(37) = 95943 + 342 = **96285 精确命中**（此前"95972 起算"把 56 次树态误标为 R1290 后；基数归属修正，算术全清）。
+- argv 教训守恒：edges164/165/166 修复 + 新 CLI 文件（edges167/168）自带 autouse `_restore_argv` → 全绿。
+- 累计（总数）：93014 → … → 95332 → 95588 → 95943 → 96285。
+- 第 58 次预测：96285 + 33（R1297）+ 30（R1298）= **96348** 起算（R1299 起按提交轮次累加）。
+
+---
+
 ## 回归基线 95943（第 56 次：总数精确命中；失败根因=sys.argv 污染，已修）
 
 - bjzen4gvi 后台回归 **1 failed + 95942 passed + 22 skipped（1609.77s，全日志 reg56.log 未截断）**——树态 = R1285 提交后。**与预测 95943 精确吻合，连续第二十次总数命中**。
@@ -11,6 +21,62 @@
 - 教训沉淀：CLI 测试凡 `sys.argv =` 必配 autouse 还原 fixture；回归失败先怀疑跨文件 argv/全局态污染，再看缓存。
 - 累计（总数）：93014 → … → 95332 → 95588 → 95943。
 - 第 57 次预测：95943 + 29（R1291）= **95972** 起算（R1292 起按提交轮次累加）。
+
+---
+
+## Round 1298 — evaluation/cli.py 第六百六十九轮（30 测试）
+
+- 文件：`tests/test_evaluation_cli_edges168.py`（batch496，edges 第六百七十批，forbidden 第五百九十批，open 1）。
+- 新角度（双文档 CLI 全链 / 图片板 inspect-doc）：**双文档混合 run**——d1 锚定 + d2 无标注 → rc 0 + "documents=2（成功 2，失败 0）" + "file_count=2 groups=2 pdf=2 docx=0"；**混合报告过 Schema**——cbp {1/15, 1 参与, 1 未评} 报告 validate-report 通关；**图片板 parse**——(elements=3, chunks=16, warnings=0)；**图片板 inspect-doc**——ecbt 行 "heading=1, image=1, paragraph=1"（image 入表首锁）+ irer 行 1.0000 (ok)。首跑 2 挂（36 宽字段后分隔符是单空格非双空格），修正后全绿。
+
+---
+
+## Round 1297 — evaluation/runner.py 第六百六十七轮（33 测试）
+
+- 文件：`tests/test_evaluation_runner_edges232.py`（batch495，edges 第六百六十九批，forbidden 第七百五十一批，open 2）。
+- 新角度（双板锚定聚合 / 跨文档恒等）：**双锚同板**——两份同板锚定 PDF → cbp {1/15, 2, 0} / cbr {1.0, 2, 0} / cbf {0.125, 2, 0}（participating_docs 2 首锁）；**跨文档 metrics 恒等**——两 per_doc metrics dict 完全相等（确定性首锁）；**noann 劈叉参与**——d2 去标注 → 三键 {宏不变, 1 参与, 1 未评} 而 counts {sum 4, participating 2} 不动；**空锚劈叉 reason**——no_ground_truth_anchors 区别 no_annotation；**devset 块**——{incomplete, file_count 2, groups 2, pdf 2, docx 0}。首跑 1 挂（file_count 在 devset 块非 provenance），修正后全绿。
+
+---
+
+## Round 1296 — evaluation/metrics.py 第五百七十二轮（37 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges151.py`（batch494，edges 第六百六十八批，forbidden 第七百五十批，open 0）。
+- 新角度（image 型静默丢落 / irer 双候选回退）：**image 计入 sdc**——真板 ecbt {heading:1, paragraph:1, image:1}：image:2 → 1、image:5 单键 → 4（图片欠发射首锁）；**期望侧独裁**——期望无 image 键 → 0（多余实际型不计）、caption:1 → 1（缺席型经 by_type.get(t,0) 计入）；**ecbt 空态**——{} / 缺键 → no_expectations_element_count（区别 no_expectations）；**irer 双候选**——裸名 + base_dir 同名 → 1.0（join 候选）；gone_dir/nope.png + base_dir 含 nope.png → 1.0（按名救回首锁）；零字节 → 0.0（st_size>0 门槛）。首跑全绿。
+
+---
+
+## Round 1295 — evaluation/annotation_metrics.py 第五百八十七轮（36 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges156.py`（batch493，edges 第六百六十七批，forbidden 第七百四十九批，open 0）。
+- 新角度（真板重复 marker 顺序定位 / 一对一帽）：**真板双现几何**——LONG 尾接 " Word3." → 17 块 / 流 557 / Word3. 双现 [102, 551] / 末块恰 "Word3."；**双锚 tol30 全中**——[after,after] gt [108,557] → (0.125, 1.0, 2/9)；单锚 (1/16, 1.0, 2/17) 对照；**tol0 劈叉**——[before,after] gt [102,557] 双落空 → 三 0.0（顺序敏感首锁）；**邻接一对一帽**——"Word3. Word3." → gt [108,115]，tol 7 单预测 108 距双 gt 均 ≤7 仍只中 1 → recall 0.5（一对一帽真板首锁；tol 30 第二预测救回 1.0）；**第三锚吞没**——_missing_markers ['Word3.'] 而指标不变。首跑全绿。
+
+---
+
+## Round 1294 — evaluation/report.py 第五百七十三轮（29 测试）
+
+- 文件：`tests/test_evaluation_report_edges142.py`（batch492，edges 第六百六十六批，forbidden 第七百五十二批，open 0）。
+- 新角度（mc 崩变面 15 路 / 聚合劈叉差分）：**崩变差分**——同标注板 mc32 vs mc10000 全树对比 → 恰 15 条叶路径（cbp value+reason / cbr 仅 value（reason 同 None 不变）/ cbf value+reason / wall_time / max_chars / 时间戳 / 聚合 cbp 三键 + cbf 三键 + cbr 仅 macro_average）；**聚合劈叉差分**——cbr 两 mc 均 participating 1（macro 1.0 ↔ 0.0）而 cbp 0↔1 翻转；**计数面恒等**——counts/success 跨 mc 不变。首跑全绿。
+
+---
+
+## Round 1293 — evaluation/schema.py 第五百七十九轮（27 测试）
+
+- 文件：`tests/test_evaluation_schema_edges144.py`（batch491，edges 第六百六十五批，forbidden 第七百五十一批，open 2）。
+- 新角度（source_span 运行时闭包）：**真板 span 形**——fallback 板全部 span 键集恰 {element_id, end, start}；首块 span {doc-<hash>::e0000, 0, 80}（:: 前缀命名首锁）；**运行时闭包**——额外键 note → "Additional properties are not allowed"（区别 locator 开放面）；**数值域**——start -1 → minimum 0；1.5 → not integer；恰 0 VALID（下界含端）；**第二 span 坏**——错误路径落 [.., 1]。首跑全绿。
+
+---
+
+## Round 1292 — evaluation/cli.py 第六百六十八轮（27 测试）
+
+- 文件：`tests/test_evaluation_cli_edges167.py`（batch490，edges 第六百六十四批，forbidden 第五百八十九批，open 1）。
+- 新角度（mc10000 单块板 CLI 全链）：**极宽 mc 合一块**——heading + 469 字段 → mc 10000 → 1 块 550 字；**单块 + 锚混合三态**——cbp {None, no_predicted_boundaries} + cbr {0.0, None} + cbf {None, no_predicted_boundaries}（有锚但无预测界 → R 计 0 而非 null 首锁）；**聚合劈叉参与**——cbp {None, 0, 1} vs cbr {0.0, 1, 0} 同报告并存；**no_annotation 优先**——无锚时三态全 no_annotation；tol 0 无效。首跑全绿。
+
+---
+
+## Round 1291 — evaluation/runner.py 第六百六十六轮（29 测试）
+
+- 文件：`tests/test_evaluation_runner_edges231.py`（batch489，edges 第六百六十三批，forbidden 第七百五十批，open 2）。
+- 新角度（图片增广差分）：**IMG_DIFF 10 路**——combo 板加图片 XObject → 全树差分恰 10 条叶路径（元素计数三键 + ecbt + ect + irer 两键 + chunks 相关）；**no_image_elements**——无图板 irer 该因；**聚合翻转**——irer 聚合 {None, 0, 1} ↔ {1.0, 1, 0}；**17/20 metrics 相等**——文本面全不动。首跑全绿。
 
 ---
 
