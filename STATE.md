@@ -51,6 +51,72 @@ print(2)"）；cell 边界不是 chunk 边界（markdown heading 才是硬边界
 - 文件：`tests/test_pipeline_edges10.py`。
 - 新角度（markdown 走全管线分块几何）：mc64 三块（heading+para+list 并入 sequential / 表格 isolated / Sub 硬边界）；max_chars 地板 mc31 → chunker_failed {exception_type: ValueError}；mc32 恰过；空 md → no_extracted_elements 带 source_type；扩展名 × parser 交叉错配 → unsupported_type；write_json 默认落盘。
 
+## 回归基线 98738（第 63 次：0 失败；98738 = 98571 + 167 精确命中）
+
+- 后台回归（1052.06s ≈ 17.5 分钟）**98738 passed + 22 skipped + 0 failed**——树态 = R1374 提交后。
+- 对账：62 次总数 98571 + R1368(27)+R1369(21)+R1370(22)+R1371(26)+R1372(24)+R1373(25)+R1374(22) = 167 → **98738 精确命中**（连续第二十六次总数命中）。
+- 累计（总数）：98072 → 98392 → 98571 → 98738。
+- 第 64 次预测：98738 + 19（R1375）+15（R1376）+18（R1377）+19（R1378）+15（R1379）+12（R1380）+15（R1381）+15（R1382）= 98738 + 128 = **98866** 起算。
+
+---
+
+## Round 1382 — app/parsers/fallback_parser.py 边角第九轮（15 测试）
+
+- 文件：`tests/test_parsers_fallback_edges9.py`。
+- 新角度（docx 表格/列表样式，历史零覆盖）：List Bullet/List Number → 普通 paragraph（无 list_item）；docx 表格 → table 元素 markdown 渲染 + table_index locator；paragraph_index 与 table_index 各自独立计数（p0 t0 p1 t1 p2）；合并单元格文本在跨度两端重复（'| merged | merged |'）。
+
+---
+
+## Round 1381 — app/parsers/html_parser.py 边角第十三轮（15 测试）
+
+- 文件：`tests/test_parsers_html_edges13.py`。
+- 新角度（heading 边角）：空 heading 静默跳过（整文档无内容才告警 html_no_content）；<h7> 透明 → paragraph；heading 内 inline 摊平；heading 内 <img> → heading+image 两元素且 image 继承 section_path；属性 id/class 不影响；h1-h6 全级别。
+
+---
+
+## Round 1380 — evaluation/report.py 边角（12 测试）
+
+- 文件：`tests/test_evaluation_report_edges154.py`。
+- 新角度（真实管线产物聚合，历史板全手拼）：aggregate_summary 吃 markdown+text 真实产物——hbc macro text 文档 not_evaluated+1（no_heading_elements 与 pipeline_failed 在聚合层同归 not_evaluated）；markdown 好 + ipynb 坏（真实 ParserError 透传）rate 0.5、counts 只 1 参与；有 expectations 时 sdt 是纯 int 求和（0）非 dict。
+
+---
+
+## Round 1379 — app/pipeline.py 边角第十五轮（15 测试）
+
+- 文件：`tests/test_pipeline_edges15.py`。
+- 新角度（parser 错误透传，ipynb 三专属码 pipeline 层零覆盖）：cells 非数组（字符串/JSON 数组/JSON null 三入口）→ ipynb_bad_structure；nbformat=3 → ipynb_unsupported_version；非 JSON → ipynb_invalid_json；ErrorRecord.details 只有 path；空文件 html/md/txt → no_extracted_elements 各带 source_type。
+
+---
+
+## Round 1378 — evaluation/cli.py 边角第一百七十九轮（19 测试）
+
+- 文件：`tests/test_evaluation_cli_edges179.py`。
+- 新角度（inspect-doc 跨新类型产物）：inspect 现场重算 metrics（输入 JSON 无 metrics 字段）；ipynb 'ipynb vstdlib/0.1.0' + ect 'heading=1, paragraph=2'；html ect 含 image=1 + img_ratio 0.0000；text hbc no_heading_elements；image-only ipynb 'elements=1 chunks=0' + crir no_chunks + cmp/cmr empty_expected_and_actual。
+
+---
+
+## Round 1377 — app/parsers/markdown_parser.py 边角第十一轮（18 测试）
+
+- 文件：`tests/test_parsers_markdown_edges11.py`。
+- 新角度（列表语义，task list 零覆盖）：'- [ ] todo' → list_item '[ ] todo' 字面（有序/star 同）；嵌套列表降级 paragraph 且首层缩进剥（'- inner'）、三层只剥一层（'- b
+    - c'）；tab 同 2 空格；续行独立段；空 item '- ' → paragraph '-'。
+
+---
+
+## Round 1376 — app/parsers/html_parser.py 边角第十二轮（15 测试）
+
+- 文件：`tests/test_parsers_html_edges12.py`。
+- 新角度（表格结构，thead/tfoot/colgroup/caption 零覆盖）：thead/tbody/tfoot 行按文档序合一张表，分隔行固定第一行后；单元格内 <br> 丢弃无分隔；<caption> 被吞、caption-only 表整个消失；<figcaption> → paragraph；colgroup 静默；空 cell '|  |'。
+
+---
+
+## Round 1375 — app/pipeline.py 边角第十四轮（19 测试）
+
+- 文件：`tests/test_pipeline_edges14.py`。
+- 新角度（退化文档全栈）：image-only notebook → 成功、2 元素、0 chunk、schema 仍 VALID、落盘 chunks:[]；metrics crir null no_chunks、cmp/cmr null empty_expected_and_actual、tpe True、sdc 0；svg-only html（title 被全局 skip 吞）→ no_extracted_elements；markdown 实体/转义/脚注定义/form 段穿过 chunker 字面保留。
+
+---
+
 ## 回归基线 98571（第 62 次：0 失败；98571 = 98392 + 179 精确命中）
 
 - 后台回归（1022.79s ≈ 17 分钟）**98571 passed + 22 skipped + 0 failed**——树态 = R1367/STATE 提交后。
