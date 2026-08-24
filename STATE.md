@@ -51,6 +51,65 @@ print(2)"）；cell 边界不是 chunk 边界（markdown heading 才是硬边界
 - 文件：`tests/test_pipeline_edges10.py`。
 - 新角度（markdown 走全管线分块几何）：mc64 三块（heading+para+list 并入 sequential / 表格 isolated / Sub 硬边界）；max_chars 地板 mc31 → chunker_failed {exception_type: ValueError}；mc32 恰过；空 md → no_extracted_elements 带 source_type；扩展名 × parser 交叉错配 → unsupported_type；write_json 默认落盘。
 
+## 回归基线 98571（第 62 次：0 失败；98571 = 98392 + 179 精确命中）
+
+- 后台回归（1022.79s ≈ 17 分钟）**98571 passed + 22 skipped + 0 failed**——树态 = R1367/STATE 提交后。
+- 对账：61 次总数 98392 + R1361(33)+R1362(30)+R1363(24)+R1364(20)+R1365(21)+R1366(25)+R1367(26) = 179 → **98571 精确命中**（连续第二十五次总数命中）。
+- 累计（总数）：97354 → 98072 → 98392 → 98571。
+- 第 63 次预测：98571 + 27（R1368）+21（R1369）+22（R1370）+26（R1371）+24（R1372）+25（R1373）+22（R1374）= 98571 + 167 = **98738** 起算。
+
+---
+
+## Round 1374 — app/parsers/ipynb_parser.py 边角第十轮（22 测试）
+
+- 文件：`tests/test_parsers_ipynb_edges10.py`。
+- 新角度（image 提取规则 / outputs 全丢）：整行单图 → image（attachment: 前缀只是字面 URL）；图 + 文本同行 → 字面 paragraph 不提取；两行两图 → 两 image；无 alt → alt ''；title 拼进 resource_path（'img.png "title"'）；纯链接不提取；attachments 字段对提取无影响；outputs 三类型 + 图片输出全丢；cells 空 dict {} 容忍（cell_count 0）非空 dict 拒（ipynb_bad_structure）；source int 42 → 双告警不崩。
+
+---
+
+## Round 1373 — app/parsers/markdown_parser.py 边角第十轮（25 测试）
+
+- 文件：`tests/test_parsers_markdown_edges10.py`。
+- 新角度（字面保留家族，历史零覆盖）：HTML 实体不解码（&amp;/&lt;/&nbsp;/&#65; 原样）；反斜杠转义不解（\* 字面）；autolink 尖括号原样；引用链接三种（full/collapsed/shortcut）+ 定义行独立成段；脚注 [^1] 字面 + 定义成段（相邻定义合并含内部 
+）；硬换行行尾双空格保留；行内/块级 HTML 原样。
+
+---
+
+## Round 1372 — app/parsers/html_parser.py 边角第十一轮（24 测试）
+
+- 文件：`tests/test_parsers_html_edges11.py`。
+- 新角度（媒体/嵌入标签，历史零覆盖）：video/canvas/object/iframe fallback 文本保留且不关缓冲（'fallback vidt'）；picture 透明——内部 img 正常产 image 含 alt；audio/embed 无文本；source/track 静默；svg 不整体跳过（<text> 保留）但 <title> 在全局 skip 集（svg+title → 0 元素）；details/dialog/template/math 文本全保留；h2 照常关缓冲。
+
+---
+
+## Round 1371 — app/parsers/html_parser.py 边角第十轮（26 测试）
+
+- 文件：`tests/test_parsers_html_edges10.py`。
+- 新角度（表单控件，历史零覆盖）：form 透明容器——整块文本坍缩进一个 paragraph 且不关缓冲（后续 <p> 拼入 'Fafter'）；select option 无分隔拼接（'AB'）；input 无文本贡献；textarea 文本保留；fieldset/legend 摊平；progress/meter/output 内文本保留 value 属性丢；h2/table 照常关缓冲。
+
+---
+
+## Round 1370 — app/pipeline.py 边角第十三轮（22 测试）
+
+- 文件：`tests/test_pipeline_edges13.py`。
+- 新角度（text 走全管线——六 parser 几何收尾）：无 heading → 唯一分块力 max_chars；mc800 单块 sequential；mc100 每段 2 块（4 块 long_paragraph_sentence_split）；mc60 每段 4 块（8 块）句子不跨块；locator 只有 line（1/3）；hbc null no_heading_elements；段内锚点 tol1 miss / 块尾唯一后缀锚点 tol0 命中 P=1/3。
+
+---
+
+## Round 1369 — evaluation/annotation_metrics.py 边角（21 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges168.py`。
+- 新角度（真实 markdown/ipynb 产物 + 边界锚点）：chunk_boundary_prf 直接吃 process_single 产物；"before 标题" 锚点 tol0 全 miss——空格 join off-by-one（标题起始比块尾恰晚 1 字符）tol1 全中；"after 块尾词" tol0 精确命中；ipynb 单锚点对双边界 tol1 P=0.5/R=1.0/F=0.6667；单块文档 P null no_predicted_boundaries；缺失 marker 三 null + _missing_markers。
+
+---
+
+## Round 1368 — evaluation/metrics.py 边角（27 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges168.py`。
+- 新角度（markdown/html/ipynb 真实管线产物——历史 metrics 板只用 pdf/docx/text）：非 pdf/docx 文档两 locator 比例 null（not_pdf/not_docx_document）；ipynb hbc 1.0；html image_resource_exists_ratio 0.0（不存在）→ 1.0（image_base_dir 真文件）；markdown 表格+列表 ect；失败路径 error_code 透传全值指标 null pipeline_failed。
+
+---
+
 ## 回归基线 98072（第 60 次：0 失败；98072 = 97354 + 503 + 215 精确命中）
 
 - 后台回归（24558.70s ≈ 6.8h，与轮次并行 CPU 争用）**98072 passed + 22 skipped + 0 failed**——树态 = R1352 提交后。
