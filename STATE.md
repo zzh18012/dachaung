@@ -4,6 +4,55 @@
 
 ---
 
+## 回归基线 98866（第 64 次：0 失败；98866 = 98738 + 128 精确命中）
+
+- 后台回归（1096.32s ≈ 18 分钟）**98866 passed + 22 skipped + 0 failed**——树态 = R1382/STATE 提交后（R1383 在回归收集后落盘，不计入）。
+- 对账：63 次总数 98738 + R1375(19)+R1376(15)+R1377(18)+R1378(19)+R1379(15)+R1380(12)+R1381(15)+R1382(15) = 128 → **98866 精确命中**（连续第二十七次总数命中）。
+- 累计（总数）：98072 → 98392 → 98571 → 98738 → 98866。
+- 第 65 次预测：98866 + 14（R1383）+23（R1384）+18（R1385）+16（R1386）+24（R1387）+18（R1388）= 98866 + 113 = **98979** 起算。
+
+---
+
+## Round 1388 — evaluation/cli.py 边角第一百八十一轮（18 测试）
+
+- 文件：`tests/test_evaluation_cli_edges181.py`。
+- 新角度（真文件期望偏差 + 解析失败共存）：好 PDF 期望多算（heading 3/paragraph 2 vs 实际 1/1）→ silent_drop_count 3（逐类型缺口求和）；坏 PDF 字节 → error_code=pdfplumber_open_failed、全部指标 null + pipeline_failed；聚合 sdt 只累 participating（3）；rate 0.5；hbc not_evaluated+1；validate-report 含失败文档仍 rc 0。
+
+---
+
+## Round 1387 — evaluation/cli.py 边角第一百八十轮（24 测试）
+
+- 文件：`tests/test_evaluation_cli_edges180.py`。
+- 新角度（混合真文件 manifest 全链）：手工合法 xref 真 PDF（heading/paragraph/caption）+ python-docx 真文件 → run rc 0、stdout 'documents=2（成功 2，失败 0）' + 'pdf=1 docx=1'；pdf 文档 docx_locator null not_docx_document（镜像亦然）；双 locator 聚合各 1 参与 + 1 not_evaluated；metric 键全集 21 键；report/evaluator_version 1.1；validate-report rc 0。
+
+---
+
+## Round 1386 — app/cli.py 边角第九轮（16 测试）
+
+- 文件：`tests/test_cli_edges9.py`。
+- 新角度（真文件穿 CLI 子进程全纵向，历史只 dummy 字节）：手工 PDF/python-docx 真文件 → parse rc 0 [OK] + INFO 自动选 fallback；JSON 顶层 13 键全集；document_id doc-<16hex>；chunk metadata 三键 + source_element_ids 非空；validate '通过 Schema 校验'；inspect schema 0.1.0 + '::c0000 chars=80 refs=2'。
+
+---
+
+## Round 1385 — app/parsers/fallback_parser.py 边角第十二轮（18 测试）
+
+- 文件：`tests/test_parsers_fallback_edges12.py`。
+- 新角度（真实 PDF 字节段落 grouping）：同 y 流序 ≠ x 序 → 按 x0 排序；14pt 紧邻三行合并单元素空格连接、bbox 跨行聚合（top=首行/bottom=末行/x1=最大）；50pt 间隔三行独立；12pt Helvetica 实测 gap 阈值 ≤30 合并 / ≥32 切分；混合板紧邻对 + 远距行。
+
+---
+
+## Round 1384 — app/parsers/fallback_parser.py 边角第十一轮（23 测试）
+
+- 文件：`tests/test_parsers_fallback_edges11.py`。
+- 新角度（真实 PDF 字节端到端，历史全 monkeypatch/dummy）：手工正确 xref 的 PDF 穿 pdfplumber——短行无句号 heading（short_line/level 0）、带句号 paragraph、Figure/TABLE/Fig. 缩写 caption（caption_regex）；locator page 按真实页对象（中间空白页不重排 1、3）；bbox x0=72.0 top=82.484 精确；圆括号/反斜杠转义往返；全空白 → pdf_no_text_extracted；管线 6 chunk + 指标全绿。
+
+---
+
+## Round 1383 — app/parsers/fallback_parser.py 边角第十轮（14 测试）
+
+- 文件：`tests/test_parsers_fallback_edges10.py`。
+- 新角度（docx 样式元数据面）：每个段落/标题 metadata 三键 {level, style, empty}；add_heading(x,0) Title 样式 → level 1；H1-H9 全透传（level 9 不截断）；空段落不跳过（content '(空段落)' + empty=True）；Normal level 0；非内置样式 Intense Quote 原样保留。
+
 ---
 
 ## 回归基线 98392（第 61 次：0 失败；98392 = 98072 + 320 精确命中）
