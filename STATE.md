@@ -4,6 +4,71 @@
 
 ---
 
+## 回归基线 99319（第 68 次：0 失败；99319 = 99255 + 64 精确命中）
+
+- 后台回归（1272.69s ≈ 21 分钟）**99319 passed + 22 skipped + 0 failed**——树态 = R1408 提交后（R1409 在收集后落盘，不计入）。
+- 对账：67 次总数 99255 + 14（R1404）+13（R1405）+11（R1406）+13（R1407）+13（R1408）= 64 → **99319 精确命中**（连续第三十一次总数命中）。
+- 累计（总数）：98866 → 98979 → 99090 → 99255 → 99319。
+- 第 69 次预测：99319 + 15（R1409）+12（R1410）+11（R1411）+10（R1412）+10（R1413）+13（R1414）+13（R1415）+10（R1416）+12（R1417）= 99319 + 106 = **99425**。
+
+---
+
+## Round 1417 — 跨 parser 对照第三轮（12 测试）
+
+- 文件：`tests/test_parsers_cross_edges3.py`。
+- 新角度（Windows 编辑器实况编码劣化）：CRLF 三 parser 全干净（txt 段落照切无 \r、md heading 照认 locator {line:3, section_path}）；UTF-8 BOM 三种劣化——txt '﻿BOM title' 进 content、md '# ' 不在行首致 heading 识别断裂整行变 paragraph 且无 section_path、html 泄 '﻿' 幽灵 paragraph 于真元素之前。
+
+---
+
+## Round 1416 — app/parsers/fallback_parser.py 边角第二十八轮（10 测试）
+
+- 文件：`tests/test_parsers_fallback_edges28.py`。
+- 新角度（非正文 PDF 结构可见性）：/Annots 文本注解（Contents+T 作者）完全不可见无告警；无 /Contents 键的页静默跳过页码保留（元素页 [1,3]、跨空页 chunk 合并 refs 2）；/Outlines 书签不可见；pdfloc 1.0。
+
+---
+
+## Round 1415 — app/parsers/fallback_parser.py 边角第二十七轮（13 测试）
+
+- 文件：`tests/test_parsers_fallback_edges27.py`。
+- 新角度（单容器多图命名）：docx 同段两图 + 夹文本 → 'between' 段落 + 两 image 殿后命名 image_<sha>_para1_00/_01.png（docx zip 字节随构建变 → sha 用 regex 锁）；pdf 同页两 XObject → bbox [100/300, 252, +40, 292]、image_<sha>_p1_00/_01.png 204 字节精确锁。
+
+---
+
+## Round 1414 — evaluation/cli.py 边角第一百八十四轮（13 测试）
+
+- 文件：`tests/test_evaluation_cli_edges184.py`。
+- 新角度（金样双胞胎 paired_with 配对穿评测）：devset {file_count 2, content_group_count 1, pdf/docx 各 1, categories ['golden']}；success 2/2、ect_sum 19 参与 2（10+9）；**irer macro 1.0 参与 2**——runner 双侧真渲染（docx 段基命名 para4、pdf 页基命名 p1，目录按各自 source hash 分开、目录 sha16 == 文件名 sha16）。
+
+---
+
+## Round 1413 — app/parsers/fallback_parser.py 边角第二十六轮（10 测试）
+
+- 文件：`tests/test_parsers_fallback_edges26.py`。
+- 新角度（q/cm 图形变换下文本几何）：'q 2 0 0 2 0 0 cm' 内 Td(72,350) 12pt → 有效位置 (144,700)、有效字号 24，bbox [144.0, 72.968, 370.752, 96.968] 高 24.0（与 R1406 24pt 直排一致）；同文本不同缩放 → 两个独立 heading；chunk 两段空格连接。
+
+---
+
+## Round 1412 — app/parsers/fallback_parser.py 边角第二十五轮（10 测试）
+
+- 文件：`tests/test_parsers_fallback_edges25.py`。
+- 新角度（跨页横线表格多页）：每页独立 table 元素独立 bbox（页 1 [100.0, 392.0, 340.0, 442.0]）；页标题+表格同页共 chunk（refs 2）、四 chunk 完全隔离不跨页合并。
+
+---
+
+## Round 1411 — app/parsers/fallback_parser.py 边角第二十四轮（11 测试）
+
+- 文件：`tests/test_parsers_fallback_edges24.py`。
+- 新角度（docx 混合 run）：plain/bold/italic run 直接拼接无分隔（'plain start then bold middle and italic tail'）；run 内 tab 后接文本 'after tabsecond' 无分隔符；w:br → '\n' 进 content 且段落分组不受影响。
+
+---
+
+## Round 1410 — 跨 parser 对照第二轮（12 测试）
+
+- 文件：`tests/test_parsers_cross_edges2.py`。
+- 新角度（metrics 层四 parser 对照）：hbc txt null no_heading_elements；sdc 算术（{heading:2, paragraph:5} vs 实际 {paragraph:2} → 5）；四 parser（md/html/txt/ipynb）schema 全绿、sdt 0。
+
+---
+
 ## 回归基线 99255（第 67 次：0 失败；99255 = 99090 + 165 精确命中）
 
 - 后台回归（1188.18s ≈ 20 分钟）**99255 passed + 22 skipped + 0 failed**——树态 = R1403/STATE 提交后（R1404+ 在收集后落盘，不计入）。
