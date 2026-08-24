@@ -6,12 +6,71 @@
 
 ---
 
+## 回归基线 98392（第 61 次：0 失败；98392 = 98072 + 320 精确命中）
+
+- 后台回归（1177.09s ≈ 20 分钟，无并行争用）**98392 passed + 22 skipped + 0 failed**——树态 = R1360/STATE 提交后。
+- 对账：60 次总数 98072 + R1353(37)+R1354(33)+R1355(32)+R1356(39)+R1357(50)+R1358(44)+R1359(43)+R1360(42) = 320 → **98392 精确命中**（连续第二十四次总数命中）。
+- 累计（总数）：96773 → 97354 → 98072 → 98392。
+- 第 62 次预测：98392 + 33（R1361）+30（R1362）+24（R1363）+20（R1364）+21（R1365）+25（R1366）+26（R1367）= 98392 + 179 = **98571** 起算。
+
+---
+
+## Round 1367 — 跨模块结构不变量（26 测试）
+
+- 文件：`tests/test_cross_module_invariants.py`（跨模块第三文件）。
+- 新角度（id 结构不变量 / hash 关联）：**无孤儿**——chunk.source_element_ids ⊆ elements id 集合（md/html/ipynb 全管线）；**不重**——同一 element id 最多进一个 chunk；**顺序保持**——sources 展平 = 元素文档序过滤；**image 唯一漏网**——html 板中唯一不进 chunk 的 type 是 image；**hash 关联**——source_hash == compute_file_hash(文件)、document_id == make_document_id(hash)、内容寻址/敏感/64 位小写 hex；**chunk meta 键集合**恰 {strategy, char_count, max_chars}；**evaluator_version 无 schema const**（report_version 有）。
+
+---
+
+## Round 1366 — 跨模块常量一致性（25 测试）
+
+- 文件：`tests/test_cross_module_conformance.py`（跨模块第二文件）。
+- 新角度（常量对齐）：models.SCHEMA_VERSION == document.schema.json const；schema enum 与 Literal 逐字对齐（source 6 / element 8 / cell_type 3）；四 stdlib parser 共享 "stdlib/0.1.0"；make_document_id = "doc-"+sha[:16]；REPORT_VERSION "1.1" == report schema const；::e%04d/::c%04d 模式跨 parser 一致；同文本不同扩展名 → 不同 source_type；全 stdlib 产物 + docx 过 is_valid。
+
+---
+
+## Round 1365 — app/pipeline.py 边角第十二轮（21 测试）
+
+- 文件：`tests/test_pipeline_edges12.py`。
+- 新角度（html 走全管线分块几何）：pre 内换行在 chunk 文本存活（"line1
+bold
+line3"）；image 元素被分块器完全跳过（不产生 chunk 不进 source_ids）；Sub heading 硬边界第二块；表格 isolated_table 保 markdown 渲染；不丢不重 normalize 对账；落盘 JSON 保换行。
+
+---
+
+## Round 1364 — app/pipeline.py 边角第十一轮（20 测试）
+
+- 文件：`tests/test_pipeline_edges11.py`。
+- 新角度（ipynb 走全管线分块几何）：code cell 换行在 chunk 文本存活（"print(1)
+print(2)"）；cell 边界不是 chunk 边界（markdown heading 才是硬边界）；长 code cell → long_paragraph_sentence_split 四块不丢字符；raw cell 并入后续 heading chunk；空 notebook → no_extracted_elements。
+
+---
+
+## Round 1363 — app/pipeline.py 边角第十轮（24 测试）
+
+- 文件：`tests/test_pipeline_edges10.py`。
+- 新角度（markdown 走全管线分块几何）：mc64 三块（heading+para+list 并入 sequential / 表格 isolated / Sub 硬边界）；max_chars 地板 mc31 → chunker_failed {exception_type: ValueError}；mc32 恰过；空 md → no_extracted_elements 带 source_type；扩展名 × parser 交叉错配 → unsupported_type；write_json 默认落盘。
+
 ## 回归基线 98072（第 60 次：0 失败；98072 = 97354 + 503 + 215 精确命中）
 
 - 后台回归（24558.70s ≈ 6.8h，与轮次并行 CPU 争用）**98072 passed + 22 skipped + 0 failed**——树态 = R1352 提交后。
 - 对账：59 次总数 97354 + R1330-R1346 已计 503 之上，R1347(36)+R1348(34)+R1349(38)+R1350(36)+R1351(34)+R1352(37) = 215 → 97354 + 503 + 215 = **98072 精确命中**（连续第二十三次总数命中）。
 - 累计（总数）：96285 → 96773 → 97354 → 98072。
 - 第 61 次预测：98072 + 37（R1353）+33（R1354）+32（R1355）+39（R1356）+50（R1357）+44（R1358）+43（R1359）+42（R1360）= 98072 + 320 = **98392** 起算。
+
+---
+
+## Round 1362 — app/parsers/ipynb_parser.py 边角第九轮（30 测试）
+
+- 文件：`tests/test_parsers_ipynb_edges9.py`。
+- 新角度（跳格重编号 / 空 cell 不对称）：cell 3-6 被跳过后 element_id 仍连续（e0007 对应 cell_index 7）；空 raw 静默跳过 vs 空 code 告警（ipynb_empty_code_cell 带 "cell #4"）；未知 cell_type 'weird' → ipynb_unknown_cell_type + repr；非 dict cell → ipynb_bad_cell；markdown cell 内 image resource_path 透传；code outputs/execution_count 丢弃；section_path cell 间不继承；kernelspec 回退链 language → name → language_info.name → ""。
+
+---
+
+## Round 1361 — app/parsers/html_parser.py 边角第九轮（33 测试）
+
+- 文件：`tests/test_parsers_html_edges9.py`。
+- 新角度（表格属性忽略 / dl / 实体）：rowspan 忽略（按位置取 cell，3 行）；colspan 忽略（col_count 取最大实际行宽 = 2）；参差行补齐；dl → "termdef" 单 paragraph；HTML 实体（&lt;b&gt; 转义还原、&#65; → A、&unknown; 字面量、&amp; 流入 section_path）；pre 内标签剥离换行保留；嵌套 blockquote 摊平；hr 静默；img 空 alt 保留。
 
 ---
 
