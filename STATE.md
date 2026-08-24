@@ -4,6 +4,71 @@
 
 ---
 
+## 回归基线 98979（第 65 次：0 失败；98979 = 98866 + 113 精确命中）
+
+- 后台回归（1189.77s ≈ 20 分钟）**98979 passed + 22 skipped + 0 failed**——树态 = R1388/STATE 提交后（R1389+ 在收集后落盘，不计入）。
+- 对账：64 次总数 98866 + 14（R1383）+23（R1384）+18（R1385）+16（R1386）+24（R1387）+18（R1388）= 113 → **98979 精确命中**（连续第二十八次总数命中）。
+- 累计（总数）：98392 → 98571 → 98738 → 98866 → 98979。
+- 第 66 次预测：98979 + 13（R1389）+19（R1390）+16（R1391）+13（R1392）+11（R1393）+16（R1394）+13（R1395）+10（R1396）= 98979 + 111 = **99090** 起算。
+
+---
+
+## Round 1396 — evaluation/runner.py 边角（10 测试）
+
+- 文件：`tests/test_evaluation_runner_edges243.py`。
+- 新角度（评测 run 后磁盘图片布局，真渲染核对文件本体）：`<out>/_per_doc/` 存在且无 JSON 残留（stub 已 unlink）；`images-<sha16>/image_<sha16>_p1_00.png` 目录名与文件名 sha 一致；落盘是真 PNG（\x89PNG 签名、pypdfium2 渲染 447 字节）；同 run irer 1.0。
+
+---
+
+## Round 1395 — evaluation/cli.py 边角第一百八十二轮（13 测试）
+
+- 文件：`tests/test_evaluation_cli_edges182.py`。
+- 新角度（富真 PDF 全类型谱）：heading×2 页 + 长段 + 题注 + 画线表 + Image XObject 穿 manifest——ECT 全五类 {heading 3, paragraph 2, caption 1, table 1, image 1}；**runner 给 parse 传 image_output_dir → PDF 图片真落盘 → irer 1.0**（裸 process_single 是 '(unrendered)'）；pdfloc/hbc/crir/tpe 全绿；sdt 0。
+
+---
+
+## Round 1394 — app/parsers/fallback_parser.py 边角第十七轮（16 测试）
+
+- 文件：`tests/test_parsers_fallback_edges17.py`。
+- 新角度（真 PDF 画线表格 + Image XObject）：find_tables 认出 2x2 规则表 → table 元素 markdown + {row_count, col_count, source: pdfplumber} + 页 bbox；表内文字双份（'cell A1 cell B1' heading + table 元素）；Image XObject → image，无 dir '(unrendered)'，有 dir pypdfium2 渲染 image_<hash16>_p1_00.png（页基命名）。
+
+---
+
+## Round 1393 — app/pipeline.py 边角第十六轮（11 测试）
+
+- 文件：`tests/test_pipeline_edges16.py`。
+- 新角度（真实文件 heading 锚定分块几何）：双标题 + 五长段 mc=150 → 5 chunk（heading 并入后随长段 2 srcs、每长段独立单句不可再分），PDF 与 DOCX 双板 chunk 文本完全一致；每 chunk ≤ max_chars；hbc 1.0、tpe True。
+
+---
+
+## Round 1392 — app/parsers/fallback_parser.py 边角第十六轮（13 测试）
+
+- 文件：`tests/test_parsers_fallback_edges16.py`。
+- 新角度（页眉/页脚与表内图片可见性）：sections header/footer 文本对 parser 完全不可见；表格单元格内 inline 图片被静默丢弃（无元素/不落盘/无告警，cell 渲染空 '|  |'）；paragraph_index 只数 body 段；管线表格 isolated chunk；irer null no_image_elements。
+
+---
+
+## Round 1391 — app/parsers/fallback_parser.py 边角第十五轮（16 测试）
+
+- 文件：`tests/test_parsers_fallback_edges15.py`。
+- 新角度（docx 题注分隔符 + hyperlink）：英文 'Figure 1:'/'TABLE 2:' → caption；**中文全角 '：'/'，' 不在 _CAPTION_RE 分隔符类 [.、:\s] 里 → paragraph**；'图 1:x'/'图 3 x' → caption；hyperlink run 文本并入段落（'link text follows: clicked part'）。
+
+---
+
+## Round 1390 — app/parsers/fallback_parser.py 边角第十四轮（19 测试）
+
+- 文件：`tests/test_parsers_fallback_edges14.py`。
+- 新角度（真 docx 内嵌 inline 图片）：image 元素 + 同段 '(空段落)' 占位；image_output_dir 时落盘 image_<hash16>_paraN_MM.png（文件真实存在、字节一致）；metadata {byte_size 69, ext png, extracted_to_disk True}；locator 带 relationship_id rId9/target_partname；无 dir → '(unsaved)' 占位；管线 image 不进 chunk；irer 0.0。
+
+---
+
+## Round 1389 — app/parsers/fallback_parser.py 边角第十三轮（13 测试）
+
+- 文件：`tests/test_parsers_fallback_edges13.py`。
+- 新角度（WinAnsi Unicode 真实 PDF）：font 声明 /Encoding /WinAnsiEncoding + cp1252 字节——'Café Münchén naïve résumé'/'Überstraße déjà vu' 逐字符无损；重音不影响分类（短行无句号仍 heading/长行带句号仍 paragraph/'Figure 1: café' 仍 caption）；无 mojibake；管线 chunk 含重音；tpe/cmp/cmr/hbc 全绿。
+
+---
+
 ## 回归基线 98866（第 64 次：0 失败；98866 = 98738 + 128 精确命中）
 
 - 后台回归（1096.32s ≈ 18 分钟）**98866 passed + 22 skipped + 0 failed**——树态 = R1382/STATE 提交后（R1383 在回归收集后落盘，不计入）。
