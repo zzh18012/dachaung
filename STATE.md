@@ -4,6 +4,113 @@
 
 ---
 
+---
+
+## 回归基线 98072（第 60 次：0 失败；98072 = 97354 + 503 + 215 精确命中）
+
+- 后台回归（24558.70s ≈ 6.8h，与轮次并行 CPU 争用）**98072 passed + 22 skipped + 0 failed**——树态 = R1352 提交后。
+- 对账：59 次总数 97354 + R1330-R1346 已计 503 之上，R1347(36)+R1348(34)+R1349(38)+R1350(36)+R1351(34)+R1352(37) = 215 → 97354 + 503 + 215 = **98072 精确命中**（连续第二十三次总数命中）。
+- 累计（总数）：96285 → 96773 → 97354 → 98072。
+- 第 61 次预测：98072 + 37（R1353）+33（R1354）+32（R1355）+39（R1356）+50（R1357）+44（R1358）+43（R1359）+42（R1360）= 98072 + 320 = **98392** 起算。
+
+---
+
+## Round 1360 — evaluation/annotation_metrics.py 第五百九十八轮（42 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges167.py`（batch558，edges 第七百三十二批，forbidden 第七百九十九批，open 0）。
+- 新角度（词位-容差等差阶梯）：**7 字符步进**——"Word%d. " 每词 7 字符，词尾到块边界距离 0/7/14/21 等差（二分 probe 实证）；**最小命中容差**——Word3. 需 tol 0、Word2. 需 7、Word1. 需 14、Word0. 需 21；**锐利边界**——tol 6 拒 / tol 7 收无中间态；**模式复现**——每块末词 Word3./Word7./Word11. 均 tol 0 命中。修正 ladder 断言方向（[21,14,7,0]）。
+
+---
+
+## Round 1359 — evaluation/report.py 第五百八十四轮（43 测试）
+
+- 文件：`tests/test_evaluation_report_edges153.py`（batch557，edges 第七百三十一批，forbidden 第七百九十八批，open 0）。
+- 新角度（.md 假充 docx / 混合板全线 pipeline_failed）：**后缀不匹配**——path d.md + source_type docx → loader 收但 fallback detect_source_type 拒 → error_code unsupported_type（首锁）；**全线 failed**——schema_valid/ect/tpe/hbc/crir/ect_by_type 全 {None, pipeline_failed}；**expectations 失效**——有 expectations 的失败 doc sdc 也是 pipeline_failed 非 no_expectations；**sdt None**——无参与者时 silent_drop_total 是 None 而非 0；**混合板**——success 1/2 rate 0.5 + pv 取自好 doc。修正源码断言（pipeline_failed 在 metrics 非 report）。
+
+---
+
+## Round 1358 — evaluation/schema.py 第五百八十九轮（44 测试）
+
+- 文件：`tests/test_evaluation_schema_edges154.py`（batch556，edges 第七百三十批，forbidden 第七百九十七批，open 2）。
+- 新角度（summary/metric 开放 vs 其余全闭合）：**summary 开放**——summary["zzz"] 任意键 VALID、counts 内层 junk 也 VALID（但 summary 必须是 object，字符串拒）；**metric 条目开放**——缺 value 只剩 reason VALID、value 可为字符串；**闭合面**——report 顶层/devset/provenance/ef/per_doc/wall/manifest 顶层与 documents/annotation 顶层与 anchor/heading 条目全部 zzz 拒；**heading_order 约束**——level min 1（0 拒带 path）、text 非空。首跑全绿。
+
+---
+
+## Round 1357 — evaluation/cli.py 第六百七十九轮（50 测试）
+
+- 文件：`tests/test_evaluation_cli_edges178.py`（batch555，edges 第七百二十九批，forbidden 第六百批，open 1）。
+- 新角度（markdown 文档喂 inspect-doc / 内部键渲染泄漏）：**markdown × inspect**——MarkdownParser 产物直接 inspect-doc → type=markdown + 'markdown vstdlib/0.1.0'；**_tolerance_chars 泄漏**——inspect 路径不 pop 内部键（runner 才 pop）→ 渲染行 '_tolerance_chars 30 (ok)'；**empty_actual 不对称**——chunks=0 时 tcmp null (empty_actual) 而 tcmr 0.0000；**桶排序**——3 bool + 5 数值 + 1 dict + 12 null 恰 21 行、总 28 行；**dict 渲染**——ect_by_type 一行 'heading=1, image=1, list_item=2, paragraph=3, table=1'。首跑全绿。
+
+---
+
+## Round 1356 — evaluation/runner.py 第六百七十七轮（39 测试）
+
+- 文件：`tests/test_evaluation_runner_edges242.py`（batch554，edges 第七百二十八批，forbidden 第七百九十六批，open 2）。
+- 新角度（重复 doc_id / 插入序 / wall 模板）：**重复 doc_id 收**——['g1','g1'] 两条 manifest 条目全部处理（loader 不去重不拒）；**同 id 可区分**——ect [{paragraph:1},{paragraph:2}]；**expectations 不对称**——第一条 no_expectations、第二条 sdc 0 → sdt 0；**插入序保持**——[zzz,aaa] → per_doc [zzz,aaa] 非字典序；**wall 模板**——{total>0, parse None, chunk None, 双 reason not_instrumented} 精确锁。首跑全绿。
+
+---
+
+## Round 1355 — evaluation/metrics.py 第五百八十二轮（32 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges161.py`（batch553，edges 第七百二十七批，forbidden 第七百九十五批，open 0）。
+- 新角度（全角/半角多集合分裂面）：**全角逗号**——'你好，世界' vs '你好,世界' → tpe False + tcmp/tcmr 各 0.8（，与 , 不同码位）；**全角数字**——'第１２３页' vs '第123页' → 0.4/0.4（仅第/页相交）；**表意空格剥离**——U+3000 isspace → '你　好' vs '你好' 全等；**CJK reorder**——{False, 1.0, 1.0}；**CJK extra**——{False, 2/3, 1.0}。首跑全绿。
+
+---
+
+## Round 1354 — evaluation/annotation_metrics.py 第五百九十七轮（33 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges166.py`（batch552，edges 第七百二十六批，forbidden 第七百九十四批，open 0）。
+- 新角度（无点前缀 marker 族）：**无点单锚**——'Word5'（无句点）→ {1/14, 1.0, 2/15}；**Word50 前缀**——单锚同 trio；**无点重复**——['Word5','Word5'] → {2/14, 1.0, 0.25}（第二锚落 Word50 前缀内仍命中；f1 = 2/8 = 0.25 非 4/15——probe 纠偏）；**顺序不敏感**——[Word50,Word5] 与 [Word5,Word50] 同 trio；**永不 missing**。首跑 4 失败修正后全绿。
+
+---
+
+## Round 1353 — evaluation/report.py 第五百八十三轮（37 测试）
+
+- 文件：`tests/test_evaluation_report_edges152.py`（batch551，edges 第七百二十五批，forbidden 第七百九十三批，open 0）。
+- 新角度（unicode categories 全链排序 / 混合 expectations 板）：**unicode 排序**——['测试','alpha']+['中文'] → ['alpha','中文','测试']（ASCII 先于 CJK、中文 U+4E2D < 测试 U+6D4B 全链首锁）；**混合 sdt**——doc1 无 expectations + doc2 sdc 2 → total 2（None 不参与但成功不减）；**双 docx 板**——files 2 / groups 2 / success 2/2。首跑全绿。
+
+---
+
+## Round 1352 — evaluation/schema.py 第五百八十八轮（37 测试）
+
+- 文件：`tests/test_evaluation_schema_edges153.py`（batch550，edges 第七百二十四批，forbidden 第七百九十二批，open 2）。
+- 新角度（ef 条目 report/manifest 严宽不对称）：**report ef 闭 4 键**——source_type 任何值均 additionalProperties 拒（manifest 却收 4 枚举）；**report ef 空串宽**——doc_id ''/expected_error_code '' 均 VALID（manifest 有 minLength 1 对差）；**manifest ef 空串拒**——'' should be non-empty；**provenance 内层 report_version 必填**——缺键 required 拒、自由串 '9.9' VALID（probe 纠偏）；**annotation reason 空串宽**。
+
+---
+
+## Round 1351 — evaluation/cli.py 第六百七十八轮（34 测试）
+
+- 文件：`tests/test_evaluation_cli_edges177.py`（batch549，edges 第七百二十三批，forbidden 第五百九十九批，open 1）。
+- 新角度（composite manifest 走 CLI run / run 无 tolerance 行）：**run 收 --tolerance-chars**——flag 被接受；**报告 composite**——sdt 2 + cbp 1/14（容差 40 端到端进报告）；**run 输出恰四行**——成功输出无 tolerance 行（tmp 目录名泄漏教训：测试改名避免）；**max_chars 回显**——provenance max_chars 32。
+
+---
+
+## Round 1350 — evaluation/runner.py 第六百七十六轮（36 测试）
+
+- 文件：`tests/test_evaluation_runner_edges241.py`（batch548，edges 第七百二十二批，forbidden 第七百九十一批，open 2）。
+- 新角度（composite 板 expectations+annotation）：**sdc {2} + cb trio {1/14, 1.0, 2/15} tol40**；**tol0**——ZERO trio {0.0,0.0,0.0} 但 sdc 2 不变（probe 纠偏：cbr 1.0→0.0）；**summary.silent_drop_total == 2 == per-doc**；**metrics 20 键**；**pop 源码锁**。
+
+---
+
+## Round 1349 — evaluation/metrics.py 第五百八十一轮（38 测试）
+
+- 文件：`tests/test_evaluation_metrics_edges160.py`（batch547，edges 第七百二十一批，forbidden 第七百九十批，open 0）。
+- 新角度（schema_valid 细粒度触发）：**板 `_doc(line=1, sv="0.1.0", sha="a"*64)` 基态 True**——line 0/-5、sv 9.9、sha 'x' 各自单字段翻转 → {False}；**每次翻转 diff == ["schema_valid"] 仅此一键**（metric 独立性锁）；**KEYS_14 集合锁**；**无 chunks 板**——crir no_chunks + tpe False + schema False。三次 probe 追因（line≥1 / sv const / sha 64-hex）后全绿。
+
+---
+
+## Round 1348 — evaluation/annotation_metrics.py 第五百九十六轮（34 测试）
+
+- 文件：`tests/test_evaluation_annotation_metrics_edges165.py`（batch546，edges 第七百二十批，forbidden 第七百八十九批，open 0）。
+- 新角度（中间空 chunk / 乱序锚）：**middle-empty-chunk**——[ab,"",cd] → joined "ab  cd" normalize 塌缩 → preds [2,3] 伪边界 → {0.5, 1.0, 2/3}；**TWO**——[ab,"","",cd] tol0 {1/3, 1.0, 0.5} 容差不敏感；**None text ≡ ""**；**乱序**——[cd-before, ab-after] → _missing_markers ["ab"]（search_from 单调性吞掉）；**键集 4/5 键**。
+
+---
+
+## Round 1347 — evaluation/report.py 第五百八十二轮（36 测试）
+
+- 文件：`tests/test_evaluation_report_edges151.py`（batch545，edges 第七百一十九批，forbidden 第七百八十八批，open 0）。
+- 新角度（全管线 paired 板）：**g1.pdf + d1.docx 双向 paired_with + d2.docx 未配对** → devset {files 3, groups 2, pdf 1, docx 2, cats [alpha,beta,gamma]}；**plvr {1.0,1,2} vs dlvr {1.0,2,1} 互补**；**hbc {None,0,3}**；**counts == 仅 element_count_total**（silent_drop_total 在顶层非 counts 内——probe 纠偏）。
+
 ## 回归基线 97354（第 59 次：0 失败；97354 = 96773 + 581 精确命中）
 
 - 后台回归（1113.55s ≈ 18.6min，与轮次并行 CPU 争用）**97354 passed + 22 skipped + 0 failed**——树态 = R1329 提交后。
