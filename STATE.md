@@ -4,6 +4,64 @@
 
 ---
 
+## 回归基线 99090（第 66 次：0 失败；99090 = 98979 + 111 精确命中）
+
+- 后台回归（1198.02s ≈ 20 分钟）**99090 passed + 22 skipped + 0 failed**——树态 = R1396 提交后（R1397+ 在收集后落盘，不计入）。
+- 对账：65 次总数 98979 + 13（R1389）+19（R1390）+16（R1391）+13（R1392）+11（R1393）+16（R1394）+13（R1395）+10（R1396）= 111 → **99090 精确命中**（连续第二十九次总数命中）。
+- 累计（总数）：98571 → 98738 → 98866 → 98979 → 99090。
+- 第 67 次预测：99090 + 22（R1397）+6（R1398）+65（R1399）+18（R1400）+16（R1401）+19（R1402）+19（R1403）= 99090 + 165 = **99255** 起算。
+
+---
+
+## Round 1403 — parsers 跨 parser 同文本对照第一轮（19 测试）
+
+- 文件：`tests/test_parsers_cross_edges1.py`。
+- 新角度（同一语义文本穿四 stdlib parser 并排比较，历史只单 parser 锁）：md/html/ipynb 都 heading+paragraph、txt 全 paragraph；section_path ' > ' 连接三态一致、txt locator 仅 ['line']；line 三种语义（md 文件行 1/3/5/7、html 恒 1、ipynb cell 内行 1/2/4/5 空行不计）；chunk 文本四种完全相同，H2 切双 chunk 三态一致。
+
+---
+
+## Round 1402 — app/cli.py 边角第十一轮（19 测试）
+
+- 文件：`tests/test_cli_edges11.py`。
+- 新角度（金样双胞胎在 inspect 渲染层精确算术，历史只锁摘要行）：element 行 '- [heading  ] doc-<sha16>::e0000  | ...'（类型 9 宽左对齐、:: 双冒号 ID）；chunk text/refs 统计行精确值（docx 11/109/49/296 + 1/2/1.5；pdf 7/108/47/283 + 1/2/1.3，avg 截 0/1 位）；每条 span 精确 [0:len]（docx 9 条、pdf 8 条；image 元素永无 span）。
+
+---
+
+## Round 1401 — 集成金样板 PDF 孪生（16 测试）
+
+- 文件：`tests/test_integration_golden_pdf.py`。
+- 新角度（R1400 金样 docx 的 PDF 孪生穿全栈）：富手工 PDF（heading + 长段 + 题注 + 画线表 + Image XObject + 尾行）→ 9 元素（表内文字 word-heading 先于表格、图片最后）+ 6 chunk 精确文本（mc=120）；output 推导 images-<sha16>/image_<sha16>_p1_00.png（447 字节真 PNG）；irer/pdfloc/hbc/tpe 全绿；element_id 顺序 e0000-e0008。
+
+---
+
+## Round 1400 — 集成金样板 docx（18 测试）
+
+- 文件：`tests/test_integration_golden_docx.py`。
+- 新角度（单文件锁整条纵向组合，各环节单锁过、整链首次）：富真 docx（H1/H2 + 长段 + 题注 + 空段 + inline 图 + 2x2 表 + 尾段）→ 10 元素（图前两空占位）+ 6 chunk 精确文本（两占位合并同 chunk）；schema 0.1.0；images-<sha16>/ 真 PNG；sdc 0/hbc 1.0/docxloc 1.0/crir 1.0/irer 1.0。
+
+---
+
+## Round 1399 — app/pipeline.py 边角第十七轮（65 测试）
+
+- 文件：`tests/test_pipeline_edges17.py`。
+- 新角度（扩展名 × parser 错配整表 21 组，历史只零星锁 md 组合）：任何真实文件配不匹配 --parser 都在 parser 选择层被拒——unsupported_type + ErrorRecord.details 恰 {path, suffix}；错配不产出 output 文件。
+
+---
+
+## Round 1398 — app/parsers/fallback_parser.py 边角第十八轮（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges18.py`。
+- 新角度（docx 垂直合并单元格 rowspan，R1382 只锁了水平）：merge 后文本在两行重复（'| vmerge | r0c1 |' / '| vmerge | r1c1 |'）；单 table 元素 + table_index 0；管线单 chunk 同文本。
+
+---
+
+## Round 1397 — app/cli.py 边角第十轮（22 测试）
+
+- 文件：`tests/test_cli_edges10.py`。
+- 新角度（四个 stdlib parser 穿 CLI 子进程纵向，R1386 只做真 PDF/DOCX）：md/html/txt/ipynb 的 parse→validate→inspect 三连——source_type/parser_name 自动推断；txt 无 heading、ipynb code → paragraph；parser 行 'X vstdlib/0.1.0'；counts 行 elements=2 chunks=1。
+
+---
+
 ## 回归基线 98979（第 65 次：0 失败；98979 = 98866 + 113 精确命中）
 
 - 后台回归（1189.77s ≈ 20 分钟）**98979 passed + 22 skipped + 0 failed**——树态 = R1388/STATE 提交后（R1389+ 在收集后落盘，不计入）。
