@@ -4,6 +4,58 @@
 
 ---
 
+## 回归基线 99255（第 67 次：0 失败；99255 = 99090 + 165 精确命中）
+
+- 后台回归（1188.18s ≈ 20 分钟）**99255 passed + 22 skipped + 0 failed**——树态 = R1403/STATE 提交后（R1404+ 在收集后落盘，不计入）。
+- 对账：66 次总数 99090 + 22（R1397）+6（R1398）+65（R1399）+18（R1400）+16（R1401）+19（R1402）+19（R1403）= 165 → **99255 精确命中**（连续第三十次总数命中）。
+- 累计（总数）：98738 → 98866 → 98979 → 99090 → 99255。
+- 第 68 次预测：99255 + 14（R1404）+13（R1405）+11（R1406）+13（R1407）+13（R1408）= 99255 + 64 = **99319** 起算（R1409 在收集后落盘，归入第 69 次）。
+- 备注：R1409 期间追查过一个 flate.pdf 经评测 runner 偶发 no_extracted_elements 的幽灵（同字节 12 连跑全绿、hash seed 无关），未复现即放弃，组合 manifest 未纳入 flate。
+
+---
+
+## Round 1409 — evaluation/cli.py 边角第一百八十三轮（15 测试）
+
+- 文件：`tests/test_evaluation_cli_edges183.py`。
+- 新角度（R1404-R1407 真实文件行为在评测层组合）：TJ 字距 PDF + 非零 MediaBox PDF + 嵌套表 docx + 分节 docx 四文件 manifest——success 4/4 rate 1.0；ect_sum 10 参与 4；sdt 0；pdfloc/docxloc 各参与 2 类型互斥；hbc 只参与有 heading 的 2 PDF；irer null no_image_elements；cbp/cbr/cbf null no_annotation；validate-report rc 0。
+
+---
+
+## Round 1408 — app/parsers/fallback_parser.py 边角第二十三轮（13 测试）
+
+- 文件：`tests/test_parsers_fallback_edges23.py`。
+- 新角度（文本状态运算符三连）：3 Tr 不可见文本照常抽取（OCR 层几何同可见）；150 Tz + 5 Tc 字距超分词阈值 → 每字母独立 word 空格拼回（'W i d e s p a c e d h e a d l i n e'）；裸字符串无 Tj 不渲染、T* 仍对下个 Tj 施加 leading（top 156.484）。
+
+---
+
+## Round 1407 — app/parsers/fallback_parser.py 边角第二十二轮（13 测试）
+
+- 文件：`tests/test_parsers_fallback_edges22.py`。
+- 新角度（docx 嵌套表 + 分节）：cell 内 add_table 内表文本完全静默丢弃（'ic0'/'ic1' 无处出现、无告警）；add_section 产生 '(空段落)' 占位、locator 的 section 字段不随节走（仍 0）；三段并进单 chunk refs 3。
+
+---
+
+## Round 1406 — app/parsers/fallback_parser.py 边角第二十一轮（11 测试）
+
+- 文件：`tests/test_parsers_fallback_edges21.py`。
+- 新角度（TJ 字距数组 + 字号几何）：[(K) -120 (er) 40 (...)] TJ 文本正确拼回、调整只进 x1；bbox 高度精确等于字号（24.0/6.0）；heading 判定与字号无关；两个 heading 各自独立 chunk。
+
+---
+
+## Round 1405 — app/parsers/fallback_parser.py 边角第二十轮（13 测试）
+
+- 文件：`tests/test_parsers_fallback_edges20.py`。
+- 新角度（真实 PDF 编码）：/Filter /FlateDecode 压缩内容流 zlib 解压后抽取与未压缩逐值一致；/Contents [4 0 R 5 0 R] 数组多流按序拼接（流 1 heading 先于流 2 paragraph、同 page 1）。
+
+---
+
+## Round 1404 — app/parsers/fallback_parser.py 边角第十九轮（14 测试）
+
+- 文件：`tests/test_parsers_fallback_edges19.py`。
+- 新角度（PDF 几何两事实）：非零 MediaBox 起点 [50 50 562 742]——x0 用 Td 绝对坐标（起点不减）、top 按 box 高 692 算；段落分组按页隔离（页 1 底 + 页 2 顶不跨页合并）但 chunk 层仍跨页并段（空格连接 refs 2）。
+
+---
+
 ## 回归基线 99090（第 66 次：0 失败；99090 = 98979 + 111 精确命中）
 
 - 后台回归（1198.02s ≈ 20 分钟）**99090 passed + 22 skipped + 0 failed**——树态 = R1396 提交后（R1397+ 在收集后落盘，不计入）。
