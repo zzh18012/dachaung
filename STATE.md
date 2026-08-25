@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1579 — pipeline 文本渲染状态：Tm 旋转/极端字号/缺 Tf（3 测试）
+
+- 文件：`tests/test_pipeline_text_state.py`（R1578 锁页几何——**文本矩阵与字号状态**零覆盖）。
+- 新角度（probe 实证）：**竖排 Tm**（[0 1 -1 0]）→ 提取内容**字符倒序** 'LACITREV'；**极端字号共存**（0.5pt + 300pt）→ 巨字形包围小字区域、合并单元素且分类 heading、bbox 允许负 y；**缺 Tf** → no_extracted_elements + pdf_no_text_extracted 警告（doc=None）。
+
+---
+
 ## Round 1578 — pipeline 页几何与换行操作符（4 测试）
 
 - 文件：`tests/test_pipeline_geometry_lineops.py`（R1574 锁页缘文本——**MediaBox 平移/矮页与 T*/' 换行操作符**零覆盖）。
