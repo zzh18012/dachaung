@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1463 — app/parsers/fallback_parser.py 边角第六十轮（7 测试）
+
+- 文件：`tests/test_parsers_fallback_edges60.py`。
+- 新角度（probe 实证）Tw/TL 缺省/负 Tz/双 BT 排序/同源 Form，edges54-59 未碰过：**Tw 词间距** 10 Tw → 'a b c' 正常提取、bbox x1 拉宽 46.016（每空格 +10pt）、对照无 Tw x1<40；**TL 缺省 0 时 ' 算子不换行**——两串同 y → pdfplumber 按 x 排字符**逐字交错** 'snteaxrtt line'（edges56 的 ' 用 TL 14 才并段）；**Tz 负值** -50 → 文本反向 + 词内散开 'tz g e n'、bbox x0 为负；**Tz 小数** 33.3 → 宽度按 0.333 缩放 x1≈11.77；**双 BT 块按 top-origin y 排序**——Td 72 700 的 'B'（y≈82）排在原点 'A'（y≈782）前；**同源 Form XObject**——/X9 Do 表单文本与页面文本同坐标逐字交错 'ianf txeorbject'（edges55 只测过带平移嵌套 Form）。
+- 撞墙：0 fail 首跑（7 全过）。
+
+---
+
 ## Round 1462 — app/parsers/text_parser.py 边角第十二轮（10 测试）
 
 - 文件：`tests/test_parsers_text_edges12.py`。
