@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1548 — pipeline 生成式坏 PDF 错误路径（4 测试）
+
+- 文件：`tests/test_pipeline_pdf_errors.py`（'pdfplumber_open_failed' 此前只在 evaluation 层断言过；pipeline 层坏 PDF 测试依赖 samples/private 常年 SKIPPED——本轮用**生成字节**真实锁定）。
+- 新角度：**纯文本垃圾/空文件/仅头+EOF** → doc=None + 单条 pdfplumber_open_failed（'No /Root object!'、details.exception_type='PdfminerException'、details.path=输入路径）；**有效 PDF 中途截断** → 同码但 'Unexpected EOF'（与无 Root 可区分）。
+
+---
+
 ## Round 1547 — pipeline 异形输入端到端（4 测试）
 
 - 文件：`tests/test_pipeline_exotic_edges.py`（新集成轴：近期 40+ 轮锁定的**解析层**异形行为——CID 占位符/千字号合并/零宽 bbox/超长段落——此前只在 parser 层验证，本轮全量走 process_single）。
