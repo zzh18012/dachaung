@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1470 — app/parsers/markdown_parser.py 边角第十五轮（10 测试）
+
+- 文件：`tests/test_parsers_markdown_edges15.py`。
+- 新角度（probe 实证）info 字符串约束 + 图片语法字面性（edges1-14 未碰过；base 已锁 standalone image RE 与 'python'/'' 语言，RE 级拒绝未锁 e2e）：**info 带引号/空格即杀死围栏**（'```python title="x"' → 围栏不开、整块成 paragraph、尾部 ``` 反开空栏 → md_empty_code_block 告警链）；**info 带点同样杀围栏**（'```python.py' 同上）；**info 两端空白剥离**（'```  python  ' → language='python'）；纯空白 info → language=''；**语言大小写保留**（'Python' 原样进 metadata）；**图片语法在结构内全部字面**——blockquote/列表项内不产 image element、行内有其他文本（前后缀/两图相连/夹文本）→ 单 paragraph 字面、表格单元格内同样字面保留。
+- 撞墙：0 fail 首跑（10 全过）。77 次回归后台运行中（bzid0fb94，预测 100034 passed + 22 skipped = 100056 收集）。
+
+---
+
 ## Round 1469 — app/parsers/fallback_parser.py 边角第六十二轮（9 测试）
 
 - 文件：`tests/test_parsers_fallback_edges62.py`。
