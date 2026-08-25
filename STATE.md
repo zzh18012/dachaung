@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1604 — pipeline 非fallback家族 JSON 落盘结构（3 测试）
+
+- 文件：`tests/test_pipeline_json_roundtrip_family.py`（R1603 锁扩展名路由——**write_json=True 落盘 JSON 完整结构**零覆盖，R1596-1602 全用 write_json=False）。
+- 新角度（probe 实证）：chunk JSON 键（chunk_id `doc-{hash16}::cNNNN`、metadata {strategy,max_chars,char_count}、**source_spans 逐元素 start/end 偏移**）；**source_hash = 文件字节完整 sha256（64 hex）**、document_id = 'doc-'+前16；家族 metadata 怪癖（md/html/text → {"<fmt>": true}，ipynb 附 nbformat/cell_count/language）；两次运行 JSON 逐字节一致；全部通过 schema validate。
+
+---
+
 ## Round 1603 — pipeline 解析器×扩展名错配路由（3 测试）
 
 - 文件：`tests/test_pipeline_parser_mismatch.py`（R1602 锁 html 结构——**扩展名路由优先于 parser_name** 零覆盖）。
