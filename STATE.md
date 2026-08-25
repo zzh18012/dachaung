@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1575 — pipeline DOCX 图片元素家族（4 测试）
+
+- 文件：`tests/test_pipeline_docx_images.py`（R1551–R1565 锁满 PDF 图片——**DOCX 图片** pipeline 层零覆盖）。
+- 新角度（probe 实证）：无 output → `'(unsaved)'` 哨兵（区别于 PDF 的 `'(unrendered)'`）、extracted_to_disk=False；有 output → 落盘 `image_{docsha16}_para{段索引}_{全局序:02d}.png`（**段索引**作用域 + 全局递增序号，区别于 PDF 的 `p{页}_` 页作用域与图片内容哈希）；图片元素不参与 chunk；纯图片文档仅 '(空段落)' 一个 chunk。
+
+---
+
 ## Round 1574 — pipeline 空白页与页缘文本（3 测试）
 
 - 文件：`tests/test_pipeline_blank_pages_edges.py`（R1573 锁页作用域——**空白页家族与 MediaBox 边缘文本**零覆盖）。
