@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1466 — app/parsers/html_parser.py 边角第十六轮（13 测试）
+
+- 文件：`tests/test_parsers_html_edges16.py`。
+- 新角度（probe 实证）空白保留 + br 语义 + 属性兼容性（edges1-15 未碰过；base 已覆盖 style/title/doctype 跳过）：**内部空白原样保留**（'a    b\n\t c' 不折叠——SAX 文本直进 buffer，与浏览器渲染不同）；**br 每个贡献一个空格**（'a<br><br>b' → 'a  b' 两空格保留）、**只有 br 的 p 是空**（0 元素 + html_no_content）；**<ol start>/<li value> 被忽略**（metadata 无起始编号）；**img data: URI 原样进 resource_path**；**自闭合 '<p/>'** 当开标签（'after' 成段）；**无引号属性**正常；**注释含标签**整体隐藏；**大写实体 &AMP; 解码**；heading 内 <a> 拼接成标题文本；**heading 内 <img> 拆出独立 image element**（heading 只剩文本）；**嵌套 blockquote 合并为一个**（不同于 markdown 只剥一层，html 完全不保留层级）。
+- 撞墙：0 fail 首跑（13 全过）。
+
+---
+
 ## Round 1465 — app/parsers/markdown_parser.py 边角第十四轮（9 测试）
 
 - 文件：`tests/test_parsers_markdown_edges14.py`。
