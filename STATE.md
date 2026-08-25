@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1569 — pipeline 默认 max_chars=800 精确边界（3 测试）
+
+- 文件：`tests/test_pipeline_maxchars_default.py`（R1549 锁非法值与 32 下界——**默认 800 精确边界**与**超大值**零覆盖）。
+- 新角度（probe 实证）：**段落恰 800 字** → 单 chunk（len==800）；**801 字** → 2 chunk（词边界切分、两段均 ≤800、第二段以完整词开头）；**max_chars=10⁹** → 999 字段落单 chunk。诊断澄清：Tj 字面括号计入 content（此前多轮 probe 均见 '(...)' 前后缀，801=799+2 括号）。
+
+---
+
 ## Round 1568 — pipeline 分块不丢不重扫描（8 测试）
 
 - 文件：`tests/test_pipeline_noloss_sweep.py`（R1547 对 4 种异形输入做过不丢不重——本轮把本 stretch 新建的**全生成器家族**（plain/长段拆分/表格/图片/50 图/多页/CJK/mixed DOCX）一次扫过）。
