@@ -12,6 +12,11 @@
 
 ---
 
+## Round 1518 — fallback PDF 标记内容与注释（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges88.py`（tagged PDF 结构 BDC/BMC/ActualText/Annots 此前未碰；edges66 _pdf 基础上加 extra_page/extra_obj 注入）。
+- 新角度（probe 实证）：**⚠ /ActualText 替换被忽略**（BDC (xyz) Tj EMC → 'xyz' 而非 'replaced'——pdfplumber 不读 ActualText，tagged PDF 替换文本丢失）；**BDC 带属性字典无副作用**（'real' 正常）；**⚠ /Artifact 标记文本照常提取**（页眉页脚分页装饰标记不剔除）；**FreeText 注释不提取**（/Contents 只在注释对象里，正文照常）；**便签注释不提取**；**悬空 /Annots 引用容忍**（指向不存在对象无警告）。
+
 ## Round 1517 — fallback PDF Type0/CID + ToUnicode CMap（6 测试）
 
 - 文件：`tests/test_parsers_fallback_edges87.py`（真实 CJK PDF 标准结构；此前轮次全部 Type1 单字节；自带 CMap 流 scaffold）。
