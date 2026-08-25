@@ -20,6 +20,11 @@
 
 ---
 
+## Round 1522 — fallback PDF 跨页状态/空页/qQ 栈（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges92.py`（q/Q 栈与缺 /Contents 页此前未碰；自带 None=无 Contents 的多页 scaffold）。
+- 新角度（probe 实证）：**跨页文本状态不泄漏**（第 1 页 Tf 24+Tc 30 'B I G' 炸开、第 2 页自带 Tf 12 'plainer' 正常——每页状态独立初始化）；**空白中页页码跳号正确**（P1/空页/P3 → page 1 与 3）；**不闭合 q 双层变换仍提取**（'QQ' 字号翻倍高 24pt、y 负 [244,-627,281.3,-603]，栈不配对不报错）；**孤立 Q 容忍**（'OQ' 正常）；**⚠ BT 内 cm 仍生效**（cm 严格应在 BT 外，放 BT 内 Td 前 → 'CM' [244,-927,281.3,-903] 照常并入 CTM）。
+
 ## Round 1521 — fallback PDF 加密表面与损坏图像（2 测试）
 
 - 文件：`tests/test_parsers_fallback_edges91.py`（此前轮次零 /Encrypt 覆盖）。
