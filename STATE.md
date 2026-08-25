@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1621 — pipeline HTML 实体全集与 img 属性、行内标签（3 测试）
+
+- 文件：`tests/test_pipeline_html_entities.py`（R1620 锁 md 引用——**数字实体、命名实体（nbsp/copy/quot）、img 属性筛选、em/code**零覆盖，R1602 只锁 &amp;&lt;&gt;）。
+- 新角度（probe 实证）：**数字实体解码**（&#65;→'A'、十六进制 &#x41;→'A'）；**命名实体解码**（&nbsp;→'\xa0' 不间断空格、&copy;→'©'、&quot;→'"'）；**img 只留 alt**（title/width 丢弃）；em/code 行内剥除同 strong。
+
+---
+
 ## Round 1620 — pipeline Markdown 引用机制缺失与图片标题（3 测试）
 
 - 文件：`tests/test_pipeline_md_refs.py`（R1619 锁 docid/img src——**引用式链接/图片、autolink、图片标题**零覆盖）。
