@@ -20,6 +20,11 @@
 
 ---
 
+## Round 1526 — fallback PDF 文档级元数据全忽略（3 测试）
+
+- 文件：`tests/test_parsers_fallback_edges96.py`（/Info、XMP、/Outlines 从未测过）。
+- 新角度（probe 实证）：**/Info 字典完全忽略**（Title/Author/CreationDate → doc.metadata 仍 {'fallback': True, 'image_output_dir': None}）；**XMP 元数据流完全忽略**（catalog /Metadata dc:title 不解析不告警）；**/Outlines 书签完全忽略**（书签标题不产生元素）。
+
 ## Round 1525 — fallback PDF Tr 7 与错误 /Length（4 测试）
 
 - 文件：`tests/test_parsers_fallback_edges95.py`（Tr 0-3 已测 7 未测；流长度错误未测）。
