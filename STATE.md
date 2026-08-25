@@ -81,6 +81,20 @@
 
 ---
 
+## Round 1646 — pipeline caption 丢弃/figcaption 成段/bq 分段（3 测试）
+
+- 文件：tests/test_pipeline_caption_bq_sep.py
+- 新角度（probe 实证）：R1645 锁属性/pre——**caption 元素丢弃、figcaption 无关联成普通段、'>' 分隔引用语义**零覆盖：
+  - table 内 caption 丢弃：'Cap' 不进表格也不成段；纯 caption 表（无行）→ no_extracted_elements + html_no_content
+  - figcaption 成普通段：figure 里 img 照常 image（alt），figcaption 文本成 paragraph，无 caption 关联（印证 figure_caption_* 指标 parser_does_not_emit_relations）
+  - '>' 分隔行在引用内：'> a
+>
+> b' 单 blockquote 'a
+
+b'（空 '>' 行成引用内空行）；空行分隔才是两个 blockquote
+
+---
+
 ## Round 1645 — pipeline HTML 属性透明与 pre 首尾 strip（3 测试）
 
 - 文件：tests/test_pipeline_html_attrs_pre.py
