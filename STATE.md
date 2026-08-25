@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1620 — pipeline Markdown 引用机制缺失与图片标题（3 测试）
+
+- 文件：`tests/test_pipeline_md_refs.py`（R1619 锁 docid/img src——**引用式链接/图片、autolink、图片标题**零覆盖）。
+- 新角度（probe 实证）：**图片标题不剥离**（resource_path = 'src.png "the title"' 括号内整体原样）；**引用定义不解析**（`[ref]: url` 成普通段落，`![alt][ref]` 不解析为图片）；**autolink 原样**（`<http://…>` 整体保留）。
+
+---
+
 ## Round 1619 — pipeline document_id 内容派生与 img src 变体（2 测试）
 
 - 文件：`tests/test_pipeline_docid_imagesrc.py`（R1618 锁成功警告——**document_id 与文件名/扩展名无关**、**img src 变体**零覆盖）。
