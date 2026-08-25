@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1530 — fallback PDF 垃圾/截断家族（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges100.py`（parser 层零覆盖——此前仅 evaluation 层一个 broken 样例）。
+- 新角度（probe 实证）：**纯文本字节 / 错误魔数 %PSD / 仅头+EOF / 空文件** → 全部 ParserError 'No /Root object!'（魔数不校验只看结构）；**有效 PDF 中途截断** → ParserError 'Unexpected EOF'（截断在流内 → 不同底层错误）。
+
+---
+
 ## 回归基线 100378（第 87 次：0 失败；100356 passed + 22 skipped，887s）
 
 - 预测命中：**100356 passed + 22 skipped = 100378 收集**（第 50 次连续总数命中）。
