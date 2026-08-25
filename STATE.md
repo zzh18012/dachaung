@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1497 — fallback PDF 退化文本状态参数（9 测试）
+
+- 文件：`tests/test_parsers_fallback_edges74.py`。
+- 新角度（probe 实证）：**Tf 0 无害**（零号字号照常提取）；**⚠ Tf 负值整串倒序**（Tf -12 的 'neg size' → 'ezis gen'，负字号翻转排布方向，与 R1496 Tm 旋转倒序同族）；**Tz 0 / Tz 1000 / Ts 上升均不影响提取**（横缩放与基线偏移不进 content）；**十六进制串容空格**（'<48 65 6C 6C 6F>' → 'Hello'）；**空 BT/ET 对象无害**；**空字符串 Tj 跳过**（只留 'real'）；**WinAnsi 0x92 → U+2019**（'it’s'）。
+- 撞墙：0 fail 首跑（9/9）。
+
 ## Round 1496 — fallback PDF 文本状态边界与 Tm 矩阵（7 测试）
 
 - 文件：`tests/test_parsers_fallback_edges73.py`。
