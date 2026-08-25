@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1531 — fallback PDF 旋转页表格检测（3 测试）
+
+- 文件：`tests/test_parsers_fallback_edges101.py`（表格检测与 /Rotate 的交互零覆盖；R1512 锁过旋转文本、R1520 锁过坐标翻转）。
+- 新角度（probe 实证）：2×2 网格（四格 re S 矩形 + 格内 a1/b1/a2/b2）——**无旋转基线：两个 1×2 表**（纵向共边不合并，每行各成一表，bbox y 翻转 112..182）；**/Rotate 90：行变纵向单列表**（两个 2×1 表 '| a2 |---|b2|'，bbox x=原 y 带/y=原 x 带，文本行内序反转 'a2 a1'）；**/Rotate 180：格文本镜像 + bbox 平移**（'| 2b | 2a |'，bbox x=612-原x=340..540，底行文本先行）。
+
+---
+
 ## Round 1530 — fallback PDF 垃圾/截断家族（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges100.py`（parser 层零覆盖——此前仅 evaluation 层一个 broken 样例）。
