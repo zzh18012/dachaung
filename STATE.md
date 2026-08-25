@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1538 — fallback PDF 词内混排家族（7 测试）
+
+- 文件：`tests/test_parsers_fallback_edges108.py`（真实 PDF 常态：粗体词中切换字体/字号；此前轮次单元素内字体字号恒定）。
+- 新角度（probe 实证）：**词中换字体不裂词**（Helvetica+Courier+Helvetica → 'abcdefghi' 单词）；**⚠ 词中换字号裂词且乱序**（12+24+12 → 'DEF abc ghi'、24pt 段排前）；**词中换 Tr 不裂词**（'abcinvghi' 隐形段并入）；整词隐形照常独立提取；**⚠ 同位异字体叠印字符级交错**（'OVER'+'LAY' → 'OLAVYER' 内容损坏零警告）；**纯空格串/空串 → 静默无元素零警告**。
+
+---
+
 ## Round 1537 — fallback PDF Tm 矩阵极端+字号极端（9 测试）
 
 - 文件：`tests/test_parsers_fallback_edges107.py`（此前轮次 Tm/Tf 均为规范正交矩阵与常规字号；页面级 /Rotate 已锁——本轮是**文本级**几何变换）。
