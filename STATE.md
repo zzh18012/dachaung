@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1460 — app/parsers/html_parser.py 边角第十五轮（14 测试）
+
+- 文件：`tests/test_parsers_html_edges15.py`。
+- 新角度（实体解码 + 定义列表 + 容器合并，edges1-14 未碰过）：<dl>/<dt>/<dd> **不是块**——全部文本并进一个 paragraph（'TermDef'、dd-only 'Def'、多 dt 串联 'ABC'、内嵌 <p> 也并入 'TPara def'）；命名实体解码 &copy; → '©'、&nbsp; → \xa0、&mdash; → '—'（**未知实体字面** '&nosuch; stays'；**分号缺失仍解码** '&copy stays' → '© stays'；实体在 h1 内解码且进 section_path 'A & B'）；<div> 相邻**合并成单段** 'onetwo' 且 div 后跟 <p> 同样并段 'ab'（div 不 flush loose 缓冲、p 开标签也不先 flush）；sup/sub 拍平 'x2 y1'；hgroup 透传两个 heading 栈正常 'T' → 'T > S' 正文承袭；pre 内实体照常解码；嵌套 table 内容形状：外层行文本**丢失**、内层行存活 '|  |'/'| in |' + html_nested_table 告警。
+- 撞墙：0 fail 首跑（14 全过）。76 次回归已在后台启动（bqx34kld4，预测 99944 passed + 22 skipped = 99966 收集）。
+
+---
+
 ## Round 1459 — app/parsers/markdown_parser.py 边角第十三轮（17 测试）
 
 - 文件：`tests/test_parsers_markdown_edges13.py`。
