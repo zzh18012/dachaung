@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1556 — pipeline 输入路径形态错误（3 测试）
+
+- 文件：`tests/test_pipeline_input_paths.py`（file_not_found/unsupported_type 各有覆盖——**输入是目录**这一形态变体零覆盖）。
+- 新角度（probe 实证）：**输入是目录** → hash 阶段即拒绝：单条 file_not_found（消息含路径），不进 parser；**无扩展名文件** → unsupported_type 消息含 '(无)'（pipeline 层呈现，此前只在 parser 层）；**未知扩展名 .xyz** → unsupported_type 消息含该扩展名。
+
+---
+
 ## Round 1555 — pipeline 输出路径与 CJK 文件名/内容（3 测试）
 
 - 文件：`tests/test_pipeline_output_paths.py`（此前 pipeline 测试全部预 mkdir 输出目录——**自动建目录**行为未锁；中文文件名/CJK 内容端到端零覆盖）。
