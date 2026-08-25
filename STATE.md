@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1565 — pipeline 多页图片命名与页内元素序（3 测试）
+
+- 文件：`tests/test_pipeline_image_multipage.py`（R1551-R1564 图片全部单页——**跨页**与**页内全类型序**零覆盖）。
+- 新角度（probe 实证）：**第 2 页图片** → 文件名 `_p2_00.png`（无 p1 文件）；**页内元素序**：先全部文本、再表格、最后图片（heading,heading,table,table / heading,image），页间严格按页号升序；**图片 bbox 翻转**：cm y=692（页高 792）→ bbox y=0..100。
+
+---
+
 ## Round 1564 — pipeline 图片规模与页外放置（3 测试）
 
 - 文件：`tests/test_pipeline_image_scale_offpage.py`（R1563 锁同一 XObject 两次绘制——**规模 50 次**与**页外坐标**零覆盖）。
