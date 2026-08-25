@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1502 — html 表格子元素错位与未闭合致命面（7 测试）
+
+- 文件：`tests/test_parsers_html_edges22.py`。
+- 新角度（probe 实证，edges18 的 missing-</tr> 只锁丢行，本轮发现**整文档丢失**面）：**裸 '<td>'/'<tr>' 文本流入后续段**（'cellb'/'xb' 合并，不成表不丢文本但混段）；**⚠ table 内裸文本被丢弃**（'loose' 静默丢失）；**全 th 单行表照常**（1x1）；**嵌套表折入外层 + 专用告警 html_nested_table**（outer cell 空、inner 成外层第二行 '|  |\n| --- |\n| inner |'）；**⚠ 表未闭合 + 尾随文本 → 整文档丢失**（html_no_content，表与尾文本全丢）；**⚠ 表内 '<p>' 无 '</tr>' → 整文档丢失**（状态机被打断后不恢复）。
+- 撞墙：0 fail 首跑（7/7）。th+td 混合表已由主文件覆盖，跳过。
+
 ## Round 1501 — html 大小写/属性形态/裸元素（7 测试）
 
 - 文件：`tests/test_parsers_html_edges21.py`。
