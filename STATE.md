@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1635 — pipeline Markdown 围栏变体：波浪线/四反引号/带参 info/未闭合（3 测试）
+
+- 文件：`tests/test_pipeline_md_fences.py`（R1634 锁列表延续——**围栏字符变体与 info 字符串严格性**零覆盖）。
+- 新角度（probe 实证）：**~~~ 波浪线围栏**与**```` 四反引号**均识别为 code_block（language ''）；**带参数 info 字符串破坏围栏**（'```python title="x"' 非纯词 → 整块 raw 段落）；**未闭合围栏**其后全部内容入 code_block。
+
+---
+
 ## Round 1634 — pipeline Markdown 列表延续与缩进（3 测试）
 
 - 文件：`tests/test_pipeline_md_list_continuation.py`（R1633 锁 html 文本节点——**任务列表标记 raw、缩进延续行独立成段、4 空格缩进无代码块语义**零覆盖）。
