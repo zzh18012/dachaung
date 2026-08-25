@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1600 — pipeline ipynb 单元格家族（3 测试）
+
+- 文件：`tests/test_pipeline_ipynb_cells.py`（R1599 锁列表元数据——**ipynb 输出丢弃、raw 单元、单元内 markdown、语言元数据**零覆盖）。
+- 新角度（probe 实证）：**code 单元输出（stream/execute_result）完全丢弃**仅取 source；**markdown 单元内列表** → list_item；**raw 单元** → paragraph {'kind': 'raw_cell'}；**language** 取 kernelspec.language（无则 ''）。
+
+---
+
 ## Round 1599 — pipeline 列表元数据与 text 段落分割（3 测试）
 
 - 文件：`tests/test_pipeline_text_list_metadata.py`（R1598 锁 markdown raw——**列表 marker 元数据、text 段落分割规则、空 text**零覆盖）。
