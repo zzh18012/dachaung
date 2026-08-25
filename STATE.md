@@ -81,6 +81,20 @@
 
 ---
 
+## Round 1651 — pipeline 引用内围栏/连续标题分块/无竖线表（3 测试）
+
+- 文件：tests/test_pipeline_bq_fence_headings.py
+- 新角度（probe 实证）：R1650 锁标题层级/缩进——**引用内围栏惰性、heading+heading 不合并、管道表需首尾竖线**零覆盖：
+  - 引用内围栏惰性：'> ```' 逐行剥一个 '>'，内容 '```
+code
+```' 是 blockquote 段而非 code_block
+  - 连续标题各成块：'# A' 与 '# B' 两个 sequential chunk 各 1 id（对照 R1611 heading+para 合并——标题只与后随段落合并，不与另一标题合并）
+  - 无首尾竖线不成表：'a | b
+--- | ---
+x | y' 是 paragraph（首尾 '|' 必需，比 GFM 严格）
+
+---
+
 ## Round 1650 — pipeline 标题层级范围与列表缩进阈值（3 测试）
 
 - 文件：tests/test_pipeline_heading_range_indent.py
