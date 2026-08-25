@@ -72,6 +72,16 @@
 
 ---
 
+## Round 1640 — pipeline HTML br 换行与 th 表头（3 测试）
+
+- 文件：tests/test_pipeline_html_br_th.py
+- 新角度（probe 实证）：R1639 锁 ipynb section——**br 段内行为、th 表头行渲染**零覆盖：
+  - br → 单空格：'<p>line one<br>line two</p>' 同段成 'line one line two'（与 R1633 文本节点零插入不同，br 显式补空格）
+  - 双 br 不分段：'a<br><br>b' 单段落 'a  b'（两个空格，无段落切分）
+  - th 渲染表头：th 行 + '| --- |' 分隔行，row_count 含表头行；纯 th 表同样有表头+分隔
+
+---
+
 ## Round 1639 — pipeline ipynb 单元内 section 与跨单元重置（3 测试）
 
 - 文件：tests/test_pipeline_ipynb_sections.py
