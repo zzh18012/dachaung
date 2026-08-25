@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1490 — fallback DOCX 修订与内容控件静默丢文本（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges67.py`（复用 edges65 的 _build_docx 手工 docx 支架，import 复用）。
+- 新角度（probe 实证，edges1-66 未碰的修订/sdt XML 家族，与评测 silent_drop 高度相关）：**⚠ w:ins 修订插入文本静默丢弃**（'<w:ins>' 包裹的 w:r 在 Word 中是可见文本，paragraph.text 只读直接子 w:r → 'keep inserted' 只得 'keep'，真实修订文档会丢内容）；**w:del/delText 丢弃（正确行为）**；**⚠ w:sdt 内容控件整段丢弃**（sdtContent 内 w:p 非直接子层 → 只剩 'outside'，Word 表单模板常态）；**全 sdt 文档 → docx_no_content**（整份文档解析为空）；**仅 ins+del 段 → '(空段落)' 占位 element**（metadata empty=True，非跳过）。
+- 撞墙：0 fail 首跑（5/5）。ins 丢可见文本与 sdt 丢段是 fallback DOCX 路径的已知缺口，锁定现状供未来修复对照（若未来改用 body.iter(w:p) / .//w:r 需同步换正向断言）。
+
 ## Round 1489 — html 空元素安全边界（8 测试）
 
 - 文件：`tests/test_parsers_html_edges20.py`。
