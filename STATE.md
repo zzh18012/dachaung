@@ -2,6 +2,21 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1549 — pipeline max_chars 边界与回环（7 测试）
+
+- 文件：`tests/test_pipeline_maxchars_roundtrip.py`（max_chars 无效值在 pipeline 层此前只断言"不崩"——本轮锁**精确错误**与**阈值边界**：StructuralChunker 要求 ≥32）。
+- 新角度（probe 实证）：**max_chars ∈ {0, 1, -5, 10, 31}** → doc=None + 单条 chunker_failed（'max_chars 过小: {n}'、exception_type='ValueError'）；**边界 32 正好可用**（所有 chunk ≤32、ids 非空）；**写盘→validate_only 回环** → (True, 'OK')。
+
+---
+
+## 回归基线 100507（第 92 次：0 失败；100485 passed + 22 skipped，898s）
+
+- 预测命中：**100485 passed + 22 skipped = 100507 收集**（第 55 次连续总数命中）。
+- 含轮次：至 R1548（R1543-R1548 的 31 个计入 91 次基线后的预测）。此后新增 R1549(7)。
+- 第 93 次预测：100507 + 7 = **100514 收集**（100492 passed + 22 skipped 预期）；collect-only 已实测 100514 一致。
+
+---
+
 ## Round 1548 — pipeline 生成式坏 PDF 错误路径（4 测试）
 
 - 文件：`tests/test_pipeline_pdf_errors.py`（'pdfplumber_open_failed' 此前只在 evaluation 层断言过；pipeline 层坏 PDF 测试依赖 samples/private 常年 SKIPPED——本轮用**生成字节**真实锁定）。
