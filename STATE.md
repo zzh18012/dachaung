@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1609 — pipeline 多行引用与超长 pre 拆分（3 测试）
+
+- 文件：`tests/test_pipeline_pre_blockquote_split.py`（R1608 锁 md 结构边角——**blockquote 多行、含换行内容的词界拆分、pre 内嵌标签**零覆盖）。
+- 新角度（probe 实证）：**多行 blockquote** 单段 'line a\nline b'（换行保留）；**超长 pre（1699 字符）** 词界硬拆 799/797/101，可**行中间切断**（'preformatted line'|'number 023'），缝隙为边界处单个空白符（首缝空格、次缝换行，初版误判全空格——测试失败后修正）；**pre 不保护内嵌标签**（br 转空格、b 剥除，kind 仍 preformatted）。
+
+---
+
 ## Round 1608 — pipeline Markdown 结构边角：setext/嵌套/超长代码（3 测试）
 
 - 文件：`tests/test_pipeline_md_structure_edges.py`（R1607 锁 html 列表表格——**setext 不对称、缩进子列表、超长围栏代码**零覆盖，R1598 只锁 type+content）。
