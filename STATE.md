@@ -20,6 +20,11 @@
 
 ---
 
+## Round 1525 — fallback PDF Tr 7 与错误 /Length（4 测试）
+
+- 文件：`tests/test_parsers_fallback_edges95.py`（Tr 0-3 已测 7 未测；流长度错误未测）。
+- 新角度（probe 实证）：**Tr 7（仅裁剪不显示）仍提取**（'CLIP' 与 Tr 3 同路）；**⚠ Tr 7 → Tr 0 后顺序倒置**（CLIP(y700 上)+NORMAL(y650 下) → ['NORMAL','CLIP']，裁剪模式字符布局排序异常）；**/Length 偏大容忍**（500 vs 实际 33 → 照常，读到 endstream 为止）；**/Length 0 容忍**（长度全错不截断）。
+
 ## Round 1524 — fallback PDF 1.5 xref 流与对象流（2 测试）
 
 - 文件：`tests/test_parsers_fallback_edges94.py`（现代 PDF 生成器默认结构；此前轮次全部经典 xref 表或无 xref 靠扫描兜底；自带 struct+zlib xref 流 builder）。
