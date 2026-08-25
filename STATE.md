@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1614 — pipeline 小 max_chars 区间与 # 变体（3 测试）
+
+- 文件：`tests/test_pipeline_small_maxchars.py`（R1613 锁下限 32——**32-100 小区间拆分、超限 heading 不拆、# 紧贴/缩进/尾随**零覆盖）。
+- 新角度（probe 实证）：**小区间词界拆分** 67 字符@32 → 31/31/3，表格小 max_chars 仍豁免（64 单 chunk）；**超限 heading 永不拆**（40 字符@35 → 原样单 chunk，不切不失败，与段落不同）；**# 变体**——'#HHHH' 无空格/2 空格缩进 → 段落 raw，'### Title ###' → level 3 且尾随 # 剥除。
+
+---
+
 ## Round 1613 — pipeline max_chars 下限 32 与 heading×list 累积（3 测试）
 
 - 文件：`tests/test_pipeline_maxchars_floor.py`（R1612 锁 flush 交互——**max_chars < 32 一律 ValueError**零覆盖，R1581 的 max_chars=5 失败实为此下限）。
