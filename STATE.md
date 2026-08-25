@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1602 — pipeline HTML 结构家族：pre/br/实体/无 src 图（2 测试）
+
+- 文件：`tests/test_pipeline_html_structure.py`（R1597 锁 html 元素家族——**结构细节**零覆盖）。
+- 新角度（probe 实证）：**&lt;br&gt;** → 转空格；**&lt;pre&gt;** → paragraph {'kind': 'preformatted'}（换行保留）；**HTML 实体解码**（&amp;&lt;&gt; → &<>，区别于 markdown raw 保留）；**无 src 的 &lt;img&gt;** → 完全丢弃；h2/h3 → heading level。
+
+---
+
 ## Round 1601 — pipeline Markdown 结构家族：层级/引用/分隔线（2 测试）
 
 - 文件：`tests/test_pipeline_markdown_structure.py`（R1598/1599 锁 raw 与列表——**ATX 层级、blockquote、水平线**零覆盖）。
