@@ -13,6 +13,14 @@
 
 ---
 
+## Round 1450 — app/parsers/fallback_parser.py 边角第五十六轮（19 测试）
+
+- 文件：`tests/test_parsers_fallback_edges56.py`。
+- 新角度（文本显示算子变体，历史全用朴素 `(text) Tj`）：字面串转义 `\(` `\)` `\\`、八进制 `\101\102\103` → 'ABC octal'、嵌套平衡括号原样保留；十六进制串 `<486578...> Tj` → 'Hex text'；TJ 数组 -250 千分位字距**拆词** 'Kern ed text' / 0 偏移**粘连** 'ZeroKern'；T*（TL 14）与 `'` 两行并段；TD 显式换行跨两行 bbox；`"` 算子隐式换行**不生效** → 'OneTwo' 单行 bbox；Tm 6 操作数与 Td 等价、2 操作数残缺 Tm **静默回退原点** bbox [0.0, 782.484, ...] 无告警、2x 缩放 Tm bbox 高 24；`\t` → '(cid:9)' 占位符；`\<EOL>` 行接续正确消除；空串 `() Tj` → 0 元素 + pdf_no_text_extracted；残缺操作数栈 `(Dropped) Td` 字符串操作数被 TD **丢弃**只留 'Kept'。
+- 撞墙：cid_line_continuation 首跑 1 fail——probe 的 '(cid:10)' 是 bash heredoc CRLF 伪影（`\` + CR + LF），Write 工具干净 LF 下 pdfminer 正确消除行接续 → 'Split string'。改断言后 19 全过。
+
+---
+
 ## Round 1449 — app/parsers/fallback_parser.py 边角第五十五轮（10 测试）
 
 - 文件：`tests/test_parsers_fallback_edges55.py`。
