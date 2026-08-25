@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1587 — pipeline CropBox 忽略与页级继承（3 测试）
+
+- 文件：`tests/test_pipeline_cropbox_inherit.py`（R1580 锁 Resources 继承——**CropBox、共享内容流、MediaBox 继承**零覆盖）。
+- 新角度（probe 实证）：**/CropBox [0 0 300 400]**（文本在裁剪区外）→ 裁剪完全忽略、bbox 与无 CropBox 一致（y 翻转仍用 MediaBox 高 792）；**两页共享内容流** → 各自产出不去重；**MediaBox/Resources 全挂 /Pages** → 继承生效、y 翻转用继承高 600。
+
+---
+
 ## Round 1586 — pipeline Unicode 内容：WinAnsi 八进制与 CJK（3 测试）
 
 - 文件：`tests/test_pipeline_unicode_content.py`（R1585 锁确定性——**多字节内容编码与无空白长文切分**零覆盖）。
