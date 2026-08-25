@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1504 — markdown 文本链接家族全字面（7 测试）
+
+- 文件：`tests/test_parsers_markdown_edges21.py`。
+- 新角度（probe 实证，图片链接已覆盖、autolink 字面已由 edges10 锁，纯文本链接语法**零处理**）：**行内链接逐字保留**（'[the docs](url)' 不解、无 href 元数据；带 title 同样）；**引用式链接 + 定义都成段**（'[text][1]' 与 '[1]: url' 两个独立 paragraph，定义不被消费）；**shortcut 引用同样**；**裸 URL / 嵌套方括号逐字**；**链接语法在 heading/list_item 内照常进 content**（'## See [guide](x)' → heading 原样）。
+- 撞墙：0 fail 首跑（7/7）。markdown 链接语义与 edges10 脚注定义行为一致：全字面透传。
+
 ## Round 1503 — html 未闭合块标签恢复 vs 表格致命面（5 测试）
 
 - 文件：`tests/test_parsers_html_edges23.py`。
