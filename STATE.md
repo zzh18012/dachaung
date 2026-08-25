@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1499 — chunker isolated 超长不切与 header/footer 流（5 测试）
+
+- 文件：`tests/test_chunker_edges15.py`（复用 edges14 的 _el/_doc 支架）。
+- 新角度（probe 实证，R1478 只锁了 heading 超长不切）：**超长 table 不切**（373 字符 > max_chars=100 → 单个超长 chunk strategy='isolated_table'，table 分支只 push 不 split）；**超长 caption 不切**（239 字符 isolated_caption 超长 chunk）；**header/footer 是普通文本流**（单独成 sequential chunk；**夹在段间不打断缓冲**：para+header+para → 单 chunk 'one two hdr three four' 三 ids 连续——header 不触发 flush/reset，与 table/caption 的 isolated 行为相反）。
+- 撞墙：0 fail 首跑（5/5）。
+
 ## Round 1498 — markdown 混合标记/下划线与 tab 位置（7 测试）
 
 - 文件：`tests/test_parsers_markdown_edges20.py`。
