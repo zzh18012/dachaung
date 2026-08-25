@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1570 — pipeline 行距驱动的段落合并与累积分块（2 测试）
+
+- 文件：`tests/test_pipeline_accumulation.py`（R1569 锁单段落 800 边界——**多段落**两条路径零覆盖）。
+- 新角度（probe 实证）：**近距行（20pt）** → pdfplumber 合并单元素（3×297 → 893 字）再走长段落切分 [797, 95]；**远距行（100pt）** → 3 独立段落元素，chunker 顺序累积：a+b=595 ≤800 合一 chunk、+c 超限开新 chunk → [595, 297]、strategy='sequential'、ids 计数 [2, 1]。
+
+---
+
 ## Round 1569 — pipeline 默认 max_chars=800 精确边界（3 测试）
 
 - 文件：`tests/test_pipeline_maxchars_default.py`（R1549 锁非法值与 32 下界——**默认 800 精确边界**与**超大值**零覆盖）。
