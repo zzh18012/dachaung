@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1615 — pipeline 句界字符集：?;! 边界、小数点豁免、中文句号非边界（3 测试）
+
+- 文件：`tests/test_pipeline_sentence_boundaries.py`（R1614 锁小 max_chars——**句界字符集本身**零覆盖，R1591 只对比 '.' 与 ','）。
+- 新角度（probe 实证）：**ASCII ?/;/! 均为句界**（按句贪心累积）；**小数点不拆**（3.14/2.71 完整保留，首句恰 40=max，初版误数 41 已修正）；**中文全角 '。' 不是句界**——无空格文本在 max 处硬切（32/9 句中切断）。
+
+---
+
 ## Round 1614 — pipeline 小 max_chars 区间与 # 变体（3 测试）
 
 - 文件：`tests/test_pipeline_small_maxchars.py`（R1613 锁下限 32——**32-100 小区间拆分、超限 heading 不拆、# 紧贴/缩进/尾随**零覆盖）。
