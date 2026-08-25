@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1576 — pipeline DOCX 表格边界：嵌套/合并与页眉页脚（3 测试）
+
+- 文件：`tests/test_pipeline_docx_tables_edges.py`（R1559 锁基础表格——**嵌套表格、合并单元格、页眉页脚**零覆盖）。
+- 新角度（probe 实证）：**嵌套表格**（cell.add_table）→ 仅外层一个元素、内层内容**静默丢弃**；**合并单元格**（cell.merge）→ 文本在两列**重复出现**、row/col 仍 2×2；**页眉/页脚** → 完全忽略仅提取正文。
+
+---
+
 ## Round 1575 — pipeline DOCX 图片元素家族（4 测试）
 
 - 文件：`tests/test_pipeline_docx_images.py`（R1551–R1565 锁满 PDF 图片——**DOCX 图片** pipeline 层零覆盖）。
