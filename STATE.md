@@ -12,6 +12,11 @@
 
 ---
 
+## Round 1520 — fallback PDF OCG 图层与逐页 MediaBox（3 测试）
+
+- 文件：`tests/test_parsers_fallback_edges90.py`（此前多页轮次全部同尺寸 letter；自带逐页 MediaBox scaffold）。
+- 新角度（probe 实证）：**⚠ OCG OFF 图层文本照常提取**（catalog /OCProperties OFF 隐藏层 + 内容 /OC BDC 标记 → 'HIDDENLVISIBLE' 合并提取——pdfplumber 无图层可见性概念）；**⚠ 小页框上方文本负 y**（第 2 页 A4 横 595 高、文本 y=700 → bbox y=-114.5，超框仍提取按该页高度翻转）；**大页框按自身高度翻转**（1000 高 y=700 → 290.5 而非 letter 的 82.5——坐标归一化逐页独立）。
+
 ## Round 1519 — fallback PDF Tc 字距与 Tw 词距（6 测试）
 
 - 文件：`tests/test_parsers_fallback_edges89.py`（测过 Tz/Ts/TL 但从未碰 Tc/Tw）。
