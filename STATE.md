@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1590 — pipeline 表格最小形状（3 测试）
+
+- 文件：`tests/test_pipeline_table_min_shape.py`（R1584 锁非表格几何——**最小可识别形状**零覆盖）。
+- 新角度（probe 实证）：**1 行 × 2 列**（共享竖边）→ 识别表格（markdown 自动补表头分隔行、row_count=1/col_count=2），文本同时产出独立 heading（双重提取）；**2 行 × 1 列** → 不识别（列 <2）；**对角错位矩形** → 不识别。
+
+---
+
 ## Round 1589 — pipeline 行合并间距阈值 = 2.5×字号（3 测试）
 
 - 文件：`tests/test_pipeline_linemerge_threshold.py`（R1570 锁 20pt/100pt 两端——**阈值精确边界与字号缩放**零覆盖）。
