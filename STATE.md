@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1580 — pipeline 资源继承与重叠/变换文本（3 测试）
+
+- 文件：`tests/test_pipeline_resource_quirks.py`（R1579 锁渲染状态——**Resources 继承、重叠重复文本、cm 变换**零覆盖）。
+- 新角度（probe 实证）：**Resources 挂 /Pages 节点**（页节点不写）→ 继承链解析正常提取；**同位置重复绘制同文本两次** → pdfminer 字符级**交错合并** 'DDUUPP'；**cm 横向 100 倍缩放 +200 平移** → bbox 变换至 [7400, ...] 深出页外仍提取。
+
+---
+
 ## Round 1579 — pipeline 文本渲染状态：Tm 旋转/极端字号/缺 Tf（3 测试）
 
 - 文件：`tests/test_pipeline_text_state.py`（R1578 锁页几何——**文本矩阵与字号状态**零覆盖）。
