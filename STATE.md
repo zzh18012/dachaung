@@ -81,6 +81,17 @@
 
 ---
 
+## Round 1650 — pipeline 标题层级范围与列表缩进阈值（3 测试）
+
+- 文件：tests/test_pipeline_heading_range_indent.py
+- 新角度（probe 实证）：R1649 锁相邻表——**h4-h6 层级、标题内换行、列表缩进容忍度**零覆盖：
+  - h4/h5/h6：level 4/5/6 全支持
+  - 标题内换行：'<h2>a
+b</h2>' 换行保留在 heading content
+  - 缩进破坏列表：'	- x'、1 空格与 3 空格缩进都是 paragraph 原样——仅 0 缩进成 list_item（比 CommonMark 宽松度 4 空格严格得多）
+
+---
+
 ## Round 1649 — pipeline 相邻表格与 md 单列表不识别（3 测试）
 
 - 文件：tests/test_pipeline_adjacent_tables.py
