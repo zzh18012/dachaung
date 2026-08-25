@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1577 — pipeline DOCX 样式层级与 markdown 敌意单元格（4 测试）
+
+- 文件：`tests/test_pipeline_docx_styles_cells.py`（R1576 锁表格结构边界——**标题层级全谱、列表样式降级、单元格特殊文本**零覆盖）。
+- 新角度（probe 实证）：**标题 level 1..9** → 全部 heading、level=N、style='Heading N'；**List Bullet/Number** → 降级 paragraph、level=0、样式名保留；**markdown 敌意单元格**：`a|b` 竖线不转义、换行原样保留、空白 strip；**纯表格文档** → 单 table + isolated_table chunk。
+
+---
+
 ## Round 1576 — pipeline DOCX 表格边界：嵌套/合并与页眉页脚（3 测试）
 
 - 文件：`tests/test_pipeline_docx_tables_edges.py`（R1559 锁基础表格——**嵌套表格、合并单元格、页眉页脚**零覆盖）。
