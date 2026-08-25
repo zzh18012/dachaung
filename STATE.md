@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1533 — fallback PDF 线性化布局/前向 /Prev 链（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges103.py`（R1532 锁的是经典**向后** /Prev；真实线性化 PDF 是 startxref 指向**头部**首页 xref、其 trailer 带 /Root 且 /Prev **指向前方**尾主 xref——零覆盖）。
+- 新角度（probe 实证，环形 /Prev 用子进程看门狗防挂起）：**完整线性化布局**与**真首页切分**（首页 xref 仅 1-4、尾部 5 1 小节更新 obj5）均正常提取（pdfminer 沿 /Prev 不分方向、跨段对象可解析）；**/Prev 自指** → ParserError 'maximum recursion depth exceeded'（无限链被递归上限截断后捕获，**不挂起**）；**/Prev 越界 99999 / =0** → 回退扫描救援正常。
+
+---
+
 ## Round 1532 — fallback PDF 经典 xref/startxref 家族（12 测试）
 
 - 文件：`tests/test_parsers_fallback_edges102.py`（此前 100+ 轮最小 PDF **全部无 xref 表**（纯 trailer 扫描模式）；xref 流 R1524 之后经典 xref + startxref + /Prev 链零覆盖）。
