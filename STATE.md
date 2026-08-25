@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1626 — pipeline HTML 块级包装透明性（3 测试）
+
+- 文件：`tests/test_pipeline_html_wrappers.py`（R1625 锁宽容解码——**div/section 包装、裸 div 文本、script/style 内容**零覆盖）。
+- 新角度（probe 实证）：**包装透明**（div/section 内的 p/h2/表格原样提取，包装本身不产生元素）；**裸 div 文本** → paragraph；**script/style 内容整体丢弃**（.a{} 与 var x; 不产生元素）。
+
+---
+
 ## Round 1625 — pipeline 非 UTF-8 输入的宽容解码（2 测试）
 
 - 文件：`tests/test_pipeline_encoding_lenient.py`（R1624 锁 BOM/CRLF——**编码错误从不抛出**零覆盖，此前全部测试用 UTF-8）。
