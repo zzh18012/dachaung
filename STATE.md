@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1540 — fallback PDF 页面几何变体（7 测试）
+
+- 文件：`tests/test_parsers_fallback_edges110.py`（R1520 锁过 per-page MediaBox 与小页坐标翻转；本轮锁 MediaBox **取值变体**——扫描件常见负原点/小数、退化值与 /UserUnit）。
+- 新角度（probe 实证）：**负原点 [-100 -100 512 692] 完全忽略**（bbox 与默认基线一字不差——y 翻转只用高度、x 不平移）；**小数高度** bbox 随之精确偏移（82.7/94.7）；**零尺寸 [0 0 0 0]** 退化接受 y 深负 -709.5；**巨型 7920** y 达 7210.5；**倒序 [612 792 0 0]** 负宽高参与翻转（x→-540、y→874.5）；**/UserUnit 2 完全忽略**；**横向 [0 0 792 612]** 内容 y=700 出界 → 负 bbox 不裁剪不警告。
+
+---
+
 ## Round 1539 — fallback PDF /Filter 链序家族（8 测试）
 
 - 文件：`tests/test_parsers_fallback_edges109.py`（此前轮次仅单 FlateDecode；真实 PDF 常见 ASCIIHex/ASCII85 包裹链式过滤器——零覆盖）。
