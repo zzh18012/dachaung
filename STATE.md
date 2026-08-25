@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1553 — pipeline 生成式坏 DOCX 错误路径（5 测试）
+
+- 文件：`tests/test_pipeline_docx_errors.py`（`docx_open_failed` 此前只在 parser 层 pytest.raises 断言——R1548 坏 PDF 镜像的 DOCX 侧 pipeline 层零覆盖）。
+- 新角度（probe 实证）：**纯垃圾/空字节** → docx_open_failed + exception_type=PackageNotFoundError（消息含输入路径）；**合法 zip 非 DOCX** → 同码 + KeyError；**有 [Content_Types].xml 缺 document.xml** → 同码 + AttributeError（lxml 容器缺失，三种异常可区分）；**失败时不写输出**（write_json=True 失败 → 目录零残留）。
+
+---
+
 ## Round 1552 — pipeline 图片路径策略变体（4 测试）
 
 - 文件：`tests/test_pipeline_image_variants.py`（R1551 锁标准路径下的图片落盘；**output_path 缺失 / write_json=False / 多图 / 重跑**策略零覆盖）。
