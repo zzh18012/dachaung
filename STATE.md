@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1494 — fallback PDF 显示/渲染操作符家族（7 测试）
+
+- 文件：`tests/test_parsers_fallback_edges71.py`（复用 edges66 的 _pdf 手工 PDF 支架）。
+- 新角度（probe 实证，edges1-70 未碰的 ' / " / Tr / 非常规 TL）：**Tr 3 隐形文本照常提取**（'ghost'——渲染模式 3 是 OCR 文本层实现方式，可见性与提取无关）；**Tr 3 → Tr 0 混排顺序倒置**（先画的 ghost y=700 后出、后画的 real y=650 先出 → ['real','ghost']，3 次复跑稳定）；**' 撇号 op 默认 TL=0 三行同位交错**（'llliiinnneee123'，与 R1483 overprint 同现象不同路径）；**" 双引号 op 正常**（'ab'）；**" 后接 Tj 直接拼接**（'firstsecond'，Tw/Tc 不留空隙）；**负 TL 反序**（T* 上移 → 'b a'）；**ET 后三个裸 Q 不崩**（'a'）。
+- 撞墙：0 fail 首跑（7/7）。
+
 ## Round 1493 — fallback DOCX 嵌套表/多段 cell/悬空关系（4 测试）
 
 - 文件：`tests/test_parsers_fallback_edges70.py`。
