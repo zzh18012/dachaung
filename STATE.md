@@ -13,6 +13,31 @@
 
 ---
 
+## 回归基线 99794（第 74 次：0 失败；99816 = 99755 + 61 精确命中 R1444-R1449）
+
+- 后台回归（929.34s ≈ 15.5 分钟）**99794 passed + 22 skipped + 0 failed** exit=0——该 run 在 R1449 提交后（34e8efe）启动（compaction 前发出的后台任务），收集树态 99816，**精确命中**第 74 次预测（连续第三十六次总数命中）。
+- 对账：73 次总数 99755 + 13（R1444）+10（R1445）+9（R1446）+10（R1447）+9（R1448）+10（R1449）= 61 → **99816 精确命中**。
+- 累计（passed）：99733 → 99794（总收集数 99755 → 99816）。
+- 第 75 次预测：R1450 后实测 `--collect-only` 99835（99755 + 61 + 19）；R1451 +12、R1452 +18 → R1452 后应为 **99847**（99825 passed + 22 skipped 预期）。另有一个 R1450 后启动的确认 run（bv7erme6m，期望 99835）在跑，落地后作为第 75 次数据点核对。
+
+---
+
+## Round 1452 — app/parsers/fallback_parser.py 边角第五十八轮（18 测试）
+
+- 文件：`tests/test_parsers_fallback_edges58.py`。
+- 新角度（聚合/分类边界，自有代码阈值首次直打）：行聚类 y 中心差恰好 3.0 → pdfplumber 自身容差把重叠文本**字符交错**成 'ABlepthaa'（bbox 高 15）；3.5 → 两行分开 'Alpha Beta'；段落边界行距恰好 18.0 同段单元素 vs 18.1 **劈两元素**；标题长度 80/81 分界；句尾 '.'/'!' 强制 paragraph；caption 正则 'Table 1. '/'Table 1 '/'figure 2:'/'Fig. 3 ' 命中、'Tab 1.' 不命中；直连 _is_caption：'表 1、'/'图2、'/'表１、'/'图3 ' 命中，**全角冒号 '：' 不在字符类** → '图2：架构' 不命中（文档化缺口）。
+- 撞墙：2 fail 首跑——(1) bbox[3] 97.98400000000004 写成 97.984；(2) '图2：架构' 想当然以为全角冒号命中，probe 证实字符类只有 [\.、:\s]。改 '图2、架构' 并新增 fullwidth_colon_gap 负测后 18 全过。
+
+---
+
+## Round 1451 — app/parsers/fallback_parser.py 边角第五十七轮（12 测试）
+
+- 文件：`tests/test_parsers_fallback_edges57.py`。
+- 新角度（页面几何，历史全部 MediaBox [0 0 612 792] 无旋转）：/Rotate 90 施加旋转变换（页面转横，bbox [697.516, 72.0, 709.516, 136.704]）；/Rotate 180/270 字符序**倒序** 'txet detatoR'（同负字号现象）；/Rotate 45 非直角**静默忽略**（与 rot0 全同，无告警）；MediaBox 非零原点 [100 50 712 842] 原点 x 被**丢弃**（bbox 与零原点全同）；偏移 MediaBox + Rotate 90 交互产生**负 y** bbox [697.516, -128.0, ...]；/CropBox 单独/与偏移 MediaBox 并存坐标**不受影响**；双页仅首页 /Rotate 90 → 逐页独立变换。
+- 撞墙：1 fail 首跑——双页用例第 2 页文本是 'Normal text'（比 'Rotated text' 短），x1 期望值误抄 136.704，实际 133.344。修正后 12 全过。
+
+---
+
 ## Round 1450 — app/parsers/fallback_parser.py 边角第五十六轮（19 测试）
 
 - 文件：`tests/test_parsers_fallback_edges56.py`。
