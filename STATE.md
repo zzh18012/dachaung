@@ -20,6 +20,12 @@
 
 ---
 
+## Round 1524 — fallback PDF 1.5 xref 流与对象流（2 测试）
+
+- 文件：`tests/test_parsers_fallback_edges94.py`（现代 PDF 生成器默认结构；此前轮次全部经典 xref 表或无 xref 靠扫描兜底；自带 struct+zlib xref 流 builder）。
+- 新角度（probe 实证）：**xref 流（/Type /XRef + FlateDecode）正常解析**（W [1 4 2] 二进制条目 + startxref 指向流对象 → 'XREFSTREAM' 照常提取、bbox 完全正常）；**对象流（/ObjStm）内压缩字体照常加载**（type-2 条目定位 → 'INOBJECTSTREAM' 正常）。
+- 构造细节：/W 字段序 [type(1) offset(4) gen(2)] → struct '>BIH'（错用 '>BHI' 字段错位会空提取）。
+
 ## Round 1523 — fallback PDF Type3 字体（3 测试）
 
 - 文件：`tests/test_parsers_fallback_edges93.py`（最后一种未测字体类型；R1515 Type1 编码重映射、R1517 Type0/CID 已测）。
