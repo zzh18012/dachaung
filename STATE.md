@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1461 — app/parsers/ipynb_parser.py 边角第十二轮（8 测试）
+
+- 文件：`tests/test_parsers_ipynb_edges12.py`。
+- 新角度（doc.metadata 摘要化 + 类型透传 + 混合计数，edges1-11 未碰过）：doc.metadata 是**扁平摘要**五键（ipynb/nbformat/nbformat_minor/cell_count/language），notebook 原始 metadata（kernelspec 对象、language_info、authors、title）**整体丢弃**；语言推断**不 str 强转**——kernelspec.language=42（int）原样进 doc.metadata 与 code cell element metadata；单 markdown cell 多块结构（heading/para/bq/list）全解析、locator 保留 cell 内 line 1/2/4/6、section_path 栈 cell 内生效全承袭 'H'；attachments 字段忽略、cell id 字段（nbformat 4.5）忽略；**cell_count=len(cells) 含被跳过的 cell**（bad str/unknown/空 code 各占计数，4 cell 1 element 3 告警）；nbformat 为字符串时 line 103 `nbformat < 4` **无类型守卫直接 TypeError**（非 ParserError）；element confidence 固定 0.95。
+- 撞墙：0 fail 首跑（8 全过）。edges10 已覆盖 cells 类型族与 int source（勿重复）。
+
+---
+
 ## Round 1460 — app/parsers/html_parser.py 边角第十五轮（14 测试）
 
 - 文件：`tests/test_parsers_html_edges15.py`。
