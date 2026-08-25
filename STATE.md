@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1589 — pipeline 行合并间距阈值 = 2.5×字号（3 测试）
+
+- 文件：`tests/test_pipeline_linemerge_threshold.py`（R1570 锁 20pt/100pt 两端——**阈值精确边界与字号缩放**零覆盖）。
+- 新角度（probe 二分实证）：**合并 ⟺ 间距 ≤ 2.5 × font_size**——fs10: 25 合并/26 分离；fs20: 50/51；fs5: 12/13，阈值随字号线性缩放。
+
+---
+
 ## Round 1588 — pipeline heading 分类的长度阈值（3 测试）
 
 - 文件：`tests/test_pipeline_heading_threshold.py`（R1571 锁短行家族行为——**阈值边界与字号无关性**零覆盖）。
