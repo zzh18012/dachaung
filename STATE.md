@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1560 — pipeline 多文件共享输出目录 + 空 DOCX 警告透传（2 测试）
+
+- 文件：`tests/test_pipeline_corpus.py`（此前 pipeline 测试全部单文件单输出——**多文件同目录**与**空 python-docx 警告进 error details** 零覆盖）。
+- 新角度（probe 实证）：**4 文件混合语料**（含图 PDF×2 / 纯文本 PDF / DOCX）写同一输出目录：全部 validate_only OK、document_id 互异、两个 images-<sha16>/ 各含一个 _p1_00.png（内容寻址互不串扰）；**空 python-docx 文档** → no_extracted_elements + details.warnings=[{code: docx_no_content}]（警告以 details 透传）。
+
+---
+
 ## Round 1559 — pipeline python-docx 标准文档结构端到端（3 测试）
 
 - 文件：`tests/test_pipeline_docx_structure.py`（'(空段落)' 进 chunk 文本已在 evaluation 层锁定——**python-docx 标准 API 混合文档**（真 Heading1 + 空段落 + 正文 + 表格）的 pipeline 层完整结构零覆盖）。
