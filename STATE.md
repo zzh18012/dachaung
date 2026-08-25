@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1554 — pipeline document_id 内容寻址 + 扩展名大小写（4 测试）
+
+- 文件：`tests/test_pipeline_identity_and_ext.py`（"doc-"+sha16 前缀约定已有单测——**文件名不参与 id** 与**扩展名大小写不敏感**零覆盖）。
+- 新角度（probe 实证）：**同字节不同文件名 → 同 document_id**（纯内容寻址）；不同字节 → 不同 id；**`.PDF` / `.Docx` 大写扩展名**不落入 unsupported_type，正常解析出元素且 source_type 正确。
+
+---
+
 ## Round 1553 — pipeline 生成式坏 DOCX 错误路径（5 测试）
 
 - 文件：`tests/test_pipeline_docx_errors.py`（`docx_open_failed` 此前只在 parser 层 pytest.raises 断言——R1548 坏 PDF 镜像的 DOCX 侧 pipeline 层零覆盖）。
