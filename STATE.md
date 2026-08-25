@@ -72,6 +72,16 @@
 
 ---
 
+## Round 1641 — pipeline Markdown 内联标记全 raw（3 测试）
+
+- 文件：tests/test_pipeline_md_inline_raw.py
+- 新角度（probe 实证）：R1640 锁 br/th——**段落内 link/code span/强调/HTML 行全部原样**零覆盖：
+  - 内联 link：'[text](http://x.com) tail' 方括号原样（与 R1620 引用式图片一致，不解析）
+  - code span 与强调：'before `code span` after' / 'some **bold** and *ital* here' 反引号与星号不剥
+  - HTML 行原样：'<div class="x">hello</div>' 整行不解析不剥属性（md 解析器不路由 html）；'start <b>bold</b> end' 混排同样保留
+
+---
+
 ## Round 1640 — pipeline HTML br 换行与 th 表头（3 测试）
 
 - 文件：tests/test_pipeline_html_br_th.py
