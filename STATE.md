@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1585 — pipeline DOCX 特殊样式与输出确定性（2 测试）
+
+- 文件：`tests/test_pipeline_docx_styles_determinism.py`（R1577 锁标题层级——**Title/Quote 家族、分页符、跨运行字节确定性**零覆盖）。
+- 新角度（probe 实证）：**Title** → heading、**Subtitle/Quote/Intense Quote** → paragraph（样式名保留）；**分页符** → 仅 '(空段落)' 段落；**同一输入两次运行** → 输出 JSON 字节级一致（无时间戳/随机量）。
+
+---
+
 ## Round 1584 — pipeline 非表格几何家族（4 测试）
 
 - 文件：`tests/test_pipeline_nontable_geometry.py`（R1583 锁超限表格——**不成格的几何**零覆盖）。
