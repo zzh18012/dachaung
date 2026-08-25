@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1567 — pipeline PDF 加密与文档级元数据（2 测试）
+
+- 文件：`tests/test_pipeline_pdf_doc_features.py`（真实世界高频两类**文档级**形态零覆盖）。
+- 新角度（probe 实证）：**加密 PDF**（trailer /Encrypt + Standard handler + 伪 O/U 键）→ doc=None + 单条结构化 pdfplumber_open_failed（exception_type=PdfminerException），不崩溃；**/Info（Title/Author/Producer）与 catalog XMP /Metadata 流** → 对 elements/chunks 完全中性（元数据不进输出、零错误）。
+
+---
+
 ## Round 1566 — pipeline PDF 页级特性家族（5 测试）
 
 - 文件：`tests/test_pipeline_pdf_page_features.py`（此前 60+ 轮 PDF 边角全聚焦**内容流**——页 dict/catalog 级特性零覆盖）。
