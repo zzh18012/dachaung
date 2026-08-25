@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1563 — pipeline 内联图片与重复绘制（2 测试）
+
+- 文件：`tests/test_pipeline_image_inline_repeat.py`（R1551-R1562 全用 XObject——两个相邻形态零覆盖）。
+- 新角度（probe 实证）：**内联图片 BI/ID/EI**（无 XObject 资源）同样被提取为 image 元素并落盘（srcsize [1,1]、不进 chunks）；**同一 XObject 一页绘制两次** → 两个 image 元素 + 两个文件 _p1_00/_p1_01（按绘制次数提取，不按内容去重）。
+
+---
+
 ## Round 1562 — pipeline 图片 XObject 声明变体（5 测试）
 
 - 文件：`tests/test_pipeline_image_edges.py`（R1551/1552 锁标准 1×1 RGB——**退化/变体声明**零覆盖）。
