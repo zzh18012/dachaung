@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1482 — app/parsers/ipynb_parser.py 边角第十五轮（5 测试）
+
+- 文件：`tests/test_parsers_ipynb_edges15.py`。
+- 新角度（probe 实证）metadata 透传不校验 + BOM/嵌套经 cell 通道（edges1-14 未碰过；nbformat 数值变体已由 edges14 锁、嵌套降级已由 md edges11 锁 md 通道，本轮锁 ipynb 通道传播）：**nbformat_minor 字符串透传**（'5' 不校验不转 int）；**kernelspec.language 数值透传**（42 直接进 element metadata.language 与 doc.metadata['language']，无类型强转）；**markdown cell 带 BOM**（'﻿# heading' 不成标题 → 单 paragraph 字面保留）；**markdown cell 嵌套 tab 列表降级**（'- tabbed' 成 paragraph line 2，外层 list_item 正常）；**坏 cell 在前好 cell 在后**（warning cell #0 + element cell_index=1 共存、cell_count=2 计数含坏 cell）。
+- 撞墙：0 fail 首跑（5 全过）。
+
+---
+
 ## Round 1481 — app/parsers/html_parser.py 边角第十九轮（8 测试）
 
 - 文件：`tests/test_parsers_html_edges19.py`。
