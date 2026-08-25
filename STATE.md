@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1471 — app/parsers/html_parser.py 边角第十七轮（9 测试）
+
+- 文件：`tests/test_parsers_html_edges17.py`。
+- 新角度（probe 实证）隐式闭合 + 罕见容器（edges1-16 未碰过；base/edges10/edges11 已锁 noscript/video/svg/button/input 等，避开）：**<p> 不隐式闭合**（'<p>one<p>two' → 合并单段 'onetwo'——html.parser 不实现 HTML 的 p 自动闭合，与 R1466 div 并段同源）；**<template> 内容照常提取**且与后续并段（'t contentvis'，template 不在 _SKIP_TAGS）；**<details>/<summary> 合并**单段；**孤儿 td/tr**（表格外）→ 纯 paragraph；**heading 内 <br>** → 空格拼接仍单 heading；**EOF 未闭合 <b>** 文本照常完整；**blockquote 双 <p> 精确合并** 'p1p2'（base 只断言 ≥1 且文本在场，未锁精确形状）；p 间纯空白**不并段**（对照 div 并段行为）。
+- 撞墙：0 fail 首跑（9 全过）。
+
+---
+
 ## Round 1470 — app/parsers/markdown_parser.py 边角第十五轮（10 测试）
 
 - 文件：`tests/test_parsers_markdown_edges15.py`。
