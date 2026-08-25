@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1476 — app/parsers/html_parser.py 边角第十八轮（9 测试）
+
+- 文件：`tests/test_parsers_html_edges18.py`。
+- 新角度（probe 实证）skip 栈阴影 + 表格自动闭合语义 + bq 内 heading 的栈效应（edges1-17 未碰过；edges14 已锁 img-in-cell 丢弃与空 cell '| --- |'，避开）：**script 内 <div> 阴影**（div 不匹配 skip 栈顶 → 连文本整段丢弃）；**嵌套 <style> 早弹**（内层开第二层 skip、首个 </style> 只弹一层，'c' 泄漏成 loose text 与 'ok' 并段 'cok'）；**未闭合 <script> 吞掉一切** → html_no_content 零 element；**</ol> 关 <ul>**（栈顶不匹配不弹但仍 flush → list_item 照发 unordered、后续段落正常）；**空 <tr>（零 cell）** → '|  |\n|  |'（分隔行也空列！）row_count 1 / col_count 0；**缺 </tr> 丢整行**（第二个 <tr> 收尾上一行后 </table> 直接弹栈，开着的 b 行静默丢失）；**缺 </td> 自动闭合** → '| a | b |' col_count 2；**bq 内 <h2> 更新 section 栈**（bq 段先发、heading 'T' 照发、后续 body 段 section_path 'T'）；**表格后 loose text** 成 paragraph。
+- 撞墙：0 fail 首跑（9 全过）。
+
+---
+
 ## Round 1475 — app/parsers/text_parser.py 边角第十三轮（8 测试）
 
 - 文件：`tests/test_parsers_text_edges13.py`。
