@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1539 — fallback PDF /Filter 链序家族（8 测试）
+
+- 文件：`tests/test_parsers_fallback_edges109.py`（此前轮次仅单 FlateDecode；真实 PDF 常见 ASCIIHex/ASCII85 包裹链式过滤器——零覆盖）。
+- 新角度（probe 实证）：**单 /ASCIIHexDecode**、**空数组 []** 正常；**⚠ 链序按数组顺序解码（非规范逆序）**：数据 hex(flate(raw)) 声明 [/ASCIIHexDecode /FlateDecode]（hex 在前）→ 正常；声明 [/FlateDecode /ASCIIHexDecode]（规范序）→ **[] + 仅 pdf_no_text_extracted**（对 hex 文本做 unflate 静默失败——规范序反而丢全部文本）；[/FlateDecode /ASCII85Decode] 同上丢失；**重复声明两次 FlateDecode**（数据压一次）丢失；**明文声明 /ASCIIHexDecode** → unhex 乱码 → word_extract_failed + no_text 双警告；**未知 /FooDecode** 同上双警告。
+
+---
+
 ## Round 1538 — fallback PDF 词内混排家族（7 测试）
 
 - 文件：`tests/test_parsers_fallback_edges108.py`（真实 PDF 常态：粗体词中切换字体/字号；此前轮次单元素内字体字号恒定）。
