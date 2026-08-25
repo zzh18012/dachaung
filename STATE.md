@@ -4,6 +4,14 @@
 
 ---
 
+## 回归基线 100118（第 78 次：0 失败；100096 passed + 22 skipped，1255s）
+
+- 预测命中：**100096 passed + 22 skipped = 100118 收集**（第 41 次连续总数命中）。
+- 含轮次：至 R1476。此后新增 R1477(5) + R1478(6) + R1479(6) + R1480(6) + R1481(8) + R1482(5) = 36。
+- 第 79 次预测：100118 + 36 = **100154 收集**（100132 passed + 22 skipped 预期）；collect-only 已实测 100154 一致。后台 bo037s3sx 运行中。
+
+---
+
 ## Round 1482 — app/parsers/ipynb_parser.py 边角第十五轮（5 测试）
 
 - 文件：`tests/test_parsers_ipynb_edges15.py`。
