@@ -72,10 +72,24 @@
 
 ---
 
+## Round 1617 — pipeline 失败路径输出不变式与句界补充（3 测试）
+
+- 文件：`tests/test_pipeline_error_output.py`（R1616 锁拆分精度——**失败时绝不落盘**与**省略号/小写句界**零覆盖）。
+- 新角度（probe 实证）：**失败不写 JSON**（chunker_failed / no_extracted_elements 时 output_path 不创建，**已有旧文件原样保留**）；**省略号单边界**（'Wait...' 整体一个句尾）；**小写句界**（'stop. next' 同样切，无大写要求）。
+
+---
+
 ## Round 1606 — pipeline 家族空输入与损坏输入（3 测试）
 
 - 文件：`tests/test_pipeline_empty_families.py`（R1605 锁 spans 偏移——**md/html/ipynb 空内容警告码**零覆盖，空家族仅 R1599 锁过 .txt）。
 - 新角度（probe 实证）：**4 个新警告码**——md_no_content / html_no_content / ipynb_no_content（嵌在 no_extracted_elements details.warnings）+ ipynb_empty_code_cell（逐空 code cell，带 cell_index，markdown 空单元不警告）；**坏 JSON .ipynb** → ipynb_invalid_json（exception_type=JSONDecodeError）；**markdown frontmatter 无特殊语义**（`---` 当水平线丢弃，夹的内容成普通段落）；head-only html → 无元素。
+
+---
+
+## 回归基线 100691（第 104 次：0 失败；100669 passed + 22 skipped，1251s）
+
+- **命中**：预测 100691 = 100669 + 22，实际 100669 passed + 22 skipped，**第 67 次连续精确命中**（含 R1606 及之前全部轮次）。
+- 下次预测：100691 + R1607(3)+R1608(3)+R1609(3)+R1610(3)+R1611(3)+R1612(3)+R1613(3)+R1614(3)+R1615(3)+R1616(3)+R1617(3) = **100724**（100702 passed + 22 skipped，collect-only 已验证）。
 
 ---
 
