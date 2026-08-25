@@ -13,12 +13,34 @@
 
 ---
 
+## 确认基线 99813（R1450 后补跑：0 失败；99835 = 99816 + 19 精确命中 R1450）
+
+- 补充后台回归（949.76s）**99813 passed + 22 skipped + 0 failed** exit=0——R1450 提交后启动（72b09d4），启动前 `--collect-only` 实测 99835，**精确命中**（连续第三十七次总数命中）。与第 74 次基线（99794）共同确认 R1444-R1450 全绿。
+
+---
+
+## Round 1454 — app/chunkers/structural.py 边角第十二轮（13 测试）
+
+- 文件：`tests/test_chunker_edges12.py`。
+- 新角度（精确贴合边界 + 句子正则盲区，edges1-11 未打过的等号两侧与 lookbehind 缺口）：双 element 累积 40+1+59 **恰好** max_chars=100 → 同 chunk（len 100、双 ids、joiner 空格不入 span、char_count=100）；+1 超限劈两 chunk；句子累积 49+1+50=100 单 piece span [0,100) vs 101 两 piece [0,49)/[50,101)（索引 49 空格在 span 外）；_SENTENCE_SPLIT_RE 盲区：'." '（引号夹在句点与空白间）lookbehind 不命中**不切句**、超长走 hard split（59+25 两 piece，whitespace/None 边界）、无丢失；CJK 无空格 '第一。第二。' 不切、'。 ' 带空格才切、多空格连续切；前导空白 + forced_char CJK 的 span [3,43)/[43,83)/[83,103) 切片重建精确；CJK 带空格累积 15+1+7>20 两 piece。
+- 撞墙：0 fail 首跑（13 全过）。命名更正：test_chunker_edges11.py 已存在（R1441 表格交互），本轮文件为 edges12。
+
+---
+
+## Round 1453 — app/parsers/fallback_parser.py 边角第五十九轮（11 测试）
+
+- 文件：`tests/test_parsers_fallback_edges59.py`。
+- 新角度（内容流结构变体，历史全单流 + 完整 BT/ET + 默认编码 + 默认 Tz）：/Contents 数组 [4 0 R 8 0 R] 两流**拼接**成一段 'First stream Second stream'（bbox 跨两行）+ 管线 chunk；缺 ET 流在 Tj 后直接结束 → 文本照出无告警；Tz 50 宽度**减半** 30.672 / Tz 200 **翻倍** 100.032 高度不变 12；WinAnsiEncoding 高位字节 <9550> → '•P' 真实映射 vs 默认 StandardEncoding 同字节 '(cid:149)P' 占位符；Tr 3 隐形文本**照常提取**（无渲染模式过滤——OCR 隐形层行为锚点）；双栏同排 y 排序阅读序**跨栏交错** 'L one R one L two R two' bbox 横跨两栏。
+- 撞墙：1 fail 首跑——Tz50 断言 (bbox[2]-bbox[0])==30.672 浮点差 30.671999...（bbox 全等断言已覆盖），删冗余子断言后 11 全过。
+
+---
+
 ## 回归基线 99794（第 74 次：0 失败；99816 = 99755 + 61 精确命中 R1444-R1449）
 
 - 后台回归（929.34s ≈ 15.5 分钟）**99794 passed + 22 skipped + 0 failed** exit=0——该 run 在 R1449 提交后（34e8efe）启动（compaction 前发出的后台任务），收集树态 99816，**精确命中**第 74 次预测（连续第三十六次总数命中）。
 - 对账：73 次总数 99755 + 13（R1444）+10（R1445）+9（R1446）+10（R1447）+9（R1448）+10（R1449）= 61 → **99816 精确命中**。
 - 累计（passed）：99733 → 99794（总收集数 99755 → 99816）。
-- 第 75 次预测：R1450 后实测 `--collect-only` 99835（99755 + 61 + 19）；R1451 +12、R1452 +18 → R1452 后应为 **99847**（99825 passed + 22 skipped 预期）。另有一个 R1450 后启动的确认 run（bv7erme6m，期望 99835）在跑，落地后作为第 75 次数据点核对。
+- 第 75 次预测：R1450 后实测 `--collect-only` 99835（已由确认基线命中）；R1451 +12、R1452 +18、R1453 +11、R1454 +13 → R1454 后应为 **99859 收集**（99837 passed + 22 skipped 预期）。
 
 ---
 
