@@ -4,6 +4,58 @@
 
 ---
 
+## 回归基线 99670（第 72 次：0 失败；99692 = 99570 + 122 精确命中 R1428-R1437）
+
+- 后台回归（名义 39820s，实际跨机器休眠 11 小时）**99670 passed + 22 skipped + 0 failed** exit=0——收集树态 = R1437/STATE 提交后（60d1dfd，R1438+ 在收集后落盘）。
+- 对账：71 次总数 99570 + 9（R1428）+10（R1429）+10（R1430）+11（R1431）+11（R1432）+11（R1433）+10（R1434）+18（R1435）+15（R1436）+17（R1437）= 122 → **99692 精确命中**（连续第三十四次总数命中，含跨休眠）。
+- 全史对账修正：70 次实际收集止于 R1421（99504 总数），71 次增量 66 = R1422-R1427 全部（此前误记为只含 R1427——预测偏差源于此，非测试数错误）。
+- 累计（总数）：99425 → 99482 → 99548 → 99670（总收集数 99504 → 99570 → 99692）。
+- 第 73 次预测：当前 rev 8246f16 `pytest --collect-only` 实测 **99755 收集**（99733 passed + 22 skipped 预期）= 99692 + 14（R1438）+8（R1439）+12（R1440）+9（R1441）+10（R1442）+10（R1443）。
+
+---
+
+## Round 1443 — app/parsers/fallback_parser.py 边角第五十轮（10 测试）
+
+- 文件：`tests/test_parsers_fallback_edges50.py`。
+- 新角度（文档级外围）：空 docx → 0 元素 + docx_no_content，管线 no_extracted_elements 错误链 details.warnings 携带原因；zip 手术注入 comments.xml + commentReference → 批注文本完全不可见无告警（同脚注家族）；元素默认值 confidence 0.95 / parent_id None / relations 恒 []；文档 metadata 恒 {'fallback': True, 'image_output_dir': None}——PDF /Info 与 docx core_properties 都不进模型。
+
+---
+
+## Round 1442 — app/parsers/fallback_parser.py 边角第四十九轮（10 测试）
+
+- 文件：`tests/test_parsers_fallback_edges49.py`。
+- 新角度（域代码 + 制表符）：w:fldSimple（内裹缓存 '7'）文本整体丢失 → '(空段落)'（paragraph.text 只读直接 w:r）；复杂域链 begin/instrText/separate/'42'/end → 缓存结果保留 '42'、域指令不留痕；w:tab → 字面 '\t'（对照 w:br '\n'、分页符无字符）。
+
+---
+
+## Round 1441 — app/chunkers/structural.py 边角第十一轮（9 测试）
+
+- 文件：`tests/test_chunker_edges11.py`。
+- 新角度（表格与 max_chars 交互）：表格元素拒绝切分——491 字符 markdown 在 mc=100/200/490/491/492 全部原样单 chunk；长文本空格优先（799 字符 mc=100 → 8×95+31，mc=200 → 4×199）；无空格长词 300×a mc=100 → 精确 100×3 硬切；表格是 chunk 孤岛（para+table+para mc=100 → 3 独立 chunk，对照纯短段落并块）。
+
+---
+
+## Round 1440 — app/parsers/fallback_parser.py 边角第四十八轮（12 测试）
+
+- 文件：`tests/test_parsers_fallback_edges48.py`。
+- 新角度（docx 嵌套表/分节/合并单元格）：cell.add_table 嵌套内表完全不可见无告警；add_section(NEW_PAGE) locator 无 section 区分（都 section 0）+ 幽灵 '(空段落)' + 索引连续；cell.merge 行向合并 → 文本进两个格位 '| A\nB | A\nB |' markdown 层重复；'(空段落)' 会参与 chunk 与真文本合并（3 元素 1 chunk）。
+
+---
+
+## Round 1439 — app/parsers/fallback_parser.py 边角第四十七轮（8 测试）
+
+- 文件：`tests/test_parsers_fallback_edges47.py`。
+- 新角度（表格检测几何变体）：re f 纯填充仍产表但空表头行 + 格内 \n 并格；re 无绘制操作符 → 无表；单列竖排规范 1×2 表；m/l 显式线段同样产表（bbox [72.0, 72.0, 272.0, 152.0]）；四种画法格内文字都是独立 heading。
+
+---
+
+## Round 1438 — app/parsers/fallback_parser.py 边角第四十六轮（14 测试）
+
+- 文件：`tests/test_parsers_fallback_edges46.py`。
+- 新角度（PDF 表格 + 多页）：re S 矩形触发 pdfplumber lines 策略 → table 元素诞生（两格并排 '| Name\nAge | Alice\n30 |'，格内 \n 连接，PDF locator 无 table_index）；文本双份（heading + table 各一份）；3×3 全框格每行一 heading + 完整 markdown 表；无矩形不产表；空矩形幽灵空表 '|  |  |'；多页 /Kids → page 1/2/3、三 chunk。
+
+---
+
 ## 回归基线 99548（第 71 次：0 失败；预测 99491 未命中，实际 99548）
 
 - 后台回归（1260.54s ≈ 21 分钟）**99548 passed + 22 skipped + 0 failed**——树态不明（收集起点晚于假设，实际比 70 次多收 66 个测试；连续总数命中纪录终止于三十三次，但 0 失败不变量保持）。
