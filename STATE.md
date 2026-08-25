@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1475 — app/parsers/text_parser.py 边角第十三轮（8 测试）
+
+- 文件：`tests/test_parsers_text_edges13.py`。
+- 新角度（probe 实证）NBSP 语义 + 三种换行混排 + id 进位（edges1-12 未碰过；edges12 已锁 VT 整行空行与 LS/NEL/PS 不切行，BOM 已由早期轮锁定，避开）：**NBSP 整行是空行**（'a\n\xa0\nb' → 两段 lines 1/3，\xa0.isspace() 为 True）；**NBSP 行内保留**（'a\xa0b' 单段原样）；**NBSP 行尾不杀行**（'a\xa0\nb' → 单段两行并入）；**纯 NBSP 文件** → text_no_content 零 element；**NBSP 混空白行**（'\t \xa0 \t'）照样分隔；**三种换行混排一个文件**（'a\r\nb\rc\n\nd' → 'a\nb\nc' line 1 + 'd' line 5，归一后统一 LF 计行）；**CRLF+CR 空行混排**（'x\r\n\r y\r\n\r\nz' → 三段 1/3/5）；**element_id 万位进位**（10001 段 → e9999 后是 e10000，:04d 不截断）。
+- 撞墙：0 fail 首跑（8 全过）。
+
+---
+
 ## Round 1474 — app/parsers/ipynb_parser.py 边角第十四轮（8 测试）
 
 - 文件：`tests/test_parsers_ipynb_edges14.py`。
