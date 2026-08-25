@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1637 — pipeline blockquote 内部惰性（3 测试）
+
+- 文件：`tests/test_pipeline_blockquote_interior.py`（R1636 锁嵌套容器——**引用内部的结构标记全部失效**零覆盖）。
+- 新角度（probe 实证）：**'>>' 仅剥一个 >**（剩 '> deep quote' 仍单层 blockquote，初版误读 probe repr 已修正）；**引用内 '#'/'- ' 不再解析**（原样文本）；**惰性延续不属于引用**（无 > 的下一行成独立普通段落）。
+
+---
+
 ## Round 1636 — pipeline HTML 块嵌套异常容器（3 测试）
 
 - 文件：`tests/test_pipeline_html_nested_blocks.py`（R1635 锁围栏变体——**td 内 h2、li 内 p、非法 p 嵌套 p**零覆盖）。
