@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1473 — app/parsers/markdown_parser.py 边角第十六轮（10 测试）
+
+- 文件：`tests/test_parsers_markdown_edges16.py`。
+- 新角度（probe 实证）CRLF 全结构 + 表格边界 + 栈语义（edges1-15 未碰过；base 只锁过 CRLF 标题/段落两例）：**CRLF 表格**全表识别、行内容归一 \n、line 1；**CRLF 列表**两个 list_item 正常；**CRLF 引用**多行 blockquote 内容 \n join（\r\n 归一后拼接）；**CRLF 围栏带语言** language='python'；**CRLF 混合结构** heading/para/list/bq 全链路、行号 1/3/5/7 精确；**标题尾随空白剥掉**（'## Title   ' → 'Title'，section_path 同步）；**同名标题不消歧**（两个 '# Same' 的 section_path 都 'Same'）；**表格前无空行**照样检测（para line 1 + table line 2，不依赖前空行）；**缺尾管道不是表**（'| a | b\n| --- | ---\n| 1 | 2' → 整块 paragraph、无告警）；**H2 后 H1 栈重置**（'## sub\n# top' → 'sub' → 'top'，弹到根非 'sub > top'）。
+- 撞墙：0 fail 首跑（10 全过）。另：仓库根 `tests/manifest.json`（75 字节空 devset 模板，今日 10:38 出现）疑似回归跑期间某测试泄漏产物，未删除未提交，留观。
+
+---
+
 ## Round 1472 — app/parsers/fallback_parser.py 边角第六十三轮（8 测试）
 
 - 文件：`tests/test_parsers_fallback_edges63.py`。
