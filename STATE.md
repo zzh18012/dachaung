@@ -2,6 +2,11 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1528 — fallback PDF 水印叠印家族（4 测试）
+
+- 文件：`tests/test_parsers_fallback_edges98.py`（真实 PDF 水印场景；R1483 同位叠印为同字号，本轮是大字号跨行盒叠加）。
+- 新角度（probe 实证）：**同基线大字号水印并成一元素**（BODY TEXT 12pt + DRAFT 48pt 同 y → 'DRAFT BODY TEXT' 单元素、bbox 高 48pt 跨两字号行盒）；**半行偏移水印同样合并**；**⚠ 远距大字号仍并一元素**（水印 y=600 视觉分离 → 'BODY DRAFT' 单元素 bbox 跨 119pt——大字号行盒使 pdfplumber 行分组阈值失效）；**删除线矩形无副作用**（re S 描边不影响文本）。
+
 ## Round 1527 — fallback PDF Unicode/空格文件名（4 测试）
 
 - 文件：`tests/test_parsers_fallback_edges97.py`（Windows GBK 环境真实边角；此前轮次文件名全 ASCII 单层）。
