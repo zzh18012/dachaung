@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1562 — pipeline 图片 XObject 声明变体（5 测试）
+
+- 文件：`tests/test_pipeline_image_edges.py`（R1551/1552 锁标准 1×1 RGB——**退化/变体声明**零覆盖）。
+- 新角度（probe 实证）：**0×0 尺寸**、**DeviceGray 2×2**、**ImageMask**、**截断像素数据**（声明 RGB 只有 1 字节）、**100000×100000 声明尺寸**全部：零错误、srcsize 照抄声明值、extracted_to_disk=True、PNG 真实落盘非空。huge-dims 不炸（区域渲染按页面放置矩形走，不按原生分辨率分配位图）。
+
+---
+
 ## Round 1561 — CLI 图片流程端到端（1 测试）
 
 - 文件：`tests/test_cli_image_flow.py`（CLI 测试全部纯文本样例——**图片 PDF 经 parse 子命令 → images-<sha16>/ 真实创建 → validate 子命令通过**的子进程级流程零覆盖；pipeline 层 R1551/1552 已锁，本轮锁 CLI 进程边界）。
