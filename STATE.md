@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1613 — pipeline max_chars 下限 32 与 heading×list 累积（3 测试）
+
+- 文件：`tests/test_pipeline_maxchars_floor.py`（R1612 锁 flush 交互——**max_chars < 32 一律 ValueError**零覆盖，R1581 的 max_chars=5 失败实为此下限）。
+- 新角度（probe 实证）：**下限边界 31 失败/32 通过**（源码 structural.py:280 `if max_chars < 32 raise`）；**与内容长度无关**（1 字符 heading 在 max_chars=10 也失败）；**heading 累积跨 list**（'# Head'+列表 → 'Head a b' 单 chunk 3 个 source id）。
+
+---
+
 ## Round 1612 — pipeline 分块 flush 交互：heading×table、图片旁路（3 测试）
 
 - 文件：`tests/test_pipeline_flush_interplay.py`（R1611 锁家族交互——**heading 累积被 table 打断、image 元素被分块旁路**零覆盖）。
