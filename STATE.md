@@ -81,6 +81,17 @@
 
 ---
 
+## Round 1652 — pipeline pre>code/硬换行/嵌套引用/字符串 code（3 测试）
+
+- 文件：tests/test_pipeline_micro_edges.py
+- 新角度（probe 实证）：R1651 锁引用内围栏——**pre 内 code 透明、行尾双空格保留、html 嵌套引用单层化、code 单元字符串 source**零覆盖：
+  - '<pre><code>'：code 标签透明，仍 kind 'preformatted'
+  - 硬换行空格保留：'a  
+b' 行尾两空格不剥（strip 只作用于元素首尾，不逐行）
+  - html 嵌套 blockquote：单层化成单个 blockquote 段（与 md '>>' 只剥一层对应）；code 单元字符串 source 'print(9)' 照常接受
+
+---
+
 ## Round 1651 — pipeline 引用内围栏/连续标题分块/无竖线表（3 测试）
 
 - 文件：tests/test_pipeline_bq_fence_headings.py
