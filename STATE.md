@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1647 — pipeline text_no_content 与 img 容器内（3 测试）
+
+- 文件：tests/test_pipeline_text_empty_img_containers.py
+- 新角度（probe 实证）：R1646 锁 caption/figcap——**text 空/纯空白、img 进 li/td 容器行为**零覆盖：
+  - text_no_content（第 7 个家族警告码）：空与纯空白 .txt → no_extracted_elements，嵌套 warning code='text_no_content'（reason '空文件或仅含空白'）
+  - li 内 img 破坏 list_item：img 独立成 image，剩余文本成普通 paragraph（不再有 list_item）
+  - td 内 img 静默丢弃：单元格成空 '|  |'，img 不出现（对照 td 内 h2 拍平成文本，img 连文本都不是）
+
+---
+
 ## Round 1646 — pipeline caption 丢弃/figcaption 成段/bq 分段（3 测试）
 
 - 文件：tests/test_pipeline_caption_bq_sep.py
