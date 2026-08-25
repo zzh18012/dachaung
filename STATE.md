@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1601 — pipeline Markdown 结构家族：层级/引用/分隔线（2 测试）
+
+- 文件：`tests/test_pipeline_markdown_structure.py`（R1598/1599 锁 raw 与列表——**ATX 层级、blockquote、水平线**零覆盖）。
+- 新角度（probe 实证）：**ATX #..######** → heading {'level': 1..6}；**blockquote** → paragraph {'kind': 'blockquote'}（'>' 剥除）；**水平线 ---** → 完全丢弃；**行内强调**（**bold**/*italic*）→ 原样保留。另探明 kreuzberg 启发式回退（_kreuzberg_heuristic/placeholder locator、DOCX quality 1.0 vs PDF 0.1）已被 parser 级测试覆盖，未另开轮。
+
+---
+
 ## Round 1600 — pipeline ipynb 单元格家族（3 测试）
 
 - 文件：`tests/test_pipeline_ipynb_cells.py`（R1599 锁列表元数据——**ipynb 输出丢弃、raw 单元、单元内 markdown、语言元数据**零覆盖）。
