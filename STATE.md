@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1465 — app/parsers/markdown_parser.py 边角第十四轮（9 测试）
+
+- 文件：`tests/test_parsers_markdown_edges14.py`。
+- 新角度（probe 实证）标题合法性 + 引用定义 + 强调 vs 分隔（edges1-13 未碰过；base 已覆盖 marker 混排/thematic 纯行/html block，edges10 已覆盖脚注与 &nbsp; 实体，本轮避开）：**# 后无空格不是标题**（'#Heading no space' → paragraph 字面）；**空标题降级**（'# ' → paragraph '#'）；**链接引用定义不解析**（'[ref]: http://x' 独立成段、正文 '[ref]' 也字面，两段互不相认）；删除线 '~~gone~~' 字面；***text*** **带文字时不是 thematic break**（强调标记字面 paragraph，纯 '***' 行才是 break）；**缩进 pipe 表仍是表**（每行 2 空格前缀 e2e 全表解析成功且输出归一去缩进——base 只测过行级 RE）；原生 NBSP 字符 \xa0（非实体）保留在内容；列表后无空行直接跟正文 → item 与 paragraph 各自成 element（非缩进不算续行）。
+- 撞墙：0 fail 首跑（9 全过）。
+
+---
+
 ## Round 1464 — app/chunkers/structural.py 边角第十三轮（7 测试）
 
 - 文件：`tests/test_chunker_edges13.py`。
