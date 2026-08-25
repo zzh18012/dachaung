@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1498 — markdown 混合标记/下划线与 tab 位置（7 测试）
+
+- 文件：`tests/test_parsers_markdown_edges20.py`。
+- 新角度（probe 实证）：**三种无序标记混排**（'- a / * b / + c' → 三个独立 list_item、marker 统一 'unordered'，标记差异不进元素）；**无序→有序切换**（'- a\n1. b' → ordered 正确切换）；**混合 setext 下划线不成标题**（'Title\n=-=' / 'Title\n-=-' → 合并 paragraph，setext RE 只认单字符纯下划线，'-=-' 含 = 亦非 thematic break）；**'-\titem' tab 做分隔**（标记后 tab 照常）；**'#\tHead' tab 做分隔**（ATX 照常）；**表格 cell 内 tab 逐字保留**。
+- 撞墙：0 fail 首跑（7/7）。paren 有序列表已由主文件 RE 级测试覆盖，跳过避免重复。
+
 ## Round 1497 — fallback PDF 退化文本状态参数（9 测试）
 
 - 文件：`tests/test_parsers_fallback_edges74.py`。
