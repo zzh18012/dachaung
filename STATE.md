@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1573 — pipeline 跨页表格与遮挡文本（2 测试）
+
+- 文件：`tests/test_pipeline_page_scoped.py`（表格检测均在单页内构造——**跨页拆分表格**与**被矩形覆盖的文本**零覆盖）。
+- 新角度（probe 实证）：**表格跨页拆分**（每页 1 行）→ 两个独立 table 元素（检测按页作用域、不跨页合并）、各带 markdown、页序保持；**文本被后绘制的填充矩形覆盖** → 仍然提取（向量提取无视 z-order 视觉遮挡）、零错误。
+
+---
+
 ## Round 1572 — pipeline id 连续性扫描（5 测试）
 
 - 文件：`tests/test_pipeline_id_continuity.py`（chunker 单测锁过单个 id 形态——pipeline 层**全家族 id 连续性**零覆盖）。
