@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1645 — pipeline HTML 属性透明与 pre 首尾 strip（3 测试）
+
+- 文件：tests/test_pipeline_html_attrs_pre.py
+- 新角度（probe 实证）：R1644 锁标题空格——**元素属性全丢、pre 内部空白保留但首尾 strip**零覆盖：
+  - h2/ul/li 带属性：id/class/data-* 全部丢弃，只留文本
+  - pre 首行缩进剥除：'  indented' → 'indented'；中间行 '    more' 缩进保留；尾部空格剥除（kind 'preformatted'）
+
+---
+
 ## Round 1644 — pipeline Markdown 标题空格边界（3 测试）
 
 - 文件：tests/test_pipeline_md_heading_space.py
