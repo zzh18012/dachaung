@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1544 — fallback PDF 图形状态算子中性+深度堆栈（8 测试）
+
+- 文件：`tests/test_parsers_fallback_edges114.py`（gs/rg/g/k/cs/w/d 等算子对**提取**的影响——零覆盖）。
+- 新角度（probe 实证）：**gs 有效/悬空引用**、**全套颜色算子**（rg/RG/g/k/cs/scn）、**全套描边算子**（w/d/J/j/M/ri/i）全部中性（bbox 同基线零警告）；**100 层 q/Q 嵌套**照常；**q+cm 100× 缩放**文本被放大（bbox x 达 7200..10600.8——平衡的 q/Q 不撤销文本期内变换）；**嵌套 BT/BT** 容忍；**3 个未恢复 q** 照常。
+
+---
+
 ## Round 1543 — fallback PDF 文件头/尾变体（6 测试）
 
 - 文件：`tests/test_parsers_fallback_edges113.py`（R1530 垃圾家族测过整体垃圾；本轮是**头部前后缀与尾部 %%EOF 的边界**——零覆盖）。
