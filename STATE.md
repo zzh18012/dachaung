@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1625 — pipeline 非 UTF-8 输入的宽容解码（2 测试）
+
+- 文件：`tests/test_pipeline_encoding_lenient.py`（R1624 锁 BOM/CRLF——**编码错误从不抛出**零覆盖，此前全部测试用 UTF-8）。
+- 新角度（probe 实证）：**UTF-16 文件不报错**（BOM 两字节成两个替换符，内容成 NUL 交错形态仍单段落）；**latin-1 高位字节 → � 替换**（无 encoding 错误码，md heading 仍识别）；解码为 errors='replace' 语义。教训：U+FFFD 字面量在工具链中反复丢失，测试用 chr(0xFFFD) 构造。
+
+---
+
 ## Round 1624 — pipeline BOM/CRLF × 家族结构识别（3 测试）
 
 - 文件：`tests/test_pipeline_bom_crlf_structural.py`（R1623 锁行分隔符——**BOM 对结构识别的破坏、CRLF 无害性**零覆盖）。
