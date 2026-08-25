@@ -13,6 +13,22 @@
 
 ---
 
+## Round 1456 — app/parsers/html_parser.py 边角第十四轮（19 测试）
+
+- 文件：`tests/test_parsers_html_edges14.py`。
+- 新角度（跨标签交互，edges1-13 未碰过）：**未闭合 <tr> 整表消失**（`<table><tr><td>a<td>b</table>` → 0 元素 + html_no_content，开行缓冲在 </table> 被丢弃；补 </tr> 正常）；同种嵌套 <pre><pre> 文本合并单 preformatted 'outerinnertail'；<pre> 内 <blockquote> 把 pre 提前 flush 成三段（code/quote/more 无 kind）；<blockquote> 内 <p> 忽略；表格内 <img> 丢失（空单元格）、<br> 不加空格 'ab'、内联标签拼接 'bold rest'；空 src 跳过；孤儿 <li> unordered、<ul> 嵌 <ol> 内层 ordered=True；游离 </p> 提前封口 loose 段；大写标签正常；&nbsp; → \xa0 保留；<script> 内字面 '<script>' 嵌套 skip 栈存活；表格承袭 section_path；纯表头 row_count=1；th/td 无区分。
+- 撞墙：0 fail 首跑（19 全过）。
+
+---
+
+## Round 1455 — app/parsers/markdown_parser.py 边角第十二轮（17 测试）
+
+- 文件：`tests/test_parsers_markdown_edges12.py`。
+- 新角度（围栏不对称 + section_path 栈 + 表格分隔行变体）：缩进围栏不被识别（开栏用原始 line、关栏却 strip）→ '   ```' 并入段落且后续 ``` 开空栏 + md_empty_code_block 告警；4 反引号栏内 3 反引号行会关栏、尾随 ```` 再开空栏；关栏行带尾随文本整行吞掉；~~~ 栏内 ``` 行是代码内容；section_path 栈跳跃 H1→H4→H2 弹栈正确、栏内 ## 不影响；**单列 pipe 表不是表**（分隔行正则要求 ≥2 列）整块并入 paragraph；':---:' 冒号容忍并规范化；参差行补空列；BOM 杀死标题识别；空 blockquote 静默消失（line=3 保留）；空 alt 图片合法；URL 带括号字面 paragraph；'10)'/'123.' 多位有序号；####### 七号非标题；'## Title ##' 尾井号剥掉；'- - -' 带空格主题分隔符。
+- 撞墙：0 fail 首跑（17 全过）。
+
+---
+
 ## 确认基线 99813（R1450 后补跑：0 失败；99835 = 99816 + 19 精确命中 R1450）
 
 - 补充后台回归（949.76s）**99813 passed + 22 skipped + 0 failed** exit=0——R1450 提交后启动（72b09d4），启动前 `--collect-only` 实测 99835，**精确命中**（连续第三十七次总数命中）。与第 74 次基线（99794）共同确认 R1444-R1450 全绿。
