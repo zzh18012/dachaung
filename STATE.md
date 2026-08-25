@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1552 — pipeline 图片路径策略变体（4 测试）
+
+- 文件：`tests/test_pipeline_image_variants.py`（R1551 锁标准路径下的图片落盘；**output_path 缺失 / write_json=False / 多图 / 重跑**策略零覆盖）。
+- 新角度（probe 实证）：**output_path=None** → resource_path 为哨兵 `'(unrendered)'`（fallback_parser.py:377 `resource_path or "(unrendered)"`）、extracted_to_disk=False、tmp 目录零残留；**output_path 给定但 write_json=False** → 图片**仍**落盘到输出旁 images-<sha16>/ 而 JSON 不写（落盘只跟 output_path 走）；**同页两图** → `_p1_00.png`/`_p1_01.png` 顺序编号；**同输出重复运行** → 目录内容不增长（幂等）。
+
+---
+
 ## Round 1551 — pipeline 图片落盘端到端集成（3 测试）
 
 - 文件：`tests/test_pipeline_image_integration.py`（`images-<sha16>/` 命名与 `extracted_to_disk` 此前各有单测/parser 层测试——**真实 PDF 图片 → process_single → 目录/文件真正出现在输出 JSON 旁 → JSON 不变量 → 图片不进 chunks** 的完整链路零覆盖）。
