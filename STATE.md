@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1534 — fallback PDF 表格检测×绘图算子（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges104.py`（表格轮 R1531/R1533 全用 `re S` 描边；填充式单元格网格为真实 PDF 常见形态——零覆盖）。
+- 新角度（probe 实证）：**仅填充 re f / 奇偶 f\* / 填充+描边 B / 混合行（上行 S 下行 f）→ 表格全部照常检出**（2 个 1×2 表、内容/bbox 与描边完全一致——填充矩形同样驱动检测，非静默丢表）；**闭合路径线段网格 m/l/l/l/h S 与 re 完全等价**（检测只看几何不看成因）；**⚠ 左列格子只剩竖边 + 右列完整 → 0 表**：文本照常提取但表格整体无声丢失（残缺边框毒化整片检测）、零警告。
+
+---
+
 ## Round 1533 — fallback PDF 线性化布局/前向 /Prev 链（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges103.py`（R1532 锁的是经典**向后** /Prev；真实线性化 PDF 是 startxref 指向**头部**首页 xref、其 trailer 带 /Root 且 /Prev **指向前方**尾主 xref——零覆盖）。
