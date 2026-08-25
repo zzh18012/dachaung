@@ -4,6 +4,13 @@
 
 ---
 
+## Round 1506 — fallback DOCX 图片保存失败分支（2 测试，警告码审计）
+
+- 文件：`tests/test_parsers_fallback_edges77.py`。
+- 方法：**警告码覆盖审计**——grep app/ 全部 39 个 warning code → 逐码 grep tests/，`docx_image_save_failed` 是唯一 0 文件命中的码（其余 38 码均有覆盖）。
+- 新角度（probe 实证）：触发方式 image_output_dir 指向普通文件（mkdir 到文件内 → OSError）；**docx_image_save_failed 告警**（reason '图片保存失败 rId=rId20:' + details {rid, paragraph_index}）；**图片回退 '(unsaved)'**（extracted_to_disk=False）；段落不受影响。成功写盘路径已由 edges14 锁（文件名 pattern/bytes/True）。
+- 撞墙：0 fail 首跑（2/2）。
+
 ## Round 1505 — fallback DOCX footnotes/header 多 part 丢内容（3 测试）
 
 - 文件：`tests/test_parsers_fallback_edges76.py`（新增多 part docx 支架：footnotes.xml + header1.xml + rels + content-types Override）。
