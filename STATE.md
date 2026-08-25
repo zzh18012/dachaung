@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1584 — pipeline 非表格几何家族（4 测试）
+
+- 文件：`tests/test_pipeline_nontable_geometry.py`（R1583 锁超限表格——**不成格的几何**零覆盖）。
+- 新角度（probe 实证）：**纯对齐文本**（3×3 无矩形）→ 不识别表格、每视觉行一个 heading；**曲线 + 虚线矩形**、**单矩形**、**嵌套同心矩形** → 均无表格无图形元素、仅文本。表格检测要求真网格（≥2×2 相交线）。
+
+---
+
 ## Round 1583 — pipeline 超限表格 markdown 的分块豁免（2 测试）
 
 - 文件：`tests/test_pipeline_table_oversize.py`（R1570 锁段落累积、R1559 锁表格基础——**表格 markdown 超过 max_chars** 交互零覆盖）。
