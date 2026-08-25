@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1489 — html 空元素安全边界（8 测试）
+
+- 文件：`tests/test_parsers_html_edges20.py`。
+- 新角度（probe 实证）markdown 崩溃家族的 html 对照面：**html 空元素全部安全不崩**——'<h1></h1>' / '<h1>   </h1>' / 空 bq / 空 pre / '<table></table>' 均不产元素（仅文件级 html_no_content）；**空 li 跳过兄弟保留**（'b' 带 marker 元数据）；**空 p 跳过且无告警**（后续有内容即不告警）；**img 空 alt 仍产 image**（content=None + resource_path='x.png' + alt=''）；**空 h2 夹在真内容间不可见**（不打扰 section 栈）；**嵌套空 bq 塌缩**（'<blockquote><blockquote></blockquote>x' → 单段 'x' kind=blockquote）。
+- 撞墙：0 fail 首跑（8/8）。html 侧无 markdown 式空 content 崩溃路径，崩溃家族到 html 为止。
+
 ## Round 1488 — markdown 表格相邻与分隔行语义（6 测试）
 
 - 文件：`tests/test_parsers_markdown_edges19.py`。
