@@ -81,6 +81,19 @@
 
 ---
 
+## Round 1649 — pipeline 相邻表格与 md 单列表不识别（3 测试）
+
+- 文件：tests/test_pipeline_adjacent_tables.py
+- 新角度（probe 实证）：R1648 锁围栏语言——**相邻 html 表各自 isolated、md 管道表需 ≥2 列、'--- x' 非 hr**零覆盖：
+  - 相邻 html 表：两个 table 元素 → 各自 isolated_table chunk（一对一 id，不合并）
+  - md 单列表：'| a |
+| --- |
+| one |' 是 paragraph 不是 table（有无数据行皆然）——管道表检测要求 ≥2 列
+  - 仅表头+分隔行的 2 列表：成 table（row_count 1 含表头，source 'markdown_pipe_table'，与 html 'html_table' 区分）；'--- x' 带 x 非 hr，lazy 并入上段 'T
+--- x'
+
+---
+
 ## Round 1648 — pipeline 围栏语言字符集与链接定义原样（3 测试）
 
 - 文件：tests/test_pipeline_fence_lang_defs.py
