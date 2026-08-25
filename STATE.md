@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1628 — pipeline Markdown 管道表边角：对齐/参差/分隔必需（3 测试）
+
+- 文件：`tests/test_pipeline_md_table_edges.py`（R1627 锁 html 孤儿标签——**md 表格对齐冒号、参差行补空、无分隔行**零覆盖）。
+- 新角度（probe 实证）：**对齐标记不识别**（'|:--|:-:|--:|' 不匹配分隔行 → 整块段落 raw）；**参差行补空**（短行补到最大列数、col_count=3）；**分隔行必需**（无 '| --- |' 的两行管道 → 段落 raw）。
+
+---
+
 ## Round 1627 — pipeline HTML 容错标记与孤儿标签（3 测试）
 
 - 文件：`tests/test_pipeline_html_orphans.py`（R1626 锁包装透明——**doctype/注释/未闭合标签、孤儿 li/td/tr、嵌套表格**零覆盖）。
