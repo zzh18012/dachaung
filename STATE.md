@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1618 — pipeline 成功路径警告序列化（3 测试）
+
+- 文件：`tests/test_pipeline_success_warnings.py`（R1617 锁失败路径——**成功但有警告**（空 code cell 夹在真实单元中间）零覆盖）。
+- 新角度（probe 实证）：**doc.warnings 非空而 errors 空**（每个空 code cell 一条 ipynb_empty_code_cell，cell_index 保原始索引）；**JSON warnings 完整序列化**（code/reason/details，errors 仍 []）；**cell_count 计所有单元**（含空）；干净成功时 warnings []。
+
+---
+
 ## Round 1617 — pipeline 失败路径输出不变式与句界补充（3 测试）
 
 - 文件：`tests/test_pipeline_error_output.py`（R1616 锁拆分精度——**失败时绝不落盘**与**省略号/小写句界**零覆盖）。
