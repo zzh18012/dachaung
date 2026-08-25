@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1624 — pipeline BOM/CRLF × 家族结构识别（3 测试）
+
+- 文件：`tests/test_pipeline_bom_crlf_structural.py`（R1623 锁行分隔符——**BOM 对结构识别的破坏、CRLF 无害性**零覆盖）。
+- 新角度（probe 实证）：**BOM 破坏 md heading**（'﻿# Title' ATX 前缀被粘 → 段落 raw）；**CRLF 无害**（md/html 下 heading/段落识别正常）；**html 的 BOM 成独立段落**（'﻿' 文本节点自成一 paragraph 排在 heading 前）。
+
+---
+
 ## Round 1623 — pipeline 行分隔符归一：孤立 CR、\f、 、\x85（3 测试）
 
 - 文件：`tests/test_pipeline_line_separators.py`（R1622 锁空白家族——**非 \n 行分隔符**零覆盖）。
