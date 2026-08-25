@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1598 — pipeline Markdown 解析器：raw 保留家族（3 测试）
+
+- 文件：`tests/test_pipeline_markdown_family.py`（R1597 锁 html——**markdown 行内语法不做转换**与图片/表格细节零覆盖）。
+- 新角度（probe 实证）：**行内 raw**：链接 `[t](url)` 原样、setext 下划线成段原样、HTML 实体不解码、围栏代码语言丢弃；**图片**：content=None、resource_path=src、alt 进 metadata、不产 chunk；**管道表格**：table + isolated_table。
+
+---
+
 ## Round 1597 — pipeline HTML 解析器元素与分块家族（2 测试）
 
 - 文件：`tests/test_pipeline_html_family.py`（R1596 锁 locator——**html 的 img/表格/列表**在 pipeline 层零覆盖）。
