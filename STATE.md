@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1462 — app/parsers/text_parser.py 边角第十二轮（10 测试）
+
+- 文件：`tests/test_parsers_text_edges12.py`。
+- 新角度（非 LF 换行系字符全不是行分隔，edges1-11 未碰过；实证实现按 \n/\r 切而非 str.splitlines）：\v（0x0B）/ \f（0x0C）/ NEL（0x85）/ LS（U+2028）/ PS（U+2029）/ FS（0x1C）/ GS（0x1D）夹在文本中间**留在内容里**、行号 1、单 paragraph（splitlines 会切的这些都不切）；混合 'a\vb\fc' 一整段保留；但**整行只有 \v** 按含空白空行算分隔行且计入行号（'a\n\v\nb' → b line 3）；内容带真 \n 时多行段落 join 首行行号（'x \n y' 单段原样）；_split_paragraphs 直连 LS/VT/FS 各单 tuple。
+- 撞墙：0 fail 首跑（10 全过）。
+
+---
+
 ## Round 1461 — app/parsers/ipynb_parser.py 边角第十二轮（8 测试）
 
 - 文件：`tests/test_parsers_ipynb_edges12.py`。
