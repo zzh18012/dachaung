@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1483 — app/parsers/fallback_parser.py 边角第六十六轮（7 测试）
+
+- 文件：`tests/test_parsers_fallback_edges66.py`。
+- 新角度（probe 实证）字号退化 + 奇长度十六进制 + 同位叠印 + 空白位移（edges1-65 未碰过；edges55 已锁 Tf 0 点 bbox 与 Tf 负镜像、edges56 已锁偶长度 hex 与 \( \) 转义、edges30 已锁八进制与 () 空串、edges35 已锁常规 hex，避开）：**奇长度十六进制串**（'<414>' → 'A(cid:4)'，尾巴半字节解成不可映射 CID 占位符——edges56 的 (cid:) 由 \t 触发，此处奇 hex 不同入口）；**Tf 1 微字号**（bbox 高度精确 1.0）；**Tf 12.5 小数**（高度 12.5）；**同行混字号**（12pt + 24pt 同 y → 'SMALL24 big'、bbox 跨 772.968-796.968）；**同位叠印**（'dup' 两次同位 → 'dduupp' 重叠字符 x 排序交织）；**纯空格 Tj**（无元素 + pdf_no_text_extracted）；**空格位移**（前导空格推 x0 至 10.008、内容只剩 'real'）。
+- 撞墙：0 fail 首跑（7 全过）。
+
+---
+
 ## 回归基线 100118（第 78 次：0 失败；100096 passed + 22 skipped，1255s）
 
 - 预测命中：**100096 passed + 22 skipped = 100118 收集**（第 41 次连续总数命中）。
