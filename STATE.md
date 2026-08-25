@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1508 — fallback PDF Td 相对累计 vs Tm 绝对重置（3 测试，解释修正）
+
+- 文件：`tests/test_parsers_fallback_edges78.py`。
+- 新角度（probe 实证 + **修正 R1494/R1495 的解释误差**）：**连续 Td 是相对位移（累计）**——同一 BT 内 '72 700 Td' 后再 '72 650 Td' → 第二行绝对 y=1350（不是 650！），超出 MediaBox → bbox y 为负（-567.52），第二行先出；**Tm 是绝对重置**（'1 0 0 1 72 650 Tm' → 真 y=650，顺序正常）；**负 delta Td**（'0 -50 Td'）正常下一行。R1494 tr3 顺序倒置与 R1495"页内 y 升序"实为**自上而下阅读顺序**——当时探针的连续 Td 把第二行放到比预期高 650pt 处，observables 不变、仅因果解释更正。
+- 撞墙：0 fail 首跑（3/3）。
+
 ## Round 1507 — chunker image content 静默丢弃（4 测试，strategy 值审计）
 
 - 文件：`tests/test_chunker_edges16.py`。
