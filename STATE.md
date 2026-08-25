@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1608 — pipeline Markdown 结构边角：setext/嵌套/超长代码（3 测试）
+
+- 文件：`tests/test_pipeline_md_structure_edges.py`（R1607 锁 html 列表表格——**setext 不对称、缩进子列表、超长围栏代码**零覆盖，R1598 只锁 type+content）。
+- 新角度（probe 实证）：**setext 不对称**——`====` 不识别（下划线留在段落里）、`------` 当水平线丢弃；**缩进子列表不解析**（2 空格 `- inner` → paragraph 保留原始 '- ' 标记）；**围栏代码块 metadata** {'kind': 'code_block', 'language': 'python'}（语言保留）+ 超长代码同样硬拆（798/220，chunk1 恰含 47 行）。
+
+---
+
 ## Round 1607 — pipeline HTML 列表/表格/行内家族（3 测试）
 
 - 文件：`tests/test_pipeline_html_lists_tables.py`（R1606 锁空输入——**html 的 ol 属性、嵌套列表、thead/tbody、colspan、链接、dl** 零覆盖）。
