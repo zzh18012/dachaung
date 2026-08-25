@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1551 — pipeline 图片落盘端到端集成（3 测试）
+
+- 文件：`tests/test_pipeline_image_integration.py`（`images-<sha16>/` 命名与 `extracted_to_disk` 此前各有单测/parser 层测试——**真实 PDF 图片 → process_single → 目录/文件真正出现在输出 JSON 旁 → JSON 不变量 → 图片不进 chunks** 的完整链路零覆盖）。
+- 新角度（probe 实证）：1×1 DeviceRGB 图片 XObject 端到端 → element.content=None、resource_path 为**绝对路径**（probe 前未文档化：以 `images-<sha16>\image_<sha16>_p1_00.png` 结尾）、PNG 文件真实落盘、metadata srcsize=[1,1] extracted_to_disk=True；chunks 仅 ['BODY']（图片不产生文本块）；写盘 JSON 中图片元素 content null + resource_path 非空（schema anyOf 在磁盘产物上成立）。
+
+---
+
 ## Round 1550 — parse/pipeline 确定性与幂等性（3 测试）
 
 - 文件：`tests/test_pipeline_determinism.py`（新不变量轴：此前 100+ 轮全部验证**单次**行为——输出可复现性零覆盖）。
