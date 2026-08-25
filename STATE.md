@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1644 — pipeline Markdown 标题空格边界（3 测试）
+
+- 文件：tests/test_pipeline_md_heading_space.py
+- 新角度（probe 实证）：R1643 锁 ipynb extras——**'#' 后无空格、裸井号、井号+空格+空**零覆盖：
+  - '#Nospace heading'：井号后必须有空格才是标题，否则整行原样段落
+  - 裸 '###'：无标题文本 → 段落 '###'（不产出空标题）
+  - '# '（井号空格空）：strip 后剩 '#'，段落 '#'；'# mid' 在文档中部照常成 heading level 1
+
+---
+
 ## Round 1643 — pipeline ipynb outputs/attachments 全忽略（3 测试）
 
 - 文件：tests/test_pipeline_ipynb_extras.py
