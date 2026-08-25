@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1568 — pipeline 分块不丢不重扫描（8 测试）
+
+- 文件：`tests/test_pipeline_noloss_sweep.py`（R1547 对 4 种异形输入做过不丢不重——本轮把本 stretch 新建的**全生成器家族**（plain/长段拆分/表格/图片/50 图/多页/CJK/mixed DOCX）一次扫过）。
+- 新角度（probe 实证）：8 类文档端到端 max_chars=100 下：errors==[]、chunks 非空、source_element_ids 全非空、**每个非 image 元素的 normalize 后文本出现在 chunk 拼接中**（紧拼接或空格拼接任一——分块边界允许丢弃空白分隔符；图片被 chunker 丢弃为已知行为）。诊断发现：CJK 长段 3 块切分字符级零丢失（280 = 100+100+80）。
+
+---
+
 ## Round 1567 — pipeline PDF 加密与文档级元数据（2 测试）
 
 - 文件：`tests/test_pipeline_pdf_doc_features.py`（真实世界高频两类**文档级**形态零覆盖）。
