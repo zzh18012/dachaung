@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1610 — pipeline ipynb 单元格边角（3 测试）
+
+- 文件：`tests/test_pipeline_ipynb_cell_edges.py`（R1609 锁 pre 拆分——**单元格内代码围栏、字符串形态 source、未知 cell_type**零覆盖）。
+- 新角度（probe 实证）：**markdown 单元内代码围栏** → code_block kind + language（单元用完整 md 语法）；**source 纯字符串**正常解析；**未知 cell_type** → 第 5 个新警告码 ipynb_unknown_cell_type（details 带 cell_index/cell_type）+ ipynb_no_content。
+
+---
+
 ## Round 1609 — pipeline 多行引用与超长 pre 拆分（3 测试）
 
 - 文件：`tests/test_pipeline_pre_blockquote_split.py`（R1608 锁 md 结构边角——**blockquote 多行、含换行内容的词界拆分、pre 内嵌标签**零覆盖）。
