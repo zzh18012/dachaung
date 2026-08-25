@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1484 — app/parsers/markdown_parser.py 边角第十八轮（6 测试）
+
+- 文件：`tests/test_parsers_markdown_edges18.py`。
+- 新角度（probe 实证）空标题崩溃 + 转义管道不处理 + bq 内围栏 + setext 尾巴（edges1-17 未碰过；edges12 已锁 '## Title ##' 闭合序列、edges10 已锁实体/HTML 字面、edges14 已锁 '#Heading' 无空格标题，避开）：**⚠ 发现 bug：纯 '#' + 空白标题 → ValueError 崩溃穿透**（'#   \n' 与 '###   \n' 都命中 ATX RE、strip 后空 title → Element 校验 ValueError 直接穿透 parse，非 ParserError；本轮按现状 pytest.raises 锁定，待修复——push 前应跳过空标题）；**'###' 无空格不成标题**（整块 paragraph 字面）；**'\|' 转义管道不处理**（单元格在 '\|' 处被切开 → 表格拓宽 3 列、数据行补空）；**bq 内围栏字面**（'> ```' 不开围栏 → blockquote 内容 '```\nx=1\n```' 字面）；**setext 下划线带尾巴不成标题**（'--- extra' → 整块 paragraph）；**列表标记无空格**（'-item'/'*item' → paragraph 字面）。
+- 撞墙：probe 首跑即踩崩溃（space_only_heading），加 try/except 后跑完全量。
+
+---
+
 ## Round 1483 — app/parsers/fallback_parser.py 边角第六十六轮（7 测试）
 
 - 文件：`tests/test_parsers_fallback_edges66.py`。
