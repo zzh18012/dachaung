@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1591 — pipeline 长段落切分的句子边界优先（2 测试）
+
+- 文件：`tests/test_pipeline_sentence_split.py`（R1570 锁无标点长段落的词边界切分——**句子边界优先与逗号对照**零覆盖）。
+- 新角度（probe 实证）：**'. ' 句号分隔 959 字段落** → 切在句边界 [767, 191]（chunk0 以 '.' 结尾、chunk1 以 'Sentence number 008' 整句开头）；**', ' 逗号分隔同长段落** → 无句界退回词边界 [797, 161]（chunk0/1 均在句中）。
+
+---
+
 ## Round 1590 — pipeline 表格最小形状（3 测试）
 
 - 文件：`tests/test_pipeline_table_min_shape.py`（R1584 锁非表格几何——**最小可识别形状**零覆盖）。
