@@ -72,6 +72,13 @@
 
 ---
 
+## 回归基线 100666（第 103 次：0 失败；100644 passed + 22 skipped，952s）
+
+- **命中**：预测 100666 = 100644 + 22，实际 100644 passed + 22 skipped，**第 66 次连续精确命中**（含 R1597 及之前全部轮次）。
+- 下次预测：100666 + R1598(3)+R1599(3)+R1600(3)+R1601(2)+R1602(2)+R1603(3)+R1604(3)+R1605(3)+R1606(3) = **100691**（100669 passed + 22 skipped，collect-only 已验证）。
+
+---
+
 ## Round 1596 — pipeline 多解析器 source_locator 分类学（3 测试）
 
 - 文件：`tests/test_pipeline_locator_taxonomy.py`（R1594 锁 confidence——**markdown/text/ipynb 的 locator 结构与 section_path 嵌套**在 pipeline 层零覆盖）。
