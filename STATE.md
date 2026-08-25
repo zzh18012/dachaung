@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1478 — app/chunkers/structural.py 边角第十四轮（6 测试）
+
+- 文件：`tests/test_chunker_edges14.py`。
+- 新角度（probe 实证）真 heading 不切句 + 空文本类型跳过的并段效应 + isolated 交替（edges1-13 未碰过；edges13 的 test_header_overlong_splits 用的是 type='header'——非 heading，走普通超长分支，真 heading 的超长行为未锁）：**真 heading 超长不切**（type='heading' 150 字符 > max_chars=100 → 单个 150 字符 chunk、strategy='sequential'、允许超长、span 0..150）；**heading 恰好 = max_chars 逼 flush**（100 字符 heading + para → projected 105 > 100 → 两 chunk 各 sequential）；**纯空白 table 被跳过**（para+空白 table+para → 两段并成一个 sequential chunk 双 ids 跨过 table）；**image 跳过并段**（'one two three four' 单 chunk 双 ids）；**caption/table/caption 交替**（c0000-c0002 依次 isolated_caption/isolated_table/isolated_caption）；**超长 list_item 走切句路径**（600 字符 → 6 chunk 全 long_paragraph_sentence_split 且各 ≤100）。
+- 撞墙：0 fail 首跑（6 全过）。probe 初版 image 用例踩 Element 校验（content 与 resource_path 至少一非空），改带 resource_path 后过。
+
+---
+
 ## Round 1477 — app/parsers/fallback_parser.py 边角第六十四轮（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges64.py`。
