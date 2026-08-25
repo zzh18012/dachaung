@@ -4,6 +4,11 @@
 
 ---
 
+## Round 1514 — fallback PDF 多内容流与 FlateDecode（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges84.py`（真实 PDF 生成器常见结构；此前轮次全部单流明文；自带 zlib 压缩流 scaffold）。
+- 新角度（probe 实证）：**⚠ 多流页字符 bbox 零宽**（/Contents 两流 → 内容/y 正常、顺序保持，但字符宽度丢失 bbox x0==x1（[72,80,72,92]），stderr 伴 "Could not get FontBBox"——pdfminer 流数组字体度量缺陷）；**三流中间 FlateDecode 正常解码**（明文+压缩+明文 → FIRST/SECOND/THIRD）；**全压缩流照常提取**；**单流压缩对照 bbox 完全正常**（[72,82.5,106.7,94.5]——零宽是多流特有）；**流边界隐式结束文本对象**（第一流缺 ET、第二流另起 BT → 均照常提取）。
+
 ## Round 1513 — fallback PDF TJ 数组 kern 位移语义（8 测试）
 
 - 文件：`tests/test_parsers_fallback_edges83.py`（edges43 只测过 [()] TJ 空数组，数字位移从未测过）。
