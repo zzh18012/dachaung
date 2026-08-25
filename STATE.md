@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1477 — app/parsers/fallback_parser.py 边角第六十四轮（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges64.py`。
+- 新角度（probe 实证）兼容段 + 畸形双引号 + 缺省 TL 的 T* + 颜色/合法 gs（edges1-63 未碰过；edges43 已锁 ' 与 " 带显式 TL/操作数、edges23 已锁 T* 带 TL 14、edges44 已锁 Ts/Tz/Tr、edges63 已锁缺失 gs、edges32 已锁内联图片、edges54 已锁 Form XObject，避开）：**BX/EX 兼容段完全透明**（unknown 运算符被兼容机制吞掉，文本照常无告警）；**畸形 "（操作数不足）→ 全页无文本**（"(dq text)\" 只有字符串在栈上，pdfminer 静默消化失败 → 空 elements + pdf_no_text_extracted，对照 edges43 合法 0 0 (...) " 正常画字）；**T\* 无 TL（缺省 0）同 y 交织**（'fsiresctond'，TL 缺省 0 不降行 x 排序交织，对照 edges23 的 TL 14 正常降行）；**颜色运算符 rg/g 全部忽略**；**合法 /GS1 gs（ca/CA 半透明）文本照常**（ExtGState 真实在 Resources 里，alpha 只影响渲染不影响抽取，对照 edges63 缺失 gs 被忽略）。
+- 撞墙：0 fail 首跑（5 全过）。probe 另发现 td+Tm 操作数不足时 x 取栈上残留（版本敏感，未锁）。
+
+---
+
 ## 回归基线 100056（第 77 次：0 失败；100034 passed + 22 skipped，1464s）
 
 - 预测命中：**100034 passed + 22 skipped = 100056 收集**（第 40 次连续总数命中）。
