@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1594 — pipeline 元素置信度分类学（2 测试）
+
+- 文件：`tests/test_pipeline_confidence_taxonomy.py`（R1593 锁 caption——**confidence 字段的 parser 级取值**在合成文档层零覆盖）。
+- 新角度（probe 实证）：**PDF 混合页** → heading 0.85 / table 0.7 / image 0.6（页内序 text→table→image 与绘制顺序无关）；**DOCX 混合** → 全部 0.95、JSON 往返保留。
+
+---
+
 ## Round 1593 — pipeline 题注 caption 家族：正则变体与隔离（3 测试）
 
 - 文件：`tests/test_pipeline_caption_family.py`（R1591/1592 锁切分边界——**caption 分类正则与 isolated_caption 策略**在合成文档层零覆盖）。
