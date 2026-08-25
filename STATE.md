@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1588 — pipeline heading 分类的长度阈值（3 测试）
+
+- 文件：`tests/test_pipeline_heading_threshold.py`（R1571 锁短行家族行为——**阈值边界与字号无关性**零覆盖）。
+- 新角度（probe 二分实证）：**孤立行长度阈值 ≤80 → heading、≥81 → paragraph**（单字无空白亦然，纯长度驱动）；**字号无关**（9..14pt 全 heading）；多词行一致（须词长凑足 80+，'b0'..短词 43 字仍 heading）。
+
+---
+
 ## Round 1587 — pipeline CropBox 忽略与页级继承（3 测试）
 
 - 文件：`tests/test_pipeline_cropbox_inherit.py`（R1580 锁 Resources 继承——**CropBox、共享内容流、MediaBox 继承**零覆盖）。
