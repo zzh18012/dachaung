@@ -4,6 +4,13 @@
 
 ---
 
+## Round 1507 — chunker image content 静默丢弃（4 测试，strategy 值审计）
+
+- 文件：`tests/test_chunker_edges16.py`。
+- 方法：**strategy 值审计**——isolated_{type} 是 f-string（table/image/caption 三个理论值），grep 发现 isolated_image 零测试命中。
+- 新角度（probe 实证，比预期更极端）：**⚠ image 的 content 被 chunker 按类型硬丢弃**——_element_text_with_span 对 type='image' 与是否有 content 无关地返空 → 带内容 image 产 **0 chunk**（若未来 parser 给 image 填 content 将在此静默丢失）；**段跨 image 合并**（para+image+para → 'one two three four' 双 ids，image 完全不可见）；**超长 image content 同样 0 chunk**；结论：isolated_image 策略值当前**不可达**（table/caption 可达且已锁）。
+- 撞墙：0 fail 首跑（4/4）。
+
 ## Round 1506 — fallback DOCX 图片保存失败分支（2 测试，警告码审计）
 
 - 文件：`tests/test_parsers_fallback_edges77.py`。
