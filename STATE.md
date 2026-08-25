@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1633 — pipeline HTML 文本节点拼接与空元素（3 测试）
+
+- 文件：`tests/test_pipeline_html_text_nodes.py`（R1632 锁空白保留——**行内标签拼接不加空格、空/纯空白元素整体丢弃、body 级 br**零覆盖）。
+- 新角度（probe 实证）：**文本节点原样拼接**（'one<b>two</b>three' → 'onetwothree'，无插入空格，span 透明）；**空元素丢弃**（空 p/纯空白 p/空 li 不产生元素）；**body 级 br 丢弃**（不产生空段落）。
+
+---
+
 ## Round 1632 — pipeline 首尾空白与内部空白保留（3 测试）
 
 - 文件：`tests/test_pipeline_ws_handling.py`（R1631 锁 html section_path——**尾随空白剥除、标题内行内 raw、html 内部空白不折叠**零覆盖）。
