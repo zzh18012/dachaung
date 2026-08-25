@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1578 — pipeline 页几何与换行操作符（4 测试）
+
+- 文件：`tests/test_pipeline_geometry_lineops.py`（R1574 锁页缘文本——**MediaBox 平移/矮页与 T*/' 换行操作符**零覆盖）。
+- 新角度（probe 实证）：**MediaBox 原点平移**（[100 100 712 892]、文本 x=72 在盒外）→ bbox 与未平移完全一致（x 原样、y 只按盒高翻转、原点被忽略）、盒外文本照常提取；**矮页高 600** → y 翻转用盒高而非默认 792；**T*（TL=14 三行）**与**' 操作符（TL=20 两撇）** → 均合并单元素。
+
+---
+
 ## Round 1577 — pipeline DOCX 样式层级与 markdown 敌意单元格（4 测试）
 
 - 文件：`tests/test_pipeline_docx_styles_cells.py`（R1576 锁表格结构边界——**标题层级全谱、列表样式降级、单元格特殊文本**零覆盖）。
