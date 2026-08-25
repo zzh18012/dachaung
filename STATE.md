@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1480 — app/parsers/fallback_parser.py DOCX 边角第六十五轮（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges65.py`。
+- 新角度（probe 实证）超链接 + 行内图 + 零散透传标签（fallback edges1-64 未碰过；hyperlink 全库零覆盖，wp:anchor 浮动图已覆盖但 wp:inline 行内图未锁）：**w:hyperlink 文本保留**（'before link text after' 单段，hyperlink 内 runs 照常进 paragraph.text、目标 URL 不捕获、resource_path None）；**bookmarkStart/End 透明**（'ab'）；**w:tab 成字面 \t**（'col1\tcol2'）；**commentRange/Reference**（range 内文本保留 'textcommented'、reference 本体不产内容）；**proofErr 拼写标记透明**（'mispeld'）；**wp:inline 行内图提取**（段落 'pic:' + image element、resource_path '(unsaved)'、metadata byte_size/ext='png'/extracted_to_disk=False）。手写 zipfile 构造 docx（styles part 的 content-type 必须 Override 成 styles+xml，否则 python-docx 报 'Part' object has no attribute 'styles'）。
+- 撞墙：probe 首跑 6 例全 AttributeError——[Content_Types].xml 把 rels Override 写错、styles.xml 落 Default xml 类型；修正后 6 测试 0 fail。
+
+---
+
 ## Round 1479 — app/parsers/markdown_parser.py 边角第十七轮（6 测试）
 
 - 文件：`tests/test_parsers_markdown_edges17.py`。
