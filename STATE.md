@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1472 — app/parsers/fallback_parser.py 边角第六十三轮（8 测试）
+
+- 文件：`tests/test_parsers_fallback_edges63.py`。
+- 新角度（probe 实证）marked-content + 未知资源 + 嵌套 BT（edges1-62 未碰过；图片 /Im Do 与 re S 画线表格已由 edges17/27/46 锁定，避开）：**BDC/BMC/EMC 标记内容完全透明**（文本照常提取、MCID 被忽略）；**未闭合 BDC**（无 EMC）也容忍；**未知 XObject Do 静默忽略**（/Missing Do 无告警、后续文本存活）；**裁剪路径 W n 不裁剪提取**（bbox 不受 re+W n 影响，pdfplumber 不模拟 clipping）；**缺失 gs 资源**忽略；**sh 轴渐变**忽略；**BT 嵌套 BT**（无中间 ET）两串文本都提取、top-origin y 排序内层在前。
+- 撞墙：1 fail 首跑——clip 用例 x1 实为 74.7（probe 展示 74.699…是另例的截断串读），修正后 8 全过。
+
+---
+
 ## Round 1471 — app/parsers/html_parser.py 边角第十七轮（9 测试）
 
 - 文件：`tests/test_parsers_html_edges17.py`。
