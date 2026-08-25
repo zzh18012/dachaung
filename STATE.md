@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1467 — app/parsers/fallback_parser.py 边角第六十一轮（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges61.py`。
+- 新角度（probe 实证）docx 外围 XML 元素可见性（edges49 已锁 fldChar 链缓存结果保留，本轮全未锁）：**fldSimple 包裹内容整体不可见**——TOC 域（含 run 级缓存文本 'TOC placeholder'）→ 段落 '(空段落)' 占位（empty: True），与 fldChar separate 段**缓存结果保留**形成对比（fldSimple 连缓存都丢）；**w:sym 不可见**（Wingdings 符号 run：'sym: ' → 'sym:'）；**浮动 wp:anchor 不可见**（w:drawing 无 inline 数据 → 无 image 无告警）；**core properties 不进 doc.metadata**（title/author 完全丢弃，metadata 只 fallback/image_output_dir 两键）；**段首 BOM 保留**（docx 无 strip，不像 markdown 杀标题）。选型备注：list 样式/页断/行断已被 edges45/41/24 锁定，probe 后避开。
+- 撞墙：0 fail 首跑（5 全过）。
+
+---
+
 ## Round 1466 — app/parsers/html_parser.py 边角第十六轮（13 测试）
 
 - 文件：`tests/test_parsers_html_edges16.py`。
