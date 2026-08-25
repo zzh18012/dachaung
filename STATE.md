@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1496 — fallback PDF 文本状态边界与 Tm 矩阵（7 测试）
+
+- 文件：`tests/test_parsers_fallback_edges73.py`。
+- 新角度（probe 实证）：**BT 外文本 op 被忽略**（无 BT 的 Td/Tj → pdf_no_text_extracted，文本对象边界硬性）；**裸 ET 前置无害**（'ET BT ...' → 'x'）；**⚠ Tm 旋转 90° 文本倒序**（'0 1 -1 0 72 700 Tm' 的 'rotated' → 'detator' 逐字符反向——字符沿 y 排布后按升序 y 串起，与 R1495 页内 y 升序同规则）；**Tm 纯缩放正常**（'scaled' 方向不变）；**页外坐标仍提取**（(72000,70000) → 'far'，无裁剪）；**字体缺失仍提取**（/F2 不在 Resources → 'ghost font'，pdfminer 容错仅 stderr 日志）；**行内换字号顺序**（'big' 先出，y=650 < 700，y 升序规则再实证）。
+- 撞墙：0 fail 首跑（7/7）。y 升序规则已在 R1495/R1494/R1496 三轮多角度交叉验证。
+
 ## Round 1495 — fallback PDF 多页与字符串转义（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges72.py`（新增 _pdf_pages 多页 scaffold，此前所有轮均单页）。
