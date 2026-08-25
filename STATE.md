@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1550 — parse/pipeline 确定性与幂等性（3 测试）
+
+- 文件：`tests/test_pipeline_determinism.py`（新不变量轴：此前 100+ 轮全部验证**单次**行为——输出可复现性零覆盖）。
+- 新角度（probe 实证）：**parse 两次全同**（document_id / element_id 序 / content / bbox）；**pipeline 写盘字节级幂等**（两次输出 JSON 字节完全一致——无时间戳噪声源）；**混合页（文本+表格）次序确定**（元素序列、chunk_id、chunk text 两次全同）。
+
+---
+
 ## Round 1549 — pipeline max_chars 边界与回环（7 测试）
 
 - 文件：`tests/test_pipeline_maxchars_roundtrip.py`（max_chars 无效值在 pipeline 层此前只断言"不崩"——本轮锁**精确错误**与**阈值边界**：StructuralChunker 要求 ≥32）。
