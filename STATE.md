@@ -12,6 +12,11 @@
 
 ---
 
+## Round 1519 — fallback PDF Tc 字距与 Tw 词距（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges89.py`（测过 Tz/Ts/TL 但从未碰 Tc/Tw）。
+- 新角度（probe 实证）：**Tc 2 正常**（'ab cd'）；**⚠ Tc 30 字距炸开插空格**（'(ab)' → 'a b'——每字符 +30pt 被 pdfplumber 判为词界）；**⚠ Tc 负值字符反转**（-8 → 'ba'，b 起点提前至 70.7、x 排序倒置）；**Tw 80 宽词距仍单元素**（bbox 跨 96.7pt 同行不分裂）；**⚠ Tw 负值空格消失**（-10 → 'ab' 空格宽度归零）；**Tw 驱动空格位移**（50 Tw 纯空格 Tj 推进 53.3pt 不出元素）。
+
 ## Round 1518 — fallback PDF 标记内容与注释（6 测试）
 
 - 文件：`tests/test_parsers_fallback_edges88.py`（tagged PDF 结构 BDC/BMC/ActualText/Annots 此前未碰；edges66 _pdf 基础上加 extra_page/extra_obj 注入）。
