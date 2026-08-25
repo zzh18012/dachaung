@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1547 — pipeline 异形输入端到端（4 测试）
+
+- 文件：`tests/test_pipeline_exotic_edges.py`（新集成轴：近期 40+ 轮锁定的**解析层**异形行为——CID 占位符/千字号合并/零宽 bbox/超长段落——此前只在 parser 层验证，本轮全量走 process_single）。
+- 新角度（端到端不变量）：**CID 占位符** '(cid:16975)(cid:17497)' 原样进 chunk、ids 非空、schema 通过；**千字号吞并行** 'BIG SMALL' 单 chunk；**零宽 bbox（Tz 0）** locator x1==x2 不违 schema；**200 词段落** split 成 2 chunk（≤800）、normalize_text 不丢不重、ids 全非空。
+
+---
+
 ## Round 1546 — fallback PDF 共享流/大页数/跨页元素序（3 测试）
 
 - 文件：`tests/test_parsers_fallback_edges116.py`（共享流、页数规模、元素全局顺序——零覆盖）。
