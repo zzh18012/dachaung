@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1631 — pipeline HTML section_path 机制（2 测试）
+
+- 文件：`tests/test_pipeline_html_section_path.py`（R1630 锁 md section_path 边角——**html 的同名嵌套、跳级、任意层级起步、孤儿 li 继承**零覆盖）。
+- 新角度（probe 实证）：**html 与 md 同一套 section_path 机制**（h1→h2 嵌套、回 h1 重置、后续元素含孤儿 li 继承当前节）；**同名嵌套 'X > X'**、**跳级 'A > C'**、**任意层级起步**（首标题 h4 成根）；line 恒 1。
+
+---
+
 ## Round 1630 — pipeline section_path 边角：跳级/回退/全类型继承（3 测试）
 
 - 文件：`tests/test_pipeline_section_path_edges.py`（R1629 锁标记变体——**heading 跳级、向上回退、代码块与列表继承**零覆盖，R1596 只锁相邻嵌套与同级重置）。
