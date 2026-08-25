@@ -4,6 +4,11 @@
 
 ---
 
+## Round 1512 — fallback PDF /Rotate /CropBox 与内联图像（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges82.py`（页面级几何属性此前未碰；自带带 `extra_page` 参数的 scaffold）。
+- 新角度（probe 实证）：**/Rotate 90 坐标旋转**（bbox [72,82.5,102.7,94.5] → [697.5,72,709.5,102.7]）；**⚠ /Rotate 180/270 内容镜像反转**（'TEXT'→'TXET'——翻转阅读方向后按左→右重排字符；180 与 270 bbox 各异）；**⚠ /Rotate 180 词+字符双反转**（'WORD1 word2'→'2drow 1DROW'）；**/Rotate 90 竖排两行并栏**（TOP/BOT → 单元素 'BOT TOP'，旋转后按新 x 排序）；**/CropBox 完全被忽略**（y=770、x=550 均在裁剪框外仍照常提取）；**内联图像 BI/ID/EI 触发 image 元素**（bbox 退化 [0,791,1,792] 1×1——pdfminer 无定位信息；EI 后文本照常提取）。
+
 ## Round 1511 — fallback PDF XObject /Do 家族（7 测试）
 
 - 文件：`tests/test_parsers_fallback_edges81.py`（此前 80 轮只测页面内容流，未碰 Form/Image XObject；自带 `_pdf_form`/`_pdf_img` 双 scaffold）。
