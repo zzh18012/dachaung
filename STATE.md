@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1487 — markdown 空内容 element 家族扩展（5 测试）
+
+- 文件：`tests/test_parsers_md_crash_family2.py`。
+- 新角度（probe 实证）崩溃家族扩展到列表标记（R1484/R1486 只扫了标题，本轮补列表）：**⚠ 列表标记 + 纯空白同样崩溃**（'-   \n' / '*   \n' / '1.   \n' 全部命中列表 RE、strip 后空 content → ValueError 穿透，与 '#   \n' 同一 Element 校验）；**无尾换行同样崩**（'-   ' EOF）；**bq 纯空白安全**（'>   \n' → md_no_content）；**bq 内 '-   ' 降级为段**（内容 '-' 字面、kind=blockquote）；**缩进 '#   ' 安全**（'  #   \n' 不成标题 → paragraph '#'，ATX RE 不容许前导缩进）。修复建议（累积）：push 前统一跳过 strip 后为空的 content，可一并消掉标题与列表两类崩溃。
+- 撞墙：0 fail 首跑（5 全过）。
+
+---
+
 ## Round 1486 — markdown 空标题崩溃家族（3 测试）
 
 - 文件：`tests/test_parsers_md_crash_family.py`。
