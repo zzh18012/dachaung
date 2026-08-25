@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1572 — pipeline id 连续性扫描（5 测试）
+
+- 文件：`tests/test_pipeline_id_continuity.py`（chunker 单测锁过单个 id 形态——pipeline 层**全家族 id 连续性**零覆盖）。
+- 新角度（5 类文档 plain/table/image/multipage/mixed-docx）：element_id 严格 e0000..eNNNN 无缺口；chunk_id 严格 c0000..cMMMM 无缺口；每个 chunk 的 source_element_ids ⊆ element_id 全集。
+
+---
+
 ## Round 1571 — pipeline 版面：双栏交错与短行分类（2 测试）
 
 - 文件：`tests/test_pipeline_layout_reading.py`（R1570 锁行距——**水平版面**零覆盖）。
