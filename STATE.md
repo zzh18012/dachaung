@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1464 — app/chunkers/structural.py 边角第十三轮（7 测试）
+
+- 文件：`tests/test_chunker_edges13.py`。
+- 新角度（probe 实证）header/footer 归并 + 空白跳过 + 计数器跨策略连续（edges1-12 与 base 未碰过；base 已覆盖 caption 隔离/连续 heading/image 跳过/ids 去重，本轮明确避开）：header/footer **当普通段落累积**（'head text foot text' 单 chunk sequential，夹在段落间也不 flush）；纯空白 element **跳过**且夹在两个真段落间 → 两段**并成同一 chunk**（ids [e0,e2]）；content=None 只有 resource_path 的**非 image** element 同样跳过；chunk_id 计数器**跨策略连续**（isolated_table c0000 → 长段切分 c0001/c0002 → sequential c0003，长段路径直接递增 counter、缓冲 flush 前同步回 buf）；header 超长走 long_paragraph_sentence_split（split_boundary_after=whitespace / 尾段 None）。
+- 撞墙：0 fail 首跑（7 全过）。选型备注：cli（197 文件）/schema（167 文件）/evaluation_cli（edges 到 109 轮）全部饱和，唯有 parser 行为面持续产出新角度。
+
+---
+
 ## Round 1463 — app/parsers/fallback_parser.py 边角第六十轮（7 测试）
 
 - 文件：`tests/test_parsers_fallback_edges60.py`。
