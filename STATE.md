@@ -4,6 +4,14 @@
 
 ---
 
+## 回归基线 100056（第 77 次：0 失败；100034 passed + 22 skipped，1464s）
+
+- 预测命中：**100034 passed + 22 skipped = 100056 收集**（第 40 次连续总数命中）。
+- 含轮次：至 R1469。此后新增 R1470(10) + R1471(9) + R1472(8) + R1473(10) + R1474(8) + R1475(8) + R1476(9) = 62。
+- 第 78 次预测：100056 + 62 = **100118 收集**（100096 passed + 22 skipped 预期）；collect-only 已实测 100118 一致。后台 bznclb5ew 运行中。
+
+---
+
 ## Round 1476 — app/parsers/html_parser.py 边角第十八轮（9 测试）
 
 - 文件：`tests/test_parsers_html_edges18.py`。
