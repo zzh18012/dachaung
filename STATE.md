@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1491 — fallback DOCX 真实表格与包裹标签家族扩展（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges68.py`。
+- 新角度（probe 实证，R1490 包裹家族扩展）：**真实手造 w:tbl 完整提取**（前后段顺序保留、markdown 管道格式 '| a1 | b1 |\n| --- | --- |\n| a2 | b2 |'、metadata source='python-docx'——edges4 只用 FakeTable mock，本轮首个真实 XML 表锁定）；**⚠ sdt 内 w:tbl 整表丢弃**（docx_no_content，sdt 家族从段扩展到表）；**⚠ smartTag 包裹 run 丢弃**（与 w:ins 同根因）；**moveFrom/moveTo 全丢**（moveTo 虽包 w:t 同丢 → '(空段落)'）；**w:tblHeader 不区分**（表头行照常数据行）。
+- 撞墙：0 fail 首跑（5/5）。包裹标签静默丢文本家族（ins/smartTag/moveTo/sdt）已系统性锁完，根因同一：只读 body 直接子层。
+
 ## Round 1490 — fallback DOCX 修订与内容控件静默丢文本（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges67.py`（复用 edges65 的 _build_docx 手工 docx 支架，import 复用）。
