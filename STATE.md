@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1501 — html 大小写/属性形态/裸元素（7 测试）
+
+- 文件：`tests/test_parsers_html_edges21.py`。
+- 新角度（probe 实证）：**大写/混合大小写标签照常**（'<H1>UPPER</H1><P>para</P>' → heading level 1 + paragraph，HTMLParser 自动小写化）；**无引号属性照常**（'<img src=pic.png alt=hi>' → image、resource_path='pic.png'）；**'<p/>' 视为开标签**（后续文本流入 → 单段 'after'）；**十六进制实体 &#x41; → 'A'**（主文件只锁了十进制）；**三重嵌套 bq 不追踪深度**（kind=blockquote 无 depth 字段）；**裸 '<li>' 独立成 list_item**（前后文本各成段互不合并）。
+- 撞墙：0 fail 首跑（7/7）。inline `<b>` 已由主文件覆盖，跳过避免重复。
+
 ## Round 1500（里程碑）— fallback PDF tokenization 鲁棒性（8 测试）
 
 - 文件：`tests/test_parsers_fallback_edges75.py`。
