@@ -4,6 +4,11 @@
 
 ---
 
+## Round 1516 — fallback PDF 嵌套 Form 与 /Matrix（3 测试）
+
+- 文件：`tests/test_parsers_fallback_edges86.py`（R1511 单层 Form 的深化；自带双层 Form scaffold）。
+- 新角度（probe 实证）：**双层嵌套变换精确复合**（page cm(100,500) → outer 内 cm(50,60) → inner 文本 (10,20) → INNER bbox [160,202.5,197.3,214.5]，三级平移相加）；**Form /Matrix 参与复合**（/Matrix [1 0 0 1 20 30] 先于内容应用 → 设备 x=100+20+10=130）；**嵌套深度不破坏阅读序**（页底 PAGE 文本仍排最后）。
+
 ## Round 1515 — fallback PDF 字体编码重映射（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges85.py`（此前轮次字体全部固定 WinAnsiEncoding Helvetica；自带可变字体字典 scaffold）。
