@@ -4,6 +4,57 @@
 
 ---
 
+## 回归基线 99733（第 73 次：0 失败；99755 = 99692 + 63 精确命中 R1438-R1443）
+
+- 后台回归（925.12s ≈ 15 分钟）**99733 passed + 22 skipped + 0 failed** exit=0——收集树态 = R1443 提交后（8246f16，预测即用 `pytest --collect-only` 实测 99755，**精确命中**——新对账方法：启动前实测收集数，不再依赖增量推算）。
+- 对账：72 次总数 99692 + 14（R1438）+8（R1439）+12（R1440）+9（R1441）+10（R1442）+10（R1443）= 63 → **99755 精确命中**（连续第三十五次总数命中）。
+- 累计（总数）：99548 → 99670 → 99733（总收集数 99570 → 99692 → 99755）。
+- 第 74 次预测：99755 + 13（R1444）+10（R1445）+9（R1446）+10（R1447）+9（R1448）+10（R1449）= **99816 收集**（99794 passed + 22 skipped 预期）。
+
+---
+
+## Round 1449 — app/parsers/fallback_parser.py 边角第五十五轮（10 测试）
+
+- 文件：`tests/test_parsers_fallback_edges55.py`。
+- 新角度（退化字号 + 嵌套 Form）：Tf 0 → 文本照出但 bbox 塌成点 [72.0, 92.0, 72.0, 92.0]；Tf -12 → 字符序倒序 'txet ezis evitageN'、bbox 反向延伸 [-22.704, ..., 72.0, ...]；Tf 12.5 小数正常；嵌套 Form X1→X2 平移累加（72+30=102）bbox [102.0, 52.484, 192.708, 64.484]。
+
+---
+
+## Round 1448 — app/parsers/fallback_parser.py 边角第五十四轮（9 测试）
+
+- 文件：`tests/test_parsers_fallback_edges54.py`。
+- 新角度（Form XObject）：/X1 Do 内嵌文本透明提取、cm 平移正确施加（bbox 同直接 Td 一致）；页面直接文本 + Form 文本 30pt 行距合并单元素；未定义资源 /X9 Do → 整页静默失败 0 元素 + pdf_no_text_extracted。
+
+---
+
+## Round 1447 — app/parsers/fallback_parser.py 边角第五十三轮（10 测试）
+
+- 文件：`tests/test_parsers_fallback_edges53.py`。
+- 新角度（注释层 + 空白页）：/Annots Link 注释文本完全不可见；/Outlines 书签不可见；空白中间页干净跳过（页号 1/3 无幽灵无告警）；全空白 PDF → pdf_no_text_extracted。
+
+---
+
+## Round 1446 — app/parsers/fallback_parser.py 边角第五十二轮（9 测试）
+
+- 文件：`tests/test_parsers_fallback_edges52.py`。
+- 新角度（增量更新 + 尾部追加）：规范增量更新（新版 obj + 子段 xref + trailer /Prev）修订版胜出；缺 /Prev → 整文档不可用 0 元素；%%EOF 后孤儿对象完全容忍。
+
+---
+
+## Round 1445 — app/parsers/fallback_parser.py 边角第五十一轮（10 测试）
+
+- 文件：`tests/test_parsers_fallback_edges51.py`。
+- 新角度（内容流 /Filter）：FlateDecode/ASCIIHexDecode/ASCII85Decode 透明解码；未知过滤器 → 双告警 [pdfplumber_word_extract_failed, pdf_no_text_extracted]（前者首次现身）；过滤器数组链两种序都失败；Flate + 错误 /Length 截断 → 整流静默丢失。
+
+---
+
+## Round 1444 — app/parsers/text_parser.py 边角第十轮（13 测试）
+
+- 文件：`tests/test_parsers_text_edges10.py`。
+- 新角度（文件编码退化）：UTF-16LE 无 BOM → NUL 交错；带 BOM LE → �� 前缀 + NUL 交错；BE → NUL 前缀式；UTF-16 CJK → 乱码；UTF-8 BOM 留在 content 不剥；光杆 BOM 单元素 '﻿'；latin-1/cp1252 字节 → �；空文件 → text_no_content + 管线 no_extracted_elements 链。
+
+---
+
 ## 回归基线 99670（第 72 次：0 失败；99692 = 99570 + 122 精确命中 R1428-R1437）
 
 - 后台回归（名义 39820s，实际跨机器休眠 11 小时）**99670 passed + 22 skipped + 0 failed** exit=0——收集树态 = R1437/STATE 提交后（60d1dfd，R1438+ 在收集后落盘）。
