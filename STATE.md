@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1493 — fallback DOCX 嵌套表/多段 cell/悬空关系（4 测试）
+
+- 文件：`tests/test_parsers_fallback_edges70.py`。
+- 新角度（probe 实证）：**⚠ 嵌套 w:tbl 整表丢弃**（外层 cell 含内层表 → 只留外层 cell 文本 '| outer | side |'，内层 i1/i2 静默丢失）；**多段 cell 以 \n 连接**（同 tc 两个 w:p → 'line1\nline2'）；**悬空 hyperlink r:id 无害**（r:id 不在 rels → 'see link' 照常保留，不崩不告警）；**空 tc 产空 cell**（'| a |  |'）。
+- 撞墙：0 fail 首跑（4/4）。fallback DOCX 表格家族（真实表/表头/vMerge/gridSpan/嵌套/多段 cell/空 cell）至此系统锁完。
+
 ## Round 1492 — fallback DOCX 结构语义来源与合并单元格（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges69.py`。
