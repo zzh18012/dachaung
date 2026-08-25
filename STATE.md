@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1505 — fallback DOCX footnotes/header 多 part 丢内容（3 测试）
+
+- 文件：`tests/test_parsers_fallback_edges76.py`（新增多 part docx 支架：footnotes.xml + header1.xml + rels + content-types Override）。
+- 新角度（probe 实证，此前所有轮只构造 document.xml 单 part）：**⚠ footnotes.xml 文本被静默丢弃**（body 含 footnoteReference + 脚注 part 有 'the footnote text' → 只留 body text、无告警——真实 Word 文档脚注是正文一部分）；**⚠ header1.xml 文本被丢弃**（sectPr 引用 header + header part 有文本 → 同样只留 body）；**header-only 文档 → '(空段落)' 占位**（空 w:p 触发占位逻辑，非 docx_no_content）。
+- 撞墙：0 fail 首跑（3/3）。与 R1490-1493 的包裹标签丢文本同属 fallback DOCX 静默丢内容家族，至此该家族系统性锁完：ins/smartTag/moveTo/sdt（包裹）/嵌套表/表内裸文本（html 侧）/footnotes/headers（part 侧）。
+
 ## Round 1504 — markdown 文本链接家族全字面（7 测试）
 
 - 文件：`tests/test_parsers_markdown_edges21.py`。
