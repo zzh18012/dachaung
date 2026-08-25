@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1468 — app/parsers/ipynb_parser.py 边角第十三轮（8 测试）
+
+- 文件：`tests/test_parsers_ipynb_edges13.py`。
+- 新角度（probe 实证）cell_type 变体 + md cell 无内容静默 + 语言推断坏值（edges1-12 未碰过；base 已锁 unknown 类型/cell_type 缺失/代码 cell strip，避开）：cell_type **空串**与缺失同样落 'unknown'（details cell_type='unknown'）；**大写 'CODE' 也 unknown**（大小写敏感，details 保留 'CODE'）；markdown cell 只有无内容内容（thematic '---'）→ **零 element 且无 cell 级告警**（只有顶层 ipynb_no_content）；markdown cell 带 BOM → '# H' **标题识别被杀**降级 paragraph '﻿# H\ntext'（镜像 markdown 直接解析）；language_info **无 name 键** → language ''；kernelspec/language_info/metadata **非 dict** → _extract_kernel_language 无守卫直接 AttributeError；raw cell 内容同样 strip（'  raw txt ' → 'raw txt'）。
+- 撞墙：0 fail 首跑（8 全过）。
+
+---
+
 ## Round 1467 — app/parsers/fallback_parser.py 边角第六十一轮（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges61.py`。
