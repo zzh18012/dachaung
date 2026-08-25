@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1535 — fallback PDF BX/EX 兼容块（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges105.py`（PDF 规范 BX...EX 内未知算子应被忽略；此前未知算子轮均在块外——块内屏蔽语义与块平衡性零覆盖）。
+- 新角度（probe 实证）：**BX/EX 完全透明**——BX 内未知算子与块外行为相同（pdfminer 一律静默跳过，不做块内屏蔽）；**未定义字体 /F9 → 文本仍提取零警告**（BADOUT/GOOD 双出，字体缺失静默回退）；**BX 无 EX / 嵌套 BX / 孤儿 EX** 全容忍；**文本操作跨越 BX 边界**（BT → BX → Tj → EX → ET）照常提取。
+
+---
+
 ## Round 1534 — fallback PDF 表格检测×绘图算子（6 测试）
 
 - 文件：`tests/test_parsers_fallback_edges104.py`（表格轮 R1531/R1533 全用 `re S` 描边；填充式单元格网格为真实 PDF 常见形态——零覆盖）。
@@ -13,6 +20,14 @@
 
 - 文件：`tests/test_parsers_fallback_edges103.py`（R1532 锁的是经典**向后** /Prev；真实线性化 PDF 是 startxref 指向**头部**首页 xref、其 trailer 带 /Root 且 /Prev **指向前方**尾主 xref——零覆盖）。
 - 新角度（probe 实证，环形 /Prev 用子进程看门狗防挂起）：**完整线性化布局**与**真首页切分**（首页 xref 仅 1-4、尾部 5 1 小节更新 obj5）均正常提取（pdfminer 沿 /Prev 不分方向、跨段对象可解析）；**/Prev 自指** → ParserError 'maximum recursion depth exceeded'（无限链被递归上限截断后捕获，**不挂起**）；**/Prev 越界 99999 / =0** → 回退扫描救援正常。
+
+---
+
+## 回归基线 100395（第 89 次：0 失败；100373 passed + 22 skipped，891s）
+
+- 预测命中：**100373 passed + 22 skipped = 100395 收集**（第 52 次连续总数命中）。
+- 含轮次：至 R1531（R1530-R1531 的 8 个计入 88 次基线后的预测）。此后新增 R1532(12) + R1533(5) + R1534(6) = 23。
+- 第 90 次预测：100395 + 23 + R1535(6) = **100424 收集**（100402 passed + 22 skipped 预期）；collect-only 已实测 100424 一致。
 
 ---
 
