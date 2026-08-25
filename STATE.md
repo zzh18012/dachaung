@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1503 — html 未闭合块标签恢复 vs 表格致命面（5 测试）
+
+- 文件：`tests/test_parsers_html_edges23.py`。
+- 新角度（probe 实证，R1502 只锁表内 '<p>' 与表+尾文本，本轮系统扫未闭合家族）：**未闭合 bq/pre/ul/h1 EOF 全恢复**（元素照常、kind/marker/level 元数据齐全，HTMLParser 惰性闭合）；**未闭合 '<p>' 相邻合并**（'<p>before<p>second' → 'beforesecond' 单段，隐式 p 闭合不识别）；**未闭合 '<b>' inline 无害**；**⚠ 未闭合表在文档中部只丢表本身**（第二表静默丢 y、前后段完好——尾文本是否在表后是整文档丢/只丢表的分界）；**⚠ 仅未闭合 td/tr/table → 整文档丢**。
+- 撞墙：0 fail 首跑（5/5）。
+
 ## Round 1502 — html 表格子元素错位与未闭合致命面（7 测试）
 
 - 文件：`tests/test_parsers_html_edges22.py`。
