@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1543 — fallback PDF 文件头/尾变体（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges113.py`（R1530 垃圾家族测过整体垃圾；本轮是**头部前后缀与尾部 %%EOF 的边界**——零覆盖）。
+- 新角度（probe 实证）：**%PDF-2.0**、**头部前垃圾字节**（头定位允许前缀）、**完全无版本行**（trailer 驱动扫描不需要头）、**二进制标记注释行** 全部照常；**⚠ 缺失尾部 %%EOF → ParserError 'No /Root object!'**（%%EOF 是结构定位必需锚点，有 trailer 也不行）；**⚠ %%EOF 之后有垃圾 → 同样 ParserError**（规范允许尾部垃圾、实现拒绝）。
+
+---
+
 ## Round 1542 — fallback PDF 字体声明变体（7 测试）
 
 - 文件：`tests/test_parsers_fallback_edges112.py`（此前轮次字体为 Type1/Type0/CIDFontType0/Type3 完整声明；真实 PDF 常见 TrueType 非嵌入、残缺声明）。
