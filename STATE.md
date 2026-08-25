@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1537 — fallback PDF Tm 矩阵极端+字号极端（9 测试）
+
+- 文件：`tests/test_parsers_fallback_edges107.py`（此前轮次 Tm/Tf 均为规范正交矩阵与常规字号；页面级 /Rotate 已锁——本轮是**文本级**几何变换）。
+- 新角度（probe 实证）：**Tm 90°** 'VERT'→'TREV'（字符竖排阅读序反转、bbox 成 12pt 宽竖条）；**Tm 270°** 'V270' 不反转；**⚠ Tm 斜切** 'SKEW'→'W E K S'（剪切致字符基线错位 → 逐字裂词+顺序打乱）；**Tm 零横列** 零宽 bbox 文本完整；**Tm 零纵列** 零高 bbox 且 'ZV'→'Z V' 裂词；**非均匀缩放** bbox 高压至 6pt；**Tf 0.001** bbox 退化为一点仍完整提取；**⚠ Tf 1000 + 同页 12pt** 并成 'BIG SMALL' 单元素、bbox y 达 -701..299（千级行盒越出页面仍吞并）；**竖排+横排同页** 仍单元素 'TREV HORIZ'。
+
+---
+
 ## Round 1536 — fallback PDF 词法容忍度家族（8 测试）
 
 - 文件：`tests/test_parsers_fallback_edges106.py`（真实 PDF 生成器差异：无空格 token、CR 老式行尾、非规范数字——此前轮次内容流全为规范空格 + \n 行尾 + 规范数字）。
