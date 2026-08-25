@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1648 — pipeline 围栏语言字符集与链接定义原样（3 测试）
+
+- 文件：tests/test_pipeline_fence_lang_defs.py
+- 新角度（probe 实证）：R1647 锁 text_no_content——**info 串非纯词字符（c++/python3）、链接定义行独立成文**零覆盖：
+  - 'c++' 语言保留：R1635 只锁带空格参数破坏围栏；'+' 非 \w 但仍进 language
+  - 'python3' 数字后缀照常保留
+  - 链接定义原样：'[a]: http://x' 独立成文也是 raw 段落（不剥离、不触发 md_no_content）；def+文本两段
+
+---
+
 ## Round 1647 — pipeline text_no_content 与 img 容器内（3 测试）
 
 - 文件：tests/test_pipeline_text_empty_img_containers.py
