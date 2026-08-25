@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1509 — fallback PDF 分立 BT 绝对定位与紧凑行距合并（3 测试）
+
+- 文件：`tests/test_parsers_fallback_edges79.py`（R1508 Td 累计语义的对照轮；edges43 的 TL/T* 家族测的是全空白操作数，本轮是定位语义）。
+- 新角度（probe 实证）：**分立 BT 对象的 Td 各自绝对**（'ET BT ... 72 650 Td' → bbb 真 y=650、顺序正常，与同 BT 累计对照）；**TD 相对位移且顺带设 TL**（'0 -50 TD' 后 T* 再走 -50 → aaa/bbb/ccc 三行各降 50pt 三元素）；**⚠ 紧凑行距行重叠合并**（'0 -20 TD' 行距 20pt < 行高 → pdfminer 三行并成一个元素 'a b c' 空格连接、bbox 高 52pt——行距小于行高时元素粒度突变）。
+- 撞墙：0 fail 首跑（3/3）。
+
 ## Round 1508 — fallback PDF Td 相对累计 vs Tm 绝对重置（3 测试，解释修正）
 
 - 文件：`tests/test_parsers_fallback_edges78.py`。
