@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1492 — fallback DOCX 结构语义来源与合并单元格（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges69.py`。
+- 新角度（probe 实证）：**w:outlineLvl 被忽略**（导航窗格大纲级别、含自定义 style 组合，均不成标题 → 普通 paragraph，Word 语义中是标题，结构静默丢失）；**w:numPr 被忽略**（编号/项目符号段落不成 list_item、无 marker 元数据 → 普通 paragraph，列表结构静默丢失）；**vMerge 续行复制文本**（垂直合并续行 cell 复读首行文本 '| merged | r2 |'）；**gridSpan 复制文本**（跨列 cell 文本两列重复 '| wide | wide |'）。
+- 撞墙：0 fail 首跑（5/5）。与 R1490/1491 同属"Word 结构语义不被 fallback 识别"家族：ins/sdt/smartTag/moveTo 丢文本、outlineLvl/numPr 丢结构、merge 复读文本。
+
 ## Round 1491 — fallback DOCX 真实表格与包裹标签家族扩展（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges68.py`。
