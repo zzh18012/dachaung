@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1603 — pipeline 解析器×扩展名错配路由（3 测试）
+
+- 文件：`tests/test_pipeline_parser_mismatch.py`（R1602 锁 html 结构——**扩展名路由优先于 parser_name** 零覆盖）。
+- 新角度（probe 实证）：**错配拒绝**——.md+text / .txt+markdown / .ipynb+markdown / 无扩展名 / .md+fallback → doc=None + [unsupported_type]（details 含 path 与**小写 suffix**）；**后缀大小写不敏感**（.MD+markdown 正常）；**复合后缀取最后一段**（f.md.txt 走 text，markdown 语法原样保留为段落）。
+
+---
+
 ## Round 1602 — pipeline HTML 结构家族：pre/br/实体/无 src 图（2 测试）
 
 - 文件：`tests/test_pipeline_html_structure.py`（R1597 锁 html 元素家族——**结构细节**零覆盖）。
