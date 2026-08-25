@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1623 — pipeline 行分隔符归一：孤立 CR、\f、 、\x85（3 测试）
+
+- 文件：`tests/test_pipeline_line_separators.py`（R1622 锁空白家族——**非 \n 行分隔符**零覆盖）。
+- 新角度（probe 实证）：**孤立 \r 归一为 \n**（与 \r\n 同路）；**\f/ /\x85 惰性**（留在内容原样不构成换行）；**只含 \f 的行当空行**（分段且计行号 1/3）。教训：不可见字符两次在 heredoc/源码中丢失，须用 chr(0x2028) 显式构造。
+
+---
+
 ## Round 1622 — pipeline 空白家族：CRLF/制表符/nbsp/BOM（3 测试）
 
 - 文件：`tests/test_pipeline_whitespace_family.py`（R1621 锁实体（&nbsp;→\xa0）——**\xa0、\t 词界、CRLF 归一、BOM 保留**零覆盖）。
