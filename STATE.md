@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1606 — pipeline 家族空输入与损坏输入（3 测试）
+
+- 文件：`tests/test_pipeline_empty_families.py`（R1605 锁 spans 偏移——**md/html/ipynb 空内容警告码**零覆盖，空家族仅 R1599 锁过 .txt）。
+- 新角度（probe 实证）：**4 个新警告码**——md_no_content / html_no_content / ipynb_no_content（嵌在 no_extracted_elements details.warnings）+ ipynb_empty_code_cell（逐空 code cell，带 cell_index，markdown 空单元不警告）；**坏 JSON .ipynb** → ipynb_invalid_json（exception_type=JSONDecodeError）；**markdown frontmatter 无特殊语义**（`---` 当水平线丢弃，夹的内容成普通段落）；head-only html → 无元素。
+
+---
+
 ## Round 1605 — pipeline 硬拆分 source_spans 偏移（3 测试）
 
 - 文件：`tests/test_pipeline_split_spans.py`（R1604 锁 JSON 落盘结构——**跨 chunk source_spans 偏移语义**零覆盖）。
