@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1474 — app/parsers/ipynb_parser.py 边角第十四轮（8 测试）
+
+- 文件：`tests/test_parsers_ipynb_edges14.py`。
+- 新角度（probe 实证）source 类型强转 + nbformat 数值变体 + 子 element 定位传播（edges1-13 未碰过；edges2 单元级已锁 _extract_kernel_language 回退链与弱断言嵌套 list，本轮走 e2e 精确锁，避开）：**source list 含非字符串**逐项 str() 强转拼接（['print(', 42, ')\n', 3.5, None, True] → 'print(42)\n3.5NoneTrue'）；**source 是 dict** → "" → ipynb_empty_code_cell + ipynb_no_content 双告警零 element；**nbformat 浮点 4.5** 放行且 metadata 原样存浮点；**nbformat 缺失 + minor 在场** → nbformat=None/minor=2 共存放行；**markdown 子告警前缀**（空围栏 md_empty_code_block reason 带 'cell #0 (markdown): ' 前缀、details 注入 cell_index=0）；**markdown 表格子 element** type=table 带 cell_index/cell_type='markdown'/line=1 + row_count/col_count；**raw cell list source** 拼接 'line1\nline2'；**code cell 内部换行保留**（strip 只削两端，含内部空行原样）。
+- 撞墙：0 fail 首跑（8 全过）。
+
+---
+
 ## Round 1473 — app/parsers/markdown_parser.py 边角第十六轮（10 测试）
 
 - 文件：`tests/test_parsers_markdown_edges16.py`。
