@@ -4,6 +4,14 @@
 
 ---
 
+## 回归基线 100304（第 84 次：0 失败；100282 passed + 22 skipped，893s）
+
+- 预测命中：**100282 passed + 22 skipped = 100304 收集**（第 47 次连续总数命中）。
+- 含轮次：至 R1510。此后新增 R1511(7) + R1512(6) + R1513(8) + R1514(5) + R1515(5) + R1516(3) = 34。
+- 第 85 次预测：100304 + 34 = **100338 收集**（100316 passed + 22 skipped 预期）；collect-only 已实测 100338 一致。
+
+---
+
 ## Round 1516 — fallback PDF 嵌套 Form 与 /Matrix（3 测试）
 
 - 文件：`tests/test_parsers_fallback_edges86.py`（R1511 单层 Form 的深化；自带双层 Form scaffold）。
