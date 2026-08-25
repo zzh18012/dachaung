@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1558 — pipeline 写盘 JSON 契约（4 测试）
+
+- 文件：`tests/test_pipeline_json_contract.py`（schema 保证字段存在——**顶层键集、source_path 形态、metadata 内容、表格→markdown chunk 原文**未在 pipeline 层锁定）。
+- 新角度（probe 实证）：**source_path** == str(输入绝对路径)；**顶层键集**恰为 13 键（document_id/source_type/source_path/source_hash/parser_name/parser_version/schema_version/elements/chunks/relations/errors/warnings/metadata），errors/warnings/relations 成功时为空数组；**metadata** fallback=True + image_output_dir 以 images-<sha16> 结尾 + parser_version 含 'pdfplumber='；**表格元素 → 原样 markdown chunk**（'| a1 |  |\n| --- | --- |' 单一 source_element_ids）。
+
+---
+
 ## Round 1557 — pipeline 错误优先级（4 测试）
 
 - 文件：`tests/test_pipeline_error_precedence.py`（各错误码单独出现均有覆盖——**多失败条件叠加时谁先胜出**零覆盖）。
