@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1571 — pipeline 版面：双栏交错与短行分类（2 测试）
+
+- 文件：`tests/test_pipeline_layout_reading.py`（R1570 锁行距——**水平版面**零覆盖）。
+- 新角度（probe 实证）：**双栏文本**（x=72/350 同行）→ 按视觉行合并 'left0 right0 left1 right1 left2 right2'——阅读顺序交错（已知限制，锁行为）；**短行家族**（14pt 标题 + 两行 10pt 短文本）→ 全部 heading、sequential 下各占独立 chunk。
+
+---
+
 ## Round 1570 — pipeline 行距驱动的段落合并与累积分块（2 测试）
 
 - 文件：`tests/test_pipeline_accumulation.py`（R1569 锁单段落 800 边界——**多段落**两条路径零覆盖）。
