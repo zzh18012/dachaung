@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1486 — markdown 空标题崩溃家族（3 测试）
+
+- 文件：`tests/test_parsers_md_crash_family.py`。
+- 新角度（probe 实证）崩溃家族边界扫描（edges1-18 未碰过）：**setext 空 title 安全**（'   \n---\n' → 不产空标题不崩溃，仅 md_no_content——setext 路径 title 取自行内容，空白行跳过，与 ATX 路 '#   \n' 的崩溃行为对照）；**裸 '===' 自成段**（'   \n===\n' → 单 paragraph '==='，= 不是 thematic break）；**崩溃经 ipynb cell 通道传播**（markdown cell source 含 '#   \n' → IpynbParser.parse 同样 ValueError 穿透，ipynb 循环无 try/except；管线级由 R1485 的 unexpected_parser_error 兜底）。
+- 撞墙：0 fail 首跑（3 全过）。
+
+---
+
 ## Round 1485 — app/pipeline.py + app/cli.py markdown 崩溃遏制（2 测试）
 
 - 文件：`tests/test_pipeline_md_crash_containment.py`。
