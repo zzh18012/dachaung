@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1488 — markdown 表格相邻与分隔行语义（6 测试）
+
+- 文件：`tests/test_parsers_markdown_edges19.py`。
+- 新角度（probe 实证，2 列表格避开 edges12 单列非表锁定）：**空行分隔两表 → 两个独立 2x2 table**；**无空行相邻两表 → 合并 5x2 单表**（第二个表头与第二个 '| --- | --- |' 分隔行全部降级为数据行、'---' 字面入表）；**分隔行作数据行**（'| --- | --- |' 紧跟正常分隔行被吸收，内容逐字保留）；**纯管道表头 '| | | |' 是表**（3 空 cell 成表头、内容规范化 '|  |  |  |'、参差数据行右侧补空 cell，与 edges17 单列空 cell 成段互补）；**表后紧跟 '## H' / 文本 → header-only 表（row_count=1）+ heading/paragraph**（edges16 的 table_no_blank_before 是段→表方向，本轮补表→heading/表→段方向）。
+- 撞墙：首个 probe 用单列表格作废一轮内重试（edges12 锁定单列不成表，全部退化为 paragraph），换 2 列后一次通过（6/6 首跑）。
+
 ## Round 1487 — markdown 空内容 element 家族扩展（5 测试）
 
 - 文件：`tests/test_parsers_md_crash_family2.py`。
