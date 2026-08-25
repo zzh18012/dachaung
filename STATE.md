@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1638 — pipeline HTML 完整文档结构与标题内行内（3 测试）
+
+- 文件：`tests/test_pipeline_html_full_doc.py`（R1637 锁引用内部——**html/body 属性透明、head 整体丢弃、标题内行内剥除+实体解码**零覆盖）。
+- 新角度（probe 实证）：**标题内行内**（'<b>B</b> old &amp; new' → heading 'B old & new'）；**html/body 带属性透明**；**完整文档 head（meta/title）整体丢弃**，body 内容正常。
+
+---
+
 ## Round 1637 — pipeline blockquote 内部惰性（3 测试）
 
 - 文件：`tests/test_pipeline_blockquote_interior.py`（R1636 锁嵌套容器——**引用内部的结构标记全部失效**零覆盖）。
