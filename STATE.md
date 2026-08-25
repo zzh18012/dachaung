@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1630 — pipeline section_path 边角：跳级/回退/全类型继承（3 测试）
+
+- 文件：`tests/test_pipeline_section_path_edges.py`（R1629 锁标记变体——**heading 跳级、向上回退、代码块与列表继承**零覆盖，R1596 只锁相邻嵌套与同级重置）。
+- 新角度（probe 实证）：**跳级** '# A' 后直接 '### C' → 'A > C'（不补隐含中间层）；**向上回退** '## B' 回到 '# Z' → 'Z' 干净重置；**全类型继承**（代码围栏段落与 list_item 都带所在节 section_path）。
+
+---
+
 ## Round 1629 — pipeline Markdown 标记变体：7 级标题/子弹/括号序号（3 测试）
 
 - 文件：`tests/test_pipeline_md_markers.py`（R1628 锁表格边角——**####### 超级标题、* + - 子弹、'1)' 括号序号、混合标记**零覆盖）。
