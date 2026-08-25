@@ -72,6 +72,17 @@
 
 ---
 
+## Round 1639 — pipeline ipynb 单元内 section 与跨单元重置（3 测试）
+
+- 文件：tests/test_pipeline_ipynb_sections.py
+- 新角度（probe 实证）：R1638 锁 html 完整文档——**单元内 section_path 嵌套、跨单元重置、code 单元无 section**零覆盖：
+  - 单元内嵌套完整：多行 markdown 单元里 '# T' → '## S' 逐行跟踪（line 1/2 = 'T'，line 3/4 = 'T > S'）
+  - section 每单元重置：单元 0 的 '# Title' 不影响单元 1（段落 locator 无 section_path 键）
+  - code 单元永无 section_path；后续单元 '##' 从根开始（'Sub' 而非 'Title > Sub'）
+  - cell_index 用 notebook 原始下标（0,1,2,3 连续），code 单元不产出 heading 占位
+
+---
+
 ## Round 1638 — pipeline HTML 完整文档结构与标题内行内（3 测试）
 
 - 文件：`tests/test_pipeline_html_full_doc.py`（R1637 锁引用内部——**html/body 属性透明、head 整体丢弃、标题内行内剥除+实体解码**零覆盖）。
