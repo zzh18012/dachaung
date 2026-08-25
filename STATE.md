@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1586 — pipeline Unicode 内容：WinAnsi 八进制与 CJK（3 测试）
+
+- 文件：`tests/test_pipeline_unicode_content.py`（R1585 锁确定性——**多字节内容编码与无空白长文切分**零覆盖）。
+- 新角度（probe 实证）：**WinAnsi 八进制转义**（\\351 \\357 \\374）→ 'café naïve über' 正确解码；**DOCX 中文** → JSON 往返无损校验通过；**纯 CJK 850 字无空白** → 无词边界、**硬切** [800, 50]（strategy 仍 sentence_split）。
+
+---
+
 ## Round 1585 — pipeline DOCX 特殊样式与输出确定性（2 测试）
 
 - 文件：`tests/test_pipeline_docx_styles_determinism.py`（R1577 锁标题层级——**Title/Quote 家族、分页符、跨运行字节确定性**零覆盖）。
