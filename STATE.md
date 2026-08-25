@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1559 — pipeline python-docx 标准文档结构端到端（3 测试）
+
+- 文件：`tests/test_pipeline_docx_structure.py`（'(空段落)' 进 chunk 文本已在 evaluation 层锁定——**python-docx 标准 API 混合文档**（真 Heading1 + 空段落 + 正文 + 表格）的 pipeline 层完整结构零覆盖）。
+- 新角度（probe 实证）：**heading 元素带样式元数据** level=1 / style='Heading 1'；**标题+空段落+正文三元素合并单 chunk**（'Chapter Title (空段落) Body text here.'，ids 按序 e0000..e0002）；**表格 → 独立 markdown chunk**（'| cell1 | cell2 |\n| --- | --- |'，metadata row_count=1/col_count=2/source='python-docx'）；写盘→validate_only 回环通过。
+
+---
+
 ## Round 1558 — pipeline 写盘 JSON 契约（4 测试）
 
 - 文件：`tests/test_pipeline_json_contract.py`（schema 保证字段存在——**顶层键集、source_path 形态、metadata 内容、表格→markdown chunk 原文**未在 pipeline 层锁定）。
