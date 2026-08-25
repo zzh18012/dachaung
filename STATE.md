@@ -72,6 +72,25 @@
 
 ---
 
+## Round 1642 — pipeline Markdown 分隔线变体与列表起始号（3 测试）
+
+- 文件：tests/test_pipeline_md_hr_start.py
+- 新角度（probe 实证）：R1641 锁内联 raw——**'\*\*\*' / '\_\_\_' 分隔线、非 1 起始有序列表**零覆盖：
+  - '***' 与 '___' 都是分隔线：整行丢弃（与 '------' 一致），不产出元素
+  - 起始号 5 的有序列表：marker 'ordered'，起始号不保留在 metadata（与 html ol start 忽略一致）
+
+---
+
+## Round 1643 — pipeline ipynb outputs/attachments 全忽略（3 测试）
+
+- 文件：tests/test_pipeline_ipynb_extras.py
+- 新角度（probe 实证）：R1642 锁 hr/起始号——**code 单元 outputs/execution_count、markdown 单元 attachments 不进文档**零覆盖：
+  - outputs 丢弃：stream 输出文本不出现在任何元素
+  - execution_count 丢弃：locator 只有 cell_index/cell_type
+  - attachments 丢弃：markdown 附件不成 resource/元素
+
+---
+
 ## Round 1641 — pipeline Markdown 内联标记全 raw（3 测试）
 
 - 文件：tests/test_pipeline_md_inline_raw.py
