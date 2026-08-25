@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1479 — app/parsers/markdown_parser.py 边角第十七轮（6 测试）
+
+- 文件：`tests/test_parsers_markdown_edges17.py`。
+- 新角度（probe 实证）分隔行 RE 最短横线 + 列数自适应 + 围栏空白体（edges1-16 未碰过；edges12 已锁带空格 ':---: ' 容忍与 H1→H4→H2 栈跳级、edges11 已锁嵌套降级与 continuation、edges12 已锁 4 反引号围栏、base 已锁 ordered/tilde/hr/setext，避开）：**2 短横线杀死表格**（'| :-- | :-: |' 与 '|:--|:-:|' → 整块 paragraph，RE 要 ≥3 横线，空格无关）；**3 横线不带空格 + 冒号仍是表**（'|:---:|---:|' 规范化 '| --- | --- |'）；**参差行拓宽表格**（2 列 header + 3 列数据行 → header 补空 '| a | b |  |'、col_count=3，锁 e2e 长行拓宽）；**围栏体纯空白保留**（'```\\n   \\n```' → code_block content '   ' 原样、不发 md_empty_code_block）；**空表头不是表**（'|  |\\n| --- |\\n| x |' → paragraph）；**列表项数字内容不误判**（'- 1. looks ordered' → unordered list_item）。
+- 撞墙：0 fail 首跑（6 全过）。
+
+---
+
 ## Round 1478 — app/chunkers/structural.py 边角第十四轮（6 测试）
 
 - 文件：`tests/test_chunker_edges14.py`。
