@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1622 — pipeline 空白家族：CRLF/制表符/nbsp/BOM（3 测试）
+
+- 文件：`tests/test_pipeline_whitespace_family.py`（R1621 锁实体（&nbsp;→\xa0）——**\xa0、\t 词界、CRLF 归一、BOM 保留**零覆盖）。
+- 新角度（probe 实证）：**CRLF 归一**（\r\n→\n，空行分段不受影响）；**\xa0 与 \t 均为完整词界**（缝隙为该空白字符本身，31/3 与 32/2）；**BOM 不剥离**（﻿ 进段落内容开头）。
+
+---
+
 ## Round 1621 — pipeline HTML 实体全集与 img 属性、行内标签（3 测试）
 
 - 文件：`tests/test_pipeline_html_entities.py`（R1620 锁 md 引用——**数字实体、命名实体（nbsp/copy/quot）、img 属性筛选、em/code**零覆盖，R1602 只锁 &amp;&lt;&gt;）。
