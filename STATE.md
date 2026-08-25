@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1634 — pipeline Markdown 列表延续与缩进（3 测试）
+
+- 文件：`tests/test_pipeline_md_list_continuation.py`（R1633 锁 html 文本节点——**任务列表标记 raw、缩进延续行独立成段、4 空格缩进无代码块语义**零覆盖）。
+- 新角度（probe 实证）：**任务列表标记不解析**（'- [ ] todo' → '[ ] todo' 原样）；**缩进延续行不属于列表项**（独立 paragraph，与 R1608 嵌套一致）；**4 空格缩进剥除**（普通段落，无 indented-code-block）。
+
+---
+
 ## Round 1633 — pipeline HTML 文本节点拼接与空元素（3 测试）
 
 - 文件：`tests/test_pipeline_html_text_nodes.py`（R1632 锁空白保留——**行内标签拼接不加空格、空/纯空白元素整体丢弃、body 级 br**零覆盖）。
