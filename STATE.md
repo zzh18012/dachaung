@@ -4,6 +4,14 @@
 
 ---
 
+## Round 1481 — app/parsers/html_parser.py 边角第十九轮（8 测试）
+
+- 文件：`tests/test_parsers_html_edges19.py`。
+- 新角度（probe 实证）非元素语法构造 + img 边界 + 跨上下文 flush 丢 kind（edges1-18 未碰过；comment 已由 edges/edges3/edges16 锁定、dup-src 后者覆盖与数字实体已由 edges3 锁定，避开）：**CDATA 整段丢弃**（'<![CDATA[raw <b>stuff</b>]]>' 被 html.parser 当 bogus comment）；**处理指令丢弃**（'<?php echo 1; ?>'）；**DOCTYPE 丢弃**；**img src 纯空白**（strip 后空 → 不发 image、alt 一并丢弃）；**alt 内实体反转义**（alt='&amp;&lt;x&gt;' → '&<x>'）；**bq 内 table 杀 kind**（table 触发 flush 清空 bq 上下文 → 其后 'tail' 段丢 blockquote kind）；**bq 内 ul 的 li 无 kind 传递**；**pre 内 table**（'code' 先成 preformatted 段、table 照发，pre 上下文被 flush 打断）。
+- 撞墙：1 fail 首跑——doctype 用例笔误把 '</p>' 写成 '>'（内容变 'after doctype>'），修正后 8 全过。
+
+---
+
 ## Round 1480 — app/parsers/fallback_parser.py DOCX 边角第六十五轮（6 测试）
 
 - 文件：`tests/test_parsers_fallback_edges65.py`。
