@@ -13,6 +13,22 @@
 
 ---
 
+## Round 1458 — app/parsers/text_parser.py 边角第十一轮（11 测试）
+
+- 文件：`tests/test_parsers_text_edges11.py`。
+- 新角度（行号语义 + 空白保留）：CRLF 与**纯 CR**（老 Mac）归一 LF 行号一致（1/3）；含空白的"空行"（' '/'\t'）算分隔且**计入行号**（b 在 line 4）；段内行前导空白保留（'  a\n  b' → 'a\n  b'，首行被外层 strip）；行尾空白内部保留末行剥掉（'a   \nb'）；BOM 保留在内容里；纯空白文件 text_no_content；开头空行后段落 line 4；多空行 y line 6；直连 _split_paragraphs 三例。
+- 撞墙：0 fail 首跑（11 全过）。
+
+---
+
+## Round 1457 — app/parsers/ipynb_parser.py 边角第十一轮（13 测试）
+
+- 文件：`tests/test_parsers_ipynb_edges11.py`。
+- 新角度（source 归一 + 语言推断 + cell 交互）：source 列表**逐项 str() 强转** [1,"a",None,2.5] → '1aNone2.5'；source 缺失 → ipynb_empty_code_cell；语言推断三级回退 kernelspec.language > kernelspec.name > language_info.name（'python'/'ir'/'julia' 三路实证）；nbformat 键缺失**容忍**（doc.metadata nbformat=None）；markdown cell 的 section_path **逐 cell 隔离**；markdown 空代码块告警透传加前缀 'cell #0 (markdown):' 且 details 合并 cell_index；未知 cell_type / 非 dict cell 跳过 + 告警 + element_id 重新连续编号；空 code cell 告警 vs 空 raw cell **静默跳过**（不对称）；markdown 表格/图片 cell 类型与 resource_path 保留。
+- 撞墙：0 fail 首跑（13 全过）。
+
+---
+
 ## Round 1456 — app/parsers/html_parser.py 边角第十四轮（19 测试）
 
 - 文件：`tests/test_parsers_html_edges14.py`。
