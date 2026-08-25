@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1612 — pipeline 分块 flush 交互：heading×table、图片旁路（3 测试）
+
+- 文件：`tests/test_pipeline_flush_interplay.py`（R1611 锁家族交互——**heading 累积被 table 打断、image 元素被分块旁路**零覆盖）。
+- 新角度（probe 实证）：**md heading+table** → table 触发 flush，heading 单独成 sequential chunk（heading 累积不跨 table）；**图片旁路** → p/img/p 两段合并为一个 sequential chunk 'before after'（2 个 source id，image 不进 chunk 也不阻断合并），html 与 md 行为一致。
+
+---
+
 ## Round 1611 — pipeline 分块器 × 家族元数据交互（3 测试）
 
 - 文件：`tests/test_pipeline_chunker_family_interactions.py`（R1610 锁 ipynb 单元边角——**caption 识别仅限 fallback、家族共享 heading 累积、text 词界拆分**零覆盖）。
