@@ -72,6 +72,15 @@
 
 ---
 
+## Round 1627 — pipeline HTML 容错标记与孤儿标签（3 测试）
+
+- 文件：`tests/test_pipeline_html_orphans.py`（R1626 锁包装透明——**doctype/注释/未闭合标签、孤儿 li/td/tr、嵌套表格**零覆盖）。
+- 新角度（probe 实证）：**宽容标记**（doctype/注释丢弃、未闭合 p 正常、p 属性忽略）；**孤儿 li** → list_item（unordered 缺省）、**孤儿 td/tr** → paragraph；**嵌套表格塌缩**（外层消失，产出 '|  |
+| --- |
+| in |' 空表头+内容行）。
+
+---
+
 ## Round 1626 — pipeline HTML 块级包装透明性（3 测试）
 
 - 文件：`tests/test_pipeline_html_wrappers.py`（R1625 锁宽容解码——**div/section 包装、裸 div 文本、script/style 内容**零覆盖）。
