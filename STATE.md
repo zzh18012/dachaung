@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1564 — pipeline 图片规模与页外放置（3 测试）
+
+- 文件：`tests/test_pipeline_image_scale_offpage.py`（R1563 锁同一 XObject 两次绘制——**规模 50 次**与**页外坐标**零覆盖）。
+- 新角度（probe 实证）：**同图 50 次绘制** → 50 元素 + 50 文件 _p1_00.._p1_49（0.5s 线性、不去重）；**页外绘制**（cm 平移 x=5000）→ 元素**保留**（bbox [5000,0,5100,100]）但**不渲染**：extracted_to_disk=False、resource_path='(unrendered)' 哨兵、零错误、JSON 中 content null + 哨兵非空满足 anyOf。
+
+---
+
 ## Round 1563 — pipeline 内联图片与重复绘制（2 测试）
 
 - 文件：`tests/test_pipeline_image_inline_repeat.py`（R1551-R1562 全用 XObject——两个相邻形态零覆盖）。
