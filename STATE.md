@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1511 — fallback PDF XObject /Do 家族（7 测试）
+
+- 文件：`tests/test_parsers_fallback_edges81.py`（此前 80 轮只测页面内容流，未碰 Form/Image XObject；自带 `_pdf_form`/`_pdf_img` 双 scaffold）。
+- 新角度（probe 实证）：**Form 内文本照常提取且坐标经 cm 变换**（form 空间 (10,20) 经 cm(100,600) → bbox [110,162.5,176,174.5]；与页面文本按自上而下阅读序混排）；**Form 无 /Resources 时继承页面资源**（F1 从 page Resources 解析）；**cm 缩放精确翻倍 bbox**（2x → 宽 66→132、高 12→24）；**⚠ Form /BBox 不裁剪文本**（文本放 form y=150、BBox 仅 0..100 → 照常提取）；**Image XObject 触发 image 元素**（content=None、resource_path='(unrendered)'、bbox 即 cm 矩形、metadata srcsize=[5,5]、extracted_to_disk=False）；**未定义 XObject 名静默忽略**（/NoSuchX Do 无警告）。
+- 附带实证：form 的 /Resources 键缺失值（空值）→ PSSyntaxError → ParserError 抛出。
+
 ## Round 1510 — fallback PDF 同行跨 BT 合并与双栏布局（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges80.py`（R1509 行合并的横向对照轮）。
