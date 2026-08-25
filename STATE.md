@@ -12,6 +12,12 @@
 
 ---
 
+## Round 1517 — fallback PDF Type0/CID + ToUnicode CMap（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges87.py`（真实 CJK PDF 标准结构；此前轮次全部 Type1 单字节；自带 CMap 流 scaffold）。
+- 新角度（probe 实证）：**bfchar 映射正常提取**（<00010002> → 'AB'）；**CJK 映射**（<00030003> → '中中'）；**未映射 CID → (cid:N) 十进制占位**（<0099> → '(cid:153)'）；**⚠ 字面串字节按 CID 配对**（CID 字体上下文 '(mid)' → m+i=0x6D69=28009 → 'A(cid:28009)B'，奇数尾字节丢弃）；**无 ToUnicode 全占位**（'(cid:1)(cid:2)'）；**bfrange 区间映射**（<0010..0012> → 'abc'）。
+- 过程教训：初版 scaffold 把 /ToUnicode 指向错误对象号 → pdfplumber_word_extract_failed + pdf_no_text_extracted（字体加载失败连锁）；修正后干净提取——锁定的必须是结构正确的 PDF 行为。
+
 ## Round 1516 — fallback PDF 嵌套 Form 与 /Matrix（3 测试）
 
 - 文件：`tests/test_parsers_fallback_edges86.py`（R1511 单层 Form 的深化；自带双层 Form scaffold）。
