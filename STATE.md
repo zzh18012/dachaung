@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1541 — fallback PDF 页树结构家族（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges111.py`（此前轮次页树全为扁平单层 Kids；真实 PDF 常见多层中间 /Pages 节点与属性继承——零覆盖）。
+- 新角度（probe 实证）：**多层嵌套中间 /Pages 节点**三页按深度优先序提取（N1/N2/N3 → page 1/2/3）；**MediaBox/Resources 从父 /Pages 继承**照常（叶子省略两属性）；**/Count 5 实际 1 页**只按 Kids 提取（Count 忽略）；**同页对象重复引用**只提取一次；**空 Kids + Count 0** 零页容忍：[] + 仅 pdf_no_text_extracted；**缺失 /Count** 照常。
+
+---
+
 ## Round 1540 — fallback PDF 页面几何变体（7 测试）
 
 - 文件：`tests/test_parsers_fallback_edges110.py`（R1520 锁过 per-page MediaBox 与小页坐标翻转；本轮锁 MediaBox **取值变体**——扫描件常见负原点/小数、退化值与 /UserUnit）。
