@@ -20,6 +20,11 @@
 
 ---
 
+## Round 1523 — fallback PDF Type3 字体（3 测试）
+
+- 文件：`tests/test_parsers_fallback_edges93.py`（最后一种未测字体类型；R1515 Type1 编码重映射、R1517 Type0/CID 已测）。
+- 新角度（probe 实证）：**Type3 无 ToUnicode 原样提取**（空 CharProcs glyph 流 + /Differences → 'ab'、bbox 宽由 /Widths×/FontMatrix×字号精确驱动 (600+700)×0.012×12=187.2）；**Type3 + 单字节 ToUnicode 映射**（bfchar → 'AB'）；**超出 /LastChar 的码零宽**（'c' 仍提取但 bbox 与 'ab' 相同——默认宽 0 字符叠加）。
+
 ## Round 1522 — fallback PDF 跨页状态/空页/qQ 栈（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges92.py`（q/Q 栈与缺 /Contents 页此前未碰；自带 None=无 Contents 的多页 scaffold）。
