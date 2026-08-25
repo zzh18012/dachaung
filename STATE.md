@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1599 — pipeline 列表元数据与 text 段落分割（3 测试）
+
+- 文件：`tests/test_pipeline_text_list_metadata.py`（R1598 锁 markdown raw——**列表 marker 元数据、text 段落分割规则、空 text**零覆盖）。
+- 新角度（probe 实证）：**markdown 列表** {'ordered': True/False, 'marker': 'ordered'/'unordered'}（编号/符号剥除）；**text 解析器**空行分段、单换行保留同段；**空 .txt** → no_extracted_elements。
+
+---
+
 ## Round 1598 — pipeline Markdown 解析器：raw 保留家族（3 测试）
 
 - 文件：`tests/test_pipeline_markdown_family.py`（R1597 锁 html——**markdown 行内语法不做转换**与图片/表格细节零覆盖）。
