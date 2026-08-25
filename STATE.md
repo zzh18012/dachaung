@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1542 — fallback PDF 字体声明变体（7 测试）
+
+- 文件：`tests/test_parsers_fallback_edges112.py`（此前轮次字体为 Type1/Type0/CIDFontType0/Type3 完整声明；真实 PDF 常见 TrueType 非嵌入、残缺声明）。
+- 新角度（probe 实证）：**/Subtype /TrueType 非嵌入**同 Type1 行为；**CIDFontType2 + Identity-H 无 ToUnicode** → '(cid:16975)(cid:17497)' 双字节占位符（DW 600 定宽）；**缺失 /Subtype / /Encoding / /Type** 全部照常（回退）；**未知 /BogusEncoding** 静默回退；**/Encoding 悬空间接引用**容忍回退。全部零警告。
+
+---
+
 ## Round 1541 — fallback PDF 页树结构家族（6 测试）
 
 - 文件：`tests/test_parsers_fallback_edges111.py`（此前轮次页树全为扁平单层 Kids；真实 PDF 常见多层中间 /Pages 节点与属性继承——零覆盖）。
@@ -34,6 +41,14 @@
 
 - 文件：`tests/test_parsers_fallback_edges107.py`（此前轮次 Tm/Tf 均为规范正交矩阵与常规字号；页面级 /Rotate 已锁——本轮是**文本级**几何变换）。
 - 新角度（probe 实证）：**Tm 90°** 'VERT'→'TREV'（字符竖排阅读序反转、bbox 成 12pt 宽竖条）；**Tm 270°** 'V270' 不反转；**⚠ Tm 斜切** 'SKEW'→'W E K S'（剪切致字符基线错位 → 逐字裂词+顺序打乱）；**Tm 零横列** 零宽 bbox 文本完整；**Tm 零纵列** 零高 bbox 且 'ZV'→'Z V' 裂词；**非均匀缩放** bbox 高压至 6pt；**Tf 0.001** bbox 退化为一点仍完整提取；**⚠ Tf 1000 + 同页 12pt** 并成 'BIG SMALL' 单元素、bbox y 达 -701..299（千级行盒越出页面仍吞并）；**竖排+横排同页** 仍单元素 'TREV HORIZ'。
+
+---
+
+## 回归基线 100424（第 90 次：0 失败；100402 passed + 22 skipped，912s）
+
+- 预测命中：**100402 passed + 22 skipped = 100424 收集**（第 53 次连续总数命中）。
+- 含轮次：至 R1535（R1532-R1535 的 29 个计入 89 次基线后的预测）。此后新增 R1536(8) + R1537(9) + R1538(7) + R1539(8) + R1540(7) + R1541(6) = 45。
+- 第 91 次预测：100424 + 45 + R1542(7) = **100476 收集**（100454 passed + 22 skipped 预期）；collect-only 已实测 100476 一致。
 
 ---
 
