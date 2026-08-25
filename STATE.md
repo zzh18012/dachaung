@@ -4,6 +4,11 @@
 
 ---
 
+## Round 1515 — fallback PDF 字体编码重映射（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges85.py`（此前轮次字体全部固定 WinAnsiEncoding Helvetica；自带可变字体字典 scaffold）。
+- 新角度（probe 实证）：**/Differences 字形名重映射生效**（[65 /Beta /euro] → 'ABC' 提取为 'Β€C'——字形名查 Unicode 表、未映射码不变）；**高位码 /Differences**（[97 /alpha /beta /gamma] → 'αβγd'）；**Symbol 字体直通**（/BaseFont /Symbol 无 Encoding → 'ab' 原样——pdfminer 未应用 Symbol 希腊映射）；**ZapfDingbats 字体直通**（'ab' 原样）；**/MacRomanEncoding 生效**（\x80\x81 → 'ÄÅ' 按编码表映射）。
+
 ## Round 1514 — fallback PDF 多内容流与 FlateDecode（5 测试）
 
 - 文件：`tests/test_parsers_fallback_edges84.py`（真实 PDF 生成器常见结构；此前轮次全部单流明文；自带 zlib 压缩流 scaffold）。
