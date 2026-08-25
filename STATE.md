@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1607 — pipeline HTML 列表/表格/行内家族（3 测试）
+
+- 文件：`tests/test_pipeline_html_lists_tables.py`（R1606 锁空输入——**html 的 ol 属性、嵌套列表、thead/tbody、colspan、链接、dl** 零覆盖）。
+- 新角度（probe 实证）：**ol** → ordered/marker 分类同 markdown，**start 属性忽略**、**嵌套列表拉平**；**thead/tbody 无缝合并**、metadata 带 source:'html_table'（md 管道表是 'markdown_pipe_table'）、**colspan 折叠**（col_count 1）；**链接丢 href 留锚文本**（md 是 raw 保留）、strong 剥除、**dl 的 dt+dd 无分隔拼接**（'termdef'）。
+
+---
+
 ## Round 1606 — pipeline 家族空输入与损坏输入（3 测试）
 
 - 文件：`tests/test_pipeline_empty_families.py`（R1605 锁 spans 偏移——**md/html/ipynb 空内容警告码**零覆盖，空家族仅 R1599 锁过 .txt）。
