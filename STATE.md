@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1597 — pipeline HTML 解析器元素与分块家族（2 测试）
+
+- 文件：`tests/test_pipeline_html_family.py`（R1596 锁 locator——**html 的 img/表格/列表**在 pipeline 层零覆盖）。
+- 新角度（probe 实证）：**img** → type=image、content=None、resource_path=src 原样（不落盘）；**table** → markdown + isolated_table；**li** → list_item 像 paragraph 累积（'one two' 合并）；无 content 图片**不产 chunk**。修正：probe 打印用 `or ""` 掩盖了 content=None，断言初版误写空串。
+
+---
+
 ## Round 1596 — pipeline 多解析器 source_locator 分类学（3 测试）
 
 - 文件：`tests/test_pipeline_locator_taxonomy.py`（R1594 锁 confidence——**markdown/text/ipynb 的 locator 结构与 section_path 嵌套**在 pipeline 层零覆盖）。
