@@ -4,6 +4,11 @@
 
 ---
 
+## Round 1513 — fallback PDF TJ 数组 kern 位移语义（8 测试）
+
+- 文件：`tests/test_parsers_fallback_edges83.py`（edges43 只测过 [()] TJ 空数组，数字位移从未测过）。
+- 新角度（probe 实证）：**小正 kern 直接拼接**（[(K) 2 (e) 2 (rn)] → 'Kern' 无空格）；**⚠ 亚字符宽位移字符交织**（[(left) 300 (right)] → 'lefrtight'——300/1000×12pt=3.6pt < 字宽，字符按 x 排序交织）；**负 kern（右移）正常拼**（[(AB) -100 (CD)] → 'ABCD'）；**⚠ 正 kern 是左移**（[(aa) 8000 (bb)] → 'bb aa'、x0=-10.7——规范语义位移从当前 x 减去，与直觉相反）；**巨 kern 推出页外**（50000=600pt → x0=-514.7 仍提取）；**纯数字无字符串**（[50 -20] → pdf_no_text_extracted）；**TJ+Tj 连续**（'onetwo'）；**混合正负三组**（[(A) 4000 (B) -4000 (C)] → 'B A C' 空格连接按 x 排序）。
+
 ## Round 1512 — fallback PDF /Rotate /CropBox 与内联图像（6 测试）
 
 - 文件：`tests/test_parsers_fallback_edges82.py`（页面级几何属性此前未碰；自带带 `extra_page` 参数的 scaffold）。
