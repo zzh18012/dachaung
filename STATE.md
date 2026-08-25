@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1619 — pipeline document_id 内容派生与 img src 变体（2 测试）
+
+- 文件：`tests/test_pipeline_docid_imagesrc.py`（R1618 锁成功警告——**document_id 与文件名/扩展名无关**、**img src 变体**零覆盖）。
+- 新角度（probe 实证）：**document_id = f(内容字节)**（同内容不同文件名/.md vs .markdown → 同 id，内容变 → 不同 id，element_id 共享 doc 前缀）；**img src 原样保留**（绝对 URL/绝对路径/data URI 均不处理，alt 缺省 ''，**src="" 当无 src 丢弃**）。
+
+---
+
 ## Round 1618 — pipeline 成功路径警告序列化（3 测试）
 
 - 文件：`tests/test_pipeline_success_warnings.py`（R1617 锁失败路径——**成功但有警告**（空 code cell 夹在真实单元中间）零覆盖）。
