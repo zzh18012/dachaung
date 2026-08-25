@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1500（里程碑）— fallback PDF tokenization 鲁棒性（8 测试）
+
+- 文件：`tests/test_parsers_fallback_edges75.py`。
+- 新角度（probe 实证）：**无空格 token 全容忍**（'(compact)Tj' / 'BT/F1 12 Tf' 照常，PSBaseParser 按类型切词不依赖空白）；**\n 与纯 \r 分隔照常**；**% 注释透明**（行首 + 操作数之间的行内注释均跳过）；**重复 Tj 只显示一次**（'(a) Tj Tj' → 'a'，第二次弹空栈无效）；**连续 Td 取最后位置**。
+- 撞墙：0 fail 首跑（8/8）。累计 1500 轮；本会话自 R1488 起 13 轮连跑（markdown 2 / html 1 / fallback-docx 4 / fallback-pdf 4 / chunker 1 / markdown 1）+ 两次基线命中（79/80）。
+
 ## Round 1499 — chunker isolated 超长不切与 header/footer 流（5 测试）
 
 - 文件：`tests/test_chunker_edges15.py`（复用 edges14 的 _el/_doc 支架）。
