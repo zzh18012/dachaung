@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1605 — pipeline 硬拆分 source_spans 偏移（3 测试）
+
+- 文件：`tests/test_pipeline_split_spans.py`（R1604 锁 JSON 落盘结构——**跨 chunk source_spans 偏移语义**零覆盖）。
+- 新角度（probe 实证）：**切片恒等**（chunk.text == 元素内容[start:end]）；**拆分缝隙恰好 1 个分隔空格**（句界 797/41、词界 800/800/197，gap 均 1）；**无句读文本也用 long_paragraph_sentence_split 策略名**（词界拆分精确 800 硬上限 vs 句界 797 让步）；不超限 → 单 chunk [0, len] sequential。
+
+---
+
 ## Round 1604 — pipeline 非fallback家族 JSON 落盘结构（3 测试）
 
 - 文件：`tests/test_pipeline_json_roundtrip_family.py`（R1603 锁扩展名路由——**write_json=True 落盘 JSON 完整结构**零覆盖，R1596-1602 全用 write_json=False）。
