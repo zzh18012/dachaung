@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1566 — pipeline PDF 页级特性家族（5 测试）
+
+- 文件：`tests/test_pipeline_pdf_page_features.py`（此前 60+ 轮 PDF 边角全聚焦**内容流**——页 dict/catalog 级特性零覆盖）。
+- 新角度（probe 实证）：**/Annots（Link）**、**/AcroForm（表单字段 /V 值）**、**/Outlines（书签）** 全部中性（仅 BODY 元素、表单值不进 elements、零错误）；**/Rotate 90 / 270** → bbox 旋转变换（rot90 [697.516,72,709.516,106.008]、rot270 [82.484,505.992,94.484,540]）；**⚠ rot270 字符序反转 'YDOB'**（与 R1531 cm 旋转镜像同族）。
+
+---
+
 ## Round 1565 — pipeline 多页图片命名与页内元素序（3 测试）
 
 - 文件：`tests/test_pipeline_image_multipage.py`（R1551-R1564 图片全部单页——**跨页**与**页内全类型序**零覆盖）。
