@@ -72,6 +72,13 @@
 
 ---
 
+## Round 1629 — pipeline Markdown 标记变体：7 级标题/子弹/括号序号（3 测试）
+
+- 文件：`tests/test_pipeline_md_markers.py`（R1628 锁表格边角——**####### 超级标题、* + - 子弹、'1)' 括号序号、混合标记**零覆盖）。
+- 新角度（probe 实证）：**7 个 # 不是标题**（层级封顶 6，段落 raw）；**三种子弹字符**均 unordered；**'1)' 括号式序号识别为 ordered**；混合标记逐项保型不重编号。
+
+---
+
 ## Round 1628 — pipeline Markdown 管道表边角：对齐/参差/分隔必需（3 测试）
 
 - 文件：`tests/test_pipeline_md_table_edges.py`（R1627 锁 html 孤儿标签——**md 表格对齐冒号、参差行补空、无分隔行**零覆盖）。
