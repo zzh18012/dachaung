@@ -4,6 +4,12 @@
 
 ---
 
+## Round 1495 — fallback PDF 多页与字符串转义（5 测试）
+
+- 文件：`tests/test_parsers_fallback_edges72.py`（新增 _pdf_pages 多页 scaffold，此前所有轮均单页）。
+- 新角度（probe 实证）：**两页顺序保留**（page one → page two 各自成元素、element metadata 无 page 字段）；**⚠ 页内按 y 升序（自下而上）**：同页 bottom(y=100) 先于 top(y=700) → ['bottom','top','top2']，跨页仍按页序——**R1494 的 tr3 顺序倒置同根因**（非渲染模式影响，是页内输出顺序规则）；**转义括号**（'a\(b\)c' → 'a(b)c'）；**八进制转义**（'\053' → '+'）；**转义反斜杠**（'a\\b'）。
+- 撞墙：0 fail 首跑（5/5）。
+
 ## Round 1494 — fallback PDF 显示/渲染操作符家族（7 测试）
 
 - 文件：`tests/test_parsers_fallback_edges71.py`（复用 edges66 的 _pdf 手工 PDF 支架）。
