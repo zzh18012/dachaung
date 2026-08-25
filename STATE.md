@@ -2,6 +2,11 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1529 — fallback PDF 厨房水槽集成（1 测试）
+
+- 文件：`tests/test_parsers_fallback_edges99.py`（集成对照轮——此前 20+ 轮逐项隔离验证，本轮锁全部异形特性共存不互扰）。
+- 第 1 页叠合（双内容流明文+Flate × Type1 × Type0/CID+ToUnicode 中文 × OCG OFF 图层 × Form XObject × 48pt 水印）：**整页并成单元素** 'ALPHA GHOST DRAFT FORMBODY 中文'（水印大字号行盒吞并 640/680 行，与 R1528 单独结论一致）、零警告。第 2 页叠合（/Rotate 180 × TJ kern × /Artifact）：'HEADER'→'REDAEH'、'kerned'→'denrek' 镜像反转、页内自上而下。
+
 ## Round 1528 — fallback PDF 水印叠印家族（4 测试）
 
 - 文件：`tests/test_parsers_fallback_edges98.py`（真实 PDF 水印场景；R1483 同位叠印为同字号，本轮是大字号跨行盒叠加）。
