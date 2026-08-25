@@ -12,6 +12,11 @@
 
 ---
 
+## Round 1521 — fallback PDF 加密表面与损坏图像（2 测试）
+
+- 文件：`tests/test_parsers_fallback_edges91.py`（此前轮次零 /Encrypt 覆盖）。
+- 新角度（probe 实证）：**⚠ 标准 V1/R2 加密 → ParserError**（trailer 挂 /Encrypt、空密码校验失败 → 抛 ParserError 'pdfplumber 打开/解析 PDF 失败: ...'——结构化错误而非警告）；**DCTDecode 垃圾数据不影响提取**（/Filter /DCTDecode 流塞非 JPEG 字节 → TEXT 照常 + image 元素照发、零警告——图像数据从不解码）。
+
 ## Round 1520 — fallback PDF OCG 图层与逐页 MediaBox（3 测试）
 
 - 文件：`tests/test_parsers_fallback_edges90.py`（此前多页轮次全部同尺寸 letter；自带逐页 MediaBox scaffold）。
