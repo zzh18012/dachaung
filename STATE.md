@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1561 — CLI 图片流程端到端（1 测试）
+
+- 文件：`tests/test_cli_image_flow.py`（CLI 测试全部纯文本样例——**图片 PDF 经 parse 子命令 → images-<sha16>/ 真实创建 → validate 子命令通过**的子进程级流程零覆盖；pipeline 层 R1551/1552 已锁，本轮锁 CLI 进程边界）。
+- 新角度（probe 实证）：子进程 `parse` → rc=0 + JSON 含 image 元素（content null / resource_path 非空）+ 输出旁 images-<sha16>/ 含 _p1_00.png；接续 `validate` → rc=0。
+
+---
+
 ## Round 1560 — pipeline 多文件共享输出目录 + 空 DOCX 警告透传（2 测试）
 
 - 文件：`tests/test_pipeline_corpus.py`（此前 pipeline 测试全部单文件单输出——**多文件同目录**与**空 python-docx 警告进 error details** 零覆盖）。
