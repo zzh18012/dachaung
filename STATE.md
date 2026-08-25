@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1611 — pipeline 分块器 × 家族元数据交互（3 测试）
+
+- 文件：`tests/test_pipeline_chunker_family_interactions.py`（R1610 锁 ipynb 单元边角——**caption 识别仅限 fallback、家族共享 heading 累积、text 词界拆分**零覆盖）。
+- 新角度（probe 实证）：**md 的 'Table 1: …' 不是 caption**（caption 检测只活在 fallback 解析器，md 中是普通段落并入 sequential）；**md heading+段落合并**规则跨家族与 PDF 相同；**text 超长段**（1799 字符）词界拆 791/791/215（66 个 11 字符词恰 791，非 800 硬切；初版长度算错 1649 已修正）。
+
+---
+
 ## Round 1610 — pipeline ipynb 单元格边角（3 测试）
 
 - 文件：`tests/test_pipeline_ipynb_cell_edges.py`（R1609 锁 pre 拆分——**单元格内代码围栏、字符串形态 source、未知 cell_type**零覆盖）。
