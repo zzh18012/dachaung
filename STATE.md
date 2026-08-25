@@ -2,6 +2,14 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1582 — pipeline 图片编码变体：JPEG/CMYK/Decode 反相（3 测试）
+
+- 文件：`tests/test_pipeline_image_codecs.py`（R1562 锁基础 XObject——**压缩与色彩编码**零覆盖）。
+- 新角度（probe 实证）：**DCTDecode JPEG**（PIL 生成）与 **DeviceCMYK** → 均正常提取渲染为合法 PNG；**/Decode [1 0 1 0 1 0] 反相** → 渲染像素真实反转（红 → 青，(255,0,0)→(0,255,255)），Decode 数组被渲染器尊重。
+- 修正：`_img_obj` 最初漏插 spec 参数（/Decode 未写入流）→ 断言白像素失败；修复后首像素 (0,255,255) 命中（渲染放大后前 50 像素均属源像素 0）。
+
+---
+
 ## Round 1581 — pipeline Tz/Ts 缩放与跨 max_chars 的 id 稳定性（4 测试）
 
 - 文件：`tests/test_pipeline_tz_ts_ids.py`（R1579 锁字号——**Tz 水平缩放、Ts 基线抬升、max_chars 越界与跨参数 id 不变性**零覆盖）。
