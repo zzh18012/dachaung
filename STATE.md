@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1595 — pipeline heading 与后续段落的累积边界（2 测试）
+
+- 文件：`tests/test_pipeline_heading_para_merge.py`（R1559 锁 DOCX 标题段合并、R1592 锁段落间累积——**heading × 超长段落**交互零覆盖）。
+- 新角度（probe 实证）：**heading(19) + 小段(139)** → 合并单 chunk 159、ids [1,2]；**heading(19) + 超长段(899)** → 合并将超 max_chars → heading 独立成 sequential chunk、段落自行 sentence_split [797, 101]、heading 内容不渗入段落 chunk。
+
+---
+
 ## Round 1594 — pipeline 元素置信度分类学（2 测试）
 
 - 文件：`tests/test_pipeline_confidence_taxonomy.py`（R1593 锁 caption——**confidence 字段的 parser 级取值**在合成文档层零覆盖）。
