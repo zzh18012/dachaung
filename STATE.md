@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1596 — pipeline 多解析器 source_locator 分类学（3 测试）
+
+- 文件：`tests/test_pipeline_locator_taxonomy.py`（R1594 锁 confidence——**markdown/text/ipynb 的 locator 结构与 section_path 嵌套**在 pipeline 层零覆盖）。
+- 新角度（probe 实证）：**markdown** {line, section_path}、嵌套 ' > '（'A > B'）、同级重置；**text** 仅 {line}；**ipynb** markdown 单元带 cell_index/cell_type/line/section_path、code 单元仅 cell_index/cell_type。
+
+---
+
 ## Round 1595 — pipeline heading 与后续段落的累积边界（2 测试）
 
 - 文件：`tests/test_pipeline_heading_para_merge.py`（R1559 锁 DOCX 标题段合并、R1592 锁段落间累积——**heading × 超长段落**交互零覆盖）。
