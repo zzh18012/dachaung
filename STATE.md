@@ -2,6 +2,14 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1532 — fallback PDF 经典 xref/startxref 家族（12 测试）
+
+- 文件：`tests/test_parsers_fallback_edges102.py`（此前 100+ 轮最小 PDF **全部无 xref 表**（纯 trailer 扫描模式）；xref 流 R1524 之后经典 xref + startxref + /Prev 链零覆盖）。
+- 新角度（probe 实证）：**正经经典 xref + startxref** 正常（对照）；**/Prev 链**（startxref 指末段、obj5 前段 free 末段更新）正常；**/Root 只在前方段** → ParserError（只沿 /Prev 向后找）；**无 startxref 双 trailer 取第一个**（非最后）→ 无 /Root 即报错；**伪造 startxref 偏移** → 回退扫描救援正常；**代数不匹配 /Root 5 1 R** 容忍；**扫描模式重复对象定义字节序最后一个胜出**。
+- ⚠ 静默丢失家族（**正确 startxref + 个别条目指向垃圾偏移**——表整体可用故不触发回退扫描，逐对象信任坏条目）：**内容流坏/页对象坏 → elements=[] 仅 pdf_no_text_extracted 警告（文本无声蒸发）**；字体坏 → 仍提出文本零警告（stderr FontBBox 降级）；Catalog 坏 → 该失败触发回退救援正常。
+
+---
+
 ## Round 1531 — fallback PDF 旋转页表格检测（3 测试）
 
 - 文件：`tests/test_parsers_fallback_edges101.py`（表格检测与 /Rotate 的交互零覆盖；R1512 锁过旋转文本、R1520 锁过坐标翻转）。
