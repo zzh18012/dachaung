@@ -72,6 +72,14 @@
 
 ---
 
+## Round 1632 — pipeline 首尾空白与内部空白保留（3 测试）
+
+- 文件：`tests/test_pipeline_ws_handling.py`（R1631 锁 html section_path——**尾随空白剥除、标题内行内 raw、html 内部空白不折叠**零覆盖）。
+- 新角度（probe 实证）：**尾随空白剥除**（'# Head   ' → 'Head'，段落行尾同）；**标题内行内 raw**（'**Bold** and *it*' 原样）；**html 内部空白不折叠**（double space/
+/	 原样保留，只剥首尾，不按 HTML 规范折叠）。
+
+---
+
 ## Round 1631 — pipeline HTML section_path 机制（2 测试）
 
 - 文件：`tests/test_pipeline_html_section_path.py`（R1630 锁 md section_path 边角——**html 的同名嵌套、跳级、任意层级起步、孤儿 li 继承**零覆盖）。
