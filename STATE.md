@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1557 — pipeline 错误优先级（4 测试）
+
+- 文件：`tests/test_pipeline_error_precedence.py`（各错误码单独出现均有覆盖——**多失败条件叠加时谁先胜出**零覆盖）。
+- 新角度（probe 实证顺序：扩展名检查 > 打开/解析 > chunker > 空元素检查）：**坏 PDF + 非法 max_chars** → 仅 pdfplumber_open_failed；**⚠ 空元素 DOCX + 非法 max_chars** → 仅 chunker_failed（空元素判定发生在**分块之后**——chunker 对 0 元素文档仍先初始化并抛 max_chars 校验）；**未知扩展名 + 非法 max_chars** → 仅 unsupported_type；对照：空元素 DOCX + 合法 max_chars → no_extracted_elements。
+
+---
+
 ## Round 1556 — pipeline 输入路径形态错误（3 测试）
 
 - 文件：`tests/test_pipeline_input_paths.py`（file_not_found/unsupported_type 各有覆盖——**输入是目录**这一形态变体零覆盖）。
