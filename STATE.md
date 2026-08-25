@@ -72,6 +72,14 @@
 
 ---
 
+## Round 1636 — pipeline HTML 块嵌套异常容器（3 测试）
+
+- 文件：`tests/test_pipeline_html_nested_blocks.py`（R1635 锁围栏变体——**td 内 h2、li 内 p、非法 p 嵌套 p**零覆盖）。
+- 新角度（probe 实证）：**td 内 h2 拍平**（标题作为单元格文本进表 '| H |
+| --- |'）；**li 内 p 折叠**（块级子元素并入 li 文本成单 list_item）；**p 嵌套 p 内层透明**（'outerinner' 无分隔拼接）。
+
+---
+
 ## Round 1635 — pipeline Markdown 围栏变体：波浪线/四反引号/带参 info/未闭合（3 测试）
 
 - 文件：`tests/test_pipeline_md_fences.py`（R1634 锁列表延续——**围栏字符变体与 info 字符串严格性**零覆盖）。
