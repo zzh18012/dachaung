@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1555 — pipeline 输出路径与 CJK 文件名/内容（3 测试）
+
+- 文件：`tests/test_pipeline_output_paths.py`（此前 pipeline 测试全部预 mkdir 输出目录——**自动建目录**行为未锁；中文文件名/CJK 内容端到端零覆盖）。
+- 新角度（probe 实证）：**嵌套缺失父目录** → 自动创建后写盘成功；**中文文件名** → 正常解析、document_id 仍为 doc-<sha256[:16]>；**CJK 按字符分块** → 280 字段落 max_chars=200 切成 [200, 80]（字符计数而非 UTF-8 字节计数）。
+
+---
+
 ## Round 1554 — pipeline document_id 内容寻址 + 扩展名大小写（4 测试）
 
 - 文件：`tests/test_pipeline_identity_and_ext.py`（"doc-"+sha16 前缀约定已有单测——**文件名不参与 id** 与**扩展名大小写不敏感**零覆盖）。
