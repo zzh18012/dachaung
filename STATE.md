@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1593 — pipeline 题注 caption 家族：正则变体与隔离（3 测试）
+
+- 文件：`tests/test_pipeline_caption_family.py`（R1591/1592 锁切分边界——**caption 分类正则与 isolated_caption 策略**在合成文档层零覆盖）。
+- 新角度（probe 实证）：**PDF 正变体** Table 1:/Figure 2/Fig. 3./TABLE 4（大小写不敏感）→ caption + isolated_caption；负变体 'Table of contents'（无数字）/ 'Tab 6' → heading；**DOCX 中文** 表 1:/图 2、→ caption，**全角冒号紧贴数字** '表 1：x' → 分隔符类不含 '：' 仍是 paragraph（quirk）；caption 前后段落不与之合并。
+
+---
+
 ## Round 1592 — pipeline sequential 累积的精确 800 边界（3 测试）
 
 - 文件：`tests/test_pipeline_seq_accum_boundary.py`（R1570 锁 595 合并/893 开新——**计入分隔符的精确边界**零覆盖）。
