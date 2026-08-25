@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1581 — pipeline Tz/Ts 缩放与跨 max_chars 的 id 稳定性（4 测试）
+
+- 文件：`tests/test_pipeline_tz_ts_ids.py`（R1579 锁字号——**Tz 水平缩放、Ts 基线抬升、max_chars 越界与跨参数 id 不变性**零覆盖）。
+- 新角度（probe 实证）：**Tz 50/200** → bbox 宽度精确减半/加倍；**Ts 30** → bbox 上移 30；**max_chars=5 < 32** → chunker_failed（不静默钳制）；**同一文件不同 max_chars** → document_id 与全部 element_id 一致、chunk 数量随参数变化。
+
+---
+
 ## Round 1580 — pipeline 资源继承与重叠/变换文本（3 测试）
 
 - 文件：`tests/test_pipeline_resource_quirks.py`（R1579 锁渲染状态——**Resources 继承、重叠重复文本、cm 变换**零覆盖）。
