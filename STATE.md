@@ -2,6 +2,13 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 1545 — fallback PDF 对象引用形式家族（6 测试）
+
+- 文件：`tests/test_parsers_fallback_edges115.py`（此前轮次 /Length、字体、资源全为直接值或常规间接流引用——本轮锁非常规引用形式）。
+- 新角度（probe 实证）：**/Length 间接引用**（数字对象）、**/Font 直接内联 dict**、**多级继承**（MediaBox/Resources 在祖父 /Pages、两级向上查找）全部照常；**/Contents 指向普通 dict** → [] + 仅 pdf_no_text_extracted；**页 dict 缺失 /Type /Page** → 页不被识别静默跳页；**⚠ 流 dict 带 /F 100**（文件规格标志）→ [] + word_extract_failed + no_text 双警告——未知键无害但 /F 是保留语义键，触发外部文件解析整体失败。
+
+---
+
 ## Round 1544 — fallback PDF 图形状态算子中性+深度堆栈（8 测试）
 
 - 文件：`tests/test_parsers_fallback_edges114.py`（gs/rg/g/k/cs/w/d 等算子对**提取**的影响——零覆盖）。
