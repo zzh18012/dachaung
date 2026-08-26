@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1801 — 切分余块终结性：不吸后续短元素；标题不拉超限元素
+
+- 文件：tests/test_pipeline_remainder_terminal.py（3 个测试）
+- 新角度（probe 实证）：'好'x801 切 800+1 后，后随 '乙' 不并入 1 字余块——自起 sequential 链（余块终结、块级吸邻禁止）；'好'x799+'乙' 合并后 801 超限故两块；'## A'+巨段+'## B'：'A' 独块（标题不拉超限元素）、'B tail' 新链拉取、元素路径 [A,A,B,B]（标题路径含自身）
+- 提交：test(pipeline): add remainder terminal round (Round 1801)
+
+---
+
 ## Round 1800 — ipynb 代码胞句界/raw 胞切分、max_chars=32 极限拉取与表豁免（里程碑）
 
 - 文件：tests/test_pipeline_ipynb_minmax_milestone.py（4 个测试）
