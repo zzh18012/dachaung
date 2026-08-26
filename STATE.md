@@ -81,6 +81,22 @@
 
 ---
 
+## Round 1719 — pipeline text CRLF 分段与 ipynb source 内 CRLF 归一
+
+- 文件：tests/test_pipeline_crlf_text_ipynb.py（3 个测试）
+- 新角度（probe 实证）：R1718 锁引用散文本——text 'a
+
+b
+' CRLF 空行分段两段（write_bytes 精确写盘，呼应 R1658 教训）；ipynb markdown cell source ['l1
+','l2
+'] 归一成段落 'l1
+l2'；cell 内 ['# T
+','para
+'] heading + paragraph 照常识别
+- 提交：test(pipeline): add CRLF text/ipynb round (Round 1719)
+
+---
+
 ## Round 1718 — pipeline 嵌套列表带文本、引用散文本与表格后紧跟段落
 
 - 文件：tests/test_pipeline_nestedlist_text_bqloose.py（4 个测试）
