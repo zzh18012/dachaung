@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1776 — pipeline 标题拉列表 799 边界与 text 家族策略同谱
+
+- 文件：tests/test_pipeline_heading_list_boundary_text.py（3 个测试）
+- 新角度（probe 实证）：R1775 锁超限策略——'## '+H×795+'- bbb' → 799 合并（2 ids）——拉列表与拉段落边界全同；text 家族策略名同谱：'a'+'b' → 'a b' sequential、1019 词段 → 799（whitespace 边界）+219 'long_paragraph_sentence_split'
+- 提交：test(pipeline): add heading-list boundary/text strategy round (Round 1776)
+
+---
+
 ## Round 1775 — pipeline 超限代码/引用统一切分策略与组合隔离
 
 - 文件：tests/test_pipeline_oversize_code_bq_strategy.py（3 个测试）
