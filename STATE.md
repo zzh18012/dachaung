@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1698 — pipeline 围栏长度不敏感、星加 marker、raw cell 与超长行分块
+
+- 文件：tests/test_pipeline_fence_len_markers_raw.py（5 个测试）
+- 新角度（probe 实证）：R1697 锁闭合类型匹配——'```' 可闭合 '````'（长度不敏感，与 CommonMark 相反：code 'code' + para 'more' + 未闭合 '````' 吞 'tail'）；'*'/'+' marker 均成 list_item；ipynb raw cell 正常提取 paragraph kind 'raw_cell'（locator cell_type 'raw'，非 unknown）；1200 字符 text 行 799+399 两块（split_boundary_after 'whitespace'）；<a> 包 <h2> 透明 heading 照常
+- 提交：test(pipeline): add fence length/markers/raw cell round (Round 1698)
+
+---
+
 ## Round 1697 — pipeline 围栏闭合类型匹配、md HTML 块原样与 html 单元格内嵌块
 
 - 文件：tests/test_pipeline_fence_mismatch_nested.py（6 个测试）
