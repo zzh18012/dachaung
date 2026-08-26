@@ -81,6 +81,18 @@
 
 ---
 
+## Round 1717 — pipeline 前置空行、语言尾空格、非标准分隔行与 raw cell 多行
+
+- 文件：tests/test_pipeline_leadingblanks_badsep_rawcell.py（5 个测试）
+- 新角度（probe 实证）：R1716 锁 cell 列表——text '
+
+a
+' 前置空行忽略单段 'a'；'```py ' 尾随空格剥除 language 'py'（与 R1681 前导对偶）；'| -*- | -*- |' 非标准分隔行使三行整块退化段落（内嵌换行保留）；raw cell 多行 source 段落 'l1
+l2' kind 'raw_cell'（换行保留）；两个 td 内 h2 均拍平 '| A | B |'
+- 提交：test(pipeline): add leading blanks/bad sep/raw cell round (Round 1717)
+
+---
+
 ## Round 1716 — pipeline cell 内列表、h2 内 div、无空行引用打断与嵌套 pre
 
 - 文件：tests/test_pipeline_celllist_divh2_bq_pre.py（4 个测试）
