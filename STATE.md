@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1740 — pipeline 标题拉段撞 max_chars 精确边界与列表贪心
+
+- 文件：tests/test_pipeline_pull_maxchars_boundary.py（4 个测试）
+- 新角度（probe 实证）：R1739 锁跨 cell 链——标题只在合并后 ≤ 800 时拉段：'## T'+798 字符段 → 'T '+798=800 恰合并单 chunk（2 ids）；799 字符段 → 801 超 → 'T'（1 id）+799（1 id）；'## T'+909 字符段 → 'T'（1 id）+段自行切 799/109，标题永不并入切分块；3×389 列表项 → 779（2 ids）+389（1 id）贪心与段落全同
+- 提交：test(pipeline): add pull max_chars boundary round (Round 1740)
+
+---
+
 ## Round 1739 — pipeline ipynb 跨 cell 链细节：code cell 入链、标题跨 cell 拉段、表格 cell 打断
 
 - 文件：tests/test_pipeline_ipynb_cross_cell_chain.py（3 个测试）
