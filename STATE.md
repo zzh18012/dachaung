@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1792 — 表格规范化与列表元数据：对齐行归一、紧凑单元格重排、ordered/marker
+
+- 文件：tests/test_parser_table_norm_list_metadata.py（3 个测试）
+- 新角度（probe 实证）：':---' 与 '---:' 对齐行归一为 '---'（对齐信息丢失、表仍识别）；'|a|b|' 紧凑单元格识别后重排为 '| a | b |'；list_item 携带 {'ordered': bool, 'marker': ...}——md '1.'→ordered、'- '/'*'→unordered、html ol 同谱 ordered
+- 提交：test(parser): add table norm list metadata round (Round 1792)
+
+---
+
 ## Round 1791 — 切分块真实偏移、md bq kind 元数据、bq 内结构不解析
 
 - 文件：tests/test_pipeline_split_spans_bq_kind.py（3 个测试）
