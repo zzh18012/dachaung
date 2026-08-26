@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1821 — li 内嵌表格抽出、th 内标题剥壳、th 内图片空单元（html 嵌套结构）
+- 动机：锁 R1820（md 尖括号 URL）之后，转向 html 解析器嵌套结构交互——列表项内嵌表格、表头单元格内的块级标签与图片，此前 42 轮零覆盖
+- 探针：3 组独立 heredoc 探针（li+table / th+h2 / th+img），全部断言来自实测输出
+- 结论 1：`<li>x<table>...</table></li>` 表格不留在列表项内——抽出为兄弟 table 元素，list_item 'x'（unordered）+ table 并存，metadata {row_count:1, col_count:2, source:html_table}
+- 结论 2：`<th><h2>H</h2></th>` 剥成纯文本 'H'——单元内块级标签退化为文本，不发射 heading 元素，整表 '| H | n |' + '| --- | --- |'
+- 结论 3：`<th><img src="i.png"></th>` 图片不抽出（区别于 img-in-heading 的拆分行为）——静默空单元 '|  | n |'，无 image 元素发射
+- 新增：tests/test_parser_li_table_th_structures.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1820 — md 块级 HTML 原样、裸 URL 原样、尖括号图 URL 保留
 
 - 文件：tests/test_parser_md_raw_html_url.py（3 个测试）
