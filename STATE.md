@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1750 — pipeline 标题内联处理：md 全 raw 与 html 解码剥除
+
+- 文件：tests/test_pipeline_heading_inline_raw.py（3 个测试）
+- 新角度（probe 实证）：R1749 锁 image 细节——md 标题内容 100% raw：'## T **b** `c`'/'a | b'/'[t](u)'/'*i* _u_ ~~s~~' 全原样保留、'&amp;' 不解码；html 标题相反：'A &amp; B' → 'A & B' 解码、'T <b>x</b> y' → 'T x y' 标签剥除——同语义两家解析器相反策略
+- 提交：test(pipeline): add heading inline raw round (Round 1750)
+
+---
+
 ## Round 1749 — pipeline image 元素细节：URL/data URI src、重复不去重、confidence 0.9 与四图夹段
 
 - 文件：tests/test_pipeline_image_element_details.py（3 个测试）
