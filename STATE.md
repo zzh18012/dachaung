@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1733 — pipeline 超限两段不合并与图片不打断合并
+
+- 文件：tests/test_pipeline_merge_boundaries.py（2 个测试）
+- 新角度（probe 实证）：R1732 锁贪心合并——764+189 字符两段合并会超 max_chars 各自成 chunk（764/189 各 1 id）；html p/img/p 两段跨 image 照常合并 'aaa bbb' 单 chunk（image 元素被旁路，不参与也不打断段落合并，ids 2）
+- 提交：test(pipeline): add merge boundaries round (Round 1733)
+
+---
+
 ## Round 1732 — pipeline 顺序合并贪心规则：合并到不超 max_chars 为止
 
 - 文件：tests/test_pipeline_greedy_merge.py（2 个测试）
