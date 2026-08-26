@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1685 — pipeline 分隔线变体扩展与嵌套空容器（3 测试）
+
+- 文件：tests/test_pipeline_hr_variants_empty.py
+- 新角度（probe 实证）：R1684 锁空标题——**'****' 四星、'- - -' 带空格破折号都是分隔线、嵌套空 div 整体无内容**零覆盖：
+  - '****'：分隔线丢弃（R1642 三星版延伸）
+  - '- - -'：带空格破折号同样丢弃（不成列表项）
+  - 嵌套空容器：'<div><div></div></div>' → no_extracted_elements + html_no_content
+
+---
+
 ## Round 1684 — pipeline 空标题丢弃与空单元格保留（3 测试）
 
 - 文件：tests/test_pipeline_empty_headings_cells.py
