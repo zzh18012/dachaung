@@ -84,8 +84,7 @@
 ## Round 1789 — 内联 HTML 原样、单列表退化、实体单趟解码、有序列表去号
 
 - 文件：tests/test_parser_inline_html_entities.py（4 个测试）
-- 新角度（probe 实证）：md 段内 <b>bold</b> 原样保留；'\|' 单列头+分隔行不构成表——整块退化多行段落（
- 保留、无警告）；html 实体单趟解码：'&amp;amp;' → '&amp;'（不解第二趟）、'&lt;x&gt;' → '<x>'、无分号 '&copy' → '©'（宽松解析）；md '1. one' 与 html ol 全同——裸 list_item、编号丢弃、合并 'one two'
+- 新角度（probe 实证）：md 段内 <b>bold</b> 原样保留；'\|' 单列头+分隔行不构成表——整块退化多行段落（\n 保留、无警告）；html 实体单趟解码：'&amp;amp;' → '&amp;'（不解第二趟）、'&lt;x&gt;' → '<x>'、无分号 '&copy' → '©'（宽松解析）；md '1. one' 与 html ol 全同——裸 list_item、编号丢弃、合并 'one two'
 - 提交：test(parser): add inline html entities round (Round 1789)
 
 ---
