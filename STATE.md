@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1706 — pipeline 异 marker 列表合并、块级 code、unknown cell reason 与 emoji 实体
+
+- 文件：tests/test_pipeline_diffmarkers_blockcode_unknown.py（5 个测试）
+- 新角度（probe 实证）：R1705 锁前导零——'- a
+
+* b' 异 marker 两个 list_item 合 1 chunk（跨空行合并）；<body><code>sys</code></body> 块级 code 成普通段落（无 code_block kind，对比 pre）；cell_type 'custom' doc None + 完整 reason "cell #0 类型未知: 'custom'"（details cell_index/cell_type）；'## T   ' 尾随空格剥除；'&#x1F600;' emoji 十六进制实体解码 'a 😀 b'
+- 提交：test(pipeline): add diff markers/block code/unknown cell round (Round 1706)
+
+---
+
 ## Round 1705 — pipeline 前导零列表、nbsp 空格、cell 内围栏、p 内 div 与表头列数优先
 
 - 文件：tests/test_pipeline_zeros_nbsp_cellfence.py（6 个测试）
