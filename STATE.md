@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1784 — parser 结构覆盖：ol/ul 无编号、br 转空格、setext 退化、hr 静默丢弃
+
+- 文件：tests/test_parser_structures_coverage.py（5 个测试）
+- 新角度（probe 实证）：html ol 与 ul 同为裸 list_item（'1.' 编号不保留）合并 '一 二'；<br> 转空格并入同段 'line1 line2'；md setext 'Title
+===' 不识别为标题（退化段落、内部 
+ 保留、与 body 合并）；'---' 主题分隔线整行静默丢弃（无元素无警告）两侧段落跨越合并 'aaa bbb'；嵌套引用 '> > deep' 剥一层标记成 '> deep' 段落（非 blockquote 类型）
+- 提交：test(parser): add structures coverage round (Round 1784)
+
+---
+
 ## Round 1783 — 句界无阈值、whitespace 多路、超限判定前先 strip
 
 - 文件：tests/test_pipeline_sentence_threshold_strip.py（3 个测试）
