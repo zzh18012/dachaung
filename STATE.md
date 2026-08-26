@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1790 — parser 细节：dl 无分隔拼接、ATX 尾井号剥离、空 p 丢弃、bq 平段化
+
+- 文件：tests/test_parser_dl_trailing_hash_empty.py（4 个测试）
+- 新角度（probe 实证）：html <dl> 的 dt+dd 直接拼接无空格 'termdef' 成单段；'## T ##' 尾井号剥离 heading 'T'（level 2）；<p></p> 与 <p>  </p> 静默丢弃（仅剩 'x'、无警告）；<blockquote> 不留标记——'q1' 平段落与后续合并 'q1 after'
+- 提交：test(parser): add dl trailing hash empty round (Round 1790)
+
+---
+
 ## Round 1789 — 内联 HTML 原样、单列表退化、实体单趟解码、有序列表去号
 
 - 文件：tests/test_parser_inline_html_entities.py（4 个测试）
