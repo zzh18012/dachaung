@@ -81,6 +81,17 @@
 
 ---
 
+## Round 1659 — pipeline md 文件尾无换行（3 测试）
+
+- 文件：tests/test_pipeline_eof_no_newline.py
+- 新角度（probe 实证）：R1658 锁 CR 字节——**EOF 无尾换行的表格/列表/标题/带语言未闭合围栏**零覆盖：
+  - 表无尾换行：检测照常成 table（separator 行完整即可，最后一行不需 
+）
+  - 列表/标题无尾换行：list_item / heading 照常
+  - 带语言未闭合围栏：吃余文件且 language 'py' 保留（R1635 只锁空语言版）
+
+---
+
 ## Round 1658 — pipeline 语义容器透明与 CR 字节精确性（3 测试）
 
 - 文件：tests/test_pipeline_wrappers_text_lines.py
