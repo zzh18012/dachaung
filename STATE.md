@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1741 — pipeline 各级标题拉段一致、链块元数据与多行拼接
+
+- 文件：tests/test_pipeline_heading_levels_join_sep.py（3 个测试）
+- 新角度（probe 实证）：R1740 锁拉段 800 边界——h1–h6 六级行为全同（'T bbb'，2 ids，sequential）；'## T'+列表 chunk metadata 完整三键 {'strategy': 'sequential', 'max_chars': 800, 'char_count': 3}；多行引用 '> line a
+> line b'+'bbb' → 'line a
+line b bbb'（2 ids）——内部换行保留、元素间拼接恒单空格
+- 提交：test(pipeline): add heading levels/join sep round (Round 1741)
+
+---
+
 ## Round 1740 — pipeline 标题拉段撞 max_chars 精确边界与列表贪心
 
 - 文件：tests/test_pipeline_pull_maxchars_boundary.py（4 个测试）
