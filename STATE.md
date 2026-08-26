@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1730 — pipeline 引用后表格打断、img 独占 h2、单引号属性与 form feed
+
+- 文件：tests/test_pipeline_bqtable_imgh2_squote.py（4 个测试）
+- 新角度（probe 实证）：R1729 锁双 img——'> q' 后无空行表格照常识别并打断引用块；<h2><img></h2> 仅剩 image 元素（空标题静默丢弃无警告）；<img src='a.png'> 单引号属性等价解析；text 'ab' form feed 原样保留不作行分隔
+- 提交：test(pipeline): add bq table/img h2/squote round (Round 1730)
+
+---
+
 ## Round 1729 — pipeline 同段双 img、hr 分隔双表与两个引用段
 
 - 文件：tests/test_pipeline_dualimg_hrtables_twobq.py（3 个测试）
