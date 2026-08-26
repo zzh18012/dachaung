@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1707 — pipeline img 字段、text 尾空格保留、nbformat 3 不支持与 td 多项拼接
+
+- 文件：tests/test_pipeline_img_fields_nbformat3.py（5 个测试）
+- 新角度（probe 实证）：R1706 锁 unknown cell——**新错误码 ipynb_unsupported_version**（nbformat=3 → 错误级非嵌套警告，message '仅支持 nbformat ≥ 4，得到 nbformat=3'，details path/nbformat）；img 完整字段 content None、resource_path 'pic.png'、metadata 仅 alt（title 丢弃）；text 'a   
+b  ' 行尾空格原样保留不 strip；td 内两个 li 无空格拼接 'ij'；'- a | b' list_item 管道原样不切
+- 提交：test(pipeline): add img fields/nbformat3 round (Round 1707)
+
+---
+
 ## Round 1706 — pipeline 异 marker 列表合并、块级 code、unknown cell reason 与 emoji 实体
 
 - 文件：tests/test_pipeline_diffmarkers_blockcode_unknown.py（5 个测试）
