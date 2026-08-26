@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1782 — 切分家族同谱：CJK 多路 forced、句界跨 md/html/代码块统一
+
+- 文件：tests/test_pipeline_split_family_uniformity.py（3 个测试）
+- 新角度（probe 实证）：'字'*1800 三块 800/800/200——中间块各标 forced_char、末块 None；句界切分跨家族统一：md 段落、html <p>、md 围栏代码块的 7 句 1007 全部 723+283（首块尾 'S5.'）——代码块并非 forced_char 专属，R1775 的 CJK 代码 forced 只因 CJK 无空白句界
+- 提交：test(pipeline): add split family uniformity round (Round 1782)
+
+---
+
 ## Round 1781 — 多路句界切分：逐窗递进、每窗末句号、无内容丢失
 
 - 文件：tests/test_pipeline_multiway_sentence_split.py（3 个测试）
