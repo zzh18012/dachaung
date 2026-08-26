@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1800 — ipynb 代码胞句界/raw 胞切分、max_chars=32 极限拉取与表豁免（里程碑）
+
+- 文件：tests/test_pipeline_ipynb_minmax_milestone.py（4 个测试）
+- 新角度（probe 实证）：ipynb code cell 带句号 1007 → 723+283（与 md 围栏同用句界，代码胞非 forced 专属）；raw cell 字x900 → 800+100 forced（raw 胞照切分）；max_chars=32 极限：H30+'- b' → 恰 32 合并（2 ids sequential）；33 字表仍单块 isolated_table——表豁免与 max_chars 取值无关
+- 提交：test(pipeline): add ipynb minmax milestone round (Round 1800)
+
+---
+
 ## Round 1799 — 超限 bq/pre 邻居隔离：双侧独立 sequential、bq 内围栏字面
 
 - 文件：tests/test_pipeline_bq_pre_neighbor_isolation.py（3 个测试）
