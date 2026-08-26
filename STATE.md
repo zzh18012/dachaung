@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1819 — html 锚文本保留、style/script 内容整体丢弃
+
+- 文件：tests/test_parser_anchor_style_script.py（3 个测试）
+- 新角度（probe 实证）：<a href> 内联——锚文本保留 'see link here'、href 丢弃；<style> 与 <script> 内容整体静默丢弃（CSS/JS 不发射、无警告、后续段落照常）——与注释/hr 同属静默丢弃族
+- 提交：test(parser): add anchor style script round (Round 1819)
+
+---
+
 ## Round 1818 — max_chars 变体类型：float 限内可行/切分即败、bool ValueError、None TypeError
 
 - 文件：tests/test_pipeline_maxchars_variant_types.py（3 个测试）
