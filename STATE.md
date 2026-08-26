@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1812 — 裸标签：tr 无表成拼接段、li 独立成项、列表项空格剥离
+
+- 文件：tests/test_parser_bare_tags_li_strip.py（3 个测试）
+- 新角度（probe 实证）：裸 <tr>（无 <table> 包裹）不是表——单元格拼接 'xy' 成段（与 dl 同型无分隔）；裸 <li> 无 <ul> 仍是 list_item（unordered）；'- x  ' 尾空格与 '-   y' 多空格标记后都剥净
+- 提交：test(parser): add bare tags li strip round (Round 1812)
+
+---
+
 ## Round 1811 — ipynb source 变体：字符串源、胞多余字段忽略、minor 0 记录
 
 - 文件：tests/test_pipeline_ipynb_source_variants.py（3 个测试）
