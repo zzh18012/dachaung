@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1832 — fence 语言原样、bq 懒续行分裂、hr 星号变体（Round 1832）
+- 动机：锁 R1831（家族统一切分）后回到 parser 表层——语言标识规范化与否、引用跨行语法、水平线语法变体，均零覆盖
+- 探针：4 组 heredoc 探针（原始大小写围栏 / 懒续行 / 星号 hr 单置 / 混排），断言全部来自实测
+- 结论 1：'```PyThon' 语言原样存 metadata {'kind':'code_block','language':'PyThon'}——不小写化不归一
+- 结论 2：'> a' 后无 '>' 标记行 'b' 不并引用——bq 'a'（kind blockquote）+ 独立 paragraph 'b'（懒续行不识别）
+- 结论 3：'***' 星号 hr 同破折号——单置整文档无元素 → doc=None + no_extracted_elements；混排时静默消失仅剩 'para'
+- 新增：tests/test_parser_fence_case_lazy_hr.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1831 — 超长 li/fence/bq 统一 3a 切分 800+100 forced_char（Round 1831）
 - 动机：R1830 锁 heading 豁免后补反面——非标题非表格元素（list_item/code fence/bq）超长时全部走 3a 分支，家族一致性未锁
 - 探针：4 组 heredoc 探针（li/fence/bq 各 900 字 + 边界键复探），断言全部来自实测
