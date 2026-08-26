@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1727 — pipeline 引用内列表标题惰性与嵌套标题拆分
+
+- 文件：tests/test_pipeline_bq_inert_nested_headings.py（3 个测试）
+- 新角度（probe 实证）：R1726 锁 figure——'> - item' 与 '> # T' 引用内列表/标题标记全惰性成原样段落 kind 'blockquote'（与 fence/table 惰性一致，md bq 内部完全无语法）；<h2>a<h3>b</h3>c</h2> 嵌套标题拆开外层容器成 heading 'a'（2）+ heading 'b'（3）+ paragraph 'c' 三段
+- 提交：test(pipeline): add bq inert/nested headings round (Round 1727)
+
+---
+
 ## Round 1726 — pipeline figure 透明、language_info 语言来源与 details/summary 合并
 
 - 文件：tests/test_pipeline_figure_langinfo_details.py（3 个测试）
