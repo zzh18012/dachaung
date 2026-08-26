@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1824 — md 任务列表字面、嵌套表行提升外文本丢、标题内锚文本保（Round 1824）
+- 动机：锁 R1823（html bq/li p/ol start）之后，查 md 任务列表语法、html 深层嵌套表格、标题内联锚——三者此前零覆盖
+- 探针：4 组 heredoc 探针（任务列表 / 嵌套表 / 标题锚 / 嵌套表复证），断言全部来自实测
+- 结论 1：md '- [ ] todo' / '- [x] done' 复选框语法整体字面——内容 '[ ] todo'/'[x] done'，unordered 照发（raw 哲学含任务标记）
+- 结论 2：td 内嵌 <table>——内层行提升进外表格（row_count=2, col_count=1），首行外单元文本 'out' 丢失（空单元），整表 '|  |' + 分隔 + '| in |'，单 table 元素，静默无警告
+- 结论 3：`<h2>T <a href="u">lnk</a></h2>` → heading 'T lnk' + level 2——锚壳剥掉文本留，标题类型不分裂（区别于 img-in-heading）
+- 新增：tests/test_parser_tasklist_nested_table_heading_a.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1823 — html bq kind、li 内 p 剥壳、ol start 忽略（Round 1823）
 - 动机：锁 R1822（内联格式/caption/md 链接）之后，查 html 语义块标签与列表属性——html <blockquote> 的元素形态、li 内块级嵌套、ol start 编号行为，此前零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测输出
