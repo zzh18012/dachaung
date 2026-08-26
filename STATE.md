@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1665 — pipeline 无引号属性/br/ 自闭合/空白 md cell（3 测试）
+
+- 文件：tests/test_pipeline_unquoted_br_ws.py
+- 新角度（probe 实证）：R1664 锁大写标签——**无引号属性值、'<br/>' 变体、纯空白 markdown cell**零覆盖：
+  - 无引号属性：'<img src=x.png alt=A>' 照常 image（alt 'A'）
+  - '<br/>'：与 <br> 一致成单空格 'a b'
+  - 纯空白 md cell：无元素无专属警告（markdown cell 从不单独警告），整本 → no_extracted_elements + ipynb_no_content
+
+---
+
 ## Round 1664 — pipeline 孤 dd/大写标签/带空格引用（3 测试）
 
 - 文件：tests/test_pipeline_dd_upper_bq.py
