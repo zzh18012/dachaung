@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1731 — pipeline ul 前散文本、百段合一块与 raw/markdown 交替 cell
+
+- 文件：tests/test_pipeline_ulloose_100paras_altcells.py（3 个测试）
+- 新角度（probe 实证）：R1730 锁引用后表格——<ul>pre<li>a</li></ul> 散文本先成 paragraph 'pre' 再 list_item 'a'；100 个 text 段落（'w0'…'w99'）全并单 chunk 389 字符（sequential 全合并，远小于 max_chars）；raw/m1/raw 三 cell 交替顺序保留 kind 依次 raw_cell/无/raw_cell
+- 提交：test(pipeline): add ul loose/100 paras/alt cells round (Round 1731)
+
+---
+
 ## Round 1730 — pipeline 引用后表格打断、img 独占 h2、单引号属性与 form feed
 
 - 文件：tests/test_pipeline_bqtable_imgh2_squote.py（4 个测试）
