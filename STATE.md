@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1774 — pipeline 管道行退化：裸分隔行、分隔行在前皆段落
+
+- 文件：tests/test_pipeline_pipe_line_degradation.py（3 个测试）
+- 新角度（probe 实证）：R1773 锁策略三值——'| --- | --- |' 单独成 paragraph；分隔行在前（'| --- | --- |
+| a | b |'）整块退化 paragraph（内部 
+ 保留、无警告）；两者都是 sequential 链成员；仅"表头在前+分隔行"构成真表（row_count 1，isolated_table）
+- 提交：test(pipeline): add pipe line degradation round (Round 1774)
+
+---
+
 ## Round 1773 — pipeline chunk strategy 全谱三值：sequential / long_paragraph_sentence_split / isolated_table
 
 - 文件：tests/test_pipeline_strategy_taxonomy.py（3 个测试）
