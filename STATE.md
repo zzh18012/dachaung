@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1677 — pipeline 同级标题替换与标题自身入路径（2 测试）
+
+- 文件：tests/test_pipeline_sibling_sections.py
+- 新角度（probe 实证）：R1676 锁 html 引用透明——**同级兄弟标题替换（不嵌套）、回到 h1 重置、heading 自身 section_path 含自己**零覆盖：
+  - '## B' 后 '## C'：C 是 'A > C' 而非 'A > B > C'（同级替换）——补齐 section 矩阵：下嵌/上重置/跳级/同名合并/同级替换
+  - 回到 '# C'：路径从根重来 'C'
+  - 标题自身入路径：heading 'B' 的 section_path 是 'A > B'（含自己）
+
+---
+
 ## Round 1676 — pipeline html blockquote 结构透明与交替围栏（3 测试）
 
 - 文件：tests/test_pipeline_html_bq_fence_langs.py
