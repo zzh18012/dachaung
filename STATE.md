@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1709 — pipeline marker 后纯空格 crash 家族、tab 分隔标题与空单元格表
+
+- 文件：tests/test_pipeline_marker_ws_crash_family.py（5 个测试）
+- 新角度（probe 实证）：R1708 锁 '##   ' crash——crash 家族扩大：'-   ' 与 '1.   '（marker 后仅空格）同样触发 unexpected_parser_error（空 content ValueError）；'>   ' 引用丢弃走 doc None + md_no_content（不 crash）；'#	T' tab 等效空格作标题分隔符 heading 'T'；'~~~   ' info 空白剥除 language ''；'|  |  |' 空单元格表合法 row_count 1 col 2
+- 提交：test(pipeline): add marker-ws crash family round (Round 1709)
+
+---
+
 ## Round 1708 — pipeline 仅表头表格、colspan 忽略与纯空格标题结构化错误
 
 - 文件：tests/test_pipeline_header_only_ws_heading.py（5 个测试）
