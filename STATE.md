@@ -81,6 +81,18 @@
 
 ---
 
+## Round 1699 — pipeline 次行 th 非表头、kernelspec 语言、围栏内波浪线与散表格文本
+
+- 文件：tests/test_pipeline_th_tbody_kernelspec.py（6 个测试）
+- 新角度（probe 实证）：R1698 锁围栏长度——第二行 <th>H</th> 不当表头（首行 'a' 隐式表头，'H' 为数据格）；kernelspec.language 'python' 写入 cell metadata 与 doc.metadata；'```' 围栏内 '~~~' 是内容原样闭合照常；text 'a
+
+
+
+b' 空行串折叠两段；h2 实体解码 'a & b'；<table>loose</table> 散文本丢弃 doc None + html_no_content
+- 提交：test(pipeline): add second-row th/kernelspec round (Round 1699)
+
+---
+
 ## Round 1698 — pipeline 围栏长度不敏感、星加 marker、raw cell 与超长行分块
 
 - 文件：tests/test_pipeline_fence_len_markers_raw.py（5 个测试）
