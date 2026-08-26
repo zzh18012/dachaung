@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1673 — pipeline 闭合围栏带尾文本与 h7/h0（3 测试）
+
+- 文件：tests/test_pipeline_fence_close_h7.py
+- 新角度（probe 实证）：R1672 锁混合行尾——**'``` tail' 闭合变体、超范围标题层级**零覆盖：
+  - 闭合围栏带尾：'``` tail' 仍闭合 code_block，但 ' tail' 文本被丢弃（不成段落、不进 code）
+  - '<h7>'：超 6 级 → 普通段落；'<h0>'：低于 1 级 → 普通段落（heading 只认 1-6）
+
+---
+
 ## Round 1672 — pipeline 混合行尾/尾井号非独立/td 内 pre 换行（3 测试）
 
 - 文件：tests/test_pipeline_mixed_endings.py
