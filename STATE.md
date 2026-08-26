@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1713 — pipeline 引用内表格与 pre、text 行首空格、深层嵌套 img
+
+- 文件：tests/test_pipeline_bq_table_pre_deepimg.py（5 个测试）
+- 新角度（probe 实证）：R1712 锁 CRLF——html blockquote 对 <table> 完全透明（嵌套 bq 内表格同样）；bq 内 <pre> 成 preformatted 段落；text 'a
+ b' 合并单段（行首空格与换行保留）；div>div>p>img 深层嵌套 image 照常提取 resource_path 'i.png'
+- 提交：test(pipeline): add bq table/pre/deep img round (Round 1713)
+
+---
+
 ## Round 1712 — pipeline text tab 保留、ol 散文本插序与 CRLF markdown
 
 - 文件：tests/test_pipeline_tab_loose_crlf.py（5 个测试）
