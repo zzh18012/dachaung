@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1814 — cli 扩展名大小写不敏感自动选择：.HTML/.Txt/.Md 全识别
+
+- 文件：tests/test_cli_autoselect_case.py（2 个测试）
+- 新角度（probe 实证）：自动选择对后缀大小写不敏感——.HTML→html、.TXT→text、.Md→markdown（INFO+OK+exit 0）；大写 .MD 的 JSON source_type 'markdown'（后缀 lower 后判型，与 R1754 显式 parser 路径一致）
+- 提交：test(cli): add autoselect case round (Round 1814)
+
+---
+
 ## Round 1813 — 空白标记崩溃边界：'## '/'##T' 非标题成段，2+ 空格崩溃
 
 - 文件：tests/test_parser_ws_marker_crash_boundary.py（3 个测试）
