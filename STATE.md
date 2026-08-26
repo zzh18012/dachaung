@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1767 — pipeline 超限元素隔离：切分块不吸邻与尾部重组
+
+- 文件：tests/test_pipeline_oversize_isolation.py（3 个测试）
+- 新角度（probe 实证）：R1766 锁混型链——1019 字符巨段切 799/219 后前邻 'a'、后邻 'b' 都不并入任何切分块（'a'+巨+'b' → 1/799/219/1 四块各 1 id）；巨段+'b'+'c' → 799/219/'b c'（2 ids）尾部小段重组新链；'## T'+巨+'- x' → 'T'/799/219/'x' 四块
+- 提交：test(pipeline): add oversize isolation round (Round 1767)
+
+---
+
 ## Round 1766 — pipeline 混型连续链：夹心、标题居中与混标记全并
 
 - 文件：tests/test_pipeline_mixed_chains.py（3 个测试）
