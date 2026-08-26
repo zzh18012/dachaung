@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1764 — pipeline html 空表与单行表：静默消失、无警告与表头化重建
+
+- 文件：tests/test_pipeline_empty_table_html.py（3 个测试）
+- 新角度（probe 实证）：R1763 锁 output_path——'<table></table>' 不产元素：单独时整文件 (None, no_extracted_elements) 嵌 html_no_content；混 '<p>keep</p>' 时表静默消失且 warnings [] 无警告；单行表重建为表头+分隔行（'| x & y | z |
+| --- | --- |'，cell 内标签剥除+实体解码、tbody 内首行同样表头化、row_count 1）
+- 提交：test(pipeline): add empty/single-row table round (Round 1764)
+
+---
+
 ## Round 1763 — pipeline output_path 行为：自动建目录、静默覆盖与字符串路径
 
 - 文件：tests/test_pipeline_output_path_mkdir.py（3 个测试）
