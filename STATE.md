@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1771 — pipeline 超限标题：永不切分、不拉段与 799 合并边界
+
+- 文件：tests/test_pipeline_oversized_heading.py（3 个测试）
+- 新角度（probe 实证）：R1770 锁 JSON 警告——标题自身超 800 也原样单 chunk 不切（'## '+H×850 → 850 单块 1 id）+ 'bbb' 独立；恰好合并不超时才拉段：H×795+' bbb'=799 ≤ 800 合并单 chunk（2 ids）、H×798+' bbb'=802 > 800 分开两块
+- 提交：test(pipeline): add oversized heading round (Round 1771)
+
+---
+
 ## Round 1770 — pipeline 失败不落盘与 warnings 序列化省键
 
 - 文件：tests/test_pipeline_json_failure_warnings.py（3 个测试）
