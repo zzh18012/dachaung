@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1722 — pipeline 切分边界元数据三态：句界省略、whitespace、forced_char
+
+- 文件：tests/test_pipeline_split_boundary_metadata.py（4 个测试）
+- 新角度（probe 实证）：R1721 锁 forced_char——'word. '*200（1200 字符）797+401 两块块尾 'rd.'，句界切分时 metadata 无 split_boundary_after 键（三态：句界省略 / 'whitespace' / 'forced_char'）；CJK 恰 800 单 chunk 边界不切；CJK 802 800 forced_char + 2；3 句长句 + 'a '*300（666 字符）单 chunk 665 不切
+- 提交：test(pipeline): add split boundary metadata round (Round 1722)
+
+---
+
 ## Round 1721 — pipeline 反斜杠围栏失效、空 tr 占位与 CJK forced_char 切分
 
 - 文件：tests/test_pipeline_backslash_fence_forcedchar.py（4 个测试）
