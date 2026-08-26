@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1724 — pipeline CJK 内容跨家族：md 结构、html 与 ipynb
+
+- 文件：tests/test_pipeline_cjk_all_families.py（3 个测试）
+- 新角度（probe 实证）：R1723 锁句界缺失——CJK 在 md 标题/列表/管道表（表格重建 CJK 原样 row_count 2）、html 标题/段落、ipynb code cell（中文代码 code_cell 段落原样）全部正常
+- 提交：test(pipeline): add CJK all families round (Round 1724)
+
+---
+
 ## Round 1723 — pipeline 中文句号不作句界、ASCII ?/! 句界与混合文本 forced_char
 
 - 文件：tests/test_pipeline_cjk_sentence_boundary.py（4 个测试）
