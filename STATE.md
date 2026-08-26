@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1810 — 无空白文本 forced_char：长单词、混排粘接；全角/组合字符原样
+
+- 文件：tests/test_pipeline_script_split_preserve.py（3 个测试）
+- 新角度（probe 实证）：'a'x900 无空格拉丁长词 → 800 forced_char+100（无句界无空白 → 直落第三档 forced 而非 whitespace）；字x450+q x450 混排粘接 → 800 forced+100（切点不看文字边界）；'ＡＢＣ é' 全角+组合字符原样保留（无规范化、len 5）
+- 提交：test(pipeline): add script split preserve round (Round 1810)
+
+---
+
 ## Round 1809 — 切分块 metadata 全键、标题拉代码链、样式标题原文
 
 - 文件：tests/test_pipeline_split_meta_h_code.py（3 个测试）
