@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1653 — pipeline html hr 丢弃/li 链接 raw/body 内 title 丢弃（3 测试）
+
+- 文件：tests/test_pipeline_hr_title_drop.py
+- 新角度（probe 实证）：R1652 锁 pre>code——**hr 元素、列表项内联链接、head 外 title**零覆盖：
+  - html '<hr>' 整体丢弃：前后段落照常（与 md 分隔线一致）
+  - li 内链接 raw：'- [x](http://u) tail' 剥 '- ' 后链接原样
+  - body 内 '<title>' 也丢：title 不只在 head 中被剥，出现在 body 同样不产出元素
+
+---
+
 ## Round 1652 — pipeline pre>code/硬换行/嵌套引用/字符串 code（3 测试）
 
 - 文件：tests/test_pipeline_micro_edges.py
