@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1701 — pipeline dl 多项拼接、双空 cell 警告、800 字符边界与标题紧接表格
+
+- 文件：tests/test_pipeline_dl_multi_800_boundary.py（5 个测试）
+- 新角度（probe 实证）：R1700 锁 md 注释原样——dl 多项 dt A + dt B + dd C 全拼接单段 'ABC'；两个空 code cell 各自 ipynb_empty_code_cell 警告（cell_index 0/1）+ ipynb_no_content（注意 no_content 警告 dict 无 'details' 键，断言用 .get）；恰好 800 字符无空格 text 单 chunk 800 strategy 'sequential' 边界不切；'# T' 直接接表格行 heading 与 table 都识别（表格不做惰性续行）；空 code cell + markdown cell 成功路径 doc 有 'hi' 且 warnings 携带 cell #0 警告
+- 提交：test(pipeline): add dl multi/800 boundary round (Round 1701)
+
+---
+
 ## Round 1700 — pipeline md 注释原样、li 内 b 剥离、script 剔除与 hr-only cell
 
 - 文件：tests/test_pipeline_md_comment_li_script.py（6 个测试）
