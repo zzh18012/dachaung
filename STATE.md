@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1798 — 无空行块边界：标题贴表、表贴段、列表-表-列表三明治
+
+- 文件：tests/test_pipeline_glued_block_boundaries.py（3 个测试）
+- 新角度（probe 实证）：块类型交替处无需空行——'## T' 直接贴表行：heading 与 table 各自成块（表破拉取，'T' 独块 sequential + isolated_table）；表行直接贴 'after' 段：两元素两块；'- a' 表 '- b' 三明治：三块 'a'/表/'b' 各 1 id——表两侧链全断、不跨表重连
+- 提交：test(pipeline): add glued block boundaries round (Round 1798)
+
+---
+
 ## Round 1797 — 标签大小写不敏感、属性实体解码、md 反斜杠转义字面
 
 - 文件：tests/test_parser_tag_case_escapes.py（3 个测试）
