@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1737 — pipeline 代码块与引用块完整入合并链
+
+- 文件：tests/test_pipeline_code_bq_join_chain.py（4 个测试）
+- 新角度（probe 实证）：R1736 锁表格唯一打断链——代码块与引用块都是链的正式成员：'aaa'+围栏代码+'bbb' → 'aaa code bbb'（3 ids）；'aaa'+'> q'+'bbb' → 'aaa q bbb'（3 ids）；'## T'+code+'bbb' → 'T c bbb'（3 ids）标题链穿过代码块；'> q'+'bbb' → 'q bbb'（2 ids）引用块作链首
+- 提交：test(pipeline): add code/bq join chain round (Round 1737)
+
+---
+
 ## Round 1736 — pipeline 列表入合并链与表格打断标题链
 
 - 文件：tests/test_pipeline_list_chain_table_break.py（4 个测试）
