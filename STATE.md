@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1803 — cli 扩展名自动选 parser、显式 --parser 无 INFO、--max-chars 传达到切分
+
+- 文件：tests/test_cli_autoselect_maxchars.py（3 个测试）
+- 新角度（probe 实证）：省略 --parser 时按扩展名自动选择——'[INFO] 未指定 --parser，按扩展名 .txt 自动选择: text'（INFO 行走 stderr、[OK] 走 stdout）；显式 --parser 不出 INFO；--max-chars 100 → 300 词文本切 14 块、全部 ≤100、块 metadata max_chars=100——CLI 参数全量传达
+- 提交：test(cli): add autoselect maxchars round (Round 1803)
+
+---
+
 ## Round 1802 — cli parse/validate md：OK 摘要行、Schema 校验通过、空文件错误 JSON 与退出码
 
 - 文件：tests/test_cli_parse_md_round.py（3 个测试）
