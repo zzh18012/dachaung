@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1781 — 多路句界切分：逐窗递进、每窗末句号、无内容丢失
+
+- 文件：tests/test_pipeline_multiway_sentence_split.py（3 个测试）
+- 新角度（probe 实证）：18 句 2799 字符四块 723/720/679/674——每窗刷新，前三块尾 'S5.'/'S10.'/'S14.'（皆句号）、末块余文 'w17_24'；归一化拼接 == 原文（块间不丢不重）；max_chars=200 时 435 字符 147/143/139——窗口大小随参数缩放
+- 提交：test(pipeline): add multiway sentence split round (Round 1781)
+
+---
+
 ## Round 1780 — 句末符集：全角/半角终结符需后随空白，; , 不终结
 
 - 文件：tests/test_pipeline_sentence_terminators.py（3 个测试）
