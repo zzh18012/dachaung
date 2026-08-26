@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1729 — pipeline 同段双 img、hr 分隔双表与两个引用段
+
+- 文件：tests/test_pipeline_dualimg_hrtables_twobq.py（3 个测试）
+- 新角度（probe 实证）：R1728 锁 NBSP——同一 <p> 内两个 <img> 出两个 image 元素（a.png + b.png 顺序保留，p 消失）；html <hr> 正确分隔两张独立表；'> q1
+
+> q2' 空行分隔两个 blockquote 段落但合 1 chunk
+- 提交：test(pipeline): add dual img/hr tables/two bq round (Round 1729)
+
+---
+
 ## Round 1728 — pipeline tab 缩进断列表、NBSP 作标题分隔、td 内引用拍平
 
 - 文件：tests/test_pipeline_tablist_nbspsep.py（4 个测试）
