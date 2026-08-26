@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1820 — md 块级 HTML 原样、裸 URL 原样、尖括号图 URL 保留
+
+- 文件：tests/test_parser_md_raw_html_url.py（3 个测试）
+- 新角度（probe 实证）：md 不解析块级 HTML——'<div>x</div>' 整行字面段落；裸 URL 不成链接——原文保留；'![a](<url with space.png>)' 尖括号本身保留在 resource_path 里（不剥壳）——md 家族"原文至上"再添三证
+- 提交：test(parser): add md raw html url round (Round 1820)
+
+---
+
 ## Round 1819 — html 锚文本保留、style/script 内容整体丢弃
 
 - 文件：tests/test_parser_anchor_style_script.py（3 个测试）
