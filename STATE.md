@@ -174,6 +174,14 @@ b' 两段一个 chunk；markdown cell 只有 '---' hr 丢弃 doc None + ipynb_no
 
 ---
 
+## 回归基线 100972（第 119 次：0 失败；100950 passed + 22 skipped，1022s）
+
+- 命中：预测 100972 = 100950 + 22，实际 100950 + 22 = 100972（第 82 次连续精确命中）
+- 含轮次：R1691–R1699（新增 40 个测试：100910 + 40 = 100950 passed）
+- 下次预测：101024 = 100972 + 52（R1700–R1709 共 10 轮 52 个测试）
+
+---
+
 ## Round 1699 — pipeline 次行 th 非表头、kernelspec 语言、围栏内波浪线与散表格文本
 
 - 文件：tests/test_pipeline_th_tbody_kernelspec.py（6 个测试）
