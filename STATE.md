@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1791 — 切分块真实偏移、md bq kind 元数据、bq 内结构不解析
+
+- 文件：tests/test_pipeline_split_spans_bq_kind.py（3 个测试）
+- 新角度（probe 实证）：切分块 spans 是元素相对真实偏移：(0,723) 与 (724,1007)——边界空格 723 被跳过（与合并块 start=0 退化形成对照；标题块 (0,1)）；md '> x' 是 paragraph + kind='blockquote'、locator {'line': 1}（html bq 无 kind——家族有差）；bq 内 '## T'/表格行不解析——整块字面成段（内部换行保留）；另实证 section_path 在元素 source_locator 上（块 metadata 无此键）
+- 提交：test(pipeline): add split spans bq kind round (Round 1791)
+
+---
+
 ## Round 1790 — parser 细节：dl 无分隔拼接、ATX 尾井号剥离、空 p 丢弃、bq 平段化
 
 - 文件：tests/test_parser_dl_trailing_hash_empty.py（4 个测试）
