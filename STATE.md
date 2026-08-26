@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1773 — pipeline chunk strategy 全谱三值：sequential / long_paragraph_sentence_split / isolated_table
+
+- 文件：tests/test_pipeline_strategy_taxonomy.py（3 个测试）
+- 新角度（probe 实证）：R1772 锁表格豁免——strategy 仅三值：合并链一切成员 'sequential'（短段/列表/代码/引用/标题拉段）；超限元素切分 'long_paragraph_sentence_split'（词界与 CJK forced_char 同名）；真表格 'isolated_table'；另证：'| a | b |' 无分隔行不是表（paragraph 并入链 'T bbb | a | b |'）
+- 提交：test(pipeline): add strategy taxonomy round (Round 1773)
+
+---
+
 ## Round 1772 — pipeline 真表格豁免 max_chars：strategy isolated_table 永不切分
 
 - 文件：tests/test_pipeline_isolated_table_exemption.py（3 个测试）
@@ -278,6 +286,16 @@ b'、'  a  ' → 'a'（两侧全 strip）；source 键缺失或空列表 → 静
 - 文件：tests/test_pipeline_image_element_details.py（3 个测试）
 - 新角度（probe 实证）：R1748 锁 doc id 派生——image resource_path 原样保留（'http://x/y.png' 与 'data:image/png;base64,AAAA' 均不处理），metadata 仅 {'alt': ...}；重复 src 不去重（两个元素各得 id）；image confidence 0.9 低于文本元素 0.95、locator {'line': 1}；4 图夹在两段间合并如常 'a b'（2 ids）
 - 提交：test(pipeline): add image element details round (Round 1749)
+
+---
+
+## 回归基线 101200（第 126 次：0 失败；101178 passed + 22 skipped，1050s）
+
+- 命中：预测 101200 = 101178 + 22，实际 101178 + 22 = 101200（第 89 次连续精确命中）
+- 含轮次：R1748–R1759（新增 39 个测试：101139 + 39 = 101178 passed）
+- 下次预测：101243 = 101200 + 43（R1760–R1773 共 14 轮 43 个测试）
+  （R1760:3 R1761:2 R1762:3 R1763:3 R1764:3 R1765:3 R1766:3 R1767:3 R1768:4 R1769:3 R1770:3 R1771:3 R1772:3 R1773:3）
+- 备注：第 126 次预测初版误算 35 已当场修正为 39（collect-only 实证），命中不受影响
 
 ---
 
