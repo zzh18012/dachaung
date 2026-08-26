@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1831 — 超长 li/fence/bq 统一 3a 切分 800+100 forced_char（Round 1831）
+- 动机：R1830 锁 heading 豁免后补反面——非标题非表格元素（list_item/code fence/bq）超长时全部走 3a 分支，家族一致性未锁
+- 探针：4 组 heredoc 探针（li/fence/bq 各 900 字 + 边界键复探），断言全部来自实测
+- 结论：900 字 list_item、代码围栏、引用全切 (800, long_paragraph_sentence_split, forced_char) + (100, 同 strategy, 无 boundary 键)——首块键集 [char_count, max_chars, split_boundary_after, strategy]，末块 [char_count, max_chars, strategy]，三家完全同型
+- 新增：tests/test_pipeline_oversize_family_split.py（3 个测试，共用 _assert_two_way_split）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1830 — 超长标题豁免切分、不吸尾段、max_chars 31 触底（Round 1830）
 - 动机：R1829 读 structural.py 后继续沿源码锁分支行为——heading 分支（310-315 行）只 push 不查超长，与表格豁免平行；构造器 280-281 行 max_chars < 32 raise ValueError，管线级表现未锁
 - 探针：3 组 heredoc 探针（900 字标题单置 / +尾段 / max_chars=31），断言全部来自实测
