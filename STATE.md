@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1671 — pipeline 裸引用行/表内散文本/空 tbody 空文档（3 测试）
+
+- 文件：tests/test_pipeline_nocontent_edges.py
+- 新角度（probe 实证）：R1670 锁空列表项——**'>' 独行、table 直下文本、无行 tbody 三个空边界全走 no_content**零覆盖：
+  - '>' 独行：空 blockquote 丢弃 → md_no_content
+  - 表内散文本：'<table>loose</table>' 文本不在 td 内 → 丢弃 → html_no_content
+  - 空 tbody：无 tr → 表不产出 → html_no_content
+
+---
+
 ## Round 1670 — pipeline md 空列表项退化（3 测试）
 
 - 文件：tests/test_pipeline_empty_list_items.py
