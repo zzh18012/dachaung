@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1746 — pipeline 家族 locator 形态与 section_path 跨 cell 不传递
+
+- 文件：tests/test_pipeline_family_locators.py（3 个测试）
+- 新角度（probe 实证）：R1745 锁 JSON 回验——html/text 物理行号定位：html 三元素 line 1/2/3 且 h2 起带 section_path 'T'；text 仅 line 无 section_path 键、metadata {'text': True}、confidence 0.95；ipynb locator 带 cell_index/cell_type/line 三键且 section_path 不跨 cell 传递——cell0 '## T' 带 'T'、cell1 段落无该键（与 md 文件内跟随标题相反）
+- 提交：test(pipeline): add family locators round (Round 1746)
+
+---
+
 ## Round 1745 — pipeline JSON 落盘与 schema 回验闭环
 
 - 文件：tests/test_pipeline_json_roundtrip.py（3 个测试）
