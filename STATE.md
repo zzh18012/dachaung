@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1756 — pipeline WarningRecord 精确形态：reason 字段、details 键与空块不入元素
+
+- 文件：tests/test_pipeline_warning_records.py（3 个测试）
+- 新角度（probe 实证）：R1755 锁未知 parser——WarningRecord 三字段 code/reason/details（用 reason 非 message，ErrorRecord 才用 message）：ipynb 空 code cell → reason 'cell #0 是空 code cell'、details {'cell_index': 0}；未知类型 → details {'cell_index', 'cell_type'}；md 空代码块 → reason 'line 3 处的代码块为空'、details=None 且空块不入元素（段落照常合并 'text more'）
+- 提交：test(pipeline): add warning records round (Round 1756)
+
+---
+
 ## Round 1755 — pipeline 未知 parser、目录输入与 kreuzberg 扩展名限制
 
 - 文件：tests/test_pipeline_unknown_parser_dir.py（3 个测试）
