@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1694 — pipeline md checkbox 原样、列表后围栏、对齐冒号归一与 BOM
+
+- 文件：tests/test_pipeline_checkbox_fence_align_bom.py（4 个测试）
+- 新角度（probe 实证）：R1693 锁嵌套列表——'- [ ] todo' checkbox 语法无感知原样 list_item；列表项后 0 缩进围栏独立成 code_block（language py）；'| :---: | ---: |' 对齐冒号重建时剥离归一 '| --- | --- |'；'﻿# T' BOM 挡住标题识别降级 paragraph（text 侧 '﻿hello' 段落保留）；html <ol start="5"> 属性忽略仅 ordered list_item
+- 提交：test(pipeline): add checkbox/fence/align/BOM round (Round 1694)
+
+---
+
 ## Round 1693 — pipeline html 嵌套列表拍平、标题 inline 剥离、单列表格与 md 括号 marker
 
 - 文件：tests/test_pipeline_nested_list_html_edges.py（4 个测试）
