@@ -81,6 +81,17 @@
 
 ---
 
+## Round 1690 — pipeline 空代码块警告 md_empty_code_block（3 测试）
+
+- 文件：tests/test_pipeline_empty_code_block.py
+- 新角度（probe 实证）：R1689 锁跨行注释——**'```py
+```' 空块触发第 8 个警告码、行号入 reason、纯空白块不算空**零覆盖：
+  - 空块独占文件：warnings = [md_empty_code_block（line 1）, md_no_content]，doc None
+  - 空块夹在段落间：成功路径 doc.warnings 携带 'line 3 处的代码块为空'，段落照常
+  - 纯空白块：'   ' 成 paragraph 内容不警告；两个空块各自一条警告（line 1/line 4）
+
+---
+
 ## Round 1689 — pipeline 跨行注释与空白 code 单元（2 测试）
 
 - 文件：tests/test_pipeline_ml_comment_ws_cell.py
