@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1742 — pipeline 相邻表格独立性与无空行并表、多行代码入链
+
+- 文件：tests/test_pipeline_adjacent_tables_multiline_code.py（3 个测试）
+- 新角度（probe 实证）：R1741 锁拼接单空格——空行分隔的两表各自成 chunk（各 1 id）互不合并；无空行直接相连时并成一个 5 行表（第二分隔行 '| --- | --- |' 沦为数据行，row_count=5）；多行围栏代码入链保内部换行 'aaa l1
+l2 bbb'（3 ids）
+- 提交：test(pipeline): add adjacent tables/multiline code round (Round 1742)
+
+---
+
 ## Round 1741 — pipeline 各级标题拉段一致、链块元数据与多行拼接
 
 - 文件：tests/test_pipeline_heading_levels_join_sep.py（3 个测试）
