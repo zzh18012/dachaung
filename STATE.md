@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1662 — pipeline code_block 与段落/列表合并分块（3 测试）
+
+- 文件：tests/test_pipeline_code_chunk_merge.py
+- 新角度（probe 实证）：R1661 锁纯图零 chunk——**code_block 元素与相邻段落/列表合并进同一 sequential chunk**零覆盖：
+  - 段落-围栏-段落：'before code after' 单块（3 id，空格连接 code 文本）
+  - 列表-围栏-列表：'a c b' 单块（3 id，围栏不切断列表合并）
+  - 引用单块：blockquote 成常规 sequential chunk（无特殊 strategy）
+
+---
+
 ## Round 1661 — pipeline 纯图文档零 chunk/纯标题单 chunk（3 测试）
 
 - 文件：tests/test_pipeline_image_only_docs.py
