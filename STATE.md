@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1799 — 超限 bq/pre 邻居隔离：双侧独立 sequential、bq 内围栏字面
+
+- 文件：tests/test_pipeline_bq_pre_neighbor_isolation.py（3 个测试）
+- 新角度（probe 实证）：'aaa'+巨引用(好x900)+'bbb' → 3/800/100/3——引用超限切分与代码块同谱、双侧邻居独立成链不被吸入；bq 内 '```' 围栏不识别——字面成段 kind blockquote；html 巨 pre 同构 3/800/100/3——隔离模式跨 md/html 全同
+- 提交：test(pipeline): add bq pre neighbor isolation round (Round 1799)
+
+---
+
 ## Round 1798 — 无空行块边界：标题贴表、表贴段、列表-表-列表三明治
 
 - 文件：tests/test_pipeline_glued_block_boundaries.py（3 个测试）
