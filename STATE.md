@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1739 — pipeline ipynb 跨 cell 链细节：code cell 入链、标题跨 cell 拉段、表格 cell 打断
+
+- 文件：tests/test_pipeline_ipynb_cross_cell_chain.py（3 个测试）
+- 新角度（probe 实证）：R1738 锁跨 cell 段落合并——md+code+md 三 cell → 'aaa print(1) bbb'（3 ids），code cell 元素 metadata {'kind': 'code_cell', 'language': ''}（无 kernelspec 时 language 空）；cell1 '## T' 拉 cell2 段 → 'T bbb'（2 ids）；表格 cell 跨 cell 打断 → 'aaa'+表+'bbb' 三块各 1 id
+- 提交：test(pipeline): add ipynb cross-cell chain round (Round 1739)
+
+---
+
 ## Round 1738 — pipeline 合并链跨家族：html 标题链、html 表格打断与 ipynb 跨 cell 合并
 
 - 文件：tests/test_pipeline_chain_cross_family.py（3 个测试）
