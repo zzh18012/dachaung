@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1823 — html bq kind、li 内 p 剥壳、ol start 忽略（Round 1823）
+- 动机：锁 R1822（内联格式/caption/md 链接）之后，查 html 语义块标签与列表属性——html <blockquote> 的元素形态、li 内块级嵌套、ol start 编号行为，此前零覆盖
+- 探针：3 组独立 heredoc 探针，断言全部来自实测输出
+- 结论 1：html `<blockquote>quoted text</blockquote>` → paragraph + metadata {kind: 'blockquote'}——与 md bq 共用 kind taxonomy，非独立 bq 类型
+- 结论 2：`<li><p>para in li</p></li>` → list_item 'para in li'——p 壳在 li 内剥掉，只留文本，unordered 元数据照发
+- 结论 3：`<ol start="5">` 编号忽略——'five'/'six' 内容无数字（start 属性不进内容），ordered=True/marker='ordered' 元数据照发
+- 新增：tests/test_parser_html_bq_li_p_ol_start.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1822 — 内联格式剥壳、caption 静默丢、md 内联链接字面（Round 1822）
 - 动机：锁 R1821（li 内表格/th 嵌套）之后，继续查 html 内联语义标签与表格附属元素、md 链接语法——三者此前零覆盖
 - 探针：3 组独立 heredoc 探针（b/i/strong/em/code 串 / caption 表 / md 链接行），断言全部来自实测
