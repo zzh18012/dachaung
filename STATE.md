@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1802 — cli parse/validate md：OK 摘要行、Schema 校验通过、空文件错误 JSON 与退出码
+
+- 文件：tests/test_cli_parse_md_round.py（3 个测试）
+- 新角度（probe 实证）：CLI 层（此前轮次全走 process_single）——parse md → '[OK] in → out (elements=2, chunks=1, warnings=0)' exit 0、out.json 落盘可回读；validate 独立子命令 → '通过 Schema 校验' exit 0；空 md → 结构化错误 JSON（code no_extracted_elements、details.warnings 含 md_no_content、source_type markdown）exit 1、不落盘（错误 JSON 走 stderr，OK 行走 stdout——两流分流实证）
+- 提交：test(cli): add parse md round (Round 1802)
+
+---
+
 ## Round 1801 — 切分余块终结性：不吸后续短元素；标题不拉超限元素
 
 - 文件：tests/test_pipeline_remainder_terminal.py（3 个测试）
