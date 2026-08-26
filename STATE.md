@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1826 — 语义壳透明、空 alt 图片、section_path 层级链（Round 1826）
+- 动机：锁 R1825（ipynb md cell/混排表头/空白文件）之后，查 html 语义容器、md 图片边界、标题层级深度——R1817 只锁过单级 section_path，嵌套层级行为零覆盖
+- 探针：3 组独立 heredoc 探针，断言全部来自实测输出
+- 结论 1：`<article><section><p>in sec</p></section></article>` 双层语义壳完全透明——仅 paragraph 'in sec'，无壳字面残留、不推断 heading
+- 结论 2：md '![](u.png)' 空 alt 图片——image 元素 content=None、metadata {alt: ''}、resource_path='u.png'（空 alt 是空串不是 None）
+- 结论 3：'# A' + '## B' 层级 section_path 用 ' > ' 分隔——heading A 自身 'A'、heading B 与后续 para 均 'A > B'（层级而非只有末级）
+- 新增：tests/test_parser_semantic_wrap_alt_hierarchy.py（3 个测试）
+- 状态：本地通过（3 passed；首跑 1 断言书写笔误，修后通过）
+---
+
 ## Round 1825 — ipynb md cell 结构、混排 th/td 全表头、纯空白 text 报空（Round 1825）
 - 动机：锁 R1824（任务列表/嵌套表/标题锚）之后，查 ipynb markdown cell 的内部解析深度、表头单元格混排判定、text 空白文件路径——三者此前零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测输出
