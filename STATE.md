@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1762 — pipeline max_chars 极值：负值、十亿巨值与字符串类型
+
+- 文件：tests/test_pipeline_maxchars_extremes.py（3 个测试）
+- 新角度（probe 实证）：R1761 锁 32 下限——负值 -5 同 chunker_failed 壳（'分块失败: max_chars 过小: -5'，ValueError）；10**9 巨值三段全并 'aaa bbb ccc'（3 ids）；字符串 '800' 触发 TypeError 也走 chunker_failed（message 含 "'<' not supported"，details exception_type TypeError）
+- 提交：test(pipeline): add max_chars extremes round (Round 1762)
+
+---
+
 ## Round 1761 — pipeline max_chars 下限契约：chunker_failed 错误与 32 边界
 
 - 文件：tests/test_pipeline_maxchars_floor_contract.py（2 个测试）
