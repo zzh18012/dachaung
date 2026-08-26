@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1828 — html 嵌套 ul 扁平、li 内 bq 抽出、连续表 isolated_table（Round 1828）
+- 动机：锁 R1827（img alt/波浪围栏/三级链）之后，查 html 列表嵌套形态、li 内引用抽取、表格分块策略名——三者零覆盖
+- 探针：3 组独立 heredoc 探针，断言全部来自实测（chunk 策略名首测误写 sequential，实测 isolated_table 后修正）
+- 结论 1：html 嵌套 `<ul><li>a<ul><li>b</li></ul></li></ul>` 扁平化——'a'/'b' 两兄弟 list_item，均 unordered，无层级信息（与 md 嵌套扁平一致）
+- 结论 2：li 内 `<blockquote>` 抽出为兄弟——list_item 'x' + paragraph 'q' kind='blockquote'（与 li 内表格抽取同模式）
+- 结论 3：两张连续表各自独立 chunk——每 chunk 1 元素，strategy='isolated_table'（表格分块策略名首次锁定，区别于段落 sequential 合并）
+- 新增：tests/test_parser_nested_ul_li_bq_tables.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1827 — html img alt 捕获、波浪线围栏等价、三级层级链（Round 1827）
 - 动机：锁 R1826（语义壳/空 alt/两级链）之后，补 html 图片 alt 侧、md 波浪线围栏、层级深度三点——均零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测输出
