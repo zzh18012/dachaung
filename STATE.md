@@ -81,6 +81,23 @@
 
 ---
 
+## Round 1658 — pipeline 语义容器透明与 CR 字节精确性（3 测试）
+
+- 文件：tests/test_pipeline_wrappers_text_lines.py
+- 新角度（probe 实证）：R1657 锁连续表/img——**六种语义容器透明、精确 
+ 与畸形 
+ 的家族一致行为**零覆盖：
+  - main/article/header/footer/nav/aside 六种语义容器与 div/section 一致全透明
+  - 精确 CRLF 字节（write_bytes）：text 与 md 都合并连续行 'para one.
+still one.'（与 R1622/R1624 一致）
+  - 畸形 '
+'（双 CR）：每个孤立  都是分隔符 → 成空白行 → 逐行各成段（两家族一致）
+- 教训：Path.write_text 在 Windows 默认 newline 翻译会把字符串里的 
+ 写成 
+，测 CRLF 必须用 write_bytes（本轮曾因此得到"text 逐行分段"的假发现并纠正）
+
+---
+
 ## Round 1657 — pipeline 连续 md 表/img 破坏标题/ipynb 缺 source（3 测试）
 
 - 文件：tests/test_pipeline_md_tables_img_heading.py
