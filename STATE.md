@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1775 — pipeline 超限代码/引用统一切分策略与组合隔离
+
+- 文件：tests/test_pipeline_oversize_code_bq_strategy.py（3 个测试）
+- 新角度（probe 实证）：R1774 锁管道行退化——900 CJK 围栏代码与引用块切分同为 'long_paragraph_sentence_split'（首块 forced_char）；'aaa'+巨码块+'bbb' 组合：两侧 sequential 独立（3/1 id）、中间 800/100 切分——R1767 隔离模式的策略名印证
+- 提交：test(pipeline): add oversize code/bq strategy round (Round 1775)
+
+---
+
 ## Round 1774 — pipeline 管道行退化：裸分隔行、分隔行在前皆段落
 
 - 文件：tests/test_pipeline_pipe_line_degradation.py（3 个测试）
