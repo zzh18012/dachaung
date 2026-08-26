@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1816 — 全类型混合链：标题+段+列表+引用+代码+尾段单块；span 退化全景
+
+- 文件：tests/test_pipeline_full_mixed_chain.py（2 个测试）
+- 新角度（probe 实证）：'## T'+para+'- li'+'> q'+'```c```'+tail 六元素全部一块 'T para li q c tail'（6 ids sequential）；每元素 span start=0、end=自身长度——合并块 span 退化在 6 元素全景下复证；bq/代码元素类型均为 paragraph（kind 区分）
+- 提交：test(pipeline): add full mixed chain round (Round 1816)
+
+---
+
 ## Round 1815 — 多警告保序：空围栏行号递增、ipynb 混合警告按胞序
 
 - 文件：tests/test_pipeline_warning_order.py（2 个测试）
