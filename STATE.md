@@ -85,15 +85,19 @@
 
 - 文件：tests/test_pipeline_wrappers_text_lines.py
 - 新角度（probe 实证）：R1657 锁连续表/img——**六种语义容器透明、精确 
- 与畸形 
+ 与畸形 
+
  的家族一致行为**零覆盖：
   - main/article/header/footer/nav/aside 六种语义容器与 div/section 一致全透明
   - 精确 CRLF 字节（write_bytes）：text 与 md 都合并连续行 'para one.
 still one.'（与 R1622/R1624 一致）
-  - 畸形 '
-'（双 CR）：每个孤立  都是分隔符 → 成空白行 → 逐行各成段（两家族一致）
+  - 畸形 '
+
+'（双 CR）：每个孤立 
+ 都是分隔符 → 成空白行 → 逐行各成段（两家族一致）
 - 教训：Path.write_text 在 Windows 默认 newline 翻译会把字符串里的 
- 写成 
+ 写成 
+
 ，测 CRLF 必须用 write_bytes（本轮曾因此得到"text 逐行分段"的假发现并纠正）
 
 ---
@@ -143,6 +147,12 @@ text
   - 标题贴表无空行：'# H' 下一行即表头，heading 与 table 均识别（table isolated_table）
 
 ---
+
+## 回归基线 100829（第 109 次：0 失败；100807 passed + 22 skipped，1049s）
+
+- 预测 100829（= 100807 + 22）✅ **命中**（连续第 72 次）
+- 含轮次：R1653 及之前全部（R1646~R1653 共 8 轮 24 测试）
+- 下次预测：100844（= 100829 + R1654~R1658 共 5 轮 × 3 = 15；collect-only 已复核）
 
 ## Round 1653 — pipeline html hr 丢弃/li 链接 raw/body 内 title 丢弃（3 测试）
 
