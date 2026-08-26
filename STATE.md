@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1712 — pipeline text tab 保留、ol 散文本插序与 CRLF markdown
+
+- 文件：tests/test_pipeline_tab_loose_crlf.py（5 个测试）
+- 新角度（probe 实证）：R1711 锁无值 src——text 'a	b' 内 tab 原样保留不转空格；<li>a</li>loose<li>b</li> 散文本成 paragraph 且顺序插在两个 list_item 之间（不打断列表）；CRLF 结尾的 md 表格/标题+段落/列表全部识别（write_bytes 精确写盘，内容归一 '
+'，呼应 R1658 教训）
+- 提交：test(pipeline): add tab/loose ol/CRLF round (Round 1712)
+
+---
+
 ## Round 1711 — pipeline 无值 src、大写实体、脚注原样、null source 与闭合空格
 
 - 文件：tests/test_pipeline_bare_attr_entity_footnote.py（5 个测试）
