@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1760 — pipeline 表格实体对比：md raw 保留与 html 解码、img 属性解码
+
+- 文件：tests/test_pipeline_table_entity_contrast.py（3 个测试）
+- 新角度（probe 实证）：R1759 锁 alt 变体——同一表格语义两家实体策略相反：md 重建管道文本原样保留 '&amp;'/'&#65;'（'| a &amp; b | c |...' 整块原样）；html 解码成 '&'/'A'（重建文本 '| a & b | c |...'）；html img 的 src 与 alt 实体均解码（'a&b.png'/'x <y>'）
+- 提交：test(pipeline): add table entity contrast round (Round 1760)
+
+---
+
 ## Round 1759 — pipeline 图片 alt 变体：缺省空串、多余属性丢弃、md raw 内联与置信度家族差
 
 - 文件：tests/test_pipeline_image_alt_variants.py（3 个测试）
