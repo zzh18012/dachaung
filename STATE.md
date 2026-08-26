@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1797 — 标签大小写不敏感、属性实体解码、md 反斜杠转义字面
+
+- 文件：tests/test_parser_tag_case_escapes.py（3 个测试）
+- 新角度（probe 实证）：'<P CLASS=x>a</P><H2>T</H2>' 大写标签+无引号属性照识别（paragraph + heading level 2）；img 属性内实体解码 alt='a&b'（与正文实体同趟）；md 反斜杠转义字面保留——'\## not heading' 不识别标题成段落、'a \*b\* c' 原样
+- 提交：test(parser): add tag case escapes round (Round 1797)
+
+---
+
 ## Round 1796 — 游离文本、内部空白保留、松散列表与续行分离
 
 - 文件：tests/test_parser_stray_ws_lists.py（4 个测试）
