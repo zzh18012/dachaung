@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1683 — pipeline 闭合围栏尾空白与未闭合引号（2 测试）
+
+- 文件：tests/test_pipeline_close_ws_unclosed_quote.py
+- 新角度（probe 实证）：R1682 锁属性/分隔行——**'```  ' 尾空格仍闭合、未闭合引号整行 raw**零覆盖：
+  - 闭合围栏尾空白：'```  ' 照常闭合，后续 'more' 成段（闭合只看 ``` 前缀）
+  - 未闭合引号：'<p title="x>x' 标签不识别，整行原样段落
+
+---
+
 ## Round 1682 — pipeline 属性值含 > 与孤分隔行（3 测试）
 
 - 文件：tests/test_pipeline_attr_gt_sep.py
