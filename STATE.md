@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1795 — 嵌套列表扁平、hr 丢弃、ipynb 粘连标题识别、链接定义字面
+
+- 文件：tests/test_parser_nested_list_hr_glued.py（4 个测试）
+- 新角度（probe 实证）：html 嵌套 <ul> 全部扁平同级（'a','b','c' 三 list_item、无嵌套信息、合并 'a b c'）；<hr> 与 md '---' 同——静默丢弃、两侧合并 'a b'；ipynb '## T
+bbb' 无空行仍识别 heading+paragraph（'T bbb'）；'[ref]: url' 链接定义不消费——字面段落
+- 提交：test(parser): add nested list hr glued round (Round 1795)
+
+---
+
 ## Round 1794 — 文本块与边缘语法：单换行成块、缩进/h7 非法、pre 剥标签
 
 - 文件：tests/test_parser_text_blocks_edge.py（4 个测试）
