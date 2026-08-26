@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1813 — 空白标记崩溃边界：'## '/'##T' 非标题成段，2+ 空格崩溃
+
+- 文件：tests/test_parser_ws_marker_crash_boundary.py（3 个测试）
+- 新角度（probe 实证）：'##' 无空格与 '##T' 无空格——非标题、字面段落；'## ' 单空格——段落 '##' 不崩（合并 '## body'）；'##  '（2+ 空格）与 '-   '——unexpected_parser_error 崩溃（details {path, parser_name}）——崩溃家族精确边界 = 标记后 ≥2 空格且内容空白（R1484/1486/1487 家族边界的单空格侧此前未锁）
+- 提交：test(parser): add ws marker crash boundary round (Round 1813)
+
+---
+
 ## Round 1812 — 裸标签：tr 无表成拼接段、li 独立成项、列表项空格剥离
 
 - 文件：tests/test_parser_bare_tags_li_strip.py（3 个测试）
