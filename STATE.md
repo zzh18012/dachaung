@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1726 — pipeline figure 透明、language_info 语言来源与 details/summary 合并
+
+- 文件：tests/test_pipeline_figure_langinfo_details.py（3 个测试）
+- 新角度（probe 实证）：R1725 锁超长切分——<figure> 包装透明（image + figcaption 段落 'cap'）；metadata.language_info.name 'python' 同样设置 cell 与 doc 语言（与 kernelspec.language 并列的第二来源）；<details><summary>S</summary><p>b</p> 两标签透明无空格合并单段 'Sb'
+- 提交：test(pipeline): add figure/language_info/details round (Round 1726)
+
+---
+
 ## Round 1725 — pipeline 超长 code/pre 与表格同样切分
 
 - 文件：tests/test_pipeline_long_code_table_split.py（3 个测试）
