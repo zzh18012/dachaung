@@ -81,6 +81,17 @@
 
 ---
 
+## Round 1682 — pipeline 属性值含 > 与孤分隔行（3 测试）
+
+- 文件：tests/test_pipeline_attr_gt_sep.py
+- 新角度（probe 实证）：R1681 锁 info 空格/实体——**引号内 '>' 容忍、'| --- |' 无表头不成表**零覆盖：
+  - 属性含 '>'：'title="a>b"' 引号保护，照常解析 paragraph 'x'
+  - 孤分隔行贴段：lazy 并入段落 'text
+| --- | --- |'（分隔行需要表头行才触发表格检测）
+  - 分隔行独占文件：单 paragraph 原样
+
+---
+
 ## Round 1681 — pipeline 围栏 info 前导空格与无分号实体（3 测试）
 
 - 文件：tests/test_pipeline_info_space_entity.py
