@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1747 — pipeline CJK 元素拼接加空格与自定义 max_chars 拉段
+
+- 文件：tests/test_pipeline_cjk_join_custom_maxchars.py（3 个测试）
+- 新角度（probe 实证）：R1746 锁家族 locator——CJK 元素间拼接恒加半角空格：'## 标'+两段 → '标 内容甲 内容乙'（3 ids）；'## 标'+'好'×900 → '标'（1 id）+800 forced_char+100（标题不沾切分块）；max_chars=100 时拉段边界随参数移动：97 段 → 'T '+97=99 合并（2 ids）、99 段 → 101 分开（'T' 1 id+99 1 id），metadata 记录 max_chars: 100
+- 提交：test(pipeline): add CJK join/custom max_chars round (Round 1747)
+
+---
+
 ## Round 1746 — pipeline 家族 locator 形态与 section_path 跨 cell 不传递
 
 - 文件：tests/test_pipeline_family_locators.py（3 个测试）
@@ -188,6 +196,14 @@ line b bbb'（2 ids）——内部换行保留、元素间拼接恒单空格
 
 bbb' 得 'T1'（1 id）+ 'T2 bbb'（2 ids），连续标题各自开链；'## T'+列表 → 'T a b'（3 ids）列表项入链；'## T'+两段 → 'T bbb ccc'（3 ids）连拉多段；标题与段之间 image 旁路不断链（'T bbb'，2 ids）
 - 提交：test(pipeline): add heading chain depth round (Round 1735)
+
+---
+
+## 回归基线 101116（第 124 次：0 失败；101094 passed + 22 skipped，1046s）
+
+- 命中：预测 101116 = 101094 + 22，实际 101094 + 22 = 101116（第 87 次连续精确命中）
+- 含轮次：R1729–R1734（新增 16 个测试：101078 + 16 = 101094 passed）
+- 下次预测：101161 = 101116 + 45（R1735–R1747 共 13 轮 45 个测试）
 
 ---
 
