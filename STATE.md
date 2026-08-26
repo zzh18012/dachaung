@@ -81,6 +81,18 @@
 
 ---
 
+## Round 1734 — pipeline 标题只向后拉段与表格独立成块
+
+- 文件：tests/test_pipeline_heading_pull_table_chain.py（2 个测试）
+- 新角度（probe 实证）：R1733 锁图片不打断合并——'aaa
+
+## T
+
+bbb'：chunk 'aaa'（1 id）+ 'T bbb'（2 ids），标题打断向前合并链、只拉入后续段落；'aaa'+2 列表+'bbb'：3 chunks 各 1 id——表格独占一块不并入段落合并链（首探针 1 列表退化成段落系假象，md 表格需 ≥2 列）
+- 提交：test(pipeline): add heading pull/table chain round (Round 1734)
+
+---
+
 ## Round 1733 — pipeline 超限两段不合并与图片不打断合并
 
 - 文件：tests/test_pipeline_merge_boundaries.py（2 个测试）
@@ -120,6 +132,14 @@
 
 > q2' 空行分隔两个 blockquote 段落但合 1 chunk
 - 提交：test(pipeline): add dual img/hr tables/two bq round (Round 1729)
+
+---
+
+## 回归基线 101100（第 123 次：0 失败；101078 passed + 22 skipped，1014s）
+
+- 命中：预测 101100 = 101078 + 22，实际 101078 + 22 = 101100（第 86 次连续精确命中）
+- 含轮次：R1722–R1728（新增 24 个测试：101054 + 24 = 101078 passed）
+- 下次预测：101116 = 101100 + 16（R1729–R1734 共 6 轮 16 个测试）
 
 ---
 
