@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1708 — pipeline 仅表头表格、colspan 忽略与纯空格标题结构化错误
+
+- 文件：tests/test_pipeline_header_only_ws_heading.py（5 个测试）
+- 新角度（probe 实证）：R1707 锁 nbformat3——**'##   '（## 后纯空格）触发 unexpected_parser_error**（ValueError '必须至少有 content 或 resource_path'，markdown crash 家族新成员，结构化错误不崩进程，待修复）；md 表头+分隔行无数据行表存在 row_count 1；html 仅 th 行同理；colspan 属性忽略列数以表头为准；tfoot 并入普通数据行
+- 提交：test(pipeline): add header-only/ws heading round (Round 1708)
+
+---
+
 ## Round 1707 — pipeline img 字段、text 尾空格保留、nbformat 3 不支持与 td 多项拼接
 
 - 文件：tests/test_pipeline_img_fields_nbformat3.py（5 个测试）
