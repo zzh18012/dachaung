@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1710 — pipeline ws li 丢弃、null 实体、重复 src 后者生效与 info tab
+
+- 文件：tests/test_pipeline_wsli_nullentity_dupsrc.py（5 个测试）
+- 新角度（probe 实证）：R1709 锁 marker crash——<li>   </li> ws-only li 丢弃（同空 li）；'a&#0;b' null 实体解码成替换字符 'a�b'；<img src="a.png" src="b.png"> 重复属性后者生效 resource_path 'b.png'；'```	py' 围栏 info 前 tab 剥除 language 'py'；'***   ' 尾随空格不影响 hr 识别丢弃 → md_no_content
+- 提交：test(pipeline): add ws li/null entity/dup src round (Round 1710)
+
+---
+
 ## Round 1709 — pipeline marker 后纯空格 crash 家族、tab 分隔标题与空单元格表
 
 - 文件：tests/test_pipeline_marker_ws_crash_family.py（5 个测试）
