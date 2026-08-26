@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1772 — pipeline 真表格豁免 max_chars：strategy isolated_table 永不切分
+
+- 文件：tests/test_pipeline_isolated_table_exemption.py（3 个测试）
+- 新角度（probe 实证）：R1771 锁超限标题——重大修正：真表格（≥2 列）无论多长永不切分——md 2 列 1725 字符单 chunk、html 122 行表同块，strategy 'isolated_table'（新策略值）；R1725 所谓"表格切分"实为 1 列退化段落（元素 type paragraph、metadata {}，切分 strategy 名 'long_paragraph_sentence_split' 佐证）——该轮文件未断言 e.type 故未察觉
+- 提交：test(pipeline): add isolated_table exemption round (Round 1772)
+
+---
+
 ## Round 1771 — pipeline 超限标题：永不切分、不拉段与 799 合并边界
 
 - 文件：tests/test_pipeline_oversized_heading.py（3 个测试）
