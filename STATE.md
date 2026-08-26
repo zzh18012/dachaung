@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1664 — pipeline 孤 dd/大写标签/带空格引用（3 测试）
+
+- 文件：tests/test_pipeline_dd_upper_bq.py
+- 新角度（probe 实证）：R1663 锁孤 dt——**dd 无 dt、大写 HTML 标签、'> >' 带空格双层引用**零覆盖：
+  - 孤 dd：'<dd>def</dd>' 无 dt → 普通 paragraph（与孤 dt 对称；termdef 需成对）
+  - 大写标签照常：'<P>UPPER</P>' 成段、'<H1>TOP</H1>' 成 level 1 标题（标签大小写不敏感）
+  - '> >' 带空格：剥一层 '> ' 剩 '> deep'（与 '>>' 无空格版一致，仍只剥一层）
+
+---
+
 ## Round 1663 — pipeline 孤 dt/html 参差行/标题前导空格（3 测试）
 
 - 文件：tests/test_pipeline_dt_ragged_indent.py
