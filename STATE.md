@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1655 — pipeline 顶层内联/td 内 br/ipynb cell 表格（3 测试）
+
+- 文件：tests/test_pipeline_inline_cell_grammar.py
+- 新角度（probe 实证）：R1654 锁列表合并——**顶层裸内联标签、单元格内 br 无空格、ipynb cell 完整 md 表格语法**零覆盖：
+  - 顶层 '<b>bold</b> tail'：内联剥除成 paragraph 'bold tail'
+  - td 内 br 无贡献：'a<br>b' 成 'ab'（对照 p 内 br → 单空格，两路径不同）
+  - ipynb cell 表格：markdown 单元里管道表照常成 table（≥2 列规则同 md），locator 指向 {cell_index, cell_type, line}
+
+---
+
 ## Round 1654 — pipeline 列表分块合并与标题贴表（3 测试）
 
 - 文件：tests/test_pipeline_list_chunks.py
