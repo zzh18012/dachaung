@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1835 — 缩进标题退化、段内硬换行保留、pre 实体解码（Round 1835）
+- 动机：锁 R1834（缩进围栏退化）后系统补列 0 语法边界——缩进标题、段内换行、pre 内实体，均零覆盖
+- 探针：3 组独立 heredoc 探针，断言全部来自实测输出
+- 结论 1：'  ## T' 缩进 2 空格不识别标题——paragraph 字面 '## T'（与缩进围栏平行：md 块语法需列 0 起）
+- 结论 2：'line1 双空格换行 line2' 段内换行与尾随双空格原样保留——paragraph content 可含真实换行，不做硬换行转换
+- 结论 3：html `<pre>` 内 '&amp;' 照常单次解码——'a & b' + kind='preformatted'（pre 不豁免实体解码）
+- 新增：tests/test_parser_indent_heading_hardbreak_pre_entity.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1834 — 缩进围栏退化、tfoot DOM 序、无引号属性容错（Round 1834）
 - 动机：锁 R1833（标记变体）后查语法边界——缩进代码围栏、表格分区顺序、宽松属性语法，均零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测输出
