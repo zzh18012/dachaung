@@ -81,6 +81,18 @@
 
 ---
 
+## Round 1736 — pipeline 列表入合并链与表格打断标题链
+
+- 文件：tests/test_pipeline_list_chain_table_break.py（4 个测试）
+- 新角度（probe 实证）：R1735 锁标题拉列表——列表项与段落互通：'- a'+'bbb' → 'a bbb'（2 ids）、'aaa'+'- a' → 'aaa a'（2 ids）；'- a
+
+## T
+
+- b' → 'a'（1 id）+ 'T b'（2 ids）标题打断列表链；'## T'+表+'bbb' → 'T'（1 id）+表（1 id）+'bbb'（1 id）——表格 flush 打断标题链，标题被截空（与 image 旁路不断链相反）
+- 提交：test(pipeline): add list chain/table break round (Round 1736)
+
+---
+
 ## Round 1735 — pipeline 标题链累积深度：连续标题、拉列表、拉多段、跨图
 
 - 文件：tests/test_pipeline_heading_chain_depth.py（4 个测试）
