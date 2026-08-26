@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1778 — pipeline html 超限 pre/bq 切分与纯图零 chunk
+
+- 文件：tests/test_pipeline_html_oversize_imgonly.py（3 个测试）
+- 新角度（probe 实证）：R1777 锁 ipynb 同谱——html pre '字'×900 与 bq '好'×900 都走 'long_paragraph_sentence_split'（bq 首块 forced_char）；html 纯图文档（两 img）chunks []、无错误无警告——与 md 行为一致
+- 提交：test(pipeline): add html oversize/imgonly round (Round 1778)
+
+---
+
 ## Round 1777 — pipeline ipynb 策略同谱：cell 切分、表隔离与标题拉段
 
 - 文件：tests/test_pipeline_ipynb_strategy_taxonomy.py（3 个测试）
