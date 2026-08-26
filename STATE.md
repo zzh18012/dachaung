@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1693 — pipeline html 嵌套列表拍平、标题 inline 剥离、单列表格与 md 括号 marker
+
+- 文件：tests/test_pipeline_nested_list_html_edges.py（4 个测试）
+- 新角度（probe 实证）：R1692 锁 setext——html 嵌套 ul in li 层级丢失拍平成兄弟 list_item；h2 内 <b> 剥离 'bold x tail'；thead+tbody 单列表格合法（col_count 1，对比 md ≥2 列要求）；md '1)' 括号 marker 成 ordered；'- item' 后 '  cont' 缩进续行独立 paragraph 不并入项内
+- 提交：test(pipeline): add nested list/html edge round (Round 1693)
+
+---
+
 ## Round 1692 — pipeline md setext 标题、4 空格缩进与 marker 后多空格
 
 - 文件：tests/test_pipeline_setext_indent_markers.py（4 个测试）
