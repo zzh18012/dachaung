@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1674 — pipeline 引用内图片 raw/链接内图片提取（3 测试）
+
+- 文件：tests/test_pipeline_img_bq_link.py
+- 新角度（probe 实证）：R1673 锁围栏闭合变体——**blockquote 内图片语法不解析、<a> 内 img 照常提取**零覆盖：
+  - 引用内图片 raw：'> ![alt](x.png)' → blockquote 段原样，无 image 元素（引用内部完全惰性，与 R1637 一致）
+  - 文字+图片混排引用：全部原样保留
+  - a 内 img：链接包装透明，image 正常产出（alt 保留）
+
+---
+
 ## Round 1673 — pipeline 闭合围栏带尾文本与 h7/h0（3 测试）
 
 - 文件：tests/test_pipeline_fence_close_h7.py
