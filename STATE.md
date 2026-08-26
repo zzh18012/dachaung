@@ -81,6 +81,17 @@
 
 ---
 
+## Round 1758 — pipeline ipynb source 语义：列表拼接 strip、缺键静默与 outputs 忽略
+
+- 文件：tests/test_pipeline_ipynb_source_semantics.py（3 个测试）
+- 新角度（probe 实证）：R1757 锁语言优先级——cell source = ''.join(items).strip()：['a
+', 'b
+'] → 'a
+b'、'  a  ' → 'a'（两侧全 strip）；source 键缺失或空列表 → 静默跳过（唯一 cell 时整本 (None, no_extracted_elements) 嵌 ipynb_no_content；混好 cell 时成功且 warnings [] 无 cell 级警告）；code cell 的 outputs/execution_count 完全忽略
+- 提交：test(pipeline): add ipynb source semantics round (Round 1758)
+
+---
+
 ## Round 1757 — pipeline ipynb 语言来源优先级：kernelspec > language_info > 空
 
 - 文件：tests/test_pipeline_ipynb_language_priority.py（3 个测试）
