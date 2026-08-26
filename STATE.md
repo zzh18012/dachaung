@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1667 — pipeline 标题-表-标题流与 li 内表格成兄弟（3 测试）
+
+- 文件：tests/test_pipeline_table_li_flow.py
+- 新角度（probe 实证）：R1666 锁紧贴块——**三明治分块流、li 内表格抽出为兄弟元素（list_item 保留）**零覆盖：
+  - '# A' 表 '# B'：三 chunk 各自独立（sequential / isolated_table / sequential）
+  - li 内 table：list_item 保留文本，table 作为兄弟元素就地展开（与 R1647 img-in-li 破坏 list_item 不同型）
+  - 元素顺序：前后 list_item 不受影响，table 落在原位置（one/two/table/three）
+
+---
+
 ## Round 1666 — pipeline 表格紧贴段落/列表与多空行折叠（3 测试）
 
 - 文件：tests/test_pipeline_adjacent_blocks.py
