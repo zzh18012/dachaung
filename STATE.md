@@ -81,6 +81,17 @@
 
 ---
 
+## Round 1700 — pipeline md 注释原样、li 内 b 剥离、script 剔除与 hr-only cell
+
+- 文件：tests/test_pipeline_md_comment_li_script.py（6 个测试）
+- 新角度（probe 实证）：R1699 锁次行 th——md 中 '<!-- c -->
+p' HTML 注释不剔除原样并段（内嵌换行保留，对比 html 剔除）；li 内 <b> 剥离 'a bold b'（对比链接原样 R1653）；<li></li> 空项丢弃；script/style 内容整体剔除；text 'a
+
+b' 两段一个 chunk；markdown cell 只有 '---' hr 丢弃 doc None + ipynb_no_content（无 md 层警告）
+- 提交：test(pipeline): add md comment/li/script round (Round 1700)
+
+---
+
 ## Round 1699 — pipeline 次行 th 非表头、kernelspec 语言、围栏内波浪线与散表格文本
 
 - 文件：tests/test_pipeline_th_tbody_kernelspec.py（6 个测试）
