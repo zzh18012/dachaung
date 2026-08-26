@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1815 — 多警告保序：空围栏行号递增、ipynb 混合警告按胞序
+
+- 文件：tests/test_pipeline_warning_order.py（2 个测试）
+- 新角度（probe 实证）：三个空围栏 → 3 条 md_empty_code_block 按物理行递增（line 3/8/13 保序不重排）；ipynb 未知胞+空代码胞混合 → 按胞序 unknown(cell_index 0, cell_type 'weird') 先于 empty(cell_index 1)，各带 details——警告列表 = 遭遇序
+- 提交：test(pipeline): add warning order round (Round 1815)
+
+---
+
 ## Round 1814 — cli 扩展名大小写不敏感自动选择：.HTML/.Txt/.Md 全识别
 
 - 文件：tests/test_cli_autoselect_case.py（2 个测试）
