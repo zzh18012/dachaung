@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1723 — pipeline 中文句号不作句界、ASCII ?/! 句界与混合文本 forced_char
+
+- 文件：tests/test_pipeline_cjk_sentence_boundary.py（4 个测试）
+- 新角度（probe 实证）：R1722 锁边界三态——'。' 不被切分器当句界：'你好。'*300（900 字符）仍 forced_char 切 800（首块尾 '好。你好' 跨句中）+ 100；'what? yes! '*100 797+301 块尾 'hat?'/'yes!'（?/! 句界识别，无 split_boundary_after 键）；'hello世界测试。'*100 中英混合 800 forced_char + 200；'你好。'*200（600 字符）单 chunk
+- 提交：test(pipeline): add CJK sentence boundary round (Round 1723)
+
+---
+
 ## Round 1722 — pipeline 切分边界元数据三态：句界省略、whitespace、forced_char
 
 - 文件：tests/test_pipeline_split_boundary_metadata.py（4 个测试）
