@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1755 — pipeline 未知 parser、目录输入与 kreuzberg 扩展名限制
+
+- 文件：tests/test_pipeline_unknown_parser_dir.py（3 个测试）
+- 新角度（probe 实证）：R1754 锁 fallback 分派——未知 parser 名 → unexpected_parser_error（message 'ValueError: 未知 parser: nonexistent（支持: fallback, kreuzberg, markdown, html, text, ipynb）' 枚举全部 6 名，details 含 parser_name）；目录作输入 → file_not_found（'hash 目标不是文件'）；kreuzberg+.md → 与 fallback 同 unsupported_type（kreuzberg 同样仅 pdf/docx）
+- 提交：test(pipeline): add unknown parser/dir round (Round 1755)
+
+---
+
 ## Round 1754 — pipeline fallback 分派：仅 pdf/docx、unsupported_type 与假 PDF 失败
 
 - 文件：tests/test_pipeline_fallback_dispatch.py（3 个测试）
