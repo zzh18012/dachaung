@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1761 — pipeline max_chars 下限契约：chunker_failed 错误与 32 边界
+
+- 文件：tests/test_pipeline_maxchars_floor_contract.py（2 个测试）
+- 新角度（probe 实证）：R1760 锁表格实体——max_chars < 32 在 pipeline 层不抛异常而是 (None, [ErrorRecord(code='chunker_failed', message='分块失败: max_chars 过小: N', details={'exception_type': 'ValueError'})])（第 7 个错误码）；恰 32 成功且 metadata max_chars: 32
+- 提交：test(pipeline): add max_chars floor contract round (Round 1761)
+
+---
+
 ## Round 1760 — pipeline 表格实体对比：md raw 保留与 html 解码、img 属性解码
 
 - 文件：tests/test_pipeline_table_entity_contrast.py（3 个测试）
