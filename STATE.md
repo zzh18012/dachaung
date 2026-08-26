@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1705 — pipeline 前导零列表、nbsp 空格、cell 内围栏、p 内 div 与表头列数优先
+
+- 文件：tests/test_pipeline_zeros_nbsp_cellfence.py（6 个测试）
+- 新角度（probe 实证）：R1704 锁 801 切分——'01.' 前导零照常 ordered list_item；td 仅 '&nbsp;' 解码   后按空白处理成空占位 '|  |'；markdown cell 内 '```py' 完整围栏语法（code_block 段落 language 'py'）；<p>a<div>d</div>b</p> div 透明且三段无空格拼接 'adb'；表头 2 列 + 分隔 3 列 col_count 2 分隔行截断（与 R1695 反向对偶）；html bq 内 <img> 引用透明 image + 段落 'q'
+- 提交：test(pipeline): add zeros/nbsp/cell fence round (Round 1705)
+
+---
+
 ## Round 1704 — pipeline 801 字符切分、中部 hr、td 内 div、nbsp 与 code cell 表格原样
 
 - 文件：tests/test_pipeline_801_hr_nbsp_codecell.py（5 个测试）
