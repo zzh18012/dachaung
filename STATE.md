@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1679 — pipeline 引用内表格 raw 与纯换行文件（3 测试）
+
+- 文件：tests/test_pipeline_bq_table_nl_only.py
+- 新角度（probe 实证）：R1678 锁 img/pre——**blockquote 内表格语法原样、'
+' 独占文件两家族 no_content**零覆盖：
+  - 引用内表格：'> | a | b |' 剥 '> ' 后不成 table，blockquote 段原样（引用惰性最后一族：标题/列表/围栏/图片/表格全 inert）
+  - 纯换行 md：md_no_content；纯换行 txt：text_no_content
+
+---
+
 ## Round 1678 — pipeline img 破坏 pre 与标题内联全 raw（3 测试）
 
 - 文件：tests/test_pipeline_img_pre_heading.py
