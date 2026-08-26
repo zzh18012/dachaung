@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1751 — pipeline section_path 全类型传播与表格后重组成链
+
+- 文件：tests/test_pipeline_section_path_rechain.py（3 个测试）
+- 新角度（probe 实证）：R1750 锁标题内联——section_path 从标题传播到 table/list_item/code_block/blockquote 全类型（locator 均 {'line': N, 'section_path': 'T'}，confidence 全 0.95）；表格打断后后续元素重组新链：'## T'+表+'- a'+code+'> q' → 'T'（1 id）+表（1 id）+'a c q'（3 ids 混型合并）；无语言围栏 metadata {'kind': 'code_block', 'language': ''}
+- 提交：test(pipeline): add section_path/rechain round (Round 1751)
+
+---
+
 ## Round 1750 — pipeline 标题内联处理：md 全 raw 与 html 解码剥除
 
 - 文件：tests/test_pipeline_heading_inline_raw.py（3 个测试）
