@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1817 — 物理行号跨家族：html/text/md 空行计数、section_path 同居 locator
+
+- 文件：tests/test_pipeline_locator_line_numbers.py（3 个测试）
+- 新角度（probe 实证）：html '<p>a</p>'+换行 '<h2>T</h2>'+两换行 '<p>b</p>' → 行 1/2/4（空行跳过但计数）；text 'one/空/two/空空/three' → 行 1/3/6（连续空行全计入）；md 行 1/3/5 且 section_path 键与 line 同在 source_locator——首段（标题前）无路径键
+- 提交：test(pipeline): add locator line numbers round (Round 1817)
+
+---
+
 ## Round 1816 — 全类型混合链：标题+段+列表+引用+代码+尾段单块；span 退化全景
 
 - 文件：tests/test_pipeline_full_mixed_chain.py（2 个测试）
