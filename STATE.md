@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1809 — 切分块 metadata 全键、标题拉代码链、样式标题原文
+
+- 文件：tests/test_pipeline_split_meta_h_code.py（3 个测试）
+- 新角度（probe 实证）：切分块 metadata = {strategy, max_chars, char_count} + split_boundary_after（仅非末块有键、char_count==len(text)）；'## T'+围栏代码+'bbb' → 'T code bbb' 3 ids（代码块是拉取链全成员）；'## **B** and x' 样式标记入标题原文并合并 '**B** and x body'
+- 提交：test(pipeline): add split meta h code round (Round 1809)
+
+---
+
 ## Round 1808 — cli inspect 零块与警告态：纯图无 chunk 行、warnings 计数、错误 JSON 不落盘链
 
 - 文件：tests/test_cli_inspect_zero_chunks.py（3 个测试）
