@@ -81,6 +81,18 @@
 
 ---
 
+## Round 1697 — pipeline 围栏闭合类型匹配、md HTML 块原样与 html 单元格内嵌块
+
+- 文件：tests/test_pipeline_fence_mismatch_nested.py（6 个测试）
+- 新角度（probe 实证）：R1696 锁波浪线围栏——'```' 不能闭合 '~~~py'（类型匹配，content 'code
+```
+after' 全吞）；'~~~' 内嵌 '```' 全是内容 '~~~' 才闭合；md 中 '<div>x</div>' HTML 块原样 paragraph；td 内 <h2> 拍平成单元格文本 'H'；li 内 <blockquote> 吞掉 list_item 只剩 blockquote 段 'q'；td 内嵌 <table> 内层行并入外层 '|  |
+| --- |
+| in |'
+- 提交：test(pipeline): add fence mismatch/nested blocks round (Round 1697)
+
+---
+
 ## Round 1696 — pipeline section 透明、波浪线围栏、li 内嵌 p 与引用内部空行
 
 - 文件：tests/test_pipeline_section_tilde_bq_blank.py（4 个测试）
