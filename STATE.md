@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1725 — pipeline 超长 code/pre 与表格同样切分
+
+- 文件：tests/test_pipeline_long_code_table_split.py（3 个测试）
+- 新角度（probe 实证）：R1724 锁 CJK 家族——md 围栏 900 CJK 与 html pre 900 CJK 都 800 forced_char + 100（code/pre 无 max_chars 豁免，同样切分）；表格含 1000 字符单元格（表文本 1018）切 799+218 whitespace 边界
+- 提交：test(pipeline): add long code/table split round (Round 1725)
+
+---
+
 ## Round 1724 — pipeline CJK 内容跨家族：md 结构、html 与 ipynb
 
 - 文件：tests/test_pipeline_cjk_all_families.py（3 个测试）
