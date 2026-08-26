@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1805 — cli 扩展名映射全表：html/ipynb/md 自动选择；未知扩展落 fallback 即拒
+
+- 文件：tests/test_cli_autoselect_map.py（3 个测试）
+- 新角度（probe 实证）：自动选择映射 .html→html、.ipynb→ipynb、.md→markdown（INFO+OK+exit 0、ipynb metadata 可回读）；未知扩展 .xyz → INFO '自动选择: fallback' → fallback 拒绝 exit 1 + stderr 错误 JSON（code unsupported_type、details suffix '.xyz'、不落盘）——CLI 层 8 误差分层补全：argparse exit 2 / 文件与类型 exit 1
+- 提交：test(cli): add autoselect map round (Round 1805)
+
+---
+
 ## Round 1804 — cli 错误面：缺文件 exit 1 错误 JSON、非法 --parser exit 2 argparse、validate 坏 JSON exit 1
 
 - 文件：tests/test_cli_error_exits.py（3 个测试）
