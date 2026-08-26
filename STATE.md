@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1702 — pipeline li 内 h2 抽出、img 独占 p、标题内 br 与双 tbody
+
+- 文件：tests/test_pipeline_h2_li_img_p_tbodys.py（5 个测试）
+- 新角度（probe 实证）：R1701 锁 dl 拼接——li 内 <h2>H</h2> 被抽成兄弟 heading（该 li 不留 list_item，后一个 li 正常）；<p> 仅含 <img> 时 p 消失只留 image 元素（content None、alt 'A'）；<h2>a<br>b</h2> 变 'a b' 空格连接（对比 td 内 br 无空格 'ab'）；两个 <tbody> 合并一表 row_count 2；text 单字符 'x' 一段一 chunk
+- 提交：test(pipeline): add h2-in-li/img-p/tbodys round (Round 1702)
+
+---
+
 ## Round 1701 — pipeline dl 多项拼接、双空 cell 警告、800 字符边界与标题紧接表格
 
 - 文件：tests/test_pipeline_dl_multi_800_boundary.py（5 个测试）
