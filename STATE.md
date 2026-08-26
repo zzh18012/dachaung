@@ -81,6 +81,22 @@
 
 ---
 
+## Round 1654 — pipeline 列表分块合并与标题贴表（3 测试）
+
+- 文件：tests/test_pipeline_list_chunks.py
+- 新角度（probe 实证）：R1653 锁 hr/title——**list_item 互相合并（含跨段落打断）、标题后无空行贴表照常识别**零覆盖：
+  - 三项列表单块：'- a
+- b
+- c' → 一个 sequential chunk 'a b c'（3 id，空格连接）
+  - 段落打断仍单块：'- a
+
+text
+
+- b' → 'a text b'（3 id）；html 列表同样 'a b'（2 id）
+  - 标题贴表无空行：'# H' 下一行即表头，heading 与 table 均识别（table isolated_table）
+
+---
+
 ## Round 1653 — pipeline html hr 丢弃/li 链接 raw/body 内 title 丢弃（3 测试）
 
 - 文件：tests/test_pipeline_hr_title_drop.py
