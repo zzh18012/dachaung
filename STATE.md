@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1754 — pipeline fallback 分派：仅 pdf/docx、unsupported_type 与假 PDF 失败
+
+- 文件：tests/test_pipeline_fallback_dispatch.py（3 个测试）
+- 新角度（probe 实证）：R1753 锁失败分类学——fallback 只认 .pdf/.docx（大小写不敏感）：.md/.txt/.html/.ipynb/.xyz 一律 unsupported_type（message '仅支持 .pdf / .docx'，details {'path', 'suffix'}）；缺 .pdf 先 file_not_found；内容非 PDF 的 .PDF → pdfplumber_open_failed（message 'No /Root object!'，details exception_type PdfminerException）；.MD 大写 + 显式 markdown parser 正常解析（source_type 'markdown'）
+- 提交：test(pipeline): add fallback dispatch round (Round 1754)
+
+---
+
 ## Round 1753 — pipeline 失败分类学：坏 JSON、旧 nbformat、缺文件与解析器崩溃
 
 - 文件：tests/test_pipeline_error_taxonomy.py（4 个测试）
