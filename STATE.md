@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1720 — pipeline br 收尾、标题双 br、CJK 文本与 cell 内标题表格组合
+
+- 文件：tests/test_pipeline_br_ends_cjk_cellcombo.py（4 个测试）
+- 新角度（probe 实证）：R1719 锁 CRLF 归一——<p>a<br></p> 末尾 br 不留空格段落 'a'；<h2>a<br><br>b</h2> 双 br 两空格 'a  b'（同段落行为，对比 td 内 br 无空格）；CJK '你好
+
+世界' 两段合 1 chunk；同 markdown cell 内 '# T' + 表格行 heading 与 table（row_count 1）都提取
+- 提交：test(pipeline): add br ends/CJK/cell combo round (Round 1720)
+
+---
+
 ## Round 1719 — pipeline text CRLF 分段与 ipynb source 内 CRLF 归一
 
 - 文件：tests/test_pipeline_crlf_text_ipynb.py（3 个测试）
