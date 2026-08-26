@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1780 — 句末符集：全角/半角终结符需后随空白，; , 不终结
+
+- 文件：tests/test_pipeline_sentence_terminators.py（3 个测试）
+- 新角度（probe 实证）：句末符集 {. ! ? 。 ！ ？}后随空白才构成句界——稀疏全角 ('好'*140+'。 ')*6=852 切 709+141（尾 '。'，尾随空格丢弃）；密集 '好. '/'好！ '*300 落 800 但 boundary None（句界）而非 forced_char；'abc; '/'abc, '*200 不触发句界 → 799 whitespace 回退——与 R1779 合成句界三档：句号>空白>forced_char
+- 提交：test(pipeline): add sentence terminators round (Round 1780)
+
+---
+
 ## Round 1779 — 超限切分落点：句界优先、无标点回退空白
 
 - 文件：tests/test_pipeline_sentence_split_points.py（3 个测试）
