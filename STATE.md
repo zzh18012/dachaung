@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1745 — pipeline JSON 落盘与 schema 回验闭环
+
+- 文件：tests/test_pipeline_json_roundtrip.py（3 个测试）
+- 新角度（probe 实证）：R1744 锁结构字段——write_json 默认 True 但无 output_path 不落盘（目录仅源文件）；给 output_path 才写 13 顶层键 JSON（schema_version '0.1.0'、source_hash 64 位 hex、source_path 绝对路径）；写出的 JSON 过 validate/is_valid/validate_file 且 document_id 与返回 Document 一致；JSON element 8 键、chunk 5 键
+- 提交：test(pipeline): add JSON roundtrip round (Round 1745)
+
+---
+
 ## Round 1744 — pipeline id 形态、section_path 转换与 source_spans 现状
 
 - 文件：tests/test_pipeline_id_locator_spans.py（4 个测试）
