@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1783 — 句界无阈值、whitespace 多路、超限判定前先 strip
+
+- 文件：tests/test_pipeline_sentence_threshold_strip.py（3 个测试）
+- 新角度（probe 实证）：'S0. '+226 词（句号在第 3 字符）照切首块 3 字 'S0.'，余文回退 whitespace 799+219——句界无"距 max_chars 最小距离"阈值；纯词 2499 → 799/799/799/99 中间块全 'whitespace'；799 词+10 尾空格单块不切（超限判定在 strip 之后）
+- 提交：test(pipeline): add sentence threshold strip round (Round 1783)
+
+---
+
 ## Round 1782 — 切分家族同谱：CJK 多路 forced、句界跨 md/html/代码块统一
 
 - 文件：tests/test_pipeline_split_family_uniformity.py（3 个测试）
