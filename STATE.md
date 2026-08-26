@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1714 — pipeline 纯 hash 标题内容、nbsp 标题丢弃与长短段 chunk 组成
+
+- 文件：tests/test_pipeline_hash_heading_nbsp_chunks.py（4 个测试）
+- 新角度（probe 实证）：R1713 锁引用透明——'## ###' 纯 hash 内容成 heading '#'（尾随 hash 剥除后剩一个）；<h2>&nbsp;</h2> 解码   按空白处理标题丢弃仅剩 't' 段；1000 字符段 + 'short' 成 3 chunks（799+199 长段切分 + 5 sequential 短段独立）；'## > q' 标题内引用符原样
+- 提交：test(pipeline): add hash heading/nbsp/chunks round (Round 1714)
+
+---
+
 ## Round 1713 — pipeline 引用内表格与 pre、text 行首空格、深层嵌套 img
 
 - 文件：tests/test_pipeline_bq_table_pre_deepimg.py（5 个测试）
