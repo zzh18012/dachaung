@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1757 — pipeline ipynb 语言来源优先级：kernelspec > language_info > 空
+
+- 文件：tests/test_pipeline_ipynb_language_priority.py（3 个测试）
+- 新角度（probe 实证）：R1756 锁 WarningRecord——code cell 元素 language 与 doc.metadata['language'] 同源解析且优先级 kernelspec > language_info > 空：仅 kernelspec → 'python'；仅 language_info → 'julia'；两者并存 kernelspec 胜（'python' 压过 'r'）；都无 → ''（空串非 null），元素 metadata {'kind': 'code_cell', 'language': ''}
+- 提交：test(pipeline): add ipynb language priority round (Round 1757)
+
+---
+
 ## Round 1756 — pipeline WarningRecord 精确形态：reason 字段、details 键与空块不入元素
 
 - 文件：tests/test_pipeline_warning_records.py（3 个测试）
