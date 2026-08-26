@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1675 — pipeline colgroup 透明与闭合标签带属性（2 测试）
+
+- 文件：tests/test_pipeline_colgroup_closetag.py
+- 新角度（probe 实证）：R1674 锁引用内图片——**colgroup/col 不影响表格、闭合标签带属性容忍**零覆盖：
+  - colgroup：'<colgroup><col>' 丢弃，行照常提取（col_count 按实际 td 算）
+  - '</p class="x">'：闭合标签带属性不报错，paragraph 'x' 照常
+
+---
+
 ## Round 1674 — pipeline 引用内图片 raw/链接内图片提取（3 测试）
 
 - 文件：tests/test_pipeline_img_bq_link.py
