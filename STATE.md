@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1818 — max_chars 变体类型：float 限内可行/切分即败、bool ValueError、None TypeError
+
+- 文件：tests/test_pipeline_maxchars_variant_types.py（3 个测试）
+- 新角度（probe 实证）：float 800.5——限内文档正常合并 'aaa bbb'（仅比较不切片）；一旦需要切分 → chunker_failed TypeError（切片要 int）——失败与否取决于是否触发切分；True/False → ValueError（按 1/0 判过小）；None → TypeError（比较即败）
+- 提交：test(pipeline): add maxchars variant types round (Round 1818)
+
+---
+
 ## Round 1817 — 物理行号跨家族：html/text/md 空行计数、section_path 同居 locator
 
 - 文件：tests/test_pipeline_locator_line_numbers.py（3 个测试）
