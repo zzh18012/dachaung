@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1785 — 内联与围栏：md 标记原样、fence language 入 metadata、html 注释/未知标签
+
+- 文件：tests/test_parser_inline_fence_html.py（4 个测试）
+- 新角度（probe 实证）：md 内联 **bold**/*it*/`code`/[t](url) 标记全原样保留；'```python' 围栏语言进 element metadata（kind='code_block'、language='python'，元素类型仍 paragraph）；html 注释整段静默丢弃、'a b' 跨注释合并；未知标签 <custom> 剥壳留内容与后续段落合并 'xy'；thead/tbody 表重建为管道（source 'html_table'、row_count 2、isolated_table）
+- 提交：test(parser): add inline fence html round (Round 1785)
+
+---
+
 ## Round 1784 — parser 结构覆盖：ol/ul 无编号、br 转空格、setext 退化、hr 静默丢弃
 
 - 文件：tests/test_parser_structures_coverage.py（5 个测试）
