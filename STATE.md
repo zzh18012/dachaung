@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1748 — pipeline doc.metadata 家族形态、内容派生 id 与扩展名 source_type
+
+- 文件：tests/test_pipeline_doc_metadata_hash.py（4 个测试）
+- 新角度（probe 实证）：R1747 锁 CJK 拼接——doc.metadata 家族形态：html {'html': True}、ipynb {'ipynb': True, 'nbformat': 4, 'nbformat_minor': 5, 'cell_count': 1, 'language': 'python'}；source_hash 与 document_id 均内容派生：同内容不同文件名 → hash 同 id 同；document_id == 'doc-' + source_hash[:16]；扩展名推导 source_type：'.markdown' → 'markdown'、'.txt' → 'text'
+- 提交：test(pipeline): add doc metadata/hash round (Round 1748)
+
+---
+
 ## Round 1747 — pipeline CJK 元素拼接加空格与自定义 max_chars 拉段
 
 - 文件：tests/test_pipeline_cjk_join_custom_maxchars.py（3 个测试）
