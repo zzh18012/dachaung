@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1718 — pipeline 嵌套列表带文本、引用散文本与表格后紧跟段落
+
+- 文件：tests/test_pipeline_nestedlist_text_bqloose.py（4 个测试）
+- 新角度（probe 实证）：R1717 锁非标准分隔——li 内 'a text' + 嵌套 ul 拍平顺序保留（list_item 'a text' + 'b' 平级）；<blockquote>loose</blockquote> 散文本成段 kind 'blockquote'；blockquote 内散文本与 <p> 无空格合并 'loosep'；md 表格行后直接 'tail' 无空行段落独立（表格在最后数据行结束不吞后续）
+- 提交：test(pipeline): add nested list text/bq loose round (Round 1718)
+
+---
+
 ## Round 1717 — pipeline 前置空行、语言尾空格、非标准分隔行与 raw cell 多行
 
 - 文件：tests/test_pipeline_leadingblanks_badsep_rawcell.py（5 个测试）
