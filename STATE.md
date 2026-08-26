@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1732 — pipeline 顺序合并贪心规则：合并到不超 max_chars 为止
+
+- 文件：tests/test_pipeline_greedy_merge.py（2 个测试）
+- 新角度（probe 实证）：R1731 锁百段合并——两段 389 字符合并单 chunk 779（sequential，source_element_ids 2 个）；三段 389 时前两段合并 779 + 第三段独立 389（1 id）——贪心合并：加入下一段会超 max_chars 就新开 chunk
+- 提交：test(pipeline): add greedy merge rule round (Round 1732)
+
+---
+
 ## Round 1731 — pipeline ul 前散文本、百段合一块与 raw/markdown 交替 cell
 
 - 文件：tests/test_pipeline_ulloose_100paras_altcells.py（3 个测试）
