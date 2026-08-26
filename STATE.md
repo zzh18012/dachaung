@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1763 — pipeline output_path 行为：自动建目录、静默覆盖与字符串路径
+
+- 文件：tests/test_pipeline_output_path_mkdir.py（3 个测试）
+- 新角度（probe 实证）：R1762 锁 max_chars 极值——output_path 指向不存在目录（含嵌套 a/b/）→ 自动创建且 JSON 落盘 errors []；已有文件内容静默覆盖（'OLD' 被替换）；字符串路径与 Path 等价
+- 提交：test(pipeline): add output_path mkdir round (Round 1763)
+
+---
+
 ## Round 1762 — pipeline max_chars 极值：负值、十亿巨值与字符串类型
 
 - 文件：tests/test_pipeline_maxchars_extremes.py（3 个测试）
