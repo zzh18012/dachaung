@@ -81,6 +81,17 @@
 
 ---
 
+## Round 1715 — pipeline 1600 字符两块不丢、hr 后表格、顶级 a 文本与混合 td
+
+- 文件：tests/test_pipeline_1600_hr_a_mixedtd.py（4 个测试）
+- 新角度（probe 实证）：R1714 锁纯 hash 标题——'w '*800（1599 字符）799+799 两块，' '.join 后与归一原文相等（分块不丢不重，边界空白作 join 消耗）；'---
+' 后直接表格照常识别；顶级 <a href>link text</a> 成 paragraph（href 丢弃）；td 't' + 嵌套表并存外层文本 't' 丢失（输出 '|  |
+| --- |
+| in |'）
+- 提交：test(pipeline): add 1600 no-loss/hr/a/mixed td round (Round 1715)
+
+---
+
 ## Round 1714 — pipeline 纯 hash 标题内容、nbsp 标题丢弃与长短段 chunk 组成
 
 - 文件：tests/test_pipeline_hash_heading_nbsp_chunks.py（4 个测试）
