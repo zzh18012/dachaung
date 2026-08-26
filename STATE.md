@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1829 — 真表恒孤立、单列 pipe 退化段落、邻接三块型（Round 1829）
+- 动机：锁 R1828（isolated_table 策略名）后深挖表格邻接规则，首探发现"1-col 表与段落合并"表象，读 app/chunkers/structural.py 302-308 行源码后纠正——**table 元素在 chunker 里无条件 flush+单块+flush（isolated_table 恒定），永不与邻居合并**
+- 关键纠正：单列 pipe 行 '| a |' + '| --- |' 不构成 table——md parser 只认 ≥2 列 pipe，单列退化为 paragraph（与 R1789 1-col escaped pipe 退化一致），此前的"合并"实为段落顺序合并
+- 结论 1：单列 pipe → paragraph 元素，chunk strategy sequential
+- 结论 2：'# T' + 2 列表 + 'after' → 恰 3 块 [sequential 'T', isolated_table, sequential 'after']
+- 结论 3：表+段 → 2 块；段+表+段 → 3 块——真表两侧邻居各成 sequential，零合并
+- 新增：tests/test_pipeline_table_adjacent_chunks.py（3 个测试）
+- 状态：本地通过（3 passed；首版误锁 1-col 表邻接，源码+复探后重写）
+---
+
 ## Round 1828 — html 嵌套 ul 扁平、li 内 bq 抽出、连续表 isolated_table（Round 1828）
 - 动机：锁 R1827（img alt/波浪围栏/三级链）之后，查 html 列表嵌套形态、li 内引用抽取、表格分块策略名——三者零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测（chunk 策略名首测误写 sequential，实测 isolated_table 后修正）
