@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1822 — 内联格式剥壳、caption 静默丢、md 内联链接字面（Round 1822）
+- 动机：锁 R1821（li 内表格/th 嵌套）之后，继续查 html 内联语义标签与表格附属元素、md 链接语法——三者此前零覆盖
+- 探针：3 组独立 heredoc 探针（b/i/strong/em/code 串 / caption 表 / md 链接行），断言全部来自实测
+- 结论 1：`<b>/<i>/<strong>/<em>/<code>` 在 `<p>` 内全部剥壳只留文本——'bold it st em cd'，无任何标签残留、无警告
+- 结论 2：`<caption>Cap</caption>` 静默丢弃——既不进表格内容也不发射独立元素，整表只剩 '| a |' + 分隔行
+- 结论 3：md 内联链接 '[text](http://x.com)' 整串字面保留——raw 哲学覆盖链接语法本身，不成链接、不拆 URL、metadata 空
+- 新增：tests/test_parser_inline_fmt_caption_link.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1821 — li 内嵌表格抽出、th 内标题剥壳、th 内图片空单元（html 嵌套结构）
 - 动机：锁 R1820（md 尖括号 URL）之后，转向 html 解析器嵌套结构交互——列表项内嵌表格、表头单元格内的块级标签与图片，此前 42 轮零覆盖
 - 探针：3 组独立 heredoc 探针（li+table / th+h2 / th+img），全部断言来自实测输出
