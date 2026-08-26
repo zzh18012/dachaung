@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1728 — pipeline tab 缩进断列表、NBSP 作标题分隔、td 内引用拍平
+
+- 文件：tests/test_pipeline_tablist_nbspsep.py（4 个测试）
+- 新角度（probe 实证）：R1727 锁引用惰性——'	- b' tab 缩进断列表成 paragraph '- b'（同空格）；'# T' NBSP 可作标题分隔符 heading 'T'；td 内 <blockquote>q</blockquote> 拍平单元格 'q'；text 'a b' NBSP 原样保留
+- 提交：test(pipeline): add tab list/nbsp separator round (Round 1728)
+
+---
+
 ## Round 1727 — pipeline 引用内列表标题惰性与嵌套标题拆分
 
 - 文件：tests/test_pipeline_bq_inert_nested_headings.py（3 个测试）
