@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1695 — pipeline 数字实体、dl 配对合并、md 参差表格与无 src 图片
+
+- 文件：tests/test_pipeline_numeric_entity_dl_ragged.py（5 个测试）
+- 新角度（probe 实证）：R1694 锁 BOM——'&#65;'/'&#x42;' 十进制与十六进制数字实体都解码成 'AB'；dl 正常配对 <dt>T</dt><dd>D</dd> 无空格合并单段 'TD'；md 参差表格表头 3 列 + 分隔 2 列以表头为准 col_count 3 补齐 '| --- |'，短行 '| x |  |  |'；<img alt> 无 src 整图跳过无警告；td 内 'a<!-- c -->b' 注释剔除拼接 'ab'
+- 提交：test(pipeline): add numeric entity/dl/ragged table round (Round 1695)
+
+---
+
 ## Round 1694 — pipeline md checkbox 原样、列表后围栏、对齐冒号归一与 BOM
 
 - 文件：tests/test_pipeline_checkbox_fence_align_bom.py（4 个测试）
