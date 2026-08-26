@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1689 — pipeline 跨行注释与空白 code 单元（2 测试）
+
+- 文件：tests/test_pipeline_ml_comment_ws_cell.py
+- 新角度（probe 实证）：R1688 锁反斜杠——**多行 HTML 注释整体丢弃、纯空白 code cell 同样触发 ipynb_empty_code_cell**零覆盖：
+  - 跨行注释：'<!-- multi
+line -->' 整块丢弃，后续段落照常
+  - '   ' code cell：空白也算空（cell_index 0 details）+ ipynb_no_content（R1618 空串版的延伸）
+
+---
+
 ## Round 1688 — pipeline md 反斜杠转义不生效（2 测试）
 
 - 文件：tests/test_pipeline_backslash_raw.py
