@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1721 — pipeline 反斜杠围栏失效、空 tr 占位与 CJK forced_char 切分
+
+- 文件：tests/test_pipeline_backslash_fence_forcedchar.py（4 个测试）
+- 新角度（probe 实证）：R1720 锁 br 收尾——'```\py' 反斜杠使围栏整个失效退化段落 '```\py
+x'（反引号原样）；空 <tr></tr> 成占位表头 '|  |
+| --- |'；CJK 1080 字符无空白可用首块 800 metadata split_boundary_after 'forced_char'（新值：强制字符切分），次块 280；p/img/p 段间散 img 顺序保留 paragraph+image+paragraph
+- 提交：test(pipeline): add backslash fence/forced char round (Round 1721)
+
+---
+
 ## Round 1720 — pipeline br 收尾、标题双 br、CJK 文本与 cell 内标题表格组合
 
 - 文件：tests/test_pipeline_br_ends_cjk_cellcombo.py（4 个测试）
