@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1666 — pipeline 表格紧贴段落/列表与多空行折叠（3 测试）
+
+- 文件：tests/test_pipeline_adjacent_blocks.py
+- 新角度（probe 实证）：R1665 锁无引号属性——**表格行紧贴上一块不 lazy 合并、多个空行等同一个**零覆盖：
+  - 段落贴表：'intro text' 下一行即表头 → paragraph 与 table 各自成块（表格检测优先于段落 lazy 延续；与 R1651 '--- x' 并入段落形成对照）
+  - 列表贴表：list_item 与 table 同样分离
+  - 多空行：连续 4 空行 = 1 空行，两段照常
+
+---
+
 ## Round 1665 — pipeline 无引号属性/br/ 自闭合/空白 md cell（3 测试）
 
 - 文件：tests/test_pipeline_unquoted_br_ws.py
