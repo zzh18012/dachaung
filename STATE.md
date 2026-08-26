@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1738 — pipeline 合并链跨家族：html 标题链、html 表格打断与 ipynb 跨 cell 合并
+
+- 文件：tests/test_pipeline_chain_cross_family.py（3 个测试）
+- 新角度（probe 实证）：R1737 锁 md 代码/引用入链——合并规则跨家族一致：html '<h2>T</h2><p>bbb</p>' → 'T bbb'（2 ids）；html p+表+p → 三块各 1 id 且 html 表格内容重建为 markdown 管道文本 '| h1 | h2 |
+| --- | --- |
+| v1 | v2 |'；ipynb 两个 markdown cell 的段落合并 'aaa bbb'（2 ids）——cell 边界对分块器不可见
+- 提交：test(pipeline): add chain cross-family round (Round 1738)
+
+---
+
 ## Round 1737 — pipeline 代码块与引用块完整入合并链
 
 - 文件：tests/test_pipeline_code_bq_join_chain.py（4 个测试）
