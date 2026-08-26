@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1743 — pipeline html 链成员细则：标题拉列表、pre 入链、表格后不复并、标题断反向链
+
+- 文件：tests/test_pipeline_html_chain_members.py（4 个测试）
+- 新角度（probe 实证）：R1742 锁 md 相邻表——html 与 md 链规则完全同构：'<h2>T</h2><ul><li>a</li></ul>' → 'T a'（2 ids）；p+pre+p → 'aaa line1
+line2 bbb'（3 ids，kind 'preformatted' 保内部换行）；表+img+p → 表块+'bbb' 两块（表格打断后段落不复并，img 旁路不恢复合并）；bq+h2+p → 'q'（1 id）+'T bbb'（2 ids）标题断反向链
+- 提交：test(pipeline): add html chain members round (Round 1743)
+
+---
+
 ## Round 1742 — pipeline 相邻表格独立性与无空行并表、多行代码入链
 
 - 文件：tests/test_pipeline_adjacent_tables_multiline_code.py（3 个测试）
