@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1779 — 超限切分落点：句界优先、无标点回退空白
+
+- 文件：tests/test_pipeline_sentence_split_points.py（3 个测试）
+- 新角度（probe 实证）：带句号超限文本 7 句 ×144=1007 切在 ≤800 的最后一个句号处（首块 723 尾 'S5.'，split_boundary_after 键不出现），S5 标记留前块、词群 'w5_0' 入次块；无标点纯词 979 回退 whitespace（797 boundary='whitespace'+181）——句界优先级 > 空白 > forced_char
+- 提交：test(pipeline): add sentence split points round (Round 1779)
+
+---
+
 ## Round 1778 — pipeline html 超限 pre/bq 切分与纯图零 chunk
 
 - 文件：tests/test_pipeline_html_oversize_imgonly.py（3 个测试）
