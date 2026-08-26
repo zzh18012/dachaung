@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1834 — 缩进围栏退化、tfoot DOM 序、无引号属性容错（Round 1834）
+- 动机：锁 R1833（标记变体）后查语法边界——缩进代码围栏、表格分区顺序、宽松属性语法，均零覆盖
+- 探针：3 组独立 heredoc 探针，断言全部来自实测输出
+- 结论 1：md 列表项后缩进 2 空格的围栏不识别——退化普通 paragraph 字面三反引号串，无 code_block 元数据（围栏需列 0 起）
+- 结论 2：thead/tfoot/tbody 按源码 DOM 序输出 H/F/B——tfoot 不重排到末尾，row_count=3 全计入
+- 结论 3：html 无引号属性 border=1 容错——表格照常解析，内容 '| x |' 不受影响
+- 新增：tests/test_parser_indented_fence_tfoot_attr.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1833 — 自动链接字面、列表 * / + 标记、空 td 单元（Round 1833）
 - 动机：锁 R1832（fence 原样/懒续行/hr 变体）后继续表层语法覆盖——尖括号自动链接、非破折号列表标记、空单元格，均零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测输出
