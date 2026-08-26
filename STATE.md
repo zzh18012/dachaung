@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1686 — pipeline pre 内实体与混合层级引用（2 测试）
+
+- 文件：tests/test_pipeline_pre_entity_mixed_bq.py
+- 新角度（probe 实证）：R1685 锁分隔线变体——**pre 内实体照常解码、空行分隔的混合层级引用各自成块**零覆盖：
+  - pre 内 '&amp;'：解码 '&'（kind 'preformatted' 不影响实体处理；R1609 只锁了标签剥除）
+  - '> a' 与 '>> b' 相邻：两个独立 blockquote，第二个内容 '> b'（层级不合并、不嵌套）
+
+---
+
 ## Round 1685 — pipeline 分隔线变体扩展与嵌套空容器（3 测试）
 
 - 文件：tests/test_pipeline_hr_variants_empty.py
