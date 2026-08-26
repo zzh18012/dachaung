@@ -81,6 +81,23 @@
 
 ---
 
+## Round 1672 — pipeline 混合行尾/尾井号非独立/td 内 pre 换行（3 测试）
+
+- 文件：tests/test_pipeline_mixed_endings.py
+- 新角度（probe 实证）：R1671 锁空边界——**
+ 与 
+ 混排、'### T ### extra'、td 内 pre 换行**零覆盖：
+  - 混合行尾：一行 
+ 一行 
+ 交错 → 全归一成 
+，单段落（write_bytes 精确字节）
+  - 尾井号非独立：'T ### extra' 井号是标题文本一部分（R1614 只锁井号独立结尾才剥）
+  - td 内 pre：'<pre>a
+b</pre>' 换行保留进单元格 '| a
+b |'
+
+---
+
 ## Round 1671 — pipeline 裸引用行/表内散文本/空 tbody 空文档（3 测试）
 
 - 文件：tests/test_pipeline_nocontent_edges.py
