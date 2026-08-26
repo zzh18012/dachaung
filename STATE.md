@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1768 — pipeline section_path 嵌套算法：' > ' 连接、同级替换、跳级追加与 h1 重置
+
+- 文件：tests/test_pipeline_section_path_nesting.py（4 个测试）
+- 新角度（probe 实证）：R1767 锁超限隔离——标题层级栈算法：子标题追加 'T > U'；同级替换末段 'A'→'B'；跳级直接追加（h2→h4 'A > D' 无中间层）；h1 任意处全重置（'A > B'→'H'）；六层最深 'a > b > c > d > e > f'（' > ' 单空格连接）
+- 提交：test(pipeline): add section_path nesting round (Round 1768)
+
+---
+
 ## Round 1767 — pipeline 超限元素隔离：切分块不吸邻与尾部重组
 
 - 文件：tests/test_pipeline_oversize_isolation.py（3 个测试）
