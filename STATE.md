@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1691 — pipeline 空 pre 静默丢弃与 ipynb 单元内空围栏警告
+
+- 文件：tests/test_pipeline_empty_pre_nb_fence.py（2 个测试）
+- 新角度（probe 实证）：R1690 锁 md 空围栏警告——html 侧空 `<pre></pre>` 无警告直接丢弃（段落 x 照常、errors 空、warnings 空）；ipynb markdown cell 内空围栏的 md_empty_code_block 警告穿透到 notebook 层，reason 带 `cell #0 (markdown): ` 前缀 + 行号 1，随后 ipynb_no_content，doc None + no_extracted_elements
+- 提交：test(pipeline): add empty pre/nb fence round (Round 1691)
+
+---
+
 ## Round 1690 — pipeline 空代码块警告 md_empty_code_block（3 测试）
 
 - 文件：tests/test_pipeline_empty_code_block.py
