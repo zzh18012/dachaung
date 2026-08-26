@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1656 — pipeline 单元格实体/围栏内表格惰性/ipynb 缺键（3 测试）
+
+- 文件：tests/test_pipeline_entity_fence_nbkeys.py
+- 新角度（probe 实证）：R1655 锁顶层内联——**td 内实体解码、code_block 内表格语法惰性、nbformat/cells 键缺失**零覆盖：
+  - td 内 '&amp;'：解码成 '&' 进单元格 '| a & b |'
+  - 围栏内表格不成表：管道表语法在 code_block 内原样保留
+  - 缺 nbformat 仍解析（metadata nbformat None + nbformat_minor None）；缺 cells → no_extracted_elements + ipynb_no_content（reason '空 notebook 或仅含空 cell'）
+
+---
+
 ## Round 1655 — pipeline 顶层内联/td 内 br/ipynb cell 表格（3 测试）
 
 - 文件：tests/test_pipeline_inline_cell_grammar.py
