@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1684 — pipeline 空标题丢弃与空单元格保留（3 测试）
+
+- 文件：tests/test_pipeline_empty_headings_cells.py
+- 新角度（probe 实证）：R1683 锁围栏闭合/引号——**空与纯空白 h2 丢弃、td 空值保留为空格格**零覆盖：
+  - '<h2></h2>' 与 '<h2>   </h2>'：空/纯空白标题丢弃（同 R1633 空 p 规则），后续段落照常
+  - 空 td：'|  | x |' 空格占位，col_count 2（空单元格不丢，保持列对齐）
+
+---
+
 ## Round 1683 — pipeline 闭合围栏尾空白与未闭合引号（2 测试）
 
 - 文件：tests/test_pipeline_close_ws_unclosed_quote.py
