@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1716 — pipeline cell 内列表、h2 内 div、无空行引用打断与嵌套 pre
+
+- 文件：tests/test_pipeline_celllist_divh2_bq_pre.py（4 个测试）
+- 新角度（probe 实证）：R1715 锁 1600 不丢——ipynb markdown cell 内 '- a
+- b' 列表完整语法（两个 list_item 合 1 chunk）；<h2>a<div>d</div>b</h2> 无空格拼接 heading 'adb'；'para
+> q' 无空行引用打断段落（paragraph + blockquote，不做惰性合并）；嵌套 <pre> 全拼接单段 preformatted 'outerinnertail'
+- 提交：test(pipeline): add cell list/div h2/bq break round (Round 1716)
+
+---
+
 ## Round 1715 — pipeline 1600 字符两块不丢、hr 后表格、顶级 a 文本与混合 td
 
 - 文件：tests/test_pipeline_1600_hr_a_mixedtd.py（4 个测试）
