@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1796 — 游离文本、内部空白保留、松散列表与续行分离
+
+- 文件：tests/test_parser_stray_ws_lists.py（4 个测试）
+- 新角度（probe 实证）：html 'loose<p>a</p>tail'——前游离文本并入段 'loosea'（无空格拼接）、后游离文本 'tail' 独立成段（前后不对称）；段内三空格 'a   b' 原样保留（仅剥两端）；md 松散列表（项间空行）仍 2x list_item 合并 'a b'；'- a' + 缩进续行 'cont' 剥缩进独立成段
+- 提交：test(parser): add stray ws lists round (Round 1796)
+
+---
+
 ## Round 1795 — 嵌套列表扁平、hr 丢弃、ipynb 粘连标题识别、链接定义字面
 
 - 文件：tests/test_parser_nested_list_hr_glued.py（4 个测试）
