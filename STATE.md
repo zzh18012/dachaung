@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1657 — pipeline 连续 md 表/img 破坏标题/ipynb 缺 source（3 测试）
+
+- 文件：tests/test_pipeline_md_tables_img_heading.py
+- 新角度（probe 实证）：R1656 锁实体/围栏——**空行分隔的两个 md 表各自 isolated、img 进 h2 破坏标题、cell 缺 source 静默跳过**零覆盖：
+  - 两个 md 表（空行分隔）：各 1 元素各 1 块 isolated_table（与 html 相邻表一致）
+  - img 进 h2：标题不保——image + 普通 paragraph 'T'（与 R1647 img-in-li 破坏同型：img 出现即破坏所在容器语义）
+  - 缺 source 键：该 cell 无元素无警告（markdown 不警告），后续 cell 正常，cell_index 保留原值 1
+
+---
+
 ## Round 1656 — pipeline 单元格实体/围栏内表格惰性/ipynb 缺键（3 测试）
 
 - 文件：tests/test_pipeline_entity_fence_nbkeys.py
