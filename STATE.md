@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1680 — pipeline 单元格内剥内联与三层引用（3 测试）
+
+- 文件：tests/test_pipeline_cell_inline_bq.py
+- 新角度（probe 实证）：R1679 锁引用内表格——**td/th 内内联标签剥除（与正文一致）、'>>>' 三层只剥一层**零覆盖：
+  - td 内 <b>：'| x y |'（内联剥、文本拼接）
+  - th 内 <i>：'| H |'
+  - '>>>'：剩 '>> deep' 单层 blockquote（每行只剥一个 '>'，R1637 双层版延伸）
+
+---
+
 ## Round 1679 — pipeline 引用内表格 raw 与纯换行文件（3 测试）
 
 - 文件：tests/test_pipeline_bq_table_nl_only.py
