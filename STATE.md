@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1786 — 输入形态：ipynb raw cell 有 kind、CRLF 透明、BOM 不剥破坏标题
+
+- 文件：tests/test_pipeline_raw_cell_crlf_bom.py（3 个测试）
+- 新角度（probe 实证）：ipynb 'raw' cell 非未知类型：paragraph + kind='raw_cell' 无警告、照常入合并链 'raw text md ok'；CRLF 输入与 LF 全同（段落内容无  残留）；UTF-8 BOM 不剥——'﻿## T' 退化为段落（标题丢失、section_path None、'﻿## T body' 跨合并），纯文本段落同样保留 ﻿ 前缀
+- 提交：test(pipeline): add raw cell crlf bom round (Round 1786)
+
+---
+
 ## Round 1785 — 内联与围栏：md 标记原样、fence language 入 metadata、html 注释/未知标签
 
 - 文件：tests/test_parser_inline_fence_html.py（4 个测试）
