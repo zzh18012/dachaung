@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1777 — pipeline ipynb 策略同谱：cell 切分、表隔离与标题拉段
+
+- 文件：tests/test_pipeline_ipynb_strategy_taxonomy.py（3 个测试）
+- 新角度（probe 实证）：R1776 锁 text 同谱——ipynb 三策略与 md/text 全同：code cell '字'×900 → 800 forced_char+100 'long_paragraph_sentence_split'；md cell 内表格 → 'isolated_table'；cell 内 '## T'+'bbb' → 'T bbb' 'sequential'——四家族策略谱完全统一
+- 提交：test(pipeline): add ipynb strategy taxonomy round (Round 1777)
+
+---
+
 ## Round 1776 — pipeline 标题拉列表 799 边界与 text 家族策略同谱
 
 - 文件：tests/test_pipeline_heading_list_boundary_text.py（3 个测试）
