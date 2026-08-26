@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1692 — pipeline md setext 标题、4 空格缩进与 marker 后多空格
+
+- 文件：tests/test_pipeline_setext_indent_markers.py（4 个测试）
+- 新角度（probe 实证）：R1691 锁空 pre——setext 下划线完全不识别：'Title
+===' 惰性并段内嵌换行保留、'Title
+---' 中 '---' 被 hr 丢弃只留标题、前置段落后三行全并一段；'    code line' 4 空格缩进被 strip 成普通 paragraph（无 code_block kind），空行后独立段落但同 chunk；'-   '/'1.  ' marker 后多空格照常 list_item
+- 提交：test(pipeline): add setext/indent4/multi-space markers round (Round 1692)
+
+---
+
 ## Round 1691 — pipeline 空 pre 静默丢弃与 ipynb 单元内空围栏警告
 
 - 文件：tests/test_pipeline_empty_pre_nb_fence.py（2 个测试）
