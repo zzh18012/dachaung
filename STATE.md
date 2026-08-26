@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1661 — pipeline 纯图文档零 chunk/纯标题单 chunk（3 测试）
+
+- 文件：tests/test_pipeline_image_only_docs.py
+- 新角度（probe 实证）：R1660 锁分块流——**只有 image 元素的文档 chunks 为空（合法）、纯标题文档单 chunk**零覆盖：
+  - md/html 纯图：1 个 image 元素、0 个 chunk——图片完全绕过分块，空 chunk 列表不报错（"每 chunk 必有非空 source_element_ids" 不因空列表被违反）
+  - 纯标题：'# T' → 单 chunk 'T'（1 id）
+
+---
+
 ## Round 1660 — pipeline 双标题分块流/贴段围栏/code 多行（3 测试）
 
 - 文件：tests/test_pipeline_flush_flow.py
