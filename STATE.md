@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1676 — pipeline html blockquote 结构透明与交替围栏（3 测试）
+
+- 文件：tests/test_pipeline_html_bq_fence_langs.py
+- 新角度（probe 实证）：R1675 锁 colgroup——**html 引用内 heading/list 照常提取（与 md 引用内部惰性相反）、交替围栏语言**零覆盖：
+  - h3 在 blockquote：heading level 3 正常产出——html 引用只是透明容器，无 md 的内部惰性规则（与 R1637/R1674 md 版对照）
+  - ul 在 blockquote：list_item 正常产出
+  - 交替围栏：```py 与 ```js 两个 code_block 各带语言
+
+---
+
 ## Round 1675 — pipeline colgroup 透明与闭合标签带属性（2 测试）
 
 - 文件：tests/test_pipeline_colgroup_closetag.py
