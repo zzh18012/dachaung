@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1681 — pipeline 围栏 info 前导空格与无分号实体（3 测试）
+
+- 文件：tests/test_pipeline_info_space_entity.py
+- 新角度（probe 实证）：R1680 锁单元格内联——**'``` py' 前导空格剥离、'&amp' 无分号照常解码**零覆盖：
+  - info 前导空格：'``` py' → language 'py'（R1635 的破坏只在词后带参数，前导空格不破坏围栏）
+  - '&amp' 无分号：'a &amp b' → 'a & b'（宽松实体解码）
+  - '&lt' 无分号：'a &lt b' → 'a < b'
+
+---
+
 ## Round 1680 — pipeline 单元格内剥内联与三层引用（3 测试）
 
 - 文件：tests/test_pipeline_cell_inline_bq.py
