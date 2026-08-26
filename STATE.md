@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1808 — cli inspect 零块与警告态：纯图无 chunk 行、warnings 计数、错误 JSON 不落盘链
+
+- 文件：tests/test_cli_inspect_zero_chunks.py（3 个测试）
+- 新角度（probe 实证）：纯图文档 chunks=0——'chunk text'/'chunk refs' 行整体缺席（零块守卫、无除零）、element text total_chars=0；空围栏警告文档 counts warnings=1；失败 parse 不落盘（错误 JSON 只在 stderr）→ 后续 inspect 必 '文件不存在' exit 2
+- 提交：test(cli): add inspect zero chunks round (Round 1808)
+
+---
+
 ## Round 1807 — cli inspect：摘要行、聚合统计（元素/块/引用 min-max-avg）、缺文件 exit 2
 
 - 文件：tests/test_cli_inspect_round.py（3 个测试）
