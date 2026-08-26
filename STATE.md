@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1806 — JSON 成功态字段：relations/errors 空数组、source_path 原样、警告序列化无 details
+
+- 文件：tests/test_pipeline_json_fields_round.py（3 个测试）
+- 新角度（probe 实证）：成功 JSON 里 relations=[]、errors=[]、warnings=[]（空数组非 null）；parser_name/version、schema_version 0.1.0、metadata {'markdown': True}；source_path 原样保留——相对进相对出 'd.md'、绝对进绝对出（不做 resolve）；空围栏警告序列化 [{'code','reason'}]——details 键省略在 JSON 层复证
+- 提交：test(pipeline): add json fields round (Round 1806)
+
+---
+
 ## Round 1805 — cli 扩展名映射全表：html/ipynb/md 自动选择；未知扩展落 fallback 即拒
 
 - 文件：tests/test_cli_autoselect_map.py（3 个测试）
