@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1793 — 单元格净化、colspan 空补、标题内 img 拆分、ipynb 单胞多块
+
+- 文件：tests/test_parser_cell_colspan_img_split.py（4 个测试）
+- 新角度（probe 实证）：html 单元格内 <b>/<i> 剥壳、实体照解 '1 & 2'；colspan=2 不生效——'wide' 落首列、次列空补 '| wide |  |'（col_count 仍 2）；<h2>T <img></h2>——标题 'T' 不含图、img 独立成元素、后段照拉 'T b'；ipynb 单 md 胞 heading+list+table：三类型齐发、表破链 'H li' sequential + isolated_table
+- 提交：test(parser): add cell colspan img split round (Round 1793)
+
+---
+
 ## Round 1792 — 表格规范化与列表元数据：对齐行归一、紧凑单元格重排、ordered/marker
 
 - 文件：tests/test_parser_table_norm_list_metadata.py（3 个测试）
