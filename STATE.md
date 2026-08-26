@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1807 — cli inspect：摘要行、聚合统计（元素/块/引用 min-max-avg）、缺文件 exit 2
+
+- 文件：tests/test_cli_inspect_round.py（3 个测试）
+- 新角度（probe 实证）：inspect 子命令输出结构化摘要——document_id、source（type+hash 16 前缀省略号）、counts、elements by type、element text（total_chars+avg）、chunk text（min max avg total）、chunk refs（source_element_ids 统计）；'a/bb/ccc' 三段合一块 → element total=6 avg=2、chunk 8、refs min=3 avg=3.0；缺文件 exit 2 + '[ERROR] 文件不存在'（与 parse 的 exit 1 分层）
+- 提交：test(cli): add inspect round (Round 1807)
+
+---
+
 ## Round 1806 — JSON 成功态字段：relations/errors 空数组、source_path 原样、警告序列化无 details
 
 - 文件：tests/test_pipeline_json_fields_round.py（3 个测试）
