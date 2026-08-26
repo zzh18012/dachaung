@@ -81,10 +81,19 @@
 
 ---
 
+## Round 1787 — 标题 level 元数据、html title 丢弃、标题跨图拉段
+
+- 文件：tests/test_pipeline_heading_level_pull_image.py（3 个测试）
+- 新角度（probe 实证）：heading 元素 metadata {'level': N}（1/2/3 实证；段落 metadata 恒 {}）；html <title> 整段丢弃（head 内内容不发射、只剩 body 段落）；标题+图+段落：图不破拉取——'T bbb' 2 ids 跨图成立，image 元素 content=None（资源信息在 metadata）
+- 提交：test(pipeline): add heading level pull image round (Round 1787)
+
+---
+
 ## Round 1786 — 输入形态：ipynb raw cell 有 kind、CRLF 透明、BOM 不剥破坏标题
 
 - 文件：tests/test_pipeline_raw_cell_crlf_bom.py（3 个测试）
-- 新角度（probe 实证）：ipynb 'raw' cell 非未知类型：paragraph + kind='raw_cell' 无警告、照常入合并链 'raw text md ok'；CRLF 输入与 LF 全同（段落内容无  残留）；UTF-8 BOM 不剥——'﻿## T' 退化为段落（标题丢失、section_path None、'﻿## T body' 跨合并），纯文本段落同样保留 ﻿ 前缀
+- 新角度（probe 实证）：ipynb 'raw' cell 非未知类型：paragraph + kind='raw_cell' 无警告、照常入合并链 'raw text md ok'；CRLF 输入与 LF 全同（段落内容无 
+ 残留）；UTF-8 BOM 不剥——'﻿## T' 退化为段落（标题丢失、section_path None、'﻿## T body' 跨合并），纯文本段落同样保留 ﻿ 前缀
 - 提交：test(pipeline): add raw cell crlf bom round (Round 1786)
 
 ---
