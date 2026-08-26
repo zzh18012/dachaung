@@ -81,6 +81,18 @@
 
 ---
 
+## Round 1735 — pipeline 标题链累积深度：连续标题、拉列表、拉多段、跨图
+
+- 文件：tests/test_pipeline_heading_chain_depth.py（4 个测试）
+- 新角度（probe 实证）：R1734 锁标题只向后拉段——标题链更深：'## T1
+
+## T2
+
+bbb' 得 'T1'（1 id）+ 'T2 bbb'（2 ids），连续标题各自开链；'## T'+列表 → 'T a b'（3 ids）列表项入链；'## T'+两段 → 'T bbb ccc'（3 ids）连拉多段；标题与段之间 image 旁路不断链（'T bbb'，2 ids）
+- 提交：test(pipeline): add heading chain depth round (Round 1735)
+
+---
+
 ## Round 1734 — pipeline 标题只向后拉段与表格独立成块
 
 - 文件：tests/test_pipeline_heading_pull_table_chain.py（2 个测试）
