@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1794 — 文本块与边缘语法：单换行成块、缩进/h7 非法、pre 剥标签
+
+- 文件：tests/test_parser_text_blocks_edge.py（4 个测试）
+- 新角度（probe 实证）：text 单换行整块（内部换行保留、line 1）；前导空行跳过但物理行号计入（空两行后 'x' → line 3）；md 4 空格缩进剥空成段（非代码块）；'#######' 七井非标题（字面段落）；html pre 内 <b> 剥壳 'a b c'、kind 'preformatted'
+- 提交：test(parser): add text blocks edge round (Round 1794)
+
+---
+
 ## Round 1793 — 单元格净化、colspan 空补、标题内 img 拆分、ipynb 单胞多块
 
 - 文件：tests/test_parser_cell_colspan_img_split.py（4 个测试）
