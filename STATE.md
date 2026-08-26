@@ -81,6 +81,18 @@
 
 ---
 
+## Round 1704 — pipeline 801 字符切分、中部 hr、td 内 div、nbsp 与 code cell 表格原样
+
+- 文件：tests/test_pipeline_801_hr_nbsp_codecell.py（5 个测试）
+- 新角度（probe 实证）：R1703 锁引用无惰性——801 字符无空格 text 切 800+1 两块（均 long_paragraph_sentence_split）；'a
+
+---
+
+b' 中部 hr 丢弃两段合 1 chunk；td 内 <div> 透明单元格 'd'；'a&nbsp;b' 解码 'a b'；code cell 含完整表格语法不解析（单段 kind 'code_cell' 原样，对比 markdown cell 会成表）
+- 提交：test(pipeline): add 801/hr-mid/nbsp/code-cell round (Round 1704)
+
+---
+
 ## Round 1703 — pipeline 引用无惰性续行、img 打断标题、cell 内引用与 td 内列表
 
 - 文件：tests/test_pipeline_bq_lazy_img_heading.py（5 个测试）
