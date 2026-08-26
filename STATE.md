@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1766 — pipeline 混型连续链：夹心、标题居中与混标记全并
+
+- 文件：tests/test_pipeline_mixed_chains.py（3 个测试）
+- 新角度（probe 实证）：R1765 锁纯图零 chunk——列表-段落-列表夹心不断链：'- a'+'mid'+'- b' → 'a mid b'（3 ids）；标题居中：'aaa' 独立（1 id）+'## T' 连拉两段 'T bbb ccc'（3 ids）；无序+有序+段落全并：'- a'+'1. b'+'para' → 'a b para'（3 ids），元素 marker 各自保留 unordered/ordered
+- 提交：test(pipeline): add mixed chains round (Round 1766)
+
+---
+
 ## Round 1765 — pipeline 纯图文档：chunks 空列表合法与零 chunk JSON 过 schema
 
 - 文件：tests/test_pipeline_image_only_empty_chunks.py（3 个测试）
