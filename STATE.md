@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1752 — pipeline 空输入失败契约：doc=None + no_extracted_elements 与嵌套家族警告
+
+- 文件：tests/test_pipeline_empty_input_contract.py（4 个测试）
+- 新角度（probe 实证）：R1751 锁 section_path——空/纯白 md、空 txt、空 html、空 cells ipynb 统一返回 (None, [ErrorRecord(code='no_extracted_elements', message='解析完成但未提取到任何 element（可能为扫描件或不支持的内容）')])，家族警告嵌在 details['warnings'][0]['code']（md/text/html/ipynb_no_content）而非 doc.warnings，details 另含 source_type；纯图 md 文件成功（1 image 元素，图片算内容）
+- 提交：test(pipeline): add empty input contract round (Round 1752)
+
+---
+
 ## Round 1751 — pipeline section_path 全类型传播与表格后重组成链
 
 - 文件：tests/test_pipeline_section_path_rechain.py（3 个测试）
