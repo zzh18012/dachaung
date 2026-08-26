@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1663 — pipeline 孤 dt/html 参差行/标题前导空格（3 测试）
+
+- 文件：tests/test_pipeline_dt_ragged_indent.py
+- 新角度（probe 实证）：R1662 锁 code 合并——**dt 无 dd、html 行比表头短、标题前 1 空格**零覆盖：
+  - 孤 dt：'<dt>term</dt>' 无 dd → 普通 paragraph（不成 termdef；R1607 的 termdef 需 dt+dd 对）
+  - html 参差行：第二行 1 格 → 补空 '| x |  |'，col_count 仍 2（与 md 参差一致）
+  - 标题前导空格：' # T' → paragraph '# T' 原样（任何缩进破坏，与 R1650 列表结论一致）
+
+---
+
 ## Round 1662 — pipeline code_block 与段落/列表合并分块（3 测试）
 
 - 文件：tests/test_pipeline_code_chunk_merge.py
