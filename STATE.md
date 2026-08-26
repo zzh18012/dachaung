@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1825 — ipynb md cell 结构、混排 th/td 全表头、纯空白 text 报空（Round 1825）
+- 动机：锁 R1824（任务列表/嵌套表/标题锚）之后，查 ipynb markdown cell 的内部解析深度、表头单元格混排判定、text 空白文件路径——三者此前零覆盖
+- 探针：3 组独立 heredoc 探针，断言全部来自实测输出
+- 结论 1：ipynb markdown cell 内 '## MT' 真解析出 heading——md cell 走完整 markdown 结构解析，locator 带 cell_index=0/cell_type='markdown'/line=1/section_path='MT' 四键，后续 para 同 cell_index=0/line=3/section_path='MT'
+- 结论 2：`<tr><th>H</th><td>D</td></tr>` 混排行整行按表头处理——'| H | D |' + 分隔行，th 存在即整行表头（td 不另起数据行）
+- 结论 3：纯空白 text 文件（'\n\n  \n\n'）→ doc=None + no_extracted_elements——与空 md 同错误码，whitespace 不算内容
+- 新增：tests/test_pipeline_ipynb_mdcell_thmix_wsfile.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1824 — md 任务列表字面、嵌套表行提升外文本丢、标题内锚文本保（Round 1824）
 - 动机：锁 R1823（html bq/li p/ol start）之后，查 md 任务列表语法、html 深层嵌套表格、标题内联锚——三者此前零覆盖
 - 探针：4 组 heredoc 探针（任务列表 / 嵌套表 / 标题锚 / 嵌套表复证），断言全部来自实测
