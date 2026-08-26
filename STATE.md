@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1804 — cli 错误面：缺文件 exit 1 错误 JSON、非法 --parser exit 2 argparse、validate 坏 JSON exit 1
+
+- 文件：tests/test_cli_error_exits.py（3 个测试）
+- 新角度（probe 实证）：缺输入文件 → exit 1 + stderr 结构化 JSON（code file_not_found、message 含 不存在、无 details、不落盘）；--parser 非法值 → exit 2（argparse 层拒绝、stderr 列 6 个合法名——早于管道，与 process_single 的 unexpected_parser_error 分层）；validate 非 JSON 文件 → exit 1 + '[FAIL] ... JSON 解析失败'
+- 提交：test(cli): add error exits round (Round 1804)
+
+---
+
 ## Round 1803 — cli 扩展名自动选 parser、显式 --parser 无 INFO、--max-chars 传达到切分
 
 - 文件：tests/test_cli_autoselect_maxchars.py（3 个测试）
