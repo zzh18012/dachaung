@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1770 — pipeline 失败不落盘与 warnings 序列化省键
+
+- 文件：tests/test_pipeline_json_failure_warnings.py（3 个测试）
+- 新角度（probe 实证）：R1769 锁路径同构——解析失败（doc=None，含崩溃与缺文件）时 output_path 完全不写文件；成功 JSON 的 warnings：details=None 的记录整键省略（md_empty_code_block 仅 code/reason 两键）、有 details 的保留（ipynb_empty_code_cell 含 details {'cell_index': 0}）；初版误用仅空码 cell 的 notebook（失败路径无 JSON），加好 cell 后修正
+- 提交：test(pipeline): add JSON failure/warnings round (Round 1770)
+
+---
+
 ## Round 1769 — pipeline html/ipynb 标题路径：' > ' 同构嵌套与 cell 内生效
 
 - 文件：tests/test_pipeline_html_ipynb_heading_paths.py（3 个测试）
