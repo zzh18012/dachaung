@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1688 — pipeline md 反斜杠转义不生效（2 测试）
+
+- 文件：tests/test_pipeline_backslash_raw.py
+- 新角度（probe 实证）：R1687 锁管道转义——**'\#' 不成标题、反斜杠原样保留、不还原转义**零覆盖：
+  - '\# not heading'：行首反斜杠挡住标题识别，paragraph 且 '' 保留（CommonMark 会还原成 '# not heading' 文本，这里不还原）
+  - 行内 '\*'/'\['：全部原样（与 R1687 管道转义不生效一致——全家族无转义处理）
+
+---
+
 ## Round 1687 — pipeline md 表格单元格无管道转义（2 测试）
 
 - 文件：tests/test_pipeline_escaped_pipes.py
