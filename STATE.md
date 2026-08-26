@@ -81,6 +81,17 @@
 
 ---
 
+## Round 1703 — pipeline 引用无惰性续行、img 打断标题、cell 内引用与 td 内列表
+
+- 文件：tests/test_pipeline_bq_lazy_img_heading.py（5 个测试）
+- 新角度（probe 实证）：R1702 锁 li 内 h2——'> a
+b' 引用不做惰性续行（blockquote 'a' + 独立 paragraph 'b'，对比段落续行合并）；<h2>T <img> tail</h2> 拆 heading 'T' + image + paragraph 'tail'（img 打断标题容器同 li/pre）；'- a
+# H' 标题正常打断列表两者都识别；ipynb markdown cell '> q
+' 段落 kind 'blockquote'（cell 内完整 md 语法）；td 内 <ul> 拍平单元格文本 'i'
+- 提交：test(pipeline): add bq lazy/img heading round (Round 1703)
+
+---
+
 ## Round 1702 — pipeline li 内 h2 抽出、img 独占 p、标题内 br 与双 tbody
 
 - 文件：tests/test_pipeline_h2_li_img_p_tbodys.py（5 个测试）
