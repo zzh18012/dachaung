@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1759 — pipeline 图片 alt 变体：缺省空串、多余属性丢弃、md raw 内联与置信度家族差
+
+- 文件：tests/test_pipeline_image_alt_variants.py（3 个测试）
+- 新角度（probe 实证）：R1758 锁 source 语义——img 无 alt/空 alt 都得 {'alt': ''}，title/width 等属性丢弃；md 图片 alt raw 保留（'**b** `c`' 原样）；置信度家族差：md image 0.95 vs html image 0.9
+- 提交：test(pipeline): add image alt variants round (Round 1759)
+
+---
+
 ## Round 1758 — pipeline ipynb source 语义：列表拼接 strip、缺键静默与 outputs 忽略
 
 - 文件：tests/test_pipeline_ipynb_source_semantics.py（3 个测试）
@@ -275,6 +283,14 @@ line b bbb'（2 ids）——内部换行保留、元素间拼接恒单空格
 
 - b' → 'a'（1 id）+ 'T b'（2 ids）标题打断列表链；'## T'+表+'bbb' → 'T'（1 id）+表（1 id）+'bbb'（1 id）——表格 flush 打断标题链，标题被截空（与 image 旁路不断链相反）
 - 提交：test(pipeline): add list chain/table break round (Round 1736)
+
+---
+
+## 回归基线 101161（第 125 次：0 失败；101139 passed + 22 skipped，1042s）
+
+- 命中：预测 101161 = 101139 + 22，实际 101139 + 22 = 101161（第 88 次连续精确命中）
+- 含轮次：R1735–R1747（新增 45 个测试：101094 + 45 = 101139 passed）
+- 下次预测：101196 = 101161 + 35（R1748–R1759 共 12 轮 35 个测试）
 
 ---
 
