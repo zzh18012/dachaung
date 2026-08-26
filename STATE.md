@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1830 — 超长标题豁免切分、不吸尾段、max_chars 31 触底（Round 1830）
+- 动机：R1829 读 structural.py 后继续沿源码锁分支行为——heading 分支（310-315 行）只 push 不查超长，与表格豁免平行；构造器 280-281 行 max_chars < 32 raise ValueError，管线级表现未锁
+- 探针：3 组 heredoc 探针（900 字标题单置 / +尾段 / max_chars=31），断言全部来自实测
+- 结论 1：900 字 '# HHH...' 标题单块 (900, sequential) 不劈——heading 绕过 3a 超长切分分支，整块发射（超 max_chars 也照发）
+- 结论 2：900 字标题 + 'body' → (900, sequential, 1) + (4, sequential, 1) 两块——超长标题不吸收尾段（投影 900+1+4 > 800 先 flush）
+- 结论 3：max_chars=31 → doc=None + chunker_failed/ValueError——32 下限在管线级全链路成立
+- 新增：tests/test_pipeline_oversize_heading_floor.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1829 — 真表恒孤立、单列 pipe 退化段落、邻接三块型（Round 1829）
 - 动机：锁 R1828（isolated_table 策略名）后深挖表格邻接规则，首探发现"1-col 表与段落合并"表象，读 app/chunkers/structural.py 302-308 行源码后纠正——**table 元素在 chunker 里无条件 flush+单块+flush（isolated_table 恒定），永不与邻居合并**
 - 关键纠正：单列 pipe 行 '| a |' + '| --- |' 不构成 table——md parser 只认 ≥2 列 pipe，单列退化为 paragraph（与 R1789 1-col escaped pipe 退化一致），此前的"合并"实为段落顺序合并
