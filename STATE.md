@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1687 — pipeline md 表格单元格无管道转义（2 测试）
+
+- 文件：tests/test_pipeline_escaped_pipes.py
+- 新角度（probe 实证）：R1686 锁 pre 实体——**'\|' 反斜杠不转义管道，照常切格**零覆盖：
+  - 'a \| b' 一格：实际切成 'a ' 与 'b' 两格（反斜杠留在前格文本，比 GFM 严格）
+  - '\|' 独占一格：成 '' 格 + 空格占位；表头行短时补空格到分隔行列数
+
+---
+
 ## Round 1686 — pipeline pre 内实体与混合层级引用（2 测试）
 
 - 文件：tests/test_pipeline_pre_entity_mixed_bq.py
