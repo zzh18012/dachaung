@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1753 — pipeline 失败分类学：坏 JSON、旧 nbformat、缺文件与解析器崩溃
+
+- 文件：tests/test_pipeline_error_taxonomy.py（4 个测试）
+- 新角度（probe 实证）：R1752 锁空输入契约——四类失败统一 (None, [ErrorRecord])：'{not json' → ipynb_invalid_json（message 含 json 报错原文、details {'path', 'exception_type': 'JSONDecodeError'}）；nbformat=3 → ipynb_unsupported_version（无 details）；不存在文件 → file_not_found（'hash 目标不是文件: <path>'，details {'path'}）；'##   ' 崩溃 → unexpected_parser_error（message 以 'ValueError: element doc-' 开头，details {'path', 'parser_name': 'markdown'}）
+- 提交：test(pipeline): add error taxonomy round (Round 1753)
+
+---
+
 ## Round 1752 — pipeline 空输入失败契约：doc=None + no_extracted_elements 与嵌套家族警告
 
 - 文件：tests/test_pipeline_empty_input_contract.py（4 个测试）
