@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1765 — pipeline 纯图文档：chunks 空列表合法与零 chunk JSON 过 schema
+
+- 文件：tests/test_pipeline_image_only_empty_chunks.py（3 个测试）
+- 新角度（probe 实证）：R1764 锁空表——只有 image 元素的文档成功返回（非 None）：elements N 图、chunks []（空列表）、无警告；零 chunk JSON 照常落盘（data['chunks'] == []）且过 schema validate；两图夹一段恰好 1 chunk 'mid'（旁路另一侧印证）
+- 提交：test(pipeline): add image-only empty chunks round (Round 1765)
+
+---
+
 ## Round 1764 — pipeline html 空表与单行表：静默消失、无警告与表头化重建
 
 - 文件：tests/test_pipeline_empty_table_html.py（3 个测试）
