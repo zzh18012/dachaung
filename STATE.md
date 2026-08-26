@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1749 — pipeline image 元素细节：URL/data URI src、重复不去重、confidence 0.9 与四图夹段
+
+- 文件：tests/test_pipeline_image_element_details.py（3 个测试）
+- 新角度（probe 实证）：R1748 锁 doc id 派生——image resource_path 原样保留（'http://x/y.png' 与 'data:image/png;base64,AAAA' 均不处理），metadata 仅 {'alt': ...}；重复 src 不去重（两个元素各得 id）；image confidence 0.9 低于文本元素 0.95、locator {'line': 1}；4 图夹在两段间合并如常 'a b'（2 ids）
+- 提交：test(pipeline): add image element details round (Round 1749)
+
+---
+
 ## Round 1748 — pipeline doc.metadata 家族形态、内容派生 id 与扩展名 source_type
 
 - 文件：tests/test_pipeline_doc_metadata_hash.py（4 个测试）
