@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1788 — 参差表格补齐、md 图标题泄入 resource_path、level 跨家族
+
+- 文件：tests/test_pipeline_ragged_table_image_path.py（4 个测试）
+- 新角度（probe 实证）：行比表头多列——表头补空 '| a | b |  |'、col_count 取最大 3；行比表头少列——'| 1 |  |  |' 右补空；md 图 ![alt](url "tip") 的 resource_path 原样含 ' "tip"'（标题不剥、metadata 仅 alt、confidence 0.95）；html <h2> 与 ipynb ### 同给 {'level': N}——level 家族全同
+- 提交：test(pipeline): add ragged table image path round (Round 1788)
+
+---
+
 ## Round 1787 — 标题 level 元数据、html title 丢弃、标题跨图拉段
 
 - 文件：tests/test_pipeline_heading_level_pull_image.py（3 个测试）
