@@ -81,6 +81,18 @@
 
 ---
 
+## Round 1696 — pipeline section 透明、波浪线围栏、li 内嵌 p 与引用内部空行
+
+- 文件：tests/test_pipeline_section_tilde_bq_blank.py（4 个测试）
+- 新角度（probe 实证）：R1695 锁数字实体——<section> 第 7 个透明包装器（h2/p 照常提取）；'````' 4 反引号与 '~~~' 波浪线围栏都成 code_block，'~~~py' 语言照常；<li><p>x</p></li> 内层 p 透明成 list_item 'x'；<p>   </p> 纯空白 p 丢弃；'> a
+>
+> b' 引用内部空行保留为 'a
+
+b' 仍单块（空行不拆 blockquote）
+- 提交：test(pipeline): add section/tilde fence/bq blank round (Round 1696)
+
+---
+
 ## Round 1695 — pipeline 数字实体、dl 配对合并、md 参差表格与无 src 图片
 
 - 文件：tests/test_pipeline_numeric_entity_dl_ragged.py（5 个测试）
