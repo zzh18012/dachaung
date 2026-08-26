@@ -81,6 +81,15 @@
 
 ---
 
+## Round 1669 — pipeline 属性值实体解码与深层容器（2 测试）
+
+- 文件：tests/test_pipeline_attr_entity_depth.py
+- 新角度（probe 实证）：R1668 锁单元格内联 raw——**alt 属性值内实体照常解码、5 层嵌套容器全透明**零覆盖：
+  - alt 内实体：'a&nbsp;b &amp; c' → 'a b & c'（  与 & 都在属性值里解码，与正文一致）
+  - 5 层 div 嵌套：链条全透明，只留 paragraph 'deep'
+
+---
+
 ## Round 1668 — pipeline md 单元格内联图片/链接 raw（3 测试）
 
 - 文件：tests/test_pipeline_inline_in_cells.py
