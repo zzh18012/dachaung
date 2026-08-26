@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1836 — 括号有序标记、md 参差表补空、text 不解释井号（Round 1836）
+- 动机：锁 R1835（列 0 语法边界）后补标记/表格/家族分工三点——括号有序标记、md 参差表、text 家族井号行，均零覆盖
+- 探针：3 组独立 heredoc 探针，断言全部来自实测输出
+- 结论 1：'1) first' 括号变体识别为 ordered list_item——'first'/'second' ordered=True/marker='ordered'（与点号等价）
+- 结论 2：md 表 3 列头 + 2 列数据行——行尾补空单元 '| 1 | 2 |  |'（与 html 参差补空行为一致，跨家族同型）
+- 结论 3：text 解析器对 '# looks heading' 输出普通段落——井号字面保留，不解释 md 语法（家族分工边界）
+- 新增：tests/test_parser_paren_marker_ragged_txthash.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1835 — 缩进标题退化、段内硬换行保留、pre 实体解码（Round 1835）
 - 动机：锁 R1834（缩进围栏退化）后系统补列 0 语法边界——缩进标题、段内换行、pre 内实体，均零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测输出
