@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1711 — pipeline 无值 src、大写实体、脚注原样、null source 与闭合空格
+
+- 文件：tests/test_pipeline_bare_attr_entity_footnote.py（5 个测试）
+- 新角度（probe 实证）：R1710 锁重复 src——<img src alt> 无值属性 src 空串图片整个跳过（doc None + html_no_content，同无 src）；'&AMP; x' 大写命名实体解码 '& x'（大小写不敏感）；'text[^1]' 与 '[^1]: note' 脚注语法两段原样（无脚注支持，定义也不剔除，对比链接定义也原样）；ipynb markdown cell source=null 静默跳 cell → ipynb_no_content；'</h2 >' 闭合标签带空格容忍
+- 提交：test(pipeline): add bare attr/uppercase entity/footnote round (Round 1711)
+
+---
+
 ## Round 1710 — pipeline ws li 丢弃、null 实体、重复 src 后者生效与 info tab
 
 - 文件：tests/test_pipeline_wsli_nullentity_dupsrc.py（5 个测试）
