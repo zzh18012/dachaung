@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1678 — pipeline img 破坏 pre 与标题内联全 raw（3 测试）
+
+- 文件：tests/test_pipeline_img_pre_heading.py
+- 新角度（probe 实证）：R1677 锁同级替换——**img 把 pre 拆三段（尾段丢 pre 标记）、md 标题内链接/图片语法全 raw**零覆盖：
+  - img 进 pre：paragraph 'a'（仍 preformatted）+ image + paragraph 'b'（普通段）——img 提取优先于 pre 容器（与 img-in-li/h2 破坏同族）
+  - 标题内链接 raw：'# H [x](u) tail' → heading 原样
+  - 标题内图片 raw：'![i](x.png)' 原样，无 image 元素
+
+---
+
 ## Round 1677 — pipeline 同级标题替换与标题自身入路径（2 测试）
 
 - 文件：tests/test_pipeline_sibling_sections.py
