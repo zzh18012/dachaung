@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1668 — pipeline md 单元格内联图片/链接 raw（3 测试）
+
+- 文件：tests/test_pipeline_inline_in_cells.py
+- 新角度（probe 实证）：R1667 锁 li 内表格——**管道表单元格里的 ![..]() / [..]() 不解析、不产 image 元素**零覆盖：
+  - 图片语法 raw：'![i](p.png)' 原样留在单元格文本里
+  - 链接语法 raw：'[L](u)' 同样原样
+  - 无 image 元素：即使图片语法独占一格，全文档也只有 1 个 table 元素（单元格内不做任何内联解析）
+
+---
+
 ## Round 1667 — pipeline 标题-表-标题流与 li 内表格成兄弟（3 测试）
 
 - 文件：tests/test_pipeline_table_li_flow.py
