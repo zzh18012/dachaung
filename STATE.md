@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1744 — pipeline id 形态、section_path 转换与 source_spans 现状
+
+- 文件：tests/test_pipeline_id_locator_spans.py（4 个测试）
+- 新角度（probe 实证）：R1743 锁 html 链——结构字段：element_id 'doc-<16hex>::eNNNN' 4 位零序号、chunk_id '::cNNNN'；section_path 首标题前缺失（locator 仅 line）、标题起携带并随标题切换；合并块 source_spans 现状：各元素 start 恒 0、end-start=元素自身长度（非 chunk 内偏移——'T bbb ccc' 得 (0,1)/(0,3)/(0,3)，疑似 chunker span 计算缺陷，现状锁定）；md 元素 confidence 恒 0.95、parent_id None；doc 字段 source_type 'markdown'/parser_version 'stdlib/0.1.0'/metadata {'markdown': True}/relations []
+- 提交：test(pipeline): add id/locator/spans round (Round 1744)
+
+---
+
 ## Round 1743 — pipeline html 链成员细则：标题拉列表、pre 入链、表格后不复并、标题断反向链
 
 - 文件：tests/test_pipeline_html_chain_members.py（4 个测试）
