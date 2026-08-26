@@ -81,6 +81,26 @@
 
 ---
 
+## Round 1660 — pipeline 双标题分块流/贴段围栏/code 多行（3 测试）
+
+- 文件：tests/test_pipeline_flush_flow.py
+- 新角度（probe 实证）：R1659 锁 EOF 无换行——**A/B/body 三分块流、围栏前无空行照常、ipynb code 多行 source**零覆盖：
+  - 双标题+段落：'# A
+
+# B
+
+body' → chunk 'A'（1 id）+ 'B body text'（2 id）——B 与后随段落合并、A 独占（R1651 A/B 分开 + R1611 heading+para 合并的组合流）
+  - 贴段围栏：'text
+```
+code
+```' 无空行也照常成 code_block（段落不吞围栏行）
+  - code 多行 source：['a
+','b
+'] → 段落 'a
+b'
+
+---
+
 ## Round 1659 — pipeline md 文件尾无换行（3 测试）
 
 - 文件：tests/test_pipeline_eof_no_newline.py
