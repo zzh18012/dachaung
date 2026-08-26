@@ -81,6 +81,18 @@
 
 ---
 
+## Round 1769 — pipeline html/ipynb 标题路径：' > ' 同构嵌套与 cell 内生效
+
+- 文件：tests/test_pipeline_html_ipynb_heading_paths.py（3 个测试）
+- 新角度（probe 实证）：R1768 锁 md 路径算法——html h2/h3/h1 同建路径：'T'/'T > U'/'H'（h1 重置）与 md 全同；ipynb 同 cell 内嵌套标题也建路径（'## T
+
+### U
+
+x' → 'T'/'T > U'，line 1/3/5 逐行、cell_index 同 0）；cell1 '### A' 的栈不泄漏到 cell2（cell2 段落无 section_path 键）——路径算法三家族同构，仅 ipynb 不跨 cell
+- 提交：test(pipeline): add html/ipynb heading paths round (Round 1769)
+
+---
+
 ## Round 1768 — pipeline section_path 嵌套算法：' > ' 连接、同级替换、跳级追加与 h1 重置
 
 - 文件：tests/test_pipeline_section_path_nesting.py（4 个测试）
