@@ -81,6 +81,14 @@
 
 ---
 
+## Round 1811 — ipynb source 变体：字符串源、胞多余字段忽略、minor 0 记录
+
+- 文件：tests/test_pipeline_ipynb_source_variants.py（3 个测试）
+- 新角度（probe 实证）：source 可以是纯字符串（非列表）——'plain string' 直接成段；cell 的 id/execution_count/metadata.tags 全忽略（element metadata 恒 {}）；nbformat_minor 0 合法并录入 doc.metadata {'nbformat_minor': 0, language ''}
+- 提交：test(pipeline): add ipynb source variants round (Round 1811)
+
+---
+
 ## Round 1810 — 无空白文本 forced_char：长单词、混排粘接；全角/组合字符原样
 
 - 文件：tests/test_pipeline_script_split_preserve.py（3 个测试）
