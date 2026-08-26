@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1670 — pipeline md 空列表项退化（3 测试）
+
+- 文件：tests/test_pipeline_empty_list_items.py
+- 新角度（probe 实证）：R1669 锁属性实体——**'- ' 与 '1. ' 空内容项不成 list_item**零覆盖：
+  - '- ' 空项：paragraph '-'（仅剩标记，尾空格剥）
+  - '1. ' 空有序项：paragraph '1.'
+  - 夹在真实项中间：空项打断列表成 paragraph '-'，前后 list_item 保留
+
+---
+
 ## Round 1669 — pipeline 属性值实体解码与深层容器（2 测试）
 
 - 文件：tests/test_pipeline_attr_entity_depth.py
