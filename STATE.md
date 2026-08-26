@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1827 — html img alt 捕获、波浪线围栏等价、三级层级链（Round 1827）
+- 动机：锁 R1826（语义壳/空 alt/两级链）之后，补 html 图片 alt 侧、md 波浪线围栏、层级深度三点——均零覆盖
+- 探针：3 组独立 heredoc 探针，断言全部来自实测输出
+- 结论 1：html `<img src="p.png" alt="pic">` → image 元素 content=None、metadata {alt: 'pic'}、resource_path='p.png'——alt 属性进元数据（md 侧 R1826 已锁空 alt）
+- 结论 2：md '~~~py ... ~~~' 波浪线围栏与反引号围栏完全等价——paragraph 'code' + {kind: code_block, language: 'py'}
+- 结论 3：'# A'/'## B'/'### C' 三级链 section_path 逐级累积——'A'、'A > B'、'A > B > C'，末级 para 继承 'A > B > C'
+- 新增：tests/test_parser_img_alt_tilde_chain.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1826 — 语义壳透明、空 alt 图片、section_path 层级链（Round 1826）
 - 动机：锁 R1825（ipynb md cell/混排表头/空白文件）之后，查 html 语义容器、md 图片边界、标题层级深度——R1817 只锁过单级 section_path，嵌套层级行为零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测输出
