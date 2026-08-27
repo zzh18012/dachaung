@@ -13,7 +13,7 @@
 - v1.1：text_preservation 改为非空白字符的有序序列对比（口径 D）。
   旧 baseline 的 text_preservation_equal / precision / recall 与新 baseline
   不可横向比较。其它指标语义未变。
-- v1.2（当前）：expectation 契约可执行——runner 实际消费
+- v1.2：expectation 契约可执行——runner 实际消费
   required_markers（自 schema 起声明但此前从未求值）并新增
   forbidden_markers / must_not_error_codes / max_silent_drop_count；
   summary 新增 expectation_checks 分节。版本语义为精确快照：
@@ -22,9 +22,14 @@
   1.1 报告保持旧结构。UDM 侧 document.schema_version 同步改为
   0.1.0（旧形状）/ 0.2.0（新类型或 source_spans）精确快照，
   旧 PDF/DOCX 输出继续生成 0.1.0，与冻结基线字节一致。
+- v1.3（当前）：评测 CLI 可运行 markdown manifest（--parser choices 补齐；
+  自跑线评测从未接 markdown，属搬运线补齐）。能力封口：1.2 evaluator
+  无法运行 markdown manifest，同版本不同能力损害复现，故升 1.3 封存
+  Markdown 候选（ChatGPT 5.6 Sol 2026-08-27 指示）；HTML 注册时再升 1.4。
+  report_version 保持 1.2（报告结构未变）。
 """
 
-EVALUATOR_VERSION = "1.2"
+EVALUATOR_VERSION = "1.3"
 REPORT_VERSION = "1.2"
 ANNOTATION_VERSION = "1.0"
 MANIFEST_VERSION = "1.1"
