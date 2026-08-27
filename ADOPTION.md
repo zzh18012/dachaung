@@ -784,5 +784,25 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   四个 fixture 文件未改动（哈希不变）；expectations-chunks.json 修正后哈希
   a730ac914411556abeb65607dc472140ffc883981325bc54f7ecc4b6bdd7d09b。
   修正发生于任何 holdout 运行之前；此偏差如实登记并将在下轮汇报 GPT。
+- **实现（9adc2d8，adoption 原创）**：app/chunkers/structural.py 仅在
+  `source_type == "ipynb"` 时激活 cell 边界判定（cell_index 变化即封口；
+  locator 缺失/非 dict → 元素自成一组）；tests/test_chunker_ipynb_cell.py
+  18 个测试逐条映射契约（九规则 + §2 防御 + 三指标 + 端到端）。
+  指标 1 口径注记：超长 element 切分多 chunk 时 chunk 侧 joiner 空白在
+  element 侧无对应物，采用 v1.1 已裁决的非空白有序字符口径（7e1246d；
+  同 test_chunker.py::assert_text_preserved），与契约"既有口径"一致。
+- **dev 验收（SHA 9adc2d8，git_dirty=False）**：全套回归 4950 passed
+  （基线 4932 + 新增 18，0 回归）；devset-ipynb 复跑 9 输入 = 5 成功 +
+  4 ef 精确匹配 + 0 意外失败，element_count_total=14 与冻结期望一致；
+  5 成功文档 chunk 层断言全过（每 chunk 单 cell、覆盖无丢失、chunk 全字段
+  两次一致）；报告确定性成立（除 run_timestamp_iso 与 wall_time_seconds
+  计时噪声外逐字段一致——parser 阶段两次运行同样仅计时字段不同，口径
+  补记）；报告存 outputs/evaluation-chunker-dev-acceptance{,-run2}.json。
+- **holdout 首跑封存（SHA 9adc2d8，git_dirty=False，一次性）**：4/4 全过——
+  H-CHK-001 chunk_count=6 逐格单 cell 文本一致；H-CHK-002 chunk_count=5
+  （首 {0}、中段全 {1}、尾 {2}，max piece 200）；H-CHK-003 chunk_count=2
+  （勘误后期望）；H-CHK-004 结构化 no_extracted_elements（0 element 0 chunk，
+  无崩溃）；外加每文档单 cell 不变量与非空白覆盖断言。封存报告
+  outputs/holdout-chunker-v1-firstrun.json（gitignored），此后不再重跑。
 - **纪律**：holdout 不进任何对照/预跑；固定干净 SHA 首跑封存；dev 侧断言
   （单 cell、覆盖、确定性 + 三指标 + 端到端）作为常驻回归测试。
