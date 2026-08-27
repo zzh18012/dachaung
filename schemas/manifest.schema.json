@@ -26,7 +26,7 @@
       "properties": {
         "doc_id": { "type": "string", "minLength": 1 },
         "path": { "type": "string", "minLength": 1 },
-        "source_type": { "enum": ["pdf", "docx"] },
+        "source_type": { "enum": ["pdf", "docx", "markdown", "html", "text", "ipynb"] },
         "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
         "categories": { "type": "array", "items": { "type": "string" } },
         "paired_with": { "type": "string" },
@@ -42,6 +42,18 @@
             "required_markers": {
               "type": "array",
               "items": { "type": "string", "minLength": 1 }
+            },
+            "forbidden_markers": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "must_not_error_codes": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "max_silent_drop_count": {
+              "type": "integer",
+              "minimum": 0
             }
           }
         }

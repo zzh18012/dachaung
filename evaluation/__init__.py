@@ -10,13 +10,19 @@
 版本历史：
 - v1.0（初始）：text_preservation 用 ' '.join 重建全文 + normalize_text 比对；
   对 chunker 在词内硬切产生的额外空格误报为不等于。
-- v1.1（当前）：text_preservation 改为非空白字符的有序序列对比（口径 D）。
+- v1.1：text_preservation 改为非空白字符的有序序列对比（口径 D）。
   旧 baseline 的 text_preservation_equal / precision / recall 与新 baseline
   不可横向比较。其它指标语义未变。
+- v1.2（当前）：expectation 契约可执行——runner 实际消费
+  required_markers（自 schema 起声明但此前从未求值）并新增
+  forbidden_markers / must_not_error_codes / max_silent_drop_count；
+  summary 新增 expectation_checks 分节；manifest/report schema 的
+  source_type 枚举扩至 markdown/html/text/ipynb（additive）。
+  旧 manifest（1.0）与旧报告（1.1）在扩展后 schema 下仍然有效。
 """
 
-EVALUATOR_VERSION = "1.1"
-REPORT_VERSION = "1.1"
+EVALUATOR_VERSION = "1.2"
+REPORT_VERSION = "1.2"
 ANNOTATION_VERSION = "1.0"
 MANIFEST_VERSION = "1.0"
 

@@ -6,6 +6,7 @@
 - ratio_macro_averages（locator / image / chunk_ref / text_* / heading_boundary）
   → 各项 macro average + participating_docs + not_evaluated
 - silent_drop_count → 求和（无 expectations 的文档不参与）
+- expectation_checks → 按键统计 evaluated/passed/failed 文档数（未声明键不算）
 """
 
 from __future__ import annotations
@@ -36,6 +37,14 @@ _RATIO_METRICS = (
 
 _COUNT_METRICS = ("element_count_total",)
 _SUCCESS_BOOL_METRICS = ("pipeline_success",)
+
+# expectation 契约检查：per-doc value 为 {expected/…, passed: bool} 或 null
+_CHECK_METRICS = (
+    "required_markers_check",
+    "forbidden_markers_check",
+    "must_not_error_codes_check",
+    "max_silent_drop_check",
+)
 
 
 def get_git_provenance(project_root: Path) -> dict[str, Any]:
@@ -187,6 +196,26 @@ def aggregate_summary(per_doc_results: list[dict[str, Any]]) -> dict[str, Any]:
         if r["metrics"].get("silent_drop_count", {}).get("value") is not None
     ]
     summary["silent_drop_total"] = sum(silent_vals) if silent_vals else None
+
+    # expectation 契约检查：按键统计 通过/失败/未声明
+    checks: dict[str, Any] = {}
+    for name in _CHECK_METRICS:
+        evaluated = passed = failed = 0
+        for r in per_doc_results:
+            v = r["metrics"].get(name, {}).get("value")
+            if v is None:
+                continue
+            evaluated += 1
+            if v.get("passed") is True:
+                passed += 1
+            else:
+                failed += 1
+        checks[name] = {
+            "evaluated_docs": evaluated,
+            "passed_docs": passed,
+            "failed_docs": failed,
+        }
+    summary["expectation_checks"] = checks
 
     return summary
 

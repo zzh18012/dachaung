@@ -1,4 +1,4 @@
-"""自动指标：13 项 + 计时占位。
+"""自动指标：14 项 + 4 项 expectation 契约检查 + 计时占位。
 
 设计原则：
 - 纯函数：输入是已解析的 document dict（来自 process_single 返回的 Document.to_dict()）
@@ -28,6 +28,8 @@ import math
 from collections import Counter
 from pathlib import Path
 from typing import Any
+
+from app.chunkers.structural import normalize_text
 
 # 文本元素类型（参与"不丢不重"文本比对；image 不参与）
 _TEXT_TYPES = ("heading", "paragraph", "list_item", "table", "caption", "header", "footer")
@@ -96,6 +98,11 @@ def compute_automatic_metrics(
                 "reason": f"schema_check_exception:{type(e).__name__}",
             }
 
+    # expectation 检查中与 error 相关的：即使 pipeline 失败也可判定
+    metrics["must_not_error_codes_check"] = _must_not_error_codes_check(
+        error, expectations
+    )
+
     # 后续指标都需要 document；失败时统一返回 null
     if document is None:
         for name in (
@@ -110,6 +117,9 @@ def compute_automatic_metrics(
             "text_char_multiset_recall",
             "heading_boundary_compliance",
             "silent_drop_count",
+            "required_markers_check",
+            "forbidden_markers_check",
+            "max_silent_drop_check",
         ):
             metrics[name] = _null("pipeline_failed")
         return metrics
@@ -158,6 +168,18 @@ def compute_automatic_metrics(
 
     # 14. silent_drop_count
     metrics["silent_drop_count"] = _silent_drop_count(by_type, expectations)
+
+    # 15-18. expectation 契约检查（manifest 声明的期望 vs 实际输出）
+    norm_stream = _normalized_element_text(elements)
+    metrics["required_markers_check"] = _required_markers_check(
+        norm_stream, expectations
+    )
+    metrics["forbidden_markers_check"] = _forbidden_markers_check(
+        norm_stream, expectations
+    )
+    metrics["max_silent_drop_check"] = _max_silent_drop_check(
+        metrics["silent_drop_count"], expectations
+    )
 
     return metrics
 
@@ -376,6 +398,103 @@ def _silent_drop_count(
         if actual < exp:
             drops += (exp - actual)
     return _int_metric(drops)
+
+
+# ---------- expectation 契约检查 ----------
+#
+# 语义约定（与 manifest.schema.json 一致）：
+# - marker 检查基于 elements 的规范化文本投影：非 image 元素的 content 用
+#   "\n" 连接后过 normalize_text（所有空白压成单空格）。选 elements 而非
+#   chunks 投影，是因为 chunker 词内硬切会在 chunk 文本间引入额外空格，
+#   破坏跨 chunk 的子串匹配；elements→chunks 的保留已由 text_preservation
+#   系列指标单独覆盖。
+# - marker 自身也过 normalize_text 后再做子串匹配；forbidden marker 是
+#   精确子串语义（"script" 会命中 "javascript"），清单作者负责精确性。
+# - manifest 未声明该键（或声明为空列表）→ null + no_expectation_key:<键名>，
+#   不算通过也不算失败。
+
+
+def _expectation_str_list(
+    expectations: dict[str, Any] | None, key: str
+) -> list[str] | None:
+    if not expectations:
+        return None
+    v = expectations.get(key)
+    if not v:
+        return None
+    return v
+
+
+def _normalized_element_text(elements: list[dict]) -> str:
+    raw = "\n".join(
+        e.get("content") or "" for e in elements if e.get("type") != "image"
+    )
+    return normalize_text(raw)
+
+
+def _required_markers_check(
+    norm_stream: str, expectations: dict[str, Any] | None
+) -> dict[str, Any]:
+    markers = _expectation_str_list(expectations, "required_markers")
+    if markers is None:
+        return _null("no_expectation_key:required_markers")
+    missing = [
+        m for m in markers if normalize_text(m) not in norm_stream
+    ]
+    return {
+        "value": {"expected": markers, "missing": missing, "passed": not missing},
+        "reason": None,
+    }
+
+
+def _forbidden_markers_check(
+    norm_stream: str, expectations: dict[str, Any] | None
+) -> dict[str, Any]:
+    markers = _expectation_str_list(expectations, "forbidden_markers")
+    if markers is None:
+        return _null("no_expectation_key:forbidden_markers")
+    found = [m for m in markers if normalize_text(m) in norm_stream]
+    return {
+        "value": {"expected": markers, "found": found, "passed": not found},
+        "reason": None,
+    }
+
+
+def _must_not_error_codes_check(
+    error: dict[str, Any] | None, expectations: dict[str, Any] | None
+) -> dict[str, Any]:
+    codes = _expectation_str_list(expectations, "must_not_error_codes")
+    if codes is None:
+        return _null("no_expectation_key:must_not_error_codes")
+    actual = error.get("code") if error else None
+    occurred = [c for c in codes if c == actual]
+    return {
+        "value": {"expected": codes, "occurred": occurred, "passed": not occurred},
+        "reason": None,
+    }
+
+
+def _max_silent_drop_check(
+    silent_drop_metric: dict[str, Any], expectations: dict[str, Any] | None
+) -> dict[str, Any]:
+    maximum = None
+    if expectations:
+        maximum = expectations.get("max_silent_drop_count")
+    if maximum is None:
+        return _null("no_expectation_key:max_silent_drop_count")
+    actual = silent_drop_metric.get("value")
+    if actual is None:
+        # manifest 加载时的交叉校验保证声明了 max 必须有 element_count_by_type，
+        # 走到这里说明绕过了加载器直接调用
+        return _null("silent_drop_not_computable")
+    return {
+        "value": {
+            "max": maximum,
+            "actual": actual,
+            "passed": actual <= maximum,
+        },
+        "reason": None,
+    }
 
 
 __all__ = ["compute_automatic_metrics"]

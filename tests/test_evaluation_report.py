@@ -144,8 +144,8 @@ def test_no_mixed_overall_score():
     """聚合 summary 不应包含一个混合所有指标的'综合分数'。"""
     per_doc = [_make_per_doc()]
     s = aggregate_summary(per_doc)
-    # 应当只有这 4 个 key
-    assert set(s.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
+    # 应当只有这 5 个 key
+    assert set(s.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total", "expectation_checks"}
     # 不存在 overall / total_score / aggregate_score 之类的字段
     for v in s.values():
         if isinstance(v, dict):

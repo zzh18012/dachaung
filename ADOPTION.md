@@ -70,9 +70,30 @@
 | html-dev-v1 | samples/private/devset-html/ | 5 | 标题段落+内联/列表/表格/实体+可恢复畸形/script-style 排除 |
 | known-regressions-v1 | samples/private/devset-regressions/ | 3 | BUG-md-1 / BUG-html-1 / BUG-html-2 最小复现 |
 
-新增规格键（现 runner 不支持，需后续评测模块扩展，不改 parser/chunker/pipeline）：
-`forbidden_markers`（不得出现的文本）、`must_not_error_codes`（不得出现的错误码）、`forbidden_silent_drop`（不得静默丢弃的元素类型）。
+新增规格键（runner PR 后已可执行，见下）：
+`forbidden_markers`（不得出现的文本）、`must_not_error_codes`（不得出现的错误码）、
+`max_silent_drop_count`（静默丢弃数上限；替代最初草稿的 forbidden_silent_drop，更可判定，
+声明它必须同时声明 element_count_by_type）。
 holdout manifest（不参与调参）留待 parser 搬运完成后另建。
+
+### Runner PR（evaluator v1.2，2026-08-27）
+
+让 manifest 契约可执行，不改 parser/chunker/pipeline：
+- 实现 `required_markers` 求值（自 schema 起声明但从未消费）+ 新增
+  `forbidden_markers` / `must_not_error_codes` / `max_silent_drop_count` 三键
+- marker 匹配基于 elements 规范化投影（非 image content 以 \n 连接后
+  normalize_text；选 elements 而非 chunks，避免 chunker 词内硬切误报）
+- per_doc 新增四个 `*_check` 指标（value 含 expected/actual/passed）；
+  summary 新增 `expectation_checks` 分节（evaluated/passed/failed 分开计数）
+- manifest 严格校验：schema additionalProperties:false 拒未知键与类型错误；
+  加载器交叉校验 max_silent_drop_count 必须伴随 element_count_by_type
+- manifest/report schema 的 source_type 枚举扩至 markdown/html/text/ipynb（additive）；
+  report_version 接受 1.1 与 1.2（冻结基线报告仍有效）；EVALUATOR/REPORT_VERSION → 1.2
+- 三份 manifest 修正：devset_status 改合法枚举（dev-v1→incomplete、
+  known-regressions-v1→complete）；REG-HTML-002 补 element_count_by_type（table:1 image:1）
+- 验收：全套测试 191 passed；旧 PDF/DOCX manifest 重跑与冻结基线
+  既有指标零差异（新增键纯 additive；旧 manifest 的 required_markers 首次求值即通过）；
+  新旧报告均通过扩展后 evaluation-report Schema 校验
 
 ## 六、缺陷登记（评测期只登记不修）
 

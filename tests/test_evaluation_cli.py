@@ -134,7 +134,7 @@ def test_cli_run_end_to_end(project_root: Path):
     validate_file(output, "evaluation-report.schema.json")
 
     report = json.loads(output.read_text(encoding="utf-8"))
-    assert report["report_version"] == "1.1"
+    assert report["report_version"] == "1.2"
     assert report["devset"]["status"] == "incomplete"
     assert report["devset"]["file_count"] == 1
     assert report["devset"]["docx_count"] == 1

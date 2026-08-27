@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kvfs.local/schemas/evaluation-report.schema.json",
-  "title": "Evaluation Report v1.1",
+  "title": "Evaluation Report v1.1/v1.2",
   "type": "object",
   "required": ["report_version", "provenance", "devset", "summary", "per_doc"],
   "additionalProperties": false,
   "properties": {
-    "report_version": { "type": "string", "const": "1.1" },
+    "report_version": { "type": "string", "enum": ["1.1", "1.2"] },
     "provenance": { "$ref": "#/$defs/provenance" },
     "devset": { "$ref": "#/$defs/devset" },
     "summary": { "$ref": "#/$defs/summary" },
@@ -79,7 +79,20 @@
         "counts": { "type": "object" },
         "success_rates": { "type": "object" },
         "ratio_macro_averages": { "type": "object" },
-        "silent_drop_total": { "type": ["integer", "null"] }
+        "silent_drop_total": { "type": ["integer", "null"] },
+        "expectation_checks": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["evaluated_docs", "passed_docs", "failed_docs"],
+            "additionalProperties": false,
+            "properties": {
+              "evaluated_docs": { "type": "integer", "minimum": 0 },
+              "passed_docs": { "type": "integer", "minimum": 0 },
+              "failed_docs": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
       }
     },
     "per_doc": {
@@ -93,7 +106,7 @@
       "additionalProperties": false,
       "properties": {
         "doc_id": { "type": "string", "minLength": 1 },
-        "source_type": { "enum": ["pdf", "docx"] },
+        "source_type": { "enum": ["pdf", "docx", "markdown", "html", "text", "ipynb"] },
         "metrics": { "type": "object" },
         "wall_time_seconds": {
           "type": "object",

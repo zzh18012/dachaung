@@ -180,6 +180,13 @@ def load_manifest(
                 d["annotation_file"], project_root,
                 f"documents[{d['doc_id']}].annotation_file",
             )
+        exp = d.get("expectations")
+        if exp and exp.get("max_silent_drop_count") is not None:
+            if not exp.get("element_count_by_type"):
+                raise ManifestError(
+                    f"documents[{d['doc_id']}].expectations.max_silent_drop_count "
+                    "声明了上限但没有 element_count_by_type，无法计算 silent_drop_count"
+                )
         documents.append(
             DocumentEntry(
                 doc_id=d["doc_id"],
