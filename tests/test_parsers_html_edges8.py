@@ -720,11 +720,12 @@ def test_handle_starttag_nested_table_emits_warning():
     assert p.warnings[0].code == "html_nested_table"
 
 
-def test_handle_starttag_nested_table_not_added_to_depth():
+def test_handle_starttag_nested_table_adds_depth():
+    # BUG-html-1 修复后：内层 table 压入独立上下文，depth 递增
     p = _HTMLDocParser("doc-x")
     p.handle_starttag("table", [])
     p.handle_starttag("table", [])
-    assert p._table_depth == 1  # 内层 table 被忽略
+    assert p._table_depth == 2
 
 
 # =========================================================================

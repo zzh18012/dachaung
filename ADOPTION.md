@@ -304,3 +304,29 @@ HTML-DEV-001..003、005、HTML-HOLD-003/004 核对无误。
   - 封存记录：候选 SHA bc714f3、manifest sha256 前缀 f637dd28de85bfb2
     （与冻结值一致，未改动）、报告 sha256 前缀 49d15a0650fefc46
   - 无失败 → 无需分类实现缺陷/规格争议，无新增 regression
+
+### 提交 2a：修 BUG-html-1（2026-08-27 完成）
+
+- 根因（instrumented trace 定位）：内层 `<table>` start 被忽略（不压栈），
+  但其后的内层 `<tr>/<td>/data` 仍落在**外层**表格状态上——`<tr>` 处理器
+  把外层 cell 缓冲直接置 None（外层文本 "OUTER" 在此被丢弃）；内层
+  `</table>` 又把**外层**的栈弹出，产出的表格是内外混合体
+  （rows=[[], ["INNER"]]，外层文本丢失）
+- 修复语义（ChatGPT 5.6 Sol 2026-08-27 确认）：
+  - 内层 table 压入独立上下文（rows/lines/row/cell/nested 栈，depth 递增），
+    在其 `</table>` 作为独立 table element 解析一次
+  - 嵌套点前：外层 cell 待定文本 → paragraph element（line locator）
+  - 嵌套点后：pop 回外层时重开 cell 接收后文，`</td>` 收尾时同样 → paragraph
+  - 每段文本恰好出现一次；内层文本不折叠进外层单元格；外层表格保留
+  - 元素顺序：前文本段 → 内层表格 → 后文本段 → 外层表格，来源顺序可追踪
+  - `html_nested_table` 警告保留（每嵌套一次一条），reason 更正为实际语义
+- 更新的特征化测试（提交 1 曾按缺陷现状锁定）：edges8 depth 断言 1→2、
+  edges15 嵌套表形状、edges22 内层独立形状；edges2/3/6 的警告存在性/
+  次数/reason 测试无需改动
+- 回归强化（GPT 指示"断言精确出现次数和 table 数量"）：外/内文本
+  count==1、table 计数==2、三层嵌套 count==1 + table==3 + 警告==2、
+  同 row 未嵌套 sibling cell 不受影响、REG-HTML-001 fixture 全绿
+- 验收：全套 3002 passed + 5 xfailed（全部为 BUG-html-2，留 2b）；
+  语料对照：10 个非回归 HTML 文件与 autoline-snapshot 仍逐字节一致
+  （修复零外溢），REG-HTML-001 修复后满足语义而 autoline 同文件仍丢
+  外层文本 = 修复对等性证据；REG-HTML-002 输出不变（2b 前不动）

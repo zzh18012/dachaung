@@ -179,21 +179,24 @@ def test_hgroup_two_headings(
         == "T > S"
 
 
-# ---------- 嵌套表内容形状 ----------
+# ---------- 嵌套表内容形状（BUG-html-1 修复后） ----------
 
 def test_nested_table_shape(tmp_path):
+    """修复后：外层直接文本成段、内层表格独立成元素、外层表格保留。"""
     doc = _parse(
         tmp_path,
         "<table><tr><td>outer<table>"
         "<tr><td>in</td></tr></table>"
         "</td></tr></table>")
-    assert len(doc.elements) == 1
-    e = doc.elements[0]
-    assert e.type == "table"
-    assert e.content == \
-        "|  |\n| --- |\n| in |"
-    assert e.metadata["row_count"] == 2
-    assert "outer" not in e.content
+    assert [(e.type, e.content)
+            for e in doc.elements] == [
+        ("paragraph", "outer"),
+        ("table", "| in |\n| --- |"),
+        ("table", "|  |\n| --- |"),
+    ]
+    tables = [e for e in doc.elements if e.type == "table"]
+    assert tables[0].metadata["row_count"] == 1
+    assert tables[1].metadata["row_count"] == 1
     assert any(
         w.code == "html_nested_table"
         for w in doc.warnings)

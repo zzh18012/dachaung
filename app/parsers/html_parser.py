@@ -14,11 +14,17 @@
 跳过：``<head>``、``<title>``、``<script>``、``<style>`` 内的内容。
 
 明确不支持：
-- 嵌套 table（内层忽略，记 warning）
 - 表格列对齐 / colspan / rowspan（按 cell 顺序填充）
 - ``<dl>/<dt>/<dd>`` 定义列表
 - 内联框架 / object / video
 - CSS / JS 触发的动态内容
+
+嵌套 table 语义（BUG-html-1 修复）：内层 table 作为独立 table element
+解析一次（不重复折叠进外层单元格）；外层单元格的直接文本在嵌套点
+前/后各保留为一个 paragraph element；每段文本恰好出现一次；记
+``html_nested_table`` 警告。元素顺序：前文本段 → 内层表格 → 后文本段
+→ 外层表格（外层表格在 ``</table>`` 才产出），来源顺序经 line locator
+可追踪。
 
 source_locator 结构：``{"line": N, "section_path": "H1 > H2..."}``，
 ``section_path`` 跟踪当前 ATX 标题层级（同级或更高级标题弹出栈）。
@@ -93,6 +99,8 @@ class _HTMLDocParser(_StdHTMLParser):
         self._table_start_lines: list[int] = []
         self._row_buffers_stack: list[list[str] | None] = []
         self._cell_buffers_stack: list[list[str] | None] = []
+        # 当前 cell 是否被嵌套 table 消费过（收尾时文本走段落而非单元格）
+        self._cell_nested_stack: list[bool] = []
         # 跳过栈
         self._skip_stack: list[str] = []
 
@@ -122,6 +130,20 @@ class _HTMLDocParser(_StdHTMLParser):
                 source_locator=self._make_locator_for_inline(),
                 confidence=0.9,
                 metadata={"alt": alt},
+            )
+        )
+
+    def _emit_cell_text_paragraph(self, text: str) -> None:
+        """BUG-html-1：被嵌套 table 消费的单元格直接文本 → paragraph。"""
+        self.elements.append(
+            Element(
+                element_id=f"{self.document_id}::e{len(self.elements):04d}",
+                type="paragraph",
+                content=text,
+                parent_id=None,
+                source_locator=self._make_locator_for_inline(),
+                confidence=0.9,
+                metadata={},
             )
         )
 
@@ -208,18 +230,26 @@ class _HTMLDocParser(_StdHTMLParser):
         if tag == "table":
             self._flush_block()
             if self._table_depth >= 1:
+                # BUG-html-1 修复：嵌套 table 作为独立元素解析一次；
+                # 外层单元格的直接文本保留为段落，不折叠进外层单元格
+                if self._cell_buffers_stack[-1] is not None:
+                    text = "".join(self._cell_buffers_stack[-1]).strip()
+                    if text:
+                        self._emit_cell_text_paragraph(text)
+                    self._cell_buffers_stack[-1] = None
+                    self._cell_nested_stack[-1] = True
                 self.warnings.append(
                     WarningRecord(
                         code="html_nested_table",
-                        reason="嵌套 table 已忽略内层",
+                        reason="嵌套 table 已作为独立元素解析；外层单元格直接文本保留为段落",
                     )
                 )
-                return
             self._table_depth += 1
             self._table_rows_stack.append([])
             self._table_start_lines.append(self.getpos()[0])
             self._row_buffers_stack.append(None)
             self._cell_buffers_stack.append(None)
+            self._cell_nested_stack.append(False)
             return
         if self._table_depth >= 1:
             self._handle_table_inner_start(tag, attrs)
@@ -289,7 +319,16 @@ class _HTMLDocParser(_StdHTMLParser):
                 start_line = self._table_start_lines.pop()
                 self._row_buffers_stack.pop()
                 self._cell_buffers_stack.pop()
+                self._cell_nested_stack.pop()
                 self._table_depth -= 1
+                # BUG-html-1：回到外层时，被嵌套消费过的 cell 重开以接收后文
+                if (
+                    self._table_depth >= 1
+                    and self._cell_nested_stack
+                    and self._cell_nested_stack[-1]
+                    and self._cell_buffers_stack[-1] is None
+                ):
+                    self._cell_buffers_stack[-1] = []
                 md = _rows_to_md(rows)
                 if md:
                     self.elements.append(
@@ -332,34 +371,54 @@ class _HTMLDocParser(_StdHTMLParser):
                 self._list_stack.pop()
             self._flush_block()
 
+    def _finalize_cell(self) -> None:
+        """收尾当前 cell：被嵌套消费过的 cell 文本走段落，普通 cell 并入行。"""
+        text = "".join(self._cell_buffers_stack[-1]).strip()
+        if self._cell_nested_stack[-1]:
+            if text:
+                self._emit_cell_text_paragraph(text)
+            if self._row_buffers_stack[-1] is not None:
+                self._row_buffers_stack[-1].append("")
+        else:
+            if self._row_buffers_stack[-1] is not None:
+                self._row_buffers_stack[-1].append(text)
+        self._cell_buffers_stack[-1] = None
+        self._cell_nested_stack[-1] = False
+
     def _handle_table_inner_start(
         self, tag: str, attrs: list[tuple[str, str | None]]
     ) -> None:
         if tag == "tr":
             if self._row_buffers_stack[-1] is not None:
+                if (
+                    self._cell_buffers_stack[-1] is not None
+                    and self._cell_nested_stack[-1]
+                ):
+                    # 嵌套消费过的 cell 在未闭合 <tr> 前收尾（保留文本）
+                    self._finalize_cell()
                 # 上一个 <tr> 未正常闭合，先收尾
                 self._table_rows_stack[-1].append(self._row_buffers_stack[-1])
             self._row_buffers_stack[-1] = []
             self._cell_buffers_stack[-1] = None
+            self._cell_nested_stack[-1] = False
         elif tag in ("td", "th"):
             if self._row_buffers_stack[-1] is None:
                 self._row_buffers_stack[-1] = []
             if self._cell_buffers_stack[-1] is not None:
-                self._row_buffers_stack[-1].append("".join(self._cell_buffers_stack[-1]).strip())
+                self._finalize_cell()
             self._cell_buffers_stack[-1] = []
+            self._cell_nested_stack[-1] = False
 
     def _handle_table_inner_end(self, tag: str) -> None:
         if tag == "tr":
-            if self._cell_buffers_stack[-1] is not None and self._row_buffers_stack[-1] is not None:
-                self._row_buffers_stack[-1].append("".join(self._cell_buffers_stack[-1]).strip())
-                self._cell_buffers_stack[-1] = None
+            if self._cell_buffers_stack[-1] is not None:
+                self._finalize_cell()
             if self._row_buffers_stack[-1] is not None:
                 self._table_rows_stack[-1].append(self._row_buffers_stack[-1])
                 self._row_buffers_stack[-1] = None
         elif tag in ("td", "th"):
-            if self._cell_buffers_stack[-1] is not None and self._row_buffers_stack[-1] is not None:
-                self._row_buffers_stack[-1].append("".join(self._cell_buffers_stack[-1]).strip())
-                self._cell_buffers_stack[-1] = None
+            if self._cell_buffers_stack[-1] is not None:
+                self._finalize_cell()
 
     def handle_data(self, data: str) -> None:
         if self._skip_stack:

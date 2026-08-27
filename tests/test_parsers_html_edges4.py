@@ -557,11 +557,12 @@ def test_handle_starttag_table_increments_depth():
     assert p._table_depth == 1
 
 
-def test_handle_starttag_nested_table_does_not_increment():
+def test_handle_starttag_nested_table_pushes_context():
+    # BUG-html-1 修复后：嵌套 → 警告 + 压入独立表格上下文（depth 递增）
     p = _HTMLDocParser("doc1")
     p.handle_starttag("table", [])
-    p.handle_starttag("table", [])  # 嵌套 → 警告，不增 depth
-    assert p._table_depth == 1
+    p.handle_starttag("table", [])
+    assert p._table_depth == 2
     assert len(p.warnings) == 1
 
 

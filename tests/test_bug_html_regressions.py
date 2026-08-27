@@ -1,18 +1,16 @@
-"""BUG-html-1 / BUG-html-2 回归登记（提交 1：strict xfail 锁未来正确行为）。
+"""BUG-html-1 / BUG-html-2 回归（提交 2a 后：BUG-html-1 已修，BUG-html-2 仍 xfail）。
 
-BUG-html-1：td 内嵌 table 时，外层单元格文本静默丢失——输出只剩内层
-表格内容，外层文本（REG_OUTER_TEXT 类）不进任何 element。现有警告
-html_nested_table（"已忽略内层"）与实际行为（丢的是外层文本）不符。
-修复目标（ADOPTION.md 回归语义）：外层文本与内层表格都保留，
-顺序稳定不重复。
+BUG-html-1（已修，2026-08-27 提交 2a）：td 内嵌 table 时外层单元格文本
+静默丢失。修复语义（ChatGPT 5.6 Sol 确认）：外层单元格直接文本在嵌套点
+前/后各保留为一个 paragraph；内层 table 独立解析一次，不折叠进外层；
+每段文本恰好出现一次；table 计数精确；顺序 前文本→内层→后文本 可追踪。
 
-BUG-html-2：th 内 <img> 静默丢弃——无 image 元素、无警告，图片在
-统一模型中消失。修复目标：图片按统一模型保留（image element +
-resource_path）；模型不支持时必须显式诊断，不得静默消失。
+BUG-html-2（xfail，提交 2b 修复）：th 内 <img> 静默丢弃——无 image 元素、
+无警告。修复目标：复用现有 body/td 图片路径，恰好一个 image element，
+不重复计入，缺 src/alt 沿用现有诊断政策。
 
 按 ChatGPT 5.6 Sol 指示，xfail 写成"未来正确行为"断言（解析成功、
-无静默丢失），不把当前缺陷行为固化为期望。修复在阶段 4 提交 2，
-届时移除 xfail。
+无静默丢失），不把当前缺陷行为固化为期望。
 """
 
 from __future__ import annotations
@@ -37,13 +35,12 @@ def _texts(doc: object) -> list[str]:
     return [e.content for e in doc.elements if e.content]
 
 
-@pytest.mark.xfail(strict=True, reason="BUG-html-1: 外层单元格文本静默丢失，提交 2 修复")
 @pytest.mark.parametrize("outer_prefix", ["REG_OUTER_TEXT", "前文"])
 @pytest.mark.parametrize("inner", ["REG_INNER_TEXT", "内层内容"])
 def test_bug_html1_nested_table_preserves_both(
     tmp_path: Path, outer_prefix: str, inner: str
 ):
-    """外层文本与内层表格都保留；顺序稳定；不重复。"""
+    """外层文本与内层表格都保留；恰好各出现一次；table 计数精确。"""
     html = (
         "<table><tr><td>"
         f"{outer_prefix}<table><tr><td>{inner}</td></tr></table>"
@@ -53,22 +50,72 @@ def test_bug_html1_nested_table_preserves_both(
     joined = "\n".join(_texts(doc))
     assert outer_prefix in joined, "外层文本不得静默丢失"
     assert inner in joined, "内层表格内容不得丢失"
-    # 不重复：外层文本只出现一次
+    # 精确出现次数：各恰好一次（防"修复丢失但引入重复"）
     assert joined.count(outer_prefix) == 1
+    assert joined.count(inner) == 1
+    # 精确 table 计数：内层 + 外层 = 2
+    tables = [e for e in doc.elements if e.type == "table"]
+    assert len(tables) == 2
+    assert inner in tables[0].content and outer_prefix not in tables[0].content
+    assert outer_prefix not in tables[1].content, "内层文本不得折叠进外层单元格"
+    # 外层直接文本以独立 paragraph 保留
+    paras = [e for e in doc.elements if e.type == "paragraph"]
+    assert [p.content for p in paras] == [outer_prefix]
+    # 警告通道
+    assert sum(1 for w in doc.warnings if w.code == "html_nested_table") == 1
     validate(doc.to_dict())
 
 
-@pytest.mark.xfail(strict=True, reason="BUG-html-1: 外层文本静默丢失，提交 2 修复")
 def test_bug_html1_outer_order_before_inner(tmp_path: Path):
-    """外层文本出现在内层表格内容之前（顺序稳定）。"""
+    """前文本 → 内层表格 → 后文本：元素顺序与来源顺序一致。"""
     html = (
         "<table><tr><td>OUTER_MARK"
         "<table><tr><td>INNER_MARK</td></tr></table>"
+        "POST_MARK</td></tr></table>"
+    )
+    doc = _parse(html, tmp_path)
+    seq = [(e.type, e.content) for e in doc.elements]
+    assert seq == [
+        ("paragraph", "OUTER_MARK"),
+        ("table", "| INNER_MARK |\n| --- |"),
+        ("paragraph", "POST_MARK"),
+        ("table", "|  |\n| --- |"),
+    ]
+
+
+def test_bug_html1_deep_nesting_each_once(tmp_path: Path):
+    """三层嵌套：每层文本恰好一次，table 计数 = 3，逐层警告。"""
+    html = (
+        "<table><tr><td>L1"
+        "<table><tr><td>L2"
+        "<table><tr><td>L3</td></tr></table>"
+        "</td></tr></table>"
         "</td></tr></table>"
     )
     doc = _parse(html, tmp_path)
     joined = "\n".join(_texts(doc))
-    assert joined.index("OUTER_MARK") < joined.index("INNER_MARK")
+    for mark in ("L1", "L2", "L3"):
+        assert joined.count(mark) == 1
+    assert sum(1 for e in doc.elements if e.type == "table") == 3
+    assert sum(1 for w in doc.warnings if w.code == "html_nested_table") == 2
+    validate(doc.to_dict())
+
+
+def test_bug_html1_sibling_cell_not_affected(tmp_path: Path):
+    """同 row 的未嵌套 cell 仍按普通单元格并入外层表格。"""
+    html = (
+        "<table><tr>"
+        "<td>NESTED_PRE<table><tr><td>IN</td></tr></table></td>"
+        "<td>PLAIN_SIBLING</td>"
+        "</tr></table>"
+    )
+    doc = _parse(html, tmp_path)
+    tables = [e for e in doc.elements if e.type == "table"]
+    assert len(tables) == 2
+    assert "PLAIN_SIBLING" in tables[1].content
+    assert "PLAIN_SIBLING" not in tables[0].content
+    joined = "\n".join(_texts(doc))
+    assert joined.count("PLAIN_SIBLING") == 1
 
 
 @pytest.mark.xfail(strict=True, reason="BUG-html-2: th 内 img 静默丢弃，提交 2 修复")
@@ -119,9 +166,22 @@ def test_non_nested_table_unchanged(tmp_path: Path):
 
 @pytest.mark.parametrize("fixture", ["html-nested-table-loss.html", "html-th-img-drop.html"])
 def test_regression_fixture_current_state(tmp_path: Path, fixture: str):
-    """REG fixture 存在且可读（缺陷行为本身由上面 xfail 用例锁定）。"""
+    """REG fixture 存在且可读（BUG-html-1 已修，BUG-html-2 由 xfail 用例锁定）。"""
     p = REG_DIR / fixture
     if not p.is_file():
         pytest.skip("samples/private 为本机资产，不存在时跳过")
     doc = HtmlParser().parse(p, source_hash="d" * 64)
+    validate(doc.to_dict())
+
+
+def test_regression_fixture_html1_fixed(tmp_path: Path):
+    """REG-HTML-001 fixture：外层文本保留恰好一次，table 数 = 2。"""
+    p = REG_DIR / "html-nested-table-loss.html"
+    if not p.is_file():
+        pytest.skip("samples/private 为本机资产，不存在时跳过")
+    doc = HtmlParser().parse(p, source_hash="e" * 64)
+    joined = "\n".join(_texts(doc))
+    assert joined.count("REG_OUTER_TEXT") == 1
+    assert joined.count("REG_INNER_TEXT") == 1
+    assert sum(1 for e in doc.elements if e.type == "table") == 2
     validate(doc.to_dict())

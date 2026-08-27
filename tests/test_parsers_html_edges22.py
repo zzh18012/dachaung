@@ -100,8 +100,9 @@ def test_all_th_single_row_table(
 
 # ---------- 嵌套与未闭合 ----------
 
-def test_nested_table_folds_with_warning(
+def test_nested_table_inner_parsed_independently(
         tmp_path):
+    """BUG-html-1 修复后：内层独立成元素（无外层文本时不产段落）。"""
     doc = _html(
         tmp_path,
         "<table><tr><td><table>"
@@ -110,7 +111,9 @@ def test_nested_table_folds_with_warning(
     assert [(e.type, e.content)
             for e in doc.elements] == [
         ("table",
-         "|  |\n| --- |\n| inner |"),
+         "| inner |\n| --- |"),
+        ("table",
+         "|  |\n| --- |"),
     ]
     assert [w.code for w in
             doc.warnings] == [
