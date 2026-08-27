@@ -130,6 +130,20 @@ def test_empty_marker_still_interrupts_paragraph(tmp_path: Path):
     assert paras == ["前段文字", "后段文字"]
 
 
+def test_consecutive_empty_constructs_no_crash(tmp_path: Path):
+    """连续多个（相邻行）空构造也不崩溃，逐行记警告，周围内容保留。"""
+    doc = _parse(tmp_path, "#  \n##  \n-  \n1.  \n正文 REG_CONSEC\n")
+    assert [(e.type, e.content) for e in doc.elements] == [
+        ("paragraph", "正文 REG_CONSEC")
+    ]
+    hits = [w for w in doc.warnings if w.code == "empty_markdown_construct_ignored"]
+    assert [h.details["line"] for h in hits] == [1, 2, 3, 4]
+    assert [h.details["construct"] for h in hits] == [
+        "atx_heading", "atx_heading", "unordered_list_item", "ordered_list_item"
+    ]
+    validate(doc.to_dict())
+
+
 def test_non_crashing_neighbours_still_fine(tmp_path: Path):
     """单空格/tab/正常内容不受影响（防止修复误伤）。"""
     doc = _parse(tmp_path, "# \n-\t\n正文 MARKER_OK\n")
