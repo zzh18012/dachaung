@@ -24,7 +24,10 @@
 前/后各保留为一个 paragraph element；每段文本恰好出现一次；记
 ``html_nested_table`` 警告。元素顺序：前文本段 → 内层表格 → 后文本段
 → 外层表格（外层表格在 ``</table>`` 才产出），来源顺序经 line locator
-可追踪。
+可追踪。这些 paragraph 的 ``metadata`` 记录
+``{origin: "table_cell_text", table_start_line, row_index, cell_index,
+position: "before_inner_table"|"after_inner_table"}``，坐标相对直接
+外层 table，可回溯到原单元格。
 
 cell 内图片语义（BUG-html-2 修复）：``<td>/<th>`` 内的 ``<img>`` 复用
 body 图片路径（image element + resource_path=src + metadata.alt），
@@ -138,8 +141,28 @@ class _HTMLDocParser(_StdHTMLParser):
             )
         )
 
-    def _emit_cell_text_paragraph(self, text: str) -> None:
-        """BUG-html-1：被嵌套 table 消费的单元格直接文本 → paragraph。"""
+    def _current_cell_coords(self) -> tuple[int, int]:
+        """当前 cell 在所属 table 中的 (row_index, cell_index)。
+
+        当前行/当前 cell 尚未 append 进 rows，索引即栈顶容器当前长度。
+        """
+        row_buf = self._row_buffers_stack[-1] or []
+        return len(self._table_rows_stack[-1]), len(row_buf)
+
+    def _emit_cell_text_paragraph(
+        self,
+        text: str,
+        *,
+        position: str,
+        row_index: int,
+        cell_index: int,
+        table_start_line: int,
+    ) -> None:
+        """BUG-html-1：被嵌套 table 消费的单元格直接文本 → paragraph。
+
+        metadata 记录外层单元格坐标（immediate outer table），使该段
+        可回溯到原 cell，而非与 body 段落无法区分。
+        """
         self.elements.append(
             Element(
                 element_id=f"{self.document_id}::e{len(self.elements):04d}",
@@ -148,7 +171,13 @@ class _HTMLDocParser(_StdHTMLParser):
                 parent_id=None,
                 source_locator=self._make_locator_for_inline(),
                 confidence=0.9,
-                metadata={},
+                metadata={
+                    "origin": "table_cell_text",
+                    "table_start_line": table_start_line,
+                    "row_index": row_index,
+                    "cell_index": cell_index,
+                    "position": position,
+                },
             )
         )
 
@@ -240,7 +269,15 @@ class _HTMLDocParser(_StdHTMLParser):
                 if self._cell_buffers_stack[-1] is not None:
                     text = "".join(self._cell_buffers_stack[-1]).strip()
                     if text:
-                        self._emit_cell_text_paragraph(text)
+                        row_index, cell_index = self._current_cell_coords()
+                        self._emit_cell_text_paragraph(
+                            text,
+                            position="before_inner_table",
+                            row_index=row_index,
+                            cell_index=cell_index,
+                            # 此刻内层 table 尚未 push，栈顶即外层 table
+                            table_start_line=self._table_start_lines[-1],
+                        )
                     self._cell_buffers_stack[-1] = None
                     self._cell_nested_stack[-1] = True
                 self.warnings.append(
@@ -381,7 +418,15 @@ class _HTMLDocParser(_StdHTMLParser):
         text = "".join(self._cell_buffers_stack[-1]).strip()
         if self._cell_nested_stack[-1]:
             if text:
-                self._emit_cell_text_paragraph(text)
+                row_index, cell_index = self._current_cell_coords()
+                self._emit_cell_text_paragraph(
+                    text,
+                    position="after_inner_table",
+                    row_index=row_index,
+                    cell_index=cell_index,
+                    # 内层 table 已 pop，栈顶即当前 cell 所属 table
+                    table_start_line=self._table_start_lines[-1],
+                )
             if self._row_buffers_stack[-1] is not None:
                 self._row_buffers_stack[-1].append("")
         else:

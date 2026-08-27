@@ -219,3 +219,104 @@ def test_regression_fixture_html1_fixed(tmp_path: Path):
     assert joined.count("REG_INNER_TEXT") == 1
     assert sum(1 for e in doc.elements if e.type == "table") == 2
     validate(doc.to_dict())
+
+
+# ---------- 结构归属（ChatGPT 5.6 Sol 2026-08-27 核对点①） ----------
+# paragraph 不只"文本出现一次"，还必须能通过 metadata 回溯到原外层
+# 单元格：{origin, table_start_line, row_index, cell_index, position}。
+
+
+def test_bug_html1_cell_text_attribution_to_outer_cell(tmp_path: Path):
+    """前/后文本段的 metadata 精确指向原 cell；table_start_line 与外层
+    table element 的 locator.line 一致（同一坐标系的互证）。"""
+    html = (
+        "<table><tr><td>OUTER_MARK"
+        "<table><tr><td>INNER_MARK</td></tr></table>"
+        "POST_MARK</td></tr></table>"
+    )
+    doc = _parse(html, tmp_path)
+    paras = [e for e in doc.elements if e.type == "paragraph"]
+    outer_tables = [e for e in doc.elements if e.type == "table"
+                    and "INNER_MARK" not in (e.content or "")]
+    assert len(paras) == 2 and len(outer_tables) == 1
+    outer_line = outer_tables[0].source_locator["line"]
+
+    before, after = paras
+    assert before.content == "OUTER_MARK"
+    assert after.content == "POST_MARK"
+    for para, position in ((before, "before_inner_table"),
+                           (after, "after_inner_table")):
+        meta = para.metadata
+        assert meta["origin"] == "table_cell_text"
+        assert meta["position"] == position
+        assert meta["row_index"] == 0
+        assert meta["cell_index"] == 0
+        # 与外层 table element 的 locator.line 同源，可互相关联
+        assert meta["table_start_line"] == outer_line
+    validate(doc.to_dict())
+
+
+def test_bug_html1_attribution_row_and_cell_indices(tmp_path: Path):
+    """多行多列：row_index/cell_index 精确到发生嵌套的那个 cell。"""
+    html = (
+        "<table>"
+        "<tr><td>KEEP_A</td><td>NEST_R0C1<table><tr><td>IN1</td></tr></table></td></tr>"
+        "<tr><td>NEST_R1C0<table><tr><td>IN2</td></tr></table></td><td>KEEP_D</td></tr>"
+        "</table>"
+    )
+    doc = _parse(html, tmp_path)
+    attr = {e.content: e.metadata for e in doc.elements
+            if e.type == "paragraph" and e.metadata.get("origin")}
+    assert set(attr) == {"NEST_R0C1", "NEST_R1C0"}
+    assert attr["NEST_R0C1"]["row_index"] == 0
+    assert attr["NEST_R0C1"]["cell_index"] == 1
+    assert attr["NEST_R1C0"]["row_index"] == 1
+    assert attr["NEST_R1C0"]["cell_index"] == 0
+    # 未嵌套 cell 正常并入外层表格，不产生归属段
+    joined = "\n".join(_texts(doc))
+    assert joined.count("KEEP_A") == 1 and joined.count("KEEP_D") == 1
+    validate(doc.to_dict())
+
+
+def test_bug_html1_deep_nesting_immediate_outer_attribution(tmp_path: Path):
+    """三层嵌套：L2 段归属中间层 table，L1 段归属最外层 table（各table
+    起始行不同，可区分）。"""
+    html = (
+        "<table><tr><td>L1\n"
+        "<table><tr><td>L2\n"
+        "<table><tr><td>L3</td></tr></table>\n"
+        "</td></tr></table>\n"
+        "</td></tr></table>\n"
+    )
+    doc = _parse(html, tmp_path)
+    tables = [e for e in doc.elements if e.type == "table"]
+    assert len(tables) == 3  # 产出顺序：L3 内层 → L2 中间 → L1 外层
+    line_l3 = tables[0].source_locator["line"]
+    line_l2 = tables[1].source_locator["line"]
+    line_l1 = tables[2].source_locator["line"]
+    assert len({line_l1, line_l2, line_l3}) == 3
+
+    attr = [e for e in doc.elements
+            if e.type == "paragraph" and e.metadata.get("origin")]
+    assert [p.content for p in attr] == ["L1", "L2"]
+    by_content = {p.content: p for p in attr}
+    assert by_content["L2"].metadata["table_start_line"] == line_l2, \
+        "L2 段应归属中间层（直接外层）table"
+    assert by_content["L2"].metadata["position"] == "before_inner_table"
+    assert by_content["L1"].metadata["table_start_line"] == line_l1, \
+        "L1 段应归属最外层 table"
+    validate(doc.to_dict())
+
+
+def test_bug_html1_body_paragraph_not_mislabeled(tmp_path: Path):
+    """邻域不回归：普通 body 段落不带 cell 归属 metadata（可区分两类段）。"""
+    html = (
+        "<p>BODY_PARA</p>"
+        "<table><tr><td>CELL_PARA<table><tr><td>IN</td></tr></table></td></tr></table>"
+    )
+    doc = _parse(html, tmp_path)
+    paras = {e.content: e for e in doc.elements if e.type == "paragraph"}
+    assert set(paras) == {"BODY_PARA", "CELL_PARA"}
+    assert "origin" not in paras["BODY_PARA"].metadata
+    assert paras["CELL_PARA"].metadata["origin"] == "table_cell_text"
+    validate(doc.to_dict())

@@ -110,15 +110,24 @@ holdout manifest（不参与调参）留待 parser 搬运完成后另建。
 devset-md bce257755967e834、devset-html 82b0ec83d13f04f4、
 devset-regressions 8e5ecd3e3e44d756。
 
-**哈希废止声明（2026-08-27，ChatGPT 5.6 Sol 指示补记）**：上表 holdout 哈希为
-最终正式冻结值。历史值按时间序全部废止，不与正式版本并称冻结集：
-- 初版冻结（manifest 1.0）哈希已被版本语义升 1.1 取代；
-- 升 1.1 后的 holdout-md e08b50ada20f577f、holdout-html 5decd9940de62567
-  已在**首次运行之前**经"冻结核对更正"（规格裁决，见下方两段）废止——
-  两份 holdout 的首次正式运行（holdout-md 于候选 bc714f3、holdout-html 于
-  候选 0fec2f8）均使用更正后清单；
-- 正式冻结集唯一：holdout-md f637dd28de85bfb2、holdout-html
-  3ceb4f212dc60b3b。devset 哈希同理以更正段记录的最终值为准
+**哈希沿革与废止声明（2026-08-27，ChatGPT 5.6 Sol 两轮指示补记）**：
+上表 holdout 哈希为最终正式冻结值。完整沿革链（旧哈希 → 修改原因 →
+新哈希 → 首跑候选），历史值全部废止，不与正式版本并称冻结集：
+- holdout-md-v1：f274bb076c5542a0（初版冻结，manifest 1.0）
+  → 版本语义 PR 纯版本声明 1.0→1.1（内容与 expectations 未动）
+  → e08b50ada20f577f
+  → 首次运行前冻结核对更正（规格裁决：MD-DEV-006 图片行非段落、
+  MD-HOLD-001 setext 不支持、MD-HOLD-002 引用合并，见下段）
+  → **f637dd28de85bfb2（正式冻结集）→ 首跑候选 bc714f3**
+- holdout-html-v1：74e1631be285aff1（初版冻结，manifest 1.0）
+  → 版本语义 PR 纯版本声明 1.0→1.1 → 5decd9940de62567
+  → 首次运行前冻结核对更正（规格裁决：HTML-DEV-004 未闭合 p 合并、
+  HTML-HOLD-001 blockquote/pre 各成段、HTML-HOLD-002 补 paragraph 计数、
+  REG-HTML-002 删 image alt marker，见下段）
+  → **3ceb4f212dc60b3b（正式冻结集）→ 首跑候选 0fec2f8**
+- 两份 holdout 的首次正式运行均使用更正后清单（首跑报告永久保留，
+  哈希 49d15a0650fefc46 / 5fe5878b8d770b7b，不重跑不覆盖；后续运行
+  一律标作复跑）。devset 哈希同理以更正段记录的最终值为准
   （devset-md d41d5e6d54902160、devset-html 3b72b05620d6b9d8、
   devset-regressions 030f6401af7acf5e）。
 **此后两份 holdout manifest 不得再修改**（新 expectations 争议只能另建新版本
@@ -486,3 +495,31 @@ text-dev-v1 / text-holdout-v1；expectations 全部按 TextParser 文档化规�
   复核，先于任何评测运行）；主仓 samples/private 副本已同步
 - 两段式计划（无已知缺陷，GPT 指示不造空三段式）：机械搬运不注册 →
   注册启用；发现真实缺陷再插独立修复提交
+
+## 十三、HTML 嵌套单元格段落结构归属修复（2026-08-27，ChatGPT 核对点①）
+
+ChatGPT 5.6 Sol 对阶段 3/4 合入的核对结论：外层单元格文本转独立
+paragraph 可以是一种表示策略，但"文本各出现一次"不能证明结构保留——
+须能通过 locator/关联信息回溯到原外层单元格。核查结果：**归属实际丢失**
+（该 paragraph 与 body 段落同形：inline locator、parent_id=None、
+metadata={}，无从区分），故先修后报，不凭 marker 全命中关闭结构验收。
+
+- 修复：`_emit_cell_text_paragraph` 增加
+  `metadata={origin: "table_cell_text", table_start_line, row_index,
+  cell_index, position}`；坐标相对**直接外层** table（嵌套点前发射时
+  内层尚未 push、收尾发射时内层已 pop，两种时刻栈顶均为所属 table 的
+  start_line）；`_current_cell_coords()` 以栈顶容器当前长度取
+  row/cell 索引（当前行/格尚未 append）。position ∈
+  {before_inner_table, after_inner_table}
+- 登记测试（test_bug_html_regressions.py +4，共 23）：
+  1. 前/后段 metadata 精确指向原 cell，且 table_start_line 与外层
+     table element 的 locator.line 同源互证
+  2. 多行多列：row_index/cell_index 精确到发生嵌套的 cell；未嵌套
+     兄弟 cell 不产生归属段
+  3. 三层嵌套：L2 段归属中间层、L1 段归属最外层（各 table 起始行
+     不同可区分）——立即外层语义
+  4. 邻域不回归：body 段落不带 origin，两类段可区分
+- 验证：全套 3032 passed（3028+4）；html-dev 5/5、regressions auto
+  3/3 全绿且与修复前运行**指标零差异**；holdout-html 复跑（本文件
+  标作复跑，非首跑）schema 通过、规范化后与封存首跑零差异——修复为
+  纯加性 metadata，不触指标与管线行为；首跑报告与 stage4 标签不动
