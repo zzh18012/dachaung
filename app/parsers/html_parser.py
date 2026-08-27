@@ -26,6 +26,11 @@
 → 外层表格（外层表格在 ``</table>`` 才产出），来源顺序经 line locator
 可追踪。
 
+cell 内图片语义（BUG-html-2 修复）：``<td>/<th>`` 内的 ``<img>`` 复用
+body 图片路径（image element + resource_path=src + metadata.alt），
+不与单元格文本重复计入；缺 src 沿用既有政策（跳过）。
+
+
 source_locator 结构：``{"line": N, "section_path": "H1 > H2..."}``，
 ``section_path`` 跟踪当前 ATX 标题层级（同级或更高级标题弹出栈）。
 """
@@ -388,6 +393,14 @@ class _HTMLDocParser(_StdHTMLParser):
     def _handle_table_inner_start(
         self, tag: str, attrs: list[tuple[str, str | None]]
     ) -> None:
+        if tag == "img":
+            # BUG-html-2 修复：cell 内 img 复用 body 图片路径，不再静默丢弃
+            attrs_d = {k: (v or "") for k, v in attrs}
+            src = attrs_d.get("src", "").strip()
+            alt = attrs_d.get("alt", "")
+            if src:
+                self._emit_image(src, alt)
+            return
         if tag == "tr":
             if self._row_buffers_stack[-1] is not None:
                 if (

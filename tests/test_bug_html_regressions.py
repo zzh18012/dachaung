@@ -1,16 +1,14 @@
-"""BUG-html-1 / BUG-html-2 回归（提交 2a 后：BUG-html-1 已修，BUG-html-2 仍 xfail）。
+"""BUG-html-1 / BUG-html-2 回归（提交 2a/2b 后：均已修复，无 xfail）。
 
-BUG-html-1（已修，2026-08-27 提交 2a）：td 内嵌 table 时外层单元格文本
-静默丢失。修复语义（ChatGPT 5.6 Sol 确认）：外层单元格直接文本在嵌套点
-前/后各保留为一个 paragraph；内层 table 独立解析一次，不折叠进外层；
+BUG-html-1（已修，提交 2a）：td 内嵌 table 时外层单元格文本静默丢失。
+修复语义（ChatGPT 5.6 Sol 确认）：外层单元格直接文本在嵌套点前/后
+各保留为一个 paragraph；内层 table 独立解析一次，不折叠进外层；
 每段文本恰好出现一次；table 计数精确；顺序 前文本→内层→后文本 可追踪。
 
-BUG-html-2（xfail，提交 2b 修复）：th 内 <img> 静默丢弃——无 image 元素、
-无警告。修复目标：复用现有 body/td 图片路径，恰好一个 image element，
-不重复计入，缺 src/alt 沿用现有诊断政策。
-
-按 ChatGPT 5.6 Sol 指示，xfail 写成"未来正确行为"断言（解析成功、
-无静默丢失），不把当前缺陷行为固化为期望。
+BUG-html-2（已修，提交 2b）：th 内 <img> 静默丢弃——无 image 元素、
+无警告。修复语义：复用现有 body/td 图片路径（image element +
+resource_path + metadata.alt），恰好一个 image element，不与单元格
+文本重复计入，缺 src 沿用现有诊断政策（跳过）。
 """
 
 from __future__ import annotations
@@ -118,13 +116,12 @@ def test_bug_html1_sibling_cell_not_affected(tmp_path: Path):
     assert joined.count("PLAIN_SIBLING") == 1
 
 
-@pytest.mark.xfail(strict=True, reason="BUG-html-2: th 内 img 静默丢弃，提交 2 修复")
 @pytest.mark.parametrize("alt", ["REG_TH_IMG_ALT", ""])
 @pytest.mark.parametrize("neighbour_th", ["REG_TH_TEXT", ""])
 def test_bug_html2_th_img_preserved(
     tmp_path: Path, alt: str, neighbour_th: str
 ):
-    """th 内 img → image element（resource_path 保留）；alt 可空。"""
+    """th 内 img → 恰好一个 image element（resource_path 保留）；alt 可空。"""
     html = (
         "<table><tr>"
         f"<th><img src='fixture-image.png' alt='{alt}'></th>"
@@ -133,16 +130,20 @@ def test_bug_html2_th_img_preserved(
     )
     doc = _parse(html, tmp_path)
     imgs = [e for e in doc.elements if e.type == "image"]
-    assert imgs, "th 内图片不得静默消失"
+    assert len(imgs) == 1, "恰好一个 image element，不重复计入"
     assert imgs[0].resource_path == "fixture-image.png"
     if alt:
         assert imgs[0].metadata.get("alt") == alt
+    tables = [e for e in doc.elements if e.type == "table"]
+    assert len(tables) == 1
     if neighbour_th:
-        assert neighbour_th in "\n".join(_texts(doc))
+        joined = "\n".join(_texts(doc))
+        assert neighbour_th in joined
+        # 表头文本不因图片重复计入
+        assert joined.count(neighbour_th) == 1
     validate(doc.to_dict())
 
 
-@pytest.mark.xfail(strict=True, reason="BUG-html-2: th 内 img 静默丢弃，提交 2 修复")
 def test_bug_html2_no_silent_drop_either_element_or_diagnostic(tmp_path: Path):
     """最低语义：图片要么保留为 image，要么有显式诊断；两者皆无 = 静默丢失。"""
     html = "<table><tr><th><img src='x.png'></th></tr></table>"
@@ -151,6 +152,24 @@ def test_bug_html2_no_silent_drop_either_element_or_diagnostic(tmp_path: Path):
     has_diagnostic = any("img" in w.code.lower() or "image" in w.code.lower()
                          for w in doc.warnings)
     assert has_image or has_diagnostic, "不得既无 image 元素又无任何诊断"
+
+
+def test_bug_html2_td_img_same_path_as_th(tmp_path: Path):
+    """td 与 th 走同一图片路径：行为一致，各恰好一个 image。"""
+    for cell_tag in ("td", "th"):
+        html = f"<table><tr><{cell_tag}><img src='c.png'></{cell_tag}></tr></table>"
+        doc = _parse(html, tmp_path)
+        imgs = [e for e in doc.elements if e.type == "image"]
+        assert len(imgs) == 1 and imgs[0].resource_path == "c.png", cell_tag
+        validate(doc.to_dict())
+
+
+def test_bug_html2_missing_src_follows_existing_policy(tmp_path: Path):
+    """缺 src 沿用既有诊断政策：跳过（与 body 内缺 src img 一致）。"""
+    doc = _parse("<table><tr><th><img alt='no-src'></th></tr></table>", tmp_path)
+    assert not any(e.type == "image" for e in doc.elements)
+    body = _parse("<p><img alt='no-src'></p>", tmp_path)
+    assert not any(e.type == "image" for e in body.elements)
 
 
 def test_non_nested_table_unchanged(tmp_path: Path):
@@ -166,11 +185,26 @@ def test_non_nested_table_unchanged(tmp_path: Path):
 
 @pytest.mark.parametrize("fixture", ["html-nested-table-loss.html", "html-th-img-drop.html"])
 def test_regression_fixture_current_state(tmp_path: Path, fixture: str):
-    """REG fixture 存在且可读（BUG-html-1 已修，BUG-html-2 由 xfail 用例锁定）。"""
+    """REG fixture 存在且可读（两个缺陷均已修复）。"""
     p = REG_DIR / fixture
     if not p.is_file():
         pytest.skip("samples/private 为本机资产，不存在时跳过")
     doc = HtmlParser().parse(p, source_hash="d" * 64)
+    validate(doc.to_dict())
+
+
+def test_regression_fixture_html2_fixed(tmp_path: Path):
+    """REG-HTML-002 fixture：恰好一个 image（BUG-html-2 门），表头文本保留。"""
+    p = REG_DIR / "html-th-img-drop.html"
+    if not p.is_file():
+        pytest.skip("samples/private 为本机资产，不存在时跳过")
+    doc = HtmlParser().parse(p, source_hash="f" * 64)
+    imgs = [e for e in doc.elements if e.type == "image"]
+    assert len(imgs) == 1
+    assert imgs[0].resource_path == "fixture-image.png"
+    assert imgs[0].metadata.get("alt") == "REG_TH_IMG_ALT"
+    joined = "\n".join(_texts(doc))
+    assert joined.count("REG_TH_TEXT") == 1
     validate(doc.to_dict())
 
 

@@ -113,17 +113,22 @@ def test_p_in_blockquote_ignored(
 
 # ---------- 表格内元素 ----------
 
-def test_img_in_table_dropped(
+def test_img_in_table_emitted(
         tmp_path):
+    # BUG-html-2 修复后：cell 内 img 复用 body 图片路径
+    # （提交 1 曾按丢弃现状锁定）
     doc = _parse(
         tmp_path,
         "<table><tr><td><img src='x.png'>"
         "</td></tr></table>")
-    assert len(doc.elements) == 1
-    e = doc.elements[0]
-    assert e.type == "table"
-    assert e.content == "|  |\n| --- |"
-    assert e.metadata["col_count"] == 1
+    assert [(e.type, e.resource_path)
+            for e in doc.elements] == [
+        ("image", "x.png"),
+        ("table", None),
+    ]
+    assert doc.elements[1].content == \
+        "|  |\n| --- |"
+    assert doc.elements[1].metadata["col_count"] == 1
 
 
 def test_br_in_cell_no_space(

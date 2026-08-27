@@ -330,3 +330,23 @@ HTML-DEV-001..003、005、HTML-HOLD-003/004 核对无误。
   语料对照：10 个非回归 HTML 文件与 autoline-snapshot 仍逐字节一致
   （修复零外溢），REG-HTML-001 修复后满足语义而 autoline 同文件仍丢
   外层文本 = 修复对等性证据；REG-HTML-002 输出不变（2b 前不动）
+
+### 提交 2b：修 BUG-html-2（2026-08-27 完成）
+
+- 根因：`<img>`（非自闭合）在表格内走 `_handle_table_inner_start`，
+  该分支只识别 tr/td/th，img 被静默忽略——无 image 元素、无警告；
+  自闭合 `<img/>` 走 `handle_startendtag` 反而会发（路径不一致）
+- 修复语义（ChatGPT 5.6 Sol 确认）：`_handle_table_inner_start` 增加
+  img 分支，复用现有 body/td 图片路径（`_emit_image`：image element +
+  resource_path=src + metadata.alt + inline locator）；恰好一个 image，
+  不与单元格文本重复计入；缺 src 沿用既有政策（跳过，与 body 一致）；
+  不联网抓取
+- 更新的特征化测试：edges14 `test_img_in_table_dropped` →
+  `test_img_in_table_emitted`（提交 1 曾按丢弃现状锁定）
+- 回归强化：恰好一个 image、alt 保留、表头文本 count==1、td/th 同路径
+  行为一致、缺 src 政策与 body 对齐、REG-HTML-002 fixture 全绿
+  （image:1 + REG_TH_TEXT 各一次）
+- 验收：全套 3010 passed（0 xfail，xfail 全部移除）；语料对照：
+  10 个非回归文件仍逐字节一致，REG-HTML-001/002 均按修复语义 DIFF
+  于 autoline（两缺陷修复对等性证据）；REG-HTML-002 spec-elements
+  {image:1, table:1} 与 manifest expectations 精确一致
