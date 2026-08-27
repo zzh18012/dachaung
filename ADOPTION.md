@@ -350,3 +350,32 @@ HTML-DEV-001..003、005、HTML-HOLD-003/004 核对无误。
   10 个非回归文件仍逐字节一致，REG-HTML-001/002 均按修复语义 DIFF
   于 autoline（两缺陷修复对等性证据）；REG-HTML-002 spec-elements
   {image:1, table:1} 与 manifest expectations 精确一致
+
+### 提交 3：注册启用 + 评测矩阵（2026-08-27 完成）
+
+- 注册（最小改动，无自动选择，默认仍 fallback）：pipeline get_parser /
+  app.cli / evaluation.cli 的 --parser choices += html
+- EVALUATOR_VERSION 1.3 → 1.4（能力封口，同 Markdown 候选逻辑；
+  report_version 保持 1.2）
+- 搬回提交 1 裁掉的两个端到端测试（原样）+ 整文件推迟的
+  test_parser_html_bq_li_p_ol_start.py
+- 评测矩阵（GPT 门，含已采用的 Markdown 回归）：
+  1. 全套 3015 tests passed（0 xfail）
+  2. 冻结 PDF/DOCX manifest vs 冻结基线：既有指标零差异
+     （仅 expectation_checks additive 分节，与 MD 启用时一致）
+  3. markdown-dev-v1 复跑：6/6 全绿（marker 6/6）
+  4. REG-MD-001 复跑：全绿（must_not_error_codes 通过）
+  5. html-dev-v1（5 文档）：5/5 全绿，forbidden_markers 首次实际
+     求值通过（script/style 排除），silent_drop=0，marker 5/5
+  6. REG-HTML-001/002（html 过滤 manifest）：全绿——REG-HTML-001
+     外层文本恢复（marker 通过），REG-HTML-002 max_silent_drop 1/1
+     通过（image:1 门）
+  7. HTML 端到端：pipeline + CLI e2e → UDM 0.2.0 校验通过
+  8. chunk 交叉：html-dev chunk_reference_intact_ratio 5×1.0；
+     重复运行（含两修复 fixture）规范化输出完全一致
+  9. 两份 HTML 评测报告通过 evaluation-report 1.2 Schema 校验
+- 注：regressions manifest 为混合格式，单一 --parser 不适配——按
+  source_type 拆两次跑（REG-MD-001 用 markdown、REG-HTML-* 用 html，
+  过滤 manifest 落 outputs/）；混合单跑会因 md 文件过 html parser
+  记 unsupported_type（预期行为，非缺陷）
+- chunker 交叉无缺陷暴露，未触发"记录并暂停"条款

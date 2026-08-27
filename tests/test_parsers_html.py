@@ -316,8 +316,59 @@ def test_html_full_document_schema_valid(tmp_path: Path):
 
 
 # 机械搬运（阶段 4 提交 1）：以下两个依赖 pipeline 注册/CLI 的端到端测试
-# （test_html_pipeline_end_to_end / test_cli_parse_html_end_to_end）
-# 按三段式计划推迟到注册启用 PR 原样搬回。
+# 曾按三段式计划推迟；阶段 4 提交 3（注册启用）原样搬回如下。
+
+
+def test_html_pipeline_end_to_end(tmp_path: Path):
+    from app.pipeline import process_single
+
+    body = (
+        "<h1>Project</h1>"
+        "<p>Intro paragraph with enough text.</p>"
+        "<h2>Background</h2>"
+        "<p>More content. Lorem ipsum dolor sit amet.</p>"
+        "<ul><li>one</li><li>two</li></ul>"
+    )
+    src = _write_html(tmp_path, "doc.html", _wrap(body))
+    out = tmp_path / "out.json"
+    document, errors = process_single(src, out, parser_name="html", write_json=True)
+    assert errors == []
+    assert document is not None
+    assert document.source_type == "html"
+    types = {e.type for e in document.elements}
+    assert {"heading", "paragraph", "list_item"}.issubset(types)
+    assert len(document.chunks) >= 1
+    for c in document.chunks:
+        assert c.source_element_ids
+
+
+def test_cli_parse_html_end_to_end(tmp_path: Path):
+    body = "<h1>Title</h1><p>Hello HTML world.</p>"
+    src = tmp_path / "doc.html"
+    src.write_text(_wrap(body), encoding="utf-8")
+    out = tmp_path / "out.json"
+
+    env = {
+        **os.environ,
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONPATH": str(PROJECT_ROOT) + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
+    proc = subprocess.run(
+        [_PYTHON, "-m", "app.cli", "parse", str(src),
+         "-o", str(out), "--parser", "html"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        env=env,
+    )
+    assert proc.returncode == 0, f"stderr={proc.stderr}"
+    assert "[OK]" in proc.stdout
+    assert out.is_file()
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["source_type"] == "html"
+    assert data["parser_name"] == "html"
+    assert len(data["elements"]) >= 2
 
 # ---------- 内部 helpers（纯函数）----------
 
