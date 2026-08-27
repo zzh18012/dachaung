@@ -601,3 +601,28 @@ ChatGPT 5.6 Sol 指出：table_start_line + row_index + cell_index 在
   （两文件自此与 autoline 有注记差异）
 - 验证：全套 3826 passed；html-dev 与 holdout-html 复跑指标与
   既有结果零差异（纯加性 metadata，不触指标）；首跑报告与标签不动
+
+### Stage 5 验收矩阵与 holdout-text 官方首跑（候选 SHA ca3fbd9）
+
+按 ChatGPT 5.6 Sol 确立的验收顺序（全部通过后才首次运行 holdout）：
+
+- 候选 SHA **ca3fbd9**（干净树，git_dirty=false）：= 85e3dda 机械搬运
+  + d0f11a0 注册启用 + 76deba9 归属唯一标识 + ca3fbd9 解码语义补测
+- 验收矩阵（全部在 ca3fbd9 上执行）：
+  1. 全套已搬运测试 **3835 passed**（3028 基线 + 807 text 相关）
+  2. pilot 冻结基线（PDF/DOCX）、md-dev 6/6、html-dev 5/5、
+     regressions auto 3/3、text-dev 5/5+ef 2/2——与各自参照运行
+     **七组规范化零差异**（去时间戳/git/计时/版本戳/parser_used）
+  3. holdout-md / holdout-html 确定性复跑与封存首跑零差异
+  4. 全部 stage5 报告 schema 校验通过（report 1.3）
+- **holdout-text 官方首跑**：ca3fbd9 干净 SHA 上
+  outputs/evaluation-holdout-text-first-run.json——4/4 全绿，
+  required_markers 4/4（含 U+FFFD×2 连续序列精确断言）、
+  must_not_error 1/1，schema 通过，sha256 前缀 **468a4ea55a3d297d**，
+  已同步主仓 outputs/
+- 运行沿革（诚实记录顺序偏差）：首跑曾在 85e3dda+dirty（注册改动
+  未提交时）预跑、又在 d0f11a0 复验，两次与官方首跑规范化零差异
+  （确定性成立），但不符合"固定候选 SHA 后首跑"的时序要求——预跑
+  保留为 evaluation-holdout-text-preliminary-run.json（同步主仓），
+  **官方首跑以 ca3fbd9 为准**，此偏差已向 ChatGPT 报备
+- 此后两份以上 holdout（md/html/text）manifest 均不得再修改
