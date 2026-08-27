@@ -541,3 +541,31 @@ metadata={}，无从区分），故先修后报，不凭 marker 全命中关闭�
   TextParser 直接解析（不经 pipeline），规范化输出（去 source_path）
   **11/11 逐键一致**（PARITY-ZERO-DIFF）
 - 全套 3802 passed（3032+770）
+
+### 提交 2：注册启用（evaluator 1.6）
+
+- 注册点：pipeline 工厂 get_parser 补 text 分支；app CLI 与评测 CLI
+  --parser choices 补 text；AUTO_PARSER_BY_SOURCE_TYPE 补 text→text
+- 能力封口：EVALUATOR_VERSION 1.5→1.6（1.5 无法运行 text manifest，
+  同版本不同能力损害复现）；报告结构未变，report_version 保持 1.3；
+  ipynb 仍为未注册类型（auto 文档级合成失败语义不变）
+- 裁掉的 7 个测试原样搬回（edges10 三个含 chunk 断言，chunker 行为
+  对 text 段落两仓一致）；edges9 整文件（15 个）补齐；test_parser_auto
+  重构：映射/参数化补 text→text，ipynb 成为唯一未注册类型，混合
+  manifest e2e 改为 md/html/text 成功 + ipynb 合成失败，版本断言 1.6
+- **text-dev-v1 manifest 哈希沿革**（首跑揭示 expectations 推导漏算
+  pipeline 层）：4b0e5abc0fc55851 → TEXT-DEV-004/005（空文件/纯空白）
+  误按 documents+expectations 声明，但 parser 按规格产出 0 elements +
+  text_no_content 警告后，pipeline 按既定不变量报
+  no_extracted_elements（blank.pdf/corrupt.pdf 同类，
+  test_empty_pipeline_error 钉住），属 expectations 作者错误而非代码
+  缺陷 → 转为 expected_failures（expected_error_code=
+  no_extracted_elements）→ **a14b4d6dfbd3fe32（现行）**。揭示运行的
+  报告保留为 evaluation-text-dev-v1-first-run-revealed-ef-gap.json。
+  **holdout-text 未动**（4c7be8ff8e495946，4/4 全绿无需修改）
+- 验证：text-dev-v1 5/5 成功 + ef 2/2 matches + required_markers 5/5；
+  holdout-text 首跑 4/4 全绿（报告 outputs/
+  evaluation-holdout-text-first-run.json，schema 通过，已同步主仓
+  outputs/）；known-regressions auto 复跑 3/3 且与 text 注册前
+  **零差异**；全套 3824 passed（3802+22）
+- 15 个 text 测试文件与 autoline-snapshot 逐字节一致（diff 校验）

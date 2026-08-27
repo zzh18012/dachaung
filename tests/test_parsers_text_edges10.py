@@ -150,10 +150,21 @@ def test_empty_no_content(
         "text_no_content"]
 
 
-# 提交 1（机械搬运，未注册）裁剪点：test_empty_pipeline_error /
-# test_utf8_bom_chunk / test_nul_content_chunk 依赖 parser 注册
-# （process_single parser_name="text"），按两段式计划在注册启用
-# 提交原样搬回。
+def test_empty_pipeline_error(
+        tmp_path):
+    p = _txt(tmp_path, "e2", b"")
+    doc, errors = process_single(
+        p, None,
+        parser_name="text",
+        max_chars=800)
+    assert doc is None
+    assert [e.code
+            for e in errors] == [
+        "no_extracted_elements"]
+    det = errors[0].to_dict()[
+        "details"]
+    assert det["warnings"][0][
+        "code"] == "text_no_content"
 
 
 # ---------- 通用 ----------
@@ -165,3 +176,32 @@ def test_utf16_schema_valid(
              "SC".encode("utf-16-le"))
     doc = _parse(p)
     assert is_valid(doc.to_dict())
+
+
+def test_utf8_bom_chunk(
+        tmp_path):
+    p = _txt(
+        tmp_path, "c",
+        b"\xef\xbb\xbfutf8 bom text")
+    doc, errors = process_single(
+        p, None,
+        parser_name="text",
+        max_chars=800)
+    assert errors == []
+    assert doc.chunks[
+        0].text == \
+        "﻿utf8 bom text"
+
+
+def test_nul_content_chunk(
+        tmp_path):
+    p = _txt(tmp_path, "nc",
+             "AB".encode("utf-16-le"))
+    doc, errors = process_single(
+        p, None,
+        parser_name="text",
+        max_chars=800)
+    assert errors == []
+    assert doc.chunks[
+        0].text == \
+        "A\x00B\x00"

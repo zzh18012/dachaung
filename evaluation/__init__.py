@@ -37,9 +37,14 @@
   1.1/1.2 报告保持旧结构（schema 条件分支互斥）。
   auto 模式下 provenance.parser_version 为 null（多 parser 并存，
   单值会误导）（ChatGPT 5.6 Sol 2026-08-27 指示）。
+- v1.6（当前）：评测 CLI 可运行 text manifest（--parser choices 补
+  text；auto 映射补 text→text）。能力封口：1.5 evaluator 无法运行
+  text manifest，同版本不同能力损害复现，故升 1.6（ChatGPT 5.6 Sol
+  2026-08-27 确立的政策沿用）。报告结构未变，report_version 保持
+  1.3；未注册类型（ipynb）的 auto 文档级合成失败语义不变。
 """
 
-EVALUATOR_VERSION = "1.5"
+EVALUATOR_VERSION = "1.6"
 REPORT_VERSION = "1.3"
 ANNOTATION_VERSION = "1.0"
 MANIFEST_VERSION = "1.1"

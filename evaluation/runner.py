@@ -40,6 +40,7 @@ AUTO_PARSER_BY_SOURCE_TYPE = {
     "docx": "fallback",
     "markdown": "markdown",
     "html": "html",
+    "text": "text",
 }
 
 

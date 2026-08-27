@@ -22,10 +22,26 @@ from pathlib import Path
 from app.pipeline import process_single
 
 
-# 提交 1（机械搬运，未注册）裁剪点：test_text_single_newline_one_paragraph
-# 与 test_text_padding_physical_line_locator 依赖 parser 注册
-# （process_single parser_name="text"），按两段式计划在注册启用提交
-# 原样搬回。
+def test_text_single_newline_one_paragraph(tmp_path):
+    p = tmp_path / "d.txt"
+    p.write_text("l1\nl2\nl3\n", encoding="utf-8")
+    doc, errors = process_single(
+        p, write_json=False, parser_name="text")
+    assert errors == []
+    assert [(e.type, e.content, e.source_locator)
+            for e in doc.elements] == [
+        ("paragraph", "l1\nl2\nl3", {"line": 1})]
+
+
+def test_text_padding_physical_line_locator(tmp_path):
+    p = tmp_path / "d.txt"
+    p.write_text("\n\nx\n\n\n", encoding="utf-8")
+    doc, errors = process_single(
+        p, write_json=False, parser_name="text")
+    assert errors == []
+    assert [(e.type, e.content, e.source_locator)
+            for e in doc.elements] == [
+        ("paragraph", "x", {"line": 3})]
 
 
 def test_md_indent_h7_not_special(tmp_path):

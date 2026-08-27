@@ -236,9 +236,52 @@ def test_text_full_document_schema_valid(tmp_path: Path):
     validate(doc.to_dict())
 
 
-# 提交 1（机械搬运，未注册）裁剪点：test_text_pipeline_end_to_end 与
-# test_cli_parse_text_end_to_end 依赖 parser 注册/CLI choices，按两段式
-# 计划在注册启用提交原样搬回。
+def test_text_pipeline_end_to_end(tmp_path: Path):
+    from app.pipeline import process_single
+
+    content = (
+        "First meaningful paragraph with enough text to chunk.\n\n"
+        "Second paragraph. More content here.\n\n"
+        "Third paragraph to ensure multiple chunks.\n"
+    )
+    src = _write_text(tmp_path, "doc.txt", content)
+    out = tmp_path / "out.json"
+    document, errors = process_single(src, out, parser_name="text", write_json=True)
+    assert errors == []
+    assert document is not None
+    assert document.source_type == "text"
+    assert len(document.elements) == 3
+    assert len(document.chunks) >= 1
+    for c in document.chunks:
+        assert c.source_element_ids
+
+
+def test_cli_parse_text_end_to_end(tmp_path: Path):
+    src = tmp_path / "doc.txt"
+    src.write_text("Hello text world.\n\nSecond paragraph.\n", encoding="utf-8")
+    out = tmp_path / "out.json"
+
+    env = {
+        **os.environ,
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONPATH": str(PROJECT_ROOT) + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
+    proc = subprocess.run(
+        [_PYTHON, "-m", "app.cli", "parse", str(src),
+         "-o", str(out), "--parser", "text"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        env=env,
+    )
+    assert proc.returncode == 0, f"stderr={proc.stderr}"
+    assert "[OK]" in proc.stdout
+    assert out.is_file()
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["source_type"] == "text"
+    assert data["parser_name"] == "text"
+    assert len(data["elements"]) == 2
 
 
 # ---------- 边角与缺漏补强（Round 37） ----------
