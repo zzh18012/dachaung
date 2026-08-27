@@ -22,6 +22,15 @@ _SENTENCE_SPLIT_RE = re.compile(r"(?<=[。！？!?\.])\s+")
 _HARD_BREAK_LANGS = ("。", "！", "？", ".", "!", "?")
 _WHITESPACE_RE = re.compile(r"\s+")
 
+# ipynb cell 边界哨兵（契约 docs/chunker-ipynb-cell-contract.md §1/§2）：
+# _NO_CELL 是起始态标记；_UNGROUPED() 每次返回全新对象，
+# 使 locator 异常缺失 cell_index 的连续元素各自成组、不互相合并。
+_NO_CELL = object()
+
+
+def _UNGROUPED() -> object:
+    return object()
+
 
 def normalize_text(s: str) -> str:
     """统一的文本规范化规则（用于"不丢不重"测试）。
@@ -218,6 +227,11 @@ class StructuralChunker:
         chunks: list[Chunk] = []
         counter = 0
         buf = _ChunkBuffer(document_id=document.document_id, counter=0)
+        # ipynb cell 硬边界状态（契约 docs/chunker-ipynb-cell-contract.md §1/§2）：
+        # 仅 source_type == "ipynb" 时激活；非 ipynb 路径不进入该分支，
+        # 既有分块结果保持不变。
+        is_ipynb = document.source_type == "ipynb"
+        current_cell: Any = _NO_CELL
 
         def flush(strategy: str = "sequential") -> None:
             nonlocal counter
@@ -231,6 +245,20 @@ class StructuralChunker:
             text = self._element_text(el)
             if not text:
                 continue
+
+            # 0. ipynb cell 硬边界：相邻元素 cell_index 不同 → 先封口再开新
+            #    chunk；相邻短 cell 即使未达 max_chars 也不得合并（规则 1/3）。
+            #    locator 异常缺失 cell_index → 该元素自成一组（不崩溃不猜测）。
+            if is_ipynb:
+                loc = el.source_locator if isinstance(el.source_locator, dict) else {}
+                if "cell_index" in loc:
+                    cell = loc["cell_index"]
+                    if cell != current_cell:
+                        flush()
+                        current_cell = cell
+                else:
+                    flush()
+                    current_cell = _UNGROUPED()
 
             # 1. table/image/caption：单独成 chunk（先 flush 当前 buf）
             if el.type in ("table", "image", "caption"):
@@ -249,6 +277,7 @@ class StructuralChunker:
 
             # 3. paragraph / list_item / 其他
             # 3a. 自身就超长 → 先 flush 当前 buf，再按句子切
+            #     （切分只发生在该 element 内，天然不跨 cell——规则 2）
             if len(text) > self.max_chars:
                 flush()
                 for piece in _split_long_text(text, self.max_chars):
