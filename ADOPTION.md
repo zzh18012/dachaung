@@ -60,6 +60,22 @@
 - tests/test_contract_adoption_v1.py（6 测试：旧形状不变/新枚举过/非法拒/locator 必填/span 序列化）
 - 验收：全套旧测试 + 旧 PDF/DOCX manifest 评测重跑与冻结基线对比
 
+### schema_version 版本政策（2026-08-27 定案）
+
+`document.schema.json` 的 `schema_version` 保持 `0.1.0`，采用**兼容家族**语义：
+
+- 0.1.0 家族 = additive-only 演进：只增可选字段 / 可选枚举值 / 新 if-then 分支；
+  不改必填集合、不删字段、不收紧已有约束、不改变旧类型（pdf/docx）的输出形状
+- 消费者规则：家族内必须用**最新** schema 校验（旧 schema 文件可能因
+  additionalProperties 严格而误拒新增可选键）；不得按版本字符串假设精确快照
+- 任何非 additive 变更（改必填 / 删字段 / 收紧枚举 / 旧类型形状变化）→
+  升 `0.2.0` 并走独立契约迁移 PR + 旧格式评测对照
+- 执行保障：`tests/test_contract_adoption_v1.py` 的旧形状不变测试在每个
+  触达 models/schema 的 PR 上必须保持绿色
+
+理由：0.x 阶段唯一消费者是本仓 pipeline 与评测模块，精确快照式逐次 bump
+只产生版本噪声；待首个外部消费者出现（1.0 起）再收紧为精确快照。
+
 ## 五、评测 manifest 起草（2026-08-27 完成）
 
 三份独立 manifest（不触碰哈希 15f60b11 的 Stage 2 manifest；expectations 全按规格人工给定，非 golden）：
@@ -75,6 +91,21 @@
 `max_silent_drop_count`（静默丢弃数上限；替代最初草稿的 forbidden_silent_drop，更可判定，
 声明它必须同时声明 element_count_by_type）。
 holdout manifest（不参与调参）留待 parser 搬运完成后另建。
+
+### holdout manifest 冻结（2026-08-27，MD/HTML 各一份）
+
+| manifest | 位置 | 文档数 | manifest sha256 前缀 | 覆盖 |
+|---|---|---|---|---|
+| holdout-md-v1 | samples/private/holdout-md/ | 4 | f274bb076c5542a0 | setext 标题+thematic break / 嵌套引用 / 行内格式+转义 / 内嵌 HTML+自动链接 |
+| holdout-html-v1 | samples/private/holdout-html/ | 4 | 74e1631be285aff1 | blockquote+pre / dl+br / 注释与 script-style 排除（forbidden_markers 首次实际使用）/ thead-tbody-colspan |
+
+规则：
+- expectations 全部按规格人工给定（与 devset 同纪律，非 golden）
+- 计数断言为"下限"语义：多出的未声明类型不计违规，缺漏才触发 silent_drop；
+  语义不确定的结构（hr、blockquote 归属、dl、pre）只声明 marker，不声明计数
+- 不参与任何调参 / 修 bug 决策；MD/HTML 候选完成前不得运行
+- 首次正式运行报告原样存档（含失败），作为泛化证据
+- 冻结后样本与 manifest 不再修改；发现期望写错 → 在本台账登记并单独说明，不悄悄改
 
 ### Runner PR（evaluator v1.2，2026-08-27）
 
