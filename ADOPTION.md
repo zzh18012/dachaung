@@ -523,3 +523,21 @@ metadata={}，无从区分），故先修后报，不凭 marker 全命中关闭�
   3/3 全绿且与修复前运行**指标零差异**；holdout-html 复跑（本文件
   标作复跑，非首跑）schema 通过、规范化后与封存首跑零差异——修复为
   纯加性 metadata，不触指标与管线行为；首跑报告与 stage4 标签不动
+
+## 十四、text parser 两段式搬运（2026-08-27）
+
+### 提交 1：机械搬运（不注册）
+
+- app/parsers/text_parser.py：自 autoline-snapshot（fcad055）逐字节
+  搬运，零行为改动；未注册未启用（pipeline 工厂 / CLI / auto 映射
+  均未触碰）
+- 测试搬运：test_parsers_text.py + test_parsers_text_edges.py 及
+  edges2–8、edges10–13（12 个文件）+ test_parser_text_blocks_edge.py；
+  裁掉依赖注册的 7 个测试（test_parsers_text.py 的 pipeline/CLI e2e
+  2 个、edges10 的 process_single 3 个、blocks_edge 的 text 2 个），
+  裁剪点留注释，注册启用提交原样搬回；edges9（15 个测试全部走
+  process_single）整文件推迟到注册启用提交；共 770 tests passed
+- 语料对照：devset-text(7) + holdout-text(4) 共 11 文件，两仓
+  TextParser 直接解析（不经 pipeline），规范化输出（去 source_path）
+  **11/11 逐键一致**（PARITY-ZERO-DIFF）
+- 全套 3802 passed（3032+770）
