@@ -725,3 +725,14 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   （口径为 cell source 抽取，非 OCR 全文）；报告通过 evaluation-report
   schema 校验（validate-report）；两次运行除 run_timestamp_iso 外
   逐字段一致（确定性成立）；原始报告 JSON 仅存 outputs/（gitignored）
+- **holdout-v1 首跑封存（2026-08-27）**：固定干净 SHA
+  1b0b7dd5823c98161d321c335a858094749a1e29（docs 提交后、无未提交
+  改动）执行首跑：4 输入 = 3 成功 + 1 ef 精确匹配（no_extracted_elements）
+  + 0 意外失败；3 成功文档 element_count_by_type 与冻结 expectations
+  逐项一致（HOLD-001 {heading:1,paragraph:3,list_item:2}、
+  HOLD-002 {heading:1,paragraph:3}、HOLD-003 {paragraph:3}），
+  silent_drop 均 0、schema/tp 均 true、required_markers 3/3；报告
+  sha256
+  21c9c5c0920e6d93ee20db2d1ffbbb71fe34464dc10a793e7563942fc848356a，
+  仅存 outputs/evaluation-ipynb-holdout-v1-firstrun.json（gitignored，
+  不入 git）；此后 holdout 结果只封存不回调算法
