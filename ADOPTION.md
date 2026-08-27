@@ -639,3 +639,57 @@ ChatGPT 5.6 Sol 指出：table_start_line + row_index + cell_index 在
   或意外成功均不能冒充预期失败）+ 0 个非预期失败；不得概括为
   "7/7 解析成功"。**manifest 修订后的通过不是算法性能提升**——
   变化发生在评测期望层（规格勘误），非解析能力变化
+
+## 十五、阶段 6 准备：ipynb 契约定稿 + dev/holdout 冻结（2026-08-27）
+
+ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其修订表
+定稿后冻结语料，本轮采用三段式（机械搬运 → 独立契约修正 → 注册启用）。
+
+- **契约**：docs/ipynb-contract.md（提交 f35e8b7）。要点：nbformat == 4
+  精确范围（未来主版本 → ipynb_unsupported_version）；版本字段整数类型
+  检查（缺失/str/bool → ipynb_bad_structure；nbformat_minor 非负整数）；
+  source 全字符串先验后 join（禁止 str() 强转，非法 → 跳过 cell +
+  ipynb_bad_cell 注明 cell_index 与字段）；语言链 kernelspec.language →
+  language_info.name → 空（kernelspec.name 不冒充语言，不记录）；outputs
+  非空 → ipynb_outputs_ignored、attachments 非空 → ipynb_attachments_ignored
+  （每 cell 一次注数量，不按 nbformat_minor 门控——官方已回移 4.0）；
+  attachment: 图片引用不解码、不当路径读取、不伪造资源 → 跳过 image +
+  ipynb_attachment_ref_skipped；code/raw 正文保留原始缩进换行（strip 仅
+  判空）；评测口径一律称"cell source 抽取"；测试按依赖切分（非按失败
+  归类）
+- **版本封口**：REPORT_VERSION 保持 1.3（document schema 的 source_type
+  枚举与 ipynb locator 分支已存在，evaluation report 的 parser_used 为
+  自由字符串，无结构扩展）；注册时 EVALUATOR_VERSION 1.6 → 1.7
+- **语料**（samples/private/，gitignored）：
+  - devset-ipynb 5 成功 + 4 预期失败：基本 mixed cells（heading/导语/
+    code/raw/列表）/ source 列表 + language_info 唯一语言来源 / 边界
+    cell（空 code、空 raw、未知类型 widget、保留 raw）/ 附件引用 +
+    执行输出（minor 4）/ 高 minor=9；ef：nbformat=5（unsupported）/
+    非法 JSON / nbformat 为字符串 "4"（bad_structure）/ 全空 cell
+    notebook（no_extracted_elements）
+  - holdout-ipynb 3 成功 + 1 预期失败：现实分析流（5 cell 混合含带输出
+    code）/ 列表 source + language_info / 附件+输出混合 / 全空 cell
+- **expectations 推导要点**（先于任何运行，按契约逐条人工推导）：markdown
+  委托逐 cell 计数；attachment: 引用图按契约 §7 跳过（DEV-004 与
+  HOLD-003 的段落计数已扣除该 image）；code/raw 各产出 1 paragraph；
+  高 minor 按已知字段照常解析；ef 错误码逐一对应契约 §2/§3；空
+  notebook 走 parser ipynb_no_content + pipeline no_extracted_elements
+  分层（text 先例）
+- **与机械版的已知故意分歧**（契约修正提交后才满足 expectations，属
+  预期而非缺陷）：DEV-002 语言元数据（机械版从 kernelspec.name 取
+  "python3"）；DEV-004/HOLD-003 的 image 元素（机械版产出
+  resource_path="attachment:…" 的伪路径元素）；DEV-006（机械版
+  `5 < 4` 为假照常解析 cells）；DEV-008（机械版 str < int 抛
+  TypeError → unexpected_parser_error）。机械对照阶段两仓行为一致，
+  不受影响
+- **冻结哈希**：devset-ipynb manifest
+  4a210e98ed8c0e15300b23c4be5d07293efe53134de08a3efe0ce152571bbb23、
+  holdout-ipynb manifest
+  38090ead37ea035d6e4863a2b3909c57aca15a93ebdc1a227337a1d6e4c62609
+  （manifest 1.1；holdout devset_status=complete 与 text/md 一致）
+- **holdout 纪律**：不进入直接解析、对照脚本或任何预跑；完整候选固定
+  干净 SHA 后才首跑（text 时序教训）
+- **三段式计划**（GPT 定案顺序）：机械搬运不注册（对照仅 dev + 公开
+  regression）→ 独立契约修正提交（版本字段 / source / language / 忽略
+  诊断四项）→ 注册启用（1.7 + auto 映射）
+- 主仓 samples/private 副本同步
