@@ -201,3 +201,29 @@ PDF/DOCX 输出仍为 0.1.0 且通过校验。
   两仓 parser 输出 11/11 一致（模 source_path 与预期的 schema_version
   0.1.0→0.2.0 差异；BUG-md-1 文件双方同样崩溃 = 崩溃对等）
 - 前置核对：base.py / parsers/__init__.py 与自跑线内容一致（仅行尾差异）
+
+### 提交 2：修 BUG-md-1 + 参数化回归（2026-08-27 完成）
+
+- 根因：`_ATX_HEADING_RE` / `_UNORDERED_LIST_RE` / `_ORDERED_LIST_RE` 的
+  `\s+(.+)` 在标记后跟 ≥2 尾随空白时回溯让 group 捕获单个空白，
+  strip 后为空 → push 出空 content Element → `Element.__post_init__`
+  ValueError 穿透 parse（pipeline 包装为 unexpected_parser_error）
+- 修复语义（2026-08-27 与 ChatGPT 5.6 Sol 确认）：空标记行 → 忽略该行
+  （不发空节点、不发空 chunk、不崩溃），记 `empty_markdown_construct_ignored`
+  警告（现有 warnings 通道，details 带 line/construct，不扩 schema）；
+  该行仍中断段落吸收（块级边界）；空标题不污染 section_path
+- 修改点：markdown_parser.py 三处（atx_heading / unordered_list_item /
+  ordered_list_item）push 前空值守卫 + 模块 docstring 补语义
+- tests/test_bug_md1_regression.py：去掉 xfail，全参数化矩阵
+  （标记 6 × 尾随空白 6 × eof_newline × CRLF × 夹心 = 288 参数）+
+  夹心不变式 / 整文件仅空标记 / 警告 details / section_path 不污染 /
+  段落中断 / 邻域不回归 / REG-MD-001 fixture
+- tests/test_parsers_markdown_edges18.py：提交 1 按崩溃现状锁定的
+  test_space_only_heading_crashes 改为 test_space_only_heading_ignored
+  （提交 1 曾锁定崩溃、提交 2 修复，模块 docstring 同步）
+- 验收：全套 1788 tests passed（0 xfail）；11 文件语料对照——
+  10 个非回归文件与 autoline-snapshot 输出仍逐字节一致（修复零外溢），
+  REG-MD-001 修复后解析且 expectations 精确满足（heading:2 paragraph:1、
+  3 marker 全命中、无 error、2 条 empty_markdown_construct_ignored 警告），
+  autoline 侧同文件仍崩溃 = 修复对等性证据
+- 缺陷登记表 BUG-md-1 状态：已修复（本提交），MD parser 启用前置条件清除

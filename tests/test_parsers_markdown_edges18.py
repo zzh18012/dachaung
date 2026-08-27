@@ -4,10 +4,10 @@ r"""app/parsers/markdown_parser.py 边角测试 - 第十八轮（Round 1484）�
 围栏 + setext 尾巴（edges1-17 未碰过；edges12 已锁
 '## Title ##' 闭合序列、edges10 已锁实体/HTML 字面、
 edges14 已锁 '#Heading' 无空格标题，避开）：
-- **纯 '#' + 空白标题 → 崩溃（bug）**：'#   \\n' 与
-  '###   \\n' 都命中 ATX RE、strip 后空 title → Element
-  校验 ValueError **直接穿透 parse**（非 ParserError）。
-  本轮按现状锁定，**待修复**：应在 push 前跳过空标题
+- **纯 '#' + 空白标题 → 忽略 + 警告（BUG-md-1 已修）**：
+  '#   \\n' 与 '###   \\n' 命中 ATX RE、strip 后空 title →
+  忽略该行并记 empty_markdown_construct_ignored 警告，
+  不发空节点、不崩溃（提交 1 曾按崩溃现状锁定，提交 2 修复）
 - **'###' 无空格不成标题**：整块 paragraph 字面
 - **'\\|' 转义管道不处理**：单元格在 '\\|' 处被切开
   （'a \\' 与 'b' 分列）→ 表格拓宽到 3 列、数据行补空
@@ -21,8 +21,6 @@ edges14 已锁 '#Heading' 无空格标题，避开）：
 from __future__ import annotations
 
 from pathlib import Path
-
-import pytest
 
 from app.hash import compute_file_hash
 from app.parsers.markdown_parser import \
@@ -39,21 +37,27 @@ def _parse(tmp_path, text, name=TMP_NAME):
         p, compute_file_hash(p))
 
 
-# ---------- 空标题（bug：崩溃穿透） ----------
+# ---------- 空标题（BUG-md-1 已修：忽略 + 警告） ----------
 
-def test_space_only_heading_crashes(tmp_path):
-    """'#   \\n' 空 title → ValueError 穿透（非 ParserError）。
+def test_space_only_heading_ignored(tmp_path):
+    """'#   \\n' 空 title → 该行忽略 + 警告，正文保留。
 
-    现状锁定：任何层级 '#' 后跟空白、无标题文本都会触发。
-    待修复：push 前应跳过空标题。
+    修复语义：不发空节点、不崩溃；记
+    empty_markdown_construct_ignored（details 带 line/construct）。
     """
     for text in ("#   \nbody\n",
                  "###   \nbody\n"):
-        with pytest.raises(
-                ValueError, match=
-                "必须至少有 content 或"
-                " resource_path"):
-            _parse(tmp_path, text)
+        doc = _parse(tmp_path, text)
+        assert [(e.type, e.content)
+                for e in doc.elements] == [
+            ("paragraph", "body"),
+        ]
+        hits = [w for w in doc.warnings
+                if w.code ==
+                "empty_markdown_construct_ignored"]
+        assert len(hits) == 1
+        assert hits[0].details[
+            "construct"] == "atx_heading"
 
 
 def test_empty_hash_no_space_paragraph(

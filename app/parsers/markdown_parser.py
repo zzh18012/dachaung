@@ -22,6 +22,10 @@
 
 source_locator 结构：``{"line": N, "section_path": "H1 > H2 > ..."}``，
 其中 ``section_path`` 跟踪当前 ATX 标题层级（同级或更高级的标题会弹出栈）。
+
+空标记行语义（BUG-md-1 修复）：ATX 标题 / 无序 / 有序列表标记后跟 ≥2 个
+空白且无内容时，该行被忽略——不发空节点、不崩溃，记
+``empty_markdown_construct_ignored`` 警告；该行仍中断段落吸收（块级边界）。
 """
 
 from __future__ import annotations
@@ -197,6 +201,17 @@ class MarkdownParser(Parser):
             if m:
                 level = len(m.group(1))
                 title = m.group(2).strip()
+                if not title:
+                    # BUG-md-1 修复：空标题标记行忽略，不发空节点，不崩溃
+                    warnings.append(
+                        WarningRecord(
+                            code="empty_markdown_construct_ignored",
+                            reason=f"line {i + 1} 处的空标题标记被忽略",
+                            details={"line": i + 1, "construct": "atx_heading"},
+                        )
+                    )
+                    i += 1
+                    continue
                 while section_levels and section_levels[-1] >= level:
                     section_levels.pop()
                     section_path.pop()
@@ -248,12 +263,34 @@ class MarkdownParser(Parser):
             # 列表项
             m = _UNORDERED_LIST_RE.match(line)
             if m:
-                push("list_item", m.group(1).strip(), i + 1, ordered=False, marker="unordered")
+                item = m.group(1).strip()
+                if not item:
+                    warnings.append(
+                        WarningRecord(
+                            code="empty_markdown_construct_ignored",
+                            reason=f"line {i + 1} 处的空无序列表标记被忽略",
+                            details={"line": i + 1, "construct": "unordered_list_item"},
+                        )
+                    )
+                    i += 1
+                    continue
+                push("list_item", item, i + 1, ordered=False, marker="unordered")
                 i += 1
                 continue
             m = _ORDERED_LIST_RE.match(line)
             if m:
-                push("list_item", m.group(1).strip(), i + 1, ordered=True, marker="ordered")
+                item = m.group(1).strip()
+                if not item:
+                    warnings.append(
+                        WarningRecord(
+                            code="empty_markdown_construct_ignored",
+                            reason=f"line {i + 1} 处的空有序列表标记被忽略",
+                            details={"line": i + 1, "construct": "ordered_list_item"},
+                        )
+                    )
+                    i += 1
+                    continue
+                push("list_item", item, i + 1, ordered=True, marker="ordered")
                 i += 1
                 continue
 
