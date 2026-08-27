@@ -290,3 +290,17 @@ marker 投影语义，发生在首次运行之前）：
 更正后哈希：devset-html 3b72b05620d6b9d8、holdout-html 3ceb4f212dc60b3b、
 devset-regressions 030f6401af7acf5e。主仓 samples/private 副本已同步。
 HTML-DEV-001..003、005、HTML-HOLD-003/004 核对无误。
+
+### Markdown 候选封存 + holdout-md 首跑（2026-08-27，ChatGPT 5.6 Sol 指示）
+
+- EVALUATOR_VERSION 1.2 → 1.3（提交 bc714f3）：1.2 evaluator 无法运行
+  markdown manifest，同版本不同能力损害复现；REPORT_VERSION 保持 1.2
+  （报告结构未变）；HTML 注册时再升 1.4
+- 冻结 holdout-md 首次正式运行（候选提交 bc714f3，evaluator 1.3）：
+  - **4/4 全绿**：pipeline_success、schema_valid、silent_drop=0、
+    required_markers 4/4 通过，无任何 failed check
+  - 首次报告永久保留：outputs/evaluation-holdout-md-first-run.json
+    （gitignored 本机资产），通过 evaluation-report Schema 校验
+  - 封存记录：候选 SHA bc714f3、manifest sha256 前缀 f637dd28de85bfb2
+    （与冻结值一致，未改动）、报告 sha256 前缀 49d15a0650fefc46
+  - 无失败 → 无需分类实现缺陷/规格争议，无新增 regression
