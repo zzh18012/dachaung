@@ -159,7 +159,9 @@ def test_th_scope_ignored():
         "| H |\n| --- |")
     assert doc.elements[0].metadata == {
         "row_count": 1, "col_count": 1,
-        "source": "html_table"}
+        "source": "html_table",
+        # adoption 补丁：table_index 唯一 join key（2026-08-27）
+        "table_index": 0}
 
 
 # ---------- schema ----------

@@ -25,9 +25,11 @@
 ``html_nested_table`` 警告。元素顺序：前文本段 → 内层表格 → 后文本段
 → 外层表格（外层表格在 ``</table>`` 才产出），来源顺序经 line locator
 可追踪。这些 paragraph 的 ``metadata`` 记录
-``{origin: "table_cell_text", table_start_line, row_index, cell_index,
-position: "before_inner_table"|"after_inner_table"}``，坐标相对直接
-外层 table，可回溯到原单元格。
+``{origin: "table_cell_text", table_index, table_start_line, row_index,
+cell_index, position: "before_inner_table"|"after_inner_table"}``，
+坐标相对直接外层 table，可回溯到原单元格；``table_index`` 与所属
+table 元素 ``metadata.table_index`` 同值，是全文档唯一 join key
+（单行 HTML 中起始行与行列坐标都会碰撞，不能单独作身份）。
 
 cell 内图片语义（BUG-html-2 修复）：``<td>/<th>`` 内的 ``<img>`` 复用
 body 图片路径（image element + resource_path=src + metadata.alt），
@@ -105,6 +107,10 @@ class _HTMLDocParser(_StdHTMLParser):
         self._table_depth = 0
         self._table_rows_stack: list[list[list[str]]] = []
         self._table_start_lines: list[int] = []
+        # 每个 <table> 起始标签分配的全文档唯一索引（起始行/行列坐标
+        # 在单行 HTML 中会碰撞，table_index 是唯一 join key）
+        self._table_counter = 0
+        self._table_indices: list[int] = []
         self._row_buffers_stack: list[list[str] | None] = []
         self._cell_buffers_stack: list[list[str] | None] = []
         # 当前 cell 是否被嵌套 table 消费过（收尾时文本走段落而非单元格）
@@ -157,11 +163,14 @@ class _HTMLDocParser(_StdHTMLParser):
         row_index: int,
         cell_index: int,
         table_start_line: int,
+        table_index: int,
     ) -> None:
         """BUG-html-1：被嵌套 table 消费的单元格直接文本 → paragraph。
 
         metadata 记录外层单元格坐标（immediate outer table），使该段
-        可回溯到原 cell，而非与 body 段落无法区分。
+        可回溯到原 cell，而非与 body 段落无法区分。table_index 引用
+        所属 table 元素 metadata 中的同名字段——唯一 join key（起始行
+        与行列坐标在单行 HTML 中会碰撞，不能单独作身份）。
         """
         self.elements.append(
             Element(
@@ -173,6 +182,7 @@ class _HTMLDocParser(_StdHTMLParser):
                 confidence=0.9,
                 metadata={
                     "origin": "table_cell_text",
+                    "table_index": table_index,
                     "table_start_line": table_start_line,
                     "row_index": row_index,
                     "cell_index": cell_index,
@@ -277,6 +287,7 @@ class _HTMLDocParser(_StdHTMLParser):
                             cell_index=cell_index,
                             # 此刻内层 table 尚未 push，栈顶即外层 table
                             table_start_line=self._table_start_lines[-1],
+                            table_index=self._table_indices[-1],
                         )
                     self._cell_buffers_stack[-1] = None
                     self._cell_nested_stack[-1] = True
@@ -289,6 +300,8 @@ class _HTMLDocParser(_StdHTMLParser):
             self._table_depth += 1
             self._table_rows_stack.append([])
             self._table_start_lines.append(self.getpos()[0])
+            self._table_indices.append(self._table_counter)
+            self._table_counter += 1
             self._row_buffers_stack.append(None)
             self._cell_buffers_stack.append(None)
             self._cell_nested_stack.append(False)
@@ -359,6 +372,7 @@ class _HTMLDocParser(_StdHTMLParser):
             if tag == "table":
                 rows = self._table_rows_stack.pop()
                 start_line = self._table_start_lines.pop()
+                table_index = self._table_indices.pop()
                 self._row_buffers_stack.pop()
                 self._cell_buffers_stack.pop()
                 self._cell_nested_stack.pop()
@@ -385,6 +399,7 @@ class _HTMLDocParser(_StdHTMLParser):
                                 "row_count": len(rows),
                                 "col_count": max((len(r) for r in rows), default=0),
                                 "source": "html_table",
+                                "table_index": table_index,
                             },
                         )
                     )
@@ -426,6 +441,7 @@ class _HTMLDocParser(_StdHTMLParser):
                     cell_index=cell_index,
                     # 内层 table 已 pop，栈顶即当前 cell 所属 table
                     table_start_line=self._table_start_lines[-1],
+                    table_index=self._table_indices[-1],
                 )
             if self._row_buffers_stack[-1] is not None:
                 self._row_buffers_stack[-1].append("")

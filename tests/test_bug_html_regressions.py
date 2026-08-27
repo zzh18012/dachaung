@@ -320,3 +320,73 @@ def test_bug_html1_body_paragraph_not_mislabeled(tmp_path: Path):
     assert "origin" not in paras["BODY_PARA"].metadata
     assert paras["CELL_PARA"].metadata["origin"] == "table_cell_text"
     validate(doc.to_dict())
+
+
+# ---------- table_index 唯一 join key（ChatGPT 5.6 Sol 2026-08-27 边界①） ----------
+# 单行 HTML 中多个 table 的起始行、行列索引都可能相同，坐标不能单独
+# 作身份；归属必须经 table_index 唯一解析到直接外层 table 元素。
+
+
+def test_bug_html1_same_line_deep_nesting_unique_join(tmp_path: Path):
+    """同一行三层嵌套：三个 table 起始行相同，table_index 互异；
+    每个归属段经 table_index 唯一解析到直接外层（非首个同起始行匹配）。"""
+    html = (
+        "<table><tr><td>L1"
+        "<table><tr><td>L2"
+        "<table><tr><td>L3</td></tr></table>"
+        "</td></tr></table>"
+        "</td></tr></table>"
+    )
+    doc = _parse(html, tmp_path)
+    tables = [e for e in doc.elements if e.type == "table"]
+    assert len(tables) == 3
+    # 全部同一起始行（碰撞前提）
+    assert len({t.source_locator["line"] for t in tables}) == 1
+    idx = [t.metadata["table_index"] for t in tables]
+    assert len(set(idx)) == 3, "table_index 必须全文档唯一"
+
+    def resolve(table_index: int) -> list:
+        return [t for t in tables if t.metadata["table_index"] == table_index]
+
+    attr = {e.content: e for e in doc.elements
+            if e.type == "paragraph" and e.metadata.get("origin")}
+    assert set(attr) == {"L1", "L2"}
+    for content, expect_depth in (("L2", 1), ("L1", 2)):
+        ti = attr[content].metadata["table_index"]
+        matches = resolve(ti)
+        assert len(matches) == 1, "join key 必须唯一解析到一个 table"
+        # tables 产出顺序：内层在前（L3→L2→L1），直接外层即对应深度
+        assert matches[0] is tables[expect_depth], content
+    validate(doc.to_dict())
+
+
+def test_bug_html1_same_line_multiple_outer_tables(tmp_path: Path):
+    """同一行两个并列外层表格各自嵌套：坐标完全同形（起始行/行列均同），
+    归属经 table_index 区分并各自指向自己的直接外层。"""
+    html = (
+        "<table><tr><td>NEST_A<table><tr><td>IN_A</td></tr></table></td></tr></table>"
+        "<table><tr><td>NEST_B<table><tr><td>IN_B</td></tr></table></td></tr></table>"
+    )
+    doc = _parse(html, tmp_path)
+    tables = [e for e in doc.elements if e.type == "table"]
+    assert len(tables) == 4  # 内A、外A、内B、外B（产出顺序）
+    assert len({t.source_locator["line"] for t in tables}) == 1
+
+    outer_a, outer_b = tables[1], tables[3]
+    assert outer_a.metadata["table_index"] != outer_b.metadata["table_index"]
+
+    attr = {e.content: e for e in doc.elements
+            if e.type == "paragraph" and e.metadata.get("origin")}
+    assert set(attr) == {"NEST_A", "NEST_B"}
+    # 坐标完全同形（同为 row 0 / cell 0 / 同起始行）
+    for content in ("NEST_A", "NEST_B"):
+        m = attr[content].metadata
+        assert (m["table_start_line"], m["row_index"], m["cell_index"]) == (
+            outer_a.source_locator["line"], 0, 0), content
+    # 唯一解析且各归其主
+    ti_a = attr["NEST_A"].metadata["table_index"]
+    ti_b = attr["NEST_B"].metadata["table_index"]
+    assert ti_a != ti_b, "同形坐标必须由 table_index 区分"
+    assert [t for t in tables if t.metadata["table_index"] == ti_a] == [outer_a]
+    assert [t for t in tables if t.metadata["table_index"] == ti_b] == [outer_b]
+    validate(doc.to_dict())

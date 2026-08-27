@@ -569,3 +569,25 @@ metadata={}，无从区分），故先修后报，不凭 marker 全命中关闭�
   outputs/）；known-regressions auto 复跑 3/3 且与 text 注册前
   **零差异**；全套 3824 passed（3802+22）
 - 15 个 text 测试文件与 autoline-snapshot 逐字节一致（diff 校验）
+
+### 追加补丁：归属唯一标识 table_index（2026-08-27，ChatGPT 边界①）
+
+ChatGPT 5.6 Sol 指出：table_start_line + row_index + cell_index 在
+单行 HTML 中会碰撞（多个 table 同起始行、同行列索引），不能单独作
+单元格身份；原三层测试特意用了不同起始行，未覆盖碰撞。
+
+- 修复：每个 `<table>` 起始标签分配全文档唯一 `table_index`
+  （0,1,2,...），table element 的 metadata 与 cell-text paragraph 的
+  metadata 同字段同值，构成唯一 join key；行号/行列坐标保留用于
+  定位。设计说明：外层 table 元素在 `</table>` 才产出，段落发射时
+  其 element_id 尚不存在，故用 table_index 而非 element.id 作引用
+  ——唯一性与可解析性等价（一对一 join），已向 ChatGPT 报备
+- 登记测试 +2（test_bug_html_regressions.py，共 25）：同一行三层
+  嵌套（三 table 同起始行、table_index 互异、每段唯一解析到直接
+  外层）；同一行两个并列外层表格（坐标完全同形，table_index 区分
+  且各归其主）
+- 邻域适配：edges12 test_th_scope_ignored / edges22
+  test_all_th_single_row_table 的精确 metadata 断言补 table_index
+  （两文件自此与 autoline 有注记差异）
+- 验证：全套 3826 passed；html-dev 与 holdout-html 复跑指标与
+  既有结果零差异（纯加性 metadata，不触指标）；首跑报告与标签不动
