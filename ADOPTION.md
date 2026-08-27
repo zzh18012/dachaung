@@ -379,3 +379,17 @@ HTML-DEV-001..003、005、HTML-HOLD-003/004 核对无误。
   过滤 manifest 落 outputs/）；混合单跑会因 md 文件过 html parser
   记 unsupported_type（预期行为，非缺陷）
 - chunker 交叉无缺陷暴露，未触发"记录并暂停"条款
+
+### HTML 候选封存 + holdout-html 首跑（2026-08-27）
+
+- 候选提交 0fec2f8（工作树 clean，git_dirty=False），evaluator 1.4
+- 冻结 holdout-html 首次正式运行：**4/4 全绿**——pipeline_success、
+  schema_valid、silent_drop=0、required_markers 4/4、forbidden_markers
+  1/1（HTML-HOLD-003 的注释/script 排除首次实际求值即通过）
+- 首次报告永久保留：outputs/evaluation-holdout-html-first-run.json，
+  通过 evaluation-report Schema 校验
+- 封存记录：manifest sha256 前缀 3ceb4f212dc60b3b（与冻结值一致）、
+  报告 sha256 前缀 5fe5878b8d770b7b
+- 无失败 → 无需分类实现缺陷/规格争议，无新增 regression
+- 阶段 3（Markdown）+ 阶段 4（HTML）全部完成；缺陷登记表
+  BUG-md-1 / BUG-html-1 / BUG-html-2 全部已修复关闭
