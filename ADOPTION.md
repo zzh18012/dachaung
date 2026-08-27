@@ -459,3 +459,30 @@ HTML-DEV-001..003、005、HTML-HOLD-003/004 核对无误。
   1.2/1.1 含 parser_used 拒绝）；全套 3028 passed
 - 待办（不属本 PR）：docs/evaluation.md 的 report_version 说明停在 1.0，
   历史遗留失同步，需单独文档 PR 一并补 1.1→1.3 演进
+
+
+## 十二、阶段 5 准备：text dev/holdout 冻结（2026-08-27）
+
+按 ChatGPT 5.6 Sol 指示：text parser 机械搬运前先建立并冻结
+text-dev-v1 / text-holdout-v1；expectations 全部按 TextParser 文档化规格
+（autoline-snapshot）人工推导，不运行 parser、不看作弊输出。
+
+- 语料（samples/private/，gitignored）：
+  - devset-text 7 文档：基本多段落 / CRLF+段内不重排 / Unicode
+    （CJK+emoji+组合字符+NBSP 分隔行）/ 空文件 0 字节 / 纯空白 /
+    超长行（两段各数千字符）/ UTF-8 BOM
+  - holdout-text 4 文档：CR-only 换行 / 无效 UTF-8 字节（errors=replace
+    政策，marker 精确断言 PAD_END+U+FFFD×2+TAIL_START 连续序列）/
+    .text 备用扩展名+多种空白分隔行 / 行尾空白+段内换行
+- expectations 要点：段落计数全部按"空行分隔、段内行保留、整段首尾
+  strip"推导；空文件与纯空白声明 paragraph:0（计数下限语义下 0 是
+  强断言）；BOM 行为按文档推导——无 BOM 处理条款 + "用户怎么写就
+  怎么存" → BOM 为普通非空白字符（首段保留、不影响分段）；无效字节
+  按逐字节 U+FFFD 替换断言；must_not_error_codes 守护 text_read_failed
+  与 unsupported_type 不发生
+- 冻结哈希：devset-text manifest 4b0e5abc0fc55851、
+  holdout-text manifest 4c7be8ff8e495946（manifest 1.1）
+- 首次运行前 expectations 审计已完成（本轮起草即按规格逐条推导并
+  复核，先于任何评测运行）；主仓 samples/private 副本已同步
+- 两段式计划（无已知缺陷，GPT 指示不造空三段式）：机械搬运不注册 →
+  注册启用；发现真实缺陷再插独立修复提交
