@@ -806,3 +806,8 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   outputs/holdout-chunker-v1-firstrun.json（gitignored），此后不再重跑。
 - **纪律**：holdout 不进任何对照/预跑；固定干净 SHA 首跑封存；dev 侧断言
   （单 cell、覆盖、确定性 + 三指标 + 端到端）作为常驻回归测试。
+- **合入 main（2026-08-27）**：`git merge --ff-only`
+  integration/stage6-chunker-ipynb-cells → main 96b688b..4d0d471（5 提交，
+  无合并提交）；主 worktree 全套回归 4950 passed；Stage 6 第一批在
+  4d0d471 关闭。EVALUATOR_VERSION 保持 1.7、report_version 1.3、
+  manifest 1.1（契约 §4，无 evaluator 能力变更）。
