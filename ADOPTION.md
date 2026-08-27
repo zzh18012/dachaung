@@ -110,6 +110,20 @@ holdout manifest（不参与调参）留待 parser 搬运完成后另建。
 devset-md bce257755967e834、devset-html 82b0ec83d13f04f4、
 devset-regressions 8e5ecd3e3e44d756。
 
+**冻结核对更正（2026-08-27，MD 机械搬运时发现，先于任何评测运行）**：
+机械搬运后用搬运版 parser 逐份核对了全部 MD expectations 与文档化规格，
+发现三处我起草时的规格错误并更正（非调参——依据是 parser 文档化规格，
+且发生在首次运行之前）：
+- MD-DEV-006：paragraph 2→1（图片行不是段落）；IMG_ALT_DESC / fixture-image.png
+  两个 marker 删除——image 不参与文本投影，alt/resource_path 由 image 计数与
+  image_resource_exists_ratio 覆盖（ChatGPT 5.6 Sol 确认此分工）；补
+  http://example.net（在段落文本内）
+- MD-HOLD-001（setext）：heading 2→删除、paragraph 2→4——parser 文档明确
+  不支持 setext 标题（下划线式并入段落文本）
+- MD-HOLD-002（blockquote）：paragraph 1→3——连续 > 行合并为单段落是文档化规格
+更正后哈希：devset-md d41d5e6d54902160、holdout-md f637dd28de85bfb2。
+MD-DEV-001..005、MD-HOLD-003/004 核对无误。
+
 规则：
 - expectations 全部按规格人工给定（与 devset 同纪律，非 golden）
 - 计数断言为"下限"语义：多出的未声明类型不计违规，缺漏才触发 silent_drop；
@@ -171,3 +185,19 @@ PDF/DOCX 输出仍为 0.1.0 且通过校验。
 - 单一目的、干净适用的提交：`git cherry-pick -x <sha>`
 - 混合/依赖中间态/大体量：以自跑线代码为来源在 main 架构上重写 PR，描述列来源 tag 与 commit 范围
 - 本分支（integration/autoline-adoption）只做搬运集成，不合任何未修已知缺陷的 parser 启用
+
+## 九、Markdown parser 三段式搬运
+
+### 提交 1：机械搬运（2026-08-27 完成）
+
+- app/parsers/markdown_parser.py：自 autoline-snapshot（fcad055）逐字节搬运，
+  零行为改动；未注册未启用（pipeline/registry/CLI 均未触碰）
+- 测试搬运：test_parsers_markdown_edges*.py 全部 20 个文件 + 
+  test_parsers_markdown.py（裁掉 2 个依赖注册/CLI 的端到端测试，
+  按三段式计划在提交 3 原样搬回，裁剪点留注释）；共 1284 tests passed
+- BUG-md-1 以 strict xfail 登记（tests/test_bug_md1_regression.py，
+  4 个崩溃形态 + 1 个邻域不回归测试）；修复在提交 2
+- 同语料对照：devset-md(6) + holdout-md(4) + regressions md(1) 共 11 文件，
+  两仓 parser 输出 11/11 一致（模 source_path 与预期的 schema_version
+  0.1.0→0.2.0 差异；BUG-md-1 文件双方同样崩溃 = 崩溃对等）
+- 前置核对：base.py / parsers/__init__.py 与自跑线内容一致（仅行尾差异）
