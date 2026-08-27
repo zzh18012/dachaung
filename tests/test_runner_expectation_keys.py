@@ -7,7 +7,8 @@
 3. manifest 严格校验：未知键 / 类型错误 / max_silent_drop_count 缺
    element_count_by_type / markdown source_type 接受
 4. summary.expectation_checks 聚合：evaluated/passed/failed 分开计数
-5. 报告 schema：report_version 1.1 与 1.2 均有效；expectation_checks 通过校验
+5. 报告 schema：report_version 1.1 / 1.2 / 1.3 均有效；expectation_checks 通过校验；
+   parser_used 仅 1.3 允许且必需
 """
 
 from __future__ import annotations
@@ -321,6 +322,7 @@ def test_summary_expectation_checks_aggregation():
 
 def _report(report_version: str) -> dict:
     is_old = report_version == "1.1"
+    has_parser_used = report_version == "1.3"
     summary: dict = {
         "counts": {},
         "success_rates": {},
@@ -361,6 +363,7 @@ def _report(report_version: str) -> dict:
             {
                 "doc_id": "D1",
                 "source_type": "docx" if is_old else "markdown",
+                **({"parser_used": "auto→markdown"} if has_parser_used else {}),
                 "metrics": {},
                 "wall_time_seconds": {
                     "total": 0.1,
@@ -374,9 +377,10 @@ def _report(report_version: str) -> dict:
     }
 
 
-def test_report_schema_accepts_v11_and_v12():
+def test_report_schema_accepts_v11_v12_v13():
     validate(_report("1.1"), "evaluation-report.schema.json")
     validate(_report("1.2"), "evaluation-report.schema.json")
+    validate(_report("1.3"), "evaluation-report.schema.json")
 
 
 def test_report_v11_rejects_new_sections():
@@ -403,4 +407,22 @@ def test_report_v11_rejects_new_sections():
 
 def test_report_schema_rejects_unknown_version():
     with pytest.raises(EvalSchemaError):
-        validate(_report("1.3"), "evaluation-report.schema.json")
+        validate(_report("1.4"), "evaluation-report.schema.json")
+
+
+def test_report_parser_used_version_gating():
+    # 1.3 缺 parser_used → 拒绝
+    r = _report("1.3")
+    del r["per_doc"][0]["parser_used"]
+    with pytest.raises(EvalSchemaError):
+        validate(r, "evaluation-report.schema.json")
+    # 1.2 带 parser_used → 拒绝（精确快照：新字段不得出现在旧版本报告）
+    r2 = _report("1.2")
+    r2["per_doc"][0]["parser_used"] = "fallback"
+    with pytest.raises(EvalSchemaError):
+        validate(r2, "evaluation-report.schema.json")
+    # 1.1 带 parser_used → 拒绝
+    r3 = _report("1.1")
+    r3["per_doc"][0]["parser_used"] = "fallback"
+    with pytest.raises(EvalSchemaError):
+        validate(r3, "evaluation-report.schema.json")

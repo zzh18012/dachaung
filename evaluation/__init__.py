@@ -27,12 +27,20 @@
   无法运行 markdown manifest，同版本不同能力损害复现，故升 1.3 封存
   Markdown 候选（ChatGPT 5.6 Sol 2026-08-27 指示）。
   report_version 保持 1.2（报告结构未变）。
-- v1.4（当前）：评测 CLI 可运行 html manifest（能力封口同上，
+- v1.4：评测 CLI 可运行 html manifest（能力封口同上，
   ChatGPT 5.6 Sol 2026-08-27 指示）。report_version 保持 1.2。
+- v1.5（当前）：评测 CLI 新增 --parser auto（混合 manifest 单次调度），
+  仅按 manifest 的 source_type 解析 parser（pdf/docx→fallback、
+  markdown→markdown、html→html），不按扩展名猜测；显式 --parser
+  旧行为不变。报告 per_doc 新增 parser_used（复现不依赖隐式映射），
+  按 v1.2 确立的精确快照政策，含新字段的报告必须标 report_version 1.3，
+  1.1/1.2 报告保持旧结构（schema 条件分支互斥）。
+  auto 模式下 provenance.parser_version 为 null（多 parser 并存，
+  单值会误导）（ChatGPT 5.6 Sol 2026-08-27 指示）。
 """
 
-EVALUATOR_VERSION = "1.4"
-REPORT_VERSION = "1.2"
+EVALUATOR_VERSION = "1.5"
+REPORT_VERSION = "1.3"
 ANNOTATION_VERSION = "1.0"
 MANIFEST_VERSION = "1.1"
 MANIFEST_VERSIONS_SUPPORTED = ("1.0", "1.1")

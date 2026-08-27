@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kvfs.local/schemas/evaluation-report.schema.json",
-  "title": "Evaluation Report v1.1/v1.2（精确快照）",
+  "title": "Evaluation Report v1.1/v1.2/v1.3（精确快照）",
   "type": "object",
   "required": ["report_version", "provenance", "devset", "summary", "per_doc"],
   "additionalProperties": false,
   "allOf": [
     {
-      "$comment": "1.1 精确快照：不得包含 expectation_checks 分节与 per-doc 的四个 check 键。",
+      "$comment": "1.1 精确快照：不得包含 expectation_checks 分节、per-doc 的四个 check 键与 parser_used。",
       "if": {
         "properties": { "report_version": { "const": "1.1" } },
         "required": ["report_version"]
@@ -28,7 +28,40 @@
                     ]
                   }
                 }
-              }
+              },
+              "not": { "required": ["parser_used"] }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "1.2 精确快照：不得包含 per-doc parser_used（1.3 起才有）。",
+      "if": {
+        "properties": { "report_version": { "const": "1.2" } },
+        "required": ["report_version"]
+      },
+      "then": {
+        "properties": {
+          "per_doc": {
+            "items": {
+              "not": { "required": ["parser_used"] }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "1.3 精确快照：per-doc 必须带 parser_used。",
+      "if": {
+        "properties": { "report_version": { "const": "1.3" } },
+        "required": ["report_version"]
+      },
+      "then": {
+        "properties": {
+          "per_doc": {
+            "items": {
+              "required": ["parser_used"]
             }
           }
         }
@@ -36,7 +69,7 @@
     }
   ],
   "properties": {
-    "report_version": { "type": "string", "enum": ["1.1", "1.2"] },
+    "report_version": { "type": "string", "enum": ["1.1", "1.2", "1.3"] },
     "provenance": { "$ref": "#/$defs/provenance" },
     "devset": { "$ref": "#/$defs/devset" },
     "summary": { "$ref": "#/$defs/summary" },
@@ -137,6 +170,7 @@
       "properties": {
         "doc_id": { "type": "string", "minLength": 1 },
         "source_type": { "enum": ["pdf", "docx", "markdown", "html", "text", "ipynb"] },
+        "parser_used": { "type": "string", "minLength": 1 },
         "metrics": { "type": "object" },
         "wall_time_seconds": {
           "type": "object",

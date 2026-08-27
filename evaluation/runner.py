@@ -31,6 +31,28 @@ from evaluation.report import (
     build_provenance,
 )
 
+# --parser auto 的 source_type → parser 映射（仅按 manifest 声明，不猜扩展名）。
+# 未注册的类型（text/ipynb）不路由到任何 parser——fallback 会把 .txt 错送进
+# docx 路径产出误导性错误码，故由 runner 合成结构化 unsupported_type；
+# parser 注册后加入本映射。
+AUTO_PARSER_BY_SOURCE_TYPE = {
+    "pdf": "fallback",
+    "docx": "fallback",
+    "markdown": "markdown",
+    "html": "html",
+}
+
+
+def _resolve_parser_name(requested: str, source_type: str | None) -> str | None:
+    """auto 模式下按 source_type 解析；未注册类型返回 None（文档级失败）。"""
+    if requested != "auto":
+        return requested
+    if source_type is None:
+        # expected_failures 的旧条目可无 source_type（pdf/docx 时代），
+        # 沿用 fallback 保持旧行为
+        return "fallback"
+    return AUTO_PARSER_BY_SOURCE_TYPE.get(source_type)
+
 
 def _load_annotation(path: Path | None) -> dict[str, Any] | None:
     if path is None or not path.is_file():
@@ -113,9 +135,26 @@ def run_evaluation(
     parser_version_for_prov: str | None = None
 
     for doc in manifest.documents:
-        document, error, total_seconds, parser_version, image_dir = _process_one(
-            doc, output_root, parser_name, max_chars
-        )
+        effective_parser = _resolve_parser_name(parser_name, doc.source_type)
+        if effective_parser is None:
+            # auto 遇未注册 source_type：合成结构化失败，不跑 pipeline
+            document, error, total_seconds, parser_version, image_dir = (
+                None,
+                {
+                    "code": "unsupported_type",
+                    "message": (
+                        f"auto 调度尚未注册 source_type={doc.source_type} 的 parser"
+                    ),
+                    "details": {"source_type": doc.source_type, "parser_mode": "auto"},
+                },
+                0.0,
+                None,
+                Path(),
+            )
+        else:
+            document, error, total_seconds, parser_version, image_dir = _process_one(
+                doc, output_root, effective_parser, max_chars
+            )
         if parser_version and not parser_version_for_prov:
             parser_version_for_prov = parser_version
 
@@ -141,6 +180,7 @@ def run_evaluation(
             {
                 "doc_id": doc.doc_id,
                 "source_type": doc.source_type,
+                "parser_used": effective_parser or "none",
                 "metrics": metrics,
                 "wall_time_seconds": {
                     "total": total_seconds,
@@ -164,21 +204,25 @@ def run_evaluation(
     # 评测预期失败用例
     expected_failure_results: list[dict[str, Any]] = []
     for ef in manifest.expected_failures:
-        out_stub = output_root / "_per_doc" / f"{ef.doc_id}.json"
-        out_stub.parent.mkdir(parents=True, exist_ok=True)
-        document, errors = process_single(
-            ef.resolved_path,
-            out_stub,
-            parser_name=parser_name,
-            max_chars=max_chars,
-            write_json=False,
-        )
-        if out_stub.is_file():
-            try:
-                out_stub.unlink()
-            except OSError:
-                pass
-        actual_code = errors[0].code if errors else None
+        ef_parser = _resolve_parser_name(parser_name, ef.source_type)
+        if ef_parser is None:
+            actual_code = "unsupported_type"
+        else:
+            out_stub = output_root / "_per_doc" / f"{ef.doc_id}.json"
+            out_stub.parent.mkdir(parents=True, exist_ok=True)
+            document, errors = process_single(
+                ef.resolved_path,
+                out_stub,
+                parser_name=ef_parser,
+                max_chars=max_chars,
+                write_json=False,
+            )
+            if out_stub.is_file():
+                try:
+                    out_stub.unlink()
+                except OSError:
+                    pass
+            actual_code = errors[0].code if errors else None
         expected_failure_results.append(
             {
                 "doc_id": ef.doc_id,
@@ -192,7 +236,8 @@ def run_evaluation(
         project_root=manifest.project_root,
         parser_name=parser_name,
         max_chars=max_chars,
-        parser_version=parser_version_for_prov,
+        # auto 模式下多 parser 并存，单一 parser_version 会误导 → null
+        parser_version=None if parser_name == "auto" else parser_version_for_prov,
     )
     devset = build_devset_section(manifest)
     summary = aggregate_summary(per_doc_results)
@@ -203,6 +248,7 @@ def run_evaluation(
             {
                 "doc_id": r["doc_id"],
                 "source_type": r["source_type"],
+                "parser_used": r["parser_used"],
                 "metrics": r["metrics"],
                 "wall_time_seconds": r["wall_time_seconds"],
             }

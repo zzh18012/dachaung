@@ -407,3 +407,55 @@ HTML-DEV-001..003、005、HTML-HOLD-003/004 核对无误。
 - 无失败 → 无需分类实现缺陷/规格争议，无新增 regression
 - 阶段 3（Markdown）+ 阶段 4（HTML）全部完成；缺陷登记表
   BUG-md-1 / BUG-html-1 / BUG-html-2 全部已修复关闭
+
+
+## 十一、阶段 2–4 合入 main + 混合 manifest 调度（2026-08-27，ChatGPT 5.6 Sol 指示）
+
+### 阶段 2–4 落入 main（保留提交身份）
+
+- 证据记录补丁：旧 holdout 哈希显式标记"首次运行前经规格裁决废止"
+  （holdout-md e08b50ada20f577f、holdout-html 5decd9940de62567），
+  冻结表更新为最终正式值；此后两份 holdout 不得再修改（c68820b）
+- 合入方式：main 与 adoption 分支为严格线性关系，`git merge --ff-only`
+  到 c68820b——17 个提交 SHA 全部原样保留（无 squash、无 cherry-pick
+  重写）；分支当时尖端即已验证集，无未验证尾随提交，不构成
+  "整支合并未验证工作"
+- 合入后 main 上的最终矩阵（dachuang-code/.venv）：
+  1. 全套测试 3015 passed 0 xfail
+  2. pilot 冻结基线对比：frozen 全部键值不变（单向对比，加性键允许，
+     除计时/版本戳）——1.2 报告的 expectation_checks 分节为既定加性设计
+     （v1.2 版本语义测试钉住）
+  3. markdown-dev-v1 6/6、html-dev-v1 5/5 + forbidden 1/1、
+     REG-MD-001 / REG-HTML-001/002 拆跑全绿
+  4. 两份 holdout 首跑报告 schema 校验通过；确定性复跑（规范化去
+     generated_at/git_*/wall_time_seconds）与首跑完全一致
+  5. chunk_reference_intact_ratio 全 1.0
+- 打 tag `stage4-html-adopted`（附注含矩阵结论）
+- gitignored 工件同步：holdout 两份首跑报告复制到主仓 outputs/
+  （sha256 前缀 49d15a0650fefc46 / 5fe5878b8d770b7b 与封存记录一致）；
+  samples/private 两 worktree diff 为空（此前已同步）
+
+### --parser auto 混合 manifest 调度（evaluator 1.5 / report 1.3）
+
+- `--parser auto`：仅按 manifest 的 source_type 解析——pdf/docx→fallback、
+  markdown→markdown、html→html；不按扩展名猜测；text/ipynb 待 parser
+  注册后加入映射。显式 --parser 旧行为不变（默认仍 fallback）
+- 未注册 source_type 的 auto 文档：**不路由到任何 parser**（fallback 会把
+  .txt 错送 docx 路径产出误导性错误码），由 runner 合成结构化
+  unsupported_type 失败，parser_used="none"，计时 total=0
+- 报告 per_doc 新增 `parser_used`（复现不依赖隐式映射）；按精确快照政策
+  升 REPORT_VERSION 1.2→1.3：schema 条件互斥——1.3 必含 parser_used，
+  1.1/1.2 报告不得含（旧报告继续原样通过校验）；EVALUATOR_VERSION
+  1.4→1.5。auto 模式下 provenance.parser_version=null（多 parser 并存，
+  单值会误导）；ef 旧条目无 source_type 时沿用 fallback
+- 验收门（ChatGPT 指定）：known-regressions-v1 混合清单单次
+  `--parser auto` 运行 **3/3 全绿**（REG-MD-001 marker+must_not_error、
+  REG-HTML-001 marker、REG-HTML-002 marker+silent_drop 门），逐文档
+  parser_used 正确（markdown/html），且各文档指标与按格式拆跑的成功
+  结果零差异
+- 新增 tests/test_parser_auto.py（映射表/解析函数参数化、混合清单单次
+  运行 e2e、显式模式不变、ef 无 source_type 兼容）；
+  test_runner_expectation_keys.py 补 1.3 版本门（1.3 缺 parser_used 拒绝、
+  1.2/1.1 含 parser_used 拒绝）；全套 3028 passed
+- 待办（不属本 PR）：docs/evaluation.md 的 report_version 说明停在 1.0，
+  历史遗留失同步，需单独文档 PR 一并补 1.1→1.3 演进
