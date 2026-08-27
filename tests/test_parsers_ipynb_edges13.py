@@ -21,8 +21,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 from app.hash import compute_file_hash
 from app.parsers.ipynb_parser import IpynbParser
 
@@ -112,7 +110,9 @@ def test_lang_info_no_name_empty(
     assert doc.metadata["language"] == ""
 
 
-def test_kernelspec_not_dict_crashes(
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_kernelspec_not_dict_treated_absent(
         tmp_path):
     p = tmp_path / TMP_NAME
     p.write_text(json.dumps(_nb(
@@ -120,12 +120,12 @@ def test_kernelspec_not_dict_crashes(
           "source": "x"}],
         {"kernelspec": "python"})),
         encoding="utf-8")
-    with pytest.raises(AttributeError):
-        IpynbParser().parse(
-            p, compute_file_hash(p))
+    doc = IpynbParser().parse(
+        p, compute_file_hash(p))
+    assert doc.metadata["language"] == ""
 
 
-def test_metadata_not_dict_crashes(
+def test_metadata_not_dict_treated_empty(
         tmp_path):
     p = tmp_path / TMP_NAME
     p.write_text(json.dumps(_nb(
@@ -133,9 +133,9 @@ def test_metadata_not_dict_crashes(
           "source": "x"}],
         "bad")),
         encoding="utf-8")
-    with pytest.raises(AttributeError):
-        IpynbParser().parse(
-            p, compute_file_hash(p))
+    doc = IpynbParser().parse(
+        p, compute_file_hash(p))
+    assert doc.metadata["language"] == ""
 
 
 # ---------- raw cell strip ----------

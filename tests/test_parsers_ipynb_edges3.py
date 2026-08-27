@@ -111,9 +111,11 @@ def test_extract_lang_prio_kernelspec_language_first():
     assert _extract_kernel_language(md) == "python"
 
 
-def test_extract_lang_prio_kernelspec_name_when_no_language():
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_extract_lang_kernelspec_only_name_empty():
     md = {"kernelspec": {"name": "fallback-name"}}
-    assert _extract_kernel_language(md) == "fallback-name"
+    assert _extract_kernel_language(md) == ""
 
 
 def test_extract_lang_prio_language_info_when_no_kernelspec():
@@ -164,13 +166,13 @@ def test_extract_lang_kernelspec_language_overrides_language_info():
     assert _extract_kernel_language(md) == "python"
 
 
-def test_extract_lang_kernelspec_name_overrides_language_info():
-    """kernelspec.name 优先于 language_info.name。"""
+def test_extract_lang_language_info_name_when_no_ks_language():
+    """ks 无 language → language_info.name 生效（ks.name 不参与）。"""
     md = {
         "kernelspec": {"name": "julia"},
         "language_info": {"name": "ruby"},
     }
-    assert _extract_kernel_language(md) == "julia"
+    assert _extract_kernel_language(md) == "ruby"
 
 
 def test_extract_lang_empty_kernelspec_falls_back_to_language_info():

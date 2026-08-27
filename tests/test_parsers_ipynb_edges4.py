@@ -162,10 +162,12 @@ def test_cell_source_returns_str_for_list_input():
 # =========================================================================
 
 
-def test_extract_lang_kernelspec_empty_string_language_falls_back_to_name():
-    """kernelspec.language='' 时 fall back to kernelspec.name。"""
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_extract_lang_kernelspec_empty_string_language_is_absent():
+    """kernelspec.language='' 视为缺失 → 空串。"""
     md = {"kernelspec": {"language": "", "name": "python3"}}
-    assert _extract_kernel_language(md) == "python3"
+    assert _extract_kernel_language(md) == ""
 
 
 def test_extract_lang_kernelspec_language_whitespace_only_does_not_fall_back():
@@ -201,17 +203,15 @@ def test_extract_lang_language_info_empty_string_returns_empty():
     assert _extract_kernel_language(md) == ""
 
 
-def test_extract_lang_language_info_non_dict_raises_attribute_error():
-    """language_info 是 non-dict → AttributeError（实际无 type guard）。"""
+def test_extract_lang_language_info_non_dict_treated_absent():
+    """language_info 非 dict → 视作缺失，不崩溃。"""
     md = {"language_info": "python"}
-    with pytest.raises(AttributeError):
-        _extract_kernel_language(md)
+    assert _extract_kernel_language(md) == ""
 
 
-def test_extract_lang_kernelspec_non_dict_raises_attribute_error():
+def test_extract_lang_kernelspec_non_dict_treated_absent():
     md = {"kernelspec": "python3"}
-    with pytest.raises(AttributeError):
-        _extract_kernel_language(md)
+    assert _extract_kernel_language(md) == ""
 
 
 def test_extract_lang_metadata_empty_dict():

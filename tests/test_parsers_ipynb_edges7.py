@@ -156,9 +156,11 @@ def test_extract_kernel_language_kernelspec_language():
     assert _extract_kernel_language(metadata) == "python"
 
 
-def test_extract_kernel_language_kernelspec_name_fallback():
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_extract_kernel_language_kernelspec_name_not_a_language():
     metadata = {"kernelspec": {"name": "python3"}}  # 无 language
-    assert _extract_kernel_language(metadata) == "python3"
+    assert _extract_kernel_language(metadata) == ""
 
 
 def test_extract_kernel_language_language_info_name_fallback():

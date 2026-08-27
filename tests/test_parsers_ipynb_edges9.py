@@ -272,11 +272,12 @@ def test_doc_identity():
 
 # ---------- kernelspec 回退链 ----------
 
-def test_language_fallback_to_ks_name():
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_language_ks_name_not_used():
     nb = _nb()
     nb["metadata"]["kernelspec"] = {"name": "julia-1.9"}
-    assert _parse(nb).metadata["language"] == \
-        "julia-1.9"
+    assert _parse(nb).metadata["language"] == ""
 
 
 def test_language_fallback_to_language_info():

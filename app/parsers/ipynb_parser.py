@@ -58,13 +58,24 @@ def _cell_source_to_text(source: Any) -> str | None:
 
 
 def _extract_kernel_language(metadata: dict[str, Any]) -> str:
-    """从 notebook metadata 推断主语言。"""
-    ks = metadata.get("kernelspec") or {}
-    lang = ks.get("language") or ks.get("name") or ""
-    if not lang:
-        li = metadata.get("language_info") or {}
-        lang = li.get("name") or ""
-    return lang or ""
+    """从 notebook metadata 推断主语言。
+
+    契约 §6（adoption 修正，2026-08-27）：kernelspec.language →
+    language_info.name → 空串；kernelspec.name 是内核标识，不参与
+    语言判定。非 dict 的中间节点与非 str 取值视作缺失（不崩溃、
+    不做 str() 强转）。
+    """
+    for holder_key, lang_key in (
+        ("kernelspec", "language"),
+        ("language_info", "name"),
+    ):
+        holder = metadata.get(holder_key)
+        if not isinstance(holder, dict):
+            continue
+        value = holder.get(lang_key)
+        if isinstance(value, str) and value:
+            return value
+    return ""
 
 
 class IpynbParser(Parser):
@@ -140,7 +151,10 @@ class IpynbParser(Parser):
                 message=".ipynb 的 cells 字段不是数组",
             )
 
-        language = _extract_kernel_language(nb.get("metadata") or {})
+        nb_metadata = nb.get("metadata")
+        if not isinstance(nb_metadata, dict):
+            nb_metadata = {}
+        language = _extract_kernel_language(nb_metadata)
         md_parser = MarkdownParser()
         raw_elements: list[tuple[str, str | None, str | None, dict[str, Any], dict[str, Any]]] = []
         # (type, content, resource_path, source_locator, metadata)

@@ -69,14 +69,16 @@ def test_metadata_flattened_summary(
     }
 
 
-def test_lang_int_passthrough(tmp_path):
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_lang_int_treated_absent(tmp_path):
     doc = _parse(tmp_path, _nb(
         [{"cell_type": "code",
           "source": "x"}],
         {"kernelspec": {"language": 42}}))
-    assert doc.metadata["language"] == 42
+    assert doc.metadata["language"] == ""
     assert doc.elements[
-        0].metadata["language"] == 42
+        0].metadata["language"] == ""
 
 
 # ---------- 单 cell 多块 markdown ----------

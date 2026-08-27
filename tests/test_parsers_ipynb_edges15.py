@@ -70,16 +70,18 @@ def test_nbformat_minor_string_rejected(
     assert ei.value.code == "ipynb_bad_structure"
 
 
-def test_kernel_language_numeric_passthrough(
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_kernel_language_numeric_treated_absent(
         tmp_path):
     doc = _nb(
         tmp_path, "ln.ipynb",
         [_code("x=1")],
         meta={"kernelspec": {
             "language": 42}})
-    assert doc.metadata["language"] == 42
+    assert doc.metadata["language"] == ""
     assert doc.elements[0].metadata[
-        "language"] == 42
+        "language"] == ""
 
 
 # ---------- markdown cell 通道 ----------

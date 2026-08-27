@@ -204,3 +204,85 @@ def test_raw_cell_locator_has_line1(tmp_path):
     doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
     assert doc.elements[0].source_locator == {
         "cell_index": 0, "cell_type": "raw", "line": 1}
+
+
+# ---------- 修正 3：language 链重排（契约 §6） ----------
+
+
+def _lang_of(tmp_path, metadata):
+    nb = _nb([_cell("code", "x = 1")], metadata=metadata)
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    return doc
+
+
+def test_language_chain_ks_language_first(tmp_path):
+    doc = _lang_of(tmp_path, {
+        "kernelspec": {"name": "python3", "language": "python"},
+        "language_info": {"name": "ruby"},
+    })
+    assert doc.metadata["language"] == "python"
+    assert doc.elements[0].metadata["language"] == "python"
+
+
+def test_language_chain_falls_to_language_info_name(tmp_path):
+    doc = _lang_of(tmp_path, {
+        "kernelspec": {"name": "python3"},
+        "language_info": {"name": "ruby"},
+    })
+    assert doc.metadata["language"] == "ruby"
+
+
+def test_language_chain_empty_when_absent(tmp_path):
+    doc = _lang_of(tmp_path, {
+        "kernelspec": {"name": "python3"},
+    })
+    assert doc.metadata["language"] == ""
+
+
+def test_kernelspec_name_never_a_language(tmp_path):
+    """kernelspec.name 是内核标识，即使 language_info 也缺失也不用 name。"""
+    doc = _lang_of(tmp_path, {
+        "kernelspec": {"name": "python3"},
+        "language_info": {"version": "3.12"},
+    })
+    assert doc.metadata["language"] == ""
+
+
+def test_language_non_str_treated_absent(tmp_path):
+    doc = _lang_of(tmp_path, {"kernelspec": {"language": 42}})
+    assert doc.metadata["language"] == ""
+
+
+def test_language_empty_str_treated_absent(tmp_path):
+    doc = _lang_of(tmp_path, {
+        "kernelspec": {"language": ""},
+        "language_info": {"name": "ruby"},
+    })
+    assert doc.metadata["language"] == "ruby"
+
+
+def test_language_none_treated_absent(tmp_path):
+    doc = _lang_of(tmp_path, {
+        "kernelspec": {"language": None},
+        "language_info": {"name": "ruby"},
+    })
+    assert doc.metadata["language"] == "ruby"
+
+
+def test_kernelspec_non_dict_treated_absent(tmp_path):
+    doc = _lang_of(tmp_path, {"kernelspec": "python"})
+    assert doc.metadata["language"] == ""
+
+
+def test_language_info_non_dict_treated_absent(tmp_path):
+    doc = _lang_of(tmp_path, {
+        "kernelspec": {"language": "python"},
+        "language_info": "python",
+    })
+    assert doc.metadata["language"] == "python"
+
+
+def test_notebook_metadata_non_dict_treated_empty(tmp_path):
+    nb = _nb([_cell("code", "x = 1")], metadata="bad")
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.metadata["language"] == ""

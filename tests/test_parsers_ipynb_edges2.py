@@ -249,9 +249,11 @@ def test_extract_kernel_language_kernelspec_language_field():
     assert _extract_kernel_language(md) == "python"
 
 
-def test_extract_kernel_language_kernelspec_name_fallback():
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_extract_kernel_language_kernelspec_name_not_a_language():
     md = {"kernelspec": {"name": "python3"}}
-    assert _extract_kernel_language(md) == "python3"
+    assert _extract_kernel_language(md) == ""
 
 
 def test_extract_kernel_language_language_info_name_fallback():
@@ -276,14 +278,14 @@ def test_extract_kernel_language_kernelspec_language_overrides_name():
     assert _extract_kernel_language(md) == "python"
 
 
-def test_extract_kernel_language_kernelspec_language_empty_falls_to_name():
+def test_extract_kernel_language_kernelspec_language_empty_is_absent():
     md = {"kernelspec": {"language": "", "name": "fallback_name"}}
-    assert _extract_kernel_language(md) == "fallback_name"
+    assert _extract_kernel_language(md) == ""
 
 
-def test_extract_kernel_language_kernelspec_language_none_falls_to_name():
+def test_extract_kernel_language_kernelspec_language_none_is_absent():
     md = {"kernelspec": {"language": None, "name": "fallback"}}
-    assert _extract_kernel_language(md) == "fallback"
+    assert _extract_kernel_language(md) == ""
 
 
 def test_extract_kernel_language_all_fields_empty():
@@ -301,15 +303,15 @@ def test_extract_kernel_language_kernelspec_none_language_info_present():
     assert _extract_kernel_language(md) == "julia"
 
 
-def test_extract_kernel_language_with_special_chars_in_name():
+def test_extract_kernel_language_special_chars_in_kernel_name_ignored():
     md = {"kernelspec": {"name": "python-c++"}}
-    assert _extract_kernel_language(md) == "python-c++"
+    assert _extract_kernel_language(md) == ""
 
 
 def test_extract_kernel_language_kernelspec_with_only_name_key():
-    """kernelspec 仅含 name 不含 language → fallback 到 name。"""
+    """kernelspec 仅含 name 不含 language → 空串（name 不参与）。"""
     md = {"kernelspec": {"name": "python3"}}
-    assert _extract_kernel_language(md) == "python3"
+    assert _extract_kernel_language(md) == ""
 
 
 def test_extract_kernel_language_language_info_with_only_name():

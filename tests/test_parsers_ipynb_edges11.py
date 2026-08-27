@@ -88,13 +88,15 @@ def test_lang_ks_language_wins(
         0].metadata["language"] == "python"
 
 
-def test_lang_ks_name_fallback(
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_lang_ks_name_not_used(
         tmp_path):
     doc = _parse(tmp_path, _nb(
         [{"cell_type": "code",
           "source": "x=1"}],
         {"kernelspec": {"name": "ir"}}))
-    assert doc.metadata["language"] == "ir"
+    assert doc.metadata["language"] == ""
 
 
 def test_lang_language_info(

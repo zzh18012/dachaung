@@ -361,11 +361,13 @@ def test_extract_kernel_language_from_kernelspec_language():
     assert _extract_kernel_language(metadata) == "python"
 
 
-def test_extract_kernel_language_falls_back_to_kernelspec_name():
-    """kernelspec.language 缺失时，回退到 kernelspec.name。"""
+# adoption 契约 §6 注记（2026-08-27）：kernelspec.name 是内核标识，不参与语言判定；
+# 链为 kernelspec.language → language_info.name → 空串。
+def test_extract_kernel_language_kernelspec_name_not_a_language():
+    """kernelspec.name 不参与语言判定：仅含 name → 空串。"""
     from app.parsers.ipynb_parser import _extract_kernel_language
     metadata = {"kernelspec": {"name": "julia3"}}
-    assert _extract_kernel_language(metadata) == "julia3"
+    assert _extract_kernel_language(metadata) == ""
 
 
 def test_extract_kernel_language_falls_back_to_language_info_name():
