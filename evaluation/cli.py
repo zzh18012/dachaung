@@ -40,7 +40,7 @@ def _build_parser() -> argparse.ArgumentParser:
     run_p.add_argument("--output", required=True, help="报告输出 JSON 路径")
     run_p.add_argument(
         "--parser",
-        choices=("fallback", "kreuzberg"),
+        choices=("fallback", "kreuzberg", "markdown"),
         default="fallback",
         help="parser（默认 fallback）",
     )

@@ -300,8 +300,69 @@ def test_full_document_schema_valid(tmp_path: Path):
 
 
 # 机械搬运（阶段 3 提交 1）：以下两个依赖 pipeline 注册/CLI 的端到端测试
-# （test_pipeline_end_to_end_with_markdown / test_cli_parse_markdown_end_to_end）
-# 按三段式计划推迟到注册启用 PR 原样搬回。
+# 曾按三段式计划推迟；阶段 3 提交 3（注册启用）原样搬回如下。
+
+
+def test_pipeline_end_to_end_with_markdown(tmp_path: Path):
+    """app.pipeline.process_single 对 .md 输入完整跑通 parse→chunk→validate→write。"""
+    from app.pipeline import process_single
+
+    md = (
+        "# Project\n\n"
+        "This is a paragraph with enough text to be useful for chunking.\n\n"
+        "## Background\n\n"
+        "More content here. Lorem ipsum dolor sit amet.\n\n"
+        "- one\n"
+        "- two\n"
+    )
+    src = _write_md(tmp_path, "doc.md", md)
+    out = tmp_path / "out.json"
+    document, errors = process_single(src, out, parser_name="markdown", write_json=True)
+    assert errors == []
+    assert document is not None
+    assert document.source_type == "markdown"
+    # 至少有 heading + paragraph + list_item
+    types = {e.type for e in document.elements}
+    assert "heading" in types
+    assert "paragraph" in types
+    assert "list_item" in types
+    # chunker 对所有非 image element 都应产出 chunk
+    assert len(document.chunks) >= 1
+    for c in document.chunks:
+        assert c.source_element_ids  # 非空
+    # 输出文件存在
+    assert out.is_file()
+
+
+def test_cli_parse_markdown_end_to_end(tmp_path: Path):
+    """`python -m app.cli parse doc.md -o out.json --parser markdown` 跑通。"""
+    md = "# Title\n\nHello markdown world.\n"
+    src = tmp_path / "doc.md"
+    src.write_text(md, encoding="utf-8")
+    out = tmp_path / "out.json"
+
+    env = {
+        **os.environ,
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONPATH": str(PROJECT_ROOT) + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
+    proc = subprocess.run(
+        [_PYTHON, "-m", "app.cli", "parse", str(src),
+         "-o", str(out), "--parser", "markdown"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        env=env,
+    )
+    assert proc.returncode == 0, f"stderr={proc.stderr}"
+    assert "[OK]" in proc.stdout
+    assert out.is_file()
+    # 输出 JSON 通过 schema 校验
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["source_type"] == "markdown"
+    assert data["parser_name"] == "markdown"
+    assert len(data["elements"]) >= 2
 
 # ---------- 内部 helpers（纯函数）----------
 

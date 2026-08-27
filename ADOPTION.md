@@ -227,3 +227,29 @@ PDF/DOCX 输出仍为 0.1.0 且通过校验。
   3 marker 全命中、无 error、2 条 empty_markdown_construct_ignored 警告），
   autoline 侧同文件仍崩溃 = 修复对等性证据
 - 缺陷登记表 BUG-md-1 状态：已修复（本提交），MD parser 启用前置条件清除
+
+### 提交 3：注册启用 + 评测矩阵（2026-08-27 完成）
+
+- 注册（最小改动，无自动选择逻辑，默认 parser 仍 fallback）：
+  - app/pipeline.py get_parser 增加 markdown 分支（与自跑线同形；
+    html/text/ipynb 留阶段 4-5；image_output_dir_for 重构未搬）
+  - app/cli.py parse --parser choices += markdown
+  - evaluation/cli.py run --parser choices += markdown（自跑线评测从未接
+    markdown，此为搬运线补齐，属评测模块自身 PR 范畴）
+- 搬回提交 1 裁掉的两个端到端测试（原样）：pipeline e2e + CLI e2e
+- 评测矩阵（GPT 门）：
+  1. 全套 1791 tests passed（含旧 169 条时代测试 + 搬回 e2e）
+  2. 旧 PDF/DOCX manifest 重跑 vs 冻结基线：既有 summary/per_doc 指标
+     零差异（仅 Runner PR 已验收的 expectation_checks additive 分节）
+  3. markdown-dev-v1（6 文档）：6/6 pipeline_success、schema_valid、
+     text_preservation_equal 全 True、chunk_reference_intact_ratio=1.0、
+     char_multiset P/R=1.0、heading_boundary=1.0、silent_drop=0、
+     required_markers 6/6 通过
+  4. known-regressions-v1 仅 REG-MD-001（过滤 manifest 于 outputs/）：
+     pipeline_success、must_not_error_codes 通过（无 unexpected_parser_error）、
+     required_markers 通过、silent_drop=0、schema_valid=True
+  5. Markdown 端到端：CLI parse .md → JSON schema 校验通过（e2e 测试内）
+  6. 重复运行一致性：同输入两次 process_single，规范化输出（去 source_path）
+     完全一致；输出 schema_version=0.2.0、7 elements → 4 chunks
+- chunker 交叉：无缺陷暴露（reference/text/boundary 指标全满），无需暂停
+- 评测报告均通过 evaluation-report 1.2 Schema 校验

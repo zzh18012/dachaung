@@ -40,12 +40,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="command", required=True)
 
     # parse 子命令
-    parse = sub.add_parser("parse", help="解析 PDF/DOCX → 统一文档模型 → 分块 → JSON")
-    parse.add_argument("input", help="输入文件路径（PDF/DOCX）")
+    parse = sub.add_parser("parse", help="解析 PDF/DOCX/MD → 统一文档模型 → 分块 → JSON")
+    parse.add_argument("input", help="输入文件路径（PDF/DOCX/MD）")
     parse.add_argument("-o", "--output", required=True, help="输出 JSON 路径")
     parse.add_argument(
         "--parser",
-        choices=("fallback", "kreuzberg"),
+        choices=("fallback", "kreuzberg", "markdown"),
         default="fallback",
         help="选择解析器（默认 fallback；kreuzberg 已实测对 DOCX 给不出元素结构）",
     )

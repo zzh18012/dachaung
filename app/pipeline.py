@@ -18,6 +18,7 @@ from app.models import Document, ErrorRecord
 from app.parsers import Parser, ParserError
 from app.parsers.fallback_parser import FallbackParser
 from app.parsers.kreuzberg_parser import KreuzbergParser
+from app.parsers.markdown_parser import MarkdownParser
 from app.schema import SchemaValidationError, validate
 
 
@@ -27,7 +28,9 @@ def get_parser(name: str, image_output_dir: Path | str | None = None) -> Parser:
         return FallbackParser(image_output_dir=image_output_dir)
     if name == "kreuzberg":
         return KreuzbergParser()
-    raise ValueError(f"未知 parser: {name}（支持: fallback, kreuzberg）")
+    if name == "markdown":
+        return MarkdownParser()
+    raise ValueError(f"未知 parser: {name}（支持: fallback, kreuzberg, markdown）")
 
 
 def process_single(
