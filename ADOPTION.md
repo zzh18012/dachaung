@@ -102,13 +102,27 @@ holdout manifest（不参与调参）留待 parser 搬运完成后另建。
 
 | manifest | 位置 | 文档数 | manifest sha256 前缀 | 覆盖 |
 |---|---|---|---|---|
-| holdout-md-v1 | samples/private/holdout-md/ | 4 | e08b50ada20f577f（manifest 1.1） | setext 标题+thematic break / 嵌套引用 / 行内格式+转义 / 内嵌 HTML+自动链接 |
-| holdout-html-v1 | samples/private/holdout-html/ | 4 | 5decd9940de62567（manifest 1.1） | blockquote+pre / dl+br / 注释与 script-style 排除（forbidden_markers 首次实际使用）/ thead-tbody-colspan |
+| holdout-md-v1 | samples/private/holdout-md/ | 4 | f637dd28de85bfb2（manifest 1.1） | setext 标题+thematic break / 嵌套引用 / 行内格式+转义 / 内嵌 HTML+自动链接 |
+| holdout-html-v1 | samples/private/holdout-html/ | 4 | 3ceb4f212dc60b3b（manifest 1.1） | blockquote+pre / dl+br / 注释与 script-style 排除（forbidden_markers 首次实际使用）/ thead-tbody-colspan |
 
 注：holdout 冻结后因版本语义 PR 把 manifest_version 升到 1.1（纯版本声明变更，
 内容与 expectations 未动），哈希随之更新为上表值。三份 dev manifest 同步升 1.1：
 devset-md bce257755967e834、devset-html 82b0ec83d13f04f4、
 devset-regressions 8e5ecd3e3e44d756。
+
+**哈希废止声明（2026-08-27，ChatGPT 5.6 Sol 指示补记）**：上表 holdout 哈希为
+最终正式冻结值。历史值按时间序全部废止，不与正式版本并称冻结集：
+- 初版冻结（manifest 1.0）哈希已被版本语义升 1.1 取代；
+- 升 1.1 后的 holdout-md e08b50ada20f577f、holdout-html 5decd9940de62567
+  已在**首次运行之前**经"冻结核对更正"（规格裁决，见下方两段）废止——
+  两份 holdout 的首次正式运行（holdout-md 于候选 bc714f3、holdout-html 于
+  候选 0fec2f8）均使用更正后清单；
+- 正式冻结集唯一：holdout-md f637dd28de85bfb2、holdout-html
+  3ceb4f212dc60b3b。devset 哈希同理以更正段记录的最终值为准
+  （devset-md d41d5e6d54902160、devset-html 3b72b05620d6b9d8、
+  devset-regressions 030f6401af7acf5e）。
+**此后两份 holdout manifest 不得再修改**（新 expectations 争议只能另建新版本
+清单，不得在 v1 上改动）。
 
 **冻结核对更正（2026-08-27，MD 机械搬运时发现，先于任何评测运行）**：
 机械搬运后用搬运版 parser 逐份核对了全部 MD expectations 与文档化规格，
