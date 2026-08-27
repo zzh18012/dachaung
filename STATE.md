@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1837 — md 实体字面、未闭合围栏成块、嵌套 bq 扁平（Round 1837）
+- 动机：锁 R1836（家族分工）后补三边界——md 实体解码与否、未闭合围栏、html 双层引用，均零覆盖
+- 探针：3 组独立 heredoc 探针，断言全部来自实测输出
+- 结论 1：md '&amp;'/'&lt;x&gt;' 整串字面保留——md 家族不解码实体（对比 html 单次解码，家族哲学差异复证）
+- 结论 2：'```py' 无闭合围栏到文件尾仍成 code_block——paragraph 'unclosed' + kind='code_block' + language='py'
+- 结论 3：html 双层 <blockquote> 扁平单层——paragraph 'deep' + kind='blockquote'（与 md 嵌套引用一层化一致）
+- 新增：tests/test_parser_md_entity_unterminated_nestbq.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1836 — 括号有序标记、md 参差表补空、text 不解释井号（Round 1836）
 - 动机：锁 R1835（列 0 语法边界）后补标记/表格/家族分工三点——括号有序标记、md 参差表、text 家族井号行，均零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测输出
@@ -261,6 +271,13 @@
 - 新角度（probe 实证）：float 800.5——限内文档正常合并 'aaa bbb'（仅比较不切片）；一旦需要切分 → chunker_failed TypeError（切片要 int）——失败与否取决于是否触发切分；True/False → ValueError（按 1/0 判过小）；None → TypeError（比较即败）
 - 提交：test(pipeline): add maxchars variant types round (Round 1818)
 
+---
+
+## 回归基线 101412（第 132 次：0 失败；101390 passed + 22 skipped，1088s）
+
+- 命中：预测 101412 = 101390 + 22，实际 101390 + 22 = 101412（第 95 次连续精确命中）
+- 含轮次：R1817–R1827（新增 33 个测试：101357 + 33 = 101390 passed）
+- 下次预测：101442 = 101412 + 30（R1828–R1837 共 10 轮 30 个测试；自跑线特征化测试阶段于此收官，如做最终全量以此为准）
 ---
 
 ## Round 1817 — 物理行号跨家族：html/text/md 空行计数、section_path 同居 locator
