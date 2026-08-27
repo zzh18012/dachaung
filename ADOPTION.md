@@ -736,3 +736,7 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   21c9c5c0920e6d93ee20db2d1ffbbb71fe34464dc10a793e7563942fc848356a，
   仅存 outputs/evaluation-ipynb-holdout-v1-firstrun.json（gitignored，
   不入 git）；此后 holdout 结果只封存不回调算法
+- **合入 main 后复验（2026-08-27）**：main 以 --ff-only 前进到 bee7494
+  （无合并提交）；主 worktree 全套回归 4932 passed；devset-ipynb 复跑
+  5/5 成功（git_commit=bee749446445，git_dirty=False）且报告通过
+  schema 校验；holdout 未重跑（封存纪律）
