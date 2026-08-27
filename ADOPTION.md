@@ -740,3 +740,39 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   （无合并提交）；主 worktree 全套回归 4932 passed；devset-ipynb 复跑
   5/5 成功（git_commit=bee749446445，git_dirty=False）且报告通过
   schema 校验；holdout 未重跑（封存纪律）
+
+## 十六、Stage 6 第一批：ipynb cell 硬边界（2026-08-27）
+
+- **裁决来源**：ChatGPT 5.6 Sol 新对话第一轮（旧对话历史无法重建，换新对话
+  带自包含简报）。首批只做 ipynb cell 硬边界；96b688b 为 parser 阶段关闭点。
+- **盘点结论**：autoline-snapshot fcad055 无 cell 硬边界生产代码/依赖测试
+  （structural.py 与 16 个 chunker 测试文件均无 cell/ipynb 边界逻辑）；本能力
+  为 adoption 原创实现，无机械搬运步骤（契约 §0 记录）。
+- **契约**：docs/chunker-ipynb-cell-contract.md（f8c2949）——九条核心规则、
+  三指标验收（正文覆盖无丢失 / 跨 cell chunk 数=0 / 非 ipynb 基线变化=0，
+  以验收测试与首跑断言执行，不进 evaluator 报告结构）、EVALUATOR_VERSION
+  保持 1.7（GPT 条件句未触发）、Chunk/UDM schema 不变。
+- **受控 push**：用户授权后按 GPT 精确范围执行（fetch → 校验干净/96b688b/
+  祖先/0/37 → push origin main:main → 三引用复核一致）。
+- **chunker 专属 holdout（全新，不复用已曝光 parser holdout）**：
+  samples/private/holdout-chunker-ipynb/，max_chars=200，期望按契约先于实现
+  人工推导（expectations-chunks.json）：
+  - H-CHK-001（6 短 cell，总长<<200）：chunk_count=6，逐 chunk 单 cell、
+    文本逐格对应（钉"相邻短 cell 不合并"）
+  - H-CHK-002（短+600 字符超长 code cell+短）：chunk_count>=5、中段全部
+    cell={1}、每 piece<=200（钉"超长只在 cell 内切分"）
+  - H-CHK-003（单 cell 内 heading 边界 + 相邻 list cell）：chunk_count=3、
+    cell 集 {0},{0},{1}、文本逐条钉死
+  - H-CHK-004（全空 cell）：无 element 无 chunk
+  - 冻结哈希：expectations-chunks.json
+    0275b43efd855ed23530b00daf51da2dc197d29bf9cbc018d2ccd920850d0843；
+    H-CHK-001.ipynb
+    6c879a3e18f520c4d329e02110c109c1888e393272ca15d7bbbf303a30950357；
+    H-CHK-002.ipynb
+    f9c7998eea339babdbd8c45605d1b1cb2a889d3d61c30597c9df433d0a655bf7；
+    H-CHK-003.ipynb
+    1499724f246220028790d091db82efef7e13b5efc5d3a317fac87578b6aa7bd2；
+    H-CHK-004.ipynb
+    92208b0a82e441dc785c260db41753982f07d7ea45ad54092ad8fb1168a3ead6
+- **纪律**：holdout 不进任何对照/预跑；固定干净 SHA 首跑封存；dev 侧断言
+  （单 cell、覆盖、确定性 + 三指标 + 端到端）作为常驻回归测试。
