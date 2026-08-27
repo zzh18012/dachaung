@@ -55,11 +55,18 @@ def test_single_image_whole_line():
         ("image", "img.png", {"alt": "pic"})]
 
 
-def test_attachment_prefix_is_literal_url():
+# adoption 契约 §7 注记（2026-08-27）：attachment: 引用不解析为资源、
+# 不伪造本地路径 → 跳过该 image element + ipynb_attachment_ref_skipped。
+def test_attachment_prefix_ref_skipped():
     doc = _parse(_nb("![pic](attachment:p.png)"))
-    img = doc.elements[0]
-    assert img.type == "image"
-    assert img.resource_path == "attachment:p.png"
+    assert doc.elements == []
+    w = doc.warnings[0]
+    assert w.code == "ipynb_attachment_ref_skipped"
+    assert w.details == {
+        "cell_index": 0,
+        "ref": "attachment:p.png",
+        "alt": "pic",
+    }
 
 
 def test_image_with_text_same_line_not_extracted():

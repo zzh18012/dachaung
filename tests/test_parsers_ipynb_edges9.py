@@ -108,12 +108,16 @@ def test_empty_raw_skipped_not_element():
     assert len(raws) == 1
 
 
+# adoption 契约 §7 注记（2026-08-27）：outputs 非空 → ipynb_outputs_ignored
+# （cell 1 在 4/5/6 之前按 cell 顺序出现）。
 def test_warning_order_matches_cell_order():
     doc = _full()
     idxs = [w.details["cell_index"] for w
             in doc.warnings
             if "cell_index" in (w.details or {})]
-    assert idxs == [4, 5, 6]
+    assert idxs == [1, 4, 5, 6]
+    assert doc.warnings[0].code == "ipynb_outputs_ignored"
+    assert doc.warnings[0].details["count"] == 1
 
 
 # ---------- 未知 cell_type ----------

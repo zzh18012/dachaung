@@ -286,3 +286,88 @@ def test_notebook_metadata_non_dict_treated_empty(tmp_path):
     nb = _nb([_cell("code", "x = 1")], metadata="bad")
     doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
     assert doc.metadata["language"] == ""
+
+
+# ---------- 修正 4：outputs / attachments 忽略诊断 + attachment 引用跳过（契约 §7） ----------
+
+
+def test_outputs_nonempty_warns_with_count(tmp_path):
+    nb = _nb([_cell("code", "x = 1", outputs=[{"output_type": "stream", "text": "out"}])])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    w = doc.warnings[0]
+    assert w.code == "ipynb_outputs_ignored"
+    assert w.details == {"cell_index": 0, "count": 1}
+    assert doc.elements[0].content == "x = 1"
+    assert "out" not in doc.elements[0].content
+
+
+def test_outputs_empty_list_no_warning(tmp_path):
+    nb = _nb([_cell("code", "x = 1", outputs=[])])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert [w.code for w in doc.warnings] == []
+    assert doc.elements[0].content == "x = 1"
+
+
+def test_outputs_non_list_silent(tmp_path):
+    nb = _nb([_cell("code", "x = 1", outputs="junk")])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert [w.code for w in doc.warnings] == []
+
+
+def test_attachments_nonempty_dict_warns_with_count(tmp_path):
+    nb = _nb([_cell("markdown", "txt", attachments={"a.png": {"image/png": "AA"}})])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    w = doc.warnings[0]
+    assert w.code == "ipynb_attachments_ignored"
+    assert w.details == {"cell_index": 0, "count": 1}
+    assert "AA" not in str(doc.elements[0].to_dict())
+
+
+def test_attachments_ignored_not_gated_on_minor(tmp_path):
+    """附件支持已回移 nbformat 4.0：minor=0 同样诊断（契约 §7）。"""
+    nb = _nb([_cell("markdown", "txt", attachments={"a.png": {"image/png": "AA"}})],
+             nbformat_minor=0)
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.warnings[0].code == "ipynb_attachments_ignored"
+
+
+def test_attachments_empty_dict_silent(tmp_path):
+    nb = _nb([_cell("markdown", "txt", attachments={})])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert [w.code for w in doc.warnings] == []
+
+
+def test_execution_count_silent(tmp_path):
+    nb = _nb([_cell("code", "x = 1", execution_count=7)])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert [w.code for w in doc.warnings] == []
+    assert "execution_count" not in str(doc.elements[0].to_dict())
+
+
+def test_attachment_ref_skipped_with_details(tmp_path):
+    nb = _nb([_cell("markdown", "![pic](attachment:p.png)")])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements == []
+    w = doc.warnings[0]
+    assert w.code == "ipynb_attachment_ref_skipped"
+    assert w.details == {
+        "cell_index": 0, "ref": "attachment:p.png", "alt": "pic"}
+
+
+def test_attachment_ref_skipped_keeps_other_elements(tmp_path):
+    nb = _nb([_cell("markdown", "# H\n\ntext\n\n![pic](attachment:p.png)\n\n![ok](real.png)")])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert [(e.type, e.content or e.resource_path) for e in doc.elements] == [
+        ("heading", "H"), ("paragraph", "text"), ("image", "real.png")]
+    assert doc.elements[0].source_locator["cell_index"] == 0
+    assert doc.elements[2].source_locator["line"] == 7
+    skip = [w for w in doc.warnings if w.code == "ipynb_attachment_ref_skipped"]
+    assert len(skip) == 1
+
+
+def test_attachment_ref_empty_alt_in_details(tmp_path):
+    nb = _nb([_cell("markdown", "![](attachment:p.png)")])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    w = doc.warnings[0]
+    assert w.details == {
+        "cell_index": 0, "ref": "attachment:p.png", "alt": ""}

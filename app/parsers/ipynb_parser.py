@@ -168,6 +168,22 @@ class IpynbParser(Parser):
                     details={"cell_index": idx},
                 ))
                 continue
+            # 契约 §7（adoption 修正，2026-08-27）：outputs/attachments 只忽略
+            # 并诊断，不入 elements/metadata；不因 nbformat_minor 门控。
+            outputs = cell.get("outputs")
+            if isinstance(outputs, list) and outputs:
+                warnings.append(WarningRecord(
+                    code="ipynb_outputs_ignored",
+                    reason=f"cell #{idx} 的 outputs 已忽略",
+                    details={"cell_index": idx, "count": len(outputs)},
+                ))
+            attachments = cell.get("attachments")
+            if isinstance(attachments, dict) and attachments:
+                warnings.append(WarningRecord(
+                    code="ipynb_attachments_ignored",
+                    reason=f"cell #{idx} 的 attachments 已忽略",
+                    details={"cell_index": idx, "count": len(attachments)},
+                ))
             ct = cell.get("cell_type") or "unknown"
             text = _cell_source_to_text(cell.get("source"))
             if text is None:
@@ -188,6 +204,23 @@ class IpynbParser(Parser):
                         details={**(w.details or {}), "cell_index": idx},
                     ))
                 for el in sub_elements:
+                    # 契约 §7（adoption 修正，2026-08-27）：attachment: 图片引用
+                    # 无法解析为资源 → 跳过该 image element 并诊断，其余照常。
+                    if (
+                        el.type == "image"
+                        and isinstance(el.resource_path, str)
+                        and el.resource_path.startswith("attachment:")
+                    ):
+                        warnings.append(WarningRecord(
+                            code="ipynb_attachment_ref_skipped",
+                            reason=f"cell #{idx} 的 attachment: 图片引用未解析，已跳过",
+                            details={
+                                "cell_index": idx,
+                                "ref": el.resource_path,
+                                "alt": el.metadata.get("alt", ""),
+                            },
+                        ))
+                        continue
                     loc = dict(el.source_locator)
                     # 在 locator 前置 cell 信息
                     new_loc: dict[str, Any] = {
