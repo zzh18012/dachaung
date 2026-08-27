@@ -60,21 +60,27 @@
 - tests/test_contract_adoption_v1.py（6 测试：旧形状不变/新枚举过/非法拒/locator 必填/span 序列化）
 - 验收：全套旧测试 + 旧 PDF/DOCX manifest 评测重跑与冻结基线对比
 
-### schema_version 版本政策（2026-08-27 定案）
+### schema_version 版本政策（2026-08-27 定案：精确 schema 快照）
 
-`document.schema.json` 的 `schema_version` 保持 `0.1.0`，采用**兼容家族**语义：
+采纳 ChatGPT 5.6 Sol 指示，放弃此前"兼容家族"草案：版本必须对应**精确契约**，
+避免"版本相同却无法互相验证"。版本映射：
 
-- 0.1.0 家族 = additive-only 演进：只增可选字段 / 可选枚举值 / 新 if-then 分支；
-  不改必填集合、不删字段、不收紧已有约束、不改变旧类型（pdf/docx）的输出形状
-- 消费者规则：家族内必须用**最新** schema 校验（旧 schema 文件可能因
-  additionalProperties 严格而误拒新增可选键）；不得按版本字符串假设精确快照
-- 任何非 additive 变更（改必填 / 删字段 / 收紧枚举 / 旧类型形状变化）→
-  升 `0.2.0` 并走独立契约迁移 PR + 旧格式评测对照
-- 执行保障：`tests/test_contract_adoption_v1.py` 的旧形状不变测试在每个
-  触达 models/schema 的 PR 上必须保持绿色
+| 契约 | 旧版本 | 新版本 | 语义分界 |
+|---|---|---|---|
+| 统一文档 schema | 0.1.0 | 0.2.0 | 0.1.0 仅旧 PDF/DOCX 形状且无 source_spans；0.2.0 才有新 SourceType/locator 分支/spans |
+| manifest | 1.0 | 1.1 | 1.0 仅旧格式与旧 expectation 键；1.1 才允许 markdown/html/text/ipynb 与新键 |
+| report | 1.1 | 1.2 | 1.1 保持旧结构；含 expectation_checks / per-doc check 键必须标 1.2 |
+| evaluator | — | 1.2 | provenance 可追踪 |
 
-理由：0.x 阶段唯一消费者是本仓 pipeline 与评测模块，精确快照式逐次 bump
-只产生版本噪声；待首个外部消费者出现（1.0 起）再收紧为精确快照。
+实现要点：
+- `Document.effective_schema_version()`：source_type 属新四类或任一 chunk 带
+  source_spans → 0.2.0；否则 0.1.0。旧 PDF/DOCX 输出继续生成 0.1.0，
+  与冻结基线字节一致
+- 三张 schema 均为版本条件分支（allOf/if/then），而非不断扩展却声称旧版本
+- 测试矩阵（tests/test_version_semantics.py）：1.0+新键失败 / 1.0+markdown
+  失败 / 同内容 1.1 通过 / report 1.1+新分节失败 / UDM 0.1.0+markdown 或
+  spans 失败、0.2.0 通过 / 冻结旧 manifest、旧结构报告、旧 PDF/DOCX 输出继续通过
+- 任何再次扩展契约 → 新版本号 + 独立契约 PR，不得在旧版本号下加键
 
 ## 五、评测 manifest 起草（2026-08-27 完成）
 
@@ -96,8 +102,13 @@ holdout manifest（不参与调参）留待 parser 搬运完成后另建。
 
 | manifest | 位置 | 文档数 | manifest sha256 前缀 | 覆盖 |
 |---|---|---|---|---|
-| holdout-md-v1 | samples/private/holdout-md/ | 4 | f274bb076c5542a0 | setext 标题+thematic break / 嵌套引用 / 行内格式+转义 / 内嵌 HTML+自动链接 |
-| holdout-html-v1 | samples/private/holdout-html/ | 4 | 74e1631be285aff1 | blockquote+pre / dl+br / 注释与 script-style 排除（forbidden_markers 首次实际使用）/ thead-tbody-colspan |
+| holdout-md-v1 | samples/private/holdout-md/ | 4 | e08b50ada20f577f（manifest 1.1） | setext 标题+thematic break / 嵌套引用 / 行内格式+转义 / 内嵌 HTML+自动链接 |
+| holdout-html-v1 | samples/private/holdout-html/ | 4 | 5decd9940de62567（manifest 1.1） | blockquote+pre / dl+br / 注释与 script-style 排除（forbidden_markers 首次实际使用）/ thead-tbody-colspan |
+
+注：holdout 冻结后因版本语义 PR 把 manifest_version 升到 1.1（纯版本声明变更，
+内容与 expectations 未动），哈希随之更新为上表值。三份 dev manifest 同步升 1.1：
+devset-md bce257755967e834、devset-html 82b0ec83d13f04f4、
+devset-regressions 8e5ecd3e3e44d756。
 
 规则：
 - expectations 全部按规格人工给定（与 devset 同纪律，非 golden）
@@ -125,6 +136,15 @@ holdout manifest（不参与调参）留待 parser 搬运完成后另建。
 - 验收：全套测试 191 passed；旧 PDF/DOCX manifest 重跑与冻结基线
   既有指标零差异（新增键纯 additive；旧 manifest 的 required_markers 首次求值即通过）；
   新旧报告均通过扩展后 evaluation-report Schema 校验
+
+### 版本语义 PR（2026-08-27，接 ChatGPT 5.6 Sol 修正）
+
+Runner PR 后追加（不重写 f85bddd 历史）：按"精确 schema 快照"修正版本语义，
+UDM manifest_version enum+条件分支、manifest 1.0/1.1 快照、report 1.1 禁新分节、
+Document.to_dict 动态选版本、五份新 manifest 升 1.1。
+验收：206 tests passed；旧 manifest 重跑既有指标与冻结基线零差异；
+冻结 1.1 报告与新 1.2 报告均通过校验；真实 fallback pipeline 的
+PDF/DOCX 输出仍为 0.1.0 且通过校验。
 
 ## 六、缺陷登记（评测期只登记不修）
 

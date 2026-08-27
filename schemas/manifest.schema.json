@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kvfs.local/schemas/manifest.schema.json",
-  "title": "Evaluation Manifest v1.0",
-  "description": "开发集清单。所有 path 必须是相对项目根目录的正斜杠相对路径，禁止绝对路径与反斜杠。",
+  "title": "Evaluation Manifest v1.0/v1.1（精确快照）",
+  "description": "开发集清单。所有 path 必须是相对项目根目录的正斜杠相对路径，禁止绝对路径与反斜杠。manifest_version 为精确快照：1.0 只允许旧格式（pdf/docx）与旧 expectation 键；1.1 才允许 markdown/html/text/ipynb 与新增键。",
   "type": "object",
   "required": ["manifest_version", "devset_status", "documents"],
   "additionalProperties": false,
   "properties": {
-    "manifest_version": { "type": "string", "const": "1.0" },
+    "manifest_version": { "enum": ["1.0", "1.1"] },
     "devset_status": { "enum": ["complete", "incomplete"] },
     "documents": {
       "type": "array",
@@ -18,6 +18,40 @@
       "items": { "$ref": "#/$defs/expected_failure" }
     }
   },
+  "allOf": [
+    {
+      "$comment": "1.0 精确快照：documents 只允许 pdf/docx，expectations 只允许旧两键。",
+      "if": {
+        "properties": { "manifest_version": { "const": "1.0" } },
+        "required": ["manifest_version"]
+      },
+      "then": {
+        "properties": {
+          "documents": {
+            "items": {
+              "properties": {
+                "source_type": { "enum": ["pdf", "docx"] },
+                "expectations": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "element_count_by_type": {
+                      "type": "object",
+                      "additionalProperties": { "type": "integer", "minimum": 0 }
+                    },
+                    "required_markers": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "document": {
       "type": "object",

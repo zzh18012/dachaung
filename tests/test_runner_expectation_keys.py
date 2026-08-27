@@ -38,7 +38,7 @@ def _el(i: int, type_: str, content: str) -> dict:
 
 def _doc(elements: list[dict]) -> dict:
     return {
-        "schema_version": "0.1.0",
+        "schema_version": "0.2.0",
         "document_id": "doc-test",
         "source_path": "samples/private/x.md",
         "source_type": "markdown",
@@ -214,10 +214,15 @@ def test_max_silent_drop_absent_key_is_null():
 
 # ---------- manifest 严格校验 ----------
 
-def _write_manifest(tmp_path: Path, expectations: dict, source_type: str = "markdown") -> Path:
+def _write_manifest(
+    tmp_path: Path,
+    expectations: dict,
+    source_type: str = "markdown",
+    version: str = "1.1",
+) -> Path:
     (tmp_path / "doc.md").write_text("# x\n", encoding="utf-8")
     data = {
-        "manifest_version": "1.0",
+        "manifest_version": version,
         "devset_status": "incomplete",
         "documents": [
             {
@@ -315,6 +320,21 @@ def test_summary_expectation_checks_aggregation():
 # ---------- 报告 schema 兼容 ----------
 
 def _report(report_version: str) -> dict:
+    is_old = report_version == "1.1"
+    summary: dict = {
+        "counts": {},
+        "success_rates": {},
+        "ratio_macro_averages": {},
+        "silent_drop_total": None,
+    }
+    if not is_old:
+        summary["expectation_checks"] = {
+            "required_markers_check": {
+                "evaluated_docs": 1,
+                "passed_docs": 1,
+                "failed_docs": 0,
+            }
+        }
     return {
         "report_version": report_version,
         "provenance": {
@@ -333,26 +353,14 @@ def _report(report_version: str) -> dict:
             "file_count": 1,
             "content_group_count": 1,
             "pdf_count": 0,
-            "docx_count": 0,
+            "docx_count": 0 if not is_old else 1,
             "categories_covered": ["x"],
         },
-        "summary": {
-            "counts": {},
-            "success_rates": {},
-            "ratio_macro_averages": {},
-            "silent_drop_total": None,
-            "expectation_checks": {
-                "required_markers_check": {
-                    "evaluated_docs": 1,
-                    "passed_docs": 1,
-                    "failed_docs": 0,
-                }
-            },
-        },
+        "summary": summary,
         "per_doc": [
             {
                 "doc_id": "D1",
-                "source_type": "markdown",
+                "source_type": "docx" if is_old else "markdown",
                 "metrics": {},
                 "wall_time_seconds": {
                     "total": 0.1,
@@ -369,6 +377,28 @@ def _report(report_version: str) -> dict:
 def test_report_schema_accepts_v11_and_v12():
     validate(_report("1.1"), "evaluation-report.schema.json")
     validate(_report("1.2"), "evaluation-report.schema.json")
+
+
+def test_report_v11_rejects_new_sections():
+    # 精确快照：1.1 报告不得包含 expectation_checks
+    r = _report("1.1")
+    r["summary"]["expectation_checks"] = {
+        "required_markers_check": {
+            "evaluated_docs": 0,
+            "passed_docs": 0,
+            "failed_docs": 0,
+        }
+    }
+    with pytest.raises(EvalSchemaError):
+        validate(r, "evaluation-report.schema.json")
+    # 1.1 报告的 per_doc 也不得含 check 键
+    r2 = _report("1.1")
+    r2["per_doc"][0]["metrics"]["required_markers_check"] = {
+        "value": None,
+        "reason": "no_expectation_key:required_markers",
+    }
+    with pytest.raises(EvalSchemaError):
+        validate(r2, "evaluation-report.schema.json")
 
 
 def test_report_schema_rejects_unknown_version():

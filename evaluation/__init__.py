@@ -16,15 +16,19 @@
 - v1.2（当前）：expectation 契约可执行——runner 实际消费
   required_markers（自 schema 起声明但此前从未求值）并新增
   forbidden_markers / must_not_error_codes / max_silent_drop_count；
-  summary 新增 expectation_checks 分节；manifest/report schema 的
-  source_type 枚举扩至 markdown/html/text/ipynb（additive）。
-  旧 manifest（1.0）与旧报告（1.1）在扩展后 schema 下仍然有效。
+  summary 新增 expectation_checks 分节。版本语义为精确快照：
+  manifest 1.1 才允许新格式（markdown/html/text/ipynb）与新 expectation 键，
+  1.0 清单继续按旧契约校验；报告含新分节必须标 report_version 1.2，
+  1.1 报告保持旧结构。UDM 侧 document.schema_version 同步改为
+  0.1.0（旧形状）/ 0.2.0（新类型或 source_spans）精确快照，
+  旧 PDF/DOCX 输出继续生成 0.1.0，与冻结基线字节一致。
 """
 
 EVALUATOR_VERSION = "1.2"
 REPORT_VERSION = "1.2"
 ANNOTATION_VERSION = "1.0"
-MANIFEST_VERSION = "1.0"
+MANIFEST_VERSION = "1.1"
+MANIFEST_VERSIONS_SUPPORTED = ("1.0", "1.1")
 
 __all__ = [
     "EVALUATOR_VERSION",

@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from evaluation import MANIFEST_VERSION
+from evaluation import MANIFEST_VERSIONS_SUPPORTED
 from evaluation.schema import validate
 
 
@@ -165,10 +165,10 @@ def load_manifest(
     # Schema 校验（不通过则抛 EvalSchemaError，调用方决定怎么处理）
     validate(data, "manifest.schema.json")
 
-    if data.get("manifest_version") != MANIFEST_VERSION:
+    if data.get("manifest_version") not in MANIFEST_VERSIONS_SUPPORTED:
         raise ManifestError(
             f"manifest_version 不兼容：清单={data.get('manifest_version')}，"
-            f"代码={MANIFEST_VERSION}"
+            f"支持={MANIFEST_VERSIONS_SUPPORTED}"
         )
 
     documents: list[DocumentEntry] = []

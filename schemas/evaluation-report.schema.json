@@ -1,10 +1,40 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kvfs.local/schemas/evaluation-report.schema.json",
-  "title": "Evaluation Report v1.1/v1.2",
+  "title": "Evaluation Report v1.1/v1.2（精确快照）",
   "type": "object",
   "required": ["report_version", "provenance", "devset", "summary", "per_doc"],
   "additionalProperties": false,
+  "allOf": [
+    {
+      "$comment": "1.1 精确快照：不得包含 expectation_checks 分节与 per-doc 的四个 check 键。",
+      "if": {
+        "properties": { "report_version": { "const": "1.1" } },
+        "required": ["report_version"]
+      },
+      "then": {
+        "properties": {
+          "summary": { "not": { "required": ["expectation_checks"] } },
+          "per_doc": {
+            "items": {
+              "properties": {
+                "metrics": {
+                  "not": {
+                    "anyOf": [
+                      { "required": ["required_markers_check"] },
+                      { "required": ["forbidden_markers_check"] },
+                      { "required": ["must_not_error_codes_check"] },
+                      { "required": ["max_silent_drop_check"] }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "properties": {
     "report_version": { "type": "string", "enum": ["1.1", "1.2"] },
     "provenance": { "$ref": "#/$defs/provenance" },

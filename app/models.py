@@ -10,11 +10,15 @@ from dataclasses import dataclass, field, asdict
 from typing import Any, Literal, Optional
 
 SCHEMA_VERSION = "0.1.0"
+SCHEMA_VERSION_EXTENDED = "0.2.0"
 
 ElementType = Literal[
     "heading", "paragraph", "list_item", "table", "image", "caption", "header", "footer"
 ]
 SourceType = Literal["pdf", "docx", "markdown", "html", "text", "ipynb"]
+
+# 0.2.0 快照才允许的来源类型；出现任一（或 chunk 带 source_spans）→ 输出 0.2.0
+_EXTENDED_SOURCE_TYPES = frozenset({"markdown", "html", "text", "ipynb"})
 
 
 @dataclass
@@ -140,9 +144,21 @@ class Document:
     errors: list[ErrorRecord] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    def effective_schema_version(self) -> str:
+        """精确快照版本：旧 PDF/DOCX 且不带 span → 0.1.0；否则 0.2.0。
+
+        保证旧 pipeline 输出与冻结基线字节一致（0.1.0），
+        新格式/新字段只出现在 0.2.0 快照里，版本即契约。
+        """
+        if self.source_type in _EXTENDED_SOURCE_TYPES:
+            return SCHEMA_VERSION_EXTENDED
+        if any(c.source_spans for c in self.chunks):
+            return SCHEMA_VERSION_EXTENDED
+        return SCHEMA_VERSION
+
     def to_dict(self) -> dict[str, Any]:
         return {
-            "schema_version": SCHEMA_VERSION,
+            "schema_version": self.effective_schema_version(),
             "document_id": self.document_id,
             "source_path": self.source_path,
             "source_type": self.source_type,
