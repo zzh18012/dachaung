@@ -693,3 +693,35 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   regression）→ 独立契约修正提交（版本字段 / source / language / 忽略
   诊断四项）→ 注册启用（1.7 + auto 映射）
 - 主仓 samples/private 副本同步
+
+### 十五-4、三段式执行记录（2026-08-27）
+
+- **机械搬运（faab6db）**：IpynbParser + 16 个测试文件原样入库（不注册），
+  1053/1055 直测通过（2 个 pipeline/CLI 测试按契约 §12 切分表裁切）；
+  两仓 dev 语料对照零内容差异（仅预登记的 schema_version 快照分歧）
+- **契约修正 1（20dd9b6，§2）**：版本字段整数校验（bool 拒绝）+
+  nbformat==4 精确范围；9 个 fixture helper 补缺省版本字段、25 个版本
+  钉住测试改写、10 个契约测试
+- **契约修正 2（e396cf4，§5/§8）**：source verify-then-join（非 str /
+  含非 str 项 → 跳过 cell + ipynb_bad_cell，details 记 cell_index+field）；
+  code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1；
+  约 100 个原快照测试改写 + 10 个契约测试
+- **契约修正 3（086c35f，§6）**：语言链 ks.language → language_info.name
+  → 空串；kernelspec.name 不再参与；非 dict / 非 str 一律视作缺失不
+  崩溃；26 个测试改写 + 10 个契约测试
+- **契约修正 4（2edb166，§7）**：outputs/attachments 非空各发一条忽略
+  诊断（details 记数量，不因 minor 门控）；attachment: 图片引用跳过 +
+  ipynb_attachment_ref_skipped（details 记 cell_index/ref/alt）；2 个
+  测试改写 + 10 个契约测试
+- **注册启用（5c4fa93）**：pipeline/app.cli/evaluation.cli choices 补
+  ipynb；AUTO_PARSER_BY_SOURCE_TYPE 补 ipynb→ipynb；EVALUATOR_VERSION
+  1.6→1.7（能力封口；报告结构未变，report_version 保持 1.3）；裁切的
+  2 个测试原样搬回；test_parser_auto.py 按 v1.7 改写
+- **全套回归**：4932 passed（注册后口径）
+- **ipynb-dev 验收（SHA 5c4fa93，git_dirty=False）**：9 输入 = 5 成功 +
+  4 ef 精确匹配 + 0 意外失败；5 成功文档 element_count_by_type 与冻结
+  expectations 逐项一致（含 silent_drop_count=0）；required_markers
+  5/5 通过；全部 schema_valid=true、text_preservation_equal=true
+  （口径为 cell source 抽取，非 OCR 全文）；报告通过 evaluation-report
+  schema 校验（validate-report）；两次运行除 run_timestamp_iso 外
+  逐字段一致（确定性成立）；原始报告 JSON 仅存 outputs/（gitignored）
