@@ -68,70 +68,68 @@ def _minimal_nb(cells: list[dict], **extra: Any) -> dict:
 # =========================================================================
 
 
-def test_cell_source_bool_returns_empty():
+def test_cell_source_bool_returns_none():
     """bool 不是 str/list → ''。"""
-    assert _cell_source_to_text(True) == ""
+    assert _cell_source_to_text(True) is None
 
 
-def test_cell_source_int_returns_empty():
-    assert _cell_source_to_text(42) == ""
+def test_cell_source_int_returns_none():
+    assert _cell_source_to_text(42) is None
 
 
-def test_cell_source_float_returns_empty():
-    assert _cell_source_to_text(3.14) == ""
+def test_cell_source_float_returns_none():
+    assert _cell_source_to_text(3.14) is None
 
 
-def test_cell_source_none_returns_empty():
-    assert _cell_source_to_text(None) == ""
+def test_cell_source_none_returns_none():
+    assert _cell_source_to_text(None) is None
 
 
-def test_cell_source_bytes_returns_empty():
+def test_cell_source_bytes_returns_none():
     """bytes 不是 str（Python 3 strict）→ ''。"""
-    assert _cell_source_to_text(b"hello") == ""
+    assert _cell_source_to_text(b"hello") is None
 
 
-def test_cell_source_dict_returns_empty():
-    assert _cell_source_to_text({"k": "v"}) == ""
+def test_cell_source_dict_returns_none():
+    assert _cell_source_to_text({"k": "v"}) is None
 
 
-def test_cell_source_tuple_returns_empty():
+def test_cell_source_tuple_returns_none():
     """tuple 不是 list → ''。"""
-    assert _cell_source_to_text(("a", "b")) == ""
+    assert _cell_source_to_text(("a", "b")) is None
 
 
-def test_cell_source_set_returns_empty():
-    assert _cell_source_to_text({"a", "b"}) == ""
+def test_cell_source_set_returns_none():
+    assert _cell_source_to_text({"a", "b"}) is None
 
 
 def test_cell_source_list_of_ints_joined_as_str():
     """list[int] → join str(each)。"""
-    assert _cell_source_to_text([1, 2, 3]) == "123"
+    assert _cell_source_to_text([1, 2, 3]) is None
 
 
 def test_cell_source_list_of_floats_joined():
-    assert _cell_source_to_text([1.5, 2.5]) == "1.52.5"
+    assert _cell_source_to_text([1.5, 2.5]) is None
 
 
 def test_cell_source_list_of_bools_joined():
-    assert _cell_source_to_text([True, False]) == "TrueFalse"
+    assert _cell_source_to_text([True, False]) is None
 
 
 def test_cell_source_list_of_none_joined():
     """None 在 list 内 → str(None) = 'None'。"""
-    assert _cell_source_to_text([None, None]) == "NoneNone"
+    assert _cell_source_to_text([None, None]) is None
 
 
+# adoption 契约 §5 注记（2026-08-27）：list 须全为 str 才拼接，含非 str 项 → None。
 def test_cell_source_list_of_dicts_joined():
-    """dict 在 list 内 → str(dict)。"""
-    out = _cell_source_to_text([{"a": 1}])
-    assert "a" in out and "1" in out
+    """list 内含 dict → None（不做 str() 强转）。"""
+    assert _cell_source_to_text([{"a": 1}]) is None
 
 
 def test_cell_source_list_nested():
-    """nested list → str(repr)。"""
-    out = _cell_source_to_text([["nested"]])
-    # join str(["nested"]) = "['nested']"
-    assert "nested" in out
+    """nested list → None（不做 str() 强转）。"""
+    assert _cell_source_to_text([["nested"]]) is None
 
 
 def test_cell_source_empty_str_returns_empty():
@@ -292,14 +290,18 @@ def test_ipynb_extensions_count_one():
 # =========================================================================
 
 
+# adoption 契约 §5 注记（2026-08-27）：source 非法（含 None）→ 跳过 cell + ipynb_bad_cell。
 def test_parse_code_cell_source_null_skipped_with_warning(tmp_path: Path):
-    """code cell source=null → 空 text → 触发 empty_code_cell warning。"""
+    """code cell source=null → 跳过 cell + ipynb_bad_cell warning。"""
     nb = _minimal_nb([{"cell_type": "code", "source": None, "metadata": {}}])
     p = _write_nb(tmp_path, nb)
     parser = IpynbParser()
     doc = parser.parse(p, source_hash=SHA)
     codes = [w.code for w in doc.warnings]
-    assert "ipynb_empty_code_cell" in codes
+    assert codes == ["ipynb_bad_cell",
+                     "ipynb_no_content"]
+    w = doc.warnings[0]
+    assert w.details == {"cell_index": 0, "field": "source"}
     assert doc.elements == []
 
 
@@ -480,22 +482,25 @@ def test_parse_unknown_cell_type_warning_has_details(tmp_path: Path):
             assert w.details.get("cell_index") == 0
 
 
-def test_parse_code_cell_text_stripped_in_output(tmp_path: Path):
+def test_parse_code_cell_text_preserved_in_output(tmp_path: Path):
     nb = _minimal_nb(
         [{"cell_type": "code", "source": "  print('hi')  \n", "metadata": {}}]
     )
     p = _write_nb(tmp_path, nb)
     parser = IpynbParser()
     doc = parser.parse(p, source_hash=SHA)
-    assert doc.elements[0].content == "print('hi')"
+    assert doc.elements[0].content == "  print('hi')  \n"
 
 
-def test_parse_raw_cell_text_stripped(tmp_path: Path):
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_parse_raw_cell_text_preserved(tmp_path: Path):
     nb = _minimal_nb([{"cell_type": "raw", "source": "  hello  ", "metadata": {}}])
     p = _write_nb(tmp_path, nb)
     parser = IpynbParser()
     doc = parser.parse(p, source_hash=SHA)
-    assert doc.elements[0].content == "hello"
+    assert doc.elements[0].content == '  hello  '
 
 
 def test_parse_code_cell_metadata_has_kind_code_cell(tmp_path: Path):

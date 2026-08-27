@@ -128,6 +128,7 @@ def test_cell_id_ignored(tmp_path):
         0].source_locator == {
         "cell_index": 0,
         "cell_type": "code",
+        "line": 1,
     }
     assert "abc-123" not in str(
         doc.elements[0].to_dict())

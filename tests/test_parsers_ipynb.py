@@ -131,7 +131,7 @@ def test_ipynb_locator_code_cell_basic(tmp_path: Path):
     assert code.source_locator["cell_index"] == 0
     assert code.source_locator["cell_type"] == "code"
     # code cell 没有 line / section_path
-    assert "line" not in code.source_locator
+    assert code.source_locator["line"] == 1
     assert "section_path" not in code.source_locator
 
 
@@ -333,16 +333,16 @@ def test_cell_source_to_text_empty_list_returns_empty():
     assert _cell_source_to_text([]) == ""
 
 
-def test_cell_source_to_text_none_returns_empty():
+def test_cell_source_to_text_none_returns_none():
     from app.parsers.ipynb_parser import _cell_source_to_text
-    assert _cell_source_to_text(None) == ""
+    assert _cell_source_to_text(None) is None
 
 
-def test_cell_source_to_text_int_returns_empty():
+def test_cell_source_to_text_int_returns_none():
     """非 str/list 类型 → 空字符串。"""
     from app.parsers.ipynb_parser import _cell_source_to_text
-    assert _cell_source_to_text(42) == ""
-    assert _cell_source_to_text(3.14) == ""
+    assert _cell_source_to_text(42) is None
+    assert _cell_source_to_text(3.14) is None
 
 
 def test_cell_source_to_text_list_with_non_string_items():
@@ -581,26 +581,30 @@ def test_ipynb_parser_empty_raw_cell_skipped_silently(tmp_path: Path):
     assert "ipynb_no_content" in codes
 
 
-def test_ipynb_parser_strip_whitespace_for_code_cell(tmp_path: Path):
-    """code cell 的内容首尾空白被 strip。"""
+# adoption 契约 §5/§8 注记（2026-08-27）：code/raw 正文保留原始缩进换行（strip 仅判空）。
+def test_ipynb_parser_preserve_whitespace_for_code_cell(tmp_path: Path):
+    """code cell 的正文保留原始首尾空白（strip 仅用于判空）。"""
     nb = _nb([
         {"cell_type": "code", "source": "\n\n   print('hi')   \n\n", "metadata": {}},
     ])
     p = _write_nb(tmp_path, "ws.ipynb", nb)
     doc = IpynbParser().parse(p, source_hash="a" * 64)
     code = [e for e in doc.elements if e.metadata.get("kind") == "code_cell"][0]
-    assert code.content == "print('hi')"
+    assert code.content == "\n\n   print('hi')   \n\n"
 
 
-def test_ipynb_parser_strip_whitespace_for_raw_cell(tmp_path: Path):
-    """raw cell 的内容首尾空白被 strip。"""
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_ipynb_parser_preserve_whitespace_for_raw_cell(tmp_path: Path):
+    """raw cell 的正文保留原始首尾空白（strip 仅用于判空）。"""
     nb = _nb([
         {"cell_type": "raw", "source": "  raw text  ", "metadata": {}},
     ])
     p = _write_nb(tmp_path, "raw2.ipynb", nb)
     doc = IpynbParser().parse(p, source_hash="a" * 64)
     raw = [e for e in doc.elements if e.metadata.get("kind") == "raw_cell"][0]
-    assert raw.content == "raw text"
+    assert raw.content == "  raw text  "
 
 
 def test_ipynb_parser_default_cell_type_when_missing(tmp_path: Path):

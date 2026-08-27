@@ -42,13 +42,19 @@ def _detect_ipynb_source_type(path: Path) -> str:
     )
 
 
-def _cell_source_to_text(source: Any) -> str:
-    """nbformat 的 cell.source 可能是 list[str] 或 str，归一为单字符串。"""
+def _cell_source_to_text(source: Any) -> str | None:
+    """契约 §5（adoption 修正，2026-08-27）：source 归一。
+
+    str 原样返回；list 须全部项为 str 才 ''.join（禁止 str() 把
+    数字/对象/null 转成正文）；其余（缺失、非 str/list、列表含非
+    字符串项）返回 None 表示非法，由调用方跳过该 cell 并发
+    ipynb_bad_cell。
+    """
     if isinstance(source, str):
         return source
-    if isinstance(source, list):
-        return "".join(str(s) for s in source)
-    return ""
+    if isinstance(source, list) and all(isinstance(s, str) for s in source):
+        return "".join(source)
+    return None
 
 
 def _extract_kernel_language(metadata: dict[str, Any]) -> str:
@@ -150,6 +156,15 @@ class IpynbParser(Parser):
                 continue
             ct = cell.get("cell_type") or "unknown"
             text = _cell_source_to_text(cell.get("source"))
+            if text is None:
+                # 契约 §5（adoption 修正，2026-08-27）：source 缺失/非 str/list/
+                # 列表含非字符串项 → 跳过该 cell + ipynb_bad_cell（注明字段）。
+                warnings.append(WarningRecord(
+                    code="ipynb_bad_cell",
+                    reason=f"cell #{idx} 的 source 字段非法，已跳过",
+                    details={"cell_index": idx, "field": "source"},
+                ))
+                continue
             if ct == "markdown":
                 sub_elements, sub_warnings = md_parser._parse_text(text, document_id)
                 for w in sub_warnings:
@@ -178,11 +193,13 @@ class IpynbParser(Parser):
                         details={"cell_index": idx},
                     ))
                     continue
+                # 契约 §5（adoption 修正，2026-08-27）：strip() 仅用于判空，
+                # 正文保留原始缩进与换行；locator 含 line=1（契约 §8）。
                 raw_elements.append((
                     "paragraph",
-                    text.strip(),
+                    text,
                     None,
-                    {"cell_index": idx, "cell_type": "code"},
+                    {"cell_index": idx, "cell_type": "code", "line": 1},
                     {"kind": "code_cell", "language": language},
                 ))
             elif ct == "raw":
@@ -190,9 +207,9 @@ class IpynbParser(Parser):
                     continue
                 raw_elements.append((
                     "paragraph",
-                    text.strip(),
+                    text,
                     None,
-                    {"cell_index": idx, "cell_type": "raw"},
+                    {"cell_index": idx, "cell_type": "raw", "line": 1},
                     {"kind": "raw_cell"},
                 ))
             else:

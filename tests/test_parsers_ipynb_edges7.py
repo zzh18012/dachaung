@@ -126,20 +126,20 @@ def test_cell_source_to_text_empty_list():
 
 def test_cell_source_to_text_list_with_non_str_elements():
     """list 中含 int 等 → 转 str。"""
-    assert _cell_source_to_text(["a", 1, "b"]) == "a1b"
+    assert _cell_source_to_text(["a", 1, "b"]) is None
 
 
-def test_cell_source_to_text_none_returns_empty():
-    assert _cell_source_to_text(None) == ""
+def test_cell_source_to_text_none_returns_none():
+    assert _cell_source_to_text(None) is None
 
 
-def test_cell_source_to_text_int_returns_empty():
+def test_cell_source_to_text_int_returns_none():
     """非 str/list → 返回空。"""
-    assert _cell_source_to_text(42) == ""
+    assert _cell_source_to_text(42) is None
 
 
-def test_cell_source_to_text_dict_returns_empty():
-    assert _cell_source_to_text({"k": "v"}) == ""
+def test_cell_source_to_text_dict_returns_none():
+    assert _cell_source_to_text({"k": "v"}) is None
 
 
 def test_cell_source_to_text_list_returns_str():
@@ -519,12 +519,12 @@ def test_parse_code_cell_locator(tmp_path: Path):
     assert loc["cell_type"] == "code"
 
 
-def test_parse_code_cell_content_stripped(tmp_path: Path):
+def test_parse_code_cell_content_preserved(tmp_path: Path):
     cells = [{"cell_type": "code", "source": "  print(1)\n\n"}]
     p = _write_nb(tmp_path, _make_notebook(cells))
     parser = IpynbParser()
     doc = parser.parse(p, "a" * 64)
-    assert doc.elements[0].content == "print(1)"
+    assert doc.elements[0].content == '  print(1)\n\n'
 
 
 def test_parse_code_cell_empty_emits_warning(tmp_path: Path):
@@ -599,12 +599,15 @@ def test_parse_raw_cell_basic(tmp_path: Path):
     assert doc.elements[0].metadata["kind"] == "raw_cell"
 
 
-def test_parse_raw_cell_content_stripped(tmp_path: Path):
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_parse_raw_cell_content_preserved(tmp_path: Path):
     cells = [{"cell_type": "raw", "source": "  raw text  \n"}]
     p = _write_nb(tmp_path, _make_notebook(cells))
     parser = IpynbParser()
     doc = parser.parse(p, "a" * 64)
-    assert doc.elements[0].content == "raw text"
+    assert doc.elements[0].content == '  raw text  \n'
 
 
 def test_parse_raw_cell_empty_skipped_no_warning(tmp_path: Path):

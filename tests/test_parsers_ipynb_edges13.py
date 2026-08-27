@@ -140,13 +140,16 @@ def test_metadata_not_dict_crashes(
 
 # ---------- raw cell strip ----------
 
-def test_raw_cell_stripped(tmp_path):
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_raw_cell_preserved(tmp_path):
     doc = _parse(tmp_path, _nb([
         {"cell_type": "raw",
          "source": "  raw txt "},
     ]))
     assert [e.content
             for e in doc.elements] == \
-        ["raw txt"]
+        ["  raw txt "]
     assert doc.elements[
         0].metadata["kind"] == "raw_cell"

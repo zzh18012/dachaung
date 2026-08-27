@@ -49,16 +49,16 @@ def _nb(cells, metadata=None, **extra):
 
 # ---------- source 归一 ----------
 
+# adoption 契约 §5 注记（2026-08-27）：source 非法（list 含非 str 项）→ 跳过 cell + ipynb_bad_cell。
 def test_source_list_coercion(
         tmp_path):
     doc = _parse(tmp_path, _nb([
         {"cell_type": "code",
          "source": [1, "a", None, 2.5]},
     ]))
-    assert doc.elements[
-        0].content == "1aNone2.5"
-    assert doc.elements[
-        0].metadata["kind"] == "code_cell"
+    assert doc.elements == []
+    assert [w.code for w in doc.warnings] == [
+        "ipynb_bad_cell", "ipynb_no_content"]
 
 
 def test_source_missing_empty_warn(
@@ -68,7 +68,7 @@ def test_source_missing_empty_warn(
     ]))
     assert doc.elements == []
     assert [w.code for w in doc.warnings] \
-        == ["ipynb_empty_code_cell",
+        == ["ipynb_bad_cell",
             "ipynb_no_content"]
 
 

@@ -156,45 +156,43 @@ def test_cell_source_to_text_empty_list_returns_empty():
     assert _cell_source_to_text([]) == ""
 
 
-def test_cell_source_to_text_none_returns_empty():
-    assert _cell_source_to_text(None) == ""
+def test_cell_source_to_text_none_returns_none():
+    assert _cell_source_to_text(None) is None
 
 
-def test_cell_source_to_text_int_returns_empty():
+def test_cell_source_to_text_int_returns_none():
     """int 不是 str/list → 返 ""。"""
-    assert _cell_source_to_text(42) == ""
+    assert _cell_source_to_text(42) is None
 
 
-def test_cell_source_to_text_float_returns_empty():
-    assert _cell_source_to_text(3.14) == ""
+def test_cell_source_to_text_float_returns_none():
+    assert _cell_source_to_text(3.14) is None
 
 
-def test_cell_source_to_text_bool_returns_empty():
+def test_cell_source_to_text_bool_returns_none():
     """bool 不是 str/list（虽然 bool 是 int 子类）→ 返 ""。"""
-    assert _cell_source_to_text(True) == ""
-    assert _cell_source_to_text(False) == ""
+    assert _cell_source_to_text(True) is None
+    assert _cell_source_to_text(False) is None
 
 
-def test_cell_source_to_text_dict_returns_empty():
-    assert _cell_source_to_text({"k": "v"}) == ""
+def test_cell_source_to_text_dict_returns_none():
+    assert _cell_source_to_text({"k": "v"}) is None
 
 
-def test_cell_source_to_text_bytes_returns_empty():
+def test_cell_source_to_text_bytes_returns_none():
     """bytes 不是 str/list（Python 严格区分）→ 返 ""。"""
-    assert _cell_source_to_text(b"hello") == ""
+    assert _cell_source_to_text(b"hello") is None
 
 
 def test_cell_source_to_text_list_with_non_string_items():
     """list 含 int/None → 用 str() 转。"""
-    assert _cell_source_to_text(["a", 1, None, "b"]) == "a1Noneb"
+    assert _cell_source_to_text(["a", 1, None, "b"]) is None
 
 
+# adoption 契约 §5 注记（2026-08-27）：list 须全为 str 才拼接，含非 str 项 → None。
 def test_cell_source_to_text_list_with_nested_list():
-    """嵌套 list → 子 list 用 str() 转。"""
-    result = _cell_source_to_text(["a", ["x", "y"], "b"])
-    assert "a" in result
-    assert "b" in result
-    assert "x" in result and "y" in result
+    """嵌套 list（含子 list）→ None（不做 str() 强转）。"""
+    assert _cell_source_to_text(["a", ["x", "y"], "b"]) is None
 
 
 def test_cell_source_to_text_list_with_empty_strings():
@@ -205,7 +203,7 @@ def test_cell_source_to_text_list_with_empty_strings():
 def test_cell_source_to_text_returns_str_type():
     assert isinstance(_cell_source_to_text("hello"), str)
     assert isinstance(_cell_source_to_text(["a"]), str)
-    assert isinstance(_cell_source_to_text(None), str)
+    assert _cell_source_to_text(None) is None
 
 
 # ---------- _extract_kernel_language 边角 ----------
@@ -619,7 +617,7 @@ def test_ipynb_parser_markdown_cell_sub_element_metadata_no_kind(tmp_path: Path)
     assert "kind" not in doc.elements[0].metadata
 
 
-def test_ipynb_parser_code_cell_locator_no_line(tmp_path: Path):
+def test_ipynb_parser_code_cell_locator_line1(tmp_path: Path):
     """code cell locator 只有 cell_index/cell_type，无 line。"""
     p = _write_nb(tmp_path, "x.ipynb", _nb([
         {"cell_type": "code", "source": "print(1)"},
@@ -627,40 +625,45 @@ def test_ipynb_parser_code_cell_locator_no_line(tmp_path: Path):
     parser = IpynbParser()
     doc = parser.parse(p, source_hash="a" * 64)
     loc = doc.elements[0].source_locator
-    assert set(loc.keys()) == {"cell_index", "cell_type"}
+    assert set(loc.keys()) == {"cell_index", "cell_type", "line"}
     assert loc["cell_index"] == 0
     assert loc["cell_type"] == "code"
+    assert loc["line"] == 1
 
 
-def test_ipynb_parser_raw_cell_locator_no_line(tmp_path: Path):
+def test_ipynb_parser_raw_cell_locator_line1(tmp_path: Path):
     p = _write_nb(tmp_path, "x.ipynb", _nb([
         {"cell_type": "raw", "source": "raw"},
     ]))
     parser = IpynbParser()
     doc = parser.parse(p, source_hash="a" * 64)
     loc = doc.elements[0].source_locator
-    assert set(loc.keys()) == {"cell_index", "cell_type"}
+    assert set(loc.keys()) == {"cell_index", "cell_type", "line"}
     assert loc["cell_index"] == 0
     assert loc["cell_type"] == "raw"
+    assert loc["line"] == 1
 
 
-def test_ipynb_parser_code_cell_content_stripped(tmp_path: Path):
+def test_ipynb_parser_code_cell_content_preserved(tmp_path: Path):
     """code cell 内容 strip 两端空白。"""
     p = _write_nb(tmp_path, "x.ipynb", _nb([
         {"cell_type": "code", "source": "\n\n   print(1)  \n\n"},
     ]))
     parser = IpynbParser()
     doc = parser.parse(p, source_hash="a" * 64)
-    assert doc.elements[0].content == "print(1)"
+    assert doc.elements[0].content == '\n\n   print(1)  \n\n'
 
 
-def test_ipynb_parser_raw_cell_content_stripped(tmp_path: Path):
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_ipynb_parser_raw_cell_content_preserved(tmp_path: Path):
     p = _write_nb(tmp_path, "x.ipynb", _nb([
         {"cell_type": "raw", "source": "\n\n   raw text  \n\n"},
     ]))
     parser = IpynbParser()
     doc = parser.parse(p, source_hash="a" * 64)
-    assert doc.elements[0].content == "raw text"
+    assert doc.elements[0].content == '\n\n   raw text  \n\n'
 
 
 def test_ipynb_parser_code_cell_multiline_source_list(tmp_path: Path):

@@ -121,36 +121,35 @@ def test_cell_source_to_text_list_of_str_with_newlines():
 
 def test_cell_source_to_text_list_with_int():
     """list 含非 str 元素 → str() 转换。"""
-    assert _cell_source_to_text(["a", 1, "b"]) == "a1b"
+    assert _cell_source_to_text(["a", 1, "b"]) is None
 
 
 def test_cell_source_to_text_empty_list():
     assert _cell_source_to_text([]) == ""
 
 
-def test_cell_source_to_text_none_returns_empty():
-    assert _cell_source_to_text(None) == ""
+def test_cell_source_to_text_none_returns_none():
+    assert _cell_source_to_text(None) is None
 
 
-def test_cell_source_to_text_int_returns_empty():
+def test_cell_source_to_text_int_returns_none():
     """非 str/list → 空字符串。"""
-    assert _cell_source_to_text(42) == ""
+    assert _cell_source_to_text(42) is None
 
 
-def test_cell_source_to_text_dict_returns_empty():
-    assert _cell_source_to_text({"k": "v"}) == ""
+def test_cell_source_to_text_dict_returns_none():
+    assert _cell_source_to_text({"k": "v"}) is None
 
 
+# adoption 契约 §5 注记（2026-08-27）：list 须全为 str 才拼接，含非 str 项 → None。
 def test_cell_source_to_text_list_of_dicts():
-    """list 含 dict → 每个 dict str() 化。"""
-    result = _cell_source_to_text([{"a": 1}])
-    assert "a" in result and "1" in result
+    """list 含 dict → None（不做 str() 强转）。"""
+    assert _cell_source_to_text([{"a": 1}]) is None
 
 
 def test_cell_source_to_text_nested_list():
-    """list 含 list → 整个嵌套 str() 化。"""
-    result = _cell_source_to_text([["nested"]])
-    assert "nested" in result
+    """list 含 list → None（不做 str() 强转）。"""
+    assert _cell_source_to_text([["nested"]]) is None
 
 
 # =========================================================================
@@ -424,8 +423,8 @@ def test_markdown_cell_locator_has_cell_index_and_type(tmp_path: Path):
     assert head.source_locator["cell_type"] == "markdown"
 
 
-def test_code_cell_locator_no_line(tmp_path: Path):
-    """code cell locator 只含 cell_index/cell_type，无 line。"""
+def test_code_cell_locator_line1(tmp_path: Path):
+    """code cell locator 固定补 line=1（cell 级元素）。"""
     p = tmp_path / "t.ipynb"
     nb = _make_notebook([
         {"cell_type": "code", "source": "x = 1"}
@@ -433,7 +432,7 @@ def test_code_cell_locator_no_line(tmp_path: Path):
     p.write_text(json.dumps(nb), encoding="utf-8")
     doc = IpynbParser().parse(p, source_hash="0" * 64)
     loc = doc.elements[0].source_locator
-    assert "line" not in loc
+    assert loc["line"] == 1
     assert loc["cell_index"] == 0
     assert loc["cell_type"] == "code"
 
@@ -590,24 +589,27 @@ def test_mixed_cell_types(tmp_path: Path):
     assert types.count("paragraph") == 2
 
 
-def test_code_cell_text_is_stripped(tmp_path: Path):
+def test_code_cell_text_preserved(tmp_path: Path):
     p = tmp_path / "t.ipynb"
     nb = _make_notebook([
         {"cell_type": "code", "source": "  x = 1  \n"}
     ])
     p.write_text(json.dumps(nb), encoding="utf-8")
     doc = IpynbParser().parse(p, source_hash="0" * 64)
-    assert doc.elements[0].content == "x = 1"
+    assert doc.elements[0].content == '  x = 1  \n'
 
 
-def test_raw_cell_text_is_stripped(tmp_path: Path):
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_raw_cell_text_preserved(tmp_path: Path):
     p = tmp_path / "t.ipynb"
     nb = _make_notebook([
         {"cell_type": "raw", "source": "  raw text  "}
     ])
     p.write_text(json.dumps(nb), encoding="utf-8")
     doc = IpynbParser().parse(p, source_hash="0" * 64)
-    assert doc.elements[0].content == "raw text"
+    assert doc.elements[0].content == '  raw text  '
 
 
 # =========================================================================

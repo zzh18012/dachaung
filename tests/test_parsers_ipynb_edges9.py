@@ -202,14 +202,18 @@ def test_code_outputs_dropped():
         "kind": "code_cell", "language": "python"}
 
 
-def test_code_no_line_in_locator():
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_code_line1_in_locator():
     doc = _full()
     code = [e for e in doc.elements
             if e.metadata.get("kind")
             == "code_cell"][0]
-    assert "line" not in code.source_locator
+    assert code.source_locator["line"] == 1
     assert code.source_locator == {
-        "cell_index": 1, "cell_type": "code"}
+        "cell_index": 1, "cell_type": "code",
+        "line": 1}
 
 
 # ---------- section_path cell 间独立 ----------

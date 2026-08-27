@@ -59,14 +59,14 @@ def _md(source):
 
 # ---------- source 类型强转 ----------
 
+# adoption 契约 §5 注记（2026-08-27）：source 非法（list 含非 str 项）→ 跳过 cell + ipynb_bad_cell。
 def test_nonstr_source_list_coerced(tmp_path):
     doc = _nb(
         tmp_path, "coerce.ipynb",
         [_code(["print(", 42, ")\n", 3.5, None, True])])
-    e = doc.elements[0]
-    assert e.type == "paragraph"
-    assert e.content == "print(42)\n3.5NoneTrue"
-    assert e.metadata["kind"] == "code_cell"
+    assert doc.elements == []
+    assert [w.code for w in doc.warnings] == [
+        "ipynb_bad_cell", "ipynb_no_content"]
 
 
 def test_source_dict_becomes_empty(tmp_path):
@@ -75,7 +75,7 @@ def test_source_dict_becomes_empty(tmp_path):
         [_code({"lines": ["x"]})])
     assert doc.elements == []
     assert [w.code for w in doc.warnings] == [
-        "ipynb_empty_code_cell",
+        "ipynb_bad_cell",
         "ipynb_no_content",
     ]
 

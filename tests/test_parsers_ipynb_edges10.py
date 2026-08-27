@@ -210,14 +210,17 @@ def test_cells_none_tolerated():
 
 # ---------- source 非字符串 ----------
 
+# adoption 契约 §5 注记（2026-08-27）：source 非法（非 str / 非 str-list）→ 跳过 cell + ipynb_bad_cell。
 def test_source_int_double_warning():
     nb = {"cells": [{"cell_type": "code",
                      "source": 42}],
           "metadata": {}, "nbformat": 4}
     doc = _parse(nb)
     codes = [w.code for w in doc.warnings]
-    assert "ipynb_empty_code_cell" in codes
-    assert "ipynb_no_content" in codes
+    assert codes == ["ipynb_bad_cell",
+                     "ipynb_no_content"]
+    assert doc.warnings[0].details == {
+        "cell_index": 0, "field": "source"}
 
 
 def test_source_int_no_elements():

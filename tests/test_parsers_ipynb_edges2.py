@@ -151,55 +151,53 @@ def test_cell_source_to_text_empty_list():
     assert _cell_source_to_text([]) == ""
 
 
-def test_cell_source_to_text_none_returns_empty():
-    assert _cell_source_to_text(None) == ""
+def test_cell_source_to_text_none_returns_none():
+    assert _cell_source_to_text(None) is None
 
 
-def test_cell_source_to_text_int_returns_empty():
-    assert _cell_source_to_text(42) == ""
+def test_cell_source_to_text_int_returns_none():
+    assert _cell_source_to_text(42) is None
 
 
-def test_cell_source_to_text_float_returns_empty():
-    assert _cell_source_to_text(3.14) == ""
+def test_cell_source_to_text_float_returns_none():
+    assert _cell_source_to_text(3.14) is None
 
 
-def test_cell_source_to_text_bool_true_returns_empty():
-    assert _cell_source_to_text(True) == ""
+def test_cell_source_to_text_bool_true_returns_none():
+    assert _cell_source_to_text(True) is None
 
 
-def test_cell_source_to_text_bool_false_returns_empty():
-    assert _cell_source_to_text(False) == ""
+def test_cell_source_to_text_bool_false_returns_none():
+    assert _cell_source_to_text(False) is None
 
 
-def test_cell_source_to_text_dict_returns_empty():
-    assert _cell_source_to_text({"k": "v"}) == ""
+def test_cell_source_to_text_dict_returns_none():
+    assert _cell_source_to_text({"k": "v"}) is None
 
 
-def test_cell_source_to_text_bytes_returns_empty():
-    assert _cell_source_to_text(b"hello") == ""
+def test_cell_source_to_text_bytes_returns_none():
+    assert _cell_source_to_text(b"hello") is None
 
 
 def test_cell_source_to_text_list_with_int_items():
     """list 中含 int → 强制 str。"""
-    assert _cell_source_to_text([1, 2, 3]) == "123"
+    assert _cell_source_to_text([1, 2, 3]) is None
 
 
+# adoption 契约 §5 注记（2026-08-27）：list 须全为 str 才拼接，含非 str 项 → None。
 def test_cell_source_to_text_list_with_none_items():
-    """list 中含 None → str(None) = 'None'。"""
-    result = _cell_source_to_text([None, "x"])
-    assert "None" in result
+    """list 中含 None → None（不做 str() 强转）。"""
+    assert _cell_source_to_text([None, "x"]) is None
 
 
 def test_cell_source_to_text_list_with_bool_items():
-    """list 中含 bool → str(True) = 'True'。"""
-    result = _cell_source_to_text([True, False])
-    assert "True" in result
-    assert "False" in result
+    """list 中含 bool → None（不做 str() 强转）。"""
+    assert _cell_source_to_text([True, False]) is None
 
 
 def test_cell_source_to_text_list_mixed_types():
-    result = _cell_source_to_text(["a", 1, "b", 2.5])
-    assert "a" in result and "1" in result and "b" in result
+    """list 混入 int/float → None（不做 str() 强转）。"""
+    assert _cell_source_to_text(["a", 1, "b", 2.5]) is None
 
 
 def test_cell_source_to_text_returns_str_type():
@@ -214,14 +212,14 @@ def test_cell_source_to_text_returns_str_type_for_empty():
     assert isinstance(_cell_source_to_text(""), str)
 
 
-def test_cell_source_to_text_tuple_input_returns_empty():
+def test_cell_source_to_text_tuple_input_returns_none():
     """tuple 不是 list → 不被识别 → 返 ''。"""
-    assert _cell_source_to_text(("a", "b")) == ""
+    assert _cell_source_to_text(("a", "b")) is None
 
 
-def test_cell_source_to_text_set_input_returns_empty():
+def test_cell_source_to_text_set_input_returns_none():
     """set 不是 list → 返 ''。"""
-    assert _cell_source_to_text({"a", "b"}) == ""
+    assert _cell_source_to_text({"a", "b"}) is None
 
 
 def test_cell_source_to_text_long_list():
@@ -239,10 +237,8 @@ def test_cell_source_to_text_list_unicode():
 
 
 def test_cell_source_to_text_list_with_nested_list():
-    """list 中含 nested list → str(list) 嵌入。"""
-    result = _cell_source_to_text([["a", "b"], "c"])
-    # str(["a", "b"]) 字符串化嵌套
-    assert "c" in result
+    """list 中含 nested list → None（不做 str() 强转）。"""
+    assert _cell_source_to_text([["a", "b"], "c"]) is None
 
 
 # ---------- _extract_kernel_language 深度 ----------
@@ -766,20 +762,23 @@ def test_parse_element_confidence_strictly_095(tmp_path: Path):
         assert e.confidence == 0.95
 
 
-def test_parse_code_cell_content_stripped(tmp_path: Path):
+def test_parse_code_cell_content_preserved(tmp_path: Path):
     p = IpynbParser()
     cells = [{"cell_type": "code", "source": "  print('x')  \n"}]
     f = _write_nb(tmp_path, "f.ipynb", {"nbformat": 4, "cells": cells})
     doc = p.parse(f, "a" * 64)
-    assert doc.elements[0].content == "print('x')"
+    assert doc.elements[0].content == "  print('x')  \n"
 
 
-def test_parse_raw_cell_content_stripped(tmp_path: Path):
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_parse_raw_cell_content_preserved(tmp_path: Path):
     p = IpynbParser()
     cells = [{"cell_type": "raw", "source": "  raw content  "}]
     f = _write_nb(tmp_path, "f.ipynb", {"nbformat": 4, "cells": cells})
     doc = p.parse(f, "a" * 64)
-    assert doc.elements[0].content == "raw content"
+    assert doc.elements[0].content == '  raw content  '
 
 
 def test_parse_code_cell_multiline_source_list(tmp_path: Path):

@@ -116,3 +116,91 @@ def test_high_minor_parsed_by_known_fields(tmp_path):
     assert doc.errors == []
     assert doc.metadata["nbformat"] == 4
     assert doc.metadata["nbformat_minor"] == 9
+
+
+# ---------- 修正 2：source 校验 + 正文保留 + line=1（契约 §5/§8） ----------
+
+
+def test_source_int_skipped_with_bad_cell(tmp_path):
+    nb = _nb([_cell("code", 42)])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements == []
+    w = doc.warnings[0]
+    assert w.code == "ipynb_bad_cell"
+    assert w.details == {"cell_index": 0, "field": "source"}
+
+
+def test_source_missing_skipped_with_bad_cell(tmp_path):
+    nb = _nb([{"cell_type": "code", "metadata": {}}])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements == []
+    w = doc.warnings[0]
+    assert w.code == "ipynb_bad_cell"
+    assert w.details == {"cell_index": 0, "field": "source"}
+
+
+def test_source_list_with_non_str_skipped(tmp_path):
+    nb = _nb([_cell("code", ["a", 1])])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements == []
+    w = doc.warnings[0]
+    assert w.code == "ipynb_bad_cell"
+    assert w.details == {"cell_index": 0, "field": "source"}
+
+
+def test_source_list_all_str_joined(tmp_path):
+    nb = _nb([_cell("code", ["print(1)\n", "print(2)\n"])])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements[0].content == "print(1)\nprint(2)\n"
+
+
+def test_bad_source_cell_index_is_raw_position(tmp_path):
+    """cell_index 是原始数组位置，被跳过的 cell 不影响后续 cell 的编号。"""
+    nb = _nb([
+        {"cell_type": "code", "metadata": {}},
+        _cell("markdown", "ok"),
+        _cell("code", 7),
+        _cell("code", "x = 1"),
+    ])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    bad = [w for w in doc.warnings if w.code == "ipynb_bad_cell"]
+    assert [w.details["cell_index"] for w in bad] == [0, 2]
+    assert doc.elements[-1].source_locator["cell_index"] == 3
+
+
+def test_code_content_preserves_whitespace(tmp_path):
+    """code 正文保留原始缩进/换行/首尾空白（strip 仅用于判空）。"""
+    src = "\n\n    if x:\n        pass   \n\n"
+    nb = _nb([_cell("code", src)])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements[0].content == src
+
+
+def test_raw_content_preserves_whitespace(tmp_path):
+    src = "  raw \n keep  \n"
+    nb = _nb([_cell("raw", src)])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements[0].content == src
+
+
+def test_whitespace_only_source_still_empty(tmp_path):
+    """全空白 source 视为空 cell（strip 判空），不发 bad_cell。"""
+    nb = _nb([_cell("code", "   \n  ")])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements == []
+    codes = [w.code for w in doc.warnings]
+    assert codes == ["ipynb_empty_code_cell", "ipynb_no_content"]
+
+
+def test_code_cell_locator_has_line1(tmp_path):
+    nb = _nb([_cell("code", "x = 1")])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements[0].source_locator == {
+        "cell_index": 0, "cell_type": "code", "line": 1}
+
+
+def test_raw_cell_locator_has_line1(tmp_path):
+    nb = _nb([_cell("raw", "raw txt")])
+    doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
+    assert doc.elements[0].source_locator == {
+        "cell_index": 0, "cell_type": "raw", "line": 1}

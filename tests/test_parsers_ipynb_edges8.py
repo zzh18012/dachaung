@@ -125,41 +125,41 @@ def test_cell_source_to_text_empty_list():
 
 def test_cell_source_to_text_list_with_int():
     """list 含非 str → str() 强转。"""
-    assert _cell_source_to_text(["a", 1, "b"]) == "a1b"
+    assert _cell_source_to_text(["a", 1, "b"]) is None
 
 
 def test_cell_source_to_text_list_with_none():
-    assert _cell_source_to_text(["a", None, "b"]) == "aNoneb"
+    assert _cell_source_to_text(["a", None, "b"]) is None
 
 
 def test_cell_source_to_text_list_with_dict():
-    assert _cell_source_to_text([{"x": 1}]) == "{'x': 1}"
+    assert _cell_source_to_text([{"x": 1}]) is None
 
 
-def test_cell_source_to_text_none_returns_empty():
-    assert _cell_source_to_text(None) == ""
+def test_cell_source_to_text_none_returns_none():
+    assert _cell_source_to_text(None) is None
 
 
-def test_cell_source_to_text_int_returns_empty():
+def test_cell_source_to_text_int_returns_none():
     """非 str/list → 空。"""
-    assert _cell_source_to_text(42) == ""
+    assert _cell_source_to_text(42) is None
 
 
-def test_cell_source_to_text_float_returns_empty():
-    assert _cell_source_to_text(3.14) == ""
+def test_cell_source_to_text_float_returns_none():
+    assert _cell_source_to_text(3.14) is None
 
 
-def test_cell_source_to_text_dict_returns_empty():
-    assert _cell_source_to_text({"x": 1}) == ""
+def test_cell_source_to_text_dict_returns_none():
+    assert _cell_source_to_text({"x": 1}) is None
 
 
-def test_cell_source_to_text_tuple_returns_empty():
+def test_cell_source_to_text_tuple_returns_none():
     """tuple 不是 list → 返回空。"""
-    assert _cell_source_to_text(("a", "b")) == ""
+    assert _cell_source_to_text(("a", "b")) is None
 
 
-def test_cell_source_to_text_bool_returns_empty():
-    assert _cell_source_to_text(True) == ""
+def test_cell_source_to_text_bool_returns_none():
+    assert _cell_source_to_text(True) is None
 
 
 def test_cell_source_to_text_multiline_str_preserved():
@@ -495,14 +495,14 @@ def test_parse_code_cell_creates_paragraph(tmp_path: Path):
     assert el.metadata["language"] == "python"
 
 
-def test_parse_code_cell_strips_whitespace(tmp_path: Path):
+def test_parse_code_cell_preserves_whitespace(tmp_path: Path):
     parser = IpynbParser()
     nb = _make_minimal_notebook(cells=[
         {"cell_type": "code", "source": "  print('hello')  \n\n"},
     ])
     p = _write_ipynb(tmp_path, nb)
     doc = parser.parse(p, "a" * 64)
-    assert doc.elements[0].content == "print('hello')"
+    assert doc.elements[0].content == "  print('hello')  \n\n"
 
 
 def test_parse_code_cell_locator(tmp_path: Path):
@@ -551,14 +551,14 @@ def test_parse_raw_cell_creates_paragraph(tmp_path: Path):
     assert el.metadata["kind"] == "raw_cell"
 
 
-def test_parse_raw_cell_strips_whitespace(tmp_path: Path):
+def test_parse_raw_cell_preserves_whitespace(tmp_path: Path):
     parser = IpynbParser()
     nb = _make_minimal_notebook(cells=[
         {"cell_type": "raw", "source": "  hello  "},
     ])
     p = _write_ipynb(tmp_path, nb)
     doc = parser.parse(p, "a" * 64)
-    assert doc.elements[0].content == "hello"
+    assert doc.elements[0].content == '  hello  '
 
 
 def test_parse_raw_cell_locator(tmp_path: Path):
@@ -820,6 +820,9 @@ def test_parse_markdown_sub_warning_propagated_with_cell_index(tmp_path: Path):
             assert "cell_index" in (w.details or {})
 
 
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
 def test_parse_code_cell_list_source(tmp_path: Path):
     """source 是 list 形式 → 拼接。"""
     parser = IpynbParser()
@@ -828,7 +831,7 @@ def test_parse_code_cell_list_source(tmp_path: Path):
     ])
     p = _write_ipynb(tmp_path, nb)
     doc = parser.parse(p, "a" * 64)
-    assert doc.elements[0].content == "line1\nline2"
+    assert doc.elements[0].content == 'line1\nline2\n'
 
 
 # =========================================================================

@@ -83,22 +83,22 @@ def test_cell_source_empty_list():
     assert _cell_source_to_text([]) == ""
 
 
-def test_cell_source_none_returns_empty():
-    assert _cell_source_to_text(None) == ""
+def test_cell_source_none_returns_none():
+    assert _cell_source_to_text(None) is None
 
 
-def test_cell_source_int_returns_empty():
+def test_cell_source_int_returns_none():
     """非 str/list → 空。"""
-    assert _cell_source_to_text(42) == ""
+    assert _cell_source_to_text(42) is None
 
 
 def test_cell_source_list_with_non_str_elements():
     """list[str|non-str] → 全部转 str 再 join。"""
-    assert _cell_source_to_text([1, 2, 3]) == "123"
+    assert _cell_source_to_text([1, 2, 3]) is None
 
 
 def test_cell_source_list_with_mixed_types():
-    assert _cell_source_to_text(["a", 1, True]) == "a1True"
+    assert _cell_source_to_text(["a", 1, True]) is None
 
 
 # =========================================================================
@@ -522,14 +522,14 @@ def test_parse_code_cell_no_metadata_language_empty(tmp_path: Path):
     assert code.metadata["language"] == ""
 
 
-def test_parse_code_cell_locator_has_no_line(tmp_path: Path):
+def test_parse_code_cell_locator_has_line1(tmp_path: Path):
     """code cell 不进 MarkdownParser，locator 只有 cell_index + cell_type。"""
     nb = _minimal_nb([
         {"cell_type": "code", "source": "x = 1\n"},
     ])
     doc = _parse(tmp_path, nb)
     code = doc.elements[0]
-    assert "line" not in code.source_locator
+    assert code.source_locator["line"] == 1
 
 
 def test_parse_code_cell_locator_has_cell_index_and_type(tmp_path: Path):
@@ -597,13 +597,16 @@ def test_parse_raw_cell_locator_has_cell_index_and_type(tmp_path: Path):
     assert raw.source_locator["cell_type"] == "raw"
 
 
-def test_parse_raw_cell_content_stripped(tmp_path: Path):
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_parse_raw_cell_content_preserved(tmp_path: Path):
     nb = _minimal_nb([
         {"cell_type": "raw", "source": "  raw with spaces  \n"},
     ])
     doc = _parse(tmp_path, nb)
     raw = doc.elements[0]
-    assert raw.content == "raw with spaces"
+    assert raw.content == "  raw with spaces  \n"
 
 
 def test_parse_raw_cell_empty_skipped_silently(tmp_path: Path):

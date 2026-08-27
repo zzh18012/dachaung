@@ -166,26 +166,26 @@ def test_cell_source_empty_list():
     assert _cell_source_to_text([]) == ""
 
 
-def test_cell_source_none_returns_empty():
-    assert _cell_source_to_text(None) == ""
+def test_cell_source_none_returns_none():
+    assert _cell_source_to_text(None) is None
 
 
-def test_cell_source_int_returns_empty():
+def test_cell_source_int_returns_none():
     """非 str/list → ""."""
-    assert _cell_source_to_text(42) == ""
+    assert _cell_source_to_text(42) is None
 
 
-def test_cell_source_dict_returns_empty():
-    assert _cell_source_to_text({"k": "v"}) == ""
+def test_cell_source_dict_returns_none():
+    assert _cell_source_to_text({"k": "v"}) is None
 
 
 def test_cell_source_list_of_non_str():
     """list 中含非 str → 强转 str。"""
-    assert _cell_source_to_text([1, 2, 3]) == "123"
+    assert _cell_source_to_text([1, 2, 3]) is None
 
 
 def test_cell_source_list_mixed_types():
-    assert _cell_source_to_text(["a", 1, None]) == "a1None"
+    assert _cell_source_to_text(["a", 1, None]) is None
 
 
 # =========================================================================
@@ -540,20 +540,20 @@ def test_parse_code_cell_language_empty_when_no_kernelspec(tmp_path: Path):
     assert doc.elements[0].metadata["language"] == ""
 
 
-def test_parse_code_cell_content_stripped(tmp_path: Path):
+def test_parse_code_cell_content_preserved(tmp_path: Path):
     cells = [{"cell_type": "code", "source": "  print(1)  \n"}]
     p = _write_nb(tmp_path, "x.ipynb", _minimal_nb(cells))
     doc = IpynbParser().parse(p, _H)
-    assert doc.elements[0].content == "print(1)"
+    assert doc.elements[0].content == '  print(1)  \n'
 
 
-def test_parse_code_cell_locator_no_line(tmp_path: Path):
-    """code cell locator 不含 line 字段（只有 cell_index/cell_type）。"""
+def test_parse_code_cell_locator_line1(tmp_path: Path):
+    """code cell locator 固定补 line=1（cell 级元素）。"""
     cells = [{"cell_type": "code", "source": "x"}]
     p = _write_nb(tmp_path, "x.ipynb", _minimal_nb(cells))
     doc = IpynbParser().parse(p, _H)
     loc = doc.elements[0].source_locator
-    assert "line" not in loc
+    assert loc["line"] == 1
     assert loc["cell_index"] == 0
     assert loc["cell_type"] == "code"
 
@@ -567,11 +567,14 @@ def test_parse_raw_cell_emits_paragraph_with_kind(tmp_path: Path):
     assert doc.elements[0].metadata["kind"] == "raw_cell"
 
 
-def test_parse_raw_cell_content_stripped(tmp_path: Path):
+# adoption 契约 §5/§8 注记（2026-08-27）：source 非法输入归一为 None（跳过 cell +
+# ipynb_bad_cell）；code/raw 正文保留原始缩进换行（strip 仅判空）；locator 补 line=1。
+# 以下原快照期望已按定稿契约改写。
+def test_parse_raw_cell_content_preserved(tmp_path: Path):
     cells = [{"cell_type": "raw", "source": "  x  \n"}]
     p = _write_nb(tmp_path, "x.ipynb", _minimal_nb(cells))
     doc = IpynbParser().parse(p, _H)
-    assert doc.elements[0].content == "x"
+    assert doc.elements[0].content == '  x  \n'
 
 
 def test_parse_unknown_cell_type_emits_warning(tmp_path: Path):
