@@ -30,7 +30,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from app.hash import compute_file_hash
+from app.parsers.base import ParserError
 from app.parsers.ipynb_parser import IpynbParser
 
 
@@ -79,21 +82,22 @@ def test_source_dict_becomes_empty(tmp_path):
 
 # ---------- nbformat 数值变体 ----------
 
-def test_nbformat_float_4_5(tmp_path):
-    doc = _nb(
-        tmp_path, "f45.ipynb", [_code("x=1")],
-        nbformat=4.5)
-    assert doc.elements[0].content == "x=1"
-    assert doc.metadata["nbformat"] == 4.5
+def test_nbformat_float_4_5_rejected(tmp_path):
+    """adoption 契约 §2（2026-08-27）：nbformat 必须为整数 → ipynb_bad_structure。"""
+    with pytest.raises(ParserError) as ei:
+        _nb(
+            tmp_path, "f45.ipynb", [_code("x=1")],
+            nbformat=4.5)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
-def test_minor_without_major(tmp_path):
-    doc = _nb(
-        tmp_path, "nomin.ipynb", [_code("x=1")],
-        nbformat=None, nbformat_minor=2)
-    assert doc.metadata["nbformat"] is None
-    assert doc.metadata["nbformat_minor"] == 2
-    assert len(doc.elements) == 1
+def test_minor_without_major_rejected(tmp_path):
+    """adoption 契约 §2（2026-08-27）：nbformat=None → ipynb_bad_structure。"""
+    with pytest.raises(ParserError) as ei:
+        _nb(
+            tmp_path, "nomin.ipynb", [_code("x=1")],
+            nbformat=None, nbformat_minor=2)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 # ---------- markdown 子结果传播 ----------

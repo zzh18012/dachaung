@@ -257,34 +257,40 @@ def test_parse_nbformat_4_supported(tmp_path: Path):
     assert doc.metadata["nbformat"] == 4
 
 
-def test_parse_nbformat_5_supported(tmp_path: Path):
+def test_parse_nbformat_5_unsupported(tmp_path: Path):
+    """adoption 契约 §1（2026-08-27）：nbformat=5 → ipynb_unsupported_version。"""
     nb = _minimal_nb([])
     nb["nbformat"] = 5
-    doc = _parse(tmp_path, nb)
-    assert doc.metadata["nbformat"] == 5
+    with pytest.raises(ParserError) as ei:
+        _parse(tmp_path, nb)
+    assert ei.value.code == "ipynb_unsupported_version"
 
 
-def test_parse_nbformat_10_supported(tmp_path: Path):
-    """任何 nbformat >= 4 都支持。"""
+def test_parse_nbformat_10_unsupported(tmp_path: Path):
+    """adoption 契约 §1（2026-08-27）：仅 == 4，未来主版本不承诺。"""
     nb = _minimal_nb([])
     nb["nbformat"] = 10
-    doc = _parse(tmp_path, nb)
-    assert doc.metadata["nbformat"] == 10
+    with pytest.raises(ParserError) as ei:
+        _parse(tmp_path, nb)
+    assert ei.value.code == "ipynb_unsupported_version"
 
 
-def test_parse_nbformat_missing_supported(tmp_path: Path):
+def test_parse_nbformat_missing_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat 缺失 → ipynb_bad_structure。"""
     nb = _minimal_nb([])
     del nb["nbformat"]
-    doc = _parse(tmp_path, nb)
-    # nbformat 缺失 → metadata.nbformat = None
-    assert doc.metadata["nbformat"] is None
+    with pytest.raises(ParserError) as ei:
+        _parse(tmp_path, nb)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
-def test_parse_nbformat_minor_missing_is_none(tmp_path: Path):
+def test_parse_nbformat_minor_missing_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat_minor 缺失 → ipynb_bad_structure。"""
     nb = _minimal_nb([])
     del nb["nbformat_minor"]
-    doc = _parse(tmp_path, nb)
-    assert doc.metadata["nbformat_minor"] is None
+    with pytest.raises(ParserError) as ei:
+        _parse(tmp_path, nb)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 def test_parse_nbformat_minor_value_preserved(tmp_path: Path):

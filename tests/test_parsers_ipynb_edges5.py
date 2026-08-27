@@ -354,14 +354,14 @@ def test_parse_nbformat_3_rejected(tmp_path: Path):
     assert exc.value.code == "ipynb_unsupported_version"
 
 
-def test_parse_nbformat_none_accepted(tmp_path: Path):
-    """nbformat 缺失 → 视为 None → 不进入版本检查。"""
+def test_parse_nbformat_none_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat 缺失 → ipynb_bad_structure。"""
     p = tmp_path / "t.ipynb"
     nb = {"cells": []}
     p.write_text(json.dumps(nb), encoding="utf-8")
-    # 不抛异常
-    doc = IpynbParser().parse(p, source_hash="0" * 64)
-    assert isinstance(doc, Document)
+    with pytest.raises(ParserError) as ei:
+        IpynbParser().parse(p, source_hash="0" * 64)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 def test_parse_nbformat_4_accepted(tmp_path: Path):
@@ -372,13 +372,14 @@ def test_parse_nbformat_4_accepted(tmp_path: Path):
     assert doc.metadata.get("nbformat") == 4
 
 
-def test_parse_nbformat_5_accepted(tmp_path: Path):
-    """nbformat 5 也支持（>= 4）。"""
+def test_parse_nbformat_5_unsupported(tmp_path: Path):
+    """adoption 契约 §1（2026-08-27）：nbformat=5 → ipynb_unsupported_version。"""
     p = tmp_path / "t.ipynb"
-    nb = {"nbformat": 5, "cells": []}
+    nb = {"nbformat": 5, "nbformat_minor": 0, "cells": []}
     p.write_text(json.dumps(nb), encoding="utf-8")
-    doc = IpynbParser().parse(p, source_hash="0" * 64)
-    assert doc.metadata.get("nbformat") == 5
+    with pytest.raises(ParserError) as ei:
+        IpynbParser().parse(p, source_hash="0" * 64)
+    assert ei.value.code == "ipynb_unsupported_version"
 
 
 def test_parse_top_level_not_dict_raises(tmp_path: Path):

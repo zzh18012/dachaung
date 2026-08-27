@@ -26,6 +26,10 @@ from app.parsers.ipynb_parser import IpynbParser
 
 
 def _parse(nb):
+    # adoption 契约 §2 注记（2026-08-27）：版本字段必填——fixture 缺省时补默认。
+    if isinstance(nb, dict):
+        nb.setdefault("nbformat", 4)
+        nb.setdefault("nbformat_minor", 5)
     with tempfile.TemporaryDirectory() as td:
         tp = Path(td)
         (tp / "t.ipynb").write_text(
@@ -36,9 +40,10 @@ def _parse(nb):
 
 
 def _nb(source):
+    # adoption 契约 §2 注记（2026-08-27）：补 nbformat_minor（版本字段必填）。
     return {"cells": [{"cell_type": "markdown",
                        "source": source}],
-            "metadata": {}, "nbformat": 4}
+            "metadata": {}, "nbformat": 4, "nbformat_minor": 5}
 
 
 # ---------- image 提取规则 ----------

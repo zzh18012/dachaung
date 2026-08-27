@@ -48,6 +48,10 @@ def _write(tmp_path: Path, name: str, content: str) -> Path:
 
 
 def _write_nb(tmp_path: Path, name: str, nb: dict) -> Path:
+    # adoption 契约 §2 注记（2026-08-27）：版本字段必填——fixture 缺省时补默认。
+    if isinstance(nb, dict):
+        nb.setdefault("nbformat", 4)
+        nb.setdefault("nbformat_minor", 5)
     return _write(tmp_path, name, json.dumps(nb))
 
 

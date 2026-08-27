@@ -1,6 +1,6 @@
 """Jupyter Notebook (.ipynb) 解析器：stdlib ``json`` + 复用 MarkdownParser。
 
-支持 nbformat 4+ 的 .ipynb 文件。每个 cell 转换为 element(s)：
+支持 nbformat == 4 的 .ipynb 文件（契约 docs/ipynb-contract.md）。每个 cell 转换为 element(s)：
 
 - ``markdown`` cell → 委托给 ``MarkdownParser._parse_text``，可能产生多个 element
   （heading / paragraph / list_item / table 等）
@@ -99,12 +99,32 @@ class IpynbParser(Parser):
                 code="ipynb_bad_structure",
                 message=".ipynb 顶层不是对象",
             )
+        # 契约 §2（adoption 修正，2026-08-27）：版本字段必须为整数类型
+        # （bool 属于 int 但语义是布尔，显式拒绝）；缺失或类型错误归
+        # ipynb_bad_structure；类型合法但主版本 != 4 归 ipynb_unsupported_version。
         nbformat_major = nb.get("nbformat")
-        if nbformat_major is not None and nbformat_major < 4:
+        if not isinstance(nbformat_major, int) or isinstance(nbformat_major, bool):
+            raise ParserError(
+                code="ipynb_bad_structure",
+                message=f".ipynb 的 nbformat 字段缺失或不是整数: {nbformat_major!r}",
+                details={"field": "nbformat", "value": nbformat_major},
+            )
+        if nbformat_major != 4:
             raise ParserError(
                 code="ipynb_unsupported_version",
-                message=f"仅支持 nbformat ≥ 4，得到 nbformat={nbformat_major}",
+                message=f"仅支持 nbformat == 4，得到 nbformat={nbformat_major}",
                 details={"nbformat": nbformat_major},
+            )
+        nbformat_minor = nb.get("nbformat_minor")
+        if (
+            not isinstance(nbformat_minor, int)
+            or isinstance(nbformat_minor, bool)
+            or nbformat_minor < 0
+        ):
+            raise ParserError(
+                code="ipynb_bad_structure",
+                message=f".ipynb 的 nbformat_minor 字段缺失、不是整数或为负: {nbformat_minor!r}",
+                details={"field": "nbformat_minor", "value": nbformat_minor},
             )
 
         cells = nb.get("cells") or []
@@ -217,7 +237,7 @@ class IpynbParser(Parser):
             metadata={
                 "ipynb": True,
                 "nbformat": nbformat_major,
-                "nbformat_minor": nb.get("nbformat_minor"),
+                "nbformat_minor": nbformat_minor,
                 "cell_count": len(cells),
                 "language": language,
             },

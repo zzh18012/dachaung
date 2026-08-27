@@ -241,6 +241,9 @@ def _make_notebook(cells: list[dict], **extra) -> dict:
 
 
 def _write_nb(tmp_path: Path, nb: dict, name: str = "test.ipynb") -> Path:
+    # adoption 契约 §2 注记（2026-08-27）：版本字段必填——fixture 缺省时补默认。
+    nb.setdefault("nbformat", 4)
+    nb.setdefault("nbformat_minor", 5)
     p = tmp_path / name
     p.write_text(json.dumps(nb), encoding="utf-8")
     return p

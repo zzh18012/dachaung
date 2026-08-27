@@ -39,9 +39,10 @@ def _parse(tmp_path, obj, name=TMP_NAME):
 
 
 def _nb(cells, metadata=None):
+    # adoption 契约 §2 注记（2026-08-27）：补 nbformat_minor（版本字段必填）。
     return {"cells": cells,
             "metadata": metadata or {},
-            "nbformat": 4}
+            "nbformat": 4, "nbformat_minor": 5}
 
 
 # ---------- doc.metadata 摘要化 ----------
@@ -60,7 +61,9 @@ def test_metadata_flattened_summary(
     assert doc.metadata == {
         "ipynb": True,
         "nbformat": 4,
-        "nbformat_minor": None,
+        # adoption 契约 §2 注记（2026-08-27）：版本字段必填，
+        # _nb helper 现补 nbformat_minor=5（原快照为 None 透传）。
+        "nbformat_minor": 5,
         "cell_count": 1,
         "language": "python",
     }
@@ -155,18 +158,24 @@ def test_cell_count_includes_skipped(
 
 # ---------- nbformat 类型不守卫 ----------
 
-def test_nbformat_str_typeerror(
+def test_nbformat_str_rejected(
         tmp_path):
+    """adoption 契约 §2（2026-08-27）：nbformat 为字符串 → ipynb_bad_structure。
+
+    原快照此处为未捕获 TypeError，契约修订后为结构化错误。
+    """
     p = tmp_path / TMP_NAME
     p.write_text(json.dumps({
         "cells": [{"cell_type": "code",
                    "source": "x"}],
         "metadata": {},
         "nbformat": "4",
+        "nbformat_minor": 5,
     }), encoding="utf-8")
-    with pytest.raises(TypeError):
+    with pytest.raises(ParserError) as ei:
         IpynbParser().parse(
             p, compute_file_hash(p))
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 # ---------- confidence ----------

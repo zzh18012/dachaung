@@ -19,6 +19,7 @@ from pathlib import Path
 
 import pytest
 
+from app.parsers.base import ParserError
 from app.parsers.ipynb_parser import (
     IpynbParser,
     _IPYNB_EXTENSIONS,
@@ -501,8 +502,11 @@ def test_ipynb_parser_metadata_records_nbformat_minor(tmp_path: Path):
     assert doc.metadata["nbformat_minor"] == 5
 
 
-def test_ipynb_parser_metadata_nbformat_minor_missing_is_none(tmp_path: Path):
-    """nbformat_minor 字段缺失 → metadata.nbformat_minor = None。"""
+def test_ipynb_parser_metadata_nbformat_minor_missing_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat_minor 缺失 → ipynb_bad_structure。
+
+    原快照语义为 metadata.nbformat_minor = None 透传。
+    """
     nb = {
         "cells": [{"cell_type": "code", "source": "x"}],
         "metadata": {"kernelspec": {"language": "python", "name": "python3"}},
@@ -511,8 +515,10 @@ def test_ipynb_parser_metadata_nbformat_minor_missing_is_none(tmp_path: Path):
     p = tmp_path / "x.ipynb"
     p.write_text(json.dumps(nb), encoding="utf-8")
     parser = IpynbParser()
-    doc = parser.parse(p, source_hash="a" * 64)
-    assert doc.metadata["nbformat_minor"] is None
+    with pytest.raises(ParserError) as ei:
+        parser.parse(p, source_hash="a" * 64)
+    assert ei.value.code == "ipynb_bad_structure"
+    assert ei.value.details["field"] == "nbformat_minor"
 
 
 def test_ipynb_parser_metadata_records_cell_count(tmp_path: Path):
@@ -801,8 +807,11 @@ def test_ipynb_parser_raw_empty_silently_skipped_no_warning(tmp_path: Path):
 # ---------- nbformat 缺失/异常 ----------
 
 
-def test_ipynb_parser_nbformat_missing_treats_as_supported(tmp_path: Path):
-    """nbformat 字段缺失 → None → not < 4 → 视为支持。"""
+def test_ipynb_parser_nbformat_missing_rejected_as_bad_structure(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat 缺失 → ipynb_bad_structure。
+
+    原快照语义为“None → not < 4 → 视为支持”。
+    """
     nb = {
         "cells": [{"cell_type": "code", "source": "x"}],
         "metadata": {"kernelspec": {"language": "python", "name": "python3"}},
@@ -811,9 +820,9 @@ def test_ipynb_parser_nbformat_missing_treats_as_supported(tmp_path: Path):
     p = tmp_path / "x.ipynb"
     p.write_text(json.dumps(nb), encoding="utf-8")
     parser = IpynbParser()
-    doc = parser.parse(p, source_hash="a" * 64)
-    assert doc.metadata["nbformat"] is None
-    assert len(doc.elements) == 1
+    with pytest.raises(ParserError) as ei:
+        parser.parse(p, source_hash="a" * 64)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 def test_ipynb_parser_nbformat_4_minor_0_works(tmp_path: Path):
@@ -831,8 +840,11 @@ def test_ipynb_parser_nbformat_4_minor_0_works(tmp_path: Path):
     assert doc.metadata["nbformat_minor"] == 0
 
 
-def test_ipynb_parser_nbformat_5_works(tmp_path: Path):
-    """nbformat=5 → >= 4 → 支持。"""
+def test_ipynb_parser_nbformat_5_unsupported(tmp_path: Path):
+    """adoption 契约 §1（2026-08-27）：nbformat=5 → ipynb_unsupported_version。
+
+    原快照语义为 ">= 4 → 支持"。
+    """
     nb = {
         "cells": [{"cell_type": "code", "source": "x"}],
         "metadata": {"kernelspec": {"language": "python", "name": "python3"}},
@@ -842,8 +854,10 @@ def test_ipynb_parser_nbformat_5_works(tmp_path: Path):
     p = tmp_path / "x.ipynb"
     p.write_text(json.dumps(nb), encoding="utf-8")
     parser = IpynbParser()
-    doc = parser.parse(p, source_hash="a" * 64)
-    assert doc.metadata["nbformat"] == 5
+    with pytest.raises(ParserError) as ei:
+        parser.parse(p, source_hash="a" * 64)
+    assert ei.value.code == "ipynb_unsupported_version"
+    assert ei.value.details["nbformat"] == 5
 
 
 def test_ipynb_parser_metadata_field_none_does_not_crash(tmp_path: Path):

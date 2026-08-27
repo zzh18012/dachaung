@@ -22,7 +22,10 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from app.hash import compute_file_hash
+from app.parsers.base import ParserError
 from app.parsers.ipynb_parser import IpynbParser
 
 TMP_NAME = "nb_edge11_probe.ipynb"
@@ -107,18 +110,16 @@ def test_lang_language_info(
 
 # ---------- nbformat 缺失 ----------
 
-def test_nbformat_missing_tolerated(
+def test_nbformat_missing_rejected(
         tmp_path):
-    doc = _parse(tmp_path, {
-        "cells": [{"cell_type": "code",
-                   "source": "x=1"}],
-        "metadata": {},
-    })
-    assert doc.elements[
-        0].content == "x=1"
-    assert doc.metadata["nbformat"] is None
-    assert doc.metadata[
-        "nbformat_minor"] is None
+    """adoption 契约 §2（2026-08-27）：版本字段必填 → ipynb_bad_structure。"""
+    with pytest.raises(ParserError) as ei:
+        _parse(tmp_path, {
+            "cells": [{"cell_type": "code",
+                       "source": "x=1"}],
+            "metadata": {},
+        })
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 # ---------- section_path 隔离 ----------

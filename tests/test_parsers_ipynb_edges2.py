@@ -325,6 +325,11 @@ def test_extract_kernel_language_language_info_with_only_name():
 
 
 def _write_nb(tmp_path: Path, name: str, nb: Any) -> Path:
+    # adoption 契约 §2 注记（2026-08-27）：版本字段必填——fixture 缺省时补
+    # nbformat=4 / nbformat_minor=5；显式传入的非法值不被覆盖（契约测试覆盖）。
+    if isinstance(nb, dict):
+        nb.setdefault("nbformat", 4)
+        nb.setdefault("nbformat_minor", 5)
     f = tmp_path / name
     f.write_text(json.dumps(nb), encoding="utf-8")
     return f
@@ -897,12 +902,17 @@ def test_parse_warning_records_have_reason_string(tmp_path: Path):
 # ---------- nbformat 边界 ----------
 
 
-def test_parse_nbformat_missing_treats_as_supported(tmp_path: Path):
-    """无 nbformat 字段 → 视为支持（nbformat_major=None 跳过检查）。"""
+def test_parse_nbformat_missing_rejected_as_bad_structure(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：无 nbformat 字段 → ipynb_bad_structure。
+
+    原快照语义为"缺失视为支持"；helper 现会补默认，故直写文件。
+    """
     p = IpynbParser()
-    f = _write_nb(tmp_path, "f.ipynb", {"cells": []})
-    doc = p.parse(f, "a" * 64)
-    assert doc.metadata["nbformat"] is None
+    f = tmp_path / "f.ipynb"
+    f.write_text(json.dumps({"cells": [], "nbformat_minor": 5}), encoding="utf-8")
+    with pytest.raises(ParserError) as ei:
+        p.parse(f, "a" * 64)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 def test_parse_nbformat_4_minor_0(tmp_path: Path):
@@ -913,18 +923,24 @@ def test_parse_nbformat_4_minor_0(tmp_path: Path):
     assert doc.metadata["nbformat_minor"] == 0
 
 
-def test_parse_nbformat_5_supported(tmp_path: Path):
+def test_parse_nbformat_5_unsupported(tmp_path: Path):
+    """adoption 契约 §1（2026-08-27）：nbformat=5 → ipynb_unsupported_version。"""
     p = IpynbParser()
     f = _write_nb(tmp_path, "f.ipynb", {"nbformat": 5, "cells": []})
-    doc = p.parse(f, "a" * 64)
-    assert doc.metadata["nbformat"] == 5
+    with pytest.raises(ParserError) as ei:
+        p.parse(f, "a" * 64)
+    assert ei.value.code == "ipynb_unsupported_version"
 
 
-def test_parse_nbformat_minor_missing_is_none(tmp_path: Path):
+def test_parse_nbformat_minor_missing_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat_minor 缺失 → ipynb_bad_structure。"""
     p = IpynbParser()
-    f = _write_nb(tmp_path, "f.ipynb", {"nbformat": 4, "cells": []})
-    doc = p.parse(f, "a" * 64)
-    assert doc.metadata["nbformat_minor"] is None
+    f = tmp_path / "f.ipynb"
+    f.write_text(json.dumps({"nbformat": 4, "cells": []}), encoding="utf-8")
+    with pytest.raises(ParserError) as ei:
+        p.parse(f, "a" * 64)
+    assert ei.value.code == "ipynb_bad_structure"
+    assert ei.value.details["field"] == "nbformat_minor"
 
 
 def test_parse_cells_missing_treated_as_empty(tmp_path: Path):

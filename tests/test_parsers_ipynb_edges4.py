@@ -44,6 +44,9 @@ SHA = "a" * 64
 
 
 def _write_nb(tmp_path: Path, nb: dict, name: str = "x.ipynb") -> Path:
+    # adoption 契约 §2 注记（2026-08-27）：版本字段必填——fixture 缺省时补默认。
+    nb.setdefault("nbformat", 4)
+    nb.setdefault("nbformat_minor", 5)
     p = tmp_path / name
     p.write_text(json.dumps(nb), encoding="utf-8")
     return p
@@ -364,20 +367,27 @@ def test_parse_metadata_preserves_nbformat_minor_value(tmp_path: Path):
     assert doc.metadata["nbformat_minor"] == 2
 
 
-def test_parse_metadata_nbformat_missing_is_none(tmp_path: Path):
+def test_parse_metadata_nbformat_missing_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat 缺失 → ipynb_bad_structure（直写文件绕过 helper 默认）。"""
     nb = {"nbformat_minor": 5, "metadata": {}, "cells": []}
-    p = _write_nb(tmp_path, nb)
+    p = tmp_path / "x.ipynb"
+    p.write_text(json.dumps(nb), encoding="utf-8")
     parser = IpynbParser()
-    doc = parser.parse(p, source_hash=SHA)
-    assert doc.metadata["nbformat"] is None
+    with pytest.raises(ParserError) as ei:
+        parser.parse(p, source_hash=SHA)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
-def test_parse_metadata_nbformat_minor_missing_is_none(tmp_path: Path):
+def test_parse_metadata_nbformat_minor_missing_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat_minor 缺失 → ipynb_bad_structure（直写文件绕过 helper 默认）。"""
     nb = {"nbformat": 4, "metadata": {}, "cells": []}
-    p = _write_nb(tmp_path, nb)
+    p = tmp_path / "x.ipynb"
+    p.write_text(json.dumps(nb), encoding="utf-8")
     parser = IpynbParser()
-    doc = parser.parse(p, source_hash=SHA)
-    assert doc.metadata["nbformat_minor"] is None
+    with pytest.raises(ParserError) as ei:
+        parser.parse(p, source_hash=SHA)
+    assert ei.value.code == "ipynb_bad_structure"
+    assert ei.value.details["field"] == "nbformat_minor"
 
 
 def test_parse_metadata_cell_count_value(tmp_path: Path):
@@ -624,25 +634,24 @@ def test_parse_nbformat_negative_raises_unsupported_version(tmp_path: Path):
     assert exc_info.value.code == "ipynb_unsupported_version"
 
 
-def test_parse_nbformat_minor_negative_supported(tmp_path: Path):
-    """nbformat_minor 不被检查（只 major）。"""
+def test_parse_nbformat_minor_negative_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat_minor 为负 → ipynb_bad_structure。"""
     nb = _minimal_nb([], nbformat=4, nbformat_minor=-1)
     p = _write_nb(tmp_path, nb)
     parser = IpynbParser()
-    doc = parser.parse(p, source_hash=SHA)
-    assert doc.metadata["nbformat_minor"] == -1
+    with pytest.raises(ParserError) as ei:
+        parser.parse(p, source_hash=SHA)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
-def test_parse_nbformat_float_value_accepted(tmp_path: Path):
-    """JSON 数字 4.0 应被接受（4.0 >= 4）——
-    但实际 json.load 把 4.0 解析为 float。代码 `nbformat < 4` 在 float 下也成立。
-    """
+def test_parse_nbformat_float_value_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat 必须为整数，float 4.0 → ipynb_bad_structure。"""
     nb = {"nbformat": 4.0, "nbformat_minor": 5, "metadata": {}, "cells": []}
     p = _write_nb(tmp_path, nb)
     parser = IpynbParser()
-    doc = parser.parse(p, source_hash=SHA)
-    # metadata.nbformat 应保留 float（因为代码不强制 int 化）
-    assert doc.metadata["nbformat"] == 4.0
+    with pytest.raises(ParserError) as ei:
+        parser.parse(p, source_hash=SHA)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 # =========================================================================

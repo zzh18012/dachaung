@@ -22,7 +22,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from app.hash import compute_file_hash
+from app.parsers.base import ParserError
 from app.parsers.ipynb_parser import IpynbParser
 
 
@@ -56,16 +59,15 @@ def _md(source):
 
 # ---------- metadata 透传 ----------
 
-def test_nbformat_minor_string_passthrough(
+def test_nbformat_minor_string_rejected(
         tmp_path):
-    doc = _nb(
-        tmp_path, "ms.ipynb",
-        [_code("x=1")],
-        nbformat_minor="5")
-    assert doc.metadata["nbformat"] == 4
-    assert doc.metadata[
-        "nbformat_minor"] == "5"
-    assert len(doc.elements) == 1
+    """adoption 契约 §2（2026-08-27）：nbformat_minor 为字符串 → ipynb_bad_structure。"""
+    with pytest.raises(ParserError) as ei:
+        _nb(
+            tmp_path, "ms.ipynb",
+            [_code("x=1")],
+            nbformat_minor="5")
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 def test_kernel_language_numeric_passthrough(

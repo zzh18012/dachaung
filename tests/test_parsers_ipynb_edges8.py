@@ -289,6 +289,9 @@ def _make_minimal_notebook(cells=None, nbformat=4, nbformat_minor=5,
 
 
 def _write_ipynb(tmp_path: Path, nb: dict, name: str = "test.ipynb") -> Path:
+    # adoption 契约 §2 注记（2026-08-27）：版本字段必填——fixture 缺省时补默认。
+    nb.setdefault("nbformat", 4)
+    nb.setdefault("nbformat_minor", 5)
     p = tmp_path / name
     p.write_text(json.dumps(nb), encoding="utf-8")
     return p
@@ -359,14 +362,15 @@ def test_parse_nbformat_2_rejected(tmp_path: Path):
     assert excinfo.value.code == "ipynb_unsupported_version"
 
 
-def test_parse_nbformat_none_accepted(tmp_path: Path):
-    """nbformat 缺失 → 视为 None → 接受。"""
+def test_parse_nbformat_none_rejected(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat=None → ipynb_bad_structure。"""
     parser = IpynbParser()
     nb = _make_minimal_notebook()
     nb["nbformat"] = None
     p = _write_ipynb(tmp_path, nb)
-    doc = parser.parse(p, "a" * 64)
-    assert isinstance(doc, Document)
+    with pytest.raises(ParserError) as ei:
+        parser.parse(p, "a" * 64)
+    assert ei.value.code == "ipynb_bad_structure"
 
 
 def test_parse_nbformat_4_accepted(tmp_path: Path):
@@ -377,13 +381,14 @@ def test_parse_nbformat_4_accepted(tmp_path: Path):
     assert isinstance(doc, Document)
 
 
-def test_parse_nbformat_5_accepted(tmp_path: Path):
-    """大于 4 也接受。"""
+def test_parse_nbformat_5_unsupported(tmp_path: Path):
+    """adoption 契约 §1（2026-08-27）：nbformat=5 → ipynb_unsupported_version。"""
     parser = IpynbParser()
     nb = _make_minimal_notebook(nbformat=5)
     p = _write_ipynb(tmp_path, nb)
-    doc = parser.parse(p, "a" * 64)
-    assert isinstance(doc, Document)
+    with pytest.raises(ParserError) as ei:
+        parser.parse(p, "a" * 64)
+    assert ei.value.code == "ipynb_unsupported_version"
 
 
 def test_parse_cells_not_list(tmp_path: Path):

@@ -630,16 +630,21 @@ def test_ipynb_parser_metadata_can_be_empty_dict(tmp_path: Path):
     assert code.metadata["language"] == ""
 
 
-def test_ipynb_parser_nbformat_missing_treated_as_supported(tmp_path: Path):
-    """nbformat 字段缺失时不算 < 4，按 4+ 处理。"""
+def test_ipynb_parser_nbformat_missing_rejected_as_bad_structure(tmp_path: Path):
+    """adoption 契约 §2（2026-08-27）：nbformat 字段缺失 → ipynb_bad_structure。
+
+    原快照语义为“缺失按 4+ 处理”，契约修订后版本字段必填。
+    """
     nb = {
         "cells": [{"cell_type": "code", "source": "x=1", "metadata": {}}],
         "metadata": {},
         "nbformat_minor": 5,
     }
     p = _write_nb(tmp_path, "nofmt.ipynb", nb)
-    doc = IpynbParser().parse(p, source_hash="a" * 64)
-    assert doc.metadata["nbformat"] is None
+    with pytest.raises(ParserError) as ei:
+        IpynbParser().parse(p, source_hash="a" * 64)
+    assert ei.value.code == "ipynb_bad_structure"
+    assert ei.value.details["field"] == "nbformat"
 
 
 def test_ipynb_parser_markdown_cell_with_only_whitespace_warns_no_content(tmp_path: Path):

@@ -37,9 +37,10 @@ def _parse(tmp_path, obj, name=TMP_NAME):
 
 
 def _nb(cells, metadata=None):
+    # adoption 契约 §2 注记（2026-08-27）：补 nbformat_minor（版本字段必填）。
     return {"cells": cells,
             "metadata": metadata or {},
-            "nbformat": 4}
+            "nbformat": 4, "nbformat_minor": 5}
 
 
 # ---------- cell_type 变体 ----------
