@@ -30,12 +30,24 @@ CLI 子命令设计为清晰分离：`run` 跑评测、`validate-report` 校验�
 
 报告必须通过 `schemas/evaluation-report.schema.json`。包含：
 
-- `report_version`：固定 `"1.0"`
+- `report_version`：**精确快照版本**（见下文 3.1 演进表）
 - `provenance`：git_commit、git_dirty、parser/version、依赖版本、max_chars、运行时间
 - `devset`：status、file_count、content_group_count、pdf/docx 数量、categories 覆盖
 - `summary`：分类型聚合（counts / success_rates / ratio_macro_averages / silent_drop_total）
 - `per_doc`：每份文档的全部指标
 - `expected_failures`：预期失败用例的 expected vs actual 错误码
+
+### 3.1 report_version 演进（精确快照，schema 条件互斥）
+
+| 版本 | 引入内容 | 校验语义 |
+|---|---|---|
+| 1.1 | 旧结构（早期文档曾写"固定 1.0"，随 v1.1 语义修订废止；无存量封存报告） | 不得含 expectation_checks 分节、per-doc check 键、parser_used |
+| 1.2 | summary.expectation_checks 分节；per-doc 四个 check 键（required/forbidden_markers、must_not_error_codes、max_silent_drop） | 不得含 per-doc parser_used |
+| 1.3（当前） | per-doc `parser_used`（auto 混合调度的复现字段） | 必含 parser_used |
+
+evaluator_version 与能力封口对应：1.3 markdown、1.4 html、1.5
+`--parser auto`、1.6 text。同版本不同能力损害复现，故新格式启用即升
+evaluator 版本；report_version 仅在报告**结构**变化时提升。
 
 ## 4. 指标定义
 

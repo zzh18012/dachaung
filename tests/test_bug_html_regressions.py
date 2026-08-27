@@ -390,3 +390,31 @@ def test_bug_html1_same_line_multiple_outer_tables(tmp_path: Path):
     assert [t for t in tables if t.metadata["table_index"] == ti_a] == [outer_a]
     assert [t for t in tables if t.metadata["table_index"] == ti_b] == [outer_b]
     validate(doc.to_dict())
+
+
+def test_bug_html1_table_index_repeat_parse_deterministic(tmp_path: Path):
+    """ChatGPT 验收条件：相同输入重复解析，索引分配一致。"""
+    html = (
+        "<table><tr><td>A<table><tr><td>X</td></tr></table></td></tr></table>"
+        "<table><tr><td>B</td></tr></table>"
+    )
+    p = tmp_path / "case.html"
+    p.write_text(html, encoding="utf-8")
+    d1 = HtmlParser().parse(p, source_hash="1" * 64)
+    d2 = HtmlParser().parse(p, source_hash="1" * 64)
+    k1 = [(e.type, e.content, e.metadata.get("table_index")) for e in d1.elements]
+    k2 = [(e.type, e.content, e.metadata.get("table_index")) for e in d2.elements]
+    assert k1 == k2
+
+
+def test_bug_html1_table_index_counter_not_shared_across_documents(tmp_path: Path):
+    """ChatGPT 验收条件：不同文档不共享计数状态（计数器随 parser 实例新建）。"""
+    html = "<table><tr><td>T</td></tr></table>"
+    p = tmp_path / "case.html"
+    p.write_text(html, encoding="utf-8")
+    d1 = HtmlParser().parse(p, source_hash="1" * 64)
+    d2 = HtmlParser().parse(p, source_hash="2" * 64)
+    for d in (d1, d2):
+        tables = [e for e in d.elements if e.type == "table"]
+        assert len(tables) == 1
+        assert tables[0].metadata["table_index"] == 0, "每个文档从 0 重新计数"

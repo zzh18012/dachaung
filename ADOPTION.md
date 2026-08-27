@@ -595,14 +595,15 @@ ChatGPT 5.6 Sol 指出：table_start_line + row_index + cell_index 在
 - 登记测试 +2（test_bug_html_regressions.py，共 25）：同一行三层
   嵌套（三 table 同起始行、table_index 互异、每段唯一解析到直接
   外层）；同一行两个并列外层表格（坐标完全同形，table_index 区分
-  且各归其主）
+  且各归其主）；ChatGPT 裁决验收条件补测 +2（相同输入重复解析
+  索引分配一致；不同文档计数器不共享、各自从 0 起）
 - 邻域适配：edges12 test_th_scope_ignored / edges22
   test_all_th_single_row_table 的精确 metadata 断言补 table_index
   （两文件自此与 autoline 有注记差异）
 - 验证：全套 3826 passed；html-dev 与 holdout-html 复跑指标与
   既有结果零差异（纯加性 metadata，不触指标）；首跑报告与标签不动
 
-### Stage 5 验收矩阵与 holdout-text 官方首跑（候选 SHA ca3fbd9）
+### Stage 5 验收矩阵与 holdout-text 正式候选验收（候选 SHA ca3fbd9）
 
 按 ChatGPT 5.6 Sol 确立的验收顺序（全部通过后才首次运行 holdout）：
 
@@ -615,14 +616,26 @@ ChatGPT 5.6 Sol 指出：table_start_line + row_index + cell_index 在
      **七组规范化零差异**（去时间戳/git/计时/版本戳/parser_used）
   3. holdout-md / holdout-html 确定性复跑与封存首跑零差异
   4. 全部 stage5 报告 schema 校验通过（report 1.3）
-- **holdout-text 官方首跑**：ca3fbd9 干净 SHA 上
-  outputs/evaluation-holdout-text-first-run.json——4/4 全绿，
+- **holdout-text 正式候选验收**（ChatGPT 5.6 Sol 裁决措辞，不得称
+  "首次未暴露评测"）：ca3fbd9 干净 SHA 上 outputs/
+  evaluation-holdout-text-first-run.json——4/4 全绿，
   required_markers 4/4（含 U+FFFD×2 连续序列精确断言）、
   must_not_error 1/1，schema 通过，sha256 前缀 **468a4ea55a3d297d**，
   已同步主仓 outputs/
-- 运行沿革（诚实记录顺序偏差）：首跑曾在 85e3dda+dirty（注册改动
-  未提交时）预跑、又在 d0f11a0 复验，两次与官方首跑规范化零差异
-  （确定性成立），但不符合"固定候选 SHA 后首跑"的时序要求——预跑
-  保留为 evaluation-holdout-text-preliminary-run.json（同步主仓），
-  **官方首跑以 ca3fbd9 为准**，此偏差已向 ChatGPT 报备
-- 此后两份以上 holdout（md/html/text）manifest 均不得再修改
+- **真实时间线与暴露性质**（ChatGPT 裁决要求如实区分）：
+  1. 机械搬运阶段（85e3dda 前后）的语料对照把 holdout-text 4 文件
+     纳入两仓直接解析比对——**已发生结果暴露**
+  2. 85e3dda+dirty（注册改动未提交）预跑——未冻结源码状态的预跑；
+     该时刻的未提交差异未做快照，**复现受限**（不能以"后来输出相同"
+     证明当时源码与某 SHA 相同）
+  3. d0f11a0 中间候选复验
+  4. ca3fbd9 最终选定候选的正式验收（4/4 通过）
+  不符合"候选完成后才首次接触 holdout 结果"的原约定；但 ChatGPT
+  裁定不否定 ca3fbd9 验收结果、无依据认定据此调参。全部原始记录
+  保留。text holdout-v1 此后作为固定回归集使用；仅当项目最终需要
+  宣称严格未暴露验收时另建新集
+- **text-dev 验收口径**（ChatGPT 裁决）：7 个输入 = 5 个处理成功
+  + 2 个预期失败精确匹配（no_extracted_elements；其他错误、崩溃
+  或意外成功均不能冒充预期失败）+ 0 个非预期失败；不得概括为
+  "7/7 解析成功"。**manifest 修订后的通过不是算法性能提升**——
+  变化发生在评测期望层（规格勘误），非解析能力变化
