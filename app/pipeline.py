@@ -18,6 +18,7 @@ from app.models import Document, ErrorRecord
 from app.parsers import Parser, ParserError
 from app.parsers.fallback_parser import FallbackParser
 from app.parsers.html_parser import HtmlParser
+from app.parsers.ipynb_parser import IpynbParser
 from app.parsers.kreuzberg_parser import KreuzbergParser
 from app.parsers.markdown_parser import MarkdownParser
 from app.parsers.text_parser import TextParser
@@ -36,7 +37,9 @@ def get_parser(name: str, image_output_dir: Path | str | None = None) -> Parser:
         return HtmlParser()
     if name == "text":
         return TextParser()
-    raise ValueError(f"未知 parser: {name}（支持: fallback, kreuzberg, markdown, html, text）")
+    if name == "ipynb":
+        return IpynbParser()
+    raise ValueError(f"未知 parser: {name}（支持: fallback, kreuzberg, markdown, html, text, ipynb）")
 
 
 def process_single(

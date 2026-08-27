@@ -45,7 +45,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parse.add_argument("-o", "--output", required=True, help="输出 JSON 路径")
     parse.add_argument(
         "--parser",
-        choices=("fallback", "kreuzberg", "markdown", "html", "text"),
+        choices=("fallback", "kreuzberg", "markdown", "html", "text", "ipynb"),
         default="fallback",
         help="选择解析器（默认 fallback；kreuzberg 已实测对 DOCX 给不出元素结构）",
     )

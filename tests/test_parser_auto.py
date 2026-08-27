@@ -1,14 +1,14 @@
-"""--parser auto 混合 manifest 调度验收测试（evaluator v1.6 / report 1.3）。
+"""--parser auto 混合 manifest 调度验收测试（evaluator v1.7 / report 1.3）。
 
 ChatGPT 5.6 Sol 2026-08-27 指示：auto 只依据 manifest 的 source_type 确定
 parser，不按扩展名猜测；显式 --parser 旧行为不变；报告 per_doc 记录
-parser_used。text 注册（v1.6）后覆盖：
+parser_used。ipynb 注册（v1.7）后覆盖：
 1. 映射表与解析函数：pdf/docx→fallback、markdown→markdown、html→html、
-   text→text；未注册类型（ipynb）→ None（文档级合成失败）；显式名原样透传
+   text→text、ipynb→ipynb；未注册类型 → None（文档级合成失败）；显式名原样透传
 2. 混合 manifest（markdown+html+text+ipynb）单次 auto 运行：逐文档
-   parser_used 正确、md/html/text 成功、ipynb 合成 unsupported_type
-   （不崩溃不误导）、报告通过 schema 校验、provenance.parser_name=="auto"
-   且 parser_version 为 null（多 parser 并存时单值会误导）
+   parser_used 正确、四类全部成功、报告通过 schema 校验、
+   provenance.parser_name=="auto" 且 parser_version 为 null
+   （多 parser 并存时单值会误导）
 3. 显式 --parser markdown 行为不变：parser_used 全为 markdown，
    非 md 文档按既有语义 unsupported_type
 """
@@ -40,6 +40,7 @@ def test_auto_mapping_table_registered_types_only():
         "markdown": "markdown",
         "html": "html",
         "text": "text",
+        "ipynb": "ipynb",
     }
 
 
@@ -51,7 +52,7 @@ def test_auto_mapping_table_registered_types_only():
         ("markdown", "markdown"),
         ("html", "html"),
         ("text", "text"),
-        ("ipynb", None),  # 未注册 → 文档级合成失败，不路由到任何 parser
+        ("ipynb", "ipynb"),  # v1.7 注册
         (None, "fallback"),  # ef 旧条目无 source_type → 沿用 fallback
     ],
 )
@@ -78,7 +79,18 @@ def _mixed_manifest(tmp_path: Path) -> Path:
     md = _write(tmp_path, "docs/a.md", "# 标题\n\n正文 AUTO_MD 标记\n")
     html = _write(tmp_path, "docs/b.html", "<h1>标题</h1><p>AUTO_HTML 标记</p>")
     text = _write(tmp_path, "docs/c.txt", "plain text AUTO_TXT 标记\n")
-    ipynb = _write(tmp_path, "docs/d.ipynb", "{}")
+    # v1.7：ipynb 已注册，混合 manifest 用真实 nbformat 4 notebook
+    nb = {
+        "cells": [
+            {"cell_type": "markdown",
+             "source": "# NB 标题\n\n正文 AUTO_NB 标记"},
+            {"cell_type": "code", "source": "print('hi')"},
+        ],
+        "metadata": {},
+        "nbformat": 4,
+        "nbformat_minor": 5,
+    }
+    ipynb = _write(tmp_path, "docs/d.ipynb", json.dumps(nb, ensure_ascii=False))
     data = {
         "manifest_version": "1.1",
         "devset_status": "incomplete",
@@ -113,7 +125,7 @@ def test_auto_mixed_manifest_single_run(tmp_project: Path):
     assert report["provenance"]["parser_name"] == "auto"
     # auto 模式多 parser 并存 → parser_version 为 null
     assert report["provenance"]["parser_version"] is None
-    assert report["provenance"]["evaluator_version"] == "1.6"
+    assert report["provenance"]["evaluator_version"] == "1.7"
 
     by_id = {d["doc_id"]: d for d in report["per_doc"]}
     assert by_id["AUTO-MD"]["parser_used"] == "markdown"
@@ -126,13 +138,10 @@ def test_auto_mixed_manifest_single_run(tmp_project: Path):
     assert t["parser_used"] == "text"
     assert t["metrics"]["pipeline_success"]["value"] is True
 
-    # ipynb 未注册：文档级合成失败，parser_used="none"，错误码语义准确
+    # ipynb 已注册（v1.7）：正常解析成功
     nb = by_id["AUTO-IPYNB"]
-    assert nb["parser_used"] == "none"
-    assert nb["metrics"]["pipeline_success"]["value"] is False
-    assert nb["metrics"]["error_code"]["value"] == "unsupported_type"
-    # 未跑 pipeline → 计时 total=0
-    assert nb["wall_time_seconds"]["total"] == 0.0
+    assert nb["parser_used"] == "ipynb"
+    assert nb["metrics"]["pipeline_success"]["value"] is True
 
 
 def test_explicit_markdown_behavior_unchanged(tmp_project: Path):

@@ -272,10 +272,60 @@ def test_ipynb_full_document_schema_valid(tmp_path: Path):
     validate(doc.to_dict())
 
 
-# adoption 裁切（2026-08-27，ipynb 机械搬运阶段）：以下两个测试经 pipeline /
-# CLI 调用 ipynb，属注册启用阶段依赖（契约 §12 切分表），注册时原样搬回。
-# --- CUT test_ipynb_pipeline_end_to_end（process_single parser_name="ipynb"）---
-# --- CUT test_cli_parse_ipynb_end_to_end（app.cli parse --parser ipynb）---
+# adoption 注册启用（2026-08-27）：机械搬运阶段裁切的两个 pipeline / CLI
+# 测试按契约 §12 切分表现已原样搬回。
+def test_ipynb_pipeline_end_to_end(tmp_path: Path):
+    from app.pipeline import process_single
+
+    nb = _nb([
+        {"cell_type": "markdown", "source": "# Project\n\nIntro.", "metadata": {}},
+        {"cell_type": "code", "source": "x = 1\ny = 2\nprint(x+y)", "metadata": {}},
+        {"cell_type": "markdown", "source": "## Background\n\nMore content here.", "metadata": {}},
+    ])
+    src = _write_nb(tmp_path, "doc.ipynb", nb)
+    out = tmp_path / "out.json"
+    document, errors = process_single(src, out, parser_name="ipynb", write_json=True)
+    assert errors == []
+    assert document is not None
+    assert document.source_type == "ipynb"
+    types = {e.type for e in document.elements}
+    assert "heading" in types
+    assert "paragraph" in types
+    assert len(document.chunks) >= 1
+    for c in document.chunks:
+        assert c.source_element_ids
+
+
+def test_cli_parse_ipynb_end_to_end(tmp_path: Path):
+    nb = _nb([
+        {"cell_type": "markdown", "source": "# Title", "metadata": {}},
+        {"cell_type": "code", "source": "print('hi')", "metadata": {}},
+    ])
+    src = tmp_path / "doc.ipynb"
+    src.write_text(json.dumps(nb, ensure_ascii=False), encoding="utf-8")
+    out = tmp_path / "out.json"
+
+    env = {
+        **os.environ,
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONPATH": str(PROJECT_ROOT) + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
+    proc = subprocess.run(
+        [_PYTHON, "-m", "app.cli", "parse", str(src),
+         "-o", str(out), "--parser", "ipynb"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        env=env,
+    )
+    assert proc.returncode == 0, f"stderr={proc.stderr}"
+    assert "[OK]" in proc.stdout
+    assert out.is_file()
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["source_type"] == "ipynb"
+    assert data["parser_name"] == "ipynb"
+    assert len(data["elements"]) >= 2
 
 
 # ---------- 边角与缺漏补强（Round 38） ----------
