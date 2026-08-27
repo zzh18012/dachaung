@@ -485,10 +485,20 @@ text-dev-v1 / text-holdout-v1；expectations 全部按 TextParser 文档化规�
     .text 备用扩展名+多种空白分隔行 / 行尾空白+段内换行
 - expectations 要点：段落计数全部按"空行分隔、段内行保留、整段首尾
   strip"推导；空文件与纯空白声明 paragraph:0（计数下限语义下 0 是
-  强断言）；BOM 行为按文档推导——无 BOM 处理条款 + "用户怎么写就
-  怎么存" → BOM 为普通非空白字符（首段保留、不影响分段）；无效字节
-  按逐字节 U+FFFD 替换断言；must_not_error_codes 守护 text_read_failed
+  强断言）；BOM 为普通非空白字符（首段保留、不影响分段）；无效字节
+  按 errors=replace 替换断言；must_not_error_codes 守护 text_read_failed
   与 unsupported_type 不发生
+- 语义修正（2026-08-27，ChatGPT 边界②纠错）：初稿曾概括"无效字节
+  逐字节 → U+FFFD"，**该概括错误**。Python errors=replace 按 Unicode
+  maximal subpart 规则：孤立非法单字节各自一个 U+FFFD；截断的多字节
+  序列（E2 82+EOF、F0 9F 98+非延续）整体一个 U+FFFD。holdout fixture
+  b"\x80\xff" 为两个孤立非法单字节 → 恰好两个 U+FFFD，原 expectation
+  与连续序列 marker（PAD_END+U+FFFD×2+TAIL_START，多一个替换符则
+  子串不命中，同时钉住位置与次数）均正确，**冻结 manifest 不动**。
+  精确行为由 tests/test_text_decode_replace_semantics.py 直接断言
+  （含 ChatGPT 核对表两组：FF FF→两个、E2 82+EOF→一个；替换次数
+  全部用 element.content.count 断言）；BOM 升格为本阶段明示政策
+  "保留 U+FEFF"，不再以"规格未提及"推导
 - 冻结哈希：devset-text manifest 4b0e5abc0fc55851、
   holdout-text manifest 4c7be8ff8e495946（manifest 1.1）
 - 首次运行前 expectations 审计已完成（本轮起草即按规格逐条推导并
