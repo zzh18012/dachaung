@@ -761,8 +761,9 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
     文本逐格对应（钉"相邻短 cell 不合并"）
   - H-CHK-002（短+600 字符超长 code cell+短）：chunk_count>=5、中段全部
     cell={1}、每 piece<=200（钉"超长只在 cell 内切分"）
-  - H-CHK-003（单 cell 内 heading 边界 + 相邻 list cell）：chunk_count=3、
-    cell 集 {0},{0},{1}、文本逐条钉死
+  - H-CHK-003（单 cell 内 heading 边界 + 相邻 list cell）：chunk_count=2、
+    cell 集 {0},{1}、文本 ["标题甲 段落一文字 段落二文字", "项目一 项目二"]
+    （**冻结后修正**，见下）
   - H-CHK-004（全空 cell）：无 element 无 chunk
   - 冻结哈希：expectations-chunks.json
     0275b43efd855ed23530b00daf51da2dc197d29bf9cbc018d2ccd920850d0843；
@@ -774,5 +775,14 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
     1499724f246220028790d091db82efef7e13b5efc5d3a317fac87578b6aa7bd2；
     H-CHK-004.ipynb
     92208b0a82e441dc785c260db41753982f07d7ea45ad54092ad8fb1168a3ead6
+- **期望推导勘误（实现期间、首跑前）**：H-CHK-003 初版期望把 heading 推导为
+  独立 chunk（chunk_count=3），与契约自身矛盾——契约 §1 规则 8/9 要求 cell 内
+  行为与 96b688b 基线一致，而基线 heading 语义（main 上既有测试
+  tests/test_chunker.py::test_heading_is_hard_boundary 钉死）是"heading 封口
+  前文、与后续段落并入同一 chunk"，非孤立成 chunk。据契约修正为
+  chunk_count=2（推导权威=契约+main 既有基线测试，非新实现输出）。
+  四个 fixture 文件未改动（哈希不变）；expectations-chunks.json 修正后哈希
+  a730ac914411556abeb65607dc472140ffc883981325bc54f7ecc4b6bdd7d09b。
+  修正发生于任何 holdout 运行之前；此偏差如实登记并将在下轮汇报 GPT。
 - **纪律**：holdout 不进任何对照/预跑；固定干净 SHA 首跑封存；dev 侧断言
   （单 cell、覆盖、确定性 + 三指标 + 端到端）作为常驻回归测试。
