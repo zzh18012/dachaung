@@ -14,7 +14,7 @@ SCHEMA_VERSION = "0.1.0"
 ElementType = Literal[
     "heading", "paragraph", "list_item", "table", "image", "caption", "header", "footer"
 ]
-SourceType = Literal["pdf", "docx"]
+SourceType = Literal["pdf", "docx", "markdown", "html", "text", "ipynb"]
 
 
 @dataclass
@@ -53,12 +53,16 @@ class Chunk:
     """分块：表示一段可以独立检索的文本。
 
     `source_element_ids` 至少 1 个，确保可追溯到原始 Element。
+    `source_spans`（可选）给出每个被引用 element 在其 content 中的字符区间
+    `[start, end)`，用于字符级保留验证。空列表表示该 chunk 不带 span 信息
+    （向后兼容旧 chunker 输出）。
     """
 
     chunk_id: str
     text: str
     source_element_ids: list[str]
     metadata: dict[str, Any] = field(default_factory=dict)
+    source_spans: list[dict[str, Any]] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if not self.chunk_id:
@@ -69,7 +73,11 @@ class Chunk:
             raise ValueError(f"chunk {self.chunk_id} 文本不能为空")
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        # 空 span 不序列化：保证旧 chunker（不带 span）的输出形状不变
+        if not d["source_spans"]:
+            del d["source_spans"]
+        return d
 
 
 @dataclass

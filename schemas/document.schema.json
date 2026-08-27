@@ -23,7 +23,7 @@
     "schema_version": { "type": "string", "const": "0.1.0" },
     "document_id": { "type": "string", "minLength": 1 },
     "source_path": { "type": "string", "minLength": 1 },
-    "source_type": { "enum": ["pdf", "docx"] },
+    "source_type": { "enum": ["pdf", "docx", "markdown", "html", "text", "ipynb"] },
     "source_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
     "parser_name": { "type": "string", "minLength": 1 },
     "parser_version": { "type": "string", "minLength": 1 },
@@ -65,6 +65,78 @@
             "items": {
               "properties": {
                 "source_locator": { "$ref": "#/$defs/docx_locator" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "Markdown 文档：source_locator 含 line（≥1），section_path 可选。",
+      "if": {
+        "properties": { "source_type": { "const": "markdown" } },
+        "required": ["source_type"]
+      },
+      "then": {
+        "properties": {
+          "elements": {
+            "items": {
+              "properties": {
+                "source_locator": { "$ref": "#/$defs/markdown_locator" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "HTML 文档：source_locator 含 line（≥1），section_path 可选。",
+      "if": {
+        "properties": { "source_type": { "const": "html" } },
+        "required": ["source_type"]
+      },
+      "then": {
+        "properties": {
+          "elements": {
+            "items": {
+              "properties": {
+                "source_locator": { "$ref": "#/$defs/html_locator" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "纯文本文档：source_locator 含 line（≥1）。",
+      "if": {
+        "properties": { "source_type": { "const": "text" } },
+        "required": ["source_type"]
+      },
+      "then": {
+        "properties": {
+          "elements": {
+            "items": {
+              "properties": {
+                "source_locator": { "$ref": "#/$defs/text_locator" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "Jupyter Notebook：source_locator 含 cell_index (≥0) 与 cell_type，line 可选。",
+      "if": {
+        "properties": { "source_type": { "const": "ipynb" } },
+        "required": ["source_type"]
+      },
+      "then": {
+        "properties": {
+          "elements": {
+            "items": {
+              "properties": {
+                "source_locator": { "$ref": "#/$defs/ipynb_locator" }
               }
             }
           }
@@ -126,6 +198,10 @@
           "type": "array",
           "minItems": 1,
           "items": { "type": "string", "minLength": 1 }
+        },
+        "source_spans": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/source_span" }
         },
         "metadata": { "type": "object" }
       },
@@ -189,6 +265,53 @@
         "relationship_id": { "type": "string" }
       },
       "additionalProperties": true
+    },
+    "markdown_locator": {
+      "type": "object",
+      "required": ["line"],
+      "properties": {
+        "line": { "type": "integer", "minimum": 1 },
+        "section_path": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "html_locator": {
+      "type": "object",
+      "required": ["line"],
+      "properties": {
+        "line": { "type": "integer", "minimum": 1 },
+        "section_path": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "text_locator": {
+      "type": "object",
+      "required": ["line"],
+      "properties": {
+        "line": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": true
+    },
+    "ipynb_locator": {
+      "type": "object",
+      "required": ["cell_index", "cell_type"],
+      "properties": {
+        "cell_index": { "type": "integer", "minimum": 0 },
+        "cell_type": { "enum": ["markdown", "code", "raw"] },
+        "line": { "type": "integer", "minimum": 1 },
+        "section_path": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "source_span": {
+      "type": "object",
+      "required": ["element_id", "start", "end"],
+      "properties": {
+        "element_id": { "type": "string", "minLength": 1 },
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
     }
   }
 }

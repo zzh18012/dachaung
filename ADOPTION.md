@@ -40,7 +40,41 @@
 | app/parsers/fallback_parser.py | 3 行改动 | 阶段 2 | 微小 | 待搬 |
 | tests/（约 1800 文件，10 万+ 测试） | +874k 行 | 分类随各阶段搬 | 契约/性质测试优先，特征化测试随家族 | 待分类 |
 
-## 四、缺陷登记（评测期只登记不修）
+## 四、统一模型兼容性审计（2026-08-27 完成）
+
+四处检查结论（stage2-baseline-main vs autoline-snapshot）：
+
+| 检查点 | 差异 | 分类 | 处置 |
+|---|---|---|---|
+| models.py 字段/枚举 | SourceType +4（markdown/html/text/ipynb） | bucket 1 additive | 进契约 PR |
+| models.py 字段 | Chunk.source_spans 可选字段 | bucket 1 additive | 进契约 PR |
+| schemas/document.schema.json | source_type enum +4；4 个新 if/then + locator $defs；chunk.source_spans 可选数组 + source_span $def | bucket 1 additive（仅新类型触发） | 进契约 PR |
+| Chunk.to_dict 序列化 | asdict 无条件序列化 → 空 source_spans:[] 会进旧 PDF/DOCX 输出 | **bucket 2** | 契约 PR 改为空时省略键（已实现） |
+| app/pipeline.py | 解析器注册 +4（阶段 3-5 材料）；image_output_dir_for 纯重构 | 不属契约 | 推迟随各阶段 |
+| app/parsers/fallback_parser.py | 题注正则 [\.、\s]→[\.、:\s]（"Table 1:" 现算题注） | **旧行为变更** | 严禁进契约 PR；单独 PR + 旧格式评测对照 |
+| app/evaluation/ | 零差异 | — | 报告校验器无隐式假设变化 |
+
+契约 PR 内容（integration/autoline-adoption）：
+- app/models.py（自跑线版 + to_dict 空 span 省略）
+- schemas/document.schema.json（自跑线版 additive 全量）
+- tests/test_contract_adoption_v1.py（6 测试：旧形状不变/新枚举过/非法拒/locator 必填/span 序列化）
+- 验收：全套旧测试 + 旧 PDF/DOCX manifest 评测重跑与冻结基线对比
+
+## 五、评测 manifest 起草（2026-08-27 完成）
+
+三份独立 manifest（不触碰哈希 15f60b11 的 Stage 2 manifest；expectations 全按规格人工给定，非 golden）：
+
+| manifest | 位置 | 文档数 | 覆盖 |
+|---|---|---|---|
+| markdown-dev-v1 | samples/private/devset-md/ | 6 | 标题树/嵌套+任务列表/围栏变体/参差表/CRLF+Unicode+全角/链接图片裸URL |
+| html-dev-v1 | samples/private/devset-html/ | 5 | 标题段落+内联/列表/表格/实体+可恢复畸形/script-style 排除 |
+| known-regressions-v1 | samples/private/devset-regressions/ | 3 | BUG-md-1 / BUG-html-1 / BUG-html-2 最小复现 |
+
+新增规格键（现 runner 不支持，需后续评测模块扩展，不改 parser/chunker/pipeline）：
+`forbidden_markers`（不得出现的文本）、`must_not_error_codes`（不得出现的错误码）、`forbidden_silent_drop`（不得静默丢弃的元素类型）。
+holdout manifest（不参与调参）留待 parser 搬运完成后另建。
+
+## 六、缺陷登记（评测期只登记不修）
 
 | ID | 缺陷 | 严重度 | 修复时机 |
 |---|---|---|---|
@@ -53,14 +87,14 @@
 - BUG-html-1：外层文本与内层表格都保留，顺序稳定不重复
 - BUG-html-2：图片按统一模型保留；模型不支持时必须显式诊断，不得静默消失
 
-## 五、评测矩阵（每个高风险 PR 必跑）
+## 七、评测矩阵（每个高风险 PR 必跑）
 
 1. 旧格式回归：原 PDF/DOCX manifest，指标/规范化 JSON 哈希/静默丢弃数不得退化
 2. 新格式独立评测：MD、HTML 各自单独统计，不并入旧基线分母
 3. chunker 隔离评测：冻结统一模型 fixture，查不丢/不重/顺序/边界
 4. 端到端：parser → model → chunker → schema → JSON，真实 manifest
 
-## 六、git 操作约定
+## 八、git 操作约定
 
 - 单一目的、干净适用的提交：`git cherry-pick -x <sha>`
 - 混合/依赖中间态/大体量：以自跑线代码为来源在 main 架构上重写 PR，描述列来源 tag 与 commit 范围
