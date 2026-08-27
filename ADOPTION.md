@@ -253,3 +253,40 @@ PDF/DOCX 输出仍为 0.1.0 且通过校验。
      完全一致；输出 schema_version=0.2.0、7 elements → 4 chunks
 - chunker 交叉：无缺陷暴露（reference/text/boundary 指标全满），无需暂停
 - 评测报告均通过 evaluation-report 1.2 Schema 校验
+
+## 十、HTML parser 三段式搬运
+
+### 提交 1：机械搬运（2026-08-27 完成）
+
+- app/parsers/html_parser.py：自 autoline-snapshot（fcad055）逐字节搬运
+  （cmp 一致），stdlib html.parser 零外部依赖；未注册未启用
+- 测试搬运：test_parsers_html_edges.py + edges2..23 共 23 文件 + 
+  test_parsers_html.py（裁掉 2 个依赖注册/CLI 的端到端测试，
+  按三段式计划在提交 3 原样搬回，裁剪点留注释）；
+  test_parser_html_bq_li_p_ol_start.py 整文件依赖 process_single，
+  同样推迟到提交 3
+- BUG-html-1 / BUG-html-2 以 strict xfail 登记
+  （tests/test_bug_html_regressions.py，10 xfail + 邻域/fixture 3 pass）：
+  按 GPT 指示 xfail 断言"未来正确行为"（外层文本与内层表格都保留、
+  顺序稳定、img 保留或显式诊断），不把缺陷行为固化为期望；修复在提交 2
+- 同语料对照：devset-html(5) + holdout-html(4) + regressions html(2) 共 11 文件，
+  两仓 parser 输出 11/11 一致（模 source_path 与预期的 schema_version
+  0.1.0→0.2.0 差异；BUG-html-1/2 文件双方同样丢内容 = 缺陷对等）
+
+**冻结核对更正（2026-08-27，HTML 机械搬运时发现，先于任何评测运行）**：
+按 MD 的教训，首次运行前逐条核对了全部 HTML expectations 与文档化规格，
+发现四处我起草时的期望错误并更正（依据：parser 文档化规格与已确认的
+marker 投影语义，发生在首次运行之前）：
+- HTML-DEV-004：paragraph 3→2——未闭合 `<p>` 会吸收后续文本合并为单段
+  （搬运版实际行为；fixture 意图"可恢复畸形"不丢内容，marker 全命中）
+- HTML-HOLD-001：paragraph 2→3——blockquote 与 pre 各成一个 paragraph
+  （kind=blockquote / preformatted，文档化规格）
+- HTML-HOLD-002：补 paragraph:1——dl 不计数的豁免只覆盖语义不确定结构
+  （dl 本身），普通 `<p>` 应声明计数
+- REG-HTML-002：required_markers 删除 REG_TH_IMG_ALT——image alt 在元素
+  metadata，不进文本投影（与 MD-DEV-006 更正同类，ChatGPT 5.6 Sol 已确认
+  该分工）；BUG-html-2 的门是 element_count_by_type image:1
+  + image_resource_exists_ratio，保持不变
+更正后哈希：devset-html 3b72b05620d6b9d8、holdout-html 3ceb4f212dc60b3b、
+devset-regressions 030f6401af7acf5e。主仓 samples/private 副本已同步。
+HTML-DEV-001..003、005、HTML-HOLD-003/004 核对无误。
