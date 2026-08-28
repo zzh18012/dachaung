@@ -811,3 +811,52 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   无合并提交）；主 worktree 全套回归 4950 passed；Stage 6 第一批在
   4d0d471 关闭。EVALUATOR_VERSION 保持 1.7、report_version 1.3、
   manifest 1.1（契约 §4，无 evaluator 能力变更）。
+
+## 十七、Stage 6 第二批：Chunk.source_spans 填充（2026-08-28）
+
+- **裁决来源**：ChatGPT 5.6 Sol 新对话 6a911adf（旧对话服务端历史重建
+  错误后换新对话；裁决经 SSE 网络层取证，UI 渲染为空）。批次 1 通过并
+  封口、三项偏差全部接受、不重跑已封存 holdout；批次 2 定为
+  `Chunk.source_spans` 填充单独封口；拆批保险条款：若不同 source type
+  的 span 语义无法统一须实现前暂停汇报。
+- **受控 push（裁决第 4 条）**：用户授权后执行普通 fast-forward
+  push，origin/main 96b688b → 8a5a9e6（无 force），远端检查点对齐。
+- **盘点结论**：models/schema 侧已在基线（Chunk.source_spans 字段、
+  to_dict 空删键、effective_schema_version 0.2.0 翻转、$defs/source_span、
+  0.1.0 禁 span 分支）；autoline 有 chunker 填充逻辑与语义测试
+  （test_pipeline_split_spans.py 切片恒等）。语义统一性判定：span 是
+  el.content 字符区间、跨 source type 同构，累积路径整进整出、唯一
+  拆分在超长路径、ipynb cell 边界整元素封口与 span 正交——不触发
+  拆批暂停。搬运方式：无机械搬运，按基线语义融合实现。
+- **契约**：docs/chunker-source-spans-contract.md（9e1b4d4）——九规则
+  （定义/切片恒等/坐标基准 lstrip 推算/累积路径整区间/超长路径
+  el_start+piece 偏移与缝隙语义/逐 part 不去重/无文本无 span/既有输出
+  逐字节不变/版本契约）、§1.9 修订条款（AMENDMENT）：
+  test_old_pipeline_output_still_010_and_valid 的"pdf/docx 输出仍
+  0.1.0"被取代——0.1.0 保持合法读取格式，新 pipeline 输出一律
+  0.2.0；冻结基线字节一致保护已封存产物而非新运行。
+- **span 专属 holdout（全新，不复用已曝光语料）**：
+  samples/private/holdout-chunker-spans/，max_chars=100，期望按契约
+  先于实现人工推导（elements 清单来自冻结 parser 导出，非新实现）：
+  - H-SPN-001.md（heading+2 段）：1 chunk sequential、3 span 全区间
+  - H-SPN-002.md（149 字符 25 句）：2 chunk，[0,95)+[96,149)，
+    缝隙 1 空格，均无 split_boundary_after
+  - H-SPN-003.md（239 字符无句读）：3 chunk 硬切 whitespace 回退
+    [0,95)/[96,191)/[192,239)，前两片 split_boundary_after=whitespace
+  - H-SPN-004.ipynb（3 cell 含超长 cell）：4 chunk，cell 边界与
+    span 正交共存
+  - H-SPN-005.md（纯空白）：结构化 no_extracted_elements
+  - 冻结哈希：expectations-chunks.json
+    e3d787e9c68c0b8c9213fc8cad70ea90d42bc7ef2e2e36c075910a4ccb6fdfc2；
+    H-SPN-001.md
+    9493ce91edb3f7bfd58a6bacf265c93e886c34c760d602b17d670f9a8ebccff7；
+    H-SPN-002.md
+    e4584e9779b847c5c5cc03210bb5e79c3f6fc391ec548ed0c7ed04366e984315；
+    H-SPN-003.md
+    95551d2890a0c33cc24e2ec7dc420405e4649b416553e829fae2a26c361a7a42；
+    H-SPN-004.ipynb
+    1b1c269976873ce8ddc54a73c474353410c5f6ad058da09ad7f16158c2a6eca5；
+    H-SPN-005.md
+    6a3cf5192354f71615ac51034b3e97c20eda99643fcaf5bbe6d41ad59bd12167
+- **纪律**：holdout 不进任何对照/预跑；固定干净 SHA 一次性首跑封存；
+  切片恒等/缝隙纯空白/版本翻转/文本逐字节不变作为常驻回归测试。
