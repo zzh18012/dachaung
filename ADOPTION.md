@@ -896,3 +896,15 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
 - **版本封口**：EVALUATOR_VERSION 保持 1.7、report_version 1.3、
   manifest 1.1（evaluator 无能力变更；span 不变量以验收测试 + holdout
   首跑断言执行）。
+
+### 合入 main 与批次关闭（2026-08-28）
+
+- `git merge --ff-only` integration/stage6-chunker-source-spans →
+  main 8a5a9e6..7dd8221（4 提交，无合并提交：9e1b4d4 契约 →
+  7970192 holdout 冻结 → 63b05ce 实现+契约测试 → 7dd8221 执行记录）。
+- 主 worktree 全套回归 4972 passed（基线 4950 + 22 新增，0 回归）。
+- Stage 6 第二批在 7dd8221 关闭；本记录提交后 main 最终对齐。
+- EVALUATOR_VERSION 1.7 / report_version 1.3 / manifest 1.1 不变。
+- 待裁决事项（下次汇报）：① 契约 §1.9 版本语义修订条款追认；
+  ② 验收脚本两处口径修正（跨 chunk 覆盖并集、计数对封存基线）追认；
+  ③ 下一批次方向。
