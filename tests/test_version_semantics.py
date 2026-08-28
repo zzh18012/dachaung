@@ -5,7 +5,9 @@
 - manifest 1.0：仅旧格式与旧 expectation 键；1.1 才允许 markdown/html/text/ipynb 与新键
 - report 1.1：旧结构；含 expectation_checks / per-doc check 键必须标 1.2
 - 旧资产（冻结 manifest / 旧结构报告 / 旧 PDF/DOCX pipeline 输出）继续通过
-- 旧 PDF/DOCX 输出继续生成 schema_version 0.1.0（与冻结基线字节一致）
+- 【2026-08-28 批次 2 修订（契约 docs/chunker-source-spans-contract.md §1.9）】
+  chunker 填充 source_spans 后，新 pipeline 输出一律 0.2.0；
+  0.1.0 保持合法读取格式（已落盘旧产物继续可校验）
 """
 
 from __future__ import annotations
@@ -194,8 +196,13 @@ def test_frozen_old_manifest_loads():
     assert all(d.source_type in ("pdf", "docx") for d in m.documents)
 
 
-def test_old_pipeline_output_still_010_and_valid(tmp_path: Path):
-    """真实 fallback pipeline 的 PDF/DOCX 输出必须仍是 0.1.0 且通过校验。"""
+def test_pipeline_output_now_020_with_spans(tmp_path: Path):
+    """真实 fallback pipeline 的 DOCX 输出为 0.2.0 且全部 chunk 带 span。
+
+    2026-08-28 批次 2 修订（契约 §1.9）：原"输出仍 0.1.0（与冻结基线
+    字节一致）"断言被取代——0.1.0 是合法读取格式（旧产物继续可校验，
+    见 test_udm_old_pdf_docx_shape_still_passes），新运行一律 0.2.0。
+    """
     pytest.importorskip("app.pipeline")
     devset = ROOT / "samples/private/devset/manifest.json"
     if not devset.is_file():
@@ -213,5 +220,9 @@ def test_old_pipeline_output_still_010_and_valid(tmp_path: Path):
     )
     assert not errors and document is not None
     d = document.to_dict()
-    assert d["schema_version"] == "0.1.0"
+    assert d["schema_version"] == "0.2.0"
+    assert d["chunks"], "docx 样本应有 chunk"
+    for chunk in d["chunks"]:
+        assert "source_spans" in chunk
+        assert chunk["source_spans"], "批次 2 后所有 chunk 都带非空 span"
     validate_udm(d)
