@@ -908,3 +908,57 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
 - 待裁决事项（下次汇报）：① 契约 §1.9 版本语义修订条款追认；
   ② 验收脚本两处口径修正（跨 chunk 覆盖并集、计数对封存基线）追认；
   ③ 下一批次方向。
+
+## 十八、Stage 6 第二批裁决与版本语义纠正（2026-08-28）
+
+### 裁决获取经过
+
+- 原对话 6a911adf 镜像站故障（UI 空泡、流截断、composer 卡死），按用户
+  "开个新对话"惯例改在会话 6a91a872（标题"Stage 6封口裁决"）投递汇报；
+  UI 再次只渲染片段，最终经页面内 fetch `/backend-api/conversation/{id}`
+  （只读、带用户会话 cookie）取得完整裁决正文 3204 字。
+- SSE 流仍携带镜像方警告注释"禁程序调用，将封禁账号"，已再次向用户
+  披露；用户选择继续。
+
+### 裁决四项（GPT 5.6 Sol，2026-08-28，会话 6a91a872）
+
+1. **契约 §1.9 版本语义修订：追认通过**，但最终解释收紧为"0.2.0 表示
+   该输出由支持 source_spans 的 schema/writer 产生；空 span 不序列化；
+   0.1.0 仅作 legacy 读入格式"。版本描述 schema 能力，而非某 chunk 恰好
+   有没有非空 span。要求保留 0.1.0 读兼容测试（backward-read
+   compatibility），不强迫新 writer 产旧版本。
+2. **两处验收口径修正：追认通过**，不重跑 holdout。纪律要求：
+   DC-MVP-001-PDF silent_drop=3 继续标记为 pre-existing/baselined，
+   报告不得写成"零 silent drop"；外围验收脚本修正不动 evaluator 本体，
+   EVALUATOR_VERSION=1.7 维持合理。
+3. **下一批次排序：source_locator 对齐 KVFS → 图片 caption 关联 →
+   表格→Markdown 线性化**（依赖关系：先封稳 provenance 链路，再做内容
+   构造类能力；caption 批次开批前须先裁定 caption 是否进入
+   Element.content）。断路器沿用：六种来源无法映射到稳定 KVFS locator
+   抽象时，不硬造统一，直接断路上报分型方案。
+4. **push：建议申请用户授权，只允许普通 fast-forward push**（禁 force /
+   force-with-lease；fetch 后祖先检查失败则断路重报）。并指出账面矛盾：
+   8a5a9e6→7f5f7da 链路应领先 5 提交而非汇报所称"两提交"。
+
+### 账面修正
+
+- 实测（dachuang-code，只读）：`git fetch` 后 origin/main 仍为 8a5a9e6；
+  `rev-list --count origin/main..main` = **5**（9e1b4d4、7970192、63b05ce、
+  7dd8221、7f5f7da）；`merge-base --is-ancestor` 通过。此前汇报"领先两
+  提交"系执行记录视角（7dd8221、7f5f7da 在 63b05ce 之后）误当全量差，
+  以 5 为准。
+
+### 版本语义纠正执行（integration/stage6-batch2-version-fix，13b8973）
+
+- `Document.effective_schema_version` 改为无条件返回 0.2.0（裁决 ① 的
+  writer-能力语义），删除 `_EXTENDED_SOURCE_TYPES` 内容驱动分支；
+  SCHEMA_VERSION=0.1.0 常量保留（legacy 读格式）。
+- `test_old_types_emit_010` 被 `test_all_types_emit_020_writer_capability`
+  取代（pdf 无 span → 0.2.0 且 schema 校验通过）；`test_models.py` 的
+  to_dict 版本断言同步改 0.2.0。0.1.0 读兼容测试
+  （test_udm_old_pdf_docx_shape_still_passes 等）原样保留。
+- 行为变化面：仅"无任何非空 span 的 pdf/docx 成功文档"（如纯图片文档）
+  从 0.1.0 翻为 0.2.0；全部成功 devset 文档批次 2 后本就带 span 输出
+  0.2.0，封存 holdout 首跑期望（H-SPN-001..004 均 0.2.0、H-SPN-005 无
+  文档）不受影响，无需重跑。
+- 全套回归：**4972 passed，0 回归**。
