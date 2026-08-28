@@ -860,3 +860,39 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
     6a3cf5192354f71615ac51034b3e97c20eda99643fcaf5bbe6d41ad59bd12167
 - **纪律**：holdout 不进任何对照/预跑；固定干净 SHA 一次性首跑封存；
   切片恒等/缝隙纯空白/版本翻转/文本逐字节不变作为常驻回归测试。
+
+### 执行与验收记录（2026-08-28）
+
+- **实现（63b05ce）**：`_SplitPiece` 增 start/end；`_hard_split_with_
+  whitespace_fallback` 逐 piece 坐标（piece_start 先于游标推进捕获，end
+  排除 rstrip 空白）；`_split_long_text` 句子定位（find+pos，防御回退）
+  与合并 buf_end 扩展（句间空白含于合并 span）；`_ChunkBuffer.parts` 四
+  元组化，flush 生成逐 part span（不去重）+ 首现去重 ids；3a 超长路径
+  span = el_start + piece 坐标；`_element_text_with_span` lstrip 长度
+  推算（契约规则 3）；既有 `_element_text` 留兼容包装。
+- **契约测试**：tests/test_chunker_source_spans.py 22 个，逐条映射九
+  规则 + §2 防御（ipynb cell/缺 locator 正交）+ §3 三指标（切片恒等/
+  非空白覆盖/两跑确定性）+ §4 端到端（md 0.2.0 + ipynb cell/span 共存）。
+- **版本语义修订（契约 §1.9）**：tests/test_version_semantics.py 原
+  `test_old_pipeline_output_still_010_and_valid` 断言被
+  `test_pipeline_output_now_020_with_spans` 取代（真实 docx → 0.2.0 +
+  全 chunk 非空 span + schema 通过），旧形状 0.1.0 读取兼容由既有
+  `test_udm_old_pdf_docx_shape_still_passes` 继续钉住。
+- **全套回归**：4972 passed（8a5a9e6 基线 4950 + 22 新增，0 回归）。
+- **dev 验收（干净 SHA 63b05ce）**：全部 5 个 devset（pdf/docx/md/
+  html/text/ipynb）逐文档断言——schema_version=0.2.0 且 schema 校验通
+  过、逐 chunk span 切片恒等（单 span 严格逐字节）、非空白覆盖无丢失
+  （跨 chunk 并集口径）、两次运行 chunk 全字段一致、element 静默丢失
+  与封存 stage5 pilot 基线逐 doc 一致（DC-MVP-001-PDF 的 silent_drop=3
+  为既有 parser 能力限制，与基线相同）；evaluation.cli ×2 报告落
+  outputs/evaluation-chunkerspan-dev-acceptance{,-run2}.json。验收脚本
+  两处口径修正（跨 chunk 覆盖并集；计数与封存基线比对）如实记录。
+- **holdout 一次性首跑（固定干净 SHA 63b05ce，git_dirty=False）**：
+  5/5 全过，一次命中——H-SPN-001 1 chunk 3 span；H-SPN-002 2 chunk
+  [0,95)+[96,149)；H-SPN-003 3 chunk whitespace 回退
+  [0,95)/[96,191)/[192,239)；H-SPN-004 4 chunk cell 边界与 span 正交；
+  H-SPN-005 结构化 no_extracted_elements。报告封存
+  outputs/holdout-chunkerspan-v1-firstrun.json，不再重跑。
+- **版本封口**：EVALUATOR_VERSION 保持 1.7、report_version 1.3、
+  manifest 1.1（evaluator 无能力变更；span 不变量以验收测试 + holdout
+  首跑断言执行）。
