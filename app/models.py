@@ -17,10 +17,6 @@ ElementType = Literal[
 ]
 SourceType = Literal["pdf", "docx", "markdown", "html", "text", "ipynb"]
 
-# 0.2.0 快照才允许的来源类型；出现任一（或 chunk 带 source_spans）→ 输出 0.2.0
-_EXTENDED_SOURCE_TYPES = frozenset({"markdown", "html", "text", "ipynb"})
-
-
 @dataclass
 class Element:
     """文档元素：标题 / 段落 / 表格 / 图片等。
@@ -145,16 +141,13 @@ class Document:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def effective_schema_version(self) -> str:
-        """精确快照版本：旧 PDF/DOCX 且不带 span → 0.1.0；否则 0.2.0。
+        """输出版本：span-aware writer 对全部来源一律 0.2.0。
 
-        保证旧 pipeline 输出与冻结基线字节一致（0.1.0），
-        新格式/新字段只出现在 0.2.0 快照里，版本即契约。
+        2026-08-28 GPT 5.6 Sol 裁决追认的最终解释：版本描述 schema/writer
+        能力，而非某文档恰好是否含非空 span；0.1.0 仅为 legacy 读入格式
+        （旧产物继续可校验），新 writer 不再产出。
         """
-        if self.source_type in _EXTENDED_SOURCE_TYPES:
-            return SCHEMA_VERSION_EXTENDED
-        if any(c.source_spans for c in self.chunks):
-            return SCHEMA_VERSION_EXTENDED
-        return SCHEMA_VERSION
+        return SCHEMA_VERSION_EXTENDED
 
     def to_dict(self) -> dict[str, Any]:
         return {

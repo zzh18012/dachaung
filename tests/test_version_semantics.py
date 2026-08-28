@@ -8,6 +8,8 @@
 - 【2026-08-28 批次 2 修订（契约 docs/chunker-source-spans-contract.md §1.9）】
   chunker 填充 source_spans 后，新 pipeline 输出一律 0.2.0；
   0.1.0 保持合法读取格式（已落盘旧产物继续可校验）
+- 【2026-08-28 裁决追认后的纠正】版本描述 writer 能力而非单文档内容：
+  span-aware writer 对全部来源（含无 span 的 pdf/docx）统一输出 0.2.0
 """
 
 from __future__ import annotations
@@ -18,7 +20,6 @@ from pathlib import Path
 import pytest
 
 from app.models import (
-    SCHEMA_VERSION,
     SCHEMA_VERSION_EXTENDED,
     Chunk,
     Document,
@@ -123,9 +124,16 @@ def _model_doc(source_type: str, locator: dict, spans: bool = False) -> Document
     )
 
 
-def test_old_types_emit_010():
+def test_all_types_emit_020_writer_capability():
+    """2026-08-28 裁决追认后的纠正：版本描述 writer 能力，非内容驱动。
+
+    旧断言（pdf/docx 无 span → 0.1.0）被取代：span-aware writer 对全部
+    来源统一输出 0.2.0，即使某文档碰巧没有非空 span；0.1.0 仅为 legacy
+    读入格式（见 test_udm_old_pdf_docx_shape_still_passes）。
+    """
     d = _model_doc("pdf", {"page": 1}).to_dict()
-    assert d["schema_version"] == SCHEMA_VERSION == "0.1.0"
+    assert d["schema_version"] == SCHEMA_VERSION_EXTENDED == "0.2.0"
+    validate_udm(d)
 
 
 def test_new_types_emit_020():
