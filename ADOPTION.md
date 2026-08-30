@@ -1125,3 +1125,24 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   x 重叠条件；③唯一配对的贪心排序键；④0.4.0 分支不新增必填、
   方向性走契约测试不走 schema；⑤holdout 设计（合成 docx holdout、
   pdf 沿用批次 3 偏差先例走 dev 验收引用基线哈希）。
+
+## 二十三、批次 4 契约裁决与冻结（GPT 5.6 Sol，2026-08-30，会话 6a911adf）
+
+裁决正文封存 Temp/gpt_ruling_b4.txt（573 字符，会话 API 取回）。
+五项全部同意，不拆批；两处细化已并入契约：
+
+1. 前缀集：仅 Figure / Fig / Fig. / 图 + 数字开头；Table / 表 排除；
+   **数字明确为 ASCII [0-9]**（caption element 分类用的 _CAPTION_RE
+   含全角数字，本批不改，两口径分工：分类归 _CAPTION_RE、关联归
+   前缀集）。
+2. 几何条件：0 < gap_pt ≤ 50；x 区间严格相交（交集 > 0）；同页必要。
+3. 唯一配对：(gap, image_id, caption_id) 升序贪心，已配对端点跳过。
+4. 0.4.0：不新增顶层必填；schema 管版本分支/relation 对象结构/旧
+   版本排除；跨数组方向性与端点存在性走契约测试；metadata.rule 与
+   gap_pt 由契约测试固化。
+5. holdout：合成 docx 主 holdout；PDF 固定基线哈希 dev 验收；
+   md/html/txt/ipynb 断言关系集合为空；**合成 docx 及资源生成一次后
+   字节固定、哈希入库登记，运行时不得重新生成**（防漂移）。
+
+结论：契约正式批准（docs/caption-relation-contract.md 随本提交冻结），
+版本升 0.4.0，进入实现 → holdout 冻结 → 一次性首跑 → 全量验收。

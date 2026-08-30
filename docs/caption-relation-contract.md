@@ -29,9 +29,12 @@ caption 正常进 chunk；版本升 0.4.0；契约冻结 relation schema、缺�
   caption element 语义（alt 仍是 image.metadata.alt，不是 caption）。
 - 不做表格题注关联（`Table|表` 前缀的 caption element 保持现状，
   只作为普通元素；表关联留给未来批次）。
-- 图题注前缀集（冻结）：`Figure`、`Fig`（含 `Fig.`）、`图`；
-  即 `^(?:Figure|Fig\.?|图)\s*[0-9０-９]+[\.、\s]`。`Table`/`表`
-  前缀不是图题注。
+- 图题注前缀集（冻结，2026-08-30 裁决①）：`Figure`、`Fig`（含
+  `Fig.`）、`图`，数字限 ASCII，即
+  `^(?:Figure|Fig\.?|图)\s*[0-9]+[\.、\s]`（大小写语义沿现状）。
+  `Table`/`表` 前缀不是图题注。caption element 分类用的
+  `_CAPTION_RE`（含全角数字 `[0-9０-９]`）本批不改——两口径分工：
+  分类归 `_CAPTION_RE`，关联归前缀集。
 
 ## §2 relation 形状冻结
 
@@ -108,10 +111,13 @@ relation（不报错、不产 warning；关联是能力不是义务）。
   记录于报告）。
 - holdout：合成 docx fixture（python-docx 生成：两图两图题注 + 一表
   题注 + 无题注图），期望 relation 集合实现前手工推导冻结，固定干净
-  SHA 一次性首跑，封存 outputs/，不重跑。pdf 沿用批次 3 追认的偏差
-  先例不进 holdout（几何判定依赖 pdfplumber 实测 bbox，手工推导
-  等于预跑）；md/html/text/ipynb 无 caption 产出，以回归测试断言
-  零 has_caption relation，不设 holdout。
+  SHA 一次性首跑，封存 outputs/，不重跑。合成 docx 及其内嵌图片
+  资源**生成一次后字节固定**（sha256 登记于 ADOPTION.md），运行时
+  不得重新生成（2026-08-30 裁决⑤：防运行时漂移）。pdf 沿用批次 3
+  追认的偏差先例不进 holdout（几何判定依赖 pdfplumber 实测 bbox，
+  手工推导等于预跑），dev 验收引用固定基线哈希；md/html/text/ipynb
+  无 caption 产出，以回归测试断言零 has_caption relation，不设
+  holdout。
 
 ## §7 明确不做（本批）
 
