@@ -1758,3 +1758,40 @@ annotation notes 字段。
 本节（偏差待追认）⚠️。
 
 **待裁决**：批次 10 封口（P2 解锁验收 + notes 偏差追认）。
+
+## 三十九、批次 10 封口裁决与批次 11 指定（2026-08-30，Stage 7 轨道 A）
+
+**裁决来源**：GPT 5.6 Sol（对话 cf170a6f，2026-08-30；全文 5117 字符
+封存搬运线 outputs/_b10closure_dump.txt，经 conversation API 读取）。
+
+**偏差追认：全部通过**：
+1. chunk_boundary reason 迁移追认通过——机制正确（annotation 存在
+   但未标 anchors → no_ground_truth_anchors 是判定链正确行为）、
+   value 两轮均 null（未实质影响指标）、因果必然（挂接文件不标
+   anchors 的副作用非缺陷）。后续建议（非强制）：PDF
+   chunk_boundary_anchors 标注列 backlog（P2 扩展项），不阻塞封口。
+2. notes 字段处置追认通过——契约优先（冻结 schema > 裁决示例），
+   口径已文档化于 §三十八。附加裁决：未来可升 annotation.schema
+   v1.1 加可选 notes 字段（不阻塞本批）。
+3. 键名/路径/命令/提交对象四处偏差全部追认（沿批次 9 先例）。
+
+**批次 10 执行验收：全部通过**（①标注执行 ✓ ②评测验证 ✓（PDF
+1.0/1.0/1.0 与 dry-run 一致，docx 不变）③归因 PASS ✓（13 处全归因：
+6 解锁 + 3 reason 迁移 + 4 环境）④回归 5123 passed ✓ ⑤验收对照 ✓）。
+
+**最终裁决：批次 10 正式封口，归档编号 `Stage-7-Batch-10-Closed`。**
+
+**Stage 7 进度**：轨道 A 前两优先级完成（批次 9 P1 docx + 批次 10
+P2 PDF，figure_caption_* 双侧解锁 1.0/1.0/1.0）；轨道 B 待启动
+（P3 heading_order / P4 table_caption_* / P5 真实语料）。
+
+**批次 11 指定（P3 heading_order 消费指标族，开工许可已授予）**：
+激活已采集的 8 条 heading_order GT（批次 8 审计发现：已采集零消费
+的死数据），实现 heading_order_precision/recall/f1。两段式协议：
+1. 步骤 1 GT 语义调研（下次回复汇报）：schema 定义；GT 分布
+   （文档 ID + 条数）；1–2 个具体示例（GT vs parser 输出对照）；
+   推荐匹配规则（Option 1 序列匹配 / Option 2 层级树匹配 /
+   Option 3 存在性匹配）+ 理由。
+2. 等 GPT 裁决匹配规则与设计方案后再实现（compute_heading_order_prf
+   + runner 消费 + EVALUATOR_VERSION 1.8→1.9 + macro average
+   纳入决策 + 验证 heading_order_* 不再 null + 分数合理性审核）。
