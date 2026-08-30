@@ -1900,3 +1900,67 @@ relation（批次 7 生成，批次 6 匹配器已参数化冻结）。两段式
    实现 table_caption_prf（复用 match_relation_pairs，
    relation_type="table_has_caption"）→ EVALUATOR_VERSION 1.9→1.10
    → 评测验证 → 封口。macro 不纳入（沿标注依赖族惯例）。
+
+## 四十二、批次 12 执行与验收记录（2026-08-31，Stage 7 轨道 B）
+
+**裁决依据**：批次 12 步骤 1 裁决（同会话，2026-08-31）——schema
+设计通过（Option A 维持 additionalProperties=false；$comment 措辞
+修正"v1.0 精确快照"；$id 偏差追认，沿用 manifest 先例 $id 恒不变）；
+PDF 口径 **Option A（诚实曝光）**：题注被 pdfplumber 融合进前一段落
+→ 0 预测 relation，GT 照标，recall=0.0 曝露缺陷；issues #3 关闭指令。
+
+**执行偏差声明（契约优先，待追认）**：
+1. 裁决示例路径 `evaluation/schemas/annotation.schema.json` /
+   `docs/ADOPTION.md`——实际为 `schemas/annotation.schema.json` /
+   根 `ADOPTION.md`（仓库真实布局）。
+2. 裁决示例 `table_caption_prf` 调用 `_pair_prf(document=...,
+   annotation=..., pairs_key=...)`——实际冻结契约：
+   `match_relation_pairs(document, pairs, *, relation_type,
+   from_marker_key, to_marker_key) -> counts` + `_pair_prf(counts,
+   prefix)`；table_caption_prf 按 figure_caption_prf 同构包装。
+3. 裁决示例 docx `date: "2026-08-03" → "2026-08-30"`——实际原值
+   2026-08-30，修订日记 2026-08-31（实际执行日）。
+4. 验收项"其他文档 table_caption_* = null + no_annotation"——本
+   devset 仅 2 文档且均已挂 annotation v1.1，该路径本轮无实例
+   （契约测试已钉 no_annotation/no_annotation_pairs 降级）。
+
+**步骤 2（schema v1.0 → v1.1，commit 544ba88）**：title/
+description/annotation_version enum ["1.0","1.1"]/新增
+table_caption_pairs（与 figure_caption_pairs 严格同构，items
+additionalProperties=false）/顶层 allOf v1.0 精确快照
+（table_caption_pairs: false）。$id 不变。六项校验全符预期：
+既有两份 v1.0 文件继续合法；v1.0+新键被拒；v1.1±新键合法；
+items 错键被拒；未知版本号被拒。
+
+**步骤 3（标注，gitignored 不进 git）**：DC-MVP-001.json 与
+DC-MVP-001-PDF.json 均升 annotation_version 1.1，新增
+table_caption_pairs 各 1 对：table_marker = "Code | Element |
+Expected handling | Integrity marker"（表头行子串，两文档表元素
+同串）、caption_text = "Table 1. Module status matrix"；date 修订
+2026-08-31。两文件通过 v1.1 schema 校验。dry-run：docx counts
+(1,1,1)；PDF counts (0,1,0)。
+
+**步骤 4（实现，commit 690e676）**：annotation_metrics.py 新增
+table_caption_prf（figure_caption_prf 同构，relation_type=
+"table_has_caption"）+ __all__；runner.py 接入；EVALUATOR_VERSION
+1.9 → 1.10（版本历史补 v1.10 条目，清理 v1.8/v1.9 陈旧"（当前）"
+标记）；REPORT_VERSION 1.3 不变；_RATIO_METRICS 白名单不动
+（不纳入 macro）。新增契约测试 13 项
+（tests/test_table_caption_prf.py：完美/表格空白规范化/多检 2:1/
+题注错配 0 分/PDF Option A 零预测/他类 relation 不计/降级×4/
+三键钉/版本钉/macro 排除钉）；既有版本钉 2 处随升（1.9 → 1.10）。
+全量回归 5147 passed（5134+13）。
+
+**步骤 5（评测验证，干净树 git_dirty=False，commit 690e676）**：
+DC-MVP-001 docx table_caption_* = 1.0/1.0/1.0（与 dry-run 一致）；
+DC-MVP-001-PDF = precision null+no_predicted_relations / recall
+0.0 / f1 null+precision_or_recall_not_evaluated（Option A 诚实
+曝光，与裁决预期逐字一致）；validate-report 通过。归因验证
+（scripts/verify_batch12_attribution.py，对照批次 11 基线）：
+11 处差异全部归因（6 双文档 table_caption_* only-in-new +
+evaluator_version 1.9→1.10 + 4 运行环境），0 unexpected；
+must-not-change 全过（report_version=1.3 / summary 零差异 /
+其余指标族零差异）。VERDICT: PASS。
+
+**Issues**：#1/#2/#3 已关闭（#3 按本批裁决指令，评论引用
+Stage-7-Batch-11-Closed）。

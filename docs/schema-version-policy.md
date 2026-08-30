@@ -56,3 +56,11 @@
   per-doc metrics 为开放字典，先例：figure_caption_* 加入时 1.3
   不变，heading_order_* 同）。
 
+案例（批次 12，2026-08-31）：annotation.schema.json v1.0 → v1.1
+（新增 table_caption_pairs 可选键，allOf v1.0 精确快照禁新键）。
+annotation schema 升级解锁新 GT → evaluator 同批升 1.10（无新
+消费能力的 evaluator 与旧版本能力不同，损害复现）。三版本常量
+各自独立：annotation_version（标注契约，读兼容由精确快照分支
+保证，$id 恒不变——对齐 manifest 先例）、EVALUATOR_VERSION
+（评测器能力）、REPORT_VERSION（报告结构）。
+
