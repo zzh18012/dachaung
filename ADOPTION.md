@@ -1678,3 +1678,83 @@ GT 口径问题（批次 4 §0 / 批次 7 契约 §0 归因：devset PDF 实测
    需加 annotation_file 键）→ 重跑评测（仅 PDF 侧 figure_caption_*
    变化，对比批次 9 基线）→ 全量回归（5123+）→ 封口报告说明
    口径选择理由。
+
+## 三十八、批次 10 执行与验收记录（2026-08-30，Stage 7 轨道 A）
+
+**任务**（批次 9 封口裁决指定，P2 PDF 侧标注，两段式协议）：补完
+DC-MVP-001-PDF 的 figure_caption_pairs 标注，解决"题注被融合"GT
+口径问题。
+
+**步骤 1 实证调查（已汇报，会话 cf170a6f）**：
+1. 人工识别（pypdfium2 scale 2.0 渲染 3 页 PNG 视觉审查）：
+   **图片-题注对 1 对**——page 2 流程图 PNG + 正下方题注
+   "Figure 1. Knowledge unit processing flow"；另 page 1 有表题注
+   "Table 1. Module status matrix"（表上方，table 侧，不在本批范围）。
+   视觉转录对 page 1 细节有幻觉迹象 → 精确字符串一律以 parser 输出
+   为权威，视觉仅确认版面。
+2. parser 输出（fallback/pdfplumber，18 elements + 1 relation）：
+   - e0011 image p2：content=None、无 alt、resource 文件名
+     `image_2feac715bd0d5b4b_p2_00.png`（识别文本=文件名，批次 9
+     docx 同范式）
+   - e0009 caption p2（caption_regex 分类）：content 以题注文本为
+     **精确前缀**，尾部融合约 30 词后续说明段落
+   - e0004 paragraph p1：表题注 + 节标题 + 表体全部融合（批次 4 §0
+     "融合"归因的真实主体——**表侧**现象）
+   - relation has_caption e0011→e0009（rule=pdf_geometry_below，
+     gap_pt=11.525）已产出
+3. **融合现象澄清**：批次 4 §0"题注被融合进前一段落"实测仅发生于
+   **表题注**（table 侧，影响未来 table_caption_*）；**图题注未被
+   融合进前一段落**，而是被分离为独立 caption 元素、仅尾部融合后续
+   段落（题注=前缀，子串匹配可命中）。
+4. dry-run（冻结 match_relation_pairs 直接调用）：Option A 假想对
+   → (num_pred=1, num_gt=1, matched=1)，P/R/F1=1.0/1.0/1.0；
+   Option B 在本文档与 A 字符串完全相同（不可区分）；C 无实证障碍。
+
+**步骤 2 口径裁决（已收到）**：**Option A（标注融合元素中的题注子串）
+生效**。理由：①dry-run 实测无障碍；②口径一致性（批次 9 docx 范式
+对齐 + 批次 6 契约 §2.3 天然兼容）；③GT 反映 parser 实际输出中可
+识别的题注信息，前缀子串隔离核心题注文本；④融合现象澄清后无需
+B/C 权宜；⑤A/B 本案不可区分，选 A 无损失。裁决并要求口径声明记入
+annotation notes 字段。
+
+**步骤 3–5 执行**：
+1. 新建 samples/private/devset/annotations/DC-MVP-001-PDF.json
+   （gitignored 私有标注）：annotation_version 1.0、doc_id
+   DC-MVP-001-PDF、figure_caption_pairs 1 对（figure_marker=
+   `image_2feac715bd0d5b4b_p2_00.png`、caption_text=
+   "Figure 1. Knowledge unit processing flow"）；manifest 该 entry
+   加 annotation_file 键（manifest.schema v1.0 合法可选键，无需升版）。
+   jsonschema Draft202012 校验：annotation PASS、manifest PASS。
+2. **格式偏差声明（二处，沿批次 9 契约优先先例）**：①裁决示例的
+   `notes` 字段与冻结 annotation.schema.json v1.0（无该键 +
+   additionalProperties=false）冲突 → 不写入标注文件，口径声明改记
+   本节与封口报告（本段即口径记录：PDF 图题注 'Figure 1. Knowledge
+   unit processing flow' 为 e0009.content 前缀，尾部含 pdfplumber
+   融合的约 30 词说明文字；GT caption_text 取前缀子串以隔离核心题注
+   文本，与 caption_regex 启发式边界一致）；②裁决示例的
+   document_id/format 键与冻结 schema（annotation_version/doc_id）
+   不符 → 按冻结 schema 执行。另评测命令按实际 CLI
+   （evaluation.cli run --manifest ... --parser fallback --max-chars 800）。
+3. 评测重跑（干净树 9b016b4，git_dirty=False）：
+   outputs/evaluation-batch10-pdf-unlock.json。**DC-MVP-001-PDF
+   figure_caption_precision/recall/f1 = 1.0/1.0/1.0**（预测 1 条
+   e0011→e0009、GT 1 对、命中 1——与 dry-run 及标注一致）；docx 侧
+   维持 1.0/1.0/1.0 不变。
+4. 归因验证（scripts/verify_batch10_attribution.py）：对照批次 9
+   封存基线逐字段 diff，共 13 处且全部归因——6 处 = PDF
+   figure_caption_* value/reason 解锁（null+no_annotation →
+   1.0+null）；3 处 = PDF chunk_boundary_* reason 迁移
+   （no_annotation → no_ground_truth_anchors，annotation 文件出现
+   但未标 anchors 的降级路径变化，value 两轮均 null 不变）；4 处 =
+   运行环境（wall_time×2、git_commit、run_timestamp_iso）。
+   must-not-change 断言全过：evaluator_version 1.8 不变、docx 全部
+   字段零差异（wall_time 环除外）、其余全部 .metrics. 路径逐字节
+   一致。VERDICT: PASS。
+5. 全量回归 **5123 passed**。
+
+**验收对照（裁决验收标准）**：PDF annotation 含 figure_caption_pairs
+1 对 ✅；PDF P/R/F1=1.0/1.0/1.0 ✅；docx 维持 1.0/1.0/1.0 ✅；
+归因 PASS ✅；全量回归 5123 ✅；notes 口径声明——schema 冲突改记
+本节（偏差待追认）⚠️。
+
+**待裁决**：批次 10 封口（P2 解锁验收 + notes 偏差追认）。
