@@ -1795,3 +1795,69 @@ P2 PDF，figure_caption_* 双侧解锁 1.0/1.0/1.0）；轨道 B 待启动
 2. 等 GPT 裁决匹配规则与设计方案后再实现（compute_heading_order_prf
    + runner 消费 + EVALUATOR_VERSION 1.8→1.9 + macro average
    纳入决策 + 验证 heading_order_* 不再 null + 分数合理性审核）。
+
+## 四十、批次 11 执行与验收记录（2026-08-30，Stage 7 轨道 B）
+
+**任务**（批次 10 封口裁决指定，P3 heading_order 消费指标族，两段式）：
+激活已采集 8 条 heading_order GT，实现 heading_order_* 指标族。
+
+**步骤 1 调研（已汇报）**：schema 为扁平有序列表（level+text，无树边）；
+GT 全部集中于 DC-MVP-001 docx（8 条）；parser 实跑对照 9 heading vs
+8 GT——8 条顺序/层级/文本精确一致，唯一差异 = 主标题被解析为 heading
+（多检 1 条）；dry-run（Option 1，LCS）P=0.8889/R=1.0/F1=0.9412。
+
+**步骤 2 裁决（已收到）**：匹配规则 **Option 1（序列匹配）**；三设计点：
+实现位置沿惯例 annotation_metrics.py + heading_order_prf；REPORT_VERSION
+维持 1.3；heading_order_* 不入 macro average（标注依赖族，GT 覆盖稀疏）。
+
+**执行**：
+1. `evaluation/annotation_metrics.py` 新增 `heading_order_prf`：匹配键
+   =（metadata.level 相等）AND（normalize_text(content) ==
+   normalize_text(text)）严格相等；LCS 有序一对一 DP 对齐；降级矩阵
+   pipeline_failed / no_annotation / no_ground_truth_headings /
+   no_predicted_headings（GT>0 时 recall=0.0）。
+2. `evaluation/runner.py` 挂接消费（annotation 复用同一加载路径）；
+   `_RATIO_METRICS` 白名单未动 → heading_order_* 确认不入 macro。
+3. **EVALUATOR_VERSION 1.8 → 1.9**（evaluation/__init__.py 版本历史
+   补 1.9 条目）；REPORT_VERSION 维持 1.3。
+4. `docs/schema-version-policy.md` §5 补分工规则（EVALUATOR_VERSION
+   minor = 指标族/匹配算法/降级逻辑；REPORT_VERSION minor = 报告结构
+   变更，指标键扩展不升）。
+5. 契约测试 `tests/test_heading_order_prf.py` 11 项：完美 8/8、多检
+   （DC-MVP-001 实测情形 8/9/8）、漏检 7/8、乱序 LCS 2/3、level 不匹
+   配、空白规范化等价、大小写敏感（normalize_text 不折叠大小写——
+   与冻结匹配器族一致的严格相等口径）、降级路径 ×4。另两处既有版本
+   钉测试随升（test_relation_consumption_contract.py /
+   test_parser_auto.py 的 1.8 字面量 → 1.9）。
+6. 评测重跑（干净树 0d75d6f，git_dirty=False）：
+   outputs/evaluation-batch11-heading-unlock.json。**DC-MVP-001 docx
+   heading_order_precision/recall/f1 = 0.8889/1.0/0.9412**（与
+   dry-run 一致，主标题多检被 precision 暴露）；DC-MVP-001-PDF
+   null+no_ground_truth_headings（annotation 已挂接但无该键——
+   注意非 no_annotation，裁决原文"其他文档 null+no_annotation"对
+   PDF 侧不适用，批次 10 已挂 annotation 文件）。
+7. 归因验证（scripts/verify_batch11_attribution.py）：对照批次 10
+   封存基线逐字段 diff，共 11 处且全部归因——6 处 = 双文档
+   heading_order_* 新增（docx 数值 + PDF 降级）；1 处 =
+   evaluator_version 1.8→1.9；4 处 = 运行环境。must-not-change 全过：
+   report_version 1.3 不变、summary 零差异（macro 未纳入验证）、
+   其余全部指标路径零差异。VERDICT: PASS。
+8. 全量回归 **5134 passed**（5123 + 11 新增）。
+
+**执行偏差声明（二处，待追认）**：
+1. 规范化函数：裁决示例 normalize_heading_text（strip+lowercase+
+   collapse）→ 实际复用 app.chunkers.structural.normalize_text
+   （collapse+strip，**不折叠大小写**）——与 figure_caption/
+   chunk_boundary 冻结匹配器族同规范器，且 dry-run（裁决通过的
+   0.8889/1.0/0.9412）即此语义；大小写敏感作为契约测试钉死。
+2. 裁决评测命令 manifest 路径 samples/private/devset/devset-docx.
+   manifest.json 不存在 → 实际 samples/private/devset/manifest.json
+   （唯一主 devset manifest，批次 4 起不变）。
+
+**验收对照（裁决验收标准）**：heading_order_prf 落地 ✅；EVALUATOR_
+VERSION 1.9 ✅；REPORT_VERSION 1.3 ✅；不入 macro ✅；契约测试五类
+场景 ✅；DC-MVP-001 docx 0.8889/1.0/0.9412 ✅；PDF 侧 null+
+no_ground_truth_headings（裁决预期 no_annotation 的修正，见执行⑥）
+⚠️；归因 PASS ✅；全量回归 5134 ✅。
+
+**待裁决**：批次 11 封口（P3 验收 + 二处执行偏差追认）。
