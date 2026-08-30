@@ -1,0 +1,53 @@
+{
+  "holdout": "holdout-caption-relation",
+  "kind": "batch4-caption-relation-first-run",
+  "fixture": "holdout-caption.docx",
+  "fixture_sha256": "57c4b3b2ddff4be24a1f2df13a33c821f5272914f1ad3b8ba537d16a823d106d",
+  "parser": "fallback",
+  "expected_schema_version": "0.4.0",
+  "hand_derivation_basis": "依据生成脚本 body 大纲（ authored 结构）+ docs/caption-relation-contract.md §3 docx 规则，在本夹具任何 parser 运行之前手工推导冻结；document_id=doc-<fixture sha256 前 16 hex>。image element 的 locator 只比对 family/paragraph_index/section（relationship_id/target_partname 是 python-docx 分配细节，不进契约口径）。",
+  "expected_elements": [
+    {"element_id": "doc-57c4b3b2ddff4be2::e0000", "type": "heading", "source_locator": {"family": "structural_index", "paragraph_index": 0, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0001", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 1, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0002", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 2, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0003", "type": "image", "source_locator": {"family": "structural_index", "paragraph_index": 2, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0004", "type": "caption", "source_locator": {"family": "structural_index", "paragraph_index": 3, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0005", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 4, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0006", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 5, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0007", "type": "image", "source_locator": {"family": "structural_index", "paragraph_index": 5, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0008", "type": "caption", "source_locator": {"family": "structural_index", "paragraph_index": 6, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0009", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 7, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0010", "type": "image", "source_locator": {"family": "structural_index", "paragraph_index": 7, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0011", "type": "caption", "source_locator": {"family": "structural_index", "paragraph_index": 8, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0012", "type": "table", "source_locator": {"family": "structural_index", "table_index": 0, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0013", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 9, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0014", "type": "image", "source_locator": {"family": "structural_index", "paragraph_index": 9, "section": 0}},
+    {"element_id": "doc-57c4b3b2ddff4be2::e0015", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 10, "section": 0}}
+  ],
+  "expected_caption_contents": {
+    "doc-57c4b3b2ddff4be2::e0004": "Figure 1. Flow overview",
+    "doc-57c4b3b2ddff4be2::e0008": "图 2、架构示意",
+    "doc-57c4b3b2ddff4be2::e0011": "Table 1. Metrics"
+  },
+  "expected_relations": [
+    {
+      "type": "has_caption",
+      "from_id": "doc-57c4b3b2ddff4be2::e0003",
+      "to_id": "doc-57c4b3b2ddff4be2::e0004",
+      "metadata": {"rule": "docx_adjacent_paragraph"}
+    },
+    {
+      "type": "has_caption",
+      "from_id": "doc-57c4b3b2ddff4be2::e0007",
+      "to_id": "doc-57c4b3b2ddff4be2::e0008",
+      "metadata": {"rule": "docx_adjacent_paragraph"}
+    }
+  ],
+  "hand_derivation_notes": [
+    "image@para2 + 图题注 Figure 1.@para3 → e0003 --has_caption--> e0004",
+    "image@para5 + 图题注 图 2、@para6 → e0007 --has_caption--> e0008",
+    "image@para7 紧邻 Table 1.@para8：Table 前缀不在图题注前缀集 → 零 relation（契约 §1/§3）",
+    "image@para9 紧邻普通段落@para10 → 零 relation",
+    "空段落宿主（para2/5/7/9）先产 paragraph element 再产 image element，同 paragraph_index"
+  ]
+}
