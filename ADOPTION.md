@@ -1230,3 +1230,21 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
 - 送裁七问：①strip 统一 vs 维持现状；②换行 `<br>` vs 折叠空格；
   ③md `\|` 反转义；④0 行表静默跳过；⑤共享纯函数统一三副本；
   ⑥版本不升；⑦holdout 设计（合成 docx+md+html、pdf 沿先例不进）。
+
+## 二十七、批次 5 契约裁决与冻结（GPT 5.6 Sol，2026-08-30，会话 6a911adf）
+
+裁决正文封存 Temp/gpt_ruling_b5.txt（647 字符，会话 API 取回）。
+七问全部同意（⑥ 明确 0.4.0 维持：本批不改序列化字段形状/类型，
+仅固定既有 content 的 canonical 生成语义）；⑦ 附两项约束已并入契约：
+
+- **ipynb 验证约束**：不得仅凭"自动继承"不验证——holdout 合成
+  fixture 增补 ipynb（markdown cell 内 pipe 表格 + code cell 无表格），
+  契约测试加 ipynb 表格路径断言；text 永不产 table、ipynb code/raw
+  cell 不产 table 进回归断言。
+- **md 反转义口径细化**：仅反转义两字符序列 `\|`，其余反斜杠序列
+  原样保留（其他反斜杠语义不动，roundtrip 幂等）。
+- **dev 对照归因要求**：表格相关指标允许预期变化但逐项归因；非表格
+  elements/chunk/locator/relation/确定性不得出现未解释变化。
+
+结论：契约冻结（docs/table-linearization-contract.md 随本提交），
+进入实现 → holdout 冻结 → 一次性首跑 → dev 验收。

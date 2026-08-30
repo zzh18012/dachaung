@@ -1,6 +1,7 @@
 # 表格 → Markdown 线性化契约（Stage 6 批次 5）
 
-状态：草案 v1（2026-08-30 批次 4 封口裁决第 ② 项指定本批，条文送批）。
+状态：**已冻结**（2026-08-30 GPT 5.6 Sol 裁决 ①–⑥ 全部照准；⑦ 原则
+同意并追加 ipynb 验证约束与 dev 对照归因要求，已并入 §5）。
 
 裁决依据：2026-08-30 会话 6a911adf 批次 4 封口裁决——批次 5 = (a)
 表格→Markdown 线性化；执行边界：仅改 table element 的 canonical
@@ -74,6 +75,8 @@ metadata 口径（冻结现状）：`row_count = len(rows)`（原始行数，不
   自动继承）。纯函数无 I/O、无状态，契约测试直接喂构造 rows。
 - markdown `_split_pipe_row` 增加 `\|` 反转义：按未转义 `|` 分列后，
   单元格内 `\|` → `|`（否则 re-render 会二次转义，roundtrip 不幂等）。
+  **仅反转义两字符序列 `\|`，其余反斜杠序列原样保留**（裁决③：其他
+  反斜杠语义不动）。
 - docx：0 行表跳过 element（修复 §0 缺口 3 的 ValueError 路径）。
 - pdf：`tbl.extract()` 行为不变，content 换经共享函数。
 - html：rows 累积行为不变，content 换经共享函数。
@@ -94,21 +97,28 @@ metadata 口径（冻结现状）：`row_count = len(rows)`（原始行数，不
 ## §5 契约测试与 holdout
 
 - 契约测试（喂构造 rows / 构造文件）覆盖：`|` 转义与 md `\|` 反转义
-  roundtrip；`\n`/`\r\n`/`\r` → `<br>`；None → `""`；短行补齐；
-  单行表；全空表；0 行表不产出 element（docx 修复项）；合并单元格
-  重复语义（真 docx）；三 parser 输出一致性（同一 rows 三处同串）。
+  roundtrip（仅 `\|` 反转义、其他反斜杠保留）；`\n`/`\r\n`/`\r` →
+  `<br>`；None → `""`；短行补齐；单行表；全空表；0 行表不产出
+  element（docx 修复项）；合并单元格重复语义（真 docx）；三 parser
+  输出一致性（同一 rows 三处同串）；**ipynb markdown cell 表格路径
+  断言（裁决⑦：不得仅凭"自动继承"不验证）；text 永不产 table
+  element、ipynb code/raw cell 不产 table 的回归断言**。
 - holdout（裁决⑤ 纪律沿用）：**全新**合成 fixture 一次性生成后字节
   固定（sha256 登记 ADOPTION.md，运行时禁重生成、首跑校验漂移即拒）：
   - 合成 docx：多段落单元格（触发 `\n`→`<br>`）、合并单元格（重复
     语义）、含 `|` 单元格、空单元格、普通对照表；
   - 合成 md：含 `\|` 转义、含 `<br>`、参差行；
-  - 合成 html：含 `|` 单元格、th/thead（验证不特殊化）。
+  - 合成 html：含 `|` 单元格、th/thead（验证不特殊化）；
+  - 合成 ipynb：markdown cell 内含 pipe 表格（裁决⑦ 补充项，验证
+    继承路径真实生效），code cell 无表格。
   期望 content 实现前手工推导冻结；固定干净 SHA 一次性首跑，封存
   outputs/，不重跑。
 - dev 验收：evaluation 重跑对照批次 4 封存基线——本批 content 变化
   属预期，若 devset 含表格则相关 chunk 长度/文本类指标**允许差异**，
-  逐项归因于 §2 规则（转义/`<br>`/strip），不做"全 SAME"要求；报告
-  引用基线 commit 哈希（沿批次 3 裁决纪律）。
+  但须逐项归因于 §2 规则（转义/`<br>`/strip）；**非表格面（非表格
+  elements 的数量与 locator、非表格 chunk、relation、确定性结果）
+  不得出现任何未解释变化**（裁决⑦ 追加要求）；报告引用基线 commit
+  哈希（沿批次 3 裁决纪律）。
 
 ## §6 明确不做（本批）
 
