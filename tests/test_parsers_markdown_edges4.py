@@ -256,10 +256,8 @@ def test_split_pipe_row_preserves_unicode():
 
 
 def test_split_pipe_row_preserves_pipe_in_escaped_cell():
-    """无 escape 处理：`a\\|b` 仍被切。"""
-    result = _split_pipe_row("a\\|b")
-    # \ 不阻止 split
-    assert len(result) >= 2
+    """批次 5 契约 §3：`\\|` 不参与分列且反转义为 `|`。"""
+    assert _split_pipe_row("a\\|b") == ["a|b"]
 
 
 def test_split_pipe_row_with_backslash():
@@ -359,7 +357,8 @@ def test_rows_to_md_pipe_count_matches_columns_plus_one_per_row():
 def test_rows_to_md_pipe_in_cell_preserved():
     rows = [["a|b", "c"]]
     md = _rows_to_md(rows)
-    assert "a|b" in md
+    # 批次 5 契约 §2：结构转义 | → \|
+    assert "a\\|b" in md
 
 
 def test_rows_to_md_jagged_three_rows():

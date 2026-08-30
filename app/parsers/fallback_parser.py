@@ -14,6 +14,7 @@ from typing import Any
 
 from app.models import Document, Element, Relation, WarningRecord
 from app.parsers.base import Parser, ParserError, detect_source_type, make_document_id
+from app.parsers.table_linearize import linearize_table
 
 # 这些库都是计划内依赖，且只在这个文件里 import（业务代码看不见）
 try:
@@ -151,18 +152,8 @@ def match_caption_relations_pdf(elements: list[Element]) -> list[Relation]:
 
 
 def _rows_to_markdown(rows: list[list[Any]]) -> str:
-    """把表格行渲染为 markdown，便于阅读与下游使用。"""
-    if not rows:
-        return ""
-    norm = [["" if c is None else str(c) for c in row] for row in rows]
-    width = max(len(r) for r in norm)
-    norm = [r + [""] * (width - len(r)) for r in norm]
-    header = norm[0]
-    body = norm[1:] if len(norm) > 1 else []
-    md = ["| " + " | ".join(header) + " |", "| " + " | ".join("---" for _ in header) + " |"]
-    for r in body:
-        md.append("| " + " | ".join(r) + " |")
-    return "\n".join(md)
+    """把表格行渲染为 canonical markdown（批次 5 契约，共享实现）。"""
+    return linearize_table(rows)
 
 
 def _image_filename(document_id: str, prefix: str, index: int, ext: str = "png") -> str:
@@ -645,25 +636,27 @@ def _parse_docx(
             for row in tbl.rows:
                 rows_data.append([(c.text or "").strip() for c in row.cells])
             md = _rows_to_markdown(rows_data)
-            elements.append(
-                Element(
-                    element_id=f"{document_id}::e{len(elements):04d}",
-                    type="table",
-                    content=md,
-                    parent_id=None,
-                    source_locator={
-                        "family": "structural_index",
-                        "table_index": table_counter,
-                        "section": section_idx,
-                    },
-                    confidence=0.95,
-                    metadata={
-                        "row_count": len(rows_data),
-                        "col_count": max((len(r) for r in rows_data), default=0),
-                        "source": "python-docx",
-                    },
+            # 批次 5 契约 §2：0 行表不产出 element（静默跳过，对齐 pdf/html）
+            if md:
+                elements.append(
+                    Element(
+                        element_id=f"{document_id}::e{len(elements):04d}",
+                        type="table",
+                        content=md,
+                        parent_id=None,
+                        source_locator={
+                            "family": "structural_index",
+                            "table_index": table_counter,
+                            "section": section_idx,
+                        },
+                        confidence=0.95,
+                        metadata={
+                            "row_count": len(rows_data),
+                            "col_count": max((len(r) for r in rows_data), default=0),
+                            "source": "python-docx",
+                        },
+                    )
                 )
-            )
             table_counter += 1
     if not elements:
         warnings.append(

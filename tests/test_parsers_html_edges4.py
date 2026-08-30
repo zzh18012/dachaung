@@ -93,8 +93,8 @@ def test_rows_to_md_separator_uses_three_dashes_per_col():
 def test_rows_to_md_pipe_in_cell_preserved():
     rows = [["a|b", "c"]]
     md = _rows_to_md(rows)
-    # pipe 应保留（无 escape 处理）
-    assert "a|b" in md
+    # 批次 5 契约 §2：结构转义 | → \|
+    assert "a\\|b" in md
 
 
 def test_rows_to_md_max_width_used_when_jagged():
@@ -123,8 +123,8 @@ def test_rows_to_md_empty_string_cell_value_preserved():
 def test_rows_to_md_cell_with_newline():
     rows = [["line1\nline2"]]
     md = _rows_to_md(rows)
-    # 换行原样输出（不 split）
-    assert "line1\nline2" in md
+    # 批次 5 契约 §2：换行 → <br>（GFM 表格内换行语义）
+    assert "line1<br>line2" in md
 
 
 def test_rows_to_md_all_empty_rows():

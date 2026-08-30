@@ -49,6 +49,7 @@ from typing import Any
 
 from app.models import Document, Element, WarningRecord
 from app.parsers.base import Parser, ParserError, make_document_id
+from app.parsers.table_linearize import linearize_table
 
 _HTML_EXTENSIONS = (".html", ".htm")
 _HEADING_LEVELS = {"h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6}
@@ -67,19 +68,8 @@ def _detect_html_source_type(path: Path) -> str:
 
 
 def _rows_to_md(rows: list[list[str]]) -> str:
-    if not rows:
-        return ""
-    width = max(len(r) for r in rows)
-    norm = [r + [""] * (width - len(r)) for r in rows]
-    header = norm[0]
-    body = norm[1:] if len(norm) > 1 else []
-    out = [
-        "| " + " | ".join(header) + " |",
-        "| " + " | ".join("---" for _ in header) + " |",
-    ]
-    for r in body:
-        out.append("| " + " | ".join(r) + " |")
-    return "\n".join(out)
+    """批次 5 契约：canonical 线性化走共享实现。"""
+    return linearize_table(rows)
 
 
 class _HTMLDocParser(_StdHTMLParser):

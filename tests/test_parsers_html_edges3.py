@@ -494,9 +494,9 @@ def test_rows_to_md_empty_string_cell():
 
 
 def test_rows_to_md_pipe_character_in_cell():
-    """cell 含 | → 直接放进 markdown（会破坏格式，但 html_parser 不转义）。"""
+    """cell 含 | → 转义为 \\|（批次 5 契约 §2 结构转义）。"""
     md = _rows_to_md([["a|b"]])
-    assert "a|b" in md
+    assert "a\\|b" in md
 
 
 def test_rows_to_md_single_column_multi_row():

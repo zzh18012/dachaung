@@ -37,6 +37,7 @@ from typing import Any
 
 from app.models import Document, Element, WarningRecord
 from app.parsers.base import Parser, ParserError, make_document_id
+from app.parsers.table_linearize import linearize_table
 
 _MD_EXTENSIONS = (".md", ".markdown")
 
@@ -65,19 +66,8 @@ def _detect_md_source_type(path: Path) -> str:
 
 
 def _rows_to_md(rows: list[list[str]]) -> str:
-    if not rows:
-        return ""
-    width = max(len(r) for r in rows)
-    norm = [r + [""] * (width - len(r)) for r in rows]
-    header = norm[0]
-    body = norm[1:] if len(norm) > 1 else []
-    out = [
-        "| " + " | ".join(header) + " |",
-        "| " + " | ".join("---" for _ in header) + " |",
-    ]
-    for r in body:
-        out.append("| " + " | ".join(r) + " |")
-    return "\n".join(out)
+    """批次 5 契约：canonical 线性化走共享实现。"""
+    return linearize_table(rows)
 
 
 def _split_pipe_row(line: str) -> list[str]:
@@ -86,7 +76,10 @@ def _split_pipe_row(line: str) -> list[str]:
         s = s[1:]
     if s.endswith("|"):
         s = s[:-1]
-    return [c.strip() for c in s.split("|")]
+    # 批次 5 契约 §3：仅按未转义 | 分列，且仅反转义两字符序列 \|，
+    # 其余反斜杠序列原样保留（roundtrip 幂等）
+    parts = re.split(r"(?<!\\)\|", s)
+    return [c.strip().replace("\\|", "|") for c in parts]
 
 
 def _is_pipe_table_start(lines: list[str], i: int) -> bool:

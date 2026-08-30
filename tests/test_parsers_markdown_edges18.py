@@ -74,6 +74,7 @@ def test_empty_hash_no_space_paragraph(
 
 def test_escaped_pipe_splits_cell(
         tmp_path):
+    """批次 5 契约 §3：\\| 不分列且反转义；re-render 再转义回 \\|（roundtrip 幂等）。"""
     doc = _parse(
         tmp_path,
         "| a \\| b | c |\n"
@@ -81,10 +82,10 @@ def test_escaped_pipe_splits_cell(
     e = doc.elements[0]
     assert e.type == "table"
     assert e.content == (
-        "| a \\ | b | c |\n"
-        "| --- | --- | --- |\n"
-        "| 1 | 2 |  |")
-    assert e.metadata["col_count"] == 3
+        "| a \\| b | c |\n"
+        "| --- | --- |\n"
+        "| 1 | 2 |")
+    assert e.metadata["col_count"] == 2
 
 
 # ---------- bq 内围栏 ----------
