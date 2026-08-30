@@ -1409,3 +1409,67 @@ contract.md（含三项强制要求）→ ② 重构匹配器为参数化（含�
   ⑦ 封口报告。
 
 **批次 6 正式封口，归档编号 `Stage-6-Batch-6-Closed`。**
+
+## 三十二、批次 7 执行与验收记录（2026-08-30）
+
+**版本选择声明**：Claude 选定 **Option A（schema_version 0.4.0 → 0.5.0）**。
+理由：schema_version 描述 writer 能力语义（沿革一致）；新增 relation
+type `table_has_caption` 扩展 relations[].type 枚举范围，consumers 需
+更新逻辑才能处理。规则成文 docs/schema-version-policy.md §3.2。
+
+**执行（按裁决①–⑦顺序，会话 cf170a6f 批次 6 封口裁决）**：
+
+1. ① docs/schema-version-policy.md 成文：版本=writer 能力；沿革表
+   0.1.0→0.5.0；§3.2 新增 relation type 升 minor（Option A 裁决规则）；
+   §4 读兼容（旧版本分支 + not.contains 精确排除）；§5 与
+   EVALUATOR_VERSION/REPORT_VERSION 分工。
+2. ② docs/table-caption-relation-contract.md 冻结 v1：前缀集
+   `^(?:Table|表格|表)\s*[0-9]+[\.、\s]`（与图题注集互斥）；docx 规则
+   =紧邻上一元素（表题注惯例在表上方，§0 devset 实证 DC-MVP-001：
+   caption e0012@para:12 紧邻 table e0013@tbl:0 之前；elements 列表
+   顺序=body 顺序，table_index 与 paragraph_index 不同族不可数值比较）；
+   pdf 规则=同页上方几何（gap = table.bbox[1] − caption.bbox[3] ∈
+   (0, 50]，x 区间相交，(gap,table,caption) 贪心唯一配对；批次 4 下方
+   规则的镜像）；devset PDF 实测表题注被 pdfplumber 融合进段落 →
+   devset 上 pdf 表关联恒 0 条（归因依据）。§7 不做：不新增
+   table_caption_* 指标族（annotation v1.0 无表格 GT 键、devset 零
+   标注）、EVALUATOR_VERSION 维持 1.8、match_relation_pairs 签名不改。
+3. ③ 实现（app/parsers/fallback_parser.py）：
+   `match_table_caption_relations_docx/pdf` 纯函数 + parse() wiring
+   （`_sort_relations(图关联 + 表关联)` 两类混排 (type,from,to) 字典序）；
+   metadata.rule = docx_adjacent_element_above / pdf_geometry_above
+   （pdf 加 gap_pt）。models.py `SCHEMA_VERSION_TABLE_CAPTION="0.5.0"`，
+   effective_schema_version() 无条件返回 0.5.0（writer 能力语义）；
+   schemas/document.schema.json：enum 加 0.5.0；{0.1.0–0.4.0} 分支
+   not.contains 拒 table_has_caption（0.1.0–0.3.0 同时拒 has_caption）。
+4. ④ 评测消费路径（签名冻结不改，仅传 relation_type=
+   "table_has_caption"）：契约测试以合成 docx → 真实 fallback 解析 →
+   match_relation_pairs(构造 pairs) 返回 (1,1,1) 命中 / (1,1,0) 错标
+   零命中。EVALUATOR_VERSION 维持 1.8、REPORT_VERSION 维持 1.3。
+5. ⑤ holdout（samples/synthetic/holdout-table-caption/）：夹具生成
+   一次字节固定，**sha256 = cc9424c2186390de7102802ee3fd3617401e4f
+   87f42404b8c52128daf2d00894**；四 case（裁决三类 + 前缀互斥负例）：
+   T1 表题注在上（命中）/ T2 无题注（零）/ T3 孤立表题注段落（零）/
+   T4 图题注紧邻表上（互斥零）。期望 elements+caption 内容+relations
+   全清单在 parser 运行前手工推导冻结（expectations.json，含推导
+   注记：初稿 T3 "表格 2、" 经推导发现 _CAPTION_RE 不分类 → 生成前
+   改 "表 2、"，未消耗首跑）。首跑于干净 SHA 975dff7 一次性封存
+   outputs/holdout-table-caption-v1-firstrun.json：**all_pass=True**
+   （elements/captions/relations/schema 0.5.0 全等）。pdf 沿批次 3/4
+   追认先例不进 holdout（几何 bbox 手工推导=预跑）；md/html/text/
+   ipynb 回归断言零 table_has_caption。
+6. ⑥ evaluation 归因验证（scripts/verify_batch7_attribution.py）：
+   对照批次 6 封存基线逐字段 diff，仅 4 处差异且全部显式归因
+   （wall_time×2、git_commit、run_timestamp_iso）；**evaluator_version
+   维持 1.8 与全部 .metrics. 路径逐字节一致为零变化断言通过**
+   （table_has_caption 无 GT 键不进任何指标族）——VERDICT: PASS。
+7. ⑦ 本记录 + 封口报告（提交 cf170a6f）。
+
+**测试**：新增 tests/test_table_caption_relation_contract.py（39 项：
+前缀集、docx/pdf 判定、混排排序、版本分支、消费路径、非 fallback
+零回归、devset skipif 验收 docx e0013→e0012 / pdf 零表关联）；版本
+断言重锚 0.5.0（test_version_semantics / test_caption_relation_
+contract / test_chunker_source_spans / test_models）；全量回归
+**5113 passed**。提交：500f807（实现+契约）、975dff7（holdout 套件）。
+
+**待裁决**：批次 7 封口（Option A 选择追认 + 验收）。
