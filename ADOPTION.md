@@ -1078,3 +1078,32 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
 - 契约全文（裁决流截断于 137 字符，两处可见边界已并入，全文请重认）。
 - holdout 设计偏差：pdf/docx 不进 holdout，改 dev 验收对封存基线断言。
 - 版本语义 0.3.0 提案（契约 §4）随实现送批。
+
+## 二十一、批次 3 封口裁决（GPT 5.6 Sol，2026-08-30，会话 6a911adf）
+
+裁决正文封存于本机 Temp/gpt_ruling_b3_full.txt（1021 字符；UI 空泡，
+经会话 API 只读取回）。四项：
+
+1. **契约全文追认**：四族映射、resolver 边界、版本规则、kreuzberg
+   占位语义均确认（family 只说明字段族语义、不承诺占位 locator 可
+   解析；不以"原始字节"作全族统一 resolver 输入；既有 locator 键值
+   不变）。无需修订或重跑。
+2. **holdout 偏差追认**：pdf/docx 不进 holdout 属合理契约边界偏差；
+   批次 2 封存基线 dev 等价验收（全 SAME）成立。附加要求：后续记录
+   继续固定所引用基线的提交或哈希（本次引用
+   evaluation-chunkerspan-dev-acceptance-run2.json，其 provenance
+   git_commit=63b05ce，已在 outputs 留档）。
+3. **0.3.0 版本追认**：writer 新增 family 属输出能力变化统一 0.3.0；
+   0.1.0/0.2.0 合法读格式但拒 family；source_spans 沿用；不回滚、
+   不拆批。
+4. **批次 4 前置裁定（图片 caption 关联）**：
+   - caption 文本进 Element.content，但只留在 caption 自身 element，
+     不复制/拼接进图片 element 的 content；
+   - 用新的显式 element relation，方向 `image --has_caption--> caption`，
+     不复用 parent_id（parent_id 只表达既有结构层级）；
+   - relation 以稳定 element_id 引用，去重且确定性排序；无法明确判断
+     或端点缺失时不生成；
+   - caption 文本按既有元素路径正常进 chunk；图片内容、source_spans、
+     既有文本语义不变；
+   - writer 输出形状变化 → 下一版本 0.4.0；契约须冻结 relation 的
+     schema、缺失与歧义行为。
