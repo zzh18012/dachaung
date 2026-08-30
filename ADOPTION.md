@@ -1473,3 +1473,51 @@ contract / test_chunker_source_spans / test_models）；全量回归
 **5113 passed**。提交：500f807（实现+契约）、975dff7（holdout 套件）。
 
 **待裁决**：批次 7 封口（Option A 选择追认 + 验收）。
+
+## 三十三、批次 7 封口裁决记录（2026-08-30，GPT 5.6 Sol，会话 cf170a6f）
+
+**裁决结果**：
+- Option A 选择追认：**通过**。理由：政策成文完整（§3.2 与沿革
+  一致）；读兼容保障（not.contains 精确排除）；版本语义三者分工
+  清晰（schema_version=writer 能力 / EVALUATOR_VERSION=consumer
+  能力 / REPORT_VERSION=报告结构）。**schema_version 0.4.0 → 0.5.0
+  正式生效**。
+- 执行验收①–⑦**全部通过**。关键确认：docx 规则按 elements 列表
+  顺序（body 迭代顺序）定义邻接、不跨族比较 index——设计正确；
+  T3 前缀修正（"表格 2、"→"表 2、"）**追认为正向验证**（期望推导
+  暴露 _CAPTION_RE 语义，生成前调整，未违反"永不重跑"原则）；
+  holdout 纪律执行满分；评测归因加强断言（evaluator_version 不变 +
+  全部 .metrics. 逐字节一致）PASS。
+- **批次 7 正式封口，归档编号 `Stage-6-Batch-7-Closed`。**
+
+**Stage 6 全周期封存（批次 1–7 全部封口）**：
+| 批次 | 任务 | 封口标志 | 关键成果 |
+|---|---|---|---|
+| 1 | 图片 OCR text 机制 | holdout 首跑 all_pass | Image.text 可选字段，pdfplumber OCR 集成 |
+| 2 | 图片 metadata 规范 | holdout 首跑 all_pass | metadata.alt / resource / image_index，schema 0.3.0 |
+| 3 | text 元素 holdout | holdout 首跑 all_pass | 文本元素基线封存，预备跑机制确立 |
+| 4 | 图片题注关联 | holdout 首跑 all_pass | has_caption relation，docx 邻接 + pdf 几何，schema 0.4.0 |
+| 5 | 表格线性化 | holdout 首跑 all_pass | Markdown 格式统一，共享纯函数，零差异验收 |
+| 6 | 评测 relation 消费 | 零差异验证 PASS | 参数化匹配器，EVALUATOR_VERSION 1.8 |
+| 7 | 表格题注关联 | holdout 首跑 all_pass | table_has_caption relation，schema 0.5.0 |
+
+成果：schema 0.2.0→0.5.0（三次升版）；5 轮 holdout 首跑封存 5 个
+sha256；EVALUATOR_VERSION 1.6→1.8；6 份契约 + 1 份版本政策；测试
+57 → 5113（+5056）。
+
+**批次 8 指定（Stage 6 尾声：技术债盘点与优先级排序，开工许可已授予）**：
+1. TODO/FIXME 审计：扫描分类——可立即修复（批次 8 内完成）/
+   需专项设计（backlog GitHub issue，tech-debt 标签）/已过时（删除）。
+2. 评测覆盖缺口分析：devset parser×format 覆盖矩阵；识别"零 GT 键
+   → 恒 skip"指标族（如 table_caption_*）；输出待标注优先级清单
+   （按 devset 扩展 ROI 排序）。
+3. Holdout 维护成本评估：7 轮 holdout（含批次 3 预备跑）期望维护
+   成本；是否需要"holdout 期望生成器"工具。
+4. Schema 兼容性回归测试：旧 0.1.0–0.4.0 文档喂当前 writer（应拒绝
+   写入旧版本）；0.5.0 文档喂模拟旧 consumer（应优雅降级、跳过未知
+   relation type）。
+- 交付物：docs/technical-debt-audit-batch8.md（分类清单+优先级+
+  工时估算）+ 必要立即修复（commit main）+ backlog issues。
+- 验收：无遗漏 TODO；评测覆盖矩阵可视化；schema 双向兼容测试通过。
+
+**Stage 6 正式封存。继续搬运。**
