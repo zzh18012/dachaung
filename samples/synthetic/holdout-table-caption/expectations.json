@@ -1,0 +1,43 @@
+{
+  "holdout": "holdout-table-caption-relation",
+  "kind": "batch7-table-caption-relation-first-run",
+  "fixture": "holdout-table-caption.docx",
+  "fixture_sha256": "cc9424c2186390de7102802ee3fd3617401e4f87f42404b8c52128daf2d00894",
+  "parser": "fallback",
+  "expected_schema_version": "0.5.0",
+  "hand_derivation_basis": "依据生成脚本 body 大纲（authored 结构）+ docs/table-caption-relation-contract.md §3 docx 规则（表@列表位置 i 仅当 i−1 是表题注 caption）+ 批次 4 冻结期望确立的 element/locator 形状（doc-<fixture sha256 前 16 hex>::e000N 顺序编号；caption 分类用 _CAPTION_RE），在本夹具任何 parser 运行之前手工推导冻结。本夹具无 image。",
+  "expected_elements": [
+    {"element_id": "doc-cc9424c2186390de::e0000", "type": "heading", "source_locator": {"family": "structural_index", "paragraph_index": 0, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0001", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 1, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0002", "type": "caption", "source_locator": {"family": "structural_index", "paragraph_index": 2, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0003", "type": "table", "source_locator": {"family": "structural_index", "table_index": 0, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0004", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 3, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0005", "type": "table", "source_locator": {"family": "structural_index", "table_index": 1, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0006", "type": "caption", "source_locator": {"family": "structural_index", "paragraph_index": 4, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0007", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 5, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0008", "type": "caption", "source_locator": {"family": "structural_index", "paragraph_index": 6, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0009", "type": "table", "source_locator": {"family": "structural_index", "table_index": 2, "section": 0}},
+    {"element_id": "doc-cc9424c2186390de::e0010", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 7, "section": 0}}
+  ],
+  "expected_caption_contents": {
+    "doc-cc9424c2186390de::e0002": "Table 1. Module status matrix",
+    "doc-cc9424c2186390de::e0006": "表 2、孤立说明",
+    "doc-cc9424c2186390de::e0008": "Figure 3. demo"
+  },
+  "expected_relations": [
+    {
+      "type": "table_has_caption",
+      "from_id": "doc-cc9424c2186390de::e0003",
+      "to_id": "doc-cc9424c2186390de::e0002",
+      "metadata": {"rule": "docx_adjacent_element_above"}
+    }
+  ],
+  "hand_derivation_notes": [
+    "T1 表题注在上：caption@para2 (Table 1. 前缀) 紧邻 table@tbl0（列表位置 3 的前元素）→ e0003 --table_has_caption--> e0002",
+    "T2 无题注：table@tbl1 前元素是普通段落@para3 → 零 relation",
+    "T3 孤立表题注：caption@para4 (表 2、前缀) 后是普通段落@para5，无邻接表 → 零 relation",
+    "T4 图题注紧邻表上：caption@para6 (Figure 3. 前缀) 在 table@tbl2 之前，图/表前缀集互斥 → 零 relation",
+    "无 image → 批次 4 has_caption 恒零；relations 仅 T1 一条",
+    "推导阶段修正：初稿 T3 用 '表格 2、'，但分类用 _CAPTION_RE 要求数字紧跟前缀 token（仅空白），'表格' 作为整体不在其 alternation 中 → 不会分类为 caption；改为 '表 2、'（生成前修正，未消耗首跑）"
+  ]
+}
