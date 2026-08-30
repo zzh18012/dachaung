@@ -1248,3 +1248,44 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
 
 结论：契约冻结（docs/table-linearization-contract.md 随本提交），
 进入实现 → holdout 冻结 → 一次性首跑 → dev 验收。
+
+## 二十八、批次 5 执行与验收记录（2026-08-30）
+
+- 实现 commit 54712ca（分支 integration/stage6-batch5-table-linearization）：
+  - 新共享纯函数 app/parsers/table_linearize.py `linearize_table`：
+    管线 None→"" / CR 规整 / `\n`→`<br>` / `|`→`\|` / strip（顺序
+    固定）；首行=表头、短行补齐、0 行→""。
+  - fallback/markdown/html 删除三处本地副本统一委托（ipynb 经
+    MarkdownParser 继承）；md `_split_pipe_row` 仅按未转义 `|` 分列、
+    仅反转义 `\|`（其余反斜杠保留，裁决③）；docx 0 行表静默跳过
+    不产 warning（裁决④）。
+  - 6 个钉死旧缺陷行为的既有测试按契约重钉（转义/`<br>`/反转义
+    roundtrip）；新增 20 个契约测试（含裁决⑦ ipynb 表格路径、text
+    永不产 table、三 parser 一致性、roundtrip 幂等）。全量回归
+    **5056 passed**。
+- holdout（裁决⑤ 纪律执行，含一次预备跑事故的诚实处置）：
+  - 四合成 fixture 一次性生成字节固定：docx
+    914ca721bf0917d206b...（多段单元格/合并/管道符/空 cell）、md
+    78a3f720e9587a679...（`\|`/`<br>`/参差行）、html
+    d1720cb5e8476f3c...（管道符/th）、ipynb
+    3619c7a8980b4868...（markdown 表 cell + code/raw cell，裁决⑦）；
+    生成脚本带防重入守卫仅存溯源。
+  - **预备跑事故**：commit 470c5de 首跑 all_pass=False，封存报告改名
+    outputs/holdout-table-v1-preliminary-run.json 保留。诊断：全部
+    实质性检查（content/locator/type/metadata 值）通过，两处失败均
+    为**期望誊写错误**而非实现缺陷——docx element_id 前缀多誊 1 个
+    hex 字符（…7d20 应为 …7d2）；html metadata.table_index 在期望中
+    但漏出比对键集。修正 commit 68e160e（沿 text-holdout 预备跑
+    先例：留记录、修期望、另跑正式首跑）。
+  - **正式首跑** commit 68e160e 干净树：**all_pass=True**（四 fixture
+    全部 schema_version=0.4.0 / element_count / elements_exact 通过）；
+    报告封存 outputs/holdout-table-v1-firstrun.json（sha256
+    `4e566e4919fe69bbc82e50f8378e7788c680edbc97e700f0d984a4737fa04139`），
+    永不重跑。
+- dev 验收：evaluation 重跑 outputs/evaluation-tablelinear-dev-
+  acceptance.json（git_commit=68e160e，报告 schema 校验通过）对照
+  批次 4 封存基线逐字段 diff：**除 wall_time 外全部 SAME（0 项实质
+  差异）**。归因核实：devset 两文档各含 1 个表格，全部单元格为单行
+  纯文本（无 `|`、无 `\n`、无前后空白），新管线对它们逐字节同输出
+  ——零差异是真实结果而非掩盖；非表格面（elements/locator/relation/
+  确定性）零变化，满足裁决⑦"非表格面不得出现未解释变化"要求。
