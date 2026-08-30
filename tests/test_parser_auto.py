@@ -125,7 +125,7 @@ def test_auto_mixed_manifest_single_run(tmp_project: Path):
     assert report["provenance"]["parser_name"] == "auto"
     # auto 模式多 parser 并存 → parser_version 为 null
     assert report["provenance"]["parser_version"] is None
-    assert report["provenance"]["evaluator_version"] == "1.9"
+    assert report["provenance"]["evaluator_version"] == "1.10"
 
     by_id = {d["doc_id"]: d for d in report["per_doc"]}
     assert by_id["AUTO-MD"]["parser_used"] == "markdown"

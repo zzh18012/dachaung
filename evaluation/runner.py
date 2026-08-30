@@ -24,6 +24,7 @@ from evaluation.annotation_metrics import (
     chunk_boundary_prf,
     figure_caption_prf,
     heading_order_prf,
+    table_caption_prf,
 )
 from evaluation.metrics import compute_automatic_metrics
 from evaluation.report import (
@@ -175,11 +176,13 @@ def run_evaluation(
             document, annotation, tolerance_chars=tolerance_chars
         )
         head_ord = heading_order_prf(document, annotation)
+        tab_caps = table_caption_prf(document, annotation)
         metrics.update(fig_caps)
         tolerance_record = chunk_b.pop("_tolerance_chars", None)
         missing_markers_record = chunk_b.pop("_missing_markers", None)
         metrics.update(chunk_b)
         metrics.update(head_ord)
+        metrics.update(tab_caps)
 
         per_doc_results.append(
             {

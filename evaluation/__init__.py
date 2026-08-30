@@ -48,14 +48,14 @@
   语言链 ks.language→language_info.name→空串、outputs/attachments 忽略诊断、
   attachment: 引用跳过）。能力封口：1.6 evaluator 无法运行 ipynb manifest，
   同版本不同能力损害复现，故升 1.7。报告结构未变，report_version 保持 1.3。
-- v1.8（当前）：figure_caption_* 直接消费 document.relations 的
+- v1.8：figure_caption_* 直接消费 document.relations 的
   has_caption（docs/relation-consumption-contract.md，批次 6）；内部
   匹配器 match_relation_pairs 参数化为 relation-type 可复用形式（批次 7
   table_has_caption 复用，签名冻结）；移除过时理由
   parser_does_not_emit_relations。能力封口：1.7 evaluator 无法消费
   relation，同版本不同能力损害复现，故升 1.8。报告结构未变
   （figure_caption_* 仍不进 macro average），report_version 保持 1.3。
-- v1.9（当前）：heading_order_prf 消费 annotation.heading_order GT
+- v1.9：heading_order_prf 消费 annotation.heading_order GT
   （批次 11，Option 1 序列匹配：匹配键 = level 相等 AND
   normalize_text 严格相等，LCS 有序对齐）。能力封口：1.8 evaluator
   无法消费 heading_order GT，同版本不同能力损害复现，故升 1.9。
@@ -63,9 +63,17 @@
   figure_caption_* 同为标注依赖族，不进 macro average），
   report_version 保持 1.3（批次 11 裁决：REPORT_VERSION 只随报告
   结构变，指标扩展不升）。
+- v1.10（当前）：table_caption_prf 消费 annotation.table_caption_pairs GT
+  （annotation schema 同批升 v1.1 新增该键，批次 12）；复用批次 6/7
+  冻结的 match_relation_pairs（relation_type="table_has_caption"）。
+  PDF 口径 Option A：题注被 pdfplumber 融合进前一段落 → 0 预测
+  relation，GT 照标，recall=0.0 诚实曝光。能力封口：1.9 evaluator
+  无法消费 table_caption GT，同版本不同能力损害复现，故升 1.10。
+  报告结构未变（标注依赖族不进 macro average），report_version
+  保持 1.3。
 """
 
-EVALUATOR_VERSION = "1.9"
+EVALUATOR_VERSION = "1.10"
 REPORT_VERSION = "1.3"
 ANNOTATION_VERSION = "1.0"
 MANIFEST_VERSION = "1.1"

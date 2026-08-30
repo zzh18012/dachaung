@@ -162,6 +162,37 @@ def figure_caption_prf(
     return _pair_prf(counts, prefix="figure_caption")
 
 
+def table_caption_prf(
+    document: dict[str, Any] | None,
+    annotation: dict[str, Any] | None,
+) -> dict[str, dict[str, Any]]:
+    """表题注关联 P/R/F1：消费 table_has_caption relation（契约 §2/§3）。"""
+    if document is None:
+        counts = None
+    elif not annotation:
+        return {
+            "table_caption_precision": _null("no_annotation"),
+            "table_caption_recall": _null("no_annotation"),
+            "table_caption_f1": _null("no_annotation"),
+        }
+    else:
+        pairs = annotation.get("table_caption_pairs") or []
+        if not pairs:
+            return {
+                "table_caption_precision": _null("no_annotation_pairs"),
+                "table_caption_recall": _null("no_annotation_pairs"),
+                "table_caption_f1": _null("no_annotation_pairs"),
+            }
+        counts = match_relation_pairs(
+            document,
+            pairs,
+            relation_type="table_has_caption",
+            from_marker_key="table_marker",
+            to_marker_key="caption_text",
+        )
+    return _pair_prf(counts, prefix="table_caption")
+
+
 def chunk_boundary_prf(
     document: dict[str, Any] | None,
     annotation: dict[str, Any] | None,
@@ -385,6 +416,7 @@ def heading_order_prf(
 __all__ = [
     "match_relation_pairs",
     "figure_caption_prf",
+    "table_caption_prf",
     "chunk_boundary_prf",
     "heading_order_prf",
 ]
