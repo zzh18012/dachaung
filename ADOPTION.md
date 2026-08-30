@@ -1375,3 +1375,37 @@ contract.md（含三项强制要求）→ ② 重构匹配器为参数化（含�
 
 **holdout**：不设（契约 §7：评测基础设施改动，writer 输出面零变化，
 零差异验证即验收）。schema_version 维持 0.4.0（未触碰 app/*）。
+
+## 三十一、批次 6 封口裁决记录（2026-08-30，GPT 5.6 Sol，会话 cf170a6f）
+
+**裁决结果**：
+- (a) 零差异验证偏差解释：**追认**，并自我修正裁决措辞。追认理由：
+  figure_caption_*.reason 6 处变化正是批次 6 核心任务；evaluator_version
+  1.7→1.8 符合版本封口政策；run_timestamp_iso 属运行时元数据。所有
+  value 字段逐字节相同（含 null==null）、零 unexpected diff。**修正后的
+  零差异验证政策（后续批次沿用）**：所有评测分数字段（*_precision/
+  *_recall/f1/macro 及其 value）必须逐字节相同；元数据字段
+  （evaluator_version / run_timestamp_iso / wall_time / git_commit）与
+  契约化 reason 字段允许预期内变更，但须在验证脚本中显式归因断言。
+  verify_batch6_zero_diff.py 的"排除集+归因断言+unexpected=0 判定"
+  被评为优于裁决字面要求。
+- EVALUATOR_VERSION 1.7→1.8：**追认**。
+- (b) 批次 7 开工授权：**有条件通过**——先定 schema_version 升版：
+  Option A（升 0.5.0，GPT 推荐：schema_version 反映语义契约而非仅
+  结构；新增 relation type 扩展 relations[].type 枚举范围，consumers
+  需更新逻辑；先例对齐——批次 4 是"激活已存在的 relations 字段"故
+  不升，批次 7 是扩展 type 枚举应升 minor）vs Option B（维持 0.4.0：
+  type 本为开放字符串，结构兼容；风险是 version 失去语义指示作用）。
+  Claude 选定 **Option A**（与批次 2/3/4 版本沿革=writer 能力语义
+  一致），见批次 7 报告。
+- 批次 7 预判风险（GPT 提示）：PDF 表格边界更复杂（跨页/嵌套）；题注
+  前缀中英文混合与编号格式需全覆盖；holdout 需覆盖"表格有题注/表格
+  无题注/题注无对应表格"三类 case。
+- 批次 7 执行顺序（选定版本后）：① docs/schema-version-policy.md
+  补"新增 relation type 升 minor"规则 → ② 起草
+  docs/table-caption-relation-contract.md → ③ 实现 table_has_caption
+  （复用批次 4 框架）→ ④ 匹配器调用扩展（参数不改仅传新 type）→
+  ⑤ holdout（三类 case）→ ⑥ evaluation 验证（分数变化需归因）→
+  ⑦ 封口报告。
+
+**批次 6 正式封口，归档编号 `Stage-6-Batch-6-Closed`。**
