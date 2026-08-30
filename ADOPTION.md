@@ -1964,3 +1964,41 @@ must-not-change 全过（report_version=1.3 / summary 零差异 /
 
 **Issues**：#1/#2/#3 已关闭（#3 按本批裁决指令，评论引用
 Stage-7-Batch-11-Closed）。
+
+## 四十三、批次 12 封口裁决与批次 13 指定（2026-08-31，GPT 5.6 Sol，会话 cf170a6f）
+
+**裁决存证**：outputs/_b12closure_dump.txt（5597 字符，gitignored）。
+
+**批次 12 封口**：归档编号 **Stage-7-Batch-12-Closed**。执行验收全部
+通过（schema v1.1 六项校验 / 标注 dry-run / 实现同构复用 / 评测验证
+与预期逐字一致 / 归因 PASS 11 处全归因 / git 三提交 ff-only + push /
+issues #3 已关）；验收标准 14/14。
+
+**偏差追认（4 处全部通过）**：
+1. 路径修正（evaluation/schemas/ → schemas/；docs/ADOPTION.md → 根
+   ADOPTION.md）——裁决未查阅仓库布局。
+2. 函数包装语义等价——冻结契约 counts 元组 + _pair_prf(counts,
+   prefix)，与 figure_caption_prf 严格同构，"分离匹配逻辑与指标计算
+   更清晰"。
+3. date 修订日——裁决基于过时记忆（批次 9 日期），实际执行日
+   2026-08-31 正确。
+4. "其他文档 no_annotation"验收项空集——降级语义已由契约测试钉死，
+   验收项为泛化描述，devset 覆盖受限属正常。
+
+**Stage 7 进度**：轨道 A（批次 9/10）完成；轨道 B 2/3——批次 11
+（heading_order_*，1.9）、批次 12（table_caption_*，1.10）完成，
+剩 P5（真实语料入 manifest）。
+
+**批次 13 指定（P5 真实语料入 manifest，开工许可已授予）**：
+真实语料 10 文件（real-01.docx / real-02.pdf / real-03.md /
+real-04.html / real-05.txt + 对应 worksheets）入 devset manifest，
+无 GT 标注 → 初期仅生成 expectations（人工审核合理性），不设
+annotation_file。步骤 1（下次汇报）：文件清单（路径/格式/大小）+
+快速解析测试（fallback parser 报错检查）+ worksheets 格式数量确认；
+步骤 2–5 待裁决（生成 expectations → manifest 条目 → 评测验证
+（2→12 文档，原 2 文档不变 + 新 10 文档合理性 + macro 参与数重算）
+→ 归因）。
+
+**Backlog 决策**：PDF chunk_boundary_anchors 标注暂不排入批次 13，
+待 P5 完成后重评（触发条件：需全面解锁 chunk_boundary_* 或专项
+chunking 优化）。
