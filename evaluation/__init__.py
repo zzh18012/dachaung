@@ -55,9 +55,17 @@
   parser_does_not_emit_relations。能力封口：1.7 evaluator 无法消费
   relation，同版本不同能力损害复现，故升 1.8。报告结构未变
   （figure_caption_* 仍不进 macro average），report_version 保持 1.3。
+- v1.9（当前）：heading_order_prf 消费 annotation.heading_order GT
+  （批次 11，Option 1 序列匹配：匹配键 = level 相等 AND
+  normalize_text 严格相等，LCS 有序对齐）。能力封口：1.8 evaluator
+  无法消费 heading_order GT，同版本不同能力损害复现，故升 1.9。
+  报告结构未变（per-doc metrics 为开放字典；heading_order_* 与
+  figure_caption_* 同为标注依赖族，不进 macro average），
+  report_version 保持 1.3（批次 11 裁决：REPORT_VERSION 只随报告
+  结构变，指标扩展不升）。
 """
 
-EVALUATOR_VERSION = "1.8"
+EVALUATOR_VERSION = "1.9"
 REPORT_VERSION = "1.3"
 ANNOTATION_VERSION = "1.0"
 MANIFEST_VERSION = "1.1"

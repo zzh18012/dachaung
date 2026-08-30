@@ -310,8 +310,81 @@ def chunk_boundary_prf(
     return out
 
 
+def heading_order_prf(
+    document: dict[str, Any] | None,
+    annotation: dict[str, Any] | None,
+) -> dict[str, dict[str, Any]]:
+    """heading 序列 P/R/F1（批次 11 契约：Option 1 序列匹配）。
+
+    匹配键 = (metadata.level 相等) AND (normalize_text(content) ==
+    normalize_text(text))——严格相等而非子串（heading 短文本，子串
+    易误配；融合段落等失配情形属诚实的 recall 信号）。对齐 = LCS
+    有序一对一（matched = LCS 长度）。
+
+    降级矩阵：document=None → pipeline_failed；无 annotation →
+    no_annotation；heading_order 键缺失/空 → no_ground_truth_headings；
+    parser 0 个 heading → no_predicted_headings（GT>0 时 recall=0.0）。
+    """
+    p_key = "heading_order_precision"
+    r_key = "heading_order_recall"
+    f_key = "heading_order_f1"
+    out: dict[str, dict[str, Any]] = {}
+
+    if document is None:
+        for k in (p_key, r_key, f_key):
+            out[k] = _null("pipeline_failed")
+        return out
+    if not annotation:
+        for k in (p_key, r_key, f_key):
+            out[k] = _null("no_annotation")
+        return out
+
+    gt = annotation.get("heading_order") or []
+    if not gt:
+        for k in (p_key, r_key, f_key):
+            out[k] = _null("no_ground_truth_headings")
+        return out
+
+    pred = [
+        e for e in document.get("elements") or [] if e.get("type") == "heading"
+    ]
+    if not pred:
+        out[p_key] = _null("no_predicted_headings")
+        out[r_key] = _ratio(0.0)
+        out[f_key] = _null("no_predicted_headings")
+        return out
+
+    pred_keys = [
+        ((e.get("metadata") or {}).get("level"), normalize_text(e.get("content") or ""))
+        for e in pred
+    ]
+    gt_keys = [
+        (g.get("level"), normalize_text(g.get("text") or "")) for g in gt
+    ]
+
+    n, m = len(pred_keys), len(gt_keys)
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        row, prev = dp[i], dp[i - 1]
+        for j in range(1, m + 1):
+            if pred_keys[i - 1] == gt_keys[j - 1]:
+                row[j] = prev[j - 1] + 1
+            else:
+                row[j] = prev[j] if prev[j] >= row[j - 1] else row[j - 1]
+    matched = dp[n][m]
+
+    p_val = matched / n
+    r_val = matched / m
+    out[p_key] = _ratio(p_val)
+    out[r_key] = _ratio(r_val)
+    denom = p_val + r_val
+    out[f_key] = _ratio(2 * p_val * r_val / denom) if denom > 0 else _ratio(0.0)
+    return out
+
+
 __all__ = [
     "match_relation_pairs",
     "figure_caption_prf",
     "chunk_boundary_prf",
+    "heading_order_prf",
 ]

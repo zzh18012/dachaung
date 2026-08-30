@@ -45,3 +45,14 @@
 - `EVALUATOR_VERSION`：评测器能力（能跑哪些 manifest、能消费什么），
   政策见 evaluation/__init__.py 版本历史注释。
 - `REPORT_VERSION`：报告结构快照（键集/分节变化才升）。
+
+分工规则（批次 11 裁决补充，2026-08-30）：
+
+- `EVALUATOR_VERSION` 升 minor：新增指标族 / 改匹配算法 / 改降级
+  逻辑（例：1.8 figure_caption 消费 relation、1.9 heading_order
+  消费 GT）。
+- `REPORT_VERSION` 升 minor：改报告结构——新增/删除顶层字段 / 改
+  macro 计算范围 / 改报告 schema。指标键扩展不升（报告 schema 的
+  per-doc metrics 为开放字典，先例：figure_caption_* 加入时 1.3
+  不变，heading_order_* 同）。
+
