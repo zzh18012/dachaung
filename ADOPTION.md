@@ -1587,3 +1587,41 @@ figure_caption_* 解锁（null+no_annotation_pairs → 数值；其他指标族
   annotation.schema.json v1.0（figure_marker/caption_text，
   additionalProperties=false，批次 6 契约）不符——按冻结 schema 执行，
   偏差在批次 9 报告中声明。
+
+## 三十六、批次 9 执行与验收记录（2026-08-30，Stage 7 轨道 A）
+
+**任务**（批次 8 封口裁决指定，P1 标注解锁）：补 DC-MVP-001 的
+figure_caption_pairs（1 对），解锁 figure_caption_* 指标族。
+
+**执行**：
+1. 人工识别图-题注对：DC-MVP-001.docx 仅 1 图（§2.1 Embedded figure）
+   + 其下题注段落 "Figure 1. Knowledge unit processing flow"——
+   即批次 4 起已产出的 has_caption e0018→e0019 的端点。
+2. 端点识别信息提取（裁决步骤②，从 parser 输出提取）：docx image
+   元素 content=None、metadata.alt=None，识别文本=落盘资源文件名
+   `image_966e35cc7ce36e24_para16_00.png`（评测运行 images 目录，
+   批次 7 基线同名——命名确定性）；caption 文本人工可读。
+3. **格式偏差声明**：裁决示例格式 {"figure_id","caption_id"} 与冻结
+   annotation.schema.json v1.0（figure_marker/caption_text，
+   additionalProperties=false，批次 6 契约）不符——按冻结 schema 执行：
+   `[{"figure_marker": "image_966e35cc7ce36e24_para16_00.png",
+   "caption_text": "Figure 1. Knowledge unit processing flow"}]`；
+   annotation date 2026-08-03 → 2026-08-30（修订日）；jsonschema
+   Draft202012 校验 0 错误。
+4. 评测重跑（干净树 5d09f43，git_dirty=False）：
+   outputs/evaluation-batch9-figcap-unlock.json。**DC-MVP-001 docx
+   figure_caption_precision/recall/f1 = 1.0/1.0/1.0**（预测 1 条
+   e0018→e0019、GT 1 对、命中 1——与标注一致，∈[0,1]）；PDF 侧仍
+   null+no_annotation（未解锁，验收要求）。
+5. 归因验证（scripts/verify_batch9_attribution.py）：对照批次 7 封存
+   基线逐字段 diff，共 10 处且全部归因——6 处 = docx figure_caption_*
+   value/reason 解锁（null+no_annotation_pairs → 1.0+null），4 处 =
+   运行环境（wall_time×2、git_commit、run_timestamp_iso）。must-not-
+   change 断言全过：evaluator_version 1.8 不变、PDF figure_caption_*
+   不变、其余全部 .metrics. 路径逐字节一致。VERDICT: PASS。
+6. 全量回归 **5123 passed**。
+
+**验收对照（裁决验收标准）**：annotation ≥1 对 ✅；P/R/F1 数值且与
+标注一致 ✅；PDF 侧仍 null ✅；全量回归 ✅。
+
+**待裁决**：批次 9 封口（P1 解锁验收 + 格式偏差追认）。
