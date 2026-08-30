@@ -128,6 +128,7 @@ def test_cell_id_ignored(tmp_path):
     ]))
     assert doc.elements[
         0].source_locator == {
+        "family": "container_line",
         "cell_index": 0,
         "cell_type": "code",
         "line": 1,

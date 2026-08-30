@@ -196,6 +196,7 @@ def test_code_cell_locator_has_line1(tmp_path):
     nb = _nb([_cell("code", "x = 1")])
     doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
     assert doc.elements[0].source_locator == {
+        "family": "container_line",
         "cell_index": 0, "cell_type": "code", "line": 1}
 
 
@@ -203,6 +204,7 @@ def test_raw_cell_locator_has_line1(tmp_path):
     nb = _nb([_cell("raw", "raw txt")])
     doc = IpynbParser().parse(_write(tmp_path, nb), source_hash="0" * 64)
     assert doc.elements[0].source_locator == {
+        "family": "container_line",
         "cell_index": 0, "cell_type": "raw", "line": 1}
 
 

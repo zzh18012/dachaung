@@ -40,7 +40,7 @@ def _one_content(tmp_path, text):
     e = doc.elements[0]
     assert e.type == "paragraph"
     assert e.source_locator == \
-        {"line": 1}
+        {"family": "line_address", "line": 1}
     return e.content
 
 
@@ -112,7 +112,7 @@ def test_ls_around_real_newline_join(
     assert doc.elements[0].content \
         == "x" + LS + "\n" + LS + "y"
     assert doc.elements[
-        0].source_locator == {"line": 1}
+        0].source_locator == {"family": "line_address", "line": 1}
 
 
 # ---------- _split_paragraphs 直连 ----------

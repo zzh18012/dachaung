@@ -96,6 +96,7 @@ def test_md_cell_bom_kills_heading(tmp_path):
          "﻿# heading\nbody"),
     ]
     assert doc.elements[0].source_locator == {
+        "family": "container_line",
         "cell_index": 0,
         "cell_type": "markdown",
         "line": 1,

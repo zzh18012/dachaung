@@ -26,6 +26,16 @@ def _non_ws(s: str) -> str:
     return _WS.sub("", s)
 
 
+_LOCATOR_FAMILY = {
+    "markdown": "line_address",
+    "html": "line_address",
+    "text": "line_address",
+    "docx": "structural_index",
+    "pdf": "page_geometry",
+    "ipynb": "container_line",
+}
+
+
 def _make_doc(
     elements_data: list[dict],
     doc_id: str = "d-spn0000000001",
@@ -39,7 +49,10 @@ def _make_doc(
                 type=ed["type"],
                 content=ed["content"],
                 resource_path=ed.get("resource_path"),
-                source_locator=ed.get("source_locator", {"line": i + 1}),
+                source_locator=ed.get(
+                    "source_locator",
+                    {"family": _LOCATOR_FAMILY[source_type], "line": i + 1},
+                ),
             )
         )
     return Document(
@@ -292,14 +305,14 @@ def test_rule8_long_split_metadata_unchanged():
 
 # ---------- §1 规则 9：版本契约 ----------
 
-def test_rule9_spans_force_020_docx():
+def test_rule9_spans_emit_030_docx():
     doc = _make_doc(
         [{"type": "paragraph", "content": "docx 段落"}],
         source_type="docx",
     )
     doc.chunks = StructuralChunker(max_chars=100).chunk(doc)
     d = doc.to_dict()
-    assert d["schema_version"] == "0.2.0"
+    assert d["schema_version"] == "0.3.0"
     validate_udm(d)
 
 
@@ -440,7 +453,7 @@ def test_metric3_determinism_two_runs():
 
 # ---------- §4 端到端 ----------
 
-def test_e2e_markdown_pipeline_020_and_span_identity(tmp_path):
+def test_e2e_markdown_pipeline_030_and_span_identity(tmp_path):
     from app.pipeline import process_single
 
     p = tmp_path / "doc.md"
@@ -453,7 +466,7 @@ def test_e2e_markdown_pipeline_020_and_span_identity(tmp_path):
     )
     assert errors == [] and document is not None
     d = document.to_dict()
-    assert d["schema_version"] == "0.2.0"
+    assert d["schema_version"] == "0.3.0"
     validate_udm(d)
     by_id = {e.element_id: e for e in document.elements}
     assert d["chunks"]

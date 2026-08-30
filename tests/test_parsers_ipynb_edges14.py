@@ -121,6 +121,7 @@ def test_md_table_sub_locator(tmp_path):
     e = doc.elements[0]
     assert e.type == "table"
     assert e.source_locator == {
+        "family": "container_line",
         "cell_index": 0,
         "cell_type": "markdown",
         "line": 1,

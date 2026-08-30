@@ -127,7 +127,7 @@ def test_make_locator_for_current_no_section_returns_only_line():
     p = _HTMLDocParser("doc-x")
     p._cur_start_line = 42
     loc = p._make_locator_for_current()
-    assert loc == {"line": 42}
+    assert loc == {"family": "line_address", "line": 42}
 
 
 def test_make_locator_for_current_with_section_returns_both():
@@ -135,7 +135,7 @@ def test_make_locator_for_current_with_section_returns_both():
     p._cur_start_line = 5
     p._section_path = ["H1", "H2"]
     loc = p._make_locator_for_current()
-    assert loc == {"line": 5, "section_path": "H1 > H2"}
+    assert loc == {"family": "line_address", "line": 5, "section_path": "H1 > H2"}
 
 
 def test_make_locator_for_current_section_joined_with_gt():

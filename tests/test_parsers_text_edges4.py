@@ -351,7 +351,8 @@ def test_parse_source_locator_only_line_key(tmp_path: Path):
     p = _write(tmp_path, "hello")
     parser = TextParser()
     doc = parser.parse(p, source_hash=SHA)
-    assert set(doc.elements[0].source_locator.keys()) == {"line"}
+    assert doc.elements[0].source_locator["family"] == "line_address"
+    assert set(doc.elements[0].source_locator.keys()) == {"family", "line"}
 
 
 def test_parse_returns_document_instance(tmp_path: Path):

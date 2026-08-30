@@ -4,7 +4,8 @@
 
 支持的扩展名：``.txt``、``.text``。
 
-source_locator 结构：``{"line": N}``，N 是该段首字符在原文中的 1-indexed 行号。
+source_locator 结构：``{"family": "line_address", "line": N}``，
+N 是该段首字符在原文中的 1-indexed 行号（family 见 docs/locator-kvfs-contract.md）。
 
 不做的事（明确放弃）：
 - 任何形式的结构识别（无标题、无列表、无表格）
@@ -104,7 +105,7 @@ class TextParser(Parser):
                     type="paragraph",
                     content=content,
                     parent_id=None,
-                    source_locator={"line": start_line},
+                    source_locator={"family": "line_address", "line": start_line},
                     confidence=0.95,
                     metadata={},
                 )

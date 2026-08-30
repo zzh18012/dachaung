@@ -131,12 +131,13 @@ def test_text_line_number_after_multiple_blank_lines(tmp_path: Path):
 
 
 def test_text_locator_no_section_path_key(tmp_path: Path):
-    """纯文本不需要 section_path；locator 只含 line。"""
+    """纯文本不需要 section_path；locator 只含 family + line。"""
     p = _write_text(tmp_path, "j.txt", "hi\n")
     doc = TextParser().parse(p, source_hash="15" * 32)
     para = doc.elements[0]
     assert "section_path" not in para.source_locator
-    assert set(para.source_locator.keys()) == {"line"}
+    assert para.source_locator["family"] == "line_address"
+    assert set(para.source_locator.keys()) == {"family", "line"}
 
 
 # ---------- split_paragraphs 单元测试 ----------
@@ -488,4 +489,5 @@ def test_text_parser_locator_only_has_line_key(tmp_path: Path):
     p = _write_text(tmp_path, "a.txt", "hello\n\nworld\n")
     doc = TextParser().parse(p, source_hash="a" * 64)
     for el in doc.elements:
-        assert set(el.source_locator.keys()) == {"line"}
+        assert el.source_locator["family"] == "line_address"
+        assert set(el.source_locator.keys()) == {"family", "line"}

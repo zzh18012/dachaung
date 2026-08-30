@@ -252,7 +252,7 @@ def test_parse_element_source_locator_line(tmp_path: Path):
     p = tmp_path / "x.txt"
     p.write_text("hello", encoding="utf-8")
     doc = TextParser().parse(p, source_hash="0" * 64)
-    assert doc.elements[0].source_locator == {"line": 1}
+    assert doc.elements[0].source_locator == {"family": "line_address", "line": 1}
 
 
 def test_parse_element_metadata_empty(tmp_path: Path):

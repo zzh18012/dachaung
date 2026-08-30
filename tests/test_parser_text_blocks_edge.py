@@ -30,7 +30,8 @@ def test_text_single_newline_one_paragraph(tmp_path):
     assert errors == []
     assert [(e.type, e.content, e.source_locator)
             for e in doc.elements] == [
-        ("paragraph", "l1\nl2\nl3", {"line": 1})]
+        ("paragraph", "l1\nl2\nl3",
+         {"family": "line_address", "line": 1})]
 
 
 def test_text_padding_physical_line_locator(tmp_path):
@@ -41,7 +42,8 @@ def test_text_padding_physical_line_locator(tmp_path):
     assert errors == []
     assert [(e.type, e.content, e.source_locator)
             for e in doc.elements] == [
-        ("paragraph", "x", {"line": 3})]
+        ("paragraph", "x",
+         {"family": "line_address", "line": 3})]
 
 
 def test_md_indent_h7_not_special(tmp_path):

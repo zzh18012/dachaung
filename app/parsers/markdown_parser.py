@@ -20,8 +20,9 @@
 - 原生 HTML 块
 - 表格列对齐语法（``:---:``）
 
-source_locator 结构：``{"line": N, "section_path": "H1 > H2 > ..."}``，
-其中 ``section_path`` 跟踪当前 ATX 标题层级（同级或更高级的标题会弹出栈）。
+source_locator 结构：``{"family": "line_address", "line": N, "section_path": "H1 > H2 > ..."}``，
+其中 ``section_path`` 跟踪当前 ATX 标题层级（同级或更高级的标题会弹出栈）；
+family 语义见 docs/locator-kvfs-contract.md。
 
 空标记行语义（BUG-md-1 修复）：ATX 标题 / 无序 / 有序列表标记后跟 ≥2 个
 空白且无内容时，该行被忽略——不发空节点、不崩溃，记
@@ -161,7 +162,7 @@ class MarkdownParser(Parser):
         section_levels: list[int] = []
 
         def make_locator(line_idx_1based: int) -> dict[str, Any]:
-            loc: dict[str, Any] = {"line": line_idx_1based}
+            loc: dict[str, Any] = {"family": "line_address", "line": line_idx_1based}
             if section_path:
                 loc["section_path"] = " > ".join(section_path)
             return loc

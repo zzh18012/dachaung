@@ -975,7 +975,8 @@ def _parse_text(text: str) -> tuple[list, list]:
 
 def test_section_path_single_heading():
     els, _ = _parse_text("# Title")
-    assert els[0].source_locator == {"line": 1, "section_path": "Title"}
+    assert els[0].source_locator == {
+        "family": "line_address", "line": 1, "section_path": "Title"}
 
 
 def test_section_path_nested_two_levels():

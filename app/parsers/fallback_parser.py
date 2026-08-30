@@ -271,7 +271,7 @@ def _parse_pdf(
                     if not text:
                         continue
                     etype, meta = _classify_pdf_paragraph(text)
-                    locator: dict[str, Any] = {"page": page_idx}
+                    locator: dict[str, Any] = {"family": "page_geometry", "page": page_idx}
                     if para["bbox"] is not None:
                         locator["bbox"] = para["bbox"]
                     elements.append(
@@ -299,7 +299,7 @@ def _parse_pdf(
                         continue
                     md = _rows_to_markdown(rows)
                     tbl_bbox = getattr(tbl, "bbox", None)
-                    tbl_locator: dict[str, Any] = {"page": page_idx}
+                    tbl_locator: dict[str, Any] = {"family": "page_geometry", "page": page_idx}
                     if tbl_bbox:
                         tbl_locator["bbox"] = list(tbl_bbox)
                     elements.append(
@@ -331,6 +331,7 @@ def _parse_pdf(
                         continue
                     img_element_id = f"{document_id}::e{len(elements):04d}"
                     img_locator: dict[str, Any] = {
+                        "family": "page_geometry",
                         "page": page_idx,
                         "bbox": [x0, top, x1, bottom],
                     }
@@ -476,6 +477,7 @@ def _parse_docx(
                     etype = "heading"
                     level = lvl
             locator: dict[str, Any] = {
+                "family": "structural_index",
                 "paragraph_index": para_counter,
                 "section": section_idx,
             }
@@ -527,6 +529,7 @@ def _parse_docx(
                         resource_path=resource_path or "(unsaved)",
                         parent_id=None,
                         source_locator={
+                            "family": "structural_index",
                             "paragraph_index": para_counter,
                             "section": section_idx,
                             "relationship_id": rid,
@@ -555,6 +558,7 @@ def _parse_docx(
                     content=md,
                     parent_id=None,
                     source_locator={
+                        "family": "structural_index",
                         "table_index": table_counter,
                         "section": section_idx,
                     },
@@ -582,7 +586,8 @@ def _parse_docx(
 class FallbackParser(Parser):
     """PDF → pdfplumber + pypdfium2；DOCX → python-docx。
 
-    优点：给出 element 级结构和精确 source_locator（PDF page/bbox；DOCX paragraph_index/table_index）。
+    优点：给出 element 级结构和精确 source_locator（PDF page/bbox，family=page_geometry；
+    DOCX paragraph_index/table_index，family=structural_index；契约 docs/locator-kvfs-contract.md）。
     限制：不做 OCR、不识别图片内容文本、不重建跨页段落。
     """
 

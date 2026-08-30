@@ -8,8 +8,9 @@
   ``metadata.language`` 来自 kernelspec.language_info.name
 - ``raw`` cell → 单个 paragraph，``metadata.kind="raw_cell"``
 
-source_locator 结构：``{"cell_index": N (0-based), "cell_type": "markdown"|"code"|"raw", "line": N (1-based, cell 内偏移)}``。
-markdown cell 里的 sub-element 还会带 ``section_path``（仅在该 cell 内的标题栈）。
+source_locator 结构：``{"family": "container_line", "cell_index": N (0-based), "cell_type": "markdown"|"code"|"raw", "line": N (1-based, cell 内偏移)}``。
+markdown cell 里的 sub-element 还会带 ``section_path``（仅在该 cell 内的标题栈）；
+family 语义见 docs/locator-kvfs-contract.md。
 
 不做的事（明确放弃）：
 - ``outputs``（执行输出）→ 丢弃
@@ -224,6 +225,7 @@ class IpynbParser(Parser):
                     loc = dict(el.source_locator)
                     # 在 locator 前置 cell 信息
                     new_loc: dict[str, Any] = {
+                        "family": "container_line",
                         "cell_index": idx,
                         "cell_type": "markdown",
                     }
@@ -246,7 +248,7 @@ class IpynbParser(Parser):
                     "paragraph",
                     text,
                     None,
-                    {"cell_index": idx, "cell_type": "code", "line": 1},
+                    {"family": "container_line", "cell_index": idx, "cell_type": "code", "line": 1},
                     {"kind": "code_cell", "language": language},
                 ))
             elif ct == "raw":
@@ -256,7 +258,7 @@ class IpynbParser(Parser):
                     "paragraph",
                     text,
                     None,
-                    {"cell_index": idx, "cell_type": "raw", "line": 1},
+                    {"family": "container_line", "cell_index": idx, "cell_type": "raw", "line": 1},
                     {"kind": "raw_cell"},
                 ))
             else:

@@ -448,10 +448,11 @@ def test_parse_element_resource_path_none(tmp_path: Path):
 
 
 def test_parse_element_locator_only_has_line_key(tmp_path: Path):
-    """locator 只有 line，没有 section_path 等。"""
+    """locator 只有 family + line，没有 section_path 等。"""
     doc = _parse(tmp_path, "hello")
     for e in doc.elements:
-        assert set(e.source_locator.keys()) == {"line"}
+        assert e.source_locator["family"] == "line_address"
+        assert set(e.source_locator.keys()) == {"family", "line"}
 
 
 def test_parse_element_id_continuous(tmp_path: Path):

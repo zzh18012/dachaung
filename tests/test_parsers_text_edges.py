@@ -388,13 +388,14 @@ def test_text_parser_source_locator_has_line_key(tmp_path: Path):
 
 
 def test_text_parser_source_locator_only_line_key(tmp_path: Path):
-    """source_locator 只含 line（不应有 section_path 等）。"""
+    """source_locator 只含 family + line（不应有 section_path 等）。"""
     p = tmp_path / "x.txt"
     p.write_text("a", encoding="utf-8")
     parser = TextParser()
     doc = parser.parse(p, source_hash="a" * 64)
     for el in doc.elements:
-        assert set(el.source_locator.keys()) == {"line"}
+        assert el.source_locator["family"] == "line_address"
+        assert set(el.source_locator.keys()) == {"family", "line"}
 
 
 # ---------- 文件大小边角 ----------

@@ -627,7 +627,8 @@ def test_ipynb_parser_code_cell_locator_line1(tmp_path: Path):
     parser = IpynbParser()
     doc = parser.parse(p, source_hash="a" * 64)
     loc = doc.elements[0].source_locator
-    assert set(loc.keys()) == {"cell_index", "cell_type", "line"}
+    assert set(loc.keys()) == {"family", "cell_index", "cell_type", "line"}
+    assert loc["family"] == "container_line"
     assert loc["cell_index"] == 0
     assert loc["cell_type"] == "code"
     assert loc["line"] == 1
@@ -640,7 +641,8 @@ def test_ipynb_parser_raw_cell_locator_line1(tmp_path: Path):
     parser = IpynbParser()
     doc = parser.parse(p, source_hash="a" * 64)
     loc = doc.elements[0].source_locator
-    assert set(loc.keys()) == {"cell_index", "cell_type", "line"}
+    assert set(loc.keys()) == {"family", "cell_index", "cell_type", "line"}
+    assert loc["family"] == "container_line"
     assert loc["cell_index"] == 0
     assert loc["cell_type"] == "raw"
     assert loc["line"] == 1

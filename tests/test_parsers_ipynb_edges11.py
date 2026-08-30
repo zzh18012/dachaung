@@ -224,6 +224,7 @@ def test_md_table_cell(tmp_path):
     assert e.type == "table"
     assert e.metadata["row_count"] == 2
     assert e.source_locator == {
+        "family": "container_line",
         "cell_index": 0,
         "cell_type": "markdown",
         "line": 1,
@@ -240,6 +241,7 @@ def test_md_image_cell(tmp_path):
     assert e.resource_path == "img.png"
     assert e.metadata["alt"] == "alt"
     assert e.source_locator == {
+        "family": "container_line",
         "cell_index": 0,
         "cell_type": "markdown",
         "line": 1,

@@ -36,8 +36,9 @@ body 图片路径（image element + resource_path=src + metadata.alt），
 不与单元格文本重复计入；缺 src 沿用既有政策（跳过）。
 
 
-source_locator 结构：``{"line": N, "section_path": "H1 > H2..."}``，
-``section_path`` 跟踪当前 ATX 标题层级（同级或更高级标题弹出栈）。
+source_locator 结构：``{"family": "line_address", "line": N, "section_path": "H1 > H2..."}``，
+``section_path`` 跟踪当前 ATX 标题层级（同级或更高级标题弹出栈）；
+family 语义见 docs/locator-kvfs-contract.md。
 """
 
 from __future__ import annotations
@@ -121,13 +122,13 @@ class _HTMLDocParser(_StdHTMLParser):
     # ---------- locator 与 emit ----------
 
     def _make_locator_for_current(self) -> dict[str, Any]:
-        loc: dict[str, Any] = {"line": self._cur_start_line}
+        loc: dict[str, Any] = {"family": "line_address", "line": self._cur_start_line}
         if self._section_path:
             loc["section_path"] = " > ".join(self._section_path)
         return loc
 
     def _make_locator_for_inline(self) -> dict[str, Any]:
-        loc: dict[str, Any] = {"line": self.getpos()[0]}
+        loc: dict[str, Any] = {"family": "line_address", "line": self.getpos()[0]}
         if self._section_path:
             loc["section_path"] = " > ".join(self._section_path)
         return loc
@@ -211,7 +212,7 @@ class _HTMLDocParser(_StdHTMLParser):
                     type="heading",
                     content=text,
                     parent_id=None,
-                    source_locator={"line": self._cur_start_line, "section_path": " > ".join(self._section_path)},
+                    source_locator={"family": "line_address", "line": self._cur_start_line, "section_path": " > ".join(self._section_path)},
                     confidence=0.95,
                     metadata={"level": level},
                 )
@@ -393,7 +394,7 @@ class _HTMLDocParser(_StdHTMLParser):
                             type="table",
                             content=md,
                             parent_id=None,
-                            source_locator={"line": start_line, **({"section_path": " > ".join(self._section_path)} if self._section_path else {})},
+                            source_locator={"family": "line_address", "line": start_line, **({"section_path": " > ".join(self._section_path)} if self._section_path else {})},
                             confidence=0.9,
                             metadata={
                                 "row_count": len(rows),

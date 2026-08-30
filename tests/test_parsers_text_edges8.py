@@ -383,8 +383,8 @@ def test_parse_element_locator_line(tmp_path: Path):
     p = tmp_path / "x.txt"
     p.write_text("para1\n\npara2", encoding="utf-8")
     doc = parser.parse(p, "a" * 64)
-    assert doc.elements[0].source_locator == {"line": 1}
-    assert doc.elements[1].source_locator == {"line": 3}
+    assert doc.elements[0].source_locator == {"family": "line_address", "line": 1}
+    assert doc.elements[1].source_locator == {"family": "line_address", "line": 3}
 
 
 def test_parse_element_confidence_095(tmp_path: Path):
@@ -707,7 +707,7 @@ def test_parse_single_paragraph_no_newline(tmp_path: Path):
     doc = parser.parse(p, "a" * 64)
     assert len(doc.elements) == 1
     assert doc.elements[0].content == "single line no newline"
-    assert doc.elements[0].source_locator == {"line": 1}
+    assert doc.elements[0].source_locator == {"family": "line_address", "line": 1}
 
 
 def test_parse_unicode_emoji_pipeline(tmp_path: Path):
@@ -726,5 +726,5 @@ def test_parse_locator_uses_normalized_line_numbers(tmp_path: Path):
     p = tmp_path / "crlf.txt"
     p.write_bytes(b"para1\r\n\r\npara2")
     doc = parser.parse(p, "a" * 64)
-    assert doc.elements[0].source_locator == {"line": 1}
-    assert doc.elements[1].source_locator == {"line": 3}
+    assert doc.elements[0].source_locator == {"family": "line_address", "line": 1}
+    assert doc.elements[1].source_locator == {"family": "line_address", "line": 3}

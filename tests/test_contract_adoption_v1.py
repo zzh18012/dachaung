@@ -54,12 +54,12 @@ def test_chunk_with_spans_serializes():
 
 
 def test_new_source_types_accepted():
-    base = _doc("markdown", {"line": 1})
+    base = _doc("markdown", {"family": "line_address", "line": 1})
     for st, loc in [
-        ("markdown", {"line": 1}),
-        ("html", {"line": 1}),
-        ("text", {"line": 1}),
-        ("ipynb", {"cell_index": 0, "cell_type": "code"}),
+        ("markdown", {"family": "line_address", "line": 1}),
+        ("html", {"family": "line_address", "line": 1}),
+        ("text", {"family": "line_address", "line": 1}),
+        ("ipynb", {"family": "container_line", "cell_index": 0, "cell_type": "code"}),
     ]:
         doc = copy.deepcopy(base)
         doc["source_type"] = st
@@ -94,6 +94,15 @@ def test_new_locators_required_fields():
 
 
 def test_old_pdf_docx_still_pass():
+    # 旧产物形状（无 family）在 0.2.0 读格式下继续可校验
     for st, loc in [("pdf", {"page": 1, "bbox": [0, 0, 1, 1]}),
                     ("docx", {"paragraph_index": 0})]:
-        validate(_doc(st, loc))
+        d = _doc(st, loc)
+        d["schema_version"] = "0.2.0"
+        validate(d)
+    # 当前 writer（0.3.0）：同形状 + family 常量键
+    for st, loc, fam in [
+        ("pdf", {"page": 1, "bbox": [0, 0, 1, 1]}, "page_geometry"),
+        ("docx", {"paragraph_index": 0}, "structural_index"),
+    ]:
+        validate(_doc(st, {"family": fam, **loc}))

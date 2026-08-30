@@ -216,6 +216,7 @@ def test_code_line1_in_locator():
             == "code_cell"][0]
     assert code.source_locator["line"] == 1
     assert code.source_locator == {
+        "family": "container_line",
         "cell_index": 1, "cell_type": "code",
         "line": 1}
 

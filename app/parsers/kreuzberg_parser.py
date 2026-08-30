@@ -109,12 +109,17 @@ def _split_content_to_elements(
 
 
 def _make_locator(source_type: str, paragraph_index: int) -> dict[str, Any]:
-    """Kreuzberg 给不出 bbox/page（实测）。给一个最小合法 locator。"""
+    """Kreuzberg 给不出 bbox/page（实测）。给一个最小合法 locator。
+
+    family 按 docs/locator-kvfs-contract.md §2 标注（pdf→page_geometry、
+    docx→structural_index）；占位/启发式标记键保留——family 只解释字段
+    含义，不构成可回溯承诺（契约 §1 不变量 2 豁免）。
+    """
     if source_type == "pdf":
         # PDF locator schema 要求 page（≥1）。kreuzberg 不给 page 信息时退到 page=1
         # 并用 metadata 标记这是占位。
-        return {"page": 1, "_kreuzberg_placeholder": True}
-    return {"paragraph_index": paragraph_index, "_kreuzberg_heuristic": True}
+        return {"family": "page_geometry", "page": 1, "_kreuzberg_placeholder": True}
+    return {"family": "structural_index", "paragraph_index": paragraph_index, "_kreuzberg_heuristic": True}
 
 
 class KreuzbergParser(Parser):
@@ -175,12 +180,16 @@ class KreuzbergParser(Parser):
             if source_type == "pdf":
                 # kreuzberg 给 page_number=0 表示无效
                 pn = getattr(t, "page_number", 0) or 1
-                tbl_locator = {"page": pn}
+                tbl_locator = {"family": "page_geometry", "page": pn}
                 bb = getattr(t, "bounding_box", None)
                 if bb:
                     tbl_locator["bbox"] = list(bb)
             else:
-                tbl_locator = {"table_index": i, "_kreuzberg_heuristic": True}
+                tbl_locator = {
+                    "family": "structural_index",
+                    "table_index": i,
+                    "_kreuzberg_heuristic": True,
+                }
             elements.append(
                 Element(
                     element_id=f"{document_id}::e{len(elements):04d}",

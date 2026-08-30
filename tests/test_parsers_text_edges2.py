@@ -654,7 +654,8 @@ def test_parse_element_source_locator_only_line_key(tmp_path: Path):
     f.write_text("hello\n\nworld", encoding="utf-8")
     doc = p.parse(f, "a" * 64)
     for e in doc.elements:
-        assert set(e.source_locator.keys()) == {"line"}
+        assert e.source_locator["family"] == "line_address"
+        assert set(e.source_locator.keys()) == {"family", "line"}
 
 
 def test_parse_element_source_locator_line_values(tmp_path: Path):

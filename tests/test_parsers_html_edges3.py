@@ -536,11 +536,11 @@ def test_rows_to_md_returns_str_for_empty_input():
 
 
 def test_make_locator_for_current_no_section_path():
-    """section_path 空 → locator 只有 line。"""
+    """section_path 空 → locator 只有 family + line。"""
     parser = _HTMLDocParser("doc-test")
     parser._cur_start_line = 5
     loc = parser._make_locator_for_current()
-    assert loc == {"line": 5}
+    assert loc == {"family": "line_address", "line": 5}
 
 
 def test_make_locator_for_current_with_section_path():
@@ -548,7 +548,7 @@ def test_make_locator_for_current_with_section_path():
     parser._cur_start_line = 5
     parser._section_path = ["Top", "Sub"]
     loc = parser._make_locator_for_current()
-    assert loc == {"line": 5, "section_path": "Top > Sub"}
+    assert loc == {"family": "line_address", "line": 5, "section_path": "Top > Sub"}
 
 
 def test_make_locator_for_inline_uses_getpos():

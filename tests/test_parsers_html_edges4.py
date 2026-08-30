@@ -808,7 +808,7 @@ def test_make_locator_for_current_no_section_returns_only_line():
     p = _HTMLDocParser("doc1")
     p._cur_start_line = 42
     loc = p._make_locator_for_current()
-    assert loc == {"line": 42}
+    assert loc == {"family": "line_address", "line": 42}
 
 
 def test_make_locator_for_inline_no_section_returns_only_line():
