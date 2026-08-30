@@ -159,8 +159,8 @@ def test_cli_run_end_to_end(project_root: Path):
     assert metrics["pipeline_success"]["value"] is True
     assert metrics["element_count_total"]["value"] >= 2
     assert metrics["heading_boundary_compliance"]["value"] == 1.0  # 1 heading at chunk start
-    # figure_caption 固定 null
-    assert metrics["figure_caption_precision"]["reason"] == "parser_does_not_emit_relations"
+    # figure_caption：批次 6 契约——无标注文件 → null no_annotation
+    assert metrics["figure_caption_precision"]["reason"] == "no_annotation"
     # chunk_boundary 无标注 → null
     assert metrics["chunk_boundary_precision"]["reason"] == "no_annotation"
     # wall_time

@@ -139,7 +139,7 @@ Stage 2 不修改 `app/pipeline.py`，因此 parse/chunk 阶段未插桩。**禁
 
 | 指标 | reason（缺数据时） |
 |---|---|
-| `figure_caption_precision` / `recall` / `f1` | 始终 null + `parser_does_not_emit_relations`（当前 parser 不输出 caption↔figure relation） |
+| `figure_caption_precision` / `recall` / `f1` | 消费 document.relations 的 `has_caption`，对照 annotation `figure_caption_pairs`（figure_marker/caption_text 子串匹配，docs/relation-consumption-contract.md）；降级：`pipeline_failed` / `no_annotation` / `no_annotation_pairs` / `no_predicted_relations`（此时 recall=0.0，真实漏检） |
 | `chunk_boundary_precision` / `recall` / `f1` | null + `no_annotation` / `no_predicted_boundaries` / `no_ground_truth_anchors[_in_stream]` |
 
 **chunk_boundary 匹配规则**：
@@ -186,7 +186,7 @@ Provenance: git_commit=`33c68a1e23b33e867dd872608447d1e2b89ae860`、parser=fallb
 | text_char_multiset_recall | 1.0 | 1.0 | 1.0 |
 | heading_boundary_compliance | 1.0 | 1.0 | 1.0 |
 | silent_drop_count | 0 | 3 | sum=3 |
-| figure_caption_p/r/f1 | null | null | null（parser_does_not_emit_relations） |
+| figure_caption_p/r/f1 | null | null | null（历史基线 reason=parser_does_not_emit_relations；批次 6 起为 no_annotation_pairs，见 docs/relation-consumption-contract.md） |
 | chunk_boundary_p/r/f1 | 0.53 / 1.0 / 0.69 | null | 0.53 / 1.0 / 0.69 (n=1) |
 | wall_time_total | ~0.03s | ~0.16s | — |
 

@@ -42,15 +42,22 @@
   text manifest，同版本不同能力损害复现，故升 1.6（ChatGPT 5.6 Sol
   2026-08-27 确立的政策沿用）。报告结构未变，report_version 保持
   1.3；未注册类型（ipynb）的 auto 文档级合成失败语义不变。
-- v1.7（当前）：评测 CLI 可运行 ipynb manifest（--parser choices 补
+- v1.7：评测 CLI 可运行 ipynb manifest（--parser choices 补
   ipynb；auto 映射补 ipynb→ipynb）。IpynbParser 按 docs/ipynb-contract.md
   定稿注册（adoption 独立契约修正：版本字段整数校验、source verify-then-join、
   语言链 ks.language→language_info.name→空串、outputs/attachments 忽略诊断、
   attachment: 引用跳过）。能力封口：1.6 evaluator 无法运行 ipynb manifest，
   同版本不同能力损害复现，故升 1.7。报告结构未变，report_version 保持 1.3。
+- v1.8（当前）：figure_caption_* 直接消费 document.relations 的
+  has_caption（docs/relation-consumption-contract.md，批次 6）；内部
+  匹配器 match_relation_pairs 参数化为 relation-type 可复用形式（批次 7
+  table_has_caption 复用，签名冻结）；移除过时理由
+  parser_does_not_emit_relations。能力封口：1.7 evaluator 无法消费
+  relation，同版本不同能力损害复现，故升 1.8。报告结构未变
+  （figure_caption_* 仍不进 macro average），report_version 保持 1.3。
 """
 
-EVALUATOR_VERSION = "1.7"
+EVALUATOR_VERSION = "1.8"
 REPORT_VERSION = "1.3"
 ANNOTATION_VERSION = "1.0"
 MANIFEST_VERSION = "1.1"

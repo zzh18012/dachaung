@@ -1,11 +1,10 @@
-"""annotation_metrics.py 的测试：figure_caption（固定 null）+ chunk_boundary P/R/F1。"""
+"""annotation_metrics.py 的测试：figure_caption（消费 has_caption relation，批次 6 契约）+ chunk_boundary P/R/F1。"""
 
 from __future__ import annotations
 
 import pytest
 
 from evaluation.annotation_metrics import (
-    PARSER_DOES_NOT_EMIT_RELATIONS,
     chunk_boundary_prf,
     figure_caption_prf,
 )
@@ -38,21 +37,22 @@ def _chunk(cid: str, text: str, src_ids: list[str]) -> dict:
     }
 
 
-# ---------- figure_caption: 始终 null ----------
+# ---------- figure_caption: 无 relation 数据的降级路径（契约 §3） ----------
+# 深入语义（完美/部分/零预测/桩测试）见 tests/test_relation_consumption_contract.py
 
 
-def test_figure_caption_always_null_with_annotation():
+def test_figure_caption_null_with_annotation_without_pairs():
     out = figure_caption_prf(document={"chunks": []}, annotation={"doc_id": "x"})
     for k in ("figure_caption_precision", "figure_caption_recall", "figure_caption_f1"):
         assert out[k]["value"] is None
-        assert out[k]["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
+        assert out[k]["reason"] == "no_annotation_pairs"
 
 
-def test_figure_caption_always_null_without_annotation():
+def test_figure_caption_null_without_annotation():
     out = figure_caption_prf(document={"chunks": []}, annotation=None)
     for k in ("figure_caption_precision", "figure_caption_recall", "figure_caption_f1"):
         assert out[k]["value"] is None
-        assert out[k]["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
+        assert out[k]["reason"] == "no_annotation"
 
 
 # ---------- chunk_boundary: null 路径 ----------

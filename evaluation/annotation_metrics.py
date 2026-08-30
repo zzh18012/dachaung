@@ -1,8 +1,11 @@
-"""人工标注指标：figure-caption（本期固定 null）+ chunk_boundary P/R/F1。
+"""人工标注指标：figure-caption（消费 has_caption relation）+ chunk_boundary P/R/F1。
 
-约定：
-- figure_caption_*：parser 当前不输出 caption↔figure 的 relation，固定 null + reason。
-  本期不引入"最近图片"启发式（那是新功能，不是评测）。
+约定（docs/relation-consumption-contract.md，2026-08-30 冻结）：
+- figure_caption_*：直接消费 document.relations 中 type=="has_caption" 的
+  relation，对照 annotation.figure_caption_pairs（figure_marker/caption_text）
+  计 P/R/F1；匹配器为 relation-type 参数化纯函数（批次 7 复用）。
+  降级矩阵（pipeline_failed / no_annotation / no_annotation_pairs /
+  no_predicted_relations）见契约 §3。
 - chunk_boundary_*：基于人工标注的 marker（在规范化全文流中可定位的子串）。
   匹配是一对一的：一个预测边界只能命中一个标注 anchor，反之亦然。
   容差（tolerance_chars）必须在报告中明确记录。
@@ -10,27 +13,153 @@
 
 from __future__ import annotations
 
-from collections import Counter
+from pathlib import PurePosixPath
 from typing import Any
 
 from app.chunkers.structural import normalize_text
 
 from evaluation.metrics import _null, _ratio
 
-PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"
+
+def _element_identifying_text(el: dict[str, Any]) -> str:
+    """from 侧元素的可识别文本：content + metadata.alt + resource 文件名。
+
+    顺序固定（契约 §2.3）：docx/pdf image 的 content=None、识别信息在
+    resource 文件名；md/html image 在 metadata.alt。非 str 字段跳过。
+    """
+    parts: list[str] = []
+    if isinstance(el.get("content"), str):
+        parts.append(el["content"])
+    alt = (el.get("metadata") or {}).get("alt")
+    if isinstance(alt, str):
+        parts.append(alt)
+    rp = el.get("resource_path")
+    if isinstance(rp, str) and rp:
+        parts.append(PurePosixPath(rp.replace("\\", "/")).name)
+    return normalize_text(" ".join(parts))
+
+
+def match_relation_pairs(
+    document: dict[str, Any] | None,
+    pairs: list[dict[str, str]] | None,
+    *,
+    relation_type: str,
+    from_marker_key: str,
+    to_marker_key: str,
+) -> tuple[int, int, int] | None:
+    """relation 对匹配（契约 §2，签名冻结——批次 7 只许换参数）。
+
+    返回 (num_predicted, num_ground_truth, num_matched)。
+    document 为 None 或 pairs 为 None/空 → 返回 None（调用方降级）。
+
+    语义：预测对 = type 匹配的 relations（端点缺失不计入）；GT 对 =
+    pairs；from 侧按识别文本子串匹配、to 侧按 content 子串匹配
+    （均 normalize 后）；一对一贪心按 (pred_idx, gt_idx) 字典序。
+    """
+    if document is None or not pairs:
+        return None
+
+    elements_by_id = {e.get("element_id"): e for e in document.get("elements") or []}
+
+    predicted: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    for rel in document.get("relations") or []:
+        if rel.get("type") != relation_type:
+            continue
+        src = elements_by_id.get(rel.get("from_id"))
+        dst = elements_by_id.get(rel.get("to_id"))
+        if src is None or dst is None:
+            continue  # 契约 §2.1：端点缺失不计入预测
+        predicted.append((src, dst))
+
+    gt: list[tuple[str, str]] = []
+    for p in pairs:
+        fm = p.get(from_marker_key)
+        tm = p.get(to_marker_key)
+        if isinstance(fm, str) and isinstance(tm, str):
+            gt.append((fm, tm))
+
+    matched = 0
+    used_pred: set[int] = set()
+    used_gt: set[int] = set()
+    for pi, (src, dst) in enumerate(predicted):
+        if pi in used_pred:
+            continue
+        src_txt = _element_identifying_text(src)
+        dst_txt = normalize_text(dst.get("content") or "")
+        for gi, (fm, tm) in enumerate(gt):
+            if gi in used_gt:
+                continue
+            if normalize_text(fm) in src_txt and normalize_text(tm) in dst_txt:
+                used_pred.add(pi)
+                used_gt.add(gi)
+                matched += 1
+                break
+
+    return len(predicted), len(gt), matched
+
+
+def _pair_prf(
+    counts: tuple[int, int, int] | None,
+    *,
+    prefix: str,
+) -> dict[str, dict[str, Any]]:
+    """(num_pred, num_gt, matched) → P/R/F1 三键（契约 §3 降级矩阵）。"""
+    out: dict[str, dict[str, Any]] = {}
+    p_key = f"{prefix}_precision"
+    r_key = f"{prefix}_recall"
+    f_key = f"{prefix}_f1"
+    if counts is None:
+        for k in (p_key, r_key, f_key):
+            out[k] = _null("pipeline_failed")
+        return out
+    num_pred, num_gt, matched = counts
+    if num_pred == 0:
+        out[p_key] = _null("no_predicted_relations")
+        out[r_key] = _ratio(0.0) if num_gt > 0 else _null("no_ground_truth_pairs")
+    else:
+        out[p_key] = _ratio(matched / num_pred)
+        out[r_key] = (
+            _ratio(matched / num_gt) if num_gt > 0 else _null("no_ground_truth_pairs")
+        )
+    p_val = out[p_key]["value"]
+    r_val = out[r_key]["value"]
+    if p_val is None or r_val is None:
+        out[f_key] = _null("precision_or_recall_not_evaluated")
+    else:
+        denom = p_val + r_val
+        out[f_key] = _ratio(2 * p_val * r_val / denom) if denom > 0 else _ratio(0.0)
+    return out
 
 
 def figure_caption_prf(
     document: dict[str, Any] | None,
     annotation: dict[str, Any] | None,
 ) -> dict[str, dict[str, Any]]:
-    """图表关联 P/R/F1：parser 当前不输出 relation，固定 null。"""
-    reason = PARSER_DOES_NOT_EMIT_RELATIONS
-    return {
-        "figure_caption_precision": _null(reason),
-        "figure_caption_recall": _null(reason),
-        "figure_caption_f1": _null(reason),
-    }
+    """图表关联 P/R/F1：消费 has_caption relation（契约 §2/§3）。"""
+    if document is None:
+        counts = None
+    elif not annotation:
+        return {
+            "figure_caption_precision": _null("no_annotation"),
+            "figure_caption_recall": _null("no_annotation"),
+            "figure_caption_f1": _null("no_annotation"),
+        }
+    else:
+        pairs = annotation.get("figure_caption_pairs") or []
+        if not pairs:
+            return {
+                "figure_caption_precision": _null("no_annotation_pairs"),
+                "figure_caption_recall": _null("no_annotation_pairs"),
+                "figure_caption_f1": _null("no_annotation_pairs"),
+            }
+        counts = match_relation_pairs(
+            document,
+            pairs,
+            relation_type="has_caption",
+            from_marker_key="figure_marker",
+            to_marker_key="caption_text",
+        )
+    return _pair_prf(counts, prefix="figure_caption")
 
 
 def chunk_boundary_prf(
@@ -182,7 +311,7 @@ def chunk_boundary_prf(
 
 
 __all__ = [
-    "PARSER_DOES_NOT_EMIT_RELATIONS",
+    "match_relation_pairs",
     "figure_caption_prf",
     "chunk_boundary_prf",
 ]
