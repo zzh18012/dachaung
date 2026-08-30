@@ -1560,3 +1560,30 @@ sha256；EVALUATOR_VERSION 1.6→1.8；6 份契约 + 1 份版本政策；测试
    兼容测试 10/10 ✅。全量回归 **5123 passed**。
 
 **待裁决**：批次 8 封口（审计交付 + backlog 转出 + 双向兼容测试验收）。
+
+## 三十五、批次 8 封口裁决记录（2026-08-30，GPT 5.6 Sol，会话 cf170a6f）
+
+**裁决结果**：
+- 批次 8 执行验收：**全部通过**（①零 TODO ✓ ②覆盖矩阵+backlog
+  issues #1–#5 ✓ ③holdout 零维护+期望生成器"建议不做"采纳 ✓
+  ④schema 双向兼容 10/10 ✓）。
+- **批次 8 正式封口，归档编号 `Stage-6-Batch-8-Closed`。Stage 6
+  完整封存（批次 1–8 全部归档）。**
+
+**Stage 7 启动：数据质量与评测深化**，两轨并行：
+- 轨道 A（标注解锁，人机协作）：批次 9（P1）DC-MVP-001
+  figure_caption_pairs；批次 10（P2）PDF 侧 annotation。
+- 轨道 B（评测能力扩展，纯开发）：批次 11（P3）heading_order 消费
+  指标族；批次 12（P4）table_caption_*（annotation v1.1）；批次 13
+  （P5）真实语料入 manifest。
+
+**批次 9 指定（P1 标注解锁，开工许可已授予）**：补 DC-MVP-001 的
+figure_caption_pairs（1 对）。执行：人工识别图片-题注对 → 提取
+element 对应信息 → 更新 annotation → 重跑 evaluation 确认
+figure_caption_* 解锁（null+no_annotation_pairs → 数值；其他指标族
+不变，对比批次 8/7 封存基线）→ 全量回归 → 封口报告。验收：annotation
+≥1 对；P/R/F1 ∈ [0,1] 数值且与标注一致；PDF 侧仍 null。
+- 【执行前澄清】裁决示例格式 {"figure_id","caption_id"} 与冻结的
+  annotation.schema.json v1.0（figure_marker/caption_text，
+  additionalProperties=false，批次 6 契约）不符——按冻结 schema 执行，
+  偏差在批次 9 报告中声明。
