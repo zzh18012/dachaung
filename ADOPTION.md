@@ -1009,3 +1009,15 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
 - pdf/docx 不进 holdout：pdfplumber/python-docx 的元素切分与 bbox 有无
   属解析器行为而非契约可推导内容，手工推导会变成预跑；其 family
   正确性与既有键不变改在 dev 验收对封存基线断言。
+
+### holdout 冻结（实现前，2026-08-30）
+
+- 目录 samples/private/holdout-locator-family/（gitignored），4 fixture：
+  H-LOC-001.md 3b86adfc…36dd、H-LOC-002.html 56762232…eda2、
+  H-LOC-003.txt ac884154…e654、H-LOC-004.ipynb 44c47081…833e。
+- 期望 expectations-elements.json sha256
+  684b028f29bf7a22d8ff4edf8449421109fdecd5705cc4299c5973bd539ac042：
+  每 fixture 全部 element 的 element_id/type/source_locator（含 family）
+  + schema_version 0.3.0；元素结构与行号按契约 §3 与各 parser 文档化
+  规则手工推导，document_id 按 make_document_id（sha256 前 16 位）由
+  fixture 字节派生；未运行任何 pipeline 代码。
