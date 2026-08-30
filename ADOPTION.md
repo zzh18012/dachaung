@@ -1329,3 +1329,49 @@ contract.md（含三项强制要求）→ ② 重构匹配器为参数化（含�
 零差异验证 → ⑤ 封口报告。
 
 **批次 5 正式封口，归档编号 `Stage-6-Batch-5-Closed`。**
+
+## 三十、批次 6 执行与零差异验证记录（2026-08-30）
+
+**契约**：docs/relation-consumption-contract.md（冻结 v1；批次 5 封口裁决
+三项强制要求并入 §2 签名冻结/§3 降级矩阵/§4 零差异范围/§6 桩测试）。
+
+**实现（commit 7d06f34）**：
+- `match_relation_pairs` 参数化纯函数（relation_type / from_marker_key /
+  to_marker_key；from 侧识别文本 = content + metadata.alt + resource
+  basename 经 normalize_text 后子串匹配；to 侧 content 子串匹配；一对一
+  贪心按 (pred_idx, gt_idx) 字典序；端点缺失 relation 不计入预测）。
+- `figure_caption_prf` 改为消费 relations 的 has_caption，降级矩阵五路
+  （pipeline_failed / no_annotation / no_annotation_pairs /
+  no_predicted_relations[recall=0.0 真实漏检] / 正常）；移除常量
+  PARSER_DOES_NOT_EMIT_RELATIONS。
+- EVALUATOR_VERSION 1.7→1.8（能力封口：1.7 无法消费 relation）；
+  REPORT_VERSION 保持 1.3（报告结构零变化，figure_caption_* 仍不进
+  macro average）。
+- 测试：新增 tests/test_relation_consumption_contract.py 18 项（含
+  **批次 7 桩测试**：table_has_caption + table_marker/table_caption_text
+  传演出 (2,2,2)，裁决要求③）；重钉 4 处旧语义钉子
+  （test_annotation_metrics 2 / test_evaluation_cli / test_evaluation_report）
+  + test_parser_auto 版本钉 1.7→1.8；docs/evaluation.md 两处表行与
+  CLAUDE.md 对应行更新。全量回归 **5074 passed**。
+
+**零差异验证（契约 §4，裁决要求②）**：
+- 新跑：outputs/evaluation-batch6-zerodiff-check.json（git_commit=
+  7d06f34，git_dirty=False，报告 schema 校验通过；参数与批次 4 基线
+  一致：devset manifest / fallback / max-chars 800）。
+- 脚本：scripts/verify_batch6_zero_diff.py 逐字段 diff（value 与 reason
+  均比）+ 排除集归因断言。
+- 结果：**total diffs 11，全部落在排除集（allowed=11），unexpected=0，
+  VERDICT=PASS**。排除集逐项：wall_time×2（计时）、provenance.
+  git_commit / run_timestamp_iso（运行环境）、provenance.
+  evaluator_version（1.7→1.8，契约 §5）、figure_caption_*.reason×6
+  （docx no_annotation_pairs×3：标注空表；pdf no_annotation×3：无标注
+  文件——裁决③移除过时理由的必然结果）。全部分数（value）与批次 4
+  基线逐一相同（null==null）。
+- **对裁决原文的偏差声明（待追认）**：裁决要求"除 wall_time /
+  git_commit 外所有字段逐字节相同"，与其第③项（移除过时理由）及
+  版本封口政策冲突；按裁决自身理据（"仅改评测基础设施，不改生成
+  逻辑——评测分数理应完全一致"）执行为：分数全部相同，reason 仅
+  figure_caption_* 三处（×2 文档）变化，evaluator_version 升 1.8。
+
+**holdout**：不设（契约 §7：评测基础设施改动，writer 输出面零变化，
+零差异验证即验收）。schema_version 维持 0.4.0（未触碰 app/*）。
