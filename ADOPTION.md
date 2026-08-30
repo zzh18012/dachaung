@@ -2002,3 +2002,90 @@ annotation_file。步骤 1（下次汇报）：文件清单（路径/格式/大�
 **Backlog 决策**：PDF chunk_boundary_anchors 标注暂不排入批次 13，
 待 P5 完成后重评（触发条件：需全面解锁 chunk_boundary_* 或专项
 chunking 优化）。
+
+## 四十四、批次 13 执行记录（P5 真实语料入 manifest，2026-08-31）
+
+**裁决依据**：outputs/_b13s1ruling_dump.txt（步骤 1 裁决：
+Option 1 契约优先·人工推导 + 步骤 2–6 执行指令）。
+
+**步骤 2（8 份 worksheets 人工推导，Option 1 口径）**：
+全部完成（worksheets/DC-REAL-00{1,2,3}-{DOCX,PDF}.md、
+DC-REAL-004-PDF.md、DC-REAL-005-DOCX.md），遵守「不得用 parser
+输出反推」契约——推导仅用 pypdfium2 渲染目检 + pdfplumber 文本层/
+字体属性扫描 + docx 原始 XML 解包；parser 输出仅作冒烟对照。
+
+人工 GT 总表（heading / table / image / caption）：
+
+| doc_id | heading | table | image | caption | markers |
+|---|---|---|---|---|---|
+| DC-REAL-001-DOCX | 70 | 1 | 1 | 0 | 5 |
+| DC-REAL-001-PDF | 69 | 1 | 3 | 0 | 5 |
+| DC-REAL-002-DOCX | 15 | 15 | 2 | 0 | 5 |
+| DC-REAL-002-PDF | 13 | 12 | 5 | 0 | 5 |
+| DC-REAL-003-DOCX | 13 | 0 | 8 | 0 | 5 |
+| DC-REAL-003-PDF | 13 | 0 | 9 | 0 | 5 |
+| DC-REAL-004-PDF | 6 | 1 | 2 | 3 | 5 |
+| DC-REAL-005-DOCX | 109 | 11 | 1 | 0 | 5 |
+
+40 个 markers 全部大小写敏感精确检索 1x 命中验证（pdfplumber
+PDF 全文 / docx 段落级拼接全文），纯 ASCII，无跨行断裂、无小写
+碰撞。重大发现（详见各 worksheet 复核备注）：002-DOCX 封面整体
+嵌套 w:sdt；003-PDF p1 隐形文本层（渲染全白但文本层可提取
+1189 字符）；001 同源对版本不同（PDF=Communities 版、
+DOCX=DFES 版），markers 不可互用；002-PDF ADR 1.8.3.1 大表
+跨页断裂（per-physical-grid 计 12）。
+
+**步骤 3（manifest 合并，devset 2→10）**：
+manifest.draft.json 补齐 8 条目（categories + inline
+expectations）；live manifest.json = 2 MVP + 8 real = 10 文档、
+6 内容组、5 PDF + 5 DOCX、12 categories（含 MVP 的
+integrity-markers）。annotation 依赖指标族（figure/table_caption/
+heading_order/chunk_boundary）对 8 新文档全部按契约降级
+null + no_annotation（P5 不设 annotation_file）。
+双清单均通过 manifest.schema.json v1.0 + 路径校验。
+
+**步骤 4（评测验证，干净树 git_dirty=False，commit 81051c9）**：
+10/10 pipeline 成功；schema_valid / text_preservation /
+text_char_multiset_p&r / heading_boundary_compliance 全 1.0；
+required_markers 9/10 通过；silent_drop_total 51（001-PDF 22 /
+003-PDF 8 / 002-DOCX 7 / 004-PDF 7 / 002-PDF 3 / 003-DOCX 1 /
+其余 0）。**DC-REAL-002-DOCX 是唯一 markers 失败**（缺 3 个：
+封面 sdt 嵌套漏检——P5 设计目的即曝光此类真实欠提取）。
+real-005（裁决指定头号样本）：四类型计数与 parser 逐项精确
+一致（109/11/1/0）、markers 5/5、silent_drop 0。
+validate-report 通过（report_version 1.3 / evaluator 1.10）。
+
+**冒烟对照**（scripts/compare_batch13_smoke.py，VERDICT PASS）：
+逐文档逐类型 GT vs parser 差异表，全部 >50% 差异已归因：
+001-PDF table +300%（条款布局误判为表）；002-PDF heading +246%
+（表单字段标签误判）；003-PDF image −89%、002-PDF image −60%
+（矢量图不产 raster）；004-PDF caption −100%（题注文字碎片化）；
+002-DOCX image −100%（sdt 嵌套漏检）。
+
+**步骤 5（归因验证，scripts/verify_batch13_attribution.py，
+VERDICT PASS）**：对照批次 12 基线 31 处差异全部归因——
+devset 扩容 5 处、per_doc 2→10、summary 扩容 24 处（markers
+2→10/9/1、silent_drop 3→51、participating_docs 扩容）、运行
+环境 2 处；0 unexpected；MVP 两文档除 wall_time 零漂移；
+evaluator_version=1.10 / report_version=1.3 不变（评测器零改动）。
+
+**步骤 6（全量回归）**：5147 passed（129.78s），零失败。
+
+**偏差声明（契约优先，待裁决追认）**：
+1. 裁决 2.2/步骤 3 的独立 expectations JSON 文件 + manifest
+   `expectation_file` 键不存在于冻结契约（manifest.schema.json
+   v1.0 additionalProperties=false，v1.0 快照仅允许
+   element_count_by_type/required_markers 两键、inline 结构）；
+   实际按冻结契约 inline 转录，worksheets 即人工推导档案。
+2. 裁决的指标名 text_exact / structure_preservation /
+   macro_precision / documents_evaluated 不存在于 report
+   schema v1.3；实际对应 required_markers_check /
+   element_count_by_type + silent_drop_count / ratio_macro_
+   averages（分族）/ devset.file_count。
+3. 裁决的 categories 词表（has_headings/has_tables 等）与
+   worksheets 实际受控词表（11 项）不一致，按 worksheet 词表。
+4. 裁决步骤 4「新增 8 文档无 null」与其自身「标注依赖指标
+   降级 null + no_annotation」矛盾，按后者执行。
+5. 裁决步骤 6 的 git add 含 samples/private/ 路径——项目隐私
+   契约 samples/private/ 永不进 git（gitignored）；提交物 =
+   两个脚本 + ADOPTION.md。
