@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent
 HOLDOUT_DIR = ROOT / "samples" / "synthetic" / "holdout-table"
 OUT = ROOT / "outputs" / "holdout-table-v1-firstrun.json"
 
-_TABLE_META_KEYS = ("row_count", "col_count", "source")
+_TABLE_META_KEYS = ("row_count", "col_count", "source", "table_index")
 
 
 def _die(msg: str) -> None:

@@ -23,10 +23,10 @@
       "fixture_sha256": "914ca721bf0917d206b28962eada705d83a59923109d0fc4b86e4bf50af9aa46",
       "expected_schema_version": "0.4.0",
       "expected_elements": [
-        {"element_id": "doc-914ca721bf0917d20::e0000", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 0, "section": 0}, "content": "Intro."},
-        {"element_id": "doc-914ca721bf0917d20::e0001", "type": "table", "source_locator": {"family": "structural_index", "table_index": 0, "section": 0}, "content": "| p1<br>p2 | h2 |\n| --- | --- |\n| a\\|b |  |", "metadata": {"row_count": 2, "col_count": 2, "source": "python-docx"}},
-        {"element_id": "doc-914ca721bf0917d20::e0002", "type": "table", "source_locator": {"family": "structural_index", "table_index": 1, "section": 0}, "content": "| m | m |\n| --- | --- |\n| x | y |", "metadata": {"row_count": 2, "col_count": 2, "source": "python-docx"}},
-        {"element_id": "doc-914ca721bf0917d20::e0003", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 1, "section": 0}, "content": "End."}
+        {"element_id": "doc-914ca721bf0917d2::e0000", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 0, "section": 0}, "content": "Intro."},
+        {"element_id": "doc-914ca721bf0917d2::e0001", "type": "table", "source_locator": {"family": "structural_index", "table_index": 0, "section": 0}, "content": "| p1<br>p2 | h2 |\n| --- | --- |\n| a\\|b |  |", "metadata": {"row_count": 2, "col_count": 2, "source": "python-docx"}},
+        {"element_id": "doc-914ca721bf0917d2::e0002", "type": "table", "source_locator": {"family": "structural_index", "table_index": 1, "section": 0}, "content": "| m | m |\n| --- | --- |\n| x | y |", "metadata": {"row_count": 2, "col_count": 2, "source": "python-docx"}},
+        {"element_id": "doc-914ca721bf0917d2::e0003", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 1, "section": 0}, "content": "End."}
       ]
     },
     "holdout-table.ipynb": {
