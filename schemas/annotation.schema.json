@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kvfs.local/schemas/annotation.schema.json",
-  "title": "Human Annotation v1.0",
-  "description": "人工标注文件。annotator 字段在提交版中必须脱敏（如 'initials' 或 'reviewer_a'），不写真实身份。",
+  "title": "Human Annotation v1.0/v1.1（精确快照）",
+  "description": "人工标注文件。annotator 字段在提交版中必须脱敏（如 'initials' 或 'reviewer_a'），不写真实身份。annotation_version 为精确快照：1.0 不允许 table_caption_pairs；1.1 新增该可选键。",
   "type": "object",
   "required": ["annotation_version", "doc_id"],
   "additionalProperties": false,
   "properties": {
-    "annotation_version": { "type": "string", "const": "1.0" },
+    "annotation_version": { "type": "string", "enum": ["1.0", "1.1"] },
     "doc_id": { "type": "string", "minLength": 1 },
     "annotator": { "type": "string" },
     "date": { "type": "string", "minLength": 1 },
@@ -19,6 +19,18 @@
         "additionalProperties": false,
         "properties": {
           "figure_marker": { "type": "string", "minLength": 1 },
+          "caption_text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "table_caption_pairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["table_marker", "caption_text"],
+        "additionalProperties": false,
+        "properties": {
+          "table_marker": { "type": "string", "minLength": 1 },
           "caption_text": { "type": "string", "minLength": 1 }
         }
       }
@@ -40,6 +52,18 @@
       "items": { "$ref": "#/$defs/boundary_anchor" }
     }
   },
+  "allOf": [
+    {
+      "$comment": "v1.0 精确快照：table_caption_pairs 仅 v1.1+ 允许。",
+      "if": {
+        "properties": { "annotation_version": { "const": "1.0" } },
+        "required": ["annotation_version"]
+      },
+      "then": {
+        "properties": { "table_caption_pairs": false }
+      }
+    }
+  ],
   "$defs": {
     "boundary_anchor": {
       "type": "object",
