@@ -962,3 +962,11 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   0.2.0，封存 holdout 首跑期望（H-SPN-001..004 均 0.2.0、H-SPN-005 无
   文档）不受影响，无需重跑。
 - 全套回归：**4972 passed，0 回归**。
+
+### push 执行（2026-08-30）
+
+- 用户明示长期授权："只要 GPT 同意 push 就直接 push"。裁决 ④ 已同意，
+  前置复核（origin/main=8a5a9e6、领先 7 提交、祖先检查 0、禁 force）
+  后执行 `git push origin main:main`：8a5a9e6..0fd2bcc，ff 无 force，
+  push 后本地与远端对齐（领先 0）。远端检查点就此建立在批次 2 + 版本
+  纠正的完整状态上。
