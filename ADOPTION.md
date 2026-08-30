@@ -1210,3 +1210,23 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
    关联（复用批次 4 docx 邻接规则骨架并接入评测框架）。
 4. 流程不变：契约先行、全新 holdout、干净 SHA 一次性首跑、ff-only
    合入、全量回归。
+
+## 二十六、批次 5 契约起草（2026-08-30）
+
+- 批次 4 封口裁决指定批次 5 = 表格→Markdown 线性化，边界：仅改
+  table element canonical content、先契约冻结边界行为、不做表题注与
+  评测器、holdout 固定字节 + 实现前手工推导。
+- 盘点：content 生成有三处重复实现（fallback/markdown/html），语义
+  相同但存在真实缺口——单元格含 `|` 不转义、含 `\n` 不处理（docx
+  cell.text 多段落以 \n 连接、pdfplumber 单元格常含 \n，直接内嵌破坏
+  行结构）、docx 0 行表走 Element ValueError 崩溃路径（pdf/html 现状
+  跳过）。
+- 契约草案 docs/table-linearization-contract.md（本提交）：canonical
+  管线 None→"" / CR 规整 / `\n`→`<br>` / `|`→`\|` / 统一 strip /
+  无 Unicode 归一；首行=表头与宽度补齐冻结现状；0 行表不产出 element；
+  合并单元格保持库给定重复语义；共享纯函数 app/parsers/table_linearize.py
+  收敛三副本；md `\|` 反转义保 roundtrip 幂等；schema_version 维持
+  0.4.0。
+- 送裁七问：①strip 统一 vs 维持现状；②换行 `<br>` vs 折叠空格；
+  ③md `\|` 反转义；④0 行表静默跳过；⑤共享纯函数统一三副本；
+  ⑥版本不升；⑦holdout 设计（合成 docx+md+html、pdf 沿先例不进）。
