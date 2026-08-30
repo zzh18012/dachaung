@@ -12,6 +12,7 @@ from typing import Any, Literal, Optional
 SCHEMA_VERSION = "0.1.0"
 SCHEMA_VERSION_EXTENDED = "0.2.0"
 SCHEMA_VERSION_LOCATOR = "0.3.0"
+SCHEMA_VERSION_RELATION = "0.4.0"
 
 ElementType = Literal[
     "heading", "paragraph", "list_item", "table", "image", "caption", "header", "footer"
@@ -142,14 +143,15 @@ class Document:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def effective_schema_version(self) -> str:
-        """输出版本：locator-family writer 对全部来源一律 0.3.0。
+        """输出版本：caption-relation writer 对全部来源一律 0.4.0。
 
-        版本描述 schema/writer 能力（2026-08-28 裁决确立）：批次 3 起
-        每个 source_locator 携带 family 常量键（docs/locator-kvfs-contract.md
-        §4），故新输出为 0.3.0；0.2.0 / 0.1.0 仅为 legacy 读入格式
-        （旧产物继续可校验），新 writer 不再产出。
+        版本描述 schema/writer 能力（2026-08-28 裁决确立）：批次 4 起
+        fallback pdf/docx 产出 image --has_caption--> caption relation
+        （docs/caption-relation-contract.md §4），故新输出为 0.4.0；
+        0.3.0 及以下仅为 legacy 读入格式（旧产物继续可校验），新
+        writer 不再产出。
         """
-        return SCHEMA_VERSION_LOCATOR
+        return SCHEMA_VERSION_RELATION
 
     def to_dict(self) -> dict[str, Any]:
         return {

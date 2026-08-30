@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from app.models import Document, Element, WarningRecord
+from app.models import Document, Element, Relation, WarningRecord
 from app.parsers.base import Parser, ParserError, detect_source_type, make_document_id
 
 # 这些库都是计划内依赖，且只在这个文件里 import（业务代码看不见）
@@ -54,6 +54,100 @@ _CAPTION_RE = re.compile(
 
 def _is_caption(text: str) -> bool:
     return bool(_CAPTION_RE.match(text or ""))
+
+
+# 批次 4 契约（docs/caption-relation-contract.md §1）：图题注前缀集，
+# 数字限 ASCII；与元素分类用的 _CAPTION_RE（含全角）分工。
+_FIGURE_CAPTION_RE = re.compile(
+    r"^(?:Figure|Fig\.?|图)\s*[0-9]+[\.、\s]",
+    re.IGNORECASE,
+)
+
+CAPTION_MAX_GAP_PT = 50.0
+
+
+def _is_figure_caption(el: Element) -> bool:
+    return el.type == "caption" and bool(
+        _FIGURE_CAPTION_RE.match(el.content or "")
+    )
+
+
+def _sort_relations(rels: list[Relation]) -> list[Relation]:
+    """契约 §2：relations 按 (type, from_id, to_id) 字典序稳定排序。"""
+    return sorted(rels, key=lambda r: (r.type, r.from_id, r.to_id))
+
+
+def match_caption_relations_docx(elements: list[Element]) -> list[Relation]:
+    """契约 §3 docx 规则（纯函数）：image@P 仅当图题注@P+1 生成
+    `image --has_caption--> caption`。"""
+    captions = {
+        e.source_locator.get("paragraph_index"): e
+        for e in elements
+        if _is_figure_caption(e)
+    }
+    rels: list[Relation] = []
+    for e in elements:
+        if e.type != "image":
+            continue
+        p = e.source_locator.get("paragraph_index")
+        cap = captions.get(p + 1) if p is not None else None
+        if cap is None:
+            continue
+        rels.append(
+            Relation(
+                type="has_caption",
+                from_id=e.element_id,
+                to_id=cap.element_id,
+                metadata={"rule": "docx_adjacent_paragraph"},
+            )
+        )
+    return _sort_relations(rels)
+
+
+def match_caption_relations_pdf(elements: list[Element]) -> list[Relation]:
+    """契约 §3 pdf 规则（纯函数）：同页 + 图题注在图下方
+    0 < gap ≤ CAPTION_MAX_GAP_PT + x 区间相交 > 0；候选按
+    (gap, image_id, caption_id) 升序贪心唯一配对。bbox 口径
+    pdfplumber [x0, top, x1, bottom]。"""
+    images = [e for e in elements if e.type == "image"]
+    captions = [e for e in elements if _is_figure_caption(e)]
+    candidates = []
+    for img in images:
+        iloc = img.source_locator
+        ib = iloc.get("bbox")
+        if not ib:
+            continue
+        for cap in captions:
+            cloc = cap.source_locator
+            cb = cloc.get("bbox")
+            if not cb:
+                continue
+            if iloc.get("page") != cloc.get("page"):
+                continue
+            gap = cb[1] - ib[3]
+            if not (0 < gap <= CAPTION_MAX_GAP_PT):
+                continue
+            if min(cb[2], ib[2]) - max(cb[0], ib[0]) <= 0:
+                continue
+            candidates.append((gap, img.element_id, cap.element_id))
+    candidates.sort()
+    used_img: set[str] = set()
+    used_cap: set[str] = set()
+    rels: list[Relation] = []
+    for gap, img_id, cap_id in candidates:
+        if img_id in used_img or cap_id in used_cap:
+            continue
+        used_img.add(img_id)
+        used_cap.add(cap_id)
+        rels.append(
+            Relation(
+                type="has_caption",
+                from_id=img_id,
+                to_id=cap_id,
+                metadata={"rule": "pdf_geometry_below", "gap_pt": gap},
+            )
+        )
+    return _sort_relations(rels)
 
 
 def _rows_to_markdown(rows: list[list[Any]]) -> str:
@@ -613,8 +707,10 @@ class FallbackParser(Parser):
         document_id = make_document_id(source_hash)
         if source_type == "pdf":
             elements, warnings = _parse_pdf(p, source_hash, document_id, self._image_output_dir)
+            relations = match_caption_relations_pdf(elements)
         else:
             elements, warnings = _parse_docx(p, source_hash, document_id, self._image_output_dir)
+            relations = match_caption_relations_docx(elements)
         return Document(
             document_id=document_id,
             source_path=str(p),
@@ -624,7 +720,7 @@ class FallbackParser(Parser):
             parser_version=self.version,
             elements=elements,
             chunks=[],
-            relations=[],
+            relations=relations,
             warnings=warnings,
             errors=[],
             metadata={"fallback": True, "image_output_dir": str(self._image_output_dir) if self._image_output_dir else None},
