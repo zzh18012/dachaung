@@ -15,25 +15,38 @@
 
 ## §1 两层模型
 
-**统一层（resolver envelope）**：每个 `source_locator` 必须在给定原始
-source artifact（`source_path` + `source_hash` 定位的字节）时，按本契约
-定义的确定性 resolver 规则回溯到产生该 Element 的来源区域。
+**统一层（resolver envelope）**：每个 `source_locator` 必须以原始
+source artifact（由 `source_path` + `source_hash` 唯一指认的文件）为
+回溯输入**起点**，按本契约定义的确定性 resolver 规则回溯到产生该
+Element 的来源区域。
 
 **分族层（family semantics）**：不同 locator family 使用各自坐标系；
 不要求键同构，不要求可转换为统一 byte/char offset，不相互比较。
 
+统一层统一的是 **artifact 身份与回溯义务，不统一输入表示**：各族
+resolver 各自定义输入表示（line_address = decode 后文本；
+structural_index = 解包后 XML；page_geometry = 解析后页对象；
+container_line = 解析后 JSON cell）；任何族都不得被要求以"原始字节"
+作为共同输入语义（2026-08-30 裁决钉死的边界①）。
+
 三不变量（全部 family 适用）：
 
 1. **Determinism**：同一 source 字节 + 同一解析器版本 → 相同 locator。
-2. **Resolvable**：locator + 原始文件足以执行契约回溯过程；不得依赖
-   未记录的运行时状态。
+2. **Resolvable**：locator + 原始 artifact 足以执行契约回溯过程；不得
+   依赖未记录的运行时状态。**豁免**：携带 `_kreuzberg_placeholder` /
+   `_kreuzberg_heuristic` 等启发式标记键的 locator 不承诺可回溯
+   （裁决边界②：补 `family` 只解释字段含义，不得把 placeholder 包装成
+   可解析定位器）。
 3. **No fabricated precision**：源格式不能可靠提供的粒度不得伪造。
 
 ## §2 family discriminator
 
 - 字段：`source_locator.family`（跟随 locator 本身，不挂在 source_type
   上；今天的一一对应是偶然事实，不是协议）。
-- 语义：**只声明如何解释 locator**，不声明达到任何统一精度。
+- 语义：**只声明如何解释 locator**，不声明达到任何统一精度。对携带
+  启发式标记键（`_kreuzberg_placeholder` / `_kreuzberg_heuristic`）的
+  locator，family 仅解释字段含义，不构成可回溯承诺（见 §1 不变量 2
+  豁免）。
 - 本批冻结四族（描述坐标模型，非文件格式）：
 
 | family | source_type（现状） | 坐标模型 |
