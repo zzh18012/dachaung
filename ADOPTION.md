@@ -1146,3 +1146,48 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
 
 结论：契约正式批准（docs/caption-relation-contract.md 随本提交冻结），
 版本升 0.4.0，进入实现 → holdout 冻结 → 一次性首跑 → 全量验收。
+
+## 二十四、批次 4 执行与验收记录（2026-08-30）
+
+- 实现 commit f83c0f2（分支 integration/stage6-batch4-caption-relation）：
+  - fallback_parser：`_FIGURE_CAPTION_RE`（ASCII 数字口径）+
+    `match_caption_relations_docx`（紧邻下一段）/ `match_caption_relations_pdf`
+    （同页 + 0<gap≤CAPTION_MAX_GAP_PT=50 + x 严格相交 + (gap,image_id,
+    caption_id) 升序贪心唯一配对）；relations 按 (type,from,to) 排序；
+    pdf metadata 含原始 gap_pt（浮点差不取整）。
+  - models：SCHEMA_VERSION_RELATION="0.4.0"，writer 全来源一律 0.4.0。
+  - schema：enum 加 0.4.0；0.1.0–0.3.0 not.contains has_caption；
+    四个 family 常量分支覆盖 0.4.0。
+  - 契约测试 tests/test_caption_relation_contract.py：docx/pdf 判定
+    全分支 + 版本四向 + md/html/txt/ipynb 零 has_caption（真 fixture）+
+    devset 真样本（docx e0018→e0019 rule=docx_adjacent_paragraph；pdf
+    e0011→e0009 rule=pdf_geometry_below gap_pt≈11.525）；版本断言迁移
+    0.3.0→0.4.0，unknown-version 探针改 0.5.0。
+  - 全量回归 **5036 passed**（0 fail / 0 skip 之外无异常）。
+- holdout（裁决⑤ 纪律执行）：
+  - 合成 docx 夹具 samples/synthetic/holdout-caption/holdout-caption.docx
+    **生成一次后字节固定**：sha256
+    `57c4b3b2ddff4be24a1f2df13a33c821f5272914f1ad3b8ba537d16a823d106d`
+    （内嵌 4 张 8×8 PNG 资源随 docx 字节一并固定）；生成脚本带防重入
+    守卫仅存溯源，运行时零调用。
+  - 期望 expectations.json 在该夹具任何 parser 运行之前按 authored body
+    大纲 + 契约 §3 手工推导冻结：16 elements、caption content 全集、
+    恰好 2 条 relation（e0003→e0004、e0007→e0008；Table 前缀段与无题注
+    图各证一条零关联）。
+  - 一次性首跑 commit 5750aef 干净树执行：**all_pass=True**
+    （schema_version=0.4.0 / element_count / elements_exact /
+    caption_contents_exact / relations_exact 五项全过）；报告封存
+    outputs/holdout-caption-v1-firstrun.json（gitignored，sha256
+    `34f3f5ca57fc7d7b20ac718dd0c053a642c7a8248a5e96ce223e98027459cc19`），
+    此后永不重跑。
+- dev 验收：evaluation 重跑 outputs/evaluation-captionrelation-dev-
+  acceptance.json（git_commit=5750aef，报告 schema 校验通过）；对照
+  封存基线 outputs/evaluation-locatorfamily-dev-acceptance.json（批次 3，
+  溯源 63b05ce）逐字段 diff：**除 wall_time_seconds.total 与 run 时间戳
+  外全部 SAME**（elements/chunks/expectation 检查/聚合指标零变化），
+  满足"relation 产出不扰动既有解析/分块口径"不变量。pdf 真样本断言
+  （e0011→e0009）由契约测试承载（上）。
+- 已知边界（送下批裁决参考，本批不动评测器）：annotation_metrics 的
+  figure_caption_* 仍 null + reason=parser_does_not_emit_relations——
+  该理由字符串自本批起事实过时（fallback 已产出 has_caption），
+  下批可改为直接消费 has_caption relation 计算 P/R/F1。
