@@ -1521,3 +1521,42 @@ sha256；EVALUATOR_VERSION 1.6→1.8；6 份契约 + 1 份版本政策；测试
 - 验收：无遗漏 TODO；评测覆盖矩阵可视化；schema 双向兼容测试通过。
 
 **Stage 6 正式封存。继续搬运。**
+
+## 三十四、批次 8 执行与验收记录（2026-08-30）
+
+**任务**（批次 7 封口裁决指定，Stage 6 尾声技术债清理）：①TODO/FIXME
+审计 ②评测覆盖缺口分析 ③holdout 维护成本评估 ④schema 双向兼容
+回归测试。交付 docs/technical-debt-audit-batch8.md。
+
+**执行**：
+1. ① 扫描 app/evaluation/tests/scripts/docs 全部 py/md/json/toml：
+   **零真实 TODO/FIXME 标记**（全部命中为 markdown 任务列表字面量，
+   属契约测试输入），分类清单为空，无立即修复项。
+2. ② 覆盖矩阵（实测）：7 个 devset manifest 共 31 文档，expectations
+   全覆盖；annotations 仅 1/31（DC-MVP-001，且 figure_caption_pairs
+   为空）。恒 null/未实现指标族：figure_caption_*（零 GT 对）、
+   table_caption_*（无 GT 键，批次 7 §7 冻结）。**发现项**：
+   heading_order GT 已采集 8 条但零消费（死数据）；real-01..05 真实
+   语料+worksheets 已备未入 manifest。待标注优先级 P1–P5（按 ROI）
+   见审计文档。
+3. ③ holdout 维护评估：10 个 kit（7 private + 3 synthetic）对应裁决
+   7 轮；一次性封存模型 = 零持续维护（expectations 冻结 + 首跑封存 +
+   sha256 守卫 + git 字节保护）。**"期望生成器"建议不做**：自动从
+   parser 输出生成期望=自证循环，会把 holdout 退化为回归测试；机械
+   对照已由 dev/回归覆盖。
+4. ④ 新增 tests/test_schema_compat_regression.py（10 项全过）：旧
+   0.1.0–0.5.0 各时代形状全部通过当前 schema 校验（读兼容前向承诺
+   落地为测试）；writer 一律 0.5.0；0.5.0 混排文档喂模拟批次 6
+   consumer（只识 has_caption）优雅降级——跳过未知 type 不报错；
+   真实 match_relation_pairs 路径行为不变 (1,1,1)；纯未知 type
+   文档降级 (0,1,0) 不崩溃。
+5. Backlog issues（GitHub tech-debt 标签，本仓库 #1–#5）：
+   - #1 P1 补标注 DC-MVP-001 figure_caption_pairs（解锁恒 null 族）
+   - #2 P2 补 DC-MVP-001-PDF annotation
+   - #3 P3 heading_order GT 消费指标族设计
+   - #4 P4 table_caption_*（annotation v1.1 + 标注 + 指标）
+   - #5 P5 real-01..05 真实语料入 manifest
+6. 验收对照：无遗漏 TODO ✅；覆盖矩阵可视化（3 表）✅；schema 双向
+   兼容测试 10/10 ✅。全量回归 **5123 passed**。
+
+**待裁决**：批次 8 封口（审计交付 + backlog 转出 + 双向兼容测试验收）。
