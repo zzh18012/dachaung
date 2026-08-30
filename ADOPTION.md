@@ -1191,3 +1191,22 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   figure_caption_* 仍 null + reason=parser_does_not_emit_relations——
   该理由字符串自本批起事实过时（fallback 已产出 has_caption），
   下批可改为直接消费 has_caption relation 计算 P/R/F1。
+
+## 二十五、批次 4 封口裁决与批次 5-7 排序（GPT 5.6 Sol，2026-08-30，会话 6a911adf）
+
+裁决正文封存 Temp/gpt_ruling_b4_closure.txt（640 字符，会话 API 取回）。
+
+1. 批次 4 正式通过并封口：五项裁决均按原文执行无偏差；main 与
+   origin/main 的 da90d53 普通 fast-forward push 予以确认；已封存
+   holdout 无需重跑。
+2. 批次 5 = (a) 表格→Markdown 线性化（沿用 2026-08-28 排序）。执行
+   边界：仅改 table element 的 canonical content；先契约冻结表头/
+   空单元格/合并单元格/多行文本/转义/异常与空表/确定性；source_spans
+   坐标按线性化后 Element.content 定义；本批不做表题注关联与评测器
+   变更；holdout 固定字节 + 实现前手工推导期望。
+3. 后续排序 (b)→(c)：批次 6 修 figure_caption_* 评测（直接消费
+   has_caption relation，移除过时理由 parser_does_not_emit_relations，
+   内部匹配器做成 relation-type 参数化可复用形式）；批次 7 表格题注
+   关联（复用批次 4 docx 邻接规则骨架并接入评测框架）。
+4. 流程不变：契约先行、全新 holdout、干净 SHA 一次性首跑、ff-only
+   合入、全量回归。
