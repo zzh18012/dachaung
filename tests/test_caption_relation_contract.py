@@ -255,7 +255,7 @@ def test_040_keeps_family_const_enforcement():
 
 def test_unknown_version_still_rejected():
     with pytest.raises(Exception):
-        validate_udm(_udm_with_relation("0.5.0", None))
+        validate_udm(_udm_with_relation("0.6.0", None))
 
 
 # ---------- §5 不变量：无 caption 来源零 relation ----------
@@ -311,14 +311,22 @@ def test_devset_docx_figure_relation():
     from app.parsers.fallback_parser import FallbackParser
     doc = FallbackParser().parse(entry.resolved_path, source_hash="a" * 64)
     rels = _rels(doc.relations)
-    assert rels == [{
-        "type": "has_caption",
-        "from_id": doc.document_id + "::e0018",
-        "to_id": doc.document_id + "::e0019",
-        "metadata": {"rule": "docx_adjacent_paragraph"},
-    }]
+    assert rels == [
+        {
+            "type": "has_caption",
+            "from_id": doc.document_id + "::e0018",
+            "to_id": doc.document_id + "::e0019",
+            "metadata": {"rule": "docx_adjacent_paragraph"},
+        },
+        {
+            "type": "table_has_caption",
+            "from_id": doc.document_id + "::e0013",
+            "to_id": doc.document_id + "::e0012",
+            "metadata": {"rule": "docx_adjacent_element_above"},
+        },
+    ]
     d = doc.to_dict()
-    assert d["schema_version"] == "0.4.0"
+    assert d["schema_version"] == "0.5.0"
     validate_udm(d)
 
 

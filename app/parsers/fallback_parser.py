@@ -151,6 +151,91 @@ def match_caption_relations_pdf(elements: list[Element]) -> list[Relation]:
     return _sort_relations(rels)
 
 
+# 批次 7 契约（docs/table-caption-relation-contract.md §2）：表题注前缀
+# 集，与图题注前缀集互斥；数字限 ASCII。
+_TABLE_CAPTION_RE = re.compile(
+    r"^(?:Table|表格|表)\s*[0-9]+[\.、\s]",
+    re.IGNORECASE,
+)
+
+
+def _is_table_caption(el: Element) -> bool:
+    return el.type == "caption" and bool(
+        _TABLE_CAPTION_RE.match(el.content or "")
+    )
+
+
+def match_table_caption_relations_docx(
+    elements: list[Element],
+) -> list[Relation]:
+    """契约 §3 docx 规则（纯函数）：table@列表位置 i 仅当 i−1 元素是
+    表题注 caption（表题注惯例在表上方；elements 列表顺序=body 顺序，
+    table_index 与 paragraph_index 不同族不可数值比较）。"""
+    rels: list[Relation] = []
+    for i, e in enumerate(elements):
+        if e.type != "table" or i == 0:
+            continue
+        prev = elements[i - 1]
+        if _is_table_caption(prev):
+            rels.append(
+                Relation(
+                    type="table_has_caption",
+                    from_id=e.element_id,
+                    to_id=prev.element_id,
+                    metadata={"rule": "docx_adjacent_element_above"},
+                )
+            )
+    return _sort_relations(rels)
+
+
+def match_table_caption_relations_pdf(
+    elements: list[Element],
+) -> list[Relation]:
+    """契约 §3 pdf 规则（纯函数）：同页 + 表题注在表上方
+    0 < gap ≤ CAPTION_MAX_GAP_PT + x 区间相交 > 0；候选按
+    (gap, table_id, caption_id) 升序贪心唯一配对（批次 4 下方规则的
+    镜像；gap = table.top − caption.bottom）。"""
+    tables = [e for e in elements if e.type == "table"]
+    captions = [e for e in elements if _is_table_caption(e)]
+    candidates = []
+    for tbl in tables:
+        tloc = tbl.source_locator
+        tb = tloc.get("bbox")
+        if not tb:
+            continue
+        for cap in captions:
+            cloc = cap.source_locator
+            cb = cloc.get("bbox")
+            if not cb:
+                continue
+            if tloc.get("page") != cloc.get("page"):
+                continue
+            gap = tb[1] - cb[3]
+            if not (0 < gap <= CAPTION_MAX_GAP_PT):
+                continue
+            if min(tb[2], cb[2]) - max(tb[0], cb[0]) <= 0:
+                continue
+            candidates.append((gap, tbl.element_id, cap.element_id))
+    candidates.sort()
+    used_tbl: set[str] = set()
+    used_cap: set[str] = set()
+    rels: list[Relation] = []
+    for gap, tbl_id, cap_id in candidates:
+        if tbl_id in used_tbl or cap_id in used_cap:
+            continue
+        used_tbl.add(tbl_id)
+        used_cap.add(cap_id)
+        rels.append(
+            Relation(
+                type="table_has_caption",
+                from_id=tbl_id,
+                to_id=cap_id,
+                metadata={"rule": "pdf_geometry_above", "gap_pt": gap},
+            )
+        )
+    return _sort_relations(rels)
+
+
 def _rows_to_markdown(rows: list[list[Any]]) -> str:
     """把表格行渲染为 canonical markdown（批次 5 契约，共享实现）。"""
     return linearize_table(rows)
@@ -700,10 +785,17 @@ class FallbackParser(Parser):
         document_id = make_document_id(source_hash)
         if source_type == "pdf":
             elements, warnings = _parse_pdf(p, source_hash, document_id, self._image_output_dir)
-            relations = match_caption_relations_pdf(elements)
+            # 契约 §4：两类 relation 合并后按 (type, from_id, to_id) 排序
+            relations = _sort_relations(
+                match_caption_relations_pdf(elements)
+                + match_table_caption_relations_pdf(elements)
+            )
         else:
             elements, warnings = _parse_docx(p, source_hash, document_id, self._image_output_dir)
-            relations = match_caption_relations_docx(elements)
+            relations = _sort_relations(
+                match_caption_relations_docx(elements)
+                + match_table_caption_relations_docx(elements)
+            )
         return Document(
             document_id=document_id,
             source_path=str(p),

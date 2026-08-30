@@ -305,14 +305,14 @@ def test_rule8_long_split_metadata_unchanged():
 
 # ---------- §1 规则 9：版本契约 ----------
 
-def test_rule9_spans_emit_040_docx():
+def test_rule9_spans_emit_050_docx():
     doc = _make_doc(
         [{"type": "paragraph", "content": "docx 段落"}],
         source_type="docx",
     )
     doc.chunks = StructuralChunker(max_chars=100).chunk(doc)
     d = doc.to_dict()
-    assert d["schema_version"] == "0.4.0"
+    assert d["schema_version"] == "0.5.0"
     validate_udm(d)
 
 
@@ -453,7 +453,7 @@ def test_metric3_determinism_two_runs():
 
 # ---------- §4 端到端 ----------
 
-def test_e2e_markdown_pipeline_040_and_span_identity(tmp_path):
+def test_e2e_markdown_pipeline_050_and_span_identity(tmp_path):
     from app.pipeline import process_single
 
     p = tmp_path / "doc.md"
@@ -466,7 +466,7 @@ def test_e2e_markdown_pipeline_040_and_span_identity(tmp_path):
     )
     assert errors == [] and document is not None
     d = document.to_dict()
-    assert d["schema_version"] == "0.4.0"
+    assert d["schema_version"] == "0.5.0"
     validate_udm(d)
     by_id = {e.element_id: e for e in document.elements}
     assert d["chunks"]
