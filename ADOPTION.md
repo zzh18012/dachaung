@@ -1625,3 +1625,56 @@ figure_caption_pairs（1 对），解锁 figure_caption_* 指标族。
 标注一致 ✅；PDF 侧仍 null ✅；全量回归 ✅。
 
 **待裁决**：批次 9 封口（P1 解锁验收 + 格式偏差追认）。
+
+## 三十七、批次 9 封口裁决与批次 10 指定（2026-08-30，Stage 7 轨道 A）
+
+**裁决来源**：GPT 5.6 Sol（对话 cf170a6f，2026-08-30；全文封存
+搬运线 outputs/gpt_ruling_b9_closure.json，4043 字符，经 conversation
+API 读取——新标签页 DOM 未渲染回复）。
+
+**格式偏差追认：通过，并修正裁决示例**。理由：①schema 契约优先
+（annotation.schema.json v1.0 批次 6 冻结，键名 figure_marker/
+caption_text）；②执行严格遵循冻结 schema（additionalProperties=
+false），Draft202012 校验 0 错误；③识别文本选择合理（图片无
+content/alt → 资源文件名作 figure_marker，符合批次 6 匹配器
+from 侧识别逻辑）。GPT 自我修正：批次 9 指令示例
+{"figure_id","caption_id"} 不准确，应为 {"figure_marker",
+"caption_text"}——"此为裁决失误（未查阅冻结 schema），您的纠正
+执行体现了契约优先原则"。annotation 元数据更新确认（date 修订、
+annotator 不变）✓。
+
+**批次 9 执行验收：全部通过**（逐项 ①–⑥）：①标注数据准备 ✓
+（1 对，端点与批次 4 has_caption e0018→e0019 一致）；②annotation
+更新 ✓；③评测验证 ✓（docx P/R/F1=1.0/1.0/1.0，PDF 侧仍
+null+no_annotation 符合验收）；④归因验证 ✓（10 处全归因：
+6 解锁 + 4 运行环境；evaluator_version 1.8 不变、PDF 不变、
+其余 .metrics.* 逐字节一致；VERDICT: PASS）；⑤回归 ✓（5123
+passed）；⑥验收标准对照 ✓。
+
+**最终裁决：批次 9 正式封口，归档编号 `Stage-7-Batch-9-Closed`。**
+
+**批次 10 指定（P2 PDF 侧标注，开工许可已授予）**：补完
+DC-MVP-001 PDF 侧 figure_caption_pairs 标注，解决"题注被融合"
+GT 口径问题（批次 4 §0 / 批次 7 契约 §0 归因：devset PDF 实测
+表题注被 pdfplumber 融合进前一段落）。**两段式协议（强制）**：
+1. 实证调查（步骤 1）：打开 devset/DC-MVP-001.pdf 人工识别
+   图片-题注对；跑 parser 提取 elements 输出；对照分析"融合"
+   现象，记录详细观察结果。
+2. **下次回复中汇报步骤 1 结果**（须含：人工识别对数；parser
+   输出对应 elements 的 element_id/content 片段；融合现象描述
+   ——题注文本是否出现在段落中、可识别程度）。
+3. **等待 GPT 基于步骤 1 结果裁决 Option A/B/C**，裁决前不得
+   标注：
+   - **A 标注融合段落**：GT caption_text=融合段落中的题注部分
+     子串（与 parser 实际输出对齐、测真实匹配能力；融合致特征
+     消失则可能无意义）。
+   - **B 标注理想题注**：GT=理想独立题注文本即使 parser 未分离
+     （反映"应该识别到什么"；不对齐 parser，可能恒 recall=0）。
+   - **C 不标注**：figure_caption_pairs 空数组 + notes 字段说明
+     （承认 parser 局限；PDF 侧评测永久降级 no_annotation_pairs）。
+4. 裁决后执行步骤 3–5：更新 PDF 侧 annotation（注：裁决所称
+   DC-MVP-001-annotation.json 实为 samples/private/devset/
+   annotations/DC-MVP-001-PDF.json——新 annotation 文件，manifest
+   需加 annotation_file 键）→ 重跑评测（仅 PDF 侧 figure_caption_*
+   变化，对比批次 9 基线）→ 全量回归（5123+）→ 封口报告说明
+   口径选择理由。
