@@ -970,3 +970,42 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   后执行 `git push origin main:main`：8a5a9e6..0fd2bcc，ff 无 force，
   push 后本地与远端对齐（领先 0）。远端检查点就此建立在批次 2 + 版本
   纠正的完整状态上。
+
+## 十九、Stage 6 第三批：KVFS source_locator 契约形式化（2026-08-30）
+
+### 盘点与断路（裁决记录）
+
+- 盘点结论：schema $id 基线起即 kvfs.local；六来源三套互斥坐标系
+  （pdf 页几何 / docx 结构索引 / md/html/text 1 基物理行 / ipynb 容器
+  混合）；无公共定位键；自跑线从未写下 KVFS locator 语义。
+- 裁决（2026-08-30 会话 6a91a872）：断路成立且为正确断路；目标改为
+  "统一 locator 协议 + 分族定位语义"（统一 resolver envelope + 分族
+  坐标，不强求同构）；三不变量 Determinism / Resolvable / No
+  fabricated precision；本批不加 file_offset（语义成本未清，独立未来
+  批次 raw_source_span/file_byte_span）；family 显式进入
+  source_locator（discriminator 跟 locator 走，不绑 source_type）；
+  断路解除，进入契约先行。
+- 契约送批后裁决流在 137 字处截断（镜像站故障，end_turn=False 持续
+  3 分钟以上），可见正文给出两个必须钉死的边界：① 统一 resolver 不得
+  以"原始字节"为全族共同输入语义；② Kreuzberg placeholder 不得因补
+  family 被包装成可解析定位器；其余"基本成立"。两条边界已原文落入
+  契约（§1 输入表示分族声明 + 不变量 2 豁免条款）；截断情况如实
+  记录，完整条文随批次完工汇报请 GPT 复核。
+
+### 契约（integration/stage6-batch3-locator-contract）
+
+- docs/locator-kvfs-contract.md 草案提交 + 裁决边界修订，两提交：
+  契约草案、resolver 输入边界与 kreuzberg 豁免钉死。
+- 四族名（采纳裁决第二组）：line_address / structural_index /
+  page_geometry / container_line。
+- 版本语义提案（随实现送批）：writer 能力变更 → 0.3.0；0.2.0 以
+  not.required:[family] 排除；0.1.0 约束不变；source_spans 规则
+  0.3.0 沿用 0.2.0；EVALUATOR_VERSION 不动。
+
+### holdout 设计决定（偏差候选，完工汇报时请 GPT 追认）
+
+- md/html/text/ipynb：全新 fixture，期望含 family 全字段手工推导冻结
+  （契约可推导面）。
+- pdf/docx 不进 holdout：pdfplumber/python-docx 的元素切分与 bbox 有无
+  属解析器行为而非契约可推导内容，手工推导会变成预跑；其 family
+  正确性与既有键不变改在 dev 验收对封存基线断言。
