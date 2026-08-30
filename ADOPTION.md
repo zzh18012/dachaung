@@ -1107,3 +1107,21 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
      既有文本语义不变；
    - writer 输出形状变化 → 下一版本 0.4.0；契约须冻结 relation 的
      schema、缺失与歧义行为。
+
+## 二十二、批次 4 契约起草（2026-08-30）
+
+- 盘点：caption element 仅 fallback（pdf/docx `_CAPTION_RE`）产出；
+  md/html/text/ipynb/kreuzberg 无 caption 产出；六 parser relations
+  恒空；Relation dataclass 与 schema 定义已具备。
+- devset 实测：docx 图题注在图片段落下一段（para16→17）；pdf 同页
+  题注在图正下方（gap 11.5pt）。
+- 契约草案 docs/caption-relation-contract.md（本提交）：显式
+  `image --has_caption--> caption`；图题注前缀集 {Figure, Fig, 图}；
+  docx 紧邻下一段规则；pdf 同页下方 + gap≤50pt + x 重叠 + 全局唯一
+  配对（gap,image_id,caption_id 升序贪心）；排序 (type,from,to)；
+  版本 0.4.0，≤0.3.0 not.contains has_caption；范围锁死不做
+  figcaption 语义/表题注/图上方/跨页。
+- 待 GPT 裁决重点：①图题注前缀集口径；②CAPTION_MAX_GAP_PT=50 与
+  x 重叠条件；③唯一配对的贪心排序键；④0.4.0 分支不新增必填、
+  方向性走契约测试不走 schema；⑤holdout 设计（合成 docx holdout、
+  pdf 沿用批次 3 偏差先例走 dev 验收引用基线哈希）。
