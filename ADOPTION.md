@@ -2089,3 +2089,45 @@ evaluator_version=1.10 / report_version=1.3 不变（评测器零改动）。
 5. 裁决步骤 6 的 git add 含 samples/private/ 路径——项目隐私
    契约 samples/private/ 永不进 git（gitignored）；提交物 =
    两个脚本 + ADOPTION.md。
+
+## 四十五、批次 13 封口裁决记录（Stage-7-Batch-13-Closed，2026-08-31）
+
+**裁决来源**：GPT 5.6 Sol，对话 cf170a6f（批次 13 完成报告之后）。
+报告送达后首轮裁决流在「Silent_drop 统计·其余」处服务端截断，
+经续传请求补齐 ④–⑥ 核验与三项最终结论。
+
+**核验结论（裁决原文摘要）**：
+- 契约偏差 5 条全部追认（inline expectations / 指标名映射 /
+  worksheet 词表 / 标注依赖降级 null / 私有路径不进 git），
+  理由均为「契约优先，冻结 schema > 裁决草案」。
+- ① real-005 headline ② 8 文档 GT 主表 ③ Step 4 评测
+  ④ Step 5 烟雾对比（7 处 >50% 偏差归因质量确认）
+  ⑤ Step 6 归因验证（31 diff 白名单 + MVP 零漂移 + 版本封口）
+  ⑥ 全量回归 5147——六项全部 ✓。
+- 最终裁决：1) 批次 13 封口通过，归档编号 Stage-7-Batch-13-Closed；
+  2) Push 授权通过（立即执行 ff-only 合并并推送）；
+  3) 下一批次指定 = 批次 14（修复 w:sdt 嵌套内容欠提取）。
+
+**执行偏差（本轮新增 2 条，沿既定「契约/事实优先 + 编号声明」模式）**：
+1. 裁决 push 指令中的分支名 integration/stage7-batch13-real-expansion
+   不存在；实际集成分支 = integration/stage7-batch12-table-caption
+   （commit 4ed70ab），ff-only 合并按实际分支执行。
+2. 裁决推送内容列出的 manifest.json 更新位于 samples/private/
+   （gitignored，隐私契约永不进 git）；实际推送内容 = 两个脚本 +
+   ADOPTION.md §四十四（4ed70ab 已含）。main 检出于指示线 worktree，
+   ff-only 合并在该 worktree 执行（同分支不能双 worktree 检出，
+   git 约束）。
+
+**批次 14 指令（开工许可已授予，先方案后实现）**：
+- 目标：修复 docx parser 的 w:sdt 嵌套欠提取（当前只扫 w:body
+  顶层子元素；DC-REAL-002-DOCX 封面嵌套 → heading 10/15、
+  image 0/2、markers 0/3、silent_drop 7）。
+- 步骤 1（本轮先做）：分析 DC-REAL-002-DOCX 的 XML 嵌套结构；
+  在方案 A（递归扫描 w:sdt/w:sdtContent，裁决推荐）与
+  B（入口扁平化预处理）间做选择，汇报选择 + 理由 + 实现伪代码，
+  **等裁决技术方案后再实现**。
+- 步骤 2–4：实现 + 合成 docx 测试（嵌套 heading/paragraph/table
+  顺序断言）→ 验证 002-DOCX（heading 15 / image 2 /
+  silent_drop 0 / markers 3/3）→ devset 重跑 + 归因
+  （002-DOCX 改善，其余 9 文档零漂移）→ 封口（回归 + 记录 +
+  合并推送）。验收标准 7 项见裁决原文。
