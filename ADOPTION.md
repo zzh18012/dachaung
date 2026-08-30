@@ -1861,3 +1861,42 @@ no_ground_truth_headings（裁决预期 no_annotation 的修正，见执行⑥�
 ⚠️；归因 PASS ✅；全量回归 5134 ✅。
 
 **待裁决**：批次 11 封口（P3 验收 + 二处执行偏差追认）。
+
+## 四十一、批次 11 封口裁决与批次 12 指定（2026-08-31，Stage 7 轨道 B）
+
+**裁决来源**：GPT 5.6 Sol（对话 cf170a6f，2026-08-31；全文 6147 字符
+封存搬运线 outputs/_b11closure_dump.txt，经 conversation API 直读）。
+
+**偏差追认：全部通过**：①规范化函数复用 normalize_text（口径一致性
++ dry-run 语义隐式通过 + 大小写敏感契约钉死——并确认大小写敏感对
+heading 匹配合理）；②manifest 路径为裁决示例错误，修正正确。
+③PDF 侧 no_ground_truth_heads（原文笔误，实为 no_ground_truth_
+headings）预期修正追认——annotation 存在 ≠ 所有指标族都有 GT。
+
+**批次 11 执行验收：全部通过**（①实现 ✓ ②测试 5134 ✓ ③评测验证 ✓
+（docx 0.8889/1.0/0.9412 与 dry-run 一致；PDF 降级语义正确）④归因
+PASS ✓ ⑤验收对照 ✓）。
+
+**最终裁决：批次 11 正式封口，归档编号 `Stage-7-Batch-11-Closed`。**
+
+**Stage 7 进度**：轨道 A 全部完成（批次 9/10）；轨道 B 批次 11 完成，
+余 P4（table_caption_*）/P5（真实语料）。Backlog 决策：PDF
+chunk_boundary_anchors 标注暂不排期（待 P4/P5 后重评）。
+
+**Issues 处理指令**：关闭 GitHub issues #1（P1，批次 9 完成）与
+#2（P2，批次 10 完成），下次回复确认或说明保留原因。
+
+**批次 12 指定（P4 table_caption_* 指标族，开工许可已授予）**：
+实现 table_caption_precision/recall/f1，消费 table_has_caption
+relation（批次 7 生成，批次 6 匹配器已参数化冻结）。两段式协议：
+1. 步骤 1 schema 升级设计（下次回复汇报）：annotation.schema.json
+   v1.0→v1.1，新增 table_caption_pairs（table_marker + caption_text，
+   类比 figure_caption_pairs）；additionalProperties 策略 Option A
+   （维持 false，严格验证，推荐）/ Option B（放宽 true）；完整 schema
+   片段 + 理由 + diff。
+2. 等 GPT 裁决 schema 设计后执行步骤 2–6：更新 schema → 标注
+   DC-MVP-001 docx/PDF（PDF 需决定口径：批次 4/7 归因表题注被
+   pdfplumber 融合进前一段落 → devset pdf 表 relation 恒 0 条）→
+   实现 table_caption_prf（复用 match_relation_pairs，
+   relation_type="table_has_caption"）→ EVALUATOR_VERSION 1.9→1.10
+   → 评测验证 → 封口。macro 不纳入（沿标注依赖族惯例）。
