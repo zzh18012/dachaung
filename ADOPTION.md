@@ -1021,3 +1021,60 @@ ChatGPT 5.6 Sol 对 ipynb 支持契约送审稿裁定"有条件通过"，按其�
   + schema_version 0.3.0；元素结构与行号按契约 §3 与各 parser 文档化
   规则手工推导，document_id 按 make_document_id（sha256 前 16 位）由
   fixture 字节派生；未运行任何 pipeline 代码。
+
+## 二十、批次 3 执行与验收记录（2026-08-30）
+
+### 实现（integration/stage6-batch3-locator-contract，2800a64）
+
+- models.py：新增 `SCHEMA_VERSION_LOCATOR = "0.3.0"`；
+  `effective_schema_version` 无条件返回 0.3.0（writer 能力语义）。
+- 六个 parser 在产出的每个 source_locator 上前置 `family` 常量键，
+  不改任何既有键取值：text/markdown/html → line_address；ipynb →
+  container_line；fallback pdf（段落/表格/图片三处）→ page_geometry；
+  fallback docx（段落/图片/表格三处）→ structural_index；kreuzberg
+  `_make_locator`（pdf→page_geometry、其余→structural_index）与表格
+  locator 同步，占位/启发式标记键原样保留（不变量 2 豁免）。
+- schema：schema_version enum 加 0.3.0；0.1.0 分支扩展
+  `not.required:["family"]`；新增 0.2.0 分支同口径排除；新增四个
+  0.3.0 分支按 source_type 要求 family 存在且等于族 const
+  （pdf=page_geometry、docx=structural_index、md/html/text=line_address、
+  ipynb=container_line）。
+- 测试修正 30 个文件：精确 dict / key-set 断言补 family；版本断言
+  0.2.0 → 0.3.0（test_rule9 / e2e / version_semantics 相应改名 030）；
+  test_udm_unknown_version_rejected 的非法版本探针改用 0.4.0。
+- 新契约测试 tests/test_locator_family_contract.py（40 用例）：每族
+  family 正确性（md/html/txt/ipynb 真 parser、pdf/docx 用 devset 真样本
+  skip-if-missing、kreuzberg 占位单元级）、既有键不变（去 family 后与
+  legacy 形状相等）、版本分支（0.3.0 必填+const、错 const 拒、
+  0.2.0/0.1.0 拒 family、无 family 旧输出读兼容）、resolver 可执行
+  断言（line_address 行命中、container_line cell 命中）。
+- 全量回归：5012 passed / 0 failed（含新增 40）。
+
+### holdout 一次性首跑（干净 SHA 51b60af，2026-08-30）
+
+- 脚本 scripts/holdout_locator_family_first_run.py（51b60af 提交）：
+  断言输出不存在（禁重跑）+ 干净树，记录 git SHA；逐 fixture 比对
+  parser、schema_version、全部 element 的 element_id/type/
+  source_locator 全字段。
+- 结果 all_pass=True（4/4 fixture 精确匹配，含 family 与 0.3.0）。
+  报告封存 outputs/holdout-locatorfamily-v1-firstrun.json，sha256
+  7107b7222f224664744f70bc79fcef4e60466a10593be736c7eb2a6ab8d25910。
+  此后永不重跑。
+
+### dev 验收（pdf/docx 对封存基线，2026-08-30）
+
+- 同 manifest/参数（fallback，max_chars=800）重跑：
+  outputs/evaluation-locatorfamily-dev-acceptance.json（报告 schema
+  校验通过）。
+- 与批次 2 封存基线 evaluation-chunkerspan-dev-acceptance-run2.json
+  对比：DC-MVP-001 与 DC-MVP-001-PDF 的 element_count_total /
+  element_count_by_type / schema_valid / pdf_locator_valid_ratio /
+  docx_locator_valid_ratio / silent_drop_count /
+  chunk_reference_intact_ratio 全部 SAME（既有键与结构不变，
+  Determinism 成立）；evaluator_version 两边均 1.7（本批不动评测器）。
+
+### 待 GPT 完工追认项
+
+- 契约全文（裁决流截断于 137 字符，两处可见边界已并入，全文请重认）。
+- holdout 设计偏差：pdf/docx 不进 holdout，改 dev 验收对封存基线断言。
+- 版本语义 0.3.0 提案（契约 §4）随实现送批。
