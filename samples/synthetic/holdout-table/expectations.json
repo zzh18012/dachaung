@@ -1,0 +1,50 @@
+{
+  "holdout": "holdout-table-linearization",
+  "kind": "batch5-table-linearization-first-run",
+  "fixtures": {
+    "holdout-table.md": {
+      "parser": "markdown",
+      "fixture_sha256": "78a3f720e9587a679f4cb1b070eab39a6dec0896575efa68e2cc006cff629327",
+      "expected_schema_version": "0.4.0",
+      "expected_elements": [
+        {"element_id": "doc-78a3f720e9587a67::e0000", "type": "table", "source_locator": {"family": "line_address", "line": 1}, "content": "| h1 | h2 | h3 |\n| --- | --- | --- |\n| a\\|b | c | d |\n| x | y |  |\n| p<br>q |  | z |", "metadata": {"row_count": 4, "col_count": 3, "source": "markdown_pipe_table"}}
+      ]
+    },
+    "holdout-table.html": {
+      "parser": "html",
+      "fixture_sha256": "d1720cb5e8476f3c7e47c874baef0f6c8e49dbb517978bbaae956d6a29df4a61",
+      "expected_schema_version": "0.4.0",
+      "expected_elements": [
+        {"element_id": "doc-d1720cb5e8476f3c::e0000", "type": "table", "source_locator": {"family": "line_address", "line": 1}, "content": "| A | B |\n| --- | --- |\n| x\\|y |  |", "metadata": {"row_count": 2, "col_count": 2, "source": "html_table", "table_index": 0}}
+      ]
+    },
+    "holdout-table.docx": {
+      "parser": "fallback",
+      "fixture_sha256": "914ca721bf0917d206b28962eada705d83a59923109d0fc4b86e4bf50af9aa46",
+      "expected_schema_version": "0.4.0",
+      "expected_elements": [
+        {"element_id": "doc-914ca721bf0917d20::e0000", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 0, "section": 0}, "content": "Intro."},
+        {"element_id": "doc-914ca721bf0917d20::e0001", "type": "table", "source_locator": {"family": "structural_index", "table_index": 0, "section": 0}, "content": "| p1<br>p2 | h2 |\n| --- | --- |\n| a\\|b |  |", "metadata": {"row_count": 2, "col_count": 2, "source": "python-docx"}},
+        {"element_id": "doc-914ca721bf0917d20::e0002", "type": "table", "source_locator": {"family": "structural_index", "table_index": 1, "section": 0}, "content": "| m | m |\n| --- | --- |\n| x | y |", "metadata": {"row_count": 2, "col_count": 2, "source": "python-docx"}},
+        {"element_id": "doc-914ca721bf0917d20::e0003", "type": "paragraph", "source_locator": {"family": "structural_index", "paragraph_index": 1, "section": 0}, "content": "End."}
+      ]
+    },
+    "holdout-table.ipynb": {
+      "parser": "ipynb",
+      "fixture_sha256": "3619c7a8980b4868dfa3140fbe6249959709dc9a069e4548431e687f9ace87db",
+      "expected_schema_version": "0.4.0",
+      "expected_elements": [
+        {"element_id": "doc-3619c7a8980b4868::e0000", "type": "table", "source_locator": {"family": "container_line", "cell_index": 0, "cell_type": "markdown", "line": 1}, "content": "| h | k |\n| --- | --- |\n| v\\|w |  |", "metadata": {"row_count": 2, "col_count": 2, "source": "markdown_pipe_table"}},
+        {"element_id": "doc-3619c7a8980b4868::e0001", "type": "paragraph", "source_locator": {"family": "container_line", "cell_index": 1, "cell_type": "code", "line": 1}, "content": "x = 1\n"},
+        {"element_id": "doc-3619c7a8980b4868::e0002", "type": "paragraph", "source_locator": {"family": "container_line", "cell_index": 2, "cell_type": "raw", "line": 1}, "content": "not a table\n"}
+      ]
+    }
+  },
+  "hand_derivation_basis": "依据生成脚本 authored 结构 + docs/table-linearization-contract.md §2/§3 规则，在本批任何 parser 运行于这些夹具之前手工推导冻结；document_id=doc-<fixture sha256 前 16 hex>；metadata 只对 table element 比对 row_count/col_count/source 子集。",
+  "hand_derivation_notes": [
+    "md：header 3 列；行2 a\\|b 反转义为 a|b 后再转义回 a\\|b（roundtrip 幂等）；行3 参差补空列；行4 <br> 与空 cell 原样",
+    "html：th 行=首行表头（不特殊化）；x|y 转义 x\\|y；空 td → 空串",
+    "docx：cell(0,0) 两段落 p1/p2 → cell.text 'p1\\np2' → <br>；a|b 转义；空 cell 空串；t2 首行合并 → m 重复（库给定语义）",
+    "ipynb：markdown cell 表经共享线性化（v\\|w roundtrip）；code/raw cell 为 paragraph（kind 元数据不比对）"
+  ]
+}
