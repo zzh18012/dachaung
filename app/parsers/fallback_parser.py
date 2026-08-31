@@ -407,6 +407,75 @@ def _render_pdf_image_region_verbose(
             pass
 
 
+_VECTOR_FIGURE_GAP_PT = 15.0
+_VECTOR_FIGURE_MIN_W = 100.0
+_VECTOR_FIGURE_MIN_H = 100.0
+
+
+def _vector_figure_clusters(page) -> list[list[float]]:
+    """识别页面上的矢量图形簇（批次 15，Option A 裁决）。
+
+    pdfplumber page.images 只含栅格 XObject，矢量图形（Form XObject 或
+    直接 path 绘制）不可见。此处把 rects/lines/curves 按 bbox 空间聚类
+    （gap 15pt），簇含 ≥1 条 curve 且 bbox ≥100×100pt 计为 1 个矢量图：
+    - 表格/公式框 = 纯 rects+lines 零 curves（全 devset 实证）
+    - 公式根号 = 1 curve + 线但簇高 ≤51pt，被尺寸过滤排除
+
+    已知边界（ADOPTION.md 批次 15）：
+    - 同页重叠双图（如 003 p5/p7 图标+水印）计 1
+    - 空间接近的多图（如 002 封面 logo+swoosh）计 1
+    - 多段折线路径 pdfplumber 归类为 curve，其他语料的多段线表格可能误报
+    """
+    boxes: list[list[float]] = []
+    for group, is_curve in ((page.curves, True), (page.rects, False), (page.lines, False)):
+        try:
+            objs = group or []
+        except Exception:
+            objs = []
+        for o in objs:
+            try:
+                x0, x1 = float(o["x0"]), float(o["x1"])
+                top, bottom = float(o["top"]), float(o["bottom"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if x1 <= x0 or bottom <= top:
+                continue
+            boxes.append([x0, x1, top, bottom, 1.0 if is_curve else 0.0])
+    gap = _VECTOR_FIGURE_GAP_PT
+    changed = True
+    while changed:
+        changed = False
+        merged: list[list[float]] = []
+        for b in boxes:
+            hit = None
+            for t in merged:
+                if not (
+                    b[0] > t[1] + gap
+                    or b[1] < t[0] - gap
+                    or b[2] > t[3] + gap
+                    or b[3] < t[2] - gap
+                ):
+                    hit = t
+                    break
+            if hit is not None:
+                hit[0] = min(hit[0], b[0])
+                hit[1] = max(hit[1], b[1])
+                hit[2] = min(hit[2], b[2])
+                hit[3] = max(hit[3], b[3])
+                hit[4] += b[4]
+                changed = True
+            else:
+                merged.append(b)
+        boxes = merged
+    return [
+        [b[0], b[2], b[1], b[3]]
+        for b in boxes
+        if b[4] >= 1.0
+        and (b[1] - b[0]) >= _VECTOR_FIGURE_MIN_W
+        and (b[3] - b[2]) >= _VECTOR_FIGURE_MIN_H
+    ]
+
+
 def _parse_pdf(
     path: Path,
     source_hash: str,
@@ -552,6 +621,70 @@ def _parse_pdf(
                                 "tag": img.get("tag"),
                                 "srcsize": list(img.get("srcsize", [])),
                                 "extracted_to_disk": resource_path is not None,
+                            },
+                        )
+                    )
+                # 矢量图形（批次 15）：曲线聚类检测，镜像栅格发射路径
+                try:
+                    vector_bboxes = _vector_figure_clusters(page)
+                except Exception as e:
+                    vector_bboxes = []
+                    warnings.append(
+                        WarningRecord(
+                            code="pdf_vector_cluster_failed",
+                            reason=f"page {page_idx} 矢量图聚类失败: {e}",
+                            details={"page": page_idx},
+                        )
+                    )
+                for vb in vector_bboxes:
+                    vec_element_id = f"{document_id}::e{len(elements):04d}"
+                    vec_locator: dict[str, Any] = {
+                        "family": "page_geometry",
+                        "page": page_idx,
+                        "bbox": vb,
+                    }
+                    vec_resource: str | None = None
+                    if image_output_dir is not None:
+                        vec_path = image_output_dir / _image_filename(
+                            document_id, f"p{page_idx}v", image_counter, "png"
+                        )
+                        try:
+                            vec_path.parent.mkdir(parents=True, exist_ok=True)
+                        except OSError as e:
+                            warnings.append(
+                                WarningRecord(
+                                    code="pdf_image_dir_failed",
+                                    reason=f"无法创建图片输出目录: {e}",
+                                )
+                            )
+                            vec_path = None  # type: ignore[assignment]
+                        if vec_path is not None:
+                            err = _render_pdf_image_region_verbose(
+                                path, page_idx - 1, vb, vec_path
+                            )
+                            if err is None:
+                                vec_resource = str(vec_path)
+                                image_counter += 1
+                            else:
+                                warnings.append(
+                                    WarningRecord(
+                                        code="pdf_image_render_failed",
+                                        reason=f"page {page_idx} 矢量图渲染失败：{err}",
+                                        details={"page": page_idx, "bbox": vb},
+                                    )
+                                )
+                    elements.append(
+                        Element(
+                            element_id=vec_element_id,
+                            type="image",
+                            content=None,
+                            resource_path=vec_resource or "(unrendered)",
+                            parent_id=None,
+                            source_locator=vec_locator,
+                            confidence=0.5,
+                            metadata={
+                                "kind": "vector_cluster",
+                                "extracted_to_disk": vec_resource is not None,
                             },
                         )
                     )

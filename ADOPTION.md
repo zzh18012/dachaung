@@ -2194,3 +2194,60 @@ schema 校验通过）；无 sdt 文档零回归。
 碎字符（复杂度最高）；C：002-PDF 表单域标签误判；D：001-PDF 跨页表格
 拆分；或进入 Stage 8（剩余修复归 backlog）。
 确认结果见下一节记录。
+
+## 四十八、批次 15 执行记录（PDF 矢量图 image 计数修复，Option A）
+
+**技术裁决**（会话 cf170a6f，GPT 5.6 Sol，2026-08-31）：调查汇报确认
+（缺口重核/根因/区分特征/002-p7 推翻矢量图表假设均 ✓）；**Option A
+（pdfplumber 曲线聚类矢量图检测）裁决通过**，Option B（颜色子聚类）不推荐
+（003 可 9/9 但 002 超计 6/5，净效果更差）；5 项边界声明确认生效，
+立即执行步骤 2–6。
+
+**实现**（app/parsers/fallback_parser.py）：
+- 模块级 `_vector_figure_clusters(page)`：rects/lines/curves 按 bbox 空间
+  聚类（gap 15pt 贪心合并），簇含 ≥1 条 curve 且 bbox ≥100×100pt 计为
+  1 个矢量图；常量 `_VECTOR_FIGURE_GAP_PT/_MIN_W/_MIN_H`。
+- `_parse_pdf` 栅格循环后新增矢量图发射，镜像栅格路径：bbox 进
+  source_locator、`_render_pdf_image_region_verbose` 渲染簇区域到
+  image_output_dir（文件名 `p{page}v` 前缀防碰撞）、confidence 0.5、
+  metadata.kind=vector_cluster；聚类异常 → 结构化警告
+  `pdf_vector_cluster_failed`，不崩溃。
+
+**测试**（tests/test_pdf_vector_graphics.py，8 项全过）：合成 PDF 工厂
+（手写最小 PDF 字节，无新增依赖；多段路径→curve、单段线→line、re→rect、
+/Subtype /Image XObject→栅格）。用例：单大曲线识别／曲线+矩形混合簇／
+小簇（<100×100）排除／纯 rects+lines 表格零误报／栅格+矢量共存各计 1／
+gap 15pt 近合远分／bbox 重叠聚 1／边界恰 100×100 包含。
+实现期发现（已体现在用例）：pdfplumber curve bbox 取**锚点** hull
+（起/终点），不含贝塞尔控制点。
+
+**验收数据**：
+- 全量回归 **5163 passed**（5155+8，零回归，符合裁决预期）。
+- 真样重解析：002-PDF image 2→**4**（GT 5，−1=边界 1）；003-PDF
+  1→**7**（GT 9，−2=边界 2）；004-PDF 1→**2**（GT 2 精确）；
+  MVP-PDF 1/1、001-PDF 3/3 不可回归项零变化。image 短缺合计 12→**3**。
+- devset 重跑（outputs/evaluation-batch15-vector-graphics.json，报告
+  Schema 校验通过）：10/10 成功；归因**仅 002/003/004-PDF 三文档变化，
+  其余 7 文档逐指标零漂移**；summary.silent_drop_total 44→**35**
+  （−9 = 002 image −2 + 003 −6 + 004 −1；裁决预估 41–42 系只算
+  image 净缺 3，实际按逐类型短缺合计）；element_count_total 合计
+  1486→1495（+9）。
+- figure_caption_* 零变化：PDF 侧不构建 image→caption 关联
+  （契约 §3 仅 DOCX image@P↔caption@P+1），裁决关注的 004 caption
+  GT=3 未受影响（既无正向收益也无误匹配）。
+- devset_status=incomplete（pilot baseline，不代表项目总体准确率）。
+
+**5 项边界声明（裁决原文确认）**：
+1. 002-PDF −1：封面 logo 与 swoosh 艺术空间接近（gap <15pt），聚类识别
+   为 1 个矢量图（GT 标注为 2）；标注口径非对称（封面分 2/封底不分），
+   确定性规则无法复现，如实报告。
+2. 003-PDF −2：p5/p7 灯泡图标与人环水印重叠，聚类识别为单图（GT 标注
+   双图）；颜色子聚类可分离但会导致 002-PDF 超计（trade-off）。
+3. 新增矢量图 image 可能改变 figure_caption_* relation 匹配——本批
+   实测零变化（PDF 无 image→caption 关联构建），边界关闭。
+4. 已知风险：曲线装饰物（波浪线/花边）可能误报为矢量图。当前 devset
+   未出现，未来需扩展过滤规则（如 aspect ratio / curve 数量阈值）。
+5. 已知限制：003-PDF 全页背景样板导致矢量图 bbox 扩大至整页，定位精度
+   有限；计数不受影响。
+   附注（实现期补充）：pdfplumber 将多段折线路径归类为 curve，本 devset
+   表格均为单段线（实证 0 curves），其他语料的多段线表格存在误报可能。
