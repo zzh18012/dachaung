@@ -2727,3 +2727,69 @@ batch_start.plugins 保留原始列表）、
 parser 名单（裁决要求的 JSONL 端到端断言）。共 28 项。
 
 **回归**：5235 passed（5233 + 2 净增，零回归）。
+
+## 五十八、批次 19 封口裁决记录（Stage-8-Batch-19-Closed，2026-09-01）
+
+**裁决对话变更**：旧对话 6a952dc9（ChatGPT 5.6 Terra 创建）经实测不支持
+切换 GPT-5.6 Sol（模型菜单 Sol 项 aria-disabled + 站点提示"当前聊天不支持
+切换至该模型，如需使用请创建新聊天"；React onSelect 直调亦被禁用短路）。
+按用户指示新建裁决对话 6a957e64-fbac-83ea-af7d-64efe4924af3
+（GPT-5.6 Sol，思考程度"高"——该模型仅有 中/高 两档，"极高"为
+Terra/Work 独有），修正后完成报告于 2026-08-31 21:15 首条发送（含角色
+简报 + 项目背景 + 完整报告）。
+
+**裁决：Batch 19 = SEALED，授权 ff-only 推送。**
+
+三个阻断点关闭确认：
+
+1. `plugin_loaded.parsers_added` 代表首次真实注册增量，CLI 预加载与
+   batch 重放经进程级备忘保持同一语义；
+2. 重复 `--plugin` 正确分层（plugin_loaded 单事件 + batch_start.plugins
+   保留原始输入），契约自洽；
+3. worker 初始化失败受控通道（D7）：initializer 不抛异常、派发前收齐
+   回报、超时 `plugin_init_report_timeout` 带 expected_workers /
+   received_reports；真实跨进程失败路径已覆盖，标准 JSON 不泄漏
+   traceback。
+
+120 秒 timeout 未自动化覆盖：接受继续留 BACKLOG #9，不作本批阻断项。
+GPT 另核对公开远端 main 仍为批次 18 状态、7033dc5 尚未公开——与
+"待推送"状态一致。
+
+**推送授权与执行**（GPT 给定命令序列，逐字执行于指示线 main worktree）：
+
+```
+git fetch origin                                → OK（首试 502，重试成功）
+EXPECTED=$(git rev-parse integration/stage8-batch19-plugin-loading)
+                                                → 7033dc587556448c6a8a5a64a601337e9b2d940d（前 7 位 7033dc5 ✓）
+git merge-base --is-ancestor origin/main $EXPECTED → OK（0 退出）
+git merge --ff-only $EXPECTED                   → 81bcaa3..7033dc5，无 merge commit
+git push origin main                            → 81bcaa3..7033dc5
+git ls-remote origin refs/heads/main            → remote == expected
+test "$REMOTE" = "$EXPECTED"                    → Batch 19 push verified
+```
+
+远端 SHA 与授权 SHA 完全一致，无 force。推送回执（main remote SHA +
+Batch 19 push verified）已发裁决对话。封口记录提交（本条）在授权推送
+SHA 之后，随下一批次合并推送。
+
+**下一批次指定：批次 20——外部插件"全新格式"契约：解开 source_type
+封闭枚举，同时保持 locator 强校验。**
+
+裁决边界（逐条）：
+
+- 目标**不是** `"source_type": {"type": "string"}` 一放了之（未知格式
+  locator 将失去约束，不接受）；
+- 历史 Schema 版本语义不得回写修改；新 writer 版本按既有
+  schema-version policy 演进；
+- 外部 parser 可声明新 source_type，但必须同时声明/绑定合法
+  **locator family**；
+- locator 强校验主要由 family 驱动，未知 source_type 不得直接落入
+  无约束对象；
+- 内置 pdf/docx/markdown/html/text/ipynb 现有约束不得放宽；
+- parser 声明的 source contract 与实际返回 Document 不一致时，给出
+  稳定、结构化错误；
+- 增加真正的新扩展名测试插件（如 `.myx`）：
+  `--plugin → auto discovery → parse → chunk → schema validate → JSON`
+  全链闭环，不再借用既有 source_type；
+- BACKLOG #8（--plugin 文件路径）与 #9（120 秒真实 timeout 测试）
+  不混入本批，继续留 backlog。
