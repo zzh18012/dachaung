@@ -12,7 +12,14 @@
 - cpp-chunker / Rust 加速
 - 多 OCR 引擎
 - 内核代码 / FUSE / Docker / 数据库
-- 流式处理 / 异步 / 多进程
+- 流式处理 / 异步（多进程已于 Stage 8 批次 16 纳入，见"并行化"节）
+
+## 并行化（Stage 8 批次 16）
+
+- **批量处理**：`app.cli batch-parse` 支持多进程并行（默认 `min(cpu_count, 8)` workers）
+- **Evaluation 并行化**：`evaluation.cli run --workers N` 文档级并行（默认 1=顺序行为不变）
+- **已知限制**：pdfplumber C 库 segfault 可能破坏进程池（docs/BACKLOG.md）
+- 小批次（<3 文件）或 workers=1 自动走顺序路径；tqdm 为可选依赖（未装降级为逐行进度）
 
 ## 环境
 
@@ -49,6 +56,14 @@ uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.
 
 # Stage 2：校验评测报告
 .venv/Scripts/python.exe -m evaluation.cli validate-report outputs/evaluation-pilot-baseline.json
+
+# Stage 8 批次 16：批量解析（目录 / glob / 单文件 → 多进程并行 + summary.json）
+.venv/Scripts/python.exe -m app.cli batch-parse samples/private/docs -o outputs/batch --workers 8
+
+# Stage 8 批次 16：评测并行（--workers >1 文档级并行，默认 1 顺序行为不变）
+.venv/Scripts/python.exe -m evaluation.cli run \
+  --manifest samples/private/devset/manifest.json \
+  --output outputs/evaluation-parallel.json --workers 8
 ```
 
 ## Stage 2 评测规则（当前阶段）

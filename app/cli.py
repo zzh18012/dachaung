@@ -5,6 +5,9 @@
     python -m app.cli parse <input.pdf|input.docx> -o <output.json>
     python -m app.cli parse <input.docx> -o <output.json> --parser fallback --max-chars 1000
 
+    # 批量解析（目录 / glob / 单文件，多进程并行 + summary.json）
+    python -m app.cli batch-parse <dir|glob|file> -o <output_dir> [--workers 8]
+
     # 仅校验已有的 JSON（独立子命令，不会把 JSON 当成 PDF/DOCX 输入）
     python -m app.cli validate <output.json>
 """
@@ -59,6 +62,41 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     # validate 子命令
     val = sub.add_parser("validate", help="校验已有的 JSON 文件是否符合 Schema")
     val.add_argument("input", help="待校验的 JSON 文件路径")
+
+    # batch-parse 子命令（Stage 8 批次 16）
+    from app.batch import default_workers
+
+    batch = sub.add_parser(
+        "batch-parse",
+        help="批量解析：目录（递归 pdf/docx/md）/ glob 模式 / 单文件 → 多进程并行 + summary.json",
+    )
+    batch.add_argument(
+        "input", help="输入目录、glob 模式（含 * 或 ?）或单文件路径"
+    )
+    batch.add_argument(
+        "-o",
+        "--output-dir",
+        required=True,
+        help="输出目录（每文档 1 个 JSON + summary.json）",
+    )
+    batch.add_argument(
+        "--parser",
+        choices=("fallback", "kreuzberg", "markdown", "html", "text", "ipynb"),
+        default="fallback",
+        help="选择解析器（默认 fallback）",
+    )
+    batch.add_argument(
+        "--max-chars",
+        type=int,
+        default=800,
+        help="分块最大字符数（默认 800）",
+    )
+    batch.add_argument(
+        "--workers",
+        type=int,
+        default=None,
+        help=f"并行进程数（默认 min(cpu_count, 8) = {default_workers()}）",
+    )
     return p
 
 
@@ -123,6 +161,46 @@ def main(argv: list[str] | None = None) -> int:
             f"warnings={len(document.warnings)})"
         )
         return 0
+
+    if args.command == "batch-parse":
+        import glob as globlib
+
+        from app.batch import BATCH_SUFFIXES, batch_parse_files
+
+        raw = args.input
+        input_path = Path(raw)
+        if input_path.is_dir():
+            files = sorted(
+                p for p in input_path.rglob("*") if p.suffix.lower() in BATCH_SUFFIXES
+            )
+        elif any(ch in raw for ch in "*?["):
+            files = sorted(Path(p) for p in globlib.glob(raw, recursive=True))
+        else:
+            if not input_path.is_file():
+                print(f"[ERROR] 输入文件不存在: {input_path}", file=sys.stderr)
+                return 2
+            files = [input_path]
+        if not files:
+            print(f"[ERROR] 未找到可解析文件: {raw}", file=sys.stderr)
+            return 2
+
+        out_dir = Path(args.output_dir)
+        summary = batch_parse_files(
+            files,
+            out_dir,
+            parser_name=args.parser,
+            max_chars=args.max_chars,
+            workers=args.workers,
+        )
+        status = "[OK]" if summary["failed"] == 0 else "[FAIL]"
+        print(
+            f"{status} batch-parse: {summary['success']}/{summary['total']} 成功，"
+            f"workers={summary['workers']}，"
+            f"{summary['wall_time_seconds']:.1f}s → {out_dir / 'summary.json'}"
+        )
+        for err in summary["errors"]:
+            print(f"  [FAIL] {err['file']}: {err['code']} {err['message']}", file=sys.stderr)
+        return 0 if summary["failed"] == 0 else 1
 
     return 2
 

@@ -2,7 +2,7 @@
 
 用法：
     python -m evaluation.cli run --manifest <path> --output <path>
-        [--parser fallback] [--max-chars 800] [--tolerance-chars 30]
+        [--parser fallback] [--max-chars 800] [--tolerance-chars 30] [--workers 1]
     python -m evaluation.cli validate-report <report.json>
 """
 
@@ -56,6 +56,12 @@ def _build_parser() -> argparse.ArgumentParser:
         default=30,
         help="chunk_boundary 匹配容差（字符数，默认 30）",
     )
+    run_p.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="文档级并行进程数（默认 1=顺序行为，报告不变；>1 并行，结果按 manifest 原序装配）",
+    )
 
     val_p = sub.add_parser(
         "validate-report", help="校验评测报告是否符合 evaluation-report.schema.json"
@@ -86,6 +92,7 @@ def main(argv: list[str] | None = None) -> int:
                 parser_name=args.parser,
                 max_chars=args.max_chars,
                 tolerance_chars=args.tolerance_chars,
+                workers=args.workers,
             )
         except EvalSchemaError as e:
             print(f"[ERROR] 生成的报告未通过 Schema 校验: {e}", file=sys.stderr)

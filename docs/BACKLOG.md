@@ -30,3 +30,11 @@
 - 现象：w:tc 内 sdt 包裹的内容欠提取
 - 声明位置：ADOPTION.md §四十八（批次 15 附注引用批次 14 边界声明）
 - 状态：backlog（Stage 8 不动）
+
+## 5. pdfplumber 底层 C 库崩溃（segfault）可能破坏批处理进程池
+
+- 影响范围：Stage 8 批次 16 批量处理与评测并行化（multiprocessing）
+- 现象：worker 内 Python 异常已全隔离（单文档失败不中断批）；但 pdfplumber 底层 C 库的原生崩溃（segfault / access violation）会导致进程池整体失效，剩余任务全部失败
+- 缓解建议：批量处理前对可疑文档先单文档预测试（`app.cli parse`）
+- 依据：批次 16 步骤 1 裁决（2026-08-31，会话 cf170a6f）
+- 状态：已知限制（本批不修）

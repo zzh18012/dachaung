@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import time
+from multiprocessing import Pool
 from pathlib import Path
 from typing import Any
 
@@ -66,6 +67,12 @@ def _load_annotation(path: Path | None) -> dict[str, Any] | None:
             return json.load(f)
     except (OSError, json.JSONDecodeError):
         return None
+
+
+def _process_one_task(args: tuple) -> tuple:
+    """Pool 入口：把单参数元组解开传给 _process_one（可 pickle，spawn 兼容）。"""
+    doc, output_root, parser_name, max_chars = args
+    return _process_one(doc, output_root, parser_name, max_chars)
 
 
 def _process_one(
@@ -130,19 +137,34 @@ def run_evaluation(
     parser_name: str = "fallback",
     max_chars: int = 800,
     tolerance_chars: int = 30,
+    workers: int | None = 1,
 ) -> dict[str, Any]:
-    """跑评测主流程，返回报告 dict（同时写到 output_path）。"""
+    """跑评测主流程，返回报告 dict（同时写到 output_path）。
+
+    workers=1（默认）：顺序行为，报告与历史逐字节一致。
+    workers>1：文档级并行（multiprocessing.imap 保序），per_doc 仍按
+    manifest 原序装配；expected_failures 保持顺序（仅少量文档，不并行）。
+    """
     output_root = Path(output_path).parent
     output_root.mkdir(parents=True, exist_ok=True)
 
     per_doc_results: list[dict[str, Any]] = []
     parser_version_for_prov: str | None = None
 
-    for doc in manifest.documents:
-        effective_parser = _resolve_parser_name(parser_name, doc.source_type)
-        if effective_parser is None:
+    # 批次 16：文档级并行（Option A，imap 保序）。workers=1（默认）保持原顺序
+    # 行为；auto 未注册 source_type 的文档在父进程合成失败，不派发。
+    workers = 1 if workers is None else max(1, int(workers))
+    docs = list(manifest.documents)
+    effective_parsers: list[str | None] = [
+        _resolve_parser_name(parser_name, doc.source_type) for doc in docs
+    ]
+    entries: list[tuple | None] = [None] * len(docs)
+    task_args: list[tuple] = []
+    task_index: list[int] = []
+    for i, doc in enumerate(docs):
+        if effective_parsers[i] is None:
             # auto 遇未注册 source_type：合成结构化失败，不跑 pipeline
-            document, error, total_seconds, parser_version, image_dir = (
+            entries[i] = (
                 None,
                 {
                     "code": "unsupported_type",
@@ -156,9 +178,21 @@ def run_evaluation(
                 Path(),
             )
         else:
-            document, error, total_seconds, parser_version, image_dir = _process_one(
-                doc, output_root, effective_parser, max_chars
-            )
+            task_index.append(i)
+            task_args.append((doc, output_root, effective_parsers[i], max_chars))
+
+    if workers > 1 and len(task_args) >= 3:
+        with Pool(workers) as pool:
+            outcomes = list(pool.imap(_process_one_task, task_args))
+    else:
+        outcomes = [_process_one(*a) for a in task_args]
+    for j, outcome in enumerate(outcomes):
+        entries[task_index[j]] = outcome
+
+    for i, doc in enumerate(docs):
+        assert entries[i] is not None
+        document, error, total_seconds, parser_version, image_dir = entries[i]
+        effective_parser = effective_parsers[i]
         if parser_version and not parser_version_for_prov:
             parser_version_for_prov = parser_version
 

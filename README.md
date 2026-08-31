@@ -54,6 +54,10 @@ Installed 10 packages in 125ms
 - `python-docx>=1.2,<2` — DOCX 降级解析
 - `pytest>=8.0,<9` — 测试（dev 组）
 
+可选依赖（不装则自动降级，不报错）：
+
+- `tqdm` — 批量处理进度条（`python -m app.cli batch-parse`）。未安装或 stderr 非 TTY（CI）时降级为每文档一行文本进度（Stage 8 批次 16）。
+
 ---
 
 ## 3. 运行

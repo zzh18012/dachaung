@@ -2330,3 +2330,67 @@ tab 污染规避（避免在同 tab 混用 cdp/network 与发送序列）。
 
 **GPT 前端提示**：镜像站提示"对话轮数较多，建议创建新聊天"——若后续
 对话异常频发，考虑新会话并自包含简报（携带 ADOPTION.md 台账指针）。
+
+## 五十一、批次 16 执行记录（批量处理与并行化，Option A，2026-08-31）
+
+**裁决（步骤 1，会话 cf170a6f）**：全部设计决策通过——Option A
+（multiprocessing.Pool.imap_unordered）；workers 默认
+min(cpu_count(), 8)；tqdm 可选导入降级；8 项边界全追认；加速比验收
+调整为 ≥2×（8 核，devset 10 文档）；附加要求：BACKLOG 记 segfault
+限制、README 记可选依赖、CLAUDE.md 增并行化章节、新增
+scripts/verify_batch16_parallel_consistency.py。
+
+**实现**（分支 integration/stage8-batch16-batch-parse）：
+1. `app/batch.py`（新）：模块级 worker `parse_one_file((src, out_dir,
+   parser_name, max_chars))` → 小 dict（file/success/elements/chunks/
+   warnings(码表)/error_code/error_message/seconds）；worker 内自写
+   JSON；`batch_parse_files` 父进程侧 stem 冲突检测（后者记
+   stem_collision 不覆盖）；小批次（<3）或 workers=1 顺序路径；
+   summary.json（total/success/failed/workers/wall_time_seconds/errors）；
+   进度条 tqdm 可选（未装或非 TTY → 每文档一行 stderr）。
+2. `app/cli.py`：`batch-parse` 子命令（目录递归 pdf/docx/md、glob、
+   单文件三态；退出码 0 全成/1 有败/2 用法）。
+3. `evaluation/cli.py` + `runner.py`：`run --workers N`（默认 1）；
+   >1 且 ≥3 文档走 Pool.imap（保序），auto 未注册类型父进程合成失败
+   不派发；per_doc 按 manifest 原序装配；expected_failures 保持顺序。
+
+**实现期发现的契约偏差（GPT 示例 vs 实际，按"契约优先"处理）**：
+1. 示例用 click——项目实际 argparse（parse/validate 同款风格）。
+2. 示例 `process_single(src, parser=...)`——实际签名
+   `(input, output, *, parser_name, max_chars, write_json)`。
+3. 示例 summary.wall_time_seconds=sum(各文档 seconds)——改为父进程
+   墙钟（并行加速比据此才真实；逐文档 seconds 仍在结果 dict 保留）。
+4. 示例 error_code=type(e).__name__——改用 pipeline 结构化
+   ErrorRecord.code（file_not_found 等，与单文档 CLI 错误码一致）。
+5. 示例全部文件走单一 parser_name——实测 fallback parser 不支持
+   .md（仅 pdf/docx），批模式按扩展名路由 .md → markdown
+   （effective_parser_for；仅 fallback 时路由，显式指定不覆盖）。
+6. summary.workers 记录实际生效值（顺序路径记 1）。
+7. runner 并行实现为 run_evaluation 增 workers 参数 + 保序 imap
+   （非独立 run_evaluation_parallel 函数）；workers=1 路径与原顺序
+   代码同构（相同 _process_one 调用序 + 相同装配），报告逐字节不变。
+
+**测试**：`tests/test_batch_parse.py` 12 项——裁决 3.1 六项（10 文档
+并行批、顺序并行输出逐字节一致、错误隔离（缺失文件不中断批）、stem
+冲突不覆盖、小批次顺序路径、summary 格式）+ default_workers 上界 +
+md 路由 + CLI 三态冒烟（rc 0/1/2）+ evaluation 并行报告一致性
+（metrics/parser_used/summary/devset 相同，wall_time 除外）。
+全量回归 **5175 passed**（5163 + 12，零回归）。
+
+**性能基准（devset 10 文档，手动，Windows 11 / 14 核）**：
+- workers=1：wall 5485 ms（含解释器启动与导入）
+- workers=8：wall 2614 ms → **加速比 2.10×（≥2× 验收线 PASS）**
+- workers=4：wall 2373 ms → 2.31×（spawn+导入开销在小 devset 上
+  显著，4 进程反而最优；批量更大时 8 优势应扩大）
+- per-doc total 之和：seq 4.45 s vs par 3.97 s（含轻微争用）
+- 报告：outputs/b16-bench-{seq,par}.json（gitignored）
+
+**一致性验证**：`scripts/verify_batch16_parallel_consistency.py`
+对 b16-bench 两份报告 rc=0——per_doc 按 doc_id 排序后逐字节相同
+（wall_time_seconds 除外）；summary/devset/expected_failures/
+provenance（剔 run_timestamp_iso/git 状态）一致。
+report_version 1.3 与 EVALUATOR_VERSION 1.10 不变（裁决确认）。
+
+**文档更新**：README 可选依赖节（tqdm）；CLAUDE.md 范围节（多进程
+移出"不做"清单）+ 并行化章节 + 常用命令；docs/BACKLOG.md 第 5 项
+（segfault 限制）。
