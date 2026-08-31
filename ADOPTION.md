@@ -2481,3 +2481,33 @@ null/file_warning 逐码/append 两轮/eval 事件含 doc_error（fallback 拒
 
 **devset 真实日志验证**：batch 16 文件（13 成功 + 3 stem_collision）
 与 eval 10 文档（10 成功）各生成 JSONL，verify 脚本均 rc=0。
+
+## 五十四、批次 17 封口裁决记录（Stage-8-Batch-17-Closed，2026-08-31）
+
+**裁决结论**（会话 cf170a6f，GPT 5.6 Sol）：
+
+1. **执行验收全部通过 ✓**：实现（jsonlog.py + batch 5 事件流式发射 +
+   evaluation 4 事件 + CLI 双参数 + verify 脚本）；验收对照 14/14；
+   测试 12 项 + 全量回归 5187（5175+12 零回归）；devset 真实日志
+   （batch 16 文件 + eval 10 文档，verify 均 rc=0）；文档三处。
+2. **6 项契约偏差全部追认 ✓**（各附理由）：error_message（LogRecord
+   保留属性 KeyError 冒烟实证）、record.__dict__ 扫描（extra= 实际
+   机制）、record.created（事件真实时间）、NullHandler（边界 2 预
+   申报）、流式发射（JSON Lines 理念）、manifest_label（Manifest
+   无 path 字段）。
+3. **归档编号：Stage-8-Batch-17-Closed。**
+4. **合并推送授权：通过**（ff-only 合并
+   integration/stage8-batch17-structured-logging @ 6b375c5 并推送
+   origin/main，立即执行）。
+5. **下一批次指定：批次 18（Parser 插件化与扩展接口）**——Parser
+   抽象接口（Protocol/ABC + name/supported_extensions/priority 元
+   数据）、注册表（register/get/discover + 扩展名自动发现 + 优先级
+   排序）、现有 parser 迁移（fallback/markdown/kreuzberg）、外部
+   插件示例（推荐 Markdown Enhanced：YAML frontmatter → metadata）、
+   CLI（list-parsers / --parser 支持插件名 / 自动发现）。
+   步骤 1 设计决策（方案 A Protocol+装饰器 vs B ABC+显式注册 / 接口
+   设计 / 注册表 API / 插件示例功能清单 / CLI 命令 / 边界声明）需
+   汇报后裁决；步骤 2–5 待裁决后执行。
+
+**执行记录**：本节归档后随分支一并合并推送（封口记录提交在合并授权
+范围内）。
