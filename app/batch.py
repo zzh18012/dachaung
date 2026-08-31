@@ -14,10 +14,12 @@ import json
 import os
 import sys
 import time
+import traceback as traceback_mod
 from multiprocessing import Pool
 from pathlib import Path
 from typing import Any, Iterable
 
+from app.jsonlog import setup_logger
 from app.pipeline import process_single
 
 try:  # 可选依赖：新增依赖须用户单独批准，未装时降级为逐行进度
@@ -48,20 +50,24 @@ def _result(
     success: bool,
     seconds: float,
     *,
+    parser: str | None = None,
     elements: int = 0,
     chunks: int = 0,
     warning_codes: list[str] | None = None,
     code: str | None = None,
     message: str | None = None,
+    tb: str | None = None,
 ) -> dict[str, Any]:
     return {
         "file": str(file),
         "success": success,
+        "parser": parser,
         "elements": elements,
         "chunks": chunks,
         "warnings": warning_codes or [],
         "error_code": code,
         "error_message": message,
+        "traceback": tb,
         "seconds": seconds,
     }
 
@@ -80,6 +86,7 @@ def parse_one_file(args: tuple) -> dict[str, Any]:
     if not src_path.is_file():
         return _result(
             src_path, False, time.perf_counter() - t0,
+            parser=parser_name,
             code="file_not_found", message=f"输入文件不存在: {src_path}",
         )
 
@@ -94,7 +101,9 @@ def parse_one_file(args: tuple) -> dict[str, Any]:
     except Exception as exc:  # noqa: BLE001 — 裁决要求错误隔离：任何异常都转为失败结果
         return _result(
             src_path, False, time.perf_counter() - t0,
+            parser=parser_name,
             code=type(exc).__name__, message=str(exc),
+            tb=traceback_mod.format_exc(),
         )
 
     seconds = time.perf_counter() - t0
@@ -109,12 +118,14 @@ def parse_one_file(args: tuple) -> dict[str, Any]:
         first = errors[0].to_dict()
         return _result(
             src_path, False, seconds,
+            parser=parser_name,
             code=first.get("code"), message=first.get("message"),
         )
 
     assert document is not None
     return _result(
         src_path, True, seconds,
+        parser=parser_name,
         elements=len(document.elements),
         chunks=len(document.chunks),
         warning_codes=[w.code for w in document.warnings],
@@ -135,22 +146,57 @@ def _progress(iterable: Iterable[dict[str, Any]], total: int, desc: str):
         yield r
 
 
+def _log_file_event(logger, r: dict[str, Any]) -> None:
+    """结果到达即发：success → file_complete + 逐 warning 码；else → file_error。"""
+    if r["success"]:
+        logger.info(
+            "file_complete",
+            extra={
+                "file": r["file"],
+                "parser": r["parser"],
+                "elements": r["elements"],
+                "chunks": r["chunks"],
+                "seconds": r["seconds"],
+            },
+        )
+        for wc in r["warnings"]:
+            logger.warning("file_warning", extra={"file": r["file"], "warning_code": wc})
+    else:
+        logger.error(
+            "file_error",
+            extra={
+                "file": r["file"],
+                "parser": r["parser"],
+                "error_code": r["error_code"],
+                # "message" 是 LogRecord 保留属性，extra 不可用 → error_message
+                "error_message": r["error_message"],
+                "traceback": r["traceback"],
+            },
+        )
+
+
 def batch_parse_files(
     file_list: Iterable[str | Path],
     output_dir: str | Path,
     *,
     parser_name: str = "fallback",
     max_chars: int = 800,
+    log_file: str | Path | None = None,
+    verbose: bool = False,
     workers: int | None = None,
 ) -> dict[str, Any]:
     """批量解析并写盘，返回 summary dict（同时写 <output_dir>/summary.json）。
 
     summary.wall_time_seconds 为父进程墙钟（并行加速比据此计算），
     不是各文档 seconds 之和。
+
+    log_file / verbose：结构化 JSONL 日志（app.jsonlog.setup_logger）。
+    事件在结果到达时流式发射（并行下非 manifest 顺序）。
     """
     workers = default_workers() if workers is None else max(1, int(workers))
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    logger = setup_logger("app.batch", log_file, verbose)
 
     files = [Path(f) for f in file_list]
 
@@ -178,20 +224,43 @@ def batch_parse_files(
         workers if workers > 1 and len(args_list) >= SEQUENTIAL_THRESHOLD else 1
     )
 
-    wall0 = time.perf_counter()
-    if effective_workers == 1:
-        results = list(
-            _progress((parse_one_file(a) for a in args_list), len(args_list), "parse")
+    logger.info(
+        "batch_start",
+        extra={
+            "workers": effective_workers,
+            "file_count": len(files),
+            "parser": parser_name,
+            "max_chars": max_chars,
+        },
+    )
+    for ce in collision_errors:
+        logger.error(
+            "file_error",
+            extra={
+                "file": ce["file"],
+                "error_code": ce["code"],
+                "error_message": ce["message"],
+                "traceback": None,
+            },
         )
+
+    wall0 = time.perf_counter()
+    results: list[dict[str, Any]] = []
+    if effective_workers == 1:
+        for r in _progress(
+            (parse_one_file(a) for a in args_list), len(args_list), "parse"
+        ):
+            _log_file_event(logger, r)
+            results.append(r)
     else:
         with Pool(effective_workers) as pool:
-            results = list(
-                _progress(
-                    pool.imap_unordered(parse_one_file, args_list),
-                    len(args_list),
-                    "parse",
-                )
-            )
+            for r in _progress(
+                pool.imap_unordered(parse_one_file, args_list),
+                len(args_list),
+                "parse",
+            ):
+                _log_file_event(logger, r)
+                results.append(r)
     wall = time.perf_counter() - wall0
 
     failed_results = [r for r in results if not r["success"]]
@@ -214,6 +283,15 @@ def batch_parse_files(
         "wall_time_seconds": wall,
         "errors": errors,
     }
+
+    logger.info(
+        "batch_complete",
+        extra={
+            "success": summary["success"],
+            "failed": summary["failed"],
+            "wall_time_seconds": wall,
+        },
+    )
 
     with (out_dir / "summary.json").open("w", encoding="utf-8") as fh:
         json.dump(summary, fh, ensure_ascii=False, indent=2)

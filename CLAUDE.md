@@ -21,6 +21,14 @@
 - **已知限制**：pdfplumber C 库 segfault 可能破坏进程池（docs/BACKLOG.md）
 - 小批次（<3 文件）或 workers=1 自动走顺序路径；tqdm 为可选依赖（未装降级为逐行进度）
 
+## 结构化日志（Stage 8 批次 17）
+
+- `app/jsonlog.py`：`JSONFormatter`（record.msg → event，extra= 字段顶层展开）+ `setup_logger`
+- `batch-parse` 与 `evaluation.cli run` 均支持 `--log-file`（JSONL，append）与 `--verbose`（stderr）；默认零输出变化（NullHandler，防 lastResort 泄漏）
+- 事件：batch_start / file_complete / file_warning / file_error（含 traceback）/ batch_complete；eval_start / doc_complete / doc_error / eval_complete
+- 错误事件的文本字段名是 `error_message`（`message` 是 LogRecord 保留属性，extra 不可用）
+- 已知限制：日志 append 不轮转（需手动清理）；traceback 首版不截断；timestamp 为 epoch 秒
+
 ## 环境
 
 - 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
@@ -64,6 +72,10 @@ uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.
 .venv/Scripts/python.exe -m evaluation.cli run \
   --manifest samples/private/devset/manifest.json \
   --output outputs/evaluation-parallel.json --workers 8
+
+# Stage 8 批次 17：结构化日志（--log-file 建议写 outputs/ 下，gitignored；append 模式需定期清理）
+.venv/Scripts/python.exe -m app.cli batch-parse samples/private/docs \
+  -o outputs/batch --log-file outputs/batch.jsonl --verbose
 ```
 
 ## Stage 2 评测规则（当前阶段）

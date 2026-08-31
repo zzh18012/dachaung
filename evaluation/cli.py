@@ -62,6 +62,16 @@ def _build_parser() -> argparse.ArgumentParser:
         default=1,
         help="文档级并行进程数（默认 1=顺序行为，报告不变；>1 并行，结果按 manifest 原序装配）",
     )
+    run_p.add_argument(
+        "--log-file",
+        default=None,
+        help="结构化日志（JSONL，append）输出路径，建议 outputs/ 下（gitignored）",
+    )
+    run_p.add_argument(
+        "--verbose",
+        action="store_true",
+        help="把结构化日志同时打到 stderr（与进度输出可能交错）",
+    )
 
     val_p = sub.add_parser(
         "validate-report", help="校验评测报告是否符合 evaluation-report.schema.json"
@@ -92,6 +102,9 @@ def main(argv: list[str] | None = None) -> int:
                 parser_name=args.parser,
                 max_chars=args.max_chars,
                 tolerance_chars=args.tolerance_chars,
+                log_file=args.log_file,
+                verbose=args.verbose,
+                manifest_label=manifest_path.as_posix(),
                 workers=args.workers,
             )
         except EvalSchemaError as e:

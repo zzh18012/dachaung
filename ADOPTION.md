@@ -2425,3 +2425,59 @@ report_version 1.3 与 EVALUATOR_VERSION 1.10 不变（裁决确认）。
 
 **执行记录**：本节归档后随分支一并合并推送（封口记录提交在合并授权
 范围内）。
+
+## 五十三、批次 17 执行记录（结构化日志，Option A，2026-08-31）
+
+**设计裁决**（会话 cf170a6f，GPT 5.6 Sol，全票）：方案 A（Python logging +
+自定义 JSONFormatter，零新增依赖）；事件 schema 见下；CLI --log-file +
+--verbose；8 条边界（默认零输出变化/JSON Lines/多 handler/append/verbose
+交错提示/worker 隔离/轮转留后/traceback 首版不截断）。
+
+**实现**：
+
+- `app/jsonlog.py`（新建）：`JSONFormatter`（record.msg → event，extra=
+  字段经 record.__dict__ 扫描顶层展开，排除 LogRecord 保留属性）+
+  `setup_logger`（log_file/verbose 可同开，两者皆无挂 NullHandler）。
+- `app/batch.py`：worker 返回 dict 增 parser/traceback 字段；
+  batch_parse_files 增 log_file/verbose 参数；事件 batch_start
+  {workers,file_count,parser,max_chars} → 碰撞 file_error（traceback=null）
+  → 流式逐结果 file_complete{file,parser,elements,chunks,seconds} /
+  逐 warning 码 file_warning{file,warning_code} / 失败
+  file_error{file,parser,error_code,error_message,traceback} →
+  batch_complete{success,failed,wall_time_seconds}。
+- `evaluation/runner.py`：run_evaluation 增 log_file/verbose/
+  manifest_label 参数；eval_start{parser,doc_count,manifest_label} →
+  装配循环内 doc_complete{doc_id,source_type,parser_used,seconds} /
+  doc_error{doc_id,error_code,error_message} → eval_complete{success,
+  failed,wall_time_seconds}。
+- CLI：app/cli.py batch-parse 与 evaluation/cli.py run 增
+  --log-file（help 注明建议 outputs/，gitignored）与 --verbose。
+- `scripts/verify_batch17_log_completeness.py`（新建）：首尾事件 +
+  file_complete+file_error==file_count（eval 同构）校验，rc 0/1/2。
+
+**契约偏差（待追认）**：
+
+1. 错误事件文本字段名 `error_message` 而非 `message`——"message" 是
+   LogRecord 保留属性，`extra={"message":...}` 直接 KeyError（冒烟
+   实证），与 batch result dict 键名一致。
+2. JSONFormatter 扫描 `record.__dict__` 而非 GPT 示例的
+   `record.extra` dict——logging 的 extra= 实际机制是设置 record
+   属性，不存在 record.extra。
+3. timestamp 用 `record.created` 而非 format 时 `time.time()`——
+   记录事件真实发生时间。
+4. NullHandler——GPT 蓝图未提，但无 handler 时 logging lastResort
+   会把 WARNING+ 泄漏到 stderr，违反"默认零输出变化"（设计阶段已
+   预申报，含在 8 边界内）。
+5. file 事件在结果到达时流式发射（并行下非提交顺序）——非"全部
+   完成后统一发射"，便于实时观测。
+6. eval 事件增 `manifest_label`（CLI 传 manifest 路径）——Manifest
+   对象无 path 字段，事件需可辨认清单来源。
+
+**测试**：`tests/test_jsonlog.py` 12 项（formatter 格式/中文往返/双
+handler/NullHandler 静默 capfd 实证/batch 事件完整性/碰撞 file_error/
+traceback 捕获（RuntimeError 冒烟 monkeypatch）/file_not_found traceback=
+null/file_warning 逐码/append 两轮/eval 事件含 doc_error（fallback 拒
+.md → unsupported_type 真实路径）/doc_complete 字段/CLI 透传）。
+
+**devset 真实日志验证**：batch 16 文件（13 成功 + 3 stem_collision）
+与 eval 10 文档（10 成功）各生成 JSONL，verify 脚本均 rc=0。

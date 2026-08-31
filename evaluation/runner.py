@@ -18,6 +18,7 @@ from multiprocessing import Pool
 from pathlib import Path
 from typing import Any
 
+from app.jsonlog import setup_logger
 from app.pipeline import process_single
 
 from evaluation import REPORT_VERSION
@@ -137,6 +138,9 @@ def run_evaluation(
     parser_name: str = "fallback",
     max_chars: int = 800,
     tolerance_chars: int = 30,
+    log_file: str | Path | None = None,
+    verbose: bool = False,
+    manifest_label: str | None = None,
     workers: int | None = 1,
 ) -> dict[str, Any]:
     """跑评测主流程，返回报告 dict（同时写到 output_path）。
@@ -144,17 +148,32 @@ def run_evaluation(
     workers=1（默认）：顺序行为，报告与历史逐字节一致。
     workers>1：文档级并行（multiprocessing.imap 保序），per_doc 仍按
     manifest 原序装配；expected_failures 保持顺序（仅少量文档，不并行）。
+
+    log_file / verbose：结构化 JSONL 日志；manifest_label 由 CLI 传入
+    （Manifest 无 path 字段，事件需可辨认清单来源）。
     """
     output_root = Path(output_path).parent
     output_root.mkdir(parents=True, exist_ok=True)
+    logger = setup_logger("evaluation.runner", log_file, verbose)
+    wall0 = time.perf_counter()
 
     per_doc_results: list[dict[str, Any]] = []
     parser_version_for_prov: str | None = None
+    doc_success = 0
+    doc_failed = 0
 
     # 批次 16：文档级并行（Option A，imap 保序）。workers=1（默认）保持原顺序
     # 行为；auto 未注册 source_type 的文档在父进程合成失败，不派发。
     workers = 1 if workers is None else max(1, int(workers))
     docs = list(manifest.documents)
+    logger.info(
+        "eval_start",
+        extra={
+            "parser": parser_name,
+            "doc_count": len(docs),
+            "manifest_label": manifest_label,
+        },
+    )
     effective_parsers: list[str | None] = [
         _resolve_parser_name(parser_name, doc.source_type) for doc in docs
     ]
@@ -195,6 +214,29 @@ def run_evaluation(
         effective_parser = effective_parsers[i]
         if parser_version and not parser_version_for_prov:
             parser_version_for_prov = parser_version
+
+        if error is None:
+            doc_success += 1
+            logger.info(
+                "doc_complete",
+                extra={
+                    "doc_id": doc.doc_id,
+                    "source_type": doc.source_type,
+                    "parser_used": effective_parser or "none",
+                    "seconds": total_seconds,
+                },
+            )
+        else:
+            doc_failed += 1
+            logger.error(
+                "doc_error",
+                extra={
+                    "doc_id": doc.doc_id,
+                    "error_code": error.get("code"),
+                    # "message" 是 LogRecord 保留属性，extra 不可用 → error_message
+                    "error_message": error.get("message"),
+                },
+            )
 
         metrics = compute_automatic_metrics(
             document=document,
@@ -309,6 +351,15 @@ def run_evaluation(
     out_p.parent.mkdir(parents=True, exist_ok=True)
     with out_p.open("w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
+
+    logger.info(
+        "eval_complete",
+        extra={
+            "success": doc_success,
+            "failed": doc_failed,
+            "wall_time_seconds": time.perf_counter() - wall0,
+        },
+    )
 
     return report
 

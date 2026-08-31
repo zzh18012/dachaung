@@ -97,6 +97,16 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         default=None,
         help=f"并行进程数（默认 min(cpu_count, 8) = {default_workers()}）",
     )
+    batch.add_argument(
+        "--log-file",
+        default=None,
+        help="结构化日志（JSONL，append）输出路径，建议 outputs/ 下（gitignored）",
+    )
+    batch.add_argument(
+        "--verbose",
+        action="store_true",
+        help="把结构化日志同时打到 stderr（与进度输出可能交错）",
+    )
     return p
 
 
@@ -190,6 +200,8 @@ def main(argv: list[str] | None = None) -> int:
             out_dir,
             parser_name=args.parser,
             max_chars=args.max_chars,
+            log_file=args.log_file,
+            verbose=args.verbose,
             workers=args.workers,
         )
         status = "[OK]" if summary["failed"] == 0 else "[FAIL]"

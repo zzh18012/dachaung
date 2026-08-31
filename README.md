@@ -111,6 +111,42 @@ CLI 不会崩溃，会输出结构化 JSON 到 stderr 并返回非零：
 
 **失败时不残留半成品 JSON**（CLI 会主动清理）。
 
+### 3.4 结构化日志（`--log-file` / `--verbose`，Stage 8 批次 17）
+
+`batch-parse` 与 `evaluation.cli run` 支持结构化 JSONL 日志（每行一个 JSON 对象）：
+
+```bash
+# 推荐写到 outputs/ 下（已 gitignored）
+.venv/Scripts/python.exe -m app.cli batch-parse samples/private/devset \
+    -o outputs/batch-out --log-file outputs/batch.jsonl
+
+# 同时打到 stderr（与进度输出可能交错，建议用 --log-file 获得干净日志）
+.venv/Scripts/python.exe -m evaluation.cli run \
+    --manifest samples/private/devset/manifest.json --output outputs/eval.json \
+    --log-file outputs/eval.jsonl --verbose
+```
+
+事件类型：`batch_start` / `file_complete` / `file_warning` / `file_error`（含
+`traceback`）/ `batch_complete`；评测侧 `eval_start` / `doc_complete` /
+`doc_error` / `eval_complete`。默认（不带参数）零输出变化。
+
+注意事项：
+
+- **append 模式**：日志只追加不覆盖，需定期手动清理（无自动轮转）。
+- `timestamp` 为 epoch 秒，转 ISO：
+
+```python
+import datetime
+datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc).isoformat()
+```
+
+- 完整性校验（首尾事件 + 逐文档事件数 == 文档总数）：
+
+```bash
+.venv/Scripts/python.exe scripts/verify_batch17_log_completeness.py \
+    --log outputs/batch.jsonl --kind batch
+```
+
 ---
 
 ## 4. 输出格式（简化示例）
