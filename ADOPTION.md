@@ -2131,3 +2131,42 @@ evaluator_version=1.10 / report_version=1.3 不变（评测器零改动）。
   silent_drop 0 / markers 3/3）→ devset 重跑 + 归因
   （002-DOCX 改善，其余 9 文档零漂移）→ 封口（回归 + 记录 +
   合并推送）。验收标准 7 项见裁决原文。
+
+## 四十六、批次 14 执行记录（w:sdt 嵌套欠提取修复，2026-08-31）
+
+**技术方案裁决（会话 cf170a6f，2026-08-31）**：Option A（递归扫描生成器）批准，
+4 项理由全部成立；实现伪代码确认；4 项边界声明确认（无 sdtContent 跳过／嵌套
+sdt 递归／w:tc 内 sdt 不处理／heading 按实测归因）。验收标准调整：heading
+10 → 13–15（范围容差）、image 0 → 2（精确）、silent_drop 7 → 0–2、
+required_markers 0/3 → 3/3。执行指令：实现 + 8 项测试 + 全量回归 5155 +
+002-DOCX 验证 + devset 重跑归因 + 文档 + 封口。
+
+**实现（integration/stage7-batch14-sdt-nested，基于 main@69b4d1c）**：
+- `app/parsers/fallback_parser.py`：新增 `_iter_flow_elements(el)` 递归生成器
+  （深度优先产出 w:p/w:tbl，下钻 w:sdt/w:sdtContent；其余 tag 跳过）；
+  `_parse_docx` 主循环迭代源 `body.iterchildren()` → `_iter_flow_elements(body)`，
+  段落/图片/表格分支逻辑与计数器零改动。
+- 裁决偏差声明（已在步骤 1 汇报）：裁决所写 `app/parsers/docx_parser.py`
+  不存在，实际文件为 `app/parsers/fallback_parser.py` 的 `_parse_docx()`。
+
+**已知边界（裁决要求记录）**：批次 14 修复 body 顶层 w:sdt 嵌套内容欠提取。
+已知边界：表格单元格（w:tc）内的 w:sdt 未处理，需单独修复（backlog）。
+
+**测试（tests/test_docx_sdt_nested.py，8 项全过）**：
+sdt 内 heading 提取与 paragraph_index 连续；文档顺序 DFS（A,sdt(B,C),D）；
+sdt 内表格与 table_index 计数；嵌套 sdt 递归（2 层）；裸 sdt（无 sdtContent）
+跳过且零警告；空 sdtContent 跳过；混合结构（封面 sdt + body 交错，计数器连续，
+schema 校验通过）；无 sdt 文档零回归。
+
+**验收（对照调整后标准）**：
+- 回归：pytest 全量 **5155 passed**（5147 + 8，零回归）。
+- DC-REAL-002-DOCX：heading **10 → 15（GT=15，精确命中）**；image
+  **0 → 2（GT=2 精确）**；table 15 不变（GT=15）；silent_drop
+  **7 → 0**（标准 0–2）；required_markers **0/5 → 5/5**（封面 3 个全恢复，
+  另 2 个 GT marker 同步恢复）；image_resource_exists_ratio
+  null(no_image_elements) → **1.0**；element_count_total 57 → 81
+  （+15 heading/图片增量 +9 封面普通段落）。
+- devset 重跑（outputs/evaluation-batch14-real-corpus.json，报告校验通过）：
+  10/10 成功；归因 **仅 DC-REAL-002-DOCX 变化，其余 9 文档逐指标零漂移**；
+  summary.silent_drop_total 51 → 44（−7，恰为 002 的全部 drop）。
+- devset_status=incomplete（10 文件，pilot baseline，不代表项目总体准确率）。

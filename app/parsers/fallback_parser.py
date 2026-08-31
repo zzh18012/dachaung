@@ -602,6 +602,24 @@ def _extract_inline_image_rids(paragraph_xml) -> list[str]:
     return rids
 
 
+def _iter_flow_elements(el):
+    """递归提取 body/sdtContent 内的段落和表格（保持文档顺序）。
+
+    批次 14：w:body 顶层的 w:sdt（结构化文档标签容器）此前被主循环整块跳过，
+    导致封面等内容（标题/图片/marker）静默丢失；此处深度优先下钻 w:sdtContent。
+    已知边界：表格单元格（w:tc）内的 w:sdt 未处理（表格内容走 _rows_to_markdown 单独管线）。
+    """
+    for child in el.iterchildren():
+        tag = child.tag
+        if tag == qn("w:p") or tag == qn("w:tbl"):
+            yield child
+        elif tag == qn("w:sdt"):
+            content = child.find(qn("w:sdtContent"))
+            if content is not None:
+                yield from _iter_flow_elements(content)  # 递归
+        # 其余（w:sectPr 等）跳过
+
+
 def _parse_docx(
     path: Path,
     source_hash: str,
@@ -630,7 +648,7 @@ def _parse_docx(
     para_counter = 0
     table_counter = 0
     section_idx = 0
-    for child in body.iterchildren():
+    for child in _iter_flow_elements(body):
         tag = child.tag
         if tag == qn("w:p"):  # paragraph
             from docx.text.paragraph import Paragraph
