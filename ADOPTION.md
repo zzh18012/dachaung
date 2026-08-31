@@ -2170,3 +2170,27 @@ schema 校验通过）；无 sdt 文档零回归。
   10/10 成功；归因 **仅 DC-REAL-002-DOCX 变化，其余 9 文档逐指标零漂移**；
   summary.silent_drop_total 51 → 44（−7，恰为 002 的全部 drop）。
 - devset_status=incomplete（10 文件，pilot baseline，不代表项目总体准确率）。
+
+## 四十七、批次 14 封口裁决记录（Stage-7-Batch-14-Closed，2026-08-31）
+
+**裁决结论**（会话 cf170a6f，GPT 5.6 Sol）：
+- 执行验收全部通过：实现 ✓（Option A 按批准伪代码，路径偏差追认）；
+  8 项测试 ✓；全量回归 5155 ✓（零回归）；002-DOCX 精确达标
+  （heading 15/15、image 2/2、silent_drop 0、markers 5/5 超预期、
+  image ratio 1.0、element_total 81）；devset 归因 PASS（其余 9 文档
+  零漂移、MVP 两文档零漂移、silent_drop_total 51→44）；已知边界
+  文档化 ✓（§四十六）。
+- **归档编号：Stage-7-Batch-14-Closed。**
+- **合并推送授权：通过**（ff-only 合并 integration/stage7-batch14-sdt-nested
+  @ bbb7022 并推送 origin/main，立即执行）。
+
+**Stage 7 全景回顾（裁决原文）**：轨道 A 批次 9/10（figure_caption_pairs
+标注解锁，1.0/1.0/1.0）；轨道 B 批次 11（heading_order_*）/12
+（table_caption_*）/13（真实语料 devset 2→10）；修复批次 14
+（w:sdt 欠提取）。全部封口。
+
+**下一批次候选（裁决列出，待确认）**：A：PDF 矢量图 image 计数修复
+（影响 3 文档，优先级中，可行性高，裁决推荐第一）；B：004-PDF 多栏题注
+碎字符（复杂度最高）；C：002-PDF 表单域标签误判；D：001-PDF 跨页表格
+拆分；或进入 Stage 8（剩余修复归 backlog）。
+确认结果见下一节记录。
