@@ -15,31 +15,14 @@ from typing import Any
 from app.chunkers import StructuralChunker
 from app.hash import compute_file_hash
 from app.models import Document, ErrorRecord
+from app.parser_registry import get_parser as _registry_get_parser
 from app.parsers import Parser, ParserError
-from app.parsers.fallback_parser import FallbackParser
-from app.parsers.html_parser import HtmlParser
-from app.parsers.ipynb_parser import IpynbParser
-from app.parsers.kreuzberg_parser import KreuzbergParser
-from app.parsers.markdown_parser import MarkdownParser
-from app.parsers.text_parser import TextParser
 from app.schema import SchemaValidationError, validate
 
 
 def get_parser(name: str, image_output_dir: Path | str | None = None) -> Parser:
-    """parser 名称 → 实例。业务代码通过这个名字选实现。"""
-    if name == "fallback":
-        return FallbackParser(image_output_dir=image_output_dir)
-    if name == "kreuzberg":
-        return KreuzbergParser()
-    if name == "markdown":
-        return MarkdownParser()
-    if name == "html":
-        return HtmlParser()
-    if name == "text":
-        return TextParser()
-    if name == "ipynb":
-        return IpynbParser()
-    raise ValueError(f"未知 parser: {name}（支持: fallback, kreuzberg, markdown, html, text, ipynb）")
+    """parser 名称 → 实例。委托注册表（批次 18），调用方接口不变。"""
+    return _registry_get_parser(name, image_output_dir)
 
 
 def process_single(

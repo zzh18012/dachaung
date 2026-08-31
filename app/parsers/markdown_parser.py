@@ -97,6 +97,8 @@ class MarkdownParser(Parser):
 
     name = "markdown"
     version = "stdlib/0.1.0"
+    supported_extensions = _MD_EXTENSIONS
+    priority = 20
 
     def parse(self, path: str | Path, source_hash: str) -> Document:
         p = Path(path)

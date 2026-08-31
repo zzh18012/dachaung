@@ -147,6 +147,43 @@ datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc).isoformat()
     --log outputs/batch.jsonl --kind batch
 ```
 
+### 3.5 Parser 注册表与插件（Stage 8 批次 18）
+
+```bash
+# 列出已注册 parser（含插件）
+.venv/Scripts/python.exe -m app.cli list-parsers
+
+# 按扩展名自动发现（priority 小者优先；显式 --parser 永远覆盖发现）
+.venv/Scripts/python.exe -m app.cli parse doc.md -o out.json --parser auto
+```
+
+内置参考插件 `markdown_enhanced`（priority 5）：YAML frontmatter 受限解析
+（仅扁平 `key: scalar`，嵌套/列表记 warning 跳过，不伪装完整 YAML）+
+GFM 任务列表（`- [ ]` / `- [x]` → `metadata.task_item` / `metadata.checked`）。
+
+**外部插件开发指南**：写一个继承 `app.parsers.base.Parser` 的类（实现
+`parse(path, source_hash) -> Document`，声明 `name` / `version` /
+`supported_extensions` / `priority`），在自己的模块里 import 后用装饰器注册：
+
+```python
+from app.parser_registry import register
+from app.parsers.base import Parser
+
+@register
+class MyParser(Parser):
+    name = "my_parser"
+    version = "1.0.0"
+    supported_extensions = (".myx",)
+    priority = 100
+
+    def parse(self, path, source_hash):
+        ...
+```
+
+然后 `import` 该模块即可被 `list-parsers` / `--parser auto` 发现。
+不做 entry_points 自动扫描（显式优于隐式）；重名注册在 import 时即报
+ValueError。完整 YAML（PyYAML）支持见 docs/BACKLOG.md。
+
 ---
 
 ## 4. 输出格式（简化示例）

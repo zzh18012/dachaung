@@ -38,3 +38,12 @@
 - 缓解建议：批量处理前对可疑文档先单文档预测试（`app.cli parse`）
 - 依据：批次 16 步骤 1 裁决（2026-08-31，会话 cf170a6f）
 - 状态：已知限制（本批不修）
+
+## 6. markdown_enhanced 的完整 YAML frontmatter 支持
+
+- 影响范围：Stage 8 批次 18 参考插件（app/parsers/plugins/markdown_enhanced.py）
+- 现象：受限解析仅支持扁平 `key: scalar`；嵌套/列表/映射值记
+  `frontmatter_*_skipped` warning 后跳过，不伪装为完整 YAML
+- 升级条件：需要 PyYAML 依赖（**新增主依赖须用户单独批准**，项目规则禁止未批准引入）；批准后替换 `_parse_frontmatter` 并保留降级语义
+- 依据：批次 18 步骤 1 裁决第 7 条（2026-08-31，会话 6a952dc9）
+- 状态：backlog

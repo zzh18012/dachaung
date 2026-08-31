@@ -84,6 +84,8 @@ class IpynbParser(Parser):
 
     name = "ipynb"
     version = "stdlib/0.1.0"
+    supported_extensions = (".ipynb",)
+    priority = 100
 
     def parse(self, path: str | Path, source_hash: str) -> Document:
         p = Path(path)

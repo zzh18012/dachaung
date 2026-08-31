@@ -29,6 +29,14 @@
 - 错误事件的文本字段名是 `error_message`（`message` 是 LogRecord 保留属性，extra 不可用）
 - 已知限制：日志 append 不轮转（需手动清理）；traceback 首版不截断；timestamp 为 epoch 秒
 
+## Parser 注册表（Stage 8 批次 18）
+
+- `app/parser_registry.py`：`register`（装饰器兼容）/ `get_parser` / `discover_parser`（扩展名 → priority 最小者名称）/ `list_parsers`
+- `pipeline.get_parser` 委托注册表，调用方接口不变；`--parser` 默认仍 fallback（零变化），显式 `--parser auto` 走扩展名发现
+- Parser 元数据：`supported_extensions`（空 = 不参与发现，仅显式指定）与 `priority`（小者优先；平局先注册者胜 + UserWarning）；重名注册 import 时 ValueError
+- 参考插件 `app/parsers/plugins/markdown_enhanced.py`（priority 5）：frontmatter 受限解析（仅扁平 key: scalar，嵌套/列表 warning 跳过）+ GFM 任务列表；外部插件 = 自定义模块 import + `@register`（无 entry_points 扫描）
+- `app.cli list-parsers` 列出全部已注册 parser；evaluation 的 AUTO_PARSER_BY_SOURCE_TYPE 是 source_type 语义，与扩展名发现并存，评测不改
+
 ## 环境
 
 - 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
@@ -76,6 +84,10 @@ uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.
 # Stage 8 批次 17：结构化日志（--log-file 建议写 outputs/ 下，gitignored；append 模式需定期清理）
 .venv/Scripts/python.exe -m app.cli batch-parse samples/private/docs \
   -o outputs/batch --log-file outputs/batch.jsonl --verbose
+
+# Stage 8 批次 18：parser 注册表（列出已注册 parser / 扩展名自动发现）
+.venv/Scripts/python.exe -m app.cli list-parsers
+.venv/Scripts/python.exe -m app.cli parse <input.md> -o out.json --parser auto
 ```
 
 ## Stage 2 评测规则（当前阶段）

@@ -38,8 +38,20 @@ def default_workers() -> int:
 
 
 def effective_parser_for(parser_name: str, path: str | Path) -> str:
-    """批模式按扩展名路由：fallback 仅支持 pdf/docx，.md 走 markdown。"""
+    """批模式按扩展名路由。
+
+    - auto：注册表 discover_parser（priority 最小者）；无候选时回落
+      fallback（worker 侧产出 unsupported_type 结构化错误，不炸批）
+    - fallback 仅支持 pdf/docx，.md 走 markdown（批次 16 既有行为）
+    """
+    from app.parser_registry import discover_parser
+
     p = Path(path)
+    if parser_name == "auto":
+        try:
+            return discover_parser(p)
+        except ValueError:
+            return "fallback"
     if parser_name == "fallback" and p.suffix.lower() == ".md":
         return "markdown"
     return parser_name

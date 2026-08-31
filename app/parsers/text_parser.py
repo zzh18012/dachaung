@@ -73,6 +73,8 @@ class TextParser(Parser):
 
     name = "text"
     version = "stdlib/0.1.0"
+    supported_extensions = _TEXT_EXTENSIONS
+    priority = 100
 
     def parse(self, path: str | Path, source_hash: str) -> Document:
         p = Path(path)

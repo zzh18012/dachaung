@@ -4,9 +4,13 @@
     # 解析 + 分块 + 校验 + 写盘
     python -m app.cli parse <input.pdf|input.docx> -o <output.json>
     python -m app.cli parse <input.docx> -o <output.json> --parser fallback --max-chars 1000
+    python -m app.cli parse <input.md> -o out.json --parser auto   # 扩展名自动发现
 
     # 批量解析（目录 / glob / 单文件，多进程并行 + summary.json）
     python -m app.cli batch-parse <dir|glob|file> -o <output_dir> [--workers 8]
+
+    # 列出已注册 parser（含插件；批次 18）
+    python -m app.cli list-parsers
 
     # 仅校验已有的 JSON（独立子命令，不会把 JSON 当成 PDF/DOCX 输入）
     python -m app.cli validate <output.json>
@@ -27,7 +31,11 @@ if hasattr(sys.stdout, "reconfigure"):
     except (AttributeError, OSError):
         pass
 
+from app.parser_registry import list_parsers as _reg_list_parsers
 from app.pipeline import process_single, validate_only
+
+# 动态 choices：已注册 parser（含插件）+ auto（批次 18；默认仍 fallback，零变化）
+_PARSER_CHOICES = tuple(r["name"] for r in _reg_list_parsers()) + ("auto",)
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
@@ -48,9 +56,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parse.add_argument("-o", "--output", required=True, help="输出 JSON 路径")
     parse.add_argument(
         "--parser",
-        choices=("fallback", "kreuzberg", "markdown", "html", "text", "ipynb"),
+        choices=_PARSER_CHOICES,
         default="fallback",
-        help="选择解析器（默认 fallback；kreuzberg 已实测对 DOCX 给不出元素结构）",
+        help=(
+            "选择解析器（默认 fallback；auto=按扩展名自动发现，"
+            "priority 小者优先；kreuzberg 已实测对 DOCX 给不出元素结构）"
+        ),
     )
     parse.add_argument(
         "--max-chars",
@@ -81,9 +92,9 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     )
     batch.add_argument(
         "--parser",
-        choices=("fallback", "kreuzberg", "markdown", "html", "text", "ipynb"),
+        choices=_PARSER_CHOICES,
         default="fallback",
-        help="选择解析器（默认 fallback）",
+        help="选择解析器（默认 fallback；auto=按扩展名自动发现，逐文件路由）",
     )
     batch.add_argument(
         "--max-chars",
@@ -106,6 +117,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--verbose",
         action="store_true",
         help="把结构化日志同时打到 stderr（与进度输出可能交错）",
+    )
+
+    # list-parsers 子命令（Stage 8 批次 18）
+    sub.add_parser(
+        "list-parsers",
+        help="列出已注册 parser（含插件）：name / priority / extensions / version",
     )
     return p
 
@@ -135,16 +152,28 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     if args.command == "parse":
+        from app.parser_registry import discover_parser
+
         input_path = Path(args.input)
         output_path = Path(args.output)
         if not input_path.is_file():
             _emit_structured_error(input_path, "file_not_found", f"输入文件不存在: {input_path}")
             return 1
 
+        try:
+            parser_name = (
+                discover_parser(input_path)
+                if args.parser == "auto"
+                else args.parser
+            )
+        except ValueError as e:
+            _emit_structured_error(input_path, "unsupported_type", str(e))
+            return 1
+
         document, errors = process_single(
             input_path,
             output_path,
-            parser_name=args.parser,
+            parser_name=parser_name,
             max_chars=args.max_chars,
             write_json=True,
         )
@@ -169,6 +198,18 @@ def main(argv: list[str] | None = None) -> int:
             f"[OK] {input_path} → {output_path}  "
             f"(elements={len(document.elements)}, chunks={len(document.chunks)}, "
             f"warnings={len(document.warnings)})"
+        )
+        return 0
+
+    if args.command == "list-parsers":
+        rows = _reg_list_parsers()
+        print(f"{'name':<20} {'priority':<8} {'extensions':<22} version")
+        for r in rows:
+            exts = ",".join(r["extensions"]) or "-"
+            print(f"{r['name']:<20} {r['priority']:<8} {exts:<22} {r['version']}")
+        print(
+            f"\n共 {len(rows)} 个已注册 parser；--parser auto 按扩展名自动发现"
+            "（priority 小者优先；显式 --parser 永远覆盖发现）"
         )
         return 0
 

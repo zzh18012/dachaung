@@ -2511,3 +2511,73 @@ null/file_warning 逐码/append 两轮/eval 事件含 doc_error（fallback 拒
 
 **执行记录**：本节归档后随分支一并合并推送（封口记录提交在合并授权
 范围内）。
+
+## 五十五、批次 18 执行记录（Parser 插件化与扩展接口，Option B，2026-08-31）
+
+**会话切换**：旧对话 cf170a6f 已 25 轮，消息 POST 连续 4 次上游 502
+（网络抓包实证 POST /backend-api/f/conversation → 502，整条不落库，
+非配额 18364），按既有运维惯例开新对话 6a952dc9 发自包含简报。
+GPT 确认新对话继续担任裁决者，ADOPTION.md 保持唯一权威台账。
+
+**设计裁决**（新对话首条，全部通过）：方案 B（保留 Parser ABC + 注册表，
+register 装饰器兼容）；契约不变（parse(path, source_hash) -> Document、
+schema 0.1.0、新增 supported_extensions=() 与 priority=100）；
+registry 三 API；插件内置注册定位（"随项目分发的参考/增强插件"）；
+优先级 markdown_enhanced=5 < markdown=20，显式 --parser 永远覆盖，
+平局先注册者胜 + warning；CLI 6(a)（默认 fallback 零变化 + 显式 auto）；
+frontmatter 零依赖受限解析（仅扁平 key: scalar，嵌套/列表 warning 跳过，
+完整 YAML 列 backlog）；evaluation 不改。额外要求 7 类测试。
+
+**实现**（分支 integration/stage8-batch18-parser-plugins，基于 0b13589）：
+
+- `app/parsers/base.py`：Parser ABC 增 supported_extensions / priority 类属性
+- `app/parser_registry.py`（新建）：register（装饰器兼容，重名/缺名
+  ValueError）/ get_parser（inspect 按构造签名传 image_output_dir，未知名
+  ValueError 语义兼容）/ discover_parser（返回**名称**字符串——pipeline/
+  CLI 流转以名称为准，与蓝图"返回 Parser 实例"偏差已申报；无候选
+  ValueError；平局 UserWarning）/ list_parsers（按 priority 排序）；内置
+  6 个导入时显式注册，插件经类上 @register 在其后 import 自注册
+- 6 内置 parser 补元数据：fallback(.pdf/.docx,10)、kreuzberg(.pdf/.docx,50)、
+  markdown(.md/.markdown,20)、html(.html/.htm,100)、text(.txt/.text,100)、
+  ipynb(.ipynb,100)
+- `app/parsers/plugins/markdown_enhanced.py`（新建，@register，priority=5）：
+  frontmatter 受限解析（`_split_frontmatter` 首尾 --- 闭合才认；
+  `_parse_frontmatter` 扁平 key: scalar，一层引号剥除，标量保持字符串不猜
+  类型；嵌套/列表/映射/空值 → frontmatter_value_skipped /
+  frontmatter_line_skipped warning 跳过）→ 顶层合并 Document.metadata；
+  GFM 任务列表（- [ ]/- [x] → metadata.task_item/checked，content 去标记）；
+  body 解析复用 MarkdownParser._parse_text（私有方法同仓复用）
+- `app/pipeline.py`：get_parser 委托注册表（签名与错误语义不变，调用方零改动）
+- `app/batch.py`：effective_parser_for 增 auto 分支（discover；无候选回落
+  fallback → worker 侧结构化 unsupported_type，不炸批）
+- `app/cli.py`：parse/batch-parse --parser choices 动态取自注册表 + auto；
+  parse 处理器 auto → discover（ValueError → structured unsupported_type rc1）；
+  新增 list-parsers 子命令（name/priority/extensions/version 表格）
+- evaluation 未动（AUTO_PARSER_BY_SOURCE_TYPE 为 source_type 语义）
+
+**契约偏差（待追认）**：
+
+1. discover_parser 返回名称字符串而非 Parser 实例（蓝图签名）——
+   pipeline/CLI/batch 全链路以 parser_name 流转，返回实例还需二次取
+   .name 且 image_output_dir 无从传递；测试断言也以名称为准。
+2. 插件注册顺序实现：内置 6 个显式 register 后 import 插件模块（其
+   @register 在 import 时自注册）——首版曾显式 register(MarkdownEnhancedParser)
+   与类上装饰器双重注册冲突（冒烟实证 ValueError 重名），改为 import 即
+   注册，恰好就是外部插件的接入样态。
+3. frontmatter 标量值一律保持字符串（"42" 不转 int）——受限解析不猜类型，
+   避免引入 YAML 类型规则。
+
+**测试**：`tests/test_parser_registry.py` 20 项，覆盖裁决 7 类要求
+（自动发现含无候选 ValueError / 优先级平局先注册者+UserWarning / 重名与
+缺名注册 ValueError / CLI auto 解析 md→enhanced 与不支持扩展 rc1 / 默认
+fallback 不变（.md 默认仍 unsupported_type rc1）/ frontmatter 嵌套列表
+降级 warning + 未闭合不误认 / 外部 @register 显式注册全可见）+ 注册表基础
+（元数据/未知名/image_output_dir/pipeline 委托）+ batch auto 路由 +
+list-parsers CLI + 任务列表元数据。
+
+**回归**：5207 passed（5187 + 20，零回归）。
+
+**冒烟记录**：list-parsers 7 行表格；parse --parser auto .md →
+markdown_enhanced（frontmatter title/author 入 metadata，任务项
+checked True/False）；默认不带 --parser .md → structured
+unsupported_type（行为与批次 17 前一致）；batch-parse --parser auto 1/1。

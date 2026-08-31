@@ -66,10 +66,17 @@ class Parser(ABC):
     - 包含完整的 elements
     - chunks 留空（由 chunker 在后续步骤填充）
     - warnings 记录降级、缺字段等情况
+
+    批次 18 注册表元数据：
+    - `supported_extensions`：声明支持的扩展名（小写含点）；空 tuple =
+      不参与扩展名自动发现（只能显式 --parser 指定）
+    - `priority`：自动发现时数值越小越优先；平局先注册者胜
     """
 
     name: str = "abstract"
     version: str = "0.0.0"
+    supported_extensions: tuple[str, ...] = ()
+    priority: int = 100
 
     @abstractmethod
     def parse(self, path: str | Path, source_hash: str) -> Document:

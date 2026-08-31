@@ -916,6 +916,8 @@ class FallbackParser(Parser):
 
     name = "fallback"
     version = f"pdfplumber={_PDFPLUMBER_VERSION},python-docx={_DOCX_VERSION},pypdfium2={_PDFIUM_VERSION}"
+    supported_extensions = (".pdf", ".docx")
+    priority = 10
 
     def __init__(self, image_output_dir: Path | str | None = None) -> None:
         """Args:
