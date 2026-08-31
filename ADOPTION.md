@@ -2621,3 +2621,79 @@ git ls-remote origin refs/heads/main                        → 81bcaa3e842a...d
 外部模块加载、加载时机与动态 CLI 校验、导入/注册失败的错误契约与
 JSONL 记录、冲突处理及端到端测试。保持"显式加载"——不引入
 entry_points 自动扫描、YAML 扩展或内容嗅探。
+
+## 五十七、批次 19 执行记录（显式外部插件加载，2026-08-31）
+
+设计裁决（会话 6a952dc9）：D1–D3、D5、D8、D9 通过；D4、D6 附条件通过；
+D7"初始化异常直接冒泡"不通过，须受控失败通道；另补 3 项测试要求
+（顶层普通 ValueError 映射 / worker 侧失败结构化返回无挂起无原始
+traceback / auto 与显式外部名在插件加载后才校验）——全部落实。
+
+**实现**：
+
+- `app/parser_registry.py`：新增 `ParserRegistrationError(ValueError)`
+  （register 缺名/重名专用，错误文本不变，既有 ValueError 断言向后兼容）
+  与 `registered_names()`（快照，供加载器 diff）
+- `app/plugin_loader.py`（新）：`load_plugins(modules)` 按序 dotted 导入，
+  注册表快照前后 diff 出 `parsers_added`；同模块重复 = importlib 缓存
+  幂等；`PluginLoadError`（code/plugin/error_type/error_message，
+  `to_dict()` 默认不含 traceback）；映射：ParserRegistrationError →
+  `plugin_register_failed`，其他导入期异常 → `plugin_import_failed`
+- `app/batch.py`：`batch_parse_files` 增 `plugins` 参数——父进程池创建前
+  加载（fail-fast 抛 PluginLoadError，不启动批、不写 summary.json）；
+  并行路径 `Pool(initializer=_worker_init_plugins, initargs=(modules, queue))`，
+  worker 捕获 PluginLoadError 后经 multiprocessing.Queue **恰一次**回报
+  初始化状态（initializer 永不抛异常，避免重生循环/挂起），父进程在
+  任何文件任务派发前收取全部回报（超时 120s → 受控
+  `plugin_init_report_timeout`），not ok → 日志 plugin_load_failed +
+  受控上抛（with 语句退出即 terminate+join 回收池）；`parse_one_file`
+  增防御背板（_WORKER_PLUGIN_ERROR 非空时直接结构化失败）；
+  `batch_start` 增 `plugins` 字段；新增 `plugin_loaded` / `plugin_load_failed`
+  JSONL 事件（沿批次 17 logger，error 字段名 error_message）
+- `app/cli.py`：`--plugin MODULE`（append 可重复）挂 parse / batch-parse /
+  list-parsers；validate 与 evaluation.cli 不参与；`--parser` 去掉 argparse
+  静态 choices，改为**插件加载后**按注册表动态校验（auto 唯一保留名），
+  未知名 → 结构化 `unknown_parser` rc 1（裁决 D6 接受 rc 2→1 变更）；
+  parse 侧文件存在性检查先于插件加载（仅错误优先级细节，校验时序符合
+  裁决"插件加载先于 parser 名称校验"）；batch-parse 捕获 PluginLoadError
+  → 结构化 rc 1
+
+**契约偏差与边界（待追认）**：
+
+1. 新增错误码 `plugin_init_report_timeout`（裁决契约只列了两种加载失败
+   码）：回报超时是 D7 受控通道的必要兜底路径，无法用既有两码诚实表达。
+2. `plugin_loaded` 事件的 `parsers_added` 在 CLI 流程下为空表：CLI 校验
+   阶段已在父进程完成注册，batch 层重放加载命中模块缓存——事件语义为
+   "batch 路径加载成功"，纯 API 调用（无 CLI 预加载）时为实际新增名单。
+3. **source_type 封闭枚举**：`schemas/document.schema.json` 的 source_type
+   为封闭枚举（pdf/docx/markdown/html/text/ipynb），外部插件解析新格式
+   只能复用枚举内取值（测试插件 .myx 复用 "text"）；开放枚举需 Schema
+   变更，列 docs/BACKLOG.md #7 待裁决。
+4. batch-parse 目录递归扫描后缀固定 .pdf/.docx/.md 不随插件扩展：
+   插件格式经单文件或 glob 显式传入（glob 路径既有行为本就不做后缀
+   过滤）。裁决未涉及此点，按最小改动处理并声明。
+5. 父进程加载失败的批量命令不写 summary.json（批未启动）；此前
+   batch-parse 的 rc 1 伴有 summary，本路径没有——命令级失败语义。
+
+**测试**：`tests/test_plugin_loader.py` 26 项，覆盖裁决全部要求 + 补充 3
+项：加载基础（parsers_added / 幂等 / fail-fast 后续模块不加载 / 顺序即
+先注册者）/ 错误契约四种（ModuleNotFound / SyntaxError / 顶层 ValueError /
+重名 fallback）/ to_dict 无 traceback 默认 / CLI e2e（显式外部名 / auto
+路由 / 加载失败与冲突结构化 / unknown_parser / 外部名未加载插件时同样
+unknown_parser / **--plugin 失败优先于 unknown_parser（加载先于校验）** /
+auto 无插件回归）/ list-parsers 双路径 / 批量（父失败无池无 summary /
+顺序成功 / 并行成功 + JSONL plugin_loaded + batch_start.plugins）/
+**真实跨进程 worker 初始化失败**（sentinel 文件控制模块体行为：父缓存
+命中成功、worker 新进程导入失败 → 受控 rc 1、无 summary、结构化 JSON
+无 traceback 字段）/ worker 函数单元（initializer 捕获回报 / 成功回报 /
+背板）/ validate 无 --plugin。
+
+**回归**：5233 passed（5207 + 26，零回归）。
+
+**冒烟记录**（真实子进程，PYTHONPATH 注入 smoke_plug）：list-parsers
+--plugin 显示 smoke_ext 行（8 个 parser）；parse --plugin --parser
+smoke_ext rc 0 且 validate 通过 Schema；parse --plugin --parser auto rc 0
+路由 smoke_ext；batch-parse --plugin --workers 2 3/3 成功，JSONL 含
+plugin_loaded + batch_start.plugins=["smoke_plug"]；--plugin 不存在模块
+→ 结构化 plugin_import_failed rc 1、无半成品 JSON；--parser 拼写错 →
+结构化 unknown_parser rc 1。

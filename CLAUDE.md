@@ -37,6 +37,16 @@
 - 参考插件 `app/parsers/plugins/markdown_enhanced.py`（priority 5）：frontmatter 受限解析（仅扁平 key: scalar，嵌套/列表 warning 跳过）+ GFM 任务列表；外部插件 = 自定义模块 import + `@register`（无 entry_points 扫描）
 - `app.cli list-parsers` 列出全部已注册 parser；evaluation 的 AUTO_PARSER_BY_SOURCE_TYPE 是 source_type 语义，与扩展名发现并存，评测不改
 
+## 外部插件加载（Stage 8 批次 19）
+
+- `app/plugin_loader.py`：`load_plugins(modules)`（dotted 模块名、按 CLI 出现顺序、fail-fast）+ `PluginLoadError`（code/plugin/error_type/error_message；标准 JSON 不含 traceback）
+- `--plugin MODULE`（append 可重复）挂在 parse / batch-parse / list-parsers；validate 与 evaluation.cli 不参与；模块查找走 PYTHONPATH（不做文件路径加载）
+- 错误契约：`ParserRegistrationError`（register 专用 ValueError 子类，重名/缺名）→ `plugin_register_failed`；其他导入期异常 → `plugin_import_failed`；重名冲突（含与内置同名）绝不静默覆盖
+- `--parser` 去掉 argparse 静态 choices，插件加载后按注册表动态校验（`auto` 唯一保留名）；未知名 → 结构化 `unknown_parser` rc 1（此前 argparse rc 2，有意变更）
+- 批量：父进程在池创建前加载（失败不启动批）；并行 worker initializer 重放加载 + multiprocessing.Queue 恰一次初始化回报，文件任务派发前校验，失败受控终止池（code 同上，回报超时 `plugin_init_report_timeout`）；parse_one_file 有防御背板
+- JSONL：`plugin_loaded`（含 parsers_added，CLI 已预加载时为空表）/ `plugin_load_failed` + `batch_start.plugins`
+- 已知边界：`source_type` 封闭枚举限制新格式插件（复用枚举内取值）；batch 目录递归扫描后缀固定三类，插件格式走单文件/glob
+
 ## 环境
 
 - 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
@@ -88,6 +98,11 @@ uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.
 # Stage 8 批次 18：parser 注册表（列出已注册 parser / 扩展名自动发现）
 .venv/Scripts/python.exe -m app.cli list-parsers
 .venv/Scripts/python.exe -m app.cli parse <input.md> -o out.json --parser auto
+
+# Stage 8 批次 19：显式外部插件加载（dotted 模块名，PYTHONPATH 提供模块）
+PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli parse doc.smk \
+  -o out.json --plugin my_pkg.my_plugin --parser my_parser
+.venv/Scripts/python.exe -m app.cli list-parsers --plugin my_pkg.my_plugin
 ```
 
 ## Stage 2 评测规则（当前阶段）

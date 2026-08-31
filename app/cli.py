@@ -5,12 +5,13 @@
     python -m app.cli parse <input.pdf|input.docx> -o <output.json>
     python -m app.cli parse <input.docx> -o <output.json> --parser fallback --max-chars 1000
     python -m app.cli parse <input.md> -o out.json --parser auto   # 扩展名自动发现
+    python -m app.cli parse <input.myx> -o out.json --plugin my_pkg.my_plugin   # 外部插件（批次 19）
 
     # 批量解析（目录 / glob / 单文件，多进程并行 + summary.json）
     python -m app.cli batch-parse <dir|glob|file> -o <output_dir> [--workers 8]
 
-    # 列出已注册 parser（含插件；批次 18）
-    python -m app.cli list-parsers
+    # 列出已注册 parser（含插件）
+    python -m app.cli list-parsers [--plugin my_pkg.my_plugin]
 
     # 仅校验已有的 JSON（独立子命令，不会把 JSON 当成 PDF/DOCX 输入）
     python -m app.cli validate <output.json>
@@ -32,10 +33,43 @@ if hasattr(sys.stdout, "reconfigure"):
         pass
 
 from app.parser_registry import list_parsers as _reg_list_parsers
+from app.parser_registry import registered_names as _reg_registered_names
 from app.pipeline import process_single, validate_only
 
-# 动态 choices：已注册 parser（含插件）+ auto（批次 18；默认仍 fallback，零变化）
-_PARSER_CHOICES = tuple(r["name"] for r in _reg_list_parsers()) + ("auto",)
+
+def _load_cli_plugins(modules: list[str] | None, input_label: str) -> int | None:
+    """批次 19：加载 --plugin 模块（fail-fast，先于 parser 名称校验）。
+
+    失败时输出结构化 errors JSON 并返回 1；成功返回 None。
+    """
+    if not modules:
+        return None
+    from app.plugin_loader import PluginLoadError, load_plugins
+
+    try:
+        load_plugins(modules)
+    except PluginLoadError as e:
+        d = e.to_dict()
+        _emit_structured_error(
+            Path(input_label),
+            d["code"],
+            d["message"],
+            plugin=d["plugin"],
+            error_type=d["error_type"],
+        )
+        return 1
+    return None
+
+
+def _validate_parser_choice(name: str, input_label: str) -> int | None:
+    """批次 19：插件加载后按注册表名单动态校验 --parser（auto 为唯一保留名）。"""
+    if name == "auto" or name in _reg_registered_names():
+        return None
+    known = ", ".join([*_reg_registered_names(), "auto"])
+    _emit_structured_error(
+        Path(input_label), "unknown_parser", f"未知 parser: {name}（支持: {known}）"
+    )
+    return 1
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
@@ -56,11 +90,11 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parse.add_argument("-o", "--output", required=True, help="输出 JSON 路径")
     parse.add_argument(
         "--parser",
-        choices=_PARSER_CHOICES,
         default="fallback",
         help=(
             "选择解析器（默认 fallback；auto=按扩展名自动发现，"
-            "priority 小者优先；kreuzberg 已实测对 DOCX 给不出元素结构）"
+            "priority 小者优先；插件加载后按注册表动态校验，"
+            "未知名 → 结构化 unknown_parser）"
         ),
     )
     parse.add_argument(
@@ -68,6 +102,16 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         type=int,
         default=800,
         help="分块最大字符数（默认 800）",
+    )
+    parse.add_argument(
+        "--plugin",
+        action="append",
+        default=None,
+        metavar="MODULE",
+        help=(
+            "外部插件模块（dotted 名，可重复，按出现顺序加载；"
+            "仅显式加载，不做 entry_points 扫描）"
+        ),
     )
 
     # validate 子命令
@@ -92,9 +136,18 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     )
     batch.add_argument(
         "--parser",
-        choices=_PARSER_CHOICES,
         default="fallback",
-        help="选择解析器（默认 fallback；auto=按扩展名自动发现，逐文件路由）",
+        help=(
+            "选择解析器（默认 fallback；auto=按扩展名自动发现，逐文件路由；"
+            "插件加载后按注册表动态校验）"
+        ),
+    )
+    batch.add_argument(
+        "--plugin",
+        action="append",
+        default=None,
+        metavar="MODULE",
+        help="外部插件模块（dotted 名，可重复；并行 worker 内重放加载）",
     )
     batch.add_argument(
         "--max-chars",
@@ -119,10 +172,17 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="把结构化日志同时打到 stderr（与进度输出可能交错）",
     )
 
-    # list-parsers 子命令（Stage 8 批次 18）
-    sub.add_parser(
+    # list-parsers 子命令（Stage 8 批次 18；批次 19 增 --plugin）
+    lp = sub.add_parser(
         "list-parsers",
         help="列出已注册 parser（含插件）：name / priority / extensions / version",
+    )
+    lp.add_argument(
+        "--plugin",
+        action="append",
+        default=None,
+        metavar="MODULE",
+        help="外部插件模块（dotted 名，可重复；加载后再列出）",
     )
     return p
 
@@ -159,6 +219,14 @@ def main(argv: list[str] | None = None) -> int:
         if not input_path.is_file():
             _emit_structured_error(input_path, "file_not_found", f"输入文件不存在: {input_path}")
             return 1
+
+        # 批次 19：插件加载必须先于 parser 名称校验（裁决条件 D6）
+        rc = _load_cli_plugins(args.plugin, str(input_path))
+        if rc is not None:
+            return rc
+        rc = _validate_parser_choice(args.parser, str(input_path))
+        if rc is not None:
+            return rc
 
         try:
             parser_name = (
@@ -202,6 +270,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "list-parsers":
+        rc = _load_cli_plugins(args.plugin, "list-parsers")
+        if rc is not None:
+            return rc
         rows = _reg_list_parsers()
         print(f"{'name':<20} {'priority':<8} {'extensions':<22} version")
         for r in rows:
@@ -217,6 +288,15 @@ def main(argv: list[str] | None = None) -> int:
         import glob as globlib
 
         from app.batch import BATCH_SUFFIXES, batch_parse_files
+        from app.plugin_loader import PluginLoadError
+
+        # 批次 19：插件加载必须先于 parser 名称校验（裁决条件 D6）
+        rc = _load_cli_plugins(args.plugin, args.input)
+        if rc is not None:
+            return rc
+        rc = _validate_parser_choice(args.parser, args.input)
+        if rc is not None:
+            return rc
 
         raw = args.input
         input_path = Path(raw)
@@ -236,15 +316,28 @@ def main(argv: list[str] | None = None) -> int:
             return 2
 
         out_dir = Path(args.output_dir)
-        summary = batch_parse_files(
-            files,
-            out_dir,
-            parser_name=args.parser,
-            max_chars=args.max_chars,
-            log_file=args.log_file,
-            verbose=args.verbose,
-            workers=args.workers,
-        )
+        try:
+            summary = batch_parse_files(
+                files,
+                out_dir,
+                parser_name=args.parser,
+                max_chars=args.max_chars,
+                log_file=args.log_file,
+                verbose=args.verbose,
+                workers=args.workers,
+                plugins=args.plugin,
+            )
+        except PluginLoadError as e:
+            # 父进程加载失败或 worker 初始化回报失败（受控通道，池已回收）
+            d = e.to_dict()
+            _emit_structured_error(
+                Path(raw),
+                d["code"],
+                d["message"],
+                plugin=d["plugin"],
+                error_type=d["error_type"],
+            )
+            return 1
         status = "[OK]" if summary["failed"] == 0 else "[FAIL]"
         print(
             f"{status} batch-parse: {summary['success']}/{summary['total']} 成功，"

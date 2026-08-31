@@ -47,3 +47,30 @@
 - 升级条件：需要 PyYAML 依赖（**新增主依赖须用户单独批准**，项目规则禁止未批准引入）；批准后替换 `_parse_frontmatter` 并保留降级语义
 - 依据：批次 18 步骤 1 裁决第 7 条（2026-08-31，会话 6a952dc9）
 - 状态：backlog
+
+## 7. source_type 封闭枚举限制外部插件新格式
+
+- 影响范围：Stage 8 批次 19 外部插件加载（app/plugin_loader.py）
+- 现象：`schemas/document.schema.json` 的 `source_type` 为封闭枚举
+  （pdf/docx/markdown/html/text/ipynb），外部插件解析新格式（如 .smk）
+  只能复用枚举内取值（测试插件复用 "text"），否则 Schema 校验失败
+- 升级条件：开放枚举或注册式扩展需 Schema 变更（report/schema 版本
+  政策约束），须单独裁决
+- 依据：批次 19 实现中实证（2026-08-31，会话 6a952dc9）
+- 状态：backlog
+
+## 8. --plugin 文件路径加载
+
+- 影响范围：Stage 8 批次 19
+- 现象：--plugin 仅接受 dotted 模块名（PYTHONPATH/sys.path 提供模块），
+  不支持直接传 .py 文件路径
+- 升级条件：路径 → 模块名映射（需 sys.path 临时注入与命名冲突处理），
+  另行裁决
+- 状态：backlog
+
+## 9. plugin_init_report_timeout 路径无自动化测试
+
+- 影响范围：Stage 8 批次 19 批量并行受控通道（app/batch.py）
+- 现象：worker 初始化回报超时（120s）走受控失败，但该路径需真实超时
+  注入，未覆盖自动化测试；worker 失败/成功路径已有跨进程真实测试
+- 状态：已知限制（本批不测）

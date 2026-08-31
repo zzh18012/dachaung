@@ -15,12 +15,14 @@ import os
 import sys
 import time
 import traceback as traceback_mod
-from multiprocessing import Pool
+from multiprocessing import Pool, Queue as MpQueue
 from pathlib import Path
 from typing import Any, Iterable
 
 from app.jsonlog import setup_logger
+from app.parser_registry import registered_names
 from app.pipeline import process_single
+from app.plugin_loader import PluginLoadError, load_plugins
 
 try:  # 可选依赖：新增依赖须用户单独批准，未装时降级为逐行进度
     from tqdm import tqdm as _tqdm
@@ -55,6 +57,31 @@ def effective_parser_for(parser_name: str, path: str | Path) -> str:
     if parser_name == "fallback" and p.suffix.lower() == ".md":
         return "markdown"
     return parser_name
+
+
+# 批次 19：worker 侧插件初始化状态。initializer 永不抛异常（避免进程池
+# 重生循环/挂起），失败经 multiprocessing.Queue 恰回报一次，父进程在
+# 任何文件任务派发前收取全部回报（受控通道，探测式 map 无法保证覆盖
+# 每个 worker）。
+_WORKER_PLUGIN_ERROR: dict | None = None
+PLUGIN_INIT_REPORT_TIMEOUT = 120.0
+
+
+def _worker_init_plugins(
+    modules: tuple[str, ...], report_queue: Any
+) -> None:
+    """Pool initializer：在每个 worker 进程内重放插件加载（Windows spawn）。
+
+    只捕获 PluginLoadError（load_plugins 契约保证只抛该类型）：存入
+    worker 全局（作 parse_one_file 防御背板），并恰回报一次给父进程。
+    """
+    global _WORKER_PLUGIN_ERROR
+    try:
+        load_plugins(list(modules))
+        report_queue.put({"ok": True})
+    except PluginLoadError as e:
+        _WORKER_PLUGIN_ERROR = e.to_dict()
+        report_queue.put({"ok": False, **_WORKER_PLUGIN_ERROR})
 
 
 def _result(
@@ -94,6 +121,16 @@ def parse_one_file(args: tuple) -> dict[str, Any]:
     src_path = Path(src)
     out_path = Path(out_dir) / f"{src_path.stem}.json"
     t0 = time.perf_counter()
+
+    # 批次 19 防御背板：initializer 已捕获插件加载失败时，任何任务都不再
+    # 触碰解析路径，直接返回结构化失败（正常情况下探测阶段已先行暴露）
+    if _WORKER_PLUGIN_ERROR is not None:
+        return _result(
+            src_path, False, time.perf_counter() - t0,
+            parser=parser_name,
+            code=_WORKER_PLUGIN_ERROR["code"],
+            message=_WORKER_PLUGIN_ERROR["message"],
+        )
 
     if not src_path.is_file():
         return _result(
@@ -196,6 +233,7 @@ def batch_parse_files(
     log_file: str | Path | None = None,
     verbose: bool = False,
     workers: int | None = None,
+    plugins: list[str] | None = None,
 ) -> dict[str, Any]:
     """批量解析并写盘，返回 summary dict（同时写 <output_dir>/summary.json）。
 
@@ -204,11 +242,38 @@ def batch_parse_files(
 
     log_file / verbose：结构化 JSONL 日志（app.jsonlog.setup_logger）。
     事件在结果到达时流式发射（并行下非 manifest 顺序）。
+
+    plugins（批次 19）：父进程在池创建前加载（fail-fast 抛 PluginLoadError，
+    不启动批处理）；并行路径每 worker initializer 重放加载，探测阶段在任何
+    文件任务前校验全部 worker 初始化成功，失败则受控终止池并抛
+    PluginLoadError（不挂起、不泄漏原始 traceback）。
     """
     workers = default_workers() if workers is None else max(1, int(workers))
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     logger = setup_logger("app.batch", log_file, verbose)
+
+    plugin_modules = list(plugins or [])
+    try:
+        loaded_plugins = load_plugins(plugin_modules) if plugin_modules else []
+    except PluginLoadError as e:
+        logger.error(
+            "plugin_load_failed",
+            extra={
+                "plugin": e.plugin,
+                "error_code": e.code,
+                "error_message": e.error_message,
+            },
+        )
+        raise
+    for entry in loaded_plugins:
+        logger.info(
+            "plugin_loaded",
+            extra={
+                "plugin": entry["plugin"],
+                "parsers_added": entry["parsers_added"],
+            },
+        )
 
     files = [Path(f) for f in file_list]
 
@@ -243,6 +308,7 @@ def batch_parse_files(
             "file_count": len(files),
             "parser": parser_name,
             "max_chars": max_chars,
+            "plugins": plugin_modules,
         },
     )
     for ce in collision_errors:
@@ -265,14 +331,60 @@ def batch_parse_files(
             _log_file_event(logger, r)
             results.append(r)
     else:
-        with Pool(effective_workers) as pool:
-            for r in _progress(
-                pool.imap_unordered(parse_one_file, args_list),
-                len(args_list),
-                "parse",
-            ):
-                _log_file_event(logger, r)
-                results.append(r)
+        pool_kwargs: dict[str, Any] = {}
+        init_reports: list[dict[str, Any]] = []
+        report_queue: Any = None
+        if plugin_modules:
+            report_queue = MpQueue()
+            pool_kwargs = {
+                "initializer": _worker_init_plugins,
+                "initargs": (tuple(plugin_modules), report_queue),
+            }
+        try:
+            with Pool(effective_workers, **pool_kwargs) as pool:
+                # 批次 19 受控通道：收取每个 worker 恰一次的初始化回报
+                # （在文件任务派发前）；not ok / 回报超时 → 受控上抛，
+                # with 语句退出即 terminate + join 回收池
+                if plugin_modules:
+                    try:
+                        init_reports = [
+                            report_queue.get(timeout=PLUGIN_INIT_REPORT_TIMEOUT)
+                            for _ in range(effective_workers)
+                        ]
+                    except Exception as e:  # queue.Empty 等：同样受控，不挂起
+                        raise PluginLoadError(
+                            "plugin_init_report_timeout",
+                            ",".join(plugin_modules),
+                            type(e).__name__,
+                            f"worker 初始化回报超时/异常（{PLUGIN_INIT_REPORT_TIMEOUT}s）: {e}",
+                        ) from None
+                    bad = next((r for r in init_reports if not r.get("ok", True)), None)
+                    if bad is not None:
+                        logger.error(
+                            "plugin_load_failed",
+                            extra={
+                                "plugin": bad.get("plugin"),
+                                "error_code": bad.get("code"),
+                                "error_message": bad.get("message"),
+                                "worker_init": True,
+                            },
+                        )
+                        raise PluginLoadError(
+                            bad.get("code", "plugin_import_failed"),
+                            bad.get("plugin", "?"),
+                            bad.get("error_type", ""),
+                            bad.get("message", ""),
+                        )
+                for r in _progress(
+                    pool.imap_unordered(parse_one_file, args_list),
+                    len(args_list),
+                    "parse",
+                ):
+                    _log_file_event(logger, r)
+                    results.append(r)
+        finally:
+            if report_queue is not None:
+                report_queue.close()
     wall = time.perf_counter() - wall0
 
     failed_results = [r for r in results if not r["success"]]

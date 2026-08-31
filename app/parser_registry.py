@@ -26,15 +26,23 @@ from app.parsers.base import Parser
 _registry: dict[str, type[Parser]] = {}
 
 
+class ParserRegistrationError(ValueError):
+    """register() 的缺名/重名等注册失败专用（ValueError 子类，向后兼容）。
+
+    批次 19：plugin_loader 仅将本异常映射为 plugin_register_failed；
+    插件模块顶层其他 ValueError 一律归为 plugin_import_failed。
+    """
+
+
 def register(parser_cls: type[Parser]) -> type[Parser]:
-    """注册 parser 类；兼作装饰器。重名/缺名 ValueError（显式失败优于静默）。"""
+    """注册 parser 类；兼作装饰器。重名/缺名 ParserRegistrationError（显式失败优于静默）。"""
     name = getattr(parser_cls, "name", None)
     if not name or name == "abstract":
-        raise ValueError(
+        raise ParserRegistrationError(
             f"{parser_cls.__name__} 必须定义非 'abstract' 的 name 类属性"
         )
     if name in _registry:
-        raise ValueError(
+        raise ParserRegistrationError(
             f"parser 重名注册: {name}（已注册: {_registry[name].__qualname__}）"
         )
     _registry[name] = parser_cls
@@ -96,6 +104,11 @@ def list_parsers() -> list[dict[str, Any]]:
             _registry.items(), key=lambda kv: (kv[1].priority, kv[0])
         )
     ]
+
+
+def registered_names() -> list[str]:
+    """当前已注册 parser 名称快照（plugin_loader 用于加载前后 diff）。"""
+    return sorted(_registry)
 
 
 def _register_builtins() -> None:

@@ -75,6 +75,10 @@ Installed 10 packages in 125ms
 
 # 自定义分块大小
 .venv/Scripts/python.exe -m app.cli parse samples/private/sample.pdf -o outputs/sample.json --max-chars 1200
+
+# 显式加载外部插件（批次 19；dotted 模块名，可重复，模块由 PYTHONPATH 提供）
+PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli parse doc.smk \
+  -o out.json --plugin my_pkg.my_plugin --parser my_parser
 ```
 
 成功输出示例：
@@ -185,6 +189,33 @@ class MyParser(Parser):
 统一走 `get_parser(name)`，`image_output_dir` 等构造参数在该层注入。
 不做 entry_points 自动扫描（显式优于隐式）；重名注册在 import 时即报
 ValueError。完整 YAML（PyYAML）支持见 docs/BACKLOG.md。
+
+**显式外部插件加载（Stage 8 批次 19）**：`--plugin MODULE`（可重复，
+dotted 模块名，按出现顺序加载）挂在 `parse` / `batch-parse` /
+`list-parsers`；`validate` 与 `evaluation.cli` 不参与。模块查找走
+PYTHONPATH / sys.path（不做文件路径加载）；同一模块重复指定为幂等 no-op。
+
+失败契约（结构化 errors JSON + rc 1，标准输出不含 traceback）：
+
+- `plugin_import_failed`：模块不存在 / 语法错误 / 顶层任意异常
+- `plugin_register_failed`：import 期间 `@register` 抛
+  `ParserRegistrationError`（重名/缺名，含与内置 parser 同名冲突）——
+  绝不静默覆盖
+- `unknown_parser`：`--parser` 在插件加载后按注册表动态校验（`auto` 为
+  唯一保留名）；此前无效名为 argparse rc 2，现为结构化 rc 1（有意变更）
+- `plugin_init_report_timeout`：并行 worker 初始化回报超时（受控失败）
+
+批量路径：父进程在池创建前加载（失败不启动批处理）；并行 worker 经
+initializer 重放加载，并通过 multiprocessing.Queue 在任何文件任务派发前
+向父进程恰回报一次初始化状态，失败即受控终止池（不挂起、不泄漏原始
+traceback）。JSONL 事件：`plugin_loaded`（含 `parsers_added`；CLI 校验
+阶段已在父进程加载时为空表）/ `plugin_load_failed`；`batch_start` 增
+`plugins` 字段。
+
+已知边界：`schemas/document.schema.json` 的 `source_type` 为封闭枚举
+（pdf/docx/markdown/html/text/ipynb），外部插件解析新格式暂需复用枚举内
+取值（开放枚举需 Schema 变更，见 docs/BACKLOG.md）；`batch-parse` 目录
+递归扫描仍固定 .pdf/.docx/.md，插件格式经单文件或 glob 显式传入。
 
 ---
 
