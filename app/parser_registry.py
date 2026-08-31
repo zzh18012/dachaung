@@ -60,6 +60,7 @@ def get_parser(name: str, image_output_dir: Path | str | None = None) -> Parser:
 def discover_parser(path: str | Path) -> str:
     """扩展名 → priority 最小的已注册 parser 名称。
 
+    返回 str（非 Parser 实例）；实例化统一走 get_parser(name)。
     显式 --parser 永远覆盖本发现。平局（同扩展名同 priority）取先
     注册者并发 UserWarning。
     """

@@ -181,6 +181,8 @@ class MyParser(Parser):
 ```
 
 然后 `import` 该模块即可被 `list-parsers` / `--parser auto` 发现。
+`discover_parser(path)` 返回 parser **名称**（`str`，非实例）——实例化
+统一走 `get_parser(name)`，`image_output_dir` 等构造参数在该层注入。
 不做 entry_points 自动扫描（显式优于隐式）；重名注册在 import 时即报
 ValueError。完整 YAML（PyYAML）支持见 docs/BACKLOG.md。
 

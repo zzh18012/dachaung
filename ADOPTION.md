@@ -2581,3 +2581,43 @@ list-parsers CLI + 任务列表元数据。
 markdown_enhanced（frontmatter title/author 入 metadata，任务项
 checked True/False）；默认不带 --parser .md → structured
 unsupported_type（行为与批次 17 前一致）；batch-parse --parser auto 1/1。
+
+## 五十六、批次 18 封口裁决记录（Stage-8-Batch-18-Closed，2026-08-31）
+
+裁决对话 6a952dc9（完成报告因镜像站落库延迟首查未见，重试一条；
+GPT 对两条分别回复：完整封口裁决 + "裁决不变"确认，二者一致）。
+
+**裁决：批次 18 予以封口，三项契约偏差全部追认。**
+
+1. `discover_parser()` 返回 parser 名称（str）：追认——与现有按名称
+   流转、由 `get_parser()` 注入构造参数的链路一致；要求在接口文档中
+   明确返回值为 str（本提交已在 docstring 与 README §3.5 落实）。
+2. 插件以模块导入触发 `@register`：追认——注册必须恰好一次，禁止再
+   显式重复注册同一类（与冒烟实证的双重注册 ValueError 一致）。
+3. Frontmatter 标量一律保留为字符串：追认——受限解析器不进行 YAML
+   类型猜测是正确边界。
+
+**归档标记**：`Stage-8-Batch-18-Closed`（裁决原文写"登记于 §五十五"，
+按本台账一节一记录惯例登记为 §五十六，编号偏差待追认）。
+
+**推送授权与执行**（GPT 给定四步命令，逐字执行）：
+
+```
+git fetch origin refs/heads/main:refs/remotes/origin/main   → OK
+git merge-base --is-ancestor origin/main 81bcaa3            → OK（0 退出）
+git push origin 81bcaa3:refs/heads/main                     → 0b13589..81bcaa3
+git ls-remote origin refs/heads/main                        → 81bcaa3e842a...d60e
+```
+
+远端 SHA 与授权 SHA 完全一致，无 force。指示线 worktree 本地 main
+已同步 ff 至 81bcaa3。封口记录提交（本条）在授权推送 SHA 之后，
+随下一批次合并推送。
+
+**裁决环境说明（GPT 自述）**：当前裁决环境未挂载工作树，无法独立复跑
+5207 项或实际代推；封口基于提交的实现、测试与冒烟证据。
+
+**下一批次指定：批次 19——显式外部插件加载。**
+范围（GPT 划定）：先提交步骤 1 设计决策；可重复的 `--plugin MODULE`
+外部模块加载、加载时机与动态 CLI 校验、导入/注册失败的错误契约与
+JSONL 记录、冲突处理及端到端测试。保持"显式加载"——不引入
+entry_points 自动扫描、YAML 扩展或内容嗅探。
