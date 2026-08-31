@@ -187,6 +187,10 @@ class MyParser(Parser):
 然后 `import` 该模块即可被 `list-parsers` / `--parser auto` 发现。
 `discover_parser(path)` 返回 parser **名称**（`str`，非实例）——实例化
 统一走 `get_parser(name)`，`image_output_dir` 等构造参数在该层注入。
+**新格式注意**：`Document.source_type` 受 Schema 封闭枚举约束
+（pdf/docx/markdown/html/text/ipynb），外部插件解析新格式时暂须将
+`source_type` 映射至既有语义类型（如纯文本类新格式用 `"text"`），
+开放枚举需 Schema 变更（docs/BACKLOG.md #7）。
 不做 entry_points 自动扫描（显式优于隐式）；重名注册在 import 时即报
 ValueError。完整 YAML（PyYAML）支持见 docs/BACKLOG.md。
 
@@ -203,7 +207,9 @@ PYTHONPATH / sys.path（不做文件路径加载）；同一模块重复指定�
   绝不静默覆盖
 - `unknown_parser`：`--parser` 在插件加载后按注册表动态校验（`auto` 为
   唯一保留名）；此前无效名为 argparse rc 2，现为结构化 rc 1（有意变更）
-- `plugin_init_report_timeout`：并行 worker 初始化回报超时（受控失败）
+- `plugin_init_report_timeout`：并行 worker 初始化回报超时（受控失败；
+  固定上限 120 秒，`plugin_load_failed` 事件携带 `expected_workers` /
+  `received_reports` 计数）
 
 批量路径：父进程在池创建前加载（失败不启动批处理）；并行 worker 经
 initializer 重放加载，并通过 multiprocessing.Queue 在任何文件任务派发前

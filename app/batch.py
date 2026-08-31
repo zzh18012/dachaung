@@ -266,7 +266,13 @@ def batch_parse_files(
             },
         )
         raise
+    seen_plugins: set[str] = set()
     for entry in loaded_plugins:
+        # 重复 --plugin 同一模块只发一次命令级 plugin_loaded 事件
+        # （事件 parsers_added 为本进程首次加载的真实增量，见 plugin_loader）
+        if entry["plugin"] in seen_plugins:
+            continue
+        seen_plugins.add(entry["plugin"])
         logger.info(
             "plugin_loaded",
             extra={
@@ -346,17 +352,37 @@ def batch_parse_files(
                 # （在文件任务派发前）；not ok / 回报超时 → 受控上抛，
                 # with 语句退出即 terminate + join 回收池
                 if plugin_modules:
-                    try:
-                        init_reports = [
-                            report_queue.get(timeout=PLUGIN_INIT_REPORT_TIMEOUT)
-                            for _ in range(effective_workers)
-                        ]
-                    except Exception as e:  # queue.Empty 等：同样受控，不挂起
+                    timed_out: BaseException | None = None
+                    for _ in range(effective_workers):
+                        try:
+                            init_reports.append(
+                                report_queue.get(timeout=PLUGIN_INIT_REPORT_TIMEOUT)
+                            )
+                        except Exception as e:  # queue.Empty 等：受控，不挂起
+                            timed_out = e
+                            break
+                    if timed_out is not None or len(init_reports) < effective_workers:
+                        logger.error(
+                            "plugin_load_failed",
+                            extra={
+                                "plugin": ",".join(plugin_modules),
+                                "error_code": "plugin_init_report_timeout",
+                                "error_message": (
+                                    f"worker 初始化回报超时/异常"
+                                    f"（固定上限 {PLUGIN_INIT_REPORT_TIMEOUT}s）: {timed_out}"
+                                ),
+                                "expected_workers": effective_workers,
+                                "received_reports": len(init_reports),
+                            },
+                        )
                         raise PluginLoadError(
                             "plugin_init_report_timeout",
                             ",".join(plugin_modules),
-                            type(e).__name__,
-                            f"worker 初始化回报超时/异常（{PLUGIN_INIT_REPORT_TIMEOUT}s）: {e}",
+                            type(timed_out).__name__ if timed_out else "Timeout",
+                            (
+                                f"worker 初始化回报超时/异常"
+                                f"（固定上限 {PLUGIN_INIT_REPORT_TIMEOUT}s）: {timed_out}"
+                            ),
                         ) from None
                     bad = next((r for r in init_reports if not r.get("ok", True)), None)
                     if bad is not None:

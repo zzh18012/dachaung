@@ -2697,3 +2697,33 @@ smoke_ext rc 0 且 validate 通过 Schema；parse --plugin --parser auto rc 0
 plugin_loaded + batch_start.plugins=["smoke_plug"]；--plugin 不存在模块
 → 结构化 plugin_import_failed rc 1、无半成品 JSON；--parser 拼写错 →
 结构化 unknown_parser rc 1。
+
+### 五十七（续）、批次 19 封口修正轮（2026-08-31）
+
+首份完成报告裁决：暂不封口，需修正偏差 2 后重报。其余 4 项偏差中
+plugin_init_report_timeout / source_type 封闭枚举 / 目录扫描后缀固定 /
+父失败不写 summary 均已追认，另附条件：
+
+**修正内容**：
+
+1. `plugin_loaded.parsers_added` 不得恒为空——`app/plugin_loader.py` 增
+   `_FIRST_LOAD` 进程级备忘：`load_plugins` 始终返回该模块**首次**加载的
+   真实注册增量（命中备忘不重复导入/注册）；CLI 校验阶段预加载后，批量
+   路径发事件即携带真实名单。空表仅限真实幂等情形（外部途径预导入 /
+   模块未注册 parser / 重复指定——重复 spec 只发一次命令级事件，
+   `batch_start.plugins` 仍保留原始输入列表）。
+2. 回报超时事件补字段：`plugin_load_failed` 携带
+   `error_code=plugin_init_report_timeout` + `expected_workers` /
+   `received_reports`；120 秒固定上限写入 README / CLAUDE.md。
+3. 外部插件开发指南（README §3.5）明确：新格式 `source_type` 暂须映射
+   至既有语义类型（开放枚举列 BACKLOG #7 待裁决）。
+
+**测试增量**：`test_load_plugins_repeat_module_returns_first_increment`
+（重写幂等语义：二次返回首次增量且注册表不增长）、
+`test_batch_duplicate_plugin_spec_single_event`（重复 spec 单事件 +
+batch_start.plugins 保留原始列表）、
+`test_batch_plugin_registering_nothing_empty_added`（无注册插件真实
+空表）、`test_batch_parallel_with_plugins_jsonl` 断言改为事件含真实
+parser 名单（裁决要求的 JSONL 端到端断言）。共 28 项。
+
+**回归**：5235 passed（5233 + 2 净增，零回归）。

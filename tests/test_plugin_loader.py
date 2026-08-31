@@ -139,11 +139,13 @@ def _write_plugin(directory: Path, mod_name: str, source: str) -> str:
 
 @pytest.fixture
 def plugin_env(tmp_path: Path, monkeypatch):
-    """sys.path 注入 + 注册表副本隔离 + 本目录模块的 sys.modules 清理。"""
+    """sys.path 注入 + 注册表副本隔离 + 首载备忘重置 + 模块 sys.modules 清理。"""
     monkeypatch.syspath_prepend(str(tmp_path))
     import app.parser_registry as pr
+    from app import plugin_loader as pl
 
     monkeypatch.setattr(pr, "_registry", dict(pr._registry))
+    monkeypatch.setattr(pl, "_FIRST_LOAD", {})
     yield tmp_path
     for key, mod in list(sys.modules.items()):
         f = getattr(mod, "__file__", None)
@@ -159,12 +161,18 @@ def test_load_plugins_returns_parsers_added(plugin_env: Path):
     assert out == [{"plugin": "myx_mod", "parsers_added": ["myx_test"]}]
 
 
-def test_load_plugins_repeat_module_idempotent(plugin_env: Path):
+def test_load_plugins_repeat_module_returns_first_increment(plugin_env: Path):
+    """封口修正：重复加载返回首次真实增量（事件不得恒为空），且不重复注册。"""
+    import app.parser_registry as pr
+
     _write_plugin(plugin_env, "myx_mod", _PLUGIN_MYX)
-    load_plugins(["myx_mod"])
-    assert load_plugins(["myx_mod"]) == [
-        {"plugin": "myx_mod", "parsers_added": []}
+    first = load_plugins(["myx_mod"])
+    n_after_first = len(pr._registry)
+    second = load_plugins(["myx_mod"])
+    assert first == second == [
+        {"plugin": "myx_mod", "parsers_added": ["myx_test"]}
     ]
+    assert len(pr._registry) == n_after_first  # 幂等：无二次注册
 
 
 def test_load_plugins_missing_module(plugin_env: Path):
@@ -394,15 +402,54 @@ def test_batch_parallel_with_plugins_jsonl(plugin_env: Path):
     for ev in events:
         by_event.setdefault(ev["event"], []).append(ev)
     plugin_events = by_event["plugin_loaded"]
-    # CLI 校验阶段已在父进程加载注册，batch 层重放为缓存命中：
-    # 事件确认 batch 路径加载成功，parsers_added 为空是既定语义
-    assert plugin_events and all(
-        ev["plugin"] == "myx_mod" and ev["parsers_added"] == []
-        for ev in plugin_events
-    )
+    # 封口修正断言（裁决要求）：CLI 流程下事件含首次加载的真实 parser 名单；
+    # batch_start.plugins 保留输入模块列表
+    assert len(plugin_events) == 1
+    assert plugin_events[0]["plugin"] == "myx_mod"
+    assert plugin_events[0]["parsers_added"] == ["myx_test"]
     assert by_event["batch_start"][0]["plugins"] == ["myx_mod"]
     assert len(by_event["file_complete"]) == 3
     assert by_event["batch_complete"][0]["success"] == 3
+
+
+def test_batch_duplicate_plugin_spec_single_event(plugin_env: Path):
+    """重复 --plugin 同一模块：只发一次命令级 plugin_loaded 事件。"""
+    _write_plugin(plugin_env, "myx_mod", _PLUGIN_MYX)
+    docs = _write_docs(plugin_env / "docs", 1)
+    out = plugin_env / "out"
+    log = plugin_env / "dup.jsonl"
+    rc = app_main(
+        ["batch-parse", str(docs), "-o", str(out),
+         "--plugin", "myx_mod", "--plugin", "myx_mod", "--log-file", str(log)]
+    )
+    assert rc == 0
+    events = [json.loads(x) for x in log.read_text(encoding="utf-8").splitlines()]
+    loaded = [e for e in events if e["event"] == "plugin_loaded"]
+    assert len(loaded) == 1
+    assert loaded[0]["plugin"] == "myx_mod"
+    start = next(e for e in events if e["event"] == "batch_start")
+    assert start["plugins"] == ["myx_mod", "myx_mod"]  # 保留原始输入列表
+
+
+_PLUGIN_NO_REGISTER = "X = 1\n"
+
+
+def test_batch_plugin_registering_nothing_empty_added(plugin_env: Path):
+    """真实幂等为空：模块本身不注册任何 parser 时 parsers_added 为空表。"""
+    _write_plugin(plugin_env, "noop_mod", _PLUGIN_NO_REGISTER)
+    docs = _write_docs(plugin_env / "docs", 1)
+    out = plugin_env / "out"
+    log = plugin_env / "noop.jsonl"
+    rc = app_main(
+        ["batch-parse", str(docs), "-o", str(out), "--plugin", "noop_mod",
+         "--log-file", str(log)]
+    )
+    assert rc == 0
+    events = [json.loads(x) for x in log.read_text(encoding="utf-8").splitlines()]
+    loaded = [e for e in events if e["event"] == "plugin_loaded"]
+    assert len(loaded) == 1
+    assert loaded[0]["plugin"] == "noop_mod"
+    assert loaded[0]["parsers_added"] == []
 
 
 def test_batch_parallel_worker_init_failure_controlled(plugin_env: Path, capfd):

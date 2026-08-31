@@ -22,6 +22,11 @@ from app.parser_registry import ParserRegistrationError, registered_names
 
 __all__ = ["PluginLoadError", "load_plugins"]
 
+# 本进程内每个模块**首次** load_plugins 的真实注册增量备忘（批次 19 封口
+# 裁决：plugin_loaded 事件须反映首次增量，CLI 校验阶段预加载后再由批量
+# 路径发事件时不得恒为空）。重复加载命中备忘，不重复导入/注册。
+_FIRST_LOAD: dict[str, dict] = {}
+
 
 class PluginLoadError(Exception):
     """插件加载失败的可序列化结构化错误（CLI/批处理受控通道）。"""
@@ -56,12 +61,16 @@ class PluginLoadError(Exception):
 def load_plugins(modules: list[str]) -> list[dict]:
     """按顺序导入插件模块，返回 [{plugin, parsers_added}]。
 
-    parsers_added 由注册表名单快照前后 diff 得出；重复模块命中
-    importlib 缓存，返回 parsers_added=[]。任一失败抛 PluginLoadError
-    （fail-fast，不继续加载后续模块）。
+    parsers_added 始终为本进程**首次**加载该模块时的真实注册增量（命中
+    _FIRST_LOAD 备忘，不重复导入/注册）；仅在模块被本函数之外的途径
+    预先导入（diff 为空）或模块本身不注册 parser 时为空表。任一失败抛
+    PluginLoadError（fail-fast，不继续加载后续模块）。
     """
     results: list[dict] = []
     for mod in modules:
+        if mod in _FIRST_LOAD:
+            results.append(dict(_FIRST_LOAD[mod]))
+            continue
         before = set(registered_names())
         try:
             importlib.import_module(mod)
@@ -81,7 +90,10 @@ def load_plugins(modules: list[str]) -> list[dict]:
                 str(e),
                 traceback.format_exc(),
             ) from None
-        results.append(
-            {"plugin": mod, "parsers_added": sorted(set(registered_names()) - before)}
-        )
+        entry = {
+            "plugin": mod,
+            "parsers_added": sorted(set(registered_names()) - before),
+        }
+        _FIRST_LOAD[mod] = entry
+        results.append(dict(entry))
     return results
