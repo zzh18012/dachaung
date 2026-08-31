@@ -2251,3 +2251,38 @@ gap 15pt 近合远分／bbox 重叠聚 1／边界恰 100×100 包含。
    有限；计数不受影响。
    附注（实现期补充）：pdfplumber 将多段折线路径归类为 curve，本 devset
    表格均为单段线（实证 0 curves），其他语料的多段线表格存在误报可能。
+
+## 四十九、批次 15 封口裁决记录（Stage-7-Batch-15-Closed，2026-08-31）
+
+**裁决结论**（会话 cf170a6f，GPT 5.6 Sol）：
+- 执行验收全部通过：实现 ✓（聚类函数/镜像发射/异常警告）；8 项测试 ✓；
+  全量回归 5163 ✓（零回归）；修复效果精确达标（002 4/5、003 7/9、
+  004 2/2，image 短缺 12→3）；devset 归因 PASS（其余 7 文档零漂移、
+  MVP 两文档零漂移、silent_drop_total 44→35 −9 优于预估 −3 且归因
+  追认、figure_caption_* 零变化边界关闭）；Must-not-change 确认
+  （evaluator_version 1.10 / report_version 1.3）；路径偏差 4 项
+  全部追认（Element dataclass／根 ADOPTION.md／一次性脚本不提交／
+  curve bbox 锚点 hull 发现）；5 项边界 + 附注文档化 ✓。
+- **归档编号：Stage-7-Batch-15-Closed。**
+- **合并推送授权：通过**（ff-only 合并
+  integration/stage7-batch15-pdf-vector-image 并推送 origin/main，
+  立即执行，HEAD=01eaed8 或分支最新提交）。
+
+**Stage 7 成果清单（裁决总结）**：7 批次全部完成——轨道 A 批次 9/10
+（figure_caption_pairs 解锁，各 1.0/1.0/1.0）；轨道 B 批次 11/12/13
+（heading_order_*、table_caption_* 指标族、真实语料 devset 2→10）；
+修复批次 14（w:sdt 欠提取）/15（PDF 矢量图）。devset 2→10 文档、
+annotation v1.0→v1.1、EVALUATOR_VERSION 1.8→1.10、
+silent_drop 51→35（−31%）、测试 5147→5163（+16）。
+
+**待决事项（裁决请求下次回复明确）**：Stage 8（新特性开发，
+候选 B/C/D 归 backlog）vs 继续 Stage 7 微调（批次 16=候选 B
+多栏题注碎字符）。候选 B（004-PDF caption −100%，多栏提取失败，
+复杂度高）/ C（002-PDF 表单域标签误判 heading +246%）/ D（001-PDF
+跨页表格拆分 table +300%）均为低优先级、各影响 1 文档。
+
+**会话运行注记**：本段出现服务端配额限制（错误 18364，每 3 小时
+88 次请求上限，耗尽后需等 ~80 分钟）；另旧 tab 经 cdp/network 调用后
+出现编辑器 React 状态失同步（insertText/fill 均不触发按钮变形），
+close_session 后新开 tab 恢复。后续与 GPT 交互需注意配额节奏与
+tab 污染规避（避免在同 tab 混用 cdp/network 与发送序列）。
