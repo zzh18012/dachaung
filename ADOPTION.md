@@ -2394,3 +2394,34 @@ report_version 1.3 与 EVALUATOR_VERSION 1.10 不变（裁决确认）。
 **文档更新**：README 可选依赖节（tqdm）；CLAUDE.md 范围节（多进程
 移出"不做"清单）+ 并行化章节 + 常用命令；docs/BACKLOG.md 第 5 项
 （segfault 限制）。
+
+## 五十二、批次 16 封口裁决记录（Stage-8-Batch-16-Closed，2026-08-31）
+
+**裁决结论**（会话 cf170a6f，GPT 5.6 Sol）：
+
+1. **执行验收全部通过 ✓**：实现（app/batch.py worker+批函数+进度降级、
+   CLI 三态+退出码、evaluation --workers 保序装配+EF 顺序）；测试
+   12 项 + 全量回归 5175；性能基准 2.10×（≥2× 验收线）；一致性
+   验证 rc=0（report_version 1.3 / EVALUATOR_VERSION 1.10 不变）；
+   文档四处更新。
+2. **7 项契约偏差全部追认 ✓**（各附追认理由）：argparse（项目惯例）、
+   process_single 实签名（示例为伪代码）、wall_time=墙钟（"工程正确性
+   优于裁决示例"）、error_code=ErrorRecord.code（与单文档 CLI 一致）、
+   md 路由（fallback 实测不支持 .md）、workers 记生效值（可判断是否
+   启用并行）、run_evaluation 增参非独立函数（workers=1 同构）。
+3. **归档编号：Stage-8-Batch-16-Closed。**
+4. **合并推送授权：通过**（ff-only 合并
+   integration/stage8-batch16-batch-parse @ 94d2e12 并推送
+   origin/main，立即执行）。
+5. **下一批次指定：批次 17（结构化日志与可观测性）**——JSON Lines
+   结构化日志；方案 A（Python logging + 自定义 JSON formatter，
+   零新增依赖，裁决推荐）vs B（structlog，新增依赖须用户批准）；
+   关键事件 batch_start/file_complete/file_error/batch_complete/
+   warnings；CLI --log-file 与 --verbose；进度条与日志共存；
+   默认向后兼容；步骤 1 设计决策（方案选择/事件 schema/CLI 接口/
+   共存细节/边界声明）需汇报后裁决。
+   验收标准：JSON Lines 格式、INFO/WARNING/ERROR、关键事件全覆盖、
+   CLI 参数、共存不冲突、向后兼容、测试覆盖、文档更新、全量回归。
+
+**执行记录**：本节归档后随分支一并合并推送（封口记录提交在合并授权
+范围内）。
