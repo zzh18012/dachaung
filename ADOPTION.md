@@ -2286,3 +2286,47 @@ silent_drop 51→35（−31%）、测试 5147→5163（+16）。
 出现编辑器 React 状态失同步（insertText/fill 均不触发按钮变形），
 close_session 后新开 tab 恢复。后续与 GPT 交互需注意配额节奏与
 tab 污染规避（避免在同 tab 混用 cdp/network 与发送序列）。
+
+## 五十、Stage 8 启动裁决记录（Stage 7 封存 + 批次 16 开工许可，2026-08-31）
+
+**前置运维事实**：批次 15 封口确认 + Stage 7/8 决策回复首次发送时撞
+服务端配额（错误 18364），经 `/backend-api/conversation/{id}` API 直读
+核实**服务端未收到该消息**（对话最后一条 user 消息仍为批次 15 封口
+汇报）——配额拒绝发生在请求层，整条消息未落库。配额恢复后在新 tab
+重发（760 字符，含运维注记披露重发事实），GPT 已收到并裁决。
+
+**裁决结论**（会话 cf170a6f，GPT 5.6 Sol）：
+
+1. **批次 15 封口确认 ✓**：合并推送 main a85eeb7 → 52b8eb6 验证通过；
+   commits 01eaed8 / 52b8eb6 核对无误；归档编号 Stage-7-Batch-15-Closed。
+2. **Stage 7 正式封存**（批次 9–15，7 批次）：devset 2→10、annotation
+   v1.0→v1.1、EVALUATOR_VERSION 1.8→1.10、silent_drop_total 51→35
+   （−31%）、测试 5147→5163、ADOPTION.md §三十八–§四十九。
+3. **Stage 7/8 决策：进入 Stage 8（新特性开发）**。候选 B/C/D 与
+   w:tc 内 sdt 全部归 backlog，Stage 8 期间不动。
+4. **GitHub Issues #4 / #5 立即关闭**：#4 引用 Stage-7-Batch-12-Closed
+   （批次 12 完成）、#5 引用 Stage-7-Batch-13-Closed（批次 13 完成）。
+   **已执行**：均以 completed 关闭并附评论（issuecomment-5473175405 /
+   issuecomment-5473175772）。
+5. **Backlog 文档化**：4 项已知限制（B/C/D/w:tc）已记入
+   `docs/BACKLOG.md`（本批提交）。
+6. **Stage 8 目标：生产化与扩展性**——性能优化、可观测性、扩展性、
+   部署准备。封口标准（Stage 8 整体）：100 文档 <10min（8 核单机）、
+   结构化日志 + 进度 + 错误汇总、≥1 外部 parser 插件示例、Docker +
+   CI/CD、生产部署与 API 文档。
+7. **批次 16（批量处理与并行化）开工许可已授予**：
+   - `app.cli batch-parse`（目录/glob 输入、每文档 1 JSON + summary
+     汇总、多进程池、tqdm 进度条）
+   - `evaluation.cli run` 并行化（报告格式不变，per-doc 排序）
+   - 错误隔离（单文档失败不中断）
+   - 验收：10 文档并行 vs 顺序加速比 >2×（8 核）；并行结果排序后与
+     顺序逐字节一致；全量回归通过
+   - **步骤 1（设计决策，需汇报后裁决）**：技术方案 A
+     （multiprocessing.Pool）vs B（ProcessPoolExecutor）+ 理由；CLI
+     接口完整设计；进度条策略；边界声明（小文档阈值/内存/错误处理）
+
+**执行记录**：docs/BACKLOG.md 新建；issues #4/#5 关闭；本节归档。
+步骤 1 设计调查随后启动。
+
+**GPT 前端提示**：镜像站提示"对话轮数较多，建议创建新聊天"——若后续
+对话异常频发，考虑新会话并自包含简报（携带 ADOPTION.md 台账指针）。
