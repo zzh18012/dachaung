@@ -18,6 +18,7 @@
 | 0.3.0 | locator family（结构化 source_locator） | Stage 6 批次 3 |
 | 0.4.0 | relations 数组激活（has_caption） | Stage 6 批次 4 |
 | 0.5.0 | 新增 relation type 枚举（table_has_caption） | Stage 6 批次 7 |
+| 0.6.0 | 开放扩展 source_type（pattern + family 驱动 locator 形状；0.1.0–0.5.0 守卫仍限内置六类型） | Stage 8 批次 20 |
 
 ## 3. 升版规则
 

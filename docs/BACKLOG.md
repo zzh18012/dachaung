@@ -57,7 +57,29 @@
 - 升级条件：开放枚举或注册式扩展需 Schema 变更（report/schema 版本
   政策约束），须单独裁决
 - 依据：批次 19 实现中实证（2026-08-31，会话 6a952dc9）
-- 状态：backlog
+- 状态：**已解决（Stage 8 批次 20，2026-09-01）**——schema 0.6.0 受控
+  开放（pattern `^[a-z][a-z0-9_]{0,31}$` + family 四值驱动 locator 形状
+  + parser 声明契约 + 运行时 parser_contract_mismatch）；locator family
+  集合仍封闭（新增 family = 新 locator 形状/schema 依据，需单独批次裁决）
+
+## 7a. holdout_table_caption_first_run.py 期望版本冻结于 0.5.0
+
+- 影响范围：Stage 6 批次 7 封存的 holdout 首跑对照脚本（scripts/）
+- 现象：脚本与 samples/synthetic/holdout-table-caption/expectations.json
+  的 `expected_schema_version` 冻结为 0.5.0（批次 7 时代工件）；批次 20
+  起 writer 一律输出 0.6.0，对**新**产出重跑该脚本会版本失配
+- 升级条件：如需对新产物重跑对照，须同步期望版本并重新封存（holdout
+  纪律：已封存工件不追溯改动）；封存的历史结论不受影响
+- 状态：已知限制（本批不动）
+
+## 7b. locator family 集合封闭（无扩展机制）
+
+- 影响范围：批次 20 契约（app/source_types.py LOCATOR_FAMILIES）
+- 现象：family 仅四值（page_geometry/structural_index/line_address/
+  container_line）；新文档类型必须复用现有 family 的 locator 形状
+- 升级条件：新增 family 需同时定义新 locator schema 形状 + 契约表 +
+  测试矩阵（批次 20 裁决 D3：单独批次处理）
+- 状态：设计决定（封闭是有意的，非缺陷）
 
 ## 8. --plugin 文件路径加载
 

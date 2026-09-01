@@ -45,7 +45,16 @@
 - `--parser` 去掉 argparse 静态 choices，插件加载后按注册表动态校验（`auto` 唯一保留名）；未知名 → 结构化 `unknown_parser` rc 1（此前 argparse rc 2，有意变更）
 - 批量：父进程在池创建前加载（失败不启动批）；并行 worker initializer 重放加载 + multiprocessing.Queue 恰一次初始化回报，文件任务派发前校验，失败受控终止池（code 同上，回报超时 `plugin_init_report_timeout`，固定上限 120 秒，事件带 expected/received worker 数）；parse_one_file 有防御背板；`plugin_loaded.parsers_added` 为本进程首次加载真实增量（重复 --plugin 同模块只发一次事件，空表仅限预导入/未注册 parser 的真实幂等情形）
 - JSONL：`plugin_loaded`（含 parsers_added，CLI 已预加载时为空表）/ `plugin_load_failed` + `batch_start.plugins`
-- 已知边界：`source_type` 封闭枚举限制新格式插件（复用枚举内取值）；batch 目录递归扫描后缀固定三类，插件格式走单文件/glob
+- 已知边界：batch 目录递归扫描后缀固定三类，插件格式走单文件/glob
+
+## source_type 受控扩展契约（Stage 8 批次 20）
+
+- `app/source_types.py`：`SOURCE_TYPE_PATTERN=^[a-z][a-z0-9_]{0,31}$`；`LOCATOR_FAMILIES` 封闭四值（page_geometry/structural_index/line_address/container_line，**不新增**——新 family 需单独批次）；`BUILTIN_SOURCE_TYPE_FAMILIES` 六类型冻结映射；`normalize_*` 全部拒绝而非静默修正
+- Parser 契约声明（register 强制）：`source_types` tuple（str=单元素；多格式 parser 如 fallback 声明 `("pdf","docx")`）+ `locator_family`（新类型必填；纯内置多类型必须 None）；类型→family 全局唯一绑定（先注册者胜，冲突 ParserRegistrationError）；同绑定多 parser 并存合法；读取统一走 `declared_source_types()`（str 归一）
+- schema 0.6.0：顶层 source_type 改 pattern；0.1.0–0.5.0 守卫仍限内置六类型（历史不回写）；扩展类型 locator.family 必填且 ∈ 四值，形状按 family 路由（line_address → 新 `$defs/line_address_locator`）；内置六类型 0.5.0/0.6.0 形状完全一致；`SCHEMA_VERSION_CURRENT="0.6.0"`（models.py，唯一权威常量），writer 一律输出 0.6.0
+- 运行时契约检查：`process_single` 在 schema 校验后、写盘前核对 source_type ∈ 声明集合 且 每个 locator.family == 全局绑定；违规 → `parser_contract_mismatch`（details 带 declared/actual/expected_family/element_ids）+ rc 1 + 不写盘；所有 parser 统一检查（内置同规）
+- `validate` 子命令纯 schema 校验，不含注册表/契约检查（无 parser 上下文）
+- `.myx` 全链测试插件在 `tests/test_plugin_myx_fullchain.py`（subprocess 走真实 CLI；测试专用，永不内置、不进 evaluation AUTO 映射）；评测 AUTO_PARSER_BY_SOURCE_TYPE 语义不变
 
 ## 环境
 

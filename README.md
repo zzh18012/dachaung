@@ -179,12 +179,31 @@ class MyParser(Parser):
     version = "1.0.0"
     supported_extensions = (".myx",)
     priority = 100
-    source_types = ("text",)          # 批次 20 起强制：声明产出的 source_type 集合
-    locator_family = "line_address"   # 仅声明新（非内置）类型时必填，四选一
+    source_types = ("myx",)           # 批次 20 起强制：声明产出的 source_type 集合
+    locator_family = "line_address"   # 产出新（非内置）类型时必填，四选一
 
     def parse(self, path, source_hash):
+        # 新格式：Document.source_type="myx"，每个 element 的
+        # source_locator 携带 {"family": "line_address", "line": N}
         ...
 ```
+
+**新格式扩展 source_type（Stage 8 批次 20，schema 0.6.0）**：非内置类型
+按 `^[a-z][a-z0-9_]{0,31}$` 受控开放——旧版本（0.1.0–0.5.0）仍限内置
+六类型（历史不回写）；0.6.0 下扩展类型的每个
+`element.source_locator.family` 必填且属于封闭四值枚举，locator 形状按
+family 而非 source_type 路由校验。运行时 pipeline 在 schema 校验后核对
+产出与声明（`source_type` 是否在声明集合内、locator.family 是否等于该
+类型的全局绑定），违规 → 结构化错误 `parser_contract_mismatch`
+（rc 1、不写盘）。全链示例：
+
+```bash
+.venv/Scripts/python.exe -m app.cli parse doc.myx -o out.json \
+  --plugin my_pkg.my_plugin --parser auto   # 输出 schema_version=0.6.0
+```
+
+（`.myx` 测试插件完整可运行样板见 `tests/test_plugin_myx_fullchain.py`
+——测试专用，永不内置、不进评测 AUTO 映射。）
 
 **契约声明（Stage 8 批次 20，register 时强制）**：`source_types` 必须非空
 （str 视为单元素 tuple；多格式 parser 如 fallback 声明 `("pdf", "docx")`）；
@@ -197,10 +216,6 @@ ParserRegistrationError）；同 source_type + 同 family 的多 parser 并存�
 然后 `import` 该模块即可被 `list-parsers` / `--parser auto` 发现。
 `discover_parser(path)` 返回 parser **名称**（`str`，非实例）——实例化
 统一走 `get_parser(name)`，`image_output_dir` 等构造参数在该层注入。
-**新格式注意**：`Document.source_type` 受 Schema 封闭枚举约束
-（pdf/docx/markdown/html/text/ipynb），外部插件解析新格式时暂须将
-`source_type` 映射至既有语义类型（如纯文本类新格式用 `"text"`），
-开放枚举需 Schema 变更（docs/BACKLOG.md #7）。
 不做 entry_points 自动扫描（显式优于隐式）；重名注册在 import 时即报
 ValueError。完整 YAML（PyYAML）支持见 docs/BACKLOG.md。
 
@@ -228,10 +243,9 @@ traceback）。JSONL 事件：`plugin_loaded`（含 `parsers_added`；CLI 校验
 阶段已在父进程加载时为空表）/ `plugin_load_failed`；`batch_start` 增
 `plugins` 字段。
 
-已知边界：`schemas/document.schema.json` 的 `source_type` 为封闭枚举
-（pdf/docx/markdown/html/text/ipynb），外部插件解析新格式暂需复用枚举内
-取值（开放枚举需 Schema 变更，见 docs/BACKLOG.md）；`batch-parse` 目录
-递归扫描仍固定 .pdf/.docx/.md，插件格式经单文件或 glob 显式传入。
+已知边界：`batch-parse` 目录递归扫描仍固定 .pdf/.docx/.md，插件格式经
+单文件或 glob 显式传入；`validate` 子命令为纯 schema 校验（无注册表
+上下文，不校验 parser 契约声明——运行时契约检查在 parse 路径）。
 
 ---
 
