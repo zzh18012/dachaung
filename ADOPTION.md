@@ -2937,3 +2937,55 @@ CLI 入口 / 解释-warning-error 三层边界 / CLI JSON / 不做清单 /
 discover_parser() 零变化），先设计裁决后实现。
 
 **边界**：BACKLOG #7a/#7b/#8/#9 继续不混入。
+
+## 六十一、批次 22 执行记录（Parser Resolution Explainability，2026-09-01）
+
+裁决对话：6a957e64-fbac-83ea-af7d-64efe4924af3（GPT-5.6 Sol，思考程度
+"高"）。Step 1 设计裁决 APPROVED（D1 复用 DiscoveryResult 不新增
+ResolutionReport；D2 explain-parser 独立子命令 + "三不"边界；D3 解释/
+warning/error 三层分离，不重放 UserWarning；D4 --json 显式构造五字段、
+不用 asdict——防内部字段泄漏；D5/D6 全通过）。
+
+两相实现（严格门禁）：
+
+```text
+Phase A  5b4e595b34ddc18a71d39290788964d6ade1c786  CLI 实现
+         app.cli explain-parser <input> [--plugin ...] [--json]；
+         registry 零改动（唯一实现文件 app/cli.py）；+9 测试
+Phase B  dc2bc8004ba4da267ecfcb26710d307767236c31  文档+收口
+         README §3.5 / CLAUDE.md 批次 22 节 / ADOPTION §六十 /
+         收口测试（解释与执行同源锁 ×5 + D4 契约键集锁）；+6 测试
+```
+
+测试：5384 passed（5369 + 15，零回归）。
+
+送审传输注记：Phase D 时代确立的"发送前刷新页面"流程在全程沿用，本批
+三次送审（Step 1 / Phase A / Phase B）均一次落地无回滚。
+
+**推送授权与执行**（五步序列，指示线 main worktree；首次 fetch 遇
+GitHub 504 瞬时故障重试成功，其余全部一次通过）：
+
+```
+git fetch origin                                → OK（504 重试后）
+EXPECTED=$(git rev-parse integration/stage8-batch22-resolution-explain)
+                                                → dc2bc8004ba4da267ecfcb26710d307767236c31
+git merge-base --is-ancestor origin/main $EXPECTED → OK（0 退出）
+git merge --ff-only $EXPECTED                   → 342b2cc..dc2bc80（2 commits，无 merge commit）
+git push origin main                            → OK
+git ls-remote origin refs/heads/main            → remote == expected
+test "$REMOTE" = "$EXPECTED"                    → Batch 22 push verified
+```
+
+**批次 23 指定：Parser Resolution Audit（解析竞争审计）**——从"单个输入
+为什么选它"扩展到"整个 registry 当前有哪些解析竞争、谁胜出、哪里存在
+平局"。已锁定边界：不给 explain-parser 加 --all（保持单输入职责）；
+Step 1 优先评估独立入口 audit-parsers [--plugin ...] [--json]；extension
+universe 只来自已注册 capability snapshot 的 extensions 并集；每个扩展的
+裁决必须委托 discover_parser_details()（不复制排序算法）；不实例化
+parser、不读文件、不 parse；平局不重发 UserWarning；schema/source_type/
+family 零改动；插件加载失败复用批次 19 错误契约。
+
+演进链（GPT 总结）：插件可加载（19）→ 输出受控（20）→ 能力快照（21）→
+单次选择可解释（22）→ 全局解析竞争可审计（23）。
+
+**边界**：BACKLOG #7a/#7b/#8/#9 继续不混入。
