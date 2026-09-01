@@ -10,7 +10,7 @@ from app.models import (
     Element,
     ErrorRecord,
     Relation,
-    SCHEMA_VERSION_TABLE_CAPTION,
+    SCHEMA_VERSION_CURRENT,
     WarningRecord,
 )
 
@@ -110,7 +110,7 @@ def test_document_to_dict_round_trip_keys():
         relations=[Relation(type="parent_child", from_id="e1", to_id="c1")],
     )
     d = doc.to_dict()
-    assert d["schema_version"] == SCHEMA_VERSION_TABLE_CAPTION
+    assert d["schema_version"] == SCHEMA_VERSION_CURRENT
     assert set(d.keys()) >= {
         "schema_version", "document_id", "source_path", "source_type",
         "source_hash", "parser_name", "parser_version",

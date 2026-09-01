@@ -353,7 +353,7 @@ def test_evaluator_consumes_table_has_caption(tmp_path: Path):
         _synthetic_table_docx(tmp_path), source_hash="a" * 64
     )
     d = doc.to_dict()
-    assert d["schema_version"] == "0.5.0"
+    assert d["schema_version"] == "0.6.0"
     validate_udm(d)
     table_rels = [r for r in d["relations"] if r["type"] == "table_has_caption"]
     assert len(table_rels) == 1
@@ -452,7 +452,7 @@ def test_devset_docx_table_relation():
         "metadata": {"rule": "docx_adjacent_element_above"},
     }]
     d = doc.to_dict()
-    assert d["schema_version"] == "0.5.0"
+    assert d["schema_version"] == "0.6.0"
     validate_udm(d)
 
 
@@ -463,5 +463,5 @@ def test_devset_pdf_zero_table_relations():
     doc = _devset_doc("pdf")
     assert all(r.type != "table_has_caption" for r in doc.relations)
     d = doc.to_dict()
-    assert d["schema_version"] == "0.5.0"
+    assert d["schema_version"] == "0.6.0"
     validate_udm(d)

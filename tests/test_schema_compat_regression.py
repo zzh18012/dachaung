@@ -1,9 +1,9 @@
 """Schema 双向兼容回归测试（批次 8 技术债清理之④）。
 
 裁决要求（ADOPTION §三十三，批次 8 任务 4）：
-- 读兼容（旧→新）：0.1.0–0.4.0 各时代形状的文档必须能被当前 schema
+- 读兼容（旧→新）：0.1.0–0.5.0 各时代形状的文档必须能被当前 schema
   校验通过（旧产物永远合法读入，docs/schema-version-policy.md §4）。
-- 写能力（新）：当前 writer 一律输出 0.5.0，不再产出任何旧版本。
+- 写能力（新）：当前 writer 一律输出 0.6.0，不再产出任何旧版本。
 - 消费兼容（新→旧）：0.5.0 文档喂给"只认识旧 relation type 集"的模拟
   旧 consumer，应优雅降级——跳过未知 type，不报错、不误读。
 """
@@ -85,7 +85,7 @@ def test_v050_both_relation_types_validates():
     ))
 
 
-# ---------- 写能力：当前 writer 只产 0.5.0 ----------
+# ---------- 写能力：当前 writer 只产 0.6.0 ----------
 
 def test_writer_emits_only_current_version():
     d = Document(
@@ -98,7 +98,7 @@ def test_writer_emits_only_current_version():
                       source_element_ids=["e1"])],
         relations=[Relation(type="has_caption", from_id="e1", to_id="e1")],
     ).to_dict()
-    assert d["schema_version"] == "0.5.0"
+    assert d["schema_version"] == "0.6.0"
     validate_udm(d)
 
 

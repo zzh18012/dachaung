@@ -255,7 +255,7 @@ def test_040_keeps_family_const_enforcement():
 
 def test_unknown_version_still_rejected():
     with pytest.raises(Exception):
-        validate_udm(_udm_with_relation("0.6.0", None))
+        validate_udm(_udm_with_relation("0.7.0", None))
 
 
 # ---------- §5 不变量：无 caption 来源零 relation ----------
@@ -326,7 +326,7 @@ def test_devset_docx_figure_relation():
         },
     ]
     d = doc.to_dict()
-    assert d["schema_version"] == "0.5.0"
+    assert d["schema_version"] == "0.6.0"
     validate_udm(d)
 
 

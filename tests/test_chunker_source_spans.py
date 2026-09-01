@@ -312,7 +312,7 @@ def test_rule9_spans_emit_050_docx():
     )
     doc.chunks = StructuralChunker(max_chars=100).chunk(doc)
     d = doc.to_dict()
-    assert d["schema_version"] == "0.5.0"
+    assert d["schema_version"] == "0.6.0"
     validate_udm(d)
 
 
@@ -466,7 +466,7 @@ def test_e2e_markdown_pipeline_050_and_span_identity(tmp_path):
     )
     assert errors == [] and document is not None
     d = document.to_dict()
-    assert d["schema_version"] == "0.5.0"
+    assert d["schema_version"] == "0.6.0"
     validate_udm(d)
     by_id = {e.element_id: e for e in document.elements}
     assert d["chunks"]

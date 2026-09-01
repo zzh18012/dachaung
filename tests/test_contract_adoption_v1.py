@@ -68,12 +68,44 @@ def test_new_source_types_accepted():
 
 
 def test_unknown_source_type_rejected():
+    """批次 20 重锚：source_type 开放为受控扩展（schema 0.6.0）。
+
+    - pattern 非法（大写/数字开头）任意版本拒绝；
+    - pattern 合法的扩展类型在 0.6.0 下缺 family/形状即拒；
+    - 0.5.0 守卫仍拒扩展类型；0.6.0 带完整 family 契约则合法。
+    """
+    # pattern 非法：大写
+    for bad in ("Bogus", "1bogus"):
+        doc = _doc(bad)
+        try:
+            validate(doc)
+            raise AssertionError(f"should reject pattern-invalid {bad}")
+        except AssertionError:
+            raise
+        except Exception:
+            pass
+    # pattern 合法但缺 family（0.6.0 扩展分支）
     doc = _doc("bogus")
     try:
         validate(doc)
-        raise AssertionError("should reject bogus source_type")
+        raise AssertionError("0.6.0 extension type without family should fail")
+    except AssertionError:
+        raise
+    except Exception:
+        pass
+    # 0.5.0 守卫：内置六类型之外一律拒
+    doc = _doc("bogus")
+    doc["schema_version"] = "0.5.0"
+    try:
+        validate(doc)
+        raise AssertionError("0.5.0 should reject extension source_type")
+    except AssertionError:
+        raise
     except Exception as e:
-        assert "bogus" in str(e) or "enum" in str(e)
+        assert "enum" in str(e) or "bogus" in str(e)
+    # 0.6.0 + 完整 family 契约：合法（开放承诺）
+    doc = _doc("bogus", {"family": "line_address", "line": 1})
+    validate(doc)
 
 
 def test_new_locators_required_fields():
