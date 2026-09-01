@@ -172,10 +172,14 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="把结构化日志同时打到 stderr（与进度输出可能交错）",
     )
 
-    # list-parsers 子命令（Stage 8 批次 18；批次 19 增 --plugin）
+    # list-parsers 子命令（Stage 8 批次 18；批次 19 增 --plugin；
+    # 批次 21 Phase C 增 --json 与能力列）
     lp = sub.add_parser(
         "list-parsers",
-        help="列出已注册 parser（含插件）：name / priority / extensions / version",
+        help=(
+            "列出已注册 parser（含插件）：name / priority / extensions /"
+            " source_types / locator_family / version"
+        ),
     )
     lp.add_argument(
         "--plugin",
@@ -183,6 +187,11 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         default=None,
         metavar="MODULE",
         help="外部插件模块（dotted 名，可重复；加载后再列出）",
+    )
+    lp.add_argument(
+        "--json",
+        action="store_true",
+        help="输出机器可读 JSON（list_parsers() 行原样，(priority, name) 稳定序）",
     )
     return p
 
@@ -274,10 +283,24 @@ def main(argv: list[str] | None = None) -> int:
         if rc is not None:
             return rc
         rows = _reg_list_parsers()
-        print(f"{'name':<20} {'priority':<8} {'extensions':<22} version")
+        if args.json:
+            # 批次 21 Phase C：机器可读能力清单（数据源 list_parsers()
+            # → _capabilities 快照，不重读 Parser 类）
+            print(json.dumps(rows, ensure_ascii=False, indent=2))
+            return 0
+        header = (
+            f"{'name':<20} {'priority':<8} {'extensions':<18}"
+            f" {'source_types':<18} {'locator_family':<16} version"
+        )
+        print(header)
         for r in rows:
             exts = ",".join(r["extensions"]) or "-"
-            print(f"{r['name']:<20} {r['priority']:<8} {exts:<22} {r['version']}")
+            sts = ",".join(r["source_types"]) or "-"
+            fam = r["locator_family"] or "-"
+            print(
+                f"{r['name']:<20} {r['priority']:<8} {exts:<18}"
+                f" {sts:<18} {fam:<16} {r['version']}"
+            )
         print(
             f"\n共 {len(rows)} 个已注册 parser；--parser auto 按扩展名自动发现"
             "（priority 小者优先；显式 --parser 永远覆盖发现）"
