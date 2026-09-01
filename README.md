@@ -165,6 +165,10 @@ datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc).isoformat()
 .venv/Scripts/python.exe -m app.cli explain-parser doc.md
 .venv/Scripts/python.exe -m app.cli explain-parser doc.pdf --json
 
+# 审计注册表全局解析竞争（Stage 8 批次 23）
+.venv/Scripts/python.exe -m app.cli audit-parsers
+.venv/Scripts/python.exe -m app.cli audit-parsers --json
+
 # 按扩展名自动发现（priority 小者优先；显式 --parser 永远覆盖发现）
 .venv/Scripts/python.exe -m app.cli parse doc.md -o out.json --parser auto
 ```
@@ -251,6 +255,19 @@ extensions / priority / version）——registry 一切核心路径（自动发�
 直接序列化，CLI JSON 是稳定外部契约，不随内部模型演化泄漏字段）。
 错误契约零新增：无候选 → `unsupported_type`；`--plugin` 失败 →
 `plugin_import_failed` / `plugin_register_failed`（加载先于解释）。
+
+**解析竞争审计（Stage 8 批次 23）**：`audit-parsers [--plugin ...] [--json]`
+把发现决策扩展到注册表级观察——extension universe 来自已注册 capability
+snapshot 的 extensions 并集（经 `list_parsers()` 读取，不扫文件系统、不建
+第二份缓存），每个扩展的裁决委托 `discover_parser_details()`（构造伪路径
+`Path("x"+ext)`，单一决策实现，零排序算法复制）。每行报告 extension /
+候选（name+priority）/ winner / reason，并给出 `status` 派生展示字段
+（单候选 `uncontested`、同 priority 平局 `tie`、否则
+`priority_competition`——CLI 层派生，非 discovery 状态）；tie 行在 human
+模式显式标注"平局：先注册者 X 胜（registration_order=N）"（决胜依据可
+追溯）。`summary` 仅数量/分类计数，无健康评分/排名（audit 是观察，不是
+治理）。全程不实例化 parser、不读文件、不 parse、零 UserWarning；空注册表
+输出空报告（rc 0）。
 
 然后 `import` 该模块即可被 `list-parsers` / `--parser auto` 发现。
 `discover_parser(path)` 返回 parser **名称**（`str`，非实例）——实例化

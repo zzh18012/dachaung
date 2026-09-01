@@ -73,6 +73,15 @@
 - 错误契约零新增：无候选 → `unsupported_type`（rc 1 结构化 JSON）；`--plugin` 失败 → `plugin_import_failed` / `plugin_register_failed`（批次 19 通道，加载序先于解释，与 parse 一致）
 - discover 算法 / 选择规则 / warning / schema / parse 默认行为全部零变化；不做 `--all` 全量矩阵（会滑向 registry analysis）、不做批量解释、不做 dry-run parse
 
+## 解析竞争审计（Stage 8 批次 23）
+
+- `app.cli audit-parsers [--plugin MODULE ...] [--json]`：注册表级观察——extension universe = 已注册 capability snapshot 的 extensions 并集（经 `list_parsers()` 读快照，字典序稳定输出）；每扩展构造伪路径 `Path("x"+ext)` 委托 `discover_parser_details()`（单一决策实现，不复制排序）；registry/discovery 零改动（实现文件仅 `app/cli.py`）
+- `status` 是 CLI 派生展示字段（derived presentation field），**禁止**反向进入 DiscoveryResult：单候选 `uncontested` / 平局 `tie` / 否则 `priority_competition`；`summary` 仅四项计数（extension_count / uncontested / priority_competition / tie），禁止健康/风险/推荐评分与"最佳 parser"排名（audit 是观察不是治理）
+- tie human 行显式含决胜三要素：winner name + winner registration_order + "先注册者胜"说明（Phase A 修正裁决，格式如 `<- 平局：先注册者 X 胜（registration_order=N）`）；audit 通道零 UserWarning（执行时告警、解释/审计时陈述）
+- `--json` 显式构造（D4 原则沿用）：`{"extensions": [{extension, candidates[{name,priority,registration_order}], winner, reason, tied_names, status}], "summary": {...}}`
+- 空注册表 → 空报告 rc 0（只读诊断语义，不制造错误）；不实例化 parser、不读文件、不 parse；`--plugin` 复用批次 19 契约（加载先行，`plugin_*` 错误码零新增）
+- 不做：explain-parser --all（单输入职责）、插件目录扫描 / entry points / 动态安装 / 网络（沿用）、audit 结果持久化/缓存、schema/source_type/family 改动
+
 ## 环境
 
 - 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
@@ -131,6 +140,10 @@ uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.
 # Stage 8 批次 22：解释 --parser auto 的选择（不读文件内容）
 .venv/Scripts/python.exe -m app.cli explain-parser doc.md
 .venv/Scripts/python.exe -m app.cli explain-parser doc.pdf --json
+
+# Stage 8 批次 23：审计注册表全局解析竞争
+.venv/Scripts/python.exe -m app.cli audit-parsers
+.venv/Scripts/python.exe -m app.cli audit-parsers --json
 
 # Stage 8 批次 19：显式外部插件加载（dotted 模块名，PYTHONPATH 提供模块）
 PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli parse doc.smk \
