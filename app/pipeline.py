@@ -15,7 +15,11 @@ from typing import Any
 from app.chunkers import StructuralChunker
 from app.hash import compute_file_hash
 from app.models import Document, ErrorRecord
-from app.parser_registry import get_parser as _registry_get_parser
+from app.parser_registry import (
+    declared_source_types,
+    get_parser as _registry_get_parser,
+    source_type_family,
+)
 from app.parsers import Parser, ParserError
 from app.schema import SchemaValidationError, validate
 
@@ -141,6 +145,52 @@ def process_single(
                 message=str(e),
                 details={
                     "validation_errors": e.errors[:20],  # 截断，避免 JSON 巨大
+                },
+            )
+        )
+        return None, errors
+
+    # 4c. 契约检查（批次 20 Phase C）：产出必须落在 parser 声明的
+    #     source_types 内，且每个 locator.family 与该类型的全局绑定一致。
+    #     schema 已放行（0.6.0 按 family 路由形状），此处拦截"合法但违背
+    #     声明"的产出：失败按单文件结构化错误处理，不写盘。
+    declared = declared_source_types(type(parser))
+    if document.source_type not in declared:
+        errors.append(
+            ErrorRecord(
+                code="parser_contract_mismatch",
+                message=(
+                    f"source_type {document.source_type!r} 不在 parser"
+                    f" {parser_name!r} 声明的 {list(declared)} 内"
+                ),
+                details={
+                    "parser_name": parser_name,
+                    "declared_source_types": list(declared),
+                    "actual_source_type": document.source_type,
+                },
+            )
+        )
+        return None, errors
+    expected_family = source_type_family(document.source_type)
+    bad_elements = [
+        el.element_id
+        for el in document.elements
+        if el.source_locator.get("family") != expected_family
+    ]
+    if bad_elements:
+        errors.append(
+            ErrorRecord(
+                code="parser_contract_mismatch",
+                message=(
+                    f"locator.family 应为 {expected_family!r}（source_type="
+                    f"{document.source_type!r} 的全局绑定），"
+                    f"不符元素: {bad_elements[:10]}"
+                ),
+                details={
+                    "parser_name": parser_name,
+                    "actual_source_type": document.source_type,
+                    "expected_locator_family": expected_family,
+                    "offending_element_ids": bad_elements[:10],
                 },
             )
         )

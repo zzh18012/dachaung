@@ -135,7 +135,7 @@ def list_parsers() -> list[dict[str, Any]]:
             "priority": cls.priority,
             "extensions": list(cls.supported_extensions),
             "version": cls.version,
-            "source_types": list(cls.source_types),
+            "source_types": list(declared_source_types(cls)),
             "locator_family": cls.locator_family,
         }
         for name, cls in sorted(
@@ -147,6 +147,18 @@ def list_parsers() -> list[dict[str, Any]]:
 def registered_names() -> list[str]:
     """当前已注册 parser 名称快照（plugin_loader 用于加载前后 diff）。"""
     return sorted(_registry)
+
+
+def declared_source_types(parser_cls: type[Parser]) -> tuple[str, ...]:
+    """读取 parser 类声明的 source_types，str 视为单元素 tuple。
+
+    register() 校验时按此规则归一，但不改写类属性；本函数供
+    list_parsers 与 pipeline 契约检查（批次 20 Phase C）以同一口径读取。
+    """
+    raw = getattr(parser_cls, "source_types", ())
+    if isinstance(raw, str):
+        return (raw,)
+    return tuple(raw)
 
 
 def source_type_family(source_type: str) -> str | None:
@@ -184,6 +196,7 @@ _register_builtins()
 
 
 __all__ = [
+    "declared_source_types",
     "discover_parser",
     "get_parser",
     "list_parsers",
