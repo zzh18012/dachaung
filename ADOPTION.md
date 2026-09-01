@@ -2793,3 +2793,82 @@ SHA 之后，随下一批次合并推送。
   全链闭环，不再借用既有 source_type；
 - BACKLOG #8（--plugin 文件路径）与 #9（120 秒真实 timeout 测试）
   不混入本批，继续留 backlog。
+
+## 五十九、批次 20 封口裁决记录（Stage-8-Batch-20-Closed，2026-09-01）
+
+裁决对话：6a957e64-fbac-83ea-af7d-64efe4924af3（GPT-5.6 Sol，思考程度
+"高"）。批次 20 四相（A 声明契约 / B schema 0.6.0 / C 运行时契约检查 /
+D .myx 全链测试）逐相送审：
+
+- Phase A（ce0c476）与 Phase B（c9a3d57）先后 APPROVED；
+- 相位时序偏差（B 报告送审前已先行实现 C）主动申报，裁决**接受不返工**
+  （三 commit 相互独立、未越设计范围、可 bisect），但 Phase D 起恢复严格
+  门禁：设计→裁决→实现→报告→下一阶段；
+- Phase C（1e9dc49）与 Phase D（0431fb0）按严格门禁送审通过；
+- Batch 20 = SEALED，授权 ff-only 推送。
+
+**三项偏差追认**：
+
+1. `source_types` 声明收窄为 str 或 str 元组（list 不接受）——实现期
+   发现 list 会与"扩展名列表"语义混淆，收窄后 `register` 即时校验；
+2. B→C 相位时序偏差（见上，接受不返工）；
+3. Phase A 潜伏缺陷（`list_parsers` 对 str 声明逐字符拆分）在 Phase C
+   期间发现，经 `declared_source_types()` 统一归一入口修复，GPT 追认为
+   有效修复。
+
+**关键成果**（对应 schema-version policy 0.6.0 行）：
+
+```text
+schema 0.6.0（SCHEMA_VERSION_CURRENT 唯一权威常量）
+source_type 封闭枚举 → pattern ^[a-z][a-z0-9_]{0,31}$ 受控开放
+0.1.0–0.5.0 守卫分支仍限内置六类型（历史不回写）
+扩展类型 locator.family 必填 ∈ 封闭四值（family 集合仍封闭）
+line_address → 新 $defs/line_address_locator；形状按 family 路由
+parser 声明契约：source_types tuple + locator_family，全局类型→family 唯一绑定
+运行时 parser_contract_mismatch（schema 校验后、写盘前；rc 1 不落盘）
+.myx 外部插件全链验证（tests 专用，永不内置、不进 AUTO 映射）
+```
+
+**测试**：5329 passed（5235 + 94：Phase A 44 + B 37 + C 5 + D 8，零回归）。
+
+**推送授权与执行**（GPT 给定五步序列，逐字执行于指示线 main worktree）：
+
+```
+git fetch origin                                → OK
+EXPECTED=$(git rev-parse integration/stage8-batch20-sourcetype-extension)
+                                                → 0431fb0e8823236574c5cb393813e525aa5471e0
+git merge-base --is-ancestor origin/main $EXPECTED → OK（0 退出）
+git merge --ff-only $EXPECTED                   → 7033dc5..0431fb0（31 files，+1487/-58）
+git push origin main                            → OK
+git ls-remote origin refs/heads/main            → remote == expected
+test "$REMOTE" = "$EXPECTED"                    → Batch 20 push verified
+```
+
+远端 SHA 与授权 SHA 完全一致，无 force。推送回执已发裁决对话，GPT 回复
+确认 Batch 20 正式进入 Stage 8 封存状态（2026-09-01）。封口记录提交（本
+条）在授权推送 SHA 之后，随下一批次合并推送。
+
+**下一批次指定：批次 21——Plugin Capability Manifest（插件能力描述与
+发现契约）**：从"插件能加载、输出受控"推进到"插件能力可声明、可解释、
+可确定选择"。**必须先提交 Step 1 Design Decision List，不直接实现**。
+
+裁决要点（GPT 列出的重点裁决项）：
+
+1. capability 是否独立抽象（独立 dataclass vs Parser 类属性继续扩展，
+   是否进 registry 内部模型）；
+2. input capability（extensions → parser candidate）与 output contract
+   （source_type → schema 形状）是否保持分离（GPT 倾向保持分离，待确认）；
+3. parser selection 是否确定性（priority 必要性、数值方向、相同
+   priority 处理、silent fallback 是否允许）；
+4. registry 是否继续保持受控通道；
+5. 不破坏 Batch 19/20 已封口契约。
+
+设计问题 D1–D6：D1 capability metadata 模型、D2 extensions 归属、
+D3 auto parser 冲突策略、D4 list-parsers 输出契约（人类/JSON/向后兼容）、
+D5 注册冲突错误归入既有 plugin_register_failed 还是新码、D6 不做清单
+（目录扫描 / pip entry points / 网络插件市场 / 动态安装 / GUI 插件管理
+——继续不做）。
+
+**边界**：BACKLOG #7a（holdout 脚本 0.5.0 冻结）、#7b（family 集合
+封闭为设计决定）、#8（--plugin 文件路径）、#9（120 秒 timeout 自动化）
+均不混入批次 21。
