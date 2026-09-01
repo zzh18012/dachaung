@@ -64,6 +64,15 @@
 - extensions=输入能力，source_types+locator_family=输出契约，两轴独立不映射；`list-parsers` 表格含六列（None 显示 "-"），`list-parsers --json` 输出 `list_parsers()` 行原样（(priority, name) 稳定序）
 - 本批不做：extension→胜出 parser 展示与 resolution report CLI（留批次 22）、schema 变更（schema_version 不升）、插件目录扫描/pip entry points/网络市场/动态安装/GUI
 
+## 选择解释 CLI（Stage 8 批次 22）
+
+- `app.cli explain-parser <input> [--plugin MODULE ...] [--json]`：解释 `--parser auto` 的选择——extension、候选表（name/priority/registration_order，胜者标记）、winner、reason、平局信息；registry 零改动（唯一实现文件 `app/cli.py`）
+- 关键边界（裁决 D2）：只取 `path.suffix`，**不读文件内容、不实例化 parser、不 parse**；文件不存在也可解释；输出含免责说明（"仅按扩展名解释，未读取文件内容"）
+- warning 边界（裁决 D3）：解释通道**不重放** `discover_parser()` 的平局 UserWarning（执行时告警、解释时陈述，语义不同）；平局信息入报告（tied_names + reason"平局：先注册者胜"）
+- `--json`（裁决 D4）：**显式构造**五字段 {extension, candidates[{name, priority, registration_order}], winner, reason, tied_names}——不用 `dataclasses.asdict` 直接序列化（CLI JSON 是稳定外部契约，防未来内部字段泄漏）
+- 错误契约零新增：无候选 → `unsupported_type`（rc 1 结构化 JSON）；`--plugin` 失败 → `plugin_import_failed` / `plugin_register_failed`（批次 19 通道，加载序先于解释，与 parse 一致）
+- discover 算法 / 选择规则 / warning / schema / parse 默认行为全部零变化；不做 `--all` 全量矩阵（会滑向 registry analysis）、不做批量解释、不做 dry-run parse
+
 ## 环境
 
 - 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
@@ -118,6 +127,10 @@ uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.
 
 # Stage 8 批次 21：能力清单（机器可读 JSON，六字段/行）
 .venv/Scripts/python.exe -m app.cli list-parsers --json
+
+# Stage 8 批次 22：解释 --parser auto 的选择（不读文件内容）
+.venv/Scripts/python.exe -m app.cli explain-parser doc.md
+.venv/Scripts/python.exe -m app.cli explain-parser doc.pdf --json
 
 # Stage 8 批次 19：显式外部插件加载（dotted 模块名，PYTHONPATH 提供模块）
 PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli parse doc.smk \

@@ -2872,3 +2872,68 @@ D5 注册冲突错误归入既有 plugin_register_failed 还是新码、D6 不�
 **边界**：BACKLOG #7a（holdout 脚本 0.5.0 冻结）、#7b（family 集合
 封闭为设计决定）、#8（--plugin 文件路径）、#9（120 秒 timeout 自动化）
 均不混入批次 21。
+
+## 六十、批次 21 执行记录（Plugin Capability Manifest，2026-09-01）
+
+裁决对话：6a957e64-fbac-83ea-af7d-64efe4924af3（GPT-5.6 Sol，思考程度
+"高"）。Step 1 设计裁决 APPROVED（核心裁定 D1=Option B：Parser 类属性
+仍是公开创作面，register() 校验后构建 frozen `ParserCapability` 快照存
+`_capabilities`；registry 核心路径只读快照，注册后改写类属性不生效——
+行为收紧=修复非破坏；能力唯一来源 `_capabilities`，禁止第三份缓存）。
+
+四相实现（严格门禁：设计→裁决→实现→报告→下一相）：
+
+```text
+Phase A  88cf90f8df2ded7a21494c01fecee90905d761c5  快照层
+         ParserCapability frozen dataclass 六字段 + register 校验
+         （priority/extensions/version）+ capability() 查询；18 项测试
+Phase B  a595aa4dee5b3af594f5b50fa620cce6feda0e13  发现解释
+         DiscoveryCandidate/DiscoveryResult + discover_parser_details()
+         单一决策实现；discover_parser() 委托（签名/返回不变）；13 项
+Phase C  66b5bafd5c212ce8d78946957dea8559d5373ba7  CLI 展示
+         list-parsers 六列表格 + --json（list_parsers() 行原样）；6 项
+Phase D  342b2cc9e014c0de522f2973a842c0a8a7fc6bb0  收口测试+文档
+         跨层快照一致性贯通测试 + 插件通道校验经真实 CLI；README/CLAUDE；3 项
+```
+
+测试：5369 passed（5329 + 40：A 18 + B 13 + C 6 + D 3，零回归）。
+
+**送审中断与恢复（传输层记录）**：Phase A/B/C 逐相 APPROVED 后，Phase D +
+总封口报告送审遭遇三轮服务端故障，处置时间线：
+
+1. 旧裁决对话三次"生成卡死"（0 字节 15–25 分钟、stop 无效、服务器超时后
+   回滚未完成消息）；
+2. 按既有先例（§五十八）尝试换新裁决对话：新对话创建与简报发送当时显示
+   成功（DOM article 计数 +2），实则被乐观 UI 回滚——后经用户告知根因是
+   **GPT 配额用尽**（账号级发送阻塞，与此前"卡死"表现同形）；
+3. 暂停等待配额恢复（用户确认后），在旧对话重发 Phase D + 总封口报告：
+   APPROVED + Batch 21 = SEALED + ff-only 推送授权，一次成功。
+
+经验固化：**验证消息落地不能只看发送后即时 DOM**（乐观 UI 会先渲染再
+回滚）；发送后 ≥90 秒复查 article 数与消息头部；页面长停留后发送疑似
+token 失效（两次观察：停留 >15 分钟的页面发送必回滚），**发送前刷新页面**
+后即恢复；配额恢复后同一对话重发无碍。
+
+**推送授权与执行**（GPT 给定五步序列，逐字执行于指示线 main worktree）：
+
+```
+git fetch origin                                → OK
+EXPECTED=$(git rev-parse integration/stage8-batch21-capability-manifest)
+                                                → 342b2cc9e014c0de522f2973a842c0a8a7fc6bb0
+git merge-base --is-ancestor origin/main $EXPECTED → OK（0 退出）
+git merge --ff-only $EXPECTED                   → 0431fb0..342b2cc（4 commits）
+git push origin main                            → OK
+git ls-remote origin refs/heads/main            → remote == expected
+test "$REMOTE" = "$EXPECTED"                    → Batch 21 push verified
+```
+
+远端 SHA 与授权 SHA 完全一致，无 force。回执发送一次因上述页面 token
+问题回滚，刷新页面后重发确认送达；不影响推送本身（推送先于回执完成）。
+
+**批次 22 指定：Parser Resolution Explainability（选择解释）**：在
+Batch 21 capability snapshot 与 discovery details 之上增加"为什么选择这个
+parser"的用户可见解释层。Step 1 设计范围 D1–D6（ResolutionReport 模型 /
+CLI 入口 / 解释-warning-error 三层边界 / CLI JSON / 不做清单 /
+discover_parser() 零变化），先设计裁决后实现。
+
+**边界**：BACKLOG #7a/#7b/#8/#9 继续不混入。

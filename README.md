@@ -161,6 +161,10 @@ datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc).isoformat()
 # 机器可读能力清单（JSON 数组，(priority, name) 稳定序，六字段/行）
 .venv/Scripts/python.exe -m app.cli list-parsers --json
 
+# 解释 --parser auto 的选择：扩展名 → 候选 + 胜者 + 原因（Stage 8 批次 22）
+.venv/Scripts/python.exe -m app.cli explain-parser doc.md
+.venv/Scripts/python.exe -m app.cli explain-parser doc.pdf --json
+
 # 按扩展名自动发现（priority 小者优先；显式 --parser 永远覆盖发现）
 .venv/Scripts/python.exe -m app.cli parse doc.md -o out.json --parser auto
 ```
@@ -235,6 +239,18 @@ extensions / priority / version）——registry 一切核心路径（自动发�
 诊断接口 `discover_parser_details(path)` 返回冻结 `DiscoveryResult`
 （候选列表 + 胜者 + 原因 + 平局说明，含 `registration_order`），
 与 `discover_parser()` 共用同一决策实现；诊断只陈述事实、不发告警。
+
+**选择解释 CLI（Stage 8 批次 22）**：`explain-parser <input> [--plugin ...]
+[--json]` 把上述发现决策对用户可见——输出 extension、候选表
+（name / priority / registration_order，胜者标记）、winner、reason 与平局
+信息。它只取 `path.suffix`：**不读文件内容、不实例化 parser、不 parse**
+（文件不存在也能解释），输出明示这一点。解释通道不重放 `discover_parser()`
+的平局 UserWarning（执行时告警、解释时陈述，二者语义不同）——平局信息在
+报告正文中。`--json` 显式构造五字段
+（extension / candidates / winner / reason / tied_names，非 dataclass
+直接序列化，CLI JSON 是稳定外部契约，不随内部模型演化泄漏字段）。
+错误契约零新增：无候选 → `unsupported_type`；`--plugin` 失败 →
+`plugin_import_failed` / `plugin_register_failed`（加载先于解释）。
 
 然后 `import` 该模块即可被 `list-parsers` / `--parser auto` 发现。
 `discover_parser(path)` 返回 parser **名称**（`str`，非实例）——实例化
