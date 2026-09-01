@@ -39,6 +39,7 @@ def fresh_registry(monkeypatch):
     """隔离的全局注册表副本：测试内注册不污染其他测试。"""
     monkeypatch.setattr(pr, "_registry", dict(pr._registry))
     monkeypatch.setattr(pr, "_source_type_families", dict(pr._source_type_families))
+    monkeypatch.setattr(pr, "_capabilities", dict(pr._capabilities))
     return pr._registry
 
 

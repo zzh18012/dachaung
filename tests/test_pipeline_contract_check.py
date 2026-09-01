@@ -23,6 +23,7 @@ from app.pipeline import process_single
 def fresh_registry(monkeypatch):
     monkeypatch.setattr(pr, "_registry", dict(pr._registry))
     monkeypatch.setattr(pr, "_source_type_families", dict(pr._source_type_families))
+    monkeypatch.setattr(pr, "_capabilities", dict(pr._capabilities))
     return pr._registry
 
 

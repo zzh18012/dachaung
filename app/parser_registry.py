@@ -8,6 +8,13 @@
   无候选 ValueError；同扩展名同 priority 平局 → 先注册者胜 + UserWarning
 - `list_parsers()`：按 (priority, name) 排序的元数据表
 
+批次 21 Phase A（capability snapshot）：register() 校验通过后即构建
+冻结 `ParserCapability` 快照；registry 一切核心路径（discover / list /
+pipeline 契约检查）**只读快照，不再活读 Parser 类属性**——注册后改写
+类属性不再影响注册表行为（registered capability is immutable，属
+行为收紧修复，非兼容破坏）。快照非公开创作面：插件作者仍以类属性
+声明能力（批次 18/19/20 契约零变化）。
+
 内置 parser 在本模块导入时按既有顺序注册；参考插件 markdown_enhanced
 随项目分发并注册（定位：随项目分发的参考/增强插件，非第三方外部插件）。
 外部插件接入方式：自定义模块 `import` 后 `@register`（不做
@@ -18,6 +25,7 @@ from __future__ import annotations
 
 import inspect
 import warnings
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +38,9 @@ from app.source_types import (
 
 _registry: dict[str, type[Parser]] = {}
 
+# 注册时冻结的能力快照（批次 21 Phase A）：核心路径唯一读取来源
+_capabilities: dict[str, ParserCapability] = {}
+
 # source_type → locator family 的全局唯一绑定（批次 20 D4）：
 # 首个声明该类型的 parser 建立绑定，后注册者绑定不同 family 即拒绝
 _source_type_families: dict[str, str] = {}
@@ -40,7 +51,77 @@ class ParserRegistrationError(ValueError):
 
     批次 19：plugin_loader 仅将本异常映射为 plugin_register_failed；
     插件模块顶层其他 ValueError 一律归为 plugin_import_failed。
+
+    批次 21：能力声明非法（extensions/priority/version 格式不符）同抛
+    本异常（顶层错误码不新增，details 级差异由错误文本标明字段名）。
     """
+
+
+@dataclass(frozen=True)
+class ParserCapability:
+    """register() 时冻结的 parser 能力快照（批次 21 Phase A，D1 裁决 B）。
+
+    六字段（GPT 批准）：name / source_types / locator_family /
+    extensions / priority / version。extensions 是**输入能力**（能吃什么
+    文件），source_types + locator_family 是**输出契约**（产出什么形状，
+    D2：两轴独立，不建立 extension → source_type 固定映射）。
+    registry 核心路径（discover / list / pipeline 契约检查）只读本快照。
+    """
+
+    name: str
+    source_types: tuple[str, ...]
+    locator_family: str | None
+    extensions: tuple[str, ...]
+    priority: int
+    version: str
+
+
+def _validated_extensions(parser_cls: type[Parser]) -> tuple[str, ...]:
+    """归一并校验 supported_extensions：str 视为单元素（与 source_types
+    同规），仅接受 tuple/list 容器；元素必须是小写、以点开头、长度 ≥ 2
+    的字符串（如 ".md"）。非法即 ParserRegistrationError。
+    """
+    raw = getattr(parser_cls, "supported_extensions", ())
+    if isinstance(raw, str):
+        items = (raw,)
+    elif isinstance(raw, (tuple, list)):
+        items = tuple(raw)
+    else:
+        raise ParserRegistrationError(
+            f"{parser_cls.__name__}.supported_extensions 必须是 str 或"
+            f" str 元组，得到 {type(raw).__name__}"
+        )
+    for ext in items:
+        if (
+            not isinstance(ext, str)
+            or len(ext) < 2
+            or not ext.startswith(".")
+            or ext != ext.lower()
+        ):
+            raise ParserRegistrationError(
+                f"{parser_cls.__name__}.supported_extensions 元素非法:"
+                f" {ext!r}（须为小写、点开头、长度≥2，如 '.md'）"
+            )
+    return items
+
+
+def _validated_priority(parser_cls: type[Parser]) -> int:
+    raw = getattr(parser_cls, "priority", 100)
+    if not isinstance(raw, int) or isinstance(raw, bool) or raw < 1:
+        raise ParserRegistrationError(
+            f"{parser_cls.__name__}.priority 必须为正整数（小者优先），"
+            f"得到 {raw!r}"
+        )
+    return raw
+
+
+def _validated_version(parser_cls: type[Parser]) -> str:
+    raw = getattr(parser_cls, "version", "")
+    if not isinstance(raw, str) or not raw:
+        raise ParserRegistrationError(
+            f"{parser_cls.__name__}.version 必须为非空字符串"
+        )
+    return raw
 
 
 def register(parser_cls: type[Parser]) -> type[Parser]:
@@ -50,6 +131,9 @@ def register(parser_cls: type[Parser]) -> type[Parser]:
     批次 20：注册时强制校验 (source_types, locator_family) 契约组合，
     并维护 source_type → family 的全局唯一绑定（首个声明者建立绑定，
     后续不同绑定即拒绝；同绑定多 parser 并存合法，如多个 markdown parser）。
+
+    批次 21 Phase A：校验通过后构建冻结 ParserCapability 快照存入
+    _capabilities；此后核心路径只读快照（注册后改写类属性不再生效）。
     """
     name = getattr(parser_cls, "name", None)
     if not name or name == "abstract":
@@ -69,6 +153,9 @@ def register(parser_cls: type[Parser]) -> type[Parser]:
         raise ParserRegistrationError(
             f"{parser_cls.__name__} 契约声明无效: {e}"
         ) from e
+    extensions = _validated_extensions(parser_cls)
+    priority = _validated_priority(parser_cls)
+    version = _validated_version(parser_cls)
     for st in declared_types:
         binding = BUILTIN_SOURCE_TYPE_FAMILIES.get(st) or _family
         existing = _source_type_families.get(st)
@@ -79,6 +166,14 @@ def register(parser_cls: type[Parser]) -> type[Parser]:
                 f"（类型→family 唯一，先注册者胜）"
             )
     _registry[name] = parser_cls
+    _capabilities[name] = ParserCapability(
+        name=name,
+        source_types=declared_types,
+        locator_family=_family,
+        extensions=extensions,
+        priority=priority,
+        version=version,
+    )
     for st in declared_types:
         binding = BUILTIN_SOURCE_TYPE_FAMILIES.get(st) or _family
         _source_type_families.setdefault(st, binding)
@@ -107,12 +202,15 @@ def discover_parser(path: str | Path) -> str:
     返回 str（非 Parser 实例）；实例化统一走 get_parser(name)。
     显式 --parser 永远覆盖本发现。平局（同扩展名同 priority）取先
     注册者并发 UserWarning。
+
+    批次 21 Phase A：候选集与排序只读 _capabilities 快照（注册后改写
+    类属性不影响发现结果）。
     """
     ext = Path(path).suffix.lower()
     candidates = [
-        (cls.priority, name)
-        for name, cls in _registry.items()
-        if ext in cls.supported_extensions
+        (cap.priority, name)
+        for name, cap in _capabilities.items()
+        if ext in cap.extensions
     ]
     if not candidates:
         raise ValueError(f"无已注册 parser 支持扩展名 {ext or '(无)'}")
@@ -128,18 +226,18 @@ def discover_parser(path: str | Path) -> str:
 
 
 def list_parsers() -> list[dict[str, Any]]:
-    """按 (priority, name) 排序的已注册 parser 元数据表。"""
+    """按 (priority, name) 排序的已注册 parser 元数据表（读快照）。"""
     return [
         {
-            "name": name,
-            "priority": cls.priority,
-            "extensions": list(cls.supported_extensions),
-            "version": cls.version,
-            "source_types": list(declared_source_types(cls)),
-            "locator_family": cls.locator_family,
+            "name": cap.name,
+            "priority": cap.priority,
+            "extensions": list(cap.extensions),
+            "version": cap.version,
+            "source_types": list(cap.source_types),
+            "locator_family": cap.locator_family,
         }
-        for name, cls in sorted(
-            _registry.items(), key=lambda kv: (kv[1].priority, kv[0])
+        for cap in sorted(
+            _capabilities.values(), key=lambda c: (c.priority, c.name)
         )
     ]
 
@@ -150,15 +248,35 @@ def registered_names() -> list[str]:
 
 
 def declared_source_types(parser_cls: type[Parser]) -> tuple[str, ...]:
-    """读取 parser 类声明的 source_types，str 视为单元素 tuple。
+    """读取 parser 注册时冻结的 source_types 快照（批次 21 Phase A）。
 
-    register() 校验时按此规则归一，但不改写类属性；本函数供
-    list_parsers 与 pipeline 契约检查（批次 20 Phase C）以同一口径读取。
+    供 pipeline 契约检查（批次 20 Phase C）以注册口径读取；注册后改写
+    类属性不再改变此结果。未注册的类没有快照——显式失败优于静默
+    活读（ParserRegistrationError）。
     """
-    raw = getattr(parser_cls, "source_types", ())
-    if isinstance(raw, str):
-        return (raw,)
-    return tuple(raw)
+    cap = _capabilities.get(getattr(parser_cls, "name", None))
+    if cap is None:
+        raise ParserRegistrationError(
+            f"{parser_cls.__name__}（name="
+            f"{getattr(parser_cls, 'name', None)!r}）未注册，无能力快照；"
+            f"能力读取只针对已注册 parser"
+        )
+    return cap.source_types
+
+
+def capability(parser_cls_or_name: type[Parser] | str) -> ParserCapability:
+    """名称或类 → 冻结能力快照（诊断/测试用；未注册即显式失败）。"""
+    name = (
+        parser_cls_or_name
+        if isinstance(parser_cls_or_name, str)
+        else getattr(parser_cls_or_name, "name", None)
+    )
+    cap = _capabilities.get(name)
+    if cap is None:
+        raise ParserRegistrationError(
+            f"parser 未注册，无能力快照: {name!r}"
+        )
+    return cap
 
 
 def source_type_family(source_type: str) -> str | None:
@@ -196,6 +314,8 @@ _register_builtins()
 
 
 __all__ = [
+    "ParserCapability",
+    "capability",
     "declared_source_types",
     "discover_parser",
     "get_parser",
