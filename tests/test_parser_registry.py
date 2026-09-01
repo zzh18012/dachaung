@@ -38,6 +38,7 @@ def _write_md(directory: Path, name: str, text: str) -> Path:
 def fresh_registry(monkeypatch):
     """隔离的全局注册表副本：测试内注册不污染其他测试。"""
     monkeypatch.setattr(pr, "_registry", dict(pr._registry))
+    monkeypatch.setattr(pr, "_source_type_families", dict(pr._source_type_families))
     return pr._registry
 
 
@@ -102,6 +103,9 @@ def _make_parser_cls(name: str, exts: tuple, priority: int) -> type[Parser]:
     _P.name = name
     _P.supported_extensions = exts
     _P.priority = priority
+    # 批次 20：契约声明强制——测试桩统一声明 text/line_address
+    _P.source_types = ("text",)
+    _P.locator_family = "line_address"
     return _P
 
 

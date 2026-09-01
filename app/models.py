@@ -128,11 +128,17 @@ class ErrorRecord:
 
 @dataclass
 class Document:
-    """统一文档模型：贯穿解析、分块、校验、输出全流程。"""
+    """统一文档模型：贯穿解析、分块、校验、输出全流程。
+
+    批次 20（D5/Q1 裁决）：source_type 注解放宽为 str——Document 是扩展
+    点产物，不应被内置枚举限制；运行时合法性由 parser 契约声明
+    （app/source_types.py + parser_registry）与 schema 0.6.0 分支共同
+    约束。SourceType Literal 保留，供内置 parser 类型提示使用。
+    """
 
     document_id: str
     source_path: str
-    source_type: SourceType
+    source_type: str
     source_hash: str
     parser_name: str
     parser_version: str

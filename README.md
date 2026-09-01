@@ -179,10 +179,20 @@ class MyParser(Parser):
     version = "1.0.0"
     supported_extensions = (".myx",)
     priority = 100
+    source_types = ("text",)          # 批次 20 起强制：声明产出的 source_type 集合
+    locator_family = "line_address"   # 仅声明新（非内置）类型时必填，四选一
 
     def parse(self, path, source_hash):
         ...
 ```
+
+**契约声明（Stage 8 批次 20，register 时强制）**：`source_types` 必须非空
+（str 视为单元素 tuple；多格式 parser 如 fallback 声明 `("pdf", "docx")`）；
+声明非内置类型时必须同时声明 `locator_family`（封闭枚举
+page_geometry / structural_index / line_address / container_line，不新增）；
+`locator_family` 非 None 时必须与所声明内置类型的既有绑定一致。
+source_type → family 绑定全局唯一（先注册者胜，冲突即
+ParserRegistrationError）；同 source_type + 同 family 的多 parser 并存合法。
 
 然后 `import` 该模块即可被 `list-parsers` / `--parser auto` 发现。
 `discover_parser(path)` 返回 parser **名称**（`str`，非实例）——实例化

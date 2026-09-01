@@ -71,12 +71,22 @@ class Parser(ABC):
     - `supported_extensions`：声明支持的扩展名（小写含点）；空 tuple =
       不参与扩展名自动发现（只能显式 --parser 指定）
     - `priority`：自动发现时数值越小越优先；平局先注册者胜
+
+    批次 20 契约声明（register 时强制校验，app/source_types.py）：
+    - `source_types`：本 parser 可能产出的 source_type 集合（str 视为
+      单元素 tuple）。多格式 parser（如 fallback 同时产出 pdf/docx）
+      声明全部可能值；空声明非法。
+    - `locator_family`：新（非内置）source_type 必须绑定的 locator
+      family（四选一，封闭枚举）。仅声明内置类型时可省略（None）；
+      声明多个绑定不同的内置类型时必须为 None。
     """
 
     name: str = "abstract"
     version: str = "0.0.0"
     supported_extensions: tuple[str, ...] = ()
     priority: int = 100
+    source_types: tuple[str, ...] = ()
+    locator_family: str | None = None
 
     @abstractmethod
     def parse(self, path: str | Path, source_hash: str) -> Document:

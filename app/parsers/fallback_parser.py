@@ -918,6 +918,8 @@ class FallbackParser(Parser):
     version = f"pdfplumber={_PDFPLUMBER_VERSION},python-docx={_DOCX_VERSION},pypdfium2={_PDFIUM_VERSION}"
     supported_extensions = (".pdf", ".docx")
     priority = 10
+    source_types = ("pdf", "docx")
+    locator_family = None  # 两类型 family 不同（page_geometry/structural_index），按类型走内置绑定
 
     def __init__(self, image_output_dir: Path | str | None = None) -> None:
         """Args:

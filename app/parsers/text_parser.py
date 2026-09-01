@@ -75,6 +75,8 @@ class TextParser(Parser):
     version = "stdlib/0.1.0"
     supported_extensions = _TEXT_EXTENSIONS
     priority = 100
+    source_types = ("text",)
+    locator_family = "line_address"
 
     def parse(self, path: str | Path, source_hash: str) -> Document:
         p = Path(path)

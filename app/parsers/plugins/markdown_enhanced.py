@@ -96,6 +96,8 @@ class MarkdownEnhancedParser(Parser):
     version = "stdlib/0.1.0"
     supported_extensions = _MD_EXTENSIONS
     priority = 5  # 裁决：优先于 markdown(20)，.md 自动发现选本插件
+    source_types = ("markdown",)
+    locator_family = "line_address"
 
     def __init__(self) -> None:
         self._md = MarkdownParser()

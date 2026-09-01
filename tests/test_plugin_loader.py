@@ -34,6 +34,8 @@ class MyxParser(Parser):
     version = "test/1.0"
     supported_extensions = (".myx",)
     priority = 1
+    source_types = ("text",)
+    locator_family = "line_address"
 
     def parse(self, path, source_hash):
         p = Path(path)
@@ -108,6 +110,8 @@ class SentinelParser(Parser):
     version = "test/1.0"
     supported_extensions = (".snt",)
     priority = 1
+    source_types = ("text",)
+    locator_family = "line_address"
 
     def parse(self, path, source_hash):
         raise NotImplementedError
@@ -126,6 +130,8 @@ def _tie_plugin(var: str) -> str:
         '    version = "test/1.0"\n'
         '    supported_extensions = (".tie",)\n'
         "    priority = 7\n"
+        '    source_types = ("text",)\n'
+        '    locator_family = "line_address"\n'
         "\n"
         "    def parse(self, path, source_hash):\n"
         "        raise NotImplementedError\n"
@@ -145,6 +151,7 @@ def plugin_env(tmp_path: Path, monkeypatch):
     from app import plugin_loader as pl
 
     monkeypatch.setattr(pr, "_registry", dict(pr._registry))
+    monkeypatch.setattr(pr, "_source_type_families", dict(pr._source_type_families))
     monkeypatch.setattr(pl, "_FIRST_LOAD", {})
     yield tmp_path
     for key, mod in list(sys.modules.items()):

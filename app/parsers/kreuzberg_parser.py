@@ -135,6 +135,8 @@ class KreuzbergParser(Parser):
     version = _KREUZBERG_VERSION or "unknown"
     supported_extensions = (".pdf", ".docx")
     priority = 50  # 备选路径：自动发现让位于 fallback(10)
+    source_types = ("pdf", "docx")
+    locator_family = None  # 同 fallback：两类型按各自内置绑定
 
     def __init__(self, *, include_document_structure: bool = True) -> None:
         self._include_document_structure = include_document_structure

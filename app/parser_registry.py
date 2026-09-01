@@ -22,8 +22,17 @@ from pathlib import Path
 from typing import Any
 
 from app.parsers.base import Parser
+from app.source_types import (
+    BUILTIN_SOURCE_TYPE_FAMILIES,
+    ContractViolationError,
+    normalize_parser_contract,
+)
 
 _registry: dict[str, type[Parser]] = {}
+
+# source_type → locator family 的全局唯一绑定（批次 20 D4）：
+# 首个声明该类型的 parser 建立绑定，后注册者绑定不同 family 即拒绝
+_source_type_families: dict[str, str] = {}
 
 
 class ParserRegistrationError(ValueError):
@@ -35,7 +44,13 @@ class ParserRegistrationError(ValueError):
 
 
 def register(parser_cls: type[Parser]) -> type[Parser]:
-    """注册 parser 类；兼作装饰器。重名/缺名 ParserRegistrationError（显式失败优于静默）。"""
+    """注册 parser 类；兼作装饰器。重名/缺名/契约声明非法均抛
+    ParserRegistrationError（显式失败优于静默）。
+
+    批次 20：注册时强制校验 (source_types, locator_family) 契约组合，
+    并维护 source_type → family 的全局唯一绑定（首个声明者建立绑定，
+    后续不同绑定即拒绝；同绑定多 parser 并存合法，如多个 markdown parser）。
+    """
     name = getattr(parser_cls, "name", None)
     if not name or name == "abstract":
         raise ParserRegistrationError(
@@ -45,7 +60,28 @@ def register(parser_cls: type[Parser]) -> type[Parser]:
         raise ParserRegistrationError(
             f"parser 重名注册: {name}（已注册: {_registry[name].__qualname__}）"
         )
+    try:
+        declared_types, _family = normalize_parser_contract(
+            getattr(parser_cls, "source_types", ()),
+            getattr(parser_cls, "locator_family", None),
+        )
+    except ContractViolationError as e:
+        raise ParserRegistrationError(
+            f"{parser_cls.__name__} 契约声明无效: {e}"
+        ) from e
+    for st in declared_types:
+        binding = BUILTIN_SOURCE_TYPE_FAMILIES.get(st) or _family
+        existing = _source_type_families.get(st)
+        if existing is not None and existing != binding:
+            raise ParserRegistrationError(
+                f"source_type '{st}' 已全局绑定 locator family "
+                f"'{existing}'，{parser_cls.__name__} 声明 '{binding}'"
+                f"（类型→family 唯一，先注册者胜）"
+            )
     _registry[name] = parser_cls
+    for st in declared_types:
+        binding = BUILTIN_SOURCE_TYPE_FAMILIES.get(st) or _family
+        _source_type_families.setdefault(st, binding)
     return parser_cls
 
 
@@ -99,6 +135,8 @@ def list_parsers() -> list[dict[str, Any]]:
             "priority": cls.priority,
             "extensions": list(cls.supported_extensions),
             "version": cls.version,
+            "source_types": list(cls.source_types),
+            "locator_family": cls.locator_family,
         }
         for name, cls in sorted(
             _registry.items(), key=lambda kv: (kv[1].priority, kv[0])
@@ -109,6 +147,17 @@ def list_parsers() -> list[dict[str, Any]]:
 def registered_names() -> list[str]:
     """当前已注册 parser 名称快照（plugin_loader 用于加载前后 diff）。"""
     return sorted(_registry)
+
+
+def source_type_family(source_type: str) -> str | None:
+    """source_type → locator family 绑定查询（内置映射优先，其次注册表）。
+
+    供 pipeline 契约一致性检查（批次 20 Phase C）与测试使用。
+    未知类型返回 None。
+    """
+    if source_type in BUILTIN_SOURCE_TYPE_FAMILIES:
+        return BUILTIN_SOURCE_TYPE_FAMILIES[source_type]
+    return _source_type_families.get(source_type)
 
 
 def _register_builtins() -> None:

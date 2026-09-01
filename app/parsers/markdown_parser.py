@@ -99,6 +99,8 @@ class MarkdownParser(Parser):
     version = "stdlib/0.1.0"
     supported_extensions = _MD_EXTENSIONS
     priority = 20
+    source_types = ("markdown",)
+    locator_family = "line_address"
 
     def parse(self, path: str | Path, source_hash: str) -> Document:
         p = Path(path)
