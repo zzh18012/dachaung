@@ -172,6 +172,34 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="把结构化日志同时打到 stderr（与进度输出可能交错）",
     )
 
+    # explain-parser 子命令（Stage 8 批次 22）
+    exp = sub.add_parser(
+        "explain-parser",
+        help=(
+            "解释 --parser auto 的选择：扩展名 → 候选 parser + 胜者 + 原因"
+            "（仅按扩展名，不读文件内容、不实例化 parser）"
+        ),
+    )
+    exp.add_argument(
+        "input",
+        help="输入文件路径（仅取扩展名；文件不存在也可解释）",
+    )
+    exp.add_argument(
+        "--plugin",
+        action="append",
+        default=None,
+        metavar="MODULE",
+        help="外部插件模块（dotted 名，可重复；加载后参与解释）",
+    )
+    exp.add_argument(
+        "--json",
+        action="store_true",
+        help=(
+            "输出机器可读 JSON（显式字段：extension/candidates/winner/"
+            "reason/tied_names）"
+        ),
+    )
+
     # list-parsers 子命令（Stage 8 批次 18；批次 19 增 --plugin；
     # 批次 21 Phase C 增 --json 与能力列）
     lp = sub.add_parser(
@@ -275,6 +303,53 @@ def main(argv: list[str] | None = None) -> int:
             f"[OK] {input_path} → {output_path}  "
             f"(elements={len(document.elements)}, chunks={len(document.chunks)}, "
             f"warnings={len(document.warnings)})"
+        )
+        return 0
+
+    if args.command == "explain-parser":
+        from app.parser_registry import discover_parser_details
+
+        input_path = Path(args.input)
+        # 插件加载先于解释（与 parse 一致的加载序，批次 19 契约）
+        rc = _load_cli_plugins(args.plugin, str(input_path))
+        if rc is not None:
+            return rc
+        result = discover_parser_details(input_path)
+        if result.winner is None:
+            _emit_structured_error(input_path, "unsupported_type", result.reason)
+            return 1
+        if args.json:
+            # 批次 22 D4 裁决：显式构造字段，不直接序列化 dataclass
+            # （CLI JSON 是公开契约，防未来内部字段泄漏）
+            payload = {
+                "extension": result.extension,
+                "candidates": [
+                    {
+                        "name": c.name,
+                        "priority": c.priority,
+                        "registration_order": c.registration_order,
+                    }
+                    for c in result.candidates
+                ],
+                "winner": result.winner,
+                "reason": result.reason,
+                "tied_names": list(result.tied_names),
+            }
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+            return 0
+        print(f"extension: {result.extension}")
+        print("candidates（priority 升序，同 priority 先注册者胜）:")
+        for c in result.candidates:
+            mark = "  <-- winner" if c.name == result.winner else ""
+            print(
+                f"  {c.name:<24} priority={c.priority:<6}"
+                f" registration_order={c.registration_order}{mark}"
+            )
+        print(f"winner: {result.winner}")
+        print(f"reason: {result.reason}")
+        print(
+            "\n注：仅按扩展名解释，未读取文件内容"
+            "（resolution based on extension only; file content was not read）"
         )
         return 0
 
