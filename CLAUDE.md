@@ -56,6 +56,14 @@
 - `validate` 子命令纯 schema 校验，不含注册表/契约检查（无 parser 上下文）
 - `.myx` 全链测试插件在 `tests/test_plugin_myx_fullchain.py`（subprocess 走真实 CLI；测试专用，永不内置、不进 evaluation AUTO 映射）；评测 AUTO_PARSER_BY_SOURCE_TYPE 语义不变
 
+## Parser 能力快照与发现解释（Stage 8 批次 21）
+
+- `ParserCapability` frozen dataclass 六字段（name / source_types / locator_family / extensions / priority / version）：register() 校验通过即冻结快照存 `_capabilities`；registry 核心路径（discover / list / pipeline 契约检查）**只读快照**，注册后改写类属性不生效（行为收紧修复）；能力唯一来源 `_capabilities`，不建第三份缓存
+- register 校验：`supported_extensions` 元素小写含点长度≥2（str=单元素，list 归一 tuple）；`priority` 正整数（拒 bool/0/负数）；`version` 非空 str；非法 → ParserRegistrationError（经插件通道仍 `plugin_register_failed`，错误码零新增）
+- 发现确定性：全序 `(priority, 注册顺序)`，小者优先、平局先注册者胜 + UserWarning、无候选即失败不静默降级；`discover_parser_details(path)` 返回冻结 `DiscoveryResult`（候选+胜者+原因+平局，含 registration_order），`discover_parser()` 委托之（单一决策实现）；诊断不发告警
+- extensions=输入能力，source_types+locator_family=输出契约，两轴独立不映射；`list-parsers` 表格含六列（None 显示 "-"），`list-parsers --json` 输出 `list_parsers()` 行原样（(priority, name) 稳定序）
+- 本批不做：extension→胜出 parser 展示与 resolution report CLI（留批次 22）、schema 变更（schema_version 不升）、插件目录扫描/pip entry points/网络市场/动态安装/GUI
+
 ## 环境
 
 - 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
@@ -107,6 +115,9 @@ uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.
 # Stage 8 批次 18：parser 注册表（列出已注册 parser / 扩展名自动发现）
 .venv/Scripts/python.exe -m app.cli list-parsers
 .venv/Scripts/python.exe -m app.cli parse <input.md> -o out.json --parser auto
+
+# Stage 8 批次 21：能力清单（机器可读 JSON，六字段/行）
+.venv/Scripts/python.exe -m app.cli list-parsers --json
 
 # Stage 8 批次 19：显式外部插件加载（dotted 模块名，PYTHONPATH 提供模块）
 PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli parse doc.smk \

@@ -154,8 +154,12 @@ datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc).isoformat()
 ### 3.5 Parser 注册表与插件（Stage 8 批次 18）
 
 ```bash
-# 列出已注册 parser（含插件）
+# 列出已注册 parser（含插件）：name / priority / extensions /
+# source_types / locator_family / version
 .venv/Scripts/python.exe -m app.cli list-parsers
+
+# 机器可读能力清单（JSON 数组，(priority, name) 稳定序，六字段/行）
+.venv/Scripts/python.exe -m app.cli list-parsers --json
 
 # 按扩展名自动发现（priority 小者优先；显式 --parser 永远覆盖发现）
 .venv/Scripts/python.exe -m app.cli parse doc.md -o out.json --parser auto
@@ -212,6 +216,25 @@ page_geometry / structural_index / line_address / container_line，不新增）�
 `locator_family` 非 None 时必须与所声明内置类型的既有绑定一致。
 source_type → family 绑定全局唯一（先注册者胜，冲突即
 ParserRegistrationError）；同 source_type + 同 family 的多 parser 并存合法。
+
+**能力快照与发现解释（Stage 8 批次 21）**：register() 校验通过即冻结
+六字段能力快照（`ParserCapability`：name / source_types / locator_family /
+extensions / priority / version）——registry 一切核心路径（自动发现 /
+`list-parsers` / pipeline 契约检查）只读快照，**注册后改写类属性不再
+影响已注册能力**（registered capability is immutable）。register 时同时
+校验能力声明格式：`supported_extensions` 元素须小写含点（如 `.md`）；
+`priority` 须为正整数（小者优先，默认 100）；`version` 非空字符串；
+非法即 `ParserRegistrationError`（经插件通道仍归类
+`plugin_register_failed`，批次 19 错误体系不变）。
+
+发现规则确定性：候选按全序 `(priority, 注册顺序)` 决胜——priority 小者
+胜；同 priority 先注册者胜并发 UserWarning；无候选即失败（结构化
+`unsupported_type`），**从不静默降级**。`extensions` 是**输入能力**
+（能解析什么文件），`source_types` + `locator_family` 是**输出契约**
+（产出什么形状的 Document），两轴独立、不建立固定映射。
+诊断接口 `discover_parser_details(path)` 返回冻结 `DiscoveryResult`
+（候选列表 + 胜者 + 原因 + 平局说明，含 `registration_order`），
+与 `discover_parser()` 共用同一决策实现；诊断只陈述事实、不发告警。
 
 然后 `import` 该模块即可被 `list-parsers` / `--parser auto` 发现。
 `discover_parser(path)` 返回 parser **名称**（`str`，非实例）——实例化
