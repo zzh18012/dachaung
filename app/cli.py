@@ -391,11 +391,13 @@ def main(argv: list[str] | None = None) -> int:
             cands = ", ".join(
                 f"{c.name}({c.priority})" for c in r.candidates
             )
-            tie_note = (
-                "  <- 平局：先注册者胜"
-                if s == "tie"
-                else ""
-            )
+            tie_note = ""
+            if s == "tie":
+                w = r.candidates[0]
+                tie_note = (
+                    f"  <- 平局：先注册者 {w.name} 胜"
+                    f"（registration_order={w.registration_order}）"
+                )
             print(
                 f"{r.extension:<12} {r.winner:<20} {s:<22} {cands}{tie_note}"
             )

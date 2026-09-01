@@ -167,7 +167,13 @@ def test_tie_human_annotation(fresh_registry, capfd):
     assert rc == 0
     out = capfd.readouterr().out
     tie_line = next(ln for ln in out.splitlines() if ln.startswith(".tieh"))
-    assert "平局：先注册者胜" in tie_line
+    # D4 修正裁决：tie human 行显式含 winner name + registration_order
+    # + "先注册者胜"说明（决胜依据可追溯，不需用户自行拼接）
+    expected_order = list(pr._capabilities).index("tie_h1")
+    assert (
+        f"平局：先注册者 tie_h1 胜（registration_order={expected_order}）"
+        in tie_line
+    )
 
 
 def test_empty_registry_empty_report(fresh_registry, capfd):
