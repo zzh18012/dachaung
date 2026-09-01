@@ -2989,3 +2989,65 @@ family 零改动；插件加载失败复用批次 19 错误契约。
 单次选择可解释（22）→ 全局解析竞争可审计（23）。
 
 **边界**：BACKLOG #7a/#7b/#8/#9 继续不混入。
+
+## 六十二、批次 23 执行记录（Parser Resolution Audit，2026-09-01）
+
+裁决对话：6a957e64-fbac-83ea-af7d-64efe4924af3（GPT-5.6 Sol，思考程度
+"高"）。Step 1 设计裁决 APPROVED（D1 audit-parsers 独立入口无位置参数；
+D2 universe = capability snapshot extensions 并集经 list_parsers() 读取；
+D3 CLI 层聚合 + 显式 JSON，status 为派生展示字段禁止反向进入
+DiscoveryResult，summary 仅计数禁评分；D4 不新增 conflict 分类，tie 行
+含决胜三要素；D5 插件契约复用；D6 兼容边界）。
+
+相位实现（严格门禁）：
+
+```text
+Phase A  d8cc199bc2ece25e1280feede8e7d63c2d17e316  CLI 实现
+         app.cli audit-parsers [--plugin ...] [--json]；伪路径委托
+         discover_parser_details()；registry/discovery 零改动；+8 测试
+修正     d001a0b0c69ede4d236747599e3c8810583d8005  单点修正（REVISION→APPROVED）
+         裁决要求：tie human 行必须显式含 winner name + winner
+         registration_order + "先注册者胜"说明（此前仅固定串"先注册者胜"）。
+         修正仅动 formatter 层（r.candidates[0] 取决胜依据），JSON/status/
+         summary/registry/warning/error code 全未触碰。
+Phase B  8c4fb9bfdf81a424f4733bee9f5dccd2f2669ffb  文档+收口
+         README/CLAUDE.md 批次 23 节 + 三层同源收口测试
+         （audit ↔ explain ↔ discover_parser，competition 与真实 tie
+         双场景；执行通道 UserWarning 用 pytest.warns 锁定与观察通道
+         零告警的行为差异）；+5 测试
+```
+
+测试：5397 passed（5384 + 13：A 8 + B 5，零回归）。
+
+送审传输注记：本批送审期间服务端多次"乐观 UI 回滚 + DOM 冻结"（消息
+发送后渲染正常，assistant 生成 0 字节数分钟，实则服务器已在后台完成或
+超时后整体回滚）。有效对策组合：发送前刷新页面；发送后 ≥95 秒复查
+article；怀疑冻结时主动 navigate 刷新再读（三次靠刷新拿到已完成的裁决
+文本）。Phase B 报告与修正回执各经历一次回滚后重发成功。
+
+**推送授权与执行**（五步序列，指示线 main worktree，全部一次通过）：
+
+```
+git fetch origin                                → OK
+EXPECTED=$(git rev-parse integration/stage8-batch23-resolution-audit)
+                                                → 8c4fb9bfdf81a424f4733bee9f5dccd2f2669ffb
+git status --short                              → 干净
+git merge-base --is-ancestor origin/main $EXPECTED → OK（0 退出）
+git merge --ff-only $EXPECTED                   → dc2bc80..8c4fb9b（4 commits，无 merge commit）
+git push origin main                            → OK
+git ls-remote origin refs/heads/main            → remote == expected
+test "$REMOTE" = "$EXPECTED"                    → Batch 23 push verified
+```
+
+**批次 24 指定：Parser Identity & Provenance（Parser 身份与注册来源
+可追溯契约）**——回答"这个 parser 到底来自哪里"：定义它的 Python
+module / class qualname（implementation identity），以及是内置能力还是
+经本次 --plugin 显式入口加载（loading provenance），两者概念分清、不混
+成一个 origin 字符串。Step 1 裁决面 D1–D6（provenance 定义 / 注册时冻结
+与事实来源 / 既有 JSON 契约兼容——不加字段优先独立入口如 inspect-parser
+/ 用户可见信息与路径泄漏禁令 / 错误与插件关系 / 不做清单）。
+
+演进链：可加载（19）→ 输出受控（20）→ 能力冻结（21）→ 单次选择可解释
+（22）→ 全局竞争可审计（23）→ parser 身份可追溯（24）。
+
+**边界**：BACKLOG #7a/#7b/#8/#9 继续不混入。
