@@ -200,6 +200,27 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         ),
     )
 
+    # audit-parsers 子命令（Stage 8 批次 23）
+    aud = sub.add_parser(
+        "audit-parsers",
+        help=(
+            "审计注册表全局解析竞争：扩展名全集 → 每扩展候选/胜者/平局"
+            "（只读，不实例化 parser、不读文件）"
+        ),
+    )
+    aud.add_argument(
+        "--plugin",
+        action="append",
+        default=None,
+        metavar="MODULE",
+        help="外部插件模块（dotted 名，可重复；加载后参与审计）",
+    )
+    aud.add_argument(
+        "--json",
+        action="store_true",
+        help="输出机器可读 JSON（extensions 明细 + summary 计数）",
+    )
+
     # list-parsers 子命令（Stage 8 批次 18；批次 19 增 --plugin；
     # 批次 21 Phase C 增 --json 与能力列）
     lp = sub.add_parser(
@@ -303,6 +324,86 @@ def main(argv: list[str] | None = None) -> int:
             f"[OK] {input_path} → {output_path}  "
             f"(elements={len(document.elements)}, chunks={len(document.chunks)}, "
             f"warnings={len(document.warnings)})"
+        )
+        return 0
+
+    if args.command == "audit-parsers":
+        from app.parser_registry import discover_parser_details, list_parsers
+
+        rc = _load_cli_plugins(args.plugin, "audit-parsers")
+        if rc is not None:
+            return rc
+        # extension universe：已注册 capability snapshot 的 extensions 并集
+        # （经 list_parsers() 读取快照，不建第二份缓存、不扫文件系统）
+        extensions = sorted({
+            ext
+            for row in list_parsers()
+            for ext in row["extensions"]
+        })
+        entries = []
+        for ext in extensions:
+            result = discover_parser_details(Path("x" + ext))
+            # status 是 CLI 派生展示字段（derived presentation field），
+            # 不是 discovery 状态——禁止反向进入 DiscoveryResult
+            if len(result.candidates) == 1:
+                status = "uncontested"
+            elif result.tied_names:
+                status = "tie"
+            else:
+                status = "priority_competition"
+            entries.append((result, status))
+        summary = {
+            "extension_count": len(entries),
+            "uncontested": sum(1 for _, s in entries if s == "uncontested"),
+            "priority_competition": sum(
+                1 for _, s in entries if s == "priority_competition"
+            ),
+            "tie": sum(1 for _, s in entries if s == "tie"),
+        }
+        if args.json:
+            payload = {
+                "extensions": [
+                    {
+                        "extension": r.extension,
+                        "candidates": [
+                            {
+                                "name": c.name,
+                                "priority": c.priority,
+                                "registration_order": c.registration_order,
+                            }
+                            for c in r.candidates
+                        ],
+                        "winner": r.winner,
+                        "reason": r.reason,
+                        "tied_names": list(r.tied_names),
+                        "status": s,
+                    }
+                    for r, s in entries
+                ],
+                "summary": summary,
+            }
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+            return 0
+        print(
+            f"{'extension':<12} {'winner':<20} {'status':<22} candidates"
+        )
+        for r, s in entries:
+            cands = ", ".join(
+                f"{c.name}({c.priority})" for c in r.candidates
+            )
+            tie_note = (
+                "  <- 平局：先注册者胜"
+                if s == "tie"
+                else ""
+            )
+            print(
+                f"{r.extension:<12} {r.winner:<20} {s:<22} {cands}{tie_note}"
+            )
+        print(
+            f"\nsummary: {summary['extension_count']} extensions | "
+            f"uncontested={summary['uncontested']} "
+            f"priority_competition={summary['priority_competition']} "
+            f"tie={summary['tie']}"
         )
         return 0
 
