@@ -15,6 +15,11 @@ pipeline 契约检查）**只读快照，不再活读 Parser 类属性**——�
 行为收紧修复，非兼容破坏）。快照非公开创作面：插件作者仍以类属性
 声明能力（批次 18/19/20 契约零变化）。
 
+批次 21 Phase B（discovery explainability）：`discover_parser_details()`
+返回冻结 `DiscoveryResult`（候选列表 + 胜者 + 原因 + 平局说明），与
+`discover_parser()` 共用同一决策实现；排序全序 (priority, 注册顺序)，
+结果按需派生不缓存——能力唯一来源仍是 `_capabilities` 快照。
+
 内置 parser 在本模块导入时按既有顺序注册；参考插件 markdown_enhanced
 随项目分发并注册（定位：随项目分发的参考/增强插件，非第三方外部插件）。
 外部插件接入方式：自定义模块 `import` 后 `@register`（不做
@@ -196,6 +201,99 @@ def get_parser(name: str, image_output_dir: Path | str | None = None) -> Parser:
     return _instantiate(_registry[name], image_output_dir)
 
 
+@dataclass(frozen=True)
+class DiscoveryCandidate:
+    """发现候选（批次 21 Phase B）：按决策序 (priority, 注册顺序) 排列。
+
+    registration_order 是 _capabilities 的插入序号（0 起）——同 priority
+    平局时的先注册者胜依据，使选择完全可解释、可复现。
+    """
+
+    name: str
+    priority: int
+    registration_order: int
+
+
+@dataclass(frozen=True)
+class DiscoveryResult:
+    """扩展名发现的完整解释（批次 21 Phase B，D3 裁决）。
+
+    只读诊断（winner/reason/candidates），按需从 _capabilities 派生、
+    不缓存（能力唯一来源仍是 _capabilities 快照）。本结果不发
+    UserWarning——告警是 discover_parser 决策路径的行为，诊断只陈述。
+    """
+
+    extension: str
+    candidates: tuple[DiscoveryCandidate, ...]  # 已按 (priority, 注册序) 排序
+    winner: str | None  # 无候选时 None
+    reason: str
+    tied_names: tuple[str, ...]  # 真实平局（最优 priority 多候选）时的候选名（含胜者，注册序）；无平局为空
+
+    @property
+    def resolved(self) -> bool:
+        return self.winner is not None
+
+
+def discover_parser_details(path: str | Path) -> DiscoveryResult:
+    """扩展名 → 完整发现解释（候选列表 + 胜者 + 原因）。
+
+    与 discover_parser 同一决策实现（后者委托本函数）；排序全序
+    (priority, 注册顺序)，确定性可复现。无候选不抛异常——返回
+    winner=None 的结果（诊断用途，调用方自行陈述）。
+    """
+    ext = Path(path).suffix.lower()
+    candidates = tuple(
+        sorted(
+            (
+                DiscoveryCandidate(
+                    name=name, priority=cap.priority, registration_order=idx
+                )
+                for idx, (name, cap) in enumerate(_capabilities.items())
+                if ext in cap.extensions
+            ),
+            key=lambda c: (c.priority, c.registration_order),
+        )
+    )
+    if not candidates:
+        return DiscoveryResult(
+            extension=ext,
+            candidates=(),
+            winner=None,
+            reason=f"无已注册 parser 支持扩展名 {ext or '(无)'}",
+            tied_names=(),
+        )
+    winner = candidates[0]
+    at_best = [c.name for c in candidates if c.priority == winner.priority]
+    # 仅真实平局（最优 priority 有多个候选）才非空；单候选不成"平局"，
+    # 否则 discover_parser 的告警条件会误触发
+    tied_names = tuple(at_best) if len(at_best) > 1 else ()
+    if len(candidates) == 1:
+        reason = (
+            f"扩展名 {ext} 唯一候选 {winner.name}"
+            f"（priority={winner.priority}）"
+        )
+    elif tied_names:
+        reason = (
+            f"扩展名 {ext} 共 {len(candidates)} 个候选，priority 最小"
+            f" {winner.priority} 平局: {', '.join(tied_names)}；"
+            f"先注册者 {winner.name} 胜（registration_order="
+            f"{winner.registration_order}）"
+        )
+    else:
+        runner = candidates[1]
+        reason = (
+            f"扩展名 {ext} 共 {len(candidates)} 个候选，priority 最小者 "
+            f"{winner.name}（{winner.priority} < {runner.priority}）"
+        )
+    return DiscoveryResult(
+        extension=ext,
+        candidates=candidates,
+        winner=winner.name,
+        reason=reason,
+        tied_names=tied_names,
+    )
+
+
 def discover_parser(path: str | Path) -> str:
     """扩展名 → priority 最小的已注册 parser 名称。
 
@@ -205,24 +303,22 @@ def discover_parser(path: str | Path) -> str:
 
     批次 21 Phase A：候选集与排序只读 _capabilities 快照（注册后改写
     类属性不影响发现结果）。
+    批次 21 Phase B：决策逻辑委托 discover_parser_details（唯一实现，
+    防止两份决策来源漂移）；本函数保持原返回值与告警行为不变。
     """
-    ext = Path(path).suffix.lower()
-    candidates = [
-        (cap.priority, name)
-        for name, cap in _capabilities.items()
-        if ext in cap.extensions
-    ]
-    if not candidates:
-        raise ValueError(f"无已注册 parser 支持扩展名 {ext or '(无)'}")
-    best = min(p for p, _ in candidates)
-    tied = [name for p, name in candidates if p == best]
-    if len(tied) > 1:
+    result = discover_parser_details(path)
+    if result.winner is None:
+        raise ValueError(
+            f"无已注册 parser 支持扩展名 {result.extension or '(无)'}"
+        )
+    if result.tied_names:
         warnings.warn(
-            f"扩展名 {ext} 存在多个同优先级({best}) parser: "
-            f"{', '.join(tied)}；取先注册的 {tied[0]}",
+            f"扩展名 {result.extension} 存在多个同优先级"
+            f"({result.candidates[0].priority}) parser: "
+            f"{', '.join(result.tied_names)}；取先注册的 {result.winner}",
             stacklevel=2,
         )
-    return tied[0]
+    return result.winner
 
 
 def list_parsers() -> list[dict[str, Any]]:
@@ -314,10 +410,13 @@ _register_builtins()
 
 
 __all__ = [
+    "DiscoveryCandidate",
+    "DiscoveryResult",
     "ParserCapability",
     "capability",
     "declared_source_types",
     "discover_parser",
+    "discover_parser_details",
     "get_parser",
     "list_parsers",
     "register",
