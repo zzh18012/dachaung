@@ -24,15 +24,25 @@ pipeline 契约检查）**只读快照，不再活读 Parser 类属性**——�
 随项目分发并注册（定位：随项目分发的参考/增强插件，非第三方外部插件）。
 外部插件接入方式：自定义模块 `import` 后 `@register`（不做
 entry_points 自动扫描，显式优于隐式）；重名注册 import 时即 ValueError。
+
+批次 24 Phase A（parser identity & provenance）：注册瞬间冻结
+module/qualname/loaded_via/plugin_spec 四字段进能力快照。加载来源由
+**registration context** 决定——loader（plugin_loader.load_plugins）进入
+`_plugin_registration_context(spec)`，register() 在调用瞬间消费冻结；
+无上下文注册（内置/预 import）→ loaded_via="builtin", plugin_spec=None。
+禁止任何事后推断（cls.__module__ / sys.modules / import graph 均不作
+加载来源依据；cls.__module__ 只作 identity 冻结，不作 provenance）。
 """
 
 from __future__ import annotations
 
+import contextvars
 import inspect
 import warnings
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 from app.parsers.base import Parser
 from app.source_types import (
@@ -49,6 +59,39 @@ _capabilities: dict[str, ParserCapability] = {}
 # source_type → locator family 的全局唯一绑定（批次 20 D4）：
 # 首个声明该类型的 parser 建立绑定，后注册者绑定不同 family 即拒绝
 _source_type_families: dict[str, str] = {}
+
+# 批次 24 D1：registration provenance context（私有内部 API）。
+# 值为 (loaded_via, plugin_spec)；None = 无上下文 → builtin。
+# 用 ContextVar 而非裸全局：栈式可嵌套（token reset 恢复外层）、
+# 异常安全、不跨线程/协程泄漏。
+_registration_context: contextvars.ContextVar[
+    tuple[str, str | None] | None
+] = contextvars.ContextVar("parser_registration_context", default=None)
+
+
+@contextmanager
+def _plugin_registration_context(plugin_spec: str) -> Iterator[None]:
+    """把当前 registration context 标记为"经 plugin_spec 加载"（私有）。
+
+    仅 loader（plugin_loader.load_plugins）与测试/bootstrap 使用；register()
+    在调用瞬间读取并冻结，退出后恢复外层上下文。plugin_spec 保存规范化前
+    的**原始字符串**（批次 19 仅 dotted 名），拒绝路径形态（绝对路径与
+    路径分隔符一律禁止）。
+    """
+    if (
+        not isinstance(plugin_spec, str)
+        or not plugin_spec
+        or "/" in plugin_spec
+        or "\\" in plugin_spec
+    ):
+        raise ValueError(
+            f"plugin_spec 必须是非空 dotted 模块名（禁止路径）: {plugin_spec!r}"
+        )
+    token = _registration_context.set(("plugin", plugin_spec))
+    try:
+        yield
+    finally:
+        _registration_context.reset(token)
 
 
 class ParserRegistrationError(ValueError):
@@ -71,6 +114,12 @@ class ParserCapability:
     文件），source_types + locator_family 是**输出契约**（产出什么形状，
     D2：两轴独立，不建立 extension → source_type 固定映射）。
     registry 核心路径（discover / list / pipeline 契约检查）只读本快照。
+
+    批次 24 D2：追加 identity/provenance 四字段——module / qualname
+    （cls.__module__ / cls.__qualname__ 调用瞬间冻结）+ loaded_via /
+    plugin_spec（registration context 调用瞬间消费）。值域封闭：
+    loaded_via ∈ {"builtin", "plugin"}；builtin 时 plugin_spec 为 None。
+    注册后 monkeypatch 类属性或改变上下文，快照不漂移。
     """
 
     name: str
@@ -79,6 +128,10 @@ class ParserCapability:
     extensions: tuple[str, ...]
     priority: int
     version: str
+    module: str
+    qualname: str
+    loaded_via: str
+    plugin_spec: str | None
 
 
 def _validated_extensions(parser_cls: type[Parser]) -> tuple[str, ...]:
@@ -139,6 +192,11 @@ def register(parser_cls: type[Parser]) -> type[Parser]:
 
     批次 21 Phase A：校验通过后构建冻结 ParserCapability 快照存入
     _capabilities；此后核心路径只读快照（注册后改写类属性不再生效）。
+
+    批次 24 Phase A：快照追加 identity/provenance 四字段——module/
+    qualname 取 cls 属性调用瞬间值，loaded_via/plugin_spec 消费当前
+    registration context（无上下文 → builtin）。provenance 逐次注册各自
+    冻结，不按 class identity 合并；装饰器与直接调用不构成不同来源。
     """
     name = getattr(parser_cls, "name", None)
     if not name or name == "abstract":
@@ -171,6 +229,8 @@ def register(parser_cls: type[Parser]) -> type[Parser]:
                 f"（类型→family 唯一，先注册者胜）"
             )
     _registry[name] = parser_cls
+    prov = _registration_context.get()
+    loaded_via, plugin_spec = prov if prov is not None else ("builtin", None)
     _capabilities[name] = ParserCapability(
         name=name,
         source_types=declared_types,
@@ -178,6 +238,10 @@ def register(parser_cls: type[Parser]) -> type[Parser]:
         extensions=extensions,
         priority=priority,
         version=version,
+        module=parser_cls.__module__,
+        qualname=parser_cls.__qualname__,
+        loaded_via=loaded_via,
+        plugin_spec=plugin_spec,
     )
     for st in declared_types:
         binding = BUILTIN_SOURCE_TYPE_FAMILIES.get(st) or _family

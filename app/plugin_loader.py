@@ -11,6 +11,10 @@
   - 导入期其他任意异常（ModuleNotFoundError/SyntaxError/顶层 ValueError 等）
     → code=plugin_import_failed
 - 标准 CLI 错误 JSON 不含 traceback（to_dict() 默认省略，仅日志层保留）
+
+批次 24：每个 spec 的 import 全程包裹 registration context
+（plugin_spec=规范化前原始字符串）；插件触发的注册在 register() 调用
+瞬间冻结 provenance（loaded_via="plugin"）。
 """
 
 from __future__ import annotations
@@ -18,7 +22,11 @@ from __future__ import annotations
 import importlib
 import traceback
 
-from app.parser_registry import ParserRegistrationError, registered_names
+from app.parser_registry import (
+    ParserRegistrationError,
+    _plugin_registration_context,
+    registered_names,
+)
 
 __all__ = ["PluginLoadError", "load_plugins"]
 
@@ -73,7 +81,11 @@ def load_plugins(modules: list[str]) -> list[dict]:
             continue
         before = set(registered_names())
         try:
-            importlib.import_module(mod)
+            # 批次 24 D1：每个 spec 独立进入上下文，import 与其触发的
+            # 注册 hook（顶层 @register / 副模块 / helper 转注册）全程在
+            # plugin_spec 上下文内；contextmanager finally 保证异常恢复
+            with _plugin_registration_context(mod):
+                importlib.import_module(mod)
         except ParserRegistrationError as e:
             raise PluginLoadError(
                 "plugin_register_failed",

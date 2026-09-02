@@ -13,6 +13,9 @@
     # 列出已注册 parser（含插件）
     python -m app.cli list-parsers [--plugin my_pkg.my_plugin]
 
+    # 查询单个 parser 的 identity 与 provenance（批次 24）
+    python -m app.cli inspect-parser fallback [--plugin my_pkg.my_plugin] [--json]
+
     # 仅校验已有的 JSON（独立子命令，不会把 JSON 当成 PDF/DOCX 输入）
     python -m app.cli validate <output.json>
 """
@@ -221,6 +224,34 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="输出机器可读 JSON（extensions 明细 + summary 计数）",
     )
 
+    # inspect-parser 子命令（Stage 8 批次 24）
+    insp = sub.add_parser(
+        "inspect-parser",
+        help=(
+            "查询单个 parser 的 identity 与 provenance"
+            "（只读注册表快照，不实例化 parser）"
+        ),
+    )
+    insp.add_argument(
+        "name",
+        help="parser 名称（--plugin 加载后查询；未知名 → unknown_parser）",
+    )
+    insp.add_argument(
+        "--plugin",
+        action="append",
+        default=None,
+        metavar="MODULE",
+        help="外部插件模块（dotted 名，可重复；加载先行，再按名字查询）",
+    )
+    insp.add_argument(
+        "--json",
+        action="store_true",
+        help=(
+            "输出机器可读 JSON（显式字段：name/version/module/qualname/"
+            "loaded_via/plugin_spec；builtin 时 plugin_spec 为 null）"
+        ),
+    )
+
     # list-parsers 子命令（Stage 8 批次 18；批次 19 增 --plugin；
     # 批次 21 Phase C 增 --json 与能力列）
     lp = sub.add_parser(
@@ -407,6 +438,45 @@ def main(argv: list[str] | None = None) -> int:
             f"priority_competition={summary['priority_competition']} "
             f"tie={summary['tie']}"
         )
+        return 0
+
+    if args.command == "inspect-parser":
+        from app.parser_registry import capability, registered_names
+
+        # D5：--plugin 加载先于名字查询——初始未知、加载后出现 → 可查询；
+        # 插件加载失败 → plugin_*（绝不落成 unknown_parser）
+        rc = _load_cli_plugins(args.plugin, "inspect-parser")
+        if rc is not None:
+            return rc
+        if args.name not in registered_names():
+            known = ", ".join(registered_names())
+            _emit_structured_error(
+                Path(args.name),
+                "unknown_parser",
+                f"未知 parser: {args.name}（支持: {known}）",
+            )
+            return 1
+        cap = capability(args.name)
+        if args.json:
+            # D4 裁决：显式构造六键（禁 asdict）；builtin 时 plugin_spec
+            # 为 null 不省略；不含 __file__/绝对路径/cwd/环境信息
+            payload = {
+                "name": cap.name,
+                "version": cap.version,
+                "module": cap.module,
+                "qualname": cap.qualname,
+                "loaded_via": cap.loaded_via,
+                "plugin_spec": cap.plugin_spec,
+            }
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+            return 0
+        # human：信息集合恰六项（None 显示 "-"，与 list-parsers 同规）
+        print(f"name: {cap.name}")
+        print(f"version: {cap.version}")
+        print(f"module: {cap.module}")
+        print(f"qualname: {cap.qualname}")
+        print(f"loaded_via: {cap.loaded_via}")
+        print(f"plugin_spec: {cap.plugin_spec if cap.plugin_spec is not None else '-'}")
         return 0
 
     if args.command == "explain-parser":
