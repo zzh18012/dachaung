@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 
@@ -19,6 +20,8 @@ from evaluation.schema import validate_file
 VENV_PYTHON = str(
     Path(__file__).resolve().parent.parent / ".venv" / "Scripts" / "python.exe"
 )
+# Windows venv 布局不存在（如 Linux CI）时回退当前解释器（pytest 即 venv python）
+_PYTHON = VENV_PYTHON if Path(VENV_PYTHON).is_file() else sys.executable
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -30,7 +33,7 @@ def _run_cli(args: list[str], cwd: Path) -> tuple[int, str, str]:
         "PYTHONPATH": str(PROJECT_ROOT) + os.pathsep + os.environ.get("PYTHONPATH", ""),
     }
     proc = subprocess.run(
-        [VENV_PYTHON, "-m", "evaluation.cli", *args],
+        [_PYTHON, "-m", "evaluation.cli", *args],
         capture_output=True,
         text=True,
         encoding="utf-8",

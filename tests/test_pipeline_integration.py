@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 
@@ -187,7 +188,9 @@ def test_validate_only_on_bad_json(tmp_path: Path):
 # ---------- CLI subprocess 测试（新 parse/validate 子命令） ----------
 
 def _run_cli(args: list[str]) -> tuple[int, str, str]:
-    venv_python = str(Path(__file__).resolve().parent.parent / ".venv" / "Scripts" / "python.exe")
+    # Windows venv 布局不存在（如 Linux CI）时回退当前解释器（pytest 即 venv python）
+    cand = Path(__file__).resolve().parent.parent / ".venv" / "Scripts" / "python.exe"
+    venv_python = str(cand) if cand.is_file() else sys.executable
     env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
     proc = subprocess.run(
         [venv_python, "-m", "app.cli", *args],
