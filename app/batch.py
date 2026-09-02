@@ -1,21 +1,24 @@
 """批量解析：多进程并行处理文档列表（Stage 8 批次 16，Option A 裁决）。
 
 关键约束（会话 cf170a6f，GPT 5.6 Sol 裁决）：
-- worker 为模块级函数（Windows spawn 可 pickle）
+- worker 为模块级函数（spawn 可 pickle）
 - worker 内自写 JSON，IPC 只传小 dict（不回传 Document 大对象）
 - 错误全隔离：Python 异常永不出 worker；单文档失败不中断批
 - 小批次（<3 文件）或 workers=1 走顺序路径（免 spawn + import 开销）
+- 进程池强制 spawn 上下文（批次 25）：fork 平台（Linux 默认）下
+  sys.modules 缓存会使 worker initializer 的插件"重放加载"退化为
+  缓存命中，批次 19 的 worker 侧防护形同虚设；spawn 使全平台语义一致
 - 已知限制：pdfplumber 底层 C 库崩溃（segfault）会破坏进程池（docs/BACKLOG.md）
 """
 
 from __future__ import annotations
 
 import json
+import multiprocessing as _mp
 import os
 import sys
 import time
 import traceback as traceback_mod
-from multiprocessing import Pool, Queue as MpQueue
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -32,6 +35,9 @@ except ImportError:  # pragma: no cover - 取决于环境是否安装 tqdm
 BATCH_SUFFIXES = (".pdf", ".docx", ".md")
 DEFAULT_MAX_WORKERS = 8
 SEQUENTIAL_THRESHOLD = 3
+
+# 批次 25：Queue 与 Pool 必须同上下文；强制 spawn（理由见模块 docstring）
+_MP_CTX = _mp.get_context("spawn")
 
 
 def default_workers() -> int:
@@ -70,7 +76,7 @@ PLUGIN_INIT_REPORT_TIMEOUT = 120.0
 def _worker_init_plugins(
     modules: tuple[str, ...], report_queue: Any
 ) -> None:
-    """Pool initializer：在每个 worker 进程内重放插件加载（Windows spawn）。
+    """Pool initializer：在每个 worker 进程内重放插件加载（强制 spawn）。
 
     只捕获 PluginLoadError（load_plugins 契约保证只抛该类型）：存入
     worker 全局（作 parse_one_file 防御背板），并恰回报一次给父进程。
@@ -341,13 +347,13 @@ def batch_parse_files(
         init_reports: list[dict[str, Any]] = []
         report_queue: Any = None
         if plugin_modules:
-            report_queue = MpQueue()
+            report_queue = _MP_CTX.Queue()
             pool_kwargs = {
                 "initializer": _worker_init_plugins,
                 "initargs": (tuple(plugin_modules), report_queue),
             }
         try:
-            with Pool(effective_workers, **pool_kwargs) as pool:
+            with _MP_CTX.Pool(effective_workers, **pool_kwargs) as pool:
                 # 批次 19 受控通道：收取每个 worker 恰一次的初始化回报
                 # （在文件任务派发前）；not ok / 回报超时 → 受控上抛，
                 # with 语句退出即 terminate + join 回收池
