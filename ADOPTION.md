@@ -3343,3 +3343,33 @@ schema 版本封口（SCHEMA_VERSION_CURRENT=0.6.0 + 条件互斥）、分块
 **本提交物**：scripts/benchmark_stage8_closure.py（可复现基准）+
 tests/test_stage8_closure.py（脚本契约 + 台账锚点锁定）+ 本台账记录；
 基准产出在 outputs/stage8-closure-bench/（gitignored）。
+
+**Stage 8 最终封口裁决与推送回执（2026-09-02，传输层 v3 用户中转）**：
+
+- GPT 裁决：**Stage 8 最终封口（SEALED），不指定批次 26**。六项标准均
+  满足；第⑤项附口径约束：项目明确不做 Web/API 服务，**现有 CLI 文档即
+  为本项目接口文档，不得将其表述为 HTTP API**（复查：README §3.6 与
+  本台账自始均未表述为 HTTP API，口径一致，约束成立即遵守）。
+- 授权七步协议推送封口提交。执行回执（指示线 dachuang-code，全过）：
+  1. `EXPECTED=$(git rev-parse integration/stage8-closure-eval)` =
+     3ec446ef5fba41bc798d8b56710fe3cf9122d16d；全 SHA 相等断言 ✓；
+     `rev-parse --short=7` = 3ec446e ✓
+  2. `git fetch origin`：origin/main = 4858ab743b998da2d783f5c37f8e5bf99ff3d098
+  3. 工作树干净 ✓
+  4. `merge-base --is-ancestor` ✓（快进 1 提交）
+  5. `merge --ff-only` ✓（4858ab7..3ec446e，3 文件 +458）
+  6. `git push origin main` ✓
+  7. `git ls-remote origin refs/heads/main` =
+     3ec446ef5fba41bc798d8b56710fe3cf9122d16d，与 EXPECTED **逐字符
+     一致** ✓
+- **main = 3ec446ef5fba41bc798d8b56710fe3cf9122d16d（已推送并核验）**。
+- **Stage 8 封存摘要**（2026-08-31 至 2026-09-02，批次 16–25 + 封口
+  评估）：并行批量与评测并行化（16）、结构化 JSONL 日志（17）、parser
+  注册表与 auto 发现（18）、外部插件显式加载与 worker 重放（19）、
+  source_type 受控扩展契约 schema 0.6.0（20）、能力快照冻结（21）、
+  explain-parser 选择解释（22）、audit-parsers 竞争审计（23）、identity/
+  provenance 追溯（24）、可复现容器交付 digest 锁定 + 单 job CI + 部署
+  runbook（25）、六项封口证据与 100 文档基准（封口评估）。测试 5163
+  （Stage 7 封存）→ **5482 passed + 4 skipped**；评测器/报告版本沿既定
+  封口策略未动（EVALUATOR_VERSION 1.10、REPORT_VERSION 1.3）。
+  本回执随后续提交入库。

@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 BENCH = ROOT / "scripts" / "benchmark_stage8_closure.py"
 
 MAIN_SHA = "4858ab743b998da2d783f5c37f8e5bf99ff3d098"
+SEALED_MAIN_SHA = "3ec446ef5fba41bc798d8b56710fe3cf9122d16d"
 
 
 def _read(name: str) -> str:
@@ -105,3 +106,29 @@ def test_adoption_closure_records_jsonl_event_counts():
     squeezed = _squeeze("ADOPTION.md")
     assert _sq("batch_start=1 / file_complete=100 / batch_complete=1") in squeezed
     assert _sq("file_error=3") in squeezed
+
+
+# ---------- Stage 8 最终封口裁决与推送回执 ----------
+
+def test_adoption_records_stage8_final_seal_and_push_receipt():
+    text = _read("ADOPTION.md")
+    assert "Stage 8 最终封口（SEALED），不指定批次 26" in text
+    assert SEALED_MAIN_SHA in text
+    assert "4858ab7..3ec446e" in text
+
+
+def test_adoption_records_cli_docs_boundary_constraint():
+    """⑤项口径约束：CLI 文档即接口文档，不得表述为 HTTP API。"""
+    squeezed = _squeeze("ADOPTION.md")
+    assert _sq("现有 CLI 文档即为本项目接口文档") in squeezed
+    assert _sq("不得将其表述为 HTTP API") in squeezed
+
+
+def test_adoption_stage8_archive_summary_consistent_with_code():
+    """封存摘要的版本陈述与代码常量一致（防台账与代码漂移）。"""
+    squeezed = _squeeze("ADOPTION.md")
+    assert _sq("EVALUATOR_VERSION 1.10、REPORT_VERSION 1.3") in squeezed
+    assert _sq("5482 passed + 4 skipped") in squeezed
+    init = (ROOT / "evaluation" / "__init__.py").read_text(encoding="utf-8")
+    assert 'EVALUATOR_VERSION = "1.10"' in init
+    assert 'REPORT_VERSION = "1.3"' in init
