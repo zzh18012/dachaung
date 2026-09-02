@@ -3087,7 +3087,7 @@ Phase A  6212a34aa8ec6b62049650a2ca4d6af7dfdb43c1  registry 实现
          形态）+ ParserCapability 四字段注册瞬间冻结 + plugin_loader
          上下文包裹 + inspect-parser CLI（六键 JSON / human 六项）；
          +24 测试（四类验收 + 三 JSON 键集锁回归）
-Phase B  本提交（SHA 与推送回执随批次 25 准备提交补记，惯例同 §六十二）
+Phase B  122feafcaabe255db32b6049bf674e2cdeea1237  文档+收口
          README/CLAUDE.md 批次 24 节 + ADOPTION §六十三 + 收口测试
          （inspect↔snapshot 逐字段一致 + 六键 exact-set 全注册参数化 +
          builtin plugin_spec 恒 null + plugin spec/输出无路径泄漏
@@ -3098,7 +3098,67 @@ Phase A 裁决：APPROVE，偏差追认——未增加私有 override 参数（�
 项取舍：私有 contextmanager 已满足测试/bootstrap 需要，不构成设计偏差）。
 Phase B 范围由同一裁决确认：README/CLAUDE.md + §六十三 + 收口三件。
 
-测试：Phase A 后 5421 passed（5397 + 24，零回归）；Phase B 后见收口
-送审报告。
+测试：Phase A 后 5421 passed（5397 + 24，零回归）；Phase B 后 5431
+passed（5421 + 10，零回归，77.4s）。
 
-（SEALED 裁决与推送回执随批次 25 准备提交补记。）
+**SEALED 裁决与推送**（传输层 v3，用户手动中转）：Phase B 收口报告获
+SEALED——范围完成（README/CLAUDE.md/§六十三齐）、三项封口门槛全落实
+（六键 exact-set / builtin plugin_spec null / 无路径泄漏）、10 收口测试
+全过、5431 passed 零回归、无新设计偏差（Phase A 追认继续有效）+ 推送
+授权（预期 SHA 122feafcaabe255db32b6049bf674e2cdeea1237，五条件全满足
+才执行，禁 force，任一步失败即停并回报）。批次 25 指定与回执验收同轮。
+
+**推送授权与执行**（五步序列，指示线 main worktree，全部一次通过）：
+
+```
+git fetch origin                                → OK
+EXPECTED=$(git rev-parse integration/stage8-batch24-parser-provenance)
+                                                → 122feafcaabe255db32b6049bf674e2cdeea1237
+git status --short                              → 干净（分支 main）
+git merge-base --is-ancestor origin/main $EXPECTED → OK（0 退出；origin/main=8c4fb9b）
+git merge --ff-only $EXPECTED                   → 8c4fb9b..122feaf（3 commits，无 merge commit）
+git push origin main                            → OK（8c4fb9b..122feaf main -> main）
+git ls-remote origin refs/heads/main            → remote == expected
+test "$REMOTE" = "$EXPECTED"                    → Batch 24 push verified
+```
+
+合并统计：9 files，+1085/-3（c920c15 + 6212a34 + 122feaf）。
+
+**批次 25 指定：可复现交付（Container, CI/CD & Deployment Runbook）**
+——Stage 8 最后一块工程化拼图；本批完成并 SEALED 后，按"交付制品可
+复现、CI 绿、部署文档可操作、全量回归零变化"做 Stage 8 封口评估。
+裁决面 D1–D6：D1 容器运行契约（OCI/Docker 镜像构建可复现、依赖由项目
+锁文件严格约束、运行镜像启动不装依赖不联网、默认入口为既有 CLI 且
+CLI/JSON/错误码契约零变化、非 root 运行、挂载目录输入、输出经既有
+stdout/显式输出机制、不写回源码/挂载输入/宿主路径、.dockerignore 排除
+.git/测试缓存/密钥/环境文件/本地构建产物、镜像与交付物无绝对构建
+路径/凭据/令牌/私有配置/环境变量值）；D2 镜像身份与可追溯性（明确
+Python 3.12 运行时 + 确定构建工具版本、基础镜像与关键工具版本固定
+策略必须记录、最小 OCI 元数据（来源/版本/提交 SHA/构建时间）、不以
+运行时环境信息伪造版本、镜像身份仅交付追溯不影响 parser 注册/选择/
+provenance/Schema/解析输出）；D3 CI 与持续交付边界（PR 与 main 推送时
+执行锁定依赖安装/全量测试/静态容器构建/容器内 CLI 冒烟、验证用版本化
+脚本或可本地复现命令而非只靠 YAML 文本断言、测试全绿后才产可部署
+制品（带 SHA/校验的 OCI 归档或等价不可变制品）、可部署制品≠自动部署、
+无自动生产部署/云账号/镜像仓库推送/凭据/secrets/外部服务/环境特定
+基础设施、CI 权限最小化默认只读、第三方 Actions 可审计固定版本）；
+D4 部署运行手册（构建/制品→启动→挂载输入→取得 JSON 全命令、容器资源/
+文件权限/升级/按不可变版本回滚、常见失败信号与诊断边界、外部 parser
+插件仅经显式受信任镜像构建/打包路径 + --plugin 显式加载、不加隐式
+扫描或宿主路径猜测）；D5 验收与测试（干净上下文构建遵锁文件、容器内
+代表性解析输出与主机既有契约一致、非 root + 输入挂载只读、CI 同一
+验证入口远端绿回执、制品可重载并完成容器 CLI 冒烟、全量 Python 测试
+通过且 parser/插件/inspect JSON 键集与语义零回归）；D6 禁止项（不改
+parser registry/plugin/provenance/Schema/source type/解析规则/既有
+命令语义；不引入 Kubernetes/Compose 编排/服务化 API/数据库/网络服务/
+遥测/自动部署；本地路径/宿主环境/.env/令牌/私有依赖不入镜像/日志/
+制品/文档示例）。Phase A = Docker 交付物 + 可执行容器验证入口 +
+CI/CD 工作流及相应测试；Phase B = README/CLAUDE.md 部署运行手册 +
+ADOPTION 执行记录 + 收口测试 + 全量测试 + 远端 CI 回执。
+
+演进链：可加载（19）→ 输出受控（20）→ 能力冻结（21）→ 单次选择可
+解释（22）→ 全局竞争可审计（23）→ parser 身份可追溯（24）→ 交付可
+复现（25）。
+
+**边界**：BACKLOG #7a/#7b/#8/#9 继续不混入。批次 25 准备提交自
+main@122feaf 建分支，不进入 Phase A，先提交 Step 1 设计清单。
