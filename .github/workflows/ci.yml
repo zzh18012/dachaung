@@ -1,0 +1,82 @@
+# 批次 25：可复现交付 CI（单 job 链，裁决修订 1）
+# 单 job 原因：GitHub Actions 各 job 不共享 Docker daemon，镜像构建与验证
+# 必须在同一 job 内完成（test → build → verify --image → 归档 → rmi →
+# verify --artifact → upload）。
+name: container-delivery
+
+on:
+  push:
+    branches: [main, "integration/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  container-delivery:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout（action 以完整 commit SHA 锁定）
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: 安装 uv（版本锁定）
+        run: |
+          set -euo pipefail
+          pip install uv==0.11.11
+
+      - name: 同步依赖（uv sync --locked）
+        run: |
+          set -euo pipefail
+          uv sync --locked
+
+      - name: 全量测试（含 docker-gated 容器 e2e）
+        run: |
+          set -euo pipefail
+          .venv/bin/python -m pytest
+
+      - name: 构建容器镜像（digest 锁定基础镜像，linux/amd64 显式声明）
+        run: |
+          set -euo pipefail
+          GIT_VERSION="$(.venv/bin/python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")"
+          docker build --platform linux/amd64 \
+            --build-arg GIT_REVISION="${GITHUB_SHA}" \
+            --build-arg GIT_VERSION="${GIT_VERSION}" \
+            --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            -t kvfs-doc-parser:ci .
+
+      - name: 镜像验证（container_verify --image）
+        run: |
+          set -euo pipefail
+          .venv/bin/python scripts/container_verify.py --image kvfs-doc-parser:ci
+
+      - name: 归档不可变制品（docker save | gzip + sha256 边车）
+        run: |
+          set -euo pipefail
+          SHORT="$(git rev-parse --short=12 "${GITHUB_SHA}")"
+          mkdir -p dist
+          docker save kvfs-doc-parser:ci | gzip > "dist/kvfs-doc-parser_${SHORT}-img.tar.gz"
+          (cd dist && sha256sum "kvfs-doc-parser_${SHORT}-img.tar.gz" > "kvfs-doc-parser_${SHORT}-img.tar.gz.sha256")
+          echo "ARTIFACT_STEM=kvfs-doc-parser_${SHORT}-img.tar.gz" >> "$GITHUB_ENV"
+
+      - name: 清理本地镜像（迫使 --artifact 走完整 load 路径）
+        run: |
+          set -euo pipefail
+          docker rmi kvfs-doc-parser:ci
+
+      - name: 制品验证（校验和先行 → docker load → 全套检查）
+        run: |
+          set -euo pipefail
+          .venv/bin/python scripts/container_verify.py --artifact "dist/${ARTIFACT_STEM}"
+
+      - name: 上传制品（action 以完整 commit SHA 锁定）
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: container-artifact
+          path: dist/*
+          if-no-files-found: error

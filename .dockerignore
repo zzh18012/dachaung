@@ -1,0 +1,13 @@
+# 批次 25：白名单式 .dockerignore（裁决修订 4：default-deny）
+# 默认拒绝一切，仅放行镜像运行必需文件；再排除缓存产物。
+*
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!uv.lock
+!app
+!app/**
+!schemas
+!schemas/document.schema.json
+**/__pycache__
+**/*.pyc
