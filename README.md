@@ -327,6 +327,49 @@ traceback）。JSONL 事件：`plugin_loaded`（含 `parsers_added`；CLI 校验
 单文件或 glob 显式传入；`validate` 子命令为纯 schema 校验（无注册表
 上下文，不校验 parser 契约声明——运行时契约检查在 parse 路径）。
 
+### 3.6 容器交付与部署验证（Stage 8 批次 25）
+
+> **边界声明：制品交付 ≠ 部署。** CI 产出的 docker 镜像归档（tar.gz +
+> sha256 边车）是可复现交付物；把它加载进某个运行环境并按下方受限配置
+> 运行并通过 `container_verify --artifact` 验证，才构成一次"已验证部署"。
+> 本项目不提供编排、服务化、镜像仓库托管或网络暴露——那是部署方的职责。
+
+**CI 产物**（GitHub Actions 单 job 链 `container-delivery`，每次 push 到
+main / integration 分支自动产出）：artifact `container-artifact` 内含
+`kvfs-doc-parser_<short-sha>-img.tar.gz` 与同名 `.sha256` 边车。镜像本身：
+非 root（uid/gid 1000）、digest 锁定基础镜像（python:3.12-slim +
+ghcr uv）、ENTRYPOINT `["/app/.venv/bin/python","-m","app.cli"]`、
+4 个 OCI 标签（title/version/revision/created，构建期强制非空注入）。
+
+**部署验证步骤**（需要 Docker daemon；`container_verify.py` 须用项目
+venv 的 python 运行——宿主侧对照解析依赖项目环境）：
+
+```bash
+# 1. 下载制品（GitHub Actions run 页 artifact "container-artifact"），校验和先行
+sha256sum -c kvfs-doc-parser_<short-sha>-img.tar.gz.sha256
+
+# 2. 完整验证（校验和 → docker load → 镜像契约检查 → 受限运行 →
+#    宿主↔容器语义对照 → 精确分区断言 → 非 root/只读探针）
+.venv/Scripts/python.exe scripts/container_verify.py \
+  --artifact kvfs-doc-parser_<short-sha>-img.tar.gz
+# 预期输出末尾 JSON："result": "PASS"，三个合成输入（md/txt/docx）
+# 逐文件 status=match，container_uid="1000"，input_ro_probe_rc=0
+
+# 3. 手工受限运行示例（container_verify 内部即此配置）
+docker run --rm --read-only --tmpfs /tmp:rw,noexec,nosuid --network none \
+  -v "$PWD/inputs":/input:ro -v "$PWD/outputs":/output \
+  kvfs-doc-parser:<tag> parse /input/doc.md -o /output/doc.json --parser auto
+```
+
+**供应链口径**：Dockerfile 默认基础镜像引用为 docker.io 规范名 + digest
+锁定；`PYTHON_BASE` 构建参数允许覆盖 registry 前缀**仅用于受限网络下的
+本地验证**（digest 内容寻址保证字节一致），不构成官方可复现交付路径或
+供应链替代——官方交付物一律以 CI 从规范名构建的 artifact 为准。
+
+**已知边界**：容器以 `--network none` 运行（无外联）；根文件系统只读，
+仅 `/output` 挂载可写；CI 是 canonical 构建证据通道（本地 docker.io 不可
+达时 e2e 测试按显式理由 SKIPPED，不伪造通过）。
+
 ---
 
 ## 4. 输出格式（简化示例）

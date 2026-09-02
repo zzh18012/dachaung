@@ -11,7 +11,7 @@
 - 向量化、Sentence-BERT、任何 embedding
 - cpp-chunker / Rust 加速
 - 多 OCR 引擎
-- 内核代码 / FUSE / Docker / 数据库
+- 内核代码 / FUSE / 数据库（容器交付已于 Stage 8 批次 25 纳入，见"容器交付"节；不做编排/服务化）
 - 流式处理 / 异步（多进程已于 Stage 8 批次 16 纳入，见"并行化"节）
 
 ## 并行化（Stage 8 批次 16）
@@ -90,6 +90,16 @@
 - `--plugin` 加载先于名字查询：初始未知、加载后出现 → 可查询；插件失败 → `plugin_import_failed` / `plugin_register_failed`（不落成 unknown_parser）；插件成功但名字不存在 → `unknown_parser` rc 1；provenance 纯只读，不参与 duplicate/priority/discovery/resolution/audit/错误分支
 - list-parsers 六键 / explain 五键 / audit 键集零变化（键集锁测试守护）；不做：给既有三个 JSON 加字段、文件系统信息、运行时活读、哈希/签名/源码比对、依赖图/传递 import、网络查询、inspect --all、schema/source_type/family/priority/discovery 改动
 
+## 容器交付与可复现构建（Stage 8 批次 25）
+
+- **制品交付 ≠ 部署**：CI artifact（tar.gz + .sha256 边车）是交付物；加载并经 `container_verify --artifact` 验证通过才构成已验证部署（runbook 见 README §3.6）
+- `Dockerfile` 两阶段：builder（ghcr uv digest 锁定，`uv sync --locked --no-dev`）→ runtime（仅 `.venv` + `app/` + `schemas/document.schema.json`——后者运行时被 app/schema.py 读取，必须随镜像分发）；基础镜像 `PYTHON_BASE` 默认 docker.io 规范名 + digest 锁定，两阶段同一 ARG；registry 前缀覆盖**仅限受限网络本地验证**，非官方供应链路径
+- 运行契约：非 root uid/gid 1000（HOME=/tmp）、4 个 OCI 标签构建期 `test -n` 强制非空注入、`ENTRYPOINT ["/app/.venv/bin/python","-m","app.cli"]`、`CMD ["--help"]`、无 pip/apt 系统包安装
+- `scripts/container_verify.py`（stdlib only，须用项目 venv python 运行）：`--image` / `--artifact`（校验和先行 → docker load → 显式镜像检查）；D-C 语义对照剔除恰两来源可变字段（顶层 `source_path`、`metadata.image_output_dir`）且 `source_hash`/`document_id` 显式相等；精确分区断言（chunk source_element_ids 构成 element id 精确划分）；探针：uid==1000、/input 只读 errno∈{EROFS,EACCES,EPERM}；退出码 0/2/3/4/5/6/7
+- CI `.github/workflows/ci.yml`：**单 job**（job 间不共享 Docker daemon）链 test → build（`--platform linux/amd64`）→ verify --image → save/gzip+sha256 → rmi → verify --artifact → upload；action 全 commit SHA 锁定 + `persist-credentials: false`；每步 `set -euo pipefail`；触发 push [main, integration/\*\*] + pull_request
+- 批次 25 CI 暴露并修复的两个既有跨平台缺陷：测试硬编码 `.venv/Scripts/python.exe`（改回退 `sys.executable`）；`app/batch.py` fork 下 worker 插件重放退化为 sys.modules 缓存命中（强制 `get_context("spawn")`，Queue 与 Pool 同上下文）
+- 已知边界：本地 docker.io 不可达时 docker-gated e2e 按显式理由 SKIPPED（CI 为 canonical 构建证据通道）；容器 `--network none`、根只读、仅 /output 可写
+
 ## 环境
 
 - 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
@@ -162,6 +172,15 @@ PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli inspect-parser my
 PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli parse doc.smk \
   -o out.json --plugin my_pkg.my_plugin --parser my_parser
 .venv/Scripts/python.exe -m app.cli list-parsers --plugin my_pkg.my_plugin
+
+# Stage 8 批次 25：构建镜像（digest 锁定；GIT_* build-arg 必填）与交付验证
+docker build --platform linux/amd64 --build-arg GIT_REVISION=$(git rev-parse HEAD) \
+  --build-arg GIT_VERSION=0.1.0 --build-arg BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  -t kvfs-doc-parser:ci .
+.venv/Scripts/python.exe scripts/container_verify.py --image kvfs-doc-parser:ci
+docker save kvfs-doc-parser:ci | gzip > dist/img.tar.gz
+(cd dist && sha256sum img.tar.gz > img.tar.gz.sha256)
+.venv/Scripts/python.exe scripts/container_verify.py --artifact dist/img.tar.gz
 ```
 
 ## Stage 2 评测规则（当前阶段）

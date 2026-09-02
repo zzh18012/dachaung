@@ -3162,3 +3162,84 @@ ADOPTION 执行记录 + 收口测试 + 全量测试 + 远端 CI 回执。
 
 **边界**：BACKLOG #7a/#7b/#8/#9 继续不混入。批次 25 准备提交自
 main@122feaf 建分支，不进入 Phase A，先提交 Step 1 设计清单。
+
+---
+
+## 六十四、批次 25 执行记录（可复现交付：Container / CI-CD / Runbook，2026-09-02）
+
+传输层 v3（用户人工中转 GPT-5.6 Sol，思考极高档，新对话自包含简报）。
+
+**Step 1 设计裁决（2026-09-02）**：APPROVED AFTER REVISION。四项强制修
+订已并入：① CI 单 job 链（job 间不共享 Docker daemon）：test → build →
+verify --image → save/gzip/checksum → docker rmi → --artifact reload 验证
+→ upload，每步 `set -euo pipefail`；② `--entrypoint /app/.venv/bin/python`
+用于非 root/只读探针（接受 EROFS/EACCES/EPERM）；③ 加固 flags
+`--read-only --tmpfs /tmp:rw,noexec,nosuid --network none` + /output 唯一
+可写 + 脚本 chmod；④ `.dockerignore` 白名单 default-deny。补充：
+`--artifact` 校验和先行再 load 再显式镜像检查；4 个 OCI 标签非空/注入/
+验证；`--platform linux/amd64` 显式；action 全 commit SHA 锁定 +
+`persist-credentials: false`。D-E：授权有限推送
+`integration/stage8-batch25-reproducible-delivery`（禁 force/main/PR）。
+
+**Phase 执行表**：
+
+| 阶段 | 提交 | 内容 |
+|---|---|---|
+| 准备 | 914b441 | §六十三补记 SEALED+推送回执+批次 25 指定，建分支 |
+| Phase A | 1ab2573 | Dockerfile / .dockerignore / scripts/container_verify.py / .github/workflows/ci.yml / 37 测试（静态 11 + 逻辑 18 + docker-gated e2e 8） |
+| 缺陷修复 1 | 8bc10c9 | test_evaluation_cli.py / test_pipeline_integration.py 硬编码 `.venv/Scripts/python.exe`（首次 Linux CI 暴露）→ 沿用 parser 测试既有回退惯用法（否则 sys.executable） |
+| 缺陷修复 2 | 0e5d22b | app/batch.py 强制 `get_context("spawn")`：fork 平台 worker 继承 sys.modules，批次 19 worker initializer 插件"重放加载"退化为缓存命中、worker 侧防护形同虚设（sentinel 测试 rc 0≠1 实证）——**批次 25 CI 暴露的既有缺陷**；Windows 本就 spawn 默认，行为零变化；Queue 与 Pool 同上下文 |
+| Phase B | （本提交） | README §3.6 部署 runbook、CLAUDE.md 批次 25 节+范围修订、本记录、收口测试 |
+
+**Phase A 关键实现**：基础镜像 digest 双阶段锁定（PYTHON_BASE 默认
+docker.io/library/python:3.12-slim@sha256:e5c9fa26ffb76e11e0f054f30dc2523
+a2f9693f0c36c0cf1e39b27e152d899fc + ghcr.io/astral-sh/uv:0.11.11@sha256:79
+8712e57f879c5393777cbda2bb309b29fcdeb0532129d4b1c3125c5385975a）；uv 声明
+为独立 stage（BuildKit 不支持 COPY --from 变量展开，官方 workaround）；
+runtime 仅 .venv + app/ + schemas/document.schema.json（schema 运行时读
+取）；uid/gid 1000、HOME=/tmp、OCI 标签 `RUN test -n` 构建期强制非空、
+ENTRYPOINT venv python。container_verify：D-C 语义对照剔除恰两来源可变
+字段（顶层 source_path、metadata.image_output_dir——证据：pipeline 由
+output_path 派生）且 source_hash/document_id 显式相等、其余 13 顶层键递
+归相等；精确分区断言（非空/⊆/无重/两两不相交/并集=全集）；探针 uid==1000
+与 /input 只读 errno 白名单；inspect-parser/list-parsers 宿主==容器。
+
+**偏差 A–F 及追认（2026-09-02 GPT 裁决：Phase A APPROVE，六项全追认）**：
+A. PYTHON_BASE 前缀覆盖——追认，条件：默认值必须继续是规范 docker.io
+digest 引用；镜像源覆盖仅用于受限网络本地验证，不构成官方可复现交付路
+径或供应链替代（该边界声明已写入 README §3.6 与 CLAUDE.md）。B. uv 独
+立 stage——必要兼容实现，零行为差异。C. e2e skip 仅限 canonical registry
+解析/连通失败类别，其余失败必须失败。D/E. 两项真实跨平台缺陷独立提交修
+复、未掩盖失败，合格（E 须明确为批次 25 CI 暴露的既有缺陷——本表已注）。
+F. md/txt/docx 满足本批语料口径，PDF 不伪装进覆盖范围。
+
+**远端 CI 回执（D-E 授权推送）**：
+- run 33585538869：失败（全量测试步骤；缺陷 1——Windows venv 路径硬编码）；
+- run 33585903380：失败（单测步骤；缺陷 2——fork 下 worker 重放失效）；
+- **run 33587036477：成功**（3m22s，10 步全 ✓），
+  https://github.com/zzh18012/dachaung/actions/runs/33587036477
+  - 全量测试 5446 passed + 22 skipped（与本地 5464+4 合计同为 5468：差 18
+    = samples/private 私有语料 CI 跳过；本地 skip 的 4 个 docker e2e 在
+    CI 真实执行）；
+  - container_verify --image：PASS；rmi 后 --artifact（校验和先行 + load）：
+    PASS；
+  - 制品 `kvfs-doc-parser_0e5d22b8bddc-img.tar.gz`，sha256
+    `8c850fde8594b0b74a8b2836fb18d1a96403dc33eba7a81fc6b2856de5e63215`
+    （已下载回本地独立重哈希，逐字一致）。
+
+**本地证据（Windows Docker Desktop 29.4.3，containerd/overlayfs）**：同
+digest 镜像源前缀构建（偏差 A 场景；daocloud 与 1ms.run 双源 digest 逐字
+一致）成功；container_verify --image PASS（md 6 元素/2 块、txt 1/1、
+docx 3/1 含 heading、uid=1000、RO 探针 rc=0）；制品全链路（save|gzip+
+边车 → rmi → --artifact）PASS；全量回归 5464 passed + 4 skipped 零回归
+（基线 5431 + 新增 37）。
+
+**Phase B（本提交）**：README §3.6 容器交付与部署验证 runbook（制品≠
+部署边界、校验和先行、container_verify --artifact、受限运行示例、供应
+链口径、已知边界）；CLAUDE.md 新增"容器交付与可复现构建"节 + 范围修订
+（"不做 Docker" → 容器交付自批次 25 纳入，不做编排/服务化）+ 常用命令
+补构建/验证；收口测试 tests/test_batch25_closure.py；全量测试 + 远端 CI
+回执登记（Phase B 推送将触发新 run，作为文档提交的附加绿证据）。
+
+**边界**：Phase B 未改动 Phase A 的容器/CI/解析行为（Dockerfile、
+ci.yml、container_verify.py、app/ 零触碰）。
