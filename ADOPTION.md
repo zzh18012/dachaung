@@ -3243,3 +3243,103 @@ docx 3/1 含 heading、uid=1000、RO 探针 rc=0）；制品全链路（save|gzi
 
 **边界**：Phase B 未改动 Phase A 的容器/CI/解析行为（Dockerfile、
 ci.yml、container_verify.py、app/ 零触碰）。
+
+**Phase B 回执、封口与推送（2026-09-02，传输层 v3 用户中转）**：
+
+- Phase B 推送触发 run 33589020316：**成功**（3m6s），
+  https://github.com/zzh18012/dachaung/actions/runs/33589020316
+  （文档提交的附加绿证据）。
+- GPT 裁决：**批次 25 SEALED**（Phase B 完成批准范围：三文档收口、
+  9 收口测试、全量 5473 passed + 4 skipped 零回归、run 33589020316
+  成功、未改容器/CI/解析行为、无新偏差）。
+- 授权 ff-only 合入 main，协议要求先解析完整 SHA（报告只给短 SHA
+  4858ab7，不得臆造）。执行回执（指示线 dachuang-code，七步全过）：
+  1. `EXPECTED=$(git rev-parse integration/stage8-batch25-reproducible-delivery)`
+     = 4858ab743b998da2d783f5c37f8e5bf99ff3d098；
+     `rev-parse --short=7` 校验 = 4858ab7 ✓
+  2. `git fetch origin`：origin/main = 122feaf
+  3. 工作树干净 ✓
+  4. `merge-base --is-ancestor` ✓（快进 5 提交：914b441 → 1ab2573 →
+     8bc10c9 → 0e5d22b → 4858ab7）
+  5. `merge --ff-only` ✓（122feaf..4858ab7，14 文件 +1597/−12）
+  6. `git push origin main` ✓（122feaf..4858ab7）
+  7. `git ls-remote origin refs/heads/main` =
+     4858ab743b998da2d783f5c37f8e5bf99ff3d098，与 EXPECTED **逐字符
+     一致** ✓
+- **main = 4858ab743b998da2d783f5c37f8e5bf99ff3d098（已推送并核验）**；
+  本回执随封口评估提交（§六十五）入库。
+
+## 六十五、Stage 8 封口评估（六项证据，2026-09-02）
+
+裁决指令（2026-09-02 GPT）：批次 25 推送回执验证后进入最终评估，
+**不指定批次 26**；最终报告逐项给出证据；封口评估完成前 Stage 8 暂不
+宣告最终封口，只有发现明确缺口才另行指定针对性批次。
+
+对照原始封口标准（§五十：100 文档 <10min 8 核单机、结构化日志+进度+
+错误汇总、≥1 外部 parser 插件示例、Docker+CI/CD、生产部署与 API 文档）
+与裁决复述口径，逐项证据如下：
+
+**① 100 文档处理耗时 <10 min**：`scripts/benchmark_stage8_closure.py`
+（本提交；确定性合成语料 40 md / 30 docx / 30 pdf；计时取 batch-parse
+自身 summary.wall_time_seconds，不含语料生成；exit 0 = 全成功且
+<600s）。实测（2026-09-02，Windows 11，cpu_count=14，workers=8）：
+**100/100 成功、失败 0、墙钟 1.06s**（上限 600s，5661.83 docs/min）。
+语料性质披露：合成文档为中小体量（md 8 段、docx 1 标题+8 段+1 表、
+pdf 单页 10 行）。补充真实语料计时：devset real-01..05 共 8 文档分两
+批（docx+pdf 同源对 stem 冲突受控拒绝为批次 16 设计行为）：5 文档批
+（3 docx + 2 pdf，含多栏 IVD 与年报）墙钟 1.22s；4 真实 PDF 批（含
+real-04 多栏）墙钟 1.78s；两批 9/9 成功（1 项 file_error =
+stem_collision 为同批设计内拒绝）。
+
+**② 结构化 JSONL 日志**：批次 17 `app/jsonlog.py`（JSONFormatter：
+record.msg→event、extra 字段顶层展开；setup_logger；--log-file
+JSONL append + --verbose stderr；默认零输出变化）。基准运行
+bench.jsonl 事件计数：batch_start=1 / file_complete=100 /
+batch_complete=1；真实语料 real-bench.jsonl（append 两批）：
+batch_start=2 / file_complete=9 / file_error=3（stem_collision 结构化
+错误事件，含 error_code/error_message/traceback 字段）/ batch_complete=2。
+进度：tqdm（TTY）或逐文档 stderr 行（非 TTY）；错误汇总：
+summary.json errors 列表。
+
+**③ ≥1 外部 parser 插件示例**：批次 18 参考插件
+`app/parsers/plugins/markdown_enhanced.py`（priority 5，随项目分发，
+provenance loaded_via=builtin）；批次 19 外部插件显式加载
+`app/plugin_loader.py` + `--plugin MODULE`（dotted 模块名、fail-fast、
+结构化错误契约 plugin_import_failed/plugin_register_failed、并行
+worker initializer 重放 + 恰一次回报）；全链外部插件示例
+`tests/test_plugin_myx_fullchain.py`（.myx 自定义格式经真实 CLI
+parse→chunk→validate 全链；测试专用，永不内置、不进 evaluation AUTO
+映射）。
+
+**④ 可复现 Docker/CI 交付制品**：批次 25 Dockerfile（两阶段 digest
+锁定 python+uv、uid/gid 1000、OCI 标签 `RUN test -n` 构建期强制、
+ENTRYPOINT venv python）+ 白名单 .dockerignore +
+`scripts/container_verify.py`（--image / --artifact 双模式、校验和先
+行、D-C 语义对照 + 精确分区断言 + uid/RO 探针）+ 单 job 全链 CI
+（actions 全 SHA 钉死、persist-credentials off、set -euo pipefail）。
+回执：run 33587036477 成功（制品 kvfs-doc-parser_0e5d22b8bddc-img.tar.gz
+sha256 8c850fde8594b0b74a8b2836fb18d1a96403dc33eba7a81fc6b2856de5e63215，
+本地独立重哈希一致）+ run 33589020316 成功；本地 --image / --artifact
+双模式 PASS。
+
+**⑤ 可操作的部署运行手册**：README §3.6 容器交付与部署验证（制品≠
+部署边界；下载 → sha256sum -c 校验和先行 → docker load →
+container_verify --artifact 预期结果 → --read-only --network none
+--tmpfs /tmp:rw,noexec,nosuid 受限运行示例 → 供应链口径与已知边界）；
+tests/test_batch25_closure.py 锁定 runbook 契约锚点。原标准"生产部署
+与 API 文档"中的 API 维度按项目范围裁定（不做 Web UI/服务化，批次 25
+范围修订），由 CLI 文档承担（README 命令文档 + `--help` + docs/）。
+
+**⑥ 全量测试及既有契约零回归**：4858ab7 本地全量 **5473 passed +
+4 skipped**（Phase B 实测；基线口径沿革 5431 → 5464 → 5473 随批次
+递增，无失败无回归）；远端 CI 5446 passed + 22 skipped（口径差 =
+samples/private 私有语料 CI 跳过 + 本地 skip 的 4 个 docker e2e 在
+CI 真实执行，两口径合计同为 5468 + 批次 25 文档测试）。既有契约在
+列通过：键集锁测试（list-parsers 六键 / explain 五键 / audit 键集）、
+schema 版本封口（SCHEMA_VERSION_CURRENT=0.6.0 + 条件互斥）、分块
+不丢不重（normalize_text 口径）、评测不变量（比例指标分母 0 → null
++ reason 等）、批次 16–25 各收口测试。
+
+**本提交物**：scripts/benchmark_stage8_closure.py（可复现基准）+
+tests/test_stage8_closure.py（脚本契约 + 台账锚点锁定）+ 本台账记录；
+基准产出在 outputs/stage8-closure-bench/（gitignored）。
