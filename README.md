@@ -169,6 +169,10 @@ datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc).isoformat()
 .venv/Scripts/python.exe -m app.cli audit-parsers
 .venv/Scripts/python.exe -m app.cli audit-parsers --json
 
+# 查询单个 parser 的 identity 与 provenance（Stage 8 批次 24，只读快照）
+.venv/Scripts/python.exe -m app.cli inspect-parser fallback
+.venv/Scripts/python.exe -m app.cli inspect-parser my_parser --plugin my_pkg.my_plugin --json
+
 # 按扩展名自动发现（priority 小者优先；显式 --parser 永远覆盖发现）
 .venv/Scripts/python.exe -m app.cli parse doc.md -o out.json --parser auto
 ```
@@ -268,6 +272,26 @@ snapshot 的 extensions 并集（经 `list_parsers()` 读取，不扫文件系�
 追溯）。`summary` 仅数量/分类计数，无健康评分/排名（audit 是观察，不是
 治理）。全程不实例化 parser、不读文件、不 parse、零 UserWarning；空注册表
 输出空报告（rc 0）。
+
+**Parser 身份与来源追溯（Stage 8 批次 24）**：能力快照（批次 21）追加
+identity / provenance 四字段——`module` / `qualname`（实现身份：定义在
+哪个模块、哪个类）与 `loaded_via` / `plugin_spec`（加载来源：`builtin`，
+或经哪个 `--plugin` spec 注册），两轴分清、不合成一个 origin 字符串。
+provenance 由 registration context 决定：`load_plugins` 对每个 spec 独立
+进入上下文（ContextVar，嵌套最内层生效、异常安全），`register()` 在
+调用瞬间消费冻结——顶层 `@register` / 副模块注册 / helper 转注册别处
+定义的类一律归当前 spec；无上下文注册（内置/预 import，含随项目分发的
+markdown_enhanced）→ `builtin` + `plugin_spec=null`。**不做任何事后
+推断**：插件模块若被普通 `import` 预导入，其注册就是 `builtin`，事后
+补 `--plugin` 也不改写。查询入口 `inspect-parser <name> [--plugin ...]
+[--json]` 只读快照、不实例化 parser：`--json` 显式六键（builtin 时
+`plugin_spec` 为 null 不省略；无 `__file__`/绝对路径/环境信息），human
+模式恰六项（None 显示 "-"）。`--plugin` 加载先于名字查询：初始未知、
+加载后出现 → 可查询；插件失败 → `plugin_import_failed` /
+`plugin_register_failed`（不落成 unknown_parser）；名字不存在 →
+`unknown_parser` rc 1。provenance 纯只读，不参与
+duplicate/priority/discovery/resolution/audit 与错误分支；list-parsers
+六键 / explain 五键 / audit 键集零变化。
 
 然后 `import` 该模块即可被 `list-parsers` / `--parser auto` 发现。
 `discover_parser(path)` 返回 parser **名称**（`str`，非实例）——实例化

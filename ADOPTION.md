@@ -3051,3 +3051,54 @@ module / class qualname（implementation identity），以及是内置能力还�
 （22）→ 全局竞争可审计（23）→ parser 身份可追溯（24）。
 
 **边界**：BACKLOG #7a/#7b/#8/#9 继续不混入。
+
+## 六十三、批次 24 执行记录（Parser Identity & Provenance，2026-09-02）
+
+裁决通道：**传输层 v3（用户手动中转）**——webbridge 自动传输于批次 24
+启动前废弃（乐观 UI 回滚 / DOM 冻结 / tab 分叉反复发生，2026-09-02
+实锤：tab DOM 停留在旧消息而服务端裁决已完成）。现行协议：Claude 整理
+提示词 → 用户贴给 GPT（GPT-5.6 Sol，思考"极高"档，新对话自包含简报）→
+裁决贴回，全程无浏览器操作。
+
+Step 1 设计裁决 **APPROVED AFTER D1 REVISION**。要点：D1（修正后）
+registration provenance context——loader 建栈式 ContextVar 上下文、
+register() 调用瞬间消费冻结，禁止任何事后推断（cls.__module__ /
+sys.modules / 已加载模块集合 / import graph 全禁）；无上下文注册（内置/
+预 import）→ builtin/null；load_plugins 每个 spec 独立进入上下文、
+import+注册 hook 全程在内；注册语法≠加载来源；plugin_spec 存规范化前
+原始字符串、绝对路径禁止；嵌套最内层生效退出恢复、异常安全；同一 class
+不同时刻经不同 spec 注册各 snapshot 各归各、禁按 class identity 合并；
+内部 API"loader 设置、registry 消费"，不做公开 register(...,
+loaded_via=...)，私有 override 可留；loaded_via 值域封闭 builtin|plugin。
+D2 快照四字段 module/qualname/loaded_via/plugin_spec 注册时冻结。D3 既有
+三 JSON 键集不变 + 新增 inspect-parser。D4 六键显式构造、builtin 时
+plugin_spec null 不省略、禁 __file__/绝对路径/cwd/环境泄漏、human ≤ 六项。
+D5 --plugin 加载先行、插件失败走 plugin_* 不落成 unknown_parser、名字
+不存在 unknown_parser rc 1。D6 不做清单（不加字段/文件系统信息/活读/
+哈希签名/依赖图/网络/inspect --all/schema 改动）。Phase 拆分 A/B +
+Phase A 四类验收测试 + Phase B 封口门槛。
+
+相位实现（严格门禁）：
+
+```text
+Phase A  6212a34aa8ec6b62049650a2ca4d6af7dfdb43c1  registry 实现
+         私有 ContextVar 上下文（_plugin_registration_context：token
+         set/reset + try/finally，嵌套最内层生效；plugin_spec 拒路径
+         形态）+ ParserCapability 四字段注册瞬间冻结 + plugin_loader
+         上下文包裹 + inspect-parser CLI（六键 JSON / human 六项）；
+         +24 测试（四类验收 + 三 JSON 键集锁回归）
+Phase B  本提交（SHA 与推送回执随批次 25 准备提交补记，惯例同 §六十二）
+         README/CLAUDE.md 批次 24 节 + ADOPTION §六十三 + 收口测试
+         （inspect↔snapshot 逐字段一致 + 六键 exact-set 全注册参数化 +
+         builtin plugin_spec 恒 null + plugin spec/输出无路径泄漏
+         subprocess 实证）；+10 测试
+```
+
+Phase A 裁决：APPROVE，偏差追认——未增加私有 override 参数（裁决"可留"
+项取舍：私有 contextmanager 已满足测试/bootstrap 需要，不构成设计偏差）。
+Phase B 范围由同一裁决确认：README/CLAUDE.md + §六十三 + 收口三件。
+
+测试：Phase A 后 5421 passed（5397 + 24，零回归）；Phase B 后见收口
+送审报告。
+
+（SEALED 裁决与推送回执随批次 25 准备提交补记。）

@@ -82,6 +82,14 @@
 - 空注册表 → 空报告 rc 0（只读诊断语义，不制造错误）；不实例化 parser、不读文件、不 parse；`--plugin` 复用批次 19 契约（加载先行，`plugin_*` 错误码零新增）
 - 不做：explain-parser --all（单输入职责）、插件目录扫描 / entry points / 动态安装 / 网络（沿用）、audit 结果持久化/缓存、schema/source_type/family 改动
 
+## Parser 身份与来源追溯（Stage 8 批次 24）
+
+- 能力快照追加 identity/provenance 四字段：`module` / `qualname`（cls.__module__ / cls.__qualname__ 注册瞬间冻结）+ `loaded_via` / `plugin_spec`（registration context 调用瞬间消费）；值域封闭 `builtin|plugin`；无上下文注册（内置/预 import，含随项目分发的 markdown_enhanced）→ `builtin` + `plugin_spec=null`
+- registration context（registry 私有 ContextVar，默认栈式可嵌套、异常安全，最内层生效、退出恢复外层）：loader（`load_plugins`）对每个 spec 独立进入 `_plugin_registration_context(spec)`，import 与其触发的注册 hook（顶层 @register / 副模块 / helper 转注册）全程在上下文内；plugin_spec 存规范化前原始字符串、拒绝路径形态；**禁止任何事后推断**（cls.__module__ / sys.modules / 已加载模块集合 / import graph 均不作加载来源依据——插件模块被普通 import 预导入即 builtin）；同一 class 不同时刻经不同 spec 注册各 snapshot 各归各（不按 class identity 合并）；装饰器与直接调用不构成不同 loaded_via
+- `app.cli inspect-parser <name> [--plugin MODULE ...] [--json]`：只读 `_capabilities` 快照查询 identity/provenance，不实例化 parser、不做选择解释/竞争审计；`--json` 显式六键 {name, version, module, qualname, loaded_via, plugin_spec}（builtin 时 plugin_spec 为 null **不省略**；version 用注册表冻结值；无 `__file__`/绝对路径/cwd/环境变量/import search path）；human 恰六项（None 显示 "-"，与 list-parsers 同规）
+- `--plugin` 加载先于名字查询：初始未知、加载后出现 → 可查询；插件失败 → `plugin_import_failed` / `plugin_register_failed`（不落成 unknown_parser）；插件成功但名字不存在 → `unknown_parser` rc 1；provenance 纯只读，不参与 duplicate/priority/discovery/resolution/audit/错误分支
+- list-parsers 六键 / explain 五键 / audit 键集零变化（键集锁测试守护）；不做：给既有三个 JSON 加字段、文件系统信息、运行时活读、哈希/签名/源码比对、依赖图/传递 import、网络查询、inspect --all、schema/source_type/family/priority/discovery 改动
+
 ## 环境
 
 - 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
@@ -144,6 +152,11 @@ uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.
 # Stage 8 批次 23：审计注册表全局解析竞争
 .venv/Scripts/python.exe -m app.cli audit-parsers
 .venv/Scripts/python.exe -m app.cli audit-parsers --json
+
+# Stage 8 批次 24：查询单个 parser 的 identity 与 provenance（只读快照）
+.venv/Scripts/python.exe -m app.cli inspect-parser fallback
+PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli inspect-parser my_parser \
+  --plugin my_pkg.my_plugin --json
 
 # Stage 8 批次 19：显式外部插件加载（dotted 模块名，PYTHONPATH 提供模块）
 PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli parse doc.smk \
