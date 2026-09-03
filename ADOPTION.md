@@ -3509,3 +3509,27 @@ comparison 4 / holdout 5 + 备选 2 未分配）、collection-report.md
 **未做（授权边界内待续）**：prod-06/prod-08 落位、manifest 冻结与
 逐篇分配表（补录 A）、人工标注与 split 落盘、dev 上 N 选优与基线冻结
 （⑥后半）。embedding 依赖仍未授权。
+
+## 六十八、批次 26 prod-08 用户私有 DOCX 落位（2026-09-03）
+
+用户授权其微信接收文件目录为 prod-08 候选来源。筛选（方法与排除规则
+见 collection-report.md §6.1，私人文件按纪律不看内容直接排除、候选仅
+做结构统计与隐私正则扫描计数）：6 个月份目录 146 个 DOCX 中，否决
+亿学手册（44 段 ~600 字符截图驱动，将沦为 empty_result）与各近重复
+变体，选定 `信息安全技术基础测试习题集.docx`（原版）：
+- 落位 `files/prod-08-infosec-exercises.docx`，sha256
+  b2e2270b35af7da7ad434cafb0f2f21d4848c089216abfd2ef4f61134b581ce2，
+  3591 段 / 11 表 / 10 图，Heading1×26 / Heading2×110 / Heading3×91，
+  102,871 规范化字符，隐私扫描零命中；split=holdout，
+  license=user-private（授权课题评测使用、不公开分发）。
+- 同目录 `(1)` 变体为重排近重复（无标题样式，normsha c50c7e6c…），
+  按"同系版本只取一份"纪律取原版。
+- **偏差（冻结前待 GPT 裁决）**：该文档是课程习题集而非产品手册——
+  私有槽位授权范围无争议，但域属性与 product_manual 不符，连同
+  prod-06 提案（唯一私有 DOCX 已用于 prod-08 → 提案 B=tech-09
+  家电售后服务规范升格补产品域，保 8/8/8 域平衡）一并呈报。
+- 采集现状：23/24 正选 + 2 备选；split dev 13 / comparison 4 /
+  holdout 6 + 备选 2；DOCX 达停机线 4（tech-04/05、prod-07/08）。
+- 标注试点（prod-05，§六十七后追加）：claude-draft 82 units
+  （text 72 / nontext 10）/12 segments/2609 字符流过全部校验；
+  B1 N=800 投影 0 unmatched、ARI 0.3665 冒烟（非正式值）。
