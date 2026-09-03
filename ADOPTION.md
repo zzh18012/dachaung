@@ -3455,3 +3455,57 @@ A. manifest 冻结前给出 24 篇逐篇 split/域/格式分配表；B. 明确�
 或无文本文档的 ARI 分母、N/A 与失败计数规则，禁止静默排除。停机门槛
 不变（许可证合格文档 <20 篇 / DOCX <4 篇 / 双标注一致率 <85% 且仲裁不
 收敛 / 冻结后发生未经裁决的 manifest 改动，任一触发立即停止并汇报）。
+
+## 六十七、批次 26 采集进展与授权子阶段实现（2026-09-03）
+
+**采集（授权①，2026-09-02 至 09-03）**：22/24 正选已采集并逐篇核实
+许可证（学术 8/8、技术 8/8、产品 6/8）+ 备选 2（tech-09 家电售后
+DOCX、samr-a2 修订说明）。语料与草稿（samples/private/stage9-corpus/，
+gitignored 永不进 git）：files/ 24 文件、stats.json（逐篇
+sha256/页数/段落/表格/图抽样）、manifest.draft.json（逐篇
+source_url/license/language/split 提案/布局标签；split 现状 dev 13 /
+comparison 4 / holdout 5 + 备选 2 未分配）、collection-report.md
+（替换与网络受阻实证）。要点：
+- 替换（客观理由，冻结前待 GPT 审）：WCAG→NIST SP 800-207（无官方
+  PDF）；GIMP→GNU Bash 手册（官方 PDF 404）；PostgreSQL→GNU Make
+  （约 2900 页句级标注不可行）；CAICT→CNCERT 2020 年报（WAF 412，
+  冻结前最后重试已于 09-03 执行、http/https 均 412 失败留档）；
+  Python tutorial zip→完整 a4 归档解包（tutorial-only 停发）。
+- LibreOffice Writer 指南 490 页超 ≤300 页预期（偏差待追认）；多栏
+  实际 6 篇（acad-01..06）< 预期 8（汉斯两篇为单栏 OA 版式，如实
+  呈报）。
+- 未决：prod-06（开源 DOCX 手册公开渠道未果，候选 A=用户私有补位 /
+  B=提升 tech-09 备选，冻结前裁决）；prod-08（用户私有 DOCX，待提供，
+  拟 holdout）。DOCX 现状 3+待用户 1，达停机线 4。
+- MS-TDS [MS-TDS]-260617.docx 断点续传完整（2854761B，7608 段 69 表，
+  sha256 27c77be0e324ab38e3b02cca59919c4ef60332b63f2f349bfbeb76ca4564b226，
+  覆盖下载中间态部分哈希并如实登记）。
+
+**实现（授权④，commit 本条）**：
+- `stage9/` 零依赖包：normalize.py（fold-ws-v1，与 app 不丢不重测试
+  同源规则、实现独立）；project.py（chunk→unit 投影：顺序游标+全局
+  回退定位、最大重叠归属、平局取先出现 chunk、跨块/unmatched 披露）；
+  validation.py（标注校验五项契约）；baselines.py（B1 固定长度 +
+  B2 递归字符切分，分隔符层级与 N 网格按设计 §5 冻结）；ari.py
+  （pairwise contingency ARI，n<2 与退化分母规则明确）。
+- `scripts/stage9_validate_annotations.py`：校验 CLI（--manifest
+  --annotations [--full-set] [--report] [--json]；退出码 0/1/2）。
+- `docs/stage9-annotation-guide.md`：正式标注指南（含裁决补录 B 的
+  ARI 分母/N/A/失败计数规则：parse_failed/empty_result/
+  annotation_invalid → N/A 并计数披露，unmatched_chunk/
+  uncovered_unit/cross_chunk_unit 单列，集级 ARI=非 N/A 文档 macro
+  average 且 N/A 分布必报；禁止静默排除）。
+- **实现口径补充（偏差声明，待 GPT 追认）**：①标注 JSON 在设计 §3
+  示例字段外新增必要字段 `stream`（规范化字符流全文）——norm_hash
+  复算与 span 全覆盖检查必须有独立基准（标注流是人工阅读序，无法从
+  源文档用解析器再推导）；②unit 间分隔空格归入前一 unit 的 span 末尾
+  （平铺规则的具体化）；③B2 输入为保留换行的原始文本（fold-ws 会消
+  灭前两级分隔符），chunk 投影前逐块 fold_ws。
+- 测试：tests/test_stage9_validation.py（21）、test_stage9_projection.py
+  （8，含设计要求的跨 chunk 投影手算 fixture）、test_stage9_baselines_
+  ari.py（21，ARI 手算 −1/9 例锁死）。回归 5535 passed + 4 skipped
+  （docker-gated 已知）。
+
+**未做（授权边界内待续）**：prod-06/prod-08 落位、manifest 冻结与
+逐篇分配表（补录 A）、人工标注与 split 落盘、dev 上 N 选优与基线冻结
+（⑥后半）。embedding 依赖仍未授权。
