@@ -48,17 +48,24 @@ unit 之间的分隔空格**归入前一 unit 的 span 末尾**
 
 ## 4. 字段填写规范
 
+格式版本 `annotation_schema`（冻结值 `v1.1`，2026-09-05 GPT 裁决
+C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现偏差
+转正为正式字段——norm_hash 复算与 span 全覆盖检查以它为唯一基准；
+②page 语义收紧为"只表物理页码"，新增 `body_index`。
+
 ```json
 {
   "doc_id": "acad-01-sentencebert",
+  "annotation_schema": "v1.1",
   "sentence_splitter": "v1",
   "normalization": "fold-ws-v1",
   "annotator": "claude-draft + user-review",
-  "stream": "<规范化字符流全文>",
+  "stream": "<规范化字符流全文（fold-ws-v1）>",
   "units": [{
     "unit_id": "u0001",
     "kind": "heading | sentence | nontext",
     "page": 1,
+    "body_index": null,
     "char_span": [0, 18],
     "norm_text_hash": "sha256:<stream[a:b] 的 sha256 十六进制>",
     "text_preview": "<stream[a:b] 的非空前缀，≤60 字符>",
@@ -73,11 +80,23 @@ unit 之间的分隔空格**归入前一 unit 的 span 末尾**
 ```
 
 硬性约束（校验器逐项检查，失败码见 §8）：
+- `annotation_schema`：必须为冻结值 `v1.1`；
 - `unit_id`：`^u\d{4,}$` 且全文件唯一；
 - `kind`：三值枚举；text 类（heading/sentence）必须有合法 span 与
   hash；nontext 类 `char_span`/`norm_text_hash` 必须为 null、必须有
   `nontext_ref`（`^(img|tab):\S+$`，全文件唯一）；
-- `page`：≥1 整数（人眼所见页码，PDF 用印刷页码所在 PDF 页序）；
+- `page`：**只表物理页码**（人眼所见页码，PDF 用印刷页码所在 PDF
+  页序）；null 或 ≥1 整数。DOCX 无物理页码 → 全部 null，定位改用
+  `body_index`；同一 unit 两者互斥（禁一字段两义）；
+- `body_index`：null 或 ≥1 整数（body 元素 1-based 连续序，DOCX 篇
+  供人工复核定位）；PDF 篇必须 null；
+- `char_span`：半开区间 `[start, end)`（end 不含），0 ≤ start <
+  end ≤ 流长；text unit 在 `units` 列表序中的 span 单调递增
+  （列表序 = 阅读序 = 流序）；text unit 的 span 集精确覆盖全流
+  （连续无重叠无间隙）；**unit 间分隔空格归前一 unit 的 span 末尾**
+  （平铺规则：unit_i 的 end = unit_{i+1} 的 start）；
+- `norm_text_hash`：仅按 `stream[span[0]:span[1]]` 字节复算（不从
+  源文档推导）；
 - `text_preview`：unit 文本的非空前缀且 ≤60 字符；
 - `gold_segment_id`：每个 unit（含 nontext）必须引用存在的 segment；
   每个 segment 必须被 ≥1 unit 引用（双向闭合）；
@@ -119,13 +138,15 @@ unit 之间的分隔空格**归入前一 unit 的 span 末尾**
 ```
 
 退出码：0 通过 / 1 存在失败 / 2 输入错误。失败码：`frozen_value`
-`stream_not_folded` `bad_unit_id_format` `duplicate_unit_id` `bad_type`
-`span_out_of_range` `span_overlap` `span_gap` `hash_mismatch`
-`preview_mismatch` `span_not_null_nontext` `bad_nontext_ref`
-`duplicate_nontext_ref` `unknown_nontext_ref` `unknown_segment`
-`unreferenced_segment` `duplicate_segment_id` `missing_field`
-`doc_not_in_manifest`；`--full-set` 追加 `split_count_mismatch`
-`split_domain_coverage` `missing_annotation`（冻结终检用）。
+（含 `annotation_schema` 版本）`stream_not_folded` `bad_unit_id_format`
+`duplicate_unit_id` `bad_type` `unit_order` `dual_locator`
+`locator_format_mismatch` `span_out_of_range` `span_overlap` `span_gap`
+`hash_mismatch` `preview_mismatch` `span_not_null_nontext`
+`bad_nontext_ref` `duplicate_nontext_ref` `unknown_nontext_ref`
+`unknown_segment` `unreferenced_segment` `duplicate_segment_id`
+`missing_field` `doc_not_in_manifest`；`--full-set` 追加
+`split_count_mismatch` `split_domain_coverage` `missing_annotation`
+（冻结终检用）。
 
 ## 9. ARI 分母、N/A 与失败计数规则（封口裁决补录 B）
 

@@ -14,12 +14,13 @@ import pytest
 
 from stage9.ari import ari_units_vs_chunks
 from stage9.baseline_eval import (
+    BASELINE_CONFIG,
     evaluate_doc,
     macro_average,
     pick_best,
     select_baselines,
 )
-from stage9.baselines import b1_fixed_length, b2_recursive
+from stage9.baselines import B2_VARIANT, b1_fixed_length, b2_recursive
 from stage9.project import project_chunks_to_units
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,7 +69,7 @@ def test_evaluate_doc_matches_direct_ari():
     rep = evaluate_doc(ann, n_grid=(7, 12))
     text_units = [u for u in ann["units"] if u["char_span"] is not None]
     seg_ids = [u["gold_segment_id"] for u in text_units]
-    for bl, fn in (("B1", b1_fixed_length), ("B2", b2_recursive)):
+    for bl, fn in (("B1", b1_fixed_length), (B2_VARIANT, b2_recursive)):
         for n in (7, 12):
             proj = project_chunks_to_units(fn(STREAM, n), STREAM,
                                            text_units)
@@ -93,12 +94,12 @@ def test_evaluate_doc_disclosure_fields():
 def test_macro_average_and_selection():
     ann = _ann(STREAM, UNIT_TEXTS, SEGS)
     reps = [evaluate_doc(ann, n_grid=(12, 24)) for _ in range(3)]
-    for bl in ("B1", "B2"):
+    for bl in ("B1", B2_VARIANT):
         for n in (12, 24):
             per_doc = reps[0]["results"][bl][n]["ari"]
             assert macro_average(reps, bl, n) == pytest.approx(per_doc)
     macro, selection = select_baselines(reps, n_grid=(12, 24))
-    for bl in ("B1", "B2"):
+    for bl in ("B1", B2_VARIANT):
         best_n, best_v = pick_best(macro[bl])
         assert selection[bl]["n"] == best_n
         assert selection[bl]["macro_ari"] == best_v
@@ -110,6 +111,16 @@ def test_pick_best_tie_smallest_n():
     assert pick_best({200: 0.9, 800: 0.7}) == (200, 0.9)
     assert pick_best({200: None}) == (None, None)
     assert pick_best({800: 0.1, 200: None}) == (800, 0.1)
+
+
+def test_b2_variant_frozen_contract():
+    assert B2_VARIANT == "B2-foldws-v1"
+    cfg = BASELINE_CONFIG[B2_VARIANT]
+    assert cfg["input_view"] == "fold_ws"
+    assert cfg["newline_level_hits"] == 0
+    rep = evaluate_doc(_ann(STREAM, UNIT_TEXTS, SEGS), n_grid=(12,))
+    assert set(rep["results"]) == {"B1", B2_VARIANT}
+    assert "B2" not in rep["results"]
 
 
 def test_cli_report_and_exit_codes(tmp_path):

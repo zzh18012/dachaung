@@ -7,11 +7,11 @@
       --annotations samples/private/stage9-corpus/annotations \
       [--split dev] [--report outputs/stage9-baseline-select.json] [--json]
 
-退出码：0 = 完成；2 = 输入/IO 错误。输出：逐篇 × (B1/B2, N) 的 ARI
-与披露计数、集级 macro average、选优结果（平局取最小 N）。
-B2 在 fold-ws 流上运行（前两级分隔符恒不命中）——口径偏差见
-stage9/baseline_eval.py 模块注释，待 GPT 追认。manifest 冻结前的
-运行视为 dry run，冻结 stamp 另行走台账。
+退出码：0 = 完成；2 = 输入/IO 错误。输出：逐篇 × (B1 / B2-foldws-v1,
+N) 的 ARI 与披露计数、集级 macro average、选优结果（平局取最小 N）。
+B2-foldws-v1 为冻结显式变体（GPT 裁决 2026-09-05 C3 追认：
+input_view=fold_ws，换行级分隔符结构性恒不命中）。manifest 冻结前的
+运行视为 dry run；N* 冻结硬门槛 = 最终 14 篇 dev 全网格重跑。
 """
 import argparse
 import json
@@ -21,6 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from stage9.baseline_eval import (  # noqa: E402
+    BASELINE_CONFIG,
     select_baselines,
     evaluate_doc,
 )
@@ -71,13 +72,17 @@ def main(argv=None):
         "doc_count": len(doc_reports),
         "n_grid": list(B1_N_GRID),
         "selection_rule": "macro ARI 最大者；平局取最小 N",
+        "baseline_config": BASELINE_CONFIG,
         "selection": selection,
         "macro": macro,
         "docs": doc_reports,
-        "deviation_note": (
-            "B2 输入为标注流（fold-ws，无换行）：前两级分隔符恒不命中，"
-            "层级退化为句读级——保守设定，待 GPT 追认"
-            "（stage9/baseline_eval.py 模块注释）"),
+        "variant_note": (
+            "B2-foldws-v1 为冻结显式变体（GPT 裁决 2026-09-05 C3）："
+            "input_view=fold_ws，前两级分隔符（\\n\\n 与 \\n）结构性恒"
+            "不命中；设计 §5 原始 B2（保留换行输入）记未执行/不可复现"),
+        "dry_run_note": (
+            "manifest 冻结前运行视为 dry run；N* 冻结硬门槛 = 最终 "
+            "14 篇 dev 全网格重跑（13 篇 dev 结果非正式）"),
     }
     if args.report:
         with open(args.report, "w", encoding="utf-8") as fh:

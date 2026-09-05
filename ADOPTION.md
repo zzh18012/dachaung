@@ -3704,3 +3704,102 @@ B1 定义即 fold-ws 流，无偏差。
 （自包含，A prod-06 提案 B / B prod-08 域属性 / C1–C4 口径追认 /
 D push 放行 / E 双标注告知）。裁决回来前：manifest 不冻结、基线不
 stamp、不 push。
+
+## 七十一、Stage 9 批次 26：GPT 裁决执行记录（2026-09-05，A/B/C/D/E 全项）
+
+**裁决来源**：用户中转 GPT-5.6 Sol（思考极高档，2026-09-05），对
+outputs/gpt_brief_batch26_pending.txt 五项待决的逐项裁决。裁决原则：
+"先守住实验口径，再守住可复现性，最后考虑进度"。
+
+### D（先执行）：push 放行 ✓ 已完成
+
+- 远端同名分支原不存在；fetch + 祖先检查（origin/main 是 da78816 祖先，
+  领先 9 commit = 本批 6 个裁决放行 commit + 3 个已裁设计/封口记录
+  commit）后普通 push（无 force）创建分支。
+- ls-remote 核对：`integration/stage9-batch26-corpus-annotation` =
+  da788164dc905e06aafc30c95b8d40dfe93ba84d（与本地一致）。
+- 裁决边界遵守：远端 HEAD 定位为"冻结前候选"；在 A/B、C2、C3 及最终
+  14-dev 重跑完成前，不标记 manifest frozen、不生成 final corpus/version
+  tag、不声称 13-dev N* 为正式冻结结果、不作为批次 26 完成态合并发布。
+
+### C1：stream 字段追认（附条件）→ 已正式化
+
+- 新增顶层冻结字段 `annotation_schema="v1.1"`（23 builder 全部落位；
+  校验器 frozen_value 检查）。版本沿革：v1.0=设计 §3 原字段；
+  v1.1=stream 转正 + page 物理页语义（C2）。
+- 校验器硬约束（stage9/validation.py）：norm_hash 仅按 stream 字节
+  复算（原有）；char_span 半开 [start,end) + 有序性新失败码 `unit_order`
+  （text unit 的 span 在 units 列表序中必须单调递增——此前先排序再查
+  覆盖，序违规会被吞掉）；分隔空格归属规则（unit_i.end =
+  unit_{i+1}.start）写入指南 §4。
+- 指南 §4 重写（格式版本说明 + 新字段 + 硬约束清单）；§8 失败码表更新。
+
+### C2：page=body 序号否决 → 已按修正口径迁移
+
+- 简报笔误更正：DOCX 篇实为 4 篇（tech-04/05、prod-07/08）；prod-05
+  是 PDF（page=物理页，不在迁移范围）。manifest format 字段为权威。
+- 迁移：4 个 DOCX builder 改为 `page=null` + `body_index`（body 元素
+  1-based 连续序；tech-04/05 原值即 body 序改挂新字段；prod-07/08 原
+  page=1 占位常量改为真实 head 块 body 序）；19 个 PDF builder 补
+  `body_index=null`；NOTES 措辞同步。
+- 校验器：page=null 或 ≥1 整数；body_index 同规；新失败码
+  `dual_locator`（两字段互斥，禁一字段两义）+ `locator_format_mismatch`
+  （manifest format=docx → page 必 null；pdf → body_index 必 null）。
+- 重建 23 篇 + 全量校验 0 失败；总量不变性核对：3,499,694 字符 /
+  48,298 units / 333 segments（与迁移前一致）；DOCX 4 篇 page 全
+  null + body_index≥1，PDF 19 篇 body_index 全 null 且 page 全非空。
+- spotcheck 更新重跑：prod-07 59/0、prod-08（修旧 merges.json 路径
+  引用）、tech-04 32/0、tech-05 40/0。
+
+### C3：B2 fold-ws 口径修改后追认 → 已按裁决重命名冻结
+
+- 冻结显式变体 **B2-foldws-v1**（stage9/baselines.py：B2_VARIANT/
+  B2_INPUT_VIEW 常量；报告键名、CLI 输出全量替换）；报告新增
+  baseline_config：{input_view: "fold_ws", newline_level_hits: 0,
+  结构性说明}；设计 §5 修订注记：原始 B2（保留换行输入）记**未执行/
+  不可复现**。
+- 13-dev dry run 重跑（outputs/stage9-baseline-select-dev13.json）：
+  数值与重命名前逐位一致（B1 0.2433 / B2-foldws-v1 0.2389，均
+  N*=2000，unmatched/uncovered=0）——纯重命名零行为变化。
+- **硬门槛登记**：N* 冻结须最终 14 篇 dev 全网格重跑（13-dev 结果
+  非正式；若仍 2000 记为 re-confirmed）。14 篇依赖 A/B 补采完成。
+
+### A/B：产品域资格规则 + prod-08 降级 → 已落档
+
+- 裁决 A：提案 B 否决（tech-09 不得升格 product_manual，保持备选）。
+  裁决 B：prod-08 降为备选/辅助，不计 product_manual 配额，
+  license=user-private 保留，内容类型如实记录课程/习题/训练类。
+- **三条件资格规则**（正式写入设计 §1 + manifest _meta）：①面向特定
+  产品/机型/有界产品族；②读者主要是用户/操作/安装维护/售后人员；
+  ③主体为安装/操作/配置/维护/排障/参考查询类指南；标准规范、教材、
+  习题集、论文、营销材料均不计。
+- manifest 落位：prod-08 domain→course_exercises、split→null（原
+  holdout 作废）、note 记降级裁决与回正选须重新裁决；split_counts
+  更新 dev13/comp4/holdout5/备选3；_meta 记资格规则 + 缺口（2 篇：
+  prod-06 槽 + prod-08 替补；DOCX 核心 4→3 篇 <4 停机线，优先补
+  ≥1 篇 DOCX）。
+- 冻结持续 blocked；若最终无法补齐 2 篇，须冻结前正式修订设计
+  （承认非 8/8/8 或增设辅助类别），报告不得声称"三域各 8 篇平衡
+  语料"。
+
+### E：双标注（知悉项）
+
+按既定方案执行：dev=tech-03+prod-01 / holdout=acad-03+tech-08（三域
+覆盖；prod-08 降级不影响选篇），0.85 停机阈值，用户独立第二标注。
+
+### 回归与提交
+
+- 全测试套件 **5567 passed + 4 skipped**（+7：校验 6 新失败码测试 +
+  B2-foldws-v1 冻结契约测试）；本节 commit 含 stage9/validation.py、
+  stage9/baselines.py、stage9/baseline_eval.py、scripts/stage9_baseline_
+  select.py、tests×2、docs×2（设计+指南）。私有侧（manifest draft、
+  23 builder + 23 标注 JSON、spotcheck 脚本）gitignored 不进 git。
+- 新 commit 不随本次推送（远端 da78816 为裁决 D 放行边界），待下轮
+  裁决一并处理。
+
+### 下一步（授权边界内）
+
+1. 产品域补采 2 篇（三条件资格规则；优先 ≥1 篇 DOCX）→ 补标注 →
+   14-dev 基线全网格重跑 → manifest 冻结终检（--full-set）。
+2. 用户侧双标注 4 篇 + 一致率落盘。
+3. 下一轮简报：补采结果 + 14-dev 重跑数值 + 冻结申请。

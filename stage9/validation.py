@@ -5,9 +5,13 @@
 检查 = schema 符合、char_span 连续无重叠全覆盖、norm_hash 复算一致、
 gold_segment 引用闭合、split 分层约束；退出码 0/1/2 + 失败报告。
 
-标注 JSON 在设计 §3 示例字段之外补充一个必要字段 `stream`（文档规范化
-字符流全文）：norm_hash 复算与 span 全覆盖检查都必须以该流为基准
-（标注流是人工阅读序，独立于任何解析器输出，无法从源文档再推导）。
+格式版本 annotation_schema=v1.1（2026-09-05 GPT 裁决 C1/C2 正式化）：
+v1.0 = 设计 §3 原字段；v1.1 = ①`stream`（文档规范化字符流全文）由偏差
+转正——norm_hash 复算与 span 全覆盖检查以该流为唯一基准（标注流是人工
+阅读序，独立于任何解析器输出，无法从源文档再推导）；unit 间分隔空格
+归前一 unit 的 span 末尾（平铺规则，写入指南 §4）；②page 只表物理页码
+（DOCX 无物理页 → null），DOCX 定位改用 body_index（body 元素 1-based
+连续序）——禁一字段两义。
 """
 import hashlib
 import json
@@ -23,6 +27,7 @@ TEXT_KINDS = ("heading", "sentence")
 PREVIEW_MAX = 60
 FROZEN_SPLITTER = "v1"
 FROZEN_NORMALIZATION = "fold-ws-v1"
+FROZEN_ANNOTATION_SCHEMA = "v1.1"
 
 
 class Failure:
@@ -54,6 +59,9 @@ def validate_annotation(data, manifest_index):
     if not isinstance(doc_id, str) or not doc_id:
         return None, [Failure("missing_field", "doc_id 缺失或非字符串")]
 
+    if data.get("annotation_schema") != FROZEN_ANNOTATION_SCHEMA:
+        f("frozen_value", "annotation_schema 必须为 %r"
+          % FROZEN_ANNOTATION_SCHEMA)
     if data.get("sentence_splitter") != FROZEN_SPLITTER:
         f("frozen_value", "sentence_splitter 必须为 %r" % FROZEN_SPLITTER)
     if data.get("normalization") != FROZEN_NORMALIZATION:
@@ -93,6 +101,9 @@ def validate_annotation(data, manifest_index):
     seen_unit_ids = set()
     nontext_refs = set()
     text_units = []
+    entry = (manifest_index.get(doc_id)
+             if isinstance(manifest_index, dict) else None)
+    doc_format = entry.get("format") if isinstance(entry, dict) else None
     for idx, unit in enumerate(units):
         where = "units[%d]" % idx
         if not isinstance(unit, dict):
@@ -111,9 +122,26 @@ def validate_annotation(data, manifest_index):
             f("bad_type", "%s.kind 必须为 %s 之一" % (where, "/".join(KINDS)))
             kind = None
 
-        if not isinstance(unit.get("page"), int) or \
-                isinstance(unit.get("page"), bool) or unit.get("page", 0) < 1:
-            f("bad_type", where + ".page 必须为 >=1 整数")
+        page = unit.get("page")
+        if page is not None and (not isinstance(page, int)
+                                 or isinstance(page, bool) or page < 1):
+            f("bad_type", where + ".page 必须为 null 或 >=1 整数（物理页码）")
+        body_index = unit.get("body_index")
+        if body_index is not None and (
+                not isinstance(body_index, int)
+                or isinstance(body_index, bool) or body_index < 1):
+            f("bad_type",
+              where + ".body_index 必须为 null 或 >=1 整数（body 元素序）")
+        if page is not None and body_index is not None:
+            f("dual_locator",
+              "%s 同时设 page 与 body_index（定位字段互斥，禁一字段两义）"
+              % uid)
+        if doc_format == "docx" and page is not None:
+            f("locator_format_mismatch",
+              "%s DOCX 篇 page 必须为 null（无物理页码）" % uid)
+        if doc_format == "pdf" and body_index is not None:
+            f("locator_format_mismatch",
+              "%s PDF 篇 body_index 必须为 null（定位用物理页 page）" % uid)
 
         if not isinstance(unit.get("hard_boundary_before"), bool):
             f("bad_type", where + ".hard_boundary_before 必须为布尔")
@@ -190,6 +218,16 @@ def validate_annotation(data, manifest_index):
         if sid not in referenced:
             f("unreferenced_segment", sid)
 
+    # C1（裁决 2026-09-05）：units 列表序 = 阅读序，text unit 的
+    # char_span 在列表序中必须单调递增（此前先排序再查覆盖，序违规被吞）
+    for k in range(1, len(text_units)):
+        prev_uid, (_pa, pb) = text_units[k - 1]
+        cur_uid, (a, _cb) = text_units[k]
+        if a < pb:
+            f("unit_order",
+              "%s char_span 起点落在前一 text unit（%s）span 内——"
+              "units 列表序与流序不一致" % (cur_uid, prev_uid))
+
     # char_span 连续无重叠全覆盖（仅 text units）
     text_units.sort(key=lambda t: t[1][0])
     pos = 0
@@ -205,10 +243,8 @@ def validate_annotation(data, manifest_index):
         f("span_gap", "流非空但没有任何 text unit")
 
     # manifest 交叉核对
-    if manifest_index is not None:
-        entry = manifest_index.get(doc_id)
-        if entry is None:
-            f("doc_not_in_manifest", doc_id)
+    if manifest_index is not None and entry is None:
+        f("doc_not_in_manifest", doc_id)
 
     return doc_id, fails
 

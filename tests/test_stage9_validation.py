@@ -28,25 +28,30 @@ def _base_annotation():
     """
     return {
         "doc_id": "acad-01-sentencebert",
+        "annotation_schema": "v1.1",
         "sentence_splitter": "v1",
         "normalization": "fold-ws-v1",
         "annotator": "claude-draft + user-review",
         "stream": STREAM,
         "units": [
             {"unit_id": "u0001", "kind": "heading", "page": 1,
+             "body_index": None,
              "char_span": [0, 18], "norm_text_hash": _sha(STREAM[0:18]),
              "text_preview": STREAM[0:18], "gold_segment_id": "g01",
              "hard_boundary_before": True},
             {"unit_id": "u0002", "kind": "sentence", "page": 1,
+             "body_index": None,
              "char_span": [18, 33], "norm_text_hash": _sha(STREAM[18:33]),
              "text_preview": STREAM[18:33], "gold_segment_id": "g02",
              "hard_boundary_before": False,
              "linked_nontext": ["img:figure1"]},
             {"unit_id": "u0003", "kind": "sentence", "page": 2,
+             "body_index": None,
              "char_span": [33, 48], "norm_text_hash": _sha(STREAM[33:48]),
              "text_preview": STREAM[33:48], "gold_segment_id": "g02",
              "hard_boundary_before": True},
             {"unit_id": "u0004", "kind": "nontext", "page": 1,
+             "body_index": None,
              "char_span": None, "norm_text_hash": None,
              "nontext_ref": "img:figure1", "gold_segment_id": "g02",
              "hard_boundary_before": False},
@@ -60,7 +65,7 @@ def _base_annotation():
 
 def _manifest_index():
     return {"acad-01-sentencebert": {"doc_id": "acad-01-sentencebert",
-                                     "split": "dev"}}
+                                     "split": "dev", "format": "pdf"}}
 
 
 def _validate(data):
@@ -77,6 +82,60 @@ def test_frozen_value_splitter():
     data = _base_annotation()
     data["sentence_splitter"] = "v2"
     assert "frozen_value" in [f.code for f in _validate(data)]
+
+
+def test_frozen_value_annotation_schema():
+    data = _base_annotation()
+    del data["annotation_schema"]
+    assert "frozen_value" in [f.code for f in _validate(data)]
+    data = _base_annotation()
+    data["annotation_schema"] = "v1.0"
+    assert "frozen_value" in [f.code for f in _validate(data)]
+
+
+def test_docx_page_null_body_index_ok():
+    data = _base_annotation()
+    for u in data["units"]:
+        u["page"] = None
+        u["body_index"] = 7
+    idx = {"acad-01-sentencebert": {"doc_id": "acad-01-sentencebert",
+                                    "split": "dev", "format": "docx"}}
+    doc_id, fails = validate_annotation(data, idx)
+    assert fails == [], [f.to_json() for f in fails]
+
+
+def test_dual_locator_rejected():
+    data = _base_annotation()
+    data["units"][0]["body_index"] = 3
+    assert "dual_locator" in [f.code for f in _validate(data)]
+
+
+def test_locator_format_mismatch():
+    docx_in_manifest = {"acad-01-sentencebert":
+                        {"doc_id": "acad-01-sentencebert",
+                         "split": "dev", "format": "docx"}}
+    data = _base_annotation()  # page 有值 → DOCX 篇违规
+    fails = validate_annotation(data, docx_in_manifest)[1]
+    assert "locator_format_mismatch" in [f.code for f in fails]
+    pdf_in_manifest = _manifest_index()  # body_index 有值 → PDF 篇违规
+    data = _base_annotation()
+    data["units"][0]["page"] = None
+    data["units"][0]["body_index"] = 3
+    fails = validate_annotation(data, pdf_in_manifest)[1]
+    assert "locator_format_mismatch" in [f.code for f in fails]
+
+
+def test_bad_page_zero_and_body_index_zero():
+    data = _base_annotation()
+    data["units"][0]["page"] = 0
+    codes = [f.code for f in _validate(data)]
+    assert "bad_type" in codes
+
+
+def test_unit_order_violation():
+    data = _base_annotation()  # units 列表序 u1[0,18) u2[18,33) u3[33,48)
+    data["units"][0], data["units"][2] = data["units"][2], data["units"][0]
+    assert "unit_order" in [f.code for f in _validate(data)]
 
 
 def test_stream_not_folded():
