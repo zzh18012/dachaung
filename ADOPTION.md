@@ -3645,3 +3645,57 @@ tests/test_stage9_agreement.py（本条 commit）。
 **未做（授权边界内待续）**：prod-06 裁决与 manifest 冻结（#17）、
 用户侧双标注执行与一致率落盘、B1/B2 dev 选优与基线冻结（#21，
 embedding 依赖仍冻结待批）。
+
+## 七十、批次 26 基线 dev 选优 dry run：B1/B2 网格评测工具与首轮结果（2026-09-05）
+
+**工具（⑥冻结基线配置的实现部分）**：
+- `stage9/baseline_eval.py`：evaluate_doc（单篇 × (B1/B2, N) 网格：
+  切块 → 投影 text unit → ARI，披露 unmatched chunk / 跨块 unit /
+  uncovered unit，指南 §9 不静默排除）/ macro_average（集级 = 非N/A
+  文档 macro average）/ pick_best（macro ARI 最大者，平局取最小 N，
+  确定性规则登记于报告）/ select_baselines。
+- `scripts/stage9_baseline_select.py` CLI：`--manifest --annotations
+  [--split dev] [--report PATH] [--json]`；`--split holdout` 直接拒绝
+ （用途矩阵：参数搜索仅 dev）；空 split / IO 错误 exit 2。
+- `tests/test_stage9_baseline_eval.py` 6 例：B1/B2 均为流的精确划分
+  （`"".join(chunks) == stream`）且投影全覆盖（unmatched/uncovered
+  恒 0）不变量、与 ari_units_vs_chunks 直算逐格一致、披露字段、
+  macro 平均与选优一致性、平局取最小 N、CLI 契约（报告落盘 =
+  stdout JSON、holdout 拒绝、空 split exit 2）。
+
+**实现口径补充（偏差，待 GPT 追认）**：设计 §5 规定 B2 输入为保留
+换行的原始文本；但标注 JSON 只存 fold-ws 流（换行已折叠），评测
+harness 无统一的原始阅读序文本源（各 builder 异构、无统一原始文本
+接口）。本实现 B2 直接在 fold-ws 流上运行：前两级分隔符（\n\n/\n）
+恒不命中，层级退化为句读级（。！？；. ! ? 空格）——保守（更难）
+设定。用 gold unit 边界合成换行会把标注决策泄漏进基线，明确不做。
+B1 定义即 fold-ws 流，无偏差。
+
+**dev 选优 dry run（13 篇，manifest 冻结前，非正式 stamp）**：
+
+| baseline | 200 | 500 | 800 | 1200 | 2000 | N* | macro |
+|---|---|---|---|---|---|---|---|
+| B1 | 0.0774 | 0.1484 | 0.1653 | 0.1956 | 0.2433 | 2000 | 0.2433 |
+| B2 | 0.0646 | 0.1259 | 0.1549 | 0.1870 | 0.2389 | 2000 | 0.2389 |
+
+- 两基线全网格单调升且上界处仍在升——gold 段粒度粗（大手册典型
+  一章/一节一 segment），更大块与段对齐更好；不扩网格（网格
+  {200,500,800,1200,2000} 为设计冻结值，扩格属未裁决变更），
+  按网格取 N*=2000。
+- B1 在每个 N 上 ≥ B2（纯长度 vs 句读感知切分，对粗粒度 gold 段
+  前者略优）；报告如实记录，选优各自独立。
+- 投影质量：13 篇 unmatched_chunks=0、uncovered_units=0（全覆盖
+  契约成立）；N=200 时跨块 unit 每篇 11%–47%（披露于报告，符合
+  预期——块远小于段）。
+- 报告：outputs/stage9-baseline-select-dev-dryrun.json（gitignored）；
+  正式冻结 stamp 待 manifest 冻结（#17，prod-06 裁决）后重跑落台账
+  ——届时 dev 集可能从 13 → 14 篇（tech-09 升格提案 B），数值以
+  冻结集重跑为准。
+
+**回归**：全测试套件 5560 passed + 4 skipped（docker-gated 已知；
+较上节 +6 = 本节基线评测测试）。
+
+**未做（授权边界内待续）**：manifest 冻结（#17 阻塞于 prod-06 GPT
+裁决）；基线正式 stamp；本系统结构分块 max_chars dev 选优（对照主体
+调参，需 parse→标注流投影 harness，属最终评测管线部分）；用户侧
+双标注。
