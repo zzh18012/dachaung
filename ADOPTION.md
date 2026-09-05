@@ -3699,3 +3699,8 @@ B1 定义即 fold-ws 流，无偏差。
 裁决）；基线正式 stamp；本系统结构分块 max_chars dev 选优（对照主体
 调参，需 parse→标注流投影 harness，属最终评测管线部分）；用户侧
 双标注。
+
+**待决汇总简报（用户中转 GPT）**：outputs/gpt_brief_batch26_pending.txt
+（自包含，A prod-06 提案 B / B prod-08 域属性 / C1–C4 口径追认 /
+D push 放行 / E 双标注告知）。裁决回来前：manifest 不冻结、基线不
+stamp、不 push。
