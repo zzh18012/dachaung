@@ -3533,3 +3533,115 @@ comparison 4 / holdout 5 + 备选 2 未分配）、collection-report.md
 - 标注试点（prod-05，§六十七后追加）：claude-draft 82 units
   （text 72 / nontext 10）/12 segments/2609 字符流过全部校验；
   B1 N=800 投影 0 unmatched、ARI 0.3665 冒烟（非正式值）。
+
+## 六十九、批次 26 人工标注首轮收口：23 篇 claude-draft 全量 + 双标注一致率工具（2026-09-05）
+
+**现状**：23/24 正选完成 claude-draft 首轮标注（第 24 槽 prod-06 待
+GPT 裁决，见 §六十八未决项）。全量校验 23 文件 0 失败；内容级
+spot-check 证据覆盖 23/23——本节新增 tech-04（32 检查）/ tech-05
+（40 检查）/ prod-05（37 检查）三篇小体量篇的独立脚本（此前仅校验
+覆盖），并完成最后两篇大手册 prod-03（729/729）与 prod-02（42/42）。
+
+**两篇大手册判据族（builder 内注释为权威，此处摘要）**：
+- prod-03 Bash 参考手册（texinfo serif 变体，533,606 字符）：索引三
+  字体集（CMR9/CMTT9 + 1 行 CMSLTT10）双栏流序、右栏虚拟行回收
+  142、字母组题 105（含 . : [ ] { } 符号组）、多数派字体判桶（行内
+  代码词折行续行）、@table 释文跨桶拼接、CMCSC10 小 Caps 词归
+  prose、GFDL ADDENDUM 节题；碎片白名单冻结 CONNECTORS 8 元 +
+  SHORT_TT 15 元；排除 {toc:149, header:208, index-rightonly:142}。
+- prod-02 LibreOffice Writer 指南（sans-serif 变体，787,376 字符，
+  全语料最大篇）：页脚 t>760（465 行全在 771.7–773.2）+ 24pt 书名行
+  模板 ×22（重复模板家具）排除；分部开篇 32pt Italic 多行合并
+  （ch15/ch19 三行折行）+ 18pt Italic 副题 4 处并入；13pt Bold 恰为
+  告示框标签全集（Note/Tip/Caution/Warning + 4 变体，269 行）→ 归
+  正文；正文块纯 t-gap<14.5 行距判据（x0/字体不参与，行距双峰 12.65/
+  12.1 vs 段间 ≥16）；碎片豁免 {'Tip'}；排除 {toc:251, footer:460,
+  book-title:22}，joins=123。
+
+**一致性回归修订（三处，均 rebuild + 全量校验 0 失败 + spot-check
+重过）**：
+1. **prod-05 语义段连续性违规**（§六十七试点遗留）：g05"用户组数据
+   服务"与 g06"使用方法"阅读序 interleave，违反指南 §5"连续正文
+   段"。修订：用户组引子段（"另外，装置内提供用户组数据服务…"）归
+   g04 并撤销其 hard；g05/g06 重排为阅读序（使用方法 g05、用户组
+   须知 g06）；hard 13→12。语料全域扫描确认其余 22 篇均单调且
+   无 interleave。
+2. **tech-04/tech-05 首单元 hard=False**：违反指南 §6"第一个 unit
+   恒为 true"（'附件1'/'UDC' 封面元素）。builder 首块 hard=True，
+   hard 10→11 / 29→30。语料全域扫描确认仅此两篇。
+3. **prod08_merges.json → .txt**：prod-08 builder 伴随数据（JSON
+   数组非标注对象）混在标注目录触发目录级校验假失败（bad_type）；
+   改后缀后目录校验从 24 文件 1 假失败净化为 23 文件 0 失败，
+   build_prod08.py 路径同步。
+
+**首轮标注全量表**（stream 字符 / units / heading / hard / segments /
+nontext）：
+
+| doc | chars | units | head | hard | seg | NT |
+|---|---|---|---|---|---|---|
+| acad-01-sentencebert | 39114 | 527 | 17 | 17 | 11 | 9 |
+| acad-02-layoutlm | 36907 | 241 | 24 | 24 | 7 | 7 |
+| acad-03-layoutlmv3 | 44735 | 336 | 21 | 21 | 9 | 8 |
+| acad-04-docling | 34077 | 309 | 19 | 19 | 10 | 7 |
+| acad-05-pubtables1m | 39643 | 397 | 15 | 15 | 11 | 8 |
+| acad-06-dmap | 62112 | 641 | 23 | 23 | 8 | 9 |
+| acad-07-hans-rag | 21464 | 378 | 30 | 27 | 8 | 15 |
+| acad-08-hans-kg | 11902 | 267 | 21 | 18 | 6 | 11 |
+| prod-01-python-tutorial | 343278 | 3274 | 361 | 22 | 22 | 1 |
+| prod-02-libreoffice-writer76 | 787376 | 9278 | 845 | 23 | 23 | 0 |
+| prod-03-gnubash-refmanual | 533606 | 6554 | 257 | 15 | 15 | 0 |
+| prod-04-gnumake-manual | 548253 | 7298 | 263 | 23 | 23 | 0 |
+| prod-05-earthlab-manual | 2609 | 82 | 22 | 12 | 12 | 10 |
+| prod-07-ms-tds | 310779 | 7836 | 233 | 9 | 9 | 82 |
+| prod-08-infosec-exercises | 102871 | 4096 | 219 | 36 | 36 | 21 |
+| tech-01-nist-sp800-207 | 137402 | 1059 | 79 | 11 | 11 | 13 |
+| tech-02-nist-airmf | 80910 | 576 | 31 | 31 | 18 | 9 |
+| tech-03-cncert-annual2020 | 108719 | 2256 | 135 | 40 | 40 | 258 |
+| tech-04-nmpa-rd-rules | 9737 | 197 | 10 | 11 | 10 | 0 |
+| tech-05-schoolcode | 7872 | 262 | 30 | 30 | 11 | 13 |
+| tech-06-enisa-etl2025 | 177514 | 1348 | 68 | 14 | 14 | 56 |
+| tech-07-cisa-ghost | 19254 | 180 | 24 | 23 | 8 | 13 |
+| tech-08-cnnic57 | 39560 | 906 | 74 | 74 | 11 | 63 |
+| **合计（23 篇）** | **3499694** | **48298** | **2821** | **538** | **333** | **613** |
+
+**双标注一致率工具（指南 §7 实现）**：
+- `stage9/agreement.py`：unit 级口径（切分一致 + gold_segment 一
+  致）。两份标注按人工阅读序经 difflib.SequenceMatcher
+  (autojunk=False) 以 strip 文本对齐（nontext 用 nontext_ref 作身
+  份；重复文本如告示框标签 "Note"×269 依赖序列位置而非文本唯一
+  性）；对齐只认文本切分，kind 与 gold_segment 在对齐对上另行比
+  较。一致率 = 一致对数 /（units_a + units_b − 对齐对数）；四类分
+  歧清单（kind_diff / segment_diff / only_a / only_b）供仲裁；
+  hard_boundary 差异仅信息项（节级标题段内 hard 为语料合法先例，
+  不入一致判据）；阈值 0.85。
+- `scripts/stage9_agreement.py` CLI：`--a --b [--json]
+  [--max-disagreements N]`；退出码 0 = ≥0.85、1 = <0.85（停机线
+  预警——是否停机仍须仲裁判定收敛性）、2 = 输入/IO 错误；不重复
+  schema 校验（输入应先过 stage9_validate_annotations.py）。
+- `tests/test_stage9_agreement.py` 11 例：identical 满分 /
+  segment_diff / kind_diff / 切分差 unmatched 双侧 / 重复文本位置
+  对齐 / nontext ref 身份 / hard 信息项 / doc_id 不匹配 / 空并集
+  n/a / unit_key strip / CLI 退出码与 JSON 键——分子分母全部手算
+  锁死。
+- 冒烟：prod-05 自比对 1.0（82 units）；prod-02 自比对 1.0（9278
+  units，0.16s）。
+- 回归：全测试套件 5554 passed + 4 skipped（docker-gated 已知）。
+
+**双标注选篇提案（待用户确认后执行）**：dev 2 + holdout 2、覆盖三
+域——tech-03（dev，2256 units，CJK 年报多图多表）+ prod-01（dev，
+3274 units，texinfo 大手册）+ acad-03（holdout，336 units，双栏学
+术）+ tech-08（holdout，906 units，CNNIC 报告）；轻量替代（工作量
+受限时）：prod-01 → acad-02（dev，241 units，双栏学术，域覆盖降为
+两域）。操作协议：用户不看草案独立产出 `<doc>-review.json` →
+stage9_validate_annotations 校验 → stage9_agreement 比对 → <85% 进
+仲裁（分歧清单即仲裁材料）；其余 19 篇用户抽查 ≥2 篇（指南 §7）。
+
+**产物位置**：标注 JSON 与 builder 在
+samples/private/stage9-corpus/annotations/（gitignored，永不进
+git）；spot-check 脚本与输出在 outputs/（gitignored）；可提交物 =
+本台账 + stage9/agreement.py + scripts/stage9_agreement.py +
+tests/test_stage9_agreement.py（本条 commit）。
+
+**未做（授权边界内待续）**：prod-06 裁决与 manifest 冻结（#17）、
+用户侧双标注执行与一致率落盘、B1/B2 dev 选优与基线冻结（#21，
+embedding 依赖仍冻结待批）。
