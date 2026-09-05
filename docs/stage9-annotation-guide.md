@@ -88,8 +88,10 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
 - `page`：**只表物理页码**（人眼所见页码，PDF 用印刷页码所在 PDF
   页序）；null 或 ≥1 整数。DOCX 无物理页码 → 全部 null，定位改用
   `body_index`；同一 unit 两者互斥（禁一字段两义）；
-- `body_index`：null 或 ≥1 整数（body 元素 1-based 连续序，DOCX 篇
-  供人工复核定位）；PDF 篇必须 null；
+- `body_index`：null 或 ≥1 整数（**解析器定义的 DOCX body block 的
+  1-based 源序**，非 unit 序；一个 body block 产生多个 unit 时允许多个
+  unit 共享同一 body_index，不为制造 unit 级连续值而重新编号——
+  GPT 裁决 2026-09-05 C2 补充定义）；PDF 篇必须 null；
 - `char_span`：半开区间 `[start, end)`（end 不含），0 ≤ start <
   end ≤ 流长；text unit 在 `units` 列表序中的 span 单调递增
   （列表序 = 阅读序 = 流序）；text unit 的 span 集精确覆盖全流

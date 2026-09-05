@@ -3803,3 +3803,67 @@ outputs/gpt_brief_batch26_pending.txt 五项待决的逐项裁决。裁决原则
    14-dev 基线全网格重跑 → manifest 冻结终检（--full-set）。
 2. 用户侧双标注 4 篇 + 一致率落盘。
 3. 下一轮简报：补采结果 + 14-dev 重跑数值 + 冻结申请。
+
+## 七十二、Stage 9 批次 26：二轮裁决执行记录（2026-09-05，追认+F/G 门槛+a69bc07 push）
+
+**裁决来源**：用户中转 GPT-5.6 Sol（2026-09-05 二轮），对 §七十一执行
+报告的审阅 + F/G 裁决。总评：执行符合上轮裁决，无需回滚。
+
+### 逐项追认
+
+- D/C1/C2/C3/A/B：全部追认。C2 补充定义：**body_index = 解析器定义
+  的 DOCX body block 1-based 源序（非 unit 序）**，一个 body block
+  产生多 unit 时允许多 unit 共享同一值、不得为 unit 级连续性重编号。
+  实现核对：4 篇 DOCX 现状即如此（共享值：tech-04=51/tech-05=42/
+  prod-07=373/prod-08=870 个 body_index；值不连续；prod-08 max=3602
+  =body 总数，无重编号）——符合，无需改 schema；定义补入指南 §4。
+- prod-05 格式更正（PDF 非 DOCX）：属简报事实纠正，不改变裁决逻辑。
+- 扁平 body_index 方案（两选项之一）：正式接受。
+- **核心集口径统一**：有效核心 = **22 篇**（dev13+comparison4+
+  holdout5）；prod-08/samr-a2/tech-09 为备用不计统计；"23 篇已标注"
+  ≠"23 篇核心集"。已落 manifest _meta。
+
+### a69bc07 push：批准并已执行
+
+- 机械检查：fetch → 远端 HEAD（da78816）是 a69bc07 祖先 → 普通
+  push（无 force）→ ls-remote 核对 a69bc07 一致。
+- 边界：push 仅表示"上轮裁决实施结果进入远端审计链"，不构成
+  manifest/gold/baseline frozen 或批次 26 完成态。
+
+### F（补采方案）：修改后批准——规则收紧落档（manifest _meta
+collection_plan_2026_09_05 + 设计 §1）
+
+1. 两篇均须真满足三条件资格规则，不因格式/稀缺/标注成本降门槛；
+2. **至少 1 篇必须为原生公开 DOCX**；"DOCX 找不到就两篇 PDF 补数"
+   不予批准（=绕过 <4 停机线）；穷尽合理检索仍无 DOCX → 停下单独
+   申请解除/修改 DOCX≥4 门槛；
+3. 第一篇 DOCX 落位后第二篇质量/来源独立性相当时可选 PDF；
+4. 来源优先序：官方原生可验证 provenance 手册 DOCX → 官方厂商/项目
+   同类手册 PDF → 其他明确授权第一方文档；"开源"本身非资格条件；
+5. 两来源不同项目/厂商、与 prod-02 非同族、禁版本近重复；
+6. provenance 五字段必录（source_url/publisher/retrieval_date/
+   original_file_hash/license-terms）；公开可下载≠开放许可；
+7. **split 现在定死**：prod-06 替补=dev、prod-08 替补=holdout
+   （恢复 14/4/6；禁依据长度/segment 数/ARI/标注难度事后选 split）。
+
+### G（14-dev 全网格重跑时机）：修改顺序后批准——七步序列落档
+
+（完整序列见设计 §2 冻结顺序 + manifest _meta
+baseline_freeze_sequence_2026_09_05）核心变更：**正式 N* 选优必须
+晚于双标注质量门**——双标注覆盖 tech-03/prod-01 两篇 dev，仲裁若
+修改 gold segmentation，提前算出的 N* 即失去冻结依据。双标注可与
+补采并行，但 14-dev 正式选优必须等 gold 收敛；此前仅允许调试运行
+（不定参数、不写正式 N*）。冻结报告须绑定代码 commit、manifest
+hash、annotation schema 版本+gold revision hash、完整网格、
+tie-break、B1/B2-foldws-v1 配置、N*、macro-ARI、unmatched/uncovered；
+N*=2000 时明确写 "re-confirmed on final 14-dev"。
+
+### 即行工作流（两线并行，互不冲突）
+
+1. 补采候选调研：只检索不落位，按资格+provenance 门槛筛选后申请落位；
+2. 既定四篇独立双标注（用户侧）继续执行。
+
+### 本节提交
+
+- docs（设计 §2 冻结顺序 + 指南 §4 body_index 定义）+ 本台账节；
+  manifest _meta 私有侧落档。commit 未推送（待下轮一并裁决）。

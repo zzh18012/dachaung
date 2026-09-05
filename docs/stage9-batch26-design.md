@@ -107,6 +107,19 @@ DOCX 仍是最弱获取渠道，若核实不足，缺口由用户私有（#24）
 → 其 SHA-256 登记入 ADOPTION → **此后任何变更（替换/删除/改字段）一律
 走新版本文件 + 单独裁决**，旧版本永不覆写。draft 阶段可改。
 
+**冻结顺序（GPT 裁决 2026-09-05 二轮 G，修改后批准）**：①补齐两篇
+产品手册（split 落位前定死：prod-06 替补=dev、prod-08 替补=holdout）
+→ ②一级标注 + spot-check + v1.1 校验 → ③--full-set 终检（24 核心/
+8-8-8/14-4-6/核心 DOCX≥4/split 全非空/备用不计）→ **冻结 source/
+manifest/split 层**（此后不得因 baseline 表现换文档或换 split）→
+④四篇双标注 + 仲裁（仲裁修改的 gold 重跑全量 validator；<0.85 不收敛
+停机）→ ⑤冻结最终 gold revision/hash → ⑥此时且仅此时执行一次具冻结
+效力的 14-dev 全网格选优（此前仅调试运行）→ ⑦冻结报告绑定代码
+commit/manifest hash/annotation schema+gold revision hash/网格/
+tie-break/基线配置/N*/macro-ARI/unmatched-uncovered；N*=2000 写
+"re-confirmed on final 14-dev"。核心集口径 = 22 篇有效核心
+（dev13+comp4+holdout5）+备用不计入统计。
+
 ## 3. 人工标注格式（句子为 ARI 原子单位）
 
 标注对象：**人眼可见的正文句子流**（heading 也作为一个 unit）。表格与图
