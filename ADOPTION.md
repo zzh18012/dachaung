@@ -3992,3 +3992,79 @@ outputs/gpt_brief_batch26_freeze.txt 待用户中转）；冻结后进入
   genre/落位三段（§七十三执行+本轮记录；manifest/标注/builder 均
   gitignored 私有层，不入 git）。
 - push 待下轮裁决授权。
+
+## 七十五、Stage 9 批次 26：G④ manifest/split 冻结执行（2026-09-06，裁决轮4 APPROVED）
+
+### 裁决要点（轮4）
+
+- 步骤④批准冻结：24 篇核心文档身份及其 split 分配自此冻结。破坏
+  冻结的动作 = 文档加入/删除/替换、core↔backup 身份变化、domain
+  改动、dev/comparison/holdout 之间任何迁移——均须重新申请裁决；
+  描述性元数据的非语义修正不在此列。
+- 冻结机制（裁决修改后采纳）：混合式"规范文件 + 外部戳记"——draft
+  更名 manifest.json，_meta 只写**非自指**冻结语义字段；最终
+  manifest.json SHA-256 不写回本体（避免哈希自指），只记录于本节
+  外部冻结凭证。
+- push 授权：1dc67c7 → c10d057 → 冻结 commit 一次普通
+  fast-forward push（禁 force）；c10d057 消息笔误不 amend（D2）。
+- 步骤⑤选篇维持：dev=tech-03+prod-01 / holdout=acad-03+tech-08
+  （不因 prod-06/prod-09 入库重抽）。
+- D1 追认 + 新规则：_meta.split_counts 若存在必须等于逐篇 split
+  重算（不一致 = manifest consistency failure）；检查可延至下次
+  validator 维护，非本次阻塞项。D3 不阻塞；不得为统计美观合并/
+  改写 gold。
+
+### 执行记录
+
+1. manifest.draft.json（字节 SHA-256 = 6f93b446…cd0d，与送审值一致）
+   → 更名 samples/private/stage9-corpus/manifest.json；_meta 写入
+   freeze_scope=["manifest","split"] / ruling_round=4 /
+   freeze_date="2026-09-06" / pre_freeze_sha256=6f93b446…（非自指：
+   语义 = 送审 draft 的字节哈希）；status 由 draft 改 frozen。
+2. **冻结窗口内修正（如实披露）**：顶层 split_counts（生成期残留、
+   与 _meta 平级的重复键，值 13/4/5）与逐篇重算 14/4/6 不符——即
+   此前"读数不一致"之谜的根源（两个同名键，历次读数交替命中）。
+   全库检索证实零代码消费者（validator 独立重算，从不读该键）；
+   按重算真值同步为 14/4/6/备3，与 _meta.split_counts 一致后回读
+   校验通过。修正发生在凭证封口（本 commit + 最终 SHA 登记）之前，
+   属 D1 同类展示层一致性修正，无任何文档/分配变动。
+3. 冻结后 --full-set 终检（manifest.json）：检查 25 个文件：0 项
+   失败，0 个 IO 错误；split {dev 14 / comparison 4 / holdout 6}，
+   annotated 25 / total 24。
+4. 最终 manifest.json SHA-256（含冻结字段后的字节，未写回本体）：
+   51d3d40057568a35ee8415e30c91824662be216d098e3d639aaa954f4f140855
+5. 规范名同步：validate/baseline_select 两脚本 docstring 用法、
+   标注指南 §8、设计 §2（补执行注记）由 manifest.draft.json 改指
+   manifest.json；历史台账段落中的 draft 名称保留（历史事实）。
+
+### 冻结凭证（绑定值）
+
+- freeze_scope：manifest + split
+- ruling round：4（2026-09-06）
+- freeze date：2026-09-06
+- pre-freeze draft SHA-256：
+  6f93b4463ca0e6d860797509bda66804ea15390aebc35c7285c91d7edee6cd0d
+- final manifest.json SHA-256：
+  51d3d40057568a35ee8415e30c91824662be216d098e3d639aaa954f4f140855
+- 核心文档：24（dev 14 / comparison 4 / holdout 6）；三域
+  academic/product/tech = 8/8/8；核心 DOCX = 4（prod-07、tech-05、
+  tech-04、prod-09）；备用 3（prod-08 已标注、samr-a2 与 tech-09
+  未标注）不计核心统计。
+- freeze commit SHA：本 commit（§七十五 所在）——commit 无法自含
+  自身哈希，SHA 按 §五十六先例于 push 后回执登记。
+- **gold 未冻结**（步骤⑥以 revision+hash 冻结；⑤双标注仲裁可能
+  修改 gold，改后须重跑 validator）；**baseline 选优未冻结**（步骤
+  ⑦一次具冻结效力的 14-dev 全网格重跑，N*=2000 若复现记
+  re-confirmed）。
+
+### 提交物与 push
+
+- 本 commit：ADOPTION §七十五、scripts 两处 docstring、docs 两处
+  规范名同步（manifest 与标注 builder 仍 gitignored 私有层）。
+- push：c10d057 + 本冻结 commit 一次 fast-forward push 至
+  integration/stage9-batch26-corpus-annotation（fetch → 远端
+  1dc67c7 祖先检查 → push 禁 force → ls-remote 核对 SHA 一致）。
+- D1 validator 检查（_meta.split_counts == 逐篇重算）延后至下次
+  validator 维护批次（裁决明示允许，非阻塞）。
+- 下一步：⑤四篇双标注+仲裁（用户侧独立标注；0.85 停机线）→
+  ⑥gold freeze → ⑦一次具冻结效力的 14-dev 全网格选优。

@@ -135,7 +135,7 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
 
 ```bash
 .venv/Scripts/python.exe scripts/stage9_validate_annotations.py \
-  --manifest samples/private/stage9-corpus/manifest.draft.json \
+  --manifest samples/private/stage9-corpus/manifest.json \
   --annotations samples/private/stage9-corpus/annotations
 ```
 

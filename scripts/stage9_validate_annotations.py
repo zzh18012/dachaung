@@ -3,7 +3,7 @@
 
 用法（项目 venv python 运行）：
   python scripts/stage9_validate_annotations.py \
-      --manifest samples/private/stage9-corpus/manifest.draft.json \
+      --manifest samples/private/stage9-corpus/manifest.json \
       --annotations samples/private/stage9-corpus/annotations \
       [--full-set] [--report outputs/stage9-validation.json] [--json]
 

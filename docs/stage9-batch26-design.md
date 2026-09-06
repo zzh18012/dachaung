@@ -98,7 +98,7 @@ DOCX 仍是最弱获取渠道，若核实不足，缺口由用户私有（#24）
 ## 2. manifest 与冻结协议
 
 文件：`samples/private/stage9-corpus/manifest.draft.json` → 冻结为
-`manifest.json`。字段（每文档）：
+`manifest.json`（已于 2026-09-06 裁决轮4 执行）。字段（每文档）：
 
 ```json
 {
