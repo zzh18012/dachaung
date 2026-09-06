@@ -117,18 +117,63 @@ def test_repeated_text_aligns_by_position():
     assert len(r["segment_diff"]) == 2
 
 
-def test_nontext_identity_by_ref():
+def test_nontext_identity_independent_of_naming():
+    # 跨标注人命名未冻结（img:fig-1 vs img:1 并存）：对齐键=家族+页+
+    # 页内阅读序号，与命名字符串无关（2026-09-06 修正，测量前落定）
     a = _ann("d", [("s", "Text one.", "g01", False),
-                   ("n", "img:f1", "g01", False)])
+                   ("n", "img:fig-1", "g01", False)])
     b = _ann("d", [("s", "Text one.", "g01", False),
-                   ("n", "img:f2", "g01", False)])
+                   ("n", "img:1", "g01", False)])
     r = compute_agreement(a, b)
-    assert r["matched"] == 1 and r["agree"] == 1
-    assert r["union"] == 3 and r["agreement"] == pytest.approx(1 / 3)
-    assert r["only_a"][0]["kind"] == "nontext"
-    assert r["only_a"][0]["preview"] == "img:f1"
+    assert r["matched"] == 2 and r["agree"] == 2
+    assert r["union"] == 2 and r["agreement"] == 1.0
     same = compute_agreement(a, a)
     assert same["agreement"] == 1.0 and same["matched"] == 2
+
+
+def test_nontext_different_family_no_match():
+    # img vs tab 同页同序：族不同 → 不匹配
+    a = _ann("d", [("n", "img:fig-1", "g01", False)])
+    b = _ann("d", [("n", "tab:1", "g01", False)])
+    r = compute_agreement(a, b)
+    assert r["matched"] == 0 and r["union"] == 2
+    assert r["agreement"] == 0.0
+
+
+def test_nontext_missed_image_costs_itself_only():
+    # b 漏登一张图：b 的单图按页内序拿序号 1，与 a 的第一张对上；
+    # a 的第二张落单（多登记方自付，不殃及对齐）
+    a = _ann("d", [("n", "img:fig-1", "g01", False),
+                   ("n", "img:fig-2", "g01", False)])
+    b = _ann("d", [("n", "img:1", "g01", False)])
+    r = compute_agreement(a, b)
+    assert r["matched"] == 1 and r["agree"] == 1
+    assert r["union"] == 2
+    assert len(r["only_a"]) == 1 and r["only_a"][0]["kind"] == "nontext"
+
+
+def test_nontext_ordinal_is_per_page():
+    # 页内序：同在页 2 的首图互相匹配；页 2 vs 页 3 的首图不匹配
+    a = _ann("d", [("n", "img:fig-1", "g01", False)])
+    a["units"][0]["page"] = 2
+    b = _ann("d", [("n", "img:1", "g01", False)])
+    b["units"][0]["page"] = 2
+    assert compute_agreement(a, b)["matched"] == 1
+    b["units"][0]["page"] = 3
+    assert compute_agreement(a, b)["matched"] == 0
+
+
+def test_nontext_key_via_annotation_unit_keys():
+    from stage9.agreement import (AgreementInputError,
+                                  annotation_unit_keys)
+    ann = _ann("d", [("n", "img:fig-9", "g01", False),
+                     ("n", "img:fig-10", "g01", False),
+                     ("n", "tab:2", "g02", False)])
+    assert annotation_unit_keys(ann) == [
+        ("nontext", "img", 1, 1), ("nontext", "img", 1, 2),
+        ("nontext", "tab", 1, 1)]
+    with pytest.raises(AgreementInputError):
+        unit_key(ann, ann["units"][0])
 
 
 def test_hard_boundary_is_informational_only():

@@ -7,11 +7,13 @@
 
 对齐方法：同一文档的两份标注按人工阅读序各成一个 unit 序列，unit
 对齐键 = 规范化文本（文本单元取 stream 上 char_span 的 strip 文本；
-nontext 单元无文本，用 nontext_ref）。两序列经
+nontext 单元无文本，对齐键 = 家族(img/tab)+物理页+页内阅读序号，
+**与 nontext_ref 命名字符串无关**——跨标注人命名从未冻结，按字符串
+对齐会因 img:fig-1 vs img:1 之类前缀差异系统性错配）。两序列经
 difflib.SequenceMatcher(autojunk=False) 对齐——同文档同 splitter 冻结
 规则下分歧局部化，序对齐即位置对应；重复文本（如告示框标签 "Note"
-×269）依赖序列位置而非文本唯一性。对齐只认文本（切分），kind 与
-gold_segment 在对齐对上另行比较。
+×269）依赖序列位置而非文本唯一性。对齐只认键（文本切分/非文本位次），
+kind 与 gold_segment 在对齐对上另行比较。
 
 并集数 = len(units_a) + len(units_b) - 对齐对数（对齐到的同文本 pair
 视为同一 unit，双方各自独有的进并集）。
@@ -29,8 +31,32 @@ class AgreementInputError(ValueError):
 
 def unit_key(ann, u):
     if u["kind"] == "nontext":
-        return ("nontext", u["nontext_ref"])
+        raise AgreementInputError(
+            "nontext 键含页内序号，须整篇按阅读序计算——用 "
+            "annotation_unit_keys(ann)")
     return ann["stream"][u["char_span"][0]:u["char_span"][1]].strip()
+
+
+def annotation_unit_keys(ann):
+    """按 units 阅读序生成对齐键序列。
+
+    文本单元 = stream 切片 strip；nontext 单元 = (家族, 物理页,
+    页内阅读序号)——同家族同页的第 k 个 nontext unit 键的序号为 k，
+    与 nontext_ref 命名无关（页内序使多/漏登记的错位只波及本页）。
+    """
+    keys = []
+    counters = {}
+    for u in ann["units"]:
+        if u["kind"] == "nontext":
+            family = str(u.get("nontext_ref", "")).split(":", 1)[0]
+            page = u.get("page")
+            ck = (family, page)
+            counters[ck] = counters.get(ck, 0) + 1
+            keys.append(("nontext", family, page, counters[ck]))
+        else:
+            keys.append(ann["stream"][u["char_span"][0]:u["char_span"][1]]
+                        .strip())
+    return keys
 
 
 def _brief(ann, u):
@@ -67,8 +93,8 @@ def compute_agreement(ann_a, ann_b):
 
     units_a = list(ann_a["units"])
     units_b = list(ann_b["units"])
-    keys_a = [unit_key(ann_a, u) for u in units_a]
-    keys_b = [unit_key(ann_b, u) for u in units_b]
+    keys_a = annotation_unit_keys(ann_a)
+    keys_b = annotation_unit_keys(ann_b)
 
     sm = difflib.SequenceMatcher(None, keys_a, keys_b, autojunk=False)
     matched = 0
