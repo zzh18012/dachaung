@@ -4177,3 +4177,38 @@ outputs/gpt_brief_batch26_freeze.txt 待用户中转）；冻结后进入
 
 - 本节内容分两 commit（agreement 修正+测试 / 工具+指南 §7.1+本
   台账），连同 c039d03、082bfbd、dea066e 待下轮 push 授权。
+
+## 七十八、Stage 9 批次 26：G④ 冻结回执裁决——G①–④ 正式封口（2026-09-07）
+
+### 裁决内容（用户中转，全文要点）
+
+- **G④ 执行合格**：a11dce34dc54c2855bbe3ce58e79891afe79c635 为本轮
+  正式冻结执行 commit，冻结状态继续有效，无需返工。
+- 三点特别确认：
+  1. 哈希链正确：6f93b446… 为送审 draft 的 pre-freeze hash；最终
+     51d3d400… 只存外部冻结凭证、不写回 manifest，无自指问题；
+  2. split_counts 修正**不破坏冻结**：修正发生在冻结凭证封口与最终
+     SHA 计算之前，未改任何 core/backup 身份、domain、逐篇 split，
+     属冻结形成过程中的一致性修复，非 freeze 后改动；
+  3. push 审计链合格：1dc67c7→c10d057→a11dce3 普通 FF、未 amend
+     历史 commit、未 force、远端 HEAD 与本地完整 SHA 一致。
+- 规范名 draft→manifest.json 同步属必要的 freeze 后引用更新；历史
+  台账保留旧名是正确处理。
+- **Authoritative state（G④ 权威状态，正式确认）**：
+  - manifest.json SHA-256 =
+    51d3d40057568a35ee8415e30c91824662be216d098e3d639aaa954f4f140855
+  - 24 core / 三域 8-8-8 / dev14-comparison4-holdout6 / core DOCX=4
+- **D1 定性补充**：validator 的 split_counts==重算 consistency check
+  可正常进行，但属代码/校验器维护，**不得借此静默修改已冻结 manifest
+  字节**；若 frozen manifest 本身需改文档集合/domain/split → 重新裁决。
+- **G 序列状态**：G①–④ 完成并封口；G⑤ 按既定四篇继续（用户侧第二
+  标注人进行中）；G⑥ 等双标注+仲裁全部收敛后申请；G⑦ 仍不得提前
+  产生具冻结效力的 N*/macro-ARI。
+- 本轮无新增待决事项。
+
+### 后续待裁（下轮简报提出，非本轮裁决内容）
+
+- push 授权：c039d03..8522fcf（D1 检查/台账§76/指南§7.1/agreement
+  键修正/第二标注人工具，共 5 commits，均未推送）；
+- §七十七 A 披露的 agreement 非文本对齐键修正（家族+页+页内序，
+  测量前落定）追认。
