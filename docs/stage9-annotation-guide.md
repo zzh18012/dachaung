@@ -137,11 +137,60 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
 
 ### 7.1 操作流程（第二标注人）
 
-1. 独立标注产物存 `samples/private/stage9-corpus/annotations-user/
-   <doc_id>.json`（独立目录——`annotations/` 目录会被 full-set 校验
-   整目录吸入，用户复核件不得混入）；schema/字段规范同本指南
-   §2-§6，`annotator` 填用户自署。
-2. 自校验（单文件，须 0 失败再比对）：
+零判断辅助工具 `scripts/stage9_user_annotate.py`（dump 摘行 /
+assemble 组装+校验）：工具只做机械工作（逐行抽取、规范化、切分、
+span 平铺、hash、schema 组装），一切判断由用户的 blocks 文件表达；
+工具不读、不显示、不依赖第一标注人（Claude 草案）的任何产物。
+
+1. dump 逐页行清单（稳定 ID：`pNNN` + 列标记 `L`/`R`/`C` + 行号；
+   含字号/字体/x0、图片 IMG、表格检测 FTAB 提示）：
+
+```bash
+.venv/Scripts/python.exe -X utf8 scripts/stage9_user_annotate.py \
+  dump --doc tech-08-cnnic57
+# 默认写 outputs/userannot_<短名>_dump.txt（--stdout 直接打印）
+```
+
+   - `L`/`R` = 左/右半栏行（页面中线裁剪，双栏文档分栏干净）；
+   - `C` = 跨中线整行（题名/整宽题注/跨栏表格行/单栏宽行）；单栏
+     文档宽行同时以 L半+R半+C整 三键出现，引用 C 键即自动消费其
+     两个半行（标 `≈Ckkk` 的半行勿单独引用，会判重复计数）；
+   - `≈Liii+Rjjj` 标记 = C 行可分解为两个半行（同一视觉行）；双栏
+     正文页上全页提取会把左右栏基线对齐行融成伪 C 行，同样带此
+     标记——正文取 L/R 键，真全宽行（题名/整宽题注）取 C 键。
+
+2. 对照 dump（与 PDF 原文）写 blocks 文件（Python；判断全部在此
+   表达：哪些行入流、heading/para/lines 分类、语义段分组、排除项、
+   图/表登记）：
+
+```python
+ANNOTATOR = "user-independent（自署）"
+NOTES = "处理口径说明"
+SEGMENTS = [("g00", "题名+摘要", "frontmatter"), ("g01", "§1", "body")]
+EXCLUDE = set(P(1, "L", 3, 5))              # 可选：明确排除的行
+BLOCKS = [
+    (P(1, "C", 0),    "heading", "g00", True),   # 整行标题=1 heading
+    (P(1, "L", 9, 27), "para",   "g00", False),  # 段落=冻结 v1 切句
+    (P(1, "L", 28),   "lines",   "g00", False),  # 每行 1 sentence unit
+    (1,               "nontext", "g01", "img:fig-1"),
+]
+```
+
+3. assemble 组装 v1.1 JSON + 就地校验（校验失败不写盘；产物存
+   `annotations-user/<doc_id>.json` 独立目录——`annotations/` 会被
+   full-set 校验整目录吸入，用户复核件不得混入）：
+
+```bash
+.venv/Scripts/python.exe -X utf8 scripts/stage9_user_annotate.py \
+  assemble --doc tech-08-cnnic57 \
+  --blocks samples/private/stage9-corpus/annotations-user/blocks_tech-08.py \
+  --dump outputs/userannot_tech-08_dump.txt
+# --dump 核对行注册表指纹未漂移；未处理行清单须逐项确认（排除入
+# EXCLUDE 或补引用），BLOCKS 顺序=阅读序
+```
+
+4. 单文件校验复核（assemble 已就地校验过，此步可选；须 0 失败再
+   比对）：
 
 ```bash
 .venv/Scripts/python.exe scripts/stage9_validate_annotations.py \
@@ -149,7 +198,7 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
   --annotations samples/private/stage9-corpus/annotations-user/<doc_id>.json
 ```
 
-3. 一致率比对（rc 0 = ≥0.85；rc 1 = <0.85 停机线预警，是否停机
+5. 一致率比对（rc 0 = ≥0.85；rc 1 = <0.85 停机线预警，是否停机
    仍须仲裁判定收敛性）：
 
 ```bash
@@ -158,7 +207,7 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
   --b samples/private/stage9-corpus/annotations-user/<doc_id>.json
 ```
 
-4. 分歧仲裁 →（如改 gold）重建标注+重跑校验 → ⑥gold 冻结。
+6. 分歧仲裁 →（如改 gold）重建标注+重跑校验 → ⑥gold 冻结。
 
 ## 8. 校验
 

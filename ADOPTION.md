@@ -4108,3 +4108,72 @@ outputs/gpt_brief_batch26_freeze.txt 待用户中转）；冻结后进入
   重跑 validator 均入指南。
 - stage9_agreement.py docstring 用法示例同步指向 annotations-user/；
   指南 §8 失败码清单补 `manifest_consistency_failure`（始终执行）。
+
+## 七十七、Stage 9 批次 26：⑤双标注前置——agreement 非文本对齐键修正 + 第二标注人零判断工具（2026-09-06，待 GPT 追认 1 项）
+
+### A. agreement 非文本 unit 对齐键改为 家族+物理页+页内阅读序（语义修正，测量前落定，待追认）
+
+- **问题**：原实现对 nontext unit 以 `nontext_ref` 字符串为对齐键；
+  该命名字符串从未冻结——23 篇草案实测并存 `img:fig-N`（acad-03/
+  tech-08）与 `img:N`（tech-03）两族，prod-01 用 `tab:1`。按字符串
+  对齐会把 tech-03 的 258 个 nontext unit（占其 unit 总量约 11%）
+  系统性错配，仅命名差异即可把一致率压到 0.85 停机线以下——测量
+  口径缺陷，非标注分歧。
+- **修正**（`stage9/agreement.py`）：nontext 对齐键 = (家族,
+  物理页, 页内阅读序号)——同家族同页第 k 个 nontext unit 序号为
+  k，与命名无关；`unit_key()` 对 nontext 改为抛
+  AgreementInputError（页内序须整篇按阅读序计算），新增
+  `annotation_unit_keys(ann)` 统一产键；模块 docstring 同步。
+  行为学性质：多/漏登记的序号错位只波及本页本家族（漏登一张图
+  由多登方自付，不殃及对齐——手算测试锁定）。
+- **时点披露**：修正发生在 4 篇双标注第二标注人动笔之前（尚无
+  第二份标注，零偏袒窗口），但属测量口径语义变更，**待 GPT 追认**。
+- 测试：`tests/test_stage9_agreement.py` 原
+  `test_nontext_identity_by_ref` 删除，新增 5 个手算测试
+  （命名无关全对齐 / 异家族不匹配 / 漏登图仅自付 / 页内序跨页
+  区分 / annotation_unit_keys 产键+unit_key 抛错）；15 测试过。
+- 命名建议（非强制，agreement 已与命名无关）：blocks 文件 ref 用
+  `img:fig-N` / `tab:N`（N=阅读序 1-based）。
+
+### B. 第二标注人零判断辅助工具 `scripts/stage9_user_annotate.py`
+
+- **原则**：工具只做机械工作（逐行抽取、fold-ws-v1 规范化、冻结
+  v1 切分、span 平铺、hash、schema 组装、就地校验）；一切判断
+  （入流行、heading/para/lines 分类、语义段、排除、图表登记）由
+  用户 blocks 文件表达；工具不读/不显示/不依赖第一标注人草案，
+  独立性保持。
+- `dump`：逐页行清单。行注册表与草案 builder 的 crop 方案同源：
+  L/R=页面中线裁剪的左/右半栏行（双栏文档全页 extract_text_lines
+  会把基线对齐行融合，不可用——acad-03 p005 实证 60 融合行 vs
+  crop 57+53）；C=全页提取中横跨中线的整行（0 基连续）。`≈Liii+
+  Rjjj` 标记=该 C 行可分解为两个半行（top 差<3 + 模糊拼接匹配，
+  容差同 builder：跨界重叠 ≤8 字符或左右各删 ≤2 字符断词）；单栏
+  文档宽行以 L半+R半+C整 三键呈现。附每行 x0/字号/字体众数、IMG、
+  FTAB（find_tables 可能假阳性，是否登记由标注人判）。行注册表
+  指纹（全部行文本+键序 sha256）写入 dump 头部。
+- `assemble`：exec 用户 blocks 文件（注入 `P(page,col,a,b=None)`
+  键区间辅助）→ 按 BLOCKS 阅读序机械组装 v1.1 JSON（规则与草案
+  builder 完全同源）→ **就地 validate_annotation，失败不写盘** →
+  写 `annotations-user/<doc_id>.json`。防线：行重复引用报错；引用
+  C 键自动消费其两个半行、再单独引用半行=同一视觉行重复计数报错
+  （修复旧稿 `rj/ri` 笔误——右半匹配赋值与判空变量名不一致，曾致
+  匹配表恒空）；`--dump` 传 dump 文件核对指纹漂移（pdfplumber 版
+  本/源文件变动防线）；未处理行清单逐项打印（确认排除入 EXCLUDE
+  或补引用），分栏计数。
+- **冒烟记录**：acad-03 p005/p006 整页跨栏表格=50 真全宽 C 行、
+  题名带/整宽图题 C 键+半行 ≈ 标记正确；p001 双栏正文页的全页
+  提取融合行如实以伪 C 行呈现（≈L+R 可分解标记暴露其性质，正文
+  取 L/R 键由标注人判断）；prod-01 p010 单栏宽行三键呈现、页眉/
+  页脚短行仅落半栏。4 篇 dump 已生成（acad-03 指纹 a35004bb…、
+  tech-08 35cbf01e…、tech-03 d4fe244f…、prod-01 4d099d38…）。
+  一次性 blocks 端到端冒烟通过（C 自动消费 4 半行、校验 0 失败、
+  自比对 1.0000；整段一句=冻结 v1 切分器在"句点后无空格"文本下
+  的正确机械行为，与 builder 同源）；冒烟产物即删，未入
+  annotations-user/。
+- 指南 §7.1 重写为工具化六步流程（dump → blocks → assemble →
+  可选单文件校验 → agreement → 仲裁）。
+
+### 提交
+
+- 本节内容分两 commit（agreement 修正+测试 / 工具+指南 §7.1+本
+  台账），连同 c039d03、082bfbd、dea066e 待下轮 push 授权。
