@@ -4068,3 +4068,31 @@ outputs/gpt_brief_batch26_freeze.txt 待用户中转）；冻结后进入
   validator 维护批次（裁决明示允许，非阻塞）。
 - 下一步：⑤四篇双标注+仲裁（用户侧独立标注；0.85 停机线）→
   ⑥gold freeze → ⑦一次具冻结效力的 14-dev 全网格选优。
+
+## 七十六、Stage 9 批次 26：D1 validator 检查实现（2026-09-06，裁决轮4 授权）
+
+### 内容
+
+- `stage9/validation.py` 新增 `validate_manifest_consistency`：D1 规则
+  （轮4）落地——声明的 split_counts（`_meta.split_counts` 与顶层
+  `split_counts`，**若存在才查**）逐键必须等于逐篇 split 重算
+  （键 unassigned_spares = 无 split 文档数；其余键 = split==key 文档
+  数；值非整数同判失败）；不一致 → 新失败码
+  `manifest_consistency_failure`。
+- CLI 接线：manifest 加载后**始终执行**（不限 --full-set），失败计入
+  报告与 rc 1；docstring 同步说明。
+- 测试：+7（缺失声明零失败 / 一致通过 / _meta 陈旧 / 顶层陈旧 /
+  备数错+野键 / 非整数 / CLI 端到端 rc 1）。回归 5574 passed + 4
+  skipped；对已冻结 manifest.json live 重跑 --full-set 仍 25 文件
+  0 失败（冻结层两处 split_counts 已同步为重算真值，新检查通过=
+  冻结后一致性的首验）。
+- 提交 c039d03（未推送——push 授权范围止于冻结 commit a11dce3，
+  本 commit 待下轮一并）。
+
+### 背景（自包含）
+
+轮4 裁决 D1："_meta.split_counts 若存在必须等于逐篇 split 重算；
+不一致应判 manifest consistency failure。检查可现在加入，也可在下
+次 validator 维护时加入；不作为 freeze 阻塞项。"本节为前者。触发
+场景即 §七十五执行记录 2 披露的顶层 split_counts 13/4/5 陈旧残留
+（两个同名键交替命中导致此前读数不一致之谜）。
