@@ -281,6 +281,44 @@ def validate_split_constraints(manifest_data, annotated_doc_ids):
     return fails, summary
 
 
+def validate_manifest_consistency(manifest_data):
+    """D1 规则（2026-09-06 裁决轮4）：声明的 split_counts 若存在，逐键
+    必须等于逐篇 split 重算结果；不一致判 manifest consistency failure。
+
+    检查两处声明（_meta.split_counts 与顶层 split_counts，均"若存在才查"）：
+    每个声明键的重算值 = split==key 的文档数；键 unassigned_spares 例外，
+    重算值 = 无 split 字段的文档数。校验器本身从不消费这些声明字段
+    （--full-set 一律独立重算），本检查只保证声明与逐篇字段不矛盾。
+    """
+    fails = []
+    if not isinstance(manifest_data, dict):
+        return fails
+    docs = [d for d in manifest_data.get("docs", []) if isinstance(d, dict)]
+    meta = manifest_data.get("_meta")
+    declared_fields = []
+    if isinstance(meta, dict) and isinstance(meta.get("split_counts"), dict):
+        declared_fields.append(("_meta.split_counts", meta["split_counts"]))
+    if isinstance(manifest_data.get("split_counts"), dict):
+        declared_fields.append(("split_counts", manifest_data["split_counts"]))
+    for where, declared in declared_fields:
+        for key, value in declared.items():
+            if not isinstance(value, int) or isinstance(value, bool):
+                fails.append(Failure(
+                    "manifest_consistency_failure",
+                    "%s.%s 值非整数: %r" % (where, key, value)))
+                continue
+            if key == "unassigned_spares":
+                got = sum(1 for d in docs if not d.get("split"))
+            else:
+                got = sum(1 for d in docs if d.get("split") == key)
+            if value != got:
+                fails.append(Failure(
+                    "manifest_consistency_failure",
+                    "%s.%s=%d 与逐篇 split 重算 %d 不一致"
+                    % (where, key, value, got)))
+    return fails
+
+
 def load_json(path):
     with open(path, encoding="utf-8") as fh:
         return json.load(fh)

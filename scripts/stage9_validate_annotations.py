@@ -9,7 +9,9 @@
 
 退出码：0 = 全部通过；1 = 存在校验失败；2 = 输入/IO 错误（文件缺失、
 JSON 解析失败等）。--full-set 在单篇校验之上追加 split 分层约束
-（14/4/6、三域全覆盖、全部正选已标注）。
+（14/4/6、三域全覆盖、全部正选已标注）。manifest 一致性检查（D1，
+2026-09-06 裁决轮4）始终执行：声明的 split_counts（_meta 与顶层，
+若存在）逐键必须等于逐篇 split 重算，否则 manifest_consistency_failure。
 """
 import argparse
 import json
@@ -21,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from stage9.validation import (  # noqa: E402
     load_json,
     validate_annotation,
+    validate_manifest_consistency,
     validate_split_constraints,
 )
 
@@ -63,12 +66,16 @@ def main(argv=None):
                       for d in manifest_data.get("docs", [])
                       if isinstance(d, dict)}
 
+    failures = []
+    for fail in validate_manifest_consistency(manifest_data):
+        failures.append({"file": str(manifest_path), "doc_id": None,
+                         **fail.to_json()})
+
     files = collect_annotation_files(args.annotations)
     if not files:
         print("未找到标注文件", file=sys.stderr)
         return 2
 
-    failures = []
     annotated = set()
     io_errors = 0
     for path in files:

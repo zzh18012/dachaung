@@ -9,7 +9,11 @@ from pathlib import Path
 
 import pytest
 
-from stage9.validation import validate_annotation, validate_split_constraints
+from stage9.validation import (
+    validate_annotation,
+    validate_manifest_consistency,
+    validate_split_constraints,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -292,6 +296,77 @@ def test_split_constraints_missing_annotation():
     annotated.discard("dev-00")
     fails, _ = validate_split_constraints(manifest, annotated)
     assert "missing_annotation" in [f.code for f in fails]
+
+
+def test_manifest_consistency_absent_ok():
+    # D1 规则"若存在才查"：无声明字段 → 零失败
+    assert validate_manifest_consistency(_manifest_data()) == []
+
+
+def test_manifest_consistency_consistent_ok():
+    manifest = _manifest_data()
+    truth = {"dev": 14, "comparison": 4, "holdout": 6,
+             "unassigned_spares": 1}
+    manifest["split_counts"] = dict(truth)
+    manifest["_meta"] = {"split_counts": dict(truth)}
+    assert validate_manifest_consistency(manifest) == []
+
+
+def test_manifest_consistency_stale_meta():
+    manifest = _manifest_data()
+    manifest["_meta"] = {"split_counts": {"dev": 13, "comparison": 4,
+                                          "holdout": 6,
+                                          "unassigned_spares": 1}}
+    fails = validate_manifest_consistency(manifest)
+    assert [f.code for f in fails] == ["manifest_consistency_failure"]
+    assert "dev=13" in fails[0].detail and "14" in fails[0].detail
+
+
+def test_manifest_consistency_stale_top_level():
+    manifest = _manifest_data()
+    manifest["split_counts"] = {"dev": 14, "comparison": 4, "holdout": 5}
+    fails = validate_manifest_consistency(manifest)
+    assert [f.code for f in fails] == ["manifest_consistency_failure"]
+    assert "split_counts.holdout" in fails[0].detail
+
+
+def test_manifest_consistency_bad_spare_count_and_stray_key():
+    manifest = _manifest_data()
+    manifest["_meta"] = {"split_counts": {"dev": 14, "comparison": 4,
+                                          "holdout": 6,
+                                          "unassigned_spares": 2,
+                                          "quarantine": 5}}
+    fails = validate_manifest_consistency(manifest)
+    assert [f.code for f in fails] == ["manifest_consistency_failure"] * 2
+    details = " | ".join(f.detail for f in fails)
+    assert "unassigned_spares=2" in details
+    assert "quarantine=5" in details and "0" in details.split("quarantine=5")[1]
+
+
+def test_manifest_consistency_non_int_value():
+    manifest = _manifest_data()
+    manifest["split_counts"] = {"dev": "14"}
+    fails = validate_manifest_consistency(manifest)
+    assert [f.code for f in fails] == ["manifest_consistency_failure"]
+    assert "非整数" in fails[0].detail
+
+
+def test_cli_manifest_consistency_failure(tmp_path):
+    script = ROOT / "scripts" / "stage9_validate_annotations.py"
+    manifest_data = _manifest_data_with_annotation_doc()
+    manifest_data["_meta"] = {"split_counts": {"dev": 1, "holdout": 9}}
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps(manifest_data), encoding="utf-8")
+    good = tmp_path / "good.json"
+    good.write_text(json.dumps(_base_annotation(), ensure_ascii=False),
+                    encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(script), "--manifest", str(manifest),
+         "--annotations", str(good)],
+        capture_output=True, text=True, cwd=str(ROOT))
+    assert result.returncode == 1
+    assert "manifest_consistency_failure" in result.stdout
+    assert "holdout=9" in result.stdout
 
 
 def test_cli_exit_codes(tmp_path):
