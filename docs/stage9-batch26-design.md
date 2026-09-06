@@ -71,6 +71,25 @@ product_manual 配额的文档须三条件**全部满足**：①面向特定产�
 产品域缺口 2 篇按本规则重新采集。若最终无法补齐，须冻结前正式修订本设计
 （承认非 8/8/8 或增设辅助类别），报告不得声称"三域各 8 篇平衡语料"。
 
+**genre 解释口径（GPT 裁决 2026-09-05 三轮 B 追认）**：product_manual
+includes operational manuals for bounded software applications and online
+service platforms, regardless of commercial or governmental ownership.
+即"产品"按文档工程意义理解为有界软件产品/应用系统/在线服务平台，
+不要求商业售卖或本地安装；此为解释既有三条件，非新增第四资格条件。
+
+**补采落位（GPT 裁决 2026-09-05 三轮 A 批准，检索阶段正式关闭）**：
+- prod-06 = 《"单一窗口"标准版用户手册（货物申报-上）_20260416》PDF
+  （137 页/46,167 无空格字符/单栏；辽宁单一窗口站点分发；split=**dev**）。
+- prod-09 = 《CA证书与电子签章资源共享平台PC端操作手册》DOCX（6,749
+  规范化字符/H1×8 H2×9/76 图；常德市公共资源交易中心分发；split=
+  **holdout**；即 prod-08 替补，原 id 保留给已降级习题集故用新 id）。
+  content_profile="visual_heavy"（描述性元数据，非准入门槛，不参与
+  split/选优/事后剔除）。
+- 映射定死：不得因标注后的 units/segments/ARI/难度等信息互换二者 split。
+- provenance 纪律：分发站点不自动升级为文档作者（document_author=unknown
+  除非文档内部另有明确署名）；公开可下载 ≠ 开放许可（license 如实记
+  not stated）。
+
 诚实申报：①原设计正选 20（8+6+6）在汇报提示词中被误计为 8+6+5=19，系
 汇报计数笔误非设计矛盾，已在台账如实登记；v2 按裁决改为 24 正选。②公开
 DOCX 仍是最弱获取渠道，若核实不足，缺口由用户私有（#24）与备选补足；

@@ -3867,3 +3867,128 @@ N*=2000 时明确写 "re-confirmed on final 14-dev"。
 
 - docs（设计 §2 冻结顺序 + 指南 §4 body_index 定义）+ 本台账节；
   manifest _meta 私有侧落档。commit 未推送（待下轮一并裁决）。
+
+## 七十三、Stage 9 批次 26：三轮裁决执行——补采候选落位（2026-09-05，A/B/C/D 全批准）
+
+### 裁决摘要（GPT-5.6 Sol，2026-09-05 三轮）
+
+- **A 批准**：C2《"单一窗口"标准版用户手册（货物申报-上）_20260416》
+  → prod-06 = dev；C1《CA证书与电子签章资源共享平台PC端操作手册》
+  → prod-08 替补 = holdout（实现取新 doc_id=prod-09-changde-ca，原
+  prod-08 id 保留给已降级习题集，语义即裁决所指 prod-08 replacement，
+  实现细节已在此声明）。映射定死：不得因标注后 units/segments/ARI/
+  难度互换 split。C1 允许进入核心集——无预冻结最低字符数规则，事后
+  加门槛即 post-hoc selection；仅增描述性元数据
+  content_profile="visual_heavy"（不参与 split/选优/剔除）。
+- **B 追认**：政务电子服务平台操作手册计入 product_manual。口径
+  （英文原文入档）："product_manual includes operational manuals for
+  bounded software applications and online service platforms, regardless
+  of commercial or governmental ownership."——解释既有三条件，非新增
+  第四资格条件。外部核验：常德/辽宁官方页面均以"操作手册/用户手册"
+  制度化栏目发布两候选。
+- **C 批准执行**：链路=复核 hash → files/ 落位 → manifest 定稿 →
+  一级标注 → v1.1 全校验 → spot-check → --full-set → 汇报申请
+  manifest/split freeze（本轮不预签 freeze stamp）。终检必须验证
+  24 核心/8-8-8/14-4-6/核心 DOCX=4/全 split 非 null/原 prod-08
+  习题集继续备用不重计。三约束：①provenance 分字段精确（分发站点≠
+  文档作者，document_author=unknown 除非内部署名）；②license 不得
+  从"公开下载"推导为开放许可（如实记 not stated）；③repo 副本
+  SHA-256 必须逐一等于筛查记录，不一致即停。
+- **D 放行**：1dc67c7 普通 FF push。
+- 补采检索阶段正式关闭。
+
+### 执行记录
+
+1. **D push**：a69bc07..1dc67c7 fast-forward，ls-remote 核对远端
+   HEAD=1dc67c7 一致，无 force。
+2. **复核下载**：两候选从原始 URL 重新下载，SHA-256 逐位等于筛查
+   记录（C1 c28b0f91…849e / C2 d78c0c80…96c5）。
+3. **files/ 落位 + repo 副本复核**：files/prod-06-singlewindow-decl-up.pdf
+   与 files/prod-09-changde-ca.docx，重算 hash 双 MATCH。
+4. **manifest 条目**（27 条目）：prod-06（pdf/zh/dev/137 页/
+   approx_chars 46167/单栏/heading_depth 3）+ prod-09（docx/zh/
+   holdout/286 段/6749 字符/H1×8 H2×9/content_profile=visual_heavy），
+   均含 provenance 三字段（distributing_site/product_or_project/
+   document_author=unknown）与 license=not stated 诚实表述。
+   _meta 新增 genre_clarification_2026_09_05 + ruling3_2026_09_05；
+   split_counts 更新后核心 **24 = dev14+comparison4+holdout6**，
+   三域 **8/8/8**，核心 DOCX **=4**（≥4 达标）——与裁决 C 终检
+   目标逐项吻合。
+5. **设计文档 §1**：genre 解释口径 + 补采落位记录 + provenance 纪律
+   三段落档。
+6. 筛查台账：outputs/screening/SCREENING-LOG-2026-09-05.md
+   （gitignored；候选/拒绝清单/槽位提案全文）。
+
+### 待办（本节之后）
+
+- 两篇一级标注 + v1.1 全量校验 + spot-check + --full-set 终检
+  （§七十四计划）→ 汇报申请冻结 manifest/split 层；
+- 用户侧四篇双标注继续（G 序列 ④，双标注质量门先于 14-dev 正式
+  选优）；
+- 本节 commit 待下轮裁决 push。
+
+## 七十四、Stage 9 批次 26：prod-06/prod-09 一级标注 + --full-set 终检通过（2026-09-06）
+
+背景：§七十三裁决 C 授权链的第②③步（一级标注+校验+spot-check+终检）。
+
+### prod-09-changde-ca（DOCX，holdout）
+
+- builder=annotations/build_prod09.py：零转写（文本/图片计数按 body_index
+  直接取自源文件），人工判读产物=RANGES 语义段区间表+EXPECTED_HEADINGS
+  17 个标题断言+HARD_AT。
+- 产出：stream 6,749 字符 / 329 units（text 210 / nontext 119=img 119）/
+  11 segments（封面 g00 + 10 业务段）；DOCX 无物理页码 → page=null、
+  body_index 定位（§七十二 C2 口径）。
+- 口径：图片按 body 段落出现次数登记；H1 引言段并入首个 H2 段；
+  源笔误照录（"2.、"、"(6)"重复、"第三步"重复等）。
+
+### prod-06-singlewindow-decl-up（PDF，dev，137 页）
+
+- builder=annotations/build_prod06.py：规则驱动零转写（pdfplumber 逐行
+  抽取+字体/字号/前缀分类），人工判读产物=分类规则+57 锚点语义段表+
+  3 处表格登记清单。
+- 排除项（prod-05 先例）：页眉（SimSun9 书眉）/页脚（Calibri9 "N/137"）/
+  目录页 p2-3。假阳性处理：p74 find_tables 散文框判非可视表格（prose
+  入流）；p6 嵌套 1x4 弃用。
+- 表格登记 3 处：键盘操作表跨页（tab:tab001 p6 + tab:tab002 p7）+
+  p112 底色图例表（tab:tab003）；单元格文本不入流。
+- 产出：stream 36,921 字符 / 1,482 units（text 1,228=heading 118 +
+  sentence 1,110 / nontext 254=img 251 + tab 3）/ 57 segments
+  （篇/章/节结构；1.1 内按 SUBHEI 字段簇细分 16 段；1.4-1.8、
+  2.4-2.9 并排小节各成段）；hard boundary 57=段首。
+- 清理规则（prod-05 手工清理的规则化等价，已入 notes）：CJK-CJK 间
+  对齐/字距空格删除、ASCII 词间空格保留；跨页/跨字体断行重组
+  （spot-check 合并探针 6/6 通过）。
+- 诚实披露：薄段 11 个（g00 封面 0 文本；g21 资质查询+附注 63 字符、
+  g39 第三章 48 字符等为源文档截图驱动小节，如实标注）；1 处源文档
+  枚举句以"，"收尾（枚举体为五个界面页签标签子块，照录）；
+  第三章仅标题+1 指引句（纯截图章节）。
+
+### 校验与终检
+
+- v1.1 全量校验：25 文件（24 核心+prod-08 备用仍标注）**0 失败
+  0 IO 错误**。
+- --full-set 终检：split_counts **dev 14 / comparison 4 / holdout 6**，
+  annotated 25 / total 24；三域 8/8/8；核心 DOCX=4——§七十三裁决 C
+  终检要求逐项满足（原 prod-08 习题集仍备用不计）。
+- spot-check：outputs/spotcheck_prod06.{py,txt}（gitignored）——
+  57 硬边界逐段、18 阅读序探针单调、6 合并探针、7 排除探针（表格
+  单元格/页眉/页脚/目录全部不在流中）、4 清理探针全过；句末完整性：
+  64 处"："收尾为合法引出句、1 处"，"收尾为上述源枚举句、0 处真实
+  断句。
+- prod-09 spot-check 含于上轮全量 spot-check 23/23 报告口径内。
+
+### G 序列位置与下一步
+
+①补齐 ②标注+校验+spot-check ③--full-set 终检——**全部完成**。
+下一步=按④前申请：**冻结 manifest/split 层**（简报
+outputs/gpt_brief_batch26_freeze.txt 待用户中转）；冻结后进入
+⑤四篇双标注+仲裁（用户侧）→⑥gold freeze→⑦一次具冻结效力的
+14-dev 全网格选优。
+
+### 提交物
+
+- 本 commit：ADOPTION §七十三+§七十四、docs/stage9-batch26-design.md
+  genre/落位三段（§七十三执行+本轮记录；manifest/标注/builder 均
+  gitignored 私有层，不入 git）。
+- push 待下轮裁决授权。
