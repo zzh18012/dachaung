@@ -4096,3 +4096,15 @@ outputs/gpt_brief_batch26_freeze.txt 待用户中转）；冻结后进入
 次 validator 维护时加入；不作为 freeze 阻塞项。"本节为前者。触发
 场景即 §七十五执行记录 2 披露的顶层 split_counts 13/4/5 陈旧残留
 （两个同名键交替命中导致此前读数不一致之谜）。
+
+### 附：⑤双标注操作支撑（同日）
+
+- 标注指南 §7 补定稿选篇（裁决轮4：dev=tech-03-cncert-annual2020
+  +prod-01-python-tutorial / holdout=acad-03-layoutlmv3+
+  tech-08-cnnic57，全 PDF）与 §7.1 操作流程：用户复核件存
+  `samples/private/stage9-corpus/annotations-user/<doc_id>.json`
+  （独立目录，防被 full-set 整目录吸入；目录已建+README，私有层）；
+  自校验单文件命令 + stage9_agreement 比对命令 + 仲裁改 gold 须
+  重跑 validator 均入指南。
+- stage9_agreement.py docstring 用法示例同步指向 annotations-user/；
+  指南 §8 失败码清单补 `manifest_consistency_failure`（始终执行）。

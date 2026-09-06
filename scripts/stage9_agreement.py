@@ -2,10 +2,10 @@
 """Stage 9 批次 26：双标注一致率 CLI（标注指南 §7）。
 
 用法（项目 venv python 运行；两份输入须为同一 doc_id 的标注 JSON，
-第一份 = Claude 草案，第二份 = 用户独立复核）：
+第一份 = Claude 草案，第二份 = 用户独立复核，见标注指南 §7.1）：
   python scripts/stage9_agreement.py \
-      --a samples/private/stage9-corpus/annotations/<doc>.json \
-      --b samples/private/stage9-corpus/annotations/<doc>-review.json \
+      --a samples/private/stage9-corpus/annotations/<doc_id>.json \
+      --b samples/private/stage9-corpus/annotations-user/<doc_id>.json \
       [--json] [--max-disagreements 40]
 
 退出码：0 = 一致率 ≥0.85；1 = 一致率 <0.85（停机线预警——是否停机

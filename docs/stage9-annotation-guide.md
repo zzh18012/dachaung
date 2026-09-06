@@ -123,13 +123,42 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
 
 ## 7. 双标注与仲裁
 
-- 双标注 4 篇（dev 2 + holdout 2，覆盖至少两域）：第一标注人 =
-  Claude 草案，第二标注人 = 用户独立复核（不看 Claude 草案）；
+- 双标注 4 篇（2026-09-06 裁决轮4 定稿，不因 prod-06/prod-09 入库
+  重抽）：dev = `tech-03-cncert-annual2020` + `prod-01-python-tutorial`；
+  holdout = `acad-03-layoutlmv3` + `tech-08-cnnic57`（全部 PDF）。
+  第一标注人 = Claude 草案，第二标注人 = 用户独立复核（不看 Claude
+  草案）；
 - 比对口径：unit 级（切分一致 + gold_segment 一致）；
 - 一致率 = 一致 unit 数 / 双方 unit 并集数；**<85% 且仲裁不收敛 =
   停机条件**；
 - 分歧清单记录于该文档标注文件的 `notes`（或仲裁记录文件），协商
-  仲裁结果为准；其余 20 篇用户抽查 ≥2 篇。
+  仲裁结果为准；仲裁修改 gold 后须重跑 validator；其余 20 篇用户
+  抽查 ≥2 篇。
+
+### 7.1 操作流程（第二标注人）
+
+1. 独立标注产物存 `samples/private/stage9-corpus/annotations-user/
+   <doc_id>.json`（独立目录——`annotations/` 目录会被 full-set 校验
+   整目录吸入，用户复核件不得混入）；schema/字段规范同本指南
+   §2-§6，`annotator` 填用户自署。
+2. 自校验（单文件，须 0 失败再比对）：
+
+```bash
+.venv/Scripts/python.exe scripts/stage9_validate_annotations.py \
+  --manifest samples/private/stage9-corpus/manifest.json \
+  --annotations samples/private/stage9-corpus/annotations-user/<doc_id>.json
+```
+
+3. 一致率比对（rc 0 = ≥0.85；rc 1 = <0.85 停机线预警，是否停机
+   仍须仲裁判定收敛性）：
+
+```bash
+.venv/Scripts/python.exe scripts/stage9_agreement.py \
+  --a samples/private/stage9-corpus/annotations/<doc_id>.json \
+  --b samples/private/stage9-corpus/annotations-user/<doc_id>.json
+```
+
+4. 分歧仲裁 →（如改 gold）重建标注+重跑校验 → ⑥gold 冻结。
 
 ## 8. 校验
 
@@ -146,7 +175,9 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
 `hash_mismatch` `preview_mismatch` `span_not_null_nontext`
 `bad_nontext_ref` `duplicate_nontext_ref` `unknown_nontext_ref`
 `unknown_segment` `unreferenced_segment` `duplicate_segment_id`
-`missing_field` `doc_not_in_manifest`；`--full-set` 追加
+`missing_field` `doc_not_in_manifest`；manifest 一致性检查（D1，
+2026-09-06 裁决轮4）始终执行，追加 `manifest_consistency_failure`；
+`--full-set` 追加
 `split_count_mismatch` `split_domain_coverage` `missing_annotation`
 （冻结终检用）。
 
