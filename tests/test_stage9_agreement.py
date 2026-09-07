@@ -118,8 +118,9 @@ def test_repeated_text_aligns_by_position():
 
 
 def test_nontext_identity_independent_of_naming():
-    # 跨标注人命名未冻结（img:fig-1 vs img:1 并存）：对齐键=家族+页+
-    # 页内阅读序号，与命名字符串无关（2026-09-06 修正，测量前落定）
+    # 契约 1（ref 仅改名 agreement 不变）：跨标注人命名未冻结
+    # （img:fig-1 vs img:1 并存）：对齐键=家族+物理页（v3-page-family），
+    # 与命名字符串无关（2026-09-07 裁决 B 修正：键不含任何标注自序编号）
     a = _ann("d", [("s", "Text one.", "g01", False),
                    ("n", "img:fig-1", "g01", False)])
     b = _ann("d", [("s", "Text one.", "g01", False),
@@ -132,7 +133,7 @@ def test_nontext_identity_independent_of_naming():
 
 
 def test_nontext_different_family_no_match():
-    # img vs tab 同页同序：族不同 → 不匹配
+    # img vs tab 同页：族不同 → 不匹配
     a = _ann("d", [("n", "img:fig-1", "g01", False)])
     b = _ann("d", [("n", "tab:1", "g01", False)])
     r = compute_agreement(a, b)
@@ -141,8 +142,9 @@ def test_nontext_different_family_no_match():
 
 
 def test_nontext_missed_image_costs_itself_only():
-    # b 漏登一张图：b 的单图按页内序拿序号 1，与 a 的第一张对上；
-    # a 的第二张落单（多登记方自付，不殃及对齐）
+    # 契约 2（漏登页首一个 nontext 只罚该对象，后续仍正常对齐）：
+    # b 漏登一张图：同页同族其余对象仍按结构位置配对，matched/union
+    # 精确；漏登方自付，不殃及后续对齐（无任何按标注自序的编号可漂移）
     a = _ann("d", [("n", "img:fig-1", "g01", False),
                    ("n", "img:fig-2", "g01", False)])
     b = _ann("d", [("n", "img:1", "g01", False)])
@@ -152,8 +154,66 @@ def test_nontext_missed_image_costs_itself_only():
     assert len(r["only_a"]) == 1 and r["only_a"][0]["kind"] == "nontext"
 
 
-def test_nontext_ordinal_is_per_page():
-    # 页内序：同在页 2 的首图互相匹配；页 2 vs 页 3 的首图不匹配
+def test_nontext_page_leading_miss_pollutes_nothing():
+    # 契约 2 强化版（裁决 B 原例）：页首 img 漏登后，同页同族后续
+    # 两个对象仍全部对上（matched=2），下一页对象也不受影响
+    a = _ann("d", [("n", "img:a", "g01", False),
+                   ("n", "img:b", "g01", False),
+                   ("n", "img:c", "g01", False),
+                   ("n", "img:d", "g01", False)])
+    a["units"][3]["page"] = 2
+    b = _ann("d", [("n", "img:b", "g01", False),
+                   ("n", "img:c", "g01", False),
+                   ("n", "img:d", "g01", False)])
+    b["units"][2]["page"] = 2
+    r = compute_agreement(a, b)
+    assert r["matched"] == 3 and r["agree"] == 3
+    assert r["union"] == 4 and r["agreement"] == pytest.approx(3 / 4)
+    assert len(r["only_a"]) == 1 and not r["only_b"]
+
+
+def test_nontext_family_interleave_no_identity_collision():
+    # 契约 3（img/tab 交错不碰撞）：同页同序时 img 与 tab 各自对齐
+    # （matched=2，无族间误配）
+    a = _ann("d", [("n", "img:1", "g01", False),
+                   ("n", "tab:1", "g02", False)])
+    b = _ann("d", [("n", "tab:x", "g02", False),
+                   ("n", "img:y", "g01", False)])
+    same = compute_agreement(a, a)
+    assert same["matched"] == 2 and same["agree"] == 2
+    assert same["kind_diff"] == [] and same["agreement"] == 1.0
+    # 顺序颠倒（阅读序分歧）：SequenceMatcher 只配得一对，但**绝不
+    # 产生 img↔tab 族间误配**（kind_diff 恒空）；未配上的一对如实
+    # 进 only_a/only_b——交叉序分歧本身应计入一致率惩罚
+    r = compute_agreement(a, b)
+    assert r["matched"] == 1 and r["agree"] == 1
+    assert r["kind_diff"] == [] and r["segment_diff"] == []
+    assert len(r["only_a"]) == 1 and len(r["only_b"]) == 1
+    assert r["union"] == 3 and r["agreement"] == pytest.approx(1 / 3)
+
+
+def test_nontext_keys_deterministic_on_repeat():
+    # 契约 4（同一输入重复运行键完全相同、报告逐字段相等）
+    from stage9.agreement import annotation_unit_keys
+    a = _ann("d", [("s", "T.", "g01", False),
+                   ("n", "img:fig-1", "g01", False),
+                   ("n", "tab:2", "g02", False)])
+    b = _ann("d", [("s", "T.", "g01", False),
+                   ("n", "img:2", "g01", False),
+                   ("n", "tab:t", "g02", False)])
+    assert annotation_unit_keys(a) == annotation_unit_keys(b)
+    assert compute_agreement(a, b) == compute_agreement(a, b)
+
+
+def test_report_records_nontext_alignment_version():
+    # 契约 5（报告记录算法版本）
+    a = _ann("d", [("n", "img:fig-1", "g01", False)])
+    r = compute_agreement(a, a)
+    assert r["nontext_alignment"] == "v3-page-family"
+
+
+def test_nontext_key_is_per_page_family():
+    # 页维度：同在页 2 的图互相匹配；页 2 vs 页 3 的图不匹配
     a = _ann("d", [("n", "img:fig-1", "g01", False)])
     a["units"][0]["page"] = 2
     b = _ann("d", [("n", "img:1", "g01", False)])
@@ -170,8 +230,8 @@ def test_nontext_key_via_annotation_unit_keys():
                      ("n", "img:fig-10", "g01", False),
                      ("n", "tab:2", "g02", False)])
     assert annotation_unit_keys(ann) == [
-        ("nontext", "img", 1, 1), ("nontext", "img", 1, 2),
-        ("nontext", "tab", 1, 1)]
+        ("nontext", "img", 1), ("nontext", "img", 1),
+        ("nontext", "tab", 1)]
     with pytest.raises(AgreementInputError):
         unit_key(ann, ann["units"][0])
 
@@ -240,4 +300,5 @@ def test_cli_exit_codes_and_json(tmp_path):
     assert payload["doc_id"] == "d"
     assert payload["agreement"] == pytest.approx(2 / 3)
     assert payload["below_threshold"] is True
+    assert payload["nontext_alignment"] == "v3-page-family"
     assert len(payload["segment_diff"]) == 1

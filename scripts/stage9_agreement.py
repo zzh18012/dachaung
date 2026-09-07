@@ -63,6 +63,8 @@ def show(report, limit):
     print("一致率: %s（阈值 %s）"
           % ("n/a" if rate is None else "%.4f" % rate,
              report["threshold"]))
+    print("nontext 对齐: %s（家族+物理页，无序号——键不随多登/漏登漂移）"
+          % report["nontext_alignment"])
     print("units: a=%d b=%d 对齐=%d 一致=%d 并集=%d"
           % (report["units_a"], report["units_b"], report["matched"],
              report["agree"], report["union"]))
