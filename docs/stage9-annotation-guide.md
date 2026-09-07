@@ -236,6 +236,25 @@ BLOCKS = [
 
 6. 分歧仲裁 →（如改 gold）重建标注+重跑校验 → ⑥gold 冻结。
 
+### 7.2 identity resolution 辅助工具（裁决 B'/B'' 配套，只读）
+
+`scripts/stage9_identity_view.py`——只读辅助，不改 agreement 语义：
+- `plan`（操作员视图，`--json` 机器可读）：列未消解且贡献区间
+  gap>0 的歧义组（贡献区间/matched/双方成员数），按整数比较复算
+  **单独消解即可定判**标志（alone_pass = 该组取上界贡献整篇即
+  pass；alone_below = 取下界即 below_threshold），供操作员选定应
+  交解析的跨线组；整篇判定已定（不跨线）时明确提示无需 resolution；
+- `blind`（解析者视图，盲态纪律工具化）：对选定组只输出 PDF 物理页
+  +家族+双方 unit_id（阅读序）+各自前后相邻文本单元内容+需配对数
+  matched（presence 信息，填合法 pair map 所必需）；**不输出
+  gold_segment_id 与任何得分/贡献数值**。`--skeleton` 生成待填
+  pair map 骨架（`{"家族|页": []}`，填恰 matched 对
+  `[a_unit_id, b_unit_id]`、单射、仅用组内 unit_id）；
+- 两子命令均支持 `--pair-map` 代入已填部分后显示**剩余**未消解组
+  （多轮迭代：骨架逐组补齐，最终一次代入
+  `scripts/stage9_agreement.py --pair-map` 得确定一致率）。
+  退出码 0 正常 / 2 输入错误（组不存在、组已消解等）。
+
 ## 8. 校验
 
 ```bash

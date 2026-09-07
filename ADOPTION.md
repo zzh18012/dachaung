@@ -4500,3 +4500,36 @@ G④ 保持封口；**G⑤ 测量口径完成封口**（1817d3b = authoritative
 agreement 实现），第二标注人四篇（tech-03/prod-01/acad-03/
 tech-08）待交回（annotations-user/ 现仅 README+指南）；G⑥/G⑦ 按
 既定前置条件等待。本 commit 未推送，push 待下轮授权。
+
+## §八十三（2026-09-07）⑤支撑补充：identity resolution 盲态辅助工具（四轮封口后并行件）
+
+背景：G⑤ 测量口径已封口（§82，1817d3b authoritative）；第二标注人
+四篇待交回。本条为等回件期间的并行支撑件，**零改
+stage9/agreement.py**（七项禁改清单+C'' 冻结零接触），属 ⑤ 操作
+支撑先例（dea066e/8522fcf）同类的工具层补充。
+
+1. **新增 `scripts/stage9_identity_view.py`**（只读辅助，两子命令）：
+   - `plan`（操作员视图）：列未消解 gap>0 歧义组+贡献区间+matched，
+     整数比较复算"单独消解即可定判"（alone_pass：该组取上界贡献
+     整篇即 pass；alone_below：取下界即 below_threshold），供选定
+     交解析的跨线组；`--json` 机器可读；整篇判定已定时明示无需
+     resolution；
+   - `blind`（解析者视图，盲态纪律工具化）：对选定组只输出物理页+
+     家族+双方 unit_id（阅读序）+前后相邻文本单元内容+需配对数
+     matched（presence 信息）；**不输出 gold_segment_id/一致率/
+     贡献区间/判定**；`--skeleton` 生成待填 pair map 骨架；
+   - `--pair-map` 代入已填部分显示剩余未消解组（多轮迭代）。
+2. **测试**：tests/test_stage9_identity_view.py 9 个——alone 标志
+   手算锁死（1×2 例 [5/7,6/7]：alone_pass 与 alone_below 同真）、
+   退化组排除、盲态契约（输出含 unit_id/组键/邻文/matched，禁
+   gold_segment 值与得分子串）、--groups 选择+骨架形状、迭代排除
+   已消解组+显式重选 rc 2、邻文证据、--out 落盘、输入错误 rc 2
+   （doc_id 不一致/文件不存在/组名不存在/非法 pair map）。
+3. **真实数据冒烟**：tech-03 自比对 plan → decision=pass、
+   open=0（81 个歧义组全部 gap=0 退化，正确排除）；四篇 claude-
+   draft 自比对 agreement 全 pass（tech-03 2256 units 81 组 /
+   prod-01 3274 units 0 组 / acad-03 336 units 0 组 / tech-08
+   906 units 14 组；耗时 ≤0.2s/篇）——预演结论：真实双标注回来
+   后可能需 resolution 的组为几十量级，工作量可控。
+4. 指南 §7.2 同步（工具用法与盲态边界）；本条随工具同 commit。
+   **未推送**（连同 §82 的 565c075，push 待下轮授权）。
