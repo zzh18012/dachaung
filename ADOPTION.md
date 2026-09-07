@@ -4434,3 +4434,69 @@ G④ 冻结零改动；G⑤ 第二标注继续（正式 agreement 前本 B-fix �
 indeterminate 非新增停机条件）；G⑥ 须等四篇 bounded agreement 可判定
 +必要 identity resolution/仲裁全部收敛后申请；G⑦ 预注册有效（87e640d
 版 authoritative），真实 system-side max_chars 保持零运行。
+
+## §八十二（2026-09-07）四轮裁决登记：B''/C''/push 三项正式封口追认——G⑤ 测量口径封口
+
+裁决来源：GPT-5.6 Sol（用户中转），对 §81 回执简报
+（outputs/gpt_brief_batch26_bfix.txt）的审阅结论：**三项全部正式
+封口，无需返工，不产生新停机条件**。本条为纯台账登记（无代码改动）。
+
+1. **B'' 正式追认（G⑤ 测量口径封口）**：以 commit
+   `1817d3b86a2170771467ee152bbf799d793fc7bb` 为当前 G⑤
+   authoritative agreement 实现，正式追认
+   nontext_alignment = "v3-page-family-bounded"（五项修正全符
+   三轮裁决）。GPT 重点复核两处均通过：
+   - **canonical tie 情形**：canonical signature 相等 ⇒ key
+     sequence 本身相等 ⇒ 不产生需另行裁决的 score-order 自由度；
+   - **pair-map 不改分母**：只解决 identity correspondence，不
+     改 presence/segment/kind/任何标注判断；size=matched 的合法
+     单射约束 ⇒ 无法经 pair-map 改写分母。
+   - 有理阈值判定（0.85=17/20 整数比较）= 比原实现更严格的
+     **实现**，不是阈值变化；报告字段语义（decision 三值/
+     requires_action/严格兼容 below_threshold）与 CLI rc 0/1/2
+     均冻结。
+2. **七项禁改清单（B'' 封口配套纪律）**：自本裁决起，改动下列
+   任一项须在正式 agreement 运行前**重新披露并裁决**，不得作为
+   普通维护静默修改：
+   ① nontext ambiguity 定义；② bounded 上下界算法；
+   ③ pair-map validity；④ union/matched 分母；⑤ 0.85 阈值；
+   ⑥ decision 判定；⑦ authoritative score 的 A/B symmetry。
+3. **C'' 登记确认并冻结口径**：
+   - 87e640d 版 preregistration JSON 字节 = G⑦ authoritative
+     prereg，**此后该文件字节不再修改**；若发现真正影响选优规则
+     或 provenance 语义的 bug，先披露再裁决，**不得更新同一
+     prereg 后继续运行**；
+   - selection rules 最早形成于 9985c2a、provenance guard 完成
+     于 87e640d；G⑥ 实际 gold_digest 不写回 prereg JSON；G⑦
+     由命令参数/冻结凭证提供 gold_revision + gold_digest；
+   - G⑦ 报告至少绑定 manifest_sha256 / gold_revision /
+     gold_digest / preregistration_sha256 /
+     implementation_commit；14-dev dev_annotation_hashes 继续
+     作为逐文件审计证据。
+4. **push 正式追认**：8c077af..a2a2439（3 commits）+
+   a2a2439..1817d3b（1 个预授权 B-fix commit）均在授权边界内
+   （四步机械核验完整、无 force/amend/rebase、B-fix 未夹带
+   manifest/gold/标注格式变化、8c76e63 保留审计链无历史改写）；
+   local/remote HEAD = `1817d3b86a2170771467ee152bbf799d793fc7bb`。
+5. **非阻塞台账口径提醒（GPT 指出，登记采纳）**：G 序列七步
+   正式名称 = 补齐 → 一级标注+校验 → --full-set 终检 →
+   manifest/split freeze →（⑤双标注+仲裁 → ⑥gold freeze →
+   ⑦选优）。§81 前简报 §0 曾把 G①–④ 概括为"采集/manifest 草案/
+   标注/冻结"，与已裁定名称不一致——不影响任何执行结果，历史
+   commit 不改；**后续简报一律使用正式七步名称**，避免两套
+   G①–③ 编号解释。
+6. **下一阶段（裁决指引）**：
+   - G⑤ 可用 1817d3b 版工具正式运行，判定流程四分支：lower
+     ≥0.85 → 直接通过；upper<0.85 → 进入既定仲裁；lower<0.85
+     ≤upper → 盲态 identity resolution（pair-map 保存+hash）
+     后得确定结果；<0.85 且仲裁不收敛 → 既定停机条件；
+   - **G⑥ 申请材料清单**：四篇最终 decision/agreement + 发生过
+     的 pair-map hash + 仲裁修改情况及重新 validator 结果 +
+     最终 24-core gold_revision + gold_digest。
+
+### 阶段位置
+
+G④ 保持封口；**G⑤ 测量口径完成封口**（1817d3b = authoritative
+agreement 实现），第二标注人四篇（tech-03/prod-01/acad-03/
+tech-08）待交回（annotations-user/ 现仅 README+指南）；G⑥/G⑦ 按
+既定前置条件等待。本 commit 未推送，push 待下轮授权。
