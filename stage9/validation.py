@@ -198,18 +198,39 @@ def validate_annotation(data, manifest_index):
                     not all(isinstance(x, str) for x in linked):
                 f("bad_type", uid + ".linked_nontext 须为字符串列表")
 
-    # linked_nontext 引用闭合（两遍：先收集全部 nontext_ref）
+    # linked_nontext 引用闭合（两遍：先收集全部 nontext_ref）。
+    # 七轮裁决 B1 确定性约束（2026-09-07）：同一 text unit 禁重复 ref；
+    # 多 ref 必须按目标 nontext unit 在 units 列表（阅读序）中的顺序
+    # 排列——语义相同的关系集合不得因填写顺序不同产生随机 gold hash。
     all_nontext_refs = {u.get("nontext_ref") for u in units
                         if isinstance(u, dict)
                         and u.get("kind") == "nontext"}
+    ref_reading_order = {}
+    for i, u in enumerate(units):
+        if isinstance(u, dict) and u.get("kind") == "nontext" \
+                and isinstance(u.get("nontext_ref"), str):
+            ref_reading_order[u["nontext_ref"]] = i
     for unit in units:
         if not isinstance(unit, dict):
             continue
-        for ref in unit.get("linked_nontext") or []:
+        linked = unit.get("linked_nontext")
+        if not isinstance(linked, list):
+            continue  # 非 list 已在第一遍报 bad_type
+        uid = unit.get("unit_id", "?")
+        if len(set(linked)) != len(linked):
+            f("duplicate_linked_ref",
+              "%s linked_nontext 存在重复 ref: %r" % (uid, linked))
+        positions = [ref_reading_order[r] for r in linked
+                     if r in ref_reading_order]
+        if positions != sorted(positions):
+            f("linked_ref_order",
+              "%s linked_nontext 未按目标 nontext unit 的阅读序排列: %r"
+              % (uid, linked))
+        for ref in linked:
             if ref not in all_nontext_refs:
                 f("unknown_nontext_ref",
                   "%s linked_nontext 引用不存在的 nontext_ref=%s"
-                  % (unit.get("unit_id", "?"), ref))
+                  % (uid, ref))
 
     # 引用闭合另一方向：segment 必须被至少一个 unit 引用
     referenced = {u.get("gold_segment_id") for u in units
@@ -317,6 +338,45 @@ def validate_manifest_consistency(manifest_data):
                     "%s.%s=%d 与逐篇 split 重算 %d 不一致"
                     % (where, key, value, got)))
     return fails
+
+
+def compute_link_stats(data):
+    """七轮裁决 B3（2026-09-07）：linked_nontext 计算型披露统计。
+
+    从标注实际字节现场重算（不信任任何手填 _meta）：
+    - linked_pairs = 去重后 text→nontext gold 边数（(unit, ref) 对）；
+    - linked_objects = 有 ≥1 入边的 unique nontext 对象数；
+    - anchorless_count = 无入边对象数；
+    - nontext_total = nontext 对象总数。
+    恒等式 linked_objects + anchorless_count = nontext_total 由构造
+    保证（两者按同一出现次数口径计数）。纯诊断披露，无通过阈值——
+    anchorless_count > 0 完全合法，不构成校验失败。
+    """
+    units = data.get("units") if isinstance(data, dict) else None
+    if not isinstance(units, list):
+        return {"linked_pairs": 0, "linked_objects": 0,
+                "anchorless_count": 0, "nontext_total": 0}
+    nontext_refs = [u["nontext_ref"] for u in units
+                    if isinstance(u, dict) and u.get("kind") == "nontext"
+                    and isinstance(u.get("nontext_ref"), str)]
+    linked_refs = set()
+    pairs = 0
+    for u in units:
+        if not isinstance(u, dict):
+            continue
+        linked = u.get("linked_nontext")
+        if not isinstance(linked, list):
+            continue
+        uniq = [r for r in linked if isinstance(r, str)]
+        pairs += len(set(uniq))
+        linked_refs.update(uniq)
+    linked_objects = sum(1 for r in nontext_refs if r in linked_refs)
+    return {
+        "linked_pairs": pairs,
+        "linked_objects": linked_objects,
+        "anchorless_count": len(nontext_refs) - linked_objects,
+        "nontext_total": len(nontext_refs),
+    }
 
 
 def load_json(path):

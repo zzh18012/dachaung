@@ -403,3 +403,70 @@ def test_cli_exit_codes(tmp_path):
 def _manifest_data_with_annotation_doc():
     return {"docs": [{"doc_id": "acad-01-sentencebert",
                       "domain": "academic", "split": "dev"}]}
+
+
+def _two_nontext_annotation():
+    """两 nontext 对象版夹具（关联边确定性检查用，七轮裁决 B1）。"""
+    data = _base_annotation()
+    data["units"].append(
+        {"unit_id": "u0005", "kind": "nontext", "page": 2,
+         "body_index": None, "char_span": None, "norm_text_hash": None,
+         "nontext_ref": "img:figure2", "gold_segment_id": "g02",
+         "hard_boundary_before": False})
+    return data
+
+
+def test_linked_duplicate_ref_fails():
+    data = _two_nontext_annotation()
+    data["units"][1]["linked_nontext"] = ["img:figure1", "img:figure1"]
+    assert "duplicate_linked_ref" in [f.code for f in _validate(data)]
+
+
+def test_linked_ref_order_fails_and_correct_order_passes():
+    data = _two_nontext_annotation()
+    data["units"][1]["linked_nontext"] = ["img:figure2", "img:figure1"]
+    assert "linked_ref_order" in [f.code for f in _validate(data)]
+    data["units"][1]["linked_nontext"] = ["img:figure1", "img:figure2"]
+    assert _validate(data) == []
+
+
+def test_compute_link_stats_identity_and_values():
+    from stage9.validation import compute_link_stats
+    data = _two_nontext_annotation()
+    data["units"][1]["linked_nontext"] = ["img:figure1"]
+    data["units"][2]["linked_nontext"] = ["img:figure1", "img:figure2"]
+    assert compute_link_stats(data) == {
+        "linked_pairs": 3, "linked_objects": 2,
+        "anchorless_count": 0, "nontext_total": 2}
+    partial = _two_nontext_annotation()
+    partial["units"][1]["linked_nontext"] = ["img:figure1"]
+    stats = compute_link_stats(partial)
+    assert stats["anchorless_count"] == 1
+    assert stats["linked_objects"] + stats["anchorless_count"] \
+        == stats["nontext_total"]
+    assert compute_link_stats({}) == {"linked_pairs": 0,
+                                      "linked_objects": 0,
+                                      "anchorless_count": 0,
+                                      "nontext_total": 0}
+
+
+def test_cli_full_set_link_stats(tmp_path):
+    script = ROOT / "scripts" / "stage9_validate_annotations.py"
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps(_manifest_data_with_annotation_doc()),
+                        encoding="utf-8")
+    data = _two_nontext_annotation()
+    data["units"][1]["linked_nontext"] = ["img:figure1"]
+    good = tmp_path / "good.json"
+    good.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(script), "--manifest", str(manifest),
+         "--annotations", str(good), "--full-set", "--json"],
+        capture_output=True, text=True, cwd=str(ROOT))
+    # 单文档不满足 14/4/6 分层（rc 1），但 links 统计照常输出
+    links = json.loads(result.stdout)["summary"]["links"]
+    assert links["nontext_total"] == 2
+    assert links["linked_objects"] + links["anchorless_count"] \
+        == links["nontext_total"]
+    by_doc = json.loads(result.stdout)["links_by_doc"]
+    assert by_doc["acad-01-sentencebert"]["linked_pairs"] == 1

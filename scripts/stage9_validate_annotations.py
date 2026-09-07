@@ -21,6 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from stage9.validation import (  # noqa: E402
+    compute_link_stats,
     load_json,
     validate_annotation,
     validate_manifest_consistency,
@@ -78,6 +79,7 @@ def main(argv=None):
 
     annotated = set()
     io_errors = 0
+    link_stats_by_doc = {}
     for path in files:
         try:
             data = load_json(path)
@@ -91,6 +93,8 @@ def main(argv=None):
         for fail in fails:
             failures.append({"file": str(path), "doc_id": doc_id,
                              **fail.to_json()})
+        if args.full_set:
+            link_stats_by_doc[doc_id or path.name] = compute_link_stats(data)
 
     summary = {"checked_files": len(files), "failures": len(failures),
                "io_errors": io_errors}
@@ -101,8 +105,16 @@ def main(argv=None):
             failures.append({"file": str(manifest_path), "doc_id": None,
                              **fail.to_json()})
         summary["split"] = split_summary
+        # 七轮裁决 B3：关联统计从标注字节现场重算（不信任手填 _meta），
+        # 纯披露无阈值；恒等式由 compute_link_stats 构造保证
+        summary["links"] = {
+            key: sum(d[key] for d in link_stats_by_doc.values())
+            for key in ("linked_pairs", "linked_objects",
+                        "anchorless_count", "nontext_total")}
 
     report = {"summary": summary, "failures": failures}
+    if args.full_set:
+        report["links_by_doc"] = link_stats_by_doc
     if args.report:
         out = Path(args.report)
         out.parent.mkdir(parents=True, exist_ok=True)
@@ -120,6 +132,8 @@ def main(argv=None):
         if args.full_set:
             print("split: %s" % json.dumps(
                 summary["split"], ensure_ascii=False))
+            print("links: %s" % json.dumps(
+                summary["links"], ensure_ascii=False))
 
     if io_errors:
         return 2

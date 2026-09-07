@@ -4676,3 +4676,60 @@ agreement/prereg 语义均不受影响。
    仍为 b7d006dc…/5673801 时代哈希）。
 4. 定位不变：G⑤ human spot-check rendering aid, non-authoritative
    （§86 B 追认范围内的小补丁，下轮简报披露待追认）。
+
+## §八十八（2026-09-07）七轮裁决：linked_nontext 升格 gold + push 放行
+
+裁决来源：GPT-5.6 Sol（用户中转）。动议背景：用户裁定结题需要
+"图表关联准确率"数字（项目目标句含"文本块、图像、表格及其内部
+关联"），简报 gpt_brief_batch26_linked.txt 提请。
+
+1. **A push 已执行**：`5673801..32590ee`（58798a3 sha 头 +
+   32590ee notes 渲染补丁）。四步核验通过；远端=本地=
+   `32590ee81abf62f0455d26155407bf64930bf9af`。
+2. **B1 linked_nontext 升格为 gold（修改后批准）**：schema 不 bump
+   （v1.1 既有字段正式启用）。**authoritative 语义锁定**：无类型的、
+   人类判定的 text→nontext 语义锚定边，gold 单位 =
+   (text_unit, nontext_ref)。三类锚来源：题注锚（批准）/显式引用锚
+   （批准，一句多对象多边、一对象多引用多边）/隐式锚（**修改后
+   批准**：文本语义+页面/结构关系唯一或明确确定目标才成边；
+   **proximity 可作判读证据但不得单独成为充分条件**，多候选不唯一
+   即不建边）。anchorless 合法；图内未转写文字禁虚构 text unit
+   建边。**两项确定性约束**：同一 text unit 禁重复 ref；多 ref 按
+   目标 nontext unit 阅读序排列（防随机 gold hash）；重复边必须
+   校验失败、禁评测期静默去重。**gold independence 追认强化**：
+   正则只产生候选/每条边人工对照 PDF/禁读 parser relations/禁按
+   系统预测调边/禁为未来指标调范围。
+3. **B2 时点（批准）**：立即执行，与 G⑤ 并行（1817d3b agreement
+   不读 linked_nontext，⑤ 无扰动）。**硬边界**：补链 pass 只改
+   linked_nontext + 非判定性审计说明；发现原 gold 缺陷停链单独
+   披露另裁，禁顺手修；relation 标注与 segmentation 修订严格分流。
+4. **B3 --full-set 关联统计（批准）**：从标注字节现场重算（不信
+   手填 _meta）：linked_pairs（去重边数）/linked_objects/
+   anchorless_count/nontext_total，恒等式
+   linked_objects + anchorless_count = nontext_total；纯诊断无
+   阈值（anchorless > 0 合法不 fail）。validator 继续保证 ref 存在/
+   唯一解析/同 unit 无重复/阅读序正确——annotation 维护，不触碰
+   G④ manifest freeze。
+5. **G⑥ 新增前置项**：补链完成 + full-set/validator 通过 + 两篇
+   relation 专项独立抽查（≥2 core/≥2 domain/须有 linked pairs；
+   逐条核全部 positive 边 + 每篇 ≥10 anchorless 查漏锚，不足全查；
+   默认复用 prod-05+tech-01；segmentation 抽查先完成的用补链后
+   最终字节只复核 relation 部分）。
+6. **未来指标边界锁定**：本 gold 无类型边——未来 P/R/F1 只能称
+   untyped text↔nontext relation edge P/R/F1，不得声称 caption/
+   explicit-reference/implicit-anchor accuracy；系统 typed relations
+   须归一化为"是否存在边"再对比或另申 typed gold 扩展；禁把
+   relation type 塞进 linked_nontext。
+7. **实现落地（本 commit）**：stage9/validation.py 新失败码
+   duplicate_linked_ref / linked_ref_order（第二遍引用闭合扩展，
+   阅读序映射 ref→units 序）+ compute_link_stats（B3 四指标，
+   恒等式构造保证）；CLI --full-set 输出 summary.links +
+   links_by_doc；scripts/stage9_link_apply.py 施加工具（LINKS 表
+   exec 载入；只改 linked_nontext 的 B2 边界守卫=剥离后深比较，
+   越界拒绝写盘；nontext unit 拒收；施加后就地校验失败不写盘；
+   序列化保持原文件 CRLF/LF 与结尾换行）。测试 +9（校验 4 +
+   施加 7 中的 6 新场景），回归全绿；live full-set 25 文件 0 失败，
+   links 全 0（nontext_total=986：613 为 prod-06/09 入库前旧数，
+   现含 prod-06 254 + prod-09 119）。指南 §4 语义/§7.4 新节/§8
+   失败码同步。**补链 pass 本体（24 篇逐篇判读）待续——下批
+   commit 逐篇推进**。本 commit 未推送，随下轮授权。

@@ -103,6 +103,27 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
 - `gold_segment_id`：每个 unit（含 nontext）必须引用存在的 segment；
   每个 segment 必须被 ≥1 unit 引用（双向闭合）；
 - `linked_nontext`：可省略；出现则每项必须是文件内存在的 nontext_ref。
+  **关联 gold 语义（七轮裁决 B1，2026-09-07 升格为正式结题指标
+  gold）**：linked_nontext 表示**无类型的、人类判定的 text→nontext
+  语义锚定边**，gold 单位 = `(text_unit, nontext_ref)`——不是
+  "有 caption"之类的 relation type。锚来源三类：①题注锚——题注
+  作为独立 text unit 链接其明确描述的图/表；②显式引用锚——
+  "见图 X/如表 3 所示"等明确指称成边（一句引多对象分多条边、一
+  对象被多处引用允许多边）；③隐式锚——仅当文本语义+页面/结构
+  关系能**唯一或明确确定**目标对象时成边（**proximity 可作判读
+  证据，但不得单独成为 gold link 的充分条件**；多候选无法唯一
+  确定即不建边）。装饰性/图标等确实无文本锚的对象允许保持
+  anchorless；图内未转写进 stream 的文字不得虚构 text unit 建边。
+  **确定性约束**：同一 text unit 禁重复 ref；多 ref 必须按目标
+  nontext unit 在 units 列表（阅读序）中的顺序排列——语义相同的
+  关系集合不得因填写顺序不同产生随机 gold hash（校验码
+  `duplicate_linked_ref` / `linked_ref_order`；重复边必须校验失败，
+  禁评测期静默去重）。**gold independence**（约束级纪律）：正则/
+  检索脚本只能产生候选；每条边必须人工对照 PDF 核对；禁止读取
+  本系统 parser 的 relations；禁止按当前系统预测结果决定加/删边；
+  禁止为提高未来关联指标调整 gold 范围。施加工具
+  `scripts/stage9_link_apply.py`（只改 linked_nontext，越界拒绝
+  写盘；links 判读表存 samples/private 层）。
 
 ## 5. gold_segment 判定（语义段 = 主题内聚的知识单元）
 
@@ -315,6 +336,35 @@ G⑥ 封口顺序（不得倒置）：四篇判定/必要 resolution → 必要�
 gold_digest → 写 credential → 计算 credential SHA → 外部台账
 登记 credential SHA。
 
+### 7.4 关联 gold 补链与 G⑥ 新增前置项（七轮裁决，2026-09-07）
+
+- **执行边界（B2 硬边界）**：补链 pass 只能修改 linked_nontext 及
+  必要的非判定性审计说明（notes），不得顺手修改
+  text/span/kind/gold_segment/hard_boundary/nontext_ref 或增删
+  unit。补链中发现原一级标注真实缺陷（漏图表/错切句/segment 错误）
+  时**不得顺手修**：停该文档补链 → 单独披露原 gold defect → 另行
+  裁决是否允许结构修订（四篇双标注文档尤其如此——结构修订可能
+  影响进行中的 G⑤ agreement）。relation 标注与 segmentation 修订
+  严格分流。
+- **G⑥ 新增前置项**（在原 ⑤ 四篇收敛之上）：
+  1. 24 core 关联补链完成；
+  2. --full-set / validator 通过（含 B1 确定性约束与新关联统计）；
+  3. **relation 专项独立抽查通过**：≥2 篇 core、≥2 个 domain、所选
+     文档须实际存在 linked pairs——逐条核对两篇全部 positive
+     linked pairs + 每篇再查 ≥10 个 anchorless nontext 对象（不足
+     10 全查）确认无明显漏锚。默认复用用户正抽查的
+     prod-05 + tech-01（product + tech，两篇补链后有边即可）；
+     若用户的 segmentation 抽查先于补链完成，relation 部分用补链
+     后最终字节做一次针对性复核即可，无须重做切分抽查。
+- **未来指标边界（本轮锁住）**：linked_nontext 是无类型边 gold。
+  将来基于它计算的 P/R/F1 只能称为 **untyped text↔nontext
+  relation edge precision/recall/F1**，不得声称 caption /
+  explicit-reference / implicit-anchor accuracy（gold 未保存
+  relation type）。系统侧 typed relations（has_caption /
+  table_has_caption）届时须先归一化为"是否存在 text→nontext 边"
+  再对比，或另行申请 typed-relation gold 扩展；不得为实现便利把
+  relation type 塞进 linked_nontext。
+
 ## 8. 校验
 
 ```bash
@@ -329,12 +379,16 @@ gold_digest → 写 credential → 计算 credential SHA → 外部台账
 `locator_format_mismatch` `span_out_of_range` `span_overlap` `span_gap`
 `hash_mismatch` `preview_mismatch` `span_not_null_nontext`
 `bad_nontext_ref` `duplicate_nontext_ref` `unknown_nontext_ref`
+`duplicate_linked_ref` `linked_ref_order`（七轮裁决 B1 确定性约束）
 `unknown_segment` `unreferenced_segment` `duplicate_segment_id`
 `missing_field` `doc_not_in_manifest`；manifest 一致性检查（D1，
 2026-09-06 裁决轮4）始终执行，追加 `manifest_consistency_failure`；
 `--full-set` 追加
 `split_count_mismatch` `split_domain_coverage` `missing_annotation`
-（冻结终检用）。
+（冻结终检用）+ **关联统计披露**（七轮裁决 B3，从标注字节现场重算，
+纯诊断无阈值）：`linked_pairs`（去重边数）/`linked_objects`/
+`anchorless_count`/`nontext_total`，恒等式
+linked_objects + anchorless_count = nontext_total 由构造保证。
 
 ## 9. ARI 分母、N/A 与失败计数规则（封口裁决补录 B）
 
