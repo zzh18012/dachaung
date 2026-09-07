@@ -50,8 +50,12 @@ def _ann():
 
 
 def run(*args):
+    # ⇈/⇉ 等字符超出 cp936——子进程强制 UTF-8 输出，父进程同编码解码
+    import os
+    env = dict(os.environ, PYTHONIOENCODING="utf-8")
     return subprocess.run([sys.executable, str(SCRIPT), *args],
-                          capture_output=True, text=True, cwd=str(ROOT))
+                          capture_output=True, text=True, cwd=str(ROOT),
+                          encoding="utf-8", env=env)
 
 
 def test_render_reading_order_view(tmp_path):
@@ -102,6 +106,36 @@ def test_render_body_index_locator_for_docx(tmp_path):
     assert r.returncode == 0
     assert "u0002 b3 sentence First sentence." in r.stdout
     assert "-- 第" not in r.stdout  # 页未知不插分隔线
+
+
+def test_render_links_section(tmp_path):
+    ann = _ann()
+    # u0003 锚定 img:fig-1；再造一个 anchorless nontext
+    ann["units"][2]["linked_nontext"] = ["img:fig-1"]
+    pos = 0
+    for u in ann["units"]:
+        if u.get("char_span"):
+            u["char_span"] = [pos, pos + (u["char_span"][1] -
+                                          u["char_span"][0])]
+            pos = u["char_span"][1] + 1
+    extra = {"unit_id": "u0006", "kind": "nontext", "page": 2,
+             "body_index": None, "char_span": None,
+             "nontext_ref": "img:logo", "gold_segment_id": "g01",
+             "hard_boundary_before": False}
+    ann["units"].append(extra)
+    p = tmp_path / "ann.json"
+    p.write_text(json.dumps(ann, ensure_ascii=False), encoding="utf-8")
+    r = run("--annotation", str(p))
+    assert r.returncode == 0, r.stdout + r.stderr
+    out = r.stdout
+    # 头部 linked 统计（与 validator compute_link_stats 同源）
+    assert "关联边统计：linked_pairs=1 linked_objects=1 anchorless=1 " \
+           "nontext_total=2" in out
+    # 关联边清单：锚句行 + anchorless 行
+    assert "img:fig-1 ⇈ u0003 1 Second sentence." in out
+    assert "img:logo ⇈ （anchorless，无锚句）" in out
+    # 阅读序明细中锚句带 ⇉ 标记
+    assert "◆ u0003 p1 sentence Second sentence. ⇉ img:fig-1" in out
 
 
 def test_input_errors_rc2(tmp_path):

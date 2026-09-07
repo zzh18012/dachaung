@@ -4,7 +4,9 @@
 用途：指南 §7 用户抽查义务的支撑件——把标注 JSON 渲染为人类可读
 视图（按 gold_segment 分组、逐 unit 列页码/kind/硬边界标记/完整
 文本，页切换处插分隔线；nontext 显示 nontext_ref），供用户对照
-PDF 原文抽查切分/段归属/图 表登记质量。工具只渲染标注内容，
+PDF 原文抽查切分/段归属/图 表登记质量。七轮裁决后另渲染关联边
+（头部 linked 统计 + 正文锚句 ⇉ 标记 + 逐对象锚句清单/anchorless
+标记），支撑指南 §7.4 relation 专项抽查。工具只渲染标注内容，
 不做任何判定，不改任何冻结物（与 identity_view 同类支撑件）。
 
 用法（项目 venv python）：
@@ -20,6 +22,10 @@ import hashlib
 import json
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from stage9.validation import compute_link_stats  # noqa: E402
 
 
 def render(ann, annotation_sha256):
@@ -43,6 +49,32 @@ def render(ann, annotation_sha256):
         lines.append("—— 标注 notes（处理口径——排除项/判定依据）——")
         for para in str(ann["notes"]).split("\n"):
             lines.append("  %s" % para)
+    stats = compute_link_stats(ann)
+    lines.append("关联边统计：linked_pairs=%s linked_objects=%s "
+                 "anchorless=%s nontext_total=%s"
+                 % (stats["linked_pairs"], stats["linked_objects"],
+                    stats["anchorless_count"], stats["nontext_total"]))
+    lines.append("—— 关联边清单（relation 抽查用；⇈=被这些锚句指向）——")
+    incoming = {}
+    for u in units:
+        for ref in (u.get("linked_nontext") or []):
+            incoming.setdefault(ref, []).append(u)
+    for u in units:
+        if u.get("kind") != "nontext":
+            continue
+        ref = u.get("nontext_ref")
+        anchors = incoming.get(ref, [])
+        if anchors:
+            for a in anchors:
+                span = a.get("char_span") or [0, 0]
+                preview = ann.get("stream", "")[span[0]:span[1]].strip()
+                lines.append("  %s ⇈ %s %s %s"
+                             % (ref, a.get("unit_id"), a.get("page"),
+                                preview[:40]))
+        else:
+            lines.append("  %s ⇈ （anchorless，无锚句）" % ref)
+    if not any(u.get("kind") == "nontext" for u in units):
+        lines.append("  （无 nontext 对象）")
     lines.append("—— segments 一览 ——")
     seg_order = []
     for u in units:
@@ -83,9 +115,11 @@ def render(ann, annotation_sha256):
                 loc = "p%s" % u.get("page")
             else:
                 loc = "b%s" % u.get("body_index")
-            lines.append("%s%s %s %s %s"
+            lines.append("%s%s %s %s %s%s"
                          % (hard, u.get("unit_id"), loc,
-                            u.get("kind"), text))
+                            u.get("kind"), text,
+                            (" ⇉ %s" % ", ".join(u["linked_nontext"]))
+                            if u.get("linked_nontext") else ""))
     lines.append("")
     lines.append("（渲染工具：scripts/stage9_annotation_report.py；"
                  "仅呈现标注内容，判定以 validator/agreement 为准）")
