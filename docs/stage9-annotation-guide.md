@@ -160,7 +160,9 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
   停机条件**（区间跨线经 identity resolution 消解后同规）；
 - 分歧清单记录于该文档标注文件的 `notes`（或仲裁记录文件），协商
   仲裁结果为准；仲裁修改 gold 后须重跑 validator；其余 20 篇用户
-  抽查 ≥2 篇。
+  抽查 ≥2 篇（可用 `scripts/stage9_annotation_report.py` 把标注
+  JSON 渲染为人类可读视图对照 PDF——只读支撑件，仅呈现标注内容，
+  判定仍以 validator/agreement 为准；结论记入该文档标注 `notes`）。
 
 ### 7.1 操作流程（第二标注人）
 

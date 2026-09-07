@@ -4592,3 +4592,32 @@ agreement/prereg 语义均不受影响。
    （1817d3b authoritative；区间+decision 为合法终态）；⑥ 格式
    已预裁定不得签发；⑦ 零真实运行。本 commit（§84+指南 §7.2/
    §7.3 同步）未推送，随下轮授权。
+
+## §八十五（2026-09-07）⑤支撑补充：用户抽查渲染工具 + 冻结层完整性复核（全绿）
+
+背景：等第二标注人交回件期间的并行件（用户指示按 GPT 已追认的
+支持工具模式推进：只读、零改冻结物、测试+指南+台账同步、下轮
+简报披露追认）。与 identity_view（§83）同类。
+
+1. **冻结层完整性复核（纯只读，全绿）**：manifest.json SHA-256 =
+   51d3d400…（与 §七十五冻结凭证逐位一致）；27 个语料文件逐一
+   重算 sha256 与 manifest 登记值全部一致（零漂移）；标注层
+   --full-set 校验 25 文件 0 失败，split=dev14/comp4/holdout6。
+   等待期无任何字节被动过。
+2. **新增 `scripts/stage9_annotation_report.py`**（用户抽查支撑）：
+   把标注 JSON 渲染为人类可读视图——头部统计（stream 长度/units/
+   segments 计数）+ segments 一览（按首次出现序）+ 阅读序明细
+   （按 gold_segment 分组、逐 unit 硬边界标记 ◆/页码或 body_index
+   定位/kind/完整文本、页切换处插分隔线、nontext 显示 nontext_ref）。
+   --out 写 UTF-8 文件（默认 stdout）；rc 0/2。工具只呈现标注
+   内容不做判定。指南 §7 抽查条目同步注记。
+3. **测试**：tests/test_stage9_annotation_report.py 4 个——阅读序
+   视图（分组/硬边界/页分隔线/nontext ref）、--out 落盘、DOCX
+   body_index 定位（页未知不插分隔线，修两处实现缺陷：loc 格式
+   串字面 p 拼接错、None 页打印"第 None 页"）、输入错误 rc 2。
+4. **默认抽查件已渲染**（outputs/，gitignored）：
+   outputs/spotcheck_prod-05.txt（135 行，82 units/12 segs）与
+   outputs/spotcheck_tech-01.txt（1156 行）——供用户对照 PDF
+   完成 §7 抽查 ≥2 篇义务；抽查结论由用户记入对应标注 notes。
+5. 本条随工具同 commit；**未推送**（连同 §84 f9ebdfd，随下轮
+   授权）。
