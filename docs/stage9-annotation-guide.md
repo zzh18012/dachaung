@@ -130,23 +130,32 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
   草案）；
 - 比对口径：unit 级（切分一致 + gold_segment 一致）；
 - nontext 对齐键 = 家族(img/tab)+物理页（`v3-page-family-bounded`，
-  2026-09-07 裁决 B/B' 两轮落定）：**不含任何按标注自身 nontext
+  2026-09-07 裁决 B/B'/B'' 三轮落定）：**不含任何按标注自身 nontext
   出现顺序的编号**（序号须来自共同源注册表且不随多登/漏登漂移——
   而机械注册表（page.images/find_tables）经实证无法枚举语义图形：
   栅格碎片与语义图 1:N、矢量图 0:N、FTAB 假阳性大量存在，source
   ordinal 不可表达，故取零编号的页族粒度）。计数层精确：多登/漏登
   只影响该对象自身的并集计数（matched/union 不随组内配对漂移）。
-  同页同族**双方均多对象**的组（歧义组）内"哪个 A 对象与哪个 B
-  对象是同一视觉语义对象"无观测依据——结构位置配对仅为诊断；该组
-  一致贡献按**所有合法一对一配对**取区间 [lower, upper]（各配对
-  贡献相同时自然退化为单值），全篇合成 agreement_lower /
-  agreement_upper。判定：lower≥0.85 过；upper<0.85 照走仲裁；
-  区间跨 0.85 不可判定 → 仅对跨线组做 **identity resolution**（解析
-  者只看 PDF 页面+双方标注的结构位置、对 gold_segment 与得分盲态；
-  只决定"哪个是同一视觉语义对象"，不得改任一标注人的切分/kind/
-  segment；pair map 单独保存并记录 sha256，经 CLI `--pair-map` 代入
-  后计算确定最终一致率）。单侧 ≤1 对象的组不属歧义组（结构配对
-  照算、差异逐条可见）；并集分母与 0.85 阈值不变；
+  同页同族 **m×n>1** 的组（歧义组——双方均有对象且对应不唯一，
+  **含 1×N/N×1**；1×1 唯一配对、单侧 0 对象无歧义）内"哪个 A
+  对象与哪个 B 对象是同一视觉语义对象"无观测依据——结构位置配对
+  仅为诊断；该组一致贡献按**所有合法一对一配对**取区间
+  [lower, upper]（各配对贡献相同时自然退化为单值），全篇合成
+  agreement_lower / agreement_upper；
+- 判定（整数/有理数比较，阈值固定 17/20，不经二进制 float 边界）：
+  20×lower ≥ 17×union → `pass`；20×upper < 17×union →
+  `below_threshold`（照走仲裁）；其间 → `indeterminate`（阈值暂不
+  可判定，非新增停机条件）→ 仅对跨线组做 **identity resolution**
+  （解析者只看 PDF 页面+双方标注的结构位置、对 gold_segment 与得
+  分盲态；只决定"哪个是同一视觉语义对象"，不得改任一标注人的
+  切分/kind/segment；pair map 单独保存并记录 sha256，经 CLI
+  `--pair-map` 代入后计算确定最终一致率）；
+- 报告字段语义：`decision` = pass/below_threshold/indeterminate；
+  `requires_action` = below_threshold ∪ indeterminate（CLI rc 1）；
+  `below_threshold` 为严格兼容字段（= decision == below_threshold，
+  不再兼指 indeterminate）；**对称性契约**：交换两份标注的 A/B
+  角色，agreement_lower/agreement_upper/decision（及 matched/
+  union/agree）必须逐字段相同；
 - 一致率 = 一致 unit 数 / 双方 unit 并集数；**<85% 且仲裁不收敛 =
   停机条件**（区间跨线经 identity resolution 消解后同规）；
 - 分歧清单记录于该文档标注文件的 `notes`（或仲裁记录文件），协商

@@ -152,6 +152,13 @@ def test_nontext_missed_image_costs_itself_only():
     assert r["matched"] == 1 and r["agree"] == 1
     assert r["union"] == 2
     assert len(r["only_a"]) == 1 and r["only_a"][0]["kind"] == "nontext"
+    # B''：2×1 也是歧义组（唯一对象可能对应两个中任一个）；本例各
+    # 配对贡献相同（同 seg）→ 区间退化 [1,1]
+    assert r["ambiguous_group_count"] == 1
+    assert (r["ambiguous_groups"][0]["contribution_lower"],
+            r["ambiguous_groups"][0]["contribution_upper"]) == (1, 1)
+    assert r["agreement_lower"] == r["agreement_upper"] \
+        == pytest.approx(0.5)
 
 
 def test_nontext_page_leading_miss_pollutes_nothing():
@@ -220,9 +227,10 @@ def test_report_records_nontext_alignment_version():
     a = _ann("d", [("n", "img:fig-1", "g01", False)])
     r = compute_agreement(a, a)
     assert r["nontext_alignment"] == "v3-page-family-bounded"
-    assert r["ambiguous_group_count"] == 0  # 单对象组不属歧义组
+    assert r["ambiguous_group_count"] == 0  # 1×1 唯一配对不属歧义组
     assert r["agreement_lower"] == r["agreement_upper"] == 1.0
     assert r["decision"] == "pass"
+    assert r["requires_action"] is False and r["below_threshold"] is False
 
 
 def test_nontext_key_is_per_page_family():
@@ -266,7 +274,8 @@ def test_ambiguous_group_interval_hand_computed():
     assert r["agreement_lower"] == pytest.approx(0.0)
     assert r["agreement_upper"] == pytest.approx(1.0)
     assert r["decision"] == "indeterminate"
-    assert r["below_threshold"] is True  # 不可判定=需处置（CLI rc 1）
+    assert r["requires_action"] is True  # 需处置（CLI rc 1）
+    assert r["below_threshold"] is False  # 严格语义：尚未确定低于
     # 结构配对是合法配对之一 → 诊断值必落在区间内
     assert r["agreement_lower"] <= r["agreement"] <= r["agreement_upper"]
 
@@ -286,17 +295,115 @@ def test_ambiguous_group_degenerate_interval():
     assert r["below_threshold"] is False
 
 
-def test_single_side_multi_not_ambiguous():
-    # 单侧多对象（另一侧 ≤1）不属歧义组（裁决"≤1 对象正常算"）：
-    # 结构配对照算、出确定值（本例配上的对 seg 不同 → 0.0）
+def test_single_side_multi_is_ambiguous():
+    # B''：1×N/N×1 同样身份歧义——唯一对象可能对应对侧任一对象；
+    # 本例正配 g02 全等、错配 g01 不等 → 区间 [0,1]/union=2
     a = _ann("d", [("n", "img:a", "g01", False),
                    ("n", "img:b", "g02", False)])
     b = _ann("d", [("n", "img:x", "g02", False)])
     r = compute_agreement(a, b)
-    assert r["ambiguous_group_count"] == 0
-    assert r["agreement_lower"] == r["agreement_upper"] == pytest.approx(0.0)
-    assert r["decision"] == "below_threshold"
-    assert len(r["segment_diff"]) == 1
+    assert r["matched"] == 1 and r["union"] == 2
+    assert r["ambiguous_group_count"] == 1
+    g = r["ambiguous_groups"][0]
+    assert (g["side_a"], g["side_b"], g["matched"]) == (2, 1, 1)
+    assert (g["contribution_lower"], g["contribution_upper"]) == (0, 1)
+    assert r["agree_lower"] == 0 and r["agree_upper"] == 1
+    assert r["agreement_lower"] == pytest.approx(0.0)
+    assert r["agreement_upper"] == pytest.approx(0.5)
+    assert r["decision"] == "below_threshold"  # 上界 0.5 < 0.85
+    assert r["requires_action"] is True
+    assert r["below_threshold"] is True
+    assert len(r["segment_diff"]) == 1  # 结构配对诊断照出
+
+
+def test_one_to_many_ambiguous_and_resolvable():
+    # 1×2 + 5 个固定文本对：[5/7, 6/7] 跨 0.85 → indeterminate；
+    # pair map 允许 1×N 组（B''）；正配 → 6/7 pass，错配 → 5/7 below
+    items_a = [("s", "S%d." % i, "g01", False) for i in range(5)]
+    items_a.append(("n", "img:only", "g01", False))
+    items_b = [("s", "S%d." % i, "g01", False) for i in range(5)]
+    items_b += [("n", "img:1", "g01", False), ("n", "img:2", "g02", False)]
+    a = _ann("d", items_a)
+    b = _ann("d", items_b)
+    r = compute_agreement(a, b)
+    assert r["matched"] == 6 and r["union"] == 7
+    assert r["ambiguous_group_count"] == 1  # img 1×2
+    assert (r["agree_lower"], r["agree_upper"]) == (5, 6)
+    assert r["agreement_lower"] == pytest.approx(5 / 7)
+    assert r["agreement_upper"] == pytest.approx(6 / 7)
+    assert r["decision"] == "indeterminate"
+    assert r["requires_action"] is True
+    assert r["below_threshold"] is False  # 严格语义：尚未确定低于
+    resolved = compute_agreement(
+        a, b, pair_map={"img|1": [["u0006", "u0006"]]},
+        pair_map_sha256="cd" * 32)
+    assert resolved["decision"] == "pass" and resolved["agreement"] \
+        == pytest.approx(6 / 7)
+    crossed = compute_agreement(
+        a, b, pair_map={"img|1": [["u0006", "u0007"]]},
+        pair_map_sha256="ef" * 32)
+    assert crossed["decision"] == "below_threshold"
+    assert crossed["agreement"] == pytest.approx(5 / 7)
+
+
+def test_symmetry_swap_contract():
+    # B'' 契约：交换 A/B 角色，authoritative score 逐字段相同。
+    # 含 difflib 交换不对称模式（交叉文本序 [X,Y,X] vs [Y,Z,X]）+ 1×2
+    # + 2×2 歧义组——内部 canonical 帧保证对称
+    a = _ann("d", [("s", "X.", "g01", False),
+                   ("s", "Y.", "g01", False),
+                   ("s", "X.", "g02", False),
+                   ("n", "img:1", "g01", False),
+                   ("n", "img:2", "g02", False),
+                   ("n", "img:3", "g01", False),
+                   ("n", "tab:1", "g02", False)])
+    b = _ann("d", [("s", "Y.", "g01", False),
+                   ("s", "Z.", "g02", False),
+                   ("s", "X.", "g02", False),
+                   ("n", "img:x", "g01", False),
+                   ("n", "img:y", "g01", False),
+                   ("n", "tab:t", "g02", False)])
+    r1 = compute_agreement(a, b)
+    r2 = compute_agreement(b, a)
+    for key in ("matched", "union", "agree", "agree_lower",
+                "agree_upper", "agreement_lower", "agreement_upper",
+                "decision", "requires_action", "below_threshold",
+                "ambiguous_group_count"):
+        assert r1[key] == r2[key], key
+    assert r1["units_a"] == r2["units_b"] and r1["units_b"] \
+        == r2["units_a"]
+    assert r1["decision"] in ("indeterminate", "below_threshold",
+                              "pass")
+    # 角色呈现字段随视角互换（unit 计数与清单成对调换）
+    assert [u["unit_id"] for u in r1["only_a"]] == \
+        [u["unit_id"] for u in r2["only_b"]]
+    assert [u["unit_id"] for u in r1["only_b"]] == \
+        [u["unit_id"] for u in r2["only_a"]]
+    for g1, g2 in zip(r1["ambiguous_groups"], r2["ambiguous_groups"]):
+        assert g1["a_unit_ids"] == g2["b_unit_ids"]
+        assert g1["b_unit_ids"] == g2["a_unit_ids"]
+        assert g1["contribution_lower"] == g2["contribution_lower"]
+        assert g1["contribution_upper"] == g2["contribution_upper"]
+
+
+def test_threshold_exact_rational_boundary():
+    # 判定走整数比较（17/20）：恰 17/20 → pass（含等号），16/20 →
+    # below；不经 float 0.85 边界
+    items = [("s", "S%02d." % i, "g01", False) for i in range(17)]
+    items += [("s", "T%02d." % i, "g02", False) for i in range(3)]
+    a = _ann("d", items)
+    b_items = [("s", "S%02d." % i, "g01", False) for i in range(17)]
+    b_items += [("s", "T%02d." % i, "g03", False) for i in range(3)]
+    b = _ann("d", b_items)
+    r = compute_agreement(a, b)
+    assert (r["agree"], r["union"]) == (17, 20)
+    assert r["agreement"] == pytest.approx(0.85)
+    assert r["decision"] == "pass" and r["requires_action"] is False
+    b_items[0] = ("s", "S00.", "g04", False)
+    b2 = _ann("d", b_items)
+    r2 = compute_agreement(a, b2)
+    assert r2["agreement"] == pytest.approx(0.8)
+    assert r2["decision"] == "below_threshold"
 
 
 def test_mixed_text_and_ambiguous_bounds():
@@ -352,9 +459,8 @@ def test_pair_map_rejects_illegal():
     with pytest.raises(AgreementInputError):  # 组不存在
         compute_agreement(a, b, pair_map={
             "img|2": [["u0001", "u0001"], ["u0002", "u0002"]]})
-    # 非歧义组（b 侧单对象）不许 identity resolution
-    c = _ann("d", [("n", "img:a", "g01", False),
-                   ("n", "img:b", "g01", False)])
+    # 1×1 唯一配对（m×n=1）无身份歧义，不许 resolution
+    c = _ann("d", [("n", "img:a", "g01", False)])
     d = _ann("d", [("n", "img:x", "g01", False)])
     with pytest.raises(AgreementInputError):
         compute_agreement(c, d, pair_map={"img|1": [["u0001", "u0001"]]})
@@ -445,6 +551,7 @@ def test_cli_exit_codes_and_json(tmp_path):
     assert payload["doc_id"] == "d"
     assert payload["agreement"] == pytest.approx(2 / 3)
     assert payload["below_threshold"] is True
+    assert payload["requires_action"] is True
     assert payload["decision"] == "below_threshold"
     assert payload["nontext_alignment"] == "v3-page-family-bounded"
     assert payload["ambiguous_group_count"] == 0
@@ -472,6 +579,8 @@ def test_cli_pair_map_resolution(tmp_path):
     payload = json.loads(base.stdout)
     assert base.returncode == 1  # indeterminate → 需处置（非 pass）
     assert payload["decision"] == "indeterminate"
+    assert payload["requires_action"] is True
+    assert payload["below_threshold"] is False  # 严格语义
     assert payload["ambiguous_group_count"] == 1
     assert payload["identity_resolution"] is None
 

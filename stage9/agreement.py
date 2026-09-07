@@ -20,20 +20,34 @@ difflib.SequenceMatcher(autojunk=False) 对齐——同文档同 splitter 冻结
 ×269）依赖序列位置而非文本唯一性。对齐只认键（文本切分/非文本
 页族），kind 与 gold_segment 在对齐对上另行比较。
 
-nontext 身份不可辨识区间（v3-page-family-bounded，裁决 B' 2026-09-07
-二轮）：同页同族**双方均多对象**的组（歧义组）内，"哪个 A 对象与
-哪个 B 对象是同一视觉语义对象"无观测依据——结构位置配对仅为诊断，
-不作为最终口径。计数层（presence）追认为精确：matched/union 不随
-组内配对选择变化（多登/漏登只罚该对象自身）。一致数层对该组枚举
-**所有合法一对一配对**（恰 matched_g 对、单射、m×n 全空间），取
-per-pair 一致贡献之和的 min/max（二分图最大匹配精确求解），全篇合成
-agreement_lower/agreement_upper。判定：lower≥0.85 过 / upper<0.85
-照走仲裁 / lower<0.85≤upper 不可判定 → 仅对跨线组做 identity
-resolution（解析者只看 PDF 页面+结构位置、对 gold_segment 与得分
-盲态，不得改任一标注人的切分/kind/segment；pair map 单独保存+hash，
-经 CLI --pair-map 代入后计算确定最终一致率）。各配对贡献相同的组
-lower=upper 自然退化单值。单侧 ≤1 对象的组不属歧义组（裁决口径
-"≤1 对象正常算"）：结构配对照算，kind/seg 差异逐条可见。
+nontext 身份不可辨识区间（v3-page-family-bounded，裁决 B'/B'' 2026-09-07
+二/三轮）：同页同族 **m×n>1** 的组（歧义组：双方均有对象且对应不
+唯一——含 1×N/N×1；1×1 唯一配对、0×N 无对象，不歧义）内，"哪个
+A 对象与哪个 B 对象是同一视觉语义对象"无观测依据——结构位置配对
+仅为诊断，不作为最终口径。计数层（presence）追认为精确：matched/
+union 不随组内配对选择变化（多登/漏登只罚该对象自身）。一致数层对
+该组枚举**所有合法一对一配对**（恰 matched_g 对、单射、m×n 全
+空间），取 per-pair 一致贡献之和的 min/max（二分图最大匹配精确
+求解），全篇合成 agreement_lower/agreement_upper。判定（**整数/有理
+数比较，不依赖二进制 float 边界**，阈值 17/20）：20×lower ≥ 17×
+union → pass；20×upper < 17×union → below_threshold；其间 →
+indeterminate → 仅对跨线组做 identity resolution（解析者只看 PDF
+页面+结构位置、对 gold_segment 与得分盲态，不得改任一标注人的切分/
+kind/segment；pair map 单独保存+hash，经 CLI --pair-map 代入后计算
+确定最终一致率）。各配对贡献相同的组 lower=upper 自然退化单值。
+
+报告语义（B''）：decision = pass|below_threshold|indeterminate；
+requires_action = 需后续动作（below_threshold ∪ indeterminate，
+CLI rc 1）；below_threshold 为严格兼容字段（= decision ==
+"below_threshold"，**不再**兼指 indeterminate）。
+
+对称性契约（B''）：交换两份标注的 A/B 角色，authoritative score
+（matched/union/agree/agreement_lower/agreement_upper/decision）必须
+完全相同。difflib.SequenceMatcher 的匹配数在交叉序下对参数顺序不
+对称（[X,Y,X] vs [Y,Z,X] 实测 1≠2），故 compute_agreement 内部按
+键序列签名的固定 canonical 帧计算（同一对标注恒同一帧），输出时把
+角色呈现字段（only_a/only_b、diff 条目 a/b、组 unit_id 清单）换回
+调用方 A/B 视角。
 
 并集数 = len(units_a) + len(units_b) - 对齐对数（对齐到的同文本 pair
 视为同一 unit，双方各自独有的进并集）。
@@ -43,6 +57,8 @@ lower=upper 自然退化单值。单侧 ≤1 对象的组不属歧义组（裁�
 import difflib
 
 THRESHOLD = 0.85
+THRESHOLD_NUM = 17
+THRESHOLD_DEN = 20
 NONTEXT_ALIGNMENT = "v3-page-family-bounded"
 
 
@@ -182,22 +198,29 @@ def compute_agreement(ann_a, ann_b, pair_map=None, pair_map_sha256=None):
 
     pair_map（可选）：identity resolution 产物，
     {"家族|页": [[a_unit_id, b_unit_id], ...]}。只允许覆盖歧义组
-    （同页同族双方均 ≥2 对象），每组恰 matched 对、单射、unit_id
-    只能引用组内对象；提供后该组按解析配对出确定贡献，报告含
-    identity_resolution.pair_map_sha256。resolution 只决定"哪个是
-    同一视觉语义对象"，不改任一标注人的切分/kind/segment，也不改
-    presence 计数。
+    （同页同族 m×n>1——含 1×N/N×1），每组恰 matched 对、单射、
+    unit_id 只能引用组内对象；提供后该组按解析配对出确定贡献，报告
+    含 identity_resolution.pair_map_sha256。resolution 只决定"哪个
+    是同一视觉语义对象"，不改任一标注人的切分/kind/segment，也不改
+    presence 计数。pair map 以调用方 A/B 视角给出（内部 canonical
+    帧自动换轴）。
 
     返回 dict：agreement（歧义组全部消解时=确定值；否则=结构配对
     诊断值，必落在 [agreement_lower, agreement_upper] 内）、
     agreement_lower/agreement_upper（全部合法配对区间）、
-    agree_lower/agree_upper（对应计数）、decision
-    （pass/below_threshold/indeterminate；双方 unit 均空时 None）、
-    ambiguous_group_count/ambiguous_groups（组明细：成员数、matched、
-    贡献区间、双方 unit_id 清单、是否已消解）、四类分歧清单（歧义
-    组未消解时该组条目为结构诊断）、hard_boundary_diff（信息项）、
-    below_threshold（decision ∈ {below_threshold, indeterminate}——
-    二者均需处置，驱动 CLI rc 1）。
+    agree_lower/agree_upper（对应计数）、decision（pass /
+    below_threshold / indeterminate；双方 unit 均空时 None；由整数
+    比较 20×cnt ? 17×union 产生，不经 float 边界）、requires_action
+    （below_threshold ∪ indeterminate——需后续动作，驱动 CLI rc 1）、
+    below_threshold（**严格兼容字段** = decision == "below_threshold"，
+    不再兼指 indeterminate）、ambiguous_group_count/ambiguous_groups
+    （组明细：成员数、matched、贡献区间、双方 unit_id 清单、是否已
+    消解）、四类分歧清单（歧义组未消解时该组条目为结构诊断）、
+    hard_boundary_diff（信息项）。
+    对称性（B'' 契约）：交换两份标注入参，matched/union/agree/
+    agreement_lower/agreement_upper/decision 逐字段相同（内部
+    canonical 帧）；only_a/only_b、diff 条目与组 unit_id 清单随调用
+    方视角呈现。
     抛 AgreementInputError：doc_id 不一致、输入形态非法或 pair map
     非法。
     """
@@ -211,6 +234,18 @@ def compute_agreement(ann_a, ann_b, pair_map=None, pair_map_sha256=None):
                 "annotation %s missing stream/units" % name)
     if pair_map is not None:
         _validate_pair_map_shape(pair_map)
+
+    # 对称性契约（B''）：canonical 帧——同一对标注恒按键序列签名的
+    # 固定顺序计算（difflib 匹配数在交叉序下对参数顺序不对称）；
+    # 输出时角色呈现字段换回调用方 A/B 视角。
+    sig_a = tuple(repr(k) for k in annotation_unit_keys(ann_a))
+    sig_b = tuple(repr(k) for k in annotation_unit_keys(ann_b))
+    flipped = sig_b < sig_a
+    if flipped:
+        ann_a, ann_b = ann_b, ann_a
+        if pair_map is not None:
+            pair_map = {gk: [[b_uid, a_uid] for a_uid, b_uid in pairs]
+                        for gk, pairs in pair_map.items()}
 
     units_a = list(ann_a["units"])
     units_b = list(ann_b["units"])
@@ -285,7 +320,7 @@ def compute_agreement(ann_a, ann_b, pair_map=None, pair_map_sha256=None):
     for gk in order:
         members_a = groups[gk]["a"]
         members_b = groups[gk]["b"]
-        ambiguous = len(members_a) >= 2 and len(members_b) >= 2
+        ambiguous = len(members_a) * len(members_b) > 1
         pairs = struct_pairs.get(gk, [])
         k_g = len(pairs)
         map_key = _pair_map_key(gk)
@@ -293,8 +328,9 @@ def compute_agreement(ann_a, ann_b, pair_map=None, pair_map_sha256=None):
             touched.add(map_key)
             if not ambiguous:
                 raise AgreementInputError(
-                    "pair map 组 %s 非歧义组（同页同族双方均多对象才"
-                    "可做 identity resolution）" % map_key)
+                    "pair map 组 %s 无身份歧义（须 m×n>1：同页同族双方"
+                    "均有对象且对应不唯一，才可做 identity resolution）"
+                    % map_key)
             resolved = _resolve_pairs(pair_map[map_key], map_key,
                                       members_a, members_b, k_g)
             g_agree = sum(1 for ua, ub in resolved if _pair_agrees(ua, ub))
@@ -365,24 +401,42 @@ def compute_agreement(ann_a, ann_b, pair_map=None, pair_map_sha256=None):
 
     if agreement is None:
         decision = None
-    elif agreement_lower >= THRESHOLD:
+    elif THRESHOLD_DEN * cnt_lower >= THRESHOLD_NUM * union:
         decision = "pass"
-    elif agreement_upper < THRESHOLD:
+    elif THRESHOLD_DEN * cnt_upper < THRESHOLD_NUM * union:
         decision = "below_threshold"
     else:
         decision = "indeterminate"
+
+    if flipped:  # 角色呈现字段换回调用方 A/B 视角（score 不变）
+        kind_diff = [{"a": d["b"], "b": d["a"]} for d in kind_diff]
+        segment_diff = [{"a": d["b"], "b": d["a"]}
+                        for d in segment_diff]
+        for g in ambiguous_groups:
+            g["side_a"], g["side_b"] = g["side_b"], g["side_a"]
+            g["a_unit_ids"], g["b_unit_ids"] = (g["b_unit_ids"],
+                                                g["a_unit_ids"])
+        only_a_out = [_brief(ann_b, units_b[j]) for j in only_b]
+        only_b_out = [_brief(ann_a, units_a[i]) for i in only_a]
+        units_a_n, units_b_n = len(keys_b), len(keys_a)
+    else:
+        only_a_out = [_brief(ann_a, units_a[i]) for i in only_a]
+        only_b_out = [_brief(ann_b, units_b[j]) for j in only_b]
+        units_a_n, units_b_n = len(keys_a), len(keys_b)
     return {
         "doc_id": ann_a["doc_id"],
         "agreement": agreement,
         "agreement_lower": agreement_lower,
         "agreement_upper": agreement_upper,
         "threshold": THRESHOLD,
+        "threshold_rational": [THRESHOLD_NUM, THRESHOLD_DEN],
         "nontext_alignment": NONTEXT_ALIGNMENT,
         "decision": decision,
-        "below_threshold": decision in ("below_threshold",
+        "requires_action": decision in ("below_threshold",
                                         "indeterminate"),
-        "units_a": len(keys_a),
-        "units_b": len(keys_b),
+        "below_threshold": decision == "below_threshold",
+        "units_a": units_a_n,
+        "units_b": units_b_n,
         "matched": matched,
         "agree": agree_report,
         "agree_lower": cnt_lower,
@@ -391,8 +445,8 @@ def compute_agreement(ann_a, ann_b, pair_map=None, pair_map_sha256=None):
         "hard_boundary_diff": hard_boundary_diff,
         "kind_diff": kind_diff,
         "segment_diff": segment_diff,
-        "only_a": [_brief(ann_a, units_a[i]) for i in only_a],
-        "only_b": [_brief(ann_b, units_b[j]) for j in only_b],
+        "only_a": only_a_out,
+        "only_b": only_b_out,
         "ambiguous_group_count": len(ambiguous_groups),
         "ambiguous_groups": ambiguous_groups,
         "identity_resolution": (

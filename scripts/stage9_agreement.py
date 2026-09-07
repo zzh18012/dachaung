@@ -9,18 +9,20 @@
       [--pair-map <identity resolution 产物 JSON>] \
       [--json] [--max-disagreements 40]
 
---pair-map（裁决 B' 2026-09-07 二轮）：仅当报告 decision=
-indeterminate（lower<0.85≤upper）时对跨线组做 identity resolution
-后使用——解析者只看 PDF 页面+结构位置、对 gold_segment 与得分盲态，
-不得改任一标注人的切分/kind/segment；pair map 单独保存，其 sha256
-记入报告 identity_resolution。格式：
+--pair-map（裁决 B'/B'' 2026-09-07）：仅当报告 decision=
+indeterminate（lower<0.85≤upper，整数比较 20×cnt vs 17×union）时
+对跨线组做 identity resolution 后使用——解析者只看 PDF 页面+结构
+位置、对 gold_segment 与得分盲态，不得改任一标注人的切分/kind/
+segment；pair map 单独保存，其 sha256 记入报告 identity_resolution。
+格式：
   {"家族|页": [[a_unit_id, b_unit_id], ...]}
-每组恰 matched 对、单射、unit_id 只能引用该组对象，非歧义组拒绝。
+仅限歧义组（同页同族 m×n>1，含 1×N/N×1），每组恰 matched 对、
+单射、unit_id 只能引用该组对象；pair map 以 --a/--b 视角给出。
 
-退出码：0 = 判定 pass（agreement_lower ≥0.85）；1 = 需处置
-（below_threshold：agreement_upper <0.85，照走仲裁；或
-indeterminate：区间跨 0.85 需 identity resolution）；2 = 输入/IO
-错误。输入应先过 stage9_validate_annotations.py（本脚本不重复
+退出码：0 = 判定 pass；1 = requires_action（below_threshold：
+agreement_upper <0.85 照走仲裁；或 indeterminate：区间跨 0.85 需
+identity resolution——二者均为需处置，非新增停机条件）；2 = 输入/
+IO 错误。输入应先过 stage9_validate_annotations.py（本脚本不重复
 schema 校验）。
 """
 import argparse
@@ -77,7 +79,7 @@ def main(argv=None):
         print(json.dumps(report, ensure_ascii=False, indent=1))
     else:
         show(report, args.max_disagreements)
-    return 1 if report["below_threshold"] else 0
+    return 1 if report["requires_action"] else 0
 
 
 def _fmt(v):

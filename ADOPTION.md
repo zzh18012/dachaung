@@ -4369,3 +4369,68 @@ outputs/gpt_brief_batch26_freeze.txt 待用户中转）；冻结后进入
 - B'/C' 落地形态追认（含预注册 JSON 增补的披露）；
 - G⑤ 进行中（四篇第二标注人在做，B'/C' 对其零影响）；G⑥ 等
   agreement 可判定+仲裁收敛。
+
+## §八十一（2026-09-07）三轮裁决执行：A'' push + B-fix 边界修正 + C'' 追认登记（本条随 B-fix commit 一并落地）
+
+裁决来源：GPT 5.6 Sol 2026-09-07 三轮（用户中转，A''/B''/C''；B''
+预授权紧随 a2a2439 的单个 B-fix commit 一并 FF push，范围仅限
+ambiguity/pair-map/report-threshold 修正及其测试、指南/台账同步）。
+
+1. **A'' push 已执行**：`git fetch` → `merge-base --is-ancestor
+   8c077af a2a2439` ✓ → `rev-list --count 8c077af..a2a2439` = 3 ✓ →
+   普通 FF push `8c077af..a2a2439`（无 force/amend/rebase）→
+   `ls-remote` = `a2a2439a28963c1acd9973a818bffb9e2be79aba` == 本地
+   HEAD ✓。三 commit：7d2e0a7（B'）/87e640d（C'）/a2a2439（§80）。
+2. **B-fix 已落地（本 commit）——GPT 指出的真实配对自由度**：
+   - **歧义定义 双方均≥2 → m×n>1**（同页同族双方均有对象且对应不
+     唯一，含 1×N/N×1；1×1 唯一配对、0×N 无对象不歧义）。贵方
+     例成立：A 1 图 vs B 同页 3 图，唯一对象仍可能对应三者任一，
+     结构位置固定配 B1 是在制造无观测依据的 identity；
+   - **--pair-map 放宽至 m×n>1 全部歧义组**（1×N/N×1 可 resolution；
+     1×1 与不存在组仍拒绝）；pair map 以调用方 A/B 视角给出，内部
+     canonical 帧自动换轴；
+   - **阈值判定改整数/有理数比较**（THRESHOLD_NUM/DEN=17/20）：
+     `20×cnt_lower ≥ 17×union` → pass；`20×cnt_upper < 17×union` →
+     below_threshold；其间 indeterminate。decision 由精确计数产生，
+     不经二进制 float 0.85 边界；报告增 threshold_rational=[17,20]，
+     浮点展示保留；
+   - **报告字段语义**：decision = pass|below_threshold|indeterminate；
+     requires_action = below_threshold ∪ indeterminate（CLI rc 1，
+     行为不变）；below_threshold 恢复**严格兼容字段**（= decision
+     == below_threshold，不再兼指 indeterminate）；
+   - **对称性契约（B''）**：交换 A/B 角色，matched/union/agree/
+     agreement_lower/agreement_upper/decision 逐字段相同。**前置实证**：
+     difflib.SequenceMatcher 匹配数在交叉序下对参数顺序不对称
+     （3 符号 3 长度穷举 1296 对中 12 对不对称，如 [X,Y,X] vs
+     [Y,Z,X]：1≠2）→ compute_agreement 内部按键序列签名的固定
+     canonical 帧计算（同一对标注恒同一帧），输出时角色呈现字段
+     （only_a/only_b、diff 条目 a/b、歧义组 unit_id 清单与成员数）
+     换回调用方视角；
+   - 测试 30（27 存量适配 + 新增：2×1 歧义区间手算/1×2+文本混合
+     indeterminate 与 pair-map 正配错配/对称性契约（含 difflib 不
+     对称模式 fixture）/17-20 恰等号 pass 与 16/20 below）；指南
+     §7 同步（m×n>1/有理数阈值/字段语义/对称性契约）；
+   - 名称正式追认 nontext_alignment="v3-page-family-bounded"；外发
+     blocks/dump/PDF/交接包零改动（第二标注人无感）。
+3. **C'' 追认登记（87e640d 无回滚）**：
+   - 24-core 聚合 digest + 14-dev 逐文件 hash + dirty-tree
+     fail-closed 满足 provenance 目的；
+   - **87e640d 版预注册字节 = 最终 authoritative prereg**；
+     **G⑥ 得到的实际 gold_digest 值不写回预注册 JSON**（进 gold
+     freeze 凭证、CLI 参数、G⑦ 报告——防止看到最终 gold 后再改
+     prereg 文件）；
+   - 最终 G⑦ 至少绑定：manifest_sha256 / gold_revision /
+     gold_digest / preregistration_sha256 / implementation_commit；
+   - 台账保留"selection rules 最早形成于 9985c2a、provenance guard
+     完成于 87e640d"，不再创造新的形式层。
+4. 回归 5610 passed + 4 skipped。
+5. **本 commit 即预授权的 B-fix**，随裁决一并 FF push（范围自律：
+   未夹带 manifest、gold、阈值数值、分母、标注工具格式变化——阈值
+   仍 0.85=17/20，仅比较方式改整数）。
+
+### 阶段位置
+
+G④ 冻结零改动；G⑤ 第二标注继续（正式 agreement 前本 B-fix 已完成，
+indeterminate 非新增停机条件）；G⑥ 须等四篇 bounded agreement 可判定
++必要 identity resolution/仲裁全部收敛后申请；G⑦ 预注册有效（87e640d
+版 authoritative），真实 system-side max_chars 保持零运行。
