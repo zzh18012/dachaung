@@ -4212,3 +4212,80 @@ outputs/gpt_brief_batch26_freeze.txt 待用户中转）；冻结后进入
   键修正/第二标注人工具，共 5 commits，均未推送）；
 - §七十七 A 披露的 agreement 非文本对齐键修正（家族+页+页内序，
   测量前落定）追认。
+
+## 七十九、Stage 9 批次 26：三轮裁决执行（push 放行/agreement B 修正后追认/⑦管线授权）（2026-09-07）
+
+### 裁决内容（用户中转，全文要点）
+
+- **A push 放行**：授权恰 5 个 commit（c039d03/082bfbd/dea066e/31408b6/
+  8522fcf），远端基线 a11dce3；记法纠正采纳——a11dce3..8522fcf = 5
+  commits（c039d03..8522fcf 不含左端，弃用）。禁 force/amend/rebase。
+- **B agreement nontext 键：修改后追认**。硬约束：页内序必须是标注前由
+  共同源注册表确定的不变 source ordinal，**不得按各标注 JSON 自身出现
+  顺序重新编号**（漏登页首对象会使后续全体错位）；建议键名
+  (family, physical_page, source_nontext_ordinal)；若当前实现属自序
+  编号 → 不得开始正式测量，先修。五项回归契约（改名不变/漏页首只罚
+  自身/img-tab 不碰撞/重复运行键相同/报告记版本
+  nontext_alignment=v2-page-source-order）。
+- **14-dev 调试重跑追认为非冻结**；自此封死 researcher degrees of
+  freedom：B1/B2 的候选网格/macro 算法/tie-break/input view/异常规则
+  不得因该组数值调整；真 bug 可修但须 G⑦ 前披露重裁。
+- **C ⑦系统侧 max_chars 管线：批准并行实现**，仅限预注册代码+测试；
+  G⑥ 完成前禁止在真实 14-dev gold 上做任何参数探索（含自称 dry
+  run）；真实运行前先 commit 预注册（网格/指标/聚合/tie-break/14 篇
+  单列/comparison+holdout 禁调参/边界处理/manifest SHA/gold revision
+  运行时绑定/实现 commit）；测试用合成夹具，真实文件加载 smoke 不得
+  计算参数优劣。
+- G④ 保持 frozen；G⑤ 继续；G⑥ 等四篇收敛；G⑦ 不得提前正式选优。
+
+### 执行记录
+
+1. **A 已执行**：fetch → merge-base --is-ancestor（a11dce3 祖先
+   8522fcf ✓）→ rev-list count = 5 ✓ → 普通 FF push
+   a11dce3..8522fcf（无 force）→ ls-remote =
+   8522fcf8e9f504b2dc9f1159d634bda95f819b7a == 本地 ✓。**1e8ba50
+   （§七十八台账）不在授权 5 个之列，有意未推**，留待下轮。
+2. **B 已执行（8c76e63）**：
+   - 核查确认 31408b6 实现属裁决禁止情形（annotation_unit_keys 按
+     各标注自身 (family,page) counters 临时编号）；
+   - **裁决设想的 source ordinal 经实证不可表达**：机械注册表与语义
+     图形系统性错位——tech-03 标注 241 img vs dump 2308 个栅格（p003
+     一页 869）、tech-08 54 vs 296、多页语义图 2 张而栅格 0 个（矢量
+     图）、FTAB 检测 151 vs 语义表 17（find_tables 假阳性）；语义图形
+     （"图 3"=13 个子栅格）无法映射单一 IMG 序号；
+   - 落地 **v3-page-family**：键 = (家族, 物理页)，**零编号**——不存
+     在可漂移的序号；多登/漏登只影响该对象自身并集计数
+     （matched/union 精确），同页同族内语义配对可能置换（有界、方向
+     中性、仲裁清单逐条可见）；并集分母与 0.85 阈值不变；报告新增
+     nontext_alignment 版本字段；五项契约测试 + 页族维度测试落
+     tests/test_stage9_agreement.py（19 过）；指南 §7 更新；
+   - **第二标注人侧零影响**：blocks 格式/dump/交接包均不变；
+   - **偏差披露待裁**：v3 偏离裁决指定的 source-ordinal 实现形态
+     （原因=实证不可表达），正式 agreement 测量在 GPT 确认 v3 替代
+     口径前不启动（标注人仍在工作，无延迟成本）。
+3. **C 已执行（9985c2a）**：
+   - 预注册 stage9/system_select_preregistration.json：网格
+     [200,500,800,1200,2000]（镜像冻结 B1 网格，在任何系统侧曲线产生
+     前选定；9-07 调试运行只含 B1/B2 无系统侧数据，无结果依赖）、
+     macro-ARI、平局取最小、14 dev 篇单列、comparison/holdout 禁调参、
+     manifest SHA 钉死 51d3d400…、gold revision 经强制 --gold-revision
+     运行时绑定（G⑥ 门槛）、边界处理含全 N/A 选优失败不产伪结果；
+   - 实现 stage9/system_eval.py + scripts/stage9_system_select.py：
+     CLI 四重核对（split=dev/manifest SHA/dev 集与预注册一致/
+     --gold-revision 必填），provenance 必含 manifest_sha256/
+     gold_revision/preregistration_sha256/implementation_commit；
+   - 测试 tests/test_stage9_system_select.py 13 过：纯函数（完美平铺
+     ARI=1/N/A 披露/unmatched 不静默/平局取小/全 N/A 失败）+ CLI 守卫
+     （缺 gold-revision/非 dev split/SHA 不符/dev 集不符）+ 真实管线
+     接线（合成 docx，仅验证产出不评分）+ 缺失文件 parse_failed；
+   - **真实语料零接触**：未对 14-dev 跑过任何参数值（含单值）；
+   - 披露：预注册与实现同 commit（规则与代码同时冻结、先于任何运行）。
+4. 回归 5595 passed + 4 skipped。
+
+### 后续待裁（下轮简报）
+
+- push 授权：1e8ba50..本轮台账 commit（§78 台账/B 修正/C 预注册+管线
+  /§79 台账）；
+- **B v3-page-family 替代口径追认**（source ordinal 实证不可表达的
+  数据 + v3 契约测试如上，正式测量已 held）；
+- G⑤ 用户侧四篇标注进行中（第二标注人任务包已外发，不受 B 影响）。
