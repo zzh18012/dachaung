@@ -41,6 +41,7 @@ def _ann():
         "doc_id": "d-test", "annotation_schema": "v1.1",
         "sentence_splitter": "v1", "normalization": "fold-ws-v1",
         "annotator": "test", "stream": "".join(parts), "units": units,
+        "notes": "处理口径：目录页未入句子流。",
         "segments": [
             {"gold_segment_id": "g00", "hint": "题名", "kind":
              "frontmatter"},
@@ -65,6 +66,8 @@ def test_render_reading_order_view(tmp_path):
     expect_sha = hashlib.sha256(p.read_bytes()).hexdigest()
     assert "annotation_sha256=%s" % expect_sha in out
     assert "units: 5（text 4 + nontext 1）" in out
+    assert "标注 notes（处理口径——排除项/判定依据）" in out
+    assert "处理口径：目录页未入句子流。" in out
     assert "g00  题名（frontmatter）× 2 units" in out
     # 阅读序：分组标题、硬边界标记、页分隔线、全文呈现
     assert "[segment g00  题名（frontmatter）]" in out

@@ -39,6 +39,10 @@ def render(ann, annotation_sha256):
                  "| segments: %d" % (len(ann.get("stream", "")),
                                    len(units), n_text, n_non,
                                    len(segs)))
+    if ann.get("notes"):
+        lines.append("—— 标注 notes（处理口径——排除项/判定依据）——")
+        for para in str(ann["notes"]).split("\n"):
+            lines.append("  %s" % para)
     lines.append("—— segments 一览 ——")
     seg_order = []
     for u in units:
