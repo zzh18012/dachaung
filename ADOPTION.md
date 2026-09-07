@@ -4733,3 +4733,73 @@ agreement/prereg 语义均不受影响。
    现含 prod-06 254 + prod-09 119）。指南 §4 语义/§7.4 新节/§8
    失败码同步。**补链 pass 本体（24 篇逐篇判读）待续——下批
    commit 逐篇推进**。本 commit 未推送，随下轮授权。
+
+## §八十九（2026-09-07）补链 pass 完成：24 core 全量判读 + 全绿 + 披露清单
+
+承接 §八十八 B1/B2/B3 裁决：立即执行、只改 linked_nontext、发现
+原 gold 缺陷停链单独披露。本节为执行完成记录（判读表
+`samples/private/stage9-corpus/annotations/links_*.py`，gitignored）。
+
+1. **完成状态**：24 core 全部完成（20 篇有边 + 4 篇零 nontext 无需
+   链：prod-02/03/04、tech-04）。备选 prod-08 未施行（降备选口径，
+   其 anchorless=21 为未链状态而非判读结论，勿计入语义统计）。
+   **core 聚合：linked_pairs=1447 / linked_objects=905 /
+   anchorless=60 / nontext=965**（恒等式成立）；full-set 校验器口径
+   （含 prod-08 共 25 文件）：1447/905/81/986，0 失败 0 IO 错误，
+   split comparison 4 / dev 14 / holdout 6。
+2. **逐篇边数**（pairs/objects/anchorless/nontext）：acad-01 16/9/0/9、
+   acad-02 8/7/0/7、acad-03 10/8/0/8、acad-04 11/7/0/7、acad-05
+   11/8/0/8、acad-06 13/9/0/9、acad-07 46/15/0/15、acad-08 33/11/0/11、
+   prod-01 1/1/0/1、prod-05 11/10/0/10、prod-06 382/253/1/254、
+   prod-07 86/73/9/82、prod-09 119/118/1/119、tech-01 28/13/0/13、
+   tech-02 23/9/0/9、tech-03 516/258/0/258、tech-05 22/11/2/13、
+   tech-06 10/9/47/56、tech-07 38/13/0/13、tech-08 63/63/0/63。
+   施加全部经 stage9_link_apply（B2 边界守卫）+ validate_annotation
+   零错误（含 duplicate_linked_ref / linked_ref_order 闭合）。
+3. **披露 A——题注/对象登记序倒置类**（题注在表上方但一级标注
+   nontext 先登；阅读序倒置，测量零影响）：acad-03（4 表）、
+   acad-04（Table 1）、acad-05（4 表）、acad-06（tab2/tab6 确定 +
+   tab3-5 编号歧义待裁）、acad-07（7 表）、tech-07（13 表全量）、
+   tech-08（9 表含附表）。登记序一致篇：acad-01/02/08、tech-01/02、
+   tech-03、tech-05、prod-05。处置：只披露不修（B2）。
+4. **披露 B——结构性发现（B2 停链披露）**：tech-06 p81 Mobile TTPs
+   表整页表体内容未进 stream（PDF p81 文本层含 3 表正文，一级标注
+   仅存题行 u1317）——疑似解析/一级标注层丢内容，待 GPT 裁决
+   （修法属 gold 缺陷流程，不属补链 pass）。
+5. **披露 C——隐式锚裁量类**（待 GPT 抽检定性）：①操作手册体裁
+   步句↔截图配对（prod-09 全量 118 对 + prod-06 210 对 prev 隐式：
+   文档体裁定义的步骤-截图结构，非单纯 proximity）；②tech-03
+   img:1 无题注会议照片 ← u0095"80 多名代表参加了此次会议"（内容
+   +紧随唯一）；③tech-06 倒装指称 u0969"the graph hereunder"/
+   u1222"the following top 25 weaknesses"（图在句上方，内容唯一
+   倒装解析）；④prod-01 u2908 未编号"the table below"全篇唯一表。
+6. **披露 D——编号推定类**：tech-06 img:47=Fig47 由 Fig45=img:45
+   （题注实证）+顺序推定（img:46→Fig46）；tech-08 题注编号与对象
+   序 1:1（63 对全核）。
+7. **披露 E——不成锚裁定类**：①节标题不成锚（kind=heading）：
+   tech-06 tab:6/7（LEXICON/LOG HISTORY 节标题）、prod-07 tab:1
+   （"Revision Summary" heading）；②1×N 歧义不成边：prod-07 u0507
+   "Also in the table"回指 tab:8/9 二义；③背靠背孪生对象一句题名
+   只锚第一张：prod-07 tab:45/47、prod-06 同类；④tech-06 42/49 图
+   anchorless=语料真实属性（题注嵌图内未转写，正文无对象词指称，
+   B1 邻近性单独不足）；⑤tech-05 封面国徽/发布信息表 anchorless；
+   ⑥prod-06 fig107、prod-09 fig057 唯一无锚图。
+8. **披露 F——区间引用展开**（一句引多对象分多条边）：tech-07
+   u0105"Table 4 to Table 13"（10 边）+ u0156"Table 3 to Table 13"
+   （11 边）；tech-03 图2-73～76/2-79～81/2-88～92/2-98～100（4 句
+   15 边）。
+9. **披露 G——夹句指称解析**：指称句与目标间夹一句正文/跨节指针
+   句时按"唯一后随对象"解析（prod-07 u7189/u7326、u2688 图系列；
+   tech-03 u1385 同类）。
+10. **披露 H——xref 同名消歧**：prod-06 23 处"如图XXX"按编号+位置
+    感知消歧（同名截图多处出现取语境最近）。
+11. **工具与证据**：`scripts/stage9_annotation_report.py` 补关联边
+    渲染（头部统计+逐对象锚句清单/anchorless 标记，G⑥ 抽查支撑件，
+    +测试）；pytest 5635 passed / 4 skipped（docker-gated，既有）。
+    注：subprocess 型测试在 cp936 控制台需 PYTHONUTF8=1（Windows
+    父进程 locale 解码，非代码缺陷）。
+12. **git 状态**：未推送 74c76bb（§八十八实现）+ 本节两个 commit
+    （报告工具补丁 / 本台账）。push 待下轮裁决授权。G⑥ 前置条件
+    ①补链完成②full-set/validator 通过已满足；③relation 专项抽查
+    （≥2 core/≥2 domain，默认 prod-05+tech-01）待用户执行；G⑤
+    第二标注人 4 篇独立进行中。
