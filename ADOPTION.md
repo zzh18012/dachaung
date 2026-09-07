@@ -4289,3 +4289,83 @@ outputs/gpt_brief_batch26_freeze.txt 待用户中转）；冻结后进入
 - **B v3-page-family 替代口径追认**（source ordinal 实证不可表达的
   数据 + v3 契约测试如上，正式测量已 held）；
 - G⑤ 用户侧四篇标注进行中（第二标注人任务包已外发，不受 B 影响）。
+
+## §八十（2026-09-07）二轮裁决执行：A' push + B' v3-page-family-bounded + C' gold_digest（commit 本条随下批推送）
+
+裁决来源：GPT 5.6 Sol 2026-09-07 二轮（用户中转，A'/B'/C' 三项）。
+
+1. **A' push 已执行**：`git fetch` → `merge-base --is-ancestor 8522fcf
+   8c077af` ✓ → `rev-list --count 8522fcf..8c077af` = 4 ✓ → 普通 FF
+   push `8522fcf..8c077af`（无 force/amend/rebase）→ `ls-remote` =
+   `8c077afe1019b2d3eeb73e3a36e2b9875c21ee66` == 本地 HEAD ✓。四
+   commit：1e8ba50（§78）/8c76e63（B v3）/9985c2a（C 预注册+管线）/
+   8c077af（§79）。裁决明示 8c76e63 入审计链 ≠ 批准其配对算法为最终
+   ——修正以新增 commit 落地，未改写 8c76e63。
+2. **B' 已落地（7d2e0a7）v3-page-family-bounded**：
+   - 计数层（presence）照裁决追认口径：matched/union 不随组内配对
+     选择变化（多登/漏登只罚该对象自身）；
+   - 歧义组 = 同页同族**双方均 ≥2 对象**（单侧 ≤1 照常结构配对——
+     裁决"≤1 对象正常算"，差异逐条可见）；结构位置配对降级为仅
+     诊断（diff 清单照出）；
+   - 一致数层对该组枚举**所有合法一对一配对**（恰 matched_g 对、
+     单射、m×n 全空间）取 per-pair 贡献 min/max——二分图最大匹配
+     精确求解（upper=min(k,ν1)，lower=k−min(k,ν0)），2×2/3×3 全
+     矩阵暴力枚举交叉验证锁死；组区间独立求和 → 全篇
+     agreement_lower/agreement_upper；
+   - 判定：lower≥0.85 pass / upper<0.85 照走仲裁 / 区间跨 0.85
+     indeterminate；各配对贡献相同的组 lower=upper 自然退化单值
+     （契约 2 强化例实测：漏登 1 图歧义组区间 [2,2] 退化，
+     agreement=3/4 上界恰=只罚该对象）；
+   - **identity resolution**：CLI `--pair-map`（{"家族|页":
+     [[a_unit_id,b_unit_id],…]}）——仅歧义组、恰 matched 对、单射、
+     unit_id 只能引用组内对象，非歧义组/不存在组拒绝
+     （AgreementInputError）；resolution 只定身份，不改切分/kind/
+     segment、不改 presence；pair map 文件 sha256 记入报告
+     identity_resolution；
+   - 报告新增：nontext_alignment="v3-page-family-bounded"、decision、
+     agreement_lower/upper、agree_lower/upper、ambiguous_group_count、
+     ambiguous_groups（组键/成员数/matched/贡献区间/双方 unit_id
+     清单/是否已消解）、identity_resolution；below_threshold 语义
+     = 需处置（below_threshold ∪ indeterminate，CLI rc 1）；
+   - 指南 §7 已改 bounded 口径（resolution 盲态纪律：只看 PDF 页面
+     +结构位置、对 gold_segment 与得分盲态、pair map 单独保存）；
+   - 27 agreement 测试（19 存量改口径断言 + 8 新增：区间手算/退化/
+     单侧多对象非歧义/文本+歧义混合/pair-map 消解与交叉配对/
+     pair-map 六种非法/暴力交叉验证/CLI pair-map 三态）；
+   - 第二标注人侧零影响（blocks/dump/交接包不变，与 B 轮一致）。
+3. **C' 已落地（87e640d）gold_digest provenance guard**：
+   - `stage9.system_eval.compute_gold_digest`：core 集（split ∈
+     {dev,comparison,holdout}，24 篇，备选不计）标注文件按 doc_id
+     排序逐文件 sha256，聚合式 sha256("".join(f"{doc_id}:{file_sha}
+     \n"))；G⑥ 冻结时签发（gold revision+gold_digest 成对），G⑦
+     运行时重算逐位比对，文件缺失 → 拒绝运行；
+   - CLI `--gold-digest` 强制参数 + **拒绝 dirty working tree**
+     （git status --porcelain 非空或 git 不可核验均拒绝，fail-closed）；
+   - provenance 增 gold_digest + dev_annotation_hashes（14 dev 逐篇
+     标注 sha256——"至少核验 14 dev annotation hashes"以逐篇可审计
+     披露落实）；
+   - **预注册 JSON 增补披露**：system_select_preregistration.json 追加
+     gold_digest 定义（definition/issued_at/working_tree/authority）
+     与 report_provenance_fields 两项（gold_digest/
+     dev_annotation_hashes）——裁决 C' 明示"输入身份校验增强可新增
+     commit，不得借机改网格/metric/tie-break"，网格/指标/平局/14 dev
+     单列等预注册规则逐字段未动；预注册字节 SHA 因增补而变化
+     （9985c2a 版 → 87e640d 版），G⑦ 报告绑定的 preregistration_
+     sha256 将是 87e640d 版——任何真实运行仍未发生，规则冻结时序
+     链完整；
+   - 17 系统选优测试（13 存量适配 + 4 新增：dirty tree 拒绝/错误
+     digest 拒绝/digest 确定性与字节敏感+聚合式手算锁死/缺文件
+     ValueError）；真实语料零接触维持。
+4. 回归 5607 passed + 4 skipped（两 commit 分两次全量跑：5603/5607）。
+5. **未推送 2 commit**：7d2e0a7（B'）/87e640d（C'）——待下轮 push
+   授权（远端现 HEAD=8c077af）。本轮台账 §80 随下批一并。
+6. 自由度封死重申：B1/B2 网格/macro-ARI/tie-break/input view 不因
+   已见 14-dev 调试值（B1 N*=2000 0.2593/B2 0.2557）调整；G⑦ 网格
+   [200,500,800,1200,2000] 与选优规则先于任何系统侧运行冻结。
+
+### 待裁决（下轮简报 outputs/gpt_brief_batch26_bounded.txt）
+
+- push 授权：8c077af..87e640d（7d2e0a7/87e640d，远端=8c077af）；
+- B'/C' 落地形态追认（含预注册 JSON 增补的披露）；
+- G⑤ 进行中（四篇第二标注人在做，B'/C' 对其零影响）；G⑥ 等
+  agreement 可判定+仲裁收敛。
