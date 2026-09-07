@@ -123,3 +123,33 @@ def load_preregistration(path=None):
     raw = Path(path).read_bytes()
     return (json.loads(raw.decode("utf-8")),
             hashlib.sha256(raw).hexdigest())
+
+
+def compute_gold_digest(annotations_dir, core_docs):
+    """G⑥ gold digest（裁决 C' 2026-09-07 二轮：输入身份校验）。
+
+    core 文档（split ∈ {dev, comparison, holdout}，24 篇，备选不计）
+    的标注文件按 doc_id 排序，逐文件 sha256，聚合为单一 sha256：
+      sha256("".join(f"{doc_id}:{file_sha256}\\n" for doc_id in sorted))
+    G⑥ 冻结时计算并签发（gold revision + gold_digest 成对）；G⑦ 运行
+    时重算并逐位比对——任何标注字节变动都会改变 digest。返回
+    (digest_hex, {doc_id: file_sha_hex})；文件缺失/不可读 → ValueError
+    （gold 不完整，拒绝运行）。
+    """
+    import hashlib
+
+    lines = []
+    per_file = {}
+    for doc in sorted(core_docs, key=lambda d: d["doc_id"]):
+        doc_id = doc["doc_id"]
+        path = Path(annotations_dir) / (doc_id + ".json")
+        try:
+            file_sha = hashlib.sha256(path.read_bytes()).hexdigest()
+        except OSError as exc:
+            raise ValueError(
+                "gold 标注文件不可读（G⑥ 冻结集不完整）: %s: %s"
+                % (path, exc))
+        lines.append("%s:%s\n" % (doc_id, file_sha))
+        per_file[doc_id] = file_sha
+    digest = hashlib.sha256("".join(lines).encode("ascii")).hexdigest()
+    return digest, per_file

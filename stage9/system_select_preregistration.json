@@ -29,6 +29,12 @@
   "exclusion_note": "comparison/holdout 不得参与调参；仅在选优冻结后的最终报告中按同一配置评测一次",
   "manifest_sha256_expected": "51d3d40057568a35ee8415e30c91824662be216d098e3d639aaa954f4f140855",
   "gold_binding": "gold revision/hash 由 G⑥ 冻结后在运行时绑定（CLI 强制 --gold-revision 参数）；G⑥ 前真实语料运行被双重禁止（本预注册 + 裁决 C）",
+  "gold_digest": {
+    "definition": "sha256(''.join(f\"{doc_id}:{sha256(标注文件字节).hexdigest()}\\n\" for doc_id in sorted(core_doc_ids)))；core = manifest 中 split ∈ {dev, comparison, holdout} 的全部文档（24 篇，备选不计）",
+    "issued_at": "G⑥ 冻结 gold 时计算并签发（gold revision 与 gold_digest 成对）；G⑦ 运行时对 core 集重算并要求逐位相等，另列 14 dev 逐篇标注 sha256（dev_annotation_hashes）",
+    "working_tree": "G⑦ 正式运行拒绝 dirty working tree（git status --porcelain 非空或 git 不可核验即拒绝）",
+    "authority": "GPT 裁决 2026-09-07 二轮 C'：输入身份校验增强，可新增 commit；不得借机改网格/metric/tie-break（本文件其余字段未动）"
+  },
   "parser": "fallback（项目默认）",
   "projection": "stage9.project（顺序游标+全局回退精确子串匹配；unmatched 披露不静默）",
   "edge_handling": {
@@ -44,6 +50,8 @@
   "report_provenance_fields": [
     "manifest_sha256",
     "gold_revision",
+    "gold_digest",
+    "dev_annotation_hashes",
     "preregistration_sha256",
     "implementation_commit",
     "candidate_grid",

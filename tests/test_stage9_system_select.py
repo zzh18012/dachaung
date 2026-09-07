@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 from stage9.system_eval import (
+    compute_gold_digest,
     evaluate_system_doc,
     load_preregistration,
     system_macro_and_select,
@@ -115,6 +116,12 @@ def test_preregistration_frozen_shape():
         "51d3d40057568a35ee8415e30c91824662be216d098e3d639aaa954f4f"
         "140855")
     assert len(sha) == 64
+    # 裁决 C' 追加的输入身份校验（不触网格/metric/tie-break）
+    assert "sha256" in cfg["gold_digest"]["definition"]
+    assert "dev, comparison, holdout" in cfg["gold_digest"]["definition"]
+    assert "gold_digest" in cfg["report_provenance_fields"]
+    assert "dev_annotation_hashes" in cfg["report_provenance_fields"]
+    assert "working_tree" in cfg["gold_digest"]
 
 
 # ---------- CLI 守卫（合成 manifest + 合成预注册，进程内 monkeypatch） ----------
@@ -150,7 +157,7 @@ def test_cli_requires_gold_revision(tmp_path):
     mpath, anns, prereg = _synth_env(tmp_path)
     with pytest.raises(SystemExit) as ei:
         cli.main(["--manifest", str(mpath), "--annotations", str(anns)])
-    assert ei.value.code == 2  # argparse 缺必选参数
+    assert ei.value.code == 2  # argparse 缺必选参数（revision+digest）
 
 
 def test_cli_rejects_non_dev_split(tmp_path, monkeypatch):
@@ -159,7 +166,8 @@ def test_cli_rejects_non_dev_split(tmp_path, monkeypatch):
     monkeypatch.setattr(cli, "load_preregistration",
                         lambda path=None: (prereg, "synthsha"))
     rc = cli.main(["--manifest", str(mpath), "--annotations", str(anns),
-                   "--gold-revision", "synthetic-test", "--split",
+                   "--gold-revision", "synthetic-test",
+                   "--gold-digest", "0" * 64, "--split",
                    "holdout"])
     assert rc == 2
 
@@ -170,8 +178,11 @@ def test_cli_rejects_manifest_sha_mismatch(tmp_path, monkeypatch):
     prereg["manifest_sha256_expected"] = "0" * 64
     monkeypatch.setattr(cli, "load_preregistration",
                         lambda path=None: (prereg, "synthsha"))
+    monkeypatch.setattr(cli, "_working_tree_dirty",
+                        lambda: (False, ""))
     rc = cli.main(["--manifest", str(mpath), "--annotations", str(anns),
-                   "--gold-revision", "synthetic-test"])
+                   "--gold-revision", "synthetic-test",
+                   "--gold-digest", "0" * 64])
     assert rc == 2
 
 
@@ -181,8 +192,41 @@ def test_cli_rejects_dev_set_mismatch(tmp_path, monkeypatch):
     prereg["dev_doc_ids"] = ["another-doc"]
     monkeypatch.setattr(cli, "load_preregistration",
                         lambda path=None: (prereg, "synthsha"))
+    monkeypatch.setattr(cli, "_working_tree_dirty",
+                        lambda: (False, ""))
     rc = cli.main(["--manifest", str(mpath), "--annotations", str(anns),
-                   "--gold-revision", "synthetic-test"])
+                   "--gold-revision", "synthetic-test",
+                   "--gold-digest", "0" * 64])
+    assert rc == 2
+
+
+def test_cli_rejects_dirty_working_tree(tmp_path, monkeypatch):
+    # 裁决 C'：G⑦ 正式运行拒绝 dirty working tree（其余输入全对）
+    cli = _load_cli()
+    mpath, anns, prereg = _synth_env(tmp_path)
+    monkeypatch.setattr(cli, "load_preregistration",
+                        lambda path=None: (prereg, "synthsha"))
+    monkeypatch.setattr(cli, "_working_tree_dirty",
+                        lambda: (True, "工作树非干净（fixture）"))
+    digest, _ = compute_gold_digest(anns, [{"doc_id": "synth-01",
+                                            "split": "dev"}])
+    rc = cli.main(["--manifest", str(mpath), "--annotations", str(anns),
+                   "--gold-revision", "synthetic-test",
+                   "--gold-digest", digest])
+    assert rc == 2
+
+
+def test_cli_rejects_wrong_gold_digest(tmp_path, monkeypatch):
+    # 裁决 C'：gold 输入身份校验——重算 digest ≠ 签发值即拒绝
+    cli = _load_cli()
+    mpath, anns, prereg = _synth_env(tmp_path)
+    monkeypatch.setattr(cli, "load_preregistration",
+                        lambda path=None: (prereg, "synthsha"))
+    monkeypatch.setattr(cli, "_working_tree_dirty",
+                        lambda: (False, ""))
+    rc = cli.main(["--manifest", str(mpath), "--annotations", str(anns),
+                   "--gold-revision", "synthetic-test",
+                   "--gold-digest", "a" * 64])
     assert rc == 2
 
 
@@ -191,6 +235,10 @@ def test_cli_happy_path_synthetic(tmp_path, monkeypatch, capsys):
     mpath, anns, prereg = _synth_env(tmp_path)
     monkeypatch.setattr(cli, "load_preregistration",
                         lambda path=None: (prereg, "synthsha"))
+    monkeypatch.setattr(cli, "_working_tree_dirty",
+                        lambda: (False, ""))
+    digest, per_file = compute_gold_digest(
+        anns, [{"doc_id": "synth-01", "split": "dev"}])
 
     def fake_run(source, max_chars, parser_name="fallback"):
         # 合成 chunk：与两 segment 边界重合（ARI=1，两参数平局→取小）
@@ -200,15 +248,53 @@ def test_cli_happy_path_synthetic(tmp_path, monkeypatch, capsys):
     report = tmp_path / "report.json"
     rc = cli.main(["--manifest", str(mpath), "--annotations", str(anns),
                    "--gold-revision", "synthetic-g6-fixture",
+                   "--gold-digest", digest,
                    "--report", str(report), "--json"])
     assert rc == 0
     payload = json.loads(report.read_text(encoding="utf-8"))
     assert payload["preregistration"] == "synthetic-test"
     assert payload["provenance"]["gold_revision"] == "synthetic-g6-fixture"
+    assert payload["provenance"]["gold_digest"] == digest
+    assert payload["provenance"]["dev_annotation_hashes"] == {
+        "synth-01": per_file["synth-01"]}
     assert payload["provenance"]["preregistration_sha256"] == "synthsha"
     assert "implementation_commit" in payload["provenance"]
     assert payload["doc_count"] == 1
     assert payload["selection"]["max_chars"] in (200, 800)
+
+
+# ---------- gold digest（裁决 C' 输入身份校验） ----------
+
+def test_compute_gold_digest_deterministic_and_sensitive(tmp_path):
+    import hashlib
+    core = [{"doc_id": "b-02", "split": "dev"},
+            {"doc_id": "a-01", "split": "holdout"},
+            {"doc_id": "c-03", "split": "dev"}]
+    for d in core:
+        (tmp_path / (d["doc_id"] + ".json")).write_text(
+            json.dumps({"doc_id": d["doc_id"]}), encoding="utf-8")
+    d1, per1 = compute_gold_digest(tmp_path, core)
+    d2, _ = compute_gold_digest(tmp_path, list(reversed(core)))  # 排序稳定
+    assert d1 == d2 and len(d1) == 64
+    # 手算锁死聚合式
+    lines = []
+    for doc_id in sorted(x["doc_id"] for x in core):
+        fsha = hashlib.sha256(
+            (tmp_path / (doc_id + ".json")).read_bytes()).hexdigest()
+        lines.append("%s:%s\n" % (doc_id, fsha))
+    assert d1 == hashlib.sha256("".join(lines).encode("ascii")).hexdigest()
+    # 逐篇哈希披露；字节变动 → digest 变化
+    assert set(per1) == {"a-01", "b-02", "c-03"}
+    (tmp_path / "a-01.json").write_text(
+        json.dumps({"doc_id": "a-01", "changed": True}), encoding="utf-8")
+    d3, _ = compute_gold_digest(tmp_path, core)
+    assert d3 != d1
+
+
+def test_compute_gold_digest_missing_file_raises(tmp_path):
+    with pytest.raises(ValueError):
+        compute_gold_digest(tmp_path, [{"doc_id": "missing",
+                                        "split": "dev"}])
 
 
 # ---------- 真实管线接线（合成 docx，不计算参数优劣） ----------
