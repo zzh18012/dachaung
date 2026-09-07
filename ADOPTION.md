@@ -4533,3 +4533,62 @@ stage9/agreement.py**（七项禁改清单+C'' 冻结零接触），属 ⑤ 操�
    后可能需 resolution 的组为几十量级，工作量可控。
 4. 指南 §7.2 同步（工具用法与盲态边界）；本条随工具同 commit。
    **未推送**（连同 §82 的 565c075，push 待下轮授权）。
+
+## §八十四（2026-09-07）五轮裁决：push 放行 + identity_view 追认 + ⑥ 凭证格式锁定
+
+裁决来源：GPT-5.6 Sol（用户中转），三项全部落定；G④ 与已封口的
+agreement/prereg 语义均不受影响。
+
+1. **A push 已执行**：`1817d3b..dabe8dd`（565c075 台账 §82 +
+   dabe8dd 盲态工具）。四步核验：fetch ✓ →
+   `merge-base --is-ancestor 1817d3b dabe8dd` ✓ →
+   `rev-list --count` = 2 ✓ → 普通 FF push（无 force/amend/
+   rebase）→ `ls-remote` = 本地 HEAD =
+   `dabe8dd1c5cb1543a92e7a24946c2b7a0f95ffc4` ✓。裁决确认
+   dabe8dd 不触及 agreement.py、manifest、gold、authoritative
+   prereg，未突破任何冻结边界。
+2. **B identity_view 正式追认**（G⑤ 非 authoritative 操作支撑
+   工具）：plan 的 alone_pass/alone_below 被认定为合法 active
+   resolution 策略（未解析组仍按 bounded worst/best 留在全文
+   区间，只有全文 lower/upper 明确越过阈值才允许停止，非
+   cherry-picking）；blind 视图符合盲态纪律。**两条执行口径
+   锁定**（指南 §7.2 同步）：
+   - **不为单值而解析**：区间已可判定即质量门闭合，禁止为标量
+     解析无关歧义；正式结果合法形态允许 agreement_lower ≠
+     agreement_upper + decision=pass/below_threshold；仅
+     indeterminate 继续 resolution；全部 positive-gap 组解析完
+     毕才可报告唯一标量；
+   - **resolution 记录含盲态视图工具 commit**（当前 dabe8dd），
+     证明解析者看到的受限视图版本；非 scoring 依赖；
+   - 自比对冒烟仅性能/接线 smoke，组数量级估计不作质量证据或
+     停机规则。
+3. **C ⑥ gold-freeze credential 格式锁定**（指南 §7.3 同步；
+   格式预裁定，⑥ 未签发不得提前）：
+   - **C① gold_revision = `stage9-b26-gold-r1`**（stage-batch-
+     对象-rN 单调；日期只进 issued_at；冻结后改 core gold 不得
+     覆盖 r1，重新裁决签发 r2 并保留 r1 凭证与哈希链）；
+   - **C② per_doc_sha256 = 全部 24 core**（与 gold_digest 同域
+     可独立自证；G⑦ 另披露 14 dev_annotation_hashes，职责
+     不同：24=完整 gold 身份，14=调参输入审计）；
+   - **C③ credential SHA 批准记录且为 ⑥→⑦ 正式链路**：最终
+     字节 SHA 不写入自身（非自指）；外部记录=台账 G⑥ 冻结
+     凭证段 + G⑦ 报告 provenance 字段 gold_credential_sha256
+     （附加 provenance，不改 prereg）；文件名版本化
+     gold-freeze-credential.stage9-b26-gold-r1.json，签发+算
+     SHA 后 immutable；
+   - **三处内容补全**：digest_definition 固定五要素
+     （algorithm=sha256/UTF-8/doc_id ascending/单行
+     {doc_id}:{file_sha}\n/24 core）；double_annotation 存
+     decision+agreement_lower/upper+可空 agreement_final（区间
+     真塌缩才填）+secondary_annotation_sha256+
+     agreement_implementation_commit+pair_map_sha256+仲裁状态，
+     不得虚构标量；validator 记录含 commit 或版本/检查范围/
+     结果/执行时间；
+   - **G⑥ 封口顺序（不得倒置）**：四篇判定/必要 resolution →
+     必要仲裁 → 最终 gold validator → 24 篇逐文件 hash →
+     gold_digest → 写 credential → credential SHA → 外部台账
+     登记（仲裁改 gold 须先改 gold 再 validator，顺序不反）。
+4. 当前状态：G④ frozen；G⑤ 等第三方交回四篇后正式测量
+   （1817d3b authoritative；区间+decision 为合法终态）；⑥ 格式
+   已预裁定不得签发；⑦ 零真实运行。本 commit（§84+指南 §7.2/
+   §7.3 同步）未推送，随下轮授权。

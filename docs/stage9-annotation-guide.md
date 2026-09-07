@@ -255,6 +255,55 @@ BLOCKS = [
   `scripts/stage9_agreement.py --pair-map` 得确定一致率）。
   退出码 0 正常 / 2 输入错误（组不存在、组已消解等）。
 
+执行口径（五轮裁决 B 锁定）：
+- **不为单值而解析**：bounded 区间已可判定（lower ≥ 0.85 或
+  upper < 0.85）时质量门即闭合，**禁止**为得到标量而解析无关
+  歧义组。正式结果的合法形态允许 `agreement_lower ≠
+  agreement_upper` 且 decision=pass/below_threshold；仅
+  indeterminate 才继续 identity resolution 至判定可确定；只有
+  全部 positive-gap 组解析完毕才可报告唯一标量 agreement。
+- **resolution 记录含盲态视图工具 commit**：pair map 的
+  resolution 记录应注明生成盲态视图所用工具 commit（当前
+  dabe8dd）——证明解析者实际看到的受限视图版本；非 scoring
+  依赖，不改 agreement 主报告契约。
+- 自比对冒烟仅作性能/接线 smoke；其组数量级估计**不作**质量
+  证据或停机规则。
+
+### 7.3 G⑥ gold freeze 凭证（格式预裁定，签发须待 ⑥ 正式申请）
+
+文件：`samples/private/stage9-corpus/
+gold-freeze-credential.stage9-b26-gold-r1.json`（私有 gitignored，
+永不进 git；**版本化文件名**，签发并计算 SHA 后即 immutable。
+core gold 若在冻结后再须改动，不得覆盖 r1——重新裁决签发
+stage9-b26-gold-r2 并保留 r1 凭证与哈希链）。
+
+- `gold_revision` 固定形如 `stage9-b26-gold-r1`（stage-batch-
+  对象-rN 单调；日期只进 `issued_at`，不承担版本身份）；
+- `per_doc_sha256` 记录**全部 24 core**（与 gold_digest 同域，
+  凭证可独立展开自证；G⑦ 报告另披露 14 篇
+  dev_annotation_hashes，职责不同：24 = 完整 gold 身份，
+  14 = 调参输入审计）；
+- `digest_definition` 固定五要素：algorithm=sha256、编码 UTF-8、
+  排序=doc_id ascending、单行格式 `{doc_id}:{file_sha}\n`、
+  范围=24 core；
+- `double_annotation` 每篇记录：decision、agreement_lower/
+  agreement_upper、**可空** agreement_final（仅区间真正塌缩为
+  单值时填）、secondary_annotation_sha256、
+  agreement_implementation_commit、pair_map_sha256（无则
+  null）、仲裁状态——门槛已定但存留无关歧义时**不得虚构标量**；
+- validator 记录：validator/代码 commit 或版本、检查范围、结果、
+  执行时间（不只 failures=0）；
+- credential 最终字节 SHA **不写入自身**（非自指）；外部记录于
+  台账 G⑥ 冻结凭证段 + G⑦ 报告 provenance 字段
+  `gold_credential_sha256`（附加 provenance，不改 authoritative
+  prereg）。
+
+G⑥ 封口顺序（不得倒置）：四篇判定/必要 resolution → 必要仲裁
+（如改 gold 先改 gold 再重跑 validator）→ 最终 gold validator
+（在最终 gold 字节状态重跑）→ 24 篇逐文件 hash → 计算
+gold_digest → 写 credential → 计算 credential SHA → 外部台账
+登记 credential SHA。
+
 ## 8. 校验
 
 ```bash
