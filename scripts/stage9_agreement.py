@@ -6,13 +6,25 @@
   python scripts/stage9_agreement.py \
       --a samples/private/stage9-corpus/annotations/<doc_id>.json \
       --b samples/private/stage9-corpus/annotations-user/<doc_id>.json \
+      [--pair-map <identity resolution 产物 JSON>] \
       [--json] [--max-disagreements 40]
 
-退出码：0 = 一致率 ≥0.85；1 = 一致率 <0.85（停机线预警——是否停机
-仍须仲裁判定收敛性）；2 = 输入/IO 错误。输入应先过
-stage9_validate_annotations.py（本脚本不重复 schema 校验）。
+--pair-map（裁决 B' 2026-09-07 二轮）：仅当报告 decision=
+indeterminate（lower<0.85≤upper）时对跨线组做 identity resolution
+后使用——解析者只看 PDF 页面+结构位置、对 gold_segment 与得分盲态，
+不得改任一标注人的切分/kind/segment；pair map 单独保存，其 sha256
+记入报告 identity_resolution。格式：
+  {"家族|页": [[a_unit_id, b_unit_id], ...]}
+每组恰 matched 对、单射、unit_id 只能引用该组对象，非歧义组拒绝。
+
+退出码：0 = 判定 pass（agreement_lower ≥0.85）；1 = 需处置
+（below_threshold：agreement_upper <0.85，照走仲裁；或
+indeterminate：区间跨 0.85 需 identity resolution）；2 = 输入/IO
+错误。输入应先过 stage9_validate_annotations.py（本脚本不重复
+schema 校验）。
 """
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -27,9 +39,13 @@ from stage9.agreement import (  # noqa: E402
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        description="双标注一致率（unit 级：切分一致 + gold_segment 一致）")
+        description="双标注一致率（unit 级：切分一致 + gold_segment 一致；"
+                    "nontext 歧义组区间口径 v3-page-family-bounded）")
     parser.add_argument("--a", required=True, help="第一份标注 JSON")
     parser.add_argument("--b", required=True, help="第二份标注 JSON")
+    parser.add_argument("--pair-map",
+                        help="identity resolution 产物 JSON（仅歧义组；"
+                             "其 sha256 记入报告）")
     parser.add_argument("--json", action="store_true",
                         help="机器可读 JSON 输出")
     parser.add_argument("--max-disagreements", type=int, default=40,
@@ -42,7 +58,14 @@ def main(argv=None):
             ann_a = json.load(fh)
         with open(args.b, encoding="utf-8") as fh:
             ann_b = json.load(fh)
-        report = compute_agreement(ann_a, ann_b)
+        pair_map = None
+        pair_map_sha = None
+        if args.pair_map:
+            raw = Path(args.pair_map).read_bytes()
+            pair_map_sha = hashlib.sha256(raw).hexdigest()
+            pair_map = json.loads(raw.decode("utf-8"))
+        report = compute_agreement(ann_a, ann_b, pair_map=pair_map,
+                                   pair_map_sha256=pair_map_sha)
     except (OSError, json.JSONDecodeError,
             AgreementInputError, KeyError, TypeError, IndexError) as exc:
         result.update({"ok": False, "error": str(exc),
@@ -57,14 +80,23 @@ def main(argv=None):
     return 1 if report["below_threshold"] else 0
 
 
+def _fmt(v):
+    return "n/a" if v is None else "%.4f" % v
+
+
 def show(report, limit):
     rate = report["agreement"]
     print("doc_id: %s" % report["doc_id"])
-    print("一致率: %s（阈值 %s）"
-          % ("n/a" if rate is None else "%.4f" % rate,
-             report["threshold"]))
-    print("nontext 对齐: %s（家族+物理页，无序号——键不随多登/漏登漂移）"
-          % report["nontext_alignment"])
+    print("一致率: %s（阈值 %s）判定: %s"
+          % (_fmt(rate), report["threshold"],
+             "n/a" if report["decision"] is None else report["decision"]))
+    print("nontext 对齐: %s（家族+物理页，无序号；一致数区间 [%s, %s]）"
+          % (report["nontext_alignment"], _fmt(report["agreement_lower"]),
+             _fmt(report["agreement_upper"])))
+    res = report["identity_resolution"]
+    if res:
+        print("identity resolution: pair_map_sha256=%s 已消解 %d 组"
+              % (res["pair_map_sha256"], res["resolved_group_count"]))
     print("units: a=%d b=%d 对齐=%d 一致=%d 并集=%d"
           % (report["units_a"], report["units_b"], report["matched"],
              report["agree"], report["union"]))
@@ -73,6 +105,16 @@ def show(report, limit):
           % (len(report["kind_diff"]), len(report["segment_diff"]),
              len(report["only_a"]), len(report["only_b"]),
              report["hard_boundary_diff"]))
+    if report["ambiguous_groups"]:
+        print("—— 歧义组（同页同族双方多对象；identity resolution 仅限"
+              "判定跨线的组，列前 %d）——" % limit)
+        for g in report["ambiguous_groups"][:limit]:
+            print("  %s p%s: a=%s b=%s matched=%d 贡献=[%d,%d]%s"
+                  % (g["group"][0], g["group"][1],
+                     ",".join(g["a_unit_ids"]),
+                     ",".join(g["b_unit_ids"]), g["matched"],
+                     g["contribution_lower"], g["contribution_upper"],
+                     "（已消解）" if g["resolved"] else ""))
     sections = (
         ("kind 不一致（文本对齐但 unit 类别不同）", report["kind_diff"],
          _pair_brief),
