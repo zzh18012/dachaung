@@ -16,18 +16,20 @@ PDF 原文抽查切分/段归属/图 表登记质量。工具只渲染标注内�
 退出码：0 正常；2 输入/IO 错误。
 """
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
 
 
-def render(ann):
+def render(ann, annotation_sha256):
     units = ann.get("units", [])
     segs = {s.get("gold_segment_id"): s for s in ann.get("segments", [])}
     n_text = sum(1 for u in units if u.get("kind") != "nontext")
     n_non = len(units) - n_text
     lines = []
     lines.append("doc_id: %s" % ann.get("doc_id"))
+    lines.append("annotation_sha256=%s" % annotation_sha256)
     lines.append("annotator: %s | schema: %s | splitter: %s | "
                  "norm: %s" % (ann.get("annotator"),
                                ann.get("annotation_schema"),
@@ -95,9 +97,10 @@ def main(argv=None):
     parser.add_argument("--out", help="输出文件路径（默认 stdout）")
     args = parser.parse_args(argv)
     try:
-        with open(args.annotation, encoding="utf-8") as fh:
-            ann = json.load(fh)
-        text = render(ann)
+        raw = Path(args.annotation).read_bytes()
+        annotation_sha = hashlib.sha256(raw).hexdigest()
+        ann = json.loads(raw.decode("utf-8"))
+        text = render(ann, annotation_sha)
         if args.out:
             Path(args.out).write_text(text + "\n", encoding="utf-8")
             print("已写 %s（%d 行）" % (args.out, text.count("\n") + 1))

@@ -4621,3 +4621,39 @@ agreement/prereg 语义均不受影响。
    完成 §7 抽查 ≥2 篇义务；抽查结论由用户记入对应标注 notes。
 5. 本条随工具同 commit；**未推送**（连同 §84 f9ebdfd，随下轮
    授权）。
+
+## §八十六（2026-09-07）六轮裁决：push 放行 + 抽查工具追认 + sha 头补强
+
+裁决来源：GPT-5.6 Sol（用户中转）。三项定位：本轮无新实验口径
+风险，属审计可追溯性。
+
+1. **A push 已执行**：`dabe8dd..5673801`（f9ebdfd §84 台账 +
+   5673801 抽查工具）。四步核验：fetch ✓ → is-ancestor ✓ →
+   rev-list count=2 ✓ → 普通 FF（无 force/amend/rebase）→
+   ls-remote = 本地 = `567380186dbf282fe13a36be6b06060a9fffd402` ✓。
+   两 commit 均在授权边界内（裁决/指南同步 + 只读工具）。
+2. **B 抽查渲染工具正式追认**：定位 = **G⑤ human spot-check
+   rendering aid, non-authoritative**——annotation JSON 是事实源，
+   report 只是投影视图：不重新切句/分段、不计算 agreement、不修改
+   annotation；PDF 物理页/DOCX body_index 定位语义清楚；不因工具
+   存在改变 validator/agreement 口径。
+3. **非阻塞补强已落地（本 commit，普通工具维护）**：报告头部第
+   二行显示 `annotation_sha256=<输入文件 sha256>`——用户"已抽查
+   通过"记录据此绑定所看标注版本（G⑥ 前仍可能发生标注元数据/
+   仲裁变更，此绑定有审计价值）。测试同步（断言哈希值正确）；
+   两份默认抽查件已带哈希头重渲染（prod-05 =
+   b7d006dc1e7f59726437a7f7187979ff0c2e4ce5c7ebae02a731b02366e59717）。
+4. **抽查结论记录口径锁定（指南 §7 同步）**：渲染件只证明材料
+   就绪不证明义务完成；结论写入标注 notes（G⑥ 前允许）须：
+   ①只记事实不改标注判断；②写入后重跑 validator；③G⑥ 的
+   per_doc_sha256/gold_digest 基于写 notes 后最终字节；④G⑥ 后
+   禁静默补写。只记外部台账则无字节影响。
+5. **完整性复核知悉**：全绿、G④ 保持原 freeze，不产生新
+   manifest freeze event 或新权威 hash。
+6. **分篇处理操作口径（执行方补充，非新裁决）**：第二标注人交回
+   件逐篇独立走 validate → agreement →（如 indeterminate）
+   identity resolution；四篇无须同时到齐。G⑥ 申请与凭证组装
+   等四篇全部收敛；任一篇 below_threshold 且仲裁不收敛即触发
+   停机条件，立即单独简报。
+7. 本 commit（sha 头补强 + 指南 §7 口径 + §86）未推送，随下轮
+   授权。

@@ -162,7 +162,16 @@ C1/C2 正式化）：v1.0 = 设计 §3 原字段；v1.1 = ①`stream` 由实现�
   仲裁结果为准；仲裁修改 gold 后须重跑 validator；其余 20 篇用户
   抽查 ≥2 篇（可用 `scripts/stage9_annotation_report.py` 把标注
   JSON 渲染为人类可读视图对照 PDF——只读支撑件，仅呈现标注内容，
-  判定仍以 validator/agreement 为准；结论记入该文档标注 `notes`）。
+  报告头部含 `annotation_sha256`，抽查记录据此绑定所看的标注版本；
+  判定仍以 validator/agreement 为准）。
+
+  抽查结论记录口径（六轮裁决锁定）：渲染件本身只证明抽查材料
+  就绪，**不证明义务完成**——完成证据=用户对照 PDF 的实际结论。
+  结论若写入标注 `notes`（G⑥ 冻结前允许）须遵守：①只记录抽查
+  事实，不改 stream/span/segment 等标注判断；②写入后重跑对应
+  validator；③G⑥ 的 per_doc_sha256/gold_digest 基于写入 notes
+  后的最终字节；④G⑥ 之后不得再为补抽查说明静默修改标注。结论
+  若只记外部审计台账则不动标注字节，无上述字节影响。
 
 ### 7.1 操作流程（第二标注人）
 

@@ -59,8 +59,11 @@ def test_render_reading_order_view(tmp_path):
     r = run("--annotation", str(p))
     assert r.returncode == 0, r.stdout + r.stderr
     out = r.stdout
-    # 头部统计与 segment 一览
+    # 头部统计与 segment 一览；annotation_sha256 绑定输入版本
     assert "doc_id: d-test" in out
+    import hashlib
+    expect_sha = hashlib.sha256(p.read_bytes()).hexdigest()
+    assert "annotation_sha256=%s" % expect_sha in out
     assert "units: 5（text 4 + nontext 1）" in out
     assert "g00  题名（frontmatter）× 2 units" in out
     # 阅读序：分组标题、硬边界标记、页分隔线、全文呈现
