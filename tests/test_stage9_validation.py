@@ -464,9 +464,46 @@ def test_cli_full_set_link_stats(tmp_path):
          "--annotations", str(good), "--full-set", "--json"],
         capture_output=True, text=True, cwd=str(ROOT))
     # 单文档不满足 14/4/6 分层（rc 1），但 links 统计照常输出
-    links = json.loads(result.stdout)["summary"]["links"]
-    assert links["nontext_total"] == 2
-    assert links["linked_objects"] + links["anchorless_count"] \
-        == links["nontext_total"]
+    summary = json.loads(result.stdout)["summary"]
+    assert "links" not in summary  # 八轮裁决：旧合并键废弃
+    core = summary["core_link_stats"]
+    all_stats = summary["all_annotated_link_stats"]
+    assert core["nontext_total"] == 2
+    assert core["linked_objects"] + core["anchorless_count"] \
+        == core["nontext_total"]
+    # 夹具文档 split=dev 属 core，两口径数值一致
+    assert core == all_stats
     by_doc = json.loads(result.stdout)["links_by_doc"]
     assert by_doc["acad-01-sentencebert"]["linked_pairs"] == 1
+
+
+def test_cli_full_set_core_excludes_unassigned(tmp_path):
+    """八轮裁决：core=split 已分配（dev/comparison/holdout）；
+    未分配 split 的已标注文档只进 all_annotated_link_stats。"""
+    script = ROOT / "scripts" / "stage9_validate_annotations.py"
+    manifest = tmp_path / "manifest.json"
+    mf = {"docs": [
+        {"doc_id": "acad-01-sentencebert", "domain": "academic",
+         "split": "dev"},
+        {"doc_id": "prod-08-infosec-exercises", "domain": "product_manual",
+         "split": None}]}
+    manifest.write_text(json.dumps(mf), encoding="utf-8")
+    data = _two_nontext_annotation()
+    data["units"][1]["linked_nontext"] = ["img:figure1"]
+    # 备选文档：doc_id 换成 prod-08，其余同构
+    alt = _two_nontext_annotation()
+    alt["doc_id"] = "prod-08-infosec-exercises"
+    alt["units"][1]["linked_nontext"] = ["img:figure1"]
+    good = tmp_path / "good.json"
+    good.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    backup = tmp_path / "backup.json"
+    backup.write_text(json.dumps(alt, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(script), "--manifest", str(manifest),
+         "--annotations", str(good), str(backup), "--full-set", "--json"],
+        capture_output=True, text=True, cwd=str(ROOT))
+    summary = json.loads(result.stdout)["summary"]
+    assert summary["core_link_stats"]["nontext_total"] == 2
+    assert summary["all_annotated_link_stats"]["nontext_total"] == 4
+    assert summary["core_link_stats"]["linked_pairs"] == 1
+    assert summary["all_annotated_link_stats"]["linked_pairs"] == 2

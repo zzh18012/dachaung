@@ -106,11 +106,21 @@ def main(argv=None):
                              **fail.to_json()})
         summary["split"] = split_summary
         # 七轮裁决 B3：关联统计从标注字节现场重算（不信任手填 _meta），
-        # 纯披露无阈值；恒等式由 compute_link_stats 构造保证
-        summary["links"] = {
-            key: sum(d[key] for d in link_stats_by_doc.values())
-            for key in ("linked_pairs", "linked_objects",
-                        "anchorless_count", "nontext_total")}
+        # 纯披露无阈值；恒等式由 compute_link_stats 构造保证。
+        # 八轮裁决：输出区分 core（24 篇 split 已分配）与全部已标注
+        # （含备选 prod-08）；G⑥ credential 与论文只用 core 口径。
+        core_split = {"dev", "comparison", "holdout"}
+        keys = ("linked_pairs", "linked_objects", "anchorless_count",
+                "nontext_total")
+
+        def _agg(pred):
+            return {k: sum(d[k] for doc_id, d in link_stats_by_doc.items()
+                           if pred(doc_id)) for k in keys}
+
+        summary["core_link_stats"] = _agg(
+            lambda doc_id: manifest_index.get(doc_id, {})
+            .get("split") in core_split)
+        summary["all_annotated_link_stats"] = _agg(lambda _: True)
 
     report = {"summary": summary, "failures": failures}
     if args.full_set:
@@ -132,8 +142,10 @@ def main(argv=None):
         if args.full_set:
             print("split: %s" % json.dumps(
                 summary["split"], ensure_ascii=False))
-            print("links: %s" % json.dumps(
-                summary["links"], ensure_ascii=False))
+            print("core_link_stats: %s" % json.dumps(
+                summary["core_link_stats"], ensure_ascii=False))
+            print("all_annotated_link_stats: %s" % json.dumps(
+                summary["all_annotated_link_stats"], ensure_ascii=False))
 
     if io_errors:
         return 2

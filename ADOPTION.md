@@ -4803,3 +4803,92 @@ agreement/prereg 语义均不受影响。
     ①补链完成②full-set/validator 通过已满足；③relation 专项抽查
     （≥2 core/≥2 domain，默认 prod-05+tech-01）待用户执行；G⑤
     第二标注人 4 篇独立进行中。
+
+## §九十（2026-09-08）八轮裁决执行：A/D/E/H 改判 + B 缺陷修复 + C/H 全量复查 + core/all 拆分
+
+承接 §八十九 GPT 八轮裁决（e64878e 保持裁决前审计记录，本节登记
+执行）。执行序：push（已完成 §A）→ 改判 → B 修复 → 重施加 →
+validator+full-set → 重算 totals → 台账+简报。
+
+1. **D 推定降级复查（tech-06）**：p57 / p61 整页渲染视觉核验
+   （pdfplumber to_image + 视觉模型转录嵌入题注）——img:43 嵌入题注
+   逐字 "Fig. 42 - Most commonly seen TTPs."（对应 u1199 "Figure 42
+   represents a clustered visualisation of common TTPs"）；img:47
+   嵌入题注逐字 "Fig. 47 - Most mentioned vendors in the KEV
+   catalogue over the reporting period."（对应 u1232 "top ten
+   mentioned vendors"）。三处 Fig→img 映射（42→43、45→45、47→47）
+   全部嵌入题注直接实证，**零删除**；判读表"顺序推定"表述作废。
+2. **B 缺陷分类与修复（tech-06）**：分类结论——p67-74 / p76-80+p81
+   上表 / p84-86 为 tab:2/tab:3/tab:5 跨页延续页，表体单元格文字按
+   既有政策不入 stream，非缺陷；唯一 gold 缺陷 = p81 下半页 Mobile
+   TTPs 语义表无 tab unit。修复：插入 nontext 单元 u1349=tab:8
+   （g12，page 81，题行 u1317 下 13 行表），notes 同步（NT 57 +
+   Mobile RATs 表补登记说明），validate 零错误。
+3. **E 改判（heading 按内容 + 孪生按覆盖）**：
+   - tech-06 tab:6 锚 u1345 "12.3 LEXICON"（p86 末编号节标题，p87
+     整页 Term|Definition 词表零间隔，标题即对象唯一语义描述；整页
+     渲染核验）；tab:7 锚 u1347 "13. LOG HISTORY"（p88，同理）。
+   - prod-07 tab:1 锚 u0035 "Revision Summary"（节全部内容即修订表）。
+   - prod-07 孪生：tab:45 并入 u2214、tab:47 并入 u2268——tab:44
+     的 Type 参数描述单元格明文引出 Types 表（tab:45 即 Type|
+     OldValue|NewValue 类型表），tab:46 的 Class 参数由 tab:47
+     （Class level|Description）细化；DOCX 正文元素序两表间仅空
+     段落。题名块语义覆盖两表。
+   - prod-05 按钮对：u0064→btn-get-data（"获取数据"）、u0065→
+     btn-script（"生成数据下载脚本"）各自功能命名句锚，内容唯一，
+     维持不变。prod-06 14 对背靠背孪生原判已全双连，并入 C 复查。
+4. **A 改判复查（acad-06 tab3-5）**：u0110/u0128/u0135 为紧贴对象的
+   "Table N:" 位置性题注（编号由题注自身携带），u0125/u0133 紧邻
+   显式引用且对象身份经题注确证——非全局编号配对推定，全部保留。
+   连带完备性补链（同 tech-03/acad-01 全显式引用成边口径）：u0023/
+   u0026→fig-1、u0048/u0066/u0071→fig-2、u0096→tab:1、u0103→tab:2、
+   u0118→tab:3、u0130→tab:4、u0150→fig-3 共 10 条；u0153 "detect
+   Table 1"（案例研究示例文档内的表）唯一性不足维持不连。
+5. **H 逐项复查（prod-06 xref）**：23 处"如图XXX"（实际 28 边）逐项
+   ——重名两类经复核均为"邻接对象题注与引用名逐字匹配"（图"单一
+   窗口"标准版登录：u0084→fig012 dist=1+叙事首达；图已处理确认×6：
+   各自紧邻题注同名确认组），题注实证=局部语境唯一，非就近兜底；
+   其余 16 名全篇唯一。**零删除**。u1153/u1169/u1181/u1193/u1205
+   另含后向列表截图边（操作语境隐式锚，紧邻唯一）。
+6. **C 严格复查（prod-06 210 + prod-09 118 隐式对）**：风险类全扫
+   （无指称词句/孤立括号句/孪生组/多图组）旗标 41 对逐项判定——
+   改判 3：u0090→fig013 删（描述不可见的验证/加密过程，无视觉指向；
+   fig013 已有 u0087 显式引用+u0092 题注双锚）；u0583/u0595 两个
+   '"' 引号碎片单元删（分句器伪影非语义锚），由所属完整注记句
+   u0582/u0594（CAS 码提示注）接管 fig097/fig101。其余 38 对保留：
+   字段标签题名锚 10、功能句→承载界面 3、参见句+本地界面 5、
+   步骤标签/注记句/多图组（prod-09）11、（如下图）指称碎片 1 等，
+   判读表逐项登记。prod-09 零改判。
+7. **陈旧边清理**：stage9_link_apply 语义为只写不清（不破坏 LINKS
+   外单元），删除类改判后 prod-06 残留 3 条陈旧 linked_nontext
+   （u0090/u0583/u0595），已手工摘除并重校验（381/253/1/254）。
+8. **full-set 输出拆分（八轮指令）**：`summary["links"]` 废弃，改
+   `core_link_stats`（split ∈ dev/comparison/holdout 24 篇）+
+   `all_annotated_link_stats`（含备选 prod-08 共 25 篇）；键集锁
+   测试 +1（core 排除未分配 split）。G⑥ credential 与论文只用
+   core 口径。
+9. **重算 totals（裁决后正式值）**：**core：linked_pairs=1462 /
+   linked_objects=911 / anchorless=55 / nontext=966**（恒等式
+   911+55=966 成立）；all_annotated：1462/911/76/987（prod-08
+   未施行 21 anchorless）。对裁决前临时值 1447/905/60/965 的
+   delta：+15 对（tech-06 +3、prod-07 +3、acad-06 +10、prod-06
+   −1）、+6 对象（tech-06 tab:6/7/8、prod-07 tab:1/45/47）、
+   −5 anchorless（tech-06 tab:6/7、prod-07 tab:1/45/47）、+1
+   nontext（tab:8）。§八十九数值标记为裁决前临时值，以本节为准。
+10. **逐篇变更后统计**（pairs/objects/anchorless/nontext）：acad-06
+    23/9/0/9、prod-06 381/253/1/254、prod-07 89/76/6/82、tech-06
+    13/12/45/57；其余 16 篇有边文档与 4 篇零 nontext 文档不变。
+    full-set 25 文件 0 失败 0 IO 错误，split 14/4/6。
+11. **G⑥ relation 专项抽查登记（八轮微调）**：positive 保留 prod-05
+    + tech-01（每对象锚句清单，⇈ 标记）；negative 新增 tech-06
+    （anchorless=45 ≥ 10 对象，B 分类已完成，anchorless 标记供
+    抽查"无锚正当性"）。支撑件 `scripts/stage9_annotation_report.py`
+    （§八十九 11）。
+12. **已知不对称（披露，待 GPT 定性）**：prod-06 "在图X中"后向提及
+    若图名唯一（u0099/u1278/u1287/u1298/u1396）未成边，与重名类
+    不建边处理一致，但与 3 条既有后向"上图"边口径不同。
+13. **验证**：pytest 5636 passed / 4 skipped（docker-gated，既有；
+    +1 拆分测试）；cp936 控制台 subprocess 型测试需 PYTHONUTF8=1。
+14. **git**：本节 + 改判 + 修复 + 拆分实现共一个 commit（待提交），
+    push 待授权。G⑥ 前置：①改判后补链态 ✓②full-set/validator ✓
+    ③relation 抽查待用户执行；G⑤ 第二标注人 4 篇独立进行中。
