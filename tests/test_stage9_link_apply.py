@@ -73,10 +73,10 @@ def _links(tmp_path, links):
     return p
 
 
-def _run(manifest, ann, links):
+def _run(manifest, ann, links, extra=()):
     return subprocess.run(
         [sys.executable, str(SCRIPT), "--manifest", str(manifest),
-         "--annotation", str(ann), "--links", str(links)],
+         "--annotation", str(ann), "--links", str(links), *extra],
         capture_output=True, text=True, cwd=str(ROOT))
 
 
@@ -151,3 +151,54 @@ def test_bad_links_file_rc2(tmp_path):
     p = tmp_path / "links.py"
     p.write_text("NOT_LINKS = 1\n", encoding="utf-8")
     assert _run(_manifest(tmp_path), ann, p).returncode == 2
+
+
+def test_default_warns_stale_but_keeps(tmp_path):
+    data = _ann()
+    data["units"][2]["linked_nontext"] = ["img:figure1"]
+    ann = _write(tmp_path, data)
+    links = _links(tmp_path, {"u0002": ["img:figure1"]})
+    r = _run(_manifest(tmp_path), ann, links)
+    assert r.returncode == 0, r.stdout + r.stderr
+    after = json.loads(ann.read_text(encoding="utf-8"))
+    # 默认模式：表外 unit 的边不动，仅提示
+    assert after["units"][2]["linked_nontext"] == ["img:figure1"]
+    assert "stale 提示" in r.stderr and "u0003" in r.stderr
+
+
+def test_replace_prunes_unlisted_edges(tmp_path):
+    data = _ann()
+    data["units"][2]["linked_nontext"] = ["img:figure1"]
+    ann = _write(tmp_path, data)
+    links = _links(tmp_path, {"u0002": ["img:figure1"]})
+    r = _run(_manifest(tmp_path), ann, links, extra=("--replace",))
+    assert r.returncode == 0, r.stdout + r.stderr
+    after = json.loads(ann.read_text(encoding="utf-8"))
+    assert after["units"][1]["linked_nontext"] == ["img:figure1"]
+    assert "linked_nontext" not in after["units"][2]
+    assert "u0003" in r.stderr and "stale" in r.stderr
+    # B2 边界：除 linked_nontext 外无差异（对照无边的原始 fixture）
+    stripped = [{k: v for k, v in u.items() if k != "linked_nontext"}
+                for u in after["units"]]
+    assert stripped == _ann()["units"]
+
+
+def test_replace_keeps_b2_guard_and_validation(tmp_path):
+    data = _ann()
+    data["units"][2]["linked_nontext"] = ["img:figure1"]
+    ann = _write(tmp_path, data)
+    raw_before = ann.read_bytes()
+    # 未知 ref：--replace 下施加后校验仍先行，失败不写盘
+    links = _links(tmp_path, {"u0002": ["img:nope"]})
+    r = _run(_manifest(tmp_path), ann, links, extra=("--replace",))
+    assert r.returncode == 1
+    assert "unknown_nontext_ref" in r.stderr
+    assert ann.read_bytes() == raw_before
+
+
+def test_default_no_stale_silent(tmp_path):
+    ann = _write(tmp_path, _ann())
+    links = _links(tmp_path, {"u0002": ["img:figure1"]})
+    r = _run(_manifest(tmp_path), ann, links)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "stale" not in r.stderr

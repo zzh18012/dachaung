@@ -25,6 +25,12 @@ relations；禁止按当前系统预测结果决定加/删边；禁止为提高�
       --annotation samples/private/stage9-corpus/annotations/<doc_id>.json \
       --links samples/private/stage9-corpus/annotations/links_<doc>.py
 
+--replace（九轮 C 非阻塞维护建议，默认关闭）：全量替换语义——LINKS
+视为该文档 linked_nontext 的完整目标状态，表外 text unit 残留的边
+（stale edge）一并清除并在 stderr 逐 id 报告。默认模式仅覆盖表内
+unit，但检测到表外带边 unit 时在 stderr 提示（不改动、不影响退出
+码）——两种模式下 B2 硬边界守卫与施加后校验均不变。
+
 退出码：0 成功写盘；1 施加后校验失败（不写盘）；2 输入/越界错误。
 """
 import argparse
@@ -80,6 +86,10 @@ def main(argv=None):
     parser.add_argument("--annotation", required=True)
     parser.add_argument("--links", required=True,
                         help="links 文件（定义 LINKS 字典的 Python 文件）")
+    parser.add_argument("--replace", action="store_true",
+                        help="全量替换语义：LINKS 视为该文档关联边的完整"
+                             "目标状态，表外 text unit 的 linked_nontext "
+                             "一并清除（防 stale edge；默认仅覆盖表内 unit）")
     args = parser.parse_args(argv)
 
     try:
@@ -111,6 +121,7 @@ def main(argv=None):
 
     new_ann = copy.deepcopy(ann)
     applied = 0
+    pruned = []
     for u in new_ann.get("units", []):
         uid = u.get("unit_id")
         if uid in links:
@@ -120,9 +131,28 @@ def main(argv=None):
             else:
                 u.pop("linked_nontext", None)
             applied += 1
+        elif args.replace and u.get("kind") != "nontext" \
+                and u.get("linked_nontext"):
+            pruned.append(uid)
+            u.pop("linked_nontext", None)
     if applied != len(links):
         print("输入错误: LINKS 含未匹配 unit_id", file=sys.stderr)
         return 2
+    if pruned:
+        print("--replace：清除 %d 个表外 unit 的 stale 边: %s"
+              % (len(pruned), ",".join(pruned[:20])
+                 + ("..." if len(pruned) > 20 else "")), file=sys.stderr)
+    if not args.replace:
+        stale = [u.get("unit_id") for u in ann.get("units", [])
+                 if isinstance(u, dict) and u.get("kind") != "nontext"
+                 and u.get("linked_nontext")
+                 and u.get("unit_id") not in links]
+        if stale:
+            print("stale 提示（未改动）: %d 个 unit 带边但不在 LINKS 表: "
+                  "%s —— 如需清除请用 --replace" % (
+                      len(stale), ",".join(stale[:20])
+                      + ("..." if len(stale) > 20 else "")),
+                  file=sys.stderr)
 
     if strip_links(new_ann) != strip_links(ann):
         print("越界改动：施加结果除 linked_nontext 外存在差异——拒绝写盘",
@@ -139,8 +169,10 @@ def main(argv=None):
         return 1
 
     Path(args.annotation).write_bytes(serialize(new_ann, raw))
-    print("已施加 %d 个 unit 的关联边（%d 条）→ %s"
-          % (applied, sum(len(v) for v in links.values()), args.annotation))
+    print("已施加 %d 个 unit 的关联边（%d 条）%s→ %s"
+          % (applied, sum(len(v) for v in links.values()),
+             ("+ 清除 %d 个 stale 边 unit " % len(pruned)
+              if args.replace else ""), args.annotation))
     return 0
 
 
