@@ -4892,3 +4892,126 @@ validator+full-set → 重算 totals → 台账+简报。
 14. **git**：本节 + 改判 + 修复 + 拆分实现共一个 commit（待提交），
     push 待授权。G⑥ 前置：①改判后补链态 ✓②full-set/validator ✓
     ③relation 抽查待用户执行；G⑤ 第二标注人 4 篇独立进行中。
+
+## §九十一（2026-09-08）九轮裁决执行：A push 追认 + C 显式指称方向无关统一（24 core 补链 68 对）+ totals 正名
+
+承接九轮 GPT 裁决（"在图X中 属于显式指称，目标唯一时不能因为它是
+后向引用就不建边。方向不是 link 判定条件"）。执行序：A push → C 五处
+核验扩全 → 24-core 窄扫 → 重施加 → validator/full-set → 程序重算
+totals → 台账+简报。
+
+1. **A push（§54 完成）**：e64878e..d6689db 已推（八轮 A/D/E/H + B
+   repair 追认），remote=local=d6689db 四步核验通过。
+2. **C-1 五处后向指称核验扩全（prod-06，10 unit/10 边）**：u0099+
+   fig009（在图门户网站）、u1278/u1282/u1287/u1298→fig207（在图报
+   关数据查询结果列表，工具栏按钮所在界面）、u1396+fig218（在图修
+   撤单-修改申请详细信息（新））、u0149→fig021/u0189→fig029/u0796→
+   fig131/u0442+fig064（后向"上图"，目标唯一，截图内容核验——p17
+   截图一题注实证等）。3 条既有"上图"边维持（目标唯一）。
+3. **C-2 窄扫范围修正**：显式标记正则全 core 扫描 pass-1 计 1160 候
+   选，其中 prod-02 独占 1091——**prod-02/prod-03/prod-04/tech-04
+   为零 nontext 文档（无对象即无边，候选无效）**，有效候选 = 其余
+   20 篇 69 + prod-06 专项（pass-1 26 / pass-2 102）。零 nontext
+   文档事实与 §九十 10 一致。
+4. **C-3 非 prod-06 判读（38 边）**：acad-01 +3（u0118/u0163/u0187
+   "depicted in Table N"）、acad-02 +6（u0017/u0024 Figure N、
+   u0088/u0090/u0097/u0100 Table N，编号全篇唯一）、acad-03 +10
+   （u0019/u0020/u0031/u0132/u0137 Figure、u0089/u0131/u0164 Table、
+   **u0138 一句双指称 [tab:3, img:fig-4] 按目标阅读序**）、acad-04
+   +5、acad-05 +6（Fig.N 句式）、tech-02 +5（u0460/u0467 附录后向
+   →fig-2）、tech-05 +1（u0114 表 4.2.1 表下注"表中"→紧邻上表）、
+   tech-08 +1（u0785 页脚注"图中"→紧邻上图 fig-53；修订该篇
+   docstring"无显式引用锚"结论——该结论仅覆盖编号引用）。假阳性不
+   成边：acad-06 u0094 "pdffigure2"（工具名）、u0494/u0535（JSON/
+   题注示例）、acad-08 u0247/u0250（"该图谱/当前图谱"=知识图谱非
+   指称标记目标）。
+5. **C-4 prod-09 u0209 改判（八轮例外撤销）**：八轮判"无法按内容+
+   邻接唯一确定"不成边——本轮经 **DOCX 顶层 body 元素序定位**
+   （word/document.xml w:p 序：注 u0209→三方式枚举 u0210/11/12→
+   image45→image46，即 fig074/fig075）+ 截图视觉核验（fig074=认证
+   方式下拉框全量展示三种企业身份认证；fig075=经办人/邮寄信息表单
+   段，不含三方式）改判成边 **u0209→fig074**。根因披露：初判唯一性
+   不足源于内联图 r:embed 序（101 图）与标注图序（119 单元）错位
+   （先按 r:embed 序提取 #74/#75 为证件上传/短信弹窗，内容不符），
+   body 元素序定位后消除；判读表 docstring 例外节同步改写。
+6. **C-5 prod-06 窄扫判读（26+102）**：pass-1 26 = 9 处"在参数下拉
+   表中选择"字典型假阳性（u0156/u0620/u0622/u0637/u0653/u0682/
+   u0710/u0712/u0734）+ 5 处已由 C-1 覆盖 + **12 unit/13 边新增**
+   （u0520→fig088、u0552→fig093、u0566→fig095、u0590→fig100 excel
+   模板三联句同构、u0543/u0559/u0573→fig091 命名图"商品规范申报
+   （申报要素）"全篇唯一题注 u0539、u0651→fig110、u0868→fig146+
+   fig147 双页签图组双题注实证、u1288→fig210、u1327→fig214、
+   u1446→fig244）。pass-2 102 逐项 eyeball 出**部分覆盖 7 边**
+   （u0087+fig012、u0388+fig054、u0852+fig144——题注句内合并的第
+   二指称与题注逐字；u0657+fig111 VIN 录入界面；u1269/u1302+
+   fig207 图报关数据查询；u1413+fig234"图中"确定按钮），其余 95
+   unit 覆盖完整维持。
+7. **重施加 + 终检**：10 篇 links 判读表更新（prod-06 353→372 unit /
+   381→411 边）经 stage9_link_apply 施加；施加前程序核验 0 坏 ref /
+   0 丢边 / 0 重复；validator --full-set 25 文件 **0 失败 0 IO 错误**
+   （split 14/4/6）。
+8. **totals 程序重算（九轮后正式值）**：**core：linked_pairs=1530 /
+   linked_objects=911 / anchorless=55 / nontext=966**（恒等式
+   911+55=966 成立）；all_annotated：1530/911/76/987。对八轮正式值
+   1462/911/55/966 的 delta：**+68 对，objects/anchorless 零变化**
+   （全部新边指向已锚对象，程序重算确认）。裁决预估"恰好 5 新 pair
+   →1467"被窄扫实际产量取代（五处核验 10 + 窄扫 58 + prod-09 1 -
+   重叠计入见判读表）；B 节 totals 正名请求：§89 1447 正式作废、
+   §90 1462 为九轮前值、本节 1530 为现行值——**措辞经十轮回执裁决
+   R1 修正为 "current authoritative working core totals"（非 G⑥
+   frozen/final，见下 12）**。
+9. **维护件（九轮非阻塞建议，独立 commit 待授权）**：stage9_link_
+   apply 新增 `--replace` 全量替换语义（表外 text unit 残留边清除并
+   逐 id 报告）；默认模式零变化 + stale 提示（不改动态不影响退出
+   码）；B2 硬边界守卫与施加后校验两模式不变。测试 6→11（全绿）；
+   pytest 全量 5640 passed / 4 skipped（docker-gated 既有）。
+10. **G⑥/G⑤ 影响**：本轮只动 linked_nontext——G⑤ agreement 不读该
+    字段（B2 硬边界，acad-03/tech-08 双标注篇已核验无影响）；G⑥
+    relation 专项抽查支撑件（has_caption 渲染）不受本轮影响，待用
+    户执行。G⑥ 禁入维持至 relation 抽查完成。
+11. **git**：gold 变更全部在 samples/private（gitignored 永不进
+    git）；可推送 = 本节 + 维护件（两个 commit：§91 台账 / --replace
+    实现+测试），push 待 GPT 裁决授权。
+12. **十轮回执裁决（R1/R2/R3，2026-09-08 用户中转，随本节 commit
+    登记）**：
+    - **R1 修改措辞后追认**：九轮 C 执行口径获确认（"text unit 对
+      nontext 有明确指称，且具体 occurrence 能唯一确定即建边；前向/
+      后向不影响资格"）。**1530/911/55/966 = current authoritative
+      working core totals**——尚非 G⑥ frozen/final totals（唯一剩余
+      前置：relation 独立抽查，抽查本身允许发现并改判 edge）。口径
+      废弃链定名：1447 = pre-r8 provisional（作废）；1462/911/55/966
+      = pre-r9 explicit-reference normalization snapshot；1530/911/
+      55/966 = current authoritative working core totals。**升级规则
+      锁定**：抽查零改判 → 1530/911/55/966 原样进 G⑥ credential，
+      G⑥ 冻结后即最终 gold totals；抽查产生任何 linked edge 增删 →
+      先修正 → validator/full-set → 重算 totals，新程序值进 G⑥。
+      无需全 24-core relation 重判。
+    - **R2 push 放行**：d6689db → §91 台账 commit → link_apply
+      --replace commit，恰 2 commits 普通 FF push；四步核验（fetch →
+      is-ancestor → rev-list count=2 → FF → ls-remote == local HEAD）；
+      禁 force/amend/rebase。--replace 语义追认（replace 模式下判读
+      表 = 该文档 linked_nontext 完整 target state，表外旧边必删，比
+      write-only 更适合 G⑥ 前最后改判阶段；默认模式 stale 仅提示不
+      静默删除正确）。
+    - **R3 relation 专项抽查批准直接随 G⑥ 申请提交**（无须为本步单
+      独裁决；与四篇 agreement/仲裁结果一并提交）。组合维持：
+      positive = prod-05 + tech-01 全部 positive linked pairs；negative
+      = tech-06 ≥10 anchorless。**记录字段锁定**：doc_id /
+      annotation_sha256_reviewed / audit_type(positive|negative) /
+      checked_count / checked_unit_ids 或 nontext_refs / result(pass|
+      defects_found) / defects 或 corrections / review_date。tech-06
+      须记录实际检查的 ≥10 个 refs/unit IDs（非"抽查 10 个"一句话），
+      按 source reading order 确定性覆盖（45 个 anchorless 阅读序均
+      匀取 ≥10 或全查 45，无须新增工具）。**notes/hash 纪律**：抽查
+      记录保存实际审阅版本的 annotation_sha256；结论后写 annotation
+      notes 则字节变 → 须确认变化仅 notes → 重跑 validator → G⑥
+      per_doc_sha256/gold_digest 用 notes 写入后最终字节，抽查记录仍
+      保留 reviewed SHA（更干净路径=结论直接进 G⑥ credential/外部审
+      计记录，不动 annotation notes，两可）。G⑥ credential 增
+      relation_spotcheck 段（三篇 reviewed SHA + 结果 + 修正后最终
+      core relation totals；有改判则附最后一次 core_link_stats /
+      all_annotated_link_stats / full-set failures=0）。
+    - **当前状态登记**：G④ 保持 frozen；G⑤ 四篇第二标注继续；linked
+      gold 九轮显式引用语义已收敛，working totals = 1530/911/55/966；
+      G⑥ 剩余 relation 前置仅独立专项抽查，零改判时 1530 升级冻结值；
+      G⑦ 仍禁提前运行 authoritative system-side selection。
