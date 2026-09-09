@@ -5015,3 +5015,57 @@ totals → 台账+简报。
       gold 九轮显式引用语义已收敛，working totals = 1530/911/55/966；
       G⑥ 剩余 relation 前置仅独立专项抽查，零改判时 1530 升级冻结值；
       G⑦ 仍禁提前运行 authoritative system-side selection。
+
+## §九十二（2026-09-09）G⑥ 前置 relation 专项抽查执行完毕 + prod-05 p6 缺陷修正 + G⑤ 第二标注人独立性事件
+
+1. **relation 专项抽查（十轮 R3 格式）三篇全部收口**，记录 =
+   outputs/relation_spotcheck_record_r10.txt（gitignored，结论随 G⑥
+   credential 的 relation_spotcheck 段提交）：
+   - 记录 A（positive，prod-05，11/11 对）：抽查人逐条核对全部锚边
+     成立；发现 1 处对象层完整性缺陷（非既有边错误）——p6
+     "1.2用户注册说明"两张行内注册界面截图未登记 nontext（top≈443
+     ＊选择角色下拉框 415×22、top≈570 ＊装置内用户下拉框＋＊装置账号
+     输入框 415×34），与 p8 行内按钮 img:btn-get-data / img:btn-script
+     已登记口径不一致；pdfplumber bbox + 截图视觉核验确认。
+     result=defects_found。
+   - 记录 B（positive，tech-01，28/28 对）：题注 12 图文相符、显式 9
+     编号目标正确、隐式 7 语义+结构唯一确定；零缺陷。result=pass。
+   - 记录 C（negative，tech-06，12 项）：45 anchorless 阅读序均匀 10
+     （img:5/9/14/18/23/27/32/36/42/49）+ 抽查人加查 2（p9 两扇形图
+     img:1/img:2）；整页正文均无"如图/见图/Figure N/下图所示"式明确
+     指称句（统计叙述与相邻图同源但句子不指称图本身，遮图后句子完整
+     通顺；proximity 不单独成边=七轮 B1 口径）。result=pass。
+   - **误边改判数 = 0**。
+2. **修正链（R1 修正分支）已执行**：build_prod05.py 补 2 nontext
+   （img:reg-role-select=u0047、img:reg-device-account=u0051，隐式锚 =
+   前邻选择句 u0046/u0048，句内字段文字与截图精确一致、页内唯一）→
+   重建 84 units（text 72 / nontext 12，stream 2609 字符不变，原
+   u0047+ 顺移 +2）→ links_prod-05.py 更新 13 边 --replace 全量替换 →
+   validator --full-set 25 文件 0 失败。**新程序值：core
+   1532/913/55/968；all_annotated 1532/913/76/989**（口径链：1447
+   作废 → 1462 pre-r8 → 1530 pre-spotcheck → 1532
+   post-spotcheck-correction；恒等式 913+55=968）。prod-05 最终字节
+   sha256 =
+   82365b96499b7b171030bd6ae84c69e2604bbc35be61d45b37d48c05a2e80214
+   （G⑥ per_doc_sha256 / gold_digest 用最终字节；抽查记录保留
+   reviewed SHA 03f32be0…）。outputs/spotcheck_prod-05.txt 已重渲染
+   （156 行，含新对象与 13 边清单）。
+3. **G⑤ 第二标注人独立性事件（2026-09-09 用户裁定）**：acad-03 交回
+   件被证实使用 AI 完成标注，违反独立性要求，整体作废不计数；已隔离
+   至 annotations-user/_rejected_2026-09-09_second_annotator_ai_use/
+   （README 证据链，保留但禁用于 G⑤/G⑥）；agreement 0.2126（91/428，
+   below_threshold，无歧义组）降为诊断件
+   outputs/agreement_acad03_r1.json，非 G⑤ 测量。G⑤ 四篇
+   （tech-03/prod-01/acad-03/tech-08）需换真人重标。台账不记标注人
+   身份。
+4. **指南缺陷诊断（与标注人无关，仍然成立）**：无标点文本区（学术
+   参考文献条目、作者块、版权/许可块、图内子题注）切分口径指南欠
+   规定——"人工判定为准"允许 per-entry 语义切与冻结 v1 字面机械切两
+   种读法（字面机械切产生跨条目 unit，对 ARI 是坏 gold）；诊断件实测
+   428 分母中 200 来自参考文献区分歧（only_a 170 / only_b 30）。待
+   GPT 裁决切分原则；若裁决先于换人重标到达，先修指南再发任务包。
+5. **待裁决**：①1532/913/55/968 追认为 current authoritative working
+   core totals（G⑥ 冻结值候选）；②本节 push 授权；③指南无标点文本
+   切分原则（Option 1 per-entry 语义切 / Option 2 字面机械切；若
+   Option 2 通过需一并裁决既有 24 core 一级标注同类区是否回溯重切）；
+   ④G⑤ 换人重标计划确认。G⑥ 其余前置全部满足，仅余 G⑤ 四篇双标注。
