@@ -47,14 +47,21 @@ blocks 文件格式（Python，exec 执行；工具注入 P 辅助函数）：
       (P(1,"L",28),    "lines",   "g00", False), # 每行 1 sentence unit
       (1,              "nontext", "g01", "img:fig-1"),  # 页 1 图标记
       (1,              "nontext", "g02", "tab:1"),      # 页 1 表标记
+      (P(2,"L",5,60),  "entries", "g08", False, re.compile(r"^\\[\\d+\\]\\s*")),
+                                        # 条目区（指南 §3.1）：编号行开
+                                        # 新条目；折行并入同条目；条目内
+                                        # 冻结 v1。无编号条目区第 5 元素
+                                        # 改显式起点行号（块内 0-based）
   ]
   # P(page, col, a, b=None)：col=L/R/C；b 省略=单行，给出=闭区间 a..b。
   # BLOCKS 顺序=阅读序；nontext 首参=物理页码，ref 命名建议 img:fig-N /
   # tab:N（N=阅读序 1-based；agreement 按 家族+页+页内序 对齐，与命名无关）。
+  # 参考文献区/作者块/版权块禁用 lines/整块 para，一律 entries（§3.1）。
 
 机械规则与第一标注人 builder 完全同源：stream=fold_ws("\\n".join(块文本))；
 heading 块整体一 unit；para 块 split_sentences(fold_ws(...))；lines 块每行
-一 unit；span 平铺=unit_i 末=unit_{i+1} 首；hash/preview 取流切片。
+一 unit；entries 块先按条目边界分组再条目内 v1（unit 页码取起始源行页）；
+span 平铺=unit_i 末=unit_{i+1} 首；hash/preview 取流切片。
 """
 import argparse
 import collections
@@ -67,6 +74,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pdfplumber
 
+from stage9.entries import partition_entries
 from stage9.normalize import fold_ws
 from stage9.splitter import split_sentences
 from stage9.validation import validate_annotation
@@ -314,9 +322,27 @@ def build_annotation(blocks_env, reg):
         elif btype == "para":
             for s in split_sentences(fold_ws(joined)):
                 add_text(page, "sentence", seg, False, s)
+        elif btype == "entries":
+            # §3.1 条目区：第 5 元素 = 条目边界判断（re.Pattern 或显式
+            # 起点行号）。机械分组 + 条目内冻结 v1；unit 页码取其起始
+            # 源行的页。首组首 unit 取块 hard，其后每组首 unit True。
+            if len(b) < 5:
+                raise SystemExit("entries 块缺第 5 元素（条目边界判断："
+                                 "re.Pattern 或显式起点行号）")
+            parts = [reg[k] for k in keys]
+            try:
+                groups = partition_entries(parts, b[4])
+            except ValueError as e:
+                raise SystemExit("entries 块（%s, %s…）边界判断错误："
+                                 "%s" % (seg, keys[0], e))
+            for gi, (_src_idx, eunits) in enumerate(groups):
+                for ui, (text, line_idx) in enumerate(eunits):
+                    add_text(keys[line_idx][0], "sentence", seg,
+                             (hard if gi == 0 else True) and ui == 0,
+                             text)
         else:
             raise SystemExit("未知块类型 %r（合法：heading/lines/para/"
-                             "nontext）" % (btype,))
+                             "entries/nontext）" % (btype,))
 
     tidx = [i for i, u in enumerate(units)
             if u["kind"] in ("heading", "sentence")]
