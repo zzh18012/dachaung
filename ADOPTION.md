@@ -5212,3 +5212,64 @@ totals → 台账+简报。
    push——自 ae84138 FF-only 四步核验（fetch → is-ancestor →
    rev-list 计数=实际 → push → ls-remote 验证）执行 d6eac07 +
    d6d4da4 + 本台账/guide commit；无 force/amend/rebase。
+
+## §九十四（2026-09-10）R4'/P3'：G⑤ 换真人任务包 r2 重制完毕（含工具缺陷修复 a5be12b + 四重绑定指纹登记）
+
+1. **重制中发现并修复真实工具缺陷（commit a5be12b，未推送——
+   远端=6657958，待下轮授权）**：`stage9_user_annotate.py`
+   load_registry 右半栏裁剪把 page.width 当绝对 x1 用——tech-08
+   约 75 页 MediaBox 整体平移（实测 x0=-0.2875），crop 越界直接
+   ValueError，工具从未成功处理过 tech-08；盘上旧 tech-08 dump
+   为 8522fcf 前废弃格式（L/R/F 行、无半行匹配），从未有效。
+   修复=裁剪一律取 page.bbox 实际坐标；回归测试
+   tests/test_stage9_user_annotate.py 以平移 MediaBox 合成 PDF
+   （[-1 0 611 792]，两行分居中线两侧）锁死 load_registry 与
+   dump CLI 两路径；全套 5666 passed + 4 skipped。行为中性证明：
+   acad-03/prod-01/tech-03 三篇 dump 指纹逐位不变。
+2. **四篇 dump 在 a5be12b 重生成**：acad-03 a35004bb…、
+   prod-01 4d099d38…、tech-03 d4fe244f…（三篇与 8522fcf 期逐位
+   一致）；tech-08 = 2c75ab91d410500d…（修复后首个有效指纹）。
+3. **指南强化（两变体）**：私有层版（annotations-user/第二标注人
+   操作指南.md，本机 .venv 路径体系）与外发版（包根
+   标注操作指南.md，任意解压目录 + 系统 Python 3.12 +
+   pip install pdfplumber==0.11.10 钉死版本）纪律条款一致：四条
+   纪律（含锁定措辞 AI 禁令原文、禁打听第一份答案/禁开
+   annotations\ 与 _rejected_ 文件夹）、§5.2 entries 块完整教学
+   （编号正则/方括号标签正则/显式起点行数三写法 + 条目区禁用
+   lines/整块 para）、§3.5 指向官方指南 §3.1/§5/§6、报错对照
+   +3 行（缺第 5 元素/边界判断错误等）、ANNOTATOR 自选代号匿名
+   制、完工交回《匿名过程确认书》（annotations-user/匿名过程
+   确认书.md，sha256 44b7b65c…：锁定措辞声明原文 + 5 条逐项
+   确认 + 四篇完工清单 + 代号签名）。
+4. **任务包 r2 组装**（outputs/第二标注人任务包-r2.zip，
+   32,611,399 字节，28 条目，zip 完整性 OK；暂存树
+   outputs/_handoff_stage/第二标注人任务包-r2/）：4 源 PDF +
+   4 dump + 工具 + stage9 依赖五文件（新增 entries.py）+
+   manifest.json（=G④ 冻结值 51d3d400… 逐位一致）+ 官方指南
+   md + 大白话指南 md/pdf + 匿名确认书 md/pdf + 包内
+   《任务包绑定清单.txt》+ 交回说明。三份 PDF 由 pandoc(gfm→
+   html5)+Edge headless 渲染。**package_sha256 =
+   31cb75adbadade1cb2d96900aaf2722b67ac3f72bebcf3391ab94cab
+   8f9d53e0**（本条外记，不入包内防自指）。
+5. **包内自含性验证**：包树内运行 dump --doc acad-03-layoutlmv3
+   指纹复现 a35004bb…（与包内 dump 文件逐位一致）；包树内
+   assemble 合成冒烟（临时 blocks → 指纹核对一致 → 校验 0 失败
+   → --out 临时路径）通过，产物即清理（包内 annotations-user/
+   仅交回说明，无残留）。
+6. **四重绑定闭合（P3'）**：guide/tool commit = a5be12b（工具
+   sha256 1782a529…、官方指南 7883ec61…、外发指南 0ea656a4…、
+   确认书 44b7b65c…）；4 源 PDF sha256（tech-03 8afe2418… /
+   prod-01 a74a046b… / acad-03 bd539561… / tech-08
+   4006a678…）；4 dump 指纹（d4fe244f… / 4d099d38… /
+   a35004bb… / 2c75ab91…）；package_sha256（见上）。逐文件
+   清单在包内《任务包绑定清单.txt》与回执简报 §十。
+7. **旧包处置**：2026-09-06 首版任务包（~31MB，旧指南三轮纪律
+   版、无确认书、无 entries 教学、tech-08 dump 废弃格式）作废
+   不重发；其对应 acad-03 交回件已于 2026-09-09 因独立性违规
+   整体作废隔离（annotations-user/_rejected_2026-09-09_…）。
+   首版暂存树 outputs/_handoff_stage/第二标注人任务包/ 保留
+   作历史证据，不再外发。
+8. **回执简报已更新**：outputs/gpt_brief_batch26_r12_receipt.txt
+   §七改写（R4' 披露 + 四重绑定）+ 新增 §十（包清单 +
+   package_sha256）+ §十一请求（追认 P3'/a5be12b + push 授权），
+   待用户中转 GPT。
