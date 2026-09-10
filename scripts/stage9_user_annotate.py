@@ -137,10 +137,13 @@ def load_registry(doc_id):
         raise SystemExit("源文件不存在: %s" % src)
     with pdfplumber.open(src) as pdf:
         for pno, page in enumerate(pdf.pages, 1):
-            mid = page.width / 2
+            # 裁剪用页面实际 bbox（MediaBox 可整体平移，x0 非 0——
+            # tech-08 实测 x0=-0.2875，width 作绝对 x1 用会越界）
+            px0, ptop, px1, pbottom = page.bbox
+            mid = (px0 + px1) / 2
             halves = {}
-            for col, box in (("L", (0, 0, mid, page.height)),
-                             ("R", (mid, 0, page.width, page.height))):
+            for col, box in (("L", (px0, ptop, mid, pbottom)),
+                             ("R", (mid, ptop, px1, pbottom))):
                 crop = page.crop(box)
                 lines = [ln for ln in crop.extract_text_lines()
                          if ln["text"].strip()]
