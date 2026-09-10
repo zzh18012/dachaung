@@ -107,7 +107,7 @@ def test_udm_old_pdf_docx_shape_still_passes():
 
 def test_udm_unknown_version_rejected():
     with pytest.raises(Exception):
-        validate_udm(_udm("pdf", "0.7.0", {"page": 1}))
+        validate_udm(_udm("pdf", "0.8.0", {"page": 1}))
 
 
 # ---------- Document.to_dict 动态版本 ----------
@@ -137,20 +137,20 @@ def _model_doc(source_type: str, locator: dict, spans: bool = False) -> Document
 def test_all_types_emit_current_writer_capability():
     """版本描述 writer 能力，非内容驱动（2026-08-28 裁决确立）。
 
-    批次 20 起对全部来源统一输出 0.6.0（开放扩展 source_type；沿革：
-    0.2.0 span、0.3.0 family、0.4.0 has_caption、0.5.0
-    table_has_caption），即使某文档没有 relation/span/扩展类型；
-    旧版本仅为 legacy 读入格式（见
+    批次 20 起开放扩展 source_type（0.6.0）；Stage 10 批次 1 起产出
+    references relation（0.7.0；沿革：0.2.0 span、0.3.0 family、
+    0.4.0 has_caption、0.5.0 table_has_caption），即使某文档没有
+    relation/span/扩展类型；旧版本仅为 legacy 读入格式（见
     test_udm_old_pdf_docx_shape_still_passes）。
     """
     d = _model_doc("pdf", {"family": "page_geometry", "page": 1}).to_dict()
-    assert d["schema_version"] == SCHEMA_VERSION_CURRENT == "0.6.0"
+    assert d["schema_version"] == SCHEMA_VERSION_CURRENT == "0.7.0"
     validate_udm(d)
 
 
 def test_new_types_emit_current():
     d = _model_doc("markdown", {"family": "line_address", "line": 1}).to_dict()
-    assert d["schema_version"] == SCHEMA_VERSION_CURRENT == "0.6.0"
+    assert d["schema_version"] == SCHEMA_VERSION_CURRENT == "0.7.0"
     validate_udm(d)
 
 
@@ -158,7 +158,7 @@ def test_spans_emit_current():
     d = _model_doc(
         "docx", {"family": "structural_index", "paragraph_index": 0}, spans=True
     ).to_dict()
-    assert d["schema_version"] == "0.6.0"
+    assert d["schema_version"] == "0.7.0"
     validate_udm(d)
 
 
@@ -219,12 +219,13 @@ def test_frozen_old_manifest_loads():
 
 
 def test_pipeline_output_now_060_with_spans(tmp_path: Path):
-    """真实 fallback pipeline 的 DOCX 输出为 0.6.0 且全部 chunk 带 span。
+    """真实 fallback pipeline 的 DOCX 输出为 0.7.0 且全部 chunk 带 span。
 
     版本沿革：批次 2 起带 span（0.2.0）；批次 3 起 locator 带 family
     （0.3.0）；批次 4 起产出 has_caption relation（0.4.0）；批次 7 起
     table_has_caption relation type（0.5.0，Option A）；批次 20 起开放
-    扩展 source_type（0.6.0）。更早版本仅为合法读取格式（见
+    扩展 source_type（0.6.0）；Stage 10 批次 1 起 references relation
+    （0.7.0）。更早版本仅为合法读取格式（见
     test_udm_old_pdf_docx_shape_still_passes）。
     """
     pytest.importorskip("app.pipeline")
@@ -244,7 +245,7 @@ def test_pipeline_output_now_060_with_spans(tmp_path: Path):
     )
     assert not errors and document is not None
     d = document.to_dict()
-    assert d["schema_version"] == "0.6.0"
+    assert d["schema_version"] == "0.7.0"
     assert d["chunks"], "docx 样本应有 chunk"
     for chunk in d["chunks"]:
         assert "source_spans" in chunk

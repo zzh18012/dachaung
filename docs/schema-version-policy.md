@@ -19,6 +19,7 @@
 | 0.4.0 | relations 数组激活（has_caption） | Stage 6 批次 4 |
 | 0.5.0 | 新增 relation type 枚举（table_has_caption） | Stage 6 批次 7 |
 | 0.6.0 | 开放扩展 source_type（pattern + family 驱动 locator 形状；0.1.0–0.5.0 守卫仍限内置六类型） | Stage 8 批次 20 |
+| 0.7.0 | 新增 relation type 枚举（references，显式引用唯一消歧） | Stage 10 批次 1 |
 
 ## 3. 升版规则
 
@@ -38,7 +39,10 @@
 
 旧版本永远合法读入：schema 对每个历史版本保留分支；新 type 用
 `not.contains` 在旧版本分支精确排除（0.1.0–0.3.0 拒 has_caption、
-0.1.0–0.4.0 拒 table_has_caption），保证旧产物可校验、新产物可区分。
+0.1.0–0.4.0 拒 table_has_caption、0.1.0–0.6.0 拒 references），保证
+旧产物可校验、新产物可区分。升版时须同步延伸"≥X"型守卫枚举
+（family 四分支、扩展类型分支）至新版本——0.7.0 升版时补齐了
+批次 20 遗留的 5 处枚举缺口。
 
 ## 5. 与 EVALUATOR_VERSION / REPORT_VERSION 的分工
 

@@ -90,6 +90,15 @@
 - `--plugin` 加载先于名字查询：初始未知、加载后出现 → 可查询；插件失败 → `plugin_import_failed` / `plugin_register_failed`（不落成 unknown_parser）；插件成功但名字不存在 → `unknown_parser` rc 1；provenance 纯只读，不参与 duplicate/priority/discovery/resolution/audit/错误分支
 - list-parsers 六键 / explain 五键 / audit 键集零变化（键集锁测试守护）；不做：给既有三个 JSON 加字段、文件系统信息、运行时活读、哈希/签名/源码比对、依赖图/传递 import、网络查询、inspect --all、schema/source_type/family/priority/discovery 改动
 
+## 显式引用关系抽取（Stage 10 批次 1）
+
+- 契约：`docs/reference-relation-contract.md`（v1，十六轮裁决授权）。`type="references"`，from=正文文本元素（type ∉ {caption, image, table}），to=图/表对象；方向与 caption 相反；`metadata={"rule": "explicit_reference_unique", "token": "<编号>"}`
+- 纯函数 `match_reference_relations(elements, caption_relations)`（app/parsers/fallback_parser.py）：编号索引只来自**已配对** caption relations 的题注文本（has_caption→figure 家族 / table_has_caption→table 家族）；编号 token 两侧同语法 `[0-9]+(?:[.\-][0-9]+)*`（限 ASCII）严格相等
+- **唯一性守卫（十六轮裁决红线）**：`(家族, token)` 恰好对应 1 个对象才产边；0 个或 ≥2 个（同编号多对象歧义）一律不产边，**任何情形不用距离/顺序猜目标（禁 nearest-wins）**；同源同目标去重 1 条边；合并后按 (type, from_id, to_id) 排序
+- 仅 fallback pdf/docx 路径产出；md/html/text/ipynb 零 references。评测零改动：evaluation 只按精确 type 消费（has_caption/table_has_caption），references 不进任何现有指标键；untyped edge P/R/F1 属后续单独裁决批次
+- schema 0.7.0（新增 relation type 升 minor，docs/schema-version-policy.md）：0.1.0–0.6.0 守卫拒 references；**升版须同步延伸"≥X"型守卫枚举**（family 四分支 + 扩展类型分支）——本批补齐批次 20 遗留的 5 处枚举缺口；`SCHEMA_VERSION_CURRENT="0.7.0"` 唯一权威常量
+- 已知边界（契约 §5）：复合编号题注（图 3-1：）不可解析（保守）；"版图 3"类 CJK 拼接词可能误配（无 Cue 词要求，已知精度损失）；"Figures 3 and 4" 只取首编号；区间不枚举；无题注对象不可达
+
 ## 容器交付与可复现构建（Stage 8 批次 25）
 
 - **制品交付 ≠ 部署**：CI artifact（tar.gz + .sha256 边车）是交付物；加载并经 `container_verify --artifact` 验证通过才构成已验证部署（runbook 见 README §3.6）

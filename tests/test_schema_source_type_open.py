@@ -164,7 +164,7 @@ def test_060_pattern_rejects_33_chars():
 # ---------- writer 版本 ----------
 
 def test_current_version_constant_is_060():
-    assert SCHEMA_VERSION_CURRENT == "0.6.0"
+    assert SCHEMA_VERSION_CURRENT == "0.7.0"
 
 
 def test_extension_document_to_dict_validates():
@@ -185,6 +185,6 @@ def test_extension_document_to_dict_validates():
         ],
     )
     d = doc.to_dict()
-    assert d["schema_version"] == "0.6.0"
+    assert d["schema_version"] == "0.7.0"
     assert d["source_type"] == "myx"
     validate_udm(d)

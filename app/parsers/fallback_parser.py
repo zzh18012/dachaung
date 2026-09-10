@@ -165,6 +165,84 @@ def _is_table_caption(el: Element) -> bool:
     )
 
 
+# Stage 10 批次 1 契约（docs/reference-relation-contract.md §1）：
+# 编号 token 语法（caption 侧与引用侧同语法，严格相等匹配）；
+# 引用前缀集（figure/table 两家族，英文词边界 + 表前禁图）。
+_NUM_TOKEN = r"[0-9]+(?:[.\-][0-9]+)*"
+
+_FIGURE_NUM_RE = re.compile(
+    r"^(?:Figure|Fig\.?|图)\s*(" + _NUM_TOKEN + r")",
+    re.IGNORECASE,
+)
+_TABLE_NUM_RE = re.compile(
+    r"^(?:Table|表格|表)\s*(" + _NUM_TOKEN + r")",
+    re.IGNORECASE,
+)
+_FIGURE_REF_RE = re.compile(
+    r"(?<![A-Za-z])(?:Figures|Figure|Figs\.?|Fig\.?|图)\s*(" + _NUM_TOKEN + r")",
+    re.IGNORECASE,
+)
+_TABLE_REF_RE = re.compile(
+    r"(?<![A-Za-z])(?<!图)(?:Tables|Table|表格|表)\s*(" + _NUM_TOKEN + r")",
+    re.IGNORECASE,
+)
+
+
+def match_reference_relations(
+    elements: list[Element], caption_relations: list[Relation]
+) -> list[Relation]:
+    """契约 §3（纯函数）：正文显式引用 → 已配题注的图/表对象。
+
+    编号索引来自 caption relations 的 to_id 题注文本（前缀 + 编号
+    token）；引用侧同 token 语法严格相等匹配。家族内编号对应
+    ≥2 个对象（同编号多对象歧义）或 0 个对象时一律不产边——
+    禁 nearest-wins，宁缺勿猜（Stage 10 批次 1 十六轮裁决）。
+    来源元素排除 caption/image/table（题注编号是锚，不是引用）；
+    同一来源对同一目标去重为 1 条边。
+    """
+    by_id = {e.element_id: e for e in elements}
+    number_index: dict[tuple[str, str], list[str]] = {}
+    for rel in caption_relations:
+        if rel.type == "has_caption":
+            family, num_re = "figure", _FIGURE_NUM_RE
+        elif rel.type == "table_has_caption":
+            family, num_re = "table", _TABLE_NUM_RE
+        else:
+            continue
+        cap = by_id.get(rel.to_id)
+        if cap is None or not cap.content:
+            continue
+        m = num_re.match(cap.content)
+        if not m:
+            continue
+        number_index.setdefault((family, m.group(1)), []).append(rel.from_id)
+
+    rels: list[Relation] = []
+    for e in elements:
+        if e.type in ("caption", "image", "table") or not e.content:
+            continue
+        per_target: dict[str, str] = {}
+        for family, ref_re in (
+            ("figure", _FIGURE_REF_RE),
+            ("table", _TABLE_REF_RE),
+        ):
+            for m in ref_re.finditer(e.content):
+                targets = number_index.get((family, m.group(1)), [])
+                if len(set(targets)) != 1:
+                    continue
+                per_target.setdefault(targets[0], m.group(1))
+        for tid, token in per_target.items():
+            rels.append(
+                Relation(
+                    type="references",
+                    from_id=e.element_id,
+                    to_id=tid,
+                    metadata={"rule": "explicit_reference_unique", "token": token},
+                )
+            )
+    return _sort_relations(rels)
+
+
 def match_table_caption_relations_docx(
     elements: list[Element],
 ) -> list[Relation]:
@@ -940,16 +1018,23 @@ class FallbackParser(Parser):
         document_id = make_document_id(source_hash)
         if source_type == "pdf":
             elements, warnings = _parse_pdf(p, source_hash, document_id, self._image_output_dir)
-            # 契约 §4：两类 relation 合并后按 (type, from_id, to_id) 排序
-            relations = _sort_relations(
+            # 契约 §4：三类 relation 合并后按 (type, from_id, to_id) 排序
+            # （caption 关系先行，references 消费其配对结果）
+            caption_rels = (
                 match_caption_relations_pdf(elements)
                 + match_table_caption_relations_pdf(elements)
             )
+            relations = _sort_relations(
+                caption_rels + match_reference_relations(elements, caption_rels)
+            )
         else:
             elements, warnings = _parse_docx(p, source_hash, document_id, self._image_output_dir)
-            relations = _sort_relations(
+            caption_rels = (
                 match_caption_relations_docx(elements)
                 + match_table_caption_relations_docx(elements)
+            )
+            relations = _sort_relations(
+                caption_rels + match_reference_relations(elements, caption_rels)
             )
         return Document(
             document_id=document_id,

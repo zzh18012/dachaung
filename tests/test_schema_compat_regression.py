@@ -98,7 +98,7 @@ def test_writer_emits_only_current_version():
                       source_element_ids=["e1"])],
         relations=[Relation(type="has_caption", from_id="e1", to_id="e1")],
     ).to_dict()
-    assert d["schema_version"] == "0.6.0"
+    assert d["schema_version"] == "0.7.0"
     validate_udm(d)
 
 

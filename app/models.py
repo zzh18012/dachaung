@@ -15,7 +15,8 @@ SCHEMA_VERSION_LOCATOR = "0.3.0"
 SCHEMA_VERSION_RELATION = "0.4.0"
 SCHEMA_VERSION_TABLE_CAPTION = "0.5.0"
 SCHEMA_VERSION_SOURCE_TYPE_OPEN = "0.6.0"
-SCHEMA_VERSION_CURRENT = SCHEMA_VERSION_SOURCE_TYPE_OPEN
+SCHEMA_VERSION_REFERENCE = "0.7.0"
+SCHEMA_VERSION_CURRENT = SCHEMA_VERSION_REFERENCE
 
 ElementType = Literal[
     "heading", "paragraph", "list_item", "table", "image", "caption", "header", "footer"
@@ -152,14 +153,15 @@ class Document:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def effective_schema_version(self) -> str:
-        """输出版本：当前 writer 对全部来源一律 0.6.0。
+        """输出版本：当前 writer 对全部来源一律 0.7.0。
 
         版本描述 schema/writer 能力（docs/schema-version-policy.md）：
         批次 4 激活 relations 字段（0.4.0，has_caption）；批次 7 扩展
         relation type 枚举（table_has_caption）→ 0.5.0；批次 20 开放
         扩展 source_type（pattern + family 四值驱动的 locator 形状
-        校验）→ 0.6.0（Stage 8 批次 20 裁决 D2）。旧版本仅为 legacy
-        读入格式（旧产物继续可校验），新 writer 不再产出。
+        校验）→ 0.6.0（Stage 8 批次 20 裁决 D2）；Stage 10 批次 1
+        新增显式引用 relation（references）→ 0.7.0。旧版本仅为
+        legacy 读入格式（旧产物继续可校验），新 writer 不再产出。
         """
         return SCHEMA_VERSION_CURRENT
 

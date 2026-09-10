@@ -183,7 +183,7 @@ def test_full_chain_plugin_to_json_060(tmp_path: Path):
     assert out.is_file()
 
     d = json.loads(out.read_text(encoding="utf-8"))
-    assert d["schema_version"] == "0.6.0"
+    assert d["schema_version"] == "0.7.0"
     assert d["source_type"] == "myx"
     assert d["parser_name"] == "myx_test"
     # 扩展名发现选中插件（唯一声明 .myx 的 parser）
