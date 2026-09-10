@@ -5170,11 +5170,14 @@ totals → 台账+简报。
      ACMReferenceFormat 标题+条目 1 block）与 acad-03（g00 移除
      引用块 6 行）曾有入流模板；acad-05/06 无入流模板（维持排除）；
      tech-01 左缘 DOI 为正文文献条目内文字（保留）。两篇重建 →
-     validate 0 失败 → links 表机械重映射（acad-02 全锚 −1=14 边、
-     acad-03 全锚 −2=19 边；锚文本移除前后逐位一致 14/14、19/19，
-     指称 token 命中 14/14、19/19）→ link_apply --replace
-     （14/14 边、20/20 边，0 stale）→ nontext/边计数不变（7/7、
-     8/8 对象；14/14、20/20 边）。
+     validate 0 失败 → links 表机械重映射（acad-02 全锚 −1、
+     acad-03 全锚 −2。精确口径【十三轮裁决修正】：acad-02 =
+     14 锚 unit / 14 边；acad-03 = 19 锚 unit / 20 linked
+     edges——一个锚 unit 双目标（u0136 一句双指称，O1 位移前
+     即九轮记录的 u0138）。锚文本移除前后逐位一致 14/14、19/19
+     （锚 unit 口径），指称 token 命中 14/14、19/19）→
+     link_apply --replace（14/14、20/20 边【边口径】，0 stale）→
+     nontext/边计数不变（7/7、8/8 对象；14/14、20/20 边）。
    - **O2 tech-01 附录 B.5 References 重切**：g10 尾部 B.5（p59
      [1]-[5]）按 g08 先例重组单一 entries 块（NUM 模式，一条引用=
      一条目，条目内冻结 v1；u1050-u1059，[2]-[5] 条目首 hard=True
@@ -5196,13 +5199,21 @@ totals → 台账+简报。
      42c16ad280375f042769b6240893b15e00d17e424b356d；tech-01
      6f075bfe3f08637c4a0cad080c3bf24a2a8c246503d81826711ee68f462
      8e14a。acad-02/acad-03 的 R3' 期 SHA（41cf5b93… / 4c7ca25c…）
-     自此作废；其余 22 篇 core 字节不变。
-4. **G⑥ 前置状态（十二轮后重写）**：(1) prod-05 新增 2 边 delta
-   用户复核待执行（对照 outputs/spotcheck_prod-05.txt，SHA
-   82365b96…——该篇字节不受十二轮影响）；(2) R3' 窄收口完成 ✓
-   （O1/O2 + preamble 契约修复全部落地）；(3) G⑤ 新真人四篇
-   （tech-03/prod-01/acad-03/tech-08）待 R4' 任务包重制——P3'
-   已批准（绑定修复后最终 guide/tool commit、独立性声明措辞
+     自此作废；**其余 21 篇 core 字节不变**（24 core − 3 变化篇 =
+     21；【十三轮裁决修正】本节原误记"22 篇 core"。若按 validator
+     实际校验的 25 个已标注文件口径，则为其余 22 个 annotated
+     files 字节不变——25 = 24 core + prod-08 备选，核心集恒为
+     24 篇）。
+4. **G⑥ 前置状态（十二轮后重写；(3) 按十三轮裁决修正）**：(1)
+   prod-05 新增 2 边 delta 用户复核待执行（对照
+   outputs/spotcheck_prod-05.txt，SHA 82365b96…——该篇字节不受
+   十二轮影响）；(2) R3' 窄收口完成 ✓（O1/O2 + preamble 契约
+   修复全部落地）；(3) G⑤ 新真人四篇（tech-03/prod-01/acad-03/
+   tech-08）**任务包 r2 已于 2026-09-10 重制完毕**（§九十四，
+   四重绑定闭合；本句原记"待 R4' 任务包重制"——任务包制备完成
+   ≠ G⑤ 完成，新真人独立标注/agreement 按实际交付状态进行）；
+   P3' 已批准要素不变（绑定修复后最终 guide/tool commit、独立
+   性声明措辞
    锁定："禁止使用生成式 AI、自动标注器或其他自动化系统代替人工
    完成语义边界/分类判断；包内提供的确定性 dump、assemble、
    splitter、validator 仅可用于机械呈现、组装和校验，不视为自动
@@ -5273,3 +5284,51 @@ totals → 台账+简报。
    §七改写（R4' 披露 + 四重绑定）+ 新增 §十（包清单 +
    package_sha256）+ §十一请求（追认 P3'/a5be12b + push 授权），
    待用户中转 GPT。
+
+## §九十五（2026-09-10）十三轮裁决：十二轮全项追认 + 四处措辞修正 + R4'/P3' 追认 + push 执行
+
+1. **追认清单（十三轮裁决原文口径）**：一~六执行闭合确认；R3'
+   preamble 契约修复追认（**R3' narrow closeout 正式完成**，不再
+   是 G⑥ 前置阻塞项）；O1/O2 追认；P1' push（ae84138→6657958）
+   追认；totals 1532/913/55/968 继续为 G⑥ frozen candidate（尚非
+   final）；P3' r2 四重绑定追认（任务包"制备层"封口；G⑤ 本身未
+   完成）；a5be12b 正式追认为 **R4' maintenance fix**（不修改 G④
+   manifest/split、不改 authoritative agreement 算法、非 annotation
+   policy 裁决）。
+2. **四处措辞修正（push 前已完成，本 commit 落地）**：
+   (1) §93"其余 22 篇 core 字节不变"→"其余 21 篇 core"（24 − 3
+   = 21；25 文件口径=其余 22 个 annotated files，25 = 24 core +
+   prod-08 备选）；(2) §93 O1 acad-03 口径精确化：**19 锚 unit /
+   20 linked edges**（一个锚 unit 双目标 u0136——O1 位移前即九轮
+   记录的 u0138；本日对当前字节程序复核：acad-03 edges=20/
+   anchor units=19/多目标 unit=[u0136]，acad-02=14/14 无多目标）；
+   (3) 1a4f7b38… 处置双轨语义：作废为 G⑥ per_doc_sha256 候选，
+   **永久保留为 relation spot-check 的 annotation_sha256_reviewed**
+   （§93 O2 原文已如此，简报 §六 原笼统"作废"已改精确；41cf5b93…/
+   4c7ca25c… 为真作废）；(4) G⑤ 状态统一：任务包 r2 重制完成 ≠
+   G⑤ 完成，§93(3) 与简报 §八 均已改"P3' r2 任务包重制完成；
+   新真人独立第二标注仍待完成"。回执简报
+   （outputs/gpt_brief_batch26_r12_receipt.txt，gitignored）同四
+   处已同步修正。
+3. **裁决边界登记**：旧包及 _rejected_ 交回件不得重新进入 G⑤；
+   tech-08 回件必须对应 r2 新 dump 指纹 2c75ab91…，旧 8522fcf
+   废弃格式产生的 blocks 不得混入正式 agreement；官方指南为规范
+   性语义来源、大白话指南为操作辅助，两者语义冲突以绑定的官方
+   指南字节为准（当前仅路径/环境差异，不构成冲突）；O2"5 entries
+   → 10 units"合规（冻结的是一条 citation = 一个 entry，entry 内
+   继续走冻结 v1，未要求 entry 必须单 unit）。
+4. **诚实披露**：commit 70b9f78 提交消息中"§"字符因 shell 转义
+   失败成字面量"\x{a194}94"（文件本体正确，仅消息笔误；按
+   c10d057/1e8ba50 先例不 amend，此处登记备查）。
+5. **push 执行（十三轮预授权场景："台账 commit 已含旧措辞→追加
+   纯 docs 窄幅修正 commit"分支，count=3）**：本 commit 即该修正
+   commit；自 6657958 FF-only 四步核验（fetch → merge-base
+   --is-ancestor 6657958 HEAD → rev-list --count 6657958..HEAD
+   = 3 = a5be12b + 70b9f78 + 本 commit → push → ls-remote ==
+   local HEAD）；无 force/amend/rebase。
+6. **阶段状态（十三轮口径）**：G④ frozen ✓；R3' 正式完成 ✓；
+   P3' 制备/绑定完成，G⑤ 新真人四篇待交付；G⑥ 等两件事——
+   prod-05 新增 2 边 delta 用户复核 + G⑤ 四篇 agreement/必要仲裁
+   收敛（review 后若发生 edge 改判：先修正 → validator/full-set →
+   重算 totals，再入 G⑥）；G⑦ 仍不得提前（正式 14-dev 选优只能
+   发生在 G⑤ 收敛、G⑥ gold freeze 之后）。
