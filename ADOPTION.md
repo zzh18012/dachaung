@@ -5358,3 +5358,28 @@ totals → 台账+简报。
    tech-03 各 2~4 天）→ 交回 → agreement 程序，任一环节都可能
    耗时。若实际 G⑤ 先交回则按规则先审 G⑤。
 4. 本节 commit 未推送（远端=42ca24b），随下轮 push 授权一并。
+
+## §九十七（2026-09-10）十五轮裁决：到件顺序判断确认 + G⑥ 双前置 AND 门重申 + push 申请细则
+
+1. **确认（无新增裁决）**：到件顺序判断成立（prod-05 delta
+   预计先到）；十四轮排序规则不调整；十四轮 CLOSED 维持。
+2. **G⑥ 双前置 AND 门（执行细则重申）**：
+   - prod-05 delta 先到 → 单独审 2 条新增隐式锚边：全部通过
+     （u0047/u0051 对象登记 + u0046/u0048 邻接句锚定）→ 前置项
+     正式核销，G⑥ 仍等 G⑤；任一条改判 → 先修正 → 对应
+     validator/--full-set → 重算 core relation totals → 修正后
+     最终值带入 G⑥。
+   - G⑤ 先到 → 核验 r2 package identity/匿名确认 → 四篇
+     bounded agreement → 必要 identity resolution/仲裁 → 改 gold
+     时重新 validator；G⑤ 闭合不提前签发 G⑥。
+   - 两件齐备 → 组装一次完整 G⑥ 申请；relation_spotcheck 用
+     §八十四/R10 已锁格式（绑定实际 reviewed annotation SHA +
+     prod-05/tech-01 positive audit + tech-06 negative audit +
+     改判后最终统计），不再重新设计凭证结构。
+3. **push 申请细则（新操作性规则）**：6ac5805（§九十六）保持
+   本地未推送；**纯台账 commit 不单独申请 push**；下一个实质
+   到件时与其台账/执行 commit 一并申请最干净。本轮未授予 push
+   （无请求）。
+4. 状态：十四轮 CLOSED；无新实验裁决；prod-05 delta 与 G⑤ 谁
+   先到先审谁；G⑥ 双前置 AND 门；G⑦ 继续禁止提前。本节 commit
+   未推送（同规则排队）。
