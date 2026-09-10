@@ -19,6 +19,12 @@
   可用 `linked_nontext` 引用它（关联指标单独计）。
 - 页眉页脚、页码、水印：不进句子流也不登记 nontext（非内容单元），
   在 notes 里说明处理口径即可。
+- **出版方模板块（2026-09-10 十二轮裁决 O1）**：标准 ACM
+  publisher-supplied boilerplate（Reference Format 引用块、
+  permission-to-copy / 版权印记、ISBN/DOI 出版信息块等）**不进入
+  stream**；已入流的删除（窄幅归一），未入流的维持排除（不做机会性
+  扩展清理）。作者/机构记录仍按 §3.1 批准规则处理；作者自有的 CC 类
+  声明保留（每条声明一条目）。
 
 ## 2. 规范化字符流（fold-ws-v1）
 

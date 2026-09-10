@@ -5069,3 +5069,146 @@ totals → 台账+简报。
    切分原则（Option 1 per-entry 语义切 / Option 2 字面机械切；若
    Option 2 通过需一并裁决既有 24 core 一级标注同类区是否回溯重切）；
    ④G⑤ 换人重标计划确认。G⑥ 其余前置全部满足，仅余 G⑤ 四篇双标注。
+
+## §九十三（2026-09-10）十一轮 R3' 执行 + 十二轮窄收口：结构化条目边界归一（9 篇重切 + preamble 契约修复 + O1/O2 + totals 复核不变）
+
+1. **R3'①②（commit d6eac07，integration 分支，未 push）**：
+   docs/stage9-annotation-guide.md §3.1 structured-entry boundary
+   override——范围锁定三类（参考文献：一条完整引用=一条目；作者/
+   机构信息块：一条可辨识的作者/机构/元信息记录=一条目；版权/许可
+   元数据块：一条独立声明/条目=一条目；其余仅指南明列才适用，禁止
+   自由扩展）＋三锁（①视觉换行≠条目边界 ②条目内部仍走冻结 v1
+   ③图内文字不转写）。工具层 stage9/entries.py partition_entries
+   （三通道：NUM 正则 ^\[\d+\]\s*、LABEL 正则
+   ^\[(?!\d+\])[^\[\]]{1,40}\]\s*（文献型）、显式起始行索引；条目首
+   unit hard=True，首条目首 unit 承接所在块 hard 标志，首条目界前
+   preamble 每行自成一 group；返回绝对行索引供 page 归因）＋
+   assembler "entries" btype ＋ scripts/stage9_user_annotate.py 模板
+   支持 ＋ tests/test_stage9_entries.py 21 tests（全套 5661 passed +
+   4 skipped；v1 splitter 零改动，纯 partition 层）。
+2. **R3'③ 24-core 窄扫归一（2026-09-09 执行；2026-09-10 复核归档）**
+   ——core 24 篇中 16 篇有范围内区（9 篇含重切区、7 篇仅 CHECKED
+   区），8 篇 N/A（tech-02/03/04/05、prod-05/06/07/09；备选 prod-08
+   亦无范围内区）：
+   - **重切清单**（旧句单元 → 新句单元 / 条目数；旧值=重切前扫描
+     实测，新值=2026-09-10 对当前字节复算）：acad-01 g10 References
+     239→147 / 38 条目（显式起始行）＋ g00 作者带 4→1（单作者一条
+     记录）；acad-02 g06 110→49 / 29（NUM）；acad-03 g08 171→86 /
+     59（NUM）；acad-04 g09 103→90 / 29（显式起始行）；acad-05 g09
+     98→87 / 23（NUM）；acad-06 g06 296→81 / 51（NUM）；acad-07 g07
+     文献部 41→32 / 20（NUM，基金项目段保留）＋ g00 CC 声明块 4→2；
+     acad-08 g05 13→9 / 6（NUM）＋ g00 CC 声明块 4→2；tech-01 g08
+     43→43 / 24 条目（LABEL；单元总数不变，23 条目首 hard=True＋
+     References 区头 hard，首条目首 unit 承接块 hard=False——符合
+     R3' 规则，2026-09-10 逐 unit 复核确认无缺陷）。
+   - **CHECKED 桶（零变化，判读理由入档）**：acad-01..06 g00 作者带
+     多作者列间交错——逐人记录在扁平文本不可源辨识（同行多名/逗号
+     名单元，无编号/项目符边界证据；栏重建=重新标注，超出窄扫范围；
+     例外 acad-01 单作者记录已重切）；acad-04 g00 逗号名单元同口径；
+     acad-07/08 g00 逐行=逐记录 ✓（CC 块除外已重切）；tech-06 g00
+     法律/版权声明 prose（entry+v1=现行 v1 切分）；tech-07 g07 免责
+     prose＋单一版本条目 ✓；tech-08 g10 机构名单两机构一行不可源
+     辨识保持行切＋版权 3 行=3 条独立声明 ✓；prod-01 g19 整章许可
+     文件（Appendix C，自带 C.2.x/C.3.x 标题结构）=正文非"版权/
+     许可元数据块"（锁定范围禁止自由扩展）；prod-01 g20 4 对
+     "Copyright © …/All rights reserved."声明对 entry+v1 句界切分
+     与现行边界逐对相同；**prod-02/03/04 g00（2026-09-10 机械复核）**
+     每条独立声明完整占据单元、无跨声明单元、句界切分与 entry+v1
+     一致 → 零变化（prod-02 贡献者名单多人同一视觉行不可源辨识
+     按行保留，同 acad 作者带口径；prod-03/04 作者行逐行=逐记录 ✓；
+     prod-04 封底声明对 "manual. Buying" v1 切分与 entry+v1 同界）。
+   - **执行链**：9 builder 重建 → 逐篇 validate 0 失败 → 锚位移分析
+     （位移仅 acad-01 −3（g00 作者带）/ acad-07 −2 / acad-08 −2（g00
+     CC 块），位移源全部位于所有锚之前；其余文献区重切在文档尾部、
+     tech-01 单元总数不变，锚零位移）→ links 判读表重映射 98 锚
+     （acad-01/07/08；token 全量复核，过程 19 处 uid 十六进制笔误由
+     复核捕获改正，终验 98/98）→ link_apply --replace 9 篇 216 边
+     （19/14/20/16/17/23/46/33/28）0 stale → validator --full-set
+     25 文件 0 失败 → **totals 复核不变：core 1532/913/55/968；
+     all_annotated 1532/913/76/989**（边集合零变化，恒等式 913+55=968
+     过；R1' 冻结候选值原样成立）。证据件 outputs/r3_anchor_dump.txt
+     （98 锚逐条 uid+refs+锚文本，gitignored）。
+   - **抽查记录版本绑定**：tech-01 字节变化（最终 sha256 见下；记录 B
+     保留 reviewed 44bdfe1f… 并加版本绑定注记；outputs/spotcheck_
+     tech-01.txt 重渲染 60 checks 0 fail，两探针随 R3' 口径更新：
+     hard=34 计入 23 条目首、孤儿标签扫描按锁②豁免 g08 条目内）；
+     prod-05 / tech-06 字节不变（82365b96… / 1d8f554a…，2026-09-10
+     复算确认）。
+   - **9 篇最终 sha256**（G⑥ per_doc_sha256 用最终字节；2026-09-10
+     对磁盘字节复算）：
+     acad-01 e8ebe1a8fadbe9fbbd762411d9d08c6df2c87ad68bf4c39a6758f9229642d336
+     acad-02 41cf5b93c840fb0a4ca075e3f7853fb9b6607685c75df50ca9d4338507e963a5
+     acad-03 4c7ca25cce573a4b58b9c3a3688c34dddf0c4a4129772bbad50cca0e32125794
+     acad-04 2c6417c17c30708bc055c46700955246df572b98effaa4ec669f62b8ecd88345
+     acad-05 7ccf72764e7f27c64a06b518436c3040b749fd9aed606345e3e1b6d9a3574999
+     acad-06 d9549bd490ee4e2a4d89dd032255bd4ff3340ffc4d77a79cadd84f177b2d085d
+     acad-07 8be00f9a8893f100e69e54486d16fa603e297d333309e4a3d24c0054776af312
+     acad-08 6bbc1d7b6a4bec88a590758bfed4430e42838439923e93e564ad41d7823a9e86
+     tech-01 1a4f7b38efd9f04fc2a69aa19d9c60ef3fdcfdad531326b5feea079ce36b380b
+3. **十二轮裁决执行（2026-09-10，承接本节开放项收口）**：
+   - **R3' 追认 + preamble 契约修复（commit d6d4da4）**：十二轮裁定
+     partition_entries 原 preamble 逐行分组与锁一冲突——新契约为
+     "entry override 从第一个被识别的 entry start 开始生效；其前连续
+     preamble 合并为单一组并回落冻结 v1，不得按物理行人为分组（换行
+     本身不是边界，锁一；已有 block/heading hard boundary 保留）"。
+     stage9/entries.py group_line_indices preamble 合并单一组 +
+     指南 §3.1 补记两段契约 + tests/test_stage9_entries.py 新增 6
+     tests（含裁决指定回归：两行折行同句 preamble + [1] 条目 →
+     preamble 经 v1 保持单一 unit；范围契约：普通 lines 块带 [1]/
+     [2] 标记不触发条目化）。保留 d6eac07 不改写，窄修独立成 commit。
+     机械证明零数据影响：9 篇 entries 文档重建后 units 逐项比对
+     （忽略 linked_nontext）全同 → 重施加 links → 终态 SHA 与
+     r3fix 前记录值逐一相等（证据 outputs/r3fix_pre_backup/ +
+     r3fix_pre_sha.txt + r3fix_post_sha.txt + r3fix_post_links_sha.txt，
+     gitignored）。
+   - **O1 ACM 出版方模板统一排除（acad-02/03/05/06 g00 窄归一）**：
+     指南 §1 新规则——标准 ACM publisher-supplied boilerplate
+     （Reference Format 引用块、permission-to-copy/版权印记、ISBN/
+     DOI 出版信息块）不进 stream；已入流的删除（窄幅归一），未入流
+     的维持排除（不做机会性扩展清理）；作者/机构记录仍按 §3.1 批准
+     规则；作者自有 CC 类声明保留。执行：仅 acad-02（g00 移除
+     ACMReferenceFormat 标题+条目 1 block）与 acad-03（g00 移除
+     引用块 6 行）曾有入流模板；acad-05/06 无入流模板（维持排除）；
+     tech-01 左缘 DOI 为正文文献条目内文字（保留）。两篇重建 →
+     validate 0 失败 → links 表机械重映射（acad-02 全锚 −1=14 边、
+     acad-03 全锚 −2=19 边；锚文本移除前后逐位一致 14/14、19/19，
+     指称 token 命中 14/14、19/19）→ link_apply --replace
+     （14/14 边、20/20 边，0 stale）→ nontext/边计数不变（7/7、
+     8/8 对象；14/14、20/20 边）。
+   - **O2 tech-01 附录 B.5 References 重切**：g10 尾部 B.5（p59
+     [1]-[5]）按 g08 先例重组单一 entries 块（NUM 模式，一条引用=
+     一条目，条目内冻结 v1；u1050-u1059，[2]-[5] 条目首 hard=True
+     +4，首条目承块 False）。机械复核：28/28 已审锚文本新旧字节
+     一致；u0001-u0967 前缀 967 单元 span/kind/segment/hard 逐项
+     全同（零位移）；27/27 适用锚 token 命中（u0406 隐式锚无指称
+     token 按判读表口径豁免，前邻即 Figure 7 题注）；link_apply
+     --replace 28 unit/28 边 0 stale；validate 0 失败；
+     outputs/spotcheck_tech-01.txt 重渲染（1189 行，头部 SHA=
+     6f075bfe…）。**1a4f7b38… 降级为完成 relation 抽查时的已审版本
+     SHA，不再是 G⑥ per_doc_sha256 候选**（记录 B 版本绑定注记二）。
+   - **totals 程序重算（无预设复算）**：validator --full-set 25 文件
+     0 失败（split 14/4/6）→ core 1532/913/55/968；all_annotated
+     1532/913/76/989 —— 与 R1' 冻结候选值完全一致，delta=0，原值
+     原样继续作为 G⑥ 冻结候选；恒等式 913+55=968 过。
+   - **三篇最终 sha256**（G⑥ per_doc_sha256 用最终字节；2026-09-10
+     对磁盘字节复算）：acad-02 f5b13696de363ec482df75d39357074d
+     c3261f0e4aa792878d9896ad7c3fc237；acad-03 391ed5f6fffa011edc
+     42c16ad280375f042769b6240893b15e00d17e424b356d；tech-01
+     6f075bfe3f08637c4a0cad080c3bf24a2a8c246503d81826711ee68f462
+     8e14a。acad-02/acad-03 的 R3' 期 SHA（41cf5b93… / 4c7ca25c…）
+     自此作废；其余 22 篇 core 字节不变。
+4. **G⑥ 前置状态（十二轮后重写）**：(1) prod-05 新增 2 边 delta
+   用户复核待执行（对照 outputs/spotcheck_prod-05.txt，SHA
+   82365b96…——该篇字节不受十二轮影响）；(2) R3' 窄收口完成 ✓
+   （O1/O2 + preamble 契约修复全部落地）；(3) G⑤ 新真人四篇
+   （tech-03/prod-01/acad-03/tech-08）待 R4' 任务包重制——P3'
+   已批准（绑定修复后最终 guide/tool commit、独立性声明措辞
+   锁定："禁止使用生成式 AI、自动标注器或其他自动化系统代替人工
+   完成语义边界/分类判断；包内提供的确定性 dump、assemble、
+   splitter、validator 仅可用于机械呈现、组装和校验，不视为自动
+   语义判读"、匿名过程确认、package_sha256 + guide/tool commit +
+   4 源 SHA + 4 dump 指纹绑定、旧包作废不重发）。
+5. **push 执行（P1' 预授权）**：十二轮 P1' 预授权修复完成后
+   push——自 ae84138 FF-only 四步核验（fetch → is-ancestor →
+   rev-list 计数=实际 → push → ls-remote 验证）执行 d6eac07 +
+   d6d4da4 + 本台账/guide commit；无 force/amend/rebase。
