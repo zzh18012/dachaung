@@ -5383,3 +5383,83 @@ totals → 台账+简报。
 4. 状态：十四轮 CLOSED；无新实验裁决；prod-05 delta 与 G⑤ 谁
    先到先审谁；G⑥ 双前置 AND 门；G⑦ 继续禁止提前。本节 commit
    未推送（同规则排队）。
+
+## §九十八（2026-09-10）十六轮裁决：等待期并行方向——A 批准开 Stage 10 Batch 1；B 既有授权确认（简报前提更正）；D 批准 Batch 2；C 暂缓；跨批次 push 捆绑否决
+
+咨询简报 outputs/gpt_brief_batch26_r16_consult.txt（Claude 提四候选
+A/B/C/D + 建议），用户指示方向由 GPT 裁决。登记行：**A APPROVED →
+Stage 10 Batch 1；B PRIOR-AUTHORIZATION CONFIRMED / NO REAL RUN
+BEFORE G⑥；D APPROVED AS SEPARATE BATCH 2；C DEFERRED；Stage 9
+freeze/gates ZERO CHANGE；跨批次 push bundling DENIED。**
+
+1. **A 显式引用关系抽取 → Stage 10 Batch 1（system-side relation
+   extraction）**：
+   - 分支 integration/stage10-batch1-relation-extraction，基线
+     main=6c6d398 新建独立 worktree；**不从
+     integration/stage9-batch26-corpus-annotation 分叉，不把批次 26
+     台账/私有标注/G⑦资产 cherry-pick 进 Stage 10**——Stage 10 与
+     Stage 9 时间并行但属独立能力建设线，不构成"Stage 9 已完成"
+     的表述。
+   - 授权边界：给 fallback_parser 增加正文显式引用（"见图 X /
+     如表 N 所示 / Figure X / Table N"等）→ 已识别图/表对象的
+     系统预测能力；现有 caption 关系保持兼容；**歧义消解禁
+     nearest-wins**——编号或名称在上下文中不能唯一落实到具体
+     occurrence 时宁可不产边（与 gold"明确指称 + occurrence 唯一"
+     一致）。
+   - 指标边界维持：最终评测 untyped relation edge P/R/F1，禁新增
+     caption/xref/implicit 分类型成绩，禁往 linked_nontext 塞
+     relation type。
+   - 本批范围：extractor、系统边 canonical projection、去重/歧义
+     守卫、synthetic tests；**禁顺手发明 system↔gold 对齐协议**——
+     若 P/R/F1 需要 text-anchor identity 新 span/alignment 规则，
+     属指标定义问题单独提交裁决，不埋在 parser feature 里。
+   - **私有 gold 收紧（GPT 修改 Claude 建议，比 gitignored 再严一级）**：
+     G⑥ 签发前 Stage 10 Batch 1 **不复制、不挂载、不读取 24-core
+     私有 gold**（即使 gitignored）；开发全部用 synthetic fixtures
+     或非 24-core 公开文档；loader 验证只用非核心文档且只验证
+     "跑通/结构合法"、不据真实 gold 调规则。G⑥ 后 14-dev gold 可
+     另行以 read-only + gitignored + digest 绑定供给 Stage 10；
+     comparison/holdout 仍不得用于迭代。
+2. **B G⑦选优管线：既有授权确认，简报前提更正**。GPT 核出历史
+   裁决已明确授权"系统侧 max_chars 最终评测管线并行实现，不必等
+   G⑥"（范围含 CLI/API、dev-only selection、candidate enumeration、
+   metric aggregation、tie-break、hash/revision guard、provenance、
+   synthetic/integration tests），且已有实现回执。**Claude 十六轮
+   简报 §二 B 项"尚未实现"前提错误**（记忆停留在 2026-09-05 状态，
+   未更新至 r7 轮实现），特此如实登记。**只读核验结果（GPT 指定
+   动作，2026-09-10 执行）**：4 个 tracked 文件在位——
+   stage9/system_eval.py、scripts/stage9_system_select.py、
+   stage9/system_select_preregistration.json、
+   tests/test_stage9_system_select.py；创建于 9985c2a（ruling C），
+   加固于 87e640d（C' r2 gold_digest guard）；两 commit 均为本地
+   HEAD 与远端 42ca24b 的祖先（无 lineage divergence）；四个文件
+   自 87e640d 起零字节漂移。处置：**不重做、不另写一套**，既有
+   实现与预注册继续有效。
+   - 边界重申（比简报更严）：G⑥ 完成前**不允许在真实 14-dev gold
+     上运行 system-side max_chars 参数搜索**（称 dry run/debug 也
+     不行）；只允许不计算参数优劣、不输出真实评分的
+     loader/smoke test。B1/B2-foldws-v1 14-dev diagnostic 数字 =
+     零依赖 baseline 授权，与 system-side max_chars 曲线不混同。
+3. **D runtime hardening → Stage 10 Batch 2（有条件批准）**：仅作
+   A 等待/阻塞时的填充工作，不混进 Batch 1 的 relation commit；
+   内部优先级 = pdfplumber segfault 进程隔离/防护 > traceback 有界
+   截断 > 结构化日志轮转；segfault 防护必须保持 parser 输出语义
+   不变（允许隔离崩溃与显式失败，禁静默重试/换解析策略悄悄改
+   结果）；Batch 2 同样零接触 Stage 9 private gold/manifest/
+   agreement/prereg/selection 状态。
+4. **C Web UI 暂缓**：CLAUDE.md 排除维持（防 UI 反向要求
+   parser/schema 改形状）；非永久否决——A 达到可审阅实现且系统
+   relation 输出接口稳定后，最早以独立 Stage 10 Batch 3 再申请，
+   届时倾向纪律 = 只读消费 schema 0.6.0、UI 不做解析推断、不反向
+   改 parser、依赖作 optional extra 隔离、绝不读 Stage 9 gold。
+5. **push 纪律（跨批次搭车否决）**：6ac5805+de6f9e9 为 Stage 9
+   纯台账链，Stage 10 从 main=6c6d398 起新分支本无祖先关系，**禁
+   捆绑成同一审计历史**；Stage 10 Batch 1 首个实质 commit 将来
+   单独申请新分支 push；Stage 9 两台账 commit（现含本节共三个）
+   继续排队，等 prod-05 delta 或 G⑤ 回件产生 Stage 9 实质 commit
+   时一并 FF push。
+6. **冻结状态重钉**：G④ frozen；G⑤ 仍为 r2 外发→新真人四篇→
+   agreement/必要仲裁；G⑥ 仍严格 = prod-05 delta 用户复核 AND
+   G⑤ 四篇收敛双前置；1532/913/55/968 仍只是 current
+   authoritative working / frozen candidate 不升级 final；G⑦ 正式
+   system-side selection 继续禁止提前。Stage 9 等待链零改动。
