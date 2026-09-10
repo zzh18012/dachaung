@@ -5463,3 +5463,64 @@ freeze/gates ZERO CHANGE；跨批次 push bundling DENIED。**
    G⑤ 四篇收敛双前置；1532/913/55/968 仍只是 current
    authoritative working / frozen candidate 不升级 final；G⑦ 正式
    system-side selection 继续禁止提前。Stage 9 等待链零改动。
+
+## §九十九（2026-09-10）十七轮裁决：Stage 10 Batch 1 实现追认 + P1 push 批准 + D2 留待 G⑥ 后 + 两窄 closeout + Batch 2 须新分支
+
+裁决来源：GPT-5.6 Sol（用户中转，2026-09-10）；对应简报
+outputs/gpt_brief_batch26_r16_receipt.txt。登记行：**"Stage 10 Batch 1
+substantive implementation APPROVED；P1 dd4e587 PUSH APPROVED；D1
+RATIFIED；D2 DEFER TO POST-G⑥；two narrow test-contract closeouts
+pending but non-blocking for P1；Stage 10 Batch 2 remains authorized
+on a separate Batch-2 branch；Stage 9 freeze/gates and P2 queue
+ZERO CHANGE。"**
+
+1. **P1 执行（push 已完成）**：dd4e587 普通推送
+   origin/integration/stage10-batch1-relation-extraction（新分支，
+   无 force/amend/rebase）。四步核验：fetch ✔；
+   merge-base --is-ancestor 6c6d398 dd4e587 ✔；rev-list --count
+   6c6d398..dd4e587 = 1 恰量 ✔；ls-remote SHA =
+   dd4e587d3468593ca9a3c783ce002f1cb0d13216 与本地一致 ✔。语义：
+   Batch 1 首个可审阅实现进入远端审计链，**不构成 Batch 1 最终
+   close，不触发任何 Stage 9 状态变化**。P2（6ac5805/de6f9e9/
+   2d65ea6）维持排队，本轮不授权、不与 P1 捆绑。
+2. **R2/D2 裁决 = (b) 留待 G⑥ 后**：G⑥ 前不得在带 samples/private
+   的机器上运行该 devset relation 精确列表测试观察真实输出，也不得
+   据观察结果"重新冻结"期望；不请用户代跑。G⑥ 后 14-dev gold 只以
+   read-only、digest-bound 方式提供给 Stage 10（comparison/holdout
+   仍不得用于迭代）。配套测试设计修正（已执行）：devset caption
+   契约测试的精确列表断言收窄到 has_caption/table_has_caption 子集
+   ——不修改原 caption 期望、不查看真实新增 references 输出。
+   G⑥ 后建真实 references 回归的纪律：**先按契约独立确定 expected
+   edges，再比较系统输出；禁把程序实际输出复制成 gold
+   expectation**。
+3. **R3 实现主体追认**：references 作为系统输出的 typed relation
+   不违反"untyped relation edge P/R/F1"裁决（被禁的是把类型塞进
+   Stage 9 linked_nontext 或声称分类型指标；系统本已有
+   has_caption/table_has_caption typed relations；真正评测时仍须
+   投影成 untyped text→nontext edge）。契约全要素追认：caption
+   pairing 先行、matcher 只消费配对结果不重推导、正文→对象方向、
+   figure/table 家族分开、目标不唯一零边、heading 合法来源、
+   caption/image/table 不作来源、同源同目标去重、无 nearest-wins
+   fallback。token grammar/前缀集/排序键/metadata 形状/0.7.0
+   writer policy 均不要求修改。两个窄 closeout（已执行，commit
+   7328566 本地未推送）：
+   - **closeout 1（唯一性按 distinct 目标对象计数）**：实现已用
+     len(set(targets))（distinct 对象集合），非 caption relation
+     行数；补 synthetic 回归：同 token 两条等价 caption edges 同
+     to_id → 仍唯一照常产边（歧义侧"两不同对象零边"已有测试）。
+   - **closeout 2（devset caption 断言收窄）**：见上第 2 条。
+4. **D1 RATIFIED**：5 处"≥X"型 family guard 枚举延伸到 0.7.0 =
+     升版本身的 correctness fix（≤0.6.0 行为未放宽已被证明），
+     不拆回另一批次；升版检查清单已入 docs/schema-version-policy.md。
+5. **Batch 2 流程修正（Claude 十六轮回执"同分支顺次提交"不批准）**：
+   Batch 2 必须新建分支（如
+   integration/stage10-batch2-runtime-hardening），以最终获准的
+   Batch 1 HEAD 为基点线性开发，**不得让 batch1 命名分支继续承载
+   Batch 2**；Batch 2 实质 commit 单独申请 push；优先级不变
+   （segfault 隔离 > traceback 截断 > 日志轮转），parser 输出语义
+   不得改变，零接触 Stage 9 private gold/manifest/agreement/
+   prereg/selection。
+6. **冻结状态重钉**：Stage 9 G④/G⑤/G⑥/G⑦ 链与 P2 队列 ZERO
+   CHANGE；G⑥ 前私有 gold 收紧维持（不复制/不挂载/不读取 24-core
+   private gold；Stage 10 开发数据面 = synthetic fixture 或
+   非 24-core 公开文档）。
