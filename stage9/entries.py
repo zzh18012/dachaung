@@ -11,7 +11,14 @@
   条目内走 split_sentences（锁二）：有句末标点则多 unit，无则整条目
   一 unit；
 - 每个 unit 的起始源行可追溯（span 布局回映射），调用方据此填 page；
-- 首条目前的不匹配行（preamble）各自成组，机械按单行条目处理。
+- entry override 从第一个被识别的 entry start 开始生效；其前连续
+  preamble 合并为单一组并回落冻结 v1（换行本身不是边界，锁一；已有
+  block/heading hard boundary 保留）。
+
+使用范围契约：NUM/LABEL 正则与显式起始行三通道只在显式指定为
+structured entries 的目标块内运行（builder/assembler 的 "entries"
+btype 必须显式给出第 5 元素边界判断），宽泛的 LABEL 正则不是普通
+文本块的全局自动探测器。
 """
 import re
 
@@ -27,7 +34,8 @@ def group_line_indices(n_lines, starts):
     - 0-based 行号可迭代对象：这些行开新条目（须非空、严格递增、
       落在界内）。
 
-    返回 list[list[int]]；首边界之前的行（preamble）每行独立成组。
+    返回 list[list[int]]；首边界之前的行（preamble）合并为单一
+    preamble 组（组内回落冻结 v1，换行不是边界）。
     """
     if isinstance(starts, re.Pattern):
         raise ValueError("regex 边界请用 partition_entries(parts, starts)")
@@ -41,9 +49,9 @@ def group_line_indices(n_lines, starts):
     if any(b <= a for a, b in zip(idx, idx[1:])):
         raise ValueError("条目起点行号必须严格递增")
     groups = []
-    # preamble：首显式起点之前的行各自成组
-    for i in range(0, idx[0]):
-        groups.append([i])
+    # preamble：首显式起点之前的行合并为单一组，组内回落冻结 v1
+    if idx[0] > 0:
+        groups.append(list(range(0, idx[0])))
     for a, b in zip(idx, idx[1:] + [n_lines]):
         groups.append(list(range(a, b)))
     return groups
@@ -110,8 +118,9 @@ def partition_entries(parts, starts):
     返回 [(line_indices, [(unit_text, first_line_idx), ...]), ...]，
     组序 = 阅读序；first_line_idx 为 parts 内的绝对行号（0-based，
     非组内相对行号），调用方据此定位 unit 的页码/源键。hard 口径：
-    首组首 unit 取块的 hard，其后每组（含 preamble 组）首 unit
-    hard=True，组内其余 unit False。
+    首组首 unit 取块的 hard（无 preamble 时首条目头即首组；有 preamble
+    时 preamble 组为首组、首个条目头起每组首 unit hard=True），组内
+    其余 unit False。
     """
     if isinstance(starts, re.Pattern):
         matched = [i for i, p in enumerate(parts) if starts.match(p)]

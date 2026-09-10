@@ -34,9 +34,9 @@ def test_explicit_starts_grouping():
     assert group_line_indices(5, [0, 2]) == [[0, 1], [2, 3, 4]]
 
 
-def test_explicit_starts_first_not_zero_preamble_own_groups():
-    # preamble 行各自成组，其后按起点分组
-    assert group_line_indices(5, [2]) == [[0], [1], [2, 3, 4]]
+def test_explicit_starts_preamble_single_group():
+    # preamble（首起点之前的行）合并为单一组，其后按起点分组
+    assert group_line_indices(5, [2]) == [[0, 1], [2, 3, 4]]
 
 
 @pytest.mark.parametrize("idx", [[], [1, 1], [2, 1], [3], [-1], ["0"],
@@ -84,10 +84,35 @@ def test_partition_regex_multi_unit_entry_has_line_attribution():
     assert groups[0][1][-1][1] == 1
 
 
-def test_partition_regex_preamble_lines_own_groups():
-    parts = ["References", "[1] Only one entry."] + REF_FOLDED
+def test_partition_regex_preamble_single_group_v1():
+    # 多行 preamble 合并为单一组（组内 v1，换行不是边界——十二轮修复）
+    parts = ["References", "updated 2026.",
+             "[1] Only one entry."] + REF_FOLDED[:2]
     groups = partition_entries(parts, NUM)
-    assert [g[0] for g in groups] == [[0], [1], [2, 3], [4]]
+    assert [g[0] for g in groups] == [[0, 1], [2], [3, 4]]
+    # preamble 两行折行同一句 → v1 单一 unit，起始源行 0
+    assert groups[0][1] == [("References updated 2026.", 0)]
+
+
+def test_preamble_wrapped_sentence_stays_v1_single_unit():
+    # 十二轮裁决回归：两行换行包裹的同一句 preamble + 后随 [1]，
+    # preamble 仍由 v1 处理，换行不产生额外边界（锁一）
+    parts = ["These entries are sorted",
+             "by publication year.",
+             "[1] Devlin J, et al — BERT 2019"]
+    groups = partition_entries(parts, NUM)
+    assert [g[0] for g in groups] == [[0, 1], [2]]
+    assert groups[0][1] == [
+        (fold_ws("These entries are sorted by publication year."), 0)]
+
+
+def test_preamble_two_sentences_v1_still_splits():
+    # preamble 单组 ≠ 整段一 unit：v1 句切仍在运行（仅换行不是边界）
+    groups = partition_entries(
+        ["See the notes below. Entries follow.", "[1] first entry"], NUM)
+    assert [u[0] for u in groups[0][1]] == [
+        s for s in split_sentences(
+            "See the notes below. Entries follow.") if s]
 
 
 def test_partition_regex_no_match_raises():
@@ -97,8 +122,11 @@ def test_partition_regex_no_match_raises():
 
 def test_partition_matches_scan_formula():
     # 与窄扫预演公式逐位一致：fold_ws(" ".join(行)) + 逐条目 v1
-    for parts in (REF_FOLDED, REF_SENTENCED, REF_FOLDED + REF_SENTENCED):
-        entries, cur = [], []
+    #（preamble 行并入首个未起始组，与十二轮修复后口径一致）
+    for parts in (REF_FOLDED, REF_SENTENCED, REF_FOLDED + REF_SENTENCED,
+                  ["Preamble line one.", "Preamble two.",
+                   "[1] single entry."]):
+        entries, cur, pre = [], [], []
         for ln in parts:
             if NUM.match(ln):
                 if cur:
@@ -107,7 +135,9 @@ def test_partition_matches_scan_formula():
             elif cur:
                 cur.append(ln)
             else:
-                entries.append([ln])
+                pre.append(ln)
+        if pre:
+            entries.insert(0, pre)
         if cur:
             entries.append(cur)
         scan_units = []
@@ -207,3 +237,35 @@ def test_build_annotation_entries_bad_start_raises():
             (((1, "L", 0),), "heading", "g00", True),
             (((1, "L", 1), (1, "L", 2)), "entries", "g01", False, (7,)),
         ])
+
+
+def test_lines_block_with_entry_markers_not_auto_partitioned():
+    # 范围契约（十二轮裁决）：NUM/LABEL 三通道只在显式 "entries" 块内
+    # 运行；普通 "lines" 块即使内容匹配条目标记，也不触发条目分组
+    ua = _load_user_annotate()
+    reg = {
+        (1, "L", 0): "Related Work",
+        (1, "L", 1): "[1] alpha first line of a folded",
+        (1, "L", 2): "citation that continues here.",
+        (2, "L", 0): "[2] beta standalone.",
+    }
+    env = {
+        "DOC": "test-doc",
+        "ANNOTATOR": "test",
+        "NOTES": "",
+        "SEGMENTS": [("g00", "题名", "frontmatter"),
+                     ("g01", "正文", "body")],
+        "BLOCKS": [
+            (((1, "L", 0),), "heading", "g00", True),
+            (((1, "L", 1), (1, "L", 2), (2, "L", 0)), "lines", "g01",
+             False),
+        ],
+    }
+    ann, _ = ua.build_annotation(env, reg)
+    sents = [u for u in ann["units"] if u["kind"] == "sentence"]
+    # lines 语义 = 逐行一 unit；[1]/[2] 标记不触发条目合并/重切
+    #（preview 含平铺尾随空格，rstrip 后比对）
+    assert [u["text_preview"].rstrip(" ") for u in sents] == [
+        "[1] alpha first line of a folded",
+        "citation that continues here.",
+        "[2] beta standalone."]

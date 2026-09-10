@@ -73,6 +73,16 @@ unit 之间的分隔空格**归入前一 unit 的 span 末尾**
 - 锁三：**图内文字不转写**——子题注等以像素形式存在于图内的文字
   不进 stream，本节规则不改变该政策。
 
+**preamble 契约（2026-09-10 十二轮裁决补正）**：entry override 从
+第一个被识别的 entry start 开始生效；其前连续 preamble 合并为单一
+组并**回落冻结 v1**，不得按物理行人为分组（换行本身不是边界，
+锁一；已有 block/heading hard boundary 保留）。
+
+**三通道使用范围契约（2026-09-10 十二轮裁决）**：NUM/LABEL 正则与
+显式起始行三通道只在**显式指定为 structured entries 的目标块**内
+运行（builder/assembler 的 entries 块必须显式给出边界判断）；宽泛
+的 LABEL 正则不得成为普通文本块的全局自动探测器。
+
 本节为**切分政策修订，不升 schema 版本**：`sentence_splitter` 仍为
 冻结 v1，本规则只在条目区增加"先断条目边界"这一划分层。工具支持：
 一级标注 builder 与第二标注人工具
