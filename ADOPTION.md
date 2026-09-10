@@ -5332,3 +5332,29 @@ totals → 台账+简报。
    收敛（review 后若发生 edge 改判：先修正 → validator/full-set →
    重算 totals，再入 G⑥）；G⑦ 仍不得提前（正式 14-dev 选优只能
    发生在 G⑤ 收敛、G⑥ gold freeze 之后）。
+
+## §九十六（2026-09-10）十四轮裁决：十三轮 CLOSED 确认 + 下轮材料排序规则
+
+1. **十三轮正式 CLOSED**（十四轮裁决原话确认）：一~三全部通过，
+   无需补修、无需重推、无需新增裁决。四处措辞修正逐项命中要求
+   （21 core/22 annotated 双口径、acad-03 19 锚 unit/20 边、
+   1a4f7b38… 双轨语义、P3' 制备与 G⑤ 完成拆开）；§九十五登记
+   追认（含 R3' completed、旧包/_rejected_ 禁入 G⑤、tech-08 必须
+   r2 指纹 2c75ab91…、r2 为 G⑤ 唯一有效 package identity）；
+   push 链与预授权分支逐项吻合（a5be12b + 70b9f78 + 42ca24b，
+   count=3，远端=本地=42ca24b）；70b9f78 消息笔误按先例处理
+   （保留 Git 身份 + 台账披露），不产生新审计债。
+   **Stage 9 Batch 26 十三轮 CLOSED ✓；remote = local = 42ca24b ✓；
+   无未推送 ✓；无新增裁决项 ✓。**
+2. **下轮材料排序规则（十四轮裁决）**：G⑤ agreement 报告先到→
+   审 G⑤，G⑥ 继续等 prod-05；prod-05 delta 先到→先封该前置，
+   仍不提前升级 G⑥。两件互不阻塞审批，但 G⑥ 需两者齐备。
+3. **对十四轮提问的答复（预测：prod-05 delta 先到）**：prod-05
+   delta 复核为用户侧分钟级任务且材料已就绪（渲染件
+   outputs/spotcheck_prod-05.txt，reviewed SHA 82365b96…，仅
+   p6 两行内截图对象 u0047/u0051 + 隐式锚 u0046/u0048 共 2 边
+   增量）；G⑤ 链条 = r2 包外发（待用户）→ 新真人四篇标注
+   （工作量参考 acad-03 约半天 / tech-08 1~2 天 / prod-01、
+   tech-03 各 2~4 天）→ 交回 → agreement 程序，任一环节都可能
+   耗时。若实际 G⑤ 先交回则按规则先审 G⑤。
+4. 本节 commit 未推送（远端=42ca24b），随下轮 push 授权一并。
