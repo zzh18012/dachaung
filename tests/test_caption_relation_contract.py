@@ -310,7 +310,14 @@ def test_devset_docx_figure_relation():
         pytest.skip("devset 无 docx 样本")
     from app.parsers.fallback_parser import FallbackParser
     doc = FallbackParser().parse(entry.resolved_path, source_hash="a" * 64)
-    rels = _rels(doc.relations)
+    # 十七轮 closeout 2：0.7.0 合法新增 references 家族后，精确列表
+    # 断言收窄到 caption 家族子集——本测试冻结的是批次 4/7 caption
+    # 契约，不与 references 契约耦合；不观察真实新增 references
+    # 输出（D2 留待 G⑥ 后按契约独立推导期望再比对）。
+    rels = _rels(
+        r for r in doc.relations
+        if r.type in ("has_caption", "table_has_caption")
+    )
     assert rels == [
         {
             "type": "has_caption",

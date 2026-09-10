@@ -129,6 +129,27 @@ def test_ambiguous_number_two_objects_no_edge():
     assert match_reference_relations(els, _docx_caption_rels(els)) == []
 
 
+def test_duplicate_caption_relation_same_object_still_unique():
+    """十七轮 closeout 1：唯一性按 distinct 目标对象计数。
+
+    同一对象因防御性输入存在两条等价 caption relation（同 token、
+    同 to_id 对侧同对象）→ distinct 对象集合大小仍为 1 → 照常产边，
+    不因 caption relation 行数==2 误判歧义。歧义侧（同 token 两不同
+    对象零边）由 test_ambiguous_number_two_objects_no_edge 覆盖。
+    """
+    els = [
+        _el("p1", "paragraph", "如图 1 所示。", _dloc(0)),
+        _img("i1", _dloc(1)),
+        _cap("c1", "图 1 系统流程图", _dloc(2)),
+    ]
+    dup = [
+        Relation(type="has_caption", from_id="i1", to_id="c1"),
+        Relation(type="has_caption", from_id="i1", to_id="c1"),
+    ]
+    rels = _rels(match_reference_relations(els, dup))
+    assert [(r["from_id"], r["to_id"]) for r in rels] == [("p1", "i1")]
+
+
 def test_dedup_same_token_twice_one_edge():
     els = [
         _el("p1", "paragraph",
