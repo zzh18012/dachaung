@@ -5524,3 +5524,48 @@ ZERO CHANGE。"**
    CHANGE；G⑥ 前私有 gold 收紧维持（不复制/不挂载/不读取 24-core
    private gold；Stage 10 开发数据面 = synthetic fixture 或
    非 24-core 公开文档）。
+
+## §一百（2026-09-10）十八轮裁决（新 GPT 对话第 1 轮）：R1 push 批准已执行 + Stage-10-Batch-1-Closed + Batch 2 开工批准
+
+裁决来源：GPT-5.6 Sol（新对话，用户中转，2026-09-10；自包含开场
+简报 outputs/gpt_brief_newchat_r18_open.txt）。新对话因原对话轮数
+过长由 GPT 站点建议开启；本节起十八轮系列。
+
+登记行照录（英文原文）：
+- "R1 APPROVED — 7328566 may be FF-pushed to
+  origin/integration/stage10-batch1-relation-extraction
+  (dd4e587..7328566, count=1), subject to the standard four-step
+  verification and no force push."
+- "R2 APPROVED — After verified R1 landing, register
+  Stage-10-Batch-1-Closed: implementation and closeout tests are
+  landed, while D2(b) remains deferred until G⑥ under its existing
+  read-only, digest-bound, independently-authored-expectation
+  discipline."
+- "R3 APPROVED — Once Batch 1 closure is recorded after verified R1
+  landing, create integration/stage10-batch2-runtime-hardening from
+  7328566 and begin with pdfplumber segfault process isolation;
+  preserve parser-output semantics, keep all Stage 9 private-gold
+  surfaces untouched, and submit each substantive Batch 2 push
+  separately."
+
+执行记录（2026-09-10）：
+1. **R1 已执行**：FF push dd4e587..7328566 至远端 batch1 分支；
+   四步核验过——fetch ✔；merge-base --is-ancestor dd4e587 7328566
+   ✔；rev-list --count = 1 恰量 ✔；ls-remote =
+   7328566fbdd48296248d01de85fb62a13fa9eff5 与本地逐位一致 ✔；
+   无 force。
+2. **Stage-10-Batch-1-Closed 登记生效**（本节即关闭凭证）：
+   实现与 closeout 测试均已落远端（batch1 分支远端 = 7328566）；
+   D2(b) 真实 devset relation 回归明确留待 G⑥ 后（read-only +
+   digest-bound + 期望独立撰写纪律），不构成关闭阻塞。Batch 1
+   最终形态：契约 docs/reference-relation-contract.md v1 +
+   match_reference_relations（唯一性守卫禁 nearest-wins）+
+   schema 0.7.0 + 33 个合成契约测试；远端审计链
+   6c6d398..dd4e587..7328566。
+3. **R3 前置满足**：Batch 2 分支
+   integration/stage10-batch2-runtime-hardening 自 7328566 创建
+   （复用 dachuang-stage10 worktree 切换分支）；首项 =
+   pdfplumber segfault 进程隔离；约束：parser 输出语义不变、
+   Stage 9 私有数据面零接触、每个实质 commit 单独申请 push。
+4. Stage 9 台账队列更新为 5 个（6ac5805/de6f9e9/2d65ea6/
+   9968c99/本节 commit），继续按纯台账排队规则等待实质到件。
