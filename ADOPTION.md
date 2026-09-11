@@ -5997,3 +5997,31 @@ G⑦ 禁提前维持。本节纯台账+私有层操作，无 repo 代码改动�
    裁例：per-entry 语义切为规则，gold 侧已合规；仲裁判定分歧
    归因），随其余三篇（tech-03/prod-01/tech-08）一并入 G⑤
    收口简报。
+
+## 一百一十一、G⑤ acad-03 v2 定为最终件 + 仲裁前置审阅收口（2026-09-11）
+
+1. **用户裁定（2026-09-11）**：参考文献 items 不再返工（“这个我先不改
+   了”所指即 §110-3 参考文献区 para 整块），MVP(2).zip 为该标注人
+   最终版。v2 = acad-03 第二标注最终件，agreement 0.2532（below_threshold，
+   区间塌缩单值、0 歧义组）为正式 G⑤ 测量值，进仲裁。
+2. **仲裁前置条目级审阅完成**（219 未匹配 unit = only_a 152 + only_b 67，
+   逐条预览核对 + 双侧文本前缀比对）：**未发现 gold 缺陷**。六类分歧归因：
+   ① 参考文献区 para vs entries（106/219≈48%，gold 合规 §3.1/R3'）；
+   ② 题注/表注/表脚注取舍与切分（gold 保留为 text unit 并按 v1 切分
+   ——题注锚 gold 的载体；B 多排除或合并，Table3 题注误标 heading）；
+   ③ ACM 出版方模板块（B 保留 Permission/©/ISBN/DOI 3 unit；gold 按
+   O1 十二轮排除）；④ 题名/作者段归属与位置（B 自身 SEGMENTS 定义
+   g00 但 BLOCKS 接线到 g01 且排右栏引言后=内部接线滑动）；⑤ kind 误用
+   3 处；⑥ 合并粒度（贡献点 bullets 并句、句界不切）。技术佐证：219
+   个未匹配 unit 中零对逐字节相同文本（分歧均为真实切分/取舍差，起点同
+   终点异；排除匹配器机械保守解释）。
+3. **仲裁记录文件**（私有层，不进 git）：
+   samples/private/stage9-corpus/arbitration/acad-03-layoutlmv3.md——
+   完整分歧清单六类表、gold 缺陷排查结论、处置提案（gold 维持原判不
+   改字节、无须重跑 validator、G₆ 凭证 --arbitration=resolved、
+   agreement_final=0.25316455696202533、pair_map=null）。按 r10 R3 字节
+   冻结纪律，仲裁结论不写入任一标注 JSON notes；正式值只进 G₆ 凭证。
+   gold 字节维持 391ed5f6…424b356d（十二轮 R3″ 冻结候选，零改动）。
+4. **r29 简报已备**：outputs/gpt_brief_batch26_r29_g5_acad03.txt——
+   G₅ acad-03 首篇 agreement+仲裁提案（待 GPT 追认处置），附 P7′
+   push 申请（3 commits：§109+§110+本节台账）。
