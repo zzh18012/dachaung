@@ -5915,3 +5915,52 @@ Stage 10 保持待命；不启动新实质批次，等待 G⑥ 前置到件或�
 
 （G⑥ 双前置维持：prod-05 2 边 delta 用户复核 + G⑤ 四篇真人
 标注；G⑦ 禁提前维持；零私有 gold 接触维持。）
+
+## 一百零九、二十八轮执行 + G⑤ acad-03 首件交回收发（2026-09-11）
+
+裁决原文登记（用户中转，2026-09-11）：
+
+> P6' APPROVED — 214702a..523c149 (2 commits) may be pushed to
+> origin/integration/stage9-batch26-corpus-annotation as a
+> fast-forward, subject to the standard four-step verification,
+> confirmation of the exact 2-commit increment, and no force push.
+> （0b3db6f 为落实 D-N 的实质修订，可携带 §一百零八台账提交一并
+> 推送。）
+
+执行记录：
+
+1. **P6' push 已执行**（四步核验）：fetch ✔；merge-base
+   --is-ancestor 214702a 523c149 ✔；rev-list --count = 2 恰量 ✔；
+   FF push 214702a..523c149 无 force ✔；ls-remote 远端 SHA =
+   523c14935c0555f7224df0ca823c417fc8274e8e 与本地 HEAD 逐位一致 ✔。
+   远端 = 本地 = 523c149，零未推送。
+
+2. **G⑤ acad-03 首件交回（代号 MVP，部分交回 1/4 篇）核验与召回**：
+   - 交回件：blocks_acad-03.py（sha256 38902ea0…）+
+     acad-03-layoutlmv3.json（sha256 62093be4…），暂存
+     outputs/g5_incoming_acad03/；
+   - **程序层核验全过**：assemble --dump 指纹核对一致（行注册表
+     指纹 a35004bb = r2 任务包绑定清单记录值；本地 dump 文件
+     sha256 e0af43bc 与包内逐位一致）；1392 行全处理 0 未处理；
+     就地校验 0 失败；重组装与交回 JSON **逐字节一致**；
+   - **内容层诊断**：bounded agreement = 0.0989（58/364，
+     below_threshold，区间塌缩、0 歧义组）——**诊断值，非正式
+     G⑤ 测量**（该件随即被标注人自查召回返工）。系统性根因：
+     真全宽行（题名/作者/机构/邮箱/横跨中线行）被整行 EXCLUDE、
+     只引用 L 半行且 R 半行同被排除 → 右半文本物理丢失（实例：
+     题名只剩 "LayoutLMv3: Pre-train"，丢失 "ning for Document
+     AI"；dump C000 整行 ='LayoutLMv3: Pre-training for Document
+     AI'）；另参考文献区使用 para 整块而非 entries 条目块
+     （§3.1 指南规则），贡献大量切分歧（only_a g08 80 单元 vs
+     only_b g07 26 单元）；
+   - **处置**：标注人当晚主动自查（"有的 C 行好像还是 L+R 合并
+     的，我调整一下"）召回返工；annotations-user/acad-03-
+     layoutlmv3.json 已撤下（暂存 outputs/g5_incoming_acad03/，
+     STATUS.txt 记录始末）；负责人将按指南口径回复修正方向
+     （C 键机制 / entries 块），不向标注人披露 agreement 数值
+     （防偏置）；
+   - 匿名过程确认书未随件（按流程四篇全完后填写），待重发件与
+     其余三篇。
+
+（G⑥ 双前置维持：prod-05 2 边 delta 用户复核 + G⑤ 四篇真人标注；
+G⑦ 禁提前维持。本节纯台账+私有层操作，无 repo 代码改动。）
