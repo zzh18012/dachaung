@@ -3,6 +3,8 @@
 覆盖裁决 6 项：formatter 格式 / 多 handler 与 NullHandler 静默 /
 batch 事件完整性 / traceback 捕获与 file_not_found 之 null / append 模式 /
 evaluation 事件（含 doc_error）。
+另含 Stage 10 批次 2 次项（traceback 有界截断，4b 节）与第三项
+（日志轮转，7 节）。
 """
 
 from __future__ import annotations
@@ -65,9 +67,15 @@ def test_setup_logger_both_handlers(tmp_path: Path):
     logger = setup_logger(
         "app.jsonlog.both", tmp_path / "both.jsonl", verbose=True
     )
+    # 批次 2 第三项起默认按大小轮转（50 MiB）；文件 handler 类型随之变化
     kinds = {type(h).__name__ for h in logger.handlers}
-    assert kinds == {"FileHandler", "StreamHandler"}
+    assert kinds == {"RotatingFileHandler", "StreamHandler"}
     logger.handlers.clear()  # 摘掉 StreamHandler，避免污染后续 capfd
+
+    disabled = setup_logger(  # max_bytes=0 回退批次 17 普通 FileHandler
+        "app.jsonlog.both0", tmp_path / "both0.jsonl", max_bytes=0
+    )
+    assert [type(h).__name__ for h in disabled.handlers] == ["FileHandler"]
 
 
 def test_setup_logger_silent_by_default_no_leak(tmp_path: Path, capfd):
@@ -380,3 +388,91 @@ def test_cli_batch_parse_log_file(tmp_path: Path):
     )
     assert rc == 0
     assert any(e["event"] == "batch_start" for e in _read_events(log))
+
+
+# ---------- 7. 日志轮转（Stage 10 批次 2 第三项） ----------
+
+def _emit_padded(logger, n: int) -> None:
+    for i in range(n):
+        logger.info(f"rot_event_{i}", extra={"pad": "x" * 120})
+
+
+def _sibling(log: Path, n: int) -> Path:
+    return log.parent / f"{log.name}.{n}"
+
+
+def test_rotation_creates_backups_all_valid_jsonl(tmp_path: Path):
+    log = tmp_path / "rot.jsonl"
+    # 每条事件 ~175B，1000B 阈值 → 5 条/文件，12 条恰装 3 文件
+    # （.2/.1/main）——backup_count=2 内零丢弃，可断言事件并集完整
+    logger = setup_logger(
+        "app.jsonlog.rot", log, max_bytes=1000, backup_count=2
+    )
+    _emit_padded(logger, 12)
+
+    assert log.exists()
+    assert _sibling(log, 1).exists() and _sibling(log, 2).exists()
+    assert not _sibling(log, 3).exists()  # backup_count=2 封顶
+
+    # 每个文件（含轮转件）独立合法 JSONL；并集恰为全部事件
+    total = 0
+    for p in [log, _sibling(log, 1), _sibling(log, 2)]:
+        for line in p.read_text(encoding="utf-8").strip().splitlines():
+            obj = json.loads(line)
+            assert obj["event"].startswith("rot_event_")
+            total += 1
+    assert total == 12
+
+
+def test_rotation_disabled_zero_max_bytes(tmp_path: Path):
+    log = tmp_path / "norot.jsonl"
+    logger = setup_logger(
+        "app.jsonlog.norot", log, max_bytes=0, backup_count=2
+    )
+    _emit_padded(logger, 10)
+
+    assert log.exists()
+    assert not _sibling(log, 1).exists()
+    events = _read_events(log)
+    assert len(events) == 10  # 无轮转：全部事件单文件
+
+
+def test_rotation_backup_count_zero_discards_old(tmp_path: Path):
+    log = tmp_path / "bc0.jsonl"
+    logger = setup_logger(
+        "app.jsonlog.bc0", log, max_bytes=300, backup_count=0
+    )
+    _emit_padded(logger, 12)
+
+    assert log.exists()
+    assert not _sibling(log, 1).exists()  # backup_count=0：不留备份
+    events = _read_events(log)  # 主文件仍是合法 JSONL（旧事件被丢弃）
+    assert all(e["event"].startswith("rot_event_") for e in events)
+
+
+def test_cli_batch_parse_rotation_flags(tmp_path: Path):
+    docs = tmp_path / "docs"
+    for i in range(3):
+        _write_md(docs, f"r{i}.md", f"R{i}")
+    log = tmp_path / "cli-rot.jsonl"
+    rc = app_main(
+        [
+            "batch-parse", str(docs), "-o", str(tmp_path / "out"),
+            "--log-file", str(log),
+            "--log-max-bytes", "400", "--log-backup-count", "2",
+        ]
+    )
+    assert rc == 0
+    assert _sibling(log, 1).exists()  # 总量超 400B，发生过轮转
+
+
+def test_evaluation_rotation_wiring(tmp_path: Path):
+    manifest = load_manifest(_make_manifest(tmp_path), project_root=tmp_path)
+    log = tmp_path / "eval-rot.jsonl"
+
+    run_evaluation(
+        manifest, tmp_path / "report.json",
+        parser_name="markdown", log_file=log, workers=1,
+        log_max_bytes=250, log_backup_count=3,
+    )
+    assert _sibling(log, 1).exists()

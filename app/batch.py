@@ -25,7 +25,7 @@ import traceback as traceback_mod
 from pathlib import Path
 from typing import Any, Iterable
 
-from app.jsonlog import setup_logger
+from app.jsonlog import DEFAULT_LOG_BACKUP_COUNT, DEFAULT_LOG_MAX_BYTES, setup_logger
 from app.parser_registry import registered_names
 from app.pipeline import process_single
 from app.plugin_loader import PluginLoadError, load_plugins
@@ -313,6 +313,8 @@ def batch_parse_files(
     verbose: bool = False,
     workers: int | None = None,
     plugins: list[str] | None = None,
+    log_max_bytes: int = DEFAULT_LOG_MAX_BYTES,
+    log_backup_count: int = DEFAULT_LOG_BACKUP_COUNT,
 ) -> dict[str, Any]:
     """批量解析并写盘，返回 summary dict（同时写 <output_dir>/summary.json）。
 
@@ -330,7 +332,13 @@ def batch_parse_files(
     workers = default_workers() if workers is None else max(1, int(workers))
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    logger = setup_logger("app.batch", log_file, verbose)
+    logger = setup_logger(
+        "app.batch",
+        log_file,
+        verbose,
+        max_bytes=log_max_bytes,
+        backup_count=log_backup_count,
+    )
 
     plugin_modules = list(plugins or [])
     try:

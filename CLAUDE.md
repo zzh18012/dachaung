@@ -27,7 +27,7 @@
 - `batch-parse` 与 `evaluation.cli run` 均支持 `--log-file`（JSONL，append）与 `--verbose`（stderr）；默认零输出变化（NullHandler，防 lastResort 泄漏）
 - 事件：batch_start / file_complete / file_warning / file_error（含 traceback）/ batch_complete；eval_start / doc_complete / doc_error / eval_complete
 - 错误事件的文本字段名是 `error_message`（`message` 是 LogRecord 保留属性，extra 不可用）
-- 已知限制：日志 append 不轮转（需手动清理，轮转属 Stage 10 批次 2 后续项）；timestamp 为 epoch 秒（traceback 截断已于 Stage 10 批次 2 次项处理，见"运行时加固"节）
+- 日志轮转（Stage 10 批次 2 第三项）：默认按大小轮转 50 MiB / 保留 5 份 `.1`–`.N` 备份（`RotatingFileHandler`，轮转只重命名不写标记行，每文件独立合法 JSONL）；`--log-max-bytes 0` 禁用回退普通 append FileHandler，`--log-backup-count 0` 轮转时旧文件直接丢弃；旗标在 `batch-parse` 与 `evaluation.cli run` 双侧。已知边界：每次运行单写者（父进程独占，Pool worker 不写日志），跨进程并发写同一日志文件时轮转不安全；timestamp 为 epoch 秒（traceback 截断已于批次 2 次项处理，见"运行时加固"节）
 
 ## Parser 注册表（Stage 8 批次 18）
 
@@ -107,6 +107,7 @@
 - 已知边界：仅按 `.pdf` 后缀隔离（其他格式纯 Python 路径不付每文件解释器启动代价；插件声明 .pdf 扩展名同被隔离）；等待无超时（C 库死循环挂起行为不变）；单文件 `app.cli parse` 仍进程内执行；evaluation 的 expected_failures 通道仍进程内；子进程内 Python 异常结构化回传（与批次 16 错误隔离语义对齐）
 - docs/BACKLOG.md §5 状态已更新为已处理
 - **次项：traceback 有界截断**（批次 17 已知限制修复）。`app/jsonlog.py::truncate_traceback` 两段式：>64 行折叠中段（保头 40 + `...<truncated:{n} lines>...` + 保尾 20——尾含最内层帧与异常行，诊断价值最高），再按 8000 字符封顶（保头 1/4 + chars 标记 + 保尾，防单行巨型 repr）；标记确定性（无时间戳），截断只发生在 `JSONFormatter` 对字符串字段名恰为 "traceback" 的单点，进程内 dict / error_code / error_message / 结构化 JSON 语义零变化；短 traceback（≤64 行且 ≤8000 字符）原样通过
+- **第三项：日志轮转**（批次 17 已知限制剩余项）。`setup_logger` 新增 `max_bytes`/`backup_count`（默认 `DEFAULT_LOG_MAX_BYTES`=50 MiB / `DEFAULT_LOG_BACKUP_COUNT`=5）：>0 用 `RotatingFileHandler`（append/utf-8 不变，轮转只重命名、不写标记行），≤0 回退普通 `FileHandler`（与批次 17 行为一致）；`batch_parse_files`/`run_evaluation` 透传，CLI 双侧 `--log-max-bytes`/`--log-backup-count`；成功路径日志量远低于默认阈值，单文件输出不变
 
 ## 容器交付与可复现构建（Stage 8 批次 25）
 

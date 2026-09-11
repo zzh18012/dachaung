@@ -21,6 +21,7 @@ if hasattr(sys.stdout, "reconfigure"):
     except (AttributeError, OSError):
         pass
 
+from app.jsonlog import DEFAULT_LOG_BACKUP_COUNT, DEFAULT_LOG_MAX_BYTES
 from evaluation.manifest import ManifestError, load_manifest
 from evaluation.report import get_git_provenance
 from evaluation.runner import run_evaluation
@@ -72,6 +73,24 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="把结构化日志同时打到 stderr（与进度输出可能交错）",
     )
+    run_p.add_argument(
+        "--log-max-bytes",
+        type=int,
+        default=DEFAULT_LOG_MAX_BYTES,
+        help=(
+            f"日志按大小轮转阈值（默认 {DEFAULT_LOG_MAX_BYTES} = 50 MiB；"
+            "0 = 禁用轮转，恢复无界 append）"
+        ),
+    )
+    run_p.add_argument(
+        "--log-backup-count",
+        type=int,
+        default=DEFAULT_LOG_BACKUP_COUNT,
+        help=(
+            f"轮转保留备份文件数 .1-.N（默认 {DEFAULT_LOG_BACKUP_COUNT}；"
+            "0 = 轮转时旧文件直接丢弃）"
+        ),
+    )
 
     val_p = sub.add_parser(
         "validate-report", help="校验评测报告是否符合 evaluation-report.schema.json"
@@ -106,6 +125,8 @@ def main(argv: list[str] | None = None) -> int:
                 verbose=args.verbose,
                 manifest_label=manifest_path.as_posix(),
                 workers=args.workers,
+                log_max_bytes=args.log_max_bytes,
+                log_backup_count=args.log_backup_count,
             )
         except EvalSchemaError as e:
             print(f"[ERROR] 生成的报告未通过 Schema 校验: {e}", file=sys.stderr)

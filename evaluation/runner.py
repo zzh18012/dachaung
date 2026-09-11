@@ -24,7 +24,7 @@ from multiprocessing import Pool
 from pathlib import Path
 from typing import Any
 
-from app.jsonlog import setup_logger
+from app.jsonlog import DEFAULT_LOG_BACKUP_COUNT, DEFAULT_LOG_MAX_BYTES, setup_logger
 from app.pipeline import process_single
 from app.process_isolation import run_in_isolated_process
 
@@ -176,6 +176,8 @@ def run_evaluation(
     verbose: bool = False,
     manifest_label: str | None = None,
     workers: int | None = 1,
+    log_max_bytes: int = DEFAULT_LOG_MAX_BYTES,
+    log_backup_count: int = DEFAULT_LOG_BACKUP_COUNT,
 ) -> dict[str, Any]:
     """跑评测主流程，返回报告 dict（同时写到 output_path）。
 
@@ -188,7 +190,13 @@ def run_evaluation(
     """
     output_root = Path(output_path).parent
     output_root.mkdir(parents=True, exist_ok=True)
-    logger = setup_logger("evaluation.runner", log_file, verbose)
+    logger = setup_logger(
+        "evaluation.runner",
+        log_file,
+        verbose,
+        max_bytes=log_max_bytes,
+        backup_count=log_backup_count,
+    )
     wall0 = time.perf_counter()
 
     per_doc_results: list[dict[str, Any]] = []

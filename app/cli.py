@@ -35,6 +35,7 @@ if hasattr(sys.stdout, "reconfigure"):
     except (AttributeError, OSError):
         pass
 
+from app.jsonlog import DEFAULT_LOG_BACKUP_COUNT, DEFAULT_LOG_MAX_BYTES
 from app.parser_registry import list_parsers as _reg_list_parsers
 from app.parser_registry import registered_names as _reg_registered_names
 from app.pipeline import process_single, validate_only
@@ -173,6 +174,24 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--verbose",
         action="store_true",
         help="把结构化日志同时打到 stderr（与进度输出可能交错）",
+    )
+    batch.add_argument(
+        "--log-max-bytes",
+        type=int,
+        default=DEFAULT_LOG_MAX_BYTES,
+        help=(
+            f"日志按大小轮转阈值（默认 {DEFAULT_LOG_MAX_BYTES} = 50 MiB；"
+            "0 = 禁用轮转，恢复无界 append）"
+        ),
+    )
+    batch.add_argument(
+        "--log-backup-count",
+        type=int,
+        default=DEFAULT_LOG_BACKUP_COUNT,
+        help=(
+            f"轮转保留备份文件数 .1-.N（默认 {DEFAULT_LOG_BACKUP_COUNT}；"
+            "0 = 轮转时旧文件直接丢弃）"
+        ),
     )
 
     # explain-parser 子命令（Stage 8 批次 22）
@@ -597,6 +616,8 @@ def main(argv: list[str] | None = None) -> int:
                 verbose=args.verbose,
                 workers=args.workers,
                 plugins=args.plugin,
+                log_max_bytes=args.log_max_bytes,
+                log_backup_count=args.log_backup_count,
             )
         except PluginLoadError as e:
             # 父进程加载失败或 worker 初始化回报失败（受控通道，池已回收）
