@@ -5757,3 +5757,50 @@ existing Stage 9 private-gold and frozen-surface prohibitions."
    不下钻（其内容本就不进 cell.text，扩展即改非 sdt 输出，越授权
    边界）/ D-L 对照范围（仅旧 devset 4 DOCX，零命中，不扩数据
    访问）。
+
+## 一百零五、二十五轮裁决登记（P4' push 执行 + Batch 3 关闭）
+
+日期：2026-09-11。裁决方式：用户中转 GPT-5.6 Sol（思考程度：高）。
+裁定内容登记行原文：
+
+"P4' APPROVED — 46672e4 may be pushed to
+origin/integration/stage10-batch3-docx-sdt-in-tc as a fast-forward
+from 3f7801d (count=1), subject to the standard four-step
+verification and no force push."
+
+"D-J RATIFIED — The explicit no-w:sdt fast path preserving native
+cell.text byte-for-byte, together with the existing XML-level use of
+cell._tc, is approved."
+
+"D-K RATIFIED — Nested w:tbl content remains out of scope and is not
+traversed; this preserves the pre-existing cell-text boundary and
+avoids an unrelated nested-table semantic change."
+
+"D-L RATIFIED — The read-only structural scan of the four authorized
+legacy-devset DOCX files is approved; its zero-hit result is recorded
+without expanding access to Stage 9 private gold or frozen surfaces."
+
+"Stage-10-Batch-3-Closed — After verified P4' landing and
+ratification of D-J/D-K/D-L, Batch 3 is closed: recursive extraction
+of w:sdt nested within w:tc (46672e4) is landed on the audited chain
+7328566→5d40803→010175d→3f7801d→46672e4."
+
+执行记录（2026-09-11）：
+1. **P4' push 已执行**：新建远端分支
+   integration/stage10-batch3-docx-sdt-in-tc；四步核验过——
+   fetch ✔；merge-base --is-ancestor 3f7801d 46672e4 ✔；
+   rev-list --count 3f7801d..46672e4 = 1 恰量 ✔；push 无 force
+   （new branch）+ ls-remote =
+   46672e42561e98eb6729f42b771ea477ba99ea1d 与本地 HEAD 逐位
+   一致 ✔。
+2. **Stage-10-Batch-3-Closed 生效**：w:tc 内嵌 w:sdt 递归提取
+   （46672e4）落地于远程审计链 7328566 → 5d40803 → 010175d →
+   3f7801d → 46672e4；D-J（fast path 门控 + cell._tc 既有访问
+   层级）/ D-K（嵌套 w:tbl 不下钻保持既有单元格边界）/ D-L（四份
+   旧 devset DOCX 只读扫描 + 零命中登记不扩访问）均按已实现形态
+   追认。
+3. **Stage 10 回到待命**：候选 §1/§2/§3/§6/§8/§9 维持待命；
+   §6 无 PyYAML 依赖批准不得开工。
+4. Stage 9 台账队列现为 9 个纯台账 commit 未推送（6ac5805/
+   de6f9e9/2d65ea6/9968c99/17943bf/0386555/e4a1a11/a7774c7/
+   9ed0354 + 本节），按"实质到件一并 FF push"规则排队。
