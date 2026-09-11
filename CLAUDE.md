@@ -27,7 +27,7 @@
 - `batch-parse` 与 `evaluation.cli run` 均支持 `--log-file`（JSONL，append）与 `--verbose`（stderr）；默认零输出变化（NullHandler，防 lastResort 泄漏）
 - 事件：batch_start / file_complete / file_warning / file_error（含 traceback）/ batch_complete；eval_start / doc_complete / doc_error / eval_complete
 - 错误事件的文本字段名是 `error_message`（`message` 是 LogRecord 保留属性，extra 不可用）
-- 已知限制：日志 append 不轮转（需手动清理）；traceback 首版不截断；timestamp 为 epoch 秒
+- 已知限制：日志 append 不轮转（需手动清理，轮转属 Stage 10 批次 2 后续项）；timestamp 为 epoch 秒（traceback 截断已于 Stage 10 批次 2 次项处理，见"运行时加固"节）
 
 ## Parser 注册表（Stage 8 批次 18）
 
@@ -106,6 +106,7 @@
 - 实现选型红线：**不用 multiprocessing.Process**——Pool worker 是 daemonic 进程，禁止再派生 mp 子进程（`Process.start()` 直接 AssertionError），mp 方案恰在要保护的并行路径上不可用；subprocess 在主进程/顺序路径/Pool worker 内行为一致。任务经 stdin 两段 pickle（父 sys.path + (fn, args)），结果 stdout 单段 pickle，stderr DEVNULL
 - 已知边界：仅按 `.pdf` 后缀隔离（其他格式纯 Python 路径不付每文件解释器启动代价；插件声明 .pdf 扩展名同被隔离）；等待无超时（C 库死循环挂起行为不变）；单文件 `app.cli parse` 仍进程内执行；evaluation 的 expected_failures 通道仍进程内；子进程内 Python 异常结构化回传（与批次 16 错误隔离语义对齐）
 - docs/BACKLOG.md §5 状态已更新为已处理
+- **次项：traceback 有界截断**（批次 17 已知限制修复）。`app/jsonlog.py::truncate_traceback` 两段式：>64 行折叠中段（保头 40 + `...<truncated:{n} lines>...` + 保尾 20——尾含最内层帧与异常行，诊断价值最高），再按 8000 字符封顶（保头 1/4 + chars 标记 + 保尾，防单行巨型 repr）；标记确定性（无时间戳），截断只发生在 `JSONFormatter` 对字符串字段名恰为 "traceback" 的单点，进程内 dict / error_code / error_message / 结构化 JSON 语义零变化；短 traceback（≤64 行且 ≤8000 字符）原样通过
 
 ## 容器交付与可复现构建（Stage 8 批次 25）
 

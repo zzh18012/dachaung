@@ -153,7 +153,85 @@ def test_traceback_captured_on_exception(tmp_path: Path, monkeypatch):
     assert "Traceback" in err["traceback"]
 
 
-# ---------- 4b. file_warning 逐码发射（真实 parser 警告难稳定触发，直测发射逻辑） ----------
+# ---------- 4b. traceback 有界截断（Stage 10 批次 2 次项） ----------
+
+from app.jsonlog import (  # noqa: E402
+    TRACEBACK_HEAD_LINES,
+    TRACEBACK_MAX_CHARS,
+    TRACEBACK_MAX_LINES,
+    TRACEBACK_TAIL_LINES,
+    truncate_traceback,
+)
+
+
+def test_truncate_traceback_short_unchanged():
+    tb = (
+        'Traceback (most recent call last):\n'
+        '  File "x.py", line 1, in <module>\n'
+        "ValueError: boom"
+    )
+    assert truncate_traceback(tb) == tb
+
+
+def test_truncate_traceback_lines_bounded_head_tail_kept():
+    lines = [f"frame line {i}" for i in range(500)]
+    out_lines = truncate_traceback("\n".join(lines)).splitlines()
+    assert len(out_lines) <= TRACEBACK_MAX_LINES
+    # 头 40 原样 + 标记行（含折叠量）+ 尾 20 原样（异常行在尾部）
+    assert out_lines[:TRACEBACK_HEAD_LINES] == lines[:TRACEBACK_HEAD_LINES]
+    assert out_lines[-TRACEBACK_TAIL_LINES:] == lines[-TRACEBACK_TAIL_LINES:]
+    marker = out_lines[TRACEBACK_HEAD_LINES]
+    assert marker == f"...<truncated:{500 - TRACEBACK_HEAD_LINES - TRACEBACK_TAIL_LINES} lines>..."
+
+
+def test_truncate_traceback_chars_bounded_tail_kept():
+    tb = "Traceback (most recent call last):\n" + "x" * 100_000 + "\nValueError: boom"
+    out = truncate_traceback(tb)
+    assert len(out) <= TRACEBACK_MAX_CHARS
+    assert out.endswith("ValueError: boom")
+    assert "...<truncated:" in out and "chars>..." in out
+
+
+def test_formatter_truncates_only_traceback_field():
+    record = logging.LogRecord(
+        "t", logging.ERROR, __file__, 1, "file_error", (), None
+    )
+    record.traceback = "\n".join(f"line {i}" for i in range(1000))
+    record.error_code = "X"
+    record.other = "\n".join(f"o{i}" for i in range(1000))  # 非 traceback 字段不动
+    obj = json.loads(JSONFormatter().format(record))
+    assert len(obj["traceback"].splitlines()) <= TRACEBACK_MAX_LINES
+    assert "<truncated:" in obj["traceback"]
+    assert obj["error_code"] == "X"
+    assert obj["other"].splitlines()[0] == "o0"
+    assert len(obj["other"].splitlines()) == 1000
+
+
+def test_batch_file_error_traceback_bounded(tmp_path: Path, monkeypatch):
+    import app.batch as batch_mod
+
+    def _deep_raise(*a, **kw):
+        # exec 生成 200 个互异命名帧：真实递归会被 Python 折叠成
+        # "[Previous line repeated N more times]"（8 行），永远到不了 64 行界
+        src = "".join(f"def f{i}():\n    return f{i + 1}()\n" for i in range(200))
+        src += "def f200():\n    raise RuntimeError('深崩')\n"
+        ns: dict = {}
+        exec(src, ns)  # noqa: S102
+        ns["f0"]()
+
+    f = _write_md(tmp_path / "docs", "deep.md", "DEEP")
+    log = tmp_path / "deep.jsonl"
+    monkeypatch.setattr(batch_mod, "process_single", _deep_raise)
+    batch_parse_files([f], tmp_path / "out", log_file=log, workers=1)
+
+    err = [e for e in _read_events(log) if e["event"] == "file_error"][0]
+    assert err["error_code"] == "RuntimeError"
+    assert len(err["traceback"].splitlines()) <= TRACEBACK_MAX_LINES
+    assert "<truncated:" in err["traceback"]
+    assert "RuntimeError: 深崩" in err["traceback"]  # 尾部异常行保留
+
+
+# ---------- 4c. file_warning 逐码发射（真实 parser 警告难稳定触发，直测发射逻辑） ----------
 
 def test_file_warning_event_per_code(tmp_path: Path):
     import logging
