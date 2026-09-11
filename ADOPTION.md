@@ -5663,3 +5663,53 @@ remain unchanged."
    实质 commit 单独申请 push）。
 4. Stage 9 台账队列维持 6 个（6ac5805/de6f9e9/2d65ea6/9968c99/
    17943bf/0386555），继续按纯台账排队规则等待实质到件。
+
+## 一百零三、二十三轮裁决登记（P3' push + Batch 2 关闭 + 待命）
+
+日期：2026-09-11。裁决方式：用户中转 GPT-5.6 Sol（思考程度：高）。
+裁定内容登记行原文：
+
+"P3' APPROVED — 3f7801d may be pushed to
+origin/integration/stage10-batch2-runtime-hardening as a fast-forward
+from 010175d (count=1), subject to the standard four-step
+verification and no force push."
+
+"D-G RATIFIED — Size rotation is enabled by default at 50 MiB with 5
+backups; --log-max-bytes 0 disables rotation and restores the
+Batch-17 append behavior."
+
+"D-H RATIFIED — Stdlib size-based RotatingFileHandler with rename-only
+rollover is approved; each active or backup file remains independently
+valid JSONL."
+
+"D-I RATIFIED — Rotation is approved for the documented single-writer
+scope. Concurrent independent processes writing the same log file
+remain unsupported and must stay documented as a known limitation."
+
+"Stage-10-Batch-2-Closed — After verified P3' landing, Batch 2 is
+closed: process isolation (5d40803), bounded traceback logging
+(010175d), and log rotation (3f7801d) are all landed on the audited
+chain from 7328566."
+
+下一批次裁定（中文原文）：待命。十六轮 D 项授权队列已完成；在未提
+供具体 BACKLOG 候选及范围说明前，不启动新的 Stage 10 实质批次。
+
+执行记录（2026-09-11）：
+1. **P3' 已执行**：3f7801d 推送 →
+   integration/stage10-batch2-runtime-hardening（FF
+   010175d..3f7801d，无 force/amend/rebase）；四步核验过——
+   fetch ✔；merge-base --is-ancestor 010175d 3f7801d ✔；
+   rev-list --count 010175d..3f7801d = 1 恰量 ✔；ls-remote =
+   3f7801dbee8a8507e49feb089c0493def1c24d72 与本地 HEAD 逐位
+   一致 ✔。
+2. **Stage-10-Batch-2-Closed 生效**：三项全部落地——segfault
+   进程隔离（5d40803）/ traceback 有界截断（010175d）/ 日志轮转
+   （3f7801d）；远程审计链 7328566 → 5d40803 → 010175d →
+   3f7801d。D-G（默认 50 MiB/5 备份 + 0 回退）/ D-H（rename-only
+   轮转，各文件独立合法 JSONL）/ D-I（单写者边界；跨独立进程共写
+   同一日志文件不安全，保留为已知限制）均按已实现形态追认。
+3. **Stage 10 进入待命**：不启动新实质批次，等待 BACKLOG 候选
+   及范围说明。
+4. Stage 9 台账队列更新为 7 个（6ac5805/de6f9e9/2d65ea6/
+   9968c99/17943bf/0386555/e4a1a11），继续按纯台账排队规则等待
+   实质到件。
