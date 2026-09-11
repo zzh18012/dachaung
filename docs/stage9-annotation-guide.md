@@ -383,8 +383,11 @@ stage9-b26-gold-r2 并保留 r1 凭证与哈希链）。
 - `double_annotation` 每篇记录：decision、agreement_lower/
   agreement_upper、**可空** agreement_final（仅区间真正塌缩为
   单值时填）、secondary_annotation_sha256、
-  agreement_implementation_commit、pair_map_sha256（无则
-  null）、仲裁状态——门槛已定但存留无关歧义时**不得虚构标量**；
+  agreement_report_sha256（r27 D-N：所引 agreement report 字节
+  哈希随凭证保留，供 G⑥ 审计——仲裁声明只记录已完成的人工仲裁，
+  不替代仲裁本身）、agreement_implementation_commit、
+  pair_map_sha256（无则 null）、仲裁状态——门槛已定但存留无关
+  歧义时**不得虚构标量**；
 - validator 记录：validator/代码 commit 或版本、检查范围、结果、
   执行时间（不只 failures=0）；
 - credential 最终字节 SHA **不写入自身**（非自指）；外部记录于
@@ -404,12 +407,14 @@ gold_digest → 写 credential → 计算 credential SHA → 外部台账
 重跑（含 core_link_stats 重算）→ 逐文件 hash + gold_digest（复用
 stage9.system_eval.compute_gold_digest 单一实现）→ 双标注记录装配
 （恰 4；indeterminate 拒绝签发、below_threshold 须 --arbitration
-resolved/converged、agreement_final 仅区间塌缩时填）→ 抽查记录
+resolved/converged——声明仅记录已完成的人工仲裁，不替代仲裁本身，
+声明值与所引 agreement report 哈希（agreement_report_sha256）随
+凭证保留，r27 D-N；agreement_final 仅区间塌缩时填）→ 抽查记录
 校验（r10 R3 字段，≥2；reviewed SHA ≠ 冻结最终字节仅 stderr 注记，
 R1 修正分支合法）→ 写盘（目标已存在即拒——r2 须新裁决，不覆盖
 r1）→ 输出 credential 字节 SHA（write_bytes 写出，平台稳定字节，
 无换行翻译）。凭证含预裁定清单全部字段，另含 manifest_sha256 与
-validator_record.result.core_link_stats 两处扩展（披露待追认）。
+validator_record.result.core_link_stats 两处扩展（r27 D-M 追认）。
 `--dry-run` 全链门禁演练不写盘。
 
 ### 7.4 关联 gold 补链与 G⑥ 新增前置项（七轮裁决，2026-09-07）

@@ -107,8 +107,10 @@ def main(argv=None):
                              % DOUBLE_ANNOTATION_COUNT)
     parser.add_argument("--arbitration", action="append", default=[],
                         metavar="DOC_ID=STATUS",
-                        help="仲裁状态；below_threshold 篇必填且须 "
-                             "resolved/converged，pass 篇默认 not_needed")
+                        help="已完成人工仲裁结果的声明（r27 D-N：仅记录、"
+                             "不替代仲裁本身）；below_threshold 篇必填且须"
+                             " resolved/converged，pass 篇默认 not_needed；"
+                             "声明值与所引 agreement report 哈希随凭证保留")
     parser.add_argument("--spotcheck", action="append", required=True,
                         help="relation 抽查记录 JSON（r10 R3 字段，≥%d 份）"
                              % SPOTCHECK_MIN)
@@ -211,8 +213,14 @@ def main(argv=None):
     # ---- 步骤 6：双标注记录装配（恰 4，decision 须闭合）----
     try:
         agreements = {}
+        report_shas = {}
         for rp in args.agreement_report:
-            report = _load(rp, "agreement report")
+            try:
+                raw = Path(rp).read_bytes()
+                report = json.loads(raw.decode("utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise ValueError("agreement report 读取失败 %s: %s"
+                                 % (rp, exc))
             did = report.get("doc_id")
             decision = report.get("decision")
             if did not in core_ids:
@@ -231,6 +239,7 @@ def main(argv=None):
                     raise ValueError("doc %s agreement report 缺数值字段 %s"
                                      % (did, key))
             agreements[did] = report
+            report_shas[did] = hashlib.sha256(raw).hexdigest()
         if len(agreements) != DOUBLE_ANNOTATION_COUNT:
             raise ValueError("agreement report 须恰 %d 份，实际 %d 份"
                              % (DOUBLE_ANNOTATION_COUNT, len(agreements)))
@@ -275,6 +284,7 @@ def main(argv=None):
                 "agreement_upper": upper,
                 "agreement_final": lower if lower == upper else None,
                 "secondary_annotation_sha256": secondary_sha[did],
+                "agreement_report_sha256": report_shas[did],
                 "agreement_implementation_commit":
                     args.agreement_commit.strip().lower(),
                 "pair_map_sha256": resolution.get("pair_map_sha256"),

@@ -220,6 +220,10 @@ def test_happy_path_writes_credential(tmp_path):
         .read_bytes()).hexdigest()
     assert by_id[DOUBLE_IDS[0]]["secondary_annotation_sha256"] == \
         secondary_sha
+    # r27 D-N：仲裁声明所引 agreement report 哈希随凭证保留
+    report_sha = hashlib.sha256(
+        (tmp_path / "reports" / "report-0.json").read_bytes()).hexdigest()
+    assert by_id[DOUBLE_IDS[0]]["agreement_report_sha256"] == report_sha
 
     assert len(cred["relation_spotcheck"]) == 2
 
