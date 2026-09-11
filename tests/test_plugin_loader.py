@@ -494,6 +494,8 @@ class _FakeQueue:
 
 def test_worker_init_plugins_catches_and_reports(monkeypatch):
     monkeypatch.setattr(batch_mod, "_WORKER_PLUGIN_ERROR", None)
+    # initializer 现同时写入插件清单全局（.pdf 隔离孙进程重放用），一并还原
+    monkeypatch.setattr(batch_mod, "_WORKER_PLUGIN_MODULES", ())
 
     def _boom(modules):
         raise PluginLoadError(
@@ -511,6 +513,7 @@ def test_worker_init_plugins_catches_and_reports(monkeypatch):
 
 def test_worker_init_plugins_success_reports_ok(monkeypatch):
     monkeypatch.setattr(batch_mod, "_WORKER_PLUGIN_ERROR", None)
+    monkeypatch.setattr(batch_mod, "_WORKER_PLUGIN_MODULES", ())
     monkeypatch.setattr(batch_mod, "load_plugins", lambda modules: [])
     q = _FakeQueue()
     batch_mod._worker_init_plugins(("m",), q)

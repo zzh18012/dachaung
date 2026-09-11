@@ -99,6 +99,14 @@
 - schema 0.7.0（新增 relation type 升 minor，docs/schema-version-policy.md）：0.1.0–0.6.0 守卫拒 references；**升版须同步延伸"≥X"型守卫枚举**（family 四分支 + 扩展类型分支）——本批补齐批次 20 遗留的 5 处枚举缺口；`SCHEMA_VERSION_CURRENT="0.7.0"` 唯一权威常量
 - 已知边界（契约 §5）：复合编号题注（图 3-1：）不可解析（保守）；"版图 3"类 CJK 拼接词可能误配（无 Cue 词要求，已知精度损失）；"Figures 3 and 4" 只取首编号；区间不枚举；无题注对象不可达
 
+## 运行时加固（Stage 10 批次 2）
+
+- **首项：pdfplumber 原生崩溃进程隔离**（十七/十八轮裁决，优先级 segfault 隔离 > traceback 截断 > 日志轮转）。`.pdf` 输入在一次性 subprocess 子进程内解析（`app/process_isolation.py::run_in_isolated_process` + `app/_isolated_child.py`）；崩溃由父侧按退出码捕获 → 结构化错误 `parser_process_crashed`（无 traceback，exitcode 入 message），进程池与批次继续；成功路径输出与隔离前**逐字节一致**（禁静默重试、禁换解析策略）
+- 接线：`app/batch.py::parse_one_file` 为监督者（解析体拆至 `_parse_core`，孙进程内经 `_WORKER_PLUGIN_MODULES` 重放插件加载）；`evaluation/runner.py::_process_one_task` 对 `.pdf` 同隔离（顺序/并行同一入口）。非 `.pdf` 扩展名进程内执行，行为零变化
+- 实现选型红线：**不用 multiprocessing.Process**——Pool worker 是 daemonic 进程，禁止再派生 mp 子进程（`Process.start()` 直接 AssertionError），mp 方案恰在要保护的并行路径上不可用；subprocess 在主进程/顺序路径/Pool worker 内行为一致。任务经 stdin 两段 pickle（父 sys.path + (fn, args)），结果 stdout 单段 pickle，stderr DEVNULL
+- 已知边界：仅按 `.pdf` 后缀隔离（其他格式纯 Python 路径不付每文件解释器启动代价；插件声明 .pdf 扩展名同被隔离）；等待无超时（C 库死循环挂起行为不变）；单文件 `app.cli parse` 仍进程内执行；evaluation 的 expected_failures 通道仍进程内；子进程内 Python 异常结构化回传（与批次 16 错误隔离语义对齐）
+- docs/BACKLOG.md §5 状态已更新为已处理
+
 ## 容器交付与可复现构建（Stage 8 批次 25）
 
 - **制品交付 ≠ 部署**：CI artifact（tar.gz + .sha256 边车）是交付物；加载并经 `container_verify --artifact` 验证通过才构成已验证部署（runbook 见 README §3.6）

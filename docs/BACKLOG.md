@@ -37,7 +37,17 @@
 - 现象：worker 内 Python 异常已全隔离（单文档失败不中断批）；但 pdfplumber 底层 C 库的原生崩溃（segfault / access violation）会导致进程池整体失效，剩余任务全部失败
 - 缓解建议：批量处理前对可疑文档先单文档预测试（`app.cli parse`）
 - 依据：批次 16 步骤 1 裁决（2026-08-31，会话 cf170a6f）
-- 状态：已知限制（本批不修）
+- 状态：**已处理（Stage 10 批次 2 首项，2026-09-11）**——`.pdf` 输入在一次性
+  subprocess 子进程内解析（`app/process_isolation.py`），原生崩溃由父侧按
+  退出码捕获并转为结构化错误 `parser_process_crashed`（无 traceback，
+  exitcode 入 message），进程池与批次继续；成功路径输出与隔离前逐字节
+  一致。已知边界：仅按 `.pdf` 后缀隔离（其他格式纯 Python 路径不付
+  spawn 代价）；C 库死循环（挂起而非崩溃）行为不变；单文件
+  `app.cli parse` 仍进程内执行；evaluation 的 expected_failures 通道
+  （少量已知失败文档）仍进程内执行
+- 设计说明：不用 multiprocessing.Process——Pool worker 是 daemonic
+  进程，禁止再派生 mp 子进程（`Process.start()` 直接 AssertionError），
+  mp 方案恰在要保护的并行路径上不可用；subprocess 无此限制
 
 ## 6. markdown_enhanced 的完整 YAML frontmatter 支持
 

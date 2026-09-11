@@ -8,6 +8,12 @@
 - 图片资源：让 pipeline 把图片写入 outputs/<doc_id>/ 子目录（write_json=False 但
   output_path 给定，使 image_output_dir 仍被推导），这样 image_resource_exists_ratio
   才能真实反映 fallback parser 的能力
+- 原生崩溃隔离（Stage 10 批次 2）：.pdf 文档在一次性 spawn 子进程内解析
+  （app.process_isolation）；pdfplumber C 库 segfault 转结构化 doc 级错误
+  parser_process_crashed（code/message 与既有 error dict 同形，无 traceback
+  键），评测继续。副作用（.pdf 限定）：隔离前会炸整个 run 的子进程内
+  Python 异常，现同样收敛为 doc 级结构化错误（与 batch-parse 批次 16
+  错误隔离语义对齐）
 """
 
 from __future__ import annotations
@@ -20,6 +26,7 @@ from typing import Any
 
 from app.jsonlog import setup_logger
 from app.pipeline import process_single
+from app.process_isolation import run_in_isolated_process
 
 from evaluation import REPORT_VERSION
 from evaluation.annotation_metrics import (
@@ -71,9 +78,36 @@ def _load_annotation(path: Path | None) -> dict[str, Any] | None:
 
 
 def _process_one_task(args: tuple) -> tuple:
-    """Pool 入口：把单参数元组解开传给 _process_one（可 pickle，spawn 兼容）。"""
+    """Pool 入口：单参数元组解开传给 _process_one（可 pickle，spawn 兼容）。
+
+    .pdf 文档经 run_in_isolated_process 在一次性子进程内执行（Stage 10
+    批次 2）：原生崩溃与子进程内 Python 异常均转 doc 级结构化错误，
+    进程池与整次评测继续；其余 source_type 进程内执行，行为零变化。
+    """
     doc, output_root, parser_name, max_chars = args
-    return _process_one(doc, output_root, parser_name, max_chars)
+    if doc.resolved_path.suffix.lower() != ".pdf":
+        return _process_one(doc, output_root, parser_name, max_chars)
+    t0 = time.perf_counter()
+    status, payload = run_in_isolated_process(
+        _process_one, (doc, output_root, parser_name, max_chars)
+    )
+    if status == "ok":
+        return payload
+    if status == "crashed":
+        return (
+            None,
+            {"code": payload["code"], "message": payload["message"]},
+            time.perf_counter() - t0,
+            None,
+            Path(),
+        )
+    return (
+        None,
+        {"code": payload["type"], "message": payload["message"]},
+        time.perf_counter() - t0,
+        None,
+        Path(),
+    )
 
 
 def _process_one(
@@ -204,7 +238,8 @@ def run_evaluation(
         with Pool(workers) as pool:
             outcomes = list(pool.imap(_process_one_task, task_args))
     else:
-        outcomes = [_process_one(*a) for a in task_args]
+        # 顺序路径与并行同一入口：.pdf 隔离语义在两种模式下一致
+        outcomes = [_process_one_task(a) for a in task_args]
     for j, outcome in enumerate(outcomes):
         entries[task_index[j]] = outcome
 

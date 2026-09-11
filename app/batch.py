@@ -8,7 +8,10 @@
 - 进程池强制 spawn 上下文（批次 25）：fork 平台（Linux 默认）下
   sys.modules 缓存会使 worker initializer 的插件"重放加载"退化为
   缓存命中，批次 19 的 worker 侧防护形同虚设；spawn 使全平台语义一致
-- 已知限制：pdfplumber 底层 C 库崩溃（segfault）会破坏进程池（docs/BACKLOG.md）
+- 原生崩溃隔离（Stage 10 批次 2）：.pdf 输入在一次性 spawn 子进程内
+  解析（app.process_isolation），pdfplumber 底层 C 库 segfault 转结构化
+  错误 parser_process_crashed，进程池与批次继续；其余扩展名进程内
+  执行，行为零变化
 """
 
 from __future__ import annotations
@@ -26,6 +29,7 @@ from app.jsonlog import setup_logger
 from app.parser_registry import registered_names
 from app.pipeline import process_single
 from app.plugin_loader import PluginLoadError, load_plugins
+from app.process_isolation import run_in_isolated_process
 
 try:  # 可选依赖：新增依赖须用户单独批准，未装时降级为逐行进度
     from tqdm import tqdm as _tqdm
@@ -72,6 +76,11 @@ def effective_parser_for(parser_name: str, path: str | Path) -> str:
 _WORKER_PLUGIN_ERROR: dict | None = None
 PLUGIN_INIT_REPORT_TIMEOUT = 120.0
 
+# Stage 10 批次 2：当前批的插件模块清单。父进程（顺序路径）与 Pool
+# initializer（并行路径）各自写入；.pdf 隔离执行时传给一次性 spawn
+# 孙进程重放加载（spawn 的 sys.modules 全新，不重放则插件 parser 不可见）
+_WORKER_PLUGIN_MODULES: tuple[str, ...] = ()
+
 
 def _worker_init_plugins(
     modules: tuple[str, ...], report_queue: Any
@@ -81,7 +90,8 @@ def _worker_init_plugins(
     只捕获 PluginLoadError（load_plugins 契约保证只抛该类型）：存入
     worker 全局（作 parse_one_file 防御背板），并恰回报一次给父进程。
     """
-    global _WORKER_PLUGIN_ERROR
+    global _WORKER_PLUGIN_ERROR, _WORKER_PLUGIN_MODULES
+    _WORKER_PLUGIN_MODULES = tuple(modules)
     try:
         load_plugins(list(modules))
         report_queue.put({"ok": True})
@@ -117,33 +127,33 @@ def _result(
     }
 
 
-def parse_one_file(args: tuple) -> dict[str, Any]:
-    """Worker：单文档解析 + 写盘，返回小 dict（可 pickle，异常永不出界）。
+def _parse_core(
+    src: str,
+    out_dir: str,
+    parser_name: str,
+    max_chars: int,
+    plugin_modules: tuple[str, ...] = (),
+) -> dict[str, Any]:
+    """解析核心：worker 进程内 或 .pdf 隔离子进程内执行。
 
-    Args:
-        args: (src, out_dir, parser_name, max_chars)
+    返回 _result 小 dict；异常结构化不外泄。plugin_modules 仅在隔离子
+    进程内非空——spawn 孙进程 sys.modules 全新，须重放插件加载后插件
+    parser 才可见；重放失败按批次 19 错误码结构化返回（不炸子进程）。
     """
-    src, out_dir, parser_name, max_chars = args
     src_path = Path(src)
     out_path = Path(out_dir) / f"{src_path.stem}.json"
     t0 = time.perf_counter()
 
-    # 批次 19 防御背板：initializer 已捕获插件加载失败时，任何任务都不再
-    # 触碰解析路径，直接返回结构化失败（正常情况下探测阶段已先行暴露）
-    if _WORKER_PLUGIN_ERROR is not None:
-        return _result(
-            src_path, False, time.perf_counter() - t0,
-            parser=parser_name,
-            code=_WORKER_PLUGIN_ERROR["code"],
-            message=_WORKER_PLUGIN_ERROR["message"],
-        )
-
-    if not src_path.is_file():
-        return _result(
-            src_path, False, time.perf_counter() - t0,
-            parser=parser_name,
-            code="file_not_found", message=f"输入文件不存在: {src_path}",
-        )
+    if plugin_modules:
+        try:
+            load_plugins(list(plugin_modules))
+        except PluginLoadError as e:
+            d = e.to_dict()
+            return _result(
+                src_path, False, time.perf_counter() - t0,
+                parser=parser_name,
+                code=d.get("code"), message=d.get("message"),
+            )
 
     try:
         document, errors = process_single(
@@ -185,6 +195,69 @@ def parse_one_file(args: tuple) -> dict[str, Any]:
         chunks=len(document.chunks),
         warning_codes=[w.code for w in document.warnings],
     )
+
+
+def parse_one_file(args: tuple) -> dict[str, Any]:
+    """Worker：单文档解析监督者，返回小 dict（异常与原生崩溃均不出界）。
+
+    Args:
+        args: (src, out_dir, parser_name, max_chars)
+
+    .pdf 输入经 run_in_isolated_process 在一次性 spawn 子进程内执行
+    （Stage 10 批次 2）：pdfplumber 底层 C 库原生崩溃被父侧 exitcode
+    捕获并转为结构化错误 parser_process_crashed，进程池与批次继续；
+    子进程内 Python 异常同样结构化回传（批次 16 错误隔离语义对齐）。
+    其余扩展名进程内执行，行为零变化。
+    """
+    src, out_dir, parser_name, max_chars = args
+    src_path = Path(src)
+    out_path = Path(out_dir) / f"{src_path.stem}.json"
+    t0 = time.perf_counter()
+
+    # 批次 19 防御背板：initializer 已捕获插件加载失败时，任何任务都不再
+    # 触碰解析路径，直接返回结构化失败（正常情况下探测阶段已先行暴露）
+    if _WORKER_PLUGIN_ERROR is not None:
+        return _result(
+            src_path, False, time.perf_counter() - t0,
+            parser=parser_name,
+            code=_WORKER_PLUGIN_ERROR["code"],
+            message=_WORKER_PLUGIN_ERROR["message"],
+        )
+
+    if not src_path.is_file():
+        return _result(
+            src_path, False, time.perf_counter() - t0,
+            parser=parser_name,
+            code="file_not_found", message=f"输入文件不存在: {src_path}",
+        )
+
+    if src_path.suffix.lower() == ".pdf":
+        status, payload = run_in_isolated_process(
+            _parse_core,
+            (src, out_dir, parser_name, max_chars, _WORKER_PLUGIN_MODULES),
+        )
+        if status == "ok":
+            return payload
+        if status == "crashed":
+            # 失败不留半成品 JSON（与既有 errors 路径同规）
+            if out_path.exists():
+                try:
+                    out_path.unlink()
+                except OSError:
+                    pass
+            return _result(
+                src_path, False, time.perf_counter() - t0,
+                parser=parser_name,
+                code=payload["code"], message=payload["message"],
+            )
+        return _result(
+            src_path, False, time.perf_counter() - t0,
+            parser=parser_name,
+            code=payload["type"], message=payload["message"],
+            tb=payload["traceback"],
+        )
+
+    return _parse_core(src, out_dir, parser_name, max_chars)
 
 
 def _progress(iterable: Iterable[dict[str, Any]], total: int, desc: str):
@@ -287,6 +360,12 @@ def batch_parse_files(
             },
         )
 
+    # Stage 10 批次 2：顺序路径的 parse_one_file 在本进程执行，.pdf 隔离
+    # 孙进程须从此全局取插件清单重放；并行路径由 initializer 各自写入。
+    # 无条件赋值（含置空）防同进程多次调用的上批残留
+    global _WORKER_PLUGIN_MODULES
+    _WORKER_PLUGIN_MODULES = tuple(plugin_modules)
+
     files = [Path(f) for f in file_list]
 
     # stem 冲突：父进程侧检测，后者记错误不派发（不覆盖前者的输出）
@@ -336,87 +415,92 @@ def batch_parse_files(
 
     wall0 = time.perf_counter()
     results: list[dict[str, Any]] = []
-    if effective_workers == 1:
-        for r in _progress(
-            (parse_one_file(a) for a in args_list), len(args_list), "parse"
-        ):
-            _log_file_event(logger, r)
-            results.append(r)
-    else:
-        pool_kwargs: dict[str, Any] = {}
-        init_reports: list[dict[str, Any]] = []
-        report_queue: Any = None
-        if plugin_modules:
-            report_queue = _MP_CTX.Queue()
-            pool_kwargs = {
-                "initializer": _worker_init_plugins,
-                "initargs": (tuple(plugin_modules), report_queue),
-            }
-        try:
-            with _MP_CTX.Pool(effective_workers, **pool_kwargs) as pool:
-                # 批次 19 受控通道：收取每个 worker 恰一次的初始化回报
-                # （在文件任务派发前）；not ok / 回报超时 → 受控上抛，
-                # with 语句退出即 terminate + join 回收池
-                if plugin_modules:
-                    timed_out: BaseException | None = None
-                    for _ in range(effective_workers):
-                        try:
-                            init_reports.append(
-                                report_queue.get(timeout=PLUGIN_INIT_REPORT_TIMEOUT)
+    try:
+        if effective_workers == 1:
+            for r in _progress(
+                (parse_one_file(a) for a in args_list), len(args_list), "parse"
+            ):
+                _log_file_event(logger, r)
+                results.append(r)
+        else:
+            pool_kwargs: dict[str, Any] = {}
+            init_reports: list[dict[str, Any]] = []
+            report_queue: Any = None
+            if plugin_modules:
+                report_queue = _MP_CTX.Queue()
+                pool_kwargs = {
+                    "initializer": _worker_init_plugins,
+                    "initargs": (tuple(plugin_modules), report_queue),
+                }
+            try:
+                with _MP_CTX.Pool(effective_workers, **pool_kwargs) as pool:
+                    # 批次 19 受控通道：收取每个 worker 恰一次的初始化回报
+                    # （在文件任务派发前）；not ok / 回报超时 → 受控上抛，
+                    # with 语句退出即 terminate + join 回收池
+                    if plugin_modules:
+                        timed_out: BaseException | None = None
+                        for _ in range(effective_workers):
+                            try:
+                                init_reports.append(
+                                    report_queue.get(timeout=PLUGIN_INIT_REPORT_TIMEOUT)
+                                )
+                            except Exception as e:  # queue.Empty 等：受控，不挂起
+                                timed_out = e
+                                break
+                        if timed_out is not None or len(init_reports) < effective_workers:
+                            logger.error(
+                                "plugin_load_failed",
+                                extra={
+                                    "plugin": ",".join(plugin_modules),
+                                    "error_code": "plugin_init_report_timeout",
+                                    "error_message": (
+                                        f"worker 初始化回报超时/异常"
+                                        f"（固定上限 {PLUGIN_INIT_REPORT_TIMEOUT}s）: {timed_out}"
+                                    ),
+                                    "expected_workers": effective_workers,
+                                    "received_reports": len(init_reports),
+                                },
                             )
-                        except Exception as e:  # queue.Empty 等：受控，不挂起
-                            timed_out = e
-                            break
-                    if timed_out is not None or len(init_reports) < effective_workers:
-                        logger.error(
-                            "plugin_load_failed",
-                            extra={
-                                "plugin": ",".join(plugin_modules),
-                                "error_code": "plugin_init_report_timeout",
-                                "error_message": (
+                            raise PluginLoadError(
+                                "plugin_init_report_timeout",
+                                ",".join(plugin_modules),
+                                type(timed_out).__name__ if timed_out else "Timeout",
+                                (
                                     f"worker 初始化回报超时/异常"
                                     f"（固定上限 {PLUGIN_INIT_REPORT_TIMEOUT}s）: {timed_out}"
                                 ),
-                                "expected_workers": effective_workers,
-                                "received_reports": len(init_reports),
-                            },
-                        )
-                        raise PluginLoadError(
-                            "plugin_init_report_timeout",
-                            ",".join(plugin_modules),
-                            type(timed_out).__name__ if timed_out else "Timeout",
-                            (
-                                f"worker 初始化回报超时/异常"
-                                f"（固定上限 {PLUGIN_INIT_REPORT_TIMEOUT}s）: {timed_out}"
-                            ),
-                        ) from None
-                    bad = next((r for r in init_reports if not r.get("ok", True)), None)
-                    if bad is not None:
-                        logger.error(
-                            "plugin_load_failed",
-                            extra={
-                                "plugin": bad.get("plugin"),
-                                "error_code": bad.get("code"),
-                                "error_message": bad.get("message"),
-                                "worker_init": True,
-                            },
-                        )
-                        raise PluginLoadError(
-                            bad.get("code", "plugin_import_failed"),
-                            bad.get("plugin", "?"),
-                            bad.get("error_type", ""),
-                            bad.get("message", ""),
-                        )
-                for r in _progress(
-                    pool.imap_unordered(parse_one_file, args_list),
-                    len(args_list),
-                    "parse",
-                ):
-                    _log_file_event(logger, r)
-                    results.append(r)
-        finally:
-            if report_queue is not None:
-                report_queue.close()
+                            ) from None
+                        bad = next((r for r in init_reports if not r.get("ok", True)), None)
+                        if bad is not None:
+                            logger.error(
+                                "plugin_load_failed",
+                                extra={
+                                    "plugin": bad.get("plugin"),
+                                    "error_code": bad.get("code"),
+                                    "error_message": bad.get("message"),
+                                    "worker_init": True,
+                                },
+                            )
+                            raise PluginLoadError(
+                                bad.get("code", "plugin_import_failed"),
+                                bad.get("plugin", "?"),
+                                bad.get("error_type", ""),
+                                bad.get("message", ""),
+                            )
+                    for r in _progress(
+                        pool.imap_unordered(parse_one_file, args_list),
+                        len(args_list),
+                        "parse",
+                    ):
+                        _log_file_event(logger, r)
+                        results.append(r)
+            finally:
+                if report_queue is not None:
+                    report_queue.close()
+    finally:
+        # 批结束即清空：顺序路径的隐藏通道不留残值（同进程后续直接调用
+        # parse_one_file 的场景不应继承本批插件清单——测试隔离实测踩过）
+        _WORKER_PLUGIN_MODULES = ()
     wall = time.perf_counter() - wall0
 
     failed_results = [r for r in results if not r["success"]]
