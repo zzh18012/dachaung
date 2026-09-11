@@ -5823,3 +5823,47 @@ Stage 10 保持待命；不启动新实质批次，等待 G⑥ 前置到件或�
    纯台账 commit 未推送（6ac5805/de6f9e9/2d65ea6/9968c99/
    17943bf/0386555/e4a1a11/a7774c7/9ed0354/68aaf32 + 本节），
    按"实质到件一并 FF push"规则排队。
+
+## 一百零七、等待期并行件：G⑥ gold-freeze 凭证组装工具（commit 65054c6）
+
+日期：2026-09-11。性质：等待期并行件（先例 §八十三 identity_view /
+§八五 annotation_report）——非裁决驱动，工具+测试落地后披露待追认；
+**未对真实语料运行，零私有 gold 接触维持**（G⑥ 前禁令完好）。
+
+动机：G⑥ 凭证格式已由五轮裁决 C 预裁定（§八十四 + 指南 §7.3），
+但组装目前全靠届时手工拼装。工具化后 G⑥ 双前置闭合时签发为纯机械
+执行（用户要求节约等待时间）。
+
+实现（commit 65054c6，3 文件 +788）：
+1. `scripts/stage9_gold_credential.py`：机械执行 §7.3 封口顺序——
+   manifest 冻结校验（sha256 与 G④ 冻结值逐位比对）→ core 集恰 24
+   → 最终 validator 现场重跑（24 core 逐篇 + manifest 一致性 +
+   core_link_stats 聚合重算）→ 逐文件 hash + gold_digest（复用
+   stage9.system_eval.compute_gold_digest 单一实现，不复制聚合逻辑）
+   → 双标注记录装配（恰 4 份 agreement report）→ relation 抽查记录
+   校验（r10 R3 字段）→ 组装 credential → 写盘 → 输出 credential
+   字节 SHA（外部登记，不写入自身）。退出码 0/1（gold 不干净）/
+   2（门禁错误）。--dry-run 全链演练不写盘。
+2. `tests/test_stage9_gold_credential.py`：14 个合成夹具测试
+   （24-core 微缩语料 + 4 报告 + 抽查记录）——happy path 字段完备
+   与 digest 独立复算 / SHA 非自指 / manifest 不符 / core 数量 /
+   validator 失败 rc1 / indeterminate 拒绝 / below_threshold 无
+   收敛仲裁拒绝（有 resolved 接受）/ secondary doc_id 不符 / 抽查
+   字段缺失或不足 / defects_found 须 defects / 已存在 immutable
+   / dry-run 不写盘 / reviewed SHA 不符仅注记。
+3. `docs/stage9-annotation-guide.md` §7.3 增工具注记。
+4. 回归：5680 passed / 4 skipped（5666+14，零既有失败）。
+
+执行披露（两项，请追认或改判）：
+- **D-M 凭证字段扩展两处**：顶层 `manifest_sha256`（凭证可独立展开
+  自证的必要输入）与 `validator_record.result.core_link_stats`（core
+  totals 现场重算，作为 validator 记录"结果（不只 failures=0）"的
+  组成部分）。二者超出 §84 逐字段清单的字面列举，属格式扩展。
+- **D-N 门禁裁量工具化**：indeterminate → 拒绝签发（G⑥ AND 门机械
+  化）；below_threshold → 须 --arbitration ∈ {resolved, converged}
+  （收敛值域为工具层新裁量）；抽查记录 ≥2（r10 R3 下限）；
+  reviewed SHA ≠ 冻结最终字节 → 仅 stderr 注记不拒（R1 修正分支
+  合法性）；凭证文件已存在 → 拒绝覆盖（immutable，r2 须新裁决）；
+  write_bytes 写出（平台稳定字节，无 CRLF 翻译——测试中发现的真
+  实缺陷已修复：write_text 在 Windows 翻译换行会使凭证字节与打印
+  SHA 不一致）。
