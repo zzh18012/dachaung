@@ -5622,3 +5622,44 @@ ZERO CHANGE。"**
    逐项实现、实质 commit 单独申请 push。
 4. Stage 9 台账队列更新为 6 个（6ac5805/de6f9e9/2d65ea6/9968c99/
    17943bf/本节 commit），继续按纯台账排队规则等待实质到件。
+
+## 一百零二、二十轮裁决登记（Stage 10 Batch 2 次项 push 与三项裁量追认）
+
+日期：2026-09-11。裁决方式：用户中转 GPT-5.6 Sol（思考程度：高）。
+裁定内容登记行原文：
+
+"P2' APPROVED — 010175d may be pushed to
+origin/integration/stage10-batch2-runtime-hardening as a fast-forward
+from 5d40803 (count=1), subject to the standard four-step
+verification and no force push."
+
+"D-D RATIFIED — Traceback bounding at the JSONFormatter output
+boundary only is approved; in-process error objects and all non-log
+semantics remain unchanged."
+
+"D-E RATIFIED — The deterministic 64/40/20 line bound and
+8000-character bound, applied lines-first then characters, are
+approved; short tracebacks pass byte-for-byte unchanged."
+
+"D-F RATIFIED — Truncation is limited to string-valued extra fields
+named exactly "traceback"; all other fields, including long strings,
+remain unchanged."
+
+执行记录（2026-09-11）：
+1. **P2' 已执行**：010175d 推送 →
+   integration/stage10-batch2-runtime-hardening（FF
+   5d40803..010175d，无 force/amend/rebase）；四步核验过——
+   fetch ✔；merge-base --is-ancestor 5d40803 010175d ✔；
+   rev-list --count 5d40803..010175d = 1 恰量 ✔；ls-remote =
+   010175dd785c02e5ceaf6b7c8547fae0f6d122a8 与本地 HEAD 逐位
+   一致 ✔。
+2. **D-D/D-E/D-F 追认生效**：Batch 2 次项（traceback 有界截断）
+   按已实现形态正式封口——JSONFormatter 单点收口（进程内错误
+   对象与非日志语义不变）、确定性界值 64 行（头 40+尾 20）+
+   8000 字符两段式先行后列、作用域限字符串且字段名精确为
+   "traceback"（其他字段含超长字符串不动）均获追认。
+3. Batch 2 第三项按既定优先级排队：日志轮转（批次 17 已知限制
+   剩余项）；约束沿用（parser 输出语义不变、成功路径零变化、
+   实质 commit 单独申请 push）。
+4. Stage 9 台账队列维持 6 个（6ac5805/de6f9e9/2d65ea6/9968c99/
+   17943bf/0386555），继续按纯台账排队规则等待实质到件。
