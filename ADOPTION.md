@@ -6025,3 +6025,54 @@ G⑦ 禁提前维持。本节纯台账+私有层操作，无 repo 代码改动�
 4. **r29 简报已备**：outputs/gpt_brief_batch26_r29_g5_acad03.txt——
    G₅ acad-03 首篇 agreement+仲裁提案（待 GPT 追认处置），附 P7′
    push 申请（3 commits：§109+§110+本节台账）。
+
+## 一百一十二、二十九轮裁决登记：G⑤ acad-03 仲裁追认 + 凭证精度口径 + P7' push（2026-09-11）
+
+裁决原文（用户中转，逐字）：
+
+> A RATIFIED — acad-03 is resolved in favor of the frozen gold
+> annotation. The gold bytes remain unchanged; the documented
+> discrepancies are attributable to the secondary annotation's
+> non-application of frozen rules and internal wiring inconsistency.
+> Retain the private arbitration record under the established
+> byte-freeze discipline; no G⑤ non-convergence stop condition
+> is triggered.
+>
+> B CONFIRMED WITH PRECISION — Because the agreement interval is
+> collapsed, agreement_final may be populated, but it must preserve
+> the exact reported value 0.25316455696202533, not the rounded
+> display 0.2532. Record arbitration=resolved, pair_map_sha256=null,
+> and the cited secondary-annotation and agreement-report SHA256
+> values.
+>
+> P7' APPROVED — 523c149..a2f63a9 (3 commits) may be pushed to
+> origin/integration/stage9-batch26-corpus-annotation as a
+> fast-forward, subject to the standard four-step verification,
+> confirmation of the exact 3-commit increment, and no force push.
+
+执行记录：
+
+1. **P7' push 已执行**（四步核验）：fetch ✔；merge-base
+   --is-ancestor 523c149 a2f63a9 ✔；rev-list --count = 3 恰量 ✔
+   （50e7461 + e653aea + a2f63a9 三台账）；FF push
+   523c149..a2f63a9 无 force ✔；ls-remote 远端 SHA =
+   a2f63a979f7086c2180fd97432d7579023b58782 与本地 HEAD 逐位
+   一致 ✔。远端 = 本地 = a2f63a9，零未推送。
+
+2. **A 落地**：仲裁记录（samples/private/stage9-corpus/
+   arbitration/acad-03-layoutlmv3.md，私有层）处置节改为
+   “r29 GPT 已追认”，登记 A/B 原文；gold 字节维持
+   391ed5f6…424b356d 零改动；G⑤ 无停机触发。
+
+3. **B 落地**：docs/stage9-annotation-guide.md §7.3
+   agreement_final 字段补精度口径（须写报告完整数值，禁
+   四舍五入展示值；r29 B 出处）。G₆ 凭证组装时 acad-03 篇：
+   agreement_final = 0.25316455696202533、arbitration=resolved、
+   pair_map_sha256=null、secondary_annotation_sha256=3b2a3fcf…、
+   agreement_report_sha256=1a1bb900…（r27 D-N）。
+
+4. 状态：G⑤ acad-03 首篇闭环（交回→核验→测量→仲裁→追认）；
+   余三篇 tech-03/prod-01/tech-08 待交回同流程。G₆ 双前置不变
+   （prod-05 2 边 delta 用户复核 + G⑤ 四篇）。本轮新增 commit
+   （本节台账+指南精度注记）按 r14 规则排队，随下次实质到件
+   一并申请 push。

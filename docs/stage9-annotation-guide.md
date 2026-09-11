@@ -382,7 +382,9 @@ stage9-b26-gold-r2 并保留 r1 凭证与哈希链）。
   范围=24 core；
 - `double_annotation` 每篇记录：decision、agreement_lower/
   agreement_upper、**可空** agreement_final（仅区间真正塌缩为
-  单值时填）、secondary_annotation_sha256、
+  单值时填；r29 B：须写 agreement 报告的完整数值，**不得写
+  四舍五入后的展示值**，如 0.25316455696202533 而非 0.2532）、
+  secondary_annotation_sha256、
   agreement_report_sha256（r27 D-N：所引 agreement report 字节
   哈希随凭证保留，供 G⑥ 审计——仲裁声明只记录已完成的人工仲裁，
   不替代仲裁本身）、agreement_implementation_commit、
