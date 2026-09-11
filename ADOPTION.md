@@ -6076,3 +6076,26 @@ G⑦ 禁提前维持。本节纯台账+私有层操作，无 repo 代码改动�
    （prod-05 2 边 delta 用户复核 + G⑤ 四篇）。本轮新增 commit
    （本节台账+指南精度注记）按 r14 规则排队，随下次实质到件
    一并申请 push。
+
+## 一百一十三、三十轮裁决登记：P8' push 执行（2026-09-11）
+
+裁决原文（用户中转，逐字）：
+
+> P8' APPROVED — a2f63a9..6c540ea (1 commit) may be pushed to
+> origin/integration/stage9-batch26-corpus-annotation as a
+> fast-forward, subject to the standard four-step verification,
+> confirmation of the exact 1-commit increment, and no force push.
+> （该提交落实已裁定的 G₆ 凭证精度规范，不作为单纯台账延后。）
+
+执行记录：
+
+1. **P8' push 已执行**（四步核验）：fetch ✔；merge-base
+   --is-ancestor a2f63a9 6c540ea ✔；rev-list --count = 1 恰量 ✔
+   （6c540ea = 指南 §7.3 精度注记 + §112 台账）；FF push
+   a2f63a9..6c540ea 无 force ✔；ls-remote 远端 SHA =
+   6c540ea958b5c11afb4d871e6a5222fcae6c9b47 与本地 HEAD 逐位
+   一致 ✔。远端 = 本地 = 6c540ea，零未推送。
+2. r29 全链（A/B/P7'/P8'）收口完毕；G₅ acad-03 首篇闭环终态。
+   同日用户指示启动 Web/API 服务层提案（此前 r24 范围排除答复
+   被用户推翻——范围决定权在用户），r31 简报将附新批次提案
+   请裁。
