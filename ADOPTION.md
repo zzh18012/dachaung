@@ -5867,3 +5867,51 @@ Stage 10 保持待命；不启动新实质批次，等待 G⑥ 前置到件或�
   write_bytes 写出（平台稳定字节，无 CRLF 翻译——测试中发现的真
   实缺陷已修复：write_text 在 Windows 翻译换行会使凭证字节与打印
   SHA 不一致）。
+
+## 一百零八、二十七轮裁决执行（2026-09-11）
+
+裁决原文登记（用户中转，2026-09-11）：
+
+> D-M RATIFIED — manifest_sha256 使凭证可独立验证其冻结基线；
+> core_link_stats 记录现场重算的验证结果。两者均为可复算事实，
+> 不改变既定 gold、指标或签发门槛。
+>
+> D-N RATIFIED（附修改）— 机械门禁批准：indeterminate 拒绝签发；
+> below_threshold 须显式 resolved/converged 仲裁声明；≥2 份有效
+> relation 抽查记录；已存在凭证 immutable；凭证以稳定字节写出。
+> **修改：--arbitration 仅能声明已完成的人工仲裁结果，不能替代
+> 仲裁本身；其取值及所引用的 agreement report 哈希必须随凭证
+> 保留，供 G⑥ 审计。声明记录、不替代底层人工仲裁。**
+>
+> P5' APPROVED — 42ca24b..214702a（13 commits）可 fast-forward
+> 推送至 origin/integration/stage9-batch26-corpus-annotation；
+> 四步核验覆盖基点、恰为 13 的增量与远端 SHA；禁止 force。
+
+执行记录：
+
+1. **P5' push 已执行**（四步核验）：fetch ✔；merge-base
+   --is-ancestor 42ca24b 214702a ✔（基点为远端 HEAD 祖先）；
+   rev-list --count 42ca24b..214702a = 13 恰量 ✔；FF push
+   42ca24b..214702a 无 force ✔；ls-remote 远端 SHA =
+   214702a2170b9ffc98b50e6ff3210ce2a1d6527a 与本地 HEAD 逐位
+   一致 ✔。远端 integration/stage9-batch26-corpus-annotation =
+   本地 = 214702a。
+2. **D-N 修改已落地**（commit 0b3db6f，3 文件 +26/−7）：
+   - `scripts/stage9_gold_credential.py`：双标注记录新增
+     `agreement_report_sha256`（逐报告字节 sha256，装配时现场
+     计算）；--arbitration help 文本改为"已完成人工仲裁结果的
+     声明（仅记录、不替代仲裁本身）；声明值与所引 agreement
+     report 哈希随凭证保留"；
+   - `tests/test_stage9_gold_credential.py`：happy path 断言
+     agreement_report_sha256 == 报告文件字节哈希（独立复算）；
+   - `docs/stage9-annotation-guide.md` §7.3：double_annotation
+     字段清单补 agreement_report_sha256（含"声明记录、不替代
+     人工仲裁"语义）；工具注记同步 + D-M 两处扩展标注 r27
+     追认；
+   - 回归：5680 passed / 4 skipped（零既有失败；修改仅在既有
+     测试内加断言，测试数不变）。
+3. 队列变化：推送后 0 未推；D-N 实现后未推 2（0b3db6f 实现 +
+   本台账 commit），按 r14 规则随实质到件申请 push。
+
+（G⑥ 双前置维持：prod-05 2 边 delta 用户复核 + G⑤ 四篇真人
+标注；G⑦ 禁提前维持；零私有 gold 接触维持。）
