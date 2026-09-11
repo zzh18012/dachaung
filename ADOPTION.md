@@ -6099,3 +6099,48 @@ G⑦ 禁提前维持。本节纯台账+私有层操作，无 repo 代码改动�
    同日用户指示启动 Web/API 服务层提案（此前 r24 范围排除答复
    被用户推翻——范围决定权在用户），r31 简报将附新批次提案
    请裁。
+
+## 一百一十四、三十一轮裁决登记：W1-W4 批准（Stage 11 Batch 1 Web/API 启动）（2026-09-11）
+
+裁决原文（用户中转，逐字）：
+
+> W1 APPROVED WITH BOUNDARIES — Stage 11 Batch 1 may implement the
+> local HTTP API and minimal same-origin static frontend, with no
+> parser/chunker/pipeline semantic changes, no evaluation endpoint,
+> no persistence, no real KVFS integration, and no Stage 9
+> private-gold access. Default binding is loopback-only;
+> non-loopback binding requires an explicit unsafe-network opt-in.
+> Enforce upload limits while streaming, clean temporary files on
+> every path, expose no server temporary paths, and prevent static
+> routing from shadowing API or documentation routes.
+>
+> W2 APPROVED — Add fastapi, uvicorn[standard], and python-multipart
+> as runtime dependencies, and httpx as a development/test
+> dependency only; update the lockfile and add no npm or frontend
+> build toolchain.
+>
+> W3 APPROVED — Create integration/stage11-batch1-web-api from main
+> at 6c6d398 and designate the work as Stage 11 Batch 1.
+>
+> W4 APPROVED — Defer the complete HTTP error-mapping table to the
+> implementation first report. Before any substantive Stage 11 push
+> request, submit the mapping table, error envelope,
+> traceback-redaction behavior, and end-to-end tests for
+> adjudication; oversized uploads are 413 and unexpected exceptions
+> are traceback-free 500.
+
+W1 补充边界（裁决正文，逐条执行）：
+- 默认仅监听 127.0.0.1；非 loopback --host 须显式危险确认开关，
+  CLI 帮助与页面均说明“无鉴权，不适合公开暴露”；
+- 50 MiB 须在流式写入临时文件时实际计量并拒绝（413），不得只信
+  Content-Length；成功/失败/超限全路径清理临时文件；
+- API 返回不泄露服务器临时路径；source_locator 等输出只用净化后
+  的上传文件名或既有安全逻辑；
+- 静态根路由不遮蔽 /api/*、/docs、/openapi.json；
+- 合成夹具验证：API 与 CLI 成功结果结构等价、各已知错误码、
+  上传上限、临时文件清理、插件预加载、前端基本流程。
+
+执行：本节登记后建 worktree dachuang-stage11（分支
+integration/stage11-batch1-web-api 基点 6c6d398）动工；实现
+首报（r32）交完整 HTTP 映射表+错误 envelope+异常日志脱敏+端到端
+测试，映射表裁前不申请实质 push（W4）。
