@@ -5569,3 +5569,56 @@ ZERO CHANGE。"**
    Stage 9 私有数据面零接触、每个实质 commit 单独申请 push。
 4. Stage 9 台账队列更新为 5 个（6ac5805/de6f9e9/2d65ea6/
    9968c99/本节 commit），继续按纯台账排队规则等待实质到件。
+
+## §一百零一、第十九轮裁决：P1'' push 批准 + D-A/D-B/D-C 追认（新对话第 2 轮）
+
+日期：2026-09-11。搬运线第十九轮（新 GPT 对话第 2 轮），对十八轮回执
+（outputs/gpt_brief_batch26_r18_receipt.txt：R1/R2 执行汇报 + Batch 2
+首项完成 + P1'' push 请求 + 三项披露）的裁决。
+
+裁决内容：
+1. **P1''：批准**。5d40803 可新建推送至
+   origin/integration/stage10-batch2-runtime-hardening；执行既定四步
+   核验，确认基点 7328566、增量恰为 1、远端 SHA 一致，禁止 force。
+2. **D-A：追认**。subprocess 是为覆盖 daemonic Pool worker 场景所必需
+   且更一致的隔离机制，符合"segfault 进程隔离"授权；不构成机制越界。
+3. **D-B：追认**。仅 .pdf 进入隔离符合风险与性能边界；插件声明 .pdf
+   同样隔离是正确的保守处理。其他扩展名维持进程内行为。
+4. **D-C：追认**。将 PDF 的 Python 异常或崩溃收敛为文档级既有形状的
+   结构化错误，属于授权的运行时加固；成功路径不变。保留
+   expected-failures 进程内、无超时、单文件 CLI 进程内，均不要求本项
+   扩展。
+
+登记行照录（英文原文）：
+- "P1'' APPROVED — 5d40803 may be pushed as the initial commit of
+  origin/integration/stage10-batch2-runtime-hardening from 7328566
+  (count=1), subject to the standard four-step verification and no
+  force push."
+- "D-A RATIFIED — Using one-shot subprocess isolation rather than
+  multiprocessing.Process is approved, because the latter cannot spawn
+  from daemonic Pool workers and would fail to protect the required
+  parallel path."
+- "D-B RATIFIED — Process isolation is limited to .pdf inputs,
+  including plugin-declared .pdf parsers; non-PDF paths remain
+  in-process and semantically unchanged."
+- "D-C RATIFIED — For .pdf evaluation tasks, converting child
+  exceptions or crashes into existing-shape document-level structured
+  errors is approved; successful output remains unchanged.
+  Expected-failures, timeout behavior, and single-file CLI behavior
+  remain out of scope for this item."
+
+执行记录（2026-09-11）：
+1. **P1'' 已执行**：新建远端分支
+   integration/stage10-batch2-runtime-hardening 并推送 5d40803；四步
+   核验过——fetch ✔；merge-base --is-ancestor 7328566 5d40803 ✔；
+   rev-list --count 7328566..5d40803 = 1 恰量 ✔；ls-remote =
+   5d40803141e25cc1a3b4a526a5d256f1c01a2cb1 与本地 HEAD 逐位一致 ✔；
+   无 force。
+2. **D-A/D-B/D-C 追认生效**：Batch 2 首项（segfault 进程隔离）按已
+   实现形态正式封口——subprocess 沙箱选型、.pdf 后缀作用域（含插件
+   声明 .pdf）、eval 异常收敛语义均获追认；expected-failures 通道 /
+   等待无超时 / 单文件 CLI 进程内为已裁定边界，不扩展。
+3. Batch 2 次项按既定优先级排队：traceback 有界截断 > 日志轮转；
+   逐项实现、实质 commit 单独申请 push。
+4. Stage 9 台账队列更新为 6 个（6ac5805/de6f9e9/2d65ea6/9968c99/
+   17943bf/本节 commit），继续按纯台账排队规则等待实质到件。
