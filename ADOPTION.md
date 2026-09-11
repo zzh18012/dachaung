@@ -5964,3 +5964,36 @@ Stage 10 保持待命；不启动新实质批次，等待 G⑥ 前置到件或�
 
 （G⑥ 双前置维持：prod-05 2 边 delta 用户复核 + G⑤ 四篇真人标注；
 G⑦ 禁提前维持。本节纯台账+私有层操作，无 repo 代码改动。）
+
+## 一百一十、G⑤ acad-03 最终修改版（v2）核验与 agreement（2026-09-11）
+
+1. **v2 交回件核验全过**（MVP(2).zip，暂存 outputs/g5_incoming_acad03_v2/）：
+   blocks_acad-03.py（sha256 dccf80a2…）+ acad-03-layoutlmv3.json
+   （sha256 3b2a3fcf…）。assemble --dump 指纹核对一致（a35004bb）；
+   1392 行全处理 0 未处理；就地校验 0 失败；重组装与交回 JSON
+   **逐字节一致**（3b2a3fcfae5296212f5fbd1adf3a70d81261e34f5d0
+   0444fb837b7fc8f00d6861）。已落位 annotations-user/acad-03-
+   layoutlmv3.json。
+2. **v1→v2 修正实证**：真全宽行（题名/作者/机构/邮箱）改引 C 键
+   ——右半文本找回（流 45269→45437 字符）；伪 C 行（双栏对齐融合
+   行）继续 L/R 半行分引，处理正确。残余阅读序瑕疵：题名/作者块
+   （C0-7）被排在第 1 页右栏引言之后且归 g01（视觉序应为页首、
+   归 g00）——属判断分歧非文本丢失。
+3. **参考文献区仍用 para 整块**（未改 entries，§3.1 规则）——
+   用户转述标注人"这个我先不改了"（具体所指待澄清）。
+4. **正式 agreement（v2）**：0.2532（agree/matched/union =
+   80/97/316；units_a/b = 249/164；kind_diff=0、segment_diff=17、
+   hard_boundary_diff=9；区间塌缩、0 歧义组、无需 identity
+   resolution）→ **decision=below_threshold，requires_action，
+   走仲裁**（非停机条件；停机=仲裁不收敛）。报告=
+   outputs/agreement_acad03_mvp_v2.json。
+   分歧构成（219 未匹配 unit）：参考文献区 only_a g08=80 +
+   only_b g07=26，合计 106（48%，根因=para vs entries 规则分歧）；
+   实验节 g03 合计 49（22%，表格/题注处理分歧）；题名/引言/方法
+   区合计 58（26%，段落划分与归属）；其余零星。
+   （v1 诊断值 0.0989 作废，由 v2 取代。）
+5. 处置待定：v2 是否即最终件（用户澄清"先不改"所指后定）；
+   若为最终件→below_threshold 进仲裁（参考文献原则 R3' 已有
+   裁例：per-entry 语义切为规则，gold 侧已合规；仲裁判定分歧
+   归因），随其余三篇（tech-03/prod-01/tech-08）一并入 G⑤
+   收口简报。
