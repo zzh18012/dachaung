@@ -109,6 +109,14 @@
 - **次项：traceback 有界截断**（批次 17 已知限制修复）。`app/jsonlog.py::truncate_traceback` 两段式：>64 行折叠中段（保头 40 + `...<truncated:{n} lines>...` + 保尾 20——尾含最内层帧与异常行，诊断价值最高），再按 8000 字符封顶（保头 1/4 + chars 标记 + 保尾，防单行巨型 repr）；标记确定性（无时间戳），截断只发生在 `JSONFormatter` 对字符串字段名恰为 "traceback" 的单点，进程内 dict / error_code / error_message / 结构化 JSON 语义零变化；短 traceback（≤64 行且 ≤8000 字符）原样通过
 - **第三项：日志轮转**（批次 17 已知限制剩余项）。`setup_logger` 新增 `max_bytes`/`backup_count`（默认 `DEFAULT_LOG_MAX_BYTES`=50 MiB / `DEFAULT_LOG_BACKUP_COUNT`=5）：>0 用 `RotatingFileHandler`（append/utf-8 不变，轮转只重命名、不写标记行），≤0 回退普通 `FileHandler`（与批次 17 行为一致）；`batch_parse_files`/`run_evaluation` 透传，CLI 双侧 `--log-max-bytes`/`--log-backup-count`；成功路径日志量远低于默认阈值，单文件输出不变
 
+## DOCX 表格单元格内容控件（Stage 10 批次 3）
+
+- BACKLOG §4 修复：`_cell_text`（app/parsers/fallback_parser.py）——单元格无 `w:sdt` 后代时走 python-docx 原生 `cell.text`（**逐字节零变化** fast path），有 sdt 时走 `_iter_cell_paragraphs` 文档序递归（w:p 产出 + w:sdt/w:sdtContent 深度下钻，嵌套 sdt 递归；段落 "
+" 连接与 `_Cell.text` 同构）
+- 边界：嵌套 `w:tbl` 不下钻（其内容在既有管线中本就不进 cell.text，非本批范围）；不新增语义类别；仅 DOCX 表格路径，PDF/HTML/markdown 零接触
+- 旧 devset 真实命中对照（real-01/02/03/05 DOCX，XML 精确扫描）：**零命中**（real-02 全文档仅 1 个 body 层 sdt，批次 14 已覆盖）——修复为合成夹具验证的防御性覆盖
+- 测试：tests/test_docx_sdt_in_tc.py（6 个：整格 sdt / 混合保序不重复 / 嵌套 / 裸与空 sdtContent 跳过 / 无 sdt 逐字节一致 / 计数顺序不受影响）
+
 ## 容器交付与可复现构建（Stage 8 批次 25）
 
 - **制品交付 ≠ 部署**：CI artifact（tar.gz + .sha256 边车）是交付物；加载并经 `container_verify --artifact` 验证通过才构成已验证部署（runbook 见 README §3.6）

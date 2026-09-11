@@ -818,7 +818,7 @@ def _iter_flow_elements(el):
 
     批次 14：w:body 顶层的 w:sdt（结构化文档标签容器）此前被主循环整块跳过，
     导致封面等内容（标题/图片/marker）静默丢失；此处深度优先下钻 w:sdtContent。
-    已知边界：表格单元格（w:tc）内的 w:sdt 未处理（表格内容走 _rows_to_markdown 单独管线）。
+    表格单元格（w:tc）内的 w:sdt 由 _cell_text 处理（Stage 10 批次 3）。
     """
     for child in el.iterchildren():
         tag = child.tag
@@ -829,6 +829,37 @@ def _iter_flow_elements(el):
             if content is not None:
                 yield from _iter_flow_elements(content)  # 递归
         # 其余（w:sectPr 等）跳过
+
+
+def _iter_cell_paragraphs(tc_el):
+    """按文档序产出 w:tc 内的段落元素，深度优先下钻 w:sdt/w:sdtContent。
+
+    Stage 10 批次 3：python-docx 的 _Cell.text 只取 w:tc 直接子级 w:p，
+    sdt 包裹的段落整块静默丢失（BACKLOG §4）。嵌套 w:tbl 不下钻——
+    其内容在既有管线中本就不进 cell.text，不属本批范围。
+    """
+    for child in tc_el.iterchildren():
+        tag = child.tag
+        if tag == qn("w:p"):
+            yield child
+        elif tag == qn("w:sdt"):
+            content = child.find(qn("w:sdtContent"))
+            if content is not None:
+                yield from _iter_cell_paragraphs(content)
+
+
+def _cell_text(cell) -> str:
+    """表格单元格文本：无 sdt 后代走 python-docx 原生 cell.text（逐字节
+    零变化）；有 sdt 走 _iter_cell_paragraphs 递归序，"\n" 连接段落
+    （与 _Cell.text 实现同构，仅段落集合扩展到 sdt 内部）。
+    """
+    if cell._tc.find(f".//{qn('w:sdt')}") is None:
+        return cell.text or ""
+    from docx.text.paragraph import Paragraph
+
+    return "\n".join(
+        Paragraph(p, cell).text for p in _iter_cell_paragraphs(cell._tc)
+    )
 
 
 def _parse_docx(
@@ -948,7 +979,7 @@ def _parse_docx(
             tbl = Table(child, d)
             rows_data: list[list[str]] = []
             for row in tbl.rows:
-                rows_data.append([(c.text or "").strip() for c in row.cells])
+                rows_data.append([_cell_text(c).strip() for c in row.cells])
             md = _rows_to_markdown(rows_data)
             # 批次 5 契约 §2：0 行表不产出 element（静默跳过，对齐 pdf/html）
             if md:

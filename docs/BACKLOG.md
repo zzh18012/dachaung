@@ -29,7 +29,13 @@
 - 影响范围：批次 14 修复（w:sdt 递归扫描）覆盖 flow 内容，但表格单元格（w:tc）内的 sdt 未纳入递归路径
 - 现象：w:tc 内 sdt 包裹的内容欠提取
 - 声明位置：ADOPTION.md §四十八（批次 15 附注引用批次 14 边界声明）
-- 状态：backlog（Stage 8 不动）
+- 状态：**已处理（Stage 10 批次 3，2026-09-11）**——`_cell_text` 无 sdt
+  后代走 python-docx 原生 `cell.text`（逐字节零变化），有 sdt 走
+  `_iter_cell_paragraphs` 文档序递归（保序、不重复提取、嵌套 sdt 递归）。
+  已知边界：嵌套 w:tbl 不下钻（其内容在既有管线中本就不进 cell.text）。
+  旧 devset 真实命中对照（real-01/02/03/05 四个 DOCX，XML 精确扫描）：
+  **零命中**——该缺陷在现有语料中无真实实例，修复价值为合成夹具
+  验证的防御性覆盖
 
 ## 5. pdfplumber 底层 C 库崩溃（segfault）可能破坏批处理进程池
 
