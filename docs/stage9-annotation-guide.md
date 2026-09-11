@@ -398,6 +398,20 @@ G⑥ 封口顺序（不得倒置）：四篇判定/必要 resolution → 必要�
 gold_digest → 写 credential → 计算 credential SHA → 外部台账
 登记 credential SHA。
 
+机械组装工具（等待期并行件，2026-09-11）：
+`scripts/stage9_gold_credential.py` 在双前置闭合后执行上述顺序的
+机械部分——manifest 冻结校验 → core 集恰 24 → 最终 validator 现场
+重跑（含 core_link_stats 重算）→ 逐文件 hash + gold_digest（复用
+stage9.system_eval.compute_gold_digest 单一实现）→ 双标注记录装配
+（恰 4；indeterminate 拒绝签发、below_threshold 须 --arbitration
+resolved/converged、agreement_final 仅区间塌缩时填）→ 抽查记录
+校验（r10 R3 字段，≥2；reviewed SHA ≠ 冻结最终字节仅 stderr 注记，
+R1 修正分支合法）→ 写盘（目标已存在即拒——r2 须新裁决，不覆盖
+r1）→ 输出 credential 字节 SHA（write_bytes 写出，平台稳定字节，
+无换行翻译）。凭证含预裁定清单全部字段，另含 manifest_sha256 与
+validator_record.result.core_link_stats 两处扩展（披露待追认）。
+`--dry-run` 全链门禁演练不写盘。
+
 ### 7.4 关联 gold 补链与 G⑥ 新增前置项（七轮裁决，2026-09-07）
 
 - **执行边界（B2 硬边界）**：补链 pass 只能修改 linked_nontext 及
