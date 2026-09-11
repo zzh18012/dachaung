@@ -5713,3 +5713,47 @@ chain from 7328566."
 4. Stage 9 台账队列更新为 7 个（6ac5805/de6f9e9/2d65ea6/
    9968c99/17943bf/0386555/e4a1a11），继续按纯台账排队规则等待
    实质到件。
+
+## 一百零四、二十四轮裁决登记（Stage 10 Batch 3 授权 + 执行）
+
+日期：2026-09-11。裁决方式：用户中转 GPT-5.6 Sol（思考程度：高）。
+裁定内容登记行原文：
+
+"Stage-10-Batch-3 AUTHORIZED — Create
+integration/stage10-batch3-docx-sdt-in-tc from 3f7801d and implement
+only BACKLOG §4: recursive extraction of w:sdt content nested within
+w:tc. Use synthetic DOCX fixtures, preserve order without duplicate
+extraction, keep all non-w:tc behavior unchanged, and maintain the
+existing Stage 9 private-gold and frozen-surface prohibitions."
+
+中文裁定补充（照录）：§1、§2、§3、§6、§8、§9 继续待命；特别是 §6
+未获 PyYAML 依赖批准，不得开工。
+
+执行记录（2026-09-11）：
+1. **分支已建**：integration/stage10-batch3-docx-sdt-in-tc 自
+   3f7801d（Batch 2 最终 HEAD），dachuang-stage10 worktree 切换
+   承载。
+2. **实现 commit 46672e4（4 文件 +217/−3，本地未推送）**：
+   - app/parsers/fallback_parser.py：新增 _iter_cell_paragraphs
+     （w:tc 内文档序段落生成器，w:sdt/w:sdtContent 深度下钻、嵌套
+     sdt 递归、嵌套 w:tbl 不下钻）+ _cell_text（无 sdt 后代走
+     python-docx 原生 cell.text 逐字节零变化 fast path；有 sdt 走
+     递归序，段落 "\n" 连接与 _Cell.text 实现同构）；表格行收集
+     改用 _cell_text(c).strip()（原 (c.text or "").strip() 语义
+     保持）；_iter_flow_elements docstring 边界注记同步。
+   - tests/test_docx_sdt_in_tc.py：6 个合成夹具测试——整格 sdt
+     提取 / 混合内容文档序+恰一次不重复 / 嵌套 sdt 递归 / 裸与空
+     sdtContent 跳过不吞真实内容 / 无 sdt 表格与 canonical
+     linearize_table 逐字节一致 / sdt 单元格与 body 计数顺序不受
+     影响（含 validate_udm）。
+   - docs/BACKLOG.md §4 状态改已处理；CLAUDE.md 增批次 3 节。
+   - 全套回归 5525 passed / 0 failed / 26 skipped（5519+6）。
+3. **旧 devset 真实命中对照（零命中，如实报告）**：real-01/
+   02/03/05 四个 DOCX（主树 samples/private/devset/，XML 精确扫描
+   w:tc 后代 sdt）全部 0；real-02 全文档仅 1 个 body 层 sdt（批次
+   14 已覆盖）。未触碰 Stage 9 语料/gold/冻结面。
+4. 三项实现裁量披露（待追认）：D-J fast path 门控（无 sdt 后代走
+   原生 cell.text，零变化保证不依赖 walker 细节）/ D-K 嵌套 w:tbl
+   不下钻（其内容本就不进 cell.text，扩展即改非 sdt 输出，越授权
+   边界）/ D-L 对照范围（仅旧 devset 4 DOCX，零命中，不扩数据
+   访问）。
