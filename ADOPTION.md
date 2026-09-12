@@ -6460,3 +6460,65 @@ corpus, holdout, or private-gold access is permitted. C2/C3 and
 
 待办：r44 首报 + 实质 push 申请（batch5 新远端分支 c908858..34ab70a
 + adoption 台账搭车 42c4fa9..本节）。本节为纯台账 commit。
+
+## 一百二十四、r45 裁决执行：Batch 5 追认 + P11' A/B 推送核验 + Stage-10-Batch-5-Closed（2026-09-12）
+
+四十五轮裁决（用户中转）：
+
+**1. Batch 5 实现追认**。登记行原文：Stage-10-Batch-5
+IMPLEMENTATION RATIFIED — The .py plugin-path support,
+registration-context evolution, deterministic path/collision rules,
+and three path-specific error codes are accepted with no change to
+legal dotted-module behavior. The Stage-11 serve implementation is
+outside this branch; shared-loader propagation is accepted, but
+direct serve coverage remains explicitly pending and must be added
+when the lineages converge. The test-fixture isolation repair is
+ratified as test hygiene. 要点：批次 24 context 放宽、路径
+provenance 原样保留、三项新错误码 envelope 键集与既有一致——均
+批准；serve 缺口作为"未直接验证"持续记录，**不得宣称 Stage 10
+分支单独完成 serve 端到端覆盖**；fixture 修复属测试卫生非范围
+扩张。
+
+**2. P11' A 执行完毕（batch5 实质分支）**：前置核验 fetch 后
+远端无该分支（新分支创建语义）；is-ancestor 通过（基点 c908858）；
+rev-list count c908858..34ab70a = 1 恰量；推送
+[new branch] integration/stage10-batch5-plugin-path-loading（FF
+语义，无 force；c908858 作为父提交随分支创建一并到达远端）；
+SHA 核验 ls-remote =
+34ab70af7072e3a5635392a7f1e1a6d3211a8f87，与本地 HEAD 逐位
+一致。登记行原文：P11' A APPROVED — c908858..34ab70a (1
+substantive commit, with c908858 riding as its parent) may create
+and fast-forward-push origin/integration/stage10-batch5-plugin-
+path-loading, subject to the standard four-step verification and
+no force push.
+
+**3. P11' B 执行完毕（台账搭车）**：is-ancestor 通过；rev-list
+count 42c4fa9..4c77631 = 4 恰量（480e7d2 §120 / f9b6253 §121 /
+5aac167 §122 / 4c77631 §123）；推送 42c4fa9..4c77631 FF 无
+force；SHA 核验 ls-remote = 4c7763154792cbe39a974cecdd973568ae
+854c58，与本地 HEAD 一致。
+
+**4. Stage-10-Batch-5-Closed 登记**（push 核验通过后按预授权
+执行）。关闭要件（永久保留）：
+- 全套回归 **5565 passed + 26 skipped，0 失败**（基线 5538 +
+  新增 27 恰量）；
+- 覆盖面：六个 CLI 入口（parse/batch-parse/list-parsers/
+  explain-parser/audit-parsers/inspect-parser）+ 批量三通道
+  （父进程预载 / Pool worker spawn 重放 / .pdf 隔离孙进程重放）
+  全部经共享 load_plugins 通道验证；
+- **serve 缺口（未直接验证，持续记录）**：app/service.py 在
+  Stage 11 谱系（eba2fae），本分支无法覆盖 serve 专属测试；
+  共享 loader 传播已接受，**两谱系合流时必须补 serve 侧断言**；
+  本关闭不得解释为 Stage 11 serve 已完成独立验证；
+- 错误契约：新增 plugin_path_not_found / plugin_path_invalid /
+  plugin_path_conflict（envelope 键集 code/message/plugin/
+  error_type 与既有一致，不含 traceback）；dotted 行为逐字节
+  不变；
+- 审计链 9eb4d13→c908858→34ab70a（远端
+  integration/stage10-batch5-plugin-path-loading = 34ab70a）；
+  全链：r43 授权 → 实现 34ab70a（r44 首报四项披露）→ r45
+  追认 + P11' push → 本节关闭。
+
+Batch 5 关闭。Stage 10 无进行中批次，待命（候选 C2/C3/C5 与
+§3a 待命；C6 需用户批准 PyYAML；Stage 11 Batch 2 未启动）。本节
+为纯台账 commit，按 r14 规则排队随下个实质到件搭车 push。
