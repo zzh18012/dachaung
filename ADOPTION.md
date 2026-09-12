@@ -6543,3 +6543,24 @@ C2/C3/C5、§3a、C6 与 Stage 11 Batch 2 状态均不变。
 状态：不变（候选 C2/C3/C5 与 §3a 待命；C6 需用户批准 PyYAML；
 Stage 11 Batch 2 未启动；G⑥ 双前置在用户侧）。台账队列 = §124
 （5a05acb）+ §125（bd1001f）+ 本节。本节为纯台账 commit。
+
+## 一百二十七、r49 流程裁决：纯确认免单独登记（2026-09-12）
+
+四十九轮裁决（用户中转）：**批准"纯确认免单独登记"**。登记行
+原文：PROCESS RULE RATIFIED — Pure receipt/status-unchanged
+confirmations with no new facts, decisions, state transitions,
+code changes, or pushes require no standalone ADOPTION entry. They
+may be acknowledged conversationally and summarized in the next
+substantive ledger entry; any new substantive matter resumes normal
+registration.
+
+规则口径：自本裁决起，若 GPT 回复仅包含"收讫/状态不变"、不新增
+事实、不作新批准或改判、不产生代码/推送动作，则——不新增
+ADOPTION §；不产生新的台账 commit；在下一次实质裁决登记中用
+一句话注明前序纯确认已收讫。若出现新事实、状态变化、纠错、
+授权或 push，则恢复正常逐项登记。既有 §125、§126 不回写，保持
+有效。
+
+状态：Stage 10 待命；台账队列 = §124（5a05acb）+ §125
+（bd1001f）+ §126（bb7f376）+ 本节，随下个实质到件搭车 push。
+本节为纯台账 commit。
