@@ -6195,3 +6195,46 @@ JSON 树 23 节点、bad.zzz（auto）→ 红色"失败 [HTTP 400]
 unsupported_type: 无已注册 parser 支持扩展名 .zzz"（与 W4 映射表
 逐字一致）。上文"目检未做、以替代核对披露"一句自此过时；r32 简报
 披露节已同步更新。
+
+## 一百一十六、r32 裁决执行：Stage 11 Batch 1 映射表修正落地（2026-09-12）
+
+三十二轮裁决（用户中转 GPT-5.6 Sol）两项全部执行完毕：
+
+**Q1 DECIDED**：`max_chars >= 1` 在请求边界校验；`<= 0` 返回 422
+`invalid_request`（标准 envelope，不新增错误码），发生在 pipeline
+调用之前，不得落成 500 `chunker_failed`。落地：`app/service.py`
+parse 端点在流式落盘后、parser 校验前插入请求级校验块
+（details.max_chars 给出原值）；前端 min=1 仅为便利措施，API 层
+独立校验。CLI 行为不变（`--max-chars 0` 仍 chunker_failed rc 1）。
+
+**Q2 APPROVED WITH REQUIRED MAPPING CORRECTIONS**，修正三处全部落地：
+1. `unsupported_type` 两来源（发现层 auto 发现失败 / 显式 parser 扩展名
+   自查拒绝）**统一 400**——pipeline 错误分支对该码特判，不再因来源
+   分叉出 400/422 两状态；
+2. `schema_validation_failed` 与 `hash_io_error` 从 422 移入 **500**
+   （服务侧完整性/I/O 故障，非可归责客户端输入）——
+   `_SERVER_DEFECT_CODES` 扩为五码固定集合；
+3. `plugin_import_failed` / `plugin_register_failed` 确认为启动期
+   fail-fast（PluginLoadError），不形成运行中 HTTP 响应（实现本就
+   如此，测试守卫不变）。错误 envelope、响应脱敏、服务器日志保留
+   traceback 的边界批准。
+
+**新增测试（裁决点名四类全覆盖）**：tests/test_service_api.py 23→28 项
+——max_chars 0/-5 参数化（断言 422 invalid_request + pipeline 未被
+调用 + 清理）；显式 markdown_enhanced 收 .txt → parser 自查
+unsupported_type → 400；schema_validation_failed / hash_io_error
+参数化 monkeypatch → 500 原码透传 + 无 traceback + 清理。
+
+**验证**：定向 28/28；全套回归 5491 passed / 26 skipped（零回归；
+skip 全为 samples/private 缺样例预期项，G⑥ 纪律维持合成夹具）。
+
+**文档同步**：docs/stage11-web-api.md §1 执行序、§3 映射表全表改写
+（六行裁决表）、§5 待裁事项改为已裁决边界、§6 测试清单；CLAUDE.md
+Stage 11 节映射行同步（五缺陷码/统一 400/请求级 422），“已知待裁”
+行删除；service.py 模块 docstring 同步。
+
+**git**：stage11 worktree 新 commit eba2fae（基 5d22082，无 amend，
+4 文件 +137/-38）。**本轮按裁决不 push**——“先完成修订、更新文档与
+端到端测试，之后再提交实质 push 申请”，r33 回执简报随附 push 申请
+（stage11 分支 6c6d398..eba2fae + adoption 台账搭车 6c540ea..fad0394
+共 4 个纯文档 commit，r14 规则）。
