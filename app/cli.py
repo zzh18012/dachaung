@@ -5,7 +5,8 @@
     python -m app.cli parse <input.pdf|input.docx> -o <output.json>
     python -m app.cli parse <input.docx> -o <output.json> --parser fallback --max-chars 1000
     python -m app.cli parse <input.md> -o out.json --parser auto   # 扩展名自动发现
-    python -m app.cli parse <input.myx> -o out.json --plugin my_pkg.my_plugin   # 外部插件（批次 19）
+    python -m app.cli parse <input.myx> -o out.json --plugin my_pkg.my_plugin   # 外部插件 dotted 模块名（批次 19）
+    python -m app.cli parse <input.myx> -o out.json --plugin path/to/plug.py    # 或 .py 文件路径（Stage 10 批次 5）
 
     # 批量解析（目录 / glob / 单文件，多进程并行 + summary.json）
     python -m app.cli batch-parse <dir|glob|file> -o <output_dir> [--workers 8]
@@ -111,9 +112,9 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--plugin",
         action="append",
         default=None,
-        metavar="MODULE",
+        metavar="SPEC",
         help=(
-            "外部插件模块（dotted 名，可重复，按出现顺序加载；"
+            "外部插件（dotted 模块名或 .py 文件路径，可重复，按出现顺序加载；"
             "仅显式加载，不做 entry_points 扫描）"
         ),
     )
@@ -150,8 +151,8 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--plugin",
         action="append",
         default=None,
-        metavar="MODULE",
-        help="外部插件模块（dotted 名，可重复；并行 worker 内重放加载）",
+        metavar="SPEC",
+        help="外部插件（dotted 模块名或 .py 文件路径，可重复；并行 worker 内重放加载）",
     )
     batch.add_argument(
         "--max-chars",
@@ -210,8 +211,8 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--plugin",
         action="append",
         default=None,
-        metavar="MODULE",
-        help="外部插件模块（dotted 名，可重复；加载后参与解释）",
+        metavar="SPEC",
+        help="外部插件（dotted 模块名或 .py 文件路径，可重复；加载后参与解释）",
     )
     exp.add_argument(
         "--json",
@@ -234,8 +235,8 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--plugin",
         action="append",
         default=None,
-        metavar="MODULE",
-        help="外部插件模块（dotted 名，可重复；加载后参与审计）",
+        metavar="SPEC",
+        help="外部插件（dotted 模块名或 .py 文件路径，可重复；加载后参与审计）",
     )
     aud.add_argument(
         "--json",
@@ -259,8 +260,8 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--plugin",
         action="append",
         default=None,
-        metavar="MODULE",
-        help="外部插件模块（dotted 名，可重复；加载先行，再按名字查询）",
+        metavar="SPEC",
+        help="外部插件（dotted 模块名或 .py 文件路径，可重复；加载先行，再按名字查询）",
     )
     insp.add_argument(
         "--json",
@@ -284,8 +285,8 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--plugin",
         action="append",
         default=None,
-        metavar="MODULE",
-        help="外部插件模块（dotted 名，可重复；加载后再列出）",
+        metavar="SPEC",
+        help="外部插件（dotted 模块名或 .py 文件路径，可重复；加载后再列出）",
     )
     lp.add_argument(
         "--json",

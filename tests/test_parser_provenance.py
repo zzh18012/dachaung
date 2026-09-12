@@ -314,12 +314,18 @@ def test_failed_plugin_load_leaves_context_clean(plugin_env: Path):
     assert cap.loaded_via == "builtin" and cap.plugin_spec is None
 
 
-def test_plugin_spec_rejects_paths(fresh_registry):
-    """plugin_spec 保存原始字符串但拒绝路径形态（绝对路径/分隔符）。"""
-    for bad in ("C:/abs/path.py", "/abs/path.py", "rel/path.py", "a\\b.py", ""):
+def test_plugin_spec_rejects_empty_and_non_str(fresh_registry):
+    """批次 24：plugin_spec 保存原始字符串且拒绝路径形态。Stage 10
+    批次 5（r43 授权 .py 路径加载）起契约演进：路径形态 spec 合法
+    （loader 路径分支按输入原样冻结拼写），仍拒绝空字符串与非字符串。"""
+    for bad in ("", None, 123):
         with pytest.raises(ValueError):
             with pr._plugin_registration_context(bad):
                 pass
+    assert pr._registration_context.get() is None
+    # 路径形态自批次 5 起合法：原样入上下文，退出恢复 None
+    with pr._plugin_registration_context("rel/path.py"):
+        assert pr._registration_context.get() == ("plugin", "rel/path.py")
     assert pr._registration_context.get() is None
 
 

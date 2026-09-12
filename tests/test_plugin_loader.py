@@ -145,13 +145,18 @@ def _write_plugin(directory: Path, mod_name: str, source: str) -> str:
 
 @pytest.fixture
 def plugin_env(tmp_path: Path, monkeypatch):
-    """sys.path 注入 + 注册表副本隔离 + 首载备忘重置 + 模块 sys.modules 清理。"""
+    """sys.path 注入 + 注册表副本隔离 + 首载备忘重置 + 模块 sys.modules 清理。
+
+    批次 5 修正：_capabilities 一并副本隔离——此前快照写入真实 dict，
+    注册的 myx_test 能力会泄漏到后续测试文件（.myx 同优先级平局抢胜者）。
+    """
     monkeypatch.syspath_prepend(str(tmp_path))
     import app.parser_registry as pr
     from app import plugin_loader as pl
 
     monkeypatch.setattr(pr, "_registry", dict(pr._registry))
     monkeypatch.setattr(pr, "_source_type_families", dict(pr._source_type_families))
+    monkeypatch.setattr(pr, "_capabilities", dict(pr._capabilities))
     monkeypatch.setattr(pl, "_FIRST_LOAD", {})
     yield tmp_path
     for key, mod in list(sys.modules.items()):

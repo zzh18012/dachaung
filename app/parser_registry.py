@@ -75,17 +75,13 @@ def _plugin_registration_context(plugin_spec: str) -> Iterator[None]:
 
     仅 loader（plugin_loader.load_plugins）与测试/bootstrap 使用；register()
     在调用瞬间读取并冻结，退出后恢复外层上下文。plugin_spec 保存规范化前
-    的**原始字符串**（批次 19 仅 dotted 名），拒绝路径形态（绝对路径与
-    路径分隔符一律禁止）。
+    的**原始字符串**（dotted 名或 .py 路径拼写——Stage 10 批次 5 起路径
+    形态合法，loader 路径分支按用户输入原样冻结）；批次 24 原拒绝路径
+    分隔符的规则随之演进为仅拒绝空字符串与非字符串。仍拒绝：空/非 str。
     """
-    if (
-        not isinstance(plugin_spec, str)
-        or not plugin_spec
-        or "/" in plugin_spec
-        or "\\" in plugin_spec
-    ):
+    if not isinstance(plugin_spec, str) or not plugin_spec:
         raise ValueError(
-            f"plugin_spec 必须是非空 dotted 模块名（禁止路径）: {plugin_spec!r}"
+            f"plugin_spec 必须是非空字符串（dotted 名或 .py 路径拼写）: {plugin_spec!r}"
         )
     token = _registration_context.set(("plugin", plugin_spec))
     try:

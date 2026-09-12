@@ -40,7 +40,7 @@
 ## 外部插件加载（Stage 8 批次 19）
 
 - `app/plugin_loader.py`：`load_plugins(modules)`（dotted 模块名、按 CLI 出现顺序、fail-fast）+ `PluginLoadError`（code/plugin/error_type/error_message；标准 JSON 不含 traceback）
-- `--plugin MODULE`（append 可重复）挂在 parse / batch-parse / list-parsers；validate 与 evaluation.cli 不参与；模块查找走 PYTHONPATH（不做文件路径加载）
+- `--plugin MODULE`（append 可重复）挂在 parse / batch-parse / list-parsers；validate 与 evaluation.cli 不参与；模块查找走 PYTHONPATH（dotted 名；.py 文件路径加载于 Stage 10 批次 5 加入，见下）
 - 错误契约：`ParserRegistrationError`（register 专用 ValueError 子类，重名/缺名）→ `plugin_register_failed`；其他导入期异常 → `plugin_import_failed`；重名冲突（含与内置同名）绝不静默覆盖
 - `--parser` 去掉 argparse 静态 choices，插件加载后按注册表动态校验（`auto` 唯一保留名）；未知名 → 结构化 `unknown_parser` rc 1（此前 argparse rc 2，有意变更）
 - 批量：父进程在池创建前加载（失败不启动批）；并行 worker initializer 重放加载 + multiprocessing.Queue 恰一次初始化回报，文件任务派发前校验，失败受控终止池（code 同上，回报超时 `plugin_init_report_timeout`，固定上限 120 秒，事件带 expected/received worker 数）；parse_one_file 有防御背板；`plugin_loaded.parsers_added` 为本进程首次加载真实增量（重复 --plugin 同模块只发一次事件，空表仅限预导入/未注册 parser 的真实幂等情形）
@@ -85,7 +85,7 @@
 ## Parser 身份与来源追溯（Stage 8 批次 24）
 
 - 能力快照追加 identity/provenance 四字段：`module` / `qualname`（cls.__module__ / cls.__qualname__ 注册瞬间冻结）+ `loaded_via` / `plugin_spec`（registration context 调用瞬间消费）；值域封闭 `builtin|plugin`；无上下文注册（内置/预 import，含随项目分发的 markdown_enhanced）→ `builtin` + `plugin_spec=null`
-- registration context（registry 私有 ContextVar，默认栈式可嵌套、异常安全，最内层生效、退出恢复外层）：loader（`load_plugins`）对每个 spec 独立进入 `_plugin_registration_context(spec)`，import 与其触发的注册 hook（顶层 @register / 副模块 / helper 转注册）全程在上下文内；plugin_spec 存规范化前原始字符串、拒绝路径形态；**禁止任何事后推断**（cls.__module__ / sys.modules / 已加载模块集合 / import graph 均不作加载来源依据——插件模块被普通 import 预导入即 builtin）；同一 class 不同时刻经不同 spec 注册各 snapshot 各归各（不按 class identity 合并）；装饰器与直接调用不构成不同 loaded_via
+- registration context（registry 私有 ContextVar，默认栈式可嵌套、异常安全，最内层生效、退出恢复外层）：loader（`load_plugins`）对每个 spec 独立进入 `_plugin_registration_context(spec)`，import 与其触发的注册 hook（顶层 @register / 副模块 / helper 转注册）全程在上下文内；plugin_spec 存规范化前原始字符串（批次 24 拒绝路径形态；Stage 10 批次 5 授权路径加载后路径拼写合法，见批次 5 节）；**禁止任何事后推断**（cls.__module__ / sys.modules / 已加载模块集合 / import graph 均不作加载来源依据——插件模块被普通 import 预导入即 builtin）；同一 class 不同时刻经不同 spec 注册各 snapshot 各归各（不按 class identity 合并）；装饰器与直接调用不构成不同 loaded_via
 - `app.cli inspect-parser <name> [--plugin MODULE ...] [--json]`：只读 `_capabilities` 快照查询 identity/provenance，不实例化 parser、不做选择解释/竞争审计；`--json` 显式六键 {name, version, module, qualname, loaded_via, plugin_spec}（builtin 时 plugin_spec 为 null **不省略**；version 用注册表冻结值；无 `__file__`/绝对路径/cwd/环境变量/import search path）；human 恰六项（None 显示 "-"，与 list-parsers 同规）
 - `--plugin` 加载先于名字查询：初始未知、加载后出现 → 可查询；插件失败 → `plugin_import_failed` / `plugin_register_failed`（不落成 unknown_parser）；插件成功但名字不存在 → `unknown_parser` rc 1；provenance 纯只读，不参与 duplicate/priority/discovery/resolution/audit/错误分支
 - list-parsers 六键 / explain 五键 / audit 键集零变化（键集锁测试守护）；不做：给既有三个 JSON 加字段、文件系统信息、运行时活读、哈希/签名/源码比对、依赖图/传递 import、网络查询、inspect --all、schema/source_type/family/priority/discovery 改动
@@ -128,6 +128,18 @@
 - 产物表示（无 schema/契约变更，r36 边界）：首片段 element 就地扩展（content 重排、row_count/col_count 重算），metadata 增 `cross_page_merge`/`continuation_pages`/`dropped_header_rows`；locator 保持首片段起始页；续页 element 移除；合并发生在 relation 匹配前
 - real-01 旧 devset 对照（授权范围）：表格数 4→4、合并 0 次——**诊断更正**：原 +300% 根因是 3 个单柱高亮框假阳性（p6/p17/p17）非跨页拆分（详见 BACKLOG §3 遗留项）
 - 测试：tests/test_pdf_cross_page_tables.py（13 个：重复表头/断版位置合并、网格失配/中部/隔页/仅表头/同页次表不合并、3 页链、管线 schema 通过、判定纯函数单元；全合成手写最小 PDF 夹具，零真实语料）
+
+## 插件文件路径加载（Stage 10 批次 5）
+
+- BACKLOG §8 处理（r43 授权）：`--plugin` 接受 .py 文件路径，dotted 模块名行为逐字节/语义不变；实现收敛在 `app/plugin_loader.py`（`_is_path_spec` / `_resolve_path_spec` / `_load_path_plugin`），六个 CLI 子命令（parse/batch-parse/list-parsers/explain-parser/audit-parsers/inspect-parser）与批量父进程/worker 重放/.pdf 隔离孙进程重放全部只经 `load_plugins`，零改动自动继承
+- 判定：spec 含 `/` 或 `\`，或（大小写不敏感）以 `.py` 结尾 → 路径分支；合法 dotted 模块名不含分隔符不以 .py 结尾，故既有合法 dotted spec 零变化（历史上 "foo.py" 形态本就 import 失败，错误码从 `plugin_import_failed` 迁移为 `plugin_path_not_found`/`plugin_path_invalid`）
+- 解析：`Path(spec).resolve()`（相对调用时 cwd，spawn worker 继承同一 cwd，重放一致）；必须为已存在 .py 常规文件且 stem 合法标识符（模块名 = stem）
+- 命名冲突：stem 已在 sys.modules 时比对 `__file__`（resolve 后）与目标路径——同文件幂等（import_module 缓存命中，不重复注册，parsers_added 空表）；不同文件或 `__file__` 缺失（内置/命名空间，身份不可证）→ `plugin_path_conflict`；该规则同时阻止 shadow 标准库（如 json.py）
+- sys.path 注入：父目录 append 到**末尾**（绝不遮蔽既有项）+ try/finally 恢复（成功/失败都移除）；spawn worker 继承的 sys.path 不含注入项，worker 状态零污染；import 会在插件目录留 `__pycache__`（Python 标准行为）
+- 错误码新增三个：`plugin_path_not_found` / `plugin_path_invalid` / `plugin_path_conflict`（error_type 为合成字符串 PluginPathNotFound/Invalid/Conflict，先例=plugin_init_report_timeout 的 "Timeout"）；导入期/注册期异常沿用 `plugin_import_failed` / `plugin_register_failed`；错误 dict 键集不变（code/message/plugin/error_type）
+- provenance（批次 24 契约演进）：`_plugin_registration_context` 自本批接受路径形态 spec（原拒绝路径分隔符的校验放宽为仅拒空/非 str；锁测试同步演进），路径拼写按用户输入原样冻结进 plugin_spec（不回写 resolved 绝对路径）；inspect-parser 展示该拼写
+- 测试：tests/test_plugin_path_loading.py（27 个：绝对/相对/cwd 裸名/反斜杠成功、not_found/invalid×3、语法错误/注册冲突沿用既有码、同 stem 冲突、stdlib shadow、双拼写幂等、重复 spec 首增量、sys.path 恢复（成功+三类失败）、dotted 边界锁定、provenance 冻结、CLI parse/auto/list/inspect/explain、批量 fail-fast/顺序/并行 spawn 重放 JSONL、混合 fail-fast；全合成夹具）；附带卫生修复：tests/test_plugin_loader.py 的 plugin_env fixture 补 `_capabilities` 副本隔离（此前插件能力快照泄漏到后续套件）
+- 范围披露：serve 入口在 Stage 11 分支谱系（eba2fae，共享 load_plugins 库代码），本分支无法覆盖 serve 专属测试；两谱系合流时路径支持经共享 loader 自动到达 serve，届时补 serve 侧断言
 
 ## 容器交付与可复现构建（Stage 8 批次 25）
 
@@ -211,6 +223,10 @@ PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli inspect-parser my
 PYTHONPATH=path/to/plugins .venv/Scripts/python.exe -m app.cli parse doc.smk \
   -o out.json --plugin my_pkg.my_plugin --parser my_parser
 .venv/Scripts/python.exe -m app.cli list-parsers --plugin my_pkg.my_plugin
+
+# Stage 10 批次 5：--plugin 直接传 .py 文件路径（无需 PYTHONPATH）
+.venv/Scripts/python.exe -m app.cli parse doc.myx -o out.json \
+  --plugin path/to/my_plugin.py --parser my_parser
 
 # Stage 8 批次 25：构建镜像（digest 锁定；GIT_* build-arg 必填）与交付验证
 docker build --platform linux/amd64 --build-arg GIT_REVISION=$(git rev-parse HEAD) \

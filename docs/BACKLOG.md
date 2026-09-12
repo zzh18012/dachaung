@@ -127,7 +127,15 @@
   不支持直接传 .py 文件路径
 - 升级条件：路径 → 模块名映射（需 sys.path 临时注入与命名冲突处理），
   另行裁决
-- 状态：backlog
+- 状态：**已处理（Stage 10 批次 5，2026-09-12，r43 授权）**——
+  `app/plugin_loader.py` 路径分支：判定（含分隔符或 .py 后缀）/
+  确定性解析（resolve 后必须为已存在 .py 文件且 stem 合法标识符）/
+  命名冲突规则（sys.modules 同文件幂等、异文件或身份不可证 →
+  `plugin_path_conflict`，含 stdlib shadow 防护）/ sys.path 末尾
+  append + try/finally 恢复（不污染后续解析与 worker 状态）；错误码
+  新增 `plugin_path_not_found` / `plugin_path_invalid` /
+  `plugin_path_conflict`；dotted 行为逐字节不变（详见 CLAUDE.md
+  批次 5 节与 tests/test_plugin_path_loading.py）
 
 ## 9. plugin_init_report_timeout 路径无自动化测试
 
