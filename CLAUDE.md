@@ -105,8 +105,7 @@
 - 端点：GET `/api/v1/health`、GET `/api/v1/parsers`、POST `/api/v1/parse`（multipart：file 必填 / parser 默认 fallback 可 auto / max_chars 默认 800）；`/` 静态前端挂载在全部 API 路由之后，不遮蔽 `/api/*`、`/docs`、`/openapi.json`
 - 服务层只是外壳：解析/分块/校验复用 `process_single(write_json=False)`，不改 parser/chunker/pipeline 语义；执行序与 CLI parse 一致（插件启动时预载 fail-fast → 流式落盘 → 名校验 → auto 发现 → 解析）
 - W1 边界：上传 1 MiB 块流式写入临时文件并**实际计量**（不信任 Content-Length），超限 413；成功/失败/超限/未预期异常全路径 finally 清理临时文件；响应不泄露服务器临时路径（成功 source_path 用净化名 `sanitize_filename`，错误 message/details 递归替换）；`process_single` 事件循环内同步执行（本地单用户边界，不做异步队列）
-- 错误 envelope `{"error": {code, message, details?}}`；HTTP 映射：服务层 `upload_too_large` 413 / `unknown_parser` 400 / 发现层 `unsupported_type` 400 / `invalid_request` 422；pipeline 三缺陷码（parser_contract_mismatch / unexpected_parser_error / chunker_failed）500，其余业务码 422；未预期异常 `internal_error` 500 **无 traceback**（只进服务器日志）。完整映射表见 `docs/stage11-web-api.md`（W4 裁决：表 + envelope + redaction 行为 + e2e 测试须先报送裁夺，裁夺通过前不做实质性 Stage 11 push 请求）
-- 已知待裁：`max_chars <= 0` → 500 chunker_failed（与 CLI 同码）；前端表单 min=1 已挡、API 未挡
+- 错误 envelope `{"error": {code, message, details?}}`；HTTP 映射（r32 Q1/Q2 修正后批准）：`invalid_request` 422（参数缺失/类型不符 + **`max_chars <= 0` 请求级前置拒绝**，不进 pipeline）；`unknown_parser` 400；`unsupported_type` **两来源统一 400**（发现层 + 显式 parser 自查）；`upload_too_large` 413；pipeline 缺陷**五码** 500（parser_contract_mismatch / unexpected_parser_error / chunker_failed / schema_validation_failed / hash_io_error，原错误码透传）；其余输入文档业务码 422；未预期异常 `internal_error` 500 **无 traceback**（只进服务器日志）；plugin_import/register_failed = 启动期 fail-fast，不形成 HTTP 响应。完整映射表见 `docs/stage11-web-api.md`
 - 本批明确不做：评测端点、鉴权、持久化、批量端点、真实 KVFS 接入
 
 ## 环境

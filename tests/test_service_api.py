@@ -1,12 +1,15 @@
 """Stage 11 批次 1 测试：本地 HTTP API 服务（W1 裁决边界逐条验证）。
 
-覆盖（对应 W1 裁定原文）：
+覆盖（对应 W1 裁定原文 + r32 Q1/Q2 修正）：
 - API 与 CLI 的成功结果结构等价（合成 .md 夹具，auto 路由，除
   source_path 与 metadata.image_output_dir 外逐键相等）；
-- 各已知错误码：unknown_parser 400 / unsupported_type 400（发现层）、
-  no_extracted_elements 422（业务失败）、upload_too_large 413、
-  invalid_request 422（缺 file 字段）、服务端缺陷码 500（无 traceback、
-  临时路径被净化）；
+- 各已知错误码：unknown_parser 400 / unsupported_type 400（r32：
+  发现层与显式 parser 自查两来源统一 400）、no_extracted_elements
+  422（业务失败）、upload_too_large 413、invalid_request 422
+  （缺 file 字段与 r32 Q1 max_chars<=0 请求级前置拒绝）、
+  服务端缺陷五码 500（parser_contract_mismatch/
+  unexpected_parser_error/chunker_failed/schema_validation_failed/
+  hash_io_error，无 traceback、临时路径被净化）；
 - 上传上限：流式实际计量超限 413；恰好等于上限放行（边界）；
 - 临时文件清理：成功 / 业务失败 / 超限 / 缺陷码全路径 temp_dir 为空；
 - 响应不泄露服务器临时路径（成功 source_path 用净化名；错误
@@ -322,6 +325,77 @@ def test_missing_file_field_invalid_request_422(client: TestClient):
     resp = client.post("/api/v1/parse", data={"parser": "fallback"})
     assert resp.status_code == 422
     assert resp.json()["error"]["code"] == "invalid_request"
+
+
+@pytest.mark.parametrize("bad_max_chars", [0, -5])
+def test_max_chars_non_positive_rejected_before_pipeline(
+    client: TestClient, temp_scan_dir: Path, monkeypatch, bad_max_chars: int
+):
+    """r32 Q1：max_chars<=0 在请求边界拒绝（422 invalid_request），
+    不得进 pipeline（不得落成 500 chunker_failed）。"""
+    import app.service as service_mod
+
+    def must_not_run(*args, **kwargs):
+        raise AssertionError("pipeline 不应被调用")
+
+    monkeypatch.setattr(service_mod, "process_single", must_not_run)
+    resp = _post(
+        client, "a.md", _MD_CONTENT.encode("utf-8"), max_chars=bad_max_chars
+    )
+    assert resp.status_code == 422
+    err = resp.json()["error"]
+    assert err["code"] == "invalid_request"
+    assert err["details"]["max_chars"] == bad_max_chars
+    assert "chunker_failed" not in resp.text
+    _assert_no_temp_leak(resp, temp_scan_dir)
+    assert list(temp_scan_dir.iterdir()) == []
+
+
+def test_explicit_parser_unsupported_type_400(
+    client: TestClient, temp_scan_dir: Path
+):
+    """r32 Q2：显式指定 parser 对扩展名自查拒绝的 unsupported_type
+    与发现层同码同状态，统一 400（不再 422）。"""
+    resp = _post(
+        client,
+        "note.txt",
+        "普通文本\n".encode("utf-8"),
+        parser="markdown_enhanced",  # 只支持 .md/.markdown
+    )
+    assert resp.status_code == 400
+    err = resp.json()["error"]
+    assert err["code"] == "unsupported_type"
+    assert ".txt" in err["message"]
+    _assert_no_temp_leak(resp, temp_scan_dir)
+    assert list(temp_scan_dir.iterdir()) == []
+
+
+@pytest.mark.parametrize(
+    "defect_code", ["schema_validation_failed", "hash_io_error"]
+)
+def test_schema_and_io_defects_500(
+    client: TestClient, temp_scan_dir: Path, monkeypatch, defect_code: str
+):
+    """r32 Q2：schema 校验失败与 hash I/O 故障属服务侧完整性/I/O 缺陷，
+    从 422 移入 500（原错误码透传）。"""
+    import app.service as service_mod
+
+    def fake_process_single(input_path, output_path, *, parser_name, max_chars, write_json):
+        return None, [
+            ErrorRecord(
+                code=defect_code,
+                message=f"{defect_code} 故障于 {input_path}",
+                details={"defect": defect_code},
+            )
+        ]
+
+    monkeypatch.setattr(service_mod, "process_single", fake_process_single)
+    resp = _post(client, "bad.md", _MD_CONTENT.encode("utf-8"))
+    assert resp.status_code == 500
+    err = resp.json()["error"]
+    assert err["code"] == defect_code
+    assert "Traceback" not in resp.text and "traceback" not in resp.text
+    assert list(temp_scan_dir.iterdir()) == []
 
 
 def test_server_defect_500_scrubbed_no_traceback(

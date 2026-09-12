@@ -14,9 +14,10 @@ FastAPI 应用工厂 + 三端点 + 极简静态前端挂载；`app.cli serve` �
 
 错误 envelope：{"error": {"code", "message", "details"?}}；
 成功响应 = 与 CLI `parse -o` 同构的统一文档 JSON（source_path 为
-净化上传名）。HTTP 映射表见 docs/stage11-web-api.md（W4 后置裁定，
-首报送审）。process_single 在事件循环内同步执行——本地单用户工具
-的已知边界，不做异步任务队列。
+净化上传名）。HTTP 映射表见 docs/stage11-web-api.md（W4 裁决；
+r32 Q1/Q2 修正：请求级 max_chars 校验 422、unsupported_type 双
+来源统一 400、schema/hash 两码入 500）。process_single 在事件循环
+内同步执行——本地单用户工具的已知边界，不做异步任务队列。
 """
 
 from __future__ import annotations
@@ -39,10 +40,18 @@ DEFAULT_MAX_UPLOAD_BYTES = 50 * 1024 * 1024  # 50 MiB（W1 裁决值）
 _STATIC_DIR = Path(__file__).parent / "static"
 _LOGGER = logging.getLogger("app.service")
 
-# W4 固定 + 首报送审的映射表：业务失败 422、服务端集成缺陷 500、
-# 超限 413、请求非法 422、未预期异常 500（无 traceback）。
+# r32 Q2 裁决的固定映射：服务端完整性/集成故障五码 → 500；
+# unsupported_type 不论来源（发现层/parser 自查）一律 400；
+# 其余输入文档业务失败 → 422；超限 413；请求非法 422；
+# 未预期异常 500（无 traceback）。
 _SERVER_DEFECT_CODES = frozenset(
-    {"parser_contract_mismatch", "unexpected_parser_error", "chunker_failed"}
+    {
+        "parser_contract_mismatch",
+        "unexpected_parser_error",
+        "chunker_failed",
+        "schema_validation_failed",
+        "hash_io_error",
+    }
 )
 
 
@@ -222,6 +231,16 @@ def create_app(
             finally:
                 os.close(fd)
 
+            # 1b. 请求级参数校验（r32 Q1 裁决）：max_chars <= 0 可预先
+            # 判定无效，进 pipeline 前拒绝（不得落成 500 chunker_failed）
+            if max_chars < 1:
+                raise ServiceError(
+                    422,
+                    "invalid_request",
+                    f"max_chars 必须为正整数（得到 {max_chars}）",
+                    details={"max_chars": max_chars},
+                )
+
             # 2. parser 校验 + auto 发现（与 CLI parse 同序：先名后 auto）
             if parser != "auto" and parser not in registered_names():
                 known = ", ".join([*registered_names(), "auto"])
@@ -247,7 +266,13 @@ def create_app(
             )
             if errors:
                 first = _scrub_paths(errors[0].to_dict(), replacements)
-                status = 500 if first["code"] in _SERVER_DEFECT_CODES else 422
+                if first["code"] == "unsupported_type":
+                    # r32 Q2：同码同状态，不因发现层/parser 自查来源分叉
+                    status = 400
+                elif first["code"] in _SERVER_DEFECT_CODES:
+                    status = 500
+                else:
+                    status = 422
                 raise ServiceError(
                     status,
                     first["code"],

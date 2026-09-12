@@ -23,8 +23,9 @@
 （默认 50）、`--unsafe-expose`（非 loopback 确认开关）。
 
 `/api/v1/parse` 内部执行序与 CLI `parse` 一致：插件已在启动时预载 →
-流式落盘临时文件（实际计量，超限 413）→ parser 名校验（`auto` 为保留名）
-→ auto 扩展名发现 → `process_single(write_json=False)` → 响应。
+流式落盘临时文件（实际计量，超限 413）→ `max_chars >= 1` 请求级校验
+（r32 Q1，422）→ parser 名校验（`auto` 为保留名）→ auto 扩展名发现 →
+`process_single(write_json=False)` → 响应。
 `process_single` 在事件循环内同步执行——本地单用户工具的已知边界。
 
 ## 2. 错误 envelope（全部错误响应统一形状）
@@ -40,30 +41,26 @@
   去控制字符、长度封顶 100 保后缀），**永不**是服务器临时路径；
 - `metadata.image_output_dir` 不存在（服务不写盘、不导出图片目录）。
 
-## 3. HTTP 错误映射表（W4 首报送审）
+## 3. HTTP 错误映射表（W4 送审；r32 Q1/Q2 修正后批准）
 
 ### 3.1 服务层错误（进入 pipeline 之前）
 
 | HTTP | code | 触发条件 |
 |---|---|---|
-| 413 | `upload_too_large` | 流式写入时实际计量超过 `max_upload_bytes`（不信任 Content-Length）；`details.limit_bytes` 给出上限 |
+| 422 | `invalid_request` | 请求参数缺失或类型不符（如缺 `file` 字段、`max_chars` 非整数；`details.errors` 截断至 20 条）；以及 **`max_chars <= 0` 请求级前置校验拒绝**（r32 Q1：可预先判定的请求语义无效，`details.max_chars` 给出原值，不进 pipeline、不得落成 500 `chunker_failed`） |
 | 400 | `unknown_parser` | `parser` 不是注册名且不是 `auto`；message 含已知名单 |
-| 400 | `unsupported_type` | `parser=auto` 但扩展名无任何已注册 parser 声明（发现层 ValueError） |
-| 422 | `invalid_request` | 请求参数缺失或类型不符（如缺 `file` 字段、`max_chars` 非整数）；`details.errors` 截断至 20 条 |
+| 413 | `upload_too_large` | 流式写入时实际计量超过 `max_upload_bytes`（不信任 Content-Length）；`details.limit_bytes` 给出上限 |
 
 ### 3.2 pipeline 错误（`process_single` 返回非空 errors）
 
 取**第一条**错误记录映射，其余丢弃；`message`/`details` 中的服务器临时
-路径已被递归替换为净化上传名。
+路径已被递归替换为净化上传名。原错误码一律透传（不重写 code）。
 
 | HTTP | code | 规则 |
 |---|---|---|
-| 500 | `parser_contract_mismatch` / `unexpected_parser_error` / `chunker_failed` | 服务端集成缺陷三码（固定集合 `_SERVER_DEFECT_CODES`） |
-| 422 | 其余全部错误码 | 业务失败：`no_extracted_elements`、`schema_validation_failed`、`hash_io_error`、parser 各自的 `ParserError` 子类码（`file_not_found`、`md_read_failed`、各格式解析失败码等） |
-
-注意 `unsupported_type` 有**两个来源**：发现层（表 3.1，400）与个别 parser
-对"显式指定的扩展名"自查拒绝（pipeline 层，表 3.2，422）。同码不同状态是
-既定行为：来源不同（找不到 parser vs parser 明确拒绝）。
+| 400 | `unsupported_type` | **两个来源统一 400**（r32 Q2：同码不得因来源分叉）——发现层（`parser=auto` 扩展名无候选）与显式指定 parser 对扩展名自查拒绝（如 `markdown_enhanced` 收到 `.txt`） |
+| 500 | `parser_contract_mismatch` / `unexpected_parser_error` / `chunker_failed` / `schema_validation_failed` / `hash_io_error` | 服务端完整性/集成缺陷**五码**（固定集合 `_SERVER_DEFECT_CODES`；r32 Q2 将 schema/hash 两码从 422 移入——表示服务侧完整性或 I/O 故障，非可归责的客户端输入） |
+| 422 | 其余全部错误码 | 已知、由输入文档导致的业务失败：`no_extracted_elements` 及 parser 各自的 `ParserError` 子类码（`file_not_found`、`md_read_failed`、各格式解析失败码等） |
 
 ### 3.3 未预期异常
 
@@ -71,7 +68,11 @@
 |---|---|---|
 | 500 | `internal_error` | 响应体**无 traceback**（固定一句"服务器内部错误"）；完整 traceback 只进服务器日志（`logging.getLogger("app.service")` `.exception`） |
 
-### 3.4 traceback 泄露面（W4：redaction 行为）
+启动期 `plugin_import_failed` / `plugin_register_failed` 是 fail-fast
+异常（`PluginLoadError`），属进程启动失败，**不形成运行中 HTTP 响应**
+（r32 Q2）。
+
+### 3.4 traceback 泄露面（W4：redaction 行为，r32 批准）
 
 - 任何 HTTP 响应体（成功或错误）都不含 traceback；
 - pipeline 错误的 `message` 可能含异常类型名（如 `ValueError: ...`），
@@ -86,13 +87,11 @@
 - 响应中的服务器临时路径通过 `_scrub_paths` 递归替换（成功路径
   `source_path` 直接覆写为净化名；错误路径 message/details 同样替换）。
 
-## 5. 已知边界与待裁事项
+## 5. 已知边界
 
-1. **`max_chars <= 0` → 500 `chunker_failed`**（与 CLI 同码：CLI
-   `--max-chars 0` 同样 `chunker_failed` rc 1）。用户输入可轻易触发
-   500 是否合适待 r32 裁决：A. 维持缺陷码映射（CLI 行为一致）；
-   B. 服务层显式校验 `max_chars >= 1` → 400（新增前置拒绝）。
-   前端表单已用 `min="1"` 挡住，但 API 层未挡。
+1. `max_chars <= 0` 在请求边界被拒（r32 Q1 裁决：422 `invalid_request`，
+   进 pipeline 前）；CLI 侧行为不变（`--max-chars 0` 仍 `chunker_failed`
+   rc 1）——HTTP 层与 CLI 层校验语义允许不同。
 2. `process_single` 同步执行会阻塞事件循环——本地单用户可接受，
    不做异步任务队列（本批明确不做）。
 3. 无评测端点、无鉴权、无持久化、无批量端点、无真实 KVFS 接入
@@ -100,8 +99,10 @@
 
 ## 6. 测试
 
-`tests/test_service_api.py`（23 项，全合成夹具）：API 与 CLI 成功结构
+`tests/test_service_api.py`（28 项，全合成夹具）：API 与 CLI 成功结构
 等价（逐键相等）、max_chars 透传等价、上传名净化、错误码全表行为验证
-（400/413/422/500 + 无 traceback + 临时路径净化）、恰好等于上限放行、
-临时目录全路径清理断言、插件预载（显式/auto/健康列表/加载失败）、
-前端与遮蔽、CLI loopback 与 max-upload 守卫。
+（400/413/422/500 + 无 traceback + 临时路径净化；含 r32 新增：max_chars
+0/-5 请求级拒绝且断言 pipeline 未被调用、显式 parser 的 unsupported_type
+400、schema/hash 两缺陷码 500）、恰好等于上限放行、临时目录全路径清理
+断言、插件预载（显式/auto/健康列表/加载失败）、前端与遮蔽、CLI loopback
+与 max-upload 守卫。
