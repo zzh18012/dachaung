@@ -6322,3 +6322,41 @@ Stage 10 链）；real-01 旧 devset 只读判读 + 改后对照（仅限该文�
 待裁决：r37 首报（含上述四项强制披露）+ push 申请
 （stage10 分支 46672e4..9eb4d13 + adoption 台账搭车
 97184fe..§119 commit，r14 规则）。本节为纯台账 commit。
+
+## 一百二十、r38 裁决执行：Batch 4 追认 + P10' 两笔 push + 假阳性候选调查材料（2026-09-12）
+
+三十八轮裁决（用户中转）：①Batch 4 实现及 find_tables 排序修复
+**追认**；real-01 诊断更正追认，**不得宣称真实改进**；②P10' A 批准
+46672e4..9eb4d13 推送；③P10' B 批准 97184fe..42c4fa9 三台账搭车；
+④单柱/单格假阳性表候选**暂不立项**，先补充只读语料调查与合成
+反例材料；⑤Batch 4 待 push 核验后申请关闭；G⑥/其余候选/PyYAML
+前置不变。
+
+**执行**：
+
+1. **P10' A push 完成**：fetch 后远端无该分支（batch3 分支 HEAD =
+   46672e4 为基点核验参照）；rev-list count 46672e4..9eb4d13 = 1
+   恰量；is-ancestor 通过；推送为新远端分支创建
+   （integration/stage10-batch4-cross-page-tables，[new branch]，
+   FF 语义，无 force）；ls-remote =
+   9eb4d1325a875823d044ad1743d7272e12ab5bc1 与本地 HEAD 逐位一致。
+   （执行注记：GitHub 曾短暂不可达约 2 分钟，恢复后按四步完成，
+   无重试外的任何绕行操作。）
+2. **P10' B push 完成**：is-ancestor 通过；count 97184fe..42c4fa9
+   = 3 恰量（6407f1c §117 / 6ea53ff §118 / 42c4fa9 §119）；
+   FF 推送输出 97184fe..42c4fa9；ls-remote =
+   42c4fa98fb8eda6c3bcf6c42c5ac331fae2ce8ee 与本地 HEAD 一致。
+3. **假阳性候选调查材料完成（未立项，只读）**：
+   outputs/false_positive_investigation.txt。要点：PDF 侧单柱检测
+   全景 = real-01 三个（2×1 全宽长文段框）+ real-04 一个（4×1
+   窄侧栏框），共 4 个均刻画为假阳性；**核心发现 = 真 (2,1) 表与
+   假 (2,1) 框在语料中同形并存**（real-02 DOCX 有 5 个真单列表
+   含 (2,1)，与 real-01 假阳性形状相同），纯形状过滤不可精确；
+   方案空间 = 方案 0 不修 / 方案 1 min-cols≥2 硬过滤（带已记录
+   已知代价）/ 方案 2 文本启发式（倾向不推荐）；合成反例最小集
+   FP-A/B + TN-C/D/E 已设计（TN-C 与 FP-A 同形为硬边界证明件）。
+   附带观察：real-02 PDF 侧欠检测（15 真表 vs 12 检出）为独立
+   缺陷方向，不混入本候选。
+
+Batch 4 关闭申请随 r39 回执简报提交（push 核验已完成）。本节为
+纯台账 commit。
