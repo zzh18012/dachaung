@@ -6186,3 +6186,12 @@ skipped（skip 全为 samples/private 缺样例预期项，G⑥ 纪律下合成
 W4 程序：r32 首报交完整 HTTP 映射表 + 错误 envelope + traceback
 脱敏行为 + e2e 测试清单（outputs/gpt_brief_batch26_r32_stage11_batch1.txt），
 **映射表裁夺前不申请实质 push**（本轮无 push 请求）。
+
+§115 补记（2026-09-12）：webbridge 扩展恢复连接后，前端浏览器目检
+已完成并全部通过——警示横幅与表单渲染、parser 下拉动态填充 8 项
+（7 注册 parser + auto，priority 与 /api/v1/parsers 一致）、真传
+smoke.md（auto）→ 绿色"成功：smoke.md" + 统计条 9 项精确一致 +
+JSON 树 23 节点、bad.zzz（auto）→ 红色"失败 [HTTP 400]
+unsupported_type: 无已注册 parser 支持扩展名 .zzz"（与 W4 映射表
+逐字一致）。上文"目检未做、以替代核对披露"一句自此过时；r32 简报
+披露节已同步更新。
