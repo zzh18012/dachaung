@@ -16,6 +16,9 @@
     # 查询单个 parser 的 identity 与 provenance（批次 24）
     python -m app.cli inspect-parser fallback [--plugin my_pkg.my_plugin] [--json]
 
+    # 启动本地 HTTP API 服务 + 极简前端（Stage 11 批次 1；无鉴权，不适合公开暴露）
+    python -m app.cli serve [--host 127.0.0.1] [--port 8000] [--plugin my_pkg.my_plugin]
+
     # 仅校验已有的 JSON（独立子命令，不会把 JSON 当成 PDF/DOCX 输入）
     python -m app.cli validate <output.json>
 """
@@ -272,6 +275,46 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--json",
         action="store_true",
         help="输出机器可读 JSON（list_parsers() 行原样，(priority, name) 稳定序）",
+    )
+    # serve 子命令（Stage 11 批次 1，W1 边界：默认 loopback-only）
+    serve = sub.add_parser(
+        "serve",
+        help=(
+            "启动本地 HTTP API 服务（无鉴权，不适合公开暴露；"
+            "默认仅监听 127.0.0.1，非 loopback 须显式 --unsafe-expose）"
+        ),
+    )
+    serve.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help=(
+            "监听地址（默认 127.0.0.1；仅 127.0.0.1/::1/localhost 免确认，"
+            "其他地址须 --unsafe-expose——本服务无鉴权，不适合公开暴露）"
+        ),
+    )
+    serve.add_argument(
+        "--port", type=int, default=8000, help="监听端口（默认 8000）"
+    )
+    serve.add_argument(
+        "--plugin",
+        action="append",
+        default=None,
+        metavar="MODULE",
+        help="外部插件模块（dotted 名，可重复；服务启动时一次性加载）",
+    )
+    serve.add_argument(
+        "--max-upload-mb",
+        type=int,
+        default=50,
+        help="上传大小上限 MiB（默认 50；流式实际计量，超限 413）",
+    )
+    serve.add_argument(
+        "--unsafe-expose",
+        action="store_true",
+        help=(
+            "确认监听非 loopback 地址（危险：本服务无鉴权，"
+            "不适合公开暴露，仅限受控网络自担风险使用）"
+        ),
     )
     return p
 
@@ -553,6 +596,46 @@ def main(argv: list[str] | None = None) -> int:
             f"\n共 {len(rows)} 个已注册 parser；--parser auto 按扩展名自动发现"
             "（priority 小者优先；显式 --parser 永远覆盖发现）"
         )
+        return 0
+
+    if args.command == "serve":
+        from app.plugin_loader import PluginLoadError
+        from app.service import create_app
+
+        # W1 边界：默认 loopback-only；非 loopback 须显式危险确认开关
+        loopback = {"127.0.0.1", "::1", "localhost"}
+        if args.host not in loopback and not args.unsafe_expose:
+            print(
+                f"[ERROR] --host {args.host} 非 loopback：本服务无鉴权，"
+                "不适合公开暴露；如确要监听非本地地址，请显式加 --unsafe-expose。",
+                file=sys.stderr,
+            )
+            return 2
+        if args.max_upload_mb < 1:
+            print("[ERROR] --max-upload-mb 须为正整数", file=sys.stderr)
+            return 2
+        try:
+            app = create_app(
+                plugins=args.plugin,
+                max_upload_bytes=args.max_upload_mb * 1024 * 1024,
+            )
+        except PluginLoadError as e:
+            d = e.to_dict()
+            _emit_structured_error(
+                Path("serve"),
+                d["code"],
+                d["message"],
+                plugin=d["plugin"],
+                error_type=d["error_type"],
+            )
+            return 1
+        import uvicorn
+
+        print(
+            f"[OK] 本地服务启动: http://{args.host}:{args.port} "
+            "（无鉴权，不适合公开暴露；API 文档见 /docs）"
+        )
+        uvicorn.run(app, host=args.host, port=args.port)
         return 0
 
     if args.command == "batch-parse":

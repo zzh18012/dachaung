@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kvfs-doc-parser 本地服务</title>
+<style>
+  body { font-family: system-ui, "Segoe UI", "Microsoft YaHei", sans-serif;
+         max-width: 960px; margin: 2rem auto; padding: 0 1rem;
+         background: #fafafa; color: #222; }
+  .warn { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;
+          padding: .6rem 1rem; margin-bottom: 1.5rem; }
+  fieldset { border: 1px solid #ccc; border-radius: 8px; background: #fff; }
+  label { display: block; margin: .8rem 0 .2rem; font-weight: 600; }
+  input[type=file], input[type=number], select { padding: .4rem; width: 100%;
+          max-width: 420px; box-sizing: border-box; }
+  button { margin-top: 1rem; padding: .5rem 1.4rem; font-size: 1rem;
+           cursor: pointer; }
+  #status { margin: 1rem 0; font-weight: 600; }
+  .err { color: #b02a37; }
+  .ok { color: #1a7f37; }
+  pre { background: #f4f4f4; border: 1px solid #ddd; border-radius: 6px;
+        padding: .6rem; overflow: auto; max-height: 340px; font-size: .82rem; }
+  details { margin: .3rem 0; }
+  summary { cursor: pointer; font-family: ui-monospace, Consolas, monospace; }
+  #stats span { display: inline-block; background: #eef; border-radius: 4px;
+                padding: .15rem .6rem; margin: .2rem .3rem .2rem 0; }
+</style>
+</head>
+<body>
+<h1>kvfs-doc-parser</h1>
+<div class="warn">
+  本地服务：<strong>无鉴权，不适合公开暴露</strong>。
+  默认仅监听 127.0.0.1；请勿把本服务直接暴露到公网或不受控网络。
+</div>
+
+<fieldset>
+  <legend>解析文档（PDF / DOCX / MD / HTML / TXT / IPYNB）</legend>
+  <form id="parse-form">
+    <label for="file">文件</label>
+    <input type="file" id="file" name="file" required>
+
+    <label for="parser">解析器</label>
+    <select id="parser" name="parser">
+      <option value="fallback">fallback（默认）</option>
+      <option value="auto">auto（按扩展名自动发现）</option>
+    </select>
+
+    <label for="max-chars">分块最大字符数（max_chars）</label>
+    <input type="number" id="max-chars" name="max_chars" value="800" min="1">
+
+    <button type="submit">解析</button>
+  </form>
+</fieldset>
+
+<div id="status"></div>
+<div id="stats"></div>
+<div id="result"></div>
+
+<script>
+async function loadParsers() {
+  try {
+    const res = await fetch("/api/v1/parsers");
+    const rows = await res.json();
+    const sel = document.getElementById("parser");
+    for (const r of rows) {
+      if (r.name === "fallback") continue;  // 已作为默认项
+      const opt = document.createElement("option");
+      opt.value = r.name;
+      opt.textContent = `${r.name}（priority=${r.priority}，${r.extensions.join(",") || "-"}）`;
+      sel.appendChild(opt);
+    }
+  } catch (e) { /* 列表加载失败不阻塞手动输入 */ }
+}
+
+function tree(obj, key, depth) {
+  if (depth > 24) return `${key}: …`;
+  if (obj === null || typeof obj !== "object") {
+    const v = typeof obj === "string" && obj.length > 200
+      ? obj.slice(0, 200) + "…" : String(obj);
+    return `${key}: ${v}`;
+  }
+  const det = document.createElement("details");
+  const sum = document.createElement("summary");
+  sum.textContent = `${key}: ${Array.isArray(obj) ? `[${obj.length}]` : "{…}"}`;
+  det.appendChild(sum);
+  const items = Array.isArray(obj)
+    ? obj.map((v, i) => tree(v, `[${i}]`, depth + 1))
+    : Object.entries(obj).map(([k, v]) => tree(v, k, depth + 1));
+  for (const it of items) {
+    const div = document.createElement("div");
+    div.style.marginLeft = "1rem";
+    if (it instanceof HTMLElement) div.appendChild(it); else div.textContent = it;
+    det.appendChild(div);
+  }
+  return det;
+}
+
+document.getElementById("parse-form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const status = document.getElementById("status");
+  const stats = document.getElementById("stats");
+  const result = document.getElementById("result");
+  status.textContent = "解析中…"; status.className = "";
+  stats.textContent = ""; result.textContent = "";
+  const fd = new FormData(ev.target);
+  try {
+    const res = await fetch("/api/v1/parse", { method: "POST", body: fd });
+    const body = await res.json();
+    if (!res.ok) {
+      const e = body.error || {};
+      status.textContent = `失败 [HTTP ${res.status}] ${e.code || ""}: ${e.message || ""}`;
+      status.className = "err";
+      if (e.details) result.appendChild(tree(e.details, "details", 0));
+      return;
+    }
+    const byType = {};
+    for (const el of body.elements || []) byType[el.type] = (byType[el.type] || 0) + 1;
+    status.textContent = `成功：${body.source_path}`;
+    status.className = "ok";
+    for (const [k, v] of Object.entries({
+      schema_version: body.schema_version, source_type: body.source_type,
+      parser: `${body.parser_name} ${body.parser_version}`,
+      elements: (body.elements || []).length, chunks: (body.chunks || []).length,
+      relations: (body.relations || []).length, warnings: (body.warnings || []).length,
+      ...byType,
+    })) {
+      const s = document.createElement("span");
+      s.textContent = `${k}=${v}`;
+      stats.appendChild(s);
+    }
+    result.appendChild(tree(body, "document", 0));
+  } catch (e) {
+    status.textContent = `请求失败: ${e}`;
+    status.className = "err";
+  }
+});
+
+loadParsers();
+</script>
+</body>
+</html>

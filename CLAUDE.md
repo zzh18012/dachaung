@@ -6,13 +6,12 @@
 
 ## 范围（本阶段明确不做）
 
-- Web UI / 前端
-- 真实 KVFS 接入（仅设计 `source_locator` 字段以便未来对齐）
+- 真实 KVFS 接入（仅设计 `source_locator` 字段以便未来对齐；本地 Web/API 服务层已于 Stage 11 批次 1 纳入，见"Web/API 服务"节——定位为未来 KVFS 的接入面）
 - 向量化、Sentence-BERT、任何 embedding
 - cpp-chunker / Rust 加速
 - 多 OCR 引擎
 - 内核代码 / FUSE / 数据库（容器交付已于 Stage 8 批次 25 纳入，见"容器交付"节；不做编排/服务化）
-- 流式处理 / 异步（多进程已于 Stage 8 批次 16 纳入，见"并行化"节）
+- 流式处理 / 异步（多进程已于 Stage 8 批次 16 纳入，见"并行化"节；HTTP 服务内 process_single 同步执行，不做异步任务队列）
 
 ## 并行化（Stage 8 批次 16）
 
@@ -100,6 +99,16 @@
 - 批次 25 CI 暴露并修复的两个既有跨平台缺陷：测试硬编码 `.venv/Scripts/python.exe`（改回退 `sys.executable`）；`app/batch.py` fork 下 worker 插件重放退化为 sys.modules 缓存命中（强制 `get_context("spawn")`，Queue 与 Pool 同上下文）
 - 已知边界：本地 docker.io 不可达时 docker-gated e2e 按显式理由 SKIPPED（CI 为 canonical 构建证据通道）；容器 `--network none`、根只读、仅 /output 可写
 
+## Web/API 服务（Stage 11 批次 1）
+
+- `app.cli serve` 启动本地 HTTP API + 极简静态前端（FastAPI/uvicorn/python-multipart 运行依赖，httpx 仅测试）；**无鉴权，不适合公开暴露**，默认仅监听 127.0.0.1，非 loopback `--host` 须显式 `--unsafe-expose`（CLI 层拦截 rc 2）
+- 端点：GET `/api/v1/health`、GET `/api/v1/parsers`、POST `/api/v1/parse`（multipart：file 必填 / parser 默认 fallback 可 auto / max_chars 默认 800）；`/` 静态前端挂载在全部 API 路由之后，不遮蔽 `/api/*`、`/docs`、`/openapi.json`
+- 服务层只是外壳：解析/分块/校验复用 `process_single(write_json=False)`，不改 parser/chunker/pipeline 语义；执行序与 CLI parse 一致（插件启动时预载 fail-fast → 流式落盘 → 名校验 → auto 发现 → 解析）
+- W1 边界：上传 1 MiB 块流式写入临时文件并**实际计量**（不信任 Content-Length），超限 413；成功/失败/超限/未预期异常全路径 finally 清理临时文件；响应不泄露服务器临时路径（成功 source_path 用净化名 `sanitize_filename`，错误 message/details 递归替换）；`process_single` 事件循环内同步执行（本地单用户边界，不做异步队列）
+- 错误 envelope `{"error": {code, message, details?}}`；HTTP 映射：服务层 `upload_too_large` 413 / `unknown_parser` 400 / 发现层 `unsupported_type` 400 / `invalid_request` 422；pipeline 三缺陷码（parser_contract_mismatch / unexpected_parser_error / chunker_failed）500，其余业务码 422；未预期异常 `internal_error` 500 **无 traceback**（只进服务器日志）。完整映射表见 `docs/stage11-web-api.md`（W4 裁决：表 + envelope + redaction 行为 + e2e 测试须先报送裁夺，裁夺通过前不做实质性 Stage 11 push 请求）
+- 已知待裁：`max_chars <= 0` → 500 chunker_failed（与 CLI 同码）；前端表单 min=1 已挡、API 未挡
+- 本批明确不做：评测端点、鉴权、持久化、批量端点、真实 KVFS 接入
+
 ## 环境
 
 - 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
@@ -181,6 +190,10 @@ docker build --platform linux/amd64 --build-arg GIT_REVISION=$(git rev-parse HEA
 docker save kvfs-doc-parser:ci | gzip > dist/img.tar.gz
 (cd dist && sha256sum img.tar.gz > img.tar.gz.sha256)
 .venv/Scripts/python.exe scripts/container_verify.py --artifact dist/img.tar.gz
+
+# Stage 11 批次 1：本地 HTTP API 服务 + 极简前端（无鉴权，仅本地用）
+.venv/Scripts/python.exe -m app.cli serve                 # 默认 127.0.0.1:8000
+.venv/Scripts/python.exe -m app.cli serve --port 8080 --plugin my_pkg.my_plugin
 ```
 
 ## Stage 2 评测规则（当前阶段）
