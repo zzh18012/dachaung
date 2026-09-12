@@ -6398,3 +6398,65 @@ Batch 4 关闭登记均符合裁定；真实收益声明边界已正确保留。
 f9b6253/本节）按既定规则等待下一个实质到件后搭车推送。G⑥ 双前置
 （prod-05 2 边 delta 用户复核 + G⑤ 四篇真人标注）、Stage 11
 Batch 2 与 PyYAML 前置状态不变。本节为纯台账 commit。
+
+## 一百二十三、r43 裁决执行：Stage-10-Batch-5 启动（--plugin 文件路径加载）（2026-09-12）
+
+四十二轮简报（r42 下一批次指定申请，用户要求新并行件）→ 四十三轮
+裁决（用户中转）：**定下一批次 C4（--plugin 文件路径加载）**。C2、
+C3、C5 与 §3a 继续待命；C6 仍受 PyYAML 前置阻塞；Stage 11 Batch 2
+不启动。分支 integration/stage10-batch5-plugin-path-loading，基点
+c908858（延续 Stage 10 累积链）。登记行原文：Stage-10-Batch-5
+AUTHORIZED — Create integration/stage10-batch5-plugin-path-loading
+from c908858 and implement filesystem .py-path support for the
+existing --plugin loader while preserving dotted-module behavior.
+Define deterministic path resolution, collision handling, temporary
+sys.path restoration, and worker-state isolation; cover all shared
+CLI/serve entry points with synthetic plugin fixtures. No real
+corpus, holdout, or private-gold access is permitted. C2/C3 and
+§3a remain deferred; C5 remains standby. 另裁定：C2/C3 的 real-0X
+只读判读边界暂不启动，维持既定口径。
+
+执行（同日完成实现）：stage10 分支实质 commit **34ab70a**
+（c908858..34ab70a 恰 1 commit）：
+- `app/plugin_loader.py` 路径分支：判定（含 `/`/`\` 或 .py 后缀，
+  大小写不敏感）/ 解析（resolve 后必须为已存在 .py 常规文件且 stem
+  合法标识符，模块名=stem，相对 spec 按调用时 cwd）/ 命名冲突
+  （sys.modules 同文件幂等不重复注册；异文件或 __file__ 缺失身份
+  不可证 → 拒绝；含 stdlib shadow 防护如 json.py）/ sys.path 父目录
+  **末尾** append + try/finally 恢复（成功与失败路径都移除，spawn
+  worker 继承的 sys.path 不含注入项）；导入期/注册期异常沿用
+  plugin_import_failed / plugin_register_failed；dotted 分支逐字节
+  不变（历史上 "foo.py" 形态本就非法必失败，仅错误码迁移）
+- 错误码新增三个：plugin_path_not_found / plugin_path_invalid /
+  plugin_path_conflict（error_type 合成字符串，先例 =
+  plugin_init_report_timeout 的 "Timeout"；错误 dict 键集不变）
+- 契约演进披露：`_plugin_registration_context` 自本批接受路径形态
+  spec（原批次 24 拒绝路径分隔符校验放宽为仅拒空/非 str；锁测试
+  test_plugin_spec_rejects_paths 同步演进为
+  test_plugin_spec_rejects_empty_and_non_str）；provenance 按用户
+  输入原样冻结路径拼写进 plugin_spec（不回写 resolved 绝对路径）
+- 六个 CLI 子命令（parse/batch-parse/list-parsers/explain-parser/
+  audit-parsers/inspect-parser）与批量父进程/worker 重放/.pdf 隔离
+  孙进程全部只经 load_plugins 共享通道，零改动自动继承；metavar
+  MODULE→SPEC + 帮助文案更新
+- **范围披露（serve）**：serve 入口在 Stage 11 分支谱系（eba2fae），
+  本分支无 app/service.py，无法在本分支覆盖 serve 专属测试；serve
+  共享 load_plugins 库代码，两谱系合流时路径支持自动到达，届时补
+  serve 侧断言
+- 测试 tests/test_plugin_path_loading.py 27 个（成功路径×4/
+  路径错误码×4/沿用既有码×2/冲突与幂等×4/sys.path 恢复/dotted
+  边界锁定/provenance 冻结/CLI×6/批量×3/混合 fail-fast；全合成
+  夹具，零真实语料）；全套回归 **5565 passed + 26 skipped**
+  （基线 5538 + 新增 27 恰量，0 失败）；附带卫生修复：tests/
+  test_plugin_loader.py 的 plugin_env fixture 补 _capabilities
+  副本隔离（此前 myx_test 能力快照泄漏到后续套件，全套执行序下
+  曾致本批 3 个测试平局误判，修复后全绿）
+- 文档：CLAUDE.md 新增批次 5 节 + 批次 19/24 过时表述修订 +
+  常用命令示例；BACKLOG §8 改记已处理
+- 真实 CLI 子进程冒烟（合成插件，%TEMP% 下）：parse --plugin
+  <path> --parser auto 正确路由；inspect-parser --json 显示
+  loaded_via=plugin + 原样路径拼写；缺失路径 → 结构化
+  plugin_path_not_found rc 1 无 traceback
+
+待办：r44 首报 + 实质 push 申请（batch5 新远端分支 c908858..34ab70a
++ adoption 台账搭车 42c4fa9..本节）。本节为纯台账 commit。
