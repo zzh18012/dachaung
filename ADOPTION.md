@@ -6238,3 +6238,31 @@ Stage 11 节映射行同步（五缺陷码/统一 400/请求级 422），“已�
 端到端测试，之后再提交实质 push 申请”，r33 回执简报随附 push 申请
 （stage11 分支 6c6d398..eba2fae + adoption 台账搭车 6c540ea..fad0394
 共 4 个纯文档 commit，r14 规则）。
+
+## 一百一十七、P9' push 执行：Stage 11 Batch 1 实质分支 + 搭车台账（2026-09-12）
+
+三十三轮裁决 P9' 两笔授权全部执行，均四步核验、无 force：
+
+**1. Stage 11 实质分支**：6c6d398..eba2fae（恰 2 commits：
+5d22082 实现 + eba2fae r32 修正）推送至新远端分支
+integration/stage11-batch1-web-api。核验：fetch 后 origin/main =
+6c6d398ca9c91b5b1f297e889301e776b261bfb2（基点恰为 main HEAD，
+is-ancestor 通过）；rev-list count = 2 恰量；push 为新分支创建
+（[new branch]，FF 语义）；ls-remote =
+eba2fae1bc46ac8a1bffcce78286068be8f1570a 与本地 HEAD 逐位一致。
+
+**2. 搭车台账（r14 规则）**：6c540ea..97184fe 恰 5 个纯文档
+commits（f85072f §113 / 84b8092 §114 / b0a16ce §115 / fad0394
+§115 补记 / 97184fe §116）FF 推送至
+integration/stage9-batch26-corpus-annotation。核验：is-ancestor
+通过；count = 5 恰量；推送输出 6c540ea..97184fe；ls-remote =
+97184fe663de50c36ea38ddd9803c55e4a2d0009 与本地 HEAD 一致。
+
+**Stage 11 Batch 1 全链闭环**：W1-W4 批准（§114）→ 实现 5d22082
+（§115）→ r32 首报 → Q1/Q2 裁决 → 修正 eba2fae（§116）→ r33 回执
+→ P9' 批准 → 本节推送执行。远端审计链基点 6c6d398 = Stage 8
+终态 main；main 分支自身零改动。
+
+本节为纯台账 commit（按 r14 规则排队，随下个实质到件一并申请
+push）。G⑥ 双前置维持（prod-05 delta 用户复核 + G⑤ 四篇真人
+标注）；Stage 10 待命。无新裁决请求。
