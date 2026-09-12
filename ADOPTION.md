@@ -6144,3 +6144,45 @@ W1 补充边界（裁决正文，逐条执行）：
 integration/stage11-batch1-web-api 基点 6c6d398）动工；实现
 首报（r32）交完整 HTTP 映射表+错误 envelope+异常日志脱敏+端到端
 测试，映射表裁前不申请实质 push（W4）。
+
+## 一百一十五、Stage 11 Batch 1 执行登记：Web/API 服务层实现完成 + r32 首报（2026-09-12）
+
+分支 integration/stage11-batch1-web-api（基点 6c6d398 = main HEAD，
+W3），单 commit 5d22082（8 文件 +1378/-4）：app/service.py（FastAPI
+应用工厂 + 三端点 + 静态根最后挂载）、app/cli.py serve 子命令
+（loopback 守卫 + --unsafe-expose + --max-upload-mb ≥1）、
+app/static/index.html（无构建链极简前端，含无鉴权警示）、
+tests/test_service_api.py（23 项）、docs/stage11-web-api.md（W4
+映射表文档）、pyproject/uv.lock（W2 三运行依赖 + httpx dev）、
+CLAUDE.md 范围与 Stage 11 节。
+
+W1 边界逐条落实（实现 + 测试双重证据）：
+- loopback-only：CLI 层非 loopback 无 --unsafe-expose → rc 2（测试
+  test_cli_serve_non_loopback_requires_unsafe_expose）；
+- 50MiB 流式实际计量（1MiB 块、不信任 Content-Length）超限 413；
+  恰好等于上限放行（边界测试）；成功/失败/超限/未预期异常全路径
+  finally 清理临时文件（temp_dir 注入逐路径断言为空）；
+- 临时路径不泄露：成功 source_path 用 sanitize_filename 净化名；
+  pipeline 错误 message/details 递归替换（_scrub_paths；测试断言
+  details.path == 净化名、message 无临时路径）；
+- 静态根在全部 API 路由后挂载：/、/docs、/openapi.json、
+  /api/v1/* 实测不被遮蔽；
+- 服务层只外壳：process_single(write_json=False) 复用，parser/
+  chunker/pipeline 语义零改动；执行序与 CLI parse 一致（插件
+  预载 fail-fast → 落盘 → 名校验 → auto 发现 → 解析）。
+
+验证：tests/test_service_api.py 23/23；全套 5486 passed / 26
+skipped（skip 全为 samples/private 缺样例预期项，G⑥ 纪律下合成
+夹具）；真实启动冒烟（uvicorn :8765）：health/parser_count=7、
+/docs、/、POST parse 成功（markdown_enhanced 路由）、unknown_parser
+400、max_chars=0 → 500 chunker_failed。前端浏览器目检因 webbridge
+扩展未连接未做，以 curl + TestClient HTML 断言 + /api/v1/parsers
+形状与 JS 消费字段核对替代（如实披露）。
+
+已知待裁 Q1：max_chars<=0 → 500 chunker_failed（与 CLI 同码同
+行为；用户输入可轻易触发 500）。选项 A 维持（CLI 一致、缺陷码
+语义如实）；B 服务层前置校验 → 400（新增 invalid 参数拒绝）。
+
+W4 程序：r32 首报交完整 HTTP 映射表 + 错误 envelope + traceback
+脱敏行为 + e2e 测试清单（outputs/gpt_brief_batch26_r32_stage11_batch1.txt），
+**映射表裁夺前不申请实质 push**（本轮无 push 请求）。
