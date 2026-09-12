@@ -117,6 +117,18 @@
 - 旧 devset 真实命中对照（real-01/02/03/05 DOCX，XML 精确扫描）：**零命中**（real-02 全文档仅 1 个 body 层 sdt，批次 14 已覆盖）——修复为合成夹具验证的防御性覆盖
 - 测试：tests/test_docx_sdt_in_tc.py（6 个：整格 sdt / 混合保序不重复 / 嵌套 / 裸与空 sdtContent 跳过 / 无 sdt 逐字节一致 / 计数顺序不受影响）
 
+## PDF 跨页表格保守合并（Stage 10 批次 4）
+
+- BACKLOG §3 处理（r36 授权）：`app/parsers/fallback_parser.py` 跨页表格续页片段合并，**只在唯一、可解释的连续性证据成立时合并，证据不足一律保留独立表**（保守默认）
+- 判定信号（全部满足的结构前提 + 二者居一的连续性证据）：
+  - 前提：页号恰 +1（阅读序单链迭代保证"前页最后表/后页首表"，find_tables 返回序非阅读序，按 (page, top) 稳定排序后消费）；列网格逐边对齐（单元格 x 边界聚类，边界数相等且逐边 |Δ|≤2pt）；候选至少一行非空
+  - 证据 a 重复表头：候选首行规范化文本（空白折叠 + casefold）== 链首片段首行，且候选含 ≥2 行 → 合并并丢弃候选首行
+  - 证据 b 断版位置：链尾片段 bbox 底边 ≥ 80% 页高（底部区）且候选 bbox 顶边 ≤ 20% 页高（顶部区）
+- 误合并防护：隔页/同页后继表关闭链；网格容差超限不合并；中部同网格不合并；仅表头无数据行不合并；同页任何表先关闭当前链再开新链
+- 产物表示（无 schema/契约变更，r36 边界）：首片段 element 就地扩展（content 重排、row_count/col_count 重算），metadata 增 `cross_page_merge`/`continuation_pages`/`dropped_header_rows`；locator 保持首片段起始页；续页 element 移除；合并发生在 relation 匹配前
+- real-01 旧 devset 对照（授权范围）：表格数 4→4、合并 0 次——**诊断更正**：原 +300% 根因是 3 个单柱高亮框假阳性（p6/p17/p17）非跨页拆分（详见 BACKLOG §3 遗留项）
+- 测试：tests/test_pdf_cross_page_tables.py（13 个：重复表头/断版位置合并、网格失配/中部/隔页/仅表头/同页次表不合并、3 页链、管线 schema 通过、判定纯函数单元；全合成手写最小 PDF 夹具，零真实语料）
+
 ## 容器交付与可复现构建（Stage 8 批次 25）
 
 - **制品交付 ≠ 部署**：CI artifact（tar.gz + .sha256 边车）是交付物；加载并经 `container_verify --artifact` 验证通过才构成已验证部署（runbook 见 README §3.6）

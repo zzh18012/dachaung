@@ -554,6 +554,170 @@ def _vector_figure_clusters(page) -> list[list[float]]:
     ]
 
 
+# ---------- PDF 跨页表格保守合并（Stage 10 批次 4，r36 授权） ----------
+
+_XPAGE_GRID_TOL_PT = 2.0  # 列边界聚类与网格匹配容差（pt）
+_XPAGE_BOTTOM_ZONE = 0.80  # 链尾片段底边须 >= 页高 × 此比例（底部区）
+_XPAGE_TOP_ZONE = 0.20  # 候选片段顶边须 <= 页高 × 此比例（顶部区）
+
+
+def _xpage_column_edges(
+    cells: list[tuple[float, float, float, float]] | None,
+) -> tuple[float, ...]:
+    """全部单元格 x 边界的单遍聚类（容差内并入已保留值），升序元组。
+
+    None/空 → 空元组（无法建立网格证据，保守不参与合并）。
+    """
+    if not cells:
+        return ()
+    xs = sorted({x for c in cells for x in (c[0], c[2])})
+    kept: list[float] = []
+    for x in xs:
+        if kept and x - kept[-1] <= _XPAGE_GRID_TOL_PT:
+            continue
+        kept.append(x)
+    return tuple(kept)
+
+
+def _xpage_grid_matches(a: tuple[float, ...], b: tuple[float, ...]) -> bool:
+    return len(a) == len(b) and all(
+        abs(x - y) <= _XPAGE_GRID_TOL_PT for x, y in zip(a, b)
+    )
+
+
+def _xpage_norm_row(row: list[Any]) -> str:
+    return "|".join(" ".join(str(c or "").split()).casefold() for c in row)
+
+
+def _xpage_row_has_text(row: list[Any]) -> bool:
+    return any(str(c or "").strip() for c in row)
+
+
+def _xpage_continuation(chain_tail: dict, chain_header_sig: str, cand: dict) -> tuple[bool, bool]:
+    """判定 cand 是否为跨页表格链（尾部片段 chain_tail）的续页片段。
+
+    返回 (是否合并, 是否丢弃 cand 首行重复表头)。
+
+    结构前提（全部满足才考虑合并；页号恰 +1 且"前页最后一个表格/
+    后页第一个表格"由调用方按阅读序单链迭代保证——同页或隔页的任何
+    表格都会先关闭当前链）：
+    - 列网格一致（边界数相等且逐边 |Δ| <= 2pt）；
+    - cand 至少含一行非空内容。
+
+    连续性证据（二者居一，r36：唯一、可解释；证据不足一律不合并）：
+    a) 重复表头：cand 首行规范化文本 == 链首片段首行（非空、且 cand
+       还有数据行）→ 合并并丢弃 cand 首行；
+    b) 断版位置：链尾片段底边位于前页底部区（>= 80% 页高）且 cand
+       顶边位于后页顶部区（<= 20% 页高）。
+    """
+    if cand["page"] != chain_tail["page"] + 1:
+        return False, False
+    if not cand["rows"] or not any(_xpage_row_has_text(r) for r in cand["rows"]):
+        return False, False
+    if not _xpage_grid_matches(chain_tail["col_edges"], cand["col_edges"]):
+        return False, False
+    first = cand["rows"][0]
+    cand_sig = _xpage_norm_row(first)
+    if (
+        chain_header_sig
+        and cand_sig == chain_header_sig
+        and _xpage_row_has_text(first)
+        and len(cand["rows"]) >= 2
+    ):
+        return True, True
+    tail_bottom = chain_tail.get("bottom")
+    cand_top = cand.get("top")
+    if tail_bottom is None or cand_top is None:
+        return False, False
+    if (
+        tail_bottom >= _XPAGE_BOTTOM_ZONE * chain_tail["page_height"]
+        and cand_top <= _XPAGE_TOP_ZONE * cand["page_height"]
+    ):
+        return True, False
+    return False, False
+
+
+def _plan_cross_page_merges(records: list[dict]) -> list[dict]:
+    """按阅读序单链迭代，产出合并组（每组 records[0] 为首片段，
+    其后为 (片段, 是否丢弃重复表头)）。单片段链不成组。
+
+    输入 records 须按 (page 升序, 页内 top 升序) 排列——pdfplumber
+    find_tables 的返回序不保证阅读序（实测同页可先底后顶），由
+    _apply_cross_page_merges 排序保证。
+    """
+    groups: list[dict] = []
+    current_recs: list[tuple[dict, bool]] = []
+    tail: dict | None = None
+    header_sig = ""
+
+    def close() -> None:
+        nonlocal current_recs, tail
+        if tail is not None and len(current_recs) > 1:
+            groups.append({"records": current_recs})
+        current_recs = []
+        tail = None
+
+    for rec in records:
+        merged = False
+        if tail is not None:
+            ok, drop = _xpage_continuation(tail, header_sig, rec)
+            if ok:
+                current_recs.append((rec, drop))
+                tail = rec
+                merged = True
+        if not merged:
+            close()
+            current_recs = [(rec, False)]
+            tail = rec
+            header_sig = _xpage_norm_row(rec["rows"][0]) if rec["rows"] else ""
+    close()
+    return groups
+
+
+def _apply_cross_page_merges(
+    elements: list[Element], records: list[dict]
+) -> list[Element]:
+    """执行合并计划：首片段 element 就地扩展（行合并重排 content、
+    metadata 增补合并标记），续页片段 element 从列表移除。
+
+    locator 不变（保持首片段的 page_geometry：合并表以起始页定位，
+    续页信息进 metadata——无 schema/契约变更，r36 边界）。
+    """
+    # 阅读序排序（稳定）：find_tables 页内返回序非阅读序，直接消费
+    # 会让"页内后表"先于"页内首表"进链、破坏相邻页判定
+    ordered = sorted(
+        records,
+        key=lambda r: (r["page"], r["top"] if r["top"] is not None else float("inf")),
+    )
+    groups = _plan_cross_page_merges(ordered)
+    if not groups:
+        return elements
+    by_id = {e.element_id: e for e in elements if e.type == "table"}
+    remove_ids: set[str] = set()
+    for group in groups:
+        first_rec = group["records"][0][0]
+        el = by_id.get(first_rec["element_id"])
+        if el is None:
+            continue
+        merged_rows: list[list[Any]] = list(first_rec["rows"])
+        dropped = 0
+        cont_pages: list[int] = []
+        for rec, drop in group["records"][1:]:
+            merged_rows.extend(rec["rows"][1:] if drop else rec["rows"])
+            dropped += 1 if drop else 0
+            cont_pages.append(rec["page"])
+            remove_ids.add(rec["element_id"])
+        el.content = _rows_to_markdown(merged_rows)
+        el.metadata["row_count"] = len(merged_rows)
+        el.metadata["col_count"] = max((len(r) for r in merged_rows), default=0)
+        el.metadata["cross_page_merge"] = True
+        el.metadata["continuation_pages"] = cont_pages
+        el.metadata["dropped_header_rows"] = dropped
+    if not remove_ids:
+        return elements
+    return [e for e in elements if e.element_id not in remove_ids]
+
+
 def _parse_pdf(
     path: Path,
     source_hash: str,
@@ -568,6 +732,7 @@ def _parse_pdf(
     elements: list[Element] = []
     warnings: list[WarningRecord] = []
     image_counter = 0
+    pdf_table_records: list[dict] = []  # 跨页合并分析输入（Stage 10 批次 4）
     try:
         with pdfplumber.open(str(path)) as pdf:
             for page_idx, page in enumerate(pdf.pages, start=1):
@@ -616,12 +781,13 @@ def _parse_pdf(
                         continue
                     md = _rows_to_markdown(rows)
                     tbl_bbox = getattr(tbl, "bbox", None)
+                    tbl_element_id = f"{document_id}::e{len(elements):04d}"
                     tbl_locator: dict[str, Any] = {"family": "page_geometry", "page": page_idx}
                     if tbl_bbox:
                         tbl_locator["bbox"] = list(tbl_bbox)
                     elements.append(
                         Element(
-                            element_id=f"{document_id}::e{len(elements):04d}",
+                            element_id=tbl_element_id,
                             type="table",
                             content=md,
                             parent_id=None,
@@ -633,6 +799,19 @@ def _parse_pdf(
                                 "source": "pdfplumber",
                             },
                         )
+                    )
+                    pdf_table_records.append(
+                        {
+                            "element_id": tbl_element_id,
+                            "page": page_idx,
+                            "rows": rows,
+                            "col_edges": _xpage_column_edges(
+                                getattr(tbl, "cells", None)
+                            ),
+                            "top": float(tbl_bbox[1]) if tbl_bbox else None,
+                            "bottom": float(tbl_bbox[3]) if tbl_bbox else None,
+                            "page_height": float(page.height),
+                        }
                     )
                 # 图片
                 try:
@@ -779,6 +958,9 @@ def _parse_pdf(
                 reason="pdfplumber 未提取到任何文本/表格/图片（可能为扫描件，本阶段不支持 OCR）",
             )
         )
+    # 跨页表格保守合并（Stage 10 批次 4）：在 relation 匹配前完成，
+    # 使题注/引用关系针对合并后的表格计算
+    elements = _apply_cross_page_merges(elements, pdf_table_records)
     return elements, warnings
 
 
