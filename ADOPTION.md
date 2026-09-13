@@ -6564,3 +6564,52 @@ ADOPTION §；不产生新的台账 commit；在下一次实质裁决登记中�
 状态：Stage 10 待命；台账队列 = §124（5a05acb）+ §125
 （bd1001f）+ §126（bb7f376）+ 本节，随下个实质到件搭车 push。
 本节为纯台账 commit。
+
+## 一百二十八、r51 授权 M1 执行：Stage 10/11 谱系合流 + serve 侧路径加载断言（2026-09-13）
+
+五十一轮裁决（用户中转，r51 简报指定申请）：**M1 AUTHORIZED**——
+合流方案逐条执行。登记行原文：M1 AUTHORIZED — Create
+integration/stage10-11-convergence from Stage-11 tip eba2fae, then
+merge Stage-10 Batch-5 tip 34ab70a with one explicit --no-ff merge
+commit (first parent eba2fae, second parent 34ab70a). Rebase, squash,
+force push, and rewriting either published branch are prohibited.
+Scope is limited to mechanical lineage convergence, serve-side .py
+plugin-path end-to-end assertions, and necessary documentation; any
+semantic conflict requires separate adjudication. Use synthetic
+fixtures only and preserve all Stage 9 private-gold, holdout, and
+frozen-surface prohibitions. 同轮：C2/C3/C5/§3a 待命、C6 需用户批准
+PyYAML、B1/B2 不启动、real-0X 只读边界本轮未启用、adoption 纯台账
+四提交（§124–§127）随 M1 首个实质 push 搭车。前序纯确认（r50）已
+收讫。
+
+执行（worktree dachuang-stage11）：
+
+- 分支 integration/stage10-11-convergence 自 eba2fae 创建；
+  merge-base(eba2fae, 34ab70a) = 6c6d398（main，确认无 FF 路径）；
+- **merge commit d7a96dd**：--no-ff 合入 34ab70a，第一父 eba2fae、
+  第二父 34ab70a 恰如裁决；**零冲突**（CLAUDE.md 与 app/cli.py 自动
+  合并，两侧改动共存：批次 5 的 metavar="SPEC" 与 Stage 11 serve
+  子命令同时在位），无语义变化、无需另送审；31 文件 +3253/−215；
+- 合流后全套回归基线：**5593 passed + 26 skipped**（= Stage 10 链
+  5565 + Stage 11 28 恰量并集，零交互失败）；uv sync --locked 无依赖
+  变化（Stage 10 链未触碰 pyproject/uv.lock）；
+- **serve 侧断言 commit 6c58c59**：tests/test_service_api.py +9 项
+  （§124 遗留义务全落）——路径形态 --plugin 显式解析/auto 扩展名发现
+  路由/parsers+health 列表/cwd 相对路径形态/dotted+path 混合启动/
+  plugin_path_not_found·invalid·conflict 启动 fail-fast（PluginLoadError
+  code 断言）/CLI serve 入口结构化错误 rc 1（uvicorn 不启动）；新增
+  第二合成插件模板 myx_path(.my2) 供混合与同 stem 冲突用例；机械文案
+  对齐：serve --plugin metavar MODULE→SPEC + help 补两形态 + cli.py
+  docstring 用法行 + CLAUDE.md（批次 5"范围披露"改为 M1 已补测落档 +
+  serve 用法示例）+ docs/stage11-web-api.md（启动参数/错误契约/测试
+  覆盖三处，28→37 项）；
+- 定向 37 passed（28+9）；全套回归 **5602 passed + 26 skipped**
+  （5593+9 恰量）；
+- 全合成夹具，零真实语料/零私有 gold/零冻结面接触。
+
+分支状态：integration/stage10-11-convergence = 6c58c59（d7a96dd 合流
++ 6c58c59 断言），eba2fae..6c58c59 共 2 commits，未推送；两已发布
+分支（stage11-batch1-web-api=eba2fae、stage10-batch5=34ab70a）零
+改写。台账队列 = §124（5a05acb）+ §125（bd1001f）+ §126（bb7f376）
++ §127（4a3e121）+ 本节（远端 = 4c77631），按裁决随 M1 首个实质
+push 搭车。M1 首报（r52）请求 push 授权。
