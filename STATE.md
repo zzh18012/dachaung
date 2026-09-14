@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1926 — a 续：DOCX 空 heading 状态机三边界（3 测试）
+
+- 语境：R1925 锁"两正文间单空 heading 劈两块"；本轮锁 chunker 硬边界状态机的三个残余边界——连续空 heading / 文档开头空 heading / 文档末尾空 heading 全部 grep 零覆盖
+- 探针（outputs/autonomous/probe_emptyheading2_r1926.py + 尾界单跑，未入库）三边界全实证：
+  - **S1 连续空 heading**：正文-空H1-空H2-正文 → 恰 **3** chunk，中间块**恰为纯占位符单元素块**（text=="(空段落)"、source 恰含前一个空 heading）；空 Heading 2 级数保留（level=2）
+  - **S2 文档开头空 heading**（无前块可封）→ 融合进后续正文**单 chunk**（R1922 C1 的 PDF 表内 heading 同型，DOCX 侧锁定）
+  - **S3 文档末尾空 heading** → 收尾 flush 出**纯占位符尾块**（单元素 chunk "(空段落)"）
+- 测试：`tests/test_pipeline_docx_empty_heading_edges.py`（3 个，判别式：硬边界对空占位 heading 停止触发或收尾 flush 丢弃纯占位缓冲则翻红）。3 passed
+- 计数影响：+3（R1925–R1926 累计 +6；下次全量预测 101660 + 3xN，N≥2）
+
+---
+
 ## Round 1925 — a 续：DOCX 空 heading 级联——样式判型 × 空占位 × 硬边界（3 测试）
 
 - 语境：R1585 锁**非空** Title/Quote 样式与 Normal 空段（分页符 → "(空段落)" paragraph）；既有测试全部空段都是 Normal 样式（grep add_paragraph("") 零命中样式变体）——**空样式 heading**（style 判型不看文本空否 × 空占位文本 × chunker 硬边界按类型触发）零覆盖
