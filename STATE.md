@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1843 — html 遗留行内标签族剥壳、font/center、md 定义列表不识别（Round 1843）
+- 动机：锁 R1842 后查遗留标签——grep 核实 u/s/del/ins/big/small/font/center 八标签与 md ': def' 定义列表语法全库零覆盖
+- 探针：6 组探针（六行内标签 + font/center + 定义列表），断言全部来自实测输出
+- 结论 1：六遗留行内标签（u/s/del/ins/big/small）剥壳留内文，无 strike/underline metadata；del 的 datetime 属性整弃
+- 结论 2：font color/size 属性丢弃只留内文；center 块压平普通 paragraph，无居中语义
+- 结论 3：md 定义列表形（term 行 + ': definition' 行）合并单段且换行保留——不产生 term/definition 元素，md 无定义列表语法
+- 新增：tests/test_parser_legacy_inline_tags_dl.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1842 — md splitlines 分隔符归一、分隔符起标题、text 保真（Round 1842）
 - 动机：锁 R1841 后查控制字符——md 测试对 0x0c/0x0b/U+2028 全部零覆盖；markdown_parser.py:152 用 text.splitlines()，五类 Unicode 分隔符行为未锁
 - 探针：两组探针 + codepoint 逐项核验（ord 打印），断言全部来自实测输出
