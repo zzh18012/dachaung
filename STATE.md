@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1879 — img 在表行间静默丢弃 + image 承接 section_path（Round 1879）
+- 动机：R1877/78 锁 img 冲刷结构类型后查表行间位置与路径承接——'<tr>a</tr><img><tr>b</tr>' 与 image.section_path grep 零覆盖
+- 探针：三组（行间 img、连续双 img、h1 内 img flush + 后续段）
+- 结论 1：'<tr>a</tr><img ...><tr>b</tr>' → 单个表 row_count 2，img 元素消失（与 td 内 img 丢弃同终点、不同位置——行间 img 不中断表收集）
+- 结论 2：'<p><img><img>t</p>' → 两个 image + paragraph 't'（每个 img 独立冲刷不合并）
+- 结论 3：'<h1>T<img ...></h1><p>b</p>' → heading 'T' + image（section_path 'T'）+ 段 'b'（'T'）——img 不中断路径栈，image 元素自身带路径
+- 新增：tests/test_parser_img_rows_flush.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1878 — bq 内 img：kind 只保 img 前段（Round 1878）
 - 动机：R1877 锁 img 先行冲掉 heading/li 类型后查 blockquote kind——img 把 bq 文本切两段时 kind 归属零覆盖
 - 探针：四组（bq 文本-img-文本、bq img 先行、纯 img bq + 后续段、p img 先行对照）
