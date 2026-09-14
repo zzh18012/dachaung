@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1938 — a 续：DOCX 同段多行内图——元素序/命名/同字节复用（3 测试）
+
+- 语境：R1933 锁单图元素序 [para, image, para]；test_pipeline_docx_images 锁单图 para0_00 命名；**同段两图**与**同图字节复用**零覆盖
+- 探针（outputs/autonomous/probe_multiimg_r1938.py + output_path 命名复跑，未入库）实证：
+  - **P1 两图都跟宿主段后**：同段 "L " + 图1 + 图2 + " R" → [paragraph('L  R'), image, image, paragraph]——按插入序连排（非段前/非文档末集中）
+  - **P2 段内顺序命名**：两异图 → image_{sha}_para0_00/_para0_01.png、rels rId9/rId10、两个 PNG 落盘
+  - **P3 同字节复用共享 rel**：同 PNG 字节插两次 → **两元素共享 rId9 + 同 target_partname /word/media/image1.png**（python-docx 部件去重），但解析器仍各写一份 PNG（磁盘字节重复、para0_00/01 各自计数）
+- 测试：`tests/test_parser_docx_multi_image_paragraph.py`（3 个，判别式：图改排文档末集中则 P1 序翻红；命名按 rel 去重则 P3 文件数断言翻红）。3 passed
+- 计数影响：+3（R1925–R1938 累计 +43；下次全量预测 101660 + 43 = 101703）
+
+---
+
 ## Round 1937 — a 续：PDF 行内基线偏移——上标/同基线混号（3 测试）
 
 - 语境：edges44 只锁**整块** Ts 8 的 bbox 平移；**行内混排**（部分字符升起/缩号）与行聚类容差（:129 abs(y_center 差) <= 3.0）的交互零覆盖
