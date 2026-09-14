@@ -114,6 +114,19 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1909 — 1b/b 续：main app/plugin_loader.py 失败路径边角探针实证（Round 1909）
+- 目标：main `6c6d398ca9c` app/plugin_loader.py（批次 19；main 侧 27 测试全绿路径厚，失败路径以下五项 grep 实证零覆盖）；探针 outputs/autonomous/probe_plugin_loader_r1909.py（合成插件写系统临时目录 + sys.path 前插，main venv 子进程 + PYTHONPATH 指向 main 根 + PYTHONDONTWRITEBYTECODE=1，main worktree 零写入核验通过）
+- **边角 1 部分注册不回滚**：插件先 @register 再顶层 raise ValueError → PluginLoadError(plugin_import_failed, ValueError) 但 parser **仍留在注册表**（registered_names 实证 before=false after=true）——失败导入无注册回滚
+- **边角 2 重试错误码漂移**：失败模块不进 sys.modules（Python 导入系统清理失败导入）+ 失败路径不写 _FIRST_LOAD 备忘（源码仅成功路径写入）→ 同一 spec 重试重新执行模块 → @register 撞重名 → **code 从 plugin_import_failed 翻转为 plugin_register_failed**（同一插件两次加载报不同错误码）
+- **边角 3 非 str spec**：load_plugins([12345]) → 结构化 plugin_import_failed（error_type=ValueError，importlib 拒绝非 str），不裸抛 TypeError
+- **边角 4 to_dict 无 traceback**：PluginLoadError 构造无 traceback_str 时 to_dict(include_traceback=True) 静默省略 traceback 键（不发假空串）
+- **边角 5 空列表**：load_plugins([]) → []（无异常）
+- 影响评估：CLI 路径 fail-fast 后进程退出，部分注册无出口；影响面 = 库级复用（同进程继续用注册表）与错误码漂移的调试干扰
+- **指示线候选 #3（不在自跑线实施）**：(a) 部分注册回滚或至少文档化"失败导入可能留下半注册 parser"；(b) 失败也写 _FIRST_LOAD 哨兵或重试保持稳定错误码
+- 探针产物（未入库）：probe_plugin_loader_r1909.py（输出在会话记录）
+- 计数影响：0（autonomous baseline 101645 不变）
+- 状态：已提交已推送
+
 ## Round 1908 — 1b/b 首轮：main app/jsonlog.py 三个零覆盖边角探针实证（Round 1908）
 - 目标：main `6c6d398ca9c` app/jsonlog.py（批次 17；main 侧 test_jsonlog.py 13 测试 grep 实证以下三项零覆盖）；探针 outputs/autonomous/probe_jsonlog_edges_r1908.py（main venv 子进程 + PYTHONPATH 指向 main 根 + PYTHONDONTWRITEBYTECODE=1；日志全部写系统临时目录，main worktree 零写入核验通过）
 - **边角 1 不可序列化 extra**：extra 值为 set → 调用方零异常，但该事件**从日志文件静默丢失**（前后事件正常落盘，文件 2 行不含 evt_bad），stderr 出现 logging "--- Logging error ---" 完整 traceback 噪声——事件丢失 + stderr 噪声双面；批次 17 已知限制清单未列此项
