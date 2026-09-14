@@ -114,6 +114,19 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1923 — a 续：DOCX 脚注/尾注家族静默不可见性（3 测试）
+
+- 语境：edges50 已锁批注（comments.xml 注入）、edges67/68 锁修订跟踪；**脚注（footnotes.xml）/尾注（endnotes.xml）grep 零覆盖**（本轮前沿排查另排除：srcsize/tag 元数据、跨页段落 edges19 六测、图片零 chunk R1765、pdf_no_text_extracted 五文件）
+- 探针（outputs/autonomous/probe_docx_footnote_r1923.py，未入库；raw zip 构造完整 OOXML 包——Content_Types/rels/footnotes.xml/endnotes.xml 齐备，python-docx 可开）三假设全实证：
+  - **F1 脚注文本不可见**：footnotes.xml 里的脚注文本不出现在任何元素；w:footnoteReference 标记无字符贡献（para.text 只取 w:t）；正文 "Body with footnote" 全等保留
+  - **F2 仅含脚注引用的段落**（无 w:t）→ "(空段落)" 占位 + metadata empty=True
+  - **F3 尾注同型不可见**（endnotes.xml + w:endnoteReference）
+  - **三类不可见全部零告警**（纯静默丢失，无 WarningRecord）
+- 测试：`tests/test_parser_docx_footnote_invisible.py`（3 个，content 全等断言——未来把脚注文本并入正文则翻红）。3 passed
+- 计数影响：+3（R1919–R1923 累计 +15；下次全量预测 101645 + 15 = 101660）
+
+---
+
 ## Round 1922 — a 续：网格表 PDF 页端到端 chunk 组成——表内文本污染正文块（3 测试）
 
 - 语境：R1888 锁 parser 级双重提取、R1919/1920 锁相位序、R1765 锁 markdown 纯图零 chunk、R1829 锁 markdown pipe 表邻接三块型——**真实网格表 PDF 页的 pipeline 级级联**（相位序→双重提取→heading 判类→chunker 硬边界）零覆盖。前沿排查本轮又排除：表内图/页眉图（edges16 已锁）、w:pict（edges38）、TJ/Tm/Tc 算子家族（edges56 等）、/Rotate（edges101/107）、横版页（edges110）、文本序来源（edges23/44/56/71）、图片元素无 chunk（R1765 markdown 家族级锁定）
