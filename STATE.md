@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1871 — 隐式闭合：h1<h2 / li<li 开新元素，table 无 tr 整表错误（Round 1871）
+- 动机：R1870 锁 p 的同 kind 忽略合并后查对照面——h1<h2 异 kind 与 li<li 同 kind 是否也合并；'<table><td>'（无 tr）edges14 只锁有 tr 的未闭合形态，无 tr 形态 + pipeline 级错误零覆盖
+- 探针：五组（h1<h2 带后续段、裸 li<li、ul 包裹 li<li、无 tr 表、未闭 h1 到 EOF）
+- 结论 1：'<h1>a<h2>b</h2><p>t</p>' → 两个 heading（level 1/2）+ 段落；h2 section_path 'a > b'（畸形嵌套仍建立层级栈），'t' 继承 'a > b'
+- 结论 2：'<li>a<li>b' 裸与 ul 包裹 → 两个 list_item unordered（与 p 的单元素合并形成 kind 对照：p 忽略同 kind，li 隐式闭合）
+- 结论 3：'<table><td>x</td></table>'（无 tr）→ 整表消失，pipeline 级 no_extracted_elements 结构化错误（details 含 html_no_content warning）+ 不写盘（edges14 是 parser 级空 doc，本例是 CLI 级错误路径）
+- 新增：tests/test_parser_html_implicit_close.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1870 — p 标签畸形形态精确锁定：兄弟嵌开合并 / 多余闭合（Round 1870）
 - 动机：edges.py:410 '<p>hello<p>world' 与 edges3:677 '<p><p>text</p></p>' 都只断言 len>=1——精确内容与元素数从未锁定；'</p>' 打头与纯多余闭合全库零覆盖；裸 td/tr/li 已锁（orphan/R1812）复核弃用
 - 探针：八组（兄弟嵌开三形态、多余闭合两种、未闭到 EOF、文本先于 p、裸 td 对照）
