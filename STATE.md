@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1849 — md 标题内行内标记/实体全字面 + section_path 传播（Round 1849）
+- 动机：edges13 只覆盖 html 侧标题内行内标记拍平；md 标题内 inline 标记/实体、html 标题实体、md section_path 带标记传播均 grep 零覆盖
+- 探针：2 组探针（md 标题 b/行内代码/行内链接/实体、html 标题实体对照、传播链），断言全部来自实测输出
+- 结论 1：'# <b>bold</b> head' → content 逐字保留（行内代码/链接同规），不剥壳不解析
+- 结论 2：实体家族对照——md '# T &amp; U' → 'T &amp; U' 字面；html '<h1>a &amp; b</h1>' → 'a & b'（SAX 解码）
+- 结论 3：'# <b>B</b>' 的 section_path == '<b>B</b>'（原始标记文本进路径）并传播到后续段落
+- 新增：`tests/test_parser_md_heading_inline_literal.py`（3 测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1848 — md 空围栏静默丢弃 + html 属性级 tokenizer 恢复（Round 1848）
 - 动机：dl/figcaption/转义/sub-sup/波浪围栏/td 内 img 均已覆盖后，转向 md 空围栏与 html 属性级 tokenizer 恢复（grep 核实 '```\\n```' 与未闭合引号/属性内换行全库零覆盖）
 - 探针：2 组探针（空围栏±lang、未闭合引号 img、src 内换行、多行属性），断言全部来自实测输出
