@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1929 — a 续：PDF 网格表 cell 内图片独立性（3 测试）
+
+- 语境：R1888/R1922 锁 cell 文本双重提取、R1919/1920 锁三相位序、edges16 锁 **DOCX** cell 内图片不可见；**PDF 侧网格 cell 内图片**（第三相位完全无视表格存在）grep 零覆盖
+- 探针（outputs/autonomous/probe_gridimage_r1929.py，未入库）四假设全实证：
+  - **G1 相位序保持**：元素序 [heading(cell 文双重提取), paragraph, table, image]
+  - **G2 图独立成元素**：图片 bbox 落在表格 bbox 内部、渲染成功（PNG 落盘 `_p1_00`）、零告警——图片不折叠进表格
+  - **G3 图片行全空 cell**：三列两行表格，图片所在第二行 '|  |  |  |'——图片对表格 markdown 零文本贡献
+  - **G4 chunk 级联**：[seq(cell 文+正文融合), isolated_table]——图片无 chunk（R1922 C3 家族规则，PDF 网格版）
+- 测试：`tests/test_parser_pdf_grid_cell_image.py`（3 个，判别式：表提取若吸收图片则元素序与空行断言翻红；相位序改图片在表格前则元素序翻红）。3 passed
+- 计数影响：+3（R1925–R1929 累计 +16；下次全量预测 101660 + 16 = 101676）
+
+---
+
 ## Round 1928 — a 续：DOCX 纯空白段 ≡ 空串归一（4 测试）
 
 - 语境：R1925/1926 锁空串 heading、R1585 锁分页符段；**纯空白文本**（空格/制表符）的归一语义零锁（既有 "   " 段全是评测侧 gap 填充，无 content 断言）。探针推翻代码直觉（"content=text or 占位符"会保空白）——实际 _parse_docx :468 `(para.text or "").strip()` 在 intake 即归一
