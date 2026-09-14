@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1865 — fence info 前导空白剥离 + 标记分隔 \s 族 + section_path 保 NBSP（Round 1865）
+- 动机：'``` py' 带空格 info、'1.\t'/'1.　'/'+\t'/'>\t' 标记分隔、section_path 含 NBSP 全库零覆盖；空 heading 跳过复核弃用（edges13:37 已锁同终点）；'2)second' 括号列表复核弃用（paren lists 已锁）
+- 探针：九组（info 三种前导空白、ordered/unordered/bq 四种 \t 与全角标记、NBSP 标题路径）
+- 结论 1：'``` py' / '```  py' / '```　py' → language 全部 'py'（前导 \s 整体剥离）
+- 结论 2：'1.\tfirst' 与 '1.　first' → ordered list_item 'first'；'+\tplus' → unordered；'>\tq' → blockquote（四标记分隔符同为 \s）
+- 结论 3：'<h1>T\xa0U</h1>' → 后续段落 section_path 'T\xa0U' 逐字（NBSP 不折叠）
+- 新增：tests/test_pipeline_fenceinfo_wsmarkers.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## 回归基线 101478（第 134 次：0 失败；101456 passed + 22 skipped，2023s）
 
 - 命中：基线 101454（含至 R1841）+ R1842–R1849 共 24 个测试（8 轮 × 3）= 101478 = 101456 + 22（第 97 次连续精确命中；此前笔记"预期 101466"漏算 R1842–R1845 的 12 个测试，实际口径以本轮登记为准）
