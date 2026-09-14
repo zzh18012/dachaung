@@ -114,6 +114,22 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1910 — 1b/b 续：main app/batch.py 七个零覆盖边角探针实证（Round 1910）
+- 目标：main `6c6d398ca9c` app/batch.py（批次 16+19+25，463 行，main 侧 test_batch_parse.py 仅 12 测试）；探针 outputs/autonomous/probe_batch_r1910.py（main venv 子进程 + PYTHONPATH 指向 main 根 + PYTHONDONTWRITEBYTECODE=1，全部产物写系统临时目录，main worktree 零写入核验通过：git status 空、HEAD 6c6d398 不变）
+- **E1 auto 路由观测**：effective_parser_for 实测 auto+pdf/docx→"fallback"、auto+md→"markdown_enhanced"（priority 5 胜出内置 markdown）、auto+未知扩展→"fallback" 回落（worker 侧再报 unsupported_type）、显式非 auto/fallback 名原样透传（markdown+.pdf 也放行，靠 worker 结构化失败兜底）
+- **E2 workers 钳制**：workers=0 与 workers=-3 → max(1,int(w))=1 → 顺序路径，summary.workers=1、成功数正常（负数不炸、不误入池创建）
+- **E3 大小写唯一 stem 静默覆盖（指示线候选 #4）**：不同子目录 dirA/Case.md + dirB/case.md → 冲突守卫按 p.stem 精确匹配判"无冲突"→ 双双 success，但 Windows 大小写不敏感文件系统上 Case.json 与 case.json 是同一文件 → **磁盘只剩一个 json 且仅含后写的 content B，前一份解析结果静默丢失**（summary 报 2 成功 0 失败）；现有 stem_collision 守卫只防精确同名，不防大小写折叠（Linux 行为不同——平台依赖缺陷）
+- **E4 冲突剔除后并行降级**：4 文件 3 同 stem + workers=4 → 任务派发前剔除 2 个冲突，effective_workers 按**剔除后** args_list 数（2 < SEQUENTIAL_THRESHOLD=3）判 → 实际顺序执行 summary.workers=1；summary 算术自洽（total=4 = success 2 + failed 2，failed 含 2 条 stem_collision）
+- **E6 重复 --plugin 去重**：plugins=[m,m] → plugin_loaded 事件恰 1 次（parsers_added 恰一次非空）、batch_start.plugins 原样保留两个重复项（去重只作用于事件层）；批完成且插件注册成功
+- **E8 非 TTY 进度行**：格式实测"[i/N] parse <basename> OK <秒>.1f" / 失败行"FAIL <error_code>"（tqdm 缺失或 stderr 非 TTY 时逐行 stderr）
+- **E5 worker 初始化回报超时分支**：构造仅子进程挂起的合成插件（parent_process() 判定 + sleep 999）+ 探针内补丁 PLUGIN_INIT_REPORT_TIMEOUT=1.5 → 1.5s 受控上抛 PluginLoadError(code=plugin_init_report_timeout)，任务零派发（out 目录无文档 json），与批次 19 设计声明一致
+- **探针方法论教训（spawn 重导入陷阱）**：首轮 guard 误写 __name__ in ("__main__","__mp_main__") → spawn 子进程引导期把整个探针重跑（输出三份）且子进程引导期已加载 hang 插件 → initializer 命中 memo 不睡 → E5 假阴性"NO ERROR"；改回标准 __name__ == "__main__" 后 E5 才真实触发。多进程探针必须用标准 main guard
+- 指示线候选累计：#1（test_contract_adoption_v1 空转守卫）、#2a-c（jsonlog 键覆盖/关闭泄漏/序列化失败丢事件）、#3a-b（plugin_loader 不回滚/重试错误码翻转）、**#4（batch 大小写 stem 静默覆盖）**；均只记录不自修
+- 探针产物（未入库）：probe_batch_r1910.py、probe-batch-r1910.out、probe-batch-r1910.err
+- 计数影响：0（纯探针轮，无测试增删；autonomous baseline 101645 不变）
+
+---
+
 ## Round 1909 — 1b/b 续：main app/plugin_loader.py 失败路径边角探针实证（Round 1909）
 - 目标：main `6c6d398ca9c` app/plugin_loader.py（批次 19；main 侧 27 测试全绿路径厚，失败路径以下五项 grep 实证零覆盖）；探针 outputs/autonomous/probe_plugin_loader_r1909.py（合成插件写系统临时目录 + sys.path 前插，main venv 子进程 + PYTHONPATH 指向 main 根 + PYTHONDONTWRITEBYTECODE=1，main worktree 零写入核验通过）
 - **边角 1 部分注册不回滚**：插件先 @register 再顶层 raise ValueError → PluginLoadError(plugin_import_failed, ValueError) 但 parser **仍留在注册表**（registered_names 实证 before=false after=true）——失败导入无注册回滚
