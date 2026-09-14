@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1855 — ipynb metadata 代理崩溃 + 忽略字段 + nbformat 浮点泄漏（Round 1855）
+- 动机：edges12/15 已锁 int language 与 minor 字符串透传——metadata 代理、忽略字段集合、nbformat 浮点 grep 零覆盖；source-int[edges10 已覆盖]、nbformat 字符串[edges12 TypeError 已覆盖]复核弃用
+- 探针：3 组探针（kernelspec language '\\ud800'、exec_count/outputs/id 类型违规、nbformat 4.7/nbformat "4"/minor "5"），断言全部来自实测输出
+- 结论 1：kernelspec language 含 '\\ud800' → 与 R1854 元素内容同型 **UnicodeEncodeError 穿透**（写盘失守不限元素通道）
+- 结论 2：execution_count="1" / outputs="notalist" / id="cell-1" 全部**静默忽略**——code cell 照发、零错误零告警
+- 结论 3：nbformat=4.7（浮点）**被接受**（版本门未拦）且 verbatim 进 metadata；nbformat="4" 字符串走 TypeError（unexpected_parser_error，已覆盖）
+- 新增：`tests/test_ipynb_surrogate_ignored_fields.py`（3 测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1854 — UTF-16 误判 NUL 保留 + ipynb 未配对代理写盘崩溃（Round 1854）
 - 动机：evaluation 侧 utf-16/surrogate 测试是标注 JSON 加载与指标层——**app 管线解析/写盘路径** grep 零覆盖
 - 探针：1 组复合探针（ASCII 的 UTF-16LE 字节流走 text 管线、ipynb 未配对 '\\ud800' 转义、合法 '\\ud83d\\ude00' 对照），断言全部来自实测输出
