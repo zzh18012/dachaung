@@ -89,11 +89,20 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1860 — chunker isspace 窗口切分机制 + R1859 误读修正（Round 1860）
+- 动机：R1859 'aaaa\r\n'×10 @40 的 '\r' 恰落上界 40，造成"硬切"误读；structural.py:64 代码核对为窗口 [max/2, max] 右起找 isspace()——本轮用**周期错开**输入实证，并同步修正 R1859 STATE 条目与测试 docstring（断言不变，均为实测行为）
+- 探针：'aa\r\n'×30、'aa\t'×30、('ab'+U2028)×30、多空格 28 字符 @40
+- 结论 1：'aa\r\n'×30 @40 → **恰 3 个 38 字符 chunk**（'aa\r\n'×9+'aa'）——切在窗口内最右 '\n'（39 位）非上界 40，'\r\n' 是合法切分点且被消费
+- 结论 2：'\t' 与 U+2028 同机制（38/38/11，末段 rstrip 剥尾随分隔符）——R1851 "惰性"措辞同因上界巧合需按机制理解（断言不受影响）
+- 结论 3：低于上限时多空格**逐字保留不折叠**（'xxxx'+10 空格+... 单 chunk 28 字符）
+- 新增：tests/test_chunk_ws_window_split.py（3 测试）；修正 test_pipeline_ipynb_crlf_chunks.py docstring + 本文件 R1859 条目
+- 状态：本地通过（3 passed + 修正文件 3 passed）
+
 ## Round 1859 — ipynb raw cell CRLF 保留 + chunk 硬切（Round 1859）
 - 动机：crlf_text_ipynb R1719 只锁 markdown cell '\r\n' 归一 '\n'——raw cell 逐字保留、chunk 层 '\r\n' 行为零覆盖；noscript/details/canvas/unquoted 属性/title/img-in-heading/空 td 复核全弃用（edges11/17/21/16/13/3 等已锁）
 - 探针：process_single ipynb 三组（raw cell 保留、'aaaa\r\n'×10 @40、双 cell 合并），chunk 断言逐字符来自实测
 - 结论 1：raw cell source "line1\r\nline2" → content **逐字保留**（与 markdown cell 归一 '\n' 形成 cell 类型不对称）
-- 结论 2：'\r\n' **不是 chunk 分隔符**——'aaaa\r\n'×10 @40 恰在 40 字符硬切（40/16），切点 '\r\n' 被消费，两半内部 \r\n 照留（与 R1851 普通 \n 分隔位切分对照）
+- 结论 2：'aaaa\r\n'×10 @40 切成 40/16 两 chunk，切点 '\r\n' 被消费，两半内部 \r\n 照留（R1860 修正：机制是 isspace 窗口回扫，'\r' 恰落上界 40 非硬切）
 - 结论 3：两 cell 合 chunk 用 ' ' 连接（'x\r\ny\r\nz tail'），cell 内 \r\n 不受影响，双元素 id 同 chunk
 - 新增：tests/test_pipeline_ipynb_crlf_chunks.py（3 测试）
 - 状态：本地通过（3 passed）

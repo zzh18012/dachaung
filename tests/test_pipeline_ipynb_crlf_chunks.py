@@ -1,13 +1,13 @@
-r"""ipynb raw cell CRLF 保留 + chunk 硬切边界（Round 1859）。
+r"""ipynb raw cell CRLF 保留 + chunk 边界消费（Round 1859）。
 
 新角度（probe 实证；crlf_text_ipynb R1719 只锁 **markdown cell**
 '\r\n' 归一 '\n'——raw cell 逐字保留与 chunk 层行为零覆盖）：
 - **raw cell 不归一**：source "line1\r\nline2" → content
   'line1\r\nline2' 逐字（与 markdown cell 归一形成 cell 类型
   不对称）
-- **\r\n 不是 chunk 分隔符**：'aaaa\r\n'×10 @40 → 恰在 40 字符
-  **硬切**（非分隔位切分），切点 '\r\n' 被消费，两半各自保留
-  内部 \r\n
+- **边界切分**：'aaaa\r\n'×10 @40 → 40/16 两 chunk，切点 '\r\n'
+  被消费，两半各自保留内部 \r\n（R1860 修正：切分机制是
+  isspace 窗口回扫——本输入 '\r' 恰落上界 40 处，非硬切）
 - **cell 间空格连接**：两 cell 合 chunk 用 ' '，cell 内部 \r\n
   照留（'x\r\ny\r\nz tail'，双元素 id）
 """
