@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1945 — a 续：PDF 未测压缩编码 JPX/CCITTFax/LZW——垃圾流三形态静默成功（3 测试）
+
+- 语境：edges91 锁 DCTDecode 垃圾、R1582 锁 DCTDecode 真图/CMYK/Decode、R1941 锁退化源；grep 实证 **JPXDecode/CCITTFaxDecode/LZWDecode 零覆盖**（含 /DecodeParms 形态）
+- 探针（outputs/autonomous/probe_codecs_r1945.py + PNG 尺寸复跑，未入库）实证——三形态同归**静默成功**（R1941"渲染放置区域、从不解码源数据"语义跨编码成立）：
+  - **J1 JPXDecode 垃圾**：16 字节噪声 + 声明 2x2 RGB → image 元素、srcsize [2,2]、真 PNG
+  - **J2 CCITTFax G4 垃圾**：/DecodeParms /Columns 2 /Rows 2 /K -1 → 同上
+  - **J3 LZWDecode 垃圾**：8 字节递减序列 → 同上
+  - 几何锚：放置 100pt@144dpi → PNG 尺寸恰 **200x200**（与 2x2 源阵不符——证明渲染的是放置区域）
+- 测试：`tests/test_parser_pdf_exotic_codecs_silent.py`（3 个共用断言；判别式：任一编码引入源解码/校验则零告警翻红；渲染改读源像素则 PNG 尺寸断言翻红）。3 passed
+- 计数影响：+3（R1925–R1945 累计 +65；下次全量预测 101660 + 65 = 101725）
+
+---
+
 ## Round 1944 — a 续：PDF 颠倒/镜像文本矩阵三形态——180° 整串倒序、镜像逐字散射（3 测试）
 
 - 语境：R1900 锁 90°（0 1 -1 0）倒序；edges107 锁 -90°（0 -1 1 0）；grep 实证 **180°（-1 0 0 -1）与镜像（-1 0 0 1 / 1 0 0 -1）零覆盖**
