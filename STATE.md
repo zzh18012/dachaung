@@ -97,6 +97,17 @@
 - 下次预测：101593 + 13（R1886–R1890：1+3+3+3+3）= 101606；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1895 — a 队列续：DOCX 合并单元格重复展开 + 嵌套表丢弃锁定（Round 1895）
+- 新颖性：grep 零覆盖（parser 测试无 gridSpan/vMerge/嵌套表），现实极常见（合并表头、嵌套布局）；探针三组实证，落点在 python-docx `row.cells` 语义 × `_parse_docx` :545-570 平铺不递归
+- **横向合并按跨度重复**：cell(0,0).merge(cell(0,1)) 后 `row.cells` 对每个网格列返回同一 cell → 合并文本 'TL\\nTR' 在 markdown 行出现两次（'| TL\\nTR | TL\\nTR |'）；合并自带 \\n 原样留在 md 里，破坏 markdown 一行一行的表结构；重复展开不改变 col_count（仍 2）
+- **纵向合并跨行重复**：vMerge 续行 `row.cells` 返回原 cell → 合并文本 'TOP\\nBOT' 在两个 markdown 行都出现——2×2 合一列后信息翻倍不丢
+- **嵌套表整体丢弃**：w:tc 里 add_table 的内表既不进 `c.text` 也不进 body.iterchildren（:463 只走直接子节点）→ 'inner cell' 无任何元素承载（R1889 sdt 丢弃同族，XML 形态不同；fork 早于主仓批次 14 的 w:tc sdt 递归提取，嵌套 tbl 是另一未修形态）
+- 新增：tests/test_parser_docx_merge_nested.py（3 测试；python-docx Table API merge/add_table 构造，无需裸 XML）
+- 计数影响：+3 测试；下次全量预测 101618 + 3（R1895）= 101621
+- 状态：已提交已推送
+
+---
+
 ## Round 1894 — a 队列续：混字号下段落分割中位数的交互锁定（Round 1894）
 - 新颖性：R1892 锁同字号 heights 的中位取法（上取 idx），R1893 证混合字号可融合——**混字号反过来如何改写分割阈值**仍 0 覆盖；探针三组判别式实证
 - **占到上取位即抬阈 3 倍**：heights [8,8,24,24] → idx2=24 → 阈 1.5×24=36——两个 24pt 词只要落在排序后半区就把阈值从纯 8pt 的 12 抬到 36：gap30 并（同号阈 12 必分）、gap37 分
