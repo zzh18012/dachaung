@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1878 — bq 内 img：kind 只保 img 前段（Round 1878）
+- 动机：R1877 锁 img 先行冲掉 heading/li 类型后查 blockquote kind——img 把 bq 文本切两段时 kind 归属零覆盖
+- 探针：四组（bq 文本-img-文本、bq img 先行、纯 img bq + 后续段、p img 先行对照）
+- 结论 1：'<blockquote>a<img ...>b</blockquote>' → paragraph 'a'（kind blockquote）+ image + paragraph 'b'（kind 丢失）——kind 不跨 img 存活，只保 img 前段
+- 结论 2：'<blockquote><img ...>q</blockquote>' → [image, paragraph 'q']——整段 kind 丢失（与 R1877 标题/列表退化同型）
+- 结论 3：纯 img bq → 仅 image，无空 bq 残留；后续 paragraph 'after' 正常
+- 新增：tests/test_parser_img_bq_kind_split.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1877 — img 先行时结构类型丢失：标题/列表项退化（Round 1877）
 - 动机：edges16:155 只锁 img 后置（'Text <img>' → heading 保留 + image）；img 先行（img 在文本前）形态零覆盖——先行 img 冲掉 pending 元素的结构类型
 - 探针：五组（img 先行 h1、img 先行 li、纯 img li、img 后置 li 对照、img 后置 h1 复核）
