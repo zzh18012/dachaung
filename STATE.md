@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1877 — img 先行时结构类型丢失：标题/列表项退化（Round 1877）
+- 动机：edges16:155 只锁 img 后置（'Text <img>' → heading 保留 + image）；img 先行（img 在文本前）形态零覆盖——先行 img 冲掉 pending 元素的结构类型
+- 探针：五组（img 先行 h1、img 先行 li、纯 img li、img 后置 li 对照、img 后置 h1 复核）
+- 结论 1：'<h1><img ...>T</h1>' → [image, paragraph 'T']——heading 类型丢失（后置形态保留，同文件对照）
+- 结论 2：'<li><img ...>text</li>' → [image, paragraph 'text']——list_item 类型丢失；纯 img li → 仅 image（无空 list_item）
+- 结论 3：'<li>text<img ...></li>' → [list_item 'text', image]——类型保留（先行/后置对照全景）
+- 新增：tests/test_parser_img_leading_degrade.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1876 — pre 剥两端 / fence 全逐字 / 标题内部多空格（Round 1876）
 - 动机：R1874/75 锁段落与 bq 两端剥后查"保留格式"语义面——pre 与 fence 对首行缩进处理不同（同族不同剥法），grep 零覆盖；edges17 只锁 fence 纯空白体
 - 探针：三组（pre 带两端空格、fence 带首行缩进、标题内部四空格）
