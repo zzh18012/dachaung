@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1852 — 无效 UTF-8 输入：三家族 errors=replace 静默替换、ipynb 报错（Round 1852）
+- 动机：grep 核实四家族解码失败路径全库零覆盖（fallback_edges 的 latin-1 是 PDF 构造字节非解码测试）
+- 探针：2 组探针（html/md/txt 非法字节 \\x80\\x83、ipynb 非法字节、截断多字节 '\\xe4\\xb8'），断言全部来自实测输出（GBK 控制台打印 U+FFFD 崩溃反证替换符存在）
+- 结论 1：html/md/text 对非法字节**照常成功**——errors=[]、文件照写、content 含 U+FFFD，无 warning 无 error record（read_text errors=replace 语义）
+- 结论 2：ipynb 非法字节 → `unexpected_parser_error` + **不写盘**（json.loads 字节流解码失败走通用错误通道）
+- 结论 3：3 字节 CJK 截断前缀 '\\xe4\\xb8'（缺尾字节）折叠为**单个** U+FFFD（与 '\\x80' 合计恰 2 个）
+- 新增：`tests/test_parser_invalid_utf8_replace.py`（3 测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1851 — chunker 对 unicode 分隔符的切分行为：惰性保留 + 家族对照（Round 1851）
 - 动机：edges9/10 只锁 _WHITESPACE_RE/normalize_text 的 RE 层、pipeline_line_separators 只锁 parser 层惰性——chunk **实际切分位置/逐字保留/尾分隔符剥除/家族对照**零覆盖
 - 探针：4 组探针（html U+2028@40、text FF@40、纯 FF 白空间@32、同内容 .md/.txt 对照；另复核 max_chars=8 落 32 下限[已覆盖弃用]），断言全部来自实测输出；初版 chunk2 对数误 9 修 8（probe len 26）
