@@ -16,6 +16,8 @@ import ast
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import pytest
+
 TESTS_DIR = Path(__file__).parent
 MAX_DUPLICATE_GROUPS = 2619
 MAX_REDUNDANT_FUNCTIONS = 6906
@@ -41,8 +43,17 @@ def _scan() -> tuple[defaultdict, list[str], list[str]]:
     return bodies, empty_files, dup_names
 
 
-def test_duplicate_test_bodies_below_ceiling():
-    bodies, _, _ = _scan()
+@pytest.fixture(scope="module")
+def scan() -> tuple[defaultdict, list[str], list[str]]:
+    """全套件 AST 扫描一次共享（R1904，f 队列）：此前三个测试各自
+    调 _scan()，同一 ~1900 文件扫描重复 3 次——全量回归 top-3 慢
+    测试 13.78/12.84/11.35s 共 ~38s 且随套件线性增长；fixture 化后
+    断言与测试名零变化。"""
+    return _scan()
+
+
+def test_duplicate_test_bodies_below_ceiling(scan):
+    bodies, _, _ = scan
     groups = sum(1 for c in bodies.values() if c > 1)
     redundant = sum(c - 1 for c in bodies.values() if c > 1)
     assert groups <= MAX_DUPLICATE_GROUPS, \
@@ -51,13 +62,13 @@ def test_duplicate_test_bodies_below_ceiling():
         f"redundant functions grew: {redundant} > {MAX_REDUNDANT_FUNCTIONS}"
 
 
-def test_every_test_file_has_tests():
-    _, empty_files, _ = _scan()
+def test_every_test_file_has_tests(scan):
+    _, empty_files, _ = scan
     assert empty_files == []
 
 
-def test_no_within_file_duplicate_test_names():
-    _, _, dup_names = _scan()
+def test_no_within_file_duplicate_test_names(scan):
+    _, _, dup_names = scan
     assert dup_names == []
 
 

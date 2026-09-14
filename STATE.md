@@ -105,6 +105,12 @@
 - 下次预测：101642 + 3（R1903）= 101645；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1904 — f 队列：harness 元测试三重全量扫描收敛为单次（Round 1904）
+- 起因：101642 基线漂移锚点触发后复查——durations top-3 全部是 tests/test_harness_health.py（13.78/12.84/11.35s，共 ~38s）：三个元测试各自调 `_scan()`（ast.parse + ast.dump 全部 ~1900 测试文件），同一扫描重复 3 次且随套件线性增长
+- 修复：module-scoped pytest fixture 共享一次 `_scan()`——测试名、断言、天花板常量（2619/6906）、语义零变化；定向验证 4 passed、单次扫描 12.49s（setup 计入首个用例）、三个消费用例 call 均 ~0.01s；全量回归 harness 成本 38s → ~12.5s
+- 计数影响：0（4 测试前后不变）；下次全量预测仍为 101645；下次全量 durations 预期：top-1 变为单条 ~12.5s 的 harness setup、其后回 2.56s CLI 条目——若仍见三条 harness call 即回退信号
+- 状态：已提交已推送
+
 ## Round 1903 — a 队列续：PDF 段落分割阈值精确等值 + 词级中位数锁定（Round 1903）
 - 新颖性：grep 零覆盖——既有行距测试全部远离边界（test_parsers_fallback.py :219 行距 2 / :231 行距 88；R1894 gap 30/37 vs 阈 36、11/15 vs 阈 12 均不命中等值），`>` 改 `>=` 所有现存测试仍绿（mutation 存活）。探针实证（`_group_words_to_paragraphs` :149 严格大于、:139-140 median 逐 word 收集）
 - **等值合并**：h=10 词 median=10 阈 15；gap 25-10=15.0 恰等 → **不拆**（严格 >）1 段 'w1 w2'；15.1 恰超 → 拆 2 段（边界恰在 15.0）
