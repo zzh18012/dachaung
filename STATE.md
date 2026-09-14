@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1882 — md 独立图片行段落冲刷 + 链接包裹不中断（Round 1882）
+- 动机：html 侧 img/hr 冲刷家族（R1877–R1881）已饱和；md 对偶零覆盖——edges2:929 只锁段落被独立图片行中断的 before 侧，after 侧文本去向与 `[![alt](img)](url)` 链接包裹形态 grep 全零（现有 img 测试全是相邻/空行分隔/bq、li 包裹形态）。机制来源 markdown_parser.py:313 段落累积循环把独立图片行列为中断条件，:48 `_STANDALONE_IMAGE_RE` 要求行首 `![`
+- 探针：'para\n![alt](i.png)\nafter' → [paragraph 'para', image alt 'alt', paragraph 'after']；'para\n[![alt](i.png)](u.com)\nafter' → 单 paragraph 三行合并（内容保留 \n）；'a\n![i](1.png)\nb\n![j](2.png)\nc' → 段/图/段/图/段五元素
+- 结论 1：图片后文本冲刷为独立段落（不与 before 侧合并）——md 版"img 中断结构"语义
+- 结论 2：`[` 开头的链接包裹图片行不匹配独立图片正则，被段落吸收（连续段落合并保留换行）——与 edges15 行内嵌图字面同因（非整行独立），但位置类不同（行首被链接包裹 vs 行中嵌入）
+- 结论 3：交替链五元素证明中断规则对称可重复，无状态残留
+- 新增：tests/test_parser_md_img_para_flush.py（3 测试）
+- 状态：已提交已推送
+
 ## Round 1881 — hr 冲刷结构类型：heading/li/bq 后段退化（Round 1881）
 - 动机：edges2:424/edges3:455 只锁 hr 不产生 element 与 only-hr 告警；hr 在结构元素内部的冲刷零覆盖——与 R1877/78 img 同族但 hr 自身无 image 产出
 - 探针：五组（h1/li/bq 内 hr、hr 在 p 间复核、lone hr 复核）
