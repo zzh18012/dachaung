@@ -114,6 +114,18 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1922 — a 续：网格表 PDF 页端到端 chunk 组成——表内文本污染正文块（3 测试）
+
+- 语境：R1888 锁 parser 级双重提取、R1919/1920 锁相位序、R1765 锁 markdown 纯图零 chunk、R1829 锁 markdown pipe 表邻接三块型——**真实网格表 PDF 页的 pipeline 级级联**（相位序→双重提取→heading 判类→chunker 硬边界）零覆盖。前沿排查本轮又排除：表内图/页眉图（edges16 已锁）、w:pict（edges38）、TJ/Tm/Tc 算子家族（edges56 等）、/Rotate（edges101/107）、横版页（edges110）、文本序来源（edges23/44/56/71）、图片元素无 chunk（R1765 markdown 家族级锁定）
+- 探针（outputs/autonomous/probe_chunkcompose_r1922.py，未入库；process_single write_json=False）三发现：
+  - **C1 表内文本污染正文块**：网格表+正文页 → 恰 **2** chunk——表内文本双重提取为 heading（文档首元素）后与正文段落**融合进同一 sequential 块**（'AA BB This body line…'）——heading 硬边界只封口**前**块，文档开头 heading 无前块可封
+  - **C2 双表页四块型**：[A表内文+正文 seq, B表内文 seq, 表A iso, 表B iso]——第二组表内文本 heading 才封口前块；两 isolated_table 保持几何上下序
+  - **C3 图片元素零 chunk**（PDF 路径同 markdown 家族规则，不另锁）
+- 测试：`tests/test_pipeline_grid_table_chunks.py`（3 个，含**双重提取下不丢不重仍成立**的不变式断言——表内文本在 elements 与 chunks 各出现两次，normalize_text 拼接相等）。3 passed
+- 计数影响：+3（R1919–R1922 累计 +12；下次全量预测 101645 + 12 = 101657）
+
+---
+
 ## Round 1921 — a 续：PDF 离页/越界图片渲染语义——失败不占号 + 钳制渲染（3 测试）
 
 - 语境：R1896 锁零宽静默跳过、edges3 用 monkeypatch 锁单图 render 失败；本轮全部**真实 PDF 路径**（合成 XObject 放置，零 monkeypatch）补三缺口。探针 outputs/autonomous/probe_offpage_r1921.py 四假设全实证：
