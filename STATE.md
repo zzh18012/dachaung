@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1874 — md 段落空白：内部行缩进保留 / 两端剥 / 缩进行非代码（Round 1874）
+- 动机：text 解析器同型已锁（R1713 'a\n b' 行首空格保留 + text_edges8 内部缩进保留/两端剥），md 侧三类形态零覆盖；CommonMark 缩进代码块在此实现不存在——4 空格/tab 缩进行退化为剥净 paragraph
+- 探针：六组（内部缩进、两端空格、4 空格整行、tab 整行、段间缩进行、列表深缩进续行对照）
+- 结论 1：'a\n    b' → paragraph 'a\n    b'（第二行 4 空格原样保留，不是 code_block）
+- 结论 2：'  a\nb  ' → 'a\nb'（块级 strip 仅剥边界，内部行不受影响）
+- 结论 3：'    code' 与 '\tcode tab' → paragraph 'code'/'code tab'（缩进剥净退化成段，无缩进代码语义；与 R1834/35 缩进围栏/标题退化同族）
+- 新增：tests/test_parser_md_para_ws_round.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1873 — section_path 分隔符碰撞：标题内容含 ' > '（Round 1873）
 - 动机：R1872 锁实体解码入路径后查分隔符碰撞——解码出的 ' > ' 与路径分隔符 ' > ' 同形，路径歧义从未锁定（grep '&gt;' 进标题 + 路径断言零覆盖）
 - 探针：四组（html 实体 h1+h2、md 字面同构、双重碰撞、fence/bq 路径对照）
