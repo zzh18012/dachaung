@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1861 — 实体 \r 存活 chunk 切分 + 孤立 \r 转 \n + md 字面 forced 切（Round 1861）
+- 动机：组合空白——R1856 只锁 parser 层实体控制符、R1858 只锁 CRLF 剥离与 tags 间裸 CR 计行；实体 \r 进 chunker、孤立源 \r 在**文本内容里**的形态、md 实体字面长文切分零覆盖；表格空 tr/colspan/th-only（edges9/12/18/20）、句子切分（edges 全锁）复核弃用
+- 探针：三组对照（html 实体 CR×30 @40、html 孤立 \r、md 实体字面 ×30 @40）
+- 结论 1：html 'ab&#xD;'×30 → content 'ab\r'×29+'ab'（89），@40 切 38/38/11——**实体解码产物绕过源级 CR 归一化**且 \r 作 isspace 切分点
+- 结论 2：'<p>a\r b</p>' → content 'a\n b'——文本内孤立 \r 归一成 **\n**（非剥离；CRLF→\n 之外的第三种形态）
+- 结论 3：md 'ab&#xD;'×30 → 210 字符 paragraph **原样字面**（md 不解实体），无空白 → forced_char 恰 40 硬切（5×40+10），第二段 'D;ab' 开头（**实体中间被切**）
+- 新增：tests/test_pipeline_entity_cr_chunk.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1860 — chunker isspace 窗口切分机制 + R1859 误读修正（Round 1860）
 - 动机：R1859 'aaaa\r\n'×10 @40 的 '\r' 恰落上界 40，造成"硬切"误读；structural.py:64 代码核对为窗口 [max/2, max] 右起找 isspace()——本轮用**周期错开**输入实证，并同步修正 R1859 STATE 条目与测试 docstring（断言不变，均为实测行为）
 - 探针：'aa\r\n'×30、'aa\t'×30、('ab'+U2028)×30、多空格 28 字符 @40
