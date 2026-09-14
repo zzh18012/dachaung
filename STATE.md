@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1857 — markdown CRLF 全面归一化（Round 1857）
+- 动机：grep 核实 '\r' 测试只在 text/kreuzberg/fallback/chunker/evaluation 侧，markdown 结构性 CRLF 全库零覆盖（Windows 记事本风格 .md 真实形态）；同轮复核 img-in-pre 拆段（R1678 已锁）、重复属性（edges3）、script/template（多轮已锁）、attachments（edges10/12）、未知 cell_type（ipynb 多轮已锁）全部弃用
+- 探针：MarkdownParser 两组 10 个输入 + LF 基线对照（setext 'H\n===' LF 也是合并段落，无 CRLF 专属退化）
+- 结论 1：heading/list/fence/bq/table 的 '\r' **全部剥离**，行定位正确（body line 3、第二 list_item line 2）、table 内容 '\n' 归一连接
+- 结论 2：EOF 裸 CR（'# H\r' 无 \n）→ heading 'H'；'---\r\n' 仍判 thematic break 零元素；'H\r\n---\r\n' → 仅 paragraph 'H'
+- 结论 3：'H\r\n===\r\n' → paragraph 'H\n==='——setext 本就不支持，与 LF 行为逐字一致（CRLF 零结构劣化）
+- 新增：tests/test_parser_md_crlf_normalized.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1856 — 数字实体三向分裂：静默丢弃 / 字面控制符 / U+FFFD（Round 1856）
 - 动机：img-in-pre 拆段复核弃用（R1678 test_img_breaks_pre 已全锁含尾段 kind 丢失）、'&#0;'→FFFD 弃用（wsli_nullentity 已锁）——grep 核实 '&#1;'/'&#x10FFFF;'/'&#9;'/'&#10;'/'&#xD;'/'&#xD800;' 全库零覆盖
 - 探针：HtmlParser 六组 + html.unescape 直测对照（丢弃/FFFD 分裂来自 stdlib _invalid_charrefs/_replace_charref，parser 纯透传）
