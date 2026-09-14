@@ -114,6 +114,18 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1920 — a 续：PDF 三相位全序 + 图片序来源（内容流序）+ 页序压倒相位序（3 测试）
+
+- 语境：R1919 锁段落→表格两相位；本轮补第三相位（图片）。DOCX 交错文档序对照角度放弃——edges4 :747 / edges9 :99 已锁 ["paragraph","table","paragraph"]
+- 探针（outputs/autonomous/probe_phase3_r1920.py，未入库；复用 R1896 图片 PDF 构造器 + R1919 grid 帮助函数，tmp_path 落盘）三假设全实证：
+  - **Q1 三相位全序**：同页图顶（bbox top≈12）/表中（≈292）/文底（≈682）→ [heading(表内文本), paragraph, table, image]——图片最后发射，元素序与几何序完全倒置
+  - **Q2 图片元素序 = 内容流序**：底图先画、顶图后画 → 底图（top 642）是第一个 image 元素拿 _p1_00，顶图（top 92）拿 _p1_01——page.images 按内容流序返回，无几何排序（R1896 顶图先画，两序不可分，本轮判别式落定）
+  - **Q3 页序压倒相位序**：页 1 文+图、页 2 表 → [paragraph(p1), image(p1), heading(p2), table(p2)]——页 1 的 image 先于页 2 的 table；"图片页内最后"非"全局最后"
+- 测试：`tests/test_parser_pdf_phase3_order.py`（3 个；判别式 = images 循环挪前则三测全红、page.images 改几何排序则 Q2 翻红）。新 3 + R1919 3 + R1896 3 = 9 passed 无回归
+- 计数影响：+3（累计 R1919+R1920 = +6；下次全量预测 101645 + 6 = 101651）
+
+---
+
 ## Round 1919 — a 队列回归：PDF 页内元素发射顺序（相位序压倒几何序）（3 测试）
 
 - 语境：1b/b 已尽（批次 16–25 全模块探针完毕）、1b/f 八维度齐——按队列序转 a（R1903 以来首批加测轮）。前沿排查：chunker（16 文件）/HTML（23）/ipynb（15）/md（21）/text（13）/evaluation schema（154）/report（100+）/fallback 函数级（题注正则、_is_heading_style、_rows_to_markdown、_image_filename、段落分割阈值/中位数/漂移链/混字号 R1892–R1903）grep 全饱和；新角度 = `_parse_pdf` **页内三阶段发射顺序**（段落→表格→图片循环 :260/:291/:330，与几何位置无关）——grep 零覆盖（无任何 paragraphs-before-tables 顺序断言）
