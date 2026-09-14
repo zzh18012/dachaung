@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1880 — br 在结构元素里：文本流变空格、表单元格内丢弃（Round 1880）
+- 动机：edges.py:423 只弱断言 p 内 br（any 命中）；heading/li/bq/pre/td 内 br 的精确内容与 img 冲刷对照零覆盖
+- 探针：五组（h1/li/bq 内 br、td 内 br、pre 内 br）
+- 结论 1：'<h1>a<br>b</h1>' / '<li>a<br>b</li>' / '<blockquote>a<br>b</blockquote>' → 单元素 'a b'——br 变空格不冲刷（与 R1877/78 img 的类型丢失形成对照）
+- 结论 2：'<td>a<br>b</td>' → 单元格 'ab'——br 在表单元格累积里零贡献（无空格直接拼接）
+- 结论 3：'<pre>a<br>b</pre>' → 'a b' kind preformatted（pre 内 br 同为空格，不保留行结构）
+- 新增：tests/test_parser_br_structural.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1879 — img 在表行间静默丢弃 + image 承接 section_path（Round 1879）
 - 动机：R1877/78 锁 img 冲刷结构类型后查表行间位置与路径承接——'<tr>a</tr><img><tr>b</tr>' 与 image.section_path grep 零覆盖
 - 探针：三组（行间 img、连续双 img、h1 内 img flush + 后续段）
