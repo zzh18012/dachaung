@@ -114,6 +114,17 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1907 — 1b/f 续：main 全量运行时基线 + 重复组归属 + 无断言全量分类（Round 1907）
+- **main-target 运行时基线首记 @ 6c6d398ca9c**：只读全量（`PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -m pytest -p no:cacheprovider --durations=25 -q`，cwd = main worktree，输出直写 outputs/autonomous/main-pytest-r1907.log）→ **5485 passed + 4 skipped（docker e2e 本地无 daemon），63.71s，exit 0**；durations top-25 全 ≤1.04s（最慢为 pipeline/evaluation/plugin CLI 端到端子进程带），无耗时异常；跑后 main `git status` 空——零写入边界核验通过
+- 静态 vs 运行时口径：顶层 test 函数 5088 vs 收集 item 5485（+397 = parametrize 展开 + 类方法），差异记录在案
+- **重复组归属**（一次性行析 outputs/autonomous/main_dup_attrib_r1907.py）：139 组 / 219 冗余实例**全部**在 merge-base 时代已存在的 10 个旧名文件内（这些文件此后被 main 大幅扩写）；121 新增文件 added-only 0、cross 0——main 新增测试零重复贡献；后续清理候选应定位到旧文件内的 main 扩写部分
+- **无断言 32 条全量分类**：31 条合法（validate/validate_udm"不抛即过"29 条 + parser close/reset 幂等不抛 2 条）；**1 条空转守卫**——tests/test_contract_adoption_v1.py::test_new_locators_required_fields：`try: validate(doc); raise AssertionError("...should fail") except Exception: pass`——守卫 raise 被自身 except Exception 吞掉，永不失败（markdown 缺 line / ipynb cell_type 非法两段同构）
+- **语义前提探针（main venv 只读子进程）**：`validate(_doc('markdown', {'page': 1}))` 实测 **SchemaValidationError（'family' is a required property @ elements[0].source_locator）**——schema 确实拒绝坏 locator，测试前提成立，缺陷纯为守卫结构（修复 = except 收窄 SchemaValidationError 或改 pytest.raises，修后行为不变仍绿），低风险
+- **指示线候选 #1（不在自跑线实施）**：上条空转守卫修复（两段同构一并修）；修复后测试才真正具备"坏 locator 必须被拒"的断言力
+- 审计产物（未入库）：main-pytest-r1907.log、main_dup_attrib_r1907.py、main-dup-attrib-r1907.txt
+- 计数影响：0（autonomous baseline 101645 不变）；main-target 基线双记录齐备（静态 R1906 + 运行时 R1907 @ 6c6d398），main SHA 变化才开新对照周期
+- 状态：已提交已推送
+
 ## Round 1906 — r54 裁决登记 + 协议 v3 生效 + 1b/f 首轮：main 侧测试质量审计基线（Round 1906）
 - 裁决（R54 AUTONOMOUS STRATEGY RATIFIED，指示线台账 §131）：方向 1 整体合入 origin/main 否决、1a 分批合入暂缓、**1b 跨 worktree 只读测试批准**（子进程 + 独立 venv + 显式目标 SHA）并与方向 4（main 侧测试质量审计）合并为新长期队列；方向 2 real-* 常设授权不授予；方向 3 静默待触仅空闲策略；队列序 **1b/f → 1b/b → a → e**；"合入不改 app 代码"解释不作为无人值守合入授权依据
 - 协议 v3 写入 AUTONOMOUS_LOOP.md 顶部（队列序、1b 边界、基线双轨、持续纪律）——r53 一次性协议文件例外延伸（协议持久化用途）
