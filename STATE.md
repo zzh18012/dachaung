@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1858 — html CRLF 内容剥离 + 裸 CR 计行（Round 1858）
+- 动机：R1857 锁 md 侧；html 侧 edges:380/392 只断言**元素个数**，内容级 '\r' 剥离/行定位数值/裸 CR 计行零覆盖；ipynb CRLF 复核弃用（crlf_text_ipynb R1718 已锁 source 字符串与列表 '\r\n' 保留）
+- 探针：HtmlParser 六组（段落内容/行号、裸 CR、table cell、img alt、pre）
+- 结论 1：'<p>a\r\nb</p>' → content 'a\nb'——'\r' 从内容剥离；行定位 CRLF 按**单行**计（P2 line 4 非第五行），section_path 'T' 照常传播
+- 结论 2：裸 '\r'（无 \n）分隔也推进行号——x/y 各 line 1/2
+- 结论 3：table cell（'| a\nb |\n| --- |'）、img alt（'a\nb'）、pre（kind preformatted 'a\nb'）三通道同步归一——html 全局 \r 清除与 ipynb 逐字保留形成 parser 间不对称
+- 新增：tests/test_parser_html_crlf_stripped.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1857 — markdown CRLF 全面归一化（Round 1857）
 - 动机：grep 核实 '\r' 测试只在 text/kreuzberg/fallback/chunker/evaluation 侧，markdown 结构性 CRLF 全库零覆盖（Windows 记事本风格 .md 真实形态）；同轮复核 img-in-pre 拆段（R1678 已锁）、重复属性（edges3）、script/template（多轮已锁）、attachments（edges10/12）、未知 cell_type（ipynb 多轮已锁）全部弃用
 - 探针：MarkdownParser 两组 10 个输入 + LF 基线对照（setext 'H\n===' LF 也是合并段落，无 CRLF 专属退化）
