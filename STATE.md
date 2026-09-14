@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1868 — 缩进闭合围栏 + 短围栏闭长围栏（Round 1868）
+- 动机：读 markdown_parser.py:217 发现闭合判定是 `lines[i].strip().startswith(fence[0]*3)`——strip 后纯前缀匹配；既有测试只锁缩进开栏失效（edges12）与规整闭合，缩进闭栏全库零覆盖；edges12 的 3闭4 仅双围栏构造隐式覆盖（test 名还叫 longer_close_reopens_empty）
+- 探针：六组（空格/tab/6空格缩进闭合、缩进闭合携 junk、4开3闭隔离形态、tilde 4开3闭）
+- 结论 1：'   ```' / '\t```' / '      ```' 照常闭合（CommonMark 只允许闭栏前 ≤3 空格，此实现任意缩进都吃）
+- 结论 2：'  ``` junk' 闭合且 'junk' 静默丢弃，零 warning（R1867 结论 2 的缩进加强版）
+- 结论 3：'````py' 开栏被 '```' 闭（短闭长，偏离 CommonMark）——隔离形态 + language 'py' + tail 段落独立锁定；与 R1867 结论 3（长闭短，合规）合成围栏长度不对称全景
+- 新增：tests/test_parser_fence_indented_close.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1867 — 闭合围栏容忍：尾随空白 / 携带 info / 更长围栏（Round 1867）
 - 动机：R1865 锁开栏 info 前导空白后查闭合侧——grep 实证 '```extra'/'`````'/'``` '（尾随空白闭合）全库零覆盖，既有围栏测试只锁规整 '```' 闭合
 - 探针：五组（尾随空格/尾随制表符/携带 info/5 反引号闭合/规整闭合对照）
