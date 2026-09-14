@@ -123,7 +123,7 @@
 
 ## Round 1927 — a 续：DOCX 嵌套表静默不可见性（3 测试）
 
-- 语境：edges33 锁 cell 内图片不可见、Batch 3 锁 w:tc 内嵌 w:sdt 递归提取；**cell 内嵌套表**（cell.add_table）grep 零覆盖
+- 语境：R1895 已锁 parser 级合并重复 + 嵌套表丢弃（元素序/无承载）；edges33 锁 cell 内图片不可见、Batch 3 锁 w:tc 内嵌 w:sdt；本轮补锁的是 **pipeline 级 chunk 级联**（[seq, isolated_table, seq] + isolated 文本恰表格 markdown）与**外层 cell 精确序列化**（'| BL |  |'）+ 零告警断言——grep 嵌套表 chunk 组成零覆盖
 - 探针（outputs/autonomous/probe_nestedtable_r1927.py，未入库）三假设全实证：
   - **N1 嵌套表不成独立元素**：body 顶层只有一个 w:tbl → 元素序 [paragraph, table, paragraph]
   - **N2 嵌套表文本完全不可见**：NESTEDLEFT/NESTEDRIGHT 不出现在任何元素；零告警（纯静默丢失，与脚注家族同型）
