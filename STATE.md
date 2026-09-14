@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1853 — 文件中段 BOM：内容逐字保留、行首杀标题、BOM-ipynb 报错（Round 1853）
+- 动机：cross_edges3 只锁文件起始 BOM 三种劣化——中段 BOM（内容级/行首级/BOM 前缀 ipynb）grep 全库零覆盖
+- 探针：3 组探针（html/md/txt 中段内容 BOM、md 行首 BOM 杀标题、合法 JSON 加 BOM），断言全部来自实测输出
+- 结论 1：中段内容 BOM（'a\\ufeffb'）在 html/md/txt 全部**逐字保留**、零错误零剥离，md 其他块标题识别不受影响
+- 结论 2：行首 BOM（非文件首）杀标题——'\\ufeff# Head' 成字面段落（line 3），与文件首劣化同型但位置任意
+- 结论 3：合法 JSON 加 BOM 前缀 → `ipynb_invalid_json` + 不写盘——与 R1852 原始非法字节的 `unexpected_parser_error` 是**不同错误码**（JSONDecodeError 被 ipynb 专属通道捕获）
+- 新增：`tests/test_parser_midfile_bom.py`（3 测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1852 — 无效 UTF-8 输入：三家族 errors=replace 静默替换、ipynb 报错（Round 1852）
 - 动机：grep 核实四家族解码失败路径全库零覆盖（fallback_edges 的 latin-1 是 PDF 构造字节非解码测试）
 - 探针：2 组探针（html/md/txt 非法字节 \\x80\\x83、ipynb 非法字节、截断多字节 '\\xe4\\xb8'），断言全部来自实测输出（GBK 控制台打印 U+FFFD 崩溃反证替换符存在）
