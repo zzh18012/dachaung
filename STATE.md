@@ -114,6 +114,17 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1908 — 1b/b 首轮：main app/jsonlog.py 三个零覆盖边角探针实证（Round 1908）
+- 目标：main `6c6d398ca9c` app/jsonlog.py（批次 17；main 侧 test_jsonlog.py 13 测试 grep 实证以下三项零覆盖）；探针 outputs/autonomous/probe_jsonlog_edges_r1908.py（main venv 子进程 + PYTHONPATH 指向 main 根 + PYTHONDONTWRITEBYTECODE=1；日志全部写系统临时目录，main worktree 零写入核验通过）
+- **边角 1 不可序列化 extra**：extra 值为 set → 调用方零异常，但该事件**从日志文件静默丢失**（前后事件正常落盘，文件 2 行不含 evt_bad），stderr 出现 logging "--- Logging error ---" 完整 traceback 噪声——事件丢失 + stderr 噪声双面；批次 17 已知限制清单未列此项
+- **边角 2 下划线 extra 键**：`_private` 被静默剥离、`public` 保留（源码 not startswith 下划线的有意设计，characterize 确认）
+- **边角 3 输出三键可被 extra 覆盖**：同名 extra 键 timestamp/level/event 直接覆盖构造值（实测 timestamp=0 / level=FAKE / event=fake_event）——三键不在保留属性集内（LogRecord 标准属性不含它们），调用方可伪造 level/event 字段
+- **附带发现（探针首跑 PermissionError 实证）**：setup_logger 重复调用 handlers.clear() 不先 close()——被替换 FileHandler 依赖 GC 兜底关闭，Windows 上存在不确定文件锁窗口；单次调用的 handler 由 logging 注册表持有到进程结束，同进程不显式 close 会锁住日志文件
+- **指示线候选 #2（不在自跑线实施）**：(a) 输出三键加入保留集或显式拒绝同名 extra；(b) setup_logger 清 handler 前先 close()；(c) 不可序列化 extra 的处置裁决（default=str 降级，或保留现状但把"事件丢失"补进批次 17 已知限制）
+- 探针产物（未入库）：probe_jsonlog_edges_r1908.py、probe-jsonlog-r1908.out、probe-jsonlog-r1908.err
+- 计数影响：0（autonomous baseline 101645 不变）
+- 状态：已提交已推送
+
 ## Round 1907 — 1b/f 续：main 全量运行时基线 + 重复组归属 + 无断言全量分类（Round 1907）
 - **main-target 运行时基线首记 @ 6c6d398ca9c**：只读全量（`PYTHONDONTWRITEBYTECODE=1 .venv/Scripts/python.exe -m pytest -p no:cacheprovider --durations=25 -q`，cwd = main worktree，输出直写 outputs/autonomous/main-pytest-r1907.log）→ **5485 passed + 4 skipped（docker e2e 本地无 daemon），63.71s，exit 0**；durations top-25 全 ≤1.04s（最慢为 pipeline/evaluation/plugin CLI 端到端子进程带），无耗时异常；跑后 main `git status` 空——零写入边界核验通过
 - 静态 vs 运行时口径：顶层 test 函数 5088 vs 收集 item 5485（+397 = parametrize 展开 + 类方法），差异记录在案
