@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1947 — a 续：PDF 图像透明蒙版三形态——SMask 兑现摊平、色键抠黑、悬空蒙版忽略（3 测试）
+
+- 语境：grep 实证 /SMask 与 /Mask 零覆盖；R1936 锁 /ImageMask 模板（图本身即蒙版）——**基图附属透明蒙版**零覆盖
+- 探针（outputs/autonomous/probe_smask_r1947.py + 象限像素复跑，未入库；Windows 下 PIL 句柄占文件 → BytesIO 读取修正）实证（基图 2x2 全黑 + 100pt 放置 → 200x200 PNG 四象限采样）：
+  - **S1 软蒙版兑现后摊平**：/SMask 灰度 1bit \xa5 → 恰 TL 黑、其余白——alpha 摊平底色（PNG mode **RGB 非 RGBA**）；SMask 子图不放置不成元素；零告警
+  - **S2 色键蒙版抠黑**：/Mask [0 64]³ + 全黑源 → 四象限全白；零告警
+  - **S3 悬空 SMask 忽略**：/SMask 99 0 R → 照发元素、四象限全黑（蒙版缺失当无蒙版；对照 R1939 悬空**放置**静默跳过——悬空**蒙版**不跳基图）、零告警
+- 测试：`tests/test_parser_pdf_image_masks.py`（3 个，自建 7 对象+xref 构造器；判别式：渲染不兑现蒙版则 S1/S2 像素翻红；悬空蒙版加校验则 S3 零告警翻红；alpha 保留则 mode RGB 断言翻红）。3 passed
+- 计数影响：+3（R1925–R1947 累计 +71；下次全量预测 101660 + 71 = 101731）
+
+---
+
 ## Round 1946 — a 续：DOCX 位图格式透传——JPEG/TIFF 原始字节直存、ext 由 partname 决定（3 测试）
 
 - 语境：grep 实证 test_parser_docx* / test_pipeline_docx* 全部 PNG——**JPEG/TIFF 位图格式零覆盖**
