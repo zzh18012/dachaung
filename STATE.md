@@ -114,6 +114,23 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1911 — 1b/b 续：main markdown_enhanced.py 九个零覆盖边角探针实证（Round 1911）
+- 目标：main `6c6d398ca9c` app/parsers/plugins/markdown_enhanced.py（批次 18 参考插件；main 侧仅 test_parser_registry.py 205-251 四测试：平铺标量/嵌套列表跳过/未闭合/任务元数据）；探针 outputs/autonomous/probe_mdenhanced_r1911.py（直接调用 MarkdownEnhancedParser().parse，main venv 子进程 + PYTHONPATH 指向 main 根 + PYTHONDONTWRITEBYTECODE=1，夹具全写系统临时目录，main worktree 零写入核验通过）
+- **F4 frontmatter 键 markdown 反杀插件标记（指示线候选 #5）**：metadata 构造为 {"markdown": True, **frontmatter} → frontmatter 写 `markdown: false` 即把插件自身布尔标记覆盖为字符串 "false"（类型 True→str）——与候选 #2a（jsonlog 输出键被 extra 覆盖）同缺陷类：内部保留键无保护
+- **F2 重复键静默覆盖**：`k: first` + `k: second` → metadata.k="second"、警告列表空——后值胜且零警告（完整 YAML 会对重复键报错；受限解析未记 frontmatter_dup_key 类警告）
+- **F7 非 UTF-8 静默降级**：含 0xFF 0xFE 字节的文件 → errors="replace" 路径生效、正常解析，但**警告列表为空**（无 encoding_replaced 类警告）——静默替换路径无观测信号
+- **F6 任务列表边角**：[X] 大写 → checked=True（大小写不敏感 ✓）；`[x]nospace`（] 后无空白）→ 不识别为任务、原样保留（正则要求 \s+，与 GFM 严格口径一致）；`- []` 空括号 → 不识别 ✓；**有序列表 `1. [x] 任务` → 可识别为 task_item**（模块 docstring 只写 `- [ ]`/`- [x]` 前缀，有序列表能力未载于文档——行为合理但属未声明行为）
+- **F1 引号剥离**：对称双引号/单引号均剥一层；不对称 `"mixed'` 保留原样；`d: ""` 剥后为空 → 该键被 skip（值跳过路径，与文档一致）
+- **F3 键字符集**：带点键 `a.b: v` 与行首缩进行 → 均 frontmatter_line_skipped（受限键正则 [A-Za-z0-9_-]+），合法键并存不受影响
+- **F5 frontmatter-only 文件**：0 elements + md_no_content 警告 + title 正常入 metadata（空 body 语义与空文件一致）
+- **F8 无后缀文件**：直呼 parse → ParserError(unsupported_type)，消息后缀位显示"(无)"；**F9 .markdown 后缀**：正常受理（elements=1, parser=markdown_enhanced）
+- 探针输出中文消息在重定向 .out 文件呈 GBK 乱码（已知控制台编码陷阱，事实字段 type/code 完好，无害）
+- 指示线候选累计：#1、#2a-c、#3a-b、#4（batch 大小写 stem 静默覆盖）、**#5（markdown_enhanced frontmatter 反杀内部标记）**；均只记录不自修
+- 探针产物（未入库）：probe_mdenhanced_r1911.py、probe-mdenhanced-r1911.out/.err
+- 计数影响：0（纯探针轮；autonomous baseline 101645 不变）
+
+---
+
 ## Round 1910 — 1b/b 续：main app/batch.py 七个零覆盖边角探针实证（Round 1910）
 - 目标：main `6c6d398ca9c` app/batch.py（批次 16+19+25，463 行，main 侧 test_batch_parse.py 仅 12 测试）；探针 outputs/autonomous/probe_batch_r1910.py（main venv 子进程 + PYTHONPATH 指向 main 根 + PYTHONDONTWRITEBYTECODE=1，全部产物写系统临时目录，main worktree 零写入核验通过：git status 空、HEAD 6c6d398 不变）
 - **E1 auto 路由观测**：effective_parser_for 实测 auto+pdf/docx→"fallback"、auto+md→"markdown_enhanced"（priority 5 胜出内置 markdown）、auto+未知扩展→"fallback" 回落（worker 侧再报 unsupported_type）、显式非 auto/fallback 名原样透传（markdown+.pdf 也放行，靠 worker 结构化失败兜底）
