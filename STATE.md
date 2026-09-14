@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1869 — fence info 字符类边界：空格级联 / CJK / 大写与连字符（Round 1869）
+- 动机：_FENCED_RE info 类是 `[\w+-]*`；edges8:258 只锁 RE 级 '```python 3' m is None，parse 级联与 CJK/大写形态全库零覆盖
+- 探针：四组（info 含空格、CJK、大写、连字符）
+- 结论 1：'```python 3' 开栏行不匹配 → '```python 3\nx=1' 合并 paragraph，行尾 '```' 反而开栏到 EOF → md_empty_code_block（非围栏行级联后果）
+- 结论 2：'```中文' → language '中文'（Python re 的 \w 含 CJK，逐字保留）
+- 结论 3：'```PY' → 'PY' 原样（无小写归一）；'```py-3' → 'py-3'（'-' 在字符类，与 edges4 的 c++ '+' 合成全景）
+- 新增：tests/test_parser_fence_info_charclass.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1868 — 缩进闭合围栏 + 短围栏闭长围栏（Round 1868）
 - 动机：读 markdown_parser.py:217 发现闭合判定是 `lines[i].strip().startswith(fence[0]*3)`——strip 后纯前缀匹配；既有测试只锁缩进开栏失效（edges12）与规整闭合，缩进闭栏全库零覆盖；edges12 的 3闭4 仅双围栏构造隐式覆盖（test 名还叫 longer_close_reopens_empty）
 - 探针：六组（空格/tab/6空格缩进闭合、缩进闭合携 junk、4开3闭隔离形态、tilde 4开3闭）
