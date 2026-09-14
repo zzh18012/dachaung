@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1881 — hr 冲刷结构类型：heading/li/bq 后段退化（Round 1881）
+- 动机：edges2:424/edges3:455 只锁 hr 不产生 element 与 only-hr 告警；hr 在结构元素内部的冲刷零覆盖——与 R1877/78 img 同族但 hr 自身无 image 产出
+- 探针：五组（h1/li/bq 内 hr、hr 在 p 间复核、lone hr 复核）
+- 结论 1：'<h1>a<hr>b</h1>' → [heading 'a', paragraph 'b']——hr 后文本退化 paragraph
+- 结论 2：'<li>a<hr>b</li>' → [list_item 'a', paragraph 'b']——同型退化
+- 结论 3：'<blockquote>a<hr>b</blockquote>' → paragraph 'a'（kind bq）+ paragraph 'b'（kind 丢失）——kind 只保 hr 前段（与 img 分裂语义一致，两冲刷源同一机制）
+- 新增：tests/test_parser_hr_flush.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1880 — br 在结构元素里：文本流变空格、表单元格内丢弃（Round 1880）
 - 动机：edges.py:423 只弱断言 p 内 br（any 命中）；heading/li/bq/pre/td 内 br 的精确内容与 img 冲刷对照零覆盖
 - 探针：五组（h1/li/bq 内 br、td 内 br、pre 内 br）
