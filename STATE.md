@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1930 — a 续：PDF 混合页尺寸 + 小页右缘越界图（3 测试）
+
+- 语境：评测侧 edges150+ 已用单尺寸 400x800 页（页族度量语境）；**同文档混合页尺寸**（per-page MediaBox）零覆盖
+- 探针（outputs/autonomous/probe_mixedpages_r1930.py，未入库；自定义 per-page MediaBox 构造器）三假设全实证：
+  - **M1 混合尺寸正常抽取**：p1 612x792 + p2 300x300 文本各自成元素、pages=[1,2]、bbox 落各自坐标系（小页 y 按页高 300 翻转）、零告警
+  - **M2 小页右缘越界图**：p2（宽 300）上 x 450-550 图 → 元素保留、bbox 超 MediaBox 宽（pdfplumber 不裁剪）；渲染 crop 钳制 x1=min(页宽) → 退化 → resource_path=="(unrendered)" + `pdf_image_render_failed`——R1921 顶缘（height 钳制）的 **width 版**
+  - **M3 界内图不受累**：同页 x 50-150 图渲染成功拿 _p2_00（失败图不占号，R1921 成功才计数规则的小页重放）；失败+成功并存恰一 PNG
+- 测试：`tests/test_parser_pdf_mixed_page_sizes.py`（3 个，判别式：渲染改按绝对坐标/越界 bbox 被裁剪则 M2/M3 翻红；页尺寸参与文本坐标则 M1 翻红）。3 passed
+- 计数影响：+3（R1925–R1930 累计 +19；下次全量预测 101660 + 19 = 101679）
+
+---
+
 ## Round 1929 — a 续：PDF 网格表 cell 内图片独立性（3 测试）
 
 - 语境：R1888/R1922 锁 cell 文本双重提取、R1919/1920 锁三相位序、edges16 锁 **DOCX** cell 内图片不可见；**PDF 侧网格 cell 内图片**（第三相位完全无视表格存在）grep 零覆盖
