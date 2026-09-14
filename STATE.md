@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1872 — 实体标题 → section_path：html 解码流入 / md 字面流入（Round 1872）
+- 动机：R1826 只锁标题 content 的实体对照与 md '<b>B</b>' 字面路径传播；html 实体解码后的 section_path 断言与 md 实体字面路径传播零覆盖；复核弃用：chunk 空格连接（chunker:1480）/ 超长 isolated 不切（edges15）/ 图片不入 chunk（pipeline_edges12）/ 空文件 no_extracted_elements（多文件）/ 文本纯空白行分隔（text_edges8）/ 大写标签（edges21）/ caption 吞（edges12）全已锁
+- 探针：三组（html 数字实体标题、html NBSP 实体标题、md 命名实体标题，各带后续段）
+- 结论 1：'<h1>&#65;B</h1>' → heading 'AB' 且后续段 section_path 'AB'（SAX 解码在路径建立之前）
+- 结论 2：'<h1>a&nbsp;b</h1>' → 路径 'a\xa0b'（实体解码出 NBSP 逐字入路径不折叠；R1865 锁源码 NBSP，此处锁实体来源）
+- 结论 3：'# T &amp; U' → md 路径 'T &amp; U' 字面（不解码原样入路径，与 html 解码形成对照）
+- 新增：tests/test_parser_entity_section_path.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1871 — 隐式闭合：h1<h2 / li<li 开新元素，table 无 tr 整表错误（Round 1871）
 - 动机：R1870 锁 p 的同 kind 忽略合并后查对照面——h1<h2 异 kind 与 li<li 同 kind 是否也合并；'<table><td>'（无 tr）edges14 只锁有 tr 的未闭合形态，无 tr 形态 + pipeline 级错误零覆盖
 - 探针：五组（h1<h2 带后续段、裸 li<li、ul 包裹 li<li、无 tr 表、未闭 h1 到 EOF）
