@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1846 — html 控制字符逐字保留、块嵌套违规、游离标题闭合（Round 1846）
+- 动机：R1842 锁 md splitlines 分隔符归一后补家族对照——html 侧 unicode 分隔符保留、块嵌套违规恢复、非匹配游离闭合三个角度 grep 全库零覆盖
+- 探针：4 组探针（U+2028/NEL/VT 保留与行号、`<p>a<h2>t</h2>b</p>` 嵌套、游离 `</p>` 与 `</h1>` 不对称、img 无 src 复核[已覆盖弃用]），断言全部来自实测输出
+- 结论 1：U+2028/U+0085/VT 在 html 内容中逐字保留（'a\\u2028b'），行号只被真实 \\n 推进——与 md 归一为 \\n 且当块级换行成家族对照
+- 结论 2：`<p>a<h2>t</h2>b</p>` → 段落 'a' flush + heading 't'（section_path='t'）+ loose 'b' 成新段落且承袭 section_path='t'（顺序式承袭已有覆盖，打断-承袭零覆盖）
+- 结论 3：当前 kind=paragraph 时游离 `</h1>` 不 flush、后续数据并入（'posttail' 合并）——edges3 只覆盖反方向（heading 时 `</p>`）
+- 新增：`tests/test_parser_html_ctrlchar_nesting.py`（3 测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1845 — 四家族同输入重复解析全等、管线输出字节全等（Round 1845）
 - 动机：锁 R1844 后补横切性质——parser/pipeline 层"同一输入两次结果全等"的确定性断言全库零覆盖（annotation 系 determinis 是指标层）
 - 探针：3 组探针（md/html 深比较、text/ipynb 深比较、process_single 双跑字节比较），断言全部来自实测输出
