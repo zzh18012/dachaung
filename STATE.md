@@ -97,6 +97,17 @@
 - 下次预测：101593 + 13（R1886–R1890：1+3+3+3+3）= 101606；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1900 — a 队列续：PDF 旋转文本字符倒序 + 隐形文本（3 Tr）幻影元素锁定（Round 1900）
+- 新颖性：grep 零覆盖（无 Tm 旋转矩阵、无渲染模式构造）；现实常见——图表轴标签（90° 旋转）、OCR 底层/水印（Tr 3）。探针实证
+- **旋转文本字符倒序**：Tm 90° 矩阵（0 1 -1 0）下 'abc' → 元素 **'cba'**——pdfplumber 提取 upright=False 字符但组词时字符序倒排；几何隔离时自成元素（竖条 bbox [540.484, 672.656, 552.484, 692.0]）
+- **隐形文本完全无视**：`3 Tr` 渲染模式下文本阅读器不可见，但渲染模式不进任何过滤——照常成元素且与正常文本同分类（幻影内容进 chunks）
+- **旋转词融合乱序汤**：旋转词 y_center 落入正常行容差 → 单元素 'txet normal text detator hidden text'（倒序词与正常词按 (y_center, x0) 混排），bbox x1 被竖条拉宽到 502.484
+- 新增：tests/test_parser_pdf_rotated_hidden_text.py（3 测试；Tm 矩阵与 Tr 操作符构造，复用 `_build_pdf`）
+- 计数影响：+3 测试；下次全量预测 101633 + 3（R1900）= 101636
+- 状态：已提交已推送
+
+---
+
 ## Round 1899 — a 队列续：DOCX a:blip 关系守卫锁定：外链图整文档失败 + 非图/缺失 rid 静默跳过（Round 1899）
 - 新颖性：`_extract_inline_image_rids` :428 故意收 `r:embed or r:link`，但 `_parse_docx` :502 `rel.target_part` 对 External 关系未设防——三路径零覆盖。探针实证
 - **r:link 外链图 → 整文档失败**：TargetMode="External" 的 image 关系 → python-docx target_part 抛**裸 ValueError**（连 ParserError 都不是）；pipeline 层 process_single 兜成结构化 `unexpected_parser_error`——一张外链图废掉整篇文档
