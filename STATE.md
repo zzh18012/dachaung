@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1862 — NBSP 四态：尾随剥离 / chunk 切分 / md 标题分隔（Round 1862）
+- 动机：edges14:208 只锁内容中间 '&nbsp;' → \xa0 保留——尾随剥离、chunk 切分、md 标题分隔零覆盖；NBSP.isspace()=True 使其横跨 strip/窗口切分/RE \s 三机制
+- 探针：四组（'<p>a&nbsp;</p>'、'ab&nbsp;'×30 @40、'#\xa0T'、'\xa0#T'）
+- 结论 1：'<p>a&nbsp;</p>' → content 'a'——**尾随 NBSP 被段级 strip 剥离**（与中间保留对照）
+- 结论 2：'ab&nbsp;'×30 → content 'ab\xa0'×29+'ab'（89），@40 切 38/38/11——NBSP 与 \r/\t/U+2028 同为 isspace 窗口切分位（R1860 机制延伸）
+- 结论 3：'#\xa0T' → **heading 'T' level 1**（标题 RE 分隔符类匹配 NBSP）；'\xa0#T' → 惰性 paragraph '#T'
+- 新增：tests/test_pipeline_nbsp_strip_chunk_heading.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1861 — 实体 \r 存活 chunk 切分 + 孤立 \r 转 \n + md 字面 forced 切（Round 1861）
 - 动机：组合空白——R1856 只锁 parser 层实体控制符、R1858 只锁 CRLF 剥离与 tags 间裸 CR 计行；实体 \r 进 chunker、孤立源 \r 在**文本内容里**的形态、md 实体字面长文切分零覆盖；表格空 tr/colspan/th-only（edges9/12/18/20）、句子切分（edges 全锁）复核弃用
 - 探针：三组对照（html 实体 CR×30 @40、html 孤立 \r、md 实体字面 ×30 @40）
