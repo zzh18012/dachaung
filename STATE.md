@@ -114,6 +114,18 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1919 — a 队列回归：PDF 页内元素发射顺序（相位序压倒几何序）（3 测试）
+
+- 语境：1b/b 已尽（批次 16–25 全模块探针完毕）、1b/f 八维度齐——按队列序转 a（R1903 以来首批加测轮）。前沿排查：chunker（16 文件）/HTML（23）/ipynb（15）/md（21）/text（13）/evaluation schema（154）/report（100+）/fallback 函数级（题注正则、_is_heading_style、_rows_to_markdown、_image_filename、段落分割阈值/中位数/漂移链/混字号 R1892–R1903）grep 全饱和；新角度 = `_parse_pdf` **页内三阶段发射顺序**（段落→表格→图片循环 :260/:291/:330，与几何位置无关）——grep 零覆盖（无任何 paragraphs-before-tables 顺序断言）
+- 探针（outputs/autonomous/probe_page_order_r1919.py，未入库；合成 PDF 走 tempfile，零 main 接触）三假设全实证：
+  - **P1 相位序压倒几何序**：表在页首（bbox top≈92）、正文在页底（top≈682）→ 元素序 [heading(表内文本双重提取), paragraph(正文), table]——table **最后**发射，阅读序与几何序倒置
+  - **P2 同页双表**：上下两表 + 中部正文 → 类型序 [heading, paragraph, heading, table, table]——全部文本元素先于两个 table；双表之间保持 find_tables 几何上下序（top 小者先）
+  - **P3 跨页页序优先**：页 1 表 + 页 2 正文 → [heading, table, paragraph]，页内相位序不变，locator.page 各记来源页
+- 测试：`tests/test_parser_pdf_page_phase_order.py`（3 个，复用 _build_pdf 构造器 + 自写 grid/text_line 帮助函数；断言类型序、几何倒置 bbox 比较、跨页 page 字段；判别式 = 表格循环挪到段落循环之前则三测全红）。3 passed
+- 计数影响：+3（101645 → 下次全量预测 101648，第 103 次连续精确命中链）
+
+---
+
 ## Round 1918 — 1b/f 续：main 测试断言强度审计（第八维度；候选 #1 精确定界）（Round 1918）
 - 目标：main `6c6d398ca9c` tests/ 断言强度静态审计——第八审计维度；常驻扫描器 outputs/autonomous/main_assert_scan.py（A1 raises 无 match / A3 不等式断言 / A4 恒真 / A6 静默吞咽 / A6b 候选#1 同型空转守卫；结果 main-assert-scan-r1918.json 未入库）
 - **A4 恒真断言 0**；**A6b/A6 净命中经人工复核收敛为：候选 #1 精确定界为恰 2 处**——test_contract_adoption_v1.py `test_new_locators_required_fields` 的两个守卫（117/124 行：try 内 raise AssertionError + `except Exception: pass` 无再抛 → AssertionError 被吞，validate 无论是否放行该测试恒过）；**修复模式 = 补 `except AssertionError: raise`**（该文件其余 6 处 A6b 命中全是此健全再抛惯用法——守卫有效，属扫描器误报，模式已记录）；ipynb 两命中同误报（handler 捕 ParserError 捕不到 AssertionError）
