@@ -95,6 +95,15 @@
 - 含轮次：R1850–R1864（run 启动于 d3c64f3 之后；R1865–R1883 后于 run 启动，待下次基线覆盖）
 - 下次预测：101580 + 3xN（R1865–R1883 共 57 个测试已在工作树未覆盖；N = R1884 起新增轮次数）
 
+## Round 1884 — md bq 内特殊行不递归解析：标记字面化（Round 1884）
+- 动机：grep '> #' / '> -' / '> |' 全库零命中，现有 bq 测试全是纯文本内容；机制 markdown_parser.py:260-273 bq 分支把 quoted 内容 join 后直接 push 单个 paragraph，不递归解析
+- 探针：'> # Fake\n\n## Real\n\ntext' → [paragraph '# Fake'（kind bq）, heading 'Real', paragraph 'text']；'> - item' → paragraph '- item'（kind bq）；'> | a | b |\n> | --- | --- |\n> | 1 | 2 |' → paragraph 管道符原样（kind bq）
+- 结论 1：bq 内 heading 标记不产 heading 元素也**不进 section 栈**——后续真 heading 的路径不含 '# Fake'；空路径时 section_path 键整体省略（非空串）
+- 结论 2：bq 内 list 标记不产 list_item，'- item' 整体字面
+- 结论 3：bq 内管道表语法不产 table，管道与分隔行原样保留（多行 join \n）——bq 是"单元素终点站"，无任何二级结构
+- 新增：tests/test_parser_md_bq_special_lines.py（3 测试）
+- 状态：已提交已推送
+
 ## Round 1883 — md 图片行插入列表项间 / 终止 bq 运行（Round 1883）
 - 动机：R1882 锁段落侧冲刷；列表项交错与 bq 运行终止零覆盖——grep 全部 md 图片行用例只有 para-image / image-image / bq、li 内包裹（edges15:104/117）形态。机制：list 分支逐行匹配无延续吸收（markdown_parser.py:248-258），bq 分支 while 循环只吸收连续 '>' 行（:260-268），standalone 匹配用 stripped（:240）
 - 探针：'- a\n![i](1.png)\n- b' → [list_item 'a', image, list_item 'b']；'> q\n![i](1.png)\nafter' → paragraph 'q'（kind blockquote）+ image + paragraph 'after'；'- a\n  ![i](1.png)\n- b' → 同项间冲刷（缩进不豁免）
