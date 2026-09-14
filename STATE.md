@@ -97,6 +97,17 @@
 - 下次预测：101593 + 13（R1886–R1890：1+3+3+3+3）= 101606；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1899 — a 队列续：DOCX a:blip 关系守卫锁定：外链图整文档失败 + 非图/缺失 rid 静默跳过（Round 1899）
+- 新颖性：`_extract_inline_image_rids` :428 故意收 `r:embed or r:link`，但 `_parse_docx` :502 `rel.target_part` 对 External 关系未设防——三路径零覆盖。探针实证
+- **r:link 外链图 → 整文档失败**：TargetMode="External" 的 image 关系 → python-docx target_part 抛**裸 ValueError**（连 ParserError 都不是）；pipeline 层 process_single 兜成结构化 `unexpected_parser_error`——一张外链图废掉整篇文档
+- **r:embed 指向非图关系 → 静默跳过**：守卫 `"image" not in rel.reltype` 生效（探针发现 styles reltype 不可用作判别——python-docx 打开期要求唯一，重复即拒；改用 Target=settings.xml 的 hyperlink rel）——无 image 元素、无告警
+- **r:embed 指向缺失 rid → 静默跳过**：rels.get(rid) 为 None → continue
+- 新增：tests/test_parser_docx_blip_rel_guards.py（3 测试；含 parser 层 pytest.raises + pipeline 层 process_single 双断言）
+- 计数影响：+3 测试；下次全量预测 101630 + 3（R1899）= 101633
+- 状态：已提交已推送
+
+---
+
 ## Round 1898 — a 队列续：DOCX 浮动图（anchor 带真实 blip）可提取 + hyperlink 内嵌 drawing 可见锁定（Round 1898）
 - 新颖性：edges61 锁过"浮动 wp:anchor 不可见"但其构造的 anchor **无 a:blip 数据**——锁的是空 anchor；反向判别零覆盖。探针实证：`_extract_inline_image_rids` :422 用 `drawing.iter(qn("a:blip"))` 后代递归，不在乎 blip 挂在 wp:inline 还是 wp:anchor 下（函数名 "inline" 有误导性）
 - **带真实 blip 的浮动图被提取**：wp:inline 换名成 wp:anchor（保留 a:graphic 子树）→ image 元素照常生成（rid/locator 完整、零告警、段落文本不受影响）
