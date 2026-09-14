@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1841 — html kbd/mark/abbr 行内语义标签剥壳（Round 1841）
+- 动机：锁 R1840 后查 html 行内语义标签——grep 核实 kbd/mark/abbr 标签全库零覆盖（sub/sup 在 edges15、figure/caption 已锁）
+- 探针：5 组探针（kbd 行内/顶层、mark、abbr 带 title/顶层），断言全部来自实测输出
+- 结论 1：kbd 剥壳无缝拼接——'press Ctrl+C now'（标签剥离、内文直接相连不加空格）；顶层裸 kbd 压成单段 'Standalone outside'
+- 结论 2：mark 高亮剥壳——'note highlighted text'，无 highlight 相关 metadata（装饰语义全弃）
+- 结论 3：abbr title 属性整弃——只留元素文本，title 展开词既不并入 content 也不入 metadata；顶层裸 abbr 同规
+- 新增：tests/test_parser_kbd_mark_abbr_flatten.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1840 — 下划线强调字面、词内下划线字面、html dir 属性忽略（Round 1840）
 - 动机：锁 R1839 后查强调族——'_em_' 不在任何 md parser 测试、'__strong__' 与词内 'a_b_c' 全库零覆盖、html dir 属性全库零覆盖（grep 逐项核实）
 - 探针：3 组探针（下划线强调形、词内下划线、html dir 属性），断言全部来自实测输出
