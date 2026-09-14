@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1839 — 裸 www 不自动链接、html style 属性忽略、表格单元格 tab 保留（Round 1839）
+- 动机：锁 R1838（有序标记语法族）后补三边角——裸 URL 自动链接、html style 属性、md 表格单元格内 hard tab，均零覆盖（R1833 只锁了尖括号 autolink 字面）
+- 探针：3 组独立探针，断言全部来自实测输出
+- 结论 1：md 'visit www.example.com now' 与 'see https://example.com ok' 都是普通段落字面——裸 www/https URL 不做自动链接，无 link 元数据
+- 结论 2：html p/td 的 style 装饰属性全弃——content 只留文本，无 style 相关 metadata（与 type/start/dir 同哲学）
+- 结论 3：md 表格单元格内 hard tab 不当分隔符——只按竖线切列，'a' + tab + 'b' 整格保留 tab 字符，row_count=2/col_count=2、content 是含分隔行的整段原文
+- 新增：tests/test_parser_www_styleattr_tabcell.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1838 — 字母/罗马有序标记字面、html ol type 属性忽略（Round 1838）
 - 动机：锁 R1837（实体/围栏/嵌套引用）后查有序标记语法族——_ORDERED_LIST_RE 只认数字，字母/罗马标记与 html ol type 属性零覆盖
 - 探针：4 组独立探针（md 字母/罗马、html ol type、text 家族对照），断言全部来自实测输出
