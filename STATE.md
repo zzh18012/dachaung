@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1870 — p 标签畸形形态精确锁定：兄弟嵌开合并 / 多余闭合（Round 1870）
+- 动机：edges.py:410 '<p>hello<p>world' 与 edges3:677 '<p><p>text</p></p>' 都只断言 len>=1——精确内容与元素数从未锁定；'</p>' 打头与纯多余闭合全库零覆盖；裸 td/tr/li 已锁（orphan/R1812）复核弃用
+- 探针：八组（兄弟嵌开三形态、多余闭合两种、未闭到 EOF、文本先于 p、裸 td 对照）
+- 结论 1：第二 <p> 同 _cur_kind 被忽略，文本无分隔连续累积——'hello<p>world' / 'a<p>b</p></p>' / 'x<p>y' → 单 paragraph 'helloworld'/'ab'/'xy'（把 edges 弱断言升为精确锁定）
+- 结论 2：多余 '</p>' 无副作用——'<p>a</p></p>' → 恰一个 'a'；'</p>' 打头同样无副作用
+- 结论 3：'<p>abc' 未闭跑到 EOF → 恰一个 paragraph 'abc'，零 warning
+- 新增：tests/test_parser_html_p_malformed_exact.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1869 — fence info 字符类边界：空格级联 / CJK / 大写与连字符（Round 1869）
 - 动机：_FENCED_RE info 类是 `[\w+-]*`；edges8:258 只锁 RE 级 '```python 3' m is None，parse 级联与 CJK/大写形态全库零覆盖
 - 探针：四组（info 含空格、CJK、大写、连字符）
