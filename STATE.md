@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1854 — UTF-16 误判 NUL 保留 + ipynb 未配对代理写盘崩溃（Round 1854）
+- 动机：evaluation 侧 utf-16/surrogate 测试是标注 JSON 加载与指标层——**app 管线解析/写盘路径** grep 零覆盖
+- 探针：1 组复合探针（ASCII 的 UTF-16LE 字节流走 text 管线、ipynb 未配对 '\\ud800' 转义、合法 '\\ud83d\\ude00' 对照），断言全部来自实测输出
+- 结论 1：UTF-16LE 误判——字母+NUL 交替全部是合法 UTF-8，逐字解码成 **NUL 掺杂 content**（24 字符含 12 个 NUL）、零 FFFD 零错误（与 R1852 非法字节替换对照）
+- 结论 2：ipynb source 含 '\\ud800' → json.loads 接受成 lone surrogate → 写盘 ensure_ascii=False 阶段 **UnicodeEncodeError 直接穿透 process_single**（结构化 errors 不变量在此输入下失守——测试以 pytest.raises 记录实际行为）
+- 结论 3：合法代理对 '\\ud83d\\ude00' → 组合成 😀 正常写盘（同机制安全半边）
+- 新增：`tests/test_pipeline_utf16_surrogate.py`（3 测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1853 — 文件中段 BOM：内容逐字保留、行首杀标题、BOM-ipynb 报错（Round 1853）
 - 动机：cross_edges3 只锁文件起始 BOM 三种劣化——中段 BOM（内容级/行首级/BOM 前缀 ipynb）grep 全库零覆盖
 - 探针：3 组探针（html/md/txt 中段内容 BOM、md 行首 BOM 杀标题、合法 JSON 加 BOM），断言全部来自实测输出
