@@ -97,6 +97,17 @@
 - 下次预测：101593 + 13（R1886–R1890：1+3+3+3+3）= 101606；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1897 — a 队列续：DOCX 多节 section 字段恒 0 + 分节符空段落实体化锁定（Round 1897）
+- 新颖性：edges29 只在单节文档锁过 section: 0（headerReference 挂文末 sectPr）；多节判别式零覆盖。探针实证：`_parse_docx` :462 section_idx=0 初始化后循环内无任何递增——tag 分派只有 w:p/w:tbl 两分支，w:sectPr 落空
+- **section 字段结构性死亡**：真实 2 节文档（python-docx len(sections)==2 判别前提），分节后的段落与表格 locator 仍全部 section: 0
+- **分节符实体化为空段落**：add_section 把 sectPr 挂在新段 pPr 里，该段无文本 → 成 "(空段落)" 元素并**消耗一个 paragraph_index**（"after break" 拿 index 2 而非 1）
+- **零告警**：节结构完全不可见，无任何 WarningRecord；分节后表格 locator 仍 {table_index: 0, section: 0}
+- 新增：tests/test_parser_docx_section_field.py（3 测试；python-docx add_section API 构造真多节文档，无需裸 XML/zip 手术）
+- 计数影响：+3 测试；下次全量预测 101624 + 3（R1897）= 101627
+- 状态：已提交已推送
+
+---
+
 ## Round 1896 — a 队列续：PDF 图片文件名全局 counter 编号 + 零宽图静默跳过锁定（Round 1896）
 - 新颖性：edges17 只锁过单图 p1_00 正则；多页多图编号语义与退化几何跳过零覆盖。探针实证：`_parse_pdf` :250 image_counter 在页循环**外**初始化，:340 前缀 p{page_idx} 但 index 用全局 counter
 - **counter 全局延续**：第二页唯一图片文件名是 **_p2_02**——页前缀 + 全局索引的错配组合（每页前缀暗示"每页编号"，索引却跨页延续；p2_02 是第 2 页唯一的图）。页内基线 _p1_00/_p1_01 无意外
