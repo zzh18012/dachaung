@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1927 — a 续：DOCX 嵌套表静默不可见性（3 测试）
+
+- 语境：edges33 锁 cell 内图片不可见、Batch 3 锁 w:tc 内嵌 w:sdt 递归提取；**cell 内嵌套表**（cell.add_table）grep 零覆盖
+- 探针（outputs/autonomous/probe_nestedtable_r1927.py，未入库）三假设全实证：
+  - **N1 嵌套表不成独立元素**：body 顶层只有一个 w:tbl → 元素序 [paragraph, table, paragraph]
+  - **N2 嵌套表文本完全不可见**：NESTEDLEFT/NESTEDRIGHT 不出现在任何元素；零告警（纯静默丢失，与脚注家族同型）
+  - **N3 外层 cell 呈空**：嵌套表所在 cell 序列化为空字符串（'| BL |  |'），嵌套结构信息不留痕
+  - chunk 级联：[seq, isolated_table, seq] 干净隔离（isolated_table 文本恰为表格 markdown）
+- 测试：`tests/test_parser_docx_nested_table.py`（3 个，判别式：表提取若改递归（嵌套并入 cell 文本或另立元素）N1/N2 翻红）。3 passed
+- 计数影响：+3（R1925–R1927 累计 +9；下次全量预测 101660 + 3xN，N≥3）
+
+---
+
 ## Round 1926 — a 续：DOCX 空 heading 状态机三边界（3 测试）
 
 - 语境：R1925 锁"两正文间单空 heading 劈两块"；本轮锁 chunker 硬边界状态机的三个残余边界——连续空 heading / 文档开头空 heading / 文档末尾空 heading 全部 grep 零覆盖
