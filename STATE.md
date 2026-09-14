@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1925 — a 续：DOCX 空 heading 级联——样式判型 × 空占位 × 硬边界（3 测试）
+
+- 语境：R1585 锁**非空** Title/Quote 样式与 Normal 空段（分页符 → "(空段落)" paragraph）；既有测试全部空段都是 Normal 样式（grep add_paragraph("") 零命中样式变体）——**空样式 heading**（style 判型不看文本空否 × 空占位文本 × chunker 硬边界按类型触发）零覆盖
+- 探针（outputs/autonomous/probe_emptyheading_r1925.py，未入库；python-docx add_paragraph("", style=...)）三假设全实证：
+  - **H1 样式判型优先于空文本**：空 Heading 1 段 → type=heading、content="(空段落)"、level=1、empty=True、style="Heading 1"——样式赢判型、空赢占位文本
+  - **H2 硬边界零文本照样劈块**：两正文段之间的空 heading → 恰 2 个 sequential chunk；前块恰 "Before body text."；后块 = "(空段落) After body text."——占位符进入 chunk 文本并与其后正文融合
+  - **H3 Title 同型**：空 Title 段 → heading level=1 + 同样二劈 chunk 序
+- 测试：`tests/test_pipeline_docx_empty_heading.py`（3 个，判别式：样式判型若要求非空文本则判型/劈块翻红；chunker 若过滤空占位则融合断言翻红）。3 passed
+- 计数影响：+3（R1925 起 N=1；下次全量预测 101660 + 3xN）
+
+---
+
 ## Round 1923 — a 续：DOCX 脚注/尾注家族静默不可见性（3 测试）
 
 - 语境：edges50 已锁批注（comments.xml 注入）、edges67/68 锁修订跟踪；**脚注（footnotes.xml）/尾注（endnotes.xml）grep 零覆盖**（本轮前沿排查另排除：srcsize/tag 元数据、跨页段落 edges19 六测、图片零 chunk R1765、pdf_no_text_extracted 五文件）
