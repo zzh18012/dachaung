@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1941 — a 续：PDF 退化图像源三形态——静默成功（3 测试）
+
+- 语境：R1896 锁零宽**放置**（cm 退化 → 静默跳过）；R1936 锁模板/镜像/旋转矩阵；**退化源图**（零像素/数据截断/缺 /ColorSpace）零覆盖
+- 探针（outputs/autonomous/probe_zeropix_r1941.py + 缺 CS/PNG 头复跑，未入库）实证——三形态同归**静默成功**（与退化放置相反：元素照发、PNG 照渲染落盘、零告警）：
+  - **Z1 零像素源**：/Width 0 /Height 0 + 正常 cm → image 元素、srcsize [0,0]、真 PNG（\x89PNG 头）
+  - **Z2 截断数据**：声明 2x2 RGB（需 12 字节）但 /Length 1 → 照发、srcsize [2,2]（pdfium 渲染放置区域、从不解码源数据）
+  - **Z3 缺 /ColorSpace**：非模板图缺 CS → 照发、真 PNG（对照 R1936 X3 模板合法缺 CS）
+- 测试：`tests/test_parser_pdf_degenerate_image_source.py`（3 个，pytest monkeypatch _IMG；判别式：零像素源被跳过/告警则 Z1 翻红；数据长度校验加严则 Z2 翻红；缺 CS 崩溃/告警则 Z3 翻红；PNG 头断言区分真渲染与 "(unrendered)" 占位）。3 passed
+- 计数影响：+3（R1925–R1941 累计 +53；下次全量预测 101660 + 53 = 101713）
+
+---
+
 ## Round 1940 — a 续：PDF 内容流边界落 token 中间——pdfminer 垫 \n 截断（4 测试）
 
 - 语境：PDF 规范语义多流应等同单一拼接流；edges44 只锁 token**之间**分界（两 BT 拼接/跨流未闭合 BT）；**边界落在 token 中间**零覆盖
