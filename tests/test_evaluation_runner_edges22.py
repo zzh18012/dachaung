@@ -196,7 +196,7 @@ def test_process_one_unknown_error_dict_when_no_errors_no_doc(tmp_path):
     assert "process_single returned None without errors" in src
 
 
-def test_process_one_source_contains_5_tuple_return():
+def test_process_one_source_return_count_at_least_three():
     """source 含 5-tuple return。"""
     src = inspect.getsource(_process_one)
     # 三个 return 路径都是 5-tuple

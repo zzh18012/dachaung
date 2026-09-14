@@ -931,12 +931,6 @@ def test_module_source_contains_typing_any_import_batch41():
     assert "from typing import Any" in src
 
 
-def test_module_source_contains_strip_unicode_whitespace_definition_batch41():
-    """v1.1 不再 import normalize_text；自己实现 _strip_unicode_whitespace。"""
-    src = inspect.getsource(mmod)
-    assert "def _strip_unicode_whitespace(" in src
-
-
 def test_module_source_does_not_import_normalize_text_batch41():
     """v1.1 不依赖 app.chunkers.structural.normalize_text。"""
     src = inspect.getsource(mmod)

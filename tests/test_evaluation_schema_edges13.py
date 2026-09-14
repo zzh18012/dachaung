@@ -166,7 +166,7 @@ def test_validate_manifest_version_missing_fails():
         validate(m, "manifest.schema.json")
 
 
-def test_validate_devset_status_unknown_fails():
+def test_validate_manifest_devset_status_unknown_fails():
     m = _minimal_valid_manifest()
     m["devset_status"] = "unknown"
     with pytest.raises(EvalSchemaError):

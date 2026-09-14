@@ -262,7 +262,7 @@ def test_schema_path_error_message_contains_path():
     assert "nonexistent.schema.json" in str(exc_info.value)
 
 
-def test_schema_path_signature_1_param_no_default():
+def test_schema_path_signature_param_name_and_default():
     sig = inspect.signature(_schema_path)
     assert len(sig.parameters) == 1
     params = list(sig.parameters.values())
@@ -443,7 +443,7 @@ def test_validate_does_not_modify_instance():
     assert invalid == before
 
 
-def test_validate_signature_2_params_no_default():
+def test_validate_signature_param_names_and_defaults():
     sig = inspect.signature(validate)
     assert len(sig.parameters) == 2
     params = list(sig.parameters.values())

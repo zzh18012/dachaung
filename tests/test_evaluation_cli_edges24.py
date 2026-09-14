@@ -527,7 +527,7 @@ def test_main_inspect_doc_with_tolerance_chars(tmp_path):
 # =========================================================================
 
 
-def test_module_has_no_all():
+def test_module_has_no_all_attr_check():
     """cli 没有 __all__（不在 source）。"""
     assert not hasattr(climod, "__all__") or climod.__all__ is None or len(climod.__all__) == 0
 

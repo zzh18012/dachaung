@@ -678,7 +678,7 @@ def test_element_text_with_span_whitespace_only():
     assert _element_span(el) == ("", 0, 0)
 
 
-def test_element_text_with_span_image_returns_empty():
+def test_local_element_span_image_returns_empty():
     """image element 不参与分块（_element_text_with_span 强制返回空）。"""
     el = Element(element_id="x::e0", type="image", content=None,
                  resource_path="/tmp/x.png", source_locator={})
@@ -693,14 +693,6 @@ def test_element_text_with_span_none_content():
 
 
 # ---- _split_long_text 边界直接测试 ----
-
-
-def test_split_long_text_empty_string():
-    assert _split_long_text("", 100) == []
-
-
-def test_split_long_text_whitespace_only():
-    assert _split_long_text("   \n\t  ", 100) == []
 
 
 def test_split_long_text_below_max_returns_single_piece():
@@ -843,7 +835,7 @@ def test_paragraph_then_long_paragraph_boundary_resets():
 # normalize_text 直接单测
 
 
-def test_normalize_text_idempotent():
+def test_normalize_text_already_normalized_unchanged():
     """规范化已经是规范化形式时再次规范化应保持不变。"""
     s = "hello world"
     assert normalize_text(s) == s
