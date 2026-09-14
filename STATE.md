@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1946 — a 续：DOCX 位图格式透传——JPEG/TIFF 原始字节直存、ext 由 partname 决定（3 测试）
+
+- 语境：grep 实证 test_parser_docx* / test_pipeline_docx* 全部 PNG——**JPEG/TIFF 位图格式零覆盖**
+- 探针（outputs/autonomous/probe_docx_formats_r1946.py，未入库）实证（parser 直存 target.blob、ext 取 partname 后缀，无 PIL 转码/嗅探）：
+  - **D1 JPEG → ext 'jpg'**：python-docx ImageFormat 约定 partname /word/media/image1.jpg（非 'jpeg'）；落盘字节与源 blob **逐字节全等**
+  - **D2 TIFF → ext 'tiff'**：同样逐字节全等（byte_size=len(blob)）
+  - **D3 PNG 对照 + 宿主空段落**：add_picture 自成段落 → 元素序 [paragraph, paragraph(empty=True), image]、命名前缀 para1_00（paragraph_index=1）
+- 测试：`tests/test_parser_docx_image_format_passthrough.py`（3 个 PIL 生成 blob；判别式：引入格式嗅探/转码则字节全等翻红；ext 改走内容类型映射则 D1 'jpg' 翻红；空宿主段落被跳过则 D3 元素序翻红）。3 passed
+- 计数影响：+3（R1925–R1946 累计 +68；下次全量预测 101660 + 68 = 101728）
+
+---
+
 ## Round 1945 — a 续：PDF 未测压缩编码 JPX/CCITTFax/LZW——垃圾流三形态静默成功（3 测试）
 
 - 语境：edges91 锁 DCTDecode 垃圾、R1582 锁 DCTDecode 真图/CMYK/Decode、R1941 锁退化源；grep 实证 **JPXDecode/CCITTFaxDecode/LZWDecode 零覆盖**（含 /DecodeParms 形态）
