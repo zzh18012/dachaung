@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1933 — a 续：DOCX 行内图中插段落——元素序与文本融合（3 测试）
+
+- 语境：test_pipeline_docx_images 锁资源命名（para0_00.png）；**行内图与宿主段的元素序、图两侧文本融合形态、locator 关系字段**零覆盖
+- 探针（outputs/autonomous/probe_inlineimg_r1933.py，未入库；python-docx `add_run().add_picture` 行内图构造）三假设全实证：
+  - **I1 图元素紧跟宿主段之后**：段内行内图 → 元素序 [paragraph(宿主), image, paragraph(下一段)]——不是图在段前、也不是文档末尾集中
+  - **I2 图切断词无缝愈合**：run "be" + 图 + run "af" → 宿主段 content 恰 **'beaf'**（图 run 零字符贡献、不插分隔符）；有空格时直拼保留 "Before text after text"
+  - **I3 locator 带宿主关系**：image locator 含宿主段 paragraph_index + relationship_id（rId9）+ target_partname（/word/media/image1.png）；chunk 层图零参与（单 sequential 恰宿主段+下一段文本、source_ids 仅两段）
+- 测试：`tests/test_parser_docx_inline_image_fusion.py`（3 个，判别式：图元素改排段前/文档末则 I1 序断言翻红；图 run 插占位空格则 I2 'beaf' 全等断言翻红）。3 passed
+- 计数影响：+3（R1925–R1933 累计 +28；下次全量预测 101660 + 28 = 101688）
+
+---
+
 ## Round 1932 — a 续：PDF 同位叠印文本——水印家族成对交错（3 测试）
 
 - 语境：edges200 锁**不同 x** 的栏交叠交错（'nRoiwgh.t'）；**完全同位叠印**（水印/粗体阴影：同一 Td 画两遍——DRAFT 水印即此形态）零覆盖
