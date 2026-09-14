@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1850 — html 容器级 loose 文本不对称：列表放行成段、表格吞噬（Round 1850）
+- 动机：edges14 孤儿 li 是无容器裸 li、edges12 caption 是 `<caption>` 标签——**容器内裸文本**（列表 vs 表格）grep 零覆盖；ol start / 嵌套 ul 探针复核均已覆盖弃用
+- 探针：2 组探针（ul/ol 首个 li 前的 loose、table 行前/单元格间 loose、无 li 纯 stray 容器），断言全部来自实测输出
+- 结论 1：`<ul>stray<li>a</li></ul>` → loose 'stray' **成 paragraph** + list_item 'a'（ol 同规，ordered 标记不变）
+- 结论 2：`<table>loose<tr>` 行前与 `<td>a</td>gap<td>b</td>` 单元格间 loose 均**静默消失**——无 paragraph 无 warning，单元格照常合并
+- 结论 3：`<ul>stray</ul>` 无 li → 仅一个 paragraph，列表容器本身零产出
+- 新增：`tests/test_parser_container_loose_text.py`（3 测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1849 — md 标题内行内标记/实体全字面 + section_path 传播（Round 1849）
 - 动机：edges13 只覆盖 html 侧标题内行内标记拍平；md 标题内 inline 标记/实体、html 标题实体、md section_path 带标记传播均 grep 零覆盖
 - 探针：2 组探针（md 标题 b/行内代码/行内链接/实体、html 标题实体对照、传播链），断言全部来自实测输出
