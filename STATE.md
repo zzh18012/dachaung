@@ -89,14 +89,11 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
-## Round 1882 — md 独立图片行段落冲刷 + 链接包裹不中断（Round 1882）
-- 动机：html 侧 img/hr 冲刷家族（R1877–R1881）已饱和；md 对偶零覆盖——edges2:929 只锁段落被独立图片行中断的 before 侧，after 侧文本去向与 `[![alt](img)](url)` 链接包裹形态 grep 全零（现有 img 测试全是相邻/空行分隔/bq、li 包裹形态）。机制来源 markdown_parser.py:313 段落累积循环把独立图片行列为中断条件，:48 `_STANDALONE_IMAGE_RE` 要求行首 `![`
-- 探针：'para\n![alt](i.png)\nafter' → [paragraph 'para', image alt 'alt', paragraph 'after']；'para\n[![alt](i.png)](u.com)\nafter' → 单 paragraph 三行合并（内容保留 \n）；'a\n![i](1.png)\nb\n![j](2.png)\nc' → 段/图/段/图/段五元素
-- 结论 1：图片后文本冲刷为独立段落（不与 before 侧合并）——md 版"img 中断结构"语义
-- 结论 2：`[` 开头的链接包裹图片行不匹配独立图片正则，被段落吸收（连续段落合并保留换行）——与 edges15 行内嵌图字面同因（非整行独立），但位置类不同（行首被链接包裹 vs 行中嵌入）
-- 结论 3：交替链五元素证明中断规则对称可重复，无状态残留
-- 新增：tests/test_parser_md_img_para_flush.py（3 测试）
-- 状态：已提交已推送
+## 回归基线 101523（第 135 次：0 失败；101501 passed + 22 skipped，3191s）
+
+- 命中：预测 101523 = 101478 + 45（R1850–R1864 共 15 轮 × 3），实际 101501 + 22 = 101523（第 98 次连续精确命中）
+- 含轮次：R1850–R1864（run 启动于 d3c64f3 之后；R1865–R1883 后于 run 启动，待下次基线覆盖）
+- 下次预测：101580 + 3xN（R1865–R1883 共 57 个测试已在工作树未覆盖；N = R1884 起新增轮次数）
 
 ## Round 1883 — md 图片行插入列表项间 / 终止 bq 运行（Round 1883）
 - 动机：R1882 锁段落侧冲刷；列表项交错与 bq 运行终止零覆盖——grep 全部 md 图片行用例只有 para-image / image-image / bq、li 内包裹（edges15:104/117）形态。机制：list 分支逐行匹配无延续吸收（markdown_parser.py:248-258），bq 分支 while 循环只吸收连续 '>' 行（:260-268），standalone 匹配用 stripped（:240）
@@ -105,6 +102,15 @@
 - 结论 2：图片行终止 bq '>' 连续运行；其后文本成普通 paragraph（kind 丢失）——与 html bq 被 img 切段 kind 不跨存活（R1878）同语义的 md 对偶
 - 结论 3：缩进图片行（'  ![i](1.png)'）经 stripped 仍匹配 standalone 正则，照样冲刷——前导空格不构成"列表延续行"
 - 新增：tests/test_parser_md_img_struct_interleave.py（3 测试）
+- 状态：已提交已推送
+
+## Round 1882 — md 独立图片行段落冲刷 + 链接包裹不中断（Round 1882）
+- 动机：html 侧 img/hr 冲刷家族（R1877–R1881）已饱和；md 对偶零覆盖——edges2:929 只锁段落被独立图片行中断的 before 侧，after 侧文本去向与 `[![alt](img)](url)` 链接包裹形态 grep 全零（现有 img 测试全是相邻/空行分隔/bq、li 包裹形态）。机制来源 markdown_parser.py:313 段落累积循环把独立图片行列为中断条件，:48 `_STANDALONE_IMAGE_RE` 要求行首 `![`
+- 探针：'para\n![alt](i.png)\nafter' → [paragraph 'para', image alt 'alt', paragraph 'after']；'para\n[![alt](i.png)](u.com)\nafter' → 单 paragraph 三行合并（内容保留 \n）；'a\n![i](1.png)\nb\n![j](2.png)\nc' → 段/图/段/图/段五元素
+- 结论 1：图片后文本冲刷为独立段落（不与 before 侧合并）——md 版"img 中断结构"语义
+- 结论 2：`[` 开头的链接包裹图片行不匹配独立图片正则，被段落吸收（连续段落合并保留换行）——与 edges15 行内嵌图字面同因（非整行独立），但位置类不同（行首被链接包裹 vs 行中嵌入）
+- 结论 3：交替链五元素证明中断规则对称可重复，无状态残留
+- 新增：tests/test_parser_md_img_para_flush.py（3 测试）
 - 状态：已提交已推送
 
 ## Round 1881 — hr 冲刷结构类型：heading/li/bq 后段退化（Round 1881）
