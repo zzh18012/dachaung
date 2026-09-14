@@ -89,6 +89,18 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1888 — b 次轮：候选 D 跨页表格拆分合成复现 + 表格文本双重提取复合发现（Round 1888）
+- 动机：b 队列续——BACKLOG §3 候选 D（跨页表格按页拆分，table 计数 +300%）合成复现
+- 方法：手写最小双页线框表格 PDF（网格线路径 + 单元格文本操作符，xref 偏移程序化计算；无外部 PDF 库、不读 real-*）；两页列 x 完全对齐 = 逻辑同一张表
+- 候选 D 根因确认（:257 逐页循环 + :291 page.find_tables()）：pdfplumber 每页各检出 1 表 → `_parse_pdf` 产出 **2 个 table 元素**（page=1/2 各挂各的 locator），无任何跨页状态（列对齐/表头相似度信号均不采集）；**语义后果**：页 2 片段首行（beta 数据行）被 `_rows_to_markdown` 当表头渲染——不仅计数膨胀，表头错位
+- **复合发现（BACKLOG 未记）**：:260 `extract_words()` 不排除表格区域——单元格文本同时进 words 流聚成段落，被 :184 短行启发式判成 heading（4 个 heading 元素与 table markdown 内容完全重复）——**表格文本双重提取**；real-02 表单 heading +246% 应是候选 C 启发式 + 本双重提取的叠加
+- 新增：tests/test_backlog_pdf_crosspage_table.py（3 测试：拆分机制 / 页 2 表头错位 / 双重提取）——特征锁定非期望规格
+- b 队列剩余：§4 sdt 内容整体丢弃变体（需合成 docx 内嵌 w:sdt XML，可行）；候选 B 的真实 PDF 多栏版（raw PDF 文本定位即可构造，可做）；§5–§9 不在自跑线代码中（已记 R1887）
+- 计数影响：+3 测试；下次全量预测 101594 + 3（R1887）+ 3（R1888）= 101600
+- 状态：已提交已推送
+
+---
+
 ## Round 1887 — b 优先级首轮：BACKLOG 候选 B/C 根因合成复现（Round 1887）
 - 动机：协议 v2 次优先级 b——BACKLOG 根因调研（只读代码 + 合成复现，不读 real-*、不改 app 代码）
 - 适用性核查：自跑线分叉点 2c35244（早于 Stage 8 全部批次）——BACKLOG §5–§9 涉及的 batch.py/plugin_loader 等文件不存在，不可复现；§1–§3（候选 B/C/D）与 §4 的 PDF/DOCX 解析路径存在（fallback_parser 同源），可做单元级复现
