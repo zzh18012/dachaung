@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1935 — a 续：PDF WinAnsi 高区字节——标点直通/NBSP 归一/(cid:N) 标记（3 测试）
+
+- 语境：_pdf 构造器字体无 /Encoding（StandardEncoding 低位 ASCII）；**WinAnsi 高区**（0x80-0x9F 特殊标点 / NBSP / 未定义位）零覆盖
+- 探针（outputs/autonomous/probe_winansi_r1935.py，未入库；monkeypatch _FONT 加 /Encoding /WinAnsiEncoding）实证：
+  - **W1 高区标点直通**：0x93/0x94/0x97 → '“hi” —'（U+201C/U+201D/U+2014）原样进 content、零告警
+  - **W2 NBSP 词边界归一**："a\\xa0b" → content 恰 'a b'（U+0020）——NBSP 被当词分隔、空格连接重插 ASCII 空格（非保留 U+00A0 在词内）
+  - **W3 未定义位 (cid:N) 直通**：0x81 → content 含字面 '(cid:129)' 11 字符标记、零告警（pdfminer 未映射回退的静默损伤形态）
+  - **证伪记录**：连字预设翻车——WinAnsi 0xFB = 'û'（0xA0-0xFF 与 Latin-1 一致），连字 ﬁ 不在 WinAnsi 表内
+- 测试：`tests/test_parser_pdf_winansi_high_bytes.py`（3 个，pytest monkeypatch 字体编码；判别式：高区标点被滤则码点断言翻红；NBSP 保留词内则 'a b' 全等翻红；(cid:N) 被清洗则 W3 全等翻红）。3 passed
+- 计数影响：+3（R1925–R1935 累计 +34；下次全量预测 101660 + 34 = 101694）
+
+---
+
 ## Round 1934 — a 续：PDF 降序 x 字符——RTL 视觉序家族（3 测试）
 
 - 语境：RTL/连字 parser 侧 grep 零覆盖；真实 RTL PDF 按视觉序排放（流内逻辑序、位置降序）——用负字符距 **Tc=-8**（净前进 -1.328pt/字符）确定性模拟
