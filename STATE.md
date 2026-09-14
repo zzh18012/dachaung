@@ -114,6 +114,19 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1914 — 1b/b 续：main pipeline.py 契约检查边角探针实证（健康轮，无新候选）（Round 1914）
+- 目标：main `6c6d398ca9c` app/pipeline.py 契约检查（批次 20 Phase C；main 侧 test_pipeline_contract_check.py 5 测试：ok/类型越界/family 错/str 归一/内置）；探针 outputs/autonomous/probe_contract_r1914.py（桩 parser 进程内注册 + process_single 直调，夹具写系统临时目录，main worktree 零写入核验通过）
+- **P1 违规元素截断**：15 个 family 违规元素 → details.offending_element_ids **恰截断为 10**（消息与 details 同步截断；总数 15 不可见——截断语义未载于 CLAUDE.md"details 带 element_ids"表述，行为合理）
+- **P2 双违规优先级**：source_type 越界 + family 错同时存在 → 仅 source_type 错误返回（类型检查先行短路 family 检查）；details 键集恰 {parser_name, declared_source_types, actual_source_type}
+- **P3 空 elements 分层拦截**：0 元素文档在契约检查**之前**被 no_extracted_elements 拦截（details 含 warnings+source_type）——防御分层顺序实证：空检查 → schema → 契约 → 写盘
+- **P0 对照**：合法产出正常写盘；family 错误不写盘 ✓；P1 details 键集恰 {parser_name, actual_source_type, expected_locator_family, offending_element_ids}
+- **附带观察**：Chunk 模型无 source_locator 字段 → family 契约检查面天然仅 elements（chunks 不可违规）
+- 结论：四边角全绿无指示线新候选；候选维持 #1-#5
+- 探针产物（未入库）：probe_contract_r1914.py、probe-contract-r1914.out/.err
+- 计数影响：0（纯探针轮；autonomous baseline 101645 不变）
+
+---
+
 ## Round 1913 — 1b/b 续：main evaluation/runner.py 并行与 auto 模式零覆盖探针实证（健康轮 + 两条结构性观察）（Round 1913）
 - 目标：main `6c6d398ca9c` evaluation/runner.py（批次 16 评测并行；**main 侧 evaluation 测试对 workers/auto/未注册 source_type 完全零覆盖**——test_evaluation_cli.py 无一处 workers/parallel 字样，仅 test_batch_parse.py 的 evaluation_parallel_report_consistency 覆盖全有效文档一致性）；探针 outputs/autonomous/probe_evalparallel_r1913.py（run_evaluation 进程内直调 + 临时项目根 git init，全部输出写系统临时目录，main worktree 零写入核验通过）
 - **W1 并行=顺序全等**：manifest v1.1 四文档（3 markdown + 1 text，4 任务 ≥3 走 Pool(workers=4)）vs workers=1 → per_doc 逐 doc_id 保序、**全量 metrics 完全相等**（含 text 文档混排；imap 保序声明成立）
