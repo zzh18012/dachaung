@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1940 — a 续：PDF 内容流边界落 token 中间——pdfminer 垫 \n 截断（4 测试）
+
+- 语境：PDF 规范语义多流应等同单一拼接流；edges44 只锁 token**之间**分界（两 BT 拼接/跨流未闭合 BT）；**边界落在 token 中间**零覆盖
+- 探针（outputs/autonomous/probe_dangling_r1939.py 复用 + 精确无垫流构造 + 单流 EOL 对照，未入库）实证根因（pdfminer psparser.PSStackParser.nexttoken，#1157 修复：流切换时半截 token 在途 → 垫 `\n` 强行截断再续）：
+  - **T1 字符串中间断**：流 4 "(Str" + 流 6 "eam joined)" → content 恰 **'Str(cid:10)eam joined'**——垫入 \n 落进字面串成 0x0A 字符（StandardEncoding 无映射 → cid 标记，R1935 W3 家族的 EOL 触发形态），后半仍被提取、同元素、零告警
+  - **T2 数字中间断**："1"+"2 Tf" → 12 截成 1/2 两 token（仅字号受损）——'num split' 完整提取单元素
+  - **T3 操作符中间断**："E"+"T" → ET 不再是 ET（首文本对不闭合仍提取；后续 BT 开新元素）→ ['text','two']（edges34 missing-ET 容忍家族的多流触发形态）
+  - **T4 单流串内 EOL 对照**：裸 \n / \r → (cid:10)/(cid:13) 直通 content（规范称应归一为 \n——pdfminer 按 cid 保留）
+- 测试：`tests/test_parser_pdf_stream_token_boundary.py`（4 个，本地精确无垫流构造器；判别式：pdfminer 改真无缝拼接则 T1 全等翻红（变 'Stream joined'）；串内 EOL 归一成空格则 T4 cid 断言翻红）。4 passed
+- 计数影响：+4（R1925–R1940 累计 +50；下次全量预测 101660 + 50 = 101710）
+
+---
+
 ## Round 1939 — a 续：PDF 悬空 XObject 引用——两形态同归静默（3 测试）
 
 - 语境：edges35/105 锁未定义**字体** /F9（文本仍提取）；**未注册 XObject 的 Do** 与 **Resources 有名但对象号悬空**零覆盖
