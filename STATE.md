@@ -114,6 +114,21 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1913 — 1b/b 续：main evaluation/runner.py 并行与 auto 模式零覆盖探针实证（健康轮 + 两条结构性观察）（Round 1913）
+- 目标：main `6c6d398ca9c` evaluation/runner.py（批次 16 评测并行；**main 侧 evaluation 测试对 workers/auto/未注册 source_type 完全零覆盖**——test_evaluation_cli.py 无一处 workers/parallel 字样，仅 test_batch_parse.py 的 evaluation_parallel_report_consistency 覆盖全有效文档一致性）；探针 outputs/autonomous/probe_evalparallel_r1913.py（run_evaluation 进程内直调 + 临时项目根 git init，全部输出写系统临时目录，main worktree 零写入核验通过）
+- **W1 并行=顺序全等**：manifest v1.1 四文档（3 markdown + 1 text，4 任务 ≥3 走 Pool(workers=4)）vs workers=1 → per_doc 逐 doc_id 保序、**全量 metrics 完全相等**（含 text 文档混排；imap 保序声明成立）
+- **W3 auto 路由**：auto + source_type text → parser "text" 正常解析；parsers_used_all=[markdown×3, text] 按 manifest 序
+- **W4 expected_failures 两条**：legacy 无 source_type → fallback → file_not_found matches=True；source_type "other" → ef_parser None → 合成 unsupported_type matches=True（**None 分支经 EF 的 txt/other 可达**）
+- **W2 workers 钳制**：workers=0 / -2 → max(1,int) → 顺序完成（4 文档报告完整）；**W5 provenance**：auto → parser_version=None（多 parser 并存不误导）、显式 markdown → "stdlib/0.1.0"；**W6 _per_doc 残留**：零 *.json stub（out_stub 清理生效）
+- **观察 O1（schema 版本条件收窄，设计如此）**：manifest.schema.json 顶层 allOf 按 manifest_version 条件收窄——1.0 仅 pdf/docx，1.1 起解锁 markdown/html/text/ipynb；探针首跑用 1.0+markdown 被正确拒绝（排查路径：load_schema 直读六值 vs validate 两值拒 → allOf 分支）。runner 级 1.1 四类型路由（text）本轮首次实证
+- **观察 O2（documents 侧合成失败分支当前不可达）**：schema documents.source_type 枚举恰六值，AUTO_PARSER_BY_SOURCE_TYPE 键恰同六值 → documents 的 synthesized unsupported_type 分支（runner 183-198）经 schema 合法清单**当前不可达**（防御性深度代码；仅 expected_failures 的 txt/other 经 _resolve_parser_name None 触发同类语义）
+- **观察 O3（平台上下文不对称）**：runner `Pool(workers)` 用默认上下文（Windows=spawn / Linux=fork），与 app/batch.py 批次 25 强制 get_context("spawn") 不一致——evaluation 无插件重放故 fork 风险低，但两模块 multiprocessing 口径不一
+- 结论：六边角全绿无指示线新候选；候选维持 #1-#5
+- 探针产物（未入库）：probe_evalparallel_r1913.py、probe-evalparallel-r1913.out/.err
+- 计数影响：0（纯探针轮；autonomous baseline 101645 不变）
+
+---
+
 ## Round 1912 — 1b/b 续：main cli.py 诊断子命令六边角探针实证（健康轮，无新候选）（Round 1912）
 - 目标：main `6c6d398ca9c` app/cli.py explain-parser / audit-parsers / inspect-parser（批次 22-24；main 侧 26 测试较厚）；探针 outputs/autonomous/probe_clidiag_r1912.py（CLI 子进程实测 sys.executable -m app.cli，诊断命令只读、parse 输出写系统临时目录，main worktree 零写入核验通过）
 - **C3 大写扩展一致性（本轮核心）**：X.MD 文件 → explain 输出 extension ".md"（小写化）、胜者 markdown_enhanced（5 < 20）；实际 parse --parser auto 同一文件 rc0、elements=1、经 markdown_enhanced 成功出盘——**解释通道与执行通道对大写扩展行为一致**（两者均经 discover_parser_details 单一决策实现）
