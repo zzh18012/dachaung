@@ -59,3 +59,21 @@ def test_every_test_file_has_tests():
 def test_no_within_file_duplicate_test_names():
     _, _, dup_names = _scan()
     assert dup_names == []
+
+
+def test_no_private_user_paths_in_tests():
+    """私有数据路径审计（f 队列，R1886）：测试源码不得含
+    用户名 / 中文私人目录字面量（R1886 修复 edges57 一处
+    硬编码用户名路径；C 盘符串不禁止——66 处为良性负向守卫
+    断言"源码不含绝对路径"）。模式运行时拼接，防自匹配。"""
+    user = "zzh" + "n2"
+    private_dir = "大" + "创"
+    banned = (user, private_dir)
+    offenders = []
+    for p in sorted(TESTS_DIR.glob("test_*.py")):
+        src = p.read_text(encoding="utf-8")
+        for token in banned:
+            if token in src:
+                offenders.append(f"{p.name} contains private token")
+                break
+    assert offenders == []

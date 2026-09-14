@@ -102,7 +102,7 @@ def test_manifest_error_can_be_chained_batch30():
 
 def test_is_absolute_like_long_string_with_drive_batch30():
     """长字符串 + 盘符 → True。"""
-    assert _is_absolute_like("C:/Users/zzhn2/Desktop/x.pdf") is True
+    assert _is_absolute_like("C:/Users/somebody/Desktop/x.pdf") is True
 
 
 def test_is_absolute_like_two_letters_no_colon_batch30():
