@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1845 — 四家族同输入重复解析全等、管线输出字节全等（Round 1845）
+- 动机：锁 R1844 后补横切性质——parser/pipeline 层"同一输入两次结果全等"的确定性断言全库零覆盖（annotation 系 determinis 是指标层）
+- 探针：3 组探针（md/html 深比较、text/ipynb 深比较、process_single 双跑字节比较），断言全部来自实测输出
+- 结论 1：md/html 同文件两次 parse 的 Document dataclass 深比较全等（elements/locator/section_path/metadata/warnings 全同）
+- 结论 2：text（多段含连续空行）与 ipynb（markdown/code/raw 三型 cell + kernelspec language）同样两次全等
+- 结论 3：process_single 同输入跑两次输出 JSON 逐字节相同（2673 字节）——无时间戳/随机序/路径差异泄漏，errors 空
+- 新增：tests/test_determinism_same_input_twice.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1844 — html xml 声明丢弃、条件注释丢弃、NUL 保留/emoji 引用解码（Round 1844）
 - 动机：锁 R1843 后查文档级前缀与控制字节——grep 核实 html 测试对 xml 声明、条件注释、输入 NUL、超 BMP 数字字符引用全零覆盖
 - 探针：4 组探针（声明前缀/条件注释/NUL 字节/十进制与十六进制 emoji 引用），断言全部来自实测输出
