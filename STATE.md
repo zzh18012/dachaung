@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1844 — html xml 声明丢弃、条件注释丢弃、NUL 保留/emoji 引用解码（Round 1844）
+- 动机：锁 R1843 后查文档级前缀与控制字节——grep 核实 html 测试对 xml 声明、条件注释、输入 NUL、超 BMP 数字字符引用全零覆盖
+- 探针：4 组探针（声明前缀/条件注释/NUL 字节/十进制与十六进制 emoji 引用），断言全部来自实测输出
+- 结论 1：'<?xml version="1.0"?>' 声明整段丢弃——无元素无 warning，后续内容照常解析（XHTML 可吃）
+- 结论 2：'<!--[if IE]...<![endif]-->' 条件注释当注释丢弃——downlevel 内容不泄漏成元素
+- 结论 3：NUL 字节字面保留在 content（不剥离不替换）；'&#128512;' 与 '&#x1F600;' 都正确解码为 U+1F600（超 BMP 引用支持）
+- 新增：tests/test_parser_xmldecl_condcomment_nul_emoji.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1843 — html 遗留行内标签族剥壳、font/center、md 定义列表不识别（Round 1843）
 - 动机：锁 R1842 后查遗留标签——grep 核实 u/s/del/ins/big/small/font/center 八标签与 md ': def' 定义列表语法全库零覆盖
 - 探针：6 组探针（六行内标签 + font/center + 定义列表），断言全部来自实测输出
