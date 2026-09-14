@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1838 — 字母/罗马有序标记字面、html ol type 属性忽略（Round 1838）
+- 动机：锁 R1837（实体/围栏/嵌套引用）后查有序标记语法族——_ORDERED_LIST_RE 只认数字，字母/罗马标记与 html ol type 属性零覆盖
+- 探针：4 组独立探针（md 字母/罗马、html ol type、text 家族对照），断言全部来自实测输出
+- 结论 1：md 'a. alpha'/'A. Beta'/'i. first'/'iv. fourth' 全部 paragraph 字面——字母与罗马标记都不触发有序列表；连续字母标记行合并单段且换行保留
+- 结论 2：html ol type="a"/type="I" 项照常 list_item，metadata 恒 ordered=True + marker='ordered'——type 属性忽略（与 start 属性忽略同哲学）
+- 结论 3：text 家族 'a. line one' 同样 paragraph 字面——三家族对字母标记全部不识别，只有 html ol 显式结构才有序
+- 新增：tests/test_parser_ordered_marker_grammar.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1837 — md 实体字面、未闭合围栏成块、嵌套 bq 扁平（Round 1837）
 - 动机：锁 R1836（家族分工）后补三边界——md 实体解码与否、未闭合围栏、html 双层引用，均零覆盖
 - 探针：3 组独立 heredoc 探针，断言全部来自实测输出
