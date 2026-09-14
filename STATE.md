@@ -89,6 +89,19 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1887 — b 优先级首轮：BACKLOG 候选 B/C 根因合成复现（Round 1887）
+- 动机：协议 v2 次优先级 b——BACKLOG 根因调研（只读代码 + 合成复现，不读 real-*、不改 app 代码）
+- 适用性核查：自跑线分叉点 2c35244（早于 Stage 8 全部批次）——BACKLOG §5–§9 涉及的 batch.py/plugin_loader 等文件不存在，不可复现；§1–§3（候选 B/C/D）与 §4 的 PDF/DOCX 解析路径存在（fallback_parser 同源），可做单元级复现
+- 候选 B 根因确认（fallback_parser.py:121/:127-131/:50）：word 排序键 (y_center, x0) + 行聚类只看 y（±3.0）**无 x 栏目聚类**——双栏同行词跨栏并成一行；合成复现：左栏题注两行 + 右栏正文同 y 带 → 单段 '图 1 系统 架构 The model achieves 与 模块 划分 95% accuracy'，bbox 横跨两栏 [50,500,448,526]；caption 正则前缀锚定 → 污染文本仍判 caption（内容错、计数偏）——与 BACKLOG "多栏栏目坐标聚类后未按栏重组" 方向一致，实证为"聚类根本不存在"
+- 候选 C 根因确认（fallback_parser.py:184）：`len(t)<=80 且无终止标点` → heading(level 0, short_line)，无字体/语境信号——10 个合成表单标签（姓名/出生日期/Name/Date of Birth/Signature/请填写以下信息后提交 等）全部误判 heading；带句读对照行走 paragraph；阈值恰 80/81 分界——BACKLOG "+246%" 的单元级根源
+- 新增：tests/test_backlog_pdf_heuristics_rootcause.py（3 测试，特征锁定非期望规格，docstring 注明供指示线修复对照）
+- 候选 D（跨页表格）初判：:257 逐页循环 + :291 page.find_tables() 结构性逐页独立，无跨页状态——代码阅读已立，合成复现需最小双页 PDF（raw PDF 手写可行），留后续轮次
+- §4（w:tc 内 sdt）注意：自跑线无任何 sdt 处理路径（分叉早于批次 14）——对应缺陷变体是 sdt 包裹内容整体丢弃（更老版本），与主线"递归已覆盖 flow、w:tc 边界"不同层
+- 计数影响：+3 测试；下次全量预测 101594 + 3 = 101597（待跑动中回归完成后顺延）
+- 状态：已提交已推送
+
+---
+
 ## Round 1886 — f 队列第二项：私有数据路径审计 + 隐私元测试（Round 1886）
 - 动机：f 队列剩余项之一——测试源码中的私有数据路径（用户名 / 私人中文目录字面量）审计
 - 审计结果：**真缺陷 1 处**——tests/test_evaluation_manifest_edges57.py:105 硬编码用户名路径样例（`C:/Users/zzhn2/Desktop/x.pdf`）→ 改 `somebody`；其余 66 处 C 盘符串均为良性负向守卫（断言"源码不含绝对路径"类），不列入禁止
