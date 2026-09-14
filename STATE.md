@@ -114,6 +114,18 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1917 — 1b/f 续：main 测试全局状态变异隔离审计（第七维度，干净）（Round 1917）
+- 目标：main `6c6d398ca9c` tests/（131 文件）全局状态隔离静态审计——新开第七审计维度；常驻扫描器 outputs/autonomous/main_state_scan.py（六类模式：注册表变异/sys.path 无清理/sys.modules 变异/os.chdir/env 直写/logging 全局操作；结果 main-state-scan-r1917.json 未入库）
+- **六维仅两类命中、共 4 处，人工复核全部良性**：
+  - S1 ×2 = test_batch24_closure.py 32/53 行——**只读**迭代 pr._capabilities（parametrize + items()），扫描器"变异"正则误报（读访问）；
+  - S3 ×2 = test_parser_provenance.py 54 / test_plugin_loader.py 160 行——fixture **teardown 定向清理**（仅删 __file__ 在 tmp 目录内的模块）且 _FIRST_LOAD 走 monkeypatch.setattr，教科书级隔离；
+  - S2 sys.path 无清理 0；S4 os.chdir 0；S5 os.environ 直写 0；S6 logging 全局操作 0
+- 结论：main 测试全局状态卫生干净，与 R1915（flaky 零命中）、R1907（运行时零 flaky）三维互证；无指示线候选；候选维持 #1-#5
+- 扫描器为常驻工具（新 main SHA 可重跑对照）；S1 正则读/写不分的误报模式已记录在案
+- 计数影响：0（纯审计轮；autonomous baseline 101645 不变）
+
+---
+
 ## Round 1916 — 1b/b 续：main container_verify.py 残余微边角探针实证（健康轮，无新候选）（Round 1916）
 - 目标：main `6c6d398ca9c` scripts/container_verify.py（批次 25；main 侧三测试文件覆盖厚：logic 26 测 + 静态契约 + e2e）；探针 outputs/autonomous/probe_containerv_r1916.py（纯函数无 docker 直调 + 子进程 main()，夹具写系统临时目录，main worktree 零写入核验通过）
 - **三个真零覆盖微边角补齐**：空 sha256 边车（纯空白行）→ ValueError"边车为空"；大写 hex 边车 → read_sha256_sidecar 归一小写；边车文件缺失 → load_artifact 返回 (None, "读取 sha256 边车失败")且**未触碰 docker**（OSError 路径在 docker load 之前）
