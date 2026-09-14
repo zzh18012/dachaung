@@ -114,6 +114,17 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1921 — a 续：PDF 离页/越界图片渲染语义——失败不占号 + 钳制渲染（3 测试）
+
+- 语境：R1896 锁零宽静默跳过、edges3 用 monkeypatch 锁单图 render 失败；本轮全部**真实 PDF 路径**（合成 XObject 放置，零 monkeypatch）补三缺口。探针 outputs/autonomous/probe_offpage_r1921.py 四假设全实证：
+  - **W1 完全离页图**（PDF y 800 h 100 → top 坐标 -108..-8）：pdfplumber **不做页面裁剪**，负坐标 bbox 原样进 locator；元素保留 "(unrendered)" + warning `pdf_image_render_failed`，零 PNG
+  - **W2 失败不占号**：image_counter 只在渲染成功时递增（:355）——离页图（失败）+ 在页图（成功）→ 在页图拿 **_p1_00**（失败占号假设下应为 _p1_01），盘上恰一 PNG
+  - **W3/W4 钳制渲染**：半离顶（top -50..50）与负 x（x0=-50）→ crop `max(0,..)`/`min(page,..)` 钳制后非退化 → 正常落盘（越出部分丢弃），零告警
+- 测试：`tests/test_parser_pdf_offpage_render.py`（3 个；判别式 = counter 改无条件递增则占号测试翻红、去钳制则负坐标进 PIL.crop 抛错）。3 passed
+- 计数影响：+3（R1919–R1921 累计 +9；下次全量预测 101645 + 9 = 101654）
+
+---
+
 ## Round 1920 — a 续：PDF 三相位全序 + 图片序来源（内容流序）+ 页序压倒相位序（3 测试）
 
 - 语境：R1919 锁段落→表格两相位；本轮补第三相位（图片）。DOCX 交错文档序对照角度放弃——edges4 :747 / edges9 :99 已锁 ["paragraph","table","paragraph"]
