@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1851 — chunker 对 unicode 分隔符的切分行为：惰性保留 + 家族对照（Round 1851）
+- 动机：edges9/10 只锁 _WHITESPACE_RE/normalize_text 的 RE 层、pipeline_line_separators 只锁 parser 层惰性——chunk **实际切分位置/逐字保留/尾分隔符剥除/家族对照**零覆盖
+- 探针：4 组探针（html U+2028@40、text FF@40、纯 FF 白空间@32、同内容 .md/.txt 对照；另复核 max_chars=8 落 32 下限[已覆盖弃用]），断言全部来自实测输出；初版 chunk2 对数误 9 修 8（probe len 26）
+- 结论 1：分隔符惰性——U+2028/FF 逐字留在 chunk 内、计入长度，按**普通空格**贪心切（39+7），非优先切点非句界
+- 结论 2：('ab'+FF)\*20 @32 → 恰 32/26 两 chunk，FF 作词界生效、跨界 FF 剥除，两 chunk 同 element id
+- 结论 3：同内容 ('ab'+U2028)\*20 的 .md（归一 \\n）与 .txt（原样 U+2028）切分位置完全一致（32/26），仅分隔符字符不同
+- 新增：`tests/test_chunker_unicode_separator_split.py`（3 测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1850 — html 容器级 loose 文本不对称：列表放行成段、表格吞噬（Round 1850）
 - 动机：edges14 孤儿 li 是无容器裸 li、edges12 caption 是 `<caption>` 标签——**容器内裸文本**（列表 vs 表格）grep 零覆盖；ol start / 嵌套 ul 探针复核均已覆盖弃用
 - 探针：2 组探针（ul/ol 首个 li 前的 loose、table 行前/单元格间 loose、无 li 纯 stray 容器），断言全部来自实测输出
