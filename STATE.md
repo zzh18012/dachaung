@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1875 — 引用内部空白与表单元格多空格（Round 1875）
+- 动机：R1874 锁普通段落内部/两端后查容器面——blockquote 内部缩进、标记后空白、pipe 表单元格多空格 grep 零覆盖
+- 探针：三组（bq 两行内部缩进、bq 标记后+行尾空格、表三行多空格单元格）
+- 结论 1：'> a\n>     b' → paragraph 'a\n    b' kind blockquote（'>' 标记剥后内部行 4 空格原样保留）
+- 结论 2：'>   lead\n> trail   ' → 'lead\ntrail'（标记后空格与块两端一并剥净）
+- 结论 3：'| a   b | c   d |' → table content 逐字（单元格内部多空格不折叠，metadata row/col_count 2/2）
+- 新增：tests/test_parser_bq_cell_ws.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1874 — md 段落空白：内部行缩进保留 / 两端剥 / 缩进行非代码（Round 1874）
 - 动机：text 解析器同型已锁（R1713 'a\n b' 行首空格保留 + text_edges8 内部缩进保留/两端剥），md 侧三类形态零覆盖；CommonMark 缩进代码块在此实现不存在——4 空格/tab 缩进行退化为剥净 paragraph
 - 探针：六组（内部缩进、两端空格、4 空格整行、tab 整行、段间缩进行、列表深缩进续行对照）
