@@ -89,6 +89,18 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1890 — b 四轮：候选 B 真实 PDF 多栏版元素级复现（Round 1890）
+- 动机：b 队列收尾项——R1887 单元级（word-dict）机制补上**元素级**证据：手写最小双栏 PDF 走完整 `_parse_pdf` 路径
+- 方法：复用 R1888 PDF 构造器（`from tests.test_backlog_pdf_crosspage_table import _build_pdf` 跨测试复用，避免加重重复体存量），纯文本定位无网格线
+- 元素级实证 3 条：① caption 元素内容被右栏正文**逐行穿插**（'Figure 1. System The model achieves high architecture overview accuracy on all benchmarks'，左栏题注 2 行与右栏 2 行交替融合），仍按前缀判 caption——类型对内容错；② 两栏正文合进同一元素且级联误判 heading（候选 C 叠加工候选 B）；③ 两元素 bbox 均横跨双栏（x0=50，x1>400，宽 >300）——单栏假设失效的几何证据
+- 意义：证明候选 B 无需特殊 PDF 结构即可触发——真实多栏文档（real-04）的"题注碎字符/计数偏差"必然发生，不是边角
+- 新增：tests/test_backlog_pdf_multicolumn_caption.py（3 测试，特征锁定）
+- b 队列小结：候选 B（单元+PDF 双层）/ C（单元+阈值边界）/ D（PDF+表头错位+双重提取复合发现）/ §4 变体（docx 三形态）全部完成根因+合成复现；§5–§9 不在自跑线代码（R1887）；b 方向暂尽，转 a（新颖性门槛）/f（回归资源）轮换
+- 计数影响：+3 测试；下次全量预测 101594 + 3×4（R1887–R1890）= 101606
+- 状态：已提交已推送
+
+---
+
 ## Round 1889 — b 三轮：BACKLOG §4 变体 sdt 内容整体静默丢弃合成复现（Round 1889）
 - 动机：b 队列续——§4（w:tc 内 sdt 欠提取）在自跑线的对应变体（分叉早于批次 14，无任何 sdt 路径）
 - 方法：python-docx 造基线 docx + lxml 原生 XML 注入 w:sdt（parse_xml + body/tc 插入），三种形态
