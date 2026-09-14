@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1948 — a 续：DOCX 表格单元格内嵌图片静默丢失（3 测试）
+
+- 语境：grep 实证无任何 DOCX 测试把图片放进表格 cell（PDF 侧 grid_cell_image 已锁）；parser w:tbl 分支只读 `c.text`（:552-556），cell 段落不走 `_extract_inline_image_rids`
+- 探针（outputs/autonomous/probe_docx_tblimg_r1948.py，未入库）实证：
+  - **T1 cell 图片静默丢失**：1x2 表格 cell(0,1) 内嵌 PNG → 零 image 元素、零告警、零 PNG 落盘（与 edges69 numPr/outlineLvl 同族：Word 语义有、提取面没有）
+  - **表格 md 空 cell**：'| text cell |  |'（图片占位不进单元格文本）
+  - **T2 body 图片不受影响**：同文档 body 段落图片照常成元素（恰 1、para2_00、PNG 落盘）——丢失只发生在 tbl 分支
+- 测试：`tests/test_parser_docx_table_cell_image_dropped.py`（3 个；判别式：tbl 分支补扫 cell rId 则 T1/T2 元素数翻红；引入丢失告警则零告警翻红；md 全等锁 cell 文本形态）。3 passed
+- 计数影响：+3（R1925–R1948 累计 +74；下次全量预测 101660 + 74 = 101734）
+
+---
+
 ## Round 1947 — a 续：PDF 图像透明蒙版三形态——SMask 兑现摊平、色键抠黑、悬空蒙版忽略（3 测试）
 
 - 语境：grep 实证 /SMask 与 /Mask 零覆盖；R1936 锁 /ImageMask 模板（图本身即蒙版）——**基图附属透明蒙版**零覆盖
