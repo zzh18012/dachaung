@@ -114,6 +114,16 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1915 — 1b/f 续：main 测试非确定性/flaky 风险模式全维扫描（干净维度）（Round 1915）
+- 目标：main `6c6d398ca9c` tests/（131 文件）flaky 风险静态审计——新开第六审计维度；常驻扫描器 outputs/autonomous/main_flaky_scan.py（AST + 行级正则，只读 main，结果 outputs/autonomous/main-flaky-scan-r1915.json 未入库）
+- **八维扫描全部零命中**（双路验证：扫描器 + 直接 grep 复核一致）：
+  F1 time.sleep 显式等待 0；F2 datetime.now/utcnow/today 与 time.time 进断言 0；F3 random 未播种 0（整个 tests/ 无 random）；F4 os.listdir/iterdir/glob 目录序假设 0；F5 requests/urllib/httpx/socket 网络导入 0；F6 uuid 断言 0；F7 threading 导入 0；F8 语法错误 0
+- 结论：main 测试在非确定性维度卫生极佳（夹具全合成、无 sleeps/无随机/无网络/无目录序依赖/无多线程）——与 R1907 运行时基线 102 次连续精确命中、零 flaky 观察相互印证；无指示线候选；候选维持 #1-#5
+- 扫描器为常驻工具（新 main SHA 到来时可重跑对照）
+- 计数影响：0（纯审计轮；autonomous baseline 101645 不变）
+
+---
+
 ## Round 1914 — 1b/b 续：main pipeline.py 契约检查边角探针实证（健康轮，无新候选）（Round 1914）
 - 目标：main `6c6d398ca9c` app/pipeline.py 契约检查（批次 20 Phase C；main 侧 test_pipeline_contract_check.py 5 测试：ok/类型越界/family 错/str 归一/内置）；探针 outputs/autonomous/probe_contract_r1914.py（桩 parser 进程内注册 + process_single 直调，夹具写系统临时目录，main worktree 零写入核验通过）
 - **P1 违规元素截断**：15 个 family 违规元素 → details.offending_element_ids **恰截断为 10**（消息与 details 同步截断；总数 15 不可见——截断语义未载于 CLAUDE.md"details 带 element_ids"表述，行为合理）
