@@ -81,6 +81,16 @@
 
 ---
 
+## Round 1840 — 下划线强调字面、词内下划线字面、html dir 属性忽略（Round 1840）
+- 动机：锁 R1839 后查强调族——'_em_' 不在任何 md parser 测试、'__strong__' 与词内 'a_b_c' 全库零覆盖、html dir 属性全库零覆盖（grep 逐项核实）
+- 探针：3 组探针（下划线强调形、词内下划线、html dir 属性），断言全部来自实测输出
+- 结论 1：md 'plain _em_ text'/'double __strong__ text' 全部 paragraph 字面——下划线形强调不转换（星号形字面已在 edges4/edges11 锁过）
+- 结论 2：md 'a_b_c'/'pre_alpha_post' 词内下划线原样保留——identifier 不触发任何转换、无 emphasis 元数据
+- 结论 3：html dir="rtl" 属性忽略、RTL 文本逐字保留——阿拉伯字符完整进 content、无 dir 元数据；div+span 嵌套压平成单段
+- 新增：tests/test_parser_underscore_emphasis_dir_attr.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1839 — 裸 www 不自动链接、html style 属性忽略、表格单元格 tab 保留（Round 1839）
 - 动机：锁 R1838（有序标记语法族）后补三边角——裸 URL 自动链接、html style 属性、md 表格单元格内 hard tab，均零覆盖（R1833 只锁了尖括号 autolink 字面）
 - 探针：3 组独立探针，断言全部来自实测输出
