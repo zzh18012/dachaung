@@ -97,6 +97,16 @@
 - 下次预测：101593 + 13（R1886–R1890：1+3+3+3+3）= 101606；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1896 — a 队列续：PDF 图片文件名全局 counter 编号 + 零宽图静默跳过锁定（Round 1896）
+- 新颖性：edges17 只锁过单图 p1_00 正则；多页多图编号语义与退化几何跳过零覆盖。探针实证：`_parse_pdf` :250 image_counter 在页循环**外**初始化，:340 前缀 p{page_idx} 但 index 用全局 counter
+- **counter 全局延续**：第二页唯一图片文件名是 **_p2_02**——页前缀 + 全局索引的错配组合（每页前缀暗示"每页编号"，索引却跨页延续；p2_02 是第 2 页唯一的图）。页内基线 _p1_00/_p1_01 无意外
+- **零宽图静默丢弃**：cm 矩阵宽 0 的放置（x1 == x0）命中 :326 `x1 <= x0 or bottom <= top` 直接 continue——不产生元素也不产生告警（silent drop 无痕迹）；同页正常图 bbox 完好
+- 新增：tests/test_parser_pdf_image_numbering.py（3 测试；裸 PDF 多页构造器——页 i → 对象 3+2i/4+2i，image/font 殿后全连续，XObject 1x1 DeviceRGB 复用 edges17 风格）
+- 计数影响：+3 测试；下次全量预测 101621 + 3（R1896）= 101624
+- 状态：已提交已推送
+
+---
+
 ## Round 1895 — a 队列续：DOCX 合并单元格重复展开 + 嵌套表丢弃锁定（Round 1895）
 - 新颖性：grep 零覆盖（parser 测试无 gridSpan/vMerge/嵌套表），现实极常见（合并表头、嵌套布局）；探针三组实证，落点在 python-docx `row.cells` 语义 × `_parse_docx` :545-570 平铺不递归
 - **横向合并按跨度重复**：cell(0,0).merge(cell(0,1)) 后 `row.cells` 对每个网格列返回同一 cell → 合并文本 'TL\\nTR' 在 markdown 行出现两次（'| TL\\nTR | TL\\nTR |'）；合并自带 \\n 原样留在 md 里，破坏 markdown 一行一行的表结构；重复展开不改变 col_count（仍 2）
