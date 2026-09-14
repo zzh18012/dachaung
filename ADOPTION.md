@@ -6613,3 +6613,60 @@ PyYAML、B1/B2 不启动、real-0X 只读边界本轮未启用、adoption 纯台
 改写。台账队列 = §124（5a05acb）+ §125（bd1001f）+ §126（bb7f376）
 + §127（4a3e121）+ 本节（远端 = 4c77631），按裁决随 M1 首个实质
 push 搭车。M1 首报（r52）请求 push 授权。
+
+## 一百二十九、r52 附问裁决：自跑线方向与两线协调规则批准（2026-09-14）
+
+五十二轮附问（自跑线方向问询，简报 outputs/gpt_brief_
+autotrack_direction_coordination.txt，与 M1 首报同轮转达）。
+用户动机（原话要旨）：指示线 token 消耗太慢，自跑线必须能
+长时间无人值守连续运转。登记行原文：R52 COORDINATION RULE
+RATIFIED — The autonomous track continues indefinitely only
+through a queued, novelty-gated loop: priority is test-harness
+health, then BACKLOG root-cause preparation, then contract-safe
+test-first work, with low-frequency baselines. Free-running
+documentation edits and duplicate behavior-lock tests are
+prohibited. The autonomous branch remains archival and is never
+auto-merged; selective transport may occur only after milestone
+audit on the instruction line. Blocked work is isolated and
+recorded, periodic summaries occur every 100 rounds or 7 days,
+and full regressions are change-triggered or weekly.
+
+裁决要点：
+
+- 问询一排序：**f 测试/自跑线健康维护**（新增最高优先级：
+  重复测试检测、覆盖面/新颖性检查、测试耗时漂移、全量回归
+  资源监控、私有数据路径审计）> **b BACKLOG 根因预备调研**
+  （C2/C3/§3a/C5 代码阅读、合成复现、调研记录；不得自行改
+  parser 或冻结规则；real-* 仅指示线为具体候选明确授权后
+  只读；笔记入 STATE.md，大型材料入未入库 outputs/autonomous/
+  并记摘要+哈希）> **a 行为锁定测试**（保留但加新颖性门槛：
+  仅新未覆盖行为/边界/回归风险才新增；连续周期无新发现转
+  f/b，不停机）> **c 搬运线预备件**（有条件：仅已授权/已冻结
+  契约候选、不含新语义假设；不得替未来批次决定 expected
+  behavior）> **e 基准采集**（低频：仅变化触发或每周）；
+  **d 文档维护砍掉**（规范 docs/README/runbook 仅指示线改）。
+- 问询二逐条：分工原则批准附例外（新语义/新数据面/新依赖/
+  真实语料范围/异常资源消耗/安全问题必须停在撞墙规则）；
+  产出边界维持 tests/ + STATE.md 不开放写 docs/；**2736
+  commits 归宿 = 不自动合入、设选择性搬运通道**（里程碑后
+  指示线审计，以原 commit 哈希为据选择性 cherry-pick，不
+  rebase、不整体 merge、不搬 STATE.md 历史）；撞墙规则批准
+  补"隔离后继续"（冻结子任务、续跑独立队列项、全阻塞才
+  待命）；汇报节流每 100 轮或 7 天先到者（安全问题/越权
+  风险/测试失败/环境变化立即报告）；资源边界改"按变化触发
+  + 每周全量"（单次全量须超时与 CPU 上限，不得无限重试）。
+
+执行（自跑线 worktree dachuang-autonomous）：
+
+- 协议 v2 写入 AUTONOMOUS_LOOP.md 顶部（优先级 f>b>a>c>e、
+  d 禁止、产出边界、分支归宿、撞墙"隔离后继续"、汇报节流、
+  资源边界）+ STATE.md 协议修订条目，commit **acdd13b** 已
+  push（claude/autonomous-track）；
+- 同 commit 记回归基线 101580（第 136 次：101558 passed +
+  22 skipped，997s，第 99 次连续精确命中；含 R1865–R1883）；
+  该次全量为裁决前启动的存量 run，此后按新资源规则执行；
+- 后续 f 优先级首轮启动（重复测试检测/套件健康元测试）。
+
+r52 主件（M1 首报 P12' push 授权）本轮未随附回复，仍待裁决。
+台账队列 = §124–§128 + 本节（远端 = 4c77631），随 M1 首个
+实质 push 搭车。
