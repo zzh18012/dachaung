@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1856 — 数字实体三向分裂：静默丢弃 / 字面控制符 / U+FFFD（Round 1856）
+- 动机：img-in-pre 拆段复核弃用（R1678 test_img_breaks_pre 已全锁含尾段 kind 丢失）、'&#0;'→FFFD 弃用（wsli_nullentity 已锁）——grep 核实 '&#1;'/'&#x10FFFF;'/'&#9;'/'&#10;'/'&#xD;'/'&#xD800;' 全库零覆盖
+- 探针：HtmlParser 六组 + html.unescape 直测对照（丢弃/FFFD 分裂来自 stdlib _invalid_charrefs/_replace_charref，parser 纯透传）
+- 结论 1：'&#1;'（Cc）与 '&#x10FFFF;'（非字符）→ content 'ab' **静默丢弃零错误**——与 '&#0;'→U+FFFD 同族三向分裂
+- 结论 2：'&#9;'/'&#10;'/'&#xD;' → '\t'/'\n'/'\r' 字面保留，实体 LF **不拆段**（单 paragraph 含 \n）
+- 结论 3：'&#xD800;'/'&#1114113;' → U+FFFD——unescape 已消毒不产生 lone surrogate（R1854 JSON 转义通道写盘崩溃的安全半边对照）
+- 新增：tests/test_parser_numentity_drop_ctl.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1855 — ipynb metadata 代理崩溃 + 忽略字段 + nbformat 浮点泄漏（Round 1855）
 - 动机：edges12/15 已锁 int language 与 minor 字符串透传——metadata 代理、忽略字段集合、nbformat 浮点 grep 零覆盖；source-int[edges10 已覆盖]、nbformat 字符串[edges12 TypeError 已覆盖]复核弃用
 - 探针：3 组探针（kernelspec language '\\ud800'、exec_count/outputs/id 类型违规、nbformat 4.7/nbformat "4"/minor "5"），断言全部来自实测输出
