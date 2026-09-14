@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1932 — a 续：PDF 同位叠印文本——水印家族成对交错（3 测试）
+
+- 语境：edges200 锁**不同 x** 的栏交叠交错（'nRoiwgh.t'）；**完全同位叠印**（水印/粗体阴影：同一 Td 画两遍——DRAFT 水印即此形态）零覆盖
+- 探针（outputs/autonomous/probe_overprint_r1932.py + 3 Tr 变体单跑，未入库）三态实证（pdfplumber 字符无去重、同 x 排序稳定保插入序）：
+  - **O1 同文本同位两遍**：'WATER' ×2 → 单元素 content 恰 **'WWAATTEERR'**——成对交错加倍（非连接 'WATERWATER'、非去重 'WATER'）；零告警
+  - **O2 异文本同位**：'AAAA' 叠 'bbbb' → **'AbbAbAbA'**——两份字符全在（8=4+4 无丢失）、交错序确定
+  - **O3 隐形叠印同型**：第二遍 `3 Tr` → 与 O1 全等 'WWAATTEERR'——渲染模式既不滤字符也不构成去重键
+- 测试：`tests/test_parser_pdf_overprint_text.py`（3 个，判别式：同位去重（水印抑制）则长度断言翻红；排序改不稳定则交错全等断言翻红）。3 passed
+- 计数影响：+3（R1925–R1932 累计 +25；下次全量预测 101660 + 25 = 101685）
+
+---
+
 ## Round 1931 — a 续：DOCX 样式名判型残余边界——basedOn 继承不可见（3 测试）
 
 - 语境：edges10 锁内置样式名（H1-H9 透传、Title=1、Intense Quote 原样）；**basedOn 继承**与 **heading 前缀异名**零覆盖
