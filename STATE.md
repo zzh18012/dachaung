@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1859 — ipynb raw cell CRLF 保留 + chunk 硬切（Round 1859）
+- 动机：crlf_text_ipynb R1719 只锁 markdown cell '\r\n' 归一 '\n'——raw cell 逐字保留、chunk 层 '\r\n' 行为零覆盖；noscript/details/canvas/unquoted 属性/title/img-in-heading/空 td 复核全弃用（edges11/17/21/16/13/3 等已锁）
+- 探针：process_single ipynb 三组（raw cell 保留、'aaaa\r\n'×10 @40、双 cell 合并），chunk 断言逐字符来自实测
+- 结论 1：raw cell source "line1\r\nline2" → content **逐字保留**（与 markdown cell 归一 '\n' 形成 cell 类型不对称）
+- 结论 2：'\r\n' **不是 chunk 分隔符**——'aaaa\r\n'×10 @40 恰在 40 字符硬切（40/16），切点 '\r\n' 被消费，两半内部 \r\n 照留（与 R1851 普通 \n 分隔位切分对照）
+- 结论 3：两 cell 合 chunk 用 ' ' 连接（'x\r\ny\r\nz tail'），cell 内 \r\n 不受影响，双元素 id 同 chunk
+- 新增：tests/test_pipeline_ipynb_crlf_chunks.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1858 — html CRLF 内容剥离 + 裸 CR 计行（Round 1858）
 - 动机：R1857 锁 md 侧；html 侧 edges:380/392 只断言**元素个数**，内容级 '\r' 剥离/行定位数值/裸 CR 计行零覆盖；ipynb CRLF 复核弃用（crlf_text_ipynb R1718 已锁 source 字符串与列表 '\r\n' 保留）
 - 探针：HtmlParser 六组（段落内容/行号、裸 CR、table cell、img alt、pre）
