@@ -114,6 +114,18 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1916 — 1b/b 续：main container_verify.py 残余微边角探针实证（健康轮，无新候选）（Round 1916）
+- 目标：main `6c6d398ca9c` scripts/container_verify.py（批次 25；main 侧三测试文件覆盖厚：logic 26 测 + 静态契约 + e2e）；探针 outputs/autonomous/probe_containerv_r1916.py（纯函数无 docker 直调 + 子进程 main()，夹具写系统临时目录，main worktree 零写入核验通过）
+- **三个真零覆盖微边角补齐**：空 sha256 边车（纯空白行）→ ValueError"边车为空"；大写 hex 边车 → read_sha256_sidecar 归一小写；边车文件缺失 → load_artifact 返回 (None, "读取 sha256 边车失败")且**未触碰 docker**（OSError 路径在 docker load 之前）
+- **V2 校验和先行复验**：内容篡改 → "校验和不符"在 docker 前返回（main 已有测试，交叉印证）
+- **V3 argparse**：无参 → rc2；--image 与 --artifact 同给（互斥组）→ rc2
+- **V4 结构顺序观察**：本机 docker daemon 不可用（preflight_daemon False）+ --artifact 指向不存在文件 → **rc3 stage=daemon_preflight**——daemon 预检先于制品存在性检查，制品侧 rc4 问题在 daemon 离线时被掩蔽（rc 语义顺序：daemon 3 > 制品 4；CI 上 daemon 恒在线故无实害，记录备查）
+- 结论：全绿无指示线新候选；候选维持 #1-#5
+- 探针产物（未入库）：probe_containerv_r1916.py、probe-containerv-r1916.out/.err
+- 计数影响：0（纯探针轮；autonomous baseline 101645 不变）
+
+---
+
 ## Round 1915 — 1b/f 续：main 测试非确定性/flaky 风险模式全维扫描（干净维度）（Round 1915）
 - 目标：main `6c6d398ca9c` tests/（131 文件）flaky 风险静态审计——新开第六审计维度；常驻扫描器 outputs/autonomous/main_flaky_scan.py（AST + 行级正则，只读 main，结果 outputs/autonomous/main-flaky-scan-r1915.json 未入库）
 - **八维扫描全部零命中**（双路验证：扫描器 + 直接 grep 复核一致）：
