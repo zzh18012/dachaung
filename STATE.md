@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1866 — 数字实体语法容忍：大写 X / 无分号 / 前导零 / 空十六进制（Round 1866）
+- 动机：grep 实证 '&#X'/'&#65 '/'&#065'/'&#x;' 全库零覆盖——既有实体测试全用规范小写 x + 分号形态；R1856 锁的是码点值域（drop/FFFD/控制符），本批锁的是**语法形态**容忍
+- 探针：四组（大写 X 十六进制、缺分号十进制、空十六进制、前导零）
+- 结论 1：'&#X41;' → 'A'（charref RE 大小写都吃）且 '&#065;' → 'A'（int() 容忍补零）
+- 结论 2：'a&#65 b' → 'aA b'——数字实体缺 ';' 照常解码（与命名实体无分号锁 &copy 是另一条路径）
+- 结论 3：'z&#x;' → 字面保留 'z&#x; empty'（无数字不匹配 RE，不解码不丢弃）
+- 新增：tests/test_parser_numentity_syntax_tolerance.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1865 — fence info 前导空白剥离 + 标记分隔 \s 族 + section_path 保 NBSP（Round 1865）
 - 动机：'``` py' 带空格 info、'1.\t'/'1.　'/'+\t'/'>\t' 标记分隔、section_path 含 NBSP 全库零覆盖；空 heading 跳过复核弃用（edges13:37 已锁同终点）；'2)second' 括号列表复核弃用（paren lists 已锁）
 - 探针：九组（info 三种前导空白、ordered/unordered/bq 四种 \t 与全角标记、NBSP 标题路径）
