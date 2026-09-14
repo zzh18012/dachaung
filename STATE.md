@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1928 — a 续：DOCX 纯空白段 ≡ 空串归一（4 测试）
+
+- 语境：R1925/1926 锁空串 heading、R1585 锁分页符段；**纯空白文本**（空格/制表符）的归一语义零锁（既有 "   " 段全是评测侧 gap 填充，无 content 断言）。探针推翻代码直觉（"content=text or 占位符"会保空白）——实际 _parse_docx :468 `(para.text or "").strip()` 在 intake 即归一
+- 探针（outputs/autonomous/probe_whitespace_r1928.py，未入库）实证：
+  - **W1 空格段 → 占位符**："   " Normal 段 → content=="(空段落)"（非原始 "   "）、empty=True
+  - **W2 占位符入 chunk**：两正文间空白段 → 单 chunk 'Before body text. (空段落) After body text.'，三元素全进 source_ids
+  - **W3 空白 heading 同型空 heading**："   " Heading 1 → heading + 占位符 + level=1 + 照常劈 2 chunk（硬边界判据是 strip 后非空的占位符文本）
+  - **W4 制表符变体**："\t" 段 → 同占位符
+- 测试：`tests/test_parser_docx_whitespace_normalization.py`（4 个，判别式：:468 strip 移除则 W1/W4 翻红；占位符被 chunker 视空白跳过则 W2 翻红）。4 passed
+- 计数影响：+4（R1925–R1928 累计 +13；下次全量预测 101660 + 3xN+1 → 101660+13=101673 当前累计）
+
+---
+
 ## Round 1927 — a 续：DOCX 嵌套表静默不可见性（3 测试）
 
 - 语境：R1895 已锁 parser 级合并重复 + 嵌套表丢弃（元素序/无承载）；edges33 锁 cell 内图片不可见、Batch 3 锁 w:tc 内嵌 w:sdt；本轮补锁的是 **pipeline 级 chunk 级联**（[seq, isolated_table, seq] + isolated 文本恰表格 markdown）与**外层 cell 精确序列化**（'| BL |  |'）+ 零告警断言——grep 嵌套表 chunk 组成零覆盖
