@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1848 — md 空围栏静默丢弃 + html 属性级 tokenizer 恢复（Round 1848）
+- 动机：dl/figcaption/转义/sub-sup/波浪围栏/td 内 img 均已覆盖后，转向 md 空围栏与 html 属性级 tokenizer 恢复（grep 核实 '```\\n```' 与未闭合引号/属性内换行全库零覆盖）
+- 探针：2 组探针（空围栏±lang、未闭合引号 img、src 内换行、多行属性），断言全部来自实测输出
+- 结论 1：'```\\n```'（有无 lang 均同）→ **零元素**（空 code block 静默丢弃），'tail' line 4 不受影响
+- 结论 2：`<img src="a.png alt="x">` → 未闭合引号把 'a.png alt=' 当完整 src 值、x 成裸属性；image 照发，alt 缺失时 metadata 含空串
+- 结论 3：src='b\\n.png' → resource_path 逐字保留换行，locator 取起始标签起始行（多行属性不推进行号）；`<img\\nsrc=...\\nalt=...>` 起始行 1
+- 新增：`tests/test_parser_emptyfence_attr_recovery.py`（3 测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1847 — md 链接引用定义不识别：原样段落、无解析、按段落规则合并（Round 1847）
 - 动机：grep 核实 '[ref]: url' 形式全库零覆盖（markdown_edges10 只覆盖脚注定义 '[^1]: …'）；另核 BOM（cross_edges3 已覆盖）、`<br>`/inline link/autolink/脚注（均已覆盖）弃用
 - 探针：2 组探针（定义行独立/定义+使用相邻/相邻多定义/标题行跟进/4 空格缩进[已覆盖弃用]/大小写变体），断言全部来自实测输出
