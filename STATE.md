@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1864 — 空白分类学第三批：U+3000 / BOM#后 / 软连字符 / 制表符列表（Round 1864）
+- 动机：R1862/R1863 建立 isspace×\s 二分后补齐第三批字符与**新位置变体**（R1853 只锁行首 BOM 杀标题，# 后 BOM 未测）；全库零覆盖
+- 探针：五组（'#　T'、'#﻿T'、'<p>a　</p>'、'<p>a\xad</p>'、'-\titem'）
+- 结论 1：U+3000 全角空格与 NBSP 同桶——'#　T' → heading 'T'、'<p>a　</p>' → 'a'（尾随剥离）
+- 结论 2：'#﻿T' → paragraph 原样（BOM 非 \s；与行首 BOM 杀标题不同位置同结论）
+- 结论 3：软连字符 '\xad' 保留（非 isspace，与 U+3000 成对反衬）；'-\titem' → list_item 'item'（列表标记分隔符 \s 含 \t）
+- 新增：tests/test_pipeline_ws_taxonomy.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1863 — ZWSP 三态反衬 NBSP：尾随保留 / 标题不识别 / forced 硬切（Round 1863）
 - 动机：ZWSP 管线测试零覆盖（grep 仅 metrics/exotic 的零宽 bbox 语义）；U+200B 非 isspace() 也非 \s，与 R1862 NBSP 处处成对反衬
 - 探针：三组（'<p>a​</p>'、'#​T'、'ab​'×30 @40）
