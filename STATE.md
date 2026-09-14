@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1873 — section_path 分隔符碰撞：标题内容含 ' > '（Round 1873）
+- 动机：R1872 锁实体解码入路径后查分隔符碰撞——解码出的 ' > ' 与路径分隔符 ' > ' 同形，路径歧义从未锁定（grep '&gt;' 进标题 + 路径断言零覆盖）
+- 探针：四组（html 实体 h1+h2、md 字面同构、双重碰撞、fence/bq 路径对照）
+- 结论 1：'<h1>a &gt; b</h1><h2>c</h2>' → 路径 'a > b' / 'a > b > c'——内容 ' > ' 与分隔符不可区分（确定性拼接，无转义）
+- 结论 2：'# a > b' md 字面同一碰撞（'>' 原样入路径）
+- 结论 3：两级都含 ' > ' → 'a > b > c > d'（4 段路径 3 个 ' > ' 只有一个真分隔符）
+- 新增：tests/test_parser_sectpath_gt_collision.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1872 — 实体标题 → section_path：html 解码流入 / md 字面流入（Round 1872）
 - 动机：R1826 只锁标题 content 的实体对照与 md '<b>B</b>' 字面路径传播；html 实体解码后的 section_path 断言与 md 实体字面路径传播零覆盖；复核弃用：chunk 空格连接（chunker:1480）/ 超长 isolated 不切（edges15）/ 图片不入 chunk（pipeline_edges12）/ 空文件 no_extracted_elements（多文件）/ 文本纯空白行分隔（text_edges8）/ 大写标签（edges21）/ caption 吞（edges12）全已锁
 - 探针：三组（html 数字实体标题、html NBSP 实体标题、md 命名实体标题，各带后续段）
