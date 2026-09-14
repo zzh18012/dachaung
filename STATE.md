@@ -114,6 +114,16 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1918 — 1b/f 续：main 测试断言强度审计（第八维度；候选 #1 精确定界）（Round 1918）
+- 目标：main `6c6d398ca9c` tests/ 断言强度静态审计——第八审计维度；常驻扫描器 outputs/autonomous/main_assert_scan.py（A1 raises 无 match / A3 不等式断言 / A4 恒真 / A6 静默吞咽 / A6b 候选#1 同型空转守卫；结果 main-assert-scan-r1918.json 未入库）
+- **A4 恒真断言 0**；**A6b/A6 净命中经人工复核收敛为：候选 #1 精确定界为恰 2 处**——test_contract_adoption_v1.py `test_new_locators_required_fields` 的两个守卫（117/124 行：try 内 raise AssertionError + `except Exception: pass` 无再抛 → AssertionError 被吞，validate 无论是否放行该测试恒过）；**修复模式 = 补 `except AssertionError: raise`**（该文件其余 6 处 A6b 命中全是此健全再抛惯用法——守卫有效，属扫描器误报，模式已记录）；ipynb 两命中同误报（handler 捕 ParserError 捕不到 AssertionError）
+- **A1 pytest.raises 无 match= 465 处**（占位计数观察——项目异常多为自定义类型带 code 属性，match 缺失属风格而非缺陷；无行动项）；**A3 不等式计数断言 85 处**（多为合法的 ≥1 类断言；抽样无异常）
+- 结论：无新指示线候选；候选 #1 从"空转守卫（1 处示例）"升级为"精确 2 处 + 已知修复模式"，其余 #2-#5 不变
+- 扫描器为常驻工具（A6b 需 handler 级再抛识别的改进点已记录）
+- 计数影响：0（纯审计轮；autonomous baseline 101645 不变）
+
+---
+
 ## Round 1917 — 1b/f 续：main 测试全局状态变异隔离审计（第七维度，干净）（Round 1917）
 - 目标：main `6c6d398ca9c` tests/（131 文件）全局状态隔离静态审计——新开第七审计维度；常驻扫描器 outputs/autonomous/main_state_scan.py（六类模式：注册表变异/sys.path 无清理/sys.modules 变异/os.chdir/env 直写/logging 全局操作；结果 main-state-scan-r1917.json 未入库）
 - **六维仅两类命中、共 4 处，人工复核全部良性**：
