@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1931 — a 续：DOCX 样式名判型残余边界——basedOn 继承不可见（3 测试）
+
+- 语境：edges10 锁内置样式名（H1-H9 透传、Title=1、Intense Quote 原样）；**basedOn 继承**与 **heading 前缀异名**零覆盖
+- 探针（outputs/autonomous/probe_customstyle_r1931.py，未入库；python-docx add_style + base_style）三假设全实证：
+  - **C1 basedOn 继承不可见**：自定义样式 basedOn Heading 1（名 "Section Title"）→ **paragraph**（level 0，样式名保留）——用户自定义标题样式静默丢失 heading 语义；chunker 无硬边界 → 三段融合**单 chunk**（真实世界常见静默结构丢失首锁）
+  - **C2 "Heading abc" → heading level=1**：heading 前缀命中但 int 解析失败 → 回退 1（不是 paragraph）
+  - **C3 "Heading 10" → heading level=10**：无上限钳制（对照 edges10 H1-H9 透传）
+- 测试：`tests/test_parser_docx_style_name_boundaries.py`（3 个，判别式：判型改解析 basedOn 链则 C1 翻红；解析失败回退改拒判则 C2 翻红；加 ≤9 上限则 C3 翻红）。3 passed
+- 计数影响：+3（R1925–R1931 累计 +22；下次全量预测 101660 + 22 = 101682）
+
+---
+
 ## Round 1930 — a 续：PDF 混合页尺寸 + 小页右缘越界图（3 测试）
 
 - 语境：评测侧 edges150+ 已用单尺寸 400x800 页（页族度量语境）；**同文档混合页尺寸**（per-page MediaBox）零覆盖
