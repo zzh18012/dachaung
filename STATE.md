@@ -114,6 +114,20 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1912 — 1b/b 续：main cli.py 诊断子命令六边角探针实证（健康轮，无新候选）（Round 1912）
+- 目标：main `6c6d398ca9c` app/cli.py explain-parser / audit-parsers / inspect-parser（批次 22-24；main 侧 26 测试较厚）；探针 outputs/autonomous/probe_clidiag_r1912.py（CLI 子进程实测 sys.executable -m app.cli，诊断命令只读、parse 输出写系统临时目录，main worktree 零写入核验通过）
+- **C3 大写扩展一致性（本轮核心）**：X.MD 文件 → explain 输出 extension ".md"（小写化）、胜者 markdown_enhanced（5 < 20）；实际 parse --parser auto 同一文件 rc0、elements=1、经 markdown_enhanced 成功出盘——**解释通道与执行通道对大写扩展行为一致**（两者均经 discover_parser_details 单一决策实现）
+- **C1/C2 无后缀与点文件**：文件名无后缀、以及整名为 ".md" 的点文件（pathlib 语义 suffix 为空）→ 均结构化 unsupported_type rc1（消息后缀位显示"(空)"）——点文件被拒是 Python suffix 语义外溢，与 batch.py 同源一致，非缺陷但未载于文档
+- **C4 空串参数**：explain-parser "" → Path("") 归一为 "."，仍走 unsupported_type rc1（input 字段显示 "."）
+- **C5 inspect-parser auto**：保留名 auto 不作特判 → unknown_parser rc1，消息附全部已注册名列表（auto 只在 --parser 选择层保留，inspect 是名字查询层）
+- **C6 --json 错误通道**：错误 JSON 走 stderr + rc1（stdout 空），与"单文件失败→结构化 errors JSON+非零退出码"不变量一致
+- 探针输出中文在 GBK 控制台重定向呈乱码（已知陷阱，code 字段完好）
+- 结论：六边角全部与既有文档化契约一致，无指示线新候选；候选维持 #1-#5
+- 探针产物（未入库）：probe_clidiag_r1912.py、probe-clidiag-r1912.out/.err
+- 计数影响：0（纯探针轮；autonomous baseline 101645 不变）
+
+---
+
 ## Round 1911 — 1b/b 续：main markdown_enhanced.py 九个零覆盖边角探针实证（Round 1911）
 - 目标：main `6c6d398ca9c` app/parsers/plugins/markdown_enhanced.py（批次 18 参考插件；main 侧仅 test_parser_registry.py 205-251 四测试：平铺标量/嵌套列表跳过/未闭合/任务元数据）；探针 outputs/autonomous/probe_mdenhanced_r1911.py（直接调用 MarkdownEnhancedParser().parse，main venv 子进程 + PYTHONPATH 指向 main 根 + PYTHONDONTWRITEBYTECODE=1，夹具全写系统临时目录，main worktree 零写入核验通过）
 - **F4 frontmatter 键 markdown 反杀插件标记（指示线候选 #5）**：metadata 构造为 {"markdown": True, **frontmatter} → frontmatter 写 `markdown: false` 即把插件自身布尔标记覆盖为字符串 "false"（类型 True→str）——与候选 #2a（jsonlog 输出键被 extra 覆盖）同缺陷类：内部保留键无保护
