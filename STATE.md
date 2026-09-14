@@ -89,6 +89,15 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1863 — ZWSP 三态反衬 NBSP：尾随保留 / 标题不识别 / forced 硬切（Round 1863）
+- 动机：ZWSP 管线测试零覆盖（grep 仅 metrics/exotic 的零宽 bbox 语义）；U+200B 非 isspace() 也非 \s，与 R1862 NBSP 处处成对反衬
+- 探针：三组（'<p>a​</p>'、'#​T'、'ab​'×30 @40）
+- 结论 1：'<p>a​</p>' → content 'a​'——**尾随 ZWSP 段级 strip 剥不掉**；'ab​'×30 content **90 字符**（NBSP 同型 89）
+- 结论 2：'#​T' → paragraph 原样——标题 RE 分隔符 \s **不含 ZWSP**（'#\xa0T' 是 heading）
+- 结论 3：无 isspace 字符 → forced_char 恰 40 硬切（40/40/10 纯切片，尾段含尾随 ZWSP；NBSP 同型 38/38/11 窗口切）
+- 新增：tests/test_pipeline_zwsp_contrast.py（3 测试）
+- 状态：本地通过（3 passed）
+
 ## Round 1862 — NBSP 四态：尾随剥离 / chunk 切分 / md 标题分隔（Round 1862）
 - 动机：edges14:208 只锁内容中间 '&nbsp;' → \xa0 保留——尾随剥离、chunk 切分、md 标题分隔零覆盖；NBSP.isspace()=True 使其横跨 strip/窗口切分/RE \s 三机制
 - 探针：四组（'<p>a&nbsp;</p>'、'ab&nbsp;'×30 @40、'#\xa0T'、'\xa0#T'）
