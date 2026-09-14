@@ -89,6 +89,16 @@
 - 下次预测：101454 + 3xN（N = 后续轮次数，R1842 起）
 ---
 
+## Round 1842 — md splitlines 分隔符归一、分隔符起标题、text 保真（Round 1842）
+- 动机：锁 R1841 后查控制字符——md 测试对 0x0c/0x0b/U+2028 全部零覆盖；markdown_parser.py:152 用 text.splitlines()，五类 Unicode 分隔符行为未锁
+- 探针：两组探针 + codepoint 逐项核验（ord 打印），断言全部来自实测输出
+- 结论 1：md 五分隔符（0x0c/0x0b/U+2028/U+0085/U+001C）全部归一为换行——content 中原字符消失、变 LF，单段内保留
+- 结论 2：分隔符是块级真换行——'x'+U+2028+'# Title' 出 heading 元素（分隔符后可起 ATX 标题，0x0c 同型）
+- 结论 3：text 家族 \x0c/\x0b 原样保留在 content、行中不切段（text 只按 LF 切段，与 md 家族哲学差异）
+- 新增：tests/test_parser_md_splitlines_separators.py（3 个测试）
+- 状态：本地通过（3 passed）
+---
+
 ## Round 1841 — html kbd/mark/abbr 行内语义标签剥壳（Round 1841）
 - 动机：锁 R1840 后查 html 行内语义标签——grep 核实 kbd/mark/abbr 标签全库零覆盖（sub/sup 在 edges15、figure/caption 已锁）
 - 探针：5 组探针（kbd 行内/顶层、mark、abbr 带 title/顶层），断言全部来自实测输出
