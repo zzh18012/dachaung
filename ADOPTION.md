@@ -6689,3 +6689,54 @@ r52 主件（M1 首报 P12' push 授权）本轮未随附回复，仍待裁决�
 
 台账队列 = §124–§129 + 本节（远端 = 4c77631），随 M1 首个
 实质 push 搭车。
+
+## 一百三十一、r54 裁决登记：自跑线长跑续向——1b 跨 worktree 只读测试 + main 质量审计（2026-09-14）
+
+五十四轮（用户中转，对 r54 长跑续向问询的裁决）。要点：
+
+- 方向 1（origin/main 133 commits 整体 merge 进 claude/autonomous-track）：
+  **否决**——一次性甄别墙不适合无人值守长跑；
+- 方向 1a（分批合入）：**暂缓**——除非未来有明确里程碑与人工审计
+  窗口，不启动；
+- 方向 1b（跨 worktree 只读测试 main）：**批准**——自跑分支保持
+  现状不 merge；通过子进程、独立 venv、显式目标 worktree/commit
+  只读运行 main 侧探针与测试；每次记录目标 commit SHA、环境、
+  命令、结果与耗时；与方向 4 的"main 侧测试质量审计"合并为新的
+  长期队列；
+- 1b 边界：不得写入、checkout、rebase 或修改 main worktree；
+  自跑提交仍只允许 tests/、STATE.md，大型结果进未入库
+  outputs/autonomous/；测试不得替 main 预先决定未裁定的
+  parser/API/schema 语义；main 侧结果与自跑旧基线分开统计
+  （自跑 101645 = autonomous baseline 保留；main-target probe
+  另建基线、首记目标 SHA、不重置不覆盖旧基线）；"合入不改
+  app 代码"解释**不作为**无人值守合入的授权依据；
+- 方向 2（real-* 常设授权）：**不授予**——仅指示线针对具体文件、
+  具体候选逐项授权；自跑线继续代码阅读 + 合成复现 + 只读材料；
+- 方向 3（静默待触）：**仅空闲策略**——授权队列暂无新颖性时允许
+  低频深挖/健康扫描/等待，不得为唯一工作模式；变化触发或每周
+  全量回归规则不变；
+- 方向 4（main 侧测试质量审计）：**批准**为 1b 配套长期队列——
+  审计新增测试的重复体、无效断言、收集遗漏、耗时异常与私有
+  路径风险；只读分析 main worktree，结果写 STATE.md/未入库
+  outputs；不删除、不重写 main 测试、不自行搬运；可安全修复项
+  先形成指示线候选；
+- 队列序：1b/f（main 质量审计）→ 1b/b（合成根因探针）→ a
+  （仅新颖行为）→ e（低频基准）；
+- 持续纪律：队列项可重复/可去重/可跳过；连续无新颖性转下一
+  队列；探针以目标 commit SHA 为输入；需裁决/授权/依赖/契约/
+  资源异常项隔离记录后继续；摘要每 100 轮或 7 天；失败、安全
+  问题、越权风险立即报告。
+
+登记行原文：
+
+> R54 AUTONOMOUS STRATEGY RATIFIED — Do not merge origin/main wholesale into claude/autonomous-track; defer staged merge as well. Adopt read-only cross-worktree testing of main at an explicitly recorded commit SHA, using isolated subprocess/venv execution and separate baselines. Pair this with a main-side test-quality audit. No main worktree mutation, autonomous app changes, unratified semantic expectations, real-* standing access, holdout access, or 24-core private-gold access is authorized. Idle mode remains fallback only; the loop must continue through novelty-gated queues with periodic summaries and change-triggered or weekly full regressions.
+
+执行：协议 v3 写入 AUTONOMOUS_LOOP.md 顶部（r53 一次性协议文件
+例外延伸——协议持久化用途）+ STATE.md R1906 登记裁决与 1b/f 首轮
+审计基线（main-target baseline 首记 @ main 6c6d398：131 test 文件 /
+5088 函数 / 重复组 139（冗余 219）/ 空文件 0 / 重名 0 / 私有 token 0 /
+收集遗漏 0 / 无断言 32 条抽样均为"不抛即过"合法模式；added 子集
+121 新增文件四维全零；静态扫描 0.61s）。
+
+台账队列 = §124–§130 + 本节（远端 = 4c77631），随 M1 首个
+实质 push 搭车。
