@@ -669,8 +669,6 @@ def test_run_evaluation_out_p_open_with_utf8():
 
 def test_run_evaluation_returns_report_dict():
     """返回 report dict。"""
-    manifest = _load_manifest(_write_manifest(tmp_path := Path(__file__).parent, _empty_manifest_data()))
-    # 用临时目录更干净
     import tempfile
     with tempfile.TemporaryDirectory() as td:
         td_path = Path(td)

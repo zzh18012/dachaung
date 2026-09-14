@@ -105,6 +105,13 @@
 - 下次预测：101642 + 3（R1903）= 101645；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1905 — f 队列：tests/ 目录污染源修复 + 陈旧探针清理（Round 1905）
+- 发现路径：本轮收尾 git status 复核发现两个未跟踪残留——tests/manifest.json（mtime 2026-09-14 11:45，恰在全量回归运行中 → 每次全量再生）与 tests/_probe_r1603/（2026-08-25 陈旧探针，违反"探针验证后删除"生命周期）
+- 根因：tests/test_evaluation_runner_edges22.py `test_run_evaluation_returns_report_dict` 首行 `_write_manifest(tmp_path := Path(__file__).parent, ...)`——walrus 把局部变量命名成 tmp_path fixture 同名，实际指向 **tests/ 目录本身**，写出 tests/manifest.json 后立即被 TemporaryDirectory 分支覆盖重做（该行纯浪费 + 污染源码树）
+- 修复：删除该行与邻近注释；断言/语义零变化；定向 1 passed + 全文件 161 passed + tests/manifest.json 不再生成；删除既有残留文件与 _probe_r1603/（均未跟踪，零 git 影响）
+- 计数影响：0；下次全量预测仍为 101645
+- 状态：已提交已推送
+
 ## Round 1904 — f 队列：harness 元测试三重全量扫描收敛为单次（Round 1904）
 - 起因：101642 基线漂移锚点触发后复查——durations top-3 全部是 tests/test_harness_health.py（13.78/12.84/11.35s，共 ~38s）：三个元测试各自调 `_scan()`（ast.parse + ast.dump 全部 ~1900 测试文件），同一扫描重复 3 次且随套件线性增长
 - 修复：module-scoped pytest fixture 共享一次 `_scan()`——测试名、断言、天花板常量（2619/6906）、语义零变化；定向验证 4 passed、单次扫描 12.49s（setup 计入首个用例）、三个消费用例 call 均 ~0.01s；全量回归 harness 成本 38s → ~12.5s
