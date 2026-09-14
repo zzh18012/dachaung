@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1936 — a 续：PDF 非规范 cm 矩阵与 /ImageMask 图像（3 测试）
+
+- 语境：R1896 锁零宽（x1==x0）静默跳过；**镜像（负宽）/旋转 cm/1-bit 模板（/ImageMask）**零覆盖
+- 探针（outputs/autonomous/probe_imgmat_r1936.py + bbox 复取，未入库）实证（pdfplumber 对 cm 矩阵取 min/max 归一 bbox）：
+  - **X1 镜像负宽保留**：`-100 0 0 100 550 600 cm` → image 保留、bbox 与轴对齐基线**全等** [450, 92, 550, 192]、渲染落盘、零告警——不落 R1896 退化跳过（宽 0 才跳、负宽归一）
+  - **X2 旋转 90° 保留**：`0 100 -100 0 550 600 cm` → 同 bbox 全等保留（旋转不退化）
+  - **X3 /ImageMask 模板图**：1-bit 模板（无 ColorSpace、带 /Decode）→ image 元素、srcsize [2,2]、渲染落盘、零告警（水印/图章形态）
+- 测试：`tests/test_parser_pdf_image_matrix_forms.py`（3 个，_IMG patch 后 finally 还原；判别式：改用矩阵原始跨度判退化则 X1 元素数翻红；ImageMask 被排除则 X3 翻红）。3 passed
+- 计数影响：+3（R1925–R1936 累计 +37；下次全量预测 101660 + 37 = 101697）
+
+---
+
 ## Round 1935 — a 续：PDF WinAnsi 高区字节——标点直通/NBSP 归一/(cid:N) 标记（3 测试）
 
 - 语境：_pdf 构造器字体无 /Encoding（StandardEncoding 低位 ASCII）；**WinAnsi 高区**（0x80-0x9F 特殊标点 / NBSP / 未定义位）零覆盖
