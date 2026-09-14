@@ -97,6 +97,18 @@
 - 下次预测：101593 + 13（R1886–R1890：1+3+3+3+3）= 101606；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1898 — a 队列续：DOCX 浮动图（anchor 带真实 blip）可提取 + hyperlink 内嵌 drawing 可见锁定（Round 1898）
+- 新颖性：edges61 锁过"浮动 wp:anchor 不可见"但其构造的 anchor **无 a:blip 数据**——锁的是空 anchor；反向判别零覆盖。探针实证：`_extract_inline_image_rids` :422 用 `drawing.iter(qn("a:blip"))` 后代递归，不在乎 blip 挂在 wp:inline 还是 wp:anchor 下（函数名 "inline" 有误导性）
+- **带真实 blip 的浮动图被提取**：wp:inline 换名成 wp:anchor（保留 a:graphic 子树）→ image 元素照常生成（rid/locator 完整、零告警、段落文本不受影响）
+- **判据是 blip 存在性**：同文档空 anchor + 数据 anchor 并存 → 恰 1 个 image 元素且来自数据段——inline/anchor 形态无关
+- **hyperlink 内嵌 drawing 可见**：drawing 的 run 搬进 w:hyperlink → .iter() 递归照常找到，图独立成元素
+- 构造：add_picture 生成真实图片部件后 lxml 换名（inline→anchor）/搬 run 进 hyperlink；PNG 用 zlib+struct 现造 1x1
+- 新增：tests/test_parser_docx_anchor_blip.py（3 测试）
+- 计数影响：+3 测试；下次全量预测 101627 + 3（R1898）= 101630
+- 状态：已提交已推送
+
+---
+
 ## Round 1897 — a 队列续：DOCX 多节 section 字段恒 0 + 分节符空段落实体化锁定（Round 1897）
 - 新颖性：edges29 只在单节文档锁过 section: 0（headerReference 挂文末 sectPr）；多节判别式零覆盖。探针实证：`_parse_docx` :462 section_idx=0 初始化后循环内无任何递增——tag 分派只有 w:p/w:tbl 两分支，w:sectPr 落空
 - **section 字段结构性死亡**：真实 2 节文档（python-docx len(sections)==2 判别前提），分节后的段落与表格 locator 仍全部 section: 0
