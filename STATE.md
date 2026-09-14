@@ -97,6 +97,15 @@
 - 下次预测：101593 + 13（R1886–R1890：1+3+3+3+3）= 101606；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1902 — a 队列续：PDF 题注正则边界锁定（Round 1902）
+- 新颖性：grep 零覆盖（edges131/145/186 锁的是分隔类变体/真实 docx/五变体，均未锁：行尾无分隔符边界、数字前零空格、题注对 80 字长规则的优先级）。探针实证（`_CAPTION_RE` :50-53）
+- **尾分隔符必需**：'Table 1' / 'Figure 12'（行尾即数字尾）→ 不匹配——正则要求数字后跟 `[.、:\s]`；落 heading（short_line 启发式）；'Table 1.' / 'Figure 12:' 对照匹配
+- **前置空格可零**：`\s*` 零或多——'Figure1.'、'表2、'、'Fig3 x' 全 caption（Fig 还可无点）
+- **题注优先于长度规则**：109 字 'Table 1: xxx…' → caption（caption 检查在 ≤80 短行规则之前——分类优先级 caption > heading > paragraph）；同长无前缀 → paragraph
+- 新增 tests/test_parser_pdf_caption_boundary.py（3 测试，单元级 _is_caption / _classify_pdf_paragraph）
+- 计数影响：+3 测试；下次全量预测 101639 + 3（R1902）= 101642
+- 状态：已提交已推送
+
 ## Round 1901 — a 队列续：PDF 行尾连字符不做 dehyphenation 锁定（Round 1901）
 - 新颖性：grep 零覆盖（fence-info 的连字符是 markdown 信息串、kreuzberg edges 是终止符——均非 PDF 行尾连字符合并语义）；现实高频（justified/印刷文本断词换行）。探针实证（`_lines_to_para` :168 行间 `" ".join`——无任何合并逻辑）
 - **行尾连字符保留 + 插空格**：'inter-'（行 1 尾）+ 'national'（行 2 首）同段落 → **'inter- national'**——连字符原样保留且后跟空格，"international" 在提取文本里不可检索
