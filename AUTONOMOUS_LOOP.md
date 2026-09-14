@@ -2,7 +2,34 @@
 
 > 本文件是自跑线 agent 的操作手册。每次 cron 唤醒主 session 时，主 session 读本文件，按"唤醒流程"spawn 下一轮 agent。
 
-## 协议 v2 — R52 协调规则（2026-09-14 起生效，覆盖下方旧流程中冲突的部分）
+## 协议 v3 — R54 长跑续向（2026-09-14 起生效，覆盖协议 v2 及以下旧流程中冲突的部分）
+
+GPT 裁决（**R54 AUTONOMOUS STRATEGY RATIFIED**，指示线台账 §131）。核心变化：队列从 f>b>a>c>e 改为 **1b 队列优先**；自跑分支**不合入** origin/main（整体合入否决、分批合入暂缓），改获 **main worktree 只读跨 worktree 测试授权**。
+
+**任务优先级（从高到低）**：
+1. **1b/f main 侧测试质量审计**：审计 main tests/（相对 merge-base `2c35244` 的新增为重点）的重复体、无效断言、收集遗漏、耗时异常、私有路径风险；只读分析 main worktree，结果写 STATE.md + 未入库 outputs/autonomous/；**不删除、不重写、不搬运** main 测试；发现可安全修复项 → 形成指示线候选，不在自跑线实施
+2. **1b/b main 侧合成根因探针**：main 新模块（batch.py / jsonlog.py / parser_registry.py / plugin_loader.py / source_types.py / parsers/plugins/ 等）的合成复现与行为探针；子进程 + main worktree venv 运行，显式记录目标 commit SHA
+3. **a 行为锁定测试（仅新颖行为）**：沿用 v2 新颖性门槛（grep 零覆盖 → 探针 → 3 测试）；连续无新发现转下一队列，不停机
+4. **e 基准采集（低频）**：变化触发或每周；main-target probe 基线独立于自跑基线维护
+- **c 搬运预备件**：维持 v2 有条件状态（仅已授权/已冻结契约候选）；**d 文档维护：禁止**（AUTONOMOUS_LOOP.md 协议持久化例外见 r53/r54）
+
+**1b 执行边界（r54 裁决）**：
+- **不得写入、checkout、rebase 或修改 main worktree**；运行 main 测试须 `-p no:cacheprovider` + `PYTHONDONTWRITEBYTECODE=1`（防 .pytest_cache / __pycache__ 写入）
+- 自跑提交仍只允许 tests/、STATE.md；大型结果与扫描器入未入库 outputs/autonomous/（当前：main_audit_scan.py）
+- 测试不得替 main 预先决定未裁定的 parser/API/schema 语义
+- main 侧结果与自跑旧基线**分开统计**，不合并为"总套件"；每次记录目标 SHA、环境、命令、结果、耗时
+- real-* 常设授权**不生效**（仅指示线逐文件逐候选授权）；holdout / 24-core 私有 gold 不变禁读
+- 静默待触仅空闲策略，**不得为唯一工作模式**
+
+**基线双轨**：
+- **autonomous baseline**：101645 精确命中（第 102 次连续），沿用既有计数纪律，不重置不覆盖
+- **main-target baseline**：首记 @ main `6c6d398`（R1906）——131 test 文件 / 5088 函数 / 重复组 139（冗余实例 219）/ 空文件 0 / 文件内重名 0 / 私有 token 0 / 收集遗漏 0 / 无断言 32（抽样 3 条均为"调用不抛即过"合法模式）/ added 子集（121 新增文件）四维全零 / 静态扫描 0.61s；**main SHA 变化才开新对照周期**
+
+**持续纪律（r54）**：队列项可重复、可去重、可跳过；连续无新颖性转下一队列，不机械复制测试；探针以目标 commit SHA 为输入；遇裁决/授权/依赖/契约/资源异常 → 隔离记录，继续其他已授权项；摘要每 100 轮或 7 天（先到者）；失败、安全、越权立即报告；定向测试按轮、全量回归按变化触发或每周。
+
+**协议 v2 条目继续有效的部分**（未被 v3 覆盖）：产出边界、分支归宿（防护网存证分支永不自动合入）、撞墙"隔离后继续"、汇报节流、资源边界（单轮 ≤30 分钟）、f/b/a 队列既有方法论。
+
+## 协议 v2 — R52 协调规则（2026-09-14 起生效，覆盖下方旧流程中冲突的部分；v3 已生效部分以 v3 为准）
 
 GPT 裁决（R52 COORDINATION RULE RATIFIED，指示线台账 §129）：自跑线继续无限期运行，但从"无界重复写测试"改为**有队列、有新颖性门槛、可长期无人值守**的循环。用户硬约束：自跑线必须能长时间无人值守连续运转（token 配额消耗需求）。
 

@@ -114,6 +114,17 @@
 - 下次预测：101645 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天
 ---
 
+## Round 1906 — r54 裁决登记 + 协议 v3 生效 + 1b/f 首轮：main 侧测试质量审计基线（Round 1906）
+- 裁决（R54 AUTONOMOUS STRATEGY RATIFIED，指示线台账 §131）：方向 1 整体合入 origin/main 否决、1a 分批合入暂缓、**1b 跨 worktree 只读测试批准**（子进程 + 独立 venv + 显式目标 SHA）并与方向 4（main 侧测试质量审计）合并为新长期队列；方向 2 real-* 常设授权不授予；方向 3 静默待触仅空闲策略；队列序 **1b/f → 1b/b → a → e**；"合入不改 app 代码"解释不作为无人值守合入授权依据
+- 协议 v3 写入 AUTONOMOUS_LOOP.md 顶部（队列序、1b 边界、基线双轨、持续纪律）——r53 一次性协议文件例外延伸（协议持久化用途）
+- 1b 边界落内规：不写/checkout/rebase main worktree（运行 main 测试须 `-p no:cacheprovider` + `PYTHONDONTWRITEBYTECODE=1`）；自跑提交仍仅 tests/ + STATE.md，大型结果与扫描器入未入库 outputs/autonomous/；main 侧结果独立统计不并总套件；每次记录目标 SHA/环境/命令/结果/耗时
+- **1b/f 首轮（main-target baseline 首记 @ main 6c6d398ca9c）**：只读 AST 扫描 main tests/（扫描器 outputs/autonomous/main_audit_scan.py，自跑 venv 执行，0.61s）：131 test 文件 / 5088 测试函数 / 跨文件重复组 139（冗余实例 219）/ 空文件 0 / 文件内重名 0 / 私有 token 0 / 疑似收集遗漏 0 / 纯 pass 0 / 无断言 32
+- 无断言 32 条抽样 3 条（test_schema.py::test_valid_pdf_passes、test_table_caption_relation_contract.py::test_050_accepts_with_table_has_caption、test_parsers_html_edges3.py::test_doc_parser_close_does_not_raise）——全部为"调用不抛即过"合法模式（validate()/close() 即断言），非无效测试；全量分类留下轮
+- **added 子集（merge-base 2c35244 后新增 121 文件）四维全零**（空文件/重名/无断言/纯 pass）——main 新增测试结构健康；重复组 139 的归属（新增 vs 旧文件）留下轮维度
+- 审计产物（未入库）：outputs/autonomous/main-audit-r1906.json、main_added_tests_r1906.txt；结果不并自跑基线
+- 计数影响：0（本轮无新增测试；autonomous baseline 101645 不变）；下次全量预测 101645 + 3xN（N = 后续加测轮次）
+- 状态：已提交已推送
+
 ## Round 1905 — f 队列：tests/ 目录污染源修复 + 陈旧探针清理（Round 1905）
 - 发现路径：本轮收尾 git status 复核发现两个未跟踪残留——tests/manifest.json（mtime 2026-09-14 11:45，恰在全量回归运行中 → 每次全量再生）与 tests/_probe_r1603/（2026-08-25 陈旧探针，违反"探针验证后删除"生命周期）
 - 根因：tests/test_evaluation_runner_edges22.py `test_run_evaluation_returns_report_dict` 首行 `_write_manifest(tmp_path := Path(__file__).parent, ...)`——walrus 把局部变量命名成 tmp_path fixture 同名，实际指向 **tests/ 目录本身**，写出 tests/manifest.json 后立即被 TemporaryDirectory 分支覆盖重做（该行纯浪费 + 污染源码树）
