@@ -98,6 +98,15 @@
 - 新增：tests/test_parser_md_img_para_flush.py（3 测试）
 - 状态：已提交已推送
 
+## Round 1883 — md 图片行插入列表项间 / 终止 bq 运行（Round 1883）
+- 动机：R1882 锁段落侧冲刷；列表项交错与 bq 运行终止零覆盖——grep 全部 md 图片行用例只有 para-image / image-image / bq、li 内包裹（edges15:104/117）形态。机制：list 分支逐行匹配无延续吸收（markdown_parser.py:248-258），bq 分支 while 循环只吸收连续 '>' 行（:260-268），standalone 匹配用 stripped（:240）
+- 探针：'- a\n![i](1.png)\n- b' → [list_item 'a', image, list_item 'b']；'> q\n![i](1.png)\nafter' → paragraph 'q'（kind blockquote）+ image + paragraph 'after'；'- a\n  ![i](1.png)\n- b' → 同项间冲刷（缩进不豁免）
+- 结论 1：图片行插入列表项之间成独立 image 元素，两侧 list_item 不合并——列表无组块语义（每项一行一元素）
+- 结论 2：图片行终止 bq '>' 连续运行；其后文本成普通 paragraph（kind 丢失）——与 html bq 被 img 切段 kind 不跨存活（R1878）同语义的 md 对偶
+- 结论 3：缩进图片行（'  ![i](1.png)'）经 stripped 仍匹配 standalone 正则，照样冲刷——前导空格不构成"列表延续行"
+- 新增：tests/test_parser_md_img_struct_interleave.py（3 测试）
+- 状态：已提交已推送
+
 ## Round 1881 — hr 冲刷结构类型：heading/li/bq 后段退化（Round 1881）
 - 动机：edges2:424/edges3:455 只锁 hr 不产生 element 与 only-hr 告警；hr 在结构元素内部的冲刷零覆盖——与 R1877/78 img 同族但 hr 自身无 image 产出
 - 探针：五组（h1/li/bq 内 hr、hr 在 p 间复核、lone hr 复核）
