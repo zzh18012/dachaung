@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1990（a：DOCX VML 图片与 OLE 对象不可见）
+
+- 假设：老版 Word 的 VML 行内图（w:pict > v:shape > v:imagedata r:id）与 OLE 嵌入（w:object 包 v:shape + o:OLEObject）在 fallback 下零处理零测试——图片提取只扫 w:drawing（fallback_parser:427）。grep 实证 imagedata/OLE/pict 在 parser 与测试全库零匹配（既有图片覆盖全走 w:drawing 路径）。
+- 探针：outputs/autonomous/probe_vmlimg_r1990.py + dbg_vml2_r1990.py。夹具：add_picture 建立真实 rId+media part，剥除 drawing run 后改挂 v:imagedata——图片字节确实在包里。实证：VML-only 文档零 image 元素单 '(空段落)' 占位；w:object 前导文本照提零 image；w:drawing 对照照发（分支活）。零告警。
+- 测试：tests/test_parser_docx_vml_image_invisible.py（+3：VML 不可见 / OLE 文本-only / drawing 对照）。
+- 计数影响：+3；R1925–R1990 累计 +204；全套预测 101660+204=101864。
+- 探针教训：python-docx nsdecls 无 v/o 前缀（KeyError），VML/o 命名空间需手拼 xmlns 声明；add_picture 后再 add_paragraph 会把 paragraphs[-1] 挪离图片段——取 rId 应走 inline_shapes[-1] 而非段落扫描。
+
 ## Round 1989（a：DOCX 修订标记内容静默缺席）
 
 - 假设：python-docx Paragraph.text 只拼直接 w:r 子 run（fallback_parser._parse_docx:468 用 para.text，cell 同理 c.text）——w:ins 包裹的 run 与 w:del 里的 w:delText 均非直接子 run，协作文档的未接受修订内容结构性排除且零告警。grep 实证 docx 测试零 w:ins/w:del 匹配（vanish 隐藏文本 R1978 照提是另一语义：格式性 vs 结构性）。
