@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1983 — a 续：PDF 空用户密码 V5/R6 AESV3（AES-256-CBC）加密透明解密（4 测试）
+
+- 语境：R1980–R1982 锁了 RC4 V1/V2 + AESV2 V4；V5/R6 是最后一个标准安全家族且与前代完全异构——无 MD5/RC4；算法 2.B（SHA-256/384/512 由密文首 16 字节 mod 3 动态选 + AES-128-CBC 内层扰动 ≥64 轮，owner 路径拼整个 48 字节 U 作 vector）；U/O 各 48 字节（hash+验证盐+密钥盐）；file_key 藏 UE/OE（AES-256-CBC 零 IV 无填充）；流 = IV 前置 + AES-256-CBC(file_key 直接用，无 objid 盐) + PKCS#7；/CFM /AESV3；派生不依赖 /ID。探针实现严格镜像 pdfminer _r6_password/authenticate（pdfdocument.py 548–670 行，含 mod3= sum(b%3)、内层 IV=k[16:32] 等细节）
+- 探针（outputs/autonomous/probe_aes256_r1983.py，未入库）实证（四变体一次全绿）：
+  - **E1 单页 AESV3 流** → 'AES256X' 照提 [100.0, 82.484, 152.032, 94.484]
+  - **E2 Flate+AESV3 链** → 'ZAES256' 照提 [100.0, 82.484, 151.36, 94.484]
+  - **E3 objstm 加密 + xref 流明文** → 'STMAES' 照提 [100.0, 82.484, 149.344, 94.484]
+  - **E4 owner 密码非空** → 'OWNER256' 照提 [100.0, 82.484, 166.012, 94.484]（authenticate 先试 owner 路径，file_key 从 OE 出）
+- 测试（tests/test_parser_pdf_aesv3_r6.py，4 个，全绿；cryptography 缺席 importorskip）
+- 计数影响：+4（全量预测更新为 101660 + 182 = 101842，R1925–R1983 累计 +182）
+- 里程碑：**标准安全处理器四代全锁**（V1/R2 RC4-40、V2/R3 RC4-128、V4/R4 AESV2、V5/R6 AESV3，空用户密码全透明解密）；pdfminer V4/V5 依赖 venv 自带 cryptography 50.0.0，零新增依赖
+- 备注：pdfminer _r6_password 内层 CBC 无填充——空密码下 K1=k*64 恒为 16 倍数天然安全；非空密码若长度使 K1 非 16 倍数会 ValueError（上游限制，未测）
+
 ## Round 1982 — a 续：PDF 空用户密码 V4/R4 AESV2（AES-128-CBC）加密透明解密（3 测试）
 
 - 语境：R1980/R1981 锁了 RC4（V1/V2）；V4 起流改 AESV2——密钥派生与 R3 同源（O/U 仍 RC4 链），对象密钥多拼 4 字节盐（MD5(fk+objid_le24+gen_le16+"sAlT")[:16]），流密文 = IV 前置 + AES-128-CBC(PKCS#7)，经 /CF /StdCF /CFM /AESV2 + /StmF /StrF 声明。venv 已装 cryptography 50.0.0（pdfminer AES 同依赖），覆盖 grep（ToUnicode/Differences/Tz/pagetree inherit 均已锁）后选此空白；探针用 cryptography 加密
