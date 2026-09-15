@@ -121,6 +121,13 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1989（a：DOCX 修订标记内容静默缺席）
+
+- 假设：python-docx Paragraph.text 只拼直接 w:r 子 run（fallback_parser._parse_docx:468 用 para.text，cell 同理 c.text）——w:ins 包裹的 run 与 w:del 里的 w:delText 均非直接子 run，协作文档的未接受修订内容结构性排除且零告警。grep 实证 docx 测试零 w:ins/w:del 匹配（vanish 隐藏文本 R1978 照提是另一语义：格式性 vs 结构性）。
+- 探针：outputs/autonomous/probe_trackchg_r1989.py（E1 混排段 ins / E2 del+delText / E3 段中 ins 无空隙拼接 / E4 cell 内 ins）。四态全实证：INSERTED/GONE/MID/ELLINS 全部静默缺席，'BEFOREAFTER' 直接拼接，零告警。
+- 测试：tests/test_parser_docx_track_changes.py（+4：ins 丢弃 / del 不可见 / 段中无空隙拼接 / cell 丢弃）。
+- 计数影响：+4；R1925–R1989 累计 +201；全套预测 101660+201=101861。
+
 ## Round 1988（a：标准加密密钥派生参数分支）
 
 - 假设：此前全部加密夹具参数空间收窄（/P 恒 -1、/EncryptMetadata 缺省、/Length 恒 128）。三个真实世界分支：compute_encryption_key 的 struct.pack("<L",p) 进哈希（P 非装饰字段）；R≥4 且 EncryptMetadata false 时哈希末尾追加 FFFFFFFF（pdfdocument.py:404-408）；/Length 96 时 n=12 截断作用于扩展轮次（每轮只哈希 result[:n]）与 key_o/O/U 链。
