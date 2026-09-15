@@ -130,7 +130,7 @@
 - **T3 空自开+游闭合**：'<table/>x</table>' → rows 空 + 'x' 被吞 → [] + html_no_content
 - **T4 双自开告警分序**：'<table/><table/>' → [html_nested_table, html_no_content]（feed 期告警先于 parse 尾部追补）
 - **候选剔除**：行聚类 running-average 漂移（阶梯 3pt 内逐词）分析后**不可观察**——单行/多行最终 text 与 bbox 完全一致（每词单行 join 同序），R1974 排除
-- **计数影响**：+4 → 实测锚 101856 + 快照后增量 47 = 101903
+- **计数影响**：+4 → 实测锚 101856 + 快照后增量 54 = 101910
 - **下一轮候选**：html `<pre/>`/`<blockquote/>` 自闭合块级吞噬；或 ipynb/markdown 侧未扫分支
 
 ## Round 2005（PDF upright 字符绘制流序 vs 位置序 + 段距阈值上中位数）
@@ -141,7 +141,7 @@
 - **T2/T3 位置序压倒流序**：B@200 先画 → 'A B'；底行 y=100 先画 → 元素仍 ['upper line','lower line']（fallback (y_center,x0) 重排）
 - **T4/T5 上中位数**：fallback_parser.py:140 `sorted(heights)[len//2]` 偶数个取**大者**非平均——12pt+24pt 词 median=24 → 阈值 36（真中位数 18→27）：gap=30 合段 'AA BB'、gap=37 拆两段（若取真中位数 T4 翻红）
 - **T6/T7 严格 > 边界**：等高 gap 恰 1.5*12=18 → 合段；gap=19 → 拆段
-- **计数影响**：+7 → 实测锚 101856 + 快照后增量 43 = 101906
+- **计数影响**：+7 → 实测锚 101856 + 快照后增量 50 = 101906
 - **下一轮候选**：html_parser 表模式残余（`<table/>` 自闭合吞噬后续文档——startendtag 委托分支）；或行聚类 running-average 漂移语义（3pt 内逐词阶梯可无限漂移）
 
 ## Round 2004（PDF Type0 /ToUnicode 名字形态）
