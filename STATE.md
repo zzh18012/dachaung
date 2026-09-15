@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1962 — a 续：PDF 内容流结构变体——Flate / 数组拼接 / 状态跨流持续（3 测试）
+
+- 语境：既有测试全部单一裸 stream（广扫 Flate / Contents [ / 流数组 零匹配——zlib 仅用于 PNG IDAT）；真实 PDF 几乎必 Flate、大页常拆数组
+- 探针（outputs/autonomous/probe_contentstream_r1962.py，未入库）实证（pdfminer 数组按序拼接、Flate 透明解压、**图形/文本状态跨数组元素持续**——规范行为）：
+  - **F1 FlateDecode 单流**：'FLATED' 照提、bbox 与裸流逐位一致（[72.0, 82.484, 118.008, 94.484]）
+  - **F2 数组劈开文本对象**：算子边界劈（s1='...Td' + s2=' (ARRAY) Tj ET'）→ 'ARRAY' 连贯；**字符串内部劈**（流尾 \n 入开放字符串）→ 'ARR(cid:10)AY'——流界空白在串内成字符（规范行为，cid 10 即 LF）
+  - **F3 q/cm 跨流（双 Flate）**：s1 设 cm 平移 10、s2 写字 → bbox x0 = 72+10 = **82.0**（状态持续非重置）
+- 测试：`tests/test_parser_pdf_content_stream_variants.py`（3 个；判别式：数组元素改独立解析每流重置状态则 F3 bbox 回 72 翻红；流界空白被剔出字符串则 F2b 变 'ARRAY' 翻红）。3 passed
+- 计数影响：+3（R1925–R1962 累计 +116；下次全量预测 101660 + 116 = 101776）
+
+---
+
 ## Round 1961 — a 续：题注正则边角——字母编号双格式漏/前缀陷阱/缩写点（3 测试）
 
 - 语境：`_CAPTION_RE = ^\s*(?:Table|Figure|Fig\.?|表|图)\s*[0-9０-９]+[\.、:\s]`（fallback_parser.py:50，DOCX/PDF 共用）；edges15 锁 'Figure 1:'/'TABLE 2:' 与全角冒号不匹配——**字母编号**（增刊 Figure S1/A1 常见）、**前缀陷阱**（Tablet）、**缩写点形态**未锁
