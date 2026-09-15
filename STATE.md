@@ -121,6 +121,17 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2005（PDF upright 字符绘制流序 vs 位置序 + 段距阈值上中位数）
+
+- **家族**：pdfplumber 词内字符序 / fallback 行词序 / `_group_words_to_paragraphs` 段距阈值语义（7 测试，tests/test_parser_pdf_draw_order_median.py，探针 outputs/autonomous/probe_draw_order_median_r2005.py）
+- **零覆盖声明（宽 grep）**：R1944 锁矩阵反转倒序（镜像/180°）、R1920 锁图片元素流序、R1887 单元级锁跨栏融合（全 12pt 等高）、phase3_order 锁三相位序——upright **绘制乱序**与**高度中位数语义**全库零覆盖
+- **T1 词内字符序=位置序**：同词簇（间距<3pt）按 T@120→C@100→A@110 乱序绘制 → 'CAT'（pdfplumber 按位置组词，流序不参与）
+- **T2/T3 位置序压倒流序**：B@200 先画 → 'A B'；底行 y=100 先画 → 元素仍 ['upper line','lower line']（fallback (y_center,x0) 重排）
+- **T4/T5 上中位数**：fallback_parser.py:140 `sorted(heights)[len//2]` 偶数个取**大者**非平均——12pt+24pt 词 median=24 → 阈值 36（真中位数 18→27）：gap=30 合段 'AA BB'、gap=37 拆两段（若取真中位数 T4 翻红）
+- **T6/T7 严格 > 边界**：等高 gap 恰 1.5*12=18 → 合段；gap=19 → 拆段
+- **计数影响**：+7 → 实测锚 101856 + 快照后增量 43 = 101906
+- **下一轮候选**：html_parser 表模式残余（`<table/>` 自闭合吞噬后续文档——startendtag 委托分支）；或行聚类 running-average 漂移语义（3pt 内逐词阶梯可无限漂移）
+
 ## Round 2004（PDF Type0 /ToUnicode 名字形态）
 
 - **假设**：pdffont.py:1143-1151——ToUnicode 非流而是**名字**时 "Identity" ∈ {ToUnicode 名, Encoding 名, cid_ordering} 任一命中 → IdentityUnicodeMap（CID==码点直译）。既有夹具 ToUnicode 全是流，零覆盖。
