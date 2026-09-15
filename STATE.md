@@ -121,6 +121,20 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1974 — a 续：PDF 混合引用文件（classic 表 + /XRefStm 流）单侧损伤恢复（4 测试）
+
+- 语境：PDF 1.5 hybrid 文件（老阅读器用 classic 表、新阅读器用流），真实世界增量更新/修复工具产物；广扫 tests/ 零 XRefStm 匹配
+- 探针（outputs/autonomous/probe_hybrid_r1974.py，未入库）+ pdfdocument.py 源码双确认（read_xref_from 按 trailer /XRefStm 递归把流加入 xrefs 列表；getobj 对每个 xref 逐个尝试，KeyError 或 PSEOF/PDFSyntaxError 均 continue 到下一 xref）：
+  - **H1 双表一致**（对照）→ 正常提取零告警
+  - **H2 classic 条目全零 + 流正确** → **全恢复**——classic 表 pos 0 解析失败后由流条目接管（R1972 X2 同形损伤在纯 classic 文件是静默全丢，hybrid 提供第二来源）
+  - **H3 classic 正确 + 流条目全零** → 全恢复——classic 先入 xrefs 列表先命中，流不被用到
+  - **H4 双侧全零** → 零元素 + pdf_no_text_extracted——per-object 跨 xref 重试穷尽，PDFXRefFallback 不接管（只在初始化期 PDFNoValidXRef 启用）
+- 探针教训：首版 both-bad 的 mode 分支漏写（实际跑成 agree，假恢复）；修正后 H4 真为全丢——损伤探针必须核对分支真被触发
+- 测试（tests/test_parser_pdf_hybrid_xrefstm.py）：H1/H2/H3 共用 `_assert_recovered`（heading 'HYBRID' + bbox [100, 82.484, 145.336, 94.484] + 零告警）；H4 断言零元素 + pdf_no_text_extracted。判别式：getobj 首个 xref 即判死则 H2 翻红；条目级失败触发暴力扫描则 H4 恢复翻红；流先消费则 H3 翻红
+- 计数影响：+4（R1925–R1974 累计 +153；下次全量预测 101660 + 153 = 101813）
+
+---
+
 ## Round 1973 — a 续：PDF /Annots 注释文本全形态静默不可见（3 测试）
 
 - 语境：真实世界审阅/批注 PDF（律师标记、评审意见）文本多在 /Annots；广扫 tests/test_parser_pdf*.py 零 /Annots 匹配（evaluation 侧 annotation metrics 是另一语义，无关）
