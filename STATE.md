@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1980 — a 续：PDF 空用户密码 V1/R2 RC4 加密透明解密（3 测试）
+
+- 语境：权限受限（无用户密码）加密 PDF 是现实常见形态（禁止打印/复制）；edges91 只锁密码校验失败 → ParserError，可解密形态零覆盖（venv 无 pypdf/reportlab，探针手搓 R2/V1 标准安全处理器，纯 hashlib+RC4）
+- 探针（outputs/autonomous/probe_encrypt_r1980.py，未入库）实证（pdfminer 空密码透明解密全通）：
+  - **E1 单页加密内容流**（无压缩）→ 'ENCTEXT' 照提满宽、零告警
+  - **E2 两页各自加密**（对象密钥 = MD5(file_key+objid_le24+gen_le16)[:10]）→ PAGEA/PAGEB 都提
+  - **E3 加密 + Flate 链**（流先 Flate 后 RC4，解码序解密再解压）→ 'ZLIBENC' 照提
+  - 手搓算法：O=RC4(MD5(PAD)[:5],PAD)、file_key=MD5(PAD+O+P_le32+ID0)[:5]、U=RC4(file_key,PAD)；U 校验通过即证明实现正确
+- 测试（tests/test_parser_pdf_rc4_empty_password.py）。判别式：U 校验/解密路径变化则 E1–E3 变 ParserError 翻红；对象密钥不再含 objid 则 E2 第二页翻红；先解压后解密则 E3 翻红
+- 计数影响：+3（R1925–R1980 累计 +172；下次全量预测 101660 + 172 = 101832）
+
+---
+
 ## Round 1979 — a 续：PDF xref/全局行尾变体全通（3 测试）
 
 - 语境：Windows .NET/老工具产物常见 CRLF；既有 277 处 xref builder 全部 \n 行尾（grep 实证零 \r 形态）。规范 xref 条目 20 字节含 2 字节 EOL（\r\n 或 空格+\n）
