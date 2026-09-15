@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1967 — a 续：DOCX 表行 gridBefore/gridAfter 列偏移——首偏移静默左移（3 测试）
+
+- 语境：既有表格测试全整齐行/gridSpan/vMerge（广扫 gridBefore/gridAfter 零匹配）；真实 Word 允许行首/行尾跳过网格列
+- 探针（outputs/autonomous/probe_gridbefore_r1967.py，未入库）实证（python-docx row.cells 只看 gridSpan，gridBefore/gridAfter **全忽略**；_rows_to_markdown 右补齐）：
+  - **G1 gridBefore=1（A|B 两格）在 3 列表**→ '| A | B |  |'——**行左移**（A 落 H1 列而非 H2）、行尾右补齐凑 3 列、零告警
+  - **G2 gridAfter=1**→ 与 G1 渲染**逐字相同**——尾跳列恰被右补齐复原（巧合正确），首跳列信息静默丢失
+  - **G3 gridBefore=1 + gridSpan=2 单格**→ row.cells span 复制叠加左移 → '| SPAN | SPAN |  |'
+- 测试：`tests/test_parser_docx_grid_offset_rows.py`（3 个；判别式：尊重 gridBefore 则 G1 变 '|  | A | B |' 翻红；G1/G2 恒等锁"首尾偏移不可分辨"）。3 passed
+- 计数影响：+3（R1925–R1967 累计 +131；下次全量预测 101660 + 131 = 101791）
+
+---
+
 ## Round 1966 — a 续：PDF 内联图片 BI/ID/EI——与 XObject 全平权（3 测试）
 
 - 语境：既有图片测试全走 /Resources /XObject /Im1 Do（广扫 BI/ID/EI、inline image 零匹配）；小图形/图标的真实 PDF 常内联
