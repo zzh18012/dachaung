@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1961 — a 续：题注正则边角——字母编号双格式漏/前缀陷阱/缩写点（3 测试）
+
+- 语境：`_CAPTION_RE = ^\s*(?:Table|Figure|Fig\.?|表|图)\s*[0-9０-９]+[\.、:\s]`（fallback_parser.py:50，DOCX/PDF 共用）；edges15 锁 'Figure 1:'/'TABLE 2:' 与全角冒号不匹配——**字母编号**（增刊 Figure S1/A1 常见）、**前缀陷阱**（Tablet）、**缩写点形态**未锁
+- 探针（outputs/autonomous/probe_caption_regex_r1961.py，未入库）实证：
+  - **C1 'Figure S1: supplementary'**：数字位是字母 → 不匹配 → DOCX 落 paragraph（style Normal）；PDF 级联 short_line → heading（metadata 恰 {'level':0,'heuristic':'short_line'}）——**增刊题注双格式全漏**
+  - **C2 'Tablet 1: pad device here'**：Table 后接 t → 不匹配 → paragraph（负类不误收）
+  - **C3 'Fig. 3: caption text'**：Fig\.? 吃点 + 空格 + 数字 → 匹配 caption（缩写正形态，与对照 'Figure 1:' 同判）
+- 测试：`tests/test_parser_caption_regex_edges.py`（3 个；判别式：regex 放宽到 [0-9A-Za-z] 编号则 C1 翻红；前缀改词边界锚定则 C2 行为变）。3 passed
+- 计数影响：+3（R1925–R1961 累计 +113；下次全量预测 101660 + 113 = 101773）
+
+---
+
 ## Round 1960 — a 续：DOCX 样式名解析地雷——复数 typo 静默成 heading、0 级钳制、Subtitle 落 paragraph（3 测试）
 
 - 语境：`_is_heading_style`（fallback_parser.py:406）s=="title"→(True,1)；startswith("heading") 且后缀可 int→(True,max(1,level))；后缀非 int（ValueError）→**(True,1) 静默降级**；否则 paragraph——**退化样式名**经广扫（headings 复数/heading0/裸 Heading/Subtitle 各形）实证零覆盖
