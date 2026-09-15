@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1966 — a 续：PDF 内联图片 BI/ID/EI——与 XObject 全平权（3 测试）
+
+- 语境：既有图片测试全走 /Resources /XObject /Im1 Do（广扫 BI/ID/EI、inline image 零匹配）；小图形/图标的真实 PDF 常内联
+- 探针（outputs/autonomous/probe_inlineimg_r1966.py，未入库）实证（pdfplumber page.images 收内联图，与 XObject 同路径全平权——元素/cm 变换 bbox/盘渲染/编号/srcsize 透传）：
+  - **I1 文本 + 单内联图**（q cm BI /W /H /CS /BPC ID…EI Q，cm 100×50 @ (200,100)）→ image 元素 bbox [200, 642, 300, 692]（top=792−150）、PNG 落盘 p1_00、srcsize [2,1] 透传、文本不受扰、零告警
+  - **I2 双内联图** → 顺序编号 p1_00 / p1_01、两 bbox 各准
+  - **I3 XObject Do + 内联图同页** → 双图都提取、**内容顺序保持**（XObject 在前 p1_00 srcsize [1,1]、内联在后 p1_01 srcsize [2,1]——srcsize 可辨来源）、编号连续
+- 测试：`tests/test_parser_pdf_inline_image.py`（3 个；判别式：不收内联图则 I1 无 image 元素翻红；编号按图型分池则 I3 顺序翻红）。3 passed
+- 计数影响：+3（R1925–R1966 累计 +128；下次全量预测 101660 + 128 = 101788）
+
+---
+
 ## Round 1965 — a 续：DOCX mc:AlternateContent Choice/Fallback 可见性（3 测试）
 
 - 语境：真实 Word 对 wps 内容必写 mc:AlternateContent（Choice=新版 drawing、Fallback=老版 w:pict）——两分支常含**同一文本**；edges38 锁过裸 w:pict 文本框/w:sdt 不可见，mc: 包装层（双分支语义）零覆盖（广扫 AlternateContent 零匹配）。风险：文本收集若按后代 w:t 收集 → 两分支双重提取
