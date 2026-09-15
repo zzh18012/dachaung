@@ -121,6 +121,15 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2016（/Rotate 退化值：负数/超 360/实数/名字/字符串）
+
+- **家族**：PDF 页 /Rotate 退化值。双层消费：pdfminer pdfpage.py:76 `(int_value(Rotate,0)+360)%360`（非 int 静默归 0，pdftypes.py:148-155 非 STRICT 分支；pdfinterp.py:1355-1359 只对精确 90/180/270 施加矩阵）；pdfplumber page.py:211-212 原始值 `%360`（PSLiteral/bytes % int → TypeError）。
+- **零覆盖**：R1451(edges57) 已锁 90/180/270 正字面值、45 静默忽略、非零原点交互；负值/>360/实数/名字/字符串 grep 实证零覆盖（/Rotate 值枚举只出 0/45/90/180/270）。
+- **探针**：outputs/autonomous/probe_pdf_rotate_degenerate_r2016.py。
+- **测试**：tests/test_parser_pdf_rotate_degenerate.py（5 用例全过，文本 '(ROT)' 基线 bbox [100, 82.484, 125.332, 94.484]）。T1 -90 → (−90+360)%360=270 双层一致 → 倒序 'TOR' bbox [82.484, 486.668, 94.484, 512.0]；T2 450 → 90 语义竖条 [697.516, 100.0, 709.516, 125.332]；T3 90.5 → pdfminer 归 0 + pdfplumber 不换宽高 → 与基线逐位一致；T4 /A → 'PSLiteral' % int TypeError → ParserError；T5 (90) → bytes % 360 bytes formatting TypeError → ParserError。
+- **判别式**：T1/T2 若当 0 水平抽取翻；T3 若旋转翻；T4/T5 若不崩翻。
+- **计数影响**：+5（101952 → 101957）。
+
 ## Round 2015（MediaBox 退化形态：pdfplumber 原始 attrs 重读）
 
 - **家族**：PDF /MediaBox 退化（缺失/null/长度 3/非数值/对角反转）。pdfminer pdfpage.py:189-204 的 US Letter 回退只作用于 pdfminer 侧 page.bbox；pdfplumber Page.__init__（page.py:212-214）get_attr("MediaBox") 直接重读原始 attrs 重新归一，回退被架空。
