@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1979 — a 续：PDF xref/全局行尾变体全通（3 测试）
+
+- 语境：Windows .NET/老工具产物常见 CRLF；既有 277 处 xref builder 全部 \n 行尾（grep 实证零 \r 形态）。规范 xref 条目 20 字节含 2 字节 EOL（\r\n 或 空格+\n）
+- 探针（outputs/autonomous/probe_crlf_r1979.py，未入库）实证（pdfminer 行尾宽容全过）：
+  - **E1 xref 条目 \r\n EOL**（其余行尾 \n）→ 'CRLFTEST' 照提、零告警
+  - **E2 全文件 CRLF**（header/对象/表/trailer/startxref 全 \r\n，流内 \r\n 进 /Length 计数）→ 同上
+  - **E3 裸 \r 条目**（19 字节非规范形态）→ 同上——条目扫描按分隔符而非定长
+- 测试（tests/test_parser_pdf_line_endings.py）：三测试共用 `_assert_ok`（heading 'CRLFTEST' + bbox [100, 82.484, 162.0, 94.484] + 零告警）。判别式：若条目解析改按 20 字节定长读则 E3 翻红；若行尾规约收紧为仅 \n 则 E1/E2 翻红
+- 计数影响：+3（R1925–R1979 累计 +169；下次全量预测 101660 + 169 = 101829）
+
+---
+
 ## Round 1978 — a 续：DOCX w:vanish / w:webHidden 隐藏文本照提（4 测试）
 
 - 语境：模板/表单常把答案、批注藏进 vanish run（Word 显示隐藏文本需开关）；grep 实证 docx 测试零 vanish/webHidden 匹配（html/markdown 侧 vanish 是另一语义）
