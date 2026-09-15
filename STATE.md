@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1996（PDF ToUnicode CMap 块容错与 cidchar）
+
+- **假设**：R1995 四块入口共享 add_cid2unichr；容错分支（isinstance 校验丢弃/zip 截断/奇长 nibble）零覆盖。
+- **探针**：outputs/autonomous/probe_cmap_fault_r1996.py。实证：E1 规范序 cidchar（`<0030> 48`，code+CID）被 ENDCIDCHAR 的 isinstance(cid,int) 校验**静默丢弃**（无任何告警）→ '(cid:48)(cid:49)'；E2 数组 dst 短条目（3 宽范围配 2 条目）→ stderr warn_once（不入结构化告警）+ zip strict=False 截断 → 'A(cid:18)(cid:19)'（范围内 CID18 也未映射）；E3 奇数 nibble dst <048> 在**词法层**右补零成 0x04,0x48 → UTF-16BE U+0448 'Ј'（奇长根本到不了解码器）。全部零结构化告警。
+- **测试**：tests/test_parser_pdf_cmap_fault_tolerant.py——T1 cidchar 规范序丢弃；T2 数组短条目 zip 截断；T3 奇 nibble 词法补零。
+- **计数影响**：+3；R1925–R1996 累计 +223；全套预测 101660+223=101883。
+- **探针教训**：(1) E2 预测 'AB(cid:18)' 实得 'A(cid:18)(cid:19)'——探针文本码点选错（0010/0012/0013 vs 范围 0x10-0x12），意外让"zip 截断对范围内 CID 也生效"更清晰：探针预测错不浪费，按实证锁即可。(2) 十六进制串奇 nibble 补零发生在 PDF 词法层（PSStackParser），不是 CMap 解码层——分层定位靠 U+0448 逆推。(3) pdfminer 容错告警（warn_once）走 log.warning stderr，永不入 d.warnings——"Ignoring (part of) ToUnicode map" 可作 stderr 判据但结构化断言必须 == []。
+
 ## Round 1995（PDF ToUnicode CMap 源块形态变体）
 
 - **假设**：edges87 只锁 bfrange 连续 dst 起点；R1994 锁 bfchar dst 形态；CMap 源块侧（数组 dst/多块合并/cidrange 混入）零覆盖。
