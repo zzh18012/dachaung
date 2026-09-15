@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1975 — a 续：PDF FlateDecode + PNG Predictor 12 流解码（3 测试）
+
+- 语境：真实世界 Word/LaTeX 产 PDF 1.5+ 常用 predictor 压缩 objstm/xrefstm；广扫 tests/ 零 Predictor 匹配（R1963 锁 plain Flate ObjStm、R1945 锁图像编码垃圾，均不含 DecodeParms 预测器路径）
+- 探针（outputs/autonomous/probe_predictor_r1975.py，未入库）：编码侧镜像 pdfminer utils.apply_png_predictor 的 Up 滤波（filter 2、stride=columns+1、尾行允许部分）+ zlib；三态全通：
+  - **P1 objstm predictor**（/Columns 16，xref 流 plain Flate）→ 'PREDICT' 照提、零告警
+  - **P2 xref 流 predictor**（/Columns 7 = /W 行宽，objstm plain Flate）→ 同上
+  - **P3 双流 predictor** → 同上
+- 测试（tests/test_parser_pdf_flate_predictor.py）：三测试共用 `_assert_extracted`（heading 'PREDICT' + bbox [100, 82.484, 152.668, 94.484] + 零告警）。判别式：若解码侧忽略 DecodeParms（差分字节直当明文）则 P1/P3 条目/对象乱码 → ParserError 或 pdf_no_text_extracted 翻红；若仅支持 TIFF predictor 2 则同红
+- 计数影响：+3（R1925–R1975 累计 +156；下次全量预测 101660 + 156 = 101816）
+
+---
+
 ## Round 1974 — a 续：PDF 混合引用文件（classic 表 + /XRefStm 流）单侧损伤恢复（4 测试）
 
 - 语境：PDF 1.5 hybrid 文件（老阅读器用 classic 表、新阅读器用流），真实世界增量更新/修复工具产物；广扫 tests/ 零 XRefStm 匹配
