@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1960 — a 续：DOCX 样式名解析地雷——复数 typo 静默成 heading、0 级钳制、Subtitle 落 paragraph（3 测试）
+
+- 语境：`_is_heading_style`（fallback_parser.py:406）s=="title"→(True,1)；startswith("heading") 且后缀可 int→(True,max(1,level))；后缀非 int（ValueError）→**(True,1) 静默降级**；否则 paragraph——**退化样式名**经广扫（headings 复数/heading0/裸 Heading/Subtitle 各形）实证零覆盖
+- 探针（outputs/autonomous/probe_stylename_r1960.py，未入库）实证：
+  - **D1 "headings"（复数 typo）**：startswith 命中、int 失败 → **heading level 1**——非标题样式被静默误判（metadata style 保留原名可追查）
+  - **D2 "heading 0"**：int 成功 0 → max(1,0) **钳制为 1**
+  - **D3 "Subtitle"（真 Word 内置）**：不匹配任何规则 → **paragraph**——语义上是标题层的副标题被当正文
+- 测试：`tests/test_parser_docx_style_name_edges.py`（3 个；判别式：startswith 改全词匹配或 int 失败改判 paragraph 则 D1 翻红；取消 max(1,·) 钳制则 D2 翻红；规则扩到 subtitle 则 D3 翻红）。3 passed
+- 计数影响：+3（R1925–R1960 累计 +110；下次全量预测 101660 + 110 = 101770）
+
+---
+
 ## Round 1959 — a 续：PDF Tz 横向缩放——宽度缩放不改行聚类、可翻分词（3 测试）
 
 - 语境：Tz 零覆盖（R1958 grep 实证；R1956/R1958 锁字号与 Ts 轴）——Tz 只缩字宽不改 y → 行聚类与类型判定不变；字宽变化改 x 间隙 → 可翻转 pdfplumber 分词
