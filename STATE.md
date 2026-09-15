@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1965 — a 续：DOCX mc:AlternateContent Choice/Fallback 可见性（3 测试）
+
+- 语境：真实 Word 对 wps 内容必写 mc:AlternateContent（Choice=新版 drawing、Fallback=老版 w:pict）——两分支常含**同一文本**；edges38 锁过裸 w:pict 文本框/w:sdt 不可见，mc: 包装层（双分支语义）零覆盖（广扫 AlternateContent 零匹配）。风险：文本收集若按后代 w:t 收集 → 两分支双重提取
+- 探针（outputs/autonomous/probe_altcontent_r1965.py，未入库）实证（fallback 走 body.iterchildren + para.text，mc: 分支内容**全不可见、无重复、零告警**）：
+  - **P1 run 级 mc: 两分支各裸 w:t**（机制探针）→ 'before  after'——两分支全丢，中间双空格保留
+  - **P2 run 级真实形态**：Choice=wps 文本框 'CHOICE BOX' / Fallback=pict 文本框 'FALLBACK BOX' → 同 P1（无任何 BOX 残留）
+  - **P3 block 级**：AlternateContent 直接包两 w:p → 只剩前后正文段，paragraph_index 顺延 0/1 不被包装层消耗
+- 测试：`tests/test_parser_docx_altcontent.py`（3 个；判别式：文本收集改 .//w:t 则 P1 变 'before CHOICE TEXT…FALLBACK TEXT… after' 翻红；实现 Choice 优先可见则 P2 出 'CHOICE BOX' 翻红）。3 passed（首跑 P3 断言自打脸——可见正文含 "block" 字样撞负类断言，改锁 CHOICE/FALLBACK 标记）
+- 计数影响：+3（R1925–R1965 累计 +125；下次全量预测 101660 + 125 = 101785）
+
+---
+
 ## Round 1964 — a 续：PDF 多级页树 + 资源/MediaBox 继承（3 测试）
 
 - 语境：既有测试全部扁平页树（root Pages → Page 直连，广扫 /Type /Pages 下的 /Parent 零匹配）；真实 PDF（章节/分册）常多级嵌套；规范 /Resources、/MediaBox 沿 /Parent 链继承、最近祖先胜
