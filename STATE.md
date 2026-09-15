@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1973 — a 续：PDF /Annots 注释文本全形态静默不可见（3 测试）
+
+- 语境：真实世界审阅/批注 PDF（律师标记、评审意见）文本多在 /Annots；广扫 tests/test_parser_pdf*.py 零 /Annots 匹配（evaluation 侧 annotation metrics 是另一语义，无关）
+- 探针（outputs/autonomous/probe_annots_r1973.py，未入库）实证（pdfplumber page.extract_text 只走页面内容流，三形态同归静默缺席）：
+  - **A1 FreeText /Contents 'ANNOTTXT'** → 不可见
+  - **A2 /Highlight /Contents 'HILITETXT'** → 不可见
+  - **A3 FreeText 带 /AP /N 外观流**（外观流自身含合法 BT/Tj 'APSTREAM' 绘图文本）→ **同样不可见**——注释外观流不是页面内容流，从不被处理
+  - 三形态均：仅 body 'BODYTXT' 照提、**零告警**（纯静默缺席，无任何"存在未提取注释"提示）
+- 测试（tests/test_parser_pdf_annots_invisible.py）：三测试共用 `_assert_body_only`（单 heading 'BODYTXT' + 三标记词全不出现 + 零告警）。判别式：若 fallback 未来消费 page.annots 或渲染 /AP 则注释文本出现翻红；若引入缺失告警则 warnings 断言翻红
+- 计数影响：+3（R1925–R1973 累计 +149；下次全量预测 101660 + 149 = 101809）
+
+---
+
 ## Round 1972 — a 续：PDF 经典 xref 偏移损伤不对称恢复（3 测试）
 
 - 语境：真实世界截断/拼接文件常见 xref 偏移漂移；既有 xref 测试全合法偏移（edges52 增量 /Prev、edges103 线性化），广扫 wrong offset/错位零匹配
