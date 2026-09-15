@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2006（HTML `<table/>` 自闭合——startendtag 委托分支）
+
+- **家族**：html_parser.py:262-277 `handle_startendtag` 对非 img/br/hr 标签只转发 handle_starttag 不补 endtag → `<table/>` 进表格模式永不闭合（4 测试，tests/test_parser_html_table_selfclose.py，探针 outputs/autonomous/probe_html_table_selfclose_r2006.py）
+- **零覆盖声明（宽 grep）**：tests/ 无任何 `<table/>` 形态；edges22 锁的是缺 `</table>` 普通开标签；edges16/21 锁 `<p/>`；edges.py 只断言 handle_startendtag callable
+- **T1 吞噬后续文档**：'<p>a</p><table/><p>b</p>' → 只剩段落 'a'，'b' 静默丢失，零告警
+- **T2 自开表被真表收口**：'<table/><table><tr><td>x</td></tr></table>' → 内层 tr/td 记在自开表栈上、真表 `</table>` 正常收口 → 表 '| x |' + html_nested_table
+- **T3 空自开+游闭合**：'<table/>x</table>' → rows 空 + 'x' 被吞 → [] + html_no_content
+- **T4 双自开告警分序**：'<table/><table/>' → [html_nested_table, html_no_content]（feed 期告警先于 parse 尾部追补）
+- **候选剔除**：行聚类 running-average 漂移（阶梯 3pt 内逐词）分析后**不可观察**——单行/多行最终 text 与 bbox 完全一致（每词单行 join 同序），R1974 排除
+- **计数影响**：+4 → 实测锚 101856 + 快照后增量 47 = 101903
+- **下一轮候选**：html `<pre/>`/`<blockquote/>` 自闭合块级吞噬；或 ipynb/markdown 侧未扫分支
+
 ## Round 2005（PDF upright 字符绘制流序 vs 位置序 + 段距阈值上中位数）
 
 - **家族**：pdfplumber 词内字符序 / fallback 行词序 / `_group_words_to_paragraphs` 段距阈值语义（7 测试，tests/test_parser_pdf_draw_order_median.py，探针 outputs/autonomous/probe_draw_order_median_r2005.py）
