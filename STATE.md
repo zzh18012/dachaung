@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1972 — a 续：PDF 经典 xref 偏移损伤不对称恢复（3 测试）
+
+- 语境：真实世界截断/拼接文件常见 xref 偏移漂移；既有 xref 测试全合法偏移（edges52 增量 /Prev、edges103 线性化），广扫 wrong offset/错位零匹配
+- 探针（outputs/autonomous/probe_xrefdamage_r1972.py，未入库）实证 pdfminer 恢复路径**不对称**：
+  - **X1 条目偏移 +10 漂移**（表语法合法、指向对象内部垃圾位）→ **无恢复**：零元素 + 仅泛化告警 `pdf_no_text_extracted`——PDFXRefFallback 不接管，逐对象解析失败静默丢弃
+  - **X2 条目偏移全归零** → 同 X1 静默全丢
+  - **X3 startxref 指向内容流中间**（130）→ **全恢复**：PDFXRef.load 失败 → PDFXRefFallback 全文件扫 "N 0 obj" 重建 → 'XREFDMG' 照提、bbox [100, 82.484, 160, 94.484] 正常、**零告警**
+- 测试（tests/test_parser_pdf_xref_offset_damage.py）：X1/X2 断言零元素 + `pdf_no_text_extracted`；X3 断言 heading 'XREFDMG' + bbox + 零告警。判别式：若条目错位也触发 fallback 扫描则 X1/X2 恢复翻红；若 startxref 错直接判死则 X3 翻红
+- 计数影响：+3（R1925–R1972 累计 +146；下次全量预测 101660 + 146 = 101806）
+
+---
+
 ## Round 1971 — a 续：DOCX RTL（bidiVisual 表/w:bidi 节/w:rtl run）全部忽略（3 测试）
 
 - 语境：阿拉伯/希伯来文档与部分排版工具产物；广扫 bidiVisual/w:bidi/w:rtl 零匹配
