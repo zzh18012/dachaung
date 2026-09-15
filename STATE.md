@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1957 — a 续：DOCX 表格 cell 内 hyperlink——可见文本并入、悬挂 r:id 亦可（3 测试）
+
+- 语境：edges15 锁 body 段落 hyperlink 可见文本并入（悬挂 r:id 无 relationship 亦可解析）；**cell × hyperlink** 经广扫（add_hyperlink/hyperlink×cell/表格×链接 各形）实证零覆盖
+- 探针（outputs/autonomous/probe_cellhyper_r1957.py，未入库）实证（`_Cell.text` 经 `Paragraph.text`，python-docx 1.2.0 含 hyperlink 可见文本；parser 只读 c.text）：
+  - **H1 cell 中置**：run 'see ' + link 'docs here' → md '| see docs here | right |'、无 link 元数据、零告警
+  - **H2 链后接 run**：'see ' + link 'docs' + ' now' → '| see docs now | right |'（序保真）
+  - **H3 链独占 cell**：cell 文本全部来自 hyperlink → '| docs here | right |'（无 run 也不空）
+- 测试：`tests/test_parser_docx_cell_hyperlink.py`（3 个；判别式：cell 通道改只读 w:r 直系 run 跳 hyperlink 则三断言齐翻红——H3 空 cell）。3 passed
+- 计数影响：+3（R1925–R1957 累计 +101；下次全量预测 101660 + 101 = 101761）
+
+---
+
 ## Round 1956 — a 续：PDF 同基线混排字号——3pt 行容差边界与词序重排（3 测试）
 
 - 语境：`_group_words_to_paragraphs` 行聚类条件 `abs(yc - current_y) <= 3.0`（fallback_parser.py:129）；字号不参与分类（short_line 纯文本启发式，:184）——**同基线混排字号**经广扫（混排字号/Tf.*Tf/mixed size 各形）实证零覆盖
