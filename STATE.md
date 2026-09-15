@@ -121,6 +121,17 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1984 — a 续：PDF xref 流 /Index 稀疏子节 + ObjStm /Extends 链（3 测试）
+
+- 语境：真实大文件/增量更新常见形态——xref 流 /Index [start count ...] 只列实际存在的 oid 区间（留洞、省 0 号 free 头）；ObjStm 分段后段 /Extends 前段。覆盖 grep：/Prev（edges52/102/103）、Linearized 与多子节经典表（edges103）已锁；/Index、/Extends 零覆盖
+- 探针（outputs/autonomous/probe_sparse_extends_r1984.py，未入库）实证全通：
+  - **T1 /Index [0 6 7 2 9 1]**：oid 6 留洞、8 行 type-0 free、font 放 oid 9 仍在 objstm → 'SPARSIDX' 照提 [100.0, 82.484, 160.684, 94.484]
+  - **T2 ObjStm /Extends 链**：5 号装 1/2/3、10 号 /Extends 5 装 font 6 → 'EXTCHAIN' 照提 [100.0, 82.484, 160.672, 94.484]（各段独立索引，/Extends 对读者透明）
+  - **T3 /Index [1 5 7 2 9 1]**：无 0 号行 → 'NOZEROROW' 照提 [100.0, 82.484, 180.664, 94.484]
+- 测试（tests/test_parser_pdf_xref_index_extends.py，3 个，全绿）
+- 计数影响：+3（全量预测更新为 101660 + 185 = 101845，R1925–R1984 累计 +185）
+- 探针教训（轻）：手算对象偏移的表达式（xref_off 减块长）漏包一层 len() → TypeError；改为块 bytes 先建成变量再取 len 后修复——与 R1981 的 block7 回填套路一致，结构生成优先算长度不如先生成再量
+
 ## Round 1983 — a 续：PDF 空用户密码 V5/R6 AESV3（AES-256-CBC）加密透明解密（4 测试）
 
 - 语境：R1980–R1982 锁了 RC4 V1/V2 + AESV2 V4；V5/R6 是最后一个标准安全家族且与前代完全异构——无 MD5/RC4；算法 2.B（SHA-256/384/512 由密文首 16 字节 mod 3 动态选 + AES-128-CBC 内层扰动 ≥64 轮，owner 路径拼整个 48 字节 U 作 vector）；U/O 各 48 字节（hash+验证盐+密钥盐）；file_key 藏 UE/OE（AES-256-CBC 零 IV 无填充）；流 = IV 前置 + AES-256-CBC(file_key 直接用，无 objid 盐) + PKCS#7；/CFM /AESV3；派生不依赖 /ID。探针实现严格镜像 pdfminer _r6_password/authenticate（pdfdocument.py 548–670 行，含 mod3= sum(b%3)、内层 IV=k[16:32] 等细节）
