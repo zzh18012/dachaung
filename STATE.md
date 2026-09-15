@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1963 — a 续：PDF ObjStm + xref stream（PDF 1.5+ 现代结构）（3 测试）
+
+- 语境：既有测试全部经典 xref 表 + 独立对象（广扫 ObjStm/XRef/PDF 1.5 零匹配）；真实现代 PDF（Word/打印驱动产物）默认对象流 + 交叉引用流
+- 探针（outputs/autonomous/probe_objstm_r1963.py，未入库）实证（pdfminer 完整支持——ObjStm 内对象照常解析、type2 xref 条目定位、文本照提零告警）：
+  - **O1 裸 ObjStm + 裸 xref stream**（4 对象入流；/W [1 4 2]、type2 条目 (objstm oid, index)）→ 'OBJSTM' 照提、bbox [72.0, 82.484, 120.672, 94.484] 与经典结构逐位一致、metadata {"level": 0, "heuristic": "short_line"}
+  - **O2 Flate 矩阵**（ObjStm 单压 / xref stream 单压 / 双压，/Length 声明压缩后字节数）→ 全部与 O1 逐位一致（解压透明）
+  - **O3 ObjStm 内对象乱序**（oid 6 在 1 前）→ pair 表 "num rel-offset" 决定归属、编号与物理位置无关 → 同 O1
+- 探针教训（不锁测试）：xref stream /Length 误写解压前长度时行为**布局依赖**——某布局 pdfminer 词法扫穿 EOF 崩 ParserError("pdfplumber 打开/解析 PDF 失败： Unexpected EOF")，另一布局越界跳过后照常恢复 endstream 照解析；非稳定契约不入测试。首版探针 /Length bug 复盘：压缩流 /Length 必须是压缩后字节数
+- 测试：`tests/test_parser_pdf_objstm_xrefstm.py`（3 函数 5 用例：O2 参数化 ×3；判别式：pdfminer 若不解析 type2 条目则 O1 直接 parse 失败翻红；若 ObjStm 按物理位置编号则 O3 乱序对象错位翻红）。5 passed
+- 计数影响：+5（R1925–R1963 累计 +119；下次全量预测 101660 + 119 = 101779）
+
+---
+
 ## Round 1962 — a 续：PDF 内容流结构变体——Flate / 数组拼接 / 状态跨流持续（3 测试）
 
 - 语境：既有测试全部单一裸 stream（广扫 Flate / Contents [ / 流数组 零匹配——zlib 仅用于 PNG IDAT）；真实 PDF 几乎必 Flate、大页常拆数组
