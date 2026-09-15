@@ -121,6 +121,15 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1998（PDF Type1 简单字体自定义宽度分支）
+
+- **假设**：edges93 只锁 Type3 /Widths；Type1 的 /FirstChar//LastChar//Widths 查表与 /MissingWidth 回退零覆盖。内置 BaseFont 命中 FontMetricsDB 时是否读 /Widths？未知 BaseFont 范围外字符回退宽几？/MissingWidth 何时生效？
+- **探针**（outputs/autonomous/probe_t1_widths_r1998.py，6 实验）：E1 内置 Helvetica 'AB'+/Widths[400 900] → x1=116.008（恰=内置 667+667，自定义宽**被忽略**）；E2 'AZ' → 115.336（=667+611）；E3 +/MissingWidth 250 → 与 E2 完全同值（也忽略）；E4 未知 /ZZZUnknown 'AB' → x1=115.6（400+900 **生效**）；E5 'AZ' 范围外 Z → x1=104.8（**0 宽**回退）；E6 +/MissingWidth 250 → x1=107.8（3pt 生效）。
+- **源码对照**：pdffont.py:1053-1062 PDFType1Font——BaseFont ∈ FontMetricsDB（内置 Helvetica 等）→ AFM 度量，**不读 /Widths 与 /MissingWidth**；KeyError（未知 BaseFont）→ 读 spec FirstChar/Widths；查表失败 default_width = 描述符 /MissingWidth 否则 0。内置宽 FONT_METRICS['Helvetica'][1]：A=667、B=667、Z=611。
+- **测试**：tests/test_parser_pdf_t1_widths_branch.py 5 个（T1 内置忽略 Widths 116.008 / T2 内置忽略 MissingWidth 115.336 / T3 未知读 Widths 115.6 / T4 范围外 0 宽 104.8 / T5 未知 MissingWidth 250 生效 107.8）。
+- **计数影响**：+5 → R1925–R1998 累计 +231；全套预测 101660+231=**101891**。
+- **探针教训**：未知 BaseFont 的 bbox y 与内置不同（[100, 80.0, …, 92.0] vs 内置 [100, 82.484, …, 94.484]，ascent 默认值不同）；经典 xref 循环 `range(1, m+1)` 要求对象号连续 1..max，描述符给 8 留 7 空号直接 KeyError。
+
 ## Round 1997（PDF 线框表跨列/跨行——不均匀行）
 
 - **假设**：既有 PDF 表格夹具行宽全均匀；跨列/跨行的不均匀行零覆盖，_rows_to_markdown 尾部补空（fallback_parser.py:66）从未被 PDF 端真实几何触发。
