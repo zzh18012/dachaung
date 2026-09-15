@@ -121,6 +121,26 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2012（PDF pdfplumber 分词 x/y_tolerance=3 精确边界）
+
+- **家族**：pdfplumber utils/text.py _is_new_word 新词判据
+  `(cx < ax) or (cx > bx + x) or abs(cy - ay) > y`（x/y 默认 3，
+  DEFAULT_X_TOLERANCE=3 :27）——intra 行距从前一字符 x1 量到当前 x0、
+  严格 >（==3.0 仍同词）；字符级 inter 行 |Δtop|>3 破词；fallback
+  _lines_to_para 词间/行间均单空格 join
+- **零覆盖**：flip_mirror 只定性说过 "间距 > x_tolerance → 逐字成词"；
+  精确边界（==3.0 联/3.1 裂）与字符级 inter 行破词零覆盖（grep 实证）
+- **探针**：outputs/autonomous/probe_pdf_wordgap_boundary_r2012.py（单
+  内容流两 BT 块；注意 _pdf 构造器 list 项=页，两块必须同流）。实证：
+  T1 gap 恰 3.0 → 同词 'AB'（浮点 111.004-108.004 实算 ≤3）；T2 3.1 →
+  'A B' 裂词单元素 bbox 拓宽；T3 2.9 → 'AB'；T4 同列 Δtop 3.5 → 破词
+  破行 **'B A' 高位在前**（行按 y_center 升序）；T5 Δtop 2.5 → 同词
+  'AB' 跨 14.5 高
+- **测试**：tests/test_parser_pdf_wordgap_boundary.py（T1-T5）5 passed
+- **判别式**：T1/T3 若 'A B' 翻；T2 若 'AB' 翻；T4 若顺序翻；T5 若
+  裂词翻
+- **计数影响**：快照后增量 +5（…R2011 +5、R2012 +5）→ 预估 101940
+
 ## Round 2011（PDF 页树节点识别变体）
 
 - **家族**：pdfpage.create_pages（pdfminer/pdfpage.py:91-150）的节点识别
