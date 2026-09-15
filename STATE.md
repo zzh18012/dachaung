@@ -121,6 +121,15 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1999（PDF CIDFont 后代 /W 宽度数组）
+
+- **假设**：既有 Type0 夹具（R1994-1996、edges87/99/112）只用平 /DW；/W 数组（数组态 cid [w...]、三元组态 cid1 cid2 w）零覆盖。get_widths（pdffont.py:54-88）数组态只消费 r[-1] 丢弃前缀孤儿？倒序范围空 no-op？同 CID 后写覆盖？
+- **探针**（outputs/autonomous/probe_cidfont_w_r1999.py，6 实验，全命中预测）：E1 数组态 [1 [500 900]] → 116.8；E2 三元组 [1 2 500] → 112；E3 /W 只盖 CID1 → 118（CID2 走 DW）；E4 [1 2 [500 900]] **CID1 静默掉** → 118；E5 倒序 [5 3 500] → 124（空范围 no-op）；E6 [1 1 500 1 1 900] 后写胜 → 110.8。
+- **源码对照**：pdffont.py:54-88 get_widths——数组态 `char1 = r[-1]` 后 `r=[]`（前缀孤儿丢弃，无告警）；三元组 `range(char1, char2+1)`（倒序空）；widths dict 赋值后者胜；pdffont.py:955-971 char_width 三级回退（int 键 → str 等价键 → default_width）。
+- **测试**：tests/test_parser_pdf_cidfont_w_array.py 6 个（T1 数组态 / T2 三元组 / T3 W 胜 DW+单字符伴随 / T4 前缀孤儿+单字符伴随 / T5 倒序 no-op / T6 后写覆盖）。
+- **计数影响**：+6 → R1925–R1999 累计 +237；全套预测 101660+237=**101897**。
+- **探针教训**：T3/T4 双字符 x1 同为 118 但机制相反（哪个 CID 拿到自定义宽），用单字符伴随解析（<0001>/<0002>）在测试内区分方向；E4 的 1 个孤儿数字是文档化行为而非 bug（get_widths 不回看）。
+
 ## Round 1998（PDF Type1 简单字体自定义宽度分支）
 
 - **假设**：edges93 只锁 Type3 /Widths；Type1 的 /FirstChar//LastChar//Widths 查表与 /MissingWidth 回退零覆盖。内置 BaseFont 命中 FontMetricsDB 时是否读 /Widths？未知 BaseFont 范围外字符回退宽几？/MissingWidth 何时生效？
