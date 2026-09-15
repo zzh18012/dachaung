@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1994（PDF ToUnicode bfchar 目标形态变体）
+
+- **假设**：既有 Type0/CID 映射覆盖（edges87/93/99）全是"一 CID → 一 BMP 码点"；dst 侧形态（多码点/星体代理对/空目标）零覆盖。pdfminer dst 解码应为 UTF-16BE 变长。
+- **探针**：outputs/autonomous/probe_tounicode_dst_r1994.py——Identity-H + CIDFontType2 DW 1000，bfchar 三形态。实证：E1 <0001>→<00410042> 得 'ABC'（一 CID 两字符，bbox 仍 2 字形宽 x1=124，字符数与字形数解耦）；E2 <0003>→<D83DDE00> 得 '😀Z'（代理对正确合成星体字符）；E3 <0005>→<> 得 'Q'（空串入表生效非未映射回退，字形吞字但宽度照走 x1=124 非 112）——全部零告警（FontBBox stderr 不入结构化告警）。
+- **测试**：tests/test_parser_pdf_tounicode_dst_shapes.py——T1 多码点 dst；T2 星体代理对；T3 空 dst 静默吞字宽度前进。
+- **计数影响**：+3；R1925–R1994 累计 +216；全套预测 101660+216=101876。
+- **探针教训**：(1) **零覆盖 grep 禁止 head 截断**——本轮首候选（PDF 内联图 BI/ID/EI）因 `head -5` 截断漏看 test_parser_pdf_inline_image.py（R1966 已锁），探针跑完才发现重复，浪费一轮扫描；改用完整文件列表比对。(2) 探针打印含 astral/孤立代理风险时用 ascii() 而非 repr()，防控制台 UnicodeEncodeError 掩盖真实结果。(3) ToUnicode dst 是 UTF-16BE 变长解码：字符数、字形数、字节数三者解耦，bbox 断言只跟字形数走。
+
 ## Round 1993（PDF xref 流 /Prev 链——增量更新家族）
 
 - **假设**：既有 /Prev 覆盖（edges52/102/103）全是经典表链；xref 流→xref 流稀疏 /Index 增量更新零覆盖。pdfminer 应跨 /Prev 链合并稀疏段，新一代胜出；free 行不遮蔽旧代在用条目。
