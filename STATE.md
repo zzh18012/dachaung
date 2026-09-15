@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1968 — a 续：PDF 受损/退化内容容差——幽灵字体零宽/坏流部分存活/负坐标透传（3 测试）
+
+- 语境：既有测试全部完好的规范文件（广扫 undeclared/corrupt/损坏 parser 侧零匹配）；真实世界损坏常见三类
+- 探针（outputs/autonomous/probe_damaged_r1968.py，未入库）实证：
+  - **D1 未声明字体**（Tf /F9，Resources 只有 /F1）→ 文本 'GHOSTFONT' 照提但**零宽 bbox** [100, 80, 100, 92]——pdfminer 回退字体无度量、字宽全 0、x1 塌缩到 x0；零宽文本**不被丢弃**（:331 零宽剔除仅图片路径）；stderr 有 pdfminer FontBBox 日志但 warnings 空
+  - **D2 /Contents 数组 [好流, 坏 Flate]**（zlib 头+垃圾）→ 坏流解压错误被 pdfminer 静默吞、好流 'GOODTEXT' 存活、零告警——部分存活语义
+  - **D3 负坐标文本**（Td -100 -50）→ bbox [-100, 832.484, -39.316, 844.484] 原样透传——无页面裁剪、无告警
+- 测试：`tests/test_parser_pdf_damaged_tolerance.py`（3 个；判别式：文本路径加零宽剔除则 D1 元素消失翻红；坏流错误上抛则 D2 变 ParserError 翻红；加边界裁剪则 D3 翻红）。3 passed
+- 计数影响：+3（R1925–R1968 累计 +134；下次全量预测 101660 + 134 = 101794）
+
+---
+
 ## Round 1967 — a 续：DOCX 表行 gridBefore/gridAfter 列偏移——首偏移静默左移（3 测试）
 
 - 语境：既有表格测试全整齐行/gridSpan/vMerge（广扫 gridBefore/gridAfter 零匹配）；真实 Word 允许行首/行尾跳过网格列
