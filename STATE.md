@@ -121,6 +121,24 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2013（PDF pdfplumber 连字展开 expand_ligatures）
+
+- **家族**：pdfplumber/utils/text.py:34 LIGATURES 七映射（ﬀ→ff ﬃ→ffi
+  ﬄ→ffl ﬁ→fi ﬂ→fl ﬆ→st ﬅ→st），:476 默认展开进 word 文本；连字字符经
+  /Encoding /Differences 字形名重映射进 PDF（edges85 锁过一般重映射，
+  连字字形名 parser 侧零覆盖——grep 实证 ligature 命中全在 evaluation）
+- **探针**：outputs/autonomous/probe_pdf_ligature_expand_r2013.py。实证：
+  T1 ﬁﬂ → 'fifl'（宽度按字形名 500/1000 → bbox [100,82.484,112,94.484]）；
+  T2 ff/ffi/ffl 在 Helvetica AFM 无宽度条目 → **宽度 0、三字符全停
+  x=100、文本照常展开 'ffffiffl' 但 bbox 退化 x0==x1**、零告警；T3 'st'
+  非 AGL 名 → Differences 条目静默丢弃、码位 102 走基础编码 'f'（宽
+  3.336）、无 (cid:) 占位
+- **测试**：tests/test_parser_pdf_ligature_expand.py（T1 fi/fl 展开 /
+  T2 零宽退化 bbox / T3 st 丢弃）3 passed
+- **判别式**：T1 若 'ﬁﬂ' 未展开翻；T2 若 bbox 非零宽翻；T3 若 'st'
+  生效或 (cid:102) 翻
+- **计数影响**：快照后增量 +3（…R2012 +5、R2013 +3）→ 预估 101943
+
 ## Round 2012（PDF pdfplumber 分词 x/y_tolerance=3 精确边界）
 
 - **家族**：pdfplumber utils/text.py _is_new_word 新词判据
