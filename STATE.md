@@ -121,6 +121,27 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2011（PDF 页树节点识别变体）
+
+- **家族**：pdfpage.create_pages（pdfminer/pdfpage.py:91-150）的节点识别
+  分支——/Count 从不被消费（枚举纯走 Kids DFS）、visited 集合防 Kids 环
+  （:111-116，与 R1986 Form XObject 重入守卫不同层）、非 STRICT 小写
+  /type 兜底（:112-114 See #64）、节点无 type 键静默丢页、catalog 无
+  /Pages 时 xref 全扫兜底（:142-149）
+- **零覆盖**：grep 实证四形态全零——circular_form 是 Form XObject 环
+  （pdfinterp 层）；pagetree_inherit 的 Count 全部算术正确；lowercase
+  type / Pages 缺失 / Kids 环 / Count 撒谎无任何夹具
+- **探针**：outputs/autonomous/probe_pdf_pagetree_id_r2011.py。实证：
+  T1 Count 99 照提；T2 自引用不挂起照提；T3 小写 /type 照提；T4 无
+  type 键 → 0 元素 + 仅 pdf_no_text_extracted（主走查丢弃 + 兜底也找不到
+  ——兜底同样要求 /Type /Page）；T5 无 /Pages → xref 全扫兜底照提。
+  全部 bbox [100,82.484,155.332,94.484] 零告警
+- **测试**：tests/test_parser_pdf_pagetree_id.py（T1 Count 撒谎 / T2
+  Kids 环 / T3 小写 type / T4 无 type 键丢页 / T5 无 Pages 兜底）5 passed
+- **判别式**：T1 若信 Count 翻；T2 挂起或 RecursionError 翻；T3 若零
+  元素翻；T4 若照提翻；T5 若 ParserError 翻
+- **计数影响**：快照后增量 +5（…R2010 +4、R2011 +5）→ 预估 101935
+
 ## Round 2010（PDF V4 加密 crypt filter 矩阵）
 
 - **家族**：V4/R4 /Encrypt 的 crypt filter 声明分支——/StmF /Identity
