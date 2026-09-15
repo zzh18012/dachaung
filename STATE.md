@@ -121,6 +121,15 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2009（PDF 退化 /Contents 五形态统一容忍）
+
+- **家族**：页 /Contents 退化形态（5 测试，tests/test_parser_pdf_contents_degenerate.py，探针内联 Bash heredoc 实证）
+- **零覆盖声明（宽 grep）**：edges115 已锁 /Contents→dict 非流、/Length 间接、内联字体、多级继承、缺 /Type /Page、/F 标志；null / 空数组 / 键缺失 / 空流 / 纯空白流五形态全库零覆盖
+- **统一下场**：五者同值——0 元素 + 仅 pdf_no_text_extracted，不抛 pdfplumber_open_failed、无 word_extract_failed（页对象合法，pdfplumber 当空页处理）
+- **实现注记**：测试夹具构造与探针差异教训——xref 表按 max(objs) 连续编号写 offsets，省略中间对象会 KeyError；对象 4 必须常驻
+- **计数影响**：+5 → 实测锚 101856 + 快照后增量 70 = 101926
+- **下一轮候选**：词法器续（关键字 true/false 进操作数栈、字典内 % 注释）；或评估退出 a-queue 转向 b-queue 固化
+
 ## Round 2008（PDF 内容流操作数数字形态——pdfminer 词法器）
 
 - **家族**：psparser.py `_parse_main` 数字分派（'-+'/数字→`_parse_number`，'.'→`_parse_float`，终值 Python int()/float() 语法超集）（6 测试，tests/test_parser_pdf_number_forms.py，探针 outputs/autonomous/probe_pdf_number_forms_r2008.py）
