@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1971 — a 续：DOCX RTL（bidiVisual 表/w:bidi 节/w:rtl run）全部忽略（3 测试）
+
+- 语境：阿拉伯/希伯来文档与部分排版工具产物；广扫 bidiVisual/w:bidi/w:rtl 零匹配
+- 探针（outputs/autonomous/probe_rtl_r1971.py，未入库）实证（python-docx 全按文档序、视觉反转**不应用**）：
+  - **R1 bidiVisual 表**（3 列填 1/2/3）→ md 文档序 '| 1 | 2 | 3 |'——视觉列反转不发生
+  - **R2 w:bidi 节** + 两段 → 段序 0/1、文本逐字不变
+  - **R3 run 级 w:rtl** → 'LTR part RTL RUN TEXT' 文档序拼接、不反转、零告警
+- 测试：`tests/test_parser_docx_rtl_bidi.py`（3 个；判别式：实现 bidiVisual 视觉重排则 R1 变 '| 3 | 2 | 1 |' 翻红；run 反转则 R3 变 'TXET NUR TLR' 翻红）。3 passed
+- 计数影响：+3（R1925–R1971 累计 +143；下次全量预测 101660 + 143 = 101803）
+
+---
+
 ## Round 1970 — a 续：DOCX framePr 定位段 + 同 rId 图复用（3 测试）
 
 - 语境：framePr（旧式定位文本框段落）零覆盖（广扫零匹配）；R1969 锁了 PDF 对象别名，DOCX 侧同图 rId 两处引用语义未知
