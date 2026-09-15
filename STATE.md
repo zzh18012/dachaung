@@ -121,6 +121,15 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2001（PDF OneByteIdentityH/V 与 Encoding 字典态）
+
+- **假设**：cmapdb.py:293-296 内置 IdentityCMapByte（单字节 code=CID）与 _get_cmap_name 字典态分支（pdffont.py:1205-1210，Encoding 无 name 属性 → 读 [CMapName]）零覆盖；未知名是否落空 CMap 回退？
+- **探针**（outputs/autonomous/probe_onebyte_cmap_r2001.py，6 实验）：E1 /OneByteIdentityH '(AB)' → 单字节拆两 CID → 'AB' x1=124；E2 字典态 /CMapName → 同值；E3 /DLIdent-H → **'(cid:16706)'（与 Identity-H 全同）**——预期空回退被证伪，溯源 pdffont.py:168-171 `IDENTITY_ENCODER = {DLIdent-H→Identity-H, DLIdent-V→Identity-V}` 别名表 + 1222 行 `.get(cmap_name, cmap_name)`；E4 字典态未知名 /ZZZUnknown → 真·空 CMap（decode 零产出，cmapdb.py:90-102）→ 0 元素 + pdf_no_text_extracted 告警；E5 /OneByteIdentityV → 1 字节竖排 'A B'（几何同 R2000 T1）；E6 Identity-H 对照 '(cid:16706)' x1=112。
+- **消费链**：pdfinterp.py:238-246 Type0 合流（后代 dict 拷贝 + Encoding/ToUnicode 注入）→ PDFCIDFont；pdfdevice.py:88-239 render_string 按 is_vertical 分水平/垂直渲染（`for cid in font.decode(obj)`）。
+- **测试**：tests/test_parser_pdf_onebyte_cmap.py 5 个（T1 单字节拆+对照断言 / T2 字典分支 / T3 别名+对照 / T4 空回退+告警 / T5 单字节竖排）。
+- **计数影响**：+5 → 实测锚预测 101882+5=**101887**（名义累计 +247）。
+- **探针教训**：E3 预测错（空回退）→ 实测同 Identity-H——grep 源码定位 IDENTITY_ENCODER 别名表才归因；"未知名"测试必须挑真不在别名表的名字（ZZZUnknown 过，DLIdent-H 不过）。pdfdevice.py 是 render_string 真身（converter/pdfinterp 均无）——找消费链别只盯 converter。
+
 ## Round 2000（PDF Type0 竖排 Identity-V 与 W2/DW2）
 
 - **假设**：Identity-V（WMode=1，cmapdb.py:292 内置）与竖排分支（pdffont.py:1163-1173：get_widths2、DW2 默认 [880,-1000]、default_disp=(None,vy)）零覆盖。W2 数组态截断行为？DW2 参与？竖排位移方向？
