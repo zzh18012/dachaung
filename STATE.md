@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1995（PDF ToUnicode CMap 源块形态变体）
+
+- **假设**：edges87 只锁 bfrange 连续 dst 起点；R1994 锁 bfchar dst 形态；CMap 源块侧（数组 dst/多块合并/cidrange 混入）零覆盖。
+- **探针**：outputs/autonomous/probe_tounicode_src_r1995.py——四块形态。实证：E1 bfrange 数组 dst [<0041><0042>] 逐码点配对得 'AB'；E2 数组变长条目 [<00410042> <D83DDE00>] 得 'AB😀'（UTF-16BE 变长）；E3 两个独立 bfchar 块全合并得 'XY'；E4 **cidrange 混入 ToUnicode 不被忽略**——cmapdb.py ENDCIDRANGE 同样调 add_cid2unichr（范围基址 CID → 码点字节按 UTF-16BE 解）：<0030><0031> 49 → CID49→'0'，文本 <00300031> 得 '(cid:48)0' 混合占位。全部零告警。
+- **测试**：tests/test_parser_pdf_cmap_block_shapes.py——T1 数组 dst；T2 数组变长条目；T3 多 bfchar 块合并；T4 cidrange 误映射（机制源码级对照 cmapdb.py:190/:385-425）。
+- **计数影响**：+4；R1925–R1995 累计 +220；全套预测 101660+220=101880。
+- **探针教训**：(1) "块被忽略"的直觉要源码对照——ENDCIDRANGE 实际共享 add_cid2unichr 入口，cidrange 在 ToUnicode 里是**意外生效**（CID→码点字节 UTF-16BE）而非忽略；探针打印 '(cid:48)0' 首看费解，读 cmapdb 后机制完全可解释。(2) 意外结果≠不可测——只要确定性且机制可解释就可锁（R1974 规则的精神是"分支必须真的触发"，E4 正是分支触发的实证）。(3) bfchar/bfrange/cidrange/cidchar 四块入口在 cmapdb.py 共一套 add_cid2unichr，后续变体（cidchar 块、数组 dst 长度不匹配 zip 截断）可继续挖。
+
 ## Round 1994（PDF ToUnicode bfchar 目标形态变体）
 
 - **假设**：既有 Type0/CID 映射覆盖（edges87/93/99）全是"一 CID → 一 BMP 码点"；dst 侧形态（多码点/星体代理对/空目标）零覆盖。pdfminer dst 解码应为 UTF-16BE 变长。
