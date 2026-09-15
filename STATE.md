@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1987（a：无 /ID trailer 下的标准加密）
+
+- 假设：pdfminer 对无 /ID 文件显式降级 docid=(b"",b"")（pdfdocument.py:734），算法 2 与 R3 U 链均 update(docid[0])——无 /ID 时密钥全按 id=b"" 派生，空密码透明解密不变。此前 R1980/R1981 全部加密夹具 trailer 均带 /ID，此分支零覆盖。
+- 探针：outputs/autonomous/probe_noid_enc_r1987.py（E1 V1/R2 / E2 V2/R3 / E3 V2/R3+objstm+xref 流，全部无 /ID，密钥手搓 id=b""）。实测三例照提零告警。
+- 测试：tests/test_parser_pdf_encryption_no_id.py（+3：R2 无 ID / R3 无 ID / R3+objstm+xref 流无 ID；bbox 断言取探针全精度打印）。
+- 计数影响：+3；R1925–R1987 累计 +194；全套预测 101660+194=101854。
+- 探针教训：V2 缺 /Length 时 pdfminer 按 40 位默认取 n=5 → 认证失败 ParserError（空 message）——R3/V2 夹具 /Length 128 必须显式写（初版 E2 即栽此处，E1 不受影响故未即暴露）。
+
 ## Round 1986（a：PDF Form XObject 循环引用防护）
 
 - 假设：恶意/损坏 PDF 的 Form 自引用/互引用（CWE-835）由 pdfminer pdfinterp.execute 的 parent_stream_ids 守卫拦截——拒绝重入仅 log.warning（stderr），不产生结构化告警；非循环深链不被过度拦截。覆盖 grep：dangling XObject / image matrix / 对象别名既有，循环防护零覆盖。
