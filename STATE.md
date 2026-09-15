@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1986（a：PDF Form XObject 循环引用防护）
+
+- 假设：恶意/损坏 PDF 的 Form 自引用/互引用（CWE-835）由 pdfminer pdfinterp.execute 的 parent_stream_ids 守卫拦截——拒绝重入仅 log.warning（stderr），不产生结构化告警；非循环深链不被过度拦截。覆盖 grep：dangling XObject / image matrix / 对象别名既有，循环防护零覆盖。
+- 探针：outputs/autonomous/probe_circform_r1986.py（E1 自 Do / E2 互引用 / E3 深链负控）。实测 stderr 恰两条 "Refusing to execute circular reference to content stream 6"，E1 'SELFDO' 恰一次、E2 'FORMBB FORMAA' 各恰一次（行合并单元素）、E3 'DEEPCHN' 照提，全部零 d.warnings、无挂起。
+- 测试：tests/test_parser_pdf_circular_form.py（+3：自引用恰一次 / 互引用各恰一次 / 深链负控不过度拦截；bbox 断言取探针全精度打印）。
+- 计数影响：+3；R1925–R1986 累计 +191；全套预测 101660+191=101851。
+- 探针教训：build() 按 forms 字典键自动生成页级资源名 /Fm{oid}（oid 为 6/7/8），页内容流必须绘制同名 /Fm6 Do——名字不匹配时 do_XObject 静默 no-op（零元素 + pdf_no_text_extracted），现象与"守卫过度拦截"完全同形；此轮靠 DEBUG 级 pdfinterp 逐 exec 日志定位（Resource 行可见实际注册的 XObject 名）。红判先证夹具健全（R1974 规则再现）。
+
 ## Round 1985 — a 续：PDF xref 条目编码变体——/W 窄字段 + 非零代数 gen（3 测试）
 
 - 语境：真实文件并非都是 /W [1 4 2] + gen 0——小文件用窄字段编码、增量更新过的对象带非零代数（经典表 00001 n）。覆盖 grep 确认既有 xref 流夹具全为 [1 4 2] + gen 0，gen 语义零覆盖
