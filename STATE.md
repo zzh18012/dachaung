@@ -121,6 +121,20 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2014（HTML 数字字符引用退化形态）
+
+- **家族**：html.parser convert_charrefs=True（html_parser.py:72）的
+  HTML5 数字字符引用语义——&#0;/超界/代理 → U+FFFD；edges15 已锁未知
+  命名实体字面，数字退化形态零覆盖（grep 实证 &#0;/&#x110000;/&#xD800;/
+  双重编码无夹具）
+- **探针**：outputs/autonomous/probe_html_numeric_charref_r2014.py。实证：
+  T1 '&#65;'/'&#x41;' → 都是 'A'；T2 'a&#0;b' → 'a�b'（0 →
+  REPLACEMENT 非 NUL 非丢弃）；T3 超界/代理 → '�'；T4 '&#38;#41;'
+  → '&#41;' 字面（单遍不重解析）
+- **测试**：tests/test_parser_html_numeric_charref.py（T1-T4）4 passed
+- **判别式**：T2/T3 若空串/异常/原字面翻；T4 若 ')' 翻；T1 若非 'A' 翻
+- **计数影响**：快照后增量 +4（…R2013 +3、R2014 +4）→ 预估 101947
+
 ## Round 2013（PDF pdfplumber 连字展开 expand_ligatures）
 
 - **家族**：pdfplumber/utils/text.py:34 LIGATURES 七映射（ﬀ→ff ﬃ→ffi
