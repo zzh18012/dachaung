@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1958 — a 续：PDF Ts 文字升起——上标/下标的行聚类归属（3 测试）
+
+- 语境：行聚类容差 `abs(yc - current_y) <= 3.0`（R1956 锁字号轴；本轮锁 **Ts 升起轴**——上标/下标真实形态）经广扫（Ts/Tz/上标/下标 各形）实证零覆盖
+- 探针（outputs/autonomous/probe_tsrise_r1958.py，未入库）实证：
+  - **S1 上标 8pt+6Ts**：中心 ≈ 基线+2 vs 基词中心 ≈ 基线-6 → 差 >3 → **拆行重排**（上标行先）'nd x'——视觉 'x^nd' 被重排为前缀（bbox [100.0, 79.656, 138.896, 94.484]）
+  - **S2 下标 8pt-4Ts**：差 ≤3 → 同行 → x 序 'x nd'（bbox [100.0, 82.484, 138.896, 97.656]）
+  - **S3 Ts 跨 Tj 持续**：6 Ts 后两个 Tj 都升起且 pen 连续 → 'n'+'d' 合成单词 'nd' → 'nd x'（text state 不因 Tj 重置；同 R1953 B3 连字家族）
+- 测试：`tests/test_parser_pdf_ts_rise.py`（3 个；判别式：行聚类改基线对齐则 S1/S3 翻红；容差收窄则 S2 翻红；Ts 改每 Tj 重置则 S3 变 'n d x' 翻红）。3 passed
+- 计数影响：+3（R1925–R1958 累计 +104；下次全量预测 101660 + 104 = 101764）
+
+---
+
 ## Round 1957 — a 续：DOCX 表格 cell 内 hyperlink——可见文本并入、悬挂 r:id 亦可（3 测试）
 
 - 语境：edges15 锁 body 段落 hyperlink 可见文本并入（悬挂 r:id 无 relationship 亦可解析）；**cell × hyperlink** 经广扫（add_hyperlink/hyperlink×cell/表格×链接 各形）实证零覆盖
