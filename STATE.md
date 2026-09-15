@@ -121,6 +121,16 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2015（MediaBox 退化形态：pdfplumber 原始 attrs 重读）
+
+- **家族**：PDF /MediaBox 退化（缺失/null/长度 3/非数值/对角反转）。pdfminer pdfpage.py:189-204 的 US Letter 回退只作用于 pdfminer 侧 page.bbox；pdfplumber Page.__init__（page.py:212-214）get_attr("MediaBox") 直接重读原始 attrs 重新归一，回退被架空。
+- **零覆盖**：grep 实证 tests/ 无任何夹具命中 "MediaBox missing"/null 字面/长度≠4/对角反转（R1943 只锁非零原点有效盒，R1587 锁 CropBox 忽略/继承有效盒）。
+- **探针**：outputs/autonomous/probe_pdf_mediabox_fallback_r2015.py。
+- **测试**：tests/test_parser_pdf_mediabox_degenerate.py（5 用例全过）。T1 缺键→ParserError pdfplumber_open_failed/TypeError 'NoneType' not iterable（page.py:166 pragma: nocover 分支）；T2 /MediaBox null（PDFSyntaxParser null→None，pdfparser.py:63）同分支同消息；T3 [0 0 900] 数值全过 isinstance 后 box_raw[3] IndexError；T4 [0 0 /A /B] 先死于 pdfminer parse_rect float(PSLiteral)（被包成 PdfminerException 透传消息；pdfplumber MalformedPDFException "non-number coordinate" 分支此路径不可达）；T5 [612 792 0 0] 对角反转双层不一致——pdfminer parse_rect 不排序按原点 (612,792) 平移字符，pdfplumber _normalize_box 按规范排序当 Letter 不回移 → heading 'A' 成功但 bbox 位移 [-512, 874.484, -503.996, 886.484] 零告警。
+- **判别式**：T1-T4 若走 Letter 回退正常抽取翻；T5 若 bbox 与正常 Letter 相同（双层一致）翻。
+- **计数影响**：+5（101947 → 101952）。
+- **工程注**：ParserError 逃逸时 pdfplumber 句柄未闭（close() re-raise 同一异常），Windows 删临时文件 WinError 32——测试用 TemporaryDirectory(ignore_cleanup_errors=True)。
+
 ## Round 2014（HTML 数字字符引用退化形态）
 
 - **家族**：html.parser convert_charrefs=True（html_parser.py:72）的
