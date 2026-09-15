@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1949 — a 续：DOCX 表格 cell 多段落——内部 \n 保留、两端 strip（3 测试）
+
+- 语境：广扫（cell.add_paragraph/多段/second line in cell 全形）实证既有测试 cell 全部单段（edges4:550 多段是 body 级）
+- 探针（outputs/autonomous/probe_docx_cellmultiline_r1949.py + M3 复跑，未入库）实证（`_Cell.text` = "\n".join(p.text)；每 cell 先 `.strip()` :553）：
+  - **M1 cell 两段落**：md 首格内嵌 '\n'：'| line one\nline two | right |'——破坏 md 表格行语法但逐字保留；row/col 不变；零告警
+  - **M2 cell 段内 w:br**：para.text 同映射 '\n' → 与 M1 完全同形态（两来源经 c.text 收敛）
+  - **M3 尾随空段落被 strip**：c.text='text\n' → 尾随 '\n' 消失 '| text | right |'（初版预测 '| text\n |' 翻红修正——strip 只削两端，对照 M1 内部保留）
+- 测试：`tests/test_parser_docx_cell_multiline.py`（3 个；判别式：改连接符/全剥换行则 M1/M2/M3 全等翻红；strip 取消则 M3 翻红）。3 passed
+- 计数影响：+3（R1925–R1949 累计 +77；下次全量预测 101660 + 77 = 101737）
+
+---
+
 ## Round 1948 — a 续：DOCX 表格单元格内嵌图片静默丢失（3 测试）——**与 edges33 重复，登记更正**
 
 - 语境：本轮声称"grep 零覆盖"有误——**edges33（R1423）已锁 cell add_picture 静默丢失主体**（无元素/无落盘/无告警/空格渲染）；本轮 grep 模式（add_picture.*cell/表格.*图）未命中 edges33 的措辞。R1927 教训（先广扫再声称零覆盖）第二次踩中
