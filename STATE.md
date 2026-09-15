@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1988（a：标准加密密钥派生参数分支）
+
+- 假设：此前全部加密夹具参数空间收窄（/P 恒 -1、/EncryptMetadata 缺省、/Length 恒 128）。三个真实世界分支：compute_encryption_key 的 struct.pack("<L",p) 进哈希（P 非装饰字段）；R≥4 且 EncryptMetadata false 时哈希末尾追加 FFFFFFFF（pdfdocument.py:404-408）；/Length 96 时 n=12 截断作用于扩展轮次（每轮只哈希 result[:n]）与 key_o/O/U 链。
+- 探针：outputs/autonomous/probe_encparams_r1988.py（E1 P=-4 / E2 AESV2+metaoff / E3 len96）。三例手搓密钥全部照提零告警，首跑即过（R1981 教训养成的密钥形状预核对奏效）。
+- 测试：tests/test_parser_pdf_encryption_params.py（+3；T2 用 cryptography importorskip；bbox 断言取探针全精度打印）。
+- 计数影响：+3；R1925–R1988 累计 +197；全套预测 101660+197=101857。
+- 备注：StrF（对象字符串解密）经查无观察面——R1973 已锁注释文本静默不可见，字典字符串不进 elements，无法经 fallback 输出验证，按 R1974 规则不写无法验证分支的测试。
+
 ## Round 1987（a：无 /ID trailer 下的标准加密）
 
 - 假设：pdfminer 对无 /ID 文件显式降级 docid=(b"",b"")（pdfdocument.py:734），算法 2 与 R3 U 链均 update(docid[0])——无 /ID 时密钥全按 id=b"" 派生，空密码透明解密不变。此前 R1980/R1981 全部加密夹具 trailer 均带 /ID，此分支零覆盖。
