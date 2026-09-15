@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1964 — a 续：PDF 多级页树 + 资源/MediaBox 继承（3 测试）
+
+- 语境：既有测试全部扁平页树（root Pages → Page 直连，广扫 /Type /Pages 下的 /Parent 零匹配）；真实 PDF（章节/分册）常多级嵌套；规范 /Resources、/MediaBox 沿 /Parent 链继承、最近祖先胜
+- 探针（outputs/autonomous/probe_pagetree_r1964.py，未入库）实证（pdfminer 递归走树 + 属性继承照常）：
+  - **N1 两级页树**（root [branchA[1 页] + branchB[2 页]]）→ 页序 = Kids 深度优先遍历 1/2/3、三页文本照提零告警（'THIRD!' 以 ! 结尾落 paragraph）
+  - **N2 /Resources 仅在根节点**（页面无自身资源）→ 字体沿链继承 → 与每页自带资源**逐位一致**（无 (cid:) 退化）
+  - **N3 MediaBox 最近祖先胜**（根 612×792、branchA 300×400）→ branchA 页 y 翻转按 400 高：bbox y0 = 502.484−392 = **110.484**；branchB 页仍按根盒 792（y0 502.484）——同文档异页高共存
+- 探针教训：硬编码 /Length 三处全错（8/40/41 vs 实际 ~38-47）→ pdfminer "Execute called on non-indirect object" stderr 噪声 + 整页文本丢失——内容流 /Length 必须从实际字节算（R1963 同型教训再现）
+- 测试：`tests/test_parser_pdf_pagetree_inherit.py`（3 个；判别式：资源不继承则 N2 文本 (cid:)/空翻红；MediaBox 取根则 N3 页 1 y0 回 502.484 翻红；页序按 oid 则 N1 页码错）。3 passed
+- 计数影响：+3（R1925–R1964 累计 +122；下次全量预测 101660 + 122 = 101782）
+
+---
+
 ## Round 1963 — a 续：PDF ObjStm + xref stream（PDF 1.5+ 现代结构）（3 测试）
 
 - 语境：既有测试全部经典 xref 表 + 独立对象（广扫 ObjStm/XRef/PDF 1.5 零匹配）；真实现代 PDF（Word/打印驱动产物）默认对象流 + 交叉引用流
