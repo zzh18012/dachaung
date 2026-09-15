@@ -121,6 +121,17 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1982 — a 续：PDF 空用户密码 V4/R4 AESV2（AES-128-CBC）加密透明解密（3 测试）
+
+- 语境：R1980/R1981 锁了 RC4（V1/V2）；V4 起流改 AESV2——密钥派生与 R3 同源（O/U 仍 RC4 链），对象密钥多拼 4 字节盐（MD5(fk+objid_le24+gen_le16+"sAlT")[:16]），流密文 = IV 前置 + AES-128-CBC(PKCS#7)，经 /CF /StdCF /CFM /AESV2 + /StmF /StrF 声明。venv 已装 cryptography 50.0.0（pdfminer AES 同依赖），覆盖 grep（ToUnicode/Differences/Tz/pagetree inherit 均已锁）后选此空白；探针用 cryptography 加密
+- 探针（outputs/autonomous/probe_aesv2_r1982.py，未入库）实证（pdfminer 空密码透明解密全通，一次全绿）：
+  - **E1 单页 AES 内容流** → 'AESENC' 照提 [100.0, 82.484, 149.344, 94.484]、零告警
+  - **E2 两页各自加密**（对象密钥含 objid+盐）→ PAGEA/PAGEB 都提 [100.0, 82.484, 141.352, 94.484]
+  - **E3 先 Flate 后 AES**（解码序解密再解压）→ 'ZAESNC' 照提 [100.0, 82.484, 148.672, 94.484]
+- 测试（tests/test_parser_pdf_aesv2_r4.py，3 个，全绿；cryptography 缺席 importorskip——与 pdfminer AES 同依赖，缺席即整条路径不可用）
+- 计数影响：+3（全量预测更新为 101660 + 178 = 101838，R1925–R1982 累计 +178）
+- 顺带：R1981 的两个探针教训在本轮复用成功——对象密钥形状（含 gen、含盐）先对 spec 再写探针，避免静默翻红排查
+
 ## Round 1981 — a 续：PDF 空用户密码 R3/V2 RC4-128 加密透明解密（3 测试）
 
 - 语境：R1980 锁了 R2/V1（40 位、无密钥扩展）；现实主流是 R3/V2 /Length 128（key_o/file_key 各 50 轮 MD5 扩展、O/U 各 19 轮 RC4 链、U 校验只认前 16 字节）。覆盖 grep（rc4/RC4、R 3、Length 128）确认零覆盖后开工；venv 无 pypdf/reportlab，探针手搓算法 3.3/3.2/3.5（纯 hashlib+RC4）
