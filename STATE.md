@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1950 — a 续：PDF 网格表多行 cell——md 内嵌 \n + 词相位跨 cell 交错（3 测试）
+
+- 语境：广扫实证 PDF 表格测试 cell 全部单行文本（edges38/67 multiline 是 DOCX sdt/ins 家族；R1949 锁 DOCX 版——本轮是其 PDF 对照）
+- 探针（outputs/autonomous/probe_pdf_cellwrap_r1950.py，未入库）实证（一行网格 + col1 两/三行、col2 单行 BB）：
+  - **P1 md 内嵌 '\n'**：col1 两行 'AA1'/'AA2' → '| AA1\nAA2 | BB |  |'（pdfplumber extract() 同 cell 多行以 '\n' 合并，与 DOCX c.text 形态一致）；row 1 / col 3
+  - **词相位跨 cell 交错**：双重提取（R1888/R1922 家族）按视觉行排 'AA1 BB AA2'——cell1 行1 + cell2 + cell1 行2；行距 30pt、12pt 字 → gap 18 = 1.5×12 恰等值不拆段（R1903 严格 >）单 heading
+  - **P2 三行 cell**：'| A\nB\nC | BB |  |'、词相位 'A BB B C'
+- 测试：`tests/test_parser_pdf_cell_multiline.py`（3 个；判别式：extract 改空格合并则 md 全等翻红；词相位跳过表区文本则交错 heading 翻红）。3 passed
+- 计数影响：+3（R1925–R1950 累计 +80；下次全量预测 101660 + 80 = 101740）
+
+---
+
 ## Round 1949 — a 续：DOCX 表格 cell 多段落——内部 \n 保留、两端 strip（3 测试）
 
 - 语境：广扫（cell.add_paragraph/多段/second line in cell 全形）实证既有测试 cell 全部单段（edges4:550 多段是 body 级）
