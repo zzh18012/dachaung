@@ -121,6 +121,16 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1985 — a 续：PDF xref 条目编码变体——/W 窄字段 + 非零代数 gen（3 测试）
+
+- 语境：真实文件并非都是 /W [1 4 2] + gen 0——小文件用窄字段编码、增量更新过的对象带非零代数（经典表 00001 n）。覆盖 grep 确认既有 xref 流夹具全为 [1 4 2] + gen 0，gen 语义零覆盖
+- 探针（outputs/autonomous/probe_wgen_r1985.py，未入库）实证全通：
+  - **T1 /W [1 2 1]**：偏移 2 字节、代数 1 字节 → 'NARROWW' 照提 [100.0, 82.484, 165.988, 94.484]
+  - **T2 经典表 gen=1 明文** → 'GENONE' 照提 [100.0, 82.484, 152.008, 94.484]（检索按 objid，gen 被容忍）
+  - **T3 R2/V1 加密 + gen=1** → 'GENENC' 照提 [100.0, 82.484, 151.336, 94.484]——**对象密钥取真实 gen 值**（R1981 锁了 gen 字节必须在，本轮锁了 gen 数值必须真实：pdfminer 从 xref 条目读 gen 传入派生，硬编码 0 即静默翻红）
+- 测试（tests/test_parser_pdf_xref_gen_widths.py，3 个，全绿）
+- 计数影响：+3（全量预测更新为 101660 + 188 = 101848，R1925–R1985 累计 +188）
+
 ## Round 1984 — a 续：PDF xref 流 /Index 稀疏子节 + ObjStm /Extends 链（3 测试）
 
 - 语境：真实大文件/增量更新常见形态——xref 流 /Index [start count ...] 只列实际存在的 oid 区间（留洞、省 0 号 free 头）；ObjStm 分段后段 /Extends 前段。覆盖 grep：/Prev（edges52/102/103）、Linearized 与多子节经典表（edges103）已锁；/Index、/Extends 零覆盖
