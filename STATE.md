@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2008（PDF 内容流操作数数字形态——pdfminer 词法器）
+
+- **家族**：psparser.py `_parse_main` 数字分派（'-+'/数字→`_parse_number`，'.'→`_parse_float`，终值 Python int()/float() 语法超集）（6 测试，tests/test_parser_pdf_number_forms.py，探针 outputs/autonomous/probe_pdf_number_forms_r2008.py）
+- **零覆盖声明（宽 grep）**：parser 测试无前导点/尾随点/正号/科学计数操作数形态（evaluation CLI 的匹配为误命中）
+- **T1 '.5'**：`100 .5 Td` → y=0.5（top=781.984）
+- **T2 '700.'**：float('700.')=700.0 等价
+- **T3 '+100 +700'**：int('+100') 等价
+- **T4 '-.5'**：y=-0.5 越下界仍提取零告警
+- **T5 裸 '.'**：float('.') ValueError 被 suppress → **零 token**——`100 . 200 700 Td` 与无点版逐位同（Td 配对 (200,700)）
+- **T6 '1e2'**：int(1) + KWD('e2') 未知算子静默忽略 → Td(100,**1**) → y=1（科学计数静默降级为 1）
+- **计数影响**：+6 → 实测锚 101856 + 快照后增量 65 = 101921
+- **下一轮候选**：词法器续（NAME 字节级、hex string 奇数位、字典内注释）；或 Tj 字符串里控制字符 char10/13 的词裂变
+
 ## Round 2007（HTML 块级自闭合 `<pre/>` `<blockquote/>` `<ol/>` `<h2/>`）
 
 - **家族**：startendtag 委托续（R2006 锁 `<table/>` 唯一吞噬形态）；html_parser.py:275-277 对非 img/br/hr 自闭合只转发 handle_starttag——其余块级自闭合只当开标签，块上下文活到下一块标签或 EOF flush，不吞噬后续块（5 测试，tests/test_parser_html_block_selfclose.py，探针 outputs/autonomous/probe_html_block_selfclose_r2007.py）
