@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1991（a：PDF RunLengthDecode 透明解码）
+
+- 假设：老 PDF 内容流/对象流偶用 RLE（0-127 字面 n+1 / 129 NOP / 130-255 重复 257-n 次 / 128 EOD），pdfminer 解码器分支应透明。grep 实证 RunLengthDecode 全库零覆盖（Flate/LZW/ASCII85/ASCIIHex/链式数组已锁）。
+- 探针：outputs/autonomous/probe_rle_r1991.py（E1 内容流 RLE / E2 ObjStm RLE+xref 流 / E3 EOD+尾部垃圾）。三例照提零告警——E3 证解码停在 EOD 不按 /Length 硬读。
+- 测试：tests/test_parser_pdf_runlength_decode.py（+3；手写 rle() 编码器：≥3 重复走重复段、长字面拆 128 段）。
+- 计数影响：+3；R1925–R1991 累计 +207；全套预测 101660+207=101867。
+- 探针教训：Python 闭包内 bytearray 的 `out += chunk` 是重绑定（UnboundLocalError），闭包累加要用 out.extend。
+
 ## Round 1990（a：DOCX VML 图片与 OLE 对象不可见）
 
 - 假设：老版 Word 的 VML 行内图（w:pict > v:shape > v:imagedata r:id）与 OLE 嵌入（w:object 包 v:shape + o:OLEObject）在 fallback 下零处理零测试——图片提取只扫 w:drawing（fallback_parser:427）。grep 实证 imagedata/OLE/pict 在 parser 与测试全库零匹配（既有图片覆盖全走 w:drawing 路径）。
