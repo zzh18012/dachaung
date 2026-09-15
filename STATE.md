@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2003（PDF 多字节字体文本状态选择归零 + 竖排 TJ）
+
+- **假设**：pdfdevice.py:115-116 `if font.is_multibyte(): wordspace = 0`——Tw 对 Type0 失效而 Tc 保留，零覆盖（edges44 只锁简单字体）；pdfdevice.py:213-214 竖排 TJ 数字沿列位移零覆盖。
+- **探针**（outputs/autonomous/probe_multibyte_textstate_r2003.py，5 实验全命中）：E1 OneByteIdentityH '(A B)' 无 Tw → 'A(cid:32)B' x1=136（空格 CID 32 未映射仍计 DW 宽）；E2 + 15 Tw → **完全同值**（wordspace 归零）；E3 Helvetica 对照 → x1=134.344=19.344+**15**——Tw/Tc 单位为点×Tz%（pdfdevice.py:111-112 `wordspace = wordspace*scaling`，无 0.001·fontsize 因子）；E4 Identity-V [(A) -250 (B)] → B 原点 y -= -250·0.012 → +3 上移，union 高 21（12+12−重叠 3），y 重叠 3pt 不足合词 → 'A B'；E5 '(AB)' 5 Tc → x1=129=124+5 且 5pt > 3pt 词裂变阈值 → 'A B'。
+- **测试**：tests/test_parser_pdf_multibyte_textstate.py 5 个（T1 基线 / T2 Tw 归零 / T3 简单对照+单位 / T4 竖排 TJ 上移 / T5 Tc 保留+裂词）。
+- **计数影响**：+5 → 实测锚预测 101890+5=**101895**（名义累计 +255）。
+- **探针教训**：E1 空格未映射成 'A(cid:32)' 是夹具副产品（ToUnicode bfchar 只写 <41>/<42>），顺带锁了未映射空格仍计宽的行为；Tw/Tc 的"点×Tz%"单位从 E3 实测反推（134.344−19.344=15 整）再对 pdfdevice.py:111-112 源码归因，非先验。
+
 ## Round 2002（PDF Type0 嵌入 CMap 流 Encoding）
 
 - **假设**：/Encoding 指向 CMap 流对象（PDFStream）零覆盖。_get_cmap_name（pdffont.py:1205-1222）流无 name 属性 → 读流字典 [CMapName]；流**内容**是否被解析？CMapName 缺失走哪条回退？
