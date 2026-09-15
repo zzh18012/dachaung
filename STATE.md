@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1951 — a 续：PDF 半边框不成表——仅竖线/仅横线/不相交线框（3 测试）
+
+- 语境：edges104 锁完整网格成表；R1942 K3 锁散置 rect 不成表；**单方向线条 / 线条不相交**（坏转换常见形态——扫描件表格常只保留一个方向的边线）经广扫（vertical only/horizontal only/半边框/虚线框 各形 grep edgesNN + tests/）实证零覆盖
+- 探针（outputs/autonomous/probe_halfborder_r1951.py，未入库）实证——三形态同归**不成表**（pdfplumber lines 策略需 H×V 相交成 cell）：
+  - **V1 仅竖线**：4 竖跨 620-700 + 四词 → 无 table 元素、两 heading 'AA BB'/'CC DD'、零告警
+  - **H1 仅横线**：3 横 + 同文本 → 同 V1
+  - **X1 不相交**：横在 620/700、竖缩短 630-690（不接触横线）→ 同 V1——**端点接触才计数，短一截即整表消失**（0.1pt 之差 = 成表/不成表二值切换）
+- 测试：`tests/test_parser_pdf_half_border_no_table.py`（3 个；判别式：若 find_tables 引入半边框/单方向容忍则元素序断言翻红——出现 table；对照 edges104 完整网格会成表）。3 passed
+- 计数影响：+3（R1925–R1951 累计 +83；下次全量预测 101660 + 83 = 101743）
+
+---
+
 ## Round 1950 — a 续：PDF 网格表多行 cell——md 内嵌 \n + 词相位跨 cell 交错（3 测试）
 
 - 语境：广扫实证 PDF 表格测试 cell 全部单行文本（edges38/67 multiline 是 DOCX sdt/ins 家族；R1949 锁 DOCX 版——本轮是其 PDF 对照）
