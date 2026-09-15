@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1993（PDF xref 流 /Prev 链——增量更新家族）
+
+- **假设**：既有 /Prev 覆盖（edges52/102/103）全是经典表链；xref 流→xref 流稀疏 /Index 增量更新零覆盖。pdfminer 应跨 /Prev 链合并稀疏段，新一代胜出；free 行不遮蔽旧代在用条目。
+- **探针**：outputs/autonomous/probe_xrefstm_prev_r1993.py——E1 双代（rev2 稀疏 /Index [(4 1)(9 1)] 更新 obj4 'OLDTXT'→'NEWTXT' + /Prev 指向 rev1 xref 流）；E2 三代链（6/9/10 逐代 /Prev，OLDTXT→MIDTXT→LASTXT）；E3 删除语义（rev2 obj4 标 type-0 free）。实证：E1 'NEWTXT' / E2 'LASTXT' / E3 **'OLDTXT' 照提**（free 行跳过不记录，删除语义未实现）——全部零告警。
+- **测试**：tests/test_parser_pdf_xrefstm_prev_chain.py——T1 双代新文本胜出；T2 三代最后一代胜出；T3 free 行不遮蔽 /Prev 在用条目（锁删除语义缺失这一行为差异）。
+- **计数影响**：+3；R1925–R1993 累计 +213；全套预测 101660+213=101873。
+- **探针教训**：(1) xref 流自引用行需双调用模式——先用占位行构建一次（固定 /W 行宽保证长度不变），rows[xref_oid]=inuse(len(out)) 后重建；(2) 增量代 offsets 表只含对象代（range(1,6)），xref 流自身行单独设，否则 KeyError；(3) pdfminer 稀疏 free 行=跳过，不是删除——对象仍从 /Prev 链解析（与经典表语义对照：经典表 free 头行同样不触发删除）。
+
 ## Round 1992（a：xref 流 /W 零宽字段与 8 字节偏移）
 
 - 假设：规范允许 /W 任一字段宽度 0（字段省略，gen 常见）与 8 字节超宽偏移；全库夹具 /W 仅 [1 4 2]（13 处）与 [1 2 1]（3 处，R1985），零宽/8 字节变体零覆盖，pdfminer 应透明。
