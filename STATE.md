@@ -121,15 +121,13 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
-## Round 1948 — a 续：DOCX 表格单元格内嵌图片静默丢失（3 测试）
+## Round 1948 — a 续：DOCX 表格单元格内嵌图片静默丢失（3 测试）——**与 edges33 重复，登记更正**
 
-- 语境：grep 实证无任何 DOCX 测试把图片放进表格 cell（PDF 侧 grid_cell_image 已锁）；parser w:tbl 分支只读 `c.text`（:552-556），cell 段落不走 `_extract_inline_image_rids`
-- 探针（outputs/autonomous/probe_docx_tblimg_r1948.py，未入库）实证：
-  - **T1 cell 图片静默丢失**：1x2 表格 cell(0,1) 内嵌 PNG → 零 image 元素、零告警、零 PNG 落盘（与 edges69 numPr/outlineLvl 同族：Word 语义有、提取面没有）
-  - **表格 md 空 cell**：'| text cell |  |'（图片占位不进单元格文本）
-  - **T2 body 图片不受影响**：同文档 body 段落图片照常成元素（恰 1、para2_00、PNG 落盘）——丢失只发生在 tbl 分支
-- 测试：`tests/test_parser_docx_table_cell_image_dropped.py`（3 个；判别式：tbl 分支补扫 cell rId 则 T1/T2 元素数翻红；引入丢失告警则零告警翻红；md 全等锁 cell 文本形态）。3 passed
-- 计数影响：+3（R1925–R1948 累计 +74；下次全量预测 101660 + 74 = 101734）
+- 语境：本轮声称"grep 零覆盖"有误——**edges33（R1423）已锁 cell add_picture 静默丢失主体**（无元素/无落盘/无告警/空格渲染）；本轮 grep 模式（add_picture.*cell/表格.*图）未命中 edges33 的措辞。R1927 教训（先广扫再声称零覆盖）第二次踩中
+- 探针（outputs/autonomous/probe_docx_tblimg_r1948.py，未入库）复现 edges33 结论；**真实增量仅**：T2 body 图片同文档对照（恰 1 元素 + para2_00 命名 + PNG 落盘）、表格 md 全等 '| text cell |  |'
+- 测试：`tests/test_parser_docx_table_cell_image_dropped.py`（3 个，保留作回归锁但新颖性按重复计）。3 passed
+- 计数影响：+3（测试确实入库，预测口径不变：R1925–R1948 累计 +74；下次全量预测 101660 + 74 = 101734）
+- 流程修正：后续轮次"零覆盖"声称前必须 grep edgesNN 文件名空间的关键词族（cell/表格/blip/drawing 各形）
 
 ---
 
