@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1970 — a 续：DOCX framePr 定位段 + 同 rId 图复用（3 测试）
+
+- 语境：framePr（旧式定位文本框段落）零覆盖（广扫零匹配）；R1969 锁了 PDF 对象别名，DOCX 侧同图 rId 两处引用语义未知
+- 探针（outputs/autonomous/probe_framepr_r1970.py，未入库）实证：
+  - **F1 w:framePr 段**（x/y/w/h 页锚定）→ 文本照提为普通 paragraph、pidx 0、定位**全忽略**、零告警
+  - **F2 同一 rId 的 w:drawing 深拷贝进两段** → **不去重**：两个 image 元素 + 两个独立 PNG（前缀 para0/para1 + 全局 counter 00/01）——与 PDF A2 页共享对偶
+  - **F3 framePr 段夹在普通段之间** → 文档序（非视觉序）0/1/2 顺延
+- 测试：`tests/test_parser_docx_framepr_and_image_reuse.py`（3 个；判别式：按 rId 去重则 F2 单元素单文件翻红；实现框定位重排则 F3 顺序变翻红）。3 passed
+- 计数影响：+3（R1925–R1970 累计 +140；下次全量预测 101660 + 140 = 101800）
+
+---
+
 ## Round 1969 — a 续：PDF 对象别名/共享引用——重复引用字符交错（3 测试）
 
 - 语境：生成器常共享对象（同内容流多处引用/同 Form 多次 Do）；既有测试每流唯一引用（广扫 [4 0 R 4 0 R]/共享 contents 零匹配）
