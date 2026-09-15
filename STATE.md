@@ -121,6 +121,15 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2002（PDF Type0 嵌入 CMap 流 Encoding）
+
+- **假设**：/Encoding 指向 CMap 流对象（PDFStream）零覆盖。_get_cmap_name（pdffont.py:1205-1222）流无 name 属性 → 读流字典 [CMapName]；流**内容**是否被解析？CMapName 缺失走哪条回退？
+- **探针**（outputs/autonomous/probe_embedded_cmap_r2002.py，3 实验全命中）：E1 流字典 /CMapName /OneByteIdentityH + 流体内自定义 cidrange <41>-<42>→CID 100/101 → 输出 'AB'（**内容被忽略**——若解析应得 'ZZ'）；E2 流无 /CMapName → "unknown" → CMapNotFound → 空 CMap → 0 元素 + pdf_no_text_extracted；E3 流字典 /CMapName /Identity-H + hex <00410042> → 'AB' x1=124（2 字节路径）。
+- **源码对照**：pdffont.py:1215-1220 PDFStream 兜底（读流 dict CMapName / strict 才报错）；get_cmap_from_spec 始终走 CMapDB.get_cmap **按名查表**，流内容永不上 CMapParser。
+- **测试**：tests/test_parser_pdf_embedded_cmap_stream.py 3 个（T1 名生效内容忽略 / T2 缺名空回退 / T3 2 字节路径）。
+- **计数影响**：+3 → 实测锚预测 101887+3=**101890**（名义累计 +250）。
+- **探针教训**：无——探针 3/3 预测命中（R2001 已把 _get_cmap_name 分支图景摸清，本轮直接套用）。
+
 ## Round 2001（PDF OneByteIdentityH/V 与 Encoding 字典态）
 
 - **假设**：cmapdb.py:293-296 内置 IdentityCMapByte（单字节 code=CID）与 _get_cmap_name 字典态分支（pdffont.py:1205-1210，Encoding 无 name 属性 → 读 [CMapName]）零覆盖；未知名是否落空 CMap 回退？
