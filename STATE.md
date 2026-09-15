@@ -121,6 +121,20 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1981 — a 续：PDF 空用户密码 R3/V2 RC4-128 加密透明解密（3 测试）
+
+- 语境：R1980 锁了 R2/V1（40 位、无密钥扩展）；现实主流是 R3/V2 /Length 128（key_o/file_key 各 50 轮 MD5 扩展、O/U 各 19 轮 RC4 链、U 校验只认前 16 字节）。覆盖 grep（rc4/RC4、R 3、Length 128）确认零覆盖后开工；venv 无 pypdf/reportlab，探针手搓算法 3.3/3.2/3.5（纯 hashlib+RC4）
+- 探针（outputs/autonomous/probe_rc4128_r1981.py + probe_rc4128_v23_r1981.py，未入库）实证（pdfminer 空密码透明解密全通）：
+  - **基线 R3/V2 单页**（owner=user=""，经典 xref）→ 'RC4R3' 照提 [100.0, 82.484, 139.336, 94.484]、零告警——16 字节 file_key + 19 轮 U 链完整支持（注意：基线探针 O 链用 40 位语义仍过——O 只要存储自洽即可解，user 路径认证不重推 O）
+  - **V2 owner 密码非空**（user 空）→ 'OWNERLOCK' 照提 [100.0, 82.484, 178.672, 94.484]、零告警——空用户密码走 user 路径认证（file_key 只依赖存储 O）
+  - **V3 objstm+内容流加密、xref 流明文**（交叉引用流格式）→ 'STMENC' 照提 [100.0, 82.484, 150.664, 94.484]、零告警——对象流按自身 objid 解密、xref 流规范豁免
+- 测试（tests/test_parser_pdf_rc4_r3_128.py，3 个，全绿）：T1 基线 R3/V2；T2 owner 密码非空（user 空）；T3 objstm+xref 流组合
+- 计数影响：+3（全量预测更新为 101660 + 175 = 101835，R1925–R1981 累计 +175）
+- 探针教训（两条，已入轮）：
+  - **对象密钥漏 gen 两字节 = 静默翻红**：v23 探针初版 obj_key = MD5(fk+objid_le24)[:16] 漏 gen_le16 → 认证仍过（U/file_key 正确）但流解密成乱码 → 零元素 + pdf_no_text_extracted（非 ParserError）；与基线探针（含 gen）差分定位。crypto 夹具的失败模式可以在认证之后
+  - **xref 流条目漏 Encrypt 对象 → /Encrypt 解引用为空 dict**：ParserError "Unknown filter: param={}"（把加密字典当成了 /Filter 数组的空参数）；修复 = 条目齐全 + /Size 一致（9 行）；自引用条目（xref 流对象自身）也可给
+  - bash heredoc python 补丁脚本 assert 失败即整体不写入（write 在替换之后），此类修补改用 Edit 工具直改（本教训来自本轮实际翻车：初版补丁脚本静默未生效，重跑复现同一失败）
+
 ## Round 1980 — a 续：PDF 空用户密码 V1/R2 RC4 加密透明解密（3 测试）
 
 - 语境：权限受限（无用户密码）加密 PDF 是现实常见形态（禁止打印/复制）；edges91 只锁密码校验失败 → ParserError，可解密形态零覆盖（venv 无 pypdf/reportlab，探针手搓 R2/V1 标准安全处理器，纯 hashlib+RC4）
