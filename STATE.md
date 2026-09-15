@@ -121,6 +121,28 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2010（PDF V4 加密 crypt filter 矩阵）
+
+- **家族**：V4/R4 /Encrypt 的 crypt filter 声明分支——/StmF /Identity
+  （明文流 + 免 CF 直名 decrypt_identity）、/CFM /V2（RC4 对象密钥
+  **无 sAlT 盐**，算法 3.1 形状，与 AESV2 含盐对照）、/CFM /None 拒绝、
+  StmF≠StrF 拒绝（pdfdocument.py PDFStandardSecurityHandlerV4.init_params
+  :482-498 实读）
+- **零覆盖**：R1980/81 锁 V1/V2 直 RC4、R1982 锁 V4 AESV2+StdCF、R1983
+  AESV3、R1988 只变 /P//EncryptMetadata//Length——grep 实证 tests/ 无任何
+  StmF 非 StdCF 形态
+- **探针**：outputs/autonomous/probe_pdf_stmf_identity_r2010.py（复用
+  R1982 _r4_keys 脚手架）。实证：Identity+明文流照提满宽零告警
+  [100,82.484,160.012,94.484]；CFM/V2 无盐 RC4 同样照提；两条拒绝分支
+  均 ParserError code=pdfplumber_open_failed（message 含 Unknown crypt
+  filter method / Unsupported crypt filter 甄别串）
+- **测试**：tests/test_parser_pdf_stmf_identity.py（T1 Identity 明文照提 /
+  T2 V2 无盐解密 / T3 CFM-None 拒绝 / T4 StmF-StrF 不匹配拒绝）4 passed
+- **判别式**：T1 若被强行解密 → 乱码零元素翻；T2 若错用 AES 盐 → 乱码
+  翻；T3/T4 code 或甄别串不同翻
+- **计数影响**：快照后增量 +4（R2005 +7、R2006 +4、R2007 +5、R2008 +6、
+  R2009 +5、R2010 +4）→ 预估 101930
+
 ## Round 2009（PDF 退化 /Contents 五形态统一容忍）
 
 - **家族**：页 /Contents 退化形态（5 测试，tests/test_parser_pdf_contents_degenerate.py，探针内联 Bash heredoc 实证）
