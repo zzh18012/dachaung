@@ -121,6 +121,20 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1978 — a 续：DOCX w:vanish / w:webHidden 隐藏文本照提（4 测试）
+
+- 语境：模板/表单常把答案、批注藏进 vanish run（Word 显示隐藏文本需开关）；grep 实证 docx 测试零 vanish/webHidden 匹配（html/markdown 侧 vanish 是另一语义）
+- 探针（outputs/autonomous/probe_vanish_r1978.py，未入库）实证（python-docx run.text 不看格式属性，隐藏文本与可见**完全同权**）：
+  - **V1 混排段**：可见 run + vanish run → 'shown SECRET' 拼接
+  - **V2 整段 vanish** → 'HIDEPARA' 段落照提
+  - **V3 webHidden run** → 'shown WEBSECRET' 同 vanish
+  - **V4 表格 cell 内 vanish** → md '| CELLSECRET |' 照提
+  - 四态均零告警（无"存在隐藏文本"提示——纯静默提取）
+- 测试（tests/test_parser_docx_vanish_hidden_text.py）：V1–V4 各断言元素类型 + 精确 content + 零告警。判别式：若 run.text 按格式过滤隐藏则文本断言翻红；若引入 hidden 标记告警则 warnings 断言翻红
+- 计数影响：+4（R1925–R1978 累计 +166；下次全量预测 101660 + 166 = 101826）
+
+---
+
 ## Round 1977 — a 续：PDF 文本渲染模式 Tr 3（不可见）照提（3 测试）
 
 - 语境：扫描件 OCR PDF 的识别文本层几乎全用 `3 Tr` 叠加在图像上；广扫 tests/ 零 `3 Tr`/render mode 匹配（edges113 锁头尾垃圾、R1973 锁 /Annots，均无关）
