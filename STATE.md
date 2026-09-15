@@ -121,6 +121,14 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2004（PDF Type0 /ToUnicode 名字形态）
+
+- **假设**：pdffont.py:1143-1151——ToUnicode 非流而是**名字**时 "Identity" ∈ {ToUnicode 名, Encoding 名, cid_ordering} 任一命中 → IdentityUnicodeMap（CID==码点直译）。既有夹具 ToUnicode 全是流，零覆盖。
+- **探针**（outputs/autonomous/probe_tounicode_name_r2004.py，4 实验全命中）：E1 /ToUnicode /Identity-H（名）→ 'AB'；E2 /ToUnicode /ZZZMap + /Encoding /OneByteIdentityH → **Encoding 析取命中**仍 'AB'（若只看 ToUnicode 名则 (cid:65)）；E3 无 ToUnicode → '(cid:65)(cid:66)'；E4 OneByte + 名字 ToUnicode → 'AB'。
+- **测试**：tests/test_parser_pdf_tounicode_name.py 4 个（T1 名字命中 / T2 Encoding 析取 / T3 缺失对照 / T4 单字节组合）。
+- **计数影响**：+4 → 实测锚预测 101895+4=**101899**（名义累计 +259）。
+- **探针教训**：OneByteIdentityH 下 hex <00410042> 会拆成 4 个单字节（含 0x00）——单字节 CMap 的文本一律用字面串 (AB)；探针首版没意识到，跑前自查参数语义改掉了（未产生错实验）。
+
 ## Round 2003（PDF 多字节字体文本状态选择归零 + 竖排 TJ）
 
 - **假设**：pdfdevice.py:115-116 `if font.is_multibyte(): wordspace = 0`——Tw 对 Type0 失效而 Tc 保留，零覆盖（edges44 只锁简单字体）；pdfdevice.py:213-214 竖排 TJ 数字沿列位移零覆盖。
