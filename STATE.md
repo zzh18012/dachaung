@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1976 — a 续：PDF 名字对象 #-hex 转义双侧解码（3 测试）
+
+- 语境：PDF 规范允许名字含 #-hex 转义（资源键/内容流引用/BaseFont 均可能带）；广扫 tests/ 零匹配
+- 探针（outputs/autonomous/probe_nameesc_r1976.py，未入库）实证（pdfminer 词法层解码 #XX，两侧在解码值相遇）：
+  - **N1 资源字典键转义**：/Font << /F#31 5 0 R >>、内容流用 /F1 → 'NAMEESC' 照提满宽（BaseFont /Hel#76etica 亦解码）
+  - **N2 内容流名转义**：字典键 /F1、Tf 用 /F#31 → 同上
+  - **N3 图像 XObject 键转义**：/XObject << /Im#31 6 0 R >>、Do 用 /Im1 → image 照放 bbox [200, 492, 300, 592]
+- 候选过程教训：原候选"MediaBox 非零原点"经 Write 冲突发现已被 R1943 锁定（tests/test_parser_pdf_mediabox_origin.py 已存在）——字面量 grep `MediaBox \[[1-9]` 假阴性（R1943 用变量拼接 mediabox），再次验证 R1948 教训：覆盖 grep 需同时查变量构造形态；本次 M3 纯 y 偏移负 bbox 增量不足以另开轮
+- 测试（tests/test_parser_pdf_name_hex_escape.py）：N1/N2 共用 `_assert_text`（heading 'NAMEESC' + bbox [100, 82.484, 159.336, 94.484] 满宽 + 零告警）；N3 断言 heading+image 两元素。判别式：任一侧不解码则资源名不匹配 → GHOSTFONT 零宽形态或 pdf_no_text_extracted / 图像缺失翻红
+- 计数影响：+3（R1925–R1976 累计 +159；下次全量预测 101660 + 159 = 101819）
+
+---
+
 ## Round 1975 — a 续：PDF FlateDecode + PNG Predictor 12 流解码（3 测试）
 
 - 语境：真实世界 Word/LaTeX 产 PDF 1.5+ 常用 predictor 压缩 objstm/xrefstm；广扫 tests/ 零 Predictor 匹配（R1963 锁 plain Flate ObjStm、R1945 锁图像编码垃圾，均不含 DecodeParms 预测器路径）
