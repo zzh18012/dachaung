@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1954 — a 续：DOCX 表格 cell 内 w:tab——中置 \t 保留、前置 \t 剥除（3 测试）
+
+- 语境：edges49/65 锁 body 段落 w:tab → 字面 '\t'；R1839 锁 md parser 表格 cell 的 hard tab；**DOCX cell × w:tab** 经广扫（qn("w:tab") × table 各形）实证零覆盖
+- 探针（outputs/autonomous/probe_celltab_r1954.py，未入库）实证（`_Cell.text` 经 `Paragraph.text` tab→'\t'；parser 每 cell `.strip()` :553）：
+  - **T1 中置 tab**：'col1\tcol2' → md '| col1\tcol2 | right |'
+  - **T2 前置 tab**：'\tcol2' → strip 剥首 → '| col2 | right |'（**与 body 段落不同——body 不 strip 前置 \t 会留**，edges49 的 body 版无此差异面）
+  - **T3 双 tab**：'a\t\tb' → 内部双 \t 全留
+- 测试：`tests/test_parser_docx_cell_tab.py`（3 个；判别式：cell 序列化改剥全部 \t 则 T1/T3 翻红；strip 取消则 T2 翻红）。3 passed
+- 计数影响：+3（R1925–R1954 累计 +92；下次全量预测 101660 + 92 = 101752）
+
+---
+
 ## Round 1953 — a 续：PDF 图片 Do 在 BT/ET 文本对象内——图文状态机互不干扰（3 测试）
 
 - 语境：PDF 规范允许 Do 出现在内容流任何位置（含 BT/ET 之间）——朴素实现会假设图片只在文本对象外；广扫（BT.*Do / Do.*ET 各形）实证既有测试的 Do 全部在 BT/ET 外，零覆盖
