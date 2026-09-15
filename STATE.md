@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1977 — a 续：PDF 文本渲染模式 Tr 3（不可见）照提（3 测试）
+
+- 语境：扫描件 OCR PDF 的识别文本层几乎全用 `3 Tr` 叠加在图像上；广扫 tests/ 零 `3 Tr`/render mode 匹配（edges113 锁头尾垃圾、R1973 锁 /Annots，均无关）
+- 探针（outputs/autonomous/probe_tr3_r1977.py，未入库）实证（pdfplumber chars 不过滤渲染模式，不可见与可见**完全同权**）：
+  - **I1 单一 3 Tr 文本** → 'GHOSTOCR' 照提、bbox 满宽正常、零告警
+  - **I2 可见+不可见混排**（0 Tr / 3 Tr 两段）→ 两段都提、文档序 VISIBLE→INVISBLE、bbox 各自独立
+  - **I3 整页仅不可见文本**（纯 OCR 层形态）→ 照提，**非** pdf_no_text_extracted——空文本判定不看不可见性
+- 测试（tests/test_parser_pdf_tr3_invisible_text.py）。判别式：若 chars 按渲染模式过滤则 I1/I3 零元素 + pdf_no_text_extracted 翻红；若引入 invisibility 标记告警则 warnings 断言翻红
+- 探针教训：I2 两处 bbox x1 从探针四舍五入值抄录时笔误（145.36→145.336、154.024→154.016），pytest 两轮翻红后才核对到——bbox 断言值必须从全精度打印取，不能从 round(v,2) 反推
+- 计数影响：+3（R1925–R1977 累计 +162；下次全量预测 101660 + 162 = 101822）
+
+---
+
 ## Round 1976 — a 续：PDF 名字对象 #-hex 转义双侧解码（3 测试）
 
 - 语境：PDF 规范允许名字含 #-hex 转义（资源键/内容流引用/BaseFont 均可能带）；广扫 tests/ 零匹配
