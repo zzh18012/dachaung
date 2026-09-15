@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2007（HTML 块级自闭合 `<pre/>` `<blockquote/>` `<ol/>` `<h2/>`）
+
+- **家族**：startendtag 委托续（R2006 锁 `<table/>` 唯一吞噬形态）；html_parser.py:275-277 对非 img/br/hr 自闭合只转发 handle_starttag——其余块级自闭合只当开标签，块上下文活到下一块标签或 EOF flush，不吞噬后续块（5 测试，tests/test_parser_html_block_selfclose.py，探针 outputs/autonomous/probe_html_block_selfclose_r2007.py）
+- **零覆盖声明（宽 grep）**：tests/ 无 `<pre/>` `<blockquote/>` `<ol/>` `<hN/>` 任何形态（edges16/21 只锁 `<p/>`）
+- **T1** '<pre/>abc' → paragraph kind=preformatted（块活到 EOF flush）
+- **T2** '<p>x</p><pre/>y<h1>t</h1>' → [para x, pre y, heading t]——pre 不吞 h1（块互 flush，与表格吞噬对照）
+- **T3** '<blockquote/><p>a</p>b' → p 被 :232-234 忽略 → 单 blockquote 'ab'
+- **T4** '<ol/><li>a</ol><li>b' → a ordered=True / b 孤儿 ordered=False（同文档元数据对照）
+- **T5** '<h2/>t' → heading level 2
+- **计数影响**：+5 → 实测锚 101856 + 快照后增量 59 = 101915
+- **下一轮候选**：ipynb 解析器未扫分支（本段未勘察）；或 markdown 侧
+
 ## Round 2006（HTML `<table/>` 自闭合——startendtag 委托分支）
 
 - **家族**：html_parser.py:262-277 `handle_startendtag` 对非 img/br/hr 标签只转发 handle_starttag 不补 endtag → `<table/>` 进表格模式永不闭合（4 测试，tests/test_parser_html_table_selfclose.py，探针 outputs/autonomous/probe_html_table_selfclose_r2006.py）
