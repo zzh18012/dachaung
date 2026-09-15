@@ -121,6 +121,13 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 1992（a：xref 流 /W 零宽字段与 8 字节偏移）
+
+- 假设：规范允许 /W 任一字段宽度 0（字段省略，gen 常见）与 8 字节超宽偏移；全库夹具 /W 仅 [1 4 2]（13 处）与 [1 2 1]（3 处，R1985），零宽/8 字节变体零覆盖，pdfminer 应透明。
+- 探针：outputs/autonomous/probe_w0_r1992.py（E1 [1 4 0] / E2 [1 8 2]+objstm type-2 行 / E3 [1 8 0]）。三例照提零告警。
+- 测试：tests/test_parser_pdf_xref_w_zero_wide.py（+3；E2 附 objstm 行使索引字段也走 8 字节布局参与错位检验——纯 type-1 行小文件里 8 字节偏移截断不可分辨）。
+- 计数影响：+3；R1925–R1992 累计 +210；全套预测 101660+210=101870。
+
 ## Round 1991（a：PDF RunLengthDecode 透明解码）
 
 - 假设：老 PDF 内容流/对象流偶用 RLE（0-127 字面 n+1 / 129 NOP / 130-255 重复 257-n 次 / 128 EOD），pdfminer 解码器分支应透明。grep 实证 RunLengthDecode 全库零覆盖（Flate/LZW/ASCII85/ASCIIHex/链式数组已锁）。
