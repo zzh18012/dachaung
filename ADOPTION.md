@@ -6878,3 +6878,32 @@ main。
 真实 G⑥ 应用时注意：rec-prod-05 真实记录（defects_found，十轮
 R3）届时须补 corrections/defects 处置闭环叙述才过门禁 4；#67
 （prod-05 delta 复核）与此衔接。
+
+## §一百三十五（2026-09-16）R-C：对象级抽取 P/R 指标预注册 + 纯函数实现（G⑦ 前置件）
+
+外部评审 R-C（§132）：抽取有效性缺对象级 P/R（对 gold objects 一对一
+匹配、TP/FP/FN、零预测 N/A、按 PDF/DOCX × 3 域拆分）。本节落评测
+协议件（执行序第 1 项"评测协议"的补全；G⑥ 前不触真实 gold）：
+
+- **预注册先行**：stage9/extraction_preregistration.json（先于实现
+  提交口径；修订须新裁决）。口径：gold 对象 = nontext_ref（img/tab
+  家族、units 阅读序）；预测 = Document elements type image/table
+  （elements 序）；**一对一匹配按格式分轴**——PDF 家族内页码序列
+  difflib 对齐（autojunk=False，相等页码按序配对，对插入/删除/错位
+  稳健；缺页对象永不配对，计 FN/FP 不虚 TP）；DOCX 双方无物理页 →
+  家族内序数对齐（第 k ↔ 第 k，预注册明示序数口径非身份口径）。
+- **stage9/extraction_metrics.py**（纯函数，无 CLI——G⑦ 接线时按
+  gold revision 门禁落 CLI，与 system_eval 同纪律）：
+  evaluate_extraction_doc（家族级 TP/FP/FN + P/R/F1）+
+  aggregate_extraction_cells（format × domain 格 micro 求和后出率，
+  N/A 文档计 na_docs 披露不静默剔除，格内零可评分文档 → null +
+  no_scorable_docs）。
+- **零分母纪律**（Stage 2 同规）：precision 分母 0 → null +
+  no_predictions（评审"零预测 N/A"）；recall 分母 0 → null +
+  no_gold_objects；F1 任一亲代 null 即 null——不虚构 1.0；文档级
+  parse_failed/empty_result/annotation_invalid → 全家族 doc_na。
+- 测试：tests/test_stage9_extraction_metrics.py 17 合成用例（PDF
+  完配/错位漏抽/多抽/错页/缺页不虚 TP、DOCX 序数、零预测/零 gold/
+  双空披露双家族、doc_na 传播、micro 聚合 + N/A 格披露 + 缺元数据
+  拒绝 + 家族缺席零证据、预注册字段与 sha 一致）。全量回归
+  **5712 passed / 4 skipped / 0 failed（56s）**。

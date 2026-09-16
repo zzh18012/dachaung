@@ -1,0 +1,14 @@
+{
+ "metric": "object-level extraction precision/recall/F1 against gold nontext objects (per family img/tab), per document then micro-aggregated per (format, domain) cell; no global composite score",
+ "registered_at": "2026-09-16",
+ "authority": "external review R-C (ADOPTION.md §132) skeleton + this pre-registration completes the matching rule; revisions require a new ledger ruling before any real-corpus run",
+ "gold_objects": "annotation nontext units' nontext_ref (^(img|tab):\\S+$), family = prefix, reading order = units list order",
+ "predicted_objects": "system Document elements with type in {image->img, table->tab}, reading order = elements list order; only these two types in scope",
+ "matching_rule": {
+  "pdf": "within family, page-number sequence alignment via difflib.SequenceMatcher(autojunk=False); equal page numbers inside matching blocks pair one-to-one; robust to insertion/deletion/shift; gold or predicted objects with missing (null/non-int) page never pair (count FN/FP respectively, never a false TP)",
+  "docx": "within family, ordinal alignment (k-th gold <-> k-th predicted, TP = min(|G|,|P|)); disclosed as ordinal not identity matching because neither side has physical pages"
+ },
+ "na_rules": "doc-level parse_failed:<code>/empty_result/annotation_invalid -> all families null with na_reason, counted in cell na_docs, never silently dropped; precision denominator 0 -> null reason=no_predictions (review: zero-prediction N/A); recall denominator 0 -> null reason=no_gold_objects; f1 null when either parent null or precision+recall==0; cell with zero scorable docs -> null reason=no_scorable_docs; never fabricate 1.0 on zero denominators",
+ "aggregation": "cells keyed (format, domain) from manifest (authoritative); family tp/fp/fn micro-summed within cell then rates computed; na_docs disclosed per cell",
+ "discipline": "no real gold run before G6 freeze; module is pure functions only, no CLI; G7 wiring must gate on gold revision like stage9.system_eval"
+}
