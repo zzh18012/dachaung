@@ -14,8 +14,11 @@ G⑥ 封口顺序的机械可执行部分（§7.3，不得倒置）：
 manifest 冻结校验 → core 集确定（恰 24）→ 最终 validator（24 core
 逐篇 + manifest 一致性）→ 24 篇逐文件 hash → gold_digest → 双标注
 记录装配（恰 4，decision 须闭合）→ relation 抽查记录校验（≥2）→
-组装 credential → 写盘（已存在即拒，immutable：r2 须新裁决不得覆盖
-r1）→ 输出 credential 字节 sha256（外部台账登记；不写入自身，非自指）。
+抽查覆盖门禁（外部评审 R-D：r10 R3 audit_type 词汇表、domain ≥2、
+positive 逐边全查、negative anchorless 计数、defects/corrections
+闭环——从最终 gold 字节现场重算）→ 组装 credential → 写盘（已存在
+即拒，immutable：r2 须新裁决不得覆盖 r1）→ 输出 credential 字节
+sha256（外部台账登记；不写入自身，非自指）。
 
 用法（项目 venv python；G⑥ 双前置闭合后执行）：
   python scripts/stage9_gold_credential.py \
@@ -61,6 +64,9 @@ _LINK_KEYS = ("linked_pairs", "linked_objects", "anchorless_count",
 _SPOTCHECK_REQUIRED = ("doc_id", "annotation_sha256_reviewed", "audit_type",
                        "checked_count", "result", "review_date")
 _SPOTCHECK_RESULTS = ("pass", "defects_found")
+_SPOTCHECK_AUDIT_TYPES = ("positive", "negative")  # r10 R3 词汇表
+DOMAIN_MIN = 2               # 指南 G⑥ 前置 3：抽查覆盖 ≥2 个 domain
+ANCHORLESS_MIN = 10          # 指南：每篇 ≥10 anchorless（不足 10 全查）
 
 
 def _err(msg):
@@ -72,6 +78,32 @@ def _load(path, what):
         return load_json(Path(path))
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError("%s 读取失败 %s: %s" % (what, path, exc))
+
+
+def _doc_link_sets(data):
+    """R-D 机械核对：从最终标注字节现场提取 relation 引用集合。
+
+    positive_refs = 出现在任一 unit linked_nontext 的引用（有入边对象）；
+    anchorless_refs = nontext 对象中无入边者（与 compute_link_stats
+    同口径，但保留对象身份供覆盖比对）；unit_linked = unit_id → 该
+    unit 声明的 linked_nontext 原样列表（推导 checked 边覆盖）。
+    """
+    units = data.get("units") if isinstance(data, dict) else None
+    positive, nontext_all, unit_linked = set(), set(), {}
+    if not isinstance(units, list):
+        return positive, nontext_all - positive, unit_linked
+    for u in units:
+        if not isinstance(u, dict):
+            continue
+        if u.get("kind") == "nontext" and \
+                isinstance(u.get("nontext_ref"), str):
+            nontext_all.add(u["nontext_ref"])
+        linked = u.get("linked_nontext")
+        if isinstance(linked, list):
+            refs = [r for r in linked if isinstance(r, str)]
+            unit_linked[u.get("unit_id")] = refs
+            positive.update(refs)
+    return positive, nontext_all - positive, unit_linked
 
 
 def _parse_pairs(items, what):
@@ -172,6 +204,9 @@ def main(argv=None):
                          **fail.to_json()})
     annotations_dir = Path(args.annotations)
     link_totals = {k: 0 for k in _LINK_KEYS}
+    doc_positive = {}      # R-D：per-doc positive/anchorless 引用集（步骤 7b 消费）
+    doc_anchorless = {}
+    doc_unit_linked = {}
     for doc in sorted(core_docs, key=lambda d: d["doc_id"]):
         doc_id = doc["doc_id"]
         path = annotations_dir / (doc_id + ".json")
@@ -193,6 +228,10 @@ def main(argv=None):
         stats = compute_link_stats(data)
         for k in _LINK_KEYS:
             link_totals[k] += stats[k]
+        pos, anch, ulinks = _doc_link_sets(data)
+        doc_positive[doc_id] = pos
+        doc_anchorless[doc_id] = anch
+        doc_unit_linked[doc_id] = ulinks
     if failures:
         for item in failures:
             print("[%s] %s %s: %s" % (item["code"], item["doc_id"] or "-",
@@ -314,9 +353,10 @@ def main(argv=None):
                 raise ValueError("spotcheck result 非法: %r（须 %s）"
                                  % (rec["result"], "/".join(
                                      _SPOTCHECK_RESULTS)))
-            if rec["result"] == "defects_found" and "defects" not in rec:
-                raise ValueError("result=defects_found 须含 defects 字段: %s"
-                                 % sp)
+            if rec["result"] == "defects_found" and \
+                    not (rec.get("defects") or rec.get("corrections")):
+                raise ValueError("result=defects_found 须含非空 defects 或"
+                                 " corrections 字段（r10 R3 词汇表）: %s" % sp)
             if not (rec.get("checked_unit_ids")
                     or rec.get("nontext_refs")):
                 raise ValueError("spotcheck 须含 checked_unit_ids 或 "
@@ -327,6 +367,89 @@ def main(argv=None):
                              % (SPOTCHECK_MIN, len(spotcheck_records)))
     except (ValueError, OSError, json.JSONDecodeError) as exc:
         _err(str(exc))
+        return 2
+
+    # ---- 步骤 7b：抽查覆盖门禁（指南 G⑥ 前置 3 + r10 R3 词汇表）----
+    # 外部评审 R-D 采纳：domain 覆盖、positive 逐边全查、negative
+    # anchorless 计数、defects/corrections 闭环——全部从最终 gold 字节
+    # 现场重算（步骤 3 采集），不信任记录自述。
+    audit_lines = []
+    try:
+        domains = {}
+        for d in core_docs:
+            dom = d.get("domain")
+            if not isinstance(dom, str) or not dom:
+                raise ValueError(
+                    "manifest core doc %s 缺 domain 字段（domain ≥%d 覆盖"
+                    "核对需要它；manifest 为 G④ 冻结层）"
+                    % (d["doc_id"], DOMAIN_MIN))
+            domains[d["doc_id"]] = dom
+        spot_domains = sorted({domains[r["doc_id"]]
+                               for r in spotcheck_records})
+        if len(spot_domains) < DOMAIN_MIN:
+            raise ValueError("抽查记录仅覆盖 %d 个 domain（%s），须 ≥%d"
+                             % (len(spot_domains), "/".join(spot_domains),
+                                DOMAIN_MIN))
+        for rec in spotcheck_records:
+            did = rec["doc_id"]
+            atype = rec.get("audit_type")
+            if atype not in _SPOTCHECK_AUDIT_TYPES:
+                raise ValueError(
+                    "doc %s audit_type=%r 非法（r10 R3 词汇表须 %s）"
+                    % (did, atype, "/".join(_SPOTCHECK_AUDIT_TYPES)))
+            pos = doc_positive[did]
+            anchorless = doc_anchorless[did]
+            unit_linked = doc_unit_linked[did]
+            rec_refs = set(r for r in (rec.get("nontext_refs") or [])
+                           if isinstance(r, str))
+            if atype == "positive":
+                if not pos:
+                    raise ValueError(
+                        "doc %s 无 linked pairs，不能作为 positive 抽查对象"
+                        "（指南 G⑥ 前置 3：抽查文档须有 linked pairs）" % did)
+                checked_ids = set(rec.get("checked_unit_ids") or [])
+                edges = {(uid, ref) for uid, refs in unit_linked.items()
+                         for ref in refs}
+                covered = {(uid, ref) for uid in checked_ids
+                           if uid in unit_linked
+                           for ref in unit_linked[uid]}
+                covered |= {(uid, ref) for uid, refs in unit_linked.items()
+                            for ref in refs if ref in rec_refs}
+                missing = edges - covered
+                if missing:
+                    raise ValueError(
+                        "doc %s positive 抽查未逐条覆盖全部 linked pairs"
+                        "（缺 %d/%d 条边）——指南 G⑥ 前置 3：逐条核对"
+                        % (did, len(missing), len(edges)))
+                audit_lines.append(
+                    "doc %s domain=%s positive：边覆盖 %d/%d（全）"
+                    % (did, domains[did], len(edges), len(edges)))
+            else:
+                if not anchorless:
+                    raise ValueError(
+                        "doc %s 无 anchorless 对象，不满足 negative 抽查"
+                        "条件（指南：每篇 ≥%d anchorless，不足全查）"
+                        % (did, ANCHORLESS_MIN))
+                required = min(ANCHORLESS_MIN, len(anchorless))
+                covered_anch = len(rec_refs & anchorless)
+                if covered_anch < required:
+                    raise ValueError(
+                        "doc %s negative 抽查 anchorless 覆盖 %d/%d"
+                        "（对象共 %d）——每篇 ≥%d 或不足全查"
+                        % (did, covered_anch, required, len(anchorless),
+                           ANCHORLESS_MIN))
+                audit_lines.append(
+                    "doc %s domain=%s negative：anchorless 覆盖 %d/%d"
+                    "（对象共 %d）"
+                    % (did, domains[did], covered_anch, required,
+                       len(anchorless)))
+            audit_lines.append(
+                "  result=%s %s" % (
+                    rec["result"],
+                    "（含 defects/corrections 记录）"
+                    if rec["result"] == "defects_found" else "（无缺陷）"))
+    except ValueError as exc:
+        _err("抽查覆盖门禁: %s" % exc)
         return 2
 
     for rec in spotcheck_records:
@@ -394,6 +517,9 @@ def main(argv=None):
              len(spotcheck_records)))
     print("core_link_stats=%s"
           % json.dumps(link_totals, ensure_ascii=False))
+    print("spotcheck_audit:")
+    for line in audit_lines:
+        print("  %s" % line)
     if args.dry_run:
         print("dry-run：全链门禁通过，未写盘（credential SHA 以签发时"
               "实际写出字节为准）")

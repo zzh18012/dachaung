@@ -6840,3 +6840,41 @@ main。
 实：stage9-batch26-corpus-annotation / stage10-11-convergence
 @6c58c59 未推）。**待授权 push 捆绑**：r52 P12'（convergence
 6c58c59 + 台账 5+2 commits）+ docs/readme-stage-status 7a0378c。
+
+## §一百三十四（2026-09-16）R-D：G⑥ 抽查凭证机械化门禁强化（外部评审执行序第 3 项）
+
+外部评审 R-D（§132）指认 G⑥ 凭证工具缺机械核对：domain 覆盖、
+逐边核对、negative 计数、defects 闭环、SHA 不一致处理。本节落地
+（scripts/stage9_gold_credential.py 步骤 7b，纯增量——§7.3 预裁定的
+凭证 payload 格式零变化）：
+
+- **采集（步骤 3 扩展）**：最终 validator 循环内用 _doc_link_sets
+  从最终 gold 字节现场提取 per-doc positive 引用集（有入边对象）/
+  anchorless 引用集 / unit→linked_nontext 表——不信任抽查记录
+  自述，与 compute_link_stats 同口径但保留对象身份。
+- **步骤 7b 四门禁**（任一不过 → rc 2 不写盘）：
+  1. r10 R3 词汇表封闭：audit_type 须 positive/negative（旧自由词
+     如 positive_edge_full 拒绝）；
+  2. domain 覆盖：manifest 24 core 逐篇须有 domain 字段（G④ 冻结
+     层既有，full-set split_domain_coverage 已核），抽查记录覆盖
+     distinct domain ≥2；
+  3. positive 记录：doc 须有 linked pairs（指南 G⑥ 前置 3），且
+     覆盖边集（checked_unit_ids 推导 ∪ nontext_refs 全入边）须
+     ⊇ 全部 (unit, ref) 边——逐条核对全部 positive linked pairs
+     的机械化；negative 记录：|nontext_refs ∩ anchorless| ≥
+     min(10, |anchorless|)，anchorless 空集拒绝（不足 10 全查）；
+  4. 闭环词汇：result=defects_found 须带非空 defects **或**
+     corrections（r10 R3 原文"defects 或 corrections"）。
+- **stdout 审计摘要**（spotcheck_audit 块）：逐记录输出
+  domain/型别/覆盖 x/y 与闭环状态——机器可查、随签发 stdout 存档。
+  SHA 不一致仍按十轮裁决保留 stderr 注记不阻断（R1 修正分支合法）。
+- 测试：tests/test_stage9_gold_credential.py 12→22 用例（夹具补
+  domain 三域 8/8/8、anchorless 对象 img:logo1、默认抽查改
+  doc-05+doc-10 跨域一正一负；新增 7 例：词汇表拒绝/单域拒绝/
+  manifest 缺 domain/positive 漏边/positive 无边 doc/negative
+  覆盖不足/negative 无 anchorless 对象 + corrections 闭环接受）。
+  全量回归 **5695 passed / 4 skipped / 0 failed（55s）**。
+
+真实 G⑥ 应用时注意：rec-prod-05 真实记录（defects_found，十轮
+R3）届时须补 corrections/defects 处置闭环叙述才过门禁 4；#67
+（prod-05 delta 复核）与此衔接。

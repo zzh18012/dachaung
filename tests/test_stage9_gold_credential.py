@@ -10,6 +10,9 @@
 - 门禁拒绝：manifest 冻结不符 / core 数量 / validator 失败（rc 1）/
   indeterminate 未闭合 / below_threshold 无收敛仲裁 / 抽查字段缺失
   或不足 / secondary doc_id 不符 / 目标文件已存在（immutable）
+- 抽查覆盖门禁（外部评审 R-D，步骤 7b）：r10 R3 audit_type 词汇表、
+  domain ≥2、positive 逐边全查、negative anchorless 计数、
+  manifest 缺 domain、defects/corrections 闭环词汇
 - --dry-run 不写盘
 """
 import hashlib
@@ -66,6 +69,11 @@ def _annotation(doc_id):
              "char_span": None, "norm_text_hash": None,
              "nontext_ref": "img:figure1", "gold_segment_id": "g02",
              "hard_boundary_before": False},
+            {"unit_id": "u0005", "kind": "nontext", "page": 2,
+             "body_index": None,
+             "char_span": None, "norm_text_hash": None,
+             "nontext_ref": "img:logo1", "gold_segment_id": "g02",
+             "hard_boundary_before": True},
         ],
         "segments": [
             {"gold_segment_id": "g01", "hint": "标题", "kind": "frontmatter"},
@@ -76,6 +84,7 @@ def _annotation(doc_id):
 
 DOC_IDS = ["doc-%02d" % i for i in range(24)]
 SPLITS = (["dev"] * 14) + (["comparison"] * 4) + (["holdout"] * 6)
+DOMAINS = (["academic"] * 8) + (["tech_report"] * 8) + (["product_manual"] * 8)
 DOUBLE_IDS = DOC_IDS[:4]
 
 
@@ -87,8 +96,8 @@ def _write_json(path, data):
 
 def _build_corpus(tmp_path, mutate_annotation=None):
     manifest = {"docs": [
-        {"doc_id": did, "split": split, "format": "pdf"}
-        for did, split in zip(DOC_IDS, SPLITS)]}
+        {"doc_id": did, "split": split, "format": "pdf", "domain": dom}
+        for did, split, dom in zip(DOC_IDS, SPLITS, DOMAINS)]}
     manifest_path = tmp_path / "manifest.json"
     _write_json(manifest_path, manifest)
     annotations = tmp_path / "annotations"
@@ -118,14 +127,29 @@ def _spotcheck(doc_id, result="pass"):
     rec = {
         "doc_id": doc_id,
         "annotation_sha256_reviewed": "0" * 64,
-        "audit_type": "positive_edge_full",
-        "checked_count": 11,
+        "audit_type": "positive",
+        "checked_count": 1,
         "checked_unit_ids": ["u0002"],
         "result": result,
         "review_date": "2026-09-08",
     }
     if result == "defects_found":
         rec["defects"] = ["p6 两张行内截图未登记"]
+    return rec
+
+
+def _spotcheck_negative(doc_id, result="pass"):
+    rec = {
+        "doc_id": doc_id,
+        "annotation_sha256_reviewed": "0" * 64,
+        "audit_type": "negative",
+        "checked_count": 1,
+        "nontext_refs": ["img:logo1"],
+        "result": result,
+        "review_date": "2026-09-08",
+    }
+    if result == "defects_found":
+        rec["corrections"] = ["img:logo1 漏标补登"]
     return rec
 
 
@@ -160,7 +184,8 @@ def _build_inputs(tmp_path, agreements=None, spotchecks=None,
         secondary_args.append("%s=%s" % (did, p))
 
     if spotchecks is None:
-        spotchecks = [_spotcheck("doc-05"), _spotcheck("doc-06")]
+        # doc-05=academic / doc-10=tech_report：跨域 + 一正一负两型抽查
+        spotchecks = [_spotcheck("doc-05"), _spotcheck_negative("doc-10")]
     spot_paths = []
     for i, rec in enumerate(spotchecks):
         p = reports_dir / ("spot-%d.json" % i)
@@ -185,7 +210,7 @@ def _build_inputs(tmp_path, agreements=None, spotchecks=None,
     return argv, out, manifest_path, annotations
 
 
-def test_happy_path_writes_credential(tmp_path):
+def test_happy_path_writes_credential(tmp_path, capsys):
     argv, out, manifest_path, annotations = _build_inputs(tmp_path)
     assert gc.main(argv) == 0
     assert out.is_file()
@@ -236,6 +261,13 @@ def test_happy_path_writes_credential(tmp_path):
                        ("linked_pairs", "linked_objects",
                         "anchorless_count", "nontext_total")}
     assert vr["result"]["core_link_stats"] == expected_totals
+
+    # R-D 步骤 7b：stdout 审计摘要（一正一负两型、跨两域）
+    stdout = capsys.readouterr().out
+    assert "spotcheck_audit:" in stdout
+    assert "doc-05 domain=academic positive：边覆盖 1/1（全）" in stdout
+    assert "doc-10 domain=tech_report negative：anchorless 覆盖 1/1" \
+        in stdout
 
 
 def test_credential_sha_printed_not_self_referential(tmp_path, capsys):
@@ -348,14 +380,25 @@ def test_spotcheck_missing_fields_or_too_few_refused(tmp_path):
 def test_defects_found_requires_defects_field(tmp_path):
     argv, out, _, _ = _build_inputs(tmp_path / "ok", spotchecks=[
         _spotcheck("doc-05"),
-        _spotcheck("doc-06", result="defects_found")])
+        _spotcheck("doc-10", result="defects_found")])
     assert gc.main(argv) == 0  # _spotcheck 已带 defects
-    bad = _spotcheck("doc-06", result="defects_found")
+    bad = _spotcheck("doc-10", result="defects_found")
     del bad["defects"]
     argv, out, _, _ = _build_inputs(tmp_path / "bad", spotchecks=[
         _spotcheck("doc-05"), bad])
     assert gc.main(argv) == 2
     assert not out.exists()
+
+
+def test_defects_found_corrections_vocabulary_accepted(tmp_path):
+    # r10 R3 词汇表："defects 或 corrections"——corrections 同样构成闭环
+    argv, out, _, _ = _build_inputs(tmp_path, spotchecks=[
+        _spotcheck("doc-05"),
+        _spotcheck_negative("doc-10", result="defects_found")])
+    assert gc.main(argv) == 0
+    cred = json.loads(out.read_text(encoding="utf-8"))
+    assert any(r.get("corrections") for r in cred["relation_spotcheck"]
+               if r["audit_type"] == "negative")
 
 
 def test_existing_credential_immutable(tmp_path):
@@ -378,3 +421,74 @@ def test_reviewed_sha_mismatch_noted_not_failed(tmp_path, capsys):
     assert gc.main(argv) == 0
     assert out.is_file()
     assert "R1 修正分支合法" in capsys.readouterr().err
+
+
+def test_audit_type_vocabulary_refused(tmp_path):
+    # r10 R3 词汇表封闭：旧自由词 positive_edge_full 不再接受
+    rec = _spotcheck("doc-05")
+    rec["audit_type"] = "positive_edge_full"
+    argv, out, _, _ = _build_inputs(
+        tmp_path, spotchecks=[rec, _spotcheck("doc-10")])
+    assert gc.main(argv) == 2
+    assert not out.exists()
+
+
+def test_domain_coverage_below_two_refused(tmp_path):
+    # doc-05/doc-07 同属 academic——抽查记录只覆盖 1 个 domain
+    argv, out, _, _ = _build_inputs(
+        tmp_path, spotchecks=[_spotcheck("doc-05"), _spotcheck("doc-07")])
+    assert gc.main(argv) == 2
+    assert not out.exists()
+
+
+def test_manifest_missing_domain_refused(tmp_path):
+    argv, out, manifest_path, _ = _build_inputs(tmp_path)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    del manifest["docs"][0]["domain"]
+    _write_json(manifest_path, manifest)
+    idx = argv.index("--expected-manifest-sha")
+    argv[idx + 1] = hashlib.sha256(
+        manifest_path.read_bytes()).hexdigest()
+    assert gc.main(argv) == 2
+    assert not out.exists()
+
+
+def test_positive_edge_coverage_incomplete_refused(tmp_path):
+    # u0003 无边：positive 记录漏掉 (u0002, img:figure1) 这条边
+    rec = _spotcheck("doc-05")
+    rec["checked_unit_ids"] = ["u0003"]
+    argv, out, _, _ = _build_inputs(
+        tmp_path, spotchecks=[rec, _spotcheck("doc-10")])
+    assert gc.main(argv) == 2
+    assert not out.exists()
+
+
+def test_positive_doc_without_linked_pairs_refused(tmp_path):
+    def strip_links(data):
+        data["units"][1].pop("linked_nontext")
+    rec = _spotcheck("doc-05")
+    argv, out, _, _ = _build_inputs(
+        tmp_path, spotchecks=[rec, _spotcheck("doc-10")],
+        mutate_annotation=("doc-05", strip_links))
+    assert gc.main(argv) == 2  # 指南：抽查文档须有 linked pairs
+    assert not out.exists()
+
+
+def test_negative_anchorless_coverage_insufficient_refused(tmp_path):
+    rec = _spotcheck_negative("doc-10")
+    rec["nontext_refs"] = ["img:notexist1"]  # 不在 anchorless 集合
+    argv, out, _, _ = _build_inputs(
+        tmp_path, spotchecks=[_spotcheck("doc-05"), rec])
+    assert gc.main(argv) == 2  # 覆盖 0/1（须 ≥min(10, |anchorless|)）
+    assert not out.exists()
+
+
+def test_negative_without_anchorless_objects_refused(tmp_path):
+    def drop_anchorless(data):
+        data["units"].pop()  # 移除 u0005（img:logo1，唯一 anchorless）
+    argv, out, _, _ = _build_inputs(
+        tmp_path, spotchecks=[_spotcheck("doc-05"),
+                              _spotcheck_negative("doc-10")],
+        mutate_annotation=("doc-10", drop_anchorless))
+    assert gc.main(argv) == 2
+    assert not out.exists()
