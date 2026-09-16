@@ -6934,3 +6934,14 @@ R3）届时须补 corrections/defects 处置闭环叙述才过门禁 4；#67
   垃圾串 unmatched 披露 / 空文本与 parse_failed N/A / 选优隔离 /
   macro N/A 剔除 / runner 缺文件分支）。全量回归 **5720 passed /
   4 skipped / 0 failed（53s）**。
+
+## §一百三十七（2026-09-16）R-F：gold 术语边界落指南（对外措辞纪律）
+
+外部评审 R-F：gold 称为"经人工复核与仲裁的参考标注"，不称真值。
+全库扫描确认 stage9 工件无"真值/标准答案"越权措辞（仅存命中为
+Stage 2 机器 reason 码 no_ground_truth_* 与 relation 契约文档英文
+签名，外部报告契约不动）。落地：docs/stage9-annotation-guide.md
+文首新增"术语边界"块——gold 标注 = 经人工复核与仲裁的参考标注
+（annotated reference），非客观真值；质量由双标注一致率、仲裁收敛
+与 G⑤/G⑥ 抽查凭证约束并披露；对外表述（结题报告/README/演示）
+一律"参考标注"。G⑥ 凭证 payload 格式已锁定（§7.3 预裁定）不改。
