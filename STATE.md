@@ -121,6 +121,16 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2030 — 无断言函数面价值分类（R-I 延续轮，纯分析零改动；上轮 API 中断的恢复收尾）
+
+- 背景：上轮扫描完成、写报告前死于 API 连接失败；本轮复用扫描件收尾（扫描器与桶定义零改动）。产物 outputs/autonomous/noassert_triage_r2030.md + noassert_r2030_data.json（+ 过期 json 备份 .prev.json，均未入库）。
+- 宇宙（AST，词法子树 0 个 ast.Assert）：**4,040 / 94,914（4.26%）**，R2027 正则 4,118 高估 78。
+- **可复现性验证发现不一致并定根因**：存量 json B3=131/无 B2 vs 复跑 B3=89/B2=42（89+42=131）。worktree 干净（HEAD d42ca10，语料零变化）+ 当前扫描器二次复跑完整 json 深度相等（确定性成立）+ 去"两层 helper 检查"变体精确还原旧计数 ⇒ 上轮先跑 v1 产出 json、后修订扫描器（加 B2 两层 `_acc→validate` 识别）、重跑前断线，存量 json 是修订前过期产物。**以复跑为准**（8 非零桶 + A_rc/C_helper_check=0 恰合计 4,040）。
+- 复跑桶计数：A_capture 2803（69.4%）/ B1_calls_raising_api 523（12.9%）/ C_helper_assert 269 / A_smoke 145 / A_manual_fail 138 / **B3_fallthrough 89 / B2_local_raising_helper 42** / A_assert_call 25 / A_skip 6；B 族合计 654（universe 16.2%、语料 0.69%），散布 215 文件，top15 占 39.6%（schema/evaluation schema 边角为 B1 温床）。parametrize 全宇宙仅 A_capture 2 个——B 族 654 零参数化。
+- 抽样复核（19 个，种子 2030）：sample_b 10 个 B3 **规则应用 10/10 正确**，但语义 3/10 逃逸（1 个 import 别名 validate 实为 B1；2 个 patch 故障注入——fake_unlink 含 raise 只作值传递不经调用名，B2 看不见）+ 1 个"不应抛"措辞逃出冒烟标记表；真死重 ≈6/10（含自抛自接永真函数、函数体字面 pass 的占位、2 个名字/docstring 承诺检查却从未求值）。B1 补抽 6/6 + B2 补抽 3/3 分类与语义均成立（_acc/_valid 包装链与 validate 双 raise 位已核实）。
+- **R-I 裁决数据点**：B1 是"调用会 raise 的 API 即隐式异常测试"的**合法变体**（按抽样下结论）——与 A_capture 互补成对（raises 锁拒绝路径、B1 不抛锁接受路径），抽样锁的 anyOf 不变量/additionalProperties/E2E report 契约均为实锁；弱点 = 单侧无阳性对照（validate 退化为不抛则全绿）+ 零字段验证。**"删 B 桶 654 零防护损失"不成立**：真死重数量级 ≈53 个（语料 0.06%）；比死重更值得注意的是"名义承诺未验证"函数构成覆盖率信号噪声（default_tolerance_30 / annotation_loads / f1_zero_denominator 三例）。
+- 下次建议：R-I 候选序继续（R-A/R-B 行为缺口，或对 4,040 宇宙中 A_smoke/A_manual_fail 做价值细分）；无断言面已闭合，不建议再投轮。
+
 ## Round 2029 — DOCX 表格行列基数退化与嵌套 w:p 静默丢弃（6 测试）
 
 - 文件：`tests/test_parser_docx_rowless_cellless.py`（换轴：近五轮全 PDF；DOCX 侧 R1957 cell hyperlink / R1967 gridBefore 列偏移 / R1889 sdt 丢弃 / R1899 blip 守卫均未触碰**行列基数**——w:tr 零 w:tc、w:tbl 零 w:tr、w:p 嵌套 w:p、w:p 直挂 w:tbl。xref/trailer 候选弃选：R1972 已锁 startxref 偏移损伤、R1993 已锁 xref 流 /Prev 链与 free 条目、edges52/103 已锁经典表 /Prev，剩余角度薄）。
