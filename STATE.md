@@ -121,6 +121,24 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2041 — evaluation run 的 annotation 内容降级信封（1b/b 换轴 evaluation 侧，R2040 建议，3 测试）
+
+- 任务：`evaluation run` 对 annotation 文件四形态（缺文件 / 坏 JSON / {} / 缺键 JSON）的区分度矩阵 + annotation v1.1 新键（table_caption_pairs）消费路径 + schema 装饰性 + 落盘信封键剔除，main 只读 @ `6c6d398`（运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_annotation_env_r2041.py + .out（未入库）；子进程真实 CLI（main venv `python -m evaluation.cli run`），cwd=临时合成根 + PYTHONPATH=main 根；合成 DOCX 夹具复制 main tests/test_evaluation_cli.py 构造法。
+- 覆盖面：main 降级矩阵已**进程内**锁（test_annotation_metrics 12 测含 _tolerance_chars/_missing_markers 函数返回值级 + test_table_caption_prf 13 + test_heading_order_prf 11 + test_caption_relation_contract）；CLI 面仅 test_cli_run_with_annotation 一测（单一 no_ground_truth_anchors_in_stream reason + 无非 null 值断言）。残留：四形态区分度 / v1.1 键 CLI 消费 / annotation.schema.json 是否进 run 通道 / doc_id 交叉核对 / 落盘信封键——main 全部零覆盖。
+- **C0 对照先通过**：全量标注（heading_order + 真实 marker chunk_boundary_anchors）→ rc 0 + heading_order P/R/F1 = 1.0/1.0/1.0、chunk_boundary P/R/F1 = 0.5/1.0/0.667 全非 null——**CLI 面真实消费首次以非 null 值锁**（main CLI 测试只锁过降级 reason）。
+- 发现（E1–E8，**全部成立，零行为偏差，2 缺陷候选 + 1 文档偏差候选**）：
+  - **E1–E3 成立（不可区分三元组）**：缺文件 / 坏 JSON / {} 三形态经真实 run 后 per_doc.metrics **逐键相等**（12 个 annotation 族键全 reason=no_annotation）——坏 JSON 被 `_load_annotation`（runner.py:63-70）静默吞成 None，与缺文件完全同表象；
+  - **E2b 成立（可见性缺陷候选 r54 记录不修）**：坏 JSON + `--log-file` + `--verbose` → JSONL 4 事件（eval_start/doc_complete/eval_complete）与 stderr 均零 annotation 字样——坏标注在 stdout/stderr/JSONL/报告四通道全不可见；
+  - **E4 成立（可区分形态）**：缺键 JSON（合法骨架无指标键）→ figure/table→no_annotation_pairs、chunk→no_ground_truth_anchors、heading→no_ground_truth_headings，四族 reason 各就各位；
+  - **E5/E6 成立（schema 装饰性）**：schemas/annotation.schema.json 在 run 通道**零消费**（grep 全库无代码引用，evaluation/schema.py 只载 manifest/evaluation-report 两个）——v1.0+table_caption_pairs（schema v1.0 明令禁止的组合）仍被 table_caption_prf 消费（precision=no_predicted_relations / recall 诚实 0.0 / f1=precision_or_recall_not_evaluated）；schema required 键 annotation_version/doc_id 全缺仍消费；ANNOTATION_VERSION 常量（__init__.py:78）运行时无人读；
+  - **E7 成立**：doc_id 错配（WRONG-DOC）+ annotation_version "9.9" → heading_order 1.0/1.0 照常消费，无运行时交叉核对；
+  - **E8 成立（信封剔除）**：persisted report per_doc 键集恰五项（doc_id/source_type/parser_used/metrics/wall_time_seconds），_annotation_present/_tolerance_chars/_missing_markers 全被 public_per_doc 剥离，全文无 "tolerance" 子串——**CLAUDE.md 评测规则"容差 tolerance_chars 必须在报告中记录"与落盘实态不符**（文档/实现偏差候选 r54 记录不修；annotation_metrics.py:11 docstring 同样声称"必须在报告中记录"）。内部 _annotation_present 对 {} 为 True（annotation is not None）但落盘不可见，E3 的区分只存在于 run_evaluation 返回值，不在报告文件。
+- 加测 3：`tests/test_annotation_env_r2041.py`——(1) 四形态区分度矩阵（三形态 metrics 逐键相等断言 + 缺键 JSON 四族 12 键 reason 全锁）；(2) v1.1 键消费 + schema 装饰性（v1.0 禁键 / required 全缺 / doc_id 错配三形态照常消费，recall 0.0 + no_predicted_relations 精确断言）；(3) C0 真实消费非 null 值 + 落盘信封（per_doc 键集恰五项 + 全文无 tolerance/_missing_markers + ZZZ marker 复刻 main 行为）。被测 main 按 `git worktree list --porcelain` 动态定位（零硬编码路径，缺目标显式 SKIP）。
+- 定向：新文件 3 passed 7.92s；邻居 main `test_evaluation_cli.py + test_annotation_metrics.py + test_table_caption_prf.py + test_heading_order_prf.py` 合计 **42 passed 5.48s**（main venv + `-p no:cacheprovider`，main 全程 clean）+ 自跑 `test_container_env_r2040.py` + `test_eval_cli_channel_r2039.py` + `test_schema_routing_cli_r2038.py` 合计 9 passed 23.68s。全量不跑（加测纯子进程型）；预测锚 **102073 + 3 = 102076**（R2040 预测锚，本轮 +3）。
+- 下次建议：annotation 通道面本轮已闭合（四形态 + v1.1 键 + schema 装饰性 + 信封剔除全覆盖，不建议再投轮）；三个候选已入指示线池——① 坏 JSON 静默吞（区分 reason 或日志事件，属 main 行为改动需裁决）② tolerance 落盘缺失（CLAUDE.md 承诺 vs 实态，一行文档修正或 public_per_doc 保留 _tolerance_chars 二选一）③ doc_id 交叉核对缺失；可换轴 container_verify 分区断言面（R2038 备选仍未投）或 R-A/R-I 行为缺口。
+
+---
+
 ## Round 2040 — container_verify 退出码信封 + 校验和先于 docker load 排序证明（1b/b 回 container 侧，R2039 建议，3 测试）
 
 - 任务：main `scripts/container_verify.py` CLI 退出码信封（rc 2/3/4/5 形态 + stage 阶段序）与"校验和检查先于 docker load"排序证明，main 只读 @ `6c6d398`（运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_container_env_r2040.py + .out（未入库）；子进程真实 CLI（main venv `python scripts/container_verify.py`）。**环境起点：本地 daemon 未运行**——Docker Desktop 为本机已装应用，启动既有程序（非安装、非配置改动、未 build/pull）后 5s 就绪 29.4.3，符合"只用本地已有 daemon"边界。
