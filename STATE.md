@@ -2,6 +2,21 @@
 
 > 每轮 agent 追加一条记录。最新的"下一步建议"是下一轮的起点。
 
+## Round 2033 — jsonlog 结构化日志族探针：CLI 边界与信封覆盖（1b/b，R2031 候选 1 号，3 测试）
+
+- 任务：app/jsonlog.py 族（批次 17）合成探针，main 只读 @ `6c6d398`（运行前后 status clean）。探针 outputs/autonomous/probe_jsonlog_r2033.py（+r2033b 重现性/r2033c 压力，.out 存证，均未入库）。**契约背景勘误（R2031 教训：以 main 只读源码为准）**：prompt 所述"traceback 批次 2 改有界截断"在 main `6c6d398` **不存在**——jsonlog.py docstring 自述"traceback 首版不截断"，grep 全 app/+evaluation/ 无 traceback 截断逻辑（唯一截断是 pipeline.py validation_errors[:20]）。
+- 覆盖面：main test_jsonlog.py 12 测试已锁 happy path/NullHandler 静默/同进程两次 append/traceback 捕获/evaluation 事件；自跑 tests/ jsonlog/JSONFormatter/setup_logger/--log-file 全零命中。**C0 对照先通过**（3 好 .md → rc 0 + 全行 json.loads + 事件序列完整）后各实验有效。
+- 发现（E1-E7）：
+  - **E7 CLI 边界缺陷候选（特征锁定未修）**：`--log-file` 指向目录或空串（Path('')→cwd）→ setup_logger FileHandler 打开失败以**原生 PermissionError/IsADirectoryError traceback + rc 1** 穿透，无结构化 errors 信封；batch-parse 与 evaluation.cli run 双通道同路径（E7c 首跑被 argparse 误传参污染 rc 2，修正 --manifest 形态重跑确认）。操作员一笔之误产出裸 traceback，违背批次 17"结构化"精神 → 指示线候选：--log-file 早期校验或捕获转结构化
+  - **E1 信封覆盖（库层）**：extra 撞 LogRecord 保留属性（message/args/name/levelname/asctime）→ stdlib 调用点 KeyError×5（"Attempt to overwrite ... in LogRecord"，formatter 不参与）；但**信封字段 event/level/timestamp 不在 _RESERVED** → `extra={"event":"shadowed","level":"FAKE","timestamp":"not-a-time"}` 静默覆盖信封三键——结构性字段可被业务 extra 无声污染（当前调用方无此用法，属边界不是现行缺陷）→ 指示线候选：_RESERVED 补 event/level/timestamp
+  - **E2 不可序列化 extra（库层）**：json.dumps TypeError → handler.handleError 吞掉：**整行丢弃不写坏**（存活 2/3，JSONL 全行合法）+ raiseExceptions=True 默认下 stderr 泄漏 "--- Logging error ---" 裸 traceback（经 jsonlog.py:36）；对照默认 NullHandler 同场景 stderr 零泄漏（emit 不调 format）→ "JSONL 被写坏"担忧不成立，实际模式是"丢行+stderr 噪声"
+  - **E5a 并发 append 罕见静默丢行（特征存证）**：双进程同刻启动写同一 --log-file，首跑 **1 行 batch_start 静默丢失**（27=1+24+2 行，零撕裂零坏行、双 rc 0）；重现性 5 连跑全 28/28 + 8 进程压力 24/24 → 合计 **1/7 观察率**，不可确定性断言故不入测试。机制与 Windows CRT _O_APPEND seek+write 非原子一致；批次 17 docstring 只提"无自动轮转"，未提跨进程丢行 → 指示线候选：文档或按进程分文件
+  - **E5b --verbose 混流（help 自述"可能交错"，零测试）**：stderr = JSON 事件行×4 + "[1/2] parse" 进度行×2 同流；stderr JSON 事件序列与 --log-file 文件事件序列**逐项相等**（双写一致成立）——stderr 不是纯 JSONL，消费方需过滤
+  - **E3 msg 非 str**：dict/int/None → event 为 str() 形态（"{'a': 1}"/"42"/"None"）；多行 msg 单行性保持（4 条 4 物理行；首跑判定字符串双重转义误报"破坏"，以 RAW_LINES 原始数据修正）
+- 加测 3：`tests/test_jsonlog_cli_edges.py`——(1) --log-file 目录/空串双 CLI 通道原生 traceback（rc 1 + OSError 家族 + 非 JSON 信封）；(2) 跨进程顺序 append（28 行全合法 + batch_start×2/file_complete×24/batch_complete×2 + 按进程分组前 pa 后 pb）；(3) --verbose+--log-file 双写一致（stderr JSON 序列==文件序列 + 进度行混流 + 首进度行在 batch_start 之后）。被测对象按 `git worktree list --porcelain` 动态定位 main（零硬编码绝对路径，缺目标显式 SKIP），subprocess 真实 CLI + PYTHONDONTWRITEBYTECODE=1。
+- 定向：新文件 3 passed 3.69s；邻居 test_plugin_cli_spec_forms.py 3 passed（合计 6 passed 6.19s）；main worktree 全程 clean。全量不跑（加测纯子进程型）；预测锚 **102055 + 3 = 102058**（R2031 锚 102052 + R2031 的 3 = 102055，R2032 零加测）。
+- 下次建议：1b/b 换轴（parser_registry 快照语义残留面 / batch.py 并行通道）或 R-A/R-B 行为缺口；E1 信封覆盖与 E7 --log-file 校验已入指示线候选池，不自跑线实施。
+
 ## Round 1616 — pipeline 拆分精度：引号/括号内句号、缩写、换行（3 测试）
 
 - 文件：`tests/test_pipeline_split_precision.py`（R1615 锁句界字符集——**句号后跟非空格字符、缩写无感知、换行非句界**零覆盖）。
