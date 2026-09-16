@@ -121,6 +121,20 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2023（对象体词法截断/重复/缺值）
+
+- 家族：xref 定位后的对象体 dict/array 词法；内容流词法已由 R2020 锁、对象体截断 grep 实证零覆盖
+- 探针 R2023 实证（好流 '(BODY)' 基线 [100, 82.484, 134.008, 94.484]）：
+  - 页 dict 未闭合（值尾无 >>）→ 不崩：零元素 + pdf_no_text_extracted
+  - Kids 数组未闭合（`[3 0 R /Count 1 >>`）→ 完全恢复：后续键值对被数组吸收、>> 兜住 Pages dict、Kids[0] 仍可达 → 'BODY' 基线完整、零告警
+  - 双字典（页 dict 后游离 << /Extra 1 >>）→ 第二 dict 静默丢弃、完整恢复
+  - 键缺值（<< /MediaBox >> 值位撞闭合）→ PSBaseParser Invalid dictionary construct → ParserError pdfplumber_open_failed（exception_type=PdfminerException，message 含 "Invalid dictionary construct: [/'MediaBox']"）
+  - 空对象体（obj 3 直接 endobj）→ dict_value→{} 无 /Type 页树跳过 → 零文本 + pdf_no_text_extracted
+  - /Length null（edges37 只锁数字错值）→ 流边界丢失 → 零文本 + pdf_no_text_extracted
+- 判别式：恢复形若 BODY 缺失/告警翻；塌缩形若 BODY 存活翻；E4 异常三要素任一变翻
+- 测试：tests/test_parser_pdf_objlex_truncation.py（基线 + 6 形态，7 用例）
+- 计数影响：+7（101997 → 102004）
+
 ## Round 2022（/Font 条目 spec 退化形态）
 
 - 家族：get_font（pdfinterp.py:212-250）分派路径；spec 退化 grep 实证零覆盖（edges35 只锁未注册名 fontmap 缺失）
