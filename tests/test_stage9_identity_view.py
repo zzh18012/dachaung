@@ -63,7 +63,7 @@ def _two_group_pair():
 
 def run(*args):
     return subprocess.run([sys.executable, str(SCRIPT), *args],
-                          capture_output=True, text=True, cwd=str(ROOT))
+                          capture_output=True, text=True, cwd=str(ROOT), encoding="utf-8")
 
 
 def _write(tmp_path, ann, name):

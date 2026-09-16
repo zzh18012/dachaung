@@ -363,7 +363,7 @@ def test_cli_manifest_consistency_failure(tmp_path):
     result = subprocess.run(
         [sys.executable, str(script), "--manifest", str(manifest),
          "--annotations", str(good)],
-        capture_output=True, text=True, cwd=str(ROOT))
+        capture_output=True, text=True, cwd=str(ROOT), encoding="utf-8")
     assert result.returncode == 1
     assert "manifest_consistency_failure" in result.stdout
     assert "holdout=9" in result.stdout
@@ -385,7 +385,7 @@ def test_cli_exit_codes(tmp_path):
     def run(*args):
         return subprocess.run(
             [sys.executable, str(script), "--manifest", str(manifest),
-             *args], capture_output=True, text=True, cwd=str(ROOT))
+             *args], capture_output=True, text=True, cwd=str(ROOT), encoding="utf-8")
 
     ok = run("--annotations", str(good))
     assert ok.returncode == 0, ok.stdout + ok.stderr
@@ -462,7 +462,7 @@ def test_cli_full_set_link_stats(tmp_path):
     result = subprocess.run(
         [sys.executable, str(script), "--manifest", str(manifest),
          "--annotations", str(good), "--full-set", "--json"],
-        capture_output=True, text=True, cwd=str(ROOT))
+        capture_output=True, text=True, cwd=str(ROOT), encoding="utf-8")
     # 单文档不满足 14/4/6 分层（rc 1），但 links 统计照常输出
     summary = json.loads(result.stdout)["summary"]
     assert "links" not in summary  # 八轮裁决：旧合并键废弃
@@ -501,7 +501,7 @@ def test_cli_full_set_core_excludes_unassigned(tmp_path):
     result = subprocess.run(
         [sys.executable, str(script), "--manifest", str(manifest),
          "--annotations", str(good), str(backup), "--full-set", "--json"],
-        capture_output=True, text=True, cwd=str(ROOT))
+        capture_output=True, text=True, cwd=str(ROOT), encoding="utf-8")
     summary = json.loads(result.stdout)["summary"]
     assert summary["core_link_stats"]["nontext_total"] == 2
     assert summary["all_annotated_link_stats"]["nontext_total"] == 4

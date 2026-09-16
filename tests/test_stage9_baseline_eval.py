@@ -141,7 +141,7 @@ def test_cli_report_and_exit_codes(tmp_path):
             [sys.executable, str(script),
              "--manifest", str(manifest),
              "--annotations", str(ann_dir), *args],
-            capture_output=True, text=True, cwd=str(ROOT))
+            capture_output=True, text=True, cwd=str(ROOT), encoding="utf-8")
 
     ok = run("--report", str(report), "--json")
     assert ok.returncode == 0, ok.stdout + ok.stderr

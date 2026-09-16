@@ -77,7 +77,7 @@ def _run(manifest, ann, links, extra=()):
     return subprocess.run(
         [sys.executable, str(SCRIPT), "--manifest", str(manifest),
          "--annotation", str(ann), "--links", str(links), *extra],
-        capture_output=True, text=True, cwd=str(ROOT))
+        capture_output=True, text=True, cwd=str(ROOT), encoding="utf-8")
 
 
 def test_apply_only_touches_linked_field(tmp_path):

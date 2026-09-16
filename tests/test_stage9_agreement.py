@@ -535,7 +535,8 @@ def test_cli_exit_codes_and_json(tmp_path):
     def run(*args):
         return subprocess.run(
             [sys.executable, str(script), *args],
-            capture_output=True, text=True, cwd=str(ROOT))
+            capture_output=True, text=True, encoding="utf-8",
+            cwd=str(ROOT))
 
     full = run("--a", str(a), "--b", str(a))
     assert full.returncode == 0, full.stdout + full.stderr
@@ -573,7 +574,8 @@ def test_cli_pair_map_resolution(tmp_path):
     def run(*args):
         return subprocess.run(
             [sys.executable, str(script), *args],
-            capture_output=True, text=True, cwd=str(ROOT))
+            capture_output=True, text=True, encoding="utf-8",
+            cwd=str(ROOT))
 
     base = run("--a", str(pa), "--b", str(pb), "--json")
     payload = json.loads(base.stdout)

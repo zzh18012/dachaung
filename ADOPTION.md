@@ -6788,3 +6788,55 @@ chunk→source spans→locator 回溯视图优先于扩 WebUI）；R-I 自跑
 待用户裁决：①是否按评审序执行（与 §九十七 G⑥ 双前置 AND 门
 的衔接：R-A 审计是否列为 G⑥ 第三个前置）；②一致率算法是否
 走 v2 批次正式修订；③ R-H README 更新走 main 直改或分支。
+## §一百三十三（2026-09-16）用户裁决：外部评审执行序全盘采纳 + README 走分支；R-A 编号不变性审计落地 + acad-03 首个分解结果
+
+用户裁决（2026-09-16）：①按外部评审建议执行序执行（编号不变性
+审计与评测协议 → 四篇真人标注和仲裁 → 强化抽查凭证 → G⑥ → G⑦
+与粒度诊断 → 有依据的算法批次 → 最小集成演示）；②R-A 审计开工
+（辅助口径，不动冻结件与原始报告）；③README 更新走分支不直改
+main。
+
+**R-A 实现（本节提交）**：
+- stage9/agreement_audit.py：编号不变性辅助审计——按 compute_
+  agreement 同一対齐键取对齐对，段标签规范化为"该段所含对齐
+  单元的 pair_index 升序元组"后用未修改的冻结 compute_agreement
+  重算；输出原始/分区双口径 + label_only（纯编号伪分歧）/
+  partition_only（分区更严：标签碰巧相同但分组关系不同）分解 +
+  段词表统计。冻结算法零改动。
+- scripts/stage9_agreement_audit.py（CLI）+ tests/test_stage9_
+  agreement_audit.py（7 合成用例：纯改名 1.0 恢复 / 编号漂移
+  1.0 恢复 / 真拆段分区更严 0.0 / 同标签双 1.0 / 词表风格 /
+  doc_id 不匹配 / 零对齐不变）。
+- 维护件：6 个测试文件共 9 处 subprocess.run 补
+  encoding="utf-8"（Windows GBK locale 解码子进程 CLI 的 UTF-8
+  输出在 reader 线程 UnicodeDecodeError → stdout=None → 测试
+  TypeError；涉及 agreement/validation/link_apply/identity_view/
+  baseline_eval——环境性既有缺陷 17 例，CI Linux 不受影响；
+  批次 25 跨平台修复同族）。修复后本机全量回归 **5687 passed /
+  4 skipped / 0 failed（78s）**。
+
+**acad-03 首个分解结果（0.2532 原始口径复现一致）**：
+- units a=249 b=164 对齐=97 union=316；段词表双方同 gNN 风格
+  （a=9/b=8 交集 8）
+- 原始口径 0.2532（segment_diff=17）；分区口径 **0.0918**
+  （segment_diff=68）
+- 分解：label_only=**7**（编号伪分歧仅 ≈2.2pp，修净也就
+  ≈0.275）；partition_only=58（字符串口径把 58 对"标签碰巧相同
+  但分组关系不同"误计为一致——**字符串口径在该篇是偏乐观的**）；
+  双口径都分歧 10
+- **结论：acad-03 低分主因不是编号**，是 unit 粒度不一致
+  （only_a=152 / only_b=67，对齐覆盖率 97/316）——即使编号与
+  分组全对，天花板 = 97/316 ≈ 0.307，0.85 阈值对该篇结构性
+  不可达。与评审 R-B 粒度主题同根，但发生在标注层（两个标注人
+  切 unit 粒度不同），先于系统 chunk 粒度问题。
+- v2 修订判定：acad-03 证据不构成"编号伪分歧主导"——正式修订
+  一致率算法的动议**不因此触发**，等其余三篇双标注到件后同工具
+  复核再议（若同样 label_only 微小 + 粒度主导，则评审的改名
+  假设全局证伪，重点转向粒度协议）。
+
+**README 分支（用户裁决③）**：docs/readme-stage-status @ 7a0378c
+（基于 main 6c6d398，worktree dachuang-readme）：最小闭环表述
+→ Stage 8 已封口 + Stage 9/10/11 集成分支指称（分支名已核
+实：stage9-batch26-corpus-annotation / stage10-11-convergence
+@6c58c59 未推）。**待授权 push 捆绑**：r52 P12'（convergence
+6c58c59 + 台账 5+2 commits）+ docs/readme-stage-status 7a0378c。
