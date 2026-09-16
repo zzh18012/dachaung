@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2037 — 收集数锚核对（新锚后第 1 次连续精确命中）+ 耗时漂移抽样（1b/f 校准轮，零测试新增）
+
+- 任务：R2029"计数链失效"教训的制度化核对——重锚（102052，R2029 实测）后 +3xN 预测链首次逐轮实测锚定；抽样已知慢文件与第 138/139 次基线耗时锚点对照。零测试新增（校准轮默认）。
+- **收集数锚核对（主任务，精确命中）**：worktree venv 跑 `pytest --collect-only -q -p no:cacheprovider`（PYTHONDONTWRITEBYTECODE=1）→ **实测 102064 tests collected，= 预测锚 102064**（102052 + 3×4：R2031/R2033/R2034/R2036 各 +3，R2032/R2035 零加测）——**新锚后第 1 次连续精确命中**（R2029 自身为第 0 次）。输出 102066 行 = 102064 node ID + 空行 + 尾行，零收集错误（grep "error" 命中全为测试名子串）；证据 outputs/autonomous/collect_only_r2037.out（未入库）。
+- 口径记录（按 R2029 口径 passed+skipped=collected）：本轮为 collect-only 尾行 "N tests collected"，未实跑全量；近 5 次基线 skipped 恒 22，若全量实跑预期 passed=102042 + skipped=22 = 102064。差源：无（预测链无漂移，无修正需要记录）。
+- **耗时漂移抽样**（4 文件顺序跑、窗口内零并发 Python；全部 passed）：
+  - `test_harness_health.py` 4 passed 9.12s；scan fixture setup **8.35s**（现行唯一重项）——锚：R139 standalone 12.49s→11.45s、in-run 重载 16.23s；扫描实现自 R1904 `f026313` 后未改、语料 1,985→1,986 文件（+18 测试）几乎不变 → **真实改善**（−27% vs 11.45s 轻载锚），机器状态/速度差非实现差
+  - `test_cli_edges11.py` 19 passed 15.02s；top-10 **0.76–0.88s**——锚：轻窗 0.67–0.80s（R137/R138）、重载 1.0–3.2s（R139）→ 稳定，上浮 +10~15% 属已记录机器方差（干净窗口全套 1306–1843s 即 ±40%）
+  - `test_cli_edges9.py`（+edges44 合跑 109 passed 9.38s）top-5 **0.70–0.75s** → 正中历史带内；`test_evaluation_report_edges44.py` 全部 <0.38s 未入 top-8 → 无新慢测试
+  - collect-only wall 17.37s / pytest 自报收集 13.43s（R2027 锚 15.91s，语料 +18 测试）→ 平稳
+- **耗时结论：稳定**——R137 漂移判定锚点两项（最慢 25 名突破 1s / 出现新非 CLI 型慢测试）均未触发；最干净探针（harness 扫描）反降，排除套件退化方向；CLI 子进程带无漂移。
+- 下次建议：R-A/R-B 行为缺口或 1b/b 换轴（evaluation 侧新模块 / schemas 0.6.0 family 路由面，R2036 建议沿用）；**2026-09-21 周期简报窗口做下一次全量实跑**（预测 102064 + 3xN，N=其间加测轮数；并重采 --durations=25 对照漂移锚点两项）。
+
 ## Round 2036 — parser_registry 快照语义残留面 + source_types 契约 CLI 面（1b/b，R2032/R2035 建议点名，3 测试）
 
 - 任务：ParserCapability 冻结快照（批次 21）与 source_types.py 受控扩展契约（批次 20）在**真实 CLI 通道**的残留面探针，main 只读 @ `6c6d398`（运行前后 status clean）。探针 outputs/autonomous/probe_registry_r2036.py + .out（未入库）；子进程真实 CLI，PYTHONPATH=main 根 + PYTHONDONTWRITEBYTECODE=1 + cwd=临时目录；样例插件先读 main app/parsers/base.py 确认基类实名 `Parser`（R2031 教训），契约字段按批次 20/21 合法组合。
