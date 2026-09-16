@@ -121,6 +121,20 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2026（内容流注释 % 与数字词法退化）
+
+- 家族：a 队列（PSBaseParser 词法层：注释与数字 token 形态，grep 实证零覆盖）
+- 探针：outputs/autonomous/probe_pdf_comment_numberlex_r2026.py + 词法直测（PSStackParser）
+- 词法直测落锁：`--5 700` → 单个数 -5（双负号塌缩）；`1e2 1e2` → 数字 1 + 名字 e2 ×2（科学计数不被支持）；`+100 .5` → 100, 0.5
+- 锁定行为（tests/test_parser_pdf_comment_numberlex.py，8 用例）：
+  - `%` 进 _parse_comment 吞到 EOL 且不产 token：注释吞操作数行尾（700 在下行）→ 完整恢复；吞假字符串+假 Tj（真 Tj 在下行）→ 基线不变
+  - **注释吞整行尾部**（`100 700 % Td (BODY) Tj ET`）→ Td/字符串/Tj/ET 全部被吞 → 零文本 + pdf_no_text_extracted（静默内容丢失）
+  - 字符串上下文 % 是字面量 → 'BO%DY'（宽 44.676）
+  - **E5 科学计数**：do_Td pop(1, /e2) → safe_float(名字)=0.0 **静默归零**（对照 R2025 do_Tf 的 float_value→None+stderr：两个算子容错策略不同）→ 'BODY' @ (1,0) → [1.0, 781.484, 35.008, 793.484]
+  - `+100 .5 Td` → Td(100, 0.5) 顶到页边；`--5 700 Td` → x=-5.0 越出 MediaBox 左缘照常抽取
+- 计数影响：+8（全量预测 102016 → 102024）
+- 提交：tests + STATE.md；消息 "tests: content-stream comments and number lexer degenerates (Stage 8 autonomous R2026)"
+
 ## Round 2025（内容流操作数栈污染 + BX/EX 未实现）
 
 - 家族：a 队列（pdfminer 内容流解释器退化行为，grep 实证零覆盖）
