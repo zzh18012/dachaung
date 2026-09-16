@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2024（页树图退化：环/重复 Kids/指向 Catalog）
+
+- 家族：pdfpage.create_pages depth_first_search 的 visited 集合（pdfpage.py:109-111）图形态行为；/Count 权威性已由 edges111 锁，图形态（自环/互环/重复 Kids/Kids 指向 Catalog/悬空整数）grep 实证零覆盖
+- 探针 R2024 实证（好流 '(BODY)' 基线 [100, 82.484, 134.008, 94.484]）：
+  - 两不同页对照（C0）：Kids [3 0 R 7 0 R] → 2 元素（page 1 @x100 + page 2 @x300）
+  - 重复 Kids [3 0 R 3 0 R] → 仅 1 元素——visited 按 objid 去重（对照 C0）
+  - 自环 [2 0 R 3 0 R] / 互环（obj6 Kids [2 0 R 3 0 R]）→ visited 断环、页照出、零告警
+  - Kids [1 0 R 3 0 R] → Catalog 节点 Type 非 Pages/Page 静默跳过 → 1 元素零告警
+  - Kids [42] 悬空整数 → getobj(42) PdfminerException → ParserError pdfplumber_open_failed（message 尾部恰 "42"）
+- 判别式：重复 Kids 若 2 元素翻；环若异常/告警翻；E5 若不崩或 message 不含 42 翻
+- 测试：tests/test_parser_pdf_pagetree_graph.py（C0 对照 + 5 形态，6 用例）
+- 计数影响：+6（102004 → 102010）
+
 ## Round 2023（对象体词法截断/重复/缺值）
 
 - 家族：xref 定位后的对象体 dict/array 词法；内容流词法已由 R2020 锁、对象体截断 grep 实证零覆盖
