@@ -6907,3 +6907,30 @@ R3）届时须补 corrections/defects 处置闭环叙述才过门禁 4；#67
   双空披露双家族、doc_na 传播、micro 聚合 + N/A 格披露 + 缺元数据
   拒绝 + 家族缺席零证据、预注册字段与 sha 一致）。全量回归
   **5712 passed / 4 skipped / 0 failed（56s）**。
+
+## §一百三十六（2026-09-16）R-E：B1-systext 输入对等性对照组（G⑦ 前置件）
+
+外部评审 R-E（§132）：B1/B2 基线吃 gold fold-ws 流、系统吃自身解析
+文本——输入不对等，基线-系统差值混淆"文本源差异"与"算法差异"。
+本节落对照组（单列报告，评审"report separately"）：
+
+- **baseline_eval.evaluate_doc_system_text（B1-systext）**：B1 定长
+  算法 × **系统解析文本**（fold-ws 同视图），同 N 网格；投影仍锚
+  gold stream（顺序游标+全局回退）——系统文本与 gold 流不一致的
+  定位失败计入 unmatched_chunks / uncovered_units **量化披露不
+  静默**。隔离逻辑：B1@gold vs B1-systext@系统文本 = 同算法不同
+  输入源（差值即对等性损失）；B1-systext vs 系统 pipeline = 同
+  输入源不同算法。SYSTEM_TEXT_CONTROL 不入 BASELINES，
+  select_baselines 结构性不可见。
+- **system_eval.run_system_parsed_text**：对照组输入源 runner——
+  真实管线 parse 取 elements 文本 fold-ws（与 run_system_chunks 同
+  parse_failed:<code>/empty_result 守卫；chunks 不消费故
+  max_chars=800 默认）。
+- N/A 纪律：parsed 文本空 → empty_parsed_text；上游
+  parse_failed/empty_result 透传——全 N null + na_reason，macro
+  剔除 N/A 但保留条目计数，全 N/A → None 不虚构。
+- 测试：tests/test_stage9_system_text_control.py 8 合成用例
+  （对等完美时逐 N ARI 全等锚定 / 丢尾句 uncovered 披露 / 插入
+  垃圾串 unmatched 披露 / 空文本与 parse_failed N/A / 选优隔离 /
+  macro N/A 剔除 / runner 缺文件分支）。全量回归 **5720 passed /
+  4 skipped / 0 failed（53s）**。

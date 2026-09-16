@@ -49,6 +49,32 @@ def run_system_chunks(source_path, max_chars, parser_name="fallback"):
     return chunk_texts, None
 
 
+def run_system_parsed_text(source_path, parser_name="fallback"):
+    """R-E 对照组输入源：系统解析文本（fold-ws 后整篇，未切块）。
+
+    返回 (fold_ws 后的解析文本 或 None, reason)。None + reason ∈
+    {"parse_failed:<code>", "empty_result"}——与 run_system_chunks
+    同守卫（elements < EMPTY_RESULT_MIN_ELEMENTS 或文本 <
+    EMPTY_RESULT_MIN_CHARS → empty_result）。供 baseline_eval.
+    evaluate_doc_system_text 消费；G⑥ 前不触真实语料（合成接线测试）。
+    """
+    from app.pipeline import process_single
+
+    document, errors = process_single(
+        source_path, None, parser_name=parser_name,
+        max_chars=800, write_json=False)  # chunks 不消费，取默认即可
+    if document is None:
+        code = errors[0].code if errors else "unknown"
+        return None, "parse_failed:%s" % code
+    if len(document.elements) < EMPTY_RESULT_MIN_ELEMENTS:
+        return None, "empty_result"
+    text = fold_ws("\n".join(e.content or ""
+                             for e in document.elements))
+    if not text or len(text) < EMPTY_RESULT_MIN_CHARS:
+        return None, "empty_result"
+    return text, None
+
+
 def evaluate_system_doc(ann, chunks_by_param, params, na_by_param=None):
     """单篇标注 × {max_chars: chunk 文本列表} 评测（纯函数，合成可测）。
 

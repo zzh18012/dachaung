@@ -25,9 +25,11 @@ from stage9.baselines import (
     b1_fixed_length,
     b2_recursive,
 )
+from stage9.normalize import fold_ws
 from stage9.project import project_chunks_to_units
 
 BASELINES = ("B1", B2_VARIANT)
+SYSTEM_TEXT_CONTROL = "B1-systext"  # R-E 对照组：单列报告，不入选优
 
 
 def evaluate_doc(ann, n_grid=B1_N_GRID, baselines=BASELINES):
@@ -68,6 +70,61 @@ def evaluate_doc(ann, n_grid=B1_N_GRID, baselines=BASELINES):
         "text_units": len(text_units),
         "nontext_units": len(ann["units"]) - len(text_units),
         "results": results,
+    }
+
+
+def evaluate_doc_system_text(ann, parsed_text, n_grid=B1_N_GRID,
+                             na_reason=None):
+    """R-E 对照组（外部评审 §132）：B1 定长算法作用于**系统解析文本**
+    （非 gold stream），单列报告不参与 select_baselines 选优。
+
+    输入对等性隔离逻辑：B1@gold-stream vs B1-systext@系统文本 = 同
+    算法不同输入源（差值即文本源对等性损失）；B1-systext vs 系统
+    pipeline = 同输入源不同算法。parsed_text 先 fold_ws（与 B1 同
+    视图）；投影仍锚 gold stream（顺序游标+全局回退）——系统文本
+    与 gold 流不一致产生的定位失败计入 unmatched_chunks /
+    uncovered_units，**不静默**（对等性损失的量化披露）。
+
+    parsed_text 为 None 或 fold-ws 后为空（na_reason 优先传入
+    parse_failed:<code> / empty_result）→ 全 N 的 ari=null +
+    na_reason，保留 doc 条目计数披露。
+    """
+    stream = ann["stream"]
+    text_units = [u for u in ann["units"] if u["char_span"] is not None]
+    seg_ids = [u["gold_segment_id"] for u in text_units]
+    folded = fold_ws(parsed_text) if isinstance(parsed_text, str) else ""
+    if not na_reason and not folded:
+        na_reason = "empty_parsed_text"
+    per_n = {}
+    for n in n_grid:
+        if na_reason:
+            per_n[n] = {"ari": None, "n_ari_units": 0,
+                        "unmatched_chunks": 0, "cross_chunk_units": 0,
+                        "uncovered_units": len(text_units),
+                        "na_reason": na_reason}
+            continue
+        chunks = b1_fixed_length(folded, n)
+        proj = project_chunks_to_units(chunks, stream, text_units)
+        labels = [proj.attributions.get(u["unit_id"])
+                  for u in text_units]
+        ari, _stats = ari_units_vs_chunks(seg_ids, labels)
+        per_n[n] = {
+            "ari": ari,
+            "n_ari_units": sum(1 for x in labels if x is not None),
+            "unmatched_chunks": len(proj.unmatched_chunk_indexes),
+            "cross_chunk_units": len(proj.cross_chunk_unit_ids),
+            "uncovered_units": len(text_units)
+            - len(proj.attributions),
+            "na_reason": None,
+        }
+    return {
+        "doc_id": ann["doc_id"],
+        "chars": len(stream),
+        "parsed_chars": len(folded),
+        "text_units": len(text_units),
+        "nontext_units": len(ann["units"]) - len(text_units),
+        "results": {SYSTEM_TEXT_CONTROL: per_n},
+        "na_reason": na_reason,
     }
 
 
