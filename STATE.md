@@ -121,6 +121,22 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2039 — evaluation.cli run/validate-report 通道残留面（1b/b 换轴 evaluation 侧，R2038 建议，3 测试）
+
+- 任务：evaluation CLI 两子命令的通道残留面探针（换轴首投），main 只读 @ `6c6d398`（运行前后 status clean，全程 PYTHONDONTWRITEBYTECODE=1）。探针 outputs/autonomous/probe_eval_cli_r2039.py + .out（未入库）；子进程真实 CLI（main venv `python -m evaluation.cli`），cwd=临时目录、PYTHONPATH=main 根；合成 DOCX 夹具复制 main tests/test_evaluation_cli.py 构造法。
+- 覆盖面：main test_manifest.py 仅**进程内**锁 documents[].path 三类守卫；test_evaluation_cli.py 仅 7 测（run/annotation e2e、validate-report 正例+缺文件、缺/坏 manifest、expected failures）。残留五面：① annotation_file 字段守卫（manifest.py:178-182 第二个 _resolve_relative_path 调用点）② expected_failures[].path 守卫（第三调用点）③ _detect_project_root 语义 ④ workers 1 vs 2 等价 ⑤ validate-report 负例信封——main 全部零覆盖（自跑 test_evaluation_manifest_edges* 在进程内锁的是自跑分支旧 evaluation 副本，与 main-targeting 无关）。
+- **C0 对照先通过**：main e2e 复现（run rc 0 [OK] + validate-report rc 0），一次通过。
+- 发现（E1–E6，**全部成立，零行为偏差**）：
+  - **E1 成立**：annotation_file 三类违规（绝对/反斜杠/越根）经 CLI → rc 1 + `[ERROR] 清单加载失败` + 字段名 `documents[TEST-001].annotation_file` 进报文 + 不写盘；
+  - **E2 成立**：expected_failures[].path 三类违规同信封，字段名 `expected_failures[ERR-1].path`；
+  - **E3 成立**：(a) 同 manifest 换 cwd 跑 → 去时变字段后报告逐字段相等（project_root 探测锚定 manifest 位置，与 cwd 无关）；(b) 嵌套 manifest（pyproject 在根、manifest 在 samples/devset/）→ 路径相对根解析（最近祖先）；(c) 全链无 pyproject → 回退 manifest 父目录为根，rc 0 + pipeline_success=True + git_commit=None（stdout 打 unknown）。**附带偏差观察（记录不修 r54）**：load_manifest docstring（manifest.py:149）称"向上找 .git 或 pyproject.toml"，实现 _detect_project_root 只找 pyproject.toml——文档/实现不一致；
+  - **E4 成立**：3 docs × workers=2（真走 Pool.imap，Windows spawn）vs workers=1 → 保 manifest 原序、去 run_timestamp_iso/per_doc.wall_time_seconds 后**全报告相等**（含 summary/devset/provenance 其余字段）；2 docs + workers=2（<3 任务）静默走顺序路径 rc 0 全成功（CLAUDE.md 已记录行为，锁边界）；
+  - **E5 成立**：validate-report 负例——坏 JSON → rc 1 `[ERROR] JSON 解析失败`；非报告 JSON（{}）→ rc 1 [FAIL] 投诉 report_version required；删 per_doc → [FAIL] 精确投诉；report_version=9.9 → [FAIL] 枚举投诉（'9.9' is not one of ['1.1','1.2','1.3']）；目录输入 → rc 2 不存在；
+  - **E6 成立**：expectations.max_silent_drop_count 无 element_count_by_type → rc 1 清单加载失败，报文点名两键（manifest.py:184-189 前置检查，main 零测试覆盖）。
+- 加测 3：`tests/test_eval_cli_channel_r2039.py`——(1) manifest 字段守卫经 CLI 信封（annotation_file 三类 + expected_failures[].path 越根 + max_silent_drop_count 前置检查，共 5 子例，documents[].path 保持合法以证明触发点）；(2) workers 1 vs 2 全报告等价 + 换 cwd 等价 + <3 任务顺序路径边界；(3) validate-report 负例信封五形态。被测 main 按 `git worktree list --porcelain` 动态定位（零硬编码路径，缺目标显式 SKIP）。
+- 定向：新文件 3 passed 7.65s；邻居 test_schema_routing_cli_r2038.py + test_evaluation_cli_edges177.py + test_evaluation_cli_edges168.py + test_evaluation_cli.py 合计 115 passed 36.26s；main worktree 全程 clean。全量不跑（加测纯子进程型）；预测锚 **102067 + 3 = 102070**（R2038 预测锚，本轮 +3）。
+- 下次建议：1b/b 换轴续投 evaluation 侧（metrics.py/annotation_metrics.py 进程内面已密、CLI 面基本由本批闭合——可转向 container_verify 分区断言面（R2038 备选）或 schemas/annotation.schema.json 通道面）；docstring .git 偏差已入指示线候选池（可选：manifest.py:149 文档修正一句话，属 main 改动需指示线裁决）。
+
 ## Round 2038 — schemas 0.6.0 family 路由 + validate 子命令契约面（1b/b，R2037 建议沿用，3 测试）
 
 - 任务：schemas/document.schema.json 0.6.0 扩展类型 family 路由与 `validate` 子命令契约（批次 20）的 CLI 通道残留面探针，main 只读 @ `6c6d398`（运行前后 status clean，全程 PYTHONDONTWRITEBYTECODE=1）。探针 outputs/autonomous/probe_schema_routing_r2038.py + .out（未入库）；子进程真实 CLI（main venv `python -m app.cli validate/parse`），cwd=临时目录、PYTHONPATH=main 根；手造 JSON 骨架形状参照 main tests/test_schema_source_type_open.py 的 `_udm` 夹具（只读参考）；探针插件先确认 base.py 基类实名 `Parser`（parse(path, source_hash)）。
