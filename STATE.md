@@ -121,6 +121,21 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2038 — schemas 0.6.0 family 路由 + validate 子命令契约面（1b/b，R2037 建议沿用，3 测试）
+
+- 任务：schemas/document.schema.json 0.6.0 扩展类型 family 路由与 `validate` 子命令契约（批次 20）的 CLI 通道残留面探针，main 只读 @ `6c6d398`（运行前后 status clean，全程 PYTHONDONTWRITEBYTECODE=1）。探针 outputs/autonomous/probe_schema_routing_r2038.py + .out（未入库）；子进程真实 CLI（main venv `python -m app.cli validate/parse`），cwd=临时目录、PYTHONPATH=main 根；手造 JSON 骨架形状参照 main tests/test_schema_source_type_open.py 的 `_udm` 夹具（只读参考）；探针插件先确认 base.py 基类实名 `Parser`（parse(path, source_hash)）。
+- 覆盖面：main **进程内**已全锁（test_schema_source_type_open：路由矩阵正负例/0.1.0–0.5.0 守卫/pattern 边界/内置六类型 0.5.0+0.6.0 双版本一致/writer 常量；test_pipeline_contract_check：契约检查三态进程内；test_plugin_myx_fullchain：.myx 真实 CLI 全链含 liar source_type 违规）；CLI `validate` 在 main 只对 **parse 产物**复检过。**手造 JSON 经真实 CLI validate 的路由矩阵/历史守卫**与**契约缝隙端到端**两侧零覆盖；自跑旧 tests/ 的 validate 面跑在旧基线 app（base 2c35244，无 0.6.0），与 main-targeting 无关。writer 版本常量角度确认 N/A（parse 不吃 JSON 输入），C0 顺带实证 parse 输出恒 0.6.0。
+- **C0 对照先通过**（内置 .md `--parser auto` → parse rc 0 + schema_version=0.6.0 + family=line_address + validate rc 0 [OK]；注意默认 fallback 不支持 .md，须 auto/显式 markdown）。首跑 C0 即因此失败（fallback unsupported_type），修正后 55/55 PASS，**零契约-实现偏差**。
+- 发现（E1–E5）：
+  - **E1 路由矩阵 CLI 面成立**：扩展类型@0.6.0 四 family 正例（含 structural_index 仅 family 自身——docx_locator minProperties=1 把 family 计为一个属性；line_address 扩展键 additionalProperties true）全 rc 0；负例（缺 family/未知 family/各 family 错形状）全 rc 1 [FAIL]，stderr 报文含精确投诉（required property / not one of / minimum of 1 + JSON path）。
+  - **E1mix 边界观察（记录非缺陷）**：多 element 混 family（各自形状自洽）→ validate rc 0——schema 按**逐 element** 路由，跨 element family 一致性属 parse 期契约检查职责（全局绑定 vs 每个 locator.family），schema 层无此约束；消费方若假设同文档 family 单一会漏检，契约文档未显式陈述此分工。
+  - **E2 历史守卫 + 双版本一致 CLI 面成立**：0.1.0–0.5.0 × 扩展类型全拒（历史不回写）；内置六类型 × {0.5.0, 0.6.0} 全过（升版零回归承诺端到端）；0.6.0 内置缺 family 拒（family 绑定分支已扩到 0.6.0）。
+  - **E4 职责缝隙实证（契约设计行为，非缺陷）**：手造 smk@0.6.0 + family=page_geometry/page=1（family 路由自洽合法）→ **validate rc 0 [OK]**（纯 schema 无 parser 上下文）；同内容经声明 smk/line_address 但产 page_geometry 的真实插件 parse → rc 1 + parser_contract_mismatch + details 四要素（parser_name/actual_source_type/expected_locator_family/offending_element_ids）+ **不写盘**；诚实插件对照 rc 0 且 validate 产物 rc 0——拦截由声明绑定驱动、非形状歧视，与 CLAUDE.md"validate 子命令纯 schema 校验"契约逐项一致。
+  - **E5 错误信封**：两处 schema 错 → "Schema 校验失败 (2 处)"计数报文；非 JSON 文件 → rc 1 "[FAIL] … JSON 解析失败"（同信封非独立形态）；缺文件/目录 → rc 2。
+- 加测 3：`tests/test_schema_routing_cli_r2038.py`——(1) 0.6.0 family 路由矩阵经真实 CLI validate（正例七形态含混 family + 负例六形态含报文投诉断言）；(2) 0.1.0–0.5.0 守卫 ×5 + 内置六类型双版本一致 ×12 + 0.6.0 内置缺 family；(3) 职责缝隙端到端（validate 放行手造契约违规 JSON + liar 插件 parse 拒收 details 三要素不写盘 + 诚实插件对照双 rc 0）。被测对象按 `git worktree list --porcelain` 动态定位 main（零硬编码路径，缺目标显式 SKIP）。首跑暴露 `_udm` 调用名笔误（sed 修正 7 处）后全过。
+- 定向：新文件 3 passed 13.26s；邻居 test_registry_cli_freeze_and_rejects.py 3 + test_plugin_cli_spec_forms.py 3 + test_jsonlog_cli_edges.py 3 + test_batch_cli_spawn_edges.py 3 合计 12 passed 15.62s；main worktree 全程 clean。全量不跑（加测纯子进程型）；预测锚 **102064 + 3 = 102067**（R2037 实测锚）。
+- 下次建议：R-A/R-B 行为缺口或 1b/b 换轴（evaluation 侧新模块 / container_verify 分区断言面）；schema 0.6.0 路由面已闭合，不建议再投轮；E1mix 分工观察已入指示线候选池（可选：契约文档补一句"跨 element family 一致性由 parse 期契约检查保证，validate 不查"）。
+
 ## Round 2037 — 收集数锚核对（新锚后第 1 次连续精确命中）+ 耗时漂移抽样（1b/f 校准轮，零测试新增）
 
 - 任务：R2029"计数链失效"教训的制度化核对——重锚（102052，R2029 实测）后 +3xN 预测链首次逐轮实测锚定；抽样已知慢文件与第 138/139 次基线耗时锚点对照。零测试新增（校准轮默认）。
