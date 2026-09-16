@@ -121,6 +121,15 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2042 — 指示线候选池盘点归档 + 收集数锚核对（1b/f 校准轮，零测试新增）
+
+- 任务：f 队列校准轮——① R2028–R2041 各轮散落的"指示线候选"归档成单一盘点件（r54 纪律：候选不实施）；② 收集数锚核对（R2037 先例沿用）。零测试新增、零语料改动；main 目标 SHA `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（`git worktree list --porcelain` 动态核对，本轮未在 main 跑任何命令）。
+- 盘点件：`outputs/autonomous/candidates_inventory_r2042.md` + 同名 `.json`（sort_keys + ensure_ascii=False 规范化；均未入库）。**主表 22 条**——文档一句话修正 7（C01 workers 上限 help / C02 后缀双通道不对称 / C03 跨 family 分工未文档化 / C04 manifest.py:149 .git docstring / C05 EXIT_RUN=6 死常量 / C06 tolerance 落盘承诺偏差 / C07 跨进程丢行未披露）；代码修复需裁决 9（C08 行空表裸 ValueError / C09 目录通道静默剔除 / C10 目录名 *.md 措辞误导 / C11 插件 BaseException 穿透 / C12 --log-file 裸 traceback / C13 _RESERVED 缺三键 / C14 --image 空串 mode 标签 / C15 坏 JSON 静默吞四通道不可见 / C16 doc_id 交叉核对缺失）；仅披露 6（D01–D06：嵌套 w:p / w:p 直挂 tbl / 不可序列化 extra 丢行 / --verbose 混流 / register 校验顺序 / annotation.schema.json 装饰性）+ **R-I 语料治理另表 5 条**（G01 source-lock 三桶 / G02 真死重 / G03 克隆压缩候选 A–D / G04 三块统一净额 / G05 B 桶分层）。每条含来源轮次/特征锁定摘要/建议处置/影响面；盘点不产生新候选、不删减。盘点结果即 2026-09-21 周期简报候选池素材。
+- 收集数锚核对（**精确命中**）：worktree venv 跑 `pytest --collect-only -q -p no:cacheprovider`（PYTHONDONTWRITEBYTECODE=1，R2037 同口径）→ 实测 **102076 tests collected（12.08s）= 预测锚 102076**（102073 + 3：R2041 加测，本轮零加测）——重锚（102052，R2029）后**第 2 次实测精确命中**（第 1 次 R2037，中间 R2038–R2041 为纯预测链）。输出 102078 行 = 102076 node ID + 空行 + 尾行，零收集错误（"error" 4389 命中全为测试名子串）；证据 outputs/autonomous/collect_only_r2042.out（未入库）。
+- 下次建议：1b/b 探针续投（R-A/R-I 行为缺口或换轴新模块；annotation 通道 / container_verify 信封 / schema 路由 / registry 契约四面上轮起均已闭合不建议再投）；**2026-09-21 周期简报窗口做下一次全量实跑**（预测 102076 + 3xN，N=其间加测轮数；重采 --durations=25 对照漂移锚点两项；候选池直接引用本轮盘点件）。
+
+---
+
 ## Round 2041 — evaluation run 的 annotation 内容降级信封（1b/b 换轴 evaluation 侧，R2040 建议，3 测试）
 
 - 任务：`evaluation run` 对 annotation 文件四形态（缺文件 / 坏 JSON / {} / 缺键 JSON）的区分度矩阵 + annotation v1.1 新键（table_caption_pairs）消费路径 + schema 装饰性 + 落盘信封键剔除，main 只读 @ `6c6d398`（运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_annotation_env_r2041.py + .out（未入库）；子进程真实 CLI（main venv `python -m evaluation.cli run`），cwd=临时合成根 + PYTHONPATH=main 根；合成 DOCX 夹具复制 main tests/test_evaluation_cli.py 构造法。
