@@ -121,6 +121,15 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2020（字符串括号不平衡 + 八进制转义边界）
+
+- **家族**：PDF 字符串括号深度/不平衡 + 八进制转义边界。edges30（R1419）只锁 é→'Ø'/\(\)/
+→(cid:10)/续行/空串；未锁形态 grep 实证零覆盖。
+- **探针**：outputs/autonomous/probe_pdf_paren_octal_r2020.py。
+- **测试**：tests/test_parser_pdf_paren_octal_edges.py（6 用例全过）。T1 `((NEST))` → **'(NEST)'**（规范语义：嵌套括号属字符串内容，非 'NEST'）；T2 `(A)) Tj` → 串在首个 ')' 结束、游离 token 静默丢弃 → 'A' 零告警；T3 `((A) Tj` 未闭合 → 流尾全吞成串 → 零文本 + pdf_no_text_extracted；T4 `(Ā)` 八进制越界 → psparser 在 **extract_words 阶段**抛 "Invalid octal b'400' (256)" → **双告警** pdfplumber_word_extract_failed（details page=1）+ pdf_no_text_extracted；T5 `( )` → (cid:0) 零宽占位；T6 `(\8)` 非法位 → 零文本 + 单告警。
+- **判别式**：T1 若剥内层括号翻；T2 若异常翻；T3 若 'A' 存活翻；T4 若单告警翻；T5 若空串翻；T6 若当 '8' 提取翻。
+- **计数影响**：+6（101973 → 101979）。
+
 ## Round 2019（十六进制字符串文本操作数退化形态）
 
 - **家族**：PDF `<hex>` 串作 Tj 操作数。历史夹具全部用 (...) 字面串（grep 实证 hex 串零覆盖，edges30 只锁 () 转义）；pdfminer PSBaseParser hexstring token 化。
