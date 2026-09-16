@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2025（内容流操作数栈污染 + BX/EX 未实现）
+
+- 家族：a 队列（pdfminer 内容流解释器退化行为，grep 实证零覆盖）
+- 探针：outputs/autonomous/probe_pdf_stack_pollution_r2025.py（E0-E5 六例，先实证后落锁）
+- 锁定行为（tests/test_parser_pdf_stack_pollution_r2025.py，6 用例）：
+  - 未知算子非 STRICT 静默跳过且不清栈（pdfinterp.py:1417-1447）；已知算子 pop 恰取栈顶 nargs，多余操作数永久残留、整个内容流共享一栈
+  - E1/E5 Td/Tf 多余前置操作数被吸收 → 基线不变（'BODY' [100, 82.484, 134.008, 94.484] 零告警）
+  - **E2 跨 ET 栈泄漏换位**：块1 残留 300 被块2 `/F1 Tf` pop2 吞作 fontid（int 键查表静默失败）、/F1 落字号位 float_value(PSLiteral)→None → stderr "invalid float value"、字体未设；叠加 do_BT 空方法体（pdfinterp.py:1015-1031，docstring 声称重置矩阵实现是 no-op）位置沿用块1 Td → 'TAIL' 零宽盒 [100, 80, 100, 92] 零告警（stderr 不进 warnings）
+  - E3 BX/EX 同为空实现 → 块内内容照常解释、基线不变（兼容性段不抑制任何操作）
+  - E4 未知算子 /Foo 夹在操作数与 Tj 之间 → 忽略、Tj 照常
+- 计数影响：+6（全量预测 102010 → 102016）
+- 提交：tests + STATE.md；消息 "tests: operand stack pollution, cross-ET position leak via no-op BT, BX/EX unimplemented (Stage 8 autonomous R2025)"
+
 ## Round 2024（页树图退化：环/重复 Kids/指向 Catalog）
 
 - 家族：pdfpage.create_pages depth_first_search 的 visited 集合（pdfpage.py:109-111）图形态行为；/Count 权威性已由 edges111 锁，图形态（自环/互环/重复 Kids/Kids 指向 Catalog/悬空整数）grep 实证零覆盖
