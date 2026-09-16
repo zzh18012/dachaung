@@ -121,6 +121,17 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2022（/Font 条目 spec 退化形态）
+
+- 家族：get_font（pdfinterp.py:212-250）分派路径；spec 退化 grep 实证零覆盖（edges35 只锁未注册名 fontmap 缺失）
+- 探针 R2022 实证（好字体 '(FONT)' 基线 [100, 82.484, 132.664, 94.484]）：
+  - 六种垃圾形态同归零宽框：spec 数字 42 / null / 空字典 / 未知 Subtype /Nope（else 分支照样落 Type1，"this is so wrong!"）、/Font 容器 42、/Resources null → 'FONT' 照出 bbox [100, 80, 100, 92]、零告警；前四者 dict_value→{} → 默认 Type1 "Unknown"（fontmap 命中但无度量）、后两者 fontmap 缺失——机制不同、观测收敛（与 edges35 [72,80,72,92] 同一零宽公式）
+  - Type0 缺 DescendantFonts → spec["DescendantFonts"] 直接 KeyError → 双告警 pdfplumber_word_extract_failed（reason 含 "'DescendantFonts'"，details page=1）+ pdf_no_text_extracted
+  - Type0 DescendantFonts 空数组 → 裸 assert dfonts → AssertionError 空 str → 同双告警但 reason 尾部空串
+- 判别式：垃圾形态若零宽框翻；E7 若 reason 不含键名翻；E8 若 reason 非空串翻
+- 测试：tests/test_parser_pdf_fontspec_degenerate.py（基线 + 参数化 6 垃圾 + 2 Type0，9 用例）
+- 计数影响：+9（101988 → 101997）
+
 ## Round 2021（/Contents 非流退化形态与混合数组）
 
 - 家族：/Contents 期望流引用或流引用数组（pdfpage._parse_contents resolve1）；非流形态 grep 实证零覆盖（edges20 等只锁合法数组形态）
