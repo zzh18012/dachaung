@@ -121,6 +121,22 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2031 — plugin_loader spec 形态 CLI 层结构化分类（1b/b 探针轮收尾；上轮 API 中断，本轮恢复收尾+对照组修正，3 测试）
+
+- 背景与污染修正：上轮（R2031 首跑）死于 API 网络错误，遗留探针输出（现更名 probe-plugin-loader-r2031.out.prev）**对照组 C0 也失败**——样例插件误写 `from app.parsers.base import BaseParser`（main 基类实名 `Parser`，base.py `__all__` 仅 Parser/ParserError/make_document_id/detect_source_type），E4/E7/E8 三实验被污染（loader 报 plugin_import_failed 本身没错，但没测到 intended 场景）；E1/E2/E3/E5/E6 不受影响。本轮修正：模板基类改 `Parser`（契约字段齐全：source_types=("text",)+locator_family="line_address"，批次 20/21 合法组合），修 E7 探针 bug（inspect-parser 误用类名 RecB 而注册名是 rec_b），补 C0/E8 provenance 端到端查询，重跑全部实验（目标 main `6c6d398` 运行前后 status clean，零写入）。
+- 重跑判读（outputs/autonomous/probe-plugin-loader-r2031.out）：
+  - **C0 通过 → 探针有效**：合法 dotted 插件 rc 0 上榜，inspect-parser 六键 loaded_via="plugin"/plugin_spec=原始 spec
+  - **E7 递归加载分类正确**：load_plugins(['rec_a']) → parsers_added=["rec_a","rec_b"]（外层首载增量含递归注册的 rec_b）；二次 load_plugins(['rec_b']) 命中 _FIRST_LOAD 备忘返回其自身首增量 ["rec_b"]，不重导入。**归因精确**：RecB 快照 plugin_spec=="rec_b"（ContextVar 栈式最内层上下文生效，不误归外层 'rec_a'）
+  - **E8 循环导入半加载态成立**：circ_a↔circ_b 双双注册成功（circ_b import 部分初始化的 circ_a 仅取模块对象）；二次 load_plugins(['circ_b']) → sys.modules 命中 parsers_added=[]（docstring 明示的"本函数之外途径预导入 diff 为空"情形）；sys.modules 残留 [circ_a, circ_b]；CircB plugin_spec=="circ_a"（裸 import 在外层插件上下文内完成注册）
+  - **E1/E2 行为发现（特征锁定，不定性缺陷）**：import 期 sys.exit(7) → rc=7、stdout/stderr 全空、无结构化错误（SystemExit 是 BaseException，穿透 load_plugins `except Exception` 与 CLI `except PluginLoadError`）；KeyboardInterrupt 同族（Windows rc 0xC000013A + 裸 traceback）。CLAUDE.md 批次 19 枚举的失败示例全是 Exception 子类，无明确契约违反 → 指示线候选：插件 import 期 BaseException 处置裁决（捕获转结构化 vs 维持穿透）
+  - **E3/E5/E6**：点前缀/绝对路径/空 spec → rc 1 + plugin_import_failed + error_type=ValueError + plugin 字段保留原始 spec + 无 traceback，与批次 19 契约一致
+  - **E4 intended 场景确认**：".py" 后缀 spec 按 dotted 语义拆父子模块——父模块在 PYTHONPATH 真实存在也失败（ModuleNotFoundError: 'my_plug' is not a package）；**副作用**：报错即证明父模块已被完整执行（含 @register，与 R1909 边角 1"失败导入无回滚"同族，CLI fail-fast 退出无出口）
+- novelty 判定：main 侧 test_plugin_loader.py 的 CLI 结构化失败只覆盖 missing-module 与重名两类 spec；路径形态/空 spec 仅库层覆盖（test_parser_provenance.test_plugin_spec_rejects_paths 直调 _plugin_registration_context）；".py" 后缀 spec 分类两层零覆盖；inspect-parser 经 subprocess 真实 CLI 的端到端零覆盖（main 同名测试走进程内 app_main）。自跑 tests/ plugin 面 git grep 零命中。
+- 加测 3：`tests/test_plugin_cli_spec_forms.py`——(1) 路径形态+空 spec 的 CLI 结构化契约（rc 1 / plugin_import_failed / error_type=ValueError / plugin 保留原始 spec / 无 traceback）；(2) ".py" 后缀 spec 分类（ModuleNotFoundError + "is not a package"）；(3) 合法插件端到端 happy path（list-parsers 上榜 + inspect-parser 恰六键 + loaded_via/plugin_spec）。被测对象经 `git worktree list --porcelain` 动态定位 branch=refs/heads/main 的 worktree（零硬编码绝对路径；未来搬运回 main 后同一逻辑定位自身），subprocess 走其 venv 真实 CLI + PYTHONDONTWRITEBYTECODE=1 + cwd/PYTHONPATH 指向临时目录，目标缺失显式 SKIP 不伪造；E1/E2 按指示只记行为发现不入测试。
+- 定向：新文件 3 passed 2.58s；邻居 test_cli.py + test_cli_error_exits.py + test_cli_edges.py 154 passed；main worktree 全程 clean。全量不跑（零依赖变化、加测纯子进程型）；预测锚 **102052 + 3 = 102055**（R2029 再锚定口径）。
+- 探针产物（未入库）：probe_plugin_loader_r2031.py（修正版）、probe-plugin-loader-r2031.out（重跑）、probe-plugin-loader-r2031.out.prev（污染首跑存证）。
+- 下次建议：R-I 候选序继续（R-A/R-B 行为缺口）或 1b/b 换轴（batch.py 并行通道 / parser_registry 快照语义残留面；jsonlog 已轮过）。
+
 ## Round 2030 — 无断言函数面价值分类（R-I 延续轮，纯分析零改动；上轮 API 中断的恢复收尾）
 
 - 背景：上轮扫描完成、写报告前死于 API 连接失败；本轮复用扫描件收尾（扫描器与桶定义零改动）。产物 outputs/autonomous/noassert_triage_r2030.md + noassert_r2030_data.json（+ 过期 json 备份 .prev.json，均未入库）。
