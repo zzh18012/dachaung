@@ -121,6 +121,16 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2028 — source-lock 族深挖（R-I 延续轮，纯分析零改动）
+
+- 任务：R2027 发现语料 31% 函数对我方源码文本做 grep 式断言但未裁决；本轮 AST 精确重测 + 目的复原 + 三维评估 + 三桶裁决数据点。产物 outputs/autonomous/source_lock_triage_r2028.md + source_lock_r2028_data.json + 扫描器 source_lock_scan_r2028.py（均未入库）。
+- 方法与修正：AST 定义 = 获取源码文本（inspect.getsource / __doc__ / _src() helper，693 文件）且 assert 直接作用于该文本。**修正 R2027 计数：28,169 静态函数（29.7%）/ 1,226 文件（61.9%）**，R2027 正则高估 4.2%（净 ~1,232）；收集态估 ~30,465（29.8%）。另有 ~208 个 ast.parse 后断树节点者不计入（锁结构非文本）。
+- 构成：evaluation 七子域占 98.9%（runner 5565 / cli 4208 / annotation_metrics 3923 / metrics 3810 / schema* 3554 / report 3371 / manifest 3026 / __init__ 311），app 侧仅 ~311。形态：forbidden-token 15593（55.4%）、required-line 7266（25.8%）、required-token 4265（15.1%）、shape-lock 1885、doc 814、compare 774、doc-truthy 403、length 249。同 token 重复度病：eval( 878 次、exec( 856、from __future__ import annotations 322。
+- 目的复原（14 样本）：required 类锁的是行为契约的**拼写**——抽样 5/5（pipeline_success 赋值行、_null 字面量、CLI default=fallback、=30 容差、return metrics）在语料中已有逐字重复的行为断言；forbidden 类锁静态卫生（危险 API/依赖禁令），sys.modules 行为版只覆盖 import 面；唯一真语义边界静态锁 = figure_caption_prf 禁调 normalize_text（edges18）。语料中**不存在**预注册字节不变性类合法化石锁。
+- 三维：耗时——edges33 376 passed 1.54s（4.1ms/测试）、runner34+cli33 520 passed 4.16s（8.0ms），低于套件均值 13-18ms，收集态估占套件 ~7-15%，非问题；重构脆性——1,213/1,226 文件出生后零修改，13 个多 commit 全为 harness 修正，被锁源 evaluation/*.py 仅 1-3 commits，唯一真实重构（7e1246d metrics.py ±56 行）早于该族出生且由行为测试吸收 => 脆性潜伏未触发；缺陷捕获——套件史唯一真实回归失败（reg56 sys.argv 污染）由行为测试抓获，source-lock 出生即绿 0 捕获（第 103 次连续 0 失败覆盖全部在世窗口）。
+- 三桶（互斥启发式分配）：**纯重构噪声 10,777（38.3%）**（shape/import 行/docstring 措辞/count 类：重构必碎且碎得无信息）/ **可被行为测试替代 8,742（31.0%）**（契约拼写锁，行为等价物已存在，删除零损失）/ **合法文本锁 8,650（30.7%）**（危险 API 静态禁令 + doc-truthy：无行为全等价、该锁文本，但子串匹配过宽 + 同一检查重复 700-880 次，每模块一条 AST 断言可压缩三个数量级）。
+- 裁决建议数据点（不构成行动）：R-I"测试数不等于效果证据"在此族最尖锐——删可替代桶零防护损失；合法桶可 8 条 AST 卫生测试替代 8,650 条的 99%；噪声桶唯一损失是数字变小。若未来重构 evaluation/*，先处理三桶否则 28k 断言同时碎裂（该族从无用变有害的唯一路径）。下次：R-I 候选序推进（R-A/R-B 行为缺口或无断言 4,118 函数面）。
+
 ## Round 2027 — 测试语料价值分类（external review R-I，纯分析零测试改动）
 
 - 任务：R-I 项（ADOPTION.md §132）——10 万+自跑测试的"测试数"不宜写成效果证据；对只锁第三方库极端内部行为的测试须按 运行耗时/版本升级失败噪声/是否曾抓到真实缺陷 筛选。本轮**纯分析**：不删不改不加任何测试文件，产出分类数据供裁决。
