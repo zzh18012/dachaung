@@ -121,6 +121,28 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2040 — container_verify 退出码信封 + 校验和先于 docker load 排序证明（1b/b 回 container 侧，R2039 建议，3 测试）
+
+- 任务：main `scripts/container_verify.py` CLI 退出码信封（rc 2/3/4/5 形态 + stage 阶段序）与"校验和检查先于 docker load"排序证明，main 只读 @ `6c6d398`（运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_container_env_r2040.py + .out（未入库）；子进程真实 CLI（main venv `python scripts/container_verify.py`）。**环境起点：本地 daemon 未运行**——Docker Desktop 为本机已装应用，启动既有程序（非安装、非配置改动、未 build/pull）后 5s 就绪 29.4.3，符合"只用本地已有 daemon"边界。
+- 覆盖面：main 已锁 logic **22 测**进程内（compare/partition/sha256/边车双形态/load_artifact 校验和不符函数面/vol/合成夹具）+ e2e 4 测 docker-gated 快乐路径（entrypoint help/image config/verify --image 全通过/制品 save→gzip→边车→rmi→--artifact 往返）+ static 11 测；**CLI 信封负例面（rc 2/3/4/5 各形态 + 排序）main 零覆盖**（load_artifact 校验和仅函数级、未经 CLI）。
+- **C0 对照先通过**：`--help` rc 0（argparse 先于 daemon 预检）+ 真实 daemon 下坏制品 rc 4 `artifact_missing`（≠3，daemon 可达证明）。前置 E0：DOCKER_HOST env 覆盖优先于 desktop-linux context（npipe/tcp 双形态 `docker version` 均 rc 1）。
+- 发现（E1–E14，**15 成立 + 1 观察 + 1 缺陷候选，零行为偏差**）：
+  - **E1/E2 成立**：bogus DOCKER_HOST（npipe 不存在管道 / tcp://127.0.0.1:1 拒连）→ rc 3 + JSON `result=FAIL stage=daemon_preflight`；
+  - **E3 成立（排序上半）**：坏 daemon + 制品不存在 → rc 3 非 4——daemon 预检先于制品存在性/校验和检查；
+  - **E4–E6 成立**：rc 2 三形态（无参 / --image+--artifact 互斥同给 / 未知 flag），stderr usage、stdout 无 JSON 信封；
+  - **E7/E8 成立**：制品缺文件/路径是目录 → rc 4 `artifact_missing`；**E9 成立**：边车缺 → rc 4 `artifact_load`「读取 sha256 边车失败」；
+  - **E10 成立（排序核心）**：边车不匹配 → rc 4 `artifact_load`「校验和不符」，镜像清单前后不变——该报文只在 docker load 之前产生 → **load 未被尝试**；
+  - **E11 成立（排序下半）**：好校验和 + 垃圾 gzip（边车为垃圾真实 sha256）→ rc 5 `artifact_load`「docker load 失败」——checksum 已过、死在 load；镜像清单不变（垃圾制品不产生镜像）。与 E10 同 stage 不同错误文本/不同 rc，构成"checksum 先于 load"的 CLI 级证明；
+  - **E12 成立**：`--image` 假 tag → rc 5 `image_contract`（docker image inspect 失败路径）；
+  - **E13 观察（记录不修 r54）**：`--image ""` → rc 5 `image_contract` 但 `mode="artifact"`——空串 falsy 被 mode 判定当 artifact 模式标签（实际走 image 检查），信封标签 quirk；
+  - **E14 缺陷候选**：`EXIT_RUN=6` 死常量——模块 docstring 承诺"6=容器/宿主执行失败"，但 `main()` 实际返回集 = {0,2,3,4,5,7}（run_semantic_suite 的容器/宿主执行失败折叠进 problems → rc 7），无任何路径返回 6：文档/实现不一致（记录不修 main，已入指示线候选池）；
+  - **rc 7 如实不锁**：需语义对照失败（要故意错误镜像，构建超本轮边界）；rc 6 因 E14 不可达，同样不伪造。
+- 加测 3：`tests/test_container_env_r2040.py`——(1) argparse rc 2 三形态 + --help rc 0（函数内循环，无 daemon 依赖）；(2) rc 3 双形态 + 排序上半（gate：docker CLI 存在）；(3) rc 4/5 全链 + 排序下半（缺制品/目录/边车缺/边车不匹配→4；好校验和垃圾 gzip→5「docker load」且互斥断言报文不含"校验和"；假 tag→5 image_contract；gate：daemon 可用，同 main e2e D-E 纪律显式 SKIP）。被测 main 按 `git worktree list --porcelain` 动态定位（零硬编码路径，缺 main/缺 venv/缺脚本显式 SKIP）。
+- 定向：新文件 3 passed 2.14s；邻居 main `test_container_verify_logic.py` **22 passed 0.25s**（main venv + `-p no:cacheprovider`，main 全程 clean）+ 自跑 `test_eval_cli_channel_r2039.py` + `test_schema_routing_cli_r2038.py` + `test_registry_cli_freeze_and_rejects.py` 合计 9 passed 27.62s。全量不跑（加测纯子进程型）；预测锚 **102070 + 3 = 102073**（R2039 预测锚，本轮 +3）。
+- 下次建议：1b/b 换轴 evaluation 侧（metrics/annotation_metrics 的 CLI 面、report 通道残留）或 schemas/annotation.schema.json 通道面——container_verify 信封面本轮已闭合（rc 6/7 不廉价构造已如实记录，不建议再投轮）；E13/E14 已入指示线候选池（docstring 退出码行与 EXIT_RUN 修正属 main 改动，需指示线裁决）。
+
+---
+
 ## Round 2039 — evaluation.cli run/validate-report 通道残留面（1b/b 换轴 evaluation 侧，R2038 建议，3 测试）
 
 - 任务：evaluation CLI 两子命令的通道残留面探针（换轴首投），main 只读 @ `6c6d398`（运行前后 status clean，全程 PYTHONDONTWRITEBYTECODE=1）。探针 outputs/autonomous/probe_eval_cli_r2039.py + .out（未入库）；子进程真实 CLI（main venv `python -m evaluation.cli`），cwd=临时目录、PYTHONPATH=main 根；合成 DOCX 夹具复制 main tests/test_evaluation_cli.py 构造法。
