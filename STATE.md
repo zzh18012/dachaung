@@ -121,6 +121,17 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2027 — 测试语料价值分类（external review R-I，纯分析零测试改动）
+
+- 任务：R-I 项（ADOPTION.md §132）——10 万+自跑测试的"测试数"不宜写成效果证据；对只锁第三方库极端内部行为的测试须按 运行耗时/版本升级失败噪声/是否曾抓到真实缺陷 筛选。本轮**纯分析**：不删不改不加任何测试文件，产出分类数据供裁决。
+- 方法：静态启发式双轴打标（扫描器 `outputs/autonomous/test_triage_scan_r2027.py`，逐文件明细 `test_triage_r2027_data.json`，完整报告 `test_triage_r2027.md`）。输入轴 valid/malformed（畸形标记词，中英双语；手搓但结构合法的 PDF 记 valid——手搓字节 ≠ malformed）；断言轴 our-contract（warning/elements/chunks/schema/rc/metric 字段/CLI 返回码）vs third-party-geometry（bbox/x0/pdfminer/do_Td 等几何上下文 + ≥2 位小数或 approx，含 helper 委托传导）vs source-lock（inspect.getsource 源码文本 grep 断言，计划外语料发现，单列）。文件级：C=infra/meta、B=手搓格式字节且几何断言 ≥50%、A=其余（混合文件从严归 A → B 为严格下界）。
+- 计数（静态 94,908 函数/1985 文件；collect-only 15.91s 实证 102,046 collected）：**A 1,936 文件/94,725 函数（99.8%）；B 45 文件/179 函数（0.19%，全部 test_parser_pdf_*+fallback_edges91，45/45 自跑分支新增、main 侧 0）；C 4 文件/4 函数**。交叉：malformed 仅 2,039 函数（2.1%）且 86% 断言落 our-contract（fallback 错误契约=我们的行为）；third-party-geometry 全语料 492 函数（0.52%，B 内 160 + A 文件内散布 332 基线锚点）；374 文件手搓 %PDF 字节但 329 个归 A（结构合法载体，锁我们契约）。
+- B 三维度实测：耗时 191 tests/39.39s ≈ 2–3% 套件耗时（13–18ms/测试均摊对照）→ 可忽略；版本升级噪声 = ≥44 函数精确小数几何断言 + 9 处第三方异常文本断言（pdfminer 异常消息措辞敏感；tests/ 零直接 import pdfminer/pdfplumber，耦合经 FallbackParser 间接传导）；缺陷捕获 = 第 133–140 次回归基线全 0 失败 → B 从未抓到出生后回归（出生即绿的探针先行产物，价值=行为存档非防线）。
+- 对 R-I 裁决建议数据点：(1) "10 万测试主要是第三方极端行为锁"按实测**不成立**（0.19%）；(2) 三维度中只有版本升级噪声对 B 构成实质风险，可考虑标记分层（third-party-lock tier）而非删除——pdfplumber 升级时这 45 文件是现成差异探测器；(3) "曾抓到缺陷"标准下最脆弱的不是 B（0.19%）而是 source-lock 族（29,401 函数=31%，evaluation forbidden-token/key-lines 批次，重构脆且从未抓过回归）——R-I 后续若扩展筛选，该族才是数量级主体；(4) autonomous baseline 101,645 计数纪律不受影响（102,046-101,645=401=R2018–R2026 新增）。
+- 边界（诚实处理）：malformed+our-warning-code 测试归 A（双轴本意）；混合文件（如 evaluation_report_edges21 6/138 几何函数）归 A 不误伤；静态正则无语义理解，our-contract 正则偏宽可能高估；timing 为 45 文件单次实测含启动摊销。
+
+---
+
 ## Round 2026（内容流注释 % 与数字词法退化）
 
 - 家族：a 队列（PSBaseParser 词法层：注释与数字 token 形态，grep 实证零覆盖）
