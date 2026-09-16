@@ -121,6 +121,15 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2019（十六进制字符串文本操作数退化形态）
+
+- **家族**：PDF `<hex>` 串作 Tj 操作数。历史夹具全部用 (...) 字面串（grep 实证 hex 串零覆盖，edges30 只锁 () 转义）；pdfminer PSBaseParser hexstring token 化。
+- **零覆盖**：hex 等价/内嵌空白/奇数位/非法字符/空串/小写 grep 实证零覆盖。
+- **探针**：outputs/autonomous/probe_pdf_hexstring_operand_r2019.py。
+- **测试**：tests/test_parser_pdf_hexstring_operand.py（6 用例全过，基线 '(HX)' [100, 82.484, 116.668, 94.484]）。T1 <4858> 与字面串逐位同；T2 <48 58> 空白被剥同 T1；T3 <4> 奇数位 → **(cid:4) 零宽占位**（半字节值 4 无字形，不是规范"尾补 0"的 '@'）[100, 82.484, 100.0, 94.484]；T4 <4G> token 化失败 → 零文本+pdf_no_text_extracted；T5 <> 空串同告警；T6 <6878> → 'hx'。
+- **判别式**：T1/T2 若 bbox 异于基线翻；T3 若 '@' 或异常翻；T4/T5 若有文本翻；T6 若大写翻。
+- **计数影响**：+6（101967 → 101973）。
+
 ## Round 2018（内容流操作数类型混淆：Tf/Tj/TJ）
 
 - **家族**：PDF 内容流操作数类型混淆。历史轮操作数全部良构（字符串/数字/名字按规范位型）；pdfminer PDFContentParser 操作数弹栈经 number_value/float_value 强转（非 STRICT 静默 0）、字符串 isinstance 检查、弹栈不足操作符整体跳过。
