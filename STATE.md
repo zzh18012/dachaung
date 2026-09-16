@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2032 — AST 级重复测试检测：克隆度量化（R-I 系列第三块拼图，纯分析零测试改动）
+
+- 任务：自跑语料（worktree tests/ 1,984 文件 / 94,917 函数 / 0 解析失败；parametrize 仅 296=0.31%，几乎全手写展开）的冗余度分层量化。产物 outputs/autonomous/dup_scan_r2032.py + dup_r2032_data.json + dup_triage_r2032.md + 抽样存证 dup_sample_r2032.py/.out（均未入库）。
+- 判定规则：去名归一化（自身名→`__fn__`、参数名按位→`__p0__`…）后 **L1**=ast.dump 逐字节相同；**L2**=再加叶子常量占位符（NUM/STR/BYTES/BOOL/NONE），已带 @parametrize 的函数整域排除，头条取"L2 族含 ≥2 个 L1 哈希"（净新增）；**L3**=语句类型骨架相同但内容不同（只计数、与 L1/L2 不可加，另给不相交 L3-only 口径）。
+- 计数：**L1 7,018 团 / 38,967 函数（41.05%）/ 冗余 31,949（33.66%）**——同文件仅 90 团 93 冗余，跨文件 31,856（99.7%，重复几乎全是跨文件盖章）；**L2 族 5,895 / 51,725（54.50%）/ 可压 45,830**；L1∪L2 真实并集 **62,087 函数（65.41%）/ 净移除上界 53,480（56.34%）**（首版并集记账错误——L2 族吸收成员的 L1 组、非不相交——已修正，报告全用修正后数）；L3 骨架共享 96.89%（形状指标）、L3-only 30,075（31.69%）。稳健拆分（≥2 语句）L1 仍有 15,425 冗余，结论不依赖单 assert 组。
+- 最大克隆团 Top 15 全是 source-lock forbidden-token 族：eval/exec/compile/globals/os_system/yaml_load/pickle_load/socket/requests/urllib/shutil_rmtree 各 **711 份逐字节拷贝**（跨 711 文件）、yield 709 / locals 706 / popen 704 / async_await 692——R2028"同检查重复 700-880 次"精化为逐字节证据；L2 最大族 10,848 函数即这些 token 团的字面量归并集。L2 parametrize 候选 Top 5：10,848（禁令 token）/ 1,039（manifest required-token，净省 ~1,039 LOC）/ 990（report 同形 ~989）/ 695（async 双禁令）/ 519（open 计数）。全语料测试函数 498,958 LOC：**L1 可删 90,386（18.1%）+ L2 压缩净省 69,225（13.9%）= 32.0% 可无防护损失移除**。
+- 抽样复核：L1 抽 5 团（最大 711 团/最大同文件 4 团/最大稳健 692 团/随机中团×2）**5/5 真克隆**（含 metrics_edges31 同文件 4 连 `compute_automatic_metrics` 同体不同名）；L2 抽 3 族 **3/3 仅字面量差异**（token/required 字符串逐成员不同）；匿名化误判 0 例，参数名映射掩盖 fixture 的理论风险未实现于样本。
+- 复跑稳定性：最终版连跑两次（各 ~98s）json sha256 均为 b243e7db…e1e6ae1、stdout diff 空——字节级可复现。
+- R-I 裁决数据点：(1) L1 删除零防护损失是**构造性事实**（同组断言集逐字节相同、同路径执行，突变体逃过一份必逃过全部 711 份；140 次基线 0 失败与"多拷贝曾拦截缺陷"零证据兼容）；(2) L2 必须**压缩而非删除**（字面量=输入空间参数化，parametrize 后收集数不变、断言语义逐条保留，防护损失仅在"删而不压"误操作下发生）；(3) 语料 65.4% 处于重复组、56.3% 可移除——102k 收集数中过半是既有断言的原样重复，R-I"测试数≠效果证据"至此三条独立证据线（R2028 语义桶 28,169 / R2030 真死重 ≈53 / 本轮逐字节克隆 62,087）。指示线候选（仅文字不实施）：A 禁令族压成每模块 parametrize 卫生测试（def 10,848→711）；B 同文件 90 团删冗余；C manifest/report 双族参数化；D 实施后重锚 autonomous baseline（收集数预计 −33k+，需指示线裁决）。
+- 计数影响：零（纯分析轮）；预测锚 102055 不变，全量回归不跑。
+- 下次建议：R-I 候选序继续（R-A/R-B 行为缺口）或 1b/b 换轴（batch.py 并行通道 / parser_registry 快照语义残留面）；克隆度已闭合，不建议再投轮。
+
 ## Round 2031 — plugin_loader spec 形态 CLI 层结构化分类（1b/b 探针轮收尾；上轮 API 中断，本轮恢复收尾+对照组修正，3 测试）
 
 - 背景与污染修正：上轮（R2031 首跑）死于 API 网络错误，遗留探针输出（现更名 probe-plugin-loader-r2031.out.prev）**对照组 C0 也失败**——样例插件误写 `from app.parsers.base import BaseParser`（main 基类实名 `Parser`，base.py `__all__` 仅 Parser/ParserError/make_document_id/detect_source_type），E4/E7/E8 三实验被污染（loader 报 plugin_import_failed 本身没错，但没测到 intended 场景）；E1/E2/E3/E5/E6 不受影响。本轮修正：模板基类改 `Parser`（契约字段齐全：source_types=("text",)+locator_family="line_address"，批次 20/21 合法组合），修 E7 探针 bug（inspect-parser 误用类名 RecB 而注册名是 rec_b），补 C0/E8 provenance 端到端查询，重跑全部实验（目标 main `6c6d398` 运行前后 status clean，零写入）。
