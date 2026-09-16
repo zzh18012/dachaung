@@ -6945,3 +6945,30 @@ Stage 2 机器 reason 码 no_ground_truth_* 与 relation 契约文档英文
 （annotated reference），非客观真值；质量由双标注一致率、仲裁收敛
 与 G⑤/G⑥ 抽查凭证约束并披露；对外表述（结题报告/README/演示）
 一律"参考标注"。G⑥ 凭证 payload 格式已锁定（§7.3 预裁定）不改。
+
+## §一百三十八（2026-09-16）R-B：粒度诊断与合规 ARI 上界（协议件，真实 run G⑥ 后）
+
+外部评审 R-B 指认：gold 段长（均值 ~10⁴ 字符级）远超 max_chars
+（≤2000），长度约束迫使任何合规 chunker 把单段切成多块 → ARI 结构性
+受损。本条落地机械化论证的**协议件**（等待期并行，零真实 gold 接触）：
+
+- `stage9/granularity.py`（纯函数，无 CLI）：`segment_spans` 按
+  gold_segment 聚合 text unit 流区间；`oracle_pieces` 段内均分
+  ceil(段长/N) 片、片恒不跨段边界（任何 max_chars≤N 的真实 chunker
+  不会更好：跨段切只会再降 ARI，段内对齐切为上界）；片号全局唯一
+  （offset 累加，防跨段并簇污染 contingency 表）；
+  `granularity_bound` 逐 N 输出 oracle_chunks / split_segments /
+  **ari_bound**（oracle 标签经冻结 ari_units_vs_chunks，分母不变）
+  与段长分布披露（median/mean/max/over_grid_max）；`granularity_macro`
+  非 None macro（与基线/系统同规）。
+- 预注册 `stage9/granularity_preregistration.json`：oracle 规则、
+  ari_bound=结构天花板（非系统分）、分布披露口径、纪律（真实 run
+  仅 G⑥ 后 dev 14 篇；**永不修改 ARI 分母**；ARI<0.75 公开差距与
+  粒度归因，不调口径救指标）。
+- 测试 `tests/test_stage9_granularity.py` 8 合成用例：段区间聚合、
+  均分片界（≤N、覆盖和守恒、零长段）、全段≤N → 上界 1.0、单段拆 2
+  → 上界 0.0（评审示意机理最小复现）、部分拆分 ∈(0,1)、
+  over_grid_max 披露、macro N/A 剔除、预注册件字段锁。全量回归
+  **5728 passed / 4 skipped / 0 failed（58s）**。
+
+真实 run 接线（G⑦ 报告消费）待 G⑥ gold 冻结后按预注册执行。

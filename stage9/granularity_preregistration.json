@@ -1,0 +1,9 @@
+{
+ "metric": "granularity diagnostic + compliant ARI upper bound (oracle piecewise chunking per gold segment), per document per N in the frozen grid",
+ "registered_at": "2026-09-16",
+ "authority": "external review R-B (ADOPTION.md §132); revisions require a new ledger ruling before any real-corpus run",
+ "oracle_rule": "each gold segment split into ceil(seg_chars/N) even pieces, pieces never cross segment boundaries, unit assigned to the piece containing its char_span start; this is the upper bound for any real chunker with max_chars<=N because crossing segment boundaries can only lower ARI further",
+ "ari_bound_semantics": "ARI of oracle labels via the same frozen ari_units_vs_chunks (denominator unchanged); ari_bound is a structural ceiling of the gold-vs-chunk agreement at that N, not a system score",
+ "distribution_disclosure": "per-doc segment count and segment_chars {median, mean, max, over_grid_max per N}; corpus-level macro via non-None average, same as baseline/system macro rules",
+ "discipline": "real run only after G6 freeze and only on the 14 dev docs; ARI denominator is never modified; if ARI<0.75 the gap and its granularity attribution are disclosed openly rather than adjusting the metric; module stays pure functions, no CLI (G7 report wiring gated on gold revision)"
+}
