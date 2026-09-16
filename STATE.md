@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2029 — DOCX 表格行列基数退化与嵌套 w:p 静默丢弃（6 测试）
+
+- 文件：`tests/test_parser_docx_rowless_cellless.py`（换轴：近五轮全 PDF；DOCX 侧 R1957 cell hyperlink / R1967 gridBefore 列偏移 / R1889 sdt 丢弃 / R1899 blip 守卫均未触碰**行列基数**——w:tr 零 w:tc、w:tbl 零 w:tr、w:p 嵌套 w:p、w:p 直挂 w:tbl。xref/trailer 候选弃选：R1972 已锁 startxref 偏移损伤、R1993 已锁 xref 流 /Prev 链与 free 条目、edges52/103 已锁经典表 /Prev，剩余角度薄）。
+- 新角度（probe 实证 outputs/autonomous/probe_docx_degen_r2029.py；python-docx 1.2.0：_Row.cells 只产 tc_lst、CT_P.text 只拼 ./w:r|./w:hyperlink 直系）：
+  - **C1 尾行零 cell** → row.cells=() 空行右补齐 → 尾 body 行 '|  |  |  |'，row_count=2/col_count=3，零告警
+  - **C2 全表仅一行零 cell** → width=0 渲染两行空管道壳 '|  |\n|  |'（minLength 1 满足合法落库），col_count=0，table_index 正常递增
+  - **C3 行空表（零 w:tr）→ 产品缺陷**：_rows_to_markdown 返回 "" → Element 不变量抛**裸 ValueError（非 ParserError）穿透 _parse_docx**；pipeline 兜成 `unexpected_parser_error` + 整篇失败——一张行空表废掉整篇文档。特征锁定记录，不修
+  - **C4 w:p 嵌套 w:p** → 外层 'OUTAFTER'（直系 run 按序）、内层 'IN' 静默丢弃、段落计数 1、零告警
+  - **C5 首行零 cell + 次行有内容** → 表头被空补齐行 '|  |  |' 占据，真实内容降级 body 行
+  - **C6 w:p 直挂 w:tbl** → Table.rows 只读 tr_lst → 'LOST' 整段静默丢弃（与 sdt 丢弃同机制不同通道）
+- 全绿证据：本文件 6 passed；全套 **102030 passed + 22 skipped = 102052 collected，0 失败，1327s**。
+- **计数链修正（重要）**：第 140 次基线（101660）冻结于 R1923 状态，其后 R1924–R2028 加测从未跑过全量，"+3xN" 预测链已失效——本轮实测 = 基线 + 386（中间各轮存量）+ 6（本轮）= 102052。**再锚定：下次预测 102052 + 各轮实际加测数**；连续精确命中计数在第 140 次后暂停，本轮为新锚点第 0 次命中。
+
 ## Round 2028 — source-lock 族深挖（R-I 延续轮，纯分析零改动）
 
 - 任务：R2027 发现语料 31% 函数对我方源码文本做 grep 式断言但未裁决；本轮 AST 精确重测 + 目的复原 + 三维评估 + 三桶裁决数据点。产物 outputs/autonomous/source_lock_triage_r2028.md + source_lock_r2028_data.json + 扫描器 source_lock_scan_r2028.py（均未入库）。
