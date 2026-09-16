@@ -121,6 +121,20 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2036 — parser_registry 快照语义残留面 + source_types 契约 CLI 面（1b/b，R2032/R2035 建议点名，3 测试）
+
+- 任务：ParserCapability 冻结快照（批次 21）与 source_types.py 受控扩展契约（批次 20）在**真实 CLI 通道**的残留面探针，main 只读 @ `6c6d398`（运行前后 status clean）。探针 outputs/autonomous/probe_registry_r2036.py + .out（未入库）；子进程真实 CLI，PYTHONPATH=main 根 + PYTHONDONTWRITEBYTECODE=1 + cwd=临时目录；样例插件先读 main app/parsers/base.py 确认基类实名 `Parser`（R2031 教训），契约字段按批次 20/21 合法组合。
+- 覆盖面：main 进程内已全锁（test_capability_snapshot 冻结+校验矩阵 / test_source_types normalize+组合+register 绑定 / test_parser_registry 平局+重名 / test_plugin_loader CLI 通道仅 missing-module+重名两类）；**子进程真实 CLI** 仅 test_plugin_myx_fullchain 的 "MyX" pattern 一类拒绝 + R2031 自跑 3 测（spec 形态）；本轮三角度 CLI 通道零覆盖。**C0 对照先通过**（合法插件 → list-parsers --json 六键行 + explain 胜者 + inspect loaded_via=plugin/plugin_spec=spec）。
+- 发现（18 项断言全过，**零契约-实现偏差**——批次 20/21 语义在 CLI 通道无漂移）：
+  - **E1 快照冻结 CLI 面成立**：模块顶层 @register 后改 priority/extensions/source_types/version/locator_family/**__qualname__** 六属性 → list-parsers --json 五字段、explain 候选 priority=50（非改写 1）、inspect qualname=真类名（非 FakeQualname）全为注册瞬间值；被劫持扩展名（改写注入 .r2036hij）对 auto 发现不可见 → unsupported_type rc 1
+  - **E2 拒绝矩阵 11 类逐项一致**：bool/0/负 priority、大写/无点 extension、空 source_types、连字符/空白/33 字符 source_type、未知 locator_family('vector')、内置绑定冲突(("pdf",)+line_address) → 全部 rc 1 + plugin_register_failed + error_type=ParserRegistrationError + plugin 字段保留原 spec + 无 traceback + 字段级 message（"得到 True"/"须为小写、点开头"/"不得为空"/pattern/"封闭枚举"/"内置绑定不可改"）
+  - **E3 双插件同新类型不同 family**：两种加载序（A→B / B→A）均拒第二个 spec，message 带"已全局绑定……先注册者胜"且点名败者类——先注册者胜经 CLI 多插件加载序端到端成立
+  - **验证顺序观察（记录非缺陷）**：register() 先契约检查（source_types/locator_family）后能力校验（extensions/priority/version）——首版探针基底漏 source_types，五例在契约步即失败没测到 intended 字段，修正模板（基底契约合法、body 单变量改写）后全部命中；提示 plugin 作者报错信息按此顺序出现首个失败字段
+  - 不探理由（R-I 筛选）：--plugin A --plugin A 重复加载单事件已被 main test_plugin_loader.test_batch_duplicate_plugin_spec_single_event 进程内锁；递归/循环导入 provenance R2031 已轮；spec 形态分类 R2031 已轮
+- 加测 3：`tests/test_registry_cli_freeze_and_rejects.py`——(1) 注册后改类属性冻结 CLI 三面（list --json 五字段/explain 胜者+劫持扩展名不可见/inspect 六键 qualname 冻结）；(2) 契约拒绝矩阵 8 类代表（bool/0 priority、大写/无点 extension、空 source_types、连字符 pattern、未知 family、内置绑定冲突）结构化信封逐项；(3) 双插件类型→family 绑定先注册者胜（两种加载序，败者=第二 spec + message 三要素）。被测对象按 `git worktree list --porcelain` 动态定位 main（零硬编码绝对路径，缺目标显式 SKIP）。
+- 定向：新文件 3 passed 5.17s；邻居 test_plugin_cli_spec_forms.py 3 + test_jsonlog_cli_edges.py 3 + test_batch_cli_spawn_edges.py 3 合计 9 passed 9.52s；main worktree 全程 clean。全量不跑（加测纯子进程型）；预测锚 **102061 + 3 = 102064**（R2034 锚，R2035 零加测）。
+- 下次建议：R-A/R-B 行为缺口或 1b/b 换轴（evaluation 侧新模块 / schemas 0.6.0 family 路由面）；parser_registry+source_types 契约面已闭合，不建议再投轮。
+
 ## Round 2035 — R-I 三块数据交叉去重综合：统一净额（f 队列纯分析轮；两连 API 中断后主会话内联收尾，零测试改动）
 
 - 任务：source-lock（R2028）/ 无断言（R2030）/ 克隆度（R2032）三块独立测量的函数级交叠矩阵与统一划分（union 语义，优先级 zero_loss > compressible > keep）。扫描器 outputs/autonomous/ri_synth_scan_r2035.py 复用三件既有扫描器只读 import；数据 ri_synth_r2035_data.json。
