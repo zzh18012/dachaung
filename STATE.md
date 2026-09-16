@@ -121,6 +121,23 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2034 — batch.py 并行通道族探针：workers 钳制、后缀过滤双通道、目录名 *.md（1b/b，R2031 候选 2 号，3 测试）
+
+- 第 0 步（版式修复，独立 commit 3cbbe4b）：R2033 条目上轮被误插文件头（16xx 遗留节之上）；既定版式 = ①头部 ②16xx 节（1616..1607、1642）③回归基线节 ×5 ④20xx 倒序块。二进制安全移动 R2033 整块（15 行，含尾随空行）到 `## Round 2032` 正上方，脚本复核 2139 个 `## ` 标题顺序恢复（16xx → 基线 → 2033 → 2032 → …），文件字节长度不变（纯移动）。
+- 任务：app/batch.py 并行通道族（批次 16 多进程 / 19 worker 插件重放 / 25 强制 spawn）CLI 边界合成探针，main 只读 @ `6c6d398`（运行前后 status clean）。探针 outputs/autonomous/probe_batch_spawn_r2034.py + .out（未入库）；子进程真实 CLI，PYTHONPATH=main 根 + PYTHONDONTWRITEBYTECODE=1 + cwd=系统临时目录，main worktree 零写入。
+- 覆盖面：main test_batch_parse.py 已锁（进程内）顺序/并行一致性、错误隔离、stem 冲突、<3 文件顺序路径、CLI 冒烟 rc0/rc2/rc1；test_jsonlog.py 已锁事件流 + traceback 捕获（monkeypatch 进程内）；test_plugin_loader.py 已锁批量插件父加载失败/顺序/并行 + JSONL（进程内 CLI）；自跑 tests/ 除 R2033 jsonlog 间接外 batch 全零命中。**C0 对照先通过**（3 好 .md + workers=2 → rc 0 + 3/3 + 池路径 batch_start/file_complete×3/batch_complete 信封完整）。
+- 发现（E1-E5，探针实测全部确定性）：
+  - **E1 顺序/池切换边界**：恰 2 文件 × workers=2 → effective=1（summary.workers 与 JSONL batch_start.workers 双反映）；恰 3 文件 → effective=2；顺序路径 file_complete 序 = 文件名字典序，池路径 imap_unordered 序不作确定性断言（本轮碰巧也是字典序）。
+  - **E2 --workers 钳制语义**：0 / -5 经 `max(1, int(w))` 钳到 1 → 顺序路径 rc 0 全成功；`abc` → argparse rc 2（通用行为不锁）；**显式 12 不被钳制**——DEFAULT_MAX_WORKERS=8 上限只作用于默认值，显式 --workers 原样建 Pool(12)（12 个 spawn worker，实测 1.0s；docstring 自述"内存 ∝ workers"，help 文本未声明上限）→ 记录为边界非缺陷，指示线候选（help 补一句上限说明即可）。
+  - **E3 目录通道静默剔除**：{2 md + 1 txt} → rc 0、summary.total=2、.txt 在 summary 与 JSONL 原文**零痕迹**（无 skip/warning 事件）；{仅 txt+log} → rc 2 "未找到可解析文件" 且不写 summary.json。静默跳过对操作员不可见 → 指示线候选（可选）：被剔文件计数或 batch_start 侧告警。
+  - **E4 glob 通道无后缀过滤（双通道不对称）**：`*.txt` glob 照样派发 → fallback detect_source_type 抛 unsupported_type → 结构化 file_error（error_message 字段名正确）+ rc 1、0/1；同目录 glob `*.md` 无匹配 → rc 2。**同一 .txt 文件目录通道一静默、glob 通道一报错**，help 未声明 glob 不过滤 → 指示线候选（文档说明或过滤统一）。
+  - **E5 目录名 *.md 混入（特征锁定未修）**：子目录 trap.md 通过 rglob 后缀过滤被当任务派发 → parse_one_file 的 is_file() False → file_not_found，**message 自述"输入文件不存在"但该路径作为目录存在**（措辞误导）；兄弟 real.md 正常完成，rc 1、1/2 → 指示线候选：过滤侧加 is_file() 或 message 改"不是常规文件"。
+- 不探理由（R-I 筛选）：plugin+pool 真 CLI 端到端已被 main test_plugin_loader.py 进程内三态覆盖（新增仅"真子进程"维度，低新颖性）；真 spawn worker traceback 回传 = str 经 dict pickle，进程内 format_exc 已锁；tqdm 缺席模拟须卸载依赖不可行（且子进程 stderr 非 TTY 本就逐行进度路径，tqdm 面天然不激活）。
+- 加测 3：`tests/test_batch_cli_spawn_edges.py`——(1) workers 钳制与 2/3 边界（0/-5 → workers=1 顺序 rc 0；2 文件 effective=1 / 3 文件 effective=2；summary 与 batch_start.workers 双反映；顺序路径字典序）；(2) 目录/glob 后缀过滤不对称（.txt 静默零痕迹 + batch_start.file_count=2；全剔 rc 2 无 summary；glob '*.txt' → unsupported_type rc 1 + file_error 事件 error_message 键；glob '*.md' 无匹配 rc 2）；(3) 目录名 *.md（计入 total=2、file_not_found + "输入文件不存在"误导措辞 + 兄弟完成 + traceback None）。被测对象按 `git worktree list --porcelain` 动态定位 main（零硬编码绝对路径，缺目标显式 SKIP）。首跑 rc 2 暴露 helper 重复传子命令 bug（8 处调用点修正）后全通过。
+- 定向：新文件 3 passed 3.94s；邻居 test_jsonlog_cli_edges.py 3 + test_plugin_cli_spec_forms.py 3 合计 6 passed 6.57s；main worktree 全程 clean。全量不跑（加测纯子进程型）；预测锚 **102058 + 3 = 102061**。
+- 下次建议：R-A/R-B 行为缺口或 parser_registry 快照语义残留面（R2031 候选清单 1 号至今未探）；E2/E3/E4/E5 已入指示线候选池，不自跑线实施。
+
+
 ## Round 2033 — jsonlog 结构化日志族探针：CLI 边界与信封覆盖（1b/b，R2031 候选 1 号，3 测试）
 
 - 任务：app/jsonlog.py 族（批次 17）合成探针，main 只读 @ `6c6d398`（运行前后 status clean）。探针 outputs/autonomous/probe_jsonlog_r2033.py（+r2033b 重现性/r2033c 压力，.out 存证，均未入库）。**契约背景勘误（R2031 教训：以 main 只读源码为准）**：prompt 所述"traceback 批次 2 改有界截断"在 main `6c6d398` **不存在**——jsonlog.py docstring 自述"traceback 首版不截断"，grep 全 app/+evaluation/ 无 traceback 截断逻辑（唯一截断是 pipeline.py validation_errors[:20]）。
