@@ -15,7 +15,7 @@
 | 操作系统 | Windows 11（Git Bash / msys2 ucrt64） |
 | Python | CPython 3.12.10（**官方构建**，路径见下方命令） |
 | 包管理 | uv（已有 0.11.11） |
-| 工作目录 | `C:\Users\zzhn2\Desktop\dachuang-code` |
+| 工作目录 | 本仓库克隆位置（示例 `C:\Users\<你的用户名>\Desktop\dachuang-code`） |
 
 **禁止**使用 PATH 里的 mingw Python 3.14：uv 会拒绝（`Unknown operating system: mingw_x86_64_ucrt_gnu`），且主流库几乎没有 mingw wheel。
 
@@ -24,11 +24,11 @@
 ## 2. 安装（一次性）
 
 ```bash
-# 在 Git Bash 中（用 Unix 路径风格）
-cd "/c/Users/zzhn2/Desktop/dachuang-code"
+# 在 Git Bash 中（用 Unix 路径风格；<你的用户名> 按本机实际替换）
+cd "/c/Users/<你的用户名>/Desktop/dachuang-code"
 
-# 用项目内指定的官方 Python 3.12.10 创建 .venv 并装齐依赖
-uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.exe"
+# 用官方 CPython 3.12.10 创建 .venv 并装齐依赖（<你的用户名> 按本机实际替换）
+uv sync --python "C:/Users/<你的用户名>/AppData/Local/Programs/Python/Python312/python.exe"
 ```
 
 **实测输出（2026-08-03）**：
