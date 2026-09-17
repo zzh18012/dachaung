@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2056 — G03 守卫机制轮：parametrize 装饰器严格等价守卫入库（r56 裁决②，机制先行，零语料删除）
+
+- 性质：r56 裁决②执行——先机制后数据，守卫 + 合成验证件同一 commit，实际语料删除留给后续批次 commit。本轮零删除、零语料改动、零真实语料接触（验证件全部合成源码字符串）。
+- 守卫规则四条（裁决原文口径）：①函数体 L1 同体只是候选条件；团内任一成员存在 parametrize 时，团内各成员（含团代表）完整 decorator list 必须数量、顺序、原始源码文本逐字节一致，否则整团延期（parametrize_decorator_mismatch_deferred）；②parametrize 参数必须为删除器能静态确认的自包含形式（内联 str/int/bool/None + 内联 list/tuple/dict 字面量递归，键值同规），出现外部 Name 引用、starred 展开、函数调用、动态构造 → parametrize_dynamic_deferred；③团内无任何成员存在 parametrize → 守卫恒放行（no_parametrize_unchanged，非 parametrize 团行为与 R2055 前完全一致）；④既有 G03 其他安全条件（同文件完整团、跨文件 ≤3 文件、团规模、重名、未收集、被引用排除、新鲜度复核）全部上游叠加，不因通过守卫放宽任何一条。逐字节口径 = 首装饰器行至 def 前一行的整段（含装饰器间注释、空行、多行调用换行形态），不做 AST/格式归一——允许安全假阴性，拒绝假阳性。
+- 落位：tests/g03_parametrize_guard.py（tracked 守卫模块；pyproject python_files=test_*.py 故自身不被收集；harness 健康扫描同 glob 不受影响）。删除器/规划器侧经文件路径 importlib 加载，须先注册 sys.modules 再 exec（dataclasses 字符串注解解析所需——验证件⑨锁死该接线模式）。
+- 验证件：tests/test_g03_guard_r2056.py 共 9 测试全绿（0.75s）——三件合成验证件：①体同体 + 装饰器块逐字节同体（内联字面量清单、双装饰器保序）→ eligible；②体同体但 parametrize 清单不同（R2055 forbidden_tokens 实况）→ mismatch deferred 不得删除；③装饰器文本逐字节同体但实参引用各自文件模块级 TOKENS → dynamic deferred（并前置自证装饰器块确实同体，排除误归因）。第④件零变化回归：无 parametrize 团（含成员间装饰器不一致团）恒放行。边界件 5 件：装饰器数量不一致 / 装饰器块内注释或空行差异（AST 结构等价但字节差，证逐字节非 AST 归一）/ ids 关键字调用 + starred 展开 + BinOp 拼接三动态形态 / 白名单单元（float、bytes、set 字面量、f-string、一元负数、lambda、推导式、dict 星键展开、Ellipsis 等全部拒收）/ 外部脚本上下文 import 接线证明。
+- collect-only：**101600 = 101591 + 9 精确命中**（18.7s，零收集错误；输出 outputs/autonomous/g03_guard_collect_r2056.out，新测试文件恰 9 条 node id）。锚记账：守卫轮属加测方向，删除递减链基点改为 101600（R2057 批次 2 删除前锚）。
+- 接线与预览（未入库 outputs/autonomous/）：g03_guard_wiring_r2056.py 按删除器上下文（不经 sys.path）文件路径加载守卫成功并跑通三类判例；分类预览 g03_guard_preview_r2056.json——R2035 标记的 190 条 parametrize 目标（21 团，与 R2055 首批复核数精确一致）经守卫 **0 条转 eligible**：187 条 decorator mismatch + 3 条 dynamic（test_evaluation_cli_edges47 至 50 的 forbidden_tokens_batch20，实参引用模块级 FORBIDDEN_TOKENS 名）。R2055 首批"全部 parametrize 延期"的裁决被守卫独立证实为必要且充分。已知边界：parametrize 别名形态（模块级赋值后引用）不在识别口径——与 R2035 打标/R2055 延期口径一致，当前语料别名赋值 0 命中，出现时须单批扩口径。
+- 下次建议：R2057 = G03 批次 2 非 parametrize 低段 500-1000 续删（同文件完整团 + 跨文件 ≤3 完整团优先；五步协议照旧：新鲜度复核、删除、collect-only 精确递减、定向回归、一批一 commit；删除前锚 101600）；190 条 parametrize 目标的守卫重评结论已出（当前 0 放行），继续延期至其形态随语料演化满足守卫，不为其阻塞递减锚链；一期连续稳定计数维持 1/5（守卫轮非删除批不计入）。
+
+---
+
 ## Round 2055 — G03 批次 1：L1 克隆冗余删除首批（协议 v3.1 授权执行，500 函数，纯删零加测）
 
 - 性质：G03 执行线首批（v3.1 授权下第一次真实删除）。基线锚 102091（R2053 全量实跑）；锚记账自本轮切换为逐批递减链：**102091 − 500 = 101591**。
