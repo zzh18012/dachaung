@@ -27,7 +27,7 @@
 - `batch-parse` 与 `evaluation.cli run` 均支持 `--log-file`（JSONL，append）与 `--verbose`（stderr）；默认零输出变化（NullHandler，防 lastResort 泄漏）
 - 事件：batch_start / file_complete / file_warning / file_error（含 traceback）/ batch_complete；eval_start / doc_complete / doc_error / eval_complete
 - 错误事件的文本字段名是 `error_message`（`message` 是 LogRecord 保留属性，extra 不可用）
-- 已知限制：日志 append 不轮转（需手动清理）；traceback 首版不截断；timestamp 为 epoch 秒
+- 已知限制：日志 append 不轮转（需手动清理）；traceback 首版不截断；timestamp 为 epoch 秒；跨进程并发写同一 --log-file 有罕见静默丢行风险（Windows CRT _O_APPEND 非原子），建议按进程分文件
 
 ## Parser 注册表（Stage 8 批次 18）
 
@@ -53,7 +53,7 @@
 - Parser 契约声明（register 强制）：`source_types` tuple（str=单元素；多格式 parser 如 fallback 声明 `("pdf","docx")`）+ `locator_family`（新类型必填；纯内置多类型必须 None）；类型→family 全局唯一绑定（先注册者胜，冲突 ParserRegistrationError）；同绑定多 parser 并存合法；读取统一走 `declared_source_types()`（str 归一）
 - schema 0.6.0：顶层 source_type 改 pattern；0.1.0–0.5.0 守卫仍限内置六类型（历史不回写）；扩展类型 locator.family 必填且 ∈ 四值，形状按 family 路由（line_address → 新 `$defs/line_address_locator`）；内置六类型 0.5.0/0.6.0 形状完全一致；`SCHEMA_VERSION_CURRENT="0.6.0"`（models.py，唯一权威常量），writer 一律输出 0.6.0
 - 运行时契约检查：`process_single` 在 schema 校验后、写盘前核对 source_type ∈ 声明集合 且 每个 locator.family == 全局绑定；违规 → `parser_contract_mismatch`（details 带 declared/actual/expected_family/element_ids）+ rc 1 + 不写盘；所有 parser 统一检查（内置同规）
-- `validate` 子命令纯 schema 校验，不含注册表/契约检查（无 parser 上下文）
+- `validate` 子命令纯 schema 校验，不含注册表/契约检查（无 parser 上下文）；跨 element family 一致性由 parse 期契约检查保证（见上条），validate 不查
 - `.myx` 全链测试插件在 `tests/test_plugin_myx_fullchain.py`（subprocess 走真实 CLI；测试专用，永不内置、不进 evaluation AUTO 映射）；评测 AUTO_PARSER_BY_SOURCE_TYPE 语义不变
 
 ## Parser 能力快照与发现解释（Stage 8 批次 21）

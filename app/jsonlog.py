@@ -5,7 +5,8 @@
   两者皆无时挂 NullHandler——否则 logging 的 lastResort 会把 WARNING+
   泄漏到 stderr，破坏"默认零输出变化"
 - 已知限制（裁决边界 3/4）：无自动轮转（append 需手动清理）；
-  traceback 首版不截断
+  traceback 首版不截断；跨进程共享同一日志文件有罕见静默丢行风险
+  （Windows CRT _O_APPEND 非原子），建议按进程分文件
 """
 
 from __future__ import annotations

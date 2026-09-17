@@ -146,7 +146,8 @@ def load_manifest(
 
     Args:
         manifest_path: 清单文件路径（本机任意位置，不会写入报告）
-        project_root: 项目根目录；默认为 manifest 所在仓库根（向上找 .git 或 pyproject.toml）
+        project_root: 项目根目录；默认为 manifest 所在仓库根（向上找最近的
+            pyproject.toml；全链无则回退 manifest 父目录）
     """
     p = Path(manifest_path).resolve()
     if not p.is_file():

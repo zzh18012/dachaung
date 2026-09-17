@@ -129,7 +129,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="批量解析：目录（递归 pdf/docx/md）/ glob 模式 / 单文件 → 多进程并行 + summary.json",
     )
     batch.add_argument(
-        "input", help="输入目录、glob 模式（含 * 或 ?）或单文件路径"
+        "input",
+        help=(
+            "输入目录、glob 模式（含 * 或 ?）或单文件路径；"
+            "目录输入只收 .pdf/.docx/.md（其余留痕跳过），"
+            "glob 输入不做后缀过滤（不支持后缀文件将被派发并按 unsupported_type 失败）"
+        ),
     )
     batch.add_argument(
         "-o",
@@ -162,7 +167,10 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--workers",
         type=int,
         default=None,
-        help=f"并行进程数（默认 min(cpu_count, 8) = {default_workers()}）",
+        help=(
+            f"并行进程数（默认 min(cpu_count, 8) = {default_workers()}；"
+            "显式值不受该上限钳制，内存占用与进程数成正比）"
+        ),
     )
     batch.add_argument(
         "--log-file",
