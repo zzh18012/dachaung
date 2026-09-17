@@ -137,7 +137,7 @@ def test_cli_run_end_to_end(project_root: Path):
     validate_file(output, "evaluation-report.schema.json")
 
     report = json.loads(output.read_text(encoding="utf-8"))
-    assert report["report_version"] == "1.3"
+    assert report["report_version"] == "1.4"
     # v1.3：per_doc 必须带 parser_used
     assert report["per_doc"][0]["parser_used"] == "fallback"
     assert report["devset"]["status"] == "incomplete"

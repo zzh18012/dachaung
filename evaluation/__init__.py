@@ -63,7 +63,7 @@
   figure_caption_* 同为标注依赖族，不进 macro average），
   report_version 保持 1.3（批次 11 裁决：REPORT_VERSION 只随报告
   结构变，指标扩展不升）。
-- v1.10（当前）：table_caption_prf 消费 annotation.table_caption_pairs GT
+- v1.10：table_caption_prf 消费 annotation.table_caption_pairs GT
   （annotation schema 同批升 v1.1 新增该键，批次 12）；复用批次 6/7
   冻结的 match_relation_pairs（relation_type="table_has_caption"）。
   PDF 口径 Option A：题注被 pdfplumber 融合进前一段落 → 0 预测
@@ -71,10 +71,20 @@
   无法消费 table_caption GT，同版本不同能力损害复现，故升 1.10。
   报告结构未变（标注依赖族不进 macro average），report_version
   保持 1.3。
+- v1.11（当前）：标注通道完整性（r55 C15/C16/C06，ChatGPT 5.6 Sol
+  2026-09-21 裁决）。C15：坏标注（annotation_unreadable /
+  annotation_invalid_json）与缺标注（no_annotation）在降级 reason 上
+  可区分，坏标注发结构化日志事件；C16：标注 doc_id 与清单不符时拒绝
+  消费（annotation_doc_id_mismatch，事件携带双侧 doc_id），无 doc_id
+  字段的旧标注保持兼容。报告 per_doc 新增 annotation_status 与
+  tolerance_chars（C06：容差必须在报告中记录的外部承诺），报告结构
+  变更 → report_version 升 1.4（精确快照：1.1/1.2/1.3 报告保持旧
+  结构，schema 条件分支互斥）。能力封口：1.10 evaluator 无法区分
+  坏标注与缺标注，同版本不同能力损害复现，故升 1.11。
 """
 
-EVALUATOR_VERSION = "1.10"
-REPORT_VERSION = "1.3"
+EVALUATOR_VERSION = "1.11"
+REPORT_VERSION = "1.4"
 ANNOTATION_VERSION = "1.0"
 MANIFEST_VERSION = "1.1"
 MANIFEST_VERSIONS_SUPPORTED = ("1.0", "1.1")

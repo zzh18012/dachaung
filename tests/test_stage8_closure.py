@@ -130,5 +130,5 @@ def test_adoption_stage8_archive_summary_consistent_with_code():
     assert _sq("EVALUATOR_VERSION 1.10、REPORT_VERSION 1.3") in squeezed
     assert _sq("5482 passed + 4 skipped") in squeezed
     init = (ROOT / "evaluation" / "__init__.py").read_text(encoding="utf-8")
-    assert 'EVALUATOR_VERSION = "1.10"' in init
-    assert 'REPORT_VERSION = "1.3"' in init
+    assert 'EVALUATOR_VERSION = "1.11"' in init
+    assert 'REPORT_VERSION = "1.4"' in init

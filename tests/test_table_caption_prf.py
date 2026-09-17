@@ -186,8 +186,8 @@ def test_wrapper_emits_exactly_three_keys() -> None:
 # ---------- 版本与 macro 钉死 ----------
 
 def test_evaluator_version_bumped_report_unchanged() -> None:
-    assert evaluation.EVALUATOR_VERSION == "1.10"
-    assert evaluation.REPORT_VERSION == "1.3"
+    assert evaluation.EVALUATOR_VERSION == "1.11"
+    assert evaluation.REPORT_VERSION == "1.4"
 
 
 def test_table_caption_not_in_macro_average() -> None:

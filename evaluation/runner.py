@@ -60,14 +60,24 @@ def _resolve_parser_name(requested: str, source_type: str | None) -> str | None:
     return AUTO_PARSER_BY_SOURCE_TYPE.get(source_type)
 
 
-def _load_annotation(path: Path | None) -> dict[str, Any] | None:
+def _load_annotation(
+    path: Path | None,
+) -> tuple[dict[str, Any] | None, str]:
+    """加载标注 JSON，返回 (annotation, status)。
+
+    status：loaded / missing / annotation_unreadable（OSError）/
+    annotation_invalid_json（解析失败）——坏标注与缺标注必须可区分
+    （r55 C15），消费点按 status 降级 reason 并发日志事件。
+    """
     if path is None or not path.is_file():
-        return None
+        return None, "missing"
     try:
         with path.open("r", encoding="utf-8") as f:
-            return json.load(f)
-    except (OSError, json.JSONDecodeError):
-        return None
+            return json.load(f), "loaded"
+    except OSError:
+        return None, "annotation_unreadable"
+    except json.JSONDecodeError:
+        return None, "annotation_invalid_json"
 
 
 def _process_one_task(args: tuple) -> tuple:
@@ -246,13 +256,48 @@ def run_evaluation(
             image_base_dir=image_dir if image_dir.is_dir() else None,
         )
 
-        annotation = _load_annotation(doc.annotation_resolved)
+        annotation, annotation_status = _load_annotation(doc.annotation_resolved)
+        # C16：标注携带与清单不符的 doc_id 时拒绝消费（错误标注不得进入
+        # 评测链）；无 doc_id 字段的旧标注保持兼容（不拒绝）
+        if annotation is not None:
+            ann_doc_id = annotation.get("doc_id")
+            if isinstance(ann_doc_id, str) and ann_doc_id != doc.doc_id:
+                logger.warning(
+                    "annotation_doc_id_mismatch",
+                    extra={
+                        "doc_id": doc.doc_id,
+                        "annotation_doc_id": ann_doc_id,
+                        "annotation_path": str(doc.annotation_resolved),
+                    },
+                )
+                annotation = None
+                annotation_status = "annotation_doc_id_mismatch"
+        # doc_id_mismatch 已在上方发过专属事件，不重复发通用事件
+        if annotation_status not in (
+            "loaded",
+            "missing",
+            "annotation_doc_id_mismatch",
+        ):
+            logger.warning(
+                annotation_status,
+                extra={
+                    "doc_id": doc.doc_id,
+                    "annotation_path": str(doc.annotation_resolved),
+                },
+            )
         fig_caps = figure_caption_prf(document, annotation)
         chunk_b = chunk_boundary_prf(
             document, annotation, tolerance_chars=tolerance_chars
         )
         head_ord = heading_order_prf(document, annotation)
         tab_caps = table_caption_prf(document, annotation)
+        # C15：坏标注（unreadable / invalid_json / doc_id 不匹配）的降级
+        # reason 必须与缺标注（no_annotation）可区分
+        if annotation_status not in ("loaded", "missing"):
+            for prf_dict in (fig_caps, chunk_b, head_ord, tab_caps):
+                for v in prf_dict.values():
+                    if isinstance(v, dict) and v.get("reason") == "no_annotation":
+                        v["reason"] = annotation_status
         metrics.update(fig_caps)
         tolerance_record = chunk_b.pop("_tolerance_chars", None)
         missing_markers_record = chunk_b.pop("_missing_markers", None)
@@ -274,6 +319,7 @@ def run_evaluation(
                     "chunk_reason": "not_instrumented",
                 },
                 "_annotation_present": annotation is not None,
+                "_annotation_status": annotation_status,
                 "_tolerance_chars": (
                     tolerance_record["value"] if tolerance_record else None
                 ),
@@ -335,6 +381,10 @@ def run_evaluation(
                 "parser_used": r["parser_used"],
                 "metrics": r["metrics"],
                 "wall_time_seconds": r["wall_time_seconds"],
+                # C06：CLAUDE.md 承诺"容差必须在报告中记录"→ 公开 per_doc
+                # 落盘；C15：标注消费状态同落（schema per_doc 无键约束）
+                "annotation_status": r["_annotation_status"],
+                "tolerance_chars": r["_tolerance_chars"],
             }
         )
 

@@ -284,8 +284,8 @@ def test_wrapper_emits_exactly_three_keys():
 
 
 def test_evaluator_version_bumped_report_unchanged():
-    assert evaluation.EVALUATOR_VERSION == "1.10"
-    assert evaluation.REPORT_VERSION == "1.3"
+    assert evaluation.EVALUATOR_VERSION == "1.11"
+    assert evaluation.REPORT_VERSION == "1.4"
 
 
 def test_figure_caption_not_in_macro_average():

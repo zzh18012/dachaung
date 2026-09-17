@@ -121,11 +121,11 @@ def test_auto_mixed_manifest_single_run(tmp_project: Path):
 
     # 报告通过 schema 校验（1.3 要求 per_doc.parser_used）
     validate_file(out, "evaluation-report.schema.json")
-    assert report["report_version"] == "1.3"
+    assert report["report_version"] == "1.4"
     assert report["provenance"]["parser_name"] == "auto"
     # auto 模式多 parser 并存 → parser_version 为 null
     assert report["provenance"]["parser_version"] is None
-    assert report["provenance"]["evaluator_version"] == "1.10"
+    assert report["provenance"]["evaluator_version"] == "1.11"
 
     by_id = {d["doc_id"]: d for d in report["per_doc"]}
     assert by_id["AUTO-MD"]["parser_used"] == "markdown"
