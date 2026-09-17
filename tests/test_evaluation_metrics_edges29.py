@@ -55,20 +55,9 @@ def test_ratio_returns_dict_with_value_and_reason():
     assert set(out.keys()) == {"value", "reason"}
 
 
-def test_ratio_value_is_float():
-    out = _ratio(1)
-    assert isinstance(out["value"], float)
-
-
 def test_ratio_reason_is_none():
     out = _ratio(0.5)
     assert out["reason"] is None
-
-
-def test_ratio_with_int_input_converts_to_float():
-    out = _ratio(1)
-    assert out["value"] == 1.0
-    assert isinstance(out["value"], float)
 
 
 def test_ratio_with_zero_returns_zero():
@@ -142,11 +131,6 @@ def test_bool_metric_with_empty_string_returns_false():
     """bool("") = False。"""
     out = _bool_metric("")  # type: ignore[arg-type]
     assert out["value"] is False
-
-
-def test_bool_metric_with_non_empty_string_returns_true():
-    out = _bool_metric("x")  # type: ignore[arg-type]
-    assert out["value"] is True
 
 
 def test_int_metric_value_is_int():
@@ -418,15 +402,6 @@ def test_docx_locator_with_relationship_id_valid():
     ]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 1.0
-
-
-def test_docx_locator_with_page_invalid():
-    elements = [
-        {"type": "paragraph", "source_locator": {"page": 1, "paragraph_index": 0}},
-    ]
-    out = _docx_locator_ratio(elements)
-    # 含 page → 不合法
-    assert out["value"] == 0.0
 
 
 def test_docx_locator_with_bbox_invalid():
@@ -868,10 +843,6 @@ def test_strip_unicode_whitespace_with_paragraph_separator():
     assert _strip_unicode_whitespace("a b") == "ab"
 
 
-def test_strip_unicode_whitespace_preserves_chinese():
-    assert _strip_unicode_whitespace("你好 世界") == "你好世界"
-
-
 def test_strip_unicode_whitespace_preserves_digits():
     assert _strip_unicode_whitespace("a 1 b") == "a1b"
 
@@ -909,10 +880,6 @@ def test_is_valid_bbox_with_4_ints():
 
 def test_is_valid_bbox_with_mixed_int_float():
     assert _is_valid_bbox([0, 0.0, 1, 1.0]) is True
-
-
-def test_is_valid_bbox_with_3_elements():
-    assert _is_valid_bbox([0.0, 0.0, 1.0]) is False
 
 
 def test_is_valid_bbox_with_5_elements():
@@ -1167,20 +1134,10 @@ def test_module_source_text_preservation_uses_counter():
     assert "Counter(actual)" in src
 
 
-def test_module_source_text_preservation_uses_intersection():
-    src = inspect.getsource(_text_preservation)
-    assert "c_expected & c_actual" in src
-
-
 def test_module_source_pdf_locator_uses_isinstance():
     src = inspect.getsource(_pdf_locator_ratio)
     assert "isinstance(page, int)" in src
     assert "page < 1" in src
-
-
-def test_module_source_pdf_locator_uses_pdf_bbox_required_types():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "_PDF_BBOX_REQUIRED_TYPES" in src
 
 
 def test_module_source_pdf_locator_uses_is_valid_bbox():
@@ -1198,11 +1155,6 @@ def test_module_source_docx_locator_uses_structural_keys_tuple():
     assert '"row_index"' in src
     assert '"col_index"' in src
     assert '"relationship_id"' in src
-
-
-def test_module_source_docx_locator_uses_any():
-    src = inspect.getsource(_docx_locator_ratio)
-    assert "any(k in loc for k in structural_keys)" in src
 
 
 def test_module_source_image_resource_uses_path():
@@ -1247,11 +1199,6 @@ def test_module_source_silent_drop_uses_max_zero_pattern():
 def test_module_source_silent_drop_iterates_items():
     src = inspect.getsource(_silent_drop_count)
     assert ".items()" in src
-
-
-def test_module_source_strip_unicode_whitespace_uses_isspace():
-    src = inspect.getsource(_strip_unicode_whitespace)
-    assert "ch.isspace()" in src
 
 
 # ---------- signatures 精确补强 ----------
@@ -1567,28 +1514,6 @@ def test_e2e_compute_metrics_returns_dict_with_14_keys():
     out = compute_automatic_metrics(doc, None, "pdf", None)
     # 14 metric keys
     assert len(out) == 14
-
-
-def test_e2e_compute_metrics_keys_exact():
-    doc = {"elements": [], "chunks": []}
-    out = compute_automatic_metrics(doc, None, "pdf", None)
-    expected_keys = {
-        "pipeline_success",
-        "error_code",
-        "schema_valid",
-        "element_count_total",
-        "element_count_by_type",
-        "pdf_locator_valid_ratio",
-        "docx_locator_valid_ratio",
-        "image_resource_exists_ratio",
-        "chunk_reference_intact_ratio",
-        "text_preservation_equal",
-        "text_char_multiset_precision",
-        "text_char_multiset_recall",
-        "heading_boundary_compliance",
-        "silent_drop_count",
-    }
-    assert set(out.keys()) == expected_keys
 
 
 def test_e2e_compute_metrics_deterministic():

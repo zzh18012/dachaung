@@ -688,13 +688,6 @@ def test_ast_manifest_error_no_methods_batch48():
     assert len(methods) == 0
 
 
-def test_ast_load_manifest_has_two_for_loops_batch48():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "load_manifest"][0]
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) >= 2  # documents + expected_failures
-
-
 def test_ast_load_manifest_has_try_batch48():
     tree = ast.parse(inspect.getsource(manifest_mod))
     func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "load_manifest"][0]
@@ -794,29 +787,9 @@ def test_source_no_pickle_load_batch48():
     assert "pickle.load(" not in src
 
 
-def test_source_no_subprocess_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "subprocess" not in src
-
-
-def test_source_no_lambda_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "lambda" not in src
-
-
 def test_source_no_yield_batch48():
     src = inspect.getsource(manifest_mod)
     assert "yield" not in src
-
-
-def test_source_no_walrus_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert ":=" not in src
-
-
-def test_source_no_async_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "async def" not in src
 
 
 def test_source_no_await_batch48():

@@ -141,11 +141,6 @@ def test_text_types_contains_caption_batch38():
     assert "caption" in _TEXT_TYPES
 
 
-def test_text_types_contains_header_footer_batch38():
-    assert "header" in _TEXT_TYPES
-    assert "footer" in _TEXT_TYPES
-
-
 def test_text_types_does_not_contain_image_batch38():
     assert "image" not in _TEXT_TYPES
 
@@ -156,11 +151,6 @@ def test_pdf_bbox_required_types_is_tuple_batch38():
 
 def test_pdf_bbox_required_types_contains_four_kinds_batch38():
     assert len(_PDF_BBOX_REQUIRED_TYPES) == 4
-
-
-def test_pdf_bbox_required_types_does_not_contain_table_batch38():
-    """table 不需要 bbox。"""
-    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
 
 
 def test_pdf_bbox_required_types_does_not_contain_image_batch38():
@@ -835,11 +825,6 @@ def test_module_source_contains_compute_automatic_metrics_def_batch38():
 def test_module_source_contains_pathlib_path_import_batch38():
     src = inspect.getsource(mmod)
     assert "from pathlib import Path" in src
-
-
-def test_module_source_contains_math_isfinite_call_batch38():
-    src = inspect.getsource(mmod)
-    assert "math.isfinite" in src
 
 
 def test_module_source_contains_image_element_filter_batch38():

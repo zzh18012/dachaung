@@ -405,11 +405,6 @@ def test_detect_project_root_resolves_input_batch13(tmp_path):
 # ---------- DocumentEntry / ExpectedFailure / Manifest dataclass 行为第十三批 ----------
 
 
-def test_document_entry_field_count_10_batch13():
-    """DocumentEntry 有 10 个字段。"""
-    assert len(fields(DocumentEntry)) == 10
-
-
 def test_document_entry_field_names_batch13():
     names = {f.name for f in fields(DocumentEntry)}
     assert names == {

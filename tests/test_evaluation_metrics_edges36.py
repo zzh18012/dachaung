@@ -162,11 +162,6 @@ def test_bool_metric_converts_int_to_bool():
     assert _bool_metric(1)["value"] is True
 
 
-def test_bool_metric_reason_always_none():
-    out = _bool_metric(True)
-    assert out["reason"] is None
-
-
 def test_int_metric_returns_dict_with_value_reason():
     out = _int_metric(5)
     assert isinstance(out, dict)
@@ -189,11 +184,6 @@ def test_int_metric_negative():
 
 def test_int_metric_zero():
     assert _int_metric(0)["value"] == 0
-
-
-def test_int_metric_reason_always_none():
-    out = _int_metric(5)
-    assert out["reason"] is None
 
 
 # ---------- compute_automatic_metrics 行为深度第九批 ----------
@@ -242,12 +232,6 @@ def test_compute_metrics_document_none_schema_valid_null():
     out = compute_automatic_metrics(None, None, "pdf", None)
     assert out["schema_valid"]["value"] is None
     assert out["schema_valid"]["reason"] == "pipeline_failed"
-
-
-def test_compute_metrics_returns_14_keys_when_document():
-    doc = {"elements": [], "chunks": []}
-    out = compute_automatic_metrics(doc, None, "pdf", None)
-    assert len(out) == 14
 
 
 def test_compute_metrics_returns_14_keys_when_document_none():
@@ -599,14 +583,6 @@ def test_compute_metrics_actual_less_than_expected():
 # ---------- _is_valid_bbox 行为第九批 ----------
 
 
-def test_is_valid_bbox_valid_4_ints():
-    assert _is_valid_bbox([0, 0, 10, 10]) is True
-
-
-def test_is_valid_bbox_valid_4_floats():
-    assert _is_valid_bbox([0.0, 0.0, 10.5, 10.5]) is True
-
-
 def test_is_valid_bbox_mixed_int_float():
     assert _is_valid_bbox([0, 0.0, 10, 10.5]) is True
 
@@ -646,10 +622,6 @@ def test_is_valid_bbox_too_long():
 
 def test_is_valid_bbox_string_element():
     assert _is_valid_bbox([0, 0, "10", 10]) is False
-
-
-def test_is_valid_bbox_none_element():
-    assert _is_valid_bbox([0, 0, None, 10]) is False
 
 
 def test_is_valid_bbox_bool_element():
@@ -727,10 +699,6 @@ def test_strip_unicode_whitespace_line_separator():
 def test_strip_unicode_whitespace_paragraph_separator():
     """PARAGRAPH SEPARATOR U+2029。"""
     assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_preserves_non_whitespace_punctuation():
-    assert _strip_unicode_whitespace("a.b,c!") == "a.b,c!"
 
 
 def test_strip_unicode_whitespace_preserves_unicode_letters():

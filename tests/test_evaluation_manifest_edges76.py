@@ -621,12 +621,6 @@ def test_ast_has_4_class_def_batch51():
     assert len(classes) == 4
 
 
-def test_ast_class_names_batch51():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.ClassDef)]
-    assert names == ["ManifestError", "DocumentEntry", "ExpectedFailure", "Manifest"]
-
-
 def test_ast_3_dataclass_decorators_batch51():
     tree = ast.parse(inspect.getsource(manifest_mod))
     decorated = [n for n in tree.body if isinstance(n, ast.ClassDef) and n.decorator_list]

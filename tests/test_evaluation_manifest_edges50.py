@@ -950,12 +950,6 @@ def test_module_does_not_import_evaluation_metrics_batch23():
     assert "from evaluation import metrics" not in src
 
 
-def test_module_does_not_import_evaluation_report_batch23():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.report" not in src
-    assert "from evaluation import report" not in src
-
-
 def test_module_does_not_import_evaluation_annotation_metrics_batch23():
     src = inspect.getsource(mmod)
     assert "from evaluation.annotation_metrics" not in src

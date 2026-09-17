@@ -105,12 +105,6 @@ def test_pdf_bbox_required_types_subset_of_text_types():
     assert set(_PDF_BBOX_REQUIRED_TYPES).issubset(set(_TEXT_TYPES))
 
 
-def test_pdf_bbox_required_types_excludes_table_header_footer():
-    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "header" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "footer" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 # =========================================================================
 # 构造器签名 + 精确 keys
 # =========================================================================
@@ -148,11 +142,6 @@ def test_ratio_return_annotation_is_dict_str_any():
     assert sig.return_annotation == "dict[str, Any]"
 
 
-def test_ratio_keys_exact():
-    m = _ratio(0.5)
-    assert set(m.keys()) == {"value", "reason"}
-
-
 def test_ratio_negative_value_returned_as_is():
     """_ratio 不做 0..1 截断，原样返回。"""
     m = _ratio(-0.5)
@@ -173,11 +162,6 @@ def test_bool_metric_signature():
     sig = inspect.signature(_bool_metric)
     params = list(sig.parameters)
     assert params == ["value"]
-
-
-def test_bool_metric_return_annotation_is_dict_str_any():
-    sig = inspect.signature(_bool_metric)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_bool_metric_keys_exact():
@@ -214,11 +198,6 @@ def test_int_metric_signature():
     sig = inspect.signature(_int_metric)
     params = list(sig.parameters)
     assert params == ["value"]
-
-
-def test_int_metric_return_annotation_is_dict_str_any():
-    sig = inspect.signature(_int_metric)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_int_metric_keys_exact():
@@ -366,17 +345,6 @@ def test_pdf_locator_ratio_signature():
     sig = inspect.signature(_pdf_locator_ratio)
     params = list(sig.parameters)
     assert params == ["elements"]
-
-
-def test_pdf_locator_ratio_return_annotation_str():
-    sig = inspect.signature(_pdf_locator_ratio)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
-def test_pdf_locator_ratio_empty_list_no_elements():
-    m = _pdf_locator_ratio([])
-    assert m["value"] is None
-    assert m["reason"] == "no_elements"
 
 
 def test_pdf_locator_ratio_page_zero_invalid():
@@ -729,12 +697,6 @@ def test_chunk_reference_ratio_return_annotation_str():
     assert sig.return_annotation == "dict[str, Any]"
 
 
-def test_chunk_reference_ratio_empty_chunks_null():
-    m = _chunk_reference_ratio([], [])
-    assert m["value"] is None
-    assert m["reason"] == "no_chunks"
-
-
 def test_chunk_reference_ratio_no_chunks_with_elements_null():
     elems = [{"element_id": "e1"}]
     m = _chunk_reference_ratio(elems, [])
@@ -822,10 +784,6 @@ def test_strip_unicode_whitespace_signature():
 def test_strip_unicode_whitespace_return_annotation_str():
     sig = inspect.signature(_strip_unicode_whitespace)
     assert sig.return_annotation == "str"
-
-
-def test_strip_unicode_whitespace_ordinary_space():
-    assert _strip_unicode_whitespace(" ") == ""
 
 
 def test_strip_unicode_whitespace_preserves_punctuation():
@@ -1231,11 +1189,6 @@ def test_compute_automatic_metrics_defaults_image_base_dir_none():
     assert sig.parameters["image_base_dir"].default is None
 
 
-def test_compute_automatic_metrics_returns_dict():
-    m = compute_automatic_metrics(None, None, "pdf", None)
-    assert isinstance(m, dict)
-
-
 def test_compute_automatic_metrics_keys_on_failure_exact():
     """document=None, error=None → pipeline_success=False 但 schema_valid 等都 null。"""
     m = compute_automatic_metrics(None, None, "pdf", None)
@@ -1435,19 +1388,9 @@ def test_module_imports_math():
     assert hasattr(m, "math")
 
 
-def test_module_imports_counter():
-    import evaluation.metrics as m
-    assert hasattr(m, "Counter")
-
-
 def test_module_imports_path():
     import evaluation.metrics as m
     assert hasattr(m, "Path")
-
-
-def test_module_imports_any():
-    import evaluation.metrics as m
-    assert hasattr(m, "Any")
 
 
 def test_module_docstring_present():

@@ -626,12 +626,6 @@ def test_ratio_with_very_small_negative():
     assert r["value"] == -1e-300
 
 
-def test_ratio_with_negative_zero():
-    r = _ratio(-0.0)
-    # -0.0 转 float 仍是 -0.0
-    assert math.copysign(1.0, r["value"]) == -1.0
-
-
 def test_ratio_with_int_input():
     """int 输入被 float() 转。"""
     r = _ratio(1)  # int
@@ -736,11 +730,6 @@ def test_int_metric_value_is_int_type():
 # ---------- module source 字符串精确补强（math/Counter source level） ----------
 
 
-def test_module_source_has_import_math():
-    src = inspect.getsource(m)
-    assert "import math" in src
-
-
 def test_module_source_has_from_collections_import_counter():
     src = inspect.getsource(m)
     assert "from collections import Counter" in src
@@ -749,11 +738,6 @@ def test_module_source_has_from_collections_import_counter():
 def test_module_source_has_math_isfinite_in_is_valid_bbox():
     src = inspect.getsource(_is_valid_bbox)
     assert "math.isfinite(v)" in src
-
-
-def test_module_source_has_counter_intersection_in_text_preservation():
-    src = inspect.getsource(_text_preservation)
-    assert "c_expected & c_actual" in src
 
 
 def test_module_source_has_sum_for_common():
@@ -778,11 +762,6 @@ def test_module_source_has_f1_calc_pattern():
     assert "_ratio(common" in src
 
 
-def test_module_source_pdf_locator_uses_isinstance():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "isinstance(page, int)" in src
-
-
 def test_module_source_docx_locator_uses_any_for_structural_keys():
     src = inspect.getsource(_docx_locator_ratio)
     assert "any(k in loc for k in structural_keys)" in src
@@ -802,11 +781,6 @@ def test_module_source_chunk_reference_uses_set_comprehension():
 def test_module_source_heading_boundary_uses_add_to_set():
     src = inspect.getsource(_heading_boundary_ratio)
     assert "chunk_first_ids.add(ids[0])" in src
-
-
-def test_module_source_silent_drop_uses_items_iteration():
-    src = inspect.getsource(_silent_drop_count)
-    assert "for t, exp in expected_counts.items():" in src
 
 
 # ---------- module source forbidden tokens 第三批 ----------

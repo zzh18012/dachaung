@@ -395,22 +395,10 @@ def test_heading_boundary_ratio_no_heading_returns_null_batch33():
 # ---------- _silent_drop_count 第三十三批 ----------
 
 
-def test_silent_drop_count_no_expectations_returns_null_batch33():
-    out = _silent_drop_count({}, None)
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations"
-
-
 def test_silent_drop_count_empty_expectations_returns_null_batch33():
     out = _silent_drop_count({}, {})
     assert out["value"] is None
     assert out["reason"] == "no_expectations"
-
-
-def test_silent_drop_count_empty_expected_counts_returns_null_batch33():
-    out = _silent_drop_count({}, {"element_count_by_type": {}})
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations_element_count"
 
 
 def test_silent_drop_count_returns_dict_batch33():

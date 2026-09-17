@@ -154,11 +154,6 @@ def test_compute_metrics_schema_valid_exception_path_batch29():
     assert "schema_check_exception" in m["schema_valid"]["reason"]
 
 
-def test_compute_metrics_returns_dict_with_metrics_key_only_batch29():
-    m = compute_automatic_metrics(None, None, "pdf", None)
-    assert isinstance(m, dict)
-
-
 # ---------- _pdf_locator_ratio 第二十九批 ----------
 
 
@@ -546,14 +541,6 @@ def test_silent_drop_multiple_types_batch29():
     )
     # paragraph: 5-1=4, heading: 3-0=3, image: 2-0=2 → 9
     assert out["value"] == 9
-
-
-def test_silent_drop_returns_int_value_batch29():
-    out = _silent_drop_count(
-        {},
-        {"element_count_by_type": {"paragraph": 1}},
-    )
-    assert isinstance(out["value"], int)
 
 
 # ---------- module source forbidden tokens 第四十六批 ----------

@@ -75,12 +75,6 @@ def test_ratio_with_inf_input_batch39():
     assert out["value"] == float("inf")
 
 
-def test_ratio_with_zero_batch39():
-    out = _ratio(0)
-    assert out["value"] == 0.0
-    assert isinstance(out["value"], float)
-
-
 def test_ratio_with_one_batch39():
     out = _ratio(1)
     assert out["value"] == 1.0
@@ -138,10 +132,6 @@ def test_not_evaluated_is_lowercase_batch39():
     assert _NOT_EVALUATED.islower()
 
 
-def test_not_evaluated_is_underscore_separated_batch39():
-    assert "_" in _NOT_EVALUATED
-
-
 def test_text_types_does_not_contain_table_batch39_or_does_it():
     """_TEXT_TYPES 是否含 table？看实际行为（含 table）。"""
     assert "table" in _TEXT_TYPES
@@ -172,17 +162,9 @@ def test_is_valid_bbox_with_three_values_batch39():
     assert _is_valid_bbox([0, 0, 1]) is False
 
 
-def test_is_valid_bbox_with_five_values_batch39():
-    assert _is_valid_bbox([0, 0, 1, 1, 2]) is False
-
-
 def test_is_valid_bbox_with_nan_value_batch39():
     """math.isfinite(nan) == False → False。"""
     assert _is_valid_bbox([0, 0, float("nan"), 1]) is False
-
-
-def test_is_valid_bbox_with_inf_value_batch39():
-    assert _is_valid_bbox([0, 0, float("inf"), 1]) is False
 
 
 def test_is_valid_bbox_with_string_value_batch39():
@@ -474,16 +456,6 @@ def test_chunk_reference_returns_float_batch39():
     chunks = [{"source_element_ids": ["e1"]}]
     m = _chunk_reference_ratio(elements, chunks)
     assert isinstance(m["value"], float)
-
-
-def test_chunk_reference_all_valid_batch39():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}]
-    chunks = [
-        {"source_element_ids": ["e1"]},
-        {"source_element_ids": ["e2"]},
-    ]
-    m = _chunk_reference_ratio(elements, chunks)
-    assert m["value"] == 1.0
 
 
 def test_chunk_reference_no_chunks_returns_null_batch39():

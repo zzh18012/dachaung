@@ -76,10 +76,6 @@ def test_is_absolute_like_windows_backslash_batch45():
     assert _is_absolute_like("C:\\Windows") is True
 
 
-def test_is_absolute_like_windows_forward_slash_batch45():
-    assert _is_absolute_like("C:/Windows") is True
-
-
 def test_is_absolute_like_lowercase_drive_batch45():
     assert _is_absolute_like("c:\\Windows") is True
 
@@ -164,10 +160,6 @@ def test_has_backslash_at_start_batch45():
     assert _has_backslash("\\foo") is True
 
 
-def test_has_backslash_forward_only_batch45():
-    assert _has_backslash("/foo/bar") is False
-
-
 # ---------- DocumentEntry frozen ----------
 
 def _make_doc_entry(
@@ -208,18 +200,6 @@ def test_document_entry_hashable_batch45():
     assert isinstance(h, int)
 
 
-def test_document_entry_equality_batch45():
-    d1 = _make_doc_entry()
-    d2 = _make_doc_entry()
-    assert d1 == d2
-
-
-def test_document_entry_inequality_batch45():
-    d1 = _make_doc_entry(doc_id="d1")
-    d2 = _make_doc_entry(doc_id="d2")
-    assert d1 != d2
-
-
 def test_document_entry_in_set_batch45():
     d1 = _make_doc_entry()
     d2 = _make_doc_entry()
@@ -239,11 +219,6 @@ def test_document_entry_replace_batch45():
     d2 = replace(d1, doc_id="x")
     assert d2.doc_id == "x"
     assert d1.doc_id == "d1"  # 不变
-
-
-def test_document_entry_fields_count_batch45():
-    fs = fields(DocumentEntry)
-    assert len(fs) == 10
 
 
 def test_document_entry_field_names_batch45():
@@ -305,12 +280,6 @@ def test_expected_failure_hashable_batch45():
     ef = _make_expected_failure()
     h = hash(ef)
     assert isinstance(h, int)
-
-
-def test_expected_failure_equality_batch45():
-    ef1 = _make_expected_failure()
-    ef2 = _make_expected_failure()
-    assert ef1 == ef2
 
 
 def test_expected_failure_fields_count_batch45():

@@ -106,11 +106,6 @@ def test_bool_metric_none_batch16():
     assert r["value"] is False
 
 
-def test_bool_metric_zero_batch16():
-    r = _bool_metric(0)
-    assert r["value"] is False
-
-
 def test_bool_metric_empty_string_batch16():
     r = _bool_metric("")
     assert r["value"] is False
@@ -252,10 +247,6 @@ def test_strip_unicode_whitespace_empty_batch16():
 
 def test_strip_unicode_whitespace_all_ws_batch16():
     assert _strip_unicode_whitespace("  \t\n\r") == ""
-
-
-def test_strip_unicode_whitespace_no_ws_batch16():
-    assert _strip_unicode_whitespace("abcXYZ") == "abcXYZ"
 
 
 def test_strip_unicode_whitespace_nul_not_ws_batch16():
@@ -416,12 +407,6 @@ def test_docx_locator_ratio_locator_none_batch16():
     assert r["value"] == 0.0
 
 
-def test_docx_locator_ratio_empty_dict_batch16():
-    elements = [{"type": "paragraph", "source_locator": {}}]
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 0.0
-
-
 def test_docx_locator_ratio_page_present_invalidates_batch16():
     """含 page → 整个 element invalid（即使有 paragraph_index）。"""
     elements = [{"type": "paragraph", "source_locator": {"page": 1, "paragraph_index": 0}}]
@@ -497,20 +482,8 @@ def test_image_resource_ratio_mixed_batch16(tmp_path):
     assert r["value"] == 0.5
 
 
-def test_image_resource_ratio_resource_path_empty_batch16():
-    elements = [{"type": "image", "resource_path": ""}]
-    r = _image_resource_ratio(elements, None)
-    assert r["value"] == 0.0
-
-
 def test_image_resource_ratio_resource_path_none_batch16():
     elements = [{"type": "image", "resource_path": None}]
-    r = _image_resource_ratio(elements, None)
-    assert r["value"] == 0.0
-
-
-def test_image_resource_ratio_no_resource_path_key_batch16():
-    elements = [{"type": "image"}]
     r = _image_resource_ratio(elements, None)
     assert r["value"] == 0.0
 
@@ -1069,24 +1042,9 @@ def test_e2e_metric_keys_correct_batch16():
     assert set(m.keys()) == expected_keys
 
 
-def test_e2e_locator_ratio_pdf_no_elements_batch16():
-    r = _pdf_locator_ratio([])
-    assert r["reason"] == "no_elements"
-
-
-def test_e2e_locator_ratio_docx_no_elements_batch16():
-    r = _docx_locator_ratio([])
-    assert r["reason"] == "no_elements"
-
-
 def test_e2e_image_ratio_no_images_batch16():
     r = _image_resource_ratio([{"type": "paragraph"}], None)
     assert r["reason"] == "no_image_elements"
-
-
-def test_e2e_chunk_reference_no_chunks_batch16():
-    r = _chunk_reference_ratio([], [])
-    assert r["reason"] == "no_chunks"
 
 
 def test_e2e_heading_boundary_no_headings_batch16():

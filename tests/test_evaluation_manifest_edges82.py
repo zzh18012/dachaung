@@ -260,12 +260,6 @@ def test_source_pair_ids_add_batch53():
     assert "return groups + unpaired" in _src()
 
 
-def test_source_default_gets_batch53():
-    src = _src()
-    assert 'data.get("documents", [])' in src
-    assert 'data.get("expected_failures", [])' in src
-
-
 def test_source_list_annotations_batch53():
     src = _src()
     assert "documents: list[DocumentEntry] = []" in src

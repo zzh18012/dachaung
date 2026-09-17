@@ -66,20 +66,10 @@ def test_ratio_independent_dict_each_call_batch26():
     assert r2["value"] == 0.7
 
 
-def test_ratio_returns_two_keys_batch26():
-    out = _ratio(0.5)
-    assert set(out.keys()) == {"value", "reason"}
-
-
 def test_bool_metric_independent_each_call_batch26():
     b1 = _bool_metric(True)
     b2 = _bool_metric(False)
     assert b1 is not b2
-
-
-def test_bool_metric_returns_two_keys_batch26():
-    out = _bool_metric(True)
-    assert set(out.keys()) == {"value", "reason"}
 
 
 def test_int_metric_value_is_int_batch26():
@@ -696,12 +686,6 @@ def test_module_source_no_dataclass_batch26():
     assert "@dataclass" not in source
 
 
-def test_module_source_no_network_io_batch26():
-    source = inspect.getsource(mmod)
-    assert "import socket" not in source
-    assert "import http" not in source
-
-
 # ---------- module source 字符串精确补强第三十七批 ----------
 
 
@@ -748,11 +732,6 @@ def test_module_source_contains_heading_boundary_ratio_def_batch26():
 def test_module_source_contains_silent_drop_count_def_batch26():
     source = inspect.getsource(mmod)
     assert "_silent_drop_count" in source
-
-
-def test_module_source_contains_text_types_constant_batch26():
-    source = inspect.getsource(mmod)
-    assert "_TEXT_TYPES" in source
 
 
 def test_module_source_contains_pdf_bbox_constant_batch26():

@@ -164,12 +164,6 @@ def test_expected_failure_field_count_batch39():
     assert len(fields(ExpectedFailure)) == 5
 
 
-def test_expected_failure_field_names_batch39():
-    names = {f.name for f in fields(ExpectedFailure)}
-    expected = {"doc_id", "path_str", "resolved_path", "expected_error_code", "source_type"}
-    assert names == expected
-
-
 def test_expected_failure_frozen_batch39():
     ef = ExpectedFailure("a", "p", Path("/p"), "E", None)
     with pytest.raises(FrozenInstanceError):

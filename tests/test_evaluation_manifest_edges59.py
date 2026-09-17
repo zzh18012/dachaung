@@ -37,11 +37,6 @@ def test_manifest_error_str_batch32():
     assert str(e) == "boom"
 
 
-def test_manifest_error_no_args_batch32():
-    e = ManifestError()
-    assert str(e) == ""
-
-
 def test_manifest_error_caught_as_exception_batch32():
     with pytest.raises(Exception) as exc:
         raise ManifestError("x")
@@ -116,10 +111,6 @@ def test_has_backslash_two_backslashes_batch32():
     assert _has_backslash("\\\\") is True
 
 
-def test_has_backslash_forward_only_batch32():
-    assert _has_backslash("/foo/bar") is False
-
-
 def test_has_backslash_mixed_batch32():
     assert _has_backslash("foo\\bar/baz") is True
 
@@ -147,11 +138,6 @@ def test_document_entry_is_frozen_batch32():
     )
     with pytest.raises(FrozenInstanceError):
         e.doc_id = "modified"  # type: ignore[misc]
-
-
-def test_document_entry_field_count_ten_batch32():
-    fs = fields(DocumentEntry)
-    assert len(fs) == 10
 
 
 def test_document_entry_field_names_batch32():

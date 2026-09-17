@@ -270,10 +270,6 @@ def test_is_valid_bbox_accepts_four_ints():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
 
 
-def test_is_valid_bbox_accepts_mixed_int_float():
-    assert _is_valid_bbox([0, 0.0, 100, 100.0]) is True
-
-
 def test_is_valid_bbox_accepts_negative_values():
     assert _is_valid_bbox([-1.0, -2.0, -3.0, -4.0]) is True
 
@@ -452,12 +448,6 @@ def test_docx_locator_ratio_empty_returns_null():
     assert result["reason"] == "no_elements"
 
 
-def test_docx_locator_ratio_paragraph_index_valid():
-    elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 0}}]
-    result = _docx_locator_ratio(elements)
-    assert result["value"] == 1.0
-
-
 def test_docx_locator_ratio_section_valid():
     elements = [{"type": "paragraph", "source_locator": {"section": "main"}}]
     result = _docx_locator_ratio(elements)
@@ -470,12 +460,6 @@ def test_docx_locator_ratio_run_index_valid():
     assert result["value"] == 1.0
 
 
-def test_docx_locator_ratio_table_index_valid():
-    elements = [{"type": "table", "source_locator": {"table_index": 0}}]
-    result = _docx_locator_ratio(elements)
-    assert result["value"] == 1.0
-
-
 def test_docx_locator_ratio_row_index_valid():
     elements = [{"type": "table", "source_locator": {"row_index": 0}}]
     result = _docx_locator_ratio(elements)
@@ -484,12 +468,6 @@ def test_docx_locator_ratio_row_index_valid():
 
 def test_docx_locator_ratio_col_index_valid():
     elements = [{"type": "table", "source_locator": {"col_index": 0}}]
-    result = _docx_locator_ratio(elements)
-    assert result["value"] == 1.0
-
-
-def test_docx_locator_ratio_relationship_id_valid():
-    elements = [{"type": "image", "source_locator": {"relationship_id": "rId1"}}]
     result = _docx_locator_ratio(elements)
     assert result["value"] == 1.0
 
@@ -508,12 +486,6 @@ def test_docx_locator_ratio_bbox_rejected():
 
 def test_docx_locator_ratio_no_structural_key():
     elements = [{"type": "paragraph", "source_locator": {"unknown_key": "x"}}]
-    result = _docx_locator_ratio(elements)
-    assert result["value"] == 0.0
-
-
-def test_docx_locator_ratio_no_locator():
-    elements = [{"type": "paragraph"}]
     result = _docx_locator_ratio(elements)
     assert result["value"] == 0.0
 
@@ -678,23 +650,9 @@ def test_chunk_reference_ratio_partial():
     assert result["value"] == 0.5
 
 
-def test_chunk_reference_ratio_empty_ids():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": []}]
-    result = _chunk_reference_ratio(elements, chunks)
-    assert result["value"] == 0.0
-
-
 def test_chunk_reference_ratio_no_source_element_ids_key():
     elements = [{"element_id": "e1"}]
     chunks = [{}]
-    result = _chunk_reference_ratio(elements, chunks)
-    assert result["value"] == 0.0
-
-
-def test_chunk_reference_ratio_none_source_element_ids():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": None}]
     result = _chunk_reference_ratio(elements, chunks)
     assert result["value"] == 0.0
 

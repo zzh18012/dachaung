@@ -493,11 +493,6 @@ def test_expected_failure_equality_batch17():
 # ---------- load_manifest 异常深度第十七批 ----------
 
 
-def test_load_manifest_file_not_exists_batch17(tmp_path):
-    with pytest.raises(ManifestError, match="清单文件不存在"):
-        load_manifest(tmp_path / "no.json")
-
-
 def test_load_manifest_invalid_json_batch17(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("not json", encoding="utf-8")
@@ -696,11 +691,6 @@ def test_module_source_has_load_manifest_function_batch17():
 def test_module_source_has_detect_project_root_function_batch17():
     src = inspect.getsource(mmod)
     assert "def _detect_project_root(" in src
-
-
-def test_module_source_has_all_dunder_batch17():
-    src = inspect.getsource(mmod)
-    assert "__all__ = [" in src
 
 
 def test_module_source_all_has_5_items_batch17():

@@ -208,12 +208,6 @@ def test_pdf_locator_ratio_page_negative_rejected_batch48():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_ratio_text_type_without_bbox_rejected_batch48():
-    elements = [{"type": "heading", "source_locator": {"page": 1}}]  # 缺 bbox
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_ratio_text_type_with_valid_bbox_batch48():
     elements = [{"type": "heading", "source_locator": {"page": 1, "bbox": [0.0, 0.0, 100.0, 100.0]}}]
     out = _pdf_locator_ratio(elements)
@@ -238,12 +232,6 @@ def test_docx_locator_ratio_with_page_rejected_batch48():
 
 def test_docx_locator_ratio_with_bbox_rejected_batch48():
     elements = [{"type": "paragraph", "source_locator": {"bbox": [1, 2, 3, 4], "paragraph_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_docx_locator_ratio_no_structural_keys_rejected_batch48():
-    elements = [{"type": "paragraph", "source_locator": {"foo": "bar"}}]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -349,16 +337,6 @@ def test_chunk_reference_ratio_chunk_empty_source_element_ids_batch48():
     chunks = [{"text": "x", "source_element_ids": []}]
     out = _chunk_reference_ratio(elements, chunks)
     assert out["value"] == 0.0
-
-
-def test_chunk_reference_ratio_all_match_batch48():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}]
-    chunks = [
-        {"text": "a", "source_element_ids": ["e1"]},
-        {"text": "b", "source_element_ids": ["e2"]},
-    ]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 1.0
 
 
 def test_chunk_reference_ratio_partial_match_batch48():
@@ -517,12 +495,6 @@ def test_heading_boundary_ratio_partial_batch48():
 
 # ---------- _silent_drop_count 边界 ----------
 
-def test_silent_drop_count_no_expectations_batch48():
-    out = _silent_drop_count({}, None)
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations"
-
-
 def test_silent_drop_count_empty_expectations_batch48():
     out = _silent_drop_count({}, {})
     assert out["value"] is None
@@ -531,12 +503,6 @@ def test_silent_drop_count_empty_expectations_batch48():
 
 def test_silent_drop_count_no_element_count_by_type_batch48():
     out = _silent_drop_count({}, {"other_key": 1})
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations_element_count"
-
-
-def test_silent_drop_count_empty_element_count_by_type_batch48():
-    out = _silent_drop_count({}, {"element_count_by_type": {}})
     assert out["value"] is None
     assert out["reason"] == "no_expectations_element_count"
 

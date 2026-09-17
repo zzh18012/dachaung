@@ -349,10 +349,6 @@ def test_helper_null_reason_kept_batch52():
     assert _null("why")["reason"] == "why"
 
 
-def test_helper_ratio_coerces_int_batch52():
-    assert isinstance(_ratio(1)["value"], float)
-
-
 # ---------- _pdf_locator_ratio 数值 ----------
 
 def _pdf_elem(valid: bool, t: str = "paragraph") -> dict:

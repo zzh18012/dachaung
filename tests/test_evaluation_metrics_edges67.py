@@ -91,11 +91,6 @@ def test_int_metric_zero_batch41():
     assert out["reason"] is None
 
 
-def test_int_metric_huge_batch41():
-    out = _int_metric(10**18)
-    assert out["value"] == 10**18
-
-
 def test_int_metric_negative_batch41():
     out = _int_metric(-1)
     assert out["value"] == -1
@@ -126,10 +121,6 @@ def test_not_evaluated_is_str_batch41():
     assert isinstance(_NOT_EVALUATED, str)
 
 
-def test_not_evaluated_underscore_separated_batch41():
-    assert "_" in _NOT_EVALUATED
-
-
 def test_text_types_all_lowercase_batch41():
     for t in _TEXT_TYPES:
         assert t.islower()
@@ -146,10 +137,6 @@ def test_text_types_exactly_seven_batch41():
 def test_pdf_bbox_required_types_all_lowercase_batch41():
     for t in _PDF_BBOX_REQUIRED_TYPES:
         assert t.islower()
-
-
-def test_pdf_bbox_required_types_no_duplicates_batch41():
-    assert len(_PDF_BBOX_REQUIRED_TYPES) == len(set(_PDF_BBOX_REQUIRED_TYPES))
 
 
 def test_pdf_bbox_required_types_subset_of_text_types_batch41():
@@ -249,10 +236,6 @@ def test_is_valid_bbox_empty_tuple_batch41():
 
 def test_strip_unicode_whitespace_callable_batch41():
     assert callable(_strip_unicode_whitespace)
-
-
-def test_strip_unicode_whitespace_preserves_digits_batch41():
-    assert _strip_unicode_whitespace("12345") == "12345"
 
 
 def test_strip_unicode_whitespace_preserves_punctuation_batch41():
@@ -505,20 +488,7 @@ def test_docx_locator_ratio_missing_locator_batch41():
     assert out["value"] == 0.0
 
 
-def test_docx_locator_ratio_partial_valid_batch41():
-    elements = [
-        {"type": "paragraph", "source_locator": {"paragraph_index": 0}},
-        {"type": "paragraph", "source_locator": {}},
-    ]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.5
-
-
 # ---------- _image_resource_ratio 第四十一批
-
-
-def test_image_resource_ratio_callable_batch41():
-    assert callable(_image_resource_ratio)
 
 
 def test_image_resource_ratio_no_images_batch41():
@@ -573,10 +543,6 @@ def test_image_resource_ratio_signature_batch41():
 # ---------- _chunk_reference_ratio 第四十一批
 
 
-def test_chunk_reference_ratio_callable_batch41():
-    assert callable(_chunk_reference_ratio)
-
-
 def test_chunk_reference_ratio_empty_chunks_batch41():
     out = _chunk_reference_ratio([], [])
     assert out["value"] is None
@@ -588,13 +554,6 @@ def test_chunk_reference_ratio_chunk_with_source_ids_batch41():
     chunks = [{"source_element_ids": ["e1", "e2"]}]
     out = _chunk_reference_ratio(elements, chunks)
     assert out["value"] == 1.0
-
-
-def test_chunk_reference_ratio_chunk_without_source_ids_batch41():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"text": "abc"}]  # 缺 source_element_ids
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.0
 
 
 def test_chunk_reference_ratio_empty_source_ids_batch41():
@@ -695,10 +654,6 @@ def test_text_preservation_does_not_mutate_inputs_batch41():
 # ---------- _heading_boundary_ratio 第四十一批
 
 
-def test_heading_boundary_ratio_callable_batch41():
-    assert callable(_heading_boundary_ratio)
-
-
 def test_heading_boundary_ratio_empty_elements_batch41():
     out = _heading_boundary_ratio([], [])
     assert out["value"] is None
@@ -732,10 +687,6 @@ def test_heading_boundary_ratio_signature_two_params_batch41():
 
 
 # ---------- _silent_drop_count 第四十一批
-
-
-def test_silent_drop_count_callable_batch41():
-    assert callable(_silent_drop_count)
 
 
 def test_silent_drop_count_none_expectations_batch41():
@@ -1008,16 +959,6 @@ def test_module_source_contains_is_valid_bbox_definition_batch41():
     assert "def _is_valid_bbox(" in src
 
 
-def test_module_source_contains_no_elements_keyword_batch41():
-    src = inspect.getsource(mmod)
-    assert "no_elements" in src
-
-
-def test_module_source_contains_pipeline_failed_keyword_batch41():
-    src = inspect.getsource(mmod)
-    assert "pipeline_failed" in src
-
-
 def test_module_source_contains_all_export_batch41():
     src = inspect.getsource(mmod)
     assert "__all__" in src
@@ -1107,10 +1048,6 @@ def test_module_has_all_attribute_batch41():
 
 def test_module_all_is_list_batch41():
     assert isinstance(mmod.__all__, list)
-
-
-def test_module_all_contains_compute_automatic_metrics_batch41():
-    assert "compute_automatic_metrics" in mmod.__all__
 
 
 def test_module_does_not_define_class_batch41():

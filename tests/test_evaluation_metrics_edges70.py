@@ -134,12 +134,6 @@ def test_int_metric_zero_input_batch45():
     assert out["value"] == 0
 
 
-def test_ratio_zero_batch45():
-    out = _ratio(0)
-    assert out["value"] == 0.0
-    assert isinstance(out["value"], float)
-
-
 def test_ratio_one_batch45():
     out = _ratio(1)
     assert out["value"] == 1.0
@@ -239,24 +233,12 @@ def test_is_valid_bbox_tuple_rejected_batch45():
     assert _is_valid_bbox((1.0, 2.0, 3.0, 4.0)) is False
 
 
-def test_is_valid_bbox_set_rejected_batch45():
-    assert _is_valid_bbox({1.0, 2.0, 3.0, 4.0}) is False
-
-
 def test_is_valid_bbox_dict_rejected_batch45():
     assert _is_valid_bbox({"x": 1, "y": 2, "w": 3, "h": 4}) is False
 
 
 def test_is_valid_bbox_empty_list_batch45():
     assert _is_valid_bbox([]) is False
-
-
-def test_is_valid_bbox_short_list_batch45():
-    assert _is_valid_bbox([1.0, 2.0, 3.0]) is False
-
-
-def test_is_valid_bbox_long_list_batch45():
-    assert _is_valid_bbox([1.0, 2.0, 3.0, 4.0, 5.0]) is False
 
 
 def test_is_valid_bbox_with_bool_batch45():
@@ -294,10 +276,6 @@ def test_is_valid_bbox_negative_values_batch45():
     assert _is_valid_bbox([-1.0, -2.0, -3.0, -4.0]) is True
 
 
-def test_is_valid_bbox_mixed_int_float_batch45():
-    assert _is_valid_bbox([1, 2.0, 3, 4.0]) is True
-
-
 def test_is_valid_bbox_one_element_none_batch45():
     """list 含 None 元素拒绝。"""
     assert _is_valid_bbox([None, 2.0, 3.0, 4.0]) is False
@@ -309,21 +287,12 @@ def test_is_valid_bbox_one_element_str_batch45():
 
 # ---------- _strip_unicode_whitespace ----------
 
-def test_strip_unicode_whitespace_returns_str_batch45():
-    out = _strip_unicode_whitespace("abc")
-    assert isinstance(out, str)
-
-
 def test_strip_unicode_whitespace_empty_batch45():
     assert _strip_unicode_whitespace("") == ""
 
 
 def test_strip_unicode_whitespace_no_change_batch45():
     assert _strip_unicode_whitespace("abc") == "abc"
-
-
-def test_strip_unicode_whitespace_all_whitespace_batch45():
-    assert _strip_unicode_whitespace(" \t\n\r") == ""
 
 
 def test_strip_unicode_whitespace_preserves_punctuation_batch45():
@@ -336,10 +305,6 @@ def test_strip_unicode_whitespace_preserves_digits_batch45():
 
 def test_strip_unicode_whitespace_preserves_emoji_batch45():
     assert _strip_unicode_whitespace("🎉 🚀") == "🎉🚀"
-
-
-def test_strip_unicode_whitespace_preserves_chinese_batch45():
-    assert _strip_unicode_whitespace("你 好 世 界") == "你好世界"
 
 
 def test_strip_unicode_whitespace_only_nbsp_batch45():
@@ -398,12 +363,6 @@ def test_pdf_locator_ratio_page_string_batch45():
 def test_pdf_locator_ratio_no_locator_batch45():
     """没有 source_locator 的元素 page=None。"""
     elements = [{"type": "paragraph"}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_locator_none_batch45():
-    elements = [{"type": "paragraph", "source_locator": None}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -624,17 +583,6 @@ def test_compute_source_uses_error_get_or_index_batch45():
     src = inspect.getsource(compute_automatic_metrics)
     # error["code"] 严格索引
     assert 'error["code"]' in src
-
-
-def test_compute_source_uses_lazy_import_batch45():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert "from evaluation.schema_validation import document_passes_schema" in src
-
-
-def test_compute_source_uses_try_except_batch45():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert "try:" in src
-    assert "except Exception" in src
 
 
 def test_compute_source_uses_schema_check_exception_batch45():

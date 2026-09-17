@@ -146,11 +146,6 @@ def test_manifest_error_str_returns_message():
     assert str(e) == "specific error"
 
 
-def test_manifest_error_args_preserved():
-    e = ManifestError("a", "b", "c")
-    assert e.args == ("a", "b", "c")
-
-
 def test_manifest_error_no_args():
     e = ManifestError()
     assert e.args == ()

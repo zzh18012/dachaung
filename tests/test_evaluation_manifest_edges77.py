@@ -543,11 +543,6 @@ def test_ast_resolve_relative_path_signature_batch52():
     assert len(args.args) == 3  # path_str, project_root, field_name
 
 
-def test_ast_module_no_async_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
-
-
 def test_ast_module_no_star_import_batch52():
     tree = ast.parse(inspect.getsource(manifest_mod))
     for n in tree.body:
@@ -560,11 +555,6 @@ def test_ast_no_with_at_module_level_batch52():
     tree = ast.parse(inspect.getsource(manifest_mod))
     for n in tree.body:
         assert not isinstance(n, ast.With)
-
-
-def test_ast_no_global_nonlocal_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
 
 
 # ---------- forbidden tokens 第一百四十五批 ----------
@@ -636,8 +626,3 @@ def test_source_no_yield_batch52():
 def test_source_no_async_await_batch52():
     assert "async " not in _src()
     assert "await " not in _src()
-
-
-def test_source_open_count_is_1_batch52():
-    """load_manifest 1 个 with open。"""
-    assert _src().count("open(") == 1

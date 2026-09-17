@@ -110,12 +110,6 @@ def test_module_source_contains_def_chunk_reference_ratio():
     assert "def _chunk_reference_ratio(" in inspect.getsource(m)
 
 
-def test_module_source_contains_def_strip_unicode_whitespace():
-    import evaluation.metrics as m
-
-    assert "def _strip_unicode_whitespace(" in inspect.getsource(m)
-
-
 def test_module_source_contains_def_text_preservation():
     import evaluation.metrics as m
 

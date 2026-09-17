@@ -83,10 +83,6 @@ def test_is_absolute_like_number_drive_batch27():
     assert _is_absolute_like("1:/foo") is False
 
 
-def test_is_absolute_like_relative_path_batch27():
-    assert _is_absolute_like("samples/foo.pdf") is False
-
-
 def test_is_absolute_like_double_slash_batch27():
     assert _is_absolute_like("//server/share") is True
 
@@ -230,12 +226,6 @@ def test_expected_failure_frozen_batch27():
     ef = _make_ef()
     with pytest.raises(FrozenInstanceError):
         ef.doc_id = "modified"  # type: ignore[misc]
-
-
-def test_expected_failure_hashable_batch27():
-    ef = _make_ef()
-    h = hash(ef)
-    assert isinstance(h, int)
 
 
 def test_expected_failure_source_type_none_batch27():

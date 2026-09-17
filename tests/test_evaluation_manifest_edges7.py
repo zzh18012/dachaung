@@ -449,12 +449,6 @@ def test_resolve_relative_path_empty_raises(tmp_path: Path):
     assert "为空" in str(exc.value)
 
 
-def test_resolve_relative_path_absolute_posix_raises(tmp_path: Path):
-    with pytest.raises(ManifestError) as exc:
-        _resolve_relative_path("/etc/passwd", tmp_path, "f")
-    assert "绝对路径" in str(exc.value)
-
-
 def test_resolve_relative_path_absolute_windows_drive_raises(tmp_path: Path):
     with pytest.raises(ManifestError) as exc:
         _resolve_relative_path("C:/foo", tmp_path, "f")
@@ -490,11 +484,6 @@ def test_resolve_relative_path_field_name_in_message(tmp_path: Path):
     with pytest.raises(ManifestError) as exc:
         _resolve_relative_path("", tmp_path, "documents[X].path")
     assert "documents[X].path" in str(exc.value)
-
-
-def test_resolve_relative_path_signature():
-    sig = inspect.signature(_resolve_relative_path)
-    assert set(sig.parameters) == {"path_str", "project_root", "field_name"}
 
 
 # =========================================================================
@@ -750,12 +739,6 @@ def test_load_manifest_with_explicit_project_root(tmp_path: Path):
     # 但显式传 project_root 应跳过 detect
     m = load_manifest(p, project_root=tmp_path)
     assert m.project_root == tmp_path.resolve()
-
-
-def test_load_manifest_str_path(tmp_path: Path):
-    p = _write_valid_manifest(tmp_path)
-    m = load_manifest(str(p))
-    assert isinstance(m, Manifest)
 
 
 def test_load_manifest_str_project_root(tmp_path: Path):

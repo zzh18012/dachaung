@@ -215,18 +215,6 @@ def test_pdf_locator_ratio_page_negative_batch28():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_ratio_page_none_batch28():
-    elements = [{"type": "image", "source_locator": {"page": None}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_page_missing_batch28():
-    elements = [{"type": "image", "source_locator": {}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_ratio_image_only_valid_batch28():
     """image 类型只需 page≥1，不需 bbox。"""
     elements = [{"type": "image", "source_locator": {"page": 1}}]
@@ -239,17 +227,6 @@ def test_pdf_locator_ratio_paragraph_missing_bbox_batch28():
     elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_paragraph_with_valid_bbox_batch28():
-    elements = [
-        {
-            "type": "paragraph",
-            "source_locator": {"page": 1, "bbox": [0.0, 0.0, 100.0, 100.0]},
-        }
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
 
 
 def test_pdf_locator_ratio_no_locator_key_batch28():
@@ -297,12 +274,6 @@ def test_docx_locator_ratio_has_relationship_id_batch28():
     elements = [{"type": "image", "source_locator": {"relationship_id": "r1"}}]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 1.0
-
-
-def test_docx_locator_ratio_no_structural_keys_batch28():
-    elements = [{"type": "paragraph", "source_locator": {"foo": "bar"}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
 
 
 def test_docx_locator_ratio_no_locator_key_batch28():
@@ -424,13 +395,6 @@ def test_chunk_reference_ratio_no_chunks_batch28():
     assert out["reason"] == "no_chunks"
 
 
-def test_chunk_reference_ratio_single_match_batch28():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": ["e1"]}]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 1.0
-
-
 def test_chunk_reference_ratio_no_match_batch28():
     elements = [{"element_id": "e1"}]
     chunks = [{"source_element_ids": ["eX"]}]
@@ -491,21 +455,6 @@ def test_strip_unicode_whitespace_em_space_batch28():
     assert _strip_unicode_whitespace("a b") == "ab"
 
 
-def test_strip_unicode_whitespace_ideographic_space_batch28():
-    """U+3000 ideographic space。"""
-    assert _strip_unicode_whitespace("a　b") == "ab"
-
-
-def test_strip_unicode_whitespace_line_separator_batch28():
-    """U+2028 line separator。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_paragraph_separator_batch28():
-    """U+2029 paragraph separator。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
 def test_strip_unicode_whitespace_zero_width_not_space_batch28():
     """U+200B zero-width space：isspace() False，不删除。"""
     assert _strip_unicode_whitespace("a​b") == "a​b"
@@ -513,10 +462,6 @@ def test_strip_unicode_whitespace_zero_width_not_space_batch28():
 
 def test_strip_unicode_whitespace_empty_batch28():
     assert _strip_unicode_whitespace("") == ""
-
-
-def test_strip_unicode_whitespace_all_whitespace_batch28():
-    assert _strip_unicode_whitespace(" \t\n\r") == ""
 
 
 # ---------- _text_preservation 第二十八批 ----------
@@ -590,13 +535,6 @@ def test_heading_boundary_match_batch28():
     chunks = [{"source_element_ids": ["h1"]}]
     out = _heading_boundary_ratio(elements, chunks)
     assert out["value"] == 1.0
-
-
-def test_heading_boundary_no_match_batch28():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["other"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 0.0
 
 
 def test_heading_boundary_partial_match_batch28():
@@ -810,18 +748,6 @@ def test_module_source_contains_math_import_batch28():
 
 
 # ---------- signatures 第四十一批 ----------
-
-
-def test_signature_null_batch28():
-    sig = inspect.signature(_null)
-    params = list(sig.parameters.keys())
-    assert params == ["reason"]
-
-
-def test_signature_ratio_batch28():
-    sig = inspect.signature(_ratio)
-    params = list(sig.parameters.keys())
-    assert params == ["value"]
 
 
 def test_signature_bool_metric_batch28():

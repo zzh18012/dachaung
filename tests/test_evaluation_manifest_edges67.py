@@ -282,18 +282,6 @@ def test_document_entry_expectations_dict_batch40():
     assert d.expectations == e
 
 
-def test_document_entry_equality_same_fields_batch40():
-    d1 = _make_doc_entry()
-    d2 = _make_doc_entry()
-    assert d1 == d2
-
-
-def test_document_entry_inequality_diff_doc_id_batch40():
-    d1 = _make_doc_entry(doc_id="d1")
-    d2 = _make_doc_entry(doc_id="d2")
-    assert d1 != d2
-
-
 def test_document_entry_hashable_with_hashable_categories_batch40():
     d = _make_doc_entry(categories=("a", "b"))
     h = hash(d)
@@ -336,12 +324,6 @@ def test_expected_failure_field_count_five_batch40():
     assert len(fields(ExpectedFailure)) == 5
 
 
-def test_expected_failure_field_names_batch40():
-    names = {f.name for f in fields(ExpectedFailure)}
-    expected = {"doc_id", "path_str", "resolved_path", "expected_error_code", "source_type"}
-    assert names == expected
-
-
 def test_expected_failure_frozen_batch40():
     ef = _make_ef()
     with pytest.raises(FrozenInstanceError):
@@ -373,12 +355,6 @@ def test_expected_failure_inequality_diff_code_batch40():
     ef1 = _make_ef(expected_error_code="E_PARSE")
     ef2 = _make_ef(expected_error_code="E_OTHER")
     assert ef1 != ef2
-
-
-def test_expected_failure_hashable_batch40():
-    ef = _make_ef()
-    h = hash(ef)
-    assert isinstance(h, int)
 
 
 # ---------- Manifest properties 第四十批
@@ -1006,11 +982,6 @@ def test_module_source_contains_has_backslash_function_batch40():
     assert "def _has_backslash(" in src
 
 
-def test_module_source_contains_pyproject_keyword_batch40():
-    src = inspect.getsource(mmod)
-    assert "pyproject.toml" in src
-
-
 def test_module_source_contains_utf8_keyword_batch40():
     src = inspect.getsource(mmod)
     assert 'encoding="utf-8"' in src
@@ -1153,10 +1124,6 @@ def test_module_all_contains_document_entry_batch40():
 
 def test_module_all_contains_expected_failure_batch40():
     assert "ExpectedFailure" in mmod.__all__
-
-
-def test_module_all_contains_load_manifest_batch40():
-    assert "load_manifest" in mmod.__all__
 
 
 def test_module_does_not_export_helpers_batch40():

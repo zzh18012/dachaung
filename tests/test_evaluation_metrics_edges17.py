@@ -247,10 +247,6 @@ def test_is_valid_bbox_tuple():
     assert _is_valid_bbox((1, 2, 3, 4)) is False
 
 
-def test_is_valid_bbox_returns_bool_type():
-    assert isinstance(_is_valid_bbox([1, 2, 3, 4]), bool)
-
-
 # =========================================================================
 # _pdf_locator_ratio 边界
 # =========================================================================
@@ -1127,12 +1123,6 @@ def test_text_types_does_not_contain_image():
 # =========================================================================
 # 源码 token 验证（补强 edges16）
 # =========================================================================
-
-
-def test_module_source_contains_strip_unicode_whitespace_def():
-    import evaluation.metrics as m
-
-    assert "def _strip_unicode_whitespace(" in inspect.getsource(m)
 
 
 def test_module_source_contains_isspace_call():

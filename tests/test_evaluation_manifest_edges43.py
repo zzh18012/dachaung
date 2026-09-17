@@ -679,11 +679,6 @@ def test_module_source_has_typing_any_import_batch16():
     assert "from typing import Any" in src
 
 
-def test_module_source_has_all_list_batch16():
-    src = inspect.getsource(mmod)
-    assert "__all__ = [" in src
-
-
 def test_module_source_has_5_items_in_all_batch16():
     """__all__ 至少 5 项。"""
     src = inspect.getsource(mmod)

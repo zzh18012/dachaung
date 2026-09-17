@@ -71,13 +71,6 @@ def test_pdf_bbox_required_is_subset_of_text_types_batch30():
         assert t in _TEXT_TYPES
 
 
-def test_pdf_bbox_required_excludes_table_header_footer_batch30():
-    """table/header/footer 不需要 bbox。"""
-    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "header" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "footer" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_text_types_excludes_image_batch30():
     assert "image" not in _TEXT_TYPES
 
@@ -108,11 +101,6 @@ def test_null_two_keys_batch30():
 
 def test_null_value_is_none_batch30():
     assert _null("x")["value"] is None
-
-
-def test_ratio_two_keys_batch30():
-    m = _ratio(0.5)
-    assert set(m.keys()) == {"value", "reason"}
 
 
 def test_ratio_reason_is_none_batch30():
@@ -398,10 +386,6 @@ def test_is_valid_bbox_all_int_batch30():
     assert _is_valid_bbox([1, 2, 3, 4]) is True
 
 
-def test_is_valid_bbox_mixed_int_float_batch30():
-    assert _is_valid_bbox([1, 2.0, 3, 4.0]) is True
-
-
 def test_is_valid_bbox_zero_values_batch30():
     assert _is_valid_bbox([0, 0, 0, 0]) is True
 
@@ -574,13 +558,6 @@ def test_text_preservation_empty_both_batch30():
     assert out["recall"]["reason"] == "empty_expected_and_actual"
 
 
-def test_text_preservation_returns_three_keys_batch30():
-    elements = []
-    chunks = []
-    out = _text_preservation(elements, chunks)
-    assert set(out.keys()) == {"equal", "precision", "recall"}
-
-
 # ---------- _heading_boundary_ratio 第三十批 ----------
 
 
@@ -601,13 +578,6 @@ def test_heading_boundary_ratio_multiple_headings_batch30():
     out = _heading_boundary_ratio(elements, chunks)
     # 1/2 matched
     assert out["value"] == 0.5
-
-
-def test_heading_boundary_ratio_no_headings_batch30():
-    elements = [{"type": "paragraph"}]
-    chunks = []
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["reason"] == "no_heading_elements"
 
 
 def test_heading_boundary_ratio_all_matched_batch30():
@@ -766,11 +736,6 @@ def test_module_source_contains_int_metric_func_batch30():
     assert "def _int_metric" in src
 
 
-def test_module_source_contains_compute_automatic_metrics_batch30():
-    src = inspect.getsource(mmod)
-    assert "def compute_automatic_metrics" in src
-
-
 def test_module_source_contains_pdf_locator_ratio_batch30():
     src = inspect.getsource(mmod)
     assert "def _pdf_locator_ratio" in src
@@ -794,11 +759,6 @@ def test_module_source_contains_image_resource_ratio_batch30():
 def test_module_source_contains_chunk_reference_ratio_batch30():
     src = inspect.getsource(mmod)
     assert "def _chunk_reference_ratio" in src
-
-
-def test_module_source_contains_strip_unicode_whitespace_batch30():
-    src = inspect.getsource(mmod)
-    assert "def _strip_unicode_whitespace" in src
 
 
 def test_module_source_contains_text_preservation_batch30():

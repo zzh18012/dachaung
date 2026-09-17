@@ -133,21 +133,9 @@ def test_is_valid_bbox_contains_false_rejected_batch42():
     assert _is_valid_bbox([0, 0, False, 100]) is False
 
 
-def test_is_valid_bbox_all_bool_rejected_batch42():
-    assert _is_valid_bbox([True, True, True, True]) is False
-
-
 def test_is_valid_bbox_string_number_rejected_batch42():
     """字符串数字不是数值。"""
     assert _is_valid_bbox(["0", "0", "100", "100"]) is False
-
-
-def test_is_valid_bbox_nan_rejected_batch42():
-    assert _is_valid_bbox([float("nan"), 0, 100, 100]) is False
-
-
-def test_is_valid_bbox_inf_rejected_batch42():
-    assert _is_valid_bbox([float("inf"), 0, 100, 100]) is False
 
 
 def test_is_valid_bbox_neg_inf_rejected_batch42():
@@ -220,12 +208,6 @@ def test_pdf_locator_ratio_table_no_bbox_needed_batch42():
     assert out["value"] == 1.0
 
 
-def test_pdf_locator_ratio_header_no_bbox_needed_batch42():
-    elements = [{"type": "header", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_pdf_locator_ratio_footer_no_bbox_needed_batch42():
     elements = [{"type": "footer", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
@@ -239,14 +221,6 @@ def test_pdf_locator_ratio_paragraph_needs_bbox_batch42():
     ]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_paragraph_with_valid_bbox_batch42():
-    elements = [
-        {"type": "paragraph", "source_locator": {"page": 1, "bbox": [0, 0, 100, 100]}},
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
 
 
 def test_pdf_locator_ratio_page_zero_rejected_batch42():
@@ -287,12 +261,6 @@ def test_pdf_locator_ratio_page_bool_rejected_batch42():
 def test_pdf_locator_ratio_page_float_rejected_batch42():
     """float 1.0 不是 int（isinstance 严格）。"""
     elements = [{"type": "image", "source_locator": {"page": 1.0}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_page_none_rejected_batch42():
-    elements = [{"type": "image", "source_locator": {"page": None}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -590,15 +558,6 @@ def test_null_empty_reason_batch42():
     assert _null("")["reason"] == ""
 
 
-def test_ratio_returns_dict_with_two_keys_batch42():
-    out = _ratio(0.5)
-    assert set(out.keys()) == {"value", "reason"}
-
-
-def test_ratio_value_is_float_batch42():
-    assert isinstance(_ratio(1)["value"], float)
-
-
 def test_ratio_reason_is_none_batch42():
     assert _ratio(0.5)["reason"] is None
 
@@ -606,11 +565,6 @@ def test_ratio_reason_is_none_batch42():
 def test_ratio_int_input_converted_batch42():
     """int 输入被 float() 转。"""
     assert _ratio(1)["value"] == 1.0
-
-
-def test_bool_metric_returns_dict_batch42():
-    out = _bool_metric(True)
-    assert set(out.keys()) == {"value", "reason"}
 
 
 def test_bool_metric_value_is_bool_batch42():

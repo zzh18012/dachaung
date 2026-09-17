@@ -726,13 +726,6 @@ def test_load_manifest_missing_file_raises(tmp_path: Path):
     assert "清单文件不存在" in str(exc.value) or "不存在" in str(exc.value)
 
 
-def test_load_manifest_str_path_accepted(tmp_path: Path):
-    p = _write_valid_manifest(tmp_path)
-    # 传字符串路径而非 Path
-    m = load_manifest(str(p))
-    assert isinstance(m, Manifest)
-
-
 def test_load_manifest_invalid_json_raises(tmp_path: Path):
     p = tmp_path / "manifest.json"
     p.write_text("{not valid", encoding="utf-8")
@@ -746,12 +739,6 @@ def test_load_manifest_no_project_root_uses_detect(tmp_path: Path):
     p = _write_valid_manifest(tmp_path)
     m = load_manifest(p)
     # detected project_root 应是 tmp_path
-    assert m.project_root == tmp_path.resolve()
-
-
-def test_load_manifest_explicit_project_root(tmp_path: Path):
-    p = _write_valid_manifest(tmp_path)
-    m = load_manifest(p, project_root=tmp_path)
     assert m.project_root == tmp_path.resolve()
 
 

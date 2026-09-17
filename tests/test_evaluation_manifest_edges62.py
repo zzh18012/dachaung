@@ -557,16 +557,6 @@ def test_manifest_error_message_preserved_batch35():
     assert str(e) == "test message"
 
 
-def test_manifest_error_no_args_batch35():
-    e = ManifestError()
-    assert str(e) == ""
-
-
-def test_manifest_error_multiple_args_batch35():
-    e = ManifestError("a", "b", "c")
-    assert e.args == ("a", "b", "c")
-
-
 # ---------- module source forbidden tokens 第五十三批
 
 
@@ -662,11 +652,6 @@ def test_module_source_contains_all_list_batch35():
     assert "__all__" in src
 
 
-def test_module_source_all_contains_manifest_error_batch35():
-    src = inspect.getsource(mmod)
-    assert '"ManifestError"' in src
-
-
 def test_module_source_all_contains_manifest_batch35():
     src = inspect.getsource(mmod)
     assert '"Manifest"' in src
@@ -680,11 +665,6 @@ def test_module_source_all_contains_document_entry_batch35():
 def test_module_source_all_contains_expected_failure_batch35():
     src = inspect.getsource(mmod)
     assert '"ExpectedFailure"' in src
-
-
-def test_module_source_all_contains_load_manifest_batch35():
-    src = inspect.getsource(mmod)
-    assert '"load_manifest"' in src
 
 
 # ---------- signatures 第四十九批

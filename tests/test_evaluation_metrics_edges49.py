@@ -189,11 +189,6 @@ def test_pdf_bbox_required_types_excludes_table_batch23():
     assert "table" not in _PDF_BBOX_REQUIRED_TYPES
 
 
-def test_pdf_bbox_required_types_excludes_header_footer_batch23():
-    assert "header" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "footer" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_text_types_can_be_converted_to_set_batch23():
     s = set(_TEXT_TYPES)
     assert isinstance(s, set)
@@ -211,11 +206,6 @@ def test_strip_unicode_whitespace_nbsp_batch23():
 def test_strip_unicode_whitespace_em_space_batch23():
     """U+2003 em space。"""
     assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_en_space_batch23():
-    """U+2002 en space。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
 
 
 def test_strip_unicode_whitespace_ideographic_space_batch23():
@@ -1143,12 +1133,6 @@ def test_module_all_count_one_batch23():
 
 def test_module_all_contents_exact_batch23():
     assert mmod.__all__ == ["compute_automatic_metrics"]
-
-
-def test_module_does_not_import_app_pipeline_batch23():
-    src = inspect.getsource(mmod)
-    assert "from app.pipeline" not in src
-    assert "from app import pipeline" not in src
 
 
 def test_module_does_not_import_app_parsers_batch23():

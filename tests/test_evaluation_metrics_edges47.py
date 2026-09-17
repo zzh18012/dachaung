@@ -148,10 +148,6 @@ def test_strip_unicode_preserves_digits_batch20():
     assert _strip_unicode_whitespace("123") == "123"
 
 
-def test_strip_unicode_preserves_letters_batch20():
-    assert _strip_unicode_whitespace("abcXYZ") == "abcXYZ"
-
-
 def test_strip_unicode_with_tab_batch20():
     assert _strip_unicode_whitespace("a\tb") == "ab"
 
@@ -325,10 +321,6 @@ def test_docx_locator_ratio_mixed_batch20():
 
 def test_is_valid_bbox_with_decimal_string_batch20():
     assert _is_valid_bbox(["0.5", "1.0", "1.5", "2.0"]) is False
-
-
-def test_is_valid_bbox_with_more_than_4_items_batch20():
-    assert _is_valid_bbox([0, 0, 1, 1, 1]) is False
 
 
 def test_is_valid_bbox_with_dict_batch20():
@@ -597,11 +589,6 @@ def test_module_source_no_path_write_text_batch20():
 def test_module_source_no_sys_exit_batch20():
     src = inspect.getsource(mmod)
     assert "sys.exit" not in src
-
-
-def test_module_source_no_re_compile_batch20():
-    src = inspect.getsource(mmod)
-    assert "re.compile" not in src
 
 
 def test_module_source_no_pandas_import_batch20():

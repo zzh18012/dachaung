@@ -497,14 +497,6 @@ def test_ast_resolve_relative_path_has_try_batch46():
     assert len(trys) == 1
 
 
-def test_ast_load_manifest_has_two_for_loops_batch46():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "load_manifest"][0]
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    # documents + expected_failures
-    assert len(fors) >= 2
-
-
 def test_ast_manifest_class_has_property_decorators_batch46():
     tree = ast.parse(inspect.getsource(manifest_mod))
     cls = [n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "Manifest"][0]
@@ -595,29 +587,9 @@ def test_source_no_pickle_load_batch46():
     assert "pickle.load(" not in src
 
 
-def test_source_no_subprocess_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "subprocess" not in src
-
-
-def test_source_no_lambda_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "lambda" not in src
-
-
 def test_source_no_yield_batch46():
     src = inspect.getsource(manifest_mod)
     assert "yield" not in src
-
-
-def test_source_no_walrus_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert ":=" not in src
-
-
-def test_source_no_async_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "async def" not in src
 
 
 def test_source_no_await_batch46():

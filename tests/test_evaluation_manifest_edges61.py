@@ -154,16 +154,6 @@ def test_content_group_count_pair_with_unpaired_batch34():
 # ---------- Manifest.pdf_count / docx_count 第三十四批
 
 
-def test_pdf_count_only_docx_batch34():
-    docs = (
-        DocumentEntry("d1", "a.docx", Path("/x/a.docx"), "docx", None, (),
-                      None, None, None, None),
-    )
-    m = Manifest("1.0", "incomplete", docs, (), Path("/x"))
-    assert m.pdf_count == 0
-    assert m.docx_count == 1
-
-
 def test_pdf_count_only_pdf_batch34():
     docs = (
         DocumentEntry("d1", "a.pdf", Path("/x/a.pdf"), "pdf", None, (),

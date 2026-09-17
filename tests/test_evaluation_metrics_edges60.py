@@ -283,12 +283,6 @@ def test_pdf_locator_page_zero_batch34():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_no_page_batch34():
-    elements = [{"type": "image", "source_locator": {}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 # ---------- _docx_locator_ratio 第三十四批
 
 
@@ -379,11 +373,6 @@ def test_is_valid_bbox_inf_batch34():
 # ---------- _image_resource_ratio 第三十四批
 
 
-def test_image_ratio_no_images_batch34():
-    out = _image_resource_ratio([], None)
-    assert out["reason"] == "no_image_elements"
-
-
 def test_image_ratio_no_resource_path_batch34():
     elements = [{"type": "image"}]
     out = _image_resource_ratio(elements, None)
@@ -455,13 +444,6 @@ def test_chunk_ref_no_source_ids_field_batch34():
     assert out["value"] == 0.0
 
 
-def test_chunk_ref_valid_batch34():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": ["e1"]}]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 1.0
-
-
 def test_chunk_ref_invalid_id_batch34():
     elements = [{"element_id": "e1"}]
     chunks = [{"source_element_ids": ["e_nonexistent"]}]
@@ -484,13 +466,6 @@ def test_chunk_ref_multi_ids_all_valid_batch34():
     chunks = [{"source_element_ids": ["e1", "e2"]}]
     out = _chunk_reference_ratio(elements, chunks)
     assert out["value"] == 1.0
-
-
-def test_chunk_ref_multi_ids_partial_batch34():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": ["e1", "missing"]}]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.0
 
 
 # ---------- _strip_unicode_whitespace 第三十四批
@@ -589,11 +564,6 @@ def test_text_preservation_extra_chars_batch34():
 
 
 # ---------- _heading_boundary_ratio 第三十四批
-
-
-def test_heading_boundary_no_headings_batch34():
-    out = _heading_boundary_ratio([], [])
-    assert out["reason"] == "no_heading_elements"
 
 
 def test_heading_boundary_no_chunks_batch34():
@@ -822,18 +792,6 @@ def test_module_source_contains_all_batch34():
 
 
 # ---------- signatures 第四十九批
-
-
-def test_signature_null_one_param_batch34():
-    sig = inspect.signature(_null)
-    params = list(sig.parameters.keys())
-    assert params == ["reason"]
-
-
-def test_signature_ratio_one_param_batch34():
-    sig = inspect.signature(_ratio)
-    params = list(sig.parameters.keys())
-    assert params == ["value"]
 
 
 def test_signature_bool_metric_one_param_batch34():

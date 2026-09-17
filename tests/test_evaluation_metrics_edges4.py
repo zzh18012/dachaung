@@ -200,10 +200,6 @@ def test_bool_metric_non_empty_string_returns_true():
     assert _bool_metric("x")["value"] is True
 
 
-def test_bool_metric_returns_reason_none():
-    assert _bool_metric(True)["reason"] is None
-
-
 def test_int_metric_value():
     assert _int_metric(5)["value"] == 5
 
@@ -223,10 +219,6 @@ def test_int_metric_truncates_float():
 
 def test_int_metric_negative_float_truncates_toward_zero():
     assert _int_metric(-3.99)["value"] == -3
-
-
-def test_int_metric_returns_reason_none():
-    assert _int_metric(5)["reason"] is None
 
 
 # =========================================================================
@@ -276,16 +268,6 @@ def test_strip_unicode_whitespace_em_space():
     assert _strip_unicode_whitespace("a b") == "ab"
 
 
-def test_strip_unicode_whitespace_en_space():
-    """U+2002 EN SPACE。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_ideographic_space():
-    """U+3000 IDEOGRAPHIC SPACE。"""
-    assert _strip_unicode_whitespace("a　b") == "ab"
-
-
 def test_strip_unicode_whitespace_line_separator():
     """U+2028 LINE SEPARATOR。"""
     assert _strip_unicode_whitespace("a b") == "ab"
@@ -294,11 +276,6 @@ def test_strip_unicode_whitespace_line_separator():
 def test_strip_unicode_whitespace_paragraph_separator():
     """U+2029 PARAGRAPH SEPARATOR。"""
     assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_thin_space():
-    """U+2009 THIN SPACE。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
 
 
 def test_strip_unicode_whitespace_hair_space():
@@ -410,10 +387,6 @@ def test_is_valid_bbox_string_int_rejected():
 
 def test_is_valid_bbox_none_in_list_rejected():
     assert _is_valid_bbox([None, 2, 3, 4]) is False
-
-
-def test_is_valid_bbox_returns_bool():
-    assert isinstance(_is_valid_bbox([1, 2, 3, 4]), bool)
 
 
 # =========================================================================
@@ -695,13 +668,6 @@ def test_chunk_reference_ratio_chunk_multiple_ids_all_valid():
     assert out["value"] == 1.0
 
 
-def test_chunk_reference_ratio_chunk_multiple_ids_one_invalid():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": ["e1", "unknown"]}]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.0
-
-
 def test_chunk_reference_ratio_returns_ratio_dict():
     elements = [{"element_id": "e1"}]
     chunks = [{"source_element_ids": ["e1"]}]
@@ -899,11 +865,6 @@ def test_silent_drop_count_multi_type_sum():
     assert out["value"] == 4
 
 
-def test_silent_drop_count_returns_int_metric():
-    out = _silent_drop_count({}, {"element_count_by_type": {"paragraph": 1}})
-    assert isinstance(out["value"], int)
-
-
 def test_silent_drop_count_returns_dict_with_value_and_reason():
     out = _silent_drop_count({}, {"element_count_by_type": {"paragraph": 1}})
     assert "value" in out and "reason" in out
@@ -1052,12 +1013,6 @@ def test_compute_metrics_expectations_required_no_default():
 # =========================================================================
 # 模块结构深度
 # =========================================================================
-
-
-def test_module_all_exports_only_compute_automatic_metrics():
-    import evaluation.metrics as mod
-
-    assert mod.__all__ == ["compute_automatic_metrics"]
 
 
 def test_module_all_count_one():

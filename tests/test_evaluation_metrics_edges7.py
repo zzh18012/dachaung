@@ -294,13 +294,6 @@ def test_chunk_reference_ratio_chunk_with_none_ids_skipped():
     assert result["value"] == 0.0
 
 
-def test_chunk_reference_ratio_all_ids_valid():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}]
-    chunks = [{"source_element_ids": ["e1", "e2"]}]
-    result = _chunk_reference_ratio(elements, chunks)
-    assert result["value"] == 1.0
-
-
 def test_chunk_reference_ratio_partial_ids_invalid():
     elements = [{"element_id": "e1"}]
     chunks = [{"source_element_ids": ["e1", "missing"]}]
@@ -493,11 +486,6 @@ def test_compute_metrics_does_not_mutate_input():
 # =========================================================================
 
 
-def test_module_all_exact():
-    import evaluation.metrics as mod
-    assert mod.__all__ == ["compute_automatic_metrics"]
-
-
 def test_module_all_no_duplicates():
     import evaluation.metrics as mod
     assert len(mod.__all__) == len(set(mod.__all__))
@@ -537,11 +525,6 @@ def test_module_uses_future_annotations():
     import evaluation.metrics as mod
     src = inspect.getsource(mod)
     assert "from __future__ import annotations" in src
-
-
-def test_module_docstring_present():
-    import evaluation.metrics as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_counter():

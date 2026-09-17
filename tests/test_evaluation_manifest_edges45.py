@@ -493,11 +493,6 @@ def test_load_manifest_accepts_str_project_root_batch18(tmp_path):
     assert m.project_root == tmp_path.resolve()
 
 
-def test_load_manifest_not_found_raises_batch18(tmp_path):
-    with pytest.raises(ManifestError, match="清单文件不存在"):
-        load_manifest(tmp_path / "no.json")
-
-
 def test_load_manifest_invalid_json_raises_batch18(tmp_path):
     p = tmp_path / "m.json"
     p.write_text("not json", encoding="utf-8")
@@ -838,13 +833,6 @@ def test_module_all_contents_batch18():
 
 def test_module_load_manifest_callable_batch18():
     assert callable(load_manifest)
-
-
-def test_module_does_not_import_unsafe_modules_batch18():
-    src = inspect.getsource(mmod)
-    for unsafe in ["import pickle", "import marshal", "import shelve",
-                   "import subprocess"]:
-        assert unsafe not in src
 
 
 def test_module_does_not_import_evaluation_runner_batch18():

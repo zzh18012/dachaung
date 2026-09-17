@@ -237,11 +237,6 @@ def test_compute_source_silent_drop_call():
     assert 'metrics["silent_drop_count"] = _silent_drop_count(by_type, expectations)' in src
 
 
-def test_compute_source_final_return():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert "return metrics" in src
-
-
 def test_compute_source_no_yield():
     src = inspect.getsource(compute_automatic_metrics)
     assert "yield" not in src
@@ -360,11 +355,6 @@ def test_pdf_locator_source_uses_page_get():
     assert 'page = loc.get("page")' in src
 
 
-def test_pdf_locator_source_uses_isinstance_int():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "isinstance(page, int)" in src
-
-
 def test_pdf_locator_source_uses_page_lt_1():
     src = inspect.getsource(_pdf_locator_ratio)
     assert "page < 1" in src
@@ -461,11 +451,6 @@ def test_is_valid_bbox_source_no_docstring_or_present():
     src = inspect.getsource(_is_valid_bbox)
     # 至少有 def
     assert "def _is_valid_bbox(" in src
-
-
-def test_is_valid_bbox_source_uses_len_4():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "len(bbox) != 4" in src
 
 
 def test_is_valid_bbox_source_uses_isinstance_bool_check():
@@ -588,11 +573,6 @@ def test_image_resource_source_return_ratio():
 # ---------- _chunk_reference_ratio source 第三批 ----------
 
 
-def test_chunk_reference_source_uses_elem_ids_set():
-    src = inspect.getsource(_chunk_reference_ratio)
-    assert "elem_ids = {e.get(\"element_id\") for e in elements}" in src
-
-
 def test_chunk_reference_source_uses_for_c_in_chunks():
     src = inspect.getsource(_chunk_reference_ratio)
     assert "for c in chunks:" in src
@@ -601,11 +581,6 @@ def test_chunk_reference_source_uses_for_c_in_chunks():
 def test_chunk_reference_source_uses_ids_or_empty():
     src = inspect.getsource(_chunk_reference_ratio)
     assert 'ids = c.get("source_element_ids") or []' in src
-
-
-def test_chunk_reference_source_uses_all_check():
-    src = inspect.getsource(_chunk_reference_ratio)
-    assert "all(sid in elem_ids for sid in ids)" in src
 
 
 def test_chunk_reference_source_return_ratio():
@@ -751,11 +726,6 @@ def test_heading_boundary_source_docstring_present():
     assert '"""' in src
 
 
-def test_heading_boundary_source_uses_list_comprehension_for_headings():
-    src = inspect.getsource(_heading_boundary_ratio)
-    assert 'headings = [e for e in elements if e.get("type") == "heading"]' in src
-
-
 def test_heading_boundary_source_uses_no_heading_branch():
     src = inspect.getsource(_heading_boundary_ratio)
     assert "if not headings:" in src
@@ -821,11 +791,6 @@ def test_silent_drop_source_uses_if_not_expected_counts():
 def test_silent_drop_source_uses_drops_zero():
     src = inspect.getsource(_silent_drop_count)
     assert "drops = 0" in src
-
-
-def test_silent_drop_source_uses_for_t_exp_in_items():
-    src = inspect.getsource(_silent_drop_count)
-    assert "for t, exp in expected_counts.items():" in src
 
 
 def test_silent_drop_source_uses_actual_get():
@@ -899,11 +864,6 @@ def test_bool_metric_with_truthy_int():
     assert r["value"] is True
 
 
-def test_bool_metric_with_falsy_int():
-    r = _bool_metric(0)
-    assert r["value"] is False
-
-
 def test_int_metric_with_int():
     r = _int_metric(42)
     assert r == {"value": 42, "reason": None}
@@ -925,11 +885,6 @@ def test_int_metric_with_string_digit():
 
 
 # ---------- 行为深度第七批 - 子函数 ----------
-
-
-def test_pdf_locator_ratio_empty_elements():
-    r = _pdf_locator_ratio([])
-    assert r["reason"] == "no_elements"
 
 
 def test_pdf_locator_ratio_simple_text_elements():
@@ -969,14 +924,6 @@ def test_pdf_locator_ratio_text_with_invalid_bbox():
     ]
     r = _pdf_locator_ratio(elements)
     assert r["value"] == 0.0
-
-
-def test_pdf_locator_ratio_image_no_bbox_needed():
-    elements = [
-        {"type": "image", "source_locator": {"page": 1}},  # image 不需 bbox
-    ]
-    r = _pdf_locator_ratio(elements)
-    assert r["value"] == 1.0
 
 
 def test_pdf_locator_ratio_mixed_valid_invalid():
@@ -1637,25 +1584,11 @@ def test_signature_int_metric():
     assert params[0].name == "value"
 
 
-def test_signature_pdf_locator():
-    sig = inspect.signature(_pdf_locator_ratio)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "elements"
-
-
 def test_signature_docx_locator():
     sig = inspect.signature(_docx_locator_ratio)
     params = list(sig.parameters.values())
     assert len(params) == 1
     assert params[0].name == "elements"
-
-
-def test_signature_is_valid_bbox():
-    sig = inspect.signature(_is_valid_bbox)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "bbox"
 
 
 def test_signature_image_resource():
@@ -2045,16 +1978,6 @@ def test_e2e_pdf_locator_with_invalid_page():
     elements = [{"type": "image", "source_locator": {"page": 0}}]
     r = _pdf_locator_ratio(elements)
     assert r["value"] == 0.0
-
-
-def test_e2e_docx_locator_no_elements():
-    r = _docx_locator_ratio([])
-    assert r["reason"] == "no_elements"
-
-
-def test_e2e_chunk_reference_no_chunks():
-    r = _chunk_reference_ratio([], [])
-    assert r["reason"] == "no_chunks"
 
 
 def test_e2e_chunk_reference_all_valid():

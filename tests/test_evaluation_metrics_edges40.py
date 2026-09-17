@@ -701,11 +701,6 @@ def test_metrics_source_no_sys_module_batch13():
     assert "sys." not in source
 
 
-def test_metrics_source_no_tempfile_batch13():
-    source = inspect.getsource(mmod)
-    assert "tempfile" not in source
-
-
 def test_metrics_source_no_logging_batch13():
     source = inspect.getsource(mmod)
     assert "import logging" not in source
@@ -837,16 +832,6 @@ def test_module_source_has_bool_metric_def_batch13():
 def test_module_source_has_int_metric_def_batch13():
     source = inspect.getsource(mmod)
     assert "def _int_metric(" in source
-
-
-def test_module_source_has_pdf_locator_ratio_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _pdf_locator_ratio(" in source
-
-
-def test_module_source_has_docx_locator_ratio_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _docx_locator_ratio(" in source
 
 
 def test_module_source_has_is_valid_bbox_def_batch13():

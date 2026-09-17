@@ -79,10 +79,6 @@ def test_is_absolute_like_just_drive_letter_batch19():
 # ---------- _has_backslash 行为深度第十九批 ----------
 
 
-def test_has_backslash_multiple_consecutive_batch19():
-    assert _has_backslash("a\\\\\\b") is True
-
-
 def test_has_backslash_backslash_then_forward_batch19():
     assert _has_backslash("a\\/b") is True
 

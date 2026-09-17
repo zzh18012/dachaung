@@ -170,16 +170,8 @@ def test_is_valid_bbox_with_str_batch27():
     assert _is_valid_bbox(["1", 2, 3, 4]) is False
 
 
-def test_is_valid_bbox_with_nan_batch27():
-    assert _is_valid_bbox([float("nan"), 2, 3, 4]) is False
-
-
 def test_is_valid_bbox_with_inf_batch27():
     assert _is_valid_bbox([float("inf"), 2, 3, 4]) is False
-
-
-def test_is_valid_bbox_with_neg_inf_batch27():
-    assert _is_valid_bbox([float("-inf"), 2, 3, 4]) is False
 
 
 def test_is_valid_bbox_len_three_batch27():
@@ -920,19 +912,9 @@ def test_module_source_contains_compute_automatic_metrics_batch27():
     assert "def compute_automatic_metrics" in source
 
 
-def test_module_source_contains_text_types_constant_batch27():
-    source = inspect.getsource(mmod)
-    assert "_TEXT_TYPES" in source
-
-
 def test_module_source_contains_pdf_bbox_required_types_batch27():
     source = inspect.getsource(mmod)
     assert "_PDF_BBOX_REQUIRED_TYPES" in source
-
-
-def test_module_source_contains_not_evaluated_batch27():
-    source = inspect.getsource(mmod)
-    assert "_NOT_EVALUATED" in source
 
 
 def test_module_source_contains_pipeline_failed_batch27():

@@ -89,10 +89,6 @@ def test_text_types_no_duplicates():
     assert len(_TEXT_TYPES) == len(set(_TEXT_TYPES))
 
 
-def test_pdf_bbox_required_types_no_duplicates():
-    assert len(_PDF_BBOX_REQUIRED_TYPES) == len(set(_PDF_BBOX_REQUIRED_TYPES))
-
-
 # =========================================================================
 # _null / _ratio / _bool_metric / _int_metric 返回结构
 # =========================================================================
@@ -294,10 +290,6 @@ def test_is_valid_bbox_valid_int_four():
     assert _is_valid_bbox([1, 2, 3, 4]) is True
 
 
-def test_is_valid_bbox_valid_float_four():
-    assert _is_valid_bbox([1.5, 2.5, 3.5, 4.5]) is True
-
-
 def test_is_valid_bbox_valid_mixed_int_float():
     assert _is_valid_bbox([1, 2.5, 3, 4.5]) is True
 
@@ -307,20 +299,8 @@ def test_is_valid_bbox_bool_rejected():
     assert _is_valid_bbox([True, 2, 3, 4]) is False
 
 
-def test_is_valid_bbox_nan_rejected():
-    assert _is_valid_bbox([float("nan"), 2, 3, 4]) is False
-
-
 def test_is_valid_bbox_inf_rejected():
     assert _is_valid_bbox([float("inf"), 2, 3, 4]) is False
-
-
-def test_is_valid_bbox_negative_inf_rejected():
-    assert _is_valid_bbox([float("-inf"), 2, 3, 4]) is False
-
-
-def test_is_valid_bbox_string_rejected():
-    assert _is_valid_bbox(["1", "2", "3", "4"]) is False
 
 
 def test_is_valid_bbox_tuple_rejected():
@@ -888,11 +868,6 @@ def test_module_uses_future_annotations():
     assert "from __future__ import annotations" in src
 
 
-def test_module_docstring_present():
-    import evaluation.metrics as mod
-    assert mod.__doc__ is not None
-
-
 def test_module_docstring_mentions_no_fabrication():
     import evaluation.metrics as mod
     doc = mod.__doc__
@@ -959,11 +934,6 @@ def test_compute_automatic_metrics_param_names_exact():
 def test_compute_automatic_metrics_image_base_dir_default_none():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["image_base_dir"].default is None
-
-
-def test_compute_automatic_metrics_document_no_default():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert sig.parameters["document"].default is inspect.Parameter.empty
 
 
 def test_compute_automatic_metrics_return_annotation_dict():

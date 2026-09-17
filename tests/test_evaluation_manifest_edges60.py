@@ -348,12 +348,6 @@ def test_resolve_relative_path_empty_raises_batch33(tmp_path):
     assert "为空" in str(exc.value)
 
 
-def test_resolve_relative_path_absolute_posix_raises_batch33(tmp_path):
-    with pytest.raises(ManifestError) as exc:
-        _resolve_relative_path("/etc/passwd", tmp_path, "f")
-    assert "绝对路径" in str(exc.value)
-
-
 def test_resolve_relative_path_absolute_windows_raises_batch33(tmp_path):
     with pytest.raises(ManifestError) as exc:
         _resolve_relative_path("C:/foo", tmp_path, "f")
@@ -663,12 +657,6 @@ def test_module_source_contains_schema_import_batch33():
 def test_module_source_contains_manifest_error_class_batch33():
     src = inspect.getsource(mmod)
     assert "class ManifestError(Exception):" in src
-
-
-def test_module_source_contains_document_entry_class_batch33():
-    src = inspect.getsource(mmod)
-    assert "@dataclass(frozen=True)" in src
-    assert "class DocumentEntry:" in src
 
 
 def test_module_source_contains_expected_failure_class_batch33():

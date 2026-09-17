@@ -231,14 +231,6 @@ def test_is_valid_bbox_all_bools():
     assert _is_valid_bbox([True, False, True, False]) is False
 
 
-def test_is_valid_bbox_nan_rejected():
-    assert _is_valid_bbox([float("nan"), 0, 100, 100]) is False
-
-
-def test_is_valid_bbox_inf_rejected():
-    assert _is_valid_bbox([float("inf"), 0, 100, 100]) is False
-
-
 def test_is_valid_bbox_neg_inf_rejected():
     assert _is_valid_bbox([float("-inf"), 0, 100, 100]) is False
 
@@ -249,10 +241,6 @@ def test_is_valid_bbox_none_rejected():
 
 def test_is_valid_bbox_none_element():
     assert _is_valid_bbox([None, 0, 100, 100]) is False
-
-
-def test_is_valid_bbox_dict_rejected():
-    assert _is_valid_bbox({"x": 0, "y": 0, "w": 100, "h": 100}) is False
 
 
 # =========================================================================
@@ -908,10 +896,6 @@ def test_strip_unicode_whitespace_preserves_non_whitespace():
 def test_strip_unicode_whitespace_preserves_emoji():
     """emoji 是非空白。"""
     assert _strip_unicode_whitespace("a 🎉 b") == "a🎉b"
-
-
-def test_strip_unicode_whitespace_preserves_cjk():
-    assert _strip_unicode_whitespace("你 好 世 界") == "你好世界"
 
 
 def test_strip_unicode_whitespace_preserves_digits():
@@ -1577,12 +1561,6 @@ def test_pdf_bbox_required_types_exact_set():
     assert set(_PDF_BBOX_REQUIRED_TYPES) == expected
 
 
-def test_pdf_bbox_required_types_excludes_table_header_footer():
-    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "header" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "footer" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_not_evaluated_constant_value():
     assert _NOT_EVALUATED == "not_evaluated"
 
@@ -1598,19 +1576,9 @@ def test_module_has_math_import():
     assert hasattr(m, "math")
 
 
-def test_module_has_counter_import():
-    import evaluation.metrics as m
-    assert hasattr(m, "Counter")
-
-
 def test_module_has_path_import():
     import evaluation.metrics as m
     assert hasattr(m, "Path")
-
-
-def test_module_has_any_import():
-    import evaluation.metrics as m
-    assert hasattr(m, "Any")
 
 
 def test_metrics_constants_are_tuples_not_lists():

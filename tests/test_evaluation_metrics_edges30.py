@@ -302,11 +302,6 @@ def test_pdf_bbox_required_types_includes_list_item():
     assert "list_item" in _PDF_BBOX_REQUIRED_TYPES
 
 
-def test_pdf_bbox_required_types_excludes_table():
-    """table 不需要 bbox。"""
-    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_pdf_bbox_required_types_excludes_header():
     """header 不需要 bbox。"""
     assert "header" not in _PDF_BBOX_REQUIRED_TYPES
@@ -1099,10 +1094,6 @@ def test_strip_preserves_emoji():
     assert _strip_unicode_whitespace("hello 🌍 world") == "hello🌍world"
 
 
-def test_strip_preserves_chinese():
-    assert _strip_unicode_whitespace("你好 世界") == "你好世界"
-
-
 def test_strip_preserves_digits():
     assert _strip_unicode_whitespace("hello 123 world") == "hello123world"
 
@@ -1492,13 +1483,6 @@ def test_compute_automatic_metrics_signature_param_names():
 def test_compute_automatic_metrics_image_base_dir_default_none():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["image_base_dir"].default is None
-
-
-def test_compute_automatic_metrics_no_varargs():
-    sig = inspect.signature(compute_automatic_metrics)
-    kinds = {p.kind for p in sig.parameters.values()}
-    assert inspect.Parameter.VAR_POSITIONAL not in kinds
-    assert inspect.Parameter.VAR_KEYWORD not in kinds
 
 
 def test_compute_automatic_metrics_param_kinds():

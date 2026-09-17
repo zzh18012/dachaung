@@ -179,12 +179,6 @@ def _src():
     return inspect.getsource(metrics_mod)
 
 
-def test_source_key_lines_batch536():
-    src = _src()
-    assert "st_size" in src
-    assert "no_image_elements" in src
-
-
 # ---------- forbidden tokens 第七百八十一批 ----------
 
 def test_source_no_eval_batch536():

@@ -85,12 +85,6 @@ def test_ratio_value_exact_batch44():
     assert _ratio(0.5)["value"] == 0.5
 
 
-def test_ratio_int_to_float_batch44():
-    out = _ratio(1)
-    assert isinstance(out["value"], float)
-    assert out["value"] == 1.0
-
-
 def test_ratio_reason_is_none_batch44():
     assert _ratio(0.5)["reason"] is None
 
@@ -227,11 +221,6 @@ def test_strip_unicode_whitespace_preserves_punctuation_batch44():
 
 
 # ---------- _text_preservation ----------
-
-def test_text_preservation_empty_empty_equal_true_batch44():
-    out = _text_preservation([], [])
-    assert out["equal"]["value"] is True
-
 
 def test_text_preservation_empty_empty_precision_null_batch44():
     out = _text_preservation([], [])
@@ -416,25 +405,9 @@ def test_silent_drop_extra_type_in_actual_batch44():
 
 # ---------- compute_automatic_metrics: pipeline_failed ----------
 
-def test_compute_pipeline_failed_returns_14_metrics_batch44():
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    # pipeline_success + error_code + schema_valid + 11 个后续 null 指标 = 14
-    assert len(out) == 14
-
-
 def test_compute_pipeline_failed_pipeline_success_false_batch44():
     out = compute_automatic_metrics(None, None, "pdf", None)
     assert out["pipeline_success"]["value"] is False
-
-
-def test_compute_pipeline_failed_error_code_none_batch44():
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    assert out["error_code"]["value"] is None
-
-
-def test_compute_pipeline_failed_schema_valid_batch44():
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    assert out["schema_valid"]["reason"] == "pipeline_failed"
 
 
 def test_compute_pipeline_failed_all_other_metrics_null_batch44():

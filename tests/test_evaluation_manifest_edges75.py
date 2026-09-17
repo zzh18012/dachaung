@@ -660,12 +660,6 @@ def test_ast_has_4_class_def_batch49():
     assert len(classes) == 4
 
 
-def test_ast_class_names_batch49():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.ClassDef)]
-    assert names == ["ManifestError", "DocumentEntry", "ExpectedFailure", "Manifest"]
-
-
 def test_ast_no_async_function_def_batch49():
     tree = ast.parse(inspect.getsource(manifest_mod))
     assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
@@ -731,13 +725,6 @@ def test_ast_is_absolute_like_has_3_returns_batch49():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_is_absolute_like")
     returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
     assert len(returns) >= 3  # 空字符串 + POSIX + Windows + final False
-
-
-def test_ast_detect_project_root_has_for_batch49():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_detect_project_root")
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) == 1
 
 
 def test_ast_detect_project_root_has_if_batch49():

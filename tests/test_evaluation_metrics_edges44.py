@@ -65,11 +65,6 @@ def test_null_returns_consistent_batch17():
     assert r1 == r2
 
 
-def test_ratio_returns_dict_with_2_keys_batch17():
-    r = _ratio(0.5)
-    assert set(r.keys()) == {"value", "reason"}
-
-
 def test_ratio_value_always_float_batch17():
     """即使传 int，返回也是 float。"""
     r = _ratio(0)

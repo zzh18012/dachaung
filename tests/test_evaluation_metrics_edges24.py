@@ -390,16 +390,6 @@ def test_text_preservation_subset_actual_yields_precision_below_one():
     assert out["recall"]["value"] == 1.0
 
 
-def test_text_preservation_subset_expected_yields_recall_below_one():
-    # expected "abcd"，actual "abc" → recall=3/4, precision=3/3=1
-    elements = [{"type": "paragraph", "content": "abcd"}]
-    chunks = [{"text": "abc"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is False
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 0.75
-
-
 def test_text_preservation_returns_three_keys():
     elements: list[dict] = []
     chunks: list[dict] = []

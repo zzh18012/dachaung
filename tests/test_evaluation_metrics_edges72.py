@@ -290,12 +290,6 @@ def test_pdf_locator_missing_page_batch48():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_text_missing_bbox_batch48():
-    elements = [{"type": "heading", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_image_no_bbox_needed_batch48():
     elements = [{"type": "image", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
@@ -356,10 +350,6 @@ def test_docx_locator_no_structural_key_batch48():
 
 # ---------- _is_valid_bbox 各种 bbox ----------
 
-def test_is_valid_bbox_valid_batch48():
-    assert _is_valid_bbox([0, 0, 10, 10]) is True
-
-
 def test_is_valid_bbox_with_floats_batch48():
     assert _is_valid_bbox([0.5, 1.5, 2.5, 3.5]) is True
 
@@ -399,11 +389,6 @@ def test_is_valid_bbox_empty_list_batch48():
 
 
 # ---------- _image_resource_ratio 各种 image ----------
-
-def test_image_ratio_no_images_batch48():
-    out = _image_resource_ratio([], None)
-    assert out["reason"] == "no_image_elements"
-
 
 def test_image_ratio_no_other_types_count_as_image_batch48():
     """只有 heading 不算 image。"""
@@ -590,15 +575,6 @@ def test_text_preservation_extra_char_batch48():
     assert out["recall"]["value"] == 1.0
 
 
-def test_text_preservation_reorder_not_equal_but_counter_same_batch48():
-    elements = [{"type": "paragraph", "content": "abc"}]
-    chunks = [{"text": "cba"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is False
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
-
-
 def test_text_preservation_image_excluded_batch48():
     """image element 的 content 不计入 expected。"""
     elements = [
@@ -714,11 +690,6 @@ def test_silent_drop_extra_type_in_actual_ignored_batch48():
 
 # ---------- module source 字符串补强 ----------
 
-def test_source_contains_纯函数_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "纯函数" in src
-
-
 def test_source_contains_不修改_document_batch48():
     src = inspect.getsource(metrics_mod)
     assert "不修改 document" in src
@@ -737,11 +708,6 @@ def test_source_contains_v1_0_batch48():
 def test_source_contains_口径_D_batch48():
     src = inspect.getsource(metrics_mod)
     assert "口径 D" in src or "口径D" in src
-
-
-def test_source_contains_Counter_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "Counter" in src
 
 
 def test_source_contains_pipeline_failed_batch48():
@@ -922,11 +888,6 @@ def test_source_no_pickle_load_batch48():
     assert "pickle.load(" not in src
 
 
-def test_source_no_subprocess_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "subprocess" not in src
-
-
 def test_source_no_lambda_batch48():
     src = inspect.getsource(metrics_mod)
     assert "lambda" not in src
@@ -935,16 +896,6 @@ def test_source_no_lambda_batch48():
 def test_source_no_yield_batch48():
     src = inspect.getsource(metrics_mod)
     assert "yield" not in src
-
-
-def test_source_no_walrus_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert ":=" not in src
-
-
-def test_source_no_async_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "async def" not in src
 
 
 def test_source_no_await_batch48():

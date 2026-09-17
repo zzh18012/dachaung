@@ -423,10 +423,6 @@ def test_is_valid_bbox_none_rejected_batch51():
     assert _is_valid_bbox(None) is False
 
 
-def test_is_valid_bbox_5_elements_rejected_batch51():
-    assert _is_valid_bbox([0, 0, 1, 1, 2]) is False
-
-
 def test_is_valid_bbox_3_elements_rejected_batch51():
     assert _is_valid_bbox([0, 0, 1]) is False
 
@@ -474,12 +470,6 @@ def test_chunk_reference_chunk_ids_with_partial_valid_batch51():
     chunks = [{"source_element_ids": ["e1", "e2"]}]  # e2 不在
     out = _chunk_reference_ratio(elements, chunks)
     assert out["value"] == 0.0
-
-
-def test_chunk_reference_no_chunks_batch51():
-    out = _chunk_reference_ratio([{"element_id": "e1"}], [])
-    assert out["value"] is None
-    assert out["reason"] == "no_chunks"
 
 
 # ---------- _image_resource_ratio 角 ----------
@@ -548,16 +538,6 @@ def test_ratio_returns_dict_with_float_batch51():
     out = _ratio(0.5)
     assert out == {"value": 0.5, "reason": None}
     assert isinstance(out["value"], float)
-
-
-def test_ratio_int_input_converted_to_float_batch51():
-    out = _ratio(1)
-    assert isinstance(out["value"], float)
-
-
-def test_bool_metric_returns_dict_with_bool_batch51():
-    out = _bool_metric(True)
-    assert out == {"value": True, "reason": None}
 
 
 def test_bool_metric_int_converted_to_bool_batch51():
@@ -782,11 +762,6 @@ def test_source_contains_empty_expected_actual_reason_batch51():
     assert "empty_expected_and_actual" in src
 
 
-def test_source_contains_schema_check_exception_reason_batch51():
-    src = inspect.getsource(metrics_mod)
-    assert "schema_check_exception" in src
-
-
 # ---------- AST 结构补强 ----------
 
 def test_ast_has_14_top_level_functions_batch51():
@@ -819,11 +794,6 @@ def test_ast_function_names_batch51():
 def test_ast_no_class_def_batch51():
     tree = ast.parse(inspect.getsource(metrics_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_async_function_def_batch51():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
 
 
 def test_ast_no_global_statement_batch51():

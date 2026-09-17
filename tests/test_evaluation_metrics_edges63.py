@@ -115,10 +115,6 @@ def test_is_valid_bbox_with_four_int_batch37():
     assert _is_valid_bbox([1, 2, 3, 4]) is True
 
 
-def test_is_valid_bbox_with_four_float_batch37():
-    assert _is_valid_bbox([1.5, 2.5, 3.5, 4.5]) is True
-
-
 def test_is_valid_bbox_with_mixed_int_float_batch37():
     assert _is_valid_bbox([1, 2.5, 3, 4.5]) is True
 
@@ -159,10 +155,6 @@ def test_is_valid_bbox_with_nan_batch37():
 
 def test_is_valid_bbox_with_inf_batch37():
     assert _is_valid_bbox([1, math.inf, 3, 4]) is False
-
-
-def test_is_valid_bbox_with_strings_in_list_batch37():
-    assert _is_valid_bbox(["1", "2", "3", "4"]) is False
 
 
 def test_is_valid_bbox_with_none_in_list_batch37():
@@ -219,12 +211,6 @@ def test_strip_whitespace_with_paragraph_separator_batch37():
 
 
 # ---------- _pdf_locator_ratio 第三十七批
-
-
-def test_pdf_locator_empty_elements_batch37():
-    m = _pdf_locator_ratio([])
-    assert m["value"] is None
-    assert m["reason"] == "no_elements"
 
 
 def test_pdf_locator_single_valid_heading_batch37():
@@ -444,19 +430,6 @@ def test_image_resource_mixed_valid_invalid_batch37(tmp_path):
 # ---------- _chunk_reference_ratio 第三十七批
 
 
-def test_chunk_reference_no_chunks_batch37():
-    m = _chunk_reference_ratio([], [])
-    assert m["value"] is None
-    assert m["reason"] == "no_chunks"
-
-
-def test_chunk_reference_all_valid_batch37():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}]
-    chunks = [{"source_element_ids": ["e1"]}, {"source_element_ids": ["e2"]}]
-    m = _chunk_reference_ratio(elements, chunks)
-    assert m["value"] == 1.0
-
-
 def test_chunk_reference_missing_id_batch37():
     elements = [{"element_id": "e1"}]
     chunks = [{"source_element_ids": ["e1"]}, {"source_element_ids": ["e_unknown"]}]
@@ -531,17 +504,6 @@ def test_text_preservation_extra_in_actual_batch37():
     assert out["recall"]["value"] == 1.0
 
 
-def test_text_preservation_missing_in_actual_batch37():
-    elements = [{"type": "paragraph", "content": "abcd"}]
-    chunks = [{"text": "abc"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is False
-    # precision = 3/3 = 1.0
-    assert out["precision"]["value"] == 1.0
-    # recall = 3/4
-    assert out["recall"]["value"] == 0.75
-
-
 def test_text_preservation_image_excluded_batch37():
     """image 类型不参与比对。"""
     elements = [
@@ -591,16 +553,6 @@ def test_text_preservation_element_missing_content_batch37():
     # expected empty, actual non-empty
     assert out["equal"]["value"] is False
     assert out["recall"]["reason"] == "empty_expected"
-
-
-def test_text_preservation_wrong_order_batch37():
-    elements = [{"type": "paragraph", "content": "abc"}]
-    chunks = [{"text": "cba"}]
-    out = _text_preservation(elements, chunks)
-    # 字符相同但顺序不同 → equal=False, precision/recall=1.0
-    assert out["equal"]["value"] is False
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
 
 
 # ---------- _heading_boundary_ratio 第三十七批

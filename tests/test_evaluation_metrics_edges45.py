@@ -79,11 +79,6 @@ def test_ratio_returns_dict_batch18():
     assert isinstance(r, dict)
 
 
-def test_ratio_keys_batch18():
-    r = _ratio(0.5)
-    assert set(r.keys()) == {"value", "reason"}
-
-
 def test_ratio_value_is_float_batch18():
     r = _ratio(0.5)
     assert isinstance(r["value"], float)
@@ -97,11 +92,6 @@ def test_ratio_reason_is_none_batch18():
 def test_ratio_zero_batch18():
     r = _ratio(0.0)
     assert r["value"] == 0.0
-
-
-def test_ratio_one_batch18():
-    r = _ratio(1.0)
-    assert r["value"] == 1.0
 
 
 def test_bool_metric_returns_dict_batch18():
@@ -557,14 +547,6 @@ def test_docx_locator_ratio_all_valid_batch18():
     assert r["value"] == 1.0
 
 
-def test_docx_locator_ratio_missing_keys_batch18():
-    elements = [
-        {"type": "paragraph", "source_locator": {}},  # missing
-    ]
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 0.0
-
-
 # ---------- _image_resource_ratio 第十八批 ----------
 
 
@@ -949,13 +931,6 @@ def test_module_all_count_1_batch18():
 
 def test_module_compute_metrics_callable_batch18():
     assert callable(compute_automatic_metrics)
-
-
-def test_module_does_not_import_unsafe_modules_batch18():
-    src = inspect.getsource(mmod)
-    for unsafe in ["import pickle", "import marshal", "import shelve",
-                   "import subprocess"]:
-        assert unsafe not in src
 
 
 def test_module_does_not_import_evaluation_runner_batch18():

@@ -572,21 +572,6 @@ def test_module_source_contains_manifest_error_class_batch31():
     assert "class ManifestError(Exception):" in src
 
 
-def test_module_source_contains_manifest_error_doc_batch31():
-    src = inspect.getsource(mmod)
-    assert "清单加载或校验失败" in src
-
-
-def test_module_source_contains_is_absolute_like_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _is_absolute_like" in src
-
-
-def test_module_source_contains_windows_drive_doc_batch31():
-    src = inspect.getsource(mmod)
-    assert "Windows 盘符" in src
-
-
 def test_module_source_contains_has_backslash_func_batch31():
     src = inspect.getsource(mmod)
     assert "def _has_backslash" in src
@@ -607,11 +592,6 @@ def test_module_source_contains_manifest_class_batch31():
     assert "class Manifest:" in src
 
 
-def test_module_source_contains_resolve_relative_path_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _resolve_relative_path" in src
-
-
 def test_module_source_contains_load_manifest_func_batch31():
     src = inspect.getsource(mmod)
     assert "def load_manifest" in src
@@ -620,21 +600,6 @@ def test_module_source_contains_load_manifest_func_batch31():
 def test_module_source_contains_detect_project_root_func_batch31():
     src = inspect.getsource(mmod)
     assert "def _detect_project_root" in src
-
-
-def test_module_source_contains_file_count_property_batch31():
-    src = inspect.getsource(mmod)
-    assert "def file_count" in src
-
-
-def test_module_source_contains_pdf_count_property_batch31():
-    src = inspect.getsource(mmod)
-    assert "def pdf_count" in src
-
-
-def test_module_source_contains_docx_count_property_batch31():
-    src = inspect.getsource(mmod)
-    assert "def docx_count" in src
 
 
 def test_module_source_contains_content_group_count_property_batch31():

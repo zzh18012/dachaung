@@ -361,12 +361,6 @@ def test_pdf_locator_text_type_requires_bbox():
     assert r["value"] == 0.0
 
 
-def test_pdf_locator_image_does_not_require_bbox():
-    elements = [{"type": "image", "source_locator": {"page": 1}}]  # image 无 bbox 要求
-    r = _pdf_locator_ratio(elements)
-    assert r["value"] == 1.0
-
-
 def test_pdf_locator_partial():
     elements = [
         {"type": "heading", "source_locator": {"page": 1, "bbox": [0, 0, 10, 10]}},
@@ -449,12 +443,6 @@ def test_docx_locator_with_table_indices():
     assert r["value"] == 1.0
 
 
-def test_docx_locator_with_relationship_id():
-    elements = [{"type": "image", "source_locator": {"relationship_id": "rId1"}}]
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 1.0
-
-
 def test_docx_locator_page_rejected():
     elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
     r = _docx_locator_ratio(elements)
@@ -502,18 +490,6 @@ def test_image_resource_no_image_returns_null():
     r = _image_resource_ratio(elements, None)
     assert r["value"] is None
     assert r["reason"] == "no_image_elements"
-
-
-def test_image_resource_no_resource_path():
-    elements = [{"type": "image"}]  # 无 resource_path
-    r = _image_resource_ratio(elements, None)
-    assert r["value"] == 0.0
-
-
-def test_image_resource_empty_resource_path():
-    elements = [{"type": "image", "resource_path": ""}]
-    r = _image_resource_ratio(elements, None)
-    assert r["value"] == 0.0
 
 
 def test_image_resource_existing_file(tmp_path):
@@ -1351,18 +1327,6 @@ def test_signature_compute_automatic_metrics_image_base_dir_default_none():
     assert sig.parameters["image_base_dir"].default is None
 
 
-def test_signature_compute_automatic_metrics_no_varargs():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_compute_automatic_metrics_no_kwargs():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_signature_pdf_locator_1_param():
     sig = inspect.signature(_pdf_locator_ratio)
     assert len(sig.parameters) == 1
@@ -1605,14 +1569,6 @@ def test_e2e_pdf_locator_with_image_no_bbox():
         {"type": "image", "source_locator": {"page": 1}},  # no bbox, type=image
     ]
     r = _pdf_locator_ratio(elements)
-    assert r["value"] == 1.0
-
-
-def test_e2e_docx_locator_with_relationship_id():
-    elements = [
-        {"type": "image", "source_locator": {"relationship_id": "rId1"}},
-    ]
-    r = _docx_locator_ratio(elements)
     assert r["value"] == 1.0
 
 

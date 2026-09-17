@@ -468,16 +468,8 @@ def test_is_valid_bbox_3_elements_batch12():
     assert _is_valid_bbox([0, 0, 10]) is False
 
 
-def test_is_valid_bbox_5_elements_batch12():
-    assert _is_valid_bbox([0, 0, 10, 10, 10]) is False
-
-
 def test_is_valid_bbox_empty_list_batch12():
     assert _is_valid_bbox([]) is False
-
-
-def test_is_valid_bbox_float_values_batch12():
-    assert _is_valid_bbox([0.0, 0.0, 10.5, 10.5]) is True
 
 
 # ---------- _strip_unicode_whitespace 第十二批 ----------
@@ -763,11 +755,6 @@ def test_metrics_source_no_input_call_batch12():
     assert "input(" not in source
 
 
-def test_metrics_source_no_kill_batch12():
-    source = inspect.getsource(mmod)
-    assert ".kill(" not in source
-
-
 def test_metrics_source_no_remove_batch12():
     source = inspect.getsource(mmod)
     assert ".remove(" not in source
@@ -852,11 +839,6 @@ def test_module_source_has_strip_unicode_whitespace_function_batch12():
     assert "def _strip_unicode_whitespace(" in source
 
 
-def test_module_source_has_dunder_all_batch12():
-    source = inspect.getsource(mmod)
-    assert "__all__" in source
-
-
 def test_module_source_docstring_present_batch12():
     assert mmod.__doc__ is not None
     assert len(mmod.__doc__) > 30
@@ -890,11 +872,6 @@ def test_module_source_no_logging_batch12():
 
 
 # ---------- signatures 第十三批 ----------
-
-
-def test_signature_null_one_param_batch12():
-    sig = inspect.signature(_null)
-    assert list(sig.parameters) == ["reason"]
 
 
 def test_signature_null_return_dict_batch12():
@@ -955,21 +932,11 @@ def test_signature_docx_locator_ratio_1_param_batch12():
     assert list(sig.parameters) == ["elements"]
 
 
-def test_signature_is_valid_bbox_1_param_batch12():
-    sig = inspect.signature(_is_valid_bbox)
-    assert list(sig.parameters) == ["bbox"]
-
-
 def test_signature_is_valid_bbox_return_bool_batch12():
     sig = inspect.signature(_is_valid_bbox)
     annot = sig.return_annotation
     annot_str = annot if isinstance(annot, str) else str(annot)
     assert "bool" in annot_str
-
-
-def test_signature_strip_unicode_whitespace_1_param_batch12():
-    sig = inspect.signature(_strip_unicode_whitespace)
-    assert list(sig.parameters) == ["s"]
 
 
 def test_all_functions_no_var_kwargs_batch12():
@@ -1052,23 +1019,6 @@ def test_module_docstring_present_batch12():
 
 def test_module_has_text_types_constant_batch12():
     assert hasattr(mmod, "_TEXT_TYPES")
-
-
-def test_module_text_types_value_batch12():
-    assert mmod._TEXT_TYPES == (
-        "heading", "paragraph", "list_item", "table",
-        "caption", "header", "footer",
-    )
-
-
-def test_module_pdf_bbox_types_value_batch12():
-    assert mmod._PDF_BBOX_REQUIRED_TYPES == (
-        "heading", "paragraph", "caption", "list_item",
-    )
-
-
-def test_module_not_evaluated_value_batch12():
-    assert mmod._NOT_EVALUATED == "not_evaluated"
 
 
 # ---------- 端到端集成第十三批 ----------

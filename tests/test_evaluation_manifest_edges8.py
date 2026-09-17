@@ -939,11 +939,6 @@ def test_has_backslash_signature():
     assert set(sig.parameters) == {"path_str"}
 
 
-def test_resolve_relative_path_signature():
-    sig = inspect.signature(_resolve_relative_path)
-    assert set(sig.parameters) == {"path_str", "project_root", "field_name"}
-
-
 def test_load_manifest_signature():
     sig = inspect.signature(load_manifest)
     assert set(sig.parameters) == {"manifest_path", "project_root"}

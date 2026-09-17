@@ -203,15 +203,6 @@ def test_pdf_locator_non_text_type_without_bbox_accepted_batch52():
     assert out["value"] == 1.0
 
 
-def test_pdf_locator_locator_none_batch52():
-    elements = [
-        {"type": "paragraph", "source_locator": None},
-    ]
-    out = _pdf_locator_ratio(elements)
-    # loc = None or {} = {}; page = None; not int → skip
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_locator_empty_dict_batch52():
     elements = [
         {"type": "paragraph", "source_locator": {}},
@@ -300,10 +291,6 @@ def test_is_valid_bbox_length_3_rejected_batch52():
     assert _is_valid_bbox([0, 0, 10]) is False
 
 
-def test_is_valid_bbox_length_5_rejected_batch52():
-    assert _is_valid_bbox([0, 0, 10, 10, 10]) is False
-
-
 def test_is_valid_bbox_all_int_batch52():
     assert _is_valid_bbox([0, 0, 100, 200]) is True
 
@@ -318,10 +305,6 @@ def test_is_valid_bbox_mixed_int_float_batch52():
 
 def test_is_valid_bbox_string_rejected_batch52():
     assert _is_valid_bbox(["0", "0", "10", "10"]) is False
-
-
-def test_is_valid_bbox_none_rejected_batch52():
-    assert _is_valid_bbox([None, None, None, None]) is False
 
 
 def test_is_valid_bbox_nested_list_rejected_batch52():
@@ -548,14 +531,6 @@ def test_silent_drop_type_not_in_actual_batch52():
     assert out["value"] == 3
 
 
-def test_silent_drop_actual_more_than_expected_batch52():
-    by_type = {"paragraph": 10}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    out = _silent_drop_count(by_type, expectations)
-    # 10 > 5 → 不算 drop
-    assert out["value"] == 0
-
-
 def test_silent_drop_actual_equals_expected_batch52():
     by_type = {"paragraph": 5}
     expectations = {"element_count_by_type": {"paragraph": 5}}
@@ -682,17 +657,6 @@ def test_ratio_returns_proper_dict_batch52():
     assert out == {"value": 0.5, "reason": None}
 
 
-def test_ratio_converts_to_float_batch52():
-    out = _ratio(1)  # int → float
-    assert isinstance(out["value"], float)
-    assert out["value"] == 1.0
-
-
-def test_bool_metric_returns_proper_dict_batch52():
-    out = _bool_metric(True)
-    assert out == {"value": True, "reason": None}
-
-
 def test_bool_metric_converts_to_bool_batch52():
     out = _bool_metric(1)  # int → bool
     assert isinstance(out["value"], bool)
@@ -808,16 +772,6 @@ def test_source_compute_metrics_uses_lazy_schema_import_batch52():
 def test_source_pipeline_failed_reason_batch52():
     src = inspect.getsource(metrics_mod)
     assert '"pipeline_failed"' in src
-
-
-def test_source_empty_expected_and_actual_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"empty_expected_and_actual"' in src
-
-
-def test_source_empty_actual_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"empty_actual"' in src
 
 
 def test_source_empty_expected_reason_batch52():

@@ -78,16 +78,6 @@ def test_ratio_reason_always_none_batch40():
     assert out["reason"] is None
 
 
-def test_bool_metric_reason_always_none_batch40():
-    out = _bool_metric(True)
-    assert out["reason"] is None
-
-
-def test_int_metric_reason_always_none_batch40():
-    out = _int_metric(5)
-    assert out["reason"] is None
-
-
 def test_int_metric_with_negative_zero_batch40():
     """int(-0.0) == 0（int 截断）。"""
     out = _int_metric(-0.0)  # type: ignore[arg-type]
@@ -293,10 +283,6 @@ def test_docx_locator_dict_has_value_reason_batch40():
 # ---------- _image_resource_ratio 第四十批
 
 
-def test_image_resource_callable_batch40():
-    assert callable(_image_resource_ratio)
-
-
 def test_image_resource_no_images_returns_null_batch40():
     m = _image_resource_ratio([{"type": "paragraph"}], None)
     assert m["value"] is None
@@ -320,10 +306,6 @@ def test_image_resource_dict_has_value_reason_batch40(tmp_path):
 
 
 # ---------- _chunk_reference_ratio 第四十批
-
-
-def test_chunk_reference_callable_batch40():
-    assert callable(_chunk_reference_ratio)
 
 
 def test_chunk_reference_does_not_mutate_inputs_batch40():
@@ -401,10 +383,6 @@ def test_text_preservation_precision_value_float_or_none_batch40():
 # ---------- _heading_boundary_ratio 第四十批
 
 
-def test_heading_boundary_callable_batch40():
-    assert callable(_heading_boundary_ratio)
-
-
 def test_heading_boundary_returns_dict_batch40():
     elements = [{"type": "heading", "element_id": "h1"}]
     chunks = [{"source_element_ids": ["h1"]}]
@@ -428,10 +406,6 @@ def test_heading_boundary_value_zero_when_no_match_batch40():
 
 
 # ---------- _silent_drop_count 第四十批
-
-
-def test_silent_drop_count_callable_batch40():
-    assert callable(_silent_drop_count)
 
 
 def test_silent_drop_count_returns_dict_batch40():
@@ -706,19 +680,9 @@ def test_module_source_contains_not_evaluated_keyword_batch40():
     assert "not_evaluated" in src
 
 
-def test_module_source_contains_no_elements_keyword_batch40():
-    src = inspect.getsource(mmod)
-    assert "no_elements" in src
-
-
 def test_module_source_contains_no_chunks_keyword_batch40():
     src = inspect.getsource(mmod)
     assert "no_chunks" in src
-
-
-def test_module_source_contains_pipeline_failed_keyword_batch40():
-    src = inspect.getsource(mmod)
-    assert "pipeline_failed" in src
 
 
 def test_module_source_contains_empty_expected_and_actual_keyword_batch40():
@@ -737,16 +701,6 @@ def test_module_source_contains_empty_actual_keyword_batch40():
 def test_signature_null_one_param_batch40():
     sig = inspect.signature(_null)
     assert list(sig.parameters.keys()) == ["reason"]
-
-
-def test_signature_null_return_dict_batch40():
-    sig = inspect.signature(_null)
-    assert "dict" in str(sig.return_annotation)
-
-
-def test_signature_ratio_return_dict_batch40():
-    sig = inspect.signature(_ratio)
-    assert "dict" in str(sig.return_annotation)
 
 
 def test_signature_int_metric_one_param_batch40():

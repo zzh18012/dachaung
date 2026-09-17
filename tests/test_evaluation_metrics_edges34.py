@@ -660,14 +660,6 @@ def test_is_valid_bbox_empty_list():
     assert _is_valid_bbox([]) is False
 
 
-def test_is_valid_bbox_too_short():
-    assert _is_valid_bbox([1.0, 2.0, 3.0]) is False
-
-
-def test_is_valid_bbox_too_long():
-    assert _is_valid_bbox([1.0, 2.0, 3.0, 4.0, 5.0]) is False
-
-
 def test_is_valid_bbox_with_nan():
     assert _is_valid_bbox([1.0, float("nan"), 3.0, 4.0]) is False
 

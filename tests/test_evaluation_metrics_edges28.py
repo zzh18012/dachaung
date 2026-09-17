@@ -256,10 +256,6 @@ def test_strip_unicode_whitespace_with_emoji_and_spaces():
     assert _strip_unicode_whitespace("a 🎉 b") == "a🎉b"
 
 
-def test_strip_unicode_whitespace_with_only_one_space():
-    assert _strip_unicode_whitespace(" ") == ""
-
-
 def test_strip_unicode_whitespace_with_two_spaces():
     assert _strip_unicode_whitespace("  ") == ""
 
@@ -591,16 +587,6 @@ def test_heading_boundary_ratio_2_params():
 def test_silent_drop_count_2_params():
     sig = inspect.signature(_silent_drop_count)
     assert list(sig.parameters) == ["by_type", "expectations"]
-
-
-def test_strip_unicode_whitespace_1_param():
-    sig = inspect.signature(_strip_unicode_whitespace)
-    assert list(sig.parameters) == ["s"]
-
-
-def test_is_valid_bbox_1_param():
-    sig = inspect.signature(_is_valid_bbox)
-    assert list(sig.parameters) == ["bbox"]
 
 
 def test_null_1_param():

@@ -802,11 +802,6 @@ def test_module_source_contains_path_field_docstring_batch36():
     assert "相对路径" in src
 
 
-def test_module_source_contains_windows_drive_comment_batch36():
-    src = inspect.getsource(mmod)
-    assert "Windows 盘符" in src
-
-
 def test_module_source_contains_path_str_field_batch36():
     src = inspect.getsource(mmod)
     assert "path_str: str" in src
@@ -830,11 +825,6 @@ def test_module_source_contains_sha256_optional_field_batch36():
 def test_module_source_contains_categories_tuple_field_batch36():
     src = inspect.getsource(mmod)
     assert "categories: tuple[str, ...]" in src
-
-
-def test_module_source_contains_paired_with_optional_batch36():
-    src = inspect.getsource(mmod)
-    assert "paired_with: str | None" in src
 
 
 def test_module_source_contains_annotation_resolved_optional_batch36():
@@ -870,21 +860,6 @@ def test_module_source_contains_expected_failures_tuple_batch36():
 def test_module_source_contains_project_root_field_batch36():
     src = inspect.getsource(mmod)
     assert "project_root: Path" in src
-
-
-def test_module_source_contains_file_count_property_batch36():
-    src = inspect.getsource(mmod)
-    assert "def file_count" in src
-
-
-def test_module_source_contains_pdf_count_property_batch36():
-    src = inspect.getsource(mmod)
-    assert "def pdf_count" in src
-
-
-def test_module_source_contains_docx_count_property_batch36():
-    src = inspect.getsource(mmod)
-    assert "def docx_count" in src
 
 
 def test_module_source_contains_content_group_count_property_batch36():
@@ -1009,10 +984,6 @@ def test_module_has_detect_project_root_attribute_batch36():
 
 def test_module_manifest_error_is_class_batch36():
     assert isinstance(mmod.ManifestError, type)
-
-
-def test_module_document_entry_is_class_batch36():
-    assert isinstance(mmod.DocumentEntry, type)
 
 
 # ---------- 端到端集成第五十批

@@ -88,11 +88,6 @@ def test_ratio_zero_dot_zero_batch19():
     assert r["value"] == 0.0
 
 
-def test_ratio_one_dot_zero_batch19():
-    r = _ratio(1.0)
-    assert r["value"] == 1.0
-
-
 def test_bool_metric_truthy_int_batch19():
     """_bool_metric(1) → True。"""
     assert _bool_metric(1)["value"] is True
@@ -358,12 +353,6 @@ def test_docx_locator_ratio_only_page_key_batch19():
     assert out["value"] == 0.0
 
 
-def test_docx_locator_ratio_only_bbox_key_batch19():
-    elements = [{"type": "paragraph", "source_locator": {"bbox": [0, 0, 1, 1]}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_docx_locator_ratio_only_section_batch19():
     elements = [{"type": "paragraph", "source_locator": {"section": 0}}]
     out = _docx_locator_ratio(elements)
@@ -412,10 +401,6 @@ def test_is_valid_bbox_with_complex_batch19():
 
 def test_is_valid_bbox_with_nan_float_batch19():
     assert _is_valid_bbox([0, 0, float("nan"), 1]) is False
-
-
-def test_is_valid_bbox_with_inf_float_batch19():
-    assert _is_valid_bbox([0, 0, float("inf"), 1]) is False
 
 
 def test_is_valid_bbox_with_negative_inf_batch19():
@@ -753,11 +738,6 @@ def test_module_source_no_sys_exit_batch19():
     assert "sys.exit" not in src
 
 
-def test_module_source_no_re_compile_batch19():
-    src = inspect.getsource(mmod)
-    assert "re.compile" not in src
-
-
 def test_module_source_no_path_open_write_mode_batch19():
     """不应该有 'w' 写模式 open。"""
     src = inspect.getsource(mmod)
@@ -886,10 +866,6 @@ def test_signature_silent_drop_count_batch19():
 
 def test_module_has_all_attribute_batch19():
     assert hasattr(mmod, "__all__")
-
-
-def test_module_all_contains_compute_automatic_metrics_batch19():
-    assert "compute_automatic_metrics" in mmod.__all__
 
 
 def test_module_all_only_contains_one_entry_batch19():

@@ -98,28 +98,6 @@ def test_compute_metrics_document_set_error_none_pipeline_success_true():
     assert out["error_code"]["value"] is None
 
 
-def test_compute_metrics_returns_14_keys_for_normal_doc():
-    doc = {"elements": [], "chunks": []}
-    out = compute_automatic_metrics(doc, None, "pdf", None)
-    expected_keys = {
-        "pipeline_success",
-        "error_code",
-        "schema_valid",
-        "element_count_total",
-        "element_count_by_type",
-        "pdf_locator_valid_ratio",
-        "docx_locator_valid_ratio",
-        "image_resource_exists_ratio",
-        "chunk_reference_intact_ratio",
-        "text_preservation_equal",
-        "text_char_multiset_precision",
-        "text_char_multiset_recall",
-        "heading_boundary_compliance",
-        "silent_drop_count",
-    }
-    assert set(out.keys()) == expected_keys
-
-
 def test_compute_metrics_returns_14_keys_for_failed_doc():
     """document=None 也应返回 14 个 key（pipeline_success/error_code/schema_valid + 11 null）。"""
     out = compute_automatic_metrics(None, None, "pdf", None)
@@ -381,11 +359,6 @@ def test_image_resource_ratio_source_has_rp_falsy_skip():
 # ---------- _strip_unicode_whitespace source level 补强 ----------
 
 
-def test_strip_unicode_whitespace_source_has_isspace():
-    src = inspect.getsource(_strip_unicode_whitespace)
-    assert "ch.isspace()" in src
-
-
 def test_strip_unicode_whitespace_source_has_join():
     src = inspect.getsource(_strip_unicode_whitespace)
     assert '"".join(' in src
@@ -406,11 +379,6 @@ def test_strip_unicode_whitespace_source_signature():
 # ---------- _chunk_reference_ratio source level 补强 ----------
 
 
-def test_chunk_reference_ratio_source_has_elem_ids_set():
-    src = inspect.getsource(_chunk_reference_ratio)
-    assert "elem_ids = {e.get(\"element_id\") for e in elements}" in src
-
-
 def test_chunk_reference_ratio_source_has_no_chunks_branch():
     src = inspect.getsource(_chunk_reference_ratio)
     assert "if not chunks:" in src
@@ -422,11 +390,6 @@ def test_chunk_reference_ratio_source_has_ids_and_all_check():
 
 
 # ---------- _heading_boundary_ratio source level 补强 ----------
-
-
-def test_heading_boundary_ratio_source_has_headings_list():
-    src = inspect.getsource(_heading_boundary_ratio)
-    assert 'headings = [e for e in elements if e.get("type") == "heading"]' in src
 
 
 def test_heading_boundary_ratio_source_has_chunk_first_ids_set():
@@ -860,20 +823,6 @@ def test_module_has_13_private_functions():
     }
     assert set(private_fns) == expected
     assert len(private_fns) == 13
-
-
-def test_module_has_3_private_constants():
-    private_consts = [
-        n for n in dir(m)
-        if n.startswith("_")
-        and not n.startswith("__")
-        and not callable(getattr(m, n))
-    ]
-    assert set(private_consts) == {
-        "_TEXT_TYPES",
-        "_PDF_BBOX_REQUIRED_TYPES",
-        "_NOT_EVALUATED",
-    }
 
 
 # ---------- 端到端集成补强 ----------

@@ -407,10 +407,6 @@ def test_is_valid_bbox_all_float():
     assert _is_valid_bbox([0.0, 0.0, 100.0, 100.0]) is True
 
 
-def test_is_valid_bbox_int_and_float_mix():
-    assert _is_valid_bbox([0, 0.0, 100, 100.0]) is True
-
-
 def test_is_valid_bbox_bool_first_element():
     """bool 元素 → False（即使 isinstance(True, int) 也是 True，但代码先检查 bool）。"""
     assert _is_valid_bbox([True, 0, 0, 0]) is False
@@ -911,11 +907,6 @@ def test_strip_unicode_whitespace_all_whitespace():
 def test_strip_unicode_whitespace_preserves_digits_and_punctuation():
     """非空白字符（含数字、标点）保留。"""
     assert _strip_unicode_whitespace("123, abc!") == "123,abc!"
-
-
-def test_strip_unicode_whitespace_returns_str_type():
-    out = _strip_unicode_whitespace("abc")
-    assert isinstance(out, str)
 
 
 # ============================================================================

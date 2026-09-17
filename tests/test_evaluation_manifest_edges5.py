@@ -730,12 +730,6 @@ def test_resolve_relative_path_field_name_in_absolute_error(tmp_path: Path):
     assert "MY_FIELD" in str(ei.value)
 
 
-def test_resolve_relative_path_field_name_in_backslash_error(tmp_path: Path):
-    with pytest.raises(ManifestError) as ei:
-        _resolve_relative_path("a\\b", tmp_path, "MY_FIELD")
-    assert "MY_FIELD" in str(ei.value)
-
-
 def test_resolve_relative_path_field_name_in_outside_error(tmp_path: Path):
     """路径解析后在 root 外 → 错误消息含 field_name。"""
     # 用 .. 跳出到父目录

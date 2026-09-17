@@ -556,13 +556,6 @@ def test_chunk_reference_ratio_all_intact_batch22():
     assert out["value"] == 1.0
 
 
-def test_chunk_reference_ratio_missing_id_batch22():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": ["e1", "missing"]}]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.0
-
-
 def test_chunk_reference_ratio_all_missing_batch22():
     elements = [{"element_id": "e1"}]
     chunks = [{"source_element_ids": ["x", "y"]}]
@@ -710,24 +703,12 @@ def test_silent_drop_count_actual_more_batch22():
     assert out["value"] == 0
 
 
-def test_silent_drop_count_actual_less_batch22():
-    by_type = {"paragraph": 3}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    out = _silent_drop_count(by_type, expectations)
-    assert out["value"] == 2
-
-
 def test_silent_drop_count_unknown_type_ignored_batch22():
     """expectations 中没有的 type 不算 silent drop。"""
     by_type = {"weird_type": 0}
     expectations = {"element_count_by_type": {"paragraph": 5}}
     out = _silent_drop_count(by_type, expectations)
     assert out["value"] == 5  # paragraph silent dropped
-
-
-def test_silent_drop_count_empty_by_type_batch22():
-    out = _silent_drop_count({}, {"element_count_by_type": {"paragraph": 5}})
-    assert out["value"] == 5
 
 
 def test_silent_drop_count_negative_clamped_batch22():
@@ -959,12 +940,6 @@ def test_signature_compute_metrics_image_base_dir_default_none_batch22():
 # ---------- module 合理性第三十三批 ----------
 
 
-def test_module_does_not_import_app_pipeline_batch22():
-    src = inspect.getsource(mmod)
-    assert "from app.pipeline" not in src
-    assert "from app import pipeline" not in src
-
-
 def test_module_does_not_import_evaluation_runner_batch22():
     src = inspect.getsource(mmod)
     assert "from evaluation.runner" not in src
@@ -981,12 +956,6 @@ def test_module_does_not_import_evaluation_manifest_batch22():
     src = inspect.getsource(mmod)
     assert "from evaluation.manifest" not in src
     assert "from evaluation import manifest" not in src
-
-
-def test_module_does_not_import_evaluation_report_batch22():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.report" not in src
-    assert "from evaluation import report" not in src
 
 
 def test_module_no_main_block_batch22():

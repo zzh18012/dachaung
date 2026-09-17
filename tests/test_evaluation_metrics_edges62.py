@@ -71,10 +71,6 @@ def test_ratio_with_string_raises_batch36():
         _ratio("hello")  # type: ignore[arg-type]
 
 
-def test_bool_metric_with_int_one_batch36():
-    assert _bool_metric(1)["value"] is True
-
-
 def test_bool_metric_with_int_zero_batch36():
     assert _bool_metric(0)["value"] is False
 
@@ -426,12 +422,6 @@ def test_chunk_reference_ratio_missing_ids_field_batch36():
     assert out["value"] == 0.5
 
 
-def test_chunk_reference_ratio_no_chunks_batch36():
-    out = _chunk_reference_ratio([{"element_id": "e1"}], [])
-    assert out["value"] is None
-    assert out["reason"] == "no_chunks"
-
-
 def test_chunk_reference_ratio_no_elements_batch36():
     """elements=[] → elem_ids=set()，所有 ids 都视为 invalid。"""
     out = _chunk_reference_ratio([], [{"source_element_ids": ["x"]}])
@@ -449,11 +439,6 @@ def test_strip_unicode_whitespace_nbsp_batch36():
 def test_strip_unicode_whitespace_em_space_batch36():
     """U+2003 EM SPACE。"""
     assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_ideographic_space_batch36():
-    """U+3000 IDEOGRAPHIC SPACE。"""
-    assert _strip_unicode_whitespace("a　b") == "ab"
 
 
 def test_strip_unicode_whitespace_line_separator_batch36():

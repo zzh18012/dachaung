@@ -871,11 +871,6 @@ def test_module_source_contains_manifest_class_batch26():
     assert "class Manifest" in source
 
 
-def test_module_source_contains_document_entry_class_batch26():
-    source = inspect.getsource(mmod)
-    assert "class DocumentEntry" in source
-
-
 def test_module_source_contains_expected_failure_class_batch26():
     source = inspect.getsource(mmod)
     assert "class ExpectedFailure" in source
@@ -914,11 +909,6 @@ def test_module_source_contains_frozen_true_batch26():
 def test_module_source_contains_relative_to_batch26():
     source = inspect.getsource(mmod)
     assert "relative_to" in source
-
-
-def test_module_source_contains_validate_call_batch26():
-    source = inspect.getsource(mmod)
-    assert "validate(" in source
 
 
 def test_module_source_contains_manifest_version_import_batch26():

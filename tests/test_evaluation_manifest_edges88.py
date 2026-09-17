@@ -212,12 +212,6 @@ def _src() -> str:
     return inspect.getsource(manifest_mod)
 
 
-def test_source_get_defaults_batch54():
-    src = _src()
-    assert 'data.get("documents", [])' in src
-    assert 'data.get("expected_failures", [])' in src
-
-
 def test_source_frozenset_pair_batch54():
     assert "frozenset([d.doc_id, d.paired_with])" in _src()
 

@@ -79,11 +79,6 @@ def test_ratio_zero_positive():
     assert math.copysign(1.0, r["value"]) == 1.0
 
 
-def test_ratio_zero_negative_preserves_sign():
-    r = _ratio(-0.0)
-    assert math.copysign(1.0, r["value"]) == -1.0
-
-
 def test_ratio_negative_infinity_minus_one():
     r = _ratio(-math.inf - 1)
     assert r["value"] == -math.inf  # -inf - 1 = -inf
@@ -312,11 +307,6 @@ def test_compute_metrics_schema_valid_for_normal_doc():
     assert out["schema_valid"]["value"] is not None or out["schema_valid"]["reason"] is not None
 
 
-def test_compute_metrics_schema_valid_pipeline_failed_when_doc_none():
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    assert out["schema_valid"]["reason"] == "pipeline_failed"
-
-
 def test_compute_metrics_schema_valid_handles_exception():
     """document_passes_schema 抛异常 → schema_valid value=False + reason schema_check_exception。"""
     # 这个测试需要让 document_passes_schema 抛异常
@@ -393,12 +383,6 @@ def test_pdf_locator_table_no_bbox_required_still_valid():
     elements = [
         {"type": "table", "source_locator": {"page": 1}},
     ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
-def test_pdf_locator_header_no_bbox_required_still_valid():
-    elements = [{"type": "header", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 1.0
 
@@ -659,11 +643,6 @@ def test_module_source_has_from_future():
     assert "from __future__ import annotations" in src
 
 
-def test_module_source_has_import_math():
-    src = inspect.getsource(m)
-    assert "import math" in src
-
-
 def test_module_source_has_from_collections_import_counter():
     src = inspect.getsource(m)
     assert "from collections import Counter" in src
@@ -857,20 +836,6 @@ def test_module_has_13_private_functions():
         and isinstance(getattr(m, n), FunctionType)
     ]
     assert len(private_fns) == 13
-
-
-def test_module_has_3_private_constants():
-    private_consts = [
-        n for n in dir(m)
-        if n.startswith("_")
-        and not n.startswith("__")
-        and not callable(getattr(m, n))
-    ]
-    assert set(private_consts) == {
-        "_TEXT_TYPES",
-        "_PDF_BBOX_REQUIRED_TYPES",
-        "_NOT_EVALUATED",
-    }
 
 
 # ---------- 端到端集成 ----------

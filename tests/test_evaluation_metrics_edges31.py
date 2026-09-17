@@ -1124,11 +1124,6 @@ def test_module_source_no_class_definition():
     assert not any(line.startswith("class ") for line in src.splitlines())
 
 
-def test_module_source_uses_math_isfinite():
-    src = inspect.getsource(mmod)
-    assert "math.isfinite" in src
-
-
 def test_module_source_uses_counter_intersection():
     src = inspect.getsource(mmod)
     assert "Counter" in src
@@ -1231,13 +1226,6 @@ def test_compute_signature_image_base_dir_default_none():
     sig = inspect.signature(compute_automatic_metrics)
     p = sig.parameters["image_base_dir"]
     assert p.default is None
-
-
-def test_compute_signature_no_varargs():
-    sig = inspect.signature(compute_automatic_metrics)
-    kinds = {p.kind for p in sig.parameters.values()}
-    assert inspect.Parameter.VAR_POSITIONAL not in kinds
-    assert inspect.Parameter.VAR_KEYWORD not in kinds
 
 
 def test_null_signature():

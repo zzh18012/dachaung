@@ -150,12 +150,6 @@ def test_has_backslash_all_forward_batch48():
 
 # ---------- _resolve_relative_path 错误信息精确 ----------
 
-def test_resolve_relative_path_error_includes_field_name_batch48(tmp_path):
-    with pytest.raises(ManifestError) as ei:
-        _resolve_relative_path("a\\b", tmp_path, "MY_FIELD")
-    assert "MY_FIELD" in str(ei.value)
-
-
 def test_resolve_relative_path_empty_includes_field_name_batch48(tmp_path):
     with pytest.raises(ManifestError) as ei:
         _resolve_relative_path("", tmp_path, "EMPTY_FIELD")
@@ -210,12 +204,6 @@ def _write_valid_manifest(tmp_path: Path) -> Path:
 def test_load_manifest_detect_project_root_batch48(tmp_path):
     p = _write_valid_manifest(tmp_path)
     m = load_manifest(p)
-    assert m.project_root == tmp_path.resolve()
-
-
-def test_load_manifest_explicit_project_root_batch48(tmp_path):
-    p = _write_valid_manifest(tmp_path)
-    m = load_manifest(p, project_root=tmp_path)
     assert m.project_root == tmp_path.resolve()
 
 

@@ -104,10 +104,6 @@ def test_bool_metric_falsy_int_zero_batch25():
     assert _bool_metric(0)["value"] is False
 
 
-def test_bool_metric_truthy_int_one_batch25():
-    assert _bool_metric(1)["value"] is True
-
-
 def test_bool_metric_falsy_empty_str_batch25():
     assert _bool_metric("")["value"] is False
 
@@ -129,10 +125,6 @@ def test_int_metric_zero_batch25():
 
 def test_int_metric_negative_batch25():
     assert _int_metric(-5)["value"] == -5
-
-
-def test_int_metric_reason_none_batch25():
-    assert _int_metric(5)["reason"] is None
 
 
 # ---------- _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十五批 ----------
@@ -166,13 +158,6 @@ def test_pdf_bbox_required_types_is_subset_of_text_types_batch25():
     """所有 _PDF_BBOX_REQUIRED_TYPES 都在 _TEXT_TYPES 中。"""
     for t in _PDF_BBOX_REQUIRED_TYPES:
         assert t in _TEXT_TYPES
-
-
-def test_pdf_bbox_required_types_excludes_table_header_footer_batch25():
-    """table/header/footer 不需要 bbox。"""
-    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "header" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "footer" not in _PDF_BBOX_REQUIRED_TYPES
 
 
 def test_not_evaluated_constant_batch25():

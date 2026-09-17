@@ -83,10 +83,6 @@ def test_is_absolute_like_chinese_drive_batch52():
     assert _is_absolute_like("中:/foo") is True
 
 
-def test_is_absolute_like_relative_normal_batch52():
-    assert _is_absolute_like("samples/foo.pdf") is False
-
-
 def test_is_absolute_like_relative_dotslash_batch52():
     assert _is_absolute_like("./foo.pdf") is False
 
@@ -680,13 +676,6 @@ def test_ast_load_manifest_calls_validate_batch52():
     assert "validate(data, 'manifest.schema.json')" in src or 'validate(data, "manifest.schema.json")' in src
 
 
-def test_ast_detect_project_root_1_for_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_detect_project_root")
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) == 1
-
-
 def test_ast_detect_project_root_2_if_batch52():
     tree = ast.parse(inspect.getsource(manifest_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_detect_project_root")
@@ -703,22 +692,12 @@ def test_ast_top_level_functions_batch52():
     ]
 
 
-def test_ast_no_async_function_def_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
-
-
 def test_ast_no_star_import_batch52():
     tree = ast.parse(inspect.getsource(manifest_mod))
     for n in tree.body:
         if isinstance(n, ast.ImportFrom):
             for alias in n.names:
                 assert alias.name != "*"
-
-
-def test_ast_no_global_nonlocal_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
 
 
 def test_ast_all_value_is_list_5_batch52():
@@ -801,8 +780,3 @@ def test_source_no_yield_batch52():
 def test_source_no_async_await_batch52():
     assert "async " not in _src()
     assert "await " not in _src()
-
-
-def test_source_open_count_is_1_batch52():
-    """load_manifest 1 个 with open。"""
-    assert _src().count("open(") == 1

@@ -73,11 +73,6 @@ def test_null_returns_dict_strict_batch11():
     assert type(out) is dict
 
 
-def test_ratio_float_zero_batch11():
-    out = _ratio(0.0)
-    assert out["value"] == 0.0
-
-
 def test_ratio_int_input_coerced_to_float_batch11():
     out = _ratio(1)
     assert type(out["value"]) is float
@@ -152,12 +147,6 @@ def test_compute_returns_14_keys_when_doc_none_batch11():
     assert len(out) == 14
 
 
-def test_compute_returns_14_keys_when_doc_present_batch11():
-    doc = {"elements": [], "chunks": []}
-    out = compute_automatic_metrics(doc, None, "pdf", None)
-    assert len(out) == 14
-
-
 def test_compute_pipeline_success_false_when_doc_none_batch11():
     out = compute_automatic_metrics(None, None, "pdf", None)
     assert out["pipeline_success"]["value"] is False
@@ -182,11 +171,6 @@ def test_compute_error_code_extracted_from_error_batch11():
     error = {"code": "my_error", "message": "x"}
     out = compute_automatic_metrics(None, error, "pdf", None)
     assert out["error_code"]["value"] == "my_error"
-
-
-def test_compute_error_code_none_when_no_error_batch11():
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    assert out["error_code"]["value"] is None
 
 
 def test_compute_error_code_none_when_error_has_no_code_key_batch11():
@@ -338,12 +322,6 @@ def test_pdf_locator_page_negative_not_counts_batch11():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_page_string_not_counts_batch11():
-    elements = [{"type": "image", "source_locator": {"page": "1"}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_page_none_not_counts_batch11():
     elements = [{"type": "image", "source_locator": {"page": None}}]
     out = _pdf_locator_ratio(elements)
@@ -360,17 +338,6 @@ def test_pdf_locator_text_without_bbox_not_counts_batch11():
     elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
-
-
-def test_pdf_locator_text_with_valid_bbox_counts_batch11():
-    elements = [
-        {
-            "type": "paragraph",
-            "source_locator": {"page": 1, "bbox": [0, 0, 100, 100]},
-        }
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
 
 
 def test_pdf_locator_mixed_partial_batch11():
@@ -391,12 +358,6 @@ def test_docx_locator_empty_elements_null_batch11():
 
 def test_docx_locator_with_page_not_counts_batch11():
     elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_docx_locator_with_bbox_not_counts_batch11():
-    elements = [{"type": "paragraph", "source_locator": {"bbox": [0, 0, 1, 1]}}]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -569,11 +530,6 @@ def test_chunk_reference_ratio_returns_dict_batch11():
 # ---------- text_preservation batch 11 ----------
 
 
-def test_text_preservation_empty_both_equal_true_batch11():
-    out = _text_preservation([], [])
-    assert out["equal"]["value"] is True
-
-
 def test_text_preservation_matching_equal_true_batch11():
     elements = [{"type": "paragraph", "content": "abc"}]
     chunks = [{"text": "abc"}]
@@ -724,20 +680,6 @@ def test_silent_drop_count_no_drop_when_match_batch11():
     assert out["value"] == 0
 
 
-def test_silent_drop_count_drop_when_actual_less_batch11():
-    by_type = {"paragraph": 3}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    out = _silent_drop_count(by_type, expectations)
-    assert out["value"] == 2
-
-
-def test_silent_drop_count_no_drop_when_actual_more_batch11():
-    by_type = {"paragraph": 10}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    out = _silent_drop_count(by_type, expectations)
-    assert out["value"] == 0
-
-
 def test_silent_drop_count_multiple_types_batch11():
     by_type = {"paragraph": 3, "heading": 2}
     expectations = {"element_count_by_type": {"paragraph": 5, "heading": 1}}
@@ -767,10 +709,6 @@ def test_is_valid_bbox_4_ints_batch11():
 
 def test_is_valid_bbox_4_floats_batch11():
     assert _is_valid_bbox([0.0, 0.0, 100.5, 100.5]) is True
-
-
-def test_is_valid_bbox_mixed_int_float_batch11():
-    assert _is_valid_bbox([0, 0.0, 100, 100.5]) is True
 
 
 def test_is_valid_bbox_bool_rejected_batch11():
@@ -847,10 +785,6 @@ def test_strip_unicode_ws_all_whitespace_batch11():
 
 def test_strip_unicode_ws_internal_whitespace_batch11():
     assert _strip_unicode_whitespace("a b c") == "abc"
-
-
-def test_strip_unicode_ws_leading_trailing_whitespace_batch11():
-    assert _strip_unicode_whitespace("  abc  ") == "abc"
 
 
 def test_strip_unicode_ws_nbsp_batch11():
@@ -934,11 +868,6 @@ def test_metrics_source_no_unlink_batch11():
 def test_metrics_source_no_remove_batch11():
     source = inspect.getsource(mmod)
     assert ".remove(" not in source
-
-
-def test_metrics_source_no_kill_batch11():
-    source = inspect.getsource(mmod)
-    assert ".kill(" not in source
 
 
 def test_metrics_source_no_terminate_batch11():
@@ -1051,16 +980,6 @@ def test_module_source_has_compute_automatic_metrics_def_batch11():
     assert "def compute_automatic_metrics(" in source
 
 
-def test_module_source_has_pdf_locator_ratio_def_batch11():
-    source = inspect.getsource(mmod)
-    assert "def _pdf_locator_ratio(" in source
-
-
-def test_module_source_has_docx_locator_ratio_def_batch11():
-    source = inspect.getsource(mmod)
-    assert "def _docx_locator_ratio(" in source
-
-
 def test_module_source_has_text_preservation_def_batch11():
     source = inspect.getsource(mmod)
     assert "def _text_preservation(" in source
@@ -1087,11 +1006,6 @@ def test_module_source_docstring_mentions_counter_batch11():
 def test_signature_null_1_param_batch11():
     sig = inspect.signature(_null)
     assert len(sig.parameters) == 1
-
-
-def test_signature_null_param_name_batch11():
-    sig = inspect.signature(_null)
-    assert list(sig.parameters) == ["reason"]
 
 
 def test_signature_ratio_1_param_batch11():

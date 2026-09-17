@@ -116,19 +116,9 @@ def test_text_types_table_included_batch35():
     assert "table" in _TEXT_TYPES
 
 
-def test_text_types_header_footer_included_batch35():
-    assert "header" in _TEXT_TYPES
-    assert "footer" in _TEXT_TYPES
-
-
 def test_pdf_bbox_required_types_no_table_batch35():
     """table 不在 _PDF_BBOX_REQUIRED_TYPES（table 用 cell bbox）。"""
     assert "table" not in _PDF_BBOX_REQUIRED_TYPES
-
-
-def test_pdf_bbox_required_types_no_header_footer_batch35():
-    assert "header" not in _PDF_BBOX_REQUIRED_TYPES
-    assert "footer" not in _PDF_BBOX_REQUIRED_TYPES
 
 
 def test_not_evaluated_value_const_batch35():
@@ -198,12 +188,6 @@ def test_compute_error_no_code_batch35():
 # ---------- _pdf_locator_ratio 第三十五批
 
 
-def test_pdf_locator_list_item_requires_bbox_batch35():
-    elements = [{"type": "list_item", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_list_item_with_bbox_batch35():
     elements = [{"type": "list_item", "source_locator": {"page": 1, "bbox": [0, 0, 10, 10]}}]
     out = _pdf_locator_ratio(elements)
@@ -231,12 +215,6 @@ def test_pdf_locator_negative_page_batch35():
 def test_pdf_locator_page_float_batch35():
     """page 是 float 而不是 int → 视为 invalid。"""
     elements = [{"type": "image", "source_locator": {"page": 1.5}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_page_string_batch35():
-    elements = [{"type": "image", "source_locator": {"page": "1"}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -309,10 +287,6 @@ def test_is_valid_bbox_mixed_int_float_batch35():
     assert _is_valid_bbox([0, 0.5, 10, 10.5]) is True
 
 
-def test_is_valid_bbox_list_with_none_batch35():
-    assert _is_valid_bbox([0, 0, None, 10]) is False
-
-
 def test_is_valid_bbox_zero_zero_zero_zero_batch35():
     assert _is_valid_bbox([0, 0, 0, 0]) is True
 
@@ -351,13 +325,6 @@ def test_image_ratio_two_images_one_missing_batch35(tmp_path):
 
 
 # ---------- _chunk_reference_ratio 第三十五批
-
-
-def test_chunk_ref_chunk_no_ids_field_batch35():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"text": "abc"}]  # no source_element_ids
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.0
 
 
 def test_chunk_ref_chunk_ids_empty_list_batch35():
@@ -408,10 +375,6 @@ def test_strip_unicode_form_feed_batch35():
 
 def test_strip_unicode_carriage_return_batch35():
     assert _strip_unicode_whitespace("a\rb") == "ab"
-
-
-def test_strip_unicode_only_digits_batch35():
-    assert _strip_unicode_whitespace("12345") == "12345"
 
 
 def test_strip_unicode_special_chars_batch35():
@@ -636,16 +599,6 @@ def test_signature_ratio_returns_dict_batch35():
     assert sig.return_annotation == "dict[str, Any]"
 
 
-def test_signature_bool_metric_returns_dict_batch35():
-    sig = inspect.signature(_bool_metric)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
-def test_signature_int_metric_returns_dict_batch35():
-    sig = inspect.signature(_int_metric)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_signature_strip_unicode_returns_str_batch35():
     sig = inspect.signature(_strip_unicode_whitespace)
     assert sig.return_annotation == "str"
@@ -654,11 +607,6 @@ def test_signature_strip_unicode_returns_str_batch35():
 def test_signature_is_valid_bbox_returns_bool_batch35():
     sig = inspect.signature(_is_valid_bbox)
     assert sig.return_annotation == "bool"
-
-
-def test_signature_pdf_locator_returns_dict_batch35():
-    sig = inspect.signature(_pdf_locator_ratio)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 # ---------- module 合理性第四十九批

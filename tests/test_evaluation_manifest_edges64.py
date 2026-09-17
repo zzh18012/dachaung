@@ -207,16 +207,6 @@ def test_manifest_content_group_count_all_paired_batch37():
     assert m.content_group_count == 3
 
 
-def test_manifest_pdf_count_zero_when_all_docx_batch37():
-    docs = (
-        DocumentEntry("d1", "a.docx", Path("/x/a.docx"), "docx", None, (),
-                     None, None, None, None),
-    )
-    m = Manifest("1.0", "incomplete", docs, (), Path("/x"))
-    assert m.pdf_count == 0
-    assert m.docx_count == 1
-
-
 def test_manifest_devset_status_complete_batch37():
     m = Manifest("1.0", "complete", (), (), Path("/x"))
     assert m.devset_status == "complete"
@@ -785,11 +775,6 @@ def test_module_source_contains_path_str_comment_batch37():
     assert "原始相对路径" in src
 
 
-def test_module_source_contains_paired_with_field_batch37():
-    src = inspect.getsource(mmod)
-    assert "paired_with: str | None" in src
-
-
 def test_module_source_contains_categories_covered_sort_batch37():
     src = inspect.getsource(mmod)
     assert "return sorted(s)" in src
@@ -898,10 +883,6 @@ def test_signature_manifest_constructor_batch37():
 
 def test_module_has_manifest_dataclass_batch37():
     assert isinstance(mmod.Manifest, type)
-
-
-def test_module_has_document_entry_dataclass_batch37():
-    assert isinstance(mmod.DocumentEntry, type)
 
 
 def test_module_has_expected_failure_dataclass_batch37():

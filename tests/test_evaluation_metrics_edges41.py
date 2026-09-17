@@ -518,26 +518,7 @@ def test_docx_locator_ratio_all_have_paragraph_index_batch14():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_ratio_some_missing_paragraph_index_batch14():
-    elements = [
-        {"type": "paragraph", "source_locator": {"paragraph_index": 0}},
-        {"type": "paragraph", "source_locator": {}},  # 无 paragraph_index
-    ]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.5
-
-
 # ---------- _image_resource_ratio 第十四批 ----------
-
-
-def test_image_resource_ratio_no_elements_batch14():
-    out = _image_resource_ratio([], None)
-    assert out["value"] is None
-
-
-def test_image_resource_ratio_missing_elements_key_batch14():
-    out = _image_resource_ratio([], None)
-    assert out["value"] is None
 
 
 def test_image_resource_ratio_no_images_batch14():
@@ -594,16 +575,6 @@ def test_chunk_reference_ratio_empty_source_element_ids_batch14():
     chunks = [{"text": "abc", "source_element_ids": []}]
     out = _chunk_reference_ratio(elements, chunks)
     assert out["value"] == 0.0
-
-
-def test_chunk_reference_ratio_all_have_ids_batch14():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}]
-    chunks = [
-        {"text": "a", "source_element_ids": ["e1"]},
-        {"text": "b", "source_element_ids": ["e2"]},
-    ]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 1.0
 
 
 def test_chunk_reference_ratio_some_missing_ids_batch14():
@@ -694,11 +665,6 @@ def test_module_source_defines_pdf_bbox_required_types_batch14():
     assert "_PDF_BBOX_REQUIRED_TYPES" in source
 
 
-def test_module_source_defines_not_evaluated_batch14():
-    source = inspect.getsource(mmod)
-    assert "_NOT_EVALUATED" in source
-
-
 def test_module_source_defines_null_helper_batch14():
     source = inspect.getsource(mmod)
     assert "def _null(" in source
@@ -734,11 +700,6 @@ def test_module_source_defines_is_valid_bbox_batch14():
     assert "def _is_valid_bbox(" in source
 
 
-def test_module_source_uses_isspace_batch14():
-    source = inspect.getsource(mmod)
-    assert ".isspace()" in source
-
-
 def test_module_source_uses_isfinite_batch14():
     source = inspect.getsource(mmod)
     assert "math.isfinite" in source
@@ -765,11 +726,6 @@ def test_module_source_uses_counter_intersection_batch14():
     source = inspect.getsource(mmod)
     # Counter 交集应该是 & 操作符
     assert "Counter" in source
-
-
-def test_module_source_has_dunder_all_batch14():
-    source = inspect.getsource(mmod)
-    assert "__all__" in source
 
 
 def test_module_source_has_image_excluded_comment_batch14():
@@ -829,16 +785,6 @@ def test_compute_automatic_metrics_document_optional_batch14():
 
 def test_compute_automatic_metrics_return_annotation_dict_batch14():
     sig = inspect.signature(compute_automatic_metrics)
-    assert "dict" in str(sig.return_annotation)
-
-
-def test_null_return_annotation_dict_batch14():
-    sig = inspect.signature(_null)
-    assert "dict" in str(sig.return_annotation)
-
-
-def test_ratio_return_annotation_dict_batch14():
-    sig = inspect.signature(_ratio)
     assert "dict" in str(sig.return_annotation)
 
 
@@ -979,11 +925,6 @@ def test_e2e_text_types_used_in_text_preservation_batch14():
     out = _text_preservation(elements, chunks)
     # image 的 "ignored" 不应影响 equal
     assert out["equal"]["value"] is True
-
-
-def test_e2e_silent_drop_count_with_no_expectations_batch14():
-    out = _silent_drop_count({}, None)
-    assert out["value"] is None
 
 
 def test_e2e_silent_drop_count_with_matching_expectations_batch14():

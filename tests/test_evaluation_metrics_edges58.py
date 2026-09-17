@@ -169,11 +169,6 @@ def test_ratio_returns_float_batch32():
     assert isinstance(out["value"], float)
 
 
-def test_ratio_value_annotation_unchanged_batch32():
-    out = _ratio(0.0)
-    assert out["value"] == 0.0
-
-
 def test_bool_metric_accepts_int_batch32():
     """bool(int) 容许 → True/False。"""
     out = _bool_metric(1)
@@ -183,11 +178,6 @@ def test_bool_metric_accepts_int_batch32():
 def test_bool_metric_accepts_string_batch32():
     out = _bool_metric("non-empty")
     assert out["value"] is True
-
-
-def test_int_metric_large_value_batch32():
-    out = _int_metric(10**18)
-    assert out["value"] == 10**18
 
 
 def test_int_metric_returns_int_batch32():
@@ -391,16 +381,8 @@ def test_docx_locator_ratio_locator_none_batch32():
 # ---------- _is_valid_bbox 第三十二批 ----------
 
 
-def test_is_valid_bbox_length_three_batch32():
-    assert _is_valid_bbox([0.0, 0.0, 1.0]) is False
-
-
 def test_is_valid_bbox_length_five_batch32():
     assert _is_valid_bbox([0.0, 0.0, 1.0, 1.0, 2.0]) is False
-
-
-def test_is_valid_bbox_all_true_batch32():
-    assert _is_valid_bbox([True, True, True, True]) is False
 
 
 def test_is_valid_bbox_all_false_batch32():
@@ -556,26 +538,6 @@ def test_strip_unicode_whitespace_em_space_batch32():
     assert _strip_unicode_whitespace("a b") == "ab"
 
 
-def test_strip_unicode_whitespace_en_space_batch32():
-    """U+2002 en space。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_ideographic_space_batch32():
-    """U+3000 ideographic space。"""
-    assert _strip_unicode_whitespace("a　b") == "ab"
-
-
-def test_strip_unicode_whitespace_line_separator_batch32():
-    """U+2028 line separator。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_paragraph_separator_batch32():
-    """U+2029 paragraph separator。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
 def test_strip_unicode_whitespace_zero_width_not_whitespace_batch32():
     """U+200B zero-width space 不是 isspace → 保留。"""
     assert _strip_unicode_whitespace("a​b") == "a​b"
@@ -715,13 +677,6 @@ def test_silent_drop_count_multiple_types_partial_drop_batch32():
     out = _silent_drop_count(by_type, expectations)
     # paragraph drop=2, heading drop=0, table drop=7 → total=9
     assert out["value"] == 9
-
-
-def test_silent_drop_count_by_type_empty_batch32():
-    by_type = {}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    out = _silent_drop_count(by_type, expectations)
-    assert out["value"] == 5
 
 
 def test_silent_drop_count_returns_int_batch32():

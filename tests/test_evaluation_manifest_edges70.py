@@ -403,10 +403,6 @@ def test_is_absolute_like_windows_batch44():
     assert _is_absolute_like("C:\\Windows") is True
 
 
-def test_is_absolute_like_windows_forward_batch44():
-    assert _is_absolute_like("C:/Windows") is True
-
-
 def test_is_absolute_like_relative_batch44():
     assert _is_absolute_like("foo/bar.pdf") is False
 
@@ -457,10 +453,6 @@ def test_manifest_error_inherits_exception_batch44():
 
 def test_manifest_error_not_value_error_batch44():
     assert not issubclass(ManifestError, ValueError)
-
-
-def test_manifest_error_not_type_error_batch44():
-    assert not issubclass(ManifestError, TypeError)
 
 
 def test_manifest_error_message_batch44():

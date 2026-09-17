@@ -339,10 +339,6 @@ def test_is_valid_bbox_four_strings_batch15():
     assert _is_valid_bbox(["0", "0", "1", "1"]) is False
 
 
-def test_is_valid_bbox_four_none_batch15():
-    assert _is_valid_bbox([None, None, None, None]) is False
-
-
 def test_is_valid_bbox_nested_lists_batch15():
     assert _is_valid_bbox([[0], [0], [1], [1]]) is False
 

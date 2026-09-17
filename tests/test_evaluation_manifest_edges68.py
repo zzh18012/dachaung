@@ -429,12 +429,6 @@ def test_expected_failure_frozen_expected_error_code_batch41():
         ef.expected_error_code = "x"  # type: ignore[misc]
 
 
-def test_expected_failure_equality_batch41():
-    ef1 = _make_expected_failure()
-    ef2 = _make_expected_failure()
-    assert ef1 == ef2
-
-
 def test_expected_failure_hash_batch41():
     ef1 = _make_expected_failure()
     ef2 = _make_expected_failure()
@@ -1035,11 +1029,6 @@ def test_module_source_contains_outside_root_message_batch41():
     assert "项目根目录之外" in src or "项目根之外" in src
 
 
-def test_module_source_contains_pyproject_toml_batch41():
-    src = inspect.getsource(mmod)
-    assert "pyproject.toml" in src
-
-
 def test_module_source_contains_all_definition_batch41():
     src = inspect.getsource(mmod)
     assert "__all__" in src
@@ -1131,10 +1120,6 @@ def test_module_all_contains_document_entry_batch41():
 
 def test_module_all_contains_expected_failure_batch41():
     assert "ExpectedFailure" in mmod.__all__
-
-
-def test_module_all_contains_load_manifest_batch41():
-    assert "load_manifest" in mmod.__all__
 
 
 def test_module_does_not_export_private_batch41():

@@ -753,12 +753,6 @@ def test_module_source_no_environ_batch25():
     assert "os.environ" not in source
 
 
-def test_module_source_no_network_io_batch25():
-    source = inspect.getsource(mmod)
-    assert "import socket" not in source
-    assert "import http" not in source
-
-
 def test_module_source_no_pickle_batch25():
     source = inspect.getsource(mmod)
     assert "pickle" not in source
@@ -767,11 +761,6 @@ def test_module_source_no_pickle_batch25():
 def test_module_source_no_shutil_batch25():
     source = inspect.getsource(mmod)
     assert "shutil" not in source
-
-
-def test_module_source_no_tempfile_batch25():
-    source = inspect.getsource(mmod)
-    assert "tempfile" not in source
 
 
 def test_module_source_dataclass_used_batch25():
@@ -817,11 +806,6 @@ def test_module_source_contains_frozen_true_batch25():
 def test_module_source_contains_manifest_error_class_batch25():
     source = inspect.getsource(mmod)
     assert "class ManifestError" in source
-
-
-def test_module_source_contains_document_entry_class_batch25():
-    source = inspect.getsource(mmod)
-    assert "class DocumentEntry" in source
 
 
 def test_module_source_contains_expected_failure_class_batch25():

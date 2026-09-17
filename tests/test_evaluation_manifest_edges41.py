@@ -106,10 +106,6 @@ def test_has_backslash_single_batch14():
     assert _has_backslash("a\\b") is True
 
 
-def test_has_backslash_multiple_consecutive_batch14():
-    assert _has_backslash("a\\\\\\b") is True
-
-
 def test_has_backslash_at_start_batch14():
     assert _has_backslash("\\abc") is True
 
@@ -658,11 +654,6 @@ def test_module_source_no_open_call_for_secrets_batch14():
     source = inspect.getsource(mmod)
     assert "open('/etc" not in source
     assert 'open("/etc' not in source
-
-
-def test_module_source_uses_validate_call_batch14():
-    source = inspect.getsource(mmod)
-    assert "validate(" in source
 
 
 def test_module_source_no_subprocess_import_batch14():

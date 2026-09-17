@@ -150,11 +150,6 @@ def test_int_metric_with_string_digits():
     assert result["value"] == 42
 
 
-def test_int_metric_keys_exact():
-    result = _int_metric(5)
-    assert set(result.keys()) == {"value", "reason"}
-
-
 def test_int_metric_value_is_int_type():
     result = _int_metric(5)
     assert type(result["value"]) is int

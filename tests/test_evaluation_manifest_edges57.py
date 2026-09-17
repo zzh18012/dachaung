@@ -639,30 +639,15 @@ def test_module_source_contains_no_absolute_invariant_doc_batch30():
     assert "禁止绝对路径" in src
 
 
-def test_module_source_contains_manifest_error_doc_batch30():
-    src = inspect.getsource(mmod)
-    assert "清单加载或校验失败" in src
-
-
 def test_module_source_contains_dataclass_decorator_batch30():
     src = inspect.getsource(mmod)
     # frozen=True 出现在 decorator 里
     assert "frozen=True" in src
 
 
-def test_module_source_contains_is_absolute_like_func_batch30():
-    src = inspect.getsource(mmod)
-    assert "def _is_absolute_like" in src
-
-
 def test_module_source_contains_disk_letter_comment_batch30():
     src = inspect.getsource(mmod)
     assert "Windows 盘符" in src
-
-
-def test_module_source_contains_resolve_relative_path_func_batch30():
-    src = inspect.getsource(mmod)
-    assert "def _resolve_relative_path" in src
 
 
 def test_module_source_contains_load_manifest_func_batch30():
@@ -776,16 +761,6 @@ def test_module_no_main_block_batch30():
 def test_module_has_all_export_batch30():
     src = inspect.getsource(mmod)
     assert "__all__" in src
-
-
-def test_module_all_has_manifest_error_batch30():
-    src = inspect.getsource(mmod)
-    assert '"ManifestError"' in src
-
-
-def test_module_all_has_load_manifest_batch30():
-    src = inspect.getsource(mmod)
-    assert '"load_manifest"' in src
 
 
 # ---------- 端到端集成第四十三批 ----------

@@ -81,12 +81,6 @@ def test_ratio_returns_dict_with_value_float_batch10():
     assert out["value"] == 0.5
 
 
-def test_ratio_int_input_converted_to_float_batch10():
-    out = _ratio(1)  # int → float
-    assert out["value"] == 1.0
-    assert isinstance(out["value"], float)
-
-
 def test_ratio_zero_batch10():
     assert _ratio(0.0)["value"] == 0.0
 
@@ -643,13 +637,6 @@ def test_text_preservation_extra_chars_in_expected_only_batch10():
 # ---------- heading_boundary_ratio 行为深度第十批 ----------
 
 
-def test_heading_boundary_no_headings_returns_no_heading_elements_batch10():
-    elements = [{"type": "paragraph"}]
-    chunks = []
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["reason"] == "no_heading_elements"
-
-
 def test_heading_boundary_no_chunks_batch10():
     elements = [{"type": "heading", "element_id": "h1"}]
     out = _heading_boundary_ratio(elements, [])
@@ -757,13 +744,6 @@ def test_silent_drop_mixed_types_batch10():
     assert out["value"] == 2  # heading: 3-1=2
 
 
-def test_silent_drop_expected_type_missing_in_actual_batch10():
-    by_type = {}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    out = _silent_drop_count(by_type, expectations)
-    assert out["value"] == 5
-
-
 def test_silent_drop_returns_int_batch10():
     by_type = {"paragraph": 3}
     expectations = {"element_count_by_type": {"paragraph": 5}}
@@ -780,10 +760,6 @@ def test_is_valid_bbox_valid_4_ints_batch10():
 
 def test_is_valid_bbox_valid_4_floats_batch10():
     assert _is_valid_bbox([0.0, 0.0, 100.5, 100.5]) is True
-
-
-def test_is_valid_bbox_mixed_int_float_batch10():
-    assert _is_valid_bbox([0, 0.0, 100, 100.5]) is True
 
 
 def test_is_valid_bbox_negative_values_batch10():
@@ -832,10 +808,6 @@ def test_is_valid_bbox_bool_element_rejected_batch10():
     assert _is_valid_bbox([True, 0, 100, 100]) is False
 
 
-def test_is_valid_bbox_dict_rejected_batch10():
-    assert _is_valid_bbox({"x": 0, "y": 0, "w": 100, "h": 100}) is False
-
-
 def test_is_valid_bbox_set_rejected_batch10():
     assert _is_valid_bbox({0, 0, 100, 100}) is False
 
@@ -869,10 +841,6 @@ def test_strip_unicode_whitespace_all_whitespace_batch10():
 
 def test_strip_unicode_whitespace_internal_whitespace_kept_only_non_ws_batch10():
     assert _strip_unicode_whitespace("a b c") == "abc"
-
-
-def test_strip_unicode_whitespace_leading_trailing_batch10():
-    assert _strip_unicode_whitespace("  abc  ") == "abc"
 
 
 def test_strip_unicode_whitespace_nbsp_batch10():
@@ -1156,11 +1124,6 @@ def test_module_source_uses_math_isfinite_batch10():
     assert "math.isfinite" in source
 
 
-def test_module_source_uses_isspace_batch10():
-    source = inspect.getsource(mmod)
-    assert ".isspace()" in source
-
-
 def test_module_source_docstring_present_batch10():
     assert mmod.__doc__ is not None
     assert len(mmod.__doc__) > 30
@@ -1306,18 +1269,6 @@ def test_signature_subfuncs_module_eq_batch10():
         assert func.__module__ == "evaluation.metrics"
 
 
-def test_signature_compute_metrics_no_var_positional_batch10():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_compute_metrics_no_var_keyword_batch10():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 # ---------- module 合理性第十批 ----------
 
 
@@ -1387,18 +1338,6 @@ def test_module_constants_count_batch10():
     ]
     # annotations 是 from __future__ import annotations 注入
     assert set(consts) == {"_TEXT_TYPES", "_PDF_BBOX_REQUIRED_TYPES", "_NOT_EVALUATED", "annotations"}
-
-
-def test_module_text_types_value_batch10():
-    assert mmod._TEXT_TYPES == ("heading", "paragraph", "list_item", "table", "caption", "header", "footer")
-
-
-def test_module_pdf_bbox_required_types_value_batch10():
-    assert mmod._PDF_BBOX_REQUIRED_TYPES == ("heading", "paragraph", "caption", "list_item")
-
-
-def test_module_not_evaluated_value_batch10():
-    assert mmod._NOT_EVALUATED == "not_evaluated"
 
 
 def test_module_pdf_bbox_required_subset_of_text_types_batch10():

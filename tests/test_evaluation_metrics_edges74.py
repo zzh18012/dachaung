@@ -598,11 +598,6 @@ def test_source_docstring_mentions_v1_1_batch49():
     assert "v1.1" in src
 
 
-def test_source_docstring_mentions_counter_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert "Counter" in src
-
-
 def test_source_docstring_mentions_word_internal_split_batch49():
     src = inspect.getsource(metrics_mod)
     assert "词内硬切" in src
@@ -643,19 +638,9 @@ def test_source_contains_no_expectations_element_count_string_batch49():
     assert '"no_expectations_element_count"' in src
 
 
-def test_source_contains_empty_actual_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"empty_actual"' in src
-
-
 def test_source_contains_empty_expected_string_batch49():
     src = inspect.getsource(metrics_mod)
     assert '"empty_expected"' in src
-
-
-def test_source_contains_empty_expected_and_actual_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"empty_expected_and_actual"' in src
 
 
 def test_source_contains_pipeline_failed_string_batch49():
@@ -671,11 +656,6 @@ def test_source_contains_not_pdf_document_string_batch49():
 def test_source_contains_not_docx_document_string_batch49():
     src = inspect.getsource(metrics_mod)
     assert '"not_docx_document"' in src
-
-
-def test_source_contains_schema_check_exception_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert "schema_check_exception" in src
 
 
 def test_source_all_1_entry_batch49():
@@ -701,11 +681,6 @@ def test_ast_has_13_top_level_functions_batch49():
 def test_ast_has_no_class_def_batch49():
     tree = ast.parse(inspect.getsource(metrics_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_has_no_async_function_def_batch49():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
 
 
 def test_ast_module_has_docstring_batch49():

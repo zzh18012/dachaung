@@ -172,11 +172,6 @@ def test_pdf_locator_source_uses_page_check():
     assert "page < 1" in src
 
 
-def test_pdf_locator_source_uses_pdf_bbox_required_types():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "_PDF_BBOX_REQUIRED_TYPES" in src
-
-
 def test_pdf_locator_source_uses_is_valid_bbox():
     src = inspect.getsource(_pdf_locator_ratio)
     assert "_is_valid_bbox(" in src
@@ -238,11 +233,6 @@ def test_docx_locator_source_uses_bbox_in_loc_check():
     assert '"bbox" in loc' in src
 
 
-def test_docx_locator_source_uses_any_structural_keys():
-    src = inspect.getsource(_docx_locator_ratio)
-    assert "any(k in loc for k in structural_keys)" in src
-
-
 def test_docx_locator_source_returns_ratio():
     src = inspect.getsource(_docx_locator_ratio)
     assert "_ratio(valid / len(elements))" in src
@@ -269,11 +259,6 @@ def test_is_valid_bbox_source_returns_bool():
 def test_is_valid_bbox_source_uses_isinstance_list():
     src = inspect.getsource(_is_valid_bbox)
     assert "isinstance(bbox, list)" in src
-
-
-def test_is_valid_bbox_source_uses_len_4():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "len(bbox) != 4" in src
 
 
 def test_is_valid_bbox_source_uses_isinstance_bool():
@@ -395,11 +380,6 @@ def test_chunk_reference_source_uses_get_element_id():
 def test_chunk_reference_source_uses_get_source_element_ids():
     src = inspect.getsource(_chunk_reference_ratio)
     assert 'c.get("source_element_ids")' in src
-
-
-def test_chunk_reference_source_uses_all_check():
-    src = inspect.getsource(_chunk_reference_ratio)
-    assert "all(sid in elem_ids for sid in ids)" in src
 
 
 def test_chunk_reference_source_returns_ratio():
@@ -606,17 +586,6 @@ def test_compute_source_handles_document_none():
     assert 'pipeline_failed' in src
 
 
-def test_compute_source_lazy_import_schema_validation():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert "from evaluation.schema_validation import document_passes_schema" in src
-
-
-def test_compute_source_uses_try_except_exception():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert "try:" in src
-    assert "except Exception" in src
-
-
 def test_compute_source_uses_schema_check_exception_reason():
     src = inspect.getsource(compute_automatic_metrics)
     assert "schema_check_exception:" in src
@@ -645,11 +614,6 @@ def test_compute_source_uses_pdf_docx_branches():
     assert 'source_type == "docx"' in src
     assert "not_pdf_document" in src
     assert "not_docx_document" in src
-
-
-def test_compute_source_returns_metrics_var():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert "return metrics" in src
 
 
 def test_compute_source_initializes_metrics_dict():
@@ -977,11 +941,6 @@ def test_signature_compute_image_base_dir_default_none():
     assert sig.parameters["image_base_dir"].default is None
 
 
-def test_signature_compute_document_no_default():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert sig.parameters["document"].default is inspect.Parameter.empty
-
-
 def test_signature_compute_no_varargs():
     sig = inspect.signature(compute_automatic_metrics)
     for p in sig.parameters.values():
@@ -1300,14 +1259,6 @@ def test_e2e_chunk_reference_all_valid():
     chunks = [{"source_element_ids": ["e1", "e2"]}]
     out = _chunk_reference_ratio(elements, chunks)
     assert out["value"] == 1.0
-
-
-def test_e2e_chunk_reference_partial_unknown():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": ["e1", "unknown"]}]
-    out = _chunk_reference_ratio(elements, chunks)
-    # all() → 一个 unknown 就整 chunk 不 valid
-    assert out["value"] == 0.0
 
 
 def test_e2e_image_resource_no_images():

@@ -99,11 +99,6 @@ def test_bool_metric_accepts_empty_string_batch24():
     assert out["value"] is False
 
 
-def test_bool_metric_accepts_nonempty_string_batch24():
-    out = _bool_metric("x")
-    assert out["value"] is True
-
-
 def test_int_metric_accepts_negative_batch24():
     out = _int_metric(-5)
     assert out["value"] == -5
@@ -222,10 +217,6 @@ def test_strip_unicode_whitespace_empty_string_batch24():
 
 def test_strip_unicode_whitespace_preserves_digits_batch24():
     assert _strip_unicode_whitespace("1 2 3") == "123"
-
-
-def test_strip_unicode_whitespace_preserves_punctuation_batch24():
-    assert _strip_unicode_whitespace("a.b,c!") == "a.b,c!"
 
 
 def test_strip_unicode_whitespace_preserves_unicode_letters_batch24():
@@ -361,12 +352,6 @@ def test_pdf_locator_ratio_paragraph_without_bbox_invalid_batch24():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_ratio_paragraph_with_valid_bbox_valid_batch24():
-    elements = [{"type": "paragraph", "source_locator": {"page": 1, "bbox": [0.0, 0.0, 100.0, 100.0]}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_pdf_locator_ratio_image_with_page_only_valid_batch24():
     """image 不需要 bbox，只需要 page。"""
     elements = [{"type": "image", "source_locator": {"page": 1}}]
@@ -424,13 +409,6 @@ def test_docx_locator_ratio_no_locator_key_batch24():
     assert out["value"] == 0.0
 
 
-def test_docx_locator_ratio_rejects_page_batch24():
-    elements = [{"type": "paragraph", "source_locator": {"page": 1, "paragraph_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    # page 在 → invalid（即使 paragraph_index 也在）
-    assert out["value"] == 0.0
-
-
 def test_docx_locator_ratio_rejects_bbox_batch24():
     elements = [{"type": "paragraph", "source_locator": {"bbox": [0, 0, 1, 1], "paragraph_index": 0}}]
     out = _docx_locator_ratio(elements)
@@ -473,10 +451,6 @@ def test_is_valid_bbox_tuple_batch24():
 
 def test_is_valid_bbox_three_items_batch24():
     assert _is_valid_bbox([0, 0, 1]) is False
-
-
-def test_is_valid_bbox_five_items_batch24():
-    assert _is_valid_bbox([0, 0, 1, 1, 1]) is False
 
 
 def test_is_valid_bbox_bool_inside_batch24():
@@ -699,21 +673,9 @@ def test_text_preservation_duplicate_chars_batch24():
 # ---------- _heading_boundary_ratio 第二十四批 ----------
 
 
-def test_heading_boundary_ratio_no_headings_batch24():
-    out = _heading_boundary_ratio([], [])
-    assert out["reason"] == "no_heading_elements"
-
-
 def test_heading_boundary_ratio_no_chunks_batch24():
     elements = [{"type": "heading", "element_id": "h1"}]
     out = _heading_boundary_ratio(elements, [])
-    assert out["value"] == 0.0
-
-
-def test_heading_boundary_ratio_no_chunk_with_first_id_batch24():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["other"]}]
-    out = _heading_boundary_ratio(elements, chunks)
     assert out["value"] == 0.0
 
 
@@ -773,11 +735,6 @@ def test_silent_drop_count_empty_element_count_batch24():
 def test_silent_drop_count_no_drop_batch24():
     out = _silent_drop_count({"paragraph": 5}, {"element_count_by_type": {"paragraph": 5}})
     assert out["value"] == 0
-
-
-def test_silent_drop_count_full_drop_batch24():
-    out = _silent_drop_count({}, {"element_count_by_type": {"paragraph": 5}})
-    assert out["value"] == 5
 
 
 def test_silent_drop_count_partial_drop_batch24():
@@ -1032,20 +989,6 @@ def test_signature_compute_metrics_five_params_batch24():
 def test_signature_compute_metrics_image_base_dir_default_none_batch24():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["image_base_dir"].default is None
-
-
-def test_signature_pdf_locator_ratio_one_param_batch24():
-    sig = inspect.signature(_pdf_locator_ratio)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "elements"
-
-
-def test_signature_is_valid_bbox_one_param_batch24():
-    sig = inspect.signature(_is_valid_bbox)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "bbox"
 
 
 # ---------- module 合理性第三十五批 ----------

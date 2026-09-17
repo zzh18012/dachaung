@@ -196,11 +196,6 @@ def test_compute_returns_14_keys_batch46():
     assert set(out.keys()) == expected_keys
 
 
-def test_compute_pipeline_failed_returns_14_keys_batch46():
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    assert len(out) == 14
-
-
 def test_compute_element_count_by_type_value_batch46():
     document = {
         "elements": [
@@ -312,11 +307,6 @@ def test_image_resource_ratio_mixed_batch46(tmp_path):
 
 
 # ---------- _silent_drop_count 各种 expectations ----------
-
-def test_silent_drop_count_no_expectations_batch46():
-    out = _silent_drop_count({}, None)
-    assert out["value"] is None
-
 
 def test_silent_drop_count_empty_expectations_batch46():
     out = _silent_drop_count({}, {})
@@ -513,13 +503,6 @@ def test_text_preservation_empty_elements_empty_chunks_batch46():
     assert out["precision"]["reason"] is not None or out["precision"]["value"] is not None
 
 
-def test_text_preservation_returns_three_keys_batch46():
-    elements = []
-    chunks = []
-    out = _text_preservation(elements, chunks)
-    assert set(out.keys()) == {"equal", "precision", "recall"}
-
-
 # ---------- _pdf_locator_ratio 多种元素 ----------
 
 def test_pdf_locator_ratio_empty_returns_null_batch46():
@@ -549,12 +532,6 @@ def test_pdf_locator_ratio_one_missing_bbox_batch46():
 def test_pdf_locator_ratio_caption_needs_bbox_batch46():
     """caption 在 _PDF_BBOX_REQUIRED_TYPES → 需要 bbox。"""
     elements = [{"type": "caption", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_list_item_needs_bbox_batch46():
-    elements = [{"type": "list_item", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -605,11 +582,6 @@ def test_docx_locator_ratio_no_structural_key_batch46():
 
 
 # ---------- module source 补强 ----------
-
-def test_source_contains_pure_function_note_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "纯函数" in src
-
 
 def test_source_contains_no_modification_note_batch46():
     src = inspect.getsource(metrics_mod)
@@ -736,29 +708,14 @@ def test_source_no_pickle_load_batch46():
     assert "pickle.load(" not in src
 
 
-def test_source_no_subprocess_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "subprocess" not in src
-
-
 def test_source_no_class_batch46():
     src = inspect.getsource(metrics_mod)
     assert "\nclass " not in src
 
 
-def test_source_no_async_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "async def" not in src
-
-
 def test_source_no_yield_batch46():
     src = inspect.getsource(metrics_mod)
     assert "yield" not in src
-
-
-def test_source_no_walrus_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert ":=" not in src
 
 
 def test_source_no_lambda_batch46():

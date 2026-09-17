@@ -781,11 +781,6 @@ def test_module_source_contains_int_metric_func_batch31():
     assert "def _int_metric" in src
 
 
-def test_module_source_contains_compute_automatic_metrics_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def compute_automatic_metrics" in src
-
-
 def test_module_source_contains_pdf_locator_func_batch31():
     src = inspect.getsource(mmod)
     assert "def _pdf_locator_ratio" in src
@@ -809,11 +804,6 @@ def test_module_source_contains_image_resource_func_batch31():
 def test_module_source_contains_chunk_reference_func_batch31():
     src = inspect.getsource(mmod)
     assert "def _chunk_reference_ratio" in src
-
-
-def test_module_source_contains_strip_unicode_whitespace_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _strip_unicode_whitespace" in src
 
 
 def test_module_source_contains_text_preservation_func_batch31():

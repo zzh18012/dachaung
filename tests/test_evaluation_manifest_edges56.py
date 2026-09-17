@@ -164,11 +164,6 @@ def test_document_entry_is_dataclass_batch29():
     assert is_dataclass(DocumentEntry)
 
 
-def test_document_entry_ten_fields_batch29():
-    """DocumentEntry 有 10 个字段。"""
-    assert len(fields(DocumentEntry)) == 10
-
-
 def test_document_entry_field_names_batch29():
     names = {f.name for f in fields(DocumentEntry)}
     assert names == {
@@ -594,12 +589,6 @@ def test_module_source_contains_module_docstring_batch29():
 def test_module_source_contains_manifest_error_class_batch29():
     src = inspect.getsource(mmod)
     assert "class ManifestError(Exception):" in src
-
-
-def test_module_source_contains_document_entry_class_batch29():
-    src = inspect.getsource(mmod)
-    assert "@dataclass(frozen=True)" in src
-    assert "class DocumentEntry:" in src
 
 
 def test_module_source_contains_expected_failure_class_batch29():
