@@ -121,6 +121,17 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2050 — main 依赖升级噪声敏感面盘点 + a 队列价值裁决（1b/a 队列预备分析，零测试新增零语料改动，main 只读）
+
+- 任务：按外部评审 R-I 三准则（耗时/升级噪声/真实缺陷捕捉）对 main 依赖面做价值裁决——main `6c6d398`（预期 SHA 开头 6c6d398 命中，`git worktree list --porcelain` 动态定位，前后 `git status --porcelain` clean）全程只读：uv.lock/pyproject.toml 版本清单 + app/parsers/fallback_parser.py、kreuzberg_parser.py、app/schema.py、app/parsers/table_linearize.py 调用点扫描 + main tests 与自跑 main-target 加测（R2047 faces-closed 矩阵）对账。版本快照与 R2047 基线件一致（pdfplumber 0.11.10 / pdfminer-six 20260107 / pypdfium2 5.12.1 / python-docx 1.2.0 / jsonschema 4.26.0 / kreuzberg 4.10.2 / pytest 8.4.2）。
+- **面计数**：7 个运行时依赖（4 直连 + 3 传递）枚举 **13 个版本敏感面**——**已锁 8**（P1 extract_words 键系隐式集成锁 / P4 矢量聚类 8 测试 / D1 lxml 遍历 / D2 style.name / D3 Table.rows 退化矩阵=R2029 / J1 报文词汇+path repr=R2046 真实 CLI 子串级 / J2 family 路由=R2038 / K1 kreuzberg elements 恒空绊网）+ **弱锁 3**（P3 栅格图 dict 键 / Y1 pypdfium2 渲染裁剪数学 / D4 DOCX 内联图 rid→related_parts→存盘链——三者全部仅真实样例 e2e 门控，CI 上 SKIP）+ **未锁 2**（P2 PDF find_tables→table element+locator 链 **结构级零覆盖**：唯一合成 PDF 无表格线、真实样例 e2e 只对 DOCX 断言 table 对 PDF 只断言 image；M1 pdfminer-six 真实文档抽取质量）。
+- **三准则评分**（5 个非已锁面）：**P2** 耗时低/噪声中/捕捉中高 → **投轮首选**（None/合并单元格→linearize 集成、bbox→locator 契约全是 main 代码，DOCX 孪生面 R2029 曾抓真退化，非 source-lock）；**Y1** 耗时中/噪声中/捕捉中高 → 次选可投（断言裁剪 PNG 像素尺寸口径，非像素内容，保确定性）；D4 噪声低 → 暂缓（价值在覆盖补强非防噪，动机不属 a 队列本职）；P3 噪声低捕捉中低 → 暂缓；**M1 耗时高/噪声高/捕捉低 → 拒绝（R-I 典型 source-lock 噪声：金样需私有真实文档、main 自适应抽取结果、锁住只快照）**；J1/K1 已锁到位，加锁滑向 source-lock 红线。
+- **a 队列裁决结论**：有可投面但仅 1-2 个，不构成连续投轮池——**P2 值得投 1 轮**（探针：合成 m/l/S 线算子 ruled-table PDF，复用 main test_parsers._build_minimal_pdf 构造模式，main 只读，断言 table element 存在+bbox 四数+markdown 行列数与 row_count/col_count 元数据一致）；Y1 可作 P2 后补充轮；D4/P3 暂缓；M1 明确拒绝；**P2 一轮后 a 队列回待命至 main 前进（diff 路由重探）或 09-21 简报窗口，不为投而投**。
+- 产出件（均未入库，outputs/autonomous/）：`upgrade_noise_catalog_r2050.md` + `upgrade_noise_catalog_r2050.json`（sort_keys、ensure_ascii=False、已 json.load 复核）。
+- 下次建议：① a 队列投 P2 一轮（探针+加测，合成 ruled-table PDF）；或 ② 若按节奏优先后维持 R2046/R2049 建议（R-A/R-I 行为缺口候选池 R2042 盘点件；锚 102085 + 3xN；09-21 窗口全量实跑带 PYTHONIOENCODING=utf-8）。复采触发器：uv.lock / pyproject.toml 哈希任一变化即重算本目录；parsers/table_linearize 变更→P2 优先级升；pdfplumber/pdfminer-six/pypdfium2 版本变化→Y1/P2/P3 全部重评。
+
+---
+
 ## Round 2049 — 收集遗漏函数级对账（1b/f 审计：AST 规范函数 vs pytest 收集 node，R-I 系列未做函数级，零测试新增零语料改动）
 
 - 任务：worktree tests/ 的 AST 规范函数（复刻 R2032 enumerate_tests 口径：扁平 test_*.py、模块层+一层类嵌套、name.startswith("test")）对 pytest 实际收集 node ID（`--collect-only -q -p no:cacheprovider`，R2037 同口径）做双向函数级对账 + 文件级对称，证明零收集遗漏或找出遮蔽/静默不收集。零测试新增、零语料改动、main 零命令。
