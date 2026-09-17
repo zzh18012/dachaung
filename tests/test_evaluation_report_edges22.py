@@ -72,29 +72,9 @@ def test_get_git_provenance_source_uses_status_porcelain():
     assert '"git", "status", "--porcelain"' in src
 
 
-def test_get_git_provenance_source_uses_capture_output():
-    src = inspect.getsource(get_git_provenance)
-    assert "capture_output=True" in src
-
-
 def test_get_git_provenance_source_uses_text_true():
     src = inspect.getsource(get_git_provenance)
     assert "text=True" in src
-
-
-def test_get_git_provenance_source_uses_encoding_utf8():
-    src = inspect.getsource(get_git_provenance)
-    assert 'encoding="utf-8"' in src
-
-
-def test_get_git_provenance_source_uses_errors_replace():
-    src = inspect.getsource(get_git_provenance)
-    assert 'errors="replace"' in src
-
-
-def test_get_git_provenance_source_uses_timeout_10():
-    src = inspect.getsource(get_git_provenance)
-    assert "timeout=10" in src
 
 
 def test_get_git_provenance_source_uses_oserror_subprocess_error():
@@ -181,11 +161,6 @@ def test_get_dependency_versions_source_uses_package_not_found():
 def test_get_dependency_versions_source_uses_generic_exception():
     src = inspect.getsource(get_dependency_versions)
     assert "except Exception" in src
-
-
-def test_get_dependency_versions_source_returns_versions_dict():
-    src = inspect.getsource(get_dependency_versions)
-    assert "return versions" in src
 
 
 # ---------- build_provenance source level 字符串精确补强第二批 ----------
@@ -399,31 +374,6 @@ def test_aggregate_summary_source_uses_get_value():
 def test_aggregate_summary_source_uses_get_metrics():
     src = inspect.getsource(aggregate_summary)
     assert 'r["metrics"]' in src
-
-
-def test_aggregate_summary_source_returns_summary():
-    src = inspect.getsource(aggregate_summary)
-    assert "return summary" in src
-
-
-def test_aggregate_summary_source_initializes_summary_dict():
-    src = inspect.getsource(aggregate_summary)
-    assert "summary: dict[str, Any] = {}" in src
-
-
-def test_aggregate_summary_source_uses_count_branch_with_loop():
-    src = inspect.getsource(aggregate_summary)
-    assert "for name in _COUNT_METRICS:" in src
-
-
-def test_aggregate_summary_source_uses_success_branch_with_loop():
-    src = inspect.getsource(aggregate_summary)
-    assert "for name in _SUCCESS_BOOL_METRICS:" in src
-
-
-def test_aggregate_summary_source_uses_ratio_branch_with_loop():
-    src = inspect.getsource(aggregate_summary)
-    assert "for name in _RATIO_METRICS:" in src
 
 
 def test_aggregate_summary_source_uses_macro_calc():

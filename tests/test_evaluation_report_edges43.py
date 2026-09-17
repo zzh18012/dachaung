@@ -521,11 +521,6 @@ def test_module_source_no_module_level_mutables_batch27():
 # ---------- module source 字符串精确补强第三十九批 ----------
 
 
-def test_module_source_contains_from_evaluation_import_batch27():
-    source = inspect.getsource(rmod)
-    assert "from evaluation import" in source
-
-
 def test_module_source_contains_evaluator_version_constant_batch27():
     source = inspect.getsource(rmod)
     assert "EVALUATOR_VERSION" in source

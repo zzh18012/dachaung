@@ -54,12 +54,6 @@ def test_load_annotation_oserror_batch45(tmp_path):
         assert _load_annotation(p) is None
 
 
-def test_load_annotation_json_decode_error_batch45(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("not json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_empty_file_batch45(tmp_path):
     p = tmp_path / "a.json"
     p.write_text("", encoding="utf-8")
@@ -563,11 +557,6 @@ def test_module_source_contains_report_import_batch45():
 def test_module_source_contains_annotation_metrics_import_batch45():
     src = inspect.getsource(runner_mod)
     assert "from evaluation.annotation_metrics import" in src
-
-
-def test_module_source_contains_unlink_in_process_one_batch45():
-    src = inspect.getsource(_process_one)
-    assert "unlink" in src
 
 
 def test_module_source_contains_per_doc_subdir_batch45():

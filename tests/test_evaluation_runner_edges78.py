@@ -45,12 +45,6 @@ def test_load_annotation_oserror_returns_none_batch52(tmp_path):
         assert _load_annotation(p) is None
 
 
-def test_load_annotation_bad_json_returns_none_batch52(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text("not json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_directory_returns_none_batch52(tmp_path):
     d = tmp_path / "adir"
     d.mkdir()

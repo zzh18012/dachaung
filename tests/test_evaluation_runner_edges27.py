@@ -403,12 +403,6 @@ def test_run_evaluation_source_has_metrics_update():
     assert "metrics.update(chunk_b)" in src
 
 
-def test_run_evaluation_source_has_tolerance_record_pop():
-    src = inspect.getsource(run_evaluation)
-    assert 'tolerance_record = chunk_b.pop("_tolerance_chars", None)' in src
-    assert 'missing_markers_record = chunk_b.pop("_missing_markers", None)' in src
-
-
 def test_run_evaluation_source_has_per_doc_results_append():
     src = inspect.getsource(run_evaluation)
     assert "per_doc_results.append(" in src
@@ -423,16 +417,6 @@ def test_run_evaluation_source_calls_build_provenance():
     src = inspect.getsource(run_evaluation)
     assert "provenance = build_provenance(" in src
     assert "project_root=manifest.project_root," in src
-
-
-def test_run_evaluation_source_calls_build_devset_section():
-    src = inspect.getsource(run_evaluation)
-    assert "devset = build_devset_section(manifest)" in src
-
-
-def test_run_evaluation_source_calls_aggregate_summary():
-    src = inspect.getsource(run_evaluation)
-    assert "summary = aggregate_summary(per_doc_results)" in src
 
 
 def test_run_evaluation_source_has_public_per_doc_loop():
@@ -719,15 +703,7 @@ def test_namespace_run_evaluation():
     assert run_evaluation.__module__ == "evaluation.runner"
 
 
-def test_namespace_module():
-    assert m.__name__ == "evaluation.runner"
-
-
 # ---------- 模块整体合理性 ----------
-
-
-def test_module_all_only_run_evaluation():
-    assert m.__all__ == ["run_evaluation"]
 
 
 def test_module_all_is_list():

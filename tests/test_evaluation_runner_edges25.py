@@ -58,12 +58,6 @@ def test_load_annotation_oserror_returns_none(monkeypatch, tmp_path):
     assert _load_annotation(p) is None
 
 
-def test_load_annotation_invalid_json_returns_none(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_valid_json_returns_dict(tmp_path):
     p = tmp_path / "ok.json"
     p.write_text('{"a": 1}', encoding="utf-8")

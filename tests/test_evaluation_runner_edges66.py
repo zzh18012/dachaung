@@ -167,21 +167,6 @@ def test_process_one_signature_five_params_batch38():
     assert params == ["doc", "output_root", "parser_name", "max_chars"]
 
 
-def test_process_one_doc_no_default_batch38():
-    sig = inspect.signature(_process_one)
-    assert sig.parameters["doc"].default is inspect.Parameter.empty
-
-
-def test_process_one_output_root_no_default_batch38():
-    sig = inspect.signature(_process_one)
-    assert sig.parameters["output_root"].default is inspect.Parameter.empty
-
-
-def test_process_one_parser_name_no_default_batch38():
-    sig = inspect.signature(_process_one)
-    assert sig.parameters["parser_name"].default is inspect.Parameter.empty
-
-
 def test_process_one_max_chars_no_default_batch38():
     sig = inspect.signature(_process_one)
     assert sig.parameters["max_chars"].default is inspect.Parameter.empty

@@ -768,20 +768,9 @@ def test_module_all_no_duplicates():
     assert len(mod.__all__) == len(set(mod.__all__))
 
 
-def test_module_uses_future_annotations():
-    import evaluation.report as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_module_no_silence_unused():
     import evaluation.report as mod
     assert not hasattr(mod, "_silence_unused")
-
-
-def test_module_docstring_present():
-    import evaluation.report as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_no_mix_types():

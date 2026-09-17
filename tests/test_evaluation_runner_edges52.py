@@ -835,11 +835,6 @@ def test_module_source_no_async_def_batch24():
     assert "async def" not in source
 
 
-def test_module_source_no_global_keyword_batch24():
-    source = inspect.getsource(rmod)
-    assert "global " not in source
-
-
 def test_module_source_no_walrus_batch24():
     source = inspect.getsource(rmod)
     assert ":=" not in source
@@ -862,16 +857,6 @@ def test_module_source_no_subprocess_batch24():
 def test_module_source_no_pickle_batch24():
     source = inspect.getsource(rmod)
     assert "pickle" not in source
-
-
-def test_module_source_no_shutil_batch24():
-    source = inspect.getsource(rmod)
-    assert "shutil" not in source
-
-
-def test_module_source_no_tempfile_batch24():
-    source = inspect.getsource(rmod)
-    assert "tempfile" not in source
 
 
 def test_module_source_no_environ_batch24():

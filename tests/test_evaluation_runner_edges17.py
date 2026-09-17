@@ -354,18 +354,6 @@ def test_module_namespace_contains_report_version():
     assert m.REPORT_VERSION == REPORT_VERSION
 
 
-def test_module_namespace_contains_process_single():
-    import evaluation.runner as m
-
-    assert hasattr(m, "process_single")
-
-
-def test_module_namespace_contains_image_output_dir_for():
-    import evaluation.runner as m
-
-    assert hasattr(m, "image_output_dir_for")
-
-
 def test_module_namespace_contains_compute_automatic_metrics():
     import evaluation.runner as m
 

@@ -84,12 +84,6 @@ def test_locator_metrics_in_ratio_batch17():
     assert "docx_locator_valid_ratio" in _RATIO_METRICS
 
 
-def test_text_metrics_in_ratio_batch17():
-    assert "text_preservation_equal" in _RATIO_METRICS
-    assert "text_char_multiset_precision" in _RATIO_METRICS
-    assert "text_char_multiset_recall" in _RATIO_METRICS
-
-
 def test_image_chunk_metrics_in_ratio_batch17():
     assert "image_resource_exists_ratio" in _RATIO_METRICS
     assert "chunk_reference_intact_ratio" in _RATIO_METRICS
@@ -483,12 +477,6 @@ def test_module_source_forbidden_tokens_batch17(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_subprocess_allowed_batch17():
-    """report.py 允许 subprocess（git provenance）。"""
-    src = inspect.getsource(rmod)
-    assert "import subprocess" in src
-
-
 def test_module_source_no_network_batch17():
     src = inspect.getsource(rmod)
     assert "urllib.request" not in src
@@ -557,21 +545,6 @@ def test_module_source_has_aggregate_summary_batch17():
 def test_module_source_has_capture_output_batch17():
     src = inspect.getsource(rmod)
     assert "capture_output=True" in src
-
-
-def test_module_source_has_rev_parse_batch17():
-    src = inspect.getsource(rmod)
-    assert '"git", "rev-parse", "HEAD"' in src
-
-
-def test_module_source_has_status_porcelain_batch17():
-    src = inspect.getsource(rmod)
-    assert '"git", "status", "--porcelain"' in src
-
-
-def test_module_source_has_all_dunder_batch17():
-    src = inspect.getsource(rmod)
-    assert "__all__ = [" in src
 
 
 # ---------- signatures 第三十批 ----------

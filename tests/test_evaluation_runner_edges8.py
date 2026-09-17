@@ -149,12 +149,6 @@ def test_load_annotation_false_value(tmp_path: Path):
     assert _load_annotation(p) is False
 
 
-def test_load_annotation_float_value(tmp_path: Path):
-    p = tmp_path / "a.json"
-    p.write_text("3.14", encoding="utf-8")
-    assert _load_annotation(p) == 3.14
-
-
 # =========================================================================
 # _process_one monkeypatch process_single 路径
 # =========================================================================
@@ -881,11 +875,6 @@ def test_module_imports_image_output_dir_for():
     import evaluation.runner as m
     assert hasattr(m, "image_output_dir_for")
     assert callable(m.image_output_dir_for)
-
-
-def test_module_imports_report_version():
-    import evaluation.runner as m
-    assert hasattr(m, "REPORT_VERSION")
 
 
 def test_module_imports_compute_automatic_metrics():

@@ -843,11 +843,6 @@ def test_report_source_no_eval_call_batch12():
     assert "exec(" not in source
 
 
-def test_report_source_no_compile_call_batch12():
-    source = inspect.getsource(rmod)
-    assert "compile(" not in source
-
-
 def test_report_source_no_open_call_batch12():
     """report.py 不应直接 open 文件（纯计算）。"""
     source = inspect.getsource(rmod)
@@ -1149,14 +1144,6 @@ def test_module_dunder_all_includes_public_funcs_batch12():
     assert set(rmod.__all__) == expected
 
 
-def test_module_constants_count_3_tuples_batch12():
-    consts = [
-        n for n, v in vars(rmod).items()
-        if not n.startswith("__") and isinstance(v, tuple) and not callable(v)
-    ]
-    assert set(consts) == {"_RATIO_METRICS", "_COUNT_METRICS", "_SUCCESS_BOOL_METRICS"}
-
-
 def test_module_no_user_classes_batch12():
     classes = [
         n for n, v in vars(rmod).items()
@@ -1169,10 +1156,6 @@ def test_module_uses_future_annotations_batch12():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:20])
     assert "from __future__ import annotations" in head
-
-
-def test_module_evaluator_version_attr_present_batch12():
-    assert hasattr(rmod, "EVALUATOR_VERSION")
 
 
 def test_module_report_version_attr_present_batch12():
@@ -1203,12 +1186,6 @@ def test_module_pathlib_import_top_level_batch12():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
     assert "from pathlib import Path" in head
-
-
-def test_module_datetime_import_top_level_batch12():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from datetime import datetime" in head
 
 
 def test_module_has_no_unused_imports_quick_check_batch12():

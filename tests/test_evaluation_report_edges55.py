@@ -267,21 +267,6 @@ def test_dependency_versions_callable_batch36():
     assert callable(get_dependency_versions)
 
 
-def test_dependency_versions_contains_pdfplumber_batch36():
-    out = get_dependency_versions()
-    assert "pdfplumber" in out
-
-
-def test_dependency_versions_contains_python_docx_batch36():
-    out = get_dependency_versions()
-    assert "python-docx" in out
-
-
-def test_dependency_versions_contains_pypdfium2_batch36():
-    out = get_dependency_versions()
-    assert "pypdfium2" in out
-
-
 def test_dependency_versions_only_three_keys_batch36():
     out = get_dependency_versions()
     assert len(out) == 3
@@ -672,29 +657,9 @@ def test_module_source_contains_design_doc_batch36():
     assert "评测报告装配" in src
 
 
-def test_module_source_contains_no_mixed_score_comment_batch36():
-    src = inspect.getsource(rmod)
-    assert "不混合类型" in src
-
-
-def test_module_source_contains_counts_aggregation_comment_batch36():
-    src = inspect.getsource(rmod)
-    assert "counts" in src
-
-
 def test_module_source_contains_success_rates_comment_batch36():
     src = inspect.getsource(rmod)
     assert "success_rates" in src
-
-
-def test_module_source_contains_ratio_macro_comment_batch36():
-    src = inspect.getsource(rmod)
-    assert "ratio_macro_averages" in src
-
-
-def test_module_source_contains_silent_drop_comment_batch36():
-    src = inspect.getsource(rmod)
-    assert "silent_drop_count" in src
 
 
 def test_module_source_contains_ratio_metrics_definition_batch36():

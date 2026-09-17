@@ -394,11 +394,6 @@ def test_source_contains_不混合类型_batch48():
     assert "不混合类型" in src or "不混合" in src
 
 
-def test_source_contains_success_rates_batch48():
-    src = inspect.getsource(report_mod)
-    assert "success_rates" in src
-
-
 def test_source_contains_ratio_macro_averages_batch48():
     src = inspect.getsource(report_mod)
     assert "ratio_macro_averages" in src
@@ -581,26 +576,6 @@ def test_source_no_yaml_load_batch48():
 def test_source_no_pickle_load_batch48():
     src = inspect.getsource(report_mod)
     assert "pickle.load(" not in src
-
-
-def test_source_no_lambda_batch48():
-    src = inspect.getsource(report_mod)
-    assert "lambda" not in src
-
-
-def test_source_no_yield_batch48():
-    src = inspect.getsource(report_mod)
-    assert "yield" not in src
-
-
-def test_source_no_walrus_batch48():
-    src = inspect.getsource(report_mod)
-    assert ":=" not in src
-
-
-def test_source_no_async_batch48():
-    src = inspect.getsource(report_mod)
-    assert "async def" not in src
 
 
 def test_source_no_await_batch48():

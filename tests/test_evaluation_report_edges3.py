@@ -301,12 +301,6 @@ def test_get_git_provenance_returns_only_two_keys(tmp_path: Path):
 # =========================================================================
 
 
-def test_dependency_versions_returns_fresh_dict_each_call():
-    a = get_dependency_versions()
-    b = get_dependency_versions()
-    assert a is not b
-
-
 def test_dependency_versions_exact_three_keys_in_order():
     """key 顺序固定：pdfplumber, python-docx, pypdfium2。"""
     v = get_dependency_versions()

@@ -650,13 +650,6 @@ def test_run_evaluation_per_doc_results_internal_fields_present(tmp_path, monkey
     assert isinstance(internal["_missing_markers"], list)
 
 
-def test_run_evaluation_no_documents_returns_empty_per_doc(tmp_path):
-    manifest = _FakeManifest(documents=[])
-    out = tmp_path / "report.json"
-    report = run_evaluation(manifest, out)
-    assert report["per_doc"] == []
-
-
 def test_run_evaluation_no_documents_returns_empty_expected_failures(tmp_path):
     manifest = _FakeManifest(expected_failures=[])
     out = tmp_path / "report.json"

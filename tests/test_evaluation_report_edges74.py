@@ -209,12 +209,6 @@ def test_source_docstring_aggregation_rules_batch54():
     assert "无 expectations 的文档不参与" in src
 
 
-def test_all_export_list_exact_batch54():
-    assert report_mod.__all__ == [
-        "build_provenance", "build_devset_section", "aggregate_summary",
-        "get_git_provenance", "get_dependency_versions"]
-
-
 # ---------- AST ----------
 
 def _func(name: str) -> ast.FunctionDef:

@@ -70,11 +70,6 @@ def test_load_annotation_source_uses_path_is_none():
     assert "if path is None or not path.is_file():" in src
 
 
-def test_load_annotation_source_uses_return_none_first_branch():
-    src = inspect.getsource(_load_annotation)
-    assert "return None" in src
-
-
 def test_load_annotation_source_uses_try():
     src = inspect.getsource(_load_annotation)
     assert "try:" in src
@@ -179,11 +174,6 @@ def test_process_one_source_parent_mkdir():
     assert "out_stub.parent.mkdir(parents=True, exist_ok=True)" in src
 
 
-def test_process_one_source_uses_time_perf_counter():
-    src = inspect.getsource(_process_one)
-    assert "t0 = time.perf_counter()" in src
-
-
 def test_process_one_source_calls_process_single():
     src = inspect.getsource(_process_one)
     assert "document, errors = process_single(" in src
@@ -212,11 +202,6 @@ def test_process_one_source_passes_max_chars():
 def test_process_one_source_passes_write_json_false():
     src = inspect.getsource(_process_one)
     assert "write_json=False," in src
-
-
-def test_process_one_source_elapsed_calc():
-    src = inspect.getsource(_process_one)
-    assert "elapsed = time.perf_counter() - t0" in src
 
 
 def test_process_one_source_image_dir_init_none():
@@ -264,11 +249,6 @@ def test_process_one_source_return_5_tuple_success():
     )
 
 
-def test_process_one_source_no_class():
-    src = inspect.getsource(_process_one)
-    assert "class " not in src
-
-
 def test_process_one_source_no_yield():
     src = inspect.getsource(_process_one)
     assert "yield" not in src
@@ -284,11 +264,6 @@ def test_process_one_source_no_walrus():
     assert ":=" not in src
 
 
-def test_process_one_source_no_global():
-    src = inspect.getsource(_process_one)
-    assert "global " not in src
-
-
 def test_process_one_source_no_eval():
     src = inspect.getsource(_process_one)
     assert "eval(" not in src
@@ -297,11 +272,6 @@ def test_process_one_source_no_eval():
 def test_process_one_source_no_exec():
     src = inspect.getsource(_process_one)
     assert "exec(" not in src
-
-
-def test_process_one_source_no_subprocess():
-    src = inspect.getsource(_process_one)
-    assert "subprocess" not in src
 
 
 def test_process_one_source_no_print():
@@ -391,11 +361,6 @@ def test_run_evaluation_source_image_dir_is_dir_check():
 def test_run_evaluation_source_calls_load_annotation():
     src = inspect.getsource(run_evaluation)
     assert "annotation = _load_annotation(doc.annotation_resolved)" in src
-
-
-def test_run_evaluation_source_calls_figure_caption_prf():
-    src = inspect.getsource(run_evaluation)
-    assert "fig_caps = figure_caption_prf(document, annotation)" in src
 
 
 def test_run_evaluation_source_calls_chunk_boundary_prf():
@@ -514,16 +479,6 @@ def test_run_evaluation_source_calls_build_provenance():
     assert "parser_version=parser_version_for_prov" in src
 
 
-def test_run_evaluation_source_calls_build_devset_section():
-    src = inspect.getsource(run_evaluation)
-    assert "devset = build_devset_section(manifest)" in src
-
-
-def test_run_evaluation_source_calls_aggregate_summary():
-    src = inspect.getsource(run_evaluation)
-    assert "summary = aggregate_summary(per_doc_results)" in src
-
-
 def test_run_evaluation_source_public_per_doc_list_init():
     src = inspect.getsource(run_evaluation)
     assert "public_per_doc = []" in src
@@ -570,11 +525,6 @@ def test_run_evaluation_source_returns_report():
     assert "return report" in src
 
 
-def test_run_evaluation_source_no_class():
-    src = inspect.getsource(run_evaluation)
-    assert "class " not in src
-
-
 def test_run_evaluation_source_no_yield():
     src = inspect.getsource(run_evaluation)
     assert "yield" not in src
@@ -588,11 +538,6 @@ def test_run_evaluation_source_no_async():
 def test_run_evaluation_source_no_walrus():
     src = inspect.getsource(run_evaluation)
     assert ":=" not in src
-
-
-def test_run_evaluation_source_no_global():
-    src = inspect.getsource(run_evaluation)
-    assert "global " not in src
 
 
 def test_run_evaluation_source_no_eval():

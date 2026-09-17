@@ -92,11 +92,6 @@ def test_real_text_pdf_text_and_chunks_batch326(tmp_path):
         "value": None, "reason": "no_heading_elements"}
 
 
-def test_real_text_pdf_report_validates_batch326(tmp_path):
-    r = _run(tmp_path)
-    validate(r, "evaluation-report.schema.json")
-
-
 # ---------- 源码补强 ----------
 
 def _src():

@@ -33,11 +33,6 @@ from evaluation.runner import _load_annotation, _process_one, run_evaluation
 
 # ---------- _load_annotation 多种路径 ----------
 
-def test_load_annotation_none_returns_none_batch49():
-    out = _load_annotation(None)
-    assert out is None
-
-
 def test_load_annotation_missing_file_returns_none_batch49(tmp_path):
     out = _load_annotation(tmp_path / "nope.json")
     assert out is None

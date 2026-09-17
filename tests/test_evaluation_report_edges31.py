@@ -123,11 +123,6 @@ def test_get_git_provenance_r2_with_only_cr_batch14():
     assert out["git_dirty"] is False
 
 
-def test_get_git_provenance_returns_two_keys_only_batch14():
-    out = get_git_provenance(Path("."))
-    assert len(out) == 2
-
-
 def test_get_git_provenance_returns_proper_types_batch14():
     fake = subprocess.CompletedProcess(args=[], returncode=0, stdout="abc\n", stderr="")
     fake2 = subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr="")
@@ -175,11 +170,6 @@ def test_get_dependency_versions_no_other_keys_batch14():
 # ---------- build_provenance 字段深度第十四批 ----------
 
 
-def test_build_provenance_returns_9_keys_batch14():
-    out = build_provenance(Path("."), parser_name="x", max_chars=100, parser_version=None)
-    assert len(out) == 9
-
-
 def test_build_provenance_keys_exact_batch14():
     out = build_provenance(Path("."), parser_name="x", max_chars=100, parser_version=None)
     expected = {
@@ -214,11 +204,6 @@ def test_build_provenance_parser_name_passthrough_batch14():
 def test_build_provenance_evaluator_version_value_batch14():
     out = build_provenance(Path("."), parser_name="x", max_chars=100, parser_version=None)
     assert out["evaluator_version"] == EVALUATOR_VERSION
-
-
-def test_build_provenance_report_version_value_batch14():
-    out = build_provenance(Path("."), parser_name="x", max_chars=100, parser_version=None)
-    assert out["report_version"] == REPORT_VERSION
 
 
 # ---------- build_devset_section 字段深度第十四批 ----------
@@ -428,12 +413,6 @@ def test_module_source_future_annotations_present_batch14():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_subprocess_batch14():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import subprocess" in head
-
-
 def test_module_source_imports_pathlib_batch14():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
@@ -450,16 +429,6 @@ def test_module_source_imports_eval_versions_batch14():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
     assert "from evaluation import" in head
-
-
-def test_module_source_defines_get_git_provenance_batch14():
-    source = inspect.getsource(rmod)
-    assert "def get_git_provenance(" in source
-
-
-def test_module_source_defines_build_provenance_batch14():
-    source = inspect.getsource(rmod)
-    assert "def build_provenance(" in source
 
 
 def test_module_source_defines_aggregate_summary_batch14():
@@ -508,11 +477,6 @@ def test_module_source_has_macro_average_batch14():
     assert "macro_average" in source
 
 
-def test_module_source_has_participating_docs_batch14():
-    source = inspect.getsource(rmod)
-    assert "participating_docs" in source
-
-
 def test_module_source_has_success_rates_batch14():
     source = inspect.getsource(rmod)
     assert "success_rates" in source
@@ -524,12 +488,6 @@ def test_module_source_has_silent_drop_batch14():
 
 
 # ---------- signatures 第十六批 ----------
-
-
-def test_get_git_provenance_one_param_batch14():
-    sig = inspect.signature(get_git_provenance)
-    assert len(sig.parameters) == 1
-    assert "project_root" in sig.parameters
 
 
 def test_get_dependency_versions_no_params_batch14():
@@ -586,10 +544,6 @@ def test_module_name_evaluation_report_batch14():
 
 def test_module_dunder_all_5_items_batch14():
     assert len(rmod.__all__) == 5
-
-
-def test_module_dunder_all_items_unique_batch14():
-    assert len(set(rmod.__all__)) == len(rmod.__all__)
 
 
 def test_module_no_class_definitions_batch14():

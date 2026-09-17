@@ -309,16 +309,6 @@ def test_build_provenance_dict_type_batch10():
     assert type(out) is dict
 
 
-def test_build_provenance_evaluator_version_strict_batch10():
-    out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
-    assert out["evaluator_version"] == EVALUATOR_VERSION
-
-
-def test_build_provenance_report_version_strict_batch10():
-    out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
-    assert out["report_version"] == REPORT_VERSION
-
-
 def test_build_provenance_parser_name_unicode_batch10():
     out = build_provenance(
         Path("."), parser_name="fälık Bäck", max_chars=800, parser_version=None
@@ -491,11 +481,6 @@ def test_aggregate_summary_top_keys_order_batch10():
     assert list(out.keys()) == ["counts", "success_rates", "ratio_macro_averages", "silent_drop_total"]
 
 
-def test_aggregate_summary_top_keys_count_batch10():
-    out = aggregate_summary([])
-    assert len(out) == 4
-
-
 def test_aggregate_summary_counts_none_when_no_participation_batch10():
     docs = [_metrics_doc({}) for _ in range(3)]
     out = aggregate_summary(docs)
@@ -648,11 +633,6 @@ def test_report_source_no_forbidden_token_thirteenth_batch10(token):
     assert token not in source
 
 
-def test_report_source_no_unlink_batch10():
-    source = inspect.getsource(rmod)
-    assert "unlink" not in source
-
-
 def test_report_source_no_remove_batch10():
     source = inspect.getsource(rmod)
     assert ".remove(" not in source
@@ -737,16 +717,6 @@ def test_module_source_has_future_annotations_batch10():
     assert "from __future__ import annotations" in source
 
 
-def test_module_source_imports_subprocess_batch10():
-    source = inspect.getsource(rmod)
-    assert "import subprocess" in source
-
-
-def test_module_source_imports_datetime_batch10():
-    source = inspect.getsource(rmod)
-    assert "from datetime import datetime" in source
-
-
 def test_module_source_imports_path_batch10():
     source = inspect.getsource(rmod)
     assert "from pathlib import Path" in source
@@ -814,11 +784,6 @@ def test_module_source_has_popen_not_batch10():
 # ---------- signatures 第十批 ----------
 
 
-def test_signature_get_git_provenance_params_count_batch10():
-    sig = inspect.signature(get_git_provenance)
-    assert len(sig.parameters) == 1
-
-
 def test_signature_get_git_provenance_param_name_batch10():
     sig = inspect.signature(get_git_provenance)
     assert list(sig.parameters) == ["project_root"]
@@ -834,12 +799,6 @@ def test_signature_get_git_provenance_param_no_default_batch10():
     sig = inspect.signature(get_git_provenance)
     p = list(sig.parameters.values())[0]
     assert p.default is inspect.Parameter.empty
-
-
-def test_signature_get_git_provenance_return_annotation_batch10():
-    sig = inspect.signature(get_git_provenance)
-    # annotation 是字符串 "dict[str, Any]"（因为 from __future__ import annotations）
-    assert sig.return_annotation is not inspect.Signature.empty
 
 
 def test_signature_get_dependency_versions_no_params_batch10():
@@ -919,16 +878,6 @@ def test_signature_funcs_module_eq_batch10():
 # ---------- module 合理性第十批 ----------
 
 
-def test_module_all_value_batch10():
-    assert rmod.__all__ == [
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    ]
-
-
 def test_module_all_is_list_batch10():
     assert isinstance(rmod.__all__, list)
 
@@ -957,28 +906,6 @@ def test_module_dunder_file_endswith_report_py_batch10():
 
 def test_module_name_is_evaluation_report_batch10():
     assert rmod.__name__ == "evaluation.report"
-
-
-def test_module_user_function_count_batch10():
-    funcs = [
-        n for n, v in vars(rmod).items()
-        if inspect.isfunction(v) and v.__module__ == rmod.__name__
-    ]
-    assert set(funcs) == {
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    }
-
-
-def test_module_user_constant_count_batch10():
-    consts = [
-        n for n, v in vars(rmod).items()
-        if not n.startswith("__") and isinstance(v, tuple) and not callable(v)
-    ]
-    assert set(consts) == {"_RATIO_METRICS", "_COUNT_METRICS", "_SUCCESS_BOOL_METRICS"}
 
 
 def test_module_no_user_classes_batch10():
@@ -1037,13 +964,6 @@ def test_e2e_full_chain_json_serializable_batch10():
     text = json.dumps(summary)
     parsed = json.loads(text)
     assert parsed == summary
-
-
-def test_e2e_aggregate_summary_kwargs_call_batch10():
-    docs = [_metrics_doc({"schema_valid": {"value": 1.0}})]
-    out1 = aggregate_summary(docs)
-    out2 = aggregate_summary(per_doc_results=docs)
-    assert out1 == out2
 
 
 def test_e2e_build_provenance_does_not_raise_on_real_call_batch10():

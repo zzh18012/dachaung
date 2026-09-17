@@ -193,15 +193,6 @@ def test_hbc_none_zero_three_batch545(
 
 # ---------- 聚合 ----------
 
-def test_success_three_of_three_batch545(
-        tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["success_rates"][
-        "pipeline_success"] == {
-        "success_count": 3, "total": 3,
-        "rate": 1.0}
-
-
 def test_per_doc_id_order_batch545(tmp_path):
     assert [p["doc_id"]
             for p in _run(tmp_path)["per_doc"]] == [

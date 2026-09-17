@@ -181,14 +181,6 @@ def test_per_doc_untouched_batch531(tmp_path):
     assert r["per_doc"][0]["doc_id"] == "g1"
 
 
-def test_success_untouched_batch531(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["success_rates"][
-        "pipeline_success"] == {
-        "success_count": 1, "total": 1,
-        "rate": 1.0}
-
-
 def test_report_schema_batch531(tmp_path):
     validate(_run(tmp_path),
              "evaluation-report.schema.json")

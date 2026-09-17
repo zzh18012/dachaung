@@ -73,11 +73,6 @@ def test_get_git_provenance_handles_subprocess_timeout_in_porcelain():
     assert out["git_dirty"] is True
 
 
-def test_get_git_provenance_returns_dict_with_two_keys():
-    out = get_git_provenance(Path("."))
-    assert len(out) == 2
-
-
 def test_get_git_provenance_keys_exact():
     out = get_git_provenance(Path("."))
     assert set(out.keys()) == {"git_commit", "git_dirty"}
@@ -86,11 +81,6 @@ def test_get_git_provenance_keys_exact():
 def test_get_git_provenance_value_git_commit_str_or_none():
     out = get_git_provenance(Path("."))
     assert out["git_commit"] is None or isinstance(out["git_commit"], str)
-
-
-def test_get_git_provenance_value_git_dirty_bool():
-    out = get_git_provenance(Path("."))
-    assert isinstance(out["git_dirty"], bool)
 
 
 def test_get_git_provenance_real_call_in_project():
@@ -201,13 +191,6 @@ def test_build_provenance_parser_version_empty_string():
     assert out["parser_version"] == ""
 
 
-def test_build_provenance_parser_name_kreuzberg():
-    out = build_provenance(
-        Path("."), parser_name="kreuzberg", max_chars=800, parser_version=None
-    )
-    assert out["parser_name"] == "kreuzberg"
-
-
 def test_build_provenance_dependencies_value_is_dict():
     out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
     assert isinstance(out["dependencies"], dict)
@@ -224,16 +207,6 @@ def test_build_provenance_run_timestamp_valid_iso():
     # datetime.fromisoformat 能解析
     parsed = datetime.fromisoformat(ts)
     assert parsed is not None
-
-
-def test_build_provenance_evaluator_version_value():
-    out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
-    assert out["evaluator_version"] == EVALUATOR_VERSION
-
-
-def test_build_provenance_report_version_value():
-    out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
-    assert out["report_version"] == REPORT_VERSION
 
 
 def test_build_provenance_dict_serializable():
@@ -526,11 +499,6 @@ def test_report_source_no_forbidden_token_twelfth(token):
     assert token not in source
 
 
-def test_report_source_no_unlink():
-    source = inspect.getsource(rmod)
-    assert "unlink" not in source
-
-
 def test_report_source_no_remove():
     source = inspect.getsource(rmod)
     assert ".remove(" not in source
@@ -588,16 +556,6 @@ def test_report_source_no_logging():
 def test_module_source_has_future_annotations():
     source = inspect.getsource(rmod)
     assert "from __future__ import annotations" in source
-
-
-def test_module_source_imports_subprocess():
-    source = inspect.getsource(rmod)
-    assert "import subprocess" in source
-
-
-def test_module_source_imports_datetime():
-    source = inspect.getsource(rmod)
-    assert "from datetime import datetime" in source
 
 
 def test_module_source_imports_path():
@@ -667,11 +625,6 @@ def test_module_source_capture_output_true():
     assert "capture_output=True" in source
 
 
-def test_module_source_encoding_utf8():
-    source = inspect.getsource(rmod)
-    assert 'encoding="utf-8"' in source
-
-
 def test_module_source_errors_replace():
     source = inspect.getsource(rmod)
     assert 'errors="replace"' in source
@@ -724,16 +677,6 @@ def test_module_source_docstring_no_mix_word():
 
 
 # ---------- signatures 第九批 ----------
-
-
-def test_signature_get_git_provenance_1_param():
-    sig = inspect.signature(get_git_provenance)
-    assert len(sig.parameters) == 1
-
-
-def test_signature_get_git_provenance_param_name():
-    sig = inspect.signature(get_git_provenance)
-    assert "project_root" in sig.parameters
 
 
 def test_signature_get_git_provenance_param_kind():
@@ -790,11 +733,6 @@ def test_signature_aggregate_summary_1_param():
     assert len(sig.parameters) == 1
 
 
-def test_signature_aggregate_summary_param_name_per_doc_results():
-    sig = inspect.signature(aggregate_summary)
-    assert "per_doc_results" in sig.parameters
-
-
 def test_signature_funcs_function_type():
     for func in (
         get_git_provenance,
@@ -818,16 +756,6 @@ def test_signature_funcs_module_eq():
 
 
 # ---------- module 合理性第九批 ----------
-
-
-def test_module_all_value():
-    assert rmod.__all__ == [
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    ]
 
 
 def test_module_all_is_list():
@@ -934,13 +862,6 @@ def test_e2e_full_chain_json_serializable():
     text = json.dumps(summary)
     parsed = json.loads(text)
     assert parsed == summary
-
-
-def test_e2e_aggregate_summary_kwargs_call():
-    docs = [_metrics_doc({"schema_valid": {"value": 1.0}})]
-    out1 = aggregate_summary(docs)
-    out2 = aggregate_summary(per_doc_results=docs)
-    assert out1 == out2
 
 
 def test_e2e_build_provenance_does_not_raise_on_real_call():

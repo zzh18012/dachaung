@@ -106,14 +106,6 @@ def test_metric_tuples_no_figure_caption_batch16():
     assert "figure_caption_f1" not in _RATIO_METRICS
 
 
-def test_count_metrics_contains_element_count_total_batch16():
-    assert "element_count_total" in _COUNT_METRICS
-
-
-def test_success_bool_metrics_contains_pipeline_success_batch16():
-    assert "pipeline_success" in _SUCCESS_BOOL_METRICS
-
-
 def test_ratio_metrics_contains_chunk_boundary_f1_batch16():
     assert "chunk_boundary_f1" in _RATIO_METRICS
 
@@ -694,11 +686,6 @@ def test_module_source_has_importlib_metadata_batch16():
 def test_module_source_has_capture_output_batch16():
     src = inspect.getsource(rmod)
     assert "capture_output=True" in src
-
-
-def test_module_source_has_all_dunder_batch16():
-    src = inspect.getsource(rmod)
-    assert "__all__ = [" in src
 
 
 def test_module_source_all_has_5_items_batch16():

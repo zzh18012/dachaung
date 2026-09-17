@@ -531,11 +531,6 @@ def test_module_imports_annotation_metrics_batch27():
     assert "from evaluation.annotation_metrics import" in src
 
 
-def test_module_imports_metrics_batch27():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.metrics import" in src
-
-
 def test_module_imports_report_helpers_batch27():
     src = inspect.getsource(rmod)
     assert "from evaluation.report import" in src

@@ -536,11 +536,6 @@ def test_module_output_path_param_positional():
     assert sig.parameters["output_path"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_module_process_one_returns_tuple_str_annotation():
-    sig = inspect.signature(_process_one)
-    assert "tuple" in sig.return_annotation
-
-
 def test_module_load_annotation_returns_dict_or_none_str_annotation():
     sig = inspect.signature(_load_annotation)
     # 简单断言返回类型注解包含 None

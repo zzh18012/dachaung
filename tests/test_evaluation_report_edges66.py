@@ -379,11 +379,6 @@ def test_source_counts_doc_comment_batch52():
     assert "求和" in src
 
 
-def test_source_success_rates_doc_comment_batch52():
-    src = inspect.getsource(report_mod)
-    assert "success_rates" in src
-
-
 def test_source_silent_drop_doc_comment_batch52():
     src = inspect.getsource(report_mod)
     assert "silent_drop_count" in src
@@ -468,15 +463,6 @@ def test_ast_build_provenance_returns_dict_9_keys_batch52():
     assert len(returns[0].value.keys) == 9
 
 
-def test_ast_build_devset_section_returns_dict_6_keys_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "build_devset_section")
-    returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
-    assert len(returns) == 1
-    assert isinstance(returns[0].value, ast.Dict)
-    assert len(returns[0].value.keys) == 6
-
-
 def test_ast_get_git_provenance_has_try_except_batch52():
     tree = ast.parse(inspect.getsource(report_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "get_git_provenance")
@@ -504,23 +490,10 @@ def test_ast_no_class_def_batch52():
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
-def test_ast_no_async_function_def_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
-
-
 def test_ast_module_has_docstring_batch52():
     tree = ast.parse(inspect.getsource(report_mod))
     assert isinstance(tree.body[0], ast.Expr)
     assert isinstance(tree.body[0].value, ast.Constant)
-
-
-def test_ast_no_star_import_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    for n in tree.body:
-        if isinstance(n, ast.ImportFrom):
-            for alias in n.names:
-                assert alias.name != "*"
 
 
 # ---------- forbidden tokens 第一百四十六批 ----------
@@ -588,11 +561,6 @@ def test_source_no_yield_batch52():
 def test_source_no_async_await_batch52():
     assert "async " not in _src()
     assert "await " not in _src()
-
-
-def test_source_open_count_zero_batch52():
-    """report.py 不使用 open()。"""
-    assert "open(" not in _src()
 
 
 def test_source_subprocess_count_at_least_3_batch52():

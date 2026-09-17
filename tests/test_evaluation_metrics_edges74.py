@@ -608,56 +608,6 @@ def test_source_contains_math_isfinite_batch49():
     assert "math.isfinite" in src
 
 
-def test_source_contains_no_image_elements_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_image_elements"' in src
-
-
-def test_source_contains_no_chunks_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_chunks"' in src
-
-
-def test_source_contains_no_elements_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_elements"' in src
-
-
-def test_source_contains_no_heading_elements_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_heading_elements"' in src
-
-
-def test_source_contains_no_expectations_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_expectations"' in src
-
-
-def test_source_contains_no_expectations_element_count_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_expectations_element_count"' in src
-
-
-def test_source_contains_empty_expected_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"empty_expected"' in src
-
-
-def test_source_contains_pipeline_failed_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"pipeline_failed"' in src
-
-
-def test_source_contains_not_pdf_document_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"not_pdf_document"' in src
-
-
-def test_source_contains_not_docx_document_string_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert '"not_docx_document"' in src
-
-
 def test_source_all_1_entry_batch49():
     src = inspect.getsource(metrics_mod)
     assert '__all__ = ["compute_automatic_metrics"]' in src

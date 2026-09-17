@@ -569,16 +569,6 @@ def test_module_source_no_path_mkdir_unsafe_batch19():
     assert 'mkdir("/' not in src
 
 
-def test_module_source_no_sys_exit_batch19():
-    src = inspect.getsource(rmod)
-    assert "sys.exit" not in src
-
-
-def test_module_source_no_re_compile_batch19():
-    src = inspect.getsource(rmod)
-    assert "re.compile" not in src
-
-
 def test_module_source_no_pandas_import_batch19():
     src = inspect.getsource(rmod)
     assert "import pandas" not in src
@@ -710,14 +700,6 @@ def test_signature_run_evaluation_keyword_only_batch19():
     assert params[2].kind == inspect.Parameter.KEYWORD_ONLY
     assert params[3].kind == inspect.Parameter.KEYWORD_ONLY
     assert params[4].kind == inspect.Parameter.KEYWORD_ONLY
-
-
-def test_signature_run_evaluation_defaults_batch19():
-    sig = inspect.signature(run_evaluation)
-    params = {p.name: p for p in sig.parameters.values()}
-    assert params["parser_name"].default == "fallback"
-    assert params["max_chars"].default == 800
-    assert params["tolerance_chars"].default == 30
 
 
 # ---------- module 合理性第二十九批 ----------

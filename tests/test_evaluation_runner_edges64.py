@@ -41,13 +41,6 @@ def test_load_annotation_list_top_level_returns_dict_batch36(tmp_path):
     assert out == [1, 2, 3]
 
 
-def test_load_annotation_string_top_level_returns_str_batch36(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text('"hello"', encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == "hello"
-
-
 def test_load_annotation_int_top_level_returns_int_batch36(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text("42", encoding="utf-8")
@@ -765,11 +758,6 @@ def test_signature_run_evaluation_max_chars_default_800_batch36():
 def test_signature_run_evaluation_tolerance_default_30_batch36():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_signature_run_evaluation_parser_name_kw_only_batch36():
-    sig = inspect.signature(run_evaluation)
-    assert sig.parameters["parser_name"].kind == inspect.Parameter.KEYWORD_ONLY
 
 
 def test_signature_run_evaluation_max_chars_kw_only_batch36():

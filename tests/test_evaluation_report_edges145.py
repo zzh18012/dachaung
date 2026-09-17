@@ -198,13 +198,6 @@ def test_allgreen_participation_two_batch510(
 
 # ---------- counts / success ----------
 
-def test_counts_hetero_sum_batch510(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["counts"][
-        "element_count_total"] == {
-        "sum": 4, "participating_docs": 2}
-
-
 def test_success_full_batch510(tmp_path):
     r = _run(tmp_path)
     assert r["summary"]["success_rates"][

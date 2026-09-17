@@ -186,11 +186,6 @@ def test_module_all_only_run_evaluation():
     assert mod.__all__ == ["run_evaluation"]
 
 
-def test_module_all_is_list():
-    import evaluation.runner as mod
-    assert isinstance(mod.__all__, list)
-
-
 def test_module_imports_json():
     import evaluation.runner as mod
     src = inspect.getsource(mod)

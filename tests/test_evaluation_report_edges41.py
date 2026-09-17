@@ -670,11 +670,6 @@ def test_module_source_no_async_def_batch25():
     assert "async def" not in source
 
 
-def test_module_source_no_global_keyword_batch25():
-    source = inspect.getsource(rmod)
-    assert "global " not in source
-
-
 def test_module_source_no_walrus_batch25():
     source = inspect.getsource(rmod)
     assert ":=" not in source
@@ -753,11 +748,6 @@ def test_module_source_contains_count_metrics_constant_batch25():
 def test_module_source_contains_success_bool_metrics_batch25():
     source = inspect.getsource(rmod)
     assert "_SUCCESS_BOOL_METRICS = (" in source
-
-
-def test_module_source_contains_get_git_provenance_batch25():
-    source = inspect.getsource(rmod)
-    assert "def get_git_provenance(" in source
 
 
 def test_module_source_contains_rev_parse_head_batch25():

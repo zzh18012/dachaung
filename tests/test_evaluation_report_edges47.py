@@ -95,13 +95,6 @@ def test_ratio_metrics_includes_chunk_boundary_batch31():
     assert "chunk_boundary_f1" in _RATIO_METRICS
 
 
-def test_ratio_metrics_excludes_figure_caption_batch31():
-    """figure_caption_* 不在 _RATIO_METRICS（始终 null）。"""
-    assert "figure_caption_precision" not in _RATIO_METRICS
-    assert "figure_caption_recall" not in _RATIO_METRICS
-    assert "figure_caption_f1" not in _RATIO_METRICS
-
-
 # ---------- get_git_provenance 第三十一批 ----------
 
 
@@ -426,15 +419,6 @@ def test_aggregate_summary_silent_drop_total_none_when_no_values_batch31():
     assert out["silent_drop_total"] is None
 
 
-def test_aggregate_summary_silent_drop_total_sum_batch31():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 3, "reason": None}}},
-        {"metrics": {"silent_drop_count": {"value": 5, "reason": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["silent_drop_total"] == 8
-
-
 def test_aggregate_summary_top_level_keys_batch31():
     """summary 顶层 4 个 key。"""
     out = aggregate_summary([])
@@ -626,11 +610,6 @@ def test_signature_get_git_provenance_project_root_batch31():
     assert sig.parameters["project_root"].annotation == "Path"
 
 
-def test_signature_get_dependency_versions_return_batch31():
-    sig = inspect.signature(get_dependency_versions)
-    assert "dict[str, str | None]" in str(sig.return_annotation)
-
-
 def test_signature_get_dependency_versions_no_params_batch31():
     sig = inspect.signature(get_dependency_versions)
     assert len(sig.parameters) == 0
@@ -656,11 +635,6 @@ def test_signature_aggregate_summary_params_batch31():
     sig = inspect.signature(aggregate_summary)
     params = list(sig.parameters.keys())
     assert params == ["per_doc_results"]
-
-
-def test_signature_aggregate_summary_return_dict_batch31():
-    sig = inspect.signature(aggregate_summary)
-    assert "dict[str, Any]" in str(sig.return_annotation)
 
 
 # ---------- module 合理性第四十五批 ----------

@@ -125,12 +125,6 @@ def test_ratio_metrics_last_chunk_boundary_f1_batch42():
     assert _RATIO_METRICS[-1] == "chunk_boundary_f1"
 
 
-def test_ratio_metrics_no_figure_caption_batch42():
-    """figure_caption_* 始终 null，不参与 macro average。"""
-    for m in _RATIO_METRICS:
-        assert not m.startswith("figure_caption_")
-
-
 def test_ratio_metrics_no_silent_drop_batch42():
     assert "silent_drop_count" not in _RATIO_METRICS
 
@@ -432,21 +426,6 @@ def test_build_provenance_signature_batch42():
     assert list(sig.parameters.keys()) == ["project_root", "parser_name", "max_chars", "parser_version"]
 
 
-def test_build_provenance_no_default_for_project_root_batch42():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["project_root"].default is inspect.Parameter.empty
-
-
-def test_build_provenance_no_default_for_parser_name_batch42():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["parser_name"].default is inspect.Parameter.empty
-
-
-def test_build_provenance_no_default_for_max_chars_batch42():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["max_chars"].default is inspect.Parameter.empty
-
-
 def test_build_provenance_no_default_for_parser_version_batch42():
     sig = inspect.signature(build_provenance)
     assert sig.parameters["parser_version"].default is inspect.Parameter.empty
@@ -586,18 +565,6 @@ def test_aggregate_summary_counts_partial_participation_batch42():
 
 
 # ---------- aggregate_summary success_rates 第四十二批
-
-
-def test_aggregate_summary_success_rates_all_true_batch42():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": True}}},
-        {"metrics": {"pipeline_success": {"value": True}}},
-    ]
-    out = aggregate_summary(per_doc)
-    sr = out["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 2
-    assert sr["total"] == 2
-    assert sr["rate"] == 1.0
 
 
 def test_aggregate_summary_success_rates_all_false_batch42():
@@ -850,11 +817,6 @@ def test_module_source_contains_aggregate_summary_batch42():
 def test_module_source_contains_rev_parse_call_batch42():
     src = inspect.getsource(rmod)
     assert "rev-parse" in src or '"rev-parse"' in src
-
-
-def test_module_source_contains_status_porcelain_call_batch42():
-    src = inspect.getsource(rmod)
-    assert "status" in src and "porcelain" in src
 
 
 def test_module_source_contains_capture_output_batch42():

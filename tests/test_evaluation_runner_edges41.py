@@ -603,18 +603,6 @@ def test_module_source_forbidden_tokens_round19_batch14(token):
 # ---------- module source 字符串精确补强第十六批 ----------
 
 
-def test_module_source_module_docstring_present_batch14():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:15])
-    assert '"""' in head
-
-
-def test_module_source_future_annotations_present_batch14():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from __future__ import annotations" in head
-
-
 def test_module_source_imports_json_batch14():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
@@ -666,16 +654,6 @@ def test_module_source_imports_report_helpers_batch14():
 def test_module_source_defines_load_annotation_batch14():
     source = inspect.getsource(rmod)
     assert "def _load_annotation(" in source
-
-
-def test_module_source_defines_process_one_batch14():
-    source = inspect.getsource(rmod)
-    assert "def _process_one(" in source
-
-
-def test_module_source_defines_run_evaluation_batch14():
-    source = inspect.getsource(rmod)
-    assert "def run_evaluation(" in source
 
 
 def test_module_source_has_dunder_all_batch14():

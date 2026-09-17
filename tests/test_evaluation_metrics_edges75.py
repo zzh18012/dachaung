@@ -182,18 +182,6 @@ def test_text_preservation_expected_empty_actual_nonempty_batch51():
     assert out["precision"]["value"] == 0.0
 
 
-def test_text_preservation_actual_empty_expected_nonempty_batch51():
-    elements = [{"type": "paragraph", "content": "abc"}]
-    chunks = [{"text": ""}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is False
-    # actual 空 → precision null
-    assert out["precision"]["value"] is None
-    assert out["precision"]["reason"] == "empty_actual"
-    # expected 非空 → recall 是 0
-    assert out["recall"]["value"] == 0.0
-
-
 def test_text_preservation_both_nonempty_equal_batch51():
     elements = [{"type": "paragraph", "content": "hello"}]
     chunks = [{"text": "hello"}]
@@ -820,13 +808,6 @@ def test_ast_has_module_docstring_batch51():
     assert isinstance(tree.body[0].value, ast.Constant)
 
 
-def test_ast_module_has_4_top_level_assigns_batch51():
-    """_TEXT_TYPES + _PDF_BBOX_REQUIRED_TYPES + _NOT_EVALUATED + __all__ = 4。"""
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    assert len(assigns) == 4
-
-
 def test_ast_assign_targets_names_batch51():
     tree = ast.parse(inspect.getsource(metrics_mod))
     names = []
@@ -906,13 +887,6 @@ def test_ast_compute_metrics_has_for_loop_for_metrics_assign_batch51():
     fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
     # for name in (...):  +  for e in elements:  →  ≥2
     assert len(fors) >= 2
-
-
-def test_ast_silent_drop_count_has_for_loop_batch51():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_silent_drop_count")
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) == 1
 
 
 def test_ast_image_resource_ratio_has_for_loop_batch51():

@@ -734,18 +734,6 @@ def test_module_does_not_import_evaluation_manifest_batch21():
     assert "from evaluation import manifest" not in src
 
 
-def test_module_does_not_import_app_chunkers_batch21():
-    src = inspect.getsource(rmod)
-    assert "from app.chunkers" not in src
-    assert "from app import chunkers" not in src
-
-
-def test_module_does_not_import_app_parsers_batch21():
-    src = inspect.getsource(rmod)
-    assert "from app.parsers" not in src
-    assert "from app import parsers" not in src
-
-
 def test_module_constants_not_in_all_batch21():
     for k in ("_load_annotation", "_process_one"):
         assert k not in rmod.__all__
@@ -755,14 +743,6 @@ def test_module_no_main_block_batch21():
     src = inspect.getsource(rmod)
     assert 'if __name__ ==' not in src
     assert "__main__" not in src
-
-
-def test_module_load_annotation_is_private_batch21():
-    assert _load_annotation.__name__.startswith("_")
-
-
-def test_module_process_one_is_private_batch21():
-    assert _process_one.__name__.startswith("_")
 
 
 def test_module_run_evaluation_is_public_batch21():
@@ -787,15 +767,6 @@ def test_e2e_load_annotation_dict_round_trip_batch21(tmp_path):
     assert out["figure_captions"][0]["image_id"] == "img1"
 
 
-def test_e2e_run_evaluation_creates_valid_json_batch21(tmp_path):
-    m = _make_manifest(docs=[])
-    out = tmp_path / "out.json"
-    run_evaluation(m, out)
-    parsed = json.loads(out.read_text(encoding="utf-8"))
-    assert isinstance(parsed, dict)
-    assert "per_doc" in parsed
-
-
 def test_e2e_run_evaluation_returns_same_as_file_batch21(tmp_path):
     m = _make_manifest(docs=[])
     out = tmp_path / "out.json"
@@ -809,18 +780,6 @@ def test_e2e_run_evaluation_no_docs_summary_struct_batch21(tmp_path):
     report = run_evaluation(m, tmp_path / "out.json")
     s = report["summary"]
     assert set(s.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
-
-
-def test_e2e_run_evaluation_per_doc_count_matches_docs_batch21(tmp_path):
-    docs = [_make_doc(f"d{i}") for i in range(3)]
-    with patch("evaluation.runner.process_single", return_value=(None, [])):
-        with patch("evaluation.runner.image_output_dir_for", return_value=tmp_path):
-            with patch("evaluation.runner.compute_automatic_metrics", return_value={}):
-                with patch("evaluation.runner.figure_caption_prf", return_value={}):
-                    with patch("evaluation.runner.chunk_boundary_prf", return_value={}):
-                        m = _make_manifest(docs=docs)
-                        report = run_evaluation(m, tmp_path / "out.json")
-    assert len(report["per_doc"]) == 3
 
 
 def test_e2e_run_evaluation_with_expected_failure_match_batch21(tmp_path):

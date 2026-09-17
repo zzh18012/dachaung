@@ -370,11 +370,6 @@ def test_build_devset_section_status_field():
     assert build_devset_section(m)["status"] == "complete"
 
 
-def test_build_devset_section_file_count_field():
-    m = _FakeManifest(file_count=42)
-    assert build_devset_section(m)["file_count"] == 42
-
-
 def test_build_devset_section_content_group_count_field():
     m = _FakeManifest(content_group_count=7)
     assert build_devset_section(m)["content_group_count"] == 7
@@ -855,12 +850,6 @@ def test_module_uses_future_annotations():
 # =========================================================================
 
 
-def test_get_git_provenance_signature_one_param_project_root():
-    sig = inspect.signature(get_git_provenance)
-    assert len(sig.parameters) == 1
-    assert "project_root" in sig.parameters
-
-
 def test_get_dependency_versions_signature_no_params():
     sig = inspect.signature(get_dependency_versions)
     assert len(sig.parameters) == 0
@@ -881,23 +870,6 @@ def test_build_provenance_no_defaults():
     sig = inspect.signature(build_provenance)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_build_devset_section_signature_one_param_manifest():
-    sig = inspect.signature(build_devset_section)
-    assert len(sig.parameters) == 1
-    assert "manifest" in sig.parameters
-
-
-def test_aggregate_summary_signature_one_param_per_doc_results():
-    sig = inspect.signature(aggregate_summary)
-    assert len(sig.parameters) == 1
-    assert "per_doc_results" in sig.parameters
-
-
-def test_get_git_provenance_return_annotation_is_dict():
-    sig = inspect.signature(get_git_provenance)
-    assert sig.return_annotation is not inspect.Signature.empty
 
 
 def test_build_provenance_return_annotation_is_dict():

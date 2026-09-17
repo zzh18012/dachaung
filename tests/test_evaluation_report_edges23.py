@@ -208,11 +208,6 @@ def test_get_dependency_versions_source_generic_except():
     assert "except Exception:" in src
 
 
-def test_get_dependency_versions_source_returns_versions():
-    src = inspect.getsource(get_dependency_versions)
-    assert "return versions" in src
-
-
 def test_get_dependency_versions_source_no_eval():
     src = inspect.getsource(get_dependency_versions)
     assert "eval(" not in src
@@ -351,19 +346,9 @@ def test_aggregate_summary_source_docstring_mentions_聚合():
     assert "聚合" in src
 
 
-def test_aggregate_summary_source_uses_summary_dict_init():
-    src = inspect.getsource(aggregate_summary)
-    assert "summary: dict[str, Any] = {}" in src
-
-
 def test_aggregate_summary_source_uses_counts_dict_init():
     src = inspect.getsource(aggregate_summary)
     assert "counts: dict[str, Any] = {}" in src
-
-
-def test_aggregate_summary_source_for_name_in_count_metrics():
-    src = inspect.getsource(aggregate_summary)
-    assert "for name in _COUNT_METRICS:" in src
 
 
 def test_aggregate_summary_source_uses_values_list_comprehension_counts():
@@ -393,11 +378,6 @@ def test_aggregate_summary_source_summary_counts_assignment():
 def test_aggregate_summary_source_success_rates_dict_init():
     src = inspect.getsource(aggregate_summary)
     assert "success_rates: dict[str, Any] = {}" in src
-
-
-def test_aggregate_summary_source_for_name_in_success_metrics():
-    src = inspect.getsource(aggregate_summary)
-    assert "for name in _SUCCESS_BOOL_METRICS:" in src
 
 
 def test_aggregate_summary_source_success_count_sum():
@@ -432,11 +412,6 @@ def test_aggregate_summary_source_summary_success_rates():
 def test_aggregate_summary_source_ratio_avgs_init():
     src = inspect.getsource(aggregate_summary)
     assert "ratio_avgs: dict[str, Any] = {}" in src
-
-
-def test_aggregate_summary_source_for_name_in_ratio_metrics():
-    src = inspect.getsource(aggregate_summary)
-    assert "for name in _RATIO_METRICS:" in src
 
 
 def test_aggregate_summary_source_not_eval_calc():
@@ -476,11 +451,6 @@ def test_aggregate_summary_source_silent_vals_list():
 def test_aggregate_summary_source_silent_drop_total():
     src = inspect.getsource(aggregate_summary)
     assert 'summary["silent_drop_total"] = sum(silent_vals) if silent_vals else None' in src
-
-
-def test_aggregate_summary_source_return_summary():
-    src = inspect.getsource(aggregate_summary)
-    assert "return summary" in src
 
 
 def test_aggregate_summary_source_no_eval():
@@ -1158,11 +1128,6 @@ def test_module_source_subprocess_allowed():
     assert "subprocess" in src
 
 
-def test_module_source_datetime_allowed():
-    src = inspect.getsource(rmod)
-    assert "datetime" in src
-
-
 # ---------- signatures 精确补强第三批 ----------
 
 
@@ -1322,10 +1287,6 @@ def test_module_no_user_classes():
 
 def test_module_name_is_evaluation_report():
     assert rmod.__name__ == "evaluation.report"
-
-
-def test_module_file_ends_with_report_py():
-    assert rmod.__file__.endswith("report.py")
 
 
 def test_module_function_module_eq_rmod():

@@ -138,24 +138,9 @@ def test_success_bool_metrics_single_entry():
 # =========================================================================
 
 
-def test_get_git_provenance_returns_dict_type(tmp_path: Path):
-    result = get_git_provenance(tmp_path)
-    assert isinstance(result, dict)
-
-
 def test_get_git_provenance_exact_two_keys(tmp_path: Path):
     result = get_git_provenance(tmp_path)
     assert set(result.keys()) == {"git_commit", "git_dirty"}
-
-
-def test_get_git_provenance_git_commit_is_str_or_none(tmp_path: Path):
-    result = get_git_provenance(tmp_path)
-    assert result["git_commit"] is None or isinstance(result["git_commit"], str)
-
-
-def test_get_git_provenance_git_dirty_is_bool(tmp_path: Path):
-    result = get_git_provenance(tmp_path)
-    assert isinstance(result["git_dirty"], bool)
 
 
 def test_get_git_provenance_default_dirty_when_no_git(tmp_path: Path):
@@ -408,11 +393,6 @@ def test_build_provenance_max_chars_negative_value(tmp_path: Path):
     """负数 max_chars 也能转换（不强制 ≥0）。"""
     result = build_provenance(tmp_path, "fallback", -100, None)
     assert result["max_chars"] == -100
-
-
-def test_build_provenance_max_chars_zero(tmp_path: Path):
-    result = build_provenance(tmp_path, "fallback", 0, None)
-    assert result["max_chars"] == 0
 
 
 def test_build_provenance_max_chars_large_value(tmp_path: Path):

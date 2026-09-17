@@ -264,11 +264,6 @@ def test_run_evaluation_no_var_kwargs():
         assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
-def test_run_evaluation_return_annotation_is_str():
-    sig = inspect.signature(run_evaluation)
-    assert isinstance(sig.return_annotation, str)
-
-
 # =========================================================================
 # helper metadata
 # =========================================================================
@@ -278,24 +273,12 @@ def test_load_annotation_module_identity():
     assert _load_annotation.__module__ == "evaluation.runner"
 
 
-def test_load_annotation_qualname():
-    assert _load_annotation.__qualname__ == "_load_annotation"
-
-
 def test_process_one_module_identity():
     assert _process_one.__module__ == "evaluation.runner"
 
 
-def test_process_one_qualname():
-    assert _process_one.__qualname__ == "_process_one"
-
-
 def test_run_evaluation_module_identity():
     assert run_evaluation.__module__ == "evaluation.runner"
-
-
-def test_run_evaluation_qualname():
-    assert run_evaluation.__qualname__ == "run_evaluation"
 
 
 def test_all_helpers_are_function_type():
@@ -332,25 +315,6 @@ def test_module_namespace_has_any():
     import evaluation.runner as m
 
     assert hasattr(m, "Any")
-
-
-def test_module_namespace_has_report_version():
-    import evaluation.runner as m
-
-    assert hasattr(m, "REPORT_VERSION")
-    assert m.REPORT_VERSION == REPORT_VERSION
-
-
-def test_module_namespace_has_process_single():
-    import evaluation.runner as m
-
-    assert hasattr(m, "process_single")
-
-
-def test_module_namespace_has_image_output_dir_for():
-    import evaluation.runner as m
-
-    assert hasattr(m, "image_output_dir_for")
 
 
 def test_module_namespace_has_compute_automatic_metrics():

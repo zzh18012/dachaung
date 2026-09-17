@@ -652,12 +652,6 @@ def test_module_source_no_main_block_batch19():
     assert "__main__" not in src
 
 
-def test_module_source_subprocess_allowed_in_report_batch19():
-    """report.py 允许 subprocess（git provenance）。"""
-    src = inspect.getsource(rmod)
-    assert "import subprocess" in src
-
-
 # ---------- module source 字符串精确补强第二十九批 ----------
 
 
@@ -731,15 +725,6 @@ def test_module_source_has_docstring_about_aggregation_batch19():
     assert "评测报告装配" in src
 
 
-def test_module_source_has_all_list_with_5_entries_batch19():
-    src = inspect.getsource(rmod)
-    assert '"build_provenance"' in src
-    assert '"build_devset_section"' in src
-    assert '"aggregate_summary"' in src
-    assert '"get_git_provenance"' in src
-    assert '"get_dependency_versions"' in src
-
-
 def test_module_source_has_subprocess_timeout_10_batch19():
     src = inspect.getsource(rmod)
     assert "timeout=10" in src
@@ -771,12 +756,6 @@ def test_signature_build_provenance_batch19():
     params = list(sig.parameters.values())
     names = [p.name for p in params]
     assert names == ["project_root", "parser_name", "max_chars", "parser_version"]
-
-
-def test_signature_build_devset_section_batch19():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
 
 
 def test_signature_aggregate_summary_batch19():

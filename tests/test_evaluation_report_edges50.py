@@ -68,20 +68,12 @@ def test_count_metrics_one_entry_batch31():
     assert _COUNT_METRICS == ("element_count_total",)
 
 
-def test_count_metrics_contains_element_count_batch31():
-    assert "element_count_total" in _COUNT_METRICS
-
-
 def test_success_bool_metrics_is_tuple_batch31():
     assert isinstance(_SUCCESS_BOOL_METRICS, tuple)
 
 
 def test_success_bool_metrics_one_entry_batch31():
     assert _SUCCESS_BOOL_METRICS == ("pipeline_success",)
-
-
-def test_success_bool_metrics_contains_pipeline_success_batch31():
-    assert "pipeline_success" in _SUCCESS_BOOL_METRICS
 
 
 def test_no_overlap_between_count_and_ratio_batch31():
@@ -449,12 +441,6 @@ def test_aggregate_summary_counts_none_skipped_batch31():
     assert out["counts"]["element_count_total"]["participating_docs"] == 1
 
 
-def test_aggregate_summary_counts_no_data_batch31():
-    out = aggregate_summary([])
-    assert out["counts"]["element_count_total"]["sum"] is None
-    assert out["counts"]["element_count_total"]["participating_docs"] == 0
-
-
 def test_aggregate_summary_ratio_macro_batch31():
     results = [
         {"metrics": {"schema_valid": {"value": 1.0, "reason": None}}},
@@ -610,16 +596,6 @@ def test_module_source_contains_aggregate_summary_func_batch31():
 def test_module_source_contains_subprocess_run_call_batch31():
     src = inspect.getsource(rmod)
     assert "subprocess.run(" in src
-
-
-def test_module_source_contains_rev_parse_batch31():
-    src = inspect.getsource(rmod)
-    assert '"git", "rev-parse", "HEAD"' in src
-
-
-def test_module_source_contains_status_porcelain_batch31():
-    src = inspect.getsource(rmod)
-    assert '"git", "status", "--porcelain"' in src
 
 
 def test_module_source_contains_all_batch31():

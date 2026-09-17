@@ -163,11 +163,6 @@ def test_get_git_provenance_r_returncode_nonzero_batch13():
     assert out["git_commit"] is None
 
 
-def test_get_git_provenance_returns_dict_with_two_keys_batch13():
-    out = get_git_provenance(Path("."))
-    assert set(out.keys()) == {"git_commit", "git_dirty"}
-
-
 def test_get_git_provenance_first_call_rev_parse_batch13():
     seen: list = []
     def _fake(*args, **kwargs):
@@ -231,11 +226,6 @@ def test_get_dependency_versions_no_kwargs_batch13():
 # ---------- build_provenance 字段深度第十三批 ----------
 
 
-def test_build_provenance_field_count_batch13():
-    out = build_provenance(Path("."), parser_name="x", max_chars=100, parser_version=None)
-    assert len(out) == 9
-
-
 def test_build_provenance_field_order_batch13():
     out = build_provenance(Path("."), parser_name="x", max_chars=100, parser_version=None)
     keys = list(out.keys())
@@ -279,11 +269,6 @@ def test_build_provenance_parser_version_string_passthrough_batch13():
 def test_build_provenance_evaluator_version_from_eval_batch13():
     out = build_provenance(Path("."), parser_name="x", max_chars=100, parser_version=None)
     assert out["evaluator_version"] == EVALUATOR_VERSION
-
-
-def test_build_provenance_report_version_from_eval_batch13():
-    out = build_provenance(Path("."), parser_name="x", max_chars=100, parser_version=None)
-    assert out["report_version"] == REPORT_VERSION
 
 
 def test_build_provenance_dependencies_is_dict_batch13():
@@ -541,18 +526,6 @@ def test_module_source_contains_from_future_annotations_batch13():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_subprocess_top_level_batch13():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import subprocess" in head
-
-
-def test_module_source_imports_datetime_top_level_batch13():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from datetime import datetime" in head
-
-
 def test_module_source_imports_pathlib_top_level_batch13():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
@@ -579,11 +552,6 @@ def test_module_source_defines_get_git_provenance_batch13():
 def test_module_source_defines_get_dependency_versions_batch13():
     source = inspect.getsource(rmod)
     assert "def get_dependency_versions()" in source
-
-
-def test_module_source_defines_build_provenance_batch13():
-    source = inspect.getsource(rmod)
-    assert "def build_provenance(" in source
 
 
 def test_module_source_defines_build_devset_section_batch13():
@@ -680,18 +648,6 @@ def test_build_provenance_takes_4_args_batch13():
         assert name in sig.parameters
 
 
-def test_build_devset_section_takes_1_arg_batch13():
-    sig = inspect.signature(build_devset_section)
-    assert len(sig.parameters) == 1
-    assert "manifest" in sig.parameters
-
-
-def test_aggregate_summary_takes_1_arg_batch13():
-    sig = inspect.signature(aggregate_summary)
-    assert len(sig.parameters) == 1
-    assert "per_doc_results" in sig.parameters
-
-
 def test_get_git_provenance_return_annotation_dict_batch13():
     sig = inspect.signature(get_git_provenance)
     assert "dict" in str(sig.return_annotation)
@@ -763,10 +719,6 @@ def test_module_name_evaluation_report_batch13():
 
 def test_module_dunder_all_5_items_batch13():
     assert len(rmod.__all__) == 5
-
-
-def test_module_dunder_all_items_unique_batch13():
-    assert len(set(rmod.__all__)) == len(rmod.__all__)
 
 
 def test_module_constants_count_3_batch13():

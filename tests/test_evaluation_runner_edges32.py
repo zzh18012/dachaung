@@ -165,11 +165,6 @@ def test_load_annotation_does_not_write_file(tmp_path):
 # ---------- _process_one source level 第四批 ----------
 
 
-def test_process_one_source_starts_with_def():
-    src = inspect.getsource(_process_one)
-    assert src.lstrip().startswith("def _process_one(")
-
-
 def test_process_one_source_has_docstring():
     src = inspect.getsource(_process_one)
     # 函数体内含 docstring
@@ -200,11 +195,6 @@ def test_process_one_source_docstring_mentions_output_path():
 def test_process_one_source_calls_process_single():
     src = inspect.getsource(_process_one)
     assert "process_single(" in src
-
-
-def test_process_one_source_uses_perf_counter():
-    src = inspect.getsource(_process_one)
-    assert "time.perf_counter()" in src
 
 
 def test_process_one_source_creates_per_doc_subdir():
@@ -243,11 +233,6 @@ def test_process_one_source_calls_image_output_dir_for():
     assert "image_output_dir_for(" in src
 
 
-def test_process_one_source_handles_oserror_in_unlink():
-    src = inspect.getsource(_process_one)
-    assert "except OSError" in src
-
-
 def test_process_one_source_mkdir_parents():
     src = inspect.getsource(_process_one)
     assert "mkdir(parents=True" in src
@@ -265,11 +250,6 @@ def test_process_one_source_returns_image_dir_none_when_document_none():
 
 
 # ---------- run_evaluation source level 第四批 ----------
-
-
-def test_run_evaluation_source_starts_with_def():
-    src = inspect.getsource(run_evaluation)
-    assert src.lstrip().startswith("def run_evaluation(")
 
 
 def test_run_evaluation_source_docstring_present():
@@ -317,16 +297,6 @@ def test_run_evaluation_source_loops_expected_failures():
 def test_run_evaluation_source_calls_compute_automatic_metrics():
     src = inspect.getsource(run_evaluation)
     assert "compute_automatic_metrics(" in src
-
-
-def test_run_evaluation_source_passes_doc_source_type():
-    src = inspect.getsource(run_evaluation)
-    assert "source_type=doc.source_type" in src
-
-
-def test_run_evaluation_source_passes_doc_expectations():
-    src = inspect.getsource(run_evaluation)
-    assert "expectations=doc.expectations" in src
 
 
 def test_run_evaluation_source_loads_annotation():
@@ -415,24 +385,9 @@ def test_run_evaluation_source_appends_to_per_doc_results():
     assert "per_doc_results.append(" in src
 
 
-def test_run_evaluation_source_appends_to_expected_failure_results():
-    src = inspect.getsource(run_evaluation)
-    assert "expected_failure_results.append(" in src
-
-
 def test_run_evaluation_source_track_parser_version_first():
     src = inspect.getsource(run_evaluation)
     assert "if parser_version and not parser_version_for_prov:" in src
-
-
-def test_run_evaluation_source_uses_image_dir_is_dir():
-    src = inspect.getsource(run_evaluation)
-    assert "image_dir.is_dir()" in src
-
-
-def test_run_evaluation_source_uses_doc_id_in_per_doc():
-    src = inspect.getsource(run_evaluation)
-    assert '"doc_id": doc.doc_id' in src
 
 
 def test_run_evaluation_source_uses_total_seconds_in_wall_time():
@@ -561,20 +516,9 @@ def test_module_source_no_forbidden_token_round10(token):
 # ---------- module source 字符串精确补强 ----------
 
 
-def test_module_source_starts_with_docstring():
-    src = inspect.getsource(rmod)
-    assert src.lstrip().startswith(('"""', "'''"))
-
-
 def test_module_source_docstring_mentions_runner():
     src = inspect.getsource(rmod)
     assert "runner" in src.lower() or "评测" in src or "评估" in src
-
-
-def test_module_source_docstring_mentions_total_only():
-    src = inspect.getsource(rmod)
-    # 计时只记 total
-    assert "total" in src.lower()
 
 
 def test_module_source_docstring_mentions_not_instrumented():
@@ -643,16 +587,6 @@ def test_module_source_imports_report_funcs():
     assert "build_provenance" in src
 
 
-def test_module_source_no_relative_import():
-    src = inspect.getsource(rmod)
-    import_lines = [
-        line for line in src.splitlines()
-        if line.strip().startswith(("import ", "from "))
-    ]
-    for line in import_lines:
-        assert not line.strip().startswith("from .")
-
-
 def test_module_source_no_star_import():
     src = inspect.getsource(rmod)
     assert "import *" not in src
@@ -661,11 +595,6 @@ def test_module_source_no_star_import():
 def test_module_source_no_main_block():
     src = inspect.getsource(rmod)
     assert "__main__" not in src
-
-
-def test_module_source_no_yield():
-    src = inspect.getsource(rmod)
-    assert "yield " not in src
 
 
 def test_module_source_no_async():
@@ -718,15 +647,6 @@ def test_module_source_no_csv():
 def test_module_source_no_tomllib():
     src = inspect.getsource(rmod)
     assert "tomllib" not in src
-
-
-def test_module_source_function_count_3():
-    src = inspect.getsource(rmod)
-    func_count = sum(
-        1 for line in src.splitlines()
-        if line.startswith("def ")
-    )
-    assert func_count == 3
 
 
 def test_module_source_function_names():

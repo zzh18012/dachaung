@@ -113,12 +113,6 @@ def test_three_doc_sum6_batch449(tmp_path):
         "sum": 6, "participating_docs": 3}
 
 
-def test_three_doc_success_batch449(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["success_rates"]["pipeline_success"] == {
-        "success_count": 3, "total": 3, "rate": 1.0}
-
-
 def test_counts_keys_only_ect_batch449(tmp_path):
     r = _run(tmp_path)
     assert list(r["summary"]["counts"].keys()) == [

@@ -61,10 +61,6 @@ def test_count_metrics_is_tuple_type_batch33():
     assert isinstance(_COUNT_METRICS, tuple)
 
 
-def test_count_metrics_disjoint_from_success_bool_batch33():
-    assert not (set(_COUNT_METRICS) & set(_SUCCESS_BOOL_METRICS))
-
-
 # ---------- _SUCCESS_BOOL_METRICS 第三十三批 ----------
 
 
@@ -161,11 +157,6 @@ def test_build_provenance_parser_name_unicode_batch33(tmp_path):
     """parser_name 含 unicode 字符。"""
     out = build_provenance(tmp_path, "fallback-中文", 800, None)
     assert out["parser_name"] == "fallback-中文"
-
-
-def test_build_provenance_max_chars_negative_batch33(tmp_path):
-    out = build_provenance(tmp_path, "fallback", -1, None)
-    assert out["max_chars"] == -1
 
 
 def test_build_provenance_max_chars_zero_batch33(tmp_path):

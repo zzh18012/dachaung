@@ -106,10 +106,6 @@ def test_count_and_success_disjoint_batch24():
     assert set(_COUNT_METRICS).isdisjoint(_SUCCESS_BOOL_METRICS)
 
 
-def test_count_and_ratio_disjoint_batch24():
-    assert set(_COUNT_METRICS).isdisjoint(_RATIO_METRICS)
-
-
 def test_success_and_ratio_disjoint_batch24():
     assert set(_SUCCESS_BOOL_METRICS).isdisjoint(_RATIO_METRICS)
 
@@ -803,29 +799,14 @@ def test_module_does_not_import_evaluation_runner_batch24():
     assert "from evaluation import runner" not in src
 
 
-def test_module_does_not_import_evaluation_cli_batch24():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.cli" not in src
-
-
 def test_module_does_not_import_evaluation_manifest_batch24():
     src = inspect.getsource(rmod)
     assert "from evaluation.manifest" not in src
 
 
-def test_module_does_not_import_evaluation_metrics_batch24():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.metrics" not in src
-
-
 def test_module_does_not_import_evaluation_schema_batch24():
     src = inspect.getsource(rmod)
     assert "from evaluation.schema" not in src
-
-
-def test_module_does_not_import_evaluation_annotation_metrics_batch24():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.annotation_metrics" not in src
 
 
 def test_module_does_not_import_app_pipeline_batch24():

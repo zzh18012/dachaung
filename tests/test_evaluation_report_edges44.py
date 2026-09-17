@@ -93,10 +93,6 @@ def test_count_and_success_disjoint_batch28():
     assert set(_COUNT_METRICS).isdisjoint(_SUCCESS_BOOL_METRICS)
 
 
-def test_count_and_ratio_disjoint_batch28():
-    assert set(_COUNT_METRICS).isdisjoint(_RATIO_METRICS)
-
-
 def test_success_and_ratio_disjoint_batch28():
     """注意：pipeline_success 在 success_bool；schema_valid 在 ratio（也算 bool）。"""
     assert "pipeline_success" not in _RATIO_METRICS  # pipeline_success 在 success_bool
@@ -153,11 +149,6 @@ def test_get_git_provenance_oserror_falls_back_batch28(tmp_path):
         result = get_git_provenance(tmp_path)
     assert result["git_commit"] is None
     assert result["git_dirty"] is True
-
-
-def test_get_git_provenance_returns_dict_batch28(tmp_path):
-    result = get_git_provenance(tmp_path)
-    assert isinstance(result, dict)
 
 
 def test_get_git_provenance_two_keys_batch28(tmp_path):

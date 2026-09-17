@@ -465,13 +465,6 @@ def test_module_namespace_has_run_evaluation():
     assert hasattr(m, "run_evaluation")
 
 
-def test_module_namespace_has_report_version_attr():
-    import evaluation.runner as m
-
-    assert hasattr(m, "REPORT_VERSION")
-    assert m.REPORT_VERSION == REPORT_VERSION
-
-
 def test_module_namespace_has_time_attr():
     import evaluation.runner as m
 
@@ -547,10 +540,6 @@ def test_load_annotation_return_annotation_str():
     assert sig.return_annotation is not inspect.Signature.empty
 
 
-def test_load_annotation_qualname_starts_with_module():
-    assert _load_annotation.__qualname__ == "_load_annotation"
-
-
 # =========================================================================
 # _process_one 签名详细
 # =========================================================================
@@ -570,10 +559,6 @@ def test_process_one_signature_param_names_exact():
 def test_process_one_return_annotation_not_empty():
     sig = inspect.signature(_process_one)
     assert sig.return_annotation is not inspect.Signature.empty
-
-
-def test_process_one_qualname_exact():
-    assert _process_one.__qualname__ == "_process_one"
 
 
 # =========================================================================
@@ -607,10 +592,6 @@ def test_run_evaluation_positional_or_keyword_count_2():
     sig = inspect.signature(run_evaluation)
     pos = [p for p in sig.parameters.values() if p.kind == Parameter.POSITIONAL_OR_KEYWORD]
     assert len(pos) == 2
-
-
-def test_run_evaluation_qualname_exact():
-    assert run_evaluation.__qualname__ == "run_evaluation"
 
 
 def test_run_evaluation_module_name_is_evaluation_runner():

@@ -244,21 +244,6 @@ def test_get_dependency_versions_idempotent_batch32():
 # ---------- build_provenance 第三十二批 ----------
 
 
-def test_build_provenance_keys_set_batch32(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "1.0.0")
-    assert set(out.keys()) == {
-        "git_commit",
-        "git_dirty",
-        "evaluator_version",
-        "report_version",
-        "parser_name",
-        "parser_version",
-        "dependencies",
-        "max_chars",
-        "run_timestamp_iso",
-    }
-
-
 def test_build_provenance_max_chars_int_batch32(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["max_chars"] == 800
@@ -751,11 +736,6 @@ def test_signature_aggregate_summary_params_batch32():
     sig = inspect.signature(aggregate_summary)
     params = list(sig.parameters.keys())
     assert params == ["per_doc_results"]
-
-
-def test_signature_aggregate_summary_return_dict_batch32():
-    sig = inspect.signature(aggregate_summary)
-    assert "dict[str, Any]" in str(sig.return_annotation)
 
 
 # ---------- module 合理性第四十五批 ----------

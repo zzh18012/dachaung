@@ -39,17 +39,6 @@ from evaluation.report import (
 # =========================================================================
 
 
-def test_module_all_exact_set():
-    import evaluation.report as m
-    assert set(m.__all__) == {
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    }
-
-
 def test_module_all_is_list():
     import evaluation.report as m
     assert isinstance(m.__all__, list)
@@ -95,23 +84,11 @@ def test_module_imports_report_version():
     assert hasattr(m, "REPORT_VERSION")
 
 
-def test_module_docstring_present():
-    import evaluation.report as m
-    assert m.__doc__ is not None
-    assert len(m.__doc__) > 0
-
-
 def test_module_docstring_mentions_aggregation_rules():
     import evaluation.report as m
     doc = m.__doc__
     assert "counts" in doc or "求和" in doc
     assert "macro" in doc.lower() or "平均" in doc
-
-
-def test_module_uses_future_annotations():
-    import evaluation.report as m
-    sig = inspect.signature(m.aggregate_summary)
-    assert isinstance(sig.return_annotation, str)
 
 
 def test_module_no_silence_unused():
@@ -391,16 +368,6 @@ def test_build_provenance_nine_keys(tmp_path):
     assert len(result) == 9
 
 
-def test_build_provenance_evaluator_version_constant(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["evaluator_version"] == EVALUATOR_VERSION
-
-
-def test_build_provenance_report_version_constant(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["report_version"] == REPORT_VERSION
-
-
 def test_build_provenance_parser_name_propagated(tmp_path):
     result = build_provenance(tmp_path, "fallback", 800, None)
     assert result["parser_name"] == "fallback"
@@ -517,20 +484,6 @@ def test_build_devset_section_callable():
     assert callable(build_devset_section)
 
 
-def test_build_devset_section_returns_dict():
-    result = build_devset_section(_FakeManifest())
-    assert isinstance(result, dict)
-
-
-def test_build_devset_section_keys_exact():
-    result = build_devset_section(_FakeManifest())
-    expected = {
-        "status", "file_count", "content_group_count",
-        "pdf_count", "docx_count", "categories_covered",
-    }
-    assert set(result.keys()) == expected
-
-
 def test_build_devset_section_six_keys():
     result = build_devset_section(_FakeManifest())
     assert len(result) == 6
@@ -611,16 +564,6 @@ def test_aggregate_summary_has_four_top_keys():
 def test_aggregate_summary_counts_has_element_count_total_key():
     result = aggregate_summary([])
     assert "element_count_total" in result["counts"]
-
-
-def test_aggregate_summary_counts_sum_none_for_empty():
-    result = aggregate_summary([])
-    assert result["counts"]["element_count_total"]["sum"] is None
-
-
-def test_aggregate_summary_counts_participating_docs_zero_for_empty():
-    result = aggregate_summary([])
-    assert result["counts"]["element_count_total"]["participating_docs"] == 0
 
 
 def test_aggregate_summary_counts_sum_aggregates():
@@ -847,15 +790,6 @@ def test_aggregate_summary_silent_drop_all_zeros():
     ]
     result = aggregate_summary(per_doc)
     assert result["silent_drop_total"] == 0
-
-
-def test_aggregate_summary_silent_drop_all_none_returns_none():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": None}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    result = aggregate_summary(per_doc)
-    assert result["silent_drop_total"] is None
 
 
 # =========================================================================

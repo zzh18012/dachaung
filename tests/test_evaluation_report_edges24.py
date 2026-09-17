@@ -62,11 +62,6 @@ def test_get_git_provenance_in_real_repo_returns_commit():
         assert len(out["git_commit"]) == 40
 
 
-def test_get_git_provenance_in_real_repo_dirty_is_bool():
-    out = get_git_provenance(Path("."))
-    assert isinstance(out["git_dirty"], bool)
-
-
 def test_get_git_provenance_nonexistent_dir_returns_default():
     """不存在的目录 → commit=None, dirty=True。"""
     p = Path("C:/definitely_does_not_exist_xyz123")
@@ -477,24 +472,9 @@ def test_aggregate_summary_idempotent():
     assert out1 == out2
 
 
-def test_aggregate_summary_returns_4_top_keys():
-    out = aggregate_summary([])
-    assert len(out) == 4
-
-
 def test_aggregate_summary_ratio_metrics_count_12():
     out = aggregate_summary([])
     assert len(out["ratio_macro_averages"]) == 12
-
-
-def test_aggregate_summary_count_metrics_count_1():
-    out = aggregate_summary([])
-    assert len(out["counts"]) == 1
-
-
-def test_aggregate_summary_success_metrics_count_1():
-    out = aggregate_summary([])
-    assert len(out["success_rates"]) == 1
 
 
 # ---------- _RATIO_METRICS / _COUNT_METRICS / _SUCCESS_BOOL_METRICS 常量精确补强 ----------
@@ -687,10 +667,6 @@ def test_module_docstring_mentions_summary():
 
 def test_module_docstring_mentions_macro_average():
     assert "macro" in rmod.__doc__ or "平均" in rmod.__doc__
-
-
-def test_module_file_ends_with_report_py():
-    assert rmod.__file__.endswith("report.py")
 
 
 def test_module_name_is_evaluation_report():
@@ -903,11 +879,6 @@ def test_module_source_subprocess_allowed():
     """report 允许 subprocess（get_git_provenance 需要）。"""
     src = inspect.getsource(rmod)
     assert "subprocess" in src
-
-
-def test_module_source_datetime_allowed():
-    src = inspect.getsource(rmod)
-    assert "datetime" in src
 
 
 # ---------- 端到端集成第七批 ----------

@@ -40,13 +40,6 @@ def test_load_annotation_directory_returns_none_batch37(tmp_path):
     assert _load_annotation(d) is None
 
 
-def test_load_annotation_valid_dict_batch37(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text('{"k": "v"}', encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == {"k": "v"}
-
-
 def test_load_annotation_invalid_json_returns_none_batch37(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text("{not valid json", encoding="utf-8")

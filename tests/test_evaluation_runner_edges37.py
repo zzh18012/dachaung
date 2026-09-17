@@ -79,12 +79,6 @@ class _StubError:
 # ---------- _load_annotation 行为深度第十批 ----------
 
 
-def test_load_annotation_whitespace_only_returns_none(tmp_path):
-    p = tmp_path / "ws.json"
-    p.write_text("   \n\t  ", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_json_with_tabs(tmp_path):
     p = tmp_path / "tabs.json"
     p.write_text('{"a":\t1}', encoding="utf-8")
@@ -1147,16 +1141,6 @@ def test_signature_run_evaluation_keyword_only_annotations_batch10():
 def test_signature_run_evaluation_return_annotation_str_batch10():
     sig = inspect.signature(run_evaluation)
     assert sig.return_annotation == "dict[str, Any]"
-
-
-def test_signature_3_funcs_are_function_type_batch10():
-    for func in (_load_annotation, _process_one, run_evaluation):
-        assert inspect.isfunction(func)
-
-
-def test_signature_3_funcs_module_eq_batch10():
-    for func in (_load_annotation, _process_one, run_evaluation):
-        assert func.__module__ == "evaluation.runner"
 
 
 def test_signature_run_evaluation_no_var_positional_batch10():

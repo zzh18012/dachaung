@@ -152,11 +152,6 @@ def test_process_one_source_uses_parent_mkdir():
     assert "out_stub.parent.mkdir(parents=True, exist_ok=True)" in src
 
 
-def test_process_one_source_uses_perf_counter_for_t0():
-    src = inspect.getsource(_process_one)
-    assert "t0 = time.perf_counter()" in src
-
-
 def test_process_one_source_calls_process_single_with_kwargs():
     src = inspect.getsource(_process_one)
     assert "process_single(" in src
@@ -164,11 +159,6 @@ def test_process_one_source_calls_process_single_with_kwargs():
     assert "parser_name=parser_name" in src
     assert "max_chars=max_chars" in src
     assert "write_json=False" in src
-
-
-def test_process_one_source_uses_elapsed_with_perf_counter_diff():
-    src = inspect.getsource(_process_one)
-    assert "elapsed = time.perf_counter() - t0" in src
 
 
 def test_process_one_source_uses_image_output_dir_for():
@@ -295,11 +285,6 @@ def test_run_evaluation_source_calls_load_annotation():
     assert "_load_annotation(doc.annotation_resolved)" in src
 
 
-def test_run_evaluation_source_calls_figure_caption_prf():
-    src = inspect.getsource(run_evaluation)
-    assert "fig_caps = figure_caption_prf(document, annotation)" in src
-
-
 def test_run_evaluation_source_calls_chunk_boundary_prf_with_tolerance():
     src = inspect.getsource(run_evaluation)
     assert "chunk_b = chunk_boundary_prf(" in src
@@ -384,11 +369,6 @@ def test_run_evaluation_source_expected_failure_calls_process_single():
 def test_run_evaluation_source_expected_failure_appends_results():
     src = inspect.getsource(run_evaluation)
     assert "expected_failure_results.append(" in src
-
-
-def test_run_evaluation_source_expected_failure_dict_has_matches():
-    src = inspect.getsource(run_evaluation)
-    assert '"matches": actual_code == ef.expected_error_code' in src
 
 
 def test_run_evaluation_source_calls_build_provenance():

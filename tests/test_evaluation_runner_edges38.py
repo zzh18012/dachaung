@@ -1033,16 +1033,6 @@ def test_signature_run_evaluation_default_tolerance_chars_batch11():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_signature_funcs_function_type_batch11():
-    for func in (_load_annotation, _process_one, run_evaluation):
-        assert inspect.isfunction(func)
-
-
-def test_signature_funcs_module_eq_batch11():
-    for func in (_load_annotation, _process_one, run_evaluation):
-        assert func.__module__ == "evaluation.runner"
-
-
 # ---------- module 合理性第十一批 ----------
 
 

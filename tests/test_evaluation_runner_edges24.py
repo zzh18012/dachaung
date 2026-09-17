@@ -237,11 +237,6 @@ def test_process_one_source_has_process_single_call():
     assert "write_json=False" in src
 
 
-def test_process_one_source_has_image_output_dir_for_call():
-    src = inspect.getsource(_process_one)
-    assert "image_output_dir_for" in src
-
-
 def test_process_one_source_has_unlink_oserror_catch():
     src = inspect.getsource(_process_one)
     assert "out_stub.is_file()" in src
@@ -370,12 +365,6 @@ def test_run_evaluation_source_has_expected_failure_4_keys():
 def test_run_evaluation_source_has_annotation_present():
     src = inspect.getsource(run_evaluation)
     assert '"_annotation_present": annotation is not None' in src
-
-
-def test_run_evaluation_source_has_tolerance_chars_pop():
-    src = inspect.getsource(run_evaluation)
-    assert "tolerance_record = chunk_b.pop(\"_tolerance_chars\", None)" in src
-    assert 'missing_markers_record = chunk_b.pop("_missing_markers", None)' in src
 
 
 def test_run_evaluation_source_has_tolerance_value_extraction():

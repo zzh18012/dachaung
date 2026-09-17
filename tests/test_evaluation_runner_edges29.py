@@ -162,13 +162,6 @@ def test_process_one_source_has_unlink_in_try_except_oserror():
     assert "out_stub.unlink()" in src
 
 
-def test_process_one_source_has_5_tuple_normal_return():
-    src = inspect.getsource(_process_one)
-    # normal return: document.to_dict(), None, elapsed, document.parser_version, image_dir
-    assert "document.to_dict()" in src
-    assert "document.parser_version" in src
-
-
 def test_process_one_source_has_unknown_code_for_none_document():
     src = inspect.getsource(_process_one)
     assert '"unknown"' in src
@@ -233,11 +226,6 @@ def test_run_evaluation_source_has_load_annotation_call():
 def test_run_evaluation_source_has_figure_caption_prf_call():
     src = inspect.getsource(run_evaluation)
     assert "figure_caption_prf(document, annotation)" in src
-
-
-def test_run_evaluation_source_has_chunk_boundary_prf_call():
-    src = inspect.getsource(run_evaluation)
-    assert "chunk_boundary_prf(" in src
 
 
 def test_run_evaluation_source_has_metrics_update_twice():
@@ -425,11 +413,6 @@ def test_module_source_no_lambda():
     assert "lambda " not in src
 
 
-def test_module_source_no_main_block():
-    src = inspect.getsource(runner)
-    assert 'if __name__' not in src
-
-
 def test_module_source_no_decorators():
     src = inspect.getsource(runner)
     for line in src.splitlines():
@@ -446,12 +429,6 @@ def test_load_annotation_signature_return_dict_or_none():
     ret = sig.return_annotation
     assert "dict" in ret
     assert "None" in ret
-
-
-def test_load_annotation_param_kind():
-    sig = inspect.signature(_load_annotation)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_load_annotation_param_count():
@@ -500,12 +477,6 @@ def test_run_evaluation_defaults_values():
     assert sig.parameters["parser_name"].default == "fallback"
     assert sig.parameters["max_chars"].default == 800
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_run_evaluation_no_default_for_manifest_output_path():
-    sig = inspect.signature(run_evaluation)
-    assert sig.parameters["manifest"].default is inspect.Parameter.empty
-    assert sig.parameters["output_path"].default is inspect.Parameter.empty
 
 
 def test_no_varargs_varkw_in_functions():
@@ -582,11 +553,6 @@ def test_module_no_class_definition():
         and getattr(v, "__module__", "") == runner.__name__
     ]
     assert classes == []
-
-
-def test_module_no_main_block():
-    src = inspect.getsource(runner)
-    assert 'if __name__' not in src
 
 
 # ---------- 端到端集成补强 ----------

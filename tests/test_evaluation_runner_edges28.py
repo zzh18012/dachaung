@@ -165,11 +165,6 @@ def test_process_one_defaults_for_parser_name_max_chars():
 # ---------- _process_one source level 字符串精确补强 ----------
 
 
-def test_process_one_source_mentions_image_output_dir_for():
-    src = inspect.getsource(_process_one)
-    assert "image_output_dir_for" in src
-
-
 def test_process_one_source_mentions_perf_counter():
     src = inspect.getsource(_process_one)
     assert "perf_counter" in src
@@ -178,11 +173,6 @@ def test_process_one_source_mentions_perf_counter():
 def test_process_one_source_mentions_process_single():
     src = inspect.getsource(_process_one)
     assert "process_single" in src
-
-
-def test_process_one_source_mentions_write_json_false():
-    src = inspect.getsource(_process_one)
-    assert "write_json=False" in src
 
 
 def test_process_one_source_mentions_out_stub():

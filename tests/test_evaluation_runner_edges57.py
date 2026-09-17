@@ -505,11 +505,6 @@ def test_module_source_contains_report_imports_batch29():
     assert "from evaluation.report import" in src
 
 
-def test_module_source_contains_metrics_imports_batch29():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.metrics import" in src
-
-
 def test_module_source_contains_annotation_metrics_imports_batch29():
     src = inspect.getsource(rmod)
     assert "from evaluation.annotation_metrics import" in src
@@ -539,22 +534,11 @@ def test_signature_process_one_return_tuple_batch29():
     assert "tuple" in str(sig.return_annotation)
 
 
-def test_signature_run_evaluation_keyword_only_batch29():
-    sig = inspect.signature(run_evaluation)
-    assert sig.parameters["parser_name"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
 def test_signature_run_evaluation_defaults_batch29():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["parser_name"].default == "fallback"
     assert sig.parameters["max_chars"].default == 800
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_signature_run_evaluation_manifest_no_default_batch29():
-    sig = inspect.signature(run_evaluation)
-    assert sig.parameters["manifest"].default is inspect.Parameter.empty
-    assert sig.parameters["output_path"].default is inspect.Parameter.empty
 
 
 # ---------- module 合理性第四十三批 ----------

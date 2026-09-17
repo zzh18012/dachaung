@@ -206,11 +206,6 @@ def test_process_one_source_uses_doc_dot_doc_id():
     assert "doc.doc_id" in src
 
 
-def test_process_one_source_uses_doc_dot_resolved_path():
-    src = inspect.getsource(_process_one)
-    assert "doc.resolved_path" in src
-
-
 def test_process_one_source_initializes_image_dir_to_none():
     src = inspect.getsource(_process_one)
     assert "image_dir: Path | None = None" in src
@@ -240,12 +235,6 @@ def test_process_one_source_branch_2_returns_unknown_error():
     assert '"message": "process_single returned None without errors"' in src
 
 
-def test_process_one_source_branch_3_returns_normal_tuple():
-    src = inspect.getsource(_process_one)
-    assert "document.to_dict()" in src
-    assert "document.parser_version" in src
-
-
 def test_process_one_source_no_yield_keyword():
     src = inspect.getsource(_process_one)
     assert "yield" not in src
@@ -254,16 +243,6 @@ def test_process_one_source_no_yield_keyword():
 def test_process_one_source_no_async_def():
     src = inspect.getsource(_process_one)
     assert "async def" not in src
-
-
-def test_process_one_source_no_class_keyword():
-    src = inspect.getsource(_process_one)
-    assert "class " not in src
-
-
-def test_process_one_source_no_global_keyword():
-    src = inspect.getsource(_process_one)
-    assert "global " not in src
 
 
 def test_process_one_source_no_nonlocal_keyword():
@@ -337,11 +316,6 @@ def test_run_evaluation_source_passes_doc_expectations_to_metrics():
     assert "expectations=doc.expectations" in src
 
 
-def test_run_evaluation_source_passes_tolerance_chars_to_chunk_boundary():
-    src = inspect.getsource(run_evaluation)
-    assert "tolerance_chars=tolerance_chars" in src
-
-
 def test_run_evaluation_source_assigns_fig_caps_variable():
     src = inspect.getsource(run_evaluation)
     assert "fig_caps = " in src
@@ -403,11 +377,6 @@ def test_run_evaluation_source_assigns_out_p():
     assert "out_p = Path(output_path)" in src
 
 
-def test_run_evaluation_source_uses_out_p_parent_mkdir():
-    src = inspect.getsource(run_evaluation)
-    assert "out_p.parent.mkdir(parents=True, exist_ok=True)" in src
-
-
 def test_run_evaluation_source_returns_report():
     src = inspect.getsource(run_evaluation)
     assert "return report" in src
@@ -443,16 +412,6 @@ def test_run_evaluation_source_no_yield():
 def test_run_evaluation_source_no_async_def():
     src = inspect.getsource(run_evaluation)
     assert "async def" not in src
-
-
-def test_run_evaluation_source_no_class():
-    src = inspect.getsource(run_evaluation)
-    assert "class " not in src
-
-
-def test_run_evaluation_source_no_global():
-    src = inspect.getsource(run_evaluation)
-    assert "global " not in src
 
 
 def test_run_evaluation_source_no_lambda():
@@ -531,19 +490,9 @@ def test_module_source_forbidden_tokens_ninth_batch(token):
 # ---------- module source 字符串精确补强（第三批） ----------
 
 
-def test_module_source_starts_with_docstring():
-    src = inspect.getsource(rmod)
-    assert src.lstrip().startswith(('"""', "'''"))
-
-
 def test_module_source_docstring_mentions_runner():
     src = inspect.getsource(rmod)
     assert "runner" in src.lower() or "评测" in src
-
-
-def test_module_source_docstring_mentions_total_only():
-    src = inspect.getsource(rmod)
-    assert "total" in src.lower()
 
 
 def test_module_source_docstring_mentions_not_instrumented():
@@ -570,16 +519,6 @@ def test_module_source_import_block_count_10():
         and not l.startswith(" ")
     ]
     assert len(import_lines) == 10
-
-
-def test_module_source_no_relative_import():
-    src = inspect.getsource(rmod)
-    import_lines = [
-        line for line in src.splitlines()
-        if line.strip().startswith(("import ", "from "))
-    ]
-    for line in import_lines:
-        assert not line.strip().startswith("from .")
 
 
 def test_module_source_no_star_import():
@@ -630,11 +569,6 @@ def test_module_source_no_decorators():
             pytest.fail(f"unexpected decorator at line {i}: {line}")
 
 
-def test_module_source_no_lambda():
-    src = inspect.getsource(rmod)
-    assert "lambda " not in src
-
-
 def test_module_source_no_eval_exec():
     src = inspect.getsource(rmod)
     assert "eval(" not in src
@@ -663,12 +597,6 @@ def test_module_source_no_sys_import():
     assert "from sys " not in src
 
 
-def test_module_source_has_3_module_level_functions():
-    src = inspect.getsource(rmod)
-    func_count = sum(1 for line in src.splitlines() if line.startswith("def "))
-    assert func_count == 3
-
-
 def test_module_source_function_names_exact():
     src = inspect.getsource(rmod)
     assert "def _load_annotation(" in src
@@ -684,11 +612,6 @@ def test_module_source_all_exact():
 def test_module_source_imports_future_annotations():
     src = inspect.getsource(rmod)
     assert "from __future__ import annotations" in src
-
-
-def test_module_source_uses_json_load_in_load_annotation():
-    src = inspect.getsource(_load_annotation)
-    assert "json.load(f)" in src
 
 
 def test_module_source_uses_perf_counter_in_process_one():

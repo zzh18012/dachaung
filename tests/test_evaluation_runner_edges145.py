@@ -113,11 +113,6 @@ def test_paired_mixed_summary_batch325(tmp_path):
 
 # ---------- 报告照过 Schema ----------
 
-def test_paired_mixed_schema_ok_batch325(tmp_path):
-    r = _run(tmp_path)
-    validate(r, "evaluation-report.schema.json")
-
-
 # ---------- 源码补强 ----------
 
 def _src():

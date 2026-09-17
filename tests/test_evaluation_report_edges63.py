@@ -237,18 +237,6 @@ def test_build_devset_section_returns_6_keys_batch48():
     }
 
 
-def test_build_devset_section_status_passthrough_batch48():
-    m = MagicMock()
-    m.devset_status = "incomplete"
-    m.file_count = 0
-    m.content_group_count = 0
-    m.pdf_count = 0
-    m.docx_count = 0
-    m.categories_covered = []
-    out = build_devset_section(m)
-    assert out["status"] == "incomplete"
-
-
 def test_build_devset_section_counts_passthrough_batch48():
     m = MagicMock()
     m.devset_status = "complete"
@@ -418,10 +406,6 @@ def test_ratio_metrics_no_overlap_with_count_batch48():
 
 def test_ratio_metrics_no_overlap_with_success_batch48():
     assert not (set(_RATIO_METRICS) & set(_SUCCESS_BOOL_METRICS))
-
-
-def test_count_metrics_no_overlap_with_success_batch48():
-    assert not (set(_COUNT_METRICS) & set(_SUCCESS_BOOL_METRICS))
 
 
 def test_ratio_metrics_contains_chunk_boundary_batch48():

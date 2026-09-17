@@ -1006,11 +1006,6 @@ def test_module_source_no_global_keyword():
     assert "\nglobal " not in src
 
 
-def test_module_source_no_lambda():
-    src = inspect.getsource(rmod)
-    assert "lambda " not in src
-
-
 def test_module_source_no_try_in_load_annotation_body_except_in_helpers():
     """run_evaluation / _process_one 各自有 try-except（unlink 部分），
     但 _load_annotation 的 try-except 应只在 except OSError/JSONDecodeError 出现."""
@@ -1072,12 +1067,6 @@ def test_module_source_no_hardcoded_absolute_path():
 def test_module_source_no_sleep():
     src = inspect.getsource(rmod)
     assert "time.sleep" not in src
-
-
-def test_module_source_has_docstring():
-    src = inspect.getsource(rmod)
-    # 模块 docstring 应在文件开头
-    assert src.startswith('"""')
 
 
 def test_module_source_docstring_mentions_total():

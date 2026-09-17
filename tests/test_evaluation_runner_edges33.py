@@ -58,11 +58,6 @@ def test_load_annotation_source_uses_is_file_check():
     assert ".is_file()" in src
 
 
-def test_load_annotation_source_returns_none_for_none_path():
-    src = inspect.getsource(_load_annotation)
-    assert "return None" in src
-
-
 def test_load_annotation_source_uses_try_except():
     src = inspect.getsource(_load_annotation)
     assert "try:" in src
@@ -78,11 +73,6 @@ def test_load_annotation_source_uses_oserror_json_decode_error():
 def test_load_annotation_source_uses_open_utf8():
     src = inspect.getsource(_load_annotation)
     assert '.open("r", encoding="utf-8")' in src
-
-
-def test_load_annotation_source_uses_json_load():
-    src = inspect.getsource(_load_annotation)
-    assert "json.load(f)" in src
 
 
 def test_load_annotation_source_returns_json_load():
@@ -120,11 +110,6 @@ def test_load_annotation_source_no_global_keyword():
 # ---------- _process_one source level 字符串精确补强第五批 ----------
 
 
-def test_process_one_source_starts_with_def():
-    src = inspect.getsource(_process_one)
-    assert src.lstrip().startswith("def _process_one(")
-
-
 def test_process_one_source_returns_5_tuple():
     src = inspect.getsource(_process_one)
     assert "tuple[dict[str, Any] | None, dict[str, Any] | None, float, str | None, Path | None]" in src
@@ -146,19 +131,9 @@ def test_process_one_source_uses_mkdir_parents():
     assert ".mkdir(parents=True, exist_ok=True)" in src
 
 
-def test_process_one_source_uses_perf_counter():
-    src = inspect.getsource(_process_one)
-    assert "time.perf_counter()" in src
-
-
 def test_process_one_source_calls_process_single():
     src = inspect.getsource(_process_one)
     assert "process_single(" in src
-
-
-def test_process_one_source_passes_doc_resolved_path():
-    src = inspect.getsource(_process_one)
-    assert "doc.resolved_path" in src
 
 
 def test_process_one_source_passes_parser_name():
@@ -169,11 +144,6 @@ def test_process_one_source_passes_parser_name():
 def test_process_one_source_passes_max_chars():
     src = inspect.getsource(_process_one)
     assert "max_chars=max_chars" in src
-
-
-def test_process_one_source_passes_write_json_false():
-    src = inspect.getsource(_process_one)
-    assert "write_json=False" in src
 
 
 def test_process_one_source_uses_image_output_dir_for():
@@ -200,11 +170,6 @@ def test_process_one_source_uses_unlink_out_stub():
     src = inspect.getsource(_process_one)
     assert "out_stub.is_file()" in src
     assert "out_stub.unlink()" in src
-
-
-def test_process_one_source_uses_oserror_for_unlink():
-    src = inspect.getsource(_process_one)
-    assert "except OSError" in src
 
 
 def test_process_one_source_uses_errors_truthy_check():
@@ -243,22 +208,12 @@ def test_process_one_source_no_eval():
     assert "eval(" not in src
 
 
-def test_process_one_source_no_subprocess():
-    src = inspect.getsource(_process_one)
-    assert "subprocess" not in src
-
-
 def test_process_one_source_no_yield():
     src = inspect.getsource(_process_one)
     assert "yield" not in src
 
 
 # ---------- run_evaluation source level 字符串精确补强第五批 ----------
-
-
-def test_run_evaluation_source_starts_with_def():
-    src = inspect.getsource(run_evaluation)
-    assert src.lstrip().startswith("def run_evaluation(")
 
 
 def test_run_evaluation_source_5_params():
@@ -312,16 +267,6 @@ def test_run_evaluation_source_calls_compute_automatic_metrics():
     assert "compute_automatic_metrics(" in src
 
 
-def test_run_evaluation_source_passes_doc_source_type():
-    src = inspect.getsource(run_evaluation)
-    assert "source_type=doc.source_type" in src
-
-
-def test_run_evaluation_source_passes_doc_expectations():
-    src = inspect.getsource(run_evaluation)
-    assert "expectations=doc.expectations" in src
-
-
 def test_run_evaluation_source_calls_load_annotation():
     src = inspect.getsource(run_evaluation)
     assert "_load_annotation(doc.annotation_resolved)" in src
@@ -330,16 +275,6 @@ def test_run_evaluation_source_calls_load_annotation():
 def test_run_evaluation_source_calls_figure_caption_prf():
     src = inspect.getsource(run_evaluation)
     assert "figure_caption_prf(document, annotation)" in src
-
-
-def test_run_evaluation_source_calls_chunk_boundary_prf():
-    src = inspect.getsource(run_evaluation)
-    assert "chunk_boundary_prf(" in src
-
-
-def test_run_evaluation_source_passes_tolerance_chars_to_chunk_boundary():
-    src = inspect.getsource(run_evaluation)
-    assert "tolerance_chars=tolerance_chars" in src
 
 
 def test_run_evaluation_source_pops_tolerance_chars():
@@ -356,11 +291,6 @@ def test_run_evaluation_source_uses_metrics_update():
     src = inspect.getsource(run_evaluation)
     assert "metrics.update(fig_caps)" in src
     assert "metrics.update(chunk_b)" in src
-
-
-def test_run_evaluation_source_uses_image_dir_is_dir():
-    src = inspect.getsource(run_evaluation)
-    assert "image_dir.is_dir()" in src
 
 
 def test_run_evaluation_source_calls_build_provenance():
@@ -430,11 +360,6 @@ def test_run_evaluation_source_appends_to_per_doc_results():
     assert "per_doc_results.append(" in src
 
 
-def test_run_evaluation_source_appends_to_expected_failure_results():
-    src = inspect.getsource(run_evaluation)
-    assert "expected_failure_results.append(" in src
-
-
 def test_run_evaluation_source_handles_actual_code():
     src = inspect.getsource(run_evaluation)
     assert "actual_code = errors[0].code if errors else None" in src
@@ -459,11 +384,6 @@ def test_run_evaluation_source_uses_parse_chunk_null():
 def test_run_evaluation_source_uses_not_instrumented_reason():
     src = inspect.getsource(run_evaluation)
     assert '"not_instrumented"' in src
-
-
-def test_run_evaluation_source_uses_doc_id_in_per_doc():
-    src = inspect.getsource(run_evaluation)
-    assert '"doc_id": doc.doc_id' in src
 
 
 def test_run_evaluation_source_uses_doc_id_in_expected_failure():
@@ -535,11 +455,6 @@ def test_runner_source_no_forbidden_token(token):
 
 
 # ---------- module source 字符串精确补强 ----------
-
-
-def test_module_source_docstring_present():
-    src = inspect.getsource(rmod)
-    assert src.startswith('"""')
 
 
 def test_module_source_docstring_mentions_runner():
@@ -695,12 +610,6 @@ def test_signature_load_annotation_path_no_default():
     assert sig.parameters["path"].default is inspect.Parameter.empty
 
 
-def test_signature_load_annotation_no_varargs():
-    sig = inspect.signature(_load_annotation)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_signature_process_one_no_defaults():
     sig = inspect.signature(_process_one)
     for p in sig.parameters.values():
@@ -840,11 +749,6 @@ def test_module_imports_report_version():
 
 
 # ---------- 端到端集成补强 ----------
-
-
-def test_load_annotation_none_path_returns_none():
-    out = _load_annotation(None)
-    assert out is None
 
 
 def test_load_annotation_nonexistent_path_returns_none(tmp_path):

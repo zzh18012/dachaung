@@ -566,16 +566,6 @@ def test_module_source_contains_module_docstring_batch28():
     assert "评测 runner" in src
 
 
-def test_module_source_contains_load_annotation_func_batch28():
-    src = inspect.getsource(rmod)
-    assert "def _load_annotation" in src
-
-
-def test_module_source_contains_process_one_func_batch28():
-    src = inspect.getsource(rmod)
-    assert "def _process_one" in src
-
-
 def test_module_source_contains_run_evaluation_func_batch28():
     src = inspect.getsource(rmod)
     assert "def run_evaluation" in src

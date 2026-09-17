@@ -90,12 +90,6 @@ def test_ratio_metrics_all_strings_batch22():
         assert isinstance(m, str)
 
 
-def test_ratio_metrics_text_preservation_present_batch22():
-    assert "text_preservation_equal" in _RATIO_METRICS
-    assert "text_char_multiset_precision" in _RATIO_METRICS
-    assert "text_char_multiset_recall" in _RATIO_METRICS
-
-
 def test_ratio_metrics_heading_boundary_present_batch22():
     assert "heading_boundary_compliance" in _RATIO_METRICS
 

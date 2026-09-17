@@ -236,12 +236,6 @@ def _src():
     return inspect.getsource(runner_mod)
 
 
-def test_source_key_counts_batch483():
-    src = _src()
-    assert src.count("run_evaluation") == 2
-    assert src.count("per_doc") == 12
-
-
 # ---------- forbidden tokens 第七百四十四批 ----------
 
 def test_source_no_eval_batch483():

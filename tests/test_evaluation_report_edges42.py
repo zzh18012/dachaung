@@ -633,12 +633,6 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_forbidden_tokens_batch26():
-    source = inspect.getsource(rmod)
-    for tok in FORBIDDEN_TOKENS:
-        assert tok not in source, f"forbidden token in source: {tok}"
-
-
 def test_module_source_uses_from_datetime_import_batch26():
     """report.py 允许 from datetime import datetime（用于时间戳）。"""
     source = inspect.getsource(rmod)
@@ -754,11 +748,6 @@ def test_module_source_contains_errors_replace_batch26():
     assert 'errors="replace"' in source
 
 
-def test_module_source_contains_encoding_utf8_batch26():
-    source = inspect.getsource(rmod)
-    assert 'encoding="utf-8"' in source
-
-
 def test_module_source_contains_timeout_10_batch26():
     source = inspect.getsource(rmod)
     assert "timeout=10" in source
@@ -807,11 +796,6 @@ def test_module_source_contains_macro_average_batch26():
 def test_module_source_contains_silent_drop_total_batch26():
     source = inspect.getsource(rmod)
     assert "silent_drop_total" in source
-
-
-def test_module_source_contains_participating_docs_batch26():
-    source = inspect.getsource(rmod)
-    assert "participating_docs" in source
 
 
 def test_module_source_contains_not_evaluated_batch26():

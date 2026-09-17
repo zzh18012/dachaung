@@ -108,11 +108,6 @@ def test_ratio_metrics_no_duplicates_batch43():
     assert len(set(_RATIO_METRICS)) == len(_RATIO_METRICS)
 
 
-def test_ratio_metrics_all_strings_batch43():
-    for m in _RATIO_METRICS:
-        assert isinstance(m, str)
-
-
 def test_ratio_metrics_exact_set_batch43():
     expected = {
         "schema_valid",
@@ -132,10 +127,6 @@ def test_ratio_metrics_exact_set_batch43():
 
 
 # ---------- 三集合不相交 ----------
-
-def test_ratio_count_disjoint_batch43():
-    assert set(_RATIO_METRICS).isdisjoint(set(_COUNT_METRICS))
-
 
 def test_ratio_success_disjoint_batch43():
     assert set(_RATIO_METRICS).isdisjoint(set(_SUCCESS_BOOL_METRICS))
@@ -188,29 +179,9 @@ def test_get_git_provenance_return_annotation_batch43():
 
 # ---------- get_git_provenance subprocess 参数 ----------
 
-def test_get_git_provenance_uses_timeout_10_batch43():
-    src = inspect.getsource(get_git_provenance)
-    assert "timeout=10" in src
-
-
 def test_get_git_provenance_uses_cwd_str_batch43():
     src = inspect.getsource(get_git_provenance)
     assert "cwd=str(project_root)" in src
-
-
-def test_get_git_provenance_uses_capture_output_batch43():
-    src = inspect.getsource(get_git_provenance)
-    assert "capture_output=True" in src
-
-
-def test_get_git_provenance_uses_errors_replace_batch43():
-    src = inspect.getsource(get_git_provenance)
-    assert 'errors="replace"' in src
-
-
-def test_get_git_provenance_uses_encoding_utf8_batch43():
-    src = inspect.getsource(get_git_provenance)
-    assert 'encoding="utf-8"' in src
 
 
 def test_get_git_provenance_returns_2_keys_batch43():

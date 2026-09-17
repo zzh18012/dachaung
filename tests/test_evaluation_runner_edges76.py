@@ -42,25 +42,12 @@ def test_load_annotation_nonexistent_file_batch51(tmp_path):
     assert _load_annotation(p) is None
 
 
-def test_load_annotation_invalid_json_batch51(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_oserror_batch51(tmp_path):
     """open 失败 OSError 也 catch。"""
     p = tmp_path / "x.json"
     p.write_text("{}", encoding="utf-8")
     with patch("pathlib.Path.open", side_effect=OSError("boom")):
         assert _load_annotation(p) is None
-
-
-def test_load_annotation_success_batch51(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text('{"k": "v"}', encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == {"k": "v"}
 
 
 def test_load_annotation_returns_dict_or_none_batch51(tmp_path):

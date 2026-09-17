@@ -68,11 +68,6 @@ def test_ratio_metrics_no_duplicates():
     assert len(_RATIO_METRICS) == len(set(_RATIO_METRICS))
 
 
-def test_ratio_metrics_all_strings():
-    for name in _RATIO_METRICS:
-        assert isinstance(name, str)
-
-
 def test_count_metrics_count_is_one():
     assert len(_COUNT_METRICS) == 1
 
@@ -457,17 +452,6 @@ def test_get_dependency_versions_values_types():
         assert val is None or isinstance(val, str)
 
 
-def test_get_dependency_versions_no_extra_keys():
-    v = get_dependency_versions()
-    assert len(v) == 3  # 严格 3 keys
-
-
-def test_get_dependency_versions_returns_new_dict_each_call():
-    a = get_dependency_versions()
-    b = get_dependency_versions()
-    assert a is not b
-
-
 # =========================================================================
 # get_git_provenance 深度
 # =========================================================================
@@ -654,17 +638,6 @@ def test_module_imports_evaluator_version():
     assert "REPORT_VERSION" in src
 
 
-def test_module_uses_future_annotations():
-    import evaluation.report as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_docstring_present():
-    import evaluation.report as mod
-    assert mod.__doc__ is not None
-
-
 def test_module_docstring_mentions_aggregate():
     import evaluation.report as mod
     doc = mod.__doc__
@@ -693,16 +666,6 @@ def test_module_constants_present():
 # =========================================================================
 # 签名深度
 # =========================================================================
-
-
-def test_get_git_provenance_param_name():
-    sig = inspect.signature(get_git_provenance)
-    assert "project_root" in sig.parameters
-
-
-def test_get_git_provenance_param_no_default():
-    sig = inspect.signature(get_git_provenance)
-    assert sig.parameters["project_root"].default is inspect.Parameter.empty
 
 
 def test_get_dependency_versions_no_params():
@@ -734,11 +697,6 @@ def test_build_devset_section_param_name():
 def test_build_devset_section_param_no_default():
     sig = inspect.signature(build_devset_section)
     assert sig.parameters["manifest"].default is inspect.Parameter.empty
-
-
-def test_aggregate_summary_param_name():
-    sig = inspect.signature(aggregate_summary)
-    assert "per_doc_results" in sig.parameters
 
 
 def test_aggregate_summary_param_no_default():

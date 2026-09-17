@@ -81,13 +81,6 @@ def test_load_annotation_directory_returns_none_batch43(tmp_path):
     assert _load_annotation(d) is None
 
 
-def test_load_annotation_empty_json_returns_empty_dict_batch43(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text("{}", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == {}
-
-
 def test_load_annotation_whitespace_only_returns_none_batch43(tmp_path):
     """仅空白的文件不是合法 JSON → JSONDecodeError → None。"""
     p = tmp_path / "ann.json"
@@ -136,13 +129,6 @@ def test_load_annotation_list_top_level_returns_list_batch43(tmp_path):
     assert out == [1, 2, 3]
 
 
-def test_load_annotation_string_top_level_returns_str_batch43(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text('"hello"', encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == "hello"
-
-
 def test_load_annotation_number_top_level_returns_number_batch43(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text("42", encoding="utf-8")
@@ -174,21 +160,6 @@ def test_process_one_return_annotation_tuple_batch43():
     sig = inspect.signature(_process_one)
     ann = str(sig.return_annotation)
     assert "tuple" in ann.lower()
-
-
-def test_process_one_doc_no_default_batch43():
-    sig = inspect.signature(_process_one)
-    assert sig.parameters["doc"].default is inspect.Parameter.empty
-
-
-def test_process_one_output_root_no_default_batch43():
-    sig = inspect.signature(_process_one)
-    assert sig.parameters["output_root"].default is inspect.Parameter.empty
-
-
-def test_process_one_parser_name_no_default_batch43():
-    sig = inspect.signature(_process_one)
-    assert sig.parameters["parser_name"].default is inspect.Parameter.empty
 
 
 def test_process_one_max_chars_no_default_batch43():

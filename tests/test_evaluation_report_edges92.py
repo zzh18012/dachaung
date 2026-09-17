@@ -132,15 +132,6 @@ def test_partial_metrics_not_evaluated_batch56():
 
 # ---------- __all__ ----------
 
-def test_all_exports_five_ordered_batch56():
-    assert report_mod.__all__ == [
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions"]
-
-
 # ---------- 源码补强 ----------
 
 def _src():

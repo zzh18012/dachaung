@@ -204,13 +204,6 @@ def test_hbc_two_participating_batch516(tmp_path):
 
 # ---------- counts / success ----------
 
-def test_counts_cross_type_sum_batch516(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["counts"][
-        "element_count_total"] == {
-        "sum": 4, "participating_docs": 2}
-
-
 def test_success_full_batch516(tmp_path):
     r = _run(tmp_path)
     assert r["summary"]["success_rates"][

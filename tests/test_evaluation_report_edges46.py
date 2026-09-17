@@ -415,12 +415,6 @@ def test_module_source_no_unlink_batch30():
     assert ".unlink()" not in src
 
 
-def test_module_source_subprocess_allowed_batch30():
-    """report.py 允许 subprocess（git provenance 需要）。"""
-    src = inspect.getsource(rmod)
-    assert "import subprocess" in src
-
-
 # ---------- module source 字符串精确补强第四十四批 ----------
 
 
@@ -490,11 +484,6 @@ def test_signature_get_git_provenance_return_batch30():
 def test_signature_get_git_provenance_project_root_batch30():
     sig = inspect.signature(get_git_provenance)
     assert sig.parameters["project_root"].annotation == "Path"
-
-
-def test_signature_get_dependency_versions_return_batch30():
-    sig = inspect.signature(get_dependency_versions)
-    assert "dict[str, str | None]" in str(sig.return_annotation)
 
 
 def test_signature_build_provenance_no_default_batch30():

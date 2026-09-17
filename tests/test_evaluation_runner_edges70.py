@@ -336,11 +336,6 @@ def test_module_source_contains_annotation_metrics_import_batch44():
     assert "from evaluation.annotation_metrics import" in src
 
 
-def test_module_source_contains_unlink_in_process_one_batch44():
-    src = inspect.getsource(_process_one)
-    assert "unlink" in src
-
-
 def test_module_source_contains_per_doc_subdir_batch44():
     src = inspect.getsource(runner_mod)
     assert "_per_doc" in src

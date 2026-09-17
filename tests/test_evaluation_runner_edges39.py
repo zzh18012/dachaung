@@ -805,11 +805,6 @@ def test_runner_source_no_assert_batch12():
     assert not source.startswith("assert ")
 
 
-def test_runner_source_no_lambda_batch12():
-    source = inspect.getsource(rmod)
-    assert "lambda " not in source
-
-
 def test_runner_source_uses_fstring_for_doc_id_batch12():
     """runner 使用 f-string 拼接 doc_id 路径。"""
     source = inspect.getsource(rmod)
@@ -819,11 +814,6 @@ def test_runner_source_uses_fstring_for_doc_id_batch12():
 def test_runner_source_no_format_method_batch12():
     source = inspect.getsource(rmod)
     assert ".format(" not in source
-
-
-def test_runner_source_no_input_call_batch12():
-    source = inspect.getsource(rmod)
-    assert "input(" not in source
 
 
 def test_runner_source_no_while_loop_batch12():
@@ -1071,11 +1061,6 @@ def test_all_functions_no_var_kwargs_batch12():
 
 
 # ---------- module 合理性第十二批 ----------
-
-
-def test_module_dunder_all_exact_batch12():
-    assert hasattr(rmod, "__all__")
-    assert rmod.__all__ == ["run_evaluation"]
 
 
 def test_module_name_evaluation_runner_batch12():

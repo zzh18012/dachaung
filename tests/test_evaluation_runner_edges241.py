@@ -217,15 +217,6 @@ def test_composite_metrics_20_keys_batch548(
     assert len(r["per_doc"][0]["metrics"]) == 20
 
 
-def test_composite_success_rate_batch548(
-        tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["success_rates"][
-        "pipeline_success"] == {
-        "success_count": 1, "total": 1,
-        "rate": 1.0}
-
-
 # ---------- 报告合法性 ----------
 
 def test_report_schema_batch548(tmp_path):

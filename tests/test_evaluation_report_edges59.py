@@ -436,12 +436,6 @@ def test_ast_no_with_in_module_body_batch44():
         assert not isinstance(n, (ast.With, ast.AsyncWith))
 
 
-def test_ast_no_async_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(report_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
-
-
 def test_ast_function_returns_dict_annotation_batch44():
     """所有顶层函数都返回 dict。"""
     tree = ast.parse(inspect.getsource(report_mod))

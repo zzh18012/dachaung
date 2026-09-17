@@ -481,11 +481,6 @@ def test_module_all_exact():
     assert mod.__all__ == ["run_evaluation"]
 
 
-def test_module_all_is_list():
-    import evaluation.runner as mod
-    assert isinstance(mod.__all__, list)
-
-
 def test_module_all_no_duplicates():
     import evaluation.runner as mod
     assert len(mod.__all__) == len(set(mod.__all__))

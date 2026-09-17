@@ -50,12 +50,6 @@ def test_load_annotation_valid_json_batch18(tmp_path):
     assert _load_annotation(p) == {"k": "v"}
 
 
-def test_load_annotation_invalid_json_returns_none_batch18(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("not json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_zero_byte_returns_none_batch18(tmp_path):
     p = tmp_path / "a.json"
     p.write_bytes(b"")
@@ -190,16 +184,6 @@ def test_process_one_elapsed_is_float_batch18(tmp_path):
     assert isinstance(elapsed, float)
 
 
-def test_process_one_returns_5_tuple_batch18(tmp_path):
-    doc = _mk_doc()
-    fake_doc = _mk_document()
-    with patch("evaluation.runner.process_single", return_value=(fake_doc, [])), \
-         patch("evaluation.runner.image_output_dir_for", return_value=tmp_path / "imgs"):
-        result = _process_one(doc, tmp_path, "fallback", 800)
-    assert isinstance(result, tuple)
-    assert len(result) == 5
-
-
 def test_process_one_doc_id_in_out_stub_batch18(tmp_path):
     doc = _mk_doc(doc_id="special_id")
     fake_doc = _mk_document()
@@ -277,22 +261,6 @@ def test_run_evaluation_public_per_doc_no_private_fields_batch18(tmp_path):
     assert "_tolerance_chars" not in pd
     assert "_annotation_present" not in pd
     assert "_missing_markers" not in pd
-
-
-def test_run_evaluation_expected_failure_matches_true_batch18(tmp_path):
-    m = _mk_manifest_empty()
-    ef = MagicMock()
-    ef.doc_id = "bad1"
-    ef.expected_error_code = "unsupported_format"
-    ef.resolved_path = Path("/fake/bad.txt")
-    m.expected_failures = [ef]
-    err = MagicMock()
-    err.code = "unsupported_format"
-    out = tmp_path / "out.json"
-    with patch("evaluation.runner.process_single", return_value=(None, [err])):
-        r = run_evaluation(m, out)
-    assert len(r["expected_failures"]) == 1
-    assert r["expected_failures"][0]["matches"] is True
 
 
 def test_run_evaluation_expected_failure_matches_false_batch18(tmp_path):
@@ -540,12 +508,6 @@ def test_signature_run_evaluation_batch18():
     assert params == ["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]
 
 
-def test_signature_run_evaluation_keyword_only_batch18():
-    sig = inspect.signature(run_evaluation)
-    for name in ("parser_name", "max_chars", "tolerance_chars"):
-        assert sig.parameters[name].kind == sig.parameters[name].KEYWORD_ONLY
-
-
 def test_signature_run_evaluation_defaults_batch18():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["parser_name"].default == "fallback"
@@ -630,22 +592,6 @@ def test_e2e_run_evaluation_creates_valid_json_batch18(tmp_path):
     with out.open("r", encoding="utf-8") as f:
         data = json.load(f)
     assert isinstance(data, dict)
-
-
-def test_e2e_run_evaluation_with_expected_failure_batch18(tmp_path):
-    m = _mk_manifest_empty()
-    ef = MagicMock()
-    ef.doc_id = "bad1"
-    ef.expected_error_code = "unsupported_format"
-    ef.resolved_path = Path("/fake/bad.txt")
-    m.expected_failures = [ef]
-    err = MagicMock()
-    err.code = "unsupported_format"
-    out = tmp_path / "out.json"
-    with patch("evaluation.runner.process_single", return_value=(None, [err])):
-        r = run_evaluation(m, out)
-    assert len(r["expected_failures"]) == 1
-    assert r["expected_failures"][0]["matches"] is True
 
 
 def test_e2e_run_evaluation_devset_in_report_batch18(tmp_path):

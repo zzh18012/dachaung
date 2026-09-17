@@ -358,11 +358,6 @@ def test_build_provenance_max_chars_int_type(tmp_path):
     assert type(result["max_chars"]) is int
 
 
-def test_build_provenance_max_chars_zero(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 0, None)
-    assert result["max_chars"] == 0
-
-
 def test_build_provenance_max_chars_negative(tmp_path):
     result = build_provenance(tmp_path, "fallback", -1, None)
     assert result["max_chars"] == -1

@@ -763,14 +763,6 @@ def test_signature_run_evaluation_keyword_only_batch20():
     assert params[4].kind == inspect.Parameter.KEYWORD_ONLY
 
 
-def test_signature_run_evaluation_defaults_batch20():
-    sig = inspect.signature(run_evaluation)
-    params = {p.name: p for p in sig.parameters.values()}
-    assert params["parser_name"].default == "fallback"
-    assert params["max_chars"].default == 800
-    assert params["tolerance_chars"].default == 30
-
-
 def test_signature_process_one_no_default_batch20():
     """_process_one 所有参数都必填。"""
     sig = inspect.signature(_process_one)

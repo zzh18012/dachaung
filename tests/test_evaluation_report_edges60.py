@@ -76,23 +76,12 @@ def test_ratio_metrics_exact_order_batch45():
     ]
 
 
-def test_ratio_metrics_all_str_batch45():
-    for m in _RATIO_METRICS:
-        assert isinstance(m, str)
-
-
 def test_ratio_metrics_unique_batch45():
     assert len(set(_RATIO_METRICS)) == len(_RATIO_METRICS)
 
 
 def test_ratio_metrics_is_tuple_batch45():
     assert isinstance(_RATIO_METRICS, tuple)
-
-
-def test_ratio_metrics_no_figure_caption_batch45():
-    """figure_caption_* 始终 null，不参与 macro average。"""
-    for m in _RATIO_METRICS:
-        assert not m.startswith("figure_caption_")
 
 
 def test_ratio_metrics_contains_text_char_multiset_batch45():
@@ -164,14 +153,6 @@ def test_get_git_provenance_oserror_first_call_batch45(tmp_path):
 
 def test_get_git_provenance_subprocess_error_batch45(tmp_path):
     with patch("subprocess.run", side_effect=subprocess.SubprocessError("boom")):
-        out = get_git_provenance(tmp_path)
-    assert out["git_commit"] is None
-    assert out["git_dirty"] is True
-
-
-def test_get_git_provenance_timeout_batch45(tmp_path):
-    """TimeoutExpired 是 SubprocessError 子类。"""
-    with patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="git", timeout=10)):
         out = get_git_provenance(tmp_path)
     assert out["git_commit"] is None
     assert out["git_dirty"] is True
@@ -400,12 +381,6 @@ def test_build_devset_section_keys_batch45():
     }
 
 
-def test_build_devset_section_status_batch45():
-    m = _make_manifest_mock(devset_status="complete")
-    out = build_devset_section(m)
-    assert out["status"] == "complete"
-
-
 def test_build_devset_section_file_count_batch45():
     m = _make_manifest_mock(file_count=5)
     out = build_devset_section(m)
@@ -562,15 +537,6 @@ def test_aggregate_summary_ratio_all_none_batch45():
     assert avg["not_evaluated"] == 2
 
 
-def test_aggregate_summary_silent_drop_sum_batch45():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 3, "reason": None}}},
-        {"metrics": {"silent_drop_count": {"value": 5, "reason": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["silent_drop_total"] == 8
-
-
 def test_aggregate_summary_silent_drop_skip_none_batch45():
     per_doc = [
         {"metrics": {"silent_drop_count": {"value": 3, "reason": None}}},
@@ -593,16 +559,6 @@ def test_aggregate_summary_silent_drop_zero_counted_batch45():
 def test_aggregate_summary_has_12_ratio_entries_batch45():
     out = aggregate_summary([])
     assert len(out["ratio_macro_averages"]) == 12
-
-
-def test_aggregate_summary_has_1_count_entry_batch45():
-    out = aggregate_summary([])
-    assert len(out["counts"]) == 1
-
-
-def test_aggregate_summary_has_1_success_rate_entry_batch45():
-    out = aggregate_summary([])
-    assert len(out["success_rates"]) == 1
 
 
 # ---------- module source 字符串精确 ----------
@@ -766,12 +722,6 @@ def test_ast_top_level_no_class_batch45():
     tree = ast.parse(inspect.getsource(report_mod))
     for n in tree.body:
         assert not isinstance(n, ast.ClassDef)
-
-
-def test_ast_top_level_no_async_batch45():
-    tree = ast.parse(inspect.getsource(report_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
 
 
 def test_ast_first_node_docstring_batch45():

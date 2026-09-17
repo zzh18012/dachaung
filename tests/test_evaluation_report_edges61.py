@@ -430,14 +430,6 @@ def test_git_provenance_oserror_second_batch47(tmp_path):
     assert out["git_dirty"] is True
 
 
-def test_git_provenance_timeout_batch47(tmp_path):
-    """TimeoutExpired 是 SubprocessError 子类。"""
-    with patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="git", timeout=10)):
-        out = get_git_provenance(tmp_path)
-    assert out["git_commit"] is None
-    assert out["git_dirty"] is True
-
-
 # ---------- get_dependency_versions 各种 ----------
 
 def test_dependency_versions_keys_batch47():
@@ -819,26 +811,6 @@ def test_source_no_yaml_load_batch47():
 def test_source_no_pickle_load_batch47():
     src = inspect.getsource(report_mod)
     assert "pickle.load(" not in src
-
-
-def test_source_no_lambda_batch47():
-    src = inspect.getsource(report_mod)
-    assert "lambda" not in src
-
-
-def test_source_no_yield_batch47():
-    src = inspect.getsource(report_mod)
-    assert "yield" not in src
-
-
-def test_source_no_walrus_batch47():
-    src = inspect.getsource(report_mod)
-    assert ":=" not in src
-
-
-def test_source_no_async_batch47():
-    src = inspect.getsource(report_mod)
-    assert "async def" not in src
 
 
 def test_source_no_await_batch47():

@@ -575,13 +575,6 @@ def test_run_evaluation_creates_per_doc_dir(tmp_path):
     assert per_doc_dir.is_dir() or not per_doc_dir.exists()  # 至少创建了
 
 
-def test_run_evaluation_empty_manifest_per_doc_empty(tmp_path):
-    manifest = _FakeManifest(documents=[])
-    out = tmp_path / "report.json"
-    report = run_evaluation(manifest, out)
-    assert report["per_doc"] == []
-
-
 def test_run_evaluation_empty_manifest_summary_structure(tmp_path):
     manifest = _FakeManifest(documents=[])
     out = tmp_path / "report.json"
@@ -711,11 +704,6 @@ def test_module_imports_annotation_metrics():
 def test_module_imports_metrics():
     import evaluation.runner as m
     assert hasattr(m, "compute_automatic_metrics")
-
-
-def test_module_imports_report_version():
-    import evaluation.runner as m
-    assert hasattr(m, "REPORT_VERSION")
 
 
 def test_module_docstring_present():

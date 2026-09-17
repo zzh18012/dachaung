@@ -59,13 +59,6 @@ def test_ratio_metrics_contains_chunk_boundary_recall_batch33():
     assert "chunk_boundary_recall" in _RATIO_METRICS
 
 
-def test_ratio_metrics_not_contains_figure_caption_batch33():
-    """figure_caption_* 不在 _RATIO_METRICS（始终 null）。"""
-    assert "figure_caption_precision" not in _RATIO_METRICS
-    assert "figure_caption_recall" not in _RATIO_METRICS
-    assert "figure_caption_f1" not in _RATIO_METRICS
-
-
 def test_ratio_metrics_not_contains_element_count_batch33():
     assert "element_count_total" not in _RATIO_METRICS
 
@@ -266,11 +259,6 @@ def test_build_provenance_keys_count_9_batch33(tmp_path):
     assert set(out.keys()) == expected_keys
 
 
-def test_build_provenance_parser_name_value_batch33(tmp_path):
-    out = build_provenance(tmp_path, "kreuzberg", 800, "1.0")
-    assert out["parser_name"] == "kreuzberg"
-
-
 def test_build_provenance_parser_version_none_batch33(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["parser_version"] is None
@@ -349,14 +337,6 @@ def _make_manifest_mock(
 def test_build_devset_section_returns_dict_batch33():
     out = build_devset_section(_make_manifest_mock())
     assert isinstance(out, dict)
-
-
-def test_build_devset_section_keys_count_6_batch33():
-    out = build_devset_section(_make_manifest_mock())
-    assert set(out.keys()) == {
-        "status", "file_count", "content_group_count",
-        "pdf_count", "docx_count", "categories_covered",
-    }
 
 
 def test_build_devset_section_status_value_batch33():
@@ -649,11 +629,6 @@ def test_module_source_contains_status_porcelain_command_batch33():
     src = inspect.getsource(rmod)
     assert '"status"' in src
     assert '"--porcelain"' in src
-
-
-def test_module_source_contains_importlib_metadata_batch33():
-    src = inspect.getsource(rmod)
-    assert "import importlib.metadata" in src
 
 
 def test_module_source_contains_pdfplumber_dep_name_batch33():

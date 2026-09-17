@@ -39,11 +39,6 @@ def test_ratio_metrics_no_duplicates_batch35():
     assert len(set(_RATIO_METRICS)) == len(_RATIO_METRICS)
 
 
-def test_ratio_metrics_all_strings_batch35():
-    for name in _RATIO_METRICS:
-        assert isinstance(name, str)
-
-
 def test_count_metrics_no_duplicates_batch35():
     assert len(set(_COUNT_METRICS)) == len(_COUNT_METRICS)
 
@@ -341,11 +336,6 @@ def test_dependency_versions_normal_path_batch35():
 # ---------- build_provenance 第三十五批
 
 
-def test_build_provenance_returns_dict_batch35(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "1.0.0")
-    assert isinstance(out, dict)
-
-
 def test_build_provenance_nine_keys_batch35(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, "1.0.0")
     expected = {
@@ -555,18 +545,6 @@ def test_aggregate_summary_counts_sums_all_batch35():
     assert out["counts"]["element_count_total"]["participating_docs"] == 2
 
 
-def test_aggregate_summary_success_rate_all_true_batch35():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": True}}},
-        {"metrics": {"pipeline_success": {"value": True}}},
-    ]
-    out = aggregate_summary(per_doc)
-    sr = out["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 2
-    assert sr["total"] == 2
-    assert sr["rate"] == 1.0
-
-
 def test_aggregate_summary_success_rate_all_false_batch35():
     per_doc = [
         {"metrics": {"pipeline_success": {"value": False}}},
@@ -720,11 +698,6 @@ def test_module_source_contains_design_doc_batch35():
 def test_module_source_contains_aggregation_rules_batch35():
     src = inspect.getsource(rmod)
     assert "聚合规则" in src
-
-
-def test_module_source_contains_no_mixed_types_keyword_batch35():
-    src = inspect.getsource(rmod)
-    assert "不混合类型" in src
 
 
 def test_module_source_contains_figure_caption_always_null_comment_batch35():

@@ -264,18 +264,6 @@ def test_build_devset_section_has_6_keys_batch49():
     }
 
 
-def test_build_devset_section_status_passed_through_batch49():
-    m = MagicMock()
-    m.devset_status = "incomplete"
-    m.file_count = 0
-    m.content_group_count = 0
-    m.pdf_count = 0
-    m.docx_count = 0
-    m.categories_covered = []
-    out = build_devset_section(m)
-    assert out["status"] == "incomplete"
-
-
 def test_build_devset_section_categories_passed_through_batch49():
     m = MagicMock()
     m.devset_status = "complete"
@@ -497,16 +485,6 @@ def test_source_contains_timeout_10_batch49():
 def test_source_contains_capture_output_batch49():
     src = inspect.getsource(report_mod)
     assert "capture_output=True" in src
-
-
-def test_source_contains_encoding_utf8_batch49():
-    src = inspect.getsource(report_mod)
-    assert 'encoding="utf-8"' in src
-
-
-def test_source_contains_errors_replace_batch49():
-    src = inspect.getsource(report_mod)
-    assert 'errors="replace"' in src
 
 
 def test_source_contains_isoformat_call_batch49():

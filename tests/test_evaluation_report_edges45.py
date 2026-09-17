@@ -550,12 +550,6 @@ def test_module_source_no_unlink_batch29():
     assert ".unlink()" not in src
 
 
-def test_module_source_subprocess_allowed_batch29():
-    """report.py 允许 subprocess（git provenance 需要）。"""
-    src = inspect.getsource(rmod)
-    assert "import subprocess" in src
-
-
 # ---------- module source 字符串精确补强第四十二批 ----------
 
 

@@ -783,16 +783,6 @@ def test_runner_source_no_sys_module_usage_batch13():
     assert "sys." not in source
 
 
-def test_runner_source_no_shutil_usage_batch13():
-    source = inspect.getsource(rmod)
-    assert "shutil" not in source
-
-
-def test_runner_source_no_tempfile_usage_batch13():
-    source = inspect.getsource(rmod)
-    assert "tempfile" not in source
-
-
 def test_runner_source_no_logging_batch13():
     source = inspect.getsource(rmod)
     assert "import logging" not in source
@@ -810,11 +800,6 @@ def test_runner_source_no_eval_call_batch13():
     assert "exec(" not in source
 
 
-def test_runner_source_no_compile_call_batch13():
-    source = inspect.getsource(rmod)
-    assert "compile(" not in source
-
-
 def test_runner_source_no_global_keyword_batch13():
     source = inspect.getsource(rmod)
     assert "\nglobal " not in source
@@ -825,11 +810,6 @@ def test_runner_source_no_nonlocal_keyword_batch13():
     assert "nonlocal " not in source
 
 
-def test_runner_source_no_lambda_batch13():
-    source = inspect.getsource(rmod)
-    assert "lambda " not in source
-
-
 def test_runner_source_no_assert_batch13():
     source = inspect.getsource(rmod)
     assert "\nassert " not in source
@@ -838,11 +818,6 @@ def test_runner_source_no_assert_batch13():
 def test_runner_source_no_print_batch13():
     source = inspect.getsource(rmod)
     assert "print(" not in source
-
-
-def test_runner_source_no_input_function_batch13():
-    source = inspect.getsource(rmod)
-    assert "input(" not in source
 
 
 def test_runner_source_no_with_open_w_at_top_level_batch13():
@@ -928,11 +903,6 @@ def test_module_source_uses_json_load_batch13():
 def test_module_source_uses_ensure_ascii_false_batch13():
     source = inspect.getsource(rmod)
     assert "ensure_ascii=False" in source
-
-
-def test_module_source_uses_indent_2_batch13():
-    source = inspect.getsource(rmod)
-    assert "indent=2" in source
 
 
 def test_module_source_has_not_instrumented_string_batch13():
@@ -1049,11 +1019,6 @@ def test_run_evaluation_return_annotation_dict_batch13():
     ret = sig.return_annotation
     ret_str = ret if isinstance(ret, str) else str(ret)
     assert "dict" in ret_str
-
-
-def test_module_dunder_all_one_item_batch13():
-    assert hasattr(rmod, "__all__")
-    assert rmod.__all__ == ["run_evaluation"]
 
 
 def test_public_function_count_3_batch13():

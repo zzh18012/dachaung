@@ -66,11 +66,6 @@ def test_ratio_metrics_includes_11_metrics():
     assert set(_RATIO_METRICS) == expected
 
 
-def test_ratio_metrics_excludes_figure_caption():
-    for name in _RATIO_METRICS:
-        assert not name.startswith("figure_caption")
-
-
 def test_ratio_metrics_excludes_element_count_total():
     assert "element_count_total" not in _RATIO_METRICS
 
@@ -347,16 +342,6 @@ def test_build_provenance_returns_nine_keys(tmp_path: Path):
         "max_chars", "run_timestamp_iso",
     }
     assert set(result.keys()) == expected_keys
-
-
-def test_build_provenance_evaluator_version_constant(tmp_path: Path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["evaluator_version"] == EVALUATOR_VERSION
-
-
-def test_build_provenance_report_version_constant(tmp_path: Path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["report_version"] == REPORT_VERSION
 
 
 def test_build_provenance_parser_name_propagated(tmp_path: Path):
@@ -648,15 +633,6 @@ def test_aggregate_summary_silent_drop_skips_none():
     assert result["silent_drop_total"] == 5
 
 
-def test_aggregate_summary_silent_drop_all_none():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": None}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    result = aggregate_summary(per_doc)
-    assert result["silent_drop_total"] is None
-
-
 def test_aggregate_summary_all_metrics_missing():
     """per_doc 都没有 metrics key → 都视为 None。"""
     per_doc = [{"doc_id": "d1", "metrics": {}}]
@@ -704,17 +680,6 @@ def test_aggregate_summary_not_evaluated_count():
 # =========================================================================
 # 模块结构与签名
 # =========================================================================
-
-
-def test_module_all_exports_five():
-    import evaluation.report as m
-    assert set(m.__all__) == {
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    }
 
 
 def test_module_imports_subprocess():

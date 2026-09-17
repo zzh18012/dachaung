@@ -1173,12 +1173,6 @@ def test_e2e_load_annotation_returns_same_value_for_same_content(tmp_path):
     assert _load_annotation(p1) == _load_annotation(p2)
 
 
-def test_e2e_load_annotation_just_brackets(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("[]", encoding="utf-8")
-    assert _load_annotation(p) == []
-
-
 def test_e2e_load_annotation_deeply_nested(tmp_path):
     p = tmp_path / "a.json"
     nested = {"a": {"b": {"c": {"d": {"e": "deep"}}}}}

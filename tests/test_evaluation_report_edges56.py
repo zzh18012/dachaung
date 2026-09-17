@@ -44,10 +44,6 @@ def test_success_bool_metrics_no_duplicates_batch41():
     assert len(_SUCCESS_BOOL_METRICS) == len(set(_SUCCESS_BOOL_METRICS))
 
 
-def test_ratio_metrics_disjoint_from_count_batch41():
-    assert set(_RATIO_METRICS).isdisjoint(set(_COUNT_METRICS))
-
-
 def test_ratio_metrics_disjoint_from_success_bool_batch41():
     assert set(_RATIO_METRICS).isdisjoint(set(_SUCCESS_BOOL_METRICS))
 
@@ -88,12 +84,6 @@ def test_ratio_metrics_does_not_contain_chunk_boundary_specificity_batch41():
     assert "chunk_boundary_specificity" not in _RATIO_METRICS
 
 
-def test_ratio_metrics_does_not_contain_figure_caption_batch41():
-    assert "figure_caption_precision" not in _RATIO_METRICS
-    assert "figure_caption_recall" not in _RATIO_METRICS
-    assert "figure_caption_f1" not in _RATIO_METRICS
-
-
 def test_count_metrics_only_one_member_batch41():
     assert _COUNT_METRICS == ("element_count_total",)
 
@@ -114,11 +104,6 @@ def test_ratio_metrics_schema_valid_in_tuple_batch41():
 def test_git_provenance_signature_one_param_batch41():
     sig = inspect.signature(get_git_provenance)
     assert list(sig.parameters.keys()) == ["project_root"]
-
-
-def test_git_provenance_param_no_default_batch41():
-    sig = inspect.signature(get_git_provenance)
-    assert sig.parameters["project_root"].default is inspect.Parameter.empty
 
 
 def test_git_provenance_param_annotation_path_batch41():
@@ -477,14 +462,6 @@ def test_build_devset_section_returns_six_keys_batch41():
     assert len(out) == 6
 
 
-def test_build_devset_section_exact_key_set_batch41():
-    out = build_devset_section(_make_manifest_mock())
-    assert set(out.keys()) == {
-        "status", "file_count", "content_group_count",
-        "pdf_count", "docx_count", "categories_covered",
-    }
-
-
 def test_build_devset_section_content_group_count_batch41():
     out = build_devset_section(_make_manifest_mock(content_group_count=7))
     assert out["content_group_count"] == 7
@@ -792,24 +769,9 @@ def test_module_source_contains_all_export_batch41():
     assert "__all__" in src
 
 
-def test_module_source_contains_count_aggregation_comment_batch41():
-    src = inspect.getsource(rmod)
-    assert "counts" in src
-
-
 def test_module_source_contains_success_rate_comment_batch41():
     src = inspect.getsource(rmod)
     assert "success_rates" in src
-
-
-def test_module_source_contains_ratio_macro_averages_comment_batch41():
-    src = inspect.getsource(rmod)
-    assert "ratio_macro_averages" in src
-
-
-def test_module_source_contains_silent_drop_count_comment_batch41():
-    src = inspect.getsource(rmod)
-    assert "silent_drop_count" in src
 
 
 def test_module_source_contains_no_mixed_score_comment_batch41():
@@ -840,11 +802,6 @@ def test_module_source_contains_errors_replace_batch41():
 def test_module_source_contains_capture_output_batch41():
     src = inspect.getsource(rmod)
     assert "capture_output=True" in src
-
-
-def test_module_source_contains_porcelain_command_batch41():
-    src = inspect.getsource(rmod)
-    assert "status" in src and "porcelain" in src
 
 
 def test_module_source_contains_rev_parse_command_batch41():
@@ -883,21 +840,6 @@ def test_signature_build_devset_section_params_batch41():
 def test_signature_aggregate_summary_params_batch41():
     sig = inspect.signature(aggregate_summary)
     assert list(sig.parameters.keys()) == ["per_doc_results"]
-
-
-def test_signature_build_provenance_project_root_no_default_batch41():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["project_root"].default is inspect.Parameter.empty
-
-
-def test_signature_build_provenance_parser_name_no_default_batch41():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["parser_name"].default is inspect.Parameter.empty
-
-
-def test_signature_build_provenance_max_chars_no_default_batch41():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["max_chars"].default is inspect.Parameter.empty
 
 
 def test_signature_build_provenance_parser_version_no_default_batch41():

@@ -411,11 +411,6 @@ def test_module_source_has_run_evaluation_output_root_creation():
     assert "output_root.mkdir(parents=True, exist_ok=True)" in src
 
 
-def test_module_source_has_run_evaluation_out_p_creation():
-    src = inspect.getsource(run_evaluation)
-    assert "out_p.parent.mkdir(parents=True, exist_ok=True)" in src
-
-
 def test_module_source_has_per_doc_loop():
     src = inspect.getsource(run_evaluation)
     assert "for doc in manifest.documents:" in src
@@ -469,10 +464,6 @@ def test_run_evaluation_keyword_marker_in_source():
 # ---------- module 整体合理性 ----------
 
 
-def test_module_all_only_run_evaluation():
-    assert m.__all__ == ["run_evaluation"]
-
-
 def test_module_no_class():
     src = inspect.getsource(m)
     for line in src.splitlines():
@@ -483,10 +474,6 @@ def test_module_no_class():
 def test_module_no_main_block():
     src = inspect.getsource(m)
     assert 'if __name__ == "__main__":' not in src
-
-
-def test_module_namespace():
-    assert m.__name__ == "evaluation.runner"
 
 
 def test_module_has_2_private_functions():

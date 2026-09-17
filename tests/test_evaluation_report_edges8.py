@@ -71,12 +71,6 @@ def test_ratio_metrics_contains_locator_ratios():
     assert "docx_locator_valid_ratio" in _RATIO_METRICS
 
 
-def test_ratio_metrics_excludes_figure_caption():
-    assert "figure_caption_precision" not in _RATIO_METRICS
-    assert "figure_caption_recall" not in _RATIO_METRICS
-    assert "figure_caption_f1" not in _RATIO_METRICS
-
-
 def test_count_metrics_is_tuple():
     assert isinstance(_COUNT_METRICS, tuple)
 
@@ -150,16 +144,6 @@ def test_aggregate_summary_ratio_macro_averages_has_12_keys():
 def test_aggregate_summary_empty_silent_drop_total_is_none():
     result = aggregate_summary([])
     assert result["silent_drop_total"] is None
-
-
-def test_aggregate_summary_count_participating_docs_zero_for_empty():
-    result = aggregate_summary([])
-    assert result["counts"]["element_count_total"]["participating_docs"] == 0
-
-
-def test_aggregate_summary_count_sum_none_for_empty():
-    result = aggregate_summary([])
-    assert result["counts"]["element_count_total"]["sum"] is None
 
 
 def test_aggregate_summary_success_rate_zero_docs_rate_none():
@@ -557,28 +541,9 @@ class _FakeManifest:
         self.categories_covered = categories_covered or []
 
 
-def test_build_devset_section_returns_dict():
-    result = build_devset_section(_FakeManifest())
-    assert isinstance(result, dict)
-
-
-def test_build_devset_section_six_keys():
-    result = build_devset_section(_FakeManifest())
-    expected = {
-        "status", "file_count", "content_group_count",
-        "pdf_count", "docx_count", "categories_covered",
-    }
-    assert set(result.keys()) == expected
-
-
 def test_build_devset_section_status_propagated():
     m = _FakeManifest(devset_status="complete")
     assert build_devset_section(m)["status"] == "complete"
-
-
-def test_build_devset_section_file_count_propagated():
-    m = _FakeManifest(file_count=42)
-    assert build_devset_section(m)["file_count"] == 42
 
 
 def test_build_devset_section_content_group_count_propagated():
@@ -684,24 +649,11 @@ def test_module_imports_evaluation_versions():
     assert hasattr(m, "REPORT_VERSION")
 
 
-def test_module_docstring_present():
-    import evaluation.report as m
-    assert m.__doc__ is not None
-    assert len(m.__doc__) > 0
-
-
 def test_module_docstring_mentions_aggregation_rules():
     import evaluation.report as m
     doc = m.__doc__
     assert "counts" in doc.lower() or "求和" in doc
     assert "macro" in doc.lower() or "macro average" in doc.lower()
-
-
-def test_module_uses_future_annotations():
-    import evaluation.report as m
-    sig = inspect.signature(m.aggregate_summary)
-    # future annotations → annotation is string
-    assert isinstance(sig.return_annotation, str)
 
 
 def test_module_all_entries_exported():

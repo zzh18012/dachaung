@@ -1229,11 +1229,6 @@ def test_signature_process_one_annotations_are_strings_batch23():
     assert isinstance(sig.return_annotation, str)
 
 
-def test_signature_run_evaluation_annotations_are_strings_batch23():
-    sig = inspect.signature(run_evaluation)
-    assert isinstance(sig.return_annotation, str)
-
-
 def test_signature_load_annotation_param_annotation_batch23():
     """path 参数注解是 'Path | None'。"""
     sig = inspect.signature(_load_annotation)

@@ -136,21 +136,6 @@ def test_git_provenance_call_count_two_batch32(tmp_path):
 # ---------- get_dependency_versions 第三十二批
 
 
-def test_dependency_versions_pdfplumber_value_batch32():
-    out = get_dependency_versions()
-    assert "pdfplumber" in out
-
-
-def test_dependency_versions_python_docx_value_batch32():
-    out = get_dependency_versions()
-    assert "python-docx" in out
-
-
-def test_dependency_versions_pypdfium2_value_batch32():
-    out = get_dependency_versions()
-    assert "pypdfium2" in out
-
-
 # ---------- build_provenance 第三十二批
 
 

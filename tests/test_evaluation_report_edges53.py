@@ -257,11 +257,6 @@ def test_build_provenance_nine_keys_batch34(tmp_path):
     assert set(out.keys()) == expected
 
 
-def test_build_provenance_parser_name_batch34(tmp_path):
-    out = build_provenance(tmp_path, "kreuzberg", 800, "1.0")
-    assert out["parser_name"] == "kreuzberg"
-
-
 def test_build_provenance_parser_version_none_batch34(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["parser_version"] is None
@@ -349,12 +344,6 @@ def test_build_devset_section_six_keys_batch34():
     expected = {"status", "file_count", "content_group_count", "pdf_count",
                 "docx_count", "categories_covered"}
     assert set(out.keys()) == expected
-
-
-def test_build_devset_section_status_batch34():
-    m = _make_manifest_mock(devset_status="complete")
-    out = build_devset_section(m)
-    assert out["status"] == "complete"
 
 
 def test_build_devset_section_file_count_batch34():
@@ -674,11 +663,6 @@ def test_module_source_contains_status_porcelain_batch34():
     src = inspect.getsource(rmod)
     assert '"status"' in src
     assert '"--porcelain"' in src
-
-
-def test_module_source_contains_importlib_metadata_batch34():
-    src = inspect.getsource(rmod)
-    assert "import importlib.metadata" in src
 
 
 def test_module_source_contains_python_docx_pkg_batch34():

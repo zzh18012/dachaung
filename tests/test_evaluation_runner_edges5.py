@@ -93,12 +93,6 @@ def test_load_annotation_empty_file_returns_none(tmp_path: Path):
     assert _load_annotation(p) is None
 
 
-def test_load_annotation_whitespace_only_returns_none(tmp_path: Path):
-    p = tmp_path / "ws.json"
-    p.write_text("   \n\t  ", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_object_returns_dict(tmp_path: Path):
     p = tmp_path / "obj.json"
     p.write_text('{"k": "v"}', encoding="utf-8")

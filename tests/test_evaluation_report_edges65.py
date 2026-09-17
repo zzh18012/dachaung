@@ -288,13 +288,6 @@ def test_aggregate_summary_empty_batch51():
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
 
 
-def test_aggregate_summary_empty_counts_batch51():
-    out = aggregate_summary([])
-    # counts: element_count_total sum=None, participating_docs=0
-    assert out["counts"]["element_count_total"]["sum"] is None
-    assert out["counts"]["element_count_total"]["participating_docs"] == 0
-
-
 def test_aggregate_summary_empty_success_rate_batch51():
     out = aggregate_summary([])
     # success_rates: pipeline_success total=0, rate=None
@@ -490,16 +483,6 @@ def test_source_all_5_exports_batch51():
 def test_source_contains_timeout_10_batch51():
     src = inspect.getsource(report_mod)
     assert "timeout=10" in src
-
-
-def test_source_contains_encoding_utf8_batch51():
-    src = inspect.getsource(report_mod)
-    assert 'encoding="utf-8"' in src
-
-
-def test_source_contains_errors_replace_batch51():
-    src = inspect.getsource(report_mod)
-    assert 'errors="replace"' in src
 
 
 def test_source_contains_capture_output_batch51():

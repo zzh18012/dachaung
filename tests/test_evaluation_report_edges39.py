@@ -274,26 +274,6 @@ def test_get_dependency_versions_pypdfium2_value_batch23():
 # ---------- build_provenance 第二十三批 ----------
 
 
-def test_build_provenance_returns_dict_batch23(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "1.0.0")
-    assert isinstance(out, dict)
-
-
-def test_build_provenance_nine_keys_batch23(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "1.0.0")
-    assert set(out.keys()) == {
-        "git_commit",
-        "git_dirty",
-        "evaluator_version",
-        "report_version",
-        "parser_name",
-        "parser_version",
-        "dependencies",
-        "max_chars",
-        "run_timestamp_iso",
-    }
-
-
 def test_build_provenance_evaluator_version_constant_batch23(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["evaluator_version"] == EVALUATOR_VERSION
@@ -794,21 +774,6 @@ def test_module_all_contents_exact_batch23():
     }
 
 
-def test_module_does_not_import_evaluation_runner_batch23():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.runner" not in src
-
-
-def test_module_does_not_import_evaluation_metrics_batch23():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.metrics" not in src
-
-
-def test_module_does_not_import_evaluation_cli_batch23():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.cli" not in src
-
-
 def test_module_does_not_import_evaluation_schema_batch23():
     src = inspect.getsource(rmod)
     assert "from evaluation.schema" not in src
@@ -817,11 +782,6 @@ def test_module_does_not_import_evaluation_schema_batch23():
 def test_module_does_not_import_evaluation_manifest_batch23():
     src = inspect.getsource(rmod)
     assert "from evaluation.manifest" not in src
-
-
-def test_module_does_not_import_evaluation_annotation_metrics_batch23():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.annotation_metrics" not in src
 
 
 def test_module_does_not_import_app_pipeline_batch23():

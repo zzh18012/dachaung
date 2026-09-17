@@ -172,11 +172,6 @@ def test_get_git_provenance_rev_parse_stdout_multiline_batch11():
     assert out["git_commit"] == "abc\ndef"
 
 
-def test_get_git_provenance_keys_exact_set_batch11():
-    out = get_git_provenance(Path("."))
-    assert set(out.keys()) == {"git_commit", "git_dirty"}
-
-
 def test_get_git_provenance_returns_fresh_dict_each_call_batch11():
     out1 = get_git_provenance(Path("."))
     out2 = get_git_provenance(Path("."))
@@ -374,13 +369,6 @@ def test_build_provenance_keys_order_preserved_batch11():
 def test_build_provenance_dependencies_dict_batch11():
     out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
     assert type(out["dependencies"]) is dict
-
-
-def test_build_provenance_parser_name_propagated_batch11():
-    out = build_provenance(
-        Path("."), parser_name="kreuzberg", max_chars=800, parser_version=None
-    )
-    assert out["parser_name"] == "kreuzberg"
 
 
 def test_build_provenance_two_calls_with_diff_max_chars_batch11():
@@ -1032,27 +1020,9 @@ def test_module_no_user_classes_batch11():
     assert classes == []
 
 
-def test_module_user_function_count_batch11():
-    funcs = [
-        n for n, v in vars(rmod).items()
-        if inspect.isfunction(v) and v.__module__ == rmod.__name__
-    ]
-    assert set(funcs) == {
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    }
-
-
 def test_module_docstring_present_batch11():
     assert rmod.__doc__ is not None
     assert len(rmod.__doc__) > 30
-
-
-def test_module_has_evaluator_version_attr_batch11():
-    assert hasattr(rmod, "EVALUATOR_VERSION")
 
 
 def test_module_evaluator_version_value_batch11():

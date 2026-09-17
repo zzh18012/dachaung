@@ -96,16 +96,6 @@ def test_get_git_provenance_keys_exact_batch21(tmp_path):
     assert set(result.keys()) == {"git_commit", "git_dirty"}
 
 
-def test_get_git_provenance_git_commit_type_optional_str_batch21(tmp_path):
-    result = get_git_provenance(tmp_path)
-    assert result["git_commit"] is None or isinstance(result["git_commit"], str)
-
-
-def test_get_git_provenance_git_dirty_type_bool_batch21(tmp_path):
-    result = get_git_provenance(tmp_path)
-    assert isinstance(result["git_dirty"], bool)
-
-
 def test_get_git_provenance_commit_short_hash_batch21(tmp_path):
     """commit 应是 40 字符 SHA-1 或 None。"""
     fake = MagicMock(returncode=0, stdout="abc123def456789012345678901234567890abcd\n", stderr="")
@@ -139,11 +129,6 @@ def test_get_git_provenance_stdout_with_whitespace_batch21(tmp_path):
 
 
 # ---------- get_dependency_versions 边界第二十一批 ----------
-
-
-def test_get_dependency_versions_always_returns_3_keys_batch21():
-    v = get_dependency_versions()
-    assert len(v) == 3
 
 
 def test_get_dependency_versions_pdfplumber_present_batch21():
@@ -465,16 +450,6 @@ def test_module_source_no_path_write_text_batch21():
     assert ".write_text(" not in src
 
 
-def test_module_source_no_sys_exit_batch21():
-    src = inspect.getsource(rmod)
-    assert "sys.exit" not in src
-
-
-def test_module_source_no_re_compile_batch21():
-    src = inspect.getsource(rmod)
-    assert "re.compile" not in src
-
-
 def test_module_source_no_pandas_import_batch21():
     src = inspect.getsource(rmod)
     assert "import pandas" not in src
@@ -527,15 +502,6 @@ def test_module_source_has_typing_any_import_batch21():
 def test_module_source_has_evaluator_version_import_batch21():
     src = inspect.getsource(rmod)
     assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in src
-
-
-def test_module_source_has_all_list_with_5_entries_batch21():
-    src = inspect.getsource(rmod)
-    assert '"build_provenance"' in src
-    assert '"build_devset_section"' in src
-    assert '"aggregate_summary"' in src
-    assert '"get_git_provenance"' in src
-    assert '"get_dependency_versions"' in src
 
 
 def test_module_source_has_docstring_about_aggregation_batch21():
@@ -599,12 +565,6 @@ def test_signature_build_provenance_no_defaults_batch21():
         assert p.default is inspect.Parameter.empty
 
 
-def test_signature_build_devset_section_batch21():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-
-
 def test_signature_aggregate_summary_batch21():
     sig = inspect.signature(aggregate_summary)
     params = list(sig.parameters.values())
@@ -641,11 +601,6 @@ def test_module_does_not_import_evaluation_metrics_batch21():
 def test_module_does_not_import_evaluation_cli_batch21():
     src = inspect.getsource(rmod)
     assert "from evaluation.cli" not in src
-
-
-def test_module_does_not_import_evaluation_runner_batch21():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.runner" not in src
 
 
 def test_module_does_not_import_evaluation_annotation_metrics_batch21():

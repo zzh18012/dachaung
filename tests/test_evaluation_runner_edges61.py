@@ -38,12 +38,6 @@ def test_load_annotation_valid_file_returns_dict_batch33(tmp_path):
     assert out == {"k": 1}
 
 
-def test_load_annotation_invalid_json_returns_none_batch33(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text("not json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_directory_returns_none_batch33(tmp_path):
     """path 是目录（is_file() False）→ None。"""
     d = tmp_path / "subdir"
@@ -79,13 +73,6 @@ def test_load_annotation_dict_value_batch33(tmp_path):
     assert out["extra"] == [1, 2, 3]
 
 
-def test_load_annotation_empty_dict_batch33(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text("{}", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == {}
-
-
 # ---------- _process_one 第三十三批
 
 
@@ -110,12 +97,6 @@ def test_process_one_signature_batch33():
     sig = inspect.signature(_process_one)
     params = list(sig.parameters.keys())
     assert params == ["doc", "output_root", "parser_name", "max_chars"]
-
-
-def test_process_one_return_annotation_batch33():
-    sig = inspect.signature(_process_one)
-    # 返回类型注解是 tuple
-    assert "tuple" in sig.return_annotation
 
 
 def test_process_one_creates_per_doc_dir_batch33(tmp_path):
@@ -501,11 +482,6 @@ def test_module_source_contains_per_doc_dir_batch33():
 def test_module_source_contains_process_single_call_batch33():
     src = inspect.getsource(rmod)
     assert "process_single(" in src
-
-
-def test_module_source_contains_compute_automatic_metrics_call_batch33():
-    src = inspect.getsource(rmod)
-    assert "compute_automatic_metrics(" in src
 
 
 def test_module_source_contains_all_batch33():

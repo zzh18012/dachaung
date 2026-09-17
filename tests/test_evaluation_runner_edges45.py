@@ -164,16 +164,6 @@ def test_process_one_process_single_exception_propagates_batch17(tmp_path):
             _process_one(doc, tmp_path, "fallback", 800)
 
 
-def test_process_one_returns_5_tuple_batch17(tmp_path):
-    doc = _mk_doc()
-    fake_doc = _mk_document()
-    with patch("evaluation.runner.process_single", return_value=(fake_doc, [])), \
-         patch("evaluation.runner.image_output_dir_for", return_value=tmp_path / "imgs"):
-        result = _process_one(doc, tmp_path, "fallback", 800)
-    assert isinstance(result, tuple)
-    assert len(result) == 5
-
-
 def test_process_one_elapsed_is_positive_batch17(tmp_path):
     """total_seconds 应是正数（即使很小）。"""
     doc = _mk_doc()
@@ -429,12 +419,6 @@ def test_signature_run_evaluation_batch17():
     sig = inspect.signature(run_evaluation)
     params = list(sig.parameters.keys())
     assert params == ["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]
-
-
-def test_signature_run_evaluation_keyword_only_batch17():
-    sig = inspect.signature(run_evaluation)
-    for name in ("parser_name", "max_chars", "tolerance_chars"):
-        assert sig.parameters[name].kind == sig.parameters[name].KEYWORD_ONLY
 
 
 def test_signature_run_evaluation_defaults_batch17():

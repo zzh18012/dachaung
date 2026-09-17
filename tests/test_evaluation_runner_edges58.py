@@ -502,16 +502,6 @@ def test_module_source_contains_report_import_batch30():
     assert "from evaluation.report import (" in src
 
 
-def test_module_source_contains_load_annotation_func_batch30():
-    src = inspect.getsource(rmod)
-    assert "def _load_annotation" in src
-
-
-def test_module_source_contains_process_one_func_batch30():
-    src = inspect.getsource(rmod)
-    assert "def _process_one" in src
-
-
 def test_module_source_contains_run_evaluation_func_batch30():
     src = inspect.getsource(rmod)
     assert "def run_evaluation" in src

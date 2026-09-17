@@ -99,20 +99,6 @@ def test_text_preservation_empty_string_text_element_batch52():
     assert out["precision"]["value"] == 1.0
 
 
-def test_text_preservation_empty_actual_with_expected_batch52():
-    elements = [{"type": "paragraph", "content": "abc"}]
-    chunks = [{"text": ""}]
-    out = _text_preservation(elements, chunks)
-    # expected = "abc", actual = ""
-    # equal = False
-    # sum(c_actual.values()) == 0 → precision null empty_actual
-    # sum(c_expected.values()) > 0 → recall = 0/3 = 0
-    assert out["equal"]["value"] is False
-    assert out["precision"]["value"] is None
-    assert out["precision"]["reason"] == "empty_actual"
-    assert out["recall"]["value"] == 0.0
-
-
 def test_text_preservation_empty_expected_with_actual_batch52():
     elements = [{"type": "paragraph", "content": ""}]
     chunks = [{"text": "abc"}]
@@ -769,56 +755,6 @@ def test_source_compute_metrics_uses_lazy_schema_import_batch52():
     assert "from evaluation.schema_validation import document_passes_schema" in src
 
 
-def test_source_pipeline_failed_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"pipeline_failed"' in src
-
-
-def test_source_empty_expected_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"empty_expected"' in src
-
-
-def test_source_no_expectations_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_expectations"' in src
-
-
-def test_source_no_chunks_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_chunks"' in src
-
-
-def test_source_no_elements_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_elements"' in src
-
-
-def test_source_no_image_elements_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_image_elements"' in src
-
-
-def test_source_no_heading_elements_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_heading_elements"' in src
-
-
-def test_source_not_pdf_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"not_pdf_document"' in src
-
-
-def test_source_not_docx_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"not_docx_document"' in src
-
-
-def test_source_no_expectations_element_count_reason_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '"no_expectations_element_count"' in src
-
-
 def test_source_all_has_only_compute_metrics_batch52():
     src = inspect.getsource(metrics_mod)
     assert '__all__ = ["compute_automatic_metrics"]' in src
@@ -853,13 +789,6 @@ def test_ast_no_class_def_batch52():
 def test_ast_no_async_function_def_batch52():
     tree = ast.parse(inspect.getsource(metrics_mod))
     assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
-
-
-def test_ast_has_3_module_level_assigns_batch52():
-    """_TEXT_TYPES + _PDF_BBOX_REQUIRED_TYPES + _NOT_EVALUATED + __all__ = 4。"""
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    assert len(assigns) == 4
 
 
 def test_ast_module_docstring_batch52():
@@ -969,13 +898,6 @@ def test_ast_text_preservation_has_multiple_if_batch52():
 def test_ast_heading_boundary_has_for_loop_batch52():
     tree = ast.parse(inspect.getsource(metrics_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_heading_boundary_ratio")
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) == 1
-
-
-def test_ast_silent_drop_has_for_loop_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_silent_drop_count")
     fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
     assert len(fors) == 1
 

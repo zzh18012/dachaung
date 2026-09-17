@@ -487,11 +487,6 @@ def test_run_evaluation_source_has_actual_code_logic():
     assert "actual_code = errors[0].code if errors else None" in src
 
 
-def test_run_evaluation_source_has_matches_field():
-    src = inspect.getsource(run_evaluation)
-    assert '"matches": actual_code == ef.expected_error_code' in src
-
-
 def test_run_evaluation_source_calls_build_provenance():
     src = inspect.getsource(run_evaluation)
     assert "build_provenance(" in src
@@ -828,11 +823,6 @@ def test_module_source_no_class_def():
 def test_module_source_no_dataclass_decorator():
     src = inspect.getsource(rmod)
     assert "@dataclass" not in src
-
-
-def test_module_source_no_yield():
-    src = inspect.getsource(rmod)
-    assert "yield " not in src
 
 
 def test_module_source_no_async_def():
