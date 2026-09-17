@@ -121,6 +121,20 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2052 — a 队列 Y1：main PDF 图像渲染链 pypdfium2 裁剪/尺寸口径全链行为锁（R2050 裁决次选面，3 测试，main 只读）
+
+- 任务：R2050 裁决的 Y1 投轮（P2 之后的补充轮，弱锁样例门控补强为合成面 CI 稳定覆盖）——main 图像渲染链的 pypdfium2 裁剪/尺寸口径。main `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（预期 SHA 开头 6c6d398 命中，`git worktree list --porcelain` 动态定位，前后 `git status --porcelain` clean）全程只读；被测 CLI 走 main venv python 真实子进程（PYTHONDONTWRITEBYTECODE=1 / PYTHONIOENCODING=utf-8，cwd=临时目录、PYTHONPATH 指向 main 根，main 零写入）；main 侧定向 pytest 加 `-p no:cacheprovider`。版本快照：pypdfium2 5.12.1 / pdfplumber 0.11.10 / PIL 12.3.0（与 R2050 目录一致）。
+- 覆盖面：`app/parsers/fallback_parser.py` _render_pdf_image_region_verbose L365-407 + _parse_pdf 图片分支 L559-626 @ 6c6d398——`page.render(scale=dpi/72)`（dpi 默认 144 → scale=2.0，edges5/8 已锁签名默认值、未锁行为）→ `bitmap.to_pil()` → `pil.crop((max(0,int(x0*s)), max(0,int(top*s)), min(pil.width,int(x1*s)), min(pil.height,int(bottom*s))))` → PNG 落盘 `images-<hash16>/image_<hash16>_p<page>_<idx:02d>.png`（pipeline L80-84 自动推导目录）→ element(type=image, content=None, confidence=0.6, metadata{tag,srcsize,extracted_to_disk})。弱锁复核成立：main 仅 test_pipeline_integration 真实样例 resource_path 存在性断言（样例缺失即 SKIP）。
+- 探针（outputs/autonomous/probe_render_y1_r2052.py + .out，7 项矩阵）：**FlateDecode 裸 RGB 位图合成路线一次走通**（zlib 压缩 8x8 像素阵列，纯标准库，无需 DCTDecode 备选），pdfplumber/pypdfium2 双双可读。C0 无图 PDF parse rc 0 + validate rc 0 + 零 image element；V1 单图正链；V2 同页两图；V3 小数坐标；V4 越右缘；V5 越左缘；V6 两页各一图。**7/7 成立、0 偏差、0 main 缺陷**。
+- **裁剪/尺寸口径=升级噪声锚点（7 个）**：① scale=2.0 语义（100x50pt bbox → 200x100px）；② 坐标换算 **int 截断**非 round/ceil（[100.3,140.9,200.7,191.3]pt → 201x101px，宽度维区分 int/round）；③ 渲染页尺寸=MediaBox×scale（612pt → 1224px，经 V4 隐式锁定）；④ min(pil.width,·) 越右缘 clamp（x1=700 → 宽 224px）；⑤ max(0,·) 越左缘 clamp（x0=-50 → 宽 100px）；⑥ image_counter 跨图跨页连续 + 文件名 `p<page>_<idx:02d>`（同页 _00/_01、跨页 p1_00/p2_01）；⑦ bbox top 系换算（top=792−(y+h)、bottom=792−y，精确四数 [100,142,200,192]）。行为观察（非缺陷、r54 不修）：tag 恒 null（pdfplumber 0.11.10 对本构造不发 tag）；image 元素不进任何 chunk（chunker._element_text 空，V1 页 0 chunk 合法）。
+- 与既有覆盖的边界（诚实定位）：自跑线 R1945（test_parser_pdf_exotic_codecs_silent）已有 in-process `Image.open(png).size==(200,200)` 单点尺寸断言，但那是 **autonomous 分支 fork 快照**上的 FallbackParser 直调（本分支 app/ 与 main 已分叉 49 文件），且仅干净居中整 bbox 单例（作"pdfium 不解码源数据"判别式）；本轮是**main 目标真实 CLI 全链**首个裁剪口径锁（截断/双 clamp/渲染页尺寸/计数器命名/validate 链全部首次），断言 PNG 像素尺寸口径而非像素内容（R2050 裁决保确定性）。R1564 页外 case 锁的是整图出页 → "(unrendered)" 哨兵（crop 退化分支），本轮 V4/V5 是**部分**越界 clamp 分支——同函数不同分支，互补不重复。
+- 加测：`tests/test_render_y1_r2052.py` 3 测试——①正链全锁（C0 无图假阳性防线 + parse rc 0 + validate rc 0 前置、content=None/confidence=0.6/srcsize=[8,8]/extracted_to_disk、family/page/bbox 四数、images-<hash16>/image_<hash16>_p1_00.png 实存、PNG=200x100 口径锚、image 不进 chunk）②裁剪数学三连（int 截断 201x101 / min clamp 224x100 / max clamp 100x100，bbox 同步精确锁）③计数器命名双例（同页 _00/_01、跨页 p1_00/p2_01 + page 序 1/2）。被测 main 动态定位零硬编码，缺目标显式 SKIP；PNG 尺寸手解 IHDR（struct，零新依赖）。
+- 定向：新文件 3 passed（4.1s）；main test_pdf_vector_graphics + test_pipeline_integration + test_parsers 经 main venv 41 passed（6.2s，-p no:cacheprovider，main 事后 clean）；自跑线近 3 个测试轮 R2051/R2046/R2044 9 passed（16.0s）。
+- 锚预测：**102088 + 3 = 102091**。
+- 下次建议：按 R2050 裁决，a 队列 P2+Y1 均已投完，**回待命**——至 main 前进（diff 路由重探：parsers/fallback_parser.py 渲染链变更或 uv.lock pypdfium2/pdfplumber 版本变化 → Y1 锚点全部重评）或 09-21 简报窗口（全量实跑带 PYTHONIOENCODING=utf-8）；D4/P3 维持暂缓裁决（噪声准则低分），M1 维持拒绝，不为投而投。
+
+---
+
 ## Round 2051 — a 队列 P2：main PDF 表格链 find_tables→table element+locator 全链行为锁（R2050 裁决面，3 测试，main 只读）
 
 - 任务：R2050 裁决的 P2 投轮——main 13 个版本敏感面中唯一"main 代码路径 + CI 零覆盖 + 三准则全中"的未锁面。main `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（预期 SHA 开头 6c6d398 命中，`git worktree list --porcelain` 动态定位，前后 `git status --porcelain` clean）全程只读；被测 CLI 走 main venv python 真实子进程（PYTHONDONTWRITEBYTECODE=1 / PYTHONIOENCODING=utf-8，cwd=临时目录、PYTHONPATH 指向 main 根，main 零写入）；main 侧定向 pytest 加 `-p no:cacheprovider`。
