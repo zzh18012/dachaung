@@ -121,6 +121,25 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2046 — app.cli validate 子命令 CLI 信封未锁形态收尾（1b/b 队列，R2044 建议沿用，3 测试）
+
+- 任务：`app.cli validate` 的 CLI 信封残留六组形态（根类型族 / 空与空白文件 / BOM JSON / 尾随垃圾 / argparse 信封 / schema_version 边界），main 只读 @ `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（动态定位 branch=refs/heads/main worktree，运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_validate_env_r2046.py + .out（未入库，C0 + E1–E6 共 23 项已执行完毕）；子进程真实 CLI（main venv `python -m app.cli validate`），cwd=临时目录 + PYTHONPATH=main 根；手造骨架 = R2038 同款 `_udm`（markdown/line_address @0.6.0）。
+- 覆盖面（已锁跳过清单）：R2038 已锁——0.6.0 family 路由矩阵正负例 / 0.1.0–0.5.0 历史守卫 / 内置六类型双版本一致 / 0.6.0 内置缺 family / 两处 schema 错计数报文 / 非 JSON 文件 rc 1 "[FAIL]…JSON 解析失败" / 缺文件与目录 rc 2 / parse 产物 rc 0（本轮**零重复**）；main 侧 test_pipeline_integration CLI 面仅锁 parse 产物 rc 0 + legacy positional（parse 面）+ 进程内 wrong-shape 一例；BOM 覆盖（test_parsers_text_edges10 / markdown_edges12 / ipynb_edges13）全在 **parse 通道**。本轮六组形态在 validate CLI 通道全部零覆盖，无一项因 main tests 或 R2038 加测而免探。
+- **C0 对照先通过**：R2038 同款手造合法 0.6.0 骨架 → validate rc 0 [OK]（首轮即过）。
+- 发现（23 项：**成立 19 + 探针先验修正 4 + main 缺陷 0**；四处修正均非 main 行为缺陷，实态与源码链 cli→validate_only→validate_file(utf-8 文本读+json.load)→validate 逐项一致）：
+  - **E1 根类型族成立**：array（空/非空）/string/number/null/true 六根 → 全 rc 1 [FAIL] + "Schema 校验失败 (1 处)：X is not of type 'object' @ path=[]"；**空对象 {} → "Schema 校验失败 (13 处)"**——修正 1：探针先验数 14 实为 **13**（schema 根 required 恰 13 键，head 投诉 'schema_version' is a required property，无根类型投诉）。
+  - **E2 空/空白文件成立**：0 字节文件通过 is_file 门（非 rc 2 通道）→ rc 1 "JSON 解析失败: Expecting value: line 1 column 1 (char 0)"；仅空白（\n空格\t）同信封（列号指向 EOF：line 4 column 1 (char 7)）。
+  - **E3 BOM JSON 成立（修正 2：报文形态）**：utf-8-sig 前缀合法对象 → rc 1 "JSON 解析失败: **Unexpected UTF-8 BOM (decode using utf-8-sig)**: line 1 column 1 (char 0)"——json.loads 对已解码 str 中 BOM 字符的专属报文（探针先验通用 "Expecting value" 不精确，实态更优）；去 BOM 双胞胎 rc 0（内容合法对照）。**双通道对照锁定**：validate 拒 BOM（rc 1 精确指引）vs parse 收 BOM（R2043：BOM .md rc 0 且 BOM 留存 content）——同一字节前缀两通道两语义，观察记录非缺陷（parse 无 JSON 语义，行为各自自洽）。
+  - **E4 尾随垃圾成立（严格）**：合法对象 + "\ngarbage" → rc 1 "Extra data: line 2 column 1 (char 532)"；双合法对象拼接同拒——无宽松尾随容忍，json.load 严格语义。
+  - **E5 argparse 信封成立（修正 3：--help 文本内容）**：裸 CLI 无子命令 → rc 2 usage + "required: command"（subparsers required=True）；validate 缺 input → rc 2 "required: input"；多余位置参数 / 未知 flag → rc 2 "unrecognized arguments"；`validate --help` → rc 0 + usage:app.cli validate 行——修正 3：子命令自身帮助文本**不含** "Schema" 字样（"是否符合 Schema" 在父命令子命令清单里），探针先验断言过严。
+  - **E6 schema_version 边界成立（修正 4：数值型投诉数）**：缺失 → 恰 1 处 "'schema_version' is a required property" @ path=[]；空串 ""/未来版本 "0.6.1"/数值 0.6 → 全 "X is not one of ['0.1.0'..'0.6.0']（完整六版本清单）" @ path=['schema_version'] 且**均恰 1 处**——修正 4：schema_version 规格仅 enum **无 type 关键字**，数值型不另生 type 投诉（探针先验 2 处错，实态单投诉）。
+- 加测 3：`tests/test_validate_env_r2046.py`——(1) 根类型族（C0 自检前置 + 非 object 六根 rc 1 信封四断言 + 空对象 13 处 required/head 投诉/无根类型投诉）；(2) 解析期四形态（0 字节过 is_file 门走 JSON 解析失败 + 仅空白同信封 + BOM 专属报文与去 BOM 双胞胎 rc 0 对照 + 尾随垃圾/双对象拼接 Extra data 严格拒绝）；(3) argparse 信封（无参/缺 input/多余位置/未知 flag rc 2 + --help rc 0）+ schema_version 四边界（缺失 1 处 required + 三非法值 enum 单投诉含完整清单 @ path 且无 type 投诉）。被测 main 按 `git worktree list --porcelain` 动态定位（零硬编码路径，缺目标或缺 venv 显式 SKIP，绝不伪造通过）。
+- 定向：新文件 3 passed 10.11s（worktree venv）；邻居 main `test_schema_source_type_open.py` + `test_pipeline_integration.py` 合计 **60 passed 7.02s**（main venv + `-p no:cacheprovider` + PYTHONDONTWRITEBYTECODE=1，main 前后 status clean）+ 自跑 `test_batch_accounting_r2044.py` + `test_parse_edges_r2043.py` + `test_annotation_env_r2041.py` + `test_schema_routing_cli_r2038.py` 合计 12 passed 35.32s。全量不跑（加测纯子进程型）；收集数锚 **实测 102085 collected = 预测锚 102082 + 3 精确命中**（worktree venv `pytest --collect-only -q -p no:cacheprovider`，25.11s/24.03s 两次；证据 outputs/autonomous/collect_only_r2046.out 未入库）。
+- **b 队列收尾评估（本轮后 app.cli 全部子命令均有专轮）**：parse（R2043 输入/参数边界）→ validate（R2038 契约面 + R2046 信封）→ batch-parse（R2033 日志族 / R2034 后缀过滤 / R2044 三方记账）→ explain-parser / audit-parsers / inspect-parser（R2021–R2024 批次面 + 注册表专轮 R2036）——CLI 信封六组形态（根类型/空文件/BOM/尾随/argparse/版本边界）已按 parse 与 validate 两通道分别锁死，batch 通道同类形态无独立语义（输入是文件系统不是 JSON）。**结论：app.cli CLI 信封面闭合，b 队列 main 面临界耗尽**，不建议再投轮；后续方向按 R2042 盘点件（R-A 行为缺口系列）或等 main 前进（新 commit 解锁新面）。
+- 下次建议：R-A/R-I 行为缺口（引用 R2042 盘点件候选池）；**2026-09-21 周期简报窗口全量实跑**（预测 102085 + 3xN，N=其间加测轮数；重采 --durations=25 对照漂移锚点两项）；P-R2045-1（README/CLAUDE.md 用户名参数化）仍留用户裁决。
+
+---
+
 ## Round 2045 — main 侧私有路径与机密泄漏风险专项审计（1b/f，零测试新增零语料改动，R-I 系列未覆盖面）
 
 - 任务：main tracked .py/.json/.md/.yml/.toml/.cfg（224 tracked 中口径 214：186 py/17 md/9 json/1 yml/1 toml，tests/ 133 py）五维度静态扫描——绝对路径 / 用户名机具指纹 / samples/private 缺失即 SKIP 契约 / 机密形态 / 网络外呼。main 只读 @ `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（动态定位 branch=refs/heads/main worktree，前后 status clean，未跑 main pytest，samples/private 内容零读取）；rg 命中全部与 git ls-files 交叉核对，4 个未跟踪 outputs/*.json（rg 磁盘可见）出口径剔除。
