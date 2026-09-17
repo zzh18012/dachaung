@@ -153,12 +153,6 @@ def test_format_metric_bool_true_lowercase_string():
     assert "True" not in out
 
 
-def test_format_metric_bool_false_lowercase_string():
-    out = _format_metric("x", {"value": False, "reason": None})
-    assert "false" in out
-    assert "False" not in out
-
-
 def test_format_metric_str_value_uses_str_builtin():
     """str value 走 fallback → str(value) + ok。"""
     out = _format_metric("x", {"value": "hello", "reason": None})

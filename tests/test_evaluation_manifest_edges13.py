@@ -899,14 +899,6 @@ def test_module_all_exact_list():
     ]
 
 
-def test_module_all_does_not_include_internal_helpers():
-    import evaluation.manifest as m
-    assert "_is_absolute_like" not in m.__all__
-    assert "_has_backslash" not in m.__all__
-    assert "_resolve_relative_path" not in m.__all__
-    assert "_detect_project_root" not in m.__all__
-
-
 def test_module_all_size_five():
     import evaluation.manifest as m
     assert len(m.__all__) == 5

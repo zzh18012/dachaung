@@ -496,11 +496,6 @@ def test_module_source_contains_validate_report_subparser_block_batch28():
     assert '"validate-report"' in src
 
 
-def test_module_source_contains_inspect_doc_subparser_block_batch28():
-    src = inspect.getsource(climod)
-    assert '"inspect-doc"' in src
-
-
 def test_module_source_contains_reconfigure_call_batch28():
     src = inspect.getsource(climod)
     assert 'sys.stdout.reconfigure' in src

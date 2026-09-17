@@ -38,11 +38,6 @@ from evaluation.cli import _build_parser, _format_metric, _run_inspect_doc, main
 
 # ---------- _build_parser 详细属性 ----------
 
-def test_build_parser_formatter_class_batch44():
-    p = _build_parser()
-    assert p.formatter_class == argparse.RawDescriptionHelpFormatter
-
-
 def test_build_parser_has_subparser_action_batch44():
     p = _build_parser()
     # 找到 _SubParsersAction
@@ -161,11 +156,6 @@ def test_main_run_git_commit_unknown_batch44(tmp_path, capsys):
 def test_format_metric_negative_float_batch44():
     out = _format_metric("foo", {"value": -0.5, "reason": None})
     assert "-0.5000" in out
-
-
-def test_format_metric_int_zero_batch44():
-    out = _format_metric("foo", {"value": 0, "reason": None})
-    assert "0" in out
 
 
 def test_format_metric_dict_value_sorted_batch44():
@@ -512,12 +502,6 @@ def test_ast_no_classdef_in_module_body_batch44():
     tree = ast.parse(inspect.getsource(cli_mod))
     for n in tree.body:
         assert not isinstance(n, ast.ClassDef)
-
-
-def test_ast_no_async_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
 
 
 def test_ast_from_future_second_batch44():

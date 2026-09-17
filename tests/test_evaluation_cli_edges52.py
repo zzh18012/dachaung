@@ -101,13 +101,6 @@ def test_build_parser_inspect_doc_input_parsed_batch25():
     assert args.input == "/path/to/doc.json"
 
 
-def test_build_parser_inspect_doc_tolerance_chars_default_30_batch25():
-    """inspect-doc --tolerance-chars 默认 30。"""
-    p = _build_parser()
-    args = p.parse_args(["inspect-doc", "doc.json"])
-    assert args.tolerance_chars == 30
-
-
 def test_build_parser_validate_report_no_optional_flags_batch25():
     """validate-report 子命令只有 positional input（无 optional flags）。"""
     p = _build_parser()
@@ -845,11 +838,6 @@ def test_module_source_contains_validate_report_batch25():
     assert '"validate-report"' in source
 
 
-def test_module_source_contains_inspect_doc_batch25():
-    source = inspect.getsource(climod)
-    assert '"inspect-doc"' in source
-
-
 def test_module_source_contains_dest_command_batch25():
     source = inspect.getsource(climod)
     assert 'dest="command"' in source
@@ -858,12 +846,6 @@ def test_module_source_contains_dest_command_batch25():
 def test_module_source_contains_required_true_batch25():
     source = inspect.getsource(climod)
     assert "required=True" in source
-
-
-def test_module_source_contains_choices_fallback_kreuzberg_batch25():
-    source = inspect.getsource(climod)
-    assert "fallback" in source
-    assert "kreuzberg" in source
 
 
 def test_module_source_contains_default_fallback_batch25():
@@ -879,21 +861,6 @@ def test_module_source_contains_default_800_batch25():
 def test_module_source_contains_default_30_batch25():
     source = inspect.getsource(climod)
     assert "default=30" in source
-
-
-def test_module_source_contains_validate_file_call_batch25():
-    source = inspect.getsource(climod)
-    assert "validate_file(" in source
-
-
-def test_module_source_contains_load_manifest_call_batch25():
-    source = inspect.getsource(climod)
-    assert "load_manifest(" in source
-
-
-def test_module_source_contains_run_evaluation_call_batch25():
-    source = inspect.getsource(climod)
-    assert "run_evaluation(" in source
 
 
 def test_module_source_contains_get_git_provenance_call_batch25():
@@ -926,13 +893,6 @@ def test_signature_main_argv_optional_batch25():
 def test_signature_main_return_int_batch25():
     sig = inspect.signature(main)
     assert sig.return_annotation == "int"
-
-
-def test_signature_format_metric_two_args_batch25():
-    sig = inspect.signature(_format_metric)
-    params = list(sig.parameters.values())
-    assert len(params) == 2
-    assert [p.name for p in params] == ["name", "metric"]
 
 
 def test_signature_run_inspect_doc_one_arg_batch25():
@@ -991,11 +951,6 @@ def test_module_no_classes_batch25():
         if val.__module__ == climod.__name__
     ]
     assert classes == []
-
-
-def test_module_docstring_present_batch25():
-    assert climod.__doc__ is not None
-    assert len(climod.__doc__) > 0
 
 
 def test_module_docstring_mentions_subcommands_batch25():

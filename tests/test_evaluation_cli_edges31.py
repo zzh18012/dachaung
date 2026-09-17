@@ -856,11 +856,6 @@ def test_module_source_starts_with_docstring():
     assert src.lstrip().startswith(('"""', "'''"))
 
 
-def test_module_source_docstring_mentions_run():
-    src = inspect.getsource(cli_mod)
-    assert "run" in src
-
-
 def test_module_source_docstring_mentions_validate_report():
     src = inspect.getsource(cli_mod)
     assert "validate-report" in src
@@ -910,11 +905,6 @@ def test_module_source_imports_manifest():
 def test_module_source_imports_manifest_error():
     src = inspect.getsource(cli_mod)
     assert "ManifestError" in src
-
-
-def test_module_source_imports_load_manifest():
-    src = inspect.getsource(cli_mod)
-    assert "load_manifest" in src
 
 
 def test_module_source_imports_get_git_provenance():

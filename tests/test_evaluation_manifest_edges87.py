@@ -111,12 +111,6 @@ def test_devset_status_complete_passthrough_batch54(tmp_path):
 
 # ---------- __all__ 与 AST ----------
 
-def test_all_export_six_names_batch54():
-    assert manifest_mod.__all__ == [
-        "ManifestError", "Manifest", "DocumentEntry", "ExpectedFailure",
-        "load_manifest"]
-
-
 def test_ast_load_manifest_structure_batch54():
     tree = ast.parse(inspect.getsource(manifest_mod))
     fn = next(n for n in tree.body

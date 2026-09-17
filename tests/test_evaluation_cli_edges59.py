@@ -141,12 +141,6 @@ def test_format_metric_value_true_lower_batch32():
     assert "True" not in out
 
 
-def test_format_metric_value_false_lower_batch32():
-    out = _format_metric("x", {"value": False, "reason": None})
-    assert "false" in out
-    assert "False" not in out
-
-
 def test_format_metric_value_int_batch32():
     out = _format_metric("x", {"value": 42, "reason": None})
     assert "42" in out

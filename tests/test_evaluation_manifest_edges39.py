@@ -348,11 +348,6 @@ def test_document_entry_hash_consistent_with_eq_batch12():
     assert hash(d1) == hash(d2)
 
 
-def test_document_entry_repr_has_class_name_batch12():
-    d = _make_doc()
-    assert "DocumentEntry" in repr(d)
-
-
 def test_document_entry_categories_default_tuple_batch12():
     """categories 默认 tuple 类型。"""
     d = _make_doc(categories=("a", "b"))
@@ -373,12 +368,6 @@ def test_expected_failure_field_names_batch12():
         "expected_error_code",
         "source_type",
     ]
-
-
-def test_expected_failure_frozen_batch12():
-    ef = _make_ef()
-    with pytest.raises(FrozenInstanceError):
-        ef.doc_id = "new"
 
 
 def test_manifest_field_count_5_batch12():
@@ -874,22 +863,6 @@ def test_module_source_imports_validate_batch12():
 def test_module_source_has_class_manifest_error_batch12():
     source = inspect.getsource(mmod)
     assert "class ManifestError(Exception):" in source
-
-
-def test_module_source_has_dataclass_document_entry_batch12():
-    source = inspect.getsource(mmod)
-    assert "@dataclass(frozen=True)" in source
-    assert "class DocumentEntry:" in source
-
-
-def test_module_source_has_dataclass_expected_failure_batch12():
-    source = inspect.getsource(mmod)
-    assert "class ExpectedFailure:" in source
-
-
-def test_module_source_has_dataclass_manifest_batch12():
-    source = inspect.getsource(mmod)
-    assert "class Manifest:" in source
 
 
 def test_module_source_has_frozen_property_batch12():

@@ -815,11 +815,6 @@ def test_module_source_no_yield():
     assert "yield" not in src
 
 
-def test_module_source_no_async_keyword():
-    src = inspect.getsource(cli_mod)
-    assert "async " not in src
-
-
 def test_module_source_no_global_statement():
     src = inspect.getsource(cli_mod)
     assert "global " not in src
@@ -836,11 +831,6 @@ def test_module_source_no_class_definition():
 def test_module_source_no_lambda_in_module():
     src = inspect.getsource(cli_mod)
     assert "lambda " not in src
-
-
-def test_module_source_docstring_mentions_run():
-    src = inspect.getsource(cli_mod)
-    assert "run" in src
 
 
 def test_module_source_docstring_mentions_validate_report():
@@ -1335,12 +1325,6 @@ def test_e2e_run_stdout_includes_ok_marker(tmp_path, capsys):
     assert rc == 0
     captured = capsys.readouterr()
     assert "[OK]" in captured.out
-
-
-def test_e2e_unknown_subcommand_exits_2(capsys):
-    with pytest.raises(SystemExit) as ei:
-        main(["unknown"])
-    assert ei.value.code == 2
 
 
 def test_e2e_no_subcommand_exits_2(capsys):

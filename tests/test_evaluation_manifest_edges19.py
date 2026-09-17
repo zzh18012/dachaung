@@ -178,20 +178,12 @@ def test_manifest_error_is_exception_subclass():
     assert issubclass(ManifestError, Exception)
 
 
-def test_manifest_error_is_baseexception_subclass():
-    assert issubclass(ManifestError, BaseException)
-
-
 def test_manifest_error_bases_exact():
     assert ManifestError.__bases__ == (Exception,)
 
 
 def test_manifest_error_module_identity():
     assert ManifestError.__module__ == "evaluation.manifest"
-
-
-def test_manifest_error_qualname_exact():
-    assert ManifestError.__qualname__ == "ManifestError"
 
 
 def test_manifest_error_can_be_raised_and_caught():
@@ -262,10 +254,6 @@ def test_is_absolute_like_module_identity():
     assert _is_absolute_like.__module__ == "evaluation.manifest"
 
 
-def test_is_absolute_like_qualname_exact():
-    assert _is_absolute_like.__qualname__ == "_is_absolute_like"
-
-
 # =========================================================================
 # _has_backslash source-level
 # =========================================================================
@@ -287,10 +275,6 @@ def test_has_backslash_returns_bool_type():
 
 def test_has_backslash_module_identity():
     assert _has_backslash.__module__ == "evaluation.manifest"
-
-
-def test_has_backslash_qualname_exact():
-    assert _has_backslash.__qualname__ == "_has_backslash"
 
 
 # =========================================================================
@@ -388,11 +372,6 @@ def test_expected_failure_field_count_exact():
     assert len(fields(ExpectedFailure)) == 5
 
 
-def test_expected_failure_field_names_exact():
-    field_names = [f.name for f in fields(ExpectedFailure)]
-    assert field_names == ["doc_id", "path_str", "resolved_path", "expected_error_code", "source_type"]
-
-
 # =========================================================================
 # Manifest source-level
 # =========================================================================
@@ -406,11 +385,6 @@ def test_manifest_source_contains_dataclass_frozen_decorator():
 def test_manifest_source_contains_class_definition():
     src = inspect.getsource(Manifest)
     assert "class Manifest:" in src
-
-
-def test_manifest_source_contains_5_fields():
-    field_names = [f.name for f in fields(Manifest)]
-    assert field_names == ["manifest_version", "devset_status", "documents", "expected_failures", "project_root"]
 
 
 def test_manifest_source_contains_file_count_property():
@@ -844,13 +818,6 @@ def test_module_all_does_not_contain_manifest_version():
 # =========================================================================
 # namespace 详细
 # =========================================================================
-
-
-def test_module_namespace_has_manifest_version_attr():
-    import evaluation.manifest as m
-
-    assert hasattr(m, "MANIFEST_VERSION")
-    assert m.MANIFEST_VERSION == MANIFEST_VERSION
 
 
 def test_module_namespace_has_validate_attr():

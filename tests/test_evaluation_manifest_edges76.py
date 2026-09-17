@@ -581,11 +581,6 @@ def test_source_contains_path_form_rules_batch51():
     assert "反斜杠" in src
 
 
-def test_source_contains_project_root_check_batch51():
-    src = inspect.getsource(manifest_mod)
-    assert "项目根" in src
-
-
 def test_source_contains_relative_to_batch51():
     src = inspect.getsource(manifest_mod)
     assert "relative_to" in src

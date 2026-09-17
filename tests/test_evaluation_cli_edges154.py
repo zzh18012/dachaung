@@ -115,20 +115,6 @@ def test_cli_run_recovered_stdout_batch418(tmp_path, capsys):
     assert "pdf=1 docx=0" in out
 
 
-def test_cli_validate_report_batch418(tmp_path, capsys):
-    mf = _board(tmp_path)
-    rc, _ = _run_cli(capsys, [
-        "run", "--manifest", str(mf),
-        "--output", str(tmp_path / "r.json"),
-        "--parser", "fallback", "--max-chars", "60"])
-    assert rc == 0
-    rc2, out2 = _run_cli(capsys, [
-        "validate-report", str(tmp_path / "r.json")])
-    assert rc2 == 0
-    assert "[OK]" in out2
-    assert "通过" in out2
-
-
 # ---------- inspect-doc ----------
 
 def test_cli_inspect_counts_batch418(tmp_path, capsys):

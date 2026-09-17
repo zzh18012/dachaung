@@ -362,13 +362,6 @@ def test_run_inspect_doc_chunk_boundary_section_present_batch35(tmp_path, capsys
 # ---------- main 第三十五批
 
 
-def test_main_validate_report_with_corrupt_json_returns_1_batch35(tmp_path):
-    p = tmp_path / "report.json"
-    p.write_text("not json {", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
-
-
 def test_main_validate_report_with_invalid_report_content_returns_1_batch35(tmp_path):
     """合法 JSON 但不是合法报告 → 1。"""
     p = tmp_path / "report.json"
@@ -542,11 +535,6 @@ def test_module_source_contains_reconfigure_try_except_batch35():
     assert "AttributeError, OSError" in src
 
 
-def test_module_source_contains_subcommand_run_batch35():
-    src = inspect.getsource(cmod)
-    assert 'sub.add_parser("run"' in src
-
-
 def test_module_source_contains_subcommand_validate_report_batch35():
     src = inspect.getsource(cmod)
     assert "add_parser(" in src
@@ -611,11 +599,6 @@ def test_signature_format_metric_two_params_batch35():
 def test_signature_format_metric_name_str_batch35():
     sig = inspect.signature(_format_metric)
     assert sig.parameters["name"].annotation == "str"
-
-
-def test_signature_format_metric_metric_dict_batch35():
-    sig = inspect.signature(_format_metric)
-    assert sig.parameters["metric"].annotation == "dict"
 
 
 def test_signature_main_no_required_params_batch35():

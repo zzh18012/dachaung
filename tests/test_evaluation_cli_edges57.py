@@ -277,26 +277,11 @@ def test_main_inspect_doc_success_returns_0_batch30(tmp_path):
     assert rc == 0
 
 
-def test_main_inspect_doc_nonexistent_returns_2_batch30():
-    rc = main(["inspect-doc", "/nonexistent.json"])
-    assert rc == 2
-
-
-def test_main_validate_report_nonexistent_returns_2_batch30():
-    rc = main(["validate-report", "/nonexistent.json"])
-    assert rc == 2
-
-
 def test_main_validate_report_invalid_json_returns_1_batch30(tmp_path):
     p = tmp_path / "report.json"
     p.write_text("not json", encoding="utf-8")
     rc = main(["validate-report", str(p)])
     assert rc == 1
-
-
-def test_main_run_nonexistent_manifest_returns_2_batch30():
-    rc = main(["run", "--manifest", "/nonexistent.json", "--output", "/tmp/out.json"])
-    assert rc == 2
 
 
 def test_main_returns_int_for_inspect_doc_batch30(tmp_path):
@@ -357,11 +342,6 @@ def test_module_source_no_breakpoint_batch30():
 def test_module_source_no_shutil_batch30():
     src = inspect.getsource(climod)
     assert "shutil" not in src
-
-
-def test_module_source_no_requests_batch30():
-    src = inspect.getsource(climod)
-    assert "requests" not in src
 
 
 def test_module_source_no_unlink_batch30():
@@ -446,11 +426,6 @@ def test_module_source_contains_inspect_doc_branch_batch30():
 
 
 # ---------- signatures 第四十四批 ----------
-
-
-def test_signature_main_argv_annotation_batch30():
-    sig = inspect.signature(main)
-    assert "list[str] | None" in str(sig.parameters["argv"].annotation)
 
 
 def test_signature_main_return_int_batch30():

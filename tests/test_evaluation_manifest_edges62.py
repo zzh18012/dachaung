@@ -63,11 +63,6 @@ def test_document_entry_hashable_batch35():
     assert isinstance(h, int)
 
 
-def test_document_entry_field_count_10_batch35():
-    flds = fields(DocumentEntry)
-    assert len(flds) == 10
-
-
 def test_document_entry_field_names_batch35():
     flds = fields(DocumentEntry)
     names = {f.name for f in flds}

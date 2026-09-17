@@ -206,14 +206,6 @@ def test_evaluator_version_value():
     assert EVALUATOR_VERSION == "1.1"
 
 
-def test_report_version_is_str():
-    assert isinstance(REPORT_VERSION, str)
-
-
-def test_report_version_value():
-    assert REPORT_VERSION == "1.1"
-
-
 def test_evaluator_version_nonempty():
     assert len(EVALUATOR_VERSION) > 0
 

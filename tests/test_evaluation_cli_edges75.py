@@ -592,11 +592,6 @@ def test_source_contains_errors_replace_batch49():
     assert 'errors="replace"' in src
 
 
-def test_source_contains_file_stderr_batch49():
-    src = inspect.getsource(cli_mod)
-    assert "file=sys.stderr" in src
-
-
 def test_source_contains_ok_evaluation_complete_batch49():
     src = inspect.getsource(cli_mod)
     assert "[OK] 评测完成" in src
@@ -632,11 +627,6 @@ def test_source_contains_return_1_batch49():
     assert "return 1" in src
 
 
-def test_source_contains_return_2_batch49():
-    src = inspect.getsource(cli_mod)
-    assert "return 2" in src
-
-
 def test_source_contains_subparsers_required_batch49():
     src = inspect.getsource(cli_mod)
     assert 'required=True' in src
@@ -665,11 +655,6 @@ def test_ast_function_names_batch49():
 def test_ast_no_class_def_batch49():
     tree = ast.parse(inspect.getsource(cli_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_async_function_def_batch49():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
 
 
 def test_ast_module_has_docstring_batch49():
@@ -769,13 +754,6 @@ def test_ast_run_inspect_doc_has_nested_sort_key_batch49():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_run_inspect_doc")
     nested_funcs = [n for n in ast.walk(func) if isinstance(n, ast.FunctionDef)]
     assert any(nf.name == "_sort_key" for nf in nested_funcs)
-
-
-def test_ast_run_inspect_doc_has_multiple_return_batch49():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_run_inspect_doc")
-    returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
-    assert len(returns) >= 4
 
 
 def test_ast_run_inspect_doc_has_for_with_sorted_batch49():

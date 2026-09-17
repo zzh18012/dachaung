@@ -916,11 +916,6 @@ def test_module_source_contains_relative_to_batch26():
     assert "relative_to" in source
 
 
-def test_module_source_contains_resolve_call_batch26():
-    source = inspect.getsource(mmod)
-    assert ".resolve()" in source
-
-
 def test_module_source_contains_validate_call_batch26():
     source = inspect.getsource(mmod)
     assert "validate(" in source

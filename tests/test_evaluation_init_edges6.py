@@ -170,10 +170,6 @@ def test_versions_string_concat_batch46():
     assert EVALUATOR_VERSION + REPORT_VERSION == "1.11.1"
 
 
-def test_versions_string_multiply_batch46():
-    assert EVALUATOR_VERSION * 2 == "1.11.1"
-
-
 def test_versions_format_batch46():
     assert f"v{EVALUATOR_VERSION}" == "v1.1"
 
@@ -411,12 +407,6 @@ def test_ast_no_imports_batch46():
         assert not isinstance(n, (ast.Import, ast.ImportFrom))
 
 
-def test_ast_no_class_def_batch46():
-    tree = ast.parse(inspect.getsource(evaluation))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_no_function_def_batch46():
     tree = ast.parse(inspect.getsource(evaluation))
     for n in tree.body:
@@ -474,26 +464,6 @@ def test_source_no_yaml_load_batch46():
 def test_source_no_pickle_load_batch46():
     src = inspect.getsource(evaluation)
     assert "pickle.load(" not in src
-
-
-def test_source_no_lambda_batch46():
-    src = inspect.getsource(evaluation)
-    assert "lambda" not in src
-
-
-def test_source_no_yield_batch46():
-    src = inspect.getsource(evaluation)
-    assert "yield" not in src
-
-
-def test_source_no_walrus_batch46():
-    src = inspect.getsource(evaluation)
-    assert ":=" not in src
-
-
-def test_source_no_async_batch46():
-    src = inspect.getsource(evaluation)
-    assert "async " not in src
 
 
 def test_source_no_await_batch46():

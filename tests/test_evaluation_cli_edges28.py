@@ -243,11 +243,6 @@ def test_format_metric_dict_value_joined_by_comma():
     assert "a=1, b=2" in out
 
 
-def test_format_metric_fallback_str_value():
-    out = _format_metric("foo", {"value": "hello", "reason": None})
-    assert "hello" in out
-
-
 def test_format_metric_fallback_list_value():
     out = _format_metric("foo", {"value": [1, 2, 3], "reason": None})
     assert "[1, 2, 3]" in out
@@ -262,11 +257,6 @@ def test_format_metric_with_reason_overrides_ok():
     out = _format_metric("foo", {"value": 1, "reason": "specific_reason"})
     assert "specific_reason" in out
     assert "ok" not in out
-
-
-def test_format_metric_no_reason_falls_back_to_ok_for_float():
-    out = _format_metric("foo", {"value": 0.5, "reason": None})
-    assert "ok" in out
 
 
 def test_format_metric_no_reason_falls_back_to_ok_for_bool():
@@ -641,14 +631,6 @@ def test_module_source_main_calls_run_evaluation():
 def test_module_source_main_calls_validate_file():
     src = inspect.getsource(main)
     assert 'validate_file(output_path, "evaluation-report.schema.json")' in src
-
-
-def test_module_source_main_returns_0_for_run_success():
-    src = inspect.getsource(main)
-    # 多个 return 0 / return 1 / return 2
-    assert "return 0" in src
-    assert "return 1" in src
-    assert "return 2" in src
 
 
 def test_module_source_format_metric_uses_get_method():

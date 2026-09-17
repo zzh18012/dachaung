@@ -139,13 +139,6 @@ def test_build_parser_inspect_doc_positional_input_batch24():
     assert args.input == "doc.json"
 
 
-def test_build_parser_inspect_doc_tolerance_default_30_batch24():
-    """inspect-doc --tolerance-chars 默认 30。"""
-    p = _build_parser()
-    args = p.parse_args(["inspect-doc", "doc.json"])
-    assert args.tolerance_chars == 30
-
-
 def test_build_parser_inspect_doc_tolerance_custom_batch24():
     """inspect-doc --tolerance-chars 可自定义。"""
     p = _build_parser()

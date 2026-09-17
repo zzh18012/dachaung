@@ -582,12 +582,6 @@ def test_build_parser_unknown_command_fails():
         p.parse_args(["frobnicate"])
 
 
-def test_build_parser_run_missing_manifest_fails():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--output", "o.json"])
-
-
 def test_build_parser_run_missing_output_fails():
     p = _build_parser()
     with pytest.raises(SystemExit):

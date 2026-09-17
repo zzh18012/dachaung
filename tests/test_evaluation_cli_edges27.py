@@ -301,11 +301,6 @@ def test_format_metric_with_long_name_over_36_chars():
     assert name in out
 
 
-def test_format_metric_returns_str():
-    out = _format_metric("x", {"value": 1, "reason": None})
-    assert isinstance(out, str)
-
-
 def test_format_metric_starts_with_2_space_indent():
     out = _format_metric("x", {"value": 1, "reason": None})
     assert out.startswith("  ")
@@ -553,13 +548,6 @@ def test_main_inspect_doc_returns_1_when_array_top_level(tmp_path, capsys):
     assert rc == 1
 
 
-def test_main_inspect_doc_returns_0_for_valid_doc(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps({"source_type": "pdf", "elements": [], "chunks": []}), encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-
-
 def test_main_inspect_doc_with_custom_tolerance(tmp_path, capsys):
     p = tmp_path / "doc.json"
     p.write_text(json.dumps({"source_type": "pdf", "elements": [], "chunks": []}), encoding="utf-8")
@@ -713,12 +701,6 @@ def test_module_source_has_evaluation_imports():
     assert "from evaluation.schema import EvalSchemaError, validate_file" in src
 
 
-def test_module_source_has_main_block():
-    src = inspect.getsource(m)
-    assert 'if __name__ == "__main__":' in src
-    assert "raise SystemExit(main())" in src
-
-
 def test_module_source_has_sys_stdout_reconfigure():
     src = inspect.getsource(m)
     assert "sys.stdout.reconfigure" in src
@@ -842,10 +824,6 @@ def test_namespace_format_metric():
 
 def test_namespace_run_inspect_doc():
     assert _run_inspect_doc.__module__ == "evaluation.cli"
-
-
-def test_namespace_module():
-    assert m.__name__ == "evaluation.cli"
 
 
 # ---------- 模块整体合理性 ----------

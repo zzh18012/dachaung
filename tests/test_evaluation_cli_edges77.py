@@ -57,15 +57,6 @@ def test_build_parser_run_default_tolerance_30_batch52():
     assert args.tolerance_chars == 30
 
 
-def test_build_parser_run_custom_tolerance_batch52():
-    p = _build_parser()
-    args = p.parse_args([
-        "run", "--manifest", "m.json", "--output", "o.json",
-        "--tolerance-chars", "50",
-    ])
-    assert args.tolerance_chars == 50
-
-
 def test_build_parser_inspect_doc_default_tolerance_30_batch52():
     p = _build_parser()
     args = p.parse_args(["inspect-doc", "doc.json"])
@@ -473,11 +464,6 @@ def test_format_metric_float_format_4_digits_batch52():
     assert "0.1235" in out  # 4 位小数
 
 
-def test_format_metric_float_zero_batch52():
-    out = _format_metric("ratio", {"value": 0.0, "reason": None})
-    assert "0.0000" in out
-
-
 # ---------- _run_inspect_doc _sort_key 行为 ----------
 
 def test_run_inspect_doc_null_metrics_last_batch52(capsys, tmp_path):
@@ -557,19 +543,9 @@ def test_source_main_returns_int_batch52():
     assert "def main(argv: list[str] | None = None) -> int:" in src
 
 
-def test_source_has_run_inspect_doc_nested_sort_key_batch52():
-    src = inspect.getsource(cli_mod)
-    assert "_sort_key" in src
-
-
 def test_source_has_sorted_call_batch52():
     src = inspect.getsource(cli_mod)
     assert "sorted(metrics.keys()" in src
-
-
-def test_source_has_subparsers_dest_command_batch52():
-    src = inspect.getsource(cli_mod)
-    assert 'dest="command"' in src
 
 
 def test_source_has_required_true_batch52():
@@ -642,11 +618,6 @@ def test_ast_function_names_order_batch52():
 def test_ast_no_class_def_batch52():
     tree = ast.parse(inspect.getsource(cli_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_async_function_def_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
 
 
 def test_ast_2_module_level_if_batch52():
@@ -788,24 +759,6 @@ def test_ast_format_metric_has_joined_str_batch52():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_format_metric")
     joined = [n for n in ast.walk(func) if isinstance(n, ast.JoinedStr)]
     assert len(joined) >= 1
-
-
-def test_ast_no_star_import_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    for n in tree.body:
-        if isinstance(n, ast.ImportFrom):
-            for alias in n.names:
-                assert alias.name != "*"
-
-
-def test_ast_no_global_nonlocal_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
-
-
-def test_ast_no_while_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert not any(isinstance(n, ast.While) for n in ast.walk(tree))
 
 
 # ---------- forbidden tokens 第一百四十九批 ----------

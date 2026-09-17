@@ -314,21 +314,6 @@ def test_document_entry_default_paired_with_none_batch41():
     assert e.paired_with is None
 
 
-def test_document_entry_default_annotation_file_str_none_batch41():
-    e = _make_doc_entry()
-    assert e.annotation_file_str is None
-
-
-def test_document_entry_default_annotation_resolved_none_batch41():
-    e = _make_doc_entry()
-    assert e.annotation_resolved is None
-
-
-def test_document_entry_default_expectations_none_batch41():
-    e = _make_doc_entry()
-    assert e.expectations is None
-
-
 def test_document_entry_with_sha256_batch41():
     e = _make_doc_entry(sha256="abc123")
     assert e.sha256 == "abc123"
@@ -378,12 +363,6 @@ def test_document_entry_frozen_assign_sha256_batch41():
     e = _make_doc_entry()
     with pytest.raises(FrozenInstanceError):
         e.sha256 = "x"  # type: ignore[misc]
-
-
-def test_document_entry_equality_batch41():
-    e1 = _make_doc_entry()
-    e2 = _make_doc_entry()
-    assert e1 == e2
 
 
 def test_document_entry_inequality_different_doc_id_batch41():
@@ -462,11 +441,6 @@ def test_expected_failure_hash_batch41():
     assert hash(ef1) == hash(ef2)
 
 
-def test_expected_failure_repr_batch41():
-    ef = _make_expected_failure()
-    assert "ExpectedFailure" in repr(ef)
-
-
 # ---------- Manifest 第四十一批
 
 
@@ -495,11 +469,6 @@ def test_manifest_pdf_count_empty_batch41():
 def test_manifest_docx_count_empty_batch41():
     m = _make_manifest()
     assert m.docx_count == 0
-
-
-def test_manifest_content_group_count_empty_batch41():
-    m = _make_manifest()
-    assert m.content_group_count == 0
 
 
 def test_manifest_categories_covered_empty_batch41():

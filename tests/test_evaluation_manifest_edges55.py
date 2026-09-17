@@ -600,12 +600,6 @@ def test_document_entry_init_has_10_params_batch28():
     assert len(fields) == 10
 
 
-def test_expected_failure_init_has_5_params_batch28():
-    import dataclasses
-    fields = dataclasses.fields(ExpectedFailure)
-    assert len(fields) == 5
-
-
 # ---------- module 合理性第四十一批 ----------
 
 

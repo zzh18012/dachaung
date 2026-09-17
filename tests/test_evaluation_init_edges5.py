@@ -110,10 +110,6 @@ def test_dir_contains_all_four_batch45():
         assert n in names
 
 
-def test_dir_contains_all_batch45():
-    assert "__all__" in dir(evaluation)
-
-
 def test_vars_contains_all_four_batch45():
     v = vars(evaluation)
     for n in ("EVALUATOR_VERSION", "REPORT_VERSION", "ANNOTATION_VERSION", "MANIFEST_VERSION"):
@@ -213,10 +209,6 @@ def test_manifest_version_one_dot_batch45():
     assert MANIFEST_VERSION.count(".") == 1
 
 
-def test_evaluator_version_starts_with_digit_batch45():
-    assert EVALUATOR_VERSION[0].isdigit()
-
-
 def test_evaluator_version_ends_with_digit_batch45():
     assert EVALUATOR_VERSION[-1].isdigit()
 
@@ -241,11 +233,6 @@ def test_evaluator_version_no_hex_letters_batch45():
     """版本字符串不包含 a-f。"""
     for c in EVALUATOR_VERSION.lower():
         assert c not in "abcdef"
-
-
-def test_evaluator_version_split_dot_batch45():
-    parts = EVALUATOR_VERSION.split(".")
-    assert parts == ["1", "1"]
 
 
 def test_annotation_version_split_dot_batch45():

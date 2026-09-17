@@ -32,11 +32,6 @@ from evaluation.manifest import (
 # ---------- ManifestError 第三十二批 ----------
 
 
-def test_manifest_error_inherits_exception_batch32():
-    e = ManifestError("msg")
-    assert isinstance(e, Exception)
-
-
 def test_manifest_error_str_batch32():
     e = ManifestError("boom")
     assert str(e) == "boom"

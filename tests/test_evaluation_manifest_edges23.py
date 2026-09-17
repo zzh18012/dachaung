@@ -600,15 +600,6 @@ def test_content_group_count_mixed_paired_unpaired():
 # =========================================================================
 
 
-def test_categories_covered_empty():
-    m = Manifest(
-        manifest_version="1.0", devset_status="incomplete",
-        documents=(), expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    assert m.categories_covered == []
-
-
 def test_categories_covered_single_doc_multi_categories():
     de = DocumentEntry(
         doc_id="d1", path_str="x.pdf", resolved_path=Path("/tmp/x.pdf"),
@@ -859,13 +850,6 @@ def test_resolve_relative_path_chinese_path(tmp_path):
     assert isinstance(out, Path)
 
 
-def test_resolve_relative_path_signature_3_params():
-    sig = inspect.signature(_resolve_relative_path)
-    params = list(sig.parameters.values())
-    assert len(params) == 3
-    assert [p.name for p in params] == ["path_str", "project_root", "field_name"]
-
-
 def test_resolve_relative_path_no_varargs_varkw():
     sig = inspect.signature(_resolve_relative_path)
     for p in sig.parameters.values():
@@ -1079,11 +1063,6 @@ def test_manifest_error_can_raise_and_catch():
 def test_manifest_error_str_returns_message():
     e = ManifestError("my message")
     assert str(e) == "my message"
-
-
-def test_manifest_error_repr_contains_class_name():
-    e = ManifestError("msg")
-    assert "ManifestError" in repr(e)
 
 
 def test_manifest_error_args_contains_message():
@@ -1455,11 +1434,6 @@ def test_load_manifest_source_calls_validate():
 def test_load_manifest_source_compares_manifest_version():
     src = inspect.getsource(load_manifest)
     assert "MANIFEST_VERSION" in src
-
-
-def test_load_manifest_source_returns_manifest():
-    src = inspect.getsource(load_manifest)
-    assert "return Manifest(" in src
 
 
 def test_detect_project_root_source_uses_pyproject_toml():

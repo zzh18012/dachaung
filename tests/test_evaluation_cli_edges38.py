@@ -205,16 +205,6 @@ def test_namespace_run_field_order_batch11():
     assert keys[0] == "command"
 
 
-def test_namespace_validate_report_only_two_fields_batch11():
-    ns = _build_parser().parse_args(["validate-report", "a.json"])
-    assert len(vars(ns)) == 2
-
-
-def test_namespace_inspect_doc_three_fields_batch11():
-    ns = _build_parser().parse_args(["inspect-doc", "a.json"])
-    assert len(vars(ns)) == 3
-
-
 def test_namespace_max_chars_input_str_coerced_to_int_batch11():
     ns = _build_parser().parse_args(
         ["run", "--manifest", "a.json", "--output", "b.json", "--max-chars", "999"]
@@ -628,24 +618,9 @@ def test_cli_source_no_async_def_batch11():
     assert "async def" not in source
 
 
-def test_cli_source_no_yield_batch11():
-    source = inspect.getsource(climod)
-    assert "yield" not in source
-
-
 def test_cli_source_no_walrus_batch11():
     source = inspect.getsource(climod)
     assert ":=" not in source
-
-
-def test_cli_source_no_top_level_lambda_batch11():
-    source = inspect.getsource(climod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
 
 
 def test_cli_source_no_socket_batch11():
@@ -745,11 +720,6 @@ def test_module_source_has_subcommand_validate_report_batch11():
     assert "add_parser" in source
 
 
-def test_module_source_has_subcommand_inspect_doc_batch11():
-    source = inspect.getsource(climod)
-    assert '"inspect-doc"' in source
-
-
 def test_module_source_has_main_block_batch11():
     source = inspect.getsource(climod)
     assert 'if __name__' in source
@@ -788,12 +758,6 @@ def test_signature_main_1_param_batch11():
 def test_signature_main_param_name_batch11():
     sig = inspect.signature(main)
     assert list(sig.parameters) == ["argv"]
-
-
-def test_signature_main_param_default_none_batch11():
-    sig = inspect.signature(main)
-    p = list(sig.parameters.values())[0]
-    assert p.default is None
 
 
 def test_signature_main_param_kind_batch11():

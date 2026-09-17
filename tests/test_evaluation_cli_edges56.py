@@ -368,13 +368,6 @@ def test_main_inspect_doc_nonexistent_returns_2_batch29(capsys):
     assert rc == 2
 
 
-def test_main_inspect_doc_invalid_json_returns_1_batch29(tmp_path):
-    p = tmp_path / "doc.json"
-    p.write_text("not json", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 1
-
-
 def test_main_validate_report_nonexistent_returns_2_batch29():
     rc = main(["validate-report", "/nonexistent.json"])
     assert rc == 2
@@ -507,21 +500,6 @@ def test_module_source_contains_argparse_import_batch29():
 def test_module_source_contains_sys_import_batch29():
     src = inspect.getsource(climod)
     assert "import sys" in src
-
-
-def test_module_source_contains_load_manifest_import_batch29():
-    src = inspect.getsource(climod)
-    assert "from evaluation.manifest import" in src
-
-
-def test_module_source_contains_run_evaluation_import_batch29():
-    src = inspect.getsource(climod)
-    assert "from evaluation.runner import" in src
-
-
-def test_module_source_contains_validate_file_import_batch29():
-    src = inspect.getsource(climod)
-    assert "from evaluation.schema import" in src
 
 
 def test_module_source_contains_subparsers_required_batch29():

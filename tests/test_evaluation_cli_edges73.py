@@ -514,11 +514,6 @@ def test_source_contains_reconfigure_call_batch48():
     assert "reconfigure" in src
 
 
-def test_source_contains_subparsers_batch48():
-    src = inspect.getsource(cli_mod)
-    assert "add_subparsers" in src
-
-
 def test_source_contains_required_true_batch48():
     """subparsers required=True。"""
     src = inspect.getsource(cli_mod)
@@ -529,16 +524,6 @@ def test_source_contains_choices_batch48():
     """--parser 用 choices 限定。"""
     src = inspect.getsource(cli_mod)
     assert "choices" in src
-
-
-def test_source_contains_manifest_error_import_batch48():
-    src = inspect.getsource(cli_mod)
-    assert "ManifestError" in src
-
-
-def test_source_contains_eval_schema_error_import_batch48():
-    src = inspect.getsource(cli_mod)
-    assert "EvalSchemaError" in src
 
 
 def test_source_contains_validate_file_import_batch48():

@@ -807,11 +807,6 @@ def test_module_source_no_csv_import():
     assert "import csv" not in src
 
 
-def test_module_source_no_pickle_import():
-    src = inspect.getsource(mmod)
-    assert "import pickle" not in src
-
-
 def test_module_source_no_sqlite3_import():
     src = inspect.getsource(mmod)
     assert "import sqlite3" not in src

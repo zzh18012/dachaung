@@ -152,12 +152,6 @@ def test_format_metric_none_value_batch15():
     assert "no_data" in out
 
 
-def test_format_metric_true_value_batch15():
-    out = _format_metric("x", {"value": True, "reason": None})
-    assert "true" in out
-    assert "ok" in out
-
-
 def test_format_metric_false_value_batch15():
     out = _format_metric("x", {"value": False, "reason": None})
     assert "false" in out
@@ -400,40 +394,6 @@ def test_module_source_future_annotations_present_batch15():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_argparse_batch15():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import argparse" in head
-
-
-def test_module_source_imports_json_batch15():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import json" in head
-
-
-def test_module_source_imports_sys_batch15():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import sys" in head
-
-
-def test_module_source_imports_pathlib_path_batch15():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from pathlib import Path" in head
-
-
-def test_module_source_defines_build_parser_batch15():
-    source = inspect.getsource(climod)
-    assert "def _build_parser(" in source
-
-
-def test_module_source_defines_main_batch15():
-    source = inspect.getsource(climod)
-    assert "def main(" in source
-
-
 def test_module_source_defines_format_metric_batch15():
     source = inspect.getsource(climod)
     assert "def _format_metric(" in source
@@ -454,21 +414,6 @@ def test_module_source_has_sys_exit_call_batch15():
     assert "SystemExit" in source or "sys.exit" in source
 
 
-def test_module_source_uses_load_manifest_batch15():
-    source = inspect.getsource(climod)
-    assert "load_manifest(" in source
-
-
-def test_module_source_uses_validate_file_batch15():
-    source = inspect.getsource(climod)
-    assert "validate_file(" in source
-
-
-def test_module_source_uses_run_evaluation_batch15():
-    source = inspect.getsource(climod)
-    assert "run_evaluation(" in source
-
-
 def test_module_source_has_run_subcommand_string_batch15():
     source = inspect.getsource(climod)
     assert '"run"' in source or "'run'" in source
@@ -487,12 +432,6 @@ def test_module_source_has_inspect_doc_subcommand_string_batch15():
 def test_module_source_has_subparsers_required_batch15():
     source = inspect.getsource(climod)
     assert "required=True" in source
-
-
-def test_module_source_has_choices_tuple_batch15():
-    source = inspect.getsource(climod)
-    assert "fallback" in source
-    assert "kreuzberg" in source
 
 
 def test_module_source_no_subprocess_import_batch15():
@@ -564,10 +503,6 @@ def test_module_dunder_file_cli_py_batch15():
 
 def test_module_name_evaluation_cli_batch15():
     assert climod.__name__ == "evaluation.cli"
-
-
-def test_module_has_main_callable_batch15():
-    assert callable(climod.main)
 
 
 def test_module_has_build_parser_callable_batch15():

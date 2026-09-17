@@ -61,11 +61,6 @@ def test_build_parser_source_description_present():
     assert "description=" in src
 
 
-def test_build_parser_source_formatter_class():
-    src = inspect.getsource(_build_parser)
-    assert "RawDescriptionHelpFormatter" in src
-
-
 def test_build_parser_source_add_subparsers():
     src = inspect.getsource(_build_parser)
     assert ".add_subparsers(" in src
@@ -114,11 +109,6 @@ def test_build_parser_source_tolerance_chars_default_30():
     assert "default=30" in src
 
 
-def test_build_parser_source_type_int_for_max_chars():
-    src = inspect.getsource(_build_parser)
-    assert "type=int" in src
-
-
 def test_build_parser_source_required_manifest():
     src = inspect.getsource(_build_parser)
     assert '"--manifest", required=True' in src
@@ -156,14 +146,6 @@ def test_build_parser_source_no_os_system():
 def test_main_source_starts_with_def():
     src = inspect.getsource(main)
     assert src.lstrip().startswith("def main(")
-
-
-def test_main_source_returns_int():
-    src = inspect.getsource(main)
-    # 多处 return 0/1/2
-    assert "return 0" in src
-    assert "return 1" in src
-    assert "return 2" in src
 
 
 def test_main_source_uses_build_parser():
@@ -224,16 +206,6 @@ def test_main_source_catches_manifest_error():
 def test_main_source_catches_eval_schema_error():
     src = inspect.getsource(main)
     assert "EvalSchemaError" in src
-
-
-def test_main_source_catches_json_decode_error():
-    src = inspect.getsource(main)
-    assert "json.JSONDecodeError" in src
-
-
-def test_main_source_catches_file_not_found_error():
-    src = inspect.getsource(main)
-    assert "FileNotFoundError" in src
 
 
 def test_main_source_uses_manifest_project_root():
@@ -369,11 +341,6 @@ def test_format_metric_source_str_lower_for_bool():
     assert ".lower()" in src or "str(value).lower" in src
 
 
-def test_format_metric_source_float_format_4f():
-    src = inspect.getsource(_format_metric)
-    assert ":.4f" in src
-
-
 def test_format_metric_source_name_padding():
     src = inspect.getsource(_format_metric)
     assert "{name:36}" in src or ":36" in src
@@ -430,11 +397,6 @@ def test_run_inspect_doc_source_imports_chunk_boundary_prf():
 def test_run_inspect_doc_source_imports_figure_caption_prf():
     src = inspect.getsource(_run_inspect_doc)
     assert "figure_caption_prf" in src
-
-
-def test_run_inspect_doc_source_imports_compute_automatic_metrics():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "compute_automatic_metrics" in src
 
 
 def test_run_inspect_doc_source_uses_path_args_input():
@@ -718,16 +680,6 @@ def test_main_unknown_command_returns_2():
         main(["unknown-command"])
 
 
-def test_main_validate_report_nonexistent_returns_2(tmp_path):
-    rc = main(["validate-report", str(tmp_path / "nope.json")])
-    assert rc == 2
-
-
-def test_main_inspect_doc_nonexistent_returns_2(tmp_path):
-    rc = main(["inspect-doc", str(tmp_path / "nope.json")])
-    assert rc == 2
-
-
 def test_main_inspect_doc_invalid_json_returns_1(tmp_path):
     f = tmp_path / "bad.json"
     f.write_text("{not json", encoding="utf-8")
@@ -913,11 +865,6 @@ def test_cli_source_4_evaluation_imports():
 def test_cli_source_no_relative_import_above_eval():
     src = inspect.getsource(cli_mod)
     assert "from .." not in src
-
-
-def test_cli_source_no_star_import():
-    src = inspect.getsource(cli_mod)
-    assert "import *" not in src
 
 
 def test_cli_source_no_yield():

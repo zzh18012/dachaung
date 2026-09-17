@@ -52,12 +52,6 @@ def test_build_parser_subparser_dest_command_batch14():
     assert sub_actions[0].dest == "command"
 
 
-def test_build_parser_subparser_required_true_batch14():
-    p = _build_parser()
-    sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
-    assert sub_actions[0].required is True
-
-
 def test_build_parser_subcommands_count_3_batch14():
     """3 个子命令：run, validate-report, inspect-doc。"""
     p = _build_parser()
@@ -209,11 +203,6 @@ def test_format_metric_dict_value_with_none_inner_batch14():
     """dict value 内含 None → str(None) = 'None'。"""
     out = _format_metric("d", {"value": {"k": None}, "reason": "ok"})
     assert "k=None" in out
-
-
-def test_format_metric_returns_str_batch14():
-    out = _format_metric("x", {"value": 1, "reason": "ok"})
-    assert isinstance(out, str)
 
 
 # ---------- _run_inspect_doc 边界深度第十四批 ----------
@@ -446,30 +435,6 @@ def test_module_source_future_annotations_present_batch14():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_argparse_batch14():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import argparse" in head
-
-
-def test_module_source_imports_json_batch14():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import json" in head
-
-
-def test_module_source_imports_sys_batch14():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import sys" in head
-
-
-def test_module_source_imports_pathlib_path_batch14():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from pathlib import Path" in head
-
-
 def test_module_source_imports_manifest_helpers_batch14():
     source = inspect.getsource(climod)
     head = "\n".join(source.split("\n")[:40])
@@ -494,16 +459,6 @@ def test_module_source_imports_schema_batch14():
     assert "from evaluation.schema import EvalSchemaError, validate_file" in head
 
 
-def test_module_source_defines_build_parser_batch14():
-    source = inspect.getsource(climod)
-    assert "def _build_parser(" in source
-
-
-def test_module_source_defines_main_batch14():
-    source = inspect.getsource(climod)
-    assert "def main(" in source
-
-
 def test_module_source_defines_format_metric_batch14():
     source = inspect.getsource(climod)
     assert "def _format_metric(" in source
@@ -512,11 +467,6 @@ def test_module_source_defines_format_metric_batch14():
 def test_module_source_defines_run_inspect_doc_batch14():
     source = inspect.getsource(climod)
     assert "def _run_inspect_doc(" in source
-
-
-def test_module_source_has_subparsers_batch14():
-    source = inspect.getsource(climod)
-    assert "add_subparsers" in source
 
 
 def test_module_source_has_required_true_batch14():

@@ -593,17 +593,6 @@ def test_manifest_pdf_count_batch44():
     assert m.docx_count == 1
 
 
-def test_manifest_categories_covered_empty_batch44():
-    m = Manifest(
-        manifest_version="1.0",
-        devset_status="incomplete",
-        documents=(),
-        expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    assert m.categories_covered == []
-
-
 def test_manifest_content_group_count_no_paired_batch44():
     de1 = DocumentEntry(
         doc_id="d1", path_str="d1.pdf", resolved_path=Path("/tmp/d1.pdf"),

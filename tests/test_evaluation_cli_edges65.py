@@ -147,11 +147,6 @@ def test_format_metric_negative_int_value_batch38():
     assert "-3" in out
 
 
-def test_format_metric_float_zero_batch38():
-    out = _format_metric("ratio", {"value": 0.0, "reason": None})
-    assert "0.0000" in out
-
-
 def test_format_metric_float_one_third_batch38():
     out = _format_metric("ratio", {"value": 1 / 3, "reason": None})
     assert "0.3333" in out
@@ -642,11 +637,6 @@ def test_module_source_contains_utf8_reconfigure_batch38():
     """Windows 控制台 utf-8 重新配置。"""
     src = inspect.getsource(cmod)
     assert "reconfigure" in src
-
-
-def test_module_source_contains_evaluator_cli_prog_batch38():
-    src = inspect.getsource(cmod)
-    assert 'prog="evaluation.cli"' in src
 
 
 # ---------- signatures 第五十七批

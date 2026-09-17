@@ -87,10 +87,6 @@ def test_is_absolute_like_three_chars_with_slash_batch16():
     assert _is_absolute_like("C:/") is True
 
 
-def test_is_absolute_like_three_chars_with_backslash_batch16():
-    assert _is_absolute_like("C:\\") is True
-
-
 # ---------- _has_backslash 边界第十六批 ----------
 
 
@@ -862,10 +858,6 @@ def test_e2e_manifest_hash_with_complex_data_batch16(tmp_path):
     m1 = load_manifest(p, project_root=tmp_path)
     m2 = load_manifest(p, project_root=tmp_path)
     assert hash(m1) == hash(m2)
-
-
-def test_e2e_manifest_version_constant_value_batch16():
-    assert MANIFEST_VERSION == "1.0"
 
 
 def test_e2e_manifest_in_dict_key_works_batch16(tmp_path):

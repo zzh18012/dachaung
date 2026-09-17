@@ -78,13 +78,6 @@ def test_build_parser_has_three_subcommands():
     pytest.fail("no subparsers found")
 
 
-def test_build_parser_run_manifest_required_true():
-    p = _build_parser()
-    # 用 parse_args 验证 required
-    with pytest.raises(SystemExit):
-        p.parse_args(["run"])
-
-
 def test_build_parser_run_output_required_true():
     p = _build_parser()
     with pytest.raises(SystemExit):
@@ -579,21 +572,6 @@ def test_main_inspect_doc_returns_zero(tmp_path, capsys):
     assert rc == 0
 
 
-def test_main_inspect_doc_missing_returns_2(tmp_path):
-    rc = main(["inspect-doc", str(tmp_path / "nope.json")])
-    assert rc == 2
-
-
-def test_main_validate_report_missing_returns_2(tmp_path):
-    rc = main(["validate-report", str(tmp_path / "nope.json")])
-    assert rc == 2
-
-
-def test_main_validate_report_directory_returns_2(tmp_path):
-    rc = main(["validate-report", str(tmp_path)])
-    assert rc == 2
-
-
 def test_main_validate_report_invalid_json_returns_1(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("{not json", encoding="utf-8")
@@ -645,13 +623,6 @@ def test_main_inspect_doc_non_dict_returns_1(tmp_path):
     p.write_text("[1, 2]", encoding="utf-8")
     rc = main(["inspect-doc", str(p)])
     assert rc == 1
-
-
-def test_main_inspect_doc_empty_dict_returns_0(tmp_path):
-    p = tmp_path / "empty.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
 
 
 # =========================================================================

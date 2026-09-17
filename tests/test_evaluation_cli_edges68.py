@@ -231,19 +231,9 @@ def test_format_metric_true_value_batch41():
     assert "ok" in out
 
 
-def test_format_metric_false_value_batch41():
-    out = _format_metric("foo", {"value": False, "reason": None})
-    assert "false" in out
-
-
 def test_format_metric_int_value_batch41():
     out = _format_metric("foo", {"value": 42, "reason": None})
     assert "42" in out
-
-
-def test_format_metric_zero_int_batch41():
-    out = _format_metric("foo", {"value": 0, "reason": None})
-    assert "0" in out
 
 
 def test_format_metric_negative_int_batch41():
@@ -299,11 +289,6 @@ def test_format_metric_long_name_batch41():
     assert name in out
 
 
-def test_format_metric_returns_str_batch41():
-    out = _format_metric("x", {"value": 1, "reason": None})
-    assert isinstance(out, str)
-
-
 def test_format_metric_alignment_36_batch41():
     """name 占 36 字符宽（左对齐）。"""
     out = _format_metric("foo", {"value": 1, "reason": None})
@@ -340,14 +325,6 @@ def test_run_inspect_doc_signature_batch41():
 def test_run_inspect_doc_return_annotation_int_batch41():
     sig = inspect.signature(_run_inspect_doc)
     assert "int" in str(sig.return_annotation)
-
-
-def test_run_inspect_doc_missing_file_rc_2_batch41(tmp_path):
-    args = MagicMock()
-    args.input = str(tmp_path / "missing.json")
-    args.tolerance_chars = 30
-    rc = _run_inspect_doc(args)
-    assert rc == 2
 
 
 def test_run_inspect_doc_invalid_json_rc_1_batch41(tmp_path):
@@ -566,13 +543,6 @@ def test_main_validate_report_missing_rc_2_batch41(tmp_path):
 def test_main_inspect_doc_missing_rc_2_batch41(tmp_path):
     rc = main(["inspect-doc", str(tmp_path / "missing.json")])
     assert rc == 2
-
-
-def test_main_validate_report_invalid_json_rc_1_batch41(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{invalid", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
 
 
 def test_main_inspect_doc_invalid_json_rc_1_batch41(tmp_path):

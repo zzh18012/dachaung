@@ -199,14 +199,6 @@ def test_cli_inspect_tolerance_line_batch430(tmp_path, capsys):
             "30  (ok)") in out
 
 
-def test_cli_inspect_boundary_null_batch430(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("chunk_boundary_f1                    "
-            "null  (no_annotation)") in out
-
-
 def test_cli_inspect_multiset_batch430(tmp_path, capsys):
     docp = _doc(tmp_path)
     rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
@@ -215,14 +207,6 @@ def test_cli_inspect_multiset_batch430(tmp_path, capsys):
             "1.0000  (ok)") in out
     assert ("text_char_multiset_recall            "
             "1.0000  (ok)") in out
-
-
-def test_cli_inspect_total_batch430(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("element_count_total                  "
-            "1  (ok)") in out
 
 
 # ---------- 源码补强 ----------

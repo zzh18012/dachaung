@@ -299,11 +299,6 @@ def test_format_metric_returns_str():
     assert isinstance(out, str)
 
 
-def test_format_metric_signature():
-    sig = inspect.signature(_format_metric)
-    assert set(sig.parameters) == {"name", "metric"}
-
-
 def test_format_metric_name_annotation_str():
     sig = inspect.signature(_format_metric)
     assert "str" in str(sig.parameters["name"].annotation)
@@ -448,13 +443,6 @@ def test_main_inspect_doc_top_level_list_returns_1(tmp_path: Path):
     p.write_text("[1, 2, 3]", encoding="utf-8")
     rc = main(["inspect-doc", str(p)])
     assert rc == 1
-
-
-def test_main_inspect_doc_empty_dict_returns_0(tmp_path: Path):
-    p = tmp_path / "empty.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
 
 
 def test_main_validate_report_with_invalid_schema_returns_1(tmp_path: Path, monkeypatch):

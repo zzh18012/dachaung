@@ -108,10 +108,6 @@ def test_is_absolute_like_single_char_no_colon_false():
     assert _is_absolute_like("a") is False
 
 
-def test_is_absolute_like_normal_path_no_slash_false():
-    assert _is_absolute_like("foo") is False
-
-
 def test_is_absolute_like_returns_bool_type():
     assert isinstance(_is_absolute_like("foo"), bool)
 
@@ -155,10 +151,6 @@ def test_has_backslash_unicode_no_backslash_false():
     assert _has_backslash("中文/路径") is False
 
 
-def test_has_backslash_mixed_separators_true():
-    assert _has_backslash("foo/bar\\baz") is True
-
-
 # ---------- _resolve_relative_path 行为深度第九批 ----------
 
 
@@ -186,11 +178,6 @@ def test_resolve_relative_path_normal_relative_resolves(tmp_path):
     out = _resolve_relative_path("foo/bar", tmp_path, "test")
     assert isinstance(out, Path)
     assert out.is_absolute()
-
-
-def test_resolve_relative_path_returns_path_object(tmp_path):
-    out = _resolve_relative_path("foo", tmp_path, "test")
-    assert isinstance(out, Path)
 
 
 def test_resolve_relative_path_resolved_within_project_root(tmp_path):
@@ -546,11 +533,6 @@ def test_manifest_content_group_count_three_paired():
     # pair_ids: {frozenset{d1,d2}, frozenset{d1,d3}}
     # groups = 2
     assert m.content_group_count == 2
-
-
-def test_manifest_categories_covered_empty():
-    m = _make_manifest(documents=[])
-    assert m.categories_covered == []
 
 
 def test_manifest_categories_covered_single_doc():
@@ -1138,10 +1120,6 @@ def test_module_all_is_list():
 
 def test_module_all_entries_unique():
     assert len(mmod.__all__) == len(set(mmod.__all__))
-
-
-def test_module_has_dunder_file():
-    assert hasattr(mmod, "__file__")
 
 
 def test_module_dunder_file_endswith_manifest_py():

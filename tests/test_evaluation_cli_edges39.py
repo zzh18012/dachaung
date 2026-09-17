@@ -70,25 +70,6 @@ def test_build_parser_run_subparser_default_parser_value_batch12():
     assert ns.parser == "fallback"
 
 
-def test_build_parser_run_subparser_default_max_chars_value_batch12():
-    ns = _build_parser().parse_args(
-        ["run", "--manifest", "a.json", "--output", "b.json"]
-    )
-    assert ns.max_chars == 800
-
-
-def test_build_parser_run_subparser_default_tolerance_chars_batch12():
-    ns = _build_parser().parse_args(
-        ["run", "--manifest", "a.json", "--output", "b.json"]
-    )
-    assert ns.tolerance_chars == 30
-
-
-def test_build_parser_inspect_doc_default_tolerance_chars_batch12():
-    ns = _build_parser().parse_args(["inspect-doc", "a.json"])
-    assert ns.tolerance_chars == 30
-
-
 def test_build_parser_run_subparser_argument_count_batch12():
     """run 子命令应有 5 个 user-defined 选项（--manifest/--output/--parser/--max-chars/--tolerance-chars）。"""
     p = _build_parser()
@@ -209,16 +190,6 @@ def test_namespace_run_command_value_batch12():
         ["run", "--manifest", "a.json", "--output", "b.json"]
     )
     assert ns.command == "run"
-
-
-def test_namespace_validate_report_command_value_batch12():
-    ns = _build_parser().parse_args(["validate-report", "a.json"])
-    assert ns.command == "validate-report"
-
-
-def test_namespace_inspect_doc_command_value_batch12():
-    ns = _build_parser().parse_args(["inspect-doc", "a.json"])
-    assert ns.command == "inspect-doc"
 
 
 def test_namespace_run_manifest_str_type_batch12():
@@ -430,14 +401,6 @@ def test_run_inspect_doc_path_obj_batch12(tmp_path):
     args = argparse.Namespace(input=p, tolerance_chars=30)
     rc = _run_inspect_doc(args)
     assert rc == 0
-
-
-def test_run_inspect_doc_file_not_found_returns_2_batch12(tmp_path, capsys):
-    args = argparse.Namespace(input=str(tmp_path / "no.json"), tolerance_chars=30)
-    rc = _run_inspect_doc(args)
-    assert rc == 2
-    err = capsys.readouterr().err
-    assert "[ERROR]" in err
 
 
 def test_run_inspect_doc_first_output_line_format_batch12(tmp_path, capsys):
@@ -801,16 +764,6 @@ def test_main_no_subcommand_arg_raises_systemexit_batch12(capsys):
 def test_cli_source_no_forbidden_token_fifteenth_batch12(token):
     source = inspect.getsource(climod)
     assert token not in source
-
-
-def test_cli_source_no_top_level_lambda_batch12():
-    source = inspect.getsource(climod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
 
 
 def test_cli_source_no_class_definition_batch12():

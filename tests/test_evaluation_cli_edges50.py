@@ -779,16 +779,6 @@ def test_module_source_has_build_parser_function_batch23():
     assert "def _build_parser()" in src
 
 
-def test_module_source_has_format_metric_function_batch23():
-    src = inspect.getsource(climod)
-    assert "def _format_metric(" in src
-
-
-def test_module_source_has_run_inspect_doc_function_batch23():
-    src = inspect.getsource(climod)
-    assert "def _run_inspect_doc(" in src
-
-
 def test_module_source_has_main_guard_batch23():
     src = inspect.getsource(climod)
     assert 'if __name__ ==' in src
@@ -818,12 +808,6 @@ def test_signature_main_argv_default_none_batch23():
 def test_signature_main_returns_int_annotation_batch23():
     sig = inspect.signature(main)
     assert "int" in str(sig.return_annotation)
-
-
-def test_signature_format_metric_params_batch23():
-    sig = inspect.signature(_format_metric)
-    names = list(sig.parameters.keys())
-    assert names == ["name", "metric"]
 
 
 def test_signature_format_metric_returns_str_batch23():
@@ -908,11 +892,6 @@ def test_module_does_not_import_app_parsers_batch23():
 def test_module_constants_not_exposed_batch23():
     """FORBIDDEN / private 常量不应被 export。"""
     assert not hasattr(climod, "FORBIDDEN_TOKENS")
-
-
-def test_module_has_module_docstring_batch23():
-    assert climod.__doc__ is not None
-    assert len(climod.__doc__) > 0
 
 
 def test_module_run_inspect_doc_is_private_batch23():

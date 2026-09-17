@@ -354,12 +354,6 @@ def test_document_entry_inequality_batch11():
     assert d1 != d2
 
 
-def test_document_entry_hash_equal_for_equal_batch11():
-    d1 = _make_doc()
-    d2 = _make_doc()
-    assert hash(d1) == hash(d2)
-
-
 def test_document_entry_in_set_batch11():
     d1 = _make_doc()
     d2 = _make_doc()

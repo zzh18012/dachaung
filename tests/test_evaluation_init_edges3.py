@@ -136,10 +136,6 @@ def test_manifest_version_has_dot_at_index_one_batch43():
     assert MANIFEST_VERSION[1] == "."
 
 
-def test_evaluator_version_first_char_digit_batch43():
-    assert EVALUATOR_VERSION[0].isdigit()
-
-
 def test_evaluator_version_last_char_digit_batch43():
     assert EVALUATOR_VERSION[-1].isdigit()
 
@@ -345,22 +341,6 @@ def test_all_does_not_contain_lowercase_batch43():
 # ---------- 模块属性 第四十三批
 
 
-def test_evaluator_version_in_dir_batch43():
-    assert "EVALUATOR_VERSION" in dir(evaluation)
-
-
-def test_report_version_in_dir_batch43():
-    assert "REPORT_VERSION" in dir(evaluation)
-
-
-def test_annotation_version_in_dir_batch43():
-    assert "ANNOTATION_VERSION" in dir(evaluation)
-
-
-def test_manifest_version_in_dir_batch43():
-    assert "MANIFEST_VERSION" in dir(evaluation)
-
-
 def test_all_in_dir_batch43():
     assert "__all__" in dir(evaluation)
 
@@ -410,16 +390,6 @@ def test_module_source_annotation_before_manifest_batch43():
     assert src.index("ANNOTATION_VERSION") < src.index("MANIFEST_VERSION")
 
 
-def test_module_source_contains_design_principles_batch43():
-    src = inspect.getsource(evaluation)
-    assert "设计原则" in src
-
-
-def test_module_source_contains_version_history_batch43():
-    src = inspect.getsource(evaluation)
-    assert "版本历史" in src
-
-
 def test_module_source_contains_v1_0_batch43():
     src = inspect.getsource(evaluation)
     assert "v1.0" in src
@@ -458,11 +428,6 @@ def test_module_source_contains_zero_denominator_batch43():
 def test_module_source_contains_not_instrumented_batch43():
     src = inspect.getsource(evaluation)
     assert "not_instrumented" in src
-
-
-def test_module_source_contains_baseline_incompatibility_batch43():
-    src = inspect.getsource(evaluation)
-    assert "不可横向比较" in src
 
 
 def test_module_source_contains_hard_cut_keyword_batch43():
@@ -676,20 +641,12 @@ def test_reload_preserves_docstring_batch43():
 # ---------- 版本组合 第四十三批
 
 
-def test_versions_pair_evaluator_report_equal_batch43():
-    assert EVALUATOR_VERSION == REPORT_VERSION
-
-
 def test_versions_pair_annotation_manifest_equal_batch43():
     assert ANNOTATION_VERSION == MANIFEST_VERSION
 
 
 def test_versions_pair_evaluator_annotation_differ_batch43():
     assert EVALUATOR_VERSION != ANNOTATION_VERSION
-
-
-def test_versions_pair_report_manifest_differ_batch43():
-    assert REPORT_VERSION != MANIFEST_VERSION
 
 
 def test_versions_two_distinct_values_batch43():
@@ -810,10 +767,6 @@ def test_module_source_forbidden_tokens_batch43():
 
 def test_module_has_dunder_all_batch43():
     assert hasattr(evaluation, "__all__")
-
-
-def test_module_all_is_list_batch43():
-    assert isinstance(evaluation.__all__, list)
 
 
 def test_module_all_len_four_batch43():

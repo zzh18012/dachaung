@@ -1220,11 +1220,6 @@ def test_module_source_no_walrus():
     assert ":=" not in src
 
 
-def test_module_source_no_lambda():
-    src = inspect.getsource(mmod)
-    assert "lambda " not in src
-
-
 def test_module_source_no_hardcoded_absolute_path():
     src = inspect.getsource(mmod)
     assert "C:\\\\Users" not in src
@@ -1279,11 +1274,6 @@ def test_signature_is_absolute_like_param_kind():
     assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_signature_is_absolute_like_no_default():
-    sig = inspect.signature(_is_absolute_like)
-    assert sig.parameters["path_str"].default is inspect.Parameter.empty
-
-
 def test_signature_has_backslash_param_kind():
     sig = inspect.signature(_has_backslash)
     p = sig.parameters["path_str"]
@@ -1319,11 +1309,6 @@ def test_signature_load_manifest_project_root_default_none():
 def test_signature_detect_project_root_1_param():
     sig = inspect.signature(_detect_project_root)
     assert len(sig.parameters) == 1
-
-
-def test_signature_detect_project_root_start_no_default():
-    sig = inspect.signature(_detect_project_root)
-    assert sig.parameters["start"].default is inspect.Parameter.empty
 
 
 def test_signature_manifest_error_inherits_exception():

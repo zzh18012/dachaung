@@ -88,10 +88,6 @@ def test_is_absolute_like_dot_drive_batch48():
     assert _is_absolute_like(".:/foo") is False
 
 
-def test_is_absolute_like_dash_drive_batch48():
-    assert _is_absolute_like("-:/foo") is False
-
-
 def test_is_absolute_like_empty_string_batch48():
     assert _is_absolute_like("") is False
 
@@ -548,12 +544,6 @@ def _make_ef(**kw):
     )
 
 
-def test_expected_failure_frozen_doc_id_batch48():
-    ef = _make_ef()
-    with pytest.raises(FrozenInstanceError):
-        ef.doc_id = "x"
-
-
 def test_expected_failure_frozen_path_str_batch48():
     ef = _make_ef()
     with pytest.raises(FrozenInstanceError):
@@ -611,11 +601,6 @@ def test_manifest_frozen_expected_failures_batch48():
 
 
 # ---------- ManifestError 抛出场景 ----------
-
-def test_manifest_error_is_exception_batch48():
-    e = ManifestError("msg")
-    assert isinstance(e, Exception)
-
 
 def test_manifest_error_can_be_raised_and_caught_batch48():
     with pytest.raises(ManifestError):

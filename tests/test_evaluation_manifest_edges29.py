@@ -640,11 +640,6 @@ def test_module_source_has_schema_validate_import():
     assert "from evaluation.schema import validate" in src
 
 
-def test_module_source_has_3_dataclass_decorators():
-    src = inspect.getsource(manifest_mod)
-    assert src.count("@dataclass(frozen=True)") == 3
-
-
 def test_module_source_has_5_property_decorators():
     src = inspect.getsource(manifest_mod)
     decorator_lines = [
@@ -667,11 +662,6 @@ def test_module_source_no_async():
 def test_module_source_no_lambda():
     src = inspect.getsource(manifest_mod)
     assert "lambda " not in src
-
-
-def test_module_source_no_main_block():
-    src = inspect.getsource(manifest_mod)
-    assert 'if __name__' not in src
 
 
 def test_module_source_resolve_relative_path_uses_relative_to():
@@ -794,13 +784,6 @@ def test_namespace_expected_failure():
     assert hasattr(manifest_mod, "ExpectedFailure")
 
 
-def test_module_all_5_entries():
-    assert manifest_mod.__all__ == [
-        "ManifestError", "Manifest", "DocumentEntry",
-        "ExpectedFailure", "load_manifest",
-    ]
-
-
 def test_module_all_is_list():
     assert isinstance(manifest_mod.__all__, list)
 
@@ -846,11 +829,6 @@ def test_module_has_3_dataclasses():
     assert sorted(dataclasses_in_module) == [
         "DocumentEntry", "ExpectedFailure", "Manifest",
     ]
-
-
-def test_module_no_main_block():
-    src = inspect.getsource(manifest_mod)
-    assert 'if __name__' not in src
 
 
 # ---------- 端到端集成补强 ----------

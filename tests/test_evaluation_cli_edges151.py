@@ -170,14 +170,6 @@ def test_cli_inspect_side_hbc_batch404(tmp_path, capsys):
             "1.0000  (ok)") in out
 
 
-def test_cli_inspect_side_bools_batch404(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert "pipeline_success                     true  (ok)" in out
-    assert "schema_valid                         true  (ok)" in out
-
-
 # ---------- 源码补强 ----------
 
 def _src():

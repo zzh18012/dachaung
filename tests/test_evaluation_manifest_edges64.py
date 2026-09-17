@@ -271,10 +271,6 @@ def test_has_backslash_with_back_then_forward_batch37():
     assert _has_backslash("a\\b/c") is True
 
 
-def test_has_backslash_with_only_backslashes_batch37():
-    assert _has_backslash("\\\\\\") is True
-
-
 def test_has_backslash_with_spaces_only_batch37():
     assert _has_backslash("   ") is False
 
@@ -874,11 +870,6 @@ def test_signature_load_manifest_project_root_annotation_batch37():
 def test_signature_resolve_relative_path_field_name_no_default_batch37():
     sig = inspect.signature(_resolve_relative_path)
     assert sig.parameters["field_name"].default is inspect.Parameter.empty
-
-
-def test_signature_detect_project_root_start_no_default_batch37():
-    sig = inspect.signature(_detect_project_root)
-    assert sig.parameters["start"].default is inspect.Parameter.empty
 
 
 def test_signature_document_entry_constructor_batch37():

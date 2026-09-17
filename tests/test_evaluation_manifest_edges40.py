@@ -994,11 +994,6 @@ def test_module_source_has_relative_to_call_batch13():
     assert ".relative_to(" in source
 
 
-def test_module_source_has_resolve_call_batch13():
-    source = inspect.getsource(mmod)
-    assert ".resolve()" in source
-
-
 def test_module_source_has_path_open_call_batch13():
     source = inspect.getsource(mmod)
     assert ".open(" in source
@@ -1053,25 +1048,11 @@ def test_has_backslash_return_annotation_bool_batch13():
     assert "bool" in ret_str
 
 
-def test_resolve_relative_path_signature_3_params_batch13():
-    sig = inspect.signature(_resolve_relative_path)
-    params = list(sig.parameters.values())
-    assert len(params) == 3
-    assert [p.name for p in params] == ["path_str", "project_root", "field_name"]
-
-
 def test_resolve_relative_path_return_annotation_path_batch13():
     sig = inspect.signature(_resolve_relative_path)
     ret = sig.return_annotation
     ret_str = ret if isinstance(ret, str) else str(ret)
     assert "Path" in ret_str
-
-
-def test_load_manifest_signature_2_params_batch13():
-    sig = inspect.signature(load_manifest)
-    params = list(sig.parameters.values())
-    assert len(params) == 2
-    assert [p.name for p in params] == ["manifest_path", "project_root"]
 
 
 def test_load_manifest_manifest_path_annotation_union_batch13():

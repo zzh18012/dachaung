@@ -1137,12 +1137,6 @@ def test_detect_project_root_with_file_input(tmp_path):
 # =========================================================================
 
 
-def test_module_source_does_not_contain_import_os():
-    import evaluation.manifest as m
-    src = inspect.getsource(m)
-    assert "import os" not in src
-
-
 def test_module_source_does_not_contain_import_sys():
     import evaluation.manifest as m
     src = inspect.getsource(m)

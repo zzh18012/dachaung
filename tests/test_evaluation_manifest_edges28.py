@@ -138,15 +138,6 @@ def test_has_backslash_at_last_position():
 # ---------- DocumentEntry frozen / equality / hash / fields 精确 ----------
 
 
-def test_document_entry_field_names_exact():
-    flds = [f.name for f in fields(DocumentEntry)]
-    assert flds == [
-        "doc_id", "path_str", "resolved_path", "source_type",
-        "sha256", "categories", "paired_with",
-        "annotation_file_str", "annotation_resolved", "expectations",
-    ]
-
-
 def test_document_entry_hashable_via_frozen():
     de = DocumentEntry(
         doc_id="d1",
@@ -247,14 +238,6 @@ def test_document_entry_categories_can_be_tuple_with_multiple():
 
 
 # ---------- ExpectedFailure frozen / fields ----------
-
-
-def test_expected_failure_field_names_exact():
-    flds = [f.name for f in fields(ExpectedFailure)]
-    assert flds == [
-        "doc_id", "path_str", "resolved_path",
-        "expected_error_code", "source_type",
-    ]
 
 
 def test_expected_failure_hashable():

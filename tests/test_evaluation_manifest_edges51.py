@@ -44,11 +44,6 @@ from evaluation.manifest import (
 # ---------- _is_absolute_like 第二十四批 ----------
 
 
-def test_is_absolute_like_empty_string_batch24():
-    """空字符串 → False。"""
-    assert _is_absolute_like("") is False
-
-
 def test_is_absolute_like_single_slash_batch24():
     """'/' → True。"""
     assert _is_absolute_like("/") is True
@@ -585,12 +580,6 @@ def test_expected_failure_source_type_explicit_batch24():
     assert ef.source_type == "txt"
 
 
-def test_expected_failure_frozen_batch24():
-    ef = _make_ef()
-    with pytest.raises(FrozenInstanceError):
-        ef.doc_id = "x"  # type: ignore[misc]
-
-
 def test_expected_failure_hashable_batch24():
     ef = _make_ef()
     assert hash(ef) is not None
@@ -1014,22 +1003,6 @@ def test_module_source_contains_resolve_relative_path_batch24():
 def test_module_source_contains_detect_project_root_batch24():
     source = inspect.getsource(mmod)
     assert "def _detect_project_root(" in source
-
-
-def test_module_source_contains_document_entry_dataclass_batch24():
-    source = inspect.getsource(mmod)
-    assert "@dataclass(frozen=True)" in source
-    assert "class DocumentEntry:" in source
-
-
-def test_module_source_contains_expected_failure_dataclass_batch24():
-    source = inspect.getsource(mmod)
-    assert "class ExpectedFailure:" in source
-
-
-def test_module_source_contains_manifest_dataclass_batch24():
-    source = inspect.getsource(mmod)
-    assert "class Manifest:" in source
 
 
 def test_module_source_contains_path_field_warning_batch24():

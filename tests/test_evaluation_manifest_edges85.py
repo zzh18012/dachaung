@@ -61,10 +61,6 @@ def _entry(i, st="pdf", pw=None, cats=()):
 
 # ---------- 版本 ----------
 
-def test_manifest_version_locked_batch54():
-    assert MANIFEST_VERSION == "1.0"
-
-
 def test_version_mismatch_branch_and_message_batch54(tmp_path, monkeypatch):
     # schema const 锁 "1.0"，该分支仅在代码侧 MANIFEST_VERSION 漂移时可达
     monkeypatch.setattr(manifest_mod, "MANIFEST_VERSION", "9.9")

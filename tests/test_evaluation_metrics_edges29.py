@@ -1091,11 +1091,6 @@ def test_module_source_no_async():
     assert "async " not in src
 
 
-def test_module_source_no_global():
-    src = inspect.getsource(mmod)
-    assert "global " not in src
-
-
 def test_module_source_no_main_block():
     src = inspect.getsource(mmod)
     assert "__main__" not in src
@@ -1114,11 +1109,6 @@ def test_module_source_no_decorators():
     for i, line in enumerate(lines):
         if line.startswith("@"):
             pytest.fail(f"unexpected decorator at line {i}: {line}")
-
-
-def test_module_source_no_lambda():
-    src = inspect.getsource(mmod)
-    assert "lambda " not in src
 
 
 def test_module_source_has_all_with_1_entry():
@@ -1390,10 +1380,6 @@ def test_no_varargs_varkw_in_any_helper():
 
 
 # ---------- 模块整体合理性 ----------
-
-
-def test_module_namespace():
-    assert isinstance(mmod, types.ModuleType)
 
 
 def test_module_namespace_name():

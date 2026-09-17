@@ -171,16 +171,6 @@ def test_manifest_error_no_args():
     assert err.args == ()
 
 
-def test_manifest_error_multiple_args():
-    err = ManifestError("a", "b", "c")
-    assert err.args == ("a", "b", "c")
-
-
-def test_manifest_error_str_no_args():
-    err = ManifestError()
-    assert str(err) == ""
-
-
 # ---------- DocumentEntry frozen 补充 ----------
 
 
@@ -673,10 +663,6 @@ def test_namespace_manifest():
 
 def test_module_all_count_5():
     assert len(m.__all__) == 5
-
-
-def test_module_namespace():
-    assert m.__name__ == "evaluation.manifest"
 
 
 def test_module_has_no_main_block():

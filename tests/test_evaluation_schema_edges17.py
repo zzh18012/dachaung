@@ -576,18 +576,6 @@ def test_module_source_has_raise_eval_schema_error():
     assert "raise EvalSchemaError(" in src
 
 
-def test_module_source_has_json_load_in_load_schema():
-    src = inspect.getsource(m)
-    # load_schema 用 json.load
-    assert "json.load(f)" in src
-
-
-def test_module_source_has_json_load_in_validate_file():
-    src = inspect.getsource(m)
-    # validate_file 也用 json.load
-    assert "json.load(f)" in src
-
-
 def test_module_source_has_encoding_utf8():
     src = inspect.getsource(m)
     assert 'encoding="utf-8"' in src

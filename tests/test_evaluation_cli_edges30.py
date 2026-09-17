@@ -287,11 +287,6 @@ def test_main_validate_report_invalid_top_level_dict_returns_1(tmp_path, capsys)
     assert rc == 1
 
 
-def test_main_validate_report_returns_2_for_missing_file(tmp_path, capsys):
-    rc = main(["validate-report", str(tmp_path / "nonexistent.json")])
-    assert rc == 2
-
-
 def test_main_validate_report_returns_1_for_invalid_json(tmp_path, capsys):
     bad = tmp_path / "r.json"
     bad.write_text("not json at all", encoding="utf-8")
@@ -700,16 +695,6 @@ def test_module_source_no_yield():
     assert "yield" not in src
 
 
-def test_module_source_no_async():
-    src = inspect.getsource(cli_mod)
-    assert "async " not in src
-
-
-def test_module_source_no_global():
-    src = inspect.getsource(cli_mod)
-    assert "global " not in src
-
-
 def test_module_source_no_class_definition():
     src = inspect.getsource(cli_mod)
     body_lines = [l for l in src.splitlines() if not l.strip().startswith(("#", '"', "'"))]
@@ -962,12 +947,6 @@ def test_e2e_inspect_doc_round_trip_with_run_output(tmp_path, capsys):
     }), encoding="utf-8")
     rc = main(["inspect-doc", str(d)])
     assert rc == 0
-
-
-def test_e2e_unknown_subcommand_exits_2(capsys):
-    with pytest.raises(SystemExit) as ei:
-        main(["unknown"])
-    assert ei.value.code == 2
 
 
 def test_e2e_no_subcommand_exits_2(capsys):

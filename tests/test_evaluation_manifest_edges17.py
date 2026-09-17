@@ -733,17 +733,6 @@ def test_expected_failure_field_count_5():
     assert len(fields(ExpectedFailure)) == 5
 
 
-def test_expected_failure_field_names_in_order():
-    field_names = [f.name for f in fields(ExpectedFailure)]
-    assert field_names == [
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "expected_error_code",
-        "source_type",
-    ]
-
-
 def test_expected_failure_is_hashable():
     ef = ExpectedFailure(
         doc_id="ef1",
@@ -788,17 +777,6 @@ def test_manifest_frozen_true():
 
 def test_manifest_field_count_5():
     assert len(fields(Manifest)) == 5
-
-
-def test_manifest_field_names_in_order():
-    field_names = [f.name for f in fields(Manifest)]
-    assert field_names == [
-        "manifest_version",
-        "devset_status",
-        "documents",
-        "expected_failures",
-        "project_root",
-    ]
 
 
 def test_manifest_is_hashable():

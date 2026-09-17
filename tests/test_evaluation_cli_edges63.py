@@ -123,12 +123,6 @@ def test_build_parser_subparsers_action_has_3_choices_batch36():
     assert len(sub_action.choices) == 3
 
 
-def test_build_parser_subparsers_choices_keys_batch36():
-    p = _build_parser()
-    sub_action = next(a for a in p._actions if isinstance(a, argparse._SubParsersAction))
-    assert set(sub_action.choices.keys()) == {"run", "validate-report", "inspect-doc"}
-
-
 # ---------- _format_metric 第三十六批
 
 
@@ -589,16 +583,6 @@ def test_module_source_contains_inspect_doc_subcommand_string_batch36():
     assert '"inspect-doc"' in src
 
 
-def test_module_source_contains_file_stderr_batch36():
-    src = inspect.getsource(cmod)
-    assert "file=sys.stderr" in src
-
-
-def test_module_source_contains_prog_evaluation_cli_batch36():
-    src = inspect.getsource(cmod)
-    assert 'prog="evaluation.cli"' in src
-
-
 def test_module_source_contains_raw_description_batch36():
     src = inspect.getsource(cmod)
     assert "RawDescriptionHelpFormatter" in src
@@ -651,11 +635,6 @@ def test_signature_format_metric_params_batch36():
 def test_signature_format_metric_name_str_annotation_batch36():
     sig = inspect.signature(_format_metric)
     assert sig.parameters["name"].annotation == "str"
-
-
-def test_signature_format_metric_metric_dict_annotation_batch36():
-    sig = inspect.signature(_format_metric)
-    assert sig.parameters["metric"].annotation == "dict"
 
 
 def test_signature_format_metric_return_str_batch36():

@@ -439,13 +439,6 @@ def test_main_inspect_doc_success_batch19(tmp_path, capsys):
     assert rc == 0
 
 
-def test_main_inspect_doc_invalid_json_batch19(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text("not json", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 1
-
-
 def test_main_inspect_doc_not_exist_batch19(tmp_path, capsys):
     rc = main(["inspect-doc", str(tmp_path / "no.json")])
     assert rc == 2
@@ -484,12 +477,6 @@ def test_module_source_forbidden_tokens_batch19(forbidden):
 def test_module_source_no_subprocess_batch19():
     src = inspect.getsource(cmod)
     assert "import subprocess" not in src
-
-
-def test_module_source_no_network_batch19():
-    src = inspect.getsource(cmod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
 
 
 # ---------- module source 字符串精确补强第三十一批 ----------
@@ -600,11 +587,6 @@ def test_signature_run_inspect_doc_batch19():
 
 
 # ---------- module 合理性第二十九批 ----------
-
-
-def test_module_has_main_batch19():
-    assert hasattr(cmod, "main")
-    assert callable(cmod.main)
 
 
 def test_module_has_build_parser_batch19():

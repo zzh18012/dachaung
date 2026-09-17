@@ -27,12 +27,6 @@ def test_build_parser_prog_value_batch37():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_has_run_subparser_batch37():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert args.command == "run"
-
-
 def test_build_parser_has_validate_report_subparser_batch37():
     p = _build_parser()
     args = p.parse_args(["validate-report", "report.json"])
@@ -57,12 +51,6 @@ def test_build_parser_run_default_max_chars_800_batch37():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "x", "--output", "y"])
     assert args.max_chars == 800
-
-
-def test_build_parser_run_default_tolerance_chars_30_batch37():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert args.tolerance_chars == 30
 
 
 def test_build_parser_run_with_all_options_batch37():
@@ -182,12 +170,6 @@ def test_format_metric_dict_empty_batch37():
     assert "ok" in out
 
 
-def test_format_metric_none_with_reason_batch37():
-    out = _format_metric("x", {"value": None, "reason": "no_data"})
-    assert "null" in out
-    assert "no_data" in out
-
-
 def test_format_metric_none_without_reason_batch37():
     """value=None 且 reason=None → 仍显示 null。"""
     out = _format_metric("x", {"value": None, "reason": None})
@@ -217,14 +199,6 @@ def test_run_inspect_doc_returns_zero_on_success_batch37(tmp_path, capsys):
     args.tolerance_chars = 30
     rc = _run_inspect_doc(args)
     assert rc == 0
-
-
-def test_run_inspect_doc_missing_file_returns_2_batch37(tmp_path):
-    args = MagicMock()
-    args.input = str(tmp_path / "missing.json")
-    args.tolerance_chars = 30
-    rc = _run_inspect_doc(args)
-    assert rc == 2
 
 
 def test_run_inspect_doc_invalid_json_returns_1_batch37(tmp_path):
@@ -361,13 +335,6 @@ def test_main_run_manifest_invalid_schema_returns_1_batch37(tmp_path):
 def test_main_validate_report_missing_returns_2_batch37(tmp_path):
     rc = main(["validate-report", str(tmp_path / "missing.json")])
     assert rc == 2
-
-
-def test_main_validate_report_invalid_json_returns_1_batch37(tmp_path):
-    p = tmp_path / "report.json"
-    p.write_text("not json {", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
 
 
 def test_main_validate_report_invalid_content_returns_1_batch37(tmp_path):
@@ -569,11 +536,6 @@ def test_module_source_contains_format_metric_func_batch37():
 def test_module_source_contains_run_inspect_doc_func_batch37():
     src = inspect.getsource(cmod)
     assert "def _run_inspect_doc(args) -> int:" in src
-
-
-def test_module_source_contains_run_subparser_batch37():
-    src = inspect.getsource(cmod)
-    assert 'sub.add_parser("run"' in src
 
 
 def test_module_source_contains_validate_report_subparser_batch37():

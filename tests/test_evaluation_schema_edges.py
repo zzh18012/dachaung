@@ -542,10 +542,6 @@ def test_all_exports_is_list():
     assert isinstance(__all__, list)
 
 
-def test_all_exports_count_five():
-    assert len(__all__) == 5
-
-
 def test_all_exports_exact_set():
     assert set(__all__) == {
         "SCHEMAS_DIR",

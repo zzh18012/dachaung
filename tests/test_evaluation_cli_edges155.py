@@ -112,20 +112,6 @@ def test_cli_run_long_line_stdout_batch425(tmp_path, capsys):
     assert "documents=1（成功 1，失败 0）" in out
 
 
-def test_cli_validate_report_batch425(tmp_path, capsys):
-    mf = _board(tmp_path)
-    rc, _ = _run_cli(capsys, [
-        "run", "--manifest", str(mf),
-        "--output", str(tmp_path / "r.json"),
-        "--parser", "fallback", "--max-chars", "60"])
-    assert rc == 0
-    rc2, out2 = _run_cli(capsys, [
-        "validate-report", str(tmp_path / "r.json")])
-    assert rc2 == 0
-    assert "[OK]" in out2
-    assert "通过" in out2
-
-
 # ---------- inspect-doc ----------
 
 def test_cli_inspect_counts_batch425(tmp_path, capsys):
@@ -151,14 +137,6 @@ def test_cli_inspect_multiset_batch425(tmp_path, capsys):
             "1.0000  (ok)") in out
     assert ("text_char_multiset_recall            "
             "1.0000  (ok)") in out
-
-
-def test_cli_inspect_total_batch425(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("element_count_total                  "
-            "1  (ok)") in out
 
 
 # ---------- 源码补强 ----------

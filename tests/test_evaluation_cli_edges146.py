@@ -103,17 +103,6 @@ def test_cli_run_cross_page_batch373(tmp_path, capsys):
                                        "reason": None}
 
 
-def test_cli_run_cross_page_stdout_batch373(tmp_path, capsys):
-    mf = _board(tmp_path)
-    rc, out = _run_cli(capsys, [
-        "run", "--manifest", str(mf),
-        "--output", str(tmp_path / "r.json"),
-        "--parser", "fallback", "--max-chars", "200"])
-    assert rc == 0
-    assert "documents=1（成功 1，失败 0）" in out
-    assert "pdf=1 docx=0" in out
-
-
 # ---------- inspect-doc 跨页 counts 行 ----------
 
 def test_cli_inspect_cross_page_counts_batch373(tmp_path, capsys):

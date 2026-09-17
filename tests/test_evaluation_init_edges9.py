@@ -252,20 +252,9 @@ def test_docstring_starts_with_chinese_batch49():
 
 # ---------- AST 结构补强 ----------
 
-def test_ast_module_has_docstring_batch49():
-    tree = ast.parse(inspect.getsource(eval_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
-
-
 def test_ast_no_function_def_batch49():
     tree = ast.parse(inspect.getsource(eval_mod))
     assert not any(isinstance(n, ast.FunctionDef) for n in tree.body)
-
-
-def test_ast_no_class_def_batch49():
-    tree = ast.parse(inspect.getsource(eval_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
 def test_ast_no_import_batch49():

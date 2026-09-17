@@ -293,12 +293,6 @@ def test_manifest_content_group_count_unpaired_batch30():
     assert m.content_group_count == 3
 
 
-def test_manifest_hash_eq_consistent_batch30():
-    m1 = _make_manifest()
-    m2 = _make_manifest()
-    assert hash(m1) == hash(m2)
-
-
 def test_manifest_pdf_count_with_only_docx_batch30():
     docs = (_make_doc_entry(doc_id="d1", source_type="docx"),)
     m = _make_manifest(documents=docs)

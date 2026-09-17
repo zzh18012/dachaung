@@ -288,21 +288,6 @@ def test_run_inspect_doc_returns_int_batch31(tmp_path):
 # ---------- main 第三十一批 ----------
 
 
-def test_main_run_nonexistent_manifest_returns_2_batch31():
-    rc = main(["run", "--manifest", "/nonexistent.json", "--output", "/tmp/out.json"])
-    assert rc == 2
-
-
-def test_main_validate_report_nonexistent_returns_2_batch31():
-    rc = main(["validate-report", "/nonexistent.json"])
-    assert rc == 2
-
-
-def test_main_inspect_doc_nonexistent_returns_2_batch31():
-    rc = main(["inspect-doc", "/nonexistent.json"])
-    assert rc == 2
-
-
 def test_main_unknown_subcommand_raises_systemexit_batch31():
     with pytest.raises(SystemExit):
         main(["unknown-command"])
@@ -393,11 +378,6 @@ def test_module_source_no_open_w_mode_batch31():
 def test_module_source_no_shutil_batch31():
     src = inspect.getsource(climod)
     assert "shutil" not in src
-
-
-def test_module_source_no_requests_batch31():
-    src = inspect.getsource(climod)
-    assert "requests" not in src
 
 
 def test_module_source_no_unlink_batch31():
@@ -505,11 +485,6 @@ def test_module_source_contains_raise_systemexit_batch31():
 
 
 # ---------- signatures 第四十五批 ----------
-
-
-def test_signature_main_argv_annotation_batch31():
-    sig = inspect.signature(main)
-    assert "list[str] | None" in str(sig.parameters["argv"].annotation)
 
 
 def test_signature_main_return_int_batch31():

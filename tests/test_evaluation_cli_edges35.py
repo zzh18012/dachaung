@@ -77,18 +77,6 @@ def test_build_parser_inspect_doc_tolerance_chars_type_int():
     assert isinstance(args.tolerance_chars, int)
 
 
-def test_build_parser_run_requires_manifest():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--output", "b.json"])
-
-
-def test_build_parser_run_requires_output():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--manifest", "a.json"])
-
-
 def test_build_parser_run_requires_both():
     p = _build_parser()
     with pytest.raises(SystemExit):
@@ -570,13 +558,6 @@ def test_main_inspect_doc_top_level_not_dict_returns_1(tmp_path, capsys):
     p.write_text("[1, 2]", encoding="utf-8")
     rc = main(["inspect-doc", str(p)])
     assert rc == 1
-
-
-def test_main_inspect_doc_success_returns_0(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
 
 
 def test_main_run_missing_manifest_returns_2(tmp_path, capsys):

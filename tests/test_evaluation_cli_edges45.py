@@ -120,12 +120,6 @@ def test_build_parser_inspect_doc_tolerance_custom_batch18():
     assert args.tolerance_chars == 60
 
 
-def test_build_parser_run_manifest_required_batch18():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--output", "o.json"])
-
-
 def test_build_parser_run_output_required_batch18():
     p = _build_parser()
     with pytest.raises(SystemExit):
@@ -595,12 +589,6 @@ def test_module_source_no_subprocess_batch18():
     assert "import subprocess" not in src
 
 
-def test_module_source_no_network_batch18():
-    src = inspect.getsource(cmod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
-
-
 # ---------- module source 字符串精确补强第二十八批 ----------
 
 
@@ -706,18 +694,7 @@ def test_signature_format_metric_batch18():
     assert params == ["name", "metric"]
 
 
-def test_signature_run_inspect_doc_batch18():
-    sig = inspect.signature(_run_inspect_doc)
-    params = list(sig.parameters.keys())
-    assert params == ["args"]
-
-
 # ---------- module 合理性第二十八批 ----------
-
-
-def test_module_has_main_attribute_batch18():
-    assert hasattr(cmod, "main")
-    assert callable(cmod.main)
 
 
 def test_module_has_build_parser_attribute_batch18():

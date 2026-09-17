@@ -309,11 +309,6 @@ def test_format_metric_empty_reason_int_batch52():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_prog_kwarg_batch52():
-    src = inspect.getsource(cli_mod)
-    assert 'prog="evaluation.cli"' in src
-
-
 def test_source_description_kwarg_batch52():
     src = inspect.getsource(cli_mod)
     assert "跑开发集 → 报告" in src
@@ -470,29 +465,6 @@ def test_ast_main_if_doc_batch52():
 def test_ast_no_class_def_batch52():
     tree = ast.parse(inspect.getsource(cli_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_async_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
-
-
-def test_ast_no_star_import_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    for n in tree.body:
-        if isinstance(n, ast.ImportFrom):
-            for alias in n.names:
-                assert alias.name != "*"
-
-
-def test_ast_no_global_nonlocal_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
-
-
-def test_ast_no_while_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert not any(isinstance(n, ast.While) for n in ast.walk(tree))
 
 
 # ---------- forbidden tokens 第一百五十六批 ----------

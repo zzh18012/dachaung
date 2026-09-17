@@ -241,12 +241,6 @@ def test_success_both(tmp_path):
         "total": 2, "rate": 1.0}
 
 
-def test_silent_drop_zero(tmp_path):
-    _, data, _ = _run(tmp_path)
-    assert data["summary"][
-        "silent_drop_total"] == 0
-
-
 def test_ect_sum_nineteen(tmp_path):
     _, data, _ = _run(tmp_path)
     assert data["summary"][
@@ -332,14 +326,3 @@ def test_dir_sha_matches_file(
             len("images-"):]
         for f in d.glob("*.png"):
             assert sha in f.name
-
-
-def test_validate_report_rc0(
-        tmp_path):
-    _, _, rep = _run(tmp_path)
-    buf = io.StringIO()
-    with contextlib.redirect_stdout(
-            buf):
-        rc = main(["validate-report",
-                   str(rep)])
-    assert rc == 0

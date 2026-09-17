@@ -163,12 +163,6 @@ def test_build_parser_subparsers_dest_command_batch13():
     assert sub_actions[0].dest == "command"
 
 
-def test_build_parser_subparsers_required_true_batch13():
-    p = _build_parser()
-    sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
-    assert sub_actions[0].required is True
-
-
 def test_build_parser_run_positional_action_count_0_batch13():
     """run 子命令没有 positional 参数。"""
     p = _build_parser()
@@ -249,16 +243,6 @@ def test_namespace_tolerance_chars_default_value_type_int_batch13():
         "run", "--manifest", "a.json", "--output", "b.json",
     ])
     assert isinstance(ns.tolerance_chars, int)
-
-
-def test_namespace_validate_input_str_batch13():
-    ns = _build_parser().parse_args(["validate-report", "report.json"])
-    assert ns.input == "report.json"
-
-
-def test_namespace_inspect_input_str_batch13():
-    ns = _build_parser().parse_args(["inspect-doc", "doc.json"])
-    assert ns.input == "doc.json"
 
 
 def test_namespace_custom_parser_value_kreuzberg_batch13():
@@ -993,11 +977,6 @@ def test_module_source_has_print_to_stderr_batch13():
     assert "file=sys.stderr" in source
 
 
-def test_module_source_has_subparsers_setup_batch13():
-    source = inspect.getsource(climod)
-    assert "add_subparsers" in source
-
-
 def test_module_source_has_RawDescriptionHelpFormatter_batch13():
     source = inspect.getsource(climod)
     assert "RawDescriptionHelpFormatter" in source
@@ -1062,13 +1041,6 @@ def test_build_parser_return_annotation_argument_parser_batch13():
     assert "ArgumentParser" in ret_str
 
 
-def test_main_signature_one_param_batch13():
-    sig = inspect.signature(main)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "argv"
-
-
 def test_main_argv_annotation_optional_list_str_batch13():
     sig = inspect.signature(main)
     annot = sig.parameters["argv"].annotation
@@ -1088,13 +1060,6 @@ def test_main_return_annotation_int_batch13():
     ret = sig.return_annotation
     ret_str = ret if isinstance(ret, str) else str(ret)
     assert "int" in ret_str
-
-
-def test_format_metric_signature_2_params_batch13():
-    sig = inspect.signature(_format_metric)
-    params = list(sig.parameters.values())
-    assert len(params) == 2
-    assert [p.name for p in params] == ["name", "metric"]
 
 
 def test_format_metric_return_annotation_str_batch13():

@@ -113,17 +113,6 @@ def test_cli_run_rotated_batch397(tmp_path, capsys):
         "value": 1.0, "reason": None}
 
 
-def test_cli_run_rotated_stdout_batch397(tmp_path, capsys):
-    mf = _board(tmp_path)
-    rc, out = _run_cli(capsys, [
-        "run", "--manifest", str(mf),
-        "--output", str(tmp_path / "r.json"),
-        "--parser", "fallback", "--max-chars", "200"])
-    assert rc == 0
-    assert "documents=1（成功 1，失败 0）" in out
-    assert "pdf=1 docx=0" in out
-
-
 # ---------- inspect-doc ----------
 
 def test_cli_inspect_rotated_counts_batch397(tmp_path, capsys):

@@ -731,11 +731,6 @@ def test_module_source_contains_categories_covered_property_batch33():
     assert "def categories_covered(" in src
 
 
-def test_module_source_contains_validate_call_batch33():
-    src = inspect.getsource(mmod)
-    assert 'validate(' in src
-
-
 def test_module_source_contains_all_exports_batch33():
     src = inspect.getsource(mmod)
     assert "__all__" in src

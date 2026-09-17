@@ -218,20 +218,6 @@ def test_build_parser_run_default_values():
     assert args.tolerance_chars == 30
 
 
-def test_build_parser_validate_report_takes_one_positional():
-    p = _build_parser()
-    args = p.parse_args(["validate-report", "report.json"])
-    assert args.input == "report.json"
-    assert args.command == "validate-report"
-
-
-def test_build_parser_inspect_doc_takes_one_positional():
-    p = _build_parser()
-    args = p.parse_args(["inspect-doc", "doc.json"])
-    assert args.input == "doc.json"
-    assert args.command == "inspect-doc"
-
-
 def test_build_parser_inspect_doc_tolerance_chars_default():
     p = _build_parser()
     args = p.parse_args(["inspect-doc", "doc.json"])
@@ -249,18 +235,6 @@ def test_build_parser_no_command_errors():
     p = _build_parser()
     with pytest.raises(SystemExit):
         p.parse_args([])
-
-
-def test_build_parser_unknown_command_errors():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["unknown"])
-
-
-def test_build_parser_run_missing_required_args_errors():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run"])  # 缺 --manifest 与 --output
 
 
 def test_build_parser_run_missing_output_errors():
@@ -573,12 +547,6 @@ def test_format_metric_params_no_defaults():
 def test_format_metric_return_annotation_str():
     sig = inspect.signature(_format_metric)
     assert "str" in str(sig.return_annotation).lower()
-
-
-def test_run_inspect_doc_signature_one_param():
-    sig = inspect.signature(_run_inspect_doc)
-    assert len(sig.parameters) == 1
-    assert "args" in sig.parameters
 
 
 def test_run_inspect_doc_args_no_default():

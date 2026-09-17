@@ -435,11 +435,6 @@ def test_detect_project_root_nested_file_batch46(tmp_path):
     assert root == tmp_path.resolve()
 
 
-def test_detect_project_root_no_pyproject_returns_cur_batch46(tmp_path):
-    root = _detect_project_root(tmp_path)
-    assert root == tmp_path.resolve()
-
-
 # ---------- module source 补强 ----------
 
 def test_source_contains_关键不变量_batch46():

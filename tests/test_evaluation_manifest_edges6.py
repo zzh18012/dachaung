@@ -361,11 +361,6 @@ def test_expected_failure_source_type_can_be_none():
     assert ef.source_type is None
 
 
-def test_expected_failure_repr_has_class_name():
-    ef = _make_expected_failure()
-    assert "ExpectedFailure" in repr(ef)
-
-
 # =========================================================================
 # Manifest frozen dataclass
 # =========================================================================

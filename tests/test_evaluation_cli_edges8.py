@@ -747,11 +747,6 @@ def test_main_return_annotation_int():
     assert "int" in str(sig.return_annotation)
 
 
-def test_format_metric_signature():
-    sig = inspect.signature(_format_metric)
-    assert set(sig.parameters) == {"name", "metric"}
-
-
 def test_format_metric_return_annotation_str():
     sig = inspect.signature(_format_metric)
     assert "str" in str(sig.return_annotation)

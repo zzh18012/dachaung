@@ -1245,11 +1245,6 @@ def test_module_source_no_walrus():
     assert ":=" not in src
 
 
-def test_module_source_no_global_keyword():
-    src = inspect.getsource(mmod)
-    assert "\nglobal " not in src
-
-
 def test_module_source_no_lambda_at_top_level():
     src = inspect.getsource(mmod)
     for line in src.splitlines():
@@ -1275,11 +1270,6 @@ def test_module_source_no_hardcoded_absolute_path():
     assert "C:\\\\Users" not in src
     assert "C:/Users" not in src
     assert "/home/" not in src
-
-
-def test_module_source_no_print():
-    src = inspect.getsource(mmod)
-    assert "print(" not in src
 
 
 def test_module_source_no_logging():

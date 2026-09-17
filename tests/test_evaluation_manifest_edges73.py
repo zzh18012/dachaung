@@ -50,12 +50,6 @@ def test_manifest_error_is_exception_batch48():
     assert isinstance(err, Exception)
 
 
-def test_manifest_error_can_be_raised_batch48():
-    with pytest.raises(ManifestError) as exc_info:
-        raise ManifestError("boom")
-    assert "boom" in str(exc_info.value)
-
-
 def test_manifest_error_caught_as_exception_batch48():
     with pytest.raises(Exception):
         raise ManifestError("x")
@@ -536,11 +530,6 @@ def test_manifest_content_group_count_mixed_batch48():
         _make_doc(doc_id="d3"),  # unpaired
     ])
     assert m.content_group_count == 2
-
-
-def test_manifest_content_group_count_empty_batch48():
-    m = _make_manifest()
-    assert m.content_group_count == 0
 
 
 def test_manifest_categories_covered_empty_batch48():

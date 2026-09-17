@@ -869,11 +869,6 @@ def test_module_source_no_unlink():
     assert ".unlink(" not in src
 
 
-def test_module_source_no_write():
-    src = inspect.getsource(mmod)
-    assert ".write(" not in src
-
-
 # ---------- signatures 精确补强 ----------
 
 

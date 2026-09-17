@@ -672,11 +672,6 @@ def test_module_source_contains_validate_report_subparser_batch27():
     assert "add_parser" in src
 
 
-def test_module_source_contains_inspect_doc_subparser_batch27():
-    src = inspect.getsource(climod)
-    assert '"inspect-doc"' in src
-
-
 def test_module_source_contains_manifest_required_batch27():
     src = inspect.getsource(climod)
     assert '"--manifest"' in src

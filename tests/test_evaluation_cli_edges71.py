@@ -81,12 +81,6 @@ def test_build_parser_run_default_max_chars_batch45():
     assert args.max_chars == 800
 
 
-def test_build_parser_run_default_tolerance_chars_batch45():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert args.tolerance_chars == 30
-
-
 def test_build_parser_run_custom_max_chars_batch45():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "x", "--output", "y", "--max-chars", "1200"])
@@ -141,22 +135,11 @@ def test_build_parser_no_command_required_batch45():
         p.parse_args([])
 
 
-def test_build_parser_unknown_command_batch45():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["unknown"])
-
-
 def test_build_parser_choices_three_batch45():
     p = _build_parser()
     for action in p._actions:
         if isinstance(action, argparse._SubParsersAction):
             assert set(action.choices.keys()) == {"run", "validate-report", "inspect-doc"}
-
-
-def test_build_parser_formatter_class_batch45():
-    p = _build_parser()
-    assert p.formatter_class == argparse.RawDescriptionHelpFormatter
 
 
 # ---------- main run 各种错误 ----------
@@ -388,18 +371,6 @@ def test_main_inspect_doc_success_batch45(capsys, tmp_path):
 
 # ---------- _format_metric 各种 value 类型 ----------
 
-def test_format_metric_null_value_batch45():
-    out = _format_metric("x", {"value": None, "reason": "why"})
-    assert "null" in out
-    assert "why" in out
-
-
-def test_format_metric_bool_true_batch45():
-    out = _format_metric("x", {"value": True, "reason": None})
-    assert "true" in out
-    assert "ok" in out
-
-
 def test_format_metric_bool_false_batch45():
     out = _format_metric("x", {"value": False, "reason": None})
     assert "false" in out
@@ -408,11 +379,6 @@ def test_format_metric_bool_false_batch45():
 def test_format_metric_float_batch45():
     out = _format_metric("x", {"value": 0.5, "reason": None})
     assert "0.5000" in out
-
-
-def test_format_metric_int_batch45():
-    out = _format_metric("x", {"value": 42, "reason": None})
-    assert "42" in out
 
 
 def test_format_metric_dict_value_batch45():
@@ -439,11 +405,6 @@ def test_format_metric_float_with_reason_batch45():
     out = _format_metric("x", {"value": 0.5, "reason": "ok reason"})
     assert "0.5000" in out
     assert "ok reason" in out
-
-
-def test_format_metric_str_value_batch45():
-    out = _format_metric("x", {"value": "hello", "reason": None})
-    assert "hello" in out
 
 
 def test_format_metric_negative_float_batch45():
@@ -544,11 +505,6 @@ def test_module_source_contains_schema_import_batch45():
     assert "from evaluation.schema import EvalSchemaError, validate_file" in src
 
 
-def test_module_source_contains_dest_command_batch45():
-    src = inspect.getsource(cli_mod)
-    assert 'dest="command"' in src
-
-
 def test_module_source_contains_required_true_batch45():
     src = inspect.getsource(cli_mod)
     assert "required=True" in src
@@ -558,11 +514,6 @@ def test_module_source_contains_fallback_kreuzberg_batch45():
     src = inspect.getsource(cli_mod)
     assert "fallback" in src
     assert "kreuzberg" in src
-
-
-def test_module_source_contains_prog_evaluation_cli_batch45():
-    src = inspect.getsource(cli_mod)
-    assert 'prog="evaluation.cli"' in src
 
 
 def test_module_source_contains_raw_description_batch45():
@@ -588,11 +539,6 @@ def test_module_source_contains_format_metric_function_batch45():
 def test_module_source_contains_run_inspect_doc_function_batch45():
     src = inspect.getsource(cli_mod)
     assert "def _run_inspect_doc(args) -> int:" in src
-
-
-def test_module_source_contains_sort_key_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "_sort_key" in src
 
 
 def test_module_source_contains_no_annotation_default_note_batch45():
@@ -624,12 +570,6 @@ def test_ast_top_level_no_class_batch45():
     tree = ast.parse(inspect.getsource(cli_mod))
     for n in tree.body:
         assert not isinstance(n, ast.ClassDef)
-
-
-def test_ast_top_level_no_async_batch45():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
 
 
 def test_ast_main_has_if_at_least_3_batch45():

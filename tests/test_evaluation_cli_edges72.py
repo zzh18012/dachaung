@@ -51,12 +51,6 @@ def test_build_parser_description_batch47():
     assert "评测" in p.description
 
 
-def test_build_parser_formatter_class_batch47():
-    import argparse
-    p = _build_parser()
-    assert p.formatter_class is argparse.RawDescriptionHelpFormatter
-
-
 def test_build_parser_has_subparsers_batch47():
     """add_subparsers 创建 _SubParsersAction。"""
     import argparse
@@ -171,12 +165,6 @@ def test_validate_report_parser_input_required_batch47():
         p.parse_args(["validate-report"])
 
 
-def test_validate_report_command_value_batch47():
-    p = _build_parser()
-    args = p.parse_args(["validate-report", "report.json"])
-    assert args.command == "validate-report"
-
-
 # ---------- inspect-doc 子命令参数 ----------
 
 def test_inspect_doc_parser_has_input_batch47():
@@ -201,18 +189,6 @@ def test_inspect_doc_parser_tolerance_custom_batch47():
     p = _build_parser()
     args = p.parse_args(["inspect-doc", "doc.json", "--tolerance-chars", "100"])
     assert args.tolerance_chars == 100
-
-
-def test_inspect_doc_command_value_batch47():
-    p = _build_parser()
-    args = p.parse_args(["inspect-doc", "doc.json"])
-    assert args.command == "inspect-doc"
-
-
-def test_run_command_value_batch47():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert args.command == "run"
 
 
 # ---------- main 返回码 ----------
@@ -526,16 +502,6 @@ def test_source_contains_inspect_doc_command_batch47():
 def test_source_contains_RawDescriptionHelpFormatter_batch47():
     src = inspect.getsource(cli_mod)
     assert "RawDescriptionHelpFormatter" in src
-
-
-def test_source_contains_ManifestError_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "ManifestError" in src
-
-
-def test_source_contains_EvalSchemaError_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "EvalSchemaError" in src
 
 
 def test_source_contains_utf8_reconfigure_batch47():

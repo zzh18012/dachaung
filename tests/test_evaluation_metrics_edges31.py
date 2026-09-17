@@ -1056,11 +1056,6 @@ def test_module_source_no_forbidden_token_round9(token):
 # ---------- module source 字符串精确补强 ----------
 
 
-def test_module_source_starts_with_docstring():
-    src = inspect.getsource(mmod)
-    assert src.lstrip().startswith(('"""', "'''"))
-
-
 def test_module_source_import_count_5():
     """5 个 module-level imports: __future__ + math + Counter + Path + Any。"""
     src = inspect.getsource(mmod)
@@ -1090,16 +1085,6 @@ def test_module_source_imports_path():
 def test_module_source_imports_any():
     src = inspect.getsource(mmod)
     assert "from typing import Any" in src
-
-
-def test_module_source_no_relative_import():
-    src = inspect.getsource(mmod)
-    import_lines = [
-        line for line in src.splitlines()
-        if line.strip().startswith(("import ", "from "))
-    ]
-    for line in import_lines:
-        assert not line.strip().startswith("from .")
 
 
 def test_module_source_no_star_import():
@@ -1152,11 +1137,6 @@ def test_module_source_uses_counter_intersection():
 def test_module_source_uses_isspace():
     src = inspect.getsource(mmod)
     assert ".isspace()" in src or "isspace" in src
-
-
-def test_module_source_no_pickle_import():
-    src = inspect.getsource(mmod)
-    assert "import pickle" not in src
 
 
 def test_module_source_no_yaml_import():

@@ -196,11 +196,6 @@ def test_detect_project_root_file_input_batch52(tmp_path):
     assert root == tmp_path.resolve()
 
 
-def test_detect_project_root_no_pyproject_fallback_batch52(tmp_path):
-    root = _detect_project_root(tmp_path)
-    assert root == tmp_path.resolve()
-
-
 def test_detect_project_root_with_pyproject_batch52(tmp_path):
     (tmp_path / "pyproject.toml").write_text("[project]\n", encoding="utf-8")
     sub = tmp_path / "a" / "b"
@@ -567,11 +562,6 @@ def test_source_all_5_entries_batch52():
     src = inspect.getsource(manifest_mod)
     for name in ("ManifestError", "Manifest", "DocumentEntry", "ExpectedFailure", "load_manifest"):
         assert f'"{name}"' in src
-
-
-def test_source_3_frozen_dataclasses_batch52():
-    src = inspect.getsource(manifest_mod)
-    assert src.count("@dataclass(frozen=True)") == 3
 
 
 def test_source_module_docstring_invariants_batch52():

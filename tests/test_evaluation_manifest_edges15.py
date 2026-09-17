@@ -210,12 +210,6 @@ def test_manifest_error_str_returns_message():
     assert str(e) == "hello"
 
 
-def test_manifest_error_repr_contains_class_name():
-    """repr 含类名。"""
-    e = ManifestError("msg")
-    assert "ManifestError" in repr(e)
-
-
 def test_manifest_error_can_be_raised_and_caught():
     """可 raise 与 except。"""
     with pytest.raises(ManifestError) as exc_info:

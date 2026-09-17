@@ -156,12 +156,6 @@ def test_manifest_error_no_args():
     assert e.args == ()
 
 
-def test_manifest_error_can_be_raised_and_caught():
-    with pytest.raises(ManifestError) as exc_info:
-        raise ManifestError("boom")
-    assert "boom" in str(exc_info.value)
-
-
 def test_manifest_error_caught_as_exception():
     """ManifestError 是 Exception 子类，可被裸 except/Exception 捕获。"""
     with pytest.raises(Exception):

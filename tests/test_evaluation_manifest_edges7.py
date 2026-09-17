@@ -77,11 +77,6 @@ def test_detect_project_root_no_pyproject_from_file_returns_parent(tmp_path: Pat
     assert result == tmp_path
 
 
-def test_detect_project_root_returns_path_type(tmp_path: Path):
-    result = _detect_project_root(tmp_path)
-    assert isinstance(result, Path)
-
-
 def test_detect_project_root_resolves_path(tmp_path: Path):
     """返回 .resolve() 后的路径。"""
     (tmp_path / "pyproject.toml").write_text("[tool.x]", encoding="utf-8")

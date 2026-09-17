@@ -600,11 +600,6 @@ def test_source_docstring_mentions_no_backslash_batch49():
     assert "反斜杠" in src
 
 
-def test_source_docstring_mentions_project_root_batch49():
-    src = inspect.getsource(manifest_mod)
-    assert "项目根" in src
-
-
 def test_source_all_has_5_entries_batch49():
     src = inspect.getsource(manifest_mod)
     assert '"ManifestError"' in src

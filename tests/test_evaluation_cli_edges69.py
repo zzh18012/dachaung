@@ -77,18 +77,6 @@ def test_build_parser_has_run_command_batch43():
     assert args.command == "run"
 
 
-def test_build_parser_has_validate_report_command_batch43():
-    p = _build_parser()
-    args = p.parse_args(["validate-report", "report.json"])
-    assert args.command == "validate-report"
-
-
-def test_build_parser_has_inspect_doc_command_batch43():
-    p = _build_parser()
-    args = p.parse_args(["inspect-doc", "doc.json"])
-    assert args.command == "inspect-doc"
-
-
 def test_build_parser_run_args_batch43():
     p = _build_parser()
     args = p.parse_args([
@@ -208,37 +196,11 @@ def test_format_metric_bool_false_batch43():
     assert "ok" in out
 
 
-def test_format_metric_float_value_batch43():
-    out = _format_metric("foo", {"value": 0.5, "reason": None})
-    assert "0.5000" in out
-
-
-def test_format_metric_dict_value_batch43():
-    out = _format_metric("foo", {"value": {"a": 1, "b": 2}, "reason": None})
-    assert "a=1" in out
-    assert "b=2" in out
-
-
-def test_format_metric_int_value_batch43():
-    out = _format_metric("foo", {"value": 42, "reason": None})
-    assert "42" in out
-
-
-def test_format_metric_str_value_batch43():
-    out = _format_metric("foo", {"value": "hello", "reason": None})
-    assert "hello" in out
-
-
 def test_format_metric_name_width_36_batch43():
     out = _format_metric("foo", {"value": None, "reason": "why"})
     # 第二行 ":" 之后空格对齐到 36 字符
     lines = [l for l in out.split("\n") if "foo" in l]
     assert lines  # at least one line with foo
-
-
-def test_format_metric_reason_none_falls_back_to_ok_batch43():
-    out = _format_metric("foo", {"value": 0.5, "reason": None})
-    assert "ok" in out
 
 
 def test_format_metric_with_reason_batch43():
@@ -253,12 +215,6 @@ def test_format_metric_empty_dict_value_batch43():
 
 
 # ---------- _run_inspect_doc ----------
-
-def test_run_inspect_doc_signature_batch43():
-    sig = inspect.signature(_run_inspect_doc)
-    params = list(sig.parameters.keys())
-    assert params == ["args"]
-
 
 def test_run_inspect_doc_param_kind_batch43():
     sig = inspect.signature(_run_inspect_doc)
@@ -471,11 +427,6 @@ def test_main_inspect_doc_dispatch_batch43():
 
 
 # ---------- module source ----------
-
-def test_module_source_contains_subparsers_batch43():
-    src = inspect.getsource(cli_mod)
-    assert "add_subparsers" in src
-
 
 def test_module_source_contains_run_command_batch43():
     src = inspect.getsource(cli_mod)

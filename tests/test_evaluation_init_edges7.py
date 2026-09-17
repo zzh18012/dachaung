@@ -54,10 +54,6 @@ def test_evaluator_annotation_different_batch48():
     assert EVALUATOR_VERSION != ANNOTATION_VERSION
 
 
-def test_report_manifest_different_batch48():
-    assert REPORT_VERSION != MANIFEST_VERSION
-
-
 def test_annotation_manifest_same_value_batch48():
     assert ANNOTATION_VERSION == MANIFEST_VERSION
 
@@ -474,12 +470,6 @@ def test_ast_no_import_batch48():
         assert not isinstance(n, (ast.Import, ast.ImportFrom))
 
 
-def test_ast_no_class_def_batch48():
-    tree = ast.parse(inspect.getsource(evaluation))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_no_function_def_batch48():
     tree = ast.parse(inspect.getsource(evaluation))
     for n in tree.body:
@@ -544,26 +534,6 @@ def test_source_no_subprocess_batch48():
     assert "subprocess" not in src
 
 
-def test_source_no_lambda_batch48():
-    src = inspect.getsource(evaluation)
-    assert "lambda" not in src
-
-
-def test_source_no_yield_batch48():
-    src = inspect.getsource(evaluation)
-    assert "yield" not in src
-
-
-def test_source_no_walrus_batch48():
-    src = inspect.getsource(evaluation)
-    assert ":=" not in src
-
-
-def test_source_no_async_batch48():
-    src = inspect.getsource(evaluation)
-    assert "async " not in src
-
-
 def test_source_no_await_batch48():
     src = inspect.getsource(evaluation)
     assert "await " not in src
@@ -594,8 +564,3 @@ def test_four_versions_tuple_batch48():
     assert len(t) == 4
     assert t.count("1.1") == 2
     assert t.count("1.0") == 2
-
-
-def test_four_versions_set_batch48():
-    s = {EVALUATOR_VERSION, REPORT_VERSION, ANNOTATION_VERSION, MANIFEST_VERSION}
-    assert s == {"1.1", "1.0"}

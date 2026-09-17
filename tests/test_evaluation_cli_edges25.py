@@ -235,11 +235,6 @@ def test_format_metric_dict_sorted_by_key():
     assert out.index("a=1") < out.index("b=2")
 
 
-def test_format_metric_str_value():
-    out = _format_metric("x", {"value": "hello", "reason": None})
-    assert "hello" in out
-
-
 def test_format_metric_reason_fallback_to_ok():
     out = _format_metric("x", {"value": True, "reason": None})
     assert "ok" in out

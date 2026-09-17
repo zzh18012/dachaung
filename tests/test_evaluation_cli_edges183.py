@@ -197,12 +197,6 @@ def test_ect_sum_ten(tmp_path):
         "participating_docs": 4}
 
 
-def test_silent_drop_zero(tmp_path):
-    _, data, _ = _run(tmp_path)
-    assert data["summary"][
-        "silent_drop_total"] == 0
-
-
 def test_per_doc_sdcs(tmp_path):
     _, data, _ = _run(tmp_path)
     for d in data["per_doc"]:
@@ -341,13 +335,3 @@ def test_ects_exact(tmp_path):
 
 
 # ---------- validate-report ----------
-
-def test_validate_report_rc0(
-        tmp_path):
-    _, _, rep = _run(tmp_path)
-    buf = io.StringIO()
-    with contextlib.redirect_stdout(
-            buf):
-        rc = main(["validate-report",
-                   str(rep)])
-    assert rc == 0

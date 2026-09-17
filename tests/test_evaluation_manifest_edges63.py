@@ -295,10 +295,6 @@ def test_is_absolute_like_alpha_colon_no_slash_batch36():
     assert _is_absolute_like("C:foo") is False
 
 
-def test_is_absolute_like_alpha_colon_backslash_batch36():
-    assert _is_absolute_like("C:\\") is True
-
-
 def test_is_absolute_like_alpha_colon_forward_batch36():
     assert _is_absolute_like("D:/") is True
 
@@ -319,10 +315,6 @@ def test_is_absolute_like_underscore_colon_batch36():
 
 def test_has_backslash_normal_relative_batch36():
     assert _has_backslash("foo/bar") is False
-
-
-def test_has_backslash_single_char_batch36():
-    assert _has_backslash("a") is False
 
 
 def test_has_backslash_double_backslash_batch36():

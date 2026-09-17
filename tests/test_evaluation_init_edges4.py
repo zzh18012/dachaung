@@ -55,10 +55,6 @@ def test_manifest_version_value_batch44():
     assert MANIFEST_VERSION == "1.0"
 
 
-def test_evaluator_equals_report_batch44():
-    assert EVALUATOR_VERSION == REPORT_VERSION
-
-
 def test_annotation_equals_manifest_batch44():
     assert ANNOTATION_VERSION == MANIFEST_VERSION
 
@@ -75,10 +71,6 @@ def test_two_distinct_versions_batch44():
 
 def test_evaluator_version_is_str_batch44():
     assert isinstance(EVALUATOR_VERSION, str)
-
-
-def test_report_version_is_str_batch44():
-    assert isinstance(REPORT_VERSION, str)
 
 
 def test_annotation_version_is_str_batch44():
@@ -107,11 +99,6 @@ def test_evaluator_version_truthy_batch44():
 
 # ---------- 版本字符串 split / replace / upper / lower ----------
 
-def test_evaluator_version_split_batch44():
-    parts = EVALUATOR_VERSION.split(".")
-    assert parts == ["1", "1"]
-
-
 def test_annotation_version_split_batch44():
     parts = ANNOTATION_VERSION.split(".")
     assert parts == ["1", "0"]
@@ -119,10 +106,6 @@ def test_annotation_version_split_batch44():
 
 def test_evaluator_version_replace_batch44():
     assert EVALUATOR_VERSION.replace(".", "-") == "1-1"
-
-
-def test_evaluator_version_upper_batch44():
-    assert EVALUATOR_VERSION.upper() == "1.1"
 
 
 def test_evaluator_version_lower_batch44():
@@ -235,10 +218,6 @@ def test_all_order_matches_source_batch44():
     ]
 
 
-def test_all_is_list_batch44():
-    assert isinstance(evaluation.__all__, list)
-
-
 def test_all_mutable_batch44():
     """__all__ 是 list（可变）。"""
     original = list(evaluation.__all__)
@@ -269,26 +248,6 @@ def test_all_imported_to_module_namespace_batch44():
 
 
 # ---------- 模块属性 ----------
-
-def test_evaluator_version_in_dir_batch44():
-    assert "EVALUATOR_VERSION" in dir(evaluation)
-
-
-def test_report_version_in_dir_batch44():
-    assert "REPORT_VERSION" in dir(evaluation)
-
-
-def test_annotation_version_in_dir_batch44():
-    assert "ANNOTATION_VERSION" in dir(evaluation)
-
-
-def test_manifest_version_in_dir_batch44():
-    assert "MANIFEST_VERSION" in dir(evaluation)
-
-
-def test_module_dir_contains_all_batch44():
-    assert "__all__" in dir(evaluation)
-
 
 def test_module_dir_contains_doc_batch44():
     assert "__doc__" in dir(evaluation)
@@ -353,16 +312,6 @@ def test_module_docstring_length_batch44():
     assert len(evaluation.__doc__) > 200
 
 
-def test_module_source_contains_design_principles_batch44():
-    src = inspect.getsource(evaluation)
-    assert "设计原则" in src
-
-
-def test_module_source_contains_version_history_batch44():
-    src = inspect.getsource(evaluation)
-    assert "版本历史" in src
-
-
 def test_module_source_contains_v10_batch44():
     src = inspect.getsource(evaluation)
     assert "v1.0" in src
@@ -396,11 +345,6 @@ def test_module_source_contains_no_fake_batch44():
 def test_module_source_contains_denominator_zero_batch44():
     src = inspect.getsource(evaluation)
     assert "分母" in src
-
-
-def test_module_source_contains_not_comparable_batch44():
-    src = inspect.getsource(evaluation)
-    assert "不可横向比较" in src
 
 
 def test_module_source_contains_normalize_text_batch44():
@@ -645,10 +589,6 @@ def test_evaluator_version_starts_with_digit_batch44():
 
 def test_versions_concat_batch44():
     assert EVALUATOR_VERSION + "/" + ANNOTATION_VERSION == "1.1/1.0"
-
-
-def test_versions_repeat_batch44():
-    assert EVALUATOR_VERSION * 2 == "1.11.1"
 
 
 def test_versions_join_roundtrip_batch44():

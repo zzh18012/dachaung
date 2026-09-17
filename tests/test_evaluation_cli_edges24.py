@@ -368,11 +368,6 @@ def test_run_inspect_doc_source_has_sorted_call():
     assert "_sort_key" in src
 
 
-def test_run_inspect_doc_source_has_compute_metrics_call():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "compute_automatic_metrics" in src
-
-
 def test_run_inspect_doc_source_has_figure_caption_call():
     src = inspect.getsource(_run_inspect_doc)
     assert "figure_caption_prf" in src

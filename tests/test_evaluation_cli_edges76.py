@@ -138,21 +138,6 @@ def test_format_metric_bool_true_batch51():
     assert "ok" in out
 
 
-def test_format_metric_bool_false_batch51():
-    out = _format_metric("foo", {"value": False, "reason": None})
-    assert "false" in out
-
-
-def test_format_metric_float_batch51():
-    out = _format_metric("foo", {"value": 0.5, "reason": None})
-    assert "0.5000" in out
-
-
-def test_format_metric_int_batch51():
-    out = _format_metric("foo", {"value": 42, "reason": None})
-    assert "42" in out
-
-
 def test_format_metric_large_int_batch51():
     out = _format_metric("foo", {"value": 9999999, "reason": None})
     assert "9999999" in out
@@ -161,12 +146,6 @@ def test_format_metric_large_int_batch51():
 def test_format_metric_negative_float_batch51():
     out = _format_metric("foo", {"value": -0.123, "reason": None})
     assert "-0.1230" in out
-
-
-def test_format_metric_dict_batch51():
-    out = _format_metric("foo", {"value": {"a": 1, "b": 2}, "reason": None})
-    assert "a=1" in out
-    assert "b=2" in out
 
 
 def test_format_metric_dict_sorted_batch51():
@@ -481,11 +460,6 @@ def test_source_contains_errors_replace_batch51():
     assert "errors=\"replace\"" in src
 
 
-def test_source_contains_file_stderr_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "file=sys.stderr" in src
-
-
 def test_source_contains_ok_marker_batch51():
     src = inspect.getsource(cli_mod)
     assert "[OK]" in src
@@ -509,11 +483,6 @@ def test_source_contains_return_0_batch51():
 def test_source_contains_return_1_batch51():
     src = inspect.getsource(cli_mod)
     assert "return 1" in src
-
-
-def test_source_contains_return_2_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "return 2" in src
 
 
 def test_source_contains_required_true_batch51():
@@ -657,13 +626,6 @@ def test_ast_run_inspect_doc_has_nested_sort_key_batch51():
     nested_funcs = [n for n in ast.walk(func) if isinstance(n, ast.FunctionDef) and n is not func]
     assert len(nested_funcs) == 1
     assert nested_funcs[0].name == "_sort_key"
-
-
-def test_ast_run_inspect_doc_has_returns_batch51():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_run_inspect_doc")
-    returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
-    assert len(returns) >= 4
 
 
 def test_ast_run_inspect_doc_uses_sorted_batch51():

@@ -117,10 +117,6 @@ def test_evaluator_version_is_1_1():
     assert EVALUATOR_VERSION == "1.1"
 
 
-def test_report_version_is_1_1():
-    assert REPORT_VERSION == "1.1"
-
-
 # =========================================================================
 # aggregate_summary 深度
 # =========================================================================

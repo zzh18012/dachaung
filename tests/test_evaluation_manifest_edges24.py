@@ -898,11 +898,6 @@ def test_load_manifest_source_has_for_ef_in_expected_failures():
     assert "for ef in data.get(\"expected_failures\", []):" in src
 
 
-def test_load_manifest_source_has_return_manifest():
-    src = inspect.getsource(load_manifest)
-    assert "return Manifest(" in src
-
-
 def test_resolve_relative_path_source_has_4_manifest_error_raises():
     """_resolve_relative_path 含 4 处 raise ManifestError（empty/absolute/backslash/outside-root）。"""
     src = inspect.getsource(_resolve_relative_path)

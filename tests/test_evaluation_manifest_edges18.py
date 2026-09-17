@@ -334,20 +334,12 @@ def test_manifest_error_is_exception_subclass():
     assert issubclass(ManifestError, Exception)
 
 
-def test_manifest_error_is_baseexception_subclass():
-    assert issubclass(ManifestError, BaseException)
-
-
 def test_manifest_error_mro_contains_exception():
     assert Exception in ManifestError.__mro__
 
 
 def test_manifest_error_module_identity():
     assert ManifestError.__module__ == "evaluation.manifest"
-
-
-def test_manifest_error_qualname():
-    assert ManifestError.__qualname__ == "ManifestError"
 
 
 def test_manifest_error_str_contains_message():
@@ -751,13 +743,6 @@ def test_module_namespace_has_any():
     assert hasattr(m, "Any")
 
 
-def test_module_namespace_has_manifest_version():
-    import evaluation.manifest as m
-
-    assert hasattr(m, "MANIFEST_VERSION")
-    assert m.MANIFEST_VERSION == MANIFEST_VERSION
-
-
 def test_module_namespace_has_validate():
     """从 evaluation.schema 导入 validate。"""
     import evaluation.manifest as m
@@ -856,15 +841,6 @@ def test_module_all_has_5_entries():
     import evaluation.manifest as m
 
     assert len(m.__all__) == 5
-
-
-def test_module_all_does_not_contain_private_helpers():
-    import evaluation.manifest as m
-
-    assert "_is_absolute_like" not in m.__all__
-    assert "_has_backslash" not in m.__all__
-    assert "_resolve_relative_path" not in m.__all__
-    assert "_detect_project_root" not in m.__all__
 
 
 def test_module_all_does_not_contain_constants():
@@ -1090,16 +1066,8 @@ def test_is_absolute_like_module_identity():
     assert _is_absolute_like.__module__ == "evaluation.manifest"
 
 
-def test_is_absolute_like_qualname():
-    assert _is_absolute_like.__qualname__ == "_is_absolute_like"
-
-
 def test_has_backslash_module_identity():
     assert _has_backslash.__module__ == "evaluation.manifest"
-
-
-def test_has_backslash_qualname():
-    assert _has_backslash.__qualname__ == "_has_backslash"
 
 
 def test_all_helpers_are_function_type():
@@ -1128,11 +1096,6 @@ def test_is_absolute_like_signature_param_count_1():
 def test_is_absolute_like_param_name():
     sig = inspect.signature(_is_absolute_like)
     assert list(sig.parameters.keys()) == ["path_str"]
-
-
-def test_is_absolute_like_no_default():
-    sig = inspect.signature(_is_absolute_like)
-    assert sig.parameters["path_str"].default is inspect.Parameter.empty
 
 
 def test_has_backslash_signature_param_count_1():

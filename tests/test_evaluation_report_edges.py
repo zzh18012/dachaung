@@ -142,10 +142,6 @@ def test_success_bool_metrics_excludes_schema_valid():
 # ---------- __all__ 导出 ----------
 
 
-def test_all_exports_has_five_items():
-    assert len(__all__) == 5
-
-
 def test_all_exports_contains_expected_items():
     assert set(__all__) == {
         "build_provenance",

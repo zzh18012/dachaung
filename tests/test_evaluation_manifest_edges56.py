@@ -57,13 +57,6 @@ def test_manifest_error_can_be_raised_and_caught_batch29():
         assert str(e) == "test"
 
 
-def test_manifest_error_caught_by_exception_batch29():
-    try:
-        raise ManifestError("test")
-    except Exception as e:
-        assert isinstance(e, ManifestError)
-
-
 def test_manifest_error_message_with_special_chars_batch29():
     e = ManifestError("line\nwith\ttabs")
     assert "\n" in str(e)
@@ -281,11 +274,6 @@ def test_manifest_hashable_batch29():
 def test_manifest_file_count_int_batch29():
     m = _make_manifest()
     assert isinstance(m.file_count, int)
-
-
-def test_manifest_pdf_count_int_batch29():
-    m = _make_manifest()
-    assert isinstance(m.pdf_count, int)
 
 
 def test_manifest_docx_count_int_batch29():
@@ -524,11 +512,6 @@ def test_detect_project_root_with_file_batch29(tmp_path):
     p.touch()
     result = _detect_project_root(p)
     assert result == tmp_path.resolve()
-
-
-def test_detect_project_root_returns_path_batch29(tmp_path):
-    result = _detect_project_root(tmp_path)
-    assert isinstance(result, Path)
 
 
 def test_detect_project_root_returns_absolute_batch29(tmp_path):

@@ -92,10 +92,6 @@ def test_is_absolute_like_three_chars_no_separator():
     assert _is_absolute_like("C:a") is False
 
 
-def test_is_absolute_like_three_chars_with_slash():
-    assert _is_absolute_like("C:/") is True
-
-
 def test_is_absolute_like_three_chars_with_backslash():
     assert _is_absolute_like("C:\\\\") is True
 
@@ -275,10 +271,6 @@ def test_manifest_error_no_custom_init():
     src = inspect.getsource(ManifestError)
     # 只有 class 声明 + docstring，没有 __init__
     assert "def __init__" not in src
-
-
-def test_manifest_error_bases_is_exception_only():
-    assert ManifestError.__bases__ == (Exception,)
 
 
 def test_manifest_error_namespace_is_evaluation_manifest():

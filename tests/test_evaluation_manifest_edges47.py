@@ -936,15 +936,6 @@ def test_module_source_has_has_backslash_function_batch20():
     assert "def _has_backslash(" in src
 
 
-def test_module_source_has_all_list_with_5_entries_batch20():
-    src = inspect.getsource(mmod)
-    assert '"ManifestError"' in src
-    assert '"Manifest"' in src
-    assert '"DocumentEntry"' in src
-    assert '"ExpectedFailure"' in src
-    assert '"load_manifest"' in src
-
-
 def test_module_source_has_docstring_batch20():
     src = inspect.getsource(mmod)
     assert "开发集清单加载器" in src

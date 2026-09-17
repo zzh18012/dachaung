@@ -68,12 +68,6 @@ def test_build_parser_run_parser_default_fallback_batch20():
     assert args.parser == "fallback"
 
 
-def test_build_parser_run_parser_invalid_choice_system_exit_batch20():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--manifest", "a.json", "--output", "b.json", "--parser", "invalid"])
-
-
 def test_build_parser_max_chars_type_int_batch20():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "a.json", "--output", "b.json", "--max-chars", "500"])
@@ -385,11 +379,6 @@ def test_main_validate_report_invalid_json_returns_1_batch20(tmp_path, capsys):
     p.write_text("{not valid", encoding="utf-8")
     rc = main(["validate-report", str(p)])
     assert rc == 1
-
-
-def test_main_run_manifest_not_exist_returns_2_batch20(tmp_path, capsys):
-    rc = main(["run", "--manifest", str(tmp_path / "missing.json"), "--output", str(tmp_path / "out.json")])
-    assert rc == 2
 
 
 def test_main_run_manifest_load_error_returns_1_batch20(tmp_path, capsys):

@@ -394,22 +394,6 @@ def test_document_entry_field_count_ten():
     assert len(flds) == 10
 
 
-def test_document_entry_field_names_in_order():
-    flds = [f.name for f in fields(DocumentEntry)]
-    assert flds == [
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "source_type",
-        "sha256",
-        "categories",
-        "paired_with",
-        "annotation_file_str",
-        "annotation_resolved",
-        "expectations",
-    ]
-
-
 def test_document_entry_is_dataclass():
     assert is_dataclass(DocumentEntry)
 
@@ -471,17 +455,6 @@ def test_expected_failure_inequality_source_type_none():
 def test_expected_failure_field_count_five():
     flds = fields(ExpectedFailure)
     assert len(flds) == 5
-
-
-def test_expected_failure_field_names_in_order():
-    flds = [f.name for f in fields(ExpectedFailure)]
-    assert flds == [
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "expected_error_code",
-        "source_type",
-    ]
 
 
 def test_expected_failure_is_dataclass():

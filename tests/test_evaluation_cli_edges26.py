@@ -321,13 +321,6 @@ def test_main_inspect_doc_with_empty_dict(tmp_path, capsys):
     assert "elements=0" in out
 
 
-def test_main_inspect_doc_with_str_input_path(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps({"source_type": "pdf", "elements": [], "chunks": []}), encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-
-
 # ---------- _format_metric boundary ----------
 
 
@@ -530,11 +523,6 @@ def test_module_source_has_no_all_definition():
 # ---------- signatures 精确 ----------
 
 
-def test_main_signature_argv_annotation():
-    sig = inspect.signature(main)
-    assert sig.parameters["argv"].annotation == "list[str] | None"
-
-
 def test_main_signature_return_int():
     sig = inspect.signature(main)
     assert sig.return_annotation == "int"
@@ -593,16 +581,6 @@ def test_module_has_3_private_functions():
         and isinstance(getattr(m, n), FunctionType)
     ]
     assert set(private) == {"_build_parser", "_format_metric", "_run_inspect_doc"}
-
-
-def test_module_namespace():
-    assert m.__name__ == "evaluation.cli"
-
-
-def test_module_has_main_block():
-    src = inspect.getsource(m)
-    assert 'if __name__ == "__main__":' in src
-    assert "raise SystemExit(main())" in src
 
 
 def test_module_has_no_all():

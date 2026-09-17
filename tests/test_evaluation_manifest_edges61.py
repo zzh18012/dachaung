@@ -555,20 +555,6 @@ def test_module_source_contains_has_backslash_func_batch34():
     assert "def _has_backslash(" in src
 
 
-def test_module_source_contains_validate_call_batch34():
-    src = inspect.getsource(mmod)
-    assert 'validate(' in src
-
-
-def test_module_source_contains_all_keys_batch34():
-    src = inspect.getsource(mmod)
-    assert '"ManifestError"' in src
-    assert '"Manifest"' in src
-    assert '"DocumentEntry"' in src
-    assert '"ExpectedFailure"' in src
-    assert '"load_manifest"' in src
-
-
 # ---------- signatures 第四十九批
 
 

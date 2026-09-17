@@ -1094,10 +1094,6 @@ def test_module_no_user_classes():
     assert classes == []
 
 
-def test_module_has_dunder_file():
-    assert hasattr(mmod, "__file__")
-
-
 def test_module_dunder_name():
     assert mmod.__name__ == "evaluation.metrics"
 

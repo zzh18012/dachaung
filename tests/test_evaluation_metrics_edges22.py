@@ -1101,11 +1101,6 @@ def test_module_source_no_async_def():
     assert "async def" not in src
 
 
-def test_module_source_no_global_stmt():
-    src = inspect.getsource(mmod)
-    assert "\nglobal " not in src
-
-
 def test_module_source_no_walrus():
     src = inspect.getsource(mmod)
     assert ":=" not in src

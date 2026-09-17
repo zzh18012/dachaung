@@ -344,11 +344,6 @@ def test_source_contains_run_evaluation_import_batch48():
     assert "run_evaluation" in src
 
 
-def test_source_contains_load_manifest_import_batch48():
-    src = inspect.getsource(cli_mod)
-    assert "load_manifest" in src
-
-
 def test_source_contains_validate_file_import_batch48():
     src = inspect.getsource(cli_mod)
     assert "validate_file" in src
@@ -414,11 +409,6 @@ def test_ast_top_level_functions_count_batch48():
 def test_ast_no_class_def_batch48():
     tree = ast.parse(inspect.getsource(cli_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_async_function_def_batch48():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
 
 
 def test_ast_main_has_multiple_returns_batch48():

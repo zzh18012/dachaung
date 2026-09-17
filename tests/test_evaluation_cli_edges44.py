@@ -52,15 +52,6 @@ def test_build_parser_subparsers_required_batch17():
         p.parse_args([])
 
 
-def test_build_parser_has_three_subcommands_batch17():
-    p = _build_parser()
-    # find subparsers action
-    sub_action = next(
-        a for a in p._actions if isinstance(a, argparse._SubParsersAction)
-    )
-    assert set(sub_action.choices.keys()) == {"run", "validate-report", "inspect-doc"}
-
-
 def test_build_parser_run_default_parser_batch17():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
@@ -658,11 +649,6 @@ def test_signature_main_return_annotation_int_batch17():
     sig = inspect.signature(main)
     # 因 from __future__ import annotations，return 注解是字符串
     assert sig.return_annotation == "int"
-
-
-def test_signature_build_parser_return_annotation_batch17():
-    sig = inspect.signature(_build_parser)
-    assert sig.return_annotation == "argparse.ArgumentParser"
 
 
 # ---------- module 合理性第三十批 ----------

@@ -147,14 +147,6 @@ def test_cli_inspect_three_type_by_type_batch434(tmp_path, capsys):
             "heading=1, paragraph=5, table=1  (ok)") in out
 
 
-def test_cli_inspect_hbc_batch434(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("heading_boundary_compliance          "
-            "1.0000  (ok)") in out
-
-
 def test_cli_inspect_docx_locator_batch434(tmp_path, capsys):
     docp = _doc(tmp_path)
     rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])

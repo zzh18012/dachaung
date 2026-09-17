@@ -89,15 +89,6 @@ def test_build_parser_run_choices_for_parser_batch40():
     assert args.parser == "kreuzberg"
 
 
-def test_build_parser_run_invalid_parser_raises_batch40():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args([
-            "run", "--manifest", "a.json", "--output", "b.json",
-            "--parser", "invalid",
-        ])
-
-
 def test_build_parser_run_default_parser_fallback_batch40():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
@@ -155,18 +146,6 @@ def test_build_parser_inspect_doc_custom_tolerance_chars_batch40():
     assert args.tolerance_chars == 55
 
 
-def test_build_parser_run_manifest_required_batch40():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--output", "b.json"])
-
-
-def test_build_parser_run_output_required_batch40():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--manifest", "a.json"])
-
-
 def test_build_parser_validate_report_input_required_batch40():
     p = _build_parser()
     with pytest.raises(SystemExit):
@@ -210,21 +189,10 @@ def test_format_metric_return_annotation_str_batch40():
     assert "str" in str(sig.return_annotation)
 
 
-def test_format_metric_with_none_value_and_reason_batch40():
-    out = _format_metric("x", {"value": None, "reason": "why"})
-    assert "null" in out
-    assert "why" in out
-
-
 def test_format_metric_with_none_value_no_reason_batch40():
     out = _format_metric("x", {"value": None, "reason": None})
     assert "null" in out
     assert "None" in out  # reason=None 被 f-string 渲染为 None
-
-
-def test_format_metric_with_true_value_batch40():
-    out = _format_metric("x", {"value": True, "reason": None})
-    assert "true" in out  # 小写
 
 
 def test_format_metric_with_false_value_batch40():
@@ -236,11 +204,6 @@ def test_format_metric_with_int_value_batch40():
     """int 不是 float，落入 fallback 分支。"""
     out = _format_metric("x", {"value": 42, "reason": None})
     assert "42" in out
-
-
-def test_format_metric_with_zero_int_batch40():
-    out = _format_metric("x", {"value": 0, "reason": None})
-    assert "0" in out
 
 
 def test_format_metric_with_negative_int_batch40():
@@ -391,14 +354,6 @@ def test_run_inspect_doc_empty_dict_returns_0_batch40(tmp_path):
     assert rc == 0
 
 
-def test_run_inspect_doc_prints_metrics_header_batch40(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    captured = capsys.readouterr()
-    assert "metrics:" in captured.out
-
-
 def test_run_inspect_doc_prints_file_path_batch40(tmp_path, capsys):
     p = tmp_path / "doc.json"
     p.write_text("{}", encoding="utf-8")
@@ -460,25 +415,6 @@ def test_run_inspect_doc_prints_default_unknown_when_missing_batch40(tmp_path, c
     captured = capsys.readouterr()
     # document_id 默认 '?'
     assert "?" in captured.out
-
-
-def test_run_inspect_doc_does_not_write_file_batch40(tmp_path):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    before = set(tmp_path.iterdir())
-    _run_inspect_doc(_make_args(p))
-    after = set(tmp_path.iterdir())
-    assert before == after
-
-
-def test_run_inspect_doc_idempotent_batch40(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    out1 = capsys.readouterr().out
-    _run_inspect_doc(_make_args(p))
-    out2 = capsys.readouterr().out
-    assert out1 == out2
 
 
 def test_run_inspect_doc_with_full_document_batch40(tmp_path, capsys):
@@ -569,13 +505,6 @@ def test_main_inspect_doc_missing_file_returns_2_batch40(tmp_path):
     p = tmp_path / "missing.json"
     rc = main(["inspect-doc", str(p)])
     assert rc == 2
-
-
-def test_main_validate_report_invalid_json_returns_1_batch40(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{invalid", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
 
 
 def test_main_inspect_doc_invalid_json_returns_1_batch40(tmp_path):
@@ -704,13 +633,6 @@ def test_main_run_with_load_manifest_failure_returns_1_batch40(tmp_path, capsys)
     p.write_text("{invalid", encoding="utf-8")
     rc = main(["run", "--manifest", str(p), "--output", str(tmp_path / "out.json")])
     assert rc == 1
-
-
-def test_main_inspect_doc_with_empty_dict_batch40(tmp_path):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
 
 
 # ---------- module source forbidden tokens 第七十四批
@@ -849,11 +771,6 @@ def test_module_source_contains_main_guard_batch40():
     assert 'if __name__ == "__main__"' in src
 
 
-def test_module_source_contains_system_exit_batch40():
-    src = inspect.getsource(cmod)
-    assert "SystemExit" in src or "sys.exit" in src
-
-
 # ---------- module 合理性 第七十批
 
 
@@ -889,19 +806,9 @@ def test_module_run_inspect_doc_callable_batch40():
     assert callable(cmod._run_inspect_doc)
 
 
-def test_module_no_class_definitions_batch40():
-    src = inspect.getsource(cmod)
-    assert "\nclass " not in src
-
-
 def test_module_has_main_guard_batch40():
     src = inspect.getsource(cmod)
     assert 'if __name__ == "__main__"' in src
-
-
-def test_module_has_system_exit_call_batch40():
-    src = inspect.getsource(cmod)
-    assert "SystemExit" in src or "sys.exit" in src
 
 
 def test_module_no_module_level_code_outside_functions_batch40():
@@ -941,25 +848,6 @@ def test_e2e_inspect_doc_full_dict_batch40(tmp_path):
     }), encoding="utf-8")
     rc = _run_inspect_doc(_make_args(p))
     assert rc == 0
-
-
-def test_e2e_idempotent_inspect_doc_batch40(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    out1 = capsys.readouterr().out
-    _run_inspect_doc(_make_args(p))
-    out2 = capsys.readouterr().out
-    assert out1 == out2
-
-
-def test_e2e_inspect_doc_does_not_write_batch40(tmp_path):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    before = set(tmp_path.iterdir())
-    _run_inspect_doc(_make_args(p))
-    after = set(tmp_path.iterdir())
-    assert before == after
 
 
 def test_e2e_format_metric_each_value_type_batch40():

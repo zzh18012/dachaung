@@ -219,12 +219,6 @@ def test_build_parser_has_help_option():
     assert len(help_actions) == 1
 
 
-def test_build_parser_formatter_class_is_raw_description():
-    import argparse
-    p = _build_parser()
-    assert p.formatter_class is argparse.RawDescriptionHelpFormatter
-
-
 def test_build_parser_description_starts_with_eval_cli():
     p = _build_parser()
     assert p.description is not None
@@ -760,24 +754,9 @@ def test_module_source_has_pathlib():
     assert "from pathlib" in src
 
 
-def test_module_source_has_evaluation_manifest_import():
-    src = inspect.getsource(climod)
-    assert "from evaluation.manifest import" in src
-
-
 def test_module_source_has_evaluation_report_import():
     src = inspect.getsource(climod)
     assert "from evaluation.report import" in src
-
-
-def test_module_source_has_evaluation_runner_import():
-    src = inspect.getsource(climod)
-    assert "from evaluation.runner import" in src
-
-
-def test_module_source_has_evaluation_schema_import():
-    src = inspect.getsource(climod)
-    assert "from evaluation.schema import" in src
 
 
 # =========================================================================
@@ -978,11 +957,6 @@ def test_main_source_has_validate_file_for_validate_report():
     assert 'validate_file(input_path, "evaluation-report.schema.json")' in src
 
 
-def test_main_source_has_get_git_provenance_call():
-    src = inspect.getsource(main)
-    assert "get_git_provenance(manifest.project_root)" in src
-
-
 def test_main_source_try_except_manifest_error():
     src = inspect.getsource(main)
     assert "(ManifestError, EvalSchemaError)" in src
@@ -1089,21 +1063,11 @@ def test_build_parser_source_has_argparse_argument_parser():
     assert "argparse.ArgumentParser(" in src
 
 
-def test_build_parser_source_has_raw_description_help_formatter():
-    src = inspect.getsource(_build_parser)
-    assert "RawDescriptionHelpFormatter" in src
-
-
 def test_build_parser_source_has_choices_for_parser():
     src = inspect.getsource(_build_parser)
     assert "choices=" in src
     assert "fallback" in src
     assert "kreuzberg" in src
-
-
-def test_build_parser_source_has_type_int():
-    src = inspect.getsource(_build_parser)
-    assert "type=int" in src
 
 
 # =========================================================================
@@ -1129,11 +1093,6 @@ def test_format_metric_source_has_isinstance_dict():
 def test_format_metric_source_has_value_none_branch():
     src = inspect.getsource(_format_metric)
     assert "value is None" in src
-
-
-def test_format_metric_source_has_4f_format():
-    src = inspect.getsource(_format_metric)
-    assert ":.4f" in src
 
 
 def test_format_metric_source_has_36_width():
@@ -1227,11 +1186,6 @@ def test_run_inspect_doc_source_has_4_sort_tuples():
     src = inspect.getsource(_run_inspect_doc)
     assert "return (3, name)" in src
     assert "return (0, name)" in src
-
-
-def test_run_inspect_doc_source_has_sorted_call():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "sorted(metrics.keys()" in src
 
 
 def test_run_inspect_doc_source_has_for_name_loop():

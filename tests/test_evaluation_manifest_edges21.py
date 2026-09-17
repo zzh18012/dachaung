@@ -819,10 +819,6 @@ def test_manifest_error_is_exception_subclass():
     assert issubclass(ManifestError, Exception)
 
 
-def test_manifest_error_not_baseexception_directly():
-    assert ManifestError.__bases__ == (Exception,)
-
-
 def test_manifest_error_caught_as_exception():
     try:
         raise ManifestError("test")
@@ -890,13 +886,6 @@ def test_module_source_contains_evaluation_imports():
     src = inspect.getsource(m)
     assert "from evaluation import MANIFEST_VERSION" in src
     assert "from evaluation.schema import validate" in src
-
-
-def test_module_source_does_not_contain_os():
-    import evaluation.manifest as m
-
-    src = inspect.getsource(m)
-    assert "import os" not in src
 
 
 def test_module_source_does_not_contain_sys():

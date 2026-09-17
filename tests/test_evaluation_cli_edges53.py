@@ -196,11 +196,6 @@ def test_format_metric_value_string_batch26():
     assert "hello" in out
 
 
-def test_format_metric_value_int_batch26():
-    out = _format_metric("x", {"value": 42, "reason": None})
-    assert "42" in out
-
-
 def test_format_metric_value_dict_sorted_batch26():
     """dict value → sorted items。"""
     out = _format_metric("counts", {"value": {"b": 2, "a": 1}, "reason": None})
@@ -847,11 +842,6 @@ def test_signature_main_argv_optional_batch26():
     assert sig.parameters["argv"].default is None
 
 
-def test_signature_main_argv_annotation_batch26():
-    sig = inspect.signature(main)
-    assert sig.parameters["argv"].annotation == "list[str] | None"
-
-
 def test_signature_main_return_int_batch26():
     sig = inspect.signature(main)
     assert sig.return_annotation == "int"
@@ -871,12 +861,6 @@ def test_signature_format_metric_annotations_batch26():
 def test_signature_format_metric_return_str_batch26():
     sig = inspect.signature(_format_metric)
     assert sig.return_annotation == "str"
-
-
-def test_signature_run_inspect_doc_one_arg_batch26():
-    sig = inspect.signature(_run_inspect_doc)
-    assert len(sig.parameters) == 1
-    assert "args" in sig.parameters
 
 
 def test_signature_run_inspect_doc_return_int_batch26():

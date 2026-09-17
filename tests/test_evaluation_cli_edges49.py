@@ -718,16 +718,6 @@ def test_module_source_has_build_parser_function_batch22():
     assert "def _build_parser()" in src
 
 
-def test_module_source_has_format_metric_function_batch22():
-    src = inspect.getsource(climod)
-    assert "def _format_metric(" in src
-
-
-def test_module_source_has_run_inspect_doc_function_batch22():
-    src = inspect.getsource(climod)
-    assert "def _run_inspect_doc(" in src
-
-
 def test_module_source_has_main_guard_batch22():
     src = inspect.getsource(climod)
     assert 'if __name__ ==' in src
@@ -758,12 +748,6 @@ def test_signature_main_returns_int_annotation_batch22():
     """main 返回类型注解是 int（str 形式因 __future__）。"""
     sig = inspect.signature(main)
     assert "int" in str(sig.return_annotation)
-
-
-def test_signature_format_metric_params_batch22():
-    sig = inspect.signature(_format_metric)
-    names = list(sig.parameters.keys())
-    assert names == ["name", "metric"]
 
 
 def test_signature_run_inspect_doc_params_batch22():

@@ -471,11 +471,6 @@ def test_manifest_error_repr_batch42():
     assert "ManifestError" in repr(err)
 
 
-def test_manifest_error_args_batch42():
-    err = ManifestError("a", "b", "c")
-    assert err.args == ("a", "b", "c")
-
-
 def test_manifest_error_raise_from_other_batch42():
     """raise from 另一个 exception。"""
     try:

@@ -53,10 +53,6 @@ def test_is_absolute_like_posix_absolute():
     assert _is_absolute_like("/foo/bar") is True
 
 
-def test_is_absolute_like_relative_no_slash():
-    assert _is_absolute_like("foo") is False
-
-
 def test_is_absolute_like_relative_with_slash():
     assert _is_absolute_like("foo/bar") is False
 
@@ -286,11 +282,6 @@ def test_document_entry_frozen_setattr_raises():
         e.doc_id = "other"
 
 
-def test_document_entry_field_count():
-    f = fields(DocumentEntry)
-    assert len(f) == 10
-
-
 def test_document_entry_field_names_exact():
     f = fields(DocumentEntry)
     names = {field.name for field in f}
@@ -351,11 +342,6 @@ def test_expected_failure_frozen_setattr_raises():
         e.doc_id = "other"
 
 
-def test_expected_failure_field_count():
-    f = fields(ExpectedFailure)
-    assert len(f) == 5
-
-
 def test_expected_failure_field_names_exact():
     f = fields(ExpectedFailure)
     names = {field.name for field in f}
@@ -411,11 +397,6 @@ def test_manifest_frozen_setattr_raises():
     m = _make_manifest()
     with pytest.raises(FrozenInstanceError):
         m.devset_status = "complete"
-
-
-def test_manifest_field_count():
-    f = fields(Manifest)
-    assert len(f) == 5
 
 
 def test_manifest_field_names_exact():

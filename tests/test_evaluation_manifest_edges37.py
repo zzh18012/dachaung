@@ -100,10 +100,6 @@ def test_is_absolute_like_dot_drive_not_absolute_batch10():
     assert _is_absolute_like(".:/foo") is False
 
 
-def test_is_absolute_like_dash_drive_not_absolute_batch10():
-    assert _is_absolute_like("-:/foo") is False
-
-
 def test_is_absolute_like_short_string_one_char_batch10():
     assert _is_absolute_like("a") is False
 
@@ -168,14 +164,6 @@ def test_has_backslash_unicode_no_backslash_batch10():
     assert _has_backslash("中文/路径") is False
 
 
-def test_has_backslash_mixed_separators_batch10():
-    assert _has_backslash("foo/bar\\baz") is True
-
-
-def test_has_backslash_only_backslashes_batch10():
-    assert _has_backslash("\\\\\\") is True
-
-
 def test_has_backslash_returns_bool_type_batch10():
     assert isinstance(_has_backslash("foo"), bool)
 
@@ -215,11 +203,6 @@ def test_resolve_relative_path_normal_relative_resolves_batch10(tmp_path):
     out = _resolve_relative_path("foo/bar", tmp_path, "test")
     assert isinstance(out, Path)
     assert out.is_absolute()
-
-
-def test_resolve_relative_path_returns_path_object_batch10(tmp_path):
-    out = _resolve_relative_path("foo", tmp_path, "test")
-    assert isinstance(out, Path)
 
 
 def test_resolve_relative_path_dot_path_resolves_batch10(tmp_path):
@@ -409,11 +392,6 @@ def test_document_entry_is_frozen_batch10():
         d.doc_id = "new"
 
 
-def test_document_entry_field_count_batch10():
-    f = fields(DocumentEntry)
-    assert len(f) == 10
-
-
 def test_document_entry_field_names_batch10():
     f = fields(DocumentEntry)
     names = [field.name for field in f]
@@ -443,12 +421,6 @@ def test_document_entry_inequality_batch10():
     assert d1 != d2
 
 
-def test_document_entry_hash_batch10():
-    d1 = _make_doc()
-    d2 = _make_doc()
-    assert hash(d1) == hash(d2)
-
-
 def test_document_entry_in_set_batch10():
     d1 = _make_doc()
     d2 = _make_doc()
@@ -465,17 +437,6 @@ def test_document_entry_str_repr_batch10():
 
 def test_expected_failure_is_dataclass_batch10():
     assert is_dataclass(ExpectedFailure)
-
-
-def test_expected_failure_is_frozen_batch10():
-    ef = _make_ef()
-    with pytest.raises(FrozenInstanceError):
-        ef.doc_id = "new"
-
-
-def test_expected_failure_field_count_batch10():
-    f = fields(ExpectedFailure)
-    assert len(f) == 5
 
 
 def test_expected_failure_field_names_batch10():
@@ -513,11 +474,6 @@ def test_manifest_is_frozen_batch10():
         m.devset_status = "complete"
 
 
-def test_manifest_field_count_batch10():
-    f = fields(Manifest)
-    assert len(f) == 5
-
-
 def test_manifest_field_names_batch10():
     f = fields(Manifest)
     names = [field.name for field in f]
@@ -546,12 +502,6 @@ def test_manifest_inequality_batch10():
         project_root=Path("/tmp"),
     )
     assert m1 != m2
-
-
-def test_manifest_hash_batch10():
-    m1 = _make_manifest()
-    m2 = _make_manifest()
-    assert hash(m1) == hash(m2)
 
 
 def test_manifest_in_set_batch10():
@@ -651,11 +601,6 @@ def test_manifest_content_group_count_three_paired_batch10():
     d3 = _make_doc(doc_id="d3", paired_with="d1")
     m = _make_manifest(documents=[d1, d2, d3])
     assert m.content_group_count == 2
-
-
-def test_manifest_categories_covered_empty_batch10():
-    m = _make_manifest(documents=[])
-    assert m.categories_covered == []
 
 
 def test_manifest_categories_covered_single_doc_batch10():
@@ -1586,13 +1531,6 @@ def test_e2e_manifest_error_can_be_raised_and_caught_batch10():
         assert "test" in str(e)
     except Exception:
         raise AssertionError("ManifestError not caught as itself")
-
-
-def test_e2e_manifest_error_caught_as_exception_batch10():
-    try:
-        raise ManifestError("test")
-    except Exception as e:
-        assert isinstance(e, ManifestError)
 
 
 def test_e2e_dataclass_equality_preserved_with_deep_copy_batch10():

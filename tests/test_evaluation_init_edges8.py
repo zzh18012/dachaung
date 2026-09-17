@@ -51,11 +51,6 @@ def test_versions_str_hashable_batch48():
     assert hash(MANIFEST_VERSION) == hash("1.0")
 
 
-def test_versions_in_set_batch48():
-    s = {EVALUATOR_VERSION, REPORT_VERSION, ANNOTATION_VERSION, MANIFEST_VERSION}
-    assert s == {"1.1", "1.0"}
-
-
 def test_versions_len_batch48():
     assert len(EVALUATOR_VERSION) == 3
     assert len(REPORT_VERSION) == 3
@@ -69,10 +64,6 @@ def test_versions_string_methods_batch48():
     assert REPORT_VERSION.replace(".", "-") == "1-1"
     assert ANNOTATION_VERSION.startswith("1")
     assert MANIFEST_VERSION.endswith("0")
-
-
-def test_evaluator_version_upper_batch48():
-    assert EVALUATOR_VERSION.upper() == "1.1"  # 数字没大小写
 
 
 def test_versions_are_immutable_literals_batch48():
@@ -400,11 +391,6 @@ def test_ast_no_function_def_batch48():
     assert len(funcs) == 0
 
 
-def test_ast_no_class_def_batch48():
-    tree = ast.parse(inspect.getsource(eval_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
 def test_ast_no_async_function_def_batch48():
     tree = ast.parse(inspect.getsource(eval_mod))
     assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
@@ -415,12 +401,6 @@ def test_ast_no_import_batch48():
     tree = ast.parse(inspect.getsource(eval_mod))
     imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
     assert len(imports) == 0
-
-
-def test_ast_module_docstring_batch48():
-    tree = ast.parse(inspect.getsource(eval_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_top_level_assigns_count_batch48():

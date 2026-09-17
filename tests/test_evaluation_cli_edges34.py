@@ -680,14 +680,6 @@ def test_e2e_run_subcommand_full_namespace():
     assert ns.tolerance_chars == 50
 
 
-def test_e2e_inspect_doc_subcommand_namespace():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json"])
-    assert ns.command == "inspect-doc"
-    assert ns.input == "doc.json"
-    assert ns.tolerance_chars == 30
-
-
 def test_e2e_inspect_doc_subcommand_with_custom_tolerance():
     p = _build_parser()
     ns = p.parse_args(["inspect-doc", "doc.json", "--tolerance-chars", "75"])

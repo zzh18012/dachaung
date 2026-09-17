@@ -90,21 +90,6 @@ def test_build_parser_run_parser_rejects_other_choices_batch10(capsys):
         )
 
 
-def test_build_parser_max_chars_default_800_batch10():
-    ns = _build_parser().parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert ns.max_chars == 800
-
-
-def test_build_parser_tolerance_chars_default_30_batch10():
-    ns = _build_parser().parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert ns.tolerance_chars == 30
-
-
-def test_build_parser_inspect_doc_tolerance_chars_default_30_batch10():
-    ns = _build_parser().parse_args(["inspect-doc", "a.json"])
-    assert ns.tolerance_chars == 30
-
-
 def test_build_parser_max_chars_type_int_batch10():
     ns = _build_parser().parse_args(
         ["run", "--manifest", "a.json", "--output", "b.json", "--max-chars", "500"]
@@ -119,16 +104,6 @@ def test_build_parser_tolerance_chars_type_int_batch10():
     )
     assert isinstance(ns.tolerance_chars, int)
     assert ns.tolerance_chars == 10
-
-
-def test_build_parser_validate_report_input_value_batch10():
-    ns = _build_parser().parse_args(["validate-report", "report.json"])
-    assert ns.input == "report.json"
-
-
-def test_build_parser_inspect_doc_input_value_batch10():
-    ns = _build_parser().parse_args(["inspect-doc", "doc.json"])
-    assert ns.input == "doc.json"
 
 
 def test_build_parser_required_subcommand_batch10():
@@ -187,16 +162,6 @@ def test_namespace_run_command_value_batch10():
     assert ns.command == "run"
 
 
-def test_namespace_validate_report_command_value_batch10():
-    ns = _build_parser().parse_args(["validate-report", "a.json"])
-    assert ns.command == "validate-report"
-
-
-def test_namespace_inspect_doc_command_value_batch10():
-    ns = _build_parser().parse_args(["inspect-doc", "a.json"])
-    assert ns.command == "inspect-doc"
-
-
 def test_namespace_run_manifest_value_batch10():
     ns = _build_parser().parse_args(["run", "--manifest", "/path/to/m.json", "--output", "b.json"])
     assert ns.manifest == "/path/to/m.json"
@@ -210,16 +175,6 @@ def test_namespace_run_output_value_batch10():
 def test_namespace_run_attributes_count_batch10():
     ns = _build_parser().parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
     assert len(vars(ns)) == 6
-
-
-def test_namespace_validate_report_attributes_count_batch10():
-    ns = _build_parser().parse_args(["validate-report", "a.json"])
-    assert len(vars(ns)) == 2
-
-
-def test_namespace_inspect_doc_attributes_count_batch10():
-    ns = _build_parser().parse_args(["inspect-doc", "a.json"])
-    assert len(vars(ns)) == 3
 
 
 def test_namespace_run_max_chars_negative_batch10():
@@ -381,11 +336,6 @@ def test_format_metric_list_value_falls_to_default_batch10():
     assert "[1, 2, 3]" in out
 
 
-def test_format_metric_returns_str_batch10():
-    out = _format_metric("x", {"value": 1, "reason": "ok"})
-    assert isinstance(out, str)
-
-
 def test_format_metric_padding_36_chars_batch10():
     out = _format_metric("abc", {"value": 1, "reason": "ok"})
     name_end = out.find("1")
@@ -428,14 +378,6 @@ def test_run_inspect_doc_returns_int_batch10(tmp_path):
     p.write_text("{}", encoding="utf-8")
     args = argparse.Namespace(input=str(p), tolerance_chars=30)
     assert isinstance(_run_inspect_doc(args), int)
-
-
-def test_run_inspect_doc_missing_file_returns_2_batch10(tmp_path, capsys):
-    args = argparse.Namespace(input=str(tmp_path / "no.json"), tolerance_chars=30)
-    rc = _run_inspect_doc(args)
-    assert rc == 2
-    err = capsys.readouterr().err
-    assert "[ERROR]" in err
 
 
 def test_run_inspect_doc_invalid_json_returns_1_batch10(tmp_path, capsys):
@@ -876,11 +818,6 @@ def test_cli_source_no_async_def_batch10():
     assert "async def" not in source
 
 
-def test_cli_source_no_yield_batch10():
-    source = inspect.getsource(climod)
-    assert "yield" not in source
-
-
 def test_cli_source_no_walrus_batch10():
     source = inspect.getsource(climod)
     assert ":=" not in source
@@ -1042,11 +979,6 @@ def test_signature_build_parser_param_count_batch10():
     assert len(sig.parameters) == 0
 
 
-def test_signature_build_parser_return_annotation_batch10():
-    sig = inspect.signature(_build_parser)
-    assert sig.return_annotation == "argparse.ArgumentParser"
-
-
 def test_signature_main_param_count_batch10():
     sig = inspect.signature(main)
     assert len(sig.parameters) == 1
@@ -1056,12 +988,6 @@ def test_signature_main_param_kind_batch10():
     sig = inspect.signature(main)
     p = list(sig.parameters.values())[0]
     assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_main_param_default_none_batch10():
-    sig = inspect.signature(main)
-    p = list(sig.parameters.values())[0]
-    assert p.default is None
 
 
 def test_signature_main_param_annotation_batch10():

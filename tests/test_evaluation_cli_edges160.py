@@ -190,14 +190,6 @@ def test_cli_inspect_hbc_null_reason_batch450(tmp_path, capsys):
             "null  (no_heading_elements)") in out
 
 
-def test_cli_inspect_cbf1_null_reason_batch450(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("chunk_boundary_f1                    "
-            "null  (no_annotation)") in out
-
-
 # ---------- 源码补强 ----------
 
 def _src():

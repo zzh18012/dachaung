@@ -176,14 +176,6 @@ def test_cli_inspect_total_four_batch454(tmp_path, capsys):
             "4  (ok)") in out
 
 
-def test_cli_inspect_pdf_locator_batch454(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("pdf_locator_valid_ratio              "
-            "1.0000  (ok)") in out
-
-
 # ---------- 源码补强 ----------
 
 def _src():

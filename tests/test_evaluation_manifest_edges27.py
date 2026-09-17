@@ -1178,10 +1178,6 @@ def test_module_all_is_list():
     assert isinstance(m.__all__, list)
 
 
-def test_module_namespace():
-    assert m.__name__ == "evaluation.manifest"
-
-
 def test_module_has_4_classes():
     classes = [
         n for n in dir(m)

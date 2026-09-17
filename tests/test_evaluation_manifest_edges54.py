@@ -211,11 +211,6 @@ def test_document_entry_inequality_batch27():
     assert d1 != d2
 
 
-def test_document_entry_repr_has_class_name_batch27():
-    d = _make_doc()
-    assert "DocumentEntry" in repr(d)
-
-
 # ---------- ExpectedFailure 第二十七批 ----------
 
 

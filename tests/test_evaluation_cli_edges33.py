@@ -208,21 +208,6 @@ def test_main_source_pipeline_success_check():
     assert '"pipeline_success"' in src
 
 
-def test_main_source_uses_get_git_provenance_for_project_root():
-    src = inspect.getsource(main)
-    assert "get_git_provenance(manifest.project_root)" in src
-
-
-def test_main_source_handles_file_not_found_in_validate():
-    src = inspect.getsource(main)
-    assert "FileNotFoundError" in src
-
-
-def test_main_source_handles_json_decode_in_validate():
-    src = inspect.getsource(main)
-    assert "json.JSONDecodeError" in src
-
-
 def test_main_source_validate_report_branch():
     src = inspect.getsource(main)
     assert 'args.command == "validate-report"' in src
@@ -422,11 +407,6 @@ def test_run_inspect_doc_source_prints_counts():
 def test_run_inspect_doc_source_uses_sort_key_function():
     src = inspect.getsource(_run_inspect_doc)
     assert "_sort_key" in src
-
-
-def test_run_inspect_doc_source_uses_sorted_metrics():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "sorted(metrics.keys()" in src
 
 
 def test_run_inspect_doc_source_return_0():
@@ -650,14 +630,6 @@ def test_build_parser_run_namespace_via_parse_args():
     assert ns.output == "b.json"
     assert ns.parser == "fallback"
     assert ns.max_chars == 800
-    assert ns.tolerance_chars == 30
-
-
-def test_build_parser_inspect_doc_namespace():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json"])
-    assert ns.command == "inspect-doc"
-    assert ns.input == "doc.json"
     assert ns.tolerance_chars == 30
 
 
@@ -1079,11 +1051,6 @@ def test_main_validate_report_returns_0_minimal_dict(tmp_path, capsys):
     assert rc == 1
 
 
-def test_main_validate_report_returns_2_when_path_is_dir(tmp_path):
-    rc = main(["validate-report", str(tmp_path)])
-    assert rc == 2
-
-
 def test_main_inspect_doc_returns_2_when_dir(tmp_path):
     rc = main(["inspect-doc", str(tmp_path)])
     assert rc == 2
@@ -1301,11 +1268,6 @@ def test_cli_source_no_relative_import_above_eval():
     )
 
 
-def test_cli_source_no_star_import():
-    src = inspect.getsource(cli_mod)
-    assert "import *" not in src
-
-
 def test_cli_source_no_yield():
     src = inspect.getsource(cli_mod)
     assert "yield" not in src
@@ -1319,11 +1281,6 @@ def test_cli_source_no_async_def():
 def test_cli_source_no_walrus():
     src = inspect.getsource(cli_mod)
     assert ":=" not in src
-
-
-def test_cli_source_no_global_keyword():
-    src = inspect.getsource(cli_mod)
-    assert "global " not in src
 
 
 def test_cli_source_docstring_present():
@@ -1633,11 +1590,6 @@ def test_e2e_main_inspect_doc_pipeline_success_metric(tmp_path, capsys):
     # 至少有一个非空行
     metric_lines = [l for l in out.split("\n") if l.startswith("  ")]
     assert len(metric_lines) > 0
-
-
-def test_e2e_main_validate_report_nonexistent_returns_2(tmp_path):
-    rc = main(["validate-report", str(tmp_path / "nonexistent.json")])
-    assert rc == 2
 
 
 def test_e2e_main_validate_report_directory_returns_2(tmp_path):

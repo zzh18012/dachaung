@@ -371,15 +371,6 @@ def test_main_validate_report_with_missing_returns_2_batch34(tmp_path):
     assert rc == 2
 
 
-def test_main_run_with_missing_manifest_returns_2_batch34(tmp_path):
-    rc = main([
-        "run",
-        "--manifest", str(tmp_path / "missing.json"),
-        "--output", str(tmp_path / "out.json"),
-    ])
-    assert rc == 2
-
-
 def test_main_run_with_invalid_manifest_json_returns_1_batch34(tmp_path):
     p = tmp_path / "manifest.json"
     p.write_text("not json {", encoding="utf-8")
@@ -558,11 +549,6 @@ def test_module_source_contains_run_subcommand_batch34():
     assert '"run"' in src
     assert '"validate-report"' in src
     assert '"inspect-doc"' in src
-
-
-def test_module_source_contains_file_stderr_batch34():
-    src = inspect.getsource(cmod)
-    assert "file=sys.stderr" in src
 
 
 def test_module_source_contains_raw_description_batch34():

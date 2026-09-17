@@ -1268,11 +1268,6 @@ def test_module_source_forbidden_tokens_eighth_batch(token):
 # ---------- module source 字符串精确补强 ----------
 
 
-def test_module_source_starts_with_docstring():
-    src = inspect.getsource(mmod)
-    assert src.lstrip().startswith(('"""', "'''"))
-
-
 def test_module_source_docstring_mentions_pure_function():
     src = inspect.getsource(mmod)
     assert "纯函数" in src
@@ -1329,16 +1324,6 @@ def test_module_source_5_module_level_imports_only():
     assert len(import_lines) == 5
 
 
-def test_module_source_no_relative_import():
-    src = inspect.getsource(mmod)
-    import_lines = [
-        line for line in src.splitlines()
-        if line.strip().startswith(("import ", "from "))
-    ]
-    for line in import_lines:
-        assert not line.strip().startswith("from .")
-
-
 def test_module_source_no_star_import():
     src = inspect.getsource(mmod)
     assert "import *" not in src
@@ -1357,11 +1342,6 @@ def test_module_source_no_yield():
 def test_module_source_no_async_def():
     src = inspect.getsource(mmod)
     assert "async def" not in src
-
-
-def test_module_source_no_global():
-    src = inspect.getsource(mmod)
-    assert "global " not in src
 
 
 def test_module_source_no_decorators_at_module_level():
@@ -1632,10 +1612,6 @@ def test_no_function_has_varargs():
 
 
 # ---------- 模块整体合理性 ----------
-
-
-def test_module_namespace():
-    assert isinstance(mmod, types.ModuleType)
 
 
 def test_module_namespace_name():

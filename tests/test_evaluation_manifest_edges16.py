@@ -850,12 +850,6 @@ def test_manifest_error_str():
     assert str(e) == "hello"
 
 
-def test_manifest_error_repr():
-    """repr 含类名。"""
-    e = ManifestError("msg")
-    assert "ManifestError" in repr(e)
-
-
 def test_manifest_error_caught_as_exception():
     """可被通用 except Exception 捕获。"""
     try:

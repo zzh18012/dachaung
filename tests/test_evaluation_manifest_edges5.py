@@ -264,11 +264,6 @@ def test_manifest_error_str():
     assert str(e) == "my message"
 
 
-def test_manifest_error_repr():
-    e = ManifestError("msg")
-    assert "ManifestError" in repr(e)
-
-
 def test_manifest_error_args_value():
     e = ManifestError("msg")
     assert e.args == ("msg",)
@@ -377,16 +372,6 @@ def test_document_entry_paired_with_can_be_none():
     assert e.paired_with is None
 
 
-def test_document_entry_annotation_file_str_can_be_none():
-    e = _make_doc_entry()
-    assert e.annotation_file_str is None
-
-
-def test_document_entry_annotation_resolved_can_be_none():
-    e = _make_doc_entry()
-    assert e.annotation_resolved is None
-
-
 def test_document_entry_annotation_resolved_can_be_path():
     e = _make_doc_entry(annotation_resolved=Path("/tmp/ann.json"))
     assert isinstance(e.annotation_resolved, Path)
@@ -395,11 +380,6 @@ def test_document_entry_annotation_resolved_can_be_path():
 def test_document_entry_expectations_can_be_dict():
     e = _make_doc_entry(expectations={"element_count_by_type": {}})
     assert isinstance(e.expectations, dict)
-
-
-def test_document_entry_expectations_can_be_none():
-    e = _make_doc_entry()
-    assert e.expectations is None
 
 
 def test_document_entry_field_count_ten():
@@ -429,12 +409,6 @@ def test_document_entry_in_set():
     s = {_make_doc_entry(), _make_doc_entry()}
     # frozen + 相同字段 → 集合去重
     assert len(s) == 1
-
-
-def test_document_entry_equality():
-    e1 = _make_doc_entry()
-    e2 = _make_doc_entry()
-    assert e1 == e2
 
 
 def test_document_entry_inequality_different_field():
@@ -468,13 +442,6 @@ def test_expected_failure_is_frozen():
     f = _make_failure()
     with pytest.raises(FrozenInstanceError):
         f.doc_id = "changed"  # type: ignore[misc]
-
-
-def test_expected_failure_field_count_five():
-    import dataclasses
-
-    fields = dataclasses.fields(ExpectedFailure)
-    assert len(fields) == 5
 
 
 def test_expected_failure_field_names_exact():
@@ -622,11 +589,6 @@ def test_manifest_file_count_zero_for_empty():
 def test_manifest_file_count_one():
     m = _make_manifest(documents=(_make_doc_entry(),))
     assert m.file_count == 1
-
-
-def test_manifest_pdf_count_returns_int():
-    m = _make_manifest()
-    assert isinstance(m.pdf_count, int)
 
 
 def test_manifest_pdf_count_zero_when_no_pdf():

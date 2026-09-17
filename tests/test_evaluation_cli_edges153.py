@@ -150,14 +150,6 @@ def test_cli_inspect_pdf_locator_null_batch413(tmp_path, capsys):
             "null  (not_pdf_document)") in out
 
 
-def test_cli_inspect_hbc_batch413(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("heading_boundary_compliance          "
-            "1.0000  (ok)") in out
-
-
 def test_cli_inspect_type_docx_batch413(tmp_path, capsys):
     docp = _doc(tmp_path)
     rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])

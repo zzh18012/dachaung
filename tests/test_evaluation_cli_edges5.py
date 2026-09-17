@@ -141,34 +141,11 @@ def test_build_parser_run_max_chars_custom():
     assert args.max_chars == 1200
 
 
-def test_build_parser_run_tolerance_chars_custom():
-    p = _build_parser()
-    args = p.parse_args([
-        "run", "--manifest", "m.json", "--output", "o.json",
-        "--tolerance-chars", "50",
-    ])
-    assert args.tolerance_chars == 50
-
-
-def test_build_parser_validate_report_takes_input_positional():
-    p = _build_parser()
-    args = p.parse_args(["validate-report", "report.json"])
-    assert args.input == "report.json"
-    assert args.command == "validate-report"
-
-
 def test_build_parser_validate_report_no_optional_args():
     p = _build_parser()
     # validate-report 不接受任何可选参数
     with pytest.raises(SystemExit):
         p.parse_args(["validate-report", "report.json", "--extra", "x"])
-
-
-def test_build_parser_inspect_doc_takes_input_positional():
-    p = _build_parser()
-    args = p.parse_args(["inspect-doc", "doc.json"])
-    assert args.input == "doc.json"
-    assert args.command == "inspect-doc"
 
 
 def test_build_parser_inspect_doc_tolerance_chars_default_30():

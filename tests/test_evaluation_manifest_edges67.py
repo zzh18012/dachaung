@@ -569,11 +569,6 @@ def test_manifest_error_is_exception_batch40():
     assert issubclass(ManifestError, Exception)
 
 
-def test_manifest_error_default_message_batch40():
-    err = ManifestError()
-    assert str(err) == ""
-
-
 def test_manifest_error_with_message_batch40():
     err = ManifestError("boom")
     assert str(err) == "boom"

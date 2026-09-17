@@ -341,11 +341,6 @@ def test_document_entry_dataclass_frozen():
         d.doc_id = "x"  # type: ignore[misc]
 
 
-def test_document_entry_dataclass_fields_count():
-    flds = fields(DocumentEntry)
-    assert len(flds) == 10
-
-
 def test_document_entry_dataclass_fields_names():
     flds = fields(DocumentEntry)
     names = [f.name for f in flds]
@@ -1161,13 +1156,6 @@ def test_signature_resolve_relative_path_no_varargs():
     params = sig.parameters
     assert sig.parameters.get("args") is None
     assert sig.parameters.get("kwargs") is None
-
-
-def test_signature_load_manifest():
-    sig = inspect.signature(load_manifest)
-    params = list(sig.parameters.values())
-    assert len(params) == 2
-    assert [p.name for p in params] == ["manifest_path", "project_root"]
 
 
 def test_signature_load_manifest_project_root_default_none():

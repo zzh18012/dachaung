@@ -46,11 +46,6 @@ from evaluation import manifest as mmod
 # ---------- _is_absolute_like 第二十二批 ----------
 
 
-def test_is_absolute_like_empty_string_batch22():
-    """空字符串 → False。"""
-    assert _is_absolute_like("") is False
-
-
 def test_is_absolute_like_only_drive_letter_no_separator_batch22():
     """'x:' 不被识别为绝对路径（len < 3）。"""
     assert _is_absolute_like("x:") is False
@@ -109,10 +104,6 @@ def test_is_absolute_like_just_colon_batch22():
 
 def test_has_backslash_empty_string_batch22():
     assert _has_backslash("") is False
-
-
-def test_has_backslash_only_letter_batch22():
-    assert _has_backslash("a") is False
 
 
 def test_has_backslash_in_middle_batch22():

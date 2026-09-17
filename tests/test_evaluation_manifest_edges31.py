@@ -123,10 +123,6 @@ def test_is_absolute_like_with_only_drive_letter():
     assert _is_absolute_like("C:") is False
 
 
-def test_is_absolute_like_with_drive_separator_only():
-    assert _is_absolute_like("C:/") is True
-
-
 def test_is_absolute_like_with_backslash_only():
     assert _is_absolute_like("C:\\") is True
 

@@ -741,13 +741,6 @@ def test_signature_build_parser_batch21():
     assert len(params) == 0
 
 
-def test_signature_main_batch21():
-    sig = inspect.signature(main)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "argv"
-
-
 def test_signature_main_argv_default_none_batch21():
     sig = inspect.signature(main)
     params = list(sig.parameters.values())
@@ -816,10 +809,6 @@ def test_module_lazy_imports_inside_run_inspect_doc_batch21():
 def test_module_main_returns_int_batch21():
     rc = main(["validate-report", "/nonexistent.json"])
     assert isinstance(rc, int)
-
-
-def test_module_main_callable_batch21():
-    assert callable(climod.main)
 
 
 def test_module_no_global_state_batch21():

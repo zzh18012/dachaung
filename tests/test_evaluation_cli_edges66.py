@@ -169,17 +169,6 @@ def test_build_parser_prog_value_batch39():
 # ---------- _format_metric 第三十九批
 
 
-def test_format_metric_with_none_value_batch39():
-    out = _format_metric("x", {"value": None, "reason": "no_data"})
-    assert "null" in out
-    assert "no_data" in out
-
-
-def test_format_metric_with_true_value_batch39():
-    out = _format_metric("x", {"value": True, "reason": None})
-    assert "true" in out  # 小写 bool
-
-
 def test_format_metric_with_false_value_batch39():
     out = _format_metric("x", {"value": False, "reason": None})
     assert "false" in out
@@ -189,11 +178,6 @@ def test_format_metric_with_int_value_batch39():
     """int 不是 float，落入 fallback 分支。"""
     out = _format_metric("x", {"value": 5, "reason": None})
     assert "5" in out
-
-
-def test_format_metric_with_zero_int_value_batch39():
-    out = _format_metric("x", {"value": 0, "reason": None})
-    assert "0" in out
 
 
 def test_format_metric_with_float_value_batch39():
@@ -300,14 +284,6 @@ def test_run_inspect_doc_empty_dict_returns_0_batch39(tmp_path, capsys):
     p.write_text("{}", encoding="utf-8")
     rc = _run_inspect_doc(_make_args(p))
     assert rc == 0
-
-
-def test_run_inspect_doc_prints_metrics_header_batch39(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    captured = capsys.readouterr()
-    assert "metrics:" in captured.out
 
 
 def test_run_inspect_doc_prints_file_path_batch39(tmp_path, capsys):
@@ -601,11 +577,6 @@ def test_module_main_callable_batch39():
 
 def test_module_build_parser_callable_batch39():
     assert callable(cmod._build_parser)
-
-
-def test_module_no_class_definitions_batch39():
-    src = inspect.getsource(cmod)
-    assert "\nclass " not in src
 
 
 def test_module_has_main_guard_batch39():
