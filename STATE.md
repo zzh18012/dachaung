@@ -121,6 +121,25 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2043 — app.cli parse 通道输入/参数边界信封（1b/b 换轴 parse CLI 面，R2042 建议，3 测试）
+
+- 任务：`app.cli parse` 子命令的 `--max-chars` 边界值 / 垃圾输入 × 扩展名矩阵 / 编码边缘 / `-o` 输出路径族，main 只读 @ `6c6d398`（运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_parse_edges_r2043.py + .out（未入库，C0 + E1–E8 全 18 项已执行完毕）；子进程真实 CLI（main venv `python -m app.cli`），cwd=临时目录 + PYTHONPATH=main 根。**本轮为前轮执行 agent API 中断后的窄恢复 agent 收尾**：探针零重跑，只复核探针/.out 与测试文件一致性（两处 docstring 精修：legacy positional 一测补记、BOM/Latin-1 表述核实）+ 加测定向 + 锚核对 + 收尾，**判定规则未变**。
+- 覆盖面：main `test_pipeline_integration.py` 的 CLI 面仅锁 happy path + 缺文件/假 PDF/未知扩展三负例（+ legacy positional 拒绝一测）；`--max-chars` 边界、垃圾输入 × 扩展名、编码边缘、`-o` 输出路径族的 CLI 面**零覆盖**（进程内基线已由 test_parsers_text_edges*/test_parsers_markdown_edges* 系锁定，CLI 子进程面未确认过）。
+- **C0 对照先通过**：最小合法 .md（--parser markdown）→ parse rc 0 + validate rc 0（双 rc 0）。
+- 发现（E1–E8 全 18 项，**成立/PASS 16 + 偏差 2 + 缺陷候选 0**）：
+  - **E1–E3 成立**：`--max-chars` 0 / -5 / 31 → rc 1 + 结构化 errors JSON `chunker_failed`（StructuralChunker 下限 32 的 ValueError 被 process_single 兜底）+ 无输出残留 + 无 traceback；`-5` 的 argparse 负数解析（非选项前缀冲突）一并确认走信封不走 rc 2；
+  - **E4/E5 成立**：32（下限边界）与 10^9 → rc 0 且每 chunk 非空 source_element_ids（关键不变量在极值下守住）；
+  - **E6a–E6f 成立**：垃圾输入六形态全部 rc 1 + 精确码 + 无残留 + 无 traceback——0 字节 .pdf → `pdfplumber_open_failed`；0 字节 .docx / 随机非 ZIP 字节 .docx / 截断 ZIP .docx（合法头腰斩 1/3）→ `docx_open_failed`；0 字节 .md（--parser markdown）→ `no_extracted_elements`（空内容检查先于写盘）；坏 JSON .ipynb（--parser auto 经扩展名发现 ipynb parser）→ `ipynb_invalid_json`；
+  - **E7a 偏差（探针先验预期 vs 实态，非缺陷）**：UTF-8 BOM .md → rc 0 且 `﻿` **留存** content——探针先验预期"BOM 不泄漏"与实态不符；实态与 main 进程内基线完全一致（test_parsers_text_edges10 "留在 content 里不剥" + test_parsers_markdown_edges12 BOM 杀标题识别），CLI 子进程面首次确认；
+  - **E7d 偏差（探针先验预期 vs 实态，非缺陷）**：Latin-1 字节 .md（非法 UTF-8）→ rc 0 + `�` 替换符进 content（markdown_parser UnicodeDecodeError → errors="replace" 回退）——探针先验预期"rc 1 信封"与实态不符；实态与 main 进程内基线一致（test_parsers_markdown_edges2/3/4/7 的 replace 回退系），静默替换零 warning 属已锁沉默，观察记录；
+  - **E7b/E7c/E8a/E8b 成立**：CRLF .md → CR 不残留 content；中文+emoji+假名+重音符 .md → 内容保真 + validate rc 0；`-o` 深不存在目录 → mkdir parents 自动建 + rc 0；`-o` 已存在目录 → `write_failed` rc 1 结构化信封；
+  - 探针 .out 尾部 SUMMARY 行即准确表述：两处"偏差"均为**探针先验预期与实态的偏差**（实态=main 已锁进程内基线在 CLI 面的外推确认），不是 main 行为缺陷，本轮零新增指示线候选。
+- 加测 3：`tests/test_parse_edges_r2043.py`——(1) `--max-chars` 边界信封（0/-5/31 信封三断言族 + 32/10^9 成功 + 非空 source_element_ids 不变量）；(2) 垃圾输入六形态矩阵（精确码 + errors[0].message 非空 + 无残留 + 无 traceback；DOCX 夹具 zipfile 构造法，R2041 同规）；(3) 编码边缘 + 输出路径族（BOM 留存/CRLF 清理/保真 + validate rc 0/Latin-1 替换/深目录自动建/目录 write_failed）。被测 main 按 `git worktree list --porcelain` 动态定位 branch=refs/heads/main 的 worktree（零硬编码路径，缺目标或缺 venv 显式 SKIP，绝不伪造通过）。
+- 定向：新文件 3 passed 7.31s（worktree venv）；邻居 main `test_pipeline_integration.py` **23 passed 6.92s**（main venv + `-p no:cacheprovider`，main 全程 clean，前后两次 status 核对）+ 自跑 `test_annotation_env_r2041.py` + `test_container_env_r2040.py` + `test_eval_cli_channel_r2039.py` 合计 9 passed 18.06s。全量不跑（加测纯子进程型）；收集数锚 **实测 102079 collected = 预测锚 102076 + 3 精确命中**（worktree venv `pytest --collect-only -q -p no:cacheprovider`，两次 25.61s/11.56s；重锚 102052 后第 3 次实测精确命中；证据 outputs/autonomous/collect_only_r2043.out 未入库）。
+- 下次建议：parse CLI 输入边界面本轮已闭合（max-chars / 垃圾矩阵 / 编码 / 输出路径四组全覆盖，不建议再投轮）；可换轴 validate 子命令通道面（纯 schema 校验通道的 CLI 边界仍未单独探过）或 R-A/R-I 行为缺口；**2026-09-21 周期简报窗口做下一次全量实跑**（预测 102079 + 3xN，N=其间加测轮数；重采 --durations=25 对照漂移锚点两项；候选池直接引用 R2042 盘点件）。
+
+---
+
 ## Round 2042 — 指示线候选池盘点归档 + 收集数锚核对（1b/f 校准轮，零测试新增）
 
 - 任务：f 队列校准轮——① R2028–R2041 各轮散落的"指示线候选"归档成单一盘点件（r54 纪律：候选不实施）；② 收集数锚核对（R2037 先例沿用）。零测试新增、零语料改动；main 目标 SHA `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（`git worktree list --porcelain` 动态核对，本轮未在 main 跑任何命令）。
