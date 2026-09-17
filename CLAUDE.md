@@ -102,9 +102,9 @@
 
 ## 环境
 
-- 工作目录：`C:\Users\zzhn2\Desktop\dachuang-code`（已是 git 仓库，远程 `zzh18012/dachaung`）
-- Python 解释器：`C:\Users\zzhn2\AppData\Local\Programs\Python\Python312\python.exe`（**官方 CPython 3.12.10**）
-- 严禁使用 PATH 里的 mingw Python 3.14（uv 会拒绝，wheel 兼容性差）
+- 工作目录：`"$USERPROFILE/Desktop/dachuang-code"`（已是 git 仓库，远程 `zzh18012/dachaung`；Git Bash 下 $USERPROFILE 自动解析）
+- Python 解释器：`"$LOCALAPPDATA/Programs/Python/Python312/python.exe"`（**官方 CPython 3.12.10**）
+- 严禁使用 PATH 里的 mingw Python 3.14（uv 会拒绝，wheel 兼容性差）；必须使用上述显式 Python 3.12 路径，不允许退化为裸 `python`/`python3` 查 PATH
 - 虚拟环境：`.venv/Scripts/python.exe`
 - 包管理：uv（已有 0.11.11）
 - Shell：Git Bash（msys2 ucrt64），用 Unix 语法（`/c/...`、`/dev/null`）
@@ -113,7 +113,7 @@
 
 ```bash
 # 创建/同步虚拟环境
-uv sync --python "C:/Users/zzhn2/AppData/Local/Programs/Python/Python312/python.exe"
+uv sync --python "$LOCALAPPDATA/Programs/Python/Python312/python.exe"
 
 # 运行测试
 .venv/Scripts/python.exe -m pytest
@@ -224,7 +224,7 @@ Kreuzberg 4.10.2 实测：
 
 ## 禁止事项
 
-- 不读取或复制 `C:\Users\zzhn2\Desktop\大创` 中的私人申请书
+- 不读取或枚举项目目录之外的用户私人申请材料目录（`<私人申请材料目录>`）中的内容
 - 不在源码/测试/输出中硬编码私人文件绝对路径
 - 不执行 `git commit` / `git push` 除非用户明确要求
 - 不修改全局 Git 配置（`http.sslbackend=schannel` 已在 `.git/config` local 设置）

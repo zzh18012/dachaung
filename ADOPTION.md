@@ -6973,11 +6973,13 @@ Stage 2 机器 reason 码 no_ground_truth_* 与 relation 契约文档英文
 
 真实 run 接线（G⑦ 报告消费）待 G⑥ gold 冻结后按预注册执行。
 
-## §一百三十九（2026-09-21）r55：自跑线待命解除（G03 语料清理线）+ 候选池 28 条处置
+## §一百三十九（2026-09-17）r55：自跑线待命解除（G03 语料清理线）+ 候选池 28 条处置
 
 来源：用户中转 r55 裁决（outputs/gpt_brief_autotrack_r55_reply.txt，
-2026-09-21）。裁决标准：可无限重复、无需逐轮人工介入、只读 main 纪律
+2026-09-17 11:10 到件）。裁决标准：可无限重复、无需逐轮人工介入、只读 main 纪律
 不破坏、修复收益需能形成长期信号。
+（日期校准 r56：本节原记 2026-09-21，系误把周期窗口标签当作裁决
+到件日；实测裁决文件 mtime 2026-09-17 11:10，据 r56 裁决校准。）
 
 问询①候选池处置：
 
@@ -7071,3 +7073,44 @@ app/ + schemas/document.schema.json，CLAUDE.md 不属出库面，倾向保留
 （环境文档性质）；待用户裁决后收口。
 
 r55 全部可执行项就绪；剩余待办仅 CLAUDE.md 处置裁决 + push 授权。
+
+## §一百四十一（2026-09-17）r56：P-R2045-1 收敛 d 方案落地 + G03 parametrize 守卫先行协议 + §139 日期校准
+
+来源：用户中转 r56 裁决（outputs/gpt_brief_autotrack_r56_reply.txt）。
+原则：公开仓库不保留个人路径字面量，不以牺牲无人值守执行为代价；
+G03 坚持"宁可少删，不可误删"零损失线。
+
+**裁决①执行（P-R2045-1，4/4 收敛）**：CLAUDE.md 三处执行路径改
+环境变量动态解析——工作目录 `"$USERPROFILE/Desktop/dachuang-code"`、
+解释器 `"$LOCALAPPDATA/Programs/Python/Python312/python.exe"`、
+uv sync 同形（Git Bash 下自动展开，命令保持开箱即用）；mingw 禁令
+保留并强化为"必须使用上述显式路径，不允许退化为裸 python/python3
+查 PATH"。:227 删除"大创"真实目录名，改语义型禁令"不读取或枚举
+项目目录之外的用户私人申请材料目录（<私人申请材料目录>）中的
+内容"。验收四项全过：git grep 真实用户名 0 命中 / 私人目录字面量
+0 命中（tracked 工作树全仓）/ uv sync 按文档原文直接执行成功
+（Resolved 24 packages no-op）/ 官方 Python 3.12.10 仍显式钉死。
+README 三处维持 r55 的 <你的用户名> 占位形（裁决①只涉 CLAUDE.md
+四处，未重开 README）。
+
+**边界记账（裁决①附带）**：修改 HEAD 不抹除公开 Git 历史中的旧
+路径；本裁决不含 history rewrite / force-push，该高风险操作不
+夹带进当前待 push 批次。
+
+**裁决②登记（G03 parametrize，自跑线执行）**：不永久排除
+parametrize；长期规则 = 函数体 L1 同体仅候选条件，存在
+@pytest.mark.parametrize 时装饰器须过严格等价检查，否则整团延期。
+第一版门槛四条：团内完整 decorator list 数量/顺序/原始源码严格
+一致（允许假阴性，不接受假阳性）；parametrize 参数须删除器可静态
+确认的自包含形式（内联字面量）；外部 Name/展开/动态构造 →
+parametrize_dynamic_deferred 排除；其余 G03 安全条件全部叠加不
+放宽。实现顺序 = 先机制后数据：守卫 commit 必须同带三件合成验证件
+（体+装饰器同体 → eligible；参数清单不同 → deferred；装饰器文本
+同体但引用外部名 → dynamic deferred），语料删除在下一 commit——
+守卫本身不属语料批次，一批一 commit 不破。R2056 维持现计划
+（parametrize 继续延期，非 parametrize 500–1000 低段推进）；守卫
+合入独立验证后再从后续批次重评 deferred 的 190+ 目标，不为其阻塞
+递减锚链。已派自跑线 R2056 执行（守卫机制 commit 优先）。
+
+**§139 日期校准**：原记 2026-09-21 系误把周期窗口标签当裁决到件
+日；实测裁决文件 mtime 2026-09-17 11:10，已改（见 §139 附注）。
