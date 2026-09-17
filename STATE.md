@@ -121,6 +121,17 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2045 — main 侧私有路径与机密泄漏风险专项审计（1b/f，零测试新增零语料改动，R-I 系列未覆盖面）
+
+- 任务：main tracked .py/.json/.md/.yml/.toml/.cfg（224 tracked 中口径 214：186 py/17 md/9 json/1 yml/1 toml，tests/ 133 py）五维度静态扫描——绝对路径 / 用户名机具指纹 / samples/private 缺失即 SKIP 契约 / 机密形态 / 网络外呼。main 只读 @ `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（动态定位 branch=refs/heads/main worktree，前后 status clean，未跑 main pytest，samples/private 内容零读取）；rg 命中全部与 git ls-files 交叉核对，4 个未跟踪 outputs/*.json（rg 磁盘可见）出口径剔除。
+- 五维度结果（原始命中 382 → 有意豁免 354 / 误报 143 / 安全正向 10 / 真风险 1 组 low）：(D1a 盘符 16) CLAUDE.md×4 + README×2 环境文档硬编码 + tests 合成 5 + 文档示例 3 + 误报 2；(D1b 家目录 4) 同源环境文档 3 + 合成 1；(D1c UNC 126) 全为 `\\r\\n` 类转义序列误报，精化 `\\server\share` 形态 **0**；(D2 指纹 13) zzhn2 真实泄漏面收敛于 CLAUDE.md(4 行)+README.md(3 行)，ADOPTION 的 dachuang-code 为工作树弱指纹、Docker Desktop 产品名误报；(D3 samples/private 105，tests 12 文件 36 命中) **反例 0**——skip 守卫 17（conftest fixture 缺失→None→消费方 pytest.skip）+ 合成字符串不触盘 9（test_manifest 已读源核实为 tmp_path 自建占位）+ continue 守卫 1 + docstring 声明 2，scripts 2 处为运维脚本显式依赖非测试契约；(D4 机密 23) 术语误报 13 + 安全正向 10（persist-credentials:false 配置与断言、/etc/passwd 穿越负例），**零凭据赋值字面量**；(D5 网络 95) 全为 OOXML 命名空间 URI 18 + 解析 fixture URL 77（数据串非请求），urllib/requests/socket/http.client/urlopen/curl/wget/docker pull|push 全仓 .py **0 命中**，真实网络仅 CI docker build。
+- 真风险（指示线候选，本轮不修 main，r54）：**P-R2045-1（low）** tracked 文档含真实 Windows 用户名 zzhn2 与桌面目录布局——README.md:18/28/31（门面文件，建议环境节参数化 `<repo>`/`<python>` 占位）+ CLAUDE.md:105/106/116/227（agent 指令环境节，出库与否属用户文档策略裁决）；无凭据/主机名，敏感度低。
+- 口径外观察：outputs/*.json 未入库且 `.gitignore` `outputs/*` 规则有效（纪律提示严禁 `git add -f outputs/`）；Grep 工具磁盘扫描不严格遵循 .gitignore，需 ls-files 交叉核对（本轮已核）。
+- 盘点件：outputs/autonomous/privpath_audit_r2045.md + .json（sort_keys/ensure_ascii=False，未入库）；泄漏专项闭合，不建议再投轮。
+- 下次建议：维持 R2044——**2026-09-21 周期简报窗口全量实跑**（预测 102082 + 3xN，重采 --durations=25 对照漂移锚点两项，候选池引用 R2042 盘点件）；validate 子命令通道面仍未投；P-R2045-1 是否处置（README 参数化属指示线候选）留用户裁决。
+
+---
+
 ## Round 2044 — app.cli batch-parse 三方记账一致性（1b/b 换轴 batch 记账对账面，3 测试）
 
 - 任务：`app.cli batch-parse` 的 stdout 汇总行 vs summary.json vs --log-file JSONL 事件流三方对账（批次 16/17 契约），main 只读 @ `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_batch_accounting_r2044.py + .out（未入库，C0 + E1–E7 全 17 项）；子进程真实 CLI（main venv `python -m app.cli batch-parse`），cwd=探针自造目录 + PYTHONPATH=main 根；批输入全部自造（.md 文本 + 确定性伪随机字节坏 .docx）。
