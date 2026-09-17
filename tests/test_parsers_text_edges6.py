@@ -135,12 +135,6 @@ def test_split_paragraphs_empty_string():
     assert _split_paragraphs("") == []
 
 
-def test_split_paragraphs_single_line():
-    result = _split_paragraphs("hello")
-    assert len(result) == 1
-    assert result[0] == (1, "hello")
-
-
 def test_split_paragraphs_two_paragraphs_separated_by_blank_line():
     text = "para1\n\npara2"
     result = _split_paragraphs(text)
@@ -493,34 +487,6 @@ def test_parse_invalid_utf8_falls_back_to_replace(tmp_path: Path):
 def test_module_all_exact():
     import app.parsers.text_parser as mod
     assert mod.__all__ == ["TextParser"]
-
-
-def test_module_all_is_list():
-    import app.parsers.text_parser as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_uses_future_annotations():
-    import app.parsers.text_parser as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_path():
-    import app.parsers.text_parser as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.parsers.text_parser as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
-def test_module_docstring_present():
-    import app.parsers.text_parser as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_strategy():

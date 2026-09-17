@@ -72,11 +72,6 @@ def test_module_jsvalidation_error_in_namespace_identity():
 # =========================================================================
 
 
-def test_schemas_dir_is_pathlib_path():
-    """SCHEMAS_DIR 是 Path 实例。"""
-    assert isinstance(SCHEMAS_DIR, Path)
-
-
 def test_schemas_dir_is_absolute_path():
     """SCHEMAS_DIR 是绝对路径。"""
     assert SCHEMAS_DIR.is_absolute()
@@ -97,16 +92,6 @@ def test_schemas_dir_exists():
 def test_schemas_dir_contains_manifest_schema():
     """SCHEMAS_DIR 含 manifest.schema.json。"""
     assert (SCHEMAS_DIR / "manifest.schema.json").is_file()
-
-
-def test_schemas_dir_contains_annotation_schema():
-    """SCHEMAS_DIR 含 annotation.schema.json。"""
-    assert (SCHEMAS_DIR / "annotation.schema.json").is_file()
-
-
-def test_schemas_dir_contains_evaluation_report_schema():
-    """SCHEMAS_DIR 含 evaluation-report.schema.json。"""
-    assert (SCHEMAS_DIR / "evaluation-report.schema.json").is_file()
 
 
 # =========================================================================
@@ -202,11 +187,6 @@ def test_module_docstring_mentions_no_reuse_with_app_schema():
 # =========================================================================
 # EvalSchemaError 详细测试
 # =========================================================================
-
-
-def test_eval_schema_error_subclass_of_exception():
-    """EvalSchemaError 是 Exception 子类。"""
-    assert issubclass(EvalSchemaError, Exception)
 
 
 def test_eval_schema_error_init_default_errors_is_empty_list():
@@ -674,13 +654,6 @@ def test_schema_path_callable():
 # =========================================================================
 # Draft202012Validator 集成
 # =========================================================================
-
-
-def test_load_schema_can_be_used_with_draft202012_validator():
-    """load_schema 返回的 dict 可被 Draft202012Validator 使用。"""
-    s = load_schema("manifest.schema.json")
-    v = Draft202012Validator(s)
-    assert v is not None
 
 
 def test_validate_consistent_with_direct_validator():

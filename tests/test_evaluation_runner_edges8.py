@@ -43,13 +43,6 @@ def test_load_annotation_returns_list_value(tmp_path: Path):
     assert result == [1, 2, 3]
 
 
-def test_load_annotation_returns_int_value(tmp_path: Path):
-    p = tmp_path / "a.json"
-    p.write_text("42", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == 42
-
-
 def test_load_annotation_returns_string_value(tmp_path: Path):
     p = tmp_path / "a.json"
     p.write_text('"hello"', encoding="utf-8")
@@ -923,11 +916,6 @@ def test_load_annotation_return_annotation():
     sig = inspect.signature(_load_annotation)
     annotation = str(sig.return_annotation)
     assert "dict" in annotation or "None" in annotation
-
-
-def test_process_one_signature():
-    sig = inspect.signature(_process_one)
-    assert set(sig.parameters) == {"doc", "output_root", "parser_name", "max_chars"}
 
 
 def test_process_one_return_annotation_tuple():

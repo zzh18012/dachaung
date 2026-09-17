@@ -42,15 +42,6 @@ def test_manifest_top_required_batch55():
 
 # ---------- document 顶层 ----------
 
-def test_document_top_required_thirteen_batch55():
-    s = load_schema("document.schema.json")
-    assert s["required"] == [
-        "schema_version", "document_id", "source_path",
-        "source_type", "source_hash", "parser_name",
-        "parser_version", "elements", "chunks", "relations",
-        "warnings", "errors", "metadata"]
-
-
 # ---------- documents $ref ----------
 
 def test_documents_items_ref_defs_batch55():

@@ -863,11 +863,6 @@ def test_module_source_contains_perf_counter_batch42():
     assert "time.perf_counter" in src
 
 
-def test_module_source_contains_json_load_batch42():
-    src = inspect.getsource(rmod)
-    assert "json.load(f)" in src
-
-
 def test_module_source_contains_json_dump_batch42():
     src = inspect.getsource(rmod)
     assert "json.dump(" in src
@@ -987,13 +982,6 @@ def test_signature_load_annotation_path_annotation_path_or_none_batch42():
 def test_signature_load_annotation_no_default_batch42():
     sig = inspect.signature(_load_annotation)
     assert sig.parameters["path"].default is inspect.Parameter.empty
-
-
-def test_signature_load_annotation_return_annotation_batch42():
-    sig = inspect.signature(_load_annotation)
-    ann = str(sig.return_annotation)
-    assert "dict" in ann
-    assert "None" in ann
 
 
 def test_signature_process_one_params_batch42():

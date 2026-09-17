@@ -121,11 +121,6 @@ def test_eval_schema_error_can_be_raised_with_no_message():
         raise EvalSchemaError("")
 
 
-def test_eval_schema_error_str_with_empty_message():
-    e = EvalSchemaError("")
-    assert str(e) == ""
-
-
 def test_eval_schema_error_repr_includes_args():
     e = EvalSchemaError("oops")
     r = repr(e)
@@ -150,11 +145,6 @@ def test_schema_path_returns_path_with_correct_parent():
 def test_schema_path_returns_path_with_correct_name():
     p = _schema_path("manifest.schema.json")
     assert p.name == "manifest.schema.json"
-
-
-def test_schema_path_does_not_exist_for_unknown():
-    with pytest.raises(FileNotFoundError):
-        _schema_path("does-not-exist.schema.json")
 
 
 def test_schema_path_error_message_includes_path():
@@ -744,11 +734,6 @@ def test_validate_param_annotations():
     sig = inspect.signature(validate)
     assert "dict" in str(sig.parameters["instance"].annotation)
     assert sig.parameters["schema_name"].annotation is str or sig.parameters["schema_name"].annotation == "str"
-
-
-def test_validate_return_annotation_none():
-    sig = inspect.signature(validate)
-    assert sig.return_annotation is None or sig.return_annotation == "None"
 
 
 def test_validate_file_signature_2_params():

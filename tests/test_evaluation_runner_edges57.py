@@ -30,20 +30,6 @@ from evaluation.runner import _load_annotation, _process_one, run_evaluation
 # ---------- _load_annotation 第二十九批 ----------
 
 
-def test_load_annotation_returns_array_batch29(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("[1, 2, 3]", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == [1, 2, 3]
-
-
-def test_load_annotation_returns_number_batch29(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("42", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == 42
-
-
 def test_load_annotation_returns_string_batch29(tmp_path):
     p = tmp_path / "a.json"
     p.write_text('"hello"', encoding="utf-8")

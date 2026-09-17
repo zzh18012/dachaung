@@ -54,11 +54,6 @@ def test_valid_annotation_returns_none_batch54():
 
 # ---------- 未知 schema 名传播 ----------
 
-def test_validate_unknown_schema_propagates_batch54():
-    with pytest.raises(FileNotFoundError):
-        validate({}, "nope.schema.json")
-
-
 # ---------- 顶层 type ----------
 
 @pytest.mark.parametrize("name", [

@@ -453,11 +453,6 @@ def test_module_source_imports_jsvalidation_error_batch13():
     assert "from jsonschema.exceptions import ValidationError as JSValidationError" in head
 
 
-def test_module_source_defines_schemas_dir_batch13():
-    source = inspect.getsource(smod)
-    assert "SCHEMAS_DIR" in source
-
-
 def test_module_source_defines_eval_schema_error_batch13():
     source = inspect.getsource(smod)
     assert "class EvalSchemaError" in source
@@ -508,11 +503,6 @@ def test_module_source_has_no_open_to_string_path_batch13():
 def test_module_source_uses_resolve_batch13():
     source = inspect.getsource(smod)
     assert ".resolve()" in source
-
-
-def test_module_source_uses_iter_errors_sorted_batch13():
-    source = inspect.getsource(smod)
-    assert "sorted(" in source
 
 
 def test_module_source_uses_absolute_path_batch13():
@@ -616,10 +606,6 @@ def test_module_name_evaluation_schema_batch13():
 
 def test_module_dunder_all_5_items_batch13():
     assert len(smod.__all__) == 5
-
-
-def test_module_dunder_all_items_unique_batch13():
-    assert len(set(smod.__all__)) == len(smod.__all__)
 
 
 def test_module_dunder_all_includes_expected_names_batch13():

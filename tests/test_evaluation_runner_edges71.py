@@ -579,11 +579,6 @@ def test_module_source_contains_ensure_ascii_false_batch45():
     assert "ensure_ascii=False" in src
 
 
-def test_module_source_contains_indent_2_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "indent=2" in src
-
-
 def test_module_source_contains_load_annotation_function_batch45():
     src = inspect.getsource(runner_mod)
     assert "def _load_annotation(path: Path | None) -> dict[str, Any] | None:" in src
@@ -611,14 +606,6 @@ def test_module_source_contains_unknown_error_message_batch45():
 
 # ---------- __all__ ----------
 
-def test_all_exact_batch45():
-    assert set(runner_mod.__all__) == {"run_evaluation"}
-
-
-def test_all_count_1_batch45():
-    assert len(runner_mod.__all__) == 1
-
-
 def test_all_callable_batch45():
     assert callable(getattr(runner_mod, "run_evaluation"))
 
@@ -641,24 +628,6 @@ def test_ast_top_level_function_names_batch45():
     tree = ast.parse(inspect.getsource(runner_mod))
     names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert names == ["_load_annotation", "_process_one", "run_evaluation"]
-
-
-def test_ast_top_level_no_async_batch45():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
-
-
-def test_ast_top_level_no_for_in_module_body_batch45():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.For)
-
-
-def test_ast_top_level_no_while_in_module_body_batch45():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.While)
 
 
 def test_ast_first_node_docstring_batch45():

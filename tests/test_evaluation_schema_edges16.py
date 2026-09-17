@@ -108,12 +108,6 @@ def test_eval_schema_error_isinstance_exception():
     assert isinstance(e, Exception)
 
 
-def test_eval_schema_error_default_errors_is_empty_list():
-    e = EvalSchemaError("msg")
-    assert e.errors == []
-    assert isinstance(e.errors, list)
-
-
 def test_eval_schema_error_empty_dict_in_errors_preserved():
     """errors=[{}] 保留（伪 truthy）。"""
     e = EvalSchemaError("msg", [{}])
@@ -173,12 +167,6 @@ def test_eval_schema_error_init_signature_2_params():
 def test_eval_schema_error_errors_default_is_none():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert sig.parameters["errors"].default is None
-
-
-def test_eval_schema_error_init_no_varargs_varkw():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
 
 
 # =========================================================================
@@ -329,16 +317,6 @@ def test_load_schema_signature_1_param():
     assert len(params) == 1
 
 
-def test_load_schema_source_has_utf8_encoding():
-    src = inspect.getsource(load_schema)
-    assert 'encoding="utf-8"' in src
-
-
-def test_load_schema_source_has_json_load():
-    src = inspect.getsource(load_schema)
-    assert "json.load(f)" in src
-
-
 def test_load_schema_source_has_schema_path_call():
     src = inspect.getsource(load_schema)
     assert "_schema_path(name)" in src
@@ -424,11 +402,6 @@ def test_validate_source_has_iter_errors():
 def test_validate_source_has_sorted():
     src = inspect.getsource(validate)
     assert "sorted" in src
-
-
-def test_validate_source_has_absolute_path():
-    src = inspect.getsource(validate)
-    assert "absolute_path" in src
 
 
 def test_validate_source_has_head_eq_errors_0():
@@ -522,21 +495,6 @@ def test_validate_file_signature_2_params():
     sig = inspect.signature(validate_file)
     params = list(sig.parameters.values())
     assert len(params) == 2
-
-
-def test_validate_file_source_has_path_call():
-    src = inspect.getsource(validate_file)
-    assert "Path(path)" in src
-
-
-def test_validate_file_source_has_is_file():
-    src = inspect.getsource(validate_file)
-    assert ".is_file()" in src
-
-
-def test_validate_file_source_has_utf8_encoding():
-    src = inspect.getsource(validate_file)
-    assert 'encoding="utf-8"' in src
 
 
 def test_validate_file_source_has_validate_call():
@@ -882,18 +840,6 @@ def test_validate_file_path_annotation_is_path_or_str():
 
 def test_validate_no_varargs_varkw():
     sig = inspect.signature(validate)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
-def test_validate_file_no_varargs_varkw():
-    sig = inspect.signature(validate_file)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
-def test_load_schema_no_varargs_varkw():
-    sig = inspect.signature(load_schema)
     for p in sig.parameters.values():
         assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
 

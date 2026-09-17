@@ -82,12 +82,6 @@ def test_module_no_all_attribute():
     assert not hasattr(mod, "__all__")
 
 
-def test_module_uses_future_annotations():
-    import app.models as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_module_docstring_mentions_unified():
     """docstring 应提及"统一"。"""
     import app.models as mod

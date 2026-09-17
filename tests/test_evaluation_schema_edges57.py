@@ -263,12 +263,6 @@ def test_validate_invalid_schema_name_raises_file_not_found_batch42():
         validate({}, "unknown.schema.json")
 
 
-def test_validate_eval_schema_error_has_errors_list_batch42():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    assert isinstance(exc.value.errors, list)
-
-
 def test_validate_eval_schema_error_errors_not_none_batch42():
     with pytest.raises(EvalSchemaError) as exc:
         validate({}, "manifest.schema.json")
@@ -420,13 +414,6 @@ def test_validate_file_top_level_int_raises_batch42(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_top_level_string_raises_batch42(tmp_path):
-    p = tmp_path / "str.json"
-    p.write_text('"hello"', encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_idempotent_batch42(tmp_path):
     p = tmp_path / "m.json"
     p.write_text(json.dumps({
@@ -465,11 +452,6 @@ def test_eval_schema_error_with_none_errors_batch42():
 def test_eval_schema_error_with_empty_list_errors_batch42():
     err = EvalSchemaError("boom", errors=[])
     assert err.errors == []
-
-
-def test_eval_schema_error_message_passthrough_batch42():
-    err = EvalSchemaError("test message")
-    assert str(err) == "test message"
 
 
 def test_eval_schema_error_can_be_raised_batch42():
@@ -630,11 +612,6 @@ def test_module_source_contains_encoding_utf8_batch42():
     assert 'encoding="utf-8"' in src
 
 
-def test_module_source_contains_file_not_found_keyword_batch42():
-    src = inspect.getsource(smod)
-    assert "FileNotFoundError" in src
-
-
 def test_module_source_contains_all_export_batch42():
     src = inspect.getsource(smod)
     assert "__all__" in src
@@ -663,24 +640,9 @@ def test_signature_schema_path_params_batch42():
     assert list(sig.parameters.keys()) == ["name"]
 
 
-def test_signature_validate_no_default_for_instance_batch42():
-    sig = inspect.signature(validate)
-    assert sig.parameters["instance"].default is inspect.Parameter.empty
-
-
-def test_signature_validate_no_default_for_schema_name_batch42():
-    sig = inspect.signature(validate)
-    assert sig.parameters["schema_name"].default is inspect.Parameter.empty
-
-
 def test_signature_validate_file_no_default_for_path_batch42():
     sig = inspect.signature(validate_file)
     assert sig.parameters["path"].default is inspect.Parameter.empty
-
-
-def test_signature_validate_file_no_default_for_schema_name_batch42():
-    sig = inspect.signature(validate_file)
-    assert sig.parameters["schema_name"].default is inspect.Parameter.empty
 
 
 # ---------- module 合理性 第四十二批
@@ -704,18 +666,6 @@ def test_module_all_contains_schemas_dir_batch42():
 
 def test_module_all_contains_eval_schema_error_batch42():
     assert "EvalSchemaError" in smod.__all__
-
-
-def test_module_all_contains_load_schema_batch42():
-    assert "load_schema" in smod.__all__
-
-
-def test_module_all_contains_validate_batch42():
-    assert "validate" in smod.__all__
-
-
-def test_module_all_contains_validate_file_batch42():
-    assert "validate_file" in smod.__all__
 
 
 def test_module_does_not_export_private_batch42():
@@ -747,10 +697,6 @@ def test_module_functions_callable_batch42():
     assert callable(smod.load_schema)
     assert callable(smod.validate)
     assert callable(smod.validate_file)
-
-
-def test_module_eval_schema_error_is_class_batch42():
-    assert isinstance(smod.EvalSchemaError, type)
 
 
 # ---------- AST 结构 第四十二批

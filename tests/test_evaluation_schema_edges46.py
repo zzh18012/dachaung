@@ -202,11 +202,6 @@ def test_load_schema_manifest_has_required_key_batch26():
     assert "documents" in s["required"]
 
 
-def test_load_schema_manifest_has_additional_properties_false_batch26():
-    s = load_schema("manifest.schema.json")
-    assert s.get("additionalProperties") is False
-
-
 def test_load_schema_returns_independent_dict_batch26():
     """两次调用返回独立 dict。"""
     s1 = load_schema("manifest.schema.json")

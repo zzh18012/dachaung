@@ -496,14 +496,6 @@ def test_validate_file_invalid_json_raises_jsondecodeerror_batch23(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_empty_file_raises_jsondecodeerror_batch23(tmp_path):
-    """空文件 → JSONDecodeError。"""
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_utf16_raises_jsondecodeerror_batch23(tmp_path):
     """UTF-16 编码 → utf-8 解码产生 NUL+ASCII → JSONDecodeError。"""
     p = tmp_path / "utf16.json"
@@ -652,21 +644,6 @@ def test_module_source_contains_schemas_dir_definition_batch23():
     source = inspect.getsource(smod)
     assert "Path(__file__).resolve().parent.parent" in source
     assert '"schemas"' in source
-
-
-def test_module_source_contains_draft202012_batch23():
-    source = inspect.getsource(smod)
-    assert "Draft202012Validator" in source
-
-
-def test_module_source_contains_iter_errors_batch23():
-    source = inspect.getsource(smod)
-    assert "iter_errors" in source
-
-
-def test_module_source_contains_absolute_path_batch23():
-    source = inspect.getsource(smod)
-    assert "absolute_path" in source
 
 
 def test_module_source_contains_evaluation_failed_text_batch23():

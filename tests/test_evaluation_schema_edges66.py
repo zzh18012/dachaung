@@ -175,11 +175,6 @@ def test_load_schema_annotation_has_id_batch52():
     assert "$schema" in s
 
 
-def test_load_schema_evaluation_report_has_id_batch52():
-    s = load_schema("evaluation-report.schema.json")
-    assert "$schema" in s
-
-
 def test_load_schema_manifest_has_type_object_batch52():
     s = load_schema("manifest.schema.json")
     assert s.get("type") == "object"
@@ -354,11 +349,6 @@ def test_schemas_dir_value_matches_module_level_path_batch52():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_future_annotations_batch52():
-    src = inspect.getsource(schema_mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_source_json_import_batch52():
     src = inspect.getsource(schema_mod)
     assert "import json" in src
@@ -377,16 +367,6 @@ def test_source_typing_any_import_batch52():
 def test_source_jsonschema_draft2020_import_batch52():
     src = inspect.getsource(schema_mod)
     assert "from jsonschema import Draft202012Validator" in src
-
-
-def test_source_jsvalidation_error_import_batch52():
-    src = inspect.getsource(schema_mod)
-    assert "from jsonschema.exceptions import ValidationError as JSValidationError" in src
-
-
-def test_source_schemas_dir_definition_batch52():
-    src = inspect.getsource(schema_mod)
-    assert 'SCHEMAS_DIR = Path(__file__).resolve().parent.parent / "schemas"' in src
 
 
 def test_source_eval_schema_error_docstring_batch52():
@@ -485,14 +465,6 @@ def test_ast_has_1_class_def_batch52():
     assert classes[0].name == "EvalSchemaError"
 
 
-def test_ast_eval_schema_error_has_init_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError")
-    methods = [n for n in cls.body if isinstance(n, ast.FunctionDef)]
-    assert len(methods) == 1
-    assert methods[0].name == "__init__"
-
-
 def test_ast_eval_schema_error_init_2_args_batch52():
     tree = ast.parse(inspect.getsource(schema_mod))
     cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError")
@@ -503,14 +475,6 @@ def test_ast_eval_schema_error_init_2_args_batch52():
     assert args.args[1].arg == "message"
     assert args.args[2].arg == "errors"
     assert len(args.defaults) == 1  # errors=None
-
-
-def test_ast_eval_schema_error_calls_super_init_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError")
-    init = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "__init__")
-    src = ast.unparse(init)
-    assert "super().__init__(message)" in src
 
 
 def test_ast_eval_schema_error_init_assigns_self_errors_batch52():
@@ -565,13 +529,6 @@ def test_ast_schema_path_has_1_if_batch52():
     assert len(ifs) == 1
 
 
-def test_ast_schema_path_has_1_raise_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_schema_path")
-    raises = [n for n in ast.walk(func) if isinstance(n, ast.Raise)]
-    assert len(raises) == 1
-
-
 def test_ast_schema_path_raises_filenotfounderror_batch52():
     tree = ast.parse(inspect.getsource(schema_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_schema_path")
@@ -621,13 +578,6 @@ def test_ast_validate_uses_draft202012_validator_batch52():
     assert "Draft202012Validator" in src
 
 
-def test_ast_validate_1_for_loop_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate")
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) == 1
-
-
 def test_ast_validate_1_sorted_call_batch52():
     tree = ast.parse(inspect.getsource(schema_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate")
@@ -651,13 +601,6 @@ def test_ast_validate_sorted_has_lambda_key_batch52():
     assert isinstance(kw.value, ast.Lambda)
 
 
-def test_ast_validate_raises_eval_schema_error_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate")
-    raises = [n for n in ast.walk(func) if isinstance(n, ast.Raise)]
-    assert len(raises) == 1
-
-
 def test_ast_validate_returns_none_when_no_errors_batch52():
     """validate 在 if not errors: 分支 return（隐式 None）。"""
     tree = ast.parse(inspect.getsource(schema_mod))
@@ -679,13 +622,6 @@ def test_ast_validate_file_has_1_if_batch52():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
     ifs = [n for n in ast.walk(func) if isinstance(n, ast.If)]
     assert len(ifs) == 1
-
-
-def test_ast_validate_file_calls_validate_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
-    src = ast.unparse(func)
-    assert "validate(data, schema_name)" in src
 
 
 def test_ast_validate_file_has_path_arg_batch52():

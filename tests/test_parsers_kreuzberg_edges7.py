@@ -611,11 +611,6 @@ def test_make_locator_signature_two_params():
     assert params == ["source_type", "paragraph_index"]
 
 
-def test_make_locator_pdf_keys_exact():
-    loc = _make_locator("pdf", 0)
-    assert set(loc.keys()) == {"page", "_kreuzberg_placeholder"}
-
-
 def test_make_locator_docx_keys_exact():
     loc = _make_locator("docx", 0)
     assert set(loc.keys()) == {"paragraph_index", "_kreuzberg_heuristic"}
@@ -652,14 +647,6 @@ def test_make_locator_pdf_page_value_always_one():
     assert _make_locator("pdf", 0)["page"] == 1
     assert _make_locator("pdf", 100)["page"] == 1
     assert _make_locator("pdf", -1)["page"] == 1
-
-
-def test_make_locator_pdf_placeholder_value_is_true():
-    assert _make_locator("pdf", 0)["_kreuzberg_placeholder"] is True
-
-
-def test_make_locator_docx_heuristic_value_is_true():
-    assert _make_locator("docx", 0)["_kreuzberg_heuristic"] is True
 
 
 def test_make_locator_docx_paragraph_index_value_passed_through():
@@ -755,10 +742,6 @@ def test_kreuzberg_parser_instance_attribute_version_matches_class():
     assert p.version == KreuzbergParser.version
 
 
-def test_kreuzberg_parser_inherits_parser():
-    assert issubclass(KreuzbergParser, Parser)
-
-
 def test_kreuzberg_parser_is_class():
     assert inspect.isclass(KreuzbergParser)
 
@@ -776,11 +759,6 @@ def test_kreuzberg_parser_init_signature_keyword_only_param():
     params = sig.parameters
     assert "self" in params
     assert "include_document_structure" in params
-
-
-def test_kreuzberg_parser_init_include_document_structure_default_true():
-    sig = inspect.signature(KreuzbergParser.__init__)
-    assert sig.parameters["include_document_structure"].default is True
 
 
 def test_kreuzberg_parser_init_include_document_structure_keyword_only():

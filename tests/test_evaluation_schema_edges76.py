@@ -159,12 +159,6 @@ def test_annotation_schema_top_keys_nine_batch54():
 
 # ---------- __all__ 与 AST ----------
 
-def test_all_export_five_names_batch54():
-    assert schema_mod.__all__ == [
-        "SCHEMAS_DIR", "EvalSchemaError", "load_schema", "validate",
-        "validate_file"]
-
-
 def test_ast_module_structure_batch54():
     tree = ast.parse(inspect.getsource(schema_mod))
     c = collections.Counter(type(n).__name__ for n in ast.walk(tree))

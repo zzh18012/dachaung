@@ -364,16 +364,6 @@ def test_validate_file_empty_file_raises_batch19(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_returns_none_on_success_batch19(tmp_path):
-    p = tmp_path / "x.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [],
-    }), encoding="utf-8")
-    assert validate_file(p, "manifest.schema.json") is None
-
-
 def test_validate_file_int_top_level_raises_batch19(tmp_path):
     """JSON 顶层是 int → schema 校验失败。"""
     p = tmp_path / "x.json"
@@ -457,11 +447,6 @@ def test_module_source_no_urllib_import_batch19():
 def test_module_source_no_threading_import_batch19():
     src = inspect.getsource(smod)
     assert "import threading" not in src
-
-
-def test_module_source_no_multiprocessing_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import multiprocessing" not in src
 
 
 def test_module_source_no_asyncio_import_batch19():
@@ -612,11 +597,6 @@ def test_module_source_has_all_list_batch19():
     assert '__all__' in src
 
 
-def test_module_source_has_docstring_batch19():
-    src = inspect.getsource(smod)
-    assert "Schema" in src or "schema" in src
-
-
 # ---------- signatures 第三十一批 ----------
 
 
@@ -684,12 +664,6 @@ def test_module_all_contents_exact_batch19():
     }
 
 
-def test_module_does_not_import_app_pipeline_batch19():
-    src = inspect.getsource(smod)
-    assert "from app" not in src
-    assert "import app" not in src
-
-
 def test_module_does_not_import_evaluation_runner_batch19():
     src = inspect.getsource(smod)
     assert "from evaluation.runner" not in src
@@ -706,12 +680,6 @@ def test_module_does_not_import_evaluation_manifest_batch19():
     src = inspect.getsource(smod)
     assert "from evaluation.manifest" not in src
     assert "from evaluation import manifest" not in src
-
-
-def test_module_no_main_block_batch19():
-    src = inspect.getsource(smod)
-    assert 'if __name__ ==' not in src
-    assert "__main__" not in src
 
 
 def test_module_eval_schema_error_class_exists_batch19():

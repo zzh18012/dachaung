@@ -370,12 +370,6 @@ def test_classify_paragraph_81_chars():
     assert etype == "paragraph"
 
 
-def test_classify_returns_tuple():
-    result = _classify_pdf_paragraph("hello")
-    assert isinstance(result, tuple)
-    assert len(result) == 2
-
-
 def test_classify_caption_priority_over_heading():
     """caption 优先级高于 heading（即使短）。"""
     etype, _ = _classify_pdf_paragraph("Fig 1. x")

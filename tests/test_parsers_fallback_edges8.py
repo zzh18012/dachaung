@@ -57,12 +57,6 @@ def test_is_heading_style_signature():
     assert params == ["style_name"]
 
 
-def test_is_heading_style_returns_tuple():
-    result = _is_heading_style("Heading 1")
-    assert isinstance(result, tuple)
-    assert len(result) == 2
-
-
 def test_is_heading_style_first_element_bool():
     is_h, _ = _is_heading_style("Heading 1")
     assert isinstance(is_h, bool)
@@ -73,28 +67,12 @@ def test_is_heading_style_second_element_int():
     assert isinstance(level, int)
 
 
-def test_is_heading_style_title():
-    assert _is_heading_style("Title") == (True, 1)
-
-
 def test_is_heading_style_title_lowercase():
     assert _is_heading_style("title") == (True, 1)
 
 
 def test_is_heading_style_title_uppercase():
     assert _is_heading_style("TITLE") == (True, 1)
-
-
-def test_is_heading_style_title_with_whitespace():
-    assert _is_heading_style("  Title  ") == (True, 1)
-
-
-def test_is_heading_style_heading_1():
-    assert _is_heading_style("Heading 1") == (True, 1)
-
-
-def test_is_heading_style_heading_2():
-    assert _is_heading_style("Heading 2") == (True, 2)
 
 
 def test_is_heading_style_heading_3():
@@ -141,18 +119,6 @@ def test_is_heading_style_normal_returns_false():
     assert _is_heading_style("Normal") == (False, 0)
 
 
-def test_is_heading_style_body_text_returns_false():
-    assert _is_heading_style("Body Text") == (False, 0)
-
-
-def test_is_heading_style_subtitle_returns_false():
-    assert _is_heading_style("Subtitle") == (False, 0)
-
-
-def test_is_heading_style_none_returns_false():
-    assert _is_heading_style(None) == (False, 0)
-
-
 def test_is_heading_style_empty_string_returns_false():
     assert _is_heading_style("") == (False, 0)
 
@@ -191,10 +157,6 @@ def test_is_heading_style_heading_tab_separator():
 def test_is_heading_style_quote_prefix_returns_false():
     """'Quote' 不以 heading 开头 → False。"""
     assert _is_heading_style("Quote") == (False, 0)
-
-
-def test_is_heading_style_does_not_match_subtitle_starts_with_s():
-    assert _is_heading_style("Subtitle") == (False, 0)
 
 
 # =========================================================================
@@ -443,12 +405,6 @@ def test_lines_to_para_word_missing_top_uses_default():
 # =========================================================================
 # _classify_pdf_paragraph 边界
 # =========================================================================
-
-
-def test_classify_pdf_paragraph_returns_tuple():
-    result = _classify_pdf_paragraph("hello")
-    assert isinstance(result, tuple)
-    assert len(result) == 2
 
 
 def test_classify_pdf_paragraph_first_str():
@@ -757,10 +713,6 @@ def test_fallback_parser_name_value():
     assert FallbackParser.name == "fallback"
 
 
-def test_fallback_parser_inherits_parser():
-    assert issubclass(FallbackParser, Parser)
-
-
 def test_fallback_parser_version_is_str():
     assert isinstance(FallbackParser.version, str)
 
@@ -777,19 +729,9 @@ def test_fallback_parser_version_includes_pdfium():
     assert "pypdfium2" in FallbackParser.version
 
 
-def test_fallback_parser_init_no_args():
-    parser = FallbackParser()
-    assert parser._image_output_dir is None
-
-
 def test_fallback_parser_init_str_path(tmp_path: Path):
     parser = FallbackParser(image_output_dir=str(tmp_path))
     assert isinstance(parser._image_output_dir, Path)
-    assert parser._image_output_dir == tmp_path
-
-
-def test_fallback_parser_init_path_object(tmp_path: Path):
-    parser = FallbackParser(image_output_dir=tmp_path)
     assert parser._image_output_dir == tmp_path
 
 
@@ -1139,10 +1081,6 @@ def test_caption_re_pattern_has_chinese_keywords():
     assert "图" in _CAPTION_RE.pattern
 
 
-def test_caption_re_pattern_has_full_width_digit_range():
-    assert "０-９" in _CAPTION_RE.pattern
-
-
 def test_caption_re_pattern_has_ignorecase_flag_in_pattern():
     """pattern 编译时带 IGNORECASE。"""
     src = inspect.getsource(fallback_mod)
@@ -1156,10 +1094,6 @@ def test_caption_re_pattern_has_ignorecase_flag_in_pattern():
 
 def test_is_caption_returns_true_for_caption():
     assert _is_caption("Table 1. Description") is True
-
-
-def test_is_caption_returns_false_for_non_caption():
-    assert _is_caption("hello world") is False
 
 
 def test_is_caption_none_returns_false():

@@ -104,10 +104,6 @@ def test_mc98_strategies_batch467(mc98_doc):
         "isolated_caption", "sequential", "sequential"]
 
 
-def test_base_valid_batch467(mc98_doc):
-    validate(mc98_doc, "document.schema.json")
-
-
 # ---------- 源列表项型检 ----------
 
 def test_srcs_mixed_type_index1_batch467(mc98_doc):

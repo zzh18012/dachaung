@@ -477,12 +477,6 @@ def test_validate_file_invalid_content_raises_eval_error(tmp_path: Path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_returns_none_on_success(tmp_path: Path):
-    p = tmp_path / "x.json"
-    p.write_text(json.dumps({"manifest_version": "1.0", "devset_status": "complete", "documents": []}), encoding="utf-8")
-    assert validate_file(p, "manifest.schema.json") is None
-
-
 def test_validate_file_unicode_filename(tmp_path: Path):
     """Unicode 文件名支持。"""
     p = tmp_path / "数据.json"

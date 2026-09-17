@@ -572,11 +572,6 @@ def test_make_locator_docx_with_negative_index_passes_through():
     assert loc["paragraph_index"] == -5
 
 
-def test_make_locator_docx_zero_index_passes_through():
-    loc = _make_locator("docx", 0)
-    assert loc["paragraph_index"] == 0
-
-
 def test_make_locator_docx_large_index_passes_through():
     loc = _make_locator("docx", 999999)
     assert loc["paragraph_index"] == 999999

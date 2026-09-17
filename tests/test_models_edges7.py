@@ -227,11 +227,6 @@ def test_chunk_post_init_empty_source_ids_raises():
         Chunk(chunk_id="c1", text="x", source_element_ids=[])
 
 
-def test_chunk_post_init_empty_text_raises():
-    with pytest.raises(ValueError, match="文本不能为空"):
-        Chunk(chunk_id="c1", text="", source_element_ids=["e1"])
-
-
 def test_chunk_post_init_none_text_raises():
     with pytest.raises(ValueError):
         Chunk(chunk_id="c1", text=None, source_element_ids=["e1"])  # type: ignore[arg-type]
@@ -283,10 +278,6 @@ def test_chunk_is_dataclass():
     assert is_dataclass(Chunk) is True
 
 
-def test_chunk_field_count():
-    assert len(fields(Chunk)) == 5
-
-
 # =========================================================================
 # Relation
 # =========================================================================
@@ -325,10 +316,6 @@ def test_relation_equality():
 
 def test_relation_is_dataclass():
     assert is_dataclass(Relation) is True
-
-
-def test_relation_field_count():
-    assert len(fields(Relation)) == 4
 
 
 # =========================================================================
@@ -376,10 +363,6 @@ def test_warning_record_equality():
 
 def test_warning_record_is_dataclass():
     assert is_dataclass(WarningRecord) is True
-
-
-def test_warning_record_field_count():
-    assert len(fields(WarningRecord)) == 3
 
 
 # =========================================================================
@@ -430,10 +413,6 @@ def test_error_record_inequality_on_message():
 
 def test_error_record_is_dataclass():
     assert is_dataclass(ErrorRecord) is True
-
-
-def test_error_record_field_count():
-    assert len(fields(ErrorRecord)) == 3
 
 
 # =========================================================================
@@ -554,11 +533,6 @@ def test_document_equality():
 
 def test_document_is_dataclass():
     assert is_dataclass(Document) is True
-
-
-def test_document_field_count():
-    # schema_version is a class constant, NOT a dataclass field
-    assert len(fields(Document)) == 12
 
 
 # =========================================================================

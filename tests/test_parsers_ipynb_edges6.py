@@ -73,11 +73,6 @@ def test_ipynb_extensions_is_tuple():
     assert isinstance(_IPYNB_EXTENSIONS, tuple)
 
 
-def test_ipynb_extensions_lowercase():
-    for ext in _IPYNB_EXTENSIONS:
-        assert ext == ext.lower()
-
-
 def test_ipynb_extensions_starts_with_dot():
     for ext in _IPYNB_EXTENSIONS:
         assert ext.startswith(".")
@@ -677,45 +672,11 @@ def test_module_all_exact():
     assert mod.__all__ == ["IpynbParser"]
 
 
-def test_module_all_is_list():
-    import app.parsers.ipynb_parser as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_uses_future_annotations():
-    import app.parsers.ipynb_parser as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_json():
-    import app.parsers.ipynb_parser as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_path():
-    import app.parsers.ipynb_parser as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.parsers.ipynb_parser as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
 def test_module_imports_markdown_parser():
     """复用 MarkdownParser 处理 markdown cell。"""
     import app.parsers.ipynb_parser as mod
     src = inspect.getsource(mod)
     assert "MarkdownParser" in src
-
-
-def test_module_docstring_present():
-    import app.parsers.ipynb_parser as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_nbformat():

@@ -163,11 +163,6 @@ def test_fenced_with_language_python_with_version():
     assert _FENCED_RE.match("```python3.12") is None
 
 
-def test_fenced_with_no_language():
-    m = _FENCED_RE.match("```")
-    assert m.group(2) == ""
-
-
 def test_fenced_with_leading_space_not_match():
     assert _FENCED_RE.match(" ```") is None
 
@@ -302,13 +297,6 @@ def test_blockquote_multiple_spaces():
 # =========================================================================
 
 
-def test_standalone_image_basic():
-    m = _STANDALONE_IMAGE_RE.match("![alt](url.png)")
-    assert m is not None
-    assert m.group(1) == "alt"
-    assert m.group(2) == "url.png"
-
-
 def test_standalone_image_empty_alt():
     m = _STANDALONE_IMAGE_RE.match("![](url.png)")
     assert m is not None
@@ -325,10 +313,6 @@ def test_standalone_image_url_with_query():
 def test_standalone_image_extra_text_after_not_match():
     """'![alt](url) extra' 不匹配（必须整行）。"""
     assert _STANDALONE_IMAGE_RE.match("![alt](url) extra") is None
-
-
-def test_standalone_image_text_before_not_match():
-    assert _STANDALONE_IMAGE_RE.match("text ![alt](url)") is None
 
 
 def test_standalone_image_with_trailing_spaces():
@@ -435,10 +419,6 @@ def test_detect_md_source_type_error_code():
 
 def test_split_pipe_row_basic():
     assert _split_pipe_row("| a | b |") == ["a", "b"]
-
-
-def test_split_pipe_row_no_pipes_at_edges():
-    assert _split_pipe_row("a | b") == ["a", "b"]
 
 
 def test_split_pipe_row_single_cell_with_edges():

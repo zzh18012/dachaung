@@ -200,11 +200,6 @@ def test_load_schema_missing_raises_filenotfound_batch33():
         load_schema("missing.schema.json")
 
 
-def test_load_schema_eval_report_has_schema_field_batch33():
-    s = load_schema("evaluation-report.schema.json")
-    assert "$schema" in s
-
-
 def test_load_schema_manifest_has_schema_field_batch33():
     s = load_schema("manifest.schema.json")
     assert "$schema" in s
@@ -328,20 +323,6 @@ def test_validate_errors_path_is_list_batch33():
         validate({}, "manifest.schema.json")
     for err in exc.value.errors:
         assert isinstance(err["path"], list)
-
-
-def test_validate_errors_message_is_str_batch33():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    for err in exc.value.errors:
-        assert isinstance(err["message"], str)
-
-
-def test_validate_errors_schema_path_is_list_batch33():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    for err in exc.value.errors:
-        assert isinstance(err["schema_path"], list)
 
 
 def test_validate_head_error_message_in_overall_msg_batch33():
@@ -552,11 +533,6 @@ def test_module_source_no_forbidden_tokens_batch33(token):
 # ---------- module source 字符串精确补强第四十九批
 
 
-def test_module_source_contains_docstring_batch33():
-    src = inspect.getsource(smod)
-    assert "Schema" in src
-
-
 def test_module_source_contains_future_annotations_batch33():
     src = inspect.getsource(smod)
     assert "from __future__ import annotations" in src
@@ -642,36 +618,6 @@ def test_module_source_contains_all_batch33():
     assert "__all__" in src
 
 
-def test_module_source_all_contains_schemas_dir_batch33():
-    src = inspect.getsource(smod)
-    assert '"SCHEMAS_DIR"' in src
-
-
-def test_module_source_all_contains_eval_schema_error_batch33():
-    src = inspect.getsource(smod)
-    assert '"EvalSchemaError"' in src
-
-
-def test_module_source_all_contains_load_schema_batch33():
-    src = inspect.getsource(smod)
-    assert '"load_schema"' in src
-
-
-def test_module_source_all_contains_validate_batch33():
-    src = inspect.getsource(smod)
-    assert '"validate"' in src
-
-
-def test_module_source_all_contains_validate_file_batch33():
-    src = inspect.getsource(smod)
-    assert '"validate_file"' in src
-
-
-def test_module_source_contains_file_not_found_msg_batch33():
-    src = inspect.getsource(smod)
-    assert "Schema 文件不存在" in src
-
-
 def test_module_source_contains_encoding_utf8_batch33():
     src = inspect.getsource(smod)
     assert 'encoding="utf-8"' in src
@@ -751,11 +697,6 @@ def test_module_imports_jsonschema_batch33():
 def test_module_imports_jsonschema_exceptions_batch33():
     src = inspect.getsource(smod)
     assert "from jsonschema.exceptions import ValidationError" in src
-
-
-def test_module_has_schemas_dir_const_batch33():
-    assert hasattr(smod, "SCHEMAS_DIR")
-    assert isinstance(smod.SCHEMAS_DIR, Path)
 
 
 def test_module_has_eval_schema_error_class_batch33():

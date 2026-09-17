@@ -1049,11 +1049,6 @@ def test_html_parser_instance_attrs_match_class():
     assert p.version == HtmlParser.version
 
 
-def test_html_parser_init_no_args():
-    p = HtmlParser()
-    assert p is not None
-
-
 def test_html_parser_init_keyword_only_no_image_output_dir():
     """HtmlParser 不接受 image_output_dir 参数。"""
     sig = inspect.signature(HtmlParser.__init__)
@@ -1106,10 +1101,6 @@ def test_html_extensions_count_two():
 
 def test_html_extensions_is_tuple():
     assert isinstance(_HTML_EXTENSIONS, tuple)
-
-
-def test_html_extensions_values_exact():
-    assert set(_HTML_EXTENSIONS) == {".html", ".htm"}
 
 
 # =========================================================================

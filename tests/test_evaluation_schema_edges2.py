@@ -85,11 +85,6 @@ def test_schema_path_returns_path_for_known_schema():
     assert isinstance(p, Path)
 
 
-def test_schema_path_returned_path_is_absolute():
-    p = _schema_path("annotation.schema.json")
-    assert p.is_absolute()
-
-
 def test_schema_path_returned_path_is_file():
     p = _schema_path("evaluation-report.schema.json")
     assert p.is_file()

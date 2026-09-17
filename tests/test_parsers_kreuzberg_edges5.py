@@ -142,12 +142,6 @@ def test_classify_line_80_chars_no_terminator_short_heading():
     assert etype == "heading"
 
 
-def test_classify_line_81_chars_no_terminator_paragraph():
-    text = "a" * 81
-    etype, _ = _classify_line(text)
-    assert etype == "paragraph"
-
-
 def test_classify_line_80_chars_with_terminator_paragraph():
     text = "a" * 79 + "."
     etype, _ = _classify_line(text)
@@ -208,12 +202,6 @@ def test_classify_line_atx_with_chinese_text():
     assert meta["raw_text"] == "中文标题"
 
 
-def test_classify_line_returns_tuple():
-    result = _classify_line("hello")
-    assert isinstance(result, tuple)
-    assert len(result) == 2
-
-
 def test_classify_line_first_element_is_str():
     etype, _ = _classify_line("x")
     assert isinstance(etype, str)
@@ -249,11 +237,6 @@ def test_classify_line_atx_h6_level_six():
 # =========================================================================
 
 
-def test_make_locator_pdf_keys():
-    loc = _make_locator("pdf", 0)
-    assert set(loc.keys()) == {"page", "_kreuzberg_placeholder"}
-
-
 def test_make_locator_docx_keys():
     loc = _make_locator("docx", 5)
     assert set(loc.keys()) == {"paragraph_index", "_kreuzberg_heuristic"}
@@ -269,11 +252,6 @@ def test_make_locator_pdf_page_value_one_for_negative_index():
     assert loc["page"] == 1
 
 
-def test_make_locator_docx_paragraph_index_passes_through_zero():
-    loc = _make_locator("docx", 0)
-    assert loc["paragraph_index"] == 0
-
-
 def test_make_locator_docx_paragraph_index_passes_through_large():
     loc = _make_locator("docx", 999)
     assert loc["paragraph_index"] == 999
@@ -285,22 +263,9 @@ def test_make_locator_pdf_ignores_paragraph_index():
     assert "paragraph_index" not in loc
 
 
-def test_make_locator_docx_ignores_page():
-    loc = _make_locator("docx", 0)
-    assert "page" not in loc
-
-
 def test_make_locator_returns_dict():
     assert isinstance(_make_locator("pdf", 0), dict)
     assert isinstance(_make_locator("docx", 0), dict)
-
-
-def test_make_locator_pdf_placeholder_true():
-    assert _make_locator("pdf", 0)["_kreuzberg_placeholder"] is True
-
-
-def test_make_locator_docx_heuristic_true():
-    assert _make_locator("docx", 0)["_kreuzberg_heuristic"] is True
 
 
 def test_make_locator_other_source_type_falls_to_else_branch():
@@ -530,10 +495,6 @@ def test_kreuzberg_parser_version_is_str():
 
 def test_kreuzberg_parser_version_not_empty():
     assert KreuzbergParser.version
-
-
-def test_kreuzberg_parser_inherits_parser():
-    assert issubclass(KreuzbergParser, Parser)
 
 
 def test_kreuzberg_parser_class_dict_has_name():

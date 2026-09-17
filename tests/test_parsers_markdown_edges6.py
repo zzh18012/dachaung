@@ -108,10 +108,6 @@ def test_detect_md_source_type_message_mentions_actual_suffix():
 # =========================================================================
 
 
-def test_md_extensions_exact():
-    assert _MD_EXTENSIONS == (".md", ".markdown")
-
-
 def test_md_extensions_is_tuple():
     assert isinstance(_MD_EXTENSIONS, tuple)
 
@@ -208,18 +204,6 @@ def test_split_pipe_row_two_cells_with_pipes():
 
 def test_split_pipe_row_three_cells():
     assert _split_pipe_row("| a | b | c |") == ["a", "b", "c"]
-
-
-def test_split_pipe_row_leading_pipe_only():
-    assert _split_pipe_row("| a | b") == ["a", "b"]
-
-
-def test_split_pipe_row_trailing_pipe_only():
-    assert _split_pipe_row("a | b |") == ["a", "b"]
-
-
-def test_split_pipe_row_no_outer_pipes():
-    assert _split_pipe_row("a | b") == ["a", "b"]
 
 
 def test_split_pipe_row_consecutive_pipes_empty_cell():

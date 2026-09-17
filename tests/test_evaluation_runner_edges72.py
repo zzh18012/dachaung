@@ -605,16 +605,6 @@ def test_source_contains_image_output_dir_for_batch47():
     assert "image_output_dir_for" in src
 
 
-def test_source_contains_process_single_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "process_single" in src
-
-
-def test_source_contains_compute_automatic_metrics_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "compute_automatic_metrics" in src
-
-
 def test_source_contains_figure_caption_prf_batch47():
     src = inspect.getsource(runner_mod)
     assert "figure_caption_prf" in src
@@ -769,11 +759,6 @@ def test_source_no_os_system_batch47():
     assert "os.system(" not in src
 
 
-def test_source_no_popen_batch47():
-    src = inspect.getsource(runner_mod)
-    assert ".popen(" not in src
-
-
 def test_source_no_yaml_load_batch47():
     src = inspect.getsource(runner_mod)
     assert "yaml.load(" not in src
@@ -782,31 +767,6 @@ def test_source_no_yaml_load_batch47():
 def test_source_no_pickle_load_batch47():
     src = inspect.getsource(runner_mod)
     assert "pickle.load(" not in src
-
-
-def test_source_no_subprocess_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "subprocess" not in src
-
-
-def test_source_no_lambda_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "lambda" not in src
-
-
-def test_source_no_yield_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "yield" not in src
-
-
-def test_source_no_walrus_batch47():
-    src = inspect.getsource(runner_mod)
-    assert ":=" not in src
-
-
-def test_source_no_async_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "async def" not in src
 
 
 def test_source_no_await_batch47():

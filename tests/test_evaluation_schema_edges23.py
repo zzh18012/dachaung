@@ -912,15 +912,6 @@ def test_module_source_uses_utf_8():
     assert 'utf-8' in src or 'utf_8' in src.lower()
 
 
-def test_module_source_class_count_1():
-    src = inspect.getsource(smod)
-    class_count = sum(
-        1 for line in src.splitlines()
-        if line.startswith("class ")
-    )
-    assert class_count == 1
-
-
 def test_module_source_function_count_4():
     src = inspect.getsource(smod)
     func_count = sum(

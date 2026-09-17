@@ -115,11 +115,6 @@ def test_eval_schema_error_explicit_errors_preserved_batch21():
     assert err.errors is errs  # 直接保留引用
 
 
-def test_eval_schema_error_inherits_from_exception_batch21():
-    """EvalSchemaError 是 Exception 子类。"""
-    assert issubclass(EvalSchemaError, Exception)
-
-
 def test_eval_schema_error_is_not_standard_exception_batch21():
     """EvalSchemaError 不是 Exception 实例本身（是子类）。"""
     err = EvalSchemaError("msg")
@@ -537,31 +532,6 @@ def test_module_source_no_logging_import_batch21():
     assert "import logging" not in src
 
 
-def test_module_source_no_re_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import re" not in src
-
-
-def test_module_source_no_datetime_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import datetime" not in src
-
-
-def test_module_source_no_collections_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import collections" not in src
-
-
-def test_module_source_no_pandas_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import pandas" not in src
-
-
-def test_module_source_no_numpy_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import numpy" not in src
-
-
 # ---------- module source 字符串精确补强第三十三批 ----------
 
 
@@ -653,12 +623,6 @@ def test_signature_eval_schema_error_init_batch21():
     assert params[2].name == "errors"
 
 
-def test_signature_eval_schema_error_errors_default_none_batch21():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    p = sig.parameters["errors"]
-    assert p.default is None
-
-
 def test_signature_schema_path_returns_path_annotation_batch21():
     sig = inspect.signature(_schema_path)
     assert "Path" in str(sig.return_annotation)
@@ -710,12 +674,6 @@ def test_module_does_not_import_evaluation_cli_batch21():
     src = inspect.getsource(smod)
     assert "from evaluation.cli" not in src
     assert "from evaluation import cli" not in src
-
-
-def test_module_does_not_import_evaluation_manifest_batch21():
-    src = inspect.getsource(smod)
-    assert "from evaluation.manifest" not in src
-    assert "from evaluation import manifest" not in src
 
 
 def test_module_does_not_import_evaluation_metrics_batch21():

@@ -70,12 +70,6 @@ def test_schema_path_returns_path_batch36():
     assert isinstance(p, Path)
 
 
-def test_schema_path_missing_file_raises_batch36():
-    with pytest.raises(FileNotFoundError) as exc:
-        _schema_path("nonexistent.schema.json")
-    assert "Schema 文件不存在" in str(exc.value)
-
-
 def test_schema_path_absolute_batch36():
     p = _schema_path("manifest.schema.json")
     assert p.is_absolute()
@@ -205,12 +199,6 @@ def test_validate_invalid_schema_name_raises_batch36():
     """未知 schema 名 → FileNotFoundError。"""
     with pytest.raises(FileNotFoundError):
         validate({}, "unknown.schema.json")
-
-
-def test_validate_eval_schema_error_has_errors_list_batch36():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    assert isinstance(exc.value.errors, list)
 
 
 def test_validate_eval_schema_error_errors_not_none_batch36():
@@ -349,11 +337,6 @@ def test_eval_schema_error_with_errors_batch36():
 def test_eval_schema_error_with_none_errors_batch36():
     err = EvalSchemaError("boom", errors=None)
     assert err.errors == []
-
-
-def test_eval_schema_error_message_passthrough_batch36():
-    err = EvalSchemaError("test message")
-    assert str(err) == "test message"
 
 
 def test_eval_schema_error_can_be_raised_batch36():
@@ -502,11 +485,6 @@ def test_module_source_contains_encoding_utf8_batch36():
     assert 'encoding="utf-8"' in src
 
 
-def test_module_source_contains_file_not_found_keyword_batch36():
-    src = inspect.getsource(smod)
-    assert "FileNotFoundError" in src
-
-
 def test_module_source_contains_absolute_path_keyword_batch36():
     src = inspect.getsource(smod)
     assert "absolute_path" in src
@@ -545,24 +523,9 @@ def test_signature_schema_path_params_batch36():
     assert list(sig.parameters.keys()) == ["name"]
 
 
-def test_signature_validate_no_default_for_instance_batch36():
-    sig = inspect.signature(validate)
-    assert sig.parameters["instance"].default is inspect.Parameter.empty
-
-
-def test_signature_validate_no_default_for_schema_name_batch36():
-    sig = inspect.signature(validate)
-    assert sig.parameters["schema_name"].default is inspect.Parameter.empty
-
-
 def test_signature_validate_file_no_default_for_path_batch36():
     sig = inspect.signature(validate_file)
     assert sig.parameters["path"].default is inspect.Parameter.empty
-
-
-def test_signature_validate_file_no_default_for_schema_name_batch36():
-    sig = inspect.signature(validate_file)
-    assert sig.parameters["schema_name"].default is inspect.Parameter.empty
 
 
 # ---------- module 合理性 第五十六批
@@ -586,18 +549,6 @@ def test_module_all_contains_schemas_dir_batch36():
 
 def test_module_all_contains_eval_schema_error_batch36():
     assert "EvalSchemaError" in smod.__all__
-
-
-def test_module_all_contains_load_schema_batch36():
-    assert "load_schema" in smod.__all__
-
-
-def test_module_all_contains_validate_batch36():
-    assert "validate" in smod.__all__
-
-
-def test_module_all_contains_validate_file_batch36():
-    assert "validate_file" in smod.__all__
 
 
 def test_module_does_not_export_private_batch36():

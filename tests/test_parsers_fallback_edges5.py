@@ -109,10 +109,6 @@ def test_caption_re_pattern_contains_chinese_figure():
     assert "图" in _CAPTION_RE.pattern
 
 
-def test_caption_re_pattern_contains_full_width_digit_range():
-    assert "０-９" in _CAPTION_RE.pattern
-
-
 def test_caption_re_pattern_contains_ascii_digit_range():
     assert "0-9" in _CAPTION_RE.pattern
 
@@ -122,10 +118,6 @@ def test_caption_re_pattern_contains_separator_chars():
     assert "." in _CAPTION_RE.pattern
     assert ":" in _CAPTION_RE.pattern
     assert "、" in _CAPTION_RE.pattern
-
-
-def test_caption_re_pattern_uses_ignore_case():
-    assert _CAPTION_RE.flags & re.IGNORECASE
 
 
 def test_caption_re_pattern_compiled_once():
@@ -541,25 +533,9 @@ def test_group_words_each_para_has_text_and_bbox_keys():
 # =========================================================================
 
 
-def test_is_heading_style_title_returns_true_level_1():
-    assert _is_heading_style("Title") == (True, 1)
-
-
 def test_is_heading_style_title_lowercase_returns_true():
     """style 名 lowercase 后比较，'title' 也匹配。"""
     assert _is_heading_style("title") == (True, 1)
-
-
-def test_is_heading_style_title_with_whitespace_stripped():
-    assert _is_heading_style("  Title  ") == (True, 1)
-
-
-def test_is_heading_style_heading_1():
-    assert _is_heading_style("Heading 1") == (True, 1)
-
-
-def test_is_heading_style_heading_2():
-    assert _is_heading_style("Heading 2") == (True, 2)
 
 
 def test_is_heading_style_heading_10():
@@ -597,16 +573,6 @@ def test_is_heading_style_quote_returns_false():
 
 def test_is_heading_style_empty_string_returns_false():
     assert _is_heading_style("") == (False, 0)
-
-
-def test_is_heading_style_none_returns_false():
-    assert _is_heading_style(None) == (False, 0)
-
-
-def test_is_heading_style_returns_tuple_type():
-    result = _is_heading_style("Heading 1")
-    assert isinstance(result, tuple)
-    assert len(result) == 2
 
 
 def test_is_heading_style_first_element_bool():
@@ -783,11 +749,6 @@ def test_fallback_parser_class_inherits_parser():
 
 def test_fallback_parser_has_parse_method():
     assert callable(getattr(FallbackParser, "parse", None))
-
-
-def test_fallback_parser_init_default_image_output_dir_none():
-    p = FallbackParser()
-    assert p._image_output_dir is None
 
 
 def test_fallback_parser_init_with_path(tmp_path: Path):

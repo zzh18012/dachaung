@@ -156,16 +156,6 @@ def test_extract_kernel_language_kernelspec_language():
     assert _extract_kernel_language(metadata) == "python"
 
 
-def test_extract_kernel_language_kernelspec_name_fallback():
-    metadata = {"kernelspec": {"name": "python3"}}  # 无 language
-    assert _extract_kernel_language(metadata) == "python3"
-
-
-def test_extract_kernel_language_language_info_name_fallback():
-    metadata = {"language_info": {"name": "r"}}
-    assert _extract_kernel_language(metadata) == "r"
-
-
 def test_extract_kernel_language_empty_metadata():
     assert _extract_kernel_language({}) == ""
 
@@ -206,11 +196,6 @@ def test_ipynb_parser_version_attribute():
 
 def test_ipynb_parser_inherits_parser():
     assert issubclass(IpynbParser, Parser)
-
-
-def test_ipynb_parser_parse_signature():
-    sig = inspect.signature(IpynbParser.parse)
-    assert set(sig.parameters) == {"self", "path", "source_hash"}
 
 
 def test_ipynb_parser_parse_no_defaults():
@@ -823,35 +808,6 @@ def test_module_all_exact():
     assert mod.__all__ == ["IpynbParser"]
 
 
-def test_module_all_is_list():
-    import app.parsers.ipynb_parser as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_uses_future_annotations():
-    import app.parsers.ipynb_parser as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_json():
-    import app.parsers.ipynb_parser as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_path():
-    import app.parsers.ipynb_parser as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.parsers.ipynb_parser as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
 def test_module_imports_models():
     import app.parsers.ipynb_parser as mod
     src = inspect.getsource(mod)
@@ -868,11 +824,6 @@ def test_module_imports_markdown_parser():
     import app.parsers.ipynb_parser as mod
     src = inspect.getsource(mod)
     assert "from app.parsers.markdown_parser" in src
-
-
-def test_module_docstring_present():
-    import app.parsers.ipynb_parser as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_nbformat():

@@ -550,11 +550,6 @@ def test_schema_source_no_input_call_batch11():
     assert "input(" not in source
 
 
-def test_schema_source_no_remove_batch11():
-    source = inspect.getsource(smod)
-    assert ".remove(" not in source
-
-
 def test_schema_source_no_kill_batch11():
     source = inspect.getsource(smod)
     assert ".kill(" not in source
@@ -595,24 +590,9 @@ def test_module_source_imports_typing_any_batch11():
     assert "from typing import Any" in source
 
 
-def test_module_source_imports_draft_validator_batch11():
-    source = inspect.getsource(smod)
-    assert "from jsonschema import Draft202012Validator" in source
-
-
 def test_module_source_imports_js_validation_error_batch11():
     source = inspect.getsource(smod)
     assert "from jsonschema.exceptions import ValidationError as JSValidationError" in source
-
-
-def test_module_source_has_schemas_dir_constant_batch11():
-    source = inspect.getsource(smod)
-    assert "SCHEMAS_DIR = " in source
-
-
-def test_module_source_has_class_eval_schema_error_batch11():
-    source = inspect.getsource(smod)
-    assert "class EvalSchemaError(Exception):" in source
 
 
 def test_module_source_has_schema_path_function_batch11():
@@ -645,20 +625,9 @@ def test_module_source_no_print_batch11():
     assert "print(" not in source
 
 
-def test_module_source_no_logging_batch11():
-    source = inspect.getsource(smod)
-    assert "logging" not in source
-    assert "logger" not in source
-
-
 def test_module_source_docstring_present_batch11():
     assert smod.__doc__ is not None
     assert len(smod.__doc__) > 30
-
-
-def test_module_source_docstring_mentions_schema_batch11():
-    assert smod.__doc__ is not None
-    assert "Schema" in smod.__doc__ or "schema" in smod.__doc__
 
 
 def test_module_source_docstring_mentions_separation_batch11():
@@ -700,11 +669,6 @@ def test_signature_eval_schema_error_errors_kind_kw_or_pos_batch11():
     sig = inspect.signature(EvalSchemaError.__init__)
     p = sig.parameters["errors"]
     assert p.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)
-
-
-def test_signature_schema_path_1_param_batch11():
-    sig = inspect.signature(_schema_path)
-    assert list(sig.parameters) == ["name"]
 
 
 def test_signature_schema_path_return_path_batch11():

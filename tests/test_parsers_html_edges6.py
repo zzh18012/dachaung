@@ -51,10 +51,6 @@ def _write(tmp_path: Path, name: str, content: str) -> Path:
 # =========================================================================
 
 
-def test_html_extensions_exact():
-    assert _HTML_EXTENSIONS == (".html", ".htm")
-
-
 def test_html_extensions_is_tuple():
     assert isinstance(_HTML_EXTENSIONS, tuple)
 
@@ -67,10 +63,6 @@ def test_html_extensions_lowercase():
 def test_html_extensions_starts_with_dot():
     for ext in _HTML_EXTENSIONS:
         assert ext.startswith(".")
-
-
-def test_heading_levels_exact_six_entries():
-    assert _HEADING_LEVELS == {"h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6}
 
 
 def test_heading_levels_is_dict():
@@ -629,11 +621,6 @@ def test_html_parser_version_value():
 def test_html_parser_inherits_parser():
     from app.parsers.base import Parser
     assert issubclass(HtmlParser, Parser)
-
-
-def test_html_parser_init_no_args():
-    p = HtmlParser()
-    assert p is not None
 
 
 def test_parse_nonexistent_file_raises(tmp_path: Path):

@@ -566,11 +566,6 @@ def test_module_source_contains_module_docstring_batch28():
     assert "评测 runner" in src
 
 
-def test_module_source_contains_run_evaluation_func_batch28():
-    src = inspect.getsource(rmod)
-    assert "def run_evaluation" in src
-
-
 def test_module_source_contains_process_single_import_batch28():
     src = inspect.getsource(rmod)
     assert "from app.pipeline import" in src

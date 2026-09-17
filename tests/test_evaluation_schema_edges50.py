@@ -28,26 +28,10 @@ from evaluation.schema import (
 # ---------- EvalSchemaError 第三十批 ----------
 
 
-def test_eval_schema_error_default_errors_is_empty_list_batch30():
-    e = EvalSchemaError("msg")
-    assert e.errors == []
-    assert isinstance(e.errors, list)
-
-
-def test_eval_schema_error_explicit_none_errors_batch30():
-    e = EvalSchemaError("msg", None)
-    assert e.errors == []
-
-
 def test_eval_schema_error_str_repr_batch30():
     e = EvalSchemaError("hello")
     assert str(e) == "hello"
     assert repr(e).startswith("EvalSchemaError")
-
-
-def test_eval_schema_error_inherits_exception_batch30():
-    e = EvalSchemaError("msg")
-    assert isinstance(e, Exception)
 
 
 def test_eval_schema_error_can_be_raised_and_caught_batch30():
@@ -123,11 +107,6 @@ def test_load_schema_manifest_has_required_key_batch30():
     assert "required" in s
 
 
-def test_load_schema_annotation_has_required_key_batch30():
-    s = load_schema("annotation.schema.json")
-    assert "required" in s
-
-
 def test_load_schema_evaluation_report_has_required_key_batch30():
     s = load_schema("evaluation-report.schema.json")
     assert "required" in s
@@ -176,13 +155,6 @@ def test_validate_message_contains_schema_name_batch30():
     with pytest.raises(EvalSchemaError) as exc:
         validate({}, "manifest.schema.json")
     assert "manifest.schema.json" in str(exc.value)
-
-
-def test_validate_message_contains_error_count_batch30():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    msg = str(exc.value)
-    assert "处" in msg
 
 
 def test_validate_errors_sorted_by_path_batch30():
@@ -406,12 +378,6 @@ def test_module_source_no_requests_batch30():
     assert "requests" not in src
 
 
-def test_module_source_no_open_w_mode_batch30():
-    src = inspect.getsource(smod)
-    assert "'w'" not in src
-    assert '"w"' not in src
-
-
 def test_module_source_no_unlink_batch30():
     src = inspect.getsource(smod)
     assert ".unlink()" not in src
@@ -483,11 +449,6 @@ def test_module_source_contains_absolute_path_call_batch30():
 def test_module_source_contains_absolute_schema_path_call_batch30():
     src = inspect.getsource(smod)
     assert "absolute_schema_path" in src
-
-
-def test_module_source_contains_no_app_schema_reuse_doc_batch30():
-    src = inspect.getsource(smod)
-    assert "不与 app/schema.py 复用" in src
 
 
 def test_module_source_contains_errors_or_empty_default_batch30():

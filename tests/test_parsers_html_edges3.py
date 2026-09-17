@@ -629,14 +629,6 @@ def test_html_parse_invalid_utf8_falls_back_to_replace(tmp_path: Path):
 # =========================================================================
 
 
-def test_skip_tags_includes_meta():
-    assert "meta" in _SKIP_TAGS
-
-
-def test_skip_tags_includes_link():
-    assert "link" in _SKIP_TAGS
-
-
 def test_skip_tags_includes_noscript():
     assert "noscript" in _SKIP_TAGS
 

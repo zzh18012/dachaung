@@ -44,11 +44,6 @@ def test_eval_schema_error_source_starts_with_class():
     assert src.startswith("class EvalSchemaError")
 
 
-def test_eval_schema_error_source_extends_exception():
-    src = inspect.getsource(EvalSchemaError)
-    assert "class EvalSchemaError(Exception):" in src
-
-
 def test_eval_schema_error_source_has_docstring():
     src = inspect.getsource(EvalSchemaError)
     assert '"""' in src
@@ -160,11 +155,6 @@ def test_load_schema_source_uses_utf8():
     assert '"utf-8"' in src or "'utf-8'" in src
 
 
-def test_load_schema_source_uses_json_load():
-    src = inspect.getsource(load_schema)
-    assert "json.load(f)" in src
-
-
 def test_load_schema_source_returns_json_load():
     src = inspect.getsource(load_schema)
     assert "return json.load(f)" in src
@@ -224,11 +214,6 @@ def test_validate_source_uses_sorted():
     assert "sorted(" in src
 
 
-def test_validate_source_uses_absolute_path():
-    src = inspect.getsource(validate)
-    assert "absolute_path" in src
-
-
 def test_validate_source_uses_errors_list():
     src = inspect.getsource(validate)
     assert "flat: list[dict[str, Any]]" in src or "flat = []" in src or "flat:" in src
@@ -238,11 +223,6 @@ def test_validate_source_returns_when_no_errors():
     src = inspect.getsource(validate)
     assert "if not errors:" in src
     assert "return" in src
-
-
-def test_validate_source_raises_eval_schema_error():
-    src = inspect.getsource(validate)
-    assert "raise EvalSchemaError(" in src
 
 
 def test_validate_source_error_path_keys():
@@ -292,16 +272,6 @@ def test_validate_file_source_two_params():
 def test_validate_file_source_no_return_value():
     src = inspect.getsource(validate_file)
     assert "-> None" in src
-
-
-def test_validate_file_source_uses_path():
-    src = inspect.getsource(validate_file)
-    assert "Path(path)" in src
-
-
-def test_validate_file_source_uses_is_file():
-    src = inspect.getsource(validate_file)
-    assert ".is_file()" in src
 
 
 def test_validate_file_source_raises_file_not_found():
@@ -644,12 +614,6 @@ def test_signature_validate_file_no_defaults():
         assert p.default is inspect.Parameter.empty
 
 
-def test_signature_load_schema_no_varargs():
-    sig = inspect.signature(load_schema)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 # ---------- 模块整体合理性补强 ----------
 
 
@@ -975,11 +939,6 @@ def test_e2e_validate_eval_schema_error_caught_as_value_error_ancestor():
 def test_e2e_schema_path_returns_path():
     p = _schema_path("manifest.schema.json")
     assert isinstance(p, Path)
-
-
-def test_e2e_schema_path_for_nonexistent_raises():
-    with pytest.raises(FileNotFoundError):
-        _schema_path("does-not-exist.schema.json")
 
 
 def test_e2e_eval_schema_error_with_complex_errors():

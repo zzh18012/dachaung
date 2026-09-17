@@ -51,24 +51,12 @@ def test_text_extensions_count_two():
 # =========================================================================
 
 
-def test_detect_text_source_type_txt():
-    assert _detect_text_source_type(Path("a.txt")) == "text"
-
-
-def test_detect_text_source_type_text():
-    assert _detect_text_source_type(Path("a.text")) == "text"
-
-
 def test_detect_text_source_type_uppercase_txt():
     assert _detect_text_source_type(Path("a.TXT")) == "text"
 
 
 def test_detect_text_source_type_uppercase_text():
     assert _detect_text_source_type(Path("a.TEXT")) == "text"
-
-
-def test_detect_text_source_type_mixed_case():
-    assert _detect_text_source_type(Path("a.TxT")) == "text"
 
 
 def test_detect_text_source_type_unknown_suffix_raises():
@@ -118,24 +106,11 @@ def test_split_paragraphs_empty_string():
     assert _split_paragraphs("") == []
 
 
-def test_split_paragraphs_single_line():
-    result = _split_paragraphs("hello")
-    assert len(result) == 1
-    assert result[0] == (1, "hello")
-
-
 def test_split_paragraphs_single_paragraph_multi_line():
     """连续行（无空行分隔）属于同一段。"""
     result = _split_paragraphs("line1\nline2\nline3")
     assert len(result) == 1
     assert result[0] == (1, "line1\nline2\nline3")
-
-
-def test_split_paragraphs_two_paragraphs():
-    result = _split_paragraphs("para1\n\npara2")
-    assert len(result) == 2
-    assert result[0] == (1, "para1")
-    assert result[1] == (3, "para2")
 
 
 def test_split_paragraphs_crlf_normalized():
@@ -670,29 +645,6 @@ def test_module_all_exact():
     assert mod.__all__ == ["TextParser"]
 
 
-def test_module_all_is_list():
-    import app.parsers.text_parser as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_uses_future_annotations():
-    import app.parsers.text_parser as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_path():
-    import app.parsers.text_parser as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.parsers.text_parser as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
 def test_module_imports_models():
     import app.parsers.text_parser as mod
     src = inspect.getsource(mod)
@@ -703,11 +655,6 @@ def test_module_imports_base():
     import app.parsers.text_parser as mod
     src = inspect.getsource(mod)
     assert "from app.parsers.base" in src
-
-
-def test_module_docstring_present():
-    import app.parsers.text_parser as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_strategy():

@@ -92,10 +92,6 @@ def _valid(base, fn):
 
 # ---------- 基态 ----------
 
-def test_combo_base_valid_batch473(combo_doc):
-    validate(combo_doc, "document.schema.json")
-
-
 def test_combo_confidence_default_batch473(combo_doc):
     assert [e["confidence"] for e in combo_doc["elements"]] == [
         0.85, 0.85]

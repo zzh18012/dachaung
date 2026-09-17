@@ -438,13 +438,6 @@ def test_validate_errors_schema_path_is_list():
         assert isinstance(e["schema_path"], list)
 
 
-def test_validate_errors_message_is_str():
-    with pytest.raises(EvalSchemaError) as ei:
-        validate({}, "manifest.schema.json")
-    for e in ei.value.errors:
-        assert isinstance(e["message"], str)
-
-
 def test_validate_message_includes_count():
     with pytest.raises(EvalSchemaError) as ei:
         validate({}, "manifest.schema.json")
@@ -941,12 +934,6 @@ def test_module_source_4_module_level_def_count():
     assert func_count == 4
 
 
-def test_module_source_1_class_definition():
-    src = inspect.getsource(smod)
-    class_count = sum(1 for line in src.splitlines() if line.startswith("class "))
-    assert class_count == 1
-
-
 def test_module_source_class_eval_schema_error_definition():
     src = inspect.getsource(smod)
     assert "class EvalSchemaError(Exception):" in src
@@ -1024,11 +1011,6 @@ def test_eval_schema_error_class_init_errors_annotation_union():
     assert "list" in sa
     assert "dict" in sa
     assert "None" in sa
-
-
-def test_eval_schema_error_class_init_return_annotation_none():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    assert sig.return_annotation is None or sig.return_annotation == "None"
 
 
 def test_eval_schema_error_class_init_no_varargs():
@@ -1129,11 +1111,6 @@ def test_validate_signature_no_varargs_varkw():
     kinds = {p.kind for p in sig.parameters.values()}
     assert inspect.Parameter.VAR_POSITIONAL not in kinds
     assert inspect.Parameter.VAR_KEYWORD not in kinds
-
-
-def test_validate_signature_return_annotation_none():
-    sig = inspect.signature(validate)
-    assert sig.return_annotation is None or sig.return_annotation == "None"
 
 
 def test_validate_file_signature_param_count_2():

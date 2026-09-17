@@ -98,13 +98,6 @@ def test_validate_returns_none_on_success_batch53():
 
 # ---------- load_schema ----------
 
-def test_load_schema_fresh_dict_each_call_batch53():
-    a = load_schema("manifest.schema.json")
-    b = load_schema("manifest.schema.json")
-    assert a == b
-    assert a is not b
-
-
 def test_all_four_schemas_load_batch53():
     for name in ("manifest.schema.json", "annotation.schema.json",
                  "evaluation-report.schema.json", "document.schema.json"):
@@ -180,15 +173,6 @@ def test_evaluation_report_required_five_batch53():
                              "summary", "per_doc"]
     assert "expected_failures" not in s["required"]  # 可选段
     assert s["additionalProperties"] is False
-
-
-def test_document_required_thirteen_batch53():
-    s = load_schema("document.schema.json")
-    assert s["required"] == [
-        "schema_version", "document_id", "source_path", "source_type",
-        "source_hash", "parser_name", "parser_version", "elements",
-        "chunks", "relations", "warnings", "errors", "metadata",
-    ]
 
 
 def test_document_root_additional_unspecified_batch53():

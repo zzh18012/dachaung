@@ -44,10 +44,6 @@ def test_heading_levels_exact_six_entries():
     assert len(_HEADING_LEVELS) == 6
 
 
-def test_heading_levels_h1_to_h6():
-    assert _HEADING_LEVELS == {"h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6}
-
-
 def test_skip_tags_contains_script_style():
     assert "script" in _SKIP_TAGS
     assert "style" in _SKIP_TAGS
@@ -66,10 +62,6 @@ def test_skip_tags_contains_noscript():
 
 def test_skip_tags_count_seven():
     assert len(_SKIP_TAGS) == 7
-
-
-def test_html_extensions_exact():
-    assert _HTML_EXTENSIONS == (".html", ".htm")
 
 
 def test_html_extensions_is_tuple():

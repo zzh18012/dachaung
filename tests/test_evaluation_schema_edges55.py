@@ -76,12 +76,6 @@ def test_schema_path_returns_path_batch35():
     assert isinstance(p, Path)
 
 
-def test_schema_path_missing_raises_filenotfound_batch35():
-    with pytest.raises(FileNotFoundError) as exc_info:
-        _schema_path("nonexistent.schema.json")
-    assert "Schema 文件不存在" in str(exc_info.value)
-
-
 def test_schema_path_with_subdir_batch35():
     """带子目录的 schema name。"""
     # 测试函数能拼接子目录，但 schemas/ 下没有子目录，这里跳过
@@ -337,11 +331,6 @@ def test_eval_schema_error_init_two_args_batch35():
     assert e.errors == [{"x": 1}]
 
 
-def test_eval_schema_error_init_errors_none_batch35():
-    e = EvalSchemaError("msg", None)
-    assert e.errors == []
-
-
 def test_eval_schema_error_init_errors_empty_list_batch35():
     e = EvalSchemaError("msg", [])
     assert e.errors == []
@@ -431,11 +420,6 @@ def test_module_source_contains_design_doc_batch35():
     assert "加载并校验" in src
 
 
-def test_module_source_contains_no_reuse_comment_batch35():
-    src = inspect.getsource(smod)
-    assert "不与 app/schema.py 复用" in src
-
-
 def test_module_source_contains_draft_validator_import_batch35():
     src = inspect.getsource(smod)
     assert "from jsonschema import Draft202012Validator" in src
@@ -484,11 +468,6 @@ def test_module_source_contains_validate_file_function_batch35():
 def test_module_source_contains_json_load_call_batch35():
     src = inspect.getsource(smod)
     assert "json.load(f)" in src
-
-
-def test_module_source_contains_iter_errors_call_batch35():
-    src = inspect.getsource(smod)
-    assert "validator.iter_errors(instance)" in src
 
 
 def test_module_source_contains_sort_errors_keyword_batch35():

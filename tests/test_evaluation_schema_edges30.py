@@ -42,11 +42,6 @@ def test_eval_schema_error_unicode_message_batch10():
     assert "中文错误" in str(e)
 
 
-def test_eval_schema_error_empty_message_batch10():
-    e = EvalSchemaError("")
-    assert str(e) == ""
-
-
 def test_eval_schema_error_chain_cause_batch10():
     try:
         try:
@@ -490,11 +485,6 @@ def test_schema_source_no_unlink_batch10():
     assert "unlink" not in source
 
 
-def test_schema_source_no_remove_batch10():
-    source = inspect.getsource(smod)
-    assert ".remove(" not in source
-
-
 def test_schema_source_no_kill_batch10():
     source = inspect.getsource(smod)
     assert ".kill(" not in source
@@ -508,11 +498,6 @@ def test_schema_source_no_terminate_batch10():
 def test_schema_source_no_async_def_batch10():
     source = inspect.getsource(smod)
     assert "async def" not in source
-
-
-def test_schema_source_no_yield_batch10():
-    source = inspect.getsource(smod)
-    assert "yield" not in source
 
 
 def test_schema_source_no_walrus_batch10():
@@ -661,11 +646,6 @@ def test_signature_schema_path_1_param_batch10():
     assert len(sig.parameters) == 1
 
 
-def test_signature_schema_path_param_name_batch10():
-    sig = inspect.signature(_schema_path)
-    assert list(sig.parameters) == ["name"]
-
-
 def test_signature_load_schema_1_param_batch10():
     sig = inspect.signature(load_schema)
     assert len(sig.parameters) == 1
@@ -706,16 +686,6 @@ def test_signature_validate_file_2_params_batch10():
 def test_signature_validate_file_param_names_batch10():
     sig = inspect.signature(validate_file)
     assert list(sig.parameters) == ["path", "schema_name"]
-
-
-def test_signature_funcs_function_type_batch10():
-    for func in (_schema_path, load_schema, validate, validate_file):
-        assert inspect.isfunction(func)
-
-
-def test_signature_funcs_module_eq_batch10():
-    for func in (_schema_path, load_schema, validate, validate_file):
-        assert func.__module__ == "evaluation.schema"
 
 
 # ---------- module 合理性第十批 ----------

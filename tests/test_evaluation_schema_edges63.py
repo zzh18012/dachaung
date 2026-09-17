@@ -374,16 +374,6 @@ def test_source_contains_draft202012_validator_batch49():
     assert "Draft202012Validator" in src
 
 
-def test_source_contains_iter_errors_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "iter_errors" in src
-
-
-def test_source_contains_absolute_path_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "absolute_path" in src
-
-
 def test_source_contains_absolute_schema_path_batch49():
     src = inspect.getsource(schema_mod)
     assert "absolute_schema_path" in src
@@ -409,11 +399,6 @@ def test_source_contains_json_dot_load_batch49():
     assert "json.load(" in src
 
 
-def test_source_contains_future_annotations_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_source_contains_pathlib_import_batch49():
     src = inspect.getsource(schema_mod)
     assert "from pathlib import Path" in src
@@ -430,11 +415,6 @@ def test_source_contains_no_extra_imports_batch49():
     assert "import os" not in src
     assert "import sys" not in src
     assert "import subprocess" not in src
-
-
-def test_source_contains_schemas_dir_constant_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "SCHEMAS_DIR" in src
 
 
 def test_source_contains_resolve_batch49():
@@ -583,11 +563,6 @@ def test_ast_module_has_2_top_level_assigns_batch49():
     tree = ast.parse(inspect.getsource(schema_mod))
     assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
     assert len(assigns) == 2
-
-
-def test_ast_no_async_function_def_batch49():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
 
 
 def test_ast_no_class_other_than_eval_schema_error_batch49():

@@ -288,14 +288,6 @@ def test_validate_error_each_dict_has_3_keys_batch12():
             assert set(err.keys()) == {"path", "message", "schema_path"}
 
 
-def test_validate_error_path_is_list_batch12():
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e:
-        for err in e.errors:
-            assert isinstance(err["path"], list)
-
-
 def test_validate_error_schema_path_is_list_batch12():
     try:
         validate({}, "manifest.schema.json")
@@ -395,13 +387,6 @@ def test_validate_file_invalid_json_raises_jsondecodeerror_batch12(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("{not valid", encoding="utf-8")
     with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_invalid_data_raises_eval_schema_error_batch12(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text(json.dumps({}), encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
         validate_file(p, "manifest.schema.json")
 
 
@@ -555,12 +540,6 @@ def test_schema_source_no_re_module_batch12():
     assert "re." not in source
 
 
-def test_schema_source_no_eval_call_batch12():
-    source = inspect.getsource(smod)
-    assert "eval(" not in source
-    assert "exec(" not in source
-
-
 def test_schema_source_no_compile_batch12():
     source = inspect.getsource(smod)
     assert "compile(" not in source
@@ -633,16 +612,6 @@ def test_module_source_jsonschema_import_top_level_batch12():
     assert "from jsonschema" in source
 
 
-def test_module_source_has_SCHEMAS_DIR_assignment_batch12():
-    source = inspect.getsource(smod)
-    assert "SCHEMAS_DIR = " in source
-
-
-def test_module_source_has_class_EvalSchemaError_batch12():
-    source = inspect.getsource(smod)
-    assert "class EvalSchemaError(Exception):" in source
-
-
 def test_module_source_has_self_errors_assignment_batch12():
     source = inspect.getsource(smod)
     assert "self.errors = errors or []" in source
@@ -685,15 +654,6 @@ def test_module_source_has_dunder_all_5_items_batch12():
 # ---------- signatures 第十二批 ----------
 
 
-def test_eval_schema_error_init_no_varargs_batch12():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 def test_eval_schema_error_init_message_required_batch12():
     sig = inspect.signature(EvalSchemaError.__init__)
     p = sig.parameters["message"]
@@ -734,12 +694,6 @@ def test_schema_path_return_annotation_path_batch12():
     ret = sig.return_annotation
     ret_str = ret if isinstance(ret, str) else str(ret)
     assert "Path" in ret_str
-
-
-def test_load_schema_param_kind_positional_or_keyword_batch12():
-    sig = inspect.signature(load_schema)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_validate_param_kinds_batch12():
@@ -787,11 +741,6 @@ def test_module_name_evaluation_schema_batch12():
 def test_module_docstring_present_batch12():
     assert smod.__doc__ is not None
     assert len(smod.__doc__) > 30
-
-
-def test_module_docstring_mentions_schema_batch12():
-    assert smod.__doc__ is not None
-    assert "Schema" in smod.__doc__ or "schema" in smod.__doc__
 
 
 def test_module_docstring_mentions_no_reuse_batch12():

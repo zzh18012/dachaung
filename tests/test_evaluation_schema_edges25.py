@@ -333,11 +333,6 @@ def test_validate_source_uses_head_eq_errors_0():
     assert "head = errors[0]" in src
 
 
-def test_validate_source_raises_with_f_string():
-    src = inspect.getsource(validate)
-    assert "raise EvalSchemaError(" in src
-
-
 def test_validate_source_message_has_count():
     src = inspect.getsource(validate)
     assert "len(errors)" in src
@@ -419,11 +414,6 @@ def test_validate_file_source_docstring_present():
 def test_validate_file_source_docstring_mentions_json():
     src = inspect.getsource(validate_file)
     assert "JSON" in src or "json" in src
-
-
-def test_validate_file_source_uses_p_eq_path():
-    src = inspect.getsource(validate_file)
-    assert "p = Path(path)" in src
 
 
 def test_validate_file_source_uses_p_is_file():
@@ -813,13 +803,6 @@ def test_validate_file_raises_on_int_json(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_raises_on_string_json(tmp_path):
-    p = tmp_path / "str.json"
-    p.write_text('"hello"', encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_raises_on_null_json(tmp_path):
     p = tmp_path / "null.json"
     p.write_text("null", encoding="utf-8")
@@ -1041,14 +1024,6 @@ def test_module_source_no_user_class_beyond_eval_schema_error():
     class_lines = [line for line in lines if line.lstrip().startswith("class ")]
     assert len(class_lines) == 1
     assert "EvalSchemaError" in class_lines[0]
-
-
-def test_module_source_3_user_functions():
-    src = inspect.getsource(smod)
-    assert "def _schema_path(" in src
-    assert "def load_schema(" in src
-    assert "def validate(" in src
-    assert "def validate_file(" in src
 
 
 def test_module_source_all_5_entries():
@@ -1329,10 +1304,6 @@ def test_module_namespace_1_class():
 
 def test_module_name_is_evaluation_schema():
     assert smod.__name__ == "evaluation.schema"
-
-
-def test_module_file_ends_with_schema_py():
-    assert smod.__file__.endswith("schema.py")
 
 
 def test_module_eval_schema_error_module_eq_smod():

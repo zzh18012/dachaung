@@ -101,18 +101,6 @@ def test_schema_path_return_annotation_batch43():
 
 # ---------- _schema_path 行为 ----------
 
-def test_schema_path_returns_path_batch43():
-    p = _schema_path("manifest.schema.json")
-    assert isinstance(p, Path)
-    assert p.is_file()
-
-
-def test_schema_path_missing_raises_filenotfound_batch43():
-    with pytest.raises(FileNotFoundError) as exc_info:
-        _schema_path("nonexistent.schema.json")
-    assert "Schema 文件不存在" in str(exc_info.value)
-
-
 def test_schema_path_empty_name_raises_batch43():
     with pytest.raises(FileNotFoundError):
         _schema_path("")
@@ -165,11 +153,6 @@ def test_load_schema_evaluation_report_batch43():
 def test_load_schema_missing_raises_filenotfound_batch43():
     with pytest.raises(FileNotFoundError):
         load_schema("nonexistent.json")
-
-
-def test_load_schema_uses_utf8_batch43():
-    src = inspect.getsource(load_schema)
-    assert 'encoding="utf-8"' in src
 
 
 def test_load_schema_calls_schema_path_batch43():
@@ -325,11 +308,6 @@ def test_validate_file_schema_fail_batch43(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_uses_utf8_batch43():
-    src = inspect.getsource(validate_file)
-    assert 'encoding="utf-8"' in src
-
-
 def test_validate_file_calls_validate_batch43(tmp_path):
     p = tmp_path / "m.json"
     p.write_text(json.dumps({"foo": "bar"}), encoding="utf-8")
@@ -346,10 +324,6 @@ def test_eval_schema_error_inherits_exception_batch43():
 
 def test_eval_schema_error_not_value_error_batch43():
     assert not issubclass(EvalSchemaError, ValueError)
-
-
-def test_eval_schema_error_not_type_error_batch43():
-    assert not issubclass(EvalSchemaError, TypeError)
 
 
 def test_eval_schema_error_default_errors_batch43():

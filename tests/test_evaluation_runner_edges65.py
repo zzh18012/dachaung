@@ -640,11 +640,6 @@ def test_module_source_contains_json_load_call_batch37():
     assert "json.load(f)" in src
 
 
-def test_module_source_contains_unlink_call_batch37():
-    src = inspect.getsource(rmod)
-    assert "out_stub.unlink()" in src
-
-
 # ---------- signatures 第五十六批
 
 

@@ -428,13 +428,6 @@ def test_validate_file_invalid_schema_raises(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_unknown_schema_name_raises(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text("{}", encoding="utf-8")
-    with pytest.raises(FileNotFoundError):
-        validate_file(p, "unknown.schema.json")
-
-
 def test_validate_file_does_not_modify_file(tmp_path):
     p = tmp_path / "m.json"
     content = json.dumps({
@@ -765,14 +758,6 @@ def test_module_source_docstring_mentions_app_schema():
     assert "app/schema.py" in src[:600] or "app.schema" in src[:600]
 
 
-def test_module_source_4_user_definitions():
-    src = inspect.getsource(smod)
-    assert "def _schema_path(" in src
-    assert "def load_schema(" in src
-    assert "def validate(" in src
-    assert "def validate_file(" in src
-
-
 # ---------- signatures 第七批 ----------
 
 
@@ -844,18 +829,6 @@ def test_signature_validate_schema_name_kind():
     assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_signature_validate_no_varargs():
-    sig = inspect.signature(validate)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_validate_no_kwargs():
-    sig = inspect.signature(validate)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_signature_validate_return_annotation_none():
     sig = inspect.signature(validate)
     ra = str(sig.return_annotation)
@@ -873,18 +846,6 @@ def test_signature_validate_file_path_union():
     a = str(sig.parameters["path"].annotation)
     assert "Path" in a
     assert "str" in a
-
-
-def test_signature_validate_file_no_varargs():
-    sig = inspect.signature(validate_file)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_validate_file_no_kwargs():
-    sig = inspect.signature(validate_file)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 def test_signature_eval_schema_error_inherits_exception():
@@ -931,10 +892,6 @@ def test_module_all_exact_5_items_in_order():
 
 def test_module_all_is_list():
     assert isinstance(smod.__all__, list)
-
-
-def test_module_all_entries_unique():
-    assert len(set(smod.__all__)) == len(smod.__all__)
 
 
 def test_module_all_entries_are_str():
@@ -1141,11 +1098,6 @@ def test_e2e_load_each_schema_and_check_dict_with_keys():
 
 def test_e2e_eval_schema_error_with_no_errors_arg():
     err = EvalSchemaError("only message")
-    assert err.errors == []
-
-
-def test_e2e_eval_schema_error_with_empty_errors_list():
-    err = EvalSchemaError("msg", [])
     assert err.errors == []
 
 

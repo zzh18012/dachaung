@@ -536,11 +536,6 @@ def test_module_source_has_iter_errors_batch16():
     assert "iter_errors" in src
 
 
-def test_module_source_has_all_dunder_batch16():
-    src = inspect.getsource(smod)
-    assert "__all__ = [" in src
-
-
 def test_module_source_all_has_5_items_batch16():
     src = inspect.getsource(smod)
     for name in ['"SCHEMAS_DIR"', '"EvalSchemaError"', '"load_schema"',
@@ -668,13 +663,6 @@ def test_e2e_eval_schema_error_with_complex_errors_batch16():
     ]
     err = EvalSchemaError("complex", errors=complex_errs)
     assert err.errors == complex_errs
-
-
-def test_e2e_validate_three_schemas_distinct_content_batch16():
-    s1 = load_schema("manifest.schema.json")
-    s2 = load_schema("annotation.schema.json")
-    s3 = load_schema("evaluation-report.schema.json")
-    assert s1 != s2 != s3 != s1
 
 
 def test_e2e_schema_path_round_trip_batch16():

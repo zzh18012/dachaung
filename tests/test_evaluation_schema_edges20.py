@@ -245,14 +245,6 @@ def test_validate_count_in_message_matches_errors_length():
         assert "处" in msg or "errors" in msg.lower()
 
 
-def test_validate_errors_path_is_list_type():
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e:
-        for err in e.errors:
-            assert isinstance(err["path"], list)
-
-
 def test_validate_errors_message_is_str():
     try:
         validate({}, "manifest.schema.json")

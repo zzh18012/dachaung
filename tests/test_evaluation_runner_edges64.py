@@ -626,13 +626,6 @@ def test_module_source_contains_compute_metrics_import_batch36():
     assert "from evaluation.metrics import compute_automatic_metrics" in src
 
 
-def test_module_source_contains_report_imports_batch36():
-    src = inspect.getsource(rmod)
-    assert "aggregate_summary" in src
-    assert "build_devset_section" in src
-    assert "build_provenance" in src
-
-
 def test_module_source_contains_perf_counter_batch36():
     src = inspect.getsource(rmod)
     assert "time.perf_counter" in src

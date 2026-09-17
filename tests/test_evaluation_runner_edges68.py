@@ -59,13 +59,6 @@ def test_load_annotation_signature_batch43():
     assert list(sig.parameters.keys()) == ["path"]
 
 
-def test_load_annotation_return_annotation_dict_or_none_batch43():
-    sig = inspect.signature(_load_annotation)
-    ann = str(sig.return_annotation)
-    assert "dict" in ann
-    assert "None" in ann
-
-
 def test_load_annotation_none_returns_none_batch43():
     assert _load_annotation(None) is None
 

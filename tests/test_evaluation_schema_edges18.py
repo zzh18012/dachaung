@@ -301,13 +301,6 @@ def test_validate_file_path_object(tmp_path):
     assert validate_file(Path(p), "manifest.schema.json") is None
 
 
-def test_validate_file_invalid_content_raises_eval_error(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text(json.dumps({}), encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_with_valid_annotation(tmp_path):
     p = tmp_path / "anno.json"
     p.write_text(json.dumps({
@@ -396,11 +389,6 @@ def test_manifest_schema_with_expected_failures():
         ],
     }
     assert validate(inst, "manifest.schema.json") is None
-
-
-def test_annotation_schema_minimal():
-    inst = {"annotation_version": "1.0", "doc_id": "x"}
-    assert validate(inst, "annotation.schema.json") is None
 
 
 def test_annotation_schema_with_chunk_boundary_anchors():
@@ -625,24 +613,6 @@ def test_validate_no_varargs_varkw():
         )
 
 
-def test_load_schema_no_varargs_varkw():
-    sig = inspect.signature(load_schema)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
-def test_validate_file_no_varargs_varkw():
-    sig = inspect.signature(validate_file)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 def test_namespace_load_schema():
     assert load_schema.__module__ == "evaluation.schema"
 
@@ -678,35 +648,6 @@ def test_module_all_set_strict():
         "validate",
         "validate_file",
     ]
-
-
-def test_module_has_1_class():
-    classes = [
-        n for n in dir(m)
-        if isinstance(getattr(m, n), type)
-        and getattr(m, n).__module__ == "evaluation.schema"
-    ]
-    assert classes == ["EvalSchemaError"]
-
-
-def test_module_has_3_public_functions():
-    public_fns = [
-        n for n in dir(m)
-        if not n.startswith("_")
-        and isinstance(getattr(m, n), FunctionType)
-        and getattr(m, n).__module__ == "evaluation.schema"
-    ]
-    assert set(public_fns) == {"load_schema", "validate", "validate_file"}
-
-
-def test_module_has_1_private_helper():
-    private_fns = [
-        n for n in dir(m)
-        if n.startswith("_")
-        and not n.startswith("__")
-        and isinstance(getattr(m, n), FunctionType)
-    ]
-    assert private_fns == ["_schema_path"]
 
 
 def test_module_no_main_block():

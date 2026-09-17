@@ -502,11 +502,6 @@ def test_module_source_contains_report_import_batch30():
     assert "from evaluation.report import (" in src
 
 
-def test_module_source_contains_run_evaluation_func_batch30():
-    src = inspect.getsource(rmod)
-    assert "def run_evaluation" in src
-
-
 def test_module_source_contains_per_doc_subdir_batch30():
     src = inspect.getsource(rmod)
     assert '"_per_doc"' in src

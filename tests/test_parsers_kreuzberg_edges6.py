@@ -124,22 +124,10 @@ def test_classify_line_short_line_with_chinese_exclamation():
     assert etype == "paragraph"
 
 
-def test_classify_line_empty_string():
-    etype, meta = _classify_line("")
-    assert etype == "paragraph"
-    assert meta == {}
-
-
 def test_classify_line_whitespace_only():
     etype, meta = _classify_line("   ")
     assert etype == "paragraph"
     assert meta == {}
-
-
-def test_classify_line_returns_tuple():
-    result = _classify_line("hello")
-    assert isinstance(result, tuple)
-    assert len(result) == 2
 
 
 def test_classify_line_atx_priority_over_short_line():
@@ -161,12 +149,6 @@ def test_classify_line_atx_max_80_chars_short_line():
     text = "a" * 80
     etype, _ = _classify_line(text)
     assert etype == "heading"
-
-
-def test_classify_line_atx_81_chars_paragraph():
-    text = "a" * 81
-    etype, _ = _classify_line(text)
-    assert etype == "paragraph"
 
 
 def test_classify_line_chinese_short_is_heading():
@@ -203,11 +185,6 @@ def test_make_locator_pdf_ignores_paragraph_index_arg():
     """PDF locator 用 page=1，不用 paragraph_index。"""
     loc = _make_locator("pdf", 99)
     assert "paragraph_index" not in loc
-
-
-def test_make_locator_docx_ignores_page():
-    loc = _make_locator("docx", 0)
-    assert "page" not in loc
 
 
 def test_make_locator_returns_dict():
@@ -382,11 +359,6 @@ def test_kreuzberg_parser_init_keyword_only():
     """include_document_structure 是 keyword-only（* 之后）。"""
     sig = inspect.signature(KreuzbergParser.__init__)
     assert sig.parameters["include_document_structure"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
-def test_kreuzberg_parser_init_default_value():
-    sig = inspect.signature(KreuzbergParser.__init__)
-    assert sig.parameters["include_document_structure"].default is True
 
 
 def test_kreuzberg_parser_has_parse_method():

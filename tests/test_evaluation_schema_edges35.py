@@ -161,13 +161,6 @@ def test_load_schema_idempotent_content_batch15():
     assert s1 == s2
 
 
-def test_load_schema_distinct_schemas_batch15():
-    s1 = load_schema("manifest.schema.json")
-    s2 = load_schema("annotation.schema.json")
-    s3 = load_schema("evaluation-report.schema.json")
-    assert s1 != s2 != s3 != s1
-
-
 def test_load_schema_unknown_name_raises_filenotfound_batch15():
     with pytest.raises(FileNotFoundError):
         load_schema("nonexistent.schema.json")
@@ -367,11 +360,6 @@ def test_module_source_has_docstring_batch15():
     assert '"""加载并校验本阶段三个新 Schema' in src
 
 
-def test_module_source_has_app_schema_separation_note_batch15():
-    src = inspect.getsource(smod)
-    assert "app/schema.py" in src
-
-
 def test_module_source_has_jsonschema_draft_batch15():
     src = inspect.getsource(smod)
     assert "Draft202012Validator" in src
@@ -443,11 +431,6 @@ def test_module_source_has_errors_count_in_message_batch15():
     assert "len(errors)" in src
 
 
-def test_module_source_has_all_dunder_batch15():
-    src = inspect.getsource(smod)
-    assert "__all__ = [" in src
-
-
 def test_module_source_all_has_5_items_batch15():
     src = inspect.getsource(smod)
     for name in ['"SCHEMAS_DIR"', '"EvalSchemaError"', '"load_schema"',
@@ -504,12 +487,6 @@ def test_signature_eval_schema_error_init_batch15():
 
 def test_signature_load_schema_no_varargs_batch15():
     sig = inspect.signature(load_schema)
-    for p in sig.parameters.values():
-        assert p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)
-
-
-def test_signature_validate_no_varargs_batch15():
-    sig = inspect.signature(validate)
     for p in sig.parameters.values():
         assert p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)
 

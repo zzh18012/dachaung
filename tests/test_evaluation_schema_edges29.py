@@ -73,13 +73,6 @@ def test_eval_schema_error_can_be_raised_and_caught_batch9():
         raise EvalSchemaError("test")
 
 
-def test_eval_schema_error_caught_as_exception_batch9():
-    try:
-        raise EvalSchemaError("test")
-    except Exception as e:
-        assert isinstance(e, EvalSchemaError)
-
-
 def test_eval_schema_error_repr_batch9():
     e = EvalSchemaError("msg")
     assert "EvalSchemaError" in repr(e)
@@ -418,13 +411,6 @@ def test_validate_file_invalid_schema_raises_eval_error_batch9(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_unknown_schema_raises_file_not_found_batch9(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text("{}", encoding="utf-8")
-    with pytest.raises(FileNotFoundError):
-        validate_file(p, "unknown.schema.json")
-
-
 def test_validate_file_idempotent_batch9(tmp_path):
     data = {
         "manifest_version": "1.0",
@@ -603,11 +589,6 @@ def test_smod_source_no_async_def_batch9():
     assert "async def" not in source
 
 
-def test_smod_source_no_yield_batch9():
-    source = inspect.getsource(smod)
-    assert "yield" not in source
-
-
 def test_smod_source_no_walrus_batch9():
     source = inspect.getsource(smod)
     assert ":=" not in source
@@ -623,12 +604,6 @@ def test_smod_source_no_unlink_remove_batch9():
     source = inspect.getsource(smod)
     assert ".unlink(" not in source
     assert ".remove(" not in source
-
-
-def test_smod_source_no_logging_batch9():
-    source = inspect.getsource(smod)
-    assert "logging" not in source
-    assert "logger" not in source
 
 
 def test_smod_source_no_sleep_batch9():
@@ -663,11 +638,6 @@ def test_module_source_imports_path_batch9():
 def test_module_source_imports_typing_any_batch9():
     source = inspect.getsource(smod)
     assert "from typing import Any" in source
-
-
-def test_module_source_imports_draft_validator_batch9():
-    source = inspect.getsource(smod)
-    assert "from jsonschema import Draft202012Validator" in source
 
 
 def test_module_source_imports_js_validation_error_batch9():
@@ -730,11 +700,6 @@ def test_module_source_uses_iter_errors_batch9():
     assert "iter_errors(" in source
 
 
-def test_module_source_uses_sorted_batch9():
-    source = inspect.getsource(smod)
-    assert "sorted(" in source
-
-
 def test_module_source_no_main_block_batch9():
     source = inspect.getsource(smod)
     assert "if __name__" not in source
@@ -763,11 +728,6 @@ def test_signature_schema_path_param_count_batch9():
     assert len(sig.parameters) == 1
 
 
-def test_signature_schema_path_param_name_batch9():
-    sig = inspect.signature(_schema_path)
-    assert "name" in sig.parameters
-
-
 def test_signature_schema_path_param_annotation_batch9():
     sig = inspect.signature(_schema_path)
     p = list(sig.parameters.values())[0]
@@ -782,11 +742,6 @@ def test_signature_schema_path_return_annotation_batch9():
 def test_signature_load_schema_param_count_batch9():
     sig = inspect.signature(load_schema)
     assert len(sig.parameters) == 1
-
-
-def test_signature_load_schema_param_name_batch9():
-    sig = inspect.signature(load_schema)
-    assert "name" in sig.parameters
 
 
 def test_signature_load_schema_param_annotation_batch9():
@@ -886,16 +841,6 @@ def test_signature_eval_schema_error_init_errors_default_none_batch9():
     # 实际定义 def __init__(self, message, errors=None)
     e = EvalSchemaError("msg")
     assert e.errors == []
-
-
-def test_signature_4_funcs_are_function_type_batch9():
-    for func in (_schema_path, load_schema, validate, validate_file):
-        assert inspect.isfunction(func)
-
-
-def test_signature_4_funcs_module_eq_batch9():
-    for func in (_schema_path, load_schema, validate, validate_file):
-        assert func.__module__ == "evaluation.schema"
 
 
 def test_signature_no_var_positional_batch9():
@@ -1061,13 +1006,6 @@ def test_e2e_validate_file_idempotent_batch9(tmp_path):
     validate_file(p, "manifest.schema.json")
     validate_file(p, "manifest.schema.json")
     validate_file(p, "manifest.schema.json")
-
-
-def test_e2e_eval_schema_error_caught_as_exception_batch9():
-    try:
-        raise EvalSchemaError("test")
-    except Exception as e:
-        assert isinstance(e, EvalSchemaError)
 
 
 def test_e2e_eval_schema_error_str_representation_batch9():

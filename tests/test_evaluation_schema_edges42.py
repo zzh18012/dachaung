@@ -67,16 +67,6 @@ def test_schemas_dir_contains_manifest_schema_batch22():
     assert (SCHEMAS_DIR / "manifest.schema.json").is_file()
 
 
-def test_schemas_dir_contains_annotation_schema_batch22():
-    """SCHEMAS_DIR 含 annotation.schema.json。"""
-    assert (SCHEMAS_DIR / "annotation.schema.json").is_file()
-
-
-def test_schemas_dir_contains_evaluation_report_schema_batch22():
-    """SCHEMAS_DIR 含 evaluation-report.schema.json。"""
-    assert (SCHEMAS_DIR / "evaluation-report.schema.json").is_file()
-
-
 def test_schemas_dir_str_contains_schemas_batch22():
     """str(SCHEMAS_DIR) 含 'schemas'。"""
     assert "schemas" in str(SCHEMAS_DIR)

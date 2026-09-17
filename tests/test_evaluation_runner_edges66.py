@@ -566,11 +566,6 @@ def test_module_source_contains_json_dump_call_batch38():
     assert "json.dump(" in src
 
 
-def test_module_source_contains_json_load_call_batch38():
-    src = inspect.getsource(rmod)
-    assert "json.load(f)" in src
-
-
 def test_module_source_contains_encoding_utf8_batch38():
     src = inspect.getsource(rmod)
     assert 'encoding="utf-8"' in src

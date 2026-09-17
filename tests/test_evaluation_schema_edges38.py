@@ -543,11 +543,6 @@ def test_module_source_has_future_annotations_string_batch18():
     assert "from __future__ import annotations" in src
 
 
-def test_module_source_has_docstring_about_schema_batch18():
-    src = inspect.getsource(smod)
-    assert "Schema" in src or "schema" in src
-
-
 def test_module_source_has_eval_schema_error_docstring_batch18():
     src = inspect.getsource(smod)
     assert "Schema 校验失败时抛出" in src
@@ -693,12 +688,6 @@ def test_module_does_not_import_evaluation_annotation_metrics_batch18():
     src = inspect.getsource(smod)
     assert "from evaluation.annotation_metrics" not in src
     assert "from evaluation import annotation_metrics" not in src
-
-
-def test_module_no_main_block_batch18():
-    src = inspect.getsource(smod)
-    assert 'if __name__ ==' not in src
-    assert "__main__" not in src
 
 
 # ---------- 端到端集成 第二十九批 ----------

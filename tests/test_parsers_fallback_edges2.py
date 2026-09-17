@@ -813,11 +813,6 @@ def test_fallback_parser_inherits_parser():
     assert issubclass(FallbackParser, Parser)
 
 
-def test_fallback_parser_init_default_no_image_dir():
-    p = FallbackParser()
-    assert p._image_output_dir is None
-
-
 def test_fallback_parser_init_none_arg():
     p = FallbackParser(None)
     assert p._image_output_dir is None

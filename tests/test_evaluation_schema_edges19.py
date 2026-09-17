@@ -283,11 +283,6 @@ def test_validate_source_raise_eval_schema_error_with_two_args():
     assert "errors=flat," in src
 
 
-def test_validate_returns_none_on_success():
-    inst = {"annotation_version": "1.0", "doc_id": "x"}
-    assert validate(inst, "annotation.schema.json") is None
-
-
 def test_validate_does_not_modify_instance():
     inst = {"annotation_version": "1.0", "doc_id": "x"}
     inst_copy = json.loads(json.dumps(inst))
@@ -309,13 +304,6 @@ def test_validate_errors_path_is_list_type():
     for e in ei.value.errors:
         assert isinstance(e["path"], list)
         assert isinstance(e["schema_path"], list)
-
-
-def test_validate_errors_message_is_str():
-    with pytest.raises(EvalSchemaError) as ei:
-        validate({}, "manifest.schema.json")
-    for e in ei.value.errors:
-        assert isinstance(e["message"], str)
 
 
 def test_validate_first_error_in_message():
@@ -352,11 +340,6 @@ def test_validate_file_source_signature():
     assert sig.parameters["path"].annotation == "Path | str"
     assert sig.parameters["schema_name"].annotation == "str"
     assert sig.return_annotation == "None"
-
-
-def test_validate_file_source_path_conversion():
-    src = inspect.getsource(validate_file)
-    assert "p = Path(path)" in src
 
 
 def test_validate_file_source_check_is_file():
@@ -676,35 +659,6 @@ def test_module_all_5_entries_strict():
 def test_module_has_no_main_block():
     src = inspect.getsource(m)
     assert 'if __name__ == "__main__":' not in src
-
-
-def test_module_has_1_class_only():
-    classes = [
-        n for n in dir(m)
-        if isinstance(getattr(m, n), type)
-        and getattr(m, n).__module__ == "evaluation.schema"
-    ]
-    assert classes == ["EvalSchemaError"]
-
-
-def test_module_has_3_public_functions_only():
-    public_fns = [
-        n for n in dir(m)
-        if not n.startswith("_")
-        and isinstance(getattr(m, n), FunctionType)
-        and getattr(m, n).__module__ == "evaluation.schema"
-    ]
-    assert set(public_fns) == {"load_schema", "validate", "validate_file"}
-
-
-def test_module_has_1_private_helper_only():
-    private_fns = [
-        n for n in dir(m)
-        if n.startswith("_")
-        and not n.startswith("__")
-        and isinstance(getattr(m, n), FunctionType)
-    ]
-    assert private_fns == ["_schema_path"]
 
 
 def test_module_schemas_dir_is_path_instance():

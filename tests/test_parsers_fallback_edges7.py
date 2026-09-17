@@ -121,10 +121,6 @@ def test_is_caption_returns_true_for_caption():
     assert _is_caption("Table 1. Description") is True
 
 
-def test_is_caption_returns_false_for_non_caption():
-    assert _is_caption("hello world") is False
-
-
 def test_is_caption_none_returns_false():
     assert _is_caption(None) is False
 
@@ -507,18 +503,9 @@ def test_fallback_parser_name_value():
     assert FallbackParser.name == "fallback"
 
 
-def test_fallback_parser_inherits_parser():
-    assert issubclass(FallbackParser, Parser)
-
-
 def test_fallback_parser_init_no_args():
     parser = FallbackParser()
     assert parser is not None
-
-
-def test_fallback_parser_init_with_image_output_dir(tmp_path: Path):
-    parser = FallbackParser(image_output_dir=tmp_path)
-    assert parser._image_output_dir == tmp_path
 
 
 def test_fallback_parser_init_image_output_dir_str(tmp_path: Path):

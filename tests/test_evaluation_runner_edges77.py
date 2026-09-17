@@ -453,11 +453,6 @@ def test_source_contains_json_dump_with_kwargs_batch52():
     assert "indent=2" in src
 
 
-def test_source_contains_unknown_message_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "process_single returned None without errors" in src
-
-
 def test_source_contains_out_stub_unlink_batch52():
     src = inspect.getsource(runner_mod)
     assert "out_stub.unlink()" in src
@@ -514,14 +509,6 @@ def test_ast_process_one_has_if_document_is_none_batch52():
     assert "if document is not None:" in src
 
 
-def test_ast_run_evaluation_has_3_for_in_body_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation")
-    fors = [n for n in func.body if isinstance(n, ast.For)]
-    # for doc + for ef + for r
-    assert len(fors) == 3
-
-
 def test_ast_run_evaluation_for_iter_targets_batch52():
     tree = ast.parse(inspect.getsource(runner_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation")
@@ -567,28 +554,10 @@ def test_ast_module_docstring_batch52():
     assert isinstance(tree.body[0].value, ast.Constant)
 
 
-def test_ast_no_async_function_def_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
-
-
-def test_ast_no_global_nonlocal_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
-
-
 def test_ast_no_with_at_module_level_batch52():
     tree = ast.parse(inspect.getsource(runner_mod))
     for n in tree.body:
         assert not isinstance(n, ast.With)
-
-
-def test_ast_no_star_import_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        if isinstance(n, ast.ImportFrom):
-            for alias in n.names:
-                assert alias.name != "*"
 
 
 # ---------- forbidden tokens 第一百四十七批 ----------

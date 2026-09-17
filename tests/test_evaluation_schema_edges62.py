@@ -40,11 +40,6 @@ from evaluation.schema import (
 
 # ---------- EvalSchemaError 子类化与构造 ----------
 
-def test_eval_schema_error_is_exception_batch48():
-    e = EvalSchemaError("msg")
-    assert isinstance(e, Exception)
-
-
 def test_eval_schema_error_errors_default_empty_batch48():
     e = EvalSchemaError("msg")
     assert e.errors == []

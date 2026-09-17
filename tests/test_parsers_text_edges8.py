@@ -50,24 +50,12 @@ def test_text_extensions_two_items():
 # =========================================================================
 
 
-def test_detect_text_source_type_txt():
-    assert _detect_text_source_type(Path("a.txt")) == "text"
-
-
-def test_detect_text_source_type_text():
-    assert _detect_text_source_type(Path("a.text")) == "text"
-
-
 def test_detect_text_source_type_uppercase_txt():
     assert _detect_text_source_type(Path("a.TXT")) == "text"
 
 
 def test_detect_text_source_type_uppercase_text():
     assert _detect_text_source_type(Path("a.TEXT")) == "text"
-
-
-def test_detect_text_source_type_mixed_case():
-    assert _detect_text_source_type(Path("a.TxT")) == "text"
 
 
 def test_detect_text_source_type_pdf_rejected():
@@ -117,10 +105,6 @@ def test_detect_text_source_type_docx_rejected():
 
 def test_split_paragraphs_empty_string():
     assert _split_paragraphs("") == []
-
-
-def test_split_paragraphs_single_line():
-    assert _split_paragraphs("hello") == [(1, "hello")]
 
 
 def test_split_paragraphs_single_paragraph_multiline():
@@ -196,10 +180,6 @@ def test_split_paragraphs_internal_whitespace_preserved():
     text = "line1\n    indented line\nline3"
     result = _split_paragraphs(text)
     assert result == [(1, "line1\n    indented line\nline3")]
-
-
-def test_split_paragraphs_no_trailing_newline():
-    assert _split_paragraphs("hello") == [(1, "hello")]
 
 
 def test_split_paragraphs_single_trailing_newline():

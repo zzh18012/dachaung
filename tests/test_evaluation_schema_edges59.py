@@ -139,16 +139,6 @@ def test_validate_invalid_type_string_raises_batch44():
         validate("not a dict", "manifest.schema.json")  # type: ignore[arg-type]
 
 
-def test_validate_invalid_type_int_raises_batch44():
-    with pytest.raises(EvalSchemaError):
-        validate(42, "manifest.schema.json")  # type: ignore[arg-type]
-
-
-def test_validate_invalid_type_none_raises_batch44():
-    with pytest.raises(EvalSchemaError):
-        validate(None, "manifest.schema.json")  # type: ignore[arg-type]
-
-
 def test_validate_devset_status_complete_batch44():
     valid = {
         "manifest_version": "1.0",
@@ -483,18 +473,6 @@ def test_ast_validate_function_raises_eval_schema_error_batch44():
         if isinstance(n, ast.Raise):
             has_raise = True
     assert has_raise
-
-
-def test_ast_no_for_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.For)
-
-
-def test_ast_no_while_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.While)
 
 
 def test_ast_no_async_in_module_body_batch44():

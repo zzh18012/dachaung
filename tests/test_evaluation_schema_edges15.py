@@ -225,11 +225,6 @@ def test_eval_schema_error_source_has_self_errors():
     assert "self.errors = errors or []" in src
 
 
-def test_eval_schema_error_source_has_class_def():
-    src = inspect.getsource(EvalSchemaError)
-    assert "class EvalSchemaError(Exception):" in src
-
-
 # =========================================================================
 # _schema_path 行为深度补强
 # =========================================================================

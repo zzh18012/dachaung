@@ -330,10 +330,6 @@ def test_validate_file_empty_file_raises(tmp_path):
 # =========================================================================
 
 
-def test_module_all_is_list():
-    assert isinstance(schema_all, list)
-
-
 def test_module_all_count_six():
     assert len(schema_all) == 6
 

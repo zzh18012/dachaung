@@ -176,10 +176,6 @@ def test_eval_schema_error_caught_as_filenotfound_does_not_catch():
         pass
 
 
-def test_eval_schema_error_docstring_present():
-    assert EvalSchemaError.__doc__ is not None
-
-
 def test_eval_schema_error_two_instances_independent():
     """两个 instance 的 errors list 互不影响。"""
     a = EvalSchemaError("a")
@@ -196,12 +192,6 @@ def test_eval_schema_error_two_instances_independent():
 def test_schema_path_returns_path_object():
     p = _schema_path("manifest.schema.json")
     assert isinstance(p, Path)
-
-
-def test_schema_path_nonexistent_raises_filenotfound():
-    with pytest.raises(FileNotFoundError) as exc:
-        _schema_path("nonexistent.schema.json")
-    assert "Schema 文件不存在" in str(exc.value)
 
 
 def test_schema_path_directory_raises_filenotfound():
@@ -349,20 +339,6 @@ def test_validate_errors_path_is_list():
         validate({}, "manifest.schema.json")
     for err in exc.value.errors:
         assert isinstance(err["path"], list)
-
-
-def test_validate_errors_schema_path_is_list():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    for err in exc.value.errors:
-        assert isinstance(err["schema_path"], list)
-
-
-def test_validate_errors_message_is_str():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    for err in exc.value.errors:
-        assert isinstance(err["message"], str)
 
 
 def test_validate_does_not_modify_instance():

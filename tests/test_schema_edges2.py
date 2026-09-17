@@ -1415,10 +1415,6 @@ def test_silence_unused_import_not_in_all():
 # =============================================================================
 
 
-def test_all_exports_is_list():
-    assert isinstance(schema_all, list)
-
-
 def test_all_exports_count_six():
     assert len(schema_all) == 6
 

@@ -40,10 +40,6 @@ def test_html_extensions_count_two():
     assert len(_HTML_EXTENSIONS) == 2
 
 
-def test_html_extensions_values():
-    assert set(_HTML_EXTENSIONS) == {".html", ".htm"}
-
-
 def test_heading_levels_count_six():
     assert len(_HEADING_LEVELS) == 6
 

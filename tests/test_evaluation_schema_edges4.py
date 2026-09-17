@@ -147,12 +147,6 @@ def test_eval_schema_error_init_errors_default_none():
 # =========================================================================
 
 
-def test_schema_path_returns_path_for_known_schema():
-    p = _schema_path("manifest.schema.json")
-    assert isinstance(p, Path)
-    assert p.is_file()
-
-
 def test_schema_path_raises_for_unknown_schema():
     with pytest.raises(FileNotFoundError) as exc:
         _schema_path("nonexistent.schema.json")

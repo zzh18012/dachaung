@@ -434,11 +434,6 @@ def test_module_source_contains_json_dump_batch32():
     assert "json.dump" in src
 
 
-def test_module_source_contains_unlink_call_batch32():
-    src = inspect.getsource(rmod)
-    assert "out_stub.unlink()" in src
-
-
 def test_module_source_contains_write_json_false_batch32():
     src = inspect.getsource(rmod)
     assert "write_json=False" in src

@@ -186,13 +186,6 @@ def test_two_errors_count_in_message_batch54():
 
 # ---------- 无缓存 ----------
 
-def test_load_schema_no_cache_batch54():
-    a = load_schema("manifest.schema.json")
-    b = load_schema("manifest.schema.json")
-    assert a == b
-    assert a is not b
-
-
 # ---------- 源码补强 ----------
 
 def _src():

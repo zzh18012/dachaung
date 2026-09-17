@@ -738,11 +738,6 @@ def test_signature_load_schema_one_param():
     assert len(sig.parameters) == 1
 
 
-def test_signature_load_schema_param_name():
-    sig = inspect.signature(load_schema)
-    assert "name" in sig.parameters
-
-
 def test_signature_load_schema_return_annotation():
     sig = inspect.signature(load_schema)
     ra = sig.return_annotation
@@ -800,12 +795,6 @@ def test_signature_eval_schema_error_init():
     assert len(params) == 3
     assert params[1].name == "message"
     assert params[2].name == "errors"
-
-
-def test_signature_eval_schema_error_init_errors_default_none():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    p = sig.parameters["errors"]
-    assert p.default is None
 
 
 def test_signature_funcs_function_type():

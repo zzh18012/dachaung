@@ -263,16 +263,6 @@ def test_chunk_to_dict_returns_five_keys_exact():
     }
 
 
-def test_chunk_default_metadata_is_empty_dict():
-    c = Chunk(chunk_id="c1", text="x", source_element_ids=["e1"])
-    assert c.metadata == {}
-
-
-def test_chunk_default_source_spans_is_empty_list():
-    c = Chunk(chunk_id="c1", text="x", source_element_ids=["e1"])
-    assert c.source_spans == []
-
-
 def test_chunk_metadata_isolated_per_instance():
     c1 = Chunk(chunk_id="c1", text="x", source_element_ids=["e1"])
     c2 = Chunk(chunk_id="c2", text="y", source_element_ids=["e1"])

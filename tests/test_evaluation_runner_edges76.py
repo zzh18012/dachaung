@@ -509,11 +509,6 @@ def test_source_contains_ensure_ascii_false_batch51():
     assert "ensure_ascii=False" in src
 
 
-def test_source_contains_indent_2_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "indent=2" in src
-
-
 def test_source_contains_tolerance_chars_batch51():
     src = inspect.getsource(runner_mod)
     assert "tolerance_chars" in src

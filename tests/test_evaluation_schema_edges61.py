@@ -115,11 +115,6 @@ def test_eval_schema_error_errors_default_empty_batch47():
     assert err.errors == []
 
 
-def test_eval_schema_error_errors_none_batch47():
-    err = EvalSchemaError("msg", None)
-    assert err.errors == []
-
-
 def test_eval_schema_error_errors_explicit_batch47():
     errs = [{"path": ["a"], "message": "bad"}]
     err = EvalSchemaError("msg", errs)
@@ -296,16 +291,6 @@ def test_validate_file_bad_json_batch47(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_valid_manifest_batch47(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")  # 不抛
-
-
 def test_validate_file_path_string_batch47(tmp_path):
     """接受 str 或 Path。"""
     p = tmp_path / "m.json"
@@ -395,11 +380,6 @@ def test_evaluation_report_schema_has_properties_batch47():
     assert "properties" in s
 
 
-def test_evaluation_report_schema_has_report_version_batch47():
-    s = load_schema("evaluation-report.schema.json")
-    assert "report_version" in s.get("properties", {})
-
-
 def test_evaluation_report_schema_has_per_doc_batch47():
     s = load_schema("evaluation-report.schema.json")
     assert "per_doc" in s.get("properties", {})
@@ -422,16 +402,6 @@ def test_source_contains_Draft202012Validator_batch47():
     assert "Draft202012Validator" in src
 
 
-def test_source_contains_iter_errors_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "iter_errors" in src
-
-
-def test_source_contains_absolute_path_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "absolute_path" in src
-
-
 def test_source_contains_sorted_with_lambda_batch47():
     src = inspect.getsource(schema_mod)
     assert "sorted" in src
@@ -441,11 +411,6 @@ def test_source_contains_sorted_with_lambda_batch47():
 def test_source_contains_utf8_encoding_batch47():
     src = inspect.getsource(schema_mod)
     assert "encoding=" in src
-
-
-def test_source_contains_Schemas_dir_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "SCHEMAS_DIR" in src
 
 
 def test_source_contains_不与_app_schema_复用_batch47():
@@ -609,11 +574,6 @@ def test_source_no_pickle_load_batch47():
 def test_source_no_subprocess_batch47():
     src = inspect.getsource(schema_mod)
     assert "subprocess" not in src
-
-
-def test_source_no_yield_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "yield" not in src
 
 
 def test_source_no_walrus_batch47():

@@ -241,11 +241,6 @@ def test_error_count_matches_flat_length_batch52():
 
 # ---------- 源码补强 ----------
 
-def test_source_schemas_dir_one_line_batch52():
-    src = inspect.getsource(schema_mod)
-    assert 'SCHEMAS_DIR = Path(__file__).resolve().parent.parent / "schemas"' in src
-
-
 def test_source_iter_errors_sorted_batch52():
     src = inspect.getsource(schema_mod)
     assert "sorted(validator.iter_errors(instance), key=lambda e: list(e.absolute_path))" in src

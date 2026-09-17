@@ -681,12 +681,6 @@ def test_classify_line_second_element_is_dict():
     assert isinstance(meta, dict)
 
 
-def test_classify_line_empty_string_returns_paragraph():
-    etype, meta = _classify_line("")
-    assert etype == "paragraph"
-    assert meta == {}
-
-
 def test_classify_line_text_with_carriage_return_only_treated_as_empty():
     """'\r' strip 后为空 → paragraph。"""
     etype, _ = _classify_line("\r")

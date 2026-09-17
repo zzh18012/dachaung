@@ -218,11 +218,6 @@ def test_process_one_out_stub_unlinked_after_processing(tmp_path: Path):
     assert not stub.is_file()
 
 
-def test_process_one_signature():
-    sig = inspect.signature(_process_one)
-    assert set(sig.parameters) == {"doc", "output_root", "parser_name", "max_chars"}
-
-
 def test_process_one_parser_name_no_default():
     """_process_one 内部辅助函数：parser_name 必填（默认值在 run_evaluation）。"""
     sig = inspect.signature(_process_one)

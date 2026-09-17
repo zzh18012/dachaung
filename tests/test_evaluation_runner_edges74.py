@@ -562,11 +562,6 @@ def test_source_contains_pipeline_import_batch48():
     assert "from app.pipeline import" in src
 
 
-def test_source_contains_process_single_import_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "process_single" in src
-
-
 def test_source_contains_image_output_dir_for_import_batch48():
     src = inspect.getsource(runner_mod)
     assert "image_output_dir_for" in src
@@ -585,11 +580,6 @@ def test_source_contains_chunk_boundary_prf_import_batch48():
 def test_source_contains_figure_caption_prf_import_batch48():
     src = inspect.getsource(runner_mod)
     assert "figure_caption_prf" in src
-
-
-def test_source_contains_compute_automatic_metrics_import_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "compute_automatic_metrics" in src
 
 
 def test_source_contains_aggregate_summary_import_batch48():

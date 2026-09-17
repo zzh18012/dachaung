@@ -38,16 +38,6 @@ def test_eval_schema_error_default_errors_is_empty_list():
     assert isinstance(err.errors, list)
 
 
-def test_eval_schema_error_explicit_none_errors_is_empty_list():
-    err = EvalSchemaError("msg", None)
-    assert err.errors == []
-
-
-def test_eval_schema_error_explicit_empty_errors_is_empty_list():
-    err = EvalSchemaError("msg", [])
-    assert err.errors == []
-
-
 def test_eval_schema_error_two_instances_default_errors_not_shared():
     """默认 errors=[] 不应共享引用（每次都新建）。"""
     e1 = EvalSchemaError("a")
@@ -88,10 +78,6 @@ def test_eval_schema_error_equal_message_different_errors_not_equal():
 
 def test_eval_schema_error_is_exception_subclass():
     assert issubclass(EvalSchemaError, Exception)
-
-
-def test_eval_schema_error_is_base_exception_subclass():
-    assert issubclass(EvalSchemaError, BaseException)
 
 
 def test_eval_schema_error_can_be_raised_and_caught():
@@ -545,10 +531,6 @@ def test_module_docstring_mentions_evaluation_report():
     assert "evaluation" in smod.__doc__ or "评测" in smod.__doc__
 
 
-def test_module_file_ends_with_schema_py():
-    assert smod.__file__.endswith("schema.py")
-
-
 def test_module_name_is_evaluation_schema():
     assert smod.__name__ == "evaluation.schema"
 
@@ -598,12 +580,6 @@ def test_signature_eval_schema_error_errors_annotation():
     annot = params["errors"].annotation
     # 联合类型注解
     assert annot is not inspect.Parameter.empty
-
-
-def test_signature_eval_schema_error_return_annotation_none():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    # 因为 from __future__，注解是 str "None"
-    assert sig.return_annotation is None or sig.return_annotation == "None"
 
 
 def test_signature_load_schema_returns_dict():

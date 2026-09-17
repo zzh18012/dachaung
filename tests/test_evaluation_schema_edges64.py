@@ -108,15 +108,6 @@ def test_load_schema_returns_dict_with_type_key_batch50():
     assert "type" in s or "properties" in s or "$schema" in s
 
 
-def test_load_schema_manifest_has_required_batch50():
-    s = load_schema("manifest.schema.json")
-    assert "required" in s
-    required = s["required"]
-    assert "manifest_version" in required
-    assert "devset_status" in required
-    assert "documents" in required
-
-
 def test_load_schema_annotation_has_required_batch50():
     s = load_schema("annotation.schema.json")
     assert "required" in s
@@ -448,13 +439,6 @@ def test_ast_validate_file_has_if_not_is_file_batch50():
     assert "if not p.is_file()" in src
 
 
-def test_ast_schema_path_has_if_not_is_file_batch50():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_schema_path")
-    src = ast.unparse(func)
-    assert "if not p.is_file()" in src
-
-
 def test_ast_schema_path_raises_filenotfounderror_batch50():
     tree = ast.parse(inspect.getsource(schema_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_schema_path")
@@ -481,11 +465,6 @@ def test_ast_no_class_def_other_than_eval_schema_error_batch50():
     classes = [n for n in tree.body if isinstance(n, ast.ClassDef)]
     assert len(classes) == 1
     assert classes[0].name == "EvalSchemaError"
-
-
-def test_ast_no_async_function_def_batch50():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
 
 
 def test_ast_no_global_statement_batch50():

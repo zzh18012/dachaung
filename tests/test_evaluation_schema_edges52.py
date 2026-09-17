@@ -95,11 +95,6 @@ def test_schema_path_string_argument_batch32():
     assert p.parent == SCHEMAS_DIR
 
 
-def test_schema_path_returns_absolute_batch32():
-    p = _schema_path("annotation.schema.json")
-    assert p.is_absolute()
-
-
 def test_schema_path_file_not_found_error_message_batch32():
     with pytest.raises(FileNotFoundError) as exc:
         _schema_path("doesnotexist.schema.json")
@@ -117,11 +112,6 @@ def test_load_schema_manifest_has_properties_batch32():
 
 def test_load_schema_manifest_has_required_batch32():
     s = load_schema("manifest.schema.json")
-    assert "required" in s
-
-
-def test_load_schema_annotation_has_required_batch32():
-    s = load_schema("annotation.schema.json")
     assert "required" in s
 
 
@@ -171,13 +161,6 @@ def test_validate_message_contains_path_batch32():
         validate({}, "manifest.schema.json")
     msg = str(exc.value)
     assert "path=" in msg
-
-
-def test_validate_message_contains_count_batch32():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    msg = str(exc.value)
-    assert "处" in msg  # "(N 处)"
 
 
 def test_validate_head_error_message_batch32():
@@ -304,11 +287,6 @@ def test_module_source_no_forbidden_tokens_batch32(token):
 # ---------- module source 字符串精确补强第四十九批
 
 
-def test_module_source_contains_docstring_batch32():
-    src = inspect.getsource(smod)
-    assert "Schema" in src
-
-
 def test_module_source_contains_future_annotations_batch32():
     src = inspect.getsource(smod)
     assert "from __future__ import annotations" in src
@@ -433,11 +411,6 @@ def test_module_imports_jsonschema_batch32():
 def test_module_imports_typing_any_batch32():
     src = inspect.getsource(smod)
     assert "from typing import Any" in src
-
-
-def test_module_has_schemas_dir_const_batch32():
-    assert hasattr(smod, "SCHEMAS_DIR")
-    assert isinstance(smod.SCHEMAS_DIR, Path)
 
 
 def test_module_has_all_with_five_entries_batch32():

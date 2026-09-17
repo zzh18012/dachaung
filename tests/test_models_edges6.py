@@ -216,10 +216,6 @@ def test_chunk_is_dataclass():
     assert is_dataclass(Chunk)
 
 
-def test_chunk_field_count_5():
-    assert len(fields(Chunk)) == 5
-
-
 def test_chunk_field_names_exact():
     fs = fields(Chunk)
     names = {f.name for f in fs}
@@ -277,10 +273,6 @@ def test_relation_is_dataclass():
     assert is_dataclass(Relation)
 
 
-def test_relation_field_count_4():
-    assert len(fields(Relation)) == 4
-
-
 def test_relation_field_names_exact():
     fs = fields(Relation)
     names = {f.name for f in fs}
@@ -317,10 +309,6 @@ def test_relation_to_dict_has_all_fields():
 
 def test_warning_record_is_dataclass():
     assert is_dataclass(WarningRecord)
-
-
-def test_warning_record_field_count_3():
-    assert len(fields(WarningRecord)) == 3
 
 
 def test_warning_record_field_names_exact():
@@ -369,10 +357,6 @@ def test_error_record_is_dataclass():
     assert is_dataclass(ErrorRecord)
 
 
-def test_error_record_field_count_3():
-    assert len(fields(ErrorRecord)) == 3
-
-
 def test_error_record_field_names_exact():
     fs = fields(ErrorRecord)
     names = {f.name for f in fs}
@@ -411,10 +395,6 @@ def test_error_record_to_dict_with_details():
 
 def test_document_is_dataclass():
     assert is_dataclass(Document)
-
-
-def test_document_field_count_12():
-    assert len(fields(Document)) == 12
 
 
 def test_document_field_names_exact():
@@ -506,12 +486,6 @@ def test_module_no_explicit_all():
     """models.py 没有 __all__（全部公共导出）。"""
     import app.models as mod
     assert not hasattr(mod, "__all__")
-
-
-def test_module_uses_future_annotations():
-    import app.models as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
 
 
 def test_module_imports_dataclass():

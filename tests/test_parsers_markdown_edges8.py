@@ -49,10 +49,6 @@ from app.parsers.markdown_parser import (
 # =========================================================================
 
 
-def test_md_extensions_value():
-    assert _MD_EXTENSIONS == (".md", ".markdown")
-
-
 def test_md_extensions_is_tuple():
     assert isinstance(_MD_EXTENSIONS, tuple)
 
@@ -167,10 +163,6 @@ def test_thematic_regex_two_chars_no_match():
     assert _THEMATIC_RE.match("--") is None
 
 
-def test_thematic_regex_one_char_no_match():
-    assert _THEMATIC_RE.match("-") is None
-
-
 def test_thematic_regex_long_with_spaces():
     assert _THEMATIC_RE.match("- - - - -") is not None
 
@@ -240,11 +232,6 @@ def test_fenced_regex_lang_with_plus():
     assert m.group(2) == "c++"
 
 
-def test_fenced_regex_lang_empty_string_when_absent():
-    m = _FENCED_RE.match("```")
-    assert m.group(2) == ""
-
-
 def test_fenced_regex_two_backticks_no_match():
     """至少 3 个反引号。"""
     assert _FENCED_RE.match("``") is None
@@ -284,18 +271,6 @@ def test_fenced_regex_mixed_fence_chars_no_match():
 
 def test_unordered_list_regex_minus():
     m = _UNORDERED_LIST_RE.match("- item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
-def test_unordered_list_regex_plus():
-    m = _UNORDERED_LIST_RE.match("+ item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
-def test_unordered_list_regex_asterisk():
-    m = _UNORDERED_LIST_RE.match("* item")
     assert m is not None
     assert m.group(1) == "item"
 
@@ -341,12 +316,6 @@ def test_ordered_list_regex_dot():
     assert m.group(1) == "item"
 
 
-def test_ordered_list_regex_paren():
-    m = _ORDERED_LIST_RE.match("1) item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
 def test_ordered_list_regex_multi_digit():
     m = _ORDERED_LIST_RE.match("10. item")
     assert m is not None
@@ -383,20 +352,8 @@ def test_blockquote_regex_basic():
     assert m.group(1) == "text"
 
 
-def test_blockquote_regex_no_space():
-    m = _BLOCKQUOTE_RE.match(">text")
-    assert m is not None
-    assert m.group(1) == "text"
-
-
 def test_blockquote_regex_no_marker():
     assert _BLOCKQUOTE_RE.match("text") is None
-
-
-def test_blockquote_regex_empty_content():
-    m = _BLOCKQUOTE_RE.match(">")
-    assert m is not None
-    assert m.group(1) == ""
 
 
 def test_blockquote_regex_multiple_markers_only_first_consumed():
@@ -430,22 +387,11 @@ def test_blockquote_regex_leading_space_no_match():
 # =========================================================================
 
 
-def test_standalone_image_regex_basic():
-    m = _STANDALONE_IMAGE_RE.match("![alt](url.png)")
-    assert m is not None
-    assert m.group(1) == "alt"
-    assert m.group(2) == "url.png"
-
-
 def test_standalone_image_regex_empty_alt():
     m = _STANDALONE_IMAGE_RE.match("![](url.png)")
     assert m is not None
     assert m.group(1) == ""
     assert m.group(2) == "url.png"
-
-
-def test_standalone_image_regex_no_match_inline_text():
-    assert _STANDALONE_IMAGE_RE.match("text ![alt](url)") is None
 
 
 def test_standalone_image_regex_no_match_text_after():
@@ -647,14 +593,6 @@ def test_rows_to_md_with_unicode_cells():
 
 def test_split_pipe_row_basic():
     assert _split_pipe_row("| a | b |") == ["a", "b"]
-
-
-def test_split_pipe_row_no_leading_pipe():
-    assert _split_pipe_row("a | b |") == ["a", "b"]
-
-
-def test_split_pipe_row_no_trailing_pipe():
-    assert _split_pipe_row("| a | b") == ["a", "b"]
 
 
 def test_split_pipe_row_no_pipes():

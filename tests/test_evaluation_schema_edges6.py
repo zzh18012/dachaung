@@ -528,11 +528,6 @@ def test_module_all_exact():
     }
 
 
-def test_module_all_is_list():
-    import evaluation.schema as m
-    assert isinstance(m.__all__, list)
-
-
 def test_module_all_length_five():
     import evaluation.schema as m
     assert len(m.__all__) == 5

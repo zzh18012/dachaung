@@ -408,13 +408,6 @@ def test_module_source_contains_metrics_import_batch34():
     assert "from evaluation.metrics import compute_automatic_metrics" in src
 
 
-def test_module_source_contains_report_import_batch34():
-    src = inspect.getsource(rmod)
-    assert "aggregate_summary" in src
-    assert "build_devset_section" in src
-    assert "build_provenance" in src
-
-
 def test_module_source_contains_load_annotation_func_batch34():
     src = inspect.getsource(rmod)
     assert "def _load_annotation(" in src

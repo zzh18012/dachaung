@@ -62,11 +62,6 @@ def test_eval_schema_error_repr_contains_class_name_batch51():
     assert "msg" in r
 
 
-def test_eval_schema_error_is_exception_batch51():
-    e = EvalSchemaError("x")
-    assert isinstance(e, Exception)
-
-
 def test_eval_schema_error_args_batch51():
     """super().__init__(message) 把 message 存进 args。"""
     e = EvalSchemaError("hello")
@@ -421,19 +416,9 @@ def test_source_imports_draft202012_batch51():
     assert "from jsonschema import Draft202012Validator" in src
 
 
-def test_source_imports_validation_error_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "from jsonschema.exceptions import ValidationError as JSValidationError" in src
-
-
 def test_source_contains_schemas_dir_definition_batch51():
     src = inspect.getsource(schema_mod)
     assert "SCHEMAS_DIR = Path(__file__).resolve().parent.parent / \"schemas\"" in src
-
-
-def test_source_contains_eval_schema_error_class_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "class EvalSchemaError(Exception):" in src
 
 
 def test_source_contains_super_init_message_batch51():
@@ -509,22 +494,6 @@ def test_ast_has_1_class_def_batch51():
     assert classes[0].name == "EvalSchemaError"
 
 
-def test_ast_eval_schema_error_has_1_method_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError")
-    methods = [n for n in cls.body if isinstance(n, ast.FunctionDef)]
-    assert len(methods) == 1
-    assert methods[0].name == "__init__"
-
-
-def test_ast_eval_schema_error_super_call_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError")
-    init = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "__init__")
-    src = ast.unparse(init)
-    assert "super().__init__(message)" in src
-
-
 def test_ast_eval_schema_error_self_errors_assign_batch51():
     tree = ast.parse(inspect.getsource(schema_mod))
     cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError")
@@ -583,13 +552,6 @@ def test_ast_all_value_is_list_5_batch51():
     assert len(all_assign.value.elts) == 5
 
 
-def test_ast_validate_has_for_loop_with_append_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate")
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) == 1
-
-
 def test_ast_validate_uses_sorted_with_key_lambda_batch51():
     tree = ast.parse(inspect.getsource(schema_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate")
@@ -603,13 +565,6 @@ def test_ast_validate_uses_sorted_with_key_lambda_batch51():
     assert isinstance(sorted_calls[0].keywords[0].value, ast.Lambda)
 
 
-def test_ast_validate_raises_eval_schema_error_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate")
-    raises = [n for n in ast.walk(func) if isinstance(n, ast.Raise)]
-    assert len(raises) == 1
-
-
 def test_ast_validate_file_has_with_batch51():
     tree = ast.parse(inspect.getsource(schema_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
@@ -617,32 +572,11 @@ def test_ast_validate_file_has_with_batch51():
     assert len(withs) == 1
 
 
-def test_ast_validate_file_calls_validate_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
-    src = ast.unparse(func)
-    assert "validate(data, schema_name)" in src
-
-
 def test_ast_validate_file_has_if_not_is_file_batch51():
     tree = ast.parse(inspect.getsource(schema_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
     src = ast.unparse(func)
     assert "if not p.is_file()" in src
-
-
-def test_ast_schema_path_has_if_not_is_file_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_schema_path")
-    src = ast.unparse(func)
-    assert "if not p.is_file()" in src
-
-
-def test_ast_schema_path_raises_filenotfounderror_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_schema_path")
-    raises = [n for n in ast.walk(func) if isinstance(n, ast.Raise)]
-    assert len(raises) == 1
 
 
 def test_ast_load_schema_has_with_open_batch51():

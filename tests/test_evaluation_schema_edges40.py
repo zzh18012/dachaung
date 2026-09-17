@@ -95,11 +95,6 @@ def test_schemas_dir_hash_stable_batch20():
 # ---------- EvalSchemaError 第二十批 ----------
 
 
-def test_eval_schema_error_args_contains_message_batch20():
-    err = EvalSchemaError("hello")
-    assert err.args == ("hello",)
-
-
 def test_eval_schema_error_no_cause_by_default_batch20():
     err = EvalSchemaError("x")
     assert err.__cause__ is None
@@ -479,11 +474,6 @@ def test_module_source_no_threading_import_batch20():
     assert "import threading" not in src
 
 
-def test_module_source_no_multiprocessing_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import multiprocessing" not in src
-
-
 def test_module_source_no_asyncio_import_batch20():
     src = inspect.getsource(smod)
     assert "import asyncio" not in src
@@ -507,31 +497,6 @@ def test_module_source_no_sys_import_batch20():
 def test_module_source_no_logging_import_batch20():
     src = inspect.getsource(smod)
     assert "import logging" not in src
-
-
-def test_module_source_no_re_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import re" not in src
-
-
-def test_module_source_no_datetime_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import datetime" not in src
-
-
-def test_module_source_no_collections_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import collections" not in src
-
-
-def test_module_source_no_pandas_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import pandas" not in src
-
-
-def test_module_source_no_numpy_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import numpy" not in src
 
 
 # ---------- module source 字符串精确补强第三十二批 ----------
@@ -675,12 +640,6 @@ def test_module_all_contents_exact_batch20():
     }
 
 
-def test_module_does_not_import_app_pipeline_batch20():
-    src = inspect.getsource(smod)
-    assert "from app" not in src
-    assert "import app" not in src
-
-
 def test_module_does_not_import_evaluation_runner_batch20():
     src = inspect.getsource(smod)
     assert "from evaluation.runner" not in src
@@ -691,12 +650,6 @@ def test_module_does_not_import_evaluation_metrics_batch20():
     src = inspect.getsource(smod)
     assert "from evaluation.metrics" not in src
     assert "from evaluation import metrics" not in src
-
-
-def test_module_does_not_import_evaluation_manifest_batch20():
-    src = inspect.getsource(smod)
-    assert "from evaluation.manifest" not in src
-    assert "from evaluation import manifest" not in src
 
 
 def test_module_does_not_import_evaluation_annotation_metrics_batch20():

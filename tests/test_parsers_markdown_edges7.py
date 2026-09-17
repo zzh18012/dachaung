@@ -518,12 +518,6 @@ def test_blockquote_regex_basic():
     assert m.group(1) == "text"
 
 
-def test_blockquote_regex_no_space_after_gt():
-    m = _BLOCKQUOTE_RE.match(">text")
-    assert m is not None
-    assert m.group(1) == "text"
-
-
 def test_blockquote_regex_nested_marker():
     m = _BLOCKQUOTE_RE.match(">> nested")
     # `>>` 也匹配（第二个 `>` 留在 group 1）

@@ -355,14 +355,6 @@ def test_validate_file_invalid_json_raises_decode_error_batch24(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_empty_raises_decode_error_batch24(tmp_path):
-    """空文件 → JSONDecodeError。"""
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_directory_raises_batch24(tmp_path):
     """path 是目录 → is_file() False → FileNotFoundError。"""
     with pytest.raises(FileNotFoundError):
@@ -427,12 +419,6 @@ def test_module_source_forbidden_tokens_batch24():
     source = inspect.getsource(smod)
     for tok in FORBIDDEN_TOKENS:
         assert tok not in source, f"forbidden token in source: {tok}"
-
-
-def test_module_source_no_eval_exec_batch24():
-    source = inspect.getsource(smod)
-    assert "eval(" not in source
-    assert "exec(" not in source
 
 
 def test_module_source_no_star_import_batch24():
@@ -519,30 +505,10 @@ def test_module_source_no_subprocess_batch24():
 # ---------- module source 字符串精确补强第三十八批 ----------
 
 
-def test_module_source_contains_schemas_dir_batch24():
-    source = inspect.getsource(smod)
-    assert "SCHEMAS_DIR" in source
-
-
 def test_module_source_contains_path_parent_batch24():
     source = inspect.getsource(smod)
     assert "__file__" in source
     assert ".parent" in source
-
-
-def test_module_source_contains_draft_2020_12_batch24():
-    source = inspect.getsource(smod)
-    assert "Draft202012Validator" in source
-
-
-def test_module_source_contains_iter_errors_batch24():
-    source = inspect.getsource(smod)
-    assert "iter_errors" in source
-
-
-def test_module_source_contains_absolute_path_batch24():
-    source = inspect.getsource(smod)
-    assert "absolute_path" in source
 
 
 def test_module_source_contains_absolute_schema_path_batch24():
@@ -623,12 +589,6 @@ def test_signature_eval_schema_error_init_batch24():
     assert sig.parameters["errors"].default is None
 
 
-def test_signature_validate_no_varargs_batch24():
-    sig = inspect.signature(validate)
-    for p in sig.parameters.values():
-        assert p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)
-
-
 def test_signature_all_functions_no_defaults_batch24():
     """load_schema / validate / validate_file 都无 default（必填参数）。"""
     for fn in [load_schema, validate, validate_file, _schema_path]:
@@ -701,10 +661,6 @@ def test_module_docstring_mentions_no_reuse_batch24():
 def test_module_uses_from_future_annotations_batch24():
     source = inspect.getsource(smod)
     assert "from __future__ import annotations" in source
-
-
-def test_module_eval_schema_error_docstring_present_batch24():
-    assert EvalSchemaError.__doc__ is not None
 
 
 def test_module_schemas_dir_is_path_instance_batch24():

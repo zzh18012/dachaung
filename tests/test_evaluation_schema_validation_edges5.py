@@ -318,12 +318,6 @@ def test_signature_param_name_document_batch5():
     assert list(sig.parameters.keys()) == ["document"]
 
 
-def test_signature_param_kind_positional_or_keyword_batch5():
-    sig = inspect.signature(document_passes_schema)
-    p = sig.parameters["document"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_signature_param_no_default_batch5():
     sig = inspect.signature(document_passes_schema)
     assert sig.parameters["document"].default is inspect.Parameter.empty

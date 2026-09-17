@@ -78,11 +78,6 @@ def test_eval_schema_error_str_contains_message_batch14():
     assert "oops" in str(err)
 
 
-def test_eval_schema_error_args_batch14():
-    err = EvalSchemaError("hello")
-    assert err.args == ("hello",)
-
-
 def test_eval_schema_error_repr_batch14():
     err = EvalSchemaError("boom")
     r = repr(err)
@@ -331,11 +326,6 @@ def test_schema_path_concatenation_batch14():
     assert p.parent == SCHEMAS_DIR
 
 
-def test_schema_path_name_param_batch14():
-    sig = inspect.signature(_schema_path)
-    assert "name" in sig.parameters
-
-
 def test_schema_path_with_subdir_batch14():
     """传 subdir/name 形式 — 但 schemas 下没有子目录。"""
     with pytest.raises(FileNotFoundError):
@@ -480,11 +470,6 @@ def test_module_source_has_message_count_format_batch14():
 def test_module_source_has_path_list_in_message_batch14():
     src = inspect.getsource(smod)
     assert "list(head.absolute_path)" in src
-
-
-def test_module_source_has_app_schema_separation_comment_batch14():
-    src = inspect.getsource(smod)
-    assert "app/schema.py" in src
 
 
 # ---------- signatures 第十六批 ----------

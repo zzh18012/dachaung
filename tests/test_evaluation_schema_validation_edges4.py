@@ -252,12 +252,6 @@ def test_module_function_source_no_docstring_call_batch4():
 # ---------- 签名深度 第四批
 
 
-def test_signature_param_kind_batch4():
-    sig = inspect.signature(document_passes_schema)
-    p = sig.parameters["document"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_signature_no_var_positional_batch4():
     sig = inspect.signature(document_passes_schema)
     has_var_pos = any(

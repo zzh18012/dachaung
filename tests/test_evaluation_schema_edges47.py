@@ -436,11 +436,6 @@ def test_module_source_contains_schema_path_func_batch27():
     assert "def _schema_path" in src
 
 
-def test_module_source_contains_file_not_found_message_batch27():
-    src = inspect.getsource(smod)
-    assert "Schema 文件不存在" in src
-
-
 def test_module_source_contains_load_schema_func_batch27():
     src = inspect.getsource(smod)
     assert "def load_schema" in src

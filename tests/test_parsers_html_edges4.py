@@ -184,14 +184,6 @@ def test_skip_tags_contains_title():
     assert "title" in _SKIP_TAGS
 
 
-def test_skip_tags_contains_meta():
-    assert "meta" in _SKIP_TAGS
-
-
-def test_skip_tags_contains_link():
-    assert "link" in _SKIP_TAGS
-
-
 def test_skip_tags_contains_noscript():
     assert "noscript" in _SKIP_TAGS
 

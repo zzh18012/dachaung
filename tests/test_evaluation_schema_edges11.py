@@ -50,10 +50,6 @@ def test_eval_schema_error_is_exception_subclass():
     assert issubclass(EvalSchemaError, Exception)
 
 
-def test_eval_schema_error_is_baseexception_subclass():
-    assert issubclass(EvalSchemaError, BaseException)
-
-
 def test_eval_schema_error_init_param_count_2():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert len(sig.parameters) == 3  # self, message, errors
@@ -367,18 +363,6 @@ def test_validate_param_kinds_positional_or_keyword():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_validate_no_var_args():
-    sig = inspect.signature(validate)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_validate_no_var_kwargs():
-    sig = inspect.signature(validate)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_validate_return_annotation_is_none():
     sig = inspect.signature(validate)
     # return None → return_annotation is None or 'None' (str form due to future annotations)
@@ -503,18 +487,6 @@ def test_validate_file_param_kinds_positional_or_keyword():
     sig = inspect.signature(validate_file)
     for p in sig.parameters.values():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_validate_file_no_var_args():
-    sig = inspect.signature(validate_file)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_validate_file_no_var_kwargs():
-    sig = inspect.signature(validate_file)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 def test_validate_file_path_str_accepted(tmp_path: Path):
@@ -697,12 +669,6 @@ def test_module_namespace_has_schema_path():
     import evaluation.schema as m
 
     assert hasattr(m, "_schema_path")
-
-
-def test_module_all_is_list():
-    import evaluation.schema as m
-
-    assert isinstance(m.__all__, list)
 
 
 def test_module_all_is_not_tuple():

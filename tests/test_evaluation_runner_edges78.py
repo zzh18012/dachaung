@@ -498,11 +498,6 @@ def test_source_unlink_oserror_tolerated_batch52():
     assert src.count("except OSError:") == 2
 
 
-def test_source_unknown_error_message_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "process_single returned None without errors" in src
-
-
 def test_source_annotation_present_field_batch52():
     src = inspect.getsource(runner_mod)
     assert '"_annotation_present": annotation is not None' in src
@@ -546,11 +541,6 @@ def test_ast_10_imports_batch52():
 def test_ast_no_class_def_batch52():
     tree = ast.parse(inspect.getsource(runner_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_async_function_def_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
 
 
 def test_ast_module_docstring_batch52():
@@ -614,14 +604,6 @@ def test_ast_process_one_2_try_batch52():
     assert len(trys) == 1
 
 
-def test_ast_run_evaluation_3_for_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation")
-    fors = [n for n in func.body if isinstance(n, ast.For)]
-    # for doc + for ef + for r in per_doc_results = 3
-    assert len(fors) == 3
-
-
 def test_ast_run_evaluation_2_with_batch52():
     tree = ast.parse(inspect.getsource(runner_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation")
@@ -667,19 +649,6 @@ def test_ast_run_evaluation_public_per_doc_strips_private_batch52():
     src = ast.unparse(func)
     # public 构建只取 4 个公共 key
     assert "public_per_doc.append(" in src
-
-
-def test_ast_no_star_import_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        if isinstance(n, ast.ImportFrom):
-            for alias in n.names:
-                assert alias.name != "*"
-
-
-def test_ast_no_global_nonlocal_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
 
 
 def test_ast_no_while_batch52():

@@ -28,10 +28,6 @@ from evaluation.schema import (
 # ---------- EvalSchemaError 第三十四批
 
 
-def test_eval_schema_error_not_typeerror_batch34():
-    assert not issubclass(EvalSchemaError, TypeError)
-
-
 def test_eval_schema_error_not_attribute_error_batch34():
     assert not issubclass(EvalSchemaError, AttributeError)
 
@@ -223,11 +219,6 @@ def test_load_schema_eval_report_required_keys_batch34():
     required = s.get("required", [])
     # 至少有 1 个 required field
     assert len(required) > 0
-
-
-def test_load_schema_manifest_has_additional_properties_false_batch34():
-    s = load_schema("manifest.schema.json")
-    assert s.get("additionalProperties") is False
 
 
 def test_load_schema_annotation_version_const_batch34():
@@ -626,11 +617,6 @@ def test_module_source_contains_draft202012_validator_batch34():
     assert "Draft202012Validator" in src
 
 
-def test_module_source_contains_iter_errors_call_batch34():
-    src = inspect.getsource(smod)
-    assert "validator.iter_errors(instance)" in src
-
-
 def test_module_source_contains_absolute_path_batch34():
     src = inspect.getsource(smod)
     assert "absolute_path" in src
@@ -694,31 +680,6 @@ def test_module_source_contains_validate_file_func_batch34():
 def test_module_source_contains_all_export_batch34():
     src = inspect.getsource(smod)
     assert "__all__" in src
-
-
-def test_module_source_all_contains_schemas_dir_batch34():
-    src = inspect.getsource(smod)
-    assert '"SCHEMAS_DIR"' in src
-
-
-def test_module_source_all_contains_eval_schema_error_batch34():
-    src = inspect.getsource(smod)
-    assert '"EvalSchemaError"' in src
-
-
-def test_module_source_all_contains_load_schema_batch34():
-    src = inspect.getsource(smod)
-    assert '"load_schema"' in src
-
-
-def test_module_source_all_contains_validate_batch34():
-    src = inspect.getsource(smod)
-    assert '"validate"' in src
-
-
-def test_module_source_all_contains_validate_file_batch34():
-    src = inspect.getsource(smod)
-    assert '"validate_file"' in src
 
 
 def test_module_source_contains_json_import_batch34():
@@ -817,10 +778,6 @@ def test_module_all_names_are_str_batch34():
 def test_module_all_names_exist_in_module_batch34():
     for name in smod.__all__:
         assert hasattr(smod, name)
-
-
-def test_module_eval_schema_error_is_class_batch34():
-    assert isinstance(smod.EvalSchemaError, type)
 
 
 # ---------- 端到端集成第五十三批

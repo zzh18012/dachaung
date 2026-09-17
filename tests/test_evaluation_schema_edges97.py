@@ -113,13 +113,6 @@ def test_load_schema_not_cached_batch96():
 
 # ---------- __all__ ----------
 
-def test_all_exports_order_batch96():
-    assert schema_mod.__all__ == [
-        "SCHEMAS_DIR", "EvalSchemaError", "load_schema",
-        "validate", "validate_file",
-    ]
-
-
 # ---------- 源码补强 ----------
 
 def _src():

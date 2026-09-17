@@ -353,14 +353,6 @@ def test_module_source_contains_perf_counter_batch44():
 
 # ---------- __all__ ----------
 
-def test_all_exact_batch44():
-    assert set(runner_mod.__all__) == {"run_evaluation"}
-
-
-def test_all_count_1_batch44():
-    assert len(runner_mod.__all__) == 1
-
-
 def test_all_no_duplicates_batch44():
     assert len(set(runner_mod.__all__)) == len(runner_mod.__all__)
 
@@ -389,24 +381,6 @@ def test_ast_no_try_in_module_body_batch44():
     tree = ast.parse(inspect.getsource(runner_mod))
     for n in tree.body:
         assert not isinstance(n, ast.Try)
-
-
-def test_ast_no_for_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.For)
-
-
-def test_ast_no_while_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.While)
-
-
-def test_ast_no_async_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
 
 
 def test_ast_run_evaluation_has_for_loops_in_body_batch44():

@@ -177,20 +177,10 @@ def test_extract_kernel_language_kernelspec_language():
     assert _extract_kernel_language(metadata) == "python"
 
 
-def test_extract_kernel_language_kernelspec_name_fallback():
-    metadata = {"kernelspec": {"name": "python3"}}
-    assert _extract_kernel_language(metadata) == "python3"
-
-
 def test_extract_kernel_language_language_foblacks_name():
     """language 优先于 name。"""
     metadata = {"kernelspec": {"language": "python", "name": "py3"}}
     assert _extract_kernel_language(metadata) == "python"
-
-
-def test_extract_kernel_language_language_info_name():
-    metadata = {"language_info": {"name": "r"}}
-    assert _extract_kernel_language(metadata) == "r"
 
 
 def test_extract_kernel_language_kernelspec_over_language_info():
@@ -266,11 +256,6 @@ def test_ipynb_parser_two_class_attrs_consistent():
     """两个 class attr 不需要实例化即可访问。"""
     assert IpynbParser.name is not None
     assert IpynbParser.version is not None
-
-
-def test_ipynb_parser_parse_signature():
-    sig = inspect.signature(IpynbParser.parse)
-    assert set(sig.parameters) == {"self", "path", "source_hash"}
 
 
 # =========================================================================

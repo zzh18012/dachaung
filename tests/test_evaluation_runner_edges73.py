@@ -661,11 +661,6 @@ def test_source_no_os_system_batch48():
     assert "os.system(" not in src
 
 
-def test_source_no_popen_batch48():
-    src = inspect.getsource(runner_mod)
-    assert ".popen(" not in src
-
-
 def test_source_no_yaml_load_batch48():
     src = inspect.getsource(runner_mod)
     assert "yaml.load(" not in src
@@ -674,31 +669,6 @@ def test_source_no_yaml_load_batch48():
 def test_source_no_pickle_load_batch48():
     src = inspect.getsource(runner_mod)
     assert "pickle.load(" not in src
-
-
-def test_source_no_subprocess_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "subprocess" not in src
-
-
-def test_source_no_lambda_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "lambda" not in src
-
-
-def test_source_no_yield_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "yield" not in src
-
-
-def test_source_no_walrus_batch48():
-    src = inspect.getsource(runner_mod)
-    assert ":=" not in src
-
-
-def test_source_no_async_def_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "async def" not in src
 
 
 def test_source_no_await_batch48():

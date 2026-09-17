@@ -242,15 +242,6 @@ def test_chunk_empty_id_raises():
         )
 
 
-def test_chunk_empty_text_raises():
-    with pytest.raises(ValueError, match="文本不能为空"):
-        Chunk(
-            chunk_id="c1",
-            text="",
-            source_element_ids=["e1"],
-        )
-
-
 def test_chunk_empty_source_ids_raises():
     with pytest.raises(ValueError, match="至少要有一个"):
         Chunk(

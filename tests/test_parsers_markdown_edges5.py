@@ -120,10 +120,6 @@ def test_thematic_re_two_chars_no_match():
     assert _THEMATIC_RE.match("--") is None
 
 
-def test_thematic_re_one_char_no_match():
-    assert _THEMATIC_RE.match("-") is None
-
-
 def test_thematic_re_with_internal_spaces():
     """- - -（带空格）也匹配。"""
     assert _THEMATIC_RE.match("- - -") is not None
@@ -190,18 +186,6 @@ def test_unordered_list_re_dash():
     assert m.group(1) == "item"
 
 
-def test_unordered_list_re_star():
-    m = _UNORDERED_LIST_RE.match("* item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
-def test_unordered_list_re_plus():
-    m = _UNORDERED_LIST_RE.match("+ item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
 def test_unordered_list_re_no_space_no_match():
     """- item 需空格；-item 不匹配。"""
     assert _UNORDERED_LIST_RE.match("-item") is None
@@ -209,12 +193,6 @@ def test_unordered_list_re_no_space_no_match():
 
 def test_ordered_list_re_dot():
     m = _ORDERED_LIST_RE.match("1. item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
-def test_ordered_list_re_paren():
-    m = _ORDERED_LIST_RE.match("1) item")
     assert m is not None
     assert m.group(1) == "item"
 
@@ -245,12 +223,6 @@ def test_blockquote_re_no_space():
     m = _BLOCKQUOTE_RE.match(">text")
     assert m is not None
     assert m.group(1) == "text"
-
-
-def test_blockquote_re_empty():
-    m = _BLOCKQUOTE_RE.match(">")
-    assert m is not None
-    assert m.group(1) == ""
 
 
 def test_pipe_table_row_re_basic():

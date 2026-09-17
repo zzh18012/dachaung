@@ -49,11 +49,6 @@ def test_ipynb_extensions_is_tuple():
     assert isinstance(_IPYNB_EXTENSIONS, tuple)
 
 
-def test_ipynb_extensions_lowercase():
-    for ext in _IPYNB_EXTENSIONS:
-        assert ext == ext.lower()
-
-
 def test_ipynb_extensions_starts_with_dot():
     for ext in _IPYNB_EXTENSIONS:
         assert ext.startswith(".")

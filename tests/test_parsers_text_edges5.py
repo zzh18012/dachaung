@@ -110,13 +110,6 @@ def test_split_paragraphs_single_line():
     assert result[0] == (1, "hello")
 
 
-def test_split_paragraphs_two_paragraphs_one_blank_line():
-    result = _split_paragraphs("para1\n\npara2")
-    assert len(result) == 2
-    assert result[0] == (1, "para1")
-    assert result[1] == (3, "para2")
-
-
 def test_split_paragraphs_two_paragraphs_multiple_blank_lines():
     """多个空行视为同一段落分隔。"""
     result = _split_paragraphs("para1\n\n\n\npara2")

@@ -139,15 +139,6 @@ def test_schema_path_extension_check_batch45():
 
 # ---------- load_schema 各 schema 内容深度 ----------
 
-def test_load_schema_manifest_has_required_keys_batch45():
-    s = load_schema("manifest.schema.json")
-    assert "required" in s
-    required = s["required"]
-    assert "manifest_version" in required
-    assert "devset_status" in required
-    assert "documents" in required
-
-
 def test_load_schema_manifest_type_batch45():
     s = load_schema("manifest.schema.json")
     assert s.get("type") == "object"
@@ -191,11 +182,6 @@ def test_load_schema_evaluation_report_type_batch45():
 def test_load_schema_evaluation_report_has_required_batch45():
     s = load_schema("evaluation-report.schema.json")
     assert "required" in s
-
-
-def test_load_schema_evaluation_report_has_report_version_batch45():
-    s = load_schema("evaluation-report.schema.json")
-    assert "report_version" in s.get("properties", {})
 
 
 def test_load_schema_returns_dict_batch45():
@@ -327,16 +313,6 @@ def test_validate_top_level_string_batch45():
         validate("not dict", "manifest.schema.json")  # type: ignore[arg-type]
 
 
-def test_validate_top_level_int_batch45():
-    with pytest.raises(EvalSchemaError):
-        validate(42, "manifest.schema.json")  # type: ignore[arg-type]
-
-
-def test_validate_top_level_none_batch45():
-    with pytest.raises(EvalSchemaError):
-        validate(None, "manifest.schema.json")  # type: ignore[arg-type]
-
-
 def test_validate_top_level_bool_batch45():
     with pytest.raises(EvalSchemaError):
         validate(True, "manifest.schema.json")  # type: ignore[arg-type]
@@ -357,17 +333,6 @@ def test_validate_file_utf8_with_chinese_batch45(tmp_path):
         validate_file(p, "manifest.schema.json")
     except EvalSchemaError:
         pass
-
-
-def test_validate_file_path_object_batch45(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }), encoding="utf-8")
-    # 接受 Path 对象
-    validate_file(p, "manifest.schema.json")
 
 
 def test_validate_file_str_path_batch45(tmp_path):
@@ -443,11 +408,6 @@ def test_eval_schema_error_errors_none_default_empty_batch45():
 def test_eval_schema_error_errors_empty_list_batch45():
     e = EvalSchemaError("msg", errors=[])
     assert e.errors == []
-
-
-def test_eval_schema_error_inherits_exception_batch45():
-    e = EvalSchemaError("x")
-    assert isinstance(e, Exception)
 
 
 def test_eval_schema_error_catchable_as_exception_batch45():
@@ -550,11 +510,6 @@ def test_module_source_contains_jsvalidationerror_import_batch45():
     """注意：实现 import 了 JSValidationError 但实际未用。"""
     src = inspect.getsource(schema_mod)
     assert "JSValidationError" in src or "ValidationError" in src
-
-
-def test_module_source_contains_eval_schema_error_class_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "class EvalSchemaError(Exception):" in src
 
 
 def test_module_source_contains_errors_or_empty_list_batch45():
@@ -749,18 +704,6 @@ def test_ast_no_class_in_function_body_batch45():
                 assert not isinstance(sub, ast.ClassDef)
 
 
-def test_ast_no_for_in_module_body_batch45():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.For)
-
-
-def test_ast_no_while_in_module_body_batch45():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.While)
-
-
 def test_ast_no_async_in_module_body_batch45():
     tree = ast.parse(inspect.getsource(schema_mod))
     for n in tree.body:
@@ -854,11 +797,6 @@ def test_source_no_class_other_than_eval_schema_error_batch45():
 def test_source_no_async_def_batch45():
     src = inspect.getsource(schema_mod)
     assert "async def" not in src
-
-
-def test_source_no_yield_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "yield" not in src
 
 
 def test_source_no_walrus_batch45():

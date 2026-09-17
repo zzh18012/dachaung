@@ -41,11 +41,6 @@ def test_load_schema_missing_fnf_batch55():
     assert "Schema 文件不存在" in str(ei.value)
 
 
-def test_validate_unknown_schema_fnf_batch55():
-    with pytest.raises(FileNotFoundError):
-        validate({}, "nope.schema.json")
-
-
 # ---------- EvalSchemaError 默认 ----------
 
 def test_eval_schema_error_default_errors_batch55():

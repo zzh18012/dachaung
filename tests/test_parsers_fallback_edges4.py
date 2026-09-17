@@ -358,10 +358,6 @@ def test_is_heading_style_empty_after_strip_returns_false_tuple():
     assert _is_heading_style("   ") == (False, 0)
 
 
-def test_is_heading_style_normal_text_returns_false_tuple():
-    assert _is_heading_style("Body Text") == (False, 0)
-
-
 def test_is_heading_style_returns_tuple_of_bool_int():
     result = _is_heading_style("Heading 1")
     assert isinstance(result, tuple)
@@ -1220,10 +1216,6 @@ def test_module_caption_re_is_compiled_pattern():
     assert isinstance(_CAPTION_RE, re.Pattern)
 
 
-def test_module_caption_re_uses_ignore_case():
-    assert _CAPTION_RE.flags & re.IGNORECASE
-
-
 def test_module_has_image_filename_function():
     assert callable(_image_filename)
 
@@ -1323,11 +1315,6 @@ def test_fallback_parser_class_version_contains_pypdfium2_keyword():
 
 def test_fallback_parser_has_parse_callable():
     assert callable(FallbackParser.parse)
-
-
-def test_fallback_parser_init_default_image_output_dir_none():
-    parser = FallbackParser()
-    assert parser._image_output_dir is None
 
 
 def test_fallback_parser_init_with_image_dir(tmp_path: Path):

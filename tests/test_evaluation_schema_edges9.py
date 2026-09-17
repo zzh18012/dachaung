@@ -230,11 +230,6 @@ def test_module_jsvalidation_error_is_imported():
 # =========================================================================
 
 
-def test_schemas_dir_is_pathlib_path_instance():
-    """SCHEMAS_DIR 是 Path 实例。"""
-    assert isinstance(SCHEMAS_DIR, Path)
-
-
 def test_schemas_dir_is_absolute():
     """SCHEMAS_DIR 是绝对路径。"""
     assert SCHEMAS_DIR.is_absolute()
@@ -878,13 +873,6 @@ def test_all_known_schemas_are_valid_draft2020():
     ):
         s = load_schema(name)
         Draft202012Validator.check_schema(s)
-
-
-def test_load_schema_can_be_used_with_validator():
-    """load_schema 返回的 dict 可被 Draft202012Validator 使用。"""
-    s = load_schema("manifest.schema.json")
-    v = Draft202012Validator(s)
-    assert v is not None
 
 
 def test_validate_consistent_with_direct_validator():

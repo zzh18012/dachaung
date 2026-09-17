@@ -537,10 +537,6 @@ def test_parser_has_abstract_method_parse():
     assert "parse" in Parser.__abstractmethods__
 
 
-def test_parser_default_name_value():
-    assert Parser.name == "abstract"
-
-
 def test_parser_default_version_value():
     assert Parser.version == "0.0.0"
 

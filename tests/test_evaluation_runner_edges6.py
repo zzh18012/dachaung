@@ -68,13 +68,6 @@ def test_load_annotation_utf8_bom_returns_none(tmp_path: Path):
     assert result is None
 
 
-def test_load_annotation_with_array_root(tmp_path: Path):
-    p = tmp_path / "a.json"
-    p.write_text("[1, 2, 3]", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == [1, 2, 3]
-
-
 def test_load_annotation_does_not_raise_on_invalid(tmp_path: Path):
     """invalid JSON → 返回 None，不抛异常。"""
     p = tmp_path / "a.json"
