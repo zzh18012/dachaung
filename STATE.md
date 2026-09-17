@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2047 — e 队列首采：main-target 测试套件与运行环境基准件（协议 v3 队列 4，零测试新增零语料改动）
+
+- 触发：b 队列 main 面本轮前刚闭合（R2046 裁决）——协议 v3 队列 4 变化触发。main 只读 @ `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（`git worktree list --porcelain` 动态定位，运行前后 status clean，全程 `-p no:cacheprovider` + PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8，main 零写入）。
+- **main 测试套件基线**：collect-only **5489 collected**（1.44s，rc 0，零收集错误，133 test .py）；全量实跑 **5485 passed + 4 skipped = 5489，0 失败，121.88s**（挂钟 123s）rc 0。--durations=25：top-1 = **44.01s setup `test_container_verify_e2e::test_entrypoint_help_contract`**（docker.io 可达性探测，占套件总耗时约 36%），其余 24 项全 ≤1.22s 且全为 call 相 CLI 子进程型（evaluation_cli/pipeline_integration/batch_parse/myx/batch*_closure 系）——漂移锚 = top-1 是否仍 docker 探测单项 + call 相是否现 >1.22s 新非 CLI 型。
+- **docker-gated 实态**：本地 daemon 在跑（29.4.3），但 4 条 e2e（test_container_verify_e2e.py 73/81/99/113 行）全按显式理由 SKIP——「docker.io 规范名本地不可达（DNS 污染）：CI 为 canonical 构建证据通道」，gate 检 registry 可达性非仅 daemon 存活，e2e 未真跑、探测烧 44.01s 后落 SKIP。skipped 恒 4 无其他来源。
+- **环境快照**：Python 3.12.10（uv 管理 venv，无 pip 可执行）；pytest 8.4.2（零第三方插件）/ pdfplumber 0.11.10 / pdfminer.six 20260107 / python-docx 1.2.0 / jsonschema 4.26.0（referencing 0.37.0、attrs 26.1.0）/ kreuzberg 4.10.2；pydantic 与 tqdm NOT-INSTALLED（tqdm 可选未装合契约）。sha256：uv.lock `7496e34c…f38580af`、pyproject.toml `7f32a856…93503b4`、annotation `0eebbd8e…10a485cd`、document `14595812…ab68fa2f`、evaluation-report `23444ebb…47672cf3d`、manifest `3a7982a7…828c23a77`（全量十六进制见 json）。
+- **faces-closed 矩阵（R2028–R2046，19 轮）**：main-targeting 12 轮（b 探针 12 轮 + 45 测试）+ 语料分析/校准 7 轮，全部在 main @ 6c6d398 只读执行。已闭 main 面清单：app/cli.py 全子命令（parse R2043 / validate R2038+R2046 / batch-parse R2033+R2034+R2044 / explain·audit·inspect R2031+R2036 及更早批次面）、app/batch.py、app/jsonlog.py、app/plugin_loader.py、app/parser_registry.py+source_types.py、parsers fallback DOCX 行列基数（R2029）、schemas/document.schema.json 0.6.0 路由（R2038）、evaluation/cli.py+manifest.py（R2039）、evaluation annotation 消费链（R2041）、scripts/container_verify.py（R2040）、全仓泄漏审计（R2045）。**重探策略**：main 前进时按新 commit diff 路由到最相近已闭面重探；uv.lock/pyproject/schemas 哈希任一变化触发环境漂移比对。
+- 基准件：`outputs/autonomous/main_baseline_r2047.md` + `.json`（sort_keys/ensure_ascii=False）+ 证据 `main_collect_only_r2047.out` / `main_full_run_r2047.out` + 生成器 `gen_main_baseline_r2047.py`（均未入库）。本基准独立于自跑语料锚链维护（自跑盯加测回归，本件盯 main 套件+环境；当前同点 6c6d398，main 前进后自跑锚不变、本件须复采）。
+- 下次建议：**e 轮触发条件 = main 前进（新 commit）或下周（≤7 天，2026-09-21 周期简报窗口）**；届时复采三项对照（收集数/全量计数与耗时/durations 锚点）+ 哈希比对。main 未前进期间维持 R2046 建议：R-A/R-I 行为缺口（引用 R2042 盘点件候选池）+ 2026-09-21 窗口自跑全量实跑（预测 102085 + 3xN）。
+
+---
+
 ## Round 2046 — app.cli validate 子命令 CLI 信封未锁形态收尾（1b/b 队列，R2044 建议沿用，3 测试）
 
 - 任务：`app.cli validate` 的 CLI 信封残留六组形态（根类型族 / 空与空白文件 / BOM JSON / 尾随垃圾 / argparse 信封 / schema_version 边界），main 只读 @ `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（动态定位 branch=refs/heads/main worktree，运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_validate_env_r2046.py + .out（未入库，C0 + E1–E6 共 23 项已执行完毕）；子进程真实 CLI（main venv `python -m app.cli validate`），cwd=临时目录 + PYTHONPATH=main 根；手造骨架 = R2038 同款 `_udm`（markdown/line_address @0.6.0）。
