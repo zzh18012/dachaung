@@ -506,21 +506,6 @@ def test_get_git_provenance_returns_dict():
     assert isinstance(r, dict)
 
 
-def test_get_git_provenance_2_keys():
-    r = get_git_provenance(Path("."))
-    assert set(r.keys()) == {"git_commit", "git_dirty"}
-
-
-def test_get_git_provenance_commit_is_str_or_none():
-    r = get_git_provenance(Path("."))
-    assert r["git_commit"] is None or isinstance(r["git_commit"], str)
-
-
-def test_get_git_provenance_dirty_is_bool():
-    r = get_git_provenance(Path("."))
-    assert isinstance(r["git_dirty"], bool)
-
-
 def test_get_git_provenance_nonexistent_dir():
     """不存在目录 → commit None, dirty True."""
     r = get_git_provenance(Path("/nonexistent_dir_xyz_123"))
@@ -1418,11 +1403,6 @@ def test_e2e_build_provenance_returns_9_keys():
     assert len(r) == 9
 
 
-def test_e2e_build_provenance_evaluator_version_value():
-    r = build_provenance(Path("."), "fallback", 800, "1.0")
-    assert r["evaluator_version"] == EVALUATOR_VERSION
-
-
 def test_e2e_build_provenance_max_chars_int():
     r = build_provenance(Path("."), "fallback", 800, "1.0")
     assert isinstance(r["max_chars"], int)
@@ -1432,11 +1412,6 @@ def test_e2e_build_provenance_max_chars_int():
 def test_e2e_build_provenance_str_max_chars_input():
     r = build_provenance(Path("."), "fallback", "500", "1.0")
     assert r["max_chars"] == 500
-
-
-def test_e2e_build_provenance_run_timestamp_iso_format():
-    r = build_provenance(Path("."), "fallback", 800, "1.0")
-    assert "T" in r["run_timestamp_iso"]
 
 
 def test_e2e_build_devset_section_6_keys():

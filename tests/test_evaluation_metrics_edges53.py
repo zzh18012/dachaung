@@ -879,13 +879,6 @@ def test_module_source_no_dataclass_batch27():
     assert "from dataclasses" not in source
 
 
-def test_module_source_no_class_keyword_batch27():
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(mmod))
-    classes = [n for n in tree.body if isinstance(n, _ast.ClassDef)]
-    assert classes == []
-
-
 def test_module_source_uses_from_future_annotations_batch27():
     source = inspect.getsource(mmod)
     assert "from __future__ import annotations" in source
@@ -1102,13 +1095,6 @@ def test_module_has_many_functions_batch27():
         "_heading_boundary_ratio", "_silent_drop_count",
     }
     assert set(funcs) == expected
-
-
-def test_module_no_classes_batch27():
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(mmod))
-    classes = [n for n in tree.body if isinstance(n, _ast.ClassDef)]
-    assert classes == []
 
 
 def test_module_docstring_present_batch27():

@@ -756,11 +756,6 @@ def test_module_source_has_main_block_batch11():
     assert "raise SystemExit" in source
 
 
-def test_module_source_docstring_present_batch11():
-    assert climod.__doc__ is not None
-    assert len(climod.__doc__) > 20
-
-
 def test_module_source_docstring_mentions_subcommands_batch11():
     assert climod.__doc__ is not None
     assert "run" in climod.__doc__
@@ -820,11 +815,6 @@ def test_signature_format_metric_param_names_batch11():
 def test_signature_run_inspect_doc_1_param_batch11():
     sig = inspect.signature(_run_inspect_doc)
     assert len(sig.parameters) == 1
-
-
-def test_signature_run_inspect_doc_param_name_batch11():
-    sig = inspect.signature(_run_inspect_doc)
-    assert list(sig.parameters) == ["args"]
 
 
 def test_signature_funcs_function_type_batch11():

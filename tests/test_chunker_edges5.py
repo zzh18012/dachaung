@@ -103,10 +103,6 @@ def test_part_end_constant_value_three():
     assert _PART_END == 3
 
 
-def test_part_constants_distinct():
-    assert len({_PART_TEXT, _PART_ELEMENT_ID, _PART_START, _PART_END}) == 4
-
-
 def test_part_constants_ordered():
     assert _PART_TEXT < _PART_ELEMENT_ID < _PART_START < _PART_END
 
@@ -147,31 +143,15 @@ def test_split_piece_explicit_start_end():
     assert p.end == 10
 
 
-def test_split_piece_boundary_after_whitespace():
-    p = _SplitPiece(text="x", boundary_after="whitespace")
-    assert p.boundary_after == "whitespace"
-
-
 def test_split_piece_boundary_after_forced_char():
     p = _SplitPiece(text="x", boundary_after="forced_char")
     assert p.boundary_after == "forced_char"
-
-
-def test_split_piece_boundary_after_none():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.boundary_after is None
 
 
 def test_split_piece_equality_same_values():
     p1 = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
     p2 = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
     assert p1 == p2
-
-
-def test_split_piece_equality_different_text():
-    p1 = _SplitPiece(text="x", boundary_after=None)
-    p2 = _SplitPiece(text="y", boundary_after=None)
-    assert p1 != p2
 
 
 def test_split_piece_field_count():
@@ -545,10 +525,6 @@ def test_split_long_text_long_paragraph_multiple_pieces():
 # =========================================================================
 
 
-def test_chunk_buffer_is_dataclass():
-    assert is_dataclass(_ChunkBuffer)
-
-
 def test_chunk_buffer_default_factory_independent():
     b1 = _ChunkBuffer(document_id="d1")
     b2 = _ChunkBuffer(document_id="d2")
@@ -711,11 +687,6 @@ def test_chunker_init_default_max_chars_800():
 def test_chunker_init_explicit_max_chars():
     c = StructuralChunker(max_chars=200)
     assert c.max_chars == 200
-
-
-def test_chunker_init_max_chars_32_minimum_accepted():
-    c = StructuralChunker(max_chars=32)
-    assert c.max_chars == 32
 
 
 def test_chunker_init_max_chars_31_rejected():

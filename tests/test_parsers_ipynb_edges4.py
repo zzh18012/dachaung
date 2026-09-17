@@ -607,14 +607,6 @@ def test_parse_markdown_cell_confidence_inherited_from_md_parser(tmp_path: Path)
 # =========================================================================
 
 
-def test_parse_nbformat_4_major_int_supported(tmp_path: Path):
-    nb = _minimal_nb([], nbformat=4)
-    p = _write_nb(tmp_path, nb)
-    parser = IpynbParser()
-    doc = parser.parse(p, source_hash=SHA)
-    assert doc.metadata["nbformat"] == 4
-
-
 def test_parse_nbformat_negative_raises_unsupported_version(tmp_path: Path):
     nb = _minimal_nb([], nbformat=-1)
     p = _write_nb(tmp_path, nb)

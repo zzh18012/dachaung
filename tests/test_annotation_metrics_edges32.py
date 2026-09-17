@@ -152,11 +152,6 @@ def test_chunk_boundary_source_handles_no_anchors():
     assert "if not anchors" in src
 
 
-def test_chunk_boundary_source_uses_normalize_text():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "normalize_text(" in src
-
-
 def test_chunk_boundary_source_uses_counter():
     """可能不直接用 Counter；但 module imports Counter。"""
     src = inspect.getsource(amod)
@@ -173,24 +168,9 @@ def test_chunk_boundary_source_uses_find():
     assert ".find(" in src
 
 
-def test_chunk_boundary_source_uses_search_from():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "search_from" in src
-
-
 def test_chunk_boundary_source_uses_missing_markers():
     src = inspect.getsource(chunk_boundary_prf)
     assert "missing_markers" in src
-
-
-def test_chunk_boundary_source_uses_tolerance_chars_field():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert '"_tolerance_chars"' in src
-
-
-def test_chunk_boundary_source_uses_missing_markers_field():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert '"_missing_markers"' in src
 
 
 def test_chunk_boundary_source_returns_3_metrics_and_tolerance():
@@ -198,11 +178,6 @@ def test_chunk_boundary_source_returns_3_metrics_and_tolerance():
     assert '"chunk_boundary_precision"' in src
     assert '"chunk_boundary_recall"' in src
     assert '"chunk_boundary_f1"' in src
-
-
-def test_chunk_boundary_source_uses_pairs_sort():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "pairs.sort" in src
 
 
 def test_chunk_boundary_source_uses_used_pred_used_gt():
@@ -290,16 +265,6 @@ def test_chunk_boundary_source_uses_ratio_helper():
 def test_chunk_boundary_source_no_eval():
     src = inspect.getsource(chunk_boundary_prf)
     assert "eval(" not in src
-
-
-def test_chunk_boundary_source_no_subprocess():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "subprocess" not in src
-
-
-def test_chunk_boundary_source_no_yield():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "yield" not in src
 
 
 def test_chunk_boundary_source_no_async():

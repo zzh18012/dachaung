@@ -528,11 +528,6 @@ def test_module_source_forbidden_tokens_third_batch(token):
 # ---------- module source 字符串精确补强 ----------
 
 
-def test_module_source_has_from_future():
-    src = inspect.getsource(cli_mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_module_source_has_import_argparse():
     src = inspect.getsource(cli_mod)
     assert "import argparse" in src
@@ -726,11 +721,6 @@ def test_format_metric_no_default():
     sig = inspect.signature(_format_metric)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_run_inspect_doc_1_param():
-    sig = inspect.signature(_run_inspect_doc)
-    assert list(sig.parameters) == ["args"]
 
 
 def test_run_inspect_doc_return_int():

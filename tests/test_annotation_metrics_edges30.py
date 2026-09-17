@@ -51,11 +51,6 @@ def test_figure_caption_f1_key_present():
     assert "figure_caption_f1" in out
 
 
-def test_figure_caption_precision_value_is_none():
-    out = figure_caption_prf({}, {})
-    assert out["figure_caption_precision"]["value"] is None
-
-
 def test_figure_caption_recall_value_is_none():
     out = figure_caption_prf({}, {})
     assert out["figure_caption_recall"]["value"] is None
@@ -747,34 +742,14 @@ def test_chunk_boundary_source_uses_joined_raw_assign():
     assert "joined_raw = " in src
 
 
-def test_chunk_boundary_source_uses_predicted_init_list():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "predicted: list[int] = []" in src
-
-
 def test_chunk_boundary_source_uses_pos_init():
     src = inspect.getsource(chunk_boundary_prf)
     assert "pos = 0" in src
 
 
-def test_chunk_boundary_source_uses_gt_positions_list():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "gt_positions: list[int] = []" in src
-
-
 def test_chunk_boundary_source_uses_missing_markers_list():
     src = inspect.getsource(chunk_boundary_prf)
     assert "missing_markers: list[str] = []" in src
-
-
-def test_chunk_boundary_source_uses_search_from_advance():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "search_from = find_pos + len(marker)" in src
-
-
-def test_chunk_boundary_source_uses_pairs_list_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "pairs: list[tuple[int, int, int]] = []" in src
 
 
 def test_chunk_boundary_source_uses_used_pred_used_gt_set_init():
@@ -789,11 +764,6 @@ def test_chunk_boundary_source_uses_nested_for_pred_gt():
     assert "for gi, gv in enumerate(gt_positions)" in src
 
 
-def test_chunk_boundary_source_uses_abs_distance_calculation():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "d = abs(pv - gv)" in src
-
-
 def test_chunk_boundary_source_uses_tolerance_compare_in_pairs():
     src = inspect.getsource(chunk_boundary_prf)
     assert "if d <= tolerance_chars" in src
@@ -805,25 +775,9 @@ def test_chunk_boundary_source_uses_used_pred_add():
     assert "used_gt.add(gi)" in src
 
 
-def test_chunk_boundary_source_uses_p_val_r_val_extraction():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert 'p_val = out["chunk_boundary_precision"]["value"]' in src
-    assert 'r_val = out["chunk_boundary_recall"]["value"]' in src
-
-
 def test_chunk_boundary_source_uses_f1_calculation():
     src = inspect.getsource(chunk_boundary_prf)
     assert "2 * p_val * r_val / denom" in src
-
-
-def test_chunk_boundary_source_uses_underscore_tolerance_chars_key():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert '"_tolerance_chars"' in src
-
-
-def test_chunk_boundary_source_uses_underscore_missing_markers_key():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert '"_missing_markers"' in src
 
 
 def test_chunk_boundary_source_uses_break_in_loop():
@@ -834,11 +788,6 @@ def test_chunk_boundary_source_uses_break_in_loop():
 def test_chunk_boundary_source_uses_continue_in_loop():
     src = inspect.getsource(chunk_boundary_prf)
     assert "continue" in src
-
-
-def test_chunk_boundary_source_no_print():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "print(" not in src
 
 
 def test_chunk_boundary_source_no_logging():
@@ -862,11 +811,6 @@ def test_chunk_boundary_source_no_with_statement():
 def test_chunk_boundary_source_no_async_def():
     src = inspect.getsource(chunk_boundary_prf)
     assert "async def" not in src
-
-
-def test_chunk_boundary_source_no_yield():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "yield" not in src
 
 
 def test_chunk_boundary_source_no_global_keyword():
@@ -1056,12 +1000,6 @@ def test_module_source_no_open_call():
     assert "\nopen(" not in src
 
 
-def test_module_source_2_module_level_functions_confirmed():
-    src = inspect.getsource(amod)
-    func_count = sum(1 for line in src.splitlines() if line.startswith("def "))
-    assert func_count == 2
-
-
 def test_module_source_1_module_level_constant_confirmed():
     src = inspect.getsource(amod)
     const_count = sum(
@@ -1069,14 +1007,6 @@ def test_module_source_1_module_level_constant_confirmed():
         if line.startswith("PARSER_DOES_NOT_EMIT_RELATIONS =")
     )
     assert const_count == 1
-
-
-def test_module_source_has_all_with_exact_entries():
-    src = inspect.getsource(amod)
-    assert "__all__" in src
-    assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-    assert '"figure_caption_prf"' in src
-    assert '"chunk_boundary_prf"' in src
 
 
 def test_module_source_2_function_names_exact():

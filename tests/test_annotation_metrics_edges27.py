@@ -438,16 +438,6 @@ def test_module_source_has_docstring_mentions_heuristic():
     assert "启发式" in src or "heuristic" in src.lower()
 
 
-def test_module_source_has_greedy_keyword():
-    src = inspect.getsource(m)
-    assert "贪心" in src or "greedy" in src.lower()
-
-
-def test_module_source_has_one_to_one_keyword():
-    src = inspect.getsource(m)
-    assert "一对一" in src
-
-
 def test_module_source_has_normalize_text_called_with_default():
     """代码用 c.get('text') or ''。"""
     src = inspect.getsource(chunk_boundary_prf)
@@ -607,10 +597,6 @@ def test_namespace_figure_caption_prf():
     assert figure_caption_prf.__module__ == "evaluation.annotation_metrics"
 
 
-def test_namespace_module():
-    assert m.__name__ == "evaluation.annotation_metrics"
-
-
 # ---------- 模块整体合理性 ----------
 
 
@@ -624,16 +610,6 @@ def test_module_all_3_entries():
 
 def test_module_all_is_list():
     assert isinstance(m.__all__, list)
-
-
-def test_module_has_2_module_level_functions():
-    fns = [
-        n for n in dir(m)
-        if not n.startswith("_")
-        and isinstance(getattr(m, n), FunctionType)
-        and getattr(m, n).__module__ == "evaluation.annotation_metrics"
-    ]
-    assert set(fns) == {"figure_caption_prf", "chunk_boundary_prf"}
 
 
 def test_module_has_1_module_level_constant():

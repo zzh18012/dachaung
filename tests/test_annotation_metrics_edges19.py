@@ -804,19 +804,9 @@ def test_chunk_boundary_prf_source_does_not_contain_json():
     assert "json." not in src
 
 
-def test_chunk_boundary_prf_source_does_not_contain_subprocess():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "subprocess" not in src
-
-
 def test_chunk_boundary_prf_source_does_not_contain_logging():
     src = inspect.getsource(chunk_boundary_prf)
     assert "logging" not in src
-
-
-def test_chunk_boundary_prf_source_does_not_contain_print():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "print(" not in src
 
 
 def test_chunk_boundary_prf_source_does_not_contain_os_module():

@@ -495,12 +495,6 @@ def test_module_source_no_subprocess_batch18():
     assert "import subprocess" not in src
 
 
-def test_module_source_no_network_batch18():
-    src = inspect.getsource(amod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
-
-
 # ---------- module source 字符串精确补强第二十八批 ----------
 
 

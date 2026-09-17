@@ -293,36 +293,6 @@ def test_source_contains_ratio_call_batch48():
     assert "_ratio(" in src
 
 
-def test_source_contains_pipeline_failed_string_batch48():
-    src = inspect.getsource(am_mod)
-    assert '"pipeline_failed"' in src
-
-
-def test_source_contains_no_annotation_string_batch48():
-    src = inspect.getsource(am_mod)
-    assert '"no_annotation"' in src
-
-
-def test_source_contains_no_predicted_boundaries_string_batch48():
-    src = inspect.getsource(am_mod)
-    assert '"no_predicted_boundaries"' in src
-
-
-def test_source_contains_no_ground_truth_anchors_string_batch48():
-    src = inspect.getsource(am_mod)
-    assert '"no_ground_truth_anchors"' in src
-
-
-def test_source_contains_no_ground_truth_anchors_in_stream_string_batch48():
-    src = inspect.getsource(am_mod)
-    assert '"no_ground_truth_anchors_in_stream"' in src
-
-
-def test_source_contains_precision_or_recall_not_evaluated_string_batch48():
-    src = inspect.getsource(am_mod)
-    assert '"precision_or_recall_not_evaluated"' in src
-
-
 def test_source_no_counter_usage_batch48():
     """annotation_metrics 不直接用 Counter（import 了但没用）。"""
     src = inspect.getsource(am_mod)
@@ -439,22 +409,6 @@ def test_ast_chunk_boundary_has_used_pred_used_gt_set_batch48():
     src = ast.unparse(func)
     assert "used_pred = set()" in src
     assert "used_gt = set()" in src
-
-
-def test_ast_no_class_def_batch48():
-    tree = ast.parse(inspect.getsource(am_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_async_function_def_batch48():
-    tree = ast.parse(inspect.getsource(am_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
-
-
-def test_ast_module_docstring_batch48():
-    tree = ast.parse(inspect.getsource(am_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_top_level_assigns_count_batch48():

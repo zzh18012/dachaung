@@ -833,12 +833,6 @@ def test_module_dunder_all_len_5_batch11():
     assert len(smod.__all__) == 5
 
 
-def test_module_uses_future_annotations_batch11():
-    source = inspect.getsource(smod)
-    head = "\n".join(source.split("\n")[:20])
-    assert "from __future__ import annotations" in head
-
-
 def test_module_has_draft_validator_imported_batch11():
     assert hasattr(smod, "Draft202012Validator")
     assert smod.Draft202012Validator is Draft202012Validator

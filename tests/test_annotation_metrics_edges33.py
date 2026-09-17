@@ -83,16 +83,6 @@ def test_figure_caption_source_no_chunk_boundary_string():
 # ---------- chunk_boundary_prf source level 字符串精确补强第三批 ----------
 
 
-def test_chunk_boundary_source_uses_out_dict_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "out: dict[str, dict[str, Any]] = {}" in src
-
-
-def test_chunk_boundary_source_document_none_branch():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "if document is None:" in src
-
-
 def test_chunk_boundary_source_document_none_branch_creates_three_keys():
     src = inspect.getsource(chunk_boundary_prf)
     # 包含 4 个独立的 for-loop 给 out[k] 赋值（document None / no_annotation / <2 chunks / no anchors）
@@ -151,19 +141,9 @@ def test_chunk_boundary_source_stream_normalize():
     assert "stream = normalize_text(joined_raw)" in src
 
 
-def test_chunk_boundary_source_predicted_list_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "predicted: list[int] = []" in src
-
-
 def test_chunk_boundary_source_uses_enumerate():
     src = inspect.getsource(chunk_boundary_prf)
     assert "enumerate(norm_chunks)" in src
-
-
-def test_chunk_boundary_source_break_last_chunk():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "break" in src
 
 
 def test_chunk_boundary_source_uses_stream_find():
@@ -194,11 +174,6 @@ def test_chunk_boundary_source_predicted_append_end():
 def test_chunk_boundary_source_pos_end_plus_one():
     src = inspect.getsource(chunk_boundary_prf)
     assert "pos = end + 1" in src
-
-
-def test_chunk_boundary_source_gt_positions_list_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "gt_positions: list[int] = []" in src
 
 
 def test_chunk_boundary_source_missing_markers_list_init():
@@ -251,16 +226,6 @@ def test_chunk_boundary_source_gt_positions_after_append():
     assert "gt_positions.append(find_pos + len(marker))" in src
 
 
-def test_chunk_boundary_source_search_from_advance():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "search_from = find_pos + len(marker)" in src
-
-
-def test_chunk_boundary_source_pairs_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "pairs: list[tuple[int, int, int]] = []" in src
-
-
 def test_chunk_boundary_source_used_pred_used_gt_init():
     src = inspect.getsource(chunk_boundary_prf)
     assert "used_pred = set()" in src
@@ -271,11 +236,6 @@ def test_chunk_boundary_source_double_for_loop():
     src = inspect.getsource(chunk_boundary_prf)
     assert "for pi, pv in enumerate(predicted):" in src
     assert "for gi, gv in enumerate(gt_positions):" in src
-
-
-def test_chunk_boundary_source_distance_abs():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "d = abs(pv - gv)" in src
 
 
 def test_chunk_boundary_source_tolerance_check():
@@ -335,12 +295,6 @@ def test_chunk_boundary_source_recall_branch():
     src = inspect.getsource(chunk_boundary_prf)
     assert "if num_gt == 0:" in src
     assert 'out["chunk_boundary_recall"] = _ratio(matched / num_gt)' in src
-
-
-def test_chunk_boundary_source_f1_uses_p_val_r_val():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert 'p_val = out["chunk_boundary_precision"]["value"]' in src
-    assert 'r_val = out["chunk_boundary_recall"]["value"]' in src
 
 
 def test_chunk_boundary_source_f1_none_check():
@@ -919,12 +873,6 @@ def test_module_source_parser_does_not_emit_constant():
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
 
 
-def test_module_source_two_functions():
-    src = inspect.getsource(amod)
-    assert "def figure_caption_prf(" in src
-    assert "def chunk_boundary_prf(" in src
-
-
 def test_module_source_no_relative_import_above_app_or_eval():
     src = inspect.getsource(amod)
     lines = src.split("\n")
@@ -942,11 +890,6 @@ def test_module_source_no_star_import():
 def test_module_source_no_yield():
     src = inspect.getsource(amod)
     assert "yield" not in src
-
-
-def test_module_source_no_async_def():
-    src = inspect.getsource(amod)
-    assert "async def" not in src
 
 
 def test_module_source_no_walrus():
@@ -1215,10 +1158,6 @@ def test_module_namespace_callable_names():
     assert callables == {"figure_caption_prf", "chunk_boundary_prf"}
 
 
-def test_module_namespace_has_constant():
-    assert "PARSER_DOES_NOT_EMIT_RELATIONS" in vars(amod)
-
-
 def test_module_no_user_classes():
     classes = [
         (name, obj) for name, obj in vars(amod).items()
@@ -1229,10 +1168,6 @@ def test_module_no_user_classes():
 
 def test_module_name_is_evaluation_annotation_metrics():
     assert amod.__name__ == "evaluation.annotation_metrics"
-
-
-def test_module_file_ends_with_annotation_metrics_py():
-    assert amod.__file__.endswith("annotation_metrics.py")
 
 
 def test_module_function_module_eq_amod():
@@ -1323,14 +1258,6 @@ def test_e2e_chunk_boundary_does_not_mutate_annotation():
     assert repr(ann) == ann_before
 
 
-def test_e2e_chunk_boundary_idempotent():
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "a", "position": "after"}]}
-    r1 = chunk_boundary_prf(doc, ann)
-    r2 = chunk_boundary_prf(doc, ann)
-    assert r1 == r2
-
-
 def test_e2e_chunk_boundary_positional_args():
     doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
     ann = {"chunk_boundary_anchors": [{"marker": "a", "position": "after"}]}
@@ -1346,13 +1273,6 @@ def test_e2e_chunk_boundary_kwargs():
         document=doc, annotation=ann, tolerance_chars=10
     )
     assert r["_tolerance_chars"]["value"] == 10
-
-
-def test_e2e_chunk_boundary_default_tolerance():
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "a", "position": "after"}]}
-    r = chunk_boundary_prf(doc, ann)
-    assert r["_tolerance_chars"]["value"] == 30
 
 
 def test_e2e_chunk_boundary_empty_chunks_list():

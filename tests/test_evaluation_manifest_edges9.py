@@ -860,12 +860,6 @@ def test_load_manifest_invalid_json(tmp_path):
     assert "JSON 解析失败" in str(exc_info.value)
 
 
-def test_load_manifest_returns_manifest_instance(tmp_path):
-    p = _write_manifest(tmp_path)
-    m = load_manifest(p)
-    assert isinstance(m, Manifest)
-
-
 def test_load_manifest_manifest_version_propagated(tmp_path):
     p = _write_manifest(tmp_path, manifest_version="1.0")
     m = load_manifest(p)

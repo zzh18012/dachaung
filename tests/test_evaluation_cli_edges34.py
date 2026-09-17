@@ -150,13 +150,6 @@ def test_namespace_run_with_custom_tolerance():
     assert ns.tolerance_chars == 100
 
 
-def test_namespace_validate_report_command():
-    p = _build_parser()
-    ns = p.parse_args(["validate-report", "report.json"])
-    assert ns.command == "validate-report"
-    assert ns.input == "report.json"
-
-
 def test_namespace_inspect_doc_command():
     p = _build_parser()
     ns = p.parse_args(["inspect-doc", "doc.json"])
@@ -685,13 +678,6 @@ def test_e2e_run_subcommand_full_namespace():
     assert ns.parser == "kreuzberg"
     assert ns.max_chars == 1000
     assert ns.tolerance_chars == 50
-
-
-def test_e2e_validate_report_subcommand_namespace():
-    p = _build_parser()
-    ns = p.parse_args(["validate-report", "report.json"])
-    assert ns.command == "validate-report"
-    assert ns.input == "report.json"
 
 
 def test_e2e_inspect_doc_subcommand_namespace():

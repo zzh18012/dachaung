@@ -418,18 +418,6 @@ def test_module_source_forbidden_tokens_batch25():
         assert tok not in source, f"forbidden token in source: {tok}"
 
 
-def test_module_source_no_class_keyword_batch25():
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(amod))
-    classes = [n for n in tree.body if isinstance(n, _ast.ClassDef)]
-    assert classes == []
-
-
-def test_module_source_no_yield_batch25():
-    source = inspect.getsource(amod)
-    assert "yield " not in source
-
-
 def test_module_source_no_async_def_batch25():
     source = inspect.getsource(amod)
     assert "async def" not in source
@@ -460,24 +448,9 @@ def test_module_source_no_relative_imports_batch25():
             pytest.fail(f"relative import: {line}")
 
 
-def test_module_source_no_star_import_batch25():
-    source = inspect.getsource(amod)
-    assert "import *" not in source
-
-
 def test_module_source_no_subprocess_batch25():
     source = inspect.getsource(amod)
     assert "subprocess" not in source
-
-
-def test_module_source_no_dataclass_batch25():
-    source = inspect.getsource(amod)
-    assert "@dataclass" not in source
-
-
-def test_module_source_no_environ_batch25():
-    source = inspect.getsource(amod)
-    assert "os.environ" not in source
 
 
 def test_module_source_no_network_io_batch25():
@@ -528,26 +501,6 @@ def test_module_source_contains_tolerance_chars_param_batch25():
 def test_module_source_contains_default_30_batch25():
     source = inspect.getsource(amod)
     assert "tolerance_chars: int = 30" in source
-
-
-def test_module_source_contains_pipeline_failed_batch25():
-    source = inspect.getsource(amod)
-    assert '"pipeline_failed"' in source
-
-
-def test_module_source_contains_no_annotation_batch25():
-    source = inspect.getsource(amod)
-    assert '"no_annotation"' in source
-
-
-def test_module_source_contains_no_predicted_boundaries_batch25():
-    source = inspect.getsource(amod)
-    assert '"no_predicted_boundaries"' in source
-
-
-def test_module_source_contains_no_ground_truth_anchors_batch25():
-    source = inspect.getsource(amod)
-    assert '"no_ground_truth_anchors"' in source
 
 
 def test_module_source_contains_no_ground_truth_anchors_in_stream_batch25():
@@ -616,10 +569,6 @@ def test_signature_chunk_boundary_prf_tolerance_int_batch25():
 def test_signature_chunk_boundary_prf_return_annotation_batch25():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.return_annotation == "dict[str, dict[str, Any]]"
-
-
-def test_signature_figure_caption_prf_docstring_present_batch25():
-    assert figure_caption_prf.__doc__ is not None
 
 
 def test_signature_chunk_boundary_prf_docstring_present_batch25():

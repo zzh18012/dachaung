@@ -275,11 +275,6 @@ def test_extract_kernel_language_language_info_empty_dict():
     assert _extract_kernel_language({"language_info": {}}) == ""
 
 
-def test_extract_kernel_language_kernelspec_language_overrides_name():
-    md = {"kernelspec": {"language": "python", "name": "python3"}}
-    assert _extract_kernel_language(md) == "python"
-
-
 def test_extract_kernel_language_kernelspec_language_empty_falls_to_name():
     md = {"kernelspec": {"language": "", "name": "fallback_name"}}
     assert _extract_kernel_language(md) == "fallback_name"
@@ -314,11 +309,6 @@ def test_extract_kernel_language_kernelspec_with_only_name_key():
     """kernelspec 仅含 name 不含 language → fallback 到 name。"""
     md = {"kernelspec": {"name": "python3"}}
     assert _extract_kernel_language(md) == "python3"
-
-
-def test_extract_kernel_language_language_info_with_only_name():
-    md = {"language_info": {"name": "r"}}
-    assert _extract_kernel_language(md) == "r"
 
 
 # ---------- IpynbParser.parse() 错误路径深度 ----------

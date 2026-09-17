@@ -211,11 +211,6 @@ def test_chunk_boundary_prf_document_some_annotation_empty_batch44():
     assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 
-def test_chunk_boundary_prf_document_some_annotation_none_batch44():
-    out = chunk_boundary_prf({"chunks": []}, None)
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_annotation_empty_dict_batch44():
     out = chunk_boundary_prf({"chunks": [{"text": "a"}]}, {})
     assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
@@ -275,11 +270,6 @@ def test_chunk_boundary_prf_no_chunks_key_batch44():
 def test_chunk_boundary_prf_tolerance_chars_recorded_batch44():
     out = chunk_boundary_prf(None, None, tolerance_chars=42)
     assert out["_tolerance_chars"]["value"] == 42
-
-
-def test_chunk_boundary_prf_tolerance_chars_zero_batch44():
-    out = chunk_boundary_prf(None, None, tolerance_chars=0)
-    assert out["_tolerance_chars"]["value"] == 0
 
 
 def test_chunk_boundary_prf_tolerance_chars_negative_batch44():
@@ -664,11 +654,6 @@ def test_module_has_figure_caption_prf_attr_batch44():
 
 def test_module_has_chunk_boundary_prf_attr_batch44():
     assert hasattr(amod, "chunk_boundary_prf")
-
-
-def test_module_functions_callable_batch44():
-    assert callable(amod.figure_caption_prf)
-    assert callable(amod.chunk_boundary_prf)
 
 
 # ---------- 端到端集成 第四十四批

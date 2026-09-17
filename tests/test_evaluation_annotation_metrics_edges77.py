@@ -410,10 +410,6 @@ def test_parser_does_not_emit_relations_constant_uses_underscore_batch52():
     assert PARSER_DOES_NOT_EMIT_RELATIONS.count("_") >= 4
 
 
-def test_parser_does_not_emit_relations_lowercase_batch52():
-    assert PARSER_DOES_NOT_EMIT_RELATIONS.islower()
-
-
 def test_parser_does_not_emit_relations_module_level_batch52():
     tree = ast.parse(inspect.getsource(ann_mod))
     found = False
@@ -686,58 +682,9 @@ def test_ast_chunk_boundary_has_dict_in_returns_batch52():
     assert len(return_outs) >= 3  # pipeline_failed, no_annotation, no_predicted_boundaries, no_ground_truth_anchors 等
 
 
-def test_ast_no_class_def_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_async_function_def_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
-
-
-def test_ast_no_global_nonlocal_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
-
-
-def test_ast_no_with_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    assert not any(isinstance(n, ast.With) for n in ast.walk(tree))
-
-
-def test_ast_no_try_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    assert not any(isinstance(n, ast.Try) for n in ast.walk(tree))
-
-
-def test_ast_no_while_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    assert not any(isinstance(n, ast.While) for n in ast.walk(tree))
-
-
-def test_ast_no_raise_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    assert not any(isinstance(n, ast.Raise) for n in ast.walk(tree))
-
-
 def test_ast_no_delete_batch52():
     tree = ast.parse(inspect.getsource(ann_mod))
     assert not any(isinstance(n, ast.Delete) for n in ast.walk(tree))
-
-
-def test_ast_no_star_import_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    for n in tree.body:
-        if isinstance(n, ast.ImportFrom):
-            for alias in n.names:
-                assert alias.name != "*"
-
-
-def test_ast_module_docstring_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_module_has_2_assigns_batch52():

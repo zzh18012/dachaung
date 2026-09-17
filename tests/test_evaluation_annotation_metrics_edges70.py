@@ -461,12 +461,6 @@ def test_all_entries_are_attrs_batch44():
 
 # ---------- AST 结构 ----------
 
-def test_ast_top_level_no_class_batch44():
-    tree = ast.parse(inspect.getsource(anno_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_top_level_function_count_batch44():
     tree = ast.parse(inspect.getsource(anno_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]

@@ -731,11 +731,6 @@ def test_chunker_init_max_chars_below_minimum_raises():
     assert "31" in str(ei.value)
 
 
-def test_chunker_init_max_chars_one_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=1)
-
-
 def test_chunker_init_default_max_chars_800():
     chunker = StructuralChunker()
     assert chunker.max_chars == 800

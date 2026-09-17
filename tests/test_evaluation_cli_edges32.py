@@ -1175,14 +1175,6 @@ def test_module_namespace_has_run_inspect_doc():
     assert callable(cli_mod._run_inspect_doc)
 
 
-def test_module_no_classes_user_defined():
-    classes = [
-        name for name, val in vars(cli_mod).items()
-        if isinstance(val, type) and val.__module__ == cli_mod.__name__
-    ]
-    assert classes == []
-
-
 def test_module_imports_argparse():
     import argparse as _argparse
     assert cli_mod.argparse is _argparse

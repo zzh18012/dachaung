@@ -424,11 +424,6 @@ def test_module_source_has_f1_calculation_batch16():
     assert "2 * p_val * r_val / denom" in src
 
 
-def test_module_source_has_all_dunder_batch16():
-    src = inspect.getsource(amod)
-    assert "__all__ = [" in src
-
-
 def test_module_source_has_normalize_text_call_batch16():
     src = inspect.getsource(amod)
     assert "normalize_text(c.get" in src

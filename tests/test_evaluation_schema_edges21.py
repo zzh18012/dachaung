@@ -595,16 +595,6 @@ def test_module_source_validate_file_uses_path_constructor():
     assert "p = Path(path)" in src
 
 
-def test_module_source_validate_file_checks_isfile():
-    src = inspect.getsource(smod)
-    assert "p.is_file()" in src
-
-
-def test_module_source_validate_file_raises_filenotfounderror():
-    src = inspect.getsource(smod)
-    assert "raise FileNotFoundError" in src
-
-
 def test_module_source_validate_file_calls_validate():
     src = inspect.getsource(smod)
     assert "validate(data, schema_name)" in src

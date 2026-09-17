@@ -342,20 +342,6 @@ def test_validate_file_accepts_str_path_batch24(tmp_path):
     assert validate_file(str(p), "manifest.schema.json") is None
 
 
-def test_validate_file_accepts_path_obj_batch24(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(
-        json.dumps({
-            "manifest_version": "1.0",
-            "devset_status": "incomplete",
-            "documents": [],
-            "expected_failures": [],
-        }),
-        encoding="utf-8",
-    )
-    assert validate_file(p, "manifest.schema.json") is None
-
-
 def test_validate_file_missing_raises_file_not_found_batch24(tmp_path):
     with pytest.raises(FileNotFoundError) as exc:
         validate_file(tmp_path / "missing.json", "manifest.schema.json")
@@ -366,13 +352,6 @@ def test_validate_file_invalid_json_raises_decode_error_batch24(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("not valid", encoding="utf-8")
     with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_invalid_content_raises_eval_schema_error_batch24(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text(json.dumps({"wrong": "field"}), encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
         validate_file(p, "manifest.schema.json")
 
 

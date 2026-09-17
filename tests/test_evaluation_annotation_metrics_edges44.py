@@ -519,11 +519,6 @@ def test_module_source_has_no_ground_truth_anchors_batch17():
     assert '"no_ground_truth_anchors"' in src
 
 
-def test_module_source_has_all_dunder_batch17():
-    src = inspect.getsource(amod)
-    assert "__all__ = [" in src
-
-
 def test_module_source_all_has_3_items_batch17():
     src = inspect.getsource(amod)
     for name in ['"PARSER_DOES_NOT_EMIT_RELATIONS"',
@@ -551,29 +546,12 @@ def test_signature_chunk_boundary_prf_tolerance_default_30_batch17():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_signature_figure_caption_prf_no_varargs_batch17():
-    sig = inspect.signature(figure_caption_prf)
-    for p in sig.parameters.values():
-        assert p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)
-
-
-def test_signature_chunk_boundary_prf_no_varargs_batch17():
-    sig = inspect.signature(chunk_boundary_prf)
-    for p in sig.parameters.values():
-        assert p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)
-
-
 # ---------- module 合理性第三十批 ----------
 
 
 def test_module_has_all_attribute_batch17():
     assert hasattr(amod, "__all__")
     assert isinstance(amod.__all__, list)
-
-
-def test_module_all_items_in_namespace_batch17():
-    for name in amod.__all__:
-        assert hasattr(amod, name)
 
 
 def test_module_all_count_3_batch17():

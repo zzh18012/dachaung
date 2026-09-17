@@ -102,12 +102,6 @@ def test_figure_caption_prf_reason_all_same_batch43():
         assert v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
 
 
-def test_figure_caption_prf_value_all_none_batch43():
-    out = figure_caption_prf(None, None)
-    for k, v in out.items():
-        assert v["value"] is None
-
-
 def test_figure_caption_prf_ignores_document_batch43():
     """document 即使非 None 也不读。"""
     doc = {"chunks": [{"text": "abc", "source_element_ids": ["e1"]}]}

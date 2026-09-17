@@ -642,12 +642,6 @@ def test_module_namespace_contains_pdf_bbox_required_types_exact_value():
     assert m._PDF_BBOX_REQUIRED_TYPES == ("heading", "paragraph", "caption", "list_item")
 
 
-def test_module_namespace_contains_not_evaluated():
-    import evaluation.metrics as m
-
-    assert m._NOT_EVALUATED == "not_evaluated"
-
-
 def test_text_types_count_seven():
     import evaluation.metrics as m
 

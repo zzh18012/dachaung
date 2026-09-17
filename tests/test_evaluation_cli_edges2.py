@@ -641,12 +641,6 @@ def test_main_returns_2_for_unknown_command():
     assert exc.value.code == 2
 
 
-def test_main_returns_2_for_no_command():
-    with pytest.raises(SystemExit) as exc:
-        main([])
-    assert exc.value.code == 2
-
-
 def test_main_returns_int_type_for_run(tmp_path: Path):
     out = tmp_path / "out.json"
     rc = main(["run", "--manifest", str(tmp_path / "missing.json"), "--output", str(out)])

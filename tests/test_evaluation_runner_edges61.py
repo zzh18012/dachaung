@@ -66,11 +66,6 @@ def test_load_annotation_signature_batch33():
     assert params == ["path"]
 
 
-def test_load_annotation_return_annotation_batch33():
-    sig = inspect.signature(_load_annotation)
-    assert sig.return_annotation == "dict[str, Any] | None"
-
-
 def test_load_annotation_dict_value_batch33(tmp_path):
     """返回的 dict 包含完整 JSON 内容。"""
     p = tmp_path / "ann.json"
@@ -535,11 +530,6 @@ def test_signature_run_evaluation_params_batch33():
     sig = inspect.signature(run_evaluation)
     params = list(sig.parameters.keys())
     assert params == ["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]
-
-
-def test_signature_load_annotation_return_dict_or_none_batch33():
-    sig = inspect.signature(_load_annotation)
-    assert sig.return_annotation == "dict[str, Any] | None"
 
 
 # ---------- module 合理性第四十九批

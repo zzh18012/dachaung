@@ -470,14 +470,6 @@ def test_module_source_contains_tolerance_chars_param_batch33():
     assert "tolerance_chars" in src
 
 
-def test_module_source_contains_all_batch33():
-    src = inspect.getsource(amod)
-    assert "__all__" in src
-    assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-    assert '"figure_caption_prf"' in src
-    assert '"chunk_boundary_prf"' in src
-
-
 # ---------- signatures 第四十八批
 
 

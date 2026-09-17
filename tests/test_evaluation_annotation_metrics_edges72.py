@@ -533,11 +533,6 @@ def test_source_contains_one_to_one_batch47():
     assert "一对一" in src
 
 
-def test_source_contains_search_from_batch47():
-    src = inspect.getsource(am_mod)
-    assert "search_from" in src
-
-
 def test_source_contains_missing_markers_batch47():
     src = inspect.getsource(am_mod)
     assert "missing_markers" in src
@@ -703,11 +698,6 @@ def test_source_no_pickle_load_batch47():
 def test_source_no_subprocess_batch47():
     src = inspect.getsource(am_mod)
     assert "subprocess" not in src
-
-
-def test_source_no_yield_batch47():
-    src = inspect.getsource(am_mod)
-    assert "yield" not in src
 
 
 def test_source_no_walrus_batch47():

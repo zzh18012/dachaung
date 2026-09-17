@@ -409,17 +409,6 @@ def test_validate_file_str_path(tmp_path):
     assert validate_file(str(p), "manifest.schema.json") is None
 
 
-def test_validate_file_path_object(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }), encoding="utf-8")
-    assert validate_file(p, "manifest.schema.json") is None
-
-
 def test_validate_file_missing_raises(tmp_path):
     with pytest.raises(FileNotFoundError):
         validate_file(tmp_path / "missing.json", "manifest.schema.json")
@@ -446,18 +435,6 @@ def test_validate_file_unknown_schema_name_raises(tmp_path):
         validate_file(p, "unknown.schema.json")
 
 
-def test_validate_file_idempotent(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }), encoding="utf-8")
-    assert validate_file(p, "manifest.schema.json") is None
-    assert validate_file(p, "manifest.schema.json") is None
-
-
 def test_validate_file_does_not_modify_file(tmp_path):
     p = tmp_path / "m.json"
     content = json.dumps({
@@ -469,17 +446,6 @@ def test_validate_file_does_not_modify_file(tmp_path):
     p.write_text(content, encoding="utf-8")
     validate_file(p, "manifest.schema.json")
     assert p.read_text(encoding="utf-8") == content
-
-
-def test_validate_file_positional(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }), encoding="utf-8")
-    assert validate_file(p, "manifest.schema.json") is None
 
 
 def test_validate_file_keyword_args(tmp_path):

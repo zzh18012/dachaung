@@ -735,11 +735,6 @@ def test_module_source_forbidden_tokens_fourth_batch(token):
 # ---------- module source 字符串精确补强 ----------
 
 
-def test_module_source_has_from_future():
-    src = inspect.getsource(cli_mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_module_source_imports_argparse():
     src = inspect.getsource(cli_mod)
     assert "import argparse" in src
@@ -856,11 +851,6 @@ def test_module_source_docstring_mentions_validate_report():
 def test_module_source_docstring_mentions_inspect_doc():
     src = inspect.getsource(cli_mod)
     assert "inspect-doc" in src
-
-
-def test_module_source_has_main_block():
-    src = inspect.getsource(cli_mod)
-    assert 'if __name__ == "__main__":' in src
 
 
 def test_module_source_main_block_uses_systemexit():

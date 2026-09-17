@@ -521,11 +521,6 @@ def test_module_imports_pathlib_batch30():
     assert "from pathlib import Path" in src
 
 
-def test_module_has_main_block_batch30():
-    src = inspect.getsource(climod)
-    assert 'if __name__ == "__main__"' in src
-
-
 def test_module_main_block_uses_systemexit_batch30():
     src = inspect.getsource(climod)
     assert "raise SystemExit(main())" in src

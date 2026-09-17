@@ -89,10 +89,6 @@ def test_part_constants_values():
     assert _PART_END == 3
 
 
-def test_part_constants_distinct():
-    assert len({_PART_TEXT, _PART_ELEMENT_ID, _PART_START, _PART_END}) == 4
-
-
 # =========================================================================
 # _SplitPiece frozen dataclass
 # =========================================================================
@@ -100,12 +96,6 @@ def test_part_constants_distinct():
 
 def test_split_piece_is_dataclass():
     assert is_dataclass(_SplitPiece)
-
-
-def test_split_piece_is_frozen():
-    p = _SplitPiece(text="x", boundary_after=None)
-    with pytest.raises(FrozenInstanceError):
-        p.text = "y"
 
 
 def test_split_piece_field_count():
@@ -862,16 +852,8 @@ def test_normalize_text_empty_returns_empty():
     assert normalize_text("") == ""
 
 
-def test_normalize_text_none_returns_empty():
-    assert normalize_text(None) == ""  # type: ignore[arg-type]
-
-
 def test_normalize_text_no_whitespace_returns_unchanged():
     assert normalize_text("hello") == "hello"
-
-
-def test_normalize_text_collapses_whitespace():
-    assert normalize_text("hello   world") == "hello world"
 
 
 def test_normalize_text_collapses_newlines():

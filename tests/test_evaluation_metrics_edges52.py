@@ -625,13 +625,6 @@ def test_module_source_forbidden_tokens_batch26():
         assert tok not in source, f"forbidden token in source: {tok}"
 
 
-def test_module_source_no_class_keyword_batch26():
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(mmod))
-    classes = [n for n in tree.body if isinstance(n, _ast.ClassDef)]
-    assert classes == []
-
-
 def test_module_source_no_yield_batch26():
     source = inspect.getsource(mmod)
     assert "yield " not in source

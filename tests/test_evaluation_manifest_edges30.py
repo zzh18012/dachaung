@@ -709,17 +709,6 @@ def test_load_manifest_with_expected_failure(tmp_path):
     assert m.expected_failures[0].expected_error_code == "parse_failed"
 
 
-def test_load_manifest_returns_manifest_instance(tmp_path):
-    p = _write_manifest(tmp_path, {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    })
-    m = load_manifest(p, project_root=tmp_path)
-    assert isinstance(m, Manifest)
-
-
 def test_load_manifest_documents_is_tuple(tmp_path):
     p = _write_manifest(tmp_path, {
         "manifest_version": "1.0",
@@ -762,17 +751,6 @@ def test_load_manifest_paired_with_default_none(tmp_path):
     })
     m = load_manifest(p, project_root=tmp_path)
     assert m.documents[0].paired_with is None
-
-
-def test_load_manifest_sha256_default_none(tmp_path):
-    p = _write_manifest(tmp_path, {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [{"doc_id": "x", "path": "samples/foo.pdf", "source_type": "pdf"}],
-        "expected_failures": [],
-    })
-    m = load_manifest(p, project_root=tmp_path)
-    assert m.documents[0].sha256 is None
 
 
 # ---------- module source forbidden tokens 第五批 ----------

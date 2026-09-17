@@ -543,13 +543,6 @@ def test_load_manifest_backslash_path_rejected_batch39(tmp_path):
         load_manifest(mp, project_root=tmp_path)
 
 
-def test_load_manifest_idempotent_batch39(tmp_path):
-    mp = _make_manifest_json(tmp_path)
-    m1 = load_manifest(mp, project_root=tmp_path)
-    m2 = load_manifest(mp, project_root=tmp_path)
-    assert m1 == m2
-
-
 def test_load_manifest_empty_documents_batch39(tmp_path):
     mp = _make_manifest_json(tmp_path, documents=[])
     m = load_manifest(mp, project_root=tmp_path)
@@ -981,13 +974,6 @@ def test_e2e_load_manifest_does_not_write_to_disk_batch39(tmp_path):
     load_manifest(mp, project_root=tmp_path)
     after = mp.read_text(encoding="utf-8")
     assert before == after
-
-
-def test_e2e_idempotent_load_batch39(tmp_path):
-    mp = _make_manifest_json(tmp_path)
-    m1 = load_manifest(mp, project_root=tmp_path)
-    m2 = load_manifest(mp, project_root=tmp_path)
-    assert m1 == m2
 
 
 def test_e2e_categories_with_mixed_case_batch39(tmp_path):

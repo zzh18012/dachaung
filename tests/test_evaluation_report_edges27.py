@@ -1046,13 +1046,6 @@ def test_e2e_aggregate_summary_kwargs_call_batch10():
     assert out1 == out2
 
 
-def test_e2e_build_devset_section_round_trip_batch10():
-    out = build_devset_section(_StubManifest2())
-    text = json.dumps(out)
-    parsed = json.loads(text)
-    assert parsed == out
-
-
 def test_e2e_build_provenance_does_not_raise_on_real_call_batch10():
     out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
     assert isinstance(out, dict)

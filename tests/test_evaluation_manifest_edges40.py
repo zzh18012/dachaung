@@ -1151,12 +1151,6 @@ def test_module_docstring_mentions_invariants_batch13():
     assert "相对路径" in mmod.__doc__ or "absolute" in mmod.__doc__
 
 
-def test_module_uses_future_annotations_batch13():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:20])
-    assert "from __future__ import annotations" in head
-
-
 def test_module_top_level_user_class_count_4_batch13():
     """顶层用户类 4 个：ManifestError + 3 个 dataclass。"""
     classes = [

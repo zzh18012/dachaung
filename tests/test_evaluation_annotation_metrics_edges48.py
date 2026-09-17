@@ -113,22 +113,11 @@ def test_chunk_boundary_prf_tolerance_default_30_batch21():
     assert out["_tolerance_chars"]["value"] == 30
 
 
-def test_chunk_boundary_prf_tolerance_passed_through_batch21():
-    out = chunk_boundary_prf(None, None, tolerance_chars=99)
-    assert out["_tolerance_chars"]["value"] == 99
-
-
 def test_chunk_boundary_prf_document_none_returns_pipeline_failed_batch21():
     out = chunk_boundary_prf(None, {"chunk_boundary_anchors": []})
     assert out["chunk_boundary_precision"]["reason"] == "pipeline_failed"
     assert out["chunk_boundary_recall"]["reason"] == "pipeline_failed"
     assert out["chunk_boundary_f1"]["reason"] == "pipeline_failed"
-
-
-def test_chunk_boundary_prf_annotation_empty_returns_no_annotation_batch21():
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
-    out = chunk_boundary_prf(doc, {})
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 
 def test_chunk_boundary_prf_annotation_is_none_returns_no_annotation_batch21():
@@ -391,11 +380,6 @@ def test_module_source_no_threading_import_batch21():
     assert "import threading" not in src
 
 
-def test_module_source_no_multiprocessing_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import multiprocessing" not in src
-
-
 def test_module_source_no_asyncio_import_batch21():
     src = inspect.getsource(amod)
     assert "import asyncio" not in src
@@ -409,11 +393,6 @@ def test_module_source_no_shutil_import_batch21():
 def test_module_source_no_tempfile_import_batch21():
     src = inspect.getsource(amod)
     assert "import tempfile" not in src
-
-
-def test_module_source_no_sys_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import sys" not in src
 
 
 def test_module_source_no_logging_import_batch21():
@@ -576,12 +555,6 @@ def test_module_all_contents_batch21():
         "figure_caption_prf",
         "chunk_boundary_prf",
     }
-
-
-def test_module_does_not_import_app_pipeline_batch21():
-    src = inspect.getsource(amod)
-    assert "from app.pipeline" not in src
-    assert "from app import pipeline" not in src
 
 
 def test_module_does_not_import_evaluation_runner_batch21():

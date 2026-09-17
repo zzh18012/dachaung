@@ -429,17 +429,6 @@ def test_module_source_forbidden_tokens_batch26():
         assert tok not in source, f"forbidden token: {tok}"
 
 
-def test_module_source_no_eval_exec_batch26():
-    source = inspect.getsource(amod)
-    assert "eval(" not in source
-    assert "exec(" not in source
-
-
-def test_module_source_no_star_import_batch26():
-    source = inspect.getsource(amod)
-    assert "import *" not in source
-
-
 def test_module_source_no_relative_imports_batch26():
     source = inspect.getsource(amod)
     assert "from ." not in source
@@ -451,11 +440,6 @@ def test_module_source_no_unsafe_network_batch26():
         assert tok not in source
 
 
-def test_module_source_no_environ_batch26():
-    source = inspect.getsource(amod)
-    assert "os.environ" not in source
-
-
 def test_module_source_no_subprocess_batch26():
     source = inspect.getsource(amod)
     assert "subprocess" not in source
@@ -464,18 +448,6 @@ def test_module_source_no_subprocess_batch26():
 def test_module_source_no_argparse_batch26():
     source = inspect.getsource(amod)
     assert "argparse" not in source
-
-
-def test_module_source_no_dataclass_batch26():
-    source = inspect.getsource(amod)
-    assert "@dataclass" not in source
-
-
-def test_module_source_no_class_keyword_batch26():
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(amod))
-    classes = [n for n in tree.body if isinstance(n, _ast.ClassDef)]
-    assert classes == []
 
 
 def test_module_source_uses_from_future_annotations_batch26():
@@ -510,26 +482,6 @@ def test_module_source_contains_figure_caption_prf_batch26():
 def test_module_source_contains_chunk_boundary_prf_batch26():
     source = inspect.getsource(amod)
     assert "def chunk_boundary_prf" in source
-
-
-def test_module_source_contains_pipeline_failed_batch26():
-    source = inspect.getsource(amod)
-    assert "pipeline_failed" in source
-
-
-def test_module_source_contains_no_annotation_batch26():
-    source = inspect.getsource(amod)
-    assert "no_annotation" in source
-
-
-def test_module_source_contains_no_predicted_boundaries_batch26():
-    source = inspect.getsource(amod)
-    assert "no_predicted_boundaries" in source
-
-
-def test_module_source_contains_no_ground_truth_anchors_batch26():
-    source = inspect.getsource(amod)
-    assert "no_ground_truth_anchors" in source
 
 
 def test_module_source_contains_no_ground_truth_anchors_in_stream_batch26():
@@ -612,28 +564,12 @@ def test_signature_figure_caption_prf_return_annotation_batch26():
     assert "dict" in sig.return_annotation
 
 
-def test_signature_chunk_boundary_prf_no_varargs_batch26():
-    sig = inspect.signature(chunk_boundary_prf)
-    for p in sig.parameters.values():
-        assert p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)
-
-
-def test_signature_figure_caption_prf_no_varargs_batch26():
-    sig = inspect.signature(figure_caption_prf)
-    for p in sig.parameters.values():
-        assert p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)
-
-
 def test_signature_all_annotations_are_strings_batch26():
     for fn in [figure_caption_prf, chunk_boundary_prf]:
         sig = inspect.signature(fn)
         for p in sig.parameters.values():
             if p.annotation is not inspect.Parameter.empty:
                 assert isinstance(p.annotation, str), f"{fn.__name__}.{p.name}"
-
-
-def test_signature_figure_caption_prf_docstring_present_batch26():
-    assert figure_caption_prf.__doc__ is not None
 
 
 def test_signature_chunk_boundary_prf_docstring_present_batch26():
@@ -660,13 +596,6 @@ def test_module_has_two_functions_batch26():
     tree = _ast.parse(inspect.getsource(amod))
     funcs = [n.name for n in tree.body if isinstance(n, _ast.FunctionDef)]
     assert set(funcs) == {"figure_caption_prf", "chunk_boundary_prf"}
-
-
-def test_module_no_classes_batch26():
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(amod))
-    classes = [n for n in tree.body if isinstance(n, _ast.ClassDef)]
-    assert classes == []
 
 
 def test_module_docstring_present_batch26():
@@ -699,11 +628,6 @@ def test_module_constants_only_parser_const_batch26():
         and not n.targets[0].id.startswith("_")
     ]
     assert constants == ["PARSER_DOES_NOT_EMIT_RELATIONS"]
-
-
-def test_module_all_entries_accessible_batch26():
-    for name in amod.__all__:
-        assert hasattr(amod, name)
 
 
 # ---------- 端到端集成第三十八批 ----------

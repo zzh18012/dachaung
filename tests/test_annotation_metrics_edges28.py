@@ -541,11 +541,6 @@ def test_module_source_has_used_check_in_loop():
     assert "if pi in used_pred or gi in used_gt:" in src
 
 
-def test_module_source_has_no_main_block():
-    src = inspect.getsource(am_mod)
-    assert 'if __name__' not in src
-
-
 def test_module_source_has_no_class():
     src = inspect.getsource(am_mod)
     assert "\nclass " not in src

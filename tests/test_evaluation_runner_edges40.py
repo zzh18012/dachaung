@@ -1003,13 +1003,6 @@ def test_load_annotation_return_annotation_batch13():
     assert "None" in ret_str
 
 
-def test_process_one_signature_4_params_batch13():
-    sig = inspect.signature(_process_one)
-    params = list(sig.parameters.values())
-    assert len(params) == 4
-    assert [p.name for p in params] == ["doc", "output_root", "parser_name", "max_chars"]
-
-
 def test_process_one_return_annotation_5_tuple_batch13():
     sig = inspect.signature(_process_one)
     ret = sig.return_annotation

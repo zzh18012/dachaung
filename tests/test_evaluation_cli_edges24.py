@@ -775,11 +775,6 @@ def test_module_source_has_try_except_attribute_error_oserror():
 # =========================================================================
 
 
-def test_module_source_has_main_block():
-    src = inspect.getsource(climod)
-    assert 'if __name__ == "__main__":' in src
-
-
 def test_module_source_has_system_exit_main():
     src = inspect.getsource(climod)
     assert "raise SystemExit(main())" in src

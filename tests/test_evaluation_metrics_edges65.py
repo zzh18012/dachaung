@@ -1076,19 +1076,6 @@ def test_e2e_compute_metrics_text_preservation_with_strip_batch39():
     assert out["text_char_multiset_recall"]["value"] == 1.0
 
 
-def test_e2e_compute_metrics_idempotent_batch39():
-    doc = {
-        "document_id": "d1",
-        "source_type": "pdf",
-        "elements": [{"type": "paragraph", "content": "abc", "element_id": "e1",
-                      "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}}],
-        "chunks": [{"text": "abc", "source_element_ids": ["e1"]}],
-    }
-    m1 = compute_automatic_metrics(doc, None, "pdf", None)
-    m2 = compute_automatic_metrics(doc, None, "pdf", None)
-    assert m1 == m2
-
-
 def test_e2e_compute_metrics_json_serializable_batch39():
     """输出全 JSON serializable。"""
     doc = {

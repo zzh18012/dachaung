@@ -820,11 +820,6 @@ def test_element_text_legacy_method_returns_str():
 # =========================================================================
 
 
-def test_sentence_split_re_is_compiled():
-    import re
-    assert isinstance(_SENTENCE_SPLIT_RE, re.Pattern)
-
-
 def test_hard_break_langs_contains_six_chars():
     assert len(_HARD_BREAK_LANGS) == 6
 

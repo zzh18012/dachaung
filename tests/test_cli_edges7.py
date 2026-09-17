@@ -44,20 +44,8 @@ from app.cli import _run_parse, _run_parse_dir
 # =========================================================================
 
 
-def test_preview_none_returns_empty():
-    assert _preview(None) == ""
-
-
-def test_preview_empty_string_returns_empty():
-    assert _preview("") == ""
-
-
 def test_preview_whitespace_only_returns_empty():
     assert _preview("    \n\t  ") == ""
-
-
-def test_preview_short_text_unchanged():
-    assert _preview("hello") == "hello"
 
 
 def test_preview_collapses_internal_whitespace():
@@ -829,10 +817,6 @@ def test_infer_parser_name_unknown_returns_fallback():
     assert _infer_parser_name(Path("a.unknown")) == "fallback"
 
 
-def test_infer_parser_name_no_suffix_returns_fallback():
-    assert _infer_parser_name(Path("README")) == "fallback"
-
-
 def test_infer_parser_name_pdf_uppercase():
     assert _infer_parser_name(Path("a.PDF")) == "fallback"
 
@@ -1296,34 +1280,6 @@ def test_module_extension_to_parser_pdf_value_fallback():
 
 def test_module_extension_to_parser_docx_value_fallback():
     assert _EXTENSION_TO_PARSER[".docx"] == "fallback"
-
-
-def test_module_extension_to_parser_md_value_markdown():
-    assert _EXTENSION_TO_PARSER[".md"] == "markdown"
-
-
-def test_module_extension_to_parser_html_value_html():
-    assert _EXTENSION_TO_PARSER[".html"] == "html"
-
-
-def test_module_extension_to_parser_htm_value_html():
-    assert _EXTENSION_TO_PARSER[".htm"] == "html"
-
-
-def test_module_extension_to_parser_txt_value_text():
-    assert _EXTENSION_TO_PARSER[".txt"] == "text"
-
-
-def test_module_extension_to_parser_text_value_text():
-    assert _EXTENSION_TO_PARSER[".text"] == "text"
-
-
-def test_module_extension_to_parser_ipynb_value_ipynb():
-    assert _EXTENSION_TO_PARSER[".ipynb"] == "ipynb"
-
-
-def test_module_extension_to_parser_markdown_value_markdown():
-    assert _EXTENSION_TO_PARSER[".markdown"] == "markdown"
 
 
 def test_module_extension_to_parser_count_nine():

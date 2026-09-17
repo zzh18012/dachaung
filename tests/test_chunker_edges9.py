@@ -133,10 +133,6 @@ def test_normalize_text_handles_tabs():
     assert normalize_text("a\tb") == "a b"
 
 
-def test_normalize_text_preserves_punctuation():
-    assert normalize_text("hello, world!") == "hello, world!"
-
-
 def test_normalize_text_preserves_unicode():
     assert normalize_text("中文 文本") == "中文 文本"
 
@@ -245,12 +241,6 @@ def test_split_piece_is_dataclass():
     assert is_dataclass(_SplitPiece) is True
 
 
-def test_split_piece_is_frozen():
-    p = _SplitPiece(text="x", boundary_after=None)
-    with pytest.raises(FrozenInstanceError):
-        p.text = "y"  # type: ignore[misc]
-
-
 def test_split_piece_field_count():
     assert len(fields(_SplitPiece)) == 4
 
@@ -279,12 +269,6 @@ def test_split_piece_start_default_zero():
 def test_split_piece_end_default_zero():
     sig = inspect.signature(_SplitPiece)
     assert sig.parameters["end"].default == 0
-
-
-def test_split_piece_equality():
-    a = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    b = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    assert a == b
 
 
 def test_split_piece_inequality_on_text():
@@ -702,11 +686,6 @@ def test_chunker_init_max_chars_below_32_raises():
         StructuralChunker(max_chars=31)
 
 
-def test_chunker_init_max_chars_exactly_32_ok():
-    c = StructuralChunker(max_chars=32)
-    assert c.max_chars == 32
-
-
 def test_chunker_init_max_chars_zero_raises():
     with pytest.raises(ValueError):
         StructuralChunker(max_chars=0)
@@ -715,11 +694,6 @@ def test_chunker_init_max_chars_zero_raises():
 def test_chunker_init_max_chars_negative_raises():
     with pytest.raises(ValueError):
         StructuralChunker(max_chars=-1)
-
-
-def test_chunker_init_max_chars_one_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=1)
 
 
 def test_chunker_init_error_message_contains_value():

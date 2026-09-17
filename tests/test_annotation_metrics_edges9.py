@@ -587,15 +587,6 @@ def test_chunk_boundary_prf_internal_keys_prefixed_with_underscore():
 # =========================================================================
 
 
-def test_module_all_exact_set():
-    import evaluation.annotation_metrics as m
-    assert set(m.__all__) == {
-        "PARSER_DOES_NOT_EMIT_RELATIONS",
-        "figure_caption_prf",
-        "chunk_boundary_prf",
-    }
-
-
 def test_module_all_is_list():
     import evaluation.annotation_metrics as m
     assert isinstance(m.__all__, list)
@@ -604,11 +595,6 @@ def test_module_all_is_list():
 def test_module_all_length_three():
     import evaluation.annotation_metrics as m
     assert len(m.__all__) == 3
-
-
-def test_module_imports_counter():
-    import evaluation.annotation_metrics as m
-    assert hasattr(m, "Counter")
 
 
 def test_module_imports_any():
@@ -651,12 +637,6 @@ def test_module_docstring_mentions_constraints():
     assert "tolerance" in doc.lower()
 
 
-def test_module_uses_future_annotations():
-    import evaluation.annotation_metrics as m
-    sig = inspect.signature(m.chunk_boundary_prf)
-    assert isinstance(sig.return_annotation, str)
-
-
 def test_module_no_silence_unused():
     import evaluation.annotation_metrics as m
     assert not hasattr(m, "_silence_unused_import")
@@ -664,12 +644,6 @@ def test_module_no_silence_unused():
 
 def test_chunk_boundary_prf_callable():
     assert callable(chunk_boundary_prf)
-
-
-def test_chunk_boundary_prf_three_params():
-    sig = inspect.signature(chunk_boundary_prf)
-    params = list(sig.parameters)
-    assert params == ["document", "annotation", "tolerance_chars"]
 
 
 def test_chunk_boundary_prf_document_param_kind():

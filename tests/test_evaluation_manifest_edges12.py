@@ -350,12 +350,6 @@ def test_load_manifest_accepts_str_project_root(tmp_path):
     assert isinstance(result, Manifest)
 
 
-def test_load_manifest_accepts_path_project_root(tmp_path):
-    p = _write_manifest(tmp_path, _mk_manifest())
-    result = load_manifest(p, project_root=tmp_path)
-    assert isinstance(result, Manifest)
-
-
 def test_load_manifest_missing_file_raises(tmp_path):
     with pytest.raises(ManifestError) as exc_info:
         load_manifest(tmp_path / "missing.json", project_root=tmp_path)

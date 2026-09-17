@@ -565,11 +565,6 @@ def test_module_source_no_glob():
 # =========================================================================
 
 
-def test_chunk_boundary_prf_source_has_document_none_branch():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "if document is None:" in src
-
-
 def test_chunk_boundary_prf_source_has_5_null_calls_in_pipeline_failed():
     """pipeline_failed 路径通过 for loop 给 3 个 key 赋 _null —— source 出现 1 次但展开为 3。"""
     src = inspect.getsource(chunk_boundary_prf)

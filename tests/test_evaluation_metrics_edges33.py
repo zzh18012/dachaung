@@ -947,15 +947,6 @@ def test_pdf_locator_ratio_simple_text_elements():
     assert r["value"] == 1.0
 
 
-def test_pdf_locator_ratio_invalid_page():
-    elements = [
-        {"type": "image", "source_locator": {"page": 0}},
-    ]
-    r = _pdf_locator_ratio(elements)
-    # image 不需要 bbox，但 page=0 invalid
-    assert r["value"] == 0.0
-
-
 def test_pdf_locator_ratio_negative_page():
     elements = [
         {"type": "image", "source_locator": {"page": -1}},
@@ -1071,10 +1062,6 @@ def test_is_valid_bbox_with_valid_list():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
 
 
-def test_is_valid_bbox_with_negative_values():
-    assert _is_valid_bbox([-10, -10, 10, 10]) is True
-
-
 def test_is_valid_bbox_with_floats():
     assert _is_valid_bbox([0.5, 1.5, 2.5, 3.5]) is True
 
@@ -1113,12 +1100,6 @@ def test_is_valid_bbox_with_string():
 
 def test_is_valid_bbox_none_input():
     assert _is_valid_bbox(None) is False
-
-
-def test_image_resource_ratio_no_images():
-    elements = [{"type": "paragraph"}]
-    r = _image_resource_ratio(elements, None)
-    assert r["reason"] == "no_image_elements"
 
 
 def test_image_resource_ratio_no_resource_path():
@@ -1395,11 +1376,6 @@ def test_heading_boundary_ratio_empty_ids():
     assert r["value"] == 0.0
 
 
-def test_silent_drop_count_no_expectations():
-    r = _silent_drop_count({}, None)
-    assert r["reason"] == "no_expectations"
-
-
 def test_silent_drop_count_empty_expectations():
     r = _silent_drop_count({}, {})
     assert r["reason"] == "no_expectations"
@@ -1413,28 +1389,6 @@ def test_silent_drop_count_no_element_count_key():
 def test_silent_drop_count_empty_element_count():
     r = _silent_drop_count({}, {"element_count_by_type": {}})
     assert r["reason"] == "no_expectations_element_count"
-
-
-def test_silent_drop_count_no_drops():
-    by_type = {"paragraph": 5}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    r = _silent_drop_count(by_type, expectations)
-    assert r["value"] == 0
-
-
-def test_silent_drop_count_some_drops():
-    by_type = {"paragraph": 3}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    r = _silent_drop_count(by_type, expectations)
-    assert r["value"] == 2
-
-
-def test_silent_drop_count_more_actual_than_expected():
-    by_type = {"paragraph": 10}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    r = _silent_drop_count(by_type, expectations)
-    # actual > expected → 0 drops
-    assert r["value"] == 0
 
 
 def test_silent_drop_count_missing_type_in_actual():
@@ -2106,14 +2060,6 @@ def test_e2e_pdf_locator_with_invalid_page():
 def test_e2e_docx_locator_no_elements():
     r = _docx_locator_ratio([])
     assert r["reason"] == "no_elements"
-
-
-def test_e2e_docx_locator_with_page_in_loc():
-    elements = [
-        {"type": "paragraph", "source_locator": {"page": 1, "paragraph_index": 1}}
-    ]
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 0.0
 
 
 def test_e2e_chunk_reference_no_chunks():

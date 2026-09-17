@@ -152,16 +152,6 @@ def test_chunk_boundary_prf_always_includes_tolerance_batch40():
     assert "_tolerance_chars" in out3
 
 
-def test_chunk_boundary_prf_tolerance_value_preserved_batch40():
-    out = chunk_boundary_prf(None, None, tolerance_chars=99)
-    assert out["_tolerance_chars"]["value"] == 99
-
-
-def test_chunk_boundary_prf_tolerance_value_zero_batch40():
-    out = chunk_boundary_prf(None, None, tolerance_chars=0)
-    assert out["_tolerance_chars"]["value"] == 0
-
-
 def test_chunk_boundary_prf_tolerance_value_negative_batch40():
     out = chunk_boundary_prf(None, None, tolerance_chars=-5)
     assert out["_tolerance_chars"]["value"] == -5
@@ -187,11 +177,6 @@ def test_chunk_boundary_prf_no_annotation_path_returns_3_null_metrics_batch40():
 def test_chunk_boundary_prf_empty_annotation_path_returns_3_null_metrics_batch40():
     out = chunk_boundary_prf({"chunks": [{"text": "abc"}]}, {})
     assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
-def test_chunk_boundary_prf_no_chunks_returns_no_predicted_batch40():
-    out = chunk_boundary_prf({"chunks": []}, {"chunk_boundary_anchors": [{"marker": "x"}]})
-    assert out["chunk_boundary_precision"]["reason"] == "no_predicted_boundaries"
 
 
 def test_chunk_boundary_prf_one_chunk_returns_no_predicted_batch40():
@@ -385,14 +370,6 @@ def test_chunk_boundary_prf_does_not_mutate_annotation_batch40():
     assert json.dumps(ann, sort_keys=True) == before
 
 
-def test_chunk_boundary_prf_idempotent_batch40():
-    doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "c", "position": "after"}]}
-    out1 = chunk_boundary_prf(doc, ann, tolerance_chars=5)
-    out2 = chunk_boundary_prf(doc, ann, tolerance_chars=5)
-    assert out1 == out2
-
-
 def test_chunk_boundary_prf_json_serializable_batch40():
     doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
     ann = {"chunk_boundary_anchors": [{"marker": "c", "position": "after"}]}
@@ -526,11 +503,6 @@ def test_module_source_contains_figure_caption_doc_batch40():
     assert "figure-caption" in src or "figure_caption" in src
 
 
-def test_module_source_contains_chunk_boundary_doc_batch40():
-    src = inspect.getsource(amod)
-    assert "chunk_boundary" in src
-
-
 def test_module_source_contains_parser_does_not_emit_relations_const_batch40():
     src = inspect.getsource(amod)
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
@@ -626,16 +598,6 @@ def test_signature_figure_caption_prf_two_params_batch40():
     assert list(sig.parameters.keys()) == ["document", "annotation"]
 
 
-def test_signature_figure_caption_prf_doc_no_default_batch40():
-    sig = inspect.signature(figure_caption_prf)
-    assert sig.parameters["document"].default is inspect.Parameter.empty
-
-
-def test_signature_figure_caption_prf_annotation_no_default_batch40():
-    sig = inspect.signature(figure_caption_prf)
-    assert sig.parameters["annotation"].default is inspect.Parameter.empty
-
-
 # ---------- module 合理性 第六十四批
 
 
@@ -708,14 +670,6 @@ def test_e2e_full_pipeline_one_doc_one_anchor_batch40():
     assert out["chunk_boundary_recall"]["value"] == 1.0
     assert out["chunk_boundary_f1"]["value"] == 1.0
     assert out["_tolerance_chars"]["value"] == 10
-
-
-def test_e2e_idempotent_run_batch40():
-    doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "c", "position": "after"}]}
-    out1 = chunk_boundary_prf(doc, ann, tolerance_chars=5)
-    out2 = chunk_boundary_prf(doc, ann, tolerance_chars=5)
-    assert out1 == out2
 
 
 def test_e2e_with_unicode_text_batch40():

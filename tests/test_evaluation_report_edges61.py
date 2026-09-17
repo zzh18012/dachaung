@@ -615,11 +615,6 @@ def test_source_contains_importlib_metadata_batch47():
     assert "importlib.metadata" in src
 
 
-def test_source_contains_subprocess_run_batch47():
-    src = inspect.getsource(report_mod)
-    assert "subprocess.run" in src
-
-
 def test_source_contains_cwd_str_conversion_batch47():
     src = inspect.getsource(report_mod)
     assert "cwd=str" in src

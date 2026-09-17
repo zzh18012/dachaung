@@ -698,12 +698,6 @@ def test_run_inspect_doc_metrics_sorted_bool_first(tmp_path, capsys):
     assert isinstance(lines, list)
 
 
-def test_run_inspect_doc_returns_zero_on_valid_doc(tmp_path):
-    p = _write_minimal_document(tmp_path)
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-
-
 def test_run_inspect_doc_returns_two_on_missing_file(tmp_path):
     rc = main(["inspect-doc", str(tmp_path / "noexist.json")])
     assert rc == 2

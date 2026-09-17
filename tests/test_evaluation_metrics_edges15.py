@@ -1499,12 +1499,6 @@ def test_not_evaluated_constant_is_string():
     assert isinstance(m._NOT_EVALUATED, str)
 
 
-def test_not_evaluated_constant_value():
-    import evaluation.metrics as m
-
-    assert m._NOT_EVALUATED == "not_evaluated"
-
-
 # =========================================================================
 # helper functions metadata
 # =========================================================================

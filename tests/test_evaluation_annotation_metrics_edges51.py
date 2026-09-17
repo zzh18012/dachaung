@@ -442,11 +442,6 @@ def test_module_source_no_class_keyword_batch24():
     assert classes == []
 
 
-def test_module_source_no_yield_batch24():
-    source = inspect.getsource(amod)
-    assert "yield " not in source
-
-
 def test_module_source_no_async_def_batch24():
     source = inspect.getsource(amod)
     assert "async def" not in source
@@ -556,26 +551,6 @@ def test_module_source_contains_tolerance_chars_param_batch24():
 def test_module_source_contains_default_30_batch24():
     source = inspect.getsource(amod)
     assert "tolerance_chars: int = 30" in source
-
-
-def test_module_source_contains_pipeline_failed_batch24():
-    source = inspect.getsource(amod)
-    assert '"pipeline_failed"' in source
-
-
-def test_module_source_contains_no_annotation_batch24():
-    source = inspect.getsource(amod)
-    assert '"no_annotation"' in source
-
-
-def test_module_source_contains_no_predicted_boundaries_batch24():
-    source = inspect.getsource(amod)
-    assert '"no_predicted_boundaries"' in source
-
-
-def test_module_source_contains_no_ground_truth_anchors_batch24():
-    source = inspect.getsource(amod)
-    assert '"no_ground_truth_anchors"' in source
 
 
 def test_module_source_contains_missing_markers_batch24():
@@ -695,10 +670,6 @@ def test_module_all_entries_callable_or_str_batch24():
     for name in amod.__all__:
         obj = getattr(amod, name)
         assert callable(obj) or isinstance(obj, str)
-
-
-def test_module_docstring_present_batch24():
-    assert amod.__doc__ is not None
 
 
 def test_module_docstring_mentions_annotation_batch24():

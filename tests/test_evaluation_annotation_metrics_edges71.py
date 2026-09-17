@@ -98,11 +98,6 @@ def test_figure_caption_prf_empty_dicts_batch45():
         assert v["value"] is None
 
 
-def test_figure_caption_prf_returns_dict_batch45():
-    out = figure_caption_prf({}, {})
-    assert isinstance(out, dict)
-
-
 def test_figure_caption_prf_reason_constant_batch45():
     """所有调用都用同一个 reason。"""
     out1 = figure_caption_prf({"x": 1}, {"y": 2})
@@ -137,12 +132,6 @@ def test_chunk_boundary_prf_document_none_default_tolerance_batch45():
 
 
 # ---------- chunk_boundary_prf annotation 缺失 ----------
-
-def test_chunk_boundary_prf_annotation_none_batch45():
-    out = chunk_boundary_prf({"chunks": []}, None)
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["reason"] == "no_annotation"
-
 
 def test_chunk_boundary_prf_annotation_empty_dict_batch45():
     out = chunk_boundary_prf({"chunks": []}, {})
@@ -424,11 +413,6 @@ def test_module_docstring_contains_conventions_batch45():
     assert "一对一" in src
 
 
-def test_module_source_contains_counter_import_batch45():
-    src = inspect.getsource(am_mod)
-    assert "from collections import Counter" in src
-
-
 def test_module_source_contains_any_import_batch45():
     src = inspect.getsource(am_mod)
     assert "from typing import Any" in src
@@ -442,11 +426,6 @@ def test_module_source_contains_normalize_text_import_batch45():
 def test_module_source_contains_metrics_import_batch45():
     src = inspect.getsource(am_mod)
     assert "from evaluation.metrics import _null, _ratio" in src
-
-
-def test_module_source_contains_parser_does_not_emit_constant_batch45():
-    src = inspect.getsource(am_mod)
-    assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
 
 
 def test_module_source_contains_figure_caption_function_batch45():
@@ -492,11 +471,6 @@ def test_module_source_contains_search_from_batch45():
 def test_module_source_contains_missing_markers_batch45():
     src = inspect.getsource(am_mod)
     assert "missing_markers" in src
-
-
-def test_module_source_contains_normalize_text_call_batch45():
-    src = inspect.getsource(am_mod)
-    assert "normalize_text(" in src
 
 
 def test_module_source_contains_position_before_batch45():
@@ -691,11 +665,6 @@ def test_source_no_class_keyword_batch45():
 def test_source_no_async_def_batch45():
     src = inspect.getsource(am_mod)
     assert "async def" not in src
-
-
-def test_source_no_yield_batch45():
-    src = inspect.getsource(am_mod)
-    assert "yield" not in src
 
 
 def test_source_no_walrus_batch45():

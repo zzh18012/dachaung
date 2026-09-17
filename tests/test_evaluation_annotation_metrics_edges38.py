@@ -463,11 +463,6 @@ def test_annotation_metrics_source_no_async_def_batch11():
     assert "async def" not in source
 
 
-def test_annotation_metrics_source_no_yield_batch11():
-    source = inspect.getsource(amod)
-    assert "yield" not in source
-
-
 def test_annotation_metrics_source_no_walrus_batch11():
     source = inspect.getsource(amod)
     assert ":=" not in source
@@ -655,14 +650,6 @@ def test_signature_funcs_module_eq_batch11():
 
 
 # ---------- module 合理性第十一批 ----------
-
-
-def test_module_all_value_batch11():
-    assert amod.__all__ == [
-        "PARSER_DOES_NOT_EMIT_RELATIONS",
-        "figure_caption_prf",
-        "chunk_boundary_prf",
-    ]
 
 
 def test_module_all_is_list_batch11():

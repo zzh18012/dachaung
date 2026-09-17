@@ -403,16 +403,6 @@ def test_module_source_uses_normalize_text_batch14():
     assert "normalize_text(" in source
 
 
-def test_module_source_uses_null_helper_batch14():
-    source = inspect.getsource(amod)
-    assert "_null(" in source
-
-
-def test_module_source_uses_ratio_helper_batch14():
-    source = inspect.getsource(amod)
-    assert "_ratio(" in source
-
-
 def test_module_source_has_tolerance_chars_default_batch14():
     source = inspect.getsource(amod)
     assert "tolerance_chars: int = 30" in source
@@ -421,26 +411,6 @@ def test_module_source_has_tolerance_chars_default_batch14():
 def test_module_source_has_chunk_boundary_anchors_key_batch14():
     source = inspect.getsource(amod)
     assert "chunk_boundary_anchors" in source
-
-
-def test_module_source_has_no_predicted_boundaries_reason_batch14():
-    source = inspect.getsource(amod)
-    assert "no_predicted_boundaries" in source
-
-
-def test_module_source_has_no_ground_truth_anchors_reason_batch14():
-    source = inspect.getsource(amod)
-    assert "no_ground_truth_anchors" in source
-
-
-def test_module_source_has_no_annotation_reason_batch14():
-    source = inspect.getsource(amod)
-    assert "no_annotation" in source
-
-
-def test_module_source_has_pipeline_failed_reason_batch14():
-    source = inspect.getsource(amod)
-    assert "pipeline_failed" in source
 
 
 def test_module_source_no_subprocess_import_batch14():
@@ -552,10 +522,6 @@ def test_module_name_evaluation_annotation_metrics_batch14():
 
 def test_module_dunder_all_3_items_batch14():
     assert len(amod.__all__) == 3
-
-
-def test_module_dunder_all_items_unique_batch14():
-    assert len(set(amod.__all__)) == len(amod.__all__)
 
 
 def test_module_no_class_definitions_batch14():

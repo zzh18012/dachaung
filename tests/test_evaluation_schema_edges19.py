@@ -631,10 +631,6 @@ def test_validate_file_no_default_for_schema_name():
     assert sig.parameters["schema_name"].default is inspect.Parameter.empty
 
 
-def test_namespace_module():
-    assert m.__name__ == "evaluation.schema"
-
-
 def test_namespace_load_schema():
     assert load_schema.__module__ == "evaluation.schema"
 
@@ -675,10 +671,6 @@ def test_module_all_5_entries_strict():
         "validate",
         "validate_file",
     ]
-
-
-def test_module_namespace_is_evaluation_schema():
-    assert m.__name__ == "evaluation.schema"
 
 
 def test_module_has_no_main_block():

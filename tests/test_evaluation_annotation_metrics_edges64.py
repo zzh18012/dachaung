@@ -464,16 +464,6 @@ def test_module_source_contains_no_ground_truth_anchors_reason_batch37():
     assert '"no_ground_truth_anchors"' in src
 
 
-def test_module_source_contains_precision_or_recall_not_evaluated_reason_batch37():
-    src = inspect.getsource(amod)
-    assert '"precision_or_recall_not_evaluated"' in src
-
-
-def test_module_source_contains_no_ground_truth_anchors_in_stream_reason_batch37():
-    src = inspect.getsource(amod)
-    assert '"no_ground_truth_anchors_in_stream"' in src
-
-
 def test_module_source_contains_from_future_import_batch37():
     src = inspect.getsource(amod)
     assert "from __future__ import annotations" in src
@@ -610,12 +600,6 @@ def test_module_normalize_text_used_batch37():
     src = inspect.getsource(amod)
     # normalize_text 应当被调用
     assert "normalize_text(" in src
-
-
-def test_module_null_ratio_used_batch37():
-    src = inspect.getsource(amod)
-    assert "_null(" in src
-    assert "_ratio(" in src
 
 
 # ---------- 端到端集成第五十七批

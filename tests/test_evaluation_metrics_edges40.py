@@ -1112,23 +1112,6 @@ def test_e2e_compute_automatic_metrics_with_expectations_batch13():
     assert out["silent_drop_count"]["value"] == 5
 
 
-def test_e2e_compute_automatic_metrics_idempotent_full_doc_batch13():
-    with patch("evaluation.schema_validation.document_passes_schema", return_value=True):
-        out1 = compute_automatic_metrics(
-            document=_make_full_doc(),
-            error=None,
-            source_type="pdf",
-            expectations=None,
-        )
-        out2 = compute_automatic_metrics(
-            document=_make_full_doc(),
-            error=None,
-            source_type="pdf",
-            expectations=None,
-        )
-    assert out1 == out2
-
-
 def test_e2e_combined_helpers_chain_batch13():
     """多个 helper 协作链：elements + chunks → 各种 metric。"""
     elements = [

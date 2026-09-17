@@ -1090,12 +1090,6 @@ def test_module_no_top_level_user_constants_batch12():
     assert consts == []
 
 
-def test_module_uses_future_annotations_batch12():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:25])
-    assert "from __future__ import annotations" in head
-
-
 def test_module_docstring_mentions_invariant_batch12():
     assert mmod.__doc__ is not None
     assert "不变量" in mmod.__doc__ or "invariant" in mmod.__doc__.lower()

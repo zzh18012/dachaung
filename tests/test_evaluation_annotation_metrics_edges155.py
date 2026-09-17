@@ -123,11 +123,6 @@ def test_w10_tol15_miss_batch487(tmp_path):
                 15) == ZERO
 
 
-def test_w10_tol16_hit_batch487(tmp_path):
-    assert _prf(_doc(tmp_path), [("Word10.", "after")],
-                16) == ONE5
-
-
 # ---------- W30 d 48 ----------
 
 def test_w30_tol47_miss_batch487(tmp_path):

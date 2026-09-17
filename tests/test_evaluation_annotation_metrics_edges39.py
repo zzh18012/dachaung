@@ -489,12 +489,6 @@ def test_annotation_metrics_source_no_print_batch12():
     assert "print(" not in source
 
 
-def test_annotation_metrics_source_no_logging_batch12():
-    source = inspect.getsource(amod)
-    assert "logging" not in source
-    assert "logger" not in source
-
-
 # ---------- module source 字符串精确补强第十二批 ----------
 
 
@@ -702,12 +696,6 @@ def test_module_dunder_all_exact_batch12():
 
 def test_module_dunder_all_len_3_batch12():
     assert len(amod.__all__) == 3
-
-
-def test_module_uses_future_annotations_batch12():
-    source = inspect.getsource(amod)
-    head = "\n".join(source.split("\n")[:25])
-    assert "from __future__ import annotations" in head
 
 
 def test_module_parser_constant_is_str_batch12():

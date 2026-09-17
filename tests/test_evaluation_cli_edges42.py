@@ -317,21 +317,6 @@ def test_run_inspect_doc_stdout_contains_metrics_lines_batch15(tmp_path, capsys)
 # ---------- main 路由第十五批 ----------
 
 
-def test_main_run_manifest_path_not_exist_returns_2_batch15(capsys):
-    rc = main(["run", "--manifest", "/nonexistent/x.json", "--output", "o.json"])
-    assert rc == 2
-
-
-def test_main_validate_report_path_not_exist_returns_2_batch15(capsys):
-    rc = main(["validate-report", "/nonexistent/x.json"])
-    assert rc == 2
-
-
-def test_main_inspect_doc_path_not_exist_returns_2_batch15(capsys):
-    rc = main(["inspect-doc", "/nonexistent/x.json"])
-    assert rc == 2
-
-
 def test_main_inspect_doc_invalid_json_returns_1_batch15(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("{not json}", encoding="utf-8")

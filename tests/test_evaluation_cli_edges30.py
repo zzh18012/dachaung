@@ -299,14 +299,6 @@ def test_main_validate_report_returns_1_for_invalid_json(tmp_path, capsys):
     assert rc == 1
 
 
-def test_main_validate_report_round_trip_after_run(tmp_path, capsys):
-    m = _write_manifest(tmp_path)
-    out = tmp_path / "o.json"
-    main(["run", "--manifest", str(m), "--output", str(out)])
-    rc = main(["validate-report", str(out)])
-    assert rc == 0
-
-
 def test_main_inspect_doc_returns_2_for_missing_file(tmp_path, capsys):
     rc = main(["inspect-doc", str(tmp_path / "no.json")])
     assert rc == 2
@@ -388,13 +380,6 @@ def test_main_inspect_doc_with_custom_tolerance(tmp_path, capsys):
     d.write_text(json.dumps({"source_type": "pdf", "elements": [], "chunks": []}), encoding="utf-8")
     rc = main(["inspect-doc", str(d), "--tolerance-chars", "100"])
     assert rc == 0
-
-
-def test_main_returns_int_type(tmp_path, capsys):
-    m = _write_manifest(tmp_path)
-    out = tmp_path / "o.json"
-    rc = main(["run", "--manifest", str(m), "--output", str(out)])
-    assert isinstance(rc, int)
 
 
 # ---------- _format_metric 行为深度第三批 ----------
@@ -703,11 +688,6 @@ def test_module_source_imports_sys():
 def test_module_source_imports_path():
     src = inspect.getsource(cli_mod)
     assert "from pathlib import Path" in src
-
-
-def test_module_source_has_main_block():
-    src = inspect.getsource(cli_mod)
-    assert 'if __name__ == "__main__":' in src
 
 
 def test_module_source_main_block_uses_systemexit():

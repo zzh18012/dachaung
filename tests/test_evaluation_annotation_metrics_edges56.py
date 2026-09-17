@@ -64,12 +64,6 @@ def test_figure_caption_prf_all_values_null_batch29():
         assert v["value"] is None
 
 
-def test_figure_caption_prf_reason_consistent_batch29():
-    out = figure_caption_prf({"chunks": []}, None)
-    for v in out.values():
-        assert v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 def test_figure_caption_prf_annotation_none_batch29():
     """annotation=None 也 null。"""
     out = figure_caption_prf({"chunks": [{"text": "x"}]}, None)
@@ -198,11 +192,6 @@ def test_chunk_boundary_prf_document_none_pipeline_failed_batch29():
 
 def test_chunk_boundary_prf_annotation_empty_no_annotation_batch29():
     out = chunk_boundary_prf({"chunks": []}, {})
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
-def test_chunk_boundary_prf_annotation_none_no_annotation_batch29():
-    out = chunk_boundary_prf({"chunks": []}, None)
     assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 

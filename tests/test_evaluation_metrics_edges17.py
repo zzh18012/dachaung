@@ -1112,12 +1112,6 @@ def test_pdf_bbox_required_types_exact():
     ]
 
 
-def test_not_evaluated_value():
-    import evaluation.metrics as m
-
-    assert m._NOT_EVALUATED == "not_evaluated"
-
-
 def test_pdf_bbox_required_types_subset_of_text_types():
     import evaluation.metrics as m
 

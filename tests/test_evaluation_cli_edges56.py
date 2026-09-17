@@ -524,11 +524,6 @@ def test_module_source_contains_validate_file_import_batch29():
     assert "from evaluation.schema import" in src
 
 
-def test_module_source_contains_main_block_batch29():
-    src = inspect.getsource(climod)
-    assert 'if __name__ == "__main__"' in src
-
-
 def test_module_source_contains_subparsers_required_batch29():
     src = inspect.getsource(climod)
     assert "required=True" in src

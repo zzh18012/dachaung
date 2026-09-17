@@ -997,10 +997,3 @@ def test_e2e_get_dependency_versions_returns_3_keys_str_or_none():
 def test_e2e_build_provenance_returns_9_keys():
     out = build_provenance(Path("."), "fallback", 800, "1.0")
     assert len(out) == 9
-
-
-def test_e2e_aggregate_summary_does_not_mutate_input():
-    per_doc = [_make_per_doc({"element_count_total": {"value": 5}})]
-    per_doc_before = json.loads(json.dumps(per_doc))
-    aggregate_summary(per_doc)
-    assert per_doc == per_doc_before

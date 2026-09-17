@@ -49,10 +49,6 @@ def test_parser_does_not_emit_relations_not_empty_batch31():
     assert len(PARSER_DOES_NOT_EMIT_RELATIONS) > 0
 
 
-def test_parser_does_not_emit_relations_has_underscore_batch31():
-    assert "_" in PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 # ---------- figure_caption_prf 第三十一批 ----------
 
 

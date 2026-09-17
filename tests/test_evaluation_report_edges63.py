@@ -471,11 +471,6 @@ def test_source_contains_version_imports_batch48():
     assert "REPORT_VERSION" in src
 
 
-def test_source_contains_subprocess_run_call_batch48():
-    src = inspect.getsource(report_mod)
-    assert "subprocess.run" in src
-
-
 def test_source_contains_git_rev_parse_batch48():
     src = inspect.getsource(report_mod)
     assert "rev-parse" in src

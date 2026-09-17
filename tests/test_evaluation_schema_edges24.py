@@ -527,14 +527,6 @@ def test_module_source_no_user_class_beyond_eval_schema_error():
     assert set(classes) == {"EvalSchemaError"}
 
 
-def test_module_source_3_user_functions():
-    funcs = [
-        name for name, val in vars(smod).items()
-        if isinstance(val, types.FunctionType) and val.__module__ == smod.__name__
-    ]
-    assert set(funcs) == {"_schema_path", "load_schema", "validate", "validate_file"}
-
-
 def test_module_source_all_5_entries():
     src = inspect.getsource(smod)
     assert '"SCHEMAS_DIR"' in src
@@ -988,11 +980,6 @@ def test_e2e_schema_path_returns_path():
 def test_e2e_schema_path_for_nonexistent_raises():
     with pytest.raises(FileNotFoundError):
         _schema_path("does-not-exist.schema.json")
-
-
-def test_e2e_eval_schema_error_with_empty_errors_list():
-    err = EvalSchemaError("msg", errors=[])
-    assert err.errors == []
 
 
 def test_e2e_eval_schema_error_with_complex_errors():

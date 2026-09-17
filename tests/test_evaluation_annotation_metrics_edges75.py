@@ -395,11 +395,6 @@ def test_figure_caption_prf_with_real_chunks_batch49():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_counter_import_batch49():
-    src = inspect.getsource(am_mod)
-    assert "from collections import Counter" in src
-
-
 def test_source_contains_typing_any_import_batch49():
     src = inspect.getsource(am_mod)
     assert "from typing import Any" in src
@@ -413,11 +408,6 @@ def test_source_contains_normalize_text_import_batch49():
 def test_source_contains_null_ratio_import_batch49():
     src = inspect.getsource(am_mod)
     assert "from evaluation.metrics import _null, _ratio" in src
-
-
-def test_source_parser_does_not_emit_relations_constant_batch49():
-    src = inspect.getsource(am_mod)
-    assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
 
 
 def test_source_docstring_mentions_caption_relation_batch49():
@@ -440,11 +430,6 @@ def test_source_all_has_3_entries_batch49():
     assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
     assert '"figure_caption_prf"' in src
     assert '"chunk_boundary_prf"' in src
-
-
-def test_source_contains_normalize_text_call_batch49():
-    src = inspect.getsource(am_mod)
-    assert "normalize_text(" in src
 
 
 def test_source_contains_pairs_sort_batch49():
@@ -471,41 +456,6 @@ def test_source_contains_predicted_append_batch49():
 def test_source_contains_gt_positions_append_batch49():
     src = inspect.getsource(am_mod)
     assert "gt_positions.append" in src
-
-
-def test_source_contains_pipeline_failed_string_batch49():
-    src = inspect.getsource(am_mod)
-    assert '"pipeline_failed"' in src
-
-
-def test_source_contains_no_annotation_string_batch49():
-    src = inspect.getsource(am_mod)
-    assert '"no_annotation"' in src
-
-
-def test_source_contains_no_predicted_boundaries_string_batch49():
-    src = inspect.getsource(am_mod)
-    assert '"no_predicted_boundaries"' in src
-
-
-def test_source_contains_no_ground_truth_anchors_string_batch49():
-    src = inspect.getsource(am_mod)
-    assert '"no_ground_truth_anchors"' in src
-
-
-def test_source_contains_no_ground_truth_anchors_in_stream_string_batch49():
-    src = inspect.getsource(am_mod)
-    assert '"no_ground_truth_anchors_in_stream"' in src
-
-
-def test_source_contains_precision_or_recall_not_evaluated_string_batch49():
-    src = inspect.getsource(am_mod)
-    assert '"precision_or_recall_not_evaluated"' in src
-
-
-def test_source_contains_search_from_batch49():
-    src = inspect.getsource(am_mod)
-    assert "search_from" in src
 
 
 def test_source_contains_2_p_r_divide_denom_batch49():
@@ -535,22 +485,6 @@ def test_ast_function_names_batch49():
     tree = ast.parse(inspect.getsource(am_mod))
     names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert names == ["figure_caption_prf", "chunk_boundary_prf"]
-
-
-def test_ast_no_class_def_batch49():
-    tree = ast.parse(inspect.getsource(am_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_async_function_def_batch49():
-    tree = ast.parse(inspect.getsource(am_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
-
-
-def test_ast_module_has_docstring_batch49():
-    tree = ast.parse(inspect.getsource(am_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_module_has_5_imports_batch49():

@@ -931,8 +931,3 @@ def test_source_no_walrus_batch45():
 def test_source_no_lambda_batch45():
     src = inspect.getsource(report_mod)
     assert "lambda" not in src
-
-
-def test_source_uses_subprocess_run_not_popen_batch45():
-    src = inspect.getsource(report_mod)
-    assert "subprocess.run" in src

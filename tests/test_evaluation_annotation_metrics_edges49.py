@@ -434,12 +434,6 @@ def test_module_source_forbidden_tokens_batch22(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch22():
     src = inspect.getsource(amod)
     assert "import socket" not in src
@@ -460,11 +454,6 @@ def test_module_source_no_threading_import_batch22():
     assert "import threading" not in src
 
 
-def test_module_source_no_multiprocessing_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import multiprocessing" not in src
-
-
 def test_module_source_no_asyncio_import_batch22():
     src = inspect.getsource(amod)
     assert "import asyncio" not in src
@@ -480,24 +469,9 @@ def test_module_source_no_tempfile_import_batch22():
     assert "import tempfile" not in src
 
 
-def test_module_source_no_sys_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import sys" not in src
-
-
 def test_module_source_no_logging_import_batch22():
     src = inspect.getsource(amod)
     assert "import logging" not in src
-
-
-def test_module_source_no_re_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import re" not in src
-
-
-def test_module_source_no_datetime_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import datetime" not in src
 
 
 def test_module_source_no_pandas_import_batch22():
@@ -629,12 +603,6 @@ def test_module_all_contents_exact_batch22():
     }
 
 
-def test_module_does_not_import_app_pipeline_batch22():
-    src = inspect.getsource(amod)
-    assert "from app.pipeline" not in src
-    assert "from app import pipeline" not in src
-
-
 def test_module_does_not_import_app_parsers_batch22():
     src = inspect.getsource(amod)
     assert "from app.parsers" not in src
@@ -649,11 +617,6 @@ def test_module_does_not_import_evaluation_runner_batch22():
 def test_module_does_not_import_evaluation_cli_batch22():
     src = inspect.getsource(amod)
     assert "from evaluation.cli" not in src
-
-
-def test_module_does_not_import_evaluation_schema_batch22():
-    src = inspect.getsource(amod)
-    assert "from evaluation.schema" not in src
 
 
 def test_module_does_not_import_evaluation_manifest_batch22():
@@ -700,12 +663,6 @@ def test_e2e_chunk_boundary_pipeline_failed_when_doc_none_batch22():
     assert out["chunk_boundary_precision"]["reason"] == "pipeline_failed"
     assert out["chunk_boundary_recall"]["reason"] == "pipeline_failed"
     assert out["chunk_boundary_f1"]["reason"] == "pipeline_failed"
-
-
-def test_e2e_chunk_boundary_no_annotation_when_ann_empty_batch22():
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
-    out = chunk_boundary_prf(doc, {})
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 
 def test_e2e_chunk_boundary_perfect_match_batch22():

@@ -539,34 +539,9 @@ def test_module_docstring_mentions_subcommands():
     assert "inspect-doc" in doc
 
 
-def test_module_main_callable():
-    import evaluation.cli as mod
-    assert callable(mod.main)
-
-
-def test_module_build_parser_callable():
-    import evaluation.cli as mod
-    assert callable(mod._build_parser)
-
-
-def test_module_format_metric_callable():
-    import evaluation.cli as mod
-    assert callable(mod._format_metric)
-
-
-def test_module_run_inspect_doc_callable():
-    import evaluation.cli as mod
-    assert callable(mod._run_inspect_doc)
-
-
 # =========================================================================
 # 签名深度
 # =========================================================================
-
-
-def test_main_signature_argv_param():
-    sig = inspect.signature(main)
-    assert "argv" in sig.parameters
 
 
 def test_main_signature_argv_default_none():

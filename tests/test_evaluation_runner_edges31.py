@@ -1138,17 +1138,6 @@ def test_e2e_with_kwargs_only(tmp_path):
     assert report["provenance"]["max_chars"] == 800
 
 
-def test_e2e_with_positional_first_two(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out = tmp_path / "out.json"
-    report = run_evaluation(manifest, out)
-    assert isinstance(report, dict)
-
-
 def test_e2e_does_not_overwrite_existing_per_doc_when_none(tmp_path):
     """无文档时不应有残留 _per_doc JSON。"""
     from evaluation.manifest import load_manifest

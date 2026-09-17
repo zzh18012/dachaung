@@ -377,19 +377,6 @@ def _write_json(path, data):
     return path
 
 
-def test_validate_file_str_path(tmp_path):
-    p = _write_json(
-        tmp_path / "m.json",
-        {
-            "manifest_version": "1.0",
-            "devset_status": "incomplete",
-            "documents": [],
-            "expected_failures": [],
-        },
-    )
-    validate_file(str(p), "manifest.schema.json")  # 不抛
-
-
 def test_validate_file_path_object(tmp_path):
     p = _write_json(
         tmp_path / "m.json",
@@ -427,20 +414,6 @@ def test_validate_file_unknown_schema_raises(tmp_path):
         validate_file(p, "nonexistent.schema.json")
 
 
-def test_validate_file_idempotent(tmp_path):
-    p = _write_json(
-        tmp_path / "m.json",
-        {
-            "manifest_version": "1.0",
-            "devset_status": "incomplete",
-            "documents": [],
-            "expected_failures": [],
-        },
-    )
-    validate_file(p, "manifest.schema.json")
-    validate_file(p, "manifest.schema.json")  # 不抛
-
-
 def test_validate_file_does_not_modify_file(tmp_path):
     p = _write_json(
         tmp_path / "m.json",
@@ -454,19 +427,6 @@ def test_validate_file_does_not_modify_file(tmp_path):
     snapshot = p.read_text(encoding="utf-8")
     validate_file(p, "manifest.schema.json")
     assert p.read_text(encoding="utf-8") == snapshot
-
-
-def test_validate_file_positional(tmp_path):
-    p = _write_json(
-        tmp_path / "m.json",
-        {
-            "manifest_version": "1.0",
-            "devset_status": "incomplete",
-            "documents": [],
-            "expected_failures": [],
-        },
-    )
-    validate_file(p, "manifest.schema.json")
 
 
 def test_validate_file_kwargs(tmp_path):

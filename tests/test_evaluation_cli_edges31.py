@@ -612,17 +612,6 @@ def test_run_inspect_doc_prints_counts(tmp_path, capsys):
     assert "chunks=2" in captured.out
 
 
-def test_run_inspect_doc_prints_metrics_header(tmp_path, capsys):
-    doc = _make_minimal_doc()
-    doc_path = tmp_path / "doc.json"
-    doc_path.write_text(json.dumps(doc), encoding="utf-8")
-
-    args = argparse.Namespace(input=str(doc_path), tolerance_chars=30)
-    _run_inspect_doc(args)
-    captured = capsys.readouterr()
-    assert "metrics:" in captured.out
-
-
 def test_run_inspect_doc_metrics_sorted_bool_first(tmp_path, capsys):
     doc = _make_minimal_doc()
     doc_path = tmp_path / "doc.json"

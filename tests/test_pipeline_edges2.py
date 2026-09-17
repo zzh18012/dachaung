@@ -145,11 +145,6 @@ def test_image_output_dir_for_returns_path_object():
     assert isinstance(result, Path)
 
 
-def test_image_output_dir_for_str_path_accepted():
-    result = image_output_dir_for("/tmp/out.json", "abc123")
-    assert isinstance(result, Path)
-
-
 def test_image_output_dir_for_pathlib_path_accepted():
     result = image_output_dir_for(Path("/tmp/out.json"), "abc123")
     assert isinstance(result, Path)

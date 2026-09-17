@@ -862,14 +862,6 @@ def test_chunk_boundary_prf_module_is_annotation_metrics():
     assert chunk_boundary_prf.__module__ == "evaluation.annotation_metrics"
 
 
-def test_figure_caption_prf_qualname_exact():
-    assert figure_caption_prf.__qualname__ == "figure_caption_prf"
-
-
-def test_chunk_boundary_prf_qualname_exact():
-    assert chunk_boundary_prf.__qualname__ == "chunk_boundary_prf"
-
-
 # =========================================================================
 # 签名 introspection 详细
 # =========================================================================

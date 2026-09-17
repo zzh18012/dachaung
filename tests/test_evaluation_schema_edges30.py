@@ -348,13 +348,6 @@ def test_validate_file_idempotent_batch10(tmp_path):
     assert out1 == out2
 
 
-def test_validate_file_returns_none_type_batch10(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps(_valid_manifest_data()), encoding="utf-8")
-    out = validate_file(p, "manifest.schema.json")
-    assert out is None
-
-
 # ---------- _schema_path 行为深度第十批 ----------
 
 

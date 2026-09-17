@@ -73,12 +73,6 @@ def test_split_piece_equality_with_same_values():
     assert p1 == p2
 
 
-def test_split_piece_inequality_different_text():
-    p1 = _SplitPiece(text="x", boundary_after=None)
-    p2 = _SplitPiece(text="y", boundary_after=None)
-    assert p1 != p2
-
-
 def test_split_piece_inequality_different_boundary():
     p1 = _SplitPiece(text="x", boundary_after=None)
     p2 = _SplitPiece(text="x", boundary_after="forced_char")
@@ -374,11 +368,6 @@ def test_part_end_value_three():
 # =========================================================================
 
 
-def test_sentence_split_re_compiled():
-    import re
-    assert isinstance(_SENTENCE_SPLIT_RE, re.Pattern)
-
-
 def test_whitespace_re_compiled():
     import re
     assert isinstance(_WHITESPACE_RE, re.Pattern)
@@ -414,16 +403,8 @@ def test_normalize_text_empty_returns_empty():
     assert normalize_text("") == ""
 
 
-def test_normalize_text_none_returns_empty():
-    assert normalize_text(None) == ""  # type: ignore[arg-type]
-
-
 def test_normalize_text_only_whitespace_returns_empty():
     assert normalize_text("   \t\n  ") == ""
-
-
-def test_normalize_text_no_change():
-    assert normalize_text("hello world") == "hello world"
 
 
 def test_normalize_text_collapses_internal_whitespace():
@@ -436,10 +417,6 @@ def test_normalize_text_handles_tabs_newlines():
 
 def test_normalize_text_strips_ends():
     assert normalize_text("  hello  ") == "hello"
-
-
-def test_normalize_text_preserves_punctuation():
-    assert normalize_text("hello, world!") == "hello, world!"
 
 
 def test_normalize_text_preserves_unicode():

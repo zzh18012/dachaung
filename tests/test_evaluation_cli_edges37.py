@@ -726,13 +726,6 @@ def test_main_inspect_doc_top_level_not_dict_returns_1_batch10(tmp_path, capsys)
     assert rc == 1
 
 
-def test_main_inspect_doc_success_returns_0_batch10(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-
-
 def test_main_run_with_invalid_manifest_json_returns_1_batch10(tmp_path, capsys):
     p = tmp_path / "m.json"
     p.write_text("not json", encoding="utf-8")
@@ -990,11 +983,6 @@ def test_module_source_has_run_inspect_doc_def_batch10():
     assert "def _run_inspect_doc(" in source
 
 
-def test_module_source_main_block_at_end_batch10():
-    source = inspect.getsource(climod)
-    assert 'if __name__ == "__main__":' in source
-
-
 def test_module_source_main_block_raises_system_exit_batch10():
     source = inspect.getsource(climod)
     assert "raise SystemExit(main())" in source
@@ -1020,11 +1008,6 @@ def test_module_source_uses_sub_add_parser_batch10():
 def test_module_source_parser_choices_batch10():
     source = inspect.getsource(climod)
     assert '("fallback", "kreuzberg")' in source
-
-
-def test_module_source_docstring_present_batch10():
-    assert climod.__doc__ is not None
-    assert len(climod.__doc__) > 30
 
 
 def test_module_source_docstring_mentions_run_batch10():
@@ -1067,11 +1050,6 @@ def test_signature_build_parser_return_annotation_batch10():
 def test_signature_main_param_count_batch10():
     sig = inspect.signature(main)
     assert len(sig.parameters) == 1
-
-
-def test_signature_main_param_name_batch10():
-    sig = inspect.signature(main)
-    assert "argv" in sig.parameters
 
 
 def test_signature_main_param_kind_batch10():
@@ -1352,13 +1330,6 @@ def test_e2e_run_command_with_custom_max_chars_batch10(monkeypatch, tmp_path, ca
             "15",
         ]
     )
-    assert rc == 0
-
-
-def test_e2e_inspect_doc_returns_zero_for_empty_dict_batch10(tmp_path):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
     assert rc == 0
 
 

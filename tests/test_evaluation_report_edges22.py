@@ -579,25 +579,6 @@ def test_module_source_no_main_block():
     assert 'if __name__' not in src
 
 
-def test_module_source_no_user_class():
-    classes = [
-        name for name, val in vars(rmod).items()
-        if isinstance(val, type) and val.__module__ == rmod.__name__
-    ]
-    assert classes == []
-
-
-def test_module_source_5_user_functions():
-    funcs = [
-        name for name, val in vars(rmod).items()
-        if isinstance(val, types.FunctionType) and val.__module__ == rmod.__name__
-    ]
-    assert set(funcs) == {
-        "get_git_provenance", "get_dependency_versions",
-        "build_provenance", "build_devset_section", "aggregate_summary",
-    }
-
-
 def test_module_source_all_5_entries():
     src = inspect.getsource(rmod)
     assert '__all__ = [' in src

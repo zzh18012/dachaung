@@ -66,12 +66,6 @@ def test_figure_caption_prf_all_values_none_batch32():
         assert v["value"] is None
 
 
-def test_figure_caption_prf_all_reasons_fixed_batch32():
-    out = figure_caption_prf({"chunks": []}, None)
-    for v in out.values():
-        assert v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 def test_figure_caption_prf_with_document_none_batch32():
     out = figure_caption_prf(None, None)
     for v in out.values():

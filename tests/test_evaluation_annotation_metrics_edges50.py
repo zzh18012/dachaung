@@ -58,11 +58,6 @@ def test_figure_caption_prf_no_side_effects_on_complex_inputs_batch23():
     assert repr(ann) == ann_snapshot
 
 
-def test_figure_caption_prf_returns_dict_type_batch23():
-    out = figure_caption_prf({}, {})
-    assert isinstance(out, dict)
-
-
 def test_figure_caption_prf_each_value_is_dict_batch23():
     """每个 value 也是 dict。"""
     out = figure_caption_prf({}, {})
@@ -387,12 +382,6 @@ def test_module_source_forbidden_tokens_batch23(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch23():
     src = inspect.getsource(amod)
     assert "import socket" not in src
@@ -433,16 +422,6 @@ def test_module_source_no_logging_import_batch23():
     assert "import logging" not in src
 
 
-def test_module_source_no_re_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import re" not in src
-
-
-def test_module_source_no_datetime_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import datetime" not in src
-
-
 def test_module_source_no_pandas_import_batch23():
     src = inspect.getsource(amod)
     assert "import pandas" not in src
@@ -456,11 +435,6 @@ def test_module_source_no_numpy_import_batch23():
 def test_module_source_no_csv_import_batch23():
     src = inspect.getsource(amod)
     assert "import csv" not in src
-
-
-def test_module_source_no_os_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import os" not in src
 
 
 # ---------- module source 字符串精确补强第三十四批 ----------
@@ -603,11 +577,6 @@ def test_module_does_not_import_evaluation_cli_batch23():
 def test_module_does_not_import_evaluation_manifest_batch23():
     src = inspect.getsource(amod)
     assert "from evaluation.manifest" not in src
-
-
-def test_module_does_not_import_evaluation_schema_batch23():
-    src = inspect.getsource(amod)
-    assert "from evaluation.schema" not in src
 
 
 def test_module_does_not_import_evaluation_report_batch23():

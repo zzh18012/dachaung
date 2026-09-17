@@ -647,13 +647,6 @@ def test_load_manifest_str_path_batch38(tmp_path):
     assert m.file_count == 0
 
 
-def test_load_manifest_idempotent_batch38(tmp_path):
-    mp = _make_manifest_json(tmp_path)
-    m1 = load_manifest(mp, project_root=tmp_path)
-    m2 = load_manifest(mp, project_root=tmp_path)
-    assert m1 == m2
-
-
 def test_load_manifest_project_root_default_detection_batch38(tmp_path):
     """project_root=None 时自动检测（找 pyproject.toml）。"""
     # 创建 pyproject.toml

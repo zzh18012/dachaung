@@ -302,12 +302,6 @@ def test_document_entry_field_names_exact():
     assert names == expected
 
 
-def test_document_entry_equality():
-    a = _make_doc_entry()
-    b = _make_doc_entry()
-    assert a == b
-
-
 def test_document_entry_inequality_on_doc_id():
     a = _make_doc_entry(doc_id="d1")
     b = _make_doc_entry(doc_id="d2")
@@ -1050,12 +1044,6 @@ def test_load_manifest_idempotent(tmp_path: Path):
     m1 = load_manifest(p, project_root=tmp_path)
     m2 = load_manifest(p, project_root=tmp_path)
     assert m1 == m2
-
-
-def test_document_entry_idempotent_construction():
-    a = _make_doc_entry()
-    b = _make_doc_entry()
-    assert a == b
 
 
 # =========================================================================

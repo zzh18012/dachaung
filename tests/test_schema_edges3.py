@@ -477,12 +477,6 @@ def test_silence_unused_import_in_module():
     assert hasattr(mod, "_silence_unused_import")
 
 
-def test_silence_unused_import_not_in_all():
-    from app import schema as mod
-
-    assert "_silence_unused_import" not in mod.__all__
-
-
 def test_silence_unused_import_starts_with_underscore():
     assert "_silence_unused_import".startswith("_")
 

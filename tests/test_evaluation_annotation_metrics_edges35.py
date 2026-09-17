@@ -687,12 +687,6 @@ def test_module_source_has_parser_does_not_emit_constant():
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
 
 
-def test_module_source_has_2_user_functions():
-    src = inspect.getsource(amod)
-    assert "def figure_caption_prf(" in src
-    assert "def chunk_boundary_prf(" in src
-
-
 def test_module_source_no_class_definitions():
     src = inspect.getsource(amod)
     assert "\nclass " not in src
@@ -799,11 +793,6 @@ def test_module_source_docstring_mentions_tolerance():
     assert "容差" in src[:1200] or "tolerance" in src[:1200].lower()
 
 
-def test_module_source_no_print():
-    src = inspect.getsource(amod)
-    assert "print(" not in src
-
-
 def test_module_source_no_logging():
     src = inspect.getsource(amod)
     assert "import logging" not in src
@@ -850,18 +839,6 @@ def test_signature_figure_caption_prf_no_defaults():
         assert p.default is inspect.Parameter.empty
 
 
-def test_signature_figure_caption_prf_no_varargs():
-    sig = inspect.signature(figure_caption_prf)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_figure_caption_prf_no_kwargs():
-    sig = inspect.signature(figure_caption_prf)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_signature_chunk_boundary_prf_3_params():
     sig = inspect.signature(chunk_boundary_prf)
     assert len(sig.parameters) == 3
@@ -876,12 +853,6 @@ def test_signature_chunk_boundary_prf_tolerance_kind():
     sig = inspect.signature(chunk_boundary_prf)
     p = sig.parameters["tolerance_chars"]
     assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_chunk_boundary_prf_no_varargs():
-    sig = inspect.signature(chunk_boundary_prf)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
 
 
 def test_signature_chunk_boundary_prf_no_kwargs():
@@ -921,10 +892,6 @@ def test_module_all_exact_3_items_in_order():
 
 def test_module_all_is_list():
     assert isinstance(amod.__all__, list)
-
-
-def test_module_all_entries_unique():
-    assert len(set(amod.__all__)) == len(amod.__all__)
 
 
 def test_module_all_entries_are_str():
@@ -1104,14 +1071,6 @@ def test_e2e_chunk_boundary_kwargs_full_call():
     annotation = {"chunk_boundary_anchors": [{"marker": "a", "position": "after"}]}
     r = chunk_boundary_prf(document=doc, annotation=annotation, tolerance_chars=0)
     assert "chunk_boundary_precision" in r
-
-
-def test_e2e_chunk_boundary_idempotent():
-    doc = {"chunks": [{"text": "hello"}, {"text": "world"}]}
-    annotation = {"chunk_boundary_anchors": [{"marker": "hello", "position": "after"}]}
-    r1 = chunk_boundary_prf(doc, annotation, tolerance_chars=0)
-    r2 = chunk_boundary_prf(doc, annotation, tolerance_chars=0)
-    assert r1 == r2
 
 
 def test_e2e_figure_caption_idempotent():

@@ -438,18 +438,6 @@ def test_validate_file_idempotent_batch9(tmp_path):
     validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_positional_args_batch9(tmp_path):
-    data = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps(data), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_kwargs_batch9(tmp_path):
     data = {
         "manifest_version": "1.0",

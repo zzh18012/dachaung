@@ -595,16 +595,6 @@ def test_signature_figure_caption_prf_two_params_batch36():
     assert len(sig.parameters) == 2
 
 
-def test_signature_figure_caption_prf_document_no_default_batch36():
-    sig = inspect.signature(figure_caption_prf)
-    assert sig.parameters["document"].default is inspect.Parameter.empty
-
-
-def test_signature_figure_caption_prf_annotation_no_default_batch36():
-    sig = inspect.signature(figure_caption_prf)
-    assert sig.parameters["annotation"].default is inspect.Parameter.empty
-
-
 def test_signature_chunk_boundary_prf_three_params_batch36():
     sig = inspect.signature(chunk_boundary_prf)
     assert len(sig.parameters) == 3

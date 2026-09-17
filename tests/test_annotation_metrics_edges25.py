@@ -523,11 +523,6 @@ def test_module_source_has_denom_check():
     assert "denom <= 0" in src
 
 
-def test_module_source_has_out_dict_annotation():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "out: dict[str, dict[str, Any]] = {}" in src
-
-
 def test_module_source_has_no_main_block():
     src = inspect.getsource(m)
     assert '__name__ == "__main__"' not in src

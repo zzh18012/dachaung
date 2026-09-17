@@ -653,13 +653,6 @@ def test_build_parser_run_namespace_via_parse_args():
     assert ns.tolerance_chars == 30
 
 
-def test_build_parser_validate_report_namespace():
-    p = _build_parser()
-    ns = p.parse_args(["validate-report", "report.json"])
-    assert ns.command == "validate-report"
-    assert ns.input == "report.json"
-
-
 def test_build_parser_inspect_doc_namespace():
     p = _build_parser()
     ns = p.parse_args(["inspect-doc", "doc.json"])
@@ -1286,11 +1279,6 @@ def test_cli_source_has_run_inspect_doc_function():
     assert "def _run_inspect_doc(" in src
 
 
-def test_cli_source_main_block():
-    src = inspect.getsource(cli_mod)
-    assert 'if __name__ == "__main__":' in src
-
-
 def test_cli_source_main_block_raises_system_exit():
     src = inspect.getsource(cli_mod)
     assert "raise SystemExit(main())" in src
@@ -1772,14 +1760,6 @@ def test_e2e_main_inspect_doc_with_empty_doc_id_uses_question_mark(tmp_path, cap
     main(["inspect-doc", str(p)])
     out = capsys.readouterr().out
     # doc.get('document_id', '?') 默认 '?'
-    assert "?" in out
-
-
-def test_e2e_main_inspect_doc_with_missing_source_path(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps({}), encoding="utf-8")
-    main(["inspect-doc", str(p)])
-    out = capsys.readouterr().out
     assert "?" in out
 
 

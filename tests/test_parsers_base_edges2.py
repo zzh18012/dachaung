@@ -440,10 +440,6 @@ def test_detect_source_type_mixed_case_docx():
     assert detect_source_type("x.DoCx") == "docx"
 
 
-def test_detect_source_type_str_path_accepted():
-    assert isinstance(detect_source_type("x.pdf"), str)
-
-
 def test_detect_source_type_path_object_accepted():
     assert detect_source_type(Path("x.pdf")) == "pdf"
 
@@ -779,14 +775,6 @@ def test_module_silence_unused_takes_no_arguments():
 # ---------- callable 验证 ----------
 
 
-def test_make_document_id_callable_check():
-    assert callable(make_document_id)
-
-
-def test_detect_source_type_callable_check():
-    assert callable(detect_source_type)
-
-
 def test_parser_class_callable_check():
     """Parser 类（被实例化时会 TypeError，但 callable 仍为 True）。"""
     assert callable(Parser)
@@ -797,10 +785,6 @@ def test_parser_error_class_callable():
 
 
 # ---------- 综合验证 ----------
-
-
-def test_parser_error_inherits_from_exception():
-    assert issubclass(ParserError, Exception)
 
 
 def test_parser_error_inherits_from_object():

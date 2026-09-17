@@ -381,12 +381,6 @@ def test_parser_does_not_emit_relations_hashable():
     assert d[PARSER_DOES_NOT_EMIT_RELATIONS] == 1
 
 
-def test_parser_does_not_emit_relations_singleton_in_module():
-    import evaluation.annotation_metrics as m
-
-    assert m.PARSER_DOES_NOT_EMIT_RELATIONS is PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 # =========================================================================
 # 模块 namespace 完整性
 # =========================================================================
@@ -518,18 +512,6 @@ def test_figure_caption_prf_param_kinds_positional_or_keyword():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_figure_caption_prf_no_var_args():
-    sig = inspect.signature(figure_caption_prf)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_figure_caption_prf_no_var_kwargs():
-    sig = inspect.signature(figure_caption_prf)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_chunk_boundary_prf_signature_param_count_3():
     sig = inspect.signature(chunk_boundary_prf)
     assert len(sig.parameters) == 3
@@ -561,12 +543,6 @@ def test_chunk_boundary_prf_param_kinds_positional_or_keyword():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_chunk_boundary_prf_no_var_args():
-    sig = inspect.signature(chunk_boundary_prf)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
 def test_chunk_boundary_prf_no_var_kwargs():
     sig = inspect.signature(chunk_boundary_prf)
     for p in sig.parameters.values():
@@ -582,16 +558,8 @@ def test_figure_caption_prf_module_identity():
     assert figure_caption_prf.__module__ == "evaluation.annotation_metrics"
 
 
-def test_figure_caption_prf_qualname():
-    assert figure_caption_prf.__qualname__ == "figure_caption_prf"
-
-
 def test_chunk_boundary_prf_module_identity():
     assert chunk_boundary_prf.__module__ == "evaluation.annotation_metrics"
-
-
-def test_chunk_boundary_prf_qualname():
-    assert chunk_boundary_prf.__qualname__ == "chunk_boundary_prf"
 
 
 def test_all_helpers_are_function_type():

@@ -444,10 +444,6 @@ def test_chunk_buffer_document_id_stored():
     assert buf.document_id == "doc-42"
 
 
-def test_chunk_buffer_dataclass_field():
-    assert is_dataclass(_ChunkBuffer)
-
-
 def test_chunk_buffer_init_signature():
     sig = inspect.signature(_ChunkBuffer.__init__)
     # self + document_id + parts(default) + counter(default)
@@ -476,16 +472,6 @@ def test_split_piece_explicit_start_end():
     assert p.end == 11
 
 
-def test_split_piece_boundary_after_accepts_none():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.boundary_after is None
-
-
-def test_split_piece_boundary_after_accepts_whitespace():
-    p = _SplitPiece(text="x", boundary_after="whitespace")
-    assert p.boundary_after == "whitespace"
-
-
 def test_split_piece_boundary_after_accepts_forced_char():
     p = _SplitPiece(text="x", boundary_after="forced_char")
     assert p.boundary_after == "forced_char"
@@ -495,12 +481,6 @@ def test_split_piece_setattr_raises():
     p = _SplitPiece(text="x", boundary_after=None)
     with pytest.raises(Exception):
         p.text = "y"  # frozen
-
-
-def test_split_piece_equality_same():
-    a = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    b = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    assert a == b
 
 
 def test_split_piece_equality_different_start():
@@ -885,14 +865,6 @@ def test_element_text_legacy_method_returns_text_only():
 def test_normalize_text_idempotent_on_normalized():
     s = "hello world"
     assert normalize_text(normalize_text(s)) == normalize_text(s)
-
-
-def test_normalize_text_preserves_internal_single_space():
-    assert normalize_text("hello world") == "hello world"
-
-
-def test_normalize_text_collapses_multiple_internal_spaces():
-    assert normalize_text("hello   world") == "hello world"
 
 
 def test_normalize_text_handles_mixed_whitespace_combo():

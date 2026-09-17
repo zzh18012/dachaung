@@ -522,19 +522,6 @@ def test_compute_metrics_with_patched_document_passes_schema_false_batch40():
     assert m["schema_valid"]["value"] is False
 
 
-def test_compute_metrics_idempotent_batch40():
-    doc = {
-        "document_id": "d1",
-        "source_type": "pdf",
-        "elements": [{"type": "paragraph", "content": "abc", "element_id": "e1",
-                      "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}}],
-        "chunks": [{"text": "abc", "source_element_ids": ["e1"]}],
-    }
-    m1 = compute_automatic_metrics(doc, None, "pdf", None)
-    m2 = compute_automatic_metrics(doc, None, "pdf", None)
-    assert m1 == m2
-
-
 def test_compute_metrics_with_expectations_no_drop_batch40():
     doc = {
         "document_id": "d1",
@@ -937,19 +924,6 @@ def test_e2e_compute_metrics_docx_full_batch40():
     m = compute_automatic_metrics(doc, None, "docx", None)
     assert m["docx_locator_valid_ratio"]["value"] == 1.0
     assert m["pdf_locator_valid_ratio"]["reason"] == "not_pdf_document"
-
-
-def test_e2e_compute_metrics_idempotent_batch40():
-    doc = {
-        "document_id": "d1",
-        "source_type": "pdf",
-        "elements": [{"type": "paragraph", "content": "abc", "element_id": "e1",
-                      "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}}],
-        "chunks": [{"text": "abc", "source_element_ids": ["e1"]}],
-    }
-    m1 = compute_automatic_metrics(doc, None, "pdf", None)
-    m2 = compute_automatic_metrics(doc, None, "pdf", None)
-    assert m1 == m2
 
 
 def test_e2e_compute_metrics_does_not_mutate_doc_batch40():

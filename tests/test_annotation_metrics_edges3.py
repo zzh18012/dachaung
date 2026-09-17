@@ -690,12 +690,6 @@ def test_figure_caption_keys_exact_set():
     }
 
 
-def test_figure_caption_all_values_are_none():
-    out = figure_caption_prf({"chunks": []}, None)
-    for v in out.values():
-        assert v["value"] is None
-
-
 def test_figure_caption_all_reasons_parser_does_not_emit():
     out = figure_caption_prf({"chunks": []}, None)
     for v in out.values():

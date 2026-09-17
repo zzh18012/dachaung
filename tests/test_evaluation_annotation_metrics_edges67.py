@@ -54,10 +54,6 @@ def test_parser_does_not_emit_relations_in_all_batch43():
     assert "PARSER_DOES_NOT_EMIT_RELATIONS" in amod.__all__
 
 
-def test_parser_does_not_emit_relations_lowercase_batch43():
-    assert PARSER_DOES_NOT_EMIT_RELATIONS.islower()
-
-
 # ---------- figure_caption_prf 第四十三批
 
 
@@ -919,11 +915,6 @@ def test_module_has_chunk_boundary_attr_batch43():
 
 def test_module_has_parser_does_not_emit_relations_attr_batch43():
     assert hasattr(amod, "PARSER_DOES_NOT_EMIT_RELATIONS")
-
-
-def test_module_functions_callable_batch43():
-    assert callable(amod.figure_caption_prf)
-    assert callable(amod.chunk_boundary_prf)
 
 
 def test_module_no_module_level_code_outside_functions_batch43():

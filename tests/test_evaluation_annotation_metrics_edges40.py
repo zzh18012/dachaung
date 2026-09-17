@@ -89,12 +89,6 @@ def test_figure_caption_prf_metric_dict_keys_exact_batch13():
         assert set(v.keys()) == {"value", "reason"}
 
 
-def test_figure_caption_prf_metric_dict_value_is_none_batch13():
-    out = figure_caption_prf(None, None)
-    for k, v in out.items():
-        assert v["value"] is None
-
-
 def test_figure_caption_prf_metric_dict_reason_constant_batch13():
     out = figure_caption_prf(None, None)
     for k, v in out.items():
@@ -126,12 +120,6 @@ def test_chunk_boundary_prf_document_none_returns_pipeline_failed_batch13():
 def test_chunk_boundary_prf_document_none_includes_tolerance_chars_batch13():
     out = chunk_boundary_prf(None, None, tolerance_chars=42)
     assert out["_tolerance_chars"]["value"] == 42
-
-
-def test_chunk_boundary_prf_annotation_none_returns_no_annotation_batch13():
-    out = chunk_boundary_prf({"chunks": []}, None)
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["reason"] == "no_annotation"
 
 
 def test_chunk_boundary_prf_annotation_empty_dict_batch13():
@@ -430,12 +418,6 @@ def test_annotation_metrics_source_no_re_module_batch13():
     assert "re." not in source
 
 
-def test_annotation_metrics_source_no_eval_call_batch13():
-    source = inspect.getsource(amod)
-    assert "eval(" not in source
-    assert "exec(" not in source
-
-
 def test_annotation_metrics_source_no_compile_batch13():
     source = inspect.getsource(amod)
     assert "compile(" not in source
@@ -720,12 +702,6 @@ def test_module_docstring_mentions_figure_caption_batch13():
 def test_module_docstring_mentions_chunk_boundary_batch13():
     assert amod.__doc__ is not None
     assert "chunk_boundary" in amod.__doc__ or "chunk-boundary" in amod.__doc__
-
-
-def test_module_uses_future_annotations_batch13():
-    source = inspect.getsource(amod)
-    head = "\n".join(source.split("\n")[:20])
-    assert "from __future__ import annotations" in head
 
 
 def test_module_no_user_classes_batch13():

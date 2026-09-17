@@ -1167,22 +1167,11 @@ def test_module_name_evaluation_cli_batch13():
     assert climod.__name__ == "evaluation.cli"
 
 
-def test_module_docstring_present_batch13():
-    assert climod.__doc__ is not None
-    assert len(climod.__doc__) > 30
-
-
 def test_module_docstring_mentions_subcommands_batch13():
     assert climod.__doc__ is not None
     assert "run" in climod.__doc__
     assert "validate-report" in climod.__doc__
     assert "inspect-doc" in climod.__doc__
-
-
-def test_module_uses_future_annotations_batch13():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:20])
-    assert "from __future__ import annotations" in head
 
 
 def test_module_no_user_classes_batch13():

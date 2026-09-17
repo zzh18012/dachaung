@@ -858,12 +858,6 @@ def test_module_docstring_mentions_subcommands():
     assert "inspect-doc" in doc
 
 
-def test_module_uses_future_annotations():
-    import evaluation.cli as m
-    sig = inspect.signature(m.main)
-    assert isinstance(sig.return_annotation, str)
-
-
 def test_module_stdout_reconfigure_block_present():
     """模块顶层有 sys.stdout.reconfigure 处理。"""
     import evaluation.cli as m

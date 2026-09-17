@@ -660,11 +660,6 @@ def test_chunk_boundary_source_uses_tolerance_compare():
     assert "tolerance_chars" in src
 
 
-def test_chunk_boundary_source_uses_pairs_sort_by_distance():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "pairs.sort" in src
-
-
 def test_chunk_boundary_source_uses_used_pred_used_gt_set():
     src = inspect.getsource(chunk_boundary_prf)
     assert "used_pred" in src

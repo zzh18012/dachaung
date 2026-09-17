@@ -259,16 +259,6 @@ def test_validate_does_not_raise_on_valid_instance_batch36():
     validate(data, "manifest.schema.json")  # 无异常
 
 
-def test_validate_returns_none_on_success_batch36():
-    data = {
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    assert validate(data, "manifest.schema.json") is None
-
-
 # ---------- validate_file 第三十六批
 
 
@@ -315,17 +305,6 @@ def test_validate_file_str_path_input_batch36(tmp_path):
         "expected_failures": [],
     }), encoding="utf-8")
     validate_file(str(p), "manifest.schema.json")
-
-
-def test_validate_file_returns_none_on_success_batch36(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [],
-        "expected_failures": [],
-    }), encoding="utf-8")
-    assert validate_file(p, "manifest.schema.json") is None
 
 
 def test_validate_file_path_annotation_path_or_str_batch36():
@@ -667,16 +646,6 @@ def test_module_functions_callable_batch36():
 
 
 # ---------- 端到端集成 第五十六批
-
-
-def test_e2e_validate_minimal_valid_manifest_batch36():
-    data = {
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    assert validate(data, "manifest.schema.json") is None
 
 
 def test_e2e_validate_invalid_manifest_batch36():

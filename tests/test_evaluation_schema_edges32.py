@@ -673,12 +673,6 @@ def test_module_source_has_validate_file_def_batch12():
     assert "def validate_file(" in source
 
 
-def test_module_source_future_annotations_top_level_batch12():
-    source = inspect.getsource(smod)
-    head = "\n".join(source.split("\n")[:20])
-    assert "from __future__ import annotations" in head
-
-
 def test_module_source_has_dunder_all_5_items_batch12():
     source = inspect.getsource(smod)
     assert '"SCHEMAS_DIR"' in source
@@ -804,12 +798,6 @@ def test_module_docstring_mentions_no_reuse_batch12():
     """docstring 应提到不复用 app/schema.py。"""
     assert smod.__doc__ is not None
     assert "app/schema" in smod.__doc__ or "不复用" in smod.__doc__
-
-
-def test_module_uses_future_annotations_batch12():
-    source = inspect.getsource(smod)
-    head = "\n".join(source.split("\n")[:20])
-    assert "from __future__ import annotations" in head
 
 
 def test_module_user_class_count_1_batch12():

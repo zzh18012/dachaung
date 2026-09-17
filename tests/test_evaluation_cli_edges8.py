@@ -721,16 +721,6 @@ def test_module_imports_path():
     assert hasattr(m, "Path")
 
 
-def test_module_imports_manifest_error():
-    import evaluation.cli as m
-    assert hasattr(m, "ManifestError")
-
-
-def test_module_imports_load_manifest():
-    import evaluation.cli as m
-    assert hasattr(m, "load_manifest")
-
-
 def test_module_imports_get_git_provenance():
     import evaluation.cli as m
     assert hasattr(m, "get_git_provenance")
@@ -739,16 +729,6 @@ def test_module_imports_get_git_provenance():
 def test_module_imports_run_evaluation():
     import evaluation.cli as m
     assert hasattr(m, "run_evaluation")
-
-
-def test_module_imports_eval_schema_error():
-    import evaluation.cli as m
-    assert hasattr(m, "EvalSchemaError")
-
-
-def test_module_imports_validate_file():
-    import evaluation.cli as m
-    assert hasattr(m, "validate_file")
 
 
 def test_build_parser_signature():

@@ -949,11 +949,6 @@ def test_module_source_no_hardcoded_absolute_path_batch10():
     assert "/Users/" not in source
 
 
-def test_module_source_docstring_present_batch10():
-    assert rmod.__doc__ is not None
-    assert len(rmod.__doc__) > 50
-
-
 def test_module_source_docstring_mentions_pipeline_batch10():
     assert "pipeline" in rmod.__doc__.lower()
 
@@ -1035,11 +1030,6 @@ def test_signature_load_annotation_param_annotation_str_batch10():
     sig = inspect.signature(_load_annotation)
     p = list(sig.parameters.values())[0]
     assert p.annotation == "Path | None"
-
-
-def test_signature_load_annotation_return_annotation_str_batch10():
-    sig = inspect.signature(_load_annotation)
-    assert sig.return_annotation == "dict[str, Any] | None"
 
 
 def test_signature_process_one_param_count_batch10():
@@ -1258,11 +1248,6 @@ def test_module_constants_only_all_batch10():
         if isinstance(v, (tuple, list, dict, set, frozenset)) and not callable(v):
             consts.append(n)
     assert set(consts) == set()
-
-
-def test_module_docstring_present_batch10():
-    assert rmod.__doc__ is not None
-    assert len(rmod.__doc__) > 50
 
 
 def test_module_docstring_in_chinese_or_english_batch10():

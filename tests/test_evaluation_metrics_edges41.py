@@ -479,16 +479,6 @@ def test_is_valid_bbox_tuple_batch14():
 # ---------- _pdf_locator_ratio / _docx_locator_ratio 第十四批 ----------
 
 
-def test_pdf_locator_ratio_no_elements_batch14():
-    out = _pdf_locator_ratio([])
-    assert out["value"] is None
-
-
-def test_pdf_locator_ratio_missing_elements_key_batch14():
-    out = _pdf_locator_ratio([])
-    assert out["value"] is None
-
-
 def test_pdf_locator_ratio_with_bbox_all_valid_batch14():
     elements = [
         {"type": "heading", "source_locator": {"page": 1, "bbox": [0, 0, 10, 10]}},

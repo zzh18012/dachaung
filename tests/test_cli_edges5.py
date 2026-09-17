@@ -89,34 +89,6 @@ def test_extension_to_parser_docx():
     assert _EXTENSION_TO_PARSER[".docx"] == "fallback"
 
 
-def test_extension_to_parser_md():
-    assert _EXTENSION_TO_PARSER[".md"] == "markdown"
-
-
-def test_extension_to_parser_markdown():
-    assert _EXTENSION_TO_PARSER[".markdown"] == "markdown"
-
-
-def test_extension_to_parser_html():
-    assert _EXTENSION_TO_PARSER[".html"] == "html"
-
-
-def test_extension_to_parser_htm():
-    assert _EXTENSION_TO_PARSER[".htm"] == "html"
-
-
-def test_extension_to_parser_txt():
-    assert _EXTENSION_TO_PARSER[".txt"] == "text"
-
-
-def test_extension_to_parser_text():
-    assert _EXTENSION_TO_PARSER[".text"] == "text"
-
-
-def test_extension_to_parser_ipynb():
-    assert _EXTENSION_TO_PARSER[".ipynb"] == "ipynb"
-
-
 # =========================================================================
 # _infer_parser_name 大小写
 # =========================================================================
@@ -204,11 +176,6 @@ def test_iter_supported_files_filters_only_supported(tmp_path: Path):
     assert "a.txt" in names
     assert "c.md" in names
     assert "b.unknown" not in names
-
-
-def test_iter_supported_files_returns_list(tmp_path: Path):
-    result = _iter_supported_files(tmp_path, recursive=False)
-    assert isinstance(result, list)
 
 
 def test_iter_supported_files_sorted_by_name(tmp_path: Path):

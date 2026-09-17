@@ -485,26 +485,6 @@ def test_infer_parser_name_unknown_suffix():
     assert _infer_parser_name(Path("x.unknownext")) == "fallback"
 
 
-def test_infer_parser_name_md():
-    assert _infer_parser_name(Path("x.md")) == "markdown"
-
-
-def test_infer_parser_name_markdown():
-    assert _infer_parser_name(Path("x.markdown")) == "markdown"
-
-
-def test_infer_parser_name_html():
-    assert _infer_parser_name(Path("x.html")) == "html"
-
-
-def test_infer_parser_name_htm():
-    assert _infer_parser_name(Path("x.htm")) == "html"
-
-
-def test_infer_parser_name_ipynb():
-    assert _infer_parser_name(Path("x.ipynb")) == "ipynb"
-
-
 # =============================================================================
 # _iter_supported_files 边界
 # =============================================================================

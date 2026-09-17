@@ -568,24 +568,9 @@ def test_source_contains_list_tuple_annotation_batch48():
     assert "list[tuple[int, int, int]]" in src
 
 
-def test_source_contains_break_in_loop_batch48():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "break" in src
-
-
 def test_source_contains_continue_in_loop_batch48():
     src = inspect.getsource(chunk_boundary_prf)
     assert "continue" in src
-
-
-def test_source_contains_normalize_text_called_batch48():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "normalize_text(" in src
-
-
-def test_source_contains_search_from_keyword_batch48():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "search_from" in src
 
 
 def test_source_contains_pipeline_failed_reason_batch48():

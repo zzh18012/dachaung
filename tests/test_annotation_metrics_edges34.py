@@ -413,10 +413,6 @@ def test_module_docstring_mentions_one_to_one():
     assert "一对一" in amod.__doc__
 
 
-def test_module_file_endswith_annotation_metrics_py():
-    assert amod.__file__.endswith("annotation_metrics.py")
-
-
 def test_module_name_is_evaluation_annotation_metrics():
     assert amod.__name__ == "evaluation.annotation_metrics"
 
@@ -478,11 +474,6 @@ def test_module_source_no_yield():
     assert "yield" not in src
 
 
-def test_module_source_no_async_def():
-    src = inspect.getsource(amod)
-    assert "async def" not in src
-
-
 def test_module_source_no_walrus():
     src = inspect.getsource(amod)
     assert ":=" not in src
@@ -518,11 +509,6 @@ def test_module_source_no_open():
     src = inspect.getsource(amod)
     # 'open(' 字面值（不是 keyword）
     assert "open(" not in src
-
-
-def test_module_source_no_print():
-    src = inspect.getsource(amod)
-    assert "print(" not in src
 
 
 def test_module_source_no_relative_import_above_app_or_eval():

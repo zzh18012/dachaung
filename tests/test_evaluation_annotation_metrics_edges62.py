@@ -27,10 +27,6 @@ def test_parser_const_value_exact_batch35():
     assert PARSER_DOES_NOT_EMIT_RELATIONS == "parser_does_not_emit_relations"
 
 
-def test_parser_const_contains_underscore_batch35():
-    assert "_" in PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 def test_parser_const_starts_with_parser_batch35():
     assert PARSER_DOES_NOT_EMIT_RELATIONS.startswith("parser_")
 
@@ -467,16 +463,6 @@ def test_module_source_contains_all_with_three_entries_batch35():
 def test_module_source_all_contains_parser_const_batch35():
     src = inspect.getsource(amod)
     assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-
-
-def test_module_source_all_contains_figure_caption_batch35():
-    src = inspect.getsource(amod)
-    assert '"figure_caption_prf"' in src
-
-
-def test_module_source_all_contains_chunk_boundary_batch35():
-    src = inspect.getsource(amod)
-    assert '"chunk_boundary_prf"' in src
 
 
 # ---------- signatures 第四十九批

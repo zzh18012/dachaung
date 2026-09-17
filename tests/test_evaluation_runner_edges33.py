@@ -125,13 +125,6 @@ def test_process_one_source_starts_with_def():
     assert src.lstrip().startswith("def _process_one(")
 
 
-def test_process_one_source_4_params():
-    sig = inspect.signature(_process_one)
-    params = list(sig.parameters.values())
-    assert len(params) == 4
-    assert [p.name for p in params] == ["doc", "output_root", "parser_name", "max_chars"]
-
-
 def test_process_one_source_returns_5_tuple():
     src = inspect.getsource(_process_one)
     assert "tuple[dict[str, Any] | None, dict[str, Any] | None, float, str | None, Path | None]" in src
@@ -656,22 +649,6 @@ def test_module_source_no_main_block():
     assert 'if __name__' not in src
 
 
-def test_module_source_no_user_class():
-    classes = [
-        name for name, val in vars(rmod).items()
-        if isinstance(val, type) and val.__module__ == rmod.__name__
-    ]
-    assert classes == []
-
-
-def test_module_source_3_user_functions():
-    funcs = [
-        name for name, val in vars(rmod).items()
-        if isinstance(val, types.FunctionType) and val.__module__ == rmod.__name__
-    ]
-    assert set(funcs) == {"_load_annotation", "_process_one", "run_evaluation"}
-
-
 def test_module_source_all_1_entry():
     src = inspect.getsource(rmod)
     assert '__all__ = ["run_evaluation"]' in src
@@ -724,13 +701,6 @@ def test_signature_load_annotation_no_varargs():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_signature_process_one():
-    sig = inspect.signature(_process_one)
-    params = list(sig.parameters.values())
-    assert len(params) == 4
-    assert [p.name for p in params] == ["doc", "output_root", "parser_name", "max_chars"]
-
-
 def test_signature_process_one_no_defaults():
     sig = inspect.signature(_process_one)
     for p in sig.parameters.values():
@@ -741,12 +711,6 @@ def test_signature_process_one_no_varargs():
     sig = inspect.signature(_process_one)
     for p in sig.parameters.values():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_run_evaluation():
-    sig = inspect.signature(run_evaluation)
-    params = list(sig.parameters.values())
-    assert len(params) == 5
 
 
 def test_signature_run_evaluation_manifest_no_default():
@@ -811,14 +775,6 @@ def test_module_namespace_3_callables():
         if isinstance(val, types.FunctionType) and val.__module__ == rmod.__name__
     ]
     assert set(funcs) == {"_load_annotation", "_process_one", "run_evaluation"}
-
-
-def test_module_no_user_classes():
-    classes = [
-        name for name, val in vars(rmod).items()
-        if isinstance(val, type) and val.__module__ == rmod.__name__
-    ]
-    assert classes == []
 
 
 def test_module_name_is_evaluation_runner():

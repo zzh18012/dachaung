@@ -542,11 +542,6 @@ def test_eval_schema_error_errors_default_is_empty_list():
     assert len(err.errors) == 0
 
 
-def test_eval_schema_error_errors_empty_list_unchanged():
-    err = EvalSchemaError("msg", errors=[])
-    assert err.errors == []
-
-
 def test_eval_schema_error_with_none_errors_explicit():
     err = EvalSchemaError("msg", errors=None)
     assert err.errors == []
@@ -608,16 +603,6 @@ def test_eval_schema_error_complex_errors():
 
 
 # ---------- validate 行为深度第七批 ----------
-
-
-def test_validate_returns_none_on_success():
-    schema_name = "manifest.schema.json"
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }
-    assert validate(instance, schema_name) is None
 
 
 def test_validate_raises_on_missing_required_field():
@@ -683,16 +668,6 @@ def test_validate_error_errors_list_dict_keys():
             assert "path" in err_dict
             assert "message" in err_dict
             assert "schema_path" in err_dict
-
-
-def test_validate_with_str_path_as_filename():
-    schema_name = "manifest.schema.json"
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }
-    validate(instance, schema_name)
 
 
 def test_validate_raises_file_not_found_for_unknown_schema():
@@ -1446,16 +1421,6 @@ def test_e2e_load_schema_does_not_mutate_disk():
     assert before == after
 
 
-def test_e2e_validate_minimal_manifest_passes():
-    schema_name = "manifest.schema.json"
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }
-    validate(instance, schema_name)
-
-
 def test_e2e_validate_empty_documents_passes():
     schema_name = "manifest.schema.json"
     instance = {
@@ -1554,11 +1519,6 @@ def test_e2e_schema_path_returns_path():
 def test_e2e_schema_path_for_nonexistent_raises():
     with pytest.raises(FileNotFoundError):
         _schema_path("nonexistent.schema.json")
-
-
-def test_e2e_eval_schema_error_with_empty_errors_list():
-    err = EvalSchemaError("msg", errors=[])
-    assert err.errors == []
 
 
 def test_e2e_eval_schema_error_with_complex_errors():

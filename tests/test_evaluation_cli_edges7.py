@@ -614,26 +614,6 @@ def test_module_docstring_mentions_inspect_doc_purpose():
     assert "sanity" in doc.lower() or "不写报告" in doc
 
 
-def test_module_has_main_function():
-    import evaluation.cli as mod
-    assert callable(mod.main)
-
-
-def test_module_has_build_parser_function():
-    import evaluation.cli as mod
-    assert callable(mod._build_parser)
-
-
-def test_module_has_format_metric_function():
-    import evaluation.cli as mod
-    assert callable(mod._format_metric)
-
-
-def test_module_has_run_inspect_doc_function():
-    import evaluation.cli as mod
-    assert callable(mod._run_inspect_doc)
-
-
 def test_module_main_raises_system_exit_at_module_main():
     """if __name__ == '__main__' 时 raise SystemExit(main())。"""
     import evaluation.cli as mod

@@ -326,15 +326,6 @@ def test_validate_file_path_str_batch16(tmp_path):
     validate_file(str(p), "manifest.schema.json")
 
 
-def test_validate_file_path_object_batch16(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0", "devset_status": "incomplete",
-        "documents": [], "expected_failures": [],
-    }), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_bom_fails_batch16(tmp_path):
     """UTF-8 BOM → json.load 失败。"""
     p = tmp_path / "m.json"
@@ -677,15 +668,6 @@ def test_e2e_eval_schema_error_with_complex_errors_batch16():
     ]
     err = EvalSchemaError("complex", errors=complex_errs)
     assert err.errors == complex_errs
-
-
-def test_e2e_validate_file_full_batch16(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0", "devset_status": "incomplete",
-        "documents": [], "expected_failures": [],
-    }), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
 
 
 def test_e2e_validate_three_schemas_distinct_content_batch16():

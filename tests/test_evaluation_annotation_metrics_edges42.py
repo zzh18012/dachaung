@@ -554,10 +554,6 @@ def test_module_has_null_ratio_helpers_batch15():
     assert hasattr(amod, "_ratio")
 
 
-def test_module_parser_does_not_emit_constant_in_namespace_batch15():
-    assert "PARSER_DOES_NOT_EMIT_RELATIONS" in vars(amod)
-
-
 def test_module_does_not_mutate_inputs_batch15():
     """调用 chunk_boundary_prf 不应修改输入 document/annotation。"""
     doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}

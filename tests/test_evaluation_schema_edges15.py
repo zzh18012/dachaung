@@ -521,16 +521,6 @@ def test_validate_multiple_violations_count():
 # =========================================================================
 
 
-def test_validate_file_success_returns_none(tmp_path):
-    p = tmp_path / "valid.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }), encoding="utf-8")
-    assert validate_file(p, "manifest.schema.json") is None
-
-
 def test_validate_file_invalid_content_raises(tmp_path):
     p = tmp_path / "invalid.json"
     p.write_text(json.dumps({"manifest_version": "0.5"}), encoding="utf-8")

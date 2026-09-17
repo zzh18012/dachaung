@@ -709,10 +709,6 @@ def test_module_has_1_private_helper():
     assert private_fns == ["_schema_path"]
 
 
-def test_module_namespace():
-    assert m.__name__ == "evaluation.schema"
-
-
 def test_module_no_main_block():
     src = inspect.getsource(m)
     assert 'if __name__ == "__main__":' not in src

@@ -1626,11 +1626,6 @@ def test_e2e_docx_locator_with_relationship_id():
     assert r["value"] == 1.0
 
 
-def test_e2e_chunk_reference_with_none_elements_list():
-    r = _chunk_reference_ratio([], [{"chunk_id": "c1", "source_element_ids": ["e1"]}])
-    assert r["value"] == 0.0
-
-
 def test_e2e_text_preservation_with_dup_chars_in_actual():
     elements = [{"type": "paragraph", "content": "abc"}]
     chunks = [{"text": "aabbcc"}]  # 重复字符
@@ -1656,21 +1651,6 @@ def test_e2e_heading_boundary_with_three_headings_partial():
     ]
     r = _heading_boundary_ratio(elements, chunks)
     assert r["value"] == 2 / 3
-
-
-def test_e2e_full_chain_compute_then_check_keys():
-    doc = {"elements": [], "chunks": []}
-    r = compute_automatic_metrics(doc, None, "pdf", None)
-    expected_keys = {
-        "pipeline_success", "error_code", "schema_valid",
-        "element_count_total", "element_count_by_type",
-        "pdf_locator_valid_ratio", "docx_locator_valid_ratio",
-        "image_resource_exists_ratio", "chunk_reference_intact_ratio",
-        "text_preservation_equal", "text_char_multiset_precision",
-        "text_char_multiset_recall", "heading_boundary_compliance",
-        "silent_drop_count",
-    }
-    assert set(r.keys()) == expected_keys
 
 
 def test_e2e_metric_value_or_reason_in_each():

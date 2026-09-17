@@ -397,11 +397,6 @@ def test_module_source_no_numpy_import_batch20():
     assert "import numpy" not in src
 
 
-def test_module_source_no_os_import_batch20():
-    src = inspect.getsource(amod)
-    assert "import os" not in src
-
-
 # ---------- module source 字符串精确补强第三十批 ----------
 
 

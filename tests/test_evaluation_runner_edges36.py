@@ -824,11 +824,6 @@ def test_module_source_no_main_block():
     assert "if __name__" not in source
 
 
-def test_module_source_docstring_present():
-    assert rmod.__doc__ is not None
-    assert len(rmod.__doc__) > 50
-
-
 def test_module_source_docstring_mentions_total():
     assert "total" in rmod.__doc__
 
@@ -1128,11 +1123,6 @@ def test_module_constants_only_all():
         if isinstance(v, (tuple, list, dict, set, frozenset)) and not callable(v):
             consts.append(n)
     assert set(consts) == set()  # __all__ 已通过 __ 前缀过滤
-
-
-def test_module_docstring_present():
-    assert rmod.__doc__ is not None
-    assert len(rmod.__doc__) > 50
 
 
 # ---------- 端到端集成第九批 ----------

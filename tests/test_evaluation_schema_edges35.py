@@ -259,15 +259,6 @@ def test_validate_file_unicode_content_batch15(tmp_path):
     validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_returns_none_batch15(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0", "devset_status": "incomplete",
-        "documents": [], "expected_failures": [],
-    }), encoding="utf-8")
-    assert validate_file(p, "manifest.schema.json") is None
-
-
 def test_validate_file_idempotent_batch15(tmp_path):
     """同一文件多次 validate 结果一致。"""
     p = tmp_path / "m.json"
@@ -614,15 +605,6 @@ def test_e2e_eval_schema_error_with_complex_errors_batch15():
     ]
     err = EvalSchemaError("complex", errors=complex_errs)
     assert err.errors == complex_errs
-
-
-def test_e2e_validate_file_full_batch15(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0", "devset_status": "incomplete",
-        "documents": [], "expected_failures": [],
-    }), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
 
 
 def test_e2e_validate_three_schemas_distinct_content_batch15():

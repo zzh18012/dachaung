@@ -170,13 +170,6 @@ def test_figure_caption_prf_value_keys_strict_batch10():
 # ---------- chunk_boundary_prf 行为深度第十批 ----------
 
 
-def test_chunk_boundary_prf_document_none_returns_pipeline_failed_batch10():
-    out = chunk_boundary_prf(None, None)
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["reason"] == "pipeline_failed"
-        assert out[k]["value"] is None
-
-
 def test_chunk_boundary_prf_document_none_includes_tolerance_record_batch10():
     out = chunk_boundary_prf(None, None, tolerance_chars=42)
     assert out["_tolerance_chars"]["value"] == 42
@@ -561,11 +554,6 @@ def test_amod_source_no_async_def_batch10():
     assert "async def" not in source
 
 
-def test_amod_source_no_yield_batch10():
-    source = inspect.getsource(amod)
-    assert "yield" not in source
-
-
 def test_amod_source_no_walrus_batch10():
     source = inspect.getsource(amod)
     assert ":=" not in source
@@ -580,12 +568,6 @@ def test_amod_source_no_unlink_remove_batch10():
     source = inspect.getsource(amod)
     assert ".unlink(" not in source
     assert ".remove(" not in source
-
-
-def test_amod_source_no_logging_batch10():
-    source = inspect.getsource(amod)
-    assert "logging" not in source
-    assert "logger" not in source
 
 
 def test_amod_source_no_sleep_batch10():
@@ -645,16 +627,6 @@ def test_module_source_has_chunk_boundary_prf_def_batch10():
 def test_module_source_uses_normalize_text_batch10():
     source = inspect.getsource(amod)
     assert "normalize_text(" in source
-
-
-def test_module_source_uses_null_helper_batch10():
-    source = inspect.getsource(amod)
-    assert "_null(" in source
-
-
-def test_module_source_uses_ratio_helper_batch10():
-    source = inspect.getsource(amod)
-    assert "_ratio(" in source
 
 
 def test_module_source_no_main_block_batch10():

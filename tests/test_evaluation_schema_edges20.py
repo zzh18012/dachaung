@@ -501,11 +501,6 @@ def test_module_source_has_no_global():
     assert "global " not in src
 
 
-def test_module_source_has_no_main_block():
-    src = inspect.getsource(schema_mod)
-    assert 'if __name__' not in src
-
-
 def test_module_source_has_no_lambda_other_than_sort_key():
     src = inspect.getsource(schema_mod)
     lines_with_lambda = [line for line in src.splitlines() if "lambda " in line]

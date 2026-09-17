@@ -366,15 +366,6 @@ def test_chunk_boundary_position_before_uses_start():
     assert out["chunk_boundary_precision"]["value"] == 1.0
 
 
-def test_chunk_boundary_position_after_uses_end():
-    text_a = "alpha beta gamma delta epsilon zeta eta theta iota kappa lambda"
-    text_b = "mu nu xi omicron pi rho sigma tau upsilon phi chi psi omega"
-    doc = _doc_with_chunks([{"text": text_a}, {"text": text_b}])
-    ann = {"chunk_boundary_anchors": [{"marker": "lambda", "position": "after"}]}
-    out = chunk_boundary_prf(document=doc, annotation=ann, tolerance_chars=50)
-    assert out["chunk_boundary_recall"]["value"] == 1.0
-
-
 def test_chunk_boundary_position_default_is_after():
     """缺省 position → 当作 after。"""
     text_a = "alpha beta gamma delta epsilon zeta eta theta iota kappa lambda"

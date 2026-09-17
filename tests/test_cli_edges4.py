@@ -513,11 +513,6 @@ def test_iter_supported_files_only_unsupported_returns_empty(tmp_path: Path):
     assert _iter_supported_files(tmp_path, recursive=False) == []
 
 
-def test_iter_supported_files_returns_list_type(tmp_path: Path):
-    result = _iter_supported_files(tmp_path, recursive=False)
-    assert isinstance(result, list)
-
-
 def test_iter_supported_files_mixed_supported_and_unsupported(tmp_path: Path):
     (tmp_path / "a.txt").write_text("x", encoding="utf-8")
     (tmp_path / "b.csv").write_text("x", encoding="utf-8")
@@ -616,10 +611,6 @@ def test_infer_parser_name_pdf_lowercase():
 
 def test_infer_parser_name_pdf_uppercase():
     assert _infer_parser_name(Path("TEST.PDF")) == "fallback"
-
-
-def test_infer_parser_name_no_extension():
-    assert _infer_parser_name(Path("README")) == "fallback"
 
 
 def test_infer_parser_name_unknown_extension_csv():

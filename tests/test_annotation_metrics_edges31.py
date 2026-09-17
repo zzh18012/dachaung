@@ -52,11 +52,6 @@ def test_figure_caption_f1_key_present():
     assert "figure_caption_f1" in out
 
 
-def test_figure_caption_precision_value_none():
-    out = figure_caption_prf({}, {})
-    assert out["figure_caption_precision"]["value"] is None
-
-
 def test_figure_caption_recall_value_none():
     out = figure_caption_prf({}, {})
     assert out["figure_caption_recall"]["value"] is None
@@ -128,11 +123,6 @@ def test_figure_caption_returns_consistent_results():
     a = figure_caption_prf({"x": 1}, {"y": 2})
     b = figure_caption_prf({"x": 1}, {"y": 2})
     assert a == b
-
-
-def test_figure_caption_with_empty_dict_inputs():
-    out = figure_caption_prf({}, {})
-    assert out["figure_caption_precision"]["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
 
 
 def test_figure_caption_with_non_dict_inputs():
@@ -792,15 +782,6 @@ def test_module_source_uses_search_from():
 def test_module_source_uses_missing_markers():
     src = inspect.getsource(amod)
     assert "missing_markers" in src
-
-
-def test_module_source_function_count_2():
-    src = inspect.getsource(amod)
-    func_count = sum(
-        1 for line in src.splitlines()
-        if line.startswith("def ")
-    )
-    assert func_count == 2
 
 
 def test_module_source_function_names():

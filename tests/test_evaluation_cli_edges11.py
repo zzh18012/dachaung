@@ -679,16 +679,6 @@ def test_module_imports_path():
     assert hasattr(m, "Path")
 
 
-def test_module_imports_manifest_error():
-    import evaluation.cli as m
-    assert hasattr(m, "ManifestError")
-
-
-def test_module_imports_load_manifest():
-    import evaluation.cli as m
-    assert hasattr(m, "load_manifest")
-
-
 def test_module_imports_get_git_provenance():
     import evaluation.cli as m
     assert hasattr(m, "get_git_provenance")
@@ -697,16 +687,6 @@ def test_module_imports_get_git_provenance():
 def test_module_imports_run_evaluation():
     import evaluation.cli as m
     assert hasattr(m, "run_evaluation")
-
-
-def test_module_imports_eval_schema_error():
-    import evaluation.cli as m
-    assert hasattr(m, "EvalSchemaError")
-
-
-def test_module_imports_validate_file():
-    import evaluation.cli as m
-    assert hasattr(m, "validate_file")
 
 
 def test_module_docstring_present():
@@ -735,12 +715,6 @@ def test_module_docstring_mentions_python_m_dash_m():
     assert "python -m" in m.__doc__
 
 
-def test_module_uses_future_annotations():
-    import evaluation.cli as m
-    sig = inspect.signature(m.main)
-    assert isinstance(sig.return_annotation, str)
-
-
 def test_module_no_silence_unused():
     import evaluation.cli as m
     assert not hasattr(m, "_silence_unused_import")
@@ -767,12 +741,6 @@ def test_main_unknown_command_raises_system_exit_2(capsys):
 def test_main_returns_int_for_validate_report_success(tmp_path):
     p = _write_valid_report(tmp_path)
     result = main(["validate-report", str(p)])
-    assert isinstance(result, int)
-
-
-def test_main_returns_int_for_inspect_doc_success(tmp_path):
-    p = _write_doc_json(tmp_path)
-    result = main(["inspect-doc", str(p)])
     assert isinstance(result, int)
 
 

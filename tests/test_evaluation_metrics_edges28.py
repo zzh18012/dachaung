@@ -528,23 +528,10 @@ def test_module_source_no_global():
     assert "global " not in src
 
 
-def test_module_source_no_main_block():
-    src = inspect.getsource(metrics_mod)
-    assert 'if __name__' not in src
-
-
 def test_module_source_no_class():
     src = inspect.getsource(metrics_mod)
     assert "\nclass " not in src
     assert not src.startswith("class ")
-
-
-def test_module_source_no_decorators():
-    src = inspect.getsource(metrics_mod)
-    for line in src.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("@"):
-            assert False, f"unexpected decorator: {stripped}"
 
 
 def test_module_source_no_lambda():

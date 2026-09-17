@@ -132,13 +132,6 @@ def test_figure_caption_prf_returns_dict_with_value_reason_only():
 # ---------- chunk_boundary_prf 行为深度第九批 ----------
 
 
-def test_chunk_boundary_prf_document_none_returns_pipeline_failed():
-    out = chunk_boundary_prf(None, None)
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["reason"] == "pipeline_failed"
-        assert out[k]["value"] is None
-
-
 def test_chunk_boundary_prf_document_none_includes_tolerance_record():
     out = chunk_boundary_prf(None, None, tolerance_chars=42)
     assert out["_tolerance_chars"]["value"] == 42
@@ -586,10 +579,6 @@ def test_module_source_no_class_def():
     assert "class " not in source
 
 
-def test_module_source_docstring_present():
-    assert amod.__doc__ is not None
-
-
 def test_module_source_docstring_mentions_caption():
     assert "caption" in amod.__doc__.lower()
 
@@ -703,14 +692,6 @@ def test_signature_funcs_module_eq():
 
 
 # ---------- module 合理性第九批 ----------
-
-
-def test_module_all_attribute_value():
-    assert amod.__all__ == [
-        "PARSER_DOES_NOT_EMIT_RELATIONS",
-        "figure_caption_prf",
-        "chunk_boundary_prf",
-    ]
 
 
 def test_module_all_is_list():

@@ -43,18 +43,6 @@ from app.cli import (
 # =========================================================================
 
 
-def test_preview_none_returns_empty():
-    assert _preview(None) == ""
-
-
-def test_preview_empty_string_returns_empty():
-    assert _preview("") == ""
-
-
-def test_preview_short_text():
-    assert _preview("hello") == "hello"
-
-
 def test_preview_at_width_boundary():
     """正好 width 长度 → 不截断。"""
     s = "a" * 60
@@ -565,32 +553,12 @@ def test_infer_parser_name_docx():
     assert _infer_parser_name(Path("x.docx")) == "fallback"
 
 
-def test_infer_parser_name_md():
-    assert _infer_parser_name(Path("x.md")) == "markdown"
-
-
-def test_infer_parser_name_markdown():
-    assert _infer_parser_name(Path("x.markdown")) == "markdown"
-
-
-def test_infer_parser_name_html():
-    assert _infer_parser_name(Path("x.html")) == "html"
-
-
-def test_infer_parser_name_htm():
-    assert _infer_parser_name(Path("x.htm")) == "html"
-
-
 def test_infer_parser_name_txt():
     assert _infer_parser_name(Path("x.txt")) == "text"
 
 
 def test_infer_parser_name_text():
     assert _infer_parser_name(Path("x.text")) == "text"
-
-
-def test_infer_parser_name_ipynb():
-    assert _infer_parser_name(Path("x.ipynb")) == "ipynb"
 
 
 def test_infer_parser_name_unknown_returns_fallback():

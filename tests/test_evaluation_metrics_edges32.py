@@ -828,14 +828,6 @@ def test_module_source_no_main_block():
     assert 'if __name__' not in src
 
 
-def test_module_source_no_user_class():
-    classes = [
-        name for name, val in vars(mmod).items()
-        if isinstance(val, type) and val.__module__ == mmod.__name__
-    ]
-    assert classes == []
-
-
 def test_module_source_11_user_functions():
     funcs = [
         name for name, val in vars(mmod).items()

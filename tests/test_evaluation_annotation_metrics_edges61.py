@@ -39,11 +39,6 @@ def test_parser_const_in_all_batch34():
 # ---------- figure_caption_prf 第三十四批
 
 
-def test_figure_caption_prf_returns_dict_batch34():
-    out = figure_caption_prf({"chunks": []}, None)
-    assert isinstance(out, dict)
-
-
 def test_figure_caption_prf_keys_exact_batch34():
     out = figure_caption_prf(None, None)
     assert set(out.keys()) == {
@@ -51,12 +46,6 @@ def test_figure_caption_prf_keys_exact_batch34():
         "figure_caption_recall",
         "figure_caption_f1",
     }
-
-
-def test_figure_caption_prf_all_null_values_batch34():
-    out = figure_caption_prf({"chunks": []}, None)
-    for v in out.values():
-        assert v["value"] is None
 
 
 def test_figure_caption_prf_all_reasons_const_batch34():
@@ -453,14 +442,6 @@ def test_e2e_chunk_boundary_full_pipeline_batch34():
     assert out["chunk_boundary_precision"]["value"] == 1.0
     assert out["chunk_boundary_recall"]["value"] == 1.0
     assert out["chunk_boundary_f1"]["value"] == 1.0
-
-
-def test_e2e_chunk_boundary_idempotent_batch34():
-    doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "c", "position": "after"}]}
-    out1 = chunk_boundary_prf(doc, ann, tolerance_chars=5)
-    out2 = chunk_boundary_prf(doc, ann, tolerance_chars=5)
-    assert out1 == out2
 
 
 def test_e2e_chunk_boundary_irrelevant_annotation_keys_batch34():

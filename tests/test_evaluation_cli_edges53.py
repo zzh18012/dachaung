@@ -651,14 +651,6 @@ def test_module_source_forbidden_tokens_batch26():
         assert tok not in source, f"forbidden token in source: {tok}"
 
 
-def test_module_source_no_class_keyword_batch26():
-    import ast as _ast
-    import inspect as _insp
-    tree = _ast.parse(_insp.getsource(climod))
-    classes = [n for n in tree.body if isinstance(n, _ast.ClassDef)]
-    assert classes == []
-
-
 def test_module_source_no_eval_exec_batch26():
     import inspect as _insp
     source = _insp.getsource(climod)
@@ -972,12 +964,6 @@ def test_module_build_parser_docstring_missing_ok_batch26():
 
 
 # ---------- 端到端集成第三十八批 ----------
-
-
-def test_e2e_no_args_exits_batch26():
-    with pytest.raises(SystemExit) as exc:
-        main([])
-    assert exc.value.code == 2
 
 
 def test_e2e_unknown_subcommand_exits_batch26():

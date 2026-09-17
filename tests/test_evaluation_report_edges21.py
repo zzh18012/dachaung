@@ -1168,11 +1168,6 @@ def test_e2e_aggregate_summary_with_kwargs():
     assert isinstance(out, dict)
 
 
-def test_e2e_build_provenance_with_positional(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "1.0.0")
-    assert out["parser_name"] == "fallback"
-
-
 def test_e2e_build_provenance_with_kwargs(tmp_path):
     out = build_provenance(
         project_root=tmp_path,

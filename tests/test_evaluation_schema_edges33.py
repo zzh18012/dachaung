@@ -342,17 +342,6 @@ def test_validate_file_uses_context_manager_batch13():
     assert "with " in source
 
 
-def test_validate_file_returns_none_on_success_batch13(tmp_path):
-    p = tmp_path / "manifest.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }), encoding="utf-8")
-    assert validate_file(p, "manifest.schema.json") is None
-
-
 def test_validate_file_calls_validate_batch13():
     source = inspect.getsource(validate_file)
     assert "validate(" in source

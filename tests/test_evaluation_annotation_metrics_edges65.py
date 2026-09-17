@@ -422,11 +422,6 @@ def test_module_source_contains_module_docstring_batch39():
     assert "人工标注指标" in src
 
 
-def test_module_source_contains_chunk_boundary_keyword_batch39():
-    src = inspect.getsource(amod)
-    assert "chunk_boundary" in src
-
-
 def test_module_source_contains_figure_caption_keyword_batch39():
     src = inspect.getsource(amod)
     assert "figure_caption" in src
@@ -467,16 +462,6 @@ def test_module_source_contains_no_predicted_boundaries_reason_batch39():
     assert '"no_predicted_boundaries"' in src
 
 
-def test_module_source_contains_precision_or_recall_not_evaluated_reason_batch39():
-    src = inspect.getsource(amod)
-    assert '"precision_or_recall_not_evaluated"' in src
-
-
-def test_module_source_contains_no_ground_truth_anchors_in_stream_reason_batch39():
-    src = inspect.getsource(amod)
-    assert '"no_ground_truth_anchors_in_stream"' in src
-
-
 def test_module_source_contains_from_future_import_batch39():
     src = inspect.getsource(amod)
     assert "from __future__ import annotations" in src
@@ -500,16 +485,6 @@ def test_module_source_contains_all_export_batch39():
 def test_module_source_contains_parser_const_export_batch39():
     src = inspect.getsource(amod)
     assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-
-
-def test_module_source_contains_figure_caption_prf_export_batch39():
-    src = inspect.getsource(amod)
-    assert '"figure_caption_prf"' in src
-
-
-def test_module_source_contains_chunk_boundary_prf_export_batch39():
-    src = inspect.getsource(amod)
-    assert '"chunk_boundary_prf"' in src
 
 
 def test_module_source_contains_dict_annotation_batch39():
@@ -599,12 +574,6 @@ def test_module_callable_attributes_batch39():
 def test_module_no_class_definitions_batch39():
     src = inspect.getsource(amod)
     assert "\nclass " not in src
-
-
-def test_module_uses_null_and_ratio_batch39():
-    src = inspect.getsource(amod)
-    assert "_null(" in src
-    assert "_ratio(" in src
 
 
 # ---------- 端到端集成 第五十七批

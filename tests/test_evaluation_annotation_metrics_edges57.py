@@ -94,11 +94,6 @@ def test_figure_caption_prf_three_distinct_keys_batch30():
     ]
 
 
-def test_figure_caption_prf_document_with_empty_chunks_batch30():
-    out = figure_caption_prf({"chunks": []}, None)
-    assert isinstance(out, dict)
-
-
 def test_figure_caption_prf_two_calls_independent_batch30():
     """两次调用结果一致但 dict 是独立对象。"""
     out1 = figure_caption_prf(None, None)

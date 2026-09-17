@@ -274,18 +274,8 @@ def test_compute_with_unknown_source_type():
     assert isinstance(out, dict)
 
 
-def test_compute_with_pdf_source_type():
-    out = compute_automatic_metrics({}, None, "pdf", None)
-    assert isinstance(out, dict)
-
-
 def test_compute_with_docx_source_type():
     out = compute_automatic_metrics({}, None, "docx", None)
-    assert isinstance(out, dict)
-
-
-def test_compute_with_empty_document():
-    out = compute_automatic_metrics({}, None, "pdf", None)
     assert isinstance(out, dict)
 
 
@@ -361,11 +351,6 @@ def test_compute_with_expectations():
 
 def test_compute_with_expectations_empty():
     out = compute_automatic_metrics({}, None, "pdf", {})
-    assert isinstance(out, dict)
-
-
-def test_compute_with_expectations_none():
-    out = compute_automatic_metrics({}, None, "pdf", None)
     assert isinstance(out, dict)
 
 
@@ -854,11 +839,6 @@ def test_text_preservation_normalize_whitespace():
 
 # ---------- _pdf_locator_ratio 行为深度第四批 ----------
 # 注意：page/bbox 在 source_locator 子 dict 中
-
-
-def test_pdf_locator_ratio_empty_elements():
-    out = _pdf_locator_ratio([])
-    assert out["value"] is None
 
 
 def test_pdf_locator_ratio_no_required_types():
@@ -1485,17 +1465,6 @@ def test_e2e_compute_does_not_mutate_inputs():
     compute_automatic_metrics(doc, error, "pdf", expectations)
     assert doc == before_doc
     assert expectations == before_exp
-
-
-def test_e2e_compute_idempotent():
-    doc = {
-        "source_type": "pdf",
-        "elements": [{"type": "paragraph", "element_id": "e1", "content": "hello"}],
-        "chunks": [{"chunk_id": "c1", "text": "hello", "source_element_ids": ["e1"]}],
-    }
-    a = compute_automatic_metrics(doc, None, "pdf", None)
-    b = compute_automatic_metrics(doc, None, "pdf", None)
-    assert a == b
 
 
 def test_e2e_compute_with_error_no_document():

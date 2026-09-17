@@ -1155,17 +1155,6 @@ def test_e2e_combined_chain_chunk_reference_full_match_batch12():
     assert out["chunk_reference_intact_ratio"]["value"] == 1.0
 
 
-def test_e2e_combined_chain_idempotent_run_batch12():
-    doc = {"elements": [], "chunks": []}
-    out1 = compute_automatic_metrics(
-        document=doc, error=None, source_type="pdf", expectations=None
-    )
-    out2 = compute_automatic_metrics(
-        document=doc, error=None, source_type="pdf", expectations=None
-    )
-    assert out1 == out2
-
-
 def test_e2e_combined_chain_document_none_short_circuit_batch12():
     """document=None → 提前返回 14 keys，其他指标 null。"""
     out = compute_automatic_metrics(

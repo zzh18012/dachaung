@@ -435,21 +435,6 @@ def test_load_manifest_paired_documents_batch31(tmp_path):
     assert m.content_group_count == 1
 
 
-def test_load_manifest_no_modification_batch31(tmp_path):
-    (tmp_path / "x.pdf").touch()
-    p = tmp_path / "m.json"
-    content = json.dumps(
-        {
-            "manifest_version": MANIFEST_VERSION,
-            "devset_status": "complete",
-            "documents": [{"doc_id": "d1", "path": "x.pdf", "source_type": "pdf"}],
-        }
-    )
-    p.write_text(content, encoding="utf-8")
-    load_manifest(p, project_root=tmp_path)
-    assert p.read_text(encoding="utf-8") == content
-
-
 def test_load_manifest_with_sha256_batch31(tmp_path):
     """sha256 字段透传。"""
     (tmp_path / "x.pdf").touch()

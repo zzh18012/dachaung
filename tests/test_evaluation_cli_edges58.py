@@ -499,11 +499,6 @@ def test_module_source_contains_inspect_doc_branch_batch31():
     assert 'args.command == "inspect-doc"' in src
 
 
-def test_module_source_contains_main_block_batch31():
-    src = inspect.getsource(climod)
-    assert 'if __name__ == "__main__"' in src
-
-
 def test_module_source_contains_raise_systemexit_batch31():
     src = inspect.getsource(climod)
     assert "raise SystemExit(main())" in src

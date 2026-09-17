@@ -660,25 +660,6 @@ def test_load_manifest_expectations_propagated_batch26(tmp_path):
     assert m.documents[0].expectations == {"element_count_by_type": {"paragraph": 10}}
 
 
-def test_load_manifest_expected_failure_propagated_batch26(tmp_path):
-    data = _minimal_manifest_data()
-    data["expected_failures"] = [
-        {
-            "doc_id": "bad",
-            "path": "samples/bad.txt",
-            "source_type": "txt",
-            "expected_error_code": "unsupported_format",
-        },
-    ]
-    p = _write_manifest(tmp_path, data)
-    m = load_manifest(p, project_root=tmp_path)
-    assert len(m.expected_failures) == 1
-    ef = m.expected_failures[0]
-    assert ef.doc_id == "bad"
-    assert ef.expected_error_code == "unsupported_format"
-    assert ef.source_type == "txt"
-
-
 def test_load_manifest_path_backslash_rejected_batch26(tmp_path):
     data = _minimal_manifest_data()
     data["documents"] = [

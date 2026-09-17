@@ -513,14 +513,6 @@ def test_e2e_run_evaluation_creates_valid_json_batch17(tmp_path):
     assert isinstance(data, dict)
 
 
-def test_e2e_run_evaluation_returns_same_as_file_batch17(tmp_path):
-    out = tmp_path / "out.json"
-    r = run_evaluation(_mk_manifest_empty(), out)
-    with out.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-    assert r == data
-
-
 def test_e2e_run_evaluation_with_expected_failure_batch17(tmp_path):
     m = _mk_manifest_empty()
     ef = MagicMock()

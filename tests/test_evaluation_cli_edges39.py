@@ -1077,11 +1077,6 @@ def test_module_no_user_constants_tuple_batch12():
     assert consts == []
 
 
-def test_module_docstring_present_batch12():
-    assert climod.__doc__ is not None
-    assert len(climod.__doc__) > 30
-
-
 def test_module_docstring_mentions_subcommands_batch12():
     assert climod.__doc__ is not None
     assert "run" in climod.__doc__
@@ -1091,12 +1086,6 @@ def test_module_docstring_mentions_subcommands_batch12():
 def test_module_docstring_mentions_inspect_doc_batch12():
     assert climod.__doc__ is not None
     assert "inspect-doc" in climod.__doc__
-
-
-def test_module_uses_future_annotations_batch12():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:25])
-    assert "from __future__ import annotations" in head
 
 
 def test_module_has_dunder_all_absent_batch12():
@@ -1132,13 +1121,6 @@ def test_e2e_full_chain_validate_report_with_real_file_batch12(tmp_path, capsys)
     out = capsys.readouterr().out
     assert "[OK]" in out
     assert str(p) in out
-
-
-def test_e2e_full_chain_inspect_doc_with_empty_dict_batch12(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
 
 
 def test_e2e_full_chain_run_command_integration_batch12(tmp_path):

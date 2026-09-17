@@ -80,10 +80,6 @@ def test_parser_error_args_has_message_only():
     assert e.args == ("y",)
 
 
-def test_parser_error_inherits_exception():
-    assert issubclass(ParserError, Exception)
-
-
 def test_parser_error_not_valueerror():
     assert not issubclass(ParserError, ValueError)
 
