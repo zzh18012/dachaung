@@ -240,6 +240,7 @@ def batch_parse_files(
     verbose: bool = False,
     workers: int | None = None,
     plugins: list[str] | None = None,
+    skipped_files: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """批量解析并写盘，返回 summary dict（同时写 <output_dir>/summary.json）。
 
@@ -253,11 +254,16 @@ def batch_parse_files(
     不启动批处理）；并行路径每 worker initializer 重放加载，探测阶段在任何
     文件任务前校验全部 worker 初始化成功，失败则受控终止池并抛
     PluginLoadError（不挂起、不泄漏原始 traceback）。
+
+    skipped_files（r55 C09）：扫描期排除项（unsupported_suffix /
+    not_a_regular_file），逐项发 file_skipped 事件并计入 summary["skipped"]，
+    不参与 total/success/failed 计数。
     """
     workers = default_workers() if workers is None else max(1, int(workers))
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     logger = setup_logger("app.batch", log_file, verbose)
+    skipped = list(skipped_files or [])
 
     plugin_modules = list(plugins or [])
     try:
@@ -321,8 +327,14 @@ def batch_parse_files(
             "parser": parser_name,
             "max_chars": max_chars,
             "plugins": plugin_modules,
+            "skipped_count": len(skipped),
         },
     )
+    for s in skipped:
+        logger.warning(
+            "file_skipped",
+            extra={"file": s["file"], "reason": s["reason"]},
+        )
     for ce in collision_errors:
         logger.error(
             "file_error",
@@ -437,6 +449,7 @@ def batch_parse_files(
         "failed": len(errors),
         "workers": effective_workers,
         "wall_time_seconds": wall,
+        "skipped": skipped,
         "errors": errors,
     }
 

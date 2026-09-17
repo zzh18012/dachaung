@@ -25,6 +25,7 @@ SUMMARY_KEYS = {
     "failed",
     "workers",
     "wall_time_seconds",
+    "skipped",
     "errors",
 }
 

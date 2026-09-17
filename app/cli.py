@@ -571,19 +571,50 @@ def main(argv: list[str] | None = None) -> int:
 
         raw = args.input
         input_path = Path(raw)
+        # r55 C09：目录扫描的排除项留痕（此前 .txt/.log 等零痕迹）；
+        # r55 C10：形如 *.md 的目录名在扫描期排除（此前会被派发并以
+        # 误导性的 file_not_found 失败）；glob 通道同施 is_file 守卫
+        skipped: list[dict[str, str]] = []
         if input_path.is_dir():
-            files = sorted(
-                p for p in input_path.rglob("*") if p.suffix.lower() in BATCH_SUFFIXES
-            )
+            files = []
+            for p in sorted(input_path.rglob("*")):
+                if p.suffix.lower() in BATCH_SUFFIXES:
+                    if p.is_file():
+                        files.append(p)
+                    else:
+                        skipped.append(
+                            {"file": str(p), "reason": "not_a_regular_file"}
+                        )
+                elif p.is_file():
+                    skipped.append(
+                        {"file": str(p), "reason": "unsupported_suffix"}
+                    )
         elif any(ch in raw for ch in "*?["):
-            files = sorted(Path(p) for p in globlib.glob(raw, recursive=True))
+            # glob 通道不可枚举未命中的排除后缀（通道不对称属 C02 文档
+            # 口径）；但命中的目录不派发，形如 *.md 的目录留痕
+            files = []
+            for p in sorted(Path(p) for p in globlib.glob(raw, recursive=True)):
+                if p.is_file():
+                    files.append(p)
+                elif p.suffix.lower() in BATCH_SUFFIXES:
+                    skipped.append(
+                        {"file": str(p), "reason": "not_a_regular_file"}
+                    )
         else:
             if not input_path.is_file():
                 print(f"[ERROR] 输入文件不存在: {input_path}", file=sys.stderr)
                 return 2
             files = [input_path]
         if not files:
-            print(f"[ERROR] 未找到可解析文件: {raw}", file=sys.stderr)
+            detail = ""
+            if skipped:
+                reason_counts: dict[str, int] = {}
+                for s in skipped:
+                    reason_counts[s["reason"]] = reason_counts.get(s["reason"], 0) + 1
+                detail = "（扫描排除 " + ", ".join(
+                    f"{k}={v}" for k, v in sorted(reason_counts.items())
+                ) + "）"
+            print(f"[ERROR] 未找到可解析文件: {raw}{detail}", file=sys.stderr)
             return 2
 
         out_dir = Path(args.output_dir)
@@ -597,6 +628,7 @@ def main(argv: list[str] | None = None) -> int:
                 verbose=args.verbose,
                 workers=args.workers,
                 plugins=args.plugin,
+                skipped_files=skipped,
             )
         except PluginLoadError as e:
             # 父进程加载失败或 worker 初始化回报失败（受控通道，池已回收）
@@ -610,9 +642,14 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 1
         status = "[OK]" if summary["failed"] == 0 else "[FAIL]"
+        skip_note = (
+            f"，排除 {len(summary['skipped'])} 项"
+            if summary["skipped"]
+            else ""
+        )
         print(
-            f"{status} batch-parse: {summary['success']}/{summary['total']} 成功，"
-            f"workers={summary['workers']}，"
+            f"{status} batch-parse: {summary['success']}/{summary['total']} 成功"
+            f"{skip_note}，workers={summary['workers']}，"
             f"{summary['wall_time_seconds']:.1f}s → {out_dir / 'summary.json'}"
         )
         for err in summary["errors"]:
