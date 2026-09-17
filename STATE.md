@@ -121,6 +121,25 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2044 — app.cli batch-parse 三方记账一致性（1b/b 换轴 batch 记账对账面，3 测试）
+
+- 任务：`app.cli batch-parse` 的 stdout 汇总行 vs summary.json vs --log-file JSONL 事件流三方对账（批次 16/17 契约），main 只读 @ `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_batch_accounting_r2044.py + .out（未入库，C0 + E1–E7 全 17 项）；子进程真实 CLI（main venv `python -m app.cli batch-parse`），cwd=探针自造目录 + PYTHONPATH=main 根；批输入全部自造（.md 文本 + 确定性伪随机字节坏 .docx）。
+- 覆盖面：main 已**进程内**锁（test_batch_parse.py 13 测 batch_parse_files 直调 + CLI 冒烟 rc 0/1/2；test_jsonlog.py 11 测 workers=1 事件完整性 / traceback / append / file_warning **合成单元发射**——其 docstring 自认"真实 parser 警告难稳定触发"）；CLI 子进程面的三方计数对账、零命中批三通道形态、file_warning 真实输入触发**零覆盖**。R2033（日志族）/R2034（后缀过滤行为）已闭，本轮锁**剔除/失败后的计数对账**。
+- **C0 对照先通过**：3 好 .md（--parser auto）→ rc 0 + 3 文档 JSON + summary.json（*.json 共 4）。
+- 发现（C0 + E1–E7 全 17 项，**成立 17 / 偏差 0 / 缺陷候选 0**；首轮 E1b/E7 两"偏差"均为探针先验错误——E1b 漏传 `--workers 1`、E7 未料 sorted 序 a.docx<a.md 使 docx 先注册 stem——修正后全成立，实态与 main 已锁行为完全一致）：
+  - **三方记账全场景成立**：stdout 行（状态/S/T/workers 四值）= summary（success/total/workers）；JSONL file_complete×N = success、file_error×N = failed、batch_start.file_count = total、batch_complete 的 success/failed/wall_time_seconds 与 summary **逐值相等**（同一 float，非仅近似）；事件类型封闭五值（无插件时零 plugin_*）；success+failed=total 不变量含 collision 批成立（E7：0+2=2）；
+  - **rc 语义闭环**：部分失败（2/3）→ rc 1；全坏批（0/3）→ rc 1；空目录与 glob 零命中 → rc 2 + stderr `未找到可解析文件` + **三通道零痕迹**（summary.json 不存在、JSONL 不存在、输出目录不创建——batch_parse_files 未被调用，setup_logger 亦未触达）；
+  - **file_warning 真实触发路径 CLI 面首次锁**：frontmatter 含嵌套列表行 + 列表值键的 .md 经 `--parser auto`（发现 markdown_enhanced，priority 5 胜 markdown 20）→ 恰 2 个 file_warning（frontmatter_line_skipped / frontmatter_value_skipped）且均发射于该文件 file_complete 之后；warning 不改成败记账（success 照计）——main test_jsonlog 4b 为合成 handler 捕获，本轮真实输入经全链确认；
+  - **file_error 信封**：坏 .docx（随机字节）→ docx_open_failed + 非空 error_message（"message" 保留字契约）+ traceback=None（结构化 ParserError 通道，非异常通道）+ parser=fallback；.md 在默认 fallback 下 file_complete.parser=markdown（路由可证）；
+  - **后缀过滤计数对账**（R2034 已锁静默剔除）：3 .md + 2 .txt → 三方全部只算 3（total/file_count/stdout S/T/file_complete 数），.txt 在 stdout/summary/JSONL 三通道零出现、无 note.json 产出；
+  - **观察记录（非缺陷）**：E7 stem 冲突经目录通道时胜者由 sorted() 序决定——坏 a.docx 字母序在好 a.md 之前，好 .md 成 collision 方**从未被解析**（0/2 全败）；与 main 已锁"后者记错误不覆盖"一致，目录场景的可用性代价仅披露；
+  - **勘误**：任务简报"3 好 .md → JSONL 4 事件"为笔误，实际 5 事件（batch_start + 3 file_complete + batch_complete）。
+- 加测 3：`tests/test_batch_accounting_r2044.py`——(1) 混合批三方逐值对账（rc 1 + stdout 四值 + JSONL 五计数 + batch_complete 三值逐等 + file_error 信封 + errors 形状）；(2) 空目录/glob 零命中 rc 2 三通道零痕迹 + 全坏批 rc 1 无半成品残留；(3) file_warning 真实触发（双码 + 顺序在 file_complete 后 + 不改成败）+ 后缀过滤三方计数（.txt 三通道零出现）。被测 main 按 `git worktree list --porcelain` 动态定位 branch=refs/heads/main 的 worktree（零硬编码路径，缺目标或缺 venv 显式 SKIP，绝不伪造通过）。
+- 定向：新文件 3 passed 3.34s（worktree venv）；邻居 main `test_batch_parse.py` + `test_jsonlog.py` 合计 **24 passed 2.68s**（main venv + `-p no:cacheprovider`，main 全程 clean，前后两次 status 核对）+ 自跑 `test_parse_edges_r2043.py` + `test_annotation_env_r2041.py` + `test_container_env_r2040.py` 合计 9 passed 17.35s。全量不跑（加测纯子进程型）；收集数锚 **实测 102082 collected = 预测锚 102079 + 3 精确命中**（worktree venv `pytest --collect-only -q -p no:cacheprovider`，两次 23.83s/23.31s；证据 outputs/autonomous/collect_only_r2044.out 未入库）。
+- 下次建议：batch-parse 记账对账面本轮已闭合（混合/全坏/零命中/过滤/warning/collision 六组全覆盖，不建议再投轮）；R2043 建议的 validate 子命令通道面仍未投，或 R-A/R-I 行为缺口；**2026-09-21 周期简报窗口做下一次全量实跑**（预测 102082 + 3xN，N=其间加测轮数；重采 --durations=25 对照漂移锚点两项；候选池直接引用 R2042 盘点件）。
+
+---
+
 ## Round 2043 — app.cli parse 通道输入/参数边界信封（1b/b 换轴 parse CLI 面，R2042 建议，3 测试）
 
 - 任务：`app.cli parse` 子命令的 `--max-chars` 边界值 / 垃圾输入 × 扩展名矩阵 / 编码边缘 / `-o` 输出路径族，main 只读 @ `6c6d398`（运行前后 status clean，全程子进程 PYTHONDONTWRITEBYTECODE=1 + PYTHONIOENCODING=utf-8）。探针 outputs/autonomous/probe_parse_edges_r2043.py + .out（未入库，C0 + E1–E8 全 18 项已执行完毕）；子进程真实 CLI（main venv `python -m app.cli`），cwd=临时目录 + PYTHONPATH=main 根。**本轮为前轮执行 agent API 中断后的窄恢复 agent 收尾**：探针零重跑，只复核探针/.out 与测试文件一致性（两处 docstring 精修：legacy positional 一测补记、BOM/Latin-1 表述核实）+ 加测定向 + 锚核对 + 收尾，**判定规则未变**。
