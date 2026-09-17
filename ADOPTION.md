@@ -7016,3 +7016,58 @@ G03 执行协议（自跑线）：
 执行分派：自跑线 G03 循环即起（R2054 起，AUTONOMOUS_LOOP.md 补记
 v3.1 授权）；搬运线承接 8 修复 + 6 文档修正（main 侧改动，push 仍需
 用户单独授权，随既有待授权捆绑）。
+
+## §一百四十（2026-09-17）r55 执行回执：修复 7 项 + 文档 6 项 + README 参数化全部落地
+
+分支：`integration/stage9-batch26-corpus-annotation`（merge-base =
+origin/main 6c6d398，纯领先；push 仍待用户单独授权，随既有捆绑）。
+回归：全量 **5754 passed + 4 skipped**（docker-gated e2e 因 DNS 污染
+显式 SKIP，CI 为 canonical 通道）+ 各批定向回归全绿。
+
+**代码修复（7 项，4 commit）**：
+
+- **36d52a4（C15/C16/C06）**：`_load_annotation` 状态化
+  （loaded/missing/annotation_unreadable/annotation_invalid_json）；
+  C16 doc_id 不匹配 → 拒用该标注（annotation 置 None + 专属事件
+  annotation_doc_id_mismatch，恰一次不重复）；非 loaded/missing 状态
+  回写四项 PRF 指标 reason（替换 no_annotation）；per_doc 新增
+  annotation_status + tolerance_chars（C06 落盘）。版本：EVALUATOR_VERSION
+  1.11 / REPORT_VERSION 1.4；schema 1.4 精确快照（1.1–1.3 经 not-anyOf
+  互斥排新键）。测试：test_annotation_channel_integrity.py（9）+
+  7 个版本钉死测试文件更新
+- **195bcd7（C08）**：docx 表格空表/提取异常隔离——docx_table_empty
+  （0 行跳过）与 docx_table_extract_failed（异常隔离，details 带
+  exception_type）结构化 warning 取代静默跳过；**取代批次 5 裁决④
+  docx 通道静默口径**（契约文档同步修订，pdf/html 路径不变）。
+  测试：test_docx_bad_table_isolation.py（4）+ 契约测试更名更新
+- **969bd3d（C09/C10）**：扫描通道可观测性——skipped 列表
+  {file, reason: unsupported_suffix | not_a_regular_file} 入
+  summary["skipped"] + file_skipped JSONL 事件 + batch_start.skipped_count
+  + 终行"排除 N 项"；目录名形如 *.md 在扫描期排除（目录/glob 双通道
+  is_file 守卫）；空扫描 rc 2 错误携带排除原因计数。测试：
+  test_batch_scan_traceability.py（5）
+- **94ca8b0（C12）**：`verify_log_file_target`（app/jsonlog.py）——
+  目录/空串（Path('')→cwd）/不可写目标在批启动前以
+  LogFileInvalidError（log_file_is_directory / log_file_unwritable）拒绝；
+  batch-parse 与 evaluation run 双通道接线（先于插件加载与清单检查），
+  rc 2 结构化 stderr 零 traceback；合法目标与 setup_logger 同规则预建
+  父目录（嵌套新建父目录回归守卫）。测试：test_logfile_validation.py（8）
+
+**文档修正（6 项，82d6990）**：C01 --workers help 补"显式值不受默认
+上限钳制，内存与进程数成正比"；C02 batch input help 声明目录/glob
+双通道后缀过滤不对称（glob 不过滤→unsupported_type，目录只收三类并
+留痕跳过）；C03 CLAUDE.md 批次 20 节补"跨 element family 一致性由
+parse 期契约检查保证，validate 不查"；C04 manifest.py:149 docstring
+删去与实现不符的 ".git"（实现只找 pyproject.toml，回退 manifest 父
+目录）；C05 container_verify.py docstring 退出码行删去不可达的 6
+（执行期异常折叠进 problems → rc 7）；C07 jsonlog docstring + CLAUDE.md
+批次 17 节补跨进程并发写同一 --log-file 罕见静默丢行风险（建议按进程
+分文件）。
+
+**P-R2045-1（8346603，README 部分）**：README.md 18/28/31 三处真实
+用户名/桌面布局路径参数化为 `<你的用户名>` 占位 + 替换提示。
+**CLAUDE.md 4 处（105/106/116/227）待用户定**——容器仅分发 .venv +
+app/ + schemas/document.schema.json，CLAUDE.md 不属出库面，倾向保留
+（环境文档性质）；待用户裁决后收口。
+
+r55 全部可执行项就绪；剩余待办仅 CLAUDE.md 处置裁决 + push 授权。
