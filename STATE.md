@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2051 — a 队列 P2：main PDF 表格链 find_tables→table element+locator 全链行为锁（R2050 裁决面，3 测试，main 只读）
+
+- 任务：R2050 裁决的 P2 投轮——main 13 个版本敏感面中唯一"main 代码路径 + CI 零覆盖 + 三准则全中"的未锁面。main `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（预期 SHA 开头 6c6d398 命中，`git worktree list --porcelain` 动态定位，前后 `git status --porcelain` clean）全程只读；被测 CLI 走 main venv python 真实子进程（PYTHONDONTWRITEBYTECODE=1 / PYTHONIOENCODING=utf-8，cwd=临时目录、PYTHONPATH 指向 main 根，main 零写入）；main 侧定向 pytest 加 `-p no:cacheprovider`。
+- 覆盖面：`app/parsers/fallback_parser.py` _parse_pdf L527-558 @ 6c6d398（pdfplumber 0.11.10）——`page.find_tables()`（异常静默空表）→ `tbl.extract()` rows（空/异常跳过不发 element）→ `linearize_table` canonical markdown → element(type=table, confidence=0.7, metadata{row_count,col_count,source:"pdfplumber"}) → locator{family="page_geometry", page, bbox=list(tbl.bbox) top 系} → chunker isolated_table 单元素 chunk + source_element_ids。结构级零覆盖经复核成立：main tests 的 table 断言全部落在 DOCX/HTML/markdown/ipynb，PDF 无任何正例。
+- 探针（outputs/autonomous/probe_pdf_table_r2051.py + .out，7 项矩阵）：C0 纯文本 PDF parse rc 0 + validate rc 0；V1 ruled 2×2（手写最小 PDF 字节流：m/l/S 线算子网格 + BT/ET 单元格文本，零新依赖，构造模式复用 main test_pdf_vector_graphics._make_pdf）正链全成立；V2 无线纯文本 / V3 单横线 → 零 table element（假阳性防线成立）；V4 跨列合并单元格 → `| AB |  |`（pdfplumber extract() 把合并文本放首列、延续格 None→linearize ""）；V5 空单元格 → `| C |  |` 且 row_count/col_count 仍 2/2 不塌缩；V6 两页同表 → 2 个 element page=1/2 各自 isolated chunk。**7/7 成立、0 偏差、0 main 缺陷**。迭代记录一处：首版探针自造网格漏画底框（zip 边界 bug），pdfplumber 忠实只识别出 1×2——修复后 2×2 全识别；线宽 1pt/50pt 行高无需调参（pdfplumber 行为忠实，识别失败纯系探针构造缺陷，如实记录未伪造）。
+- **pdfplumber 识别边界=升级噪声锚点（5 个）**：① ruled 网格检出事实本身（lines 策略需 ≥2 横边，单横线不成表）；② bbox=[x0, top, x1, bottom] top 系坐标（top=页高 792−PDF y，精确四数 [100,92,400,192]）；③ 合并单元格 extract() 形状（首列承载、延续 None）；④ 空单元格 None 语义；⑤ 多页 page 逐表正确递增。行为观察（非缺陷、r54 不修）：单元格文本同时进入段落流（短文本无句尾标点 → short_line 启发式判 heading），表格区文本与 extract_words 无去重——升级若改变此重叠形态，锚点测试会响亮失败。
+- 加测：`tests/test_pdf_table_chain_r2051.py` 3 测试——①正链全锁（parse rc 0 + validate rc 0 前置、markdown 三行精确、row_count/col_count/source/confidence、family/page/bbox 四数、isolated_table chunk 引用唯一且 text=markdown 全文）②假阳性双防线（无线/单横线零表）③噪声锚三连（合并/空格/多页精确 markdown 与 page 序）。被测 main 动态定位零硬编码，缺目标显式 SKIP。
+- 定向：新文件 3 passed（3.3s）；main test_pipeline_integration.py + test_chunker.py 经 main venv 63 passed（6.1s，-p no:cacheprovider，main 事后 clean）；自跑线近 3 个测试轮 R2046/R2044/R2043 9 passed（18.8s）。
+- 锚预测：**102085 + 3 = 102088**。
+- 下次建议：按 R2050 裁决，a 队列 P2 已投完回**待命**，至 main 前进（diff 路由重探：parsers/table_linearize 变更或 uv.lock pdf 系版本变化→重评）或 09-21 简报窗口（全量实跑带 PYTHONIOENCODING=utf-8）；Y1（pypdfium2 渲染裁剪数学，断言输出 PNG 像素尺寸口径而非像素内容以保确定性）是否投留给下轮判断——不为投而投。
+
+---
+
 ## Round 2050 — main 依赖升级噪声敏感面盘点 + a 队列价值裁决（1b/a 队列预备分析，零测试新增零语料改动，main 只读）
 
 - 任务：按外部评审 R-I 三准则（耗时/升级噪声/真实缺陷捕捉）对 main 依赖面做价值裁决——main `6c6d398`（预期 SHA 开头 6c6d398 命中，`git worktree list --porcelain` 动态定位，前后 `git status --porcelain` clean）全程只读：uv.lock/pyproject.toml 版本清单 + app/parsers/fallback_parser.py、kreuzberg_parser.py、app/schema.py、app/parsers/table_linearize.py 调用点扫描 + main tests 与自跑 main-target 加测（R2047 faces-closed 矩阵）对账。版本快照与 R2047 基线件一致（pdfplumber 0.11.10 / pdfminer-six 20260107 / pypdfium2 5.12.1 / python-docx 1.2.0 / jsonschema 4.26.0 / kreuzberg 4.10.2 / pytest 8.4.2）。
