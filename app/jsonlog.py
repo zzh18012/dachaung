@@ -63,4 +63,43 @@ def setup_logger(
     return logger
 
 
-__all__ = ["JSONFormatter", "setup_logger"]
+class LogFileInvalidError(Exception):
+    """--log-file 指向目录/空串/不可写目标（r55 C12：CLI 结构化信封）。"""
+
+    def __init__(self, path: str, code: str, message: str) -> None:
+        super().__init__(message)
+        self.path = path
+        self.code = code
+        self.message = message
+
+
+def verify_log_file_target(log_file: str | Path) -> Path:
+    """--log-file 前置校验（r55 C12）。
+
+    目录/空串（Path('')→cwd）/不可写目标在批处理启动前以
+    LogFileInvalidError 拒绝，不再让 FileHandler 的裸
+    PermissionError/IsADirectoryError traceback 穿透到用户。
+    合法时与 setup_logger 同规则预建父目录（append 试开一次）。
+    """
+    p = Path(log_file)
+    if p.is_dir():
+        raise LogFileInvalidError(
+            str(p), "log_file_is_directory", f"--log-file 不能是目录: {p}"
+        )
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        with p.open("a", encoding="utf-8"):
+            pass
+    except OSError as e:
+        raise LogFileInvalidError(
+            str(p), "log_file_unwritable", f"--log-file 不可写: {p} ({e})"
+        ) from e
+    return p
+
+
+__all__ = [
+    "JSONFormatter",
+    "LogFileInvalidError",
+    "setup_logger",
+    "verify_log_file_target",
+]

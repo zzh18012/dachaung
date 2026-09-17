@@ -559,7 +559,17 @@ def main(argv: list[str] | None = None) -> int:
         import glob as globlib
 
         from app.batch import BATCH_SUFFIXES, batch_parse_files
+        from app.jsonlog import LogFileInvalidError, verify_log_file_target
         from app.plugin_loader import PluginLoadError
+
+        # r55 C12：--log-file 目录/空串/不可写在批启动前拒绝（此前裸
+        # traceback 穿透）；先于插件加载（最廉价的输入校验先行）
+        if args.log_file is not None:
+            try:
+                verify_log_file_target(args.log_file)
+            except LogFileInvalidError as e:
+                print(f"[ERROR] {e.message}", file=sys.stderr)
+                return 2
 
         # 批次 19：插件加载必须先于 parser 名称校验（裁决条件 D6）
         rc = _load_cli_plugins(args.plugin, args.input)

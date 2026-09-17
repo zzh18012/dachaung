@@ -84,6 +84,17 @@ def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
 
     if args.command == "run":
+        # r55 C12：--log-file 目录/空串/不可写在评测启动前拒绝（此前
+        # setup_logger 的裸 PermissionError/IsADirectoryError traceback 穿透）
+        if args.log_file is not None:
+            from app.jsonlog import LogFileInvalidError, verify_log_file_target
+
+            try:
+                verify_log_file_target(args.log_file)
+            except LogFileInvalidError as e:
+                print(f"[ERROR] {e.message}", file=sys.stderr)
+                return 2
+
         manifest_path = Path(args.manifest)
         output_path = Path(args.output)
         if not manifest_path.is_file():
