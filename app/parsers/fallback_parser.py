@@ -867,12 +867,29 @@ def _parse_docx(
             para_counter += 1
         elif tag == qn("w:tbl"):  # table
             from docx.table import Table
-            tbl = Table(child, d)
-            rows_data: list[list[str]] = []
-            for row in tbl.rows:
-                rows_data.append([(c.text or "").strip() for c in row.cells])
-            md = _rows_to_markdown(rows_data)
-            # 批次 5 契约 §2：0 行表不产出 element（静默跳过，对齐 pdf/html）
+            try:
+                tbl = Table(child, d)
+                rows_data: list[list[str]] = []
+                for row in tbl.rows:
+                    rows_data.append([(c.text or "").strip() for c in row.cells])
+                md = _rows_to_markdown(rows_data)
+            except Exception as e:
+                # r55 C08：单表提取失败不废整篇文档，跳过 + 结构化告警
+                warnings.append(
+                    WarningRecord(
+                        code="docx_table_extract_failed",
+                        reason=f"表格提取失败，已跳过: {e}",
+                        details={
+                            "table_index": table_counter,
+                            "section": section_idx,
+                            "exception_type": type(e).__name__,
+                        },
+                    )
+                )
+                table_counter += 1
+                continue
+            # 批次 5 契约 §2：0 行表不产出 element（对齐 pdf/html）；
+            # r55 C08：跳过留痕（不再静默）
             if md:
                 elements.append(
                     Element(
@@ -890,6 +907,17 @@ def _parse_docx(
                             "row_count": len(rows_data),
                             "col_count": max((len(r) for r in rows_data), default=0),
                             "source": "python-docx",
+                        },
+                    )
+                )
+            else:
+                warnings.append(
+                    WarningRecord(
+                        code="docx_table_empty",
+                        reason="表格 0 行，不产出 table element",
+                        details={
+                            "table_index": table_counter,
+                            "section": section_idx,
                         },
                     )
                 )

@@ -4,7 +4,8 @@
 - §2 canonical 管线：None→"" / CR 规整 / \\n→<br> / |→\\| / strip，
   顺序固定；首行=表头；短行补齐；0 行→""；全空表仍产结构字符串
 - §3 接入：三 parser 走共享 linearize_table；md 仅反转义 \\|；docx
-  0 行表静默跳过；合并单元格重复语义
+  0 行表跳过留痕（r55 C08：docx_table_empty warning，取代裁决④静默）；
+  合并单元格重复语义
 - §4 确定性 + md roundtrip 幂等（linearize(split(rendered))==rendered）
 - §5 ipynb markdown cell 表格路径断言（裁决⑦）；text 永不产 table；
   ipynb code cell 不产 table
@@ -188,7 +189,7 @@ def test_docx_merged_cell_repeats_content(tmp_path: Path):
         "| m | m |\n| --- | --- |\n| a | b |")
 
 
-def test_docx_zero_row_table_skipped_silently(tmp_path: Path):
+def test_docx_zero_row_table_skipped_with_warning(tmp_path: Path):
     def build(d):
         d.add_paragraph("before")
         d.add_table(rows=0, cols=2)
@@ -200,7 +201,10 @@ def test_docx_zero_row_table_skipped_silently(tmp_path: Path):
         _docx_file(tmp_path, build), source_hash="a" * 64)
     tbl = [e for e in doc.elements if e.type == "table"]
     assert tbl == []
-    assert doc.warnings == []  # 静默跳过，不产 warning（裁决④）
+    # r55 C08 修订：跳过留痕（取代裁决④静默口径）；
+    # 空表仍是合法输入，warning 是可观测痕迹不是错误
+    assert [(w.code, w.details) for w in doc.warnings] == [
+        ("docx_table_empty", {"table_index": 0, "section": 0})]
     paras = [e.content for e in doc.elements if e.type == "paragraph"]
     assert "before" in paras and "after" in paras
 
