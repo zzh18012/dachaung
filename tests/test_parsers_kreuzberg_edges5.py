@@ -297,12 +297,6 @@ def test_make_locator_signature():
 # =========================================================================
 
 
-def test_split_content_returns_two_tuple():
-    result = _split_content_to_elements("hello", "docx", "doc-abc")
-    assert isinstance(result, tuple)
-    assert len(result) == 2
-
-
 def test_split_content_first_is_list():
     elements, _ = _split_content_to_elements("hello", "docx", "doc-abc")
     assert isinstance(elements, list)
@@ -316,11 +310,6 @@ def test_split_content_second_is_list():
 def test_split_content_second_empty_for_simple_input():
     _, second = _split_content_to_elements("hello", "docx", "doc-abc")
     assert second == []
-
-
-def test_split_content_empty_returns_empty_elements():
-    elements, _ = _split_content_to_elements("", "docx", "doc-abc")
-    assert elements == []
 
 
 def test_split_content_whitespace_only_returns_empty():
@@ -678,11 +667,6 @@ def test_module_uses_future_annotations():
 def test_module_kreuzberg_available_is_bool():
     import app.parsers.kreuzberg_parser as mod
     assert isinstance(mod._KREUZBERG_AVAILABLE, bool)
-
-
-def test_module_kreuzberg_version_is_str_or_none():
-    import app.parsers.kreuzberg_parser as mod
-    assert mod._KREUZBERG_VERSION is None or isinstance(mod._KREUZBERG_VERSION, str)
 
 
 def test_module_has_kreuzberg_import_error_attr_only_when_unavailable():

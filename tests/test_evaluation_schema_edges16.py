@@ -394,16 +394,6 @@ def test_validate_source_has_draft_validator():
     assert "Draft202012Validator" in src
 
 
-def test_validate_source_has_iter_errors():
-    src = inspect.getsource(validate)
-    assert "iter_errors" in src
-
-
-def test_validate_source_has_sorted():
-    src = inspect.getsource(validate)
-    assert "sorted" in src
-
-
 def test_validate_source_has_head_eq_errors_0():
     src = inspect.getsource(validate)
     assert "head = errors[0]" in src
@@ -513,10 +503,6 @@ def test_draft202012_validator_is_class():
 
 def test_jsvalidation_error_is_class():
     assert inspect.isclass(JSValidationError)
-
-
-def test_jsvalidation_error_subclass_exception():
-    assert issubclass(JSValidationError, Exception)
 
 
 def test_draft_validator_not_subclass_jsvalidation_error():

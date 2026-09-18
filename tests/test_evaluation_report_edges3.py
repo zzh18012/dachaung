@@ -380,11 +380,6 @@ def test_build_provenance_returns_dict_type(tmp_path: Path):
     assert isinstance(out, dict)
 
 
-def test_build_provenance_exact_nine_keys(tmp_path: Path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert len(out) == 9
-
-
 def test_build_provenance_evaluator_version_value_constant(tmp_path: Path):
     """evaluator_version 必须等于 evaluation.EVALUATOR_VERSION。"""
     from evaluation import EVALUATOR_VERSION

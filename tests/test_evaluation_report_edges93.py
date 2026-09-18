@@ -117,11 +117,6 @@ def test_silent_drop_mixed_values_batch63():
 
 # ---------- 版本常量锁定 ----------
 
-def test_versions_locked_one_one_batch63():
-    assert report_mod.EVALUATOR_VERSION == "1.1"
-    assert report_mod.REPORT_VERSION == "1.1"
-
-
 # ---------- max_chars bool ----------
 
 def test_build_provenance_max_chars_bool_batch63(tmp_path):

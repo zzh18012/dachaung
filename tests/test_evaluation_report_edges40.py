@@ -240,12 +240,6 @@ def test_get_dependency_versions_pypdfium2_str_or_none_batch24():
     assert v is None or isinstance(v, str)
 
 
-def test_get_dependency_versions_python_docx_str_or_none_batch24():
-    out = get_dependency_versions()
-    v = out["python-docx"]
-    assert v is None or isinstance(v, str)
-
-
 def test_get_dependency_versions_consistent_batch24():
     out1 = get_dependency_versions()
     out2 = get_dependency_versions()
@@ -305,22 +299,9 @@ def test_build_provenance_parser_name_passed_batch24(tmp_path):
     assert out["parser_name"] == "kreuzberg"
 
 
-def test_build_provenance_parser_version_passed_batch24(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "9.9.9")
-    assert out["parser_version"] == "9.9.9"
-
-
 def test_build_provenance_parser_version_none_batch24(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["parser_version"] is None
-
-
-def test_build_provenance_run_timestamp_iso_format_batch24(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    ts = out["run_timestamp_iso"]
-    # ISO 格式应当能被 datetime.fromisoformat 解析
-    parsed = datetime.fromisoformat(ts)
-    assert isinstance(parsed, datetime)
 
 
 def test_build_provenance_dependencies_is_dict_batch24(tmp_path):
@@ -365,28 +346,6 @@ def _make_manifest(
     m.docx_count = docx_count
     m.categories_covered = categories_covered if categories_covered is not None else []
     return m
-
-
-def test_build_devset_section_returns_six_keys_batch24():
-    out = build_devset_section(_make_manifest())
-    assert set(out.keys()) == {
-        "status",
-        "file_count",
-        "content_group_count",
-        "pdf_count",
-        "docx_count",
-        "categories_covered",
-    }
-
-
-def test_build_devset_section_passes_status_batch24():
-    out = build_devset_section(_make_manifest(devset_status="complete"))
-    assert out["status"] == "complete"
-
-
-def test_build_devset_section_passes_file_count_batch24():
-    out = build_devset_section(_make_manifest(file_count=42))
-    assert out["file_count"] == 42
 
 
 def test_build_devset_section_passes_counts_batch24():
@@ -750,12 +709,6 @@ def test_signature_get_dependency_versions_no_params_batch24():
     assert len(params) == 0
 
 
-def test_signature_build_provenance_four_params_batch24():
-    sig = inspect.signature(build_provenance)
-    names = list(sig.parameters.keys())
-    assert names == ["project_root", "parser_name", "max_chars", "parser_version"]
-
-
 def test_signature_build_devset_section_one_param_batch24():
     sig = inspect.signature(build_devset_section)
     params = list(sig.parameters.values())
@@ -793,22 +746,6 @@ def test_module_all_has_five_entries_batch24():
     }
 
 
-def test_module_does_not_import_evaluation_runner_batch24():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.runner" not in src
-    assert "from evaluation import runner" not in src
-
-
-def test_module_does_not_import_evaluation_manifest_batch24():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.manifest" not in src
-
-
-def test_module_does_not_import_evaluation_schema_batch24():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.schema" not in src
-
-
 def test_module_does_not_import_app_pipeline_batch24():
     src = inspect.getsource(rmod)
     assert "from app.pipeline" not in src
@@ -824,11 +761,6 @@ def test_module_constants_not_in_all_batch24():
     assert "_RATIO_METRICS" not in rmod.__all__
     assert "_COUNT_METRICS" not in rmod.__all__
     assert "_SUCCESS_BOOL_METRICS" not in rmod.__all__
-
-
-def test_module_no_main_block_batch24():
-    src = inspect.getsource(rmod)
-    assert 'if __name__ ==' not in src
 
 
 def test_module_has_module_docstring_batch24():

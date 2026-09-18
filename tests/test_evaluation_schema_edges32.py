@@ -272,28 +272,12 @@ def test_validate_error_message_contains_error_count_batch12():
         assert "1" in str(e) or "校验失败" in str(e)
 
 
-def test_validate_error_errors_is_list_batch12():
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e:
-        assert isinstance(e.errors, list)
-        assert len(e.errors) >= 1
-
-
 def test_validate_error_each_dict_has_3_keys_batch12():
     try:
         validate({}, "manifest.schema.json")
     except EvalSchemaError as e:
         for err in e.errors:
             assert set(err.keys()) == {"path", "message", "schema_path"}
-
-
-def test_validate_error_schema_path_is_list_batch12():
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e:
-        for err in e.errors:
-            assert isinstance(err["schema_path"], list)
 
 
 def test_validate_creates_draft_validator_batch12():
@@ -321,13 +305,6 @@ def test_validate_does_not_modify_instance_batch12():
     snapshot = json.dumps(instance, sort_keys=True)
     validate(instance, "manifest.schema.json")
     assert json.dumps(instance, sort_keys=True) == snapshot
-
-
-def test_validate_signature_2_params_batch12():
-    sig = inspect.signature(validate)
-    params = list(sig.parameters.values())
-    assert len(params) == 2
-    assert [p.name for p in params] == ["instance", "schema_name"]
 
 
 def test_validate_return_annotation_none_batch12():
@@ -421,13 +398,6 @@ def test_validate_file_calls_validate_batch12(tmp_path):
     with patch("evaluation.schema.validate") as mock:
         validate_file(p, "any.schema.json")
     assert mock.called
-
-
-def test_validate_file_signature_2_params_batch12():
-    sig = inspect.signature(validate_file)
-    params = list(sig.parameters.values())
-    assert len(params) == 2
-    assert [p.name for p in params] == ["path", "schema_name"]
 
 
 def test_validate_file_path_annotation_union_batch12():
@@ -540,16 +510,6 @@ def test_schema_source_no_re_module_batch12():
     assert "re." not in source
 
 
-def test_schema_source_no_compile_batch12():
-    source = inspect.getsource(smod)
-    assert "compile(" not in source
-
-
-def test_schema_source_no_global_keyword_batch12():
-    source = inspect.getsource(smod)
-    assert "\nglobal " not in source
-
-
 def test_schema_source_no_nonlocal_batch12():
     source = inspect.getsource(smod)
     assert "nonlocal " not in source
@@ -563,11 +523,6 @@ def test_schema_source_no_assert_batch12():
 def test_schema_source_no_print_batch12():
     source = inspect.getsource(smod)
     assert "print(" not in source
-
-
-def test_schema_source_no_input_function_batch12():
-    source = inspect.getsource(smod)
-    assert "input(" not in source
 
 
 def test_schema_source_no_class_other_than_eval_schema_error_batch12():
@@ -612,16 +567,6 @@ def test_module_source_jsonschema_import_top_level_batch12():
     assert "from jsonschema" in source
 
 
-def test_module_source_has_self_errors_assignment_batch12():
-    source = inspect.getsource(smod)
-    assert "self.errors = errors or []" in source
-
-
-def test_module_source_has_super_init_call_batch12():
-    source = inspect.getsource(smod)
-    assert "super().__init__(message)" in source
-
-
 def test_module_source_has_schema_path_def_batch12():
     source = inspect.getsource(smod)
     assert "def _schema_path(" in source
@@ -652,12 +597,6 @@ def test_module_source_has_dunder_all_5_items_batch12():
 
 
 # ---------- signatures 第十二批 ----------
-
-
-def test_eval_schema_error_init_message_required_batch12():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    p = sig.parameters["message"]
-    assert p.default is inspect.Parameter.empty
 
 
 def test_eval_schema_error_init_message_annotation_str_batch12():
@@ -789,17 +728,6 @@ def test_e2e_load_then_validate_manifest_batch12():
     }
     errors = list(validator.iter_errors(instance))
     assert errors == []
-
-
-def test_e2e_validate_then_validate_file_combined_batch12(tmp_path):
-    p = tmp_path / "valid.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
 
 
 def test_e2e_validate_file_failure_includes_message_batch12(tmp_path):

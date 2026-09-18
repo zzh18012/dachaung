@@ -103,21 +103,6 @@ def test_success_bool_metrics_len_one_batch36():
     assert len(_SUCCESS_BOOL_METRICS) == 1
 
 
-def test_count_metrics_all_strings_batch36():
-    for name in _COUNT_METRICS:
-        assert isinstance(name, str)
-
-
-def test_success_bool_metrics_all_strings_batch36():
-    for name in _SUCCESS_BOOL_METRICS:
-        assert isinstance(name, str)
-
-
-def test_ratio_metrics_count_12_batch36():
-    """12 个 ratio 指标。"""
-    assert len(_RATIO_METRICS) == 12
-
-
 # ---------- get_git_provenance 第三十六批
 
 

@@ -170,11 +170,6 @@ def test_load_schema_manifest_has_id_batch52():
     assert "2020-12" in s["$schema"]
 
 
-def test_load_schema_annotation_has_id_batch52():
-    s = load_schema("annotation.schema.json")
-    assert "$schema" in s
-
-
 def test_load_schema_manifest_has_type_object_batch52():
     s = load_schema("manifest.schema.json")
     assert s.get("type") == "object"
@@ -184,23 +179,6 @@ def test_load_schema_returns_dict_batch52():
     for name in ["manifest.schema.json", "annotation.schema.json", "evaluation-report.schema.json"]:
         s = load_schema(name)
         assert isinstance(s, dict)
-
-
-def test_load_schema_manifest_has_properties_batch52():
-    s = load_schema("manifest.schema.json")
-    assert "properties" in s
-    assert isinstance(s["properties"], dict)
-
-
-def test_load_schema_manifest_has_required_batch52():
-    s = load_schema("manifest.schema.json")
-    assert "required" in s
-    assert isinstance(s["required"], list)
-
-
-def test_load_schema_unknown_name_raises_batch52():
-    with pytest.raises(FileNotFoundError):
-        load_schema("nope.schema.json")
 
 
 # ---------- validate 错误排序 ----------
@@ -491,12 +469,6 @@ def test_ast_eval_schema_error_init_assigns_self_errors_batch52():
     assert found
 
 
-def test_ast_has_6_imports_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
-    assert len(imports) == 6  # __future__ + json + Path + Any + Draft202012 + JSValidationError
-
-
 def test_ast_module_docstring_batch52():
     tree = ast.parse(inspect.getsource(schema_mod))
     assert isinstance(tree.body[0], ast.Expr)
@@ -541,13 +513,6 @@ def test_ast_schema_path_1_return_batch52():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_schema_path")
     returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
     assert len(returns) == 1
-
-
-def test_ast_load_schema_1_with_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "load_schema")
-    withs = [n for n in ast.walk(func) if isinstance(n, ast.With)]
-    assert len(withs) == 1
 
 
 def test_ast_load_schema_1_return_batch52():
@@ -640,38 +605,9 @@ def test_ast_validate_file_path_annotation_union_batch52():
     assert "path: Path | str" in src
 
 
-def test_ast_no_async_function_def_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
-
-
-def test_ast_no_star_import_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    for n in tree.body:
-        if isinstance(n, ast.ImportFrom):
-            for alias in n.names:
-                assert alias.name != "*"
-
-
-def test_ast_no_with_at_module_level_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.With)
-
-
-def test_ast_no_while_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert not any(isinstance(n, ast.While) for n in ast.walk(tree))
-
-
 def test_ast_no_try_batch52():
     tree = ast.parse(inspect.getsource(schema_mod))
     assert not any(isinstance(n, ast.Try) for n in ast.walk(tree))
-
-
-def test_ast_no_delete_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert not any(isinstance(n, ast.Delete) for n in ast.walk(tree))
 
 
 def test_ast_no_raise_outside_functions_batch52():
@@ -681,22 +617,6 @@ def test_ast_no_raise_outside_functions_batch52():
         # module-level 不应有 Raise
         if isinstance(n, ast.Raise):
             assert False, "Module-level Raise not allowed"
-
-
-def test_ast_no_global_nonlocal_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
-
-
-def test_ast_all_value_is_list_5_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    all_assign = next(
-        n for n in tree.body
-        if isinstance(n, ast.Assign)
-        and any(isinstance(t, ast.Name) and t.id == "__all__" for t in n.targets)
-    )
-    assert isinstance(all_assign.value, ast.List)
-    assert len(all_assign.value.elts) == 5
 
 
 # ---------- forbidden tokens 第一百五十批 ----------

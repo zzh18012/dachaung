@@ -95,16 +95,6 @@ def test_get_parser_whitespace_only_raises():
         get_parser("   ")
 
 
-def test_get_parser_with_leading_space_raises():
-    with pytest.raises(ValueError):
-        get_parser(" fallback")
-
-
-def test_get_parser_with_trailing_space_raises():
-    with pytest.raises(ValueError):
-        get_parser("fallback ")
-
-
 def test_get_parser_partial_name_raises():
     """'fall' 不是 'fallback' → raise。"""
     with pytest.raises(ValueError):
@@ -115,32 +105,6 @@ def test_get_parser_fallback_with_image_output_dir_str_path(tmp_path: Path):
     """image_output_dir 接受 str。"""
     p = get_parser("fallback", image_output_dir=str(tmp_path))
     assert isinstance(p, FallbackParser)
-
-
-def test_get_parser_fallback_with_image_output_dir_path(tmp_path: Path):
-    p = get_parser("fallback", image_output_dir=tmp_path)
-    assert isinstance(p, FallbackParser)
-    assert p._image_output_dir == tmp_path
-
-
-def test_get_parser_markdown_returns_parser_subclass():
-    p = get_parser("markdown")
-    assert isinstance(p, Parser)
-
-
-def test_get_parser_html_returns_parser_subclass():
-    p = get_parser("html")
-    assert isinstance(p, Parser)
-
-
-def test_get_parser_text_returns_parser_subclass():
-    p = get_parser("text")
-    assert isinstance(p, Parser)
-
-
-def test_get_parser_ipynb_returns_parser_subclass():
-    p = get_parser("ipynb")
-    assert isinstance(p, Parser)
 
 
 def test_get_parser_each_name_returns_correct_class():
@@ -211,12 +175,6 @@ def test_image_output_dir_for_windows_path_style():
     """Windows 风格路径 C:/... 也能处理（Path 接受）。"""
     result = image_output_dir_for("C:/tmp/out.json", _H)
     assert "images-" in result.name
-
-
-def test_image_output_dir_for_idempotent():
-    a = image_output_dir_for("/tmp/out.json", _H)
-    b = image_output_dir_for("/tmp/out.json", _H)
-    assert a == b
 
 
 # =========================================================================
@@ -351,22 +309,9 @@ def test_process_single_creates_output_parent_dir(tmp_path: Path):
     assert out.is_file()
 
 
-def test_process_single_does_not_write_when_disabled(tmp_path: Path):
-    p = _write(tmp_path, "x.txt", "hello world")
-    out = tmp_path / "out.json"
-    process_single(p, parser_name="text", output_path=out, write_json=False)
-    assert not out.exists()
-
-
 def test_process_single_default_write_json_true():
     sig = inspect.signature(process_single)
     assert sig.parameters["write_json"].default is True
-
-
-def test_process_single_keyword_only_args():
-    sig = inspect.signature(process_single)
-    for name in ("parser_name", "max_chars", "write_json"):
-        assert sig.parameters[name].kind == inspect.Parameter.KEYWORD_ONLY
 
 
 def test_process_single_returns_tuple():
@@ -396,14 +341,6 @@ def test_process_single_chunk_size_respects_max_chars(tmp_path: Path):
     # 每个 chunk 文本不超过 max_chars（structural chunker 在 word boundary 切）
     for chunk in doc.chunks:
         assert len(chunk.text) <= 100 + 50  # 容差
-
-
-def test_process_single_does_not_mutate_input_file(tmp_path: Path):
-    p = _write(tmp_path, "x.txt", "hello\n\nworld")
-    before = p.read_text(encoding="utf-8")
-    process_single(p, parser_name="text", output_path=None)
-    after = p.read_text(encoding="utf-8")
-    assert before == after
 
 
 # =========================================================================
@@ -487,11 +424,6 @@ def test_validate_only_str_path(tmp_path: Path):
     assert ok is True
 
 
-def test_validate_only_signature():
-    sig = inspect.signature(validate_only)
-    assert set(sig.parameters) == {"json_path"}
-
-
 def test_validate_only_return_annotation_tuple():
     sig = inspect.signature(validate_only)
     assert "tuple" in str(sig.return_annotation).lower()
@@ -500,16 +432,6 @@ def test_validate_only_return_annotation_tuple():
 # =========================================================================
 # 模块结构
 # =========================================================================
-
-
-def test_module_all_exact():
-    import app.pipeline as mod
-    assert mod.__all__ == ["get_parser", "image_output_dir_for", "process_single", "validate_only"]
-
-
-def test_module_all_no_duplicates():
-    import app.pipeline as mod
-    assert len(mod.__all__) == len(set(mod.__all__))
 
 
 def test_module_uses_future_annotations():
@@ -536,18 +458,6 @@ def test_module_imports_any():
     assert "from typing import Any" in src
 
 
-def test_module_imports_structural_chunker():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from app.chunkers import StructuralChunker" in src
-
-
-def test_module_imports_compute_file_hash():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from app.hash import compute_file_hash" in src
-
-
 def test_module_imports_models():
     import app.pipeline as mod
     src = inspect.getsource(mod)
@@ -562,28 +472,6 @@ def test_module_imports_parser_base():
     assert "from app.parsers import" in src
     assert "Parser" in src
     assert "ParserError" in src
-
-
-def test_module_imports_all_parsers():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    for parser_imp in (
-        "from app.parsers.fallback_parser import FallbackParser",
-        "from app.parsers.html_parser import HtmlParser",
-        "from app.parsers.ipynb_parser import IpynbParser",
-        "from app.parsers.kreuzberg_parser import KreuzbergParser",
-        "from app.parsers.markdown_parser import MarkdownParser",
-        "from app.parsers.text_parser import TextParser",
-    ):
-        assert parser_imp in src
-
-
-def test_module_imports_schema_validate():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from app.schema import" in src
-    assert "SchemaValidationError" in src
-    assert "validate" in src
 
 
 def test_module_docstring_present():

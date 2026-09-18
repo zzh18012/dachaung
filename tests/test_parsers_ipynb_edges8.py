@@ -52,17 +52,9 @@ def test_ipynb_extensions_single_item():
 # =========================================================================
 
 
-def test_detect_ipynb_source_type_lowercase_ipynb():
-    assert _detect_ipynb_source_type(Path("a.ipynb")) == "ipynb"
-
-
 def test_detect_ipynb_source_type_uppercase_ipynb():
     """大写后缀 → lower() → 匹配。"""
     assert _detect_ipynb_source_type(Path("a.IPYNB")) == "ipynb"
-
-
-def test_detect_ipynb_source_type_mixed_case():
-    assert _detect_ipynb_source_type(Path("a.Ipynb")) == "ipynb"
 
 
 def test_detect_ipynb_source_type_unknown_suffix_raises():
@@ -140,11 +132,6 @@ def test_cell_source_to_text_none_returns_empty():
     assert _cell_source_to_text(None) == ""
 
 
-def test_cell_source_to_text_int_returns_empty():
-    """非 str/list → 空。"""
-    assert _cell_source_to_text(42) == ""
-
-
 def test_cell_source_to_text_float_returns_empty():
     assert _cell_source_to_text(3.14) == ""
 
@@ -156,10 +143,6 @@ def test_cell_source_to_text_dict_returns_empty():
 def test_cell_source_to_text_tuple_returns_empty():
     """tuple 不是 list → 返回空。"""
     assert _cell_source_to_text(("a", "b")) == ""
-
-
-def test_cell_source_to_text_bool_returns_empty():
-    assert _cell_source_to_text(True) == ""
 
 
 def test_cell_source_to_text_multiline_str_preserved():
@@ -219,14 +202,6 @@ def test_extract_kernel_language_kernelspec_language_empty_falls_to_name():
     assert _extract_kernel_language(metadata) == "fallback"
 
 
-def test_extract_kernel_language_all_empty_returns_empty():
-    metadata = {
-        "kernelspec": {"language": "", "name": ""},
-        "language_info": {"name": ""},
-    }
-    assert _extract_kernel_language(metadata) == ""
-
-
 def test_extract_kernel_language_kernelspec_empty_falls_to_language_info():
     metadata = {
         "kernelspec": {},
@@ -246,10 +221,6 @@ def test_ipynb_parser_name_constant():
 
 def test_ipynb_parser_version_constant():
     assert IpynbParser.version == "stdlib/0.1.0"
-
-
-def test_ipynb_parser_inherits_parser():
-    assert issubclass(IpynbParser, Parser)
 
 
 def test_ipynb_parser_two_class_attrs_consistent():
@@ -861,31 +832,6 @@ def test_module_imports_parser_base():
 def test_module_imports_markdown_parser():
     import app.parsers.ipynb_parser as m
     assert hasattr(m, "MarkdownParser")
-
-
-def test_detect_ipynb_source_type_signature():
-    sig = inspect.signature(_detect_ipynb_source_type)
-    assert set(sig.parameters) == {"path"}
-
-
-def test_detect_ipynb_source_type_return_annotation_str():
-    sig = inspect.signature(_detect_ipynb_source_type)
-    assert "str" in str(sig.return_annotation)
-
-
-def test_cell_source_to_text_signature():
-    sig = inspect.signature(_cell_source_to_text)
-    assert set(sig.parameters) == {"source"}
-
-
-def test_extract_kernel_language_signature():
-    sig = inspect.signature(_extract_kernel_language)
-    assert set(sig.parameters) == {"metadata"}
-
-
-def test_extract_kernel_language_return_annotation_str():
-    sig = inspect.signature(_extract_kernel_language)
-    assert "str" in str(sig.return_annotation)
 
 
 def test_all_internal_functions_callable():

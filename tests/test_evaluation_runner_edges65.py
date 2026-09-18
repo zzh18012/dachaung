@@ -33,13 +33,6 @@ def test_load_annotation_nonexistent_file_returns_none_batch37(tmp_path):
     assert _load_annotation(p) is None
 
 
-def test_load_annotation_directory_returns_none_batch37(tmp_path):
-    """path 是目录（is_file() False）→ None。"""
-    d = tmp_path / "subdir"
-    d.mkdir()
-    assert _load_annotation(d) is None
-
-
 def test_load_annotation_invalid_json_returns_none_batch37(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text("{not valid json", encoding="utf-8")
@@ -560,16 +553,6 @@ def test_module_source_contains_not_instrumented_keyword_batch37():
     assert "not_instrumented" in src
 
 
-def test_module_source_contains_pipeline_failed_keyword_batch37():
-    src = inspect.getsource(rmod)
-    assert "pipeline_failed" in src
-
-
-def test_module_source_contains_image_resource_keyword_batch37():
-    src = inspect.getsource(rmod)
-    assert "image_resource_exists_ratio" in src
-
-
 def test_module_source_contains_process_single_import_batch37():
     src = inspect.getsource(rmod)
     assert "from app.pipeline import image_output_dir_for, process_single" in src
@@ -598,11 +581,6 @@ def test_module_source_contains_report_import_batch37():
 def test_module_source_contains_json_dump_call_batch37():
     src = inspect.getsource(rmod)
     assert "json.dump(report" in src
-
-
-def test_module_source_contains_perf_counter_call_batch37():
-    src = inspect.getsource(rmod)
-    assert "time.perf_counter()" in src
 
 
 def test_module_source_contains_per_doc_subdir_keyword_batch37():

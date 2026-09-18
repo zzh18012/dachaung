@@ -87,11 +87,6 @@ def test_schema_validation_error_message_with_special_chars():
     assert str(e) == msg
 
 
-def test_schema_validation_error_args_length_one():
-    e = SchemaValidationError("msg")
-    assert len(e.args) == 1
-
-
 def test_schema_validation_error_default_errors_empty_list():
     e = SchemaValidationError("msg")
     assert isinstance(e.errors, list)
@@ -367,12 +362,6 @@ def test_is_valid_catches_schema_validation_error_only():
     assert is_valid(123, schema) is False
 
 
-def test_is_valid_returns_bool_type():
-    schema = {"type": "string"}
-    assert isinstance(is_valid("x", schema), bool)
-    assert isinstance(is_valid(123, schema), bool)
-
-
 def test_is_valid_does_not_raise_on_invalid():
     schema = {"type": "string"}
     try:
@@ -415,19 +404,6 @@ def test_validate_file_valid_json_failing_schema_raises_schema_error(tmp_path):
     p.write_text("123", encoding="utf-8")
     with pytest.raises(SchemaValidationError):
         validate_file(p, schema={"type": "string"})
-
-
-def test_validate_file_passes_with_explicit_schema(tmp_path):
-    p = tmp_path / "ok.json"
-    p.write_text('"hello"', encoding="utf-8")
-    # 不抛
-    validate_file(p, schema={"type": "string"})
-
-
-def test_validate_file_str_path(tmp_path):
-    p = tmp_path / "ok.json"
-    p.write_text('"hello"', encoding="utf-8")
-    validate_file(str(p), schema={"type": "string"})
 
 
 def test_validate_file_with_array_schema(tmp_path):
@@ -516,30 +492,14 @@ def test_load_schema_return_annotation_dict():
     assert "dict" in str(annotation).lower()
 
 
-def test_validate_document_no_default():
-    sig = inspect.signature(validate)
-    assert sig.parameters["document"].default is inspect.Parameter.empty
-
-
 def test_is_valid_document_no_default():
     sig = inspect.signature(is_valid)
     assert sig.parameters["document"].default is inspect.Parameter.empty
 
 
-def test_is_valid_schema_default_none():
-    sig = inspect.signature(is_valid)
-    assert sig.parameters["schema"].default is None
-
-
 def test_validate_file_path_no_default():
     sig = inspect.signature(validate_file)
     assert sig.parameters["path"].default is inspect.Parameter.empty
-
-
-def test_schema_validation_error_init_signature():
-    sig = inspect.signature(SchemaValidationError.__init__)
-    # self, message, errors
-    assert len(sig.parameters) == 3
 
 
 # =========================================================================

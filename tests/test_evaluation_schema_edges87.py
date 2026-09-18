@@ -45,13 +45,6 @@ REP = {
 
 # ---------- 目录清单 ----------
 
-def test_schemas_dir_inventory_batch55():
-    assert sorted(p.name for p in SCHEMAS_DIR.iterdir()) == [
-        "annotation.schema.json", "document.schema.json",
-        "evaluation-report.schema.json",
-        "manifest.schema.json"]
-
-
 # ---------- $id ----------
 
 @pytest.mark.parametrize("name", [

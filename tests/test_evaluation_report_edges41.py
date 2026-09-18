@@ -775,11 +775,6 @@ def test_module_source_contains_timeout_10_batch25():
     assert "timeout=10" in source
 
 
-def test_module_source_contains_importlib_metadata_batch25():
-    source = inspect.getsource(rmod)
-    assert "import importlib.metadata" in source
-
-
 def test_module_source_contains_pdfplumber_dependency_batch25():
     source = inspect.getsource(rmod)
     assert '"pdfplumber"' in source
@@ -914,10 +909,6 @@ def test_module_no_classes_batch25():
 
 def test_module_docstring_present_batch25():
     assert rmod.__doc__ is not None
-
-
-def test_module_docstring_mentions_aggregate_batch25():
-    assert "聚合" in rmod.__doc__ or "aggregate" in rmod.__doc__.lower()
 
 
 def test_module_docstring_mentions_no_mix_batch25():

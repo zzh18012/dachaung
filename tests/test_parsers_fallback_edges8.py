@@ -57,24 +57,6 @@ def test_is_heading_style_signature():
     assert params == ["style_name"]
 
 
-def test_is_heading_style_first_element_bool():
-    is_h, _ = _is_heading_style("Heading 1")
-    assert isinstance(is_h, bool)
-
-
-def test_is_heading_style_second_element_int():
-    _, level = _is_heading_style("Heading 1")
-    assert isinstance(level, int)
-
-
-def test_is_heading_style_title_lowercase():
-    assert _is_heading_style("title") == (True, 1)
-
-
-def test_is_heading_style_title_uppercase():
-    assert _is_heading_style("TITLE") == (True, 1)
-
-
 def test_is_heading_style_heading_3():
     assert _is_heading_style("Heading 3") == (True, 3)
 
@@ -85,10 +67,6 @@ def test_is_heading_style_heading_4():
 
 def test_is_heading_style_heading_5():
     assert _is_heading_style("Heading 5") == (True, 5)
-
-
-def test_is_heading_style_heading_6():
-    assert _is_heading_style("Heading 6") == (True, 6)
 
 
 def test_is_heading_style_heading_large_level():
@@ -121,18 +99,6 @@ def test_is_heading_style_normal_returns_false():
 
 def test_is_heading_style_empty_string_returns_false():
     assert _is_heading_style("") == (False, 0)
-
-
-def test_is_heading_style_whitespace_only_returns_false():
-    assert _is_heading_style("   ") == (False, 0)
-
-
-def test_is_heading_style_lowercase_heading():
-    assert _is_heading_style("heading 2") == (True, 2)
-
-
-def test_is_heading_style_uppercase_heading():
-    assert _is_heading_style("HEADING 3") == (True, 3)
 
 
 def test_is_heading_style_heading_with_extra_whitespace():
@@ -423,12 +389,6 @@ def test_classify_pdf_paragraph_empty_text_paragraph():
     assert meta == {}
 
 
-def test_classify_pdf_paragraph_whitespace_only_paragraph():
-    etype, meta = _classify_pdf_paragraph("   ")
-    assert etype == "paragraph"
-    assert meta == {}
-
-
 def test_classify_pdf_paragraph_caption_english():
     etype, meta = _classify_pdf_paragraph("Table 1. Description")
     assert etype == "caption"
@@ -453,26 +413,6 @@ def test_classify_pdf_paragraph_short_no_punct_is_heading():
     assert meta["heuristic"] == "short_line"
 
 
-def test_classify_pdf_paragraph_short_with_period_is_paragraph():
-    etype, _ = _classify_pdf_paragraph("Section.")
-    assert etype == "paragraph"
-
-
-def test_classify_pdf_paragraph_short_with_question_is_paragraph():
-    etype, _ = _classify_pdf_paragraph("What?")
-    assert etype == "paragraph"
-
-
-def test_classify_pdf_paragraph_short_with_exclamation_is_paragraph():
-    etype, _ = _classify_pdf_paragraph("Stop!")
-    assert etype == "paragraph"
-
-
-def test_classify_pdf_paragraph_short_with_chinese_period_is_paragraph():
-    etype, _ = _classify_pdf_paragraph("章节。")
-    assert etype == "paragraph"
-
-
 def test_classify_pdf_paragraph_short_with_chinese_question_is_paragraph():
     etype, _ = _classify_pdf_paragraph("章节？")
     assert etype == "paragraph"
@@ -487,12 +427,6 @@ def test_classify_pdf_paragraph_80_chars_no_punct_is_heading():
     text = "a" * 80
     etype, _ = _classify_pdf_paragraph(text)
     assert etype == "heading"
-
-
-def test_classify_pdf_paragraph_81_chars_is_paragraph():
-    text = "a" * 81
-    etype, _ = _classify_pdf_paragraph(text)
-    assert etype == "paragraph"
 
 
 def test_classify_pdf_paragraph_long_text_is_paragraph():
@@ -532,34 +466,14 @@ def test_render_pdf_image_region_verbose_returns_str_or_none():
     assert params == ["pdf_path", "page_idx_0based", "bbox", "out_path", "dpi"]
 
 
-def test_render_pdf_image_region_verbose_dpi_default_144():
-    sig = inspect.signature(_render_pdf_image_region_verbose)
-    assert sig.parameters["dpi"].default == 144
-
-
 # =========================================================================
 # _image_filename 边界
 # =========================================================================
 
 
-def test_image_filename_basic_format():
-    name = _image_filename("doc-abc123def456abcd", "pdf", 0)
-    assert name == "image_abc123def456abcd_pdf_00.png"
-
-
 def test_image_filename_default_ext_png():
     name = _image_filename("doc-x", "pdf", 0)
     assert name.endswith(".png")
-
-
-def test_image_filename_custom_ext():
-    name = _image_filename("doc-x", "pdf", 0, ext="jpg")
-    assert name.endswith(".jpg")
-
-
-def test_image_filename_index_zero_padded_two():
-    name = _image_filename("doc-x", "pdf", 5)
-    assert "_05." in name
 
 
 def test_image_filename_index_three_digits():
@@ -580,43 +494,9 @@ def test_image_filename_no_doc_prefix():
     assert "mydoc" in name
 
 
-def test_image_filename_prefix_included():
-    name = _image_filename("doc-x", "table", 0)
-    assert "_table_" in name
-
-
-def test_image_filename_returns_str():
-    assert isinstance(_image_filename("doc-x", "pdf", 0), str)
-
-
 # =========================================================================
 # _save_image 写盘行为
 # =========================================================================
-
-
-def test_save_image_creates_dir(tmp_path: Path):
-    out_dir = tmp_path / "images"
-    target = _save_image(b"\x89PNG", out_dir, "doc-abc", "pdf", 0)
-    assert out_dir.is_dir()
-    assert target.is_file()
-
-
-def test_save_image_writes_exact_bytes(tmp_path: Path):
-    data = b"\x89PNG\r\n\x1a\n"
-    target = _save_image(data, tmp_path, "doc-abc", "pdf", 0)
-    assert target.read_bytes() == data
-
-
-def test_save_image_filename_format(tmp_path: Path):
-    target = _save_image(b"x", tmp_path, "doc-abc", "pdf", 5)
-    assert "_05." in target.name
-    assert "_pdf_" in target.name
-
-
-def test_save_image_creates_parents(tmp_path: Path):
-    out_dir = tmp_path / "a" / "b" / "c"
-    target = _save_image(b"x", out_dir, "doc-x", "pdf", 0)
-    assert target.is_file()
 
 
 def test_save_image_existing_dir_no_error(tmp_path: Path):
@@ -624,16 +504,6 @@ def test_save_image_existing_dir_no_error(tmp_path: Path):
     target2 = _save_image(b"y", tmp_path, "doc-x", "pdf", 1)
     assert target1.is_file()
     assert target2.is_file()
-
-
-def test_save_image_custom_ext(tmp_path: Path):
-    target = _save_image(b"x", tmp_path, "doc-x", "pdf", 0, ext="jpg")
-    assert target.name.endswith(".jpg")
-
-
-def test_save_image_returns_path(tmp_path: Path):
-    target = _save_image(b"x", tmp_path, "doc-x", "pdf", 0)
-    assert isinstance(target, Path)
 
 
 def test_save_image_overwrites_existing_file(tmp_path: Path):
@@ -651,50 +521,6 @@ def test_save_image_overwrites_existing_file(tmp_path: Path):
 
 def test_rows_to_markdown_empty_returns_empty():
     assert _rows_to_markdown([]) == ""
-
-
-def test_rows_to_markdown_none_cell_becomes_empty():
-    result = _rows_to_markdown([[None, "b"]])
-    assert "|  | b |" in result
-
-
-def test_rows_to_markdown_int_cell_str():
-    result = _rows_to_markdown([[1, 2]])
-    assert "1" in result
-    assert "2" in result
-
-
-def test_rows_to_markdown_uneven_rows_padded():
-    result = _rows_to_markdown([
-        ["h1", "h2", "h3"],
-        ["v1"],
-    ])
-    lines = result.split("\n")
-    assert len(lines) == 3
-
-
-def test_rows_to_markdown_separator_three_dashes():
-    result = _rows_to_markdown([["a", "b"]])
-    lines = result.split("\n")
-    assert "---" in lines[1]
-
-
-def test_rows_to_markdown_pipe_at_edges():
-    result = _rows_to_markdown([["a"]])
-    for line in result.split("\n"):
-        assert line.startswith("| ")
-        assert line.endswith(" |")
-
-
-def test_rows_to_markdown_returns_str():
-    assert isinstance(_rows_to_markdown([]), str)
-    assert isinstance(_rows_to_markdown([["a"]]), str)
-
-
-def test_rows_to_markdown_single_cell():
-    result = _rows_to_markdown([["x"]])
-    lines = result.split("\n")
-    assert len(lines) == 2
 
 
 def test_rows_to_markdown_no_body_only_header():
@@ -741,11 +567,6 @@ def test_fallback_parser_init_empty_string_image_output_dir():
     assert parser._image_output_dir is None
 
 
-def test_fallback_parser_init_none_image_output_dir():
-    parser = FallbackParser(image_output_dir=None)
-    assert parser._image_output_dir is None
-
-
 def test_fallback_parser_init_default_image_output_dir_is_none():
     sig = inspect.signature(FallbackParser.__init__)
     assert sig.parameters["image_output_dir"].default is None
@@ -784,11 +605,6 @@ def test_fallback_parser_module_namespace():
     assert FallbackParser.__module__ == "app.parsers.fallback_parser"
 
 
-def test_fallback_parser_parse_method_callable():
-    parser = FallbackParser()
-    assert callable(parser.parse)
-
-
 def test_fallback_parser_parse_method_signature():
     sig = inspect.signature(FallbackParser.parse)
     params = list(sig.parameters)
@@ -798,10 +614,6 @@ def test_fallback_parser_parse_method_signature():
 # =========================================================================
 # 模块常量
 # =========================================================================
-
-
-def test_caption_re_is_compiled_pattern():
-    assert isinstance(_CAPTION_RE, re.Pattern)
 
 
 def test_caption_re_ignorecase_flag():
@@ -1057,10 +869,6 @@ def test_caption_re_no_match_without_number():
     assert _CAPTION_RE.match("Table Description") is None
 
 
-def test_caption_re_no_match_random_text():
-    assert _CAPTION_RE.match("Hello world") is None
-
-
 def test_caption_re_no_match_paragraph_starting_with_table_word():
     """不以 caption 关键字开头的不匹配。"""
     assert _CAPTION_RE.match("The table shows data.") is None
@@ -1068,17 +876,6 @@ def test_caption_re_no_match_paragraph_starting_with_table_word():
 
 def test_caption_re_no_match_empty_string():
     assert _CAPTION_RE.match("") is None
-
-
-def test_caption_re_pattern_has_caption_keywords():
-    assert "Table" in _CAPTION_RE.pattern
-    assert "Figure" in _CAPTION_RE.pattern
-    assert "Fig" in _CAPTION_RE.pattern
-
-
-def test_caption_re_pattern_has_chinese_keywords():
-    assert "表" in _CAPTION_RE.pattern
-    assert "图" in _CAPTION_RE.pattern
 
 
 def test_caption_re_pattern_has_ignorecase_flag_in_pattern():
@@ -1092,20 +889,12 @@ def test_caption_re_pattern_has_ignorecase_flag_in_pattern():
 # =========================================================================
 
 
-def test_is_caption_returns_true_for_caption():
-    assert _is_caption("Table 1. Description") is True
-
-
 def test_is_caption_none_returns_false():
     assert _is_caption(None) is False
 
 
 def test_is_caption_empty_string_returns_false():
     assert _is_caption("") is False
-
-
-def test_is_caption_returns_bool():
-    assert isinstance(_is_caption("Table 1. x"), bool)
 
 
 def test_is_caption_handles_arbitrary_text():

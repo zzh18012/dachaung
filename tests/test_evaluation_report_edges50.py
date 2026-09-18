@@ -377,14 +377,6 @@ def test_build_devset_section_passes_categories_covered_batch31():
 # ---------- aggregate_summary 第三十一批
 
 
-def test_aggregate_summary_empty_batch31():
-    out = aggregate_summary([])
-    assert "counts" in out
-    assert "success_rates" in out
-    assert "ratio_macro_averages" in out
-    assert "silent_drop_total" in out
-
-
 def test_aggregate_summary_silent_drop_total_null_no_data_batch31():
     out = aggregate_summary([])
     assert out["silent_drop_total"] is None

@@ -55,12 +55,6 @@ def test_dependency_versions_package_not_found_batch52():
     assert out == {"pdfplumber": None, "python-docx": None, "pypdfium2": None}
 
 
-def test_dependency_versions_generic_exception_batch52():
-    with patch("importlib.metadata.version", side_effect=RuntimeError("boom")):
-        out = get_dependency_versions()
-    assert all(v is None for v in out.values())
-
-
 def test_dependency_versions_mixed_outcomes_batch52():
     def fake_version(pkg):
         if pkg == "pdfplumber":
@@ -208,23 +202,6 @@ def test_aggregate_not_evaluated_exact_batch52():
     assert r["not_evaluated"] == 2
 
 
-def test_ratio_metrics_order_batch52():
-    assert _RATIO_METRICS == (
-        "schema_valid",
-        "pdf_locator_valid_ratio",
-        "docx_locator_valid_ratio",
-        "image_resource_exists_ratio",
-        "chunk_reference_intact_ratio",
-        "text_preservation_equal",
-        "text_char_multiset_precision",
-        "text_char_multiset_recall",
-        "heading_boundary_compliance",
-        "chunk_boundary_precision",
-        "chunk_boundary_recall",
-        "chunk_boundary_f1",
-    )
-
-
 def test_aggregate_empty_ratio_macro_none_all_12_batch52():
     s = aggregate_summary([])
     for name in _RATIO_METRICS:
@@ -342,14 +319,6 @@ def test_ast_dependency_versions_function_import_batch52():
     imports = [n for n in func.body if isinstance(n, ast.Import)]
     assert len(imports) == 1
     assert imports[0].names[0].name == "importlib.metadata"
-
-
-def test_ast_dependency_versions_2_except_handlers_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "get_dependency_versions")
-    trys = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
-    assert len(trys) == 1
-    assert len(trys[0].handlers) == 2
 
 
 def test_ast_aggregate_summary_assign_order_batch52():

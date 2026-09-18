@@ -531,13 +531,6 @@ def test_pdf_locator_ratio_caption_needs_bbox_batch46():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_ratio_table_no_bbox_needed_batch46():
-    """table 不在 _PDF_BBOX_REQUIRED_TYPES。"""
-    elements = [{"type": "table", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 # ---------- _docx_locator_ratio 多种 locator ----------
 
 def test_docx_locator_ratio_empty_returns_null_batch46():

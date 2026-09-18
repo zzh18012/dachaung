@@ -89,13 +89,6 @@ def test_silent_drop_zero_values_stay_zero_batch175():
 
 # ---------- summary 顶层键序 ----------
 
-def test_summary_top_keys_order_batch175():
-    s = aggregate_summary([])
-    assert list(s) == ["counts", "success_rates",
-                       "ratio_macro_averages",
-                       "silent_drop_total"]
-
-
 # ---------- schema_valid 分歧 ----------
 
 def test_schema_valid_macro_only_not_success_rates_batch175():

@@ -703,12 +703,6 @@ def test_schema_path_return_annotation_path():
     assert sig.return_annotation == "Path" or sig.return_annotation is Path
 
 
-def test_load_schema_signature_1_param():
-    sig = inspect.signature(load_schema)
-    assert len(sig.parameters) == 1
-    assert list(sig.parameters.keys()) == ["name"]
-
-
 def test_load_schema_param_annotation_str():
     sig = inspect.signature(load_schema)
     a = sig.parameters["name"].annotation
@@ -750,11 +744,6 @@ def test_validate_file_path_annotation_union():
     sig = inspect.signature(validate_file)
     a = sig.parameters["path"].annotation
     assert "Path" in str(a) and "str" in str(a)
-
-
-def test_validate_file_return_annotation_none():
-    sig = inspect.signature(validate_file)
-    assert sig.return_annotation is None or sig.return_annotation == "None"
 
 
 def test_no_varargs_varkw_in_any_function():

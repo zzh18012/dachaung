@@ -45,11 +45,6 @@ def test_null_value_is_none_batch34():
     assert m["reason"] == "reason_x"
 
 
-def test_null_keys_only_two_batch34():
-    m = _null("x")
-    assert set(m.keys()) == {"value", "reason"}
-
-
 def test_ratio_value_is_float_batch34():
     m = _ratio(0.5)
     assert isinstance(m["value"], float)
@@ -773,18 +768,6 @@ def test_module_source_contains_all_batch34():
 
 
 # ---------- signatures 第四十九批
-
-
-def test_signature_bool_metric_one_param_batch34():
-    sig = inspect.signature(_bool_metric)
-    params = list(sig.parameters.keys())
-    assert params == ["value"]
-
-
-def test_signature_int_metric_one_param_batch34():
-    sig = inspect.signature(_int_metric)
-    params = list(sig.parameters.keys())
-    assert params == ["value"]
 
 
 def test_signature_compute_params_batch34():

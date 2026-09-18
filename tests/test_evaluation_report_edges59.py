@@ -121,11 +121,6 @@ def test_success_bool_metrics_length_1_batch44():
     assert len(_SUCCESS_BOOL_METRICS) == 1
 
 
-def test_success_bool_metrics_no_schema_valid_batch44():
-    """schema_valid 是 ratio 不是 success_bool。"""
-    assert "schema_valid" not in _SUCCESS_BOOL_METRICS
-
-
 # ---------- get_git_provenance ----------
 
 def test_get_git_provenance_independent_commit_dirty_batch44():
@@ -285,14 +280,6 @@ def test_aggregate_summary_missing_metrics_key_raises_keyerror_batch44():
         aggregate_summary(per_doc)
 
 
-def test_aggregate_summary_metrics_is_empty_dict_batch44():
-    per_doc = [{"metrics": {}}]
-    out = aggregate_summary(per_doc)
-    # 没 element_count_total 数据 → sum=None participating=0
-    assert out["counts"]["element_count_total"]["sum"] is None
-    assert out["counts"]["element_count_total"]["participating_docs"] == 0
-
-
 def test_aggregate_summary_metric_dict_missing_value_key_batch44():
     """metrics 中某项不是 dict 或缺 value → 视为 None。"""
     per_doc = [{"metrics": {"schema_valid": {}}}]  # 无 value 键
@@ -418,24 +405,6 @@ def test_ast_no_try_in_module_body_batch44():
         assert not isinstance(n, ast.Try)
 
 
-def test_ast_no_for_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(report_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.For)
-
-
-def test_ast_no_while_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(report_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.While)
-
-
-def test_ast_no_with_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(report_mod))
-    for n in tree.body:
-        assert not isinstance(n, (ast.With, ast.AsyncWith))
-
-
 def test_ast_function_returns_dict_annotation_batch44():
     """所有顶层函数都返回 dict。"""
     tree = ast.parse(inspect.getsource(report_mod))
@@ -489,11 +458,6 @@ def test_source_no_open_write_batch44():
 def test_source_no_os_system_batch44():
     src = inspect.getsource(report_mod)
     assert "os.system(" not in src
-
-
-def test_source_no_popen_batch44():
-    src = inspect.getsource(report_mod)
-    assert "popen(" not in src
 
 
 def test_source_no_yaml_load_batch44():

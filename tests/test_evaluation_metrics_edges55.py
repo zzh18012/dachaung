@@ -506,15 +506,6 @@ def test_heading_ratio_returns_dict_batch29():
 # ---------- _silent_drop_count 第二十九批 ----------
 
 
-def test_silent_drop_actual_equals_expected_batch29():
-    """actual == expected → drop=0。"""
-    out = _silent_drop_count(
-        {"paragraph": 5},
-        {"element_count_by_type": {"paragraph": 5}},
-    )
-    assert out["value"] == 0
-
-
 def test_silent_drop_actual_greater_than_expected_batch29():
     """actual > expected → drop=0（max(0, ...)）。"""
     out = _silent_drop_count(

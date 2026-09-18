@@ -382,30 +382,6 @@ def test_load_annotation_directory_returns_none(tmp_path: Path):
     assert out is None
 
 
-def test_load_annotation_valid_dict_returns_dict(tmp_path: Path):
-    """合法 JSON dict → 返回 dict。"""
-    p = tmp_path / "ann.json"
-    p.write_text('{"key": "value"}', encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == {"key": "value"}
-
-
-def test_load_annotation_valid_list_returns_list(tmp_path: Path):
-    """合法 JSON list → 返回 list。"""
-    p = tmp_path / "ann.json"
-    p.write_text('[1, 2, 3]', encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == [1, 2, 3]
-
-
-def test_load_annotation_invalid_json_returns_none(tmp_path: Path):
-    """非法 JSON → 返回 None。"""
-    p = tmp_path / "ann.json"
-    p.write_text("not json", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out is None
-
-
 def test_load_annotation_empty_file_returns_none(tmp_path: Path):
     """空文件 → 返回 None。"""
     p = tmp_path / "ann.json"

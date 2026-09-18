@@ -172,11 +172,6 @@ def test_load_schema_returns_dict_batch24():
     assert isinstance(s, dict)
 
 
-def test_load_schema_has_schema_keyword_batch24():
-    s = load_schema("manifest.schema.json")
-    assert "$schema" in s or "type" in s or "properties" in s
-
-
 def test_load_schema_idempotent_batch24():
     s1 = load_schema("manifest.schema.json")
     s2 = load_schema("manifest.schema.json")
@@ -328,20 +323,6 @@ def test_validate_message_includes_head_error_batch24():
 # ---------- validate_file 第二十四批 ----------
 
 
-def test_validate_file_accepts_str_path_batch24(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(
-        json.dumps({
-            "manifest_version": "1.0",
-            "devset_status": "incomplete",
-            "documents": [],
-            "expected_failures": [],
-        }),
-        encoding="utf-8",
-    )
-    assert validate_file(str(p), "manifest.schema.json") is None
-
-
 def test_validate_file_missing_raises_file_not_found_batch24(tmp_path):
     with pytest.raises(FileNotFoundError) as exc:
         validate_file(tmp_path / "missing.json", "manifest.schema.json")
@@ -421,11 +402,6 @@ def test_module_source_forbidden_tokens_batch24():
         assert tok not in source, f"forbidden token in source: {tok}"
 
 
-def test_module_source_no_star_import_batch24():
-    source = inspect.getsource(smod)
-    assert "import *" not in source
-
-
 def test_module_source_no_relative_imports_batch24():
     source = inspect.getsource(smod)
     assert "from ." not in source
@@ -497,11 +473,6 @@ def test_module_source_no_open_at_module_level_batch24():
             assert not (isinstance(node.value, _ast.Call) and getattr(node.value.func, "id", None) == "open")
 
 
-def test_module_source_no_subprocess_batch24():
-    source = inspect.getsource(smod)
-    assert "subprocess" not in source
-
-
 # ---------- module source 字符串精确补强第三十八批 ----------
 
 
@@ -509,11 +480,6 @@ def test_module_source_contains_path_parent_batch24():
     source = inspect.getsource(smod)
     assert "__file__" in source
     assert ".parent" in source
-
-
-def test_module_source_contains_absolute_schema_path_batch24():
-    source = inspect.getsource(smod)
-    assert "absolute_schema_path" in source
 
 
 def test_module_source_contains_errors_default_none_batch24():
@@ -541,11 +507,6 @@ def test_module_source_contains_file_not_found_batch24():
 def test_module_source_contains_super_init_batch24():
     source = inspect.getsource(smod)
     assert "super().__init__" in source
-
-
-def test_module_source_contains_utf8_encoding_batch24():
-    source = inspect.getsource(smod)
-    assert 'encoding="utf-8"' in source
 
 
 # ---------- signatures 第三十八批 ----------

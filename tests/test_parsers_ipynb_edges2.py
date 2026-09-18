@@ -266,10 +266,6 @@ def test_extract_kernel_language_kernelspec_empty_dict():
     assert _extract_kernel_language({"kernelspec": {}}) == ""
 
 
-def test_extract_kernel_language_language_info_empty_dict():
-    assert _extract_kernel_language({"language_info": {}}) == ""
-
-
 def test_extract_kernel_language_kernelspec_language_empty_falls_to_name():
     md = {"kernelspec": {"language": "", "name": "fallback_name"}}
     assert _extract_kernel_language(md) == "fallback_name"
@@ -1009,11 +1005,6 @@ def test_ipynb_parser_name_is_str():
 def test_ipynb_parser_version_is_str():
     p = IpynbParser()
     assert isinstance(p.version, str)
-
-
-def test_ipynb_parser_parse_callable():
-    p = IpynbParser()
-    assert callable(p.parse)
 
 
 def test_ipynb_parser_parse_signature():

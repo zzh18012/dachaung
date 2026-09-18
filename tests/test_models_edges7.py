@@ -217,11 +217,6 @@ def _make_chunk(**overrides) -> Chunk:
     return Chunk(**defaults)
 
 
-def test_chunk_post_init_empty_id_raises():
-    with pytest.raises(ValueError, match="chunk_id"):
-        Chunk(chunk_id="", text="x", source_element_ids=["e1"])
-
-
 def test_chunk_post_init_empty_source_ids_raises():
     with pytest.raises(ValueError, match="至少要有一个"):
         Chunk(chunk_id="c1", text="x", source_element_ids=[])

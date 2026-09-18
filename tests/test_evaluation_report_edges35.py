@@ -203,25 +203,9 @@ def test_get_git_provenance_oserror_batch18(tmp_path):
 # ---------- get_dependency_versions 行为深度第十八批 ----------
 
 
-def test_get_dependency_versions_returns_dict_batch18():
-    r = get_dependency_versions()
-    assert isinstance(r, dict)
-
-
 def test_get_dependency_versions_keys_count_3_batch18():
     r = get_dependency_versions()
     assert len(r) == 3
-
-
-def test_get_dependency_versions_keys_contents_batch18():
-    r = get_dependency_versions()
-    assert set(r.keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
-
-
-def test_get_dependency_versions_values_type_batch18():
-    r = get_dependency_versions()
-    for k, v in r.items():
-        assert v is None or isinstance(v, str)
 
 
 def test_get_dependency_versions_no_timeout_batch18():
@@ -350,27 +334,12 @@ def _mk_manifest():
     return m
 
 
-def test_build_devset_section_returns_dict_batch18():
-    r = build_devset_section(_mk_manifest())
-    assert isinstance(r, dict)
-
-
-def test_build_devset_section_keys_count_6_batch18():
-    r = build_devset_section(_mk_manifest())
-    assert len(r) == 6
-
-
 def test_build_devset_section_keys_names_batch18():
     r = build_devset_section(_mk_manifest())
     assert set(r.keys()) == {
         "status", "file_count", "content_group_count",
         "pdf_count", "docx_count", "categories_covered",
     }
-
-
-def test_build_devset_section_status_string_batch18():
-    r = build_devset_section(_mk_manifest())
-    assert r["status"] == "incomplete"
 
 
 def test_build_devset_section_file_count_batch18():
@@ -388,24 +357,12 @@ def test_build_devset_section_docx_count_batch18():
     assert r["docx_count"] == 2
 
 
-def test_build_devset_section_categories_list_batch18():
-    r = build_devset_section(_mk_manifest())
-    assert isinstance(r["categories_covered"], list)
-
-
 def test_build_devset_section_does_not_call_setter_batch18():
     """build_devset_section 只读 manifest，不修改。"""
     m = _mk_manifest()
     original_status = m.devset_status
     build_devset_section(m)
     assert m.devset_status == original_status
-
-
-def test_build_devset_section_with_complete_status_batch18():
-    m = _mk_manifest()
-    m.devset_status = "complete"
-    r = build_devset_section(m)
-    assert r["status"] == "complete"
 
 
 # ---------- aggregate_summary 行为深度第十八批 ----------
@@ -418,11 +375,6 @@ def test_aggregate_summary_empty_batch18():
     assert "success_rates" in r
     assert "ratio_macro_averages" in r
     assert "silent_drop_total" in r
-
-
-def test_aggregate_summary_silent_drop_empty_batch18():
-    r = aggregate_summary([])
-    assert r["silent_drop_total"] is None
 
 
 def test_aggregate_summary_silent_drop_zero_batch18():

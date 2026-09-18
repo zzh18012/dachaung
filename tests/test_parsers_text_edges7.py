@@ -65,11 +65,6 @@ def test_detect_text_source_type_unknown_suffix_raises():
     assert exc.value.code == "unsupported_type"
 
 
-def test_detect_text_source_type_no_suffix_raises():
-    with pytest.raises(ParserError):
-        _detect_text_source_type(Path("README"))
-
-
 def test_detect_text_source_type_html_raises():
     with pytest.raises(ParserError):
         _detect_text_source_type(Path("a.html"))
@@ -161,10 +156,6 @@ def test_split_paragraphs_all_blank_returns_empty():
     assert _split_paragraphs("\n\n\n") == []
 
 
-def test_split_paragraphs_whitespace_only_returns_empty():
-    assert _split_paragraphs("   \n\t\n  ") == []
-
-
 def test_split_paragraphs_returns_list_of_tuples():
     result = _split_paragraphs("hello")
     assert isinstance(result, list)
@@ -177,25 +168,10 @@ def test_split_paragraphs_each_tuple_two_elements():
         assert len(item) == 2
 
 
-def test_split_paragraphs_first_element_int():
-    result = _split_paragraphs("hello")
-    assert isinstance(result[0][0], int)
-
-
-def test_split_paragraphs_second_element_str():
-    result = _split_paragraphs("hello")
-    assert isinstance(result[0][1], str)
-
-
 def test_split_paragraphs_strips_content():
     """para_lines 用 \n join 后 strip。"""
     result = _split_paragraphs("  hello  ")
     assert result[0][1] == "hello"
-
-
-def test_split_paragraphs_idempotent():
-    text = "para1\n\npara2"
-    assert _split_paragraphs(text) == _split_paragraphs(text)
 
 
 def test_split_paragraphs_does_not_mutate_input():
@@ -230,11 +206,6 @@ def test_text_parser_parse_no_defaults():
     sig = inspect.signature(TextParser.parse)
     for name in ("path", "source_hash"):
         assert sig.parameters[name].default is inspect.Parameter.empty
-
-
-def test_text_parser_parse_return_annotation_document():
-    sig = inspect.signature(TextParser.parse)
-    assert "Document" in str(sig.return_annotation)
 
 
 # =========================================================================
@@ -629,11 +600,6 @@ def test_parse_long_document_many_paragraphs(tmp_path: Path):
 # =========================================================================
 # 模块结构
 # =========================================================================
-
-
-def test_module_all_exact():
-    import app.parsers.text_parser as mod
-    assert mod.__all__ == ["TextParser"]
 
 
 def test_module_imports_models():

@@ -89,11 +89,6 @@ def test_schemas_dir_count_files_batch16():
 # ---------- EvalSchemaError 行为深度第十六批 ----------
 
 
-def test_eval_schema_error_args_batch16():
-    err = EvalSchemaError("msg")
-    assert err.args == ("msg",)
-
-
 def test_eval_schema_error_args_multiple_batch16():
     err = EvalSchemaError("msg", errors=[{"x": 1}])
     # super().__init__("msg") 只把 message 放 args
@@ -142,14 +137,6 @@ def test_eval_schema_error_can_be_raised_and_caught_batch16():
 def test_eval_schema_error_is_exception_batch16():
     err = EvalSchemaError("x")
     assert isinstance(err, Exception)
-
-
-def test_eval_schema_error_pickle_roundtrip_batch16():
-    err = EvalSchemaError("m", errors=[{"path": ["x"]}])
-    data = pickle.dumps(err)
-    restored = pickle.loads(data)
-    assert isinstance(restored, EvalSchemaError)
-    assert str(restored) == "m"
 
 
 def test_eval_schema_error_errors_independent_batch16():
@@ -212,20 +199,7 @@ def test_load_schema_returns_schema_with_properties_batch16():
     assert "properties" in s
 
 
-def test_load_schema_manifest_has_documents_batch16():
-    s = load_schema("manifest.schema.json")
-    assert "documents" in s.get("properties", {})
-
-
 # ---------- validate 行为深度第十六批 ----------
-
-
-def test_validate_success_returns_none_batch16():
-    inst = {
-        "manifest_version": "1.0", "devset_status": "incomplete",
-        "documents": [], "expected_failures": [],
-    }
-    assert validate(inst, "manifest.schema.json") is None
 
 
 def test_validate_invalid_returns_errors_batch16():
@@ -270,15 +244,6 @@ def test_validate_unknown_schema_raises_filenotfound_batch16():
         validate({}, "nonexistent.schema.json")
 
 
-def test_validate_does_not_modify_instance_batch16():
-    inst = {"manifest_version": "1.0", "devset_status": "incomplete",
-            "documents": [], "expected_failures": []}
-    before = json.dumps(inst, sort_keys=True)
-    validate(inst, "manifest.schema.json")
-    after = json.dumps(inst, sort_keys=True)
-    assert before == after
-
-
 def test_validate_annotation_schema_batch16():
     """annotation schema 也校验通过。"""
     inst = {
@@ -317,15 +282,6 @@ def test_validate_extra_fields_rejected_batch16():
 # ---------- validate_file 行为深度第十六批 ----------
 
 
-def test_validate_file_path_str_batch16(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0", "devset_status": "incomplete",
-        "documents": [], "expected_failures": [],
-    }), encoding="utf-8")
-    validate_file(str(p), "manifest.schema.json")
-
-
 def test_validate_file_bom_fails_batch16(tmp_path):
     """UTF-8 BOM → json.load 失败。"""
     p = tmp_path / "m.json"
@@ -359,17 +315,6 @@ def test_validate_file_invalid_json_batch16(tmp_path):
     p.write_text("not json", encoding="utf-8")
     with pytest.raises(json.JSONDecodeError):
         validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_does_not_modify_file_batch16(tmp_path):
-    p = tmp_path / "m.json"
-    content = json.dumps({
-        "manifest_version": "1.0", "devset_status": "incomplete",
-        "documents": [], "expected_failures": [],
-    })
-    p.write_text(content, encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
-    assert p.read_text(encoding="utf-8") == content
 
 
 def test_validate_file_invalid_schema_name_batch16(tmp_path):
@@ -408,14 +353,6 @@ def test_schema_path_unicode_name_batch16():
 def test_schema_path_empty_batch16():
     with pytest.raises(FileNotFoundError):
         _schema_path("")
-
-
-def test_schema_path_message_format_batch16():
-    with pytest.raises(FileNotFoundError) as exc_info:
-        _schema_path("nope.schema.json")
-    msg = str(exc_info.value)
-    assert "nope.schema.json" in msg
-    assert "Schema 文件不存在" in msg
 
 
 def test_schema_path_valid_for_three_schemas_batch16():
@@ -566,19 +503,6 @@ def test_signature_schema_path_batch16():
     assert list(sig.parameters.keys()) == ["name"]
 
 
-def test_signature_eval_schema_error_init_batch16():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    params = list(sig.parameters.keys())
-    assert params == ["self", "message", "errors"]
-    assert sig.parameters["errors"].default is None
-
-
-def test_signature_load_schema_no_varargs_batch16():
-    sig = inspect.signature(load_schema)
-    for p in sig.parameters.values():
-        assert p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)
-
-
 # ---------- module 合理性第二十七批 ----------
 
 
@@ -628,15 +552,6 @@ def test_module_does_not_import_unsafe_modules_batch16():
 # ---------- 端到端集成第二十七批 ----------
 
 
-def test_e2e_validate_manifest_full_batch16():
-    inst = {
-        "manifest_version": "1.0", "devset_status": "incomplete",
-        "documents": [{"doc_id": "d1", "path": "a.pdf", "source_type": "pdf"}],
-        "expected_failures": [],
-    }
-    validate(inst, "manifest.schema.json")
-
-
 def test_e2e_validate_annotation_full_batch16():
     inst = {
         "annotation_version": "1.0",
@@ -654,15 +569,6 @@ def test_e2e_load_then_validate_round_trip_batch16():
     from jsonschema import Draft202012Validator
     errors = list(Draft202012Validator(schema).iter_errors(inst))
     assert errors == []
-
-
-def test_e2e_eval_schema_error_with_complex_errors_batch16():
-    complex_errs = [
-        {"path": ["a", "b"], "message": "type", "schema_path": ["properties"]},
-        {"path": ["c"], "message": "missing", "schema_path": ["required"]},
-    ]
-    err = EvalSchemaError("complex", errors=complex_errs)
-    assert err.errors == complex_errs
 
 
 def test_e2e_schema_path_round_trip_batch16():

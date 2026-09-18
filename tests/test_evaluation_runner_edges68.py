@@ -639,11 +639,6 @@ def test_run_evaluation_expected_failure_keys_batch43(tmp_path):
 # ---------- module source 字符串精确 第四十三批
 
 
-def test_module_source_contains_docstring_batch43():
-    src = inspect.getsource(rmod)
-    assert '"""' in src
-
-
 def test_module_source_contains_future_annotations_batch43():
     src = inspect.getsource(rmod)
     assert "from __future__ import annotations" in src
@@ -772,13 +767,6 @@ def test_ast_has_three_functions_batch43():
     assert "_load_annotation" in funcs
     assert "_process_one" in funcs
     assert "run_evaluation" in funcs
-
-
-def test_ast_no_async_functions_batch43():
-    src = inspect.getsource(rmod)
-    tree = ast.parse(src)
-    async_funcs = [n for n in tree.body if isinstance(n, ast.AsyncFunctionDef)]
-    assert async_funcs == []
 
 
 def test_ast_top_level_only_allowed_kinds_batch43():

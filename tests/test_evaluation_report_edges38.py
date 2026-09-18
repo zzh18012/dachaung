@@ -71,11 +71,6 @@ def test_ratio_metrics_excludes_element_count_total_batch22():
     assert "element_count_total" not in _RATIO_METRICS
 
 
-def test_ratio_metrics_excludes_pipeline_success_batch22():
-    """pipeline_success 在 _SUCCESS_BOOL_METRICS 而非 _RATIO_METRICS。"""
-    assert "pipeline_success" not in _RATIO_METRICS
-
-
 def test_ratio_metrics_no_duplicates_batch22():
     assert len(_RATIO_METRICS) == len(set(_RATIO_METRICS))
 
@@ -132,12 +127,6 @@ def test_success_and_ratio_metrics_disjoint_batch22():
 
 
 # ---------- get_git_provenance 边界 第二十二批 ----------
-
-
-def test_get_git_provenance_returns_dict_with_2_keys_batch22(tmp_path):
-    out = get_git_provenance(tmp_path)
-    assert isinstance(out, dict)
-    assert set(out.keys()) == {"git_commit", "git_dirty"}
 
 
 def test_get_git_provenance_with_subprocess_error_batch22(tmp_path):
@@ -444,14 +433,6 @@ def test_aggregate_summary_success_rate_batch22():
     assert rate["success_count"] == 2
     assert rate["total"] == 3
     assert rate["rate"] == pytest.approx(2 / 3)
-
-
-def test_aggregate_summary_success_rate_empty_batch22():
-    out = aggregate_summary([])
-    rate = out["success_rates"]["pipeline_success"]
-    assert rate["success_count"] == 0
-    assert rate["total"] == 0
-    assert rate["rate"] is None
 
 
 def test_aggregate_summary_ratio_macro_average_batch22():
@@ -770,22 +751,10 @@ def test_module_all_contents_batch22():
     }
 
 
-def test_module_does_not_import_app_pipeline_batch22():
-    src = inspect.getsource(rmod)
-    assert "from app" not in src
-    assert "import app" not in src
-
-
 def test_module_does_not_import_evaluation_runner_batch22():
     src = inspect.getsource(rmod)
     assert "from evaluation.runner" not in src
     assert "from evaluation import runner" not in src
-
-
-def test_module_does_not_import_evaluation_metrics_batch22():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.metrics" not in src
-    assert "from evaluation import metrics" not in src
 
 
 def test_module_does_not_import_evaluation_cli_batch22():

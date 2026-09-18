@@ -33,11 +33,6 @@ from evaluation.runner import _load_annotation, _process_one, run_evaluation
 
 # ---------- _load_annotation 多种路径 ----------
 
-def test_load_annotation_missing_file_returns_none_batch49(tmp_path):
-    out = _load_annotation(tmp_path / "nope.json")
-    assert out is None
-
-
 def test_load_annotation_valid_file_returns_dict_batch49(tmp_path):
     f = tmp_path / "ann.json"
     f.write_text(json.dumps({"key": "value"}), encoding="utf-8")
@@ -458,11 +453,6 @@ def test_ast_no_class_def_batch49():
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
-def test_ast_no_async_function_def_batch49():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
-
-
 def test_ast_module_has_docstring_batch49():
     tree = ast.parse(inspect.getsource(runner_mod))
     assert isinstance(tree.body[0], ast.Expr)
@@ -481,13 +471,6 @@ def test_ast_module_has_1_top_level_assign_batch49():
     tree = ast.parse(inspect.getsource(runner_mod))
     assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
     assert len(assigns) == 1
-
-
-def test_ast_load_annotation_has_try_batch49():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_load_annotation")
-    trys = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
-    assert len(trys) == 1
 
 
 def test_ast_load_annotation_has_open_call_batch49():
@@ -510,13 +493,6 @@ def test_ast_process_one_has_multiple_return_batch49():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_process_one")
     returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
     assert len(returns) >= 3
-
-
-def test_ast_process_one_has_try_batch49():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_process_one")
-    trys = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
-    assert len(trys) >= 1
 
 
 def test_ast_run_evaluation_has_multiple_for_batch49():

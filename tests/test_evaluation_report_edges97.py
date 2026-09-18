@@ -148,11 +148,6 @@ def test_ratio_bool_values_participate_batch91():
         "not_evaluated": 0}
 
 
-def test_count_success_metric_tuples_batch91():
-    assert report_mod._COUNT_METRICS == ("element_count_total",)
-    assert report_mod._SUCCESS_BOOL_METRICS == ("pipeline_success",)
-
-
 # ---------- devset 段 ----------
 
 def test_devset_section_key_order_batch91():

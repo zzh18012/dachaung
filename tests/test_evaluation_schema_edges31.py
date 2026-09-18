@@ -495,16 +495,6 @@ def test_schema_source_no_forbidden_token_fifteenth_batch11(token):
     assert token not in source
 
 
-def test_schema_source_no_top_level_lambda_batch11():
-    source = inspect.getsource(smod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
-
-
 def test_schema_source_no_class_outside_eval_schema_error_batch11():
     """顶层只有 EvalSchemaError 一个 class。"""
     source = inspect.getsource(smod)
@@ -550,20 +540,10 @@ def test_schema_source_no_input_call_batch11():
     assert "input(" not in source
 
 
-def test_schema_source_no_kill_batch11():
-    source = inspect.getsource(smod)
-    assert ".kill(" not in source
-
-
 def test_schema_source_no_unlink_batch11():
     """schema 模块不删文件。"""
     source = inspect.getsource(smod)
     assert "unlink" not in source
-
-
-def test_schema_source_no_threading_batch11():
-    source = inspect.getsource(smod)
-    assert "threading" not in source
 
 
 # ---------- module source 字符串精确补强第十一批 ----------
@@ -643,11 +623,6 @@ def test_module_source_docstring_mentions_separation_batch11():
 def test_signature_eval_schema_error_2_params_batch11():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert len(sig.parameters) == 3  # self + message + errors
-
-
-def test_signature_eval_schema_error_self_param_batch11():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    assert "self" in sig.parameters
 
 
 def test_signature_eval_schema_error_message_param_batch11():
@@ -745,13 +720,6 @@ def test_module_name_evaluation_schema_batch11():
     assert smod.__name__ == "evaluation.schema"
 
 
-def test_module_dunder_file_endswith_schema_py_batch11():
-    sep = os.sep
-    assert smod.__file__.endswith("evaluation" + sep + "schema.py") or smod.__file__.endswith(
-        "evaluation/schema.py"
-    )
-
-
 def test_module_user_function_count_4_batch11():
     funcs = [
         n for n, v in vars(smod).items()
@@ -795,11 +763,6 @@ def test_module_dunder_all_exact_batch11():
 
 def test_module_dunder_all_len_5_batch11():
     assert len(smod.__all__) == 5
-
-
-def test_module_has_draft_validator_imported_batch11():
-    assert hasattr(smod, "Draft202012Validator")
-    assert smod.Draft202012Validator is Draft202012Validator
 
 
 def test_module_eval_schema_error_class_present_batch11():

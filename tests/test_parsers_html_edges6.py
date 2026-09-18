@@ -55,11 +55,6 @@ def test_html_extensions_is_tuple():
     assert isinstance(_HTML_EXTENSIONS, tuple)
 
 
-def test_html_extensions_lowercase():
-    for ext in _HTML_EXTENSIONS:
-        assert ext == ext.lower()
-
-
 def test_html_extensions_starts_with_dot():
     for ext in _HTML_EXTENSIONS:
         assert ext.startswith(".")
@@ -841,40 +836,6 @@ def test_html_doc_parser_image_confidence_09(tmp_path: Path):
 def test_module_all_exact():
     import app.parsers.html_parser as mod
     assert mod.__all__ == ["HtmlParser"]
-
-
-def test_module_all_is_list():
-    import app.parsers.html_parser as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_uses_future_annotations():
-    import app.parsers.html_parser as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_stdlib_html_parser():
-    import app.parsers.html_parser as mod
-    src = inspect.getsource(mod)
-    assert "from html.parser import HTMLParser" in src
-
-
-def test_module_imports_path():
-    import app.parsers.html_parser as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.parsers.html_parser as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
-def test_module_docstring_present():
-    import app.parsers.html_parser as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_supported_tags():

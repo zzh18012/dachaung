@@ -561,31 +561,6 @@ def test_module_source_contains_success_bool_metrics_const_batch31():
     assert '_SUCCESS_BOOL_METRICS = ("pipeline_success",)' in src
 
 
-def test_module_source_contains_get_git_provenance_func_batch31():
-    src = inspect.getsource(rmod)
-    assert "def get_git_provenance" in src
-
-
-def test_module_source_contains_get_dependency_versions_func_batch31():
-    src = inspect.getsource(rmod)
-    assert "def get_dependency_versions" in src
-
-
-def test_module_source_contains_build_provenance_func_batch31():
-    src = inspect.getsource(rmod)
-    assert "def build_provenance" in src
-
-
-def test_module_source_contains_build_devset_section_func_batch31():
-    src = inspect.getsource(rmod)
-    assert "def build_devset_section" in src
-
-
-def test_module_source_contains_aggregate_summary_func_batch31():
-    src = inspect.getsource(rmod)
-    assert "def aggregate_summary" in src
-
-
 def test_module_source_contains_git_dirty_fallback_true_batch31():
     """git_dirty 默认 True（失败时也 True）。"""
     src = inspect.getsource(rmod)

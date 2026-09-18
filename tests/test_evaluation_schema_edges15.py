@@ -548,11 +548,6 @@ def test_validate_file_nonexistent_raises_filenotfounderror(tmp_path):
         validate_file(tmp_path / "nonexistent.json", "manifest.schema.json")
 
 
-def test_validate_file_directory_raises_filenotfounderror(tmp_path):
-    with pytest.raises(FileNotFoundError):
-        validate_file(tmp_path, "manifest.schema.json")
-
-
 def test_validate_file_invalid_json_raises_jsondecode_error(tmp_path):
     """内容是 invalid JSON → 抛 json.JSONDecodeError（不转换为 EvalSchemaError）。"""
     p = tmp_path / "bad.json"
@@ -682,11 +677,6 @@ def test_module_all_entries_types():
     assert callable(smod.load_schema)
     assert callable(smod.validate)
     assert callable(smod.validate_file)
-
-
-def test_module_all_does_not_include_private():
-    """_schema_path 不在 __all__。"""
-    assert "_schema_path" not in smod.__all__
 
 
 def test_module_all_is_list_of_str():

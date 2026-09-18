@@ -160,12 +160,6 @@ def test_get_git_provenance_one_param_batch43():
     assert params == ["project_root"]
 
 
-def test_get_git_provenance_param_kind_batch43():
-    sig = inspect.signature(get_git_provenance)
-    p = sig.parameters["project_root"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_get_git_provenance_no_default_batch43():
     sig = inspect.signature(get_git_provenance)
     p = sig.parameters["project_root"]
@@ -178,11 +172,6 @@ def test_get_git_provenance_return_annotation_batch43():
 
 
 # ---------- get_git_provenance subprocess 参数 ----------
-
-def test_get_git_provenance_uses_cwd_str_batch43():
-    src = inspect.getsource(get_git_provenance)
-    assert "cwd=str(project_root)" in src
-
 
 def test_get_git_provenance_returns_2_keys_batch43():
     with patch("subprocess.run") as mock_run:
@@ -472,24 +461,6 @@ def test_aggregate_summary_empty_batch43():
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
 
 
-def test_aggregate_summary_counts_subkeys_batch43():
-    out = aggregate_summary([])
-    for name in _COUNT_METRICS:
-        assert set(out["counts"][name].keys()) == {"sum", "participating_docs"}
-
-
-def test_aggregate_summary_success_rates_subkeys_batch43():
-    out = aggregate_summary([])
-    for name in _SUCCESS_BOOL_METRICS:
-        assert set(out["success_rates"][name].keys()) == {"success_count", "total", "rate"}
-
-
-def test_aggregate_summary_ratio_macro_averages_subkeys_batch43():
-    out = aggregate_summary([])
-    for name in _RATIO_METRICS:
-        assert set(out["ratio_macro_averages"][name].keys()) == {"macro_average", "participating_docs", "not_evaluated"}
-
-
 def test_aggregate_summary_empty_all_none_batch43():
     out = aggregate_summary([])
     assert out["counts"]["element_count_total"]["sum"] is None
@@ -504,13 +475,6 @@ def test_aggregate_summary_counts_with_value_zero_batch43():
     out = aggregate_summary(per_doc)
     assert out["counts"]["element_count_total"]["sum"] == 0
     assert out["counts"]["element_count_total"]["participating_docs"] == 1
-
-
-def test_aggregate_summary_counts_with_value_none_batch43():
-    per_doc = [{"metrics": {"element_count_total": {"value": None}}}]
-    out = aggregate_summary(per_doc)
-    assert out["counts"]["element_count_total"]["sum"] is None
-    assert out["counts"]["element_count_total"]["participating_docs"] == 0
 
 
 def test_aggregate_summary_counts_missing_key_batch43():
@@ -615,12 +579,6 @@ def test_aggregate_summary_idempotent_batch43():
     out1 = aggregate_summary(per_doc)
     out2 = aggregate_summary(per_doc)
     assert out1 == out2
-
-
-def test_aggregate_summary_field_order_batch43():
-    out = aggregate_summary([])
-    keys = list(out.keys())
-    assert keys == ["counts", "success_rates", "ratio_macro_averages", "silent_drop_total"]
 
 
 # ---------- __all__ ----------

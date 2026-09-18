@@ -70,10 +70,6 @@ def test_cell_source_bool_returns_empty():
     assert _cell_source_to_text(True) == ""
 
 
-def test_cell_source_int_returns_empty():
-    assert _cell_source_to_text(42) == ""
-
-
 def test_cell_source_float_returns_empty():
     assert _cell_source_to_text(3.14) == ""
 
@@ -143,19 +139,6 @@ def test_cell_source_list_with_one_empty_str():
     assert _cell_source_to_text([""]) == ""
 
 
-def test_cell_source_list_with_newline_ending_parts():
-    parts = ["line1\n", "line2\n", "line3"]
-    assert _cell_source_to_text(parts) == "line1\nline2\nline3"
-
-
-def test_cell_source_returns_str_type():
-    assert isinstance(_cell_source_to_text("hello"), str)
-
-
-def test_cell_source_returns_str_for_list_input():
-    assert isinstance(_cell_source_to_text(["a", "b"]), str)
-
-
 # =========================================================================
 # _extract_kernel_language 深度
 # =========================================================================
@@ -182,11 +165,6 @@ def test_extract_lang_kernelspec_no_language_no_name_falls_back_to_language_info
         "language_info": {"name": "ruby"},
     }
     assert _extract_kernel_language(md) == "ruby"
-
-
-def test_extract_lang_kernelspec_no_dict_returns_from_language_info():
-    md = {"kernelspec": None, "language_info": {"name": "julia"}}
-    assert _extract_kernel_language(md) == "julia"
 
 
 def test_extract_lang_kernelspec_undefined_key_uses_language_info():
@@ -226,11 +204,6 @@ def test_extract_lang_metadata_none_raises_attribute_error():
 def test_extract_lang_kernelspec_language_overrides_name():
     md = {"kernelspec": {"language": "rust", "name": "rs"}}
     assert _extract_kernel_language(md) == "rust"
-
-
-def test_extract_lang_returns_str_type():
-    md = {"kernelspec": {"language": "python"}}
-    assert isinstance(_extract_kernel_language(md), str)
 
 
 # =========================================================================
@@ -808,10 +781,6 @@ def test_cell_source_helper_has_docstring():
 
 def test_extract_kernel_language_has_docstring():
     assert _extract_kernel_language.__doc__ is not None
-
-
-def test_cell_source_helper_returns_str_for_empty():
-    assert isinstance(_cell_source_to_text(""), str)
 
 
 def test_extract_kernel_language_returns_str_for_empty():

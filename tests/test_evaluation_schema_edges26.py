@@ -32,12 +32,6 @@ from evaluation.schema import (
 # ---------- EvalSchemaError 行为深度第六批 ----------
 
 
-def test_eval_schema_error_default_errors_is_empty_list():
-    err = EvalSchemaError("msg")
-    assert err.errors == []
-    assert isinstance(err.errors, list)
-
-
 def test_eval_schema_error_two_instances_default_errors_not_shared():
     """默认 errors=[] 不应共享引用（每次都新建）。"""
     e1 = EvalSchemaError("a")
@@ -515,10 +509,6 @@ def test_module_docstring_present():
     assert len(smod.__doc__) > 0
 
 
-def test_module_docstring_mentions_schema():
-    assert "Schema" in smod.__doc__ or "schema" in smod.__doc__
-
-
 def test_module_docstring_mentions_manifest():
     assert "manifest" in smod.__doc__
 
@@ -701,19 +691,9 @@ def test_module_source_no_compile():
     assert "compile(" not in src
 
 
-def test_module_source_no_unlink():
-    src = inspect.getsource(smod)
-    assert "unlink" not in src
-
-
 def test_module_source_no_subprocess():
     src = inspect.getsource(smod)
     assert "subprocess" not in src
-
-
-def test_module_source_no_relative_import_above_root():
-    src = inspect.getsource(smod)
-    assert "from ." not in src
 
 
 def test_module_source_no_star_import():
@@ -724,11 +704,6 @@ def test_module_source_no_star_import():
 def test_module_source_eval_schema_error_class_definition():
     src = inspect.getsource(smod)
     assert "class EvalSchemaError(Exception):" in src
-
-
-def test_module_source_eval_schema_error_init_signature():
-    src = inspect.getsource(smod)
-    assert "def __init__(self, message: str, errors: list[dict[str, Any]] | None = None)" in src
 
 
 # ---------- 端到端集成第六批 ----------

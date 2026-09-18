@@ -176,13 +176,6 @@ def test_validate_with_unknown_top_key_batch30():
         validate(instance, "manifest.schema.json")
 
 
-def test_validate_errors_each_has_path_message_schema_path_batch30():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    for err in exc.value.errors:
-        assert set(err.keys()) == {"path", "message", "schema_path"}
-
-
 def test_validate_with_invalid_manifest_version_batch30():
     instance = {
         "manifest_version": "999.0",
@@ -483,12 +476,6 @@ def test_signature_eval_schema_error_message_str_batch30():
 def test_signature_eval_schema_error_errors_default_none_batch30():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert sig.parameters["errors"].default is None
-
-
-def test_signature_eval_schema_error_errors_optional_list_batch30():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    ps = str(sig.parameters["errors"].annotation)
-    assert "list" in ps and "None" in ps
 
 
 def test_signature_schema_path_batch30():

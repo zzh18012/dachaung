@@ -26,11 +26,6 @@ def test_all_exact():
     assert pkg.__all__ == ["Parser", "ParserError", "make_document_id"]
 
 
-def test_all_is_list():
-    import app.parsers as pkg
-    assert isinstance(pkg.__all__, list)
-
-
 def test_all_no_duplicates():
     import app.parsers as pkg
     assert len(pkg.__all__) == len(set(pkg.__all__))
@@ -145,11 +140,6 @@ def test_can_import_text_parser_module():
 # =========================================================================
 # 子模块中 Parser 子类
 # =========================================================================
-
-
-def test_fallback_module_has_fallback_parser():
-    import app.parsers.fallback_parser as mod
-    assert hasattr(mod, "FallbackParser")
 
 
 def test_kreuzberg_module_has_kreuzberg_parser():

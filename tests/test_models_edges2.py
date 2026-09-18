@@ -410,11 +410,6 @@ def test_warning_record_to_dict_includes_details_when_empty_dict():
     assert "details" in d
 
 
-def test_warning_record_details_default_none():
-    w = WarningRecord(code="x", reason="y")
-    assert w.details is None
-
-
 def test_warning_record_unicode_code_reason():
     w = WarningRecord(code="代码", reason="原因 🎉")
     d = w.to_dict()
@@ -456,11 +451,6 @@ def test_error_record_to_dict_includes_details_when_empty_dict():
     er = ErrorRecord(code="x", message="y", details={})
     d = er.to_dict()
     assert "details" in d
-
-
-def test_error_record_details_default_none():
-    er = ErrorRecord(code="x", message="y")
-    assert er.details is None
 
 
 def test_error_record_unicode_message():

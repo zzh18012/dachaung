@@ -541,26 +541,6 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_forbidden_tokens_batch23():
-    """schema.py 不应 import 这些副作用大的模块。"""
-    source = inspect.getsource(smod)
-    for tok in FORBIDDEN_TOKENS:
-        assert tok not in source, f"forbidden token in source: {tok}"
-
-
-def test_module_source_no_class_other_than_eval_schema_error_batch23():
-    """schema.py 仅定义 EvalSchemaError，无其他 class。"""
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(smod))
-    classes = [n.name for n in tree.body if isinstance(n, _ast.ClassDef)]
-    assert classes == ["EvalSchemaError"]
-
-
-def test_module_source_no_yield_batch23():
-    source = inspect.getsource(smod)
-    assert "yield " not in source
-
-
 def test_module_source_no_async_def_batch23():
     source = inspect.getsource(smod)
     assert "async def" not in source
@@ -701,23 +681,7 @@ def test_module_source_contains_self_errors_batch23():
     assert "errors or []" in source
 
 
-def test_module_source_contains_isfile_check_batch23():
-    """source 含 is_file() 检查。"""
-    source = inspect.getsource(smod)
-    assert "is_file()" in source
-
-
 # ---------- signatures 第三十七批 ----------
-
-
-def test_signature_schema_path_batch23():
-    """_schema_path(name: str) -> Path。"""
-    sig = inspect.signature(_schema_path)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "name"
-    assert params[0].annotation == "str"
-    assert sig.return_annotation == "Path"
 
 
 def test_signature_load_schema_batch23():

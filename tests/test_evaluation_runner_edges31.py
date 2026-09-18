@@ -85,13 +85,6 @@ def test_load_annotation_with_empty_dict(tmp_path):
     assert out == {}
 
 
-def test_load_annotation_with_empty_array(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text("[]", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == []
-
-
 def test_load_annotation_with_whitespace_only(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text("   \n\t  ", encoding="utf-8")
@@ -372,11 +365,6 @@ def test_run_evaluation_source_creates_report_dict():
     assert "report = {" in src
 
 
-def test_run_evaluation_source_assigns_out_p():
-    src = inspect.getsource(run_evaluation)
-    assert "out_p = Path(output_path)" in src
-
-
 def test_run_evaluation_source_returns_report():
     src = inspect.getsource(run_evaluation)
     assert "return report" in src
@@ -552,11 +540,6 @@ def test_module_source_no_async_def():
     assert "async def" not in src
 
 
-def test_module_source_no_global_keyword():
-    src = inspect.getsource(rmod)
-    assert "global " not in src
-
-
 def test_module_source_no_nonlocal_keyword():
     src = inspect.getsource(rmod)
     assert "nonlocal " not in src
@@ -578,12 +561,6 @@ def test_module_source_no_eval_exec():
 def test_module_source_no_compile_call():
     src = inspect.getsource(rmod)
     assert "compile(" not in src
-
-
-def test_module_source_no_os_module():
-    src = inspect.getsource(rmod)
-    assert "import os" not in src
-    assert "from os " not in src
 
 
 def test_module_source_no_subprocess():
@@ -715,10 +692,6 @@ def test_run_evaluation_docstring_mentions_评测():
 # ---------- 模块整体合理性（第三批） ----------
 
 
-def test_module_namespace_is_module():
-    assert isinstance(rmod, types.ModuleType)
-
-
 def test_module_namespace_name():
     assert rmod.__name__ == "evaluation.runner"
 
@@ -788,25 +761,6 @@ def test_module_has_2_private_functions():
     assert names == ["_load_annotation", "_process_one"]
 
 
-def test_module_has_1_public_function():
-    public = [
-        v for v in vars(rmod).values()
-        if isinstance(v, types.FunctionType)
-        and v.__module__ == rmod.__name__
-        and not v.__name__.startswith("_")
-    ]
-    assert len(public) == 1
-    assert public[0].__name__ == "run_evaluation"
-
-
-def test_module_no_user_classes():
-    classes = [
-        v for v in vars(rmod).values()
-        if isinstance(v, type) and v.__module__ == rmod.__name__
-    ]
-    assert len(classes) == 0
-
-
 def test_module_callable_run_evaluation():
     assert callable(run_evaluation)
 
@@ -839,72 +793,6 @@ def _make_minimal_manifest(path):
     )
 
 
-def test_e2e_no_documents_creates_per_doc_dir(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out = tmp_path / "out.json"
-    report = run_evaluation(manifest, out)
-    assert report["per_doc"] == []
-    assert out.is_file()
-
-
-def test_e2e_no_documents_creates_report_dict_with_6_keys(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out = tmp_path / "out.json"
-    report = run_evaluation(manifest, out)
-    expected_keys = {
-        "report_version",
-        "provenance",
-        "devset",
-        "summary",
-        "per_doc",
-        "expected_failures",
-    }
-    assert set(report.keys()) == expected_keys
-
-
-def test_e2e_no_documents_devset_status_incomplete(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out = tmp_path / "out.json"
-    report = run_evaluation(manifest, out)
-    assert report["devset"]["status"] == "incomplete"
-
-
-def test_e2e_no_documents_summary_total_0(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out = tmp_path / "out.json"
-    report = run_evaluation(manifest, out)
-    # summary 的 schema 是 counts/success_rates/ratio_macro_averages/silent_drop_total
-    assert "counts" in report["summary"]
-    assert "success_rates" in report["summary"]
-
-
-def test_e2e_no_documents_creates_subdir(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out = tmp_path / "sub" / "deep" / "out.json"
-    report = run_evaluation(manifest, out)
-    assert out.is_file()
-
-
 def test_e2e_loadable_report(tmp_path):
     from evaluation.manifest import load_manifest
 
@@ -916,55 +804,6 @@ def test_e2e_loadable_report(tmp_path):
     with out.open("r", encoding="utf-8") as f:
         loaded = json.load(f)
     assert "report_version" in loaded
-
-
-def test_e2e_indent_2_in_output(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out = tmp_path / "out.json"
-    run_evaluation(manifest, out)
-    text = out.read_text(encoding="utf-8")
-    assert "\n" in text
-
-
-def test_e2e_deterministic_across_calls(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out1 = tmp_path / "out1.json"
-    out2 = tmp_path / "out2.json"
-    r1 = run_evaluation(manifest, out1)
-    r2 = run_evaluation(manifest, out2)
-    assert r1["per_doc"] == r2["per_doc"]
-    assert r1["summary"] == r2["summary"]
-    assert r1["devset"] == r2["devset"]
-
-
-def test_e2e_with_max_chars_1(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out = tmp_path / "out.json"
-    report = run_evaluation(manifest, out, max_chars=1)
-    assert report["provenance"]["max_chars"] == 1
-
-
-def test_e2e_with_tolerance_chars_0(tmp_path):
-    from evaluation.manifest import load_manifest
-
-    mpath = tmp_path / "manifest.json"
-    _make_minimal_manifest(mpath)
-    manifest = load_manifest(mpath)
-    out = tmp_path / "out.json"
-    report = run_evaluation(manifest, out, tolerance_chars=0)
-    assert isinstance(report["per_doc"], list)
 
 
 def test_e2e_with_kreuzberg_parser_name(tmp_path):
@@ -1002,13 +841,6 @@ def test_e2e_load_annotation_invalid_json_returns_none(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text("not json", encoding="utf-8")
     assert _load_annotation(p) is None
-
-
-def test_e2e_load_annotation_valid_returns_dict(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text('{"a": 1}', encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == {"a": 1}
 
 
 def test_e2e_returns_dict_type(tmp_path):

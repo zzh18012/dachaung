@@ -91,11 +91,6 @@ def test_int_metric_returns_dict_batch45():
     assert out["reason"] is None
 
 
-def test_null_value_is_exactly_none_batch45():
-    out = _null("x")
-    assert out["value"] is None
-
-
 def test_ratio_value_is_float_batch45():
     """int 输入也要变成 float。"""
     out = _ratio(1)
@@ -134,11 +129,6 @@ def test_int_metric_zero_input_batch45():
     assert out["value"] == 0
 
 
-def test_ratio_one_batch45():
-    out = _ratio(1)
-    assert out["value"] == 1.0
-
-
 def test_ratio_bool_true_batch45():
     """bool True 作为 float(1.0)。"""
     out = _ratio(True)
@@ -174,11 +164,6 @@ def test_not_evaluated_value_batch45():
 
 def test_not_evaluated_is_str_batch45():
     assert isinstance(_NOT_EVALUATED, str)
-
-
-def test_text_types_all_str_batch45():
-    for t in _TEXT_TYPES:
-        assert isinstance(t, str)
 
 
 def test_text_types_unique_batch45():
@@ -684,10 +669,6 @@ def test_all_exact_batch45():
     assert list(metrics_mod.__all__) == ["compute_automatic_metrics"]
 
 
-def test_all_count_one_batch45():
-    assert len(metrics_mod.__all__) == 1
-
-
 def test_all_entry_callable_batch45():
     assert callable(getattr(metrics_mod, "compute_automatic_metrics"))
 
@@ -708,12 +689,6 @@ def test_ast_top_level_no_class_batch45():
     tree = ast.parse(inspect.getsource(metrics_mod))
     for n in tree.body:
         assert not isinstance(n, ast.ClassDef)
-
-
-def test_ast_top_level_no_async_batch45():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
 
 
 def test_ast_first_node_docstring_batch45():
@@ -824,11 +799,6 @@ def test_source_no_locals_batch45():
 def test_source_no_os_system_batch45():
     src = inspect.getsource(metrics_mod)
     assert "os.system(" not in src
-
-
-def test_source_no_popen_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "popen(" not in src
 
 
 def test_source_no_yaml_load_batch45():

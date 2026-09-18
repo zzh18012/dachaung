@@ -690,16 +690,6 @@ def test_module_source_has_ratio_metrics_constant_batch19():
     assert "_RATIO_METRICS = (" in src
 
 
-def test_module_source_has_count_metrics_constant_batch19():
-    src = inspect.getsource(rmod)
-    assert "_COUNT_METRICS = (" in src
-
-
-def test_module_source_has_success_bool_metrics_constant_batch19():
-    src = inspect.getsource(rmod)
-    assert "_SUCCESS_BOOL_METRICS = (" in src
-
-
 def test_module_source_has_get_git_provenance_function_batch19():
     src = inspect.getsource(rmod)
     assert "def get_git_provenance(" in src

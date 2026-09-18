@@ -52,16 +52,6 @@ def test_schemas_dir_parent_is_project_root_batch22(tmp_path):
     assert (project_root / "pyproject.toml").is_file()
 
 
-def test_schemas_dir_is_directory_batch22():
-    """SCHEMAS_DIR 是 directory。"""
-    assert SCHEMAS_DIR.is_dir()
-
-
-def test_schemas_dir_basename_batch22():
-    """SCHEMAS_DIR.name == 'schemas'。"""
-    assert SCHEMAS_DIR.name == "schemas"
-
-
 def test_schemas_dir_contains_manifest_schema_batch22():
     """SCHEMAS_DIR 含 manifest.schema.json。"""
     assert (SCHEMAS_DIR / "manifest.schema.json").is_file()
@@ -202,13 +192,6 @@ def test_schema_path_directory_raises_filenotfound_batch22(tmp_path):
     finally:
         if bogus_dir.is_dir():
             bogus_dir.rmdir()
-
-
-def test_schema_path_idempotent_batch22():
-    """多次调用一致。"""
-    p1 = _schema_path("manifest.schema.json")
-    p2 = _schema_path("manifest.schema.json")
-    assert p1 == p2
 
 
 def test_schema_path_in_schemas_dir_batch22():

@@ -733,21 +733,6 @@ def test_module_source_no_forbidden_token_round8(token):
 # ---------- module source 字符串精确补强 ----------
 
 
-def test_module_source_starts_with_docstring():
-    src = inspect.getsource(smod)
-    assert src.lstrip().startswith(('"""', "'''"))
-
-
-def test_module_source_docstring_mentions_manifest():
-    src = inspect.getsource(smod)
-    assert "manifest" in src
-
-
-def test_module_source_docstring_mentions_annotation():
-    src = inspect.getsource(smod)
-    assert "annotation" in src
-
-
 def test_module_source_docstring_mentions_evaluation_report():
     src = inspect.getsource(smod)
     assert "evaluation" in src or "报告" in src
@@ -789,16 +774,6 @@ def test_module_source_imports_validation_error():
     assert "from jsonschema.exceptions import ValidationError" in src
 
 
-def test_module_source_no_relative_import():
-    src = inspect.getsource(smod)
-    import_lines = [
-        line for line in src.splitlines()
-        if line.strip().startswith(("import ", "from "))
-    ]
-    for line in import_lines:
-        assert not line.strip().startswith("from .")
-
-
 def test_module_source_no_star_import():
     src = inspect.getsource(smod)
     assert "import *" not in src
@@ -807,11 +782,6 @@ def test_module_source_no_star_import():
 def test_module_source_no_main_block():
     src = inspect.getsource(smod)
     assert "__main__" not in src
-
-
-def test_module_source_no_yield():
-    src = inspect.getsource(smod)
-    assert "yield " not in src
 
 
 def test_module_source_no_async():
@@ -829,11 +799,6 @@ def test_module_source_no_global_keyword():
 def test_module_source_no_walrus():
     src = inspect.getsource(smod)
     assert ":=" not in src
-
-
-def test_module_source_no_dataclass():
-    src = inspect.getsource(smod)
-    assert "@dataclass" not in src
 
 
 def test_module_source_uses_draft202012validator():
@@ -855,11 +820,6 @@ def test_module_source_no_pickle_import():
     """schema.py 不导入 pickle。"""
     src = inspect.getsource(smod)
     assert "import pickle" not in src
-
-
-def test_module_source_no_csv_import():
-    src = inspect.getsource(smod)
-    assert "import csv" not in src
 
 
 def test_module_source_no_yaml_import():
@@ -910,15 +870,6 @@ def test_module_source_uses_open():
 def test_module_source_uses_utf_8():
     src = inspect.getsource(smod)
     assert 'utf-8' in src or 'utf_8' in src.lower()
-
-
-def test_module_source_function_count_4():
-    src = inspect.getsource(smod)
-    func_count = sum(
-        1 for line in src.splitlines()
-        if line.startswith("def ")
-    )
-    assert func_count == 4
 
 
 def test_module_source_function_names():

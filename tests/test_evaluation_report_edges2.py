@@ -292,12 +292,6 @@ def test_get_dependency_versions_exact_three_keys():
     assert set(result.keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
 
 
-def test_get_dependency_versions_all_values_str_or_none():
-    result = get_dependency_versions()
-    for v in result.values():
-        assert v is None or isinstance(v, str)
-
-
 def test_get_dependency_versions_handles_package_not_found(monkeypatch):
     def _raise(name):
         raise importlib.metadata.PackageNotFoundError(name)
@@ -358,15 +352,6 @@ def test_build_provenance_returns_dict(tmp_path: Path):
     assert isinstance(result, dict)
 
 
-def test_build_provenance_nine_keys(tmp_path: Path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert set(result.keys()) == {
-        "git_commit", "git_dirty", "evaluator_version", "report_version",
-        "parser_name", "parser_version", "dependencies", "max_chars",
-        "run_timestamp_iso",
-    }
-
-
 def test_build_provenance_evaluator_version_value(tmp_path: Path):
     result = build_provenance(tmp_path, "fallback", 800, None)
     assert result["evaluator_version"] == EVALUATOR_VERSION
@@ -393,11 +378,6 @@ def test_build_provenance_max_chars_negative_value(tmp_path: Path):
     """负数 max_chars 也能转换（不强制 ≥0）。"""
     result = build_provenance(tmp_path, "fallback", -100, None)
     assert result["max_chars"] == -100
-
-
-def test_build_provenance_max_chars_large_value(tmp_path: Path):
-    result = build_provenance(tmp_path, "fallback", 10**9, None)
-    assert result["max_chars"] == 10**9
 
 
 def test_build_provenance_parser_name_value(tmp_path: Path):

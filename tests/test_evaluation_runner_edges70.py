@@ -377,12 +377,6 @@ def test_ast_top_level_function_names_batch44():
     assert names == ["_load_annotation", "_process_one", "run_evaluation"]
 
 
-def test_ast_no_try_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.Try)
-
-
 def test_ast_run_evaluation_has_for_loops_in_body_batch44():
     """run_evaluation 函数体内有 for 循环（遍历 documents / expected_failures）。"""
     tree = ast.parse(inspect.getsource(runner_mod))
@@ -407,21 +401,6 @@ def test_ast_load_annotation_has_try_in_body_batch44():
     load_func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_load_annotation"][0]
     trys = [n for n in load_func.body if isinstance(n, ast.Try)]
     assert len(trys) == 1
-
-
-def test_ast_from_future_second_batch44():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    first = tree.body[0]
-    assert isinstance(first, ast.Expr)
-    second = tree.body[1]
-    assert isinstance(second, ast.ImportFrom)
-    assert second.module == "__future__"
-
-
-def test_ast_has_imports_batch44():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
-    assert len(imports) >= 4
 
 
 # ---------- forbidden tokens 第九十三批 ----------
@@ -454,11 +433,6 @@ def test_source_no_locals_batch44():
 def test_source_no_os_system_batch44():
     src = inspect.getsource(runner_mod)
     assert "os.system(" not in src
-
-
-def test_source_no_popen_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "popen(" not in src
 
 
 def test_source_no_yaml_load_batch44():

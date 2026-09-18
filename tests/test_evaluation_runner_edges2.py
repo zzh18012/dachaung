@@ -303,13 +303,6 @@ def test_process_one_success_returns_5_tuple(tmp_path: Path):
     assert len(result) == 5
 
 
-def test_process_one_success_first_element_is_dict(tmp_path: Path):
-    docx_path = _write_minimal_docx(tmp_path / "src" / "doc.docx")
-    doc = _FakeDocEntry(doc_id="DC-1", resolved_path=docx_path)
-    document_dict, _, _, _, _ = _process_one(doc, tmp_path, "fallback", 800)
-    assert isinstance(document_dict, dict)
-
-
 def test_process_one_success_document_has_document_id(tmp_path: Path):
     docx_path = _write_minimal_docx(tmp_path / "src" / "doc.docx")
     doc = _FakeDocEntry(doc_id="DC-1", resolved_path=docx_path)

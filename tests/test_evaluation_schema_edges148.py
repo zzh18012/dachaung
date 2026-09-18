@@ -148,12 +148,6 @@ def test_version_const_batch515():
 
 # ---------- 根闭包 / 必填 ----------
 
-def test_root_extra_key_batch515():
-    _rej(lambda d: d.__setitem__("zz", 1),
-         "Additional properties are not allowed "
-         "('zz' was unexpected)", [])
-
-
 def test_doc_id_required_batch515():
     _rej(lambda d: d.pop("doc_id"),
          "'doc_id' is a required property", [])

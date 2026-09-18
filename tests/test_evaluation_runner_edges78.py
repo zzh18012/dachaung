@@ -513,11 +513,6 @@ def test_source_module_docstring_key_constraints_batch52():
     assert "不修改 app/pipeline.py" in src
 
 
-def test_source_all_1_entry_batch52():
-    src = inspect.getsource(runner_mod)
-    assert '__all__ = ["run_evaluation"]' in src
-
-
 # ---------- AST 结构补强 ----------
 
 def test_ast_3_functions_batch52():
@@ -578,14 +573,6 @@ def test_ast_process_one_calls_image_output_dir_for_batch52():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_process_one")
     src = ast.unparse(func)
     assert "image_output_dir_for(" in src
-
-
-def test_ast_process_one_3_returns_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_process_one")
-    returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
-    # errors / document None / 成功 = 3
-    assert len(returns) == 3
 
 
 def test_ast_process_one_2_if_batch52():
@@ -649,11 +636,6 @@ def test_ast_run_evaluation_public_per_doc_strips_private_batch52():
     src = ast.unparse(func)
     # public 构建只取 4 个公共 key
     assert "public_per_doc.append(" in src
-
-
-def test_ast_no_while_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, ast.While) for n in ast.walk(tree))
 
 
 def test_ast_no_raise_batch52():

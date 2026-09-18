@@ -74,11 +74,6 @@ def test_source_type_args_exact():
     assert args == {"pdf", "docx", "markdown", "html", "text", "ipynb"}
 
 
-def test_source_type_args_count_6():
-    args = get_args(SourceType)
-    assert len(args) == 6
-
-
 # =========================================================================
 # Element dataclass
 # =========================================================================
@@ -256,12 +251,6 @@ def test_chunk_post_init_empty_text_raises():
 def test_chunk_to_dict_returns_dict():
     c = Chunk(chunk_id="c1", text="hello", source_element_ids=["e1"])
     assert isinstance(c.to_dict(), dict)
-
-
-def test_chunk_to_dict_has_all_fields():
-    c = Chunk(chunk_id="c1", text="hello", source_element_ids=["e1"])
-    d = c.to_dict()
-    assert set(d.keys()) == {"chunk_id", "text", "source_element_ids", "metadata", "source_spans"}
 
 
 # =========================================================================
@@ -502,11 +491,6 @@ def test_module_imports_typing():
     assert "from typing import" in src
     for name in ("Any", "Literal", "Optional"):
         assert name in src
-
-
-def test_module_docstring_present():
-    import app.models as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_business_code_isolation():

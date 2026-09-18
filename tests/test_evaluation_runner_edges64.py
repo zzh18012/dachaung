@@ -615,12 +615,6 @@ def test_module_source_contains_report_version_import_batch36():
     assert "from evaluation import REPORT_VERSION" in src
 
 
-def test_module_source_contains_annotation_metrics_import_batch36():
-    src = inspect.getsource(rmod)
-    assert "chunk_boundary_prf" in src
-    assert "figure_caption_prf" in src
-
-
 def test_module_source_contains_compute_metrics_import_batch36():
     src = inspect.getsource(rmod)
     assert "from evaluation.metrics import compute_automatic_metrics" in src
@@ -751,11 +745,6 @@ def test_signature_run_evaluation_max_chars_default_800_batch36():
 def test_signature_run_evaluation_tolerance_default_30_batch36():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_signature_run_evaluation_max_chars_kw_only_batch36():
-    sig = inspect.signature(run_evaluation)
-    assert sig.parameters["max_chars"].kind == inspect.Parameter.KEYWORD_ONLY
 
 
 # ---------- module 合理性第五十四批

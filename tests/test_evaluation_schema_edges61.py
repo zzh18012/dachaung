@@ -121,11 +121,6 @@ def test_eval_schema_error_errors_explicit_batch47():
     assert err.errors is errs  # 直接引用
 
 
-def test_eval_schema_error_str_includes_message_batch47():
-    err = EvalSchemaError("hello world")
-    assert "hello world" in str(err)
-
-
 def test_eval_schema_error_repr_batch47():
     err = EvalSchemaError("hello")
     r = repr(err)
@@ -167,11 +162,6 @@ def test_schema_path_invalid_name_batch47():
     with pytest.raises(FileNotFoundError) as exc_info:
         _schema_path("nonexistent.schema.json")
     assert "不存在" in str(exc_info.value)
-
-
-def test_schema_path_returns_path_batch47():
-    p = _schema_path("annotation.schema.json")
-    assert isinstance(p, Path)
 
 
 def test_schema_path_absolute_batch47():
@@ -222,16 +212,6 @@ def test_validate_missing_manifest_version_batch47():
     with pytest.raises(EvalSchemaError) as exc_info:
         validate(instance, "manifest.schema.json")
     assert "manifest_version" in str(exc_info.value) or "manifest_version" in str(exc_info.value.errors)
-
-
-def test_validate_invalid_devset_status_batch47():
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "weird",  # 不在 enum
-        "documents": [],
-    }
-    with pytest.raises(EvalSchemaError):
-        validate(instance, "manifest.schema.json")
 
 
 def test_validate_manifest_version_wrong_value_batch47():
@@ -324,14 +304,6 @@ def test_manifest_schema_has_properties_batch47():
     assert "documents" in s["properties"]
 
 
-def test_manifest_schema_required_includes_core_batch47():
-    s = load_schema("manifest.schema.json")
-    required = s.get("required", [])
-    assert "manifest_version" in required
-    assert "devset_status" in required
-    assert "documents" in required
-
-
 def test_manifest_schema_devset_status_enum_batch47():
     s = load_schema("manifest.schema.json")
     ds = s["properties"]["devset_status"]
@@ -378,21 +350,6 @@ def test_evaluation_report_schema_has_type_object_batch47():
 def test_evaluation_report_schema_has_properties_batch47():
     s = load_schema("evaluation-report.schema.json")
     assert "properties" in s
-
-
-def test_evaluation_report_schema_has_per_doc_batch47():
-    s = load_schema("evaluation-report.schema.json")
-    assert "per_doc" in s.get("properties", {})
-
-
-def test_evaluation_report_schema_has_summary_batch47():
-    s = load_schema("evaluation-report.schema.json")
-    assert "summary" in s.get("properties", {})
-
-
-def test_evaluation_report_schema_has_provenance_batch47():
-    s = load_schema("evaluation-report.schema.json")
-    assert "provenance" in s.get("properties", {})
 
 
 # ---------- module source 字符串补强 ----------
@@ -556,11 +513,6 @@ def test_source_no_os_system_batch47():
     assert "os.system(" not in src
 
 
-def test_source_no_popen_batch47():
-    src = inspect.getsource(schema_mod)
-    assert ".popen(" not in src
-
-
 def test_source_no_yaml_load_batch47():
     src = inspect.getsource(schema_mod)
     assert "yaml.load(" not in src
@@ -569,16 +521,6 @@ def test_source_no_yaml_load_batch47():
 def test_source_no_pickle_load_batch47():
     src = inspect.getsource(schema_mod)
     assert "pickle.load(" not in src
-
-
-def test_source_no_subprocess_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "subprocess" not in src
-
-
-def test_source_no_walrus_batch47():
-    src = inspect.getsource(schema_mod)
-    assert ":=" not in src
 
 
 def test_source_no_await_batch47():

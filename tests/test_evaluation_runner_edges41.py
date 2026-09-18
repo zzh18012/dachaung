@@ -627,22 +627,10 @@ def test_module_source_imports_typing_any_batch14():
     assert "from typing import Any" in head
 
 
-def test_module_source_imports_pipeline_helpers_batch14():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from app.pipeline import image_output_dir_for, process_single" in head
-
-
 def test_module_source_imports_annotation_metrics_batch14():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
     assert "from evaluation.annotation_metrics import (" in head
-
-
-def test_module_source_imports_metrics_batch14():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from evaluation.metrics import compute_automatic_metrics" in head
 
 
 def test_module_source_imports_report_helpers_batch14():
@@ -679,11 +667,6 @@ def test_module_source_uses_not_instrumented_batch14():
 def test_module_source_uses_write_json_false_batch14():
     source = inspect.getsource(rmod)
     assert "write_json=False" in source
-
-
-def test_module_source_no_eval_call_batch14():
-    source = inspect.getsource(rmod)
-    assert "eval(" not in source
 
 
 def test_module_source_no_open_with_str_path_batch14():

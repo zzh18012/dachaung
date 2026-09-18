@@ -128,10 +128,6 @@ def test_text_types_hashable_batch26():
     assert hash(_TEXT_TYPES) is not None
 
 
-def test_pdf_bbox_hashable_batch26():
-    assert hash(_PDF_BBOX_REQUIRED_TYPES) is not None
-
-
 # ---------- _NOT_EVALUATED 第二十六批 ----------
 
 
@@ -588,12 +584,6 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_forbidden_tokens_batch26():
-    source = inspect.getsource(mmod)
-    for tok in FORBIDDEN_TOKENS:
-        assert tok not in source, f"forbidden token in source: {tok}"
-
-
 def test_module_source_no_yield_batch26():
     source = inspect.getsource(mmod)
     assert "yield " not in source
@@ -658,11 +648,6 @@ def test_module_source_math_imported_batch26():
 def test_module_source_pathlib_imported_batch26():
     source = inspect.getsource(mmod)
     assert "from pathlib import Path" in source
-
-
-def test_module_source_no_dataclass_batch26():
-    source = inspect.getsource(mmod)
-    assert "@dataclass" not in source
 
 
 # ---------- module source 字符串精确补强第三十七批 ----------

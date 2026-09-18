@@ -660,12 +660,6 @@ def test_ratio_metrics_contains_text_char_multiset_precision_recall():
     assert "text_char_multiset_recall" in m._RATIO_METRICS
 
 
-def test_ratio_metrics_does_not_contain_element_count_total_again():
-    import evaluation.report as m
-
-    assert "element_count_total" not in m._RATIO_METRICS
-
-
 def test_ratio_metrics_does_not_contain_pipeline_success():
     """pipeline_success 是 bool success_rate，不参与 ratio macro。"""
     import evaluation.report as m

@@ -105,18 +105,6 @@ def test_module_all_is_list():
     assert isinstance(m.__all__, list)
 
 
-def test_module_all_exact_order():
-    """__all__ 顺序精确。"""
-    import evaluation.schema as m
-    assert m.__all__ == [
-        "SCHEMAS_DIR",
-        "EvalSchemaError",
-        "load_schema",
-        "validate",
-        "validate_file",
-    ]
-
-
 def test_module_all_length_five():
     """__all__ 5 个元素。"""
     import evaluation.schema as m
@@ -233,12 +221,6 @@ def test_eval_schema_error_str_returns_message():
     """str(error) 返回 message。"""
     e = EvalSchemaError("hello world")
     assert str(e) == "hello world"
-
-
-def test_eval_schema_error_repr_contains_class_name():
-    """repr 含类名。"""
-    e = EvalSchemaError("msg")
-    assert "EvalSchemaError" in repr(e)
 
 
 def test_eval_schema_error_can_be_raised_and_caught():
@@ -369,14 +351,6 @@ def test_load_schema_returns_dict():
     assert isinstance(s, dict)
 
 
-def test_load_schema_does_not_cache():
-    """load_schema 每次返回新 dict。"""
-    a = load_schema("manifest.schema.json")
-    b = load_schema("manifest.schema.json")
-    assert a is not b
-    assert a == b
-
-
 def test_load_schema_modifying_one_does_not_affect_other():
     """修改一次的返回不影响下次。"""
     a = load_schema("manifest.schema.json")
@@ -469,28 +443,6 @@ def test_validate_errors_each_has_three_keys():
     except EvalSchemaError as e:
         for err in e.errors:
             assert set(err.keys()) == {"path", "message", "schema_path"}
-    else:
-        pytest.fail("should have raised")
-
-
-def test_validate_errors_path_is_list():
-    """errors[].path 是 list。"""
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e:
-        for err in e.errors:
-            assert isinstance(err["path"], list)
-    else:
-        pytest.fail("should have raised")
-
-
-def test_validate_errors_schema_path_is_list():
-    """errors[].schema_path 是 list。"""
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e:
-        for err in e.errors:
-            assert isinstance(err["schema_path"], list)
     else:
         pytest.fail("should have raised")
 
@@ -627,12 +579,6 @@ def test_validate_file_return_annotation_is_none():
 # =========================================================================
 # callable 验证
 # =========================================================================
-
-
-def test_eval_schema_error_callable_as_constructor():
-    """EvalSchemaError 可作为构造器调用。"""
-    e = EvalSchemaError("msg")
-    assert isinstance(e, EvalSchemaError)
 
 
 def test_load_schema_callable():

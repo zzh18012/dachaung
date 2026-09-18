@@ -337,13 +337,6 @@ def test_build_provenance_max_chars_bool_true_batch11():
     assert out["max_chars"] == 1
 
 
-def test_build_provenance_parser_version_empty_string_batch11():
-    out = build_provenance(
-        Path("."), parser_name="fallback", max_chars=800, parser_version=""
-    )
-    assert out["parser_version"] == ""
-
-
 def test_build_provenance_run_timestamp_parses_iso_batch11():
     out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
     parsed = datetime.fromisoformat(out["run_timestamp_iso"])
@@ -566,15 +559,6 @@ def test_aggregate_summary_pipeline_success_falsy_zero_batch11():
     assert rate_info["rate"] == 0.0
 
 
-def test_aggregate_summary_silent_drop_total_none_when_all_none_batch11():
-    docs = [
-        _metrics_doc({"silent_drop_count": {"value": None}}),
-        _metrics_doc({"silent_drop_count": {"value": None}}),
-    ]
-    out = aggregate_summary(docs)
-    assert out["silent_drop_total"] is None
-
-
 def test_aggregate_summary_silent_drop_total_none_when_no_metric_batch11():
     docs = [
         _metrics_doc({}),
@@ -643,11 +627,6 @@ def test_aggregate_summary_with_single_metric_doc_batch11():
     # counts 应 None
     assert out["counts"]["element_count_total"]["sum"] is None
     assert out["counts"]["element_count_total"]["participating_docs"] == 0
-
-
-def test_aggregate_summary_returns_dict_type_batch11():
-    out = aggregate_summary([])
-    assert type(out) is dict
 
 
 # ---------- module source forbidden tokens 第十四批 ----------
@@ -784,16 +763,6 @@ def test_report_source_no_format_method_batch11():
 # ---------- module source 字符串精确补强第十一批 ----------
 
 
-def test_module_source_has_SUCCESS_BOOL_METRICS_assignment_batch11():
-    source = inspect.getsource(rmod)
-    assert '_SUCCESS_BOOL_METRICS = ("pipeline_success",)' in source
-
-
-def test_module_source_has_COUNT_METRICS_assignment_batch11():
-    source = inspect.getsource(rmod)
-    assert '_COUNT_METRICS = ("element_count_total",)' in source
-
-
 def test_module_source_has_Ratio_METRICS_docstring_marker_batch11():
     source = inspect.getsource(rmod)
     # 注释中应该提到 macro average
@@ -901,18 +870,6 @@ def test_get_dependency_versions_no_params_batch11():
 def test_get_dependency_versions_return_annotation_batch11():
     sig = inspect.signature(get_dependency_versions)
     assert "dict" in str(sig.return_annotation)
-
-
-def test_build_provenance_signature_4_params_batch11():
-    sig = inspect.signature(build_provenance)
-    params = list(sig.parameters.values())
-    assert len(params) == 4
-    assert [p.name for p in params] == [
-        "project_root",
-        "parser_name",
-        "max_chars",
-        "parser_version",
-    ]
 
 
 def test_build_provenance_parser_version_optional_str_union_batch11():

@@ -395,13 +395,6 @@ def test_ast_validate_uses_sorted_with_key_lambda_batch50():
     assert isinstance(sorted_calls[0].keywords[0].value, ast.Lambda)
 
 
-def test_ast_validate_has_head_assignment_batch50():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate")
-    src = ast.unparse(func)
-    assert "head = errors[0]" in src
-
-
 def test_ast_validate_raises_eval_schema_error_batch50():
     tree = ast.parse(inspect.getsource(schema_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate")

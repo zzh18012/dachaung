@@ -257,18 +257,6 @@ def test_get_git_provenance_porcelain_with_output_dirty_batch42(tmp_path):
     assert out["git_dirty"] is True
 
 
-def test_get_git_provenance_returns_dict_batch42(tmp_path):
-    with patch("subprocess.run"):
-        out = get_git_provenance(tmp_path)
-    assert isinstance(out, dict)
-
-
-def test_get_git_provenance_keys_count_batch42(tmp_path):
-    with patch("subprocess.run"):
-        out = get_git_provenance(tmp_path)
-    assert set(out.keys()) == {"git_commit", "git_dirty"}
-
-
 def test_get_git_provenance_signature_batch42():
     sig = inspect.signature(get_git_provenance)
     assert list(sig.parameters.keys()) == ["project_root"]
@@ -774,11 +762,6 @@ def test_module_source_contains_evaluator_version_import_batch42():
     assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in src
 
 
-def test_module_source_contains_ratio_metrics_definition_batch42():
-    src = inspect.getsource(rmod)
-    assert "_RATIO_METRICS = " in src
-
-
 def test_module_source_contains_count_metrics_definition_batch42():
     src = inspect.getsource(rmod)
     assert "_COUNT_METRICS = " in src
@@ -854,11 +837,6 @@ def test_module_source_contains_three_packages_batch42():
 def test_module_source_contains_iso_format_call_batch42():
     src = inspect.getsource(rmod)
     assert "isoformat()" in src
-
-
-def test_module_source_contains_astimezone_batch42():
-    src = inspect.getsource(rmod)
-    assert "astimezone" in src
 
 
 def test_module_source_contains_no_mixing_warning_batch42():
@@ -1001,18 +979,6 @@ def test_module_has_build_devset_section_attr_batch42():
 
 def test_module_has_aggregate_summary_attr_batch42():
     assert hasattr(rmod, "aggregate_summary")
-
-
-def test_module_has_ratio_metrics_attr_batch42():
-    assert hasattr(rmod, "_RATIO_METRICS")
-
-
-def test_module_has_count_metrics_attr_batch42():
-    assert hasattr(rmod, "_COUNT_METRICS")
-
-
-def test_module_has_success_bool_metrics_attr_batch42():
-    assert hasattr(rmod, "_SUCCESS_BOOL_METRICS")
 
 
 def test_module_functions_callable_batch42():

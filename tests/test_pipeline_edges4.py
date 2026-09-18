@@ -449,10 +449,6 @@ def test_validate_only_signature():
     assert list(sig.parameters.keys()) == ["json_path"]
 
 
-def test_validate_only_callable():
-    assert callable(validate_only)
-
-
 # =========================================================================
 # image_output_dir_for 深度
 # =========================================================================
@@ -513,17 +509,6 @@ def test_image_output_dir_for_hash_length_17_truncated():
     assert name == "images-" + "c" * 16
 
 
-def test_image_output_dir_for_callable():
-    assert callable(image_output_dir_for)
-
-
-def test_image_output_dir_for_signature():
-    import inspect
-    sig = inspect.signature(image_output_dir_for)
-    params = list(sig.parameters.keys())
-    assert params == ["output_path", "source_hash"]
-
-
 # =========================================================================
 # get_parser 深度
 # =========================================================================
@@ -533,11 +518,6 @@ def test_get_parser_returns_parser_instance_for_all_six(tmp_path: Path):
     for name in ("fallback", "kreuzberg", "markdown", "html", "text", "ipynb"):
         parser = get_parser(name)
         assert parser is not None
-
-
-def test_get_parser_unknown_raises_value_error():
-    with pytest.raises(ValueError):
-        get_parser("unknown")
 
 
 def test_get_parser_none_raises_value_error():
@@ -588,17 +568,6 @@ def test_get_parser_kreuzberg_ignores_image_output_dir(tmp_path: Path):
     """kreuzberg parser 不支持 image_output_dir kwarg 但 get_parser 不传给它。"""
     parser = get_parser("kreuzberg", image_output_dir=tmp_path)
     assert parser is not None
-
-
-def test_get_parser_callable():
-    assert callable(get_parser)
-
-
-def test_get_parser_signature():
-    import inspect
-    sig = inspect.signature(get_parser)
-    params = list(sig.parameters.keys())
-    assert params == ["name", "image_output_dir"]
 
 
 # =========================================================================

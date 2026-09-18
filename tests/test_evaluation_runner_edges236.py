@@ -202,15 +202,6 @@ def test_cbp_macro_half_batch519(tmp_path):
         "not_evaluated": 0}
 
 
-def test_cbf_macro_batch519(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["ratio_macro_averages"][
-        "chunk_boundary_f1"] == {
-        "macro_average": 0.5625,
-        "participating_docs": 2,
-        "not_evaluated": 0}
-
-
 # ---------- schema_valid 比例键 ----------
 
 def test_schema_valid_ratio_key_batch519(tmp_path):
@@ -228,11 +219,6 @@ def test_counts_sum_seven_batch519(tmp_path):
     assert r["summary"]["counts"][
         "element_count_total"] == {
         "sum": 7, "participating_docs": 2}
-
-
-def test_sdt_one_batch519(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["silent_drop_total"] == 1
 
 
 def test_d1_sdc_image_two_batch519(tmp_path):

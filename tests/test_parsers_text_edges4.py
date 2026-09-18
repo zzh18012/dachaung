@@ -512,16 +512,6 @@ def test_text_parser_class_version_is_str():
     assert isinstance(TextParser.version, str)
 
 
-def test_text_parser_instance_name_matches_class():
-    p = TextParser()
-    assert p.name == "text"
-
-
-def test_text_parser_instance_version_matches_class():
-    p = TextParser()
-    assert p.version == "stdlib/0.1.0"
-
-
 def test_text_parser_inherits_parser():
     from app.parsers.base import Parser
 

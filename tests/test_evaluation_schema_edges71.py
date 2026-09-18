@@ -132,10 +132,6 @@ def _ann(**over) -> dict:
     return base
 
 
-def test_annotation_empty_anchors_ok_batch53():
-    validate(_ann(chunk_boundary_anchors=[]), "annotation.schema.json")
-
-
 def test_annotation_heading_level_bool_rejected_batch53():
     with pytest.raises(EvalSchemaError):
         validate(_ann(heading_order=[{"level": True, "text": "x"}]),

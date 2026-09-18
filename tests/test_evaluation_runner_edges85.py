@@ -86,12 +86,6 @@ def ps_capture(monkeypatch):
 
 # ---------- _load_annotation ----------
 
-def test_load_annotation_directory_returns_none_batch54(tmp_path):
-    sub = tmp_path / "sub"
-    sub.mkdir()
-    assert _load_annotation(sub) is None
-
-
 def test_load_annotation_valid_file_batch54(tmp_path):
     f = tmp_path / "ann.json"
     f.write_text('{"chunk_boundary_anchors": []}', encoding="utf-8")

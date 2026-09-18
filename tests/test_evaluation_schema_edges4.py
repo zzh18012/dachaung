@@ -82,11 +82,6 @@ def test_eval_schema_error_message_with_special_chars():
     assert str(e) == msg
 
 
-def test_eval_schema_error_args_length_one():
-    e = EvalSchemaError("msg")
-    assert len(e.args) == 1
-
-
 def test_eval_schema_error_args_value():
     e = EvalSchemaError("msg")
     assert e.args == ("msg",)
@@ -548,13 +543,6 @@ def test_module_internal_schema_path_callable():
 def test_load_schema_idempotent():
     a = load_schema("manifest.schema.json")
     b = load_schema("manifest.schema.json")
-    assert a == b
-
-
-def test_load_schema_returns_new_dict_each_call():
-    a = load_schema("manifest.schema.json")
-    b = load_schema("manifest.schema.json")
-    assert a is not b
     assert a == b
 
 

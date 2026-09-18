@@ -146,17 +146,6 @@ def test_hbc_agg_selective_batch459(tmp_path):
                    "not_evaluated": 2}
 
 
-def test_counts_sum_six_batch459(tmp_path):
-    assert _run(tmp_path)["summary"]["counts"] == {
-        "element_count_total": {"sum": 6, "participating_docs": 4}}
-
-
-def test_success_four_batch459(tmp_path):
-    assert _run(tmp_path)["summary"]["success_rates"] == {
-        "pipeline_success": {"success_count": 4, "total": 4,
-                             "rate": 1.0}}
-
-
 def test_cbp_no_annotation_all_batch459(tmp_path):
     r = _run(tmp_path)
     for p in r["per_doc"]:

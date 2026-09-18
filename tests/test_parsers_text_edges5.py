@@ -202,14 +202,6 @@ def test_text_parser_version_value():
     assert TextParser.version == "stdlib/0.1.0"
 
 
-def test_text_parser_name_is_str():
-    assert isinstance(TextParser.name, str)
-
-
-def test_text_parser_version_is_str():
-    assert isinstance(TextParser.version, str)
-
-
 def test_text_parser_inherits_parser():
     assert issubclass(TextParser, Parser)
 

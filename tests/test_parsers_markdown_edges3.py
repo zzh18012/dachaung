@@ -188,10 +188,6 @@ def test_thematic_with_spaces():
     assert _THEMATIC_RE.match("* * *") is not None
 
 
-def test_thematic_with_dashes_and_spaces():
-    assert _THEMATIC_RE.match("- - -") is not None
-
-
 def test_thematic_two_dashes_not_match():
     """2 个 - 不够。"""
     assert _THEMATIC_RE.match("--") is None
@@ -381,10 +377,6 @@ def test_detect_md_source_type_accepts_uppercase_md():
     assert _detect_md_source_type(Path("test.MD")) == "markdown"
 
 
-def test_detect_md_source_type_accepts_uppercase_markdown():
-    assert _detect_md_source_type(Path("test.MARKDOWN")) == "markdown"
-
-
 def test_detect_md_source_type_rejects_html():
     with pytest.raises(ParserError):
         _detect_md_source_type(Path("test.html"))
@@ -393,11 +385,6 @@ def test_detect_md_source_type_rejects_html():
 def test_detect_md_source_type_rejects_no_suffix():
     with pytest.raises(ParserError):
         _detect_md_source_type(Path("noext"))
-
-
-def test_detect_md_source_type_rejects_txt():
-    with pytest.raises(ParserError):
-        _detect_md_source_type(Path("test.txt"))
 
 
 def test_detect_md_source_type_error_message_contains_suffix():

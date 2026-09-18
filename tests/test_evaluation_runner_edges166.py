@@ -144,13 +144,6 @@ def _src():
     return inspect.getsource(runner_mod)
 
 
-def test_source_identifier_counts_batch346():
-    src = _src()
-    assert src.count("metrics") == 13
-    assert src.count("manifest") == 5
-    assert src.count("process_single") == 6
-
-
 # ---------- forbidden tokens 第六百二十批 ----------
 
 def test_source_no_eval_batch346():

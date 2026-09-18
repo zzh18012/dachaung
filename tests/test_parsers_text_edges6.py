@@ -53,16 +53,6 @@ def test_text_extensions_is_tuple():
     assert isinstance(_TEXT_EXTENSIONS, tuple)
 
 
-def test_text_extensions_lowercase():
-    for ext in _TEXT_EXTENSIONS:
-        assert ext == ext.lower()
-
-
-def test_text_extensions_starts_with_dot():
-    for ext in _TEXT_EXTENSIONS:
-        assert ext.startswith(".")
-
-
 def test_text_extensions_length_two():
     assert len(_TEXT_EXTENSIONS) == 2
 
@@ -273,15 +263,6 @@ def test_text_parser_version_value():
 def test_text_parser_inherits_parser():
     from app.parsers.base import Parser
     assert issubclass(TextParser, Parser)
-
-
-def test_text_parser_init_no_args():
-    p = TextParser()
-    assert p is not None
-
-
-def test_text_parser_has_parse_method():
-    assert callable(TextParser.parse)
 
 
 # =========================================================================

@@ -66,11 +66,6 @@ def test_detect_md_source_type_unknown_suffix_raises():
     assert exc.value.code == "unsupported_type"
 
 
-def test_detect_md_source_type_no_suffix_raises():
-    with pytest.raises(ParserError):
-        _detect_md_source_type(Path("README"))
-
-
 def test_detect_md_source_type_error_has_details():
     with pytest.raises(ParserError) as exc:
         _detect_md_source_type(Path("a.txt"))
@@ -195,21 +190,6 @@ def test_split_pipe_row_returns_list():
 def test_is_pipe_table_start_at_last_line_returns_false():
     """i+1 越界 → False。"""
     lines = ["| a | b |"]
-    assert _is_pipe_table_start(lines, 0) is False
-
-
-def test_is_pipe_table_start_valid_table():
-    lines = ["| a | b |", "| --- | --- |", "| 1 | 2 |"]
-    assert _is_pipe_table_start(lines, 0) is True
-
-
-def test_is_pipe_table_start_no_separator_second_line():
-    lines = ["| a | b |", "| 1 | 2 |"]
-    assert _is_pipe_table_start(lines, 0) is False
-
-
-def test_is_pipe_table_start_first_line_not_pipe():
-    lines = ["hello", "| --- | --- |"]
     assert _is_pipe_table_start(lines, 0) is False
 
 
@@ -634,11 +614,6 @@ def test_markdown_parser_version_attribute():
 
 def test_markdown_parser_inherits_parser():
     assert issubclass(MarkdownParser, Parser)
-
-
-def test_markdown_parser_parse_inherited_signature():
-    sig = inspect.signature(MarkdownParser.parse)
-    assert set(sig.parameters) == {"self", "path", "source_hash"}
 
 
 def test_markdown_parser_parse_no_defaults():

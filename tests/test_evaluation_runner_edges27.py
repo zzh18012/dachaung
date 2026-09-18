@@ -51,13 +51,6 @@ def test_load_annotation_with_empty_dict(tmp_path):
     assert out == {}
 
 
-def test_load_annotation_with_empty_array(tmp_path):
-    p = tmp_path / "arr.json"
-    p.write_text("[]", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == []
-
-
 def test_load_annotation_with_single_element_array(tmp_path):
     p = tmp_path / "arr.json"
     p.write_text('[{"x": 1}]', encoding="utf-8")
@@ -513,11 +506,6 @@ def test_module_source_has_import_json():
     assert "import json" in src
 
 
-def test_module_source_has_import_time():
-    src = inspect.getsource(m)
-    assert "import time" in src
-
-
 def test_module_source_has_from_pathlib_import_path():
     src = inspect.getsource(m)
     assert "from pathlib import Path" in src
@@ -526,11 +514,6 @@ def test_module_source_has_from_pathlib_import_path():
 def test_module_source_has_from_typing_import_any():
     src = inspect.getsource(m)
     assert "from typing import Any" in src
-
-
-def test_module_source_has_app_pipeline_import():
-    src = inspect.getsource(m)
-    assert "from app.pipeline import image_output_dir_for, process_single" in src
 
 
 def test_module_source_has_evaluation_imports():
@@ -589,16 +572,6 @@ def test_module_source_no_class():
 def test_module_source_no_main_block():
     src = inspect.getsource(m)
     assert '__name__ == "__main__"' not in src
-
-
-def test_module_source_docstring_mentions_total():
-    src = inspect.getsource(m)
-    assert "total" in src
-
-
-def test_module_source_docstring_mentions_pipeline():
-    src = inspect.getsource(m)
-    assert "pipeline" in src
 
 
 def test_module_source_docstring_mentions_metrics():
@@ -665,12 +638,6 @@ def test_run_evaluation_signature():
     assert params == ["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]
 
 
-def test_run_evaluation_first_2_positional_or_keyword():
-    sig = inspect.signature(run_evaluation)
-    assert sig.parameters["manifest"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-    assert sig.parameters["output_path"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_run_evaluation_last_3_keyword_only():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["parser_name"].kind == inspect.Parameter.KEYWORD_ONLY
@@ -724,16 +691,6 @@ def test_module_has_2_private_functions():
         and getattr(m, n).__module__ == "evaluation.runner"
     ]
     assert set(private) == {"_load_annotation", "_process_one"}
-
-
-def test_module_has_1_public_function():
-    public = [
-        n for n in dir(m)
-        if not n.startswith("_")
-        and isinstance(getattr(m, n), FunctionType)
-        and getattr(m, n).__module__ == "evaluation.runner"
-    ]
-    assert public == ["run_evaluation"]
 
 
 def test_module_no_class():
@@ -846,14 +803,6 @@ def test_e2e_with_parser_name_unknown(tmp_path):
     mf = _make_minimal_manifest(tmp_path)
     report = run_evaluation(mf, out, parser_name="unknown_parser")
     assert isinstance(report, dict)
-
-
-def test_e2e_no_documents_no_expected_failures_lists_empty(tmp_path):
-    out = tmp_path / "out.json"
-    mf = _make_minimal_manifest(tmp_path)
-    report = run_evaluation(mf, out)
-    assert report["per_doc"] == []
-    assert report["expected_failures"] == []
 
 
 def test_e2e_same_output_when_called_twice(tmp_path):

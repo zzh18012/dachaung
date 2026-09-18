@@ -356,12 +356,6 @@ def test_rows_to_md_pipe_count_matches_columns_plus_one_per_row():
         assert line.count("|") == 4
 
 
-def test_rows_to_md_pipe_in_cell_preserved():
-    rows = [["a|b", "c"]]
-    md = _rows_to_md(rows)
-    assert "a|b" in md
-
-
 def test_rows_to_md_jagged_three_rows():
     rows = [["a", "b", "c"], ["1"], ["x", "y"]]
     md = _rows_to_md(rows)

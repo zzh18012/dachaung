@@ -294,10 +294,6 @@ def test_source_no_os_system_batch52():
     assert "os.system" not in _src()
 
 
-def test_source_no_popen_batch52():
-    assert "popen(" not in _src()
-
-
 def test_source_no_yaml_load_batch52():
     assert "yaml.load" not in _src()
 

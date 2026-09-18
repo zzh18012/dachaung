@@ -528,34 +528,9 @@ def test_module_all_exact():
     }
 
 
-def test_module_all_length_five():
-    import evaluation.schema as m
-    assert len(m.__all__) == 5
-
-
-def test_module_imports_json():
-    import evaluation.schema as m
-    assert hasattr(m, "json")
-
-
-def test_module_imports_path():
-    import evaluation.schema as m
-    assert hasattr(m, "Path")
-
-
-def test_module_imports_any():
-    import evaluation.schema as m
-    assert hasattr(m, "Any")
-
-
 def test_module_imports_draft202012():
     import evaluation.schema as m
     assert hasattr(m, "Draft202012Validator")
-
-
-def test_module_imports_jsvalidation_error():
-    import evaluation.schema as m
-    assert hasattr(m, "JSValidationError")
 
 
 def test_module_docstring_present():

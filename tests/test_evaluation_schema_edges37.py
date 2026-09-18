@@ -106,11 +106,6 @@ def test_eval_schema_error_errors_default_empty_list_batch17():
     assert e.errors == []
 
 
-def test_eval_schema_error_errors_none_becomes_empty_batch17():
-    e = EvalSchemaError("x", None)
-    assert e.errors == []
-
-
 def test_eval_schema_error_errors_empty_list_kept_batch17():
     e = EvalSchemaError("x", [])
     assert e.errors == []
@@ -219,15 +214,6 @@ def test_load_schema_report_has_required_batch17():
 
 
 # ---------- validate 行为深度第十七批 ----------
-
-
-def test_validate_returns_none_on_success_batch17():
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }
-    assert validate(instance, "manifest.schema.json") is None
 
 
 def test_validate_errors_sorted_by_path_batch17():
@@ -452,16 +438,6 @@ def test_evaluation_report_schema_has_provenance_field_batch17():
     assert "provenance" in s.get("required", []) or "provenance" in s.get("properties", {})
 
 
-def test_document_schema_has_elements_field_batch17():
-    s = load_schema("document.schema.json")
-    assert "elements" in s.get("properties", {})
-
-
-def test_document_schema_has_chunks_field_batch17():
-    s = load_schema("document.schema.json")
-    assert "chunks" in s.get("properties", {})
-
-
 def test_document_schema_required_count_batch17():
     s = load_schema("document.schema.json")
     assert len(s["required"]) >= 3
@@ -491,17 +467,6 @@ def test_document_schema_required_count_batch17():
 def test_module_source_forbidden_tokens_batch17(forbidden):
     src = inspect.getsource(smod)
     assert forbidden not in src
-
-
-def test_module_source_no_subprocess_batch17():
-    src = inspect.getsource(smod)
-    assert "import subprocess" not in src
-
-
-def test_module_source_no_network_batch17():
-    src = inspect.getsource(smod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
 
 
 # ---------- module source 字符串精确补强第二十八批 ----------
@@ -648,13 +613,6 @@ def test_module_validate_callable_batch17():
 
 def test_module_validate_file_callable_batch17():
     assert callable(validate_file)
-
-
-def test_module_does_not_import_unsafe_modules_batch17():
-    src = inspect.getsource(smod)
-    for unsafe in ["import pickle", "import marshal", "import shelve",
-                   "import subprocess"]:
-        assert unsafe not in src
 
 
 def test_module_does_not_import_app_pipeline_batch17():

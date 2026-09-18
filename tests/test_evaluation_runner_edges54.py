@@ -393,13 +393,6 @@ def test_run_evaluation_devset_section_six_keys_batch26(tmp_path):
     }
 
 
-def test_run_evaluation_provenance_section_nine_keys_batch26(tmp_path):
-    m = _make_manifest()
-    out = tmp_path / "report.json"
-    report = run_evaluation(m, out)
-    assert len(report["provenance"]) == 9
-
-
 def test_run_evaluation_returns_report_dict_batch26(tmp_path):
     m = _make_manifest()
     out = tmp_path / "report.json"
@@ -486,12 +479,6 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_forbidden_tokens_batch26():
-    source = inspect.getsource(rmod)
-    for tok in FORBIDDEN_TOKENS:
-        assert tok not in source, f"forbidden token: {tok}"
-
-
 def test_module_source_no_eval_exec_batch26():
     source = inspect.getsource(rmod)
     assert "eval(" not in source
@@ -553,11 +540,6 @@ def test_module_source_uses_from_future_annotations_batch26():
 # ---------- module source 字符串精确补强第三十九批 ----------
 
 
-def test_module_source_contains_process_single_batch26():
-    source = inspect.getsource(rmod)
-    assert "process_single" in source
-
-
 def test_module_source_contains_image_output_dir_for_batch26():
     source = inspect.getsource(rmod)
     assert "image_output_dir_for" in source
@@ -566,16 +548,6 @@ def test_module_source_contains_image_output_dir_for_batch26():
 def test_module_source_contains_compute_automatic_metrics_batch26():
     source = inspect.getsource(rmod)
     assert "compute_automatic_metrics" in source
-
-
-def test_module_source_contains_figure_caption_prf_batch26():
-    source = inspect.getsource(rmod)
-    assert "figure_caption_prf" in source
-
-
-def test_module_source_contains_chunk_boundary_prf_batch26():
-    source = inspect.getsource(rmod)
-    assert "chunk_boundary_prf" in source
 
 
 def test_module_source_contains_aggregate_summary_batch26():
@@ -619,11 +591,6 @@ def test_signature_load_annotation_param_name_batch26():
 def test_signature_process_one_param_count_batch26():
     sig = inspect.signature(_process_one)
     assert len(sig.parameters) == 4
-
-
-def test_signature_process_one_param_names_batch26():
-    sig = inspect.signature(_process_one)
-    assert set(sig.parameters.keys()) == {"doc", "output_root", "parser_name", "max_chars"}
 
 
 def test_signature_run_evaluation_param_count_batch26():
@@ -683,53 +650,12 @@ def test_module_no_classes_batch26():
     assert classes == []
 
 
-def test_module_docstring_mentions_evaluation_batch26():
-    assert "评测" in rmod.__doc__ or "evaluation" in rmod.__doc__.lower()
-
-
 def test_module_uses_from_future_annotations_batch26():
     source = inspect.getsource(rmod)
     assert "from __future__ import annotations" in source
 
 
-def test_module_process_one_docstring_present_batch26():
-    assert _process_one.__doc__ is not None
-
-
 # ---------- 端到端集成第三十九批 ----------
-
-
-def test_e2e_full_flow_no_documents_writes_valid_json_batch26(tmp_path):
-    m = _make_manifest(documents=[])
-    out = tmp_path / "report.json"
-    report = run_evaluation(m, out)
-    with out.open("r", encoding="utf-8") as f:
-        round_trip = json.load(f)
-    assert round_trip == report
-
-
-def test_e2e_report_has_six_top_keys_batch26(tmp_path):
-    m = _make_manifest()
-    out = tmp_path / "report.json"
-    report = run_evaluation(m, out)
-    assert len(report) == 6
-
-
-def test_e2e_str_path_output_accepted_batch26(tmp_path):
-    m = _make_manifest()
-    out_str = str(tmp_path / "report.json")
-    report = run_evaluation(m, out_str)
-    assert Path(out_str).is_file()
-    assert isinstance(report, dict)
-
-
-def test_e2e_return_value_matches_file_batch26(tmp_path):
-    m = _make_manifest()
-    out = tmp_path / "report.json"
-    report = run_evaluation(m, out)
-    with out.open("r", encoding="utf-8") as f:
-        round_trip = json.load(f)
-    assert round_trip == report
 
 
 def test_e2e_nested_output_path_creates_dirs_batch26(tmp_path):

@@ -301,11 +301,6 @@ def test_build_provenance_dependencies_is_dict(tmp_path):
     assert isinstance(out["dependencies"], dict)
 
 
-def test_build_provenance_run_timestamp_iso_is_str(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert isinstance(out["run_timestamp_iso"], str)
-
-
 def test_build_provenance_run_timestamp_iso_parseable(tmp_path):
     """ISO 时间戳能被 datetime.fromisoformat 解析。"""
     out = build_provenance(tmp_path, "fallback", 800, None)
@@ -719,24 +714,6 @@ def test_aggregate_summary_handles_metrics_with_no_value_key():
 # =========================================================================
 
 
-def test_module_all_is_list():
-    assert isinstance(report_all, list)
-
-
-def test_module_all_count_five():
-    assert len(report_all) == 5
-
-
-def test_module_all_exact_set():
-    assert set(report_all) == {
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    }
-
-
 def test_module_constants_count_metrics_is_tuple():
     assert isinstance(_COUNT_METRICS, tuple)
 
@@ -853,17 +830,6 @@ def test_module_uses_future_annotations():
 def test_get_dependency_versions_signature_no_params():
     sig = inspect.signature(get_dependency_versions)
     assert len(sig.parameters) == 0
-
-
-def test_build_provenance_signature_four_params():
-    sig = inspect.signature(build_provenance)
-    assert len(sig.parameters) == 4
-    assert list(sig.parameters.keys()) == [
-        "project_root",
-        "parser_name",
-        "max_chars",
-        "parser_version",
-    ]
 
 
 def test_build_provenance_no_defaults():

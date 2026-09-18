@@ -455,11 +455,6 @@ def test_schema_path_unknown_raises():
         _schema_path("nonexistent.schema.json")
 
 
-def test_schema_path_directory_raises():
-    with pytest.raises(FileNotFoundError):
-        _schema_path(".")
-
-
 def test_schema_path_returns_absolute_path():
     p = _schema_path("manifest.schema.json")
     assert p.is_absolute()
@@ -725,12 +720,6 @@ def test_signature_schema_path_return_annotation():
     sig = inspect.signature(_schema_path)
     ra = sig.return_annotation
     assert ra == Path or ra == "Path"
-
-
-def test_signature_schema_path_no_default():
-    sig = inspect.signature(_schema_path)
-    p = list(sig.parameters.values())[0]
-    assert p.default is inspect.Parameter.empty
 
 
 def test_signature_load_schema_one_param():

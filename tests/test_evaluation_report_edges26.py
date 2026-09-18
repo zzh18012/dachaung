@@ -209,13 +209,6 @@ def test_build_provenance_run_timestamp_valid_iso():
     assert parsed is not None
 
 
-def test_build_provenance_dict_serializable():
-    out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
-    text = json.dumps(out)
-    parsed = json.loads(text)
-    assert parsed == out
-
-
 # ---------- build_devset_section 行为深度第九批 ----------
 
 
@@ -226,21 +219,6 @@ class _StubManifest:
     pdf_count = 2
     docx_count = 3
     categories_covered = ["normal", "edge", "extreme"]
-
-
-def test_build_devset_section_with_categories_list():
-    out = build_devset_section(_StubManifest())
-    assert isinstance(out["categories_covered"], list)
-
-
-def test_build_devset_section_status_string():
-    out = build_devset_section(_StubManifest())
-    assert isinstance(out["status"], str)
-
-
-def test_build_devset_section_file_count_int():
-    out = build_devset_section(_StubManifest())
-    assert isinstance(out["file_count"], int)
 
 
 def test_build_devset_section_value_propagation():
@@ -257,19 +235,6 @@ def test_build_devset_section_value_propagation():
     assert out["docx_count"] == 1
 
 
-def test_build_devset_section_with_empty_categories():
-    class _M:
-        devset_status = "incomplete"
-        file_count = 0
-        content_group_count = 0
-        pdf_count = 0
-        docx_count = 0
-        categories_covered = []
-
-    out = build_devset_section(_M())
-    assert out["categories_covered"] == []
-
-
 def test_build_devset_section_idempotent():
     out1 = build_devset_section(_StubManifest())
     out2 = build_devset_section(_StubManifest())
@@ -281,11 +246,6 @@ def test_build_devset_section_does_not_mutate_manifest():
     snapshot_categories = list(m.categories_covered)
     _ = build_devset_section(m)
     assert m.categories_covered == snapshot_categories
-
-
-def test_build_devset_section_returns_dict():
-    out = build_devset_section(_StubManifest())
-    assert isinstance(out, dict)
 
 
 def test_build_devset_section_json_serializable():
@@ -603,23 +563,6 @@ def test_module_source_has_aggregate_summary_def():
     assert "def aggregate_summary(" in source
 
 
-def test_module_source_has_subprocess_run_call():
-    source = inspect.getsource(rmod)
-    assert "subprocess.run(" in source
-
-
-def test_module_source_rev_parse_command():
-    source = inspect.getsource(rmod)
-    assert "rev-parse" in source
-    assert "HEAD" in source
-
-
-def test_module_source_status_porcelain_command():
-    source = inspect.getsource(rmod)
-    assert "status" in source
-    assert "--porcelain" in source
-
-
 def test_module_source_capture_output_true():
     source = inspect.getsource(rmod)
     assert "capture_output=True" in source
@@ -635,20 +578,6 @@ def test_module_source_timeout_10():
     assert "timeout=10" in source
 
 
-def test_module_source_try_except_oserror_subprocess_error():
-    source = inspect.getsource(rmod)
-    assert "except" in source
-    assert "OSError" in source
-    assert "SubprocessError" in source
-
-
-def test_module_source_three_pkg_tuple():
-    source = inspect.getsource(rmod)
-    assert '"pdfplumber"' in source
-    assert '"python-docx"' in source
-    assert '"pypdfium2"' in source
-
-
 def test_module_source_no_main_block():
     source = inspect.getsource(rmod)
     assert "if __name__" not in source
@@ -657,18 +586,6 @@ def test_module_source_no_main_block():
 def test_module_source_docstring_present():
     assert rmod.__doc__ is not None
     assert len(rmod.__doc__) > 30
-
-
-def test_module_source_docstring_mentions_macro():
-    assert "macro" in rmod.__doc__.lower()
-
-
-def test_module_source_docstring_mentions_silent():
-    assert "silent" in rmod.__doc__.lower()
-
-
-def test_module_source_docstring_mentions_counts():
-    assert "counts" in rmod.__doc__.lower()
 
 
 def test_module_source_docstring_no_mix_word():
@@ -862,11 +779,6 @@ def test_e2e_full_chain_json_serializable():
     text = json.dumps(summary)
     parsed = json.loads(text)
     assert parsed == summary
-
-
-def test_e2e_build_provenance_does_not_raise_on_real_call():
-    out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
-    assert isinstance(out, dict)
 
 
 def test_e2e_aggregate_summary_zero_participation_returns_none_macro():

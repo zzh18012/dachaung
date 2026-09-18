@@ -143,14 +143,6 @@ def test_load_schema_three_schemas_all_dicts_batch29():
         assert isinstance(s, dict)
 
 
-def test_load_schema_independent_dicts_modification_batch29():
-    """两次加载返回独立 dict，修改一个不影响另一个。"""
-    s1 = load_schema("manifest.schema.json")
-    s2 = load_schema("manifest.schema.json")
-    s1["_hack"] = True
-    assert "_hack" not in s2
-
-
 def test_load_schema_idempotent_batch29():
     s1 = load_schema("manifest.schema.json")
     s2 = load_schema("manifest.schema.json")
@@ -594,26 +586,6 @@ def test_e2e_validate_errors_complete_batch29():
         assert isinstance(err["path"], list)
         assert isinstance(err["schema_path"], list)
         assert isinstance(err["message"], str)
-
-
-def test_e2e_schemas_dir_in_project_batch29():
-    """SCHEMAS_DIR 在项目根下。"""
-    project_root = Path(__file__).resolve().parent.parent
-    assert SCHEMAS_DIR.parent == project_root
-
-
-def test_e2e_validate_idempotent_batch29():
-    """端到端：相同输入两次得到相同结果。"""
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e1:
-        try:
-            validate({}, "manifest.schema.json")
-        except EvalSchemaError as e2:
-            assert str(e1) == str(e2)
-            assert e1.errors == e2.errors
-            return
-    pytest.fail("Expected EvalSchemaError")
 
 
 def test_e2e_validate_with_valid_annotation_batch29():

@@ -429,11 +429,6 @@ def test_module_source_contains_perf_counter_batch32():
     assert "time.perf_counter" in src
 
 
-def test_module_source_contains_json_dump_batch32():
-    src = inspect.getsource(rmod)
-    assert "json.dump" in src
-
-
 def test_module_source_contains_write_json_false_batch32():
     src = inspect.getsource(rmod)
     assert "write_json=False" in src
@@ -463,22 +458,10 @@ def test_signature_load_annotation_param_batch32():
     assert params == ["path"]
 
 
-def test_signature_load_annotation_return_batch32():
-    sig = inspect.signature(_load_annotation)
-    rs = str(sig.return_annotation)
-    assert "dict" in rs and "None" in rs
-
-
 def test_signature_process_one_params_batch32():
     sig = inspect.signature(_process_one)
     params = list(sig.parameters.keys())
     assert params == ["doc", "output_root", "parser_name", "max_chars"]
-
-
-def test_signature_process_one_return_tuple_batch32():
-    sig = inspect.signature(_process_one)
-    rs = str(sig.return_annotation)
-    assert "tuple" in rs
 
 
 def test_signature_run_evaluation_params_batch32():
@@ -583,41 +566,6 @@ def test_e2e_full_run_with_one_document_batch32(tmp_path):
     assert out["per_doc"][0]["metrics"]["element_count_total"]["value"] == 1
     assert out["summary"]["counts"]["element_count_total"]["sum"] == 1
     assert out["summary"]["success_rates"]["pipeline_success"]["rate"] == 1.0
-
-
-def test_e2e_idempotent_batch32(tmp_path):
-    fake_manifest = _fake_manifest(tmp_path)
-    out_path = tmp_path / "report.json"
-    out1 = run_evaluation(fake_manifest, out_path)
-    out2 = run_evaluation(fake_manifest, out_path)
-    out1["provenance"].pop("run_timestamp_iso", None)
-    out2["provenance"].pop("run_timestamp_iso", None)
-    assert out1 == out2
-
-
-def test_e2e_returns_report_dict_batch32(tmp_path):
-    fake_manifest = _fake_manifest(tmp_path)
-    out_path = tmp_path / "report.json"
-    out = run_evaluation(fake_manifest, out_path)
-    assert isinstance(out, dict)
-    assert set(out.keys()) == {
-        "report_version",
-        "provenance",
-        "devset",
-        "summary",
-        "per_doc",
-        "expected_failures",
-    }
-
-
-def test_e2e_report_file_written_to_disk_batch32(tmp_path):
-    fake_manifest = _fake_manifest(tmp_path)
-    out_path = tmp_path / "report.json"
-    run_evaluation(fake_manifest, out_path)
-    assert out_path.is_file()
-    with out_path.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-    assert "report_version" in data
 
 
 def test_e2e_per_doc_wall_time_seconds_keys_batch32(tmp_path):

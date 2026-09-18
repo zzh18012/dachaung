@@ -136,10 +136,6 @@ def _src() -> str:
     return inspect.getsource(schema_mod)
 
 
-def test_source_draft_validator_batch54():
-    assert "Draft202012Validator(schema)" in _src()
-
-
 # ---------- forbidden tokens 第二百二十七批 ----------
 
 def test_source_no_eval_batch54():

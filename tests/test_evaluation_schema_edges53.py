@@ -36,15 +36,6 @@ def test_eval_schema_error_not_value_error_batch33():
     assert not issubclass(EvalSchemaError, ValueError)
 
 
-def test_eval_schema_error_not_key_error_batch33():
-    assert not issubclass(EvalSchemaError, KeyError)
-
-
-def test_eval_schema_error_errors_default_empty_batch33():
-    e = EvalSchemaError("x")
-    assert e.errors == []
-
-
 def test_eval_schema_error_errors_none_treated_as_empty_batch33():
     """传 None 显式 → 默认空 list（不抛）。"""
     e = EvalSchemaError("x", None)
@@ -107,10 +98,6 @@ def test_schemas_dir_basename_batch33():
 def test_schemas_dir_parent_basename_batch33():
     """SCHEMAS_DIR.parent 是项目根。"""
     assert (SCHEMAS_DIR.parent / "pyproject.toml").is_file()
-
-
-def test_schemas_dir_resolves_to_same_batch33():
-    assert SCHEMAS_DIR == SCHEMAS_DIR.resolve()
 
 
 # ---------- _schema_path 第三十三批
@@ -219,17 +206,6 @@ def test_validate_manifest_correct_no_raise_batch33():
     validate(data, "manifest.schema.json")  # no raise
 
 
-def test_validate_manifest_invalid_version_raises_batch33():
-    data = {
-        "manifest_version": "999.0",  # 不在 enum
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    with pytest.raises(EvalSchemaError):
-        validate(data, "manifest.schema.json")
-
-
 def test_validate_manifest_invalid_devset_status_raises_batch33():
     from evaluation import MANIFEST_VERSION
     data = {
@@ -285,18 +261,6 @@ def test_validate_annotation_missing_doc_id_batch33():
     data = {"annotation_version": "1.0"}
     with pytest.raises(EvalSchemaError):
         validate(data, "annotation.schema.json")
-
-
-def test_validate_annotation_with_chunk_boundary_anchors_batch33():
-    data = {
-        "annotation_version": "1.0",
-        "doc_id": "d1",
-        "chunk_boundary_anchors": [
-            {"marker": "abc", "position": "after"},
-            {"marker": "xyz", "position": "before"},
-        ],
-    }
-    validate(data, "annotation.schema.json")  # no raise
 
 
 def test_validate_annotation_anchor_invalid_position_batch33():
@@ -369,32 +333,6 @@ def test_validate_invalid_schema_name_raises_filenotfound_batch33():
 # ---------- validate_file 第三十三批
 
 
-def test_validate_file_with_str_path_batch33(tmp_path):
-    from evaluation import MANIFEST_VERSION
-    data = {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps(data), encoding="utf-8")
-    validate_file(str(p), "manifest.schema.json")  # no raise
-
-
-def test_validate_file_with_pathlib_path_batch33(tmp_path):
-    from evaluation import MANIFEST_VERSION
-    data = {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps(data), encoding="utf-8")
-    validate_file(Path(p), "manifest.schema.json")
-
-
 def test_validate_file_returns_none_batch33(tmp_path):
     from evaluation import MANIFEST_VERSION
     data = {
@@ -432,30 +370,6 @@ def test_validate_file_invalid_content_raises_eval_schema_error_batch33(tmp_path
     p.write_text("{}", encoding="utf-8")
     with pytest.raises(EvalSchemaError):
         validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_does_not_mutate_file_batch33(tmp_path):
-    from evaluation import MANIFEST_VERSION
-    data = {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps(data), encoding="utf-8")
-    content_before = p.read_text(encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
-    assert p.read_text(encoding="utf-8") == content_before
-
-
-def test_validate_file_with_annotation_batch33(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text(
-        json.dumps({"annotation_version": "1.0", "doc_id": "d1"}),
-        encoding="utf-8",
-    )
-    validate_file(p, "annotation.schema.json")
 
 
 def test_validate_file_with_annotation_and_anchors_batch33(tmp_path):
@@ -561,11 +475,6 @@ def test_module_source_contains_jsonschema_validator_import_batch33():
 def test_module_source_contains_jsonschema_validation_error_import_batch33():
     src = inspect.getsource(smod)
     assert "from jsonschema.exceptions import ValidationError as JSValidationError" in src
-
-
-def test_module_source_contains_schemas_dir_definition_batch33():
-    src = inspect.getsource(smod)
-    assert "SCHEMAS_DIR = Path" in src
 
 
 def test_module_source_contains_eval_schema_error_class_batch33():
@@ -699,11 +608,6 @@ def test_module_imports_jsonschema_exceptions_batch33():
     assert "from jsonschema.exceptions import ValidationError" in src
 
 
-def test_module_has_eval_schema_error_class_batch33():
-    assert hasattr(smod, "EvalSchemaError")
-    assert isinstance(smod.EvalSchemaError, type)
-
-
 def test_module_has_load_schema_func_batch33():
     assert callable(smod.load_schema)
 
@@ -714,10 +618,6 @@ def test_module_has_validate_func_batch33():
 
 def test_module_has_validate_file_func_batch33():
     assert callable(smod.validate_file)
-
-
-def test_module_has_schema_path_func_batch33():
-    assert callable(smod._schema_path)
 
 
 def test_module_all_contains_5_entries_batch33():
@@ -752,20 +652,6 @@ def test_e2e_validate_annotation_with_anchors_batch33():
         ],
     }
     validate(data, "annotation.schema.json")
-
-
-def test_e2e_validate_file_idempotent_batch33(tmp_path):
-    from evaluation import MANIFEST_VERSION
-    data = {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps(data), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
-    validate_file(p, "manifest.schema.json")
 
 
 def test_e2e_eval_schema_error_caught_with_errors_batch33():

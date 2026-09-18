@@ -59,12 +59,6 @@ def test_ratio_no_args_raises_batch36():
         _ratio()  # type: ignore[no-value-for-parameter]
 
 
-def test_ratio_int_one_batch36():
-    m = _ratio(1)
-    assert m["value"] == 1.0
-    assert isinstance(m["value"], float)
-
-
 def test_ratio_with_string_raises_batch36():
     """float("hello") raises ValueError。"""
     with pytest.raises(ValueError):
@@ -695,20 +689,6 @@ def test_compute_metrics_with_pdf_locator_batch36():
     out = compute_automatic_metrics(doc, None, "pdf", None)
     assert out["pdf_locator_valid_ratio"]["value"] == 1.0
     assert out["docx_locator_valid_ratio"]["reason"] == "not_docx_document"
-
-
-def test_compute_metrics_with_docx_locator_batch36():
-    doc = {
-        "source_type": "docx",
-        "elements": [
-            {"type": "paragraph", "content": "x", "element_id": "e1",
-             "source_locator": {"paragraph_index": 0}},
-        ],
-        "chunks": [{"text": "x", "source_element_ids": ["e1"]}],
-    }
-    out = compute_automatic_metrics(doc, None, "docx", None)
-    assert out["docx_locator_valid_ratio"]["value"] == 1.0
-    assert out["pdf_locator_valid_ratio"]["reason"] == "not_pdf_document"
 
 
 def test_compute_metrics_with_expectations_batch36():

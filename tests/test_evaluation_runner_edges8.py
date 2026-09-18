@@ -66,20 +66,6 @@ def test_load_annotation_returns_nested_dict(tmp_path: Path):
     assert result == {"outer": {"inner": [1, {"x": "y"}]}}
 
 
-def test_load_annotation_returns_empty_dict(tmp_path: Path):
-    p = tmp_path / "a.json"
-    p.write_text("{}", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == {}
-
-
-def test_load_annotation_returns_empty_list(tmp_path: Path):
-    p = tmp_path / "a.json"
-    p.write_text("[]", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == []
-
-
 def test_load_annotation_with_bom(tmp_path: Path):
     """encoding='utf-8' 不剥离 BOM → json.JSONDecodeError → 返回 None。"""
     p = tmp_path / "a.json"
@@ -128,12 +114,6 @@ def test_load_annotation_only_whitespace_returns_none(tmp_path: Path):
     p = tmp_path / "a.json"
     p.write_text("   \n  \t ", encoding="utf-8")
     assert _load_annotation(p) is None
-
-
-def test_load_annotation_true_value(tmp_path: Path):
-    p = tmp_path / "a.json"
-    p.write_text("true", encoding="utf-8")
-    assert _load_annotation(p) is True
 
 
 def test_load_annotation_false_value(tmp_path: Path):
@@ -507,13 +487,6 @@ def test_run_evaluation_empty_manifest_per_doc_empty(tmp_path: Path):
     output = tmp_path / "out" / "report.json"
     result = run_evaluation(manifest, output, parser_name="text")
     assert result["per_doc"] == []
-
-
-def test_run_evaluation_empty_manifest_expected_failures_empty(tmp_path: Path):
-    manifest = _FakeManifest(tmp_path)
-    output = tmp_path / "out" / "report.json"
-    result = run_evaluation(manifest, output, parser_name="text")
-    assert result["expected_failures"] == []
 
 
 def test_run_evaluation_no_docs_with_expected_failure_only(tmp_path: Path):
@@ -898,37 +871,6 @@ def test_module_imports_build_devset_section():
 def test_module_imports_build_provenance():
     import evaluation.runner as m
     assert hasattr(m, "build_provenance")
-
-
-def test_load_annotation_signature():
-    sig = inspect.signature(_load_annotation)
-    assert set(sig.parameters) == {"path"}
-
-
-def test_load_annotation_path_annotation():
-    sig = inspect.signature(_load_annotation)
-    annotation = str(sig.parameters["path"].annotation)
-    assert "Path" in annotation
-    assert "None" in annotation
-
-
-def test_load_annotation_return_annotation():
-    sig = inspect.signature(_load_annotation)
-    annotation = str(sig.return_annotation)
-    assert "dict" in annotation or "None" in annotation
-
-
-def test_process_one_return_annotation_tuple():
-    sig = inspect.signature(_process_one)
-    assert "tuple" in str(sig.return_annotation).lower()
-
-
-def test_run_evaluation_signature_parameters():
-    sig = inspect.signature(run_evaluation)
-    assert set(sig.parameters) == {
-        "manifest", "output_path", "parser_name",
-        "max_chars", "tolerance_chars"
-    }
 
 
 def test_run_evaluation_manifest_param_no_default():

@@ -49,12 +49,6 @@ def test_eval_schema_error_with_errors_list_batch51():
     assert e.errors == errs
 
 
-def test_eval_schema_error_errors_default_empty_batch51():
-    e = EvalSchemaError("x")
-    assert e.errors == []
-    assert isinstance(e.errors, list)
-
-
 def test_eval_schema_error_repr_contains_class_name_batch51():
     e = EvalSchemaError("msg")
     r = repr(e)
@@ -123,12 +117,6 @@ def test_schema_path_directory_not_file_batch51():
     """传目录名也会失败（不是 is_file）。"""
     with pytest.raises(FileNotFoundError):
         _schema_path("")  # SCHEMAS_DIR/"" 是目录
-
-
-def test_schema_path_3_valid_schemas_batch51():
-    for name in ("manifest.schema.json", "annotation.schema.json", "evaluation-report.schema.json"):
-        p = _schema_path(name)
-        assert p.is_file()
 
 
 # ---------- load_schema 边界 ----------
@@ -318,20 +306,6 @@ def test_validate_file_missing_file_batch51(tmp_path):
     assert "待校验文件不存在" in str(ei.value)
 
 
-def test_validate_file_json_decode_error_batch51(tmp_path):
-    f = tmp_path / "bad.json"
-    f.write_text("{not json", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(f, "manifest.schema.json")
-
-
-def test_validate_file_schema_failure_batch51(tmp_path):
-    f = tmp_path / "bad.json"
-    f.write_text(json.dumps({}), encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(f, "manifest.schema.json")
-
-
 def test_validate_file_path_can_be_str_batch51(tmp_path):
     """validate_file 接受 str 路径。"""
     f = tmp_path / "m.json"
@@ -431,28 +405,6 @@ def test_source_contains_self_errors_assign_batch51():
     assert "self.errors = errors or []" in src
 
 
-def test_source_contains_draft202012_call_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "Draft202012Validator(" in src
-
-
-def test_source_contains_iter_errors_batch51():
-    src = inspect.getsource(schema_mod)
-    assert ".iter_errors(" in src
-
-
-def test_source_contains_sorted_lambda_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "sorted(" in src
-    assert "lambda" in src
-
-
-def test_source_contains_absolute_path_calls_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "absolute_path" in src
-    assert "absolute_schema_path" in src
-
-
 def test_source_contains_with_open_batch51():
     src = inspect.getsource(schema_mod)
     assert "with _schema_path(name).open" in src or "with p.open" in src
@@ -462,15 +414,6 @@ def test_source_contains_docstring_eval_schema_error_batch51():
     src = inspect.getsource(schema_mod)
     assert "errors 给程序看" in src
     assert "message 给人看" in src
-
-
-def test_source_all_5_entries_batch51():
-    src = inspect.getsource(schema_mod)
-    assert '"SCHEMAS_DIR"' in src
-    assert '"EvalSchemaError"' in src
-    assert '"load_schema"' in src
-    assert '"validate"' in src
-    assert '"validate_file"' in src
 
 
 # ---------- AST 结构补强 ----------
@@ -492,14 +435,6 @@ def test_ast_has_1_class_def_batch51():
     classes = [n for n in tree.body if isinstance(n, ast.ClassDef)]
     assert len(classes) == 1
     assert classes[0].name == "EvalSchemaError"
-
-
-def test_ast_eval_schema_error_self_errors_assign_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError")
-    init = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "__init__")
-    src = ast.unparse(init)
-    assert "self.errors = errors or []" in src
 
 
 def test_ast_no_async_function_def_batch51():
@@ -570,13 +505,6 @@ def test_ast_validate_file_has_with_batch51():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
     withs = [n for n in ast.walk(func) if isinstance(n, ast.With)]
     assert len(withs) == 1
-
-
-def test_ast_validate_file_has_if_not_is_file_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
-    src = ast.unparse(func)
-    assert "if not p.is_file()" in src
 
 
 def test_ast_load_schema_has_with_open_batch51():

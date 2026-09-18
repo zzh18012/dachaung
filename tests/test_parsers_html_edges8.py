@@ -966,12 +966,6 @@ def test_rows_to_md_returns_str():
     assert isinstance(_rows_to_md([["x"]]), str)
 
 
-def test_rows_to_md_single_body_row():
-    result = _rows_to_md([["h1", "h2"], ["v1", "v2"]])
-    lines = result.split("\n")
-    assert len(lines) == 3
-
-
 def test_rows_to_md_no_body_rows():
     """只有 header 一行 → 输出 header + sep。"""
     result = _rows_to_md([["h1", "h2"]])
@@ -1026,10 +1020,6 @@ def test_html_parser_version_value():
     assert HtmlParser.version == "stdlib/0.1.0"
 
 
-def test_html_parser_inherits_parser():
-    assert issubclass(HtmlParser, Parser)
-
-
 def test_html_parser_two_instances_same_attrs():
     a = HtmlParser()
     b = HtmlParser()
@@ -1071,10 +1061,6 @@ def test_heading_levels_count_six():
     assert len(_HEADING_LEVELS) == 6
 
 
-def test_heading_levels_keys_exact():
-    assert set(_HEADING_LEVELS.keys()) == {"h1", "h2", "h3", "h4", "h5", "h6"}
-
-
 def test_heading_levels_values_exact():
     assert set(_HEADING_LEVELS.values()) == {1, 2, 3, 4, 5, 6}
 
@@ -1089,10 +1075,6 @@ def test_skip_tags_count_seven():
 
 def test_skip_tags_is_set():
     assert isinstance(_SKIP_TAGS, set)
-
-
-def test_skip_tags_values_exact():
-    assert _SKIP_TAGS == {"script", "style", "head", "title", "meta", "link", "noscript"}
 
 
 def test_html_extensions_count_two():

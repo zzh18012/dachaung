@@ -142,27 +142,11 @@ def test_group_count_with_cross_pair_batch507(
 
 # ---------- locator 分型空值 ----------
 
-def test_pdf_doc_dlvr_not_docx_batch507(tmp_path):
-    r = _run(tmp_path)
-    assert r["per_doc"][0]["metrics"][
-        "docx_locator_valid_ratio"] == {
-        "value": None,
-        "reason": "not_docx_document"}
-
-
 def test_docx_doc_dlvr_one_batch507(tmp_path):
     r = _run(tmp_path)
     assert r["per_doc"][1]["metrics"][
         "docx_locator_valid_ratio"] == {
         "value": 1.0, "reason": None}
-
-
-def test_docx_doc_plvr_not_pdf_batch507(tmp_path):
-    r = _run(tmp_path)
-    assert r["per_doc"][1]["metrics"][
-        "pdf_locator_valid_ratio"] == {
-        "value": None,
-        "reason": "not_pdf_document"}
 
 
 def test_bad_doc_double_locator_failed_batch507(

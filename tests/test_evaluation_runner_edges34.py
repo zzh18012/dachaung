@@ -40,11 +40,6 @@ def test_load_annotation_source_no_class():
     assert "class " not in src
 
 
-def test_load_annotation_source_no_yield():
-    src = inspect.getsource(_load_annotation)
-    assert "yield" not in src
-
-
 def test_load_annotation_source_no_async():
     src = inspect.getsource(_load_annotation)
     assert "async " not in src
@@ -80,11 +75,6 @@ def test_load_annotation_source_uses_with_path_open():
     assert 'with path.open("r", encoding="utf-8") as f:' in src
 
 
-def test_load_annotation_source_uses_return_json_load():
-    src = inspect.getsource(_load_annotation)
-    assert "return json.load(f)" in src
-
-
 def test_load_annotation_source_except_oserror_jsondecodeerror():
     src = inspect.getsource(_load_annotation)
     assert "except (OSError, json.JSONDecodeError):" in src
@@ -94,11 +84,6 @@ def test_load_annotation_source_except_returns_none():
     src = inspect.getsource(_load_annotation)
     # 两个 return None：一个早返回，一个 except
     assert src.count("return None") == 2
-
-
-def test_load_annotation_source_no_eval():
-    src = inspect.getsource(_load_annotation)
-    assert "eval(" not in src
 
 
 def test_load_annotation_source_no_exec():
@@ -111,24 +96,9 @@ def test_load_annotation_source_no_compile():
     assert "compile(" not in src
 
 
-def test_load_annotation_source_no_subprocess():
-    src = inspect.getsource(_load_annotation)
-    assert "subprocess" not in src
-
-
 def test_load_annotation_source_no_unlink():
     src = inspect.getsource(_load_annotation)
     assert "unlink" not in src
-
-
-def test_load_annotation_source_no_write():
-    src = inspect.getsource(_load_annotation)
-    assert ".write(" not in src
-
-
-def test_load_annotation_source_no_print():
-    src = inspect.getsource(_load_annotation)
-    assert "print(" not in src
 
 
 # ---------- _process_one source level 字符串精确补强第六批 ----------
@@ -139,34 +109,14 @@ def test_process_one_source_docstring_present():
     assert '"""' in src
 
 
-def test_process_one_source_docstring_mentions_process_single():
-    src = inspect.getsource(_process_one)
-    assert "process_single" in src
-
-
 def test_process_one_source_docstring_mentions_total_seconds():
     src = inspect.getsource(_process_one)
     assert "total_seconds" in src
 
 
-def test_process_one_source_docstring_mentions_image_dir():
-    src = inspect.getsource(_process_one)
-    assert "image_dir" in src
-
-
-def test_process_one_source_docstring_mentions_write_json():
-    src = inspect.getsource(_process_one)
-    assert "write_json" in src
-
-
 def test_process_one_source_docstring_mentions_image_output_dir():
     src = inspect.getsource(_process_one)
     assert "image_output_dir" in src
-
-
-def test_process_one_source_out_stub_assignment():
-    src = inspect.getsource(_process_one)
-    assert 'out_stub = output_root / "_per_doc" / f"{doc.doc_id}.json"' in src
 
 
 def test_process_one_source_parent_mkdir():
@@ -228,19 +178,6 @@ def test_process_one_source_unlink_try_except_oserror():
     assert "pass" in src
 
 
-def test_process_one_source_errors_truthy_branch():
-    src = inspect.getsource(_process_one)
-    assert "if errors:" in src
-    assert "return None, errors[0].to_dict(), elapsed, None, image_dir" in src
-
-
-def test_process_one_source_document_none_branch():
-    src = inspect.getsource(_process_one)
-    assert "if document is None:" in src
-    assert '"code": "unknown"' in src
-    assert '"message": "process_single returned None without errors"' in src
-
-
 def test_process_one_source_return_5_tuple_success():
     src = inspect.getsource(_process_one)
     assert (
@@ -254,29 +191,14 @@ def test_process_one_source_no_yield():
     assert "yield" not in src
 
 
-def test_process_one_source_no_async():
-    src = inspect.getsource(_process_one)
-    assert "async " not in src
-
-
 def test_process_one_source_no_walrus():
     src = inspect.getsource(_process_one)
     assert ":=" not in src
 
 
-def test_process_one_source_no_eval():
-    src = inspect.getsource(_process_one)
-    assert "eval(" not in src
-
-
 def test_process_one_source_no_exec():
     src = inspect.getsource(_process_one)
     assert "exec(" not in src
-
-
-def test_process_one_source_no_print():
-    src = inspect.getsource(_process_one)
-    assert "print(" not in src
 
 
 # ---------- run_evaluation source level 字符串精确补强第六批 ----------
@@ -317,22 +239,6 @@ def test_run_evaluation_source_for_doc_in_manifest_documents():
     assert "for doc in manifest.documents:" in src
 
 
-def test_run_evaluation_source_5_tuple_unpack():
-    src = inspect.getsource(run_evaluation)
-    assert "document, error, total_seconds, parser_version, image_dir = _process_one(" in src
-
-
-def test_run_evaluation_source_parser_version_for_prov_check():
-    src = inspect.getsource(run_evaluation)
-    assert "if parser_version and not parser_version_for_prov:" in src
-    assert "parser_version_for_prov = parser_version" in src
-
-
-def test_run_evaluation_source_calls_compute_automatic_metrics():
-    src = inspect.getsource(run_evaluation)
-    assert "metrics = compute_automatic_metrics(" in src
-
-
 def test_run_evaluation_source_passes_document_to_metrics():
     src = inspect.getsource(run_evaluation)
     assert "document=document," in src
@@ -356,17 +262,6 @@ def test_run_evaluation_source_passes_expectations_to_metrics():
 def test_run_evaluation_source_image_dir_is_dir_check():
     src = inspect.getsource(run_evaluation)
     assert "image_base_dir=image_dir if (image_dir is not None and image_dir.is_dir()) else None," in src
-
-
-def test_run_evaluation_source_calls_load_annotation():
-    src = inspect.getsource(run_evaluation)
-    assert "annotation = _load_annotation(doc.annotation_resolved)" in src
-
-
-def test_run_evaluation_source_calls_chunk_boundary_prf():
-    src = inspect.getsource(run_evaluation)
-    assert "chunk_b = chunk_boundary_prf(" in src
-    assert "document, annotation, tolerance_chars=tolerance_chars" in src
 
 
 def test_run_evaluation_source_metrics_update_fig_caps():
@@ -470,15 +365,6 @@ def test_run_evaluation_source_expected_failure_append():
     assert '"matches": actual_code == ef.expected_error_code' in src
 
 
-def test_run_evaluation_source_calls_build_provenance():
-    src = inspect.getsource(run_evaluation)
-    assert "provenance = build_provenance(" in src
-    assert "project_root=manifest.project_root" in src
-    assert "parser_name=parser_name" in src
-    assert "max_chars=max_chars" in src
-    assert "parser_version=parser_version_for_prov" in src
-
-
 def test_run_evaluation_source_public_per_doc_list_init():
     src = inspect.getsource(run_evaluation)
     assert "public_per_doc = []" in src
@@ -508,12 +394,6 @@ def test_run_evaluation_source_report_dict_keys():
     assert '"expected_failures": expected_failure_results' in src
 
 
-def test_run_evaluation_source_out_p_path():
-    src = inspect.getsource(run_evaluation)
-    assert "out_p = Path(output_path)" in src
-    assert "out_p.parent.mkdir(parents=True, exist_ok=True)" in src
-
-
 def test_run_evaluation_source_writes_file():
     src = inspect.getsource(run_evaluation)
     assert 'with out_p.open("w", encoding="utf-8") as f:' in src
@@ -530,19 +410,9 @@ def test_run_evaluation_source_no_yield():
     assert "yield" not in src
 
 
-def test_run_evaluation_source_no_async():
-    src = inspect.getsource(run_evaluation)
-    assert "async " not in src
-
-
 def test_run_evaluation_source_no_walrus():
     src = inspect.getsource(run_evaluation)
     assert ":=" not in src
-
-
-def test_run_evaluation_source_no_eval():
-    src = inspect.getsource(run_evaluation)
-    assert "eval(" not in src
 
 
 def test_run_evaluation_source_no_exec():
@@ -818,20 +688,6 @@ def test_module_source_no_main_block():
     assert 'if __name__' not in src
 
 
-def test_module_source_no_user_class():
-    src = inspect.getsource(rmod)
-    lines = src.split("\n")
-    has_class = any(line.lstrip().startswith("class ") for line in lines)
-    assert not has_class
-
-
-def test_module_source_3_user_functions():
-    src = inspect.getsource(rmod)
-    assert "def _load_annotation(" in src
-    assert "def _process_one(" in src
-    assert "def run_evaluation(" in src
-
-
 def test_module_source_all_1_entry():
     src = inspect.getsource(rmod)
     assert '__all__ = ["run_evaluation"]' in src
@@ -875,13 +731,6 @@ def test_signature_load_annotation_return_annotation():
     assert "None" in ra
 
 
-def test_signature_load_annotation_no_varargs():
-    sig = inspect.signature(_load_annotation)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_signature_process_one():
     sig = inspect.signature(_process_one)
     params = list(sig.parameters.values())
@@ -902,13 +751,6 @@ def test_signature_process_one_return_annotation_tuple():
     sig = inspect.signature(_process_one)
     ra = str(sig.return_annotation)
     assert "tuple" in ra
-
-
-def test_signature_process_one_no_varargs():
-    sig = inspect.signature(_process_one)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 def test_signature_run_evaluation():
@@ -1016,20 +858,8 @@ def test_module_namespace_callable_names():
     assert callables == {"_load_annotation", "_process_one", "run_evaluation"}
 
 
-def test_module_no_user_classes():
-    classes = [
-        (name, obj) for name, obj in vars(rmod).items()
-        if isinstance(obj, type) and obj.__module__ == rmod.__name__
-    ]
-    assert len(classes) == 0
-
-
 def test_module_name_is_evaluation_runner():
     assert rmod.__name__ == "evaluation.runner"
-
-
-def test_module_file_ends_with_runner_py():
-    assert rmod.__file__.endswith("runner.py")
 
 
 def test_module_function_module_eq_rmod():

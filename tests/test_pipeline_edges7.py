@@ -171,16 +171,6 @@ def test_image_output_dir_for_signature():
     assert set(sig.parameters) == {"output_path", "source_hash"}
 
 
-def test_image_output_dir_for_no_default_for_output_path():
-    sig = inspect.signature(image_output_dir_for)
-    assert sig.parameters["output_path"].default is inspect.Parameter.empty
-
-
-def test_image_output_dir_for_no_default_for_source_hash():
-    sig = inspect.signature(image_output_dir_for)
-    assert sig.parameters["source_hash"].default is inspect.Parameter.empty
-
-
 # =========================================================================
 # process_single 错误路径
 # =========================================================================

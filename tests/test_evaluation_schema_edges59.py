@@ -226,13 +226,6 @@ def test_validate_file_error_contains_path_batch44(tmp_path):
     assert "待校验文件不存在" in msg
 
 
-def test_validate_file_json_decode_error_propagates_batch44(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text("not json", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_calls_validate_batch44(tmp_path):
     p = tmp_path / "m.json"
     p.write_text(json.dumps({"foo": "bar"}), encoding="utf-8")
@@ -487,15 +480,6 @@ def test_ast_no_with_in_module_body_batch44():
         assert not isinstance(n, (ast.With, ast.AsyncWith))
 
 
-def test_ast_from_future_second_batch44():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    first = tree.body[0]
-    assert isinstance(first, ast.Expr)
-    second = tree.body[1]
-    assert isinstance(second, ast.ImportFrom)
-    assert second.module == "__future__"
-
-
 # ---------- forbidden tokens 第九十六批 ----------
 
 def test_source_no_eval_batch44():
@@ -526,11 +510,6 @@ def test_source_no_locals_batch44():
 def test_source_no_os_system_batch44():
     src = inspect.getsource(schema_mod)
     assert "os.system(" not in src
-
-
-def test_source_no_popen_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "popen(" not in src
 
 
 def test_source_no_yaml_load_batch44():

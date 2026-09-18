@@ -48,11 +48,6 @@ def test_load_annotation_source_returns_dict_or_none():
     assert "dict[str, Any] | None" in src
 
 
-def test_load_annotation_source_uses_path_is_none():
-    src = inspect.getsource(_load_annotation)
-    assert "path is None" in src
-
-
 def test_load_annotation_source_uses_is_file_check():
     src = inspect.getsource(_load_annotation)
     assert ".is_file()" in src
@@ -115,11 +110,6 @@ def test_process_one_source_returns_5_tuple():
     assert "tuple[dict[str, Any] | None, dict[str, Any] | None, float, str | None, Path | None]" in src
 
 
-def test_process_one_source_uses_out_stub():
-    src = inspect.getsource(_process_one)
-    assert "out_stub = " in src
-
-
 def test_process_one_source_uses_per_doc_dir():
     src = inspect.getsource(_process_one)
     assert '"_per_doc"' in src
@@ -146,11 +136,6 @@ def test_process_one_source_passes_max_chars():
     assert "max_chars=max_chars" in src
 
 
-def test_process_one_source_uses_image_output_dir_for():
-    src = inspect.getsource(_process_one)
-    assert "image_output_dir_for(" in src
-
-
 def test_process_one_source_uses_document_source_hash():
     src = inspect.getsource(_process_one)
     assert "document.source_hash" in src
@@ -161,17 +146,6 @@ def test_process_one_source_uses_image_dir_none_default():
     assert "image_dir: Path | None = None" in src
 
 
-def test_process_one_source_uses_document_is_not_none():
-    src = inspect.getsource(_process_one)
-    assert "if document is not None:" in src
-
-
-def test_process_one_source_uses_unlink_out_stub():
-    src = inspect.getsource(_process_one)
-    assert "out_stub.is_file()" in src
-    assert "out_stub.unlink()" in src
-
-
 def test_process_one_source_uses_errors_truthy_check():
     src = inspect.getsource(_process_one)
     assert "if errors:" in src
@@ -180,11 +154,6 @@ def test_process_one_source_uses_errors_truthy_check():
 def test_process_one_source_returns_errors_0_to_dict():
     src = inspect.getsource(_process_one)
     assert "errors[0].to_dict()" in src
-
-
-def test_process_one_source_uses_document_is_none_branch():
-    src = inspect.getsource(_process_one)
-    assert "if document is None:" in src
 
 
 def test_process_one_source_returns_unknown_error_message():
@@ -365,11 +334,6 @@ def test_run_evaluation_source_handles_actual_code():
     assert "actual_code = errors[0].code if errors else None" in src
 
 
-def test_run_evaluation_source_compares_actual_with_expected():
-    src = inspect.getsource(run_evaluation)
-    assert "actual_code == ef.expected_error_code" in src
-
-
 def test_run_evaluation_source_uses_total_seconds_in_wall_time():
     src = inspect.getsource(run_evaluation)
     assert '"total": total_seconds' in src
@@ -401,11 +365,6 @@ def test_run_evaluation_source_uses_kwargs_only():
 def test_run_evaluation_source_no_eval():
     src = inspect.getsource(run_evaluation)
     assert "eval(" not in src
-
-
-def test_run_evaluation_source_no_subprocess():
-    src = inspect.getsource(run_evaluation)
-    assert "subprocess" not in src
 
 
 def test_run_evaluation_source_no_yield():
@@ -534,11 +493,6 @@ def test_module_source_imports_report_helpers():
     assert "build_provenance" in src
 
 
-def test_module_source_no_relative_above_root():
-    src = inspect.getsource(rmod)
-    assert "from .." not in src
-
-
 def test_module_source_no_star_import():
     src = inspect.getsource(rmod)
     assert "import *" not in src
@@ -657,11 +611,6 @@ def test_signature_run_evaluation_3_kwargs():
 # ---------- 模块整体合理性补强 ----------
 
 
-def test_module_has_docstring():
-    assert rmod.__doc__ is not None
-    assert len(rmod.__doc__) > 10
-
-
 def test_module_has_all_attribute():
     assert hasattr(rmod, "__all__")
 
@@ -706,10 +655,6 @@ def test_module_imports_json():
 
 def test_module_imports_time():
     assert rmod.time is time
-
-
-def test_module_imports_path():
-    assert rmod.Path is Path
 
 
 def test_module_imports_process_single():

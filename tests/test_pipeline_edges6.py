@@ -101,11 +101,6 @@ def test_get_parser_each_parser_has_parse_callable():
         assert callable(p.parse)
 
 
-def test_get_parser_unknown_name_raises_value_error():
-    with pytest.raises(ValueError):
-        get_parser("nonexistent")
-
-
 def test_get_parser_unknown_name_error_message_lists_all_supported():
     with pytest.raises(ValueError) as exc:
         get_parser("xyz")
@@ -125,18 +120,9 @@ def test_get_parser_uppercase_name_raises():
         get_parser("FALLBACK")
 
 
-def test_get_parser_with_whitespace_raises():
-    with pytest.raises(ValueError):
-        get_parser(" fallback ")
-
-
 # =========================================================================
 # image_output_dir_for 边界
 # =========================================================================
-
-
-def test_image_output_dir_for_none_returns_none():
-    assert image_output_dir_for(None, "0" * 64) is None
 
 
 def test_image_output_dir_for_returns_path_with_images_prefix(tmp_path):
@@ -506,18 +492,6 @@ def test_module_imports_any():
     assert "from typing import Any" in src
 
 
-def test_module_imports_structural_chunker():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "StructuralChunker" in src
-
-
-def test_module_imports_compute_file_hash():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "compute_file_hash" in src
-
-
 def test_module_imports_document_error_record():
     import app.pipeline as mod
     src = inspect.getsource(mod)
@@ -583,39 +557,11 @@ def test_get_parser_signature_params_count():
     assert len(sig.parameters) == 2
 
 
-def test_get_parser_name_no_default():
-    sig = inspect.signature(get_parser)
-    assert sig.parameters["name"].default is inspect.Parameter.empty
-
-
-def test_image_output_dir_for_signature_params():
-    sig = inspect.signature(image_output_dir_for)
-    assert len(sig.parameters) == 2
-    assert "output_path" in sig.parameters
-    assert "source_hash" in sig.parameters
-
-
 def test_image_output_dir_for_no_defaults():
     sig = inspect.signature(image_output_dir_for)
     # output_path 必填（无 default）
     assert sig.parameters["output_path"].default is inspect.Parameter.empty
     assert sig.parameters["source_hash"].default is inspect.Parameter.empty
-
-
-def test_process_single_signature_params():
-    sig = inspect.signature(process_single)
-    # input_path, output_path, parser_name, max_chars, write_json
-    assert len(sig.parameters) == 5
-
-
-def test_process_single_input_path_no_default():
-    sig = inspect.signature(process_single)
-    assert sig.parameters["input_path"].default is inspect.Parameter.empty
-
-
-def test_process_single_output_path_default_none():
-    sig = inspect.signature(process_single)
-    assert sig.parameters["output_path"].default is None
 
 
 def test_process_single_write_json_default_true():
@@ -638,12 +584,6 @@ def test_process_single_max_chars_kw_only():
 def test_process_single_write_json_kw_only():
     sig = inspect.signature(process_single)
     assert sig.parameters["write_json"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
-def test_validate_only_signature_params():
-    sig = inspect.signature(validate_only)
-    assert len(sig.parameters) == 1
-    assert "json_path" in sig.parameters
 
 
 def test_validate_only_no_default():

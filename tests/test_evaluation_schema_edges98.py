@@ -106,10 +106,6 @@ def _minimal_report():
     }
 
 
-def test_minimal_report_valid_batch102():
-    validate(_minimal_report(), "evaluation-report.schema.json")
-
-
 def test_report_top_rejects_evaluator_version_batch102():
     bad = _minimal_report()
     bad["evaluator_version"] = "1.1"

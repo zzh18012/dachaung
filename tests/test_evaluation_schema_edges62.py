@@ -85,12 +85,6 @@ def test_eval_schema_error_catch_as_exception_batch48():
         raise EvalSchemaError("x")
 
 
-def test_eval_schema_error_errors_attribute_writable_batch48():
-    e = EvalSchemaError("msg")
-    e.errors = [{"new": True}]
-    assert e.errors == [{"new": True}]
-
-
 def test_eval_schema_error_no_required_errors_arg_batch48():
     """errors 是可选参数。"""
     # 不传 errors 也能构造
@@ -181,11 +175,6 @@ def test_validate_manifest_minimal_batch48():
     validate(instance, "manifest.schema.json")
 
 
-def test_validate_annotation_minimal_batch48():
-    instance = {"annotation_version": "1.0", "doc_id": "d1"}
-    validate(instance, "annotation.schema.json")
-
-
 def test_validate_returns_none_on_success_batch48():
     instance = {
         "manifest_version": "1.0",
@@ -227,13 +216,6 @@ def test_validate_failure_errors_flat_structure_batch48():
         assert "path" in e
         assert "message" in e
         assert "schema_path" in e
-
-
-def test_validate_failure_message_contains_schema_name_batch48():
-    instance = {}
-    with pytest.raises(EvalSchemaError) as ei:
-        validate(instance, "manifest.schema.json")
-    assert "manifest.schema.json" in str(ei.value)
 
 
 def test_validate_failure_message_contains_error_count_batch48():
@@ -297,13 +279,6 @@ def test_validate_file_accepts_str_path_batch48(tmp_path):
 def test_validate_file_missing_raises_filenotfound_batch48(tmp_path):
     with pytest.raises(FileNotFoundError):
         validate_file(tmp_path / "missing.json", "manifest.schema.json")
-
-
-def test_validate_file_invalid_json_raises_jsonerror_batch48(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not json", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
 
 
 def test_validate_file_invalid_instance_raises_eval_error_batch48(tmp_path):
@@ -377,11 +352,6 @@ def test_source_contains_all_entries_batch48():
     src = inspect.getsource(schema_mod)
     for name in ("SCHEMAS_DIR", "EvalSchemaError", "load_schema", "validate", "validate_file"):
         assert name in src
-
-
-def test_source_contains_class_eval_schema_error_batch48():
-    src = inspect.getsource(schema_mod)
-    assert "class EvalSchemaError" in src
 
 
 def test_source_contains_file_not_found_batch48():

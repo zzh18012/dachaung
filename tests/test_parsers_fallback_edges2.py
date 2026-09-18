@@ -715,11 +715,6 @@ def test_lines_to_para_words_in_line_sorted_by_x0():
 # ---------- _group_words_to_paragraphs 更深 ----------
 
 
-def test_group_words_returns_list_type():
-    result = _group_words_to_paragraphs([])
-    assert isinstance(result, list)
-
-
 def test_group_words_empty_returns_empty_list():
     assert _group_words_to_paragraphs([]) == []
 
@@ -839,19 +834,6 @@ def test_fallback_parser_init_nested_path(tmp_path: Path):
     nested = tmp_path / "a" / "b" / "c"
     p = FallbackParser(nested)
     assert p._image_output_dir == nested
-
-
-def test_fallback_parser_can_be_instantiated_multiple_times():
-    p1 = FallbackParser()
-    p2 = FallbackParser()
-    assert p1 is not p2
-    assert p1._image_output_dir is None
-    assert p2._image_output_dir is None
-
-
-def test_fallback_parser_has_parse_method():
-    p = FallbackParser()
-    assert callable(p.parse)
 
 
 def test_fallback_parser_parse_missing_file_raises(tmp_path: Path):

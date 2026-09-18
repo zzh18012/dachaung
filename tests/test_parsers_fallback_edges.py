@@ -657,12 +657,6 @@ def test_fallback_parser_has_parse_method():
 # ---------- FallbackParser.parse 错误路径 ----------
 
 
-def test_fallback_parser_parse_missing_pdf_raises(tmp_path: Path):
-    with pytest.raises(ParserError) as exc:
-        FallbackParser().parse(tmp_path / "nope.pdf", source_hash="a" * 64)
-    assert exc.value.code == "file_not_found"
-
-
 def test_fallback_parser_parse_missing_docx_raises(tmp_path: Path):
     with pytest.raises(ParserError) as exc:
         FallbackParser().parse(tmp_path / "nope.docx", source_hash="a" * 64)

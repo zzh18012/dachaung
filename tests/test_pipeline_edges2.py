@@ -98,12 +98,6 @@ def test_get_parser_each_parser_has_version_string():
         assert hasattr(p, "version")
 
 
-def test_get_parser_each_parser_has_parse_callable():
-    for name in ("fallback", "kreuzberg", "markdown", "html", "text", "ipynb"):
-        p = get_parser(name)
-        assert callable(p.parse)
-
-
 def test_get_parser_fallback_default_image_output_dir_none():
     p = get_parser("fallback")
     assert p._image_output_dir is None

@@ -779,11 +779,6 @@ def test_runner_source_no_logging_fifteenth():
     assert "logger" not in source
 
 
-def test_runner_source_no_sleep_fifteenth():
-    source = inspect.getsource(rmod)
-    assert "time.sleep" not in source
-
-
 def test_runner_source_no_remove_call():
     """不调用 Path.remove()（不存在该方法）。"""
     source = inspect.getsource(rmod)
@@ -907,11 +902,6 @@ def test_module_source_unknown_error_message_batch10():
     assert "process_single returned None without errors" in source
 
 
-def test_module_source_unknown_error_code_batch10():
-    source = inspect.getsource(rmod)
-    assert '"unknown"' in source
-
-
 def test_module_source_report_dict_keys_batch10():
     source = inspect.getsource(rmod)
     for key in ['"report_version"', '"provenance"', '"devset"', '"summary"', '"per_doc"', '"expected_failures"']:
@@ -937,22 +927,8 @@ def test_module_source_no_main_block_batch10():
     assert "if __name__" not in source
 
 
-def test_module_source_no_hardcoded_absolute_path_batch10():
-    source = inspect.getsource(rmod)
-    assert "C:\\\\Users" not in source
-    assert "/Users/" not in source
-
-
 def test_module_source_docstring_mentions_pipeline_batch10():
     assert "pipeline" in rmod.__doc__.lower()
-
-
-def test_module_source_docstring_mentions_total_batch10():
-    assert "total" in rmod.__doc__
-
-
-def test_module_source_docstring_mentions_not_instrumented_batch10():
-    assert "not_instrumented" in rmod.__doc__ or "not instrumented" in rmod.__doc__.lower()
 
 
 def test_module_source_uses_per_doc_results_var_batch10():
@@ -1031,12 +1007,6 @@ def test_signature_process_one_param_count_batch10():
     assert len(sig.parameters) == 4
 
 
-def test_signature_process_one_param_names_batch10():
-    sig = inspect.signature(_process_one)
-    names = list(sig.parameters)
-    assert names == ["doc", "output_root", "parser_name", "max_chars"]
-
-
 def test_signature_process_one_param_kinds_batch10():
     sig = inspect.signature(_process_one)
     for p in sig.parameters.values():
@@ -1083,12 +1053,6 @@ def test_signature_process_one_return_annotation_str_batch10():
 def test_signature_run_evaluation_param_count_batch10():
     sig = inspect.signature(run_evaluation)
     assert len(sig.parameters) == 5
-
-
-def test_signature_run_evaluation_param_names_batch10():
-    sig = inspect.signature(run_evaluation)
-    names = list(sig.parameters)
-    assert names == ["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]
 
 
 def test_signature_run_evaluation_manifest_kind_batch10():

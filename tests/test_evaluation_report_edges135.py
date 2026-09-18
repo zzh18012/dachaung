@@ -87,23 +87,9 @@ def test_hbc_zero_participation_batch446(tmp_path):
         "not_evaluated": 2}
 
 
-def test_chunk_boundary_f1_zero_part_batch446(tmp_path):
-    s = _summary(tmp_path)
-    assert s["ratio_macro_averages"]["chunk_boundary_f1"] == {
-        "macro_average": None, "participating_docs": 0,
-        "not_evaluated": 2}
-
-
 def test_docx_locator_zero_part_batch446(tmp_path):
     s = _summary(tmp_path)
     assert s["ratio_macro_averages"]["docx_locator_valid_ratio"] == {
-        "macro_average": None, "participating_docs": 0,
-        "not_evaluated": 2}
-
-
-def test_image_ratio_zero_part_batch446(tmp_path):
-    s = _summary(tmp_path)
-    assert s["ratio_macro_averages"]["image_resource_exists_ratio"] == {
         "macro_average": None, "participating_docs": 0,
         "not_evaluated": 2}
 
@@ -123,17 +109,6 @@ def test_tpe_full_part_batch446(tmp_path):
 
 
 # ---------- 零参评下键集不收缩 ----------
-
-def test_ratio_keys_still_twelve_batch446(tmp_path):
-    s = _summary(tmp_path)
-    assert sorted(s["ratio_macro_averages"].keys()) == [
-        "chunk_boundary_f1", "chunk_boundary_precision",
-        "chunk_boundary_recall", "chunk_reference_intact_ratio",
-        "docx_locator_valid_ratio", "heading_boundary_compliance",
-        "image_resource_exists_ratio", "pdf_locator_valid_ratio",
-        "schema_valid", "text_char_multiset_precision",
-        "text_char_multiset_recall", "text_preservation_equal"]
-
 
 # ---------- per-doc 四种 null reason ----------
 
@@ -180,17 +155,6 @@ def test_counts_sum_three_part_two_batch446(tmp_path):
     s = _summary(tmp_path)
     assert s["counts"]["element_count_total"] == {
         "sum": 3, "participating_docs": 2}
-
-
-def test_success_two_of_two_batch446(tmp_path):
-    s = _summary(tmp_path)
-    assert s["success_rates"]["pipeline_success"] == {
-        "success_count": 2, "total": 2, "rate": 1.0}
-
-
-def test_silent_drop_none_batch446(tmp_path):
-    s = _summary(tmp_path)
-    assert s["silent_drop_total"] is None
 
 
 # ---------- 源码补强 ----------

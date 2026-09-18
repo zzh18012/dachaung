@@ -302,23 +302,6 @@ def test_build_devset_section_keys_all_str():
         assert isinstance(k, str)
 
 
-def test_build_devset_section_six_keys_exact_via_list():
-    out = build_devset_section(_StubManifest())
-    assert list(out.keys()) == [
-        "status",
-        "file_count",
-        "content_group_count",
-        "pdf_count",
-        "docx_count",
-        "categories_covered",
-    ]
-
-
-def test_build_devset_section_no_extra_keys():
-    out = build_devset_section(_StubManifest())
-    assert len(out) == 6
-
-
 def test_build_devset_section_status_value_type():
     out = build_devset_section(_StubManifest())
     assert isinstance(out["status"], str)

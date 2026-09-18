@@ -594,11 +594,6 @@ def test_signature_run_evaluation_tolerance_chars_default_batch30():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_signature_run_evaluation_return_dict_batch30():
-    sig = inspect.signature(run_evaluation)
-    assert "dict[str, Any]" in str(sig.return_annotation)
-
-
 # ---------- module 合理性第四十四批 ----------
 
 

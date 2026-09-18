@@ -771,43 +771,10 @@ def test_runner_source_no_forbidden_token_eighteenth_batch13(token):
     assert token not in source
 
 
-def test_runner_source_no_os_module_usage_batch13():
-    source = inspect.getsource(rmod)
-    assert "import os" not in source
-    assert "os." not in source
-
-
-def test_runner_source_no_sys_module_usage_batch13():
-    source = inspect.getsource(rmod)
-    assert "import sys" not in source
-    assert "sys." not in source
-
-
-def test_runner_source_no_logging_batch13():
-    source = inspect.getsource(rmod)
-    assert "import logging" not in source
-
-
-def test_runner_source_no_re_module_batch13():
-    source = inspect.getsource(rmod)
-    assert "import re" not in source
-    assert "re." not in source
-
-
 def test_runner_source_no_eval_call_batch13():
     source = inspect.getsource(rmod)
     assert "eval(" not in source
     assert "exec(" not in source
-
-
-def test_runner_source_no_global_keyword_batch13():
-    source = inspect.getsource(rmod)
-    assert "\nglobal " not in source
-
-
-def test_runner_source_no_nonlocal_keyword_batch13():
-    source = inspect.getsource(rmod)
-    assert "nonlocal " not in source
 
 
 def test_runner_source_no_assert_batch13():
@@ -895,11 +862,6 @@ def test_module_source_uses_json_dump_batch13():
     assert "json.dump(" in source
 
 
-def test_module_source_uses_json_load_batch13():
-    source = inspect.getsource(rmod)
-    assert "json.load(" in source
-
-
 def test_module_source_uses_ensure_ascii_false_batch13():
     source = inspect.getsource(rmod)
     assert "ensure_ascii=False" in source
@@ -924,16 +886,6 @@ def test_module_source_has_tolerance_chars_marker_batch13():
     source = inspect.getsource(rmod)
     assert "_tolerance_chars" in source
     assert "_missing_markers" in source
-
-
-def test_module_source_has_per_doc_subdir_batch13():
-    source = inspect.getsource(rmod)
-    assert '"_per_doc"' in source or "'_per_doc'" in source
-
-
-def test_module_source_has_image_output_dir_for_call_batch13():
-    source = inspect.getsource(rmod)
-    assert "image_output_dir_for(" in source
 
 
 def test_module_source_has_process_single_call_batch13():

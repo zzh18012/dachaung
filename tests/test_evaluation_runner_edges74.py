@@ -572,21 +572,6 @@ def test_source_contains_report_version_import_batch48():
     assert "REPORT_VERSION" in src
 
 
-def test_source_contains_chunk_boundary_prf_import_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "chunk_boundary_prf" in src
-
-
-def test_source_contains_figure_caption_prf_import_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "figure_caption_prf" in src
-
-
-def test_source_contains_aggregate_summary_import_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "aggregate_summary" in src
-
-
 def test_source_contains_build_provenance_import_batch48():
     src = inspect.getsource(runner_mod)
     assert "build_provenance" in src
@@ -595,11 +580,6 @@ def test_source_contains_build_provenance_import_batch48():
 def test_source_contains_build_devset_section_import_batch48():
     src = inspect.getsource(runner_mod)
     assert "build_devset_section" in src
-
-
-def test_source_contains_perf_counter_call_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "perf_counter" in src
 
 
 def test_source_contains_not_instrumented_batch48():
@@ -774,11 +754,6 @@ def test_source_no_globals_batch48():
 
 def test_source_no_os_system_batch48():
     assert "os.system" not in _src()
-
-
-def test_source_no_popen_batch48():
-    assert ".popen(" not in _src()
-    assert "Popen(" not in _src()
 
 
 def test_source_no_yaml_load_batch48():

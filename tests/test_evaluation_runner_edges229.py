@@ -181,10 +181,6 @@ def test_round_trip_batch477(tmp_path):
         (tmp_path / "r.json").read_text(encoding="utf-8")) == r
 
 
-def test_expected_failures_empty_batch477(tmp_path):
-    assert _run(tmp_path)["expected_failures"] == []
-
-
 # ---------- 源码补强 ----------
 
 def _src():

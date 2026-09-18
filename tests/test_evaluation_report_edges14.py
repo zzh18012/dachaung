@@ -549,24 +549,6 @@ def test_module_all_is_list_type():
     assert not isinstance(m.__all__, tuple)
 
 
-def test_module_all_exact_order():
-    """__all__ 顺序精确。"""
-    import evaluation.report as m
-    assert m.__all__ == [
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    ]
-
-
-def test_module_all_length_five():
-    """__all__ 5 个元素。"""
-    import evaluation.report as m
-    assert len(m.__all__) == 5
-
-
 def test_module_typing_any_in_namespace():
     """typing.Any 在模块命名空间。"""
     import evaluation.report as m

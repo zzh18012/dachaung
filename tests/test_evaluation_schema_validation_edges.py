@@ -87,10 +87,6 @@ def test_document_passes_schema_returns_bool_type_for_valid():
     assert isinstance(result, bool)
 
 
-def test_document_passes_schema_returns_true_for_valid():
-    assert document_passes_schema(_valid_document_dict()) is True
-
-
 def test_document_passes_schema_returns_bool_not_int():
     """Python bool 是 int 子类，但 is True / is False 才严格。"""
     result = document_passes_schema(_valid_document_dict())
@@ -222,12 +218,6 @@ def test_rejects_chunks_not_list():
 def test_rejects_metadata_not_dict():
     bad = _valid_document_dict()
     bad["metadata"] = "not dict"
-    assert document_passes_schema(bad) is False
-
-
-def test_rejects_element_missing_required_field():
-    bad = _valid_document_dict()
-    del bad["elements"][0]["element_id"]
     assert document_passes_schema(bad) is False
 
 

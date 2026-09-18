@@ -851,11 +851,6 @@ def test_module_source_no_compile():
     assert "compile(" not in src
 
 
-def test_module_source_no_unlink():
-    src = inspect.getsource(rmod)
-    assert "unlink" not in src
-
-
 def test_module_source_no_relative_above_evaluation():
     src = inspect.getsource(rmod)
     assert "from ." not in src

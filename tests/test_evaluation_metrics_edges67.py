@@ -50,11 +50,6 @@ def test_null_with_long_reason_batch41():
     assert len(out["reason"]) == 200
 
 
-def test_ratio_with_very_small_batch41():
-    out = _ratio(1e-10)
-    assert out["value"] == 1e-10
-
-
 def test_ratio_with_just_under_one_batch41():
     out = _ratio(0.99999)
     assert out["value"] == 0.99999
@@ -93,10 +88,6 @@ def test_ratio_with_inf_batch41():
 
 
 # ---------- _NOT_EVALUATED / _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第四十一批
-
-
-def test_not_evaluated_no_spaces_batch41():
-    assert " " not in _NOT_EVALUATED
 
 
 def test_not_evaluated_is_str_batch41():
@@ -141,15 +132,7 @@ def test_pdf_bbox_required_types_does_not_contain_header_batch41():
     assert "header" not in _PDF_BBOX_REQUIRED_TYPES
 
 
-def test_pdf_bbox_required_types_does_not_contain_footer_batch41():
-    assert "footer" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 # ---------- _is_valid_bbox 第四十一批
-
-
-def test_is_valid_bbox_callable_batch41():
-    assert callable(_is_valid_bbox)
 
 
 def test_is_valid_bbox_negative_coords_batch41():
@@ -159,10 +142,6 @@ def test_is_valid_bbox_negative_coords_batch41():
 
 def test_is_valid_bbox_huge_coords_batch41():
     assert _is_valid_bbox([0, 0, 10**6, 10**6]) is True
-
-
-def test_is_valid_bbox_float_coords_batch41():
-    assert _is_valid_bbox([0.5, 0.5, 1.5, 1.5]) is True
 
 
 def test_is_valid_bbox_mixed_int_float_batch41():
@@ -214,10 +193,6 @@ def test_is_valid_bbox_empty_tuple_batch41():
 
 
 # ---------- _strip_unicode_whitespace 第四十一批
-
-
-def test_strip_unicode_whitespace_callable_batch41():
-    assert callable(_strip_unicode_whitespace)
 
 
 def test_strip_unicode_whitespace_preserves_punctuation_batch41():
@@ -515,10 +490,6 @@ def test_chunk_reference_ratio_signature_batch41():
 # ---------- _text_preservation 第四十一批
 
 
-def test_text_preservation_callable_batch41():
-    assert callable(_text_preservation)
-
-
 def test_text_preservation_empty_batch41():
     out = _text_preservation([], [])
     # 空对空 → equal 视为 True（无差异），precision/recall null + empty_expected_and_actual
@@ -648,11 +619,6 @@ def test_silent_drop_count_extra_elements_batch41():
     expectations = {"element_count_by_type": {"paragraph": 5}}
     out = _silent_drop_count(by_type, expectations)
     assert out["value"] == 0
-
-
-def test_silent_drop_count_returns_dict_batch41():
-    out = _silent_drop_count({}, None)
-    assert isinstance(out, dict)
 
 
 def test_silent_drop_count_does_not_mutate_inputs_batch41():

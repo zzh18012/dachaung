@@ -98,10 +98,6 @@ def test_count_metrics_no_duplicates_batch32():
     assert len(_COUNT_METRICS) == len(set(_COUNT_METRICS))
 
 
-def test_count_metrics_disjoint_from_ratio_batch32():
-    assert not (set(_COUNT_METRICS) & set(_RATIO_METRICS))
-
-
 # ---------- _SUCCESS_BOOL_METRICS 第三十二批 ----------
 
 
@@ -111,10 +107,6 @@ def test_success_bool_metrics_count_one_batch32():
 
 def test_success_bool_metrics_first_is_pipeline_success_batch32():
     assert _SUCCESS_BOOL_METRICS[0] == "pipeline_success"
-
-
-def test_success_bool_metrics_disjoint_from_ratio_batch32():
-    assert not (set(_SUCCESS_BOOL_METRICS) & set(_RATIO_METRICS))
 
 
 def test_success_bool_metrics_disjoint_from_count_batch32():
@@ -474,13 +466,6 @@ def test_aggregate_summary_counts_no_participating_batch32():
     out = aggregate_summary(per_doc)
     assert out["counts"]["element_count_total"]["sum"] is None
     assert out["counts"]["element_count_total"]["participating_docs"] == 0
-
-
-def test_aggregate_summary_success_rate_with_zero_total_batch32():
-    out = aggregate_summary([])
-    assert out["success_rates"]["pipeline_success"]["success_count"] == 0
-    assert out["success_rates"]["pipeline_success"]["total"] == 0
-    assert out["success_rates"]["pipeline_success"]["rate"] is None
 
 
 def test_aggregate_summary_returns_dict_batch32():

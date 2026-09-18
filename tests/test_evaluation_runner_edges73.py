@@ -39,13 +39,6 @@ def test_load_annotation_object_with_extra_keys_batch48(tmp_path):
     assert out["key2"] == 2
 
 
-def test_load_annotation_null_json_batch48(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("null", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out is None
-
-
 def test_load_annotation_string_json_batch48(tmp_path):
     p = tmp_path / "a.json"
     p.write_text('"just a string"', encoding="utf-8")
@@ -501,11 +494,6 @@ def test_source_contains_doc_id_batch48():
     assert "doc_id" in src
 
 
-def test_source_contains_IMAGE_DIR_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "image_dir" in src
-
-
 def test_source_contains_chunk_reason_batch48():
     src = inspect.getsource(runner_mod)
     assert "chunk_reason" in src
@@ -564,13 +552,6 @@ def test_ast_run_evaluation_has_three_main_for_batch48():
     func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation"][0]
     top_fors = [n for n in func.body if isinstance(n, ast.For)]
     assert len(top_fors) == 3  # documents / expected_failures / public_per_doc
-
-
-def test_ast_run_evaluation_has_with_for_dump_batch48():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation"][0]
-    withs = [n for n in func.body if isinstance(n, ast.With)]
-    assert len(withs) == 1
 
 
 def test_ast_run_evaluation_dump_call_batch48():
@@ -669,8 +650,3 @@ def test_source_no_yaml_load_batch48():
 def test_source_no_pickle_load_batch48():
     src = inspect.getsource(runner_mod)
     assert "pickle.load(" not in src
-
-
-def test_source_no_await_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "await " not in src

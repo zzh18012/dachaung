@@ -73,11 +73,6 @@ def test_ipynb_extensions_is_tuple():
     assert isinstance(_IPYNB_EXTENSIONS, tuple)
 
 
-def test_ipynb_extensions_starts_with_dot():
-    for ext in _IPYNB_EXTENSIONS:
-        assert ext.startswith(".")
-
-
 def test_ipynb_extensions_length_one():
     assert len(_IPYNB_EXTENSIONS) == 1
 
@@ -264,11 +259,6 @@ def test_ipynb_parser_version_value():
 def test_ipynb_parser_inherits_parser():
     from app.parsers.base import Parser
     assert issubclass(IpynbParser, Parser)
-
-
-def test_ipynb_parser_init_no_args():
-    p = IpynbParser()
-    assert p is not None
 
 
 # =========================================================================

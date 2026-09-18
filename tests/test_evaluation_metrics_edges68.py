@@ -567,10 +567,6 @@ def test_ratio_int_input_converted_batch42():
     assert _ratio(1)["value"] == 1.0
 
 
-def test_bool_metric_value_is_bool_batch42():
-    assert isinstance(_bool_metric(True)["value"], bool)
-
-
 def test_bool_metric_truthy_input_batch42():
     """任何 truthy 都被 bool() 转。"""
     assert _bool_metric(1)["value"] is True
@@ -595,11 +591,6 @@ def test_int_metric_string_input_rejected_batch42():
     """int("abc") raises ValueError。"""
     with pytest.raises(ValueError):
         _int_metric("abc")
-
-
-def test_int_metric_numeric_string_accepted_batch42():
-    """int("5") = 5。"""
-    assert _int_metric("5")["value"] == 5
 
 
 # ---------- _strip_unicode_whitespace 补强 第四十二批

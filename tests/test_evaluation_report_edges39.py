@@ -147,11 +147,6 @@ def test_count_metrics_disjoint_from_success_bool_metrics_batch23():
 # ---------- get_git_provenance 第二十三批 ----------
 
 
-def test_get_git_provenance_returns_dict_batch23(tmp_path):
-    out = get_git_provenance(tmp_path)
-    assert isinstance(out, dict)
-
-
 def test_get_git_provenance_two_keys_batch23(tmp_path):
     out = get_git_provenance(tmp_path)
     assert set(out.keys()) == {"git_commit", "git_dirty"}
@@ -711,26 +706,9 @@ def test_module_source_has_subprocess_run_call_batch23():
 # ---------- signatures 第三十五批 ----------
 
 
-def test_signature_get_git_provenance_batch23():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["project_root"]
-
-
 def test_signature_get_dependency_versions_batch23():
     sig = inspect.signature(get_dependency_versions)
     assert len(sig.parameters) == 0
-
-
-def test_signature_build_provenance_batch23():
-    sig = inspect.signature(build_provenance)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == [
-        "project_root",
-        "parser_name",
-        "max_chars",
-        "parser_version",
-    ]
 
 
 def test_signature_build_provenance_parser_version_optional_batch23():
@@ -745,12 +723,6 @@ def test_signature_build_devset_section_batch23():
     params = list(sig.parameters.values())
     assert len(params) == 1
     assert params[0].name == "manifest"
-
-
-def test_signature_aggregate_summary_batch23():
-    sig = inspect.signature(aggregate_summary)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["per_doc_results"]
 
 
 # ---------- module 合理性第三十五批 ----------

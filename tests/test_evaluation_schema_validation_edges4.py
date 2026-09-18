@@ -106,10 +106,6 @@ def test_document_passes_schema_dict_with_deeply_nested_batch4():
 # ---------- document_passes_schema 行为 第四批
 
 
-def test_document_passes_schema_callable_batch4():
-    assert callable(document_passes_schema)
-
-
 def test_document_passes_schema_with_valid_minimal_doc_batch4():
     """最小合法 doc 结构（需通过 schema 校验）。
 

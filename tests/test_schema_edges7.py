@@ -599,11 +599,6 @@ def test_validate_file_missing_raises_filenotfounderror():
         validate_file("/no/such/file.json")
 
 
-def test_validate_file_directory_raises(tmp_path):
-    with pytest.raises(FileNotFoundError):
-        validate_file(tmp_path)
-
-
 def test_validate_file_invalid_json_raises(tmp_path):
     p = tmp_path / "doc.json"
     p.write_text("{not json", encoding="utf-8")
@@ -1326,11 +1321,6 @@ def test_extra_top_field_fails(default_schema, valid_doc):
 # =========================================================================
 # 模块 / Draft202012Validator 互操作
 # =========================================================================
-
-
-def test_default_schema_passes_draft202012_check():
-    schema = load_schema()
-    Draft202012Validator.check_schema(schema)
 
 
 def test_default_schema_top_required_count():

@@ -142,10 +142,6 @@ def test_text_preservation_image_content_ignored_batch52():
 
 # ---------- _is_valid_bbox ----------
 
-def test_bbox_tuple_rejected_batch52():
-    assert _is_valid_bbox((0, 0, 1, 1)) is False
-
-
 def test_bbox_string_rejected_batch52():
     assert _is_valid_bbox("0001") is False
 

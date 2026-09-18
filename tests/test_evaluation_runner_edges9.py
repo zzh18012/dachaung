@@ -105,12 +105,6 @@ def test_load_annotation_returns_nested_dict(tmp_path):
     assert result == {"a": {"b": {"c": [1, 2]}}}
 
 
-def test_load_annotation_returns_empty_dict(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text("{}", encoding="utf-8")
-    assert _load_annotation(p) == {}
-
-
 def test_load_annotation_returns_empty_list(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text("[]", encoding="utf-8")
@@ -198,12 +192,6 @@ class _FakeDocument:
 
     def to_dict(self):
         return {"source_hash": self.source_hash, "parser_version": self.parser_version}
-
-
-def test_process_one_signature():
-    sig = inspect.signature(_process_one)
-    params = list(sig.parameters)
-    assert params == ["doc", "output_root", "parser_name", "max_chars"]
 
 
 def test_process_one_returns_5_tuple(tmp_path, monkeypatch):
@@ -718,12 +706,6 @@ def test_module_docstring_mentions_constraints():
     assert "total" in doc or "perf_counter" in doc
     assert "not_instrumented" in doc
     assert "失败" in doc or "failed" in doc.lower()
-
-
-def test_module_uses_future_annotations():
-    import evaluation.runner as m
-    sig = inspect.signature(m.run_evaluation)
-    assert isinstance(sig.return_annotation, str)
 
 
 def test_module_all_entries_exported():

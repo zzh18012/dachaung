@@ -71,11 +71,6 @@ def test_git_porcelain_nonzero_rc_dirty_false_batch54(monkeypatch):
 
 # ---------- 指标集合 ----------
 
-def test_ratio_metrics_first_element_schema_valid_batch54():
-    assert _RATIO_METRICS[0] == "schema_valid"
-    assert _RATIO_METRICS[-1] == "chunk_boundary_f1"
-
-
 # ---------- 聚合补角 ----------
 
 def test_counts_multi_doc_sum_batch54():
@@ -139,10 +134,6 @@ def test_source_dirty_expression_batch54():
     src = _src()
     assert "dirty = bool(r2.returncode == 0 and r2.stdout.strip())" in src
     assert "commit = r.stdout.strip() or None" in src
-
-
-def test_source_subprocess_error_in_except_batch54():
-    assert "except (OSError, subprocess.SubprocessError):" in _src()
 
 
 # ---------- forbidden tokens 第二百零九批 ----------

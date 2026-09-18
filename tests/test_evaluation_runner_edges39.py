@@ -793,37 +793,10 @@ def test_runner_source_no_global_keyword_batch12():
     assert " global " not in source
 
 
-def test_runner_source_no_class_definition_batch12():
-    source = inspect.getsource(rmod)
-    assert "\nclass " not in source
-    assert not source.startswith("class ")
-
-
-def test_runner_source_no_assert_batch12():
-    source = inspect.getsource(rmod)
-    assert "\nassert " not in source
-    assert not source.startswith("assert ")
-
-
 def test_runner_source_uses_fstring_for_doc_id_batch12():
     """runner 使用 f-string 拼接 doc_id 路径。"""
     source = inspect.getsource(rmod)
     assert 'f"{doc.doc_id}.json"' in source or 'f"{ef.doc_id}.json"' in source
-
-
-def test_runner_source_no_format_method_batch12():
-    source = inspect.getsource(rmod)
-    assert ".format(" not in source
-
-
-def test_runner_source_no_while_loop_batch12():
-    source = inspect.getsource(rmod)
-    assert "while " not in source
-
-
-def test_runner_source_no_sys_exit_batch12():
-    source = inspect.getsource(rmod)
-    assert "sys.exit" not in source
 
 
 def test_runner_source_no_check_output_batch12():
@@ -884,24 +857,9 @@ def test_module_source_imports_pipeline_helpers_batch12():
     assert "from app.pipeline import image_output_dir_for, process_single" in source
 
 
-def test_module_source_imports_annotation_metrics_batch12():
-    source = inspect.getsource(rmod)
-    assert "from evaluation.annotation_metrics import" in source
-    assert "chunk_boundary_prf" in source
-    assert "figure_caption_prf" in source
-
-
 def test_module_source_imports_metrics_compute_batch12():
     source = inspect.getsource(rmod)
     assert "from evaluation.metrics import compute_automatic_metrics" in source
-
-
-def test_module_source_imports_report_helpers_batch12():
-    source = inspect.getsource(rmod)
-    assert "from evaluation.report import" in source
-    assert "aggregate_summary" in source
-    assert "build_devset_section" in source
-    assert "build_provenance" in source
 
 
 def test_module_source_imports_report_version_batch12():
@@ -1005,36 +963,6 @@ def test_signature_run_evaluation_keyword_only_after_marker_batch12():
         assert p.kind == inspect.Parameter.KEYWORD_ONLY
 
 
-def test_signature_run_evaluation_manifest_positional_batch12():
-    sig = inspect.signature(run_evaluation)
-    p = sig.parameters["manifest"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_run_evaluation_output_path_positional_batch12():
-    sig = inspect.signature(run_evaluation)
-    p = sig.parameters["output_path"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_run_evaluation_default_parser_name_batch12():
-    sig = inspect.signature(run_evaluation)
-    p = sig.parameters["parser_name"]
-    assert p.default == "fallback"
-
-
-def test_signature_run_evaluation_default_max_chars_batch12():
-    sig = inspect.signature(run_evaluation)
-    p = sig.parameters["max_chars"]
-    assert p.default == 800
-
-
-def test_signature_run_evaluation_default_tolerance_chars_batch12():
-    sig = inspect.signature(run_evaluation)
-    p = sig.parameters["tolerance_chars"]
-    assert p.default == 30
-
-
 def test_signature_run_evaluation_manifest_no_annotation_batch12():
     """manifest 无类型注解（运行时类型）。"""
     sig = inspect.signature(run_evaluation)
@@ -1065,13 +993,6 @@ def test_all_functions_no_var_kwargs_batch12():
 
 def test_module_name_evaluation_runner_batch12():
     assert rmod.__name__ == "evaluation.runner"
-
-
-def test_module_dunder_file_endswith_runner_py_batch12():
-    sep = os.sep
-    assert rmod.__file__.endswith("evaluation" + sep + "runner.py") or rmod.__file__.endswith(
-        "evaluation/runner.py"
-    )
 
 
 def test_module_user_function_count_3_batch12():

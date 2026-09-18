@@ -511,14 +511,6 @@ def test_signature_run_evaluation_manifest_param_batch31():
     assert "manifest" in sig.parameters
 
 
-def test_signature_run_evaluation_keyword_only_batch31():
-    """parser_name / max_chars / tolerance_chars 是 keyword-only。"""
-    sig = inspect.signature(run_evaluation)
-    assert sig.parameters["parser_name"].kind == inspect.Parameter.KEYWORD_ONLY
-    assert sig.parameters["max_chars"].kind == inspect.Parameter.KEYWORD_ONLY
-    assert sig.parameters["tolerance_chars"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
 def test_signature_run_evaluation_defaults_batch31():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["parser_name"].default == "fallback"

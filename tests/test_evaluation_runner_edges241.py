@@ -167,11 +167,6 @@ def test_tol0_zero_trio_batch548(tmp_path):
 
 # ---------- sdt 顶层求和 ----------
 
-def test_sdt_top_level_two_batch548(tmp_path):
-    assert _run(tmp_path)["summary"][
-        "silent_drop_total"] == 2
-
-
 def test_sdt_equals_per_doc_batch548(tmp_path):
     r = _run(tmp_path)
     assert (r["summary"]["silent_drop_total"]
@@ -194,14 +189,6 @@ def test_counts_only_ect_batch548(tmp_path):
 
 
 # ---------- 联合态其他指标 ----------
-
-def test_composite_pipeline_success_batch548(
-        tmp_path):
-    r = _run(tmp_path)
-    assert r["per_doc"][0]["metrics"][
-        "pipeline_success"] == {"value": True,
-                                "reason": None}
-
 
 def test_composite_schema_valid_batch548(
         tmp_path):

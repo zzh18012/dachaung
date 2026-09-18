@@ -524,16 +524,6 @@ def test_run_evaluation_no_docs_batch45(tmp_path):
 
 # ---------- module source ----------
 
-def test_module_source_contains_run_evaluation_doc_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "跑评测主流程" in src
-
-
-def test_module_source_contains_process_one_doc_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "跑 process_single" in src
-
-
 def test_module_source_contains_not_instrumented_batch45():
     src = inspect.getsource(runner_mod)
     assert "not_instrumented" in src
@@ -547,16 +537,6 @@ def test_module_source_contains_process_single_import_batch45():
 def test_module_source_contains_metrics_import_batch45():
     src = inspect.getsource(runner_mod)
     assert "from evaluation.metrics import compute_automatic_metrics" in src
-
-
-def test_module_source_contains_report_import_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation.report import" in src
-
-
-def test_module_source_contains_annotation_metrics_import_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation.annotation_metrics import" in src
 
 
 def test_module_source_contains_per_doc_subdir_batch45():

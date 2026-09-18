@@ -283,11 +283,6 @@ def test_is_valid_bbox_negative_accepted_batch52():
     assert _is_valid_bbox([-10, -10, 0, 0]) is True
 
 
-def test_is_valid_bbox_tuple_rejected_batch52():
-    """tuple 不是 list。"""
-    assert _is_valid_bbox((0, 0, 10, 10)) is False
-
-
 # ---------- _image_resource_ratio 更深 ----------
 
 def test_image_resource_ratio_no_image_elements_batch52():
@@ -611,20 +606,10 @@ def test_null_returns_proper_dict_batch52():
     assert out == {"value": None, "reason": "reason_x"}
 
 
-def test_ratio_returns_proper_dict_batch52():
-    out = _ratio(0.5)
-    assert out == {"value": 0.5, "reason": None}
-
-
 def test_bool_metric_converts_to_bool_batch52():
     out = _bool_metric(1)  # int → bool
     assert isinstance(out["value"], bool)
     assert out["value"] is True
-
-
-def test_int_metric_returns_proper_dict_batch52():
-    out = _int_metric(42)
-    assert out == {"value": 42, "reason": None}
 
 
 def test_int_metric_converts_to_int_batch52():
@@ -661,11 +646,6 @@ def test_source_pdf_bbox_required_is_tuple_batch52():
 
 def test_source_not_evaluated_value_batch52():
     assert _NOT_EVALUATED == "not_evaluated"
-
-
-def test_source_future_annotations_import_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert "from __future__ import annotations" in src
 
 
 def test_source_math_import_batch52():
@@ -708,11 +688,6 @@ def test_source_pdf_bbox_required_definition_batch52():
     assert '_PDF_BBOX_REQUIRED_TYPES = ("heading"' in src
 
 
-def test_source_not_evaluated_definition_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '_NOT_EVALUATED = "not_evaluated"' in src
-
-
 def test_source_compute_metrics_signature_batch52():
     src = inspect.getsource(metrics_mod)
     assert "def compute_automatic_metrics(" in src
@@ -728,30 +703,12 @@ def test_source_compute_metrics_uses_lazy_schema_import_batch52():
     assert "from evaluation.schema_validation import document_passes_schema" in src
 
 
-def test_source_all_has_only_compute_metrics_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert '__all__ = ["compute_automatic_metrics"]' in src
-
-
 # ---------- AST 结构补强 ----------
 
 def test_ast_has_14_functions_batch52():
     tree = ast.parse(inspect.getsource(metrics_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 14
-
-
-def test_ast_function_names_order_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == [
-        "_null", "_ratio", "_bool_metric", "_int_metric",
-        "compute_automatic_metrics",
-        "_pdf_locator_ratio", "_docx_locator_ratio", "_is_valid_bbox",
-        "_image_resource_ratio", "_chunk_reference_ratio",
-        "_strip_unicode_whitespace", "_text_preservation",
-        "_heading_boundary_ratio", "_silent_drop_count",
-    ]
 
 
 def test_ast_no_class_def_batch52():
@@ -829,13 +786,6 @@ def test_ast_image_resource_ratio_has_2_for_loops_batch52():
     assert len(fors) == 2  # for img in images + for p in candidates
 
 
-def test_ast_image_resource_ratio_has_try_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_image_resource_ratio")
-    trys = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
-    assert len(trys) == 1
-
-
 def test_ast_chunk_reference_ratio_has_for_loop_batch52():
     tree = ast.parse(inspect.getsource(metrics_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_chunk_reference_ratio")
@@ -905,37 +855,9 @@ def test_ast_compute_metrics_has_multiple_metric_assigns_batch52():
     assert len(metric_assigns) >= 14
 
 
-def test_ast_no_star_import_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    for n in tree.body:
-        if isinstance(n, ast.ImportFrom):
-            for alias in n.names:
-                assert alias.name != "*"
-
-
 def test_ast_no_global_nonlocal_batch52():
     tree = ast.parse(inspect.getsource(metrics_mod))
     assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
-
-
-def test_ast_no_with_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert not any(isinstance(n, ast.With) for n in ast.walk(tree))
-
-
-def test_ast_no_while_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert not any(isinstance(n, ast.While) for n in ast.walk(tree))
-
-
-def test_ast_no_raise_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert not any(isinstance(n, ast.Raise) for n in ast.walk(tree))
-
-
-def test_ast_no_delete_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert not any(isinstance(n, ast.Delete) for n in ast.walk(tree))
 
 
 # ---------- forbidden tokens 第一百五十一批 ----------

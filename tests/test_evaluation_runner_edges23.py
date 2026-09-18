@@ -810,11 +810,6 @@ def test_module_source_no_functools_module():
     assert "\nimport functools" not in src
 
 
-def test_module_source_no_relative_import():
-    src = inspect.getsource(rmod)
-    assert "from ." not in src
-
-
 def test_module_source_no_class_def():
     src = inspect.getsource(rmod)
     assert "\nclass " not in src

@@ -323,11 +323,6 @@ def test_make_document_id_length_exactly_20():
     assert len(make_document_id(sha)) == 20
 
 
-def test_make_document_id_deterministic_same_input():
-    sha = "a" * 64
-    assert make_document_id(sha) == make_document_id(sha)
-
-
 def test_make_document_id_different_hashes_different_ids():
     sha1 = "a" * 64
     sha2 = "b" * 64
@@ -376,11 +371,6 @@ def test_make_document_id_raises_on_short_hash_length_63():
         make_document_id("a" * 63)
 
 
-def test_make_document_id_raises_on_long_hash_length_65():
-    with pytest.raises(ValueError):
-        make_document_id("a" * 65)
-
-
 def test_make_document_id_raises_on_empty_string():
     with pytest.raises(ValueError):
         make_document_id("")
@@ -390,12 +380,6 @@ def test_make_document_id_raises_value_error_type():
     with pytest.raises(ValueError) as exc:
         make_document_id("a" * 63)
     assert isinstance(exc.value, ValueError)
-
-
-def test_make_document_id_error_message_contains_length():
-    with pytest.raises(ValueError) as exc:
-        make_document_id("a" * 63)
-    assert "63" in str(exc.value)
 
 
 def test_make_document_id_error_message_contains_source_hash():
@@ -409,14 +393,6 @@ def test_make_document_id_callable():
 
 
 # ---------- detect_source_type 边界 ----------
-
-
-def test_detect_source_type_pdf_value():
-    assert detect_source_type("x.pdf") == "pdf"
-
-
-def test_detect_source_type_docx_value():
-    assert detect_source_type("x.docx") == "docx"
 
 
 def test_detect_source_type_uppercase_pdf():
@@ -433,10 +409,6 @@ def test_detect_source_type_mixed_case_pdf():
 
 def test_detect_source_type_mixed_case_docx():
     assert detect_source_type("x.DoCx") == "docx"
-
-
-def test_detect_source_type_path_object_accepted():
-    assert detect_source_type(Path("x.pdf")) == "pdf"
 
 
 def test_detect_source_type_returns_str_type():
@@ -534,14 +506,6 @@ def test_parser_has_abstract_method_parse():
 
 def test_parser_default_version_value():
     assert Parser.version == "0.0.0"
-
-
-def test_parser_default_name_is_str_type():
-    assert isinstance(Parser.name, str)
-
-
-def test_parser_default_version_is_str_type():
-    assert isinstance(Parser.version, str)
 
 
 def test_parser_cannot_be_instantiated_directly():

@@ -767,11 +767,6 @@ def test_module_source_contains_counter_keyword_batch38():
     assert "Counter" in src
 
 
-def test_module_source_contains_text_preservation_v11_keyword_batch38():
-    src = inspect.getsource(mmod)
-    assert "v1.1" in src
-
-
 def test_module_source_contains_text_preservation_section_batch38():
     src = inspect.getsource(mmod)
     assert "text_preservation 语义" in src

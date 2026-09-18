@@ -48,11 +48,6 @@ def test_load_annotation_param_kind_batch43():
     assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_load_annotation_return_annotation_batch43():
-    sig = inspect.signature(_load_annotation)
-    assert "dict" in str(sig.return_annotation) or "None" in str(sig.return_annotation)
-
-
 # ---------- _load_annotation 行为 ----------
 
 def test_load_annotation_none_returns_none_batch43():
@@ -94,13 +89,6 @@ def test_load_annotation_oserror_returns_none_batch43(tmp_path):
 def test_load_annotation_uses_utf8_encoding_batch43():
     src = inspect.getsource(_load_annotation)
     assert 'encoding="utf-8"' in src
-
-
-def test_load_annotation_catches_jsondecode_batch43(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("not json", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out is None
 
 
 def test_load_annotation_returns_dict_type_batch43(tmp_path):

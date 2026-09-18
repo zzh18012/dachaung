@@ -296,13 +296,6 @@ def test_build_devset_section_keys_count_6_batch17():
     assert len(r) == 6
 
 
-def test_build_devset_section_keys_correct_batch17():
-    r = build_devset_section(_mk_manifest())
-    expected = {"status", "file_count", "content_group_count",
-                "pdf_count", "docx_count", "categories_covered"}
-    assert set(r.keys()) == expected
-
-
 def test_build_devset_section_status_string_batch17():
     m = _mk_manifest()
     m.devset_status = "complete"
@@ -436,19 +429,9 @@ def test_aggregate_summary_ratio_macro_only_one_participant_batch17():
     assert s["ratio_macro_averages"]["schema_valid"]["not_evaluated"] == 2
 
 
-def test_aggregate_summary_count_keys_match_count_metrics_batch17():
-    s = aggregate_summary([])
-    assert set(s["counts"].keys()) == set(_COUNT_METRICS)
-
-
 def test_aggregate_summary_ratio_keys_match_ratio_metrics_batch17():
     s = aggregate_summary([])
     assert set(s["ratio_macro_averages"].keys()) == set(_RATIO_METRICS)
-
-
-def test_aggregate_summary_success_keys_match_success_metrics_batch17():
-    s = aggregate_summary([])
-    assert set(s["success_rates"].keys()) == set(_SUCCESS_BOOL_METRICS)
 
 
 # ---------- module source forbidden tokens 第三十三批 ----------
@@ -573,12 +556,6 @@ def test_signature_build_devset_section_batch17():
 def test_signature_aggregate_summary_batch17():
     sig = inspect.signature(aggregate_summary)
     assert list(sig.parameters.keys()) == ["per_doc_results"]
-
-
-def test_signature_build_provenance_no_varargs_batch17():
-    sig = inspect.signature(build_provenance)
-    for p in sig.parameters.values():
-        assert p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)
 
 
 # ---------- module 合理性第三十批 ----------

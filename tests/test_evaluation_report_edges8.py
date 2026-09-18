@@ -161,28 +161,6 @@ def test_aggregate_summary_ratio_macro_average_none_for_empty():
         assert result["ratio_macro_averages"][name]["not_evaluated"] == 0
 
 
-def test_aggregate_summary_count_sum_aggregates_correctly():
-    per_doc = [
-        {"metrics": {"element_count_total": {"value": 10}}},
-        {"metrics": {"element_count_total": {"value": 20}}},
-        {"metrics": {"element_count_total": {"value": 30}}},
-    ]
-    result = aggregate_summary(per_doc)
-    assert result["counts"]["element_count_total"]["sum"] == 60
-    assert result["counts"]["element_count_total"]["participating_docs"] == 3
-
-
-def test_aggregate_summary_count_skips_none_values():
-    per_doc = [
-        {"metrics": {"element_count_total": {"value": 10}}},
-        {"metrics": {"element_count_total": {"value": None}}},
-        {"metrics": {"element_count_total": {"value": 30}}},
-    ]
-    result = aggregate_summary(per_doc)
-    assert result["counts"]["element_count_total"]["sum"] == 40
-    assert result["counts"]["element_count_total"]["participating_docs"] == 2
-
-
 def test_aggregate_summary_count_skips_missing_metric():
     per_doc = [
         {"metrics": {"element_count_total": {"value": 10}}},
@@ -192,41 +170,6 @@ def test_aggregate_summary_count_skips_missing_metric():
     result = aggregate_summary(per_doc)
     assert result["counts"]["element_count_total"]["sum"] == 40
     assert result["counts"]["element_count_total"]["participating_docs"] == 2
-
-
-def test_aggregate_summary_success_rate_all_success():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": True}}},
-        {"metrics": {"pipeline_success": {"value": True}}},
-    ]
-    result = aggregate_summary(per_doc)
-    sr = result["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 2
-    assert sr["total"] == 2
-    assert sr["rate"] == 1.0
-
-
-def test_aggregate_summary_success_rate_half():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": True}}},
-        {"metrics": {"pipeline_success": {"value": False}}},
-    ]
-    result = aggregate_summary(per_doc)
-    sr = result["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 1
-    assert sr["total"] == 2
-    assert sr["rate"] == 0.5
-
-
-def test_aggregate_summary_success_rate_no_success():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": False}}},
-        {"metrics": {"pipeline_success": {"value": False}}},
-    ]
-    result = aggregate_summary(per_doc)
-    sr = result["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 0
-    assert sr["rate"] == 0.0
 
 
 def test_aggregate_summary_success_rate_skips_none():
@@ -406,11 +349,6 @@ def test_get_dependency_versions_python_docx_in_dev_env():
     assert result["python-docx"] is not None
 
 
-def test_get_dependency_versions_signature():
-    sig = inspect.signature(get_dependency_versions)
-    assert list(sig.parameters) == []
-
-
 # =========================================================================
 # build_provenance 深度
 # =========================================================================
@@ -541,11 +479,6 @@ class _FakeManifest:
         self.categories_covered = categories_covered or []
 
 
-def test_build_devset_section_status_propagated():
-    m = _FakeManifest(devset_status="complete")
-    assert build_devset_section(m)["status"] == "complete"
-
-
 def test_build_devset_section_content_group_count_propagated():
     m = _FakeManifest(content_group_count=10)
     assert build_devset_section(m)["content_group_count"] == 10
@@ -556,19 +489,9 @@ def test_build_devset_section_pdf_count_propagated():
     assert build_devset_section(m)["pdf_count"] == 5
 
 
-def test_build_devset_section_docx_count_propagated():
-    m = _FakeManifest(docx_count=7)
-    assert build_devset_section(m)["docx_count"] == 7
-
-
 def test_build_devset_section_categories_covered_propagated():
     m = _FakeManifest(categories_covered=["pdf", "docx"])
     assert build_devset_section(m)["categories_covered"] == ["pdf", "docx"]
-
-
-def test_build_devset_section_empty_categories():
-    m = _FakeManifest(categories_covered=[])
-    assert build_devset_section(m)["categories_covered"] == []
 
 
 def test_build_devset_section_calls_properties():
@@ -616,11 +539,6 @@ def test_module_all_exact():
 def test_module_all_is_list():
     import evaluation.report as m
     assert isinstance(m.__all__, list)
-
-
-def test_module_all_no_duplicates():
-    import evaluation.report as m
-    assert len(m.__all__) == len(set(m.__all__))
 
 
 def test_module_imports_subprocess():

@@ -61,16 +61,6 @@ def test_get_git_provenance_source_docstring_mentions_dirty():
     assert "dirty" in src
 
 
-def test_get_git_provenance_source_uses_commit_init_none():
-    src = inspect.getsource(get_git_provenance)
-    assert "commit: str | None = None" in src
-
-
-def test_get_git_provenance_source_uses_dirty_init_true():
-    src = inspect.getsource(get_git_provenance)
-    assert "dirty: bool = True" in src
-
-
 def test_get_git_provenance_source_two_subprocess_calls():
     src = inspect.getsource(get_git_provenance)
     assert src.count("subprocess.run(") == 2
@@ -102,30 +92,10 @@ def test_get_git_provenance_source_first_call_assigns_commit():
     assert "commit = r.stdout.strip() or None" in src
 
 
-def test_get_git_provenance_source_dirty_assignment():
-    src = inspect.getsource(get_git_provenance)
-    assert "dirty = bool(r2.returncode == 0 and r2.stdout.strip())" in src
-
-
-def test_get_git_provenance_source_except_oserror_subprocess_error():
-    src = inspect.getsource(get_git_provenance)
-    assert "except (OSError, subprocess.SubprocessError):" in src
-
-
 def test_get_git_provenance_source_except_body():
     src = inspect.getsource(get_git_provenance)
     assert "commit = None" in src
     assert "dirty = True" in src
-
-
-def test_get_git_provenance_source_return_dict_literal():
-    src = inspect.getsource(get_git_provenance)
-    assert 'return {"git_commit": commit, "git_dirty": dirty}' in src
-
-
-def test_get_git_provenance_source_uses_returncode_check():
-    src = inspect.getsource(get_git_provenance)
-    assert "if r.returncode == 0:" in src
 
 
 def test_get_git_provenance_source_no_eval():
@@ -176,21 +146,6 @@ def test_get_dependency_versions_source_docstring_mentions_importlib():
     assert "importlib" in src
 
 
-def test_get_dependency_versions_source_lazy_import_in_body():
-    src = inspect.getsource(get_dependency_versions)
-    assert "import importlib.metadata" in src
-
-
-def test_get_dependency_versions_source_versions_dict_init():
-    src = inspect.getsource(get_dependency_versions)
-    assert "versions: dict[str, str | None] = {}" in src
-
-
-def test_get_dependency_versions_source_for_pkg_in_tuple():
-    src = inspect.getsource(get_dependency_versions)
-    assert 'for pkg in ("pdfplumber", "python-docx", "pypdfium2"):' in src
-
-
 def test_get_dependency_versions_source_try_block():
     src = inspect.getsource(get_dependency_versions)
     assert "try:" in src
@@ -201,11 +156,6 @@ def test_get_dependency_versions_source_package_not_found_except():
     src = inspect.getsource(get_dependency_versions)
     assert "except importlib.metadata.PackageNotFoundError:" in src
     assert "versions[pkg] = None" in src
-
-
-def test_get_dependency_versions_source_generic_except():
-    src = inspect.getsource(get_dependency_versions)
-    assert "except Exception:" in src
 
 
 def test_get_dependency_versions_source_no_eval():
@@ -237,11 +187,6 @@ def test_build_provenance_source_docstring_present():
     assert "def build_provenance(" in src
 
 
-def test_build_provenance_source_uses_git_eq_get_git_provenance():
-    src = inspect.getsource(build_provenance)
-    assert 'git = get_git_provenance(project_root)' in src
-
-
 def test_build_provenance_source_returns_dict_with_9_keys():
     src = inspect.getsource(build_provenance)
     assert '"git_commit": git["git_commit"]' in src
@@ -253,11 +198,6 @@ def test_build_provenance_source_returns_dict_with_9_keys():
     assert '"dependencies": get_dependency_versions()' in src
     assert '"max_chars": int(max_chars)' in src
     assert '"run_timestamp_iso": datetime.now().astimezone().isoformat()' in src
-
-
-def test_build_provenance_source_no_eval():
-    src = inspect.getsource(build_provenance)
-    assert "eval(" not in src
 
 
 def test_build_provenance_source_no_class():
@@ -318,11 +258,6 @@ def test_build_devset_section_source_uses_categories_covered():
     assert '"categories_covered": manifest.categories_covered' in src
 
 
-def test_build_devset_section_source_no_eval():
-    src = inspect.getsource(build_devset_section)
-    assert "eval(" not in src
-
-
 def test_build_devset_section_source_no_class():
     src = inspect.getsource(build_devset_section)
     assert "class " not in src
@@ -346,11 +281,6 @@ def test_aggregate_summary_source_docstring_mentions_聚合():
     assert "聚合" in src
 
 
-def test_aggregate_summary_source_uses_counts_dict_init():
-    src = inspect.getsource(aggregate_summary)
-    assert "counts: dict[str, Any] = {}" in src
-
-
 def test_aggregate_summary_source_uses_values_list_comprehension_counts():
     src = inspect.getsource(aggregate_summary)
     assert 'values = [' in src
@@ -370,30 +300,10 @@ def test_aggregate_summary_source_counts_else_branch():
     assert 'counts[name] = {"sum": None, "participating_docs": 0}' in src
 
 
-def test_aggregate_summary_source_summary_counts_assignment():
-    src = inspect.getsource(aggregate_summary)
-    assert 'summary["counts"] = counts' in src
-
-
-def test_aggregate_summary_source_success_rates_dict_init():
-    src = inspect.getsource(aggregate_summary)
-    assert "success_rates: dict[str, Any] = {}" in src
-
-
 def test_aggregate_summary_source_success_count_sum():
     src = inspect.getsource(aggregate_summary)
     assert "successes = sum(" in src
     assert "if r[\"metrics\"].get(name, {}).get(\"value\") is True" in src
-
-
-def test_aggregate_summary_source_total_eq_len_per_doc():
-    src = inspect.getsource(aggregate_summary)
-    assert "total = len(per_doc_results)" in src
-
-
-def test_aggregate_summary_source_rate_calc():
-    src = inspect.getsource(aggregate_summary)
-    assert "rate = (successes / total) if total else None" in src
 
 
 def test_aggregate_summary_source_success_rates_assignment():
@@ -402,26 +312,6 @@ def test_aggregate_summary_source_success_rates_assignment():
     assert '"success_count": successes' in src
     assert '"total": total' in src
     assert '"rate": rate' in src
-
-
-def test_aggregate_summary_source_summary_success_rates():
-    src = inspect.getsource(aggregate_summary)
-    assert 'summary["success_rates"] = success_rates' in src
-
-
-def test_aggregate_summary_source_ratio_avgs_init():
-    src = inspect.getsource(aggregate_summary)
-    assert "ratio_avgs: dict[str, Any] = {}" in src
-
-
-def test_aggregate_summary_source_not_eval_calc():
-    src = inspect.getsource(aggregate_summary)
-    assert "not_eval = len(per_doc_results) - len(values)" in src
-
-
-def test_aggregate_summary_source_macro_average_calc():
-    src = inspect.getsource(aggregate_summary)
-    assert "macro = sum(values) / len(values)" in src
 
 
 def test_aggregate_summary_source_macro_else_none():
@@ -435,22 +325,6 @@ def test_aggregate_summary_source_ratio_avgs_assignment():
     assert '"macro_average": macro' in src
     assert '"participating_docs": len(values)' in src
     assert '"not_evaluated": not_eval' in src
-
-
-def test_aggregate_summary_source_summary_ratio_macro():
-    src = inspect.getsource(aggregate_summary)
-    assert 'summary["ratio_macro_averages"] = ratio_avgs' in src
-
-
-def test_aggregate_summary_source_silent_vals_list():
-    src = inspect.getsource(aggregate_summary)
-    assert "silent_vals = [" in src
-    assert 'r["metrics"].get("silent_drop_count", {}).get("value")' in src
-
-
-def test_aggregate_summary_source_silent_drop_total():
-    src = inspect.getsource(aggregate_summary)
-    assert 'summary["silent_drop_total"] = sum(silent_vals) if silent_vals else None' in src
 
 
 def test_aggregate_summary_source_no_eval():
@@ -964,18 +838,6 @@ def test_report_source_no_forbidden_token_eighth(token):
 
 def test_module_source_docstring_present():
     assert rmod.__doc__ is not None
-
-
-def test_module_source_docstring_mentions_provenance():
-    assert "provenance" in rmod.__doc__.lower()
-
-
-def test_module_source_docstring_mentions_devset():
-    assert "devset" in rmod.__doc__.lower()
-
-
-def test_module_source_docstring_mentions_summary():
-    assert "summary" in rmod.__doc__.lower()
 
 
 def test_module_source_docstring_mentions_per_doc():

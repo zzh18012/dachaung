@@ -86,11 +86,6 @@ def test_ratio_metrics_does_not_contain_pipeline_success_batch21():
 # ---------- get_git_provenance 边界第二十一批 ----------
 
 
-def test_get_git_provenance_returns_dict_keys_2_batch21(tmp_path):
-    result = get_git_provenance(tmp_path)
-    assert len(result) == 2
-
-
 def test_get_git_provenance_keys_exact_batch21(tmp_path):
     result = get_git_provenance(tmp_path)
     assert set(result.keys()) == {"git_commit", "git_dirty"}
@@ -211,11 +206,6 @@ def test_build_provenance_evaluator_version_constant_value_batch21(tmp_path):
     """evaluator_version 来自 EVALUATOR_VERSION（不应硬编码）。"""
     p = build_provenance(tmp_path, "fallback", 800, None)
     assert p["evaluator_version"] == EVALUATOR_VERSION
-
-
-def test_build_provenance_report_version_constant_value_batch21(tmp_path):
-    p = build_provenance(tmp_path, "fallback", 800, None)
-    assert p["report_version"] == REPORT_VERSION
 
 
 # ---------- build_devset_section 边界第二十一批 ----------
@@ -537,24 +527,10 @@ def test_module_source_has_timeout_10_batch21():
 # ---------- signatures 第三十一批 ----------
 
 
-def test_signature_get_git_provenance_batch21():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters.values())
-    names = [p.name for p in params]
-    assert names == ["project_root"]
-
-
 def test_signature_get_dependency_versions_batch21():
     sig = inspect.signature(get_dependency_versions)
     params = list(sig.parameters.values())
     assert len(params) == 0
-
-
-def test_signature_build_provenance_batch21():
-    sig = inspect.signature(build_provenance)
-    params = list(sig.parameters.values())
-    names = [p.name for p in params]
-    assert names == ["project_root", "parser_name", "max_chars", "parser_version"]
 
 
 def test_signature_build_provenance_no_defaults_batch21():
@@ -563,13 +539,6 @@ def test_signature_build_provenance_no_defaults_batch21():
     params = list(sig.parameters.values())
     for p in params:
         assert p.default is inspect.Parameter.empty
-
-
-def test_signature_aggregate_summary_batch21():
-    sig = inspect.signature(aggregate_summary)
-    params = list(sig.parameters.values())
-    names = [p.name for p in params]
-    assert names == ["per_doc_results"]
 
 
 # ---------- module 合理性 第三十一批 ----------
@@ -581,11 +550,6 @@ def test_module_has_all_attribute_batch21():
 
 def test_module_all_count_5_batch21():
     assert len(rmod.__all__) == 5
-
-
-def test_module_all_entries_are_strings_batch21():
-    for n in rmod.__all__:
-        assert isinstance(n, str)
 
 
 def test_module_does_not_import_app_pipeline_batch21():
@@ -606,11 +570,6 @@ def test_module_does_not_import_evaluation_cli_batch21():
 def test_module_does_not_import_evaluation_annotation_metrics_batch21():
     src = inspect.getsource(rmod)
     assert "from evaluation.annotation_metrics" not in src
-
-
-def test_module_constants_not_in_all_batch21():
-    for k in ("_RATIO_METRICS", "_COUNT_METRICS", "_SUCCESS_BOOL_METRICS"):
-        assert k not in rmod.__all__
 
 
 def test_module_no_main_block_batch21():
@@ -680,14 +639,6 @@ def test_e2e_build_devset_with_full_categories_batch21():
     out = build_devset_section(m)
     assert out["status"] == "complete"
     assert out["categories_covered"] == ["pdf", "docx", "table_heavy"]
-
-
-def test_e2e_get_git_provenance_with_mocked_full_success_batch21(tmp_path):
-    fake_ok1 = MagicMock(returncode=0, stdout="abc123\n", stderr="")
-    fake_ok2 = MagicMock(returncode=0, stdout="M file.txt\n", stderr="")
-    with patch("subprocess.run", side_effect=[fake_ok1, fake_ok2]):
-        out = get_git_provenance(tmp_path)
-    assert out == {"git_commit": "abc123", "git_dirty": True}
 
 
 def test_e2e_pipeline_combined_batch21(tmp_path):

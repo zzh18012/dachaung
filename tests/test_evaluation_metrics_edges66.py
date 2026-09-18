@@ -193,12 +193,6 @@ def test_strip_whitespace_returns_str_batch40():
 # ---------- _pdf_locator_ratio 第四十批
 
 
-def test_pdf_locator_with_string_page_batch40():
-    elements = [{"type": "table", "source_locator": {"page": "1"}}]
-    m = _pdf_locator_ratio(elements)
-    assert m["value"] == 0.0
-
-
 def test_pdf_locator_with_float_page_batch40():
     elements = [{"type": "table", "source_locator": {"page": 1.0}}]
     m = _pdf_locator_ratio(elements)
@@ -210,13 +204,6 @@ def test_pdf_locator_with_bool_true_page_batch40():
     elements = [{"type": "table", "source_locator": {"page": True}}]
     m = _pdf_locator_ratio(elements)
     assert m["value"] == 1.0
-
-
-def test_pdf_locator_with_bool_false_page_batch40():
-    """page=False == 0 → False < 1 → invalid。"""
-    elements = [{"type": "table", "source_locator": {"page": False}}]
-    m = _pdf_locator_ratio(elements)
-    assert m["value"] == 0.0
 
 
 def test_pdf_locator_negative_page_batch40():
@@ -266,13 +253,6 @@ def test_docx_locator_all_invalid_returns_zero_batch40():
     assert m["value"] == 0.0
 
 
-def test_docx_locator_does_not_mutate_input_batch40():
-    elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 0}}]
-    before = str(elements)
-    _docx_locator_ratio(elements)
-    assert str(elements) == before
-
-
 def test_docx_locator_dict_has_value_reason_batch40():
     elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 0}}]
     m = _docx_locator_ratio(elements)
@@ -287,13 +267,6 @@ def test_image_resource_no_images_returns_null_batch40():
     m = _image_resource_ratio([{"type": "paragraph"}], None)
     assert m["value"] is None
     assert m["reason"] == "no_image_elements"
-
-
-def test_image_resource_does_not_mutate_input_batch40():
-    elements = [{"type": "image", "resource_path": "x.png"}]
-    before = str(elements)
-    _image_resource_ratio(elements, None)
-    assert str(elements) == before
 
 
 def test_image_resource_dict_has_value_reason_batch40(tmp_path):
@@ -338,16 +311,6 @@ def test_chunk_reference_value_zero_when_no_valid_chunks_batch40():
 
 def test_text_preservation_callable_batch40():
     assert callable(_text_preservation)
-
-
-def test_text_preservation_does_not_mutate_inputs_batch40():
-    elements = [{"type": "paragraph", "content": "abc"}]
-    chunks = [{"text": "abc"}]
-    e_before = str(elements)
-    c_before = str(chunks)
-    _text_preservation(elements, chunks)
-    assert str(elements) == e_before
-    assert str(chunks) == c_before
 
 
 def test_text_preservation_with_image_only_batch40():
@@ -408,11 +371,6 @@ def test_silent_drop_count_dict_has_value_reason_batch40():
     m = _silent_drop_count({"a": 1}, {"element_count_by_type": {"a": 5}})
     assert "value" in m
     assert "reason" in m
-
-
-def test_silent_drop_count_value_zero_when_no_drop_batch40():
-    m = _silent_drop_count({"a": 5}, {"element_count_by_type": {"a": 5}})
-    assert m["value"] == 0
 
 
 def test_silent_drop_count_does_not_mutate_input_batch40():
@@ -671,21 +629,6 @@ def test_module_source_contains_not_evaluated_keyword_batch40():
     assert "not_evaluated" in src
 
 
-def test_module_source_contains_no_chunks_keyword_batch40():
-    src = inspect.getsource(mmod)
-    assert "no_chunks" in src
-
-
-def test_module_source_contains_empty_expected_and_actual_keyword_batch40():
-    src = inspect.getsource(mmod)
-    assert "empty_expected_and_actual" in src
-
-
-def test_module_source_contains_empty_actual_keyword_batch40():
-    src = inspect.getsource(mmod)
-    assert "empty_actual" in src
-
-
 # ---------- signatures 第六十五批
 
 
@@ -722,16 +665,6 @@ def test_signature_is_valid_bbox_one_param_batch40():
 def test_signature_is_valid_bbox_return_bool_batch40():
     sig = inspect.signature(_is_valid_bbox)
     assert "bool" in str(sig.return_annotation)
-
-
-def test_signature_pdf_locator_return_dict_batch40():
-    sig = inspect.signature(_pdf_locator_ratio)
-    assert "dict" in str(sig.return_annotation)
-
-
-def test_signature_docx_locator_return_dict_batch40():
-    sig = inspect.signature(_docx_locator_ratio)
-    assert "dict" in str(sig.return_annotation)
 
 
 def test_signature_image_resource_two_params_batch40():
@@ -806,12 +739,6 @@ def test_module_has_not_evaluated_attribute_batch40():
     assert hasattr(mmod, "_NOT_EVALUATED")
 
 
-def test_module_normalize_text_not_imported_batch40():
-    src = inspect.getsource(mmod)
-    assert "import normalize_text" not in src
-    assert "from app.chunkers" not in src
-
-
 # ---------- 端到端集成 第六十五批
 
 
@@ -869,16 +796,3 @@ def test_e2e_compute_metrics_docx_full_batch40():
     m = compute_automatic_metrics(doc, None, "docx", None)
     assert m["docx_locator_valid_ratio"]["value"] == 1.0
     assert m["pdf_locator_valid_ratio"]["reason"] == "not_pdf_document"
-
-
-def test_e2e_compute_metrics_does_not_mutate_doc_batch40():
-    doc = {
-        "document_id": "d1",
-        "source_type": "pdf",
-        "elements": [{"type": "paragraph", "content": "abc", "element_id": "e1",
-                      "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}}],
-        "chunks": [{"text": "abc", "source_element_ids": ["e1"]}],
-    }
-    before = json.dumps(doc, sort_keys=True)
-    compute_automatic_metrics(doc, None, "pdf", None)
-    assert json.dumps(doc, sort_keys=True) == before

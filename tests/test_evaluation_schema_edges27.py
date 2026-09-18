@@ -150,13 +150,6 @@ def test_load_schema_each_has_schema_dollar_key():
         assert "2020-12" in s["$schema"]
 
 
-def test_load_schema_each_has_type_object():
-    for name in ("manifest.schema.json", "annotation.schema.json",
-                 "evaluation-report.schema.json", "document.schema.json"):
-        s = load_schema(name)
-        assert s.get("type") == "object"
-
-
 def test_load_schema_id_url_format():
     """$id 应是 URL 字符串."""
     for name in ("manifest.schema.json", "annotation.schema.json",
@@ -688,11 +681,6 @@ def test_module_source_no_walrus():
     assert ":=" not in src
 
 
-def test_module_source_no_global_keyword():
-    src = inspect.getsource(smod)
-    assert "\nglobal " not in src
-
-
 def test_module_source_no_lambda_at_top_level():
     src = inspect.getsource(smod)
     # 顶层不应有 lambda 赋值（sorted 的 key=lambda 是允许的）
@@ -721,11 +709,6 @@ def test_module_source_no_hardcoded_absolute_path():
     assert "/home/" not in src
 
 
-def test_module_source_no_print():
-    src = inspect.getsource(smod)
-    assert "print(" not in src
-
-
 def test_module_source_no_logging():
     src = inspect.getsource(smod)
     assert "import logging" not in src
@@ -740,11 +723,6 @@ def test_module_source_no_unlink():
 def test_module_source_no_subprocess():
     src = inspect.getsource(smod)
     assert "subprocess." not in src
-
-
-def test_module_source_docstring_first_line():
-    src = inspect.getsource(smod)
-    assert src.startswith('"""')
 
 
 def test_module_source_docstring_mentions_schema():
@@ -781,18 +759,6 @@ def test_signature_schema_path_name_annotation_str():
 def test_signature_schema_path_no_default():
     sig = inspect.signature(_schema_path)
     assert sig.parameters["name"].default is inspect.Parameter.empty
-
-
-def test_signature_schema_path_no_varargs():
-    sig = inspect.signature(_schema_path)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_schema_path_no_kwargs():
-    sig = inspect.signature(_schema_path)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 def test_signature_load_schema_1_param():
@@ -905,10 +871,6 @@ def test_module_has_docstring():
 
 def test_module_docstring_starts_with_chinese():
     assert smod.__doc__.strip().startswith("加载并校验")
-
-
-def test_module_file_endswith_schema_py():
-    assert smod.__file__.replace("\\", "/").endswith("evaluation/schema.py")
 
 
 def test_module_name_is_evaluation_schema():

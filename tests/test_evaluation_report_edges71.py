@@ -90,11 +90,6 @@ def test_silent_drop_skips_null_batch53():
     assert aggregate_summary(docs)["silent_drop_total"] == 5
 
 
-def test_silent_drop_all_zero_is_zero_batch53():
-    docs = [_pd("a", silent_drop_count=0), _pd("b", silent_drop_count=0)]
-    assert aggregate_summary(docs)["silent_drop_total"] == 0  # 非 None
-
-
 # ---------- summary 结构 ----------
 
 def test_summary_four_keys_order_batch53():
@@ -245,14 +240,6 @@ def _src() -> str:
     return inspect.getsource(report_mod)
 
 
-def test_source_commit_or_none_batch53():
-    assert "commit = r.stdout.strip() or None" in _src()
-
-
-def test_source_dirty_bool_expr_batch53():
-    assert "dirty = bool(r2.returncode == 0 and r2.stdout.strip())" in _src()
-
-
 def test_source_except_tuple_batch53():
     assert "except (OSError, subprocess.SubprocessError):" in _src()
 
@@ -271,10 +258,6 @@ def test_source_aggregate_formulas_batch53():
     assert "macro = sum(values) / len(values)" in src
     assert "rate = (successes / total) if total else None" in src
     assert 'summary["silent_drop_total"] = sum(silent_vals) if silent_vals else None' in src
-
-
-def test_source_timeout_ten_twice_batch53():
-    assert _src().count("timeout=10") == 2
 
 
 # ---------- AST 补强 ----------

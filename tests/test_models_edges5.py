@@ -77,20 +77,10 @@ def test_module_imports_any():
     assert "Any" in src
 
 
-def test_module_no_all_attribute():
-    import app.models as mod
-    assert not hasattr(mod, "__all__")
-
-
 def test_module_docstring_mentions_unified():
     """docstring 应提及"统一"。"""
     import app.models as mod
     assert "统一" in mod.__doc__ or "Unified" in mod.__doc__
-
-
-def test_module_docstring_mentions_dataclass():
-    import app.models as mod
-    assert "dataclass" in mod.__doc__.lower()
 
 
 def test_module_has_six_dataclasses():
@@ -478,16 +468,6 @@ def test_relation_to_dict_returns_new_dict_each_call():
 # =========================================================================
 # WarningRecord vs ErrorRecord 边界对比
 # =========================================================================
-
-
-def test_warning_record_field_names():
-    flds = [f.name for f in fields(WarningRecord)]
-    assert flds == ["code", "reason", "details"]
-
-
-def test_error_record_field_names():
-    flds = [f.name for f in fields(ErrorRecord)]
-    assert flds == ["code", "message", "details"]
 
 
 def test_warning_record_reason_vs_error_record_message():

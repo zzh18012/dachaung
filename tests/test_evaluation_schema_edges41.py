@@ -374,12 +374,6 @@ def test_validate_file_accepts_path_object_batch21(tmp_path):
     validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_missing_raises_file_not_found_batch21(tmp_path):
-    """文件不存在 → FileNotFoundError。"""
-    with pytest.raises(FileNotFoundError):
-        validate_file(tmp_path / "no.json", "manifest.schema.json")
-
-
 def test_validate_file_invalid_json_raises_json_decode_error_batch21(tmp_path):
     """非法 JSON → JSONDecodeError。"""
     p = tmp_path / "a.json"
@@ -491,12 +485,6 @@ def test_module_source_no_socket_import_batch21():
     assert "import socket" not in src
 
 
-def test_module_source_no_os_system_call_batch21():
-    src = inspect.getsource(smod)
-    # 仅检查 os.system 调用
-    assert "os.system(" not in src
-
-
 def test_module_source_no_requests_import_batch21():
     src = inspect.getsource(smod)
     assert "import requests" not in src
@@ -563,11 +551,6 @@ def test_module_source_has_jsonschema_import_batch21():
 def test_module_source_has_jsvalidationerror_import_batch21():
     src = inspect.getsource(smod)
     assert "from jsonschema.exceptions import ValidationError as JSValidationError" in src
-
-
-def test_module_source_has_schemas_dir_definition_batch21():
-    src = inspect.getsource(smod)
-    assert "SCHEMAS_DIR = Path(__file__).resolve().parent.parent /" in src
 
 
 def test_module_source_has_eval_schema_error_class_batch21():

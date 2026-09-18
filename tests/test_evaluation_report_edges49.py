@@ -68,10 +68,6 @@ def test_success_bool_metrics_is_tuple_type_batch33():
     assert isinstance(_SUCCESS_BOOL_METRICS, tuple)
 
 
-def test_success_bool_metrics_disjoint_from_count_batch33():
-    assert not (set(_SUCCESS_BOOL_METRICS) & set(_COUNT_METRICS))
-
-
 # ---------- get_git_provenance 第三十三批 ----------
 
 
@@ -202,12 +198,6 @@ def test_build_devset_section_with_real_manifest_attributes_batch33():
         "docx_count": 3,
         "categories_covered": ["a", "b", "c"],
     }
-
-
-def test_build_devset_section_keys_count_six_batch33():
-    fake = MagicMock()
-    out = build_devset_section(fake)
-    assert len(out) == 6
 
 
 # ---------- aggregate_summary 第三十三批 ----------
@@ -428,11 +418,6 @@ def test_module_source_contains_capture_output_true_batch33():
     assert "capture_output=True" in src
 
 
-def test_module_source_contains_text_true_batch33():
-    src = inspect.getsource(rmod)
-    assert "text=True" in src
-
-
 def test_module_source_contains_subprocess_run_call_batch33():
     src = inspect.getsource(rmod)
     assert "subprocess.run(" in src
@@ -441,11 +426,6 @@ def test_module_source_contains_subprocess_run_call_batch33():
 def test_module_source_contains_oserror_subprocess_error_batch33():
     src = inspect.getsource(rmod)
     assert "OSError, subprocess.SubprocessError" in src
-
-
-def test_module_source_contains_dirty_true_fallback_batch33():
-    src = inspect.getsource(rmod)
-    assert "dirty = True" in src
 
 
 # ---------- signatures 第四十六批 ----------
@@ -476,12 +456,6 @@ def test_signature_build_provenance_params_count_batch33():
     sig = inspect.signature(build_provenance)
     params = list(sig.parameters.keys())
     assert params == ["project_root", "parser_name", "max_chars", "parser_version"]
-
-
-def test_signature_build_provenance_param_annotations_batch33():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["parser_name"].annotation == "str"
-    assert sig.parameters["max_chars"].annotation == "int"
 
 
 def test_signature_build_devset_section_param_batch33():
@@ -594,28 +568,6 @@ def test_e2e_aggregate_summary_three_docs_mixed_batch33():
     assert out["ratio_macro_averages"]["chunk_boundary_recall"]["participating_docs"] == 1
     assert out["ratio_macro_averages"]["chunk_boundary_recall"]["not_evaluated"] == 1
     assert out["silent_drop_total"] == 1
-
-
-def test_e2e_aggregate_summary_empty_input_batch33():
-    out = aggregate_summary([])
-    assert out["counts"]["element_count_total"]["sum"] is None
-    assert out["success_rates"]["pipeline_success"]["rate"] is None
-    assert out["ratio_macro_averages"]["schema_valid"]["macro_average"] is None
-    assert out["silent_drop_total"] is None
-
-
-def test_e2e_aggregate_summary_idempotent_batch33():
-    per_doc = [
-        {
-            "metrics": {
-                "schema_valid": {"value": True, "reason": None},
-                "pipeline_success": {"value": True, "reason": None},
-            }
-        }
-    ]
-    out1 = aggregate_summary(per_doc)
-    out2 = aggregate_summary(per_doc)
-    assert out1 == out2
 
 
 def test_e2e_get_dependency_versions_no_throw_batch33():

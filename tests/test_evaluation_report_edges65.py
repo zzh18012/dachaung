@@ -193,15 +193,6 @@ def test_get_dependency_versions_handles_generic_exception_batch51():
 
 # ---------- build_provenance ----------
 
-def test_build_provenance_has_9_keys_batch51(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert set(out.keys()) == {
-        "git_commit", "git_dirty", "evaluator_version", "report_version",
-        "parser_name", "parser_version", "dependencies", "max_chars",
-        "run_timestamp_iso",
-    }
-
-
 def test_build_provenance_max_chars_is_int_batch51(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["max_chars"] == 800
@@ -269,18 +260,6 @@ def test_build_devset_section_returns_6_keys_batch51():
     assert out["categories_covered"] == ["a", "b"]
 
 
-def test_build_devset_section_status_complete_batch51():
-    m = MagicMock()
-    m.devset_status = "complete"
-    m.file_count = 0
-    m.content_group_count = 0
-    m.pdf_count = 0
-    m.docx_count = 0
-    m.categories_covered = []
-    out = build_devset_section(m)
-    assert out["status"] == "complete"
-
-
 # ---------- aggregate_summary 多场景 ----------
 
 def test_aggregate_summary_empty_batch51():
@@ -335,17 +314,6 @@ def test_aggregate_summary_counts_sum_int_values_batch51():
     assert out["counts"]["element_count_total"]["participating_docs"] == 2
 
 
-def test_aggregate_summary_counts_skips_none_values_batch51():
-    docs = [
-        {"metrics": {"element_count_total": {"value": 5}}},
-        {"metrics": {"element_count_total": {"value": None}}},
-        {"metrics": {"element_count_total": {"value": 10}}},
-    ]
-    out = aggregate_summary(docs)
-    assert out["counts"]["element_count_total"]["sum"] == 15
-    assert out["counts"]["element_count_total"]["participating_docs"] == 2
-
-
 def test_aggregate_summary_counts_all_none_batch51():
     docs = [{"metrics": {"element_count_total": {"value": None}}}]
     out = aggregate_summary(docs)
@@ -364,15 +332,6 @@ def test_aggregate_summary_ratio_macro_partial_null_batch51():
     assert m["macro_average"] == 0.75
     assert m["participating_docs"] == 2
     assert m["not_evaluated"] == 1
-
-
-def test_aggregate_summary_silent_drop_sum_batch51():
-    docs = [
-        {"metrics": {"silent_drop_count": {"value": 3}}},
-        {"metrics": {"silent_drop_count": {"value": 5}}},
-    ]
-    out = aggregate_summary(docs)
-    assert out["silent_drop_total"] == 8
 
 
 def test_aggregate_summary_silent_drop_all_null_batch51():
@@ -444,11 +403,6 @@ def test_source_contains_get_git_provenance_docstring_batch51():
     assert "读 git commit 与 dirty 状态" in src
 
 
-def test_source_contains_get_dependency_versions_docstring_batch51():
-    src = inspect.getsource(report_mod)
-    assert "importlib.metadata.version" in src
-
-
 def test_source_contains_aggregate_summary_docstring_batch51():
     src = inspect.getsource(report_mod)
     assert "聚合" in src
@@ -461,23 +415,9 @@ def test_source_contains_counts_section_batch51():
     assert "ratio_macro_averages" in src
 
 
-def test_source_contains_silent_drop_sum_batch51():
-    src = inspect.getsource(report_mod)
-    assert "silent_drop_total" in src
-
-
 def test_source_contains_no_mixing_types_note_batch51():
     src = inspect.getsource(report_mod)
     assert "不混合" in src
-
-
-def test_source_all_5_exports_batch51():
-    src = inspect.getsource(report_mod)
-    assert '"build_provenance"' in src
-    assert '"build_devset_section"' in src
-    assert '"aggregate_summary"' in src
-    assert '"get_git_provenance"' in src
-    assert '"get_dependency_versions"' in src
 
 
 def test_source_contains_timeout_10_batch51():
@@ -493,13 +433,6 @@ def test_source_contains_capture_output_batch51():
 def test_source_contains_astimezone_iso_batch51():
     src = inspect.getsource(report_mod)
     assert ".astimezone().isoformat()" in src
-
-
-def test_source_contains_pdfplumber_python_docx_pypdfium2_batch51():
-    src = inspect.getsource(report_mod)
-    assert '"pdfplumber"' in src
-    assert '"python-docx"' in src
-    assert '"pypdfium2"' in src
 
 
 # ---------- AST 结构补强 ----------
@@ -533,13 +466,6 @@ def test_ast_has_4_imports_batch51():
     assert len(imports) == 6
 
 
-def test_ast_has_4_module_level_assigns_batch51():
-    """_RATIO_METRICS + _COUNT_METRICS + _SUCCESS_BOOL_METRICS + __all__ = 4。"""
-    tree = ast.parse(inspect.getsource(report_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    assert len(assigns) == 4
-
-
 def test_ast_module_docstring_exists_batch51():
     tree = ast.parse(inspect.getsource(report_mod))
     assert isinstance(tree.body[0], ast.Expr)
@@ -564,13 +490,6 @@ def test_ast_get_git_provenance_has_try_except_batch51():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "get_git_provenance")
     tries = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
     assert len(tries) == 1
-
-
-def test_ast_get_dependency_versions_has_for_loop_batch51():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "get_dependency_versions")
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) == 1
 
 
 def test_ast_get_dependency_versions_has_2_try_batch51():

@@ -94,10 +94,6 @@ def test_split_pipe_row_only_trailing_pipe():
     assert _split_pipe_row("a | b |") == ["a", "b"]
 
 
-def test_split_pipe_row_single_cell():
-    assert _split_pipe_row("| only |") == ["only"]
-
-
 def test_split_pipe_row_empty_cells_stripped():
     """空 cell → '' 而不是 '  '。"""
     assert _split_pipe_row("|   |   |") == ["", ""]
@@ -194,18 +190,8 @@ def test_rows_to_md_single_column():
     assert lines[3] == "| row2 |"
 
 
-def test_rows_to_md_many_columns():
-    result = _rows_to_md([["c1", "c2", "c3", "c4", "c5"]])
-    assert "| c1 | c2 | c3 | c4 | c5 |" in result
-
-
 def test_rows_to_md_returns_str_type():
     assert isinstance(_rows_to_md([["a"]]), str)
-
-
-def test_rows_to_md_separator_uses_three_dashes():
-    result = _rows_to_md([["a", "b"]])
-    assert "| --- | --- |" in result
 
 
 # ---------- _is_pipe_table_start 边界 ----------

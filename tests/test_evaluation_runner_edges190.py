@@ -196,13 +196,6 @@ def _src():
     return inspect.getsource(runner_mod)
 
 
-def test_source_identifier_counts_batch375():
-    src = _src()
-    assert src.count("process_single") == 6
-    assert src.count("annotation") == 10
-    assert src.count("expected_failure") == 5
-
-
 # ---------- forbidden tokens 第六百四十九批 ----------
 
 def test_source_no_eval_batch375():

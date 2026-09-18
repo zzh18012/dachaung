@@ -264,18 +264,6 @@ def test_build_devset_section_has_6_keys_batch49():
     }
 
 
-def test_build_devset_section_categories_passed_through_batch49():
-    m = MagicMock()
-    m.devset_status = "complete"
-    m.file_count = 0
-    m.content_group_count = 0
-    m.pdf_count = 0
-    m.docx_count = 0
-    m.categories_covered = ["x", "y", "z"]
-    out = build_devset_section(m)
-    assert out["categories_covered"] == ["x", "y", "z"]
-
-
 # ---------- aggregate_summary 多场景 ----------
 
 def test_aggregate_summary_empty_batch49():
@@ -446,11 +434,6 @@ def test_source_docstring_mentions_no_mix_types_batch49():
     assert "不混合类型" in src
 
 
-def test_source_docstring_mentions_silent_drop_batch49():
-    src = inspect.getsource(report_mod)
-    assert "silent_drop" in src
-
-
 def test_source_docstring_mentions_macro_average_batch49():
     src = inspect.getsource(report_mod)
     assert "macro average" in src.lower() or "macro_average" in src.lower() or "macro average" in src
@@ -562,11 +545,6 @@ def test_ast_no_class_def_batch49():
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
-def test_ast_no_async_function_def_batch49():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
-
-
 def test_ast_module_has_docstring_batch49():
     tree = ast.parse(inspect.getsource(report_mod))
     assert isinstance(tree.body[0], ast.Expr)
@@ -595,13 +573,6 @@ def test_ast_get_git_provenance_has_2_subprocess_calls_batch49():
         if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "run"
     ]
     assert len(calls) == 2
-
-
-def test_ast_get_git_provenance_has_try_batch49():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "get_git_provenance")
-    trys = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
-    assert len(trys) == 1
 
 
 def test_ast_get_git_provenance_has_except_tuple_batch49():

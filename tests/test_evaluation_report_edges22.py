@@ -72,11 +72,6 @@ def test_get_git_provenance_source_uses_status_porcelain():
     assert '"git", "status", "--porcelain"' in src
 
 
-def test_get_git_provenance_source_uses_text_true():
-    src = inspect.getsource(get_git_provenance)
-    assert "text=True" in src
-
-
 def test_get_git_provenance_source_uses_oserror_subprocess_error():
     src = inspect.getsource(get_git_provenance)
     assert "OSError" in src
@@ -148,16 +143,6 @@ def test_get_dependency_versions_source_3_packages():
     assert '"pypdfium2"' in src
 
 
-def test_get_dependency_versions_source_uses_importlib_metadata_version():
-    src = inspect.getsource(get_dependency_versions)
-    assert "importlib.metadata.version(pkg)" in src
-
-
-def test_get_dependency_versions_source_uses_package_not_found():
-    src = inspect.getsource(get_dependency_versions)
-    assert "importlib.metadata.PackageNotFoundError" in src
-
-
 def test_get_dependency_versions_source_uses_generic_exception():
     src = inspect.getsource(get_dependency_versions)
     assert "except Exception" in src
@@ -220,11 +205,6 @@ def test_build_provenance_source_uses_report_version():
 def test_build_provenance_source_uses_int_max_chars():
     src = inspect.getsource(build_provenance)
     assert "int(max_chars)" in src
-
-
-def test_build_provenance_source_uses_datetime_now_astimezone():
-    src = inspect.getsource(build_provenance)
-    assert "datetime.now().astimezone().isoformat()" in src
 
 
 def test_build_provenance_source_no_eval():

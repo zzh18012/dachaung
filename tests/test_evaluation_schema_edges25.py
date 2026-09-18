@@ -45,11 +45,6 @@ def test_schema_path_source_no_class():
     assert "class " not in src
 
 
-def test_schema_path_source_no_yield():
-    src = inspect.getsource(_schema_path)
-    assert "yield" not in src
-
-
 def test_schema_path_source_no_async():
     src = inspect.getsource(_schema_path)
     assert "async " not in src
@@ -76,11 +71,6 @@ def test_schema_path_source_returns_p_not_path():
     assert "return p" in src
 
 
-def test_schema_path_source_uses_local_var_p():
-    src = inspect.getsource(_schema_path)
-    assert "p = SCHEMAS_DIR / name" in src
-
-
 def test_schema_path_source_two_statements():
     """函数体至少 3 个语句：赋值 / is_file 检查 / return."""
     src = inspect.getsource(_schema_path)
@@ -93,11 +83,6 @@ def test_schema_path_source_two_statements():
 def test_schema_path_source_error_message_format():
     src = inspect.getsource(_schema_path)
     assert "Schema 文件不存在" in src
-
-
-def test_schema_path_source_no_eval():
-    src = inspect.getsource(_schema_path)
-    assert "eval(" not in src
 
 
 def test_schema_path_source_no_exec():
@@ -140,11 +125,6 @@ def test_schema_path_source_no_sys():
     assert "import sys" not in src
 
 
-def test_schema_path_source_no_subprocess():
-    src = inspect.getsource(_schema_path)
-    assert "subprocess" not in src
-
-
 def test_schema_path_source_no_argparse():
     src = inspect.getsource(_schema_path)
     assert "argparse" not in src
@@ -179,11 +159,6 @@ def test_load_schema_source_no_class():
     assert "class " not in src
 
 
-def test_load_schema_source_no_yield():
-    src = inspect.getsource(load_schema)
-    assert "yield" not in src
-
-
 def test_load_schema_source_no_async():
     src = inspect.getsource(load_schema)
     assert "async " not in src
@@ -204,11 +179,6 @@ def test_load_schema_source_no_lambda():
     assert "lambda" not in src
 
 
-def test_load_schema_source_no_eval():
-    src = inspect.getsource(load_schema)
-    assert "eval(" not in src
-
-
 def test_load_schema_source_no_exec():
     src = inspect.getsource(load_schema)
     assert "exec(" not in src
@@ -217,11 +187,6 @@ def test_load_schema_source_no_exec():
 def test_load_schema_source_no_compile():
     src = inspect.getsource(load_schema)
     assert "compile(" not in src
-
-
-def test_load_schema_source_no_print():
-    src = inspect.getsource(load_schema)
-    assert "print(" not in src
 
 
 def test_load_schema_source_no_unlink():
@@ -244,11 +209,6 @@ def test_load_schema_source_no_sys():
     assert "import sys" not in src
 
 
-def test_load_schema_source_no_subprocess():
-    src = inspect.getsource(load_schema)
-    assert "subprocess" not in src
-
-
 # ---------- validate source level 字符串精确补强第三批 ----------
 
 
@@ -265,16 +225,6 @@ def test_validate_source_docstring_mentions_Schema():
 def test_validate_source_docstring_mentions_EvalSchemaError():
     src = inspect.getsource(validate)
     assert "EvalSchemaError" in src
-
-
-def test_validate_source_uses_draft_2020_12():
-    src = inspect.getsource(validate)
-    assert "Draft202012Validator(schema)" in src
-
-
-def test_validate_source_uses_iter_errors_method():
-    src = inspect.getsource(validate)
-    assert "validator.iter_errors(instance)" in src
 
 
 def test_validate_source_uses_sorted_with_lambda():
@@ -296,21 +246,6 @@ def test_validate_source_uses_if_not_errors():
 def test_validate_source_uses_return_when_no_errors():
     src = inspect.getsource(validate)
     assert "if not errors:\n        return" in src
-
-
-def test_validate_source_flat_list_init():
-    src = inspect.getsource(validate)
-    assert "flat: list[dict[str, Any]] = []" in src
-
-
-def test_validate_source_uses_for_err_in_errors():
-    src = inspect.getsource(validate)
-    assert "for err in errors:" in src
-
-
-def test_validate_source_flat_append_dict():
-    src = inspect.getsource(validate)
-    assert "flat.append(" in src
 
 
 def test_validate_source_uses_absolute_path_in_flat():
@@ -363,11 +298,6 @@ def test_validate_source_no_global():
     assert "global " not in src
 
 
-def test_validate_source_no_eval():
-    src = inspect.getsource(validate)
-    assert "eval(" not in src
-
-
 def test_validate_source_no_exec():
     src = inspect.getsource(validate)
     assert "exec(" not in src
@@ -376,11 +306,6 @@ def test_validate_source_no_exec():
 def test_validate_source_no_compile():
     src = inspect.getsource(validate)
     assert "compile(" not in src
-
-
-def test_validate_source_no_print():
-    src = inspect.getsource(validate)
-    assert "print(" not in src
 
 
 def test_validate_source_no_unlink():
@@ -447,11 +372,6 @@ def test_validate_file_source_no_class():
     assert "class " not in src
 
 
-def test_validate_file_source_no_yield():
-    src = inspect.getsource(validate_file)
-    assert "yield" not in src
-
-
 def test_validate_file_source_no_async():
     src = inspect.getsource(validate_file)
     assert "async " not in src
@@ -462,11 +382,6 @@ def test_validate_file_source_no_global():
     assert "global " not in src
 
 
-def test_validate_file_source_no_eval():
-    src = inspect.getsource(validate_file)
-    assert "eval(" not in src
-
-
 def test_validate_file_source_no_exec():
     src = inspect.getsource(validate_file)
     assert "exec(" not in src
@@ -475,11 +390,6 @@ def test_validate_file_source_no_exec():
 def test_validate_file_source_no_compile():
     src = inspect.getsource(validate_file)
     assert "compile(" not in src
-
-
-def test_validate_file_source_no_print():
-    src = inspect.getsource(validate_file)
-    assert "print(" not in src
 
 
 def test_validate_file_source_no_unlink():
@@ -803,13 +713,6 @@ def test_validate_file_raises_on_int_json(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_raises_on_null_json(tmp_path):
-    p = tmp_path / "null.json"
-    p.write_text("null", encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_raises_eval_schema_error_on_invalid_content(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("{}", encoding="utf-8")
@@ -954,14 +857,6 @@ def test_module_source_imports_js_validation_error():
     assert "from jsonschema.exceptions import ValidationError as JSValidationError" in src
 
 
-def test_module_source_4_stdlib_imports():
-    src = inspect.getsource(smod)
-    # future + json + Path + Any
-    assert "import json" in src
-    assert "from pathlib import Path" in src
-    assert "from typing import Any" in src
-
-
 def test_module_source_schemas_dir_definition():
     src = inspect.getsource(smod)
     assert "SCHEMAS_DIR = Path(__file__).resolve().parent.parent /" in src
@@ -1055,11 +950,6 @@ def test_module_source_no_unlink():
     assert "unlink" not in src
 
 
-def test_module_source_no_write():
-    src = inspect.getsource(smod)
-    assert ".write(" not in src
-
-
 def test_module_source_no_print():
     src = inspect.getsource(smod)
     assert "print(" not in src
@@ -1083,14 +973,6 @@ def test_module_source_docstring_mentions_schema():
     assert "Schema" in smod.__doc__ or "schema" in smod.__doc__
 
 
-def test_module_source_docstring_mentions_manifest():
-    assert "manifest" in smod.__doc__.lower()
-
-
-def test_module_source_docstring_mentions_annotation():
-    assert "annotation" in smod.__doc__.lower()
-
-
 def test_module_source_docstring_mentions_evaluation_report():
     assert "evaluation" in smod.__doc__.lower()
 
@@ -1103,25 +985,10 @@ def test_module_source_docstring_mentions_app_schema():
 # ---------- signatures 精确补强第三批 ----------
 
 
-def test_signature_eval_schema_error_init():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    params = list(sig.parameters.values())
-    assert len(params) == 3  # self, message, errors
-    assert params[0].name == "self"
-    assert params[1].name == "message"
-    assert params[2].name == "errors"
-
-
 def test_signature_eval_schema_error_message_no_default():
     sig = inspect.signature(EvalSchemaError.__init__)
     params = list(sig.parameters.values())
     assert params[1].default is inspect.Parameter.empty
-
-
-def test_signature_eval_schema_error_errors_default_none():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    params = list(sig.parameters.values())
-    assert params[2].default is None
 
 
 def test_signature_eval_schema_error_return_annotation_none():
@@ -1182,14 +1049,6 @@ def test_signature_validate_no_defaults():
 def test_signature_validate_return_annotation_none():
     sig = inspect.signature(validate)
     assert sig.return_annotation == "None"
-
-
-def test_signature_validate_file():
-    sig = inspect.signature(validate_file)
-    params = list(sig.parameters.values())
-    assert len(params) == 2
-    assert params[0].name == "path"
-    assert params[1].name == "schema_name"
 
 
 def test_signature_validate_file_path_union_type():
@@ -1308,13 +1167,6 @@ def test_module_name_is_evaluation_schema():
 
 def test_module_eval_schema_error_module_eq_smod():
     assert EvalSchemaError.__module__ == "evaluation.schema"
-
-
-def test_module_function_module_eq_smod():
-    assert _schema_path.__module__ == "evaluation.schema"
-    assert load_schema.__module__ == "evaluation.schema"
-    assert validate.__module__ == "evaluation.schema"
-    assert validate_file.__module__ == "evaluation.schema"
 
 
 def test_module_function_names_correct():

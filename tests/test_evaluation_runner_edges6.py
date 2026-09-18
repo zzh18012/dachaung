@@ -75,11 +75,6 @@ def test_load_annotation_does_not_raise_on_invalid(tmp_path: Path):
     assert _load_annotation(p) is None
 
 
-def test_load_annotation_does_not_raise_on_missing(tmp_path: Path):
-    missing = tmp_path / "no.json"
-    assert _load_annotation(missing) is None
-
-
 def test_load_annotation_dict_with_nested_arrays(tmp_path: Path):
     p = tmp_path / "a.json"
     p.write_text('{"k": [1, [2, 3], {"x": "y"}]}', encoding="utf-8")
@@ -134,14 +129,6 @@ def test_run_evaluation_signature_returns_dict():
     sig = inspect.signature(run_evaluation)
     annotation = sig.return_annotation
     assert "dict" in str(annotation).lower()
-
-
-def test_run_evaluation_keyword_only_marker():
-    """parser_name/max_chars/tolerance_chars 是 keyword-only。"""
-    sig = inspect.signature(run_evaluation)
-    assert sig.parameters["parser_name"].kind == inspect.Parameter.KEYWORD_ONLY
-    assert sig.parameters["max_chars"].kind == inspect.Parameter.KEYWORD_ONLY
-    assert sig.parameters["tolerance_chars"].kind == inspect.Parameter.KEYWORD_ONLY
 
 
 def test_run_evaluation_default_parser_name_fallback():

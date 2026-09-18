@@ -258,23 +258,6 @@ def test_validate_only_returns_tuple_of_bool_str(tmp_path):
 # =========================================================================
 
 
-def test_module_all_is_list():
-    assert isinstance(pipeline_all, list)
-
-
-def test_module_all_count_four():
-    assert len(pipeline_all) == 4
-
-
-def test_module_all_exact():
-    assert set(pipeline_all) == {
-        "get_parser",
-        "image_output_dir_for",
-        "process_single",
-        "validate_only",
-    }
-
-
 def test_module_imports_json():
     import app.pipeline as mod
     src = inspect.getsource(mod)

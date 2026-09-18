@@ -112,10 +112,6 @@ def test_summary_nested_junk_valid_batch556():
     validate(r, "evaluation-report.schema.json")
 
 
-def test_summary_empty_valid_batch556():
-    validate(_rep(), "evaluation-report.schema.json")
-
-
 def test_summary_string_rejected_batch556():
     r = _rep()
     r["summary"] = "not a dict"
@@ -330,14 +326,6 @@ def test_metric_open_but_per_doc_closed_batch556():
 
 def _src():
     return inspect.getsource(schema_mod)
-
-
-def test_source_key_lines_batch556():
-    src = _src()
-    assert "class EvalSchemaError(Exception):" \
-        in src
-    assert "def validate(" in src
-    assert "Schema 文件不存在" in src
 
 
 def test_source_open_count_batch556():

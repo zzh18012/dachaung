@@ -344,11 +344,6 @@ def test_build_provenance_returns_nine_keys(tmp_path: Path):
     assert set(result.keys()) == expected_keys
 
 
-def test_build_provenance_parser_name_propagated(tmp_path: Path):
-    result = build_provenance(tmp_path, "kreuzberg", 800, "1.0")
-    assert result["parser_name"] == "kreuzberg"
-
-
 def test_build_provenance_parser_version_propagated(tmp_path: Path):
     result = build_provenance(tmp_path, "fallback", 800, "v_test")
     assert result["parser_version"] == "v_test"
@@ -717,11 +712,6 @@ def test_get_git_provenance_signature():
     assert set(sig.parameters) == {"project_root"}
 
 
-def test_get_dependency_versions_signature():
-    sig = inspect.signature(get_dependency_versions)
-    assert set(sig.parameters) == set()
-
-
 def test_build_provenance_signature():
     sig = inspect.signature(build_provenance)
     assert set(sig.parameters) == {"project_root", "parser_name", "max_chars", "parser_version"}
@@ -731,16 +721,6 @@ def test_build_provenance_no_defaults():
     sig = inspect.signature(build_provenance)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_build_devset_section_signature():
-    sig = inspect.signature(build_devset_section)
-    assert set(sig.parameters) == {"manifest"}
-
-
-def test_aggregate_summary_signature():
-    sig = inspect.signature(aggregate_summary)
-    assert set(sig.parameters) == {"per_doc_results"}
 
 
 def test_get_git_provenance_return_annotation_dict():
@@ -774,22 +754,6 @@ def test_all_functions_callable():
 # =========================================================================
 # idempotency
 # =========================================================================
-
-
-def test_get_dependency_versions_idempotent():
-    a = get_dependency_versions()
-    b = get_dependency_versions()
-    assert a == b
-
-
-def test_aggregate_summary_idempotent():
-    per_doc = [
-        {"metrics": {"element_count_total": {"value": 5}}},
-        {"metrics": {"pipeline_success": {"value": True}}},
-    ]
-    a = aggregate_summary(per_doc)
-    b = aggregate_summary(per_doc)
-    assert a == b
 
 
 def test_build_devset_section_idempotent():

@@ -407,13 +407,6 @@ def test_aggregate_summary_success_rates_with_mixed_batch15():
     assert sr["rate"] == 2 / 3
 
 
-def test_aggregate_summary_ratio_macro_average_none_when_no_values_batch15():
-    s = aggregate_summary([])
-    for name in _RATIO_METRICS:
-        assert s["ratio_macro_averages"][name]["macro_average"] is None
-        assert s["ratio_macro_averages"][name]["participating_docs"] == 0
-
-
 def test_aggregate_summary_ratio_not_evaluated_calc_batch15():
     """not_evaluated = total - participating_docs。"""
     per_doc = [

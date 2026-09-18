@@ -154,11 +154,6 @@ def test_success_bool_no_overlap_with_count_batch47():
         assert m not in _COUNT_METRICS
 
 
-def test_three_metric_tuples_disjoint_batch47():
-    all_metrics = list(_RATIO_METRICS) + list(_COUNT_METRICS) + list(_SUCCESS_BOOL_METRICS)
-    assert len(all_metrics) == len(set(all_metrics))
-
-
 # ---------- aggregate_summary counts 边界 ----------
 
 def test_aggregate_counts_all_none_batch47():
@@ -239,17 +234,6 @@ def test_aggregate_success_with_none_batch47():
     assert sr["rate"] == 0.5
 
 
-def test_aggregate_success_false_batch47():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": False}}},
-        {"metrics": {"pipeline_success": {"value": False}}},
-    ]
-    s = aggregate_summary(per_doc)
-    sr = s["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 0
-    assert sr["rate"] == 0.0
-
-
 def test_aggregate_success_empty_batch47():
     s = aggregate_summary([])
     sr = s["success_rates"]["pipeline_success"]
@@ -310,36 +294,12 @@ def test_aggregate_ratio_macro_calc_batch47():
     assert avg["not_evaluated"] == 0
 
 
-def test_aggregate_ratio_total_12_keys_batch47():
-    s = aggregate_summary([])
-    assert len(s["ratio_macro_averages"]) == 12
-
-
 def test_aggregate_summary_has_four_top_keys_batch47():
     s = aggregate_summary([])
     assert set(s.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
 
 
 # ---------- aggregate_summary silent_drop 各种 ----------
-
-def test_aggregate_silent_drop_all_none_batch47():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": None}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    s = aggregate_summary(per_doc)
-    assert s["silent_drop_total"] is None
-
-
-def test_aggregate_silent_drop_partial_batch47():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 3}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-        {"metrics": {"silent_drop_count": {"value": 5}}},
-    ]
-    s = aggregate_summary(per_doc)
-    assert s["silent_drop_total"] == 8
-
 
 def test_aggregate_silent_drop_zero_batch47():
     per_doc = [
@@ -697,13 +657,6 @@ def test_ast_success_bool_metrics_single_elt_batch47():
                 assert len(n.value.elts) == 1
                 return
     pytest.fail("_SUCCESS_BOOL_METRICS assignment not found")
-
-
-def test_ast_get_git_provenance_has_try_batch47():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "get_git_provenance"][0]
-    trys = [n for n in func.body if isinstance(n, ast.Try)]
-    assert len(trys) == 1
 
 
 def test_ast_get_git_provenance_except_handlers_batch47():

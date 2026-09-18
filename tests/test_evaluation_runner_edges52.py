@@ -809,21 +809,6 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_forbidden_tokens_batch24():
-    """runner.py 不应直接 import 这些副作用大的模块。"""
-    source = inspect.getsource(rmod)
-    for tok in FORBIDDEN_TOKENS:
-        assert tok not in source, f"forbidden token in source: {tok}"
-
-
-def test_module_source_no_class_keyword_batch24():
-    """runner.py 不应使用 class（functional 风格）。"""
-    source = inspect.getsource(rmod)
-    import re as _re
-    matches = _re.findall(r"\bclass\s+\w+", source)
-    assert matches == [], f"unexpected class definitions: {matches}"
-
-
 def test_module_source_no_yield_batch24():
     """runner.py 不应使用 yield。"""
     source = inspect.getsource(rmod)
@@ -838,20 +823,6 @@ def test_module_source_no_async_def_batch24():
 def test_module_source_no_walrus_batch24():
     source = inspect.getsource(rmod)
     assert ":=" not in source
-
-
-def test_module_source_no_eval_exec_batch24():
-    source = inspect.getsource(rmod)
-    assert "eval(" not in source
-    assert "exec(" not in source
-    assert "compile(" not in source
-
-
-def test_module_source_no_subprocess_batch24():
-    """runner.py 不应使用 subprocess（仅 report.py 需要）。"""
-    source = inspect.getsource(rmod)
-    assert "import subprocess" not in source
-    assert "from subprocess" not in source
 
 
 def test_module_source_no_pickle_batch24():
@@ -879,14 +850,6 @@ def test_module_source_no_network_io_batch24():
     assert "import socket" not in source
     assert "import http" not in source
     assert "import requests" not in source
-
-
-def test_module_source_no_relative_imports_batch24():
-    """runner.py 不应使用相对导入（from .）。"""
-    source = inspect.getsource(rmod)
-    lines = [l for l in source.split("\n") if "from " in l and "from __future__" not in l]
-    for line in lines:
-        assert not line.strip().startswith("from ."), f"relative import: {line}"
 
 
 # ---------- module source 字符串精确补强第三十七批 ----------
@@ -945,18 +908,6 @@ def test_module_source_contains_build_provenance_import_batch24():
     """source 必须从 evaluation.report 导入 build_provenance。"""
     source = inspect.getsource(rmod)
     assert "build_provenance" in source
-
-
-def test_module_source_contains_time_perf_counter_batch24():
-    """source 必须使用 time.perf_counter（计时）。"""
-    source = inspect.getsource(rmod)
-    assert "time.perf_counter" in source
-
-
-def test_module_source_contains_not_instrumented_batch24():
-    """source 必须含 reason='not_instrumented' 字符串字面量。"""
-    source = inspect.getsource(rmod)
-    assert '"not_instrumented"' in source
 
 
 def test_module_source_contains_write_json_false_batch24():
@@ -1054,26 +1005,6 @@ def test_module_all_only_run_evaluation_batch24():
     assert rmod.__all__ == ["run_evaluation"]
 
 
-def test_module_has_three_callables_batch24():
-    """runner.py 定义 3 个函数：_load_annotation, _process_one, run_evaluation。"""
-    funcs = [
-        name
-        for name, val in inspect.getmembers(rmod, inspect.isfunction)
-        if val.__module__ == rmod.__name__
-    ]
-    assert set(funcs) == {"_load_annotation", "_process_one", "run_evaluation"}
-
-
-def test_module_no_classes_batch24():
-    """runner.py 不定义任何 class。"""
-    classes = [
-        name
-        for name, val in inspect.getmembers(rmod, inspect.isclass)
-        if val.__module__ == rmod.__name__
-    ]
-    assert classes == []
-
-
 def test_module_docstring_present_batch24():
     """module 有 docstring。"""
     assert rmod.__doc__ is not None
@@ -1086,34 +1017,9 @@ def test_module_docstring_mentions_evaluation_batch24():
     assert "评测" in src or "evaluation" in src.lower() or "runner" in src.lower()
 
 
-def test_module_process_one_docstring_present_batch24():
-    """_process_one 有 docstring。"""
-    assert _process_one.__doc__ is not None
-    assert len(_process_one.__doc__) > 0
-
-
 def test_module_run_evaluation_docstring_present_batch24():
     """run_evaluation 有 docstring。"""
     assert run_evaluation.__doc__ is not None
-
-
-def test_module_uses_from_future_annotations_batch24():
-    """runner.py 必须有 from __future__ import annotations。"""
-    source = inspect.getsource(rmod)
-    assert "from __future__ import annotations" in source
-
-
-def test_module_constants_no_module_level_mutables_batch24():
-    """runner.py 顶层无私有常量（除 __all__）。"""
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(rmod))
-    top_level_assigns = [
-        node for node in tree.body if isinstance(node, _ast.Assign)
-    ]
-    for node in top_level_assigns:
-        for target in node.targets:
-            assert isinstance(target, _ast.Name)
-            assert target.id == "__all__", f"unexpected top-level assignment: {target.id}"
 
 
 def test_module_imports_use_absolute_form_batch24():

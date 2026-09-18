@@ -823,24 +823,9 @@ def test_module_source_contains_evaluation_report_version_import_batch42():
     assert "from evaluation import REPORT_VERSION" in src
 
 
-def test_module_source_contains_annotation_metrics_import_batch42():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.annotation_metrics import" in src
-    assert "chunk_boundary_prf" in src
-    assert "figure_caption_prf" in src
-
-
 def test_module_source_contains_metrics_import_batch42():
     src = inspect.getsource(rmod)
     assert "from evaluation.metrics import compute_automatic_metrics" in src
-
-
-def test_module_source_contains_report_import_batch42():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.report import" in src
-    assert "aggregate_summary" in src
-    assert "build_devset_section" in src
-    assert "build_provenance" in src
 
 
 def test_module_source_contains_load_annotation_function_batch42():
@@ -861,11 +846,6 @@ def test_module_source_contains_run_evaluation_function_batch42():
 def test_module_source_contains_perf_counter_batch42():
     src = inspect.getsource(rmod)
     assert "time.perf_counter" in src
-
-
-def test_module_source_contains_json_dump_batch42():
-    src = inspect.getsource(rmod)
-    assert "json.dump(" in src
 
 
 def test_module_source_contains_utf8_encoding_batch42():
@@ -954,11 +934,6 @@ def test_module_source_contains_ensure_ascii_false_batch42():
     assert "ensure_ascii=False" in src
 
 
-def test_module_source_contains_indent_2_batch42():
-    src = inspect.getsource(rmod)
-    assert "indent=2" in src
-
-
 def test_module_source_contains_per_doc_subdir_batch42():
     src = inspect.getsource(rmod)
     assert "_per_doc" in src
@@ -970,13 +945,6 @@ def test_module_source_contains_per_doc_subdir_batch42():
 def test_signature_load_annotation_param_batch42():
     sig = inspect.signature(_load_annotation)
     assert list(sig.parameters.keys()) == ["path"]
-
-
-def test_signature_load_annotation_path_annotation_path_or_none_batch42():
-    sig = inspect.signature(_load_annotation)
-    ann = str(sig.parameters["path"].annotation)
-    assert "Path" in ann
-    assert "None" in ann
 
 
 def test_signature_load_annotation_no_default_batch42():
@@ -1000,11 +968,6 @@ def test_signature_process_one_return_tuple_annotation_batch42():
     sig = inspect.signature(_process_one)
     ann = str(sig.return_annotation)
     assert "tuple" in ann
-
-
-def test_signature_run_evaluation_manifest_param_batch42():
-    sig = inspect.signature(run_evaluation)
-    assert "manifest" in sig.parameters
 
 
 def test_signature_run_evaluation_output_path_param_batch42():
@@ -1054,11 +1017,6 @@ def test_module_all_only_run_evaluation_batch42():
 
 def test_module_all_len_one_batch42():
     assert len(rmod.__all__) == 1
-
-
-def test_module_does_not_export_helpers_batch42():
-    for name in ("_load_annotation", "_process_one"):
-        assert name not in rmod.__all__
 
 
 def test_module_does_not_define_class_batch42():

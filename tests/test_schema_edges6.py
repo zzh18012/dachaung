@@ -103,11 +103,6 @@ def test_schema_validation_error_not_value_error():
     assert not issubclass(SchemaValidationError, ValueError)
 
 
-def test_schema_validation_error_caught_specifically():
-    with pytest.raises(SchemaValidationError):
-        raise SchemaValidationError("x")
-
-
 def test_schema_validation_error_caught_as_exception():
     try:
         raise SchemaValidationError("x")
@@ -134,11 +129,6 @@ def test_load_schema_default_returns_dict():
 def test_load_schema_explicit_default_path():
     """load_schema() 与 load_schema(SCHEMA_PATH) 等价。"""
     assert load_schema() == load_schema(SCHEMA_PATH)
-
-
-def test_load_schema_str_path():
-    schema = load_schema(str(SCHEMA_PATH))
-    assert isinstance(schema, dict)
 
 
 def test_load_schema_nonexistent_raises():
@@ -326,13 +316,6 @@ def test_validate_file_missing_raises(tmp_path: Path):
         validate_file(p)
 
 
-def test_validate_file_invalid_json_raises(tmp_path: Path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not valid", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p)
-
-
 def test_validate_file_str_path(tmp_path: Path):
     p = tmp_path / "ok.json"
     p.write_text('{"x": 1}', encoding="utf-8")
@@ -413,11 +396,6 @@ def test_module_all_is_list():
 def test_module_all_no_duplicates():
     import app.schema as mod
     assert len(mod.__all__) == len(set(mod.__all__))
-
-
-def test_module_docstring_present():
-    import app.schema as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_business_code():

@@ -551,10 +551,6 @@ def test_module_all_contains_eval_schema_error_batch36():
     assert "EvalSchemaError" in smod.__all__
 
 
-def test_module_does_not_export_private_batch36():
-    assert "_schema_path" not in smod.__all__
-
-
 def test_module_does_not_define_other_class_batch36():
     """只有 EvalSchemaError 一个类。"""
     import ast

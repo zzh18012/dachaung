@@ -69,13 +69,6 @@ def test_short_line_max_is_int():
 # =========================================================================
 
 
-def test_classify_line_atx_heading_level_1():
-    etype, meta = _classify_line("# Title")
-    assert etype == "heading"
-    assert meta["level"] == 1
-    assert meta["raw_text"] == "Title"
-
-
 def test_classify_line_atx_heading_level_6():
     etype, meta = _classify_line("###### Deep")
     assert etype == "heading"
@@ -99,11 +92,6 @@ def test_classify_line_short_line_with_period_is_paragraph():
     assert etype == "paragraph"
 
 
-def test_classify_line_short_line_with_question_mark():
-    etype, _ = _classify_line("Why?")
-    assert etype == "paragraph"
-
-
 def test_classify_line_short_line_with_exclamation():
     etype, _ = _classify_line("Wow!")
     assert etype == "paragraph"
@@ -122,12 +110,6 @@ def test_classify_line_short_line_with_chinese_question():
 def test_classify_line_short_line_with_chinese_exclamation():
     etype, _ = _classify_line("好！")
     assert etype == "paragraph"
-
-
-def test_classify_line_whitespace_only():
-    etype, meta = _classify_line("   ")
-    assert etype == "paragraph"
-    assert meta == {}
 
 
 def test_classify_line_atx_priority_over_short_line():
@@ -159,11 +141,6 @@ def test_classify_line_chinese_short_is_heading():
 # =========================================================================
 # _make_locator 各分支
 # =========================================================================
-
-
-def test_make_locator_pdf_has_page_1():
-    loc = _make_locator("pdf", 0)
-    assert loc["page"] == 1
 
 
 def test_make_locator_pdf_has_placeholder_flag():
@@ -400,40 +377,6 @@ def test_parse_unsupported_extension_raises(tmp_path: Path):
 # =========================================================================
 
 
-def test_module_all_exact():
-    import app.parsers.kreuzberg_parser as mod
-    assert mod.__all__ == ["KreuzbergParser"]
-
-
-def test_module_all_is_list():
-    import app.parsers.kreuzberg_parser as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_uses_future_annotations():
-    import app.parsers.kreuzberg_parser as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_re():
-    import app.parsers.kreuzberg_parser as mod
-    src = inspect.getsource(mod)
-    assert "import re" in src
-
-
-def test_module_imports_path():
-    import app.parsers.kreuzberg_parser as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.parsers.kreuzberg_parser as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
 def test_module_optional_import_kreuzberg():
     """kreuzberg 是 try/except 可选导入。"""
     import app.parsers.kreuzberg_parser as mod
@@ -442,20 +385,9 @@ def test_module_optional_import_kreuzberg():
     assert "except ImportError" in src
 
 
-def test_module_has_kreuzberg_available_constant():
-    import app.parsers.kreuzberg_parser as mod
-    assert hasattr(mod, "_KREUZBERG_AVAILABLE")
-    assert isinstance(mod._KREUZBERG_AVAILABLE, bool)
-
-
 def test_module_has_kreuzberg_version_constant():
     import app.parsers.kreuzberg_parser as mod
     assert hasattr(mod, "_KREUZBERG_VERSION")
-
-
-def test_module_docstring_present():
-    import app.parsers.kreuzberg_parser as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_kreuzberg_version():

@@ -265,12 +265,6 @@ def test_pdf_locator_with_page_zero_batch39():
     assert m["value"] == 0.0
 
 
-def test_pdf_locator_with_negative_page_batch39():
-    elements = [{"type": "table", "source_locator": {"page": -1}}]
-    m = _pdf_locator_ratio(elements)
-    assert m["value"] == 0.0
-
-
 def test_pdf_locator_without_source_locator_batch39():
     """element 没有 source_locator 字段 → loc = {} → invalid。"""
     elements = [{"type": "table"}]
@@ -323,21 +317,9 @@ def test_docx_locator_with_row_col_index_batch39():
     assert m["value"] == 1.0
 
 
-def test_docx_locator_with_relationship_id_batch39():
-    elements = [{"type": "image", "source_locator": {"relationship_id": "rId1"}}]
-    m = _docx_locator_ratio(elements)
-    assert m["value"] == 1.0
-
-
 def test_docx_locator_with_bbox_invalidates_batch39():
     """含 bbox → invalid（DOCX 不该有 bbox）。"""
     elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 0, "bbox": [0, 0, 1, 1]}}]
-    m = _docx_locator_ratio(elements)
-    assert m["value"] == 0.0
-
-
-def test_docx_locator_with_empty_source_locator_batch39():
-    elements = [{"type": "paragraph", "source_locator": {}}]
     m = _docx_locator_ratio(elements)
     assert m["value"] == 0.0
 
@@ -978,12 +960,6 @@ def test_module_normalize_text_not_imported_batch39():
     src = inspect.getsource(mmod)
     assert "import normalize_text" not in src
     assert "from app.chunkers" not in src
-
-
-def test_module_text_preservation_uses_strip_unicode_whitespace_batch39():
-    src = inspect.getsource(mmod)
-    assert "_strip_unicode_whitespace(expected_raw)" in src
-    assert "_strip_unicode_whitespace(actual_raw)" in src
 
 
 def test_module_has_future_annotations_batch39():

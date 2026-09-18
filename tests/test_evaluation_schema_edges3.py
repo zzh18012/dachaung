@@ -138,11 +138,6 @@ def test_eval_schema_error_errors_non_empty_passed():
     assert e.errors == errs
 
 
-def test_eval_schema_error_errors_is_list_type():
-    e = EvalSchemaError("msg")
-    assert isinstance(e.errors, list)
-
-
 def test_eval_schema_error_inherits_from_exception():
     assert issubclass(EvalSchemaError, Exception)
 
@@ -212,12 +207,6 @@ def test_schema_path_dotdot_raises_filenotfound():
     """'../nonexistent' → 跳出 SCHEMAS_DIR → 不存在。"""
     with pytest.raises(FileNotFoundError):
         _schema_path("../nonexistent.json")
-
-
-def test_schema_path_filenotfound_message_contains_path():
-    with pytest.raises(FileNotFoundError) as ei:
-        _schema_path("nonexistent.schema.json")
-    assert "nonexistent.schema.json" in str(ei.value)
 
 
 def test_schema_path_for_annotation_schema():

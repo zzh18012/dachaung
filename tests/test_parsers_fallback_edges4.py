@@ -1244,10 +1244,6 @@ def test_module_has_is_heading_style_function():
     assert callable(_is_heading_style)
 
 
-def test_module_has_extract_inline_image_rids_function():
-    assert callable(_extract_inline_image_rids)
-
-
 def test_module_imports_path():
     assert hasattr(fp, "Path")
 

@@ -71,11 +71,6 @@ def test_count_metrics_value_batch33():
     assert _COUNT_METRICS == ("element_count_total",)
 
 
-def test_count_metrics_not_contains_silent_drop_batch33():
-    """silent_drop_count 单独聚合，不在 _COUNT_METRICS。"""
-    assert "silent_drop_count" not in _COUNT_METRICS
-
-
 def test_success_bool_metrics_value_batch33():
     assert _SUCCESS_BOOL_METRICS == ("pipeline_success",)
 
@@ -175,14 +170,6 @@ def test_git_provenance_subprocess_timeout_value_10_batch33(tmp_path):
         get_git_provenance(tmp_path)
         for call in mock_run.call_args_list:
             assert call.kwargs.get("timeout") == 10
-
-
-def test_git_provenance_subprocess_capture_output_true_batch33(tmp_path):
-    with patch("evaluation.report.subprocess.run") as mock_run:
-        mock_run.return_value = MagicMock(returncode=0, stdout="abc\n", stderr="")
-        get_git_provenance(tmp_path)
-        for call in mock_run.call_args_list:
-            assert call.kwargs.get("capture_output") is True
 
 
 def test_git_provenance_subprocess_encoding_utf8_batch33(tmp_path):
@@ -389,20 +376,10 @@ def test_aggregate_summary_keys_count_4_batch33():
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
 
 
-def test_aggregate_summary_counts_element_count_total_batch33():
-    out = aggregate_summary([])
-    assert "element_count_total" in out["counts"]
-
-
 def test_aggregate_summary_counts_no_other_metrics_batch33():
     """counts 只有 element_count_total。"""
     out = aggregate_summary([])
     assert set(out["counts"].keys()) == {"element_count_total"}
-
-
-def test_aggregate_summary_success_rates_pipeline_success_batch33():
-    out = aggregate_summary([])
-    assert "pipeline_success" in out["success_rates"]
 
 
 def test_aggregate_summary_success_rates_no_other_metrics_batch33():
@@ -442,15 +419,6 @@ def test_aggregate_summary_success_rate_with_mixed_batch33():
     assert out["success_rates"]["pipeline_success"]["rate"] == 1 / 3
 
 
-def test_aggregate_summary_success_rate_all_true_batch33():
-    results = [
-        {"metrics": {"pipeline_success": {"value": True, "reason": None}}},
-        {"metrics": {"pipeline_success": {"value": True, "reason": None}}},
-    ]
-    out = aggregate_summary(results)
-    assert out["success_rates"]["pipeline_success"]["rate"] == 1.0
-
-
 def test_aggregate_summary_ratio_macro_average_batch33():
     results = [
         {"metrics": {"schema_valid": {"value": 1.0, "reason": None}}},
@@ -471,24 +439,6 @@ def test_aggregate_summary_ratio_macro_with_null_batch33():
     assert out["ratio_macro_averages"]["schema_valid"]["not_evaluated"] == 1
 
 
-def test_aggregate_summary_silent_drop_sum_batch33():
-    results = [
-        {"metrics": {"silent_drop_count": {"value": 3, "reason": None}}},
-        {"metrics": {"silent_drop_count": {"value": 5, "reason": None}}},
-    ]
-    out = aggregate_summary(results)
-    assert out["silent_drop_total"] == 8
-
-
-def test_aggregate_summary_silent_drop_with_null_batch33():
-    results = [
-        {"metrics": {"silent_drop_count": {"value": 3, "reason": None}}},
-        {"metrics": {"silent_drop_count": {"value": None, "reason": "no_expectations"}}},
-    ]
-    out = aggregate_summary(results)
-    assert out["silent_drop_total"] == 3
-
-
 def test_aggregate_summary_silent_drop_all_null_batch33():
     results = [
         {"metrics": {"silent_drop_count": {"value": None, "reason": "x"}}},
@@ -505,12 +455,6 @@ def test_aggregate_summary_does_not_mutate_input_batch33():
     before = copy.deepcopy(results)
     aggregate_summary(results)
     assert results == before
-
-
-def test_aggregate_summary_missing_metrics_key_raises_batch33():
-    """per_doc_result 缺 metrics key → KeyError（不静默吞错）。"""
-    with pytest.raises(KeyError):
-        aggregate_summary([{}])
 
 
 # ---------- module source forbidden tokens 第五十三批
@@ -543,11 +487,6 @@ def test_module_source_no_forbidden_tokens_batch33(token):
 
 
 # ---------- module source 字符串精确补强第四十九批
-
-
-def test_module_source_contains_docstring_batch33():
-    src = inspect.getsource(rmod)
-    assert "评测报告" in src
 
 
 def test_module_source_contains_future_annotations_batch33():
@@ -649,31 +588,6 @@ def test_module_source_contains_pypdfium2_dep_name_batch33():
 def test_module_source_contains_all_batch33():
     src = inspect.getsource(rmod)
     assert "__all__" in src
-
-
-def test_module_source_all_contains_build_provenance_batch33():
-    src = inspect.getsource(rmod)
-    assert '"build_provenance"' in src
-
-
-def test_module_source_all_contains_build_devset_section_batch33():
-    src = inspect.getsource(rmod)
-    assert '"build_devset_section"' in src
-
-
-def test_module_source_all_contains_aggregate_summary_batch33():
-    src = inspect.getsource(rmod)
-    assert '"aggregate_summary"' in src
-
-
-def test_module_source_all_contains_get_git_provenance_batch33():
-    src = inspect.getsource(rmod)
-    assert '"get_git_provenance"' in src
-
-
-def test_module_source_all_contains_get_dependency_versions_batch33():
-    src = inspect.getsource(rmod)
-    assert '"get_dependency_versions"' in src
 
 
 # ---------- signatures 第四十九批

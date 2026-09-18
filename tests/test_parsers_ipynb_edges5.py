@@ -51,14 +51,6 @@ def test_ipynb_extensions_is_tuple():
 # =========================================================================
 
 
-def test_detect_ipynb_source_type_lowercase():
-    assert _detect_ipynb_source_type(Path("test.ipynb")) == "ipynb"
-
-
-def test_detect_ipynb_source_type_uppercase():
-    assert _detect_ipynb_source_type(Path("test.IPYNB")) == "ipynb"
-
-
 def test_detect_ipynb_source_type_mixed_case():
     assert _detect_ipynb_source_type(Path("test.IpYnB")) == "ipynb"
 
@@ -67,16 +59,6 @@ def test_detect_ipynb_source_type_rejects_pdf():
     with pytest.raises(ParserError) as exc:
         _detect_ipynb_source_type(Path("test.pdf"))
     assert exc.value.code == "unsupported_type"
-
-
-def test_detect_ipynb_source_type_rejects_html():
-    with pytest.raises(ParserError):
-        _detect_ipynb_source_type(Path("test.html"))
-
-
-def test_detect_ipynb_source_type_rejects_md():
-    with pytest.raises(ParserError):
-        _detect_ipynb_source_type(Path("test.md"))
 
 
 def test_detect_ipynb_source_type_rejects_no_suffix():
@@ -216,14 +198,6 @@ def test_ipynb_parser_name_value():
 
 def test_ipynb_parser_version_value():
     assert IpynbParser.version == "stdlib/0.1.0"
-
-
-def test_ipynb_parser_name_is_str():
-    assert isinstance(IpynbParser.name, str)
-
-
-def test_ipynb_parser_version_is_str():
-    assert isinstance(IpynbParser.version, str)
 
 
 def test_ipynb_parser_inherits_parser():

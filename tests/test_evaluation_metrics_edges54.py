@@ -328,11 +328,6 @@ def test_is_valid_bbox_negative_values_batch28():
 # ---------- _image_resource_ratio 第二十八批 ----------
 
 
-def test_image_resource_ratio_no_images_batch28():
-    out = _image_resource_ratio([{"type": "paragraph"}], None)
-    assert out["reason"] == "no_image_elements"
-
-
 def test_image_resource_ratio_no_resource_path_batch28():
     elements = [{"type": "image"}]
     out = _image_resource_ratio(elements, None)

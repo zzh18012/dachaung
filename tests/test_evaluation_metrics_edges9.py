@@ -148,11 +148,6 @@ def test_ratio_negative_value_returned_as_is():
     assert m["value"] == -0.5
 
 
-def test_ratio_above_one_returned_as_is():
-    m = _ratio(1.5)
-    assert m["value"] == 1.5
-
-
 def test_ratio_float_class_even_for_int_input():
     m = _ratio(1)
     assert type(m["value"]) is float
@@ -162,16 +157,6 @@ def test_bool_metric_signature():
     sig = inspect.signature(_bool_metric)
     params = list(sig.parameters)
     assert params == ["value"]
-
-
-def test_bool_metric_keys_exact():
-    m = _bool_metric(True)
-    assert set(m.keys()) == {"value", "reason"}
-
-
-def test_bool_metric_coerces_int_one_to_true():
-    m = _bool_metric(1)
-    assert m["value"] is True
 
 
 def test_bool_metric_coerces_int_zero_to_false():
@@ -209,16 +194,6 @@ def test_int_metric_coerces_float_to_int():
     m = _int_metric(3.7)
     assert m["value"] == 3
     assert type(m["value"]) is int
-
-
-def test_int_metric_coerces_bool_to_int():
-    m = _int_metric(True)
-    assert m["value"] == 1
-
-
-def test_int_metric_negative_value():
-    m = _int_metric(-5)
-    assert m["value"] == -5
 
 
 # =========================================================================
@@ -574,12 +549,6 @@ def test_image_resource_ratio_signature():
     sig = inspect.signature(_image_resource_ratio)
     params = list(sig.parameters)
     assert params == ["elements", "image_base_dir"]
-
-
-def test_image_resource_ratio_empty_elements_no_image_reason():
-    m = _image_resource_ratio([], None)
-    assert m["value"] is None
-    assert m["reason"] == "no_image_elements"
 
 
 def test_image_resource_ratio_no_image_type_elements():
@@ -1037,58 +1006,6 @@ def test_silent_drop_count_signature():
     assert params == ["by_type", "expectations"]
 
 
-def test_silent_drop_count_no_expectations():
-    m = _silent_drop_count({}, None)
-    assert m["value"] is None
-    assert m["reason"] == "no_expectations"
-
-
-def test_silent_drop_count_empty_expectations_dict():
-    m = _silent_drop_count({}, {})
-    assert m["value"] is None
-    assert m["reason"] == "no_expectations"
-
-
-def test_silent_drop_count_expectations_without_element_count():
-    m = _silent_drop_count({}, {"other_field": "x"})
-    assert m["value"] is None
-    assert m["reason"] == "no_expectations_element_count"
-
-
-def test_silent_drop_count_empty_element_count_by_type():
-    m = _silent_drop_count({}, {"element_count_by_type": {}})
-    assert m["value"] is None
-    assert m["reason"] == "no_expectations_element_count"
-
-
-def test_silent_drop_count_no_drop_when_actual_ge_expected():
-    by_type = {"paragraph": 5}
-    exp = {"element_count_by_type": {"paragraph": 5}}
-    m = _silent_drop_count(by_type, exp)
-    assert m["value"] == 0
-
-
-def test_silent_drop_count_drop_when_actual_lt_expected():
-    by_type = {"paragraph": 3}
-    exp = {"element_count_by_type": {"paragraph": 5}}
-    m = _silent_drop_count(by_type, exp)
-    assert m["value"] == 2
-
-
-def test_silent_drop_count_actual_more_than_expected_no_drop():
-    by_type = {"paragraph": 10}
-    exp = {"element_count_by_type": {"paragraph": 5}}
-    m = _silent_drop_count(by_type, exp)
-    assert m["value"] == 0
-
-
-def test_silent_drop_count_actual_zero():
-    by_type = {}
-    exp = {"element_count_by_type": {"paragraph": 5}}
-    m = _silent_drop_count(by_type, exp)
-    assert m["value"] == 5
-
-
 def test_silent_drop_count_multiple_types_summed():
     by_type = {"paragraph": 3, "heading": 1}
     exp = {"element_count_by_type": {"paragraph": 5, "heading": 2}}
@@ -1168,16 +1085,6 @@ def test_compute_automatic_metrics_keys_on_failure_exact():
         "silent_drop_count",
     }
     assert set(m.keys()) == expected
-
-
-def test_compute_automatic_metrics_pipeline_success_false_when_doc_none_error_none():
-    m = compute_automatic_metrics(None, None, "pdf", None)
-    assert m["pipeline_success"]["value"] is False
-
-
-def test_compute_automatic_metrics_error_code_none_when_no_error():
-    m = compute_automatic_metrics(None, None, "pdf", None)
-    assert m["error_code"]["value"] is None
 
 
 def test_compute_automatic_metrics_error_code_propagated():

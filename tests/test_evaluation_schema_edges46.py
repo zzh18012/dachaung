@@ -194,14 +194,6 @@ def test_load_schema_evaluation_report_has_type_object_batch26():
     assert s.get("type") == "object"
 
 
-def test_load_schema_manifest_has_required_key_batch26():
-    s = load_schema("manifest.schema.json")
-    assert "required" in s
-    assert "manifest_version" in s["required"]
-    assert "devset_status" in s["required"]
-    assert "documents" in s["required"]
-
-
 def test_load_schema_returns_independent_dict_batch26():
     """两次调用返回独立 dict。"""
     s1 = load_schema("manifest.schema.json")

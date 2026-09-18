@@ -53,13 +53,6 @@ def test_load_annotation_dict_with_emoji_batch28(tmp_path):
     assert result == {"x": "🎉ok"}
 
 
-def test_load_annotation_dict_with_unicode_escape_batch28(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text('{"x": "\\u00e9"}', encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == {"x": "é"}
-
-
 def test_load_annotation_dict_with_boolean_batch28(tmp_path):
     p = tmp_path / "a.json"
     p.write_text('{"x": true, "y": false}', encoding="utf-8")
@@ -564,13 +557,6 @@ def test_module_source_unlink_used_for_cleanup_batch28():
 def test_module_source_contains_module_docstring_batch28():
     src = inspect.getsource(rmod)
     assert "评测 runner" in src
-
-
-def test_module_source_contains_process_single_import_batch28():
-    src = inspect.getsource(rmod)
-    assert "from app.pipeline import" in src
-    assert "process_single" in src
-    assert "image_output_dir_for" in src
 
 
 def test_module_source_contains_compute_automatic_metrics_batch28():

@@ -287,14 +287,6 @@ def test_parser_parse_is_abstractmethod():
     assert Parser.parse.__isabstractmethod__ is True
 
 
-def test_parser_direct_subclass_without_parse_remains_abstract():
-    class Sub(Parser):
-        pass
-
-    with pytest.raises(TypeError):
-        Sub()
-
-
 def test_parser_direct_subclass_with_parse_instantiable():
     class Sub(Parser):
         name = "sub"
@@ -652,10 +644,6 @@ def test_silence_unused_docstring_mentions_literal_or_source_type():
 def test_silence_unused_can_be_called_many_times():
     for _ in range(100):
         _silence_unused()
-
-
-def test_silence_unused_does_not_return_value():
-    assert _silence_unused() is None
 
 
 def test_silence_unused_idempotent():

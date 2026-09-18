@@ -313,44 +313,11 @@ def test_signature_one_param_batch5():
     assert len(sig.parameters) == 1
 
 
-def test_signature_param_name_document_batch5():
-    sig = inspect.signature(document_passes_schema)
-    assert list(sig.parameters.keys()) == ["document"]
-
-
-def test_signature_param_no_default_batch5():
-    sig = inspect.signature(document_passes_schema)
-    assert sig.parameters["document"].default is inspect.Parameter.empty
-
-
 def test_signature_param_annotation_dict_str_any_batch5():
     """document 参数注解是 dict[str, Any]。"""
     sig = inspect.signature(document_passes_schema)
     ann = str(sig.parameters["document"].annotation)
     assert "dict" in ann
-
-
-def test_signature_return_annotation_bool_batch5():
-    sig = inspect.signature(document_passes_schema)
-    assert "bool" in str(sig.return_annotation)
-
-
-def test_signature_no_var_positional_batch5():
-    sig = inspect.signature(document_passes_schema)
-    has_var_pos = any(
-        p.kind == inspect.Parameter.VAR_POSITIONAL
-        for p in sig.parameters.values()
-    )
-    assert not has_var_pos
-
-
-def test_signature_no_var_keyword_batch5():
-    sig = inspect.signature(document_passes_schema)
-    has_var_kw = any(
-        p.kind == inspect.Parameter.VAR_KEYWORD
-        for p in sig.parameters.values()
-    )
-    assert not has_var_kw
 
 
 # ---------- 综合行为 第五批
@@ -360,12 +327,6 @@ def test_e2e_does_not_raise_on_huge_dict_batch5():
     """超大 dict 也不抛异常。"""
     huge = {f"k{i}": i for i in range(2000)}
     result = document_passes_schema(huge)
-    assert isinstance(result, bool)
-
-
-def test_e2e_does_not_raise_on_unicode_content_batch5():
-    doc = {"content": "中文测试日本語한국어"}
-    result = document_passes_schema(doc)
     assert isinstance(result, bool)
 
 

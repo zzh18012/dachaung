@@ -104,12 +104,6 @@ def test_validate_unknown_schema_fnf_batch67():
         validate({}, "no-such.schema.json")
 
 
-def test_validate_file_directory_fnf_batch67(tmp_path):
-    with pytest.raises(FileNotFoundError) as ei:
-        validate_file(tmp_path, "manifest.schema.json")
-    assert "待校验文件不存在" in str(ei.value)
-
-
 # ---------- 源码补强 ----------
 
 def _src():

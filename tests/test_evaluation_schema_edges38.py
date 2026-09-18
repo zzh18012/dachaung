@@ -543,11 +543,6 @@ def test_module_source_has_future_annotations_string_batch18():
     assert "from __future__ import annotations" in src
 
 
-def test_module_source_has_eval_schema_error_docstring_batch18():
-    src = inspect.getsource(smod)
-    assert "Schema 校验失败时抛出" in src
-
-
 def test_module_source_has_load_schema_docstring_batch18():
     src = inspect.getsource(smod)
     assert "从 schemas/ 目录加载命名 Schema" in src

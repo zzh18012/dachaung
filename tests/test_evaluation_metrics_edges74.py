@@ -582,11 +582,6 @@ def test_source_docstring_mentions_v1_1_batch49():
     assert "v1.1" in src
 
 
-def test_source_docstring_mentions_word_internal_split_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert "词内硬切" in src
-
-
 def test_source_contains_math_isfinite_batch49():
     src = inspect.getsource(metrics_mod)
     assert "math.isfinite" in src

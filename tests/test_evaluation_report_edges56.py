@@ -462,11 +462,6 @@ def test_build_devset_section_returns_six_keys_batch41():
     assert len(out) == 6
 
 
-def test_build_devset_section_content_group_count_batch41():
-    out = build_devset_section(_make_manifest_mock(content_group_count=7))
-    assert out["content_group_count"] == 7
-
-
 def test_build_devset_section_pdf_count_batch41():
     out = build_devset_section(_make_manifest_mock(pdf_count=4))
     assert out["pdf_count"] == 4
@@ -508,13 +503,6 @@ def test_build_devset_section_does_not_mutate_input_batch41():
     before = list(m.categories_covered)
     build_devset_section(m)
     assert list(m.categories_covered) == before
-
-
-def test_build_devset_section_idempotent_batch41():
-    m = _make_manifest_mock()
-    out1 = build_devset_section(m)
-    out2 = build_devset_section(m)
-    assert out1 == out2
 
 
 def test_build_devset_section_json_serializable_batch41():
@@ -911,11 +899,6 @@ def test_module_all_contains_get_dependency_versions_batch41():
     assert "get_dependency_versions" in rmod.__all__
 
 
-def test_module_all_does_not_contain_private_metrics_batch41():
-    for name in ("_RATIO_METRICS", "_COUNT_METRICS", "_SUCCESS_BOOL_METRICS"):
-        assert name not in rmod.__all__
-
-
 def test_module_does_not_define_class_batch41():
     src = inspect.getsource(rmod)
     assert "\nclass " not in src
@@ -927,29 +910,6 @@ def test_module_has_future_annotations_batch41():
 
 
 # ---------- 端到端集成 第六十六批
-
-
-def test_e2e_build_provenance_full_round_trip_batch41(tmp_path):
-    """build_provenance 正常路径返回完整结构。"""
-    def side_effect(cmd, *args, **kwargs):
-        m = MagicMock()
-        m.returncode = 0
-        if "rev-parse" in cmd:
-            m.stdout = "abc123def\n"
-        else:
-            m.stdout = ""
-        return m
-    with patch("subprocess.run", side_effect=side_effect):
-        out = build_provenance(tmp_path, "fallback", 800, "0.1.0")
-    assert out["git_commit"] == "abc123def"
-    assert out["git_dirty"] is False
-    assert out["parser_name"] == "fallback"
-    assert out["parser_version"] == "0.1.0"
-    assert out["max_chars"] == 800
-    assert out["evaluator_version"] == EVALUATOR_VERSION
-    assert out["report_version"] == REPORT_VERSION
-    parsed = datetime.fromisoformat(out["run_timestamp_iso"])
-    assert isinstance(parsed, datetime)
 
 
 def test_e2e_build_provenance_dirty_state_batch41(tmp_path):

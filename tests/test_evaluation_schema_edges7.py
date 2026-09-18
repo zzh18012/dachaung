@@ -36,11 +36,6 @@ from evaluation.schema import (
 # =========================================================================
 
 
-def test_schemas_dir_contains_manifest_schema():
-    """schemas/ 含 manifest.schema.json。"""
-    assert (SCHEMAS_DIR / "manifest.schema.json").is_file()
-
-
 def test_schemas_dir_contains_annotation_schema():
     """schemas/ 含 annotation.schema.json。"""
     assert (SCHEMAS_DIR / "annotation.schema.json").is_file()
@@ -307,18 +302,6 @@ def test_validate_manifest_extra_top_keys_rejected():
 # =========================================================================
 
 
-def test_schema_path_returns_path_object():
-    """_schema_path 返回 Path 对象。"""
-    p = _schema_path("manifest.schema.json")
-    assert isinstance(p, Path)
-
-
-def test_schema_path_returns_under_schemas_dir():
-    """_schema_path 返回的路径在 SCHEMAS_DIR 内。"""
-    p = _schema_path("manifest.schema.json")
-    assert p.parent == SCHEMAS_DIR
-
-
 def test_schema_path_returned_path_is_absolute():
     """_schema_path 返回的路径是绝对路径。"""
     p = _schema_path("manifest.schema.json")
@@ -560,12 +543,6 @@ def test_module_all_last_element_validate_file():
     """__all__ 最后一个是 validate_file。"""
     import evaluation.schema as m
     assert m.__all__[-1] == "validate_file"
-
-
-def test_module_schema_path_not_in_all():
-    """_schema_path 不在 __all__（私有）。"""
-    import evaluation.schema as m
-    assert "_schema_path" not in m.__all__
 
 
 def test_module_schema_path_accessible():

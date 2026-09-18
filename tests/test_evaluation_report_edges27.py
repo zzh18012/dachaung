@@ -366,11 +366,6 @@ def test_build_provenance_git_dirty_is_bool_batch10():
     assert type(out["git_dirty"]) is bool
 
 
-def test_build_provenance_dependencies_3_keys_batch10():
-    out = build_provenance(Path("."), parser_name="fallback", max_chars=800, parser_version=None)
-    assert len(out["dependencies"]) == 3
-
-
 # ---------- build_devset_section 行为深度第十批 ----------
 
 
@@ -789,18 +784,6 @@ def test_signature_get_git_provenance_param_name_batch10():
     assert list(sig.parameters) == ["project_root"]
 
 
-def test_signature_get_git_provenance_param_kind_batch10():
-    sig = inspect.signature(get_git_provenance)
-    p = list(sig.parameters.values())[0]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_get_git_provenance_param_no_default_batch10():
-    sig = inspect.signature(get_git_provenance)
-    p = list(sig.parameters.values())[0]
-    assert p.default is inspect.Parameter.empty
-
-
 def test_signature_get_dependency_versions_no_params_batch10():
     sig = inspect.signature(get_dependency_versions)
     assert len(sig.parameters) == 0
@@ -814,11 +797,6 @@ def test_signature_get_dependency_versions_return_annotation_batch10():
 def test_signature_build_provenance_4_params_batch10():
     sig = inspect.signature(build_provenance)
     assert len(sig.parameters) == 4
-
-
-def test_signature_build_provenance_param_names_batch10():
-    sig = inspect.signature(build_provenance)
-    assert list(sig.parameters) == ["project_root", "parser_name", "max_chars", "parser_version"]
 
 
 def test_signature_build_provenance_param_kinds_batch10():
@@ -838,11 +816,6 @@ def test_signature_build_devset_section_1_param_batch10():
     assert len(sig.parameters) == 1
 
 
-def test_signature_build_devset_section_param_name_batch10():
-    sig = inspect.signature(build_devset_section)
-    assert list(sig.parameters) == ["manifest"]
-
-
 def test_signature_aggregate_summary_1_param_batch10():
     sig = inspect.signature(aggregate_summary)
     assert len(sig.parameters) == 1
@@ -851,28 +824,6 @@ def test_signature_aggregate_summary_1_param_batch10():
 def test_signature_aggregate_summary_param_name_batch10():
     sig = inspect.signature(aggregate_summary)
     assert list(sig.parameters) == ["per_doc_results"]
-
-
-def test_signature_funcs_function_type_batch10():
-    for func in (
-        get_git_provenance,
-        get_dependency_versions,
-        build_provenance,
-        build_devset_section,
-        aggregate_summary,
-    ):
-        assert inspect.isfunction(func)
-
-
-def test_signature_funcs_module_eq_batch10():
-    for func in (
-        get_git_provenance,
-        get_dependency_versions,
-        build_provenance,
-        build_devset_section,
-        aggregate_summary,
-    ):
-        assert func.__module__ == "evaluation.report"
 
 
 # ---------- module 合理性第十批 ----------
@@ -946,24 +897,6 @@ def test_e2e_full_chain_minimal_batch10():
     text = json.dumps(report)
     parsed = json.loads(text)
     assert parsed == report
-
-
-def test_e2e_full_chain_json_serializable_batch10():
-    docs = [
-        _metrics_doc(
-            {
-                "schema_valid": {"value": 1.0},
-                "pipeline_success": {"value": True},
-                "element_count_total": {"value": 5},
-                "silent_drop_count": {"value": 2},
-                "chunk_boundary_f1": {"value": 0.7},
-            }
-        )
-    ]
-    summary = aggregate_summary(docs)
-    text = json.dumps(summary)
-    parsed = json.loads(text)
-    assert parsed == summary
 
 
 def test_e2e_build_provenance_does_not_raise_on_real_call_batch10():

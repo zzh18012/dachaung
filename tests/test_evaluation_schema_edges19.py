@@ -60,11 +60,6 @@ def test_eval_schema_error_source_has_no_return():
     assert "return" not in src
 
 
-def test_eval_schema_error_source_init_signature():
-    src = inspect.getsource(EvalSchemaError)
-    assert "def __init__(self, message: str, errors: list[dict[str, Any]] | None = None) -> None:" in src
-
-
 def test_eval_schema_error_class_signature():
     sig = inspect.signature(EvalSchemaError)
     assert list(sig.parameters) == ["message", "errors"]
@@ -245,11 +240,6 @@ def test_validate_source_signature():
     assert sig.return_annotation == "None"
 
 
-def test_validate_source_loads_schema_first():
-    src = inspect.getsource(validate)
-    assert "schema = load_schema(schema_name)" in src
-
-
 def test_validate_source_creates_validator():
     src = inspect.getsource(validate)
     assert "validator = Draft202012Validator(schema)" in src
@@ -340,11 +330,6 @@ def test_validate_file_source_signature():
     assert sig.parameters["path"].annotation == "Path | str"
     assert sig.parameters["schema_name"].annotation == "str"
     assert sig.return_annotation == "None"
-
-
-def test_validate_file_source_check_is_file():
-    src = inspect.getsource(validate_file)
-    assert "if not p.is_file():" in src
 
 
 def test_validate_file_source_open_with_utf8():
@@ -486,16 +471,6 @@ def test_module_source_has_from_pathlib_import_path():
 def test_module_source_has_from_typing_import_any():
     src = inspect.getsource(m)
     assert "from typing import Any" in src
-
-
-def test_module_source_has_jsonschema_validator_import():
-    src = inspect.getsource(m)
-    assert "from jsonschema import Draft202012Validator" in src
-
-
-def test_module_source_has_jsonschema_validation_error_import():
-    src = inspect.getsource(m)
-    assert "from jsonschema.exceptions import ValidationError as JSValidationError" in src
 
 
 def test_module_source_no_actual_use_of_jsvalidationerror():
@@ -641,21 +616,6 @@ def test_module_all_is_list():
     assert isinstance(m.__all__, list)
 
 
-def test_module_all_entries_are_str():
-    for entry in m.__all__:
-        assert isinstance(entry, str)
-
-
-def test_module_all_5_entries_strict():
-    assert m.__all__ == [
-        "SCHEMAS_DIR",
-        "EvalSchemaError",
-        "load_schema",
-        "validate",
-        "validate_file",
-    ]
-
-
 def test_module_has_no_main_block():
     src = inspect.getsource(m)
     assert 'if __name__ == "__main__":' not in src
@@ -727,16 +687,6 @@ def test_e2e_manifest_rejects_invalid_devset_status():
     inst = {
         "manifest_version": "1.0",
         "devset_status": "invalid_status",
-        "documents": [],
-    }
-    with pytest.raises(EvalSchemaError):
-        validate(inst, "manifest.schema.json")
-
-
-def test_e2e_manifest_rejects_invalid_manifest_version():
-    inst = {
-        "manifest_version": "2.0",  # 不是 const "1.0"
-        "devset_status": "complete",
         "documents": [],
     }
     with pytest.raises(EvalSchemaError):

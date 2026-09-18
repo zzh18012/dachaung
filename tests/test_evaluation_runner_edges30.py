@@ -161,20 +161,9 @@ def test_process_one_source_calls_process_single_with_kwargs():
     assert "write_json=False" in src
 
 
-def test_process_one_source_uses_image_output_dir_for():
-    src = inspect.getsource(_process_one)
-    assert "image_output_dir_for(out_stub, document.source_hash)" in src
-
-
 def test_process_one_source_uses_isfile_before_unlink():
     src = inspect.getsource(_process_one)
     assert "if out_stub.is_file():" in src
-
-
-def test_process_one_source_unlinks_in_try_except_oserror():
-    src = inspect.getsource(_process_one)
-    assert "out_stub.unlink()" in src
-    assert "except OSError:" in src
 
 
 def test_process_one_source_returns_5_tuple_for_errors_path():
@@ -298,12 +287,6 @@ def test_run_evaluation_source_uses_metrics_update_twice():
     assert update_count == 2
 
 
-def test_run_evaluation_source_pops_tolerance_and_missing_records():
-    src = inspect.getsource(run_evaluation)
-    assert 'chunk_b.pop("_tolerance_chars"' in src
-    assert 'chunk_b.pop("_missing_markers"' in src
-
-
 def test_run_evaluation_source_appends_per_doc_results():
     src = inspect.getsource(run_evaluation)
     assert "per_doc_results.append(" in src
@@ -324,16 +307,6 @@ def test_run_evaluation_source_per_doc_dict_has_metrics():
     assert '"metrics": metrics' in src
 
 
-def test_run_evaluation_source_per_doc_dict_has_wall_time_seconds():
-    src = inspect.getsource(run_evaluation)
-    assert '"wall_time_seconds":' in src
-    assert '"total": total_seconds' in src
-    assert '"parse": None' in src
-    assert '"chunk": None' in src
-    assert '"parse_reason": "not_instrumented"' in src
-    assert '"chunk_reason": "not_instrumented"' in src
-
-
 def test_run_evaluation_source_per_doc_dict_has_annotation_present():
     src = inspect.getsource(run_evaluation)
     assert '"_annotation_present": annotation is not None' in src
@@ -347,11 +320,6 @@ def test_run_evaluation_source_loops_over_expected_failures():
 def test_run_evaluation_source_expected_failure_uses_ef_doc_id():
     src = inspect.getsource(run_evaluation)
     assert "ef.doc_id" in src
-
-
-def test_run_evaluation_source_expected_failure_uses_ef_resolved_path():
-    src = inspect.getsource(run_evaluation)
-    assert "ef.resolved_path" in src
 
 
 def test_run_evaluation_source_expected_failure_uses_ef_expected_error_code():
@@ -393,11 +361,6 @@ def test_run_evaluation_source_calls_aggregate_summary():
 def test_run_evaluation_source_initializes_public_per_doc():
     src = inspect.getsource(run_evaluation)
     assert "public_per_doc = []" in src
-
-
-def test_run_evaluation_source_loops_over_per_doc_results_for_public():
-    src = inspect.getsource(run_evaluation)
-    assert "for r in per_doc_results:" in src
 
 
 def test_run_evaluation_source_public_per_doc_excludes_private_keys():
@@ -1077,13 +1040,6 @@ def test_e2e_load_annotation_nonexistent_returns_none(tmp_path):
     """文件不存在 → None。"""
     p = tmp_path / "no.json"
     assert _load_annotation(p) is None
-
-
-def test_e2e_load_annotation_valid_json(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text('{"key": "value"}', encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == {"key": "value"}
 
 
 def test_e2e_load_annotation_invalid_json_returns_none(tmp_path):

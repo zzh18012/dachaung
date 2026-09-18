@@ -150,11 +150,6 @@ def test_process_one_source_has_image_dir_init_to_none():
     assert "image_dir: Path | None = None" in src
 
 
-def test_process_one_source_has_image_output_dir_for_call():
-    src = inspect.getsource(_process_one)
-    assert "image_dir = image_output_dir_for(out_stub, document.source_hash)" in src
-
-
 def test_process_one_source_has_unlink_in_try_except_oserror():
     src = inspect.getsource(_process_one)
     assert "try:" in src
@@ -317,69 +312,9 @@ def test_module_source_forbidden_tokens_fourth_batch(token):
 # ---------- module source 字符串精确补强 ----------
 
 
-def test_module_source_has_from_future():
-    src = inspect.getsource(runner)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_source_has_import_json():
-    src = inspect.getsource(runner)
-    assert "import json" in src
-
-
-def test_module_source_has_import_time():
-    src = inspect.getsource(runner)
-    assert "import time" in src
-
-
-def test_module_source_has_from_pathlib_import_path():
-    src = inspect.getsource(runner)
-    assert "from pathlib import Path" in src
-
-
-def test_module_source_has_from_typing_import_any():
-    src = inspect.getsource(runner)
-    assert "from typing import Any" in src
-
-
 def test_module_source_has_app_pipeline_import():
     src = inspect.getsource(runner)
     assert "from app.pipeline import image_output_dir_for, process_single" in src
-
-
-def test_module_source_has_evaluation_import():
-    src = inspect.getsource(runner)
-    assert "from evaluation import REPORT_VERSION" in src
-
-
-def test_module_source_has_annotation_metrics_import():
-    src = inspect.getsource(runner)
-    assert "from evaluation.annotation_metrics import" in src
-    assert "chunk_boundary_prf" in src
-    assert "figure_caption_prf" in src
-
-
-def test_module_source_has_metrics_import():
-    src = inspect.getsource(runner)
-    assert "from evaluation.metrics import compute_automatic_metrics" in src
-
-
-def test_module_source_has_report_import():
-    src = inspect.getsource(runner)
-    assert "from evaluation.report import" in src
-    assert "aggregate_summary" in src
-    assert "build_devset_section" in src
-    assert "build_provenance" in src
-
-
-def test_module_source_docstring_mentions_total():
-    src = inspect.getsource(runner)
-    assert "total" in src
-
-
-def test_module_source_docstring_mentions_pipeline():
-    src = inspect.getsource(runner)
-    assert "pipeline" in src
 
 
 def test_module_source_docstring_mentions_metrics():
@@ -387,48 +322,7 @@ def test_module_source_docstring_mentions_metrics():
     assert "metrics" in src
 
 
-def test_module_source_no_yield():
-    src = inspect.getsource(runner)
-    assert "yield" not in src
-
-
-def test_module_source_no_async():
-    src = inspect.getsource(runner)
-    assert "async " not in src
-
-
-def test_module_source_no_global():
-    src = inspect.getsource(runner)
-    assert "global " not in src
-
-
-def test_module_source_no_class():
-    src = inspect.getsource(runner)
-    assert "\nclass " not in src
-    assert not src.startswith("class ")
-
-
-def test_module_source_no_lambda():
-    src = inspect.getsource(runner)
-    assert "lambda " not in src
-
-
-def test_module_source_no_decorators():
-    src = inspect.getsource(runner)
-    for line in src.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("@"):
-            assert False, f"unexpected decorator: {stripped}"
-
-
 # ---------- signatures 精确补强 ----------
-
-
-def test_load_annotation_signature_return_dict_or_none():
-    sig = inspect.signature(_load_annotation)
-    ret = sig.return_annotation
-    assert "dict" in ret
-    assert "None" in ret
 
 
 def test_load_annotation_param_count():
@@ -444,13 +338,6 @@ def test_process_one_signature_4_params():
 def test_process_one_signature_param_names():
     sig = inspect.signature(_process_one)
     assert list(sig.parameters) == ["doc", "output_root", "parser_name", "max_chars"]
-
-
-def test_process_one_return_tuple_5_elements():
-    sig = inspect.signature(_process_one)
-    ret = sig.return_annotation
-    # tuple[dict | None, dict | None, float, str | None, Path | None]
-    assert "tuple" in ret
 
 
 def test_run_evaluation_signature_5_params():
@@ -494,37 +381,9 @@ def test_namespace_module():
     assert isinstance(runner, types.ModuleType)
 
 
-def test_namespace_load_annotation():
-    assert hasattr(runner, "_load_annotation")
-    assert isinstance(getattr(runner, "_load_annotation"), types.FunctionType)
-
-
-def test_namespace_process_one():
-    assert hasattr(runner, "_process_one")
-    assert isinstance(getattr(runner, "_process_one"), types.FunctionType)
-
-
-def test_namespace_run_evaluation():
-    assert hasattr(runner, "run_evaluation")
-    assert isinstance(getattr(runner, "run_evaluation"), types.FunctionType)
-
-
 def test_namespace_module_all():
     assert hasattr(runner, "__all__")
     assert "run_evaluation" in runner.__all__
-
-
-def test_module_all_only_run_evaluation():
-    assert runner.__all__ == ["run_evaluation"]
-
-
-def test_module_all_is_list():
-    assert isinstance(runner.__all__, list)
-
-
-def test_module_all_entries_str():
-    for entry in runner.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_has_2_private_functions():
@@ -535,24 +394,6 @@ def test_module_has_2_private_functions():
         and getattr(v, "__module__", "") == runner.__name__
     ]
     assert sorted(private_funcs) == ["_load_annotation", "_process_one"]
-
-
-def test_module_has_1_public_function():
-    public_funcs = [
-        n for n, v in vars(runner).items()
-        if not n.startswith("_") and isinstance(v, types.FunctionType)
-        and getattr(v, "__module__", "") == runner.__name__
-    ]
-    assert public_funcs == ["run_evaluation"]
-
-
-def test_module_no_class_definition():
-    classes = [
-        n for n, v in vars(runner).items()
-        if not n.startswith("_") and isinstance(v, type)
-        and getattr(v, "__module__", "") == runner.__name__
-    ]
-    assert classes == []
 
 
 # ---------- 端到端集成补强 ----------
@@ -569,13 +410,6 @@ def _make_minimal_manifest(tmp_path):
     )
 
 
-def test_e2e_no_documents_returns_dict(tmp_path):
-    out = tmp_path / "out.json"
-    mf = _make_minimal_manifest(tmp_path)
-    report = run_evaluation(mf, out)
-    assert isinstance(report, dict)
-
-
 def test_e2e_creates_output_in_subdir(tmp_path):
     out = tmp_path / "a" / "b" / "out.json"
     mf = _make_minimal_manifest(tmp_path)
@@ -590,14 +424,6 @@ def test_e2e_returns_same_dict_as_written(tmp_path):
     with out.open("r", encoding="utf-8") as f:
         written = json.load(f)
     assert returned == written
-
-
-def test_e2e_indent_2_in_output(tmp_path):
-    out = tmp_path / "out.json"
-    mf = _make_minimal_manifest(tmp_path)
-    run_evaluation(mf, out)
-    text = out.read_text(encoding="utf-8")
-    assert "\n  " in text
 
 
 def test_e2e_run_with_default_kwargs(tmp_path):
@@ -650,34 +476,6 @@ def test_e2e_summary_section_independent_of_documents(tmp_path):
     report = run_evaluation(mf, out)
     s = report["summary"]
     assert isinstance(s, dict)
-
-
-def test_e2e_per_doc_section_is_list(tmp_path):
-    out = tmp_path / "out.json"
-    mf = _make_minimal_manifest(tmp_path)
-    report = run_evaluation(mf, out)
-    assert isinstance(report["per_doc"], list)
-
-
-def test_e2e_expected_failures_section_is_list(tmp_path):
-    out = tmp_path / "out.json"
-    mf = _make_minimal_manifest(tmp_path)
-    report = run_evaluation(mf, out)
-    assert isinstance(report["expected_failures"], list)
-
-
-def test_e2e_no_documents_per_doc_empty(tmp_path):
-    out = tmp_path / "out.json"
-    mf = _make_minimal_manifest(tmp_path)
-    report = run_evaluation(mf, out)
-    assert report["per_doc"] == []
-
-
-def test_e2e_no_documents_expected_failures_empty(tmp_path):
-    out = tmp_path / "out.json"
-    mf = _make_minimal_manifest(tmp_path)
-    report = run_evaluation(mf, out)
-    assert report["expected_failures"] == []
 
 
 def test_e2e_run_with_max_chars_1(tmp_path):

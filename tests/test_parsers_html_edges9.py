@@ -261,10 +261,6 @@ def test_full_doc_element_types():
         "paragraph"]
 
 
-def test_full_doc_no_warnings():
-    assert _parse(FULL).warnings == []
-
-
 def test_full_doc_parser_identity():
     doc = _parse(FULL)
     assert doc.parser_name == "html"

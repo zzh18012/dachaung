@@ -804,16 +804,6 @@ def test_module_has_load_annotation_callable():
     assert callable(m._load_annotation)
 
 
-def test_module_has_process_one_callable():
-    import evaluation.runner as m
-    assert callable(m._process_one)
-
-
-def test_module_has_run_evaluation_callable():
-    import evaluation.runner as m
-    assert callable(m.run_evaluation)
-
-
 def test_load_annotation_signature():
     sig = inspect.signature(_load_annotation)
     assert list(sig.parameters) == ["path"]

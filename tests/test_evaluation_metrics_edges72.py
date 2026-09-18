@@ -363,14 +363,6 @@ def test_is_valid_bbox_with_str_batch48():
     assert _is_valid_bbox(["0", "0", "10", "10"]) is False
 
 
-def test_is_valid_bbox_with_nan_batch48():
-    assert _is_valid_bbox([float("nan"), 0, 10, 10]) is False
-
-
-def test_is_valid_bbox_with_inf_batch48():
-    assert _is_valid_bbox([float("inf"), 0, 10, 10]) is False
-
-
 def test_is_valid_bbox_none_batch48():
     assert _is_valid_bbox(None) is False
 
@@ -453,13 +445,6 @@ def test_chunk_reference_all_valid_batch48():
     chunks = [{"source_element_ids": ["e1"]}, {"source_element_ids": ["e2"]}]
     out = _chunk_reference_ratio(elements, chunks)
     assert out["value"] == 1.0
-
-
-def test_chunk_reference_missing_id_batch48():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": ["eX"]}]  # eX 不在 elements
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.0
 
 
 def test_chunk_reference_empty_ids_batch48():
@@ -573,11 +558,6 @@ def test_text_preservation_whitespace_insensitive_batch48():
 
 # ---------- _heading_boundary_ratio 各种 ----------
 
-def test_heading_boundary_no_heading_batch48():
-    out = _heading_boundary_ratio([{"type": "paragraph"}], [])
-    assert out["reason"] == "no_heading_elements"
-
-
 def test_heading_boundary_no_chunks_returns_zero_batch48():
     """有 heading 但无 chunks → 0.0（不是 null）。"""
     out = _heading_boundary_ratio([{"type": "heading", "element_id": "h1"}], [])
@@ -666,11 +646,6 @@ def test_silent_drop_extra_type_in_actual_ignored_batch48():
 
 
 # ---------- module source 字符串补强 ----------
-
-def test_source_contains_不修改_document_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "不修改 document" in src
-
 
 def test_source_contains_v1_1_batch48():
     src = inspect.getsource(metrics_mod)
@@ -799,12 +774,6 @@ def test_ast_silent_drop_has_for_loop_batch48():
     assert len(fors) == 1
 
 
-def test_ast_no_class_def_batch48():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_module_docstring_batch48():
     tree = ast.parse(inspect.getsource(metrics_mod))
     assert isinstance(tree.body[0], ast.Expr)
@@ -848,11 +817,6 @@ def test_source_no_locals_batch48():
 def test_source_no_os_system_batch48():
     src = inspect.getsource(metrics_mod)
     assert "os.system(" not in src
-
-
-def test_source_no_popen_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert ".popen(" not in src
 
 
 def test_source_no_yaml_load_batch48():

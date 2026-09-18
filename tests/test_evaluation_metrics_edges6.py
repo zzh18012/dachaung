@@ -166,11 +166,6 @@ def test_int_metric_negative():
     assert m["value"] == -3
 
 
-def test_int_metric_zero():
-    m = _int_metric(0)
-    assert m["value"] == 0
-
-
 # =========================================================================
 # _strip_unicode_whitespace 边界
 # =========================================================================

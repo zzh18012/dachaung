@@ -72,12 +72,6 @@ def test_atx_heading_regex_one_hash_level_1():
     assert m.group(2) == "Title"
 
 
-def test_atx_heading_regex_six_hashes_level_6():
-    m = _ATX_HEADING_RE.match("###### Title")
-    assert m is not None
-    assert len(m.group(1)) == 6
-
-
 def test_atx_heading_regex_seven_hashes_no_match():
     assert _ATX_HEADING_RE.match("####### Title") is None
 
@@ -159,16 +153,8 @@ def test_thematic_regex_mixed_chars_no_match():
     assert m is not None  # mixed 实际匹配
 
 
-def test_thematic_regex_two_chars_no_match():
-    assert _THEMATIC_RE.match("--") is None
-
-
 def test_thematic_regex_long_with_spaces():
     assert _THEMATIC_RE.match("- - - - -") is not None
-
-
-def test_thematic_regex_long_no_spaces():
-    assert _THEMATIC_RE.match("----------") is not None
 
 
 def test_thematic_regex_with_leading_space_no_match():
@@ -226,12 +212,6 @@ def test_fenced_regex_lang_with_dash():
     assert m.group(2) == "python-3"
 
 
-def test_fenced_regex_lang_with_plus():
-    m = _FENCED_RE.match("```c++")
-    assert m is not None
-    assert m.group(2) == "c++"
-
-
 def test_fenced_regex_two_backticks_no_match():
     """至少 3 个反引号。"""
     assert _FENCED_RE.match("``") is None
@@ -251,12 +231,6 @@ def test_fenced_regex_lang_with_space_no_match_in_lang():
 def test_fenced_regex_backticks_with_trailing_spaces():
     m = _FENCED_RE.match("```  ")
     assert m is not None
-
-
-def test_fenced_regex_tildes_with_lang():
-    m = _FENCED_RE.match("~~~javascript")
-    assert m is not None
-    assert m.group(2) == "javascript"
 
 
 def test_fenced_regex_mixed_fence_chars_no_match():
@@ -352,10 +326,6 @@ def test_blockquote_regex_basic():
     assert m.group(1) == "text"
 
 
-def test_blockquote_regex_no_marker():
-    assert _BLOCKQUOTE_RE.match("text") is None
-
-
 def test_blockquote_regex_multiple_markers_only_first_consumed():
     """嵌套引用 >>：regex 抓外层 >，剩余 > xxx 进 group(1)。"""
     m = _BLOCKQUOTE_RE.match(">> nested")
@@ -387,13 +357,6 @@ def test_blockquote_regex_leading_space_no_match():
 # =========================================================================
 
 
-def test_standalone_image_regex_empty_alt():
-    m = _STANDALONE_IMAGE_RE.match("![](url.png)")
-    assert m is not None
-    assert m.group(1) == ""
-    assert m.group(2) == "url.png"
-
-
 def test_standalone_image_regex_no_match_text_after():
     assert _STANDALONE_IMAGE_RE.match("![alt](url) text") is None
 
@@ -408,10 +371,6 @@ def test_standalone_image_regex_alt_with_spaces():
     m = _STANDALONE_IMAGE_RE.match("![some alt text](u)")
     assert m is not None
     assert m.group(1) == "some alt text"
-
-
-def test_standalone_image_regex_no_closing_paren_no_match():
-    assert _STANDALONE_IMAGE_RE.match("![alt](url") is None
 
 
 def test_standalone_image_regex_no_bang_prefix_no_match():
@@ -458,10 +417,6 @@ def test_pipe_table_sep_basic():
 def test_pipe_table_sep_no_pipes():
     """regex 允许 |? → 边缘可省略 |。"""
     assert _PIPE_TABLE_SEP_RE.match("--- | ---") is not None
-
-
-def test_pipe_table_sep_colon_left():
-    assert _PIPE_TABLE_SEP_RE.match("| :--- | --- |") is not None
 
 
 def test_pipe_table_sep_colon_both():
@@ -518,11 +473,6 @@ def test_is_pipe_table_start_three_columns():
     assert _is_pipe_table_start(lines, 0) is True
 
 
-def test_is_pipe_table_start_colon_alignment():
-    lines = ["| a | b |", "| :---: | ---: |"]
-    assert _is_pipe_table_start(lines, 0) is True
-
-
 # =========================================================================
 # _rows_to_md 深度
 # =========================================================================
@@ -574,10 +524,6 @@ def test_rows_to_md_handles_empty_cell_values():
     lines = s.split("\n")
     assert lines[0] == "|  |"
     assert lines[2] == "|  |"
-
-
-def test_rows_to_md_returns_str_type():
-    assert isinstance(_rows_to_md([]), str)
 
 
 def test_rows_to_md_with_unicode_cells():
@@ -648,14 +594,6 @@ def test_detect_md_source_type_md_upper():
 
 def test_detect_md_source_type_markdown_lower():
     assert _detect_md_source_type(Path("a.markdown")) == "markdown"
-
-
-def test_detect_md_source_type_markdown_upper():
-    assert _detect_md_source_type(Path("a.MARKDOWN")) == "markdown"
-
-
-def test_detect_md_source_type_mixed_case():
-    assert _detect_md_source_type(Path("a.Md")) == "markdown"
 
 
 def test_detect_md_source_type_double_extension_uses_last():

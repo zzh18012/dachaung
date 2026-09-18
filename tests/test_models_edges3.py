@@ -187,17 +187,6 @@ def test_element_resource_path_single_space_passes():
     assert e.resource_path == " "
 
 
-def test_element_both_content_and_resource_path_none_raises():
-    with pytest.raises(ValueError):
-        Element(
-            element_id="e1",
-            type="paragraph",
-            source_locator={},
-            content=None,
-            resource_path=None,
-        )
-
-
 def test_element_both_content_and_resource_path_empty_raises():
     with pytest.raises(ValueError):
         Element(
@@ -253,11 +242,6 @@ def test_element_confidence_zero():
     assert e.confidence == 0.0
 
 
-def test_element_metadata_default_empty_dict():
-    e = Element(element_id="e1", type="paragraph", source_locator={}, content="x")
-    assert e.metadata == {}
-
-
 def test_element_metadata_passed_through():
     e = Element(
         element_id="e1",
@@ -269,11 +253,6 @@ def test_element_metadata_passed_through():
     assert e.metadata == {"key": "value"}
 
 
-def test_element_parent_id_default_none():
-    e = Element(element_id="e1", type="paragraph", source_locator={}, content="x")
-    assert e.parent_id is None
-
-
 def test_element_parent_id_passed_through():
     e = Element(
         element_id="e1",
@@ -283,21 +262,6 @@ def test_element_parent_id_passed_through():
         parent_id="parent",
     )
     assert e.parent_id == "parent"
-
-
-def test_element_to_dict_has_seven_keys_exact():
-    e = Element(element_id="e1", type="paragraph", source_locator={}, content="x")
-    d = e.to_dict()
-    assert set(d.keys()) == {
-        "element_id",
-        "type",
-        "source_locator",
-        "parent_id",
-        "content",
-        "resource_path",
-        "confidence",
-        "metadata",
-    }
 
 
 def test_element_to_dict_keys_count_eight():

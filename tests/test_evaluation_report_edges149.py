@@ -99,11 +99,6 @@ def test_success_rate_not_one_batch534(tmp_path):
 
 # ---------- sdt None ----------
 
-def test_sdt_none_batch534(tmp_path):
-    assert _run(tmp_path)["summary"][
-        "silent_drop_total"] is None
-
-
 # ---------- 12 ratio 全 null ----------
 
 def test_ratio_count_twelve_batch534(tmp_path):

@@ -306,22 +306,6 @@ def test_run_evaluation_parser_version_first_kept_only_batch15(tmp_path):
     assert rep["provenance"]["parser_version"] == "v1"
 
 
-def test_run_evaluation_json_round_trip_batch15(tmp_path):
-    manifest = _StubManifest()
-    out_path = tmp_path / "report.json"
-    rep = run_evaluation(manifest, out_path, parser_name="fallback", max_chars=800)
-    file_text = out_path.read_text(encoding="utf-8")
-    file_rep = json.loads(file_text)
-    assert file_rep == rep
-
-
-def test_run_evaluation_returns_dict_batch15(tmp_path):
-    manifest = _StubManifest()
-    out_path = tmp_path / "report.json"
-    rep = run_evaluation(manifest, out_path, parser_name="fallback", max_chars=800)
-    assert isinstance(rep, dict)
-
-
 def test_run_evaluation_max_chars_passthrough_batch15(tmp_path):
     """max_chars 应传给 build_provenance。"""
     manifest = _StubManifest()
@@ -423,11 +407,6 @@ def test_module_source_imports_report_version_batch15():
     assert "from evaluation import REPORT_VERSION" in head
 
 
-def test_module_source_defines_load_annotation_batch15():
-    source = inspect.getsource(rmod)
-    assert "def _load_annotation(" in source
-
-
 def test_module_source_has_dunder_all_batch15():
     source = inspect.getsource(rmod)
     assert "__all__" in source
@@ -516,11 +495,6 @@ def test_module_dunder_file_exists_batch15():
     assert rmod.__file__ is not None
 
 
-def test_module_dunder_file_runner_py_batch15():
-    assert "evaluation" in rmod.__file__
-    assert rmod.__file__.endswith("runner.py")
-
-
 def test_module_name_evaluation_runner_batch15():
     assert rmod.__name__ == "evaluation.runner"
 
@@ -543,14 +517,6 @@ def test_module_public_function_count_1_batch15():
 
 
 # ---------- 端到端集成第十七批 ----------
-
-
-def test_e2e_run_evaluation_empty_manifest_json_serializable_batch15(tmp_path):
-    manifest = _StubManifest()
-    out_path = tmp_path / "report.json"
-    rep = run_evaluation(manifest, out_path, parser_name="fallback", max_chars=800)
-    parsed = json.loads(json.dumps(rep))
-    assert parsed == rep
 
 
 def test_e2e_run_evaluation_doc_with_failure_json_serializable_batch15(tmp_path):

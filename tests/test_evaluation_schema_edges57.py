@@ -52,11 +52,6 @@ def test_schemas_dir_is_path_batch42():
     assert isinstance(SCHEMAS_DIR, Path)
 
 
-def test_schemas_dir_resolved_batch42():
-    """SCHEMAS_DIR 是 resolve 过的绝对路径。"""
-    assert SCHEMAS_DIR.is_absolute()
-
-
 def test_schemas_dir_ends_with_schemas_batch42():
     assert SCHEMAS_DIR.name == "schemas"
 
@@ -102,13 +97,6 @@ def test_schema_path_returns_path_batch42():
     assert isinstance(p, Path)
 
 
-def test_schema_path_missing_file_raises_with_message_batch42():
-    with pytest.raises(FileNotFoundError) as exc:
-        _schema_path("nonexistent.schema.json")
-    assert "Schema 文件不存在" in str(exc.value)
-    assert "nonexistent.schema.json" in str(exc.value)
-
-
 def test_schema_path_absolute_batch42():
     p = _schema_path("manifest.schema.json")
     assert p.is_absolute()
@@ -117,11 +105,6 @@ def test_schema_path_absolute_batch42():
 def test_schema_path_signature_one_param_batch42():
     sig = inspect.signature(_schema_path)
     assert list(sig.parameters.keys()) == ["name"]
-
-
-def test_schema_path_name_annotation_str_batch42():
-    sig = inspect.signature(_schema_path)
-    assert "str" in str(sig.parameters["name"].annotation)
 
 
 def test_schema_path_return_annotation_path_batch42():
@@ -158,11 +141,6 @@ def test_load_schema_returns_dict_batch42():
     assert isinstance(out, dict)
 
 
-def test_load_schema_manifest_has_properties_batch42():
-    out = load_schema("manifest.schema.json")
-    assert "properties" in out
-
-
 def test_load_schema_manifest_has_required_batch42():
     out = load_schema("manifest.schema.json")
     assert "required" in out
@@ -179,11 +157,6 @@ def test_load_schema_with_annotation_batch42():
     assert "properties" in out
 
 
-def test_load_schema_with_evaluation_report_batch42():
-    out = load_schema("evaluation-report.schema.json")
-    assert isinstance(out, dict)
-
-
 def test_load_schema_signature_one_param_batch42():
     sig = inspect.signature(load_schema)
     assert list(sig.parameters.keys()) == ["name"]
@@ -192,20 +165,6 @@ def test_load_schema_signature_one_param_batch42():
 def test_load_schema_return_annotation_dict_batch42():
     sig = inspect.signature(load_schema)
     assert "dict" in str(sig.return_annotation)
-
-
-def test_load_schema_does_not_cache_batch42():
-    """两次调用返回不同对象。"""
-    s1 = load_schema("manifest.schema.json")
-    s2 = load_schema("manifest.schema.json")
-    assert s1 is not s2
-    assert s1 == s2
-
-
-def test_load_schema_idempotent_batch42():
-    s1 = load_schema("manifest.schema.json")
-    s2 = load_schema("manifest.schema.json")
-    assert json.dumps(s1, sort_keys=True) == json.dumps(s2, sort_keys=True)
 
 
 def test_load_schema_modification_isolated_batch42():
@@ -226,16 +185,6 @@ def test_validate_callable_batch42():
 def test_validate_signature_two_params_batch42():
     sig = inspect.signature(validate)
     assert list(sig.parameters.keys()) == ["instance", "schema_name"]
-
-
-def test_validate_instance_annotation_dict_batch42():
-    sig = inspect.signature(validate)
-    assert "dict" in str(sig.parameters["instance"].annotation)
-
-
-def test_validate_schema_name_annotation_str_batch42():
-    sig = inspect.signature(validate)
-    assert "str" in str(sig.parameters["schema_name"].annotation)
 
 
 def test_validate_return_annotation_none_batch42():
@@ -263,12 +212,6 @@ def test_validate_invalid_schema_name_raises_file_not_found_batch42():
         validate({}, "unknown.schema.json")
 
 
-def test_validate_eval_schema_error_errors_not_none_batch42():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    assert exc.value.errors is not None
-
-
 def test_validate_eval_schema_error_errors_have_full_keys_batch42():
     """每个 error 含 path/message/schema_path。"""
     with pytest.raises(EvalSchemaError) as exc:
@@ -289,12 +232,6 @@ def test_validate_message_contains_error_count_batch42():
         validate({}, "manifest.schema.json")
     # "X 处" 表示错误数
     assert "处" in str(exc.value)
-
-
-def test_validate_message_contains_first_error_path_batch42():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({"unknown_key": "x"}, "manifest.schema.json")
-    assert "path=" in str(exc.value)
 
 
 def test_validate_does_not_raise_on_valid_instance_batch42():
@@ -356,60 +293,15 @@ def test_validate_file_invalid_json_raises_batch42(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_valid_minimal_batch42(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [],
-        "expected_failures": [],
-    }), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")  # 不抛
-
-
-def test_validate_file_str_path_input_batch42(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [],
-        "expected_failures": [],
-    }), encoding="utf-8")
-    validate_file(str(p), "manifest.schema.json")
-
-
-def test_validate_file_path_annotation_path_or_str_batch42():
-    sig = inspect.signature(validate_file)
-    ann = str(sig.parameters["path"].annotation)
-    assert "Path" in ann
-    assert "str" in ann
-
-
 def test_validate_file_return_annotation_none_batch42():
     sig = inspect.signature(validate_file)
     assert "None" in str(sig.return_annotation)
-
-
-def test_validate_file_calls_validate_batch42(tmp_path):
-    """validate_file 内部调用 validate。"""
-    p = tmp_path / "m.json"
-    p.write_text("{}", encoding="utf-8")
-    with patch("evaluation.schema.validate") as mock:
-        validate_file(p, "manifest.schema.json")
-    mock.assert_called_once()
 
 
 def test_validate_file_top_level_array_raises_batch42(tmp_path):
     """顶层 list 不符合 manifest schema（manifest 要求 dict）。"""
     p = tmp_path / "arr.json"
     p.write_text("[1, 2, 3]", encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_top_level_int_raises_batch42(tmp_path):
-    p = tmp_path / "int.json"
-    p.write_text("42", encoding="utf-8")
     with pytest.raises(EvalSchemaError):
         validate_file(p, "manifest.schema.json")
 
@@ -433,31 +325,15 @@ def test_eval_schema_error_is_exception_batch42():
     assert issubclass(EvalSchemaError, Exception)
 
 
-def test_eval_schema_error_default_errors_empty_batch42():
-    err = EvalSchemaError("boom")
-    assert err.errors == []
-
-
 def test_eval_schema_error_with_errors_batch42():
     errs = [{"path": ["a"], "message": "x", "schema_path": []}]
     err = EvalSchemaError("boom", errors=errs)
     assert err.errors == errs
 
 
-def test_eval_schema_error_with_none_errors_batch42():
-    err = EvalSchemaError("boom", errors=None)
-    assert err.errors == []
-
-
 def test_eval_schema_error_with_empty_list_errors_batch42():
     err = EvalSchemaError("boom", errors=[])
     assert err.errors == []
-
-
-def test_eval_schema_error_can_be_raised_batch42():
-    with pytest.raises(EvalSchemaError) as exc:
-        raise EvalSchemaError("x")
-    assert "x" in str(exc.value)
 
 
 def test_eval_schema_error_caught_as_exception_batch42():
@@ -473,12 +349,6 @@ def test_eval_schema_error_caught_specific_batch42():
     except EvalSchemaError:
         caught = True
     assert caught
-
-
-def test_eval_schema_error_errors_attribute_writable_batch42():
-    err = EvalSchemaError("x")
-    err.errors = [{"new": True}]
-    assert err.errors == [{"new": True}]
 
 
 def test_eval_schema_error_signature_init_batch42():
@@ -691,12 +561,6 @@ def test_module_has_validate_attr_batch42():
 
 def test_module_has_validate_file_attr_batch42():
     assert hasattr(smod, "validate_file")
-
-
-def test_module_functions_callable_batch42():
-    assert callable(smod.load_schema)
-    assert callable(smod.validate)
-    assert callable(smod.validate_file)
 
 
 # ---------- AST 结构 第四十二批

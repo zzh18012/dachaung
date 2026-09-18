@@ -28,12 +28,6 @@ from evaluation.runner import _load_annotation, _process_one, run_evaluation
 # ---------- _load_annotation 第二十五批 ----------
 
 
-def test_load_annotation_positive_int_batch25(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("42", encoding="utf-8")
-    assert _load_annotation(p) == 42
-
-
 def test_load_annotation_zero_int_batch25(tmp_path):
     p = tmp_path / "a.json"
     p.write_text("0", encoding="utf-8")
@@ -44,12 +38,6 @@ def test_load_annotation_negative_int_batch25(tmp_path):
     p = tmp_path / "a.json"
     p.write_text("-7", encoding="utf-8")
     assert _load_annotation(p) == -7
-
-
-def test_load_annotation_scientific_notation_batch25(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("1.5e3", encoding="utf-8")
-    assert _load_annotation(p) == 1500.0
 
 
 def test_load_annotation_negative_scientific_batch25(tmp_path):
@@ -76,19 +64,6 @@ def test_load_annotation_infinity_literal_batch25(tmp_path):
     result = _load_annotation(p)
     # 默认接受为 inf；只有 JSONDecodeError 才返回 None
     assert result is None or result == float("inf")
-
-
-def test_load_annotation_single_quoted_string_invalid_batch25(tmp_path):
-    """JSON 不允许单引号字符串 → JSONDecodeError → None。"""
-    p = tmp_path / "a.json"
-    p.write_text("{'a': 1}", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
-def test_load_annotation_trailing_comma_invalid_batch25(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text('{"a": 1,}', encoding="utf-8")
-    assert _load_annotation(p) is None
 
 
 def test_load_annotation_nested_array_batch25(tmp_path):
@@ -670,18 +645,6 @@ def test_module_source_no_star_import_batch25():
     assert "import *" not in source
 
 
-def test_module_source_no_environ_batch25():
-    source = inspect.getsource(rmod)
-    assert "os.environ" not in source
-    assert "getenv" not in source
-
-
-def test_module_source_no_dataclass_batch25():
-    source = inspect.getsource(rmod)
-    assert "@dataclass" not in source
-    assert "from dataclasses" not in source
-
-
 def test_module_source_no_argparse_batch25():
     source = inspect.getsource(rmod)
     assert "argparse" not in source
@@ -809,11 +772,6 @@ def test_signature_load_annotation_param_count_batch25():
 def test_signature_load_annotation_param_name_batch25():
     sig = inspect.signature(_load_annotation)
     assert "path" in sig.parameters
-
-
-def test_signature_load_annotation_param_annotation_batch25():
-    sig = inspect.signature(_load_annotation)
-    assert sig.parameters["path"].annotation == "Path | None"
 
 
 def test_signature_process_one_param_count_batch25():

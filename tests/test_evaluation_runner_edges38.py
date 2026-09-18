@@ -836,26 +836,6 @@ def test_runner_source_no_logging_batch11():
     assert "logger" not in source
 
 
-def test_runner_source_no_socket_batch11():
-    source = inspect.getsource(rmod)
-    assert "socket" not in source
-
-
-def test_runner_source_no_threading_batch11():
-    source = inspect.getsource(rmod)
-    assert "threading" not in source
-
-
-def test_runner_source_no_multiprocessing_batch11():
-    source = inspect.getsource(rmod)
-    assert "multiprocessing" not in source
-
-
-def test_runner_source_no_asyncio_batch11():
-    source = inspect.getsource(rmod)
-    assert "asyncio" not in source
-
-
 def test_runner_source_no_pickle_module_batch11():
     source = inspect.getsource(rmod)
     assert "import pickle" not in source
@@ -893,12 +873,6 @@ def test_module_source_imports_process_single_batch11():
     source = inspect.getsource(rmod)
     assert "process_single" in source
     assert "image_output_dir_for" in source
-
-
-def test_module_source_imports_annotation_metrics_batch11():
-    source = inspect.getsource(rmod)
-    assert "chunk_boundary_prf" in source
-    assert "figure_caption_prf" in source
 
 
 def test_module_source_imports_metrics_batch11():
@@ -951,11 +925,6 @@ def test_module_source_docstring_mentions_constraints_batch11():
 def test_signature_load_annotation_1_param_batch11():
     sig = inspect.signature(_load_annotation)
     assert len(sig.parameters) == 1
-
-
-def test_signature_load_annotation_param_name_batch11():
-    sig = inspect.signature(_load_annotation)
-    assert list(sig.parameters) == ["path"]
 
 
 def test_signature_load_annotation_param_kind_batch11():
@@ -1056,14 +1025,6 @@ def test_module_all_entries_str_batch11():
 def test_module_has_dunder_file_batch11():
     assert hasattr(rmod, "__file__")
     assert rmod.__file__ is not None
-
-
-def test_module_dunder_file_endswith_runner_py_batch11():
-    import os
-    sep = os.sep
-    assert rmod.__file__.endswith("evaluation" + sep + "runner.py") or rmod.__file__.endswith(
-        "evaluation/runner.py"
-    )
 
 
 def test_module_name_is_evaluation_runner_batch11():

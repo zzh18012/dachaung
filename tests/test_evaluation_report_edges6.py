@@ -646,12 +646,6 @@ class _FakeManifest:
         self.devset_status = kwargs.get("devset_status", "incomplete")
 
 
-def test_build_devset_section_categories_covered_empty():
-    m = _FakeManifest(categories_covered=[])
-    result = build_devset_section(m)
-    assert result["categories_covered"] == []
-
-
 def test_build_devset_section_categories_covered_preserves_duplicates():
     """build_devset_section 不去重（直接读取 manifest 的 list）。"""
     m = _FakeManifest(categories_covered=["a", "a", "b"])
@@ -665,15 +659,6 @@ def test_build_devset_section_categories_covered_preserves_order():
     assert result["categories_covered"] == ["z", "a", "m"]
 
 
-def test_build_devset_section_keys_exact_set():
-    m = _FakeManifest()
-    result = build_devset_section(m)
-    assert set(result.keys()) == {
-        "status", "file_count", "content_group_count",
-        "pdf_count", "docx_count", "categories_covered",
-    }
-
-
 def test_build_devset_section_signature():
     sig = inspect.signature(build_devset_section)
     assert set(sig.parameters) == {"manifest"}
@@ -684,29 +669,11 @@ def test_build_devset_section_signature():
 # =========================================================================
 
 
-def test_module_imports_subprocess():
-    import evaluation.report as mod
-    src = inspect.getsource(mod)
-    assert "import subprocess" in src
-
-
 def test_module_imports_datetime():
     import evaluation.report as mod
     src = inspect.getsource(mod)
     assert "from datetime import" in src
     assert "datetime" in src
-
-
-def test_module_imports_path():
-    import evaluation.report as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import evaluation.report as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
 
 
 def test_module_imports_evaluator_report_versions():
@@ -750,27 +717,6 @@ def test_module_constants_are_tuples():
     assert isinstance(_COUNT_METRICS, tuple)
     assert isinstance(_SUCCESS_BOOL_METRICS, tuple)
     assert isinstance(_RATIO_METRICS, tuple)
-
-
-def test_module_all_exact_list():
-    import evaluation.report as mod
-    assert mod.__all__ == [
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    ]
-
-
-def test_module_all_no_duplicates():
-    import evaluation.report as mod
-    assert len(mod.__all__) == len(set(mod.__all__))
-
-
-def test_module_no_silence_unused():
-    import evaluation.report as mod
-    assert not hasattr(mod, "_silence_unused")
 
 
 def test_module_docstring_mentions_no_mix_types():

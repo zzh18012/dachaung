@@ -350,11 +350,6 @@ def test_lines_to_para_multi_lines_merged():
     assert "line2" in result["text"]
 
 
-def test_lines_to_para_returns_dict():
-    result = _lines_to_para([])
-    assert isinstance(result, dict)
-
-
 def test_lines_to_para_text_is_str():
     result = _lines_to_para([[_make_word("x")]])
     assert isinstance(result["text"], str)
@@ -508,12 +503,6 @@ def test_fallback_parser_init_no_args():
     assert parser is not None
 
 
-def test_fallback_parser_init_image_output_dir_str(tmp_path: Path):
-    parser = FallbackParser(image_output_dir=str(tmp_path))
-    # str 转 Path
-    assert isinstance(parser._image_output_dir, Path)
-
-
 def test_fallback_parser_init_image_output_dir_none():
     parser = FallbackParser(image_output_dir=None)
     assert parser._image_output_dir is None
@@ -559,40 +548,6 @@ def test_docx_version_constant():
 # =========================================================================
 
 
-def test_module_all_exact():
-    import app.parsers.fallback_parser as mod
-    assert mod.__all__ == ["FallbackParser"]
-
-
-def test_module_all_is_list():
-    import app.parsers.fallback_parser as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_uses_future_annotations():
-    import app.parsers.fallback_parser as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_re():
-    import app.parsers.fallback_parser as mod
-    src = inspect.getsource(mod)
-    assert "import re" in src
-
-
-def test_module_imports_path():
-    import app.parsers.fallback_parser as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.parsers.fallback_parser as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
 def test_module_imports_models():
     import app.parsers.fallback_parser as mod
     src = inspect.getsource(mod)
@@ -603,11 +558,6 @@ def test_module_imports_base():
     import app.parsers.fallback_parser as mod
     src = inspect.getsource(mod)
     assert "from app.parsers.base" in src
-
-
-def test_module_docstring_present():
-    import app.parsers.fallback_parser as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_pdfplumber():

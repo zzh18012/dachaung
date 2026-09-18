@@ -84,11 +84,6 @@ def test_schema_path_signature_batch43():
     assert params == ["name"]
 
 
-def test_schema_path_param_kind_batch43():
-    sig = inspect.signature(_schema_path)
-    assert sig.parameters["name"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_schema_path_no_default_batch43():
     sig = inspect.signature(_schema_path)
     assert sig.parameters["name"].default is inspect.Parameter.empty
@@ -148,11 +143,6 @@ def test_load_schema_annotation_batch43():
 def test_load_schema_evaluation_report_batch43():
     s = load_schema("evaluation-report.schema.json")
     assert isinstance(s, dict)
-
-
-def test_load_schema_missing_raises_filenotfound_batch43():
-    with pytest.raises(FileNotFoundError):
-        load_schema("nonexistent.json")
 
 
 def test_load_schema_calls_schema_path_batch43():
@@ -231,13 +221,6 @@ def test_validate_errors_field_has_keys_batch43():
         assert "path" in e0
         assert "message" in e0
         assert "schema_path" in e0
-
-
-def test_validate_error_message_contains_count_batch43():
-    with pytest.raises(EvalSchemaError) as exc_info:
-        validate({}, "manifest.schema.json")
-    msg = str(exc_info.value)
-    assert "校验失败" in msg
 
 
 def test_validate_uses_draft202012_batch43():
@@ -331,16 +314,6 @@ def test_eval_schema_error_default_errors_batch43():
     assert e.errors == []
 
 
-def test_eval_schema_error_none_errors_batch43():
-    e = EvalSchemaError("oops", errors=None)
-    assert e.errors == []
-
-
-def test_eval_schema_error_empty_list_errors_batch43():
-    e = EvalSchemaError("oops", errors=[])
-    assert e.errors == []
-
-
 def test_eval_schema_error_with_errors_batch43():
     errs = [{"path": ["a"], "message": "bad"}]
     e = EvalSchemaError("oops", errors=errs)
@@ -387,12 +360,6 @@ def test_eval_schema_error_init_signature_batch43():
     sig = inspect.signature(EvalSchemaError.__init__)
     params = list(sig.parameters.keys())
     assert params == ["self", "message", "errors"]
-
-
-def test_eval_schema_error_init_defaults_batch43():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    assert sig.parameters["message"].default is inspect.Parameter.empty
-    assert sig.parameters["errors"].default is None
 
 
 # ---------- __all__ ----------

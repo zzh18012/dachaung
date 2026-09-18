@@ -489,12 +489,6 @@ def test_module_source_no_argparse_batch27():
     assert "argparse" not in source
 
 
-def test_module_source_subprocess_allowed_batch27():
-    """report.py 允许 import subprocess（git provenance 用）。"""
-    source = inspect.getsource(rmod)
-    assert "import subprocess" in source
-
-
 def test_module_source_datetime_allowed_batch27():
     """report.py 允许 from datetime import datetime。"""
     source = inspect.getsource(rmod)
@@ -590,13 +584,6 @@ def test_signature_build_provenance_batch27():
     assert list(sig.parameters.keys()) == ["project_root", "parser_name", "max_chars", "parser_version"]
 
 
-def test_signature_build_provenance_annotations_batch27():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["parser_name"].annotation == "str"
-    assert sig.parameters["max_chars"].annotation == "int"
-    assert sig.parameters["parser_version"].annotation == "str | None"
-
-
 def test_signature_build_devset_section_one_arg_batch27():
     sig = inspect.signature(build_devset_section)
     assert list(sig.parameters.keys()) == ["manifest"]
@@ -626,19 +613,6 @@ def test_module_all_five_entries_batch27():
         "aggregate_summary",
         "get_git_provenance",
         "get_dependency_versions",
-    }
-
-
-def test_module_has_five_functions_batch27():
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(rmod))
-    funcs = [n.name for n in tree.body if isinstance(n, _ast.FunctionDef)]
-    assert set(funcs) == {
-        "get_git_provenance",
-        "get_dependency_versions",
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
     }
 
 
@@ -779,10 +753,3 @@ def test_e2e_build_provenance_run_timestamp_changes_batch27(tmp_path):
         out2 = build_provenance(tmp_path, "fallback", 800, None)
     datetime.fromisoformat(out1["run_timestamp_iso"])
     datetime.fromisoformat(out2["run_timestamp_iso"])
-
-
-def test_e2e_aggregate_summary_figure_caption_always_null_safe_batch27():
-    """figure_caption_* 不在 _RATIO_METRICS → ratio_macro_averages 不应包含。"""
-    per_doc = [{"metrics": {"figure_caption_precision": {"value": None, "reason": "parser_does_not_emit_relations"}}}]
-    out = aggregate_summary(per_doc)
-    assert "figure_caption_precision" not in out["ratio_macro_averages"]

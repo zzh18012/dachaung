@@ -98,20 +98,8 @@ def test_heading_levels_is_dict():
 # =========================================================================
 
 
-def test_detect_html_source_type_html_lowercase():
-    assert _detect_html_source_type(Path("test.html")) == "html"
-
-
-def test_detect_html_source_type_htm_lowercase():
-    assert _detect_html_source_type(Path("test.htm")) == "html"
-
-
 def test_detect_html_source_type_html_uppercase():
     assert _detect_html_source_type(Path("test.HTML")) == "html"
-
-
-def test_detect_html_source_type_htm_uppercase():
-    assert _detect_html_source_type(Path("test.HTM")) == "html"
 
 
 def test_detect_html_source_type_mixed_case():
@@ -127,11 +115,6 @@ def test_detect_html_source_type_rejects_pdf():
 def test_detect_html_source_type_rejects_docx():
     with pytest.raises(ParserError):
         _detect_html_source_type(Path("test.docx"))
-
-
-def test_detect_html_source_type_rejects_md():
-    with pytest.raises(ParserError):
-        _detect_html_source_type(Path("test.md"))
 
 
 def test_detect_html_source_type_rejects_no_suffix():
@@ -222,22 +205,9 @@ def test_html_parser_version_value():
     assert HtmlParser.version == "stdlib/0.1.0"
 
 
-def test_html_parser_name_is_str():
-    assert isinstance(HtmlParser.name, str)
-
-
-def test_html_parser_version_is_str():
-    assert isinstance(HtmlParser.version, str)
-
-
 def test_html_parser_inherits_parser():
     from app.parsers.base import Parser
     assert issubclass(HtmlParser, Parser)
-
-
-def test_html_doc_parser_inherits_stdlib_html_parser():
-    from html.parser import HTMLParser
-    assert issubclass(_HTMLDocParser, HTMLParser)
 
 
 # =========================================================================

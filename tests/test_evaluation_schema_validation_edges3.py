@@ -97,23 +97,6 @@ def test_module_all_no_duplicates():
     assert len(mod.__all__) == len(set(mod.__all__))
 
 
-def test_module_imports_any():
-    import evaluation.schema_validation as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
-def test_module_uses_future_annotations():
-    import evaluation.schema_validation as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_docstring_present():
-    import evaluation.schema_validation as mod
-    assert mod.__doc__ is not None
-
-
 def test_module_docstring_mentions_purpose():
     """docstring 提及"避免 import 循环"。"""
     import evaluation.schema_validation as mod
@@ -169,11 +152,6 @@ def test_module_only_one_public_name():
 def test_document_passes_schema_signature_one_param():
     sig = inspect.signature(document_passes_schema)
     assert len(sig.parameters) == 1
-
-
-def test_document_passes_schema_param_name():
-    sig = inspect.signature(document_passes_schema)
-    assert "document" in sig.parameters
 
 
 def test_document_passes_schema_param_annotation_dict():

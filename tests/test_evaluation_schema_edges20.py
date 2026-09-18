@@ -245,14 +245,6 @@ def test_validate_count_in_message_matches_errors_length():
         assert "处" in msg or "errors" in msg.lower()
 
 
-def test_validate_errors_message_is_str():
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e:
-        for err in e.errors:
-            assert isinstance(err["message"], str)
-
-
 def test_validate_invalid_schema_name_raises_filenotfound():
     with pytest.raises(FileNotFoundError):
         validate({}, "nonexistent.schema.json")
@@ -286,16 +278,6 @@ def test_validate_file_str_path_conversion_to_path(tmp_path):
     validate_file(str(p), "manifest.schema.json")
 
 
-def test_validate_file_pathlib_path(tmp_path):
-    p = tmp_path / "valid.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_missing_raises_filenotfound(tmp_path):
     p = tmp_path / "nope.json"
     with pytest.raises(FileNotFoundError):
@@ -314,13 +296,6 @@ def test_validate_file_invalid_json_raises_jsondecodeerror(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("{not json", encoding="utf-8")
     with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_invalid_content_raises_eval_schema_error(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text(json.dumps({"wrong": "shape"}), encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
         validate_file(p, "manifest.schema.json")
 
 

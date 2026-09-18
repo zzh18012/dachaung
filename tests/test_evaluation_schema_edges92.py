@@ -113,13 +113,6 @@ def test_validate_file_str_path_batch60(tmp_path):
     assert validate_file(str(f), "manifest.schema.json") is None
 
 
-def test_validate_file_missing_fnf_batch60(tmp_path):
-    with pytest.raises(FileNotFoundError) as ei:
-        validate_file(tmp_path / "nope.json",
-                      "manifest.schema.json")
-    assert "待校验文件不存在" in str(ei.value)
-
-
 # ---------- 源码补强 ----------
 
 def _src():

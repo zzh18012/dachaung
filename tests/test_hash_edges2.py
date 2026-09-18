@@ -81,11 +81,6 @@ def test_compute_text_hash_list_raises():
         compute_text_hash(["hello"])  # type: ignore[arg-type]
 
 
-def test_compute_text_hash_dict_raises():
-    with pytest.raises(AttributeError):
-        compute_text_hash({"k": "v"})  # type: ignore[arg-type]
-
-
 def test_compute_text_hash_none_raises():
     with pytest.raises(AttributeError):
         compute_text_hash(None)  # type: ignore[arg-type]

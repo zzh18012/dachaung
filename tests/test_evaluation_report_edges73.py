@@ -256,10 +256,6 @@ def test_source_figure_caption_excluded_batch53():
     assert "figure_caption" not in _RATIO_METRICS
 
 
-def test_source_version_import_batch53():
-    assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in _src()
-
-
 # ---------- AST 补强 ----------
 
 def _tree():

@@ -201,11 +201,6 @@ def test_build_provenance_parser_name_passthrough_batch14():
     assert out["parser_name"] == "my_parser"
 
 
-def test_build_provenance_evaluator_version_value_batch14():
-    out = build_provenance(Path("."), parser_name="x", max_chars=100, parser_version=None)
-    assert out["evaluator_version"] == EVALUATOR_VERSION
-
-
 # ---------- build_devset_section 字段深度第十四批 ----------
 
 
@@ -355,15 +350,6 @@ def test_aggregate_summary_success_rate_with_none_value_batch14():
     assert s["success_rates"]["pipeline_success"]["rate"] == 0.5
 
 
-def test_aggregate_summary_does_not_modify_input_batch14():
-    docs = [
-        _metrics_doc({"schema_valid": {"value": 1.0}}),
-    ]
-    docs_before = json.loads(json.dumps(docs))
-    aggregate_summary(docs)
-    assert docs == docs_before
-
-
 def test_aggregate_summary_returns_4_keys_batch14():
     s = aggregate_summary([])
     assert set(s.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
@@ -425,12 +411,6 @@ def test_module_source_imports_typing_batch14():
     assert "from typing import Any" in head
 
 
-def test_module_source_imports_eval_versions_batch14():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from evaluation import" in head
-
-
 def test_module_source_defines_aggregate_summary_batch14():
     source = inspect.getsource(rmod)
     assert "def aggregate_summary(" in source
@@ -445,11 +425,6 @@ def test_module_source_dunder_all_count_5_batch14():
     assert len(rmod.__all__) == 5
 
 
-def test_module_source_uses_subprocess_run_batch14():
-    source = inspect.getsource(rmod)
-    assert "subprocess.run" in source
-
-
 def test_module_source_no_open_call_batch14():
     source = inspect.getsource(rmod)
     assert "open('/etc" not in source
@@ -460,16 +435,6 @@ def test_module_source_no_subprocess_call_batch14():
     """不应使用 subprocess.call（旧 API）。"""
     source = inspect.getsource(rmod)
     assert "subprocess.call(" not in source
-
-
-def test_module_source_has_rev_parse_batch14():
-    source = inspect.getsource(rmod)
-    assert "rev-parse" in source
-
-
-def test_module_source_has_porcelain_batch14():
-    source = inspect.getsource(rmod)
-    assert "porcelain" in source
 
 
 def test_module_source_has_macro_average_batch14():
@@ -533,11 +498,6 @@ def test_module_dunder_file_exists_batch14():
     assert rmod.__file__ is not None
 
 
-def test_module_dunder_file_report_py_batch14():
-    assert "evaluation" in rmod.__file__
-    assert rmod.__file__.endswith("report.py")
-
-
 def test_module_name_evaluation_report_batch14():
     assert rmod.__name__ == "evaluation.report"
 
@@ -552,12 +512,6 @@ def test_module_no_class_definitions_batch14():
         if inspect.isclass(v) and v.__module__ == rmod.__name__
     ]
     assert classes == []
-
-
-def test_module_constants_count_3_batch14():
-    assert hasattr(rmod, "_RATIO_METRICS")
-    assert hasattr(rmod, "_COUNT_METRICS")
-    assert hasattr(rmod, "_SUCCESS_BOOL_METRICS")
 
 
 # ---------- 端到端集成第十六批 ----------
@@ -657,13 +611,6 @@ def test_e2e_combined_summary_full_pipeline_batch14():
     assert s["success_rates"]["pipeline_success"]["total"] == 2
     assert s["ratio_macro_averages"]["schema_valid"]["macro_average"] == 0.75
     assert s["silent_drop_total"] == 3
-
-
-def test_e2e_dependency_versions_idempotent_batch14():
-    out1 = get_dependency_versions()
-    out2 = get_dependency_versions()
-    assert out1 == out2
-    assert out1 is not out2
 
 
 def test_e2e_full_report_assembly_batch14():

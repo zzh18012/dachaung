@@ -396,11 +396,6 @@ def test_module_source_has_run_evaluation_function_batch17():
     assert "def run_evaluation(" in src
 
 
-def test_module_source_has_all_dunder_batch17():
-    src = inspect.getsource(rmod)
-    assert "__all__ = " in src
-
-
 # ---------- signatures 第二十七批 ----------
 
 

@@ -365,12 +365,6 @@ def test_pdf_locator_ratio_empty_batch52():
     assert out["reason"] == "no_elements"
 
 
-def test_pdf_locator_ratio_caption_needs_bbox_batch52():
-    elements = [{"type": "caption", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 # ---------- 模块源码补强 ----------
 
 def test_source_ids_and_all_one_line_batch52():
@@ -406,16 +400,6 @@ def test_source_no_false_positive_note_batch52():
 def test_source_source_spans_note_batch52():
     src = inspect.getsource(metrics_mod)
     assert "source_spans" in src
-
-
-def test_source_counter_intersection_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert "c_expected & c_actual" in src
-
-
-def test_source_lazy_schema_validation_import_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert "from evaluation.schema_validation import document_passes_schema" in src
 
 
 def test_source_schema_check_exception_reason_batch52():

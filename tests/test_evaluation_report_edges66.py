@@ -49,30 +49,12 @@ def test_count_metrics_tuple_immutable_batch52():
         _COUNT_METRICS[0] = "x"  # type: ignore
 
 
-def test_success_bool_metrics_tuple_immutable_batch52():
-    with pytest.raises(TypeError):
-        _SUCCESS_BOOL_METRICS[0] = "x"  # type: ignore
-
-
-def test_ratio_metrics_tuple_immutable_batch52():
-    with pytest.raises(TypeError):
-        _RATIO_METRICS[0] = "x"  # type: ignore
-
-
 def test_count_metrics_unique_per_metric_category_batch52():
     """_COUNT_METRICS / _SUCCESS_BOOL_METRICS / _RATIO_METRICS 不重叠。"""
     all_metrics = set(_COUNT_METRICS) | set(_SUCCESS_BOOL_METRICS) | set(_RATIO_METRICS)
     assert "element_count_total" in all_metrics
     assert "pipeline_success" in all_metrics
     assert "pdf_locator_valid_ratio" in all_metrics
-
-
-def test_count_and_success_metrics_no_overlap_batch52():
-    assert set(_COUNT_METRICS) & set(_SUCCESS_BOOL_METRICS) == set()
-
-
-def test_count_and_ratio_metrics_no_overlap_batch52():
-    assert set(_COUNT_METRICS) & set(_RATIO_METRICS) == set()
 
 
 def test_success_and_ratio_metrics_no_overlap_batch52():
@@ -461,13 +443,6 @@ def test_ast_build_provenance_returns_dict_9_keys_batch52():
     assert len(returns) == 1
     assert isinstance(returns[0].value, ast.Dict)
     assert len(returns[0].value.keys) == 9
-
-
-def test_ast_get_git_provenance_has_try_except_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "get_git_provenance")
-    tries = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
-    assert len(tries) == 1
 
 
 def test_ast_get_git_provenance_except_catches_oserror_subprocess_error_batch52():

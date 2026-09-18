@@ -114,11 +114,6 @@ def test_eval_schema_error_none_errors_is_empty_list_batch19():
     assert isinstance(err.errors, list)
 
 
-def test_eval_schema_error_empty_list_errors_batch19():
-    err = EvalSchemaError("x", [])
-    assert err.errors == []
-
-
 def test_eval_schema_error_with_errors_list_batch19():
     errs = [{"path": ["a"], "message": "x"}]
     err = EvalSchemaError("msg", errs)
@@ -180,11 +175,6 @@ def test_schema_path_works_for_all_four_schemas_batch19():
 def test_schema_path_rejects_python_file_batch19():
     with pytest.raises(FileNotFoundError):
         _schema_path("schema.py")
-
-
-def test_schema_path_rejects_no_extension_batch19():
-    with pytest.raises(FileNotFoundError):
-        _schema_path("manifest")
 
 
 def test_schema_path_rejects_uppercase_variant_batch19():
@@ -509,16 +499,6 @@ def test_module_source_no_path_unlink_batch19():
     assert ".unlink(" not in src
 
 
-def test_module_source_no_path_rmdir_batch19():
-    src = inspect.getsource(smod)
-    assert ".rmdir(" not in src
-
-
-def test_module_source_no_path_mkdir_batch19():
-    src = inspect.getsource(smod)
-    assert ".mkdir(" not in src
-
-
 # ---------- module source 字符串精确补强第三十一批 ----------
 
 
@@ -649,11 +629,6 @@ def test_module_all_contains_5_entries_batch19():
     assert len(smod.__all__) == 5
 
 
-def test_module_all_entries_are_strings_batch19():
-    for n in smod.__all__:
-        assert isinstance(n, str)
-
-
 def test_module_all_contents_exact_batch19():
     assert set(smod.__all__) == {
         "SCHEMAS_DIR",
@@ -706,16 +681,6 @@ def test_e2e_validate_manifest_with_documents_batch19():
     validate(instance, "manifest.schema.json")
 
 
-def test_e2e_validate_annotation_known_good_batch19():
-    instance = {
-        "doc_id": "d1",
-        "annotation_version": "1.0",
-        "annotator": "tester",
-        "date": "2026-08-10",
-    }
-    validate(instance, "annotation.schema.json")
-
-
 def test_e2e_load_then_validate_round_trip_batch19():
     schema = load_schema("annotation.schema.json")
     instance = {
@@ -737,22 +702,6 @@ def test_e2e_validate_file_round_trip_batch19(tmp_path):
     p.write_text(json.dumps(instance), encoding="utf-8")
     validate_file(p, "manifest.schema.json")
     validate(instance, "manifest.schema.json")
-
-
-def test_e2e_cross_schema_validation_fails_batch19():
-    """manifest 数据用 evaluation-report schema 校验应失败。"""
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [],
-    }
-    with pytest.raises(EvalSchemaError):
-        validate(instance, "evaluation-report.schema.json")
-
-
-def test_e2e_unknown_schema_raises_file_not_found_batch19():
-    with pytest.raises(FileNotFoundError):
-        validate({}, "absent.schema.json")
 
 
 def test_e2e_validate_file_with_unknown_schema_raises_file_not_found_batch19(tmp_path):

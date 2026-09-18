@@ -138,22 +138,10 @@ def test_fenced_re_backtick_with_lang():
     assert m.group(2) == "python"
 
 
-def test_fenced_re_tilde_three():
-    m = _FENCED_RE.match("~~~")
-    assert m is not None
-    assert m.group(1) == "~~~"
-
-
 def test_fenced_re_tilde_with_lang():
     m = _FENCED_RE.match("~~~javascript")
     assert m is not None
     assert m.group(2) == "javascript"
-
-
-def test_fenced_re_four_backticks():
-    m = _FENCED_RE.match("````")
-    assert m is not None
-    assert m.group(1) == "````"
 
 
 def test_fenced_re_two_backticks_no_match():
@@ -197,12 +185,6 @@ def test_ordered_list_re_dot():
     assert m.group(1) == "item"
 
 
-def test_ordered_list_re_multi_digit():
-    m = _ORDERED_LIST_RE.match("99. item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
 def test_ordered_list_re_no_space_no_match():
     assert _ORDERED_LIST_RE.match("1.item") is None
 
@@ -241,10 +223,6 @@ def test_pipe_table_row_re_only_pipes():
 
 def test_pipe_table_sep_re_basic():
     assert _PIPE_TABLE_SEP_RE.match("| --- | --- |") is not None
-
-
-def test_pipe_table_sep_re_no_pipes():
-    assert _PIPE_TABLE_SEP_RE.match("--- | ---") is not None
 
 
 def test_pipe_table_sep_re_with_colons():
@@ -314,21 +292,12 @@ def test_rows_to_md_three_cols():
     assert lines[2] == "| 1 | 2 | 3 |"
 
 
-def test_rows_to_md_unicode_cells():
-    out = _rows_to_md([["中"], ["文"]])
-    assert "| 中 |" in out
-
-
 def test_rows_to_md_jagged_pads_empty():
     """jagged rows 补空字符串。"""
     out = _rows_to_md([["a", "b"], ["c"]])
     lines = out.split("\n")
     # 第 2 行被补成 ["c", ""]
     assert lines[2] == "| c |  |"
-
-
-def test_rows_to_md_returns_str_type():
-    assert isinstance(_rows_to_md([[]]), str)
 
 
 # =========================================================================
@@ -710,11 +679,6 @@ def test_module_docstring_mentions_source_locator():
 
 def test_detect_md_source_type_signature_one_param():
     sig = inspect.signature(_detect_md_source_type)
-    assert len(sig.parameters) == 1
-
-
-def test_rows_to_md_signature_one_param():
-    sig = inspect.signature(_rows_to_md)
     assert len(sig.parameters) == 1
 
 

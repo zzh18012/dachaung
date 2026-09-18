@@ -174,12 +174,6 @@ def test_eval_schema_error_with_positional_only():
     assert e.errors == []
 
 
-def test_eval_schema_error_repr_includes_class_name():
-    e = EvalSchemaError("oops")
-    r = repr(e)
-    assert "EvalSchemaError" in r
-
-
 def test_eval_schema_error_class_dict_has_errors():
     """instance 有 errors 属性。"""
     e = EvalSchemaError("x", errors=[{"a": 1}])
@@ -197,17 +191,6 @@ def test_schema_path_returns_path_object():
 def test_schema_path_absolute_path():
     p = _schema_path("manifest.schema.json")
     assert p.is_absolute()
-
-
-def test_schema_path_exists_for_known_schemas():
-    for name in (
-        "manifest.schema.json",
-        "annotation.schema.json",
-        "evaluation-report.schema.json",
-        "document.schema.json",
-    ):
-        p = _schema_path(name)
-        assert p.is_file()
 
 
 def test_schema_path_deterministic_across_calls():
@@ -458,11 +441,6 @@ def test_validate_message_includes_first_error_path():
     assert "path=" in msg
 
 
-def test_validate_unknown_schema_raises_filenotfounderror():
-    with pytest.raises(FileNotFoundError):
-        validate({}, "xxx.schema.json")
-
-
 def test_validate_does_not_modify_instance_dict():
     instance = {
         "manifest_version": "1.0",
@@ -566,20 +544,6 @@ def test_validate_file_str_path_returns_none(tmp_path):
     assert validate_file(str(p), "manifest.schema.json") is None
 
 
-def test_validate_file_path_object_returns_none(tmp_path):
-    p = tmp_path / "x.json"
-    p.write_text(
-        json.dumps({
-            "manifest_version": "1.0",
-            "devset_status": "incomplete",
-            "documents": [],
-            "expected_failures": [],
-        }),
-        encoding="utf-8",
-    )
-    assert validate_file(p, "manifest.schema.json") is None
-
-
 def test_validate_file_missing_raises_filenotfounderror(tmp_path):
     with pytest.raises(FileNotFoundError):
         validate_file(tmp_path / "no.json", "manifest.schema.json")
@@ -590,20 +554,6 @@ def test_validate_file_unknown_schema_raises_filenotfounderror(tmp_path):
     p.write_text("{}", encoding="utf-8")
     with pytest.raises(FileNotFoundError):
         validate_file(p, "xxx.schema.json")
-
-
-def test_validate_file_invalid_json_raises_jsondecodeerror(tmp_path):
-    p = tmp_path / "x.json"
-    p.write_text("not json", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_invalid_content_raises_eval_schema_error(tmp_path):
-    p = tmp_path / "x.json"
-    p.write_text("{}", encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
 
 
 def test_validate_file_with_directory_raises(tmp_path):
@@ -639,34 +589,6 @@ def test_validate_file_with_unicode_path(tmp_path):
     validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_with_array_json_raises(tmp_path):
-    p = tmp_path / "x.json"
-    p.write_text("[]", encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_with_string_json_raises(tmp_path):
-    p = tmp_path / "x.json"
-    p.write_text('"hello"', encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_with_int_json_raises(tmp_path):
-    p = tmp_path / "x.json"
-    p.write_text("42", encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_with_null_json_raises(tmp_path):
-    p = tmp_path / "x.json"
-    p.write_text("null", encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_with_bool_json_raises(tmp_path):
     p = tmp_path / "x.json"
     p.write_text("true", encoding="utf-8")
@@ -679,22 +601,6 @@ def test_validate_file_with_float_json_raises(tmp_path):
     p.write_text("3.14", encoding="utf-8")
     with pytest.raises(EvalSchemaError):
         validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_with_subdir_path(tmp_path):
-    sub = tmp_path / "sub"
-    sub.mkdir()
-    p = sub / "x.json"
-    p.write_text(
-        json.dumps({
-            "manifest_version": "1.0",
-            "devset_status": "incomplete",
-            "documents": [],
-            "expected_failures": [],
-        }),
-        encoding="utf-8",
-    )
-    validate_file(p, "manifest.schema.json")
 
 
 def test_validate_file_with_nested_subdir(tmp_path):
@@ -869,12 +775,6 @@ def test_module_source_no_compile_call():
     assert "compile(" not in src
 
 
-def test_module_source_no_os_module():
-    src = inspect.getsource(smod)
-    assert "import os" not in src
-    assert "from os " not in src
-
-
 def test_module_source_no_subprocess():
     src = inspect.getsource(smod)
     assert "subprocess" not in src
@@ -888,11 +788,6 @@ def test_module_source_no_async_def():
 def test_module_source_no_yield():
     src = inspect.getsource(smod)
     assert "yield" not in src
-
-
-def test_module_source_no_global_keyword():
-    src = inspect.getsource(smod)
-    assert "global " not in src
 
 
 def test_module_source_no_nonlocal_keyword():
@@ -937,12 +832,6 @@ def test_module_source_4_module_level_def_count():
 def test_module_source_class_eval_schema_error_definition():
     src = inspect.getsource(smod)
     assert "class EvalSchemaError(Exception):" in src
-
-
-def test_module_source_class_init_with_message_errors():
-    src = inspect.getsource(smod)
-    assert "def __init__(self, message:" in src
-    assert "errors: list[dict[str, Any]] | None = None" in src
 
 
 def test_module_source_class_init_calls_super_init():
@@ -996,12 +885,6 @@ def test_eval_schema_error_class_init_param_defaults():
     assert sig.parameters["self"].default is inspect.Parameter.empty
     assert sig.parameters["message"].default is inspect.Parameter.empty
     assert sig.parameters["errors"].default is None
-
-
-def test_eval_schema_error_class_init_message_annotation_str():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    a = sig.parameters["message"].annotation
-    assert a is str or a == "str"
 
 
 def test_eval_schema_error_class_init_errors_annotation_union():
@@ -1069,12 +952,6 @@ def test_load_schema_signature_no_default():
     sig = inspect.signature(load_schema)
     p = list(sig.parameters.values())[0]
     assert p.default is inspect.Parameter.empty
-
-
-def test_load_schema_signature_param_annotation_str():
-    sig = inspect.signature(load_schema)
-    a = sig.parameters["name"].annotation
-    assert a is str or a == "str"
 
 
 def test_load_schema_signature_return_annotation_dict_str_any():
@@ -1175,10 +1052,6 @@ def test_eval_schema_error_has_docstring():
 # ---------- 模块整体合理性（第三批） ----------
 
 
-def test_module_namespace_is_module():
-    assert isinstance(smod, types.ModuleType)
-
-
 def test_module_namespace_has_name():
     assert hasattr(smod, "__name__")
     assert smod.__name__ == "evaluation.schema"
@@ -1277,15 +1150,6 @@ def test_module_has_1_private_function():
     ]
     assert len(private) == 1
     assert private[0].__name__ == "_schema_path"
-
-
-def test_module_has_1_class():
-    classes = [
-        v for v in vars(smod).values()
-        if isinstance(v, type) and v.__module__ == smod.__name__
-    ]
-    assert len(classes) == 1
-    assert classes[0].__name__ == "EvalSchemaError"
 
 
 def test_module_callable_load_schema():

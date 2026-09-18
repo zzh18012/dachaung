@@ -71,12 +71,6 @@ def test_timeout_expired_defaults_batch54():
 
 # ---------- 聚合形态 ----------
 
-def test_summary_outer_key_order_batch54():
-    assert list(aggregate_summary([])) == [
-        "counts", "success_rates", "ratio_macro_averages",
-        "silent_drop_total"]
-
-
 def test_aggregate_accepts_tuple_input_batch54():
     out = aggregate_summary(({"metrics": {
         "pipeline_success": {"value": True, "reason": None}}},))

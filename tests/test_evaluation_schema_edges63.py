@@ -75,11 +75,6 @@ def test_eval_schema_error_args_preserves_message_batch49():
     assert e.args[0] == "hello"
 
 
-def test_eval_schema_error_str_contains_message_batch49():
-    e = EvalSchemaError("hello world")
-    assert "hello world" in str(e)
-
-
 def test_eval_schema_error_can_be_raised_and_caught_batch49():
     try:
         raise EvalSchemaError("raised")
@@ -300,11 +295,6 @@ def test_validate_file_accepts_path_object_batch49(tmp_path):
     assert out is None
 
 
-def test_validate_file_missing_raises_batch49(tmp_path):
-    with pytest.raises(FileNotFoundError):
-        validate_file(tmp_path / "nope.json", "manifest.schema.json")
-
-
 def test_validate_file_directory_raises_batch49(tmp_path):
     """目录而非文件 → FileNotFoundError。"""
     with pytest.raises(FileNotFoundError):
@@ -374,26 +364,6 @@ def test_source_contains_draft202012_validator_batch49():
     assert "Draft202012Validator" in src
 
 
-def test_source_contains_absolute_schema_path_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "absolute_schema_path" in src
-
-
-def test_source_contains_sorted_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "sorted(" in src
-
-
-def test_source_contains_filenotfounderror_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "FileNotFoundError" in src
-
-
-def test_source_contains_encoding_utf8_batch49():
-    src = inspect.getsource(schema_mod)
-    assert 'encoding="utf-8"' in src
-
-
 def test_source_contains_json_dot_load_batch49():
     src = inspect.getsource(schema_mod)
     assert "json.load(" in src
@@ -442,12 +412,6 @@ def test_ast_has_4_top_level_functions_batch49():
     tree = ast.parse(inspect.getsource(schema_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 4
-
-
-def test_ast_has_1_class_def_batch49():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    classes = [n for n in tree.body if isinstance(n, ast.ClassDef)]
-    assert len(classes) == 1
 
 
 def test_ast_eval_schema_error_has_init_method_batch49():

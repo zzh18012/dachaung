@@ -282,12 +282,6 @@ def test_module_all_is_list_not_tuple():
     assert not isinstance(m.__all__, tuple)
 
 
-def test_module_all_length_five():
-    """__all__ 5 个元素。"""
-    import evaluation.schema as m
-    assert len(m.__all__) == 5
-
-
 def test_module_all_set_exact():
     """__all__ 集合精确。"""
     import evaluation.schema as m
@@ -298,12 +292,6 @@ def test_module_all_set_exact():
         "validate",
         "validate_file",
     }
-
-
-def test_module_all_no_duplicates():
-    """__all__ 无重复。"""
-    import evaluation.schema as m
-    assert len(m.__all__) == len(set(m.__all__))
 
 
 def test_module_all_does_not_contain_private():
@@ -590,12 +578,6 @@ def test_schema_path_empty_raises():
         _schema_path("")
 
 
-def test_schema_path_only_extension_raises():
-    """name='.json' → FileNotFoundError。"""
-    with pytest.raises(FileNotFoundError):
-        _schema_path(".json")
-
-
 def test_schema_path_only_basename_no_ext_raises():
     """name='manifest' → FileNotFoundError。"""
     with pytest.raises(FileNotFoundError):
@@ -605,12 +587,6 @@ def test_schema_path_only_basename_no_ext_raises():
 # =========================================================================
 # load_schema 详细
 # =========================================================================
-
-
-def test_load_schema_returns_dict_type():
-    """返回 dict。"""
-    s = load_schema("manifest.schema.json")
-    assert isinstance(s, dict)
 
 
 def test_load_schema_each_known_returns_dict_with_schema_key():
@@ -821,12 +797,6 @@ def test_validate_file_returns_none_on_success(tmp_path: Path):
     p = tmp_path / "m.json"
     p.write_text(json.dumps(m), encoding="utf-8")
     assert validate_file(p, "manifest.schema.json") is None
-
-
-def test_validate_file_missing_raises_filenotfound(tmp_path: Path):
-    """文件不存在 → FileNotFoundError。"""
-    with pytest.raises(FileNotFoundError):
-        validate_file(tmp_path / "missing.json", "manifest.schema.json")
 
 
 def test_validate_file_directory_raises_filenotfound(tmp_path: Path):

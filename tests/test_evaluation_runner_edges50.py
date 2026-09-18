@@ -958,10 +958,6 @@ def test_module_no_main_block_batch22():
     assert "__main__" not in src
 
 
-def test_module_run_evaluation_is_public_batch22():
-    assert not run_evaluation.__name__.startswith("_")
-
-
 def test_module_has_module_docstring_batch22():
     assert rmod.__doc__ is not None
     assert len(rmod.__doc__) > 0
@@ -1014,20 +1010,6 @@ def test_e2e_run_evaluation_with_expected_failure_match_batch22(tmp_path):
         m = _make_manifest(expected_failures=[ef])
         report = run_evaluation(m, tmp_path / "out.json")
     assert report["expected_failures"][0]["matches"] is True
-
-
-def test_e2e_run_evaluation_full_report_has_six_top_keys_batch22(tmp_path):
-    """完整报告含 6 个顶层字段。"""
-    m = _make_manifest(docs=[], expected_failures=[])
-    report = run_evaluation(m, tmp_path / "out.json")
-    assert set(report.keys()) == {
-        "report_version",
-        "provenance",
-        "devset",
-        "summary",
-        "per_doc",
-        "expected_failures",
-    }
 
 
 def test_e2e_run_evaluation_public_per_doc_excludes_underscore_fields_batch22(tmp_path):

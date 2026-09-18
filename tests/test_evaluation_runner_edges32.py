@@ -202,11 +202,6 @@ def test_process_one_source_creates_per_doc_subdir():
     assert '"_per_doc"' in src or "'_per_doc'" in src
 
 
-def test_process_one_source_uses_doc_doc_id():
-    src = inspect.getsource(_process_one)
-    assert "doc.doc_id" in src
-
-
 def test_process_one_source_handles_errors_truthy():
     """if errors: → 返回 errors[0].to_dict()。"""
     src = inspect.getsource(_process_one)
@@ -307,12 +302,6 @@ def test_run_evaluation_source_loads_annotation():
 def test_run_evaluation_source_calls_figure_caption_prf():
     src = inspect.getsource(run_evaluation)
     assert "figure_caption_prf(document, annotation)" in src
-
-
-def test_run_evaluation_source_calls_chunk_boundary_prf():
-    src = inspect.getsource(run_evaluation)
-    assert "chunk_boundary_prf(" in src
-    assert "tolerance_chars=tolerance_chars" in src
 
 
 def test_run_evaluation_source_pops_tolerance_chars():
@@ -597,26 +586,9 @@ def test_module_source_no_main_block():
     assert "__main__" not in src
 
 
-def test_module_source_no_async():
-    src = inspect.getsource(rmod)
-    assert "async " not in src
-    assert "await " not in src
-
-
-def test_module_source_no_global_keyword():
-    src = inspect.getsource(rmod)
-    assert "\nglobal " not in src
-    assert " global " not in src
-
-
 def test_module_source_no_walrus():
     src = inspect.getsource(rmod)
     assert ":=" not in src
-
-
-def test_module_source_no_class_definition():
-    src = inspect.getsource(rmod)
-    assert not any(line.startswith("class ") for line in src.splitlines())
 
 
 def test_module_source_no_pickle():
@@ -627,26 +599,6 @@ def test_module_source_no_pickle():
 def test_module_source_no_yaml():
     src = inspect.getsource(rmod)
     assert "yaml" not in src
-
-
-def test_module_source_no_logging():
-    src = inspect.getsource(rmod)
-    assert "logging" not in src
-
-
-def test_module_source_no_argparse():
-    src = inspect.getsource(rmod)
-    assert "argparse" not in src
-
-
-def test_module_source_no_csv():
-    src = inspect.getsource(rmod)
-    assert "csv" not in src
-
-
-def test_module_source_no_tomllib():
-    src = inspect.getsource(rmod)
-    assert "tomllib" not in src
 
 
 def test_module_source_function_names():
@@ -709,22 +661,9 @@ def test_load_annotation_signature_param_no_default():
     assert p.default is inspect.Parameter.empty
 
 
-def test_load_annotation_signature_no_varargs():
-    sig = inspect.signature(_load_annotation)
-    kinds = {p.kind for p in sig.parameters.values()}
-    assert inspect.Parameter.VAR_POSITIONAL not in kinds
-    assert inspect.Parameter.VAR_KEYWORD not in kinds
-
-
 def test_process_one_signature_param_count():
     sig = inspect.signature(_process_one)
     assert len(sig.parameters) == 4
-
-
-def test_process_one_signature_param_names():
-    sig = inspect.signature(_process_one)
-    names = list(sig.parameters.keys())
-    assert names == ["doc", "output_root", "parser_name", "max_chars"]
 
 
 def test_process_one_signature_no_defaults():
@@ -733,22 +672,9 @@ def test_process_one_signature_no_defaults():
         assert p.default is inspect.Parameter.empty
 
 
-def test_process_one_signature_no_varargs():
-    sig = inspect.signature(_process_one)
-    kinds = {p.kind for p in sig.parameters.values()}
-    assert inspect.Parameter.VAR_POSITIONAL not in kinds
-    assert inspect.Parameter.VAR_KEYWORD not in kinds
-
-
 def test_run_evaluation_signature_param_count():
     sig = inspect.signature(run_evaluation)
     assert len(sig.parameters) == 5
-
-
-def test_run_evaluation_signature_param_names():
-    sig = inspect.signature(run_evaluation)
-    names = list(sig.parameters.keys())
-    assert names == ["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]
 
 
 def test_run_evaluation_signature_parser_name_default_fallback():
@@ -847,14 +773,6 @@ def test_module_load_annotation_callable():
 
 def test_module_process_one_callable():
     assert callable(rmod._process_one)
-
-
-def test_module_no_user_classes():
-    classes = [
-        (k, v) for k, v in vars(rmod).items()
-        if isinstance(v, type) and getattr(v, "__module__", "") == rmod.__name__
-    ]
-    assert classes == []
 
 
 def test_module_function_module_eq():

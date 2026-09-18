@@ -91,13 +91,6 @@ def test_counts_sum_six_batch540(tmp_path):
 
 # ---------- hbc 满分 ----------
 
-def test_hbc_one_batch540(tmp_path):
-    r = _run(tmp_path)
-    assert r["per_doc"][0]["metrics"][
-        "heading_boundary_compliance"] == {
-        "value": 1.0, "reason": None}
-
-
 def test_hbc_macro_one_batch540(tmp_path):
     r = _run(tmp_path)
     assert r["summary"]["ratio_macro_averages"][

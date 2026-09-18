@@ -368,29 +368,10 @@ def _make_manifest_mock(**kwargs):
     return m
 
 
-def test_build_devset_section_keys_batch45():
-    m = _make_manifest_mock()
-    out = build_devset_section(m)
-    assert set(out.keys()) == {
-        "status",
-        "file_count",
-        "content_group_count",
-        "pdf_count",
-        "docx_count",
-        "categories_covered",
-    }
-
-
 def test_build_devset_section_file_count_batch45():
     m = _make_manifest_mock(file_count=5)
     out = build_devset_section(m)
     assert out["file_count"] == 5
-
-
-def test_build_devset_section_pdf_count_batch45():
-    m = _make_manifest_mock(pdf_count=3)
-    out = build_devset_section(m)
-    assert out["pdf_count"] == 3
 
 
 def test_build_devset_section_docx_count_batch45():
@@ -405,22 +386,11 @@ def test_build_devset_section_content_group_count_batch45():
     assert out["content_group_count"] == 4
 
 
-def test_build_devset_section_categories_covered_batch45():
-    m = _make_manifest_mock(categories_covered=["a", "b"])
-    out = build_devset_section(m)
-    assert out["categories_covered"] == ["a", "b"]
-
-
 # ---------- aggregate_summary 各种 ----------
 
 def test_aggregate_summary_empty_batch45():
     out = aggregate_summary([])
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
-
-
-def test_aggregate_summary_empty_counts_batch45():
-    out = aggregate_summary([])
-    assert out["counts"]["element_count_total"] == {"sum": None, "participating_docs": 0}
 
 
 def test_aggregate_summary_empty_success_rates_batch45():
@@ -685,17 +655,9 @@ def test_all_exact_order_batch45():
     ]
 
 
-def test_all_count_five_batch45():
-    assert len(report_mod.__all__) == 5
-
-
 def test_all_entries_callable_batch45():
     for name in report_mod.__all__:
         assert callable(getattr(report_mod, name))
-
-
-def test_all_entries_unique_batch45():
-    assert len(set(report_mod.__all__)) == len(report_mod.__all__)
 
 
 # ---------- AST 结构 ----------
@@ -722,20 +684,6 @@ def test_ast_top_level_no_class_batch45():
     tree = ast.parse(inspect.getsource(report_mod))
     for n in tree.body:
         assert not isinstance(n, ast.ClassDef)
-
-
-def test_ast_first_node_docstring_batch45():
-    tree = ast.parse(inspect.getsource(report_mod))
-    first = tree.body[0]
-    assert isinstance(first, ast.Expr)
-    assert isinstance(first.value, ast.Constant)
-
-
-def test_ast_second_node_future_import_batch45():
-    tree = ast.parse(inspect.getsource(report_mod))
-    second = tree.body[1]
-    assert isinstance(second, ast.ImportFrom)
-    assert second.module == "__future__"
 
 
 def test_ast_get_git_provenance_has_try_batch45():

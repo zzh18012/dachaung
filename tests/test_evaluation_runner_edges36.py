@@ -1055,10 +1055,6 @@ def test_module_all_entries_unique():
     assert len(rmod.__all__) == len(set(rmod.__all__))
 
 
-def test_module_has_dunder_file():
-    assert hasattr(rmod, "__file__")
-
-
 def test_module_dunder_file_endswith_runner_py():
     import os
     sep = os.sep
@@ -1192,12 +1188,6 @@ def test_e2e_load_annotation_with_scientific_notation(tmp_path):
     assert _load_annotation(p) == 100000.0
 
 
-def test_e2e_load_annotation_negative_number(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("-42", encoding="utf-8")
-    assert _load_annotation(p) == -42
-
-
 def test_e2e_load_annotation_json_with_whitespace(tmp_path):
     p = tmp_path / "a.json"
     p.write_text('  {"x": 1}  ', encoding="utf-8")
@@ -1235,18 +1225,8 @@ def test_e2e_run_evaluation_returns_dict_type(tmp_path):
     assert isinstance(out, dict)
 
 
-def test_e2e_module_runner_can_be_imported():
-    import evaluation.runner as r
-    assert r is rmod
-
-
 def test_e2e_module_runner_run_evaluation_in_all():
     assert "run_evaluation" in rmod.__all__
-
-
-def test_e2e_module_runner_run_evaluation_public_via_import():
-    from evaluation.runner import run_evaluation as f
-    assert f is run_evaluation
 
 
 def test_e2e_load_annotation_handles_bom_properly(tmp_path):

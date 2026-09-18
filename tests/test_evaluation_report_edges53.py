@@ -81,10 +81,6 @@ def test_ratio_metrics_not_contains_silent_drop_count_batch34():
     assert "silent_drop_count" not in _RATIO_METRICS
 
 
-def test_count_metrics_not_contains_pipeline_success_batch34():
-    assert "pipeline_success" not in _COUNT_METRICS
-
-
 def test_success_bool_metrics_not_contains_element_count_batch34():
     assert "element_count_total" not in _SUCCESS_BOOL_METRICS
 
@@ -274,11 +270,6 @@ def test_build_provenance_max_chars_int_batch34(tmp_path):
     assert isinstance(out["max_chars"], int)
 
 
-def test_build_provenance_max_chars_negative_batch34(tmp_path):
-    out = build_provenance(tmp_path, "fallback", -100, None)
-    assert out["max_chars"] == -100
-
-
 def test_build_provenance_run_timestamp_parseable_batch34(tmp_path):
     """run_timestamp_iso 是合法 ISO 时间。"""
     out = build_provenance(tmp_path, "fallback", 800, None)
@@ -346,12 +337,6 @@ def test_build_devset_section_six_keys_batch34():
     assert set(out.keys()) == expected
 
 
-def test_build_devset_section_file_count_batch34():
-    m = _make_manifest_mock(file_count=42)
-    out = build_devset_section(m)
-    assert out["file_count"] == 42
-
-
 def test_build_devset_section_content_group_count_batch34():
     m = _make_manifest_mock(content_group_count=7)
     out = build_devset_section(m)
@@ -374,12 +359,6 @@ def test_build_devset_section_categories_covered_batch34():
     m = _make_manifest_mock(categories_covered=["a", "b"])
     out = build_devset_section(m)
     assert out["categories_covered"] == ["a", "b"]
-
-
-def test_build_devset_section_empty_categories_batch34():
-    m = _make_manifest_mock(categories_covered=[])
-    out = build_devset_section(m)
-    assert out["categories_covered"] == []
 
 
 # ---------- aggregate_summary 第三十四批
@@ -437,21 +416,6 @@ def test_aggregate_summary_success_rates_pipeline_batch34():
     assert sr["success_count"] == 1
     assert sr["total"] == 2
     assert sr["rate"] == 0.5
-
-
-def test_aggregate_summary_success_rates_all_true_batch34():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": True}}},
-        {"metrics": {"pipeline_success": {"value": True}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["success_rates"]["pipeline_success"]["rate"] == 1.0
-
-
-def test_aggregate_summary_success_rates_empty_batch34():
-    out = aggregate_summary([])
-    assert out["success_rates"]["pipeline_success"]["rate"] is None
-    assert out["success_rates"]["pipeline_success"]["total"] == 0
 
 
 def test_aggregate_summary_ratio_macro_average_batch34():
@@ -657,12 +621,6 @@ def test_module_source_contains_rev_parse_head_batch34():
     src = inspect.getsource(rmod)
     assert '"rev-parse"' in src
     assert '"HEAD"' in src
-
-
-def test_module_source_contains_status_porcelain_batch34():
-    src = inspect.getsource(rmod)
-    assert '"status"' in src
-    assert '"--porcelain"' in src
 
 
 def test_module_source_contains_python_docx_pkg_batch34():

@@ -37,34 +37,6 @@ def test_load_annotation_returns_string_batch29(tmp_path):
     assert result == "hello"
 
 
-def test_load_annotation_returns_null_top_level_batch29(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("null", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result is None
-
-
-def test_load_annotation_returns_true_batch29(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("true", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result is True
-
-
-def test_load_annotation_returns_false_batch29(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("false", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result is False
-
-
-def test_load_annotation_returns_float_batch29(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("3.14", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == 3.14
-
-
 def test_load_annotation_dict_with_nested_dict_batch29(tmp_path):
     p = tmp_path / "a.json"
     p.write_text('{"a": {"b": {"c": 1}}}', encoding="utf-8")
@@ -426,12 +398,6 @@ def test_module_source_no_requests_batch29():
     assert "requests" not in src
 
 
-def test_module_source_open_w_mode_allowed_batch29():
-    """runner.py 用 open("w") 写报告 JSON（合法需求）。"""
-    src = inspect.getsource(rmod)
-    assert '"w"' in src
-
-
 def test_module_source_unlink_used_for_cleanup_batch29():
     """runner.py 用 unlink 清理 out_stub（合法需求）。"""
     src = inspect.getsource(rmod)
@@ -481,11 +447,6 @@ def test_module_source_contains_missing_markers_key_batch29():
     assert "_missing_markers" in src
 
 
-def test_module_source_contains_pipeline_import_batch29():
-    src = inspect.getsource(rmod)
-    assert "from app.pipeline import" in src
-
-
 def test_module_source_contains_report_imports_batch29():
     src = inspect.getsource(rmod)
     assert "from evaluation.report import" in src
@@ -502,11 +463,6 @@ def test_module_source_contains_annotation_metrics_imports_batch29():
 def test_signature_load_annotation_path_annotation_batch29():
     sig = inspect.signature(_load_annotation)
     assert "Path | None" in str(sig.parameters["path"].annotation)
-
-
-def test_signature_load_annotation_return_batch29():
-    sig = inspect.signature(_load_annotation)
-    assert "dict[str, Any] | None" in str(sig.return_annotation)
 
 
 def test_signature_process_one_params_batch29():
@@ -607,13 +563,6 @@ def test_e2e_run_evaluation_creates_output_file_batch29(tmp_path):
     out = tmp_path / "deep" / "nested" / "report.json"
     run_evaluation(manifest, out)
     assert out.is_file()
-
-
-def test_e2e_run_evaluation_returns_dict_batch29(tmp_path):
-    manifest = _make_manifest_mock_full()
-    out = tmp_path / "report.json"
-    result = run_evaluation(manifest, out)
-    assert isinstance(result, dict)
 
 
 def test_e2e_run_evaluation_no_input_modification_batch29(tmp_path):

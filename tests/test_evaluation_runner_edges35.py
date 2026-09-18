@@ -1001,11 +1001,6 @@ def test_module_source_no_walrus():
     assert ":=" not in src
 
 
-def test_module_source_no_global_keyword():
-    src = inspect.getsource(rmod)
-    assert "\nglobal " not in src
-
-
 def test_module_source_no_try_in_load_annotation_body_except_in_helpers():
     """run_evaluation / _process_one 各自有 try-except（unlink 部分），
     但 _load_annotation 的 try-except 应只在 except OSError/JSONDecodeError 出现."""
@@ -1184,10 +1179,6 @@ def test_module_all_attribute_value():
 def test_module_has_dunder_file():
     assert hasattr(rmod, "__file__")
     assert rmod.__file__ is not None
-
-
-def test_module_dunder_file_endswith_runner_py():
-    assert rmod.__file__.replace("\\", "/").endswith("evaluation/runner.py")
 
 
 def test_module_dunder_name():

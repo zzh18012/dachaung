@@ -277,16 +277,6 @@ def test_validate_file_called_twice_batch28(tmp_path):
     validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_no_modification_batch28(tmp_path):
-    p = tmp_path / "m.json"
-    content = json.dumps(
-        {"manifest_version": "1.0", "devset_status": "complete", "documents": []}
-    )
-    p.write_text(content, encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
-    assert p.read_text(encoding="utf-8") == content
-
-
 # ---------- module source forbidden tokens 第四十六批 ----------
 
 

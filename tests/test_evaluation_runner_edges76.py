@@ -458,24 +458,9 @@ def test_source_imports_report_version_batch51():
     assert "from evaluation import REPORT_VERSION" in src
 
 
-def test_source_imports_annotation_metrics_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation.annotation_metrics import" in src
-    assert "chunk_boundary_prf" in src
-    assert "figure_caption_prf" in src
-
-
 def test_source_imports_metrics_batch51():
     src = inspect.getsource(runner_mod)
     assert "from evaluation.metrics import compute_automatic_metrics" in src
-
-
-def test_source_imports_report_helpers_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation.report import" in src
-    assert "aggregate_summary" in src
-    assert "build_devset_section" in src
-    assert "build_provenance" in src
 
 
 def test_source_contains_not_instrumented_batch51():
@@ -486,11 +471,6 @@ def test_source_contains_not_instrumented_batch51():
 def test_source_contains_perf_counter_batch51():
     src = inspect.getsource(runner_mod)
     assert "time.perf_counter" in src
-
-
-def test_source_contains_write_json_false_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "write_json=False" in src
 
 
 def test_source_contains_image_output_dir_for_batch51():
@@ -634,11 +614,6 @@ def test_ast_run_evaluation_has_1_return_batch51():
 def test_ast_no_global_nonlocal_batch51():
     tree = ast.parse(inspect.getsource(runner_mod))
     assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
-
-
-def test_ast_no_delete_batch51():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, ast.Delete) for n in ast.walk(tree))
 
 
 def test_ast_no_while_batch51():

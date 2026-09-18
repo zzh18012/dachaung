@@ -185,11 +185,6 @@ def test_int_metric_returns_int_batch32():
     assert isinstance(out["value"], int)
 
 
-def test_int_metric_negative_value_batch32():
-    out = _int_metric(-100)
-    assert out["value"] == -100
-
-
 # ---------- compute_automatic_metrics 第三十二批 ----------
 
 
@@ -842,26 +837,6 @@ def test_module_source_contains_counter_import_batch32():
 # ---------- signatures 第四十五批 ----------
 
 
-def test_signature_null_return_batch32():
-    sig = inspect.signature(_null)
-    assert "dict[str, Any]" in str(sig.return_annotation)
-
-
-def test_signature_null_reason_annotation_batch32():
-    sig = inspect.signature(_null)
-    assert sig.parameters["reason"].annotation == "str"
-
-
-def test_signature_ratio_return_batch32():
-    sig = inspect.signature(_ratio)
-    assert "dict[str, Any]" in str(sig.return_annotation)
-
-
-def test_signature_ratio_value_annotation_batch32():
-    sig = inspect.signature(_ratio)
-    assert sig.parameters["value"].annotation == "float"
-
-
 def test_signature_bool_metric_value_annotation_batch32():
     sig = inspect.signature(_bool_metric)
     assert sig.parameters["value"].annotation == "bool"
@@ -870,11 +845,6 @@ def test_signature_bool_metric_value_annotation_batch32():
 def test_signature_int_metric_value_annotation_batch32():
     sig = inspect.signature(_int_metric)
     assert sig.parameters["value"].annotation == "int"
-
-
-def test_signature_compute_automatic_metrics_source_type_batch32():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert sig.parameters["source_type"].annotation == "str"
 
 
 def test_signature_compute_automatic_metrics_return_batch32():

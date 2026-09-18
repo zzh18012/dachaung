@@ -339,10 +339,6 @@ def test_report_written_matches_returned_batch53(tmp_path, monkeypatch):
 
 # ---------- _load_annotation 补充 ----------
 
-def test_load_annotation_directory_returns_none_batch53(tmp_path):
-    assert _load_annotation(tmp_path) is None  # 目录非 is_file
-
-
 def test_load_annotation_oserror_swallowed_batch53(tmp_path, monkeypatch):
     p = tmp_path / "ann.json"
     p.write_text("{}", encoding="utf-8")

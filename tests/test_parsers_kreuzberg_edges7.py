@@ -88,16 +88,6 @@ def test_heading_re_search_finds_anywhere():
     assert _HEADING_RE.search("text\n# Hello") is None  # ^ 锚定 + . 不匹配 \n
 
 
-def test_heading_re_hash_count_at_minimum_one():
-    m = _HEADING_RE.match("# x")
-    assert m is not None
-
-
-def test_heading_re_hash_count_at_maximum_six():
-    m = _HEADING_RE.match("###### x")
-    assert m is not None
-
-
 def test_heading_re_no_space_after_hash_caps_only():
     r"""只有 # 没有 \s+，不匹配。"""
     assert _HEADING_RE.match("######") is None
@@ -106,11 +96,6 @@ def test_heading_re_no_space_after_hash_caps_only():
 def test_heading_re_capture_group_excludes_hashes():
     m = _HEADING_RE.match("## Title")
     assert m.group(1) == "Title"
-
-
-def test_heading_re_capture_with_digit_text():
-    m = _HEADING_RE.match("# 12345")
-    assert m.group(1) == "12345"
 
 
 def test_heading_re_capture_with_special_chars():
@@ -173,11 +158,6 @@ def test_classify_line_paragraph_type_value():
     """长文本返回 paragraph。"""
     etype, _ = _classify_line("a" * 100)
     assert etype == "paragraph"
-
-
-def test_classify_line_atx_heading_type_value():
-    etype, _ = _classify_line("# Title")
-    assert etype == "heading"
 
 
 def test_classify_line_short_line_heading_type_value():
@@ -611,11 +591,6 @@ def test_make_locator_signature_two_params():
     assert params == ["source_type", "paragraph_index"]
 
 
-def test_make_locator_docx_keys_exact():
-    loc = _make_locator("docx", 0)
-    assert set(loc.keys()) == {"paragraph_index", "_kreuzberg_heuristic"}
-
-
 def test_make_locator_text_keys_match_docx():
     """text 类型走 else 分支（与 docx 同形）。"""
     loc = _make_locator("text", 5)
@@ -659,17 +634,6 @@ def test_make_locator_returns_fresh_dict_each_call():
     b = _make_locator("pdf", 0)
     assert a == b
     assert a is not b
-
-
-def test_make_locator_idempotent():
-    a = _make_locator("docx", 5)
-    b = _make_locator("docx", 5)
-    assert a == b
-
-
-def test_make_locator_returns_dict():
-    assert isinstance(_make_locator("pdf", 0), dict)
-    assert isinstance(_make_locator("docx", 0), dict)
 
 
 def test_make_locator_pdf_no_paragraph_index_key():
@@ -732,16 +696,6 @@ def test_kreuzberg_parser_class_attribute_version_not_empty():
     assert KreuzbergParser.version != ""
 
 
-def test_kreuzberg_parser_instance_attribute_name_matches_class():
-    p = KreuzbergParser()
-    assert p.name == KreuzbergParser.name
-
-
-def test_kreuzberg_parser_instance_attribute_version_matches_class():
-    p = KreuzbergParser()
-    assert p.version == KreuzbergParser.version
-
-
 def test_kreuzberg_parser_is_class():
     assert inspect.isclass(KreuzbergParser)
 
@@ -759,12 +713,6 @@ def test_kreuzberg_parser_init_signature_keyword_only_param():
     params = sig.parameters
     assert "self" in params
     assert "include_document_structure" in params
-
-
-def test_kreuzberg_parser_init_include_document_structure_keyword_only():
-    sig = inspect.signature(KreuzbergParser.__init__)
-    param = sig.parameters["include_document_structure"]
-    assert param.kind == inspect.Parameter.KEYWORD_ONLY
 
 
 def test_kreuzberg_parser_init_creates_private_attr():
@@ -818,18 +766,6 @@ def test_kreuzberg_parser_parse_method_signature():
 def test_kreuzberg_parser_parse_method_return_annotation():
     sig = inspect.signature(KreuzbergParser.parse)
     assert sig.return_annotation is not None
-
-
-def test_kreuzberg_parser_class_dict_contains_name():
-    assert "name" in KreuzbergParser.__dict__
-
-
-def test_kreuzberg_parser_class_dict_contains_version():
-    assert "version" in KreuzbergParser.__dict__
-
-
-def test_kreuzberg_parser_class_dict_contains_parse():
-    assert "parse" in KreuzbergParser.__dict__
 
 
 def test_kreuzberg_parser_mro_includes_parser():

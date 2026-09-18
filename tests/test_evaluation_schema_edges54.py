@@ -248,17 +248,6 @@ def test_load_schema_returns_fresh_dict_batch34():
 # ---------- validate 第三十四批
 
 
-def test_validate_manifest_minimal_valid_batch34():
-    from evaluation import MANIFEST_VERSION
-    data = {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    validate(data, "manifest.schema.json")
-
-
 def test_validate_manifest_complete_status_batch34():
     from evaluation import MANIFEST_VERSION
     data = {
@@ -318,11 +307,6 @@ def test_validate_manifest_devset_status_case_sensitive_batch34():
     }
     with pytest.raises(EvalSchemaError):
         validate(data, "manifest.schema.json")
-
-
-def test_validate_annotation_minimal_batch34():
-    data = {"annotation_version": "1.0", "doc_id": "d1"}
-    validate(data, "annotation.schema.json")
 
 
 def test_validate_annotation_doc_id_min_length_batch34():
@@ -647,11 +631,6 @@ def test_module_source_contains_head_error_batch34():
     assert "errors[0]" in src
 
 
-def test_module_source_contains_schemas_dir_definition_batch34():
-    src = inspect.getsource(smod)
-    assert "SCHEMAS_DIR = Path(__file__).resolve().parent.parent" in src
-
-
 def test_module_source_contains_schemas_subdir_batch34():
     src = inspect.getsource(smod)
     assert '"schemas"' in src
@@ -731,14 +710,6 @@ def test_signature_validate_file_two_params_batch34():
     assert list(sig.parameters.keys()) == ["path", "schema_name"]
 
 
-def test_signature_validate_file_path_union_type_batch34():
-    sig = inspect.signature(validate_file)
-    p = sig.parameters["path"]
-    # annotation 是 'Path | str'
-    assert "Path" in str(p.annotation)
-    assert "str" in str(p.annotation)
-
-
 # ---------- module 合理性第五十三批
 
 
@@ -762,17 +733,8 @@ def test_module_has_validate_file_attribute_batch34():
     assert hasattr(smod, "validate_file")
 
 
-def test_module_has_schema_path_attribute_batch34():
-    assert hasattr(smod, "_schema_path")
-
-
 def test_module_all_contains_5_entries_batch34():
     assert len(smod.__all__) == 5
-
-
-def test_module_all_names_are_str_batch34():
-    for name in smod.__all__:
-        assert isinstance(name, str)
 
 
 def test_module_all_names_exist_in_module_batch34():

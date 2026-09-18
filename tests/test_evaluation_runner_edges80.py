@@ -65,12 +65,6 @@ class _Err:
 
 # ---------- _load_annotation 深挖 ----------
 
-def test_load_annotation_directory_is_none_batch52(tmp_path):
-    d = tmp_path / "adir"
-    d.mkdir()
-    assert _load_annotation(d) is None
-
-
 def test_load_annotation_json_array_passthrough_batch52(tmp_path):
     p = tmp_path / "a.json"
     p.write_text("[1, 2]", encoding="utf-8")

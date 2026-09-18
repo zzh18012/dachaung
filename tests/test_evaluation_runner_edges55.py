@@ -412,11 +412,6 @@ def test_module_source_contains_image_output_dir_for_batch27():
     assert "image_output_dir_for" in src
 
 
-def test_module_source_contains_process_single_batch27():
-    src = inspect.getsource(rmod)
-    assert "process_single" in src
-
-
 def test_module_source_contains_per_doc_subdir_batch27():
     src = inspect.getsource(rmod)
     assert "_per_doc" in src

@@ -163,13 +163,6 @@ def test_schema_validation_error_does_not_inherit_from_value_error():
     assert not issubclass(SchemaValidationError, ValueError)
 
 
-def test_schema_validation_error_can_be_caught_as_exception():
-    try:
-        raise SchemaValidationError("x")
-    except Exception as e:
-        assert isinstance(e, SchemaValidationError)
-
-
 def test_schema_validation_error_two_instances_independent():
     e1 = SchemaValidationError("msg1")
     e2 = SchemaValidationError("msg2")
@@ -383,13 +376,6 @@ def test_validate_file_directory_raises_filenotfound(tmp_path: Path):
         validate_file(d)
 
 
-def test_validate_file_invalid_json_raises_jsondecodeerror(tmp_path: Path):
-    p = tmp_path / "bad.json"
-    p.write_text("{invalid", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p)
-
-
 def test_validate_file_invalid_content_raises_schema_error(tmp_path: Path):
     p = tmp_path / "bad.json"
     p.write_text("{}", encoding="utf-8")
@@ -437,13 +423,6 @@ def test_validate_file_filenotfound_message_contains_path(tmp_path: Path):
 # =========================================================================
 # _silence_unused_import 深度
 # =========================================================================
-
-
-def test_silence_unused_import_takes_no_arguments():
-    import inspect
-
-    sig = inspect.signature(_silence_unused_import)
-    assert len(sig.parameters) == 0
 
 
 def test_silence_unused_import_in_module():
@@ -640,13 +619,6 @@ def test_validate_two_params():
     params = list(sig.parameters.keys())
     assert "document" in params
     assert "schema" in params
-
-
-def test_validate_schema_default_none():
-    import inspect
-
-    sig = inspect.signature(validate)
-    assert sig.parameters["schema"].default is None
 
 
 def test_is_valid_two_params():

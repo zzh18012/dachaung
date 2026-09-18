@@ -96,11 +96,6 @@ def test_schemas_dir_endswith_schemas_batch31():
     assert SCHEMAS_DIR.name == "schemas"
 
 
-def test_schemas_dir_parent_has_pyproject_batch31():
-    """父目录应包含 pyproject.toml（项目根）。"""
-    assert (SCHEMAS_DIR.parent / "pyproject.toml").is_file()
-
-
 def test_schemas_dir_contains_manifest_schema_batch31():
     assert (SCHEMAS_DIR / "manifest.schema.json").is_file()
 
@@ -409,11 +404,6 @@ def test_module_source_contains_validate_file_func_batch31():
 def test_module_source_contains_draft_validator_call_batch31():
     src = inspect.getsource(smod)
     assert "Draft202012Validator(" in src
-
-
-def test_module_source_contains_iter_errors_call_batch31():
-    src = inspect.getsource(smod)
-    assert "iter_errors(" in src
 
 
 def test_module_source_contains_absolute_path_batch31():

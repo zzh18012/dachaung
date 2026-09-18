@@ -442,10 +442,6 @@ def test_schemas_dir_contains_document_schema_batch10():
     assert (SCHEMAS_DIR / "document.schema.json").is_file()
 
 
-def test_schemas_dir_in_module_namespace_batch10():
-    assert "SCHEMAS_DIR" in vars(smod)
-
-
 def test_schemas_dir_immutable_attribute_batch10():
     """SCHEMAS_DIR 是 module-level 常量。"""
     # 多次访问返回同一对象
@@ -478,11 +474,6 @@ def test_schemas_dir_immutable_attribute_batch10():
 def test_schema_source_no_forbidden_token_fourteenth_batch10(token):
     source = inspect.getsource(smod)
     assert token not in source
-
-
-def test_schema_source_no_unlink_batch10():
-    source = inspect.getsource(smod)
-    assert "unlink" not in source
 
 
 def test_schema_source_no_kill_batch10():
@@ -717,14 +708,6 @@ def test_module_all_entries_str_batch10():
 def test_module_has_dunder_file_batch10():
     assert hasattr(smod, "__file__")
     assert smod.__file__ is not None
-
-
-def test_module_dunder_file_endswith_schema_py_batch10():
-    import os
-    sep = os.sep
-    assert smod.__file__.endswith("evaluation" + sep + "schema.py") or smod.__file__.endswith(
-        "evaluation/schema.py"
-    )
 
 
 def test_module_name_is_evaluation_schema_batch10():

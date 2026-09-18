@@ -32,16 +32,6 @@ from app.parsers.base import (
 # =========================================================================
 
 
-def test_parser_error_init_three_params():
-    sig = inspect.signature(ParserError.__init__)
-    assert set(sig.parameters) == {"self", "code", "message", "details"}
-
-
-def test_parser_error_details_default_none_init():
-    sig = inspect.signature(ParserError.__init__)
-    assert sig.parameters["details"].default is None
-
-
 def test_parser_error_explicit_details_dict():
     e = ParserError(code="x", message="y", details={"k": "v"})
     assert e.details == {"k": "v"}
@@ -157,12 +147,6 @@ def test_make_document_id_takes_first_16_chars():
 def test_make_document_id_stable_same_input():
     h = "a" * 64
     assert make_document_id(h) == make_document_id(h)
-
-
-def test_make_document_id_different_input_different_output():
-    h1 = "a" * 64
-    h2 = "b" * 64
-    assert make_document_id(h1) != make_document_id(h2)
 
 
 def test_make_document_id_short_raises():
@@ -330,11 +314,6 @@ def test_parser_is_abstract_class():
     assert inspect.isabstract(Parser)
 
 
-def test_parser_cannot_be_instantiated():
-    with pytest.raises(TypeError):
-        Parser()  # type: ignore[abstract]
-
-
 def test_parser_has_abstract_parse():
     assert "__abstractmethods__" in Parser.__dict__
     assert "parse" in Parser.__abstractmethods__
@@ -435,29 +414,12 @@ def test_module_imports_any():
     assert "from typing import Any" in src
 
 
-def test_module_imports_literal():
-    import app.parsers.base as mod
-    src = inspect.getsource(mod)
-    assert "Literal" in src
-
-
 def test_module_imports_document_sourcetype():
     import app.parsers.base as mod
     src = inspect.getsource(mod)
     assert "from app.models import" in src
     assert "Document" in src
     assert "SourceType" in src
-
-
-def test_module_uses_future_annotations():
-    import app.parsers.base as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_docstring_present():
-    import app.parsers.base as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_business_code_isolation():
@@ -479,11 +441,6 @@ def test_module_silence_unused_no_op():
     """_silence_unused 调用应不抛异常。"""
     import app.parsers.base as mod
     mod._silence_unused()
-
-
-def test_module_silence_unused_returns_none():
-    import app.parsers.base as mod
-    assert mod._silence_unused() is None
 
 
 def test_parser_error_class_in_module():
@@ -514,11 +471,6 @@ def test_detect_source_type_in_module():
 def test_make_document_id_signature():
     sig = inspect.signature(make_document_id)
     assert set(sig.parameters) == {"source_hash"}
-
-
-def test_make_document_id_param_no_default():
-    sig = inspect.signature(make_document_id)
-    assert sig.parameters["source_hash"].default is inspect.Parameter.empty
 
 
 def test_make_document_id_return_annotation_str():

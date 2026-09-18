@@ -50,14 +50,6 @@ def test_text_extensions_two_items():
 # =========================================================================
 
 
-def test_detect_text_source_type_uppercase_txt():
-    assert _detect_text_source_type(Path("a.TXT")) == "text"
-
-
-def test_detect_text_source_type_uppercase_text():
-    assert _detect_text_source_type(Path("a.TEXT")) == "text"
-
-
 def test_detect_text_source_type_pdf_rejected():
     with pytest.raises(ParserError) as excinfo:
         _detect_text_source_type(Path("a.pdf"))
@@ -86,11 +78,6 @@ def test_detect_text_source_type_no_suffix_message_contains_kuohao():
 def test_detect_text_source_type_double_extension():
     """多后缀只看最后一段。"""
     assert _detect_text_source_type(Path("a.b.txt")) == "text"
-
-
-def test_detect_text_source_type_md_rejected():
-    with pytest.raises(ParserError):
-        _detect_text_source_type(Path("a.md"))
 
 
 def test_detect_text_source_type_docx_rejected():
@@ -180,10 +167,6 @@ def test_split_paragraphs_internal_whitespace_preserved():
     text = "line1\n    indented line\nline3"
     result = _split_paragraphs(text)
     assert result == [(1, "line1\n    indented line\nline3")]
-
-
-def test_split_paragraphs_single_trailing_newline():
-    assert _split_paragraphs("hello\n") == [(1, "hello")]
 
 
 def test_split_paragraphs_unicode_content():
@@ -583,21 +566,6 @@ def test_module_imports_parser_base():
     assert hasattr(m, "Parser")
     assert hasattr(m, "ParserError")
     assert hasattr(m, "make_document_id")
-
-
-def test_detect_text_source_type_signature():
-    sig = inspect.signature(_detect_text_source_type)
-    assert set(sig.parameters) == {"path"}
-
-
-def test_detect_text_source_type_return_annotation_str():
-    sig = inspect.signature(_detect_text_source_type)
-    assert "str" in str(sig.return_annotation)
-
-
-def test_split_paragraphs_signature():
-    sig = inspect.signature(_split_paragraphs)
-    assert set(sig.parameters) == {"text"}
 
 
 def test_split_paragraphs_return_annotation_list():

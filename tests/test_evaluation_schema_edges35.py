@@ -355,11 +355,6 @@ def test_module_source_has_future_annotations_batch15():
     assert any("from __future__ import annotations" in line for line in head)
 
 
-def test_module_source_has_docstring_batch15():
-    src = inspect.getsource(smod)
-    assert '"""加载并校验本阶段三个新 Schema' in src
-
-
 def test_module_source_has_jsonschema_draft_batch15():
     src = inspect.getsource(smod)
     assert "Draft202012Validator" in src
@@ -419,16 +414,6 @@ def test_module_source_has_schema_path_function_batch15():
 def test_module_source_has_iter_errors_call_batch15():
     src = inspect.getsource(smod)
     assert "iter_errors" in src
-
-
-def test_module_source_has_sorted_call_batch15():
-    src = inspect.getsource(smod)
-    assert "sorted(validator.iter_errors" in src
-
-
-def test_module_source_has_errors_count_in_message_batch15():
-    src = inspect.getsource(smod)
-    assert "len(errors)" in src
 
 
 def test_module_source_all_has_5_items_batch15():
@@ -526,13 +511,6 @@ def test_module_schema_path_callable_batch15():
 
 def test_module_eval_schema_error_is_class_batch15():
     assert isinstance(EvalSchemaError, type)
-
-
-def test_module_does_not_import_app_schema_batch15():
-    """明确不与 app/schema.py 复用。"""
-    src = inspect.getsource(smod)
-    assert "from app.schema" not in src
-    assert "import app.schema" not in src
 
 
 def test_module_does_not_import_app_pipeline_batch15():

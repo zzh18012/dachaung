@@ -162,18 +162,6 @@ def test_aggregate_summary_counts_sum_correct():
     assert s["counts"]["element_count_total"]["participating_docs"] == 3
 
 
-def test_aggregate_summary_success_rate_full_success():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": True}}},
-        {"metrics": {"pipeline_success": {"value": True}}},
-    ]
-    s = aggregate_summary(per_doc)
-    sr = s["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 2
-    assert sr["total"] == 2
-    assert sr["rate"] == 1.0
-
-
 def test_aggregate_summary_success_rate_full_failure():
     per_doc = [
         {"metrics": {"pipeline_success": {"value": False}}},
@@ -287,22 +275,6 @@ def test_aggregate_summary_silent_drop_count_skips_none():
     ]
     s = aggregate_summary(per_doc)
     assert s["silent_drop_total"] == 8
-
-
-def test_aggregate_summary_silent_drop_count_all_none_returns_none():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    s = aggregate_summary(per_doc)
-    assert s["silent_drop_total"] is None
-
-
-def test_aggregate_summary_silent_drop_count_zero_participates():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 0}}},
-    ]
-    s = aggregate_summary(per_doc)
-    assert s["silent_drop_total"] == 0
 
 
 def test_aggregate_summary_has_four_top_keys():
@@ -656,13 +628,6 @@ def test_module_no_silence_unused():
     assert not hasattr(mod, "_silence_unused")
 
 
-def test_module_constants_present():
-    import evaluation.report as mod
-    assert hasattr(mod, "_RATIO_METRICS")
-    assert hasattr(mod, "_COUNT_METRICS")
-    assert hasattr(mod, "_SUCCESS_BOOL_METRICS")
-
-
 # =========================================================================
 # 签名深度
 # =========================================================================
@@ -692,11 +657,6 @@ def test_build_provenance_return_annotation_dict():
 def test_build_devset_section_param_name():
     sig = inspect.signature(build_devset_section)
     assert "manifest" in sig.parameters
-
-
-def test_build_devset_section_param_no_default():
-    sig = inspect.signature(build_devset_section)
-    assert sig.parameters["manifest"].default is inspect.Parameter.empty
 
 
 def test_aggregate_summary_param_no_default():

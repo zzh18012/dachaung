@@ -64,11 +64,6 @@ def test_pdf_bbox_required_types_length_four_batch31():
     assert len(_PDF_BBOX_REQUIRED_TYPES) == 4
 
 
-def test_text_types_hashable_batch31():
-    """tuple 是 hashable。"""
-    assert hash(_TEXT_TYPES) is not None
-
-
 def test_text_types_unique_entries_batch31():
     assert len(set(_TEXT_TYPES)) == len(_TEXT_TYPES)
 
@@ -314,12 +309,6 @@ def test_docx_locator_ratio_partial_valid_batch31():
 def test_docx_locator_ratio_relationship_id_only_batch31():
     """只含 relationship_id 也算 valid。"""
     elements = [{"type": "paragraph", "source_locator": {"relationship_id": "r1"}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
-def test_docx_locator_ratio_section_only_batch31():
-    elements = [{"type": "paragraph", "source_locator": {"section": "main"}}]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 1.0
 
@@ -750,56 +739,6 @@ def test_module_source_contains_ratio_func_batch31():
     assert "def _ratio(value: float)" in src
 
 
-def test_module_source_contains_bool_metric_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _bool_metric" in src
-
-
-def test_module_source_contains_int_metric_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _int_metric" in src
-
-
-def test_module_source_contains_pdf_locator_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _pdf_locator_ratio" in src
-
-
-def test_module_source_contains_docx_locator_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _docx_locator_ratio" in src
-
-
-def test_module_source_contains_is_valid_bbox_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _is_valid_bbox" in src
-
-
-def test_module_source_contains_image_resource_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _image_resource_ratio" in src
-
-
-def test_module_source_contains_chunk_reference_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _chunk_reference_ratio" in src
-
-
-def test_module_source_contains_text_preservation_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _text_preservation" in src
-
-
-def test_module_source_contains_heading_boundary_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _heading_boundary_ratio" in src
-
-
-def test_module_source_contains_silent_drop_count_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _silent_drop_count" in src
-
-
 def test_module_source_contains_math_import_batch31():
     src = inspect.getsource(mmod)
     assert "import math" in src
@@ -856,12 +795,6 @@ def test_signature_compute_automatic_metrics_return_batch31():
 def test_signature_is_valid_bbox_return_bool_batch31():
     sig = inspect.signature(_is_valid_bbox)
     assert sig.return_annotation == "bool"
-
-
-def test_signature_strip_unicode_whitespace_return_str_batch31():
-    sig = inspect.signature(_strip_unicode_whitespace)
-    assert sig.parameters["s"].annotation == "str"
-    assert sig.return_annotation == "str"
 
 
 # ---------- module 合理性第四十四批 ----------

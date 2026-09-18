@@ -318,21 +318,6 @@ def test_validate_file_str_path(tmp_path):
 # =========================================================================
 
 
-def test_module_all_count_six():
-    assert len(schema_all) == 6
-
-
-def test_module_all_exact():
-    assert set(schema_all) == {
-        "SCHEMA_PATH",
-        "SchemaValidationError",
-        "load_schema",
-        "validate",
-        "is_valid",
-        "validate_file",
-    }
-
-
 def test_module_imports_json():
     import app.schema as mod
     src = inspect.getsource(mod)

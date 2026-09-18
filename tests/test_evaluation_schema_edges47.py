@@ -381,13 +381,6 @@ def test_module_source_no_breakpoint_batch27():
     assert "breakpoint(" not in src
 
 
-def test_module_source_no_open_w_mode_batch27():
-    """schema 模块只读。"""
-    src = inspect.getsource(smod)
-    assert "'w'" not in src
-    assert '"w"' not in src
-
-
 def test_module_source_no_shutil_batch27():
     src = inspect.getsource(smod)
     assert "shutil" not in src

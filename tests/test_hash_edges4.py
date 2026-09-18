@@ -193,14 +193,6 @@ def test_compute_text_hash_module():
     assert compute_text_hash.__module__ == "app.hash"
 
 
-def test_compute_file_hash_is_callable():
-    assert callable(compute_file_hash)
-
-
-def test_compute_text_hash_is_callable():
-    assert callable(compute_text_hash)
-
-
 def test_compute_file_hash_has_docstring():
     assert compute_file_hash.__doc__ is not None
 
@@ -225,16 +217,6 @@ def test_compute_text_hash_docstring_mentions_hash():
 # =========================================================================
 
 
-def test_module_docstring_present():
-    import app.hash as mod
-    assert mod.__doc__ is not None
-
-
-def test_module_docstring_mentions_sha256():
-    import app.hash as mod
-    assert "SHA-256" in mod.__doc__ or "sha256" in mod.__doc__.lower()
-
-
 def test_module_docstring_mentions_source_hash():
     import app.hash as mod
     assert "source_hash" in mod.__doc__
@@ -254,24 +236,6 @@ def test_module_no_all_attribute():
     """app/hash.py 不定义 __all__。"""
     import app.hash as mod
     assert not hasattr(mod, "__all__")
-
-
-def test_module_imports_hashlib():
-    import app.hash as mod
-    src = inspect.getsource(mod)
-    assert "import hashlib" in src
-
-
-def test_module_imports_path():
-    import app.hash as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_uses_future_annotations():
-    import app.hash as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
 
 
 def test_module_no_other_functions():

@@ -176,14 +176,6 @@ def test_classify_line_text_with_period_at_end_is_paragraph():
 # =========================================================================
 
 
-def test_heading_re_no_match_for_empty_string():
-    assert _HEADING_RE.match("") is None
-
-
-def test_heading_re_no_match_for_just_whitespace():
-    assert _HEADING_RE.match("   ") is None
-
-
 def test_heading_re_no_match_for_just_one_hash_no_space():
     r"""单个 # 没有 \s，不匹配。"""
     assert _HEADING_RE.match("#") is None
@@ -456,10 +448,6 @@ def test_kreuzberg_parser_name_class_attribute_value():
     assert KreuzbergParser.name == "kreuzberg"
 
 
-def test_kreuzberg_parser_version_class_attribute_exists():
-    assert hasattr(KreuzbergParser, "version")
-
-
 def test_kreuzberg_parser_version_class_attribute_is_string():
     assert isinstance(KreuzbergParser.version, str)
 
@@ -613,10 +601,6 @@ def test_module_kreuzberg_parser_inherits_parser():
     from app.parsers.base import Parser
 
     assert issubclass(KreuzbergParser, Parser)
-
-
-def test_module_kreuzberg_parser_has_docstring():
-    assert KreuzbergParser.__doc__ is not None
 
 
 def test_module_kreuzberg_parser_parse_method_has_docstring():

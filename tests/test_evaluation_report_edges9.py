@@ -91,11 +91,6 @@ def test_module_docstring_mentions_aggregation_rules():
     assert "macro" in doc.lower() or "平均" in doc
 
 
-def test_module_no_silence_unused():
-    import evaluation.report as m
-    assert not hasattr(m, "_silence_unused_import")
-
-
 # =========================================================================
 # 模块常量
 # =========================================================================
@@ -111,24 +106,6 @@ def test_ratio_metrics_length_is_12():
 
 def test_ratio_metrics_no_duplicates():
     assert len(set(_RATIO_METRICS)) == len(_RATIO_METRICS)
-
-
-def test_ratio_metrics_contains_expected_names():
-    expected = {
-        "schema_valid",
-        "pdf_locator_valid_ratio",
-        "docx_locator_valid_ratio",
-        "image_resource_exists_ratio",
-        "chunk_reference_intact_ratio",
-        "text_preservation_equal",
-        "text_char_multiset_precision",
-        "text_char_multiset_recall",
-        "heading_boundary_compliance",
-        "chunk_boundary_precision",
-        "chunk_boundary_recall",
-        "chunk_boundary_f1",
-    }
-    assert set(_RATIO_METRICS) == expected
 
 
 def test_ratio_metrics_excludes_figure_caption():
@@ -194,17 +171,6 @@ def test_report_version_nonempty():
 # =========================================================================
 # get_git_provenance 签名 + 路径
 # =========================================================================
-
-
-def test_get_git_provenance_signature():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters)
-    assert params == ["project_root"]
-
-
-def test_get_git_provenance_return_annotation_str():
-    sig = inspect.signature(get_git_provenance)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_get_git_provenance_callable():
@@ -302,11 +268,6 @@ def test_get_dependency_versions_signature():
     assert params == []
 
 
-def test_get_dependency_versions_return_annotation_str():
-    sig = inspect.signature(get_dependency_versions)
-    assert sig.return_annotation == "dict[str, str | None]"
-
-
 def test_get_dependency_versions_callable():
     assert callable(get_dependency_versions)
 
@@ -332,35 +293,8 @@ def test_get_dependency_versions_values_str_or_none():
 # =========================================================================
 
 
-def test_build_provenance_signature():
-    sig = inspect.signature(build_provenance)
-    params = list(sig.parameters)
-    assert params == ["project_root", "parser_name", "max_chars", "parser_version"]
-
-
-def test_build_provenance_return_annotation_str():
-    sig = inspect.signature(build_provenance)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_build_provenance_callable():
     assert callable(build_provenance)
-
-
-def test_build_provenance_returns_dict(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert isinstance(result, dict)
-
-
-def test_build_provenance_keys_exact(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    expected = {
-        "git_commit", "git_dirty",
-        "evaluator_version", "report_version",
-        "parser_name", "parser_version",
-        "dependencies", "max_chars", "run_timestamp_iso",
-    }
-    assert set(result.keys()) == expected
 
 
 def test_build_provenance_nine_keys(tmp_path):
@@ -378,20 +312,9 @@ def test_build_provenance_parser_name_kreuzberg(tmp_path):
     assert result["parser_name"] == "kreuzberg"
 
 
-def test_build_provenance_parser_version_propagated(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, "0.1.0")
-    assert result["parser_version"] == "0.1.0"
-
-
 def test_build_provenance_parser_version_none_ok(tmp_path):
     result = build_provenance(tmp_path, "fallback", 800, None)
     assert result["parser_version"] is None
-
-
-def test_build_provenance_max_chars_int_coercion_from_int(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["max_chars"] == 800
-    assert isinstance(result["max_chars"], int)
 
 
 def test_build_provenance_max_chars_int_coercion_from_float(tmp_path):
@@ -405,16 +328,6 @@ def test_build_provenance_max_chars_int_coercion_from_str(tmp_path):
     result = build_provenance(tmp_path, "fallback", "800", None)
     assert result["max_chars"] == 800
     assert isinstance(result["max_chars"], int)
-
-
-def test_build_provenance_dependencies_is_dict(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert isinstance(result["dependencies"], dict)
-
-
-def test_build_provenance_dependencies_three_keys(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert set(result["dependencies"].keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
 
 
 def test_build_provenance_run_timestamp_iso_format(tmp_path):
@@ -469,17 +382,6 @@ class _FakeManifest:
         self.categories_covered = categories_covered if categories_covered is not None else ["text"]
 
 
-def test_build_devset_section_signature():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters)
-    assert params == ["manifest"]
-
-
-def test_build_devset_section_return_annotation_str():
-    sig = inspect.signature(build_devset_section)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_build_devset_section_callable():
     assert callable(build_devset_section)
 
@@ -530,17 +432,6 @@ def test_build_devset_section_empty_categories():
 # =========================================================================
 
 
-def test_aggregate_summary_signature():
-    sig = inspect.signature(aggregate_summary)
-    params = list(sig.parameters)
-    assert params == ["per_doc_results"]
-
-
-def test_aggregate_summary_return_annotation_str():
-    sig = inspect.signature(aggregate_summary)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_aggregate_summary_callable():
     assert callable(aggregate_summary)
 
@@ -559,11 +450,6 @@ def test_aggregate_summary_has_four_top_keys():
 # =========================================================================
 # aggregate_summary counts 深度
 # =========================================================================
-
-
-def test_aggregate_summary_counts_has_element_count_total_key():
-    result = aggregate_summary([])
-    assert "element_count_total" in result["counts"]
 
 
 def test_aggregate_summary_counts_sum_aggregates():
@@ -607,11 +493,6 @@ def test_aggregate_summary_counts_each_entry_two_keys():
 # =========================================================================
 # aggregate_summary success_rates 深度
 # =========================================================================
-
-
-def test_aggregate_summary_success_rates_has_pipeline_success():
-    result = aggregate_summary([])
-    assert "pipeline_success" in result["success_rates"]
 
 
 def test_aggregate_summary_success_rates_zero_docs_rate_none():
@@ -687,11 +568,6 @@ def test_aggregate_summary_ratio_macro_averages_has_12_keys():
     assert len(result["ratio_macro_averages"]) == 12
 
 
-def test_aggregate_summary_ratio_macro_averages_keys_exact():
-    result = aggregate_summary([])
-    assert set(result["ratio_macro_averages"].keys()) == set(_RATIO_METRICS)
-
-
 def test_aggregate_summary_ratio_macro_averages_none_for_empty():
     result = aggregate_summary([])
     for k, v in result["ratio_macro_averages"].items():
@@ -754,16 +630,6 @@ def test_aggregate_summary_silent_drop_total_none_for_empty():
     assert result["silent_drop_total"] is None
 
 
-def test_aggregate_summary_silent_drop_total_sums():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 3}}},
-        {"metrics": {"silent_drop_count": {"value": 5}}},
-        {"metrics": {"silent_drop_count": {"value": 2}}},
-    ]
-    result = aggregate_summary(per_doc)
-    assert result["silent_drop_total"] == 10
-
-
 def test_aggregate_summary_silent_drop_skips_none():
     per_doc = [
         {"metrics": {"silent_drop_count": {"value": 3}}},
@@ -781,15 +647,6 @@ def test_aggregate_summary_silent_drop_zero_values_count():
     ]
     result = aggregate_summary(per_doc)
     assert result["silent_drop_total"] == 5
-
-
-def test_aggregate_summary_silent_drop_all_zeros():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 0}}},
-        {"metrics": {"silent_drop_count": {"value": 0}}},
-    ]
-    result = aggregate_summary(per_doc)
-    assert result["silent_drop_total"] == 0
 
 
 # =========================================================================

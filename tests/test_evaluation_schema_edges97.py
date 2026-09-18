@@ -119,14 +119,6 @@ def _src():
     return inspect.getsource(schema_mod)
 
 
-def test_source_key_lines_batch96():
-    src = _src()
-    assert 'raise FileNotFoundError(f"Schema 文件不存在: {p}")' in src
-    assert 'raise FileNotFoundError(f"待校验文件不存在: {p}")' in src
-    assert ("errors = sorted(validator.iter_errors(instance), "
-            "key=lambda e: list(e.absolute_path))") in src
-
-
 # ---------- forbidden tokens 第三百六十八批 ----------
 
 def test_source_no_eval_batch96():

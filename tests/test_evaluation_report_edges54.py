@@ -336,22 +336,6 @@ def test_dependency_versions_normal_path_batch35():
 # ---------- build_provenance 第三十五批
 
 
-def test_build_provenance_nine_keys_batch35(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "1.0.0")
-    expected = {
-        "git_commit",
-        "git_dirty",
-        "evaluator_version",
-        "report_version",
-        "parser_name",
-        "parser_version",
-        "dependencies",
-        "max_chars",
-        "run_timestamp_iso",
-    }
-    assert set(out.keys()) == expected
-
-
 def test_build_provenance_parser_name_value_batch35(tmp_path):
     out = build_provenance(tmp_path, "kreuzberg", 800, "4.10.2")
     assert out["parser_name"] == "kreuzberg"
@@ -428,11 +412,6 @@ def _make_manifest_mock(**kwargs):
     return m
 
 
-def test_build_devset_section_returns_dict_batch35():
-    out = build_devset_section(_make_manifest_mock())
-    assert isinstance(out, dict)
-
-
 def test_build_devset_section_has_six_keys_batch35():
     out = build_devset_section(_make_manifest_mock())
     expected = {
@@ -456,11 +435,6 @@ def test_build_devset_section_file_count_value_batch35():
     assert out["file_count"] == 10
 
 
-def test_build_devset_section_pdf_count_value_batch35():
-    out = build_devset_section(_make_manifest_mock(pdf_count=3))
-    assert out["pdf_count"] == 3
-
-
 def test_build_devset_section_docx_count_value_batch35():
     out = build_devset_section(_make_manifest_mock(docx_count=7))
     assert out["docx_count"] == 7
@@ -477,11 +451,6 @@ def test_build_devset_section_categories_covered_value_batch35():
     assert out["categories_covered"] == cats
 
 
-def test_build_devset_section_empty_categories_batch35():
-    out = build_devset_section(_make_manifest_mock(categories_covered=[]))
-    assert out["categories_covered"] == []
-
-
 def test_build_devset_section_unicode_categories_batch35():
     cats = ["教程", "API 文档"]
     out = build_devset_section(_make_manifest_mock(categories_covered=cats))
@@ -494,29 +463,6 @@ def test_build_devset_section_unicode_categories_batch35():
 def test_aggregate_summary_returns_dict_batch35():
     out = aggregate_summary([])
     assert isinstance(out, dict)
-
-
-def test_aggregate_summary_has_four_keys_batch35():
-    out = aggregate_summary([])
-    expected = {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
-    assert set(out.keys()) == expected
-
-
-def test_aggregate_summary_empty_input_counts_batch35():
-    out = aggregate_summary([])
-    counts = out["counts"]
-    assert "element_count_total" in counts
-    assert counts["element_count_total"]["sum"] is None
-    assert counts["element_count_total"]["participating_docs"] == 0
-
-
-def test_aggregate_summary_empty_input_success_rates_batch35():
-    out = aggregate_summary([])
-    sr = out["success_rates"]
-    assert "pipeline_success" in sr
-    assert sr["pipeline_success"]["success_count"] == 0
-    assert sr["pipeline_success"]["total"] == 0
-    assert sr["pipeline_success"]["rate"] is None
 
 
 def test_aggregate_summary_empty_input_silent_drop_total_batch35():
@@ -556,19 +502,6 @@ def test_aggregate_summary_success_rate_all_false_batch35():
     assert sr["rate"] == 0.0
 
 
-def test_aggregate_summary_success_rate_mixed_batch35():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": True}}},
-        {"metrics": {"pipeline_success": {"value": False}}},
-        {"metrics": {"pipeline_success": {"value": True}}},
-    ]
-    out = aggregate_summary(per_doc)
-    sr = out["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 2
-    assert sr["total"] == 3
-    assert sr["rate"] == pytest.approx(2 / 3)
-
-
 def test_aggregate_summary_success_rate_treats_null_as_false_batch35():
     """value=None 不算成功（is True 才算）。"""
     per_doc = [
@@ -591,30 +524,6 @@ def test_aggregate_summary_ratio_macro_average_simple_batch35():
     assert rm["macro_average"] == 0.75
     assert rm["participating_docs"] == 2
     assert rm["not_evaluated"] == 0
-
-
-def test_aggregate_summary_ratio_macro_skips_null_batch35():
-    per_doc = [
-        {"metrics": {"schema_valid": {"value": 1.0}}},
-        {"metrics": {"schema_valid": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    rm = out["ratio_macro_averages"]["schema_valid"]
-    assert rm["macro_average"] == 1.0
-    assert rm["participating_docs"] == 1
-    assert rm["not_evaluated"] == 1
-
-
-def test_aggregate_summary_ratio_macro_all_null_batch35():
-    per_doc = [
-        {"metrics": {"schema_valid": {"value": None}}},
-        {"metrics": {"schema_valid": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    rm = out["ratio_macro_averages"]["schema_valid"]
-    assert rm["macro_average"] is None
-    assert rm["participating_docs"] == 0
-    assert rm["not_evaluated"] == 2
 
 
 def test_aggregate_summary_silent_drop_total_sum_batch35():
@@ -695,11 +604,6 @@ def test_module_source_contains_design_doc_batch35():
     assert "评测报告装配" in src
 
 
-def test_module_source_contains_aggregation_rules_batch35():
-    src = inspect.getsource(rmod)
-    assert "聚合规则" in src
-
-
 def test_module_source_contains_figure_caption_always_null_comment_batch35():
     src = inspect.getsource(rmod)
     assert "figure_caption_*" in src
@@ -720,11 +624,6 @@ def test_module_source_contains_not_evaluated_keyword_batch35():
     assert "not_evaluated" in src
 
 
-def test_module_source_contains_silent_drop_total_keyword_batch35():
-    src = inspect.getsource(rmod)
-    assert "silent_drop_total" in src
-
-
 def test_module_source_contains_success_rates_keyword_batch35():
     src = inspect.getsource(rmod)
     assert "success_rates" in src
@@ -743,11 +642,6 @@ def test_module_source_contains_evaluator_version_import_batch35():
 def test_module_source_contains_importlib_metadata_call_batch35():
     src = inspect.getsource(rmod)
     assert "importlib.metadata" in src
-
-
-def test_module_source_contains_datetime_iso_call_batch35():
-    src = inspect.getsource(rmod)
-    assert "datetime.now().astimezone().isoformat()" in src
 
 
 def test_module_source_contains_git_provenance_function_batch35():
@@ -778,11 +672,6 @@ def test_module_source_contains_int_cast_for_max_chars_batch35():
 def test_module_source_contains_timeout_10_batch35():
     src = inspect.getsource(rmod)
     assert "timeout=10" in src
-
-
-def test_module_source_contains_package_not_found_handler_batch35():
-    src = inspect.getsource(rmod)
-    assert "PackageNotFoundError" in src
 
 
 # ---------- signatures 第五十五批

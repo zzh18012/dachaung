@@ -22,11 +22,6 @@ from evaluation.runner import _load_annotation, _process_one, run_evaluation
 # ---------- _load_annotation 第三十五批
 
 
-def test_load_annotation_none_input_returns_none_batch35():
-    """path=None → None。"""
-    assert _load_annotation(None) is None
-
-
 def test_load_annotation_nonexistent_file_returns_none_batch35(tmp_path):
     p = tmp_path / "missing.json"
     assert _load_annotation(p) is None
@@ -118,16 +113,6 @@ def _make_doc(tmp_path, doc_id="d1", content="hello", source_type="pdf"):
         expectations=None,
         annotation_resolved=None,
     )
-
-
-def test_process_one_returns_5_tuple_batch35(tmp_path):
-    doc = _make_doc(tmp_path)
-    output_root = tmp_path / "out"
-    with patch("evaluation.runner.process_single") as mock_proc:
-        mock_proc.return_value = (None, [MagicMock(code="E_X")])
-        result = _process_one(doc, output_root, "fallback", 800)
-        assert isinstance(result, tuple)
-        assert len(result) == 5
 
 
 def test_process_one_returns_error_dict_when_errors_batch35(tmp_path):
@@ -391,13 +376,6 @@ def test_run_evaluation_provenance_parser_name_batch35(tmp_path):
     assert report["provenance"]["parser_name"] == "kreuzberg"
 
 
-def test_run_evaluation_provenance_max_chars_batch35(tmp_path):
-    manifest = _make_real_manifest(tmp_path)
-    out_path = tmp_path / "out" / "report.json"
-    report = run_evaluation(manifest, out_path, max_chars=1234)
-    assert report["provenance"]["max_chars"] == 1234
-
-
 def test_run_evaluation_expected_failure_matches_with_actual_code_batch35(tmp_path):
     bad = tmp_path / "bad.pdf"
     bad.write_text("broken", encoding="utf-8")
@@ -486,14 +464,6 @@ def test_run_evaluation_per_doc_has_wall_time_batch35(tmp_path):
         assert wt["chunk"] is None
         assert wt["parse_reason"] == "not_instrumented"
         assert wt["chunk_reason"] == "not_instrumented"
-
-
-def test_run_evaluation_summary_present_batch35(tmp_path):
-    manifest = _make_real_manifest(tmp_path)
-    out_path = tmp_path / "out" / "report.json"
-    report = run_evaluation(manifest, out_path)
-    assert "summary" in report
-    assert isinstance(report["summary"], dict)
 
 
 def test_run_evaluation_devset_present_batch35(tmp_path):
@@ -746,22 +716,6 @@ def test_e2e_full_flow_with_two_documents_batch35(tmp_path):
         report = run_evaluation(manifest, out_path)
         assert len(report["per_doc"]) == 2
         assert report["summary"]["success_rates"]["pipeline_success"]["success_count"] == 1
-
-
-def test_e2e_idempotent_report_keys_batch35(tmp_path):
-    manifest = _make_real_manifest(tmp_path)
-    out_path1 = tmp_path / "out1" / "report.json"
-    out_path2 = tmp_path / "out2" / "report.json"
-    r1 = run_evaluation(manifest, out_path1)
-    r2 = run_evaluation(manifest, out_path2)
-    assert set(r1.keys()) == set(r2.keys())
-
-
-def test_e2e_creates_deeply_nested_output_dir_batch35(tmp_path):
-    manifest = _make_real_manifest(tmp_path)
-    out_path = tmp_path / "a" / "b" / "c" / "d" / "report.json"
-    run_evaluation(manifest, out_path)
-    assert out_path.is_file()
 
 
 def test_e2e_report_is_json_serializable_batch35(tmp_path):

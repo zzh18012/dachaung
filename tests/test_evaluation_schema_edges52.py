@@ -125,12 +125,6 @@ def test_load_schema_eval_report_has_properties_batch32():
     assert "properties" in s
 
 
-def test_load_schema_returns_dict_with_type_object_batch32():
-    for name in ("manifest.schema.json", "annotation.schema.json", "evaluation-report.schema.json"):
-        s = load_schema(name)
-        assert s.get("type") == "object"
-
-
 # ---------- validate 第三十二批
 
 
@@ -337,16 +331,6 @@ def test_module_source_contains_eval_schema_error_class_batch32():
     assert "class EvalSchemaError(Exception):" in src
 
 
-def test_module_source_contains_all_batch32():
-    src = inspect.getsource(smod)
-    assert "__all__" in src
-    assert '"SCHEMAS_DIR"' in src
-    assert '"EvalSchemaError"' in src
-    assert '"load_schema"' in src
-    assert '"validate"' in src
-    assert '"validate_file"' in src
-
-
 # ---------- signatures 第四十九批
 
 
@@ -470,17 +454,3 @@ def test_e2e_eval_schema_error_caught_batch32():
         assert "manifest.schema.json" in str(e)
         assert len(e.errors) >= 1
     assert raised
-
-
-def test_e2e_validate_with_pathlib_path_input_batch32(tmp_path):
-    from evaluation import MANIFEST_VERSION
-    data = {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps(data), encoding="utf-8")
-    # validate_file 接受 Path 对象
-    validate_file(p, "manifest.schema.json")

@@ -568,24 +568,9 @@ def test_module_source_has_report_version_import_batch16():
     assert "from evaluation import REPORT_VERSION" in src
 
 
-def test_module_source_has_annotation_metrics_import_batch16():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.annotation_metrics import (" in src
-    assert "chunk_boundary_prf," in src
-    assert "figure_caption_prf," in src
-
-
 def test_module_source_has_metrics_import_batch16():
     src = inspect.getsource(rmod)
     assert "from evaluation.metrics import compute_automatic_metrics" in src
-
-
-def test_module_source_has_report_import_batch16():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.report import (" in src
-    assert "aggregate_summary," in src
-    assert "build_devset_section," in src
-    assert "build_provenance," in src
 
 
 def test_module_source_has_load_annotation_function_batch16():

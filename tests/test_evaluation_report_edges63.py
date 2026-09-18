@@ -295,26 +295,6 @@ def test_aggregate_summary_partial_success_batch48():
     assert out["success_rates"]["pipeline_success"]["rate"] == 0.5
 
 
-def test_aggregate_summary_counts_sum_batch48():
-    per_doc = [
-        {"metrics": {"element_count_total": {"value": 5}}},
-        {"metrics": {"element_count_total": {"value": 10}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["counts"]["element_count_total"]["sum"] == 15
-    assert out["counts"]["element_count_total"]["participating_docs"] == 2
-
-
-def test_aggregate_summary_counts_with_null_skipped_batch48():
-    per_doc = [
-        {"metrics": {"element_count_total": {"value": 5}}},
-        {"metrics": {"element_count_total": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["counts"]["element_count_total"]["sum"] == 5
-    assert out["counts"]["element_count_total"]["participating_docs"] == 1
-
-
 def test_aggregate_summary_ratio_macro_average_batch48():
     per_doc = [
         {"metrics": {"schema_valid": {"value": 1.0}}},
@@ -475,11 +455,6 @@ def test_source_contains_importlib_metadata_batch48():
 def test_source_contains_package_not_found_error_batch48():
     src = inspect.getsource(report_mod)
     assert "PackageNotFoundError" in src
-
-
-def test_source_contains_isoformat_batch48():
-    src = inspect.getsource(report_mod)
-    assert "isoformat" in src or "astimezone" in src
 
 
 def test_source_contains_no_mixing_rule_batch48():

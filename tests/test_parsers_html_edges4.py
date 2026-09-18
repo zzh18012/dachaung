@@ -168,22 +168,6 @@ def test_heading_levels_h4_value_four():
     assert _HEADING_LEVELS["h4"] == 4
 
 
-def test_skip_tags_contains_script():
-    assert "script" in _SKIP_TAGS
-
-
-def test_skip_tags_contains_style():
-    assert "style" in _SKIP_TAGS
-
-
-def test_skip_tags_contains_head():
-    assert "head" in _SKIP_TAGS
-
-
-def test_skip_tags_contains_title():
-    assert "title" in _SKIP_TAGS
-
-
 def test_skip_tags_contains_noscript():
     assert "noscript" in _SKIP_TAGS
 
@@ -204,11 +188,6 @@ def test_detect_html_source_type_accepts_html_lowercase():
 
 def test_detect_html_source_type_accepts_htm_lowercase():
     p = Path("test.htm")
-    assert _detect_html_source_type(p) == "html"
-
-
-def test_detect_html_source_type_accepts_html_uppercase():
-    p = Path("test.HTML")
     assert _detect_html_source_type(p) == "html"
 
 
@@ -993,16 +972,6 @@ def test_html_parser_class_name_is_str():
 
 def test_html_parser_class_version_is_str():
     assert isinstance(HtmlParser.version, str)
-
-
-def test_html_parser_instance_name_matches_class():
-    p = HtmlParser()
-    assert p.name == "html"
-
-
-def test_html_parser_instance_version_matches_class():
-    p = HtmlParser()
-    assert p.version == "stdlib/0.1.0"
 
 
 def test_html_parser_inherits_parser():

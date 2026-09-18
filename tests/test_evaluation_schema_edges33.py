@@ -52,12 +52,6 @@ def test_schemas_dir_resolved_batch13():
     assert SCHEMAS_DIR == expected
 
 
-def test_schemas_dir_parent_is_project_root_batch13():
-    """SCHEMAS_DIR.parent 是项目根（含 pyproject.toml）。"""
-    parent = SCHEMAS_DIR.parent
-    assert (parent / "pyproject.toml").is_file()
-
-
 def test_schemas_dir_name_is_schemas_batch13():
     assert SCHEMAS_DIR.name == "schemas"
 
@@ -76,12 +70,6 @@ def test_schemas_dir_contains_annotation_schema_batch13():
 
 
 # ---------- EvalSchemaError 行为深度第十三批 ----------
-
-
-def test_eval_schema_error_super_init_batch13():
-    e = EvalSchemaError("msg")
-    # Exception message 应可被 str(e) 访问
-    assert str(e) == "msg"
 
 
 def test_eval_schema_error_args_batch13():
@@ -120,17 +108,6 @@ def test_eval_schema_errors_independent_default_batch13():
 
 def test_eval_schema_error_is_exception_batch13():
     assert issubclass(EvalSchemaError, Exception)
-
-
-def test_eval_schema_error_raise_from_chain_batch13():
-    try:
-        try:
-            raise ValueError("inner")
-        except ValueError as inner:
-            raise EvalSchemaError("outer") from inner
-    except EvalSchemaError as e:
-        assert e.__cause__ is not None
-        assert isinstance(e.__cause__, ValueError)
 
 
 def test_eval_schema_error_pickle_support_batch13():
@@ -423,24 +400,6 @@ def test_module_source_future_annotations_present_batch13():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_json_batch13():
-    source = inspect.getsource(smod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import json" in head
-
-
-def test_module_source_imports_pathlib_path_batch13():
-    source = inspect.getsource(smod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from pathlib import Path" in head
-
-
-def test_module_source_imports_typing_any_batch13():
-    source = inspect.getsource(smod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from typing import Any" in head
-
-
 def test_module_source_imports_draft202012_validator_batch13():
     source = inspect.getsource(smod)
     head = "\n".join(source.split("\n")[:30])
@@ -451,11 +410,6 @@ def test_module_source_imports_jsvalidation_error_batch13():
     source = inspect.getsource(smod)
     head = "\n".join(source.split("\n")[:30])
     assert "from jsonschema.exceptions import ValidationError as JSValidationError" in head
-
-
-def test_module_source_defines_eval_schema_error_batch13():
-    source = inspect.getsource(smod)
-    assert "class EvalSchemaError" in source
 
 
 def test_module_source_defines_schema_path_batch13():

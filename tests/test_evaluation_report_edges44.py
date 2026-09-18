@@ -400,11 +400,6 @@ def test_aggregate_summary_empty_batch28():
     assert s["silent_drop_total"] is None
 
 
-def test_aggregate_summary_returns_dict_batch28():
-    s = aggregate_summary([])
-    assert isinstance(s, dict)
-
-
 def test_aggregate_summary_four_top_keys_batch28():
     s = aggregate_summary([])
     assert set(s.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
@@ -563,12 +558,6 @@ def test_signature_build_provenance_batch28():
     sig = inspect.signature(build_provenance)
     params = list(sig.parameters.keys())
     assert params == ["project_root", "parser_name", "max_chars", "parser_version"]
-
-
-def test_signature_get_dependency_versions_batch28():
-    sig = inspect.signature(get_dependency_versions)
-    params = list(sig.parameters.keys())
-    assert params == []
 
 
 def test_signature_aggregate_summary_batch28():

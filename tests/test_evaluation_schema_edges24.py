@@ -87,26 +87,6 @@ def test_schema_path_source_one_param():
     assert "name: str" in src
 
 
-def test_schema_path_source_returns_path():
-    src = inspect.getsource(_schema_path)
-    assert "return p" in src
-
-
-def test_schema_path_source_uses_schemas_dir():
-    src = inspect.getsource(_schema_path)
-    assert "SCHEMAS_DIR" in src
-
-
-def test_schema_path_source_uses_is_file():
-    src = inspect.getsource(_schema_path)
-    assert ".is_file()" in src
-
-
-def test_schema_path_source_raises_file_not_found():
-    src = inspect.getsource(_schema_path)
-    assert "FileNotFoundError" in src
-
-
 def test_schema_path_source_no_eval():
     src = inspect.getsource(_schema_path)
     assert "eval(" not in src
@@ -155,11 +135,6 @@ def test_load_schema_source_uses_utf8():
     assert '"utf-8"' in src or "'utf-8'" in src
 
 
-def test_load_schema_source_returns_json_load():
-    src = inspect.getsource(load_schema)
-    assert "return json.load(f)" in src
-
-
 def test_load_schema_source_no_eval():
     src = inspect.getsource(load_schema)
     assert "eval(" not in src
@@ -194,11 +169,6 @@ def test_validate_source_no_return_value():
     assert "-> None" in src or "return" in src
 
 
-def test_validate_source_uses_load_schema():
-    src = inspect.getsource(validate)
-    assert "load_schema(schema_name)" in src
-
-
 def test_validate_source_uses_draft_validator():
     src = inspect.getsource(validate)
     assert "Draft202012Validator" in src
@@ -219,12 +189,6 @@ def test_validate_source_uses_errors_list():
     assert "flat: list[dict[str, Any]]" in src or "flat = []" in src or "flat:" in src
 
 
-def test_validate_source_returns_when_no_errors():
-    src = inspect.getsource(validate)
-    assert "if not errors:" in src
-    assert "return" in src
-
-
 def test_validate_source_error_path_keys():
     src = inspect.getsource(validate)
     assert '"path"' in src
@@ -235,11 +199,6 @@ def test_validate_source_error_path_keys():
 def test_validate_source_no_eval():
     src = inspect.getsource(validate)
     assert "eval(" not in src
-
-
-def test_validate_source_no_subprocess():
-    src = inspect.getsource(validate)
-    assert "subprocess" not in src
 
 
 def test_validate_source_no_yield_in_validate():
@@ -274,11 +233,6 @@ def test_validate_file_source_no_return_value():
     assert "-> None" in src
 
 
-def test_validate_file_source_raises_file_not_found():
-    src = inspect.getsource(validate_file)
-    assert "FileNotFoundError" in src
-
-
 def test_validate_file_source_uses_open():
     src = inspect.getsource(validate_file)
     assert ".open(" in src
@@ -287,11 +241,6 @@ def test_validate_file_source_uses_open():
 def test_validate_file_source_uses_utf8():
     src = inspect.getsource(validate_file)
     assert '"utf-8"' in src
-
-
-def test_validate_file_source_uses_json_load():
-    src = inspect.getsource(validate_file)
-    assert "json.load(f)" in src
 
 
 def test_validate_file_source_uses_validate():
@@ -567,12 +516,6 @@ def test_signature_schema_path():
     params = list(sig.parameters.values())
     assert len(params) == 1
     assert params[0].name == "name"
-
-
-def test_signature_schema_path_no_varargs():
-    sig = inspect.signature(_schema_path)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_signature_load_schema():

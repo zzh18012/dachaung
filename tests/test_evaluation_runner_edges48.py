@@ -56,12 +56,6 @@ def test_load_annotation_returns_float_for_float_top_level_batch20(tmp_path):
     assert _load_annotation(p) == pytest.approx(3.14)
 
 
-def test_load_annotation_returns_str_for_str_top_level_batch20(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text('"hello"', encoding="utf-8")
-    assert _load_annotation(p) == "hello"
-
-
 def test_load_annotation_directory_returns_none_batch20(tmp_path):
     """目录被 is_file() 拒绝 → None。"""
     d = tmp_path / "subdir"
@@ -739,20 +733,6 @@ def test_signature_load_annotation_batch20():
     params = list(sig.parameters.values())
     assert len(params) == 1
     assert params[0].name == "path"
-
-
-def test_signature_process_one_batch20():
-    sig = inspect.signature(_process_one)
-    params = list(sig.parameters.values())
-    names = [p.name for p in params]
-    assert names == ["doc", "output_root", "parser_name", "max_chars"]
-
-
-def test_signature_run_evaluation_batch20():
-    sig = inspect.signature(run_evaluation)
-    params = list(sig.parameters.values())
-    names = [p.name for p in params]
-    assert names == ["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]
 
 
 def test_signature_run_evaluation_keyword_only_batch20():

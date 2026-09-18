@@ -185,12 +185,6 @@ def test_ef_stub_written_then_unlinked_batch53(monkeypatch, tmp_path):
 
 # ---------- _load_annotation 非法 JSON ----------
 
-def test_load_annotation_invalid_json_none_batch53(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("not json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_valid_roundtrip_batch53(tmp_path):
     p = tmp_path / "ok.json"
     p.write_text('{"a": 1}', encoding="utf-8")
@@ -209,10 +203,6 @@ def test_source_mkdir_and_update_counts_batch53():
     assert src.count("metrics.update(") == 2
     assert src.count("open(") == 2
     assert src.count("json.dump(") == 1
-
-
-def test_source_annotation_present_line_batch53():
-    assert '"_annotation_present": annotation is not None,' in _src()
 
 
 def test_source_output_root_mkdir_batch53():

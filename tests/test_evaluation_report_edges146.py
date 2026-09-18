@@ -142,28 +142,12 @@ def test_cbf_macro_cross_type_batch516(tmp_path):
         "not_evaluated": 0}
 
 
-def test_cbr_macro_full_batch516(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["ratio_macro_averages"][
-        "chunk_boundary_recall"] == {
-        "macro_average": 1.0, "participating_docs": 2,
-        "not_evaluated": 0}
-
-
 # ---------- locator 互补劈叉 ----------
 
 def test_dlvr_half_participation_batch516(tmp_path):
     r = _run(tmp_path)
     assert r["summary"]["ratio_macro_averages"][
         "docx_locator_valid_ratio"] == {
-        "macro_average": 1.0, "participating_docs": 1,
-        "not_evaluated": 1}
-
-
-def test_plvr_half_participation_batch516(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["ratio_macro_averages"][
-        "pdf_locator_valid_ratio"] == {
         "macro_average": 1.0, "participating_docs": 1,
         "not_evaluated": 1}
 

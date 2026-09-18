@@ -371,10 +371,6 @@ def test_heading_re_pattern_uses_caret_anchor():
     assert _HEADING_RE.pattern.startswith("^")
 
 
-def test_heading_re_pattern_uses_dollar_anchor():
-    assert _HEADING_RE.pattern.endswith("$")
-
-
 # =========================================================================
 # _split_content_to_elements：rest 含 ATX 标记（不再分类）
 # =========================================================================

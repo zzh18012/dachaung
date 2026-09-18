@@ -573,11 +573,6 @@ def test_module_source_contains_no_mixed_types_comment_batch29():
     assert "不混合类型" in src
 
 
-def test_module_source_contains_subprocess_run_call_batch29():
-    src = inspect.getsource(rmod)
-    assert "subprocess.run" in src
-
-
 def test_module_source_contains_capture_output_batch29():
     src = inspect.getsource(rmod)
     assert "capture_output=True" in src

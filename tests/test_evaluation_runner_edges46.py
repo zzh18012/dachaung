@@ -549,12 +549,6 @@ def test_module_does_not_import_unsafe_modules_batch18():
         assert unsafe not in src
 
 
-def test_module_does_not_import_evaluation_cli_batch18():
-    """runner.py 不应反向依赖 cli.py。"""
-    src = inspect.getsource(rmod)
-    assert "from evaluation.cli" not in src
-
-
 def test_module_no_main_block_batch18():
     src = inspect.getsource(rmod)
     assert "if __name__" not in src
@@ -586,14 +580,6 @@ def test_e2e_load_annotation_round_trip_batch18(tmp_path):
     assert r == {"x": 1, "y": [1, 2]}
 
 
-def test_e2e_run_evaluation_creates_valid_json_batch18(tmp_path):
-    out = tmp_path / "out.json"
-    run_evaluation(_mk_manifest_empty(), out)
-    with out.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-    assert isinstance(data, dict)
-
-
 def test_e2e_run_evaluation_devset_in_report_batch18(tmp_path):
     m = _mk_manifest_empty()
     m.devset_status = "complete"
@@ -606,14 +592,6 @@ def test_e2e_run_evaluation_devset_in_report_batch18(tmp_path):
     assert r["devset"]["file_count"] == 5
     assert r["devset"]["pdf_count"] == 3
     assert r["devset"]["docx_count"] == 2
-
-
-def test_e2e_run_evaluation_empty_manifest_batch18(tmp_path):
-    """空 manifest 完整跑通。"""
-    out = tmp_path / "out.json"
-    r = run_evaluation(_mk_manifest_empty(), out)
-    assert r["per_doc"] == []
-    assert r["expected_failures"] == []
 
 
 def test_e2e_load_annotation_none_for_invalid_batch18(tmp_path):

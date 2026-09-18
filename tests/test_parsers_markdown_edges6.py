@@ -112,11 +112,6 @@ def test_md_extensions_is_tuple():
     assert isinstance(_MD_EXTENSIONS, tuple)
 
 
-def test_md_extensions_lowercase():
-    for ext in _MD_EXTENSIONS:
-        assert ext == ext.lower()
-
-
 def test_md_extensions_starts_with_dot():
     for ext in _MD_EXTENSIONS:
         assert ext.startswith(".")
@@ -211,10 +206,6 @@ def test_split_pipe_row_consecutive_pipes_empty_cell():
     assert _split_pipe_row("a || b") == ["a", "", "b"]
 
 
-def test_split_pipe_row_strips_cells():
-    assert _split_pipe_row("  a  |  b  ") == ["a", "b"]
-
-
 def test_split_pipe_row_strips_outer_whitespace():
     assert _split_pipe_row("  | a | b |  ") == ["a", "b"]
 
@@ -252,11 +243,6 @@ def test_is_pipe_table_start_last_line_returns_false():
 def test_is_pipe_table_start_valid_pair_returns_true():
     lines = ["| a | b |", "| --- | --- |"]
     assert _is_pipe_table_start(lines, 0) is True
-
-
-def test_is_pipe_table_start_no_separator_returns_false():
-    lines = ["| a | b |", "| c | d |"]
-    assert _is_pipe_table_start(lines, 0) is False
 
 
 def test_is_pipe_table_start_first_not_pipe_row_returns_false():
@@ -300,14 +286,6 @@ def test_markdown_parser_name_value():
 
 def test_markdown_parser_version_value():
     assert MarkdownParser.version == "stdlib/0.1.0"
-
-
-def test_markdown_parser_name_is_str():
-    assert isinstance(MarkdownParser.name, str)
-
-
-def test_markdown_parser_version_is_str():
-    assert isinstance(MarkdownParser.version, str)
 
 
 def test_markdown_parser_version_format():
@@ -672,40 +650,6 @@ def test_module_all_exact():
     assert mod.__all__ == ["MarkdownParser"]
 
 
-def test_module_all_is_list():
-    import app.parsers.markdown_parser as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_uses_future_annotations():
-    import app.parsers.markdown_parser as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_re():
-    import app.parsers.markdown_parser as mod
-    src = inspect.getsource(mod)
-    assert "import re" in src
-
-
-def test_module_imports_path():
-    import app.parsers.markdown_parser as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.parsers.markdown_parser as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
-def test_module_docstring_present():
-    import app.parsers.markdown_parser as mod
-    assert mod.__doc__ is not None
-
-
 def test_module_docstring_mentions_compatibility():
     """docstring 提及 ATX / paragraph / list / fenced 等。"""
     import app.parsers.markdown_parser as mod
@@ -769,11 +713,6 @@ def test_detect_md_source_type_signature():
 def test_detect_md_source_type_return_str():
     sig = inspect.signature(_detect_md_source_type)
     assert "str" in str(sig.return_annotation)
-
-
-def test_rows_to_md_signature():
-    sig = inspect.signature(_rows_to_md)
-    assert set(sig.parameters) == {"rows"}
 
 
 def test_split_pipe_row_signature():

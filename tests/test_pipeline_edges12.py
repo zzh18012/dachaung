@@ -40,23 +40,11 @@ def _run(tmp_path, html=HTML, mc=200):
 
 # ---------- 分块几何 ----------
 
-def test_html_two_chunks(tmp_path):
-    doc, errors = _run(tmp_path)
-    assert errors == []
-    assert len(doc.chunks) == 2
-
-
 def test_pre_newlines_survive(tmp_path):
     doc, _ = _run(tmp_path)
     assert doc.chunks[0].text == (
         "Head para text here "
         "line1\nbold\nline3 quote text")
-
-
-def test_seven_elements(tmp_path):
-    doc, errors = _run(tmp_path)
-    assert errors == []
-    assert len(doc.elements) == 7
 
 
 def test_element_kinds(tmp_path):
@@ -195,13 +183,6 @@ def test_written_json_source_type(tmp_path):
 
 
 # ---------- chunk 元数据 ----------
-
-def test_chunk_strategy_sequential(tmp_path):
-    doc, _ = _run(tmp_path)
-    for c in doc.chunks:
-        assert c.metadata["strategy"] == \
-            "sequential"
-
 
 def test_chunk_char_count_matches(tmp_path):
     doc, _ = _run(tmp_path)

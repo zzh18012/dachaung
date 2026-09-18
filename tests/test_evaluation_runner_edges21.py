@@ -440,14 +440,6 @@ def test_run_evaluation_does_not_modify_manifest_project_root(tmp_path):
     assert manifest.project_root == root_before
 
 
-def test_run_evaluation_does_not_modify_manifest_devset_status(tmp_path):
-    manifest = _make_empty_manifest(tmp_path)
-    status_before = manifest.devset_status
-    out_path = tmp_path / "out.json"
-    run_evaluation(manifest, out_path)
-    assert manifest.devset_status == status_before
-
-
 # ============================================================================
 # run_evaluation 报告写盘细节
 # ============================================================================

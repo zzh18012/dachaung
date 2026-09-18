@@ -215,16 +215,6 @@ def test_validate_success_returns_none_batch9():
     assert validate(data, "manifest.schema.json") is None
 
 
-def test_validate_missing_version_raises_batch9():
-    data = {
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    with pytest.raises(EvalSchemaError):
-        validate(data, "manifest.schema.json")
-
-
 def test_validate_wrong_version_raises_batch9():
     data = {
         "manifest_version": "9.9.9",
@@ -298,15 +288,6 @@ def test_validate_does_not_mutate_input_batch9():
     assert json.dumps(data, sort_keys=True) == snapshot
 
 
-def test_validate_idempotent_batch9():
-    data = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    validate(data, "manifest.schema.json")
-    validate(data, "manifest.schema.json")
     # 不抛 = 通过
 
 
@@ -322,13 +303,6 @@ def test_validate_error_includes_path_batch9():
     e = exc_info.value
     assert len(e.errors) > 0
     assert "path" in e.errors[0]
-
-
-def test_validate_error_includes_schema_name_batch9():
-    data = {}
-    with pytest.raises(EvalSchemaError) as exc_info:
-        validate(data, "manifest.schema.json")
-    assert "manifest.schema.json" in str(exc_info.value)
 
 
 def test_validate_errors_count_batch9():
@@ -484,11 +458,6 @@ def test_schema_path_error_message_contains_path_str_batch9():
     assert "nonexistent.schema.json" in str(exc_info.value)
 
 
-def test_schema_path_str_name_input_batch9():
-    p = _schema_path("document.schema.json")
-    assert p.is_file()
-
-
 # ---------- SCHEMAS_DIR 常量深度第九批 ----------
 
 
@@ -606,11 +575,6 @@ def test_smod_source_no_unlink_remove_batch9():
     assert ".remove(" not in source
 
 
-def test_smod_source_no_sleep_batch9():
-    source = inspect.getsource(smod)
-    assert "time.sleep" not in source
-
-
 def test_smod_source_no_hardcoded_path_batch9():
     source = inspect.getsource(smod)
     assert "C:\\\\Users" not in source
@@ -688,11 +652,6 @@ def test_module_source_has_validate_def_batch9():
 def test_module_source_has_validate_file_def_batch9():
     source = inspect.getsource(smod)
     assert "def validate_file(path: Path | str, schema_name: str) -> None:" in source
-
-
-def test_module_source_uses_draft202012_validator_batch9():
-    source = inspect.getsource(smod)
-    assert "Draft202012Validator(" in source
 
 
 def test_module_source_uses_iter_errors_batch9():
@@ -892,10 +851,6 @@ def test_module_dunder_file_endswith_schema_py_batch9():
 
 def test_module_dunder_name_batch9():
     assert smod.__name__ == "evaluation.schema"
-
-
-def test_module_eval_schema_error_subclass_exception_batch9():
-    assert issubclass(smod.EvalSchemaError, Exception)
 
 
 def test_module_function_count_batch9():

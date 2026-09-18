@@ -91,11 +91,6 @@ def test_bool_metric_truthy_value_batch44():
     assert _bool_metric("x")["value"] is True
 
 
-def test_bool_metric_falsy_value_batch44():
-    assert _bool_metric(0)["value"] is False
-    assert _bool_metric("")["value"] is False
-
-
 def test_int_metric_value_is_int_batch44():
     assert isinstance(_int_metric(5)["value"], int)
 
@@ -198,10 +193,6 @@ def test_strip_unicode_whitespace_only_ws_batch44():
     assert _strip_unicode_whitespace("   \t\n  ") == ""
 
 
-def test_strip_unicode_whitespace_preserves_punctuation_batch44():
-    assert _strip_unicode_whitespace("a, b. c!") == "a,b.c!"
-
-
 # ---------- _text_preservation ----------
 
 def test_text_preservation_empty_empty_precision_null_batch44():
@@ -300,16 +291,6 @@ def test_heading_boundary_perfect_match_batch44():
     assert out["value"] == 1.0
 
 
-def test_heading_boundary_partial_match_batch44():
-    elements = [
-        {"type": "heading", "element_id": "h1"},
-        {"type": "heading", "element_id": "h2"},
-    ]
-    chunks = [{"text": "x", "source_element_ids": ["h1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 0.5
-
-
 def test_heading_boundary_no_match_batch44():
     elements = [{"type": "heading", "element_id": "h1"}]
     chunks = [{"text": "x", "source_element_ids": ["other"]}]
@@ -362,15 +343,6 @@ def test_silent_drop_zero_when_actual_more_batch44():
     """actual > expected 不算 drop。"""
     out = _silent_drop_count({"paragraph": 7}, {"element_count_by_type": {"paragraph": 5}})
     assert out["value"] == 0
-
-
-def test_silent_drop_sums_across_types_batch44():
-    out = _silent_drop_count(
-        {"paragraph": 3, "heading": 1},
-        {"element_count_by_type": {"paragraph": 5, "heading": 2}},
-    )
-    # (5-3) + (2-1) = 2 + 1 = 3
-    assert out["value"] == 3
 
 
 def test_silent_drop_missing_type_in_actual_batch44():

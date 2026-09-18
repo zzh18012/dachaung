@@ -176,15 +176,6 @@ def test_hbc_none_two_batch551(tmp_path):
         "not_evaluated": 2}
 
 
-def test_tpe_macro_one_batch551(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["ratio_macro_averages"][
-        "text_preservation_equal"] == {
-        "macro_average": 1.0,
-        "participating_docs": 2,
-        "not_evaluated": 0}
-
-
 # ---------- 报告合法性 ----------
 
 def test_report_schema_batch551(tmp_path):

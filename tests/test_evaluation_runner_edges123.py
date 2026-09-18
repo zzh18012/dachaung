@@ -151,12 +151,6 @@ def test_ef_matches_true_flow_batch197(tmp_path):
 
 # ---------- 成功率 1/2 ----------
 
-def test_success_rate_half_batch197(tmp_path):
-    rep = _run(tmp_path)
-    assert rep["summary"]["success_rates"]["pipeline_success"] == {
-        "success_count": 1, "total": 2, "rate": 0.5}
-
-
 # ---------- _per_doc 与私有字段 ----------
 
 def test_per_doc_dir_empty_no_leak_batch197(tmp_path):

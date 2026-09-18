@@ -163,17 +163,6 @@ def test_load_annotation_signature_1_param_no_default():
     assert params[0].default is inspect.Parameter.empty
 
 
-def test_load_annotation_no_varargs_varkw():
-    sig = inspect.signature(_load_annotation)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
-def test_load_annotation_source_has_except_oserror_jsondecodeerror():
-    src = inspect.getsource(_load_annotation)
-    assert "except (OSError, json.JSONDecodeError)" in src
-
-
 def test_load_annotation_source_has_path_is_none_check():
     src = inspect.getsource(_load_annotation)
     assert "path is None" in src
@@ -598,16 +587,6 @@ def test_module_source_no_sqlite3():
     assert "import sqlite3" not in src
 
 
-def test_module_source_no_csv():
-    src = inspect.getsource(rmod)
-    assert "import csv" not in src
-
-
-def test_module_source_no_pickle():
-    src = inspect.getsource(rmod)
-    assert "import pickle" not in src
-
-
 # =========================================================================
 # module source 含必要字符串
 # =========================================================================
@@ -651,11 +630,6 @@ def test_module_source_has_build_devset_section():
 def test_module_source_has_aggregate_summary():
     src = inspect.getsource(rmod)
     assert "aggregate_summary" in src
-
-
-def test_module_source_has_report_version_constant():
-    src = inspect.getsource(rmod)
-    assert "REPORT_VERSION" in src
 
 
 # =========================================================================

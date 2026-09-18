@@ -114,25 +114,11 @@ def test_load_annotation_int_returns_int(tmp_path: Path):
     assert result == 42
 
 
-def test_load_annotation_string_returns_str(tmp_path: Path):
-    p = tmp_path / "str.json"
-    p.write_text('"hello"', encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == "hello"
-
-
 def test_load_annotation_null_returns_none(tmp_path: Path):
     p = tmp_path / "null.json"
     p.write_text("null", encoding="utf-8")
     result = _load_annotation(p)
     assert result is None
-
-
-def test_load_annotation_bool_returns_bool(tmp_path: Path):
-    p = tmp_path / "bool.json"
-    p.write_text("true", encoding="utf-8")
-    result = _load_annotation(p)
-    assert result is True
 
 
 def test_load_annotation_nested_dict(tmp_path: Path):
@@ -531,96 +517,6 @@ def test_run_evaluation_creates_deeply_nested_output(tmp_path: Path):
 # =========================================================================
 
 
-def test_module_imports_json():
-    from evaluation import runner as mod
-    assert hasattr(mod, "json")
-
-
-def test_module_imports_time():
-    from evaluation import runner as mod
-    assert hasattr(mod, "time")
-
-
-def test_module_imports_path():
-    from evaluation import runner as mod
-    assert hasattr(mod, "Path")
-
-
-def test_module_imports_any():
-    from evaluation import runner as mod
-    assert hasattr(mod, "Any")
-
-
-def test_module_imports_process_single():
-    from evaluation import runner as mod
-    assert hasattr(mod, "process_single")
-
-
-def test_module_imports_image_output_dir_for():
-    from evaluation import runner as mod
-    assert hasattr(mod, "image_output_dir_for")
-
-
-def test_module_imports_report_version():
-    from evaluation import runner as mod
-    assert hasattr(mod, "REPORT_VERSION")
-
-
-def test_module_imports_chunk_boundary_prf():
-    from evaluation import runner as mod
-    assert hasattr(mod, "chunk_boundary_prf")
-
-
-def test_module_imports_figure_caption_prf():
-    from evaluation import runner as mod
-    assert hasattr(mod, "figure_caption_prf")
-
-
-def test_module_imports_compute_automatic_metrics():
-    from evaluation import runner as mod
-    assert hasattr(mod, "compute_automatic_metrics")
-
-
-def test_module_imports_aggregate_summary():
-    from evaluation import runner as mod
-    assert hasattr(mod, "aggregate_summary")
-
-
-def test_module_imports_build_provenance():
-    from evaluation import runner as mod
-    assert hasattr(mod, "build_provenance")
-
-
-def test_module_imports_build_devset_section():
-    from evaluation import runner as mod
-    assert hasattr(mod, "build_devset_section")
-
-
-def test_module_has_load_annotation():
-    from evaluation import runner as mod
-    assert hasattr(mod, "_load_annotation")
-
-
-def test_module_has_process_one():
-    from evaluation import runner as mod
-    assert hasattr(mod, "_process_one")
-
-
-def test_module_has_run_evaluation():
-    from evaluation import runner as mod
-    assert hasattr(mod, "run_evaluation")
-
-
-def test_module_does_not_define_all_long():
-    from evaluation import runner as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_all_length_one():
-    from evaluation import runner as mod
-    assert len(mod.__all__) == 1
-
-
 def test_module_all_only_run_evaluation():
     from evaluation import runner as mod
     assert set(mod.__all__) == {"run_evaluation"}
@@ -636,16 +532,6 @@ def test_module_internal_funcs_callable():
     from evaluation import runner as mod
     assert callable(mod._load_annotation)
     assert callable(mod._process_one)
-
-
-def test_module_run_evaluation_callable():
-    from evaluation import runner as mod
-    assert callable(mod.run_evaluation)
-
-
-def test_module_docstring_present():
-    from evaluation import runner as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_total():

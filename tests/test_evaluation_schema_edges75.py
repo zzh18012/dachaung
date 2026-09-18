@@ -156,11 +156,6 @@ def _src() -> str:
     return inspect.getsource(schema_mod)
 
 
-def test_source_schemas_dir_definition_batch54():
-    assert 'SCHEMAS_DIR = Path(__file__).resolve().parent.parent / "schemas"' \
-        in _src()
-
-
 # ---------- forbidden tokens 第二百一十三批 ----------
 
 def test_source_no_eval_batch54():

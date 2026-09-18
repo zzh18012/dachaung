@@ -124,12 +124,6 @@ def test_schema_path_with_subdir_batch45():
         _schema_path("subdir/file.json")
 
 
-def test_schema_path_string_concat_batch45():
-    """_schema_path 用 SCHEMAS_DIR / name 拼接。"""
-    src = inspect.getsource(_schema_path)
-    assert "SCHEMAS_DIR / name" in src
-
-
 def test_schema_path_extension_check_batch45():
     """实现不强制 .json 后缀，任何 name 都查。"""
     # 给一个非 .json 名字也会查
@@ -187,11 +181,6 @@ def test_load_schema_evaluation_report_has_required_batch45():
 def test_load_schema_returns_dict_batch45():
     s = load_schema("manifest.schema.json")
     assert isinstance(s, dict)
-
-
-def test_load_schema_missing_raises_file_not_found_batch45():
-    with pytest.raises(FileNotFoundError):
-        load_schema("missing.schema.json")
 
 
 def test_load_schema_json_decode_error_batch45(tmp_path):
@@ -292,16 +281,6 @@ def test_validate_manifest_version_invalid_enum_batch45():
         validate(bad, "manifest.schema.json")
 
 
-def test_validate_devset_status_invalid_enum_batch45():
-    bad = {
-        "manifest_version": "1.0",
-        "devset_status": "partial",
-        "documents": [],
-    }
-    with pytest.raises(EvalSchemaError):
-        validate(bad, "manifest.schema.json")
-
-
 def test_validate_top_level_list_batch45():
     """顶层是 list 而非 dict。"""
     with pytest.raises(EvalSchemaError):
@@ -311,11 +290,6 @@ def test_validate_top_level_list_batch45():
 def test_validate_top_level_string_batch45():
     with pytest.raises(EvalSchemaError):
         validate("not dict", "manifest.schema.json")  # type: ignore[arg-type]
-
-
-def test_validate_top_level_bool_batch45():
-    with pytest.raises(EvalSchemaError):
-        validate(True, "manifest.schema.json")  # type: ignore[arg-type]
 
 
 # ---------- validate_file 各种编码处理 ----------
@@ -335,16 +309,6 @@ def test_validate_file_utf8_with_chinese_batch45(tmp_path):
         pass
 
 
-def test_validate_file_str_path_batch45(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }), encoding="utf-8")
-    validate_file(str(p), "manifest.schema.json")
-
-
 def test_validate_file_not_found_batch45(tmp_path):
     with pytest.raises(FileNotFoundError) as exc_info:
         validate_file(tmp_path / "missing.json", "manifest.schema.json")
@@ -358,14 +322,6 @@ def test_validate_file_json_decode_error_batch45(tmp_path):
     p.write_text("not json at all", encoding="utf-8")
     with pytest.raises(json.JSONDecodeError):
         validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_calls_validate_batch45(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({"foo": "bar"}), encoding="utf-8")
-    with patch("evaluation.schema.validate", return_value=None) as mock_v:
-        validate_file(p, "any.schema.json")
-    mock_v.assert_called_once_with({"foo": "bar"}, "any.schema.json")
 
 
 def test_validate_file_success_no_return_value_batch45(tmp_path):
@@ -392,12 +348,6 @@ def test_eval_schema_error_message_only_batch45():
     e = EvalSchemaError("just message")
     assert str(e) == "just message"
     assert e.errors == []
-
-
-def test_eval_schema_error_with_errors_batch45():
-    errs = [{"path": ["a"], "message": "x"}]
-    e = EvalSchemaError("msg", errors=errs)
-    assert e.errors == errs
 
 
 def test_eval_schema_error_errors_none_default_empty_batch45():
@@ -480,12 +430,6 @@ def test_module_docstring_contains_does_not_reuse_app_schema_batch45():
     assert "不与 app/schema.py 复用" in src
 
 
-def test_module_docstring_contains_business_vs_evaluation_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "业务输出" in src
-    assert "评测元数据" in src
-
-
 def test_module_source_contains_json_import_batch45():
     src = inspect.getsource(schema_mod)
     assert "import json" in src
@@ -515,26 +459,6 @@ def test_module_source_contains_jsvalidationerror_import_batch45():
 def test_module_source_contains_errors_or_empty_list_batch45():
     src = inspect.getsource(schema_mod)
     assert "self.errors = errors or []" in src
-
-
-def test_module_source_contains_schema_path_function_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "def _schema_path(name: str) -> Path:" in src
-
-
-def test_module_source_contains_load_schema_function_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "def load_schema(name: str) -> dict[str, Any]:" in src
-
-
-def test_module_source_contains_validate_function_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "def validate(instance: dict[str, Any], schema_name: str) -> None:" in src
-
-
-def test_module_source_contains_validate_file_function_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "def validate_file(path: Path | str, schema_name: str) -> None:" in src
 
 
 def test_module_source_contains_draft_validator_batch45():
@@ -577,27 +501,9 @@ def test_module_source_contains_file_not_found_two_places_batch45():
 
 # ---------- __all__ ----------
 
-def test_all_exact_order_batch45():
-    assert list(schema_mod.__all__) == [
-        "SCHEMAS_DIR",
-        "EvalSchemaError",
-        "load_schema",
-        "validate",
-        "validate_file",
-    ]
-
-
-def test_all_count_five_batch45():
-    assert len(schema_mod.__all__) == 5
-
-
 def test_all_entries_importable_batch45():
     for name in schema_mod.__all__:
         assert hasattr(schema_mod, name)
-
-
-def test_all_entries_unique_batch45():
-    assert len(set(schema_mod.__all__)) == len(schema_mod.__all__)
 
 
 # ---------- AST 结构 ----------
@@ -619,25 +525,6 @@ def test_ast_top_level_function_names_batch45():
     tree = ast.parse(inspect.getsource(schema_mod))
     names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert names == ["_schema_path", "load_schema", "validate", "validate_file"]
-
-
-def test_ast_eval_schema_error_only_init_batch45():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    cls = [n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError"][0]
-    methods = [n.name for n in cls.body if isinstance(n, ast.FunctionDef)]
-    assert methods == ["__init__"]
-
-
-def test_ast_eval_schema_error_init_calls_super_batch45():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    cls = [n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError"][0]
-    init = [n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "__init__"][0]
-    has_super = False
-    for n in ast.walk(init):
-        if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute):
-            if n.func.attr == "__init__":
-                has_super = True
-    assert has_super
 
 
 def test_ast_validate_has_sorted_call_batch45():
@@ -802,9 +689,3 @@ def test_source_no_async_def_batch45():
 def test_source_no_walrus_batch45():
     src = inspect.getsource(schema_mod)
     assert ":=" not in src
-
-
-def test_source_uses_json_load_batch45():
-    """使用 json.load 而非 pickle/yaml。"""
-    src = inspect.getsource(schema_mod)
-    assert "json.load" in src

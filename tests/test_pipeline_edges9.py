@@ -74,48 +74,6 @@ def test_get_parser_ipynb_returns_ipynb_parser():
     assert isinstance(p, IpynbParser)
 
 
-def test_get_parser_fallback_name_attribute():
-    p = get_parser("fallback")
-    assert p.name == "fallback"
-
-
-def test_get_parser_kreuzberg_name_attribute():
-    p = get_parser("kreuzberg")
-    assert p.name == "kreuzberg"
-
-
-def test_get_parser_markdown_name_attribute():
-    p = get_parser("markdown")
-    assert p.name == "markdown"
-
-
-def test_get_parser_html_name_attribute():
-    p = get_parser("html")
-    assert p.name == "html"
-
-
-def test_get_parser_text_name_attribute():
-    p = get_parser("text")
-    assert p.name == "text"
-
-
-def test_get_parser_ipynb_name_attribute():
-    p = get_parser("ipynb")
-    assert p.name == "ipynb"
-
-
-def test_get_parser_all_return_parser_subclass():
-    for name in ("fallback", "kreuzberg", "markdown", "html", "text", "ipynb"):
-        p = get_parser(name)
-        assert isinstance(p, Parser)
-
-
-def test_get_parser_fallback_each_call_returns_new_instance():
-    p1 = get_parser("fallback")
-    p2 = get_parser("fallback")
-    assert p1 is not p2
-
-
 def test_get_parser_unknown_raises_value_error():
     with pytest.raises(ValueError):
         get_parser("unknown_parser")
@@ -156,19 +114,10 @@ def test_get_parser_image_output_dir_passthrough_to_fallback():
 # =========================================================================
 
 
-def test_image_output_dir_for_none_returns_none():
-    assert image_output_dir_for(None, "a" * 64) is None
-
-
 def test_image_output_dir_for_str_path():
     result = image_output_dir_for("/tmp/out.json", "a" * 64)
     assert isinstance(result, Path)
     assert str(result).endswith(f"images-{'a' * 16}")
-
-
-def test_image_output_dir_for_pathlib_path():
-    result = image_output_dir_for(Path("/tmp/out.json"), "a" * 64)
-    assert isinstance(result, Path)
 
 
 def test_image_output_dir_for_short_hash_uses_full_hash_prefix():
@@ -196,11 +145,6 @@ def test_image_output_dir_for_exactly_16():
 def test_image_output_dir_for_15_chars():
     result = image_output_dir_for("/tmp/out.json", "0123456789abcde")
     assert result.name == "images-0123456789abcde"
-
-
-def test_image_output_dir_for_1_char():
-    result = image_output_dir_for("/tmp/out.json", "x")
-    assert result.name == "images-x"
 
 
 def test_image_output_dir_for_path_no_parent():

@@ -44,25 +44,9 @@ def test_null_returns_dict_with_two_keys_batch37():
     assert set(m.keys()) == {"value", "reason"}
 
 
-def test_null_value_is_none_batch37():
-    m = _null("x")
-    assert m["value"] is None
-
-
-def test_null_with_empty_string_reason_batch37():
-    m = _null("")
-    assert m["reason"] == ""
-
-
 def test_null_with_unicode_reason_batch37():
     m = _null("无内容可比")
     assert m["reason"] == "无内容可比"
-
-
-def test_ratio_zero_batch37():
-    m = _ratio(0.0)
-    assert m["value"] == 0.0
-    assert m["reason"] is None
 
 
 def test_ratio_with_negative_float_batch37():
@@ -138,10 +122,6 @@ def test_is_valid_bbox_with_empty_list_batch37():
 
 def test_is_valid_bbox_with_none_batch37():
     assert _is_valid_bbox(None) is False
-
-
-def test_is_valid_bbox_with_string_batch37():
-    assert _is_valid_bbox("abcd") is False
 
 
 def test_is_valid_bbox_with_tuple_batch37():
@@ -293,12 +273,6 @@ def test_docx_locator_empty_elements_batch37():
     assert m["reason"] == "no_elements"
 
 
-def test_docx_locator_with_paragraph_index_batch37():
-    elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 0}}]
-    m = _docx_locator_ratio(elements)
-    assert m["value"] == 1.0
-
-
 def test_docx_locator_with_table_index_batch37():
     elements = [{"type": "table", "source_locator": {"table_index": 0, "row_index": 0, "col_index": 0}}]
     m = _docx_locator_ratio(elements)
@@ -332,12 +306,6 @@ def test_docx_locator_no_structural_keys_batch37():
 
 def test_docx_locator_empty_locator_batch37():
     elements = [{"type": "paragraph", "source_locator": {}}]
-    m = _docx_locator_ratio(elements)
-    assert m["value"] == 0.0
-
-
-def test_docx_locator_missing_source_locator_batch37():
-    elements = [{"type": "paragraph"}]
     m = _docx_locator_ratio(elements)
     assert m["value"] == 0.0
 
@@ -438,13 +406,6 @@ def test_chunk_reference_empty_ids_list_batch37():
 def test_chunk_reference_missing_ids_key_batch37():
     elements = [{"element_id": "e1"}]
     chunks = [{}]
-    m = _chunk_reference_ratio(elements, chunks)
-    assert m["value"] == 0.0
-
-
-def test_chunk_reference_none_ids_batch37():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": None}]
     m = _chunk_reference_ratio(elements, chunks)
     assert m["value"] == 0.0
 
@@ -558,12 +519,6 @@ def test_heading_boundary_not_first_batch37():
     elements = [{"type": "heading", "element_id": "h1"}]
     chunks = [{"source_element_ids": ["e1", "h1"]}]  # h1 不是第一个
     m = _heading_boundary_ratio(elements, chunks)
-    assert m["value"] == 0.0
-
-
-def test_heading_boundary_empty_chunks_batch37():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    m = _heading_boundary_ratio(elements, [])
     assert m["value"] == 0.0
 
 
@@ -695,51 +650,6 @@ def test_module_source_contains_pdf_bbox_types_definition_batch37():
 def test_module_source_contains_not_evaluated_const_batch37():
     src = inspect.getsource(mmod)
     assert '_NOT_EVALUATED = "not_evaluated"' in src
-
-
-def test_module_source_contains_pipeline_failed_batch37():
-    src = inspect.getsource(mmod)
-    assert '"pipeline_failed"' in src
-
-
-def test_module_source_contains_no_elements_reason_batch37():
-    src = inspect.getsource(mmod)
-    assert '"no_elements"' in src
-
-
-def test_module_source_contains_no_chunks_reason_batch37():
-    src = inspect.getsource(mmod)
-    assert '"no_chunks"' in src
-
-
-def test_module_source_contains_no_heading_elements_reason_batch37():
-    src = inspect.getsource(mmod)
-    assert '"no_heading_elements"' in src
-
-
-def test_module_source_contains_no_image_elements_reason_batch37():
-    src = inspect.getsource(mmod)
-    assert '"no_image_elements"' in src
-
-
-def test_module_source_contains_no_expectations_reason_batch37():
-    src = inspect.getsource(mmod)
-    assert '"no_expectations"' in src
-
-
-def test_module_source_contains_empty_expected_and_actual_batch37():
-    src = inspect.getsource(mmod)
-    assert '"empty_expected_and_actual"' in src
-
-
-def test_module_source_contains_empty_actual_batch37():
-    src = inspect.getsource(mmod)
-    assert '"empty_actual"' in src
-
-
-def test_module_source_contains_empty_expected_batch37():
-    src = inspect.getsource(mmod)
-    assert '"empty_expected"' in src
 
 
 def test_module_source_contains_counter_intersection_batch37():

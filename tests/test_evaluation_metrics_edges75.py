@@ -413,23 +413,6 @@ def test_chunk_reference_all_chunks_empty_ids_batch51():
     assert out["value"] == 0.0
 
 
-def test_chunk_reference_partial_missing_batch51():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}]
-    chunks = [
-        {"source_element_ids": ["e1"]},  # valid
-        {"source_element_ids": ["e3"]},  # invalid
-    ]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.5
-
-
-def test_chunk_reference_all_missing_batch51():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": ["e2"]}, {"source_element_ids": ["e3"]}]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.0
-
-
 def test_chunk_reference_element_id_none_skipped_batch51():
     """元素 element_id 是 None → 不在 set 中（None 不能 in None）。
     其实 None 能 in set，但 chunk 引用 None 也算 id。"""
@@ -667,11 +650,6 @@ def test_source_contains_counter_import_batch51():
     assert "from collections import Counter" in src
 
 
-def test_source_contains_math_isfinite_batch51():
-    src = inspect.getsource(metrics_mod)
-    assert "math.isfinite" in src
-
-
 def test_source_contains_counter_intersection_batch51():
     src = inspect.getsource(metrics_mod)
     assert "c_expected & c_actual" in src
@@ -683,19 +661,9 @@ def test_source_contains_strip_unicode_whitespace_function_batch51():
     assert ".isspace()" in src
 
 
-def test_source_contains_text_preservation_docstring_batch51():
-    src = inspect.getsource(metrics_mod)
-    assert "口径 D" in src or "口径D" in src
-
-
 def test_source_contains_image_excluded_note_batch51():
     src = inspect.getsource(metrics_mod)
     assert "image" in src
-
-
-def test_source_contains_pipeline_failed_reason_batch51():
-    src = inspect.getsource(metrics_mod)
-    assert "pipeline_failed" in src
 
 
 def test_source_contains_no_elements_reason_batch51():
@@ -875,13 +843,6 @@ def test_ast_compute_metrics_has_for_loop_for_metrics_assign_batch51():
     fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
     # for name in (...):  +  for e in elements:  →  ≥2
     assert len(fors) >= 2
-
-
-def test_ast_image_resource_ratio_has_for_loop_batch51():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_image_resource_ratio")
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) >= 2  # for img in images + for p in candidates
 
 
 def test_ast_strip_unicode_whitespace_uses_join_batch51():

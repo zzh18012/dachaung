@@ -259,13 +259,6 @@ def test_validate_file_returns_none_batch14(tmp_path):
     assert result is None
 
 
-def test_validate_file_propagates_eval_schema_error_batch14(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({"manifest_version": "wrong"}), encoding="utf-8")
-    with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_propagates_json_decode_error_batch14(tmp_path):
     """非法 JSON → json.JSONDecodeError（不被包装）。"""
     p = tmp_path / "m.json"

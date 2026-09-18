@@ -255,55 +255,6 @@ def test_process_single_input_path_required():
     assert sig.parameters["input_path"].default is inspect.Parameter.empty
 
 
-def test_process_single_output_path_default_none():
-    import inspect
-
-    sig = inspect.signature(process_single)
-    assert sig.parameters["output_path"].default is None
-
-
-def test_process_single_parser_name_keyword_only():
-    import inspect
-
-    sig = inspect.signature(process_single)
-    assert sig.parameters["parser_name"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
-def test_process_single_max_chars_keyword_only():
-    import inspect
-
-    sig = inspect.signature(process_single)
-    assert sig.parameters["max_chars"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
-def test_process_single_write_json_keyword_only():
-    import inspect
-
-    sig = inspect.signature(process_single)
-    assert sig.parameters["write_json"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
-def test_process_single_default_parser_name_fallback():
-    import inspect
-
-    sig = inspect.signature(process_single)
-    assert sig.parameters["parser_name"].default == "fallback"
-
-
-def test_process_single_default_max_chars_800():
-    import inspect
-
-    sig = inspect.signature(process_single)
-    assert sig.parameters["max_chars"].default == 800
-
-
-def test_process_single_default_write_json_true():
-    import inspect
-
-    sig = inspect.signature(process_single)
-    assert sig.parameters["write_json"].default is True
-
-
 def test_process_single_return_annotation_is_tuple():
     import inspect
 
@@ -653,13 +604,6 @@ def test_get_parser_name_no_default():
 
     sig = inspect.signature(get_parser)
     assert sig.parameters["name"].default is inspect.Parameter.empty
-
-
-def test_get_parser_image_output_dir_default_none():
-    import inspect
-
-    sig = inspect.signature(get_parser)
-    assert sig.parameters["image_output_dir"].default is None
 
 
 # =========================================================================

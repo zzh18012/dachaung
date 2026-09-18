@@ -127,18 +127,6 @@ def test_load_annotation_signature_param_kind_positional_or_keyword():
     assert sig.parameters["path"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_load_annotation_no_var_args():
-    sig = inspect.signature(_load_annotation)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_load_annotation_no_var_kwargs():
-    sig = inspect.signature(_load_annotation)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 # =========================================================================
 # _process_one 详细
 # =========================================================================
@@ -165,18 +153,6 @@ def test_process_one_signature_param_kinds_positional_or_keyword():
     sig = inspect.signature(_process_one)
     for p in sig.parameters.values():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_process_one_no_var_args():
-    sig = inspect.signature(_process_one)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_process_one_no_var_kwargs():
-    sig = inspect.signature(_process_one)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 def test_process_one_return_annotation_is_tuple():
@@ -281,13 +257,6 @@ def test_run_evaluation_module_identity():
     assert run_evaluation.__module__ == "evaluation.runner"
 
 
-def test_all_helpers_are_function_type():
-    import types as _types
-
-    for fn in [_load_annotation, _process_one, run_evaluation]:
-        assert isinstance(fn, _types.FunctionType)
-
-
 # =========================================================================
 # 模块 namespace 完整性
 # =========================================================================
@@ -359,12 +328,6 @@ def test_module_all_is_list():
     assert isinstance(m.__all__, list)
 
 
-def test_module_all_is_not_tuple():
-    import evaluation.runner as m
-
-    assert not isinstance(m.__all__, tuple)
-
-
 def test_module_all_exact():
     import evaluation.runner as m
 
@@ -397,18 +360,6 @@ def test_module_all_does_not_contain_constants():
 # =========================================================================
 # 模块源码 token 验证（补强 edges17）
 # =========================================================================
-
-
-def test_module_source_contains_from_future_import_annotations():
-    import evaluation.runner as m
-
-    assert "from __future__ import annotations" in inspect.getsource(m)
-
-
-def test_module_source_contains_import_time():
-    import evaluation.runner as m
-
-    assert "import time" in inspect.getsource(m)
 
 
 def test_module_source_contains_perf_counter():
@@ -579,13 +530,6 @@ def test_module_source_contains_process_single_returned_none_message():
 # =========================================================================
 # 模块 docstring 内容验证
 # =========================================================================
-
-
-def test_module_docstring_is_nonempty_string():
-    import evaluation.runner as m
-
-    assert isinstance(m.__doc__, str)
-    assert len(m.__doc__) > 30
 
 
 def test_module_docstring_contains_runner_keyword():

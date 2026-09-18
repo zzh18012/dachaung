@@ -394,11 +394,6 @@ def test_source_contains_不混合类型_batch48():
     assert "不混合类型" in src or "不混合" in src
 
 
-def test_source_contains_ratio_macro_averages_batch48():
-    src = inspect.getsource(report_mod)
-    assert "ratio_macro_averages" in src
-
-
 def test_source_contains_silent_drop_total_batch48():
     src = inspect.getsource(report_mod)
     assert "silent_drop_total" in src
@@ -467,13 +462,6 @@ def test_ast_get_git_provenance_has_two_subprocess_calls_batch48():
         if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "run"
     ]
     assert len(calls) == 2
-
-
-def test_ast_get_dependency_versions_has_for_batch48():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "get_dependency_versions"][0]
-    fors = [n for n in func.body if isinstance(n, ast.For)]
-    assert len(fors) == 1
 
 
 def test_ast_get_dependency_versions_has_try_batch48():
@@ -563,11 +551,6 @@ def test_source_no_os_system_batch48():
     assert "os.system(" not in src
 
 
-def test_source_no_popen_batch48():
-    src = inspect.getsource(report_mod)
-    assert ".popen(" not in src
-
-
 def test_source_no_yaml_load_batch48():
     src = inspect.getsource(report_mod)
     assert "yaml.load(" not in src
@@ -576,11 +559,6 @@ def test_source_no_yaml_load_batch48():
 def test_source_no_pickle_load_batch48():
     src = inspect.getsource(report_mod)
     assert "pickle.load(" not in src
-
-
-def test_source_no_await_batch48():
-    src = inspect.getsource(report_mod)
-    assert "await " not in src
 
 
 def test_source_no_raise_batch48():

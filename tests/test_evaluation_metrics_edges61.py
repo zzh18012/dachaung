@@ -279,10 +279,6 @@ def test_is_valid_bbox_negative_numbers_batch35():
     assert _is_valid_bbox([-1, -2, 10, 10]) is True
 
 
-def test_is_valid_bbox_very_large_batch35():
-    assert _is_valid_bbox([1e10, 1e10, 2e10, 2e10]) is True
-
-
 def test_is_valid_bbox_mixed_int_float_batch35():
     assert _is_valid_bbox([0, 0.5, 10, 10.5]) is True
 
@@ -311,17 +307,6 @@ def test_image_ratio_resource_path_dir_batch35(tmp_path):
     elements = [{"type": "image", "resource_path": str(tmp_path)}]
     out = _image_resource_ratio(elements, None)
     assert out["value"] == 0.0
-
-
-def test_image_ratio_two_images_one_missing_batch35(tmp_path):
-    img = tmp_path / "x.png"
-    img.write_bytes(b"\x89PNG")
-    elements = [
-        {"type": "image", "resource_path": str(img)},
-        {"type": "image", "resource_path": str(tmp_path / "missing.png")},
-    ]
-    out = _image_resource_ratio(elements, None)
-    assert out["value"] == 0.5
 
 
 # ---------- _chunk_reference_ratio 第三十五批
@@ -660,13 +645,6 @@ def test_e2e_complete_doc_with_all_metrics_batch35():
     assert out["text_preservation_equal"]["value"] is True
     assert out["heading_boundary_compliance"]["value"] == 1.0
     assert out["silent_drop_count"]["value"] == 0
-
-
-def test_e2e_idempotent_batch35():
-    doc = {"source_type": "pdf", "elements": [], "chunks": []}
-    out1 = compute_automatic_metrics(doc, None, "pdf", None)
-    out2 = compute_automatic_metrics(doc, None, "pdf", None)
-    assert out1 == out2
 
 
 def test_e2e_does_not_mutate_doc_batch35():

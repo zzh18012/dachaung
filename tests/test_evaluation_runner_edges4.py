@@ -567,20 +567,6 @@ def test_run_evaluation_creates_deeply_nested_output_dirs(tmp_path: Path):
     assert isinstance(report, dict)
 
 
-def test_run_evaluation_returns_dict_with_top_level_keys(tmp_path: Path):
-    manifest = _FakeManifest()
-    out = tmp_path / "out.json"
-    report = run_evaluation(manifest, out)
-    assert set(report.keys()) == {
-        "report_version",
-        "provenance",
-        "devset",
-        "summary",
-        "per_doc",
-        "expected_failures",
-    }
-
-
 def test_run_evaluation_expected_failure_matches_field_true(tmp_path: Path):
     missing = tmp_path / "missing.docx"
     manifest = _FakeManifest(

@@ -139,11 +139,6 @@ def test_git_provenance_call_count_two_batch32(tmp_path):
 # ---------- build_provenance 第三十二批
 
 
-def test_build_provenance_parser_version_string_batch32(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "v1.2.3")
-    assert out["parser_version"] == "v1.2.3"
-
-
 def test_build_provenance_unicode_parser_version_batch32(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, "版本 1.0")
     assert out["parser_version"] == "版本 1.0"
@@ -365,16 +360,6 @@ def test_module_source_contains_aggregate_summary_func_batch32():
     assert "def aggregate_summary(" in src
 
 
-def test_module_source_contains_all_batch32():
-    src = inspect.getsource(rmod)
-    assert "__all__" in src
-    assert '"build_provenance"' in src
-    assert '"build_devset_section"' in src
-    assert '"aggregate_summary"' in src
-    assert '"get_git_provenance"' in src
-    assert '"get_dependency_versions"' in src
-
-
 # ---------- signatures 第四十九批
 
 
@@ -499,13 +484,6 @@ def test_e2e_aggregate_summary_all_results_batch32():
     assert out["success_rates"]["pipeline_success"]["rate"] == 1.0
     assert out["ratio_macro_averages"]["schema_valid"]["macro_average"] == 1.0
     assert out["ratio_macro_averages"]["pdf_locator_valid_ratio"]["macro_average"] == 1.0
-
-
-def test_e2e_idempotent_batch32():
-    results = [{"metrics": {"pipeline_success": {"value": True, "reason": None}}}]
-    out1 = aggregate_summary(results)
-    out2 = aggregate_summary(results)
-    assert out1 == out2
 
 
 def test_e2e_get_dependency_versions_returns_dict_batch32():

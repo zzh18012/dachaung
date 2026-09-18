@@ -1179,23 +1179,10 @@ def test_validate_file_pathlib_path_accepts(tmp_path):
     validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_missing_raises_filenotfound(tmp_path):
-    p = tmp_path / "missing.json"
-    with pytest.raises(FileNotFoundError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_directory_raises_filenotfound(tmp_path):
     """目录 not is_file → FileNotFoundError。"""
     with pytest.raises(FileNotFoundError):
         validate_file(tmp_path, "manifest.schema.json")
-
-
-def test_validate_file_invalid_json_raises_jsondecodeerror(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not valid json", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
 
 
 def test_validate_file_empty_file_raises_jsondecodeerror(tmp_path):
@@ -1296,11 +1283,6 @@ def test_eval_schema_error_message_attribute():
 def test_eval_schema_error_args_stored():
     e = EvalSchemaError("hello")
     assert e.args == ("hello",)
-
-
-def test_eval_schema_error_can_be_raised_and_caught():
-    with pytest.raises(EvalSchemaError):
-        raise EvalSchemaError("msg")
 
 
 def test_eval_schema_error_caught_as_exception():

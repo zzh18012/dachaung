@@ -31,13 +31,6 @@ from evaluation.runner import _load_annotation, _process_one, run_evaluation
 
 # ---------- _load_annotation 多种成功路径 ----------
 
-def test_load_annotation_empty_dict_batch52(tmp_path):
-    p = tmp_path / "empty.json"
-    p.write_text("{}", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == {}
-
-
 def test_load_annotation_with_chunk_boundary_anchors_batch52(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text(json.dumps({
@@ -467,12 +460,6 @@ def test_source_contains_image_dir_is_dir_check_batch52():
 def test_source_contains_write_json_false_batch52():
     src = inspect.getsource(runner_mod)
     assert src.count("write_json=False") >= 2  # documents 路径 + expected_failures 路径
-
-
-def test_source_all_1_export_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "__all__" in src
-    assert '"run_evaluation"' in src
 
 
 # ---------- AST 结构补强 ----------

@@ -44,11 +44,6 @@ def test_heading_levels_exact_six_entries():
     assert len(_HEADING_LEVELS) == 6
 
 
-def test_skip_tags_contains_script_style():
-    assert "script" in _SKIP_TAGS
-    assert "style" in _SKIP_TAGS
-
-
 def test_skip_tags_contains_head_title_meta_link():
     assert "head" in _SKIP_TAGS
     assert "title" in _SKIP_TAGS
@@ -101,11 +96,6 @@ def test_detect_html_source_type_unknown_suffix_raises():
     with pytest.raises(ParserError) as exc:
         _detect_html_source_type(Path("a.txt"))
     assert exc.value.code == "unsupported_type"
-
-
-def test_detect_html_source_type_no_suffix_raises():
-    with pytest.raises(ParserError):
-        _detect_html_source_type(Path("README"))
 
 
 def test_detect_html_source_type_xml_raises():
@@ -188,11 +178,6 @@ def test_html_parser_inherits_parser():
     assert issubclass(HtmlParser, Parser)
 
 
-def test_html_parser_parse_signature():
-    sig = inspect.signature(HtmlParser.parse)
-    assert set(sig.parameters) == {"self", "path", "source_hash"}
-
-
 def test_html_parser_parse_no_defaults():
     sig = inspect.signature(HtmlParser.parse)
     for name in ("path", "source_hash"):
@@ -207,16 +192,6 @@ def test_html_parser_parse_no_defaults():
 def test_html_doc_parser_init_takes_document_id():
     p = _HTMLDocParser("doc1")
     assert p.document_id == "doc1"
-
-
-def test_html_doc_parser_init_elements_empty():
-    p = _HTMLDocParser("doc1")
-    assert p.elements == []
-
-
-def test_html_doc_parser_init_warnings_empty():
-    p = _HTMLDocParser("doc1")
-    assert p.warnings == []
 
 
 def test_html_doc_parser_handles_data_method():
@@ -237,11 +212,6 @@ def test_html_doc_parser_handles_endtag_method():
 def test_html_doc_parser_handles_startendtag_method():
     p = _HTMLDocParser("doc1")
     assert callable(p.handle_startendtag)
-
-
-def test_html_doc_parser_inherits_stdlib():
-    from html.parser import HTMLParser as StdHTMLParser
-    assert issubclass(_HTMLDocParser, StdHTMLParser)
 
 
 def test_html_doc_parser_convert_charrefs_true():

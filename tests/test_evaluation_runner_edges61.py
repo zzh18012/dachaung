@@ -256,11 +256,6 @@ def test_run_evaluation_defaults_batch33():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_run_evaluation_return_annotation_batch33():
-    sig = inspect.signature(run_evaluation)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_run_evaluation_empty_documents_batch33(tmp_path):
     """空 manifest → 报告含必要 key。"""
     manifest = _make_real_manifest(tmp_path)

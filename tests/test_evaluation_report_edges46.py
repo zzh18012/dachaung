@@ -498,11 +498,6 @@ def test_signature_build_devset_section_manifest_annotation_batch30():
     assert "manifest" in sig.parameters
 
 
-def test_signature_aggregate_summary_per_doc_annotation_batch30():
-    sig = inspect.signature(aggregate_summary)
-    assert "list[dict[str, Any]]" in str(sig.parameters["per_doc_results"].annotation)
-
-
 def test_signature_build_provenance_return_dict_batch30():
     sig = inspect.signature(build_provenance)
     assert "dict[str, Any]" in str(sig.return_annotation)

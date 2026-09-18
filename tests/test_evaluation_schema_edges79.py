@@ -75,12 +75,6 @@ def test_required_miss_flat_row_batch54():
 
 # ---------- SCHEMAS_DIR 文件集 ----------
 
-def test_schemas_dir_exactly_four_files_batch54():
-    assert sorted(p.name for p in SCHEMAS_DIR.glob("*.json")) == [
-        "annotation.schema.json", "document.schema.json",
-        "evaluation-report.schema.json", "manifest.schema.json"]
-
-
 # ---------- validate_file str 路径 ----------
 
 def test_validate_file_str_path_ok_batch54():

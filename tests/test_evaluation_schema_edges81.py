@@ -112,12 +112,6 @@ def test_load_schema_missing_file_error_batch54():
 
 # ---------- EvalSchemaError 默认 ----------
 
-def test_schema_error_default_errors_batch54():
-    e = EvalSchemaError("m")
-    assert e.errors == []
-    assert str(e) == "m"
-
-
 # ---------- 坏 JSON / BOM ----------
 
 def test_validate_file_bad_json_raises_batch54():

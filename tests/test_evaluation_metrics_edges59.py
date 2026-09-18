@@ -60,10 +60,6 @@ def test_pdf_bbox_required_types_count_four_batch33():
     assert len(_PDF_BBOX_REQUIRED_TYPES) == 4
 
 
-def test_pdf_bbox_required_types_first_heading_batch33():
-    assert _PDF_BBOX_REQUIRED_TYPES[0] == "heading"
-
-
 # ---------- _NOT_EVALUATED 第三十三批 ----------
 
 
@@ -325,10 +321,6 @@ def test_strip_unicode_whitespace_no_whitespace_batch33():
     assert _strip_unicode_whitespace("abc") == "abc"
 
 
-def test_strip_unicode_whitespace_returns_str_batch33():
-    assert isinstance(_strip_unicode_whitespace(""), str)
-
-
 # ---------- _text_preservation 第三十三批 ----------
 
 
@@ -358,13 +350,6 @@ def test_text_preservation_actual_missing_chunk_text_batch33():
 
 
 # ---------- _heading_boundary_ratio 第三十三批 ----------
-
-
-def test_heading_boundary_ratio_returns_dict_batch33():
-    elements = [{"type": "heading", "content": "x", "element_id": "h1"}]
-    chunks = [{"text": "x", "source_element_ids": ["h1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert isinstance(out, dict)
 
 
 def test_heading_boundary_ratio_keys_count_batch33():

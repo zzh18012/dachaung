@@ -126,11 +126,6 @@ def test_image_resource_ratio_image_base_dir_none_doesnt_join(tmp_path: Path):
     assert result["value"] == 0.0
 
 
-def test_image_resource_ratio_signature():
-    sig = inspect.signature(_image_resource_ratio)
-    assert set(sig.parameters) == {"elements", "image_base_dir"}
-
-
 def test_image_resource_ratio_image_base_dir_no_default():
     """_image_resource_ratio 是内部辅助：image_base_dir 必填（默认值在调用方 compute_automatic_metrics）。"""
     sig = inspect.signature(_image_resource_ratio)
@@ -261,11 +256,6 @@ def test_text_preservation_each_metric_has_value_reason():
         assert "reason" in result[name]
 
 
-def test_text_preservation_signature():
-    sig = inspect.signature(_text_preservation)
-    assert set(sig.parameters) == {"elements", "chunks"}
-
-
 # =========================================================================
 # _chunk_reference_ratio 深度
 # =========================================================================
@@ -291,14 +281,6 @@ def test_chunk_reference_ratio_chunk_with_none_ids_skipped():
     chunks = [{"source_element_ids": None}]
     result = _chunk_reference_ratio(elements, chunks)
     # None falsy → not counted
-    assert result["value"] == 0.0
-
-
-def test_chunk_reference_ratio_partial_ids_invalid():
-    elements = [{"element_id": "e1"}]
-    chunks = [{"source_element_ids": ["e1", "missing"]}]
-    result = _chunk_reference_ratio(elements, chunks)
-    # all() fails on missing → not valid → ratio=0/1=0.0
     assert result["value"] == 0.0
 
 
@@ -361,11 +343,6 @@ def test_silent_drop_count_actual_greater_returns_zero():
     expectations = {"element_count_by_type": {"paragraph": 10}}
     result = _silent_drop_count(by_type, expectations)
     assert result["value"] == 0
-
-
-def test_silent_drop_count_signature():
-    sig = inspect.signature(_silent_drop_count)
-    assert set(sig.parameters) == {"by_type", "expectations"}
 
 
 # =========================================================================
@@ -491,40 +468,11 @@ def test_module_all_no_duplicates():
     assert len(mod.__all__) == len(set(mod.__all__))
 
 
-def test_module_imports_math():
-    import evaluation.metrics as mod
-    src = inspect.getsource(mod)
-    assert "import math" in src
-
-
 def test_module_imports_counter():
     import evaluation.metrics as mod
     src = inspect.getsource(mod)
     assert "from collections import" in src
     assert "Counter" in src
-
-
-def test_module_imports_path():
-    import evaluation.metrics as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import evaluation.metrics as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
-def test_module_no_silence_unused():
-    import evaluation.metrics as mod
-    assert not hasattr(mod, "_silence_unused")
-
-
-def test_module_uses_future_annotations():
-    import evaluation.metrics as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
 
 
 def test_module_docstring_mentions_counter():

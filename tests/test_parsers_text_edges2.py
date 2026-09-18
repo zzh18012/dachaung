@@ -37,10 +37,6 @@ def test_text_extensions_count_two():
     assert len(_TEXT_EXTENSIONS) == 2
 
 
-def test_text_extensions_values():
-    assert set(_TEXT_EXTENSIONS) == {".txt", ".text"}
-
-
 def test_text_extensions_all_lowercase():
     for ext in _TEXT_EXTENSIONS:
         assert ext == ext.lower()
@@ -737,11 +733,6 @@ def test_text_parser_name_is_str():
 def test_text_parser_version_is_str():
     p = TextParser()
     assert isinstance(p.version, str)
-
-
-def test_text_parser_parse_callable():
-    p = TextParser()
-    assert callable(p.parse)
 
 
 def test_text_parser_name_value():

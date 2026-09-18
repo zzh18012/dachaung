@@ -74,11 +74,6 @@ def test_schemas_dir_part_count_batch20():
     assert parts[-1] == "schemas"
 
 
-def test_schemas_dir_count_schema_json_at_least_four_batch20():
-    jsons = list(SCHEMAS_DIR.glob("*.schema.json"))
-    assert len(jsons) >= 4
-
-
 def test_schemas_dir_not_in_evaluation_subdir_batch20():
     """SCHEMAS_DIR 不在 evaluation/ 目录内（schemas/ 是项目级目录）。"""
     # parent 应是项目根，不是 evaluation/
@@ -180,17 +175,6 @@ def test_schema_path_accepts_str_only_batch20():
     assert "str" in ann
 
 
-def test_schema_path_all_four_schemas_batch20():
-    for n in (
-        "manifest.schema.json",
-        "annotation.schema.json",
-        "evaluation-report.schema.json",
-        "document.schema.json",
-    ):
-        p = _schema_path(n)
-        assert p.is_file()
-
-
 def test_schema_path_with_subpath_raises_batch20():
     """带路径分隔符的输入（如 'a/b'）应被拒（FileNotFoundError）。"""
     with pytest.raises(FileNotFoundError):
@@ -277,13 +261,6 @@ def test_validate_errors_each_has_three_keys_batch20():
         validate({}, "manifest.schema.json")
     for e in ei.value.errors:
         assert set(e.keys()) == {"path", "message", "schema_path"}
-
-
-def test_validate_errors_path_is_list_batch20():
-    with pytest.raises(EvalSchemaError) as ei:
-        validate({}, "manifest.schema.json")
-    for e in ei.value.errors:
-        assert isinstance(e["path"], list)
 
 
 def test_validate_instance_dict_required_batch20():
@@ -594,29 +571,11 @@ def test_signature_load_schema_batch20():
     assert [p.name for p in params] == ["name"]
 
 
-def test_signature_validate_batch20():
-    sig = inspect.signature(validate)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["instance", "schema_name"]
-
-
-def test_signature_validate_file_batch20():
-    sig = inspect.signature(validate_file)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["path", "schema_name"]
-
-
 def test_signature_eval_schema_error_init_has_two_params_batch20():
     """EvalSchemaError.__init__ 有 self + message + errors。"""
     sig = inspect.signature(EvalSchemaError.__init__)
     params = list(sig.parameters.values())
     assert len(params) == 3  # self, message, errors
-
-
-def test_signature_eval_schema_error_init_errors_default_none_batch20():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    params = sig.parameters
-    assert params["errors"].default is None
 
 
 # ---------- module 合理性第三十二批 ----------
@@ -650,12 +609,6 @@ def test_module_does_not_import_evaluation_metrics_batch20():
     src = inspect.getsource(smod)
     assert "from evaluation.metrics" not in src
     assert "from evaluation import metrics" not in src
-
-
-def test_module_does_not_import_evaluation_annotation_metrics_batch20():
-    src = inspect.getsource(smod)
-    assert "from evaluation.annotation_metrics" not in src
-    assert "from evaluation import annotation_metrics" not in src
 
 
 def test_module_constants_eval_schema_error_in_all_batch20():

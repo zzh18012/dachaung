@@ -843,13 +843,6 @@ def test_run_evaluation_report_per_doc_is_list(tmp_path):
     assert isinstance(report["per_doc"], list)
 
 
-def test_run_evaluation_report_expected_failures_is_list(tmp_path):
-    manifest = _make_empty_manifest(tmp_path)
-    out_path = tmp_path / "out.json"
-    report = run_evaluation(manifest, out_path)
-    assert isinstance(report["expected_failures"], list)
-
-
 # =========================================================================
 # 模块 source 不含禁止内容（再补）
 # =========================================================================

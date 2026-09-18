@@ -86,11 +86,6 @@ def test_schemas_dir_constant_in_module_all():
 # =========================================================================
 
 
-def test_eval_schema_error_init_signature():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    assert set(sig.parameters) == {"self", "message", "errors"}
-
-
 def test_eval_schema_error_errors_default_none_in_signature():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert sig.parameters["errors"].default is None
@@ -200,12 +195,6 @@ def test_schema_path_directory_raises_filenotfound():
         _schema_path(".")
 
 
-def test_schema_path_error_message_contains_path():
-    with pytest.raises(FileNotFoundError) as exc:
-        _schema_path("nonexistent.schema.json")
-    assert "nonexistent.schema.json" in str(exc.value)
-
-
 def test_schema_path_signature():
     sig = inspect.signature(_schema_path)
     assert set(sig.parameters) == {"name"}
@@ -229,12 +218,6 @@ def test_load_schema_manifest():
 
 def test_load_schema_annotation():
     s = load_schema("annotation.schema.json")
-    assert isinstance(s, dict)
-    assert s.get("type") == "object"
-
-
-def test_load_schema_evaluation_report():
-    s = load_schema("evaluation-report.schema.json")
     assert isinstance(s, dict)
     assert s.get("type") == "object"
 
@@ -351,11 +334,6 @@ def test_validate_does_not_modify_instance():
     assert instance == before
 
 
-def test_validate_signature():
-    sig = inspect.signature(validate)
-    assert set(sig.parameters) == {"instance", "schema_name"}
-
-
 def test_validate_no_defaults():
     sig = inspect.signature(validate)
     for name in sig.parameters:
@@ -392,18 +370,6 @@ def test_validate_file_invalid_content_raises_eval_error(tmp_path: Path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_str_path(tmp_path: Path):
-    p = tmp_path / "ok.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }), encoding="utf-8")
-    # 不抛即过
-    validate_file(str(p), "manifest.schema.json")
-
-
 def test_validate_file_directory_raises_filenotfound(tmp_path: Path):
     """目录不是 file → FileNotFoundError。"""
     sub = tmp_path / "sub"
@@ -436,11 +402,6 @@ def test_validate_file_priority_jsondecode_before_schema(tmp_path: Path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_signature():
-    sig = inspect.signature(validate_file)
-    assert set(sig.parameters) == {"path", "schema_name"}
-
-
 def test_validate_file_no_defaults():
     sig = inspect.signature(validate_file)
     for name in sig.parameters:
@@ -457,66 +418,9 @@ def test_validate_file_return_annotation_none():
 # =========================================================================
 
 
-def test_module_all_exact():
-    import evaluation.schema as mod
-    assert mod.__all__ == [
-        "SCHEMAS_DIR",
-        "EvalSchemaError",
-        "load_schema",
-        "validate",
-        "validate_file",
-    ]
-
-
 def test_module_all_is_list():
     import evaluation.schema as mod
     assert isinstance(mod.__all__, list)
-
-
-def test_module_all_no_duplicates():
-    import evaluation.schema as mod
-    assert len(mod.__all__) == len(set(mod.__all__))
-
-
-def test_module_uses_future_annotations():
-    import evaluation.schema as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_json():
-    import evaluation.schema as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_path():
-    import evaluation.schema as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import evaluation.schema as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
-def test_module_imports_draft202012():
-    import evaluation.schema as mod
-    src = inspect.getsource(mod)
-    assert "Draft202012Validator" in src
-
-
-def test_module_imports_jsvalidation_error():
-    import evaluation.schema as mod
-    src = inspect.getsource(mod)
-    assert "JSValidationError" in src
-
-
-def test_module_docstring_present():
-    import evaluation.schema as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_separation_from_app_schema():
@@ -524,11 +428,6 @@ def test_module_docstring_mentions_separation_from_app_schema():
     import evaluation.schema as mod
     doc = mod.__doc__
     assert "app/schema" in doc.lower() or "不复用" in doc or "分开" in doc
-
-
-def test_module_no_silence_unused():
-    import evaluation.schema as mod
-    assert not hasattr(mod, "_silence_unused")
 
 
 # =========================================================================

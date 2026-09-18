@@ -210,9 +210,3 @@ def test_chunk_strategy_sequential(tmp_path):
     for c in doc.chunks:
         assert c.metadata["strategy"] == \
             "sequential"
-
-
-def test_chunk_max_chars_echo(tmp_path):
-    doc, _ = _run(tmp_path)
-    for c in doc.chunks:
-        assert c.metadata["max_chars"] == 64

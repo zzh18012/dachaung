@@ -554,11 +554,6 @@ def test_module_source_defines_get_dependency_versions_batch13():
     assert "def get_dependency_versions()" in source
 
 
-def test_module_source_defines_build_devset_section_batch13():
-    source = inspect.getsource(rmod)
-    assert "def build_devset_section(" in source
-
-
 def test_module_source_defines_aggregate_summary_batch13():
     source = inspect.getsource(rmod)
     assert "def aggregate_summary(" in source
@@ -687,17 +682,6 @@ def test_build_provenance_no_var_positional_batch13():
     sig = inspect.signature(build_provenance)
     assert sig.parameters.get("args") is None
     assert sig.parameters.get("kwargs") is None
-
-
-def test_all_module_functions_in_dunder_all_batch13():
-    expected = {
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-        "get_git_provenance",
-        "get_dependency_versions",
-    }
-    assert set(rmod.__all__) == expected
 
 
 # ---------- module 合理性第十五批 ----------

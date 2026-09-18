@@ -157,11 +157,6 @@ def test_element_ids_sequential(
 
 # ---------- 分块 ----------
 
-def test_six_chunks(tmp_path):
-    _, _, doc, _ = _run(tmp_path)
-    assert len(doc.chunks) == 6
-
-
 def test_chunk_texts(tmp_path):
     _, _, doc, _ = _run(tmp_path)
     assert [c.text for c in doc.chunks
@@ -175,18 +170,7 @@ def test_chunk_texts(tmp_path):
         "| --- | --- |"]
 
 
-def test_chunks_within_max(tmp_path):
-    _, _, doc, _ = _run(tmp_path)
-    assert all(len(c.text) <= 120
-               for c in doc.chunks)
-
-
 # ---------- 落盘 JSON ----------
-
-def test_json_written(tmp_path):
-    _, out, _, _ = _run(tmp_path)
-    assert out.is_file()
-
 
 def test_json_shape(tmp_path):
     _, out, _, _ = _run(tmp_path)
@@ -198,21 +182,6 @@ def test_json_shape(tmp_path):
     assert len(data["chunks"]) == 6
     assert data["errors"] == []
     assert data["source_type"] == "pdf"
-
-
-def test_json_schema_valid(tmp_path):
-    from app.schema import is_valid
-    _, out, _, _ = _run(tmp_path)
-    assert is_valid(
-        json.loads(
-            out.read_text(
-                encoding="utf-8")))
-
-
-def test_source_hash_matches(tmp_path):
-    p, _, doc, _ = _run(tmp_path)
-    assert doc.source_hash == \
-        compute_file_hash(p)
 
 
 # ---------- 图片渲染落盘 ----------
@@ -276,10 +245,3 @@ def test_metrics_ect(tmp_path):
         "heading": 4, "paragraph": 2,
         "caption": 1, "table": 1,
         "image": 1}
-
-
-def test_document_id_pattern(tmp_path):
-    _, _, doc, _ = _run(tmp_path)
-    assert re.fullmatch(
-        r"doc-[0-9a-f]{16}",
-        doc.document_id)

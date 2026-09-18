@@ -267,10 +267,6 @@ def test_is_valid_bbox_true_element_rejected_batch48():
     assert _is_valid_bbox([True, 0, 0, 0]) is False
 
 
-def test_is_valid_bbox_string_rejected_batch48():
-    assert _is_valid_bbox(["0", "0", "0", "0"]) is False
-
-
 def test_is_valid_bbox_nan_rejected_batch48():
     assert _is_valid_bbox([float("nan"), 0, 0, 0]) is False
 
@@ -306,10 +302,6 @@ def test_is_valid_bbox_valid_float_batch48():
 
 def test_is_valid_bbox_none_arg_batch48():
     assert _is_valid_bbox(None) is False
-
-
-def test_is_valid_bbox_string_arg_batch48():
-    assert _is_valid_bbox("not a list") is False
 
 
 # ---------- _chunk_reference_ratio 边界 ----------
@@ -484,12 +476,6 @@ def test_heading_boundary_ratio_partial_batch48():
 
 
 # ---------- _silent_drop_count 边界 ----------
-
-def test_silent_drop_count_empty_expectations_batch48():
-    out = _silent_drop_count({}, {})
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations"
-
 
 def test_silent_drop_count_no_element_count_by_type_batch48():
     out = _silent_drop_count({}, {"other_key": 1})
@@ -667,16 +653,6 @@ def test_source_contains_pathlib_import_batch48():
 def test_source_contains_typing_any_import_batch48():
     src = inspect.getsource(metrics_mod)
     assert "from typing import Any" in src
-
-
-def test_source_contains_text_types_constant_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "_TEXT_TYPES" in src
-
-
-def test_source_contains_pdf_bbox_required_types_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "_PDF_BBOX_REQUIRED_TYPES" in src
 
 
 def test_source_contains_not_evaluated_constant_batch48():

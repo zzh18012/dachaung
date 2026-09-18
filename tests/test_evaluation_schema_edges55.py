@@ -200,12 +200,6 @@ def test_validate_error_each_item_has_schema_path_batch35():
         assert "schema_path" in err
 
 
-def test_validate_error_message_contains_schema_name_batch35():
-    with pytest.raises(EvalSchemaError) as exc_info:
-        validate({}, "manifest.schema.json")
-    assert "manifest.schema.json" in str(exc_info.value)
-
-
 def test_validate_error_message_contains_count_batch35():
     with pytest.raises(EvalSchemaError) as exc_info:
         validate({}, "manifest.schema.json")
@@ -440,11 +434,6 @@ def test_module_source_contains_class_definition_batch35():
     assert "class EvalSchemaError" in src
 
 
-def test_module_source_contains_errors_doc_batch35():
-    src = inspect.getsource(smod)
-    assert "errors 给程序看" in src
-
-
 def test_module_source_contains_schema_path_function_batch35():
     src = inspect.getsource(smod)
     assert "def _schema_path(" in src
@@ -463,11 +452,6 @@ def test_module_source_contains_validate_function_batch35():
 def test_module_source_contains_validate_file_function_batch35():
     src = inspect.getsource(smod)
     assert "def validate_file(" in src
-
-
-def test_module_source_contains_json_load_call_batch35():
-    src = inspect.getsource(smod)
-    assert "json.load(f)" in src
 
 
 def test_module_source_contains_sort_errors_keyword_batch35():

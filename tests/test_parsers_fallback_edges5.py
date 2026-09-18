@@ -756,12 +756,6 @@ def test_fallback_parser_init_with_path(tmp_path: Path):
     assert p._image_output_dir == tmp_path
 
 
-def test_fallback_parser_init_str_converted_to_path(tmp_path: Path):
-    p = FallbackParser(image_output_dir=str(tmp_path))
-    assert isinstance(p._image_output_dir, Path)
-    assert p._image_output_dir == tmp_path
-
-
 def test_fallback_parser_init_empty_string_treated_as_none():
     p = FallbackParser(image_output_dir="")
     assert p._image_output_dir is None
@@ -829,14 +823,6 @@ def test_fallback_parser_parse_directory_raises_file_not_found(tmp_path: Path):
 # =========================================================================
 # _render_pdf_image_region 兼容包装
 # =========================================================================
-
-
-def test_render_pdf_image_region_callable():
-    assert callable(_render_pdf_image_region)
-
-
-def test_render_pdf_image_region_verbose_callable():
-    assert callable(_render_pdf_image_region_verbose)
 
 
 def test_render_pdf_image_region_signature_five_params():

@@ -275,19 +275,6 @@ def test_validate_file_invalid_json_raises_jsonerror(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_str_path(tmp_path):
-    p = tmp_path / "ok.json"
-    p.write_text(
-        json.dumps({
-            "manifest_version": "1.0",
-            "devset_status": "incomplete",
-            "documents": [],
-        }),
-        encoding="utf-8",
-    )
-    assert validate_file(str(p), "manifest.schema.json") is None
-
-
 def test_validate_file_path_object(tmp_path):
     p = tmp_path / "ok.json"
     p.write_text(
@@ -337,24 +324,6 @@ def test_schemas_dir_resolved():
 
 
 # ---------- 4 schemas cross-validation 深度 ----------
-
-
-def test_manifest_schema_complete_status():
-    inst = {
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [],
-    }
-    assert validate(inst, "manifest.schema.json") is None
-
-
-def test_manifest_schema_incomplete_status():
-    inst = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }
-    assert validate(inst, "manifest.schema.json") is None
 
 
 def test_manifest_schema_with_complete_document():
@@ -426,12 +395,6 @@ def test_cross_validate_manifest_against_annotation():
         validate(inst, "annotation.schema.json")
 
 
-def test_cross_validate_annotation_against_manifest():
-    inst = {"annotation_version": "1.0", "doc_id": "x"}
-    with pytest.raises(EvalSchemaError):
-        validate(inst, "manifest.schema.json")
-
-
 # ---------- module source forbidden tokens ----------
 
 
@@ -481,19 +444,9 @@ def test_module_source_has_docstring():
     assert "Schema" in src
 
 
-def test_module_source_has_class_eval_schema_error():
-    src = inspect.getsource(m)
-    assert "class EvalSchemaError(Exception):" in src
-
-
 def test_module_source_has_init_with_errors_default_none():
     src = inspect.getsource(m)
     assert "errors: list[dict[str, Any]] | None = None" in src
-
-
-def test_module_source_has_self_errors_or_empty():
-    src = inspect.getsource(m)
-    assert "self.errors = errors or []" in src
 
 
 def test_module_source_has_schemas_dir_with_resolve():
@@ -511,11 +464,6 @@ def test_module_source_has_load_schema_with_open():
     assert '_schema_path(name).open("r", encoding="utf-8")' in src
 
 
-def test_module_source_has_validate_with_draft202012():
-    src = inspect.getsource(m)
-    assert "Draft202012Validator(schema)" in src
-
-
 def test_module_source_has_sorted_iter_errors():
     src = inspect.getsource(m)
     assert "sorted(validator.iter_errors(instance)" in src
@@ -526,21 +474,11 @@ def test_module_source_has_lambda_for_sort_key():
     assert "key=lambda e: list(e.absolute_path)" in src
 
 
-def test_module_source_has_flat_list_dict():
-    src = inspect.getsource(m)
-    assert "flat: list[dict[str, Any]] = []" in src
-
-
 def test_module_source_has_flat_append_with_3_keys():
     src = inspect.getsource(m)
     assert '"path": list(err.absolute_path)' in src
     assert '"message": err.message' in src
     assert '"schema_path": list(err.absolute_schema_path)' in src
-
-
-def test_module_source_has_head_errors_zero():
-    src = inspect.getsource(m)
-    assert "head = errors[0]" in src
 
 
 def test_module_source_has_raise_eval_schema_error_with_fstring():
@@ -712,17 +650,6 @@ def test_e2e_4_schemas_all_draft202012_compatible():
     ):
         s = load_schema(name)
         Draft202012Validator.check_schema(s)
-
-
-def test_e2e_validate_does_not_modify_input_dict():
-    inst = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    }
-    inst_copy = json.loads(json.dumps(inst))
-    validate(inst, "manifest.schema.json")
-    assert inst == inst_copy
 
 
 def test_e2e_validate_file_does_not_modify_input_file(tmp_path):

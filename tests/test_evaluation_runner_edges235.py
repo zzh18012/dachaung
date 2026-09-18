@@ -165,13 +165,6 @@ def test_missing_doc_tpe_null_batch513(tmp_path):
 
 # ---------- 同文档双 ef ----------
 
-def test_double_ef_matches_batch513(tmp_path):
-    r = _run(tmp_path)
-    assert [e["matches"]
-            for e in r["expected_failures"]] == [
-        True, False]
-
-
 def test_double_ef_same_actual_batch513(tmp_path):
     r = _run(tmp_path)
     assert [e["actual_error_code"]

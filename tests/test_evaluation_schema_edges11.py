@@ -75,12 +75,6 @@ def test_eval_schema_error_init_errors_kind_positional_or_keyword():
     assert sig.parameters["errors"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_eval_schema_error_init_no_var_kwargs():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_eval_schema_error_no_args_creates_empty_errors_list():
     e = EvalSchemaError("msg")
     assert e.errors == []
@@ -144,18 +138,6 @@ def test_eval_schema_error_attribute_errors_after_init():
 
 def test_eval_schema_error_module_identity():
     assert EvalSchemaError.__module__ == "evaluation.schema"
-
-
-def test_eval_schema_error_qualname():
-    assert EvalSchemaError.__qualname__ == "EvalSchemaError"
-
-
-def test_eval_schema_error_mro_contains_exception():
-    assert Exception in EvalSchemaError.__mro__
-
-
-def test_eval_schema_error_mro_contains_baseexception():
-    assert BaseException in EvalSchemaError.__mro__
 
 
 def test_eval_schema_error_has_errors_attribute():
@@ -259,10 +241,6 @@ def test_schema_path_module_identity():
     assert _schema_path.__module__ == "evaluation.schema"
 
 
-def test_schema_path_qualname():
-    assert _schema_path.__qualname__ == "_schema_path"
-
-
 # =========================================================================
 # load_schema 详细
 # =========================================================================
@@ -330,10 +308,6 @@ def test_load_schema_no_var_kwargs():
 
 def test_load_schema_module_identity():
     assert load_schema.__module__ == "evaluation.schema"
-
-
-def test_load_schema_qualname():
-    assert load_schema.__qualname__ == "load_schema"
 
 
 # =========================================================================
@@ -458,10 +432,6 @@ def test_validate_module_identity():
     assert validate.__module__ == "evaluation.schema"
 
 
-def test_validate_qualname():
-    assert validate.__qualname__ == "validate"
-
-
 # =========================================================================
 # validate_file 详细
 # =========================================================================
@@ -553,10 +523,6 @@ def test_validate_file_module_identity():
     assert validate_file.__module__ == "evaluation.schema"
 
 
-def test_validate_file_qualname():
-    assert validate_file.__qualname__ == "validate_file"
-
-
 # =========================================================================
 # SCHEMAS_DIR 详细
 # =========================================================================
@@ -633,20 +599,6 @@ def test_module_namespace_has_js_validation_error():
     assert m.JSValidationError is JSValidationError
 
 
-def test_module_namespace_has_schemas_dir():
-    import evaluation.schema as m
-
-    assert hasattr(m, "SCHEMAS_DIR")
-    assert m.SCHEMAS_DIR is SCHEMAS_DIR
-
-
-def test_module_namespace_has_eval_schema_error():
-    import evaluation.schema as m
-
-    assert hasattr(m, "EvalSchemaError")
-    assert m.EvalSchemaError is EvalSchemaError
-
-
 def test_module_namespace_has_load_schema():
     import evaluation.schema as m
 
@@ -671,35 +623,10 @@ def test_module_namespace_has_schema_path():
     assert hasattr(m, "_schema_path")
 
 
-def test_module_all_is_not_tuple():
-    import evaluation.schema as m
-
-    assert not isinstance(m.__all__, tuple)
-
-
-def test_module_all_exact():
-    import evaluation.schema as m
-
-    assert m.__all__ == [
-        "SCHEMAS_DIR",
-        "EvalSchemaError",
-        "load_schema",
-        "validate",
-        "validate_file",
-    ]
-
-
 def test_module_all_has_5_entries():
     import evaluation.schema as m
 
     assert len(m.__all__) == 5
-
-
-def test_module_all_does_not_contain_schema_path():
-    """__all__ 不含 _schema_path（私有）。"""
-    import evaluation.schema as m
-
-    assert "_schema_path" not in m.__all__
 
 
 def test_module_all_does_not_contain_json_path_any():
@@ -722,45 +649,6 @@ def test_module_all_does_not_contain_draft_validator():
 # =========================================================================
 # 模块源码 token 验证（补强 edges10）
 # =========================================================================
-
-
-def test_module_source_contains_from_future_annotations():
-    import evaluation.schema as m
-
-    assert "from __future__ import annotations" in inspect.getsource(m)
-
-
-def test_module_source_contains_import_json():
-    import evaluation.schema as m
-
-    assert "import json" in inspect.getsource(m)
-
-
-def test_module_source_contains_from_pathlib():
-    import evaluation.schema as m
-
-    assert "from pathlib import Path" in inspect.getsource(m)
-
-
-def test_module_source_contains_from_typing_import_any():
-    import evaluation.schema as m
-
-    assert "from typing import Any" in inspect.getsource(m)
-
-
-def test_module_source_contains_jsonschema_draft_import():
-    import evaluation.schema as m
-
-    assert "from jsonschema import Draft202012Validator" in inspect.getsource(m)
-
-
-def test_module_source_contains_js_validation_error_import():
-    import evaluation.schema as m
-
-    assert (
-        "from jsonschema.exceptions import ValidationError as JSValidationError"
-        in inspect.getsource(m)
-    )
 
 
 def test_module_source_contains_schemas_dir_definition():
@@ -813,12 +701,6 @@ def test_module_source_contains_head_error_usage():
     import evaluation.schema as m
 
     assert "head = errors[0]" in inspect.getsource(m)
-
-
-def test_module_source_does_not_contain_print():
-    import evaluation.schema as m
-
-    assert "print(" not in inspect.getsource(m)
 
 
 def test_module_source_does_not_contain_logging():

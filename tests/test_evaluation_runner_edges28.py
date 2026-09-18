@@ -222,11 +222,6 @@ def test_process_one_source_has_try_except_oserror_for_unlink():
     assert "unlink" in src
 
 
-def test_process_one_source_has_unknown_code_for_none_document():
-    src = inspect.getsource(_process_one)
-    assert '"unknown"' in src
-
-
 def test_process_one_source_has_return_none_image_dir_when_doc_none():
     src = inspect.getsource(_process_one)
     # 当 document is None 时不计算 image_dir
@@ -254,11 +249,6 @@ def test_run_evaluation_source_has_parser_version_capture_logic():
 def test_run_evaluation_source_has_image_dir_is_dir_check():
     src = inspect.getsource(run_evaluation)
     assert "image_dir.is_dir()" in src
-
-
-def test_run_evaluation_source_has_image_base_dir_param_to_compute():
-    src = inspect.getsource(run_evaluation)
-    assert "image_base_dir=" in src
 
 
 # ---------- public_per_doc 字段过滤 ----------
@@ -312,11 +302,6 @@ def test_expected_failures_empty_when_no_expected_failures(tmp_path):
     out = tmp_path / "out.json"
     report = run_evaluation(mf, out)
     assert report["expected_failures"] == []
-
-
-def test_run_evaluation_source_has_expected_failure_loop():
-    src = inspect.getsource(run_evaluation)
-    assert "for ef in manifest.expected_failures" in src
 
 
 def test_run_evaluation_source_has_actual_code_capture():

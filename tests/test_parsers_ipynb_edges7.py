@@ -151,11 +151,6 @@ def test_cell_source_to_text_list_returns_str():
 # =========================================================================
 
 
-def test_extract_kernel_language_kernelspec_language():
-    metadata = {"kernelspec": {"language": "python", "name": "python3"}}
-    assert _extract_kernel_language(metadata) == "python"
-
-
 def test_extract_kernel_language_empty_metadata():
     assert _extract_kernel_language({}) == ""
 
@@ -202,11 +197,6 @@ def test_ipynb_parser_parse_no_defaults():
     sig = inspect.signature(IpynbParser.parse)
     for name in ("path", "source_hash"):
         assert sig.parameters[name].default is inspect.Parameter.empty
-
-
-def test_ipynb_parser_parse_return_annotation_document():
-    sig = inspect.signature(IpynbParser.parse)
-    assert "Document" in str(sig.return_annotation)
 
 
 # =========================================================================
@@ -803,11 +793,6 @@ def test_parse_complex_notebook(tmp_path: Path):
 # =========================================================================
 
 
-def test_module_all_exact():
-    import app.parsers.ipynb_parser as mod
-    assert mod.__all__ == ["IpynbParser"]
-
-
 def test_module_imports_models():
     import app.parsers.ipynb_parser as mod
     src = inspect.getsource(mod)
@@ -824,11 +809,6 @@ def test_module_imports_markdown_parser():
     import app.parsers.ipynb_parser as mod
     src = inspect.getsource(mod)
     assert "from app.parsers.markdown_parser" in src
-
-
-def test_module_docstring_mentions_nbformat():
-    import app.parsers.ipynb_parser as mod
-    assert "nbformat" in mod.__doc__.lower()
 
 
 def test_module_docstring_mentions_cell_types():

@@ -265,14 +265,6 @@ def test_two_participating_ratios_batch522(tmp_path):
                          "not_evaluated": 1}
 
 
-def test_h1_hbc_no_heading_batch522(tmp_path):
-    r = _run(tmp_path)
-    assert r["per_doc"][1]["metrics"][
-        "heading_boundary_compliance"] == {
-        "value": None,
-        "reason": "no_heading_elements"}
-
-
 def test_d1_plvr_not_pdf_batch522(tmp_path):
     r = _run(tmp_path)
     assert r["per_doc"][2]["metrics"][

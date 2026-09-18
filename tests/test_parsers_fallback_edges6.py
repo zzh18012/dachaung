@@ -318,18 +318,8 @@ def test_classify_short_line_with_chinese_period():
     assert etype == "paragraph"
 
 
-def test_classify_short_line_with_question_mark():
-    etype, _ = _classify_pdf_paragraph("Why?")
-    assert etype == "paragraph"
-
-
 def test_classify_short_line_with_exclamation():
     etype, _ = _classify_pdf_paragraph("Wow!")
-    assert etype == "paragraph"
-
-
-def test_classify_short_line_with_chinese_question():
-    etype, _ = _classify_pdf_paragraph("为什么？")
     assert etype == "paragraph"
 
 
@@ -361,13 +351,6 @@ def test_classify_heading_max_80_chars():
     text = "a" * 80
     etype, _ = _classify_pdf_paragraph(text)
     assert etype == "heading"
-
-
-def test_classify_paragraph_81_chars():
-    """len == 81 → paragraph。"""
-    text = "a" * 81
-    etype, _ = _classify_pdf_paragraph(text)
-    assert etype == "paragraph"
 
 
 def test_classify_caption_priority_over_heading():
@@ -545,11 +528,6 @@ def test_fallback_parser_init_image_output_dir_str(tmp_path: Path):
     assert isinstance(p._image_output_dir, Path)
 
 
-def test_fallback_parser_init_image_output_dir_none():
-    p = FallbackParser(image_output_dir=None)
-    assert p._image_output_dir is None
-
-
 def test_fallback_parser_init_signature():
     sig = inspect.signature(FallbackParser.__init__)
     assert set(sig.parameters) == {"self", "image_output_dir"}
@@ -558,10 +536,6 @@ def test_fallback_parser_init_signature():
 def test_fallback_parser_init_default_none():
     sig = inspect.signature(FallbackParser.__init__)
     assert sig.parameters["image_output_dir"].default is None
-
-
-def test_fallback_parser_parse_method_exists():
-    assert callable(FallbackParser.parse)
 
 
 def test_fallback_parser_parse_signature():

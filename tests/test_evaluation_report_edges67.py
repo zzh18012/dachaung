@@ -145,15 +145,6 @@ def test_dependency_versions_pdfplumber_installed_batch52():
     assert v["pdfplumber"] is not None
 
 
-def test_dependency_versions_python_docx_installed_batch52():
-    v = get_dependency_versions()
-    assert v["python-docx"] is not None
-
-
-def test_dependency_versions_returns_dict_batch52():
-    assert isinstance(get_dependency_versions(), dict)
-
-
 # ---------- build_provenance 更深 ----------
 
 def test_build_provenance_max_chars_int_batch52():
@@ -247,11 +238,6 @@ def test_aggregate_counts_all_none_batch52():
     s = aggregate_summary(results)
     assert s["counts"]["element_count_total"]["sum"] is None
     assert s["counts"]["element_count_total"]["participating_docs"] == 0
-
-
-def test_aggregate_counts_empty_results_batch52():
-    s = aggregate_summary([])
-    assert s["counts"]["element_count_total"] == {"sum": None, "participating_docs": 0}
 
 
 def test_aggregate_counts_missing_metric_batch52():
@@ -609,45 +595,9 @@ def test_ast_git_provenance_2_subprocess_runs_batch52():
     assert len(runs) == 2
 
 
-def test_ast_build_provenance_returns_dict_9_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "build_provenance")
-    returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
-    assert len(returns) == 1
-    assert isinstance(returns[0].value, ast.Dict)
-    assert len(returns[0].value.keys) == 9
-
-
-def test_ast_aggregate_summary_3_explicit_for_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "aggregate_summary")
-    fors = [n for n in func.body if isinstance(n, ast.For)]
-    assert len(fors) == 3  # counts + success + ratio
-
-
-def test_ast_aggregate_summary_4_summary_keys_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "aggregate_summary")
-    src = ast.unparse(func)
-    assert "summary['counts']" in src or 'summary["counts"]' in src
-    assert "summary['success_rates']" in src or 'summary["success_rates"]' in src
-    assert "summary['ratio_macro_averages']" in src or 'summary["ratio_macro_averages"]' in src
-    assert "summary['silent_drop_total']" in src or 'summary["silent_drop_total"]' in src
-
-
 def test_ast_no_class_def_batch52():
     tree = ast.parse(inspect.getsource(report_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_no_while_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assert not any(isinstance(n, ast.While) for n in ast.walk(tree))
-
-
-def test_ast_no_global_nonlocal_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assert not any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(tree))
 
 
 def test_ast_no_raise_batch52():

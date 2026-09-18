@@ -47,27 +47,12 @@ def test_load_annotation_directory_returns_none(tmp_path: Path):
     assert _load_annotation(sub) is None
 
 
-def test_load_annotation_invalid_json_returns_none(tmp_path: Path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not valid", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_returns_dict_when_valid(tmp_path: Path):
     p = tmp_path / "a.json"
     p.write_text('{"k": "v"}', encoding="utf-8")
     result = _load_annotation(p)
     assert isinstance(result, dict)
     assert result == {"k": "v"}
-
-
-def test_load_annotation_returns_new_dict_each_call(tmp_path: Path):
-    p = tmp_path / "a.json"
-    p.write_text('{"k": "v"}', encoding="utf-8")
-    a = _load_annotation(p)
-    b = _load_annotation(p)
-    assert a is not b
-    assert a == b
 
 
 def test_load_annotation_idempotent(tmp_path: Path):
@@ -471,44 +456,9 @@ def test_run_evaluation_return_annotation_dict():
 # =========================================================================
 
 
-def test_module_all_exact():
-    import evaluation.runner as mod
-    assert mod.__all__ == ["run_evaluation"]
-
-
 def test_module_all_no_duplicates():
     import evaluation.runner as mod
     assert len(mod.__all__) == len(set(mod.__all__))
-
-
-def test_module_uses_future_annotations():
-    import evaluation.runner as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_json():
-    import evaluation.runner as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_time():
-    import evaluation.runner as mod
-    src = inspect.getsource(mod)
-    assert "import time" in src
-
-
-def test_module_imports_path():
-    import evaluation.runner as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import evaluation.runner as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
 
 
 def test_module_imports_pipeline():
@@ -548,11 +498,6 @@ def test_module_imports_report_builders():
     assert "aggregate_summary" in src
     assert "build_devset_section" in src
     assert "build_provenance" in src
-
-
-def test_module_docstring_present():
-    import evaluation.runner as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_constraints():

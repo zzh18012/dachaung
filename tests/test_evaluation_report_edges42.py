@@ -392,18 +392,6 @@ def test_build_devset_section_status_complete_batch26():
     assert out["status"] == "complete"
 
 
-def test_build_devset_section_status_incomplete_batch26():
-    m = _make_manifest(devset_status="incomplete")
-    out = build_devset_section(m)
-    assert out["status"] == "incomplete"
-
-
-def test_build_devset_section_empty_categories_batch26():
-    m = _make_manifest(categories_covered=[])
-    out = build_devset_section(m)
-    assert out["categories_covered"] == []
-
-
 def test_build_devset_section_propagates_all_attrs_batch26():
     m = _make_manifest(
         devset_status="incomplete",
@@ -633,12 +621,6 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_uses_from_datetime_import_batch26():
-    """report.py 允许 from datetime import datetime（用于时间戳）。"""
-    source = inspect.getsource(rmod)
-    assert "from datetime import datetime" in source
-
-
 def test_module_source_no_class_keyword_batch26():
     import ast as _ast
     tree = _ast.parse(inspect.getsource(rmod))
@@ -798,11 +780,6 @@ def test_module_source_contains_silent_drop_total_batch26():
     assert "silent_drop_total" in source
 
 
-def test_module_source_contains_not_evaluated_batch26():
-    source = inspect.getsource(rmod)
-    assert "not_evaluated" in source
-
-
 # ---------- signatures 第三十八批 ----------
 
 
@@ -898,10 +875,6 @@ def test_module_no_classes_batch26():
 def test_module_docstring_present_batch26():
     assert rmod.__doc__ is not None
     assert len(rmod.__doc__.strip()) > 0
-
-
-def test_module_docstring_mentions_aggregate_batch26():
-    assert "aggregate" in rmod.__doc__.lower() or "聚合" in rmod.__doc__
 
 
 def test_module_docstring_mentions_no_mix_batch26():
@@ -1035,14 +1008,6 @@ def test_e2e_build_provenance_with_real_subprocess_batch26(tmp_path):
     # （实现：dirty=bool(r2.returncode==0 and stdout.strip())，r2 失败 → False）
     assert out["git_commit"] is None
     assert out["git_dirty"] is False
-
-
-def test_e2e_aggregate_summary_does_not_mutate_input_batch26():
-    per_doc = [{"metrics": {"element_count_total": {"value": 5}}}]
-    import copy
-    snapshot = copy.deepcopy(per_doc)
-    aggregate_summary(per_doc)
-    assert per_doc == snapshot
 
 
 def test_e2e_build_provenance_run_timestamp_changes_batch26(tmp_path):

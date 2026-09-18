@@ -66,11 +66,6 @@ def test_null_empty_string_reason():
     assert m["value"] is None
 
 
-def test_null_unicode_reason():
-    m = _null("原因")
-    assert m["reason"] == "原因"
-
-
 def test_ratio_zero_returns_float_zero():
     m = _ratio(0.0)
     assert m["value"] == 0.0
@@ -80,11 +75,6 @@ def test_ratio_zero_returns_float_zero():
 def test_ratio_one_returns_float_one():
     m = _ratio(1.0)
     assert m["value"] == 1.0
-    assert isinstance(m["value"], float)
-
-
-def test_ratio_int_input_coerced_to_float():
-    m = _ratio(0)
     assert isinstance(m["value"], float)
 
 
@@ -188,10 +178,6 @@ def test_is_valid_bbox_four_ints():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
 
 
-def test_is_valid_bbox_four_floats():
-    assert _is_valid_bbox([0.0, 0.5, 100.5, 200.0]) is True
-
-
 def test_is_valid_bbox_negative_numbers():
     """负值也算合法（caller 决定语义）。"""
     assert _is_valid_bbox([-1, -1, 0, 0]) is True
@@ -231,16 +217,8 @@ def test_is_valid_bbox_all_bools():
     assert _is_valid_bbox([True, False, True, False]) is False
 
 
-def test_is_valid_bbox_neg_inf_rejected():
-    assert _is_valid_bbox([float("-inf"), 0, 100, 100]) is False
-
-
 def test_is_valid_bbox_none_rejected():
     assert _is_valid_bbox(None) is False
-
-
-def test_is_valid_bbox_none_element():
-    assert _is_valid_bbox([None, 0, 100, 100]) is False
 
 
 # =========================================================================
@@ -727,13 +705,6 @@ def test_image_resource_ratio_image_base_dir_with_two_candidates_second_ok(
 # =========================================================================
 # _chunk_reference_ratio 深度
 # =========================================================================
-
-
-def test_chunk_reference_ratio_empty_chunks_returns_null():
-    elements = [{"element_id": "e1"}]
-    result = _chunk_reference_ratio(elements, [])
-    assert result["value"] is None
-    assert result["reason"] == "no_chunks"
 
 
 def test_chunk_reference_ratio_chunk_with_no_source_ids_skipped():
@@ -1535,11 +1506,6 @@ def test_compute_automatic_metrics_text_preservation_full_pipeline():
 # =========================================================================
 
 
-def test_text_types_tuple_contains_expected():
-    expected = {"heading", "paragraph", "list_item", "table", "caption", "header", "footer"}
-    assert set(_TEXT_TYPES) == expected
-
-
 def test_text_types_does_not_include_image():
     assert "image" not in _TEXT_TYPES
 
@@ -1702,17 +1668,6 @@ def test_chunk_reference_ratio_idempotent():
     a = _chunk_reference_ratio(elements, chunks)
     b = _chunk_reference_ratio(elements, chunks)
     assert a == b
-
-
-def test_compute_automatic_metrics_does_not_mutate_input():
-    doc = {
-        "elements": [{"element_id": "e1", "type": "paragraph", "content": "abc"}],
-        "chunks": [{"text": "abc", "source_element_ids": ["e1"]}],
-    }
-    import copy
-    before = copy.deepcopy(doc)
-    compute_automatic_metrics(doc, None, "pdf", None)
-    assert doc == before
 
 
 def test_image_resource_ratio_does_not_mutate_input(tmp_path: Path):

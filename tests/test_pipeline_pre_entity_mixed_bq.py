@@ -19,19 +19,6 @@ from pathlib import Path
 from app.pipeline import process_single
 
 
-def test_pre_entity_decoded(tmp_path):
-    p = tmp_path / "d.html"
-    p.write_text("<pre>a &amp; b</pre>",
-                 encoding="utf-8")
-    doc, errors = process_single(
-        p, write_json=False, parser_name="html")
-    assert errors == []
-    assert [(e.type, e.content, e.metadata)
-            for e in doc.elements] == [
-        ("paragraph", "a & b",
-         {"kind": "preformatted"})]
-
-
 def test_mixed_level_bq_separate(tmp_path):
     p = tmp_path / "d.md"
     p.write_text("> a\n\n>> b\n", encoding="utf-8")
