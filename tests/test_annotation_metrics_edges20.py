@@ -534,13 +534,6 @@ def test_figure_caption_prf_source_contains_reason_assignment():
     assert "reason = PARSER_DOES_NOT_EMIT_RELATIONS" in src
 
 
-def test_figure_caption_prf_source_contains_three_null_calls():
-    src = inspect.getsource(figure_caption_prf)
-    assert '"figure_caption_precision": _null(reason)' in src
-    assert '"figure_caption_recall": _null(reason)' in src
-    assert '"figure_caption_f1": _null(reason)' in src
-
-
 def test_figure_caption_prf_source_does_not_contain_algorithm_tokens():
     """figure_caption_prf 是纯固定输出，不含算法 token。"""
     src = inspect.getsource(figure_caption_prf)

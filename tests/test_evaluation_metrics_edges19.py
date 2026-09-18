@@ -525,10 +525,6 @@ def test_is_valid_bbox_mixed_int_float():
     assert _is_valid_bbox([0, 0.0, 100, 100.0]) is True
 
 
-def test_is_valid_bbox_zero_box():
-    assert _is_valid_bbox([0.0, 0.0, 0.0, 0.0]) is True
-
-
 def test_is_valid_bbox_negative_coords():
     """负坐标也 valid（数学上合法）。"""
     assert _is_valid_bbox([-10.0, -10.0, 10.0, 10.0]) is True

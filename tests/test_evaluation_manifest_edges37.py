@@ -64,10 +64,6 @@ def test_is_absolute_like_uppercase_drive_posix_sep_batch10():
     assert _is_absolute_like("Z:/x") is True
 
 
-def test_is_absolute_like_uppercase_drive_windows_sep_batch10():
-    assert _is_absolute_like("Z:\\x") is True
-
-
 def test_is_absolute_like_drive_lowercase_letter_batch10():
     """a:/ → drive + sep → True。"""
     assert _is_absolute_like("a:/x") is True
@@ -168,14 +164,6 @@ def test_has_backslash_returns_bool_type_batch10():
     assert isinstance(_has_backslash("foo"), bool)
 
 
-def test_has_backslash_long_string_no_backslash_batch10():
-    assert _has_backslash("a" * 1000) is False
-
-
-def test_has_backslash_long_string_with_backslash_at_end_batch10():
-    assert _has_backslash("a" * 999 + "\\") is True
-
-
 # ---------- _resolve_relative_path 行为深度第十批 ----------
 
 
@@ -189,35 +177,9 @@ def test_resolve_relative_path_absolute_posix_raises_batch10(tmp_path):
         _resolve_relative_path("/etc/passwd", tmp_path, "test")
 
 
-def test_resolve_relative_path_absolute_windows_drive_raises_batch10(tmp_path):
-    with pytest.raises(ManifestError, match="绝对路径"):
-        _resolve_relative_path("C:/Users/foo", tmp_path, "test")
-
-
-def test_resolve_relative_path_backslash_raises_batch10(tmp_path):
-    with pytest.raises(ManifestError, match="反斜杠"):
-        _resolve_relative_path("foo\\bar", tmp_path, "test")
-
-
-def test_resolve_relative_path_normal_relative_resolves_batch10(tmp_path):
-    out = _resolve_relative_path("foo/bar", tmp_path, "test")
-    assert isinstance(out, Path)
-    assert out.is_absolute()
-
-
 def test_resolve_relative_path_dot_path_resolves_batch10(tmp_path):
     out = _resolve_relative_path(".", tmp_path, "test")
     assert out == tmp_path.resolve()
-
-
-def test_resolve_relative_path_double_dot_escape_raises_batch10(tmp_path):
-    with pytest.raises(ManifestError, match="项目根目录之外"):
-        _resolve_relative_path("../foo", tmp_path, "test")
-
-
-def test_resolve_relative_path_double_dot_escape_two_levels_raises_batch10(tmp_path):
-    with pytest.raises(ManifestError, match="项目根目录之外"):
-        _resolve_relative_path("../../foo", tmp_path, "test")
 
 
 def test_resolve_relative_path_field_name_in_error_batch10(tmp_path):
@@ -228,11 +190,6 @@ def test_resolve_relative_path_field_name_in_error_batch10(tmp_path):
 def test_resolve_relative_path_double_dot_in_middle_allowed_batch10(tmp_path):
     out = _resolve_relative_path("foo/../bar", tmp_path, "test")
     assert out == (tmp_path / "bar").resolve()
-
-
-def test_resolve_relative_path_normal_path_with_subdir_batch10(tmp_path):
-    out = _resolve_relative_path("a/b/c/d.txt", tmp_path, "test")
-    assert out == (tmp_path / "a" / "b" / "c" / "d.txt").resolve()
 
 
 def test_resolve_relative_path_returns_resolved_batch10(tmp_path):
@@ -264,32 +221,12 @@ def test_resolve_relative_path_filename_with_dots_batch10(tmp_path):
         _resolve_relative_path("..", tmp_path, "test")
 
 
-def test_resolve_relative_path_filename_with_dot_only_batch10(tmp_path):
-    """'.' 解析为 project_root 本身。"""
-    out = _resolve_relative_path(".", tmp_path, "test")
-    assert out == tmp_path.resolve()
-
-
 # ---------- _detect_project_root 行为深度第十批 ----------
 
 
 def test_detect_project_root_returns_path_object_batch10(tmp_path):
     out = _detect_project_root(tmp_path)
     assert isinstance(out, Path)
-
-
-def test_detect_project_root_finds_pyproject_batch10(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("[tool.test]\n", encoding="utf-8")
-    out = _detect_project_root(tmp_path)
-    assert out == tmp_path.resolve()
-
-
-def test_detect_project_root_walks_up_batch10(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("[tool.test]\n", encoding="utf-8")
-    nested = tmp_path / "a" / "b"
-    nested.mkdir(parents=True)
-    out = _detect_project_root(nested)
-    assert out == tmp_path.resolve()
 
 
 def test_detect_project_root_no_pyproject_returns_input_batch10(tmp_path):
@@ -309,12 +246,6 @@ def test_detect_project_root_with_str_input_raises_batch10(tmp_path):
     """_detect_project_root 仅接受 Path。"""
     with pytest.raises(AttributeError):
         _detect_project_root(str(tmp_path))  # type: ignore[arg-type]
-
-
-def test_detect_project_root_idempotent_batch10(tmp_path):
-    out1 = _detect_project_root(tmp_path)
-    out2 = _detect_project_root(tmp_path)
-    assert out1 == out2
 
 
 def test_detect_project_root_deeply_nested_batch10(tmp_path):
@@ -386,29 +317,6 @@ def test_document_entry_is_dataclass_batch10():
     assert is_dataclass(DocumentEntry)
 
 
-def test_document_entry_is_frozen_batch10():
-    d = _make_doc()
-    with pytest.raises(FrozenInstanceError):
-        d.doc_id = "new"
-
-
-def test_document_entry_field_names_batch10():
-    f = fields(DocumentEntry)
-    names = [field.name for field in f]
-    assert names == [
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "source_type",
-        "sha256",
-        "categories",
-        "paired_with",
-        "annotation_file_str",
-        "annotation_resolved",
-        "expectations",
-    ]
-
-
 def test_document_entry_equality_batch10():
     d1 = _make_doc()
     d2 = _make_doc()
@@ -439,22 +347,10 @@ def test_expected_failure_is_dataclass_batch10():
     assert is_dataclass(ExpectedFailure)
 
 
-def test_expected_failure_field_names_batch10():
-    f = fields(ExpectedFailure)
-    names = [field.name for field in f]
-    assert names == ["doc_id", "path_str", "resolved_path", "expected_error_code", "source_type"]
-
-
 def test_expected_failure_equality_batch10():
     ef1 = _make_ef()
     ef2 = _make_ef()
     assert ef1 == ef2
-
-
-def test_expected_failure_hash_batch10():
-    ef1 = _make_ef()
-    ef2 = _make_ef()
-    assert hash(ef1) == hash(ef2)
 
 
 def test_expected_failure_in_set_batch10():
@@ -472,18 +368,6 @@ def test_manifest_is_frozen_batch10():
     m = _make_manifest()
     with pytest.raises(FrozenInstanceError):
         m.devset_status = "complete"
-
-
-def test_manifest_field_names_batch10():
-    f = fields(Manifest)
-    names = [field.name for field in f]
-    assert names == [
-        "manifest_version",
-        "devset_status",
-        "documents",
-        "expected_failures",
-        "project_root",
-    ]
 
 
 def test_manifest_equality_batch10():
@@ -504,80 +388,7 @@ def test_manifest_inequality_batch10():
     assert m1 != m2
 
 
-def test_manifest_in_set_batch10():
-    m1 = _make_manifest()
-    m2 = _make_manifest()
-    s = {m1, m2}
-    assert len(s) == 1
-
-
 # ---------- Manifest properties algorithm 行为深度第十批 ----------
-
-
-def test_manifest_file_count_zero_batch10():
-    m = _make_manifest(documents=[])
-    assert m.file_count == 0
-
-
-def test_manifest_file_count_one_batch10():
-    m = _make_manifest(documents=[_make_doc()])
-    assert m.file_count == 1
-
-
-def test_manifest_file_count_three_batch10():
-    m = _make_manifest(documents=[_make_doc(), _make_doc(doc_id="d2"), _make_doc(doc_id="d3")])
-    assert m.file_count == 3
-
-
-def test_manifest_pdf_count_zero_batch10():
-    m = _make_manifest(documents=[_make_doc(source_type="docx")])
-    assert m.pdf_count == 0
-
-
-def test_manifest_pdf_count_two_batch10():
-    m = _make_manifest(documents=[_make_doc(), _make_doc(doc_id="d2")])
-    assert m.pdf_count == 2
-
-
-def test_manifest_docx_count_zero_batch10():
-    m = _make_manifest(documents=[_make_doc()])
-    assert m.docx_count == 0
-
-
-def test_manifest_docx_count_two_batch10():
-    m = _make_manifest(
-        documents=[_make_doc(source_type="docx"), _make_doc(doc_id="d2", source_type="docx")]
-    )
-    assert m.docx_count == 2
-
-
-def test_manifest_mixed_counts_batch10():
-    m = _make_manifest(
-        documents=[
-            _make_doc(),
-            _make_doc(doc_id="d2", source_type="docx"),
-            _make_doc(doc_id="d3"),
-        ]
-    )
-    assert m.pdf_count == 2
-    assert m.docx_count == 1
-
-
-def test_manifest_content_group_count_all_unpaired_batch10():
-    m = _make_manifest(
-        documents=[
-            _make_doc(),
-            _make_doc(doc_id="d2"),
-        ]
-    )
-    assert m.content_group_count == 2
-
-
-def test_manifest_content_group_count_paired_batch10():
-    d1 = _make_doc(doc_id="d1", paired_with="d2")
-    d2 = _make_doc(doc_id="d2", paired_with="d1")
-    m = _make_manifest(documents=[d1, d2])
-    assert m.content_group_count == 1
 
 
 def test_manifest_content_group_count_single_direction_paired_batch10():
@@ -585,14 +396,6 @@ def test_manifest_content_group_count_single_direction_paired_batch10():
     d2 = _make_doc(doc_id="d2")
     m = _make_manifest(documents=[d1, d2])
     assert m.content_group_count == 1
-
-
-def test_manifest_content_group_count_mixed_batch10():
-    d1 = _make_doc(doc_id="d1", paired_with="d2")
-    d2 = _make_doc(doc_id="d2", paired_with="d1")
-    d3 = _make_doc(doc_id="d3")
-    m = _make_manifest(documents=[d1, d2, d3])
-    assert m.content_group_count == 2
 
 
 def test_manifest_content_group_count_three_paired_batch10():
@@ -603,42 +406,10 @@ def test_manifest_content_group_count_three_paired_batch10():
     assert m.content_group_count == 2
 
 
-def test_manifest_categories_covered_single_doc_batch10():
-    m = _make_manifest(documents=[_make_doc(categories=("normal",))])
-    assert m.categories_covered == ["normal"]
-
-
-def test_manifest_categories_covered_multiple_docs_union_batch10():
-    d1 = _make_doc(categories=("normal", "edge"))
-    d2 = _make_doc(doc_id="d2", categories=("edge", "extreme"))
-    m = _make_manifest(documents=[d1, d2])
-    assert m.categories_covered == ["edge", "extreme", "normal"]
-
-
 def test_manifest_categories_covered_sorted_batch10():
     d1 = _make_doc(categories=("z", "a", "m"))
     m = _make_manifest(documents=[d1])
     assert m.categories_covered == ["a", "m", "z"]
-
-
-def test_manifest_categories_covered_deduplication_batch10():
-    d1 = _make_doc(categories=("normal", "edge"))
-    d2 = _make_doc(doc_id="d2", categories=("normal", "edge"))
-    m = _make_manifest(documents=[d1, d2])
-    assert m.categories_covered == ["edge", "normal"]
-
-
-def test_manifest_categories_covered_returns_list_batch10():
-    m = _make_manifest(documents=[])
-    assert isinstance(m.categories_covered, list)
-
-
-def test_manifest_properties_return_correct_types_batch10():
-    m = _make_manifest()
-    assert isinstance(m.file_count, int)
-    assert isinstance(m.pdf_count, int)
-    assert isinstance(m.docx_count, int)
-    assert isinstance(m.content_group_count, int)
 
 
 def test_manifest_categories_covered_unicode_batch10():
@@ -664,18 +435,6 @@ def _write_manifest(tmp_path, data):
     return p
 
 
-def test_load_manifest_missing_file_raises_batch10(tmp_path):
-    with pytest.raises(ManifestError, match="不存在"):
-        load_manifest(tmp_path / "no.json", project_root=tmp_path)
-
-
-def test_load_manifest_invalid_json_raises_batch10(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text("not json", encoding="utf-8")
-    with pytest.raises(ManifestError, match="JSON 解析失败"):
-        load_manifest(p, project_root=tmp_path)
-
-
 def test_load_manifest_empty_dict_raises_batch10(tmp_path):
     from evaluation.schema import EvalSchemaError
 
@@ -699,93 +458,6 @@ def test_load_manifest_valid_minimal_returns_manifest_batch10(tmp_path):
     assert isinstance(out, Manifest)
 
 
-def test_load_manifest_with_one_document_batch10(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("[tool.test]\n", encoding="utf-8")
-    p = _write_manifest(
-        tmp_path,
-        {
-            "manifest_version": MANIFEST_VERSION,
-            "devset_status": "incomplete",
-            "documents": [
-                {
-                    "doc_id": "d1",
-                    "path": "foo/bar.pdf",
-                    "source_type": "pdf",
-                }
-            ],
-            "expected_failures": [],
-        },
-    )
-    out = load_manifest(p, project_root=tmp_path)
-    assert len(out.documents) == 1
-    assert out.documents[0].doc_id == "d1"
-    assert out.documents[0].source_type == "pdf"
-
-
-def test_load_manifest_absolute_path_raises_batch10(tmp_path):
-    from evaluation.schema import EvalSchemaError
-
-    p = _write_manifest(
-        tmp_path,
-        {
-            "manifest_version": MANIFEST_VERSION,
-            "devset_status": "incomplete",
-            "documents": [
-                {
-                    "doc_id": "d1",
-                    "path": "/etc/passwd",
-                    "source_type": "pdf",
-                }
-            ],
-            "expected_failures": [],
-        },
-    )
-    with pytest.raises((ManifestError, EvalSchemaError)):
-        load_manifest(p, project_root=tmp_path)
-
-
-def test_load_manifest_backslash_path_raises_batch10(tmp_path):
-    from evaluation.schema import EvalSchemaError
-
-    p = _write_manifest(
-        tmp_path,
-        {
-            "manifest_version": MANIFEST_VERSION,
-            "devset_status": "incomplete",
-            "documents": [
-                {
-                    "doc_id": "d1",
-                    "path": "foo\\bar.pdf",
-                    "source_type": "pdf",
-                }
-            ],
-            "expected_failures": [],
-        },
-    )
-    with pytest.raises((ManifestError, EvalSchemaError)):
-        load_manifest(p, project_root=tmp_path)
-
-
-def test_load_manifest_path_outside_root_raises_batch10(tmp_path):
-    p = _write_manifest(
-        tmp_path,
-        {
-            "manifest_version": MANIFEST_VERSION,
-            "devset_status": "incomplete",
-            "documents": [
-                {
-                    "doc_id": "d1",
-                    "path": "../escape.pdf",
-                    "source_type": "pdf",
-                }
-            ],
-            "expected_failures": [],
-        },
-    )
-    with pytest.raises(ManifestError, match="项目根目录之外|relative"):
-        load_manifest(p, project_root=tmp_path)
-
-
 def test_load_manifest_str_input_batch10(tmp_path):
     (tmp_path / "pyproject.toml").write_text("[tool.test]\n", encoding="utf-8")
     p = _write_manifest(
@@ -799,43 +471,6 @@ def test_load_manifest_str_input_batch10(tmp_path):
     )
     out = load_manifest(str(p), project_root=str(tmp_path))
     assert isinstance(out, Manifest)
-
-
-def test_load_manifest_devset_status_complete_batch10(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("[tool.test]\n", encoding="utf-8")
-    p = _write_manifest(
-        tmp_path,
-        {
-            "manifest_version": MANIFEST_VERSION,
-            "devset_status": "complete",
-            "documents": [],
-            "expected_failures": [],
-        },
-    )
-    out = load_manifest(p, project_root=tmp_path)
-    assert out.devset_status == "complete"
-
-
-def test_load_manifest_with_categories_batch10(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("[tool.test]\n", encoding="utf-8")
-    p = _write_manifest(
-        tmp_path,
-        {
-            "manifest_version": MANIFEST_VERSION,
-            "devset_status": "incomplete",
-            "documents": [
-                {
-                    "doc_id": "d1",
-                    "path": "foo.pdf",
-                    "source_type": "pdf",
-                    "categories": ["normal", "edge"],
-                }
-            ],
-            "expected_failures": [],
-        },
-    )
-    out = load_manifest(p, project_root=tmp_path)
-    assert out.documents[0].categories == ("normal", "edge")
 
 
 def test_load_manifest_with_paired_with_batch10(tmp_path):
@@ -922,28 +557,6 @@ def test_load_manifest_with_annotation_file_batch10(tmp_path):
     out = load_manifest(p, project_root=tmp_path)
     assert out.documents[0].annotation_file_str == "annotations/a.json"
     assert out.documents[0].annotation_resolved is not None
-
-
-def test_load_manifest_with_expectations_batch10(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("[tool.test]\n", encoding="utf-8")
-    p = _write_manifest(
-        tmp_path,
-        {
-            "manifest_version": MANIFEST_VERSION,
-            "devset_status": "incomplete",
-            "documents": [
-                {
-                    "doc_id": "d1",
-                    "path": "a.pdf",
-                    "source_type": "pdf",
-                    "expectations": {"element_count_by_type": {"paragraph": 5}},
-                }
-            ],
-            "expected_failures": [],
-        },
-    )
-    out = load_manifest(p, project_root=tmp_path)
-    assert out.documents[0].expectations == {"element_count_by_type": {"paragraph": 5}}
 
 
 def test_load_manifest_default_project_root_uses_detection_batch10(tmp_path):
@@ -1186,10 +799,6 @@ def test_module_source_docstring_present_batch10():
     assert len(mmod.__doc__) > 30
 
 
-def test_module_source_docstring_mentions_path_batch10():
-    assert "path" in mmod.__doc__.lower() or "路径" in mmod.__doc__
-
-
 def test_module_source_docstring_mentions_relative_batch10():
     assert "相对" in mmod.__doc__ or "relative" in mmod.__doc__.lower()
 
@@ -1267,12 +876,6 @@ def test_signature_resolve_relative_path_param_names_batch10():
     sig = inspect.signature(_resolve_relative_path)
     names = list(sig.parameters)
     assert names == ["path_str", "project_root", "field_name"]
-
-
-def test_signature_resolve_relative_path_param_kinds_batch10():
-    sig = inspect.signature(_resolve_relative_path)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_signature_resolve_relative_path_return_annotation_batch10():

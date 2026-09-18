@@ -332,16 +332,6 @@ def test_manifest_content_group_count_unpaired_batch27():
     assert m.content_group_count == 2
 
 
-def test_manifest_content_group_count_one_pair_batch27():
-    docs = (
-        _make_doc(doc_id="d1", paired_with="d2"),
-        _make_doc(doc_id="d2", paired_with="d1"),
-    )
-    m = _make_manifest(documents=docs)
-    # 一对算 1 组
-    assert m.content_group_count == 1
-
-
 def test_manifest_frozen_batch27():
     m = _make_manifest()
     with pytest.raises(FrozenInstanceError):
@@ -359,11 +349,6 @@ def test_resolve_relative_path_empty_batch27(tmp_path):
 def test_resolve_relative_path_absolute_posix_batch27(tmp_path):
     with pytest.raises(ManifestError):
         _resolve_relative_path("/etc/passwd", tmp_path, "test")
-
-
-def test_resolve_relative_path_absolute_windows_batch27(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("C:\\foo", tmp_path, "test")
 
 
 def test_resolve_relative_path_backslash_batch27(tmp_path):

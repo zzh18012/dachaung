@@ -494,11 +494,6 @@ def test_figure_caption_prf_with_orphan_relations_field():
         assert result[name]["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
 
 
-def test_figure_caption_prf_signature():
-    sig = inspect.signature(figure_caption_prf)
-    assert set(sig.parameters) == {"document", "annotation"}
-
-
 def test_figure_caption_prf_no_defaults():
     sig = inspect.signature(figure_caption_prf)
     for name in sig.parameters:
@@ -518,37 +513,11 @@ def test_parser_does_not_emit_relations_is_str():
     assert isinstance(PARSER_DOES_NOT_EMIT_RELATIONS, str)
 
 
-def test_module_all_exact():
-    import evaluation.annotation_metrics as mod
-    assert mod.__all__ == [
-        "PARSER_DOES_NOT_EMIT_RELATIONS",
-        "figure_caption_prf",
-        "chunk_boundary_prf",
-    ]
-
-
-def test_module_all_no_duplicates():
-    import evaluation.annotation_metrics as mod
-    assert len(mod.__all__) == len(set(mod.__all__))
-
-
-def test_module_uses_future_annotations():
-    import evaluation.annotation_metrics as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_module_imports_counter():
     import evaluation.annotation_metrics as mod
     src = inspect.getsource(mod)
     assert "from collections import" in src
     assert "Counter" in src
-
-
-def test_module_imports_any():
-    import evaluation.annotation_metrics as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
 
 
 def test_module_imports_normalize_text():
@@ -564,11 +533,6 @@ def test_module_imports_null_ratio():
     assert "from evaluation.metrics import" in src
     assert "_null" in src
     assert "_ratio" in src
-
-
-def test_module_docstring_present():
-    import evaluation.annotation_metrics as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_no_heuristic():
@@ -592,16 +556,6 @@ def test_module_docstring_mentions_tolerance_must_be_recorded():
     assert "容差" in doc or "tolerance" in doc.lower()
 
 
-def test_module_no_silence_unused():
-    import evaluation.annotation_metrics as mod
-    assert not hasattr(mod, "_silence_unused")
-
-
-def test_chunk_boundary_prf_signature():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert set(sig.parameters) == {"document", "annotation", "tolerance_chars"}
-
-
 def test_chunk_boundary_prf_tolerance_annotation_int():
     sig = inspect.signature(chunk_boundary_prf)
     assert "int" in str(sig.parameters["tolerance_chars"].annotation)
@@ -615,12 +569,6 @@ def test_chunk_boundary_prf_return_annotation_dict():
 # =========================================================================
 # 综合行为
 # =========================================================================
-
-
-def test_figure_caption_prf_idempotent():
-    a = figure_caption_prf({}, {})
-    b = figure_caption_prf({}, {})
-    assert a == b
 
 
 def test_chunk_boundary_prf_idempotent():

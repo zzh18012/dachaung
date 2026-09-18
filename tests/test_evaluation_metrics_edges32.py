@@ -166,12 +166,6 @@ def test_pdf_locator_source_uses_get_source_locator():
     assert 'e.get("source_locator")' in src
 
 
-def test_pdf_locator_source_uses_page_check():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "isinstance(page, int)" in src
-    assert "page < 1" in src
-
-
 def test_pdf_locator_source_uses_is_valid_bbox():
     src = inspect.getsource(_pdf_locator_ratio)
     assert "_is_valid_bbox(" in src
@@ -256,16 +250,6 @@ def test_is_valid_bbox_source_returns_bool():
     assert "-> bool" in src
 
 
-def test_is_valid_bbox_source_uses_isinstance_list():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "isinstance(bbox, list)" in src
-
-
-def test_is_valid_bbox_source_uses_isinstance_bool():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "isinstance(v, bool)" in src
-
-
 def test_is_valid_bbox_source_uses_isinstance_int_float():
     src = inspect.getsource(_is_valid_bbox)
     assert "isinstance(v, (int, float))" in src
@@ -306,11 +290,6 @@ def test_image_resource_source_uses_get_resource_path():
     assert '.get("resource_path")' in src
 
 
-def test_image_resource_source_uses_path():
-    src = inspect.getsource(_image_resource_ratio)
-    assert "Path(rp)" in src
-
-
 def test_image_resource_source_uses_image_base_dir():
     src = inspect.getsource(_image_resource_ratio)
     assert "image_base_dir is not None" in src
@@ -324,11 +303,6 @@ def test_image_resource_source_uses_is_file():
 def test_image_resource_source_uses_stat_size():
     src = inspect.getsource(_image_resource_ratio)
     assert ".stat().st_size > 0" in src
-
-
-def test_image_resource_source_uses_oserror():
-    src = inspect.getsource(_image_resource_ratio)
-    assert "except OSError" in src
 
 
 def test_image_resource_source_uses_candidates_list():
@@ -760,11 +734,6 @@ def test_module_source_pdf_bbox_required_types_constant():
 def test_module_source_not_evaluated_constant():
     src = inspect.getsource(mmod)
     assert '_NOT_EVALUATED = "not_evaluated"' in src
-
-
-def test_module_source_no_relative_above_root():
-    src = inspect.getsource(mmod)
-    assert "from .." not in src
 
 
 def test_module_source_no_star_import():

@@ -287,12 +287,6 @@ def test_chunk_boundary_prf_three_chunks_two_anchors_batch12():
     assert out["chunk_boundary_f1"]["value"] == 1.0
 
 
-def test_chunk_boundary_prf_default_tolerance_30_batch12():
-    """默认 tolerance_chars=30。"""
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["tolerance_chars"].default == 30
-
-
 def test_chunk_boundary_prf_returns_dict_strict_batch12():
     out = chunk_boundary_prf(None, None)
     assert type(out) is dict
@@ -421,16 +415,6 @@ def test_chunk_boundary_prf_one_to_one_matching_batch12():
 def test_annotation_metrics_source_no_forbidden_token_fifteenth_batch12(token):
     source = inspect.getsource(amod)
     assert token not in source
-
-
-def test_annotation_metrics_source_no_top_level_lambda_batch12():
-    source = inspect.getsource(amod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
 
 
 def test_annotation_metrics_source_no_class_definition_batch12():
@@ -648,13 +632,6 @@ def test_all_functions_no_var_kwargs_batch12():
 
 def test_module_name_evaluation_annotation_metrics_batch12():
     assert amod.__name__ == "evaluation.annotation_metrics"
-
-
-def test_module_dunder_file_endswith_annotation_metrics_py_batch12():
-    sep = os.sep
-    assert amod.__file__.endswith(
-        "evaluation" + sep + "annotation_metrics.py"
-    ) or amod.__file__.endswith("evaluation/annotation_metrics.py")
 
 
 def test_module_user_function_count_2_batch12():

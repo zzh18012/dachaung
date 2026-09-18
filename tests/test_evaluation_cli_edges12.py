@@ -692,22 +692,6 @@ def test_module_imports_validate_file():
     assert hasattr(cli_module, "validate_file")
 
 
-def test_module_has_main_callable():
-    assert callable(cli_module.main)
-
-
-def test_module_has_build_parser_callable():
-    assert callable(cli_module._build_parser)
-
-
-def test_module_has_format_metric_callable():
-    assert callable(cli_module._format_metric)
-
-
-def test_module_has_run_inspect_doc_callable():
-    assert callable(cli_module._run_inspect_doc)
-
-
 def test_module_docstring_present():
     assert cli_module.__doc__ is not None
     assert len(cli_module.__doc__) > 30

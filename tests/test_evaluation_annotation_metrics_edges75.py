@@ -375,12 +375,6 @@ def test_figure_caption_prf_both_none_batch49():
         assert v["value"] is None
 
 
-def test_figure_caption_prf_empty_dict_inputs_batch49():
-    out = figure_caption_prf({}, {})
-    for v in out.values():
-        assert v["value"] is None
-
-
 def test_figure_caption_prf_with_real_chunks_batch49():
     """即使 document 有 chunks 和 captions 也不计算。"""
     document = {
@@ -410,21 +404,6 @@ def test_source_contains_null_ratio_import_batch49():
     assert "from evaluation.metrics import _null, _ratio" in src
 
 
-def test_source_docstring_mentions_caption_relation_batch49():
-    src = inspect.getsource(am_mod)
-    assert "caption" in src.lower()
-
-
-def test_source_docstring_mentions_one_to_one_batch49():
-    src = inspect.getsource(am_mod)
-    assert "一对一" in src
-
-
-def test_source_docstring_mentions_tolerance_batch49():
-    src = inspect.getsource(am_mod)
-    assert "容差" in src or "tolerance" in src.lower()
-
-
 def test_source_all_has_3_entries_batch49():
     src = inspect.getsource(am_mod)
     assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
@@ -437,30 +416,9 @@ def test_source_contains_pairs_sort_batch49():
     assert "pairs.sort" in src
 
 
-def test_source_contains_used_pred_used_gt_batch49():
-    src = inspect.getsource(am_mod)
-    assert "used_pred" in src
-    assert "used_gt" in src
-
-
-def test_source_contains_missing_markers_append_batch49():
-    src = inspect.getsource(am_mod)
-    assert "missing_markers.append" in src
-
-
 def test_source_contains_predicted_append_batch49():
     src = inspect.getsource(am_mod)
     assert "predicted.append" in src
-
-
-def test_source_contains_gt_positions_append_batch49():
-    src = inspect.getsource(am_mod)
-    assert "gt_positions.append" in src
-
-
-def test_source_contains_2_p_r_divide_denom_batch49():
-    src = inspect.getsource(am_mod)
-    assert "2 * p_val * r_val / denom" in src
 
 
 def test_source_contains_p_val_plus_r_val_batch49():
@@ -479,12 +437,6 @@ def test_ast_has_2_top_level_functions_batch49():
     tree = ast.parse(inspect.getsource(am_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 2
-
-
-def test_ast_function_names_batch49():
-    tree = ast.parse(inspect.getsource(am_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["figure_caption_prf", "chunk_boundary_prf"]
 
 
 def test_ast_module_has_5_imports_batch49():

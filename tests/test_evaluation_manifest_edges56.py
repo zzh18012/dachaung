@@ -88,11 +88,6 @@ def test_is_absolute_like_disk_letter_lowercase_batch29():
     assert _is_absolute_like("c:\\users") is True
 
 
-def test_is_absolute_like_number_prefix_batch29():
-    """数字开头不是绝对路径。"""
-    assert _is_absolute_like("1:/foo") is False  # 1 不是字母
-
-
 def test_is_absolute_like_second_char_not_colon_batch29():
     """第 2 字符不是冒号 → 不是 Windows 绝对。"""
     assert _is_absolute_like("ab/foo") is False
@@ -111,10 +106,6 @@ def test_is_absolute_like_short_string_batch29():
 
 def test_is_absolute_like_empty_batch29():
     assert _is_absolute_like("") is False
-
-
-def test_is_absolute_like_relative_batch29():
-    assert _is_absolute_like("samples/x.pdf") is False
 
 
 # ---------- _has_backslash 第二十九批 ----------
@@ -164,22 +155,6 @@ def test_document_entry_is_dataclass_batch29():
     assert is_dataclass(DocumentEntry)
 
 
-def test_document_entry_field_names_batch29():
-    names = {f.name for f in fields(DocumentEntry)}
-    assert names == {
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "source_type",
-        "sha256",
-        "categories",
-        "paired_with",
-        "annotation_file_str",
-        "annotation_resolved",
-        "expectations",
-    }
-
-
 def test_document_entry_frozen_batch29():
     """frozen=True → 不能赋值。"""
     entry = _make_doc_entry()
@@ -202,17 +177,6 @@ def test_expected_failure_is_dataclass_batch29():
 
 def test_expected_failure_five_fields_batch29():
     assert len(fields(ExpectedFailure)) == 5
-
-
-def test_expected_failure_field_names_batch29():
-    names = {f.name for f in fields(ExpectedFailure)}
-    assert names == {
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "expected_error_code",
-        "source_type",
-    }
 
 
 def test_expected_failure_frozen_batch29():
@@ -318,12 +282,6 @@ def test_manifest_pdf_count_zero_when_no_documents_batch29():
 def test_resolve_relative_path_empty_raises_batch29(tmp_path):
     with pytest.raises(ManifestError) as exc:
         _resolve_relative_path("", tmp_path, "field1")
-    assert "field1" in str(exc.value)
-
-
-def test_resolve_relative_path_absolute_raises_batch29(tmp_path):
-    with pytest.raises(ManifestError) as exc:
-        _resolve_relative_path("/etc/passwd", tmp_path, "field1")
     assert "field1" in str(exc.value)
 
 
@@ -507,11 +465,6 @@ def test_detect_project_root_with_file_batch29(tmp_path):
     p.touch()
     result = _detect_project_root(p)
     assert result == tmp_path.resolve()
-
-
-def test_detect_project_root_returns_absolute_batch29(tmp_path):
-    result = _detect_project_root(tmp_path)
-    assert result.is_absolute()
 
 
 # ---------- module source forbidden tokens 第四十六批 ----------

@@ -196,25 +196,7 @@ def test_resolve_relative_path_outside_raises_with_project_root_msg(tmp_path):
 # ---------- _detect_project_root 行为深度第四批 ----------
 
 
-def test_detect_project_root_returns_path():
-    root = _detect_project_root(Path("."))
-    assert isinstance(root, Path)
-
-
 def test_detect_project_root_default_to_cur_when_no_pyproject(tmp_path):
-    root = _detect_project_root(tmp_path)
-    assert root == tmp_path.resolve()
-
-
-def test_detect_project_root_default_to_parent_when_file(tmp_path):
-    f = tmp_path / "x.txt"
-    f.write_text("x")
-    root = _detect_project_root(f)
-    assert root == tmp_path.resolve()
-
-
-def test_detect_project_root_finds_pyproject_at_root(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n")
     root = _detect_project_root(tmp_path)
     assert root == tmp_path.resolve()
 
@@ -224,14 +206,6 @@ def test_detect_project_root_finds_pyproject_in_parent(tmp_path):
     sub = tmp_path / "sub"
     sub.mkdir()
     root = _detect_project_root(sub)
-    assert root == tmp_path.resolve()
-
-
-def test_detect_project_root_finds_pyproject_deep_nested(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n")
-    deep = tmp_path / "a" / "b" / "c" / "d" / "e"
-    deep.mkdir(parents=True)
-    root = _detect_project_root(deep)
     assert root == tmp_path.resolve()
 
 
@@ -486,11 +460,6 @@ def test_manifest_pdf_count_with_zero():
     assert m.pdf_count == 0
 
 
-def test_manifest_docx_count_with_zero():
-    m = _make_manifest(documents=())
-    assert m.docx_count == 0
-
-
 def test_manifest_content_group_count_with_one_unpaired():
     d = _make_doc()
     m = _make_manifest(documents=(d,))
@@ -710,11 +679,6 @@ def test_manifest_source_class_count_4():
     assert class_count == 3 or class_count == 4  # 4 if first line is "class"
 
 
-def test_manifest_source_property_count_5():
-    src = inspect.getsource(mmod)
-    assert src.count("@property") == 5
-
-
 def test_manifest_source_manifest_error_init_docstring():
     src = inspect.getsource(ManifestError)
     assert '"""' in src
@@ -727,31 +691,6 @@ def test_manifest_source_dataclass_uses_field_default_factories():
 
 
 # ---------- signatures 精确补强第二批 ----------
-
-
-def test_signature_document_entry_init_10_params():
-    sig = inspect.signature(DocumentEntry.__init__)
-    params = list(sig.parameters.values())
-    assert len(params) == 11  # self + 10
-
-
-def test_signature_expected_failure_init_5_params():
-    sig = inspect.signature(ExpectedFailure.__init__)
-    params = list(sig.parameters.values())
-    assert len(params) == 6  # self + 5
-
-
-def test_signature_manifest_init_5_params():
-    sig = inspect.signature(Manifest.__init__)
-    params = list(sig.parameters.values())
-    assert len(params) == 6  # self + 5
-
-
-def test_signature_resolve_relative_path_field_name_str():
-    sig = inspect.signature(_resolve_relative_path)
-    params = sig.parameters
-    # field_name 没有 default
-    assert params["field_name"].default is inspect.Parameter.empty
 
 
 def test_signature_load_manifest_returns_manifest_annotation():

@@ -154,11 +154,6 @@ def test_module_identity_batch45():
 
 # ---------- 常量 hash + id ----------
 
-def test_evaluator_version_hashable_batch45():
-    h = hash(EVALUATOR_VERSION)
-    assert isinstance(h, int)
-
-
 def test_report_version_hashable_batch45():
     assert isinstance(hash(REPORT_VERSION), int)
 
@@ -197,22 +192,6 @@ def test_evaluator_version_one_dot_batch45():
     assert EVALUATOR_VERSION.count(".") == 1
 
 
-def test_report_version_one_dot_batch45():
-    assert REPORT_VERSION.count(".") == 1
-
-
-def test_annotation_version_one_dot_batch45():
-    assert ANNOTATION_VERSION.count(".") == 1
-
-
-def test_manifest_version_one_dot_batch45():
-    assert MANIFEST_VERSION.count(".") == 1
-
-
-def test_evaluator_version_ends_with_digit_batch45():
-    assert EVALUATOR_VERSION[-1].isdigit()
-
-
 def test_evaluator_version_no_alpha_batch45():
     assert not any(c.isalpha() for c in EVALUATOR_VERSION)
 
@@ -225,19 +204,10 @@ def test_evaluator_version_no_dash_batch45():
     assert "-" not in EVALUATOR_VERSION
 
 
-def test_evaluator_version_no_space_batch45():
-    assert " " not in EVALUATOR_VERSION
-
-
 def test_evaluator_version_no_hex_letters_batch45():
     """版本字符串不包含 a-f。"""
     for c in EVALUATOR_VERSION.lower():
         assert c not in "abcdef"
-
-
-def test_annotation_version_split_dot_batch45():
-    parts = ANNOTATION_VERSION.split(".")
-    assert parts == ["1", "0"]
 
 
 def test_evaluator_version_major_minor_batch45():
@@ -274,10 +244,6 @@ def test_all_entries_str_type_batch45():
 
 def test_all_count_four_batch45():
     assert len(evaluation.__all__) == 4
-
-
-def test_all_unique_batch45():
-    assert len(set(evaluation.__all__)) == len(evaluation.__all__)
 
 
 def test_all_each_length_3_batch45():
@@ -342,11 +308,6 @@ def test_source_contains_version_history_v1_1_batch45():
 def test_source_contains_text_preservation_change_note_batch45():
     src = inspect.getsource(evaluation)
     assert "text_preservation" in src
-
-
-def test_source_contains_normalize_text_note_batch45():
-    src = inspect.getsource(evaluation)
-    assert "normalize_text" in src
 
 
 def test_source_contains_not_instrumented_batch45():
@@ -458,36 +419,6 @@ def test_ast_no_function_def_batch45():
         assert not isinstance(n, ast.AsyncFunctionDef)
 
 
-def test_ast_no_for_batch45():
-    tree = ast.parse(inspect.getsource(evaluation))
-    for n in tree.body:
-        assert not isinstance(n, ast.For)
-
-
-def test_ast_no_while_batch45():
-    tree = ast.parse(inspect.getsource(evaluation))
-    for n in tree.body:
-        assert not isinstance(n, ast.While)
-
-
-def test_ast_no_if_batch45():
-    tree = ast.parse(inspect.getsource(evaluation))
-    for n in tree.body:
-        assert not isinstance(n, ast.If)
-
-
-def test_ast_no_try_batch45():
-    tree = ast.parse(inspect.getsource(evaluation))
-    for n in tree.body:
-        assert not isinstance(n, ast.Try)
-
-
-def test_ast_no_with_batch45():
-    tree = ast.parse(inspect.getsource(evaluation))
-    for n in tree.body:
-        assert not isinstance(n, (ast.With, ast.AsyncWith))
-
-
 def test_ast_total_top_level_nodes_batch45():
     """顶层节点：1 docstring + 4 版本赋值 + 1 __all__ 赋值 = 6。"""
     tree = ast.parse(inspect.getsource(evaluation))
@@ -538,11 +469,6 @@ def test_source_no_locals_batch45():
 def test_source_no_os_system_batch45():
     src = inspect.getsource(evaluation)
     assert "os.system(" not in src
-
-
-def test_source_no_popen_batch45():
-    src = inspect.getsource(evaluation)
-    assert "popen(" not in src
 
 
 def test_source_no_yaml_load_batch45():

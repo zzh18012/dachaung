@@ -798,11 +798,6 @@ def test_module_source_no_assert_stmt():
 # =========================================================================
 
 
-def test_figure_caption_prf_source_has_def():
-    src = inspect.getsource(figure_caption_prf)
-    assert "def figure_caption_prf(" in src
-
-
 def test_figure_caption_prf_source_has_2_params():
     src = inspect.getsource(figure_caption_prf)
     assert "document" in src

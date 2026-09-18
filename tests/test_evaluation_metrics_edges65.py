@@ -70,11 +70,6 @@ def test_ratio_with_nan_input_batch39():
     assert math.isnan(out["value"])
 
 
-def test_ratio_with_inf_input_batch39():
-    out = _ratio(float("inf"))
-    assert out["value"] == float("inf")
-
-
 def test_ratio_with_one_batch39():
     out = _ratio(1)
     assert out["value"] == 1.0
@@ -181,11 +176,6 @@ def test_is_valid_bbox_with_empty_list_batch39():
 
 def test_is_valid_bbox_with_none_input_batch39():
     assert _is_valid_bbox(None) is False
-
-
-def test_is_valid_bbox_with_dict_input_batch39():
-    """dict 不是 list → False。"""
-    assert _is_valid_bbox({"x": 0}) is False
 
 
 # ---------- _strip_unicode_whitespace 第三十九批

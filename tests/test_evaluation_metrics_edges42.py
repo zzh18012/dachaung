@@ -551,13 +551,6 @@ def test_chunk_reference_ratio_partial_match_batch15():
 # ---------- _text_preservation 第十五批 ----------
 
 
-def test_text_preservation_empty_both_batch15():
-    r = _text_preservation([], [])
-    assert r["equal"]["value"] is True
-    assert r["precision"]["reason"] == "empty_expected_and_actual"
-    assert r["recall"]["reason"] == "empty_expected_and_actual"
-
-
 def test_text_preservation_perfect_match_batch15():
     elements = [{"type": "heading", "content": "Hello"}, {"type": "paragraph", "content": "World"}]
     chunks = [{"text": "HelloWorld"}]

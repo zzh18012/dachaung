@@ -804,18 +804,6 @@ def test_chunk_boundary_prf_each_metric_dict_has_value_reason_keys():
         assert set(out[k].keys()) == {"value", "reason"}
 
 
-def test_chunk_boundary_prf_perfect_match_returns_1_0():
-    """完美匹配 → precision=recall=f1=1.0。"""
-    doc = {"chunks": [{"text": "alpha"}, {"text": "beta"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "alpha", "position": "after"}]}
-    out = chunk_boundary_prf(doc, ann, tolerance_chars=10)
-    # 'alpha' end position == 5；predicted boundary == 5（alpha 长度 5）
-    # 完美匹配
-    assert out["chunk_boundary_precision"]["value"] == 1.0
-    assert out["chunk_boundary_recall"]["value"] == 1.0
-    assert out["chunk_boundary_f1"]["value"] == 1.0
-
-
 def test_chunk_boundary_prf_no_match_returns_zero():
     """无匹配 → precision=recall=0.0，f1=0.0。"""
     doc = {"chunks": [{"text": "alpha"}, {"text": "beta"}]}

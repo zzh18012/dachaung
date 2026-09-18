@@ -1035,12 +1035,6 @@ def test_detect_project_root_returns_path_type(tmp_path: Path):
 # =========================================================================
 
 
-def test_load_manifest_missing_file_raises(tmp_path: Path):
-    """manifest 文件不存在 → ManifestError。"""
-    with pytest.raises(ManifestError):
-        load_manifest(tmp_path / "missing.json")
-
-
 def test_load_manifest_directory_raises(tmp_path: Path):
     """manifest 路径是目录 → ManifestError。"""
     with pytest.raises(ManifestError):

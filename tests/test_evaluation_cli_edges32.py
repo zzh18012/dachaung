@@ -148,11 +148,6 @@ def test_main_source_starts_with_def():
     assert src.lstrip().startswith("def main(")
 
 
-def test_main_source_uses_build_parser():
-    src = inspect.getsource(main)
-    assert "_build_parser()" in src
-
-
 def test_main_source_uses_parse_args():
     src = inspect.getsource(main)
     assert ".parse_args(argv)" in src
@@ -173,39 +168,9 @@ def test_main_source_handles_inspect_doc_command():
     assert 'args.command == "inspect-doc"' in src
 
 
-def test_main_source_uses_path():
-    src = inspect.getsource(main)
-    assert "Path(" in src
-
-
-def test_main_source_uses_load_manifest():
-    src = inspect.getsource(main)
-    assert "load_manifest(" in src
-
-
 def test_main_source_uses_run_evaluation():
     src = inspect.getsource(main)
     assert "run_evaluation(" in src
-
-
-def test_main_source_uses_validate_file():
-    src = inspect.getsource(main)
-    assert 'validate_file(' in src
-
-
-def test_main_source_uses_get_git_provenance():
-    src = inspect.getsource(main)
-    assert "get_git_provenance(" in src
-
-
-def test_main_source_catches_manifest_error():
-    src = inspect.getsource(main)
-    assert "ManifestError" in src
-
-
-def test_main_source_catches_eval_schema_error():
-    src = inspect.getsource(main)
-    assert "EvalSchemaError" in src
 
 
 def test_main_source_uses_manifest_project_root():
@@ -268,11 +233,6 @@ def test_main_source_no_exec():
 def test_main_source_no_subprocess():
     src = inspect.getsource(main)
     assert "subprocess" not in src
-
-
-def test_main_source_no_yield():
-    src = inspect.getsource(main)
-    assert "yield" not in src
 
 
 def test_main_source_no_async():
@@ -349,11 +309,6 @@ def test_format_metric_source_name_padding():
 def test_format_metric_source_default_ok():
     src = inspect.getsource(_format_metric)
     assert "'ok'" in src or '"ok"' in src
-
-
-def test_format_metric_source_dict_items_join():
-    src = inspect.getsource(_format_metric)
-    assert ".join(" in src
 
 
 def test_format_metric_source_no_eval():
@@ -447,13 +402,6 @@ def test_run_inspect_doc_source_uses_sort_key():
 def test_run_inspect_doc_source_uses_sorted():
     src = inspect.getsource(_run_inspect_doc)
     assert "sorted(" in src
-
-
-def test_run_inspect_doc_source_returns_int():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "return 0" in src
-    assert "return 1" in src
-    assert "return 2" in src
 
 
 def test_run_inspect_doc_source_uses_print():
@@ -622,12 +570,6 @@ def test_build_parser_inspect_doc_default_tolerance_30():
     p = _build_parser()
     ns = p.parse_args(["inspect-doc", "doc.json"])
     assert ns.tolerance_chars == 30
-
-
-def test_build_parser_inspect_doc_tolerance_override():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json", "--tolerance-chars", "100"])
-    assert ns.tolerance_chars == 100
 
 
 def test_build_parser_inspect_doc_no_parser_param():

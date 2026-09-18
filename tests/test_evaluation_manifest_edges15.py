@@ -113,12 +113,6 @@ def test_module_all_exact_order():
     ]
 
 
-def test_module_all_length_five():
-    """__all__ 5 个元素。"""
-    import evaluation.manifest as m
-    assert len(m.__all__) == 5
-
-
 def test_module_all_no_duplicates():
     """__all__ 无重复。"""
     import evaluation.manifest as m
@@ -191,11 +185,6 @@ def test_module_docstring_mentions_project_root():
 def test_manifest_error_subclass_of_exception():
     """ManifestError 是 Exception 子类。"""
     assert issubclass(ManifestError, Exception)
-
-
-def test_manifest_error_not_subclass_of_value_error():
-    """ManifestError 不继承 ValueError。"""
-    assert not issubclass(ManifestError, ValueError)
 
 
 def test_manifest_error_init_with_message():

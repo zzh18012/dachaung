@@ -135,12 +135,6 @@ def test_format_metric_value_none_with_reason_batch32():
     assert "why" in out
 
 
-def test_format_metric_value_true_lower_batch32():
-    out = _format_metric("x", {"value": True, "reason": None})
-    assert "true" in out
-    assert "True" not in out
-
-
 def test_format_metric_value_int_batch32():
     out = _format_metric("x", {"value": 42, "reason": None})
     assert "42" in out
@@ -168,13 +162,6 @@ def test_format_metric_value_dict_empty_batch32():
 def test_format_metric_value_dict_single_item_batch32():
     out = _format_metric("x", {"value": {"a": 1}, "reason": None})
     assert "a=1" in out
-
-
-def test_format_metric_value_dict_three_items_batch32():
-    out = _format_metric("x", {"value": {"a": 1, "b": 2, "c": 3}, "reason": None})
-    assert "a=1" in out
-    assert "b=2" in out
-    assert "c=3" in out
 
 
 def test_format_metric_value_negative_int_batch32():

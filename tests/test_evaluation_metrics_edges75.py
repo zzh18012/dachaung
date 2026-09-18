@@ -285,14 +285,6 @@ def test_heading_boundary_multi_headings_some_matched_batch51():
     assert out["value"] == 1 / 3
 
 
-def test_heading_boundary_no_headings_batch51():
-    elements = [{"type": "paragraph", "element_id": "p1"}]
-    chunks = [{"source_element_ids": ["p1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] is None
-    assert out["reason"] == "no_heading_elements"
-
-
 # ---------- _silent_drop_count 边界 ----------
 
 def test_silent_drop_count_expectations_none_batch51():
@@ -369,10 +361,6 @@ def test_is_valid_bbox_set_rejected_batch51():
 
 def test_is_valid_bbox_dict_rejected_batch51():
     assert _is_valid_bbox({"x": 0}) is False
-
-
-def test_is_valid_bbox_str_rejected_batch51():
-    assert _is_valid_bbox("0000") is False
 
 
 def test_is_valid_bbox_mixed_int_float_batch51():

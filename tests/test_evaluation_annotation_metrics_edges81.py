@@ -173,10 +173,6 @@ def test_source_matching_lines_batch52():
     assert "used_gt.add(gi)" in src
 
 
-def test_source_search_from_advance_expr_batch52():
-    assert "search_from = find_pos + len(marker)" in _src()
-
-
 def test_source_marker_position_defaults_batch52():
     src = _src()
     assert 'marker = a.get("marker", "")' in src

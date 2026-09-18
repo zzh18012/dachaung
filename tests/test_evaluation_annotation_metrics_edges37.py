@@ -79,45 +79,10 @@ def test_figure_caption_prf_with_annotation_still_null_batch10():
         assert v["value"] is None
 
 
-def test_figure_caption_prf_with_both_args_still_null_batch10():
-    doc = {"elements": [{"type": "image"}]}
-    annot = {"figure_caption_pairs": [["f1", "c1"]]}
-    out = figure_caption_prf(doc, annot)
-    for v in out.values():
-        assert v["value"] is None
-
-
-def test_figure_caption_prf_each_value_is_dict_batch10():
-    out = figure_caption_prf(None, None)
-    for v in out.values():
-        assert isinstance(v, dict)
-        assert "value" in v
-        assert "reason" in v
-
-
 def test_figure_caption_prf_idempotent_batch10():
     out1 = figure_caption_prf(None, None)
     out2 = figure_caption_prf(None, None)
     assert out1 == out2
-
-
-def test_figure_caption_prf_no_mutate_input_dict_batch10():
-    doc = {"elements": [{"type": "image"}]}
-    snapshot = json.dumps(doc)
-    _ = figure_caption_prf(doc, None)
-    assert json.dumps(doc) == snapshot
-
-
-def test_figure_caption_prf_accepts_empty_dict_doc_batch10():
-    out = figure_caption_prf({}, None)
-    for v in out.values():
-        assert v["value"] is None
-
-
-def test_figure_caption_prf_accepts_empty_dict_annot_batch10():
-    out = figure_caption_prf(None, {})
-    for v in out.values():
-        assert v["value"] is None
 
 
 def test_figure_caption_prf_returns_dict_with_value_reason_only_batch10():
@@ -568,11 +533,6 @@ def test_amod_source_no_unlink_remove_batch10():
     source = inspect.getsource(amod)
     assert ".unlink(" not in source
     assert ".remove(" not in source
-
-
-def test_amod_source_no_sleep_batch10():
-    source = inspect.getsource(amod)
-    assert "time.sleep" not in source
 
 
 def test_amod_source_no_hardcoded_path_batch10():

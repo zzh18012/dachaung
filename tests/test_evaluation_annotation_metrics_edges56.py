@@ -357,19 +357,9 @@ def test_module_source_contains_parser_does_not_emit_relations_batch29():
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
 
 
-def test_module_source_contains_figure_caption_docstring_batch29():
-    src = inspect.getsource(amod)
-    assert "图表关联" in src
-
-
 def test_module_source_contains_chunk_boundary_docstring_batch29():
     src = inspect.getsource(amod)
     assert "分块边界" in src
-
-
-def test_module_source_contains_normalize_text_call_batch29():
-    src = inspect.getsource(amod)
-    assert "normalize_text" in src
 
 
 def test_module_source_contains_pipeline_failed_batch29():
@@ -423,21 +413,6 @@ def test_signature_figure_caption_prf_return_annotation_batch29():
 def test_signature_chunk_boundary_prf_return_annotation_batch29():
     sig = inspect.signature(chunk_boundary_prf)
     assert "dict[str, dict[str, Any]]" in str(sig.return_annotation)
-
-
-def test_signature_figure_caption_prf_document_annotation_batch29():
-    sig = inspect.signature(figure_caption_prf)
-    for p_name in ("document", "annotation"):
-        annotation = sig.parameters[p_name].annotation
-        assert "dict" in str(annotation)
-        assert "None" in str(annotation)
-
-
-def test_signature_chunk_boundary_prf_document_annotation_batch29():
-    sig = inspect.signature(chunk_boundary_prf)
-    annotation = sig.parameters["document"].annotation
-    assert "dict" in str(annotation)
-    assert "None" in str(annotation)
 
 
 def test_signature_chunk_boundary_prf_tolerance_default_batch29():
@@ -522,18 +497,6 @@ def test_e2e_chunk_boundary_prf_full_pipeline_batch29():
     assert out["chunk_boundary_precision"]["value"] == 1.0
     assert out["chunk_boundary_recall"]["value"] == 1.0
     assert out["chunk_boundary_f1"]["value"] == 1.0
-
-
-def test_e2e_figure_caption_prf_full_pipeline_batch29():
-    """端到端：figure_caption_prf 完整调用。"""
-    out = figure_caption_prf(
-        {"elements": [{"type": "image", "caption_id": "c1"}]},
-        {"figure_caption_relations": [{"figure_id": "f1", "caption_id": "c1"}]},
-    )
-    assert len(out) == 3
-    for v in out.values():
-        assert v["value"] is None
-        assert v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
 
 
 def test_e2e_chunk_boundary_prf_with_tolerance_batch29():

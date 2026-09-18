@@ -644,11 +644,6 @@ def test_module_source_no_numpy_import_batch21():
     assert "import numpy" not in src
 
 
-def test_module_source_no_unlink_call_batch21():
-    src = inspect.getsource(climod)
-    assert ".unlink(" not in src
-
-
 # ---------- module source 字符串精确补强第三十三批 ----------
 
 
@@ -741,30 +736,10 @@ def test_signature_build_parser_batch21():
     assert len(params) == 0
 
 
-def test_signature_main_argv_default_none_batch21():
-    sig = inspect.signature(main)
-    params = list(sig.parameters.values())
-    assert params[0].default is None
-
-
-def test_signature_format_metric_batch21():
-    sig = inspect.signature(_format_metric)
-    params = list(sig.parameters.values())
-    names = [p.name for p in params]
-    assert names == ["name", "metric"]
-
-
 def test_signature_format_metric_return_annotation_batch21():
     """_format_metric 返回类型注解 str。"""
     sig = inspect.signature(_format_metric)
     assert "str" in str(sig.return_annotation)
-
-
-def test_signature_run_inspect_doc_batch21():
-    sig = inspect.signature(_run_inspect_doc)
-    params = list(sig.parameters.values())
-    names = [p.name for p in params]
-    assert names == ["args"]
 
 
 def test_signature_run_inspect_doc_return_annotation_batch21():
@@ -774,28 +749,6 @@ def test_signature_run_inspect_doc_return_annotation_batch21():
 
 
 # ---------- module 合理性第三十三批 ----------
-
-
-def test_module_has_main_function_batch21():
-    assert hasattr(climod, "main")
-
-
-def test_module_has_build_parser_batch21():
-    assert hasattr(climod, "_build_parser")
-
-
-def test_module_has_run_inspect_doc_batch21():
-    assert hasattr(climod, "_run_inspect_doc")
-
-
-def test_module_has_format_metric_batch21():
-    assert hasattr(climod, "_format_metric")
-
-
-def test_module_does_not_import_app_pipeline_batch21():
-    src = inspect.getsource(climod)
-    assert "from app" not in src
-    assert "import app" not in src
 
 
 def test_module_lazy_imports_inside_run_inspect_doc_batch21():
@@ -846,25 +799,6 @@ def test_module_top_level_no_forbidden_globals_batch21():
 
 
 # ---------- 端到端集成第三十三批 ----------
-
-
-def test_e2e_main_inspect_doc_full_round_trip_batch21(tmp_path, capsys):
-    """inspect-doc 完整跑通。"""
-    p = _write_doc(tmp_path, doc={
-        "document_id": "d1",
-        "source_type": "pdf",
-        "source_path": "/x.pdf",
-        "parser_name": "fallback",
-        "parser_version": "1.0",
-        "elements": [],
-        "chunks": [],
-    })
-    rc = main(["inspect-doc", str(p)])
-    captured = capsys.readouterr().out
-    assert rc == 0
-    assert "document_id: d1" in captured
-    assert "elements=0" in captured
-    assert "chunks=0" in captured
 
 
 def test_e2e_main_inspect_doc_with_tolerance_batch21(tmp_path, capsys):

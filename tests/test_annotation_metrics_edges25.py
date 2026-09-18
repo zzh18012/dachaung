@@ -571,24 +571,6 @@ def test_chunk_boundary_prf_return_annotation():
     assert sig.return_annotation == "dict[str, dict[str, Any]]"
 
 
-def test_chunk_boundary_prf_no_varargs_varkw():
-    sig = inspect.signature(chunk_boundary_prf)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
-def test_figure_caption_prf_no_varargs_varkw():
-    sig = inspect.signature(figure_caption_prf)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 # ---------- namespace ----------
 
 

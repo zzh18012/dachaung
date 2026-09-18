@@ -96,12 +96,6 @@ def test_figure_caption_prf_never_returns_dict_value_batch16():
 # ---------- chunk_boundary_prf 边界第十六批 ----------
 
 
-def test_chunk_boundary_prf_document_empty_dict_batch16():
-    """document 是空 dict → chunks=[] → no_predicted_boundaries。"""
-    out = chunk_boundary_prf({}, {"chunk_boundary_anchors": [{"marker": "x"}]})
-    assert out["chunk_boundary_precision"]["reason"] == "no_predicted_boundaries"
-
-
 def test_chunk_boundary_prf_chunks_single_element_batch16():
     """chunks 只有 1 个元素 → len < 2 → no_predicted_boundaries。"""
     doc = {"chunks": [{"text": "abc"}]}
@@ -328,11 +322,6 @@ def test_module_source_has_future_annotations_batch16():
     assert any("from __future__ import annotations" in line for line in head)
 
 
-def test_module_source_has_docstring_batch16():
-    src = inspect.getsource(amod)
-    assert '"""人工标注指标：figure-caption' in src
-
-
 def test_module_source_has_counter_import_batch16():
     src = inspect.getsource(amod)
     assert "from collections import Counter" in src
@@ -452,18 +441,6 @@ def test_signature_chunk_boundary_prf_batch16():
 def test_signature_chunk_boundary_prf_default_30_batch16():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_signature_figure_caption_prf_return_annotation_batch16():
-    sig = inspect.signature(figure_caption_prf)
-    ra = sig.return_annotation
-    assert ra is not inspect._empty
-
-
-def test_signature_chunk_boundary_prf_return_annotation_batch16():
-    sig = inspect.signature(chunk_boundary_prf)
-    ra = sig.return_annotation
-    assert ra is not inspect._empty
 
 
 def test_signature_no_varargs_batch16():

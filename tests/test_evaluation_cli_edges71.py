@@ -75,12 +75,6 @@ def test_build_parser_run_invalid_parser_choice_batch45():
         p.parse_args(["run", "--manifest", "x", "--output", "y", "--parser", "invalid"])
 
 
-def test_build_parser_run_default_max_chars_batch45():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert args.max_chars == 800
-
-
 def test_build_parser_run_custom_max_chars_batch45():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "x", "--output", "y", "--max-chars", "1200"])
@@ -91,12 +85,6 @@ def test_build_parser_run_custom_tolerance_chars_batch45():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "x", "--output", "y", "--tolerance-chars", "50"])
     assert args.tolerance_chars == 50
-
-
-def test_build_parser_run_required_manifest_batch45():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--output", "y"])
 
 
 def test_build_parser_run_required_output_batch45():
@@ -381,12 +369,6 @@ def test_format_metric_float_batch45():
     assert "0.5000" in out
 
 
-def test_format_metric_dict_value_batch45():
-    out = _format_metric("x", {"value": {"a": 1, "b": 2}, "reason": None})
-    assert "a=1" in out
-    assert "b=2" in out
-
-
 def test_format_metric_dict_value_sorted_batch45():
     """dict value 按 key 排序。"""
     out = _format_metric("x", {"value": {"z": 1, "a": 2}, "reason": None})
@@ -421,11 +403,6 @@ def test_format_metric_long_name_batch45():
     out = _format_metric("a" * 50, {"value": 1, "reason": None})
     # 长 name 也应该正常输出
     assert "a" * 50 in out
-
-
-def test_format_metric_returns_str_batch45():
-    out = _format_metric("x", {"value": None, "reason": "y"})
-    assert isinstance(out, str)
 
 
 def test_format_metric_36_padding_batch45():
@@ -539,11 +516,6 @@ def test_module_source_contains_format_metric_function_batch45():
 def test_module_source_contains_run_inspect_doc_function_batch45():
     src = inspect.getsource(cli_mod)
     assert "def _run_inspect_doc(args) -> int:" in src
-
-
-def test_module_source_contains_no_annotation_default_note_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "无标注时该指标固定 null" in src
 
 
 # ---------- 模块无 __all__ ----------

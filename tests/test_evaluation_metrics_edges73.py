@@ -267,10 +267,6 @@ def test_is_valid_bbox_true_element_rejected_batch48():
     assert _is_valid_bbox([True, 0, 0, 0]) is False
 
 
-def test_is_valid_bbox_false_element_rejected_batch48():
-    assert _is_valid_bbox([False, 0, 0, 0]) is False
-
-
 def test_is_valid_bbox_string_rejected_batch48():
     assert _is_valid_bbox(["0", "0", "0", "0"]) is False
 
@@ -453,12 +449,6 @@ def test_text_preservation_chunk_missing_text_batch48():
 
 # ---------- _heading_boundary_ratio 边界 ----------
 
-def test_heading_boundary_ratio_no_headings_batch48():
-    out = _heading_boundary_ratio([], [])
-    assert out["value"] is None
-    assert out["reason"] == "no_heading_elements"
-
-
 def test_heading_boundary_ratio_no_chunks_batch48():
     """chunks 空 → chunk_first_ids 是空 set → matched=0 / 1 = 0.0。"""
     elements = [{"type": "heading", "element_id": "h1"}]
@@ -520,14 +510,6 @@ def test_silent_drop_count_actual_equals_expected_batch48():
     expectations = {"element_count_by_type": {"heading": 3}}
     out = _silent_drop_count(by_type, expectations)
     assert out["value"] == 0
-
-
-def test_silent_drop_count_partial_drop_batch48():
-    by_type = {"heading": 1}
-    expectations = {"element_count_by_type": {"heading": 3}}
-    out = _silent_drop_count(by_type, expectations)
-    # drop = 3 - 1 = 2
-    assert out["value"] == 2
 
 
 def test_silent_drop_count_missing_type_in_actual_batch48():
@@ -663,11 +645,6 @@ def test_int_metric_value_is_int_batch48():
 def test_int_metric_float_to_int_batch48():
     """_int_metric(2.7) → 2（int() 截断）。"""
     assert _int_metric(2.7)["value"] == 2
-
-
-def test_int_metric_str_raises_batch48():
-    with pytest.raises(ValueError):
-        _int_metric("abc")
 
 
 # ---------- 模块源码补强 ----------

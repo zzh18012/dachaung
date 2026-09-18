@@ -83,11 +83,6 @@ def test_annotation_falsy_variants_batch52(falsy):
     assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 
-def test_annotation_empty_dict_no_annotation_batch52():
-    out = chunk_boundary_prf({"chunks": [{"text": "a"}, {"text": "b"}]}, {})
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 # ---------- chunks<2 分支细节 ----------
 
 def test_zero_chunks_empty_anchors_recall_null_batch52():
@@ -263,16 +258,6 @@ def test_figure_caption_truthy_args_same_nulls_batch52():
 
 # ---------- 源码补强 ----------
 
-def test_source_normalize_text_import_batch52():
-    src = inspect.getsource(ann_mod)
-    assert "from app.chunkers.structural import normalize_text" in src
-
-
-def test_source_null_ratio_import_batch52():
-    src = inspect.getsource(ann_mod)
-    assert "from evaluation.metrics import _null, _ratio" in src
-
-
 def test_source_f1_formula_batch52():
     src = inspect.getsource(ann_mod)
     assert "2 * p_val * r_val / denom" in src
@@ -286,11 +271,6 @@ def test_source_denom_le_zero_batch52():
 def test_source_chunks_lt_2_condition_batch52():
     src = inspect.getsource(ann_mod)
     assert "if not chunks or len(chunks) < 2:" in src
-
-
-def test_source_search_from_advance_batch52():
-    src = inspect.getsource(ann_mod)
-    assert "search_from = find_pos + len(marker)" in src
 
 
 def test_source_used_sets_batch52():

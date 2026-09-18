@@ -259,11 +259,6 @@ def test_manifest_error_caught_as_exception():
         assert isinstance(e, ManifestError)
 
 
-def test_manifest_error_str():
-    e = ManifestError("my message")
-    assert str(e) == "my message"
-
-
 def test_manifest_error_args_value():
     e = ManifestError("msg")
     assert e.args == ("msg",)
@@ -471,11 +466,6 @@ def test_expected_failure_expected_error_code_type_str():
     assert isinstance(f.expected_error_code, str)
 
 
-def test_expected_failure_source_type_can_be_str():
-    f = _make_failure(source_type="docx")
-    assert f.source_type == "docx"
-
-
 def test_expected_failure_source_type_can_be_none():
     f = _make_failure(source_type=None)
     assert f.source_type is None
@@ -484,12 +474,6 @@ def test_expected_failure_source_type_can_be_none():
 def test_expected_failure_hashable():
     f = _make_failure()
     assert hash(f) == hash(_make_failure())
-
-
-def test_expected_failure_equality():
-    f1 = _make_failure()
-    f2 = _make_failure()
-    assert f1 == f2
 
 
 def test_expected_failure_inequality_different_field():
@@ -525,13 +509,6 @@ def test_manifest_is_frozen():
         m.devset_status = "complete"  # type: ignore[misc]
 
 
-def test_manifest_field_count_five():
-    import dataclasses
-
-    fields = dataclasses.fields(Manifest)
-    assert len(fields) == 5
-
-
 def test_manifest_field_names_exact():
     import dataclasses
 
@@ -565,12 +542,6 @@ def test_manifest_equality():
     assert m1 == m2
 
 
-def test_manifest_inequality_different_status():
-    m1 = _make_manifest(devset_status="incomplete")
-    m2 = _make_manifest(devset_status="complete")
-    assert m1 != m2
-
-
 # =========================================================================
 # Manifest properties 深度
 # =========================================================================
@@ -599,11 +570,6 @@ def test_manifest_pdf_count_zero_when_no_pdf():
 def test_manifest_pdf_count_one_when_one_pdf():
     m = _make_manifest(documents=(_make_doc_entry(source_type="pdf"),))
     assert m.pdf_count == 1
-
-
-def test_manifest_docx_count_returns_int():
-    m = _make_manifest()
-    assert isinstance(m.docx_count, int)
 
 
 def test_manifest_docx_count_zero_when_no_docx():
@@ -946,123 +912,15 @@ def test_load_manifest_manifest_version_mismatch_raises(tmp_path: Path):
 # =========================================================================
 
 
-def test_module_imports_json():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "json")
-
-
-def test_module_imports_dataclass():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "dataclass")
-
-
-def test_module_imports_path():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "Path")
-
-
-def test_module_imports_any():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "Any")
-
-
-def test_module_imports_manifest_version():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "MANIFEST_VERSION")
-
-
 def test_module_imports_validate():
     from evaluation import manifest as mod
     assert hasattr(mod, "validate")
-
-
-def test_module_has_manifest_error():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "ManifestError")
-
-
-def test_module_has_document_entry():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "DocumentEntry")
-
-
-def test_module_has_expected_failure():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "ExpectedFailure")
-
-
-def test_module_has_manifest_class():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "Manifest")
-
-
-def test_module_has_load_manifest():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "load_manifest")
-
-
-def test_module_has_is_absolute_like():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "_is_absolute_like")
-
-
-def test_module_has_has_backslash():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "_has_backslash")
-
-
-def test_module_has_resolve_relative_path():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "_resolve_relative_path")
-
-
-def test_module_has_detect_project_root():
-    from evaluation import manifest as mod
-    assert hasattr(mod, "_detect_project_root")
-
-
-def test_module_all_is_list():
-    from evaluation import manifest as mod
-    assert isinstance(mod.__all__, list)
-
-
-def test_module_all_length_five():
-    from evaluation import manifest as mod
-    assert len(mod.__all__) == 5
-
-
-def test_module_all_exact():
-    from evaluation import manifest as mod
-    assert set(mod.__all__) == {
-        "ManifestError",
-        "Manifest",
-        "DocumentEntry",
-        "ExpectedFailure",
-        "load_manifest",
-    }
 
 
 def test_module_all_excludes_internal_helpers():
     from evaluation import manifest as mod
     for item in mod.__all__:
         assert not item.startswith("_")
-
-
-def test_module_docstring_present():
-    from evaluation import manifest as mod
-    assert mod.__doc__ is not None
-
-
-def test_module_docstring_mentions_path():
-    from evaluation import manifest as mod
-    doc = mod.__doc__
-    assert "path" in doc.lower() or "路径" in doc
-
-
-def test_module_docstring_mentions_relative():
-    from evaluation import manifest as mod
-    doc = mod.__doc__
-    assert "相对" in doc or "relative" in doc.lower()
 
 
 def test_module_docstring_mentions_project_root():
@@ -1084,19 +942,6 @@ def test_module_uses_future_annotations():
         for node in tree.body
     )
     assert has_future
-
-
-def test_module_internal_funcs_callable():
-    from evaluation import manifest as mod
-    assert callable(mod._is_absolute_like)
-    assert callable(mod._has_backslash)
-    assert callable(mod._resolve_relative_path)
-    assert callable(mod._detect_project_root)
-
-
-def test_module_load_manifest_callable():
-    from evaluation import manifest as mod
-    assert callable(mod.load_manifest)
 
 
 # =========================================================================

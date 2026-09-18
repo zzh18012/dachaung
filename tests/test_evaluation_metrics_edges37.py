@@ -261,19 +261,6 @@ def test_compute_metrics_element_count_total_batch10():
     assert out["element_count_total"]["value"] == 2
 
 
-def test_compute_metrics_element_count_by_type_batch10():
-    doc = {
-        "elements": [
-            {"type": "paragraph"},
-            {"type": "paragraph"},
-            {"type": "heading"},
-        ],
-        "chunks": [],
-    }
-    out = compute_automatic_metrics(doc, None, "pdf", None)
-    assert out["element_count_by_type"]["value"] == {"paragraph": 2, "heading": 1}
-
-
 # ---------- pdf/docx locator 行为深度第十批 ----------
 
 
@@ -304,13 +291,6 @@ def test_pdf_locator_page_zero_batch10():
 
 def test_pdf_locator_page_negative_batch10():
     elements = [{"type": "paragraph", "source_locator": {"page": -1, "bbox": [0, 0, 100, 100]}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_missing_bbox_for_text_type_batch10():
-    """text type 缺 bbox → invalid。"""
-    elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -378,12 +358,6 @@ def test_docx_locator_with_page_invalid_batch10():
 def test_docx_locator_with_bbox_invalid_batch10():
     """DOCX locator 不应有 bbox。"""
     elements = [{"type": "paragraph", "source_locator": {"bbox": [0, 0, 1, 1], "paragraph_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_docx_locator_no_structural_keys_invalid_batch10():
-    elements = [{"type": "paragraph", "source_locator": {"unknown_key": "value"}}]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -744,13 +718,6 @@ def test_silent_drop_mixed_types_batch10():
     assert out["value"] == 2  # heading: 3-1=2
 
 
-def test_silent_drop_returns_int_batch10():
-    by_type = {"paragraph": 3}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    out = _silent_drop_count(by_type, expectations)
-    assert isinstance(out["value"], int)
-
-
 # ---------- _is_valid_bbox 行为深度第十批 ----------
 
 
@@ -909,25 +876,10 @@ def test_strip_unicode_whitespace_bom_not_stripped_batch10():
 # ---------- module source forbidden tokens 第十三批 ----------
 
 
-def test_metrics_source_no_os_system_batch10():
-    source = inspect.getsource(mmod)
-    assert "os.system" not in source
-
-
 def test_metrics_source_no_subprocess_batch10():
     source = inspect.getsource(mmod)
     assert "subprocess.Popen" not in source
     assert "subprocess.check_call" not in source
-
-
-def test_metrics_source_no_pickle_load_batch10():
-    source = inspect.getsource(mmod)
-    assert "pickle.load" not in source
-
-
-def test_metrics_source_no_yaml_load_batch10():
-    source = inspect.getsource(mmod)
-    assert "yaml.load" not in source
 
 
 def test_metrics_source_no_eval_exec_batch10():
@@ -939,13 +891,6 @@ def test_metrics_source_no_eval_exec_batch10():
 def test_metrics_source_no_compile_batch10():
     source = inspect.getsource(mmod)
     assert "compile(" not in source
-
-
-def test_metrics_source_no_sys_exit_batch10():
-    source = inspect.getsource(mmod)
-    assert "sys.exit" not in source
-    assert "exit(" not in source
-    assert "quit(" not in source
 
 
 def test_metrics_source_no_global_keyword_batch10():
@@ -973,12 +918,6 @@ def test_metrics_source_no_walrus_batch10():
     assert ":=" not in source
 
 
-def test_metrics_source_no_unlink_remove_batch10():
-    source = inspect.getsource(mmod)
-    assert ".unlink(" not in source
-    assert ".remove(" not in source
-
-
 def test_metrics_source_no_logging_batch10():
     source = inspect.getsource(mmod)
     assert "logging" not in source
@@ -988,12 +927,6 @@ def test_metrics_source_no_logging_batch10():
 def test_metrics_source_no_sleep_batch10():
     source = inspect.getsource(mmod)
     assert "time.sleep" not in source
-
-
-def test_metrics_source_no_hardcoded_path_batch10():
-    source = inspect.getsource(mmod)
-    assert "C:\\\\Users" not in source
-    assert "/Users/" not in source
 
 
 # ---------- module source 字符串精确补强第九批 ----------
@@ -1129,10 +1062,6 @@ def test_module_source_docstring_present_batch10():
     assert len(mmod.__doc__) > 30
 
 
-def test_module_source_docstring_mentions_text_preservation_batch10():
-    assert "text_preservation" in mmod.__doc__ or "text preservation" in mmod.__doc__.lower()
-
-
 def test_module_source_docstring_mentions_pure_function_batch10():
     """docstring 提到纯函数（设计原则）。"""
     assert "纯函数" in mmod.__doc__ or "pure" in mmod.__doc__.lower()
@@ -1144,11 +1073,6 @@ def test_module_source_docstring_mentions_pure_function_batch10():
 def test_signature_null_param_count_batch10():
     sig = inspect.signature(_null)
     assert len(sig.parameters) == 1
-
-
-def test_signature_null_param_name_batch10():
-    sig = inspect.signature(_null)
-    assert "reason" in sig.parameters
 
 
 def test_signature_null_param_annotation_batch10():
@@ -1338,11 +1262,6 @@ def test_module_constants_count_batch10():
     ]
     # annotations 是 from __future__ import annotations 注入
     assert set(consts) == {"_TEXT_TYPES", "_PDF_BBOX_REQUIRED_TYPES", "_NOT_EVALUATED", "annotations"}
-
-
-def test_module_pdf_bbox_required_subset_of_text_types_batch10():
-    """_PDF_BBOX_REQUIRED_TYPES 是 _TEXT_TYPES 的子集。"""
-    assert set(mmod._PDF_BBOX_REQUIRED_TYPES).issubset(set(mmod._TEXT_TYPES))
 
 
 def test_module_no_call_at_top_level_batch10():

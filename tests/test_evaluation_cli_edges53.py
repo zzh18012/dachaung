@@ -117,12 +117,6 @@ def test_build_parser_inspect_doc_tolerance_chars_default_30_batch26():
     assert ns.tolerance_chars == 30
 
 
-def test_build_parser_inspect_doc_tolerance_chars_custom_batch26():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json", "--tolerance-chars", "50"])
-    assert ns.tolerance_chars == 50
-
-
 def test_build_parser_run_full_args_batch26():
     p = _build_parser()
     ns = p.parse_args([
@@ -152,11 +146,6 @@ def test_build_parser_run_choices_strict_batch26():
 
 
 # ---------- _format_metric 第二十六批 ----------
-
-
-def test_format_metric_value_zero_int_batch26():
-    out = _format_metric("count", {"value": 0, "reason": None})
-    assert "0" in out
 
 
 def test_format_metric_value_zero_float_batch26():
@@ -852,12 +841,6 @@ def test_signature_format_metric_two_args_batch26():
     assert list(sig.parameters.keys()) == ["name", "metric"]
 
 
-def test_signature_format_metric_annotations_batch26():
-    sig = inspect.signature(_format_metric)
-    assert sig.parameters["name"].annotation == "str"
-    assert sig.parameters["metric"].annotation == "dict"
-
-
 def test_signature_format_metric_return_str_batch26():
     sig = inspect.signature(_format_metric)
     assert sig.return_annotation == "str"
@@ -936,10 +919,6 @@ def test_module_run_inspect_doc_uses_lazy_import_batch26():
     src = _insp.getsource(_run_inspect_doc)
     assert "from evaluation.annotation_metrics import" in src
     assert "from evaluation.metrics import" in src
-
-
-def test_module_format_metric_docstring_present_batch26():
-    assert _format_metric.__doc__ is not None
 
 
 def test_module_build_parser_docstring_missing_ok_batch26():

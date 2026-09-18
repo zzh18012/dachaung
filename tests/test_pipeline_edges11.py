@@ -185,13 +185,6 @@ def test_all_blank_cells_no_elements(tmp_path):
 
 # ---------- schema 通过 + 写盘 ----------
 
-def test_ipynb_doc_passes_schema(tmp_path):
-    doc, errors = _run(tmp_path)
-    assert errors == []
-    from app.schema import validate
-    validate(doc.to_dict())
-
-
 def test_written_json_two_chunks(tmp_path):
     _run(tmp_path)
     on_disk = json.loads(

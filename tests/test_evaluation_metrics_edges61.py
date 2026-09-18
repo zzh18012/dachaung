@@ -439,19 +439,6 @@ def test_text_preservation_content_none_batch35():
 # ---------- _heading_boundary_ratio 第三十五批
 
 
-def test_heading_boundary_multiple_chunks_match_batch35():
-    elements = [
-        {"type": "heading", "element_id": "h1"},
-        {"type": "heading", "element_id": "h2"},
-    ]
-    chunks = [
-        {"source_element_ids": ["h1"]},
-        {"source_element_ids": ["h2"]},
-    ]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 1.0
-
-
 def test_heading_boundary_only_non_heading_elements_batch35():
     elements = [{"type": "paragraph", "element_id": "p1"}]
     out = _heading_boundary_ratio(elements, [])

@@ -36,22 +36,6 @@ def test_build_parser_has_subparsers_action_batch18():
     assert len(sub_actions) == 1
 
 
-def test_build_parser_subparsers_dest_batch18():
-    p = _build_parser()
-    sub_action = next(
-        a for a in p._actions if isinstance(a, argparse._SubParsersAction)
-    )
-    assert sub_action.dest == "command"
-
-
-def test_build_parser_subparsers_required_attr_batch18():
-    p = _build_parser()
-    sub_action = next(
-        a for a in p._actions if isinstance(a, argparse._SubParsersAction)
-    )
-    assert sub_action.required is True
-
-
 def test_build_parser_run_subparser_help_batch18():
     p = _build_parser()
     sub_action = next(

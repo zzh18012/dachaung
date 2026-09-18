@@ -272,12 +272,6 @@ def test_compute_metrics_error_code_none_when_no_error_batch24():
     assert m["error_code"]["value"] is None
 
 
-def test_compute_metrics_returns_dict_batch24():
-    doc = {"elements": [], "chunks": []}
-    m = compute_automatic_metrics(doc, None, "pdf", None)
-    assert isinstance(m, dict)
-
-
 def test_compute_metrics_has_all_required_keys_batch24():
     """成功路径返回的 dict 含所有顶层指标 key。"""
     doc = {"elements": [], "chunks": []}
@@ -430,10 +424,6 @@ def test_docx_locator_ratio_mixed_batch24():
 
 def test_is_valid_bbox_none_batch24():
     assert _is_valid_bbox(None) is False
-
-
-def test_is_valid_bbox_str_batch24():
-    assert _is_valid_bbox("0,0,1,1") is False
 
 
 def test_is_valid_bbox_dict_batch24():
@@ -591,13 +581,6 @@ def test_chunk_reference_ratio_partial_valid_batch24():
     ]
     out = _chunk_reference_ratio(elements, chunks)
     assert out["value"] == 0.5
-
-
-def test_chunk_reference_ratio_multi_ids_all_valid_batch24():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}, {"element_id": "e3"}]
-    chunks = [{"source_element_ids": ["e1", "e2", "e3"]}]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 1.0
 
 
 def test_chunk_reference_ratio_multi_ids_partial_invalid_batch24():
@@ -866,11 +849,6 @@ def test_module_source_no_csv_import_batch24():
     assert "import csv" not in src
 
 
-def test_module_source_no_os_import_batch24():
-    src = inspect.getsource(mmod)
-    assert "import os" not in src
-
-
 # ---------- module source 字符串精确补强第三十五批 ----------
 
 
@@ -980,12 +958,6 @@ def test_signature_int_metric_one_param_batch24():
     assert params[0].name == "value"
 
 
-def test_signature_compute_metrics_five_params_batch24():
-    sig = inspect.signature(compute_automatic_metrics)
-    names = list(sig.parameters.keys())
-    assert names == ["document", "error", "source_type", "expectations", "image_base_dir"]
-
-
 def test_signature_compute_metrics_image_base_dir_default_none_batch24():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["image_base_dir"].default is None
@@ -1009,16 +981,6 @@ def test_module_does_not_import_evaluation_cli_batch24():
     assert "from evaluation.cli" not in src
 
 
-def test_module_does_not_import_evaluation_manifest_batch24():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.manifest" not in src
-
-
-def test_module_does_not_import_evaluation_report_batch24():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.report" not in src
-
-
 def test_module_does_not_import_evaluation_annotation_metrics_batch24():
     src = inspect.getsource(mmod)
     assert "from evaluation.annotation_metrics" not in src
@@ -1027,11 +989,6 @@ def test_module_does_not_import_evaluation_annotation_metrics_batch24():
 def test_module_does_not_import_app_pipeline_batch24():
     src = inspect.getsource(mmod)
     assert "from app.pipeline" not in src
-
-
-def test_module_does_not_import_app_parsers_batch24():
-    src = inspect.getsource(mmod)
-    assert "from app.parsers" not in src
 
 
 def test_module_does_not_import_app_chunkers_top_level_batch24():

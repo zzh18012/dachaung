@@ -269,10 +269,6 @@ def test_evaluator_version_join_round_trip_batch43():
 # ---------- __all__ 第四十三批
 
 
-def test_all_first_evaluator_batch43():
-    assert evaluation.__all__[0] == "EVALUATOR_VERSION"
-
-
 def test_all_second_report_batch43():
     assert evaluation.__all__[1] == "REPORT_VERSION"
 
@@ -292,11 +288,6 @@ def test_all_indices_unique_batch43():
 
 def test_all_no_duplicates_batch43():
     assert len(evaluation.__all__) == len(set(evaluation.__all__))
-
-
-def test_all_entries_are_str_batch43():
-    for name in evaluation.__all__:
-        assert isinstance(name, str)
 
 
 def test_all_entries_exist_as_module_attrs_batch43():
@@ -364,16 +355,6 @@ def test_module_attributes_match_imported_batch43():
 # ---------- 模块源码结构 第四十三批
 
 
-def test_module_source_has_docstring_batch43():
-    src = inspect.getsource(evaluation)
-    assert '"""' in src
-
-
-def test_module_source_has_all_definition_batch43():
-    src = inspect.getsource(evaluation)
-    assert "__all__" in src
-
-
 def test_module_source_evaluator_before_report_batch43():
     """EVALUATOR 出现在 REPORT 之前。"""
     src = inspect.getsource(evaluation)
@@ -413,11 +394,6 @@ def test_module_source_contains_no_modification_batch43():
 def test_module_source_contains_no_fabrication_batch43():
     src = inspect.getsource(evaluation)
     assert "不伪造" in src
-
-
-def test_module_source_contains_no_external_deps_batch43():
-    src = inspect.getsource(evaluation)
-    assert "不依赖" in src
 
 
 def test_module_source_contains_zero_denominator_batch43():
@@ -465,28 +441,6 @@ def test_module_source_manifest_assignment_batch43():
 # ---------- AST 结构检查 第四十三批
 
 
-def test_ast_no_class_definitions_batch43():
-    src = inspect.getsource(evaluation)
-    tree = ast.parse(src)
-    classes = [n for n in tree.body if isinstance(n, ast.ClassDef)]
-    assert classes == []
-
-
-def test_ast_no_function_definitions_batch43():
-    src = inspect.getsource(evaluation)
-    tree = ast.parse(src)
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert funcs == []
-
-
-def test_ast_no_imports_batch43():
-    """模块没有 import 语句。"""
-    src = inspect.getsource(evaluation)
-    tree = ast.parse(src)
-    imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
-    assert imports == []
-
-
 def test_ast_no_async_functions_batch43():
     src = inspect.getsource(evaluation)
     tree = ast.parse(src)
@@ -530,24 +484,6 @@ def test_ast_exactly_four_assignments_batch43():
     assert len(assigns) == 5
 
 
-def test_ast_has_module_docstring_batch43():
-    src = inspect.getsource(evaluation)
-    tree = ast.parse(src)
-    assert len(tree.body) > 0
-    first = tree.body[0]
-    assert isinstance(first, ast.Expr)
-    assert isinstance(first.value, ast.Constant)
-    assert isinstance(first.value.value, str)
-
-
-def test_ast_top_level_only_docstring_assigns_batch43():
-    """顶层节点只有 Expr(docstring) + Assign。"""
-    src = inspect.getsource(evaluation)
-    tree = ast.parse(src)
-    for node in tree.body:
-        assert isinstance(node, (ast.Expr, ast.Assign))
-
-
 def test_ast_evaluator_assignment_first_batch43():
     """第一个 Assign 是 EVALUATOR_VERSION。"""
     src = inspect.getsource(evaluation)
@@ -573,11 +509,6 @@ def test_ast_all_assignment_last_batch43():
 
 def test_module_file_ends_with_init_py_batch43():
     assert evaluation.__file__.endswith("__init__.py")
-
-
-def test_module_file_parent_is_evaluation_batch43():
-    p = Path(evaluation.__file__).resolve().parent
-    assert p.name == "evaluation"
 
 
 def test_module_name_is_evaluation_batch43():
@@ -606,33 +537,6 @@ def test_module_file_size_under_2kb_batch43():
 # ---------- reload 后保持 第四十三批
 
 
-def test_reload_preserves_evaluator_version_batch43():
-    reloaded = importlib.reload(importlib.import_module("evaluation"))
-    assert reloaded.EVALUATOR_VERSION == "1.1"
-
-
-def test_reload_preserves_report_version_batch43():
-    reloaded = importlib.reload(importlib.import_module("evaluation"))
-    assert reloaded.REPORT_VERSION == "1.1"
-
-
-def test_reload_preserves_annotation_version_batch43():
-    reloaded = importlib.reload(importlib.import_module("evaluation"))
-    assert reloaded.ANNOTATION_VERSION == "1.0"
-
-
-def test_reload_preserves_manifest_version_batch43():
-    reloaded = importlib.reload(importlib.import_module("evaluation"))
-    assert reloaded.MANIFEST_VERSION == "1.0"
-
-
-def test_reload_preserves_all_batch43():
-    reloaded = importlib.reload(importlib.import_module("evaluation"))
-    assert reloaded.__all__ == [
-        "EVALUATOR_VERSION", "REPORT_VERSION", "ANNOTATION_VERSION", "MANIFEST_VERSION",
-    ]
-
-
 def test_reload_preserves_docstring_batch43():
     reloaded = importlib.reload(importlib.import_module("evaluation"))
     assert "评测包" in (reloaded.__doc__ or "")
@@ -647,11 +551,6 @@ def test_versions_pair_annotation_manifest_equal_batch43():
 
 def test_versions_pair_evaluator_annotation_differ_batch43():
     assert EVALUATOR_VERSION != ANNOTATION_VERSION
-
-
-def test_versions_two_distinct_values_batch43():
-    values = {EVALUATOR_VERSION, REPORT_VERSION, ANNOTATION_VERSION, MANIFEST_VERSION}
-    assert len(values) == 2
 
 
 def test_versions_evaluator_report_higher_batch43():
@@ -753,20 +652,6 @@ def test_docstring_mentions_pipeline_immutability_batch43():
 
 
 # ---------- 综合 第四十三批
-
-
-def test_module_source_forbidden_tokens_batch43():
-    """__init__.py 不应有任何禁用 token。"""
-    forbidden = ["eval(", "exec(", "pickle", "yaml", "__import__", "breakpoint(",
-                 "shutil", "requests", "subprocess", "os.system", "pty.",
-                 "ctypes", "urllib", "socket"]
-    src = inspect.getsource(evaluation)
-    for token in forbidden:
-        assert token not in src
-
-
-def test_module_has_dunder_all_batch43():
-    assert hasattr(evaluation, "__all__")
 
 
 def test_module_all_len_four_batch43():

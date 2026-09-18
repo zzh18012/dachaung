@@ -373,11 +373,6 @@ def test_format_elements_list_missing_keys_use_question_mark():
     assert "?" in result
 
 
-def test_format_elements_list_returns_str():
-    result = _format_elements_list([], limit=10)
-    assert isinstance(result, str)
-
-
 # =========================================================================
 # _format_chunks_list 深度
 # =========================================================================
@@ -436,11 +431,6 @@ def test_format_chunks_list_preview_long_text():
     assert "…" in result
 
 
-def test_format_chunks_list_returns_str():
-    result = _format_chunks_list([], limit=10)
-    assert isinstance(result, str)
-
-
 def test_format_chunks_list_show_spans_missing_spans_key():
     """chunk 无 source_spans key → show_spans=True 显示 (none)。"""
     chunks = [{"chunk_id": "c1", "text": "x", "source_element_ids": []}]
@@ -451,11 +441,6 @@ def test_format_chunks_list_show_spans_missing_spans_key():
 # =========================================================================
 # _iter_supported_files 深度
 # =========================================================================
-
-
-def test_iter_supported_files_empty_dir(tmp_path: Path):
-    files = _iter_supported_files(tmp_path, recursive=False)
-    assert files == []
 
 
 def test_iter_supported_files_filters_directories(tmp_path: Path):
@@ -830,12 +815,6 @@ def test_infer_parser_name_pdf_mixed_case():
 # =========================================================================
 
 
-def test_main_unknown_command_exits_2():
-    with pytest.raises(SystemExit) as exc:
-        main(["unknown"])
-    assert exc.value.code == 2
-
-
 def test_main_validate_missing_file_returns_2(tmp_path: Path, capsys):
     rc = main(["validate", str(tmp_path / "missing.json")])
     assert rc == 2
@@ -999,11 +978,6 @@ def test_main_inspect_with_limit(tmp_path: Path, capsys):
     assert rc == 0
     out = capsys.readouterr().out
     assert "+3 more" in out
-
-
-def test_main_returns_int(tmp_path: Path):
-    rc = main(["validate", str(tmp_path / "missing.json")])
-    assert isinstance(rc, int)
 
 
 # =========================================================================

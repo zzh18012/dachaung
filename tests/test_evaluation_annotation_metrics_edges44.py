@@ -130,12 +130,6 @@ def test_chunk_boundary_prf_annotation_empty_dict_batch17():
     assert r["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 
-def test_chunk_boundary_prf_annotation_none_batch17():
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
-    r = chunk_boundary_prf(doc, None)
-    assert r["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_no_chunks_key_batch17():
     """doc 无 chunks key → 用 .get() 默认 []。"""
     r = chunk_boundary_prf({}, {"chunk_boundary_anchors": []})

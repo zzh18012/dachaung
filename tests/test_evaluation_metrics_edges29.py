@@ -106,11 +106,6 @@ def test_null_with_emoji_reason():
     assert out["reason"] == "🚨"
 
 
-def test_bool_metric_value_is_bool():
-    out = _bool_metric(1)
-    assert isinstance(out["value"], bool)
-
-
 def test_bool_metric_with_int_0_returns_false():
     out = _bool_metric(0)
     assert out["value"] is False
@@ -154,11 +149,6 @@ def test_int_metric_with_bool_true_returns_1():
     """bool 是 int 子类；int(True)=1。"""
     out = _int_metric(True)
     assert out["value"] == 1
-
-
-def test_int_metric_with_bool_false_returns_0():
-    out = _int_metric(False)
-    assert out["value"] == 0
 
 
 # ---------- _text_preservation 边界第二批 ----------
@@ -814,10 +804,6 @@ def test_silent_drop_does_not_modify_inputs():
 # ---------- _strip_unicode_whitespace 数学边界第五批 ----------
 
 
-def test_strip_unicode_whitespace_with_form_feed_only():
-    assert _strip_unicode_whitespace("\x0c") == ""
-
-
 def test_strip_unicode_whitespace_with_nbsp():
     """NBSP   isspace() True。"""
     assert _strip_unicode_whitespace("a b") == "ab"
@@ -884,14 +870,6 @@ def test_is_valid_bbox_with_mixed_int_float():
 
 def test_is_valid_bbox_with_5_elements():
     assert _is_valid_bbox([0.0, 0.0, 1.0, 1.0, 1.0]) is False
-
-
-def test_is_valid_bbox_with_nan():
-    assert _is_valid_bbox([0.0, 0.0, 1.0, float("nan")]) is False
-
-
-def test_is_valid_bbox_with_inf():
-    assert _is_valid_bbox([0.0, 0.0, 1.0, float("inf")]) is False
 
 
 def test_is_valid_bbox_with_negative_inf():
@@ -1053,11 +1031,6 @@ def test_module_source_no_yield():
     assert "yield" not in src
 
 
-def test_module_source_no_async():
-    src = inspect.getsource(mmod)
-    assert "async " not in src
-
-
 def test_module_source_no_main_block():
     src = inspect.getsource(mmod)
     assert "__main__" not in src
@@ -1128,12 +1101,6 @@ def test_module_source_text_preservation_uses_strip_unicode_whitespace():
     assert "_strip_unicode_whitespace(actual_raw)" in src
 
 
-def test_module_source_text_preservation_uses_counter():
-    src = inspect.getsource(_text_preservation)
-    assert "Counter(expected)" in src
-    assert "Counter(actual)" in src
-
-
 def test_module_source_pdf_locator_uses_isinstance():
     src = inspect.getsource(_pdf_locator_ratio)
     assert "isinstance(page, int)" in src
@@ -1162,20 +1129,9 @@ def test_module_source_image_resource_uses_path():
     assert "Path(rp)" in src
 
 
-def test_module_source_image_resource_uses_isfile_and_stat():
-    src = inspect.getsource(_image_resource_ratio)
-    assert "p.is_file()" in src
-    assert "p.stat().st_size" in src
-
-
 def test_module_source_image_resource_uses_image_base_dir():
     src = inspect.getsource(_image_resource_ratio)
     assert "image_base_dir" in src
-
-
-def test_module_source_chunk_reference_uses_set_comprehension():
-    src = inspect.getsource(_chunk_reference_ratio)
-    assert "{e.get(\"element_id\") for e in elements}" in src
 
 
 def test_module_source_chunk_reference_uses_all():
@@ -1183,22 +1139,11 @@ def test_module_source_chunk_reference_uses_all():
     assert "all(sid in elem_ids for sid in ids)" in src
 
 
-def test_module_source_heading_boundary_uses_set_add():
-    src = inspect.getsource(_heading_boundary_ratio)
-    assert "chunk_first_ids = set()" in src
-    assert "chunk_first_ids.add(ids[0])" in src
-
-
 def test_module_source_silent_drop_uses_max_zero_pattern():
     """silent_drop 用 if actual < exp 而非 max(0, ...)。"""
     src = inspect.getsource(_silent_drop_count)
     assert "if actual < exp:" in src
     assert "drops += (exp - actual)" in src
-
-
-def test_module_source_silent_drop_iterates_items():
-    src = inspect.getsource(_silent_drop_count)
-    assert ".items()" in src
 
 
 # ---------- signatures 精确补强 ----------

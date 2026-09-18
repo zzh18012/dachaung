@@ -319,11 +319,6 @@ def test_manifest_error_message_attribute():
     assert err.args == ("hello",)
 
 
-def test_manifest_error_str():
-    err = ManifestError("hello")
-    assert str(err) == "hello"
-
-
 def test_manifest_error_with_unicode():
     err = ManifestError("失败原因")
     assert "失败原因" in str(err)
@@ -968,11 +963,6 @@ def test_module_source_has_import_json():
     assert "import json" in src
 
 
-def test_module_source_has_dataclass_import():
-    src = inspect.getsource(m)
-    assert "from dataclasses import dataclass" in src
-
-
 def test_module_source_has_pathlib_path():
     src = inspect.getsource(m)
     assert "from pathlib import Path" in src
@@ -981,21 +971,6 @@ def test_module_source_has_pathlib_path():
 def test_module_source_has_typing_any():
     src = inspect.getsource(m)
     assert "from typing import Any" in src
-
-
-def test_module_source_has_evaluation_manifest_version():
-    src = inspect.getsource(m)
-    assert "from evaluation import MANIFEST_VERSION" in src
-
-
-def test_module_source_has_schema_validate():
-    src = inspect.getsource(m)
-    assert "from evaluation.schema import validate" in src
-
-
-def test_module_source_has_class_manifest_error():
-    src = inspect.getsource(m)
-    assert "class ManifestError(Exception):" in src
 
 
 def test_module_source_has_docstring_mentions_relative():
@@ -1011,11 +986,6 @@ def test_module_source_has_docstring_mentions_absolute():
 def test_module_source_has_docstring_mentions_backslash():
     src = inspect.getsource(m)
     assert "反斜杠" in src or "backslash" in src.lower()
-
-
-def test_module_source_has_docstring_mentions_project_root():
-    src = inspect.getsource(m)
-    assert "项目根" in src
 
 
 def test_module_source_no_yield():
@@ -1178,17 +1148,6 @@ def test_module_all_is_list():
     assert isinstance(m.__all__, list)
 
 
-def test_module_has_4_classes():
-    classes = [
-        n for n in dir(m)
-        if isinstance(getattr(m, n), type)
-        and getattr(m, n).__module__ == "evaluation.manifest"
-    ]
-    assert set(classes) == {
-        "ManifestError", "Manifest", "DocumentEntry", "ExpectedFailure",
-    }
-
-
 def test_module_has_3_dataclasses():
     dcs = [
         n for n in dir(m)
@@ -1197,29 +1156,6 @@ def test_module_has_3_dataclasses():
         and getattr(m, n).__module__ == "evaluation.manifest"
     ]
     assert set(dcs) == {"Manifest", "DocumentEntry", "ExpectedFailure"}
-
-
-def test_module_has_1_public_function():
-    public = [
-        n for n in dir(m)
-        if not n.startswith("_")
-        and isinstance(getattr(m, n), FunctionType)
-        and getattr(m, n).__module__ == "evaluation.manifest"
-    ]
-    assert public == ["load_manifest"]
-
-
-def test_module_has_4_private_functions():
-    private = [
-        n for n in dir(m)
-        if n.startswith("_")
-        and not n.startswith("__")
-        and isinstance(getattr(m, n), FunctionType)
-    ]
-    assert set(private) == {
-        "_is_absolute_like", "_has_backslash",
-        "_resolve_relative_path", "_detect_project_root",
-    }
 
 
 def test_module_no_main_block():

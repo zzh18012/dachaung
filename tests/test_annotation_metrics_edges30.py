@@ -813,11 +813,6 @@ def test_chunk_boundary_source_no_async_def():
     assert "async def" not in src
 
 
-def test_chunk_boundary_source_no_global_keyword():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "global " not in src
-
-
 def test_chunk_boundary_source_no_nonlocal_keyword():
     src = inspect.getsource(chunk_boundary_prf)
     assert "nonlocal " not in src
@@ -998,15 +993,6 @@ def test_module_source_no_open_call():
     """模块级不开文件。"""
     src = inspect.getsource(amod)
     assert "\nopen(" not in src
-
-
-def test_module_source_1_module_level_constant_confirmed():
-    src = inspect.getsource(amod)
-    const_count = sum(
-        1 for line in src.splitlines()
-        if line.startswith("PARSER_DOES_NOT_EMIT_RELATIONS =")
-    )
-    assert const_count == 1
 
 
 def test_module_source_2_function_names_exact():
@@ -1204,10 +1190,6 @@ def test_figure_caption_prf_docstring_mentions_null():
 # ---------- 模块整体合理性（第三批） ----------
 
 
-def test_module_namespace_is_module():
-    assert isinstance(amod, types.ModuleType)
-
-
 def test_module_namespace_name():
     assert amod.__name__ == "evaluation.annotation_metrics"
 
@@ -1295,15 +1277,6 @@ def test_module_no_user_defined_classes():
         if isinstance(v, type) and v.__module__ == amod.__name__
     ]
     assert len(classes) == 0
-
-
-def test_module_has_2_module_level_functions_counted():
-    functions = [
-        v for v in vars(amod).values()
-        if isinstance(v, types.FunctionType)
-        and v.__module__ == amod.__name__
-    ]
-    assert len(functions) == 2
 
 
 def test_module_function_names_exact():

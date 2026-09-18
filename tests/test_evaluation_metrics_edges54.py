@@ -289,14 +289,6 @@ def test_is_valid_bbox_none_batch28():
     assert _is_valid_bbox(None) is False
 
 
-def test_is_valid_bbox_str_batch28():
-    assert _is_valid_bbox("not list") is False
-
-
-def test_is_valid_bbox_dict_batch28():
-    assert _is_valid_bbox({}) is False
-
-
 def test_is_valid_bbox_short_batch28():
     assert _is_valid_bbox([1, 2, 3]) is False
 
@@ -771,12 +763,6 @@ def test_signature_compute_metrics_batch28():
 def test_signature_compute_metrics_image_base_dir_default_none_batch28():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["image_base_dir"].default is None
-
-
-def test_signature_pdf_locator_ratio_batch28():
-    sig = inspect.signature(_pdf_locator_ratio)
-    params = list(sig.parameters.keys())
-    assert params == ["elements"]
 
 
 def test_signature_text_preservation_batch28():

@@ -52,16 +52,6 @@ def test_figure_caption_prf_three_keys_only_batch35():
     assert len(out) == 3
 
 
-def test_figure_caption_prf_keys_order_batch35():
-    out = figure_caption_prf(None, None)
-    keys = list(out.keys())
-    assert keys == [
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    ]
-
-
 def test_figure_caption_prf_value_structure_batch35():
     """每个 metric 是 dict 含 value + reason。"""
     out = figure_caption_prf({}, {})

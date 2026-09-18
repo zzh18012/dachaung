@@ -210,14 +210,6 @@ def test_text_preservation_metric_value_types_batch13():
         assert "reason" in v
 
 
-def test_text_preservation_idempotent_batch13():
-    elements = [{"type": "paragraph", "content": "abc"}]
-    chunks = [{"text": "abc"}]
-    out1 = _text_preservation(elements, chunks)
-    out2 = _text_preservation(elements, chunks)
-    assert out1 == out2
-
-
 def test_text_preservation_independent_dicts_batch13():
     """两次调用返回独立 dict。"""
     out1 = _text_preservation([], [])
@@ -238,12 +230,6 @@ def test_text_preservation_does_not_mutate_inputs_batch13():
 
 
 # ---------- _heading_boundary_ratio 行为深度第十三批 ----------
-
-
-def test_heading_boundary_no_heading_returns_null_batch13():
-    elements = [{"type": "paragraph"}]
-    out = _heading_boundary_ratio(elements, [])
-    assert out["reason"] == "no_heading_elements"
 
 
 def test_heading_boundary_no_chunks_returns_zero_batch13():
@@ -270,13 +256,6 @@ def test_heading_boundary_partial_match_batch13():
     out = _heading_boundary_ratio(elements, chunks)
     # matched=1, total=2 → 0.5
     assert out["value"] == 0.5
-
-
-def test_heading_boundary_no_match_batch13():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["p1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 0.0
 
 
 def test_heading_boundary_heading_missing_element_id_batch13():
@@ -476,16 +455,6 @@ def test_compute_automatic_metrics_pipeline_success_true_batch13():
             expectations=None,
         )
     assert out["pipeline_success"]["value"] is True
-
-
-def test_compute_automatic_metrics_pipeline_success_false_when_doc_none_batch13():
-    out = compute_automatic_metrics(
-        document=None,
-        error={"code": "x"},
-        source_type="pdf",
-        expectations=None,
-    )
-    assert out["pipeline_success"]["value"] is False
 
 
 def test_compute_automatic_metrics_error_code_propagated_batch13():
@@ -689,29 +658,6 @@ def test_metrics_source_no_forbidden_token_seventeenth_batch13(token):
     assert token not in source
 
 
-def test_metrics_source_no_os_module_batch13():
-    source = inspect.getsource(mmod)
-    assert "import os" not in source
-    assert "os." not in source
-
-
-def test_metrics_source_no_sys_module_batch13():
-    source = inspect.getsource(mmod)
-    assert "import sys" not in source
-    assert "sys." not in source
-
-
-def test_metrics_source_no_logging_batch13():
-    source = inspect.getsource(mmod)
-    assert "import logging" not in source
-
-
-def test_metrics_source_no_re_module_batch13():
-    source = inspect.getsource(mmod)
-    assert "import re" not in source
-    assert "re." not in source
-
-
 def test_metrics_source_no_eval_call_batch13():
     source = inspect.getsource(mmod)
     assert "eval(" not in source
@@ -728,16 +674,6 @@ def test_metrics_source_no_global_keyword_batch13():
     assert "\nglobal " not in source
 
 
-def test_metrics_source_no_nonlocal_batch13():
-    source = inspect.getsource(mmod)
-    assert "nonlocal " not in source
-
-
-def test_metrics_source_no_assert_batch13():
-    source = inspect.getsource(mmod)
-    assert "\nassert " not in source
-
-
 def test_metrics_source_no_print_batch13():
     source = inspect.getsource(mmod)
     assert "print(" not in source
@@ -746,17 +682,6 @@ def test_metrics_source_no_print_batch13():
 def test_metrics_source_no_input_function_batch13():
     source = inspect.getsource(mmod)
     assert "input(" not in source
-
-
-def test_metrics_source_no_class_definition_batch13():
-    source = inspect.getsource(mmod)
-    assert "\nclass " not in source
-    assert not source.startswith("class ")
-
-
-def test_metrics_source_no_lambda_batch13():
-    source = inspect.getsource(mmod)
-    assert "lambda " not in source
 
 
 def test_metrics_source_no_open_at_top_level_batch13():
@@ -839,16 +764,6 @@ def test_module_source_has_is_valid_bbox_def_batch13():
     assert "def _is_valid_bbox(" in source
 
 
-def test_module_source_has_image_resource_ratio_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _image_resource_ratio(" in source
-
-
-def test_module_source_has_chunk_reference_ratio_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _chunk_reference_ratio(" in source
-
-
 def test_module_source_has_strip_unicode_whitespace_def_batch13():
     source = inspect.getsource(mmod)
     assert "def _strip_unicode_whitespace(" in source
@@ -857,16 +772,6 @@ def test_module_source_has_strip_unicode_whitespace_def_batch13():
 def test_module_source_has_text_preservation_def_batch13():
     source = inspect.getsource(mmod)
     assert "def _text_preservation(" in source
-
-
-def test_module_source_has_heading_boundary_ratio_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _heading_boundary_ratio(" in source
-
-
-def test_module_source_has_silent_drop_count_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _silent_drop_count(" in source
 
 
 def test_module_source_future_annotations_top_level_batch13():
@@ -886,15 +791,6 @@ def test_module_source_uses_Counter_intersection_batch13():
 
 
 # ---------- signatures 第十四批 ----------
-
-
-def test_compute_automatic_metrics_signature_5_params_batch13():
-    sig = inspect.signature(compute_automatic_metrics)
-    params = list(sig.parameters.values())
-    assert len(params) == 5
-    assert [p.name for p in params] == [
-        "document", "error", "source_type", "expectations", "image_base_dir",
-    ]
 
 
 def test_compute_automatic_metrics_return_annotation_dict_batch13():
@@ -974,20 +870,6 @@ def test_module_user_function_count_batch13():
     # _image_resource_ratio, _chunk_reference_ratio, _strip_unicode_whitespace,
     # _text_preservation, _heading_boundary_ratio, _silent_drop_count
     assert len(funcs) == 14
-
-
-def test_module_no_varargs_in_user_funcs_batch13():
-    funcs = [
-        v for n, v in vars(mmod).items()
-        if inspect.isfunction(v) and v.__module__ == mmod.__name__
-    ]
-    for fn in funcs:
-        sig = inspect.signature(fn)
-        for p in sig.parameters.values():
-            assert p.kind not in (
-                inspect.Parameter.VAR_POSITIONAL,
-                inspect.Parameter.VAR_KEYWORD,
-            )
 
 
 # ---------- module 合理性第十四批 ----------

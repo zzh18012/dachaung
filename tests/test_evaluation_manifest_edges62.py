@@ -140,11 +140,6 @@ def test_manifest_file_count_property_batch35():
     assert m.file_count == 1
 
 
-def test_manifest_file_count_empty_batch35():
-    m = Manifest("1.0", "incomplete", (), (), Path("/x"))
-    assert m.file_count == 0
-
-
 def test_manifest_frozen_batch35():
     m = Manifest("1.0", "incomplete", (), (), Path("/x"))
     with pytest.raises(FrozenInstanceError):
@@ -155,11 +150,6 @@ def test_manifest_pdf_count_empty_batch35():
     m = Manifest("1.0", "incomplete", (), (), Path("/x"))
     assert m.pdf_count == 0
     assert m.docx_count == 0
-
-
-def test_manifest_categories_covered_empty_batch35():
-    m = Manifest("1.0", "incomplete", (), (), Path("/x"))
-    assert m.categories_covered == []
 
 
 def test_manifest_content_group_count_empty_batch35():
@@ -291,12 +281,6 @@ def _write_manifest(tmp_path: Path, data: dict) -> Path:
     return p
 
 
-def test_load_manifest_missing_file_raises_batch35(tmp_path):
-    with pytest.raises(ManifestError) as exc:
-        load_manifest(tmp_path / "missing.json", project_root=tmp_path)
-    assert "不存在" in str(exc.value)
-
-
 def test_load_manifest_str_path_argument_batch35(tmp_path):
     """manifest_path 接受 str。"""
     a = tmp_path / "a.pdf"
@@ -425,22 +409,6 @@ def test_load_manifest_categories_empty_tuple_when_absent_batch35(tmp_path):
     assert m.documents[0].categories == ()
 
 
-def test_load_manifest_expected_failures_with_source_type_batch35(tmp_path):
-    bad = tmp_path / "bad.pdf"
-    bad.write_text("y", encoding="utf-8")
-    p = _write_manifest(tmp_path, {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [
-            {"doc_id": "bad1", "path": "bad.pdf",
-             "expected_error_code": "E_PARSE", "source_type": "pdf"},
-        ],
-    })
-    m = load_manifest(p, project_root=tmp_path)
-    assert m.expected_failures[0].source_type == "pdf"
-
-
 def test_load_manifest_expected_failures_default_source_type_none_batch35(tmp_path):
     bad = tmp_path / "bad.pdf"
     bad.write_text("y", encoding="utf-8")
@@ -499,18 +467,6 @@ def test_load_manifest_document_with_backslash_path_raises_batch35(tmp_path):
     with pytest.raises(ManifestError) as exc:
         load_manifest(p, project_root=tmp_path)
     assert "正斜杠" in str(exc.value)
-
-
-def test_load_manifest_document_with_absolute_path_raises_batch35(tmp_path):
-    p = _write_manifest(tmp_path, {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [{"doc_id": "d1", "path": "/etc/passwd", "source_type": "pdf"}],
-        "expected_failures": [],
-    })
-    with pytest.raises(ManifestError) as exc:
-        load_manifest(p, project_root=tmp_path)
-    assert "绝对路径" in str(exc.value)
 
 
 # ---------- _detect_project_root 第三十五批
@@ -650,21 +606,6 @@ def test_module_source_contains_encoding_utf8_batch35():
 def test_module_source_contains_all_list_batch35():
     src = inspect.getsource(mmod)
     assert "__all__" in src
-
-
-def test_module_source_all_contains_manifest_batch35():
-    src = inspect.getsource(mmod)
-    assert '"Manifest"' in src
-
-
-def test_module_source_all_contains_document_entry_batch35():
-    src = inspect.getsource(mmod)
-    assert '"DocumentEntry"' in src
-
-
-def test_module_source_all_contains_expected_failure_batch35():
-    src = inspect.getsource(mmod)
-    assert '"ExpectedFailure"' in src
 
 
 # ---------- signatures 第四十九批

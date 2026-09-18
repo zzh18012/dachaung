@@ -397,36 +397,6 @@ def test_module_source_has_typing_any():
     assert "from typing import Any" in src
 
 
-def test_module_source_has_normalize_text_import():
-    src = inspect.getsource(m)
-    assert "from app.chunkers.structural import normalize_text" in src
-
-
-def test_module_source_has_metrics_helpers_import():
-    src = inspect.getsource(m)
-    assert "from evaluation.metrics import _null, _ratio" in src
-
-
-def test_module_source_has_parser_does_not_emit_constant():
-    src = inspect.getsource(m)
-    assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
-
-
-def test_module_source_has_docstring_mentions_caption():
-    src = inspect.getsource(m)
-    assert "caption" in src.lower()
-
-
-def test_module_source_has_docstring_mentions_relation():
-    src = inspect.getsource(m)
-    assert "relation" in src.lower() or "关联" in src
-
-
-def test_module_source_has_docstring_mentions_marker():
-    src = inspect.getsource(m)
-    assert "marker" in src.lower()
-
-
 def test_module_source_has_docstring_mentions_tolerance():
     src = inspect.getsource(m)
     assert "tolerance" in src.lower() or "容差" in src
@@ -444,24 +414,9 @@ def test_module_source_has_normalize_text_called_with_default():
     assert 'normalize_text(c.get("text") or "")' in src
 
 
-def test_module_source_has_join_with_space():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert '" ".join(norm_chunks)' in src
-
-
 def test_module_source_has_stream_normalize_after_join():
     src = inspect.getsource(chunk_boundary_prf)
     assert "stream = normalize_text(joined_raw)" in src
-
-
-def test_module_source_has_predicted_loop():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "for i, txt in enumerate(norm_chunks):" in src
-
-
-def test_module_source_has_last_chunk_break():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "if i == len(norm_chunks) - 1:" in src
 
 
 def test_module_source_has_find_in_stream():
@@ -547,13 +502,6 @@ def test_chunk_boundary_prf_signature():
     sig = inspect.signature(chunk_boundary_prf)
     params = list(sig.parameters)
     assert params == ["document", "annotation", "tolerance_chars"]
-
-
-def test_chunk_boundary_prf_annotations():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["document"].annotation == "dict[str, Any] | None"
-    assert sig.parameters["annotation"].annotation == "dict[str, Any] | None"
-    assert sig.parameters["tolerance_chars"].annotation == "int"
 
 
 def test_chunk_boundary_prf_default_tolerance():
@@ -658,18 +606,6 @@ def test_e2e_no_match_due_to_tight_tolerance():
     out = chunk_boundary_prf(doc, anno, tolerance_chars=0)
     assert out["chunk_boundary_precision"]["value"] == 0.0
     assert out["chunk_boundary_recall"]["value"] == 0.0
-
-
-def test_e2e_deterministic_across_multiple_runs():
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}, {"text": "c"}]}
-    anno = {"chunk_boundary_anchors": [
-        {"marker": "a", "position": "after"},
-        {"marker": "b", "position": "after"},
-    ]}
-    out1 = chunk_boundary_prf(doc, anno, tolerance_chars=0)
-    out2 = chunk_boundary_prf(doc, anno, tolerance_chars=0)
-    out3 = chunk_boundary_prf(doc, anno, tolerance_chars=0)
-    assert out1 == out2 == out3
 
 
 def test_e2e_with_unicode_chunks():

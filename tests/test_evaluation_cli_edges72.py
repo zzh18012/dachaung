@@ -370,11 +370,6 @@ def test_format_metric_value_true_batch47():
     assert "true" in out  # 小写
 
 
-def test_format_metric_value_false_batch47():
-    out = _format_metric("name", {"value": False, "reason": None})
-    assert "false" in out
-
-
 def test_format_metric_value_float_batch47():
     out = _format_metric("name", {"value": 0.123456, "reason": None})
     assert "0.1235" in out  # 4 位小数
@@ -384,12 +379,6 @@ def test_format_metric_value_int_batch47():
     """int 不是 bool 也不是 float → fallthrough。"""
     out = _format_metric("name", {"value": 42, "reason": None})
     assert "42" in out
-
-
-def test_format_metric_value_dict_batch47():
-    out = _format_metric("name", {"value": {"a": 1, "b": 2}, "reason": None})
-    assert "a=1" in out
-    assert "b=2" in out
 
 
 def test_format_metric_value_dict_sorted_batch47():
@@ -504,11 +493,6 @@ def test_source_contains_RawDescriptionHelpFormatter_batch47():
     assert "RawDescriptionHelpFormatter" in src
 
 
-def test_source_contains_utf8_reconfigure_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "reconfigure" in src
-
-
 def test_source_contains_schannel_or_errors_replace_batch47():
     src = inspect.getsource(cli_mod)
     assert "errors=" in src
@@ -601,13 +585,6 @@ def test_ast_run_inspect_doc_has_nested_function_batch47():
     assert nested[0].name == "_sort_key"
 
 
-def test_ast_format_metric_has_multiple_if_batch47():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_format_metric"][0]
-    ifs = [n for n in func.body if isinstance(n, ast.If)]
-    assert len(ifs) >= 3  # None / bool / float / dict
-
-
 def test_ast_module_has_top_level_if_for_reconfigure_batch47():
     """模块顶层应有 if hasattr(sys.stdout, 'reconfigure')。"""
     tree = ast.parse(inspect.getsource(cli_mod))
@@ -658,11 +635,6 @@ def test_source_no_locals_batch47():
 def test_source_no_os_system_batch47():
     src = inspect.getsource(cli_mod)
     assert "os.system(" not in src
-
-
-def test_source_no_popen_batch47():
-    src = inspect.getsource(cli_mod)
-    assert ".popen(" not in src
 
 
 def test_source_no_yaml_load_batch47():

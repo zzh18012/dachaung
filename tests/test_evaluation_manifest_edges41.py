@@ -552,18 +552,6 @@ def test_module_source_future_annotations_present_batch14():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_json_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import json" in head
-
-
-def test_module_source_imports_dataclass_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from dataclasses import dataclass" in head
-
-
 def test_module_source_imports_pathlib_path_batch14():
     source = inspect.getsource(mmod)
     head = "\n".join(source.split("\n")[:30])
@@ -574,18 +562,6 @@ def test_module_source_imports_typing_any_batch14():
     source = inspect.getsource(mmod)
     head = "\n".join(source.split("\n")[:30])
     assert "from typing import Any" in head
-
-
-def test_module_source_imports_manifest_version_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from evaluation import MANIFEST_VERSION" in head
-
-
-def test_module_source_imports_validate_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from evaluation.schema import validate" in head
 
 
 def test_module_source_defines_manifest_error_batch14():

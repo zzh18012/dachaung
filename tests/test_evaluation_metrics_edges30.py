@@ -965,10 +965,6 @@ def test_is_valid_bbox_string_input():
     assert _is_valid_bbox("0,0,1,1") is False
 
 
-def test_is_valid_bbox_dict_input():
-    assert _is_valid_bbox({"x": 0, "y": 0}) is False
-
-
 def test_is_valid_bbox_tuple_input():
     """tuple 不是 list → False。"""
     assert _is_valid_bbox((0, 0, 1, 1)) is False
@@ -997,10 +993,6 @@ def test_is_valid_bbox_with_string_element():
 
 def test_is_valid_bbox_with_none_element():
     assert _is_valid_bbox([None, 0, 0, 0]) is False
-
-
-def test_is_valid_bbox_with_dict_element():
-    assert _is_valid_bbox([{}, 0, 0, 0]) is False
 
 
 # ---------- _strip_unicode_whitespace 行为深度第三批 ----------
@@ -1088,10 +1080,6 @@ def test_strip_with_only_whitespace():
 
 def test_strip_with_empty_string():
     assert _strip_unicode_whitespace("") == ""
-
-
-def test_strip_preserves_emoji():
-    assert _strip_unicode_whitespace("hello 🌍 world") == "hello🌍world"
 
 
 def test_strip_preserves_digits():
@@ -1335,14 +1323,6 @@ def test_module_source_no_async_def():
     assert "async def" not in src
 
 
-def test_module_source_no_decorators_at_module_level():
-    src = inspect.getsource(mmod)
-    lines = src.splitlines()
-    for i, line in enumerate(lines):
-        if line.startswith("@"):
-            pytest.fail(f"unexpected decorator at line {i}: {line}")
-
-
 def test_module_source_no_class_definition():
     src = inspect.getsource(mmod)
     body_lines = [
@@ -1399,12 +1379,6 @@ def test_module_source_has_4_one_liner_helpers():
     assert "def _ratio(" in src
     assert "def _bool_metric(" in src
     assert "def _int_metric(" in src
-
-
-def test_module_source_no_eval_exec():
-    src = inspect.getsource(mmod)
-    assert "eval(" not in src
-    assert "exec(" not in src
 
 
 def test_module_source_no_compile():
@@ -1648,14 +1622,6 @@ def test_module_has_helpers_callable():
     assert callable(_heading_boundary_ratio)
     assert callable(_silent_drop_count)
     assert callable(compute_automatic_metrics)
-
-
-def test_module_no_user_classes():
-    classes = [
-        v for v in vars(mmod).values()
-        if isinstance(v, type) and v.__module__ == mmod.__name__
-    ]
-    assert len(classes) == 0
 
 
 def test_module_helpers_module_eq_metrics():

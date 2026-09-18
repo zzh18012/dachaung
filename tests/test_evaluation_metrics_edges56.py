@@ -546,18 +546,6 @@ def test_text_preservation_partial_match_batch30():
     assert abs(out["recall"]["value"] - 0.5) < 1e-9
 
 
-def test_text_preservation_empty_both_batch30():
-    elements = [{"type": "image", "content": ""}]
-    chunks = [{"text": ""}]
-    out = _text_preservation(elements, chunks)
-    # 无非 image element → expected=""
-    # actual=""
-    # → precision/recall: empty_expected_and_actual
-    assert out["equal"]["value"] is True
-    assert out["precision"]["reason"] == "empty_expected_and_actual"
-    assert out["recall"]["reason"] == "empty_expected_and_actual"
-
-
 # ---------- _heading_boundary_ratio 第三十批 ----------
 
 

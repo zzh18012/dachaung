@@ -311,13 +311,6 @@ def test_run_inspect_doc_stdout_contains_metrics_lines_batch15(tmp_path, capsys)
 # ---------- main 路由第十五批 ----------
 
 
-def test_main_inspect_doc_invalid_json_returns_1_batch15(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not json}", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 1
-
-
 def test_main_inspect_doc_list_json_returns_1_batch15(tmp_path):
     p = tmp_path / "list.json"
     p.write_text("[1, 2, 3]", encoding="utf-8")
@@ -382,18 +375,6 @@ def test_module_source_forbidden_tokens_round21_batch15(token):
 # ---------- module source 字符串精确补强第十八批 ----------
 
 
-def test_module_source_module_docstring_present_batch15():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:15])
-    assert '"""' in head
-
-
-def test_module_source_future_annotations_present_batch15():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from __future__ import annotations" in head
-
-
 def test_module_source_defines_format_metric_batch15():
     source = inspect.getsource(climod)
     assert "def _format_metric(" in source
@@ -404,19 +385,9 @@ def test_module_source_defines_run_inspect_doc_batch15():
     assert "def _run_inspect_doc(" in source
 
 
-def test_module_source_has_main_guard_batch15():
-    source = inspect.getsource(climod)
-    assert 'if __name__ == "__main__"' in source
-
-
 def test_module_source_has_sys_exit_call_batch15():
     source = inspect.getsource(climod)
     assert "SystemExit" in source or "sys.exit" in source
-
-
-def test_module_source_has_run_subcommand_string_batch15():
-    source = inspect.getsource(climod)
-    assert '"run"' in source or "'run'" in source
 
 
 def test_module_source_has_validate_report_subcommand_string_batch15():
@@ -496,25 +467,8 @@ def test_module_dunder_file_exists_batch15():
     assert climod.__file__ is not None
 
 
-def test_module_dunder_file_cli_py_batch15():
-    assert "evaluation" in climod.__file__
-    assert climod.__file__.endswith("cli.py")
-
-
 def test_module_name_evaluation_cli_batch15():
     assert climod.__name__ == "evaluation.cli"
-
-
-def test_module_has_build_parser_callable_batch15():
-    assert callable(climod._build_parser)
-
-
-def test_module_has_format_metric_callable_batch15():
-    assert callable(climod._format_metric)
-
-
-def test_module_has_run_inspect_doc_callable_batch15():
-    assert callable(climod._run_inspect_doc)
 
 
 def test_module_no_class_definitions_batch15():
@@ -528,62 +482,9 @@ def test_module_no_class_definitions_batch15():
 # ---------- 端到端集成第十八批 ----------
 
 
-def test_e2e_main_inspect_doc_full_flow_batch15(tmp_path, capsys):
-    p = _write_valid_doc(tmp_path)
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-    captured = capsys.readouterr()
-    assert "file:" in captured.out
-    assert "document_id:" in captured.out
-    assert "source:" in captured.out
-    assert "parser:" in captured.out
-    assert "counts:" in captured.out
-    assert "metrics:" in captured.out
-
-
-def test_e2e_main_inspect_doc_with_elements_and_chunks_batch15(tmp_path, capsys):
-    doc = {
-        "document_id": "abc",
-        "source_path": "/x.pdf",
-        "source_type": "pdf",
-        "parser_name": "fallback",
-        "parser_version": "1.0.0",
-        "elements": [
-            {"type": "heading", "element_id": "h1", "content": "Title"},
-            {"type": "paragraph", "element_id": "p1", "content": "Body"},
-        ],
-        "chunks": [
-            {"text": "Title Body", "source_element_ids": ["h1", "p1"]},
-        ],
-    }
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps(doc), encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-    captured = capsys.readouterr()
-    assert "elements=2" in captured.out
-    assert "chunks=1" in captured.out
-
-
-def test_e2e_main_inspect_doc_idempotent_batch15(tmp_path, capsys):
-    p = _write_valid_doc(tmp_path)
-    main(["inspect-doc", str(p)])
-    out1 = capsys.readouterr().out
-    main(["inspect-doc", str(p)])
-    out2 = capsys.readouterr().out
-    assert out1 == out2
-
-
 def test_e2e_main_validate_report_with_invalid_schema_batch15(tmp_path, capsys):
     p = tmp_path / "report.json"
     p.write_text('{"wrong": "shape"}', encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
-
-
-def test_e2e_main_validate_report_with_invalid_json_batch15(tmp_path, capsys):
-    p = tmp_path / "bad.json"
-    p.write_text("{not json}", encoding="utf-8")
     rc = main(["validate-report", str(p)])
     assert rc == 1
 

@@ -65,11 +65,6 @@ def test_schema_validation_error_message_only():
     assert str(e) == "just message"
 
 
-def test_schema_validation_error_default_errors_empty():
-    e = SchemaValidationError("msg")
-    assert e.errors == []
-
-
 def test_schema_validation_error_explicit_errors():
     errs = [{"path": ["x"], "message": "err"}]
     e = SchemaValidationError("msg", errors=errs)
@@ -316,13 +311,6 @@ def test_validate_file_str_path(tmp_path):
     p = tmp_path / "ok.json"
     p.write_text('"hello"', encoding="utf-8")
     validate_file(str(p), schema={"type": "string"})  # 不抛
-
-
-def test_validate_file_empty_file_raises(tmp_path):
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p)
 
 
 # =========================================================================

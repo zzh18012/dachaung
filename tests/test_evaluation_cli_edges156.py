@@ -191,24 +191,6 @@ def test_cli_inspect_counts_five_batch430(tmp_path, capsys):
     assert "counts:      elements=1 chunks=5" in out
 
 
-def test_cli_inspect_tolerance_line_batch430(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("_tolerance_chars                     "
-            "30  (ok)") in out
-
-
-def test_cli_inspect_multiset_batch430(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("text_char_multiset_precision         "
-            "1.0000  (ok)") in out
-    assert ("text_char_multiset_recall            "
-            "1.0000  (ok)") in out
-
-
 # ---------- 源码补强 ----------
 
 def _src():

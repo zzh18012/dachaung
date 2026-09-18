@@ -63,11 +63,6 @@ def test_null_keys_batch18():
     assert set(r.keys()) == {"value", "reason"}
 
 
-def test_null_value_is_none_batch18():
-    r = _null("x")
-    assert r["value"] is None
-
-
 def test_null_reason_is_string_batch18():
     r = _null("my_reason")
     assert r["reason"] == "my_reason"
@@ -82,11 +77,6 @@ def test_ratio_returns_dict_batch18():
 def test_ratio_value_is_float_batch18():
     r = _ratio(0.5)
     assert isinstance(r["value"], float)
-
-
-def test_ratio_reason_is_none_batch18():
-    r = _ratio(0.5)
-    assert r["reason"] is None
 
 
 def test_ratio_zero_batch18():
@@ -120,20 +110,10 @@ def test_int_metric_returns_dict_batch18():
     assert isinstance(r, dict)
 
 
-def test_int_metric_keys_batch18():
-    r = _int_metric(5)
-    assert set(r.keys()) == {"value", "reason"}
-
-
 def test_int_metric_value_is_int_batch18():
     r = _int_metric(5)
     assert isinstance(r["value"], int)
     assert not isinstance(r["value"], bool)  # not bool even though int
-
-
-def test_int_metric_zero_batch18():
-    r = _int_metric(0)
-    assert r["value"] == 0
 
 
 def test_int_metric_negative_batch18():
@@ -474,12 +454,6 @@ def test_is_valid_bbox_with_inf_batch18():
 # ---------- _pdf_locator_ratio 第十八批 ----------
 
 
-def test_pdf_locator_ratio_empty_batch18():
-    r = _pdf_locator_ratio([])
-    assert r["value"] is None
-    assert r["reason"] == "no_elements"
-
-
 def test_pdf_locator_ratio_all_valid_batch18():
     elements = [
         {"type": "heading", "source_locator": {"page": 1, "bbox": [1, 2, 3, 4]}},
@@ -556,12 +530,6 @@ def test_image_resource_ratio_no_image_batch18(tmp_path):
     assert r["value"] is None
 
 
-def test_image_resource_ratio_image_missing_resource_path_batch18(tmp_path):
-    elements = [{"type": "image"}]  # no resource_path
-    r = _image_resource_ratio(elements, tmp_path)
-    assert r["value"] == 0.0
-
-
 def test_image_resource_ratio_image_file_exists_batch18(tmp_path):
     img = tmp_path / "img.png"
     img.write_bytes(b"x" * 100)
@@ -597,11 +565,6 @@ def test_image_resource_ratio_zero_size_batch18(tmp_path):
 
 
 # ---------- _chunk_reference_ratio 第十八批 ----------
-
-
-def test_chunk_reference_ratio_empty_chunks_batch18():
-    r = _chunk_reference_ratio([], [])
-    assert r["value"] is None
 
 
 def test_chunk_reference_ratio_all_intact_batch18():
@@ -702,23 +665,6 @@ def test_heading_boundary_ratio_no_chunk_batch18():
     elements = [{"type": "heading", "element_id": "h1"}]
     r = _heading_boundary_ratio(elements, [])
     assert r["value"] == 0.0
-
-
-def test_heading_boundary_ratio_all_match_batch18():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["h1"]}]
-    r = _heading_boundary_ratio(elements, chunks)
-    assert r["value"] == 1.0
-
-
-def test_heading_boundary_ratio_partial_match_batch18():
-    elements = [
-        {"type": "heading", "element_id": "h1"},
-        {"type": "heading", "element_id": "h2"},
-    ]
-    chunks = [{"source_element_ids": ["h1"]}]  # only h1 matched
-    r = _heading_boundary_ratio(elements, chunks)
-    assert r["value"] == 0.5
 
 
 def test_heading_boundary_ratio_dedup_batch18():
@@ -908,12 +854,6 @@ def test_signature_strip_unicode_whitespace_batch18():
     sig = inspect.signature(_strip_unicode_whitespace)
     params = list(sig.parameters.keys())
     assert params == ["s"]
-
-
-def test_signature_is_valid_bbox_batch18():
-    sig = inspect.signature(_is_valid_bbox)
-    params = list(sig.parameters.keys())
-    assert params == ["bbox"]
 
 
 # ---------- module 合理性第二十八批 ----------

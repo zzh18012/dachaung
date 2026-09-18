@@ -75,12 +75,6 @@ def test_build_parser_run_choices_batch51():
     assert args.parser == "kreuzberg"
 
 
-def test_build_parser_run_invalid_choice_batch51():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--manifest", "m.json", "--output", "o.json", "--parser", "invalid"])
-
-
 def test_build_parser_max_chars_type_int_batch51():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json", "--max-chars", "500"])
@@ -465,24 +459,9 @@ def test_source_contains_ok_marker_batch51():
     assert "[OK]" in src
 
 
-def test_source_contains_error_marker_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "[ERROR]" in src
-
-
-def test_source_contains_fail_marker_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "[FAIL]" in src
-
-
 def test_source_contains_return_0_batch51():
     src = inspect.getsource(cli_mod)
     assert "return 0" in src
-
-
-def test_source_contains_return_1_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "return 1" in src
 
 
 def test_source_contains_required_true_batch51():
@@ -584,26 +563,12 @@ def test_ast_build_parser_has_add_subparsers_batch51():
     assert len(add_sub_calls) == 1
 
 
-def test_ast_main_has_multiple_returns_batch51():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
-    returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
-    assert len(returns) >= 5
-
-
 def test_ast_main_has_4_try_batch51():
     tree = ast.parse(inspect.getsource(cli_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
     tries = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
     # run 路径 3 个（load_manifest / run_evaluation / validate_file）+ validate-report 路径 1 个 = 4
     assert len(tries) == 4
-
-
-def test_ast_main_has_multiple_if_batch51():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
-    ifs = [n for n in ast.walk(func) if isinstance(n, ast.If)]
-    assert len(ifs) >= 3
 
 
 def test_ast_format_metric_has_4_returns_batch51():

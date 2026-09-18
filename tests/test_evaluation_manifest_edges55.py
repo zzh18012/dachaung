@@ -62,10 +62,6 @@ def test_is_absolute_like_two_letter_drive_no_slash_batch28():
     assert _is_absolute_like("ab:foo") is False
 
 
-def test_is_absolute_like_long_relative_path_batch28():
-    assert _is_absolute_like("a/b/c/d/e/f") is False
-
-
 def test_is_absolute_like_just_colon_batch28():
     assert _is_absolute_like(":") is False
 
@@ -592,12 +588,6 @@ def test_signature_is_absolute_like_return_batch28():
 def test_signature_has_backslash_return_batch28():
     sig = inspect.signature(_has_backslash)
     assert sig.return_annotation == "bool"
-
-
-def test_document_entry_init_has_10_params_batch28():
-    import dataclasses
-    fields = dataclasses.fields(DocumentEntry)
-    assert len(fields) == 10
 
 
 # ---------- module 合理性第四十一批 ----------

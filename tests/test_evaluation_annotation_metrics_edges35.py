@@ -751,11 +751,6 @@ def test_module_source_inline_lambda_used_in_sort():
     assert "key=lambda" in src
 
 
-def test_module_source_no_main_block():
-    src = inspect.getsource(amod)
-    assert 'if __name__' not in src
-
-
 def test_module_source_no_sleep():
     src = inspect.getsource(amod)
     assert "time.sleep" not in src
@@ -766,11 +761,6 @@ def test_module_source_no_hardcoded_absolute_path():
     assert "C:\\\\Users" not in src
     assert "C:/Users" not in src
     assert "/home/" not in src
-
-
-def test_module_source_docstring_first_line():
-    src = inspect.getsource(amod)
-    assert src.startswith('"""')
 
 
 def test_module_source_docstring_mentions_chunk_boundary():
@@ -801,16 +791,6 @@ def test_module_source_no_logging():
 def test_module_source_uses_normalize_text_call():
     src = inspect.getsource(amod)
     assert "normalize_text(" in src
-
-
-def test_module_source_uses_null_call():
-    src = inspect.getsource(amod)
-    assert "_null(" in src
-
-
-def test_module_source_uses_ratio_call():
-    src = inspect.getsource(amod)
-    assert "_ratio(" in src
 
 
 # ---------- signatures 第八批 ----------
@@ -906,10 +886,6 @@ def test_module_has_docstring():
 
 def test_module_docstring_starts_with_chinese():
     assert amod.__doc__.strip().startswith("人工标注")
-
-
-def test_module_file_endswith_annotation_metrics_py():
-    assert amod.__file__.replace("\\", "/").endswith("evaluation/annotation_metrics.py")
 
 
 def test_module_name_is_evaluation_annotation_metrics():

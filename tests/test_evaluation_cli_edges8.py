@@ -44,12 +44,6 @@ def test_build_parser_prog_is_evaluation_cli():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_description_nonempty():
-    p = _build_parser()
-    assert p.description is not None
-    assert len(p.description) > 0
-
-
 def test_build_parser_formatter_raw_description():
     p = _build_parser()
     assert p.formatter_class is argparse.RawDescriptionHelpFormatter
@@ -750,11 +744,6 @@ def test_main_return_annotation_int():
 def test_format_metric_return_annotation_str():
     sig = inspect.signature(_format_metric)
     assert "str" in str(sig.return_annotation)
-
-
-def test_run_inspect_doc_signature():
-    sig = inspect.signature(_run_inspect_doc)
-    assert set(sig.parameters) == {"args"}
 
 
 def test_run_inspect_doc_return_annotation_int():

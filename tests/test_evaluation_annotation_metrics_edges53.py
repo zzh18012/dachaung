@@ -440,11 +440,6 @@ def test_module_source_no_unsafe_network_batch26():
         assert tok not in source
 
 
-def test_module_source_no_subprocess_batch26():
-    source = inspect.getsource(amod)
-    assert "subprocess" not in source
-
-
 def test_module_source_no_argparse_batch26():
     source = inspect.getsource(amod)
     assert "argparse" not in source
@@ -487,11 +482,6 @@ def test_module_source_contains_chunk_boundary_prf_batch26():
 def test_module_source_contains_no_ground_truth_anchors_in_stream_batch26():
     source = inspect.getsource(amod)
     assert "no_ground_truth_anchors_in_stream" in source
-
-
-def test_module_source_contains_precision_or_recall_not_evaluated_batch26():
-    source = inspect.getsource(amod)
-    assert "precision_or_recall_not_evaluated" in source
 
 
 def test_module_source_contains_missing_markers_batch26():
@@ -540,12 +530,6 @@ def test_signature_figure_caption_prf_batch26():
 def test_signature_chunk_boundary_prf_batch26():
     sig = inspect.signature(chunk_boundary_prf)
     assert list(sig.parameters.keys()) == ["document", "annotation", "tolerance_chars"]
-
-
-def test_signature_chunk_boundary_prf_document_annotation_batch26():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["document"].annotation == "dict[str, Any] | None"
-    assert sig.parameters["annotation"].annotation == "dict[str, Any] | None"
 
 
 def test_signature_chunk_boundary_prf_tolerance_int_batch26():
@@ -654,12 +638,6 @@ def test_e2e_figure_caption_always_null_batch26():
             out = figure_caption_prf(doc, ann)
             for k in out:
                 assert out[k]["value"] is None
-
-
-def test_e2e_chunk_boundary_doc_none_pipeline_failed_batch26():
-    out = chunk_boundary_prf(None, {"chunk_boundary_anchors": [{"marker": "x"}]})
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["reason"] == "pipeline_failed"
 
 
 def test_e2e_chunk_boundary_annotation_none_no_annotation_batch26():

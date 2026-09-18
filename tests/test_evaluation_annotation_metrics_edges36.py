@@ -429,12 +429,6 @@ def test_chunk_boundary_prf_returns_dict_type():
     assert isinstance(out, dict)
 
 
-def test_chunk_boundary_prf_includes_tolerance_record():
-    out = chunk_boundary_prf(None, None, tolerance_chars=42)
-    assert out["_tolerance_chars"]["value"] == 42
-    assert out["_tolerance_chars"]["reason"] is None
-
-
 def test_chunk_boundary_prf_default_tolerance_30():
     out = chunk_boundary_prf({"chunks": [{"text": "a"}, {"text": "b"}]}, {"chunk_boundary_anchors": []})
     assert out["_tolerance_chars"]["value"] == 30

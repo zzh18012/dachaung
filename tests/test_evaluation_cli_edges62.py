@@ -217,11 +217,6 @@ def test_format_metric_name_short_batch35():
     assert "  y" in out
 
 
-def test_format_metric_reason_unicode_batch35():
-    out = _format_metric("name", {"value": None, "reason": "无标注"})
-    assert "无标注" in out
-
-
 # ---------- _run_inspect_doc 第三十五批
 
 
@@ -566,11 +561,6 @@ def test_module_source_contains_required_true_batch35():
     """subparsers required=True。"""
     src = inspect.getsource(cmod)
     assert "required=True" in src
-
-
-def test_module_source_contains_choices_tuple_batch35():
-    src = inspect.getsource(cmod)
-    assert 'choices=("fallback", "kreuzberg")' in src
 
 
 def test_module_source_contains_argparse_prog_batch35():

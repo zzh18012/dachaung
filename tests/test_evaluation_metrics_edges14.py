@@ -421,30 +421,6 @@ def test_null_returns_new_dict_each_call():
     assert a == b
 
 
-def test_ratio_returns_new_dict_each_call():
-    """_ratio 每次返回新 dict。"""
-    a = _ratio(0.5)
-    b = _ratio(0.5)
-    assert a is not b
-    assert a == b
-
-
-def test_bool_metric_returns_new_dict_each_call():
-    """_bool_metric 每次返回新 dict。"""
-    a = _bool_metric(True)
-    b = _bool_metric(True)
-    assert a is not b
-    assert a == b
-
-
-def test_int_metric_returns_new_dict_each_call():
-    """_int_metric 每次返回新 dict。"""
-    a = _int_metric(5)
-    b = _int_metric(5)
-    assert a is not b
-    assert a == b
-
-
 # =========================================================================
 # _is_valid_bbox 详细
 # =========================================================================

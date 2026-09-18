@@ -88,10 +88,6 @@ def test_preview_leading_trailing_whitespace_stripped_via_split():
     assert _preview("  hello  ") == "hello"
 
 
-def test_preview_only_whitespace():
-    assert _preview("   \n\t  ") == ""
-
-
 def test_preview_width_one_returns_ellipsis_for_long():
     """width=1 → collapsed[:0] + '…' = '…'。"""
     assert _preview("hello world", width=1) == "…"
@@ -427,11 +423,6 @@ def test_format_chunks_list_returns_str():
 # =========================================================================
 
 
-def test_iter_supported_files_empty_dir(tmp_path: Path):
-    result = _iter_supported_files(tmp_path, recursive=False)
-    assert result == []
-
-
 def test_iter_supported_files_filters_by_extension(tmp_path: Path):
     (tmp_path / "a.txt").write_text("x", encoding="utf-8")
     (tmp_path / "b.unknown").write_text("x", encoding="utf-8")
@@ -545,26 +536,6 @@ def test_relative_output_path_different_extensions_no_clash(tmp_path: Path):
 # =========================================================================
 
 
-def test_infer_parser_name_pdf():
-    assert _infer_parser_name(Path("x.pdf")) == "fallback"
-
-
-def test_infer_parser_name_docx():
-    assert _infer_parser_name(Path("x.docx")) == "fallback"
-
-
-def test_infer_parser_name_txt():
-    assert _infer_parser_name(Path("x.txt")) == "text"
-
-
-def test_infer_parser_name_text():
-    assert _infer_parser_name(Path("x.text")) == "text"
-
-
-def test_infer_parser_name_unknown_returns_fallback():
-    assert _infer_parser_name(Path("x.unknown")) == "fallback"
-
-
 def test_infer_parser_name_no_suffix_returns_fallback():
     assert _infer_parser_name(Path("nofile")) == "fallback"
 
@@ -573,10 +544,6 @@ def test_infer_parser_name_uppercase_suffix():
     """大写扩展名 → .lower() → 推断。"""
     assert _infer_parser_name(Path("x.PDF")) == "fallback"
     assert _infer_parser_name(Path("x.MD")) == "markdown"
-
-
-def test_infer_parser_name_mixed_case_suffix():
-    assert _infer_parser_name(Path("x.PdF")) == "fallback"
 
 
 # =========================================================================
@@ -591,11 +558,6 @@ def test_EXTENSION_TO_PARSER_count():
 def test_EXTENSION_TO_PARSER_keys_exact():
     expected = {".pdf", ".docx", ".md", ".markdown", ".html", ".htm", ".txt", ".text", ".ipynb"}
     assert set(_EXTENSION_TO_PARSER.keys()) == expected
-
-
-def test_EXTENSION_TO_PARSER_pdf_and_docx_both_fallback():
-    assert _EXTENSION_TO_PARSER[".pdf"] == "fallback"
-    assert _EXTENSION_TO_PARSER[".docx"] == "fallback"
 
 
 def test_EXTENSION_TO_PARSER_values_are_strings():

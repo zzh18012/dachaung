@@ -375,11 +375,6 @@ def test_module_source_contains_position_before_after_batch44():
     assert "after" in src
 
 
-def test_module_source_contains_greedy_match_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "贪心" in src or "greedy" in src.lower()
-
-
 def test_module_source_contains_used_pred_used_gt_batch44():
     src = inspect.getsource(anno_mod)
     assert "used_pred" in src
@@ -396,34 +391,9 @@ def test_module_source_contains_search_from_batch44():
     assert "search_from" in src
 
 
-def test_module_source_contains_missing_markers_var_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "missing_markers" in src
-
-
 def test_module_source_contains_stream_find_batch44():
     src = inspect.getsource(anno_mod)
     assert "stream.find" in src
-
-
-def test_module_source_contains_pipeline_failed_reason_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "pipeline_failed" in src
-
-
-def test_module_source_contains_no_annotation_reason_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "no_annotation" in src
-
-
-def test_module_source_contains_no_predicted_boundaries_reason_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "no_predicted_boundaries" in src
-
-
-def test_module_source_contains_no_ground_truth_reason_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "no_ground_truth_anchors" in src
 
 
 def test_module_source_contains_precision_or_recall_reason_batch44():
@@ -433,50 +403,16 @@ def test_module_source_contains_precision_or_recall_reason_batch44():
 
 # ---------- __all__ ----------
 
-def test_all_exact_batch44():
-    assert set(anno_mod.__all__) == {
-        "PARSER_DOES_NOT_EMIT_RELATIONS",
-        "figure_caption_prf",
-        "chunk_boundary_prf",
-    }
-
-
-def test_all_count_3_batch44():
-    assert len(anno_mod.__all__) == 3
-
-
 def test_all_no_duplicates_batch44():
     assert len(set(anno_mod.__all__)) == len(anno_mod.__all__)
 
 
-def test_all_entries_are_str_batch44():
-    for e in anno_mod.__all__:
-        assert isinstance(e, str)
-
-
-def test_all_entries_are_attrs_batch44():
-    for e in anno_mod.__all__:
-        assert hasattr(anno_mod, e)
-
-
 # ---------- AST 结构 ----------
-
-def test_ast_top_level_function_count_batch44():
-    tree = ast.parse(inspect.getsource(anno_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 2
-
 
 def test_ast_top_level_function_names_batch44():
     tree = ast.parse(inspect.getsource(anno_mod))
     names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert names == ["figure_caption_prf", "chunk_boundary_prf"]
-
-
-def test_ast_top_level_assign_count_batch44():
-    tree = ast.parse(inspect.getsource(anno_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    assert len(assigns) == 2
 
 
 def test_ast_chunk_boundary_has_for_loops_batch44():
@@ -495,91 +431,13 @@ def test_ast_chunk_boundary_has_if_branches_batch44():
     assert len(ifs) >= 4
 
 
-def test_ast_no_try_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(anno_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.Try)
-
-
-def test_ast_no_while_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(anno_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.While)
-
-
-def test_ast_no_async_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(anno_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
-
-
 def test_ast_no_classdef_in_module_body_batch44():
     tree = ast.parse(inspect.getsource(anno_mod))
     for n in tree.body:
         assert not isinstance(n, ast.ClassDef)
 
 
-def test_ast_from_future_second_batch44():
-    tree = ast.parse(inspect.getsource(anno_mod))
-    first = tree.body[0]
-    assert isinstance(first, ast.Expr)
-    second = tree.body[1]
-    assert isinstance(second, ast.ImportFrom)
-    assert second.module == "__future__"
-
-
-def test_ast_has_imports_batch44():
-    tree = ast.parse(inspect.getsource(anno_mod))
-    imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
-    assert len(imports) >= 3
-
-
 # ---------- forbidden tokens 第九十四批 ----------
-
-def test_source_no_eval_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_popen_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "popen(" not in src
-
-
-def test_source_no_yaml_load_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch44():
-    src = inspect.getsource(anno_mod)
-    assert "pickle.load(" not in src
-
 
 def test_source_no_open_write_batch44():
     src = inspect.getsource(anno_mod)

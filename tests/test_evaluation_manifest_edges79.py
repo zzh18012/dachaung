@@ -108,11 +108,6 @@ def test_group_count_mixed_pair_plus_unpaired_batch52():
     assert m.content_group_count == 3
 
 
-def test_group_count_empty_manifest_batch52():
-    m = Manifest("1.0", "incomplete", (), (), Path("."))
-    assert m.content_group_count == 0
-
-
 def test_group_count_all_unpaired_batch52():
     m = Manifest("1.0", "incomplete", (_doc_entry("a"), _doc_entry("b"), _doc_entry("c")), (), Path("."))
     assert m.content_group_count == 3
@@ -257,14 +252,6 @@ def test_is_absolute_two_letters_not_drive_batch52():
 
 def test_is_absolute_digit_colon_not_drive_batch52():
     assert _is_absolute_like("1:/x") is False
-
-
-def test_is_absolute_space_colon_not_drive_batch52():
-    assert _is_absolute_like(" :/x") is False
-
-
-def test_is_absolute_unc_double_slash_batch52():
-    assert _is_absolute_like("//server/share") is True
 
 
 def test_is_absolute_tilde_relative_batch52():

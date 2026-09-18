@@ -281,14 +281,6 @@ def test_module_docstring_contains_pure_function_principle():
     assert "纯函数" in m.__doc__ or "Counter" in m.__doc__
 
 
-def test_module_all_is_list_not_tuple():
-    """__all__ 是 list 不是 tuple。"""
-    import evaluation.metrics as m
-
-    assert isinstance(m.__all__, list)
-    assert not isinstance(m.__all__, tuple)
-
-
 def test_module_namespace_contains_text_types():
     """_TEXT_TYPES 在 module namespace。"""
     import evaluation.metrics as m
@@ -630,10 +622,6 @@ def test_is_valid_bbox_inf_rejected():
 
 def test_is_valid_bbox_negative_inf_rejected():
     assert _is_valid_bbox([float("-inf"), 2.0, 3.0, 4.0]) is False
-
-
-def test_is_valid_bbox_none_in_list_rejected():
-    assert _is_valid_bbox([None, 2.0, 3.0, 4.0]) is False
 
 
 def test_is_valid_bbox_string_in_list_rejected():

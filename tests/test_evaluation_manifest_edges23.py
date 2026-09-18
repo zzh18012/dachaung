@@ -291,11 +291,6 @@ def test_document_entry_no_to_dict_method():
     assert not hasattr(de, "to_dict")
 
 
-def test_document_entry_source_has_frozen_dataclass():
-    src = inspect.getsource(DocumentEntry)
-    assert "@dataclass(frozen=True)" in src
-
-
 # =========================================================================
 # ExpectedFailure 行为深度补强
 # =========================================================================
@@ -346,11 +341,6 @@ def test_expected_failure_equality():
         expected_error_code="E_X", source_type="pdf",
     )
     assert ef1 == ef2
-
-
-def test_expected_failure_source_has_frozen_dataclass():
-    src = inspect.getsource(ExpectedFailure)
-    assert "@dataclass(frozen=True)" in src
 
 
 # =========================================================================
@@ -1094,16 +1084,6 @@ def test_expected_failure_frozen_setattr_fails():
     )
     with pytest.raises(Exception):
         ef.doc_id = "modified"
-
-
-def test_manifest_frozen_setattr_fails():
-    m = Manifest(
-        manifest_version="1.0", devset_status="incomplete",
-        documents=(), expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    with pytest.raises(Exception):
-        m.devset_status = "complete"
 
 
 def test_document_entry_hashable():

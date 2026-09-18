@@ -59,12 +59,6 @@ def test_parser_inspect_doc_default_tolerance_batch53():
     assert args.tolerance_chars == 30
 
 
-def test_parser_validate_report_positional_batch53():
-    args = _build_parser().parse_args(["validate-report", "r.json"])
-    assert args.command == "validate-report"
-    assert args.input == "r.json"
-
-
 def test_parser_prog_and_description_batch53():
     p = _build_parser()
     assert p.prog == "evaluation.cli"

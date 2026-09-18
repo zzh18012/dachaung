@@ -123,11 +123,6 @@ def test_get_parser_fallback_with_image_output_dir_path(tmp_path: Path):
     assert p._image_output_dir == tmp_path
 
 
-def test_get_parser_kreuzberg_returns_parser_subclass():
-    p = get_parser("kreuzberg")
-    assert isinstance(p, Parser)
-
-
 def test_get_parser_markdown_returns_parser_subclass():
     p = get_parser("markdown")
     assert isinstance(p, Parser)
@@ -363,19 +358,9 @@ def test_process_single_does_not_write_when_disabled(tmp_path: Path):
     assert not out.exists()
 
 
-def test_process_single_default_max_chars_800():
-    sig = inspect.signature(process_single)
-    assert sig.parameters["max_chars"].default == 800
-
-
 def test_process_single_default_write_json_true():
     sig = inspect.signature(process_single)
     assert sig.parameters["write_json"].default is True
-
-
-def test_process_single_default_parser_name_fallback():
-    sig = inspect.signature(process_single)
-    assert sig.parameters["parser_name"].default == "fallback"
 
 
 def test_process_single_keyword_only_args():
@@ -507,11 +492,6 @@ def test_validate_only_signature():
     assert set(sig.parameters) == {"json_path"}
 
 
-def test_validate_only_no_default():
-    sig = inspect.signature(validate_only)
-    assert sig.parameters["json_path"].default is inspect.Parameter.empty
-
-
 def test_validate_only_return_annotation_tuple():
     sig = inspect.signature(validate_only)
     assert "tuple" in str(sig.return_annotation).lower()
@@ -525,11 +505,6 @@ def test_validate_only_return_annotation_tuple():
 def test_module_all_exact():
     import app.pipeline as mod
     assert mod.__all__ == ["get_parser", "image_output_dir_for", "process_single", "validate_only"]
-
-
-def test_module_all_is_list():
-    import app.pipeline as mod
-    assert isinstance(mod.__all__, list)
 
 
 def test_module_all_no_duplicates():

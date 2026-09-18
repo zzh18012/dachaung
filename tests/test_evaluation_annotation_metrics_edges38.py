@@ -438,16 +438,6 @@ def test_annotation_metrics_source_no_forbidden_token_fourteenth_batch11(token):
     assert token not in source
 
 
-def test_annotation_metrics_source_no_unlink_batch11():
-    source = inspect.getsource(amod)
-    assert "unlink" not in source
-
-
-def test_annotation_metrics_source_no_remove_batch11():
-    source = inspect.getsource(amod)
-    assert ".remove(" not in source
-
-
 def test_annotation_metrics_source_no_kill_batch11():
     source = inspect.getsource(amod)
     assert ".kill(" not in source
@@ -632,23 +622,6 @@ def test_signature_chunk_boundary_prf_default_tolerance_30_batch11():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_signature_chunk_boundary_prf_first_two_no_defaults_batch11():
-    sig = inspect.signature(chunk_boundary_prf)
-    params = list(sig.parameters.values())
-    assert params[0].default is inspect.Parameter.empty
-    assert params[1].default is inspect.Parameter.empty
-
-
-def test_signature_funcs_function_type_batch11():
-    for func in (figure_caption_prf, chunk_boundary_prf):
-        assert inspect.isfunction(func)
-
-
-def test_signature_funcs_module_eq_batch11():
-    for func in (figure_caption_prf, chunk_boundary_prf):
-        assert func.__module__ == "evaluation.annotation_metrics"
-
-
 # ---------- module 合理性第十一批 ----------
 
 
@@ -668,14 +641,6 @@ def test_module_all_entries_str_batch11():
 def test_module_has_dunder_file_batch11():
     assert hasattr(amod, "__file__")
     assert amod.__file__ is not None
-
-
-def test_module_dunder_file_endswith_annotation_metrics_py_batch11():
-    import os
-    sep = os.sep
-    assert amod.__file__.endswith("evaluation" + sep + "annotation_metrics.py") or amod.__file__.endswith(
-        "evaluation/annotation_metrics.py"
-    )
 
 
 def test_module_name_is_evaluation_annotation_metrics_batch11():

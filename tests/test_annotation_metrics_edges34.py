@@ -400,14 +400,6 @@ def test_module_has_docstring():
     assert len(amod.__doc__) > 0
 
 
-def test_module_docstring_mentions_chunk_boundary():
-    assert "chunk_boundary" in amod.__doc__
-
-
-def test_module_docstring_mentions_figure_caption():
-    assert "figure_caption" in amod.__doc__
-
-
 def test_module_docstring_mentions_one_to_one():
     """__doc__ 应说明一对一匹配语义。"""
     assert "一对一" in amod.__doc__
@@ -497,11 +489,6 @@ def test_module_source_no_compile():
 def test_module_source_no_subprocess():
     src = inspect.getsource(amod)
     assert "subprocess" not in src
-
-
-def test_module_source_no_unlink():
-    src = inspect.getsource(amod)
-    assert "unlink" not in src
 
 
 def test_module_source_no_open():

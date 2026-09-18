@@ -220,16 +220,6 @@ def test_format_metric_bool_false_batch17():
     assert "false" in s
 
 
-def test_format_metric_float_zero_batch17():
-    s = _format_metric("ratio", {"value": 0.0, "reason": None})
-    assert "0.0000" in s
-
-
-def test_format_metric_float_one_batch17():
-    s = _format_metric("ratio", {"value": 1.0, "reason": None})
-    assert "1.0000" in s
-
-
 def test_format_metric_float_negative_batch17():
     """负数浮点也支持。"""
     s = _format_metric("ratio", {"value": -0.5, "reason": None})
@@ -620,13 +610,6 @@ def test_module_source_has_all_dunder_check_batch17():
 
 
 # ---------- signatures 第三十批 ----------
-
-
-def test_signature_main_batch17():
-    sig = inspect.signature(main)
-    params = list(sig.parameters.keys())
-    assert params == ["argv"]
-    assert sig.parameters["argv"].default is None
 
 
 def test_signature_build_parser_batch17():

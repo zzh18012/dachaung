@@ -277,14 +277,6 @@ def test_run_inspect_doc_full_metrics_section_batch31(capsys, tmp_path):
     assert "document_id: d1" in captured.out
 
 
-def test_run_inspect_doc_returns_int_batch31(tmp_path):
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps({}), encoding="utf-8")
-    args = MagicMock(input=str(p), tolerance_chars=30)
-    rc = _run_inspect_doc(args)
-    assert isinstance(rc, int)
-
-
 # ---------- main 第三十一批 ----------
 
 
@@ -303,11 +295,6 @@ def test_main_run_missing_manifest_raises_systemexit_batch31():
     """缺 --manifest → argparse 拒绝 → SystemExit。"""
     with pytest.raises(SystemExit):
         main(["run", "--output", "o.json"])
-
-
-def test_main_run_missing_output_raises_systemexit_batch31():
-    with pytest.raises(SystemExit):
-        main(["run", "--manifest", "m.json"])
 
 
 def test_main_returns_int_for_validate_report_batch31(tmp_path):
@@ -369,12 +356,6 @@ def test_module_source_no_breakpoint_batch31():
     assert "breakpoint(" not in src
 
 
-def test_module_source_no_open_w_mode_batch31():
-    src = inspect.getsource(climod)
-    assert "'w'" not in src
-    assert '"w"' not in src
-
-
 def test_module_source_no_shutil_batch31():
     src = inspect.getsource(climod)
     assert "shutil" not in src
@@ -391,12 +372,6 @@ def test_module_source_no_unlink_batch31():
 def test_module_source_contains_module_docstring_batch31():
     src = inspect.getsource(climod)
     assert "评测 CLI" in src
-
-
-def test_module_source_contains_usage_doc_batch31():
-    src = inspect.getsource(climod)
-    assert "validate-report" in src
-    assert "inspect-doc" in src
 
 
 def test_module_source_contains_argparse_import_batch31():
@@ -437,46 +412,6 @@ def test_module_source_contains_schema_import_batch31():
 def test_module_source_contains_build_parser_func_batch31():
     src = inspect.getsource(climod)
     assert "def _build_parser()" in src
-
-
-def test_module_source_contains_main_func_batch31():
-    src = inspect.getsource(climod)
-    assert "def main(argv" in src
-
-
-def test_module_source_contains_format_metric_func_batch31():
-    src = inspect.getsource(climod)
-    assert "def _format_metric(name: str, metric: dict) -> str:" in src
-
-
-def test_module_source_contains_run_inspect_doc_func_batch31():
-    src = inspect.getsource(climod)
-    assert "def _run_inspect_doc(args) -> int:" in src
-
-
-def test_module_source_contains_reconfigure_call_batch31():
-    src = inspect.getsource(climod)
-    assert "reconfigure" in src
-
-
-def test_module_source_contains_subparsers_batch31():
-    src = inspect.getsource(climod)
-    assert "add_subparsers" in src
-
-
-def test_module_source_contains_run_command_branch_batch31():
-    src = inspect.getsource(climod)
-    assert 'args.command == "run"' in src
-
-
-def test_module_source_contains_validate_report_branch_batch31():
-    src = inspect.getsource(climod)
-    assert 'args.command == "validate-report"' in src
-
-
-def test_module_source_contains_inspect_doc_branch_batch31():
-    src = inspect.getsource(climod)
-    assert 'args.command == "inspect-doc"' in src
 
 
 def test_module_source_contains_raise_systemexit_batch31():
@@ -630,13 +565,6 @@ def test_e2e_build_parser_inspect_doc_full_parse_batch31():
     assert ns.command == "inspect-doc"
     assert ns.input == "doc.json"
     assert ns.tolerance_chars == 20
-
-
-def test_e2e_format_metric_idempotent_batch31():
-    m = {"value": 1.0, "reason": "ok"}
-    l1 = _format_metric("m1", m)
-    l2 = _format_metric("m1", m)
-    assert l1 == l2
 
 
 def test_e2e_inspect_doc_zero_metrics_batch31(capsys, tmp_path):

@@ -112,10 +112,6 @@ def test_module_loader_has_load_module_batch46():
 
 # ---------- 模块 __spec__ 各字段 ----------
 
-def test_module_spec_name_batch46():
-    assert evaluation.__spec__.name == "evaluation"
-
-
 def test_module_spec_origin_endswith_init_batch46():
     assert evaluation.__spec__.origin is not None
     assert evaluation.__spec__.origin.endswith("__init__.py")
@@ -222,18 +218,6 @@ def test_all_starts_with_evaluator_batch46():
 def test_all_ends_with_manifest_batch46():
     """__all__ 最后一项应该是 MANIFEST_VERSION。"""
     assert evaluation.__all__[-1] == "MANIFEST_VERSION"
-
-
-def test_all_index_report_is_1_batch46():
-    assert evaluation.__all__[1] == "REPORT_VERSION"
-
-
-def test_all_index_annotation_is_2_batch46():
-    assert evaluation.__all__[2] == "ANNOTATION_VERSION"
-
-
-def test_all_index_manifest_is_3_batch46():
-    assert evaluation.__all__[3] == "MANIFEST_VERSION"
 
 
 # ---------- 模块源码字符串补强 ----------

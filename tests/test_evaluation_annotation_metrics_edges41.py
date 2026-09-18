@@ -350,30 +350,6 @@ def test_module_source_future_annotations_present_batch14():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_counter_batch14():
-    source = inspect.getsource(amod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from collections import Counter" in head
-
-
-def test_module_source_imports_typing_any_batch14():
-    source = inspect.getsource(amod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from typing import Any" in head
-
-
-def test_module_source_imports_normalize_text_batch14():
-    source = inspect.getsource(amod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from app.chunkers.structural import normalize_text" in head
-
-
-def test_module_source_imports_null_ratio_batch14():
-    source = inspect.getsource(amod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from evaluation.metrics import _null, _ratio" in head
-
-
 def test_module_source_defines_parser_does_not_emit_relations_batch14():
     source = inspect.getsource(amod)
     assert "PARSER_DOES_NOT_EMIT_RELATIONS" in source
@@ -387,11 +363,6 @@ def test_module_source_defines_figure_caption_prf_batch14():
 def test_module_source_defines_chunk_boundary_prf_batch14():
     source = inspect.getsource(amod)
     assert "def chunk_boundary_prf(" in source
-
-
-def test_module_source_has_dunder_all_batch14():
-    source = inspect.getsource(amod)
-    assert "__all__" in source
 
 
 def test_module_source_dunder_all_3_items_batch14():
@@ -416,11 +387,6 @@ def test_module_source_has_chunk_boundary_anchors_key_batch14():
 def test_module_source_no_subprocess_import_batch14():
     source = inspect.getsource(amod)
     assert "import subprocess" not in source
-
-
-def test_module_source_no_open_call_batch14():
-    source = inspect.getsource(amod)
-    assert "open(" not in source
 
 
 def test_module_source_has_f1_formula_batch14():

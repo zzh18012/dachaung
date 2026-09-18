@@ -73,26 +73,6 @@ def test_evaluator_version_is_str_batch44():
     assert isinstance(EVALUATOR_VERSION, str)
 
 
-def test_annotation_version_is_str_batch44():
-    assert isinstance(ANNOTATION_VERSION, str)
-
-
-def test_manifest_version_is_str_batch44():
-    assert isinstance(MANIFEST_VERSION, str)
-
-
-def test_evaluator_version_not_int_batch44():
-    assert not isinstance(EVALUATOR_VERSION, int)
-
-
-def test_evaluator_version_not_bool_batch44():
-    assert not isinstance(EVALUATOR_VERSION, bool)
-
-
-def test_evaluator_version_not_none_batch44():
-    assert EVALUATOR_VERSION is not None
-
-
 def test_evaluator_version_truthy_batch44():
     assert EVALUATOR_VERSION
 
@@ -108,21 +88,9 @@ def test_evaluator_version_replace_batch44():
     assert EVALUATOR_VERSION.replace(".", "-") == "1-1"
 
 
-def test_evaluator_version_lower_batch44():
-    assert EVALUATOR_VERSION.lower() == "1.1"
-
-
 def test_evaluator_version_no_alpha_batch44():
     """1.1 中无字母，upper == lower。"""
     assert EVALUATOR_VERSION.upper() == EVALUATOR_VERSION.lower()
-
-
-def test_evaluator_version_length_batch44():
-    assert len(EVALUATOR_VERSION) == 3
-
-
-def test_annotation_version_length_batch44():
-    assert len(ANNOTATION_VERSION) == 3
 
 
 # ---------- 版本字符串大小比较 ----------
@@ -130,10 +98,6 @@ def test_annotation_version_length_batch44():
 def test_evaluator_greater_than_annotation_batch44():
     """字符串比较 "1.1" > "1.0"。"""
     assert EVALUATOR_VERSION > ANNOTATION_VERSION
-
-
-def test_annotation_less_than_evaluator_batch44():
-    assert ANNOTATION_VERSION < EVALUATOR_VERSION
 
 
 def test_evaluator_version_indexing_batch44():
@@ -332,19 +296,9 @@ def test_module_source_contains_not_instrumented_batch44():
     assert "not_instrumented" in src
 
 
-def test_module_source_contains_do_not_modify_batch44():
-    src = inspect.getsource(evaluation)
-    assert "不修改" in src
-
-
 def test_module_source_contains_no_fake_batch44():
     src = inspect.getsource(evaluation)
     assert "不伪造" in src
-
-
-def test_module_source_contains_denominator_zero_batch44():
-    src = inspect.getsource(evaluation)
-    assert "分母" in src
 
 
 def test_module_source_contains_normalize_text_batch44():
@@ -353,14 +307,6 @@ def test_module_source_contains_normalize_text_batch44():
 
 
 # ---------- 4 个 assignment 字符串精确 ----------
-
-def test_module_source_has_four_assignments_batch44():
-    src = inspect.getsource(evaluation)
-    assert 'EVALUATOR_VERSION = "1.1"' in src
-    assert 'REPORT_VERSION = "1.1"' in src
-    assert 'ANNOTATION_VERSION = "1.0"' in src
-    assert 'MANIFEST_VERSION = "1.0"' in src
-
 
 # ---------- AST 结构 ----------
 

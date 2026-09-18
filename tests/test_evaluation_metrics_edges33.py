@@ -84,16 +84,6 @@ def test_compute_source_docstring_mentions_image_base_dir():
     assert "image_base_dir" in src
 
 
-def test_compute_source_uses_pipeline_success_eq():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert "pipeline_success = error is None and document is not None" in src
-
-
-def test_compute_source_pipeline_success_assignment_to_metrics():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert 'metrics["pipeline_success"] = _bool_metric(pipeline_success)' in src
-
-
 def test_compute_source_error_code_uses_dict_literal():
     src = inspect.getsource(compute_automatic_metrics)
     assert 'metrics["error_code"] = (' in src
@@ -112,13 +102,6 @@ def test_compute_source_schema_valid_else_branch():
     assert "from evaluation.schema_validation import document_passes_schema" in src
 
 
-def test_compute_source_try_except_for_schema():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert "try:" in src
-    assert "ok = document_passes_schema(document)" in src
-    assert 'metrics["schema_valid"] = _bool_metric(ok)' in src
-
-
 def test_compute_source_exception_branch():
     src = inspect.getsource(compute_automatic_metrics)
     assert "except Exception as e:" in src
@@ -133,36 +116,10 @@ def test_compute_source_second_document_none_check():
     assert src.count("if document is None:") == 2
 
 
-def test_compute_source_11_metric_for_none_loop():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert '"element_count_total"' in src
-    assert '"element_count_by_type"' in src
-    assert '"pdf_locator_valid_ratio"' in src
-    assert '"docx_locator_valid_ratio"' in src
-    assert '"image_resource_exists_ratio"' in src
-    assert '"chunk_reference_intact_ratio"' in src
-    assert '"text_preservation_equal"' in src
-    assert '"text_char_multiset_precision"' in src
-    assert '"text_char_multiset_recall"' in src
-    assert '"heading_boundary_compliance"' in src
-    assert '"silent_drop_count"' in src
-
-
 def test_compute_source_returns_metrics_for_none_branch():
     src = inspect.getsource(compute_automatic_metrics)
     assert "metrics[name] = _null(\"pipeline_failed\")" in src
     assert "return metrics" in src
-
-
-def test_compute_source_uses_get_elements_chunks():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert 'elements = document.get("elements", [])' in src
-    assert 'chunks = document.get("chunks", [])' in src
-
-
-def test_compute_source_int_metric_for_count():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert 'metrics["element_count_total"] = _int_metric(len(elements))' in src
 
 
 def test_compute_source_by_type_dict_init():
@@ -175,11 +132,6 @@ def test_compute_source_by_type_loop():
     assert "for e in elements:" in src
     assert 't = e.get("type", "unknown")' in src
     assert "by_type[t] = by_type.get(t, 0) + 1" in src
-
-
-def test_compute_source_by_type_assignment():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert 'metrics["element_count_by_type"] = {"value": by_type, "reason": None}' in src
 
 
 def test_compute_source_pdf_branch():
@@ -202,39 +154,6 @@ def test_compute_source_docx_branch():
 def test_compute_source_docx_else_not_docx():
     src = inspect.getsource(compute_automatic_metrics)
     assert 'metrics["docx_locator_valid_ratio"] = _null("not_docx_document")' in src
-
-
-def test_compute_source_image_resource_call():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert 'metrics["image_resource_exists_ratio"] = _image_resource_ratio(' in src
-    assert "elements, image_base_dir" in src
-
-
-def test_compute_source_chunk_reference_call():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert 'metrics["chunk_reference_intact_ratio"] = _chunk_reference_ratio(elements, chunks)' in src
-
-
-def test_compute_source_text_preservation_call():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert "text_metrics = _text_preservation(elements, chunks)" in src
-
-
-def test_compute_source_text_preservation_metrics_assignment():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert 'metrics["text_preservation_equal"] = text_metrics["equal"]' in src
-    assert 'metrics["text_char_multiset_precision"] = text_metrics["precision"]' in src
-    assert 'metrics["text_char_multiset_recall"] = text_metrics["recall"]' in src
-
-
-def test_compute_source_heading_boundary_call():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert 'metrics["heading_boundary_compliance"] = _heading_boundary_ratio(elements, chunks)' in src
-
-
-def test_compute_source_silent_drop_call():
-    src = inspect.getsource(compute_automatic_metrics)
-    assert 'metrics["silent_drop_count"] = _silent_drop_count(by_type, expectations)' in src
 
 
 def test_compute_source_no_yield():
@@ -345,39 +264,14 @@ def test_pdf_locator_source_uses_for_e_in_elements():
     assert "for e in elements:" in src
 
 
-def test_pdf_locator_source_uses_loc_assignment():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert 'loc = e.get("source_locator") or {}' in src
-
-
-def test_pdf_locator_source_uses_page_get():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert 'page = loc.get("page")' in src
-
-
-def test_pdf_locator_source_uses_page_lt_1():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "page < 1" in src
-
-
 def test_pdf_locator_source_uses_pdf_bbox_required_types():
     src = inspect.getsource(_pdf_locator_ratio)
     assert "e.get(\"type\") in _PDF_BBOX_REQUIRED_TYPES" in src
 
 
-def test_pdf_locator_source_calls_is_valid_bbox():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "if not _is_valid_bbox(bbox):" in src
-
-
 def test_pdf_locator_source_valid_increment():
     src = inspect.getsource(_pdf_locator_ratio)
     assert "valid += 1" in src
-
-
-def test_pdf_locator_source_return_ratio_calc():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "_ratio(valid / len(elements))" in src
 
 
 def test_pdf_locator_source_no_class():
@@ -418,16 +312,6 @@ def test_docx_locator_source_uses_structural_keys_tuple_full():
         assert k in src
 
 
-def test_docx_locator_source_uses_page_in_loc_check():
-    src = inspect.getsource(_docx_locator_ratio)
-    assert '"page" in loc' in src
-
-
-def test_docx_locator_source_uses_bbox_in_loc_check():
-    src = inspect.getsource(_docx_locator_ratio)
-    assert '"bbox" in loc' in src
-
-
 def test_docx_locator_source_uses_any_structural_keys():
     src = inspect.getsource(_docx_locator_ratio)
     assert "not any(k in loc for k in structural_keys)" in src
@@ -459,24 +343,9 @@ def test_is_valid_bbox_source_uses_isinstance_bool_check():
     assert "return False" in src
 
 
-def test_is_valid_bbox_source_uses_isinstance_int_float():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "isinstance(v, (int, float))" in src
-
-
 def test_is_valid_bbox_source_uses_math_isfinite():
     src = inspect.getsource(_is_valid_bbox)
     assert "math.isfinite(v)" in src
-
-
-def test_is_valid_bbox_source_uses_for_v_in_bbox():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "for v in bbox:" in src
-
-
-def test_is_valid_bbox_source_returns_true_at_end():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "return True" in src
 
 
 def test_is_valid_bbox_source_no_class():
@@ -497,17 +366,6 @@ def test_image_resource_source_docstring_mentions_image():
     assert "image" in src.lower()
 
 
-def test_image_resource_source_uses_list_comprehension():
-    src = inspect.getsource(_image_resource_ratio)
-    assert 'images = [e for e in elements if e.get("type") == "image"]' in src
-
-
-def test_image_resource_source_uses_no_images_branch():
-    src = inspect.getsource(_image_resource_ratio)
-    assert "if not images:" in src
-    assert 'return _null("no_image_elements")' in src
-
-
 def test_image_resource_source_uses_valid_zero_init():
     src = inspect.getsource(_image_resource_ratio)
     assert "valid = 0" in src
@@ -518,20 +376,10 @@ def test_image_resource_source_uses_for_img_in_images():
     assert "for img in images:" in src
 
 
-def test_image_resource_source_uses_get_resource_path():
-    src = inspect.getsource(_image_resource_ratio)
-    assert 'rp = img.get("resource_path")' in src
-
-
 def test_image_resource_source_uses_if_not_rp():
     src = inspect.getsource(_image_resource_ratio)
     assert "if not rp:" in src
     assert "continue" in src
-
-
-def test_image_resource_source_uses_candidates_list():
-    src = inspect.getsource(_image_resource_ratio)
-    assert "candidates: list[Path] = [Path(rp)]" in src
 
 
 def test_image_resource_source_uses_image_base_dir_concat():
@@ -565,27 +413,12 @@ def test_image_resource_source_uses_valid_increment():
     assert "valid += 1" in src
 
 
-def test_image_resource_source_return_ratio():
-    src = inspect.getsource(_image_resource_ratio)
-    assert "_ratio(valid / len(images))" in src
-
-
 # ---------- _chunk_reference_ratio source 第三批 ----------
 
 
 def test_chunk_reference_source_uses_for_c_in_chunks():
     src = inspect.getsource(_chunk_reference_ratio)
     assert "for c in chunks:" in src
-
-
-def test_chunk_reference_source_uses_ids_or_empty():
-    src = inspect.getsource(_chunk_reference_ratio)
-    assert 'ids = c.get("source_element_ids") or []' in src
-
-
-def test_chunk_reference_source_return_ratio():
-    src = inspect.getsource(_chunk_reference_ratio)
-    assert "_ratio(valid / len(chunks))" in src
 
 
 def test_chunk_reference_source_no_class():
@@ -611,24 +444,9 @@ def test_strip_unicode_source_uses_join_with_generator():
     assert '"".join(ch for ch in s' in src
 
 
-def test_strip_unicode_source_uses_not_ch_isspace():
-    src = inspect.getsource(_strip_unicode_whitespace)
-    assert "not ch.isspace()" in src
-
-
-def test_strip_unicode_source_no_re_sub():
-    src = inspect.getsource(_strip_unicode_whitespace)
-    assert "re.sub" not in src
-
-
 def test_strip_unicode_source_no_strip_call():
     src = inspect.getsource(_strip_unicode_whitespace)
     assert ".strip()" not in src
-
-
-def test_strip_unicode_source_no_replace():
-    src = inspect.getsource(_strip_unicode_whitespace)
-    assert ".replace(" not in src
 
 
 # ---------- _text_preservation source 第三批 ----------
@@ -645,11 +463,6 @@ def test_text_preservation_source_uses_expected_raw_join():
     assert 'e.get("content") or ""' in src
     assert 'for e in elements' in src
     assert 'if e.get("type") != "image"' in src
-
-
-def test_text_preservation_source_uses_actual_raw_join():
-    src = inspect.getsource(_text_preservation)
-    assert 'actual_raw = "".join(c.get("text") or "" for c in chunks)' in src
 
 
 def test_text_preservation_source_uses_strip_unicode_for_expected():
@@ -676,11 +489,6 @@ def test_text_preservation_source_counter_init_expected():
 def test_text_preservation_source_counter_init_actual():
     src = inspect.getsource(_text_preservation)
     assert "c_actual = Counter(actual)" in src
-
-
-def test_text_preservation_source_uses_intersection():
-    src = inspect.getsource(_text_preservation)
-    assert "common = sum((c_expected & c_actual).values())" in src
 
 
 def test_text_preservation_source_empty_both_check():
@@ -711,30 +519,12 @@ def test_text_preservation_source_recall_else():
     assert "recall_metric = _ratio(common / sum(c_expected.values()))" in src
 
 
-def test_text_preservation_source_returns_3_keys():
-    src = inspect.getsource(_text_preservation)
-    assert '"equal": equal_metric' in src
-    assert '"precision": precision_metric' in src
-    assert '"recall": recall_metric' in src
-
-
 # ---------- _heading_boundary_ratio source 第三批 ----------
 
 
 def test_heading_boundary_source_docstring_present():
     src = inspect.getsource(_heading_boundary_ratio)
     assert '"""' in src
-
-
-def test_heading_boundary_source_uses_no_heading_branch():
-    src = inspect.getsource(_heading_boundary_ratio)
-    assert "if not headings:" in src
-    assert 'return _null("no_heading_elements")' in src
-
-
-def test_heading_boundary_source_uses_chunk_first_ids_set():
-    src = inspect.getsource(_heading_boundary_ratio)
-    assert "chunk_first_ids = set()" in src
 
 
 def test_heading_boundary_source_uses_for_c_in_chunks():
@@ -753,16 +543,6 @@ def test_heading_boundary_source_uses_if_ids():
     assert "chunk_first_ids.add(ids[0])" in src
 
 
-def test_heading_boundary_source_uses_matched_sum():
-    src = inspect.getsource(_heading_boundary_ratio)
-    assert "matched = sum(1 for h in headings if h.get(\"element_id\") in chunk_first_ids)" in src
-
-
-def test_heading_boundary_source_return_ratio():
-    src = inspect.getsource(_heading_boundary_ratio)
-    assert "_ratio(matched / len(headings))" in src
-
-
 # ---------- _silent_drop_count source 第三批 ----------
 
 
@@ -771,42 +551,9 @@ def test_silent_drop_source_docstring_present():
     assert '"""' in src
 
 
-def test_silent_drop_source_uses_if_not_expectations():
-    src = inspect.getsource(_silent_drop_count)
-    assert "if not expectations:" in src
-    assert 'return _null("no_expectations")' in src
-
-
-def test_silent_drop_source_uses_get_element_count_by_type():
-    src = inspect.getsource(_silent_drop_count)
-    assert 'expected_counts = expectations.get("element_count_by_type") or {}' in src
-
-
-def test_silent_drop_source_uses_if_not_expected_counts():
-    src = inspect.getsource(_silent_drop_count)
-    assert "if not expected_counts:" in src
-    assert 'return _null("no_expectations_element_count")' in src
-
-
-def test_silent_drop_source_uses_drops_zero():
-    src = inspect.getsource(_silent_drop_count)
-    assert "drops = 0" in src
-
-
 def test_silent_drop_source_uses_actual_get():
     src = inspect.getsource(_silent_drop_count)
     assert "actual = by_type.get(t, 0)" in src
-
-
-def test_silent_drop_source_uses_actual_lt_exp_check():
-    src = inspect.getsource(_silent_drop_count)
-    assert "if actual < exp:" in src
-    assert "drops += (exp - actual)" in src
-
-
-def test_silent_drop_source_return_int_metric():
-    src = inspect.getsource(_silent_drop_count)
-    assert "return _int_metric(drops)" in src
 
 
 # ---------- 行为深度第七批 ----------
@@ -844,11 +591,6 @@ def test_ratio_with_zero():
     assert r["value"] == 0.0
 
 
-def test_ratio_with_negative():
-    r = _ratio(-0.5)
-    assert r["value"] == -0.5
-
-
 def test_bool_metric_with_true():
     r = _bool_metric(True)
     assert r == {"value": True, "reason": None}
@@ -859,24 +601,9 @@ def test_bool_metric_with_false():
     assert r == {"value": False, "reason": None}
 
 
-def test_bool_metric_with_truthy_int():
-    r = _bool_metric(1)
-    assert r["value"] is True
-
-
 def test_int_metric_with_int():
     r = _int_metric(42)
     assert r == {"value": 42, "reason": None}
-
-
-def test_int_metric_with_float():
-    r = _int_metric(3.7)
-    assert r["value"] == 3
-
-
-def test_int_metric_with_negative():
-    r = _int_metric(-5)
-    assert r["value"] == -5
 
 
 def test_int_metric_with_string_digit():
@@ -1041,10 +768,6 @@ def test_is_valid_bbox_with_none():
     assert _is_valid_bbox([None, 0, 0, 0]) is False
 
 
-def test_is_valid_bbox_with_string():
-    assert _is_valid_bbox(["a", "b", "c", "d"]) is False
-
-
 def test_is_valid_bbox_none_input():
     assert _is_valid_bbox(None) is False
 
@@ -1106,13 +829,6 @@ def test_image_resource_ratio_with_image_base_dir(tmp_path):
 def test_chunk_reference_ratio_no_chunks():
     r = _chunk_reference_ratio([], [])
     assert r["reason"] == "no_chunks"
-
-
-def test_chunk_reference_ratio_all_valid():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}]
-    chunks = [{"source_element_ids": ["e1", "e2"]}]
-    r = _chunk_reference_ratio(elements, chunks)
-    assert r["value"] == 1.0
 
 
 def test_chunk_reference_ratio_partial_unknown():
@@ -1416,14 +1132,6 @@ def test_module_source_docstring_mentions_text_preservation():
     assert "text_preservation" in mmod.__doc__ or "text_preservation" in mmod.__doc__
 
 
-def test_module_source_docstring_mentions_unicode_whitespace():
-    assert "Unicode 空白" in mmod.__doc__ or "Unicode" in mmod.__doc__
-
-
-def test_module_source_docstring_mentions_counter():
-    assert "Counter" in mmod.__doc__
-
-
 def test_module_source_docstring_mentions_v1_1():
     assert "v1.1" in mmod.__doc__ or "v1.0" in mmod.__doc__
 
@@ -1584,13 +1292,6 @@ def test_signature_int_metric():
     assert params[0].name == "value"
 
 
-def test_signature_docx_locator():
-    sig = inspect.signature(_docx_locator_ratio)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "elements"
-
-
 def test_signature_image_resource():
     sig = inspect.signature(_image_resource_ratio)
     params = list(sig.parameters.values())
@@ -1605,13 +1306,6 @@ def test_signature_chunk_reference():
     assert len(params) == 2
     assert params[0].name == "elements"
     assert params[1].name == "chunks"
-
-
-def test_signature_strip_unicode_whitespace():
-    sig = inspect.signature(_strip_unicode_whitespace)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "s"
 
 
 def test_signature_text_preservation():
@@ -1741,10 +1435,6 @@ def test_module_no_user_classes():
 
 def test_module_name_is_evaluation_metrics():
     assert mmod.__name__ == "evaluation.metrics"
-
-
-def test_module_file_ends_with_metrics_py():
-    assert mmod.__file__.endswith("metrics.py")
 
 
 def test_module_text_types_is_tuple():

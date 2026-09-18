@@ -121,14 +121,6 @@ def test_cli_inspect_counts_batch425(tmp_path, capsys):
     assert "counts:      elements=1 chunks=3" in out
 
 
-def test_cli_inspect_by_type_batch425(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("element_count_by_type                "
-            "paragraph=1  (ok)") in out
-
-
 def test_cli_inspect_multiset_batch425(tmp_path, capsys):
     docp = _doc(tmp_path)
     rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])

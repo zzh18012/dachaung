@@ -35,10 +35,6 @@ def test_parser_const_starts_with_parser_batch40():
     assert PARSER_DOES_NOT_EMIT_RELATIONS.startswith("parser_")
 
 
-def test_parser_const_ends_with_relations_batch40():
-    assert PARSER_DOES_NOT_EMIT_RELATIONS.endswith("_relations")
-
-
 def test_parser_const_module_level_attribute_batch40():
     """模块加载时该常量已绑定（不需要调用函数）。"""
     import evaluation.annotation_metrics as m
@@ -73,13 +69,6 @@ def test_figure_caption_prf_each_value_is_dict_batch40():
     out = figure_caption_prf({"x": 1}, None)
     for k, v in out.items():
         assert isinstance(v, dict)
-
-
-def test_figure_caption_prf_each_value_has_value_reason_batch40():
-    out = figure_caption_prf(None, None)
-    for k, v in out.items():
-        assert "value" in v
-        assert "reason" in v
 
 
 def test_figure_caption_prf_with_fully_populated_inputs_batch40():
@@ -150,11 +139,6 @@ def test_chunk_boundary_prf_always_includes_tolerance_batch40():
     assert "_tolerance_chars" in out1
     assert "_tolerance_chars" in out2
     assert "_tolerance_chars" in out3
-
-
-def test_chunk_boundary_prf_tolerance_value_negative_batch40():
-    out = chunk_boundary_prf(None, None, tolerance_chars=-5)
-    assert out["_tolerance_chars"]["value"] == -5
 
 
 def test_chunk_boundary_prf_tolerance_value_huge_batch40():
@@ -498,11 +482,6 @@ def test_module_source_contains_design_doc_batch40():
     assert "人工标注指标" in src
 
 
-def test_module_source_contains_figure_caption_doc_batch40():
-    src = inspect.getsource(amod)
-    assert "figure-caption" in src or "figure_caption" in src
-
-
 def test_module_source_contains_parser_does_not_emit_relations_const_batch40():
     src = inspect.getsource(amod)
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
@@ -686,8 +665,3 @@ def test_e2e_with_unicode_text_batch40():
 def test_e2e_pipeline_failed_path_batch40():
     out = chunk_boundary_prf(None, None)
     assert out["chunk_boundary_precision"]["reason"] == "pipeline_failed"
-
-
-def test_e2e_no_annotation_path_batch40():
-    out = chunk_boundary_prf({"chunks": [{"text": "a"}]}, None)
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"

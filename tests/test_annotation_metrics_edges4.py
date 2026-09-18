@@ -127,14 +127,6 @@ def test_figure_caption_with_annotation_present_still_null():
     assert out["figure_caption_precision"]["value"] is None
 
 
-def test_figure_caption_value_field_is_none_type():
-    out = figure_caption_prf(None, None)
-    # value 必为 None（不允许其他 falsy 值如 0/False）
-    assert out["figure_caption_precision"]["value"] is None
-    assert out["figure_caption_recall"]["value"] is None
-    assert out["figure_caption_f1"]["value"] is None
-
-
 def test_figure_caption_reason_field_is_str_type():
     out = figure_caption_prf(None, None)
     assert isinstance(out["figure_caption_precision"]["reason"], str)

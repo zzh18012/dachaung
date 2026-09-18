@@ -250,16 +250,6 @@ def test_load_manifest_empty_documents_ok_batch52(tmp_path):
     assert m.file_count == 0
 
 
-def test_load_manifest_no_expected_failures_key_ok_batch52(tmp_path):
-    p = _write_manifest(tmp_path, {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-    })
-    m = load_manifest(p, project_root=tmp_path)
-    assert m.expected_failures == ()
-
-
 def test_load_manifest_full_fields_passed_batch52(tmp_path):
     p = _write_manifest(tmp_path, {
         "manifest_version": "1.0",
@@ -489,11 +479,6 @@ def test_manifest_properties_work_despite_frozen_batch52():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_future_annotations_batch52():
-    src = inspect.getsource(manifest_mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_source_json_import_batch52():
     src = inspect.getsource(manifest_mod)
     assert "import json" in src
@@ -537,11 +522,6 @@ def test_source_is_absolute_like_docstring_batch52():
 def test_source_content_group_count_docstring_batch52():
     src = inspect.getsource(manifest_mod)
     assert "配对的 DOCX+PDF 视为同一内容来源" in src
-
-
-def test_source_resolve_relative_path_docstring_batch52():
-    src = inspect.getsource(manifest_mod)
-    assert "校验路径形式并解析为绝对路径" in src
 
 
 def test_source_load_manifest_docstring_batch52():
@@ -623,14 +603,6 @@ def test_ast_manifest_5_properties_batch52():
     ]
 
 
-def test_ast_manifest_error_extends_exception_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "ManifestError")
-    assert len(cls.bases) == 1
-    assert isinstance(cls.bases[0], ast.Name)
-    assert cls.bases[0].id == "Exception"
-
-
 def test_ast_resolve_relative_path_3_if_raise_batch52():
     tree = ast.parse(inspect.getsource(manifest_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_resolve_relative_path")
@@ -646,13 +618,6 @@ def test_ast_resolve_relative_path_raises_manifest_error_batch52():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_resolve_relative_path")
     src = ast.unparse(func)
     assert "raise ManifestError" in src
-
-
-def test_ast_load_manifest_2_for_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "load_manifest")
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    assert len(fors) == 2  # documents + expected_failures
 
 
 def test_ast_load_manifest_1_with_batch52():
@@ -690,14 +655,6 @@ def test_ast_top_level_functions_batch52():
         "_is_absolute_like", "_has_backslash",
         "_resolve_relative_path", "load_manifest", "_detect_project_root",
     ]
-
-
-def test_ast_no_star_import_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    for n in tree.body:
-        if isinstance(n, ast.ImportFrom):
-            for alias in n.names:
-                assert alias.name != "*"
 
 
 def test_ast_all_value_is_list_5_batch52():

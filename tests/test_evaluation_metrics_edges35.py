@@ -60,11 +60,6 @@ def test_null_with_empty_reason():
     assert r == {"value": None, "reason": ""}
 
 
-def test_ratio_returns_proper_structure():
-    r = _ratio(0.5)
-    assert r == {"value": 0.5, "reason": None}
-
-
 def test_ratio_with_int_input_converts_to_float():
     r = _ratio(1)
     assert r["value"] == 1.0
@@ -80,16 +75,6 @@ def test_ratio_with_negative():
     """负数也接受（虽然业务上不应有）."""
     r = _ratio(-0.5)
     assert r["value"] == -0.5
-
-
-def test_bool_metric_true():
-    r = _bool_metric(True)
-    assert r == {"value": True, "reason": None}
-
-
-def test_bool_metric_false():
-    r = _bool_metric(False)
-    assert r == {"value": False, "reason": None}
 
 
 def test_bool_metric_with_int_converts_to_bool():
@@ -355,12 +340,6 @@ def test_pdf_locator_negative_page_invalid():
     assert r["value"] == 0.0
 
 
-def test_pdf_locator_text_type_requires_bbox():
-    elements = [{"type": "paragraph", "source_locator": {"page": 1}}]  # 无 bbox
-    r = _pdf_locator_ratio(elements)
-    assert r["value"] == 0.0
-
-
 def test_pdf_locator_partial():
     elements = [
         {"type": "heading", "source_locator": {"page": 1, "bbox": [0, 0, 10, 10]}},
@@ -419,24 +398,6 @@ def test_docx_locator_no_elements_returns_null():
     assert r["reason"] == "no_elements"
 
 
-def test_docx_locator_with_paragraph_index():
-    elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 0}}]
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 1.0
-
-
-def test_docx_locator_with_section():
-    elements = [{"type": "paragraph", "source_locator": {"section": 0}}]
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 1.0
-
-
-def test_docx_locator_with_run_index():
-    elements = [{"type": "paragraph", "source_locator": {"run_index": 0}}]
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 1.0
-
-
 def test_docx_locator_with_table_indices():
     elements = [{"type": "table_cell", "source_locator": {"table_index": 0, "row_index": 0, "col_index": 0}}]
     r = _docx_locator_ratio(elements)
@@ -451,12 +412,6 @@ def test_docx_locator_page_rejected():
 
 def test_docx_locator_bbox_rejected():
     elements = [{"type": "paragraph", "source_locator": {"bbox": [0, 0, 10, 10]}}]
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 0.0
-
-
-def test_docx_locator_no_structural_key_rejected():
-    elements = [{"type": "paragraph", "source_locator": {"other_key": "value"}}]
     r = _docx_locator_ratio(elements)
     assert r["value"] == 0.0
 
@@ -632,15 +587,6 @@ def test_text_preservation_both_empty():
     assert r["recall"]["reason"] == "empty_expected_and_actual"
 
 
-def test_text_preservation_perfect_match():
-    elements = [{"type": "paragraph", "content": "hello"}]
-    chunks = [{"text": "hello"}]
-    r = _text_preservation(elements, chunks)
-    assert r["equal"]["value"] is True
-    assert r["precision"]["value"] == 1.0
-    assert r["recall"]["value"] == 1.0
-
-
 def test_text_preservation_actual_missing():
     elements = [{"type": "paragraph", "content": "abc"}]
     chunks = []  # actual = ""
@@ -685,11 +631,6 @@ def test_text_preservation_partial_overlap():
     # precision = 2/3, recall = 2/3
     assert abs(r["precision"]["value"] - 2 / 3) < 1e-6
     assert abs(r["recall"]["value"] - 2 / 3) < 1e-6
-
-
-def test_text_preservation_returns_dict_with_3_keys():
-    r = _text_preservation([], [])
-    assert set(r.keys()) == {"equal", "precision", "recall"}
 
 
 def test_text_preservation_each_key_is_dict():
@@ -766,13 +707,6 @@ def test_heading_boundary_full_match():
     assert r["value"] == 1.0
 
 
-def test_heading_boundary_no_match():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["other"]}]
-    r = _heading_boundary_ratio(elements, chunks)
-    assert r["value"] == 0.0
-
-
 def test_heading_boundary_partial():
     elements = [
         {"type": "heading", "element_id": "h1"},
@@ -781,13 +715,6 @@ def test_heading_boundary_partial():
     chunks = [{"source_element_ids": ["h1"]}]
     r = _heading_boundary_ratio(elements, chunks)
     assert r["value"] == 0.5
-
-
-def test_heading_boundary_chunk_empty_ids():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": []}]
-    r = _heading_boundary_ratio(elements, chunks)
-    assert r["value"] == 0.0
 
 
 def test_heading_boundary_chunk_no_ids_key():
@@ -1174,14 +1101,6 @@ def test_module_source_has_not_evaluated_constant():
     assert '_NOT_EVALUATED = "not_evaluated"' in src
 
 
-def test_module_source_has_4_helpers():
-    src = inspect.getsource(mmod)
-    assert "def _null(" in src
-    assert "def _ratio(" in src
-    assert "def _bool_metric(" in src
-    assert "def _int_metric(" in src
-
-
 def test_module_source_has_compute_automatic_metrics():
     src = inspect.getsource(mmod)
     assert "def compute_automatic_metrics(" in src
@@ -1204,11 +1123,6 @@ def test_module_source_no_class_definitions():
     src = inspect.getsource(mmod)
     assert "\nclass " not in src
     assert not src.startswith("class ")
-
-
-def test_module_source_no_async_def():
-    src = inspect.getsource(mmod)
-    assert "async def " not in src
 
 
 def test_module_source_no_yield():
@@ -1236,18 +1150,6 @@ def test_module_source_no_lambda_at_top_level():
             f"top-level lambda: {stripped}"
 
 
-def test_module_source_no_sleep():
-    src = inspect.getsource(mmod)
-    assert "time.sleep" not in src
-
-
-def test_module_source_no_hardcoded_absolute_path():
-    src = inspect.getsource(mmod)
-    assert "C:\\\\Users" not in src
-    assert "C:/Users" not in src
-    assert "/home/" not in src
-
-
 def test_module_source_no_logging():
     src = inspect.getsource(mmod)
     assert "import logging" not in src
@@ -1261,11 +1163,6 @@ def test_module_source_no_subprocess():
 def test_module_source_no_unlink():
     src = inspect.getsource(mmod)
     assert ".unlink(" not in src
-
-
-def test_module_source_docstring_first_line():
-    src = inspect.getsource(mmod)
-    assert src.startswith('"""')
 
 
 def test_module_source_docstring_mentions_text_preservation():
@@ -1458,10 +1355,6 @@ def test_module_has_docstring():
 
 def test_module_docstring_starts_with_chinese():
     assert mmod.__doc__.strip().startswith("自动指标")
-
-
-def test_module_file_endswith_metrics_py():
-    assert mmod.__file__.replace("\\", "/").endswith("evaluation/metrics.py")
 
 
 def test_module_name_is_evaluation_metrics():

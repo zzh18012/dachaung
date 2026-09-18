@@ -291,19 +291,6 @@ def test_math_invariant_p_equals_r_implies_f1_equals_p():
     assert p == r == f1 == 1.0
 
 
-def test_math_invariant_matched_le_min():
-    """matched ≤ min(num_pred, num_gt)。"""
-    chunks = [_make_chunk("a", "c1"), _make_chunk("b", "c2"), _make_chunk("c", "c3")]
-    doc = _make_doc(chunks)
-    # predict = [1, 3]; 1 anchor matched
-    annotation = {"chunk_boundary_anchors": [_make_anchor("a", "after")]}
-    out = chunk_boundary_prf(doc, annotation, tolerance_chars=30)
-    # matched = 1; num_pred = 2; num_gt = 1
-    # matched ≤ min(2, 1) = 1
-    assert out["chunk_boundary_precision"]["value"] == 1 / 2
-    assert out["chunk_boundary_recall"]["value"] == 1.0
-
-
 def test_math_invariant_f1_le_max_p_r():
     """f1 ≤ max(p, r) 通常成立。"""
     chunks = [_make_chunk("a", "c1"), _make_chunk("b", "c2"), _make_chunk("c", "c3")]
@@ -658,14 +645,6 @@ def test_e2e_does_not_add_missing_markers_when_normal():
 # =========================================================================
 # 模块整体合理性
 # =========================================================================
-
-
-def test_module_all_has_3_entries_in_order():
-    assert ammod.__all__ == [
-        "PARSER_DOES_NOT_EMIT_RELATIONS",
-        "figure_caption_prf",
-        "chunk_boundary_prf",
-    ]
 
 
 def test_module_has_2_module_level_functions():

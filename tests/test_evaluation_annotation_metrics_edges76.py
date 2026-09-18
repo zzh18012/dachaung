@@ -59,12 +59,6 @@ def test_figure_caption_returns_3_nulls_batch51():
         assert v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
 
 
-def test_figure_caption_with_none_inputs_batch51():
-    out = figure_caption_prf(None, None)
-    for k in ("figure_caption_precision", "figure_caption_recall", "figure_caption_f1"):
-        assert out[k]["value"] is None
-
-
 def test_figure_caption_reason_constant_batch51():
     """reason 总是同一个常量。"""
     out1 = figure_caption_prf({}, None)

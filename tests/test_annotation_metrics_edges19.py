@@ -804,16 +804,6 @@ def test_chunk_boundary_prf_source_does_not_contain_json():
     assert "json." not in src
 
 
-def test_chunk_boundary_prf_source_does_not_contain_logging():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "logging" not in src
-
-
-def test_chunk_boundary_prf_source_does_not_contain_os_module():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "import os" not in src
-
-
 def test_chunk_boundary_prf_source_does_not_contain_pathlib():
     src = inspect.getsource(chunk_boundary_prf)
     assert "pathlib" not in src

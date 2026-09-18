@@ -103,18 +103,6 @@ def test_cli_run_recovered_batch418(tmp_path, capsys):
                                 "rate": 1.0}
 
 
-def test_cli_run_recovered_stdout_batch418(tmp_path, capsys):
-    mf = _board(tmp_path)
-    rc, out = _run_cli(capsys, [
-        "run", "--manifest", str(mf),
-        "--output", str(tmp_path / "r.json"),
-        "--parser", "fallback", "--max-chars", "60"])
-    assert rc == 0
-    assert "[OK]" in out
-    assert "documents=1（成功 1，失败 0）" in out
-    assert "pdf=1 docx=0" in out
-
-
 # ---------- inspect-doc ----------
 
 def test_cli_inspect_counts_batch418(tmp_path, capsys):
@@ -138,14 +126,6 @@ def test_cli_inspect_total_batch418(tmp_path, capsys):
     assert rc == 0
     assert ("element_count_total                  "
             "1  (ok)") in out
-
-
-def test_cli_inspect_ref_intact_batch418(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("chunk_reference_intact_ratio         "
-            "1.0000  (ok)") in out
 
 
 # ---------- 源码补强 ----------

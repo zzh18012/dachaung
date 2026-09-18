@@ -99,10 +99,6 @@ def test_is_absolute_like_just_drive_colon_separator_batch23():
 # ---------- _has_backslash 第二十三批 ----------
 
 
-def test_has_backslash_multiple_consecutive_batch23():
-    assert _has_backslash("a\\\\b") is True
-
-
 def test_has_backslash_at_start_batch23():
     assert _has_backslash("\\foo") is True
 
@@ -113,11 +109,6 @@ def test_has_backslash_at_end_batch23():
 
 def test_has_backslash_only_backslash_batch23():
     assert _has_backslash("\\") is True
-
-
-def test_has_backslash_mixed_separators_batch23():
-    """正反斜杠混合。"""
-    assert _has_backslash("a/b\\c") is True
 
 
 def test_has_backslash_no_backslash_only_slashes_batch23():

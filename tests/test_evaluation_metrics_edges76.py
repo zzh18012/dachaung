@@ -189,14 +189,6 @@ def test_pdf_locator_non_text_type_without_bbox_accepted_batch52():
     assert out["value"] == 1.0
 
 
-def test_pdf_locator_locator_empty_dict_batch52():
-    elements = [
-        {"type": "paragraph", "source_locator": {}},
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_no_page_field_batch52():
     elements = [
         {"type": "paragraph", "source_locator": {"bbox": [0, 0, 10, 10]}},
@@ -264,25 +256,10 @@ def test_docx_locator_multiple_structural_keys_batch52():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_no_structural_keys_rejected_batch52():
-    elements = [{"type": "paragraph", "source_locator": {"unknown_key": "x"}}]
-    out = _docx_locator_ratio(elements)
-    # unknown_key 不在 structural_keys → continue
-    assert out["value"] == 0.0
-
-
 # ---------- _is_valid_bbox 更深 ----------
 
 def test_is_valid_bbox_length_3_rejected_batch52():
     assert _is_valid_bbox([0, 0, 10]) is False
-
-
-def test_is_valid_bbox_all_int_batch52():
-    assert _is_valid_bbox([0, 0, 100, 200]) is True
-
-
-def test_is_valid_bbox_all_float_batch52():
-    assert _is_valid_bbox([0.0, 0.0, 100.5, 200.5]) is True
 
 
 def test_is_valid_bbox_mixed_int_float_batch52():
@@ -295,10 +272,6 @@ def test_is_valid_bbox_string_rejected_batch52():
 
 def test_is_valid_bbox_nested_list_rejected_batch52():
     assert _is_valid_bbox([[0], [0], [10], [10]]) is False
-
-
-def test_is_valid_bbox_inf_rejected_batch52():
-    assert _is_valid_bbox([0, 0, math.inf, 10]) is False
 
 
 def test_is_valid_bbox_nan_rejected_batch52():

@@ -47,10 +47,6 @@ def test_is_absolute_like_single_alpha_no_colon_batch16():
     assert _is_absolute_like("a") is False
 
 
-def test_is_absolute_like_multi_alpha_batch16():
-    assert _is_absolute_like("abcd") is False
-
-
 def test_is_absolute_like_two_letters_colon_batch16():
     """AB:foo - 第 0 是字母, 第 1 是 B（不是 :）。"""
     assert _is_absolute_like("AB:foo") is False
@@ -627,16 +623,6 @@ def test_module_source_has_expectations_field_batch16():
 def test_module_source_has_categories_field_batch16():
     src = inspect.getsource(mmod)
     assert "categories: tuple[str, ...]" in src
-
-
-def test_module_source_has_pdf_count_property_batch16():
-    src = inspect.getsource(mmod)
-    assert "def pdf_count(self) -> int:" in src
-
-
-def test_module_source_has_docx_count_property_batch16():
-    src = inspect.getsource(mmod)
-    assert "def docx_count(self) -> int:" in src
 
 
 def test_module_source_has_frozenset_in_content_group_batch16():

@@ -120,12 +120,6 @@ def test_chunk_boundary_prf_document_none_returns_pipeline_failed_batch21():
     assert out["chunk_boundary_f1"]["reason"] == "pipeline_failed"
 
 
-def test_chunk_boundary_prf_annotation_is_none_returns_no_annotation_batch21():
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
-    out = chunk_boundary_prf(doc, None)
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_no_chunks_returns_no_predicted_batch21():
     doc = {"chunks": []}
     out = chunk_boundary_prf(doc, {"chunk_boundary_anchors": [{"marker": "x", "position": "after"}]})

@@ -402,11 +402,6 @@ def test_main_inspect_doc_extra_arg_raises_systemexit_batch34():
         main(["inspect-doc", "a.json", "extra"])
 
 
-def test_main_validate_report_extra_arg_raises_systemexit_batch34():
-    with pytest.raises(SystemExit):
-        main(["validate-report", "a.json", "extra"])
-
-
 def test_main_run_parser_invalid_choice_raises_systemexit_batch34():
     with pytest.raises(SystemExit):
         main(["run", "--manifest", "x", "--output", "y", "--parser", "invalid"])
@@ -732,13 +727,3 @@ def test_e2e_inspect_doc_full_docx_batch34(tmp_path, capsys):
     assert rc == 0
     captured = capsys.readouterr()
     assert "docx_locator_valid_ratio" in captured.out
-
-
-def test_e2e_inspect_doc_with_tolerance_chars_batch34(tmp_path):
-    p = tmp_path / "doc.json"
-    p.write_text(
-        json.dumps({"source_type": "pdf", "elements": [], "chunks": []}),
-        encoding="utf-8",
-    )
-    rc = main(["inspect-doc", str(p), "--tolerance-chars", "100"])
-    assert rc == 0

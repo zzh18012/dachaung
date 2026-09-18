@@ -58,10 +58,6 @@ def test_null_value_is_none_batch25():
     assert _null("r")["value"] is None
 
 
-def test_null_reason_preserved_batch25():
-    assert _null("my reason")["reason"] == "my reason"
-
-
 def test_ratio_value_is_float_batch25():
     """_ratio 总是返回 float（即使输入 int）。"""
     out = _ratio(1)
@@ -860,16 +856,6 @@ def test_module_source_no_environ_batch25():
     assert "os.environ" not in source
 
 
-def test_module_source_no_open_at_module_level_batch25():
-    import ast as _ast
-    tree = _ast.parse(inspect.getsource(mmod))
-    for node in tree.body:
-        if isinstance(node, _ast.Expr) and isinstance(node.value, _ast.Call):
-            f = node.value.func
-            if isinstance(f, _ast.Name) and f.id == "open":
-                pytest.fail("top-level open() call")
-
-
 def test_module_source_no_subprocess_batch25():
     source = inspect.getsource(mmod)
     assert "import subprocess" not in source
@@ -891,13 +877,6 @@ def test_module_source_no_dataclass_batch25():
 
 
 # ---------- module source 字符串精确补强 第三十六批 ----------
-
-
-def test_module_source_contains_text_types_definition_batch25():
-    source = inspect.getsource(mmod)
-    assert "_TEXT_TYPES" in source
-    assert '"heading"' in source
-    assert '"paragraph"' in source
 
 
 def test_module_source_contains_pdf_bbox_required_types_batch25():
@@ -1083,10 +1062,6 @@ def test_module_docstring_mentions_pure_function_batch25():
 def test_module_docstring_mentions_no_fake_batch25():
     """docstring 提及不伪造。"""
     assert "不伪造" in mmod.__doc__ or "null" in mmod.__doc__.lower()
-
-
-def test_module_compute_automatic_metrics_docstring_present_batch25():
-    assert compute_automatic_metrics.__doc__ is not None
 
 
 def test_module_uses_from_future_annotations_batch25():

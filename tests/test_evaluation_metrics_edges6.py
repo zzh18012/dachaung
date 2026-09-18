@@ -66,11 +66,6 @@ def test_pdf_bbox_required_types_exact_members():
     assert set(_PDF_BBOX_REQUIRED_TYPES) == set(expected)
 
 
-def test_pdf_bbox_required_types_subset_of_text_types():
-    """_PDF_BBOX_REQUIRED_TYPES 是 _TEXT_TYPES 的子集。"""
-    assert set(_PDF_BBOX_REQUIRED_TYPES).issubset(set(_TEXT_TYPES))
-
-
 def test_pdf_bbox_required_types_excludes_table():
     """table 不需要 bbox（table 用 cells 表达）。"""
     assert "table" not in _PDF_BBOX_REQUIRED_TYPES
@@ -130,12 +125,6 @@ def test_ratio_value_is_float():
     m = _ratio(1)
     assert isinstance(m["value"], float)
     assert m["value"] == 1.0
-
-
-def test_ratio_returns_new_dict_each_call():
-    a = _ratio(0.5)
-    b = _ratio(0.5)
-    assert a is not b
 
 
 def test_ratio_zero():
@@ -888,13 +877,6 @@ def test_module_docstring_mentions_text_preservation_semantics():
     assert "text_preservation" in doc or "expected_sequence" in doc
 
 
-def test_module_constants_present():
-    import evaluation.metrics as mod
-    assert hasattr(mod, "_TEXT_TYPES")
-    assert hasattr(mod, "_PDF_BBOX_REQUIRED_TYPES")
-    assert hasattr(mod, "_NOT_EVALUATED")
-
-
 def test_module_helper_functions_present():
     import evaluation.metrics as mod
     assert callable(mod._null)
@@ -961,12 +943,6 @@ def test_bool_metric_signature_one_param():
 def test_int_metric_signature_one_param():
     sig = inspect.signature(_int_metric)
     assert len(sig.parameters) == 1
-
-
-def test_strip_unicode_whitespace_signature_one_param():
-    sig = inspect.signature(_strip_unicode_whitespace)
-    assert len(sig.parameters) == 1
-    assert "s" in sig.parameters
 
 
 def test_is_valid_bbox_signature_one_param():

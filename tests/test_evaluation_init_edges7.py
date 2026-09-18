@@ -148,10 +148,6 @@ def test_module_file_endswith_init_py_batch48():
     assert evaluation.__file__.endswith("__init__.py")
 
 
-def test_module_file_is_absolute_batch48():
-    assert Path(evaluation.__file__).is_absolute()
-
-
 def test_module_file_exists_batch48():
     assert Path(evaluation.__file__).is_file()
 
@@ -355,11 +351,6 @@ def test_source_contains_MANIFEST_VERSION_literal_batch48():
     assert 'MANIFEST_VERSION = "1.0"' in src
 
 
-def test_source_contains_no_class_def_batch48():
-    src = inspect.getsource(evaluation)
-    assert "\nclass " not in src
-
-
 def test_source_contains_no_def_batch48():
     src = inspect.getsource(evaluation)
     assert "\ndef " not in src
@@ -437,12 +428,6 @@ def test_ast_all_targets_name_batch48():
     assert target.id == "__all__"
 
 
-def test_ast_all_value_is_list_batch48():
-    tree = ast.parse(inspect.getsource(evaluation))
-    all_assign = tree.body[5]
-    assert isinstance(all_assign.value, ast.List)
-
-
 def test_ast_all_list_elts_count_batch48():
     tree = ast.parse(inspect.getsource(evaluation))
     all_assign = tree.body[5]
@@ -457,29 +442,10 @@ def test_ast_all_list_elts_constants_batch48():
         assert isinstance(e.value, str)
 
 
-def test_ast_all_list_elts_values_batch48():
-    tree = ast.parse(inspect.getsource(evaluation))
-    all_assign = tree.body[5]
-    values = [e.value for e in all_assign.value.elts]
-    assert values == ["EVALUATOR_VERSION", "REPORT_VERSION", "ANNOTATION_VERSION", "MANIFEST_VERSION"]
-
-
 def test_ast_no_import_batch48():
     tree = ast.parse(inspect.getsource(evaluation))
     for n in tree.body:
         assert not isinstance(n, (ast.Import, ast.ImportFrom))
-
-
-def test_ast_no_function_def_batch48():
-    tree = ast.parse(inspect.getsource(evaluation))
-    for n in tree.body:
-        assert not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
-
-
-def test_ast_no_control_flow_batch48():
-    tree = ast.parse(inspect.getsource(evaluation))
-    for n in tree.body:
-        assert not isinstance(n, (ast.If, ast.For, ast.While, ast.Try, ast.With))
 
 
 # ---------- forbidden tokens 第一百一十三批 ----------
@@ -514,11 +480,6 @@ def test_source_no_os_system_batch48():
     assert "os.system(" not in src
 
 
-def test_source_no_popen_batch48():
-    src = inspect.getsource(evaluation)
-    assert ".popen(" not in src
-
-
 def test_source_no_yaml_load_batch48():
     src = inspect.getsource(evaluation)
     assert "yaml.load(" not in src
@@ -527,21 +488,6 @@ def test_source_no_yaml_load_batch48():
 def test_source_no_pickle_load_batch48():
     src = inspect.getsource(evaluation)
     assert "pickle.load(" not in src
-
-
-def test_source_no_subprocess_batch48():
-    src = inspect.getsource(evaluation)
-    assert "subprocess" not in src
-
-
-def test_source_no_await_batch48():
-    src = inspect.getsource(evaluation)
-    assert "await " not in src
-
-
-def test_source_no_raise_batch48():
-    src = inspect.getsource(evaluation)
-    assert "raise " not in src
 
 
 # ---------- 综合 ----------

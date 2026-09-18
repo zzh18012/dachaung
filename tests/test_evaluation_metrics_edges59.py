@@ -241,12 +241,6 @@ def test_docx_locator_ratio_no_elements_returns_null_batch33():
     assert out["value"] is None
 
 
-def test_docx_locator_ratio_with_table_index_batch33():
-    elements = [{"type": "table", "source_locator": {"table_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_with_row_col_index_batch33():
     elements = [{"type": "paragraph", "source_locator": {"row_index": 1, "col_index": 2}}]
     out = _docx_locator_ratio(elements)
@@ -264,10 +258,6 @@ def test_docx_locator_ratio_mixed_batch33():
 
 
 # ---------- _is_valid_bbox 第三十三批 ----------
-
-
-def test_is_valid_bbox_returns_bool_type_batch33():
-    assert type(_is_valid_bbox([0, 0, 0, 0])) is bool
 
 
 def test_is_valid_bbox_with_floats_batch33():

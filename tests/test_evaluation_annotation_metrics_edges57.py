@@ -360,16 +360,6 @@ def test_module_source_contains_parser_does_not_emit_relations_const_batch30():
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
 
 
-def test_module_source_contains_figure_caption_func_batch30():
-    src = inspect.getsource(amod)
-    assert "def figure_caption_prf" in src
-
-
-def test_module_source_contains_chunk_boundary_func_batch30():
-    src = inspect.getsource(amod)
-    assert "def chunk_boundary_prf" in src
-
-
 def test_module_source_contains_one_to_one_matching_batch30():
     src = inspect.getsource(amod)
     assert "一对一" in src
@@ -511,16 +501,6 @@ def test_module_no_main_block_batch30():
 
 
 # ---------- 端到端集成第四十三批 ----------
-
-
-def test_e2e_chunk_boundary_perfect_match_batch30():
-    """端到端：完美匹配 → P=R=F1=1.0。"""
-    doc = {"chunks": [{"text": "hello"}, {"text": "world"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "hello", "position": "after"}]}
-    out = chunk_boundary_prf(doc, ann, tolerance_chars=0)
-    assert out["chunk_boundary_precision"]["value"] == 1.0
-    assert out["chunk_boundary_recall"]["value"] == 1.0
-    assert out["chunk_boundary_f1"]["value"] == 1.0
 
 
 def test_e2e_chunk_boundary_three_chunks_two_anchors_batch30():

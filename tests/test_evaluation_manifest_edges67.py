@@ -60,10 +60,6 @@ def test_is_absolute_like_lowercase_drive_with_forward_slash_batch40():
     assert _is_absolute_like("c:/foo") is True
 
 
-def test_is_absolute_like_uppercase_drive_with_backslash_batch40():
-    assert _is_absolute_like("D:\\foo") is True
-
-
 def test_is_absolute_like_relative_with_colon_batch40():
     """'a:b' 不被识别为绝对路径（无分隔符）。"""
     assert _is_absolute_like("a:b") is False
@@ -224,27 +220,6 @@ def test_document_entry_field_count_ten_batch40():
     assert len(fields(DocumentEntry)) == 10
 
 
-def test_document_entry_field_names_batch40():
-    names = {f.name for f in fields(DocumentEntry)}
-    expected = {
-        "doc_id", "path_str", "resolved_path", "source_type", "sha256",
-        "categories", "paired_with", "annotation_file_str",
-        "annotation_resolved", "expectations",
-    }
-    assert names == expected
-
-
-def test_document_entry_frozen_batch40():
-    d = _make_doc_entry()
-    with pytest.raises(FrozenInstanceError):
-        d.doc_id = "modified"  # type: ignore
-
-
-def test_document_entry_sha256_optional_batch40():
-    d = _make_doc_entry(sha256=None)
-    assert d.sha256 is None
-
-
 def test_document_entry_sha256_str_batch40():
     d = _make_doc_entry(sha256="a" * 64)
     assert d.sha256 == "a" * 64
@@ -324,17 +299,6 @@ def test_expected_failure_field_count_five_batch40():
     assert len(fields(ExpectedFailure)) == 5
 
 
-def test_expected_failure_frozen_batch40():
-    ef = _make_ef()
-    with pytest.raises(FrozenInstanceError):
-        ef.doc_id = "modified"  # type: ignore
-
-
-def test_expected_failure_source_type_optional_batch40():
-    ef = _make_ef(source_type=None)
-    assert ef.source_type is None
-
-
 def test_expected_failure_source_type_str_batch40():
     ef = _make_ef(source_type="pdf")
     assert ef.source_type == "pdf"
@@ -395,12 +359,6 @@ def test_manifest_file_count_empty_batch40():
     assert m.file_count == 0
 
 
-def test_manifest_file_count_three_batch40():
-    docs = [_make_doc_entry(doc_id=f"d{i}") for i in range(3)]
-    m = _make_manifest(docs=docs)
-    assert m.file_count == 3
-
-
 def test_manifest_pdf_count_only_pdfs_batch40():
     docs = [
         _make_doc_entry(doc_id="d1", source_type="pdf"),
@@ -436,15 +394,6 @@ def test_manifest_no_other_source_types_counted_batch40():
     assert m.pdf_count == 0
     assert m.docx_count == 0
     assert m.file_count == 1
-
-
-def test_manifest_categories_covered_sorted_batch40():
-    docs = [
-        _make_doc_entry(doc_id="d1", categories=("z", "a")),
-        _make_doc_entry(doc_id="d2", categories=("m",)),
-    ]
-    m = _make_manifest(docs=docs)
-    assert m.categories_covered == ["a", "m", "z"]
 
 
 def test_manifest_categories_covered_empty_batch40():
@@ -499,11 +448,6 @@ def test_manifest_content_group_count_one_sided_pair_batch40():
     assert m.content_group_count == 1
 
 
-def test_manifest_devset_status_value_batch40():
-    m = _make_manifest(devset_status="complete")
-    assert m.devset_status == "complete"
-
-
 def test_manifest_project_root_value_batch40():
     pr = Path("/some/project")
     m = _make_manifest(project_root=pr)
@@ -548,12 +492,6 @@ def test_manifest_error_is_exception_batch40():
 def test_manifest_error_with_message_batch40():
     err = ManifestError("boom")
     assert str(err) == "boom"
-
-
-def test_manifest_error_can_be_raised_batch40():
-    with pytest.raises(ManifestError) as exc:
-        raise ManifestError("test")
-    assert "test" in str(exc.value)
 
 
 def test_manifest_error_can_be_caught_as_exception_batch40():
@@ -629,12 +567,6 @@ def _write_valid_manifest(tmp_path: Path) -> Path:
 
 def test_load_manifest_callable_batch40():
     assert callable(load_manifest)
-
-
-def test_load_manifest_missing_file_raises_batch40(tmp_path):
-    with pytest.raises(ManifestError) as exc:
-        load_manifest(tmp_path / "missing.json")
-    assert "清单文件不存在" in str(exc.value)
 
 
 def test_load_manifest_invalid_json_raises_batch40(tmp_path):
@@ -987,19 +919,9 @@ def test_module_source_contains_utf8_keyword_batch40():
     assert 'encoding="utf-8"' in src
 
 
-def test_module_source_contains_relative_path_keyword_batch40():
-    src = inspect.getsource(mmod)
-    assert "相对路径" in src
-
-
 def test_module_source_contains_absolute_path_keyword_batch40():
     src = inspect.getsource(mmod)
     assert "绝对路径" in src
-
-
-def test_module_source_contains_backslash_keyword_batch40():
-    src = inspect.getsource(mmod)
-    assert "反斜杠" in src
 
 
 def test_module_source_contains_categories_keyword_batch40():
@@ -1124,11 +1046,6 @@ def test_module_all_contains_document_entry_batch40():
 
 def test_module_all_contains_expected_failure_batch40():
     assert "ExpectedFailure" in mmod.__all__
-
-
-def test_module_does_not_export_helpers_batch40():
-    for name in ("_is_absolute_like", "_has_backslash", "_resolve_relative_path", "_detect_project_root"):
-        assert name not in mmod.__all__
 
 
 def test_module_has_manifest_error_attr_batch40():

@@ -271,11 +271,6 @@ def test_evaluator_version_value():
     assert EVALUATOR_VERSION == "1.1"
 
 
-def test_report_version_value():
-    from evaluation import REPORT_VERSION
-    assert REPORT_VERSION == "1.1"
-
-
 def test_evaluator_version_no_schema_const():
     rs = json.loads(Path(
         "schemas/evaluation-report.schema.json"

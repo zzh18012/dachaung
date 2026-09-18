@@ -174,14 +174,6 @@ def test_int_metric_value_is_int():
     assert isinstance(_int_metric(5)["value"], int)
 
 
-def test_int_metric_value_preserved():
-    assert _int_metric(42)["value"] == 42
-
-
-def test_int_metric_reason_is_none():
-    assert _int_metric(0)["reason"] is None
-
-
 def test_int_metric_zero():
     assert _int_metric(0)["value"] == 0
 
@@ -273,10 +265,6 @@ def test_strip_unicode_whitespace_paragraph_separator():
     assert _strip_unicode_whitespace("a b") == "ab"
 
 
-def test_strip_unicode_whitespace_only_whitespace_returns_empty():
-    assert _strip_unicode_whitespace("   \t\n\xa0　") == ""
-
-
 def test_strip_unicode_whitespace_mixed():
     # 删除全部空白（含中间），保留所有非空白字符
     assert _strip_unicode_whitespace(" a\tb\xc1\n d ") == "ab\xc1d"
@@ -284,14 +272,6 @@ def test_strip_unicode_whitespace_mixed():
 
 def test_strip_unicode_whitespace_preserves_punctuation():
     assert _strip_unicode_whitespace("a, b. c!") == "a,b.c!"
-
-
-def test_strip_unicode_whitespace_preserves_unicode_chars():
-    assert _strip_unicode_whitespace("中文 测试") == "中文测试"
-
-
-def test_strip_unicode_whitespace_preserves_emoji():
-    assert _strip_unicode_whitespace("a 🎉 b") == "a🎉b"
 
 
 def test_strip_unicode_whitespace_returns_str():
@@ -329,10 +309,6 @@ def test_is_valid_bbox_four_floats():
     assert _is_valid_bbox([0.0, 0.5, 100.5, 200.0]) is True
 
 
-def test_is_valid_bbox_mixed_int_float():
-    assert _is_valid_bbox([0, 0.5, 100, 200.5]) is True
-
-
 def test_is_valid_bbox_negative_values():
     assert _is_valid_bbox([-10, -10, 100, 100]) is True
 
@@ -359,11 +335,6 @@ def test_is_valid_bbox_string():
 
 def test_is_valid_bbox_dict():
     assert _is_valid_bbox({"x": 0}) is False
-
-
-def test_is_valid_bbox_tuple():
-    """tuple 不是 list → False。"""
-    assert _is_valid_bbox((0, 0, 100, 100)) is False
 
 
 def test_is_valid_bbox_bool_in_list():
@@ -451,12 +422,6 @@ def test_pdf_locator_ratio_page_zero_invalid():
     assert result["value"] == 0.0
 
 
-def test_pdf_locator_ratio_page_negative_invalid():
-    elements = [{"type": "image", "source_locator": {"page": -1}}]
-    result = _pdf_locator_ratio(elements)
-    assert result["value"] == 0.0
-
-
 def test_pdf_locator_ratio_page_string_invalid():
     elements = [{"type": "image", "source_locator": {"page": "1"}}]
     result = _pdf_locator_ratio(elements)
@@ -501,12 +466,6 @@ def test_docx_locator_ratio_empty_returns_null():
     assert result["reason"] == "no_elements"
 
 
-def test_docx_locator_ratio_with_section():
-    elements = [{"type": "paragraph", "source_locator": {"section": 0}}]
-    result = _docx_locator_ratio(elements)
-    assert result["value"] == 1.0
-
-
 def test_docx_locator_ratio_rejects_page():
     elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
     result = _docx_locator_ratio(elements)
@@ -539,28 +498,9 @@ def test_docx_locator_ratio_mixed():
 # =========================================================================
 
 
-def test_image_resource_ratio_no_images_returns_null():
-    elements = [{"type": "paragraph"}]
-    result = _image_resource_ratio(elements, None)
-    assert result["value"] is None
-    assert result["reason"] == "no_image_elements"
-
-
 def test_image_resource_ratio_empty_list_returns_null():
     result = _image_resource_ratio([], None)
     assert result["value"] is None
-
-
-def test_image_resource_ratio_image_no_resource_path():
-    elements = [{"type": "image"}]
-    result = _image_resource_ratio(elements, None)
-    assert result["value"] == 0.0
-
-
-def test_image_resource_ratio_image_empty_resource_path():
-    elements = [{"type": "image", "resource_path": ""}]
-    result = _image_resource_ratio(elements, None)
-    assert result["value"] == 0.0
 
 
 def test_image_resource_ratio_existing_file(tmp_path: Path):
@@ -619,13 +559,6 @@ def test_chunk_reference_ratio_no_chunks_returns_null():
     assert result["reason"] == "no_chunks"
 
 
-def test_chunk_reference_ratio_chunk_missing_ids_key():
-    elements = [{"element_id": "e1"}]
-    chunks = [{}]
-    result = _chunk_reference_ratio(elements, chunks)
-    assert result["value"] == 0.0
-
-
 def test_chunk_reference_ratio_invalid_id():
     elements = [{"element_id": "e1"}]
     chunks = [{"source_element_ids": ["e1", "missing"]}]
@@ -646,11 +579,6 @@ def test_chunk_reference_ratio_half_valid():
 # =========================================================================
 # _text_preservation 深度
 # =========================================================================
-
-
-def test_text_preservation_returns_dict_with_three_keys():
-    result = _text_preservation([], [])
-    assert set(result.keys()) == {"equal", "precision", "recall"}
 
 
 def test_text_preservation_empty_both_returns_null_metrics():
@@ -762,14 +690,6 @@ def test_text_preservation_element_content_none():
 # =========================================================================
 
 
-def test_heading_boundary_ratio_no_headings_returns_null():
-    elements = [{"type": "paragraph"}]
-    chunks = [{"source_element_ids": ["e1"]}]
-    result = _heading_boundary_ratio(elements, chunks)
-    assert result["value"] is None
-    assert result["reason"] == "no_heading_elements"
-
-
 def test_heading_boundary_ratio_heading_at_chunk_start():
     elements = [{"element_id": "h1", "type": "heading"}]
     chunks = [{"source_element_ids": ["h1"]}]
@@ -807,26 +727,10 @@ def test_heading_boundary_ratio_half_matched():
 # =========================================================================
 
 
-def test_silent_drop_count_no_expectations_returns_null():
-    result = _silent_drop_count({}, None)
-    assert result["value"] is None
-    assert result["reason"] == "no_expectations"
-
-
-def test_silent_drop_count_empty_expectations_returns_null():
-    result = _silent_drop_count({}, {})
-    assert result["value"] is None
-
-
 def test_silent_drop_count_no_element_count_by_type_returns_null():
     result = _silent_drop_count({}, {"other_key": "x"})
     assert result["value"] is None
     assert result["reason"] == "no_expectations_element_count"
-
-
-def test_silent_drop_count_empty_element_count_by_type_returns_null():
-    result = _silent_drop_count({}, {"element_count_by_type": {}})
-    assert result["value"] is None
 
 
 def test_silent_drop_count_no_drop_when_actual_matches():

@@ -196,22 +196,6 @@ def test_chunk_boundary_prf_chunk_text_missing_batch34():
     assert "_missing_markers" in out
 
 
-def test_chunk_boundary_prf_does_not_mutate_doc_batch34():
-    doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
-    doc_before = json.dumps(doc, sort_keys=True)
-    ann = {"chunk_boundary_anchors": [{"marker": "c", "position": "after"}]}
-    chunk_boundary_prf(doc, ann)
-    assert json.dumps(doc, sort_keys=True) == doc_before
-
-
-def test_chunk_boundary_prf_does_not_mutate_ann_batch34():
-    doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "c", "position": "after"}]}
-    ann_before = json.dumps(ann, sort_keys=True)
-    chunk_boundary_prf(doc, ann)
-    assert json.dumps(ann, sort_keys=True) == ann_before
-
-
 def test_chunk_boundary_prf_returns_tolerance_key_batch34():
     doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
     ann = {"chunk_boundary_anchors": []}
@@ -261,11 +245,6 @@ def test_chunk_boundary_prf_annotation_none_no_annotation_batch34():
 def test_chunk_boundary_prf_annotation_empty_dict_batch34():
     out = chunk_boundary_prf({"chunks": [{"text": "a"}, {"text": "b"}]}, {})
     assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
-def test_chunk_boundary_prf_annotation_empty_anchors_batch34():
-    out = chunk_boundary_prf({"chunks": [{"text": "a"}, {"text": "b"}]}, {"chunk_boundary_anchors": []})
-    assert out["chunk_boundary_precision"]["reason"] == "no_ground_truth_anchors"
 
 
 def test_chunk_boundary_prf_returns_dict_batch34():
@@ -413,35 +392,7 @@ def test_module_has_parser_const_batch34():
     assert hasattr(amod, "PARSER_DOES_NOT_EMIT_RELATIONS")
 
 
-def test_module_has_all_batch34():
-    assert hasattr(amod, "__all__")
-    assert "PARSER_DOES_NOT_EMIT_RELATIONS" in amod.__all__
-    assert "figure_caption_prf" in amod.__all__
-    assert "chunk_boundary_prf" in amod.__all__
-
-
 # ---------- 端到端集成第四十九批
-
-
-def test_e2e_chunk_boundary_full_pipeline_batch34():
-    """完整 doc → chunk_boundary 完美匹配。"""
-    doc = {
-        "source_type": "pdf",
-        "elements": [{"type": "paragraph", "content": "abc def ghi"}],
-        "chunks": [
-            {"text": "abc", "source_element_ids": ["e1"]},
-            {"text": "def", "source_element_ids": ["e1"]},
-            {"text": "ghi", "source_element_ids": ["e1"]},
-        ],
-    }
-    ann = {"chunk_boundary_anchors": [
-        {"marker": "c", "position": "after"},
-        {"marker": "f", "position": "after"},
-    ]}
-    out = chunk_boundary_prf(doc, ann, tolerance_chars=5)
-    assert out["chunk_boundary_precision"]["value"] == 1.0
-    assert out["chunk_boundary_recall"]["value"] == 1.0
-    assert out["chunk_boundary_f1"]["value"] == 1.0
 
 
 def test_e2e_chunk_boundary_irrelevant_annotation_keys_batch34():

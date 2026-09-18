@@ -182,14 +182,6 @@ def test_cli_inspect_total_three_batch450(tmp_path, capsys):
 
 # ---------- inspect null 带因行 ----------
 
-def test_cli_inspect_hbc_null_reason_batch450(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("heading_boundary_compliance          "
-            "null  (no_heading_elements)") in out
-
-
 # ---------- 源码补强 ----------
 
 def _src():

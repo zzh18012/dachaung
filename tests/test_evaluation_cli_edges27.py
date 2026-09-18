@@ -673,19 +673,9 @@ def test_module_source_has_from_future():
     assert "from __future__ import annotations" in src
 
 
-def test_module_source_has_import_argparse():
-    src = inspect.getsource(m)
-    assert "import argparse" in src
-
-
 def test_module_source_has_import_json():
     src = inspect.getsource(m)
     assert "import json" in src
-
-
-def test_module_source_has_import_sys():
-    src = inspect.getsource(m)
-    assert "import sys" in src
 
 
 def test_module_source_has_from_pathlib_import_path():
@@ -776,12 +766,6 @@ def test_main_signature():
     assert sig.return_annotation == "int"
 
 
-def test_build_parser_signature():
-    sig = inspect.signature(_build_parser)
-    assert len(sig.parameters) == 0
-    assert sig.return_annotation == "argparse.ArgumentParser"
-
-
 def test_format_metric_signature():
     sig = inspect.signature(_format_metric)
     params = list(sig.parameters)
@@ -832,16 +816,6 @@ def test_namespace_run_inspect_doc():
 def test_module_no_all_attribute():
     """cli.py 没定义 __all__。"""
     assert not hasattr(m, "__all__")
-
-
-def test_module_has_1_public_function():
-    public = [
-        n for n in dir(m)
-        if not n.startswith("_")
-        and isinstance(getattr(m, n), FunctionType)
-        and getattr(m, n).__module__ == "evaluation.cli"
-    ]
-    assert public == ["main"]
 
 
 def test_module_has_3_private_functions():

@@ -65,34 +65,10 @@ def test_build_parser_namespace_command_value_inspect():
     assert ns.command == "inspect-doc"
 
 
-def test_build_parser_namespace_has_parser_attr():
-    p = _build_parser()
-    ns = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert ns.parser == "fallback"  # 默认值
-
-
-def test_build_parser_namespace_has_max_chars_attr():
-    p = _build_parser()
-    ns = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert ns.max_chars == 800
-
-
-def test_build_parser_namespace_has_tolerance_chars_attr_run():
-    p = _build_parser()
-    ns = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert ns.tolerance_chars == 30
-
-
 def test_build_parser_namespace_has_tolerance_chars_attr_inspect():
     p = _build_parser()
     ns = p.parse_args(["inspect-doc", "x.json"])
     assert ns.tolerance_chars == 30
-
-
-def test_build_parser_namespace_custom_parser_choice():
-    p = _build_parser()
-    ns = p.parse_args(["run", "--manifest", "x", "--output", "y", "--parser", "kreuzberg"])
-    assert ns.parser == "kreuzberg"
 
 
 def test_build_parser_namespace_custom_max_chars():

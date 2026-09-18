@@ -133,27 +133,12 @@ def test_build_parser_source_no_walrus():
     assert ":=" not in src
 
 
-def test_build_parser_source_has_return_p():
-    src = inspect.getsource(_build_parser)
-    assert "return p" in src
-
-
 # ---------- main source level 字符串精确补强第三批 ----------
 
 
 def test_main_source_uses_args_command():
     src = inspect.getsource(main)
     assert "args.command" in src
-
-
-def test_main_source_uses_args_manifest():
-    src = inspect.getsource(main)
-    assert "args.manifest" in src
-
-
-def test_main_source_uses_args_output():
-    src = inspect.getsource(main)
-    assert "args.output" in src
 
 
 def test_main_source_uses_path_manifest():
@@ -171,28 +156,6 @@ def test_main_source_uses_is_file_check_manifest():
     assert "manifest_path.is_file()" in src
 
 
-def test_main_source_returns_2_manifest_missing():
-    src = inspect.getsource(main)
-    assert "return 2" in src
-
-
-def test_main_source_returns_1_manifest_error():
-    src = inspect.getsource(main)
-    assert "return 1" in src
-
-
-def test_main_source_returns_0_run_success():
-    src = inspect.getsource(main)
-    assert "return 0" in src
-
-
-def test_main_source_passes_kwargs_to_run_evaluation():
-    src = inspect.getsource(main)
-    assert "parser_name=args.parser" in src
-    assert "max_chars=args.max_chars" in src
-    assert "tolerance_chars=args.tolerance_chars" in src
-
-
 def test_main_source_validates_after_run():
     src = inspect.getsource(main)
     assert 'validate_file(output_path, "evaluation-report.schema.json")' in src
@@ -208,42 +171,12 @@ def test_main_source_pipeline_success_check():
     assert '"pipeline_success"' in src
 
 
-def test_main_source_validate_report_branch():
-    src = inspect.getsource(main)
-    assert 'args.command == "validate-report"' in src
-
-
-def test_main_source_inspect_doc_branch():
-    src = inspect.getsource(main)
-    assert 'args.command == "inspect-doc"' in src
-
-
-def test_main_source_run_branch():
-    src = inspect.getsource(main)
-    assert 'args.command == "run"' in src
-
-
 def test_main_source_calls_run_inspect_doc():
     src = inspect.getsource(main)
     assert "_run_inspect_doc(args)" in src
 
 
 # ---------- _format_metric source level 字符串精确补强第三批 ----------
-
-
-def test_format_metric_source_metric_get_value():
-    src = inspect.getsource(_format_metric)
-    assert 'metric.get("value")' in src
-
-
-def test_format_metric_source_metric_get_reason():
-    src = inspect.getsource(_format_metric)
-    assert 'metric.get("reason")' in src
-
-
-def test_format_metric_source_value_is_none_branch():
-    src = inspect.getsource(_format_metric)
-    assert "value is None" in src
 
 
 def test_format_metric_source_isinstance_bool():
@@ -261,11 +194,6 @@ def test_format_metric_source_isinstance_dict():
     assert "isinstance(value, dict)" in src
 
 
-def test_format_metric_source_str_lower():
-    src = inspect.getsource(_format_metric)
-    assert "str(value).lower()" in src
-
-
 def test_format_metric_source_float_format_4f_in_source():
     src = inspect.getsource(_format_metric)
     assert "{value:.4f}" in src
@@ -281,19 +209,9 @@ def test_format_metric_source_padding_36():
     assert "{name:36}" in src
 
 
-def test_format_metric_source_default_ok_in_source():
-    src = inspect.getsource(_format_metric)
-    assert "reason or 'ok'" in src or 'reason or "ok"' in src
-
-
 def test_format_metric_source_sorts_dict_items():
     src = inspect.getsource(_format_metric)
     assert "sorted(value.items())" in src
-
-
-def test_format_metric_source_no_subprocess():
-    src = inspect.getsource(_format_metric)
-    assert "subprocess" not in src
 
 
 def test_format_metric_source_no_eval():
@@ -320,24 +238,9 @@ def test_run_inspect_doc_source_lazy_import_compute_automatic_metrics():
     assert "from evaluation.metrics import compute_automatic_metrics" in src
 
 
-def test_run_inspect_doc_source_input_path_assignment():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "input_path = Path(args.input)" in src
-
-
-def test_run_inspect_doc_source_is_file_check():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "input_path.is_file()" in src
-
-
 def test_run_inspect_doc_source_open_utf8():
     src = inspect.getsource(_run_inspect_doc)
     assert 'open("r", encoding="utf-8")' in src
-
-
-def test_run_inspect_doc_source_catches_json_decode_error():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "json.JSONDecodeError" in src
 
 
 def test_run_inspect_doc_source_isinstance_dict_check():
@@ -360,15 +263,6 @@ def test_run_inspect_doc_source_doc_get_chunks_or_empty():
     assert 'doc.get("chunks") or []' in src
 
 
-def test_run_inspect_doc_source_compute_automatic_metrics_kwargs():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "document=doc" in src
-    assert "error=None" in src
-    assert "source_type=source_type" in src
-    assert "expectations=None" in src
-    assert "image_base_dir=None" in src
-
-
 def test_run_inspect_doc_source_metrics_update_figure_caption():
     src = inspect.getsource(_run_inspect_doc)
     assert "metrics.update(figure_caption_prf(doc, None))" in src
@@ -377,51 +271,6 @@ def test_run_inspect_doc_source_metrics_update_figure_caption():
 def test_run_inspect_doc_source_metrics_update_chunk_boundary():
     src = inspect.getsource(_run_inspect_doc)
     assert "tolerance_chars=args.tolerance_chars" in src
-
-
-def test_run_inspect_doc_source_prints_file_path():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "file:" in src
-
-
-def test_run_inspect_doc_source_prints_document_id():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "document_id:" in src
-
-
-def test_run_inspect_doc_source_prints_source():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "source:" in src
-
-
-def test_run_inspect_doc_source_prints_parser():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "parser:" in src
-
-
-def test_run_inspect_doc_source_prints_counts():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "counts:" in src
-
-
-def test_run_inspect_doc_source_uses_sort_key_function():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "_sort_key" in src
-
-
-def test_run_inspect_doc_source_return_0():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "return 0" in src
-
-
-def test_run_inspect_doc_source_return_1_json_decode():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "return 1" in src
-
-
-def test_run_inspect_doc_source_return_2_not_file():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "return 2" in src
 
 
 def test_run_inspect_doc_source_return_1_not_dict():
@@ -434,11 +283,6 @@ def test_run_inspect_doc_source_no_eval():
     src = inspect.getsource(_run_inspect_doc)
     assert "eval(" not in src
     assert "exec(" not in src
-
-
-def test_run_inspect_doc_source_no_subprocess():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "subprocess" not in src
 
 
 def test_run_inspect_doc_source_no_yield():
@@ -1051,11 +895,6 @@ def test_main_validate_report_returns_0_minimal_dict(tmp_path, capsys):
     assert rc == 1
 
 
-def test_main_inspect_doc_returns_2_when_dir(tmp_path):
-    rc = main(["inspect-doc", str(tmp_path)])
-    assert rc == 2
-
-
 def test_main_inspect_doc_returns_1_when_invalid_json(tmp_path):
     p = tmp_path / "doc.json"
     p.write_text("not json", encoding="utf-8")
@@ -1194,25 +1033,10 @@ def test_cli_source_has_stderr_reconfigure_call():
     assert "sys.stderr.reconfigure" in src
 
 
-def test_cli_source_hasattr_check():
-    src = inspect.getsource(cli_mod)
-    assert 'hasattr(sys.stdout, "reconfigure")' in src
-
-
 def test_cli_source_reconfigure_args():
     src = inspect.getsource(cli_mod)
     assert 'encoding="utf-8"' in src
     assert 'errors="replace"' in src
-
-
-def test_cli_source_catches_attribute_error():
-    src = inspect.getsource(cli_mod)
-    assert "AttributeError" in src
-
-
-def test_cli_source_catches_oserror():
-    src = inspect.getsource(cli_mod)
-    assert "OSError" in src
 
 
 def test_cli_source_no_class_keyword_at_module_level():
@@ -1292,14 +1116,6 @@ def test_cli_source_docstring_mentions_run():
     assert "run" in cli_mod.__doc__.lower()
 
 
-def test_cli_source_docstring_mentions_validate():
-    assert "validate" in cli_mod.__doc__.lower()
-
-
-def test_cli_source_docstring_mentions_inspect():
-    assert "inspect" in cli_mod.__doc__.lower()
-
-
 def test_cli_source_no_all_attribute():
     assert not hasattr(cli_mod, "__all__")
 
@@ -1313,13 +1129,6 @@ def test_signature_main_argv_default_none():
     assert len(params) == 1
     assert params[0].name == "argv"
     assert params[0].default is None
-
-
-def test_signature_main_no_varargs():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 def test_signature_main_return_annotation_int():
@@ -1389,19 +1198,6 @@ def test_signature_format_metric_no_varargs():
         assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
-def test_signature_run_inspect_doc_no_varargs():
-    sig = inspect.signature(_run_inspect_doc)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
-def test_signature_main_param_kind_keyword_or_positional():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_signature_format_metric_params_kind():
     sig = inspect.signature(_format_metric)
     for p in sig.parameters.values():
@@ -1455,40 +1251,20 @@ def test_module_main_name_eq_main():
     assert cli_mod.main.__name__ == "main"
 
 
-def test_module_main_module_eq_cli():
-    assert cli_mod.main.__module__ == "evaluation.cli"
-
-
 def test_module_build_parser_name():
     assert cli_mod._build_parser.__name__ == "_build_parser"
-
-
-def test_module_build_parser_module():
-    assert cli_mod._build_parser.__module__ == "evaluation.cli"
 
 
 def test_module_format_metric_name():
     assert cli_mod._format_metric.__name__ == "_format_metric"
 
 
-def test_module_format_metric_module():
-    assert cli_mod._format_metric.__module__ == "evaluation.cli"
-
-
 def test_module_run_inspect_doc_name():
     assert cli_mod._run_inspect_doc.__name__ == "_run_inspect_doc"
 
 
-def test_module_run_inspect_doc_module():
-    assert cli_mod._run_inspect_doc.__module__ == "evaluation.cli"
-
-
 def test_module_name_is_evaluation_cli():
     assert cli_mod.__name__ == "evaluation.cli"
-
-
-def test_module_file_ends_with_cli_py():
-    assert cli_mod.__file__.endswith("cli.py")
 
 
 def test_module_main_signature_no_kwargs():

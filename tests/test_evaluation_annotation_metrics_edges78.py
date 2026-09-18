@@ -227,14 +227,6 @@ def test_marker_multiple_occurrences_fewer_anchors_batch52():
 
 # ---------- 输出 key 集合 ----------
 
-def test_keys_document_none_branch_batch52():
-    out = chunk_boundary_prf(None, {})
-    assert set(out.keys()) == {
-        "chunk_boundary_precision", "chunk_boundary_recall",
-        "chunk_boundary_f1", "_tolerance_chars",
-    }
-
-
 def test_keys_no_annotation_branch_batch52():
     out = chunk_boundary_prf({"chunks": [{"text": "x"}]}, None)
     assert set(out.keys()) == {
@@ -289,12 +281,6 @@ def test_figure_caption_reason_same_constant_object_batch52():
     out = figure_caption_prf(None, None)
     for v in out.values():
         assert v["reason"] is PARSER_DOES_NOT_EMIT_RELATIONS or v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
-
-
-def test_figure_caption_values_share_reason_batch52():
-    out = figure_caption_prf({}, {})
-    reasons = {v["reason"] for v in out.values()}
-    assert reasons == {PARSER_DOES_NOT_EMIT_RELATIONS}
 
 
 # ---------- PARSER_DOES_NOT_EMIT_RELATIONS 唯一性 ----------
@@ -380,16 +366,6 @@ def test_ast_chunk_boundary_2_list_comps_batch52():
     assert len(comps) == 1  # norm_chunks = [normalize_text(...) for c in chunks]
 
 
-def test_ast_gt_positions_typed_batch52():
-    src = inspect.getsource(ann_mod)
-    assert "gt_positions: list[int] = []" in src
-
-
-def test_ast_predicted_typed_batch52():
-    src = inspect.getsource(ann_mod)
-    assert "predicted: list[int] = []" in src
-
-
 def test_ast_pairs_sort_lambda_batch52():
     tree = ast.parse(inspect.getsource(ann_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "chunk_boundary_prf")
@@ -428,12 +404,6 @@ def test_ast_chunk_boundary_5_return_out_batch52():
         and isinstance(r.value, ast.Name) and r.value.id == "out"
     ]
     assert len(returns) == 5
-
-
-def test_ast_2_functions_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 2
 
 
 # ---------- forbidden tokens 第一百五十五批 ----------

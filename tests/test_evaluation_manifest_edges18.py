@@ -232,24 +232,8 @@ def test_resolve_relative_path_param_kinds_positional_or_keyword():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_resolve_relative_path_no_var_args():
-    sig = inspect.signature(_resolve_relative_path)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_resolve_relative_path_no_var_kwargs():
-    sig = inspect.signature(_resolve_relative_path)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_resolve_relative_path_module_identity():
     assert _resolve_relative_path.__module__ == "evaluation.manifest"
-
-
-def test_resolve_relative_path_qualname():
-    assert _resolve_relative_path.__qualname__ == "_resolve_relative_path"
 
 
 # =========================================================================
@@ -321,10 +305,6 @@ def test_detect_project_root_module_identity():
     assert _detect_project_root.__module__ == "evaluation.manifest"
 
 
-def test_detect_project_root_qualname():
-    assert _detect_project_root.__qualname__ == "_detect_project_root"
-
-
 # =========================================================================
 # ManifestError 详细
 # =========================================================================
@@ -332,10 +312,6 @@ def test_detect_project_root_qualname():
 
 def test_manifest_error_is_exception_subclass():
     assert issubclass(ManifestError, Exception)
-
-
-def test_manifest_error_mro_contains_exception():
-    assert Exception in ManifestError.__mro__
 
 
 def test_manifest_error_module_identity():
@@ -445,10 +421,6 @@ def test_document_entry_module_identity():
     assert DocumentEntry.__module__ == "evaluation.manifest"
 
 
-def test_document_entry_qualname():
-    assert DocumentEntry.__qualname__ == "DocumentEntry"
-
-
 # =========================================================================
 # ExpectedFailure frozen=True
 # =========================================================================
@@ -510,10 +482,6 @@ def test_expected_failure_module_identity():
     assert ExpectedFailure.__module__ == "evaluation.manifest"
 
 
-def test_expected_failure_qualname():
-    assert ExpectedFailure.__qualname__ == "ExpectedFailure"
-
-
 # =========================================================================
 # Manifest frozen=True
 # =========================================================================
@@ -573,10 +541,6 @@ def test_manifest_dataclass_params_frozen():
 
 def test_manifest_module_identity():
     assert Manifest.__module__ == "evaluation.manifest"
-
-
-def test_manifest_qualname():
-    assert Manifest.__qualname__ == "Manifest"
 
 
 # =========================================================================
@@ -750,13 +714,6 @@ def test_module_namespace_has_validate():
     assert hasattr(m, "validate")
 
 
-def test_module_namespace_has_manifest_error():
-    import evaluation.manifest as m
-
-    assert hasattr(m, "ManifestError")
-    assert m.ManifestError is ManifestError
-
-
 def test_module_namespace_has_document_entry():
     import evaluation.manifest as m
 
@@ -819,12 +776,6 @@ def test_module_all_is_list():
     assert isinstance(m.__all__, list)
 
 
-def test_module_all_is_not_tuple():
-    import evaluation.manifest as m
-
-    assert not isinstance(m.__all__, tuple)
-
-
 def test_module_all_exact():
     import evaluation.manifest as m
 
@@ -856,36 +807,6 @@ def test_module_all_does_not_contain_constants():
 # =========================================================================
 # 模块源码 token 验证（补强）
 # =========================================================================
-
-
-def test_module_source_contains_from_future_annotations():
-    import evaluation.manifest as m
-
-    assert "from __future__ import annotations" in inspect.getsource(m)
-
-
-def test_module_source_contains_import_json():
-    import evaluation.manifest as m
-
-    assert "import json" in inspect.getsource(m)
-
-
-def test_module_source_contains_from_dataclasses_import_dataclass():
-    import evaluation.manifest as m
-
-    assert "from dataclasses import dataclass" in inspect.getsource(m)
-
-
-def test_module_source_contains_from_pathlib():
-    import evaluation.manifest as m
-
-    assert "from pathlib import Path" in inspect.getsource(m)
-
-
-def test_module_source_contains_from_typing_import_any():
-    import evaluation.manifest as m
-
-    assert "from typing import Any" in inspect.getsource(m)
 
 
 def test_module_source_contains_from_evaluation_import_manifest_version():
@@ -957,12 +878,6 @@ def test_module_source_contains_frozenset_pair_ids():
     assert "frozenset" in inspect.getsource(m)
 
 
-def test_module_source_does_not_contain_print():
-    import evaluation.manifest as m
-
-    assert "print(" not in inspect.getsource(m)
-
-
 def test_module_source_does_not_contain_logging():
     import evaluation.manifest as m
 
@@ -1007,13 +922,6 @@ def test_module_source_does_not_contain_read_text():
 # =========================================================================
 
 
-def test_module_docstring_is_nonempty_string():
-    import evaluation.manifest as m
-
-    assert isinstance(m.__doc__, str)
-    assert len(m.__doc__) > 30
-
-
 def test_module_docstring_mentions_path_relative():
     """docstring 提到 path 必须是相对路径。"""
     import evaluation.manifest as m
@@ -1056,10 +964,6 @@ def test_module_docstring_mentions_no_absolute_in_manifest():
 
 def test_load_manifest_module_identity():
     assert load_manifest.__module__ == "evaluation.manifest"
-
-
-def test_load_manifest_qualname():
-    assert load_manifest.__qualname__ == "load_manifest"
 
 
 def test_is_absolute_like_module_identity():
@@ -1108,11 +1012,6 @@ def test_has_backslash_param_name():
     assert list(sig.parameters.keys()) == ["path_str"]
 
 
-def test_has_backslash_no_default():
-    sig = inspect.signature(_has_backslash)
-    assert sig.parameters["path_str"].default is inspect.Parameter.empty
-
-
 def test_load_manifest_signature_param_count_2():
     sig = inspect.signature(load_manifest)
     assert len(sig.parameters) == 2
@@ -1131,24 +1030,6 @@ def test_load_manifest_manifest_path_no_default():
 def test_load_manifest_project_root_default_none():
     sig = inspect.signature(load_manifest)
     assert sig.parameters["project_root"].default is None
-
-
-def test_load_manifest_param_kinds_positional_or_keyword():
-    sig = inspect.signature(load_manifest)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_load_manifest_no_var_args():
-    sig = inspect.signature(load_manifest)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_load_manifest_no_var_kwargs():
-    sig = inspect.signature(load_manifest)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 def test_load_manifest_return_annotation_is_str_or_manifest():

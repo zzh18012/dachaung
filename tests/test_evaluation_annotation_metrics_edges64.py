@@ -359,14 +359,6 @@ def test_chunk_boundary_prf_calls_normalize_text_for_real_path_batch37():
         assert mock_norm.call_count >= 3
 
 
-def test_chunk_boundary_prf_idempotent_call_batch37():
-    doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "c", "position": "after"}]}
-    o1 = chunk_boundary_prf(doc, ann, tolerance_chars=5)
-    o2 = chunk_boundary_prf(doc, ann, tolerance_chars=5)
-    assert o1 == o2
-
-
 def test_chunk_boundary_prf_output_json_serializable_batch37():
     """输出能 JSON 序列化。"""
     doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
@@ -565,20 +557,8 @@ def test_module_has_docstring_batch37():
     assert len(amod.__doc__) > 0
 
 
-def test_module_docstring_mentions_figure_caption_batch37():
-    assert "figure-caption" in amod.__doc__ or "figure_caption" in amod.__doc__
-
-
-def test_module_docstring_mentions_chunk_boundary_batch37():
-    assert "chunk_boundary" in amod.__doc__ or "chunk-boundary" in amod.__doc__
-
-
 def test_module_all_len_three_batch37():
     assert len(amod.__all__) == 3
-
-
-def test_module_parser_const_module_level_batch37():
-    assert "PARSER_DOES_NOT_EMIT_RELATIONS" in dir(amod)
 
 
 def test_module_figure_caption_prf_callable_batch37():

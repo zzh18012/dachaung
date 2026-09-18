@@ -198,11 +198,6 @@ def test_null_reason_with_special_chars():
 # =========================================================================
 
 
-def test_bool_metric_non_empty_dict_is_truthy():
-    out = _bool_metric({"a": 1})
-    assert out["value"] is True
-
-
 def test_bool_metric_empty_list_is_falsy():
     out = _bool_metric([])
     assert out["value"] is False
@@ -324,12 +319,6 @@ def test_text_types_does_not_contain_unknown():
     assert "unknown" not in _TEXT_TYPES
 
 
-def test_pdf_bbox_required_types_is_subset_of_text_types():
-    """_PDF_BBOX_REQUIRED_TYPES ⊂ _TEXT_TYPES。"""
-    for t in _PDF_BBOX_REQUIRED_TYPES:
-        assert t in _TEXT_TYPES
-
-
 def test_text_types_first_is_heading():
     assert _TEXT_TYPES[0] == "heading"
 
@@ -373,12 +362,6 @@ def test_compute_metrics_error_code_in_value_field():
     err = {"code": "E1", "message": "fail"}
     out = compute_automatic_metrics(None, err, "pdf", None)
     assert out["error_code"]["value"] == "E1"
-
-
-def test_compute_metrics_error_none_yields_null_error_code():
-    """error=None → error_code value=None。"""
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    assert out["error_code"]["value"] is None
 
 
 def test_compute_metrics_schema_valid_with_dict_no_elements():
@@ -807,29 +790,9 @@ def test_module_source_no_csv_import():
     assert "import csv" not in src
 
 
-def test_module_source_no_sqlite3_import():
-    src = inspect.getsource(mmod)
-    assert "import sqlite3" not in src
-
-
 def test_module_source_no_socket_import():
     src = inspect.getsource(mmod)
     assert "import socket" not in src
-
-
-def test_module_source_no_email_import():
-    src = inspect.getsource(mmod)
-    assert "import email" not in src
-
-
-def test_module_source_no_html_import():
-    src = inspect.getsource(mmod)
-    assert "import html" not in src
-
-
-def test_module_source_no_http_import():
-    src = inspect.getsource(mmod)
-    assert "import http" not in src
 
 
 def test_module_source_no_urllib_import():

@@ -132,12 +132,6 @@ def test_format_metric_value_int_with_reason_batch36():
     assert "x" in out
 
 
-def test_format_metric_value_zero_int_no_reason_batch36():
-    out = _format_metric("name", {"value": 0, "reason": None})
-    assert "0" in out
-    assert "ok" in out
-
-
 def test_format_metric_value_negative_zero_float_batch36():
     out = _format_metric("name", {"value": -0.0, "reason": None})
     assert "-0.0000" in out
@@ -168,11 +162,6 @@ def test_format_metric_value_dict_with_negative_value_batch36():
 def test_format_metric_value_dict_with_float_batch36():
     out = _format_metric("name", {"value": {"a": 0.5}, "reason": None})
     assert "a=0.5" in out
-
-
-def test_format_metric_value_dict_with_zero_batch36():
-    out = _format_metric("name", {"value": {"a": 0}, "reason": None})
-    assert "a=0" in out
 
 
 def test_format_metric_value_true_returns_str_lower_batch36():
@@ -566,11 +555,6 @@ def test_module_source_contains_format_metric_func_batch36():
 def test_module_source_contains_run_inspect_doc_func_batch36():
     src = inspect.getsource(cmod)
     assert "def _run_inspect_doc(" in src
-
-
-def test_module_source_contains_run_subcommand_string_batch36():
-    src = inspect.getsource(cmod)
-    assert '"run"' in src
 
 
 def test_module_source_contains_validate_report_subcommand_string_batch36():

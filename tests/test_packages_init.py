@@ -38,11 +38,6 @@ def test_chunkers_init_all_only_lists_documented_names():
     assert set(pkg.__all__) == {"StructuralChunker", "normalize_text"}
 
 
-def test_chunkers_init_all_is_list():
-    import app.chunkers as pkg
-    assert isinstance(pkg.__all__, list)
-
-
 def test_chunkers_init_exports_match_actual_attributes():
     """__all__ 中的每个名字都应是模块属性。"""
     import app.chunkers as pkg

@@ -350,11 +350,6 @@ def test_chunk_boundary_prf_no_var_kwargs():
         assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
-def test_chunk_boundary_prf_return_annotation_str():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert isinstance(sig.return_annotation, str)
-
-
 # =========================================================================
 # helper metadata
 # =========================================================================

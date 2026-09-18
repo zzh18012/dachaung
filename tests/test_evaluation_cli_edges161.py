@@ -116,28 +116,6 @@ def test_cli_run_summary_sum6_batch454(tmp_path, capsys):
         "sum": 6, "participating_docs": 2}
 
 
-def test_cli_run_stdout_two_docs_batch454(tmp_path, capsys):
-    mf = _board(tmp_path)
-    rc, out = _run_cli(capsys, [
-        "run", "--manifest", str(mf),
-        "--output", str(tmp_path / "r.json"),
-        "--parser", "fallback", "--max-chars", "200"])
-    assert rc == 0
-    assert "[OK]" in out
-    assert "documents=2（成功 2，失败 0）" in out
-
-
-def test_cli_run_stdout_devset_batch454(tmp_path, capsys):
-    mf = _board(tmp_path)
-    rc, out = _run_cli(capsys, [
-        "run", "--manifest", str(mf),
-        "--output", str(tmp_path / "r.json"),
-        "--parser", "fallback", "--max-chars", "200"])
-    assert rc == 0
-    assert ("devset_status=incomplete file_count=2 groups=2 "
-            "pdf=2 docx=0") in out
-
-
 def test_cli_validate_report_batch454(tmp_path, capsys):
     mf = _board(tmp_path)
     rc, _ = _run_cli(capsys, [

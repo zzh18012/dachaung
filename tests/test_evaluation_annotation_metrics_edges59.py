@@ -122,13 +122,6 @@ def test_chunk_boundary_prf_document_none_returns_pipeline_failed_batch32():
         assert out[k]["reason"] == "pipeline_failed"
 
 
-def test_chunk_boundary_prf_no_annotation_returns_no_annotation_batch32():
-    out = chunk_boundary_prf({"chunks": []}, None)
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["value"] is None
-        assert out[k]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_empty_annotation_returns_no_annotation_batch32():
     out = chunk_boundary_prf({"chunks": []}, {})
     for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
@@ -425,22 +418,6 @@ def test_signature_chunk_boundary_prf_return_dict_batch32():
     assert "dict[str, dict[str, Any]]" in str(sig.return_annotation)
 
 
-def test_signature_figure_caption_prf_document_annotation_batch32():
-    sig = inspect.signature(figure_caption_prf)
-    for p_name in ("document", "annotation"):
-        a = sig.parameters[p_name].annotation
-        assert "dict" in str(a)
-        assert "None" in str(a)
-
-
-def test_signature_chunk_boundary_prf_document_annotation_batch32():
-    sig = inspect.signature(chunk_boundary_prf)
-    for p_name in ("document", "annotation"):
-        a = sig.parameters[p_name].annotation
-        assert "dict" in str(a)
-        assert "None" in str(a)
-
-
 def test_signature_chunk_boundary_prf_tolerance_default_30_batch32():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["tolerance_chars"].default == 30
@@ -514,24 +491,6 @@ def test_module_no_main_block_batch32():
 # ---------- 端到端集成第四十五批 ----------
 
 
-def test_e2e_chunk_boundary_perfect_match_with_tolerance_batch32():
-    """端到端：含容差的完美匹配。"""
-    doc = {"chunks": [{"text": "hello"}, {"text": "world"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "hell", "position": "after"}]}
-    out = chunk_boundary_prf(doc, ann, tolerance_chars=2)
-    # stream="hello world", predicted=[5]
-    # anchor="hell" after → 4, |5-4|=1 ≤ 2 → match
-    assert out["chunk_boundary_precision"]["value"] == 1.0
-    assert out["chunk_boundary_recall"]["value"] == 1.0
-    assert out["chunk_boundary_f1"]["value"] == 1.0
-
-
-def test_e2e_figure_caption_returns_three_keys_batch32():
-    """端到端：figure_caption 始终返回 3 key。"""
-    out = figure_caption_prf({"chunks": []}, None)
-    assert len(out) == 3
-
-
 def test_e2e_chunk_boundary_no_input_modification_batch32():
     doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
     ann = {"chunk_boundary_anchors": [{"marker": "a", "position": "after"}]}
@@ -548,50 +507,3 @@ def test_e2e_chunk_boundary_idempotent_batch32():
     out1 = chunk_boundary_prf(doc, ann)
     out2 = chunk_boundary_prf(doc, ann)
     assert out1 == out2
-
-
-def test_e2e_chunk_boundary_all_reasons_used_batch32():
-    """端到端：测各种 reason 都可能出现。"""
-    reasons = set()
-    # pipeline_failed
-    out = chunk_boundary_prf(None, None)
-    reasons.add(out["chunk_boundary_precision"]["reason"])
-    # no_annotation
-    out = chunk_boundary_prf({"chunks": []}, None)
-    reasons.add(out["chunk_boundary_precision"]["reason"])
-    # no_predicted_boundaries
-    out = chunk_boundary_prf({"chunks": []}, {"chunk_boundary_anchors": [{"marker": "x", "position": "after"}]})
-    reasons.add(out["chunk_boundary_precision"]["reason"])
-    # no_ground_truth_anchors
-    out = chunk_boundary_prf({"chunks": [{"text": "a"}, {"text": "b"}]}, {"chunk_boundary_anchors": []})
-    reasons.add(out["chunk_boundary_precision"]["reason"])
-    assert reasons == {
-        "pipeline_failed",
-        "no_annotation",
-        "no_predicted_boundaries",
-        "no_ground_truth_anchors",
-    }
-
-
-def test_e2e_chunk_boundary_tolerance_recorded_batch32():
-    """端到端：tolerance 在输出中记录。"""
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "a", "position": "after"}]}
-    out = chunk_boundary_prf(doc, ann, tolerance_chars=42)
-    assert out["_tolerance_chars"]["value"] == 42
-    assert out["_tolerance_chars"]["reason"] is None
-
-
-def test_e2e_figure_caption_with_real_document_with_figures_batch32():
-    """端到端：含 figures 的真实 document → figure_caption null。"""
-    doc = {
-        "elements": [
-            {"type": "image", "element_id": "i1"},
-            {"type": "caption", "text": "Fig 1"},
-        ],
-        "chunks": [{"text": "Fig 1"}],
-    }
-    out = figure_caption_prf(doc, None)
-    for v in out.values():
-        assert v["value"] is None
-        assert v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS

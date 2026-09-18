@@ -94,28 +94,8 @@ def test_extension_to_parser_docx():
 # =========================================================================
 
 
-def test_infer_parser_name_pdf_uppercase():
-    assert _infer_parser_name(Path("x.PDF")) == "fallback"
-
-
 def test_infer_parser_name_docx_mixed_case():
     assert _infer_parser_name(Path("x.DoCX")) == "fallback"
-
-
-def test_infer_parser_name_md_uppercase():
-    assert _infer_parser_name(Path("X.MD")) == "markdown"
-
-
-def test_infer_parser_name_html_uppercase():
-    assert _infer_parser_name(Path("X.HTML")) == "html"
-
-
-def test_infer_parser_name_txt_uppercase():
-    assert _infer_parser_name(Path("X.TXT")) == "text"
-
-
-def test_infer_parser_name_ipynb_uppercase():
-    assert _infer_parser_name(Path("X.IPYNB")) == "ipynb"
 
 
 def test_infer_parser_name_no_extension():
@@ -125,10 +105,6 @@ def test_infer_parser_name_no_extension():
 
 def test_infer_parser_name_empty_suffix():
     assert _infer_parser_name(Path("README.")) == "fallback"
-
-
-def test_infer_parser_name_unknown_extension():
-    assert _infer_parser_name(Path("x.unknownext")) == "fallback"
 
 
 def test_infer_parser_name_json():
@@ -148,17 +124,9 @@ def test_infer_parser_name_yaml():
     assert _infer_parser_name(Path("x.yaml")) == "fallback"
 
 
-def test_infer_parser_name_returns_str():
-    assert isinstance(_infer_parser_name(Path("x.txt")), str)
-
-
 # =========================================================================
 # _iter_supported_files 深度
 # =========================================================================
-
-
-def test_iter_supported_files_empty_dir(tmp_path: Path):
-    assert _iter_supported_files(tmp_path, recursive=False) == []
 
 
 def test_iter_supported_files_only_unsupported(tmp_path: Path):
@@ -755,16 +723,6 @@ def test_main_validate_returns_one_on_invalid(tmp_path: Path):
     p.write_text("{}", encoding="utf-8")
     rc = main(["validate", str(p)])
     assert rc == 1
-
-
-def test_main_validate_returns_two_on_missing(tmp_path: Path):
-    rc = main(["validate", str(tmp_path / "missing.json")])
-    assert rc == 2
-
-
-def test_main_inspect_returns_two_on_missing(tmp_path: Path):
-    rc = main(["inspect", str(tmp_path / "missing.json")])
-    assert rc == 2
 
 
 def test_main_inspect_returns_one_on_invalid_json(tmp_path: Path):

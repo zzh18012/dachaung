@@ -277,11 +277,6 @@ def test_manifest_repr_batch36():
 # ---------- _is_absolute_like / _has_backslash 第三十六批
 
 
-def test_is_absolute_like_tilde_path_batch36():
-    """~ 不是绝对路径。"""
-    assert _is_absolute_like("~/foo") is False
-
-
 def test_is_absolute_like_just_colon_batch36():
     assert _is_absolute_like(":") is False
 
@@ -306,11 +301,6 @@ def test_is_absolute_like_lowercase_alpha_colon_backslash_batch36():
 def test_is_absolute_like_digit_colon_batch36():
     """数字 + : + / 不是绝对（数字不是 alpha）。"""
     assert _is_absolute_like("1:/foo") is False
-
-
-def test_is_absolute_like_underscore_colon_batch36():
-    """下划线不是 alpha。"""
-    assert _is_absolute_like("_:/foo") is False
 
 
 def test_has_backslash_normal_relative_batch36():
@@ -822,19 +812,9 @@ def test_module_source_contains_sha256_optional_field_batch36():
     assert "sha256: str | None" in src
 
 
-def test_module_source_contains_categories_tuple_field_batch36():
-    src = inspect.getsource(mmod)
-    assert "categories: tuple[str, ...]" in src
-
-
 def test_module_source_contains_annotation_resolved_optional_batch36():
     src = inspect.getsource(mmod)
     assert "annotation_resolved: Path | None" in src
-
-
-def test_module_source_contains_expectations_dict_batch36():
-    src = inspect.getsource(mmod)
-    assert "expectations: dict[str, Any] | None" in src
 
 
 def test_module_source_contains_expected_error_code_field_batch36():
@@ -980,10 +960,6 @@ def test_module_has_resolve_relative_path_attribute_batch36():
 
 def test_module_has_detect_project_root_attribute_batch36():
     assert hasattr(mmod, "_detect_project_root")
-
-
-def test_module_manifest_error_is_class_batch36():
-    assert isinstance(mmod.ManifestError, type)
 
 
 # ---------- 端到端集成第五十批

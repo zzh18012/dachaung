@@ -386,38 +386,10 @@ def test_parser_does_not_emit_relations_hashable():
 # =========================================================================
 
 
-def test_module_namespace_has_counter():
-    import evaluation.annotation_metrics as m
-
-    assert hasattr(m, "Counter")
-    assert m.Counter is Counter
-
-
 def test_module_namespace_has_any():
     import evaluation.annotation_metrics as m
 
     assert hasattr(m, "Any")
-
-
-def test_module_namespace_has_normalize_text():
-    import evaluation.annotation_metrics as m
-
-    assert hasattr(m, "normalize_text")
-    assert m.normalize_text is normalize_text
-
-
-def test_module_namespace_has_null():
-    import evaluation.annotation_metrics as m
-
-    assert hasattr(m, "_null")
-    assert m._null is _null
-
-
-def test_module_namespace_has_ratio():
-    import evaluation.annotation_metrics as m
-
-    assert hasattr(m, "_ratio")
-    assert m._ratio is _ratio
 
 
 def test_module_namespace_has_parser_does_not_emit_relations():
@@ -444,22 +416,6 @@ def test_module_all_is_list():
     import evaluation.annotation_metrics as m
 
     assert isinstance(m.__all__, list)
-
-
-def test_module_all_is_not_tuple():
-    import evaluation.annotation_metrics as m
-
-    assert not isinstance(m.__all__, tuple)
-
-
-def test_module_all_exact():
-    import evaluation.annotation_metrics as m
-
-    assert m.__all__ == [
-        "PARSER_DOES_NOT_EMIT_RELATIONS",
-        "figure_caption_prf",
-        "chunk_boundary_prf",
-    ]
 
 
 def test_module_all_has_3_entries():
@@ -562,34 +518,9 @@ def test_chunk_boundary_prf_module_identity():
     assert chunk_boundary_prf.__module__ == "evaluation.annotation_metrics"
 
 
-def test_all_helpers_are_function_type():
-    import types as _types
-
-    for fn in [figure_caption_prf, chunk_boundary_prf]:
-        assert isinstance(fn, _types.FunctionType)
-
-
 # =========================================================================
 # 模块源码 token 验证（补强 edges16）
 # =========================================================================
-
-
-def test_module_source_contains_from_future_annotations():
-    import evaluation.annotation_metrics as m
-
-    assert "from __future__ import annotations" in inspect.getsource(m)
-
-
-def test_module_source_contains_from_collections_import_counter():
-    import evaluation.annotation_metrics as m
-
-    assert "from collections import Counter" in inspect.getsource(m)
-
-
-def test_module_source_contains_from_typing_import_any():
-    import evaluation.annotation_metrics as m
-
-    assert "from typing import Any" in inspect.getsource(m)
 
 
 def test_module_source_contains_from_app_chunkers_structural_import():
@@ -608,18 +539,6 @@ def test_module_source_contains_parser_does_not_emit_relations_definition():
     import evaluation.annotation_metrics as m
 
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in inspect.getsource(m)
-
-
-def test_module_source_contains_figure_caption_prf_def():
-    import evaluation.annotation_metrics as m
-
-    assert "def figure_caption_prf(" in inspect.getsource(m)
-
-
-def test_module_source_contains_chunk_boundary_prf_def():
-    import evaluation.annotation_metrics as m
-
-    assert "def chunk_boundary_prf(" in inspect.getsource(m)
 
 
 def test_module_source_contains_tolerance_chars_default_30():
@@ -701,12 +620,6 @@ def test_module_source_contains_denom_le_zero_check():
     assert "denom <= 0" in inspect.getsource(m)
 
 
-def test_module_source_contains_no_print():
-    import evaluation.annotation_metrics as m
-
-    assert "print(" not in inspect.getsource(m)
-
-
 def test_module_source_does_not_contain_logging():
     import evaluation.annotation_metrics as m
 
@@ -750,13 +663,6 @@ def test_module_source_does_not_contain_pathlib():
 # =========================================================================
 
 
-def test_module_docstring_is_nonempty_string():
-    import evaluation.annotation_metrics as m
-
-    assert isinstance(m.__doc__, str)
-    assert len(m.__doc__) > 30
-
-
 def test_module_docstring_mentions_figure_caption():
     import evaluation.annotation_metrics as m
 
@@ -788,10 +694,3 @@ def test_module_docstring_mentions_one_to_one():
     import evaluation.annotation_metrics as m
 
     assert "一对一" in m.__doc__ or "one-to-one" in m.__doc__.lower()
-
-
-def test_module_docstring_mentions_tolerance():
-    """docstring 提到容差。"""
-    import evaluation.annotation_metrics as m
-
-    assert "容差" in m.__doc__ or "tolerance" in m.__doc__.lower()

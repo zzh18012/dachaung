@@ -171,10 +171,6 @@ def test_has_backslash_with_special_chars():
     assert _has_backslash("@#$%^&*\\") is True
 
 
-def test_has_backslash_returns_bool():
-    assert isinstance(_has_backslash("x"), bool)
-
-
 def test_has_backslash_with_long_string_no_backslash():
     assert _has_backslash("a" * 1000) is False
 

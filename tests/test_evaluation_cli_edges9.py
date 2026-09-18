@@ -142,20 +142,6 @@ def test_build_parser_run_all_defaults():
     assert args.tolerance_chars == 30
 
 
-def test_build_parser_validate_report_takes_positional_input():
-    p = _build_parser()
-    args = p.parse_args(["validate-report", "report.json"])
-    assert args.command == "validate-report"
-    assert args.input == "report.json"
-
-
-def test_build_parser_inspect_doc_takes_positional_input():
-    p = _build_parser()
-    args = p.parse_args(["inspect-doc", "doc.json"])
-    assert args.command == "inspect-doc"
-    assert args.input == "doc.json"
-
-
 def test_build_parser_inspect_doc_tolerance_chars_default():
     p = _build_parser()
     args = p.parse_args(["inspect-doc", "doc.json"])
@@ -320,12 +306,6 @@ def test_format_metric_name_over_36_chars():
 def test_format_metric_unicode_name():
     line = _format_metric("中文 metric", {"value": True})
     assert "中文" in line
-
-
-def test_format_metric_signature():
-    sig = inspect.signature(_format_metric)
-    params = list(sig.parameters)
-    assert params == ["name", "metric"]
 
 
 def test_format_metric_returns_str():
@@ -555,12 +535,6 @@ def test_run_inspect_doc_metrics_output_includes_pipeline_success(tmp_path, caps
     assert "pipeline_success" in out
 
 
-def test_run_inspect_doc_signature():
-    sig = inspect.signature(_run_inspect_doc)
-    params = list(sig.parameters)
-    assert params == ["args"]
-
-
 # =========================================================================
 # main() 完整 exit code 矩阵
 # =========================================================================
@@ -717,13 +691,6 @@ def test_main_validate_report_invalid_schema_returns_1(tmp_path, capsys):
     assert "[FAIL]" in err
 
 
-def test_main_validate_report_empty_file_returns_1(tmp_path, capsys):
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
-
-
 def test_main_validate_report_not_object_returns_1(tmp_path, capsys):
     p = tmp_path / "list.json"
     p.write_text("[1, 2, 3]", encoding="utf-8")
@@ -813,20 +780,6 @@ def test_module_imports_schema():
     import evaluation.cli as m
     assert hasattr(m, "validate_file")
     assert hasattr(m, "EvalSchemaError")
-
-
-def test_module_docstring_present():
-    import evaluation.cli as m
-    assert m.__doc__ is not None
-    assert len(m.__doc__) > 0
-
-
-def test_module_docstring_mentions_subcommands():
-    import evaluation.cli as m
-    doc = m.__doc__
-    assert "run" in doc
-    assert "validate-report" in doc
-    assert "inspect-doc" in doc
 
 
 def test_module_stdout_reconfigure_block_present():

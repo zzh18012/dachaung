@@ -42,11 +42,6 @@ def test_build_parser_description_value_batch16():
     assert "评测 CLI" in p.description
 
 
-def test_build_parser_no_epilog_batch16():
-    p = _build_parser()
-    assert p.epilog is None
-
-
 def test_build_parser_run_subparser_has_5_args_batch16():
     p = _build_parser()
     # 通过 parse_args 验证 5 个参数都被支持
@@ -262,16 +257,6 @@ def test_run_inspect_doc_document_id_in_stdout_batch16(tmp_path, capsys):
     assert "mydoc" in captured.out
 
 
-def test_run_inspect_doc_metrics_header_in_stdout_batch16(tmp_path, capsys):
-    p = _write_valid_doc(tmp_path)
-    args = MagicMock()
-    args.input = str(p)
-    args.tolerance_chars = 30
-    _run_inspect_doc(args)
-    captured = capsys.readouterr()
-    assert "metrics:" in captured.out
-
-
 def test_run_inspect_doc_counts_in_stdout_batch16(tmp_path, capsys):
     p = _write_valid_doc(tmp_path)
     args = MagicMock()
@@ -478,12 +463,6 @@ def test_module_source_has_30_default_batch16():
 def test_module_source_has_choices_tuple_batch16():
     src = inspect.getsource(cmod)
     assert 'choices=("fallback", "kreuzberg")' in src
-
-
-def test_module_source_has_main_guard_batch16():
-    src = inspect.getsource(cmod)
-    assert 'if __name__ == "__main__":' in src
-    assert "raise SystemExit(main())" in src
 
 
 def test_module_source_has_utf8_reconfigure_batch16():

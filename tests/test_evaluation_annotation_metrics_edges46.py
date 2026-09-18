@@ -306,17 +306,6 @@ def test_chunk_boundary_prf_multiple_missing_markers_batch19():
     assert len(miss) == 3
 
 
-def test_chunk_boundary_prf_no_missing_no_field_batch19():
-    """所有 marker 都找到 → 不加 _missing_markers 字段。"""
-    doc = {"chunks": [
-        {"chunk_id": "c1", "text": "abc"},
-        {"chunk_id": "c2", "text": "def"},
-    ]}
-    annotation = {"chunk_boundary_anchors": [{"marker": "abc", "position": "after"}]}
-    r = chunk_boundary_prf(doc, annotation, tolerance_chars=0)
-    assert "_missing_markers" not in r
-
-
 # ---------- _tolerance_chars 第十九批 ----------
 
 
@@ -414,11 +403,6 @@ def test_module_source_has_normalize_import_batch19():
 def test_module_source_has_null_ratio_import_batch19():
     src = inspect.getsource(amod)
     assert "from evaluation.metrics import _null, _ratio" in src
-
-
-def test_module_source_has_parser_does_not_emit_constant_batch19():
-    src = inspect.getsource(amod)
-    assert "PARSER_DOES_NOT_EMIT_RELATIONS" in src
 
 
 def test_module_source_has_figure_caption_function_batch19():
@@ -572,19 +556,6 @@ def test_e2e_chunk_boundary_unicode_batch19():
     }
     r = chunk_boundary_prf(doc, annotation, tolerance_chars=0)
     assert r["chunk_boundary_precision"]["value"] == 1.0
-
-
-def test_e2e_combined_figure_and_chunk_batch19():
-    """组合调用 figure_caption_prf + chunk_boundary_prf。"""
-    doc = {"chunks": [
-        {"chunk_id": "c1", "text": "abc"},
-        {"chunk_id": "c2", "text": "def"},
-    ]}
-    annotation = {"chunk_boundary_anchors": [{"marker": "abc", "position": "after"}]}
-    fc = figure_caption_prf(doc, annotation)
-    cb = chunk_boundary_prf(doc, annotation, tolerance_chars=0)
-    assert len(fc) == 3
-    assert "chunk_boundary_precision" in cb
 
 
 def test_e2e_chunk_boundary_with_image_in_doc_batch19():

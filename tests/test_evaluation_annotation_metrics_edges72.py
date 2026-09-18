@@ -78,13 +78,6 @@ def test_figure_caption_prf_consistent_regardless_of_input_batch47():
     assert out1 == out2 == out3 == out4
 
 
-def test_figure_caption_prf_returns_dict_of_dicts_batch47():
-    out = figure_caption_prf(None, None)
-    assert isinstance(out, dict)
-    for v in out.values():
-        assert isinstance(v, dict)
-
-
 def test_figure_caption_prf_no_extra_keys_batch47():
     out = figure_caption_prf({"id": "d1"}, {})
     assert set(out.keys()) == {
@@ -98,21 +91,9 @@ def test_figure_caption_prf_no_extra_keys_batch47():
 
 # ---------- chunk_boundary_prf document None 路径 ----------
 
-def test_chunk_boundary_doc_none_returns_pipeline_failed_batch47():
-    out = chunk_boundary_prf(None, {"chunk_boundary_anchors": []})
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["value"] is None
-        assert out[k]["reason"] == "pipeline_failed"
-
-
 def test_chunk_boundary_doc_none_still_has_tolerance_batch47():
     out = chunk_boundary_prf(None, None, tolerance_chars=42)
     assert out["_tolerance_chars"] == {"value": 42, "reason": None}
-
-
-def test_chunk_boundary_doc_none_no_missing_markers_key_batch47():
-    out = chunk_boundary_prf(None, None)
-    assert "_missing_markers" not in out
 
 
 def test_chunk_boundary_doc_none_returns_4_keys_batch47():
@@ -533,31 +514,6 @@ def test_source_contains_one_to_one_batch47():
     assert "一对一" in src
 
 
-def test_source_contains_missing_markers_batch47():
-    src = inspect.getsource(am_mod)
-    assert "missing_markers" in src
-
-
-def test_source_contains_no_ground_truth_anchors_batch47():
-    src = inspect.getsource(am_mod)
-    assert "no_ground_truth_anchors" in src
-
-
-def test_source_contains_pipeline_failed_batch47():
-    src = inspect.getsource(am_mod)
-    assert "pipeline_failed" in src
-
-
-def test_source_contains_no_annotation_batch47():
-    src = inspect.getsource(am_mod)
-    assert "no_annotation" in src
-
-
-def test_source_contains_no_predicted_boundaries_batch47():
-    src = inspect.getsource(am_mod)
-    assert "no_predicted_boundaries" in src
-
-
 def test_source_contains_本期不引入启发式_batch47():
     src = inspect.getsource(am_mod)
     assert "启发式" in src
@@ -583,14 +539,6 @@ def test_ast_chunk_boundary_has_multiple_if_batch47():
     func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "chunk_boundary_prf"][0]
     ifs = [n for n in ast.walk(func) if isinstance(n, ast.If)]
     assert len(ifs) >= 6  # document None / annotation / chunks < 2 / anchors empty / num_pred 0 / num_gt 0 / p_val None / denom <= 0
-
-
-def test_ast_chunk_boundary_has_for_loops_batch47():
-    tree = ast.parse(inspect.getsource(am_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "chunk_boundary_prf"][0]
-    fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
-    # 4 个 for：norm_chunks / predicted / gt_positions / pairs 嵌套
-    assert len(fors) >= 3
 
 
 def test_ast_chunk_boundary_has_nested_for_in_for_batch47():
@@ -636,12 +584,6 @@ def test_ast_figure_caption_returns_dict_batch47():
     assert isinstance(returns[0].value, ast.Dict)
 
 
-def test_ast_no_class_def_batch47():
-    tree = ast.parse(inspect.getsource(am_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_module_docstring_batch47():
     tree = ast.parse(inspect.getsource(am_mod))
     assert isinstance(tree.body[0], ast.Expr)
@@ -649,66 +591,6 @@ def test_ast_module_docstring_batch47():
 
 
 # ---------- forbidden tokens 第一百一十批 ----------
-
-def test_source_no_eval_batch47():
-    src = inspect.getsource(am_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch47():
-    src = inspect.getsource(am_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch47():
-    src = inspect.getsource(am_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch47():
-    src = inspect.getsource(am_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch47():
-    src = inspect.getsource(am_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch47():
-    src = inspect.getsource(am_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_popen_batch47():
-    src = inspect.getsource(am_mod)
-    assert ".popen(" not in src
-
-
-def test_source_no_yaml_load_batch47():
-    src = inspect.getsource(am_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch47():
-    src = inspect.getsource(am_mod)
-    assert "pickle.load(" not in src
-
-
-def test_source_no_subprocess_batch47():
-    src = inspect.getsource(am_mod)
-    assert "subprocess" not in src
-
-
-def test_source_no_walrus_batch47():
-    src = inspect.getsource(am_mod)
-    assert ":=" not in src
-
-
-def test_source_no_async_batch47():
-    src = inspect.getsource(am_mod)
-    assert "async def" not in src
-
 
 def test_source_no_await_batch47():
     src = inspect.getsource(am_mod)

@@ -431,13 +431,6 @@ def test_build_parser_run_max_chars_type_int():
     assert isinstance(args.max_chars, int)
 
 
-def test_build_parser_run_tolerance_chars_default_30():
-    """run --tolerance-chars 默认 30。"""
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert args.tolerance_chars == 30
-
-
 def test_build_parser_run_tolerance_chars_type_int():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "x", "--output", "y", "--tolerance-chars", "50"])
@@ -799,16 +792,6 @@ def test_module_docstring_mentions_run():
     import evaluation.cli as m
     assert m.__doc__
     assert "run" in m.__doc__
-
-
-def test_module_docstring_mentions_validate_report():
-    import evaluation.cli as m
-    assert "validate-report" in m.__doc__
-
-
-def test_module_docstring_mentions_inspect_doc():
-    import evaluation.cli as m
-    assert "inspect-doc" in m.__doc__
 
 
 def test_module_docstring_mentions_python_m_evaluation_cli():

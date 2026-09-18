@@ -181,13 +181,6 @@ def test_hard_split_empty_text_returns_empty():
     assert _hard_split_with_whitespace_fallback("", 100) == []
 
 
-def test_hard_split_text_shorter_than_max_returns_single_piece():
-    pieces = _hard_split_with_whitespace_fallback("hello", 100)
-    assert len(pieces) == 1
-    assert pieces[0].text == "hello"
-    assert pieces[0].boundary_after is None
-
-
 def test_hard_split_text_exactly_max_returns_single_piece():
     pieces = _hard_split_with_whitespace_fallback("hello", 5)
     assert len(pieces) == 1
@@ -253,15 +246,6 @@ def test_split_long_text_empty_returns_empty_list():
 
 def test_split_long_text_only_whitespace_returns_empty_list():
     assert _split_long_text("   \n\t  ", 100) == []
-
-
-def test_split_long_text_shorter_than_max_returns_single():
-    pieces = _split_long_text("hello", 100)
-    assert len(pieces) == 1
-    assert pieces[0].text == "hello"
-    assert pieces[0].boundary_after is None
-    assert pieces[0].start == 0
-    assert pieces[0].end == 5
 
 
 def test_split_long_text_exactly_max_returns_single():
@@ -783,39 +767,16 @@ def test_module_all_no_duplicates():
     assert len(mod.__all__) == len(set(mod.__all__))
 
 
-def test_module_imports_re():
-    import app.chunkers.structural as mod
-    src = inspect.getsource(mod)
-    assert "import re" in src
-
-
 def test_module_imports_dataclass_field():
     import app.chunkers.structural as mod
     src = inspect.getsource(mod)
     assert "from dataclasses import dataclass, field" in src
 
 
-def test_module_imports_any():
-    import app.chunkers.structural as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
 def test_module_imports_models():
     import app.chunkers.structural as mod
     src = inspect.getsource(mod)
     assert "from app.models import Chunk, Document, Element" in src
-
-
-def test_module_uses_future_annotations():
-    import app.chunkers.structural as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_docstring_present():
-    import app.chunkers.structural as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_heading_boundary():

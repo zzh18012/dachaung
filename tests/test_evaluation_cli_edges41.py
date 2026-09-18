@@ -68,15 +68,6 @@ def test_build_parser_run_subparser_help_batch14():
     assert has_parser
 
 
-def test_build_parser_validate_report_positional_input_batch14():
-    p = _build_parser()
-    sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
-    val_p = sub_actions[0].choices["validate-report"]
-    positional = [a for a in val_p._actions if not a.option_strings and a.dest != "help"]
-    assert len(positional) == 1
-    assert positional[0].dest == "input"
-
-
 def test_build_parser_inspect_doc_positional_input_batch14():
     p = _build_parser()
     sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
@@ -433,30 +424,6 @@ def test_module_source_future_annotations_present_batch14():
     source = inspect.getsource(climod)
     head = "\n".join(source.split("\n")[:30])
     assert "from __future__ import annotations" in head
-
-
-def test_module_source_imports_manifest_helpers_batch14():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:40])
-    assert "from evaluation.manifest import ManifestError, load_manifest" in head
-
-
-def test_module_source_imports_report_helpers_batch14():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:40])
-    assert "from evaluation.report import get_git_provenance" in head
-
-
-def test_module_source_imports_runner_batch14():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:40])
-    assert "from evaluation.runner import run_evaluation" in head
-
-
-def test_module_source_imports_schema_batch14():
-    source = inspect.getsource(climod)
-    head = "\n".join(source.split("\n")[:40])
-    assert "from evaluation.schema import EvalSchemaError, validate_file" in head
 
 
 def test_module_source_defines_format_metric_batch14():

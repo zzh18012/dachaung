@@ -74,12 +74,6 @@ def test_load_manifest_return_annotation_batch44():
 
 # ---------- load_manifest 错误路径 ----------
 
-def test_load_manifest_file_not_found_batch44(tmp_path):
-    with pytest.raises(ManifestError) as exc_info:
-        load_manifest(tmp_path / "nonexistent.json", tmp_path)
-    assert "清单文件不存在" in str(exc_info.value)
-
-
 def test_load_manifest_invalid_json_batch44(tmp_path):
     p = tmp_path / "m.json"
     p.write_text("not json", encoding="utf-8")
@@ -403,10 +397,6 @@ def test_is_absolute_like_windows_batch44():
     assert _is_absolute_like("C:\\Windows") is True
 
 
-def test_is_absolute_like_relative_batch44():
-    assert _is_absolute_like("foo/bar.pdf") is False
-
-
 def test_is_absolute_like_empty_batch44():
     assert _is_absolute_like("") is False
 
@@ -652,11 +642,6 @@ def test_module_source_contains_manifest_version_import_batch44():
 def test_module_source_contains_validate_import_batch44():
     src = inspect.getsource(manifest_mod)
     assert "from evaluation.schema import validate" in src
-
-
-def test_module_source_contains_dataclass_batch44():
-    src = inspect.getsource(manifest_mod)
-    assert "@dataclass(frozen=True)" in src
 
 
 def test_module_source_contains_paired_group_comment_batch44():

@@ -152,11 +152,6 @@ def test_format_metric_float_one_third_batch38():
     assert "0.3333" in out
 
 
-def test_format_metric_float_full_batch38():
-    out = _format_metric("ratio", {"value": 1.0, "reason": None})
-    assert "1.0000" in out
-
-
 def test_format_metric_bool_true_batch38():
     out = _format_metric("success", {"value": True, "reason": None})
     assert "true" in out
@@ -375,11 +370,6 @@ def test_main_run_invalid_manifest_schema_returns_1_batch38(tmp_path, capsys):
     assert rc == 1
 
 
-def test_main_validate_report_missing_returns_2_batch38(capsys):
-    rc = main(["validate-report", "/nonexistent/report.json"])
-    assert rc == 2
-
-
 def test_main_validate_report_invalid_json_returns_1_batch38(tmp_path):
     """报告 JSON 不合法 → 返回 1。"""
     r = tmp_path / "report.json"
@@ -394,11 +384,6 @@ def test_main_validate_report_invalid_content_returns_1_batch38(tmp_path):
     r.write_text(json.dumps({"wrong_field": "x"}), encoding="utf-8")
     rc = main(["validate-report", str(r)])
     assert rc == 1
-
-
-def test_main_inspect_doc_missing_returns_2_batch38():
-    rc = main(["inspect-doc", "/nonexistent/doc.json"])
-    assert rc == 2
 
 
 def test_main_inspect_doc_invalid_json_returns_1_batch38(tmp_path):
@@ -556,11 +541,6 @@ def test_module_source_contains_run_keyword_batch38():
 def test_module_source_contains_validate_report_keyword_batch38():
     src = inspect.getsource(cmod)
     assert "validate-report" in src
-
-
-def test_module_source_contains_inspect_doc_keyword_batch38():
-    src = inspect.getsource(cmod)
-    assert "inspect-doc" in src
 
 
 def test_module_source_contains_argparse_import_batch38():

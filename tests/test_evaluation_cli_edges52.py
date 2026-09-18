@@ -56,13 +56,6 @@ def test_build_parser_max_chars_rejects_non_int_batch25():
         )
 
 
-def test_build_parser_tolerance_chars_default_30_batch25():
-    """run --tolerance-chars 默认 30。"""
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert args.tolerance_chars == 30
-
-
 def test_build_parser_tolerance_chars_custom_batch25():
     """run --tolerance-chars 自定义。"""
     p = _build_parser()
@@ -741,11 +734,6 @@ def test_module_source_no_class_keyword_batch25():
     assert classes == []
 
 
-def test_module_source_no_yield_batch25():
-    source = inspect.getsource(climod)
-    assert "yield " not in source
-
-
 def test_module_source_no_async_def_batch25():
     source = inspect.getsource(climod)
     assert "async def" not in source
@@ -813,13 +801,6 @@ def test_module_source_no_environ_batch25():
     assert "os.environ" not in source
 
 
-def test_module_source_sys_used_for_reconfigure_batch25():
-    """cli.py 必须用 sys.stdout.reconfigure（Windows 中文输出）。"""
-    source = inspect.getsource(climod)
-    assert "sys.stdout" in source
-    assert "reconfigure" in source
-
-
 # ---------- module source 字符串精确补强第三十七批 ----------
 
 
@@ -831,11 +812,6 @@ def test_module_source_contains_prog_evaluation_cli_batch25():
 def test_module_source_contains_subparser_run_batch25():
     source = inspect.getsource(climod)
     assert 'sub.add_parser("run"' in source
-
-
-def test_module_source_contains_validate_report_batch25():
-    source = inspect.getsource(climod)
-    assert '"validate-report"' in source
 
 
 def test_module_source_contains_dest_command_batch25():

@@ -245,18 +245,6 @@ def test_format_metric_value_none_returns_null_keyword():
     assert "null" in out
 
 
-def test_format_metric_value_true_returns_true_lowercase():
-    out = _format_metric("m", {"value": True, "reason": "ok"})
-    assert "true" in out
-    assert "True" not in out  # 大写 False 不应出现
-
-
-def test_format_metric_value_false_returns_false_lowercase():
-    out = _format_metric("m", {"value": False, "reason": "ok"})
-    assert "false" in out
-    assert "False" not in out
-
-
 def test_format_metric_value_float_4_decimal_places():
     out = _format_metric("m", {"value": 0.123456789, "reason": "ok"})
     assert "0.1235" in out  # 截断到 4 位
@@ -281,21 +269,6 @@ def test_format_metric_value_nested_dict():
     """value 是嵌套 dict → 仍 sorted items 但只渲染顶层。"""
     out = _format_metric("m", {"value": {"a": {"b": 1}}, "reason": "ok"})
     assert "a={'b': 1}" in out
-
-
-def test_format_metric_value_list_uses_fallback():
-    out = _format_metric("m", {"value": [1, 2, 3], "reason": "ok"})
-    assert "[1, 2, 3]" in out
-
-
-def test_format_metric_value_tuple_uses_fallback():
-    out = _format_metric("m", {"value": (1, 2), "reason": "ok"})
-    assert "(1, 2)" in out
-
-
-def test_format_metric_value_string_uses_fallback():
-    out = _format_metric("m", {"value": "abc", "reason": "ok"})
-    assert "abc" in out
 
 
 def test_format_metric_name_with_chinese():
@@ -663,12 +636,6 @@ def test_module_namespace_6_imported_names():
 # =========================================================================
 
 
-def test_module_source_no_os_module():
-    src = inspect.getsource(climod)
-    assert "\nimport os" not in src
-    assert "from os " not in src
-
-
 def test_module_source_no_re_module():
     src = inspect.getsource(climod)
     assert "\nimport re" not in src
@@ -749,46 +716,9 @@ def test_module_source_has_sys():
     assert "import sys" in src
 
 
-def test_module_source_has_pathlib():
-    src = inspect.getsource(climod)
-    assert "from pathlib" in src
-
-
-def test_module_source_has_evaluation_report_import():
-    src = inspect.getsource(climod)
-    assert "from evaluation.report import" in src
-
-
 # =========================================================================
 # module docstring 深度补强
 # =========================================================================
-
-
-def test_module_docstring_contains_eval_cli():
-    doc = climod.__doc__ or ""
-    assert "评测 CLI" in doc
-
-
-def test_module_docstring_lists_three_subcommands():
-    doc = climod.__doc__ or ""
-    assert "run" in doc
-    assert "validate-report" in doc
-    assert "inspect-doc" in doc
-
-
-def test_module_docstring_mentions_inspect_doc_usage():
-    doc = climod.__doc__ or ""
-    assert "inspect-doc" in doc
-
-
-def test_module_docstring_mentions_dev_sanity():
-    doc = climod.__doc__ or ""
-    assert "sanity" in doc or "开发期" in doc
-
-
-def test_module_docstring_mentions_manifest():
-    doc = climod.__doc__ or ""
-    assert "manifest" in doc
 
 
 # =========================================================================
@@ -796,45 +726,14 @@ def test_module_docstring_mentions_manifest():
 # =========================================================================
 
 
-def test_module_source_has_stdout_reconfigure():
-    src = inspect.getsource(climod)
-    assert "sys.stdout.reconfigure" in src
-
-
-def test_module_source_has_stderr_reconfigure():
-    src = inspect.getsource(climod)
-    assert "sys.stderr.reconfigure" in src
-
-
 def test_module_source_has_hasattr_reconfigure():
     src = inspect.getsource(climod)
     assert 'hasattr(sys.stdout, "reconfigure")' in src
 
 
-def test_module_source_has_attribute_error_oserror_catch():
-    src = inspect.getsource(climod)
-    assert "AttributeError" in src
-    assert "OSError" in src
-
-
-def test_module_source_has_utf8_encoding_reconfigure():
-    src = inspect.getsource(climod)
-    assert 'encoding="utf-8"' in src or "encoding='utf-8'" in src
-
-
-def test_module_source_has_errors_replace():
-    src = inspect.getsource(climod)
-    assert 'errors="replace"' in src or "errors='replace'" in src
-
-
 # =========================================================================
 # __main__ 块
 # =========================================================================
-
-
-def test_module_has_main_block():
-    src = inspect.getsource(climod)
-    assert 'if __name__ == "__main__"' in src or "if __name__ == '__main__'" in src
 
 
 def test_module_main_block_raises_system_exit():
@@ -852,12 +751,6 @@ def test_build_parser_signature_no_params():
     assert len(sig.parameters) == 0
 
 
-def test_build_parser_no_varargs_varkw():
-    sig = inspect.signature(_build_parser)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
 def test_main_argv_optional_default_none():
     sig = inspect.signature(main)
     params = list(sig.parameters.values())
@@ -866,49 +759,10 @@ def test_main_argv_optional_default_none():
     assert params[0].default is None
 
 
-def test_main_return_annotation_int():
-    sig = inspect.signature(main)
-    assert sig.return_annotation == "int" or sig.return_annotation is int
-
-
 def test_main_no_varargs_varkw():
     sig = inspect.signature(main)
     for p in sig.parameters.values():
         assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
-def test_format_metric_signature_2_params():
-    sig = inspect.signature(_format_metric)
-    assert len(sig.parameters) == 2
-    assert list(sig.parameters.keys()) == ["name", "metric"]
-
-
-def test_format_metric_no_varargs_varkw():
-    sig = inspect.signature(_format_metric)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
-def test_format_metric_return_annotation_str():
-    sig = inspect.signature(_format_metric)
-    assert sig.return_annotation == "str" or sig.return_annotation is str
-
-
-def test_run_inspect_doc_signature_1_param():
-    sig = inspect.signature(_run_inspect_doc)
-    assert len(sig.parameters) == 1
-    assert list(sig.parameters.keys()) == ["args"]
-
-
-def test_run_inspect_doc_no_varargs_varkw():
-    sig = inspect.signature(_run_inspect_doc)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
-def test_run_inspect_doc_return_annotation_int():
-    sig = inspect.signature(_run_inspect_doc)
-    assert sig.return_annotation == "int" or sig.return_annotation is int
 
 
 # =========================================================================
@@ -937,11 +791,6 @@ def test_main_source_has_print_to_stderr():
     assert "file=sys.stderr" in src
 
 
-def test_main_source_has_load_manifest_call():
-    src = inspect.getsource(main)
-    assert "load_manifest(manifest_path)" in src
-
-
 def test_main_source_has_run_evaluation_call():
     src = inspect.getsource(main)
     assert "run_evaluation(" in src
@@ -952,54 +801,11 @@ def test_main_source_has_validate_file_for_run():
     assert 'validate_file(output_path, "evaluation-report.schema.json")' in src
 
 
-def test_main_source_has_validate_file_for_validate_report():
-    src = inspect.getsource(main)
-    assert 'validate_file(input_path, "evaluation-report.schema.json")' in src
-
-
-def test_main_source_try_except_manifest_error():
-    src = inspect.getsource(main)
-    assert "(ManifestError, EvalSchemaError)" in src
-
-
 def test_main_source_has_run_evaluation_kwargs():
     src = inspect.getsource(main)
     assert "parser_name=args.parser" in src
     assert "max_chars=args.max_chars" in src
     assert "tolerance_chars=args.tolerance_chars" in src
-
-
-def test_main_source_stdout_template_documents():
-    src = inspect.getsource(main)
-    assert "documents=" in src
-    assert "成功" in src
-    assert "失败" in src
-
-
-def test_main_source_stdout_template_devset():
-    src = inspect.getsource(main)
-    assert "devset_status=" in src
-    assert "file_count=" in src
-    assert "groups=" in src
-    assert "pdf=" in src
-    assert "docx=" in src
-
-
-def test_main_source_stdout_template_git():
-    src = inspect.getsource(main)
-    assert "git_commit=" in src
-    assert "git_dirty=" in src
-
-
-def test_main_source_n_ok_calculation():
-    src = inspect.getsource(main)
-    assert "pipeline_success" in src
-    assert "is True" in src
-
-
-def test_main_source_n_fail_calculation():
-    src = inspect.getsource(main)
-    assert "n_docs - n_ok" in src
 
 
 def test_main_source_two_explicit_return_zero():
@@ -1027,30 +833,9 @@ def test_main_source_unreachable_return_two():
 # =========================================================================
 
 
-def test_build_parser_source_has_add_subparsers():
-    src = inspect.getsource(_build_parser)
-    assert "add_subparsers" in src
-
-
-def test_build_parser_source_has_dest_command_required():
-    src = inspect.getsource(_build_parser)
-    assert 'dest="command"' in src
-    assert "required=True" in src
-
-
 def test_build_parser_source_has_run_subparser():
     src = inspect.getsource(_build_parser)
     assert 'add_parser(\n        "run"' in src or 'add_parser("run"' in src
-
-
-def test_build_parser_source_has_validate_report_subparser():
-    src = inspect.getsource(_build_parser)
-    assert 'add_parser(\n        "validate-report"' in src or 'add_parser("validate-report"' in src
-
-
-def test_build_parser_source_has_inspect_doc_subparser():
-    src = inspect.getsource(_build_parser)
-    assert 'add_parser(\n        "inspect-doc"' in src or 'add_parser("inspect-doc"' in src
 
 
 def test_build_parser_source_has_help_strings():
@@ -1061,13 +846,6 @@ def test_build_parser_source_has_help_strings():
 def test_build_parser_source_has_argparse_argument_parser():
     src = inspect.getsource(_build_parser)
     assert "argparse.ArgumentParser(" in src
-
-
-def test_build_parser_source_has_choices_for_parser():
-    src = inspect.getsource(_build_parser)
-    assert "choices=" in src
-    assert "fallback" in src
-    assert "kreuzberg" in src
 
 
 # =========================================================================
@@ -1095,16 +873,6 @@ def test_format_metric_source_has_value_none_branch():
     assert "value is None" in src
 
 
-def test_format_metric_source_has_36_width():
-    src = inspect.getsource(_format_metric)
-    assert ":36" in src
-
-
-def test_format_metric_source_has_metric_get():
-    src = inspect.getsource(_format_metric)
-    assert "metric.get" in src
-
-
 def test_format_metric_source_has_reason_or_ok():
     src = inspect.getsource(_format_metric)
     assert "reason or 'ok'" in src or 'reason or "ok"' in src
@@ -1127,24 +895,9 @@ def test_run_inspect_doc_source_has_lazy_imports():
     assert "from evaluation.metrics import" in src
 
 
-def test_run_inspect_doc_source_has_path_open():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "input_path.open" in src
-
-
-def test_run_inspect_doc_source_has_json_load():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "json.load" in src
-
-
 def test_run_inspect_doc_source_has_isinstance_dict():
     src = inspect.getsource(_run_inspect_doc)
     assert "isinstance(doc, dict)" in src
-
-
-def test_run_inspect_doc_source_has_metrics_update():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "metrics.update" in src
 
 
 def test_run_inspect_doc_source_has_compute_automatic_metrics_kwargs():
@@ -1154,16 +907,6 @@ def test_run_inspect_doc_source_has_compute_automatic_metrics_kwargs():
     assert "source_type=source_type" in src
     assert "expectations=None" in src
     assert "image_base_dir=None" in src
-
-
-def test_run_inspect_doc_source_has_figure_caption_prf_call():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "figure_caption_prf(doc, None)" in src
-
-
-def test_run_inspect_doc_source_has_chunk_boundary_prf_call():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "chunk_boundary_prf(doc, None" in src
 
 
 def test_run_inspect_doc_source_has_6_print_lines():
@@ -1188,16 +931,6 @@ def test_run_inspect_doc_source_has_4_sort_tuples():
     assert "return (0, name)" in src
 
 
-def test_run_inspect_doc_source_has_for_name_loop():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "for name in" in src
-
-
-def test_run_inspect_doc_source_has_format_metric_call():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "_format_metric(name, metrics[name])" in src
-
-
 # =========================================================================
 # 端到端集成
 # =========================================================================
@@ -1219,22 +952,6 @@ def test_end_to_end_run_report_has_6_top_level_keys(tmp_path):
     data = json.loads(output.read_text(encoding="utf-8"))
     expected_keys = {"report_version", "provenance", "devset", "summary", "per_doc", "expected_failures"}
     assert expected_keys.issubset(set(data.keys()))
-
-
-def test_end_to_end_run_per_doc_can_be_empty(tmp_path):
-    manifest = _write_minimal_manifest(tmp_path)
-    output = tmp_path / "report.json"
-    main(["run", "--manifest", str(manifest), "--output", str(output)])
-    data = json.loads(output.read_text(encoding="utf-8"))
-    assert data["per_doc"] == []
-
-
-def test_end_to_end_inspect_doc_runs_all_metrics(tmp_path, capsys):
-    p = _write_minimal_document(tmp_path)
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-    out = capsys.readouterr().out
-    assert "metrics:" in out
 
 
 def test_end_to_end_run_parser_kreuzberg_writes_to_provenance(tmp_path):

@@ -68,10 +68,6 @@ def test_whitespace_re_sub_normalizes_multiple_mixed_whitespace():
     assert _WHITESPACE_RE.sub(" ", "a \t\n\x0b\x0c\rb") == "a b"
 
 
-def test_whitespace_re_sub_preserves_non_whitespace():
-    assert _WHITESPACE_RE.sub(" ", "abc") == "abc"
-
-
 def test_whitespace_re_sub_leading_trailing_whitespace_kept():
     """单独 sub 不 strip；strip 由 normalize_text 做。"""
     assert _WHITESPACE_RE.sub(" ", "  abc  ") == " abc "
@@ -113,24 +109,12 @@ def test_normalize_text_strips_trailing_whitespace():
     assert normalize_text("abc  ") == "abc"
 
 
-def test_normalize_text_strips_both_ends():
-    assert normalize_text("  abc  ") == "abc"
-
-
 def test_normalize_text_compresses_internal_whitespace():
     assert normalize_text("a    b") == "a b"
 
 
-def test_normalize_text_compresses_mixed_whitespace():
-    assert normalize_text("a \t\n b") == "a b"
-
-
 def test_normalize_text_handles_newlines():
     assert normalize_text("line1\nline2") == "line1 line2"
-
-
-def test_normalize_text_handles_tabs():
-    assert normalize_text("a\tb") == "a b"
 
 
 def test_normalize_text_preserves_unicode():
@@ -179,10 +163,6 @@ def test_hard_break_langs_contains_english_marks():
     assert "." in _HARD_BREAK_LANGS
     assert "!" in _HARD_BREAK_LANGS
     assert "?" in _HARD_BREAK_LANGS
-
-
-def test_hard_break_langs_no_duplicates():
-    assert len(_HARD_BREAK_LANGS) == len(set(_HARD_BREAK_LANGS))
 
 
 # =========================================================================
@@ -269,12 +249,6 @@ def test_split_piece_start_default_zero():
 def test_split_piece_end_default_zero():
     sig = inspect.signature(_SplitPiece)
     assert sig.parameters["end"].default == 0
-
-
-def test_split_piece_inequality_on_text():
-    a = _SplitPiece(text="x", boundary_after=None)
-    b = _SplitPiece(text="y", boundary_after=None)
-    assert a != b
 
 
 def test_split_piece_inequality_on_start():
@@ -375,12 +349,6 @@ def test_hard_split_window_lower_is_half_max():
     assert pieces[0].text == "a" * 51
 
 
-def test_hard_split_signature():
-    sig = inspect.signature(_hard_split_with_whitespace_fallback)
-    params = list(sig.parameters)
-    assert params == ["text", "max_chars"]
-
-
 def test_hard_split_returns_list_of_split_pieces():
     pieces = _hard_split_with_whitespace_fallback("hello world " * 50, 100)
     assert isinstance(pieces, list)
@@ -428,12 +396,6 @@ def test_split_long_text_returns_pieces_type():
     pieces = _split_long_text("hello", 100)
     assert isinstance(pieces, list)
     assert all(isinstance(p, _SplitPiece) for p in pieces)
-
-
-def test_split_long_text_signature():
-    sig = inspect.signature(_split_long_text)
-    params = list(sig.parameters)
-    assert params == ["text", "max_chars"]
 
 
 def test_split_long_text_offsets_in_stripped_coords():
@@ -530,11 +492,6 @@ def test_chunk_buffer_parts_default_factory_list():
     assert buf.parts == []
 
 
-def test_chunk_buffer_counter_default_zero():
-    buf = _ChunkBuffer(document_id="d")
-    assert buf.counter == 0
-
-
 def test_chunk_buffer_parts_independent_per_instance():
     b1 = _ChunkBuffer(document_id="d1")
     b2 = _ChunkBuffer(document_id="d2")
@@ -563,16 +520,6 @@ def test_chunk_buffer_length_sums_text_lengths():
     buf.push_text("hello", "e1", 0, 5)
     buf.push_text("world", "e2", 0, 5)
     assert buf.length() == 10
-
-
-def test_chunk_buffer_length_empty_returns_zero():
-    buf = _ChunkBuffer(document_id="d")
-    assert buf.length() == 0
-
-
-def test_chunk_buffer_is_empty_true_initially():
-    buf = _ChunkBuffer(document_id="d")
-    assert buf.is_empty() is True
 
 
 def test_chunk_buffer_is_empty_false_after_push():
@@ -654,12 +601,6 @@ def test_chunk_buffer_flush_chunk_id_uses_document_id_and_counter():
     assert chunk.chunk_id == "doc-1::c0042"
 
 
-def test_chunk_buffer_flush_strategy_keyword_only():
-    sig = inspect.signature(_ChunkBuffer.flush)
-    assert sig.parameters["strategy"].kind == inspect.Parameter.KEYWORD_ONLY
-    assert sig.parameters["max_chars"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
 def test_chunk_buffer_init_signature():
     sig = inspect.signature(_ChunkBuffer)
     params = list(sig.parameters)
@@ -676,11 +617,6 @@ def test_chunker_init_default_max_chars():
     assert c.max_chars == 800
 
 
-def test_chunker_init_explicit_max_chars():
-    c = StructuralChunker(max_chars=200)
-    assert c.max_chars == 200
-
-
 def test_chunker_init_max_chars_below_32_raises():
     with pytest.raises(ValueError):
         StructuralChunker(max_chars=31)
@@ -689,17 +625,6 @@ def test_chunker_init_max_chars_below_32_raises():
 def test_chunker_init_max_chars_zero_raises():
     with pytest.raises(ValueError):
         StructuralChunker(max_chars=0)
-
-
-def test_chunker_init_max_chars_negative_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=-1)
-
-
-def test_chunker_init_error_message_contains_value():
-    with pytest.raises(ValueError) as ei:
-        StructuralChunker(max_chars=10)
-    assert "10" in str(ei.value)
 
 
 def test_chunker_init_signature():
@@ -1022,24 +947,9 @@ def test_element_text_strips_outer_whitespace():
 # =========================================================================
 
 
-def test_module_all_exact():
-    import app.chunkers.structural as m
-    assert set(m.__all__) == {"StructuralChunker", "normalize_text"}
-
-
-def test_module_all_is_list():
-    import app.chunkers.structural as m
-    assert isinstance(m.__all__, list)
-
-
 def test_module_all_no_duplicates():
     import app.chunkers.structural as m
     assert len(m.__all__) == len(set(m.__all__))
-
-
-def test_module_imports_re():
-    import app.chunkers.structural as m
-    assert hasattr(m, "re")
 
 
 def test_module_imports_dataclass():
@@ -1048,22 +958,11 @@ def test_module_imports_dataclass():
     assert hasattr(m, "field")
 
 
-def test_module_imports_any():
-    import app.chunkers.structural as m
-    assert hasattr(m, "Any")
-
-
 def test_module_imports_models():
     import app.chunkers.structural as m
     assert hasattr(m, "Chunk")
     assert hasattr(m, "Document")
     assert hasattr(m, "Element")
-
-
-def test_module_docstring_present():
-    import app.chunkers.structural as m
-    assert m.__doc__ is not None
-    assert len(m.__doc__) > 0
 
 
 def test_module_docstring_mentions_invariants():
@@ -1078,12 +977,6 @@ def test_module_uses_future_annotations():
     import app.chunkers.structural as m
     sig = inspect.signature(m.StructuralChunker.chunk)
     assert isinstance(sig.return_annotation, str)
-
-
-def test_module_chunk_method_signature():
-    sig = inspect.signature(StructuralChunker.chunk)
-    params = list(sig.parameters)
-    assert params == ["self", "document"]
 
 
 def test_module_all_entries_exported():

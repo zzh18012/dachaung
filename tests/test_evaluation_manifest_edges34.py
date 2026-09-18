@@ -77,11 +77,6 @@ def test_is_absolute_like_cyrillic_alpha_pos0():
     assert _is_absolute_like("А:/foo") is True
 
 
-def test_is_absolute_like_greek_alpha_pos0():
-    # Greek α is alphabetic
-    assert _is_absolute_like("α:/foo") is True
-
-
 def test_is_absolute_like_han_pos0():
     # Han ideograph is alphabetic per .isalpha()
     assert _is_absolute_like("中:/foo") is True
@@ -347,13 +342,6 @@ def test_expected_failure_fields_count_5():
     assert len(flds) == 5
 
 
-def test_expected_failure_field_names():
-    flds = fields(ExpectedFailure)
-    names = [f.name for f in flds]
-    expected = ["doc_id", "path_str", "resolved_path", "expected_error_code", "source_type"]
-    assert names == expected
-
-
 def test_expected_failure_in_set():
     f1 = _make_failure()
     f2 = _make_failure()
@@ -398,13 +386,6 @@ def test_manifest_astuple_returns_tuple():
 def test_manifest_fields_count_5():
     flds = fields(Manifest)
     assert len(flds) == 5
-
-
-def test_manifest_field_names():
-    flds = fields(Manifest)
-    names = [f.name for f in flds]
-    expected = ["manifest_version", "devset_status", "documents", "expected_failures", "project_root"]
-    assert names == expected
 
 
 # ---------- Manifest properties 算法深度第七批 ----------
@@ -452,13 +433,6 @@ def test_manifest_categories_covered_with_unicode():
     # 排序按 Unicode codepoint
     sorted_cats = sorted(["中文", "日本語", "english"])
     assert m.categories_covered == sorted_cats
-
-
-def test_manifest_content_group_count_pair_only():
-    d1 = _make_doc(doc_id="d1", paired_with="d2")
-    d2 = _make_doc(doc_id="d2", paired_with="d1")
-    m = _make_manifest(documents=(d1, d2))
-    assert m.content_group_count == 1
 
 
 def test_manifest_content_group_count_pair_unidirectional():
@@ -665,12 +639,6 @@ def test_signature_load_manifest_two_params():
     params = list(sig.parameters.values())
     # manifest_path + project_root
     assert len(params) == 2
-
-
-def test_signature_load_manifest_project_root_default_none():
-    sig = inspect.signature(load_manifest)
-    params = sig.parameters
-    assert params["project_root"].default is None
 
 
 def test_signature_manifest_properties_return_types():

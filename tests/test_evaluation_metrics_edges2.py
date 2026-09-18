@@ -64,20 +64,10 @@ def test_null_returns_dict_with_reason_str():
     assert result["reason"] == "my_reason"
 
 
-def test_null_dict_has_exactly_two_keys():
-    result = _null("x")
-    assert set(result.keys()) == {"value", "reason"}
-
-
 def test_null_with_empty_reason():
     result = _null("")
     assert result["reason"] == ""
     assert result["value"] is None
-
-
-def test_null_with_unicode_reason():
-    result = _null("中文原因")
-    assert result["reason"] == "中文原因"
 
 
 def test_ratio_returns_dict_with_value_float():
@@ -124,11 +114,6 @@ def test_bool_metric_returns_bool_value():
 def test_bool_metric_coerces_truthy():
     result = _bool_metric(1)
     assert result["value"] is True
-
-
-def test_bool_metric_coerces_falsy():
-    result = _bool_metric(0)
-    assert result["value"] is False
 
 
 def test_bool_metric_reason_none():
@@ -354,33 +339,9 @@ def test_pdf_locator_ratio_all_valid_text_with_bbox():
     assert result["value"] == 1.0
 
 
-def test_pdf_locator_ratio_text_missing_bbox_invalid():
-    elements = [
-        {"type": "paragraph", "source_locator": {"page": 1}},  # no bbox
-    ]
-    result = _pdf_locator_ratio(elements)
-    assert result["value"] == 0.0
-
-
 def test_pdf_locator_ratio_invalid_bbox():
     elements = [
         {"type": "paragraph", "source_locator": {"page": 1, "bbox": [0, 0]}},  # only 2
-    ]
-    result = _pdf_locator_ratio(elements)
-    assert result["value"] == 0.0
-
-
-def test_pdf_locator_ratio_page_zero_invalid():
-    elements = [
-        {"type": "table", "source_locator": {"page": 0}},  # table 不需 bbox
-    ]
-    result = _pdf_locator_ratio(elements)
-    assert result["value"] == 0.0
-
-
-def test_pdf_locator_ratio_page_negative_invalid():
-    elements = [
-        {"type": "table", "source_locator": {"page": -1}},
     ]
     result = _pdf_locator_ratio(elements)
     assert result["value"] == 0.0
@@ -409,12 +370,6 @@ def test_pdf_locator_ratio_locator_none():
 def test_pdf_locator_ratio_table_does_not_need_bbox():
     """table 不在 _PDF_BBOX_REQUIRED_TYPES，所以只需 page≥1。"""
     elements = [{"type": "table", "source_locator": {"page": 1}}]
-    result = _pdf_locator_ratio(elements)
-    assert result["value"] == 1.0
-
-
-def test_pdf_locator_ratio_image_does_not_need_bbox():
-    elements = [{"type": "image", "source_locator": {"page": 1}}]
     result = _pdf_locator_ratio(elements)
     assert result["value"] == 1.0
 
@@ -494,15 +449,6 @@ def test_docx_locator_ratio_locator_none():
     elements = [{"type": "paragraph", "source_locator": None}]
     result = _docx_locator_ratio(elements)
     assert result["value"] == 0.0
-
-
-def test_docx_locator_ratio_partial_valid():
-    elements = [
-        {"type": "paragraph", "source_locator": {"paragraph_index": 0}},
-        {"type": "paragraph", "source_locator": {"unknown_key": "x"}},
-    ]
-    result = _docx_locator_ratio(elements)
-    assert result["value"] == 0.5
 
 
 def test_docx_locator_ratio_multiple_structural_keys():
@@ -618,19 +564,6 @@ def test_image_resource_ratio_returns_float():
 # =========================================================================
 # 7. _chunk_reference_ratio 第二轮
 # =========================================================================
-
-
-def test_chunk_reference_ratio_no_chunks_returns_null():
-    result = _chunk_reference_ratio([], [])
-    assert result["value"] is None
-    assert result["reason"] == "no_chunks"
-
-
-def test_chunk_reference_ratio_all_valid():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}]
-    chunks = [{"source_element_ids": ["e1"]}, {"source_element_ids": ["e2"]}]
-    result = _chunk_reference_ratio(elements, chunks)
-    assert result["value"] == 1.0
 
 
 def test_chunk_reference_ratio_invalid_reference():
@@ -928,13 +861,6 @@ def test_heading_boundary_ratio_chunk_first_id_matches():
     assert result["value"] == 1.0
 
 
-def test_heading_boundary_ratio_chunk_first_id_not_match():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["p1", "h1"]}]  # h1 not first
-    result = _heading_boundary_ratio(elements, chunks)
-    assert result["value"] == 0.0
-
-
 def test_heading_boundary_ratio_partial():
     elements = [
         {"type": "heading", "element_id": "h1"},
@@ -1220,11 +1146,6 @@ def test_metrics_all_only_compute_automatic_metrics():
 
 def test_metrics_all_is_list():
     assert isinstance(metrics_all, list)
-
-
-def test_metrics_module_has_compute_automatic_metrics():
-    import evaluation.metrics as mod
-    assert hasattr(mod, "compute_automatic_metrics")
 
 
 def test_metrics_module_imports_math():

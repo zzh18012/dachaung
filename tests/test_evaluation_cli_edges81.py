@@ -237,12 +237,6 @@ def test_run_help_lists_options_batch52(capsys):
     assert "--tolerance-chars" in o
 
 
-def test_unknown_subcommand_exit2_batch52(capsys):
-    with pytest.raises(SystemExit) as ei:
-        main(["bogus"])
-    assert ei.value.code == 2
-
-
 def test_run_missing_output_exit2_batch52(capsys):
     with pytest.raises(SystemExit) as ei:
         main(["run", "--manifest", "x.json"])
@@ -278,10 +272,6 @@ def _src() -> str:
     return inspect.getsource(cli_mod)
 
 
-def test_source_subparsers_line_batch52():
-    assert 'sub = p.add_subparsers(dest="command", required=True)' in _src()
-
-
 def test_source_formatter_class_batch52():
     assert "formatter_class=argparse.RawDescriptionHelpFormatter" in _src()
 
@@ -307,12 +297,6 @@ def test_source_float_format_and_sorted_batch52():
     src = _src()
     assert "{value:.4f}" in src
     assert "sorted(value.items())" in src
-
-
-def test_source_inspect_updates_batch52():
-    src = _src()
-    assert "metrics.update(figure_caption_prf(doc, None))" in src
-    assert "metrics.update(chunk_boundary_prf(doc, None, tolerance_chars=args.tolerance_chars))" in src
 
 
 def test_source_source_type_default_batch52():

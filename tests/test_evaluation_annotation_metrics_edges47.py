@@ -32,12 +32,6 @@ def test_figure_caption_prf_returns_3_metrics_batch20():
     }
 
 
-def test_figure_caption_prf_value_all_none_batch20():
-    out = figure_caption_prf({}, {})
-    for k, v in out.items():
-        assert v["value"] is None
-
-
 def test_figure_caption_prf_reason_constant_batch20():
     out = figure_caption_prf({}, {})
     for k, v in out.items():
@@ -367,11 +361,6 @@ def test_module_source_no_tempfile_import_batch20():
     assert "import tempfile" not in src
 
 
-def test_module_source_no_unlink_call_batch20():
-    src = inspect.getsource(amod)
-    assert ".unlink(" not in src
-
-
 def test_module_source_no_path_write_text_batch20():
     src = inspect.getsource(amod)
     assert ".write_text(" not in src
@@ -483,12 +472,6 @@ def test_signature_chunk_boundary_prf_batch20():
     params = list(sig.parameters.values())
     names = [p.name for p in params]
     assert names == ["document", "annotation", "tolerance_chars"]
-
-
-def test_signature_chunk_boundary_prf_tolerance_default_30_batch20():
-    sig = inspect.signature(chunk_boundary_prf)
-    params = list(sig.parameters.values())
-    assert params[2].default == 30
 
 
 def test_signature_chunk_boundary_prf_no_extra_args_batch20():

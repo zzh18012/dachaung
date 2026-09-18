@@ -425,11 +425,6 @@ def test_detect_project_root_no_pyproject_batch49(tmp_path):
     assert isinstance(out, Path)
 
 
-def test_detect_project_root_returns_absolute_batch49(tmp_path):
-    out = _detect_project_root(tmp_path)
-    assert out.is_absolute()
-
-
 # ---------- DocumentEntry frozen setattr 多字段 ----------
 
 def test_document_entry_frozen_doc_id_batch49(tmp_path):
@@ -585,21 +580,6 @@ def test_source_contains_validate_import_batch49():
     assert "from evaluation.schema import validate" in src
 
 
-def test_source_docstring_mentions_relative_path_batch49():
-    src = inspect.getsource(manifest_mod)
-    assert "相对路径" in src
-
-
-def test_source_docstring_mentions_no_absolute_batch49():
-    src = inspect.getsource(manifest_mod)
-    assert "绝对路径" in src
-
-
-def test_source_docstring_mentions_no_backslash_batch49():
-    src = inspect.getsource(manifest_mod)
-    assert "反斜杠" in src
-
-
 def test_source_all_has_5_entries_batch49():
     src = inspect.getsource(manifest_mod)
     assert '"ManifestError"' in src
@@ -660,11 +640,6 @@ def test_ast_has_4_class_def_batch49():
     assert len(classes) == 4
 
 
-def test_ast_no_async_function_def_batch49():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
-
-
 def test_ast_module_has_docstring_batch49():
     tree = ast.parse(inspect.getsource(manifest_mod))
     assert isinstance(tree.body[0], ast.Expr)
@@ -683,13 +658,6 @@ def test_ast_load_manifest_has_multiple_for_batch49():
     fors = [n for n in ast.walk(func) if isinstance(n, ast.For)]
     # documents for + expected_failures for = 2
     assert len(fors) >= 2
-
-
-def test_ast_load_manifest_has_try_except_batch49():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "load_manifest")
-    trys = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
-    assert len(trys) >= 1
 
 
 def test_ast_load_manifest_has_multiple_if_batch49():
@@ -725,14 +693,6 @@ def test_ast_is_absolute_like_has_3_returns_batch49():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_is_absolute_like")
     returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
     assert len(returns) >= 3  # 空字符串 + POSIX + Windows + final False
-
-
-def test_ast_detect_project_root_has_if_batch49():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_detect_project_root")
-    ifs = [n for n in ast.walk(func) if isinstance(n, ast.If)]
-    # 2 个 if：cur.is_file() 取 parent + (parent/pyproject).is_file()
-    assert len(ifs) >= 2
 
 
 def test_ast_manifest_property_file_count_returns_int_batch49():

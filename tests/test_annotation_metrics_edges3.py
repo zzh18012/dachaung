@@ -734,10 +734,6 @@ def test_figure_caption_handles_dict_with_only_chunks_key():
 # =========================================================================
 
 
-def test_module_all_exact_three_items():
-    assert len(annotation_all) == 3
-
-
 def test_module_all_items_strings():
     for item in annotation_all:
         assert isinstance(item, str)

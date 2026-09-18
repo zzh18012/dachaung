@@ -339,34 +339,9 @@ def test_source_contains_path_import_batch48():
     assert "from pathlib import Path" in src
 
 
-def test_source_contains_run_evaluation_import_batch48():
-    src = inspect.getsource(cli_mod)
-    assert "run_evaluation" in src
-
-
 def test_source_contains_validate_file_import_batch48():
     src = inspect.getsource(cli_mod)
     assert "validate_file" in src
-
-
-def test_source_contains_get_git_provenance_import_batch48():
-    src = inspect.getsource(cli_mod)
-    assert "get_git_provenance" in src
-
-
-def test_source_contains_run_subcommand_batch48():
-    src = inspect.getsource(cli_mod)
-    assert '"run"' in src
-
-
-def test_source_contains_validate_report_subcommand_batch48():
-    src = inspect.getsource(cli_mod)
-    assert '"validate-report"' in src
-
-
-def test_source_contains_inspect_doc_subcommand_batch48():
-    src = inspect.getsource(cli_mod)
-    assert '"inspect-doc"' in src
 
 
 def test_source_contains_error_2_returns_batch48():
@@ -453,20 +428,6 @@ def test_ast_build_parser_has_subparser_batch48():
         isinstance(c.func, ast.Attribute) and c.func.attr == "add_subparsers" for c in calls
     )
     assert has_subparsers
-
-
-def test_ast_module_top_level_if_reconfigure_batch48():
-    """模块顶部有 if hasattr(sys.stdout, "reconfigure")。"""
-    tree = ast.parse(inspect.getsource(cli_mod))
-    ifs = [n for n in tree.body if isinstance(n, ast.If)]
-    assert len(ifs) >= 1
-
-
-def test_ast_module_has_if_main_batch48():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    ifs = [n for n in tree.body if isinstance(n, ast.If)]
-    last_if = ifs[-1]
-    assert isinstance(last_if.test, ast.Compare)
 
 
 def test_ast_module_top_level_import_count_batch48():

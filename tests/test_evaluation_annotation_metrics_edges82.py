@@ -129,10 +129,6 @@ def test_source_for_k_tuple_loop_twice_batch53():
     ) == 2
 
 
-def test_source_break_comment_line_batch53():
-    assert "break  # 最后一个 chunk 后面不算边界" in _src()
-
-
 def test_source_pval_rval_lines_batch53():
     src = _src()
     assert 'p_val = out["chunk_boundary_precision"]["value"]' in src

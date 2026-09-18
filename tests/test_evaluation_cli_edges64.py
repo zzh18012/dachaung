@@ -41,27 +41,10 @@ def test_build_parser_has_inspect_doc_subparser_batch37():
     assert args.input == "doc.json"
 
 
-def test_build_parser_run_default_parser_fallback_batch37():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "x", "--output", "y"])
-    assert args.parser == "fallback"
-
-
 def test_build_parser_run_default_max_chars_800_batch37():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "x", "--output", "y"])
     assert args.max_chars == 800
-
-
-def test_build_parser_run_with_all_options_batch37():
-    p = _build_parser()
-    args = p.parse_args([
-        "run", "--manifest", "m.json", "--output", "o.json",
-        "--parser", "kreuzberg", "--max-chars", "500", "--tolerance-chars", "10",
-    ])
-    assert args.parser == "kreuzberg"
-    assert args.max_chars == 500
-    assert args.tolerance_chars == 10
 
 
 def test_build_parser_inspect_doc_default_tolerance_30_batch37():
@@ -112,11 +95,6 @@ def test_format_metric_int_one_batch37():
     assert "ok" in out
 
 
-def test_format_metric_int_negative_batch37():
-    out = _format_metric("x", {"value": -5, "reason": None})
-    assert "-5" in out
-
-
 def test_format_metric_float_zero_batch37():
     out = _format_metric("x", {"value": 0.0, "reason": None})
     assert "0.0000" in out
@@ -143,11 +121,6 @@ def test_format_metric_bool_false_lowercase_batch37():
     assert "false" in out
 
 
-def test_format_metric_dict_with_one_kv_batch37():
-    out = _format_metric("x", {"value": {"a": 1}, "reason": None})
-    assert "a=1" in out
-
-
 def test_format_metric_dict_with_multiple_kv_sorted_batch37():
     """dict 按 key 排序。"""
     out = _format_metric("x", {"value": {"b": 2, "a": 1}, "reason": None})
@@ -162,12 +135,6 @@ def test_format_metric_dict_with_multiple_kv_sorted_batch37():
 def test_format_metric_dict_with_unicode_value_batch37():
     out = _format_metric("x", {"value": {"k": "中文"}, "reason": None})
     assert "中文" in out
-
-
-def test_format_metric_dict_empty_batch37():
-    out = _format_metric("x", {"value": {}, "reason": None})
-    # 空 dict → 空字符串
-    assert "ok" in out
 
 
 def test_format_metric_none_without_reason_batch37():
@@ -518,26 +485,6 @@ def test_module_source_contains_schema_import_batch37():
     assert "from evaluation.schema import EvalSchemaError, validate_file" in src
 
 
-def test_module_source_contains_build_parser_func_batch37():
-    src = inspect.getsource(cmod)
-    assert "def _build_parser()" in src
-
-
-def test_module_source_contains_main_func_batch37():
-    src = inspect.getsource(cmod)
-    assert "def main(argv: list[str] | None = None) -> int:" in src
-
-
-def test_module_source_contains_format_metric_func_batch37():
-    src = inspect.getsource(cmod)
-    assert "def _format_metric(name: str, metric: dict) -> str:" in src
-
-
-def test_module_source_contains_run_inspect_doc_func_batch37():
-    src = inspect.getsource(cmod)
-    assert "def _run_inspect_doc(args) -> int:" in src
-
-
 def test_module_source_contains_validate_report_subparser_batch37():
     src = inspect.getsource(cmod)
     assert '"validate-report"' in src
@@ -563,16 +510,6 @@ def test_module_source_contains_parser_choices_batch37():
     src = inspect.getsource(cmod)
     assert '"fallback"' in src
     assert '"kreuzberg"' in src
-
-
-def test_module_source_contains_max_chars_default_800_batch37():
-    src = inspect.getsource(cmod)
-    assert "default=800" in src
-
-
-def test_module_source_contains_tolerance_default_30_batch37():
-    src = inspect.getsource(cmod)
-    assert "default=30" in src
 
 
 def test_module_source_contains_utf8_reconfigure_batch37():

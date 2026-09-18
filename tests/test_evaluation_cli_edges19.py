@@ -736,12 +736,6 @@ def test_build_parser_add_help_default_true():
     assert len(help_actions) == 1
 
 
-def test_build_parser_allow_abbrev_default_true():
-    p = _build_parser()
-    # Python 3.12 默认 allow_abbrev=True
-    assert p.allow_abbrev is True
-
-
 def test_build_parser_run_subparser_prog_contains_run():
     p = _build_parser()
     sub_action = next(a for a in p._actions if isinstance(a, argparse._SubParsersAction))

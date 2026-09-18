@@ -227,13 +227,6 @@ def test_main_inspect_doc_with_dir_returns_2_batch33(capsys, tmp_path):
     assert rc == 2
 
 
-def test_main_validate_report_with_dir_returns_2_batch33(capsys, tmp_path):
-    d = tmp_path / "subdir"
-    d.mkdir()
-    rc = main(["validate-report", str(d)])
-    assert rc == 2
-
-
 def test_main_inspect_doc_extra_arg_raises_systemexit_batch33():
     """inspect-doc 不接受额外 positional。"""
     with pytest.raises(SystemExit):
@@ -269,51 +262,6 @@ def test_main_run_tolerance_chars_negative_accepted_batch33(tmp_path):
 
 
 # ---------- module source forbidden tokens 第五十批 ----------
-
-
-def test_module_source_no_eval_batch33():
-    src = inspect.getsource(cmod)
-    assert "eval(" not in src
-
-
-def test_module_source_no_exec_batch33():
-    src = inspect.getsource(cmod)
-    assert "exec(" not in src
-
-
-def test_module_source_no_pickle_batch33():
-    src = inspect.getsource(cmod)
-    assert "pickle" not in src
-
-
-def test_module_source_no_yaml_batch33():
-    src = inspect.getsource(cmod)
-    assert "yaml" not in src
-
-
-def test_module_source_no_dunder_import_batch33():
-    src = inspect.getsource(cmod)
-    assert "__import__" not in src
-
-
-def test_module_source_no_breakpoint_batch33():
-    src = inspect.getsource(cmod)
-    assert "breakpoint(" not in src
-
-
-def test_module_source_no_shutil_batch33():
-    src = inspect.getsource(cmod)
-    assert "shutil" not in src
-
-
-def test_module_source_no_requests_batch33():
-    src = inspect.getsource(cmod)
-    assert "requests" not in src
-
-
-def test_module_source_no_subprocess_batch33():
-    src = inspect.getsource(cmod)
-    assert "subprocess" not in src
 
 
 # ---------- module source 字符串精确补强第四十六批 ----------
@@ -406,21 +354,6 @@ def test_module_source_contains_run_subcommand_batch33():
     assert '"inspect-doc"' in src
 
 
-def test_module_source_contains_validate_file_call_batch33():
-    src = inspect.getsource(cmod)
-    assert 'validate_file(' in src
-
-
-def test_module_source_contains_load_manifest_call_batch33():
-    src = inspect.getsource(cmod)
-    assert 'load_manifest(' in src
-
-
-def test_module_source_contains_run_evaluation_call_batch33():
-    src = inspect.getsource(cmod)
-    assert 'run_evaluation(' in src
-
-
 def test_module_source_contains_file_stderr_batch33():
     src = inspect.getsource(cmod)
     assert "file=sys.stderr" in src
@@ -505,95 +438,6 @@ def test_module_main_block_raises_system_exit_batch33():
 
 
 # ---------- 端到端集成第四十六批 ----------
-
-
-def test_e2e_inspect_doc_full_pdf_batch33(capsys, tmp_path):
-    """端到端：完整 PDF doc → inspect-doc 输出所有 metric。"""
-    p = tmp_path / "doc.json"
-    p.write_text(
-        json.dumps({
-            "document_id": "d1",
-            "source_path": "/x.pdf",
-            "source_type": "pdf",
-            "parser_name": "fallback",
-            "parser_version": "1.0",
-            "elements": [
-                {
-                    "type": "paragraph",
-                    "content": "hello",
-                    "element_id": "e1",
-                    "source_locator": {"page": 1, "bbox": [0, 0, 100, 50]},
-                },
-                {
-                    "type": "heading",
-                    "content": "title",
-                    "element_id": "h1",
-                    "source_locator": {"page": 1, "bbox": [0, 0, 100, 30]},
-                },
-            ],
-            "chunks": [
-                {"text": "title", "source_element_ids": ["h1"]},
-                {"text": "hello", "source_element_ids": ["e1"]},
-            ],
-        }),
-        encoding="utf-8",
-    )
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-    captured = capsys.readouterr()
-    assert "pipeline_success" in captured.out
-    assert "element_count_total" in captured.out
-    assert "pdf_locator_valid_ratio" in captured.out
-
-
-def test_e2e_inspect_doc_idempotent_batch33(capsys, tmp_path):
-    p = tmp_path / "doc.json"
-    p.write_text(
-        json.dumps({"source_type": "pdf", "elements": [], "chunks": []}),
-        encoding="utf-8",
-    )
-    rc1 = main(["inspect-doc", str(p)])
-    out1 = capsys.readouterr().out
-    rc2 = main(["inspect-doc", str(p)])
-    out2 = capsys.readouterr().out
-    assert rc1 == rc2 == 0
-    assert out1 == out2
-
-
-def test_e2e_validate_report_invalid_returns_1_batch33(capsys, tmp_path):
-    p = tmp_path / "report.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
-
-
-def test_e2e_inspect_doc_returns_0_for_minimal_valid_batch33(capsys, tmp_path):
-    p = tmp_path / "doc.json"
-    p.write_text(
-        json.dumps({"source_type": "pdf", "elements": [], "chunks": []}),
-        encoding="utf-8",
-    )
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-
-
-def test_e2e_main_no_args_to_stderr_batch33(capsys):
-    """无参数 main → SystemExit + argparse 错误打印到 stderr。"""
-    with pytest.raises(SystemExit):
-        main([])
-    captured = capsys.readouterr()
-    assert captured.err != "" or captured.out != ""
-
-
-def test_e2e_inspect_doc_with_unknown_source_type_batch33(capsys, tmp_path):
-    """unknown source_type → 仍跑（pdf/docx ratio 都 null）。"""
-    p = tmp_path / "doc.json"
-    p.write_text(
-        json.dumps({"source_type": "weird", "elements": [], "chunks": []}),
-        encoding="utf-8",
-    )
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
 
 
 def test_e2e_inspect_doc_full_docx_batch33(capsys, tmp_path):

@@ -687,13 +687,6 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_forbidden_tokens_batch25():
-    """manifest.py 不应 import 这些副作用大的模块。"""
-    source = inspect.getsource(mmod)
-    for tok in FORBIDDEN_TOKENS:
-        assert tok not in source, f"forbidden token in source: {tok}"
-
-
 def test_module_source_no_class_other_than_errors_batch25():
     """manifest.py 的 class 都必须是 dataclass（@dataclass）。"""
     import ast as _ast
@@ -772,11 +765,6 @@ def test_module_source_dataclass_used_batch25():
 # ---------- module source 字符串精确补强第三十七批 ----------
 
 
-def test_module_source_contains_manifest_version_import_batch25():
-    source = inspect.getsource(mmod)
-    assert "from evaluation import MANIFEST_VERSION" in source
-
-
 def test_module_source_contains_validate_import_batch25():
     source = inspect.getsource(mmod)
     assert "from evaluation.schema import validate" in source
@@ -849,15 +837,6 @@ def test_module_source_contains_resolve_call_batch25():
 # ---------- signatures 第三十七批 ----------
 
 
-def test_signature_is_absolute_like_batch25():
-    sig = inspect.signature(_is_absolute_like)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path_str"
-    assert params[0].annotation == "str"
-    assert sig.return_annotation == "bool"
-
-
 def test_signature_has_backslash_batch25():
     sig = inspect.signature(_has_backslash)
     params = list(sig.parameters.values())
@@ -872,14 +851,6 @@ def test_signature_resolve_relative_path_batch25():
     params = list(sig.parameters.values())
     assert len(params) == 3
     assert [p.name for p in params] == ["path_str", "project_root", "field_name"]
-    assert sig.return_annotation == "Path"
-
-
-def test_signature_detect_project_root_batch25():
-    sig = inspect.signature(_detect_project_root)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "start"
     assert sig.return_annotation == "Path"
 
 

@@ -393,18 +393,6 @@ def test_build_parser_run_invalid_parser_choice_batch48():
         )
 
 
-def test_build_parser_validate_report_no_input_errors_batch48():
-    parser = _build_parser()
-    with pytest.raises(SystemExit):
-        parser.parse_args(["validate-report"])
-
-
-def test_build_parser_inspect_doc_no_input_errors_batch48():
-    parser = _build_parser()
-    with pytest.raises(SystemExit):
-        parser.parse_args(["inspect-doc"])
-
-
 def test_build_parser_run_max_chars_type_is_int_batch48():
     """--max-chars 是 int 类型。"""
     parser = _build_parser()

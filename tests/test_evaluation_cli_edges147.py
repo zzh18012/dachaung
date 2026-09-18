@@ -70,17 +70,6 @@ def test_cli_run_style_board_batch382(tmp_path, capsys):
         "value": 1.0, "reason": None}
 
 
-def test_cli_run_style_stdout_batch382(tmp_path, capsys):
-    mf = _board(tmp_path)
-    rc, out = _run_cli(capsys, [
-        "run", "--manifest", str(mf),
-        "--output", str(tmp_path / "r.json"),
-        "--parser", "fallback", "--max-chars", "200"])
-    assert rc == 0
-    assert "documents=1（成功 1，失败 0）" in out
-    assert "pdf=0 docx=1" in out
-
-
 # ---------- inspect-doc 样式板 counts 行 ----------
 
 def test_cli_inspect_style_counts_batch382(tmp_path, capsys):

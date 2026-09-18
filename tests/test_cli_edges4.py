@@ -665,11 +665,6 @@ def test_extension_to_parser_kreuzberg_not_in_values():
 # =========================================================================
 
 
-def test_build_arg_parser_prog_is_app_cli():
-    p = _build_arg_parser()
-    assert p.prog == "app.cli"
-
-
 def test_build_arg_parser_description_mentions_pdf():
     p = _build_arg_parser()
     assert "PDF" in p.description or "pdf" in p.description.lower()
@@ -678,14 +673,6 @@ def test_build_arg_parser_description_mentions_pdf():
 def test_build_arg_parser_description_mentions_docx():
     p = _build_arg_parser()
     assert "DOCX" in p.description or "docx" in p.description.lower()
-
-
-def test_build_arg_parser_has_subparsers_required():
-    p = _build_arg_parser()
-    # subparsers 是必填（required=True）
-    # 通过 SystemExit 验证（无 subcommand）
-    with pytest.raises(SystemExit):
-        p.parse_args([])
 
 
 def test_build_arg_parser_parse_subcommand_exists():
@@ -873,11 +860,6 @@ def test_main_inspect_top_level_string_returns_1(tmp_path: Path):
 def test_main_validate_nonexistent_file_returns_2(tmp_path: Path):
     rc = main(["validate", str(tmp_path / "missing.json")])
     assert rc == 2
-
-
-def test_main_parse_nonexistent_input_returns_1(tmp_path: Path):
-    rc = main(["parse", str(tmp_path / "missing.pdf"), "-o", str(tmp_path / "out.json")])
-    assert rc == 1
 
 
 def test_main_parse_dir_nonexistent_dir_returns_2(tmp_path: Path):

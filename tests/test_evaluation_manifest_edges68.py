@@ -304,24 +304,9 @@ def _make_doc_entry(**overrides: Any) -> DocumentEntry:
     return DocumentEntry(**defaults)
 
 
-def test_document_entry_default_sha256_none_batch41():
-    e = _make_doc_entry()
-    assert e.sha256 is None
-
-
-def test_document_entry_default_paired_with_none_batch41():
-    e = _make_doc_entry()
-    assert e.paired_with is None
-
-
 def test_document_entry_with_sha256_batch41():
     e = _make_doc_entry(sha256="abc123")
     assert e.sha256 == "abc123"
-
-
-def test_document_entry_with_paired_with_batch41():
-    e = _make_doc_entry(paired_with="d2")
-    assert e.paired_with == "d2"
 
 
 def test_document_entry_with_annotation_resolved_batch41():
@@ -377,16 +362,6 @@ def test_document_entry_hash_batch41():
     assert hash(e) == hash(_make_doc_entry())
 
 
-def test_document_entry_repr_batch41():
-    e = _make_doc_entry()
-    assert "DocumentEntry" in repr(e)
-
-
-def test_document_entry_categories_default_empty_tuple_batch41():
-    e = _make_doc_entry()
-    assert e.categories == ()
-
-
 def test_document_entry_categories_with_values_batch41():
     e = _make_doc_entry(categories=("tutorial", "intro"))
     assert e.categories == ("tutorial", "intro")
@@ -405,16 +380,6 @@ def _make_expected_failure(**overrides: Any) -> ExpectedFailure:
     }
     defaults.update(overrides)
     return ExpectedFailure(**defaults)
-
-
-def test_expected_failure_default_source_type_none_batch41():
-    ef = _make_expected_failure()
-    assert ef.source_type is None
-
-
-def test_expected_failure_with_source_type_batch41():
-    ef = _make_expected_failure(source_type="pdf")
-    assert ef.source_type == "pdf"
 
 
 def test_expected_failure_frozen_batch41():
@@ -527,16 +492,6 @@ def test_manifest_content_group_count_unpaired_batch41():
     )
     m = _make_manifest(documents=docs)
     assert m.content_group_count == 2
-
-
-def test_manifest_content_group_count_mixed_batch41():
-    docs = (
-        _make_doc_entry(doc_id="d1", paired_with="d2"),
-        _make_doc_entry(doc_id="d2", paired_with="d1"),
-        _make_doc_entry(doc_id="d3"),
-    )
-    m = _make_manifest(documents=docs)
-    assert m.content_group_count == 2  # 1 pair + 1 unpaired
 
 
 def test_manifest_content_group_count_self_pair_batch41():
@@ -851,13 +806,6 @@ def test_load_manifest_return_annotation_manifest_batch41():
     assert "Manifest" in str(sig.return_annotation)
 
 
-def test_load_manifest_path_annotation_accepts_str_batch41():
-    sig = inspect.signature(load_manifest)
-    ann = str(sig.parameters["manifest_path"].annotation)
-    assert "Path" in ann
-    assert "str" in ann
-
-
 def test_load_manifest_project_root_annotation_accepts_str_batch41():
     sig = inspect.signature(load_manifest)
     ann = str(sig.parameters["project_root"].annotation)
@@ -870,11 +818,6 @@ def test_load_manifest_project_root_annotation_accepts_str_batch41():
 
 def test_manifest_error_is_exception_batch41():
     assert issubclass(ManifestError, Exception)
-
-
-def test_manifest_error_default_message_batch41():
-    err = ManifestError("boom")
-    assert str(err) == "boom"
 
 
 def test_manifest_error_can_be_raised_batch41():
@@ -896,11 +839,6 @@ def test_manifest_error_in_all_batch41():
 
 
 # ---------- module source 字符串精确 第四十二批
-
-
-def test_module_source_contains_docstring_batch41():
-    src = inspect.getsource(mmod)
-    assert '"""' in src
 
 
 def test_module_source_contains_future_annotations_batch41():
@@ -987,11 +925,6 @@ def test_module_source_contains_frozen_true_batch41():
     """dataclass(frozen=True)。"""
     src = inspect.getsource(mmod)
     assert "frozen=True" in src
-
-
-def test_module_source_contains_relative_to_batch41():
-    src = inspect.getsource(mmod)
-    assert "relative_to" in src
 
 
 def test_module_source_contains_resolve_call_batch41():
@@ -1128,11 +1061,6 @@ def test_module_does_not_export_private_batch41():
         assert name not in mmod.__all__
 
 
-def test_module_all_contains_only_strings_batch41():
-    for name in mmod.__all__:
-        assert isinstance(name, str)
-
-
 def test_module_all_no_duplicates_batch41():
     assert len(mmod.__all__) == len(set(mmod.__all__))
 
@@ -1159,22 +1087,6 @@ def test_module_has_load_manifest_attr_batch41():
 
 def test_module_load_manifest_callable_batch41():
     assert callable(mmod.load_manifest)
-
-
-def test_module_has_is_absolute_like_attr_batch41():
-    assert hasattr(mmod, "_is_absolute_like")
-
-
-def test_module_has_has_backslash_attr_batch41():
-    assert hasattr(mmod, "_has_backslash")
-
-
-def test_module_has_resolve_relative_path_attr_batch41():
-    assert hasattr(mmod, "_resolve_relative_path")
-
-
-def test_module_has_detect_project_root_attr_batch41():
-    assert hasattr(mmod, "_detect_project_root")
 
 
 # ---------- 端到端集成 第四十一批

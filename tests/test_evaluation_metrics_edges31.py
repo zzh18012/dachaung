@@ -563,11 +563,6 @@ def test_silent_drop_count_no_element_count_by_type():
     assert out["value"] is None
 
 
-def test_silent_drop_count_empty_element_count_by_type():
-    out = _silent_drop_count({}, {"element_count_by_type": {}})
-    assert out["value"] is None
-
-
 def test_silent_drop_count_actual_equals_expected():
     by_type = {"paragraph": 2}
     exp = {"element_count_by_type": {"paragraph": 2}}
@@ -1102,18 +1097,6 @@ def test_module_source_no_yield():
     assert "yield " not in src
 
 
-def test_module_source_no_async():
-    src = inspect.getsource(mmod)
-    assert "async " not in src
-    assert "await " not in src
-
-
-def test_module_source_no_global_keyword():
-    src = inspect.getsource(mmod)
-    assert "\nglobal " not in src
-    assert " global " not in src
-
-
 def test_module_source_no_walrus():
     src = inspect.getsource(mmod)
     assert ":=" not in src
@@ -1361,12 +1344,6 @@ def test_module_no_user_classes():
         if isinstance(v, type) and getattr(v, "__module__", "") == mmod.__name__
     ]
     assert classes == []
-
-
-def test_module_constants_present():
-    assert hasattr(mmod, "_TEXT_TYPES")
-    assert hasattr(mmod, "_PDF_BBOX_REQUIRED_TYPES")
-    assert hasattr(mmod, "_NOT_EVALUATED")
 
 
 def test_module_function_module_eq():

@@ -85,14 +85,6 @@ def test_anchors_none_batch143():
 
 # ---------- __all__ ----------
 
-def test_all_three_ordered_batch143():
-    assert am_mod.__all__ == [
-        "PARSER_DOES_NOT_EMIT_RELATIONS",
-        "figure_caption_prf",
-        "chunk_boundary_prf",
-    ]
-
-
 # ---------- 单 chunk 分支带 tolerance ----------
 
 def test_single_chunk_branch_tolerance_batch143():

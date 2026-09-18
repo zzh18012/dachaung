@@ -496,17 +496,6 @@ def test_e2e_chunk_boundary_prf_idempotent_batch28():
     assert out1 == out2
 
 
-def test_e2e_chunk_boundary_prf_no_side_effects_batch28():
-    """端到端：调用不修改输入。"""
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "a", "position": "after"}]}
-    doc_before = json.dumps(doc, sort_keys=True)
-    ann_before = json.dumps(ann, sort_keys=True)
-    chunk_boundary_prf(doc, ann)
-    assert json.dumps(doc, sort_keys=True) == doc_before
-    assert json.dumps(ann, sort_keys=True) == ann_before
-
-
 def test_e2e_figure_caption_prf_with_real_call_batch28():
     """端到端：figure_caption_prf 完整调用。"""
     out = figure_caption_prf(

@@ -273,13 +273,6 @@ def test_format_metric_dict_sorted_batch52():
     assert out.index("a=1") < out.index("b=2")
 
 
-def test_format_metric_dict_empty_batch52():
-    out = _format_metric("by_type", {"value": {}, "reason": None})
-    # 空字符串 value → f-string 空
-    assert "by_type" in out
-    assert "(ok)" in out
-
-
 def test_format_metric_name_width_batch52():
     out = _format_metric("x", {"value": 1, "reason": None})
     # "  {name:36}" → 名字后至少补到 36 宽

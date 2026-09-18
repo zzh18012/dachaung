@@ -651,11 +651,6 @@ def test_module_source_no_open_w_mode_batch27():
 # ---------- module source 字符串精确补强第四十批 ----------
 
 
-def test_module_source_contains_prog_evaluation_cli_batch27():
-    src = inspect.getsource(climod)
-    assert 'prog="evaluation.cli"' in src
-
-
 def test_module_source_contains_description_evluation_batch27():
     src = inspect.getsource(climod)
     assert "评测 CLI" in src
@@ -681,12 +676,6 @@ def test_module_source_contains_manifest_required_batch27():
 def test_module_source_contains_output_required_batch27():
     src = inspect.getsource(climod)
     assert '"--output"' in src
-
-
-def test_module_source_contains_parser_choices_batch27():
-    src = inspect.getsource(climod)
-    assert '"fallback"' in src
-    assert '"kreuzberg"' in src
 
 
 def test_module_source_contains_sys_exit_main_batch27():

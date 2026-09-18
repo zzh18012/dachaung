@@ -132,43 +132,12 @@ def test_cli_validate_report_batch434(tmp_path, capsys):
 
 # ---------- inspect-doc ----------
 
-def test_cli_inspect_counts_batch434(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert "counts:      elements=7 chunks=3" in out
-
-
 def test_cli_inspect_three_type_by_type_batch434(tmp_path, capsys):
     docp = _doc(tmp_path)
     rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
     assert rc == 0
     assert ("element_count_by_type                "
             "heading=1, paragraph=5, table=1  (ok)") in out
-
-
-def test_cli_inspect_docx_locator_batch434(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("docx_locator_valid_ratio             "
-            "1.0000  (ok)") in out
-
-
-def test_cli_inspect_pdf_null_batch434(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("pdf_locator_valid_ratio              "
-            "null  (not_pdf_document)") in out
-
-
-def test_cli_inspect_silent_null_batch434(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("silent_drop_count                    "
-            "null  (no_expectations)") in out
 
 
 def test_cli_inspect_image_null_batch434(tmp_path, capsys):

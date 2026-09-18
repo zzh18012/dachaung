@@ -981,10 +981,6 @@ def test_is_absolute_like_relative_path():
     assert _is_absolute_like("foo/bar") is False
 
 
-def test_is_absolute_like_just_filename():
-    assert _is_absolute_like("foo.txt") is False
-
-
 def test_is_absolute_like_empty_string():
     assert _is_absolute_like("") is False
 
@@ -1147,12 +1143,6 @@ def test_module_source_does_not_contain_import_logging():
     import evaluation.manifest as m
     src = inspect.getsource(m)
     assert "import logging" not in src
-
-
-def test_module_source_does_not_contain_subprocess():
-    import evaluation.manifest as m
-    src = inspect.getsource(m)
-    assert "subprocess" not in src
 
 
 def test_module_source_does_not_contain_asyncio():

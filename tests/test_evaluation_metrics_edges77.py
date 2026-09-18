@@ -235,10 +235,6 @@ def test_bbox_negative_inf_rejected_batch52():
     assert _is_valid_bbox([1, float("-inf"), 3, 4]) is False
 
 
-def test_bbox_set_rejected_batch52():
-    assert _is_valid_bbox({1, 2, 3, 4}) is False
-
-
 def test_bbox_generator_rejected_batch52():
     assert _is_valid_bbox(x for x in (1, 2, 3, 4)) is False
 
@@ -367,12 +363,6 @@ def test_pdf_locator_ratio_empty_batch52():
     out = _pdf_locator_ratio([])
     assert out["value"] is None
     assert out["reason"] == "no_elements"
-
-
-def test_pdf_locator_ratio_table_needs_bbox_batch52():
-    elements = [{"type": "table", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0  # table 不在 bbox 必需列表
 
 
 def test_pdf_locator_ratio_caption_needs_bbox_batch52():

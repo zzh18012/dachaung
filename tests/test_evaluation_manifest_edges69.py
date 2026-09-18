@@ -244,33 +244,6 @@ def test_manifest_field_names_batch42():
     assert names == expected
 
 
-def test_manifest_documents_is_tuple_batch42():
-    m = Manifest(
-        manifest_version="1.0", devset_status="incomplete",
-        documents=(), expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    assert isinstance(m.documents, tuple)
-
-
-def test_manifest_expected_failures_is_tuple_batch42():
-    m = Manifest(
-        manifest_version="1.0", devset_status="incomplete",
-        documents=(), expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    assert isinstance(m.expected_failures, tuple)
-
-
-def test_manifest_project_root_is_path_batch42():
-    m = Manifest(
-        manifest_version="1.0", devset_status="incomplete",
-        documents=(), expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    assert isinstance(m.project_root, Path)
-
-
 def test_manifest_init_signature_batch42():
     sig = inspect.signature(Manifest.__init__)
     params = list(sig.parameters.keys())
@@ -457,11 +430,6 @@ def test_manifest_error_not_subclass_of_value_error_batch42():
     assert not issubclass(ManifestError, ValueError)
 
 
-def test_manifest_error_str_batch42():
-    err = ManifestError("test message")
-    assert str(err) == "test message"
-
-
 def test_manifest_error_repr_batch42():
     err = ManifestError("test")
     assert "ManifestError" in repr(err)
@@ -623,11 +591,6 @@ def test_load_manifest_resolves_symlink_free_batch42(tmp_path):
 
 
 # ---------- module source 补强 第四十二批
-
-
-def test_module_source_contains_dataclass_decorator_batch42():
-    src = inspect.getsource(mmod)
-    assert "@dataclass" in src
 
 
 def test_module_source_contains_frozen_true_count_batch42():

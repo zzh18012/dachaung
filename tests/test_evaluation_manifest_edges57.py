@@ -634,17 +634,6 @@ def test_module_source_contains_path_invariant_doc_batch30():
     assert "正斜杠" in src
 
 
-def test_module_source_contains_no_absolute_invariant_doc_batch30():
-    src = inspect.getsource(mmod)
-    assert "禁止绝对路径" in src
-
-
-def test_module_source_contains_dataclass_decorator_batch30():
-    src = inspect.getsource(mmod)
-    # frozen=True 出现在 decorator 里
-    assert "frozen=True" in src
-
-
 def test_module_source_contains_disk_letter_comment_batch30():
     src = inspect.getsource(mmod)
     assert "Windows 盘符" in src
@@ -696,11 +685,6 @@ def test_signature_is_absolute_like_return_bool_batch30():
 def test_signature_has_backslash_return_bool_batch30():
     sig = inspect.signature(_has_backslash)
     assert sig.return_annotation == "bool"
-
-
-def test_signature_resolve_relative_path_field_name_annotation_batch30():
-    sig = inspect.signature(_resolve_relative_path)
-    assert sig.parameters["field_name"].annotation == "str"
 
 
 def test_signature_resolve_relative_path_project_root_annotation_batch30():

@@ -319,10 +319,6 @@ def test_strip_unicode_whitespace_empty_string():
     assert _strip_unicode_whitespace("") == ""
 
 
-def test_strip_unicode_whitespace_only_whitespace():
-    assert _strip_unicode_whitespace(" \t\n　") == ""
-
-
 def test_strip_unicode_whitespace_preserves_digits():
     assert _strip_unicode_whitespace("1 2 3") == "123"
 
@@ -762,12 +758,6 @@ def test_pdf_locator_page_zero_invalid():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_page_negative_invalid():
-    elements = [{"type": "table", "source_locator": {"page": -1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_page_string_invalid():
     elements = [{"type": "table", "source_locator": {"page": "1"}}]
     out = _pdf_locator_ratio(elements)
@@ -800,14 +790,6 @@ def test_docx_locator_with_structural_key():
 
 def test_docx_locator_with_page_rejected():
     elements = [{"type": "paragraph", "source_locator": {"page": 1, "paragraph_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_docx_locator_with_bbox_rejected():
-    elements = [
-        {"type": "paragraph", "source_locator": {"bbox": [0, 0, 1, 1], "section": 1}}
-    ]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -912,20 +894,6 @@ def test_compute_metrics_error_code_present_when_error():
 def test_compute_metrics_error_code_none_when_no_error():
     out = compute_automatic_metrics({"elements": []}, None, "pdf", None)
     assert out["error_code"]["value"] is None
-
-
-def test_compute_metrics_pdf_yields_pdf_locator_value_docx_null():
-    doc = {"elements": [], "chunks": []}
-    out = compute_automatic_metrics(doc, None, "pdf", None)
-    assert out["pdf_locator_valid_ratio"]["reason"] == "no_elements"
-    assert out["docx_locator_valid_ratio"]["reason"] == "not_docx_document"
-
-
-def test_compute_metrics_docx_yields_docx_value_pdf_null():
-    doc = {"elements": [], "chunks": []}
-    out = compute_automatic_metrics(doc, None, "docx", None)
-    assert out["docx_locator_valid_ratio"]["reason"] == "no_elements"
-    assert out["pdf_locator_valid_ratio"]["reason"] == "not_pdf_document"
 
 
 def test_compute_metrics_other_source_yields_both_not_applicable():

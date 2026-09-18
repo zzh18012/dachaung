@@ -527,11 +527,6 @@ def test_chunk_boundary_anchor_marker_empty_string_batch48():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_future_annotations_batch48():
-    src = inspect.getsource(am_mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_source_contains_counter_import_batch48():
     """Counter 虽然 import 了但实际未在 annotation_metrics 中使用。"""
     src = inspect.getsource(am_mod)
@@ -566,11 +561,6 @@ def test_source_contains_list_tuple_annotation_batch48():
     # list[int] 和 list[tuple[int, int, int]]
     assert "list[int]" in src
     assert "list[tuple[int, int, int]]" in src
-
-
-def test_source_contains_continue_in_loop_batch48():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "continue" in src
 
 
 def test_source_contains_pipeline_failed_reason_batch48():

@@ -273,21 +273,10 @@ def test_pdf_locator_ratio_source_has_page_less_than_1_check():
     assert "page < 1" in src
 
 
-def test_pdf_locator_ratio_source_has_no_elements_branch():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "if not elements:" in src
-    assert 'return _null("no_elements")' in src
-
-
 def test_pdf_locator_ratio_source_has_bbox_check_branch():
     src = inspect.getsource(_pdf_locator_ratio)
     assert "_PDF_BBOX_REQUIRED_TYPES" in src
     assert "_is_valid_bbox(bbox)" in src
-
-
-def test_pdf_locator_ratio_source_has_valid_ratio_return():
-    src = inspect.getsource(_pdf_locator_ratio)
-    assert "return _ratio(valid / len(elements))" in src
 
 
 # ---------- _docx_locator_ratio source level 补强 ----------
@@ -302,11 +291,6 @@ def test_docx_locator_ratio_source_has_page_in_loc_check():
     src = inspect.getsource(_docx_locator_ratio)
     assert '"page" in loc' in src
     assert '"bbox" in loc' in src
-
-
-def test_docx_locator_ratio_source_has_any_check():
-    src = inspect.getsource(_docx_locator_ratio)
-    assert "if not any(k in loc for k in structural_keys):" in src
 
 
 def test_docx_locator_ratio_source_has_7_structural_keys_count():
@@ -351,11 +335,6 @@ def test_image_resource_ratio_source_has_image_filter():
     assert 'e.get("type") == "image"' in src
 
 
-def test_image_resource_ratio_source_has_rp_falsy_skip():
-    src = inspect.getsource(_image_resource_ratio)
-    assert "if not rp:" in src
-
-
 # ---------- _strip_unicode_whitespace source level 补强 ----------
 
 
@@ -382,11 +361,6 @@ def test_strip_unicode_whitespace_source_signature():
 def test_chunk_reference_ratio_source_has_no_chunks_branch():
     src = inspect.getsource(_chunk_reference_ratio)
     assert "if not chunks:" in src
-
-
-def test_chunk_reference_ratio_source_has_ids_and_all_check():
-    src = inspect.getsource(_chunk_reference_ratio)
-    assert "if ids and all(sid in elem_ids for sid in ids):" in src
 
 
 # ---------- _heading_boundary_ratio source level 补强 ----------
@@ -519,24 +493,9 @@ def test_module_source_has_for_loop_in_silent_drop():
     assert "for t, exp in expected_counts.items():" in src
 
 
-def test_module_source_has_pipeline_success_with_and():
-    src = inspect.getsource(m)
-    assert "pipeline_success = error is None and document is not None" in src
-
-
 def test_module_source_has_error_code_ternary():
     src = inspect.getsource(m)
     assert 'error["code"] if error' in src
-
-
-def test_module_source_has_metrics_init_empty_dict():
-    src = inspect.getsource(m)
-    assert "metrics: dict[str, Any] = {}" in src
-
-
-def test_module_source_has_lazy_schema_import():
-    src = inspect.getsource(m)
-    assert "from evaluation.schema_validation import document_passes_schema" in src
 
 
 def test_module_source_has_exception_type_name_in_reason():
@@ -644,18 +603,6 @@ def test_compute_automatic_metrics_no_varargs_varkw():
 
 
 # ---------- signatures 精确（_pdf_locator_ratio 等 helpers） ----------
-
-
-def test_pdf_locator_ratio_has_1_param():
-    sig = inspect.signature(_pdf_locator_ratio)
-    assert len(sig.parameters) == 1
-    assert "elements" in sig.parameters
-
-
-def test_docx_locator_ratio_has_1_param():
-    sig = inspect.signature(_docx_locator_ratio)
-    assert len(sig.parameters) == 1
-    assert "elements" in sig.parameters
 
 
 def test_image_resource_ratio_has_2_params_no_default():

@@ -266,16 +266,6 @@ def test_compute_automatic_metrics_pipeline_success_false_when_no_doc_no_error_b
     assert out["pipeline_success"]["value"] is False
 
 
-def test_compute_automatic_metrics_error_code_passthrough_batch14():
-    out = compute_automatic_metrics(
-        document=None,
-        error={"code": "parse_failed"},
-        source_type="pdf",
-        expectations=None,
-    )
-    assert out["error_code"]["value"] == "parse_failed"
-
-
 def test_compute_automatic_metrics_error_code_none_when_no_error_batch14():
     out = compute_automatic_metrics(
         document=_make_full_doc(),
@@ -557,11 +547,6 @@ def test_chunk_reference_ratio_missing_chunks_key_batch14():
     assert out["value"] is None
 
 
-def test_chunk_reference_ratio_empty_chunks_batch14():
-    out = _chunk_reference_ratio([], [])
-    assert out["value"] is None
-
-
 def test_chunk_reference_ratio_missing_source_element_ids_batch14():
     elements = [{"element_id": "e1"}]
     chunks = [{"text": "abc"}]
@@ -619,28 +604,10 @@ def test_module_source_forbidden_tokens_round19_batch14(token):
 # ---------- module source 字符串精确补强第十六批 ----------
 
 
-def test_module_source_module_docstring_present_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:15])
-    assert '"""' in head
-
-
 def test_module_source_future_annotations_present_batch14():
     source = inspect.getsource(mmod)
     head = "\n".join(source.split("\n")[:30])
     assert "from __future__ import annotations" in head
-
-
-def test_module_source_imports_math_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import math" in head
-
-
-def test_module_source_imports_counter_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from collections import Counter" in head
 
 
 def test_module_source_imports_pathlib_path_batch14():

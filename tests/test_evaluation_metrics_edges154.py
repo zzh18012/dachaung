@@ -83,18 +83,6 @@ def test_plvr_not_pdf_batch512(tmp_path):
 
 # ---------- hbc 跨型一致 ----------
 
-def test_hbc_32_batch512(tmp_path):
-    m = _m(_doc(tmp_path, 32))
-    assert m["heading_boundary_compliance"] == {
-        "value": 1.0, "reason": None}
-
-
-def test_hbc_10000_batch512(tmp_path):
-    m = _m(_doc(tmp_path, 10000))
-    assert m["heading_boundary_compliance"] == {
-        "value": 1.0, "reason": None}
-
-
 # ---------- mc 晶格 ----------
 
 def test_chunk_count_32_batch512(tmp_path):

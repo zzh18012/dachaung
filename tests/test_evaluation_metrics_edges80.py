@@ -229,10 +229,6 @@ def test_ratio_int_to_float_batch53():
     assert type(v["value"]) is float
 
 
-def test_bool_metric_truthy_string_batch53():
-    assert _bool_metric("x") == {"value": True, "reason": None}
-
-
 def test_int_metric_truncates_batch53():
     assert _int_metric(2.7) == {"value": 2, "reason": None}
 

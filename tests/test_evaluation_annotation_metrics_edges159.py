@@ -195,14 +195,6 @@ def test_dup_recall_one_batch511(tmp_path):
 
 # ---------- 报告合法性 ----------
 
-def test_report_schema_batch511(tmp_path):
-    _trio(tmp_path, [{"marker": "Word3.",
-                      "position": "after"}])
-    validate(json.loads((tmp_path / "r.json")
-                        .read_text(encoding="utf-8")),
-             "evaluation-report.schema.json")
-
-
 # ---------- 源码补强 ----------
 
 def _src():

@@ -35,12 +35,6 @@ def test_figure_caption_source_starts_with_def():
     assert src.lstrip().startswith("def figure_caption_prf(")
 
 
-def test_figure_caption_source_two_params():
-    src = inspect.getsource(figure_caption_prf)
-    assert "document" in src
-    assert "annotation" in src
-
-
 def test_figure_caption_source_uses_parser_does_not_emit():
     src = inspect.getsource(figure_caption_prf)
     assert "PARSER_DOES_NOT_EMIT_RELATIONS" in src
@@ -58,30 +52,15 @@ def test_figure_caption_source_returns_three_metrics():
     assert '"figure_caption_f1"' in src
 
 
-def test_figure_caption_source_returns_dict():
-    src = inspect.getsource(figure_caption_prf)
-    assert "return {" in src
-
-
 def test_figure_caption_source_uses_reason_var():
     """source 里定义 reason 变量。"""
     src = inspect.getsource(figure_caption_prf)
     assert "reason = PARSER_DOES_NOT_EMIT_RELATIONS" in src
 
 
-def test_figure_caption_source_no_subprocess():
-    src = inspect.getsource(figure_caption_prf)
-    assert "subprocess" not in src
-
-
 def test_figure_caption_source_no_eval():
     src = inspect.getsource(figure_caption_prf)
     assert "eval(" not in src
-
-
-def test_figure_caption_source_no_yield():
-    src = inspect.getsource(figure_caption_prf)
-    assert "yield" not in src
 
 
 def test_figure_caption_source_no_async():
@@ -119,37 +98,15 @@ def test_chunk_boundary_source_starts_with_def():
     assert src.lstrip().startswith("def chunk_boundary_prf(")
 
 
-def test_chunk_boundary_source_three_params():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "document" in src
-    assert "annotation" in src
-    assert "tolerance_chars" in src
-
-
-def test_chunk_boundary_source_default_tolerance_30():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "tolerance_chars: int = 30" in src
-
-
 def test_chunk_boundary_source_handles_document_none():
     src = inspect.getsource(chunk_boundary_prf)
     assert "if document is None" in src or "document is None" in src
-
-
-def test_chunk_boundary_source_handles_no_annotation():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "if not annotation" in src
 
 
 def test_chunk_boundary_source_handles_no_chunks():
     src = inspect.getsource(chunk_boundary_prf)
     assert "if not chunks" in src
     assert "len(chunks) < 2" in src
-
-
-def test_chunk_boundary_source_handles_no_anchors():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "if not anchors" in src
 
 
 def test_chunk_boundary_source_uses_counter():
@@ -201,11 +158,6 @@ def test_chunk_boundary_source_uses_f1_formula():
     assert "2 * p_val * r_val / denom" in src
 
 
-def test_chunk_boundary_source_uses_no_predicted_boundaries_reason():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert '"no_predicted_boundaries"' in src
-
-
 def test_chunk_boundary_source_uses_no_annotation_reason():
     src = inspect.getsource(chunk_boundary_prf)
     assert '"no_annotation"' in src
@@ -219,11 +171,6 @@ def test_chunk_boundary_source_uses_pipeline_failed_reason():
 def test_chunk_boundary_source_uses_no_ground_truth_anchors_reason():
     src = inspect.getsource(chunk_boundary_prf)
     assert '"no_ground_truth_anchors"' in src
-
-
-def test_chunk_boundary_source_uses_no_ground_truth_anchors_in_stream_reason():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert '"no_ground_truth_anchors_in_stream"' in src
 
 
 def test_chunk_boundary_source_uses_precision_or_recall_not_evaluated_reason():
@@ -265,11 +212,6 @@ def test_chunk_boundary_source_uses_ratio_helper():
 def test_chunk_boundary_source_no_eval():
     src = inspect.getsource(chunk_boundary_prf)
     assert "eval(" not in src
-
-
-def test_chunk_boundary_source_no_async():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "async def" not in src
 
 
 def test_chunk_boundary_source_no_global():
@@ -550,11 +492,6 @@ def test_module_source_docstring_mentions_chunk_boundary():
 def test_module_source_docstring_mentions_parser_does_not_emit():
     src = inspect.getsource(amod)
     assert "parser" in src.lower()
-
-
-def test_module_source_docstring_mentions_tolerance():
-    src = inspect.getsource(amod)
-    assert "tolerance" in src.lower() or "容差" in src
 
 
 def test_module_source_has_future_annotations():

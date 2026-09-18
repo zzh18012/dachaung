@@ -634,29 +634,6 @@ def test_chunk_boundary_f1_when_r_none_only():
     # 跳过：实际代码中 p_val/r_val 都不为 None 时才进入 f1 计算
 
 
-def test_chunk_boundary_f1_zero_when_p_zero_r_zero():
-    """p=0, r=0 → denom=0 → f1=0.0（不是 null）。"""
-    doc = {
-        "chunks": [
-            {"text": "alpha"},
-            {"text": "beta"},
-        ]
-    }
-    ann = {
-        "chunk_boundary_anchors": [
-            {"marker": "beta", "position": "after"},  # 远离 predicted
-        ]
-    }
-    out = chunk_boundary_prf(doc, ann, tolerance_chars=0)
-    # predicted=[5], anchor "beta" after → find at 6, end=10 → 10
-    # |5-10|=5 > 0 → 不匹配
-    # p = 0/1 = 0.0, r = 0/1 = 0.0
-    # f1: denom = 0+0 = 0 → f1 = 0.0
-    assert out["chunk_boundary_precision"]["value"] == 0.0
-    assert out["chunk_boundary_recall"]["value"] == 0.0
-    assert out["chunk_boundary_f1"]["value"] == 0.0
-
-
 def test_chunk_boundary_f1_half_when_p_half_r_full():
     """p=0.5, r=1.0 → f1 = 2*0.5*1/(0.5+1) = 1/1.5 ≈ 0.667。"""
     # 构造：2 predictions, 1 anchor；都匹配（tolerance 大）
@@ -921,17 +898,6 @@ def test_chunk_boundary_signature_tolerance_annotation_int():
     ann = sig.parameters["tolerance_chars"].annotation
     # ann 可能是 int 或 "int"（from __future__）
     assert ann is int or ann == "int"
-
-
-def test_figure_caption_signature_return_annotation_dict():
-    sig = inspect.signature(figure_caption_prf)
-    # 返回类型注解存在
-    assert sig.return_annotation is not inspect.Signature.empty
-
-
-def test_chunk_boundary_signature_return_annotation_dict():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.return_annotation is not inspect.Signature.empty
 
 
 # =========================================================================

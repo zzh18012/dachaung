@@ -85,12 +85,6 @@ def test_build_parser_help_strings_batch52():
 
 # ---------- main 无子命令 ----------
 
-def test_main_no_command_system_exit_batch52(capsys):
-    with pytest.raises(SystemExit) as ei:
-        main([])
-    assert ei.value.code != 0
-
-
 def test_main_unknown_command_system_exit_batch52(capsys):
     with pytest.raises(SystemExit) as ei:
         main(["unknown"])
@@ -362,11 +356,6 @@ def test_source_return_2_notfound_batch52():
 def test_source_type_int_kwargs_batch52():
     src = inspect.getsource(cli_mod)
     assert src.count("type=int") == 3  # run max-chars + run tolerance + inspect tolerance
-
-
-def test_source_choices_kwarg_batch52():
-    src = inspect.getsource(cli_mod)
-    assert 'choices=("fallback", "kreuzberg")' in src
 
 
 def test_source_json_load_in_inspect_batch52():

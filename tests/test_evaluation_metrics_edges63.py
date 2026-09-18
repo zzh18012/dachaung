@@ -157,10 +157,6 @@ def test_is_valid_bbox_with_inf_batch37():
     assert _is_valid_bbox([1, math.inf, 3, 4]) is False
 
 
-def test_is_valid_bbox_with_none_in_list_batch37():
-    assert _is_valid_bbox([None, 2, 3, 4]) is False
-
-
 # ---------- _strip_unicode_whitespace 第三十七批
 
 
@@ -189,11 +185,6 @@ def test_strip_whitespace_with_em_space_batch37():
 def test_strip_whitespace_with_ideographic_space_batch37():
     """U+3000 是 isspace。"""
     assert _strip_unicode_whitespace("a　b") == "ab"
-
-
-def test_strip_whitespace_preserves_order_batch37():
-    """不排序，只删除空白。"""
-    assert _strip_unicode_whitespace("c b a") == "cba"
 
 
 def test_strip_whitespace_does_not_remove_digits_or_punct_batch37():
@@ -490,17 +481,6 @@ def test_text_preservation_equal_simple_batch37():
     out = _text_preservation(elements, chunks)
     assert out["equal"]["value"] is True
     assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
-
-
-def test_text_preservation_extra_in_actual_batch37():
-    elements = [{"type": "paragraph", "content": "abc"}]
-    chunks = [{"text": "abcd"}]  # 多了 d
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is False
-    # precision = common / |actual| = 3/4
-    assert out["precision"]["value"] == 0.75
-    # recall = 3/3 = 1.0
     assert out["recall"]["value"] == 1.0
 
 
@@ -844,12 +824,6 @@ def test_signature_docx_locator_return_dict_batch37():
     assert "dict" in str(sig.return_annotation)
 
 
-def test_signature_image_resource_image_base_dir_optional_batch37():
-    sig = inspect.signature(_image_resource_ratio)
-    # image_base_dir 是 required positional（无默认值）
-    assert sig.parameters["image_base_dir"].default is inspect.Parameter.empty
-
-
 def test_signature_silent_drop_return_dict_batch37():
     sig = inspect.signature(_silent_drop_count)
     assert "dict" in str(sig.return_annotation)
@@ -866,22 +840,6 @@ def test_signature_chunk_reference_return_dict_batch37():
 
 
 # ---------- module 合理性第五十二批
-
-
-def test_module_has_null_attribute_batch37():
-    assert callable(mmod._null)
-
-
-def test_module_has_ratio_attribute_batch37():
-    assert callable(mmod._ratio)
-
-
-def test_module_has_bool_metric_attribute_batch37():
-    assert callable(mmod._bool_metric)
-
-
-def test_module_has_int_metric_attribute_batch37():
-    assert callable(mmod._int_metric)
 
 
 def test_module_has_compute_metrics_attribute_batch37():

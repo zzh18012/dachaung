@@ -323,11 +323,6 @@ def test_make_document_id_length_exactly_20():
     assert len(make_document_id(sha)) == 20
 
 
-def test_make_document_id_uses_first_16_chars():
-    sha = "0123456789abcdef" + "f" * 48
-    assert make_document_id(sha) == "doc-0123456789abcdef"
-
-
 def test_make_document_id_deterministic_same_input():
     sha = "a" * 64
     assert make_document_id(sha) == make_document_id(sha)

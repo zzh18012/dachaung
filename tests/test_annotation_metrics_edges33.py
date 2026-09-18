@@ -37,11 +37,6 @@ def test_figure_caption_source_uses_reason_assignment():
     assert "reason = PARSER_DOES_NOT_EMIT_RELATIONS" in src
 
 
-def test_figure_caption_source_uses_null_three_times():
-    src = inspect.getsource(figure_caption_prf)
-    assert src.count("_null(reason)") == 3
-
-
 def test_figure_caption_source_returns_figure_caption_precision():
     src = inspect.getsource(figure_caption_prf)
     assert '"figure_caption_precision"' in src
@@ -89,11 +84,6 @@ def test_chunk_boundary_source_document_none_branch_creates_three_keys():
     assert src.count("for k in") >= 2
 
 
-def test_chunk_boundary_source_no_annotation_branch():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "if not annotation:" in src
-
-
 def test_chunk_boundary_source_anchors_get():
     src = inspect.getsource(chunk_boundary_prf)
     assert 'anchors = annotation.get("chunk_boundary_anchors") or []' in src
@@ -102,11 +92,6 @@ def test_chunk_boundary_source_anchors_get():
 def test_chunk_boundary_source_chunks_get():
     src = inspect.getsource(chunk_boundary_prf)
     assert 'chunks = document.get("chunks") or []' in src
-
-
-def test_chunk_boundary_source_len_chunks_lt_2():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "len(chunks) < 2" in src
 
 
 def test_chunk_boundary_source_no_predicted_boundaries_assignment():
@@ -131,11 +116,6 @@ def test_chunk_boundary_source_norm_chunks_uses_normalize_text():
     assert "normalize_text(c.get(" in src
 
 
-def test_chunk_boundary_source_joined_raw():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert 'joined_raw = " ".join(norm_chunks)' in src
-
-
 def test_chunk_boundary_source_stream_normalize():
     src = inspect.getsource(chunk_boundary_prf)
     assert "stream = normalize_text(joined_raw)" in src
@@ -154,11 +134,6 @@ def test_chunk_boundary_source_uses_stream_find():
 def test_chunk_boundary_source_find_pos_lt_zero():
     src = inspect.getsource(chunk_boundary_prf)
     assert "if find_pos < 0:" in src
-
-
-def test_chunk_boundary_source_pos_advance_on_skip():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "pos += len(txt) + 1" in src
 
 
 def test_chunk_boundary_source_end_eq_find_pos_plus_len():
@@ -238,24 +213,9 @@ def test_chunk_boundary_source_double_for_loop():
     assert "for gi, gv in enumerate(gt_positions):" in src
 
 
-def test_chunk_boundary_source_tolerance_check():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "if d <= tolerance_chars:" in src
-
-
-def test_chunk_boundary_source_pairs_append_tuple():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "pairs.append((d, pi, gi))" in src
-
-
 def test_chunk_boundary_source_pairs_sort_lambda():
     src = inspect.getsource(chunk_boundary_prf)
     assert "pairs.sort(key=lambda x: x[0])" in src
-
-
-def test_chunk_boundary_source_matched_init_zero():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "matched = 0" in src
 
 
 def test_chunk_boundary_source_skip_used_check():
@@ -264,25 +224,9 @@ def test_chunk_boundary_source_skip_used_check():
     assert "continue" in src
 
 
-def test_chunk_boundary_source_used_pred_add():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "used_pred.add(pi)" in src
-
-
-def test_chunk_boundary_source_used_gt_add():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "used_gt.add(gi)" in src
-
-
 def test_chunk_boundary_source_matched_increment():
     src = inspect.getsource(chunk_boundary_prf)
     assert "matched += 1" in src
-
-
-def test_chunk_boundary_source_num_pred_num_gt():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "num_pred = len(predicted)" in src
-    assert "num_gt = len(gt_positions)" in src
 
 
 def test_chunk_boundary_source_precision_branch():
@@ -297,11 +241,6 @@ def test_chunk_boundary_source_recall_branch():
     assert 'out["chunk_boundary_recall"] = _ratio(matched / num_gt)' in src
 
 
-def test_chunk_boundary_source_f1_none_check():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "if p_val is None or r_val is None:" in src
-
-
 def test_chunk_boundary_source_f1_denom_zero_branch():
     src = inspect.getsource(chunk_boundary_prf)
     assert "denom = p_val + r_val" in src
@@ -311,11 +250,6 @@ def test_chunk_boundary_source_f1_denom_zero_branch():
 def test_chunk_boundary_source_f1_formula():
     src = inspect.getsource(chunk_boundary_prf)
     assert "2 * p_val * r_val / denom" in src
-
-
-def test_chunk_boundary_source_tolerance_chars_output():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert 'out["_tolerance_chars"] = {"value": tolerance_chars, "reason": None}' in src
 
 
 def test_chunk_boundary_source_missing_markers_output_conditional():
@@ -934,11 +868,6 @@ def test_module_source_no_unlink():
     assert "unlink" not in src
 
 
-def test_module_source_no_write():
-    src = inspect.getsource(amod)
-    assert ".write(" not in src
-
-
 def test_module_source_no_print():
     src = inspect.getsource(amod)
     assert "print(" not in src
@@ -981,11 +910,6 @@ def test_module_source_docstring_mentions_tolerance():
 def test_module_source_no_logging_import():
     src = inspect.getsource(amod)
     assert "import logging" not in src
-
-
-def test_module_source_no_argparse():
-    src = inspect.getsource(amod)
-    assert "argparse" not in src
 
 
 def test_module_source_no_json():
@@ -1106,11 +1030,6 @@ def test_parser_does_not_emit_alias_identity():
 
 
 # ---------- 模块整体合理性补强第三批 ----------
-
-
-def test_module_has_docstring():
-    assert amod.__doc__ is not None
-    assert len(amod.__doc__) > 10
 
 
 def test_module_has_all_attribute():

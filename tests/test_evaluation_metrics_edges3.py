@@ -439,10 +439,6 @@ def test_strip_unicode_whitespace_preserves_non_whitespace_unicode():
     assert _strip_unicode_whitespace("你好 world") == "你好world"
 
 
-def test_strip_unicode_whitespace_preserves_emoji():
-    assert _strip_unicode_whitespace("😀😁😂") == "😀😁😂"
-
-
 # =========================================================================
 # _text_preservation 第三轮
 # =========================================================================
@@ -897,14 +893,6 @@ def test_bool_metric_with_empty_string():
 
 def test_bool_metric_with_non_empty_string():
     assert _bool_metric("x")["value"] is True
-
-
-def test_bool_metric_with_empty_list():
-    assert _bool_metric([])["value"] is False
-
-
-def test_bool_metric_with_non_empty_list():
-    assert _bool_metric([1])["value"] is True
 
 
 def test_int_metric_truncates_float():

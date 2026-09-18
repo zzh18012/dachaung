@@ -295,18 +295,6 @@ def test_document_entry_all_fields_batch19():
     assert d.expectations == {"key": "value"}
 
 
-def test_document_entry_equality_batch19():
-    d1 = _mk_doc()
-    d2 = _mk_doc()
-    assert d1 == d2
-
-
-def test_document_entry_inequality_batch19():
-    d1 = _mk_doc("d1")
-    d2 = _mk_doc("d2")
-    assert d1 != d2
-
-
 def test_document_entry_hashable_with_hashable_fields_batch19():
     """DocumentEntry 在 expectations=None 时 hashable（dict 不可 hash）。"""
     d = DocumentEntry(

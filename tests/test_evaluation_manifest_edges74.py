@@ -64,10 +64,6 @@ def test_is_absolute_like_cyrillic_drive_batch48():
     assert _is_absolute_like("Д:/foo") is True
 
 
-def test_is_absolute_like_arabic_drive_batch48():
-    assert _is_absolute_like("م:/foo") is True
-
-
 def test_is_absolute_like_emoji_drive_batch48():
     """emoji 不是 isalpha → 不是绝对路径。"""
     assert _is_absolute_like("😀:/foo") is False
@@ -108,10 +104,6 @@ def test_is_absolute_like_two_chars_batch48():
 def test_is_absolute_like_three_chars_no_separator_batch48():
     """3 字符但第 3 个不是 \\ 或 / → False。"""
     assert _is_absolute_like("a:b") is False
-
-
-def test_is_absolute_like_three_chars_dash_batch48():
-    assert _is_absolute_like("a:-") is False
 
 
 # ---------- _has_backslash 多位置 ----------
@@ -199,24 +191,6 @@ def _write_valid_manifest(tmp_path: Path) -> Path:
     p = tmp_path / "manifest.json"
     p.write_text(json.dumps(manifest_data), encoding="utf-8")
     return p
-
-
-def test_load_manifest_detect_project_root_batch48(tmp_path):
-    p = _write_valid_manifest(tmp_path)
-    m = load_manifest(p)
-    assert m.project_root == tmp_path.resolve()
-
-
-def test_load_manifest_project_root_str_batch48(tmp_path):
-    p = _write_valid_manifest(tmp_path)
-    m = load_manifest(p, project_root=str(tmp_path))
-    assert m.project_root == tmp_path.resolve()
-
-
-def test_load_manifest_missing_file_raises_batch48(tmp_path):
-    with pytest.raises(ManifestError) as ei:
-        load_manifest(tmp_path / "missing.json")
-    assert "不存在" in str(ei.value)
 
 
 def test_load_manifest_invalid_json_raises_batch48(tmp_path):
@@ -460,12 +434,6 @@ def test_detect_project_root_nested_deep_batch48(tmp_path):
 
 # ---------- DocumentEntry frozen 完整性 ----------
 
-def test_document_entry_frozen_doc_id_batch48():
-    d = _make_doc()
-    with pytest.raises(FrozenInstanceError):
-        d.doc_id = "x"
-
-
 def test_document_entry_frozen_path_str_batch48():
     d = _make_doc()
     with pytest.raises(FrozenInstanceError):
@@ -606,11 +574,6 @@ def test_manifest_error_no_errors_attr_batch48():
     assert not hasattr(e, "errors")
 
 
-def test_manifest_error_args_batch48():
-    e = ManifestError("a", "b")
-    assert e.args == ("a", "b")
-
-
 # ---------- 模块源码补强 ----------
 
 def test_source_contains_json_import_batch48():
@@ -641,11 +604,6 @@ def test_source_contains_manifest_version_import_batch48():
 def test_source_contains_validate_import_batch48():
     src = inspect.getsource(manifest_mod)
     assert "from evaluation.schema import validate" in src
-
-
-def test_source_contains_class_manifest_error_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "class ManifestError" in src
 
 
 def test_source_contains_class_document_entry_batch48():

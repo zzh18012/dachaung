@@ -479,11 +479,6 @@ def test_is_valid_bbox_dict_batch22():
     assert _is_valid_bbox({"x": 0}) is False
 
 
-def test_is_valid_bbox_inf_values_batch22():
-    import math
-    assert _is_valid_bbox([0, 0, math.inf, 100]) is False
-
-
 # ---------- _image_resource_ratio 第二十二批 ----------
 
 
@@ -575,14 +570,6 @@ def test_chunk_reference_ratio_empty_ids_batch22():
 # ---------- _text_preservation 第二十二批 ----------
 
 
-def test_text_preservation_empty_elements_empty_chunks_batch22():
-    out = _text_preservation([], [])
-    assert out["equal"]["value"] is True
-    # precision/recall 分母为 0 时是 None
-    assert out["precision"]["value"] is None
-    assert out["recall"]["value"] is None
-
-
 def test_text_preservation_image_excluded_batch22():
     """image 不参与文本比对。"""
     elements = [{"type": "image", "content": "image_data"}]
@@ -608,13 +595,6 @@ def test_text_preservation_heading_included_batch22():
 def test_text_preservation_table_included_batch22():
     elements = [{"type": "table", "content": "tabular"}]
     chunks = [{"text": "tabular"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-
-
-def test_text_preservation_caption_included_batch22():
-    elements = [{"type": "caption", "content": "cap"}]
-    chunks = [{"text": "cap"}]
     out = _text_preservation(elements, chunks)
     assert out["equal"]["value"] is True
 

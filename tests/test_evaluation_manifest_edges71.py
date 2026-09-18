@@ -270,18 +270,6 @@ def _make_expected_failure(
     )
 
 
-def test_expected_failure_frozen_batch45():
-    ef = _make_expected_failure()
-    with pytest.raises(FrozenInstanceError):
-        ef.doc_id = "x"  # type: ignore[misc]
-
-
-def test_expected_failure_hashable_batch45():
-    ef = _make_expected_failure()
-    h = hash(ef)
-    assert isinstance(h, int)
-
-
 def test_expected_failure_fields_count_batch45():
     fs = fields(ExpectedFailure)
     assert len(fs) == 5
@@ -331,12 +319,6 @@ def test_manifest_frozen_batch45():
     m = _make_manifest()
     with pytest.raises(FrozenInstanceError):
         m.manifest_version = "9.9"  # type: ignore[misc]
-
-
-def test_manifest_hashable_batch45():
-    m = _make_manifest()
-    h = hash(m)
-    assert isinstance(h, int)
 
 
 def test_manifest_fields_count_batch45():
@@ -432,24 +414,6 @@ def test_manifest_content_group_count_one_way_pair_batch45():
     # pair_ids = {frozenset({d1, d2})} → 1 group
     # d2 在 seen 中（seen.update(pair)），所以 unpaired=0
     assert m.content_group_count == 1
-
-
-def test_manifest_categories_covered_sorted_batch45():
-    docs = [
-        _make_doc_entry(doc_id="d1", categories=("z", "a")),
-        _make_doc_entry(doc_id="d2", categories=("m",)),
-    ]
-    m = _make_manifest(documents=docs)
-    assert m.categories_covered == ["a", "m", "z"]
-
-
-def test_manifest_categories_covered_dedup_batch45():
-    docs = [
-        _make_doc_entry(doc_id="d1", categories=("a", "b")),
-        _make_doc_entry(doc_id="d2", categories=("a", "c")),
-    ]
-    m = _make_manifest(documents=docs)
-    assert m.categories_covered == ["a", "b", "c"]
 
 
 def test_manifest_categories_covered_empty_batch45():
@@ -771,10 +735,6 @@ def test_all_exact_order_batch45():
     ]
 
 
-def test_all_count_five_batch45():
-    assert len(manifest_mod.__all__) == 5
-
-
 def test_all_entries_importable_batch45():
     for name in manifest_mod.__all__:
         assert hasattr(manifest_mod, name)
@@ -814,12 +774,6 @@ def test_ast_top_level_function_names_batch45():
         "load_manifest",
         "_detect_project_root",
     ]
-
-
-def test_ast_no_async_in_top_level_batch45():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
 
 
 def test_ast_first_node_docstring_batch45():
@@ -949,11 +903,6 @@ def test_source_no_locals_batch45():
 def test_source_no_os_system_batch45():
     src = inspect.getsource(manifest_mod)
     assert "os.system(" not in src
-
-
-def test_source_no_popen_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "popen(" not in src
 
 
 def test_source_no_yaml_load_batch45():

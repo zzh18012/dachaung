@@ -86,11 +86,6 @@ def test_silent_drop_empty_expected_counts_batch52():
     assert out["reason"] == "no_expectations_element_count"
 
 
-def test_silent_drop_no_negative_batch52():
-    out = _silent_drop_count({"paragraph": 5}, {"element_count_by_type": {"paragraph": 3}})
-    assert out["value"] == 0  # expected < actual 不计
-
-
 def test_silent_drop_multi_type_sum_batch52():
     out = _silent_drop_count(
         {"paragraph": 1, "heading": 2},
@@ -265,10 +260,6 @@ def test_by_type_explicit_none_key_batch52():
 
 
 # ---------- helpers 快速补充 ----------
-
-def test_null_value_is_none_batch52():
-    assert _null("r") == {"value": None, "reason": "r"}
-
 
 def test_bool_metric_false_batch52():
     assert _bool_metric(0)["value"] is False

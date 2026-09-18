@@ -388,12 +388,6 @@ def test_document_entry_inequality_different_categories():
     assert d1 != d2
 
 
-def test_document_entry_field_count_ten():
-    """DocumentEntry 应有 10 个字段。"""
-    flds = fields(DocumentEntry)
-    assert len(flds) == 10
-
-
 def test_document_entry_is_dataclass():
     assert is_dataclass(DocumentEntry)
 
@@ -498,17 +492,6 @@ def test_manifest_inequality_different_devset_status():
 def test_manifest_field_count_five():
     flds = fields(Manifest)
     assert len(flds) == 5
-
-
-def test_manifest_field_names_in_order():
-    flds = [f.name for f in fields(Manifest)]
-    assert flds == [
-        "manifest_version",
-        "devset_status",
-        "documents",
-        "expected_failures",
-        "project_root",
-    ]
 
 
 def test_manifest_is_dataclass():

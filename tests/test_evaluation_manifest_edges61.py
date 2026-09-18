@@ -70,10 +70,6 @@ def test_is_absolute_like_just_colon_batch34():
 # ---------- _has_backslash 第三十四批
 
 
-def test_has_backslash_tab_batch34():
-    assert _has_backslash("\t") is False
-
-
 def test_has_backslash_slash_batch34():
     assert _has_backslash("/") is False
 
@@ -505,11 +501,6 @@ def test_module_source_contains_manifest_error_class_batch34():
     assert "class ManifestError(Exception):" in src
 
 
-def test_module_source_contains_document_entry_class_batch34():
-    src = inspect.getsource(mmod)
-    assert "class DocumentEntry:" in src
-
-
 def test_module_source_contains_expected_failure_class_batch34():
     src = inspect.getsource(mmod)
     assert "class ExpectedFailure:" in src
@@ -613,15 +604,6 @@ def test_module_has_expected_failure_class_batch34():
     assert hasattr(mmod, "ExpectedFailure")
 
 
-def test_module_has_all_batch34():
-    assert hasattr(mmod, "__all__")
-    assert "ManifestError" in mmod.__all__
-    assert "Manifest" in mmod.__all__
-    assert "DocumentEntry" in mmod.__all__
-    assert "ExpectedFailure" in mmod.__all__
-    assert "load_manifest" in mmod.__all__
-
-
 # ---------- 端到端集成第四十九批
 
 
@@ -668,18 +650,6 @@ def test_e2e_full_manifest_round_trip_batch34(tmp_path):
     ef = m.expected_failures[0]
     assert ef.source_type == "pdf"
     assert ef.expected_error_code == "E_PARSE"
-
-
-def test_e2e_idempotent_batch34(tmp_path):
-    p = _write_manifest(tmp_path, {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    })
-    m1 = load_manifest(p, project_root=tmp_path)
-    m2 = load_manifest(p, project_root=tmp_path)
-    assert m1 == m2
 
 
 def test_e2e_default_project_root_finds_pyproject_batch34(tmp_path):

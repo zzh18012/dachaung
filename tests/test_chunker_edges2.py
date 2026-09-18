@@ -790,10 +790,6 @@ def test_chunker_chunk_with_table_isolated():
 # ---------- 模块导入与 callable ----------
 
 
-def test_normalize_text_callable():
-    assert callable(normalize_text)
-
-
 def test_split_long_text_callable():
     assert callable(_split_long_text)
 

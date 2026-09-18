@@ -763,11 +763,6 @@ def test_detect_project_root_no_pyproject_returns_curdir(tmp_path):
 # =========================================================================
 
 
-def test_manifest_error_is_exception_subclass():
-    """ManifestError 是 Exception 子类。"""
-    assert issubclass(ManifestError, Exception)
-
-
 def test_manifest_error_not_subclass_of_value_error():
     """ManifestError 不是 ValueError 子类（独立异常）。"""
     assert not issubclass(ManifestError, ValueError)

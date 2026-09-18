@@ -242,15 +242,6 @@ def test_text_parser_version_constant():
     assert TextParser.version == "stdlib/0.1.0"
 
 
-def test_text_parser_inherits_parser():
-    assert issubclass(TextParser, Parser)
-
-
-def test_text_parser_parse_signature():
-    sig = inspect.signature(TextParser.parse)
-    assert set(sig.parameters) == {"self", "path", "source_hash"}
-
-
 # =========================================================================
 # TextParser.parse 错误矩阵
 # =========================================================================

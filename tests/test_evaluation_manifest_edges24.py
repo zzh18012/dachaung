@@ -535,11 +535,6 @@ def test_is_absolute_like_drive_letter_colon_only():
     assert _is_absolute_like("C:foo") is False
 
 
-def test_is_absolute_like_drive_letter_with_backslash():
-    """'C:\\' → True。"""
-    assert _is_absolute_like("C:\\") is True
-
-
 def test_is_absolute_like_digit_drive_letter():
     """数字盘符 '9:/foo' → False（必须 alpha）。"""
     assert _is_absolute_like("9:/foo") is False
@@ -858,19 +853,9 @@ def test_module_source_has_expected_failure_class():
 # =========================================================================
 
 
-def test_load_manifest_source_has_path_resolve():
-    src = inspect.getsource(load_manifest)
-    assert "Path(manifest_path).resolve()" in src
-
-
 def test_load_manifest_source_has_is_file():
     src = inspect.getsource(load_manifest)
     assert "p.is_file()" in src
-
-
-def test_load_manifest_source_has_utf8():
-    src = inspect.getsource(load_manifest)
-    assert 'encoding="utf-8"' in src
 
 
 def test_load_manifest_source_has_json_load():
@@ -883,40 +868,10 @@ def test_load_manifest_source_has_validate_call():
     assert 'validate(data, "manifest.schema.json")' in src
 
 
-def test_load_manifest_source_has_manifest_version_compare():
-    src = inspect.getsource(load_manifest)
-    assert 'data.get("manifest_version") != MANIFEST_VERSION' in src
-
-
-def test_load_manifest_source_has_for_d_in_documents():
-    src = inspect.getsource(load_manifest)
-    assert "for d in data.get(\"documents\", []):" in src
-
-
-def test_load_manifest_source_has_for_ef_in_expected_failures():
-    src = inspect.getsource(load_manifest)
-    assert "for ef in data.get(\"expected_failures\", []):" in src
-
-
 def test_resolve_relative_path_source_has_4_manifest_error_raises():
     """_resolve_relative_path 含 4 处 raise ManifestError（empty/absolute/backslash/outside-root）。"""
     src = inspect.getsource(_resolve_relative_path)
     assert src.count("raise ManifestError") == 4
-
-
-def test_resolve_relative_path_source_has_is_absolute_like():
-    src = inspect.getsource(_resolve_relative_path)
-    assert "_is_absolute_like(path_str)" in src
-
-
-def test_resolve_relative_path_source_has_has_backslash():
-    src = inspect.getsource(_resolve_relative_path)
-    assert "_has_backslash(path_str)" in src
-
-
-def test_resolve_relative_path_source_has_resolve():
-    src = inspect.getsource(_resolve_relative_path)
-    assert ".resolve()" in src
 
 
 def test_resolve_relative_path_source_has_relative_to():

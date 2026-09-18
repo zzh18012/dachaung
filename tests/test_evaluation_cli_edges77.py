@@ -448,20 +448,9 @@ def test_format_metric_value_none_empty_reason_batch52():
     assert "(None)" in out
 
 
-def test_format_metric_bool_true_lowercase_batch52():
-    out = _format_metric("flag", {"value": True, "reason": None})
-    assert "true" in out
-    assert "True" not in out
-
-
 def test_format_metric_bool_false_lowercase_batch52():
     out = _format_metric("flag", {"value": False, "reason": None})
     assert "false" in out
-
-
-def test_format_metric_float_format_4_digits_batch52():
-    out = _format_metric("ratio", {"value": 0.123456789, "reason": None})
-    assert "0.1235" in out  # 4 位小数
 
 
 # ---------- _run_inspect_doc _sort_key 行为 ----------
@@ -527,11 +516,6 @@ def test_source_sys_stdout_reconfigure_call_batch52():
     assert 'sys.stdout.reconfigure' in src
 
 
-def test_source_utf8_encoding_batch52():
-    src = inspect.getsource(cli_mod)
-    assert 'encoding="utf-8"' in src
-
-
 def test_source_errors_replace_batch52():
     src = inspect.getsource(cli_mod)
     assert 'errors="replace"' in src
@@ -556,12 +540,6 @@ def test_source_has_required_true_batch52():
 def test_source_has_raw_description_batch52():
     src = inspect.getsource(cli_mod)
     assert "RawDescriptionHelpFormatter" in src
-
-
-def test_source_has_main_entry_point_batch52():
-    src = inspect.getsource(cli_mod)
-    assert 'if __name__ == "__main__":' in src
-    assert "raise SystemExit(main())" in src
 
 
 def test_source_has_3_subparsers_batch52():
@@ -746,14 +724,6 @@ def test_ast_run_inspect_doc_has_with_open_batch52():
     assert len(withs) == 1
 
 
-def test_ast_format_metric_has_multiple_returns_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_format_metric")
-    returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
-    # 至少 4 个 return（None/bool/float/dict/默认）
-    assert len(returns) >= 4
-
-
 def test_ast_format_metric_has_joined_str_batch52():
     tree = ast.parse(inspect.getsource(cli_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_format_metric")
@@ -830,8 +800,3 @@ def test_source_no_yield_batch52():
 def test_source_no_async_await_batch52():
     assert "async " not in _src()
     assert "await " not in _src()
-
-
-def test_source_open_count_is_1_batch52():
-    """_run_inspect_doc 1 个 with open。"""
-    assert _src().count("open(") == 1

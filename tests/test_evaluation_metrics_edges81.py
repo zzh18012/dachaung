@@ -88,14 +88,6 @@ def test_error_and_document_both_present_batch53(monkeypatch):
 
 # ---------- 空 elements ----------
 
-def test_pdf_ratio_empty_elements_null_batch53():
-    assert _pdf_locator_ratio([])["reason"] == "no_elements"
-
-
-def test_docx_ratio_empty_elements_null_batch53():
-    assert _docx_locator_ratio([])["reason"] == "no_elements"
-
-
 # ---------- 文本保留变体 ----------
 
 def test_image_only_with_nonempty_chunk_batch53():

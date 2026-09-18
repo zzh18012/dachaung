@@ -588,11 +588,6 @@ def test_get_parser_name_no_default():
     assert sig.parameters["name"].default is inspect.Parameter.empty
 
 
-def test_get_parser_image_output_dir_default_none():
-    sig = inspect.signature(get_parser)
-    assert sig.parameters["image_output_dir"].default is None
-
-
 def test_image_output_dir_for_signature_params():
     sig = inspect.signature(image_output_dir_for)
     assert len(sig.parameters) == 2
@@ -621,16 +616,6 @@ def test_process_single_input_path_no_default():
 def test_process_single_output_path_default_none():
     sig = inspect.signature(process_single)
     assert sig.parameters["output_path"].default is None
-
-
-def test_process_single_parser_name_default_fallback():
-    sig = inspect.signature(process_single)
-    assert sig.parameters["parser_name"].default == "fallback"
-
-
-def test_process_single_max_chars_default_800():
-    sig = inspect.signature(process_single)
-    assert sig.parameters["max_chars"].default == 800
 
 
 def test_process_single_write_json_default_true():

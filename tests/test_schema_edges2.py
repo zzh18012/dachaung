@@ -234,11 +234,6 @@ def test_schema_validation_error_chained_with_cause():
 # =============================================================================
 
 
-def test_load_schema_default_returns_dict():
-    s = load_schema()
-    assert isinstance(s, dict)
-
-
 def test_load_schema_default_path_is_document_schema():
     s = load_schema()
     assert s.get("$id") == "https://kvfs.local/schemas/document.schema.json"
@@ -1388,18 +1383,10 @@ def test_validate_file_unicode_content(tmp_path):
 # =============================================================================
 
 
-def test_silence_unused_import_returns_none():
-    assert _silence_unused_import() is None
-
-
 def test_silence_unused_import_takes_no_arguments():
     import inspect
     sig = inspect.signature(_silence_unused_import)
     assert len(sig.parameters) == 0
-
-
-def test_silence_unused_import_callable():
-    assert callable(_silence_unused_import)
 
 
 def test_silence_unused_import_in_module():

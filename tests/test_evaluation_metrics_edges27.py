@@ -606,10 +606,6 @@ def test_is_valid_bbox_with_4_floats():
     assert _is_valid_bbox([0.5, 1.5, 2.5, 3.5]) is True
 
 
-def test_is_valid_bbox_with_4_huge_floats():
-    assert _is_valid_bbox([1e308, 1e308, 1e308, 1e308]) is True
-
-
 def test_is_valid_bbox_with_3_elements():
     assert _is_valid_bbox([0, 0, 1]) is False
 
@@ -776,11 +772,6 @@ def test_module_source_image_resource_uses_is_file_and_stat():
 def test_module_source_chunk_reference_uses_set_comprehension():
     src = inspect.getsource(_chunk_reference_ratio)
     assert "{e.get(\"element_id\") for e in elements}" in src
-
-
-def test_module_source_heading_boundary_uses_add_to_set():
-    src = inspect.getsource(_heading_boundary_ratio)
-    assert "chunk_first_ids.add(ids[0])" in src
 
 
 # ---------- module source forbidden tokens 第三批 ----------

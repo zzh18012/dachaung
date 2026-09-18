@@ -586,35 +586,8 @@ def test_load_manifest_no_varargs_varkw():
         )
 
 
-def test_is_absolute_like_no_varargs_varkw():
-    sig = inspect.signature(_is_absolute_like)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
-def test_has_backslash_no_varargs_varkw():
-    sig = inspect.signature(_has_backslash)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 def test_resolve_relative_path_no_varargs_varkw():
     sig = inspect.signature(_resolve_relative_path)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
-def test_detect_project_root_no_varargs_varkw():
-    sig = inspect.signature(_detect_project_root)
     for p in sig.parameters.values():
         assert p.kind not in (
             inspect.Parameter.VAR_POSITIONAL,

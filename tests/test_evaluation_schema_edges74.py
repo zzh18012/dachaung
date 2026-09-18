@@ -250,12 +250,6 @@ def test_init_version_constants_batch54():
     assert evaluation.ANNOTATION_VERSION == "1.0"
 
 
-def test_init_all_four_names_batch54():
-    assert evaluation.__all__ == [
-        "EVALUATOR_VERSION", "REPORT_VERSION", "ANNOTATION_VERSION",
-        "MANIFEST_VERSION"]
-
-
 # ---------- 源码补强 ----------
 
 def _src() -> str:

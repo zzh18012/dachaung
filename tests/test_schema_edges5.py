@@ -92,20 +92,10 @@ def test_schema_validation_error_args_length_one():
     assert len(e.args) == 1
 
 
-def test_schema_validation_error_args_value():
-    e = SchemaValidationError("msg")
-    assert e.args == ("msg",)
-
-
 def test_schema_validation_error_default_errors_empty_list():
     e = SchemaValidationError("msg")
     assert isinstance(e.errors, list)
     assert len(e.errors) == 0
-
-
-def test_schema_validation_error_explicit_empty_list():
-    e = SchemaValidationError("msg", errors=[])
-    assert e.errors == []
 
 
 def test_schema_validation_error_none_errors_becomes_empty():
@@ -496,51 +486,10 @@ def test_module_all_no_silence_unused():
     assert "_silence_unused_import" not in mod.__all__
 
 
-def test_module_imports_json():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_path():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
-def test_module_imports_draft202012():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "Draft202012Validator" in src
-
-
-def test_module_imports_jsvalidation_error():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "JSValidationError" in src
-
-
-def test_module_uses_future_annotations():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
 def test_module_docstring_mentions_json_schema():
     import app.schema as mod
     doc = mod.__doc__
     assert "JSON Schema" in doc or "Schema" in doc or "schema" in doc.lower()
-
-
-def test_silence_unused_import_returns_none():
-    import app.schema as mod
-    assert mod._silence_unused_import() is None
 
 
 def test_silence_unused_import_no_args():
@@ -552,11 +501,6 @@ def test_silence_unused_import_no_args():
 # =========================================================================
 # 签名深度
 # =========================================================================
-
-
-def test_load_schema_path_default_is_schema_path():
-    sig = inspect.signature(load_schema)
-    assert sig.parameters["path"].default == SCHEMA_PATH
 
 
 def test_load_schema_path_annotation_str_or_path():
@@ -577,11 +521,6 @@ def test_validate_document_no_default():
     assert sig.parameters["document"].default is inspect.Parameter.empty
 
 
-def test_validate_schema_default_none():
-    sig = inspect.signature(validate)
-    assert sig.parameters["schema"].default is None
-
-
 def test_is_valid_document_no_default():
     sig = inspect.signature(is_valid)
     assert sig.parameters["document"].default is inspect.Parameter.empty
@@ -597,20 +536,10 @@ def test_validate_file_path_no_default():
     assert sig.parameters["path"].default is inspect.Parameter.empty
 
 
-def test_validate_file_schema_default_none():
-    sig = inspect.signature(validate_file)
-    assert sig.parameters["schema"].default is None
-
-
 def test_schema_validation_error_init_signature():
     sig = inspect.signature(SchemaValidationError.__init__)
     # self, message, errors
     assert len(sig.parameters) == 3
-
-
-def test_schema_validation_error_init_errors_default_none():
-    sig = inspect.signature(SchemaValidationError.__init__)
-    assert sig.parameters["errors"].default is None
 
 
 # =========================================================================

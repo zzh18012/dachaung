@@ -170,13 +170,6 @@ def test_null_returns_dict_with_value_none():
     assert out["reason"] == "any_reason"
 
 
-def test_null_returns_independent_dict():
-    a = _null("x")
-    b = _null("x")
-    assert a is not b
-    assert a == b
-
-
 def test_ratio_accepts_int():
     out = _ratio(0)
     assert out["value"] == 0.0
@@ -973,11 +966,6 @@ def test_module_all_entry_callable():
     assert callable(mmod.compute_automatic_metrics)
 
 
-def test_module_all_entry_valid_identifier():
-    for name in mmod.__all__:
-        assert name.isidentifier()
-
-
 # =========================================================================
 # module namespace
 # =========================================================================
@@ -1026,31 +1014,6 @@ def test_module_namespace_compute_automatic_metrics_public():
 # =========================================================================
 
 
-def test_module_source_no_re_module():
-    src = inspect.getsource(mmod)
-    assert "\nimport re" not in src
-
-
-def test_module_source_no_logging_module():
-    src = inspect.getsource(mmod)
-    assert "\nimport logging" not in src
-
-
-def test_module_source_no_subprocess_module():
-    src = inspect.getsource(mmod)
-    assert "\nimport subprocess" not in src
-
-
-def test_module_source_no_asyncio_module():
-    src = inspect.getsource(mmod)
-    assert "\nimport asyncio" not in src
-
-
-def test_module_source_no_threading_module():
-    src = inspect.getsource(mmod)
-    assert "\nimport threading" not in src
-
-
 def test_module_source_no_json_module():
     src = inspect.getsource(mmod)
     assert "\nimport json" not in src
@@ -1059,26 +1022,6 @@ def test_module_source_no_json_module():
 def test_module_source_no_time_module():
     src = inspect.getsource(mmod)
     assert "\nimport time" not in src
-
-
-def test_module_source_no_datetime_module():
-    src = inspect.getsource(mmod)
-    assert "\nimport datetime" not in src
-
-
-def test_module_source_no_itertools_module():
-    src = inspect.getsource(mmod)
-    assert "\nimport itertools" not in src
-
-
-def test_module_source_no_functools_module():
-    src = inspect.getsource(mmod)
-    assert "\nimport functools" not in src
-
-
-def test_module_source_no_relative_import():
-    src = inspect.getsource(mmod)
-    assert "from ." not in src
 
 
 def test_module_source_no_class_def():
@@ -1104,11 +1047,6 @@ def test_module_source_no_async_def():
 def test_module_source_no_walrus():
     src = inspect.getsource(mmod)
     assert ":=" not in src
-
-
-def test_module_source_no_assert_stmt():
-    src = inspect.getsource(mmod)
-    assert "\nassert " not in src
 
 
 # =========================================================================

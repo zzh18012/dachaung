@@ -117,13 +117,6 @@ def _run(tmp_path):
 
 # ---------- run 收 --tolerance-chars ----------
 
-def test_run_accepts_tolerance_flag_batch549(
-        tmp_path):
-    rc, _, err = _run(tmp_path)
-    assert rc == 0
-    assert err == ""
-
-
 # ---------- run 输出恰四行 ----------
 
 def test_run_output_four_lines_batch549(

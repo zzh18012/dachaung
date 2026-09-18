@@ -682,26 +682,10 @@ def test_ast_chunk_boundary_has_dict_in_returns_batch52():
     assert len(return_outs) >= 3  # pipeline_failed, no_annotation, no_predicted_boundaries, no_ground_truth_anchors 等
 
 
-def test_ast_no_delete_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    assert not any(isinstance(n, ast.Delete) for n in ast.walk(tree))
-
-
 def test_ast_module_has_2_assigns_batch52():
     tree = ast.parse(inspect.getsource(ann_mod))
     assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
     assert len(assigns) == 2
-
-
-def test_ast_all_is_list_3_batch52():
-    tree = ast.parse(inspect.getsource(ann_mod))
-    all_assign = next(
-        n for n in tree.body
-        if isinstance(n, ast.Assign)
-        and any(isinstance(t, ast.Name) and t.id == "__all__" for t in n.targets)
-    )
-    assert isinstance(all_assign.value, ast.List)
-    assert len(all_assign.value.elts) == 3
 
 
 # ---------- forbidden tokens 第一百四十八批 ----------
@@ -773,8 +757,3 @@ def test_source_no_yield_batch52():
 def test_source_no_async_await_batch52():
     assert "async " not in _src()
     assert "await " not in _src()
-
-
-def test_source_open_count_zero_batch52():
-    """annotation_metrics.py 不使用 open()。"""
-    assert "open(" not in _src()

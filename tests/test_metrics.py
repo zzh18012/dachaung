@@ -863,11 +863,6 @@ def test_pdf_bbox_required_types_excludes_table():
     assert "table" not in _PDF_BBOX_REQUIRED_TYPES
 
 
-def test_not_evaluated_constant_value():
-    from evaluation.metrics import _NOT_EVALUATED
-    assert _NOT_EVALUATED == "not_evaluated"
-
-
 # compute_automatic_metrics 字段完整性
 
 

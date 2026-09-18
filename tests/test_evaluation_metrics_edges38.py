@@ -190,27 +190,11 @@ def test_compute_does_not_mutate_document_batch11():
     assert json.dumps(doc, sort_keys=True) == snapshot
 
 
-def test_compute_does_not_mutate_error_batch11():
-    error = {"code": "x", "message": "y"}
-    snapshot = json.dumps(error, sort_keys=True)
-    _ = compute_automatic_metrics(None, error, "pdf", None)
-    assert json.dumps(error, sort_keys=True) == snapshot
-
-
 def test_compute_idempotent_batch11():
     doc = {"elements": [{"type": "paragraph", "content": "abc"}], "chunks": []}
     out1 = compute_automatic_metrics(doc, None, "pdf", None)
     out2 = compute_automatic_metrics(doc, None, "pdf", None)
     # 移除可能差异的字段（理论应该相同）
-    assert out1 == out2
-
-
-def test_compute_kwargs_call_batch11():
-    doc = {"elements": [], "chunks": []}
-    out1 = compute_automatic_metrics(doc, None, "pdf", None)
-    out2 = compute_automatic_metrics(
-        document=doc, error=None, source_type="pdf", expectations=None
-    )
     assert out1 == out2
 
 
@@ -279,12 +263,6 @@ def test_compute_docx_locator_null_when_source_pdf_batch11():
     doc = {"elements": [], "chunks": []}
     out = compute_automatic_metrics(doc, None, "pdf", None)
     assert out["docx_locator_valid_ratio"]["value"] is None
-
-
-def test_compute_silent_drop_count_null_when_no_expectations_batch11():
-    doc = {"elements": [], "chunks": []}
-    out = compute_automatic_metrics(doc, None, "pdf", None)
-    assert out["silent_drop_count"]["value"] is None
 
 
 def test_compute_silent_drop_count_int_with_expectations_batch11():
@@ -564,15 +542,6 @@ def test_text_preservation_unicode_content_batch11():
     assert out["equal"]["value"] is True
 
 
-def test_text_preservation_whitespace_only_both_empty_batch11():
-    """expected 和 actual 仅含空白 → strip 后都为空 → empty_expected_and_actual。"""
-    elements = [{"type": "paragraph", "content": "  \n\t "}]
-    chunks = [{"text": " "}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-    assert out["precision"]["reason"] == "empty_expected_and_actual"
-
-
 def test_text_preservation_image_excluded_batch11():
     """image 类型不参与 expected（image 的 content 不算）。"""
     elements = [
@@ -756,14 +725,6 @@ def test_is_valid_bbox_none_element_rejected_batch11():
     assert _is_valid_bbox([0, 0, None, 100]) is False
 
 
-def test_is_valid_bbox_inf_rejected_batch11():
-    assert _is_valid_bbox([0, 0, math.inf, 100]) is False
-
-
-def test_is_valid_bbox_nan_rejected_batch11():
-    assert _is_valid_bbox([0, 0, math.nan, 100]) is False
-
-
 def test_is_valid_bbox_returns_bool_batch11():
     assert type(_is_valid_bbox([0, 0, 0, 0])) is bool
 
@@ -870,11 +831,6 @@ def test_metrics_source_no_remove_batch11():
     assert ".remove(" not in source
 
 
-def test_metrics_source_no_terminate_batch11():
-    source = inspect.getsource(mmod)
-    assert ".terminate(" not in source
-
-
 def test_metrics_source_no_async_def_batch11():
     source = inspect.getsource(mmod)
     assert "async def" not in source
@@ -903,31 +859,6 @@ def test_metrics_source_no_top_level_lambda_batch11():
 def test_metrics_source_no_print_batch11():
     source = inspect.getsource(mmod)
     assert "print(" not in source
-
-
-def test_metrics_source_no_socket_batch11():
-    source = inspect.getsource(mmod)
-    assert "socket" not in source
-
-
-def test_metrics_source_no_threading_batch11():
-    source = inspect.getsource(mmod)
-    assert "threading" not in source
-
-
-def test_metrics_source_no_multiprocessing_batch11():
-    source = inspect.getsource(mmod)
-    assert "multiprocessing" not in source
-
-
-def test_metrics_source_no_asyncio_batch11():
-    source = inspect.getsource(mmod)
-    assert "asyncio" not in source
-
-
-def test_metrics_source_no_pickle_module_batch11():
-    source = inspect.getsource(mmod)
-    assert "import pickle" not in source
 
 
 # ---------- module source 字符串精确补强第十批 ----------

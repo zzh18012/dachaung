@@ -473,11 +473,6 @@ def test_module_has_future_annotations_batch27():
     assert "from __future__ import annotations" in src
 
 
-def test_module_imports_counter_batch27():
-    src = inspect.getsource(amod)
-    assert "Counter" in src
-
-
 def test_module_imports_typing_any_batch27():
     src = inspect.getsource(amod)
     assert "from typing import Any" in src

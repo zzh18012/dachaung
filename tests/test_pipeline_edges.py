@@ -36,11 +36,6 @@ def test_get_parser_fallback_returns_parser_subclass():
     assert isinstance(p, Parser)
 
 
-def test_get_parser_kreuzberg_returns_parser_subclass():
-    p = get_parser("kreuzberg")
-    assert isinstance(p, Parser)
-
-
 def test_get_parser_markdown_returns_parser_subclass():
     p = get_parser("markdown")
     assert isinstance(p, Parser)

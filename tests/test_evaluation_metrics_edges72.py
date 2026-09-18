@@ -275,15 +275,6 @@ def test_pdf_locator_empty_elements_batch48():
     assert out["reason"] == "no_elements"
 
 
-def test_pdf_locator_all_valid_batch48():
-    elements = [
-        {"type": "heading", "source_locator": {"page": 1, "bbox": [0, 0, 10, 10]}},
-        {"type": "paragraph", "source_locator": {"page": 1, "bbox": [0, 0, 10, 10]}},
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_pdf_locator_missing_page_batch48():
     elements = [{"type": "image", "source_locator": {"bbox": [0, 0, 10, 10]}}]
     out = _pdf_locator_ratio(elements)
@@ -471,16 +462,6 @@ def test_chunk_reference_missing_id_batch48():
     assert out["value"] == 0.0
 
 
-def test_chunk_reference_partial_match_batch48():
-    elements = [{"element_id": "e1"}]
-    chunks = [
-        {"source_element_ids": ["e1"]},
-        {"source_element_ids": ["eX"]},
-    ]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.5
-
-
 def test_chunk_reference_empty_ids_batch48():
     """source_element_ids=[] → 不算 valid。"""
     elements = [{"element_id": "e1"}]
@@ -529,10 +510,6 @@ def test_strip_whitespace_only_whitespace_batch48():
 
 def test_strip_whitespace_no_whitespace_batch48():
     assert _strip_unicode_whitespace("abc") == "abc"
-
-
-def test_strip_whitespace_preserves_order_batch48():
-    assert _strip_unicode_whitespace("c b a") == "cba"
 
 
 def test_strip_whitespace_chinese_batch48():

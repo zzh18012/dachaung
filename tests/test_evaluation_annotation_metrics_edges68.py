@@ -61,10 +61,6 @@ def test_parser_does_not_emit_relations_isprintable_batch44():
     assert PARSER_DOES_NOT_EMIT_RELATIONS.isprintable()
 
 
-def test_parser_does_not_emit_relations_isascii_batch44():
-    assert PARSER_DOES_NOT_EMIT_RELATIONS.isascii()
-
-
 def test_parser_does_not_emit_relations_no_uppercase_batch44():
     for c in PARSER_DOES_NOT_EMIT_RELATIONS:
         assert not c.isupper()
@@ -76,10 +72,6 @@ def test_parser_does_not_emit_relations_starts_with_letter_batch44():
 
 def test_parser_does_not_emit_relations_ends_with_letter_batch44():
     assert PARSER_DOES_NOT_EMIT_RELATIONS[-1].isalpha()
-
-
-def test_parser_does_not_emit_relations_underscore_count_batch44():
-    assert PARSER_DOES_NOT_EMIT_RELATIONS.count("_") == 4
 
 
 # ---------- figure_caption_prf 第四十四批
@@ -152,12 +144,6 @@ def test_figure_caption_prf_keys_count_batch44():
     assert len(out) == 3
 
 
-def test_figure_caption_prf_inner_dict_keys_batch44():
-    out = figure_caption_prf(None, None)
-    for k, v in out.items():
-        assert set(v.keys()) == {"value", "reason"}
-
-
 # ---------- chunk_boundary_prf 签名 第四十四批
 
 
@@ -211,24 +197,12 @@ def test_chunk_boundary_prf_document_some_annotation_empty_batch44():
     assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 
-def test_chunk_boundary_prf_annotation_empty_dict_batch44():
-    out = chunk_boundary_prf({"chunks": [{"text": "a"}]}, {})
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_annotation_no_anchors_key_batch44():
     """annotation 是 dict 但无 chunk_boundary_anchors → 视作空 anchors。"""
     doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
     ann = {"other_key": []}
     out = chunk_boundary_prf(doc, ann)
     # chunks >= 2 + no anchors → no_ground_truth_anchors
-    assert out["chunk_boundary_precision"]["reason"] == "no_ground_truth_anchors"
-
-
-def test_chunk_boundary_prf_anchors_empty_list_batch44():
-    doc = {"chunks": [{"text": "a"}, {"text": "b"}]}
-    ann = {"chunk_boundary_anchors": []}
-    out = chunk_boundary_prf(doc, ann)
     assert out["chunk_boundary_precision"]["reason"] == "no_ground_truth_anchors"
 
 
@@ -531,21 +505,6 @@ def test_module_source_contains_one_to_one_note_batch44():
     assert "一对一" in src
 
 
-def test_module_source_contains_marker_keyword_batch44():
-    src = inspect.getsource(amod)
-    assert "marker" in src
-
-
-def test_module_source_contains_position_keyword_batch44():
-    src = inspect.getsource(amod)
-    assert "position" in src
-
-
-def test_module_source_contains_chunk_boundary_anchors_keyword_batch44():
-    src = inspect.getsource(amod)
-    assert "chunk_boundary_anchors" in src
-
-
 def test_module_source_contains_missing_markers_keyword_batch44():
     src = inspect.getsource(amod)
     assert "missing_markers" in src
@@ -633,11 +592,6 @@ def test_module_all_contains_figure_caption_prf_batch44():
 
 def test_module_all_contains_chunk_boundary_prf_batch44():
     assert "chunk_boundary_prf" in amod.__all__
-
-
-def test_module_all_contains_only_strings_batch44():
-    for name in amod.__all__:
-        assert isinstance(name, str)
 
 
 def test_module_all_no_duplicates_batch44():

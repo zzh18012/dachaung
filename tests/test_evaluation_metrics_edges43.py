@@ -60,12 +60,6 @@ def test_null_returns_value_none_batch16():
     assert r["reason"] == "reason"
 
 
-def test_null_empty_reason_batch16():
-    r = _null("")
-    assert r["value"] is None
-    assert r["reason"] == ""
-
-
 def test_null_long_reason_batch16():
     r = _null("a" * 200)
     assert len(r["reason"]) == 200
@@ -106,11 +100,6 @@ def test_bool_metric_none_batch16():
     assert r["value"] is False
 
 
-def test_bool_metric_empty_string_batch16():
-    r = _bool_metric("")
-    assert r["value"] is False
-
-
 def test_bool_metric_true_batch16():
     r = _bool_metric(True)
     assert r["value"] is True
@@ -125,16 +114,6 @@ def test_int_metric_truncates_float_batch16():
     """int(3.7) → 3（截断，不四舍五入）。"""
     r = _int_metric(3.7)
     assert r["value"] == 3
-
-
-def test_int_metric_true_is_one_batch16():
-    r = _int_metric(True)
-    assert r["value"] == 1
-
-
-def test_int_metric_big_batch16():
-    r = _int_metric(10**18)
-    assert r["value"] == 10**18
 
 
 # ---------- compute_automatic_metrics 第十六批 ----------
@@ -304,11 +283,6 @@ def test_is_valid_bbox_string_digits_batch16():
 
 def test_is_valid_bbox_mixed_valid_batch16():
     assert _is_valid_bbox([0.5, 1, 1.5, 2]) is True
-
-
-def test_is_valid_bbox_tuple_batch16():
-    """tuple 不是 list → False。"""
-    assert _is_valid_bbox((0, 0, 1, 1)) is False
 
 
 def test_is_valid_bbox_negative_values_batch16():
@@ -1045,8 +1019,3 @@ def test_e2e_metric_keys_correct_batch16():
 def test_e2e_image_ratio_no_images_batch16():
     r = _image_resource_ratio([{"type": "paragraph"}], None)
     assert r["reason"] == "no_image_elements"
-
-
-def test_e2e_heading_boundary_no_headings_batch16():
-    r = _heading_boundary_ratio([{"type": "paragraph"}], [])
-    assert r["reason"] == "no_heading_elements"

@@ -354,13 +354,6 @@ def test_document_entry_inequality_batch11():
     assert d1 != d2
 
 
-def test_document_entry_in_set_batch11():
-    d1 = _make_doc()
-    d2 = _make_doc()
-    s = {d1, d2}
-    assert len(s) == 1  # same hash → same entry
-
-
 def test_document_entry_repr_batch11():
     d = _make_doc(doc_id="abc")
     assert "DocumentEntry" in repr(d)
@@ -900,19 +893,9 @@ def test_signature_is_absolute_like_1_param_batch11():
     assert len(sig.parameters) == 1
 
 
-def test_signature_is_absolute_like_param_name_batch11():
-    sig = inspect.signature(_is_absolute_like)
-    assert list(sig.parameters) == ["path_str"]
-
-
 def test_signature_has_backslash_1_param_batch11():
     sig = inspect.signature(_has_backslash)
     assert len(sig.parameters) == 1
-
-
-def test_signature_has_backslash_param_name_batch11():
-    sig = inspect.signature(_has_backslash)
-    assert list(sig.parameters) == ["path_str"]
 
 
 def test_signature_resolve_relative_path_3_params_batch11():
@@ -950,28 +933,6 @@ def test_signature_detect_project_root_param_name_batch11():
     assert list(sig.parameters) == ["start"]
 
 
-def test_signature_funcs_function_type_batch11():
-    for func in (
-        _is_absolute_like,
-        _has_backslash,
-        _resolve_relative_path,
-        load_manifest,
-        _detect_project_root,
-    ):
-        assert inspect.isfunction(func)
-
-
-def test_signature_funcs_module_eq_batch11():
-    for func in (
-        _is_absolute_like,
-        _has_backslash,
-        _resolve_relative_path,
-        load_manifest,
-        _detect_project_root,
-    ):
-        assert func.__module__ == "evaluation.manifest"
-
-
 def test_signature_manifest_error_subclass_of_exception_batch11():
     assert issubclass(ManifestError, Exception)
 
@@ -1007,14 +968,6 @@ def test_module_has_dunder_file_batch11():
     assert mmod.__file__ is not None
 
 
-def test_module_dunder_file_endswith_manifest_py_batch11():
-    import os
-    sep = os.sep
-    assert mmod.__file__.endswith("evaluation" + sep + "manifest.py") or mmod.__file__.endswith(
-        "evaluation/manifest.py"
-    )
-
-
 def test_module_name_is_evaluation_manifest_batch11():
     assert mmod.__name__ == "evaluation.manifest"
 
@@ -1031,14 +984,6 @@ def test_module_user_function_count_batch11():
         "load_manifest",
         "_detect_project_root",
     }
-
-
-def test_module_user_class_count_batch11():
-    classes = [
-        n for n, v in vars(mmod).items()
-        if inspect.isclass(v) and v.__module__ == mmod.__name__
-    ]
-    assert set(classes) == {"ManifestError", "DocumentEntry", "ExpectedFailure", "Manifest"}
 
 
 def test_module_docstring_present_batch11():

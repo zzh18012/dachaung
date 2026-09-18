@@ -242,24 +242,8 @@ def test_module_file_endswith_init_py_batch48():
     assert eval_mod.__file__.endswith("__init__.py")
 
 
-def test_module_package_evaluation_batch48():
-    assert eval_mod.__package__ == "evaluation"
-
-
-def test_module_name_evaluation_batch48():
-    assert eval_mod.__name__ == "evaluation"
-
-
 def test_module_spec_name_evaluation_batch48():
     assert eval_mod.__spec__.name == "evaluation"
-
-
-def test_module_dict_contains_all_four_versions_batch48():
-    d = eval_mod.__dict__
-    assert "EVALUATOR_VERSION" in d
-    assert "REPORT_VERSION" in d
-    assert "ANNOTATION_VERSION" in d
-    assert "MANIFEST_VERSION" in d
 
 
 def test_module_dict_all_is_list_batch48():

@@ -278,14 +278,6 @@ def test_namespace_negative_max_chars_batch13():
     assert ns.max_chars == -1
 
 
-def test_namespace_zero_max_chars_batch13():
-    ns = _build_parser().parse_args([
-        "run", "--manifest", "a.json", "--output", "b.json",
-        "--max-chars", "0",
-    ])
-    assert ns.max_chars == 0
-
-
 # ---------- _format_metric 行为深度第十三批 ----------
 
 
@@ -407,15 +399,6 @@ def test_format_metric_starts_with_two_spaces_batch13():
 # ---------- _run_inspect_doc 行为深度第十三批 ----------
 
 
-def test_run_inspect_doc_stdout_contains_file_label_batch13(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "file:" in out
-
-
 def test_run_inspect_doc_stdout_contains_document_id_label_batch13(tmp_path, capsys):
     p = tmp_path / "d.json"
     p.write_text("{}", encoding="utf-8")
@@ -423,15 +406,6 @@ def test_run_inspect_doc_stdout_contains_document_id_label_batch13(tmp_path, cap
     _run_inspect_doc(args)
     out = capsys.readouterr().out
     assert "document_id:" in out
-
-
-def test_run_inspect_doc_stdout_contains_source_label_batch13(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "source:" in out
 
 
 def test_run_inspect_doc_stdout_contains_parser_label_batch13(tmp_path, capsys):
@@ -513,15 +487,6 @@ def test_run_inspect_doc_counts_with_elements_count_batch13(tmp_path, capsys):
     _run_inspect_doc(args)
     out = capsys.readouterr().out
     assert "elements=2" in out
-
-
-def test_run_inspect_doc_counts_with_chunks_count_batch13(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text('{"chunks": [{"id": "c1"}, {"id": "c2"}, {"id": "c3"}]}', encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "chunks=3" in out
 
 
 def test_run_inspect_doc_returns_2_for_nonexistent_file_batch13(tmp_path):
@@ -839,31 +804,10 @@ def test_cli_source_no_tempfile_usage_batch13():
     assert "tempfile" not in source
 
 
-def test_cli_source_no_logging_batch13():
-    source = inspect.getsource(climod)
-    assert "import logging" not in source
-
-
 def test_cli_source_no_re_module_batch13():
     source = inspect.getsource(climod)
     assert "import re" not in source
     assert "re." not in source
-
-
-def test_cli_source_no_eval_call_batch13():
-    source = inspect.getsource(climod)
-    assert "eval(" not in source
-    assert "exec(" not in source
-
-
-def test_cli_source_no_compile_call_batch13():
-    source = inspect.getsource(climod)
-    assert "compile(" not in source
-
-
-def test_cli_source_no_global_keyword_batch13():
-    source = inspect.getsource(climod)
-    assert "\nglobal " not in source
 
 
 def test_cli_source_no_nonlocal_keyword_batch13():
@@ -879,17 +823,6 @@ def test_cli_source_no_lambda_batch13():
 def test_cli_source_no_assert_statement_batch13():
     source = inspect.getsource(climod)
     assert "\nassert " not in source
-
-
-def test_cli_source_no_input_function_batch13():
-    source = inspect.getsource(climod)
-    assert "input(" not in source
-
-
-def test_cli_source_no_class_definition_batch13():
-    source = inspect.getsource(climod)
-    assert "\nclass " not in source
-    assert not source.startswith("class ")
 
 
 def test_cli_source_no_with_at_top_level_batch13():
@@ -970,16 +903,6 @@ def test_module_source_has_ManifestError_in_except_batch13():
     source = inspect.getsource(climod)
     assert "ManifestError" in source
     assert "EvalSchemaError" in source
-
-
-def test_module_source_has_print_to_stderr_batch13():
-    source = inspect.getsource(climod)
-    assert "file=sys.stderr" in source
-
-
-def test_module_source_has_RawDescriptionHelpFormatter_batch13():
-    source = inspect.getsource(climod)
-    assert "RawDescriptionHelpFormatter" in source
 
 
 def test_module_source_has_SystemExit_at_bottom_batch13():

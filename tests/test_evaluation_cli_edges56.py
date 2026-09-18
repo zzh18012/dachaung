@@ -64,14 +64,6 @@ def test_build_parser_subparsers_dest_command_batch29():
     assert sub_actions[0].dest == "command"
 
 
-def test_build_parser_three_subcommands_batch29():
-    p = _build_parser()
-    sub_actions = [
-        a for a in p._actions if hasattr(a, "choices") and isinstance(a.choices, dict)
-    ]
-    assert set(sub_actions[0].choices.keys()) == {"run", "validate-report", "inspect-doc"}
-
-
 def test_build_parser_run_parser_choices_batch29():
     p = _build_parser()
     sub_actions = [
@@ -116,24 +108,6 @@ def test_build_parser_run_tolerance_chars_type_int_batch29():
             break
     assert tc_action is not None
     assert tc_action.type is int
-
-
-def test_build_parser_run_parser_default_fallback_batch29():
-    p = _build_parser()
-    ns = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert ns.parser == "fallback"
-
-
-def test_build_parser_run_max_chars_default_800_batch29():
-    p = _build_parser()
-    ns = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert ns.max_chars == 800
-
-
-def test_build_parser_run_tolerance_chars_default_30_batch29():
-    p = _build_parser()
-    ns = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert ns.tolerance_chars == 30
 
 
 def test_build_parser_validate_report_input_positional_batch29():

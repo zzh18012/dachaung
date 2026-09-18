@@ -834,16 +834,6 @@ def test_load_manifest_signature():
     assert list(sig.parameters) == ["manifest_path", "project_root"]
 
 
-def test_load_manifest_manifest_path_kind():
-    sig = inspect.signature(load_manifest)
-    assert sig.parameters["manifest_path"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_load_manifest_project_root_kind():
-    sig = inspect.signature(load_manifest)
-    assert sig.parameters["project_root"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_load_manifest_project_root_default_none():
     sig = inspect.signature(load_manifest)
     assert sig.parameters["project_root"].default is None

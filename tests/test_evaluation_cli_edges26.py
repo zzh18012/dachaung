@@ -324,11 +324,6 @@ def test_main_inspect_doc_with_empty_dict(tmp_path, capsys):
 # ---------- _format_metric boundary ----------
 
 
-def test_format_metric_4_char_indent():
-    out = _format_metric("x", {"value": True, "reason": None})
-    assert out.startswith("  ")
-
-
 def test_format_metric_no_value_field():
     """metric dict 没 value 字段 → value 是 None。"""
     out = _format_metric("x", {"reason": "x"})
@@ -515,11 +510,6 @@ def test_module_source_has_no_main_class():
             pytest.fail(f"Found class: {line}")
 
 
-def test_module_source_has_no_all_definition():
-    src = inspect.getsource(m)
-    assert "__all__" not in src
-
-
 # ---------- signatures 精确 ----------
 
 
@@ -583,10 +573,6 @@ def test_module_has_3_private_functions():
     assert set(private) == {"_build_parser", "_format_metric", "_run_inspect_doc"}
 
 
-def test_module_has_no_all():
-    assert not hasattr(m, "__all__")
-
-
 def test_module_has_no_class():
     src = inspect.getsource(m)
     for line in src.splitlines():
@@ -595,16 +581,6 @@ def test_module_has_no_class():
 
 
 # ---------- 端到端集成 ----------
-
-
-def test_e2e_run_then_inspect_doc_cycle(tmp_path, capsys):
-    manifest = _make_minimal_manifest(tmp_path)
-    out = tmp_path / "out.json"
-    rc1 = main(["run", "--manifest", str(manifest), "--output", str(out)])
-    assert rc1 == 0
-    capsys.readouterr()
-    rc2 = main(["validate-report", str(out)])
-    assert rc2 == 0
 
 
 def test_e2e_inspect_doc_after_pipeline_run(tmp_path, capsys):

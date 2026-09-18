@@ -487,11 +487,6 @@ def test_module_source_contains_parser_const_export_batch39():
     assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
 
 
-def test_module_source_contains_dict_annotation_batch39():
-    src = inspect.getsource(amod)
-    assert "dict[str, dict[str, Any]]" in src
-
-
 # ---------- signatures 第五十七批
 
 
@@ -500,27 +495,9 @@ def test_signature_chunk_boundary_prf_tolerance_default_30_batch39():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_signature_chunk_boundary_prf_doc_kind_batch39():
-    sig = inspect.signature(chunk_boundary_prf)
-    p = sig.parameters["document"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_chunk_boundary_prf_annotation_kind_batch39():
-    sig = inspect.signature(chunk_boundary_prf)
-    p = sig.parameters["annotation"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_signature_chunk_boundary_prf_tolerance_kind_batch39():
     sig = inspect.signature(chunk_boundary_prf)
     p = sig.parameters["tolerance_chars"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_figure_caption_prf_document_kind_batch39():
-    sig = inspect.signature(figure_caption_prf)
-    p = sig.parameters["document"]
     assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 

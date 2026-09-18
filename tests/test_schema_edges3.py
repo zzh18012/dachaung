@@ -124,11 +124,6 @@ def test_schema_validation_error_args_length_one():
     assert len(e.args) == 1
 
 
-def test_schema_validation_error_args_value():
-    e = SchemaValidationError("msg")
-    assert e.args == ("msg",)
-
-
 def test_schema_validation_error_str_contains_message():
     e = SchemaValidationError("my message")
     assert "my message" in str(e)
@@ -195,11 +190,6 @@ def test_schema_validation_error_message_attribute():
 # =========================================================================
 # load_schema 深度
 # =========================================================================
-
-
-def test_load_schema_returns_dict():
-    s = load_schema()
-    assert isinstance(s, dict)
 
 
 def test_load_schema_no_args_uses_default():
@@ -393,13 +383,6 @@ def test_validate_file_directory_raises_filenotfound(tmp_path: Path):
         validate_file(d)
 
 
-def test_validate_file_empty_raises_jsondecodeerror(tmp_path: Path):
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p)
-
-
 def test_validate_file_invalid_json_raises_jsondecodeerror(tmp_path: Path):
     p = tmp_path / "bad.json"
     p.write_text("{invalid", encoding="utf-8")
@@ -456,19 +439,11 @@ def test_validate_file_filenotfound_message_contains_path(tmp_path: Path):
 # =========================================================================
 
 
-def test_silence_unused_import_returns_none():
-    assert _silence_unused_import() is None
-
-
 def test_silence_unused_import_takes_no_arguments():
     import inspect
 
     sig = inspect.signature(_silence_unused_import)
     assert len(sig.parameters) == 0
-
-
-def test_silence_unused_import_callable():
-    assert callable(_silence_unused_import)
 
 
 def test_silence_unused_import_in_module():

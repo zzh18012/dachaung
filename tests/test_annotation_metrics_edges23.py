@@ -815,31 +815,6 @@ def test_module_source_no_functools_import():
 # =========================================================================
 
 
-def test_module_source_has_future_annotations():
-    src = inspect.getsource(ammod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_source_has_collections_counter():
-    src = inspect.getsource(ammod)
-    assert "from collections import Counter" in src
-
-
-def test_module_source_has_typing_any():
-    src = inspect.getsource(ammod)
-    assert "from typing import Any" in src
-
-
-def test_module_source_has_normalize_text_import():
-    src = inspect.getsource(ammod)
-    assert "from app.chunkers.structural import normalize_text" in src
-
-
-def test_module_source_has_null_ratio_import():
-    src = inspect.getsource(ammod)
-    assert "from evaluation.metrics import _null, _ratio" in src
-
-
 # =========================================================================
 # chunk_boundary_prf source level 完整补强
 # =========================================================================
@@ -895,24 +870,6 @@ def test_chunk_boundary_prf_source_has_neg_find_skip():
     assert "if find_pos < 0:" in src
     assert "pos += len(txt) + 1" in src
     assert "continue" in src
-
-
-def test_chunk_boundary_prf_source_has_end_computation():
-    """source 含 end = find_pos + len(txt)。"""
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "end = find_pos + len(txt)" in src
-
-
-def test_chunk_boundary_prf_source_has_predicted_append():
-    """source 含 predicted.append(end)。"""
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "predicted.append(end)" in src
-
-
-def test_chunk_boundary_prf_source_has_pos_advance():
-    """source 含 pos = end + 1（跨过空格）。"""
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "pos = end + 1" in src
 
 
 def test_chunk_boundary_prf_source_has_gt_positions_list():

@@ -84,13 +84,6 @@ def test_figure_caption_prf_annotation_with_list_value_batch31():
         assert v["value"] is None
 
 
-def test_figure_caption_prf_two_calls_independent_dict_batch31():
-    out1 = figure_caption_prf({"chunks": []}, None)
-    out2 = figure_caption_prf({"chunks": []}, None)
-    assert out1 == out2
-    assert out1 is not out2
-
-
 def test_figure_caption_prf_document_dict_with_chunks_and_elements_batch31():
     """完整 dict 也不抛。"""
     doc = {

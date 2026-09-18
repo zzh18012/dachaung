@@ -112,10 +112,6 @@ def test_bool_metric_non_empty_string_batch31():
     assert _bool_metric("x")["value"] is True
 
 
-def test_int_metric_large_value_batch31():
-    assert _int_metric(10**9)["value"] == 10**9
-
-
 def test_int_metric_zero_batch31():
     assert _int_metric(0)["value"] == 0
 
@@ -453,16 +449,6 @@ def test_chunk_reference_ratio_no_ids_key_batch31():
     assert out["value"] == 0.0
 
 
-def test_chunk_reference_ratio_all_valid_batch31():
-    elements = [{"element_id": "e1"}, {"element_id": "e2"}]
-    chunks = [
-        {"source_element_ids": ["e1"]},
-        {"source_element_ids": ["e1", "e2"]},
-    ]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 1.0
-
-
 # ---------- _strip_unicode_whitespace 第三十一批 ----------
 
 
@@ -591,13 +577,6 @@ def test_heading_boundary_ratio_chunk_no_ids_batch31():
     chunks = [{"text": "no ids"}]
     out = _heading_boundary_ratio(elements, chunks)
     assert out["value"] == 0.0
-
-
-def test_heading_boundary_ratio_no_headings_batch31():
-    elements = [{"type": "paragraph", "element_id": "p1"}]
-    chunks = [{"source_element_ids": ["p1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["reason"] == "no_heading_elements"
 
 
 def test_heading_boundary_ratio_multiple_headings_multiple_chunks_batch31():

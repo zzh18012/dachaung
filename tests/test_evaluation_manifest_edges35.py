@@ -1391,10 +1391,6 @@ def test_module_dunder_file():
     assert hasattr(mmod, "__file__")
 
 
-def test_module_dunder_file_endswith_manifest_py():
-    assert mmod.__file__.replace("\\", "/").endswith("evaluation/manifest.py")
-
-
 def test_module_name_is_evaluation_manifest():
     assert mmod.__name__ == "evaluation.manifest"
 

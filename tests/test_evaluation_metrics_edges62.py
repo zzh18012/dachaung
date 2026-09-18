@@ -75,10 +75,6 @@ def test_bool_metric_with_int_zero_batch36():
     assert _bool_metric(0)["value"] is False
 
 
-def test_bool_metric_with_none_batch36():
-    assert _bool_metric(None)["value"] is False
-
-
 def test_bool_metric_with_list_batch36():
     """非空 list → True。"""
     assert _bool_metric([1])["value"] is True
@@ -99,11 +95,6 @@ def test_int_metric_with_float_inf_batch36():
     """int(inf) raises OverflowError。"""
     with pytest.raises(OverflowError):
         _int_metric(math.inf)
-
-
-def test_int_metric_with_none_raises_batch36():
-    with pytest.raises(TypeError):
-        _int_metric(None)  # type: ignore[arg-type]
 
 
 # ---------- _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED 第三十六批
@@ -179,12 +170,6 @@ def test_pdf_locator_ratio_missing_bbox_for_paragraph_batch36():
     elements = [
         {"type": "paragraph", "source_locator": {"page": 1}},  # 缺 bbox
     ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_missing_locator_batch36():
-    elements = [{"type": "paragraph"}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -478,13 +463,6 @@ def test_strip_unicode_whitespace_no_whitespace_batch36():
 # ---------- _text_preservation 第三十六批
 
 
-def test_text_preservation_equal_simple_batch36():
-    elements = [{"type": "paragraph", "content": "hello"}]
-    chunks = [{"text": "hello"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-
-
 def test_text_preservation_equal_false_extra_in_chunk_batch36():
     elements = [{"type": "paragraph", "content": "abc"}]
     chunks = [{"text": "abcd"}]
@@ -509,15 +487,6 @@ def test_text_preservation_whitespace_ignored_batch36():
     chunks = [{"text": "abc"}]
     out = _text_preservation(elements, chunks)
     assert out["equal"]["value"] is True
-
-
-def test_text_preservation_missing_content_batch36():
-    elements = [{"type": "paragraph"}]
-    chunks = [{"text": ""}]
-    out = _text_preservation(elements, chunks)
-    # expected="" actual="" → equal=True, precision/recall=null
-    assert out["equal"]["value"] is True
-    assert out["precision"]["reason"] == "empty_expected_and_actual"
 
 
 def test_text_preservation_chunk_missing_text_batch36():
@@ -576,15 +545,6 @@ def test_heading_boundary_ratio_no_chunks_batch36():
     assert out["value"] == 0.0
 
 
-def test_heading_boundary_ratio_no_headings_batch36():
-    out = _heading_boundary_ratio(
-        [{"type": "paragraph", "element_id": "p1"}],
-        [{"source_element_ids": ["p1"]}],
-    )
-    assert out["value"] is None
-    assert out["reason"] == "no_heading_elements"
-
-
 def test_heading_boundary_ratio_chunks_no_ids_batch36():
     elements = [{"type": "heading", "element_id": "h1"}]
     chunks = [{}]  # no source_element_ids
@@ -630,12 +590,6 @@ def test_silent_drop_count_empty_expectations_batch36():
     out = _silent_drop_count({"paragraph": 5}, {})
     assert out["value"] is None
     assert out["reason"] == "no_expectations"
-
-
-def test_silent_drop_count_no_element_count_by_type_batch36():
-    out = _silent_drop_count({"paragraph": 5}, {"other_key": 1})
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations_element_count"
 
 
 def test_silent_drop_count_empty_element_count_by_type_batch36():

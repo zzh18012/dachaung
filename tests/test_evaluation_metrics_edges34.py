@@ -210,14 +210,6 @@ def test_pdf_locator_page_zero_invalid():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_page_negative_invalid():
-    elements = [
-        {"type": "paragraph", "source_locator": {"page": -1, "bbox": [0.0, 0.0, 1.0, 1.0]}},
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_bbox_as_tuple_rejected():
     """bbox 是 tuple 而非 list → isinstance False → 不 valid。"""
     elements = [
@@ -620,14 +612,6 @@ def test_silent_drop_mixed():
     assert out["value"] == 4
 
 
-def test_silent_drop_returns_int():
-    out = _silent_drop_count(
-        {"paragraph": 3},
-        {"element_count_by_type": {"paragraph": 5}},
-    )
-    assert isinstance(out["value"], int)
-
-
 # ---------- _is_valid_bbox 行为深度第七批 ----------
 
 
@@ -650,10 +634,6 @@ def test_is_valid_bbox_string_rejected():
 
 def test_is_valid_bbox_with_none_element():
     assert _is_valid_bbox([1.0, None, 3.0, 4.0]) is False
-
-
-def test_is_valid_bbox_with_string_element():
-    assert _is_valid_bbox(["1.0", 2.0, 3.0, 4.0]) is False
 
 
 def test_is_valid_bbox_empty_list():
@@ -728,10 +708,6 @@ def test_strip_unicode_whitespace_paragraph_separator():
 def test_strip_unicode_whitespace_preserves_non_whitespace():
     """不应删除任何非空白字符（标点、emoji 等）。"""
     assert _strip_unicode_whitespace("a!@#$%^&*()b") == "a!@#$%^&*()b"
-
-
-def test_strip_unicode_whitespace_returns_str():
-    assert isinstance(_strip_unicode_whitespace("hello"), str)
 
 
 def test_strip_unicode_whitespace_idempotent():
@@ -855,10 +831,6 @@ def test_module_function_module_eq_mmod():
 def test_module_docstring_present():
     assert mmod.__doc__ is not None
     assert len(mmod.__doc__) > 0
-
-
-def test_module_docstring_mentions_text_preservation():
-    assert "text_preservation" in mmod.__doc__
 
 
 def test_module_docstring_mentions_pure_function():

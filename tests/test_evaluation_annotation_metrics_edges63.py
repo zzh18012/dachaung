@@ -155,13 +155,6 @@ def test_chunk_boundary_prf_tolerance_negative_value_batch36():
     assert out["chunk_boundary_precision"]["value"] == 0.0
 
 
-def test_chunk_boundary_prf_tolerance_zero_perfect_match_batch36():
-    doc = {"chunks": [{"text": "abc"}, {"text": "def"}]}
-    ann = {"chunk_boundary_anchors": [{"marker": "c", "position": "after"}]}
-    out = chunk_boundary_prf(doc, ann, tolerance_chars=0)
-    assert out["chunk_boundary_precision"]["value"] == 1.0
-
-
 def test_chunk_boundary_prf_one_chunk_no_boundaries_batch36():
     """只有 1 个 chunk → 没有内部边界。"""
     doc = {"chunks": [{"text": "abc"}]}
@@ -481,16 +474,6 @@ def test_module_source_contains_position_param_doc_batch36():
     assert "position" in src
 
 
-def test_module_source_contains_after_value_batch36():
-    src = inspect.getsource(amod)
-    assert '"after"' in src
-
-
-def test_module_source_contains_before_value_batch36():
-    src = inspect.getsource(amod)
-    assert '"before"' in src
-
-
 def test_module_source_contains_normalize_text_call_batch36():
     src = inspect.getsource(amod)
     assert "normalize_text(" in src
@@ -504,11 +487,6 @@ def test_module_source_contains_join_call_batch36():
 def test_module_source_contains_find_call_batch36():
     src = inspect.getsource(amod)
     assert "stream.find(" in src
-
-
-def test_module_source_contains_pairs_sort_batch36():
-    src = inspect.getsource(amod)
-    assert "pairs.sort" in src
 
 
 def test_module_source_contains_used_pred_used_gt_batch36():
@@ -530,11 +508,6 @@ def test_module_source_contains_num_pred_batch36():
 def test_module_source_contains_num_gt_batch36():
     src = inspect.getsource(amod)
     assert "num_gt" in src
-
-
-def test_module_source_contains_f1_formula_batch36():
-    src = inspect.getsource(amod)
-    assert "2 * p_val * r_val / denom" in src
 
 
 def test_module_source_contains_search_from_batch36():
@@ -580,11 +553,6 @@ def test_module_source_contains_tolerance_chars_annotation_doc_batch36():
 def test_module_source_contains_one_to_one_comment_batch36():
     src = inspect.getsource(amod)
     assert "一对一" in src
-
-
-def test_module_source_contains_greedy_keyword_batch36():
-    src = inspect.getsource(amod)
-    assert "贪心" in src
 
 
 # ---------- signatures 第五十一批

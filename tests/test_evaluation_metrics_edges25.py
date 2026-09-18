@@ -58,11 +58,6 @@ def test_ratio_negative_infinity():
     assert r["value"] == -math.inf
 
 
-def test_ratio_nan_propagates():
-    r = _ratio(math.nan)
-    assert math.isnan(r["value"])
-
-
 def test_ratio_very_small_positive():
     r = _ratio(1e-300)
     assert r["value"] == 1e-300
@@ -661,11 +656,6 @@ def test_module_source_has_from_typing_import_any():
 # ---------- module source 字符串精确 ----------
 
 
-def test_module_source_has_compute_automatic_metrics_signature():
-    src = inspect.getsource(m)
-    assert "def compute_automatic_metrics(" in src
-
-
 def test_module_source_has_image_base_dir_default_none():
     src = inspect.getsource(m)
     assert "image_base_dir: Path | None = None" in src
@@ -753,40 +743,12 @@ def test_compute_automatic_metrics_namespace():
     assert compute_automatic_metrics.__module__ == "evaluation.metrics"
 
 
-def test_text_preservation_namespace():
-    assert _text_preservation.__module__ == "evaluation.metrics"
-
-
-def test_silent_drop_count_namespace():
-    assert _silent_drop_count.__module__ == "evaluation.metrics"
-
-
-def test_pdf_locator_ratio_namespace():
-    assert _pdf_locator_ratio.__module__ == "evaluation.metrics"
-
-
-def test_docx_locator_ratio_namespace():
-    assert _docx_locator_ratio.__module__ == "evaluation.metrics"
-
-
-def test_image_resource_ratio_namespace():
-    assert _image_resource_ratio.__module__ == "evaluation.metrics"
-
-
-def test_chunk_reference_ratio_namespace():
-    assert _chunk_reference_ratio.__module__ == "evaluation.metrics"
-
-
 def test_heading_boundary_ratio_namespace():
     assert _heading_boundary_ratio.__module__ == "evaluation.metrics"
 
 
 def test_strip_unicode_whitespace_namespace():
     assert _strip_unicode_whitespace.__module__ == "evaluation.metrics"
-
-
-def test_is_valid_bbox_namespace():
-    assert _is_valid_bbox.__module__ == "evaluation.metrics"
 
 
 def test_null_namespace():
@@ -826,16 +788,6 @@ def test_module_has_no_class_definition():
     for line in src.splitlines():
         if line.startswith("class "):
             pytest.fail(f"Found class definition: {line}")
-
-
-def test_module_has_13_private_functions():
-    private_fns = [
-        n for n in dir(m)
-        if n.startswith("_")
-        and not n.startswith("__")
-        and isinstance(getattr(m, n), FunctionType)
-    ]
-    assert len(private_fns) == 13
 
 
 # ---------- 端到端集成 ----------

@@ -219,17 +219,6 @@ def _write_doc(tmp_path, doc=None, name="d.json"):
     return p
 
 
-def test_run_inspect_doc_missing_document_id_default_question_batch22(tmp_path, capsys):
-    """doc 无 document_id → 打印 '?'。"""
-    p = _write_doc(tmp_path, doc={"source_type": "pdf", "elements": [], "chunks": []})
-    args = MagicMock()
-    args.input = str(p)
-    args.tolerance_chars = 30
-    _run_inspect_doc(args)
-    captured = capsys.readouterr().out
-    assert "document_id: ?" in captured
-
-
 def test_run_inspect_doc_missing_source_path_default_question_batch22(tmp_path, capsys):
     """doc 无 source_path → 打印 '?'。"""
     p = _write_doc(tmp_path, doc={
@@ -444,12 +433,6 @@ def test_main_returns_int_batch22(tmp_path):
     with patch("evaluation.cli.validate_file", return_value=None):
         rc = main(["validate-report", str(p)])
     assert isinstance(rc, int)
-
-
-def test_main_no_command_system_exit_batch22(capsys):
-    """无子命令 → SystemExit。"""
-    with pytest.raises(SystemExit):
-        main([])
 
 
 def test_main_run_passes_parser_to_run_evaluation_batch22(tmp_path):

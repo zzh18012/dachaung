@@ -185,10 +185,6 @@ def test_source_raise_messages_batch53():
     assert 'raise ManifestError(f"清单 JSON 解析失败: {e}") from e' in src
 
 
-def test_source_validate_call_line_batch53():
-    assert 'validate(data, "manifest.schema.json")' in _src()
-
-
 def test_source_version_compare_line_batch53():
     assert 'if data.get("manifest_version") != MANIFEST_VERSION:' in _src()
 

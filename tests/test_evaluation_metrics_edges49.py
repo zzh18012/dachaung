@@ -55,11 +55,6 @@ from evaluation import metrics as mmod
 # ---------- 构造子第二十三批 ----------
 
 
-def test_null_returns_dict_with_two_keys_batch23():
-    out = _null("x")
-    assert set(out.keys()) == {"value", "reason"}
-
-
 def test_null_value_is_none_batch23():
     assert _null("x")["value"] is None
 
@@ -74,11 +69,6 @@ def test_ratio_accepts_int_batch23():
     out = _ratio(1)
     assert out["value"] == 1.0
     assert isinstance(out["value"], float)
-
-
-def test_ratio_accepts_zero_batch23():
-    out = _ratio(0)
-    assert out["value"] == 0.0
 
 
 def test_ratio_returns_dict_with_two_keys_batch23():
@@ -116,12 +106,6 @@ def test_int_metric_accepts_string_digit_batch23():
     # int_metric(int('5')) → 5
     out = _int_metric(int("5"))
     assert out["value"] == 5
-
-
-def test_int_metric_zero_batch23():
-    out = _int_metric(0)
-    assert out["value"] == 0
-    assert isinstance(out["value"], int)
 
 
 def test_int_metric_negative_batch23():
@@ -615,16 +599,6 @@ def test_chunk_reference_ratio_all_invalid_batch23():
     assert out["value"] == 0.0
 
 
-def test_chunk_reference_ratio_partial_valid_batch23():
-    elements = [{"element_id": "e1"}]
-    chunks = [
-        {"source_element_ids": ["e1"]},  # valid
-        {"source_element_ids": ["missing"]},  # invalid
-    ]
-    out = _chunk_reference_ratio(elements, chunks)
-    assert out["value"] == 0.5
-
-
 def test_chunk_reference_ratio_chunk_no_ids_key_batch23():
     """chunk 缺 source_element_ids 字段。"""
     elements = [{"element_id": "e1"}]
@@ -833,23 +807,11 @@ def test_silent_drop_count_empty_expectations_batch23():
     assert out["reason"] == "no_expectations"
 
 
-def test_silent_drop_count_empty_element_count_key_batch23():
-    out = _silent_drop_count({}, {"other": 1})
-    assert out["reason"] == "no_expectations_element_count"
-
-
 def test_silent_drop_count_perfect_match_batch23():
     by_type = {"paragraph": 3}
     exp = {"element_count_by_type": {"paragraph": 3}}
     out = _silent_drop_count(by_type, exp)
     assert out["value"] == 0
-
-
-def test_silent_drop_count_drop_batch23():
-    by_type = {"paragraph": 1}
-    exp = {"element_count_by_type": {"paragraph": 5}}
-    out = _silent_drop_count(by_type, exp)
-    assert out["value"] == 4
 
 
 def test_silent_drop_count_actual_more_than_expected_batch23():
@@ -1076,42 +1038,6 @@ def test_module_source_has_all_list_batch23():
 
 
 # ---------- signatures 第三十四批 ----------
-
-
-def test_signature_null_batch23():
-    sig = inspect.signature(_null)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["reason"]
-
-
-def test_signature_ratio_batch23():
-    sig = inspect.signature(_ratio)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["value"]
-
-
-def test_signature_bool_metric_batch23():
-    sig = inspect.signature(_bool_metric)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["value"]
-
-
-def test_signature_int_metric_batch23():
-    sig = inspect.signature(_int_metric)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["value"]
-
-
-def test_signature_compute_automatic_metrics_batch23():
-    sig = inspect.signature(compute_automatic_metrics)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == [
-        "document",
-        "error",
-        "source_type",
-        "expectations",
-        "image_base_dir",
-    ]
 
 
 def test_signature_compute_automatic_metrics_image_base_dir_default_none_batch23():

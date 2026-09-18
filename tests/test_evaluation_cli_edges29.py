@@ -537,11 +537,6 @@ def test_run_inspect_doc_source_prints_counts_label():
     assert "counts:" in src
 
 
-def test_run_inspect_doc_source_defines_sort_key_inner_function():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "def _sort_key" in src
-
-
 def test_run_inspect_doc_source_no_class_definition():
     src = inspect.getsource(_run_inspect_doc)
     assert "class " not in src
@@ -619,11 +614,6 @@ def test_main_source_returns_2_fallback_at_end():
     src = inspect.getsource(main)
     # 最后兜底 return 2
     assert src.rstrip().endswith("return 2") or src.rstrip().endswith("return 2\n")
-
-
-def test_main_source_prints_to_stderr_for_errors():
-    src = inspect.getsource(main)
-    assert "file=sys.stderr" in src
 
 
 def test_main_source_uses_try_except_blocks():
@@ -826,11 +816,6 @@ def test_module_source_no_class_definition():
     lines = [l for l in src.splitlines() if not l.strip().startswith(("#", '"', "'"))]
     body = "\n".join(lines)
     assert "\nclass " not in body
-
-
-def test_module_source_no_lambda_in_module():
-    src = inspect.getsource(cli_mod)
-    assert "lambda " not in src
 
 
 def test_module_source_docstring_mentions_validate_report():

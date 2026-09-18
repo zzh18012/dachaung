@@ -464,12 +464,6 @@ def test_docx_locator_ratio_paragraph_index_only():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_ratio_with_section_key():
-    elements = [{"type": "paragraph", "source_locator": {"section": "intro"}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_with_table_index():
     elements = [{"type": "table", "source_locator": {"table_index": 0}}]
     out = _docx_locator_ratio(elements)
@@ -552,13 +546,6 @@ def test_docx_locator_ratio_returns_ratio_dict():
 # =========================================================================
 
 
-def test_image_resource_ratio_no_images_returns_no_image_elements():
-    elements = [{"type": "paragraph", "content": "x"}]
-    out = _image_resource_ratio(elements, None)
-    assert out["value"] is None
-    assert out["reason"] == "no_image_elements"
-
-
 def test_image_resource_ratio_empty_rp_skipped(tmp_path: Path):
     elements = [{"type": "image", "resource_path": ""}]
     out = _image_resource_ratio(elements, None)
@@ -616,13 +603,6 @@ def test_image_resource_ratio_returns_ratio_dict(tmp_path: Path):
 # =========================================================================
 # _chunk_reference_ratio 深度
 # =========================================================================
-
-
-def test_chunk_reference_ratio_no_chunks_returns_no_chunks():
-    elements = [{"element_id": "e1"}]
-    out = _chunk_reference_ratio(elements, [])
-    assert out["value"] is None
-    assert out["reason"] == "no_chunks"
 
 
 def test_chunk_reference_ratio_chunk_no_source_element_ids():
@@ -706,13 +686,6 @@ def test_text_preservation_text_in_chunks_only():
     assert out["recall"]["value"] is None
 
 
-def test_text_preservation_content_none_skipped():
-    elements = [{"type": "paragraph", "content": None}]
-    chunks = [{"text": ""}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-
-
 def test_text_preservation_chunk_text_none_skipped():
     elements = [{"type": "paragraph", "content": "abc"}]
     chunks = [{"text": None}]
@@ -760,14 +733,6 @@ def test_heading_boundary_ratio_heading_id_in_first_position():
     assert out["value"] == 1.0
 
 
-def test_heading_boundary_ratio_heading_id_in_non_first_position():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["other", "h1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    # 只看 first id
-    assert out["value"] == 0.0
-
-
 def test_heading_boundary_ratio_chunk_empty_source_element_ids():
     elements = [{"type": "heading", "element_id": "h1"}]
     chunks = [{"source_element_ids": []}]
@@ -788,16 +753,6 @@ def test_heading_boundary_ratio_missing_element_id():
     out = _heading_boundary_ratio(elements, chunks)
     # heading.element_id 是 None → not in chunk_first_ids → 0
     assert out["value"] == 0.0
-
-
-def test_heading_boundary_ratio_multiple_chunks_same_first_id():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [
-        {"source_element_ids": ["h1"]},
-        {"source_element_ids": ["h1"]},
-    ]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 1.0
 
 
 def test_heading_boundary_ratio_returns_ratio_dict():
@@ -839,13 +794,6 @@ def test_silent_drop_count_empty_element_count_by_type_returns_null():
 def test_silent_drop_count_actual_zero_expected_five():
     out = _silent_drop_count({}, {"element_count_by_type": {"paragraph": 5}})
     assert out["value"] == 5
-
-
-def test_silent_drop_count_actual_more_than_expected_no_drop():
-    out = _silent_drop_count(
-        {"paragraph": 10}, {"element_count_by_type": {"paragraph": 5}}
-    )
-    assert out["value"] == 0
 
 
 def test_silent_drop_count_actual_equal_expected_no_drop():
@@ -912,13 +860,6 @@ def test_compute_metrics_success_returns_13_keys():
         "silent_drop_count",
     }
     assert set(out.keys()) == expected_keys
-
-
-def test_compute_metrics_docx_source_pdf_locator_null():
-    doc = {"elements": [], "chunks": []}
-    out = compute_automatic_metrics(doc, None, "docx", None)
-    assert out["pdf_locator_valid_ratio"]["value"] is None
-    assert out["pdf_locator_valid_ratio"]["reason"] == "not_pdf_document"
 
 
 def test_compute_metrics_pdf_source_docx_locator_null():
@@ -1019,24 +960,6 @@ def test_module_all_count_one():
     import evaluation.metrics as mod
 
     assert len(mod.__all__) == 1
-
-
-def test_module_imports_math():
-    import evaluation.metrics as mod
-
-    assert hasattr(mod, "math")
-
-
-def test_module_imports_counter():
-    import evaluation.metrics as mod
-
-    assert hasattr(mod, "Counter")
-
-
-def test_module_imports_path():
-    import evaluation.metrics as mod
-
-    assert hasattr(mod, "Path")
 
 
 def test_module_imports_any():

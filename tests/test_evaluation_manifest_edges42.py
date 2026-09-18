@@ -62,11 +62,6 @@ def test_is_absolute_like_full_width_colon_batch15():
     assert _is_absolute_like("C：/foo") is False
 
 
-def test_is_absolute_like_double_dot_batch15():
-    """../foo 不是绝对路径。"""
-    assert _is_absolute_like("../foo") is False
-
-
 def test_is_absolute_like_two_drive_letters_batch15():
     """AB:/foo — 第二字符是 B 不是 :，不算。"""
     assert _is_absolute_like("AB:/foo") is False

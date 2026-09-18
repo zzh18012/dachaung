@@ -39,12 +39,6 @@ def test_build_parser_prog_value_exact_batch11():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_description_present_batch11():
-    p = _build_parser()
-    assert p.description is not None
-    assert len(p.description) > 10
-
-
 def test_build_parser_formatter_class_batch11():
     """formatter_class 是 RawDescriptionHelpFormatter。"""
     p = _build_parser()
@@ -593,11 +587,6 @@ def test_cli_source_no_forbidden_token_fourteenth_batch11(token):
     assert token not in source
 
 
-def test_cli_source_no_unlink_batch11():
-    source = inspect.getsource(climod)
-    assert "unlink" not in source
-
-
 def test_cli_source_no_remove_batch11():
     source = inspect.getsource(climod)
     assert ".remove(" not in source
@@ -760,12 +749,6 @@ def test_signature_main_param_name_batch11():
     assert list(sig.parameters) == ["argv"]
 
 
-def test_signature_main_param_kind_batch11():
-    sig = inspect.signature(main)
-    p = list(sig.parameters.values())[0]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_signature_format_metric_2_params_batch11():
     sig = inspect.signature(_format_metric)
     assert len(sig.parameters) == 2
@@ -802,14 +785,6 @@ def test_module_no_all_attribute_batch11():
 def test_module_has_dunder_file_batch11():
     assert hasattr(climod, "__file__")
     assert climod.__file__ is not None
-
-
-def test_module_dunder_file_endswith_cli_py_batch11():
-    import os
-    sep = os.sep
-    assert climod.__file__.endswith("evaluation" + sep + "cli.py") or climod.__file__.endswith(
-        "evaluation/cli.py"
-    )
 
 
 def test_module_name_is_evaluation_cli_batch11():

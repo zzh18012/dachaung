@@ -235,22 +235,10 @@ def test_is_absolute_like_just_drive_letter_colon_batch37():
     assert _is_absolute_like("C:") is False
 
 
-def test_is_absolute_like_with_query_string_batch37():
-    assert _is_absolute_like("?foo") is False
-
-
-def test_is_absolute_like_with_hash_batch37():
-    assert _is_absolute_like("#foo") is False
-
-
 def test_is_absolute_like_double_slash_batch37():
     """'//' 不算绝对（不是单 /）。"""
     # "//foo" 第一个字符是 / → True
     assert _is_absolute_like("//foo") is True
-
-
-def test_is_absolute_like_triple_slash_batch37():
-    assert _is_absolute_like("///foo") is True
 
 
 def test_has_backslash_with_forward_then_back_batch37():
@@ -365,17 +353,6 @@ def test_load_manifest_with_empty_expected_failures_list_batch37(tmp_path):
     assert m.expected_failures == ()
 
 
-def test_load_manifest_complete_status_batch37(tmp_path):
-    p = _write_manifest(tmp_path, {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "complete",
-        "documents": [],
-        "expected_failures": [],
-    })
-    m = load_manifest(p, project_root=tmp_path)
-    assert m.devset_status == "complete"
-
-
 def test_load_manifest_devset_status_invalid_value_batch37(tmp_path):
     """devset_status 不在 enum → schema 失败。"""
     from evaluation.schema import EvalSchemaError
@@ -475,20 +452,6 @@ def test_load_manifest_doc_with_invalid_sha256_uppercase_batch37(tmp_path):
     })
     with pytest.raises((ManifestError, EvalSchemaError)):
         load_manifest(p, project_root=tmp_path)
-
-
-def test_load_manifest_doc_with_valid_sha256_lowercase_batch37(tmp_path):
-    a = tmp_path / "a.pdf"
-    a.write_text("x", encoding="utf-8")
-    p = _write_manifest(tmp_path, {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [{"doc_id": "d1", "path": "a.pdf", "source_type": "pdf",
-                       "sha256": "a" * 64}],
-        "expected_failures": [],
-    })
-    m = load_manifest(p, project_root=tmp_path)
-    assert m.documents[0].sha256 == "a" * 64
 
 
 def test_load_manifest_doc_with_invalid_paired_with_empty_batch37(tmp_path):
@@ -598,20 +561,6 @@ def test_load_manifest_does_not_mutate_disk_file_batch37(tmp_path):
     load_manifest(p, project_root=tmp_path)
     after = p.read_text(encoding="utf-8")
     assert before == after
-
-
-def test_load_manifest_idempotent_batch37(tmp_path):
-    a = tmp_path / "a.pdf"
-    a.write_text("x", encoding="utf-8")
-    p = _write_manifest(tmp_path, {
-        "manifest_version": MANIFEST_VERSION,
-        "devset_status": "incomplete",
-        "documents": [{"doc_id": "d1", "path": "a.pdf", "source_type": "pdf"}],
-        "expected_failures": [],
-    })
-    m1 = load_manifest(p, project_root=tmp_path)
-    m2 = load_manifest(p, project_root=tmp_path)
-    assert m1 == m2
 
 
 def test_load_manifest_unicode_categories_batch37(tmp_path):
@@ -795,21 +744,6 @@ def test_module_source_contains_content_group_comment_batch37():
     assert "配对的 DOCX+PDF" in src
 
 
-def test_module_source_contains_pair_ids_set_batch37():
-    src = inspect.getsource(mmod)
-    assert "pair_ids" in src
-
-
-def test_module_source_contains_frozenset_import_batch37():
-    src = inspect.getsource(mmod)
-    assert "frozenset" in src
-
-
-def test_module_source_contains_validate_call_batch37():
-    src = inspect.getsource(mmod)
-    assert 'validate(data, "manifest.schema.json")' in src
-
-
 def test_module_source_contains_json_load_batch37():
     src = inspect.getsource(mmod)
     assert "json.load(f)" in src
@@ -838,23 +772,11 @@ def test_module_source_contains_manifest_version_msg_batch37():
 # ---------- signatures 第五十七批
 
 
-def test_signature_load_manifest_manifest_path_annotation_batch37():
-    sig = inspect.signature(load_manifest)
-    p = sig.parameters["manifest_path"]
-    assert "Path" in str(p.annotation)
-    assert "str" in str(p.annotation)
-
-
 def test_signature_load_manifest_project_root_annotation_batch37():
     sig = inspect.signature(load_manifest)
     p = sig.parameters["project_root"]
     assert "Path" in str(p.annotation)
     assert "None" in str(p.annotation)
-
-
-def test_signature_resolve_relative_path_field_name_no_default_batch37():
-    sig = inspect.signature(_resolve_relative_path)
-    assert sig.parameters["field_name"].default is inspect.Parameter.empty
 
 
 def test_signature_document_entry_constructor_batch37():
@@ -881,31 +803,12 @@ def test_signature_manifest_constructor_batch37():
 # ---------- module 合理性第五十七批
 
 
-def test_module_has_manifest_dataclass_batch37():
-    assert isinstance(mmod.Manifest, type)
-
-
-def test_module_has_expected_failure_dataclass_batch37():
-    assert isinstance(mmod.ExpectedFailure, type)
-
-
-def test_module_has_manifest_error_class_batch37():
-    assert isinstance(mmod.ManifestError, type)
-    assert issubclass(mmod.ManifestError, Exception)
-
-
 def test_module_document_entry_is_frozen_batch37():
     """frozen=True。"""
     d = DocumentEntry("d1", "a.pdf", Path("/x/a.pdf"), "pdf", None, (),
                      None, None, None, None)
     with pytest.raises(FrozenInstanceError):
         d.doc_id = "changed"  # type: ignore[misc]
-
-
-def test_module_manifest_is_frozen_batch37():
-    m = Manifest("1.0", "incomplete", (), (), Path("/x"))
-    with pytest.raises(FrozenInstanceError):
-        m.devset_status = "complete"  # type: ignore[misc]
 
 
 def test_module_expected_failure_is_frozen_batch37():

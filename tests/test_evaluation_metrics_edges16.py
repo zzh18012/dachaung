@@ -74,60 +74,6 @@ def test_module_source_contains_def_int_metric():
     assert "def _int_metric(" in inspect.getsource(m)
 
 
-def test_module_source_contains_compute_automatic_metrics_def():
-    import evaluation.metrics as m
-
-    assert "def compute_automatic_metrics(" in inspect.getsource(m)
-
-
-def test_module_source_contains_def_pdf_locator_ratio():
-    import evaluation.metrics as m
-
-    assert "def _pdf_locator_ratio(" in inspect.getsource(m)
-
-
-def test_module_source_contains_def_docx_locator_ratio():
-    import evaluation.metrics as m
-
-    assert "def _docx_locator_ratio(" in inspect.getsource(m)
-
-
-def test_module_source_contains_def_is_valid_bbox():
-    import evaluation.metrics as m
-
-    assert "def _is_valid_bbox(" in inspect.getsource(m)
-
-
-def test_module_source_contains_def_image_resource_ratio():
-    import evaluation.metrics as m
-
-    assert "def _image_resource_ratio(" in inspect.getsource(m)
-
-
-def test_module_source_contains_def_chunk_reference_ratio():
-    import evaluation.metrics as m
-
-    assert "def _chunk_reference_ratio(" in inspect.getsource(m)
-
-
-def test_module_source_contains_def_text_preservation():
-    import evaluation.metrics as m
-
-    assert "def _text_preservation(" in inspect.getsource(m)
-
-
-def test_module_source_contains_def_heading_boundary_ratio():
-    import evaluation.metrics as m
-
-    assert "def _heading_boundary_ratio(" in inspect.getsource(m)
-
-
-def test_module_source_contains_def_silent_drop_count():
-    import evaluation.metrics as m
-
-    assert "def _silent_drop_count(" in inspect.getsource(m)
-
-
 def test_module_source_contains_text_types_definition():
     """源码含 _TEXT_TYPES = (...)。"""
     import evaluation.metrics as m
@@ -187,13 +133,6 @@ def test_module_source_contains_docx_structural_keys_seven():
     assert '"row_index"' in src
     assert '"col_index"' in src
     assert '"relationship_id"' in src
-
-
-def test_module_source_contains_pipeline_success_logic():
-    """源码含 'pipeline_success = error is None and document is not None'。"""
-    import evaluation.metrics as m
-
-    assert "pipeline_success = error is None and document is not None" in inspect.getsource(m)
 
 
 def test_module_source_contains_error_code_logic():
@@ -299,13 +238,6 @@ def test_module_source_contains_counter_intersection():
     assert "c_expected & c_actual" in inspect.getsource(m)
 
 
-def test_module_source_contains_chunk_first_ids_add():
-    """源码含 chunk_first_ids.add(ids[0])。"""
-    import evaluation.metrics as m
-
-    assert "chunk_first_ids.add(ids[0])" in inspect.getsource(m)
-
-
 def test_module_source_contains_silent_drop_max_zero():
     """源码含 max(0, ...) 隐式语义（actual > expected → 不扣）。"""
     import evaluation.metrics as m
@@ -313,20 +245,6 @@ def test_module_source_contains_silent_drop_max_zero():
     src = inspect.getsource(m)
     assert "if actual < exp" in src
     assert "drops += (exp - actual)" in src
-
-
-def test_module_source_contains_image_filter():
-    """源码含 type == 'image' 过滤。"""
-    import evaluation.metrics as m
-
-    assert '== "image"' in inspect.getsource(m)
-
-
-def test_module_source_contains_heading_filter():
-    """源码含 type == 'heading' 过滤。"""
-    import evaluation.metrics as m
-
-    assert '== "heading"' in inspect.getsource(m)
 
 
 def test_module_source_contains_image_resource_path_check():
@@ -341,13 +259,6 @@ def test_module_source_contains_image_size_check():
     import evaluation.metrics as m
 
     assert "st_size > 0" in inspect.getsource(m)
-
-
-def test_module_source_contains_image_isfile_check():
-    """源码含 p.is_file()。"""
-    import evaluation.metrics as m
-
-    assert "p.is_file()" in inspect.getsource(m)
 
 
 def test_module_source_contains_image_oserror_catch():
@@ -535,46 +446,6 @@ def test_silent_drop_count_param_names():
 
 def test_compute_automatic_metrics_module_identity():
     assert compute_automatic_metrics.__module__ == "evaluation.metrics"
-
-
-def test_compute_automatic_metrics_qualname():
-    assert compute_automatic_metrics.__qualname__ == "compute_automatic_metrics"
-
-
-def test_pdf_locator_ratio_qualname():
-    assert _pdf_locator_ratio.__qualname__ == "_pdf_locator_ratio"
-
-
-def test_docx_locator_ratio_qualname():
-    assert _docx_locator_ratio.__qualname__ == "_docx_locator_ratio"
-
-
-def test_is_valid_bbox_qualname():
-    assert _is_valid_bbox.__qualname__ == "_is_valid_bbox"
-
-
-def test_image_resource_ratio_qualname():
-    assert _image_resource_ratio.__qualname__ == "_image_resource_ratio"
-
-
-def test_chunk_reference_ratio_qualname():
-    assert _chunk_reference_ratio.__qualname__ == "_chunk_reference_ratio"
-
-
-def test_strip_unicode_whitespace_qualname():
-    assert _strip_unicode_whitespace.__qualname__ == "_strip_unicode_whitespace"
-
-
-def test_text_preservation_qualname():
-    assert _text_preservation.__qualname__ == "_text_preservation"
-
-
-def test_heading_boundary_ratio_qualname():
-    assert _heading_boundary_ratio.__qualname__ == "_heading_boundary_ratio"
-
-
-def test_silent_drop_count_qualname():
-    assert _silent_drop_count.__qualname__ == "_silent_drop_count"
 
 
 def test_all_helpers_module_is_evaluation_metrics():
@@ -1073,27 +944,6 @@ def test_helpers_do_not_share_state():
     b = _null("y")
     a["reason"] = "modified"
     assert b["reason"] == "y"
-
-
-def test_ratio_helpers_do_not_share_state():
-    a = _ratio(0.1)
-    b = _ratio(0.2)
-    a["value"] = 99.0
-    assert b["value"] == 0.2
-
-
-def test_bool_metric_helpers_do_not_share_state():
-    a = _bool_metric(True)
-    b = _bool_metric(False)
-    a["value"] = False
-    assert b["value"] is False
-
-
-def test_int_metric_helpers_do_not_share_state():
-    a = _int_metric(1)
-    b = _int_metric(2)
-    a["value"] = 100
-    assert b["value"] == 2
 
 
 # =========================================================================

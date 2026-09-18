@@ -177,13 +177,6 @@ def test_no_loss_with_table(tmp_path):
 
 # ---------- schema + 写盘 ----------
 
-def test_html_doc_passes_schema(tmp_path):
-    doc, errors = _run(tmp_path)
-    assert errors == []
-    from app.schema import validate
-    validate(doc.to_dict())
-
-
 def test_written_json_keeps_newline(tmp_path):
     _run(tmp_path)
     on_disk = json.loads(

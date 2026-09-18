@@ -53,11 +53,6 @@ def test_is_absolute_like_drive_letter_with_backslash_batch20():
     assert _is_absolute_like("c:\\") is True
 
 
-def test_is_absolute_like_leading_whitespace_batch20():
-    """前导空白不被 strip。"""
-    assert _is_absolute_like(" /foo") is False  # 第一字符是空格
-
-
 def test_is_absolute_like_unicode_first_char_batch20():
     """Unicode 第一字符不是 / 不是 alpha。"""
     assert _is_absolute_like("中文/path") is False
@@ -949,12 +944,6 @@ def test_signature_load_manifest_batch20():
     params = list(sig.parameters.values())
     names = [p.name for p in params]
     assert names == ["manifest_path", "project_root"]
-
-
-def test_signature_load_manifest_project_root_default_none_batch20():
-    sig = inspect.signature(load_manifest)
-    params = list(sig.parameters.values())
-    assert params[1].default is None
 
 
 def test_signature_resolve_relative_path_batch20():

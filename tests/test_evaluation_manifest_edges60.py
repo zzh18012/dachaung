@@ -336,11 +336,6 @@ def test_manifest_content_group_count_unidirectional_batch33():
 # ---------- _resolve_relative_path 第三十三批
 
 
-def test_resolve_relative_path_normal_batch33(tmp_path):
-    p = _resolve_relative_path("a/b.pdf", tmp_path, "test")
-    assert p == (tmp_path / "a" / "b.pdf").resolve()
-
-
 def test_resolve_relative_path_empty_raises_batch33(tmp_path):
     with pytest.raises(ManifestError) as exc:
         _resolve_relative_path("", tmp_path, "field_x")
@@ -719,16 +714,6 @@ def test_module_source_contains_categories_covered_property_batch33():
     assert "def categories_covered(" in src
 
 
-def test_module_source_contains_all_exports_batch33():
-    src = inspect.getsource(mmod)
-    assert "__all__" in src
-    assert '"ManifestError"' in src
-    assert '"Manifest"' in src
-    assert '"DocumentEntry"' in src
-    assert '"ExpectedFailure"' in src
-    assert '"load_manifest"' in src
-
-
 # ---------- signatures 第四十七批
 
 
@@ -756,13 +741,6 @@ def test_signature_resolve_relative_path_three_params_batch33():
     sig = inspect.signature(_resolve_relative_path)
     params = list(sig.parameters.keys())
     assert params == ["path_str", "project_root", "field_name"]
-
-
-def test_signature_load_manifest_params_batch33():
-    sig = inspect.signature(load_manifest)
-    params = list(sig.parameters.keys())
-    assert params == ["manifest_path", "project_root"]
-    assert sig.parameters["project_root"].default is None
 
 
 def test_signature_detect_project_root_one_param_batch33():

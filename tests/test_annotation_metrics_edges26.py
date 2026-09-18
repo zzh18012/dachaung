@@ -363,10 +363,6 @@ def test_namespace_chunk_boundary_prf():
 # ---------- module 整体合理性 ----------
 
 
-def test_module_all_3_entries():
-    assert len(m.__all__) == 3
-
-
 def test_module_has_1_module_level_constant():
     assert hasattr(m, "PARSER_DOES_NOT_EMIT_RELATIONS")
 

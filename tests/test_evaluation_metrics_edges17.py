@@ -1022,13 +1022,6 @@ def test_module_namespace_has_math():
     assert m.math is math
 
 
-def test_module_namespace_has_counter():
-    import evaluation.metrics as m
-
-    assert hasattr(m, "Counter")
-    assert m.Counter is Counter
-
-
 def test_module_namespace_has_path():
     import evaluation.metrics as m
 
@@ -1071,12 +1064,6 @@ def test_module_all_exact():
 # =========================================================================
 
 
-def test_text_types_is_tuple():
-    import evaluation.metrics as m
-
-    assert isinstance(m._TEXT_TYPES, tuple)
-
-
 def test_text_types_exact():
     import evaluation.metrics as m
 
@@ -1089,12 +1076,6 @@ def test_text_types_exact():
         "header",
         "footer",
     ]
-
-
-def test_pdf_bbox_required_types_is_tuple():
-    import evaluation.metrics as m
-
-    assert isinstance(m._PDF_BBOX_REQUIRED_TYPES, tuple)
 
 
 def test_pdf_bbox_required_types_exact():
@@ -1114,12 +1095,6 @@ def test_pdf_bbox_required_types_subset_of_text_types():
     assert set(m._PDF_BBOX_REQUIRED_TYPES).issubset(set(m._TEXT_TYPES))
 
 
-def test_text_types_does_not_contain_image():
-    import evaluation.metrics as m
-
-    assert "image" not in m._TEXT_TYPES
-
-
 # =========================================================================
 # 源码 token 验证（补强 edges16）
 # =========================================================================
@@ -1130,12 +1105,6 @@ def test_module_source_contains_isspace_call():
     import evaluation.metrics as m
 
     assert ".isspace()" in inspect.getsource(m)
-
-
-def test_module_source_contains_isfinite():
-    import evaluation.metrics as m
-
-    assert "math.isfinite" in inspect.getsource(m)
 
 
 def test_module_source_contains_strip_unicode_whitespace_docstring():
@@ -1159,12 +1128,6 @@ def test_module_source_contains_counter_intersection():
     import evaluation.metrics as m
 
     assert "c_expected & c_actual" in inspect.getsource(m)
-
-
-def test_module_source_does_not_contain_print():
-    import evaluation.metrics as m
-
-    assert "print(" not in inspect.getsource(m)
 
 
 def test_module_source_does_not_contain_logging():

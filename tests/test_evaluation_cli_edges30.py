@@ -433,11 +433,6 @@ def test_format_metric_with_empty_dict():
     assert "counts" in out
 
 
-def test_format_metric_with_unicode_reason():
-    out = _format_metric("m", {"value": None, "reason": "无元素"})
-    assert "无元素" in out
-
-
 def test_format_metric_with_long_reason():
     reason = "a" * 100
     out = _format_metric("m", {"value": None, "reason": reason})
@@ -716,13 +711,6 @@ def test_module_source_has_4_module_level_functions():
     assert func_count == 4
 
 
-def test_module_source_has_inner_function_in_run_inspect_doc():
-    """_run_inspect_doc 内嵌 _sort_key。"""
-    src = inspect.getsource(cli_mod)
-    inner_count = sum(1 for line in src.splitlines() if line.startswith("    def "))
-    assert inner_count == 1
-
-
 # ---------- signatures 精确补强 ----------
 
 
@@ -809,25 +797,12 @@ def test_no_varargs_varkw_in_functions():
 # ---------- 模块整体合理性 ----------
 
 
-def test_module_namespace():
-    assert isinstance(cli_mod, types.ModuleType)
-
-
 def test_module_namespace_name():
     assert cli_mod.__name__ == "evaluation.cli"
 
 
 def test_module_has_no_all_attribute():
     assert not hasattr(cli_mod, "__all__")
-
-
-def test_module_has_4_functions():
-    functions = [
-        v for v in vars(cli_mod).values()
-        if isinstance(v, types.FunctionType)
-        and v.__module__ == cli_mod.__name__
-    ]
-    assert len(functions) == 4
 
 
 def test_module_has_3_private_functions():
@@ -850,14 +825,6 @@ def test_module_has_1_public_function():
     ]
     assert len(public) == 1
     assert public[0].__name__ == "main"
-
-
-def test_module_no_class():
-    classes = [
-        v for v in vars(cli_mod).values()
-        if isinstance(v, type) and v.__module__ == cli_mod.__name__
-    ]
-    assert len(classes) == 0
 
 
 def test_module_callable_main():

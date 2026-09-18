@@ -160,13 +160,6 @@ def test_array_json_batch520(tmp_path, capsys):
 
 # ---------- error_code (None) 复核 ----------
 
-def test_error_code_none_line_batch520(tmp_path,
-                                       capsys):
-    _, out = _inspect(tmp_path, capsys)
-    assert (f"  {'error_code':36}"
-            " null  (None)") in out
-
-
 # ---------- 源码补强 ----------
 
 def _src():

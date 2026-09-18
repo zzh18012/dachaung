@@ -169,10 +169,6 @@ def test_has_backslash_leading_backslash_batch12():
     assert _has_backslash("\\abc") is True
 
 
-def test_has_backslash_unicode_with_backslash_batch12():
-    assert _has_backslash("中文\\path") is True
-
-
 def test_has_backslash_no_alpha_batch12():
     assert _has_backslash("123/456") is False
 
@@ -1010,13 +1006,6 @@ def test_all_functions_no_var_kwargs_batch12():
 
 def test_module_name_evaluation_manifest_batch12():
     assert mmod.__name__ == "evaluation.manifest"
-
-
-def test_module_dunder_file_endswith_manifest_py_batch12():
-    sep = os.sep
-    assert mmod.__file__.endswith("evaluation" + sep + "manifest.py") or mmod.__file__.endswith(
-        "evaluation/manifest.py"
-    )
 
 
 def test_module_user_function_count_5_batch12():

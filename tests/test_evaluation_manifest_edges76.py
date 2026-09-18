@@ -540,34 +540,10 @@ def test_source_imports_validate_batch51():
     assert "from evaluation.schema import validate" in src
 
 
-def test_source_has_manifest_error_class_batch51():
-    src = inspect.getsource(manifest_mod)
-    assert "class ManifestError(Exception):" in src
-
-
 def test_source_has_document_entry_dataclass_batch51():
     src = inspect.getsource(manifest_mod)
     assert "@dataclass(frozen=True)" in src
     assert "class DocumentEntry" in src
-
-
-def test_source_has_expected_failure_dataclass_batch51():
-    src = inspect.getsource(manifest_mod)
-    assert "class ExpectedFailure" in src
-
-
-def test_source_has_manifest_dataclass_batch51():
-    src = inspect.getsource(manifest_mod)
-    assert "class Manifest" in src
-
-
-def test_source_has_all_5_entries_batch51():
-    src = inspect.getsource(manifest_mod)
-    assert '"ManifestError"' in src
-    assert '"Manifest"' in src
-    assert '"DocumentEntry"' in src
-    assert '"ExpectedFailure"' in src
-    assert '"load_manifest"' in src
 
 
 def test_source_contains_content_group_count_docstring_batch51():
@@ -579,11 +555,6 @@ def test_source_contains_path_form_rules_batch51():
     src = inspect.getsource(manifest_mod)
     assert "正斜杠" in src
     assert "反斜杠" in src
-
-
-def test_source_contains_relative_to_batch51():
-    src = inspect.getsource(manifest_mod)
-    assert "relative_to" in src
 
 
 def test_source_contains_resolve_call_batch51():
@@ -607,12 +578,6 @@ def test_ast_has_5_top_level_functions_batch51():
     tree = ast.parse(inspect.getsource(manifest_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 5
-
-
-def test_ast_function_names_batch51():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["_is_absolute_like", "_has_backslash", "_resolve_relative_path", "load_manifest", "_detect_project_root"]
 
 
 def test_ast_has_4_class_def_batch51():

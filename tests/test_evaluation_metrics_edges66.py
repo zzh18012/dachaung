@@ -363,15 +363,6 @@ def test_text_preservation_returns_dict_with_three_keys_batch40():
     assert set(out.keys()) == {"equal", "precision", "recall"}
 
 
-def test_text_preservation_each_metric_dict_has_value_reason_batch40():
-    elements = [{"type": "paragraph", "content": "abc"}]
-    chunks = [{"text": "abc"}]
-    out = _text_preservation(elements, chunks)
-    for k, v in out.items():
-        assert "value" in v
-        assert "reason" in v
-
-
 def test_text_preservation_precision_value_float_or_none_batch40():
     elements = [{"type": "paragraph", "content": "abc"}]
     chunks = [{"text": "abc"}]

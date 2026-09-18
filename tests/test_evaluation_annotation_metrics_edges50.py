@@ -518,21 +518,9 @@ def test_module_source_has_tolerance_chars_field_batch23():
 # ---------- signatures 第三十四批 ----------
 
 
-def test_signature_figure_caption_prf_params_batch23():
-    sig = inspect.signature(figure_caption_prf)
-    names = list(sig.parameters.keys())
-    assert names == ["document", "annotation"]
-
-
 def test_signature_figure_caption_prf_return_annotation_batch23():
     sig = inspect.signature(figure_caption_prf)
     assert "dict" in str(sig.return_annotation)
-
-
-def test_signature_chunk_boundary_prf_params_batch23():
-    sig = inspect.signature(chunk_boundary_prf)
-    names = list(sig.parameters.keys())
-    assert names == ["document", "annotation", "tolerance_chars"]
 
 
 def test_signature_chunk_boundary_prf_tolerance_default_30_batch23():
@@ -563,25 +551,9 @@ def test_module_all_has_three_entries_batch23():
     }
 
 
-def test_module_does_not_import_evaluation_runner_batch23():
-    src = inspect.getsource(amod)
-    assert "from evaluation.runner" not in src
-    assert "from evaluation import runner" not in src
-
-
 def test_module_does_not_import_evaluation_cli_batch23():
     src = inspect.getsource(amod)
     assert "from evaluation.cli" not in src
-
-
-def test_module_does_not_import_evaluation_manifest_batch23():
-    src = inspect.getsource(amod)
-    assert "from evaluation.manifest" not in src
-
-
-def test_module_does_not_import_evaluation_report_batch23():
-    src = inspect.getsource(amod)
-    assert "from evaluation.report" not in src
 
 
 def test_module_does_not_import_app_pipeline_batch23():
@@ -589,20 +561,10 @@ def test_module_does_not_import_app_pipeline_batch23():
     assert "from app.pipeline" not in src
 
 
-def test_module_does_not_import_app_parsers_batch23():
-    src = inspect.getsource(amod)
-    assert "from app.parsers" not in src
-
-
 def test_module_constants_not_in_all_batch23():
     """常量 PARSER_DOES_NOT_EMIT_RELATIONS 在 __all__ 中（例外：是公开 API）。"""
     # 这是公开 API，所以应在 __all__ 中
     assert "PARSER_DOES_NOT_EMIT_RELATIONS" in amod.__all__
-
-
-def test_module_no_main_block_batch23():
-    src = inspect.getsource(amod)
-    assert 'if __name__ ==' not in src
 
 
 def test_module_figure_caption_prf_is_public_batch23():

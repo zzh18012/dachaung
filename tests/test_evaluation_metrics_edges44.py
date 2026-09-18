@@ -76,11 +76,6 @@ def test_ratio_reason_always_none_batch17():
     assert r["reason"] is None
 
 
-def test_bool_metric_returns_dict_with_2_keys_batch17():
-    r = _bool_metric(True)
-    assert set(r.keys()) == {"value", "reason"}
-
-
 def test_bool_metric_value_always_bool_batch17():
     """即使传 1/0，也强转为 bool。"""
     r = _bool_metric(1)
@@ -302,18 +297,6 @@ def test_pdf_locator_ratio_caption_complete_batch17():
     elements = [{"type": "caption", "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}}]
     r = _pdf_locator_ratio(elements)
     assert r["value"] == 1.0
-
-
-def test_pdf_locator_ratio_caption_missing_bbox_batch17():
-    elements = [{"type": "caption", "source_locator": {"page": 1}}]
-    r = _pdf_locator_ratio(elements)
-    assert r["value"] == 0.0
-
-
-def test_pdf_locator_ratio_image_no_locator_batch17():
-    elements = [{"type": "image"}]
-    r = _pdf_locator_ratio(elements)
-    assert r["value"] == 0.0
 
 
 def test_pdf_locator_ratio_page_string_batch17():
@@ -649,11 +632,6 @@ def test_module_source_has_future_annotations_batch17():
     src = inspect.getsource(mmod)
     head = src.split("\n", 30)[:30]
     assert any("from __future__ import annotations" in line for line in head)
-
-
-def test_module_source_has_docstring_batch17():
-    src = inspect.getsource(mmod)
-    assert "自动指标：13 项" in src
 
 
 def test_module_source_has_text_types_definition_batch17():

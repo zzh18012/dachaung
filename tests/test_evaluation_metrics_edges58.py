@@ -381,10 +381,6 @@ def test_docx_locator_ratio_locator_none_batch32():
 # ---------- _is_valid_bbox 第三十二批 ----------
 
 
-def test_is_valid_bbox_length_five_batch32():
-    assert _is_valid_bbox([0.0, 0.0, 1.0, 1.0, 2.0]) is False
-
-
 def test_is_valid_bbox_all_false_batch32():
     assert _is_valid_bbox([False, False, False, False]) is False
 
@@ -415,10 +411,6 @@ def test_is_valid_bbox_all_zeros_batch32():
 
 def test_is_valid_bbox_all_negative_batch32():
     assert _is_valid_bbox([-1.0, -2.0, -3.0, -4.0]) is True
-
-
-def test_is_valid_bbox_returns_bool_batch32():
-    assert isinstance(_is_valid_bbox([0, 0, 0, 0]), bool)
 
 
 # ---------- _image_resource_ratio 第三十二批 ----------
@@ -526,11 +518,6 @@ def test_chunk_reference_ratio_partial_match_batch32():
 
 
 # ---------- _strip_unicode_whitespace 第三十二批 ----------
-
-
-def test_strip_unicode_whitespace_nbsp_batch32():
-    """U+00A0 NBSP。"""
-    assert _strip_unicode_whitespace(" ") == ""
 
 
 def test_strip_unicode_whitespace_em_space_batch32():

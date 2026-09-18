@@ -383,13 +383,6 @@ def test_module_namespace_contains_imports():
     assert hasattr(m, "get_git_provenance")
 
 
-def test_module_no_dunder_all():
-    """模块无 __all__。"""
-    import evaluation.cli as m
-
-    assert not hasattr(m, "__all__")
-
-
 # =========================================================================
 # 函数 metadata
 # =========================================================================

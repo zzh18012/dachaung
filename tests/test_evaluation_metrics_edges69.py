@@ -76,15 +76,6 @@ def test_null_reason_passthrough_batch44():
     assert _null("my-reason")["reason"] == "my-reason"
 
 
-def test_ratio_value_is_float_batch44():
-    out = _ratio(0.5)
-    assert isinstance(out["value"], float)
-
-
-def test_ratio_value_exact_batch44():
-    assert _ratio(0.5)["value"] == 0.5
-
-
 def test_ratio_reason_is_none_batch44():
     assert _ratio(0.5)["reason"] is None
 
@@ -92,11 +83,6 @@ def test_ratio_reason_is_none_batch44():
 def test_bool_metric_value_is_bool_batch44():
     assert isinstance(_bool_metric(True)["value"], bool)
     assert isinstance(_bool_metric(False)["value"], bool)
-
-
-def test_bool_metric_value_exact_batch44():
-    assert _bool_metric(True)["value"] is True
-    assert _bool_metric(False)["value"] is False
 
 
 def test_bool_metric_truthy_value_batch44():
@@ -112,10 +98,6 @@ def test_bool_metric_falsy_value_batch44():
 
 def test_int_metric_value_is_int_batch44():
     assert isinstance(_int_metric(5)["value"], int)
-
-
-def test_int_metric_value_exact_batch44():
-    assert _int_metric(5)["value"] == 5
 
 
 def test_int_metric_float_truncates_batch44():

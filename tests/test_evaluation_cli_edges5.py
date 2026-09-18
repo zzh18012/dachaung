@@ -77,11 +77,6 @@ def test_build_parser_prog_is_evaluation_cli():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_description_contains_eval_description():
-    p = _build_parser()
-    assert "评测" in p.description or "evaluation" in p.description.lower()
-
-
 def test_build_parser_run_subparser_has_manifest_arg():
     """run 必需 --manifest。"""
     p = _build_parser()
@@ -152,12 +147,6 @@ def test_build_parser_inspect_doc_tolerance_chars_default_30():
     p = _build_parser()
     args = p.parse_args(["inspect-doc", "doc.json"])
     assert args.tolerance_chars == 30
-
-
-def test_build_parser_inspect_doc_tolerance_chars_custom():
-    p = _build_parser()
-    args = p.parse_args(["inspect-doc", "doc.json", "--tolerance-chars", "60"])
-    assert args.tolerance_chars == 60
 
 
 def test_build_parser_command_dest_is_command():
@@ -513,12 +502,6 @@ def test_main_no_command_returns_2(capsys):
     """无子命令 → argparse 报错（exit 2）。"""
     with pytest.raises(SystemExit) as ei:
         main([])
-    assert ei.value.code == 2
-
-
-def test_main_unknown_command_returns_2(capsys):
-    with pytest.raises(SystemExit) as ei:
-        main(["unknown-command"])
     assert ei.value.code == 2
 
 

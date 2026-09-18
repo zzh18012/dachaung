@@ -582,11 +582,6 @@ def test_bool_metric_falsy_input_batch42():
     assert _bool_metric("")["value"] is False
 
 
-def test_int_metric_returns_dict_batch42():
-    out = _int_metric(5)
-    assert set(out.keys()) == {"value", "reason"}
-
-
 def test_int_metric_value_is_int_batch42():
     assert isinstance(_int_metric(5)["value"], int)
 
@@ -678,10 +673,6 @@ def test_strip_unicode_whitespace_unicode_letters_batch42():
 
 def test_strip_unicode_whitespace_punctuation_batch42():
     assert _strip_unicode_whitespace("a.b") == "a.b"
-
-
-def test_strip_unicode_whitespace_digits_batch42():
-    assert _strip_unicode_whitespace("123") == "123"
 
 
 def test_strip_unicode_whitespace_mixed_batch42():

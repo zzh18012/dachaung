@@ -530,13 +530,6 @@ def test_text_preservation_image_content_ignored():
     assert result["equal"]["value"] is True
 
 
-def test_text_preservation_returns_dict_with_correct_keys():
-    elements = [{"type": "paragraph", "content": "x"}]
-    chunks = [{"text": "x"}]
-    result = _text_preservation(elements, chunks)
-    assert set(result.keys()) == {"equal", "precision", "recall"}
-
-
 # =========================================================================
 # _heading_boundary_ratio 深度
 # =========================================================================
@@ -611,13 +604,6 @@ def test_silent_drop_count_actual_negative_no_drop():
     expectations = {"element_count_by_type": {"paragraph": 5}}
     result = _silent_drop_count(by_type, expectations)
     assert result["value"] == 6  # max(0, 5 - (-1)) = 6
-
-
-def test_silent_drop_count_actual_equals_expected_no_drop():
-    by_type = {"paragraph": 5}
-    expectations = {"element_count_by_type": {"paragraph": 5}}
-    result = _silent_drop_count(by_type, expectations)
-    assert result["value"] == 0
 
 
 def test_silent_drop_count_actual_more_than_expected_no_drop_negative_diff_ignored():

@@ -308,11 +308,6 @@ def test_image_resource_ratio_mixed_batch46(tmp_path):
 
 # ---------- _silent_drop_count 各种 expectations ----------
 
-def test_silent_drop_count_empty_expectations_batch46():
-    out = _silent_drop_count({}, {})
-    assert out["value"] is None
-
-
 def test_silent_drop_count_no_element_count_key_batch46():
     out = _silent_drop_count({}, {"other": 1})
     assert out["value"] is None
@@ -541,12 +536,6 @@ def test_pdf_locator_ratio_table_no_bbox_needed_batch46():
     elements = [{"type": "table", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 1.0
-
-
-def test_pdf_locator_ratio_returns_ratio_batch46():
-    elements = [{"type": "image", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert isinstance(out["value"], float)
 
 
 # ---------- _docx_locator_ratio 多种 locator ----------

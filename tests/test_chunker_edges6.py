@@ -210,16 +210,6 @@ def test_chunk_buffer_init_empty():
     assert buf.document_id == "doc"
 
 
-def test_chunk_buffer_is_empty_initially():
-    buf = _ChunkBuffer(document_id="doc")
-    assert buf.is_empty() is True
-
-
-def test_chunk_buffer_length_initially_zero():
-    buf = _ChunkBuffer(document_id="doc")
-    assert buf.length() == 0
-
-
 def test_chunk_buffer_push_increases_length():
     buf = _ChunkBuffer(document_id="doc")
     buf.push_text("hello", "e1", 0, 5)
@@ -368,11 +358,6 @@ def test_part_end_value_three():
 # =========================================================================
 
 
-def test_whitespace_re_compiled():
-    import re
-    assert isinstance(_WHITESPACE_RE, re.Pattern)
-
-
 def test_hard_break_langs_is_tuple():
     assert isinstance(_HARD_BREAK_LANGS, tuple)
 
@@ -431,11 +416,6 @@ def test_normalize_text_preserves_unicode():
 def test_chunker_init_default_max_chars():
     c = StructuralChunker()
     assert c.max_chars == 800
-
-
-def test_chunker_init_explicit_max_chars():
-    c = StructuralChunker(max_chars=500)
-    assert c.max_chars == 500
 
 
 def test_chunker_init_max_chars_below_32_raises():
@@ -778,11 +758,6 @@ def test_chunk_buffer_flush_strategy_kind_keyword_only():
 def test_chunk_buffer_flush_max_chars_kind_keyword_only():
     sig = inspect.signature(_ChunkBuffer.flush)
     assert sig.parameters["max_chars"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
-def test_structural_chunker_init_default_max_chars():
-    sig = inspect.signature(StructuralChunker.__init__)
-    assert sig.parameters["max_chars"].default == 800
 
 
 def test_structural_chunker_chunk_signature_one_param():

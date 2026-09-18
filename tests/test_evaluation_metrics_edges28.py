@@ -359,21 +359,6 @@ def test_bool_metric_with_dict_truthy():
     assert out["value"] is True
 
 
-def test_bool_metric_with_dict_empty():
-    out = _bool_metric({})
-    assert out["value"] is False
-
-
-def test_bool_metric_with_list_truthy():
-    out = _bool_metric([1])
-    assert out["value"] is True
-
-
-def test_bool_metric_with_list_empty():
-    out = _bool_metric([])
-    assert out["value"] is False
-
-
 def test_int_metric_with_float_input():
     """int_metric 接收 float → 转 int？或保持？"""
     out = _int_metric(3.7)
@@ -450,11 +435,6 @@ def test_module_source_has_from_typing_import_any():
 def test_module_source_has_from_pathlib_import_path():
     src = inspect.getsource(metrics_mod)
     assert "from pathlib import Path" in src
-
-
-def test_module_source_math_isfinite_in_is_valid_bbox():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "math.isfinite" in src
 
 
 def test_module_source_counter_intersection_in_text_preservation():
@@ -574,21 +554,6 @@ def test_chunk_reference_ratio_2_params():
     assert list(sig.parameters) == ["elements", "chunks"]
 
 
-def test_text_preservation_2_params():
-    sig = inspect.signature(_text_preservation)
-    assert list(sig.parameters) == ["elements", "chunks"]
-
-
-def test_heading_boundary_ratio_2_params():
-    sig = inspect.signature(_heading_boundary_ratio)
-    assert list(sig.parameters) == ["elements", "chunks"]
-
-
-def test_silent_drop_count_2_params():
-    sig = inspect.signature(_silent_drop_count)
-    assert list(sig.parameters) == ["by_type", "expectations"]
-
-
 def test_null_1_param():
     sig = inspect.signature(_null)
     assert list(sig.parameters) == ["reason"]
@@ -635,10 +600,6 @@ def test_namespace_module():
 def test_namespace_compute_automatic_metrics():
     assert hasattr(metrics_mod, "compute_automatic_metrics")
     assert isinstance(getattr(metrics_mod, "compute_automatic_metrics"), types.FunctionType)
-
-
-def test_module_all_only_compute_automatic_metrics():
-    assert metrics_mod.__all__ == ["compute_automatic_metrics"]
 
 
 def test_module_all_is_list():

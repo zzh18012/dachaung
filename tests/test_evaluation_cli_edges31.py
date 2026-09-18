@@ -336,12 +336,6 @@ def test_main_no_args_returns_2():
     assert exc_info.value.code == 2
 
 
-def test_main_unknown_command_returns_2():
-    with pytest.raises(SystemExit) as exc_info:
-        main(["unknown-command"])
-    assert exc_info.value.code == 2
-
-
 def test_main_run_nonexistent_manifest_returns_2(capsys):
     code = main([
         "run",
@@ -1061,15 +1055,6 @@ def test_module_source_no_logging():
 def test_module_source_no_tomllib():
     src = inspect.getsource(cli_mod)
     assert "tomllib" not in src
-
-
-def test_module_source_has_4_functions():
-    src = inspect.getsource(cli_mod)
-    func_count = sum(
-        1 for line in src.splitlines()
-        if line.startswith("def ")
-    )
-    assert func_count == 4
 
 
 def test_module_source_function_names():

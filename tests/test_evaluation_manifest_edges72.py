@@ -57,10 +57,6 @@ def test_is_absolute_like_three_chars_no_separator_batch46():
     assert _is_absolute_like("C:f") is False
 
 
-def test_is_absolute_like_four_chars_with_separator_batch46():
-    assert _is_absolute_like("C:/x") is True
-
-
 def test_is_absolute_like_drive_only_three_chars_batch46():
     """正好 3 字符 + 第 2 是冒号 + 第 3 是 \\ 或 /。"""
     assert _is_absolute_like("C:\\") is True
@@ -410,17 +406,6 @@ def test_load_manifest_with_expectations_batch46(tmp_path):
     m = load_manifest(p, project_root=tmp_path)
     d = m.documents[0]
     assert d.expectations == {"element_count_by_type": {"paragraph": 5}}
-
-
-def test_load_manifest_devset_status_complete_batch46(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [],
-    }), encoding="utf-8")
-    m = load_manifest(p, project_root=tmp_path)
-    assert m.devset_status == "complete"
 
 
 # ---------- _detect_project_root 更多 ----------

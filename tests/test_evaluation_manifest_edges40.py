@@ -100,10 +100,6 @@ def test_is_absolute_like_tab_first_not_absolute_batch13():
     assert _is_absolute_like("\t:/foo") is False
 
 
-def test_is_absolute_like_newline_first_batch13():
-    assert _is_absolute_like("\n:/foo") is False
-
-
 def test_is_absolute_like_two_char_only_alpha_colon_batch13():
     """2 字符 'C:' → len < 3 → 不是绝对路径。"""
     assert _is_absolute_like("C:") is False
@@ -135,15 +131,6 @@ def test_is_absolute_like_unc_double_backslash_batch13():
 def test_is_absolute_like_single_slash_only_batch13():
     """单 '/' → True（startswith '/'）。"""
     assert _is_absolute_like("/") is True
-
-
-def test_is_absolute_like_single_slash_with_more_batch13():
-    assert _is_absolute_like("/foo") is True
-
-
-def test_is_absolute_like_tilde_not_absolute_batch13():
-    """~ 不被识别为绝对路径。"""
-    assert _is_absolute_like("~/foo") is False
 
 
 def test_is_absolute_like_dot_first_batch13():
@@ -438,12 +425,6 @@ def test_manifest_field_names_batch13():
     }
 
 
-def test_document_entry_is_frozen_batch13():
-    d = _make_doc()
-    with pytest.raises(FrozenInstanceError):
-        d.doc_id = "modified"
-
-
 def test_expected_failure_is_frozen_batch13():
     e = _make_ef()
     with pytest.raises(FrozenInstanceError):
@@ -460,18 +441,6 @@ def test_document_entry_hash_equal_for_equal_data_batch13():
     d1 = _make_doc(doc_id="x", path_str="y.pdf")
     d2 = _make_doc(doc_id="x", path_str="y.pdf")
     assert hash(d1) == hash(d2)
-
-
-def test_document_entry_eq_for_equal_data_batch13():
-    d1 = _make_doc(doc_id="x")
-    d2 = _make_doc(doc_id="x")
-    assert d1 == d2
-
-
-def test_document_entry_ineq_for_diff_data_batch13():
-    d1 = _make_doc(doc_id="x")
-    d2 = _make_doc(doc_id="y")
-    assert d1 != d2
 
 
 def test_expected_failure_hash_equal_for_equal_data_batch13():
@@ -954,11 +923,6 @@ def test_module_source_has_frozen_dataclass_batch13():
     assert "@dataclass(frozen=True)" in source
 
 
-def test_module_source_has_three_dataclass_decorators_batch13():
-    source = inspect.getsource(mmod)
-    assert source.count("@dataclass(frozen=True)") == 3
-
-
 def test_module_source_has_is_absolute_like_def_batch13():
     source = inspect.getsource(mmod)
     assert "def _is_absolute_like(" in source
@@ -982,11 +946,6 @@ def test_module_source_has_detect_project_root_def_batch13():
 def test_module_source_has_load_manifest_def_batch13():
     source = inspect.getsource(mmod)
     assert "def load_manifest(" in source
-
-
-def test_module_source_has_relative_to_call_batch13():
-    source = inspect.getsource(mmod)
-    assert ".relative_to(" in source
 
 
 def test_module_source_has_path_open_call_batch13():

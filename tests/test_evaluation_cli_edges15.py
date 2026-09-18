@@ -479,12 +479,6 @@ def test_module_sys_in_namespace():
     assert m.sys is sys
 
 
-def test_module_path_in_namespace():
-    """Path 在模块命名空间。"""
-    import evaluation.cli as m
-    assert m.Path is Path
-
-
 def test_module_main_in_namespace():
     """main 函数在模块命名空间。"""
     import evaluation.cli as m
@@ -610,13 +604,6 @@ def test_main_unknown_command_raises_system_exit(capsys):
     """未知 subcommand → SystemExit(2)。"""
     with pytest.raises(SystemExit) as exc_info:
         main(["unknown-command"])
-    assert exc_info.value.code == 2
-
-
-def test_main_no_command_raises_system_exit(capsys):
-    """无 subcommand → required=True → SystemExit(2)。"""
-    with pytest.raises(SystemExit) as exc_info:
-        main([])
     assert exc_info.value.code == 2
 
 

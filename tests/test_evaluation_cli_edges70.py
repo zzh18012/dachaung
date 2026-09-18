@@ -492,25 +492,10 @@ def test_ast_run_inspect_doc_has_inner_function_batch44():
     assert "_sort_key" in inner_names
 
 
-def test_ast_no_while_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.While)
-
-
 def test_ast_no_classdef_in_module_body_batch44():
     tree = ast.parse(inspect.getsource(cli_mod))
     for n in tree.body:
         assert not isinstance(n, ast.ClassDef)
-
-
-def test_ast_from_future_second_batch44():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    first = tree.body[0]
-    assert isinstance(first, ast.Expr)
-    second = tree.body[1]
-    assert isinstance(second, ast.ImportFrom)
-    assert second.module == "__future__"
 
 
 def test_ast_has_main_guard_batch44():
@@ -552,11 +537,6 @@ def test_source_no_locals_batch44():
 def test_source_no_os_system_batch44():
     src = inspect.getsource(cli_mod)
     assert "os.system(" not in src
-
-
-def test_source_no_popen_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "popen(" not in src
 
 
 def test_source_no_yaml_load_batch44():

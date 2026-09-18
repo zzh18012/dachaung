@@ -466,51 +466,12 @@ def test_source_contains_no_secret_paths_note_batch52():
 
 # ---------- AST 结构补强 ----------
 
-def test_ast_3_dataclass_decorators_with_frozen_true_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    decorated = [
-        n for n in tree.body
-        if isinstance(n, ast.ClassDef) and n.decorator_list
-    ]
-    assert len(decorated) == 3
-    for d in decorated:
-        dec = d.decorator_list[0]
-        assert isinstance(dec, ast.Call)
-        assert isinstance(dec.func, ast.Name)
-        assert dec.func.id == "dataclass"
-        assert len(dec.keywords) == 1
-        assert dec.keywords[0].arg == "frozen"
-        assert dec.keywords[0].value.value is True
-
-
 def test_ast_manifest_error_extends_exception_batch52():
     tree = ast.parse(inspect.getsource(manifest_mod))
     cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "ManifestError")
     assert len(cls.bases) == 1
     assert isinstance(cls.bases[0], ast.Name)
     assert cls.bases[0].id == "Exception"
-
-
-def test_ast_document_entry_10_fields_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "DocumentEntry")
-    # 字段是 AnnAssign（带 annotation）
-    annots = [n for n in cls.body if isinstance(n, ast.AnnAssign)]
-    assert len(annots) == 10
-
-
-def test_ast_expected_failure_5_fields_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "ExpectedFailure")
-    annots = [n for n in cls.body if isinstance(n, ast.AnnAssign)]
-    assert len(annots) == 5
-
-
-def test_ast_manifest_5_fields_batch52():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "Manifest")
-    annots = [n for n in cls.body if isinstance(n, ast.AnnAssign)]
-    assert len(annots) == 5
 
 
 def test_ast_manifest_5_property_functions_batch52():

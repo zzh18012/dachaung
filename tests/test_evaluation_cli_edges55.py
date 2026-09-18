@@ -452,11 +452,6 @@ def test_module_source_no_shutil_batch28():
     assert "shutil" not in src
 
 
-def test_module_source_no_marshal_batch28():
-    src = inspect.getsource(climod)
-    assert "marshal" not in src
-
-
 def test_module_source_no_unlink_batch28():
     src = inspect.getsource(climod)
     assert ".unlink()" not in src
@@ -489,11 +484,6 @@ def test_module_source_contains_run_subparser_block_batch28():
     """run 子命令块含 'run' 命令名。"""
     src = inspect.getsource(climod)
     assert '"run"' in src
-
-
-def test_module_source_contains_validate_report_subparser_block_batch28():
-    src = inspect.getsource(climod)
-    assert '"validate-report"' in src
 
 
 def test_module_source_contains_reconfigure_call_batch28():
@@ -595,28 +585,10 @@ def test_module_imports_path_batch28():
     assert "from pathlib import Path" in src
 
 
-def test_module_imports_manifest_load_batch28():
-    src = inspect.getsource(climod)
-    assert "from evaluation.manifest import" in src
-    assert "load_manifest" in src
-
-
-def test_module_imports_run_evaluation_batch28():
-    src = inspect.getsource(climod)
-    assert "from evaluation.runner import" in src
-    assert "run_evaluation" in src
-
-
 def test_module_imports_get_git_provenance_batch28():
     src = inspect.getsource(climod)
     assert "from evaluation.report import" in src
     assert "get_git_provenance" in src
-
-
-def test_module_imports_validate_file_batch28():
-    src = inspect.getsource(climod)
-    assert "from evaluation.schema import" in src
-    assert "validate_file" in src
 
 
 def test_module_no_all_export_batch28():

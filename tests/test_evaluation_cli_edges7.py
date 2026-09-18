@@ -156,12 +156,6 @@ def test_build_parser_prog_value():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_description_present():
-    p = _build_parser()
-    assert p.description is not None
-    assert "评测" in p.description or "CLI" in p.description
-
-
 def test_build_parser_formatter_class_raw():
     p = _build_parser()
     assert p.formatter_class is argparse.RawDescriptionHelpFormatter
@@ -244,12 +238,6 @@ def test_format_metric_dict_value_multi_pairs_sorted():
     idx_b = out.find("b=2")
     idx_c = out.find("c=3")
     assert 0 <= idx_a < idx_b < idx_c
-
-
-def test_format_metric_dict_value_with_reason():
-    out = _format_metric("m", {"value": {"k": "v"}, "reason": "info"})
-    assert "k=v" in out
-    assert "info" in out
 
 
 def test_format_metric_true_with_reason_kept():
@@ -395,16 +383,6 @@ def test_main_run_invalid_parser_choice_exits():
     assert exc.value.code == 2
 
 
-def test_main_run_missing_manifest_arg_exits():
-    with pytest.raises(SystemExit):
-        main(["run", "--output", "y"])
-
-
-def test_main_run_missing_output_arg_exits():
-    with pytest.raises(SystemExit):
-        main(["run", "--manifest", "x"])
-
-
 def test_main_run_nonexistent_manifest_returns_2(tmp_path: Path):
     """manifest 不存在 → return 2（不抛 SystemExit）。"""
     missing = tmp_path / "missing.json"
@@ -434,13 +412,6 @@ def test_main_inspect_doc_nonexistent_returns_2(tmp_path: Path):
 def test_main_inspect_doc_invalid_json_returns_1(tmp_path: Path):
     p = tmp_path / "bad.json"
     p.write_text("{not valid", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 1
-
-
-def test_main_inspect_doc_top_level_list_returns_1(tmp_path: Path):
-    p = tmp_path / "list.json"
-    p.write_text("[1, 2, 3]", encoding="utf-8")
     rc = main(["inspect-doc", str(p)])
     assert rc == 1
 
@@ -508,36 +479,6 @@ def test_module_no_explicit_all():
     assert not hasattr(mod, "__all__")
 
 
-def test_module_uses_future_annotations():
-    import evaluation.cli as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_argparse():
-    import evaluation.cli as mod
-    src = inspect.getsource(mod)
-    assert "import argparse" in src
-
-
-def test_module_imports_json():
-    import evaluation.cli as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_sys():
-    import evaluation.cli as mod
-    src = inspect.getsource(mod)
-    assert "import sys" in src
-
-
-def test_module_imports_path():
-    import evaluation.cli as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
 def test_module_imports_manifest_load():
     import evaluation.cli as mod
     src = inspect.getsource(mod)
@@ -580,11 +521,6 @@ def test_module_stdout_reconfigure_in_try_except():
     import evaluation.cli as mod
     src = inspect.getsource(mod)
     assert "except (AttributeError, OSError)" in src
-
-
-def test_module_docstring_present():
-    import evaluation.cli as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_subcommands():

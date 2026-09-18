@@ -63,11 +63,6 @@ def test_sentence_split_re_splits_on_exclamation():
     assert parts == ["Stop!", "Now!"]
 
 
-def test_sentence_split_re_no_split_without_trailing_punctuation():
-    parts = _SENTENCE_SPLIT_RE.split("hello world")
-    assert parts == ["hello world"]
-
-
 def test_sentence_split_re_no_split_without_whitespace():
     """句号后无空白不切。"""
     parts = _SENTENCE_SPLIT_RE.split("Hello.World.")
@@ -86,10 +81,6 @@ def test_sentence_split_re_multiple_whitespace_collapses_to_empty():
     # 中间的空串来自 re.split 的特性
     assert "Hi." in parts
     assert "There." in parts
-
-
-def test_sentence_split_re_empty_string():
-    assert _SENTENCE_SPLIT_RE.split("") == [""]
 
 
 def test_sentence_split_re_leading_whitespace_no_split_without_punct():
@@ -943,16 +934,6 @@ def test_structural_chunker_chunk_no_default_for_document():
 # =========================================================================
 # 模块结构
 # =========================================================================
-
-
-def test_module_all_exact_two_items():
-    import app.chunkers.structural as mod
-    assert mod.__all__ == ["StructuralChunker", "normalize_text"]
-
-
-def test_module_all_no_duplicates():
-    import app.chunkers.structural as mod
-    assert len(mod.__all__) == len(set(mod.__all__))
 
 
 def test_module_uses_future_annotations():

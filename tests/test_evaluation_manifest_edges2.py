@@ -336,12 +336,6 @@ def test_resolve_relative_path_single_dot(project_root: Path):
     assert result == project_root.resolve()
 
 
-def test_resolve_relative_path_empty_string_raises(project_root: Path):
-    with pytest.raises(ManifestError) as exc:
-        _resolve_relative_path("", project_root, "my_field")
-    assert "my_field" in str(exc.value)
-
-
 def test_resolve_relative_path_absolute_posix_raises(project_root: Path):
     with pytest.raises(ManifestError) as exc:
         _resolve_relative_path("/etc/passwd", project_root, "my_field")
@@ -1249,16 +1243,6 @@ def test_module_has_manifest_version_import():
 def test_module_imports_validate_from_schema():
     import evaluation.manifest as mod
     assert hasattr(mod, "validate")
-
-
-def test_module_imports_json():
-    import evaluation.manifest as mod
-    assert hasattr(mod, "json")
-
-
-def test_module_imports_path():
-    import evaluation.manifest as mod
-    assert hasattr(mod, "Path")
 
 
 def test_module_imports_dataclass():

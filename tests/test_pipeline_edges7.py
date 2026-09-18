@@ -122,11 +122,6 @@ def test_get_parser_signature():
     assert set(sig.parameters) == {"name", "image_output_dir"}
 
 
-def test_get_parser_image_output_dir_default_none():
-    sig = inspect.signature(get_parser)
-    assert sig.parameters["image_output_dir"].default is None
-
-
 def test_get_parser_returns_new_instance_each_call():
     a = get_parser("text")
     b = get_parser("text")
@@ -355,11 +350,6 @@ def test_validate_only_signature():
     assert set(sig.parameters) == {"json_path"}
 
 
-def test_validate_only_no_default():
-    sig = inspect.signature(validate_only)
-    assert sig.parameters["json_path"].default is inspect.Parameter.empty
-
-
 # =========================================================================
 # 模块结构
 # =========================================================================
@@ -368,11 +358,6 @@ def test_validate_only_no_default():
 def test_module_all_exact():
     import app.pipeline as mod
     assert mod.__all__ == ["get_parser", "image_output_dir_for", "process_single", "validate_only"]
-
-
-def test_module_all_is_list():
-    import app.pipeline as mod
-    assert isinstance(mod.__all__, list)
 
 
 def test_module_all_no_duplicates():

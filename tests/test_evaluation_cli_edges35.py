@@ -133,11 +133,6 @@ def test_build_parser_validate_report_subparser_no_optional_flags_in_help(capsys
     assert "--parser" not in captured.out
 
 
-def test_build_parser_description_exact_wording():
-    p = _build_parser()
-    assert p.description == "评测 CLI：跑开发集 → 报告；或校验已有报告。"
-
-
 def test_build_parser_prog_exact():
     p = _build_parser()
     assert p.prog == "evaluation.cli"
@@ -1071,13 +1066,6 @@ def test_e2e_main_validate_report_with_valid_report(tmp_path, capsys):
     assert rc == 0
     out = capsys.readouterr().out
     assert "[OK]" in out
-
-
-def test_e2e_main_validate_report_with_missing_file(tmp_path, capsys):
-    rc = main(["validate-report", str(tmp_path / "no.json")])
-    assert rc == 2
-    err = capsys.readouterr().err
-    assert "[ERROR]" in err
 
 
 def test_e2e_main_inspect_doc_with_minimal_doc(tmp_path, capsys):

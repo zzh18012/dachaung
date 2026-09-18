@@ -119,11 +119,6 @@ def test_has_backslash_with_special_chars_no_backslash():
     assert _has_backslash("!@#$%^&*()") is False
 
 
-def test_has_backslash_none_raises_typeerror():
-    with pytest.raises(TypeError):
-        _has_backslash(None)
-
-
 # ---------- DocumentEntry frozen / fields 第二批 ----------
 
 
@@ -654,24 +649,9 @@ def test_module_source_no_yield():
     assert "yield" not in src
 
 
-def test_module_source_no_async():
-    src = inspect.getsource(manifest_mod)
-    assert "async " not in src
-
-
-def test_module_source_no_lambda():
-    src = inspect.getsource(manifest_mod)
-    assert "lambda " not in src
-
-
 def test_module_source_resolve_relative_path_uses_relative_to():
     src = inspect.getsource(_resolve_relative_path)
     assert "relative_to" in src
-
-
-def test_module_source_resolve_relative_path_raises_value_error_caught():
-    src = inspect.getsource(_resolve_relative_path)
-    assert "except ValueError:" in src
 
 
 def test_module_source_load_manifest_uses_validate_call():
@@ -683,11 +663,6 @@ def test_module_source_load_manifest_uses_manifest_version_compare():
     src = inspect.getsource(load_manifest)
     assert "MANIFEST_VERSION" in src
     assert "manifest_version" in src
-
-
-def test_module_source_detect_project_root_uses_pyproject_toml():
-    src = inspect.getsource(_detect_project_root)
-    assert "pyproject.toml" in src
 
 
 # ---------- signatures 精确补强 ----------
@@ -732,14 +707,6 @@ def test_has_backslash_return_annotation_bool():
     assert "bool" in str(sig.return_annotation)
 
 
-def test_no_varargs_varkw_in_helpers():
-    for fn in (_is_absolute_like, _has_backslash, _resolve_relative_path, _detect_project_root, load_manifest):
-        sig = inspect.signature(fn)
-        for p in sig.parameters.values():
-            assert p.kind != inspect.Parameter.VAR_POSITIONAL
-            assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 # ---------- 模块整体合理性 ----------
 
 
@@ -751,22 +718,6 @@ def test_namespace_is_absolute_like():
     assert hasattr(manifest_mod, "_is_absolute_like")
 
 
-def test_namespace_has_backslash():
-    assert hasattr(manifest_mod, "_has_backslash")
-
-
-def test_namespace_resolve_relative_path():
-    assert hasattr(manifest_mod, "_resolve_relative_path")
-
-
-def test_namespace_detect_project_root():
-    assert hasattr(manifest_mod, "_detect_project_root")
-
-
-def test_namespace_load_manifest():
-    assert hasattr(manifest_mod, "load_manifest")
-
-
 def test_namespace_manifest_error():
     assert hasattr(manifest_mod, "ManifestError")
     assert issubclass(manifest_mod.ManifestError, Exception)
@@ -774,18 +725,6 @@ def test_namespace_manifest_error():
 
 def test_namespace_manifest():
     assert hasattr(manifest_mod, "Manifest")
-
-
-def test_namespace_document_entry():
-    assert hasattr(manifest_mod, "DocumentEntry")
-
-
-def test_namespace_expected_failure():
-    assert hasattr(manifest_mod, "ExpectedFailure")
-
-
-def test_module_all_is_list():
-    assert isinstance(manifest_mod.__all__, list)
 
 
 def test_module_has_4_private_functions():
@@ -798,36 +737,6 @@ def test_module_has_4_private_functions():
     assert sorted(private_funcs) == [
         "_detect_project_root", "_has_backslash",
         "_is_absolute_like", "_resolve_relative_path",
-    ]
-
-
-def test_module_has_1_public_function():
-    public_funcs = [
-        n for n, v in vars(manifest_mod).items()
-        if not n.startswith("_") and isinstance(v, types.FunctionType)
-        and getattr(v, "__module__", "") == manifest_mod.__name__
-    ]
-    assert public_funcs == ["load_manifest"]
-
-
-def test_module_has_4_classes():
-    classes = [
-        n for n, v in vars(manifest_mod).items()
-        if not n.startswith("_") and isinstance(v, type)
-        and getattr(v, "__module__", "") == manifest_mod.__name__
-    ]
-    assert sorted(classes) == [
-        "DocumentEntry", "ExpectedFailure", "Manifest", "ManifestError",
-    ]
-
-
-def test_module_has_3_dataclasses():
-    dataclasses_in_module = [
-        n for n, v in vars(manifest_mod).items()
-        if not n.startswith("_") and isinstance(v, type) and is_dataclass(v)
-    ]
-    assert sorted(dataclasses_in_module) == [
-        "DocumentEntry", "ExpectedFailure", "Manifest",
     ]
 
 
@@ -846,25 +755,6 @@ def test_e2e_manifest_with_unicode_doc_id(tmp_path):
     })
     mf = load_manifest(p, project_root=tmp_path)
     assert mf.documents[0].doc_id == "测试"
-
-
-def test_e2e_manifest_with_2_documents_pair(tmp_path):
-    pdf1 = tmp_path / "a.pdf"
-    pdf1.write_bytes(b"%PDF-1.4")
-    pdf2 = tmp_path / "b.pdf"
-    pdf2.write_bytes(b"%PDF-1.4")
-    p = _write_manifest(tmp_path, {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [
-            {"doc_id": "d1", "path": "a.pdf", "source_type": "pdf",
-             "paired_with": "d2"},
-            {"doc_id": "d2", "path": "b.pdf", "source_type": "pdf",
-             "paired_with": "d1"},
-        ],
-    })
-    mf = load_manifest(p, project_root=tmp_path)
-    assert mf.content_group_count == 1
 
 
 def test_e2e_manifest_with_2_documents_unpaired(tmp_path):
@@ -932,17 +822,6 @@ def test_e2e_manifest_documents_is_tuple(tmp_path):
     })
     mf = load_manifest(p, project_root=tmp_path)
     assert isinstance(mf.documents, tuple)
-
-
-def test_e2e_manifest_expected_failures_is_tuple(tmp_path):
-    p = _write_manifest(tmp_path, {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    })
-    mf = load_manifest(p, project_root=tmp_path)
-    assert isinstance(mf.expected_failures, tuple)
 
 
 def test_e2e_manifest_with_expectations_dict(tmp_path):

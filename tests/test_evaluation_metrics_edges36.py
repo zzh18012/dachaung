@@ -103,10 +103,6 @@ def test_null_returns_dict_with_value_reason():
     assert set(out.keys()) == {"value", "reason"}
 
 
-def test_null_value_always_none():
-    assert _null("anything")["value"] is None
-
-
 def test_null_reason_passed_through():
     assert _null("foo")["reason"] == "foo"
 
@@ -119,12 +115,6 @@ def test_null_empty_reason_string():
 def test_null_unicode_reason():
     out = _null("中文原因")
     assert out["reason"] == "中文原因"
-
-
-def test_ratio_returns_dict_with_value_reason():
-    out = _ratio(0.5)
-    assert isinstance(out, dict)
-    assert set(out.keys()) == {"value", "reason"}
 
 
 def test_ratio_value_converted_to_float():
@@ -238,17 +228,6 @@ def test_compute_metrics_returns_14_keys_when_document_none():
     """document None 时仍返回 14 个 metric keys（多数 null + pipeline_failed reason）。"""
     out = compute_automatic_metrics(None, None, "pdf", None)
     assert len(out) == 14
-
-
-def test_compute_metrics_kwargs_call():
-    out = compute_automatic_metrics(
-        document=None,
-        error=None,
-        source_type="pdf",
-        expectations=None,
-        image_base_dir=None,
-    )
-    assert isinstance(out, dict)
 
 
 def test_compute_metrics_does_not_mutate_document():
@@ -583,14 +562,6 @@ def test_compute_metrics_actual_less_than_expected():
 # ---------- _is_valid_bbox 行为第九批 ----------
 
 
-def test_is_valid_bbox_mixed_int_float():
-    assert _is_valid_bbox([0, 0.0, 10, 10.5]) is True
-
-
-def test_is_valid_bbox_negative_values():
-    assert _is_valid_bbox([-1, -1, 10, 10]) is True
-
-
 def test_is_valid_bbox_all_zeros():
     assert _is_valid_bbox([0, 0, 0, 0]) is True
 
@@ -631,14 +602,6 @@ def test_is_valid_bbox_bool_element():
     assert isinstance(result, bool)
 
 
-def test_is_valid_bbox_dict():
-    assert _is_valid_bbox({"x": 0, "y": 0, "w": 10, "h": 10}) is False
-
-
-def test_is_valid_bbox_set():
-    assert _is_valid_bbox({0, 0, 10, 10}) is False
-
-
 def test_is_valid_bbox_list_of_tuples():
     assert _is_valid_bbox([(0, 0), (10, 10)]) is False
 
@@ -665,10 +628,6 @@ def test_strip_unicode_whitespace_all_whitespace():
 def test_strip_unicode_whitespace_internal_whitespace_preserved():
     """_strip_unicode_whitespace 删除全部空白，包括内部。"""
     assert _strip_unicode_whitespace("hello world") == "helloworld"
-
-
-def test_strip_unicode_whitespace_leading_trailing():
-    assert _strip_unicode_whitespace("  hello  ") == "hello"
 
 
 def test_strip_unicode_whitespace_nbsp():
@@ -703,10 +662,6 @@ def test_strip_unicode_whitespace_paragraph_separator():
 
 def test_strip_unicode_whitespace_preserves_unicode_letters():
     assert _strip_unicode_whitespace("中文.日本語") == "中文.日本語"
-
-
-def test_strip_unicode_whitespace_preserves_emoji():
-    assert _strip_unicode_whitespace("😀hello") == "😀hello"
 
 
 def test_strip_unicode_whitespace_returns_str():

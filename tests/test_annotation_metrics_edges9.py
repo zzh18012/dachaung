@@ -70,21 +70,10 @@ def test_figure_caption_prf_callable():
     assert callable(figure_caption_prf)
 
 
-def test_figure_caption_prf_signature_two_params():
-    sig = inspect.signature(figure_caption_prf)
-    params = list(sig.parameters)
-    assert params == ["document", "annotation"]
-
-
 def test_figure_caption_prf_param_kinds():
     sig = inspect.signature(figure_caption_prf)
     for p in sig.parameters.values():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_figure_caption_prf_return_annotation_str():
-    sig = inspect.signature(figure_caption_prf)
-    assert isinstance(sig.return_annotation, str)
 
 
 def test_figure_caption_prf_ignores_annotation_content():
@@ -456,15 +445,6 @@ def test_chunk_boundary_prf_top_keys_with_missing_markers():
     assert set(result.keys()) == expected
 
 
-def test_chunk_boundary_prf_top_keys_pipeline_failed():
-    result = chunk_boundary_prf(None, None)
-    expected = {
-        "chunk_boundary_precision", "chunk_boundary_recall",
-        "chunk_boundary_f1", "_tolerance_chars",
-    }
-    assert set(result.keys()) == expected
-
-
 def test_chunk_boundary_prf_top_keys_no_annotation():
     result = chunk_boundary_prf({"chunks": []}, None)
     expected = {
@@ -637,20 +617,5 @@ def test_module_docstring_mentions_constraints():
     assert "tolerance" in doc.lower()
 
 
-def test_module_no_silence_unused():
-    import evaluation.annotation_metrics as m
-    assert not hasattr(m, "_silence_unused_import")
-
-
 def test_chunk_boundary_prf_callable():
     assert callable(chunk_boundary_prf)
-
-
-def test_chunk_boundary_prf_document_param_kind():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["document"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_chunk_boundary_prf_annotation_param_kind():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["annotation"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD

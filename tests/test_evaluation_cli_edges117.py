@@ -110,12 +110,6 @@ def test_validate_report_bad_json_batch156(tmp_path, capsys):
 
 # ---------- _format_metric 字符串/int ----------
 
-def test_format_metric_string_value_batch156():
-    assert _format_metric(
-        "error_code", {"value": "E_PARSE", "reason": None}
-    ) == "  " + "error_code".ljust(36) + " E_PARSE  (ok)"
-
-
 def test_format_metric_int_value_batch156():
     assert _format_metric(
         "element_count_total", {"value": 5, "reason": None}

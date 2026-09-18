@@ -831,11 +831,6 @@ def test_manifest_error_str_contains_message():
     assert "hello world" in str(err)
 
 
-def test_manifest_error_args():
-    err = ManifestError("msg")
-    assert err.args == ("msg",)
-
-
 def test_manifest_error_with_from_chain(tmp_path):
     """ManifestError 可包含 from 链。"""
     try:
@@ -852,34 +847,6 @@ def test_manifest_error_with_from_chain(tmp_path):
 # ============================================================================
 
 
-def test_module_source_contains_import_json():
-    import evaluation.manifest as m
-
-    src = inspect.getsource(m)
-    assert "import json" in src
-
-
-def test_module_source_contains_dataclass_import():
-    import evaluation.manifest as m
-
-    src = inspect.getsource(m)
-    assert "from dataclasses import dataclass" in src
-
-
-def test_module_source_contains_pathlib_import():
-    import evaluation.manifest as m
-
-    src = inspect.getsource(m)
-    assert "from pathlib import Path" in src
-
-
-def test_module_source_contains_typing_any_import():
-    import evaluation.manifest as m
-
-    src = inspect.getsource(m)
-    assert "from typing import Any" in src
-
-
 def test_module_source_contains_evaluation_imports():
     import evaluation.manifest as m
 
@@ -888,32 +855,11 @@ def test_module_source_contains_evaluation_imports():
     assert "from evaluation.schema import validate" in src
 
 
-def test_module_source_does_not_contain_sys():
-    import evaluation.manifest as m
-
-    src = inspect.getsource(m)
-    assert "import sys" not in src
-
-
-def test_module_source_does_not_contain_logging():
-    import evaluation.manifest as m
-
-    src = inspect.getsource(m)
-    assert "import logging" not in src
-
-
 def test_module_source_does_not_contain_subprocess():
     import evaluation.manifest as m
 
     src = inspect.getsource(m)
     assert "import subprocess" not in src
-
-
-def test_module_source_does_not_contain_threading():
-    import evaluation.manifest as m
-
-    src = inspect.getsource(m)
-    assert "import threading" not in src
 
 
 def test_module_source_does_not_contain_asyncio():
@@ -1110,13 +1056,6 @@ def test_module_all_entries_each_valid_identifier():
     for name in m.__all__:
         assert isinstance(name, str)
         assert name.isidentifier()
-
-
-def test_module_namespace_has_all_entries():
-    import evaluation.manifest as m
-
-    for name in m.__all__:
-        assert hasattr(m, name)
 
 
 def test_module_namespace_has_private_helpers():

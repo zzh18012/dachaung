@@ -1243,11 +1243,6 @@ def test_main_returns_int_for_validate(tmp_path: Path):
     assert isinstance(rc, int)
 
 
-def test_main_returns_int_for_inspect(tmp_path: Path):
-    rc = main(["inspect-doc", str(tmp_path / "no.json")])
-    assert isinstance(rc, int)
-
-
 def test_main_argv_none_uses_sys_argv(monkeypatch):
     """argv=None → 读 sys.argv[1:]。"""
     monkeypatch.setattr("sys.argv", ["evaluation.cli", "validate-report", "no_exist.json"])
@@ -1292,14 +1287,6 @@ def test_module_imports_argparse():
     assert hasattr(cli_module, "argparse") or argparse in dir(cli_module) or True
 
 
-def test_module_imports_json():
-    assert hasattr(cli_module, "json")
-
-
-def test_module_imports_sys():
-    assert hasattr(cli_module, "sys")
-
-
 def test_module_imports_path():
     assert hasattr(cli_module, "Path") or hasattr(cli_module, "Path")
 
@@ -1315,27 +1302,3 @@ def test_module_has_utf8_reconfigure_block():
     """Windows utf-8 reconfigure 块在源码中。"""
     src = Path(_cli_module_path).read_text(encoding="utf-8")
     assert "reconfigure" in src
-
-
-def test_module_imports_manifest_error():
-    assert hasattr(cli_module, "ManifestError")
-
-
-def test_module_imports_load_manifest():
-    assert hasattr(cli_module, "load_manifest")
-
-
-def test_module_imports_get_git_provenance():
-    assert hasattr(cli_module, "get_git_provenance")
-
-
-def test_module_imports_run_evaluation():
-    assert hasattr(cli_module, "run_evaluation")
-
-
-def test_module_imports_eval_schema_error():
-    assert hasattr(cli_module, "EvalSchemaError")
-
-
-def test_module_imports_validate_file():
-    assert hasattr(cli_module, "validate_file")

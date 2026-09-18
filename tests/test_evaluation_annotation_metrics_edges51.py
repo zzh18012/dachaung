@@ -132,12 +132,6 @@ def test_chunk_boundary_prf_annotation_empty_dict_batch24():
     assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 
-def test_chunk_boundary_prf_annotation_empty_anchors_list_batch24():
-    out = chunk_boundary_prf({"chunks": []}, {"chunk_boundary_anchors": []})
-    # 无 chunks 也无 anchors → no_predicted_boundaries
-    assert out["chunk_boundary_precision"]["reason"] == "no_predicted_boundaries"
-
-
 def test_chunk_boundary_prf_single_chunk_no_anchors_batch24():
     """1 chunk → no_predicted_boundaries。"""
     doc = {"chunks": [{"text": "abc"}]}
@@ -492,11 +486,6 @@ def test_module_source_no_open_at_module_level_batch24():
                 pytest.fail("top-level open() call")
 
 
-def test_module_source_no_subprocess_batch24():
-    source = inspect.getsource(amod)
-    assert "import subprocess" not in source
-
-
 def test_module_source_no_argparse_batch24():
     source = inspect.getsource(amod)
     assert "import argparse" not in source
@@ -637,15 +626,6 @@ def test_signature_chunk_boundary_prf_keyword_or_positional_batch24():
 
 
 # ---------- module 合理性 第三十五批 ----------
-
-
-def test_module_all_three_entries_batch24():
-    assert hasattr(amod, "__all__")
-    assert set(amod.__all__) == {
-        "PARSER_DOES_NOT_EMIT_RELATIONS",
-        "figure_caption_prf",
-        "chunk_boundary_prf",
-    }
 
 
 def test_module_has_two_functions_batch24():

@@ -133,10 +133,6 @@ def test_has_backslash_only_forward_slashes_batch31():
     assert _has_backslash("/a/b/c") is False
 
 
-def test_has_backslash_mixed_path_batch31():
-    assert _has_backslash("a/b\\c/d") is True
-
-
 # ---------- DocumentEntry 第三十一批 ----------
 
 
@@ -244,11 +240,6 @@ def test_manifest_devset_status_arbitrary_string_batch31():
     """devset_status 是任意 string（schema 可能 enum，但 dataclass 不限制）。"""
     m = _make_manifest(devset_status="custom_status")
     assert m.devset_status == "custom_status"
-
-
-def test_manifest_project_root_is_path_batch31():
-    m = _make_manifest()
-    assert isinstance(m.project_root, Path)
 
 
 def test_manifest_documents_tuple_type_batch31():
@@ -476,13 +467,6 @@ def test_detect_project_root_starts_at_root_batch31(tmp_path):
     assert result == tmp_path.resolve()
 
 
-def test_detect_project_root_idempotent_batch31(tmp_path):
-    (tmp_path / "pyproject.toml").touch()
-    r1 = _detect_project_root(tmp_path)
-    r2 = _detect_project_root(tmp_path)
-    assert r1 == r2
-
-
 def test_detect_project_root_returns_existing_batch31(tmp_path):
     """返回的 path 必须存在。"""
     (tmp_path / "pyproject.toml").touch()
@@ -562,19 +546,9 @@ def test_module_source_contains_module_docstring_batch31():
     assert "开发集清单加载器" in src
 
 
-def test_module_source_contains_invariant_doc_batch31():
-    src = inspect.getsource(mmod)
-    assert "正斜杠" in src
-
-
 def test_module_source_contains_manifest_error_class_batch31():
     src = inspect.getsource(mmod)
     assert "class ManifestError(Exception):" in src
-
-
-def test_module_source_contains_has_backslash_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _has_backslash" in src
 
 
 def test_module_source_contains_document_entry_class_batch31():

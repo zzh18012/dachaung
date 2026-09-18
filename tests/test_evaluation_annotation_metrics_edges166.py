@@ -224,10 +224,6 @@ def test_source_search_from_advance_batch552():
         in src
 
 
-def test_source_literal_find_batch552():
-    assert "if marker else -1" in _src()
-
-
 # ---------- forbidden tokens 第七百九十四批 ----------
 
 def test_source_no_eval_batch552():

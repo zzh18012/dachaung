@@ -437,10 +437,6 @@ def test_is_valid_bbox_with_inf_batch12():
     assert _is_valid_bbox([0, 0, math.inf, 10]) is False
 
 
-def test_is_valid_bbox_with_nan_batch12():
-    assert _is_valid_bbox([0, 0, float("nan"), 10]) is False
-
-
 def test_is_valid_bbox_with_negative_inf_batch12():
     assert _is_valid_bbox([0, 0, -math.inf, 10]) is False
 
@@ -719,20 +715,9 @@ def test_metrics_source_no_class_definition_batch12():
     assert not source.startswith("class ")
 
 
-def test_metrics_source_no_assert_statement_batch12():
-    source = inspect.getsource(mmod)
-    assert "\nassert " not in source
-    assert not source.startswith("assert ")
-
-
 def test_metrics_source_no_yield_batch12():
     source = inspect.getsource(mmod)
     assert "yield " not in source
-
-
-def test_metrics_source_no_global_batch12():
-    source = inspect.getsource(mmod)
-    assert " global " not in source
 
 
 def test_metrics_source_no_walrus_batch12():
@@ -743,11 +728,6 @@ def test_metrics_source_no_walrus_batch12():
 def test_metrics_source_no_async_def_batch12():
     source = inspect.getsource(mmod)
     assert "async def" not in source
-
-
-def test_metrics_source_no_while_loop_batch12():
-    source = inspect.getsource(mmod)
-    assert "while " not in source
 
 
 def test_metrics_source_no_input_call_batch12():
@@ -787,16 +767,6 @@ def test_module_source_imports_path_batch12():
 def test_module_source_imports_typing_any_batch12():
     source = inspect.getsource(mmod)
     assert "from typing import Any" in source
-
-
-def test_module_source_has_text_types_constant_batch12():
-    source = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ("heading", "paragraph", "list_item", "table", "caption", "header", "footer")' in source
-
-
-def test_module_source_has_pdf_bbox_types_constant_batch12():
-    source = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ("heading", "paragraph", "caption", "list_item")' in source
 
 
 def test_module_source_has_not_evaluated_constant_batch12():
@@ -844,11 +814,6 @@ def test_module_source_docstring_present_batch12():
     assert len(mmod.__doc__) > 30
 
 
-def test_module_source_docstring_mentions_text_preservation_batch12():
-    assert mmod.__doc__ is not None
-    assert "text_preservation" in mmod.__doc__ or "文本保留" in mmod.__doc__
-
-
 def test_module_source_docstring_mentions_v11_batch12():
     """docstring 提到 v1.1。"""
     assert mmod.__doc__ is not None
@@ -881,21 +846,6 @@ def test_signature_null_return_dict_batch12():
     assert "dict" in annot_str
 
 
-def test_signature_ratio_one_param_batch12():
-    sig = inspect.signature(_ratio)
-    assert list(sig.parameters) == ["value"]
-
-
-def test_signature_bool_metric_one_param_batch12():
-    sig = inspect.signature(_bool_metric)
-    assert list(sig.parameters) == ["value"]
-
-
-def test_signature_int_metric_one_param_batch12():
-    sig = inspect.signature(_int_metric)
-    assert list(sig.parameters) == ["value"]
-
-
 def test_signature_compute_metrics_5_params_batch12():
     sig = inspect.signature(compute_automatic_metrics)
     assert list(sig.parameters) == [
@@ -922,16 +872,6 @@ def test_signature_compute_metrics_image_base_dir_optional_path_batch12():
     assert "None" in annot_str
 
 
-def test_signature_pdf_locator_ratio_1_param_batch12():
-    sig = inspect.signature(_pdf_locator_ratio)
-    assert list(sig.parameters) == ["elements"]
-
-
-def test_signature_docx_locator_ratio_1_param_batch12():
-    sig = inspect.signature(_docx_locator_ratio)
-    assert list(sig.parameters) == ["elements"]
-
-
 def test_signature_is_valid_bbox_return_bool_batch12():
     sig = inspect.signature(_is_valid_bbox)
     annot = sig.return_annotation
@@ -955,35 +895,8 @@ def test_module_name_evaluation_metrics_batch12():
     assert mmod.__name__ == "evaluation.metrics"
 
 
-def test_module_dunder_all_exact_set_batch12():
-    assert set(mmod.__all__) == {"compute_automatic_metrics"}
-
-
 def test_module_dunder_all_len_1_batch12():
     assert len(mmod.__all__) == 1
-
-
-def test_module_user_function_count_batch12():
-    funcs = [
-        n for n, v in vars(mmod).items()
-        if inspect.isfunction(v) and v.__module__ == mmod.__name__
-    ]
-    assert set(funcs) == {
-        "_null",
-        "_ratio",
-        "_bool_metric",
-        "_int_metric",
-        "compute_automatic_metrics",
-        "_pdf_locator_ratio",
-        "_docx_locator_ratio",
-        "_is_valid_bbox",
-        "_image_resource_ratio",
-        "_chunk_reference_ratio",
-        "_strip_unicode_whitespace",
-        "_text_preservation",
-        "_heading_boundary_ratio",
-        "_silent_drop_count",
-    }
 
 
 def test_module_no_user_classes_batch12():

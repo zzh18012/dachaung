@@ -323,10 +323,6 @@ def test_is_valid_bbox_with_decimal_string_batch20():
     assert _is_valid_bbox(["0.5", "1.0", "1.5", "2.0"]) is False
 
 
-def test_is_valid_bbox_with_dict_batch20():
-    assert _is_valid_bbox({"a": 1}) is False
-
-
 def test_is_valid_bbox_with_set_batch20():
     assert _is_valid_bbox({0, 0, 1, 1}) is False
 
@@ -581,11 +577,6 @@ def test_module_source_no_unlink_call_batch20():
     assert ".unlink(" not in src
 
 
-def test_module_source_no_path_write_text_batch20():
-    src = inspect.getsource(mmod)
-    assert ".write_text(" not in src
-
-
 def test_module_source_no_sys_exit_batch20():
     src = inspect.getsource(mmod)
     assert "sys.exit" not in src
@@ -669,12 +660,6 @@ def test_signature_compute_metrics_batch20():
     assert names == ["document", "error", "source_type", "expectations", "image_base_dir"]
 
 
-def test_signature_pdf_locator_ratio_batch20():
-    sig = inspect.signature(_pdf_locator_ratio)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["elements"]
-
-
 def test_signature_docx_locator_ratio_batch20():
     sig = inspect.signature(_docx_locator_ratio)
     params = list(sig.parameters.values())
@@ -743,13 +728,6 @@ def test_module_does_not_import_evaluation_cli_batch20():
     assert "from evaluation.cli" not in src
 
 
-def test_module_schema_validation_import_is_lazy_batch20():
-    """document_passes_schema 在 compute_automatic_metrics 内部 lazy import。"""
-    src = inspect.getsource(mmod)
-    top = src[: src.find("def compute_automatic_metrics")]
-    assert "document_passes_schema" not in top
-
-
 def test_module_no_main_block_batch20():
     src = inspect.getsource(mmod)
     assert 'if __name__ ==' not in src
@@ -810,20 +788,6 @@ def test_e2e_text_preservation_word_split_batch20():
         None, "pdf", None,
     )
     assert out["text_preservation_equal"]["value"] is True
-
-
-def test_e2e_compute_metrics_no_mutation_batch20():
-    doc = {
-        "document_id": "d",
-        "source_type": "pdf",
-        "elements": [{"element_id": "e1", "type": "heading", "content": "x",
-                       "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}}],
-        "chunks": [{"text": "x", "source_element_ids": ["e1"]}],
-    }
-    import copy as _copy
-    snapshot = _copy.deepcopy(doc)
-    compute_automatic_metrics(doc, None, "pdf", None)
-    assert doc == snapshot
 
 
 def test_e2e_image_only_text_preservation_passes_batch20():

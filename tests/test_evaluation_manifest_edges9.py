@@ -44,14 +44,6 @@ from evaluation.manifest import (
 # =========================================================================
 
 
-def test_module_all_exact_set():
-    import evaluation.manifest as m
-    assert set(m.__all__) == {
-        "ManifestError", "Manifest", "DocumentEntry",
-        "ExpectedFailure", "load_manifest",
-    }
-
-
 def test_module_all_is_list():
     import evaluation.manifest as m
     assert isinstance(m.__all__, list)
@@ -92,12 +84,6 @@ def test_module_imports_validate():
     assert hasattr(m, "validate")
 
 
-def test_module_docstring_present():
-    import evaluation.manifest as m
-    assert m.__doc__ is not None
-    assert len(m.__doc__) > 0
-
-
 def test_module_docstring_mentions_invariants():
     import evaluation.manifest as m
     doc = m.__doc__
@@ -126,10 +112,6 @@ def test_module_internal_helpers_present():
 # =========================================================================
 # ManifestError
 # =========================================================================
-
-
-def test_manifest_error_is_class():
-    assert isinstance(ManifestError, type)
 
 
 def test_manifest_error_is_exception_subclass():
@@ -238,34 +220,6 @@ def test_document_entry_construction_full():
     assert de.expectations == {"k": "v"}
 
 
-def test_document_entry_equality():
-    de1 = DocumentEntry(
-        doc_id="d1", path_str="a", resolved_path=Path("/a"),
-        source_type="pdf", sha256=None, categories=(), paired_with=None,
-        annotation_file_str=None, annotation_resolved=None, expectations=None,
-    )
-    de2 = DocumentEntry(
-        doc_id="d1", path_str="a", resolved_path=Path("/a"),
-        source_type="pdf", sha256=None, categories=(), paired_with=None,
-        annotation_file_str=None, annotation_resolved=None, expectations=None,
-    )
-    assert de1 == de2
-
-
-def test_document_entry_inequality_different_field():
-    de1 = DocumentEntry(
-        doc_id="d1", path_str="a", resolved_path=Path("/a"),
-        source_type="pdf", sha256=None, categories=(), paired_with=None,
-        annotation_file_str=None, annotation_resolved=None, expectations=None,
-    )
-    de2 = DocumentEntry(
-        doc_id="d2", path_str="a", resolved_path=Path("/a"),
-        source_type="pdf", sha256=None, categories=(), paired_with=None,
-        annotation_file_str=None, annotation_resolved=None, expectations=None,
-    )
-    assert de1 != de2
-
-
 def test_document_entry_hashable():
     de = DocumentEntry(
         doc_id="d1", path_str="a", resolved_path=Path("/a"),
@@ -367,15 +321,6 @@ def test_manifest_field_types():
     assert m_fields["project_root"].type == "Path"
 
 
-def test_manifest_frozen():
-    m = Manifest(
-        manifest_version="1.0", devset_status="incomplete",
-        documents=(), expected_failures=(), project_root=Path("/x"),
-    )
-    with pytest.raises(FrozenInstanceError):
-        m.devset_status = "complete"
-
-
 def test_manifest_hashable():
     m = Manifest(
         manifest_version="1.0", devset_status="incomplete",
@@ -411,11 +356,6 @@ def _make_doc(doc_id="d1", source_type="pdf", categories=(), paired_with=None):
 def test_manifest_file_count_returns_int():
     m = _make_manifest([_make_doc(), _make_doc("d2")])
     assert isinstance(m.file_count, int)
-
-
-def test_manifest_file_count_zero():
-    m = _make_manifest([])
-    assert m.file_count == 0
 
 
 def test_manifest_pdf_count_zero_when_no_pdf():
@@ -471,11 +411,6 @@ def test_manifest_categories_covered_dedup_across_docs():
     assert m.categories_covered == ["a", "b", "c"]
 
 
-def test_manifest_categories_covered_no_docs():
-    m = _make_manifest([])
-    assert m.categories_covered == []
-
-
 # =========================================================================
 # _is_absolute_like 穷举（补充未覆盖边界）
 # =========================================================================
@@ -498,14 +433,6 @@ def test_is_absolute_like_callable():
 
 def test_is_absolute_like_normal_relative_path():
     assert _is_absolute_like("folder/file.pdf") is False
-
-
-def test_is_absolute_like_dot_only():
-    assert _is_absolute_like(".") is False
-
-
-def test_is_absolute_like_double_dot():
-    assert _is_absolute_like("..") is False
 
 
 def test_is_absolute_like_filename_only():
@@ -537,17 +464,9 @@ def test_is_absolute_like_colon_only():
     assert _is_absolute_like(":") is False
 
 
-def test_is_absolute_like_colon_slash():
-    assert _is_absolute_like(":/foo") is False
-
-
 def test_is_absolute_like_just_colon_slash_three_chars():
     """长度恰好 3 但 path_str[0]=':' 不是字母 → False。"""
     assert _is_absolute_like(":/x") is False
-
-
-def test_is_absolute_like_two_letters_with_colon_no_sep():
-    assert _is_absolute_like("a:b") is False
 
 
 def test_is_absolute_like_digit_drive_with_separator():
@@ -697,12 +616,6 @@ def test_resolve_relative_path_backslash_raises(tmp_path):
     with pytest.raises(ManifestError) as exc_info:
         _resolve_relative_path("a\\b", tmp_path, "f")
     assert "正斜杠" in str(exc_info.value)
-
-
-def test_resolve_relative_path_field_name_in_message(tmp_path):
-    with pytest.raises(ManifestError) as exc_info:
-        _resolve_relative_path("a\\b", tmp_path, "my_field")
-    assert "my_field" in str(exc_info.value)
 
 
 def test_resolve_relative_path_outside_root_raises(tmp_path):

@@ -277,13 +277,6 @@ def test_main_inspect_doc_success_returns_0_batch30(tmp_path):
     assert rc == 0
 
 
-def test_main_validate_report_invalid_json_returns_1_batch30(tmp_path):
-    p = tmp_path / "report.json"
-    p.write_text("not json", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
-
-
 def test_main_returns_int_for_inspect_doc_batch30(tmp_path):
     p = tmp_path / "doc.json"
     p.write_text(json.dumps({}), encoding="utf-8")

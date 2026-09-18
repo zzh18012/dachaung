@@ -68,45 +68,6 @@ def test_build_parser_run_subcommand_exists_batch40():
     assert args.command == "run"
 
 
-def test_build_parser_validate_report_subcommand_exists_batch40():
-    p = _build_parser()
-    args = p.parse_args(["validate-report", "r.json"])
-    assert args.command == "validate-report"
-
-
-def test_build_parser_inspect_doc_subcommand_exists_batch40():
-    p = _build_parser()
-    args = p.parse_args(["inspect-doc", "d.json"])
-    assert args.command == "inspect-doc"
-
-
-def test_build_parser_run_choices_for_parser_batch40():
-    p = _build_parser()
-    args = p.parse_args([
-        "run", "--manifest", "a.json", "--output", "b.json",
-        "--parser", "kreuzberg",
-    ])
-    assert args.parser == "kreuzberg"
-
-
-def test_build_parser_run_default_parser_fallback_batch40():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert args.parser == "fallback"
-
-
-def test_build_parser_run_default_max_chars_800_batch40():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert args.max_chars == 800
-
-
-def test_build_parser_run_default_tolerance_chars_30_batch40():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert args.tolerance_chars == 30
-
-
 def test_build_parser_run_custom_max_chars_batch40():
     p = _build_parser()
     args = p.parse_args([
@@ -123,15 +84,6 @@ def test_build_parser_run_custom_tolerance_chars_batch40():
         "--tolerance-chars", "100",
     ])
     assert args.tolerance_chars == 100
-
-
-def test_build_parser_run_invalid_max_chars_raises_batch40():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args([
-            "run", "--manifest", "a.json", "--output", "b.json",
-            "--max-chars", "abc",
-        ])
 
 
 def test_build_parser_inspect_doc_default_tolerance_chars_30_batch40():
@@ -187,12 +139,6 @@ def test_format_metric_signature_two_params_batch40():
 def test_format_metric_return_annotation_str_batch40():
     sig = inspect.signature(_format_metric)
     assert "str" in str(sig.return_annotation)
-
-
-def test_format_metric_with_none_value_no_reason_batch40():
-    out = _format_metric("x", {"value": None, "reason": None})
-    assert "null" in out
-    assert "None" in out  # reason=None 被 f-string 渲染为 None
 
 
 def test_format_metric_with_false_value_batch40():
@@ -271,13 +217,6 @@ def test_format_metric_returns_str_batch40():
     assert isinstance(out, str)
 
 
-def test_format_metric_alignment_width_batch40():
-    """name 占 36 字符宽。"""
-    out = _format_metric("ab", {"value": True, "reason": None})
-    # 至少包含两个前导空格 + name + 填充空格
-    assert "  ab" in out
-
-
 def test_format_metric_dict_value_sorted_batch40():
     """dict value 渲染时按 key 排序。"""
     out = _format_metric("x", {"value": {"b": 2, "a": 1}, "reason": None})
@@ -309,14 +248,6 @@ def test_run_inspect_doc_return_annotation_int_batch40():
     assert "int" in str(sig.return_annotation)
 
 
-def test_run_inspect_doc_missing_file_returns_2_batch40(tmp_path, capsys):
-    p = tmp_path / "missing.json"
-    rc = _run_inspect_doc(_make_args(p))
-    assert rc == 2
-    captured = capsys.readouterr()
-    assert "ERROR" in captured.err
-
-
 def test_run_inspect_doc_invalid_json_returns_1_batch40(tmp_path, capsys):
     p = tmp_path / "bad.json"
     p.write_text("{invalid", encoding="utf-8")
@@ -324,88 +255,6 @@ def test_run_inspect_doc_invalid_json_returns_1_batch40(tmp_path, capsys):
     assert rc == 1
     captured = capsys.readouterr()
     assert "JSON" in captured.err or "ERROR" in captured.err
-
-
-def test_run_inspect_doc_top_level_not_dict_returns_1_batch40(tmp_path):
-    p = tmp_path / "arr.json"
-    p.write_text("[1, 2, 3]", encoding="utf-8")
-    rc = _run_inspect_doc(_make_args(p))
-    assert rc == 1
-
-
-def test_run_inspect_doc_top_level_int_returns_1_batch40(tmp_path):
-    p = tmp_path / "i.json"
-    p.write_text("42", encoding="utf-8")
-    rc = _run_inspect_doc(_make_args(p))
-    assert rc == 1
-
-
-def test_run_inspect_doc_top_level_string_returns_1_batch40(tmp_path):
-    p = tmp_path / "s.json"
-    p.write_text('"hello"', encoding="utf-8")
-    rc = _run_inspect_doc(_make_args(p))
-    assert rc == 1
-
-
-def test_run_inspect_doc_empty_dict_returns_0_batch40(tmp_path):
-    p = tmp_path / "empty.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = _run_inspect_doc(_make_args(p))
-    assert rc == 0
-
-
-def test_run_inspect_doc_prints_file_path_batch40(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    captured = capsys.readouterr()
-    assert "file:" in captured.out
-    assert str(p) in captured.out
-
-
-def test_run_inspect_doc_prints_document_id_batch40(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps({"document_id": "abc"}), encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    captured = capsys.readouterr()
-    assert "document_id:" in captured.out
-    assert "abc" in captured.out
-
-
-def test_run_inspect_doc_prints_source_type_batch40(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps({"source_type": "pdf"}), encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    captured = capsys.readouterr()
-    assert "type=pdf" in captured.out
-
-
-def test_run_inspect_doc_prints_elements_count_batch40(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps({"elements": [{"type": "x"}, {"type": "y"}]}), encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    captured = capsys.readouterr()
-    assert "elements=2" in captured.out
-
-
-def test_run_inspect_doc_prints_chunks_count_batch40(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps({"chunks": [{"text": "a"}]}), encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    captured = capsys.readouterr()
-    assert "chunks=1" in captured.out
-
-
-def test_run_inspect_doc_prints_parser_info_batch40(tmp_path, capsys):
-    p = tmp_path / "doc.json"
-    p.write_text(json.dumps({
-        "parser_name": "fallback",
-        "parser_version": "0.1.0",
-    }), encoding="utf-8")
-    _run_inspect_doc(_make_args(p))
-    captured = capsys.readouterr()
-    assert "fallback" in captured.out
-    assert "0.1.0" in captured.out
 
 
 def test_run_inspect_doc_prints_default_unknown_when_missing_batch40(tmp_path, capsys):
@@ -484,27 +333,6 @@ def test_main_unknown_command_raises_systemexit_batch40():
 def test_main_unknown_flag_raises_systemexit_batch40():
     with pytest.raises(SystemExit):
         main(["--unknown-flag"])
-
-
-def test_main_run_missing_manifest_returns_2_batch40(tmp_path, capsys):
-    manifest_path = tmp_path / "missing.json"
-    rc = main([
-        "run", "--manifest", str(manifest_path),
-        "--output", str(tmp_path / "out.json"),
-    ])
-    assert rc == 2
-
-
-def test_main_validate_report_missing_file_returns_2_batch40(tmp_path):
-    p = tmp_path / "missing.json"
-    rc = main(["validate-report", str(p)])
-    assert rc == 2
-
-
-def test_main_inspect_doc_missing_file_returns_2_batch40(tmp_path):
-    p = tmp_path / "missing.json"
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 2
 
 
 def test_main_inspect_doc_invalid_json_returns_1_batch40(tmp_path):
@@ -745,21 +573,6 @@ def test_module_source_contains_required_true_batch40():
     assert "required=True" in src
 
 
-def test_module_source_contains_run_subparser_batch40():
-    src = inspect.getsource(cmod)
-    assert '"run"' in src or "'run'" in src
-
-
-def test_module_source_contains_validate_report_subparser_batch40():
-    src = inspect.getsource(cmod)
-    assert '"validate-report"' in src or "'validate-report'" in src
-
-
-def test_module_source_contains_inspect_doc_subparser_batch40():
-    src = inspect.getsource(cmod)
-    assert '"inspect-doc"' in src or "'inspect-doc'" in src
-
-
 def test_module_source_contains_reconfigure_batch40():
     """Windows utf-8 fix。"""
     src = inspect.getsource(cmod)
@@ -825,13 +638,6 @@ def test_module_no_module_level_code_outside_functions_batch40():
 
 
 # ---------- 端到端集成 第七十批
-
-
-def test_e2e_inspect_doc_minimal_dict_batch40(tmp_path):
-    p = tmp_path / "doc.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = _run_inspect_doc(_make_args(p))
-    assert rc == 0
 
 
 def test_e2e_inspect_doc_full_dict_batch40(tmp_path):

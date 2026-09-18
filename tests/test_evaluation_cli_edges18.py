@@ -810,30 +810,6 @@ def test_module_source_contains_attribute_error_oserror_except():
     assert "OSError" in inspect.getsource(m)
 
 
-def test_module_source_contains_main_function_def():
-    import evaluation.cli as m
-
-    assert "def main(" in inspect.getsource(m)
-
-
-def test_module_source_contains_build_parser_def():
-    import evaluation.cli as m
-
-    assert "def _build_parser(" in inspect.getsource(m)
-
-
-def test_module_source_contains_run_inspect_doc_def():
-    import evaluation.cli as m
-
-    assert "def _run_inspect_doc(" in inspect.getsource(m)
-
-
-def test_module_source_contains_format_metric_def():
-    import evaluation.cli as m
-
-    assert "def _format_metric(" in inspect.getsource(m)
-
-
 def test_module_source_contains_if_name_main():
     import evaluation.cli as m
 
@@ -882,18 +858,6 @@ def test_module_source_contains_json_module_top_level():
     import evaluation.cli as m
 
     assert "import json" in inspect.getsource(m)
-
-
-def test_module_source_contains_sys_module_top_level():
-    import evaluation.cli as m
-
-    assert "import sys" in inspect.getsource(m)
-
-
-def test_module_source_contains_pathlib_path():
-    import evaluation.cli as m
-
-    assert "from pathlib import Path" in inspect.getsource(m)
 
 
 # =========================================================================
@@ -971,32 +935,16 @@ def test_format_metric_module_identity():
     assert _format_metric.__module__ == "evaluation.cli"
 
 
-def test_format_metric_qualname():
-    assert _format_metric.__qualname__ == "_format_metric"
-
-
 def test_run_inspect_doc_module_identity():
     assert _run_inspect_doc.__module__ == "evaluation.cli"
-
-
-def test_run_inspect_doc_qualname():
-    assert _run_inspect_doc.__qualname__ == "_run_inspect_doc"
 
 
 def test_build_parser_module_identity():
     assert _build_parser.__module__ == "evaluation.cli"
 
 
-def test_build_parser_qualname():
-    assert _build_parser.__qualname__ == "_build_parser"
-
-
 def test_main_module_identity():
     assert main.__module__ == "evaluation.cli"
-
-
-def test_main_qualname():
-    assert main.__qualname__ == "main"
 
 
 def test_all_helpers_are_function_type():
@@ -1024,11 +972,6 @@ def test_main_signature_param_name_argv():
 def test_main_signature_argv_default_none():
     sig = inspect.signature(main)
     assert sig.parameters["argv"].default is None
-
-
-def test_main_signature_argv_kind_positional_or_keyword():
-    sig = inspect.signature(main)
-    assert sig.parameters["argv"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_main_signature_no_var_args():
@@ -1062,18 +1005,6 @@ def test_format_metric_signature_no_defaults():
     sig = inspect.signature(_format_metric)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_format_metric_signature_no_var_args():
-    sig = inspect.signature(_format_metric)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_format_metric_signature_no_var_kwargs():
-    sig = inspect.signature(_format_metric)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 def test_run_inspect_doc_signature_param_count_1():

@@ -155,21 +155,6 @@ def test_cli_validate_report_batch444(tmp_path, capsys):
 
 # ---------- inspect-doc 反差行 ----------
 
-def test_cli_inspect_elements_two_chunks_one_batch444(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert "counts:      elements=2 chunks=1" in out
-
-
-def test_cli_inspect_by_type_para2_batch444(tmp_path, capsys):
-    docp = _doc(tmp_path)
-    rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])
-    assert rc == 0
-    assert ("element_count_by_type                "
-            "paragraph=2  (ok)") in out
-
-
 def test_cli_inspect_total_two_batch444(tmp_path, capsys):
     docp = _doc(tmp_path)
     rc, out = _run_cli(capsys, ["inspect-doc", str(docp)])

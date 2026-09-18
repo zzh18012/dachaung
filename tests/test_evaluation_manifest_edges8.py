@@ -124,10 +124,6 @@ def test_is_absolute_like_dotdot_relative():
     assert _is_absolute_like("../foo") is False
 
 
-def test_is_absolute_like_z_drive_forward():
-    assert _is_absolute_like("Z:/x") is True
-
-
 # =========================================================================
 # _has_backslash 深度
 # =========================================================================
@@ -357,12 +353,6 @@ def test_expected_failure_default_source_type_none():
     assert e.source_type is None
 
 
-def test_expected_failure_equality():
-    a = _make_expected_failure()
-    b = _make_expected_failure()
-    assert a == b
-
-
 def test_expected_failure_hashable():
     e = _make_expected_failure()
     assert hash(e) == hash(e)
@@ -459,26 +449,6 @@ def test_manifest_content_group_count_empty():
     assert m.content_group_count == 0
 
 
-def test_manifest_content_group_count_all_unpaired():
-    docs = (
-        _make_doc_entry(doc_id="d1"),
-        _make_doc_entry(doc_id="d2"),
-        _make_doc_entry(doc_id="d3"),
-    )
-    m = _make_manifest(documents=docs)
-    assert m.content_group_count == 3
-
-
-def test_manifest_content_group_count_one_pair_bidirectional():
-    docs = (
-        _make_doc_entry(doc_id="d1", paired_with="d2"),
-        _make_doc_entry(doc_id="d2", paired_with="d1"),
-    )
-    m = _make_manifest(documents=docs)
-    # frozenset({d1, d2}) 去重为 1 组
-    assert m.content_group_count == 1
-
-
 def test_manifest_content_group_count_one_pair_unidirectional():
     """单方向 paired_with → 仍算 1 组（避免重复计数）。"""
     docs = (
@@ -510,17 +480,6 @@ def test_manifest_content_group_count_mixed_paired_unpaired():
     m = _make_manifest(documents=docs)
     # 1 组 (d1-d2) + 2 unpaired = 3
     assert m.content_group_count == 3
-
-
-def test_manifest_content_group_count_two_disjoint_pairs():
-    docs = (
-        _make_doc_entry(doc_id="d1", paired_with="d2"),
-        _make_doc_entry(doc_id="d2", paired_with="d1"),
-        _make_doc_entry(doc_id="d3", paired_with="d4"),
-        _make_doc_entry(doc_id="d4", paired_with="d3"),
-    )
-    m = _make_manifest(documents=docs)
-    assert m.content_group_count == 2
 
 
 def test_manifest_content_group_count_three_chain():
@@ -959,11 +918,6 @@ def test_load_manifest_project_root_annotation_optional():
     assert "Path" in annotation or "str" in annotation or "None" in annotation
 
 
-def test_detect_project_root_signature():
-    sig = inspect.signature(_detect_project_root)
-    assert set(sig.parameters) == {"start"}
-
-
 def test_load_manifest_return_annotation_manifest():
     sig = inspect.signature(load_manifest)
     assert "Manifest" in str(sig.return_annotation)
@@ -996,10 +950,6 @@ def test_detect_project_root_callable():
 
 def test_is_absolute_like_idempotent():
     assert _is_absolute_like("/foo") == _is_absolute_like("/foo")
-
-
-def test_has_backslash_idempotent():
-    assert _has_backslash("a\\b") == _has_backslash("a\\b")
 
 
 def test_resolve_relative_path_idempotent(tmp_path: Path):

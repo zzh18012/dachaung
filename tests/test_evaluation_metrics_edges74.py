@@ -173,14 +173,6 @@ def test_docx_locator_table_indices_batch49():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_run_index_batch49():
-    elements = [
-        {"type": "paragraph", "source_locator": {"run_index": 5}},
-    ]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_unknown_structural_key_batch49():
     """不在 structural_keys 中的 key 不算。"""
     elements = [
@@ -458,14 +450,6 @@ def test_heading_boundary_chunk_with_multiple_ids_uses_first_batch49():
     chunks = [{"source_element_ids": ["h1", "h2", "h3"]}]
     out = _heading_boundary_ratio(elements, chunks)
     assert out["value"] == 1.0
-
-
-def test_heading_boundary_no_headings_batch49():
-    elements = [{"type": "paragraph"}]
-    chunks = [{"source_element_ids": ["e1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] is None
-    assert out["reason"] == "no_heading_elements"
 
 
 # ---------- _silent_drop_count 边界 ----------

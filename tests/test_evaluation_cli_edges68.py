@@ -88,13 +88,6 @@ def test_build_parser_help_flag_raises_system_exit_batch41():
         _build_parser().parse_args(["--help"])
 
 
-def test_build_parser_run_subcommand_exists_batch41():
-    p = _build_parser()
-    # 通过 parse_args 验证 run 子命令可用
-    args = p.parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert args.command == "run"
-
-
 def test_build_parser_validate_report_subcommand_exists_batch41():
     p = _build_parser()
     args = p.parse_args(["validate-report", "report.json"])
@@ -219,12 +212,6 @@ def test_format_metric_none_value_with_reason_batch41():
     assert "no_data" in out
 
 
-def test_format_metric_none_value_no_reason_batch41():
-    out = _format_metric("foo", {"value": None, "reason": None})
-    assert "null" in out
-    assert "(None)" in out
-
-
 def test_format_metric_true_value_batch41():
     out = _format_metric("foo", {"value": True, "reason": None})
     assert "true" in out
@@ -236,24 +223,9 @@ def test_format_metric_int_value_batch41():
     assert "42" in out
 
 
-def test_format_metric_negative_int_batch41():
-    out = _format_metric("foo", {"value": -5, "reason": None})
-    assert "-5" in out
-
-
 def test_format_metric_float_value_batch41():
     out = _format_metric("foo", {"value": 0.5, "reason": None})
     assert "0.5000" in out  # 4 位小数
-
-
-def test_format_metric_float_zero_batch41():
-    out = _format_metric("foo", {"value": 0.0, "reason": None})
-    assert "0.0000" in out
-
-
-def test_format_metric_float_one_batch41():
-    out = _format_metric("foo", {"value": 1.0, "reason": None})
-    assert "1.0000" in out
 
 
 def test_format_metric_dict_value_batch41():
@@ -340,16 +312,6 @@ def test_run_inspect_doc_invalid_json_rc_1_batch41(tmp_path):
 def test_run_inspect_doc_top_level_array_rc_1_batch41(tmp_path):
     p = tmp_path / "arr.json"
     p.write_text("[1, 2, 3]", encoding="utf-8")
-    args = MagicMock()
-    args.input = str(p)
-    args.tolerance_chars = 30
-    rc = _run_inspect_doc(args)
-    assert rc == 1
-
-
-def test_run_inspect_doc_top_level_int_rc_1_batch41(tmp_path):
-    p = tmp_path / "int.json"
-    p.write_text("42", encoding="utf-8")
     args = MagicMock()
     args.input = str(p)
     args.tolerance_chars = 30
@@ -529,12 +491,6 @@ def test_main_unknown_command_raises_system_exit_batch41():
         main(["unknown"])
 
 
-def test_main_run_missing_manifest_rc_2_batch41(tmp_path):
-    out = tmp_path / "out.json"
-    rc = main(["run", "--manifest", str(tmp_path / "missing.json"), "--output", str(out)])
-    assert rc == 2
-
-
 def test_main_validate_report_missing_rc_2_batch41(tmp_path):
     rc = main(["validate-report", str(tmp_path / "missing.json")])
     assert rc == 2
@@ -634,13 +590,6 @@ def test_module_source_contains_pathlib_path_import_batch41():
     assert "from pathlib import Path" in src
 
 
-def test_module_source_contains_manifest_import_batch41():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.manifest import" in src
-    assert "ManifestError" in src
-    assert "load_manifest" in src
-
-
 def test_module_source_contains_report_import_batch41():
     src = inspect.getsource(cmod)
     assert "from evaluation.report import" in src
@@ -734,16 +683,6 @@ def test_module_source_contains_error_prefix_batch41():
     """错误消息用 [ERROR] 前缀。"""
     src = inspect.getsource(cmod)
     assert "[ERROR]" in src
-
-
-def test_module_source_contains_ok_prefix_batch41():
-    src = inspect.getsource(cmod)
-    assert "[OK]" in src
-
-
-def test_module_source_contains_fail_prefix_batch41():
-    src = inspect.getsource(cmod)
-    assert "[FAIL]" in src
 
 
 # ---------- AST 结构 第四十一批

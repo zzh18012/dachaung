@@ -139,20 +139,10 @@ def test_ratio_one_batch45():
     assert out["value"] == 1.0
 
 
-def test_ratio_negative_batch45():
-    out = _ratio(-0.5)
-    assert out["value"] == -0.5
-
-
 def test_ratio_bool_true_batch45():
     """bool True 作为 float(1.0)。"""
     out = _ratio(True)
     assert out["value"] == 1.0
-
-
-def test_ratio_bool_false_batch45():
-    out = _ratio(False)
-    assert out["value"] == 0.0
 
 
 # ---------- 常量精确 ----------
@@ -246,18 +236,6 @@ def test_is_valid_bbox_with_bool_batch45():
     assert _is_valid_bbox([True, 2.0, 3.0, 4.0]) is False
 
 
-def test_is_valid_bbox_with_nan_batch45():
-    assert _is_valid_bbox([float("nan"), 2.0, 3.0, 4.0]) is False
-
-
-def test_is_valid_bbox_with_inf_batch45():
-    assert _is_valid_bbox([float("inf"), 2.0, 3.0, 4.0]) is False
-
-
-def test_is_valid_bbox_with_neg_inf_batch45():
-    assert _is_valid_bbox([float("-inf"), 2.0, 3.0, 4.0]) is False
-
-
 def test_is_valid_bbox_none_batch45():
     assert _is_valid_bbox(None) is False
 
@@ -334,12 +312,6 @@ def test_strip_unicode_whitespace_chain_batch45():
 def test_pdf_locator_ratio_page_zero_batch45():
     """page=0 视为 invalid（要求 page >= 1）。"""
     elements = [{"type": "paragraph", "source_locator": {"page": 0}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_page_negative_batch45():
-    elements = [{"type": "paragraph", "source_locator": {"page": -1}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
 

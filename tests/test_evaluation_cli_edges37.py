@@ -40,11 +40,6 @@ def test_build_parser_prog_value_exact_batch10():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_description_starts_with_eval_batch10():
-    p = _build_parser()
-    assert p.description.startswith("评测")
-
-
 def test_build_parser_description_mentions_devset_and_report_batch10():
     p = _build_parser()
     assert "开发集" in p.description or "跑" in p.description
@@ -71,45 +66,11 @@ def test_build_parser_run_subparser_choices_batch10():
     assert ns.parser in ("fallback", "kreuzberg")
 
 
-def test_build_parser_run_parser_default_fallback_batch10():
-    ns = _build_parser().parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert ns.parser == "fallback"
-
-
 def test_build_parser_run_parser_kreuzberg_batch10():
     ns = _build_parser().parse_args(
         ["run", "--manifest", "a.json", "--output", "b.json", "--parser", "kreuzberg"]
     )
     assert ns.parser == "kreuzberg"
-
-
-def test_build_parser_run_parser_rejects_other_choices_batch10(capsys):
-    with pytest.raises(SystemExit):
-        _build_parser().parse_args(
-            ["run", "--manifest", "a.json", "--output", "b.json", "--parser", "pdfplumber"]
-        )
-
-
-def test_build_parser_max_chars_type_int_batch10():
-    ns = _build_parser().parse_args(
-        ["run", "--manifest", "a.json", "--output", "b.json", "--max-chars", "500"]
-    )
-    assert isinstance(ns.max_chars, int)
-    assert ns.max_chars == 500
-
-
-def test_build_parser_tolerance_chars_type_int_batch10():
-    ns = _build_parser().parse_args(
-        ["run", "--manifest", "a.json", "--output", "b.json", "--tolerance-chars", "10"]
-    )
-    assert isinstance(ns.tolerance_chars, int)
-    assert ns.tolerance_chars == 10
-
-
-def test_build_parser_required_subcommand_batch10():
-    """required=True → 不传 subcommand 会 SystemExit。"""
-    with pytest.raises(SystemExit):
-        _build_parser().parse_args([])
 
 
 def test_build_parser_run_required_manifest_batch10(capsys):
@@ -172,25 +133,6 @@ def test_namespace_run_output_value_batch10():
     assert ns.output == "/path/to/o.json"
 
 
-def test_namespace_run_attributes_count_batch10():
-    ns = _build_parser().parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert len(vars(ns)) == 6
-
-
-def test_namespace_run_max_chars_negative_batch10():
-    ns = _build_parser().parse_args(
-        ["run", "--manifest", "a.json", "--output", "b.json", "--max-chars", "-1"]
-    )
-    assert ns.max_chars == -1
-
-
-def test_namespace_run_max_chars_huge_value_batch10():
-    ns = _build_parser().parse_args(
-        ["run", "--manifest", "a.json", "--output", "b.json", "--max-chars", "100000"]
-    )
-    assert ns.max_chars == 100000
-
-
 def test_namespace_run_max_chars_zero_batch10():
     ns = _build_parser().parse_args(
         ["run", "--manifest", "a.json", "--output", "b.json", "--max-chars", "0"]
@@ -203,28 +145,6 @@ def test_namespace_run_tolerance_chars_zero_batch10():
         ["run", "--manifest", "a.json", "--output", "b.json", "--tolerance-chars", "0"]
     )
     assert ns.tolerance_chars == 0
-
-
-def test_namespace_run_attributes_exact_batch10():
-    ns = _build_parser().parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert set(vars(ns)) == {
-        "command",
-        "manifest",
-        "output",
-        "parser",
-        "max_chars",
-        "tolerance_chars",
-    }
-
-
-def test_namespace_inspect_doc_attributes_exact_batch10():
-    ns = _build_parser().parse_args(["inspect-doc", "a.json"])
-    assert set(vars(ns)) == {"command", "input", "tolerance_chars"}
-
-
-def test_namespace_validate_report_attributes_exact_batch10():
-    ns = _build_parser().parse_args(["validate-report", "a.json"])
-    assert set(vars(ns)) == {"command", "input"}
 
 
 def test_namespace_input_is_str_batch10():
@@ -252,27 +172,6 @@ def test_namespace_command_first_field_batch10():
 # ---------- _format_metric 行为深度第十批 ----------
 
 
-def test_format_metric_int_value_batch10():
-    out = _format_metric("element_count_total", {"value": 5, "reason": "ok"})
-    assert "5" in out
-    assert "element_count_total" in out
-
-
-def test_format_metric_int_value_no_reason_uses_ok_batch10():
-    out = _format_metric("element_count_total", {"value": 5})
-    assert "(ok)" in out
-
-
-def test_format_metric_float_negative_value_batch10():
-    out = _format_metric("ratio", {"value": -0.5, "reason": "x"})
-    assert "-0.5000" in out
-
-
-def test_format_metric_float_zero_value_batch10():
-    out = _format_metric("ratio", {"value": 0.0, "reason": "x"})
-    assert "0.0000" in out
-
-
 def test_format_metric_float_high_precision_batch10():
     out = _format_metric("ratio", {"value": 0.123456789, "reason": "x"})
     assert "0.1235" in out  # 4 decimal places
@@ -281,54 +180,6 @@ def test_format_metric_float_high_precision_batch10():
 def test_format_metric_float_one_batch10():
     out = _format_metric("ratio", {"value": 1.0, "reason": "x"})
     assert "1.0000" in out
-
-
-def test_format_metric_bool_true_value_batch10():
-    out = _format_metric("flag", {"value": True, "reason": "ok"})
-    assert "true" in out
-
-
-def test_format_metric_bool_false_value_batch10():
-    out = _format_metric("flag", {"value": False, "reason": "ok"})
-    assert "false" in out
-
-
-def test_format_metric_bool_no_reason_uses_ok_batch10():
-    out = _format_metric("flag", {"value": True})
-    assert "(ok)" in out
-
-
-def test_format_metric_none_value_uses_reason_batch10():
-    out = _format_metric("metric", {"value": None, "reason": "no_data"})
-    assert "null" in out
-    assert "(no_data)" in out
-
-
-def test_format_metric_none_value_missing_reason_batch10():
-    out = _format_metric("metric", {"value": None})
-    assert "null" in out
-    assert "(None)" in out
-
-
-def test_format_metric_dict_empty_batch10():
-    out = _format_metric("by_type", {"value": {}, "reason": "ok"})
-    assert "by_type" in out
-    assert "(ok)" in out
-
-
-def test_format_metric_dict_multiple_pairs_sorted_batch10():
-    out = _format_metric(
-        "by_type",
-        {"value": {"paragraph": 3, "heading": 1, "image": 2}, "reason": "ok"},
-    )
-    assert "heading=1" in out
-    assert "image=2" in out
-    assert "paragraph=3" in out
-
-
-def test_format_metric_str_value_falls_to_default_batch10():
-    out = _format_metric("metric", {"value": "hello", "reason": "x"})
-    assert "hello" in out
 
 
 def test_format_metric_list_value_falls_to_default_batch10():
@@ -349,11 +200,6 @@ def test_format_metric_long_name_batch10():
     assert name in out
 
 
-def test_format_metric_unicode_name_batch10():
-    out = _format_metric("中文指标", {"value": 1, "reason": "ok"})
-    assert "中文指标" in out
-
-
 def test_format_metric_int_zero_batch10():
     out = _format_metric("count", {"value": 0, "reason": "ok"})
     # int 0 → 不是 float，不走 .4f 分支，直接 str(0) = "0"
@@ -371,23 +217,6 @@ def test_format_metric_huge_int_batch10():
 
 
 # ---------- _run_inspect_doc 行为深度第十批 ----------
-
-
-def test_run_inspect_doc_returns_int_batch10(tmp_path):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    assert isinstance(_run_inspect_doc(args), int)
-
-
-def test_run_inspect_doc_invalid_json_returns_1_batch10(tmp_path, capsys):
-    p = tmp_path / "bad.json"
-    p.write_text("not json", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    rc = _run_inspect_doc(args)
-    assert rc == 1
-    err = capsys.readouterr().err
-    assert "JSON" in err or "解析" in err
 
 
 def test_run_inspect_doc_top_level_list_returns_1_batch10(tmp_path):
@@ -418,26 +247,6 @@ def test_run_inspect_doc_top_level_null_returns_1_batch10(tmp_path):
     assert _run_inspect_doc(args) == 1
 
 
-def test_run_inspect_doc_empty_dict_returns_0_batch10(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    rc = _run_inspect_doc(args)
-    assert rc == 0
-    out = capsys.readouterr().out
-    assert "metrics:" in out
-
-
-def test_run_inspect_doc_prints_filename_batch10(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "d.json" in out
-    assert "file:" in out
-
-
 def test_run_inspect_doc_prints_metrics_header_batch10(tmp_path, capsys):
     p = tmp_path / "d.json"
     p.write_text("{}", encoding="utf-8")
@@ -445,18 +254,6 @@ def test_run_inspect_doc_prints_metrics_header_batch10(tmp_path, capsys):
     _run_inspect_doc(args)
     out = capsys.readouterr().out
     assert "metrics:" in out
-
-
-def test_run_inspect_doc_with_elements_and_chunks_batch10(tmp_path, capsys):
-    doc = {"elements": [{"type": "paragraph"}, {"type": "heading"}], "chunks": [{"id": "c1"}]}
-    p = tmp_path / "d.json"
-    p.write_text(json.dumps(doc), encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    rc = _run_inspect_doc(args)
-    assert rc == 0
-    out = capsys.readouterr().out
-    assert "elements=2" in out
-    assert "chunks=1" in out
 
 
 def test_run_inspect_doc_chunks_missing_treated_as_empty_batch10(tmp_path, capsys):
@@ -470,16 +267,6 @@ def test_run_inspect_doc_chunks_missing_treated_as_empty_batch10(tmp_path, capsy
     assert "chunks=0" in out
 
 
-def test_run_inspect_doc_explicit_source_type_batch10(tmp_path, capsys):
-    doc = {"source_type": "pdf"}
-    p = tmp_path / "d.json"
-    p.write_text(json.dumps(doc), encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "type=pdf" in out
-
-
 def test_run_inspect_doc_source_type_docx_batch10(tmp_path, capsys):
     doc = {"source_type": "docx"}
     p = tmp_path / "d.json"
@@ -488,67 +275,6 @@ def test_run_inspect_doc_source_type_docx_batch10(tmp_path, capsys):
     _run_inspect_doc(args)
     out = capsys.readouterr().out
     assert "type=docx" in out
-
-
-def test_run_inspect_doc_default_source_type_unknown_batch10(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "type=unknown" in out
-
-
-def test_run_inspect_doc_prints_document_id_batch10(tmp_path, capsys):
-    doc = {"document_id": "my_doc_001"}
-    p = tmp_path / "d.json"
-    p.write_text(json.dumps(doc), encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "my_doc_001" in out
-    assert "document_id:" in out
-
-
-def test_run_inspect_doc_document_id_missing_prints_question_mark_batch10(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "document_id:" in out
-    assert "?" in out
-
-
-def test_run_inspect_doc_prints_parser_name_batch10(tmp_path, capsys):
-    doc = {"parser_name": "fallback", "parser_version": "1.0.0"}
-    p = tmp_path / "d.json"
-    p.write_text(json.dumps(doc), encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "fallback" in out
-    assert "1.0.0" in out
-
-
-def test_run_inspect_doc_parser_missing_prints_question_mark_batch10(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "v?" in out
-
-
-def test_run_inspect_doc_with_unicode_in_doc_batch10(tmp_path, capsys):
-    doc = {"document_id": "中文文档"}
-    p = tmp_path / "d.json"
-    p.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    rc = _run_inspect_doc(args)
-    assert rc == 0
-    out = capsys.readouterr().out
-    assert "中文文档" in out
 
 
 def test_run_inspect_doc_args_namespace_type_batch10():
@@ -627,51 +353,10 @@ def test_run_inspect_doc_with_chunk_text_batch10(tmp_path, capsys):
 # ---------- main 路由第十批 ----------
 
 
-def test_main_returns_int_for_validate_report_missing_file_batch10(tmp_path, capsys):
-    rc = main(["validate-report", str(tmp_path / "no.json")])
-    assert isinstance(rc, int)
-    assert rc != 0
-
-
-def test_main_returns_int_for_inspect_doc_missing_file_batch10(tmp_path, capsys):
-    rc = main(["inspect-doc", str(tmp_path / "no.json")])
-    assert isinstance(rc, int)
-    assert rc != 0
-
-
-def test_main_returns_int_for_run_missing_manifest_batch10(tmp_path, capsys):
-    rc = main(
-        ["run", "--manifest", str(tmp_path / "no.json"), "--output", str(tmp_path / "o.json")]
-    )
-    assert isinstance(rc, int)
-    assert rc != 0
-
-
 def test_main_validate_report_invalid_json_returns_1_batch10(tmp_path, capsys):
     p = tmp_path / "r.json"
     p.write_text("not json", encoding="utf-8")
     rc = main(["validate-report", str(p)])
-    assert rc == 1
-
-
-def test_main_validate_report_invalid_schema_returns_1_batch10(tmp_path, capsys):
-    p = tmp_path / "r.json"
-    p.write_text("{}", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
-
-
-def test_main_inspect_doc_top_level_not_dict_returns_1_batch10(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("[1,2,3]", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 1
-
-
-def test_main_run_with_invalid_manifest_json_returns_1_batch10(tmp_path, capsys):
-    p = tmp_path / "m.json"
-    p.write_text("not json", encoding="utf-8")
-    rc = main(["run", "--manifest", str(p), "--output", str(tmp_path / "o.json")])
     assert rc == 1
 
 
@@ -690,11 +375,6 @@ def test_main_no_subcommand_exits_nonzero_batch10(capsys):
 def test_main_unknown_subcommand_exits_nonzero_batch10(capsys):
     with pytest.raises(SystemExit):
         main(["unknown-command"])
-
-
-def test_main_run_with_invalid_parser_choice_exits_nonzero_batch10(capsys):
-    with pytest.raises(SystemExit):
-        main(["run", "--manifest", "a.json", "--output", "b.json", "--parser", "bad"])
 
 
 def test_main_validate_report_stderr_starts_with_bracket_error_batch10(tmp_path, capsys):
@@ -833,23 +513,6 @@ def test_cli_source_no_remove_batch10():
     assert ".remove(" not in source
 
 
-def test_cli_source_no_logging_batch10():
-    source = inspect.getsource(climod)
-    assert "logging" not in source
-    assert "logger" not in source
-
-
-def test_cli_source_no_sleep_batch10():
-    source = inspect.getsource(climod)
-    assert "time.sleep" not in source
-
-
-def test_cli_source_no_hardcoded_absolute_path_batch10():
-    source = inspect.getsource(climod)
-    assert "C:\\\\Users" not in source
-    assert "/Users/" not in source
-
-
 # ---------- module source 字符串精确补强第八批 ----------
 
 
@@ -947,10 +610,6 @@ def test_module_source_parser_choices_batch10():
     assert '("fallback", "kreuzberg")' in source
 
 
-def test_module_source_docstring_mentions_run_batch10():
-    assert "run" in climod.__doc__
-
-
 def test_module_source_docstring_mentions_validate_report_batch10():
     assert "validate-report" in climod.__doc__
 
@@ -1038,18 +697,6 @@ def test_signature_run_inspect_doc_param_count_batch10():
 def test_signature_run_inspect_doc_param_name_batch10():
     sig = inspect.signature(_run_inspect_doc)
     assert "args" in sig.parameters
-
-
-def test_signature_run_inspect_doc_param_kind_batch10():
-    sig = inspect.signature(_run_inspect_doc)
-    p = list(sig.parameters.values())[0]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_run_inspect_doc_no_default_batch10():
-    sig = inspect.signature(_run_inspect_doc)
-    p = list(sig.parameters.values())[0]
-    assert p.default is inspect.Parameter.empty
 
 
 def test_signature_run_inspect_doc_return_annotation_batch10():

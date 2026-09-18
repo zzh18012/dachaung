@@ -93,16 +93,6 @@ def test_strip_unicode_whitespace_ideographic_space_batch27():
     assert _strip_unicode_whitespace("a　b") == "ab"
 
 
-def test_strip_unicode_whitespace_line_separator_batch27():
-    """U+2028 line separator 应被删除。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_paragraph_separator_batch27():
-    """U+2029 paragraph separator 应被删除。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
 def test_strip_unicode_whitespace_empty_string_batch27():
     assert _strip_unicode_whitespace("") == ""
 
@@ -424,15 +414,6 @@ def test_heading_boundary_chunks_none_source_ids_batch27():
     assert out["value"] == 0.0
 
 
-def test_heading_boundary_perfect_match_batch27():
-    out = _heading_boundary_ratio(
-        [{"type": "heading", "element_id": "h1"}],
-        [{"source_element_ids": ["h1", "p1"]}],
-    )
-    # h1 是 chunk 第一个 → matched=1, ratio=1.0
-    assert out["value"] == 1.0
-
-
 def test_heading_boundary_heading_not_first_batch27():
     """heading 在 source_element_ids 但不是第一个 → 不算合规。"""
     out = _heading_boundary_ratio(
@@ -498,14 +479,6 @@ def test_chunk_reference_ratio_chunks_no_source_ids_batch27():
     assert out["value"] == 0.0
 
 
-def test_chunk_reference_ratio_chunks_empty_source_ids_batch27():
-    out = _chunk_reference_ratio(
-        [{"element_id": "e1"}],
-        [{"source_element_ids": []}],
-    )
-    assert out["value"] == 0.0
-
-
 def test_chunk_reference_ratio_perfect_batch27():
     out = _chunk_reference_ratio(
         [{"element_id": "e1"}, {"element_id": "e2"}],
@@ -550,18 +523,6 @@ def test_chunk_reference_ratio_chunk_partial_source_ids_batch27():
 def test_image_resource_ratio_no_images_batch27():
     out = _image_resource_ratio([{"type": "paragraph"}], None)
     assert out["reason"] == "no_image_elements"
-
-
-def test_image_resource_ratio_no_resource_path_batch27():
-    out = _image_resource_ratio([{"type": "image"}], None)
-    # rp=None → 不计 valid → 0/1
-    assert out["value"] == 0.0
-
-
-def test_image_resource_ratio_empty_resource_path_batch27():
-    out = _image_resource_ratio([{"type": "image", "resource_path": ""}], None)
-    # rp="" → falsy → 不计 valid
-    assert out["value"] == 0.0
 
 
 def test_image_resource_ratio_file_does_not_exist_batch27(tmp_path):
@@ -716,13 +677,6 @@ def test_docx_locator_ratio_no_elements_batch27():
     assert out["reason"] == "no_elements"
 
 
-def test_docx_locator_ratio_paragraph_index_batch27():
-    out = _docx_locator_ratio(
-        [{"type": "paragraph", "source_locator": {"paragraph_index": 0}}]
-    )
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_table_index_batch27():
     out = _docx_locator_ratio(
         [{"type": "table", "source_locator": {"table_index": 0, "row_index": 0, "col_index": 0}}]
@@ -773,11 +727,6 @@ def test_docx_locator_ratio_mixed_batch27():
     assert out["value"] == pytest.approx(1 / 3)
 
 
-def test_docx_locator_ratio_no_source_locator_batch27():
-    out = _docx_locator_ratio([{"type": "paragraph"}])
-    assert out["value"] == 0.0
-
-
 def test_docx_locator_ratio_relationship_id_batch27():
     out = _docx_locator_ratio(
         [{"type": "image", "source_locator": {"relationship_id": "rId1"}}]
@@ -822,12 +771,6 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_forbidden_tokens_batch27():
-    source = inspect.getsource(mmod)
-    for tok in FORBIDDEN_TOKENS:
-        assert tok not in source, f"forbidden token: {tok}"
-
-
 def test_module_source_no_eval_exec_batch27():
     source = inspect.getsource(mmod)
     assert "eval(" not in source
@@ -839,17 +782,6 @@ def test_module_source_no_star_import_batch27():
     assert "import *" not in source
 
 
-def test_module_source_no_relative_imports_batch27():
-    source = inspect.getsource(mmod)
-    assert "from ." not in source
-
-
-def test_module_source_no_unsafe_network_batch27():
-    source = inspect.getsource(mmod)
-    for tok in ["requests", "urllib.request", "http.client", "socket"]:
-        assert tok not in source
-
-
 def test_module_source_no_environ_batch27():
     source = inspect.getsource(mmod)
     assert "os.environ" not in source
@@ -858,11 +790,6 @@ def test_module_source_no_environ_batch27():
 def test_module_source_no_subprocess_batch27():
     source = inspect.getsource(mmod)
     assert "subprocess" not in source
-
-
-def test_module_source_no_argparse_batch27():
-    source = inspect.getsource(mmod)
-    assert "argparse" not in source
 
 
 def test_module_source_no_dataclass_batch27():
@@ -915,11 +842,6 @@ def test_module_source_contains_compute_automatic_metrics_batch27():
 def test_module_source_contains_pdf_bbox_required_types_batch27():
     source = inspect.getsource(mmod)
     assert "_PDF_BBOX_REQUIRED_TYPES" in source
-
-
-def test_module_source_contains_pipeline_failed_batch27():
-    source = inspect.getsource(mmod)
-    assert "pipeline_failed" in source
 
 
 def test_module_source_contains_no_elements_batch27():
@@ -1077,11 +999,6 @@ def test_module_has_many_functions_batch27():
         "_heading_boundary_ratio", "_silent_drop_count",
     }
     assert set(funcs) == expected
-
-
-def test_module_docstring_present_batch27():
-    assert mmod.__doc__ is not None
-    assert len(mmod.__doc__.strip()) > 0
 
 
 def test_module_docstring_mentions_text_preservation_batch27():

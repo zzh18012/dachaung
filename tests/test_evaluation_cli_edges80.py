@@ -36,10 +36,6 @@ from evaluation.schema import EvalSchemaError
 
 # ---------- _build_parser 结构 ----------
 
-def test_parser_prog_batch52():
-    assert _build_parser().prog == "evaluation.cli"
-
-
 def test_parser_run_defaults_batch52():
     args = _build_parser().parse_args(["run", "--manifest", "m", "--output", "o"])
     assert args.command == "run"

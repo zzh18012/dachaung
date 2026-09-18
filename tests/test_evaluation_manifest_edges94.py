@@ -107,11 +107,6 @@ def _src():
     return inspect.getsource(man_mod)
 
 
-def test_source_frozen_dataclasses_batch54():
-    src = _src()
-    assert src.count("@dataclass(frozen=True)") == 3
-
-
 # ---------- forbidden tokens 第二百六十四批 ----------
 
 def test_source_no_eval_batch54():

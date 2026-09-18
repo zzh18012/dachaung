@@ -347,11 +347,6 @@ def test_module_source_has_image_output_dir_for_call():
     assert "image_output_dir_for(" in src
 
 
-def test_module_source_has_compute_automatic_metrics_call():
-    src = inspect.getsource(m)
-    assert "compute_automatic_metrics(" in src
-
-
 def test_module_source_has_figure_caption_prf_call():
     src = inspect.getsource(m)
     assert "figure_caption_prf(document, annotation)" in src

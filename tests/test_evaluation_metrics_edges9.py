@@ -277,10 +277,6 @@ def test_is_valid_bbox_long_list_five():
     assert _is_valid_bbox([1, 2, 3, 4, 5]) is False
 
 
-def test_is_valid_bbox_tuple():
-    assert _is_valid_bbox((1, 2, 3, 4)) is False
-
-
 def test_is_valid_bbox_set():
     s = {1, 2, 3, 4}
     assert _is_valid_bbox(s) is False
@@ -465,11 +461,6 @@ def test_docx_locator_ratio_signature():
     assert params == ["elements"]
 
 
-def test_docx_locator_ratio_return_annotation_str():
-    sig = inspect.signature(_docx_locator_ratio)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_docx_locator_ratio_empty_list():
     m = _docx_locator_ratio([])
     assert m["value"] is None
@@ -585,11 +576,6 @@ def test_image_resource_ratio_signature():
     assert params == ["elements", "image_base_dir"]
 
 
-def test_image_resource_ratio_return_annotation_str():
-    sig = inspect.signature(_image_resource_ratio)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_image_resource_ratio_empty_elements_no_image_reason():
     m = _image_resource_ratio([], None)
     assert m["value"] is None
@@ -690,11 +676,6 @@ def test_chunk_reference_ratio_signature():
     sig = inspect.signature(_chunk_reference_ratio)
     params = list(sig.parameters)
     assert params == ["elements", "chunks"]
-
-
-def test_chunk_reference_ratio_return_annotation_str():
-    sig = inspect.signature(_chunk_reference_ratio)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_chunk_reference_ratio_no_chunks_with_elements_null():
@@ -833,11 +814,6 @@ def test_text_preservation_signature():
     assert params == ["elements", "chunks"]
 
 
-def test_text_preservation_return_annotation_str():
-    sig = inspect.signature(_text_preservation)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_text_preservation_returns_dict_with_three_keys_exact():
     m = _text_preservation([], [])
     assert set(m.keys()) == {"equal", "precision", "recall"}
@@ -959,11 +935,6 @@ def test_heading_boundary_ratio_signature():
     assert params == ["elements", "chunks"]
 
 
-def test_heading_boundary_ratio_return_annotation_str():
-    sig = inspect.signature(_heading_boundary_ratio)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_heading_boundary_ratio_no_headings_null():
     elems = [{"type": "paragraph", "element_id": "p1"}]
     chunks = [{"text": "x", "source_element_ids": ["p1"]}]
@@ -1064,11 +1035,6 @@ def test_silent_drop_count_signature():
     sig = inspect.signature(_silent_drop_count)
     params = list(sig.parameters)
     assert params == ["by_type", "expectations"]
-
-
-def test_silent_drop_count_return_annotation_str():
-    sig = inspect.signature(_silent_drop_count)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_silent_drop_count_no_expectations():
@@ -1410,12 +1376,6 @@ def test_module_docstring_mentions_text_preservation():
     import evaluation.metrics as m
     doc = m.__doc__
     assert "text_preservation" in doc or "文本保留" in doc
-
-
-def test_module_uses_future_annotations():
-    import evaluation.metrics as m
-    sig = inspect.signature(m.compute_automatic_metrics)
-    assert isinstance(sig.return_annotation, str)
 
 
 def test_module_all_entries_exported():

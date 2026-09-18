@@ -63,11 +63,6 @@ def test_figure_caption_prf_none_document_batch18():
     assert len(r) == 3
 
 
-def test_figure_caption_prf_none_annotation_batch18():
-    r = figure_caption_prf({}, None)
-    assert len(r) == 3
-
-
 def test_figure_caption_prf_both_none_batch18():
     r = figure_caption_prf(None, None)
     assert len(r) == 3
@@ -78,12 +73,6 @@ def test_figure_caption_prf_dict_structure_batch18():
     for v in r.values():
         assert isinstance(v, dict)
         assert set(v.keys()) == {"value", "reason"}
-
-
-def test_figure_caption_prf_idempotent_batch18():
-    r1 = figure_caption_prf({}, {})
-    r2 = figure_caption_prf({}, {})
-    assert r1 == r2
 
 
 def test_figure_caption_prf_with_real_doc_batch18():
@@ -107,11 +96,6 @@ def test_chunk_boundary_prf_document_none_with_annotation_batch18():
     r = chunk_boundary_prf(None, {"chunk_boundary_anchors": []})
     assert r["chunk_boundary_precision"]["reason"] == "pipeline_failed"
     assert r["chunk_boundary_precision"]["value"] is None
-
-
-def test_chunk_boundary_prf_document_none_no_annotation_batch18():
-    r = chunk_boundary_prf(None, None)
-    assert r["chunk_boundary_precision"]["reason"] == "pipeline_failed"
 
 
 def test_chunk_boundary_prf_document_empty_annotation_none_batch18():
@@ -454,11 +438,6 @@ def test_chunk_boundary_prf_tolerance_large_batch18():
     assert r["_tolerance_chars"]["value"] == 10000
 
 
-def test_chunk_boundary_prf_tolerance_in_output_even_when_document_none_batch18():
-    r = chunk_boundary_prf(None, None, tolerance_chars=42)
-    assert r["_tolerance_chars"]["value"] == 42
-
-
 def test_chunk_boundary_prf_tolerance_reason_none_batch18():
     r = chunk_boundary_prf(None, None)
     assert r["_tolerance_chars"]["reason"] is None
@@ -600,13 +579,6 @@ def test_module_figure_caption_callable_batch18():
 
 def test_module_chunk_boundary_callable_batch18():
     assert callable(chunk_boundary_prf)
-
-
-def test_module_does_not_import_unsafe_modules_batch18():
-    src = inspect.getsource(amod)
-    for unsafe in ["import pickle", "import marshal", "import shelve",
-                   "import subprocess"]:
-        assert unsafe not in src
 
 
 def test_module_does_not_import_evaluation_runner_batch18():

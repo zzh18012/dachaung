@@ -144,11 +144,6 @@ def test_hasattr_false_for_unknown_batch49():
     assert not hasattr(eval_mod, "TOTALLY_UNKNOWN_NAME_XYZ")
 
 
-def test_hasattr_true_for_all_batch49():
-    for name in eval_mod.__all__:
-        assert hasattr(eval_mod, name)
-
-
 def test_module_dir_contains_all_names_batch49():
     d = dir(eval_mod)
     for name in eval_mod.__all__:
@@ -157,10 +152,6 @@ def test_module_dir_contains_all_names_batch49():
 
 def test_module_dir_contains_dunder_doc_batch49():
     assert "__doc__" in dir(eval_mod)
-
-
-def test_module_dir_contains_dunder_all_batch49():
-    assert "__all__" in dir(eval_mod)
 
 
 def test_module_dir_contains_dunder_name_batch49():
@@ -174,24 +165,6 @@ def test_reload_preserves_evaluator_version_batch49():
     reloaded = importlib.reload(eval_mod)
     assert reloaded.EVALUATOR_VERSION == "1.1"
     assert eval_mod.EVALUATOR_VERSION == "1.1"
-
-
-def test_reload_preserves_all_versions_batch49():
-    importlib.reload(eval_mod)
-    assert eval_mod.EVALUATOR_VERSION == "1.1"
-    assert eval_mod.REPORT_VERSION == "1.1"
-    assert eval_mod.ANNOTATION_VERSION == "1.0"
-    assert eval_mod.MANIFEST_VERSION == "1.0"
-
-
-def test_reload_preserves_all_list_batch49():
-    importlib.reload(eval_mod)
-    assert eval_mod.__all__ == [
-        "EVALUATOR_VERSION",
-        "REPORT_VERSION",
-        "ANNOTATION_VERSION",
-        "MANIFEST_VERSION",
-    ]
 
 
 def test_reload_preserves_docstring_batch49():
@@ -261,11 +234,6 @@ def test_ast_no_import_batch49():
     """模块没有 import（只定义常量）。"""
     tree = ast.parse(inspect.getsource(eval_mod))
     assert not any(isinstance(n, (ast.Import, ast.ImportFrom)) for n in tree.body)
-
-
-def test_ast_no_async_function_def_batch49():
-    tree = ast.parse(inspect.getsource(eval_mod))
-    assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
 
 
 def test_ast_has_4_top_level_assigns_batch49():

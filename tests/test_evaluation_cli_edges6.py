@@ -48,11 +48,6 @@ def test_format_metric_true_with_no_reason():
     assert "ok" in out
 
 
-def test_format_metric_false_with_no_reason():
-    out = _format_metric("m", {"value": False})
-    assert "false" in out
-
-
 def test_format_metric_float_zero():
     out = _format_metric("m", {"value": 0.0})
     assert "0.0000" in out

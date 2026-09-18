@@ -550,18 +550,6 @@ def test_module_source_has_docstring_about_parser_relations_batch22():
 # ---------- signatures 第三十三批 ----------
 
 
-def test_signature_figure_caption_prf_batch22():
-    sig = inspect.signature(figure_caption_prf)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["document", "annotation"]
-
-
-def test_signature_chunk_boundary_prf_batch22():
-    sig = inspect.signature(chunk_boundary_prf)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["document", "annotation", "tolerance_chars"]
-
-
 def test_signature_chunk_boundary_prf_tolerance_default_30_batch22():
     sig = inspect.signature(chunk_boundary_prf)
     p = sig.parameters["tolerance_chars"]
@@ -627,12 +615,6 @@ def test_module_does_not_import_evaluation_manifest_batch22():
 def test_module_does_not_import_evaluation_report_batch22():
     src = inspect.getsource(amod)
     assert "from evaluation.report" not in src
-
-
-def test_module_no_main_block_batch22():
-    src = inspect.getsource(amod)
-    assert 'if __name__ ==' not in src
-    assert "__main__" not in src
 
 
 def test_module_has_docstring_batch22():

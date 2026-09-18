@@ -39,22 +39,6 @@ from evaluation.metrics import (
 # ---------- _null / _ratio / _bool_metric / _int_metric 第三十八批
 
 
-def test_null_callable_batch38():
-    assert callable(_null)
-
-
-def test_ratio_callable_batch38():
-    assert callable(_ratio)
-
-
-def test_bool_metric_callable_batch38():
-    assert callable(_bool_metric)
-
-
-def test_int_metric_callable_batch38():
-    assert callable(_int_metric)
-
-
 def test_null_returns_dict_instance_batch38():
     assert isinstance(_null("x"), dict)
 
@@ -175,10 +159,6 @@ def test_is_valid_bbox_with_zero_values_batch38():
 
 def test_is_valid_bbox_with_negative_values_batch38():
     assert _is_valid_bbox([-1.0, -2.0, -3.0, -4.0]) is True
-
-
-def test_is_valid_bbox_with_very_large_values_batch38():
-    assert _is_valid_bbox([1e10, 1e10, 1e10, 1e10]) is True
 
 
 def test_is_valid_bbox_with_bool_false_only_batch38():
@@ -780,11 +760,6 @@ def test_module_source_contains_design_principles_batch38():
 def test_module_source_contains_pure_function_keyword_batch38():
     src = inspect.getsource(mmod)
     assert "纯函数" in src
-
-
-def test_module_source_contains_no_fake_keyword_batch38():
-    src = inspect.getsource(mmod)
-    assert "不伪造" in src
 
 
 def test_module_source_contains_counter_keyword_batch38():

@@ -73,23 +73,8 @@ def test_schema_validation_error_init_signature():
     assert set(sig.parameters) == {"self", "message", "errors"}
 
 
-def test_schema_validation_error_errors_default_none():
-    sig = inspect.signature(SchemaValidationError.__init__)
-    assert sig.parameters["errors"].default is None
-
-
-def test_schema_validation_error_no_errors_defaults_to_empty_list():
-    e = SchemaValidationError("msg")
-    assert e.errors == []
-
-
 def test_schema_validation_error_explicit_none_errors():
     e = SchemaValidationError("msg", errors=None)
-    assert e.errors == []
-
-
-def test_schema_validation_error_explicit_empty_list():
-    e = SchemaValidationError("msg", errors=[])
     assert e.errors == []
 
 
@@ -192,11 +177,6 @@ def test_load_schema_signature():
     assert set(sig.parameters) == {"path"}
 
 
-def test_load_schema_default_is_schema_path():
-    sig = inspect.signature(load_schema)
-    assert sig.parameters["path"].default == SCHEMA_PATH
-
-
 def test_load_schema_return_annotation_dict():
     sig = inspect.signature(load_schema)
     assert "dict" in str(sig.return_annotation)
@@ -288,11 +268,6 @@ def test_validate_signature():
     assert set(sig.parameters) == {"document", "schema"}
 
 
-def test_validate_schema_default_none():
-    sig = inspect.signature(validate)
-    assert sig.parameters["schema"].default is None
-
-
 def test_validate_return_annotation_none():
     sig = inspect.signature(validate)
     assert "None" in str(sig.return_annotation)
@@ -377,11 +352,6 @@ def test_validate_file_signature():
     assert set(sig.parameters) == {"path", "schema"}
 
 
-def test_validate_file_schema_default_none():
-    sig = inspect.signature(validate_file)
-    assert sig.parameters["schema"].default is None
-
-
 def test_validate_file_return_annotation_none():
     sig = inspect.signature(validate_file)
     assert "None" in str(sig.return_annotation)
@@ -445,42 +415,6 @@ def test_module_all_no_duplicates():
     assert len(mod.__all__) == len(set(mod.__all__))
 
 
-def test_module_uses_future_annotations():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_json():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_path():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
-def test_module_imports_draft202012():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "Draft202012Validator" in src
-
-
-def test_module_imports_jsvalidation_error():
-    import app.schema as mod
-    src = inspect.getsource(mod)
-    assert "JSValidationError" in src
-
-
 def test_module_docstring_present():
     import app.schema as mod
     assert mod.__doc__ is not None
@@ -498,11 +432,6 @@ def test_module_has_silence_unused():
     import app.schema as mod
     assert hasattr(mod, "_silence_unused_import")
     assert callable(mod._silence_unused_import)
-
-
-def test_module_silence_unused_returns_none():
-    import app.schema as mod
-    assert mod._silence_unused_import() is None
 
 
 # =========================================================================

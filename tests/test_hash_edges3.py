@@ -82,10 +82,6 @@ def test_text_hash_lowercase_hex():
 # =========================================================================
 
 
-def test_text_hash_same_input_same_output():
-    assert compute_text_hash("hello") == compute_text_hash("hello")
-
-
 def test_text_hash_different_input_different_output():
     assert compute_text_hash("hello") != compute_text_hash("world")
 

@@ -44,19 +44,9 @@ from evaluation.manifest import (
 # ---------- _is_absolute_like 第二十四批 ----------
 
 
-def test_is_absolute_like_single_slash_batch24():
-    """'/' → True。"""
-    assert _is_absolute_like("/") is True
-
-
 def test_is_absolute_like_posix_path_batch24():
     """'/foo/bar' → True。"""
     assert _is_absolute_like("/foo/bar") is True
-
-
-def test_is_absolute_like_windows_drive_lowercase_batch24():
-    """'c:/foo' → True（小写盘符）。"""
-    assert _is_absolute_like("c:/foo") is True
 
 
 def test_is_absolute_like_windows_drive_uppercase_batch24():
@@ -1115,17 +1105,6 @@ def test_signature_resolve_field_name_annotation_batch24():
 # ---------- module 合理性 第三十五批 ----------
 
 
-def test_module_all_five_entries_batch24():
-    assert hasattr(mmod, "__all__")
-    assert set(mmod.__all__) == {
-        "ManifestError",
-        "Manifest",
-        "DocumentEntry",
-        "ExpectedFailure",
-        "load_manifest",
-    }
-
-
 def test_module_has_three_dataclasses_batch24():
     classes = [
         name
@@ -1170,10 +1149,6 @@ def test_module_docstring_present_batch24():
 
 def test_module_docstring_mentions_path_constraint_batch24():
     assert "相对路径" in mmod.__doc__ or "正斜杠" in mmod.__doc__
-
-
-def test_module_docstring_mentions_no_absolute_batch24():
-    assert "绝对路径" in mmod.__doc__
 
 
 def test_module_uses_from_future_annotations_batch24():

@@ -716,11 +716,6 @@ def test_manifest_error_no_custom_init_batch38():
     assert ManifestError.__init__ is Exception.__init__
 
 
-def test_manifest_error_with_unicode_message_batch38():
-    e = ManifestError("中文错误")
-    assert str(e) == "中文错误"
-
-
 # ---------- module source forbidden tokens 第六十二批
 
 
@@ -759,11 +754,6 @@ def test_module_source_contains_design_doc_batch38():
 def test_module_source_contains_no_absolute_path_keyword_batch38():
     src = inspect.getsource(mmod)
     assert "拒绝绝对路径" in src
-
-
-def test_module_source_contains_no_backslash_keyword_batch38():
-    src = inspect.getsource(mmod)
-    assert "禁止反斜杠" in src
 
 
 def test_module_source_contains_dataclass_import_batch38():

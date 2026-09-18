@@ -81,10 +81,6 @@ def test_is_absolute_like_two_chars_no_drive_false():
     assert _is_absolute_like("ab/foo") is False
 
 
-def test_is_absolute_like_colon_only_false():
-    assert _is_absolute_like(":foo") is False
-
-
 def test_is_absolute_like_just_colon_separator_false():
     """a:b 类似 Windows drive 但 separator 不存在 → False。"""
     assert _is_absolute_like("a:b") is False

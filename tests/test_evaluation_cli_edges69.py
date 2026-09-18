@@ -148,12 +148,6 @@ def test_build_parser_inspect_doc_tolerance_batch43():
 
 # ---------- main 签名 ----------
 
-def test_main_signature_batch43():
-    sig = inspect.signature(main)
-    params = list(sig.parameters.keys())
-    assert params == ["argv"]
-
-
 def test_main_argv_default_none_batch43():
     sig = inspect.signature(main)
     assert sig.parameters["argv"].default is None
@@ -190,12 +184,6 @@ def test_format_metric_bool_true_batch43():
     assert "ok" in out
 
 
-def test_format_metric_bool_false_batch43():
-    out = _format_metric("foo", {"value": False, "reason": None})
-    assert "false" in out
-    assert "ok" in out
-
-
 def test_format_metric_name_width_36_batch43():
     out = _format_metric("foo", {"value": None, "reason": "why"})
     # 第二行 ":" 之后空格对齐到 36 字符
@@ -206,12 +194,6 @@ def test_format_metric_name_width_36_batch43():
 def test_format_metric_with_reason_batch43():
     out = _format_metric("foo", {"value": 0.5, "reason": "partial"})
     assert "partial" in out
-
-
-def test_format_metric_empty_dict_value_batch43():
-    out = _format_metric("foo", {"value": {}, "reason": None})
-    # empty dict → items 是空串
-    assert "foo" in out
 
 
 # ---------- _run_inspect_doc ----------

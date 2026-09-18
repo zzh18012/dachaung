@@ -929,13 +929,6 @@ def test_module_source_contains_paired_with_batch26():
 # ---------- signatures 第三十八批 ----------
 
 
-def test_signature_is_absolute_like_batch26():
-    sig = inspect.signature(_is_absolute_like)
-    assert list(sig.parameters.keys()) == ["path_str"]
-    assert sig.parameters["path_str"].annotation == "str"
-    assert sig.return_annotation == "bool"
-
-
 def test_signature_has_backslash_batch26():
     sig = inspect.signature(_has_backslash)
     assert list(sig.parameters.keys()) == ["path_str"]
@@ -952,13 +945,6 @@ def test_signature_resolve_relative_path_annotations_batch26():
     assert sig.parameters["path_str"].annotation == "str"
     assert sig.parameters["project_root"].annotation == "Path"
     assert sig.parameters["field_name"].annotation == "str"
-    assert sig.return_annotation == "Path"
-
-
-def test_signature_detect_project_root_batch26():
-    sig = inspect.signature(_detect_project_root)
-    assert list(sig.parameters.keys()) == ["start"]
-    assert sig.parameters["start"].annotation == "Path"
     assert sig.return_annotation == "Path"
 
 

@@ -1218,12 +1218,6 @@ def test_heading_boundary_ratio_only_paragraphs():
 # =========================================================================
 
 
-def test_silent_drop_count_no_expectations():
-    result = _silent_drop_count({"paragraph": 5}, None)
-    assert result["value"] is None
-    assert result["reason"] == "no_expectations"
-
-
 def test_silent_drop_count_empty_expectations():
     result = _silent_drop_count({"paragraph": 5}, {})
     assert result["value"] is None

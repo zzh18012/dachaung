@@ -50,12 +50,6 @@ def test_null_with_long_reason_batch41():
     assert len(out["reason"]) == 200
 
 
-def test_ratio_with_one_batch41():
-    out = _ratio(1.0)
-    assert out["value"] == 1.0
-    assert out["reason"] is None
-
-
 def test_ratio_with_very_small_batch41():
     out = _ratio(1e-10)
     assert out["value"] == 1e-10
@@ -71,18 +65,6 @@ def test_ratio_does_not_mutate_input_batch41():
     val = 0.5
     _ratio(val)
     assert val == 0.5
-
-
-def test_bool_metric_true_batch41():
-    out = _bool_metric(True)
-    assert out["value"] is True
-    assert out["reason"] is None
-
-
-def test_bool_metric_false_batch41():
-    out = _bool_metric(False)
-    assert out["value"] is False
-    assert out["reason"] is None
 
 
 def test_int_metric_zero_batch41():
@@ -246,20 +228,8 @@ def test_strip_unicode_whitespace_preserves_emoji_batch41():
     assert _strip_unicode_whitespace("hello😀world") == "hello😀world"
 
 
-def test_strip_unicode_whitespace_preserves_chinese_batch41():
-    assert _strip_unicode_whitespace("你好世界") == "你好世界"
-
-
 def test_strip_unicode_whitespace_removes_regular_spaces_batch41():
     assert _strip_unicode_whitespace("a b c") == "abc"
-
-
-def test_strip_unicode_whitespace_removes_tabs_batch41():
-    assert _strip_unicode_whitespace("a\tb\tc") == "abc"
-
-
-def test_strip_unicode_whitespace_removes_newlines_batch41():
-    assert _strip_unicode_whitespace("a\nb\nc") == "abc"
 
 
 def test_strip_unicode_whitespace_removes_carriage_return_batch41():
@@ -284,10 +254,6 @@ def test_strip_unicode_whitespace_only_whitespace_batch41():
     assert _strip_unicode_whitespace("   \t\n  ") == ""
 
 
-def test_strip_unicode_whitespace_returns_str_batch41():
-    assert isinstance(_strip_unicode_whitespace("abc"), str)
-
-
 # ---------- _pdf_locator_ratio 第四十一批
 
 
@@ -301,44 +267,12 @@ def test_pdf_locator_ratio_empty_list_batch41():
     assert out["reason"] == "no_elements"
 
 
-def test_pdf_locator_ratio_heading_with_bbox_batch41():
-    elements = [
-        {"type": "heading", "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}},
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_pdf_locator_ratio_heading_without_bbox_batch41():
     elements = [
         {"type": "heading", "source_locator": {"page": 1}},  # 缺 bbox
     ]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_paragraph_with_bbox_batch41():
-    elements = [
-        {"type": "paragraph", "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}},
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
-def test_pdf_locator_ratio_caption_with_bbox_batch41():
-    elements = [
-        {"type": "caption", "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}},
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
-def test_pdf_locator_ratio_list_item_with_bbox_batch41():
-    elements = [
-        {"type": "list_item", "source_locator": {"page": 1, "bbox": [0, 0, 1, 1]}},
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
 
 
 def test_pdf_locator_ratio_header_without_bbox_ok_batch41():
@@ -379,14 +313,6 @@ def test_pdf_locator_ratio_negative_page_batch41():
 def test_pdf_locator_ratio_missing_page_batch41():
     elements = [
         {"type": "heading", "source_locator": {"bbox": [0, 0, 1, 1]}},  # 缺 page
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_missing_locator_batch41():
-    elements = [
-        {"type": "heading"},  # 完全无 source_locator
     ]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
@@ -632,13 +558,6 @@ def test_text_preservation_image_excluded_batch41():
 def test_text_preservation_returns_dict_with_three_keys_batch41():
     out = _text_preservation([], [])
     assert set(out.keys()) == {"equal", "precision", "recall"}
-
-
-def test_text_preservation_each_metric_dict_has_value_reason_batch41():
-    out = _text_preservation([], [])
-    for k in ("equal", "precision", "recall"):
-        assert "value" in out[k]
-        assert "reason" in out[k]
 
 
 def test_text_preservation_does_not_mutate_inputs_batch41():

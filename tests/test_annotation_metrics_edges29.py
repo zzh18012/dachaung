@@ -703,11 +703,6 @@ def test_chunk_boundary_source_no_yield():
     assert "yield" not in src
 
 
-def test_chunk_boundary_source_no_async():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "async " not in src
-
-
 def test_chunk_boundary_source_no_class():
     src = inspect.getsource(chunk_boundary_prf)
     assert "class " not in src

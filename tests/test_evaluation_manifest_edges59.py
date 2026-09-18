@@ -64,10 +64,6 @@ def test_is_absolute_like_e_drive_batch32():
     assert _is_absolute_like("E:\\foo") is True
 
 
-def test_is_absolute_like_y_drive_batch32():
-    assert _is_absolute_like("Y:/foo") is True
-
-
 def test_is_absolute_like_relative_with_colon_no_slash_batch32():
     r"""a:b 无 \ 或 / 不是绝对路径。"""
     assert _is_absolute_like("a:b") is False
@@ -116,11 +112,6 @@ def test_has_backslash_mixed_batch32():
 
 
 # ---------- DocumentEntry 第三十二批 ----------
-
-
-def test_document_entry_is_dataclass_batch32():
-    from dataclasses import is_dataclass
-    assert is_dataclass(DocumentEntry)
 
 
 def test_document_entry_is_frozen_batch32():
@@ -205,11 +196,6 @@ def test_document_entry_hash_batch32():
 # ---------- ExpectedFailure 第三十二批 ----------
 
 
-def test_expected_failure_is_dataclass_batch32():
-    from dataclasses import is_dataclass
-    assert is_dataclass(ExpectedFailure)
-
-
 def test_expected_failure_is_frozen_batch32():
     ef = ExpectedFailure(
         doc_id="ef1",
@@ -246,11 +232,6 @@ def test_expected_failure_eq_batch32():
 
 
 # ---------- Manifest 第三十二批 ----------
-
-
-def test_manifest_is_dataclass_batch32():
-    from dataclasses import is_dataclass
-    assert is_dataclass(Manifest)
 
 
 def test_manifest_field_count_five_batch32():
@@ -542,12 +523,6 @@ def test_detect_project_root_from_file_batch32(tmp_path):
     assert out == tmp_path.resolve()
 
 
-def test_detect_project_root_from_dir_batch32(tmp_path):
-    (tmp_path / "pyproject.toml").write_text("[project]\n", encoding="utf-8")
-    out = _detect_project_root(tmp_path)
-    assert out == tmp_path.resolve()
-
-
 def test_detect_project_root_nested_batch32(tmp_path):
     """深嵌套 → 找到顶层。"""
     (tmp_path / "pyproject.toml").write_text("[project]\n", encoding="utf-8")
@@ -713,29 +688,12 @@ def test_module_source_contains_typing_any_import_batch32():
     assert "from typing import Any" in src
 
 
-def test_module_source_contains_relative_to_batch32():
-    src = inspect.getsource(mmod)
-    assert ".relative_to(" in src
-
-
 def test_module_source_contains_paired_with_doc_batch32():
     src = inspect.getsource(mmod)
     assert "配对的" in src or "paired" in src
 
 
 # ---------- signatures 第四十四批 ----------
-
-
-def test_signature_is_absolute_like_batch32():
-    sig = inspect.signature(_is_absolute_like)
-    assert sig.parameters["path_str"].annotation == "str"
-    assert sig.return_annotation == "bool"
-
-
-def test_signature_has_backslash_batch32():
-    sig = inspect.signature(_has_backslash)
-    assert sig.parameters["path_str"].annotation == "str"
-    assert sig.return_annotation == "bool"
 
 
 def test_signature_resolve_relative_path_batch32():
@@ -751,12 +709,6 @@ def test_signature_load_manifest_batch32():
     assert params == ["manifest_path", "project_root"]
     assert sig.return_annotation == "Manifest"
     assert sig.parameters["project_root"].default is None
-
-
-def test_signature_detect_project_root_batch32():
-    sig = inspect.signature(_detect_project_root)
-    assert sig.parameters["start"].annotation == "Path"
-    assert sig.return_annotation == "Path"
 
 
 # ---------- module 合理性第四十四批 ----------

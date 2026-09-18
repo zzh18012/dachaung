@@ -829,11 +829,6 @@ def test_module_manifest_error_has_empty_default_args():
     assert err.args == ("msg",)
 
 
-def test_module_manifest_error_str():
-    err = ManifestError("custom message")
-    assert str(err) == "custom message"
-
-
 def test_module_manifest_error_can_be_raised_and_caught():
     with pytest.raises(ManifestError) as exc_info:
         raise ManifestError("boom")

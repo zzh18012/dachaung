@@ -309,13 +309,6 @@ def test_format_metric_dict_with_multiple_keys_sorted_batch12():
     assert out.find("a=2") < out.find("b=1") < out.find("c=3")
 
 
-def test_format_metric_int_zero_batch12():
-    out = _format_metric("count", {"value": 0, "reason": "ok"})
-    # int 0 不走 null 分支（0 is None False）
-    # 走 default 分支：f"  {name:36} {value}  ({reason or 'ok'})"
-    assert "0" in out
-
-
 def test_format_metric_negative_int_batch12():
     out = _format_metric("count", {"value": -5, "reason": "ok"})
     assert "-5" in out
@@ -813,11 +806,6 @@ def test_cli_source_no_remove_call_batch12():
     assert ".remove(" not in source
 
 
-def test_cli_source_no_kill_batch12():
-    source = inspect.getsource(climod)
-    assert ".kill(" not in source
-
-
 # ---------- module source 字符串精确补强第十二批 ----------
 
 
@@ -847,12 +835,6 @@ def test_module_source_imports_path_batch12():
     assert "from pathlib import Path" in source
 
 
-def test_module_source_imports_manifest_error_batch12():
-    source = inspect.getsource(climod)
-    assert "ManifestError" in source
-    assert "load_manifest" in source
-
-
 def test_module_source_imports_get_git_provenance_batch12():
     source = inspect.getsource(climod)
     assert "get_git_provenance" in source
@@ -861,12 +843,6 @@ def test_module_source_imports_get_git_provenance_batch12():
 def test_module_source_imports_run_evaluation_batch12():
     source = inspect.getsource(climod)
     assert "run_evaluation" in source
-
-
-def test_module_source_imports_eval_schema_error_batch12():
-    source = inspect.getsource(climod)
-    assert "EvalSchemaError" in source
-    assert "validate_file" in source
 
 
 def test_module_source_has_subparsers_call_batch12():
@@ -894,22 +870,10 @@ def test_module_source_has_dunder_name_main_batch12():
     assert 'if __name__ == "__main__"' in source
 
 
-def test_module_source_has_system_exit_call_batch12():
-    source = inspect.getsource(climod)
-    assert "raise SystemExit(main())" in source
-
-
 def test_module_source_has_stdout_reconfigure_call_batch12():
     """Windows 友好：reconfigure stdout/stderr。"""
     source = inspect.getsource(climod)
     assert "reconfigure" in source
-
-
-def test_module_source_has_subcommand_strings_batch12():
-    source = inspect.getsource(climod)
-    assert '"run"' in source
-    assert '"validate-report"' in source
-    assert '"inspect-doc"' in source
 
 
 # ---------- signatures 第十二批 ----------
@@ -999,21 +963,6 @@ def test_module_name_evaluation_cli_batch12():
     assert climod.__name__ == "evaluation.cli"
 
 
-def test_module_dunder_file_endswith_cli_py_batch12():
-    sep = os.sep
-    assert climod.__file__.endswith("evaluation" + sep + "cli.py") or climod.__file__.endswith(
-        "evaluation/cli.py"
-    )
-
-
-def test_module_user_function_count_4_batch12():
-    funcs = [
-        n for n, v in vars(climod).items()
-        if inspect.isfunction(v) and v.__module__ == climod.__name__
-    ]
-    assert set(funcs) == {"_build_parser", "main", "_format_metric", "_run_inspect_doc"}
-
-
 def test_module_no_user_classes_batch12():
     classes = [
         n for n, v in vars(climod).items()
@@ -1028,17 +977,6 @@ def test_module_no_user_constants_tuple_batch12():
         if not n.startswith("__") and isinstance(v, tuple) and not callable(v)
     ]
     assert consts == []
-
-
-def test_module_docstring_mentions_subcommands_batch12():
-    assert climod.__doc__ is not None
-    assert "run" in climod.__doc__
-    assert "validate-report" in climod.__doc__
-
-
-def test_module_docstring_mentions_inspect_doc_batch12():
-    assert climod.__doc__ is not None
-    assert "inspect-doc" in climod.__doc__
 
 
 def test_module_has_dunder_all_absent_batch12():

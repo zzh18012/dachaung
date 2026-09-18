@@ -412,40 +412,14 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_forbidden_tokens_batch25():
-    source = inspect.getsource(amod)
-    for tok in FORBIDDEN_TOKENS:
-        assert tok not in source, f"forbidden token in source: {tok}"
-
-
 def test_module_source_no_async_def_batch25():
     source = inspect.getsource(amod)
     assert "async def" not in source
 
 
-def test_module_source_no_global_keyword_batch25():
-    source = inspect.getsource(amod)
-    assert "global " not in source
-
-
 def test_module_source_no_walrus_batch25():
     source = inspect.getsource(amod)
     assert ":=" not in source
-
-
-def test_module_source_no_eval_exec_batch25():
-    source = inspect.getsource(amod)
-    assert "eval(" not in source
-    assert "exec(" not in source
-    assert "compile(" not in source
-
-
-def test_module_source_no_relative_imports_batch25():
-    source_lines = inspect.getsource(amod).split("\n")
-    for line in source_lines:
-        stripped = line.strip()
-        if stripped.startswith("from .") and "from __future__" not in stripped:
-            pytest.fail(f"relative import: {line}")
 
 
 def test_module_source_no_subprocess_batch25():
@@ -609,15 +583,6 @@ def test_module_has_two_functions_batch25():
         if val.__module__ == amod.__name__
     ]
     assert set(funcs) == {"figure_caption_prf", "chunk_boundary_prf"}
-
-
-def test_module_no_classes_batch25():
-    classes = [
-        name
-        for name, val in inspect.getmembers(amod, inspect.isclass)
-        if val.__module__ == amod.__name__
-    ]
-    assert classes == []
 
 
 def test_module_docstring_present_batch25():

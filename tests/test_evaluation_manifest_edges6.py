@@ -156,11 +156,6 @@ def test_manifest_error_caught_as_exception():
         pass
 
 
-def test_manifest_error_message_preserved():
-    e = ManifestError("hello")
-    assert str(e) == "hello"
-
-
 def test_manifest_error_empty_message():
     e = ManifestError("")
     assert str(e) == ""
@@ -220,24 +215,6 @@ def test_document_entry_field_count():
     assert len(fs) == 10
 
 
-def test_document_entry_field_names_exact():
-    fs = fields(DocumentEntry)
-    names = {f.name for f in fs}
-    expected = {
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "source_type",
-        "sha256",
-        "categories",
-        "paired_with",
-        "annotation_file_str",
-        "annotation_resolved",
-        "expectations",
-    }
-    assert names == expected
-
-
 def test_document_entry_equality_different_doc_id():
     a = _make_doc_entry()
     b = _make_doc_entry(doc_id="d2")
@@ -262,11 +239,6 @@ def test_document_entry_categories_defaults_to_empty_when_not_provided():
     实际 manifest 加载时使用 tuple(d.get("categories", []))。"""
     d = _make_doc_entry(categories=())
     assert d.categories == ()
-
-
-def test_document_entry_categories_can_be_multidimensional():
-    d = _make_doc_entry(categories=("a", "b", "c"))
-    assert d.categories == ("a", "b", "c")
 
 
 def test_document_entry_expectations_can_be_dict():
@@ -331,19 +303,6 @@ def test_expected_failure_field_count():
     assert len(fs) == 5
 
 
-def test_expected_failure_field_names_exact():
-    fs = fields(ExpectedFailure)
-    names = {f.name for f in fs}
-    expected = {
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "expected_error_code",
-        "source_type",
-    }
-    assert names == expected
-
-
 def test_expected_failure_equality_same_values():
     a = _make_expected_failure()
     b = _make_expected_failure()
@@ -354,11 +313,6 @@ def test_expected_failure_hashable():
     ef = _make_expected_failure()
     h = hash(ef)
     assert isinstance(h, int)
-
-
-def test_expected_failure_source_type_can_be_none():
-    ef = _make_expected_failure(source_type=None)
-    assert ef.source_type is None
 
 
 # =========================================================================
@@ -393,19 +347,6 @@ def test_manifest_field_count():
     assert len(fs) == 5
 
 
-def test_manifest_field_names_exact():
-    fs = fields(Manifest)
-    names = {f.name for f in fs}
-    expected = {
-        "manifest_version",
-        "devset_status",
-        "documents",
-        "expected_failures",
-        "project_root",
-    }
-    assert names == expected
-
-
 def test_manifest_hashable():
     m = _make_manifest()
     h = hash(m)
@@ -426,26 +367,6 @@ def test_manifest_file_count_with_documents():
 def test_manifest_pdf_count_empty():
     m = _make_manifest(documents=())
     assert m.pdf_count == 0
-
-
-def test_manifest_pdf_count_filters_other_types():
-    docs = (
-        _make_doc_entry(doc_id="d1", source_type="pdf"),
-        _make_doc_entry(doc_id="d2", source_type="docx"),
-        _make_doc_entry(doc_id="d3", source_type="pdf"),
-    )
-    m = _make_manifest(documents=docs)
-    assert m.pdf_count == 2
-
-
-def test_manifest_docx_count_filters_other_types():
-    docs = (
-        _make_doc_entry(doc_id="d1", source_type="pdf"),
-        _make_doc_entry(doc_id="d2", source_type="docx"),
-        _make_doc_entry(doc_id="d3", source_type="docx"),
-    )
-    m = _make_manifest(documents=docs)
-    assert m.docx_count == 2
 
 
 def test_manifest_content_group_count_empty():
@@ -542,11 +463,6 @@ def test_resolve_relative_path_absolute_posix_raises(tmp_path: Path):
     with pytest.raises(ManifestError) as exc:
         _resolve_relative_path("/etc/passwd", tmp_path, "f")
     assert "绝对路径" in str(exc.value) or "absolute" in str(exc.value).lower()
-
-
-def test_resolve_relative_path_windows_drive_raises(tmp_path: Path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("C:/foo", tmp_path, "f")
 
 
 def test_resolve_relative_path_backslash_raises(tmp_path: Path):
@@ -746,12 +662,6 @@ def test_load_manifest_str_project_root(tmp_path: Path):
     p = _write_valid_manifest(tmp_path)
     m = load_manifest(p, project_root=str(tmp_path))
     assert m.project_root == tmp_path.resolve()
-
-
-def test_load_manifest_expected_failures_default_empty(tmp_path: Path):
-    p = _write_valid_manifest(tmp_path)
-    m = load_manifest(p)
-    assert m.expected_failures == ()
 
 
 # =========================================================================

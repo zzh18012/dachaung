@@ -92,20 +92,10 @@ def test_format_metric_value_zero_int():
     assert "ok" in line
 
 
-def test_format_metric_value_negative_int():
-    line = _format_metric("x", {"value": -5, "reason": None})
-    assert "-5" in line
-
-
 def test_format_metric_value_very_small_float():
     """很小的 float 仍要 4 位小数（会变 0.0000）。"""
     line = _format_metric("x", {"value": 1e-10, "reason": None})
     assert "0.0000" in line
-
-
-def test_format_metric_value_float_one_decimal_place():
-    line = _format_metric("x", {"value": 0.5, "reason": None})
-    assert "0.5000" in line
 
 
 def test_format_metric_value_dict_with_int_and_str():
@@ -713,11 +703,6 @@ def test_module_docstring_mentions_inspect_doc_command():
 def test_module_docstring_mentions_python_m_dash_m():
     import evaluation.cli as m
     assert "python -m" in m.__doc__
-
-
-def test_module_no_silence_unused():
-    import evaluation.cli as m
-    assert not hasattr(m, "_silence_unused_import")
 
 
 # =========================================================================

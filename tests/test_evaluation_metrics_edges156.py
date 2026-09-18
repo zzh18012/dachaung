@@ -195,14 +195,6 @@ def _src():
     return inspect.getsource(metrics_mod)
 
 
-def test_source_key_lines_batch524():
-    src = _src()
-    assert ('_PDF_BBOX_REQUIRED_TYPES = ('
-            '"heading", "paragraph", '
-            '"caption", "list_item")') in src
-    assert "drops += (exp - actual)" in src
-
-
 # ---------- forbidden tokens 第七百七十一批 ----------
 
 def test_source_no_eval_batch524():

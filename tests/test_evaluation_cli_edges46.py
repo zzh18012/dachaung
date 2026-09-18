@@ -130,18 +130,6 @@ def test_build_parser_run_with_all_options_batch19():
 # ---------- argparse Namespace 行为深度第十九批 ----------
 
 
-def test_namespace_run_manifest_value_batch19():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert args.manifest == "m.json"
-
-
-def test_namespace_run_output_value_batch19():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert args.output == "o.json"
-
-
 def test_namespace_validate_report_input_value_batch19():
     p = _build_parser()
     args = p.parse_args(["validate-report", "report.json"])
@@ -474,11 +462,6 @@ def test_module_source_forbidden_tokens_batch19(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_batch19():
-    src = inspect.getsource(cmod)
-    assert "import subprocess" not in src
-
-
 # ---------- module source 字符串精确补强第三十一批 ----------
 
 
@@ -548,11 +531,6 @@ def test_module_source_has_format_metric_batch19():
     assert "def _format_metric(" in src
 
 
-def test_module_source_has_add_subparsers_batch19():
-    src = inspect.getsource(cmod)
-    assert "add_subparsers(" in src
-
-
 def test_module_source_no_main_block_batch19():
     src = inspect.getsource(cmod)
     assert "if __name__" not in src or "__main__" not in src.split("def main")[0]
@@ -587,27 +565,6 @@ def test_signature_run_inspect_doc_batch19():
 
 
 # ---------- module 合理性第二十九批 ----------
-
-
-def test_module_has_build_parser_batch19():
-    assert hasattr(cmod, "_build_parser")
-    assert callable(cmod._build_parser)
-
-
-def test_module_has_run_inspect_doc_batch19():
-    assert hasattr(cmod, "_run_inspect_doc")
-    assert callable(cmod._run_inspect_doc)
-
-
-def test_module_has_format_metric_batch19():
-    assert hasattr(cmod, "_format_metric")
-    assert callable(cmod._format_metric)
-
-
-def test_module_does_not_import_unsafe_modules_batch19():
-    src = inspect.getsource(cmod)
-    for unsafe in ["import pickle", "import marshal", "import shelve"]:
-        assert unsafe not in src
 
 
 def test_module_does_not_import_app_pipeline_batch19():

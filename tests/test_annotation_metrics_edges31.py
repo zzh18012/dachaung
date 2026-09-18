@@ -31,37 +31,6 @@ from evaluation.annotation_metrics import (
 # ---------- figure_caption_prf 行为深度第四批 ----------
 
 
-def test_figure_caption_returns_three_metric_dicts():
-    out = figure_caption_prf({}, {})
-    assert isinstance(out, dict)
-    assert len(out) == 3
-
-
-def test_figure_caption_precision_key_present():
-    out = figure_caption_prf({}, {})
-    assert "figure_caption_precision" in out
-
-
-def test_figure_caption_recall_key_present():
-    out = figure_caption_prf({}, {})
-    assert "figure_caption_recall" in out
-
-
-def test_figure_caption_f1_key_present():
-    out = figure_caption_prf({}, {})
-    assert "figure_caption_f1" in out
-
-
-def test_figure_caption_recall_value_none():
-    out = figure_caption_prf({}, {})
-    assert out["figure_caption_recall"]["value"] is None
-
-
-def test_figure_caption_f1_value_none():
-    out = figure_caption_prf({}, {})
-    assert out["figure_caption_f1"]["value"] is None
-
-
 def test_figure_caption_precision_reason_constant():
     out = figure_caption_prf({}, {})
     assert out["figure_caption_precision"]["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
@@ -861,13 +830,6 @@ def test_chunk_boundary_prf_signature_tolerance_default_30():
     assert p.default == 30
 
 
-def test_chunk_boundary_prf_signature_no_varargs():
-    sig = inspect.signature(chunk_boundary_prf)
-    kinds = {p.kind for p in sig.parameters.values()}
-    assert inspect.Parameter.VAR_POSITIONAL not in kinds
-    assert inspect.Parameter.VAR_KEYWORD not in kinds
-
-
 def test_figure_caption_prf_signature_param_count():
     sig = inspect.signature(figure_caption_prf)
     assert len(sig.parameters) == 2
@@ -883,13 +845,6 @@ def test_figure_caption_prf_signature_no_defaults():
     sig = inspect.signature(figure_caption_prf)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_figure_caption_prf_signature_no_varargs():
-    sig = inspect.signature(figure_caption_prf)
-    kinds = {p.kind for p in sig.parameters.values()}
-    assert inspect.Parameter.VAR_POSITIONAL not in kinds
-    assert inspect.Parameter.VAR_KEYWORD not in kinds
 
 
 def test_no_function_has_varargs_in_module():

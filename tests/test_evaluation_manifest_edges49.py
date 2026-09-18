@@ -790,37 +790,6 @@ def test_module_source_has_all_list_batch22():
 # ---------- signatures 第三十三批 ----------
 
 
-def test_signature_is_absolute_like_batch22():
-    sig = inspect.signature(_is_absolute_like)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["path_str"]
-
-
-def test_signature_has_backslash_batch22():
-    sig = inspect.signature(_has_backslash)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["path_str"]
-
-
-def test_signature_resolve_relative_path_batch22():
-    sig = inspect.signature(_resolve_relative_path)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["path_str", "project_root", "field_name"]
-
-
-def test_signature_load_manifest_batch22():
-    sig = inspect.signature(load_manifest)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["manifest_path", "project_root"]
-    assert params[1].default is None
-
-
-def test_signature_detect_project_root_batch22():
-    sig = inspect.signature(_detect_project_root)
-    params = list(sig.parameters.values())
-    assert [p.name for p in params] == ["start"]
-
-
 def test_signature_load_manifest_manifest_path_union_batch22():
     """manifest_path 接受 Path | str。"""
     sig = inspect.signature(load_manifest)
@@ -888,12 +857,6 @@ def test_module_no_main_block_batch22():
     src = inspect.getsource(mmod)
     assert 'if __name__ ==' not in src
     assert "__main__" not in src
-
-
-def test_module_manifest_error_is_class_batch22():
-    assert hasattr(mmod, "ManifestError")
-    assert isinstance(mmod.ManifestError, type)
-    assert issubclass(mmod.ManifestError, Exception)
 
 
 # ---------- 端到端集成第三十三批 ----------

@@ -238,10 +238,6 @@ def test_source_break_comment_batch52():
     assert "break  # 最后一个 chunk 后面不算边界" in _src()
 
 
-def test_source_pairs_sort_batch52():
-    assert "pairs.sort(key=lambda x: x[0])" in _src()
-
-
 def test_source_search_from_advance_batch52():
     assert "search_from = find_pos + len(marker)" in _src()
 

@@ -606,12 +606,6 @@ def test_module_all_only_exports_three_names():
     assert len(m.__all__) == 3
 
 
-def test_module_all_first_constant():
-    """__all__ 第 1 个是 PARSER_DOES_NOT_EMIT_RELATIONS。"""
-    import evaluation.annotation_metrics as m
-    assert m.__all__[0] == "PARSER_DOES_NOT_EMIT_RELATIONS"
-
-
 def test_module_all_then_two_functions():
     """__all__ 后 2 个是 figure_caption_prf 和 chunk_boundary_prf。"""
     import evaluation.annotation_metrics as m

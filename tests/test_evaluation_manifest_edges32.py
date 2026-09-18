@@ -69,10 +69,6 @@ def test_is_absolute_like_double_quote_prefix():
     assert _is_absolute_like('":/foo') is False
 
 
-def test_is_absolute_like_space_prefix():
-    assert _is_absolute_like(" :/foo") is False
-
-
 def test_is_absolute_like_digit_at_pos0_with_slash():
     assert _is_absolute_like("0:/foo") is False
 
@@ -1067,11 +1063,6 @@ def test_manifest_source_uses_relative_to():
     assert ".relative_to(" in src
 
 
-def test_manifest_source_uses_isalpha():
-    src = inspect.getsource(mmod)
-    assert ".isalpha()" in src
-
-
 def test_manifest_source_uses_frozenset():
     src = inspect.getsource(mmod)
     assert "frozenset(" in src
@@ -1579,23 +1570,10 @@ def test_e2e_load_manifest_round_trip_dataclass_to_dict(tmp_path):
     assert json.dumps(round_trip)
 
 
-def test_e2e_load_manifest_returns_manifest_instance(tmp_path):
-    mf = _write_valid_manifest(tmp_path)
-    m = load_manifest(mf, project_root=tmp_path)
-    assert isinstance(m, Manifest)
-
-
 def test_e2e_load_manifest_manifest_error_caused_by_missing_file(tmp_path):
     mf = tmp_path / "doesnotexist.json"
     with pytest.raises(ManifestError):
         load_manifest(mf, project_root=tmp_path)
-
-
-def test_e2e_load_manifest_idempotent(tmp_path):
-    mf = _write_valid_manifest(tmp_path)
-    m1 = load_manifest(mf, project_root=tmp_path)
-    m2 = load_manifest(mf, project_root=tmp_path)
-    assert m1 == m2
 
 
 def test_e2e_load_manifest_doc_id_uniqueness_not_required_by_loader(tmp_path):

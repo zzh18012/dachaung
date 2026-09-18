@@ -420,16 +420,6 @@ def test_document_entry_with_dict_expectations_batch21():
 # ---------- ExpectedFailure 第二十一批 ----------
 
 
-def test_expected_failure_field_count_5_batch21():
-    fields = dataclasses.fields(ExpectedFailure)
-    assert len(fields) == 5
-
-
-def test_expected_failure_field_names_batch21():
-    fields = [f.name for f in dataclasses.fields(ExpectedFailure)]
-    assert fields == ["doc_id", "path_str", "resolved_path", "expected_error_code", "source_type"]
-
-
 def test_expected_failure_is_frozen_batch21():
     ef = ExpectedFailure(
         doc_id="ef1", path_str="ef1.pdf", resolved_path=Path("/x/ef1.pdf"),
@@ -526,11 +516,6 @@ def test_load_manifest_str_path_batch21(tmp_path):
     p = _write_valid_manifest(tmp_path)
     m = load_manifest(str(p))
     assert m.manifest_version == "1.0"
-
-
-def test_load_manifest_file_not_exist_raises_batch21(tmp_path):
-    with pytest.raises(ManifestError):
-        load_manifest(tmp_path / "missing.json")
 
 
 def test_load_manifest_invalid_json_raises_batch21(tmp_path):

@@ -44,11 +44,6 @@ def test_format_metric_large_int_batch49():
     assert "1000000" in out
 
 
-def test_format_metric_negative_float_batch49():
-    out = _format_metric("neg", {"value": -0.5, "reason": None})
-    assert "-0.5000" in out
-
-
 def test_format_metric_dict_with_int_and_float_batch49():
     out = _format_metric("mixed", {"value": {"a": 1, "b": 2.5}, "reason": None})
     assert "a=1" in out

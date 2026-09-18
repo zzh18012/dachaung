@@ -369,10 +369,6 @@ def test_is_absolute_like_unicode_first_batch39():
     assert _is_absolute_like("中:/x") is True
 
 
-def test_is_absolute_like_relative_path_batch39():
-    assert _is_absolute_like("a/b") is False
-
-
 def test_is_absolute_like_dot_relative_batch39():
     assert _is_absolute_like("./a") is False
 
@@ -441,11 +437,6 @@ def test_resolve_relative_path_outside_root_rejected_batch39(tmp_path):
 def test_resolve_relative_path_absolute_rejected_batch39(tmp_path):
     with pytest.raises(ManifestError):
         _resolve_relative_path("/etc/passwd", tmp_path, "test")
-
-
-def test_resolve_relative_path_backslash_rejected_batch39(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("a\\b.pdf", tmp_path, "test")
 
 
 def test_resolve_relative_path_empty_rejected_batch39(tmp_path):
@@ -800,31 +791,6 @@ def test_module_source_contains_load_manifest_function_batch39():
 def test_module_source_contains_detect_project_root_function_batch39():
     src = inspect.getsource(mmod)
     assert "def _detect_project_root(" in src
-
-
-def test_module_source_contains_file_count_property_batch39():
-    src = inspect.getsource(mmod)
-    assert "def file_count(" in src
-
-
-def test_module_source_contains_pdf_count_property_batch39():
-    src = inspect.getsource(mmod)
-    assert "def pdf_count(" in src
-
-
-def test_module_source_contains_docx_count_property_batch39():
-    src = inspect.getsource(mmod)
-    assert "def docx_count(" in src
-
-
-def test_module_source_contains_content_group_count_property_batch39():
-    src = inspect.getsource(mmod)
-    assert "def content_group_count(" in src
-
-
-def test_module_source_contains_categories_covered_property_batch39():
-    src = inspect.getsource(mmod)
-    assert "def categories_covered(" in src
 
 
 def test_module_source_contains_future_annotations_batch39():

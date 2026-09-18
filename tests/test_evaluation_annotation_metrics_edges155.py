@@ -149,11 +149,6 @@ def test_w59_tol88_hit_batch487(tmp_path):
 
 # ---------- HEAD before d 80 跨 mc 不变 ----------
 
-def test_head_before_tol79_miss_batch487(tmp_path):
-    assert _prf(_doc(tmp_path), [(HEAD, "before")],
-                79) == ZERO
-
-
 def test_head_before_tol80_hit_batch487(tmp_path):
     assert _prf(_doc(tmp_path), [(HEAD, "before")],
                 80) == ONE5

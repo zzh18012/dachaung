@@ -716,11 +716,6 @@ def test_module_source_no_numpy_import_batch23():
     assert "import numpy" not in src
 
 
-def test_module_source_no_csv_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import csv" not in src
-
-
 # ---------- module source 字符串精确补强第三十五批 ----------
 
 
@@ -769,25 +764,9 @@ def test_module_source_has_schema_import_batch23():
     assert "from evaluation.schema import EvalSchemaError, validate_file" in src
 
 
-def test_module_source_has_main_function_batch23():
-    src = inspect.getsource(climod)
-    assert "def main(argv:" in src
-
-
 def test_module_source_has_build_parser_function_batch23():
     src = inspect.getsource(climod)
     assert "def _build_parser()" in src
-
-
-def test_module_source_has_main_guard_batch23():
-    src = inspect.getsource(climod)
-    assert 'if __name__ ==' in src
-    assert "__main__" in src
-
-
-def test_module_source_has_raw_description_help_formatter_batch23():
-    src = inspect.getsource(climod)
-    assert "RawDescriptionHelpFormatter" in src
 
 
 # ---------- signatures 第三十五批 ----------
@@ -813,12 +792,6 @@ def test_signature_main_returns_int_annotation_batch23():
 def test_signature_format_metric_returns_str_batch23():
     sig = inspect.signature(_format_metric)
     assert "str" in str(sig.return_annotation)
-
-
-def test_signature_run_inspect_doc_params_batch23():
-    sig = inspect.signature(_run_inspect_doc)
-    names = list(sig.parameters.keys())
-    assert names == ["args"]
 
 
 def test_signature_run_inspect_doc_returns_int_annotation_batch23():
@@ -871,24 +844,6 @@ def test_module_does_not_import_evaluation_annotation_metrics_top_level_batch23(
             pytest.fail("evaluation.annotation_metrics 不应在顶层 import")
 
 
-def test_module_does_not_import_app_pipeline_batch23():
-    src = inspect.getsource(climod)
-    assert "from app.pipeline" not in src
-    assert "from app import pipeline" not in src
-
-
-def test_module_does_not_import_app_chunkers_batch23():
-    src = inspect.getsource(climod)
-    assert "from app.chunkers" not in src
-    assert "from app import chunkers" not in src
-
-
-def test_module_does_not_import_app_parsers_batch23():
-    src = inspect.getsource(climod)
-    assert "from app.parsers" not in src
-    assert "from app import parsers" not in src
-
-
 def test_module_constants_not_exposed_batch23():
     """FORBIDDEN / private 常量不应被 export。"""
     assert not hasattr(climod, "FORBIDDEN_TOKENS")
@@ -904,10 +859,6 @@ def test_module_build_parser_is_private_batch23():
 
 def test_module_format_metric_is_private_batch23():
     assert _format_metric.__name__.startswith("_")
-
-
-def test_module_main_is_public_batch23():
-    assert not main.__name__.startswith("_")
 
 
 # ---------- 端到端集成第三十五批 ----------

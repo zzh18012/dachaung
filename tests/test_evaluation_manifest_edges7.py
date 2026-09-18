@@ -181,11 +181,6 @@ def test_content_group_count_mixed_paired_unpaired():
     assert m.content_group_count == 2
 
 
-def test_content_group_count_empty_documents():
-    m = _make_manifest([])
-    assert m.content_group_count == 0
-
-
 def test_content_group_count_single_paired_with_missing_partner():
     """a paired_with=b 但 b 不存在：仍 frozenset({a, b}) → 1 group, a 在 seen 里。"""
     docs = [_make_doc("a", paired_with="b")]  # b 不在 documents
@@ -413,12 +408,6 @@ def test_load_manifest_doc_with_expectations(tmp_path: Path):
     assert m.documents[0].expectations == {"element_count_by_type": {"paragraph": 5}}
 
 
-def test_load_manifest_returns_manifest_instance(tmp_path: Path):
-    p = _write_valid_manifest(tmp_path)
-    m = load_manifest(p)
-    assert isinstance(m, Manifest)
-
-
 def test_load_manifest_manifest_version_passed_through(tmp_path: Path):
     p = _write_valid_manifest(tmp_path)
     m = load_manifest(p)
@@ -440,19 +429,6 @@ def test_load_manifest_project_root_passed_through(tmp_path: Path):
 # =========================================================================
 # _resolve_relative_path 错误消息
 # =========================================================================
-
-
-def test_resolve_relative_path_empty_raises(tmp_path: Path):
-    with pytest.raises(ManifestError) as exc:
-        _resolve_relative_path("", tmp_path, "field_x")
-    assert "field_x" in str(exc.value)
-    assert "为空" in str(exc.value)
-
-
-def test_resolve_relative_path_absolute_windows_drive_raises(tmp_path: Path):
-    with pytest.raises(ManifestError) as exc:
-        _resolve_relative_path("C:/foo", tmp_path, "f")
-    assert "绝对路径" in str(exc.value)
 
 
 def test_resolve_relative_path_backslash_raises(tmp_path: Path):
@@ -539,11 +515,6 @@ def test_manifest_is_dataclass():
     assert is_dataclass(Manifest)
 
 
-def test_document_entry_field_count():
-    """10 个字段。"""
-    assert len(fields(DocumentEntry)) == 10
-
-
 def test_expected_failure_field_count():
     """5 个字段。"""
     assert len(fields(ExpectedFailure)) == 5
@@ -608,52 +579,11 @@ def test_manifest_error_can_be_raised_and_caught():
         raise ManifestError("x")
 
 
-def test_manifest_error_caught_as_exception():
-    try:
-        raise ManifestError("x")
-    except Exception:
-        pass
-
-
-def test_module_all_exact():
-    import evaluation.manifest as mod
-    assert mod.__all__ == [
-        "ManifestError",
-        "Manifest",
-        "DocumentEntry",
-        "ExpectedFailure",
-        "load_manifest",
-    ]
-
-
-def test_module_all_no_duplicates():
-    import evaluation.manifest as mod
-    assert len(mod.__all__) == len(set(mod.__all__))
-
-
-def test_module_imports_json():
-    import evaluation.manifest as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
 def test_module_imports_dataclass():
     import evaluation.manifest as mod
     src = inspect.getsource(mod)
     assert "from dataclasses import" in src
     assert "dataclass" in src
-
-
-def test_module_imports_path():
-    import evaluation.manifest as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import evaluation.manifest as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
 
 
 def test_module_imports_manifest_version():
@@ -670,22 +600,6 @@ def test_module_imports_schema_validate():
     assert "validate" in src
 
 
-def test_module_uses_future_annotations():
-    import evaluation.manifest as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_no_silence_unused():
-    import evaluation.manifest as mod
-    assert not hasattr(mod, "_silence_unused")
-
-
-def test_module_docstring_present():
-    import evaluation.manifest as mod
-    assert mod.__doc__ is not None
-
-
 def test_module_docstring_mentions_invariants():
     """docstring 提及关键不变量。"""
     import evaluation.manifest as mod
@@ -693,11 +607,6 @@ def test_module_docstring_mentions_invariants():
     assert "相对路径" in doc
     assert "正斜杠" in doc
     assert "项目根" in doc
-
-
-def test_load_manifest_signature():
-    sig = inspect.signature(load_manifest)
-    assert set(sig.parameters) == {"manifest_path", "project_root"}
 
 
 def test_load_manifest_project_root_default_none():

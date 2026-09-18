@@ -846,13 +846,6 @@ def test_emit_structured_error_extra_none_value(capsys, tmp_path: Path):
     assert data["errors"][0]["val"] is None
 
 
-def test_emit_structured_error_extra_bool_value(capsys, tmp_path: Path):
-    _emit_structured_error(tmp_path / "x", "code", "msg", flag=True)
-    captured = capsys.readouterr()
-    data = json.loads(captured.err)
-    assert data["errors"][0]["flag"] is True
-
-
 def test_emit_structured_error_extra_path_value_raises(capsys, tmp_path: Path):
     """Path 不可 JSON 序列化 → json.dumps 抛 TypeError。"""
     with pytest.raises(TypeError):
@@ -1134,10 +1127,6 @@ def test_module_has_no_all():
     assert not hasattr(cli_mod, "__all__") or cli_mod.__all__ is None
 
 
-def test_module_extension_to_parser_is_dict():
-    assert isinstance(_EXTENSION_TO_PARSER, dict)
-
-
 def test_module_extension_to_parser_count_nine():
     assert len(_EXTENSION_TO_PARSER) == 9
 
@@ -1186,10 +1175,6 @@ def test_preview_returns_str_for_none():
 
 def test_preview_returns_str_for_empty():
     assert isinstance(_preview(""), str)
-
-
-def test_preview_returns_str_for_text():
-    assert isinstance(_preview("hello"), str)
 
 
 def test_preview_width_60_exact_no_truncation():
@@ -1271,10 +1256,6 @@ def test_module_main_callable():
     assert callable(cli_mod.main)
 
 
-def test_module_build_arg_parser_callable():
-    assert callable(_build_arg_parser)
-
-
 def test_module_run_parse_callable():
     assert callable(_run_parse)
 
@@ -1301,19 +1282,3 @@ def test_module_format_elements_list_callable():
 
 def test_module_format_chunks_list_callable():
     assert callable(_format_chunks_list)
-
-
-def test_module_emit_structured_error_callable():
-    assert callable(_emit_structured_error)
-
-
-def test_module_infer_parser_name_callable():
-    assert callable(_infer_parser_name)
-
-
-def test_module_iter_supported_files_callable():
-    assert callable(_iter_supported_files)
-
-
-def test_module_relative_output_path_callable():
-    assert callable(_relative_output_path)

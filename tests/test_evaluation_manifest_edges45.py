@@ -247,22 +247,10 @@ def _mk_manifest():
     )
 
 
-def test_manifest_is_frozen_batch18():
-    m = _mk_manifest()
-    with pytest.raises(FrozenInstanceError):
-        m.devset_status = "complete"  # type: ignore[misc]
-
-
 def test_manifest_is_hashable_batch18():
     m = _mk_manifest()
     # tuple fields are hashable; Path is hashable; str is hashable
     assert hash(m) is not None
-
-
-def test_manifest_equality_batch18():
-    m1 = _mk_manifest()
-    m2 = _mk_manifest()
-    assert m1 == m2
 
 
 def test_manifest_field_count_batch18():
@@ -274,16 +262,6 @@ def test_manifest_field_names_batch18():
     names = [f.name for f in fields(Manifest)]
     assert names == ["manifest_version", "devset_status", "documents",
                      "expected_failures", "project_root"]
-
-
-def test_manifest_documents_is_tuple_batch18():
-    m = _mk_manifest()
-    assert isinstance(m.documents, tuple)
-
-
-def test_manifest_expected_failures_is_tuple_batch18():
-    m = _mk_manifest()
-    assert isinstance(m.expected_failures, tuple)
 
 
 # ---------- Manifest properties 第十八批 ----------

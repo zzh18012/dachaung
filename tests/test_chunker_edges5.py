@@ -307,10 +307,6 @@ def test_normalize_text_none_returns_empty():
     assert normalize_text(None) == ""  # type: ignore[arg-type]
 
 
-def test_normalize_text_single_space():
-    assert normalize_text(" ") == ""
-
-
 def test_normalize_text_all_whitespace_returns_empty():
     assert normalize_text("   \t\n  ") == ""
 

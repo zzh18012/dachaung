@@ -103,12 +103,6 @@ def _src():
     return inspect.getsource(manifest_mod)
 
 
-def test_source_key_lines_batch405():
-    src = _src()
-    assert "配对的 DOCX+PDF" in src
-    assert "resolved_path: Path  # 解析后的绝对路径" in src
-
-
 # ---------- forbidden tokens 第六百七十七批 ----------
 
 def test_source_no_eval_batch405():

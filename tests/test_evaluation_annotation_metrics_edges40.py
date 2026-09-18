@@ -418,16 +418,6 @@ def test_annotation_metrics_source_no_re_module_batch13():
     assert "re." not in source
 
 
-def test_annotation_metrics_source_no_compile_batch13():
-    source = inspect.getsource(amod)
-    assert "compile(" not in source
-
-
-def test_annotation_metrics_source_no_global_keyword_batch13():
-    source = inspect.getsource(amod)
-    assert "\nglobal " not in source
-
-
 def test_annotation_metrics_source_no_nonlocal_batch13():
     source = inspect.getsource(amod)
     assert "nonlocal " not in source
@@ -448,16 +438,6 @@ def test_annotation_metrics_source_no_assert_batch13():
 def test_annotation_metrics_source_no_print_batch13():
     source = inspect.getsource(amod)
     assert "print(" not in source
-
-
-def test_annotation_metrics_source_no_input_function_batch13():
-    source = inspect.getsource(amod)
-    assert "input(" not in source
-
-
-def test_annotation_metrics_source_no_class_definition_batch13():
-    source = inspect.getsource(amod)
-    assert "\nclass " not in source
 
 
 def test_annotation_metrics_source_no_open_call_at_top_level_batch13():
@@ -663,11 +643,6 @@ def test_functions_no_varargs_batch13():
                 _insp.Parameter.VAR_POSITIONAL,
                 _insp.Parameter.VAR_KEYWORD,
             )
-
-
-def test_functions_callable_batch13():
-    assert callable(figure_caption_prf)
-    assert callable(chunk_boundary_prf)
 
 
 # ---------- module 合理性第十三批 ----------

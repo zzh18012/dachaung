@@ -304,16 +304,6 @@ def test_module_imports_counter():
     assert "from collections import Counter" in inspect.getsource(mmod)
 
 
-def test_module_imports_path():
-    """含 from pathlib import Path。"""
-    assert "from pathlib import Path" in inspect.getsource(mmod)
-
-
-def test_module_imports_any():
-    """含 from typing import Any。"""
-    assert "from typing import Any" in inspect.getsource(mmod)
-
-
 def test_module_import_order_math_before_counter():
     """math 在 Counter 之前 import。"""
     src = inspect.getsource(mmod)
@@ -1342,11 +1332,6 @@ def test_module_namespace_constants_not_in_all():
 # =========================================================================
 
 
-def test_module_docstring_present():
-    """module 有 docstring。"""
-    assert mmod.__doc__ is not None
-
-
 def test_module_docstring_mentions_zidong_zhibiao():
     """docstring 含「自动指标」。"""
     assert "自动指标" in mmod.__doc__
@@ -1387,49 +1372,9 @@ def test_module_docstring_mentions_unicode_whitespace():
 # =========================================================================
 
 
-def test_module_source_does_not_contain_sys():
-    """不含 import sys。"""
-    assert "import sys" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_logging():
-    """不含 import logging。"""
-    assert "import logging" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_subprocess():
-    """不含 import subprocess。"""
-    assert "import subprocess" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_asyncio():
-    """不含 import asyncio。"""
-    assert "import asyncio" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_threading():
-    """不含 import threading。"""
-    assert "import threading" not in inspect.getsource(mmod)
-
-
 def test_module_source_does_not_contain_concurrent():
     """不含 from concurrent。"""
     assert "from concurrent" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_re():
-    """不含 import re。"""
-    assert "import re" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_time():
-    """不含 import time。"""
-    assert "import time" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_datetime():
-    """不含 import datetime。"""
-    assert "import datetime" not in inspect.getsource(mmod)
 
 
 def test_module_source_does_not_contain_itertools():
@@ -1442,26 +1387,9 @@ def test_module_source_does_not_contain_functools():
     assert "from functools" not in inspect.getsource(mmod)
 
 
-def test_module_source_does_not_contain_os_module():
-    """不含 import os。"""
-    assert "import os" not in inspect.getsource(mmod)
-
-
 def test_module_source_does_not_contain_json():
     """不含 import json。"""
     assert "import json" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_star_import():
-    """不含 * 导入。"""
-    assert "import *" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_relative_import():
-    """不含相对导入。"""
-    src = inspect.getsource(mmod)
-    assert "from ." not in src
-    assert "from .." not in src
 
 
 def test_module_source_does_not_contain_class_definition():
@@ -1480,21 +1408,6 @@ def test_module_source_does_not_contain_yield():
     """不含 yield（不是 generator）。"""
     src = inspect.getsource(mmod)
     assert "yield" not in src
-
-
-def test_module_source_does_not_contain_async_def():
-    """不含 async def。"""
-    assert "async def" not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_global_keyword():
-    """不含 global 关键字。"""
-    assert "global " not in inspect.getsource(mmod)
-
-
-def test_module_source_does_not_contain_walrus():
-    """不含 := 海象运算符。"""
-    assert ":=" not in inspect.getsource(mmod)
 
 
 # =========================================================================

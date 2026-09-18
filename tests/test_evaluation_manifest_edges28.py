@@ -172,23 +172,6 @@ def test_document_entry_can_be_set_key():
     assert de in s
 
 
-def test_document_entry_frozen_attribute_set_raises():
-    de = DocumentEntry(
-        doc_id="d1",
-        path_str="a/b.pdf",
-        resolved_path=Path("/tmp/a/b.pdf"),
-        source_type="pdf",
-        sha256=None,
-        categories=(),
-        paired_with=None,
-        annotation_file_str=None,
-        annotation_resolved=None,
-        expectations=None,
-    )
-    with pytest.raises(FrozenInstanceError):
-        de.doc_id = "x"
-
-
 def test_document_entry_equality_full():
     a = DocumentEntry(
         doc_id="d1", path_str="a/b.pdf",
@@ -441,15 +424,6 @@ def test_content_group_count_one_unpaired_doc_only():
         project_root=Path("/tmp"),
     )
     assert mf.content_group_count == 1
-
-
-def test_content_group_count_zero_documents():
-    mf = Manifest(
-        manifest_version="1.0", devset_status="incomplete",
-        documents=(), expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    assert mf.content_group_count == 0
 
 
 def test_content_group_count_returns_int():

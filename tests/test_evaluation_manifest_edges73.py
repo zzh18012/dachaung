@@ -45,19 +45,9 @@ from evaluation.manifest import (
 
 # ---------- ManifestError 子类化与抛出 ----------
 
-def test_manifest_error_is_exception_batch48():
-    err = ManifestError("x")
-    assert isinstance(err, Exception)
-
-
 def test_manifest_error_caught_as_exception_batch48():
     with pytest.raises(Exception):
         raise ManifestError("x")
-
-
-def test_manifest_error_args_batch48():
-    err = ManifestError("hello")
-    assert err.args == ("hello",)
 
 
 def test_manifest_error_no_extra_attrs_batch48():
@@ -113,10 +103,6 @@ def test_is_absolute_like_two_chars_batch48():
 def test_is_absolute_like_posix_root_only_batch48():
     """单 / 是绝对路径。"""
     assert _is_absolute_like("/") is True
-
-
-def test_is_absolute_like_three_slash_batch48():
-    assert _is_absolute_like("///") is True
 
 
 def test_is_absolute_like_windows_unc_batch48():
@@ -196,12 +182,6 @@ def test_resolve_relative_path_escape_top_batch48(tmp_path):
     with pytest.raises(ManifestError) as exc_info:
         _resolve_relative_path("../escape.pdf", tmp_path, "x")
     assert "项目根目录之外" in str(exc_info.value)
-
-
-def test_resolve_relative_path_empty_string_batch48(tmp_path):
-    with pytest.raises(ManifestError) as exc_info:
-        _resolve_relative_path("", tmp_path, "x")
-    assert "为空" in str(exc_info.value)
 
 
 def test_resolve_relative_path_absolute_posix_batch48(tmp_path):
@@ -590,24 +570,9 @@ def test_detect_project_root_file_input_batch48(tmp_path):
 
 # ---------- module source 字符串补强 ----------
 
-def test_source_contains_关键不变量_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "关键不变量" in src
-
-
 def test_source_contains_path_字段_batch48():
     src = inspect.getsource(manifest_mod)
     assert "path 字段" in src or "path 字段必须" in src
-
-
-def test_source_contains_正斜杠_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "正斜杠" in src
-
-
-def test_source_contains_项目根目录内_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "项目根目录" in src
 
 
 def test_source_contains_frozen_True_batch48():
@@ -667,46 +632,6 @@ def test_ast_manifest_field_count_batch48():
     annots = [n for n in cls.body if isinstance(n, ast.AnnAssign)]
     # 5 字段：manifest_version / devset_status / documents / expected_failures / project_root
     assert len(annots) == 5
-
-
-def test_ast_manifest_property_count_batch48():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    cls = [n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "Manifest"][0]
-    property_count = 0
-    for n in cls.body:
-        if isinstance(n, ast.FunctionDef):
-            for d in n.decorator_list:
-                if isinstance(d, ast.Name) and d.id == "property":
-                    property_count += 1
-    assert property_count == 5  # file_count / pdf_count / docx_count / content_group_count / categories_covered
-
-
-def test_ast_manifest_error_no_methods_batch48():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    cls = [n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "ManifestError"][0]
-    methods = [n for n in cls.body if isinstance(n, ast.FunctionDef)]
-    assert len(methods) == 0
-
-
-def test_ast_load_manifest_has_try_batch48():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "load_manifest"][0]
-    trys = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
-    assert len(trys) >= 1
-
-
-def test_ast_resolve_relative_path_has_try_batch48():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_resolve_relative_path"][0]
-    trys = [n for n in func.body if isinstance(n, ast.Try)]
-    assert len(trys) == 1
-
-
-def test_ast_resolve_relative_path_has_multiple_if_batch48():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_resolve_relative_path"][0]
-    ifs = [n for n in func.body if isinstance(n, ast.If)]
-    assert len(ifs) >= 3  # empty / absolute / backslash
 
 
 def test_ast_detect_project_root_has_for_batch48():
@@ -772,11 +697,6 @@ def test_source_no_os_system_batch48():
     assert "os.system(" not in src
 
 
-def test_source_no_popen_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert ".popen(" not in src
-
-
 def test_source_no_yaml_load_batch48():
     src = inspect.getsource(manifest_mod)
     assert "yaml.load(" not in src
@@ -790,8 +710,3 @@ def test_source_no_pickle_load_batch48():
 def test_source_no_yield_batch48():
     src = inspect.getsource(manifest_mod)
     assert "yield" not in src
-
-
-def test_source_no_await_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "await " not in src

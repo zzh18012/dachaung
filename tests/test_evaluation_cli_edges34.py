@@ -122,15 +122,6 @@ def test_namespace_run_tolerance_chars_default_30():
     assert ns.tolerance_chars == 30
 
 
-def test_namespace_run_with_kreuzberg_choice():
-    p = _build_parser()
-    ns = p.parse_args([
-        "run", "--manifest", "a.json", "--output", "b.json",
-        "--parser", "kreuzberg",
-    ])
-    assert ns.parser == "kreuzberg"
-
-
 def test_namespace_run_with_custom_max_chars():
     p = _build_parser()
     ns = p.parse_args([

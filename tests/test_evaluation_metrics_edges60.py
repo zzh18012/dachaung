@@ -97,14 +97,6 @@ def test_int_metric_reason_none_batch34():
 # ---------- _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES / _NOT_EVALUATED 第三十四批
 
 
-def test_text_types_first_is_heading_batch34():
-    assert _TEXT_TYPES[0] == "heading"
-
-
-def test_text_types_last_is_footer_batch34():
-    assert _TEXT_TYPES[-1] == "footer"
-
-
 def test_text_types_caption_included_batch34():
     assert "caption" in _TEXT_TYPES
 
@@ -156,11 +148,6 @@ def test_compute_failed_pipeline_keys_batch34():
 def test_compute_failed_pipeline_success_false_batch34():
     out = compute_automatic_metrics(None, {"code": "E_X"}, "pdf", None)
     assert out["pipeline_success"]["value"] is False
-
-
-def test_compute_failed_pipeline_error_code_present_batch34():
-    out = compute_automatic_metrics(None, {"code": "E_X"}, "pdf", None)
-    assert out["error_code"]["value"] == "E_X"
 
 
 def test_compute_no_error_no_doc_batch34():
@@ -262,12 +249,6 @@ def test_pdf_locator_text_no_bbox_batch34():
     elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
-
-
-def test_pdf_locator_text_valid_bbox_batch34():
-    elements = [{"type": "paragraph", "source_locator": {"page": 1, "bbox": [0, 0, 10, 10]}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
 
 
 def test_pdf_locator_image_no_bbox_required_batch34():

@@ -76,10 +76,6 @@ def test_is_absolute_like_tab_prefix_batch17():
     assert _is_absolute_like("\t/foo") is False
 
 
-def test_is_absolute_like_newline_prefix_batch17():
-    assert _is_absolute_like("\n/foo") is False
-
-
 def test_is_absolute_like_emoji_alpha_batch17():
     """首字符是 emoji（isalpha() False）→ 不是盘符。"""
     assert _is_absolute_like("🎉:/foo") is False
@@ -152,11 +148,6 @@ def test_resolve_relative_path_dot_dot_batch17(tmp_path):
         _resolve_relative_path("../escape.pdf", tmp_path, "test")
 
 
-def test_resolve_relative_path_dot_dot_chain_batch17(tmp_path):
-    with pytest.raises(ManifestError, match="项目根目录之外"):
-        _resolve_relative_path("../../etc/passwd", tmp_path, "test")
-
-
 def test_resolve_relative_path_empty_batch17(tmp_path):
     with pytest.raises(ManifestError, match="为空"):
         _resolve_relative_path("", tmp_path, "test")
@@ -165,11 +156,6 @@ def test_resolve_relative_path_empty_batch17(tmp_path):
 def test_resolve_relative_path_absolute_batch17(tmp_path):
     with pytest.raises(ManifestError, match="绝对路径"):
         _resolve_relative_path("/etc/passwd", tmp_path, "test")
-
-
-def test_resolve_relative_path_backslash_batch17(tmp_path):
-    with pytest.raises(ManifestError, match="反斜杠"):
-        _resolve_relative_path("a\\b.pdf", tmp_path, "test")
 
 
 def test_resolve_relative_path_field_name_in_message_batch17(tmp_path):
@@ -460,17 +446,6 @@ def _mk_ef(doc_id="bad1", expected_error_code="unsupported_format"):
     )
 
 
-def test_expected_failure_source_type_none_batch17():
-    ef = _mk_ef()
-    assert ef.source_type is None
-
-
-def test_expected_failure_frozen_batch17():
-    ef = _mk_ef()
-    with pytest.raises(FrozenInstanceError):
-        ef.doc_id = "x"  # type: ignore
-
-
 def test_expected_failure_hashable_batch17():
     ef = _mk_ef()
     assert isinstance(hash(ef), int)
@@ -523,16 +498,6 @@ def test_load_manifest_explicit_project_root_batch17(tmp_path):
     }), encoding="utf-8")
     m = load_manifest(p, project_root=tmp_path)
     assert m.project_root == tmp_path.resolve()
-
-
-def test_load_manifest_returns_manifest_batch17(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps({
-        "manifest_version": "1.0", "devset_status": "incomplete",
-        "documents": [], "expected_failures": [],
-    }), encoding="utf-8")
-    m = load_manifest(p, project_root=tmp_path)
-    assert isinstance(m, Manifest)
 
 
 def test_load_manifest_with_documents_batch17(tmp_path):
@@ -652,12 +617,6 @@ def test_module_source_has_manifest_error_class_batch17():
     assert "class ManifestError(Exception):" in src
 
 
-def test_module_source_has_document_entry_class_batch17():
-    src = inspect.getsource(mmod)
-    assert "@dataclass(frozen=True)" in src
-    assert "class DocumentEntry" in src
-
-
 def test_module_source_has_expected_failure_class_batch17():
     src = inspect.getsource(mmod)
     assert "class ExpectedFailure" in src
@@ -764,18 +723,6 @@ def test_module_all_count_5_batch17():
 def test_module_manifest_error_is_class_batch17():
     assert isinstance(ManifestError, type)
     assert issubclass(ManifestError, Exception)
-
-
-def test_module_manifest_is_class_batch17():
-    assert isinstance(Manifest, type)
-
-
-def test_module_document_entry_is_class_batch17():
-    assert isinstance(DocumentEntry, type)
-
-
-def test_module_expected_failure_is_class_batch17():
-    assert isinstance(ExpectedFailure, type)
 
 
 def test_module_load_manifest_callable_batch17():

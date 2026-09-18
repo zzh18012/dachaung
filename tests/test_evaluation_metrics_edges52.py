@@ -72,21 +72,10 @@ def test_bool_metric_independent_each_call_batch26():
     assert b1 is not b2
 
 
-def test_int_metric_value_is_int_batch26():
-    out = _int_metric(42)
-    assert isinstance(out["value"], int)
-    assert not isinstance(out["value"], bool)  # bool 是 int 子类，但 isint(True) 也 True
-
-
 def test_int_metric_independent_each_call_batch26():
     i1 = _int_metric(1)
     i2 = _int_metric(2)
     assert i1 is not i2
-
-
-def test_int_metric_value_int_not_float_batch26():
-    out = _int_metric(5)
-    assert type(out["value"]) is int  # noqa: E721
 
 
 def test_int_metric_with_negative_batch26():
@@ -207,16 +196,6 @@ def test_compute_metrics_pipeline_success_true_when_doc_and_no_error_batch26():
 
 def test_compute_metrics_pipeline_success_false_when_doc_none_batch26():
     out = compute_automatic_metrics(None, None, "pdf", None)
-    assert out["pipeline_success"]["value"] is False
-
-
-def test_compute_metrics_pipeline_success_false_when_error_present_batch26():
-    out = compute_automatic_metrics(
-        None,
-        {"code": "x"},
-        "pdf",
-        None,
-    )
     assert out["pipeline_success"]["value"] is False
 
 

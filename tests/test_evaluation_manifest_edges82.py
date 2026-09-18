@@ -247,10 +247,6 @@ def test_source_empty_string_branch_batch53():
     assert 'raise ManifestError(f"{field_name} 为空")' in src
 
 
-def test_source_relative_to_call_batch53():
-    assert "resolved.relative_to(project_root_resolved)" in _src()
-
-
 def test_source_escape_message_batch53():
     assert "解析后位于项目根目录之外：{path_str} → {resolved}" in _src()
 

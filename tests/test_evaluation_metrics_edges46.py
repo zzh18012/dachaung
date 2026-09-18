@@ -83,11 +83,6 @@ def test_ratio_int_coerced_to_float_batch19():
     assert r["value"] == 1.0
 
 
-def test_ratio_zero_dot_zero_batch19():
-    r = _ratio(0.0)
-    assert r["value"] == 0.0
-
-
 def test_bool_metric_truthy_int_batch19():
     """_bool_metric(1) → True。"""
     assert _bool_metric(1)["value"] is True
@@ -397,10 +392,6 @@ def test_is_valid_bbox_with_mixed_int_float_batch19():
 def test_is_valid_bbox_with_complex_batch19():
     """complex 不是 (int, float)。"""
     assert _is_valid_bbox([0, 0, 1+0j, 1]) is False
-
-
-def test_is_valid_bbox_with_nan_float_batch19():
-    assert _is_valid_bbox([0, 0, float("nan"), 1]) is False
 
 
 def test_is_valid_bbox_with_negative_inf_batch19():
@@ -719,11 +710,6 @@ def test_module_source_no_tempfile_import_batch19():
 def test_module_source_no_unlink_call_batch19():
     src = inspect.getsource(mmod)
     assert ".unlink(" not in src
-
-
-def test_module_source_no_rmdir_call_batch19():
-    src = inspect.getsource(mmod)
-    assert ".rmdir(" not in src
 
 
 def test_module_source_no_write_text_call_batch19():

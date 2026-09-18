@@ -57,11 +57,6 @@ def test_module_imports_any():
     assert hasattr(m, "Any")
 
 
-def test_module_imports_normalize_text():
-    import evaluation.annotation_metrics as m
-    assert hasattr(m, "normalize_text")
-
-
 def test_module_docstring_present():
     import evaluation.annotation_metrics as m
     assert m.__doc__ is not None
@@ -193,11 +188,6 @@ def test_figure_caption_prf_does_not_mutate_input():
 # =========================================================================
 # chunk_boundary_prf 签名
 # =========================================================================
-
-
-def test_chunk_boundary_prf_tolerance_is_positional_or_keyword():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["tolerance_chars"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_chunk_boundary_prf_tolerance_default_30():
