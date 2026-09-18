@@ -79,10 +79,6 @@ def test_text_types_does_not_contain_image():
     assert "image" not in _TEXT_TYPES
 
 
-def test_text_types_no_duplicates():
-    assert len(set(_TEXT_TYPES)) == len(_TEXT_TYPES)
-
-
 def test_pdf_bbox_required_types_is_tuple():
     assert isinstance(_PDF_BBOX_REQUIRED_TYPES, tuple)
 
@@ -95,10 +91,6 @@ def test_pdf_bbox_required_types_exact_contents():
 
 def test_pdf_bbox_required_types_length_is_four():
     assert len(_PDF_BBOX_REQUIRED_TYPES) == 4
-
-
-def test_pdf_bbox_required_types_no_duplicates():
-    assert len(set(_PDF_BBOX_REQUIRED_TYPES)) == len(_PDF_BBOX_REQUIRED_TYPES)
 
 
 def test_pdf_bbox_required_types_subset_of_text_types():
@@ -116,30 +108,15 @@ def test_null_signature():
     assert params == ["reason"]
 
 
-def test_null_return_annotation_is_dict_str_any():
-    sig = inspect.signature(_null)
-    # from __future__ import annotations → 字符串
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_null_keys_exact():
     m = _null("r")
     assert set(m.keys()) == {"value", "reason"}
-
-
-def test_null_value_is_none():
-    assert _null("any")["value"] is None
 
 
 def test_ratio_signature():
     sig = inspect.signature(_ratio)
     params = list(sig.parameters)
     assert params == ["value"]
-
-
-def test_ratio_return_annotation_is_dict_str_any():
-    sig = inspect.signature(_ratio)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_ratio_negative_value_returned_as_is():
@@ -157,16 +134,6 @@ def test_bool_metric_signature():
     sig = inspect.signature(_bool_metric)
     params = list(sig.parameters)
     assert params == ["value"]
-
-
-def test_bool_metric_coerces_int_zero_to_false():
-    m = _bool_metric(0)
-    assert m["value"] is False
-
-
-def test_bool_metric_coerces_empty_string_to_false():
-    m = _bool_metric("")
-    assert m["value"] is False
 
 
 def test_bool_metric_coerces_nonempty_string_to_true():
@@ -272,10 +239,6 @@ def test_is_valid_bbox_with_true_bool():
 
 def test_is_valid_bbox_with_false_bool():
     assert _is_valid_bbox([1, 2, 3, False]) is False
-
-
-def test_is_valid_bbox_with_all_bools():
-    assert _is_valid_bbox([True, False, True, False]) is False
 
 
 def test_is_valid_bbox_with_nan():
@@ -434,12 +397,6 @@ def test_docx_locator_ratio_signature():
     sig = inspect.signature(_docx_locator_ratio)
     params = list(sig.parameters)
     assert params == ["elements"]
-
-
-def test_docx_locator_ratio_empty_list():
-    m = _docx_locator_ratio([])
-    assert m["value"] is None
-    assert m["reason"] == "no_elements"
 
 
 def test_docx_locator_ratio_section_only_valid():
@@ -1249,21 +1206,6 @@ def test_compute_automatic_metrics_image_base_dir_param_used(tmp_path):
 def test_module_all_exact():
     import evaluation.metrics as m
     assert set(m.__all__) == {"compute_automatic_metrics"}
-
-
-def test_module_all_is_list():
-    import evaluation.metrics as m
-    assert isinstance(m.__all__, list)
-
-
-def test_module_imports_math():
-    import evaluation.metrics as m
-    assert hasattr(m, "math")
-
-
-def test_module_imports_path():
-    import evaluation.metrics as m
-    assert hasattr(m, "Path")
 
 
 def test_module_docstring_present():

@@ -585,19 +585,9 @@ def test_module_source_contains_not_instrumented_batch35():
     assert '"not_instrumented"' in src
 
 
-def test_module_source_contains_per_doc_dir_batch35():
-    src = inspect.getsource(rmod)
-    assert '"_per_doc"' in src
-
-
 def test_module_source_contains_perf_counter_call_batch35():
     src = inspect.getsource(rmod)
     assert "time.perf_counter" in src
-
-
-def test_module_source_contains_json_dump_call_batch35():
-    src = inspect.getsource(rmod)
-    assert "json.dump(report" in src
 
 
 def test_module_source_contains_ensure_ascii_false_batch35():

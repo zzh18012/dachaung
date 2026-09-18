@@ -524,11 +524,6 @@ def test_module_source_contains_run_inspect_doc_func_batch32():
     assert "def _run_inspect_doc(" in src
 
 
-def test_module_source_contains_reconfigure_call_batch32():
-    src = inspect.getsource(cmod)
-    assert "sys.stdout.reconfigure" in src
-
-
 def test_module_source_contains_subparsers_batch32():
     src = inspect.getsource(cmod)
     assert "add_subparsers" in src

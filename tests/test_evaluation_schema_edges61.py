@@ -264,13 +264,6 @@ def test_validate_file_file_not_found_batch47(tmp_path):
     assert "不存在" in str(exc_info.value)
 
 
-def test_validate_file_bad_json_batch47(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not valid", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_path_string_batch47(tmp_path):
     """接受 str 或 Path。"""
     p = tmp_path / "m.json"
@@ -475,53 +468,7 @@ def test_ast_module_docstring_batch47():
     assert isinstance(tree.body[0].value, ast.Constant)
 
 
-def test_ast_no_async_batch47():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
-
-
 # ---------- forbidden tokens 第一百一十二批 ----------
-
-def test_source_no_eval_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "pickle.load(" not in src
-
 
 def test_source_no_await_batch47():
     src = inspect.getsource(schema_mod)

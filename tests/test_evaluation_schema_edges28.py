@@ -478,12 +478,6 @@ def test_schema_path_does_not_read_file_content():
     assert p.is_file()
 
 
-def test_schema_path_error_includes_path_str():
-    with pytest.raises(FileNotFoundError) as exc_info:
-        _schema_path("nonexistent.schema.json")
-    assert "nonexistent.schema.json" in str(exc_info.value)
-
-
 # ---------- SCHEMAS_DIR 常量深度第八批 ----------
 
 
@@ -694,10 +688,6 @@ def test_module_source_docstring_present():
     assert len(smod.__doc__) > 30
 
 
-def test_module_source_docstring_mentions_schema():
-    assert "Schema" in smod.__doc__ or "schema" in smod.__doc__.lower()
-
-
 def test_module_source_no_hardcoded_absolute_path():
     source = inspect.getsource(smod)
     assert "C:\\\\Users" not in source
@@ -813,10 +803,6 @@ def test_module_all_is_list():
     assert isinstance(smod.__all__, list)
 
 
-def test_module_all_entries_unique():
-    assert len(smod.__all__) == len(set(smod.__all__))
-
-
 def test_module_has_dunder_file():
     assert hasattr(smod, "__file__")
 
@@ -875,10 +861,6 @@ def test_module_no_call_at_top_level():
             if stripped and not any(stripped.startswith(p) for p in ok_prefixes):
                 if "(" in stripped:
                     raise AssertionError(f"unexpected top-level call: {line}")
-
-
-def test_module_docstring_present():
-    assert smod.__doc__ is not None
 
 
 # ---------- 端到端集成第八批 ----------

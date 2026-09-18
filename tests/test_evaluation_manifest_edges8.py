@@ -49,10 +49,6 @@ def test_is_absolute_like_single_slash():
     assert _is_absolute_like("/") is True
 
 
-def test_is_absolute_like_posix_absolute():
-    assert _is_absolute_like("/foo/bar") is True
-
-
 def test_is_absolute_like_relative_with_slash():
     assert _is_absolute_like("foo/bar") is False
 
@@ -442,11 +438,6 @@ def test_manifest_pdf_docx_other_count():
     m = _make_manifest(documents=docs)
     assert m.pdf_count == 0
     assert m.docx_count == 0
-
-
-def test_manifest_content_group_count_empty():
-    m = _make_manifest(documents=())
-    assert m.content_group_count == 0
 
 
 def test_manifest_content_group_count_one_pair_unidirectional():

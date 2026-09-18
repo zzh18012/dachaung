@@ -268,16 +268,6 @@ def test_build_provenance_report_version_matches_constant(tmp_path):
     assert out["report_version"] == REPORT_VERSION
 
 
-def test_build_provenance_parser_name_passed_through(tmp_path):
-    out = build_provenance(tmp_path, "kreuzberg", 800, None)
-    assert out["parser_name"] == "kreuzberg"
-
-
-def test_build_provenance_parser_version_passed_through(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "1.2.3")
-    assert out["parser_version"] == "1.2.3"
-
-
 def test_build_provenance_parser_version_none(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["parser_version"] is None

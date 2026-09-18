@@ -269,17 +269,6 @@ def _make_doc(doc_id="d1", source_type="pdf", categories=(), paired_with=None):
     )
 
 
-def test_manifest_file_count_empty_batch24():
-    m = Manifest(
-        manifest_version="1.0",
-        devset_status="incomplete",
-        documents=(),
-        expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    assert m.file_count == 0
-
-
 def test_manifest_file_count_three_batch24():
     docs = tuple(_make_doc(f"d{i}", "pdf") for i in range(3))
     m = Manifest(
@@ -936,11 +925,6 @@ def test_module_source_no_open_at_module_level_batch24():
                 pytest.fail("top-level open() call")
 
 
-def test_module_source_no_subprocess_batch24():
-    source = inspect.getsource(mmod)
-    assert "import subprocess" not in source
-
-
 def test_module_source_no_network_io_batch24():
     source = inspect.getsource(mmod)
     assert "import socket" not in source
@@ -962,27 +946,12 @@ def test_module_source_dataclass_used_batch24():
     assert "from dataclasses import dataclass" in source
 
 
-def test_module_source_validate_imported_batch24():
-    source = inspect.getsource(mmod)
-    assert "from evaluation.schema import validate" in source
-
-
 # ---------- module source 字符串精确补强 第三十五批 ----------
-
-
-def test_module_source_contains_manifest_error_class_batch24():
-    source = inspect.getsource(mmod)
-    assert "class ManifestError(Exception):" in source
 
 
 def test_module_source_contains_is_absolute_like_batch24():
     source = inspect.getsource(mmod)
     assert "def _is_absolute_like(" in source
-
-
-def test_module_source_contains_has_backslash_batch24():
-    source = inspect.getsource(mmod)
-    assert "def _has_backslash(" in source
 
 
 def test_module_source_contains_resolve_relative_path_batch24():
@@ -1010,11 +979,6 @@ def test_module_source_contains_frozenset_for_pair_batch24():
     """content_group_count 用 frozenset 去重配对。"""
     source = inspect.getsource(mmod)
     assert "frozenset" in source
-
-
-def test_module_source_contains_manifest_version_const_batch24():
-    source = inspect.getsource(mmod)
-    assert "MANIFEST_VERSION" in source
 
 
 def test_module_source_contains_categories_default_empty_batch24():

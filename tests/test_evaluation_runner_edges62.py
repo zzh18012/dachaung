@@ -84,13 +84,6 @@ def test_load_annotation_with_list_top_level_batch34(tmp_path):
     assert out == [1, 2, 3]
 
 
-def test_load_annotation_with_int_top_level_batch34(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text("42", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == 42
-
-
 # ---------- _process_one 第三十四批
 
 

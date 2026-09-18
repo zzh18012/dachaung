@@ -215,14 +215,6 @@ def test_text_types_includes_table():
     assert "table" in _TEXT_TYPES
 
 
-def test_text_types_includes_header():
-    assert "header" in _TEXT_TYPES
-
-
-def test_text_types_includes_footer():
-    assert "footer" in _TEXT_TYPES
-
-
 def test_text_types_excludes_image():
     assert "image" not in _TEXT_TYPES
 
@@ -616,10 +608,6 @@ def test_is_valid_bbox_4_floats():
 
 def test_is_valid_bbox_mixed():
     assert _is_valid_bbox([0, 0.5, 100, 100.5]) is True
-
-
-def test_is_valid_bbox_negative():
-    assert _is_valid_bbox([-10, -10, 100, 100]) is True
 
 
 def test_is_valid_bbox_zero():
@@ -1092,11 +1080,6 @@ def test_module_source_no_main_block():
     assert "__main__" not in src
 
 
-def test_module_source_no_yield():
-    src = inspect.getsource(mmod)
-    assert "yield " not in src
-
-
 def test_module_source_no_walrus():
     src = inspect.getsource(mmod)
     assert ":=" not in src
@@ -1105,11 +1088,6 @@ def test_module_source_no_walrus():
 def test_module_source_no_class_definition():
     src = inspect.getsource(mmod)
     assert not any(line.startswith("class ") for line in src.splitlines())
-
-
-def test_module_source_uses_counter_intersection():
-    src = inspect.getsource(mmod)
-    assert "Counter" in src
 
 
 def test_module_source_uses_isspace():

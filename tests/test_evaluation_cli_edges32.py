@@ -46,11 +46,6 @@ def test_build_parser_source_returns_argument_parser():
     assert "return p" in src
 
 
-def test_build_parser_source_uses_argparse_argument_parser():
-    src = inspect.getsource(_build_parser)
-    assert "argparse.ArgumentParser(" in src
-
-
 def test_build_parser_source_prog_eq_evaluation_cli():
     src = inspect.getsource(_build_parser)
     assert 'prog="evaluation.cli"' in src
@@ -166,11 +161,6 @@ def test_main_source_handles_validate_report_command():
 def test_main_source_handles_inspect_doc_command():
     src = inspect.getsource(main)
     assert 'args.command == "inspect-doc"' in src
-
-
-def test_main_source_uses_run_evaluation():
-    src = inspect.getsource(main)
-    assert "run_evaluation(" in src
 
 
 def test_main_source_uses_manifest_project_root():
@@ -342,11 +332,6 @@ def test_run_inspect_doc_source_lazy_import_annotation():
 def test_run_inspect_doc_source_lazy_import_metrics():
     src = inspect.getsource(_run_inspect_doc)
     assert "from evaluation.metrics import" in src
-
-
-def test_run_inspect_doc_source_imports_chunk_boundary_prf():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "chunk_boundary_prf" in src
 
 
 def test_run_inspect_doc_source_imports_figure_caption_prf():
@@ -552,18 +537,6 @@ def test_build_parser_run_max_chars_not_required():
         a for a in run_p._actions if "--max-chars" in (a.option_strings or [])
     )
     assert max_chars_action.required is False
-
-
-def test_build_parser_validate_report_input_positional():
-    p = _build_parser()
-    ns = p.parse_args(["validate-report", "report.json"])
-    assert ns.input == "report.json"
-
-
-def test_build_parser_inspect_doc_input_positional():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json"])
-    assert ns.input == "doc.json"
 
 
 def test_build_parser_inspect_doc_default_tolerance_30():
@@ -952,11 +925,6 @@ def test_signature_run_inspect_doc():
     assert params[0].name == "args"
 
 
-def test_signature_run_inspect_doc_no_default():
-    sig = inspect.signature(_run_inspect_doc)
-    assert sig.parameters["args"].default is inspect.Parameter.empty
-
-
 def test_signature_build_parser_no_varargs():
     sig = inspect.signature(_build_parser)
     assert "args" not in sig.parameters
@@ -1025,10 +993,6 @@ def test_module_docstring_mentions_validate():
 
 def test_module_docstring_mentions_inspect():
     assert "inspect" in cli_mod.__doc__.lower()
-
-
-def test_module_name_is_evaluation_cli():
-    assert cli_mod.__name__ == "evaluation.cli"
 
 
 def test_module_file_ends_with_cli_py():

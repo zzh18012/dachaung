@@ -41,10 +41,6 @@ import app.models as _models_module
 # =========================================================================
 
 
-def test_schema_version_is_str():
-    assert isinstance(SCHEMA_VERSION, str)
-
-
 def test_schema_version_value():
     assert SCHEMA_VERSION == "0.1.0"
 

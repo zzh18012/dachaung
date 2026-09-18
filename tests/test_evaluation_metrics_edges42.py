@@ -347,10 +347,6 @@ def test_is_valid_bbox_four_ints_batch15():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
 
 
-def test_is_valid_bbox_four_floats_batch15():
-    assert _is_valid_bbox([0.0, 0.0, 1.5, 2.5]) is True
-
-
 def test_is_valid_bbox_with_bool_batch15():
     """True 是 int 子类，但 _is_valid_bbox 应拒绝 bool。"""
     assert _is_valid_bbox([True, 0, 0, 0]) is False

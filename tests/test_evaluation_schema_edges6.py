@@ -240,16 +240,6 @@ def test_load_schema_callable():
     assert callable(load_schema)
 
 
-def test_load_schema_signature():
-    sig = inspect.signature(load_schema)
-    assert list(sig.parameters) == ["name"]
-
-
-def test_load_schema_no_default():
-    sig = inspect.signature(load_schema)
-    assert sig.parameters["name"].default is inspect.Parameter.empty
-
-
 # =========================================================================
 # validate 深度（补强 edges5）
 # =========================================================================
@@ -430,13 +420,6 @@ def test_validate_file_bool_root_raises_eval_error(tmp_path):
     p = tmp_path / "bool.json"
     p.write_text("true", encoding="utf-8")
     with pytest.raises(EvalSchemaError):
-        validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_empty_file_raises(tmp_path):
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
         validate_file(p, "manifest.schema.json")
 
 

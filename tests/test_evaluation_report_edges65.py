@@ -267,15 +267,6 @@ def test_aggregate_summary_empty_batch51():
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
 
 
-def test_aggregate_summary_empty_success_rate_batch51():
-    out = aggregate_summary([])
-    # success_rates: pipeline_success total=0, rate=None
-    sr = out["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 0
-    assert sr["total"] == 0
-    assert sr["rate"] is None
-
-
 def test_aggregate_summary_empty_ratio_macro_batch51():
     out = aggregate_summary([])
     for name in _RATIO_METRICS:
@@ -393,11 +384,6 @@ def test_source_contains_path_import_batch51():
     assert "from pathlib import Path" in src
 
 
-def test_source_imports_evaluator_and_report_version_batch51():
-    src = inspect.getsource(report_mod)
-    assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in src
-
-
 def test_source_contains_get_git_provenance_docstring_batch51():
     src = inspect.getsource(report_mod)
     assert "读 git commit 与 dirty 状态" in src
@@ -420,16 +406,6 @@ def test_source_contains_no_mixing_types_note_batch51():
     assert "不混合" in src
 
 
-def test_source_contains_timeout_10_batch51():
-    src = inspect.getsource(report_mod)
-    assert "timeout=10" in src
-
-
-def test_source_contains_capture_output_batch51():
-    src = inspect.getsource(report_mod)
-    assert "capture_output=True" in src
-
-
 def test_source_contains_astimezone_iso_batch51():
     src = inspect.getsource(report_mod)
     assert ".astimezone().isoformat()" in src
@@ -441,12 +417,6 @@ def test_ast_has_5_top_level_functions_batch51():
     tree = ast.parse(inspect.getsource(report_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 5
-
-
-def test_ast_function_names_order_batch51():
-    tree = ast.parse(inspect.getsource(report_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["get_git_provenance", "get_dependency_versions", "build_provenance", "build_devset_section", "aggregate_summary"]
 
 
 def test_ast_no_class_def_batch51():

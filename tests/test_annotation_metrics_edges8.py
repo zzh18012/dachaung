@@ -52,11 +52,6 @@ def test_module_all_no_duplicates():
     assert len(set(m.__all__)) == len(m.__all__)
 
 
-def test_module_imports_any():
-    import evaluation.annotation_metrics as m
-    assert hasattr(m, "Any")
-
-
 def test_module_docstring_present():
     import evaluation.annotation_metrics as m
     assert m.__doc__ is not None
@@ -91,10 +86,6 @@ def test_parser_does_not_emit_relations_value_exact():
     assert PARSER_DOES_NOT_EMIT_RELATIONS == "parser_does_not_emit_relations"
 
 
-def test_parser_does_not_emit_relations_nonempty():
-    assert len(PARSER_DOES_NOT_EMIT_RELATIONS) > 0
-
-
 # =========================================================================
 # figure_caption_prf 深度
 # =========================================================================
@@ -118,15 +109,6 @@ def test_figure_caption_prf_callable():
 def test_figure_caption_prf_returns_dict():
     result = figure_caption_prf(None, None)
     assert isinstance(result, dict)
-
-
-def test_figure_caption_prf_keys_exact_three():
-    result = figure_caption_prf(None, None)
-    assert set(result.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
 
 
 def test_figure_caption_prf_all_values_none():

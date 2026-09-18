@@ -169,11 +169,6 @@ def test_load_annotation_source_has_path_is_none_check():
     assert "not path.is_file()" in src
 
 
-def test_load_annotation_source_has_utf8():
-    src = inspect.getsource(_load_annotation)
-    assert 'encoding="utf-8"' in src
-
-
 def test_load_annotation_none_input_returns_none():
     """path=None → return None（short-circuit）。"""
     out = _load_annotation(None)
@@ -276,12 +271,6 @@ def test_run_evaluation_keyword_default_values():
     assert sig.parameters["parser_name"].default == "fallback"
     assert sig.parameters["max_chars"].default == 800
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_run_evaluation_no_varargs_varkw():
-    sig = inspect.signature(run_evaluation)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
 
 
 def test_run_evaluation_return_annotation_is_dict():

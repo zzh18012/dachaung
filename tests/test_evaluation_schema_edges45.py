@@ -77,11 +77,6 @@ def test_eval_schema_error_args_set_to_message_batch25():
     assert e.args == ("hello",)
 
 
-def test_eval_schema_error_str_returns_message_batch25():
-    e = EvalSchemaError("hello")
-    assert str(e) == "hello"
-
-
 def test_eval_schema_error_can_modify_errors_after_init_batch25():
     """errors 是普通属性，可以后续修改。"""
     e = EvalSchemaError("x")
@@ -549,18 +544,6 @@ def test_signature_eval_schema_error_init_batch25():
 def test_signature_eval_schema_error_init_errors_default_none_batch25():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert sig.parameters["errors"].default is None
-
-
-def test_signature_schema_path_batch25():
-    sig = inspect.signature(_schema_path)
-    params = list(sig.parameters.keys())
-    assert params == ["name"]
-
-
-def test_signature_load_schema_batch25():
-    sig = inspect.signature(load_schema)
-    params = list(sig.parameters.keys())
-    assert params == ["name"]
 
 
 def test_signature_validate_batch25():

@@ -128,10 +128,6 @@ def test_ratio_metrics_exact_set_batch43():
 
 # ---------- 三集合不相交 ----------
 
-def test_ratio_success_disjoint_batch43():
-    assert set(_RATIO_METRICS).isdisjoint(set(_SUCCESS_BOOL_METRICS))
-
-
 def test_count_success_disjoint_batch43():
     assert set(_COUNT_METRICS).isdisjoint(set(_SUCCESS_BOOL_METRICS))
 
@@ -148,22 +144,12 @@ def test_count_metrics_no_duplicates_batch43():
     assert len(set(_COUNT_METRICS)) == len(_COUNT_METRICS)
 
 
-def test_success_bool_metrics_no_duplicates_batch43():
-    assert len(set(_SUCCESS_BOOL_METRICS)) == len(_SUCCESS_BOOL_METRICS)
-
-
 # ---------- get_git_provenance 签名 ----------
 
 def test_get_git_provenance_one_param_batch43():
     sig = inspect.signature(get_git_provenance)
     params = list(sig.parameters.keys())
     assert params == ["project_root"]
-
-
-def test_get_git_provenance_no_default_batch43():
-    sig = inspect.signature(get_git_provenance)
-    p = sig.parameters["project_root"]
-    assert p.default is inspect.Parameter.empty
 
 
 def test_get_git_provenance_return_annotation_batch43():
@@ -563,15 +549,6 @@ def test_aggregate_summary_silent_drop_with_none_batch43():
     ]
     out = aggregate_summary(per_doc)
     assert out["silent_drop_total"] == 3
-
-
-def test_aggregate_summary_silent_drop_all_none_batch43():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": None}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["silent_drop_total"] is None
 
 
 def test_aggregate_summary_idempotent_batch43():

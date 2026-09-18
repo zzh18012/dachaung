@@ -316,11 +316,6 @@ def test_module_source_forbidden_tokens_batch20(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch20():
-    src = inspect.getsource(amod)
-    assert "import subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch20():
     src = inspect.getsource(amod)
     assert "import socket" not in src
@@ -429,13 +424,6 @@ def test_module_source_has_chunk_boundary_prf_function_batch20():
     assert "def chunk_boundary_prf(" in src
 
 
-def test_module_source_has_all_list_with_3_entries_batch20():
-    src = inspect.getsource(amod)
-    assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-    assert '"figure_caption_prf"' in src
-    assert '"chunk_boundary_prf"' in src
-
-
 def test_module_source_has_docstring_batch20():
     src = inspect.getsource(amod)
     assert "人工标注指标" in src
@@ -505,11 +493,6 @@ def test_module_does_not_import_app_pipeline_batch20():
 def test_module_does_not_import_app_parsers_batch20():
     src = inspect.getsource(amod)
     assert "from app.parsers" not in src
-
-
-def test_module_does_not_import_evaluation_runner_batch20():
-    src = inspect.getsource(amod)
-    assert "from evaluation.runner" not in src
 
 
 def test_module_does_not_import_evaluation_cli_batch20():

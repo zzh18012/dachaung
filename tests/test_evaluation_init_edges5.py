@@ -54,10 +54,6 @@ def test_module_file_absolute_batch45():
     assert Path(evaluation.__file__).is_absolute()
 
 
-def test_module_file_exists_batch45():
-    assert Path(evaluation.__file__).is_file()
-
-
 def test_module_loader_present_batch45():
     assert hasattr(evaluation, "__loader__")
     assert evaluation.__loader__ is not None
@@ -267,52 +263,12 @@ def test_all_each_ends_with_version_batch45():
 
 # ---------- 模块源码字符串 ----------
 
-def test_source_contains_evaluator_version_assignment_batch45():
-    src = inspect.getsource(evaluation)
-    assert 'EVALUATOR_VERSION = "1.1"' in src
-
-
-def test_source_contains_report_version_assignment_batch45():
-    src = inspect.getsource(evaluation)
-    assert 'REPORT_VERSION = "1.1"' in src
-
-
-def test_source_contains_annotation_version_assignment_batch45():
-    src = inspect.getsource(evaluation)
-    assert 'ANNOTATION_VERSION = "1.0"' in src
-
-
-def test_source_contains_manifest_version_assignment_batch45():
-    src = inspect.getsource(evaluation)
-    assert 'MANIFEST_VERSION = "1.0"' in src
-
-
 def test_source_contains_docstring_design_principles_batch45():
     src = inspect.getsource(evaluation)
     assert "设计原则" in src
     assert "不依赖任何 app/* 之外的库" in src
     assert "不修改 parser / chunker / pipeline" in src
     assert "缺数据时填 null + reason" in src
-
-
-def test_source_contains_version_history_v1_0_batch45():
-    src = inspect.getsource(evaluation)
-    assert "v1.0" in src
-
-
-def test_source_contains_version_history_v1_1_batch45():
-    src = inspect.getsource(evaluation)
-    assert "v1.1" in src
-
-
-def test_source_contains_text_preservation_change_note_batch45():
-    src = inspect.getsource(evaluation)
-    assert "text_preservation" in src
-
-
-def test_source_contains_not_instrumented_batch45():
-    src = inspect.getsource(evaluation)
-    assert "not_instrumented" in src
 
 
 def test_source_contains_all_definition_batch45():
@@ -440,46 +396,6 @@ def test_ast_assign_targets_count_batch45():
 
 
 # ---------- forbidden tokens 第九十七批 ----------
-
-def test_source_no_eval_batch45():
-    src = inspect.getsource(evaluation)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch45():
-    src = inspect.getsource(evaluation)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch45():
-    src = inspect.getsource(evaluation)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch45():
-    src = inspect.getsource(evaluation)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch45():
-    src = inspect.getsource(evaluation)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch45():
-    src = inspect.getsource(evaluation)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch45():
-    src = inspect.getsource(evaluation)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch45():
-    src = inspect.getsource(evaluation)
-    assert "pickle.load(" not in src
-
 
 def test_source_no_class_keyword_batch45():
     src = inspect.getsource(evaluation)

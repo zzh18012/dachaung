@@ -50,27 +50,6 @@ from evaluation.metrics import (
 
 # ---------- compute_automatic_metrics pipeline_failed 14 keys 精确 ----------
 
-def test_compute_pipeline_failed_returns_14_keys_batch48():
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    expected_keys = {
-        "pipeline_success",
-        "error_code",
-        "schema_valid",
-        "element_count_total",
-        "element_count_by_type",
-        "pdf_locator_valid_ratio",
-        "docx_locator_valid_ratio",
-        "image_resource_exists_ratio",
-        "chunk_reference_intact_ratio",
-        "text_preservation_equal",
-        "text_char_multiset_precision",
-        "text_char_multiset_recall",
-        "heading_boundary_compliance",
-        "silent_drop_count",
-    }
-    assert set(out.keys()) == expected_keys
-
-
 def test_compute_pipeline_failed_all_null_except_pipeline_success_error_code_batch48():
     out = compute_automatic_metrics(None, None, "pdf", None)
     # pipeline_success 是 False（不是 null）
@@ -248,12 +227,6 @@ def test_docx_locator_ratio_section_index_batch48():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_ratio_table_indices_batch48():
-    elements = [{"type": "table", "source_locator": {"table_index": 0, "row_index": 0, "col_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_relationship_id_batch48():
     elements = [{"type": "image", "source_locator": {"relationship_id": "rId1"}}]
     out = _docx_locator_ratio(elements)
@@ -267,14 +240,6 @@ def test_is_valid_bbox_true_element_rejected_batch48():
     assert _is_valid_bbox([True, 0, 0, 0]) is False
 
 
-def test_is_valid_bbox_nan_rejected_batch48():
-    assert _is_valid_bbox([float("nan"), 0, 0, 0]) is False
-
-
-def test_is_valid_bbox_inf_rejected_batch48():
-    assert _is_valid_bbox([float("inf"), 0, 0, 0]) is False
-
-
 def test_is_valid_bbox_none_rejected_batch48():
     assert _is_valid_bbox([None, 0, 0, 0]) is False
 
@@ -286,10 +251,6 @@ def test_is_valid_bbox_tuple_rejected_batch48():
 
 def test_is_valid_bbox_length_3_rejected_batch48():
     assert _is_valid_bbox([0, 0, 0]) is False
-
-
-def test_is_valid_bbox_length_5_rejected_batch48():
-    assert _is_valid_bbox([0, 0, 0, 0, 0]) is False
 
 
 def test_is_valid_bbox_valid_int_batch48():
@@ -591,10 +552,6 @@ def test_not_evaluated_constant_batch48():
 
 
 # ---------- _null / _ratio / _bool_metric / _int_metric ----------
-
-def test_null_value_is_none_batch48():
-    assert _null("any")["value"] is None
-
 
 def test_null_reason_passthrough_batch48():
     assert _null("xyz")["reason"] == "xyz"
@@ -902,7 +859,3 @@ def test_source_no_yield_batch48():
 
 def test_source_no_async_def_batch48():
     assert "async def" not in _src()
-
-
-def test_source_no_await_batch48():
-    assert "await " not in _src()

@@ -167,11 +167,6 @@ def test_process_one_signature_five_params_batch38():
     assert params == ["doc", "output_root", "parser_name", "max_chars"]
 
 
-def test_process_one_max_chars_no_default_batch38():
-    sig = inspect.signature(_process_one)
-    assert sig.parameters["max_chars"].default is inspect.Parameter.empty
-
-
 def test_process_one_returns_tuple_of_5_batch38(tmp_path):
     """成功路径返回 (dict, None, float, str|None, Path|None)。"""
     doc = _make_doc_mock(path=str(tmp_path / "x.pdf"))

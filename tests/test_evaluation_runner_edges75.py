@@ -323,34 +323,9 @@ def test_run_evaluation_expected_failures_no_errors_actual_none_batch49(tmp_path
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_json_import_batch49():
-    src = inspect.getsource(runner_mod)
-    assert "import json" in src
-
-
-def test_source_contains_time_import_batch49():
-    src = inspect.getsource(runner_mod)
-    assert "import time" in src
-
-
-def test_source_contains_pathlib_import_batch49():
-    src = inspect.getsource(runner_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_source_contains_typing_any_import_batch49():
-    src = inspect.getsource(runner_mod)
-    assert "from typing import Any" in src
-
-
 def test_source_contains_pipeline_import_batch49():
     src = inspect.getsource(runner_mod)
     assert "from app.pipeline import image_output_dir_for, process_single" in src
-
-
-def test_source_contains_report_version_import_batch49():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation import REPORT_VERSION" in src
 
 
 def test_source_contains_annotation_metrics_import_batch49():
@@ -401,11 +376,6 @@ def test_source_contains_perf_counter_batch49():
 def test_source_contains_write_json_false_batch49():
     src = inspect.getsource(runner_mod)
     assert "write_json=False" in src
-
-
-def test_source_contains_ensure_ascii_false_batch49():
-    src = inspect.getsource(runner_mod)
-    assert "ensure_ascii=False" in src
 
 
 def test_source_contains_image_output_dir_for_call_batch49():

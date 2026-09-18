@@ -104,12 +104,6 @@ def test_load_annotation_extra_data_returns_none(tmp_path: Path):
     assert _load_annotation(p) is None
 
 
-def test_load_annotation_empty_file_returns_none(tmp_path: Path):
-    p = tmp_path / "a.json"
-    p.write_text("", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_only_whitespace_returns_none(tmp_path: Path):
     p = tmp_path / "a.json"
     p.write_text("   \n  \t ", encoding="utf-8")
@@ -846,31 +840,6 @@ def test_module_imports_image_output_dir_for():
 def test_module_imports_compute_automatic_metrics():
     import evaluation.runner as m
     assert hasattr(m, "compute_automatic_metrics")
-
-
-def test_module_imports_chunk_boundary_prf():
-    import evaluation.runner as m
-    assert hasattr(m, "chunk_boundary_prf")
-
-
-def test_module_imports_figure_caption_prf():
-    import evaluation.runner as m
-    assert hasattr(m, "figure_caption_prf")
-
-
-def test_module_imports_aggregate_summary():
-    import evaluation.runner as m
-    assert hasattr(m, "aggregate_summary")
-
-
-def test_module_imports_build_devset_section():
-    import evaluation.runner as m
-    assert hasattr(m, "build_devset_section")
-
-
-def test_module_imports_build_provenance():
-    import evaluation.runner as m
-    assert hasattr(m, "build_provenance")
 
 
 def test_run_evaluation_manifest_param_no_default():

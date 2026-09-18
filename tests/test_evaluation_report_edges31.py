@@ -411,16 +411,6 @@ def test_module_source_imports_typing_batch14():
     assert "from typing import Any" in head
 
 
-def test_module_source_defines_aggregate_summary_batch14():
-    source = inspect.getsource(rmod)
-    assert "def aggregate_summary(" in source
-
-
-def test_module_source_has_dunder_all_batch14():
-    source = inspect.getsource(rmod)
-    assert "__all__" in source
-
-
 def test_module_source_dunder_all_count_5_batch14():
     assert len(rmod.__all__) == 5
 
@@ -435,11 +425,6 @@ def test_module_source_no_subprocess_call_batch14():
     """不应使用 subprocess.call（旧 API）。"""
     source = inspect.getsource(rmod)
     assert "subprocess.call(" not in source
-
-
-def test_module_source_has_macro_average_batch14():
-    source = inspect.getsource(rmod)
-    assert "macro_average" in source
 
 
 def test_module_source_has_success_rates_batch14():
@@ -470,11 +455,6 @@ def test_build_devset_section_1_param_batch14():
     assert len(sig.parameters) == 1
 
 
-def test_aggregate_summary_1_param_batch14():
-    sig = inspect.signature(aggregate_summary)
-    assert len(sig.parameters) == 1
-
-
 def test_build_provenance_return_dict_batch14():
     sig = inspect.signature(build_provenance)
     assert "dict" in str(sig.return_annotation)
@@ -483,11 +463,6 @@ def test_build_provenance_return_dict_batch14():
 def test_aggregate_summary_return_dict_batch14():
     sig = inspect.signature(aggregate_summary)
     assert "dict" in str(sig.return_annotation)
-
-
-def test_all_dunder_all_callable_batch14():
-    for name in rmod.__all__:
-        assert callable(getattr(rmod, name))
 
 
 # ---------- module 合理性第十六批 ----------

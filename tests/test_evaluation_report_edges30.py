@@ -554,11 +554,6 @@ def test_module_source_defines_get_dependency_versions_batch13():
     assert "def get_dependency_versions()" in source
 
 
-def test_module_source_defines_aggregate_summary_batch13():
-    source = inspect.getsource(rmod)
-    assert "def aggregate_summary(" in source
-
-
 def test_module_source_has_dunder_all_batch13():
     source = inspect.getsource(rmod)
     assert "__all__" in source
@@ -623,12 +618,6 @@ def test_module_source_contains_participating_docs_batch13():
 
 
 # ---------- signatures 第十五批 ----------
-
-
-def test_get_git_provenance_takes_project_root_batch13():
-    sig = inspect.signature(get_git_provenance)
-    p = sig.parameters["project_root"]
-    assert p.default is inspect.Parameter.empty
 
 
 def test_get_dependency_versions_no_args_batch13():

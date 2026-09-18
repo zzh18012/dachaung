@@ -58,11 +58,6 @@ def test_null_returns_dict_batch18():
     assert isinstance(r, dict)
 
 
-def test_null_keys_batch18():
-    r = _null("x")
-    assert set(r.keys()) == {"value", "reason"}
-
-
 def test_null_reason_is_string_batch18():
     r = _null("my_reason")
     assert r["reason"] == "my_reason"
@@ -873,19 +868,9 @@ def test_module_compute_metrics_callable_batch18():
     assert callable(compute_automatic_metrics)
 
 
-def test_module_does_not_import_evaluation_runner_batch18():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.runner" not in src
-
-
 def test_module_does_not_import_evaluation_cli_batch18():
     src = inspect.getsource(mmod)
     assert "from evaluation.cli" not in src
-
-
-def test_module_constants_are_tuples_batch18():
-    assert isinstance(_TEXT_TYPES, tuple)
-    assert isinstance(_PDF_BBOX_REQUIRED_TYPES, tuple)
 
 
 def test_module_no_main_block_batch18():

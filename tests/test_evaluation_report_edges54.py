@@ -43,16 +43,8 @@ def test_count_metrics_no_duplicates_batch35():
     assert len(set(_COUNT_METRICS)) == len(_COUNT_METRICS)
 
 
-def test_success_bool_metrics_no_duplicates_batch35():
-    assert len(set(_SUCCESS_BOOL_METRICS)) == len(_SUCCESS_BOOL_METRICS)
-
-
 def test_ratio_metrics_disjoint_from_count_batch35():
     assert set(_RATIO_METRICS).isdisjoint(set(_COUNT_METRICS))
-
-
-def test_ratio_metrics_disjoint_from_success_bool_batch35():
-    assert set(_RATIO_METRICS).isdisjoint(set(_SUCCESS_BOOL_METRICS))
 
 
 def test_count_metrics_disjoint_from_success_bool_batch35():
@@ -425,11 +417,6 @@ def test_build_devset_section_has_six_keys_batch35():
     assert set(out.keys()) == expected
 
 
-def test_build_devset_section_status_value_batch35():
-    out = build_devset_section(_make_manifest_mock(devset_status="complete"))
-    assert out["status"] == "complete"
-
-
 def test_build_devset_section_file_count_value_batch35():
     out = build_devset_section(_make_manifest_mock(file_count=10))
     assert out["file_count"] == 10
@@ -489,17 +476,6 @@ def test_aggregate_summary_counts_sums_all_batch35():
     out = aggregate_summary(per_doc)
     assert out["counts"]["element_count_total"]["sum"] == 15
     assert out["counts"]["element_count_total"]["participating_docs"] == 2
-
-
-def test_aggregate_summary_success_rate_all_false_batch35():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": False}}},
-        {"metrics": {"pipeline_success": {"value": False}}},
-    ]
-    out = aggregate_summary(per_doc)
-    sr = out["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 0
-    assert sr["rate"] == 0.0
 
 
 def test_aggregate_summary_success_rate_treats_null_as_false_batch35():
@@ -607,26 +583,6 @@ def test_module_source_contains_design_doc_batch35():
 def test_module_source_contains_figure_caption_always_null_comment_batch35():
     src = inspect.getsource(rmod)
     assert "figure_caption_*" in src
-
-
-def test_module_source_contains_macro_average_keyword_batch35():
-    src = inspect.getsource(rmod)
-    assert "macro_average" in src
-
-
-def test_module_source_contains_participating_docs_keyword_batch35():
-    src = inspect.getsource(rmod)
-    assert "participating_docs" in src
-
-
-def test_module_source_contains_not_evaluated_keyword_batch35():
-    src = inspect.getsource(rmod)
-    assert "not_evaluated" in src
-
-
-def test_module_source_contains_success_rates_keyword_batch35():
-    src = inspect.getsource(rmod)
-    assert "success_rates" in src
 
 
 def test_module_source_contains_counts_keyword_batch35():

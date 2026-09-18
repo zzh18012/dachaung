@@ -68,11 +68,6 @@ def test_bool_metric_value_is_bool_batch34():
     assert isinstance(m["value"], bool)
 
 
-def test_bool_metric_false_batch34():
-    m = _bool_metric(0)
-    assert m["value"] is False
-
-
 def test_int_metric_value_is_int_batch34():
     m = _int_metric(3.7)
     assert m["value"] == 3  # int(3.7) = 3
@@ -280,12 +275,6 @@ def test_docx_locator_with_paragraph_index_batch34():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_with_table_index_batch34():
-    elements = [{"type": "table", "source_locator": {"table_index": 0, "row_index": 0, "col_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_with_section_batch34():
     elements = [{"type": "paragraph", "source_locator": {"section": 1}}]
     out = _docx_locator_ratio(elements)
@@ -314,10 +303,6 @@ def test_is_valid_bbox_floats_batch34():
 
 def test_is_valid_bbox_too_short_batch34():
     assert _is_valid_bbox([0, 0, 10]) is False
-
-
-def test_is_valid_bbox_too_long_batch34():
-    assert _is_valid_bbox([0, 0, 0, 0, 0]) is False
 
 
 def test_is_valid_bbox_bool_inside_batch34():
@@ -503,13 +488,6 @@ def test_text_preservation_perfect_batch34():
     assert out["equal"]["value"] is True
     assert out["precision"]["value"] == 1.0
     assert out["recall"]["value"] == 1.0
-
-
-def test_text_preservation_ignores_whitespace_batch34():
-    elements = [{"type": "paragraph", "content": "a b c"}]
-    chunks = [{"text": "abc"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
 
 
 def test_text_preservation_excludes_image_content_batch34():

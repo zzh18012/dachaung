@@ -153,11 +153,6 @@ def test_eval_schema_error_init_no_varargs_batch17():
 # ---------- load_schema 行为深度第十七批 ----------
 
 
-def test_load_schema_manifest_has_schema_field_batch17():
-    s = load_schema("manifest.schema.json")
-    assert "$schema" in s
-
-
 def test_load_schema_annotation_has_schema_field_batch17():
     s = load_schema("annotation.schema.json")
     assert "$schema" in s
@@ -392,12 +387,6 @@ def test_schema_path_in_schemas_dir_batch17():
     assert p.parent == SCHEMAS_DIR
 
 
-def test_schema_path_signature_batch17():
-    sig = inspect.signature(_schema_path)
-    params = list(sig.parameters.keys())
-    assert params == ["name"]
-
-
 # ---------- 4 个 schema 内容深度第十七批 ----------
 
 
@@ -472,12 +461,6 @@ def test_module_source_forbidden_tokens_batch17(forbidden):
 # ---------- module source 字符串精确补强第二十八批 ----------
 
 
-def test_module_source_has_future_annotations_batch17():
-    src = inspect.getsource(smod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
-
-
 def test_module_source_has_docstring_batch17():
     src = inspect.getsource(smod)
     assert "Schema" in src
@@ -501,11 +484,6 @@ def test_module_source_has_typing_import_batch17():
 def test_module_source_has_jsonschema_import_batch17():
     src = inspect.getsource(smod)
     assert "from jsonschema import Draft202012Validator" in src
-
-
-def test_module_source_has_validation_error_import_batch17():
-    src = inspect.getsource(smod)
-    assert "from jsonschema.exceptions import ValidationError" in src
 
 
 def test_module_source_has_schemas_dir_batch17():
@@ -546,12 +524,6 @@ def test_module_source_no_main_block_batch17():
 # ---------- signatures 第二十八批 ----------
 
 
-def test_signature_load_schema_batch17():
-    sig = inspect.signature(load_schema)
-    params = list(sig.parameters.keys())
-    assert params == ["name"]
-
-
 def test_signature_validate_batch17():
     sig = inspect.signature(validate)
     params = list(sig.parameters.keys())
@@ -562,12 +534,6 @@ def test_signature_validate_file_batch17():
     sig = inspect.signature(validate_file)
     params = list(sig.parameters.keys())
     assert params == ["path", "schema_name"]
-
-
-def test_signature_schema_path_batch17():
-    sig = inspect.signature(_schema_path)
-    params = list(sig.parameters.keys())
-    assert params == ["name"]
 
 
 def test_signature_eval_schema_error_init_batch17():

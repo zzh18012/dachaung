@@ -827,11 +827,6 @@ def test_module_source_no_environ_batch26():
     assert "os.environ" not in source
 
 
-def test_module_source_no_subprocess_batch26():
-    source = inspect.getsource(mmod)
-    assert "subprocess" not in source
-
-
 def test_module_source_json_allowed_batch26():
     source = inspect.getsource(mmod)
     assert "import json" in source
@@ -909,11 +904,6 @@ def test_module_source_contains_frozen_true_batch26():
 def test_module_source_contains_relative_to_batch26():
     source = inspect.getsource(mmod)
     assert "relative_to" in source
-
-
-def test_module_source_contains_manifest_version_import_batch26():
-    source = inspect.getsource(mmod)
-    assert "MANIFEST_VERSION" in source
 
 
 def test_module_source_contains_pyproject_toml_batch26():

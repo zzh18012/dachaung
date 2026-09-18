@@ -600,11 +600,6 @@ def test_module_has_all_export_batch33():
     assert "__all__" in src
 
 
-def test_module_all_has_compute_automatic_metrics_batch33():
-    src = inspect.getsource(mmod)
-    assert '"compute_automatic_metrics"' in src
-
-
 def test_module_no_main_block_batch33():
     src = inspect.getsource(mmod)
     assert 'if __name__ == "__main__"' not in src

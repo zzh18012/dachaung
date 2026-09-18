@@ -382,12 +382,6 @@ def test_pdf_locator_table_no_bbox_required_still_valid():
     assert out["value"] == 1.0
 
 
-def test_pdf_locator_footer_no_bbox_required_still_valid():
-    elements = [{"type": "footer", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_pdf_locator_mixed_validity():
     elements = [
         {"type": "table", "source_locator": {"page": 1}},  # valid
@@ -440,10 +434,6 @@ def test_docx_locator_partial_validity():
 
 
 # ---------- _is_valid_bbox 补充 ----------
-
-
-def test_is_valid_bbox_with_dict():
-    assert _is_valid_bbox({"x": 1}) is False
 
 
 def test_is_valid_bbox_with_set():
@@ -739,10 +729,6 @@ def test_module_source_has_no_main_block():
 # ---------- signatures 精确 ----------
 
 
-def test_compute_automatic_metrics_namespace():
-    assert compute_automatic_metrics.__module__ == "evaluation.metrics"
-
-
 def test_heading_boundary_ratio_namespace():
     assert _heading_boundary_ratio.__module__ == "evaluation.metrics"
 
@@ -768,14 +754,6 @@ def test_int_metric_namespace():
 
 
 # ---------- 模块整体合理性 ----------
-
-
-def test_module_all_has_only_compute_automatic_metrics():
-    assert m.__all__ == ["compute_automatic_metrics"]
-
-
-def test_module_namespace_is_evaluation_metrics():
-    assert m.__name__ == "evaluation.metrics"
 
 
 def test_module_has_no_main_block():

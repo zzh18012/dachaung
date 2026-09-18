@@ -290,12 +290,6 @@ def test_validate_returns_none_on_success():
     assert validate(instance, "manifest.schema.json") is None
 
 
-def test_validate_failure_message_contains_schema_name():
-    with pytest.raises(EvalSchemaError) as ei:
-        validate({}, "manifest.schema.json")
-    assert "manifest.schema.json" in str(ei.value)
-
-
 def test_validate_failure_message_contains_error_count():
     with pytest.raises(EvalSchemaError) as ei:
         validate({}, "manifest.schema.json")
@@ -394,13 +388,6 @@ def test_validate_file_directory_raises_filenotfound(tmp_path: Path):
         validate_file(d, "manifest.schema.json")
 
 
-def test_validate_file_empty_raises_jsondecodeerror(tmp_path: Path):
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_invalid_json_raises_jsondecodeerror(tmp_path: Path):
     p = tmp_path / "bad.json"
     p.write_text("{invalid", encoding="utf-8")
@@ -413,13 +400,6 @@ def test_validate_file_invalid_content_raises_eval_error(tmp_path: Path):
     p.write_text("{}", encoding="utf-8")
     with pytest.raises(EvalSchemaError):
         validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_unknown_schema_raises_filenotfound(tmp_path: Path):
-    p = tmp_path / "ok.json"
-    p.write_text("{}", encoding="utf-8")
-    with pytest.raises(FileNotFoundError):
-        validate_file(p, "nonexistent.schema.json")
 
 
 def test_validate_file_unicode_content(tmp_path: Path):

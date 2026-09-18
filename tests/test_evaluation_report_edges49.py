@@ -155,11 +155,6 @@ def test_build_provenance_parser_name_unicode_batch33(tmp_path):
     assert out["parser_name"] == "fallback-中文"
 
 
-def test_build_provenance_max_chars_zero_batch33(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 0, None)
-    assert out["max_chars"] == 0
-
-
 def test_build_provenance_dependencies_called_batch33(tmp_path):
     """build_provenance 内部调用 get_dependency_versions。"""
     with patch("evaluation.report.get_dependency_versions", return_value={"a": "1"}) as mock_dep:
@@ -429,16 +424,6 @@ def test_module_source_contains_oserror_subprocess_error_batch33():
 
 
 # ---------- signatures 第四十六批 ----------
-
-
-def test_signature_get_git_provenance_return_dict_batch33():
-    sig = inspect.signature(get_git_provenance)
-    assert "dict[str, Any]" in str(sig.return_annotation)
-
-
-def test_signature_get_git_provenance_param_annotation_batch33():
-    sig = inspect.signature(get_git_provenance)
-    assert sig.parameters["project_root"].annotation == "Path"
 
 
 def test_signature_get_dependency_versions_no_params_batch33():

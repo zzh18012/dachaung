@@ -339,11 +339,6 @@ def test_source_contains_path_import_batch48():
     assert "from pathlib import Path" in src
 
 
-def test_source_contains_validate_file_import_batch48():
-    src = inspect.getsource(cli_mod)
-    assert "validate_file" in src
-
-
 def test_source_contains_error_2_returns_batch48():
     """main 多个 return 2 路径。"""
     src = inspect.getsource(cli_mod)

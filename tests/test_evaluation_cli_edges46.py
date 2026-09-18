@@ -427,11 +427,6 @@ def test_main_inspect_doc_success_batch19(tmp_path, capsys):
     assert rc == 0
 
 
-def test_main_inspect_doc_not_exist_batch19(tmp_path, capsys):
-    rc = main(["inspect-doc", str(tmp_path / "no.json")])
-    assert rc == 2
-
-
 def test_main_no_subcommand_system_exit_batch19():
     with pytest.raises(SystemExit):
         main([])
@@ -463,12 +458,6 @@ def test_module_source_forbidden_tokens_batch19(forbidden):
 
 
 # ---------- module source 字符串精确补强第三十一批 ----------
-
-
-def test_module_source_has_future_annotations_batch19():
-    src = inspect.getsource(cmod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
 
 
 def test_module_source_has_docstring_batch19():

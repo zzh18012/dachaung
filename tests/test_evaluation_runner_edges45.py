@@ -326,17 +326,6 @@ def test_module_source_forbidden_tokens_batch17(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_batch17():
-    src = inspect.getsource(rmod)
-    assert "import subprocess" not in src
-
-
-def test_module_source_no_network_batch17():
-    src = inspect.getsource(rmod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
-
-
 # ---------- module source 字符串精确补强第二十七批 ----------
 
 
@@ -444,12 +433,6 @@ def test_module_load_annotation_callable_batch17():
 
 def test_module_process_one_callable_batch17():
     assert callable(_process_one)
-
-
-def test_module_does_not_import_unsafe_modules_batch17():
-    src = inspect.getsource(rmod)
-    for unsafe in ["import pickle", "import marshal", "import shelve"]:
-        assert unsafe not in src
 
 
 def test_module_does_not_import_evaluation_cli_batch17():

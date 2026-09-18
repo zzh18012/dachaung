@@ -726,11 +726,6 @@ def test_module_source_has_sys():
 # =========================================================================
 
 
-def test_module_source_has_hasattr_reconfigure():
-    src = inspect.getsource(climod)
-    assert 'hasattr(sys.stdout, "reconfigure")' in src
-
-
 # =========================================================================
 # __main__ 块
 # =========================================================================
@@ -749,14 +744,6 @@ def test_module_main_block_raises_system_exit():
 def test_build_parser_signature_no_params():
     sig = inspect.signature(_build_parser)
     assert len(sig.parameters) == 0
-
-
-def test_main_argv_optional_default_none():
-    sig = inspect.signature(main)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "argv"
-    assert params[0].default is None
 
 
 def test_main_no_varargs_varkw():
@@ -789,11 +776,6 @@ def test_main_source_has_2_is_file_calls():
 def test_main_source_has_print_to_stderr():
     src = inspect.getsource(main)
     assert "file=sys.stderr" in src
-
-
-def test_main_source_has_run_evaluation_call():
-    src = inspect.getsource(main)
-    assert "run_evaluation(" in src
 
 
 def test_main_source_has_validate_file_for_run():
@@ -841,11 +823,6 @@ def test_build_parser_source_has_run_subparser():
 def test_build_parser_source_has_help_strings():
     src = inspect.getsource(_build_parser)
     assert src.count("help=") >= 6
-
-
-def test_build_parser_source_has_argparse_argument_parser():
-    src = inspect.getsource(_build_parser)
-    assert "argparse.ArgumentParser(" in src
 
 
 # =========================================================================

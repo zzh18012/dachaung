@@ -389,21 +389,6 @@ def test_figure_caption_prf_with_real_chunks_batch49():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_typing_any_import_batch49():
-    src = inspect.getsource(am_mod)
-    assert "from typing import Any" in src
-
-
-def test_source_contains_normalize_text_import_batch49():
-    src = inspect.getsource(am_mod)
-    assert "from app.chunkers.structural import normalize_text" in src
-
-
-def test_source_contains_null_ratio_import_batch49():
-    src = inspect.getsource(am_mod)
-    assert "from evaluation.metrics import _null, _ratio" in src
-
-
 def test_source_all_has_3_entries_batch49():
     src = inspect.getsource(am_mod)
     assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
@@ -432,12 +417,6 @@ def test_source_contains_denom_le_zero_batch49():
 
 
 # ---------- AST 结构补强 ----------
-
-def test_ast_has_2_top_level_functions_batch49():
-    tree = ast.parse(inspect.getsource(am_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 2
-
 
 def test_ast_module_has_5_imports_batch49():
     """5 个 import：__future__ + Counter + Any + normalize_text + _null,_ratio。"""

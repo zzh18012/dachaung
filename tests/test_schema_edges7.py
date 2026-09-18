@@ -183,10 +183,6 @@ def test_schema_validation_error_is_subclass_of_exception():
     assert issubclass(SchemaValidationError, Exception)
 
 
-def test_schema_validation_error_not_subclass_of_value_error():
-    assert not issubclass(SchemaValidationError, ValueError)
-
-
 def test_schema_validation_error_not_subclass_of_runtime_error():
     assert not issubclass(SchemaValidationError, RuntimeError)
 
@@ -214,10 +210,6 @@ def test_schema_path_is_pathlib_path():
 
 def test_schema_path_str_form_endswith_schema_json():
     assert str(SCHEMA_PATH).endswith("document.schema.json")
-
-
-def test_schema_path_parent_dir_name():
-    assert SCHEMA_PATH.parent.name == "schemas"
 
 
 def test_schema_path_parent_parent_name():

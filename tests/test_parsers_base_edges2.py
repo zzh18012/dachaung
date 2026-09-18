@@ -504,10 +504,6 @@ def test_parser_has_abstract_method_parse():
     assert "parse" in Parser.__abstractmethods__
 
 
-def test_parser_default_version_value():
-    assert Parser.version == "0.0.0"
-
-
 def test_parser_cannot_be_instantiated_directly():
     with pytest.raises(TypeError):
         Parser()  # type: ignore[abstract]

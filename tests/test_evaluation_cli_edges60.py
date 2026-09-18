@@ -332,11 +332,6 @@ def test_module_source_contains_run_inspect_doc_func_batch33():
     assert "def _run_inspect_doc(" in src
 
 
-def test_module_source_contains_reconfigure_call_batch33():
-    src = inspect.getsource(cmod)
-    assert "sys.stdout.reconfigure" in src
-
-
 def test_module_source_contains_subparsers_batch33():
     src = inspect.getsource(cmod)
     assert "add_subparsers" in src
@@ -345,13 +340,6 @@ def test_module_source_contains_subparsers_batch33():
 def test_module_source_contains_raw_description_batch33():
     src = inspect.getsource(cmod)
     assert "RawDescriptionHelpFormatter" in src
-
-
-def test_module_source_contains_run_subcommand_batch33():
-    src = inspect.getsource(cmod)
-    assert '"run"' in src
-    assert '"validate-report"' in src
-    assert '"inspect-doc"' in src
 
 
 def test_module_source_contains_file_stderr_batch33():

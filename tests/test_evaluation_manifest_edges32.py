@@ -1021,12 +1021,6 @@ def test_manifest_source_uses_frozen_dataclass():
     assert "@dataclass(frozen=True)" in src
 
 
-def test_manifest_source_uses_frozen_dataclass_count():
-    src = inspect.getsource(mmod)
-    # 3 个 dataclass：DocumentEntry、ExpectedFailure、Manifest
-    assert src.count("@dataclass(frozen=True)") == 3
-
-
 def test_manifest_source_property_decorators():
     src = inspect.getsource(mmod)
     # file_count、pdf_count、docx_count、content_group_count、categories_covered
@@ -1046,16 +1040,6 @@ def test_manifest_source_uses_json_load():
 def test_manifest_source_uses_validate():
     src = inspect.getsource(mmod)
     assert 'validate(data, "manifest.schema.json")' in src
-
-
-def test_manifest_source_uses_manifest_version_constant():
-    src = inspect.getsource(mmod)
-    assert "MANIFEST_VERSION" in src
-
-
-def test_manifest_source_uses_resolve():
-    src = inspect.getsource(mmod)
-    assert ".resolve()" in src
 
 
 def test_manifest_source_uses_relative_to():
@@ -1124,13 +1108,6 @@ def test_signature_is_absolute_like():
     assert params[0].name == "path_str"
     assert params[0].default is inspect.Parameter.empty
     assert params[0].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_has_backslash():
-    sig = inspect.signature(_has_backslash)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path_str"
 
 
 def test_signature_resolve_relative_path():

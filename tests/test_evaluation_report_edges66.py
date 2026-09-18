@@ -350,11 +350,6 @@ def test_source_figure_caption_note_batch52():
     assert "始终 null" in src
 
 
-def test_source_no_mixed_types_docstring_batch52():
-    src = inspect.getsource(report_mod)
-    assert "不混合类型" in src
-
-
 def test_source_counts_doc_comment_batch52():
     src = inspect.getsource(report_mod)
     assert "counts" in src
@@ -382,12 +377,6 @@ def test_source_function_order_batch52():
 
 
 # ---------- AST 结构补强 ----------
-
-def test_ast_has_4_module_level_assigns_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    assert len(assigns) == 4
-
 
 def test_ast_assign_target_ids_batch52():
     tree = ast.parse(inspect.getsource(report_mod))

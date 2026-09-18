@@ -267,12 +267,6 @@ def test_get_dependency_versions_values_str_or_none_batch25():
         assert v is None or isinstance(v, str)
 
 
-def test_get_dependency_versions_idempotent_batch25():
-    out1 = get_dependency_versions()
-    out2 = get_dependency_versions()
-    assert out1 == out2
-
-
 def test_get_dependency_versions_pdfplumber_or_none_batch25():
     """pdfplumber 通常已安装（fallback parser 依赖）。"""
     out = get_dependency_versions()
@@ -760,21 +754,6 @@ def test_module_source_contains_status_porcelain_batch25():
     assert '"git", "status", "--porcelain"' in source
 
 
-def test_module_source_contains_capture_output_batch25():
-    source = inspect.getsource(rmod)
-    assert "capture_output=True" in source
-
-
-def test_module_source_contains_errors_replace_batch25():
-    source = inspect.getsource(rmod)
-    assert 'errors="replace"' in source
-
-
-def test_module_source_contains_timeout_10_batch25():
-    source = inspect.getsource(rmod)
-    assert "timeout=10" in source
-
-
 def test_module_source_contains_pdfplumber_dependency_batch25():
     source = inspect.getsource(rmod)
     assert '"pdfplumber"' in source
@@ -788,16 +767,6 @@ def test_module_source_contains_python_docx_dependency_batch25():
 def test_module_source_contains_pypdfium2_dependency_batch25():
     source = inspect.getsource(rmod)
     assert '"pypdfium2"' in source
-
-
-def test_module_source_contains_aggregate_summary_batch25():
-    source = inspect.getsource(rmod)
-    assert "def aggregate_summary(" in source
-
-
-def test_module_source_contains_macro_average_batch25():
-    source = inspect.getsource(rmod)
-    assert "macro_average" in source
 
 
 # ---------- signatures 第三十七批 ----------

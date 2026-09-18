@@ -705,11 +705,6 @@ def test_fallback_parser_image_output_dir_str_converted_to_path(tmp_path: Path):
     assert p._image_output_dir == tmp_path
 
 
-def test_fallback_parser_image_output_dir_path_kept(tmp_path: Path):
-    p = FallbackParser(image_output_dir=tmp_path)
-    assert p._image_output_dir == tmp_path
-
-
 def test_fallback_parser_name_class_attribute():
     assert FallbackParser.name == "fallback"
 

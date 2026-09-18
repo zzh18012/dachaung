@@ -237,11 +237,6 @@ def test_chunk_boundary_prf_doc_none_pipeline_failed_batch34():
     assert out["chunk_boundary_f1"]["reason"] == "pipeline_failed"
 
 
-def test_chunk_boundary_prf_annotation_none_no_annotation_batch34():
-    out = chunk_boundary_prf({"chunks": [{"text": "a"}, {"text": "b"}]}, None)
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_annotation_empty_dict_batch34():
     out = chunk_boundary_prf({"chunks": [{"text": "a"}, {"text": "b"}]}, {})
     assert out["chunk_boundary_precision"]["reason"] == "no_annotation"

@@ -327,11 +327,6 @@ def test_schemas_dir_value_matches_module_level_path_batch52():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_json_import_batch52():
-    src = inspect.getsource(schema_mod)
-    assert "import json" in src
-
-
 def test_source_pathlib_path_import_batch52():
     src = inspect.getsource(schema_mod)
     assert "from pathlib import Path" in src
@@ -430,12 +425,6 @@ def test_ast_has_4_functions_batch52():
     assert len(funcs) == 4  # _schema_path, load_schema, validate, validate_file
 
 
-def test_ast_function_names_order_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["_schema_path", "load_schema", "validate", "validate_file"]
-
-
 def test_ast_has_1_class_def_batch52():
     tree = ast.parse(inspect.getsource(schema_mod))
     classes = [n for n in tree.body if isinstance(n, ast.ClassDef)]
@@ -473,13 +462,6 @@ def test_ast_module_docstring_batch52():
     tree = ast.parse(inspect.getsource(schema_mod))
     assert isinstance(tree.body[0], ast.Expr)
     assert isinstance(tree.body[0].value, ast.Constant)
-
-
-def test_ast_has_2_module_level_assigns_batch52():
-    """SCHEMAS_DIR + __all__ = 2。"""
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    assert len(assigns) == 2
 
 
 def test_ast_schemas_dir_assign_uses_path_join_batch52():
@@ -573,13 +555,6 @@ def test_ast_validate_returns_none_when_no_errors_batch52():
     returns = [n for n in ast.walk(func) if isinstance(n, ast.Return)]
     # 1 个 explicit return（在 if not errors 分支）
     assert len(returns) == 1
-
-
-def test_ast_validate_file_has_1_with_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
-    withs = [n for n in ast.walk(func) if isinstance(n, ast.With)]
-    assert len(withs) == 1
 
 
 def test_ast_validate_file_has_1_if_batch52():

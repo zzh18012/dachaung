@@ -185,13 +185,6 @@ def test_build_parser_has_two_subprocess_calls_in_module_batch12():
 # ---------- argparse Namespace 行为第十二批 ----------
 
 
-def test_namespace_run_command_value_batch12():
-    ns = _build_parser().parse_args(
-        ["run", "--manifest", "a.json", "--output", "b.json"]
-    )
-    assert ns.command == "run"
-
-
 def test_namespace_run_manifest_str_type_batch12():
     ns = _build_parser().parse_args(
         ["run", "--manifest", "a.json", "--output", "b.json"]
@@ -214,21 +207,6 @@ def test_namespace_validate_report_input_str_type_batch12():
 def test_namespace_inspect_doc_input_str_type_batch12():
     ns = _build_parser().parse_args(["inspect-doc", "a.json"])
     assert isinstance(ns.input, str)
-
-
-def test_namespace_run_parser_kreuzberg_choice_batch12():
-    ns = _build_parser().parse_args(
-        [
-            "run",
-            "--manifest",
-            "a.json",
-            "--output",
-            "b.json",
-            "--parser",
-            "kreuzberg",
-        ]
-    )
-    assert ns.parser == "kreuzberg"
 
 
 def test_namespace_run_max_chars_negative_int_batch12():
@@ -801,11 +779,6 @@ def test_cli_source_no_input_call_batch12():
     assert "input(" not in source
 
 
-def test_cli_source_no_remove_call_batch12():
-    source = inspect.getsource(climod)
-    assert ".remove(" not in source
-
-
 # ---------- module source 字符串精确补强第十二批 ----------
 
 
@@ -820,29 +793,9 @@ def test_module_source_imports_argparse_batch12():
     assert "import argparse" in source
 
 
-def test_module_source_imports_json_batch12():
-    source = inspect.getsource(climod)
-    assert "import json" in source
-
-
-def test_module_source_imports_sys_batch12():
-    source = inspect.getsource(climod)
-    assert "import sys" in source
-
-
-def test_module_source_imports_path_batch12():
-    source = inspect.getsource(climod)
-    assert "from pathlib import Path" in source
-
-
 def test_module_source_imports_get_git_provenance_batch12():
     source = inspect.getsource(climod)
     assert "get_git_provenance" in source
-
-
-def test_module_source_imports_run_evaluation_batch12():
-    source = inspect.getsource(climod)
-    assert "run_evaluation" in source
 
 
 def test_module_source_has_subparsers_call_batch12():

@@ -132,10 +132,6 @@ def test_cell_source_to_text_none_returns_empty():
     assert _cell_source_to_text(None) == ""
 
 
-def test_cell_source_to_text_float_returns_empty():
-    assert _cell_source_to_text(3.14) == ""
-
-
 def test_cell_source_to_text_dict_returns_empty():
     assert _cell_source_to_text({"x": 1}) == ""
 

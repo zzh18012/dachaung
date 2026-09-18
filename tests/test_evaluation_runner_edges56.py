@@ -559,11 +559,6 @@ def test_module_source_contains_module_docstring_batch28():
     assert "评测 runner" in src
 
 
-def test_module_source_contains_compute_automatic_metrics_batch28():
-    src = inspect.getsource(rmod)
-    assert "compute_automatic_metrics" in src
-
-
 def test_module_source_contains_figure_caption_prf_batch28():
     src = inspect.getsource(rmod)
     assert "figure_caption_prf" in src

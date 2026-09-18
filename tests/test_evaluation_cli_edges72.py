@@ -508,12 +508,6 @@ def test_source_contains_sanity_check_batch47():
     assert "sanity check" in src or "sanity" in src
 
 
-def test_source_contains_choices_fallback_kreuzberg_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "fallback" in src
-    assert "kreuzberg" in src
-
-
 def test_source_contains_no_hardcoded_paths_batch47():
     src = inspect.getsource(cli_mod)
     assert "C:\\\\Users" not in src
@@ -599,12 +593,6 @@ def test_ast_module_has_if_main_batch47():
     assert len(ifs) >= 2
 
 
-def test_ast_no_class_def_batch47():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 # ---------- forbidden tokens 第一百一十一批 ----------
 
 def test_source_no_eval_batch47():
@@ -622,31 +610,6 @@ def test_source_no_compile_batch47():
     assert "compile(" not in src
 
 
-def test_source_no_globals_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "pickle.load(" not in src
-
-
 def test_source_no_subprocess_batch47():
     src = inspect.getsource(cli_mod)
     assert "subprocess" not in src
@@ -660,11 +623,6 @@ def test_source_no_yield_batch47():
 def test_source_no_walrus_batch47():
     src = inspect.getsource(cli_mod)
     assert ":=" not in src
-
-
-def test_source_no_async_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "async def" not in src
 
 
 def test_source_no_await_batch47():

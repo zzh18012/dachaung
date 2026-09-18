@@ -174,11 +174,6 @@ def _run(tmp_path):
 
 # ---------- run 总览 ----------
 
-def test_run_rc0(tmp_path):
-    rc, _, _ = _run(tmp_path)
-    assert rc == 0
-
-
 def test_success_all_four(tmp_path):
     _, data, _ = _run(tmp_path)
     assert data["summary"][

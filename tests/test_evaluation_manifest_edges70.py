@@ -542,17 +542,6 @@ def test_document_entry_asdict_batch44():
 
 # ---------- Manifest properties ----------
 
-def test_manifest_file_count_batch44():
-    m = Manifest(
-        manifest_version="1.0",
-        devset_status="incomplete",
-        documents=(),
-        expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    assert m.file_count == 0
-
-
 def test_manifest_pdf_count_batch44():
     de1 = DocumentEntry(
         doc_id="d1", path_str="d1.pdf", resolved_path=Path("/tmp/d1.pdf"),

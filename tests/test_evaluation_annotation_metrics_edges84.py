@@ -113,13 +113,6 @@ def test_normalize_uppercase_dependency_batch53(monkeypatch):
 
 # ---------- figure_caption 稳定性 ----------
 
-def test_figure_caption_returns_three_nulls_batch53():
-    out = figure_caption_prf(None, None)
-    assert list(out.keys()) == ["figure_caption_precision",
-                                "figure_caption_recall",
-                                "figure_caption_f1"]
-
-
 # ---------- __all__ 与源码 ----------
 
 def test_all_list_exact_batch53():

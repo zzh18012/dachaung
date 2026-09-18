@@ -442,11 +442,6 @@ def test_source_has_3_frozen_dataclass_batch52():
     assert src.count("@dataclass(frozen=True)") == 3
 
 
-def test_source_has_manifest_error_docstring_batch52():
-    src = inspect.getsource(manifest_mod)
-    assert "清单加载或校验失败" in src
-
-
 def test_source_has_no_mutation_methods_batch52():
     """frozen dataclass 没有显式 __setattr__。"""
     src = inspect.getsource(manifest_mod)

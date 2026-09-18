@@ -394,12 +394,6 @@ def test_docx_locator_ratio_bbox_present_invalidates_batch16():
     assert r["value"] == 0.0
 
 
-def test_docx_locator_ratio_no_locator_key_batch16():
-    elements = [{"type": "paragraph"}]
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 0.0
-
-
 def test_docx_locator_ratio_all_structural_keys_batch16():
     loc = {"section": 0, "paragraph_index": 0, "run_index": 0,
            "table_index": 0, "row_index": 0, "col_index": 0, "relationship_id": "x"}

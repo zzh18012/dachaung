@@ -149,11 +149,6 @@ def test_module_only_one_public_name():
 # =========================================================================
 
 
-def test_document_passes_schema_signature_one_param():
-    sig = inspect.signature(document_passes_schema)
-    assert len(sig.parameters) == 1
-
-
 def test_document_passes_schema_param_annotation_dict():
     sig = inspect.signature(document_passes_schema)
     annotation = sig.parameters["document"].annotation

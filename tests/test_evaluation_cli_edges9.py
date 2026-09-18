@@ -540,12 +540,6 @@ def test_run_inspect_doc_metrics_output_includes_pipeline_success(tmp_path, caps
 # =========================================================================
 
 
-def test_main_inspect_doc_returns_zero(tmp_path, capsys):
-    p = _write_valid_doc(tmp_path)
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-
-
 def test_main_validate_report_invalid_json_returns_1(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("{not json", encoding="utf-8")
@@ -764,16 +758,6 @@ def test_module_imports_manifest():
     import evaluation.cli as m
     assert hasattr(m, "load_manifest")
     assert hasattr(m, "ManifestError")
-
-
-def test_module_imports_report():
-    import evaluation.cli as m
-    assert hasattr(m, "get_git_provenance")
-
-
-def test_module_imports_runner():
-    import evaluation.cli as m
-    assert hasattr(m, "run_evaluation")
 
 
 def test_module_imports_schema():

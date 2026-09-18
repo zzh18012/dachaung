@@ -34,10 +34,6 @@ def test_load_annotation_none_path_batch52():
     assert _load_annotation(None) is None
 
 
-def test_load_annotation_missing_file_batch52(tmp_path):
-    assert _load_annotation(tmp_path / "nope.json") is None
-
-
 def test_load_annotation_oserror_returns_none_batch52(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text("{}", encoding="utf-8")
@@ -422,34 +418,9 @@ def test_source_future_annotations_batch52():
     assert "from __future__ import annotations" in src
 
 
-def test_source_json_import_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "import json" in src
-
-
-def test_source_time_import_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "import time" in src
-
-
-def test_source_path_import_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_source_any_import_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "from typing import Any" in src
-
-
 def test_source_pipeline_imports_batch52():
     src = inspect.getsource(runner_mod)
     assert "from app.pipeline import image_output_dir_for, process_single" in src
-
-
-def test_source_report_version_import_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation import REPORT_VERSION" in src
 
 
 def test_source_annotation_metrics_imports_batch52():
@@ -589,13 +560,6 @@ def test_ast_process_one_2_try_batch52():
     trys = [n for n in ast.walk(func) if isinstance(n, ast.Try)]
     # unlink try = 1
     assert len(trys) == 1
-
-
-def test_ast_run_evaluation_2_with_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation")
-    withs = [n for n in ast.walk(func) if isinstance(n, ast.With)]
-    assert len(withs) == 1  # out_p.open
 
 
 def test_ast_run_evaluation_keyword_only_args_batch52():

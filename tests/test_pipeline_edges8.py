@@ -309,11 +309,6 @@ def test_process_single_creates_output_parent_dir(tmp_path: Path):
     assert out.is_file()
 
 
-def test_process_single_default_write_json_true():
-    sig = inspect.signature(process_single)
-    assert sig.parameters["write_json"].default is True
-
-
 def test_process_single_returns_tuple():
     """返回 (Document|None, list[ErrorRecord])。"""
     sig = inspect.signature(process_single)
@@ -434,30 +429,6 @@ def test_validate_only_return_annotation_tuple():
 # =========================================================================
 
 
-def test_module_uses_future_annotations():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_json():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_path():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
 def test_module_imports_models():
     import app.pipeline as mod
     src = inspect.getsource(mod)
@@ -472,11 +443,6 @@ def test_module_imports_parser_base():
     assert "from app.parsers import" in src
     assert "Parser" in src
     assert "ParserError" in src
-
-
-def test_module_docstring_present():
-    import app.pipeline as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_invariants():

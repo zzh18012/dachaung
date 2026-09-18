@@ -728,14 +728,6 @@ def test_NOT_EVALUATED_is_string():
 # ---------- 模块整体合理性 ----------
 
 
-def test_module_namespace_is_evaluation_metrics():
-    assert m.__name__ == "evaluation.metrics"
-
-
-def test_module_all_only_compute_automatic_metrics():
-    assert m.__all__ == ["compute_automatic_metrics"]
-
-
 def test_module_has_1_public_function():
     public_fns = [
         n for n in dir(m)

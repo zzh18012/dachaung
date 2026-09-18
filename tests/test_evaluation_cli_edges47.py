@@ -34,12 +34,6 @@ def test_build_parser_prog_attribute_batch20():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_has_description_batch20():
-    p = _build_parser()
-    assert p.description is not None
-    assert "评测" in p.description
-
-
 def test_build_parser_subparser_dest_is_command_batch20():
     """subparser 的 dest 应是 'command'。"""
     p = _build_parser()

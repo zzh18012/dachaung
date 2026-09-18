@@ -86,11 +86,6 @@ def test_load_annotation_oserror_returns_none_batch43(tmp_path):
         assert _load_annotation(p) is None
 
 
-def test_load_annotation_uses_utf8_encoding_batch43():
-    src = inspect.getsource(_load_annotation)
-    assert 'encoding="utf-8"' in src
-
-
 def test_load_annotation_returns_dict_type_batch43(tmp_path):
     p = tmp_path / "anno.json"
     p.write_text("{}", encoding="utf-8")

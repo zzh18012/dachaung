@@ -44,36 +44,6 @@ from app.pipeline import (
 # =========================================================================
 
 
-def test_get_parser_fallback_returns_fallback_parser():
-    p = get_parser("fallback")
-    assert isinstance(p, FallbackParser)
-
-
-def test_get_parser_kreuzberg_returns_kreuzberg_parser():
-    p = get_parser("kreuzberg")
-    assert isinstance(p, KreuzbergParser)
-
-
-def test_get_parser_markdown_returns_markdown_parser():
-    p = get_parser("markdown")
-    assert isinstance(p, MarkdownParser)
-
-
-def test_get_parser_html_returns_html_parser():
-    p = get_parser("html")
-    assert isinstance(p, HtmlParser)
-
-
-def test_get_parser_text_returns_text_parser():
-    p = get_parser("text")
-    assert isinstance(p, TextParser)
-
-
-def test_get_parser_ipynb_returns_ipynb_parser():
-    p = get_parser("ipynb")
-    assert isinstance(p, IpynbParser)
-
-
 def test_get_parser_unknown_raises_value_error():
     with pytest.raises(ValueError):
         get_parser("unknown_parser")

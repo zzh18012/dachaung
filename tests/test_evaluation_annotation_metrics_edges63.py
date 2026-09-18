@@ -49,12 +49,6 @@ def test_figure_caption_prf_value_field_is_none_batch36():
         assert v["value"] is None
 
 
-def test_figure_caption_prf_reason_field_batch36():
-    out = figure_caption_prf(None, None)
-    for v in out.values():
-        assert v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 def test_figure_caption_prf_with_none_doc_batch36():
     """doc=None 仍可调用。"""
     out = figure_caption_prf(None, {"figure_caption_anchors": [{"x": 1}]})
@@ -459,11 +453,6 @@ def test_module_source_no_forbidden_tokens_batch36(token):
 # ---------- module source 字符串精确补强第五十一批
 
 
-def test_module_source_contains_chunk_boundary_docstring_batch36():
-    src = inspect.getsource(amod)
-    assert "分块边界" in src
-
-
 def test_module_source_contains_marker_param_doc_batch36():
     src = inspect.getsource(amod)
     assert "marker" in src
@@ -525,11 +514,6 @@ def test_module_source_contains_missing_markers_output_key_batch36():
     assert '"_missing_markers"' in src
 
 
-def test_module_source_contains_tolerance_chars_output_key_batch36():
-    src = inspect.getsource(amod)
-    assert '"_tolerance_chars"' in src
-
-
 def test_module_source_contains_norm_chunks_var_batch36():
     src = inspect.getsource(amod)
     assert "norm_chunks" in src
@@ -576,12 +560,6 @@ def test_signature_chunk_boundary_prf_document_no_default_batch36():
 def test_signature_chunk_boundary_prf_annotation_no_default_batch36():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["annotation"].default is inspect.Parameter.empty
-
-
-def test_signature_chunk_boundary_prf_tolerance_is_keyword_batch36():
-    sig = inspect.signature(chunk_boundary_prf)
-    p = sig.parameters["tolerance_chars"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_signature_figure_caption_prf_is_callable_batch36():

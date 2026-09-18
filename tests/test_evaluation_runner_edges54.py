@@ -490,21 +490,6 @@ def test_module_source_no_star_import_batch26():
     assert "import *" not in source
 
 
-def test_module_source_no_relative_imports_batch26():
-    source = inspect.getsource(rmod)
-    assert "from ." not in source
-
-
-def test_module_source_no_environ_batch26():
-    source = inspect.getsource(rmod)
-    assert "os.environ" not in source
-
-
-def test_module_source_no_dataclass_batch26():
-    source = inspect.getsource(rmod)
-    assert "@dataclass" not in source
-
-
 def test_module_source_no_argparse_batch26():
     source = inspect.getsource(rmod)
     assert "argparse" not in source
@@ -522,27 +507,12 @@ def test_module_source_no_subprocess_batch26():
     assert "subprocess" not in source
 
 
-def test_module_source_time_allowed_batch26():
-    source = inspect.getsource(rmod)
-    assert "import time" in source
-
-
-def test_module_source_json_allowed_batch26():
-    source = inspect.getsource(rmod)
-    assert "import json" in source
-
-
 def test_module_source_uses_from_future_annotations_batch26():
     source = inspect.getsource(rmod)
     assert "from __future__ import annotations" in source
 
 
 # ---------- module source 字符串精确补强第三十九批 ----------
-
-
-def test_module_source_contains_image_output_dir_for_batch26():
-    source = inspect.getsource(rmod)
-    assert "image_output_dir_for" in source
 
 
 def test_module_source_contains_compute_automatic_metrics_batch26():
@@ -568,11 +538,6 @@ def test_module_source_contains_not_instrumented_batch26():
 def test_module_source_contains_write_json_false_batch26():
     source = inspect.getsource(rmod)
     assert "write_json=False" in source
-
-
-def test_module_source_contains_ensure_ascii_false_batch26():
-    source = inspect.getsource(rmod)
-    assert "ensure_ascii=False" in source
 
 
 # ---------- signatures 第三十九批 ----------

@@ -79,12 +79,6 @@ def test_load_annotation_whitespace_then_bom_invalid_batch25(tmp_path):
     assert _load_annotation(p) is None
 
 
-def test_load_annotation_empty_object_batch25(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("{}", encoding="utf-8")
-    assert _load_annotation(p) == {}
-
-
 def test_load_annotation_path_is_dir_returns_none_batch25(tmp_path):
     """path 是目录 → not path.is_file() → None（不调用 open）。"""
     assert _load_annotation(tmp_path) is None
@@ -676,12 +670,6 @@ def test_module_source_no_open_at_module_level_batch25():
             assert not (isinstance(node.value, _ast.Call) and getattr(node.value.func, "id", None) == "open")
 
 
-def test_module_source_no_relative_imports_batch25():
-    source = inspect.getsource(rmod)
-    # runner.py 应使用绝对 from app.pipeline / from evaluation...
-    assert "from ." not in source
-
-
 def test_module_source_uses_from_future_annotations_batch25():
     source = inspect.getsource(rmod)
     assert "from __future__ import annotations" in source
@@ -704,11 +692,6 @@ def test_module_source_constants_no_module_level_mutables_batch25():
 def test_module_source_contains_process_single_batch25():
     source = inspect.getsource(rmod)
     assert "process_single" in source
-
-
-def test_module_source_contains_image_output_dir_for_batch25():
-    source = inspect.getsource(rmod)
-    assert "image_output_dir_for" in source
 
 
 def test_module_source_contains_compute_automatic_metrics_batch25():
@@ -749,11 +732,6 @@ def test_module_source_contains_write_json_false_batch25():
 def test_module_source_contains_per_doc_subdir_batch25():
     source = inspect.getsource(rmod)
     assert "_per_doc" in source
-
-
-def test_module_source_contains_ensure_ascii_false_batch25():
-    source = inspect.getsource(rmod)
-    assert "ensure_ascii=False" in source
 
 
 def test_module_source_contains_from_app_pipeline_batch25():

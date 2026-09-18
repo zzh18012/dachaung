@@ -36,15 +36,6 @@ from evaluation.annotation_metrics import (
 # =========================================================================
 
 
-def test_figure_caption_prf_returns_three_keys_when_doc_none():
-    result = figure_caption_prf(None, None)
-    assert set(result.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_prf_returns_three_keys_when_doc_present():
     result = figure_caption_prf({"chunks": []}, {"chunk_boundary_anchors": []})
     assert set(result.keys()) == {
@@ -575,11 +566,6 @@ def test_module_all_is_list():
 def test_module_all_length_three():
     import evaluation.annotation_metrics as m
     assert len(m.__all__) == 3
-
-
-def test_module_imports_any():
-    import evaluation.annotation_metrics as m
-    assert hasattr(m, "Any")
 
 
 def test_module_imports_normalize_text():

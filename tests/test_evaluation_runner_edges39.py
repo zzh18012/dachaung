@@ -944,17 +944,6 @@ def test_signature_run_evaluation_params_count_batch12():
     assert len(sig.parameters) == 5
 
 
-def test_signature_run_evaluation_param_names_batch12():
-    sig = inspect.signature(run_evaluation)
-    assert list(sig.parameters) == [
-        "manifest",
-        "output_path",
-        "parser_name",
-        "max_chars",
-        "tolerance_chars",
-    ]
-
-
 def test_signature_run_evaluation_keyword_only_after_marker_batch12():
     """parser_name / max_chars / tolerance_chars 是 KEYWORD_ONLY。"""
     sig = inspect.signature(run_evaluation)

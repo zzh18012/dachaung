@@ -49,13 +49,6 @@ def test_ratio_metrics_contains_all_chunk_boundary_batch31():
     assert "chunk_boundary_f1" in _RATIO_METRICS
 
 
-def test_ratio_metrics_figure_caption_not_included_batch31():
-    """figure_caption_* 始终 null，不参与 macro average。"""
-    assert "figure_caption_precision" not in _RATIO_METRICS
-    assert "figure_caption_recall" not in _RATIO_METRICS
-    assert "figure_caption_f1" not in _RATIO_METRICS
-
-
 def test_ratio_metrics_is_tuple_batch31():
     assert isinstance(_RATIO_METRICS, tuple)
 
@@ -295,11 +288,6 @@ def test_build_provenance_max_chars_negative_batch31(tmp_path):
     """max_chars 负数也被接受（int(-5) = -5）。"""
     out = build_provenance(tmp_path, "fallback", -5, None)
     assert out["max_chars"] == -5
-
-
-def test_build_provenance_max_chars_zero_batch31(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 0, None)
-    assert out["max_chars"] == 0
 
 
 def test_build_provenance_max_chars_str_to_int_batch31(tmp_path):

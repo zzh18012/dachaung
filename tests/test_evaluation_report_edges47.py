@@ -189,12 +189,6 @@ def test_get_dependency_versions_values_type_batch31():
         assert v is None or isinstance(v, str)
 
 
-def test_get_dependency_versions_idempotent_batch31():
-    r1 = get_dependency_versions()
-    r2 = get_dependency_versions()
-    assert r1 == r2
-
-
 def test_get_dependency_versions_pdfplumber_value_or_none_batch31():
     result = get_dependency_versions()
     # 测试环境中 pdfplumber 应当已安装
@@ -508,11 +502,6 @@ def test_module_source_no_requests_batch31():
     assert "requests" not in src
 
 
-def test_module_source_no_unlink_batch31():
-    src = inspect.getsource(rmod)
-    assert ".unlink()" not in src
-
-
 # ---------- module source 字符串精确补强第四十五批 ----------
 
 
@@ -575,16 +564,6 @@ def test_module_source_contains_importlib_metadata_batch31():
 # ---------- signatures 第四十五批 ----------
 
 
-def test_signature_get_git_provenance_return_dict_batch31():
-    sig = inspect.signature(get_git_provenance)
-    assert "dict[str, Any]" in str(sig.return_annotation)
-
-
-def test_signature_get_git_provenance_project_root_batch31():
-    sig = inspect.signature(get_git_provenance)
-    assert sig.parameters["project_root"].annotation == "Path"
-
-
 def test_signature_get_dependency_versions_no_params_batch31():
     sig = inspect.signature(get_dependency_versions)
     assert len(sig.parameters) == 0
@@ -594,11 +573,6 @@ def test_signature_build_provenance_params_batch31():
     sig = inspect.signature(build_provenance)
     params = list(sig.parameters.keys())
     assert params == ["project_root", "parser_name", "max_chars", "parser_version"]
-
-
-def test_signature_build_provenance_return_dict_batch31():
-    sig = inspect.signature(build_provenance)
-    assert "dict[str, Any]" in str(sig.return_annotation)
 
 
 def test_signature_build_devset_section_param_batch31():

@@ -353,18 +353,6 @@ def test_module_source_forbidden_tokens_round20_batch15(token):
 # ---------- module source 字符串精确补强第十七批 ----------
 
 
-def test_module_source_imports_json_batch15():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import json" in head
-
-
-def test_module_source_imports_time_batch15():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import time" in head
-
-
 def test_module_source_imports_pathlib_path_batch15():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
@@ -405,11 +393,6 @@ def test_module_source_imports_report_version_batch15():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
     assert "from evaluation import REPORT_VERSION" in head
-
-
-def test_module_source_has_dunder_all_batch15():
-    source = inspect.getsource(rmod)
-    assert "__all__" in source
 
 
 def test_module_source_uses_perf_counter_batch15():
@@ -480,11 +463,6 @@ def test_run_evaluation_default_parser_fallback_batch15():
 def test_run_evaluation_default_max_chars_800_batch15():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["max_chars"].default == 800
-
-
-def test_dunder_all_items_callable_batch15():
-    for name in rmod.__all__:
-        assert callable(getattr(rmod, name))
 
 
 # ---------- module 合理性第十七批 ----------

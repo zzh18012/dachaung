@@ -41,11 +41,6 @@ from evaluation.schema import (
 # ---------- EvalSchemaError 实例化深度 ----------
 
 
-def test_eval_schema_error_message_preserved():
-    err = EvalSchemaError("hello")
-    assert str(err) == "hello"
-
-
 def test_eval_schema_error_default_errors_empty_list():
     err = EvalSchemaError("hello")
     assert err.errors == []
@@ -610,15 +605,6 @@ def test_validate_signature_no_defaults():
         assert p.default is inspect.Parameter.empty
 
 
-def test_validate_signature_no_varargs_varkw():
-    sig = inspect.signature(validate)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 def test_validate_signature_return_none():
     sig = inspect.signature(validate)
     assert sig.return_annotation == "None"
@@ -670,10 +656,6 @@ def test_module_all_has_5_entries():
         "validate",
         "validate_file",
     }
-
-
-def test_module_all_count_is_5():
-    assert len(m.__all__) == 5
 
 
 def test_module_has_1_class():

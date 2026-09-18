@@ -71,12 +71,6 @@ def test_build_parser_subparsers_required_batch43():
         _build_parser().parse_args([])
 
 
-def test_build_parser_has_run_command_batch43():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert args.command == "run"
-
-
 def test_build_parser_run_args_batch43():
     p = _build_parser()
     args = p.parse_args([
@@ -176,12 +170,6 @@ def test_format_metric_none_value_batch43():
     assert "null" in out
     assert "why" in out
     assert "foo" in out
-
-
-def test_format_metric_bool_true_batch43():
-    out = _format_metric("foo", {"value": True, "reason": None})
-    assert "true" in out  # 不是 True
-    assert "ok" in out
 
 
 def test_format_metric_name_width_36_batch43():

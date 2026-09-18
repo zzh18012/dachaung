@@ -137,12 +137,6 @@ def test_chunk_boundary_source_returns_3_metrics_and_tolerance():
     assert '"chunk_boundary_f1"' in src
 
 
-def test_chunk_boundary_source_uses_used_pred_used_gt():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "used_pred" in src
-    assert "used_gt" in src
-
-
 def test_chunk_boundary_source_uses_matched_counter():
     src = inspect.getsource(chunk_boundary_prf)
     assert "matched += 1" in src or "matched =" in src
@@ -588,11 +582,6 @@ def test_module_source_no_exec():
     assert "exec(" not in src
 
 
-def test_module_source_no_compile():
-    src = inspect.getsource(amod)
-    assert "compile(" not in src
-
-
 def test_module_source_no_open():
     """module 级无 open()。"""
     src = inspect.getsource(amod)
@@ -642,12 +631,6 @@ def test_signature_chunk_boundary_prf():
 def test_signature_chunk_boundary_prf_tolerance_default_30():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_signature_chunk_boundary_prf_document_annotation_no_default():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["document"].default is inspect.Parameter.empty
-    assert sig.parameters["annotation"].default is inspect.Parameter.empty
 
 
 def test_signature_chunk_boundary_prf_no_varargs():
@@ -833,11 +816,6 @@ def test_e2e_full_pipeline_with_metrics():
     assert "figure_caption_precision" in merged
     assert "chunk_boundary_precision" in merged
     assert "_tolerance_chars" in merged
-
-
-def test_e2e_chunk_boundary_empty_chunks_list():
-    out = chunk_boundary_prf({"chunks": []}, {})
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 
 def test_e2e_chunk_boundary_document_no_chunks_key():

@@ -192,11 +192,6 @@ def test_chunk_boundary_prf_document_none_with_annotation_batch44():
     assert out["chunk_boundary_precision"]["reason"] == "pipeline_failed"
 
 
-def test_chunk_boundary_prf_document_some_annotation_empty_batch44():
-    out = chunk_boundary_prf({"chunks": []}, {})
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_annotation_no_anchors_key_batch44():
     """annotation 是 dict 但无 chunk_boundary_anchors → 视作空 anchors。"""
     doc = {"chunks": [{"text": "a"}, {"text": "b"}]}

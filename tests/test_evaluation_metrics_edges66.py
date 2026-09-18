@@ -241,12 +241,6 @@ def test_pdf_locator_does_not_mutate_elements_batch40():
 # ---------- _docx_locator_ratio 第四十批
 
 
-def test_docx_locator_empty_elements_returns_null_batch40():
-    m = _docx_locator_ratio([])
-    assert m["value"] is None
-    assert m["reason"] == "no_elements"
-
-
 def test_docx_locator_all_invalid_returns_zero_batch40():
     elements = [{"type": "paragraph", "source_locator": {"unknown": "x"}}]
     m = _docx_locator_ratio(elements)
@@ -729,14 +723,6 @@ def test_module_has_future_annotations_batch40():
 
 def test_module_has_text_types_attribute_batch40():
     assert hasattr(mmod, "_TEXT_TYPES")
-
-
-def test_module_has_pdf_bbox_required_types_attribute_batch40():
-    assert hasattr(mmod, "_PDF_BBOX_REQUIRED_TYPES")
-
-
-def test_module_has_not_evaluated_attribute_batch40():
-    assert hasattr(mmod, "_NOT_EVALUATED")
 
 
 # ---------- 端到端集成 第六十五批

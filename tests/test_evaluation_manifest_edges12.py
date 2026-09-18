@@ -805,12 +805,6 @@ def test_module_docstring_mentions_invariants():
     assert "相对路径" in doc or "absolute" in doc.lower()
 
 
-def test_module_uses_future_annotations():
-    import evaluation.manifest as m
-    sig = inspect.signature(m.load_manifest)
-    assert isinstance(sig.return_annotation, str)
-
-
 def test_module_has_manifest_error_class():
     import evaluation.manifest as m
     assert isinstance(m.ManifestError, type)

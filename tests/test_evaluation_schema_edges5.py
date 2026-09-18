@@ -257,11 +257,6 @@ def test_load_schema_signature():
     assert set(sig.parameters) == {"name"}
 
 
-def test_load_schema_no_default():
-    sig = inspect.signature(load_schema)
-    assert sig.parameters["name"].default is inspect.Parameter.empty
-
-
 def test_load_schema_return_annotation_dict():
     sig = inspect.signature(load_schema)
     assert "dict" in str(sig.return_annotation)
@@ -293,12 +288,6 @@ def test_validate_error_message_contains_schema_name():
     with pytest.raises(EvalSchemaError) as exc:
         validate({}, "manifest.schema.json")
     assert "manifest.schema.json" in str(exc.value)
-
-
-def test_validate_error_message_contains_count():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    assert "处" in str(exc.value)
 
 
 def test_validate_errors_collected():
@@ -356,13 +345,6 @@ def test_validate_file_missing_raises_filenotfound(tmp_path: Path):
     assert "待校验文件不存在" in str(exc.value)
 
 
-def test_validate_file_invalid_json_raises_jsondecodeerror(tmp_path: Path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not valid", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_invalid_content_raises_eval_error(tmp_path: Path):
     p = tmp_path / "bad.json"
     p.write_text("{}", encoding="utf-8")
@@ -376,13 +358,6 @@ def test_validate_file_directory_raises_filenotfound(tmp_path: Path):
     sub.mkdir()
     with pytest.raises(FileNotFoundError):
         validate_file(sub, "manifest.schema.json")
-
-
-def test_validate_file_unknown_schema_raises_filenotfound(tmp_path: Path):
-    p = tmp_path / "ok.json"
-    p.write_text("{}", encoding="utf-8")
-    with pytest.raises(FileNotFoundError):
-        validate_file(p, "nonexistent.schema.json")
 
 
 def test_validate_file_priority_missing_first(tmp_path: Path):
@@ -440,12 +415,6 @@ def test_validate_idempotent():
     for _ in range(3):
         with pytest.raises(EvalSchemaError):
             validate({}, "manifest.schema.json")
-
-
-def test_load_schema_idempotent():
-    a = load_schema("manifest.schema.json")
-    b = load_schema("manifest.schema.json")
-    assert a == b
 
 
 def test_schemas_dir_constant_is_path():

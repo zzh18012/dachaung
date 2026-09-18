@@ -1248,14 +1248,6 @@ def test_module_extension_to_parser_is_dict():
     assert isinstance(_EXTENSION_TO_PARSER, dict)
 
 
-def test_module_extension_to_parser_pdf_value_fallback():
-    assert _EXTENSION_TO_PARSER[".pdf"] == "fallback"
-
-
-def test_module_extension_to_parser_docx_value_fallback():
-    assert _EXTENSION_TO_PARSER[".docx"] == "fallback"
-
-
 def test_module_extension_to_parser_count_nine():
     """9 个扩展名映射：.pdf/.docx/.md/.markdown/.html/.htm/.txt/.text/.ipynb。"""
     assert len(_EXTENSION_TO_PARSER) == 9

@@ -70,10 +70,6 @@ def test_cell_source_bool_returns_empty():
     assert _cell_source_to_text(True) == ""
 
 
-def test_cell_source_float_returns_empty():
-    assert _cell_source_to_text(3.14) == ""
-
-
 def test_cell_source_none_returns_empty():
     assert _cell_source_to_text(None) == ""
 

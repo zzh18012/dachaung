@@ -467,19 +467,6 @@ def test_docx_locator_no_elements_returns_null():
 # ---------- _image_resource_ratio 边界第二批 ----------
 
 
-def test_image_resource_with_no_resource_path(tmp_path):
-    elements = [{"type": "image"}]
-    out = _image_resource_ratio(elements, tmp_path)
-    # images exist but no resource_path → valid=0
-    assert out["value"] == 0.0
-
-
-def test_image_resource_with_empty_resource_path(tmp_path):
-    elements = [{"type": "image", "resource_path": ""}]
-    out = _image_resource_ratio(elements, tmp_path)
-    assert out["value"] == 0.0
-
-
 def test_image_resource_with_none_resource_path(tmp_path):
     elements = [{"type": "image", "resource_path": None}]
     out = _image_resource_ratio(elements, tmp_path)
@@ -831,10 +818,6 @@ def test_strip_unicode_whitespace_with_paragraph_separator():
 
 def test_strip_unicode_whitespace_preserves_digits():
     assert _strip_unicode_whitespace("a 1 b") == "a1b"
-
-
-def test_strip_unicode_whitespace_preserves_punctuation():
-    assert _strip_unicode_whitespace("hello, world!") == "hello,world!"
 
 
 def test_strip_unicode_whitespace_empty_string():

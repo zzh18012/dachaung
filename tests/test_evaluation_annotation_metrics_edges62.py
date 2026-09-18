@@ -269,11 +269,6 @@ def test_chunk_boundary_prf_doc_none_returns_pipeline_failed_batch35():
     assert out["chunk_boundary_f1"]["reason"] == "pipeline_failed"
 
 
-def test_chunk_boundary_prf_annotation_none_returns_no_annotation_batch35():
-    out = chunk_boundary_prf({"chunks": [{"text": "a"}, {"text": "b"}]}, None)
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_returns_dict_type_batch35():
     out = chunk_boundary_prf(None, None)
     assert isinstance(out, dict)

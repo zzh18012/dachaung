@@ -47,11 +47,6 @@ def test_eval_schema_error_message_attribute():
     assert e.args == ("test message",)
 
 
-def test_eval_schema_error_str_returns_message():
-    e = EvalSchemaError("hello")
-    assert str(e) == "hello"
-
-
 def test_eval_schema_error_repr_includes_class_name():
     e = EvalSchemaError("hi")
     assert "EvalSchemaError" in repr(e)

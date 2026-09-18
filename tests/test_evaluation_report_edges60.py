@@ -84,11 +84,6 @@ def test_ratio_metrics_is_tuple_batch45():
     assert isinstance(_RATIO_METRICS, tuple)
 
 
-def test_ratio_metrics_contains_text_char_multiset_batch45():
-    assert "text_char_multiset_precision" in _RATIO_METRICS
-    assert "text_char_multiset_recall" in _RATIO_METRICS
-
-
 def test_ratio_metrics_contains_chunk_boundary_batch45():
     assert "chunk_boundary_precision" in _RATIO_METRICS
     assert "chunk_boundary_recall" in _RATIO_METRICS
@@ -393,14 +388,6 @@ def test_aggregate_summary_empty_batch45():
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
 
 
-def test_aggregate_summary_empty_success_rates_batch45():
-    out = aggregate_summary([])
-    sr = out["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 0
-    assert sr["total"] == 0
-    assert sr["rate"] is None
-
-
 def test_aggregate_summary_empty_silent_drop_batch45():
     out = aggregate_summary([])
     assert out["silent_drop_total"] is None
@@ -524,11 +511,6 @@ def test_aggregate_summary_silent_drop_zero_counted_batch45():
     ]
     out = aggregate_summary(per_doc)
     assert out["silent_drop_total"] == 5
-
-
-def test_aggregate_summary_has_12_ratio_entries_batch45():
-    out = aggregate_summary([])
-    assert len(out["ratio_macro_averages"]) == 12
 
 
 # ---------- module source 字符串精确 ----------
@@ -680,12 +662,6 @@ def test_ast_top_level_function_names_batch45():
     ]
 
 
-def test_ast_top_level_no_class_batch45():
-    tree = ast.parse(inspect.getsource(report_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_get_git_provenance_has_try_batch45():
     tree = ast.parse(inspect.getsource(report_mod))
     func = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "get_git_provenance"][0]
@@ -759,16 +735,6 @@ def test_ast_build_provenance_calls_get_dep_versions_batch45():
 
 
 # ---------- forbidden tokens 第一百批 ----------
-
-def test_source_no_eval_batch45():
-    src = inspect.getsource(report_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch45():
-    src = inspect.getsource(report_mod)
-    assert "exec(" not in src
-
 
 def test_source_no_compile_batch45():
     src = inspect.getsource(report_mod)

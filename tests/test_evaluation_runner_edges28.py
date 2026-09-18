@@ -138,11 +138,6 @@ def test_process_one_param_count():
     assert len(sig.parameters) == 4
 
 
-def test_process_one_param_names():
-    sig = inspect.signature(_process_one)
-    assert list(sig.parameters) == ["doc", "output_root", "parser_name", "max_chars"]
-
-
 def test_process_one_param_kinds_all_positional_or_keyword():
     sig = inspect.signature(_process_one)
     for p in sig.parameters.values():

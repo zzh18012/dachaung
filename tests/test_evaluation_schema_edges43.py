@@ -787,11 +787,6 @@ def test_module_has_three_functions_batch23():
     assert set(funcs) == {"_schema_path", "load_schema", "validate", "validate_file"}
 
 
-def test_module_docstring_present_batch23():
-    assert smod.__doc__ is not None
-    assert len(smod.__doc__) > 0
-
-
 def test_module_docstring_mentions_schema_batch23():
     """module docstring 应提及 Schema / 校验。"""
     src = smod.__doc__

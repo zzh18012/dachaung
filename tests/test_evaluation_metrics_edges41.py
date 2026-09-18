@@ -517,19 +517,6 @@ def test_image_resource_ratio_no_images_batch14():
     assert out["value"] is None
 
 
-def test_image_resource_ratio_image_no_resource_path_batch14(tmp_path):
-    elements = [{"type": "image"}]
-    out = _image_resource_ratio(elements, tmp_path)
-    # 无 resource_path → 计 0
-    assert out["value"] == 0.0
-
-
-def test_image_resource_ratio_image_resource_path_none_batch14(tmp_path):
-    elements = [{"type": "image", "resource_path": None}]
-    out = _image_resource_ratio(elements, tmp_path)
-    assert out["value"] == 0.0
-
-
 def test_image_resource_ratio_image_file_exists_batch14(tmp_path):
     img = tmp_path / "a.png"
     img.write_bytes(b"\x89PNG")
@@ -610,18 +597,6 @@ def test_module_source_future_annotations_present_batch14():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_pathlib_path_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from pathlib import Path" in head
-
-
-def test_module_source_imports_typing_any_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from typing import Any" in head
-
-
 def test_module_source_defines_text_types_batch14():
     source = inspect.getsource(mmod)
     assert "_TEXT_TYPES" in source
@@ -662,21 +637,6 @@ def test_module_source_defines_strip_unicode_whitespace_batch14():
     assert "def _strip_unicode_whitespace(" in source
 
 
-def test_module_source_defines_is_valid_bbox_batch14():
-    source = inspect.getsource(mmod)
-    assert "def _is_valid_bbox(" in source
-
-
-def test_module_source_uses_isfinite_batch14():
-    source = inspect.getsource(mmod)
-    assert "math.isfinite" in source
-
-
-def test_module_source_no_subprocess_import_batch14():
-    source = inspect.getsource(mmod)
-    assert "import subprocess" not in source
-
-
 def test_module_source_no_open_call_batch14():
     source = inspect.getsource(mmod)
     # 不应有 open( 调用（除注释中的）
@@ -706,18 +666,6 @@ def test_module_source_has_pipeline_failed_reason_batch14():
 
 
 # ---------- signatures 第十六批 ----------
-
-
-def test_null_signature_one_param_batch14():
-    sig = inspect.signature(_null)
-    assert len(sig.parameters) == 1
-    assert "reason" in sig.parameters
-
-
-def test_ratio_signature_one_param_batch14():
-    sig = inspect.signature(_ratio)
-    assert len(sig.parameters) == 1
-    assert "value" in sig.parameters
 
 
 def test_bool_metric_signature_one_param_batch14():

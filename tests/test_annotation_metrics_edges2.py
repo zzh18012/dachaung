@@ -123,15 +123,6 @@ def test_figure_caption_returns_distinct_dicts_per_call():
     assert r1["figure_caption_precision"] is not r2["figure_caption_precision"]
 
 
-def test_figure_caption_three_keys_exactly():
-    result = figure_caption_prf(None, None)
-    assert set(result.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_keys_alphabetical_order_in_dict():
     """Python 3.7+ dict 保序：源码按 precision/recall/f1 顺序写入。"""
     result = figure_caption_prf(None, None)

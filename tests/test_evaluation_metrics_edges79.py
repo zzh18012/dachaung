@@ -161,10 +161,6 @@ def test_bbox_negative_ok_batch52():
     assert _is_valid_bbox([-1.5, -2, 0, 3]) is True
 
 
-def test_bbox_bool_rejected_batch52():
-    assert _is_valid_bbox([True, False, True, False]) is False
-
-
 # ---------- _strip_unicode_whitespace 特殊字符 ----------
 
 def test_strip_keeps_zero_width_space_batch52():

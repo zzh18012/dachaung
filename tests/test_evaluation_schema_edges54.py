@@ -690,11 +690,6 @@ def test_signature_schema_path_one_param_batch34():
     assert list(sig.parameters.keys()) == ["name"]
 
 
-def test_signature_schema_path_return_path_batch34():
-    sig = inspect.signature(_schema_path)
-    assert sig.return_annotation == "Path"
-
-
 def test_signature_load_schema_one_param_batch34():
     sig = inspect.signature(load_schema)
     assert list(sig.parameters.keys()) == ["name"]
@@ -719,18 +714,6 @@ def test_module_has_schemas_dir_attribute_batch34():
 
 def test_module_has_eval_schema_error_attribute_batch34():
     assert hasattr(smod, "EvalSchemaError")
-
-
-def test_module_has_load_schema_attribute_batch34():
-    assert hasattr(smod, "load_schema")
-
-
-def test_module_has_validate_attribute_batch34():
-    assert hasattr(smod, "validate")
-
-
-def test_module_has_validate_file_attribute_batch34():
-    assert hasattr(smod, "validate_file")
 
 
 def test_module_all_contains_5_entries_batch34():

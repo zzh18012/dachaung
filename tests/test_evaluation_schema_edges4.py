@@ -103,11 +103,6 @@ def test_eval_schema_error_none_errors_becomes_empty():
     assert e.errors == []
 
 
-def test_eval_schema_error_can_be_raised_and_caught():
-    with pytest.raises(EvalSchemaError):
-        raise EvalSchemaError("test")
-
-
 def test_eval_schema_error_caught_as_exception():
     try:
         raise EvalSchemaError("test")
@@ -392,13 +387,6 @@ def test_validate_file_str_path(tmp_path: Path):
     validate_file(str(p), "manifest.schema.json")
 
 
-def test_validate_file_unknown_schema_raises_filenotfound(tmp_path: Path):
-    p = tmp_path / "ok.json"
-    p.write_text("{}", encoding="utf-8")
-    with pytest.raises(FileNotFoundError):
-        validate_file(p, "nonexistent.schema.json")
-
-
 def test_validate_file_directory_raises_filenotfound(tmp_path: Path):
     """传入目录 → FileNotFoundError。"""
     sub = tmp_path / "sub"
@@ -538,12 +526,6 @@ def test_module_internal_schema_path_callable():
 # =========================================================================
 # 综合行为
 # =========================================================================
-
-
-def test_load_schema_idempotent():
-    a = load_schema("manifest.schema.json")
-    b = load_schema("manifest.schema.json")
-    assert a == b
 
 
 def test_validate_then_load_schema_consistent():

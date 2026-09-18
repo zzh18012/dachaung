@@ -192,13 +192,6 @@ def test_build_parser_inspect_positional_action_count_1_batch13():
 # ---------- argparse Namespace 行为第十三批 ----------
 
 
-def test_namespace_run_command_attribute_batch13():
-    ns = _build_parser().parse_args([
-        "run", "--manifest", "a.json", "--output", "b.json",
-    ])
-    assert ns.command == "run"
-
-
 def test_namespace_validate_command_attribute_batch13():
     ns = _build_parser().parse_args(["validate-report", "r.json"])
     assert ns.command == "validate-report"
@@ -243,14 +236,6 @@ def test_namespace_tolerance_chars_default_value_type_int_batch13():
         "run", "--manifest", "a.json", "--output", "b.json",
     ])
     assert isinstance(ns.tolerance_chars, int)
-
-
-def test_namespace_custom_parser_value_kreuzberg_batch13():
-    ns = _build_parser().parse_args([
-        "run", "--manifest", "a.json", "--output", "b.json",
-        "--parser", "kreuzberg",
-    ])
-    assert ns.parser == "kreuzberg"
 
 
 def test_namespace_custom_max_chars_value_batch13():
@@ -424,15 +409,6 @@ def test_run_inspect_doc_stdout_contains_counts_label_batch13(tmp_path, capsys):
     _run_inspect_doc(args)
     out = capsys.readouterr().out
     assert "counts:" in out
-
-
-def test_run_inspect_doc_stdout_contains_metrics_label_batch13(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "metrics:" in out
 
 
 def test_run_inspect_doc_returns_zero_for_valid_doc_batch13(tmp_path):
@@ -908,16 +884,6 @@ def test_module_source_has_ManifestError_in_except_batch13():
 def test_module_source_has_SystemExit_at_bottom_batch13():
     source = inspect.getsource(climod)
     assert "raise SystemExit(main())" in source or "SystemExit" in source
-
-
-def test_module_source_has_format_metric_function_batch13():
-    source = inspect.getsource(climod)
-    assert "def _format_metric(" in source
-
-
-def test_module_source_has_run_inspect_doc_function_batch13():
-    source = inspect.getsource(climod)
-    assert "def _run_inspect_doc(" in source
 
 
 def test_module_source_format_metric_padding_36_batch13():

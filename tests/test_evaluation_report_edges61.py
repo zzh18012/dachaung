@@ -310,11 +310,6 @@ def test_aggregate_silent_drop_zero_batch47():
     assert s["silent_drop_total"] == 0
 
 
-def test_aggregate_silent_drop_empty_batch47():
-    s = aggregate_summary([])
-    assert s["silent_drop_total"] is None
-
-
 def test_aggregate_silent_drop_missing_key_batch47():
     """doc 没有 silent_drop_count → 跳过。"""
     per_doc = [
@@ -572,16 +567,6 @@ def test_source_contains_cwd_str_conversion_batch47():
     assert "cwd=str" in src
 
 
-def test_source_contains_capture_output_batch47():
-    src = inspect.getsource(report_mod)
-    assert "capture_output=True" in src
-
-
-def test_source_contains_timeout_10_batch47():
-    src = inspect.getsource(report_mod)
-    assert "timeout=10" in src
-
-
 def test_source_contains_pypdfium2_batch47():
     src = inspect.getsource(report_mod)
     assert "pypdfium2" in src
@@ -603,13 +588,6 @@ def test_ast_top_level_functions_count_batch47():
     tree = ast.parse(inspect.getsource(report_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 5  # get_git_provenance / get_dependency_versions / build_provenance / build_devset_section / aggregate_summary
-
-
-def test_ast_top_level_assigns_count_batch47():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    # 3 tuple constants + 1 __all__
-    assert len(assigns) == 4
 
 
 def test_ast_ratio_metrics_is_tuple_literal_batch47():
@@ -707,12 +685,6 @@ def test_ast_build_devset_section_has_return_dict_batch47():
     assert isinstance(returns[0].value, ast.Dict)
 
 
-def test_ast_no_class_def_batch47():
-    tree = ast.parse(inspect.getsource(report_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_module_has_docstring_batch47():
     tree = ast.parse(inspect.getsource(report_mod))
     assert isinstance(tree.body[0], ast.Expr)
@@ -720,16 +692,6 @@ def test_ast_module_has_docstring_batch47():
 
 
 # ---------- forbidden tokens 第一百零八批 ----------
-
-def test_source_no_eval_batch47():
-    src = inspect.getsource(report_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch47():
-    src = inspect.getsource(report_mod)
-    assert "exec(" not in src
-
 
 def test_source_no_compile_batch47():
     src = inspect.getsource(report_mod)

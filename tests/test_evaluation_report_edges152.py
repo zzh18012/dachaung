@@ -183,15 +183,6 @@ def test_report_schema_batch551(tmp_path):
              "evaluation-report.schema.json")
 
 
-def test_report_on_disk_round_trip_batch551(
-        tmp_path):
-    r = _run(tmp_path)
-    on_disk = json.loads(
-        (tmp_path / "r.json").read_text(
-            encoding="utf-8"))
-    assert on_disk == r
-
-
 # ---------- 源码补强 ----------
 
 def _src():

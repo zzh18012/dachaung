@@ -209,11 +209,6 @@ def test_process_one_parser_name_no_default():
     assert sig.parameters["parser_name"].default is inspect.Parameter.empty
 
 
-def test_process_one_max_chars_no_default():
-    sig = inspect.signature(_process_one)
-    assert sig.parameters["max_chars"].default is inspect.Parameter.empty
-
-
 def test_process_one_return_annotation_tuple():
     sig = inspect.signature(_process_one)
     assert "tuple" in str(sig.return_annotation).lower()

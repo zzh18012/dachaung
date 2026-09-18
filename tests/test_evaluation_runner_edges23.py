@@ -200,11 +200,6 @@ def test_load_annotation_source_has_not_is_file():
     assert "not path.is_file()" in src
 
 
-def test_load_annotation_source_has_utf8():
-    src = inspect.getsource(_load_annotation)
-    assert 'encoding="utf-8"' in src
-
-
 def test_load_annotation_source_has_json_load():
     src = inspect.getsource(_load_annotation)
     assert "json.load" in src
@@ -487,11 +482,6 @@ def test_run_evaluation_source_has_actual_code_logic():
     assert "actual_code = errors[0].code if errors else None" in src
 
 
-def test_run_evaluation_source_calls_build_provenance():
-    src = inspect.getsource(run_evaluation)
-    assert "build_provenance(" in src
-
-
 def test_run_evaluation_source_calls_build_devset_section():
     src = inspect.getsource(run_evaluation)
     assert "build_devset_section(manifest)" in src
@@ -509,16 +499,6 @@ def test_run_evaluation_source_has_public_per_doc_4_keys():
     assert '"source_type": r["source_type"]' in src
     assert '"metrics": r["metrics"]' in src
     assert '"wall_time_seconds": r["wall_time_seconds"]' in src
-
-
-def test_run_evaluation_source_has_report_6_keys():
-    src = inspect.getsource(run_evaluation)
-    assert '"report_version": REPORT_VERSION' in src
-    assert '"provenance": provenance' in src
-    assert '"devset": devset' in src
-    assert '"summary": summary' in src
-    assert '"per_doc": public_per_doc' in src
-    assert '"expected_failures": expected_failure_results' in src
 
 
 def test_run_evaluation_source_has_json_dump_ensure_ascii_false():

@@ -527,49 +527,9 @@ def test_ast_manifest_error_no_methods_batch46():
 
 # ---------- forbidden tokens 第一百零七批 ----------
 
-def test_source_no_eval_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "os.system(" not in src
-
-
 def test_source_no_popen_batch46():
     src = inspect.getsource(manifest_mod)
     assert ".popen(" not in src
-
-
-def test_source_no_yaml_load_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "pickle.load(" not in src
 
 
 def test_source_no_yield_batch46():

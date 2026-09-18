@@ -784,11 +784,6 @@ def test_module_source_has_sys_stdout_reconfigure():
     assert 'sys.stdout.reconfigure' in src
 
 
-def test_module_source_has_sys_stderr_reconfigure():
-    src = inspect.getsource(cli_mod)
-    assert 'sys.stderr.reconfigure' in src
-
-
 def test_module_source_has_hasattr_check():
     src = inspect.getsource(cli_mod)
     assert 'hasattr(sys.stdout, "reconfigure")' in src

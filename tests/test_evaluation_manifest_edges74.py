@@ -591,11 +591,6 @@ def test_source_contains_pathlib_import_batch48():
     assert "from pathlib import Path" in src
 
 
-def test_source_contains_typing_any_import_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "from typing import Any" in src
-
-
 def test_source_contains_manifest_version_import_batch48():
     src = inspect.getsource(manifest_mod)
     assert "from evaluation import MANIFEST_VERSION" in src
@@ -690,12 +685,6 @@ def test_ast_top_level_class_count_batch48():
 def test_ast_no_async_function_def_batch48():
     tree = ast.parse(inspect.getsource(manifest_mod))
     assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
-
-
-def test_ast_module_docstring_batch48():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_document_entry_field_count_batch48():

@@ -44,25 +44,10 @@ def test_figure_caption_prf_three_keys_batch10():
     }
 
 
-def test_figure_caption_prf_keys_in_order_batch10():
-    out = figure_caption_prf(None, None)
-    assert list(out.keys()) == [
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    ]
-
-
 def test_figure_caption_prf_all_values_null_batch10():
     out = figure_caption_prf(None, None)
     for v in out.values():
         assert v["value"] is None
-
-
-def test_figure_caption_prf_reason_constant_batch10():
-    out = figure_caption_prf(None, None)
-    for v in out.values():
-        assert v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
 
 
 def test_figure_caption_prf_with_document_still_null_batch10():
@@ -549,16 +534,6 @@ def test_module_source_has_future_annotations_batch10():
     assert "from __future__ import annotations" in source
 
 
-def test_module_source_imports_counter_batch10():
-    source = inspect.getsource(amod)
-    assert "from collections import Counter" in source
-
-
-def test_module_source_imports_typing_any_batch10():
-    source = inspect.getsource(amod)
-    assert "from typing import Any" in source
-
-
 def test_module_source_imports_normalize_text_batch10():
     source = inspect.getsource(amod)
     assert "from app.chunkers.structural import normalize_text" in source
@@ -587,11 +562,6 @@ def test_module_source_has_chunk_boundary_prf_def_batch10():
 def test_module_source_uses_normalize_text_batch10():
     source = inspect.getsource(amod)
     assert "normalize_text(" in source
-
-
-def test_module_source_no_main_block_batch10():
-    source = inspect.getsource(amod)
-    assert "if __name__" not in source
 
 
 def test_module_source_docstring_present_batch10():
@@ -633,11 +603,6 @@ def test_module_source_uses_position_before_after_batch10():
 def test_module_source_uses_missing_markers_batch10():
     source = inspect.getsource(amod)
     assert "missing_markers" in source
-
-
-def test_module_source_uses_chunk_boundary_anchors_batch10():
-    source = inspect.getsource(amod)
-    assert "chunk_boundary_anchors" in source
 
 
 def test_module_source_no_print_batch10():
@@ -831,14 +796,6 @@ def test_module_constants_count_batch10():
     ]
     # annotations 是 from __future__ import annotations 注入的（_Feature 对象）
     assert set(consts) == {"PARSER_DOES_NOT_EMIT_RELATIONS", "annotations"}
-
-
-def test_module_parser_does_not_emit_constant_value_batch10():
-    assert amod.PARSER_DOES_NOT_EMIT_RELATIONS == "parser_does_not_emit_relations"
-
-
-def test_module_parser_does_not_emit_constant_type_batch10():
-    assert isinstance(amod.PARSER_DOES_NOT_EMIT_RELATIONS, str)
 
 
 def test_module_no_call_at_top_level_batch10():

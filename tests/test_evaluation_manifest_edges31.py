@@ -68,11 +68,6 @@ def test_is_absolute_like_mixed_case_drive():
     assert _is_absolute_like("D:/Users") is True
 
 
-def test_is_absolute_like_drive_only_no_separator():
-    # "C:" 后面没有 / 或 \，应该是 False
-    assert _is_absolute_like("C:foo") is False
-
-
 def test_is_absolute_like_drive_with_dash():
     # "C-foo" 不是绝对路径
     assert _is_absolute_like("C-foo") is False
@@ -1156,11 +1151,6 @@ def test_module_source_no_class_outside_dataclass():
                 )
 
 
-def test_module_source_no_yield():
-    src = inspect.getsource(mmod)
-    assert "yield " not in src
-
-
 def test_module_source_no_async():
     src = inspect.getsource(mmod)
     assert "async " not in src
@@ -1186,11 +1176,6 @@ def test_module_source_uses_validate():
 def test_module_source_uses_json_load():
     src = inspect.getsource(mmod)
     assert "json.load(" in src
-
-
-def test_module_source_uses_manifest_version():
-    src = inspect.getsource(mmod)
-    assert "MANIFEST_VERSION" in src
 
 
 def test_module_source_no_csv():

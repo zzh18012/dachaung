@@ -413,17 +413,6 @@ def test_manifest_has_5_properties():
     assert expected.issubset(set(properties))
 
 
-def test_manifest_file_count():
-    m = Manifest(
-        manifest_version="1.0",
-        devset_status="incomplete",
-        documents=(),
-        expected_failures=(),
-        project_root=Path("/tmp"),
-    )
-    assert m.file_count == 0
-
-
 def test_manifest_pdf_count():
     de_pdf = DocumentEntry(
         doc_id="d1", path_str="x.pdf", resolved_path=Path("/tmp/x.pdf"),
@@ -864,10 +853,6 @@ def test_is_absolute_like_posix_root():
     assert _is_absolute_like("/") is True
 
 
-def test_is_absolute_like_posix_path():
-    assert _is_absolute_like("/foo/bar") is True
-
-
 def test_is_absolute_like_windows_backslash():
     assert _is_absolute_like("C:\\foo") is True
 
@@ -905,13 +890,6 @@ def test_is_absolute_like_relative_filename():
 def test_is_absolute_like_unc_path():
     """UNC \\\\server\\share → 以 \\\\ 开头，is_absolute_like 不识别（只看 / 和 C:/）。"""
     assert _is_absolute_like("\\\\server\\share") is False
-
-
-def test_is_absolute_like_signature_1_param():
-    sig = inspect.signature(_is_absolute_like)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path_str"
 
 
 def test_is_absolute_like_no_varargs_varkw():
@@ -1404,11 +1382,6 @@ def test_load_manifest_source_uses_is_file():
 def test_load_manifest_source_uses_utf8():
     src = inspect.getsource(load_manifest)
     assert 'encoding="utf-8"' in src
-
-
-def test_load_manifest_source_calls_validate():
-    src = inspect.getsource(load_manifest)
-    assert 'validate(data, "manifest.schema.json")' in src
 
 
 def test_load_manifest_source_compares_manifest_version():

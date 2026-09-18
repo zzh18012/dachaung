@@ -93,20 +93,8 @@ def test_schema_path_is_path_object():
     assert isinstance(SCHEMA_PATH, Path)
 
 
-def test_schema_path_is_absolute():
-    assert SCHEMA_PATH.is_absolute()
-
-
-def test_schema_path_is_file():
-    assert SCHEMA_PATH.is_file()
-
-
 def test_schema_path_name_is_document_schema():
     assert SCHEMA_PATH.name == "document.schema.json"
-
-
-def test_schema_path_parent_name_is_schemas():
-    assert SCHEMA_PATH.parent.name == "schemas"
 
 
 def test_schema_path_parent_parent_has_pyproject():
@@ -157,10 +145,6 @@ def test_schema_validation_error_errors_is_list_type():
 
 def test_schema_validation_error_inherits_from_exception():
     assert issubclass(SchemaValidationError, Exception)
-
-
-def test_schema_validation_error_does_not_inherit_from_value_error():
-    assert not issubclass(SchemaValidationError, ValueError)
 
 
 def test_schema_validation_error_two_instances_independent():

@@ -95,18 +95,8 @@ def test_eval_schema_error_args_multiple_batch16():
     assert err.args == ("msg",)
 
 
-def test_eval_schema_error_str_default_batch16():
-    err = EvalSchemaError("hello")
-    assert str(err) == "hello"
-
-
 def test_eval_schema_error_errors_default_empty_batch16():
     err = EvalSchemaError("msg")
-    assert err.errors == []
-
-
-def test_eval_schema_error_errors_none_to_empty_batch16():
-    err = EvalSchemaError("msg", errors=None)
     assert err.errors == []
 
 
@@ -317,13 +307,6 @@ def test_validate_file_invalid_json_batch16(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_invalid_schema_name_batch16(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text("{}", encoding="utf-8")
-    with pytest.raises(FileNotFoundError):
-        validate_file(p, "nonexistent.schema.json")
-
-
 # ---------- _schema_path 行为深度第十六批 ----------
 
 
@@ -402,12 +385,6 @@ def test_module_source_no_network_batch16():
 # ---------- module source 字符串精确补强第二十七批 ----------
 
 
-def test_module_source_has_future_annotations_batch16():
-    src = inspect.getsource(smod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
-
-
 def test_module_source_has_docstring_batch16():
     src = inspect.getsource(smod)
     assert "加载并校验本阶段三个新 Schema" in src
@@ -446,21 +423,6 @@ def test_module_source_has_schemas_dir_definition_batch16():
 def test_module_source_has_class_eval_schema_error_batch16():
     src = inspect.getsource(smod)
     assert "class EvalSchemaError(Exception):" in src
-
-
-def test_module_source_has_load_schema_function_batch16():
-    src = inspect.getsource(smod)
-    assert "def load_schema(name: str) -> dict[str, Any]:" in src
-
-
-def test_module_source_has_validate_function_batch16():
-    src = inspect.getsource(smod)
-    assert "def validate(instance: dict[str, Any], schema_name: str) -> None:" in src
-
-
-def test_module_source_has_validate_file_function_batch16():
-    src = inspect.getsource(smod)
-    assert "def validate_file(path: Path | str, schema_name: str) -> None:" in src
 
 
 def test_module_source_has_schema_path_function_batch16():

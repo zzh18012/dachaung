@@ -266,11 +266,6 @@ def test_signature_no_var_keyword_batch4():
     assert not has_var_kw
 
 
-def test_signature_param_count_exact_one_batch4():
-    sig = inspect.signature(document_passes_schema)
-    assert len(sig.parameters) == 1
-
-
 def test_signature_only_one_param_named_document_batch4():
     sig = inspect.signature(document_passes_schema)
     assert list(sig.parameters.keys()) == ["document"]

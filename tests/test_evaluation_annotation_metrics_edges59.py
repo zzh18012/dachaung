@@ -51,15 +51,6 @@ def test_parser_does_not_emit_relations_in_all_batch32():
 # ---------- figure_caption_prf 第三十二批 ----------
 
 
-def test_figure_caption_prf_returns_three_keys_batch32():
-    out = figure_caption_prf({"chunks": []}, None)
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_prf_all_values_none_batch32():
     out = figure_caption_prf({"chunks": [{"text": "x"}]}, {"any": "annotation"})
     for v in out.values():
@@ -120,12 +111,6 @@ def test_chunk_boundary_prf_document_none_returns_pipeline_failed_batch32():
     for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
         assert out[k]["value"] is None
         assert out[k]["reason"] == "pipeline_failed"
-
-
-def test_chunk_boundary_prf_empty_annotation_returns_no_annotation_batch32():
-    out = chunk_boundary_prf({"chunks": []}, {})
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["reason"] == "no_annotation"
 
 
 def test_chunk_boundary_prf_one_chunk_returns_no_predicted_batch32():
@@ -400,22 +385,7 @@ def test_module_source_contains_normalize_text_call_batch32():
     assert "normalize_text(" in src
 
 
-def test_module_source_contains_tolerance_chars_record_batch32():
-    src = inspect.getsource(amod)
-    assert '"_tolerance_chars"' in src
-
-
 # ---------- signatures 第四十五批 ----------
-
-
-def test_signature_figure_caption_prf_return_dict_batch32():
-    sig = inspect.signature(figure_caption_prf)
-    assert "dict[str, dict[str, Any]]" in str(sig.return_annotation)
-
-
-def test_signature_chunk_boundary_prf_return_dict_batch32():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert "dict[str, dict[str, Any]]" in str(sig.return_annotation)
 
 
 def test_signature_chunk_boundary_prf_tolerance_default_30_batch32():
@@ -481,11 +451,6 @@ def test_module_all_has_three_entries_batch32():
         '"chunk_boundary_prf"',
     ]:
         assert name in src
-
-
-def test_module_no_main_block_batch32():
-    src = inspect.getsource(amod)
-    assert 'if __name__ == "__main__"' not in src
 
 
 # ---------- 端到端集成第四十五批 ----------

@@ -265,11 +265,6 @@ def test_process_one_source_has_out_stub_path():
     assert 'out_stub = output_root / "_per_doc" / f"{doc.doc_id}.json"' in src
 
 
-def test_process_one_source_has_parent_mkdir():
-    src = inspect.getsource(_process_one)
-    assert "out_stub.parent.mkdir(parents=True, exist_ok=True)" in src
-
-
 def test_process_one_source_has_perf_counter_calls():
     src = inspect.getsource(_process_one)
     assert "t0 = time.perf_counter()" in src
@@ -549,14 +544,6 @@ def test_module_source_no_async():
     assert "async def" not in src
 
 
-def test_module_source_no_decorators():
-    src = inspect.getsource(m)
-    for line in src.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("@"):
-            pytest.fail(f"Found decorator: {stripped}")
-
-
 def test_module_source_no_lambda():
     src = inspect.getsource(m)
     assert "lambda" not in src
@@ -658,23 +645,11 @@ def test_run_evaluation_no_default_for_manifest_output_path():
     assert sig.parameters["output_path"].default is inspect.Parameter.empty
 
 
-def test_namespace_load_annotation():
-    assert _load_annotation.__module__ == "evaluation.runner"
-
-
-def test_namespace_process_one():
-    assert _process_one.__module__ == "evaluation.runner"
-
-
 def test_namespace_run_evaluation():
     assert run_evaluation.__module__ == "evaluation.runner"
 
 
 # ---------- 模块整体合理性 ----------
-
-
-def test_module_all_is_list():
-    assert isinstance(m.__all__, list)
 
 
 def test_module_all_entries_str():

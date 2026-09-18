@@ -520,11 +520,6 @@ def test_module_source_contains_frozen_true_batch28():
     assert "@dataclass(frozen=True)" in src
 
 
-def test_module_source_contains_document_entry_class_batch28():
-    src = inspect.getsource(mmod)
-    assert "class DocumentEntry" in src
-
-
 def test_module_source_contains_expected_failure_class_batch28():
     src = inspect.getsource(mmod)
     assert "class ExpectedFailure" in src
@@ -575,11 +570,6 @@ def test_signature_resolve_relative_path_return_batch28():
     assert sig.return_annotation == "Path"
 
 
-def test_signature_detect_project_root_return_batch28():
-    sig = inspect.signature(_detect_project_root)
-    assert sig.return_annotation == "Path"
-
-
 def test_signature_is_absolute_like_return_batch28():
     sig = inspect.signature(_is_absolute_like)
     assert sig.return_annotation == "bool"
@@ -626,12 +616,6 @@ def test_module_imports_manifest_version_batch28():
 def test_module_imports_schema_validate_batch28():
     src = inspect.getsource(mmod)
     assert "from evaluation.schema import validate" in src
-
-
-def test_module_all_export_count_batch28():
-    src = inspect.getsource(mmod)
-    for name in ['"ManifestError"', '"Manifest"', '"DocumentEntry"', '"ExpectedFailure"', '"load_manifest"']:
-        assert name in src
 
 
 def test_module_no_main_block_batch28():

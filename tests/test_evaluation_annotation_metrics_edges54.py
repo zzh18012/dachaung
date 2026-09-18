@@ -414,13 +414,6 @@ def test_module_source_contains_counter_import_batch27():
     assert "from collections import Counter" in src
 
 
-def test_module_source_contains_all_export_batch27():
-    src = inspect.getsource(amod)
-    assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-    assert '"figure_caption_prf"' in src
-    assert '"chunk_boundary_prf"' in src
-
-
 # ---------- signatures 第四十批 ----------
 
 
@@ -486,10 +479,6 @@ def test_module_no_main_block_batch27():
 
 def test_module_parser_does_not_emit_relations_is_str_batch27():
     assert isinstance(PARSER_DOES_NOT_EMIT_RELATIONS, str)
-
-
-def test_module_parser_does_not_emit_relations_not_empty_batch27():
-    assert len(PARSER_DOES_NOT_EMIT_RELATIONS) > 0
 
 
 def test_module_no_class_definitions_batch27():

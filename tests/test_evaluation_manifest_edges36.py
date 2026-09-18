@@ -1000,11 +1000,6 @@ def test_signature_is_absolute_like_one_param():
     assert len(sig.parameters) == 1
 
 
-def test_signature_is_absolute_like_param_name():
-    sig = inspect.signature(_is_absolute_like)
-    assert "path_str" in sig.parameters
-
-
 def test_signature_is_absolute_like_return_annotation_bool():
     sig = inspect.signature(_is_absolute_like)
     ra = sig.return_annotation
@@ -1014,11 +1009,6 @@ def test_signature_is_absolute_like_return_annotation_bool():
 def test_signature_has_backslash_one_param():
     sig = inspect.signature(_has_backslash)
     assert len(sig.parameters) == 1
-
-
-def test_signature_has_backslash_param_name():
-    sig = inspect.signature(_has_backslash)
-    assert "path_str" in sig.parameters
 
 
 def test_signature_has_backslash_return_bool():
@@ -1052,11 +1042,6 @@ def test_signature_resolve_relative_path_return_path():
 def test_signature_detect_project_root_one_param():
     sig = inspect.signature(_detect_project_root)
     assert len(sig.parameters) == 1
-
-
-def test_signature_detect_project_root_param_name():
-    sig = inspect.signature(_detect_project_root)
-    assert "start" in sig.parameters
 
 
 def test_signature_detect_project_root_return_path():
@@ -1100,16 +1085,6 @@ def test_signature_funcs_module_eq():
 # ---------- module 合理性第九批 ----------
 
 
-def test_module_all_attribute_value():
-    assert mmod.__all__ == [
-        "ManifestError",
-        "Manifest",
-        "DocumentEntry",
-        "ExpectedFailure",
-        "load_manifest",
-    ]
-
-
 def test_module_all_is_list():
     assert isinstance(mmod.__all__, list)
 
@@ -1133,10 +1108,6 @@ def test_module_name_is_evaluation_manifest():
 def test_module_has_ManifestError_class():
     assert hasattr(mmod, "ManifestError")
     assert inspect.isclass(mmod.ManifestError)
-
-
-def test_module_ManifestError_inherits_Exception():
-    assert issubclass(mmod.ManifestError, Exception)
 
 
 def test_module_has_5_funcs_in_namespace():

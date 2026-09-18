@@ -99,11 +99,6 @@ def test_text_types_no_image_batch48():
 
 # ---------- 工厂函数 ----------
 
-def test_null_returns_dict_batch48():
-    out = _null("reason_x")
-    assert out == {"value": None, "reason": "reason_x"}
-
-
 def test_null_value_is_none_batch48():
     assert _null("x")["value"] is None
 
@@ -340,10 +335,6 @@ def test_docx_locator_no_structural_key_batch48():
 
 
 # ---------- _is_valid_bbox 各种 bbox ----------
-
-def test_is_valid_bbox_with_floats_batch48():
-    assert _is_valid_bbox([0.5, 1.5, 2.5, 3.5]) is True
-
 
 def test_is_valid_bbox_wrong_length_batch48():
     assert _is_valid_bbox([0, 0, 10]) is False
@@ -652,11 +643,6 @@ def test_source_contains_v1_1_batch48():
     assert "v1.1" in src
 
 
-def test_source_contains_v1_0_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "v1.0" in src
-
-
 def test_source_contains_口径_D_batch48():
     src = inspect.getsource(metrics_mod)
     assert "口径 D" in src or "口径D" in src
@@ -683,13 +669,6 @@ def test_source_contains_词内硬切_batch48():
 
 
 # ---------- AST 结构补强 ----------
-
-def test_ast_top_level_functions_count_batch48():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    # _null / _ratio / _bool_metric / _int_metric / compute / _pdf / _docx / _is_valid_bbox / _image / _chunk_ref / _strip / _text_preservation / _heading / _silent_drop
-    assert len(funcs) == 14
-
 
 def test_ast_constants_count_batch48():
     tree = ast.parse(inspect.getsource(metrics_mod))
@@ -789,54 +768,9 @@ def test_ast_image_ratio_has_try_batch48():
 
 # ---------- forbidden tokens 第一百一十四批 ----------
 
-def test_source_no_eval_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "pickle.load(" not in src
-
-
 def test_source_no_lambda_batch48():
     src = inspect.getsource(metrics_mod)
     assert "lambda" not in src
-
-
-def test_source_no_yield_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "yield" not in src
 
 
 def test_source_no_await_batch48():

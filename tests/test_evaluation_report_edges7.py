@@ -712,11 +712,6 @@ def test_get_git_provenance_signature():
     assert set(sig.parameters) == {"project_root"}
 
 
-def test_build_provenance_signature():
-    sig = inspect.signature(build_provenance)
-    assert set(sig.parameters) == {"project_root", "parser_name", "max_chars", "parser_version"}
-
-
 def test_build_provenance_no_defaults():
     sig = inspect.signature(build_provenance)
     for p in sig.parameters.values():
@@ -730,11 +725,6 @@ def test_get_git_provenance_return_annotation_dict():
 
 def test_build_provenance_return_annotation_dict():
     sig = inspect.signature(build_provenance)
-    assert "dict" in str(sig.return_annotation)
-
-
-def test_build_devset_section_return_annotation_dict():
-    sig = inspect.signature(build_devset_section)
     assert "dict" in str(sig.return_annotation)
 
 

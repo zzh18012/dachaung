@@ -402,11 +402,6 @@ def test_build_provenance_with_kreuzberg_parser(tmp_path):
     assert out["parser_name"] == "kreuzberg"
 
 
-def test_build_provenance_with_zero_max_chars(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 0, None)
-    assert out["max_chars"] == 0
-
-
 def test_build_provenance_idempotent_except_timestamp(tmp_path):
     """build_provenance 是非纯函数（含 timestamp + git），但主要字段一致。"""
     a = build_provenance(tmp_path, "fallback", 800, None)

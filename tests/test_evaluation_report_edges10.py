@@ -429,16 +429,6 @@ def test_build_provenance_run_timestamp_near_now(tmp_path):
     assert delta < 5  # 5 秒内
 
 
-def test_build_provenance_git_commit_str_or_none(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["git_commit"] is None or isinstance(result["git_commit"], str)
-
-
-def test_build_provenance_git_dirty_bool(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert isinstance(result["git_dirty"], bool)
-
-
 # =========================================================================
 # build_devset_section 深度
 # =========================================================================

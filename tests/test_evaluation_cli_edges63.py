@@ -507,11 +507,6 @@ def test_module_source_contains_pathlib_import_batch36():
     assert "from pathlib import Path" in src
 
 
-def test_module_source_contains_sys_stdout_reconfigure_batch36():
-    src = inspect.getsource(cmod)
-    assert "sys.stdout.reconfigure" in src
-
-
 def test_module_source_contains_sys_stderr_reconfigure_batch36():
     src = inspect.getsource(cmod)
     assert "sys.stderr.reconfigure" in src
@@ -555,16 +550,6 @@ def test_module_source_contains_format_metric_func_batch36():
 def test_module_source_contains_run_inspect_doc_func_batch36():
     src = inspect.getsource(cmod)
     assert "def _run_inspect_doc(" in src
-
-
-def test_module_source_contains_validate_report_subcommand_string_batch36():
-    src = inspect.getsource(cmod)
-    assert '"validate-report"' in src
-
-
-def test_module_source_contains_inspect_doc_subcommand_string_batch36():
-    src = inspect.getsource(cmod)
-    assert '"inspect-doc"' in src
 
 
 def test_module_source_contains_raw_description_batch36():

@@ -48,14 +48,6 @@ from app.models import Chunk, Document, Element
 # =========================================================================
 
 
-def test_whitespace_re_pattern_string():
-    assert _WHITESPACE_RE.pattern == r"\s+"
-
-
-def test_whitespace_re_compiled_type():
-    assert isinstance(_WHITESPACE_RE, re.Pattern)
-
-
 def test_whitespace_re_sub_normalizes_vertical_tab():
     assert _WHITESPACE_RE.sub(" ", "a\x0bb") == "a b"
 
@@ -91,10 +83,6 @@ def test_whitespace_re_sub_only_whitespace_to_single_space():
 
 def test_normalize_text_empty_string():
     assert normalize_text("") == ""
-
-
-def test_normalize_text_only_whitespace_returns_empty():
-    assert normalize_text("   \t\n  ") == ""
 
 
 def test_normalize_text_single_char():
@@ -153,18 +141,6 @@ def test_hard_break_langs_six_elements():
     assert len(_HARD_BREAK_LANGS) == 6
 
 
-def test_hard_break_langs_contains_chinese_marks():
-    assert "。" in _HARD_BREAK_LANGS
-    assert "！" in _HARD_BREAK_LANGS
-    assert "？" in _HARD_BREAK_LANGS
-
-
-def test_hard_break_langs_contains_english_marks():
-    assert "." in _HARD_BREAK_LANGS
-    assert "!" in _HARD_BREAK_LANGS
-    assert "?" in _HARD_BREAK_LANGS
-
-
 # =========================================================================
 # _SENTENCE_SPLIT_RE 深度
 # =========================================================================
@@ -172,10 +148,6 @@ def test_hard_break_langs_contains_english_marks():
 
 def test_sentence_split_re_pattern_string():
     assert _SENTENCE_SPLIT_RE.pattern == r"(?<=[。！？!?\.])\s+"
-
-
-def test_sentence_split_re_compiled_type():
-    assert isinstance(_SENTENCE_SPLIT_RE, re.Pattern)
 
 
 def test_sentence_split_re_lookbehind_no_capture():
@@ -610,11 +582,6 @@ def test_chunk_buffer_init_signature():
 # =========================================================================
 # StructuralChunker.__init__ 深度
 # =========================================================================
-
-
-def test_chunker_init_default_max_chars():
-    c = StructuralChunker()
-    assert c.max_chars == 800
 
 
 def test_chunker_init_max_chars_below_32_raises():

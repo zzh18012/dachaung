@@ -382,54 +382,9 @@ def test_module_source_forbidden_tokens_batch23(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_socket_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import socket" not in src
-
-
-def test_module_source_no_requests_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import requests" not in src
-
-
-def test_module_source_no_urllib_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import urllib" not in src
-
-
-def test_module_source_no_threading_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import threading" not in src
-
-
-def test_module_source_no_asyncio_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import asyncio" not in src
-
-
-def test_module_source_no_shutil_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import shutil" not in src
-
-
-def test_module_source_no_tempfile_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import tempfile" not in src
-
-
 def test_module_source_no_logging_import_batch23():
     src = inspect.getsource(amod)
     assert "import logging" not in src
-
-
-def test_module_source_no_pandas_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import pandas" not in src
-
-
-def test_module_source_no_numpy_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import numpy" not in src
 
 
 def test_module_source_no_csv_import_batch23():
@@ -508,11 +463,6 @@ def test_module_source_has_no_predicted_boundaries_string_batch23():
 def test_module_source_has_no_ground_truth_anchors_string_batch23():
     src = inspect.getsource(amod)
     assert '"no_ground_truth_anchors"' in src
-
-
-def test_module_source_has_tolerance_chars_field_batch23():
-    src = inspect.getsource(amod)
-    assert '"_tolerance_chars"' in src
 
 
 # ---------- signatures 第三十四批 ----------

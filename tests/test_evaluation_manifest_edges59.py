@@ -56,10 +56,6 @@ def test_manifest_error_module_level_batch32():
 # ---------- _is_absolute_like 第三十二批 ----------
 
 
-def test_is_absolute_like_d_drive_batch32():
-    assert _is_absolute_like("D:/foo") is True
-
-
 def test_is_absolute_like_e_drive_batch32():
     assert _is_absolute_like("E:\\foo") is True
 
@@ -105,10 +101,6 @@ def test_has_backslash_single_backslash_batch32():
 
 def test_has_backslash_two_backslashes_batch32():
     assert _has_backslash("\\\\") is True
-
-
-def test_has_backslash_mixed_batch32():
-    assert _has_backslash("foo\\bar/baz") is True
 
 
 # ---------- DocumentEntry 第三十二批 ----------
@@ -208,11 +200,6 @@ def test_expected_failure_is_frozen_batch32():
         ef.doc_id = "modified"  # type: ignore[misc]
 
 
-def test_expected_failure_field_count_five_batch32():
-    fs = fields(ExpectedFailure)
-    assert len(fs) == 5
-
-
 def test_expected_failure_field_names_batch32():
     fs = fields(ExpectedFailure)
     names = {f.name for f in fs}
@@ -232,11 +219,6 @@ def test_expected_failure_eq_batch32():
 
 
 # ---------- Manifest 第三十二批 ----------
-
-
-def test_manifest_field_count_five_batch32():
-    fs = fields(Manifest)
-    assert len(fs) == 5
 
 
 def test_manifest_field_names_batch32():

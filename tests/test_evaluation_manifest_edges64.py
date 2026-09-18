@@ -749,11 +749,6 @@ def test_module_source_contains_json_load_batch37():
     assert "json.load(f)" in src
 
 
-def test_module_source_contains_encoding_utf8_in_open_batch37():
-    src = inspect.getsource(mmod)
-    assert 'encoding="utf-8"' in src
-
-
 def test_module_source_contains_file_not_exist_msg_batch37():
     src = inspect.getsource(mmod)
     assert "清单文件不存在" in src
@@ -815,10 +810,6 @@ def test_module_expected_failure_is_frozen_batch37():
     ef = ExpectedFailure("d1", "p", Path("/x/p"), "E", None)
     with pytest.raises(FrozenInstanceError):
         ef.doc_id = "changed"  # type: ignore[misc]
-
-
-def test_module_manifest_error_inherits_exception_batch37():
-    assert issubclass(mmod.ManifestError, Exception)
 
 
 def test_module_all_contains_5_entries_batch37():

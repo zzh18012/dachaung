@@ -559,11 +559,6 @@ def test_chunk_boundary_prf_tolerance_default_30():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_chunk_boundary_prf_tolerance_annotation_int():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert "int" in str(sig.parameters["tolerance_chars"].annotation)
-
-
 def test_chunk_boundary_prf_return_annotation_dict():
     sig = inspect.signature(chunk_boundary_prf)
     assert "dict" in str(sig.return_annotation).lower()

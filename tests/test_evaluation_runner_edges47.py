@@ -106,19 +106,6 @@ def test_load_annotation_nested_dict_batch19(tmp_path):
     assert out == {"a": {"b": {"c": [1, 2]}}}
 
 
-def test_load_annotation_empty_dict_batch19(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("{}", encoding="utf-8")
-    assert _load_annotation(p) == {}
-
-
-def test_load_annotation_empty_file_returns_none_batch19(tmp_path):
-    """空文件 → JSONDecodeError → None。"""
-    p = tmp_path / "a.json"
-    p.write_text("", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 # ---------- _process_one 行为深度第十九批 ----------
 
 

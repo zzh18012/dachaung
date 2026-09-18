@@ -491,11 +491,6 @@ def test_source_path_import_batch52():
     assert "from pathlib import Path" in src
 
 
-def test_source_manifest_imports_batch52():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.manifest import ManifestError, load_manifest" in src
-
-
 def test_source_report_imports_batch52():
     src = inspect.getsource(cli_mod)
     assert "from evaluation.report import get_git_provenance" in src
@@ -506,19 +501,9 @@ def test_source_runner_imports_batch52():
     assert "from evaluation.runner import run_evaluation" in src
 
 
-def test_source_schema_imports_batch52():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.schema import EvalSchemaError, validate_file" in src
-
-
 def test_source_sys_stdout_reconfigure_call_batch52():
     src = inspect.getsource(cli_mod)
     assert 'sys.stdout.reconfigure' in src
-
-
-def test_source_errors_replace_batch52():
-    src = inspect.getsource(cli_mod)
-    assert 'errors="replace"' in src
 
 
 def test_source_main_returns_int_batch52():

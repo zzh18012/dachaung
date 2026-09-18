@@ -183,12 +183,6 @@ def test_get_dependency_versions_pypdfium2_is_str_or_none_batch28():
     assert v is None or isinstance(v, str)
 
 
-def test_get_dependency_versions_idempotent_batch28():
-    r1 = get_dependency_versions()
-    r2 = get_dependency_versions()
-    assert r1 == r2
-
-
 def test_get_dependency_versions_package_not_found_returns_none_batch28():
     """模拟 PackageNotFoundError → None。"""
     import importlib.metadata

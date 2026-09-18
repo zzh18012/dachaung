@@ -41,13 +41,6 @@ def test_load_annotation_list_top_level_returns_dict_batch36(tmp_path):
     assert out == [1, 2, 3]
 
 
-def test_load_annotation_int_top_level_returns_int_batch36(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text("42", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == 42
-
-
 def test_load_annotation_null_top_level_returns_none_batch36(tmp_path):
     """JSON null → Python None。注意：函数返回 None 不区分失败和成功-读出 null。"""
     p = tmp_path / "ann.json"
@@ -655,19 +648,9 @@ def test_module_source_contains_image_output_dir_for_call_batch36():
     assert "image_output_dir_for(out_stub" in src
 
 
-def test_module_source_contains_per_doc_subdir_batch36():
-    src = inspect.getsource(rmod)
-    assert '"_per_doc"' in src
-
-
 def test_module_source_contains_write_json_false_batch36():
     src = inspect.getsource(rmod)
     assert "write_json=False" in src
-
-
-def test_module_source_contains_json_dump_batch36():
-    src = inspect.getsource(rmod)
-    assert "json.dump(report" in src
 
 
 def test_module_source_contains_ensure_ascii_false_batch36():

@@ -544,11 +544,6 @@ def test_format_metric_return_annotation_str():
     assert "str" in str(sig.return_annotation).lower()
 
 
-def test_run_inspect_doc_args_no_default():
-    sig = inspect.signature(_run_inspect_doc)
-    assert sig.parameters["args"].default is inspect.Parameter.empty
-
-
 def test_run_inspect_doc_return_annotation_int():
     sig = inspect.signature(_run_inspect_doc)
     assert "int" in str(sig.return_annotation)

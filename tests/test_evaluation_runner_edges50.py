@@ -708,12 +708,6 @@ def test_module_source_forbidden_tokens_batch22(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch22():
-    src = inspect.getsource(rmod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch22():
     src = inspect.getsource(rmod)
     assert "import socket" not in src
@@ -767,16 +761,6 @@ def test_module_source_no_logging_import_batch22():
 def test_module_source_no_re_import_batch22():
     src = inspect.getsource(rmod)
     assert "import re" not in src
-
-
-def test_module_source_no_datetime_import_batch22():
-    src = inspect.getsource(rmod)
-    assert "import datetime" not in src
-
-
-def test_module_source_no_collections_import_batch22():
-    src = inspect.getsource(rmod)
-    assert "import collections" not in src
 
 
 def test_module_source_no_pandas_import_batch22():
@@ -855,11 +839,6 @@ def test_module_source_has_not_instrumented_string_batch22():
 def test_module_source_has_image_output_dir_for_call_batch22():
     src = inspect.getsource(rmod)
     assert "image_output_dir_for(" in src
-
-
-def test_module_source_has_process_single_call_batch22():
-    src = inspect.getsource(rmod)
-    assert "process_single(" in src
 
 
 # ---------- signatures 第三十四批 ----------
@@ -941,26 +920,10 @@ def test_module_does_not_import_evaluation_schema_batch22():
     assert "from evaluation import schema" not in src
 
 
-def test_module_does_not_import_evaluation_manifest_batch22():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.manifest" not in src
-    assert "from evaluation import manifest" not in src
-
-
-def test_module_constants_not_in_all_batch22():
-    for k in ("_load_annotation", "_process_one"):
-        assert k not in rmod.__all__
-
-
 def test_module_no_main_block_batch22():
     src = inspect.getsource(rmod)
     assert 'if __name__ ==' not in src
     assert "__main__" not in src
-
-
-def test_module_has_module_docstring_batch22():
-    assert rmod.__doc__ is not None
-    assert len(rmod.__doc__) > 0
 
 
 # ---------- 端到端集成第三十四批 ----------
@@ -983,21 +946,6 @@ def test_e2e_load_annotation_round_trip_complex_batch22(tmp_path):
     assert out == payload
 
 
-def test_e2e_run_evaluation_returns_same_as_file_batch22(tmp_path):
-    m = _make_manifest(docs=[])
-    out = tmp_path / "out.json"
-    report = run_evaluation(m, out)
-    parsed = json.loads(out.read_text(encoding="utf-8"))
-    assert parsed == report
-
-
-def test_e2e_run_evaluation_no_docs_summary_struct_batch22(tmp_path):
-    m = _make_manifest(docs=[])
-    report = run_evaluation(m, tmp_path / "out.json")
-    s = report["summary"]
-    assert set(s.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
-
-
 def test_e2e_run_evaluation_with_expected_failure_match_batch22(tmp_path):
     """expected_failure 实际错误 == 期望时 matches=True。"""
     ef = MagicMock()
@@ -1010,18 +958,3 @@ def test_e2e_run_evaluation_with_expected_failure_match_batch22(tmp_path):
         m = _make_manifest(expected_failures=[ef])
         report = run_evaluation(m, tmp_path / "out.json")
     assert report["expected_failures"][0]["matches"] is True
-
-
-def test_e2e_run_evaluation_public_per_doc_excludes_underscore_fields_batch22(tmp_path):
-    """public per_doc 不含 _ 前缀字段。"""
-    doc = _make_doc()
-    with patch("evaluation.runner.process_single", return_value=(None, [])):
-        with patch("evaluation.runner.image_output_dir_for", return_value=tmp_path):
-            with patch("evaluation.runner.compute_automatic_metrics", return_value={}):
-                with patch("evaluation.runner.figure_caption_prf", return_value={}):
-                    with patch("evaluation.runner.chunk_boundary_prf", return_value={}):
-                        m = _make_manifest(docs=[doc])
-                        report = run_evaluation(m, tmp_path / "out.json")
-    pd = report["per_doc"][0]
-    for k in pd.keys():
-        assert not k.startswith("_")

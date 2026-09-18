@@ -427,12 +427,6 @@ def test_docx_locator_ratio_partial_valid():
 # =========================================================================
 
 
-def test_image_resource_ratio_no_image_elements():
-    out = _image_resource_ratio([], None)
-    assert out["value"] is None
-    assert out["reason"] == "no_image_elements"
-
-
 def test_image_resource_ratio_non_image_only():
     """全是非 image element → no_image_elements。"""
     out = _image_resource_ratio([{"type": "paragraph"}], None)
@@ -1045,12 +1039,6 @@ def test_module_namespace_has_not_evaluated():
     import evaluation.metrics as m
 
     assert hasattr(m, "_NOT_EVALUATED")
-
-
-def test_module_all_is_list():
-    import evaluation.metrics as m
-
-    assert isinstance(m.__all__, list)
 
 
 def test_module_all_exact():

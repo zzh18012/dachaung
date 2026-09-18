@@ -785,21 +785,6 @@ def test_runner_source_no_unlink_outside_safe_context_batch11():
     assert source.count("unlink") == 2
 
 
-def test_runner_source_no_remove_batch11():
-    source = inspect.getsource(rmod)
-    assert ".remove(" not in source
-
-
-def test_runner_source_no_kill_batch11():
-    source = inspect.getsource(rmod)
-    assert ".kill(" not in source
-
-
-def test_runner_source_no_terminate_batch11():
-    source = inspect.getsource(rmod)
-    assert ".terminate(" not in source
-
-
 def test_runner_source_no_async_def_batch11():
     source = inspect.getsource(rmod)
     assert "async def" not in source
@@ -847,16 +832,6 @@ def test_runner_source_no_pickle_module_batch11():
 def test_module_source_has_future_annotations_batch11():
     source = inspect.getsource(rmod)
     assert "from __future__ import annotations" in source
-
-
-def test_module_source_imports_json_batch11():
-    source = inspect.getsource(rmod)
-    assert "import json" in source
-
-
-def test_module_source_imports_time_batch11():
-    source = inspect.getsource(rmod)
-    assert "import time" in source
 
 
 def test_module_source_imports_path_batch11():
@@ -927,26 +902,9 @@ def test_signature_load_annotation_1_param_batch11():
     assert len(sig.parameters) == 1
 
 
-def test_signature_load_annotation_param_kind_batch11():
-    sig = inspect.signature(_load_annotation)
-    p = list(sig.parameters.values())[0]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_load_annotation_param_no_default_batch11():
-    sig = inspect.signature(_load_annotation)
-    p = list(sig.parameters.values())[0]
-    assert p.default is inspect.Parameter.empty
-
-
 def test_signature_process_one_4_params_batch11():
     sig = inspect.signature(_process_one)
     assert len(sig.parameters) == 4
-
-
-def test_signature_process_one_param_names_batch11():
-    sig = inspect.signature(_process_one)
-    assert list(sig.parameters) == ["doc", "output_root", "parser_name", "max_chars"]
 
 
 def test_signature_process_one_param_kinds_batch11():
@@ -968,11 +926,6 @@ def test_signature_run_evaluation_2_positional_params_batch11():
         if p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
     ]
     assert len(positional) == 2
-
-
-def test_signature_run_evaluation_param_names_batch11():
-    sig = inspect.signature(run_evaluation)
-    assert list(sig.parameters) == ["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]
 
 
 def test_signature_run_evaluation_keyword_only_after_star_batch11():

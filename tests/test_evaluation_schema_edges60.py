@@ -425,16 +425,6 @@ def test_eval_schema_error_multiple_instances_independent_batch45():
 
 # ---------- 模块源码字符串精确 ----------
 
-def test_module_docstring_contains_does_not_reuse_app_schema_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "不与 app/schema.py 复用" in src
-
-
-def test_module_source_contains_json_import_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "import json" in src
-
-
 def test_module_source_contains_pathlib_import_batch45():
     src = inspect.getsource(schema_mod)
     assert "from pathlib import Path" in src
@@ -591,12 +581,6 @@ def test_ast_no_class_in_function_body_batch45():
                 assert not isinstance(sub, ast.ClassDef)
 
 
-def test_ast_no_async_in_module_body_batch45():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
-
-
 def test_ast_first_node_docstring_batch45():
     tree = ast.parse(inspect.getsource(schema_mod))
     first = tree.body[0]
@@ -621,49 +605,9 @@ def test_ast_eval_schema_error_inherits_exception_batch45():
 
 # ---------- forbidden tokens 第一百零四批 ----------
 
-def test_source_no_eval_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "os.system(" not in src
-
-
 def test_source_no_popen_batch45():
     src = inspect.getsource(schema_mod)
     assert ".popen(" not in src
-
-
-def test_source_no_yaml_load_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "pickle.load(" not in src
 
 
 def test_source_no_subprocess_batch45():

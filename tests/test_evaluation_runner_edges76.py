@@ -428,34 +428,9 @@ def test_run_evaluation_compute_metrics_called_with_correct_args_batch51(tmp_pat
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_json_import_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "import json" in src
-
-
-def test_source_contains_time_import_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "import time" in src
-
-
-def test_source_contains_path_import_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_source_contains_any_import_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "from typing import Any" in src
-
-
 def test_source_imports_process_single_batch51():
     src = inspect.getsource(runner_mod)
     assert "from app.pipeline import image_output_dir_for, process_single" in src
-
-
-def test_source_imports_report_version_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation import REPORT_VERSION" in src
 
 
 def test_source_imports_metrics_batch51():
@@ -482,11 +457,6 @@ def test_source_contains_unknown_error_code_batch51():
     src = inspect.getsource(runner_mod)
     assert '"unknown"' in src
     assert "process_single returned None without errors" in src
-
-
-def test_source_contains_ensure_ascii_false_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "ensure_ascii=False" in src
 
 
 def test_source_contains_tolerance_chars_batch51():
@@ -595,13 +565,6 @@ def test_ast_run_evaluation_has_2_for_batch51():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation")
     fors = [n for n in func.body if isinstance(n, ast.For)]
     assert len(fors) == 3  # for doc + for ef + for r
-
-
-def test_ast_run_evaluation_has_with_open_batch51():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation")
-    withs = [n for n in ast.walk(func) if isinstance(n, ast.With)]
-    assert len(withs) == 1
 
 
 def test_ast_run_evaluation_has_1_return_batch51():

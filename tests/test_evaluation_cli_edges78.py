@@ -338,11 +338,6 @@ def test_source_stderr_prints_batch52():
     assert src.count("file=sys.stderr") >= 8
 
 
-def test_source_return_0_ok_batch52():
-    src = inspect.getsource(cli_mod)
-    assert "return 0" in src
-
-
 def test_source_return_1_error_batch52():
     src = inspect.getsource(cli_mod)
     assert src.count("return 1") >= 6

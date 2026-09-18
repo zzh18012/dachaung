@@ -31,15 +31,6 @@ from evaluation.annotation_metrics import (
 # ---------- figure_caption_prf 行为深度补强 ----------
 
 
-def test_figure_caption_returns_dict_with_3_specific_keys():
-    out = figure_caption_prf({"chunks": []}, None)
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_each_metric_uses_null_helper():
     out = figure_caption_prf({}, {})
     for k, v in out.items():
@@ -609,11 +600,6 @@ def test_chunk_boundary_source_uses_last_chunk_break():
     assert "len(norm_chunks) - 1" in src
 
 
-def test_chunk_boundary_source_uses_stream_find():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "stream.find(txt, pos)" in src
-
-
 def test_chunk_boundary_source_uses_find_pos_negative_check():
     src = inspect.getsource(chunk_boundary_prf)
     assert "find_pos < 0" in src or "if find_pos < 0" in src
@@ -634,16 +620,6 @@ def test_chunk_boundary_source_uses_anchor_loop():
     assert "for a in anchors" in src
 
 
-def test_chunk_boundary_source_uses_marker_default_empty():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert 'a.get("marker", "")' in src
-
-
-def test_chunk_boundary_source_uses_position_default_after():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert 'a.get("position", "after")' in src
-
-
 def test_chunk_boundary_source_uses_position_before_branch():
     src = inspect.getsource(chunk_boundary_prf)
     assert 'position == "before"' in src
@@ -658,17 +634,6 @@ def test_chunk_boundary_source_uses_pairs_with_distance():
 def test_chunk_boundary_source_uses_tolerance_compare():
     src = inspect.getsource(chunk_boundary_prf)
     assert "tolerance_chars" in src
-
-
-def test_chunk_boundary_source_uses_used_pred_used_gt_set():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "used_pred" in src
-    assert "used_gt" in src
-
-
-def test_chunk_boundary_source_uses_matched_increment():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "matched += 1" in src
 
 
 def test_chunk_boundary_source_uses_num_pred_num_gt():

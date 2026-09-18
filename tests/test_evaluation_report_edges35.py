@@ -505,12 +505,6 @@ def test_module_source_forbidden_tokens_batch18(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_network_batch18():
-    src = inspect.getsource(rmod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
-
-
 def test_module_source_no_pickle_batch18():
     src = inspect.getsource(rmod)
     assert "import pickle" not in src

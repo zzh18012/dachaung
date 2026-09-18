@@ -135,13 +135,6 @@ def test_dependency_versions_pdfplumber_installed_batch52():
     assert get_dependency_versions()["pdfplumber"] is not None
 
 
-def test_dependency_versions_fresh_dict_batch52():
-    a = get_dependency_versions()
-    b = get_dependency_versions()
-    assert a == b
-    assert a is not b
-
-
 # ---------- get_git_provenance 命令序列 ----------
 
 def test_git_provenance_command_sequence_batch52():

@@ -78,10 +78,6 @@ def test_count_metrics_unique_batch29():
     assert len(_COUNT_METRICS) == len(set(_COUNT_METRICS))
 
 
-def test_success_bool_metrics_unique_batch29():
-    assert len(_SUCCESS_BOOL_METRICS) == len(set(_SUCCESS_BOOL_METRICS))
-
-
 def test_ratio_metrics_is_tuple_batch29():
     assert isinstance(_RATIO_METRICS, tuple)
 
@@ -92,11 +88,6 @@ def test_count_metrics_is_tuple_batch29():
 
 def test_success_bool_metrics_is_tuple_batch29():
     assert isinstance(_SUCCESS_BOOL_METRICS, tuple)
-
-
-def test_ratio_metrics_contains_text_char_multiset_batch29():
-    assert "text_char_multiset_precision" in _RATIO_METRICS
-    assert "text_char_multiset_recall" in _RATIO_METRICS
 
 
 def test_ratio_metrics_contains_image_resource_batch29():
@@ -234,12 +225,6 @@ def test_get_dependency_versions_mixed_none_and_str_batch29():
     assert len(result) == 3
     for v in result.values():
         assert v is None or isinstance(v, str)
-
-
-def test_get_dependency_versions_idempotent_two_calls_batch29():
-    r1 = get_dependency_versions()
-    r2 = get_dependency_versions()
-    assert r1 == r2
 
 
 def test_get_dependency_versions_no_kwargs_leak_batch29():
@@ -543,11 +528,6 @@ def test_module_source_no_shutil_batch29():
 def test_module_source_no_requests_batch29():
     src = inspect.getsource(rmod)
     assert "requests" not in src
-
-
-def test_module_source_no_unlink_batch29():
-    src = inspect.getsource(rmod)
-    assert ".unlink()" not in src
 
 
 # ---------- module source 字符串精确补强第四十二批 ----------

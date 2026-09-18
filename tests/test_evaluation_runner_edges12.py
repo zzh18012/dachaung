@@ -809,11 +809,6 @@ def test_load_annotation_signature():
     assert list(sig.parameters) == ["path"]
 
 
-def test_load_annotation_path_param_kind():
-    sig = inspect.signature(_load_annotation)
-    assert sig.parameters["path"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_process_one_signature():
     sig = inspect.signature(_process_one)
     assert list(sig.parameters) == ["doc", "output_root", "parser_name", "max_chars"]

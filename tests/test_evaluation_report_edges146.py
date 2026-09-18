@@ -195,12 +195,6 @@ def test_success_full_batch516(tmp_path):
         "success_count": 2, "total": 2, "rate": 1.0}
 
 
-def test_ratio_keys_twelve_batch516(tmp_path):
-    r = _run(tmp_path)
-    assert len(r["summary"][
-        "ratio_macro_averages"]) == 12
-
-
 # ---------- 报告合法性 ----------
 
 def test_report_schema_batch516(tmp_path):

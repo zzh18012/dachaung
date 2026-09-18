@@ -62,11 +62,6 @@ def test_eval_schema_error_errors_tuple_accepted_batch24():
     assert e.errors == errs
 
 
-def test_eval_schema_error_message_str_passthrough_batch24():
-    e = EvalSchemaError("hello")
-    assert str(e) == "hello"
-
-
 def test_eval_schema_error_inherits_exception_batch24():
     e = EvalSchemaError("x")
     assert isinstance(e, Exception)
@@ -609,10 +604,6 @@ def test_module_no_classes_other_than_one_batch24():
 def test_module_docstring_present_batch24():
     assert smod.__doc__ is not None
     assert len(smod.__doc__.strip()) > 0
-
-
-def test_module_docstring_mentions_schema_batch24():
-    assert "Schema" in smod.__doc__ or "schema" in smod.__doc__.lower()
 
 
 def test_module_docstring_mentions_no_reuse_batch24():

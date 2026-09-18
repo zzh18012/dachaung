@@ -210,13 +210,6 @@ def test_docx_locator_ratio_relationship_id_batch36():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_ratio_table_row_col_batch36():
-    elements = [{"type": "table", "source_locator": {
-        "table_index": 0, "row_index": 0, "col_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_run_index_batch36():
     elements = [{"type": "paragraph", "source_locator": {"run_index": 0}}]
     out = _docx_locator_ratio(elements)
@@ -413,11 +406,6 @@ def test_chunk_reference_ratio_no_elements_batch36():
 def test_strip_unicode_whitespace_nbsp_batch36():
     """U+00A0 NBSP。"""
     assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_em_space_batch36():
-    """U+2003 EM SPACE。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
 
 
 def test_strip_unicode_whitespace_line_separator_batch36():
@@ -1016,10 +1004,6 @@ def test_module_has_text_types_const_batch36():
 def test_module_has_pdf_bbox_required_types_const_batch36():
     assert hasattr(mmod, "_PDF_BBOX_REQUIRED_TYPES")
     assert isinstance(mmod._PDF_BBOX_REQUIRED_TYPES, tuple)
-
-
-def test_module_has_not_evaluated_const_batch36():
-    assert hasattr(mmod, "_NOT_EVALUATED")
 
 
 def test_module_has_compute_func_batch36():

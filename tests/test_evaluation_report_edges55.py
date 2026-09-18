@@ -83,10 +83,6 @@ def test_ratio_metrics_does_not_contain_silent_drop_count_batch36():
     assert "silent_drop_count" not in _RATIO_METRICS
 
 
-def test_ratio_metrics_does_not_contain_error_code_batch36():
-    assert "error_code" not in _RATIO_METRICS
-
-
 def test_count_metrics_first_element_count_total_batch36():
     assert _COUNT_METRICS[0] == "element_count_total"
 
@@ -387,11 +383,6 @@ def test_build_devset_section_status_default_batch36():
     assert out["status"] == "incomplete"
 
 
-def test_build_devset_section_status_complete_batch36():
-    out = build_devset_section(_make_manifest_mock(devset_status="complete"))
-    assert out["status"] == "complete"
-
-
 def test_build_devset_section_file_count_zero_batch36():
     out = build_devset_section(_make_manifest_mock(file_count=0))
     assert out["file_count"] == 0
@@ -420,11 +411,6 @@ def test_build_devset_section_categories_with_int_batch36():
     cats = [1, 2, 3]
     out = build_devset_section(_make_manifest_mock(categories_covered=cats))
     assert out["categories_covered"] == cats
-
-
-def test_build_devset_section_signature_return_dict_batch36():
-    sig = inspect.signature(build_devset_section)
-    assert "dict" in str(sig.return_annotation)
 
 
 # ---------- aggregate_summary 第三十六批
@@ -642,11 +628,6 @@ def test_module_source_contains_design_doc_batch36():
     assert "评测报告装配" in src
 
 
-def test_module_source_contains_success_rates_comment_batch36():
-    src = inspect.getsource(rmod)
-    assert "success_rates" in src
-
-
 def test_module_source_contains_ratio_metrics_definition_batch36():
     src = inspect.getsource(rmod)
     assert "_RATIO_METRICS" in src
@@ -745,11 +726,6 @@ def test_signature_get_dependency_versions_no_param_batch36():
     assert list(sig.parameters.keys()) == []
 
 
-def test_signature_build_provenance_no_default_for_parser_version_batch36():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["parser_version"].default is inspect.Parameter.empty
-
-
 def test_signature_build_provenance_no_default_for_parser_name_batch36():
     sig = inspect.signature(build_provenance)
     assert sig.parameters["parser_name"].default is inspect.Parameter.empty
@@ -778,26 +754,6 @@ def test_module_all_is_list_batch36():
 
 def test_module_all_len_five_batch36():
     assert len(rmod.__all__) == 5
-
-
-def test_module_all_contains_build_provenance_batch36():
-    assert "build_provenance" in rmod.__all__
-
-
-def test_module_all_contains_build_devset_section_batch36():
-    assert "build_devset_section" in rmod.__all__
-
-
-def test_module_all_contains_aggregate_summary_batch36():
-    assert "aggregate_summary" in rmod.__all__
-
-
-def test_module_all_contains_get_git_provenance_batch36():
-    assert "get_git_provenance" in rmod.__all__
-
-
-def test_module_all_contains_get_dependency_versions_batch36():
-    assert "get_dependency_versions" in rmod.__all__
 
 
 def test_module_does_not_define_class_batch36():

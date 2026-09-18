@@ -643,11 +643,6 @@ def test_ratio_dict_always_2_keys():
 # ---------- _null 行为深度补强 ----------
 
 
-def test_null_returns_dict_with_2_keys():
-    r = _null("x")
-    assert set(r.keys()) == {"value", "reason"}
-
-
 def test_null_value_is_none_type():
     r = _null("x")
     assert r["value"] is None
@@ -729,11 +724,6 @@ def test_int_metric_value_is_int_type():
 def test_module_source_has_from_collections_import_counter():
     src = inspect.getsource(m)
     assert "from collections import Counter" in src
-
-
-def test_module_source_has_math_isfinite_in_is_valid_bbox():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "math.isfinite(v)" in src
 
 
 def test_module_source_has_sum_for_common():
@@ -939,14 +929,6 @@ def test_int_metric_return_annotation():
 # ---------- 模块整体合理性 ----------
 
 
-def test_module_namespace():
-    assert m.__name__ == "evaluation.metrics"
-
-
-def test_module_all_only_compute_automatic_metrics():
-    assert m.__all__ == ["compute_automatic_metrics"]
-
-
 def test_module_has_1_public_function():
     public = [
         n for n in dir(m)
@@ -989,14 +971,6 @@ def test_module_no_class():
 def test_module_no_main_block():
     src = inspect.getsource(m)
     assert 'if __name__ == "__main__":' not in src
-
-
-def test_module_no_decorators():
-    src = inspect.getsource(m)
-    for line in src.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("@"):
-            pytest.fail(f"Found decorator: {stripped}")
 
 
 # ---------- 端到端集成补强 ----------

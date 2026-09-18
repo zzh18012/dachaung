@@ -81,14 +81,6 @@ def test_extension_to_parser_count_nine():
     assert len(_EXTENSION_TO_PARSER) == 9
 
 
-def test_extension_to_parser_pdf():
-    assert _EXTENSION_TO_PARSER[".pdf"] == "fallback"
-
-
-def test_extension_to_parser_docx():
-    assert _EXTENSION_TO_PARSER[".docx"] == "fallback"
-
-
 # =========================================================================
 # _infer_parser_name 大小写
 # =========================================================================

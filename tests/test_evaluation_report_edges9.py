@@ -39,16 +39,6 @@ from evaluation.report import (
 # =========================================================================
 
 
-def test_module_all_is_list():
-    import evaluation.report as m
-    assert isinstance(m.__all__, list)
-
-
-def test_module_all_length_is_five():
-    import evaluation.report as m
-    assert len(m.__all__) == 5
-
-
 def test_module_all_no_duplicates():
     import evaluation.report as m
     assert len(set(m.__all__)) == len(m.__all__)
@@ -149,10 +139,6 @@ def test_success_bool_metrics_value():
 # =========================================================================
 # EVALUATOR_VERSION / REPORT_VERSION 常量
 # =========================================================================
-
-
-def test_evaluator_version_is_str():
-    assert isinstance(EVALUATOR_VERSION, str)
 
 
 def test_evaluator_version_value():
@@ -352,16 +338,6 @@ def test_build_provenance_run_timestamp_near_now(tmp_path):
     after = datetime.now().astimezone()
     ts = datetime.fromisoformat(result["run_timestamp_iso"])
     assert before <= ts <= after or (ts - before).total_seconds() < 5
-
-
-def test_build_provenance_git_commit_str_or_none(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["git_commit"] is None or isinstance(result["git_commit"], str)
-
-
-def test_build_provenance_git_dirty_bool(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert isinstance(result["git_dirty"], bool)
 
 
 # =========================================================================

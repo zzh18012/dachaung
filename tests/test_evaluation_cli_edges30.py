@@ -110,18 +110,6 @@ def test_build_parser_namespace_tolerance_chars_converted_to_int():
     assert isinstance(ns.tolerance_chars, int)
 
 
-def test_build_parser_namespace_validate_report_input_field():
-    p = _build_parser()
-    ns = p.parse_args(["validate-report", "report.json"])
-    assert ns.input == "report.json"
-
-
-def test_build_parser_namespace_inspect_doc_input_field():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json"])
-    assert ns.input == "doc.json"
-
-
 def test_build_parser_namespace_inspect_doc_tolerance_default_30():
     p = _build_parser()
     ns = p.parse_args(["inspect-doc", "doc.json"])
@@ -292,11 +280,6 @@ def test_main_validate_report_returns_1_for_invalid_json(tmp_path, capsys):
     bad.write_text("not json at all", encoding="utf-8")
     rc = main(["validate-report", str(bad)])
     assert rc == 1
-
-
-def test_main_inspect_doc_returns_2_for_missing_file(tmp_path, capsys):
-    rc = main(["inspect-doc", str(tmp_path / "no.json")])
-    assert rc == 2
 
 
 def test_main_inspect_doc_returns_1_for_invalid_json(tmp_path, capsys):
@@ -829,18 +812,6 @@ def test_module_has_1_public_function():
 
 def test_module_callable_main():
     assert callable(cli_mod.main)
-
-
-def test_module_callable_build_parser():
-    assert callable(cli_mod._build_parser)
-
-
-def test_module_callable_format_metric():
-    assert callable(cli_mod._format_metric)
-
-
-def test_module_callable_run_inspect_doc():
-    assert callable(cli_mod._run_inspect_doc)
 
 
 # ---------- 端到端集成补强 ----------

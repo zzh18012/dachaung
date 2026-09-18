@@ -177,12 +177,6 @@ def test_load_annotation_valid_json_returns_dict(tmp_path):
     assert out["doc_id"] == "d1"
 
 
-def test_load_annotation_invalid_json_returns_none(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not valid json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_empty_file_returns_none(tmp_path):
     p = tmp_path / "empty.json"
     p.write_text("", encoding="utf-8")

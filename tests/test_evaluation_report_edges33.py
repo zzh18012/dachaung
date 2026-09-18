@@ -64,10 +64,6 @@ def test_success_bool_metrics_length_1_batch16():
     assert len(_SUCCESS_BOOL_METRICS) == 1
 
 
-def test_success_bool_metrics_unique_batch16():
-    assert len(set(_SUCCESS_BOOL_METRICS)) == len(_SUCCESS_BOOL_METRICS)
-
-
 def test_metric_tuples_no_overlap_batch16():
     """三个元组两两不重叠。"""
     ratio = set(_RATIO_METRICS)
@@ -97,13 +93,6 @@ def test_metric_tuples_no_error_code_batch16():
     assert "error_code" not in _RATIO_METRICS
     assert "error_code" not in _COUNT_METRICS
     assert "error_code" not in _SUCCESS_BOOL_METRICS
-
-
-def test_metric_tuples_no_figure_caption_batch16():
-    """figure_caption_* 始终 null，不参与 macro average。"""
-    assert "figure_caption_precision" not in _RATIO_METRICS
-    assert "figure_caption_recall" not in _RATIO_METRICS
-    assert "figure_caption_f1" not in _RATIO_METRICS
 
 
 def test_ratio_metrics_contains_chunk_boundary_f1_batch16():

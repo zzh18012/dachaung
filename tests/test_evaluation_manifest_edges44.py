@@ -153,11 +153,6 @@ def test_resolve_relative_path_empty_batch17(tmp_path):
         _resolve_relative_path("", tmp_path, "test")
 
 
-def test_resolve_relative_path_absolute_batch17(tmp_path):
-    with pytest.raises(ManifestError, match="绝对路径"):
-        _resolve_relative_path("/etc/passwd", tmp_path, "test")
-
-
 def test_resolve_relative_path_field_name_in_message_batch17(tmp_path):
     """错误消息含 field_name。"""
     with pytest.raises(ManifestError, match="myfield"):

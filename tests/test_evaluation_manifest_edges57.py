@@ -46,11 +46,6 @@ from evaluation.manifest import (
 # ---------- ManifestError 第三十批 ----------
 
 
-def test_manifest_error_args_just_message_batch30():
-    e = ManifestError("msg")
-    assert e.args == ("msg",)
-
-
 def test_manifest_error_raised_multiple_times_batch30():
     """循环里多次 raise。"""
     for i in range(3):
@@ -642,11 +637,6 @@ def test_module_source_contains_disk_letter_comment_batch30():
 def test_module_source_contains_load_manifest_func_batch30():
     src = inspect.getsource(mmod)
     assert "def load_manifest" in src
-
-
-def test_module_source_contains_detect_project_root_func_batch30():
-    src = inspect.getsource(mmod)
-    assert "def _detect_project_root" in src
 
 
 def test_module_source_contains_pdf_count_property_batch30():

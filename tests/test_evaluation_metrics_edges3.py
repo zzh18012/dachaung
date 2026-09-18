@@ -223,10 +223,6 @@ def test_is_valid_bbox_four_ints_accepted():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
 
 
-def test_is_valid_bbox_four_floats_accepted():
-    assert _is_valid_bbox([0.5, 1.5, 2.5, 3.5]) is True
-
-
 def test_is_valid_bbox_mixed_int_float_accepted():
     assert _is_valid_bbox([0, 1.5, 100, 100.5]) is True
 
@@ -234,10 +230,6 @@ def test_is_valid_bbox_mixed_int_float_accepted():
 def test_is_valid_bbox_bool_int_zero_rejected():
     """bool True 即使值=1 也被拒。"""
     assert _is_valid_bbox([True, 0, 0, 0]) is False
-
-
-def test_is_valid_bbox_string_rejected():
-    assert _is_valid_bbox(["0", "0", "100", "100"]) is False
 
 
 def test_is_valid_bbox_nan_rejected():

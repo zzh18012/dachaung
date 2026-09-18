@@ -240,13 +240,6 @@ def test_heading_boundary_no_chunks_returns_zero_batch13():
     assert out["value"] == 0.0
 
 
-def test_heading_boundary_perfect_match_batch13():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["h1", "p1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 1.0
-
-
 def test_heading_boundary_partial_match_batch13():
     elements = [
         {"type": "heading", "element_id": "h1"},
@@ -256,15 +249,6 @@ def test_heading_boundary_partial_match_batch13():
     out = _heading_boundary_ratio(elements, chunks)
     # matched=1, total=2 → 0.5
     assert out["value"] == 0.5
-
-
-def test_heading_boundary_heading_missing_element_id_batch13():
-    elements = [{"type": "heading"}]  # no element_id
-    chunks = [{"source_element_ids": ["h1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    # h.get('element_id') = None, not in {h1}
-    # matched=0, total=1 → 0.0
-    assert out["value"] == 0.0
 
 
 def test_heading_boundary_chunk_missing_source_element_ids_batch13():
@@ -664,24 +648,9 @@ def test_metrics_source_no_eval_call_batch13():
     assert "exec(" not in source
 
 
-def test_metrics_source_no_compile_batch13():
-    source = inspect.getsource(mmod)
-    assert "compile(" not in source
-
-
-def test_metrics_source_no_global_keyword_batch13():
-    source = inspect.getsource(mmod)
-    assert "\nglobal " not in source
-
-
 def test_metrics_source_no_print_batch13():
     source = inspect.getsource(mmod)
     assert "print(" not in source
-
-
-def test_metrics_source_no_input_function_batch13():
-    source = inspect.getsource(mmod)
-    assert "input(" not in source
 
 
 def test_metrics_source_no_open_at_top_level_batch13():
@@ -705,18 +674,6 @@ def test_module_source_counter_import_top_level_batch13():
     source = inspect.getsource(mmod)
     head = "\n".join(source.split("\n")[:30])
     assert "from collections import Counter" in head
-
-
-def test_module_source_pathlib_import_top_level_batch13():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from pathlib import Path" in head
-
-
-def test_module_source_typing_any_import_top_level_batch13():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from typing import Any" in head
 
 
 def test_module_source_has_TEXT_TYPES_assignment_batch13():
@@ -759,30 +716,15 @@ def test_module_source_has_int_metric_def_batch13():
     assert "def _int_metric(" in source
 
 
-def test_module_source_has_is_valid_bbox_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _is_valid_bbox(" in source
-
-
 def test_module_source_has_strip_unicode_whitespace_def_batch13():
     source = inspect.getsource(mmod)
     assert "def _strip_unicode_whitespace(" in source
-
-
-def test_module_source_has_text_preservation_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _text_preservation(" in source
 
 
 def test_module_source_future_annotations_top_level_batch13():
     source = inspect.getsource(mmod)
     head = "\n".join(source.split("\n")[:30])
     assert "from __future__ import annotations" in head
-
-
-def test_module_source_uses_math_isfinite_batch13():
-    source = inspect.getsource(mmod)
-    assert "math.isfinite" in source
 
 
 def test_module_source_uses_Counter_intersection_batch13():
@@ -811,34 +753,6 @@ def test_compute_automatic_metrics_image_base_dir_annotation_optional_batch13():
     annot_str = annot if isinstance(annot, str) else str(annot)
     assert "Path" in annot_str
     assert "None" in annot_str
-
-
-def test_null_signature_one_param_batch13():
-    sig = inspect.signature(_null)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "reason"
-
-
-def test_ratio_signature_one_param_batch13():
-    sig = inspect.signature(_ratio)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "value"
-
-
-def test_bool_metric_signature_one_param_batch13():
-    sig = inspect.signature(_bool_metric)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "value"
-
-
-def test_int_metric_signature_one_param_batch13():
-    sig = inspect.signature(_int_metric)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "value"
 
 
 def test_helpers_return_dict_batch13():

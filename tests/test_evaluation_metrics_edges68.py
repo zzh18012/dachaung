@@ -208,12 +208,6 @@ def test_pdf_locator_ratio_table_no_bbox_needed_batch42():
     assert out["value"] == 1.0
 
 
-def test_pdf_locator_ratio_footer_no_bbox_needed_batch42():
-    elements = [{"type": "footer", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_pdf_locator_ratio_paragraph_needs_bbox_batch42():
     """paragraph 在 _PDF_BBOX_REQUIRED_TYPES。"""
     elements = [
@@ -482,16 +476,8 @@ def test_pdf_bbox_required_types_contains_caption_batch42():
     assert "caption" in _PDF_BBOX_REQUIRED_TYPES
 
 
-def test_pdf_bbox_required_types_contains_list_item_batch42():
-    assert "list_item" in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_pdf_bbox_required_types_no_image_batch42():
     assert "image" not in _PDF_BBOX_REQUIRED_TYPES
-
-
-def test_pdf_bbox_required_types_no_table_batch42():
-    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
 
 
 def test_pdf_bbox_required_types_subset_of_text_types_batch42():
@@ -513,10 +499,6 @@ def test_text_types_contains_all_expected_batch42():
 
 def test_text_types_no_image_batch42():
     assert "image" not in _TEXT_TYPES
-
-
-def test_text_types_no_duplicates_batch42():
-    assert len(_TEXT_TYPES) == len(set(_TEXT_TYPES))
 
 
 # ---------- _NOT_EVALUATED 第四十二批
@@ -548,10 +530,6 @@ def test_null_returns_dict_with_two_keys_batch42():
 
 def test_null_value_is_none_batch42():
     assert _null("x")["value"] is None
-
-
-def test_null_reason_passthrough_batch42():
-    assert _null("my_reason")["reason"] == "my_reason"
 
 
 def test_null_empty_reason_batch42():

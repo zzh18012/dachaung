@@ -478,12 +478,6 @@ def test_docx_locator_run_index_alone_valid():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_table_index_alone_valid():
-    elements = [{"type": "paragraph", "source_locator": {"table_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_relationship_id_alone_valid():
     elements = [{"type": "paragraph", "source_locator": {"relationship_id": "rId1"}}]
     out = _docx_locator_ratio(elements)

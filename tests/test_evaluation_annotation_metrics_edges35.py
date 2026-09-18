@@ -835,12 +835,6 @@ def test_signature_chunk_boundary_prf_tolerance_kind():
     assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_signature_chunk_boundary_prf_no_kwargs():
-    sig = inspect.signature(chunk_boundary_prf)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_signature_parser_does_not_emit_constant_type():
     assert isinstance(PARSER_DOES_NOT_EMIT_RELATIONS, str)
 

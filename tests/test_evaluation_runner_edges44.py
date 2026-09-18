@@ -693,17 +693,6 @@ def test_module_process_one_callable_batch16():
     assert callable(_process_one)
 
 
-def test_module_does_not_import_subprocess_batch16():
-    src = inspect.getsource(rmod)
-    assert "import subprocess" not in src
-
-
-def test_module_does_not_import_unsafe_modules_batch16():
-    src = inspect.getsource(rmod)
-    for unsafe in ["import pickle", "import marshal", "import shelve"]:
-        assert unsafe not in src
-
-
 # ---------- 端到端集成第二十七批 ----------
 
 

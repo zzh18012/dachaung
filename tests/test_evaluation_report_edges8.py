@@ -91,10 +91,6 @@ def test_success_bool_metrics_only_pipeline_success():
     assert _SUCCESS_BOOL_METRICS == ("pipeline_success",)
 
 
-def test_success_bool_metrics_no_duplicates():
-    assert len(_SUCCESS_BOOL_METRICS) == len(set(_SUCCESS_BOOL_METRICS))
-
-
 def test_evaluator_version_value():
     """EVALUATOR_VERSION 在 evaluation/__init__.py 定义。"""
     assert isinstance(EVALUATOR_VERSION, str)
@@ -534,11 +530,6 @@ def test_module_all_exact():
         "get_git_provenance", "get_dependency_versions",
     }
     assert set(m.__all__) == expected
-
-
-def test_module_all_is_list():
-    import evaluation.report as m
-    assert isinstance(m.__all__, list)
 
 
 def test_module_imports_subprocess():

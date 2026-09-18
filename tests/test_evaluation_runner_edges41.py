@@ -603,18 +603,6 @@ def test_module_source_forbidden_tokens_round19_batch14(token):
 # ---------- module source 字符串精确补强第十六批 ----------
 
 
-def test_module_source_imports_json_batch14():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import json" in head
-
-
-def test_module_source_imports_time_batch14():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import time" in head
-
-
 def test_module_source_imports_pathlib_path_batch14():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
@@ -642,11 +630,6 @@ def test_module_source_imports_report_helpers_batch14():
 def test_module_source_defines_load_annotation_batch14():
     source = inspect.getsource(rmod)
     assert "def _load_annotation(" in source
-
-
-def test_module_source_has_dunder_all_batch14():
-    source = inspect.getsource(rmod)
-    assert "__all__" in source
 
 
 def test_module_source_dunder_all_one_item_batch14():
@@ -689,11 +672,6 @@ def test_module_source_no_subprocess_import_batch14():
 def test_module_source_uses_json_dump_batch14():
     source = inspect.getsource(rmod)
     assert "json.dump(" in source
-
-
-def test_module_source_uses_image_output_dir_for_batch14():
-    source = inspect.getsource(rmod)
-    assert "image_output_dir_for" in source
 
 
 def test_module_source_uses_compute_automatic_metrics_batch14():
@@ -783,11 +761,6 @@ def test_run_evaluation_return_annotation_dict_batch14():
     sig = inspect.signature(run_evaluation)
     ret = str(sig.return_annotation)
     assert "dict" in ret
-
-
-def test_module_dunder_all_callable_batch14():
-    for name in rmod.__all__:
-        assert callable(getattr(rmod, name))
 
 
 # ---------- module 合理性第十六批 ----------

@@ -1413,12 +1413,6 @@ def test_e2e_load_annotation_truncated_json(tmp_path):
     assert _load_annotation(p) is None
 
 
-def test_e2e_load_annotation_just_braces(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text('{}', encoding="utf-8")
-    assert _load_annotation(p) == {}
-
-
 def test_e2e_load_annotation_just_brackets(tmp_path):
     p = tmp_path / "a.json"
     p.write_text('[]', encoding="utf-8")

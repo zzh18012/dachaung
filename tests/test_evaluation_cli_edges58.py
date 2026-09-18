@@ -316,11 +316,6 @@ def test_main_run_invalid_json_manifest_returns_1_batch31(tmp_path):
 # ---------- module source forbidden tokens 第四十九批 ----------
 
 
-def test_module_source_no_subprocess_batch31():
-    src = inspect.getsource(climod)
-    assert "subprocess" not in src
-
-
 def test_module_source_no_os_system_batch31():
     src = inspect.getsource(climod)
     assert "os.system" not in src
@@ -361,17 +356,7 @@ def test_module_source_no_shutil_batch31():
     assert "shutil" not in src
 
 
-def test_module_source_no_unlink_batch31():
-    src = inspect.getsource(climod)
-    assert ".unlink()" not in src
-
-
 # ---------- module source 字符串精确补强第四十五批 ----------
-
-
-def test_module_source_contains_module_docstring_batch31():
-    src = inspect.getsource(climod)
-    assert "评测 CLI" in src
 
 
 def test_module_source_contains_argparse_import_batch31():
@@ -407,11 +392,6 @@ def test_module_source_contains_runner_import_batch31():
 def test_module_source_contains_schema_import_batch31():
     src = inspect.getsource(climod)
     assert "from evaluation.schema import EvalSchemaError, validate_file" in src
-
-
-def test_module_source_contains_build_parser_func_batch31():
-    src = inspect.getsource(climod)
-    assert "def _build_parser()" in src
 
 
 def test_module_source_contains_raise_systemexit_batch31():
@@ -495,11 +475,6 @@ def test_module_imports_pathlib_batch31():
     assert "from pathlib import Path" in src
 
 
-def test_module_no_class_definitions_batch31():
-    src = inspect.getsource(climod)
-    assert "\nclass " not in src
-
-
 # ---------- 端到端集成第四十五批 ----------
 
 
@@ -527,13 +502,6 @@ def test_e2e_main_inspect_doc_full_run_batch31(capsys, tmp_path):
     assert "fallback v1.0" in captured.out
     assert "elements=1" in captured.out
     assert "chunks=1" in captured.out
-
-
-def test_e2e_main_validate_report_invalid_json_returns_1_batch31(tmp_path):
-    p = tmp_path / "r.json"
-    p.write_text("not json", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
 
 
 def test_e2e_main_no_args_raises_systemexit_batch31(capsys):

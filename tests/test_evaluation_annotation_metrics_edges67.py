@@ -561,11 +561,6 @@ def test_chunk_boundary_prf_tolerance_default_30_batch43():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_chunk_boundary_prf_tolerance_annotation_int_batch43():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert "int" in str(sig.parameters["tolerance_chars"].annotation)
-
-
 def test_chunk_boundary_prf_returns_dict_batch43():
     out = chunk_boundary_prf(None, None)
     assert isinstance(out, dict)
@@ -856,11 +851,6 @@ def test_signature_chunk_boundary_document_annotation_dict_or_none_batch43():
     ann_ann = str(sig.parameters["annotation"].annotation)
     assert "dict" in ann_doc and "None" in ann_doc
     assert "dict" in ann_ann and "None" in ann_ann
-
-
-def test_signature_chunk_boundary_tolerance_int_annotation_batch43():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert "int" in str(sig.parameters["tolerance_chars"].annotation)
 
 
 def test_signature_chunk_boundary_tolerance_default_30_batch43():

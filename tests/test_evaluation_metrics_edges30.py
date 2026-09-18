@@ -261,14 +261,6 @@ def test_text_types_includes_caption():
     assert "caption" in _TEXT_TYPES
 
 
-def test_text_types_includes_header():
-    assert "header" in _TEXT_TYPES
-
-
-def test_text_types_includes_footer():
-    assert "footer" in _TEXT_TYPES
-
-
 def test_text_types_excludes_image():
     assert "image" not in _TEXT_TYPES
 
@@ -296,10 +288,6 @@ def test_pdf_bbox_required_types_includes_paragraph():
 
 def test_pdf_bbox_required_types_includes_caption():
     assert "caption" in _PDF_BBOX_REQUIRED_TYPES
-
-
-def test_pdf_bbox_required_types_includes_list_item():
-    assert "list_item" in _PDF_BBOX_REQUIRED_TYPES
 
 
 def test_pdf_bbox_required_types_excludes_header():
@@ -929,10 +917,6 @@ def test_is_valid_bbox_valid_4_ints():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
 
 
-def test_is_valid_bbox_valid_4_floats():
-    assert _is_valid_bbox([0.0, 0.0, 1.5, 2.5]) is True
-
-
 def test_is_valid_bbox_mixed_int_float():
     assert _is_valid_bbox([0, 0.5, 100, 200.5]) is True
 
@@ -977,18 +961,6 @@ def test_is_valid_bbox_with_bool_true():
 
 def test_is_valid_bbox_with_bool_false():
     assert _is_valid_bbox([False, 0, 0, 0]) is False
-
-
-def test_is_valid_bbox_with_nan():
-    assert _is_valid_bbox([float("nan"), 0, 0, 0]) is False
-
-
-def test_is_valid_bbox_with_inf():
-    assert _is_valid_bbox([float("inf"), 0, 0, 0]) is False
-
-
-def test_is_valid_bbox_with_string_element():
-    assert _is_valid_bbox(["0", 0, 0, 0]) is False
 
 
 def test_is_valid_bbox_with_none_element():
@@ -1084,10 +1056,6 @@ def test_strip_with_empty_string():
 
 def test_strip_preserves_digits():
     assert _strip_unicode_whitespace("hello 123 world") == "hello123world"
-
-
-def test_strip_preserves_punctuation():
-    assert _strip_unicode_whitespace("hello, world!") == "hello,world!"
 
 
 def test_strip_preserves_unicode_letters():
@@ -1381,11 +1349,6 @@ def test_module_source_has_4_one_liner_helpers():
     assert "def _int_metric(" in src
 
 
-def test_module_source_no_compile():
-    src = inspect.getsource(mmod)
-    assert "compile(" not in src
-
-
 def test_module_source_no_os_import():
     src = inspect.getsource(mmod)
     assert "import os" not in src
@@ -1595,10 +1558,6 @@ def test_module_all_has_1_entry():
 
 def test_module_all_entries_exact():
     assert set(mmod.__all__) == {"compute_automatic_metrics"}
-
-
-def test_module_namespace_has_compute_automatic_metrics():
-    assert hasattr(mmod, "compute_automatic_metrics")
 
 
 def test_module_namespace_has_constants():

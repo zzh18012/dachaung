@@ -665,10 +665,6 @@ def test_short_line_max_is_int():
     assert isinstance(_SHORT_LINE_MAX, int)
 
 
-def test_short_line_max_positive():
-    assert _SHORT_LINE_MAX > 0
-
-
 def test_short_line_max_used_in_classify_line():
     """_classify_line 用 _SHORT_LINE_MAX 作阈值。"""
     text_eq = "a" * _SHORT_LINE_MAX
@@ -688,10 +684,6 @@ def test_kreuzberg_parser_class_attribute_name_value():
     assert KreuzbergParser.name == "kreuzberg"
 
 
-def test_kreuzberg_parser_class_attribute_version_is_str():
-    assert isinstance(KreuzbergParser.version, str)
-
-
 def test_kreuzberg_parser_class_attribute_version_not_empty():
     assert KreuzbergParser.version != ""
 
@@ -704,10 +696,6 @@ def test_kreuzberg_parser_init_is_method():
     assert callable(KreuzbergParser.__init__)
 
 
-def test_kreuzberg_parser_parse_is_method():
-    assert callable(KreuzbergParser.parse)
-
-
 def test_kreuzberg_parser_init_signature_keyword_only_param():
     sig = inspect.signature(KreuzbergParser.__init__)
     params = sig.parameters
@@ -718,21 +706,6 @@ def test_kreuzberg_parser_init_signature_keyword_only_param():
 def test_kreuzberg_parser_init_creates_private_attr():
     p = KreuzbergParser()
     assert hasattr(p, "_include_document_structure")
-
-
-def test_kreuzberg_parser_init_default_value_reflected():
-    p = KreuzbergParser()
-    assert p._include_document_structure is True
-
-
-def test_kreuzberg_parser_init_explicit_false():
-    p = KreuzbergParser(include_document_structure=False)
-    assert p._include_document_structure is False
-
-
-def test_kreuzberg_parser_init_explicit_true():
-    p = KreuzbergParser(include_document_structure=True)
-    assert p._include_document_structure is True
 
 
 def test_kreuzberg_parser_init_no_positional_arg_accepted():

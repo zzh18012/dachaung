@@ -1038,10 +1038,6 @@ def test_null_value_is_none():
     assert _null("any_reason")["value"] is None
 
 
-def test_null_reason_is_input():
-    assert _null("my_reason")["reason"] == "my_reason"
-
-
 def test_null_returns_dict_with_2_keys():
     out = _null("x")
     assert set(out.keys()) == {"value", "reason"}
@@ -1271,11 +1267,6 @@ def test_compute_automatic_metrics_modify_output_does_not_affect_next_call():
 def test_module_all_equals_compute_automatic_metrics_only():
     import evaluation.metrics as m
     assert m.__all__ == ["compute_automatic_metrics"]
-
-
-def test_module_all_is_list():
-    import evaluation.metrics as m
-    assert isinstance(m.__all__, list)
 
 
 def test_module_namespace_has_sub_helpers():

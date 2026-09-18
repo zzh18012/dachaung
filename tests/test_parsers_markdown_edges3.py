@@ -148,12 +148,6 @@ def test_fenced_one_tilde_not_match():
     assert _FENCED_RE.match("~") is None
 
 
-def test_fenced_with_language_python():
-    m = _FENCED_RE.match("```python")
-    assert m is not None
-    assert m.group(2) == "python"
-
-
 def test_fenced_with_language_python_with_version():
     r"""`python3` 匹配，但 `python3.12` 因 `.` 不在 [\w+-] 中 → 不匹配。"""
     m1 = _FENCED_RE.match("```python3")
@@ -170,18 +164,6 @@ def test_fenced_with_leading_space_not_match():
 # =========================================================================
 # 主题分隔符正则
 # =========================================================================
-
-
-def test_thematic_three_dashes():
-    assert _THEMATIC_RE.match("---") is not None
-
-
-def test_thematic_three_asterisks():
-    assert _THEMATIC_RE.match("***") is not None
-
-
-def test_thematic_three_underscores():
-    assert _THEMATIC_RE.match("___") is not None
 
 
 def test_thematic_with_spaces():
@@ -253,10 +235,6 @@ def test_ordered_list_zero_number():
     assert m.group(1) == "item"
 
 
-def test_ordered_list_no_space_not_match():
-    assert _ORDERED_LIST_RE.match("1.item") is None
-
-
 # =========================================================================
 # 引用块正则
 # =========================================================================
@@ -322,10 +300,6 @@ def test_standalone_image_with_trailing_spaces():
 # =========================================================================
 
 
-def test_pipe_table_row_basic():
-    assert _PIPE_TABLE_ROW_RE.match("| a | b |") is not None
-
-
 def test_pipe_table_row_no_leading_pipe():
     """无前导 | → 不匹配。"""
     assert _PIPE_TABLE_ROW_RE.match("a | b |") is None
@@ -339,10 +313,6 @@ def test_pipe_table_row_no_trailing_pipe():
 def test_pipe_table_row_single_pipe():
     """单个 | → 不匹配（需要 .* 在 | 之间）。"""
     assert _PIPE_TABLE_ROW_RE.match("|") is None
-
-
-def test_pipe_table_sep_basic():
-    assert _PIPE_TABLE_SEP_RE.match("| --- | --- |") is not None
 
 
 def test_pipe_table_sep_no_pipes_at_edges():
@@ -402,10 +372,6 @@ def test_detect_md_source_type_error_code():
 # =========================================================================
 # _split_pipe_row 深度
 # =========================================================================
-
-
-def test_split_pipe_row_basic():
-    assert _split_pipe_row("| a | b |") == ["a", "b"]
 
 
 def test_split_pipe_row_single_cell_with_edges():

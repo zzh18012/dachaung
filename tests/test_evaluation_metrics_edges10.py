@@ -96,11 +96,6 @@ def test_ratio_with_negative_zero():
     assert math.copysign(1.0, result["value"]) in (1.0, -1.0)
 
 
-def test_ratio_keys_exact():
-    result = _ratio(0.5)
-    assert set(result.keys()) == {"value", "reason"}
-
-
 def test_bool_metric_with_none():
     """None → bool(None) = False。"""
     result = _bool_metric(None)  # type: ignore[arg-type]
@@ -126,11 +121,6 @@ def test_bool_metric_with_empty_list():
 def test_bool_metric_with_nonempty_list():
     result = _bool_metric([0])  # type: ignore[arg-type]
     assert result["value"] is True
-
-
-def test_bool_metric_keys_exact():
-    result = _bool_metric(True)
-    assert set(result.keys()) == {"value", "reason"}
 
 
 def test_int_metric_with_negative_float():

@@ -115,10 +115,6 @@ def test_chunk_boundary_prf_callable_batch40():
     assert callable(chunk_boundary_prf)
 
 
-def test_chunk_boundary_prf_doc_present_batch40():
-    assert chunk_boundary_prf.__doc__ is not None
-
-
 def test_chunk_boundary_prf_doc_mentions_algorithm_batch40():
     """docstring 描述算法。"""
     doc = chunk_boundary_prf.__doc__

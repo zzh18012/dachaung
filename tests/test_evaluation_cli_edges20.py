@@ -874,11 +874,6 @@ def test_run_inspect_doc_lazy_imports_figure_caption_prf():
     assert "figure_caption_prf" in src
 
 
-def test_run_inspect_doc_lazy_imports_chunk_boundary_prf():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "chunk_boundary_prf" in src
-
-
 # =========================================================================
 # main 的 if __name__ == '__main__' 块
 # =========================================================================

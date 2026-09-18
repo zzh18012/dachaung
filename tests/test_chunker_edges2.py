@@ -204,18 +204,6 @@ def test_hard_break_langs_count_six():
     assert len(_HARD_BREAK_LANGS) == 6
 
 
-def test_hard_break_langs_contains_chinese_marks():
-    assert "。" in _HARD_BREAK_LANGS
-    assert "！" in _HARD_BREAK_LANGS
-    assert "？" in _HARD_BREAK_LANGS
-
-
-def test_hard_break_langs_contains_english_marks():
-    assert "." in _HARD_BREAK_LANGS
-    assert "!" in _HARD_BREAK_LANGS
-    assert "?" in _HARD_BREAK_LANGS
-
-
 def test_hard_break_langs_is_tuple():
     assert isinstance(_HARD_BREAK_LANGS, tuple)
 

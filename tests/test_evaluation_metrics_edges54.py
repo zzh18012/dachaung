@@ -63,10 +63,6 @@ def test_null_returns_reason_unchanged_batch28():
     assert m["reason"] == "X"
 
 
-def test_null_returns_dict_batch28():
-    assert isinstance(_null("x"), dict)
-
-
 def test_ratio_zero_batch28():
     m = _ratio(0.0)
     assert m["value"] == 0.0
@@ -307,10 +303,6 @@ def test_is_valid_bbox_with_inf_batch28():
 
 def test_is_valid_bbox_with_nan_batch28():
     assert _is_valid_bbox([0.0, 0.0, math.nan, 0.0]) is False
-
-
-def test_is_valid_bbox_with_str_batch28():
-    assert _is_valid_bbox(["0", 0, 0, 0]) is False
 
 
 def test_is_valid_bbox_valid_batch28():
@@ -777,11 +769,6 @@ def test_module_has_future_annotations_batch28():
 def test_module_imports_math_batch28():
     src = inspect.getsource(mmod)
     assert "import math" in src
-
-
-def test_module_imports_counter_batch28():
-    src = inspect.getsource(mmod)
-    assert "Counter" in src
 
 
 def test_module_imports_typing_any_batch28():

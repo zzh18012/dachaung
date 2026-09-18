@@ -1038,24 +1038,10 @@ def test_signature_build_provenance_no_defaults():
         assert p.default is inspect.Parameter.empty
 
 
-def test_signature_build_devset_section():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "manifest"
-
-
 def test_signature_build_devset_section_no_default():
     sig = inspect.signature(build_devset_section)
     params = list(sig.parameters.values())
     assert params[0].default is inspect.Parameter.empty
-
-
-def test_signature_aggregate_summary():
-    sig = inspect.signature(aggregate_summary)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "per_doc_results"
 
 
 def test_signature_aggregate_summary_no_default():

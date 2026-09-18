@@ -674,11 +674,6 @@ def test_module_source_no_tempfile_import_batch22():
     assert "import tempfile" not in src
 
 
-def test_module_source_no_sys_import_batch22():
-    src = inspect.getsource(mmod)
-    assert "import sys" not in src
-
-
 def test_module_source_no_logging_import_batch22():
     src = inspect.getsource(mmod)
     assert "import logging" not in src
@@ -692,11 +687,6 @@ def test_module_source_no_re_import_batch22():
 def test_module_source_no_datetime_import_batch22():
     src = inspect.getsource(mmod)
     assert "import datetime" not in src
-
-
-def test_module_source_no_collections_import_batch22():
-    src = inspect.getsource(mmod)
-    assert "import collections" not in src
 
 
 def test_module_source_no_pandas_import_batch22():
@@ -828,12 +818,6 @@ def test_module_does_not_import_evaluation_runner_batch22():
     src = inspect.getsource(mmod)
     assert "from evaluation.runner" not in src
     assert "from evaluation import runner" not in src
-
-
-def test_module_does_not_import_evaluation_metrics_batch22():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.metrics" not in src
-    assert "from evaluation import metrics" not in src
 
 
 def test_module_does_not_import_evaluation_cli_batch22():

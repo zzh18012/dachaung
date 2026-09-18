@@ -57,13 +57,6 @@ def test_ratio_metrics_contains_heading_boundary_compliance():
     assert "heading_boundary_compliance" in _RATIO_METRICS
 
 
-def test_ratio_metrics_does_not_contain_figure_caption():
-    """figure_caption_* 始终 null，不参与 macro average。"""
-    assert "figure_caption_precision" not in _RATIO_METRICS
-    assert "figure_caption_recall" not in _RATIO_METRICS
-    assert "figure_caption_f1" not in _RATIO_METRICS
-
-
 def test_ratio_metrics_no_duplicates():
     assert len(_RATIO_METRICS) == len(set(_RATIO_METRICS))
 
@@ -108,11 +101,6 @@ def test_aggregate_summary_empty_list_success_rate_is_none():
     assert s["success_rates"]["pipeline_success"]["rate"] is None
     assert s["success_rates"]["pipeline_success"]["success_count"] == 0
     assert s["success_rates"]["pipeline_success"]["total"] == 0
-
-
-def test_aggregate_summary_empty_list_silent_drop_total_is_none():
-    s = aggregate_summary([])
-    assert s["silent_drop_total"] is None
 
 
 def test_aggregate_summary_empty_list_ratio_macro_average_is_none():
@@ -290,11 +278,6 @@ def test_aggregate_summary_does_not_mix_types():
     assert "composite_score" not in s
     assert "overall_score" not in s
     assert "summary_score" not in s
-
-
-def test_aggregate_summary_ratio_macro_has_all_twelve_keys():
-    s = aggregate_summary([])
-    assert set(s["ratio_macro_averages"].keys()) == set(_RATIO_METRICS)
 
 
 # =========================================================================
@@ -636,11 +619,6 @@ def test_module_no_silence_unused():
 def test_get_dependency_versions_no_params():
     sig = inspect.signature(get_dependency_versions)
     assert len(sig.parameters) == 0
-
-
-def test_build_provenance_param_names_exact():
-    sig = inspect.signature(build_provenance)
-    assert set(sig.parameters) == {"project_root", "parser_name", "max_chars", "parser_version"}
 
 
 def test_build_provenance_no_defaults():

@@ -181,12 +181,6 @@ def test_format_metric_value_is_list_batch44():
     assert "[1, 2, 3]" in out
 
 
-def test_format_metric_value_is_none_with_reason_batch44():
-    out = _format_metric("foo", {"value": None, "reason": "no_data"})
-    assert "null" in out
-    assert "no_data" in out
-
-
 def test_format_metric_value_is_true_with_reason_batch44():
     """bool True 有 reason 时仍走 bool 分支（显示 true），但 reason 替换 'ok'。"""
     out = _format_metric("foo", {"value": True, "reason": "custom"})
@@ -385,12 +379,6 @@ def test_module_source_contains_required_true_batch44():
     assert "required=True" in src
 
 
-def test_module_source_contains_choices_fallback_kreuzberg_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "fallback" in src
-    assert "kreuzberg" in src
-
-
 def test_module_source_contains_prog_evaluation_cli_batch44():
     src = inspect.getsource(cli_mod)
     assert 'prog="evaluation.cli"' in src
@@ -439,17 +427,7 @@ def test_module_source_contains_inspect_doc_no_annotation_note_batch44():
 
 # ---------- __all__ 不存在 ----------
 
-def test_module_no_all_batch44():
-    assert not hasattr(cli_mod, "__all__")
-
-
 # ---------- AST 结构 ----------
-
-def test_ast_top_level_no_class_batch44():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
 
 def test_ast_top_level_function_count_batch44():
     tree = ast.parse(inspect.getsource(cli_mod))
@@ -492,12 +470,6 @@ def test_ast_run_inspect_doc_has_inner_function_batch44():
     assert "_sort_key" in inner_names
 
 
-def test_ast_no_classdef_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_has_main_guard_batch44():
     tree = ast.parse(inspect.getsource(cli_mod))
     last = tree.body[-1]
@@ -522,31 +494,6 @@ def test_source_no_exec_batch44():
 def test_source_no_compile_batch44():
     src = inspect.getsource(cli_mod)
     assert "compile(" not in src
-
-
-def test_source_no_globals_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "pickle.load(" not in src
 
 
 def test_source_no_sys_argv_batch44():

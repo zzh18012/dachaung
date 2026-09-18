@@ -101,10 +101,6 @@ def test_load_annotation_return_annotation_optional_dict():
     assert sig.return_annotation == "dict[str, Any] | None"
 
 
-def test_load_annotation_namespace_is_evaluation_runner():
-    assert _load_annotation.__module__ == "evaluation.runner"
-
-
 # ---------- _process_one 行为深度 ----------
 
 
@@ -139,10 +135,6 @@ def test_process_one_return_annotation_5_tuple():
     sig = inspect.signature(_process_one)
     # 5-tuple: dict|None, dict|None, float, str|None, Path|None
     assert sig.return_annotation == "tuple[dict[str, Any] | None, dict[str, Any] | None, float, str | None, Path | None]"
-
-
-def test_process_one_namespace_is_evaluation_runner():
-    assert _process_one.__module__ == "evaluation.runner"
 
 
 # ---------- run_evaluation signatures ----------

@@ -913,14 +913,6 @@ def test_module_all_contents():
     ])
 
 
-def test_module_parser_does_not_emit_constant_is_str():
-    assert isinstance(amod.PARSER_DOES_NOT_EMIT_RELATIONS, str)
-
-
-def test_module_parser_does_not_emit_constant_value():
-    assert amod.PARSER_DOES_NOT_EMIT_RELATIONS == "parser_does_not_emit_relations"
-
-
 def test_module_chunk_boundary_prf_callable():
     assert callable(amod.chunk_boundary_prf)
 

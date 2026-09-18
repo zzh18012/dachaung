@@ -56,13 +56,6 @@ def test_load_annotation_json_string_root_returns_string_batch31(tmp_path):
     assert out == "hello"
 
 
-def test_load_annotation_empty_file_returns_none_batch31(tmp_path):
-    """空文件 → JSONDecodeError → None。"""
-    p = tmp_path / "a.json"
-    p.write_text("", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_invalid_json_returns_none_batch31(tmp_path):
     """非 JSON → JSONDecodeError → None。"""
     p = tmp_path / "a.json"
@@ -442,11 +435,6 @@ def test_module_source_contains_run_evaluation_func_batch31():
 def test_module_source_contains_per_doc_subdir_batch31():
     src = inspect.getsource(rmod)
     assert "_per_doc" in src
-
-
-def test_module_source_contains_image_dir_local_batch31():
-    src = inspect.getsource(rmod)
-    assert "image_dir" in src
 
 
 def test_module_source_contains_not_instrumented_batch31():

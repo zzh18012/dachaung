@@ -451,21 +451,10 @@ def test_chunk_buffer_init_document_id_no_default():
 # =========================================================================
 
 
-def test_split_piece_field_defaults_for_start_end():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.start == 0
-    assert p.end == 0
-
-
 def test_split_piece_explicit_start_end():
     p = _SplitPiece(text="x", boundary_after="whitespace", start=10, end=11)
     assert p.start == 10
     assert p.end == 11
-
-
-def test_split_piece_boundary_after_accepts_forced_char():
-    p = _SplitPiece(text="x", boundary_after="forced_char")
-    assert p.boundary_after == "forced_char"
 
 
 def test_split_piece_setattr_raises():

@@ -428,12 +428,6 @@ def test_validate_message_includes_count():
     assert "(" in msg and "处" in msg and ")" in msg
 
 
-def test_validate_message_includes_schema_name():
-    with pytest.raises(EvalSchemaError) as ei:
-        validate({}, "manifest.schema.json")
-    assert "manifest.schema.json" in str(ei.value)
-
-
 def test_validate_message_includes_first_error_path():
     with pytest.raises(EvalSchemaError) as ei:
         validate({}, "manifest.schema.json")
@@ -832,11 +826,6 @@ def test_module_source_4_module_level_def_count():
 def test_module_source_class_eval_schema_error_definition():
     src = inspect.getsource(smod)
     assert "class EvalSchemaError(Exception):" in src
-
-
-def test_module_source_class_init_calls_super_init():
-    src = inspect.getsource(smod)
-    assert "super().__init__(message)" in src
 
 
 def test_module_source_class_init_assigns_errors_or_empty():

@@ -39,21 +39,6 @@ def test_figure_caption_prf_keys_exact_set_batch12():
     }
 
 
-def test_figure_caption_prf_keys_order_batch12():
-    out = figure_caption_prf(None, None)
-    assert list(out.keys()) == [
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    ]
-
-
-def test_figure_caption_prf_reason_constant_value_batch12():
-    out = figure_caption_prf(None, None)
-    for v in out.values():
-        assert v["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 def test_figure_caption_prf_value_all_none_batch12():
     out = figure_caption_prf(None, None)
     for v in out.values():
@@ -482,16 +467,6 @@ def test_module_source_has_future_annotations_batch12():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_counter_batch12():
-    source = inspect.getsource(amod)
-    assert "from collections import Counter" in source
-
-
-def test_module_source_imports_typing_any_batch12():
-    source = inspect.getsource(amod)
-    assert "from typing import Any" in source
-
-
 def test_module_source_imports_normalize_text_batch12():
     source = inspect.getsource(amod)
     assert "from app.chunkers.structural import normalize_text" in source
@@ -525,11 +500,6 @@ def test_module_source_has_tolerance_chars_default_30_batch12():
 def test_module_source_has_dunder_all_batch12():
     source = inspect.getsource(amod)
     assert "__all__" in source
-
-
-def test_module_source_no_main_block_batch12():
-    source = inspect.getsource(amod)
-    assert "if __name__" not in source
 
 
 def test_module_source_docstring_present_batch12():
@@ -607,12 +577,6 @@ def test_signature_chunk_boundary_prf_tolerance_annotation_int_batch12():
     assert "int" in annot_str
 
 
-def test_signature_chunk_boundary_prf_tolerance_kind_batch12():
-    sig = inspect.signature(chunk_boundary_prf)
-    p = sig.parameters["tolerance_chars"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_signature_chunk_boundary_prf_return_dict_batch12():
     sig = inspect.signature(chunk_boundary_prf)
     annot = sig.return_annotation
@@ -632,14 +596,6 @@ def test_all_functions_no_var_kwargs_batch12():
 
 def test_module_name_evaluation_annotation_metrics_batch12():
     assert amod.__name__ == "evaluation.annotation_metrics"
-
-
-def test_module_user_function_count_2_batch12():
-    funcs = [
-        n for n, v in vars(amod).items()
-        if inspect.isfunction(v) and v.__module__ == amod.__name__
-    ]
-    assert set(funcs) == {"figure_caption_prf", "chunk_boundary_prf"}
 
 
 def test_module_no_user_classes_batch12():

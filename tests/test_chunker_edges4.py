@@ -261,11 +261,6 @@ def test_split_piece_text_field():
     assert p.text == "hello"
 
 
-def test_split_piece_boundary_after_field():
-    p = _SplitPiece(text="x", boundary_after="forced_char")
-    assert p.boundary_after == "forced_char"
-
-
 def test_split_piece_is_frozen():
     """_SplitPiece 是 frozen dataclass。"""
     p = _SplitPiece(text="x", boundary_after=None)

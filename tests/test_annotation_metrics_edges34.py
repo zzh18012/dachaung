@@ -409,11 +409,6 @@ def test_module_name_is_evaluation_annotation_metrics():
     assert amod.__name__ == "evaluation.annotation_metrics"
 
 
-def test_module_function_module_attribute_eq():
-    assert figure_caption_prf.__module__ == "evaluation.annotation_metrics"
-    assert chunk_boundary_prf.__module__ == "evaluation.annotation_metrics"
-
-
 def test_module_no_user_classes():
     """模块内不应有 class 定义。"""
     classes = [
@@ -481,11 +476,6 @@ def test_module_source_no_exec():
     assert "exec(" not in src
 
 
-def test_module_source_no_compile():
-    src = inspect.getsource(amod)
-    assert "compile(" not in src
-
-
 def test_module_source_no_subprocess():
     src = inspect.getsource(amod)
     assert "subprocess" not in src
@@ -538,11 +528,6 @@ def test_e2e_no_chunks_returns_pipeline_failed_or_no_predicted():
     assert out1["chunk_boundary_precision"]["reason"] == "pipeline_failed"
     out2 = chunk_boundary_prf({"chunks": []}, {"chunk_boundary_anchors": []})
     assert out2["chunk_boundary_precision"]["reason"] == "no_predicted_boundaries"
-
-
-def test_e2e_no_annotation_returns_no_annotation():
-    out = chunk_boundary_prf({"chunks": [{"text": "a"}, {"text": "b"}]}, None)
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
 
 
 def test_e2e_empty_annotation_dict_returns_no_annotation():

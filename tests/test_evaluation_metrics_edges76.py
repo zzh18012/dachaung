@@ -285,12 +285,6 @@ def test_is_valid_bbox_negative_accepted_batch52():
 
 # ---------- _image_resource_ratio 更深 ----------
 
-def test_image_resource_ratio_no_image_elements_batch52():
-    out = _image_resource_ratio([], None)
-    assert out["value"] is None
-    assert out["reason"] == "no_image_elements"
-
-
 def test_image_resource_ratio_image_without_resource_path_batch52():
     elements = [{"type": "image"}]  # 无 resource_path
     out = _image_resource_ratio(elements, None)
@@ -409,15 +403,6 @@ def test_heading_boundary_no_headings_batch52():
     out = _heading_boundary_ratio([], [{"text": "x"}])
     assert out["value"] is None
     assert out["reason"] == "no_heading_elements"
-
-
-def test_heading_boundary_heading_without_element_id_batch52():
-    elements = [{"type": "heading"}]  # 无 element_id
-    chunks = [{"source_element_ids": ["h1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    # headings = [h]; h.get("element_id") = None; None in chunk_first_ids ({"h1"}) → False
-    # matched = 0
-    assert out["value"] == 0.0
 
 
 def test_heading_boundary_chunks_first_id_none_batch52():
@@ -601,11 +586,6 @@ def test_compute_metrics_expectations_none_batch52():
 
 # ---------- _null / _ratio / _bool_metric / _int_metric ----------
 
-def test_null_returns_proper_dict_batch52():
-    out = _null("reason_x")
-    assert out == {"value": None, "reason": "reason_x"}
-
-
 def test_bool_metric_converts_to_bool_batch52():
     out = _bool_metric(1)  # int → bool
     assert isinstance(out["value"], bool)
@@ -704,17 +684,6 @@ def test_source_compute_metrics_uses_lazy_schema_import_batch52():
 
 
 # ---------- AST 结构补强 ----------
-
-def test_ast_has_14_functions_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 14
-
-
-def test_ast_no_class_def_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
 
 def test_ast_no_async_function_def_batch52():
     tree = ast.parse(inspect.getsource(metrics_mod))

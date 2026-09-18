@@ -373,11 +373,6 @@ def test_run_inspect_doc_source_has_figure_caption_call():
     assert "figure_caption_prf" in src
 
 
-def test_run_inspect_doc_source_has_chunk_boundary_call():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "chunk_boundary_prf" in src
-
-
 # =========================================================================
 # main run 路径行为深度补强
 # =========================================================================
@@ -745,11 +740,6 @@ def test_module_docstring_contains_inspect_doc_purpose():
 # =========================================================================
 
 
-def test_module_source_has_hasattr_check():
-    src = inspect.getsource(climod)
-    assert 'hasattr(sys.stdout, "reconfigure")' in src
-
-
 def test_module_source_has_stdout_reconfigure():
     src = inspect.getsource(climod)
     assert 'sys.stdout.reconfigure(encoding="utf-8", errors="replace")' in src
@@ -778,14 +768,6 @@ def test_module_source_has_system_exit_main():
 # =========================================================================
 # signatures 精确补强
 # =========================================================================
-
-
-def test_main_signature_1_param_argv_default_none():
-    sig = inspect.signature(main)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "argv"
-    assert params[0].default is None
 
 
 def test_main_return_annotation_is_int():
@@ -880,11 +862,6 @@ def test_main_source_has_return_0_1_2():
     assert "return 0" in src
     assert "return 1" in src
     assert "return 2" in src
-
-
-def test_build_parser_source_has_argument_parser():
-    src = inspect.getsource(_build_parser)
-    assert "argparse.ArgumentParser(" in src
 
 
 def test_build_parser_source_has_add_subparsers():

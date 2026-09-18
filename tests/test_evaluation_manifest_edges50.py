@@ -758,11 +758,6 @@ def test_module_source_no_datetime_import_batch23():
     assert "import datetime" not in src
 
 
-def test_module_source_no_collections_import_batch23():
-    src = inspect.getsource(mmod)
-    assert "import collections" not in src
-
-
 def test_module_source_no_pandas_import_batch23():
     src = inspect.getsource(mmod)
     assert "import pandas" not in src
@@ -859,23 +854,9 @@ def test_module_source_has_frozen_true_in_dataclass_batch23():
 # ---------- signatures 第三十四批 ----------
 
 
-def test_signature_is_absolute_like_one_param_batch23():
-    sig = inspect.signature(_is_absolute_like)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path_str"
-
-
 def test_signature_is_absolute_like_returns_bool_batch23():
     sig = inspect.signature(_is_absolute_like)
     assert "bool" in str(sig.return_annotation)
-
-
-def test_signature_has_backslash_one_param_batch23():
-    sig = inspect.signature(_has_backslash)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path_str"
 
 
 def test_signature_resolve_relative_path_three_params_batch23():
@@ -935,12 +916,6 @@ def test_module_does_not_import_evaluation_cli_batch23():
     assert "from evaluation import cli" not in src
 
 
-def test_module_does_not_import_evaluation_metrics_batch23():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.metrics" not in src
-    assert "from evaluation import metrics" not in src
-
-
 def test_module_does_not_import_evaluation_annotation_metrics_batch23():
     src = inspect.getsource(mmod)
     assert "from evaluation.annotation_metrics" not in src
@@ -989,11 +964,6 @@ def test_module_detect_project_root_is_private_batch23():
 def test_module_has_module_docstring_batch23():
     assert mmod.__doc__ is not None
     assert len(mmod.__doc__) > 0
-
-
-def test_module_no_main_block_batch23():
-    src = inspect.getsource(mmod)
-    assert 'if __name__ ==' not in src
 
 
 # ---------- 端到端集成第三十四批 ----------

@@ -44,11 +44,6 @@ from app.parsers.fallback_parser import (
 # ---------- _CAPTION_RE pattern 深度 ----------
 
 
-def test_caption_re_is_compiled_pattern():
-    import re
-    assert isinstance(_CAPTION_RE, re.Pattern)
-
-
 def test_caption_re_match_table_with_dot():
     assert _CAPTION_RE.match("Table 1. This is a caption") is not None
 
@@ -192,10 +187,6 @@ def test_is_caption_with_tab_separator():
 
 def test_rows_to_markdown_empty_returns_empty():
     assert _rows_to_markdown([]) == ""
-
-
-def test_rows_to_markdown_returns_str():
-    assert isinstance(_rows_to_markdown([["a"]]), str)
 
 
 def test_rows_to_markdown_single_cell():
@@ -531,10 +522,6 @@ def test_is_heading_style_none_returns_false():
     assert _is_heading_style(None) == (False, 0)
 
 
-def test_is_heading_style_empty_string_returns_false():
-    assert _is_heading_style("") == (False, 0)
-
-
 def test_is_heading_style_whitespace_only_returns_false():
     """strip 后为空 → False。"""
     assert _is_heading_style("   ") == (False, 0)
@@ -592,10 +579,6 @@ def test_is_heading_style_heading_negative_clamped_to_1():
 
 def test_is_heading_style_heading_with_extra_whitespace():
     assert _is_heading_style("Heading  3  ") == (True, 3)
-
-
-def test_is_heading_style_normal_paragraph():
-    assert _is_heading_style("Normal") == (False, 0)
 
 
 def test_is_heading_style_body_text():

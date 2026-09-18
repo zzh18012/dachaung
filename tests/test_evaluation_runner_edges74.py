@@ -786,7 +786,3 @@ def test_source_no_yield_batch48():
 
 def test_source_no_async_def_batch48():
     assert "async def" not in _src()
-
-
-def test_source_no_await_batch48():
-    assert "await " not in _src()

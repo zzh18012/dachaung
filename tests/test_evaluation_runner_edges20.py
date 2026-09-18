@@ -904,11 +904,6 @@ def test_module_all_is_list_type():
     assert isinstance(m.__all__, list)
 
 
-def test_module_all_length_1():
-    import evaluation.runner as m
-    assert len(m.__all__) == 1
-
-
 # =========================================================================
 # _process_one 5-tuple 元素顺序 + 类型
 # =========================================================================

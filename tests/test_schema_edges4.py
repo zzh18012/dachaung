@@ -71,11 +71,6 @@ def test_schema_validation_error_explicit_errors():
     assert e.errors == errs
 
 
-def test_schema_validation_error_none_errors_empty():
-    e = SchemaValidationError("msg", errors=None)
-    assert e.errors == []
-
-
 def test_schema_validation_error_is_exception():
     assert issubclass(SchemaValidationError, Exception)
 

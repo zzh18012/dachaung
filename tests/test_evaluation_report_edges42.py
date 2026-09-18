@@ -467,17 +467,6 @@ def test_aggregate_summary_pipeline_success_all_true_batch26():
     assert sr["rate"] == 1.0
 
 
-def test_aggregate_summary_pipeline_success_all_false_batch26():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": False}}},
-        {"metrics": {"pipeline_success": {"value": False}}},
-    ]
-    out = aggregate_summary(per_doc)
-    sr = out["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 0
-    assert sr["rate"] == 0.0
-
-
 def test_aggregate_summary_pipeline_success_mixed_batch26():
     per_doc = [
         {"metrics": {"pipeline_success": {"value": True}}},
@@ -516,15 +505,6 @@ def test_aggregate_summary_silent_drop_mixed_batch26():
     assert out["silent_drop_total"] == 8
 
 
-def test_aggregate_summary_silent_drop_all_none_batch26():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": None}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["silent_drop_total"] is None
-
-
 def test_aggregate_summary_silent_drop_zero_explicit_batch26():
     per_doc = [{"metrics": {"silent_drop_count": {"value": 0}}}]
     out = aggregate_summary(per_doc)
@@ -547,27 +527,6 @@ def test_aggregate_summary_keys_count_batch26():
     """summary 顶层 4 keys: counts / success_rates / ratio_macro_averages / silent_drop_total。"""
     out = aggregate_summary([])
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
-
-
-def test_aggregate_summary_counts_keys_batch26():
-    out = aggregate_summary([])
-    assert set(out["counts"].keys()) == {"element_count_total"}
-
-
-def test_aggregate_summary_success_rates_keys_batch26():
-    out = aggregate_summary([])
-    assert set(out["success_rates"].keys()) == {"pipeline_success"}
-
-
-def test_aggregate_summary_ratio_macro_averages_keys_count_batch26():
-    out = aggregate_summary([])
-    # 12 ratio metrics
-    assert len(out["ratio_macro_averages"]) == 12
-
-
-def test_aggregate_summary_ratio_macro_averages_keys_match_batch26():
-    out = aggregate_summary([])
-    assert set(out["ratio_macro_averages"].keys()) == set(_RATIO_METRICS)
 
 
 def test_aggregate_summary_does_not_mutate_input_batch26():
@@ -705,34 +664,14 @@ def test_module_source_contains_from_evaluation_import_batch26():
     assert "from evaluation import" in source
 
 
-def test_module_source_contains_evaluator_version_constant_batch26():
-    source = inspect.getsource(rmod)
-    assert "EVALUATOR_VERSION" in source
-
-
 def test_module_source_contains_report_version_constant_batch26():
     source = inspect.getsource(rmod)
     assert "REPORT_VERSION" in source
 
 
-def test_module_source_contains_capture_output_batch26():
-    source = inspect.getsource(rmod)
-    assert "capture_output=True" in source
-
-
 def test_module_source_contains_text_true_batch26():
     source = inspect.getsource(rmod)
     assert "text=True" in source
-
-
-def test_module_source_contains_errors_replace_batch26():
-    source = inspect.getsource(rmod)
-    assert 'errors="replace"' in source
-
-
-def test_module_source_contains_timeout_10_batch26():
-    source = inspect.getsource(rmod)
-    assert "timeout=10" in source
 
 
 def test_module_source_contains_rev_parse_head_batch26():
@@ -768,11 +707,6 @@ def test_module_source_contains_pypdfium2_dependency_batch26():
 def test_module_source_contains_aggregate_summary_batch26():
     source = inspect.getsource(rmod)
     assert "def aggregate_summary" in source
-
-
-def test_module_source_contains_macro_average_batch26():
-    source = inspect.getsource(rmod)
-    assert "macro_average" in source
 
 
 def test_module_source_contains_silent_drop_total_batch26():

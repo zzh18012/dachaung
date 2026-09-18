@@ -386,12 +386,6 @@ def test_parser_does_not_emit_relations_hashable():
 # =========================================================================
 
 
-def test_module_namespace_has_any():
-    import evaluation.annotation_metrics as m
-
-    assert hasattr(m, "Any")
-
-
 def test_module_namespace_has_parser_does_not_emit_relations():
     import evaluation.annotation_metrics as m
 
@@ -497,12 +491,6 @@ def test_chunk_boundary_prf_param_kinds_positional_or_keyword():
     sig = inspect.signature(chunk_boundary_prf)
     for p in sig.parameters.values():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_chunk_boundary_prf_no_var_kwargs():
-    sig = inspect.signature(chunk_boundary_prf)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 # =========================================================================

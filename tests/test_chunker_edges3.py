@@ -736,12 +736,6 @@ def test_chunker_init_max_chars_below_minimum_raises():
 # =============================================================================
 
 
-def test_split_piece_default_start_zero():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.start == 0
-    assert p.end == 0
-
-
 def test_split_piece_frozen():
     """_SplitPiece 是 frozen dataclass。"""
     p = _SplitPiece(text="x", boundary_after=None)
@@ -751,12 +745,6 @@ def test_split_piece_frozen():
         assert False, "expected frozen dataclass to raise"
     except (AttributeError, TypeError):
         pass
-
-
-def test_split_piece_equality():
-    p1 = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    p2 = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    assert p1 == p2
 
 
 # =============================================================================

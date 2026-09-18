@@ -56,12 +56,6 @@ def test_load_annotation_valid_json_batch47(tmp_path):
     assert out == {"key": "value"}
 
 
-def test_load_annotation_json_decode_error_batch47(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not valid json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_oserror_batch47(tmp_path):
     """open 抛 OSError → 兜底 None。"""
     p = tmp_path / "perm.json"
@@ -618,11 +612,6 @@ def test_source_contains_chunk_boundary_prf_batch47():
 def test_source_contains_aggregate_summary_batch47():
     src = inspect.getsource(runner_mod)
     assert "aggregate_summary" in src
-
-
-def test_source_contains_ensure_ascii_false_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "ensure_ascii=False" in src
 
 
 def test_source_contains_perf_counter_batch47():

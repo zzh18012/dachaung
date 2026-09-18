@@ -879,11 +879,6 @@ def test_signature_run_inspect_doc_1_param():
     assert len(sig.parameters) == 1
 
 
-def test_signature_run_inspect_doc_args_no_default():
-    sig = inspect.signature(_run_inspect_doc)
-    assert sig.parameters["args"].default is inspect.Parameter.empty
-
-
 def test_signature_all_4_functions_function_type():
     assert isinstance(_build_parser, types.FunctionType)
     assert isinstance(main, types.FunctionType)

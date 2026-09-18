@@ -121,10 +121,6 @@ def test_short_line_max_value_80():
     assert _SHORT_LINE_MAX == 80
 
 
-def test_short_line_max_positive():
-    assert _SHORT_LINE_MAX > 0
-
-
 # =========================================================================
 # _classify_line 罕见边界
 # =========================================================================
@@ -478,10 +474,6 @@ def test_kreuzberg_parser_name_is_str():
     assert isinstance(KreuzbergParser.name, str)
 
 
-def test_kreuzberg_parser_version_is_str():
-    assert isinstance(KreuzbergParser.version, str)
-
-
 def test_kreuzberg_parser_version_not_empty():
     assert KreuzbergParser.version
 
@@ -502,20 +494,10 @@ def test_kreuzberg_parser_class_dict_has_init():
     assert "__init__" in KreuzbergParser.__dict__
 
 
-def test_kreuzberg_parser_init_default_include_document_structure_true():
-    p = KreuzbergParser()
-    assert p._include_document_structure is True
-
-
 def test_kreuzberg_parser_init_keyword_only():
     """include_document_structure 是 keyword-only 参数。"""
     p = KreuzbergParser(include_document_structure=False)
     assert p._include_document_structure is False
-
-
-def test_kreuzberg_parser_init_explicit_true():
-    p = KreuzbergParser(include_document_structure=True)
-    assert p._include_document_structure is True
 
 
 def test_kreuzberg_parser_init_signature_one_keyword_param():

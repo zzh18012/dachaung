@@ -342,12 +342,6 @@ def test_docx_locator_ratio_with_page_none_batch19():
     assert out["value"] == 0.0
 
 
-def test_docx_locator_ratio_only_page_key_batch19():
-    elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_docx_locator_ratio_only_section_batch19():
     elements = [{"type": "paragraph", "source_locator": {"section": 0}}]
     out = _docx_locator_ratio(elements)

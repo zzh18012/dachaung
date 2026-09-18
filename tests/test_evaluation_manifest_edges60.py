@@ -179,11 +179,6 @@ def test_expected_failure_field_count_batch33():
     assert len(fields(ExpectedFailure)) == 5
 
 
-def test_expected_failure_field_names_batch33():
-    names = [f.name for f in fields(ExpectedFailure)]
-    assert names == ["doc_id", "path_str", "resolved_path", "expected_error_code", "source_type"]
-
-
 def test_expected_failure_frozen_batch33():
     ef = ExpectedFailure(
         doc_id="d1",

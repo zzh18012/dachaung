@@ -469,11 +469,6 @@ def test_module_source_forbidden_tokens_batch18(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_batch18():
-    src = inspect.getsource(amod)
-    assert "import subprocess" not in src
-
-
 # ---------- module source 字符串精确补强第二十八批 ----------
 
 

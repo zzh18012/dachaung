@@ -230,19 +230,9 @@ def test_manifest_hashable_batch29():
     assert hash(m) is not None
 
 
-def test_manifest_file_count_int_batch29():
-    m = _make_manifest()
-    assert isinstance(m.file_count, int)
-
-
 def test_manifest_docx_count_int_batch29():
     m = _make_manifest()
     assert isinstance(m.docx_count_int if hasattr(m, "docx_count_int") else m.docx_count, int)
-
-
-def test_manifest_content_group_count_int_batch29():
-    m = _make_manifest()
-    assert isinstance(m.content_group_count, int)
 
 
 def test_manifest_categories_covered_list_batch29():
@@ -574,11 +564,6 @@ def test_module_source_contains_load_manifest_batch29():
     assert "def load_manifest" in src
 
 
-def test_module_source_contains_detect_project_root_batch29():
-    src = inspect.getsource(mmod)
-    assert "def _detect_project_root" in src
-
-
 def test_module_source_contains_file_count_property_batch29():
     src = inspect.getsource(mmod)
     assert "def file_count" in src
@@ -683,18 +668,6 @@ def test_module_imports_validate_batch29():
 def test_module_no_main_block_batch29():
     src = inspect.getsource(mmod)
     assert 'if __name__ == "__main__"' not in src
-
-
-def test_module_all_contains_five_entries_batch29():
-    src = inspect.getsource(mmod)
-    for name in [
-        '"ManifestError"',
-        '"Manifest"',
-        '"DocumentEntry"',
-        '"ExpectedFailure"',
-        '"load_manifest"',
-    ]:
-        assert name in src
 
 
 # ---------- 端到端集成第四十二批 ----------

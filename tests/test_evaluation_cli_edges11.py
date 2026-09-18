@@ -669,16 +669,6 @@ def test_module_imports_path():
     assert hasattr(m, "Path")
 
 
-def test_module_imports_get_git_provenance():
-    import evaluation.cli as m
-    assert hasattr(m, "get_git_provenance")
-
-
-def test_module_imports_run_evaluation():
-    import evaluation.cli as m
-    assert hasattr(m, "run_evaluation")
-
-
 def test_module_docstring_present():
     import evaluation.cli as m
     assert m.__doc__ is not None

@@ -464,11 +464,6 @@ def test_build_provenance_run_timestamp_iso_has_T_separator(tmp_path: Path):
     assert "T" in ts
 
 
-def test_build_provenance_signature():
-    sig = inspect.signature(build_provenance)
-    assert set(sig.parameters) == {"project_root", "parser_name", "max_chars", "parser_version"}
-
-
 def test_build_provenance_no_defaults():
     sig = inspect.signature(build_provenance)
     for name in sig.parameters:

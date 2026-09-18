@@ -74,13 +74,6 @@ def test_dependency_versions_pkg_order_batch52():
     assert called == ["pdfplumber", "python-docx", "pypdfium2"]
 
 
-def test_dependency_versions_returns_new_dict_batch52():
-    a = get_dependency_versions()
-    b = get_dependency_versions()
-    assert a == b
-    assert a is not b
-
-
 # ---------- get_git_provenance 更细 ----------
 
 def _run(returncode=0, stdout=""):

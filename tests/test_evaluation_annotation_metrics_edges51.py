@@ -127,11 +127,6 @@ def test_chunk_boundary_prf_annotation_none_no_annotation_batch24():
     assert out["chunk_boundary_recall"]["reason"] == "no_annotation"
 
 
-def test_chunk_boundary_prf_annotation_empty_dict_batch24():
-    out = chunk_boundary_prf({"chunks": []}, {})
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_single_chunk_no_anchors_batch24():
     """1 chunk → no_predicted_boundaries。"""
     doc = {"chunks": [{"text": "abc"}]}
@@ -551,11 +546,6 @@ def test_module_source_contains_one_to_one_match_batch24():
     """docstring 提及一对一匹配。"""
     source = inspect.getsource(amod)
     assert "一对一" in source
-
-
-def test_module_source_contains_search_from_batch24():
-    source = inspect.getsource(amod)
-    assert "search_from" in source
 
 
 def test_module_source_contains_normalize_text_call_batch24():

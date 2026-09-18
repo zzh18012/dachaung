@@ -572,11 +572,6 @@ def test_source_contains_future_annotations_batch49():
     assert "from __future__ import annotations" in src
 
 
-def test_source_docstring_mentions_v1_0_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert "v1.0" in src
-
-
 def test_source_docstring_mentions_v1_1_batch49():
     src = inspect.getsource(metrics_mod)
     assert "v1.1" in src
@@ -605,11 +600,6 @@ def test_ast_has_13_top_level_functions_batch49():
     tree = ast.parse(inspect.getsource(metrics_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 14
-
-
-def test_ast_has_no_class_def_batch49():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
 def test_ast_module_has_docstring_batch49():

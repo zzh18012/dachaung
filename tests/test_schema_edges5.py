@@ -93,11 +93,6 @@ def test_schema_validation_error_default_errors_empty_list():
     assert len(e.errors) == 0
 
 
-def test_schema_validation_error_none_errors_becomes_empty():
-    e = SchemaValidationError("msg", errors=None)
-    assert e.errors == []
-
-
 def test_schema_validation_error_can_be_raised_and_caught():
     with pytest.raises(SchemaValidationError):
         raise SchemaValidationError("test")

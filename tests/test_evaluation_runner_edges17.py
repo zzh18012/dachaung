@@ -360,36 +360,6 @@ def test_module_namespace_contains_compute_automatic_metrics():
     assert hasattr(m, "compute_automatic_metrics")
 
 
-def test_module_namespace_contains_chunk_boundary_prf():
-    import evaluation.runner as m
-
-    assert hasattr(m, "chunk_boundary_prf")
-
-
-def test_module_namespace_contains_figure_caption_prf():
-    import evaluation.runner as m
-
-    assert hasattr(m, "figure_caption_prf")
-
-
-def test_module_namespace_contains_aggregate_summary():
-    import evaluation.runner as m
-
-    assert hasattr(m, "aggregate_summary")
-
-
-def test_module_namespace_contains_build_devset_section():
-    import evaluation.runner as m
-
-    assert hasattr(m, "build_devset_section")
-
-
-def test_module_namespace_contains_build_provenance():
-    import evaluation.runner as m
-
-    assert hasattr(m, "build_provenance")
-
-
 def test_module_namespace_does_not_contain_main():
     """模块无 main 函数。"""
     import evaluation.runner as m
@@ -414,24 +384,10 @@ def test_module_all_is_not_tuple():
     assert not isinstance(m.__all__, tuple)
 
 
-def test_module_all_has_one_entry():
-    import evaluation.runner as m
-
-    assert len(m.__all__) == 1
-
-
 def test_module_all_exact():
     import evaluation.runner as m
 
     assert m.__all__ == ["run_evaluation"]
-
-
-def test_module_all_does_not_contain_helpers():
-    """__all__ 不含 _load_annotation / _process_one。"""
-    import evaluation.runner as m
-
-    assert "_load_annotation" not in m.__all__
-    assert "_process_one" not in m.__all__
 
 
 def test_module_all_export_in_namespace():
@@ -469,11 +425,6 @@ def test_load_annotation_param_no_default():
     """_load_annotation 的 path 参数无 default。"""
     sig = inspect.signature(_load_annotation)
     assert sig.parameters["path"].default is inspect.Parameter.empty
-
-
-def test_load_annotation_param_kind_positional_or_keyword():
-    sig = inspect.signature(_load_annotation)
-    assert sig.parameters["path"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_load_annotation_no_var_args():

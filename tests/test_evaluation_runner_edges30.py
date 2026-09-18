@@ -147,11 +147,6 @@ def test_process_one_source_defines_out_stub_with_per_doc_subdir():
     assert "f\"{doc.doc_id}.json\"" in src
 
 
-def test_process_one_source_uses_parent_mkdir():
-    src = inspect.getsource(_process_one)
-    assert "out_stub.parent.mkdir(parents=True, exist_ok=True)" in src
-
-
 def test_process_one_source_calls_process_single_with_kwargs():
     src = inspect.getsource(_process_one)
     assert "process_single(" in src
@@ -164,12 +159,6 @@ def test_process_one_source_calls_process_single_with_kwargs():
 def test_process_one_source_uses_isfile_before_unlink():
     src = inspect.getsource(_process_one)
     assert "if out_stub.is_file():" in src
-
-
-def test_process_one_source_returns_5_tuple_for_errors_path():
-    src = inspect.getsource(_process_one)
-    # if errors: return None, errors[0].to_dict(), elapsed, None, image_dir
-    assert "errors[0].to_dict()" in src
 
 
 def test_process_one_source_returns_5_tuple_for_none_document():
@@ -252,11 +241,6 @@ def test_run_evaluation_source_calls_process_one():
 def test_run_evaluation_source_unpacked_5_tuple():
     src = inspect.getsource(run_evaluation)
     assert "document, error, total_seconds, parser_version, image_dir" in src
-
-
-def test_run_evaluation_source_caches_first_parser_version():
-    src = inspect.getsource(run_evaluation)
-    assert "if parser_version and not parser_version_for_prov:" in src
 
 
 def test_run_evaluation_source_calls_compute_automatic_metrics():
@@ -395,11 +379,6 @@ def test_run_evaluation_source_report_dict_has_6_keys():
 def test_run_evaluation_source_uses_out_p_path():
     src = inspect.getsource(run_evaluation)
     assert "out_p = Path(output_path)" in src
-
-
-def test_run_evaluation_source_opens_out_p_with_w_utf8():
-    src = inspect.getsource(run_evaluation)
-    assert 'out_p.open("w", encoding="utf-8")' in src
 
 
 def test_run_evaluation_source_uses_json_dump_with_kwargs():

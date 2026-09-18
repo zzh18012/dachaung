@@ -758,11 +758,6 @@ def test_aggregate_summary_success_rates_keys_exact_batch12():
     assert set(out["success_rates"].keys()) == {"pipeline_success"}
 
 
-def test_aggregate_summary_ratio_macro_keys_exact_batch12():
-    out = aggregate_summary([])
-    assert set(out["ratio_macro_averages"].keys()) == set(_RATIO_METRICS)
-
-
 def test_aggregate_summary_ratio_metrics_count_12_batch12():
     assert len(_RATIO_METRICS) == 12
 
@@ -1072,12 +1067,6 @@ def test_module_public_function_names_batch12():
     }
 
 
-def test_get_git_provenance_no_default_for_project_root_batch12():
-    sig = inspect.signature(get_git_provenance)
-    p = sig.parameters["project_root"]
-    assert p.default is inspect.Parameter.empty
-
-
 def test_build_provenance_no_defaults_batch12():
     sig = inspect.signature(build_provenance)
     for p in sig.parameters.values():
@@ -1160,10 +1149,6 @@ def test_module_uses_future_annotations_batch12():
 
 def test_module_report_version_attr_present_batch12():
     assert hasattr(rmod, "REPORT_VERSION")
-
-
-def test_module_evaluator_version_value_matches_batch12():
-    assert rmod.EVALUATOR_VERSION == EVALUATOR_VERSION
 
 
 def test_module_report_version_value_matches_batch12():

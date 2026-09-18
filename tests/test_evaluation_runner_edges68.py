@@ -122,13 +122,6 @@ def test_load_annotation_list_top_level_returns_list_batch43(tmp_path):
     assert out == [1, 2, 3]
 
 
-def test_load_annotation_number_top_level_returns_number_batch43(tmp_path):
-    p = tmp_path / "ann.json"
-    p.write_text("42", encoding="utf-8")
-    out = _load_annotation(p)
-    assert out == 42
-
-
 def test_load_annotation_idempotent_batch43(tmp_path):
     p = tmp_path / "ann.json"
     p.write_text('{"x": 1}', encoding="utf-8")
@@ -153,11 +146,6 @@ def test_process_one_return_annotation_tuple_batch43():
     sig = inspect.signature(_process_one)
     ann = str(sig.return_annotation)
     assert "tuple" in ann.lower()
-
-
-def test_process_one_max_chars_no_default_batch43():
-    sig = inspect.signature(_process_one)
-    assert sig.parameters["max_chars"].default is inspect.Parameter.empty
 
 
 # ---------- _process_one 行为 第四十三批
@@ -698,11 +686,6 @@ def test_module_source_contains_aggregate_summary_import_batch43():
     src = inspect.getsource(rmod)
     assert "from evaluation.report import" in src
     assert "aggregate_summary" in src
-
-
-def test_module_source_contains_build_devset_section_import_batch43():
-    src = inspect.getsource(rmod)
-    assert "build_devset_section" in src
 
 
 def test_module_source_contains_build_provenance_import_batch43():

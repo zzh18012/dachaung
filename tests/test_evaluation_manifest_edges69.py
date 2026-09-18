@@ -446,10 +446,6 @@ def test_manifest_error_raise_from_other_batch42():
         assert isinstance(me.__cause__, ValueError)
 
 
-def test_manifest_error_in_all_batch42():
-    assert "ManifestError" in mmod.__all__
-
-
 # ---------- _has_backslash / _is_absolute_like 补强 第四十二批
 
 
@@ -629,18 +625,6 @@ def test_module_all_no_dataclasses_exported_batch42():
     # 实际 __all__ 有 5 个 entries，包含 Manifest/DocumentEntry/ExpectedFailure
     # 但不 export dataclasses 模块本身
     assert "dataclasses" not in mmod.__all__
-
-
-def test_module_manifest_class_in_all_batch42():
-    assert "Manifest" in mmod.__all__
-
-
-def test_module_document_entry_in_all_batch42():
-    assert "DocumentEntry" in mmod.__all__
-
-
-def test_module_expected_failure_in_all_batch42():
-    assert "ExpectedFailure" in mmod.__all__
 
 
 # ---------- 端到端集成 第四十二批

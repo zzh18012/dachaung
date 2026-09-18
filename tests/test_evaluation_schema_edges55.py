@@ -243,13 +243,6 @@ def test_validate_file_missing_raises_filenotfound_batch35(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_invalid_json_raises_jsondecodeerror_batch35(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{invalid", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_invalid_content_raises_eval_schema_error_batch35(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("{}", encoding="utf-8")
@@ -419,16 +412,6 @@ def test_module_source_contains_draft_validator_import_batch35():
     assert "from jsonschema import Draft202012Validator" in src
 
 
-def test_module_source_contains_validation_error_import_batch35():
-    src = inspect.getsource(smod)
-    assert "from jsonschema.exceptions import ValidationError" in src
-
-
-def test_module_source_contains_schemas_dir_definition_batch35():
-    src = inspect.getsource(smod)
-    assert 'SCHEMAS_DIR = Path(__file__).resolve().parent.parent / "schemas"' in src
-
-
 def test_module_source_contains_class_definition_batch35():
     src = inspect.getsource(smod)
     assert "class EvalSchemaError" in src
@@ -560,10 +543,6 @@ def test_module_all_len_five_batch35():
 
 def test_module_all_contains_schemas_dir_batch35():
     assert "SCHEMAS_DIR" in smod.__all__
-
-
-def test_module_all_contains_eval_schema_error_batch35():
-    assert "EvalSchemaError" in smod.__all__
 
 
 def test_module_all_contains_load_schema_batch35():

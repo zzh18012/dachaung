@@ -623,11 +623,6 @@ def test_module_source_main_has_3_branches():
     assert 'args.command == "inspect-doc"' in src
 
 
-def test_module_source_main_calls_run_evaluation():
-    src = inspect.getsource(main)
-    assert "run_evaluation(" in src
-
-
 def test_module_source_main_calls_validate_file():
     src = inspect.getsource(main)
     assert 'validate_file(output_path, "evaluation-report.schema.json")' in src

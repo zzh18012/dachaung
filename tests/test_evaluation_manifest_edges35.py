@@ -596,11 +596,6 @@ def test_manifest_ne_other_devset_status():
     assert m1 != m2
 
 
-def test_manifest_repr_includes_class_name():
-    m = _make_manifest()
-    assert "Manifest" in repr(m)
-
-
 def test_manifest_with_documents_tuple():
     docs = (_make_doc_entry(doc_id="d1"), _make_doc_entry(doc_id="d2"))
     m = _make_manifest(documents=docs)
@@ -757,16 +752,6 @@ def test_manifest_docx_count_returns_int():
     docs = (_make_doc_entry(source_type="docx"),)
     m = _make_manifest(documents=docs)
     assert isinstance(m.docx_count, int)
-
-
-def test_manifest_file_count_returns_int():
-    m = _make_manifest()
-    assert isinstance(m.file_count, int)
-
-
-def test_manifest_content_group_count_returns_int():
-    m = _make_manifest()
-    assert isinstance(m.content_group_count, int)
 
 
 # ---------- load_manifest malformed data 第八批 ----------
@@ -1437,11 +1422,6 @@ def test_module_no_call_at_top_level():
                 break
         for pat in suspicious_patterns:
             assert pat not in line, f"suspicious pattern {pat!r} in {line!r}"
-
-
-def test_module_dataclass_decoration_count():
-    src = inspect.getsource(mmod)
-    assert src.count("@dataclass(frozen=True)") == 3
 
 
 # ---------- 端到端集成第四批 ----------

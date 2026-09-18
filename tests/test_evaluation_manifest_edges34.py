@@ -60,10 +60,6 @@ def test_is_absolute_like_two_char_alpha():
     assert _is_absolute_like("ab") is False
 
 
-def test_is_absolute_like_two_char_a_colon():
-    assert _is_absolute_like("a:") is False  # len < 3
-
-
 def test_is_absolute_like_underscore_pos0():
     assert _is_absolute_like("_:/foo") is False  # _ isalpha False
 

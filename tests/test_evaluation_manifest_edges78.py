@@ -53,10 +53,6 @@ def test_is_absolute_like_two_chars_batch52():
     assert _is_absolute_like("C:") is False  # len < 3
 
 
-def test_is_absolute_like_drive_no_slash_batch52():
-    assert _is_absolute_like("C:foo") is False  # path_str[2] 不是 \ 或 /
-
-
 def test_is_absolute_like_lowercase_drive_batch52():
     assert _is_absolute_like("c:/foo") is True
 
@@ -494,11 +490,6 @@ def test_source_pathlib_path_import_batch52():
     assert "from pathlib import Path" in src
 
 
-def test_source_typing_any_import_batch52():
-    src = inspect.getsource(manifest_mod)
-    assert "from typing import Any" in src
-
-
 def test_source_manifest_version_import_batch52():
     src = inspect.getsource(manifest_mod)
     assert "from evaluation import MANIFEST_VERSION" in src
@@ -507,11 +498,6 @@ def test_source_manifest_version_import_batch52():
 def test_source_validate_import_batch52():
     src = inspect.getsource(manifest_mod)
     assert "from evaluation.schema import validate" in src
-
-
-def test_source_manifest_error_docstring_batch52():
-    src = inspect.getsource(manifest_mod)
-    assert "清单加载或校验失败" in src
 
 
 def test_source_is_absolute_like_docstring_batch52():

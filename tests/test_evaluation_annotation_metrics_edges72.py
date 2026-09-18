@@ -521,12 +521,6 @@ def test_source_contains_本期不引入启发式_batch47():
 
 # ---------- AST 结构补强 ----------
 
-def test_ast_top_level_functions_count_batch47():
-    tree = ast.parse(inspect.getsource(am_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 2  # figure_caption_prf / chunk_boundary_prf
-
-
 def test_ast_module_constants_count_batch47():
     tree = ast.parse(inspect.getsource(am_mod))
     assigns = [n for n in tree.body if isinstance(n, ast.Assign)]

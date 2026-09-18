@@ -389,11 +389,6 @@ def test_aggregate_summary_has_4_top_keys_batch49():
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
 
 
-def test_aggregate_summary_ratio_macro_has_all_12_metrics_batch49():
-    out = aggregate_summary([])
-    assert len(out["ratio_macro_averages"]) == 12
-
-
 def test_aggregate_summary_figure_caption_not_in_ratio_batch49():
     """figure_caption_* 不在 _RATIO_METRICS 中。"""
     src = inspect.getsource(report_mod)
@@ -417,21 +412,6 @@ def test_source_contains_datetime_import_batch49():
 def test_source_contains_pathlib_import_batch49():
     src = inspect.getsource(report_mod)
     assert "from pathlib import Path" in src
-
-
-def test_source_contains_typing_any_import_batch49():
-    src = inspect.getsource(report_mod)
-    assert "from typing import Any" in src
-
-
-def test_source_contains_evaluation_import_batch49():
-    src = inspect.getsource(report_mod)
-    assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in src
-
-
-def test_source_docstring_mentions_no_mix_types_batch49():
-    src = inspect.getsource(report_mod)
-    assert "不混合类型" in src
 
 
 def test_source_docstring_mentions_macro_average_batch49():
@@ -460,16 +440,6 @@ def test_source_all_has_5_entries_batch49():
     assert '"get_dependency_versions"' in src
 
 
-def test_source_contains_timeout_10_batch49():
-    src = inspect.getsource(report_mod)
-    assert "timeout=10" in src
-
-
-def test_source_contains_capture_output_batch49():
-    src = inspect.getsource(report_mod)
-    assert "capture_output=True" in src
-
-
 def test_source_contains_isoformat_call_batch49():
     src = inspect.getsource(report_mod)
     assert ".isoformat()" in src
@@ -495,16 +465,6 @@ def test_source_contains_rev_parse_command_batch49():
     assert '"rev-parse", "HEAD"' in src
 
 
-def test_source_contains_importlib_metadata_batch49():
-    src = inspect.getsource(report_mod)
-    assert "importlib.metadata" in src
-
-
-def test_source_contains_package_not_found_batch49():
-    src = inspect.getsource(report_mod)
-    assert "PackageNotFoundError" in src
-
-
 def test_source_contains_python_docx_string_batch49():
     src = inspect.getsource(report_mod)
     assert '"python-docx"' in src
@@ -526,18 +486,6 @@ def test_ast_has_5_top_level_functions_batch49():
     tree = ast.parse(inspect.getsource(report_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 5
-
-
-def test_ast_function_names_batch49():
-    tree = ast.parse(inspect.getsource(report_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == [
-        "get_git_provenance",
-        "get_dependency_versions",
-        "build_provenance",
-        "build_devset_section",
-        "aggregate_summary",
-    ]
 
 
 def test_ast_no_class_def_batch49():

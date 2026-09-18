@@ -31,12 +31,6 @@ def test_build_parser_prog_evaluation_cli_batch34():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_description_present_batch34():
-    p = _build_parser()
-    assert p.description is not None
-    assert "评测" in p.description
-
-
 def test_build_parser_run_subparser_has_manifest_required_batch34():
     p = _build_parser()
     sub_action = next(a for a in p._actions if isinstance(a, argparse._SubParsersAction))
@@ -537,13 +531,6 @@ def test_module_source_contains_run_inspect_doc_func_batch34():
 def test_module_source_contains_subparsers_batch34():
     src = inspect.getsource(cmod)
     assert "add_subparsers" in src
-
-
-def test_module_source_contains_run_subcommand_batch34():
-    src = inspect.getsource(cmod)
-    assert '"run"' in src
-    assert '"validate-report"' in src
-    assert '"inspect-doc"' in src
 
 
 def test_module_source_contains_raw_description_batch34():

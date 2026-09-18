@@ -822,11 +822,6 @@ def test_figure_caption_prf_source_has_3_null_calls():
     assert src.count("_null(reason)") == 3
 
 
-def test_figure_caption_prf_source_has_reason_assignment():
-    src = inspect.getsource(figure_caption_prf)
-    assert "reason = PARSER_DOES_NOT_EMIT_RELATIONS" in src
-
-
 def test_figure_caption_prf_source_has_3_keys_in_return():
     src = inspect.getsource(figure_caption_prf)
     assert "figure_caption_precision" in src
@@ -905,11 +900,6 @@ def test_chunk_boundary_prf_source_has_used_pred_used_gt():
     src = inspect.getsource(chunk_boundary_prf)
     assert "used_pred" in src
     assert "used_gt" in src
-
-
-def test_chunk_boundary_prf_source_has_matched_increment():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "matched += 1" in src
 
 
 def test_chunk_boundary_prf_source_has_3_metric_writes():

@@ -364,11 +364,6 @@ def test_format_metric_bool_false_batch45():
     assert "false" in out
 
 
-def test_format_metric_float_batch45():
-    out = _format_metric("x", {"value": 0.5, "reason": None})
-    assert "0.5000" in out
-
-
 def test_format_metric_dict_value_sorted_batch45():
     """dict value 按 key 排序。"""
     out = _format_metric("x", {"value": {"z": 1, "a": 2}, "reason": None})
@@ -487,12 +482,6 @@ def test_module_source_contains_required_true_batch45():
     assert "required=True" in src
 
 
-def test_module_source_contains_fallback_kreuzberg_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "fallback" in src
-    assert "kreuzberg" in src
-
-
 def test_module_source_contains_raw_description_batch45():
     src = inspect.getsource(cli_mod)
     assert "RawDescriptionHelpFormatter" in src
@@ -536,12 +525,6 @@ def test_ast_top_level_function_names_batch45():
     tree = ast.parse(inspect.getsource(cli_mod))
     names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert names == ["_build_parser", "main", "_format_metric", "_run_inspect_doc"]
-
-
-def test_ast_top_level_no_class_batch45():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
 
 
 def test_ast_main_has_if_at_least_3_batch45():
@@ -633,44 +616,14 @@ def test_source_no_compile_batch45():
     assert "compile(" not in src
 
 
-def test_source_no_globals_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "os.system(" not in src
-
-
 def test_source_no_popen_batch45():
     src = inspect.getsource(cli_mod)
     assert ".popen(" not in src
 
 
-def test_source_no_yaml_load_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "pickle.load(" not in src
-
-
 def test_source_no_class_keyword_batch45():
     src = inspect.getsource(cli_mod)
     assert "\nclass " not in src
-
-
-def test_source_no_async_def_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "async def" not in src
 
 
 def test_source_no_yield_batch45():

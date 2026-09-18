@@ -442,11 +442,6 @@ def test_eval_schema_error_errors_default_is_empty_list():
     assert len(err.errors) == 0
 
 
-def test_eval_schema_error_with_none_errors_explicit():
-    err = EvalSchemaError("msg", errors=None)
-    assert err.errors == []
-
-
 def test_eval_schema_error_in_try_except():
     try:
         raise EvalSchemaError("custom")
@@ -692,13 +687,6 @@ def test_validate_file_raises_on_invalid_json(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_raises_on_empty_file(tmp_path):
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_raises_on_array_json(tmp_path):
     p = tmp_path / "arr.json"
     p.write_text("[]", encoding="utf-8")
@@ -940,11 +928,6 @@ def test_module_source_no_exec():
     assert "exec(" not in src
 
 
-def test_module_source_no_compile():
-    src = inspect.getsource(smod)
-    assert "compile(" not in src
-
-
 def test_module_source_no_unlink():
     src = inspect.getsource(smod)
     assert "unlink" not in src
@@ -958,15 +941,6 @@ def test_module_source_no_print():
 def test_module_source_no_os_import():
     src = inspect.getsource(smod)
     assert "import os" not in src
-
-
-def test_module_source_no_sys_import():
-    src = inspect.getsource(smod)
-    assert "import sys" not in src
-
-
-def test_module_source_docstring_present():
-    assert smod.__doc__ is not None
 
 
 def test_module_source_docstring_mentions_schema():
@@ -1063,11 +1037,6 @@ def test_signature_validate_file_no_defaults():
     sig = inspect.signature(validate_file)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_signature_validate_file_return_annotation_none():
-    sig = inspect.signature(validate_file)
-    assert sig.return_annotation == "None"
 
 
 def test_signature_schema_path_no_varargs():
@@ -1192,10 +1161,6 @@ def test_module_schemas_dir_resolved():
 
 def test_module_schemas_dir_endswith_schemas():
     assert SCHEMAS_DIR.name == "schemas"
-
-
-def test_module_schemas_dir_exists():
-    assert SCHEMAS_DIR.exists()
 
 
 def test_module_schemas_dir_in_all():

@@ -729,10 +729,6 @@ def test_manifest_error_with_cause_batch36():
         assert isinstance(ex.__cause__, ValueError)
 
 
-def test_manifest_error_is_not_keyerror_batch36():
-    assert not issubclass(ManifestError, KeyError)
-
-
 def test_manifest_error_is_not_valueerror_batch36():
     assert not issubclass(ManifestError, ValueError)
 
@@ -840,16 +836,6 @@ def test_module_source_contains_expected_failures_tuple_batch36():
 def test_module_source_contains_project_root_field_batch36():
     src = inspect.getsource(mmod)
     assert "project_root: Path" in src
-
-
-def test_module_source_contains_content_group_count_property_batch36():
-    src = inspect.getsource(mmod)
-    assert "def content_group_count" in src
-
-
-def test_module_source_contains_categories_covered_property_batch36():
-    src = inspect.getsource(mmod)
-    assert "def categories_covered" in src
 
 
 def test_module_source_contains_manifest_version_check_batch36():

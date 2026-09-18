@@ -414,11 +414,6 @@ def test_build_provenance_signature_batch42():
     assert list(sig.parameters.keys()) == ["project_root", "parser_name", "max_chars", "parser_version"]
 
 
-def test_build_provenance_no_default_for_parser_version_batch42():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["parser_version"].default is inspect.Parameter.empty
-
-
 # ---------- build_devset_section 第四十二批
 
 
@@ -491,11 +486,6 @@ def test_build_devset_section_signature_batch42():
     assert list(sig.parameters.keys()) == ["manifest"]
 
 
-def test_build_devset_section_return_annotation_dict_batch42():
-    sig = inspect.signature(build_devset_section)
-    assert "dict" in str(sig.return_annotation)
-
-
 # ---------- aggregate_summary counts 第四十二批
 
 
@@ -553,25 +543,6 @@ def test_aggregate_summary_counts_partial_participation_batch42():
 
 
 # ---------- aggregate_summary success_rates 第四十二批
-
-
-def test_aggregate_summary_success_rates_all_false_batch42():
-    per_doc = [
-        {"metrics": {"pipeline_success": {"value": False}}},
-        {"metrics": {"pipeline_success": {"value": False}}},
-    ]
-    out = aggregate_summary(per_doc)
-    sr = out["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 0
-    assert sr["rate"] == 0.0
-
-
-def test_aggregate_summary_success_rates_empty_batch42():
-    out = aggregate_summary([])
-    sr = out["success_rates"]["pipeline_success"]
-    assert sr["success_count"] == 0
-    assert sr["total"] == 0
-    assert sr["rate"] is None
 
 
 def test_aggregate_summary_success_rates_missing_field_batch42():
@@ -844,21 +815,6 @@ def test_module_source_contains_no_mixing_warning_batch42():
     assert "不混合" in src or "不混" in src
 
 
-def test_module_source_contains_macro_average_keyword_batch42():
-    src = inspect.getsource(rmod)
-    assert "macro_average" in src
-
-
-def test_module_source_contains_participating_docs_keyword_batch42():
-    src = inspect.getsource(rmod)
-    assert "participating_docs" in src
-
-
-def test_module_source_contains_not_evaluated_keyword_batch42():
-    src = inspect.getsource(rmod)
-    assert "not_evaluated" in src
-
-
 def test_module_source_contains_all_definition_batch42():
     src = inspect.getsource(rmod)
     assert "__all__" in src
@@ -924,26 +880,6 @@ def test_module_all_is_list_batch42():
 
 def test_module_all_five_entries_batch42():
     assert len(rmod.__all__) == 5
-
-
-def test_module_all_contains_build_provenance_batch42():
-    assert "build_provenance" in rmod.__all__
-
-
-def test_module_all_contains_build_devset_section_batch42():
-    assert "build_devset_section" in rmod.__all__
-
-
-def test_module_all_contains_aggregate_summary_batch42():
-    assert "aggregate_summary" in rmod.__all__
-
-
-def test_module_all_contains_get_git_provenance_batch42():
-    assert "get_git_provenance" in rmod.__all__
-
-
-def test_module_all_contains_get_dependency_versions_batch42():
-    assert "get_dependency_versions" in rmod.__all__
 
 
 def test_module_does_not_export_private_batch42():

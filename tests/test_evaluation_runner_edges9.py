@@ -32,10 +32,6 @@ def test_load_annotation_none_returns_none():
     assert _load_annotation(None) is None
 
 
-def test_load_annotation_nonexistent_returns_none(tmp_path):
-    assert _load_annotation(tmp_path / "nope.json") is None
-
-
 def test_load_annotation_directory_returns_none(tmp_path):
     """目录不是 file → None。"""
     assert _load_annotation(tmp_path) is None

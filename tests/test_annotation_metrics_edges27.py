@@ -414,40 +414,9 @@ def test_module_source_has_normalize_text_called_with_default():
     assert 'normalize_text(c.get("text") or "")' in src
 
 
-def test_module_source_has_stream_normalize_after_join():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "stream = normalize_text(joined_raw)" in src
-
-
-def test_module_source_has_find_in_stream():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "stream.find(txt, pos)" in src
-
-
 def test_module_source_has_search_from_init():
     src = inspect.getsource(chunk_boundary_prf)
     assert "search_from = 0" in src
-
-
-def test_module_source_has_marker_default_empty():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert 'a.get("marker", "")' in src
-
-
-def test_module_source_has_position_default_after():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert 'a.get("position", "after")' in src
-
-
-def test_module_source_has_pairs_sort_key_distance():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "pairs.sort(key=lambda x: x[0])" in src
-
-
-def test_module_source_has_used_pred_used_gt_set():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "used_pred = set()" in src
-    assert "used_gt = set()" in src
 
 
 def test_module_source_has_f1_calc_with_2p1r():

@@ -46,15 +46,6 @@ def test_parser_const_underscores_batch37():
 # ---------- figure_caption_prf 第三十七批
 
 
-def test_figure_caption_prf_returns_three_keys_batch37():
-    out = figure_caption_prf({"x": 1}, {"y": 2})
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_prf_all_reason_same_batch37():
     out = figure_caption_prf({"chunks": []}, {"x": 1})
     reasons = [v["reason"] for v in out.values()]

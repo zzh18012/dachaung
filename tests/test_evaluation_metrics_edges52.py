@@ -594,39 +594,14 @@ def test_module_source_no_async_def_batch26():
     assert "async def" not in source
 
 
-def test_module_source_no_global_keyword_batch26():
-    source = inspect.getsource(mmod)
-    assert "global " not in source
-
-
 def test_module_source_no_walrus_batch26():
     source = inspect.getsource(mmod)
     assert ":=" not in source
 
 
-def test_module_source_no_eval_exec_batch26():
-    source = inspect.getsource(mmod)
-    assert "eval(" not in source
-    assert "exec(" not in source
-    assert "compile(" not in source
-
-
-def test_module_source_no_relative_imports_batch26():
-    source_lines = inspect.getsource(mmod).split("\n")
-    for line in source_lines:
-        stripped = line.strip()
-        if stripped.startswith("from .") and "from __future__" not in stripped:
-            pytest.fail(f"relative import: {line}")
-
-
 def test_module_source_no_star_import_batch26():
     source = inspect.getsource(mmod)
     assert "import *" not in source
-
-
-def test_module_source_no_subprocess_batch26():
-    source = inspect.getsource(mmod)
-    assert "subprocess" not in source
 
 
 def test_module_source_no_environ_batch26():

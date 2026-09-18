@@ -1108,10 +1108,6 @@ def test_module_short_line_max_is_int():
     assert isinstance(_SHORT_LINE_MAX, int)
 
 
-def test_module_short_line_max_positive():
-    assert _SHORT_LINE_MAX > 0
-
-
 def test_module_kreuzberg_available_is_bool():
     assert isinstance(_KREUZBERG_AVAILABLE, bool)
 
@@ -1192,11 +1188,6 @@ def test_module_split_content_callable():
 
 def test_module_make_locator_callable():
     assert callable(_make_locator)
-
-
-def test_kreuzberg_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(KreuzbergParser, Parser)
 
 
 def test_kreuzberg_parser_class_name_constant():

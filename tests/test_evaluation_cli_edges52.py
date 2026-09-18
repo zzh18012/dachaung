@@ -819,11 +819,6 @@ def test_module_source_contains_dest_command_batch25():
     assert 'dest="command"' in source
 
 
-def test_module_source_contains_required_true_batch25():
-    source = inspect.getsource(climod)
-    assert "required=True" in source
-
-
 def test_module_source_contains_default_fallback_batch25():
     source = inspect.getsource(climod)
     assert 'default="fallback"' in source
@@ -935,11 +930,6 @@ def test_module_docstring_mentions_subcommands_batch25():
     assert "run" in src
     assert "validate-report" in src
     assert "inspect-doc" in src
-
-
-def test_module_uses_from_future_annotations_batch25():
-    source = inspect.getsource(climod)
-    assert "from __future__ import annotations" in source
 
 
 def test_module_main_docstring_present_batch25():

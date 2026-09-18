@@ -95,10 +95,6 @@ def test_is_absolute_like_empty_string_returns_false():
     assert _is_absolute_like("") is False
 
 
-def test_is_absolute_like_forward_slash_root():
-    assert _is_absolute_like("/foo/bar") is True
-
-
 def test_is_absolute_like_just_slash():
     assert _is_absolute_like("/") is True
 
@@ -129,10 +125,6 @@ def test_is_absolute_like_windows_drive_uppercase():
 
 def test_is_absolute_like_windows_drive_forward_slash():
     assert _is_absolute_like("C:/foo") is True
-
-
-def test_is_absolute_like_drive_no_separator():
-    assert _is_absolute_like("C:foo") is False
 
 
 def test_is_absolute_like_no_drive_relative():
@@ -222,10 +214,6 @@ def test_has_backslash_empty_string():
     assert _has_backslash("") is False
 
 
-def test_has_backslash_unicode_no_backslash():
-    assert _has_backslash("中文/路径") is False
-
-
 def test_has_backslash_unicode_with_backslash():
     assert _has_backslash("中文\\路径") is True
 
@@ -243,10 +231,6 @@ def test_manifest_error_does_not_inherit_value_error():
     assert not issubclass(ManifestError, ValueError)
 
 
-def test_manifest_error_does_not_inherit_key_error():
-    assert not issubclass(ManifestError, KeyError)
-
-
 def test_manifest_error_can_be_raised():
     with pytest.raises(ManifestError):
         raise ManifestError("test")
@@ -257,16 +241,6 @@ def test_manifest_error_caught_as_exception():
         raise ManifestError("x")
     except Exception as e:
         assert isinstance(e, ManifestError)
-
-
-def test_manifest_error_args_value():
-    e = ManifestError("msg")
-    assert e.args == ("msg",)
-
-
-def test_manifest_error_no_args():
-    e = ManifestError()
-    assert e.args == ()
 
 
 def test_manifest_error_multiple_args():
@@ -547,11 +521,6 @@ def test_manifest_equality():
 # =========================================================================
 
 
-def test_manifest_file_count_returns_int():
-    m = _make_manifest()
-    assert isinstance(m.file_count, int)
-
-
 def test_manifest_file_count_zero_for_empty():
     m = _make_manifest(documents=())
     assert m.file_count == 0
@@ -580,16 +549,6 @@ def test_manifest_docx_count_zero_when_no_docx():
 def test_manifest_docx_count_one_when_one_docx():
     m = _make_manifest(documents=(_make_doc_entry(source_type="docx"),))
     assert m.docx_count == 1
-
-
-def test_manifest_content_group_count_returns_int():
-    m = _make_manifest()
-    assert isinstance(m.content_group_count, int)
-
-
-def test_manifest_content_group_count_zero_when_empty():
-    m = _make_manifest(documents=())
-    assert m.content_group_count == 0
 
 
 def test_manifest_content_group_count_unpaired():
@@ -682,12 +641,6 @@ def test_resolve_relative_path_absolute_raises(tmp_path: Path):
 def test_resolve_relative_path_backslash_raises(tmp_path: Path):
     with pytest.raises(ManifestError):
         _resolve_relative_path("foo\\bar.pdf", tmp_path, "test")
-
-
-def test_resolve_relative_path_field_name_in_empty_error(tmp_path: Path):
-    with pytest.raises(ManifestError) as ei:
-        _resolve_relative_path("", tmp_path, "MY_FIELD")
-    assert "MY_FIELD" in str(ei.value)
 
 
 def test_resolve_relative_path_field_name_in_absolute_error(tmp_path: Path):

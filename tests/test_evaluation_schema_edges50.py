@@ -238,11 +238,6 @@ def test_validate_file_path_string_batch30(tmp_path):
     assert validate_file(str(p), "manifest.schema.json") is None
 
 
-def test_validate_file_nonexistent_raises_filenotfound_batch30(tmp_path):
-    with pytest.raises(FileNotFoundError):
-        validate_file(tmp_path / "nonexistent.json", "manifest.schema.json")
-
-
 def test_validate_file_directory_raises_filenotfound_batch30(tmp_path):
     """目录也 → FileNotFoundError（is_file=False）。"""
     d = tmp_path / "subdir"
@@ -389,11 +384,6 @@ def test_module_source_contains_schemas_dir_assignment_batch30():
     assert "SCHEMAS_DIR = " in src
 
 
-def test_module_source_contains_resolve_call_batch30():
-    src = inspect.getsource(smod)
-    assert ".resolve()" in src
-
-
 def test_module_source_contains_schema_path_func_batch30():
     src = inspect.getsource(smod)
     assert "def _schema_path" in src
@@ -468,11 +458,6 @@ def test_signature_eval_schema_error_init_return_none_batch30():
     assert sig.return_annotation == "None"
 
 
-def test_signature_eval_schema_error_message_str_batch30():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    assert sig.parameters["message"].annotation == "str"
-
-
 def test_signature_eval_schema_error_errors_default_none_batch30():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert sig.parameters["errors"].default is None
@@ -488,21 +473,6 @@ def test_signature_load_schema_batch30():
     sig = inspect.signature(load_schema)
     assert sig.parameters["name"].annotation == "str"
     assert sig.return_annotation == "dict[str, Any]"
-
-
-def test_signature_validate_batch30():
-    sig = inspect.signature(validate)
-    assert sig.parameters["instance"].annotation == "dict[str, Any]"
-    assert sig.parameters["schema_name"].annotation == "str"
-    assert sig.return_annotation == "None"
-
-
-def test_signature_validate_file_batch30():
-    sig = inspect.signature(validate_file)
-    assert "Path" in str(sig.parameters["path"].annotation)
-    assert "str" in str(sig.parameters["path"].annotation)
-    assert sig.parameters["schema_name"].annotation == "str"
-    assert sig.return_annotation == "None"
 
 
 # ---------- module 合理性第四十四批 ----------
@@ -542,11 +512,6 @@ def test_module_schemas_dir_absolute_batch30():
     assert SCHEMAS_DIR.is_absolute()
 
 
-def test_module_no_main_block_batch30():
-    src = inspect.getsource(smod)
-    assert 'if __name__ == "__main__"' not in src
-
-
 def test_module_all_has_five_entries_batch30():
     src = inspect.getsource(smod)
     for name in [
@@ -562,41 +527,10 @@ def test_module_all_has_five_entries_batch30():
 # ---------- 端到端集成第四十四批 ----------
 
 
-def test_e2e_validate_full_manifest_roundtrip_batch30(tmp_path):
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [
-            {"doc_id": "d1", "path": "x.pdf", "source_type": "pdf", "sha256": "a" * 64}
-        ],
-    }
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps(instance), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
-
-
 def test_e2e_three_schemas_exist_batch30():
     for name in ["manifest.schema.json", "annotation.schema.json", "evaluation-report.schema.json"]:
         p = _schema_path(name)
         assert p.is_file()
-
-
-def test_e2e_eval_schema_error_caught_batch30():
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e:
-        assert "manifest.schema.json" in str(e)
-        return
-    pytest.fail("Expected EvalSchemaError")
-
-
-def test_e2e_validate_errors_complete_batch30():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    for err in exc.value.errors:
-        assert isinstance(err["path"], list)
-        assert isinstance(err["schema_path"], list)
-        assert isinstance(err["message"], str)
 
 
 def test_e2e_schemas_dir_in_project_batch30():

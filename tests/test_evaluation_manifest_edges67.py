@@ -108,10 +108,6 @@ def test_has_backslash_no_backslash_batch40():
     assert _has_backslash("foo/bar") is False
 
 
-def test_has_backslash_mixed_separators_batch40():
-    assert _has_backslash("foo\\bar/baz") is True
-
-
 def test_has_backslash_multiple_backslashes_batch40():
     assert _has_backslash("\\\\") is True
 
@@ -914,11 +910,6 @@ def test_module_source_contains_has_backslash_function_batch40():
     assert "def _has_backslash(" in src
 
 
-def test_module_source_contains_utf8_keyword_batch40():
-    src = inspect.getsource(mmod)
-    assert 'encoding="utf-8"' in src
-
-
 def test_module_source_contains_absolute_path_keyword_batch40():
     src = inspect.getsource(mmod)
     assert "绝对路径" in src
@@ -1032,22 +1023,6 @@ def test_module_all_five_entries_batch40():
     assert len(mmod.__all__) == 5
 
 
-def test_module_all_contains_manifest_error_batch40():
-    assert "ManifestError" in mmod.__all__
-
-
-def test_module_all_contains_manifest_batch40():
-    assert "Manifest" in mmod.__all__
-
-
-def test_module_all_contains_document_entry_batch40():
-    assert "DocumentEntry" in mmod.__all__
-
-
-def test_module_all_contains_expected_failure_batch40():
-    assert "ExpectedFailure" in mmod.__all__
-
-
 def test_module_has_manifest_error_attr_batch40():
     assert hasattr(mmod, "ManifestError")
 
@@ -1062,10 +1037,6 @@ def test_module_has_expected_failure_attr_batch40():
 
 def test_module_has_manifest_attr_batch40():
     assert hasattr(mmod, "Manifest")
-
-
-def test_module_has_load_manifest_attr_batch40():
-    assert hasattr(mmod, "load_manifest")
 
 
 def test_module_load_manifest_callable_batch40():

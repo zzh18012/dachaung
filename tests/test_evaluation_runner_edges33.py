@@ -151,11 +151,6 @@ def test_process_one_source_uses_errors_truthy_check():
     assert "if errors:" in src
 
 
-def test_process_one_source_returns_errors_0_to_dict():
-    src = inspect.getsource(_process_one)
-    assert "errors[0].to_dict()" in src
-
-
 def test_process_one_source_returns_unknown_error_message():
     src = inspect.getsource(_process_one)
     assert '"unknown"' in src
@@ -175,11 +170,6 @@ def test_process_one_source_uses_elapsed_calc():
 def test_process_one_source_no_eval():
     src = inspect.getsource(_process_one)
     assert "eval(" not in src
-
-
-def test_process_one_source_no_yield():
-    src = inspect.getsource(_process_one)
-    assert "yield" not in src
 
 
 # ---------- run_evaluation source level 字符串精确补强第五批 ----------
@@ -262,11 +252,6 @@ def test_run_evaluation_source_uses_metrics_update():
     assert "metrics.update(chunk_b)" in src
 
 
-def test_run_evaluation_source_calls_build_provenance():
-    src = inspect.getsource(run_evaluation)
-    assert "build_provenance(" in src
-
-
 def test_run_evaluation_source_calls_build_devset_section():
     src = inspect.getsource(run_evaluation)
     assert "build_devset_section(manifest)" in src
@@ -304,24 +289,9 @@ def test_run_evaluation_source_uses_out_p_path():
     assert "out_p.parent.mkdir(parents=True, exist_ok=True)" in src
 
 
-def test_run_evaluation_source_uses_open_w_utf8():
-    src = inspect.getsource(run_evaluation)
-    assert 'out_p.open("w", encoding="utf-8")' in src
-
-
 def test_run_evaluation_source_returns_report():
     src = inspect.getsource(run_evaluation)
     assert "return report" in src
-
-
-def test_run_evaluation_source_uses_parser_version_first():
-    src = inspect.getsource(run_evaluation)
-    assert "if parser_version and not parser_version_for_prov:" in src
-
-
-def test_run_evaluation_source_initializes_expected_failure_results():
-    src = inspect.getsource(run_evaluation)
-    assert "expected_failure_results: list[dict[str, Any]] = []" in src
 
 
 def test_run_evaluation_source_appends_to_per_doc_results():
@@ -365,11 +335,6 @@ def test_run_evaluation_source_uses_kwargs_only():
 def test_run_evaluation_source_no_eval():
     src = inspect.getsource(run_evaluation)
     assert "eval(" not in src
-
-
-def test_run_evaluation_source_no_yield():
-    src = inspect.getsource(run_evaluation)
-    assert "yield" not in src
 
 
 # ---------- module source forbidden tokens 第十一批 ----------

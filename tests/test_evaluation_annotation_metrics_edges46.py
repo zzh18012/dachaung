@@ -366,11 +366,6 @@ def test_module_source_forbidden_tokens_batch19(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_batch19():
-    src = inspect.getsource(amod)
-    assert "import subprocess" not in src
-
-
 # ---------- module source 字符串精确补强第三十一批 ----------
 
 
@@ -477,11 +472,6 @@ def test_module_does_not_import_unsafe_modules_batch19():
     src = inspect.getsource(amod)
     for unsafe in ["import pickle", "import marshal", "import shelve"]:
         assert unsafe not in src
-
-
-def test_module_does_not_import_evaluation_runner_batch19():
-    src = inspect.getsource(amod)
-    assert "from evaluation.runner" not in src
 
 
 def test_module_does_not_import_evaluation_cli_batch19():

@@ -379,15 +379,6 @@ def test_document_entry_field_count_batch18():
     assert len(fields(DocumentEntry)) == 10
 
 
-def test_document_entry_field_names_batch18():
-    names = [f.name for f in fields(DocumentEntry)]
-    assert names == [
-        "doc_id", "path_str", "resolved_path", "source_type", "sha256",
-        "categories", "paired_with", "annotation_file_str",
-        "annotation_resolved", "expectations",
-    ]
-
-
 def test_document_entry_categories_is_tuple_batch18():
     d = _mk_doc(categories=("a", "b"))
     assert isinstance(d.categories, tuple)

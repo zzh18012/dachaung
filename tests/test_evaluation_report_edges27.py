@@ -628,21 +628,6 @@ def test_report_source_no_forbidden_token_thirteenth_batch10(token):
     assert token not in source
 
 
-def test_report_source_no_remove_batch10():
-    source = inspect.getsource(rmod)
-    assert ".remove(" not in source
-
-
-def test_report_source_no_kill_batch10():
-    source = inspect.getsource(rmod)
-    assert ".kill(" not in source
-
-
-def test_report_source_no_terminate_batch10():
-    source = inspect.getsource(rmod)
-    assert ".terminate(" not in source
-
-
 def test_report_source_no_async_def_batch10():
     source = inspect.getsource(rmod)
     assert "async def" not in source
@@ -816,11 +801,6 @@ def test_signature_build_devset_section_1_param_batch10():
     assert len(sig.parameters) == 1
 
 
-def test_signature_aggregate_summary_1_param_batch10():
-    sig = inspect.signature(aggregate_summary)
-    assert len(sig.parameters) == 1
-
-
 def test_signature_aggregate_summary_param_name_batch10():
     sig = inspect.signature(aggregate_summary)
     assert list(sig.parameters) == ["per_doc_results"]
@@ -845,14 +825,6 @@ def test_module_all_entries_str_batch10():
 def test_module_has_dunder_file_batch10():
     assert hasattr(rmod, "__file__")
     assert rmod.__file__ is not None
-
-
-def test_module_dunder_file_endswith_report_py_batch10():
-    import os
-    sep = os.sep
-    assert rmod.__file__.endswith("evaluation" + sep + "report.py") or rmod.__file__.endswith(
-        "evaluation/report.py"
-    )
 
 
 def test_module_name_is_evaluation_report_batch10():

@@ -508,11 +508,6 @@ def test_module_source_no_sys_exit_batch18():
     assert "sys.exit" not in src
 
 
-def test_module_source_no_path_unlink_batch18():
-    src = inspect.getsource(smod)
-    assert ".unlink(" not in src
-
-
 def test_module_source_no_path_rmdir_batch18():
     src = inspect.getsource(smod)
     assert ".rmdir(" not in src
@@ -556,11 +551,6 @@ def test_module_source_has_validate_docstring_batch18():
 def test_module_source_has_validate_file_docstring_batch18():
     src = inspect.getsource(smod)
     assert "加载磁盘 JSON 并按命名 Schema 校验" in src
-
-
-def test_module_source_has_schemas_dir_assignment_batch18():
-    src = inspect.getsource(smod)
-    assert 'SCHEMAS_DIR = Path(__file__).resolve().parent.parent / "schemas"' in src
 
 
 def test_module_source_has_draft_2020_12_validator_usage_batch18():

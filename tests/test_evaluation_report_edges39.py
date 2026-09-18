@@ -101,10 +101,6 @@ def test_ratio_metrics_excludes_silent_drop_count_batch23():
     assert "silent_drop_count" not in _RATIO_METRICS
 
 
-def test_ratio_metrics_excludes_error_code_batch23():
-    assert "error_code" not in _RATIO_METRICS
-
-
 # ---------- _COUNT_METRICS / _SUCCESS_BOOL_METRICS 第二十三批 ----------
 
 
@@ -277,11 +273,6 @@ def test_build_provenance_evaluator_version_constant_batch23(tmp_path):
 def test_build_provenance_report_version_constant_batch23(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["report_version"] == REPORT_VERSION
-
-
-def test_build_provenance_parser_name_passed_through_batch23(tmp_path):
-    out = build_provenance(tmp_path, "kreuzberg", 800, None)
-    assert out["parser_name"] == "kreuzberg"
 
 
 def test_build_provenance_parser_version_passed_through_batch23(tmp_path):
@@ -716,13 +707,6 @@ def test_signature_build_provenance_parser_version_optional_batch23():
     p = sig.parameters["parser_version"]
     assert p.default is inspect.Parameter.empty
     assert p.annotation == "str | None"
-
-
-def test_signature_build_devset_section_batch23():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "manifest"
 
 
 # ---------- module 合理性第三十五批 ----------

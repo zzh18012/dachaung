@@ -692,11 +692,6 @@ def test_module_source_no_datetime_import_batch21():
     assert "import datetime" not in src
 
 
-def test_module_source_no_collections_import_batch21():
-    src = inspect.getsource(mmod)
-    assert "import collections" not in src
-
-
 def test_module_source_no_pandas_import_batch21():
     src = inspect.getsource(mmod)
     assert "import pandas" not in src
@@ -861,12 +856,6 @@ def test_module_does_not_import_evaluation_runner_batch21():
     src = inspect.getsource(mmod)
     assert "from evaluation.runner" not in src
     assert "from evaluation import runner" not in src
-
-
-def test_module_does_not_import_evaluation_metrics_batch21():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.metrics" not in src
-    assert "from evaluation import metrics" not in src
 
 
 def test_module_does_not_import_evaluation_cli_batch21():

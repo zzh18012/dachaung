@@ -588,11 +588,6 @@ def test_source_validate_file_fstring_batch52():
     assert 'f"待校验文件不存在: {p}"' in src
 
 
-def test_source_docstring_separate_from_app_batch52():
-    src = inspect.getsource(schema_mod)
-    assert "不与 app/schema.py 复用" in src
-
-
 # ---------- AST 结构补强 ----------
 
 def test_ast_flat_dict_3_literal_keys_batch52():

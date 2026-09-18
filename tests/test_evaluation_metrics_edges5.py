@@ -86,10 +86,6 @@ def test_null_value_is_none():
     assert _null("x")["value"] is None
 
 
-def test_null_reason_is_argument():
-    assert _null("my_reason")["reason"] == "my_reason"
-
-
 def test_null_signature_one_param():
     sig = inspect.signature(_null)
     params = list(sig.parameters.keys())
@@ -101,11 +97,6 @@ def test_null_return_annotation_dict():
     sig = inspect.signature(_null)
     ret = sig.return_annotation
     assert "dict" in str(ret).lower()
-
-
-def test_ratio_returns_dict_with_two_keys():
-    result = _ratio(0.5)
-    assert set(result.keys()) == {"value", "reason"}
 
 
 def test_ratio_value_is_float():
@@ -140,21 +131,12 @@ def test_ratio_signature_one_param():
     assert "value" in params
 
 
-def test_bool_metric_returns_dict_with_two_keys():
-    result = _bool_metric(True)
-    assert set(result.keys()) == {"value", "reason"}
-
-
 def test_bool_metric_value_is_bool():
     assert isinstance(_bool_metric(True)["value"], bool)
 
 
 def test_bool_metric_true():
     assert _bool_metric(True)["value"] is True
-
-
-def test_bool_metric_false():
-    assert _bool_metric(False)["value"] is False
 
 
 def test_bool_metric_int_input_converted():
@@ -245,11 +227,6 @@ def test_strip_unicode_whitespace_nbsp():
     assert _strip_unicode_whitespace("a\xa0b") == "ab"
 
 
-def test_strip_unicode_whitespace_em_space():
-    """U+2003 EM SPACE。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
 def test_strip_unicode_whitespace_ideographic_space():
     """U+3000 IDEOGRAPHIC SPACE（中文全角空格）。"""
     assert _strip_unicode_whitespace("a　b") == "ab"
@@ -309,10 +286,6 @@ def test_is_valid_bbox_four_floats():
     assert _is_valid_bbox([0.0, 0.5, 100.5, 200.0]) is True
 
 
-def test_is_valid_bbox_negative_values():
-    assert _is_valid_bbox([-10, -10, 100, 100]) is True
-
-
 def test_is_valid_bbox_empty_list():
     assert _is_valid_bbox([]) is False
 
@@ -346,22 +319,6 @@ def test_is_valid_bbox_all_bools():
     assert _is_valid_bbox([True, False, True, False]) is False
 
 
-def test_is_valid_bbox_string_element():
-    assert _is_valid_bbox([0, 0, "100", 100]) is False
-
-
-def test_is_valid_bbox_none_element():
-    assert _is_valid_bbox([0, 0, None, 100]) is False
-
-
-def test_is_valid_bbox_nan():
-    assert _is_valid_bbox([0, 0, float("nan"), 100]) is False
-
-
-def test_is_valid_bbox_inf():
-    assert _is_valid_bbox([0, 0, float("inf"), 100]) is False
-
-
 def test_is_valid_bbox_neg_inf():
     assert _is_valid_bbox([0, 0, float("-inf"), 100]) is False
 
@@ -378,12 +335,6 @@ def test_is_valid_bbox_huge_values():
 # =========================================================================
 # _pdf_locator_ratio 深度
 # =========================================================================
-
-
-def test_pdf_locator_ratio_empty_returns_null():
-    result = _pdf_locator_ratio([])
-    assert result["value"] is None
-    assert result["reason"] == "no_elements"
 
 
 def test_pdf_locator_ratio_all_valid_page_only():
@@ -458,12 +409,6 @@ def test_pdf_locator_ratio_returns_dict_with_value_reason():
 # =========================================================================
 # _docx_locator_ratio 深度
 # =========================================================================
-
-
-def test_docx_locator_ratio_empty_returns_null():
-    result = _docx_locator_ratio([])
-    assert result["value"] is None
-    assert result["reason"] == "no_elements"
 
 
 def test_docx_locator_ratio_rejects_page():

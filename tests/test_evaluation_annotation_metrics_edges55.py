@@ -317,11 +317,6 @@ def test_module_source_contains_figure_caption_docstring_batch28():
     assert "图表关联" in src
 
 
-def test_module_source_contains_chunk_boundary_docstring_batch28():
-    src = inspect.getsource(amod)
-    assert "分块边界" in src
-
-
 def test_module_source_contains_normalize_text_call_batch28():
     src = inspect.getsource(amod)
     assert "normalize_text" in src

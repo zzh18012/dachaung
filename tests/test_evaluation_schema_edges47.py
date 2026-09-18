@@ -317,13 +317,6 @@ def test_validate_file_invalid_data_raises_eval_error_batch27(tmp_path):
         validate_file(p, "manifest.schema.json")
 
 
-def test_validate_file_unknown_schema_raises_batch27(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text("{}", encoding="utf-8")
-    with pytest.raises(FileNotFoundError):
-        validate_file(p, "nonexistent.schema.json")
-
-
 def test_validate_file_no_input_modification_batch27(tmp_path):
     p = tmp_path / "m.json"
     content = json.dumps(

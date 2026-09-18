@@ -157,11 +157,6 @@ def test_format_metric_with_negative_int_batch40():
     assert "-1" in out
 
 
-def test_format_metric_with_float_value_batch40():
-    out = _format_metric("x", {"value": 0.5, "reason": None})
-    assert "0.5000" in out
-
-
 def test_format_metric_with_float_zero_batch40():
     out = _format_metric("x", {"value": 0.0, "reason": None})
     assert "0.0000" in out
@@ -333,13 +328,6 @@ def test_main_unknown_command_raises_systemexit_batch40():
 def test_main_unknown_flag_raises_systemexit_batch40():
     with pytest.raises(SystemExit):
         main(["--unknown-flag"])
-
-
-def test_main_inspect_doc_invalid_json_returns_1_batch40(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{invalid", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 1
 
 
 def test_main_validate_report_valid_json_batch40(tmp_path, capsys):
@@ -568,11 +556,6 @@ def test_module_source_contains_subparsers_batch40():
     assert "add_subparsers" in src
 
 
-def test_module_source_contains_required_true_batch40():
-    src = inspect.getsource(cmod)
-    assert "required=True" in src
-
-
 def test_module_source_contains_reconfigure_batch40():
     """Windows utf-8 fix。"""
     src = inspect.getsource(cmod)
@@ -585,10 +568,6 @@ def test_module_source_contains_main_guard_batch40():
 
 
 # ---------- module 合理性 第七十批
-
-
-def test_module_has_main_attribute_batch40():
-    assert hasattr(cmod, "main")
 
 
 def test_module_has_build_parser_attribute_batch40():

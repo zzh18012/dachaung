@@ -568,20 +568,9 @@ def test_module_source_forbidden_tokens_batch21(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch21():
     src = inspect.getsource(climod)
     assert "import socket" not in src
-
-
-def test_module_source_no_requests_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import requests" not in src
 
 
 def test_module_source_no_urllib_import_batch21():
@@ -592,11 +581,6 @@ def test_module_source_no_urllib_import_batch21():
 def test_module_source_no_threading_import_batch21():
     src = inspect.getsource(climod)
     assert "import threading" not in src
-
-
-def test_module_source_no_multiprocessing_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import multiprocessing" not in src
 
 
 def test_module_source_no_asyncio_import_batch21():
@@ -612,36 +596,6 @@ def test_module_source_no_shutil_import_batch21():
 def test_module_source_no_tempfile_import_batch21():
     src = inspect.getsource(climod)
     assert "import tempfile" not in src
-
-
-def test_module_source_no_logging_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import logging" not in src
-
-
-def test_module_source_no_re_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import re" not in src
-
-
-def test_module_source_no_datetime_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import datetime" not in src
-
-
-def test_module_source_no_collections_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import collections" not in src
-
-
-def test_module_source_no_pandas_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import pandas" not in src
-
-
-def test_module_source_no_numpy_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import numpy" not in src
 
 
 # ---------- module source 字符串精确补强第三十三批 ----------

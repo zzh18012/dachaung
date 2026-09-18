@@ -163,12 +163,6 @@ def test_process_one_source_has_unknown_code_for_none_document():
     assert '"process_single returned None without errors"' in src
 
 
-def test_process_one_source_has_errors_path_return():
-    src = inspect.getsource(_process_one)
-    # errors[0].to_dict()
-    assert "errors[0].to_dict()" in src
-
-
 # ---------- run_evaluation source level 字符串精确补强 ----------
 
 
@@ -261,11 +255,6 @@ def test_run_evaluation_source_has_json_dump_kwargs():
     assert 'json.dump(report, f, ensure_ascii=False, indent=2)' in src
 
 
-def test_run_evaluation_source_has_out_p_open_w_utf8():
-    src = inspect.getsource(run_evaluation)
-    assert 'out_p.open("w", encoding="utf-8")' in src
-
-
 # ---------- module source forbidden tokens 第四批 ----------
 
 
@@ -335,19 +324,9 @@ def test_process_one_signature_4_params():
     assert len(sig.parameters) == 4
 
 
-def test_process_one_signature_param_names():
-    sig = inspect.signature(_process_one)
-    assert list(sig.parameters) == ["doc", "output_root", "parser_name", "max_chars"]
-
-
 def test_run_evaluation_signature_5_params():
     sig = inspect.signature(run_evaluation)
     assert len(sig.parameters) == 5
-
-
-def test_run_evaluation_signature_param_names():
-    sig = inspect.signature(run_evaluation)
-    assert list(sig.parameters) == ["manifest", "output_path", "parser_name", "max_chars", "tolerance_chars"]
 
 
 def test_run_evaluation_keyword_only_marker():

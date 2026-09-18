@@ -246,11 +246,6 @@ def test_resolve_relative_path_double_dot_escape_batch11(tmp_path):
         _resolve_relative_path("../foo.pdf", tmp_path, "test")
 
 
-def test_resolve_relative_path_absolute_posix_batch11(tmp_path):
-    with pytest.raises(ManifestError, match="绝对路径"):
-        _resolve_relative_path("/etc/passwd", tmp_path, "test")
-
-
 def test_resolve_relative_path_absolute_windows_batch11(tmp_path):
     with pytest.raises(ManifestError, match="绝对路径"):
         _resolve_relative_path("C:/foo", tmp_path, "test")
@@ -316,22 +311,6 @@ def test_document_entry_field_count_batch11():
     assert len(fields(DocumentEntry)) == 10
 
 
-def test_document_entry_field_names_batch11():
-    names = [f.name for f in fields(DocumentEntry)]
-    assert names == [
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "source_type",
-        "sha256",
-        "categories",
-        "paired_with",
-        "annotation_file_str",
-        "annotation_resolved",
-        "expectations",
-    ]
-
-
 def test_document_entry_is_dataclass_batch11():
     assert is_dataclass(DocumentEntry)
 
@@ -362,17 +341,6 @@ def test_document_entry_repr_batch11():
 
 def test_expected_failure_field_count_batch11():
     assert len(fields(ExpectedFailure)) == 5
-
-
-def test_expected_failure_field_names_batch11():
-    names = [f.name for f in fields(ExpectedFailure)]
-    assert names == [
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "expected_error_code",
-        "source_type",
-    ]
 
 
 def test_expected_failure_is_dataclass_batch11():
@@ -715,11 +683,6 @@ def test_manifest_source_no_forbidden_token_fourteenth_batch11(token):
     assert token not in source
 
 
-def test_manifest_source_no_unlink_batch11():
-    source = inspect.getsource(mmod)
-    assert "unlink" not in source
-
-
 def test_manifest_source_no_remove_batch11():
     source = inspect.getsource(mmod)
     assert ".remove(" not in source
@@ -821,11 +784,6 @@ def test_module_source_imports_path_batch11():
 def test_module_source_imports_typing_any_batch11():
     source = inspect.getsource(mmod)
     assert "from typing import Any" in source
-
-
-def test_module_source_imports_manifest_version_batch11():
-    source = inspect.getsource(mmod)
-    assert "MANIFEST_VERSION" in source
 
 
 def test_module_source_imports_validate_batch11():
@@ -940,16 +898,6 @@ def test_signature_manifest_error_subclass_of_exception_batch11():
 # ---------- module 合理性第十一批 ----------
 
 
-def test_module_all_value_batch11():
-    assert mmod.__all__ == [
-        "ManifestError",
-        "Manifest",
-        "DocumentEntry",
-        "ExpectedFailure",
-        "load_manifest",
-    ]
-
-
 def test_module_all_is_list_batch11():
     assert isinstance(mmod.__all__, list)
 
@@ -970,20 +918,6 @@ def test_module_has_dunder_file_batch11():
 
 def test_module_name_is_evaluation_manifest_batch11():
     assert mmod.__name__ == "evaluation.manifest"
-
-
-def test_module_user_function_count_batch11():
-    funcs = [
-        n for n, v in vars(mmod).items()
-        if inspect.isfunction(v) and v.__module__ == mmod.__name__
-    ]
-    assert set(funcs) == {
-        "_is_absolute_like",
-        "_has_backslash",
-        "_resolve_relative_path",
-        "load_manifest",
-        "_detect_project_root",
-    }
 
 
 def test_module_docstring_present_batch11():

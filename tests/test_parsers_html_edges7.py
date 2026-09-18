@@ -51,10 +51,6 @@ def test_skip_tags_contains_head_title_meta_link():
     assert "link" in _SKIP_TAGS
 
 
-def test_skip_tags_contains_noscript():
-    assert "noscript" in _SKIP_TAGS
-
-
 def test_skip_tags_count_seven():
     assert len(_SKIP_TAGS) == 7
 

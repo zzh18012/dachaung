@@ -190,11 +190,6 @@ def test_chunk_boundary_prf_document_none_pipeline_failed_batch29():
     assert out["chunk_boundary_recall"]["reason"] == "pipeline_failed"
 
 
-def test_chunk_boundary_prf_annotation_empty_no_annotation_batch29():
-    out = chunk_boundary_prf({"chunks": []}, {})
-    assert out["chunk_boundary_precision"]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_one_chunk_no_predicted_batch29():
     """单 chunk → 无预测边界。"""
     doc = {"chunks": [{"text": "aaa"}]}
@@ -355,11 +350,6 @@ def test_module_source_contains_module_docstring_batch29():
 def test_module_source_contains_parser_does_not_emit_relations_batch29():
     src = inspect.getsource(amod)
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in src
-
-
-def test_module_source_contains_chunk_boundary_docstring_batch29():
-    src = inspect.getsource(amod)
-    assert "分块边界" in src
 
 
 def test_module_source_contains_pipeline_failed_batch29():

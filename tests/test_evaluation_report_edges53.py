@@ -238,11 +238,6 @@ def test_dependency_versions_with_generic_exception_batch34():
 # ---------- build_provenance 第三十四批
 
 
-def test_build_provenance_returns_dict_batch34(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert isinstance(out, dict)
-
-
 def test_build_provenance_nine_keys_batch34(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     expected = {
@@ -623,21 +618,6 @@ def test_module_source_contains_rev_parse_head_batch34():
     assert '"HEAD"' in src
 
 
-def test_module_source_contains_python_docx_pkg_batch34():
-    src = inspect.getsource(rmod)
-    assert '"python-docx"' in src
-
-
-def test_module_source_contains_pypdfium2_pkg_batch34():
-    src = inspect.getsource(rmod)
-    assert '"pypdfium2"' in src
-
-
-def test_module_source_contains_pdfplumber_pkg_batch34():
-    src = inspect.getsource(rmod)
-    assert '"pdfplumber"' in src
-
-
 def test_module_source_contains_macro_average_key_batch34():
     src = inspect.getsource(rmod)
     assert '"macro_average"' in src
@@ -723,24 +703,12 @@ def test_signature_aggregate_summary_one_param_batch34():
 # ---------- module 合理性第五十五批
 
 
-def test_module_has_build_provenance_batch34():
-    assert callable(rmod.build_provenance)
-
-
-def test_module_has_build_devset_section_batch34():
-    assert callable(rmod.build_devset_section)
-
-
 def test_module_has_aggregate_summary_batch34():
     assert callable(rmod.aggregate_summary)
 
 
 def test_module_has_get_git_provenance_batch34():
     assert callable(rmod.get_git_provenance)
-
-
-def test_module_has_get_dependency_versions_batch34():
-    assert callable(rmod.get_dependency_versions)
 
 
 def test_module_has_ratio_metrics_batch34():

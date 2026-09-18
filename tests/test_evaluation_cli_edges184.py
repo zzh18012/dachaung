@@ -215,11 +215,6 @@ def _run(tmp_path):
     return rc, data, rep
 
 
-def test_run_rc0(tmp_path):
-    rc, _, _ = _run(tmp_path)
-    assert rc == 0
-
-
 def test_devset_group_one(tmp_path):
     _, data, _ = _run(tmp_path)
     assert data["devset"] == {

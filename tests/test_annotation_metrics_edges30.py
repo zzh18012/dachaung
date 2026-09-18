@@ -752,12 +752,6 @@ def test_chunk_boundary_source_uses_missing_markers_list():
     assert "missing_markers: list[str] = []" in src
 
 
-def test_chunk_boundary_source_uses_used_pred_used_gt_set_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "used_pred = set()" in src
-    assert "used_gt = set()" in src
-
-
 def test_chunk_boundary_source_uses_nested_for_pred_gt():
     src = inspect.getsource(chunk_boundary_prf)
     assert "for pi, pv in enumerate(predicted)" in src
@@ -1235,10 +1229,6 @@ def test_module_namespace_has_parser_constant():
 
 def test_module_namespace_parser_constant_value():
     assert amod.PARSER_DOES_NOT_EMIT_RELATIONS == "parser_does_not_emit_relations"
-
-
-def test_module_namespace_parser_constant_type():
-    assert isinstance(amod.PARSER_DOES_NOT_EMIT_RELATIONS, str)
 
 
 def test_module_namespace_has_figure_caption():

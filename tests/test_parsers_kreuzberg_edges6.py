@@ -316,30 +316,16 @@ def test_kreuzberg_parser_version_not_none():
     assert isinstance(KreuzbergParser.version, str)
 
 
-def test_kreuzberg_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(KreuzbergParser, Parser)
-
-
 def test_kreuzberg_parser_init_default():
     """__init__ 默认 include_document_structure=True。"""
     p = KreuzbergParser()
     assert p._include_document_structure is True
 
 
-def test_kreuzberg_parser_init_disabled():
-    p = KreuzbergParser(include_document_structure=False)
-    assert p._include_document_structure is False
-
-
 def test_kreuzberg_parser_init_keyword_only():
     """include_document_structure 是 keyword-only（* 之后）。"""
     sig = inspect.signature(KreuzbergParser.__init__)
     assert sig.parameters["include_document_structure"].kind == inspect.Parameter.KEYWORD_ONLY
-
-
-def test_kreuzberg_parser_has_parse_method():
-    assert callable(KreuzbergParser.parse)
 
 
 def test_kreuzberg_parser_parse_signature():

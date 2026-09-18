@@ -425,10 +425,6 @@ def test_is_valid_bbox_tuple_input_batch12():
     assert _is_valid_bbox((0, 0, 10, 10)) is False
 
 
-def test_is_valid_bbox_string_input_batch12():
-    assert _is_valid_bbox("0,0,10,10") is False
-
-
 def test_is_valid_bbox_none_input_batch12():
     assert _is_valid_bbox(None) is False
 
@@ -556,12 +552,6 @@ def test_strip_unicode_whitespace_returns_str_batch12():
 
 
 # ---------- image_resource_ratio 第十二批 ----------
-
-
-def test_image_resource_ratio_no_image_elements_batch12():
-    out = _image_resource_ratio([], None)
-    assert out["value"] is None
-    assert out["reason"] == "no_image_elements"
 
 
 def test_image_resource_ratio_image_no_resource_path_batch12():
@@ -730,11 +720,6 @@ def test_metrics_source_no_async_def_batch12():
     assert "async def" not in source
 
 
-def test_metrics_source_no_input_call_batch12():
-    source = inspect.getsource(mmod)
-    assert "input(" not in source
-
-
 def test_metrics_source_no_remove_batch12():
     source = inspect.getsource(mmod)
     assert ".remove(" not in source
@@ -799,11 +784,6 @@ def test_module_source_has_int_metric_helper_batch12():
     assert "def _int_metric(" in source
 
 
-def test_module_source_has_text_preservation_function_batch12():
-    source = inspect.getsource(mmod)
-    assert "def _text_preservation(" in source
-
-
 def test_module_source_has_strip_unicode_whitespace_function_batch12():
     source = inspect.getsource(mmod)
     assert "def _strip_unicode_whitespace(" in source
@@ -844,17 +824,6 @@ def test_signature_null_return_dict_batch12():
     annot = sig.return_annotation
     annot_str = annot if isinstance(annot, str) else str(annot)
     assert "dict" in annot_str
-
-
-def test_signature_compute_metrics_5_params_batch12():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert list(sig.parameters) == [
-        "document",
-        "error",
-        "source_type",
-        "expectations",
-        "image_base_dir",
-    ]
 
 
 def test_signature_compute_metrics_image_base_dir_default_none_batch12():

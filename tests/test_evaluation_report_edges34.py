@@ -429,11 +429,6 @@ def test_aggregate_summary_ratio_macro_only_one_participant_batch17():
     assert s["ratio_macro_averages"]["schema_valid"]["not_evaluated"] == 2
 
 
-def test_aggregate_summary_ratio_keys_match_ratio_metrics_batch17():
-    s = aggregate_summary([])
-    assert set(s["ratio_macro_averages"].keys()) == set(_RATIO_METRICS)
-
-
 # ---------- module source forbidden tokens 第三十三批 ----------
 
 

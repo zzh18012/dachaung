@@ -42,14 +42,6 @@ def test_text_types_is_tuple_batch32():
     assert isinstance(_TEXT_TYPES, tuple)
 
 
-def test_text_types_contains_header_batch32():
-    assert "header" in _TEXT_TYPES
-
-
-def test_text_types_contains_footer_batch32():
-    assert "footer" in _TEXT_TYPES
-
-
 def test_text_types_contains_caption_batch32():
     assert "caption" in _TEXT_TYPES
 
@@ -92,10 +84,6 @@ def test_pdf_bbox_required_types_contains_caption_batch32():
     assert "caption" in _PDF_BBOX_REQUIRED_TYPES
 
 
-def test_pdf_bbox_required_types_contains_list_item_batch32():
-    assert "list_item" in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_pdf_bbox_required_types_paragraph_index_batch32():
     """paragraph 索引位置。"""
     assert _PDF_BBOX_REQUIRED_TYPES.index("paragraph") == 1
@@ -110,10 +98,6 @@ def test_pdf_bbox_required_types_subset_of_text_types_batch32():
     """_PDF_BBOX_REQUIRED_TYPES 是 _TEXT_TYPES 的子集。"""
     for t in _PDF_BBOX_REQUIRED_TYPES:
         assert t in _TEXT_TYPES
-
-
-def test_pdf_bbox_required_types_does_not_contain_table_batch32():
-    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
 
 
 def test_pdf_bbox_required_types_does_not_contain_header_batch32():
@@ -147,10 +131,6 @@ def test_null_reason_arbitrary_string_batch32():
     out = _null("custom_reason_42")
     assert out["value"] is None
     assert out["reason"] == "custom_reason_42"
-
-
-def test_null_returns_dict_batch32():
-    assert isinstance(_null("x"), dict)
 
 
 def test_null_keys_count_batch32():
@@ -409,24 +389,6 @@ def test_is_valid_bbox_all_negative_batch32():
 
 
 # ---------- _image_resource_ratio 第三十二批 ----------
-
-
-def test_image_resource_ratio_rp_none_batch32(tmp_path):
-    elements = [{"type": "image", "resource_path": None}]
-    out = _image_resource_ratio(elements, tmp_path)
-    assert out["value"] == 0.0
-
-
-def test_image_resource_ratio_rp_empty_string_batch32(tmp_path):
-    elements = [{"type": "image", "resource_path": ""}]
-    out = _image_resource_ratio(elements, tmp_path)
-    assert out["value"] == 0.0
-
-
-def test_image_resource_ratio_no_resource_path_key_batch32(tmp_path):
-    elements = [{"type": "image"}]
-    out = _image_resource_ratio(elements, tmp_path)
-    assert out["value"] == 0.0
 
 
 def test_image_resource_ratio_partial_existence_batch32(tmp_path):
@@ -837,21 +799,6 @@ def test_module_source_contains_counter_import_batch32():
 # ---------- signatures 第四十五批 ----------
 
 
-def test_signature_bool_metric_value_annotation_batch32():
-    sig = inspect.signature(_bool_metric)
-    assert sig.parameters["value"].annotation == "bool"
-
-
-def test_signature_int_metric_value_annotation_batch32():
-    sig = inspect.signature(_int_metric)
-    assert sig.parameters["value"].annotation == "int"
-
-
-def test_signature_compute_automatic_metrics_return_batch32():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert "dict[str, Any]" in str(sig.return_annotation)
-
-
 def test_signature_compute_automatic_metrics_image_base_dir_optional_batch32():
     sig = inspect.signature(compute_automatic_metrics)
     ps = str(sig.parameters["image_base_dir"].annotation)
@@ -899,11 +846,6 @@ def test_module_imports_typing_any_batch32():
 def test_module_has_all_export_batch32():
     src = inspect.getsource(mmod)
     assert "__all__" in src
-
-
-def test_module_all_has_compute_automatic_metrics_batch32():
-    src = inspect.getsource(mmod)
-    assert '"compute_automatic_metrics"' in src
 
 
 def test_module_no_main_block_batch32():

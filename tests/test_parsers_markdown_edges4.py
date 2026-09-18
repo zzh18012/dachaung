@@ -212,10 +212,6 @@ def test_md_extensions_value():
     assert _MD_EXTENSIONS == (".md", ".markdown")
 
 
-def test_md_extensions_count_two():
-    assert len(_MD_EXTENSIONS) == 2
-
-
 # =========================================================================
 # _split_pipe_row 深度
 # =========================================================================

@@ -231,11 +231,6 @@ def test_dependency_versions_with_generic_exception_batch33():
 # ---------- build_provenance 第三十三批
 
 
-def test_build_provenance_returns_dict_batch33(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert isinstance(out, dict)
-
-
 def test_build_provenance_keys_count_9_batch33(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     expected_keys = {
@@ -326,11 +321,6 @@ def test_build_devset_section_returns_dict_batch33():
     assert isinstance(out, dict)
 
 
-def test_build_devset_section_status_value_batch33():
-    out = build_devset_section(_make_manifest_mock(devset_status="complete"))
-    assert out["status"] == "complete"
-
-
 def test_build_devset_section_file_count_value_batch33():
     out = build_devset_section(_make_manifest_mock(file_count=42))
     assert out["file_count"] == 42
@@ -380,11 +370,6 @@ def test_aggregate_summary_counts_no_other_metrics_batch33():
     """counts 只有 element_count_total。"""
     out = aggregate_summary([])
     assert set(out["counts"].keys()) == {"element_count_total"}
-
-
-def test_aggregate_summary_success_rates_no_other_metrics_batch33():
-    out = aggregate_summary([])
-    assert set(out["success_rates"].keys()) == {"pipeline_success"}
 
 
 def test_aggregate_summary_counts_sum_with_int_value_batch33():
@@ -570,21 +555,6 @@ def test_module_source_contains_status_porcelain_command_batch33():
     assert '"--porcelain"' in src
 
 
-def test_module_source_contains_pdfplumber_dep_name_batch33():
-    src = inspect.getsource(rmod)
-    assert '"pdfplumber"' in src
-
-
-def test_module_source_contains_python_docx_dep_name_batch33():
-    src = inspect.getsource(rmod)
-    assert '"python-docx"' in src
-
-
-def test_module_source_contains_pypdfium2_dep_name_batch33():
-    src = inspect.getsource(rmod)
-    assert '"pypdfium2"' in src
-
-
 def test_module_source_contains_all_batch33():
     src = inspect.getsource(rmod)
     assert "__all__" in src
@@ -654,24 +624,12 @@ def test_module_imports_evaluator_version_batch33():
     assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in src
 
 
-def test_module_has_build_provenance_func_batch33():
-    assert callable(rmod.build_provenance)
-
-
 def test_module_has_aggregate_summary_func_batch33():
     assert callable(rmod.aggregate_summary)
 
 
 def test_module_has_get_git_provenance_func_batch33():
     assert callable(rmod.get_git_provenance)
-
-
-def test_module_has_get_dependency_versions_func_batch33():
-    assert callable(rmod.get_dependency_versions)
-
-
-def test_module_has_build_devset_section_func_batch33():
-    assert callable(rmod.build_devset_section)
 
 
 def test_module_all_count_5_batch33():

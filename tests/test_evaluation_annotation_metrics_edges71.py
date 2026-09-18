@@ -58,15 +58,6 @@ def test_parser_does_not_emit_relations_in_all_batch45():
 
 # ---------- figure_caption_prf 各种 ----------
 
-def test_figure_caption_prf_returns_three_metrics_batch45():
-    out = figure_caption_prf({"x": 1}, {"y": 2})
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_prf_all_null_batch45():
     out = figure_caption_prf({"x": 1}, {"y": 2})
     for v in out.values():
@@ -132,12 +123,6 @@ def test_chunk_boundary_prf_document_none_default_tolerance_batch45():
 
 
 # ---------- chunk_boundary_prf annotation 缺失 ----------
-
-def test_chunk_boundary_prf_annotation_empty_dict_batch45():
-    out = chunk_boundary_prf({"chunks": []}, {})
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["reason"] == "no_annotation"
-
 
 def test_chunk_boundary_prf_annotation_empty_is_falsy_batch45():
     """空 dict 视为 falsy。"""
@@ -411,21 +396,6 @@ def test_module_docstring_contains_conventions_batch45():
     assert "figure_caption_*" in src
     assert "chunk_boundary_*" in src
     assert "一对一" in src
-
-
-def test_module_source_contains_any_import_batch45():
-    src = inspect.getsource(am_mod)
-    assert "from typing import Any" in src
-
-
-def test_module_source_contains_normalize_text_import_batch45():
-    src = inspect.getsource(am_mod)
-    assert "from app.chunkers.structural import normalize_text" in src
-
-
-def test_module_source_contains_metrics_import_batch45():
-    src = inspect.getsource(am_mod)
-    assert "from evaluation.metrics import _null, _ratio" in src
 
 
 def test_module_source_contains_figure_caption_function_batch45():

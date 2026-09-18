@@ -132,14 +132,6 @@ def test_text_types_does_not_contain_table_batch39_or_does_it():
     assert "table" in _TEXT_TYPES
 
 
-def test_text_types_no_duplicates_batch39():
-    assert len(set(_TEXT_TYPES)) == len(_TEXT_TYPES)
-
-
-def test_pdf_bbox_required_types_no_duplicates_batch39():
-    assert len(set(_PDF_BBOX_REQUIRED_TYPES)) == len(_PDF_BBOX_REQUIRED_TYPES)
-
-
 def test_pdf_bbox_required_types_contains_heading_paragraph_batch39():
     assert "heading" in _PDF_BBOX_REQUIRED_TYPES
     assert "paragraph" in _PDF_BBOX_REQUIRED_TYPES
@@ -191,10 +183,6 @@ def test_strip_whitespace_only_whitespace_batch39():
 
 def test_strip_whitespace_no_whitespace_batch39():
     assert _strip_unicode_whitespace("abc") == "abc"
-
-
-def test_strip_whitespace_single_char_batch39():
-    assert _strip_unicode_whitespace("a") == "a"
 
 
 def test_strip_whitespace_consecutive_whitespace_batch39():
@@ -464,15 +452,6 @@ def test_text_preservation_element_missing_content_batch39():
     assert out["recall"]["reason"] == "empty_expected"
 
 
-def test_text_preservation_single_chunk_full_match_batch39():
-    elements = [{"type": "paragraph", "content": "hello world"}]
-    chunks = [{"text": "hello world"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
-
-
 def test_text_preservation_text_with_extra_chars_in_actual_batch39():
     """actual 比 expected 多字符 → equal=False。"""
     elements = [{"type": "paragraph", "content": "abc"}]
@@ -633,27 +612,6 @@ def test_compute_metrics_total_key_count_batch39():
     """doc=None 时返回 14 个键（pipeline_success / error_code / schema_valid + 11 个 null 指标）。"""
     out = compute_automatic_metrics(None, None, "pdf", None)
     assert len(out) == 14
-
-
-def test_compute_metrics_doc_none_keys_exact_batch39():
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    expected_keys = {
-        "pipeline_success",
-        "error_code",
-        "schema_valid",
-        "element_count_total",
-        "element_count_by_type",
-        "pdf_locator_valid_ratio",
-        "docx_locator_valid_ratio",
-        "image_resource_exists_ratio",
-        "chunk_reference_intact_ratio",
-        "text_preservation_equal",
-        "text_char_multiset_precision",
-        "text_char_multiset_recall",
-        "heading_boundary_compliance",
-        "silent_drop_count",
-    }
-    assert set(out.keys()) == expected_keys
 
 
 def test_compute_metrics_error_dict_no_message_key_batch39():

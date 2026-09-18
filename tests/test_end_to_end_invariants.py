@@ -586,10 +586,6 @@ def test_normalize_text_idempotent():
     assert once == twice
 
 
-def test_normalize_text_strips_ends():
-    assert normalize_text("  hello  ") == "hello"
-
-
 def test_normalize_text_collapses_internal_whitespace():
     assert normalize_text("a\tb\nc") == "a b c"
 

@@ -772,24 +772,9 @@ def test_signature_ratio_value_annotation_batch31():
     assert sig.parameters["value"].annotation == "float"
 
 
-def test_signature_bool_metric_value_annotation_batch31():
-    sig = inspect.signature(_bool_metric)
-    assert sig.parameters["value"].annotation == "bool"
-
-
-def test_signature_int_metric_value_annotation_batch31():
-    sig = inspect.signature(_int_metric)
-    assert sig.parameters["value"].annotation == "int"
-
-
 def test_signature_compute_automatic_metrics_source_type_batch31():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["source_type"].annotation == "str"
-
-
-def test_signature_compute_automatic_metrics_return_batch31():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert "dict[str, Any]" in str(sig.return_annotation)
 
 
 def test_signature_is_valid_bbox_return_bool_batch31():
@@ -828,11 +813,6 @@ def test_module_imports_typing_any_batch31():
 def test_module_has_all_export_batch31():
     src = inspect.getsource(mmod)
     assert "__all__" in src
-
-
-def test_module_all_has_compute_automatic_metrics_batch31():
-    src = inspect.getsource(mmod)
-    assert '"compute_automatic_metrics"' in src
 
 
 def test_module_no_main_block_batch31():

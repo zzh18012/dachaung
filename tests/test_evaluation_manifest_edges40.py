@@ -830,11 +830,6 @@ def test_manifest_source_no_eval_call_batch13():
     assert "exec(" not in source
 
 
-def test_manifest_source_no_global_keyword_batch13():
-    source = inspect.getsource(mmod)
-    assert "\nglobal " not in source
-
-
 def test_manifest_source_no_nonlocal_keyword_batch13():
     source = inspect.getsource(mmod)
     assert "nonlocal " not in source
@@ -855,11 +850,6 @@ def test_manifest_source_no_print_batch13():
     assert "print(" not in source
 
 
-def test_manifest_source_no_input_function_batch13():
-    source = inspect.getsource(mmod)
-    assert "input(" not in source
-
-
 def test_manifest_source_no_open_call_at_top_level_batch13():
     """open() 只能在函数内。"""
     source = inspect.getsource(mmod)
@@ -867,11 +857,6 @@ def test_manifest_source_no_open_call_at_top_level_batch13():
     for line in lines:
         if not line.startswith(" ") and "open(" in line:
             raise AssertionError(f"top-level open: {line}")
-
-
-def test_manifest_source_no_compile_call_batch13():
-    source = inspect.getsource(mmod)
-    assert "compile(" not in source
 
 
 # ---------- module source 字符串精确补强第十三批 ----------
@@ -913,11 +898,6 @@ def test_module_source_validate_import_batch13():
     assert "from evaluation.schema import validate" in head
 
 
-def test_module_source_has_ManifestError_class_batch13():
-    source = inspect.getsource(mmod)
-    assert "class ManifestError(Exception):" in source
-
-
 def test_module_source_has_frozen_dataclass_batch13():
     source = inspect.getsource(mmod)
     assert "@dataclass(frozen=True)" in source
@@ -926,11 +906,6 @@ def test_module_source_has_frozen_dataclass_batch13():
 def test_module_source_has_is_absolute_like_def_batch13():
     source = inspect.getsource(mmod)
     assert "def _is_absolute_like(" in source
-
-
-def test_module_source_has_has_backslash_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _has_backslash(" in source
 
 
 def test_module_source_has_resolve_relative_path_def_batch13():
@@ -974,25 +949,11 @@ def test_manifest_error_signature_no_params_batch13():
     assert issubclass(ManifestError, Exception)
 
 
-def test_is_absolute_like_signature_one_param_batch13():
-    sig = inspect.signature(_is_absolute_like)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path_str"
-
-
 def test_is_absolute_like_return_annotation_bool_batch13():
     sig = inspect.signature(_is_absolute_like)
     ret = sig.return_annotation
     ret_str = ret if isinstance(ret, str) else str(ret)
     assert "bool" in ret_str
-
-
-def test_has_backslash_signature_one_param_batch13():
-    sig = inspect.signature(_has_backslash)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path_str"
 
 
 def test_has_backslash_return_annotation_bool_batch13():
@@ -1093,17 +1054,6 @@ def test_module_top_level_user_class_count_4_batch13():
         if inspect.isclass(v) and v.__module__ == mmod.__name__
     ]
     assert set(classes) == {"ManifestError", "DocumentEntry", "ExpectedFailure", "Manifest"}
-
-
-def test_module_user_function_count_5_batch13():
-    funcs = [
-        n for n, v in vars(mmod).items()
-        if inspect.isfunction(v) and v.__module__ == mmod.__name__
-    ]
-    assert set(funcs) == {
-        "_is_absolute_like", "_has_backslash",
-        "_resolve_relative_path", "load_manifest", "_detect_project_root",
-    }
 
 
 def test_module_has_manifest_version_attr_batch13():

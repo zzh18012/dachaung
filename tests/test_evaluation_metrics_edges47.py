@@ -140,10 +140,6 @@ def test_pdf_bbox_required_specific_values_batch20():
 # ---------- _strip_unicode_whitespace 第二批 ----------
 
 
-def test_strip_unicode_with_only_one_char_batch20():
-    assert _strip_unicode_whitespace("a") == "a"
-
-
 def test_strip_unicode_preserves_digits_batch20():
     assert _strip_unicode_whitespace("123") == "123"
 
@@ -321,10 +317,6 @@ def test_docx_locator_ratio_mixed_batch20():
 
 def test_is_valid_bbox_with_decimal_string_batch20():
     assert _is_valid_bbox(["0.5", "1.0", "1.5", "2.0"]) is False
-
-
-def test_is_valid_bbox_with_set_batch20():
-    assert _is_valid_bbox({0, 0, 1, 1}) is False
 
 
 # ---------- _image_resource_ratio 第二批 ----------
@@ -718,19 +710,9 @@ def test_module_does_not_import_app_pipeline_batch20():
     assert "import app" not in src
 
 
-def test_module_does_not_import_evaluation_runner_batch20():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.runner" not in src
-
-
 def test_module_does_not_import_evaluation_cli_batch20():
     src = inspect.getsource(mmod)
     assert "from evaluation.cli" not in src
-
-
-def test_module_no_main_block_batch20():
-    src = inspect.getsource(mmod)
-    assert 'if __name__ ==' not in src
 
 
 def test_module_constants_not_in_all_batch20():

@@ -109,12 +109,6 @@ def test_build_parser_run_parser_choices_rejects_unknown():
         ])
 
 
-def test_build_parser_run_parser_default_is_fallback():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert args.parser == "fallback"
-
-
 def test_build_parser_run_max_chars_default_800():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
@@ -153,12 +147,6 @@ def test_build_parser_command_dest_is_command():
     p = _build_parser()
     args = p.parse_args(["inspect-doc", "doc.json"])
     assert hasattr(args, "command")
-
-
-def test_build_parser_run_command_value_set():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert args.command == "run"
 
 
 # =========================================================================

@@ -514,11 +514,6 @@ def test_source_contains_choices_batch48():
     assert "choices" in src
 
 
-def test_source_contains_validate_file_import_batch48():
-    src = inspect.getsource(cli_mod)
-    assert "validate_file" in src
-
-
 def test_source_contains_json_decode_error_batch48():
     src = inspect.getsource(cli_mod)
     assert "JSONDecodeError" in src

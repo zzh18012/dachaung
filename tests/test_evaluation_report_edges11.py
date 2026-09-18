@@ -135,10 +135,6 @@ def test_ratio_metrics_does_not_contain_wall_time_seconds():
     assert "wall_time_seconds" not in _RATIO_METRICS
 
 
-def test_ratio_metrics_does_not_contain_error_code():
-    assert "error_code" not in _RATIO_METRICS
-
-
 def test_ratio_metrics_is_tuple_not_list():
     """tuple 是不可变的，确保不被改写。"""
     assert isinstance(_RATIO_METRICS, tuple)

@@ -99,10 +99,6 @@ def test_is_valid_bbox_with_four_int_batch37():
     assert _is_valid_bbox([1, 2, 3, 4]) is True
 
 
-def test_is_valid_bbox_with_mixed_int_float_batch37():
-    assert _is_valid_bbox([1, 2.5, 3, 4.5]) is True
-
-
 def test_is_valid_bbox_with_bool_batch37():
     """bool 是 int subclass，但代码显式拒绝。"""
     assert _is_valid_bbox([True, 2, 3, 4]) is False
@@ -265,12 +261,6 @@ def test_pdf_locator_mixed_valid_invalid_batch37():
 
 
 # ---------- _docx_locator_ratio 第三十七批
-
-
-def test_docx_locator_empty_elements_batch37():
-    m = _docx_locator_ratio([])
-    assert m["value"] is None
-    assert m["reason"] == "no_elements"
 
 
 def test_docx_locator_with_table_index_batch37():
@@ -460,14 +450,6 @@ def test_text_preservation_unicode_batch37():
     elements = [{"type": "paragraph", "content": "中文测试"}]
     chunks = [{"text": "中文测试"}]
     out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-
-
-def test_text_preservation_with_whitespace_batch37():
-    elements = [{"type": "paragraph", "content": "a b c"}]
-    chunks = [{"text": "abc"}]
-    out = _text_preservation(elements, chunks)
-    # 删除空白后两者相同 → equal=True
     assert out["equal"]["value"] is True
 
 

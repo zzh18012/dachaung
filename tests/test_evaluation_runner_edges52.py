@@ -830,19 +830,9 @@ def test_module_source_no_pickle_batch24():
     assert "pickle" not in source
 
 
-def test_module_source_no_environ_batch24():
-    source = inspect.getsource(rmod)
-    assert "os.environ" not in source
-
-
 def test_module_source_no_argparse_batch24():
     source = inspect.getsource(rmod)
     assert "argparse" not in source
-
-
-def test_module_source_no_dataclass_batch24():
-    source = inspect.getsource(rmod)
-    assert "@dataclass" not in source
 
 
 def test_module_source_no_network_io_batch24():

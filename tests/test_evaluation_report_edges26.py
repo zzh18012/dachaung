@@ -459,21 +459,6 @@ def test_report_source_no_forbidden_token_twelfth(token):
     assert token not in source
 
 
-def test_report_source_no_remove():
-    source = inspect.getsource(rmod)
-    assert ".remove(" not in source
-
-
-def test_report_source_no_kill():
-    source = inspect.getsource(rmod)
-    assert ".kill(" not in source
-
-
-def test_report_source_no_terminate():
-    source = inspect.getsource(rmod)
-    assert ".terminate(" not in source
-
-
 def test_report_source_no_async_def():
     source = inspect.getsource(rmod)
     assert "async def" not in source
@@ -563,21 +548,6 @@ def test_module_source_has_aggregate_summary_def():
     assert "def aggregate_summary(" in source
 
 
-def test_module_source_capture_output_true():
-    source = inspect.getsource(rmod)
-    assert "capture_output=True" in source
-
-
-def test_module_source_errors_replace():
-    source = inspect.getsource(rmod)
-    assert 'errors="replace"' in source
-
-
-def test_module_source_timeout_10():
-    source = inspect.getsource(rmod)
-    assert "timeout=10" in source
-
-
 def test_module_source_no_main_block():
     source = inspect.getsource(rmod)
     assert "if __name__" not in source
@@ -645,11 +615,6 @@ def test_signature_build_devset_section_param_name_manifest():
     assert "manifest" in sig.parameters
 
 
-def test_signature_aggregate_summary_1_param():
-    sig = inspect.signature(aggregate_summary)
-    assert len(sig.parameters) == 1
-
-
 def test_signature_funcs_function_type():
     for func in (
         get_git_provenance,
@@ -690,14 +655,6 @@ def test_module_all_entries_str():
 
 def test_module_has_dunder_file():
     assert hasattr(rmod, "__file__")
-
-
-def test_module_dunder_file_endswith_report_py():
-    import os
-    sep = os.sep
-    assert rmod.__file__.endswith("evaluation" + sep + "report.py") or rmod.__file__.endswith(
-        "evaluation/report.py"
-    )
 
 
 def test_module_name_is_evaluation_report():

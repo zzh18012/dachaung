@@ -382,11 +382,6 @@ def test_module_source_contains_annotation_metrics_import_batch32():
     assert "figure_caption_prf" in src
 
 
-def test_module_source_contains_metrics_import_batch32():
-    src = inspect.getsource(rmod)
-    assert "compute_automatic_metrics" in src
-
-
 def test_module_source_contains_report_import_batch32():
     src = inspect.getsource(rmod)
     assert "aggregate_summary" in src
@@ -414,11 +409,6 @@ def test_module_source_contains_per_doc_subdir_batch32():
     assert "_per_doc" in src
 
 
-def test_module_source_contains_image_dir_local_batch32():
-    src = inspect.getsource(rmod)
-    assert "image_dir" in src
-
-
 def test_module_source_contains_not_instrumented_batch32():
     src = inspect.getsource(rmod)
     assert "not_instrumented" in src
@@ -437,11 +427,6 @@ def test_module_source_contains_write_json_false_batch32():
 def test_module_source_contains_image_output_dir_for_batch32():
     src = inspect.getsource(rmod)
     assert "image_output_dir_for" in src
-
-
-def test_module_source_contains_process_single_call_batch32():
-    src = inspect.getsource(rmod)
-    assert "process_single(" in src
 
 
 def test_module_source_contains_image_dir_is_dir_batch32():

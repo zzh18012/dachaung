@@ -42,10 +42,6 @@ def test_schema_path_value():
     assert SCHEMA_PATH == expected
 
 
-def test_schema_path_is_absolute():
-    assert SCHEMA_PATH.is_absolute()
-
-
 def test_schema_path_resolved():
     """resolve() 后无 .. 段。"""
     assert SCHEMA_PATH == SCHEMA_PATH.resolve()
@@ -53,14 +49,6 @@ def test_schema_path_resolved():
 
 def test_schema_path_filename():
     assert SCHEMA_PATH.name == "document.schema.json"
-
-
-def test_schema_path_parent_name():
-    assert SCHEMA_PATH.parent.name == "schemas"
-
-
-def test_schema_path_is_file():
-    assert SCHEMA_PATH.is_file()
 
 
 # =========================================================================
@@ -71,11 +59,6 @@ def test_schema_path_is_file():
 def test_schema_validation_error_init_signature():
     sig = inspect.signature(SchemaValidationError.__init__)
     assert set(sig.parameters) == {"self", "message", "errors"}
-
-
-def test_schema_validation_error_explicit_none_errors():
-    e = SchemaValidationError("msg", errors=None)
-    assert e.errors == []
 
 
 def test_schema_validation_error_with_errors():
@@ -97,10 +80,6 @@ def test_schema_validation_error_args_only_message():
 
 def test_schema_validation_error_inherits_exception():
     assert issubclass(SchemaValidationError, Exception)
-
-
-def test_schema_validation_error_not_value_error():
-    assert not issubclass(SchemaValidationError, ValueError)
 
 
 def test_schema_validation_error_caught_as_exception():

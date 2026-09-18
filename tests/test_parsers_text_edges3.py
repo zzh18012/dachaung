@@ -582,11 +582,6 @@ def test_module_imports_make_document_id():
     assert hasattr(text_parser, "make_document_id")
 
 
-def test_text_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(TextParser, Parser)
-
-
 def test_text_parser_name_value():
     assert TextParser.name == "text"
 

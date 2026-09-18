@@ -97,11 +97,6 @@ def test_eval_schema_error_errors_with_complex_nested_dict_batch11():
     assert e.errors[0]["context"]["x"] == [1, 2, 3]
 
 
-def test_eval_schema_error_can_be_raised_and_caught_batch11():
-    with pytest.raises(EvalSchemaError):
-        raise EvalSchemaError("test")
-
-
 def test_eval_schema_error_is_exception_subclass_batch11():
     assert issubclass(EvalSchemaError, Exception)
 
@@ -560,51 +555,6 @@ def test_module_source_imports_json_batch11():
     assert "import json" in source
 
 
-def test_module_source_imports_path_batch11():
-    source = inspect.getsource(smod)
-    assert "from pathlib import Path" in source
-
-
-def test_module_source_imports_typing_any_batch11():
-    source = inspect.getsource(smod)
-    assert "from typing import Any" in source
-
-
-def test_module_source_imports_js_validation_error_batch11():
-    source = inspect.getsource(smod)
-    assert "from jsonschema.exceptions import ValidationError as JSValidationError" in source
-
-
-def test_module_source_has_schema_path_function_batch11():
-    source = inspect.getsource(smod)
-    assert "def _schema_path(" in source
-
-
-def test_module_source_has_load_schema_function_batch11():
-    source = inspect.getsource(smod)
-    assert "def load_schema(" in source
-
-
-def test_module_source_has_validate_function_batch11():
-    source = inspect.getsource(smod)
-    assert "def validate(" in source
-
-
-def test_module_source_has_validate_file_function_batch11():
-    source = inspect.getsource(smod)
-    assert "def validate_file(" in source
-
-
-def test_module_source_no_main_block_batch11():
-    source = inspect.getsource(smod)
-    assert "if __name__" not in source
-
-
-def test_module_source_no_print_batch11():
-    source = inspect.getsource(smod)
-    assert "print(" not in source
-
-
 def test_module_source_docstring_present_batch11():
     assert smod.__doc__ is not None
     assert len(smod.__doc__) > 30
@@ -651,11 +601,6 @@ def test_signature_schema_path_return_path_batch11():
     annot = sig.return_annotation
     annot_str = annot if isinstance(annot, str) else str(annot)
     assert "Path" in annot_str
-
-
-def test_signature_load_schema_1_param_batch11():
-    sig = inspect.signature(load_schema)
-    assert list(sig.parameters) == ["name"]
 
 
 def test_signature_load_schema_param_annotation_str_batch11():
@@ -718,22 +663,6 @@ def test_all_functions_no_var_kwargs_batch11():
 
 def test_module_name_evaluation_schema_batch11():
     assert smod.__name__ == "evaluation.schema"
-
-
-def test_module_user_function_count_4_batch11():
-    funcs = [
-        n for n, v in vars(smod).items()
-        if inspect.isfunction(v) and v.__module__ == smod.__name__
-    ]
-    assert set(funcs) == {"_schema_path", "load_schema", "validate", "validate_file"}
-
-
-def test_module_user_class_count_1_batch11():
-    classes = [
-        n for n, v in vars(smod).items()
-        if inspect.isclass(v) and v.__module__ == smod.__name__
-    ]
-    assert classes == ["EvalSchemaError"]
 
 
 def test_module_user_constants_count_1_batch11():

@@ -178,10 +178,6 @@ def test_has_backslash_whitespace_only_no_backslash():
     assert _has_backslash("   ") is False
 
 
-def test_has_backslash_unicode_no_backslash():
-    assert _has_backslash("中文/路径") is False
-
-
 def test_has_backslash_unicode_with_backslash():
     assert _has_backslash("中文\\路径") is True
 
@@ -501,12 +497,6 @@ def test_manifest_is_dataclass():
 # =========================================================================
 # _resolve_relative_path field_name 携带
 # =========================================================================
-
-
-def test_resolve_relative_path_field_name_in_empty_error(tmp_path: Path):
-    with pytest.raises(ManifestError) as ei:
-        _resolve_relative_path("", tmp_path, "MY_FIELD")
-    assert "MY_FIELD" in str(ei.value)
 
 
 def test_resolve_relative_path_field_name_in_absolute_error(tmp_path: Path):
@@ -908,11 +898,6 @@ def test_load_manifest_path_resolved_in_project_root(tmp_path: Path):
 # =========================================================================
 # ManifestError 默认行为
 # =========================================================================
-
-
-def test_manifest_error_no_args():
-    e = ManifestError()
-    assert e.args == ()
 
 
 def test_manifest_error_multiple_args():

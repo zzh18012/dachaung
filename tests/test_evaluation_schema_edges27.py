@@ -524,10 +524,6 @@ def test_schemas_dir_contains_evaluation_report_schema():
     assert (SCHEMAS_DIR / "evaluation-report.schema.json").is_file()
 
 
-def test_schemas_dir_contains_document_schema():
-    assert (SCHEMAS_DIR / "document.schema.json").is_file()
-
-
 def test_schemas_dir_in_module_namespace():
     assert hasattr(smod, "SCHEMAS_DIR")
     assert smod.SCHEMAS_DIR is SCHEMAS_DIR
@@ -635,19 +631,9 @@ def test_module_source_eval_schema_error_init_signature():
     assert "def __init__(self, message: str, errors: list[dict[str, Any]] | None = None) -> None:" in src
 
 
-def test_module_source_eval_schema_error_init_uses_super():
-    src = inspect.getsource(smod)
-    assert "super().__init__(message)" in src
-
-
 def test_module_source_eval_schema_error_init_assigns_self_errors():
     src = inspect.getsource(smod)
     assert "self.errors = errors or []" in src
-
-
-def test_module_source_uses_draft_validator_call():
-    src = inspect.getsource(smod)
-    assert "Draft202012Validator(" in src
 
 
 def test_module_source_uses_iter_errors():
@@ -713,11 +699,6 @@ def test_module_source_no_logging():
     src = inspect.getsource(smod)
     assert "import logging" not in src
     assert "logging." not in src
-
-
-def test_module_source_no_unlink():
-    src = inspect.getsource(smod)
-    assert ".unlink(" not in src
 
 
 def test_module_source_no_subprocess():
@@ -863,10 +844,6 @@ def test_module_all_is_list():
 def test_module_all_entries_are_str():
     for entry in smod.__all__:
         assert isinstance(entry, str)
-
-
-def test_module_has_docstring():
-    assert smod.__doc__ is not None
 
 
 def test_module_docstring_starts_with_chinese():

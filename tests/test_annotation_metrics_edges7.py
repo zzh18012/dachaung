@@ -556,11 +556,6 @@ def test_module_docstring_mentions_tolerance_must_be_recorded():
     assert "容差" in doc or "tolerance" in doc.lower()
 
 
-def test_chunk_boundary_prf_tolerance_annotation_int():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert "int" in str(sig.parameters["tolerance_chars"].annotation)
-
-
 def test_chunk_boundary_prf_return_annotation_dict():
     sig = inspect.signature(chunk_boundary_prf)
     assert "dict" in str(sig.return_annotation)

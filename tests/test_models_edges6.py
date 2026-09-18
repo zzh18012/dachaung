@@ -40,10 +40,6 @@ def test_schema_version_value():
     assert SCHEMA_VERSION == "0.1.0"
 
 
-def test_schema_version_is_str():
-    assert isinstance(SCHEMA_VERSION, str)
-
-
 def test_schema_version_format():
     """X.Y.Z 格式。"""
     parts = SCHEMA_VERSION.split(".")

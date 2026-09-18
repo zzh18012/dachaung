@@ -228,11 +228,6 @@ def test_process_one_source_branch_2_returns_unknown_error():
     assert '"message": "process_single returned None without errors"' in src
 
 
-def test_process_one_source_no_yield_keyword():
-    src = inspect.getsource(_process_one)
-    assert "yield" not in src
-
-
 def test_process_one_source_no_async_def():
     src = inspect.getsource(_process_one)
     assert "async def" not in src
@@ -390,11 +385,6 @@ def test_run_evaluation_source_only_first_parser_version_cached():
     """只缓存第一个非 None 的 parser_version。"""
     src = inspect.getsource(run_evaluation)
     assert "if parser_version and not parser_version_for_prov:" in src
-
-
-def test_run_evaluation_source_no_yield():
-    src = inspect.getsource(run_evaluation)
-    assert "yield" not in src
 
 
 def test_run_evaluation_source_no_async_def():

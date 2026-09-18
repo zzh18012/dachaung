@@ -40,11 +40,6 @@ from app.parsers.fallback_parser import (
 # ---------- _CAPTION_RE 直接测试 ----------
 
 
-def test_caption_re_pattern_is_compiled():
-    import re
-    assert isinstance(_CAPTION_RE, re.Pattern)
-
-
 def test_caption_re_match_returns_match_object_for_table():
     m = _CAPTION_RE.match("Table 1. Hello")
     assert m is not None

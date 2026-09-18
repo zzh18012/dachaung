@@ -40,10 +40,6 @@ from app.chunkers.structural import (
 # =========================================================================
 
 
-def test_split_piece_is_dataclass():
-    assert is_dataclass(_SplitPiece)
-
-
 def test_split_piece_is_frozen():
     """frozen=True → 不可变。"""
     p = _SplitPiece(text="abc", boundary_after=None)
@@ -51,26 +47,10 @@ def test_split_piece_is_frozen():
         p.text = "xyz"  # type: ignore[misc]
 
 
-def test_split_piece_default_start_zero():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.start == 0
-
-
-def test_split_piece_default_end_zero():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.end == 0
-
-
 def test_split_piece_explicit_start_end():
     p = _SplitPiece(text="x", boundary_after="whitespace", start=10, end=20)
     assert p.start == 10
     assert p.end == 20
-
-
-def test_split_piece_equality_with_same_values():
-    p1 = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    p2 = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    assert p1 == p2
 
 
 def test_split_piece_inequality_different_boundary():
@@ -375,10 +355,6 @@ def test_hard_break_langs_contains_chinese_and_english():
     assert "?" in _HARD_BREAK_LANGS
 
 
-def test_whitespace_re_pattern_value():
-    assert _WHITESPACE_RE.pattern == r"\s+"
-
-
 # =========================================================================
 # normalize_text 深度
 # =========================================================================
@@ -386,10 +362,6 @@ def test_whitespace_re_pattern_value():
 
 def test_normalize_text_empty_returns_empty():
     assert normalize_text("") == ""
-
-
-def test_normalize_text_only_whitespace_returns_empty():
-    assert normalize_text("   \t\n  ") == ""
 
 
 def test_normalize_text_collapses_internal_whitespace():
@@ -400,10 +372,6 @@ def test_normalize_text_handles_tabs_newlines():
     assert normalize_text("hello\tworld\nfoo") == "hello world foo"
 
 
-def test_normalize_text_strips_ends():
-    assert normalize_text("  hello  ") == "hello"
-
-
 def test_normalize_text_preserves_unicode():
     assert normalize_text("中文 测试") == "中文 测试"
 
@@ -411,11 +379,6 @@ def test_normalize_text_preserves_unicode():
 # =========================================================================
 # StructuralChunker.__init__ 深度
 # =========================================================================
-
-
-def test_chunker_init_default_max_chars():
-    c = StructuralChunker()
-    assert c.max_chars == 800
 
 
 def test_chunker_init_max_chars_below_32_raises():
@@ -432,11 +395,6 @@ def test_chunker_init_max_chars_exactly_32():
 def test_chunker_init_max_chars_zero_raises():
     with pytest.raises(ValueError):
         StructuralChunker(max_chars=0)
-
-
-def test_chunker_init_max_chars_negative_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=-100)
 
 
 # =========================================================================

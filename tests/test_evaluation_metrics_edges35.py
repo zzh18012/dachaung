@@ -60,12 +60,6 @@ def test_null_with_empty_reason():
     assert r == {"value": None, "reason": ""}
 
 
-def test_ratio_with_int_input_converts_to_float():
-    r = _ratio(1)
-    assert r["value"] == 1.0
-    assert isinstance(r["value"], float)
-
-
 def test_ratio_with_zero():
     r = _ratio(0.0)
     assert r == {"value": 0.0, "reason": None}
@@ -423,12 +417,6 @@ def test_docx_locator_partial():
     ]
     r = _docx_locator_ratio(elements)
     assert r["value"] == 0.5
-
-
-def test_docx_locator_source_locator_none():
-    elements = [{"type": "paragraph"}]  # 无 source_locator
-    r = _docx_locator_ratio(elements)
-    assert r["value"] == 0.0
 
 
 def test_docx_locator_returns_dict_with_value_and_reason():

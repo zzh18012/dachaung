@@ -60,11 +60,6 @@ def test_schemas_dir_exists_batch21():
     assert SCHEMAS_DIR.exists()
 
 
-def test_schemas_dir_has_manifest_schema_batch21():
-    """SCHEMAS_DIR 含 manifest.schema.json。"""
-    assert (SCHEMAS_DIR / "manifest.schema.json").is_file()
-
-
 def test_schemas_dir_has_annotation_schema_batch21():
     """SCHEMAS_DIR 含 annotation.schema.json。"""
     assert (SCHEMAS_DIR / "annotation.schema.json").is_file()
@@ -209,12 +204,6 @@ def test_schema_path_directory_raises_batch21():
 
 
 # ---------- load_schema 第二十一批 ----------
-
-
-def test_load_schema_returns_dict_batch21():
-    """load_schema 返回 dict。"""
-    s = load_schema("manifest.schema.json")
-    assert isinstance(s, dict)
 
 
 def test_load_schema_has_schema_version_key_batch21():
@@ -474,50 +463,14 @@ def test_module_source_forbidden_tokens_batch21(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch21():
     src = inspect.getsource(smod)
     assert "import socket" not in src
 
 
-def test_module_source_no_requests_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import requests" not in src
-
-
 def test_module_source_no_urllib_import_batch21():
     src = inspect.getsource(smod)
     assert "import urllib" not in src
-
-
-def test_module_source_no_threading_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import threading" not in src
-
-
-def test_module_source_no_asyncio_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import asyncio" not in src
-
-
-def test_module_source_no_shutil_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import shutil" not in src
-
-
-def test_module_source_no_tempfile_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import tempfile" not in src
-
-
-def test_module_source_no_logging_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import logging" not in src
 
 
 # ---------- module source 字符串精确补强第三十三批 ----------
@@ -583,11 +536,6 @@ def test_module_source_has_sort_with_absolute_path_batch21():
     assert "key=lambda e: list(e.absolute_path)" in src
 
 
-def test_module_source_has_draft202012validator_call_batch21():
-    src = inspect.getsource(smod)
-    assert "Draft202012Validator(" in src
-
-
 def test_module_source_has_encoding_utf8_in_open_batch21():
     src = inspect.getsource(smod)
     assert 'encoding="utf-8"' in src
@@ -647,22 +595,10 @@ def test_module_all_has_five_entries_batch21():
     }
 
 
-def test_module_does_not_import_evaluation_runner_batch21():
-    src = inspect.getsource(smod)
-    assert "from evaluation.runner" not in src
-    assert "from evaluation import runner" not in src
-
-
 def test_module_does_not_import_evaluation_cli_batch21():
     src = inspect.getsource(smod)
     assert "from evaluation.cli" not in src
     assert "from evaluation import cli" not in src
-
-
-def test_module_does_not_import_evaluation_metrics_batch21():
-    src = inspect.getsource(smod)
-    assert "from evaluation.metrics" not in src
-    assert "from evaluation import metrics" not in src
 
 
 def test_module_does_not_import_evaluation_report_batch21():
@@ -691,11 +627,6 @@ def test_module_validate_is_public_batch21():
 
 def test_module_validate_file_is_public_batch21():
     assert not validate_file.__name__.startswith("_")
-
-
-def test_module_has_module_docstring_batch21():
-    assert smod.__doc__ is not None
-    assert len(smod.__doc__) > 0
 
 
 def test_module_no_main_block_batch21():

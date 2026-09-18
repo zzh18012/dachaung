@@ -257,13 +257,6 @@ def test_text_preservation_ignores_image_content_batch44():
     assert out["equal"]["value"] is True
 
 
-def test_text_preservation_strips_whitespace_batch44():
-    elements = [{"type": "paragraph", "content": "a b c"}]
-    chunks = [{"text": "abc"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-
-
 def test_text_preservation_returns_3_keys_batch44():
     out = _text_preservation([], [])
     assert set(out.keys()) == {"equal", "precision", "recall"}

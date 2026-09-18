@@ -299,22 +299,10 @@ def test_module_namespace_identity_report_version():
     assert m.REPORT_VERSION == OrigRV
 
 
-def test_module_all_is_list():
-    import evaluation.report as m
-
-    assert isinstance(m.__all__, list)
-
-
 def test_module_all_is_not_tuple():
     import evaluation.report as m
 
     assert not isinstance(m.__all__, tuple)
-
-
-def test_module_all_has_5_entries():
-    import evaluation.report as m
-
-    assert len(m.__all__) == 5
 
 
 def test_module_all_exact():

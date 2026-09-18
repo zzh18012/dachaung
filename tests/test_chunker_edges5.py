@@ -112,10 +112,6 @@ def test_part_constants_ordered():
 # =========================================================================
 
 
-def test_split_piece_is_dataclass():
-    assert is_dataclass(_SplitPiece)
-
-
 def test_split_piece_is_frozen():
     p = _SplitPiece(text="x", boundary_after=None)
     with pytest.raises(FrozenInstanceError):
@@ -127,31 +123,10 @@ def test_split_piece_hashable():
     assert hash(p) == hash(_SplitPiece(text="x", boundary_after=None))
 
 
-def test_split_piece_default_start_zero():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.start == 0
-
-
-def test_split_piece_default_end_zero():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.end == 0
-
-
 def test_split_piece_explicit_start_end():
     p = _SplitPiece(text="x", boundary_after=None, start=5, end=10)
     assert p.start == 5
     assert p.end == 10
-
-
-def test_split_piece_boundary_after_forced_char():
-    p = _SplitPiece(text="x", boundary_after="forced_char")
-    assert p.boundary_after == "forced_char"
-
-
-def test_split_piece_equality_same_values():
-    p1 = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    p2 = _SplitPiece(text="x", boundary_after=None, start=0, end=1)
-    assert p1 == p2
 
 
 def test_split_piece_field_count():
@@ -172,10 +147,6 @@ def test_split_piece_field_names_exact():
 # =========================================================================
 # _SENTENCE_SPLIT_RE pattern 内容
 # =========================================================================
-
-
-def test_sentence_split_re_is_compiled_pattern():
-    assert isinstance(_SENTENCE_SPLIT_RE, re.Pattern)
 
 
 def test_sentence_split_re_pattern_contains_chinese_period():
@@ -248,18 +219,6 @@ def test_hard_break_langs_length_six():
     assert len(_HARD_BREAK_LANGS) == 6
 
 
-def test_hard_break_langs_contains_chinese_punctuations():
-    assert "。" in _HARD_BREAK_LANGS
-    assert "！" in _HARD_BREAK_LANGS
-    assert "？" in _HARD_BREAK_LANGS
-
-
-def test_hard_break_langs_contains_english_punctuations():
-    assert "." in _HARD_BREAK_LANGS
-    assert "!" in _HARD_BREAK_LANGS
-    assert "?" in _HARD_BREAK_LANGS
-
-
 def test_hard_break_langs_exact_set():
     assert set(_HARD_BREAK_LANGS) == {"。", "！", "？", ".", "!", "?"}
 
@@ -267,10 +226,6 @@ def test_hard_break_langs_exact_set():
 # =========================================================================
 # _WHITESPACE_RE 行为
 # =========================================================================
-
-
-def test_whitespace_re_is_compiled_pattern():
-    assert isinstance(_WHITESPACE_RE, re.Pattern)
 
 
 def test_whitespace_re_pattern_is_one_or_more():
@@ -305,10 +260,6 @@ def test_normalize_text_empty_string_returns_empty():
 def test_normalize_text_none_returns_empty():
     # not s → 返回 ""
     assert normalize_text(None) == ""  # type: ignore[arg-type]
-
-
-def test_normalize_text_all_whitespace_returns_empty():
-    assert normalize_text("   \t\n  ") == ""
 
 
 def test_normalize_text_no_change_already_normalized():
@@ -675,11 +626,6 @@ def test_chunk_buffer_field_names_exact():
 # =========================================================================
 
 
-def test_chunker_init_default_max_chars_800():
-    c = StructuralChunker()
-    assert c.max_chars == 800
-
-
 def test_chunker_init_explicit_max_chars():
     c = StructuralChunker(max_chars=200)
     assert c.max_chars == 200
@@ -693,11 +639,6 @@ def test_chunker_init_max_chars_31_rejected():
 def test_chunker_init_max_chars_zero_rejected():
     with pytest.raises(ValueError):
         StructuralChunker(max_chars=0)
-
-
-def test_chunker_init_max_chars_negative_rejected():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=-100)
 
 
 def test_chunker_init_value_error_message_contains_max_chars():

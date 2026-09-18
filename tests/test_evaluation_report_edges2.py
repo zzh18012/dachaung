@@ -422,16 +422,6 @@ def test_build_provenance_dependencies_three_entries(tmp_path: Path):
     assert len(result["dependencies"]) == 3
 
 
-def test_build_provenance_git_commit_str_or_none(tmp_path: Path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["git_commit"] is None or isinstance(result["git_commit"], str)
-
-
-def test_build_provenance_git_dirty_bool(tmp_path: Path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert isinstance(result["git_dirty"], bool)
-
-
 def test_build_provenance_signature_four_params():
     import inspect
     sig = inspect.signature(build_provenance)

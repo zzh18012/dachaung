@@ -56,10 +56,6 @@ def test_is_absolute_like_lowercase_drive_backslash_batch14():
     assert _is_absolute_like("d:\\foo") is True
 
 
-def test_is_absolute_like_uppercase_drive_batch14():
-    assert _is_absolute_like("D:/foo") is True
-
-
 def test_is_absolute_like_numeric_first_char_batch14():
     """数字开头不是盘符。"""
     assert _is_absolute_like("1:/foo") is False
@@ -552,18 +548,6 @@ def test_module_source_future_annotations_present_batch14():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_pathlib_path_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from pathlib import Path" in head
-
-
-def test_module_source_imports_typing_any_batch14():
-    source = inspect.getsource(mmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "from typing import Any" in head
-
-
 def test_module_source_defines_manifest_error_batch14():
     source = inspect.getsource(mmod)
     assert "class ManifestError" in source
@@ -587,11 +571,6 @@ def test_module_source_defines_manifest_batch14():
 def test_module_source_defines_is_absolute_like_batch14():
     source = inspect.getsource(mmod)
     assert "def _is_absolute_like(" in source
-
-
-def test_module_source_defines_has_backslash_batch14():
-    source = inspect.getsource(mmod)
-    assert "def _has_backslash(" in source
 
 
 def test_module_source_defines_resolve_relative_path_batch14():

@@ -410,11 +410,6 @@ def test_module_source_no_requests_batch30():
     assert "requests" not in src
 
 
-def test_module_source_no_unlink_batch30():
-    src = inspect.getsource(rmod)
-    assert ".unlink()" not in src
-
-
 # ---------- module source 字符串精确补强第四十四批 ----------
 
 
@@ -443,21 +438,6 @@ def test_module_source_contains_silent_drop_total_batch30():
     assert "silent_drop_total" in src
 
 
-def test_module_source_contains_participating_docs_batch30():
-    src = inspect.getsource(rmod)
-    assert "participating_docs" in src
-
-
-def test_module_source_contains_not_evaluated_batch30():
-    src = inspect.getsource(rmod)
-    assert "not_evaluated" in src
-
-
-def test_module_source_contains_macro_average_batch30():
-    src = inspect.getsource(rmod)
-    assert "macro_average" in src
-
-
 def test_module_source_contains_pdfplumber_batch30():
     src = inspect.getsource(rmod)
     assert '"pdfplumber"' in src
@@ -476,16 +456,6 @@ def test_module_source_contains_pypdfium2_batch30():
 # ---------- signatures 第四十四批 ----------
 
 
-def test_signature_get_git_provenance_return_batch30():
-    sig = inspect.signature(get_git_provenance)
-    assert "dict[str, Any]" in str(sig.return_annotation)
-
-
-def test_signature_get_git_provenance_project_root_batch30():
-    sig = inspect.signature(get_git_provenance)
-    assert sig.parameters["project_root"].annotation == "Path"
-
-
 def test_signature_build_provenance_no_default_batch30():
     sig = inspect.signature(build_provenance)
     for p in sig.parameters.values():
@@ -496,11 +466,6 @@ def test_signature_build_devset_section_manifest_annotation_batch30():
     sig = inspect.signature(build_devset_section)
     # manifest 没有 type annotation
     assert "manifest" in sig.parameters
-
-
-def test_signature_build_provenance_return_dict_batch30():
-    sig = inspect.signature(build_provenance)
-    assert "dict[str, Any]" in str(sig.return_annotation)
 
 
 # ---------- module 合理性第四十四批 ----------

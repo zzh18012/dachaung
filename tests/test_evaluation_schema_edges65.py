@@ -183,11 +183,6 @@ def test_validate_annotation_valid_batch51():
     assert rv is None
 
 
-def test_validate_annotation_invalid_batch51():
-    with pytest.raises(EvalSchemaError):
-        validate({}, "annotation.schema.json")
-
-
 def test_validate_evaluation_report_valid_batch51():
     instance = {
         "report_version": "1.1",
@@ -370,11 +365,6 @@ def test_schemas_dir_only_json_files_batch51():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_json_import_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "import json" in src
-
-
 def test_source_contains_path_import_batch51():
     src = inspect.getsource(schema_mod)
     assert "from pathlib import Path" in src
@@ -424,12 +414,6 @@ def test_ast_has_4_top_level_functions_batch51():
     assert len(funcs) == 4
 
 
-def test_ast_function_names_order_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["_schema_path", "load_schema", "validate", "validate_file"]
-
-
 def test_ast_has_1_class_def_batch51():
     tree = ast.parse(inspect.getsource(schema_mod))
     classes = [n for n in tree.body if isinstance(n, ast.ClassDef)]
@@ -453,13 +437,6 @@ def test_ast_module_docstring_batch51():
     tree = ast.parse(inspect.getsource(schema_mod))
     assert isinstance(tree.body[0], ast.Expr)
     assert isinstance(tree.body[0].value, ast.Constant)
-
-
-def test_ast_has_2_module_assigns_batch51():
-    """SCHEMAS_DIR + __all__ = 2。"""
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    assert len(assigns) == 2
 
 
 def test_ast_schemas_dir_target_name_batch51():
@@ -498,13 +475,6 @@ def test_ast_validate_uses_sorted_with_key_lambda_batch51():
     assert len(sorted_calls[0].keywords) == 1
     assert sorted_calls[0].keywords[0].arg == "key"
     assert isinstance(sorted_calls[0].keywords[0].value, ast.Lambda)
-
-
-def test_ast_validate_file_has_with_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
-    withs = [n for n in ast.walk(func) if isinstance(n, ast.With)]
-    assert len(withs) == 1
 
 
 def test_ast_load_schema_has_with_open_batch51():

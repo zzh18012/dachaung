@@ -156,10 +156,6 @@ def test_has_backslash_unicode_with_backslash_batch10():
     assert _has_backslash("中文\\路径") is True
 
 
-def test_has_backslash_unicode_no_backslash_batch10():
-    assert _has_backslash("中文/路径") is False
-
-
 def test_has_backslash_returns_bool_type_batch10():
     assert isinstance(_has_backslash("foo"), bool)
 
@@ -170,11 +166,6 @@ def test_has_backslash_returns_bool_type_batch10():
 def test_resolve_relative_path_empty_raises_batch10(tmp_path):
     with pytest.raises(ManifestError, match="为空"):
         _resolve_relative_path("", tmp_path, "test")
-
-
-def test_resolve_relative_path_absolute_posix_raises_batch10(tmp_path):
-    with pytest.raises(ManifestError, match="绝对路径"):
-        _resolve_relative_path("/etc/passwd", tmp_path, "test")
 
 
 def test_resolve_relative_path_dot_path_resolves_batch10(tmp_path):
@@ -687,11 +678,6 @@ def test_manifest_source_no_logging_batch10():
     assert "logger" not in source
 
 
-def test_manifest_source_no_sleep_batch10():
-    source = inspect.getsource(mmod)
-    assert "time.sleep" not in source
-
-
 def test_manifest_source_no_hardcoded_path_batch10():
     source = inspect.getsource(mmod)
     assert "C:\\\\Users" not in source
@@ -836,11 +822,6 @@ def test_signature_is_absolute_like_param_count_batch10():
     assert len(sig.parameters) == 1
 
 
-def test_signature_is_absolute_like_param_name_batch10():
-    sig = inspect.signature(_is_absolute_like)
-    assert "path_str" in sig.parameters
-
-
 def test_signature_is_absolute_like_param_kind_batch10():
     sig = inspect.signature(_is_absolute_like)
     p = list(sig.parameters.values())[0]
@@ -855,11 +836,6 @@ def test_signature_is_absolute_like_return_annotation_batch10():
 def test_signature_has_backslash_param_count_batch10():
     sig = inspect.signature(_has_backslash)
     assert len(sig.parameters) == 1
-
-
-def test_signature_has_backslash_param_name_batch10():
-    sig = inspect.signature(_has_backslash)
-    assert "path_str" in sig.parameters
 
 
 def test_signature_has_backslash_return_annotation_batch10():
@@ -920,11 +896,6 @@ def test_signature_load_manifest_return_annotation_batch10():
 def test_signature_detect_project_root_param_count_batch10():
     sig = inspect.signature(_detect_project_root)
     assert len(sig.parameters) == 1
-
-
-def test_signature_detect_project_root_param_name_batch10():
-    sig = inspect.signature(_detect_project_root)
-    assert "start" in sig.parameters
 
 
 def test_signature_detect_project_root_param_annotation_batch10():

@@ -365,12 +365,6 @@ def test_split_piece_field_types():
     assert sp_fields["end"].type == "int"
 
 
-def test_split_piece_default_start_end_zero():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.start == 0
-    assert p.end == 0
-
-
 def test_split_piece_construction_full():
     p = _SplitPiece(text="x", boundary_after="whitespace", start=5, end=10)
     assert p.text == "x"
@@ -781,11 +775,6 @@ def test_structural_chunker_init_below_32_raises():
 def test_structural_chunker_init_zero_raises():
     with pytest.raises(ValueError):
         StructuralChunker(max_chars=0)
-
-
-def test_structural_chunker_init_negative_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=-100)
 
 
 def test_structural_chunker_chunk_method_present():

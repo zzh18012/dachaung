@@ -68,11 +68,6 @@ def test_eval_schema_error_errors_none_batch9():
     assert e.errors == []
 
 
-def test_eval_schema_error_can_be_raised_and_caught_batch9():
-    with pytest.raises(EvalSchemaError):
-        raise EvalSchemaError("test")
-
-
 def test_eval_schema_error_repr_batch9():
     e = EvalSchemaError("msg")
     assert "EvalSchemaError" in repr(e)
@@ -452,12 +447,6 @@ def test_schema_path_does_not_read_file_batch9():
     assert isinstance(p, Path)
 
 
-def test_schema_path_error_message_contains_path_str_batch9():
-    with pytest.raises(FileNotFoundError) as exc_info:
-        _schema_path("nonexistent.schema.json")
-    assert "nonexistent.schema.json" in str(exc_info.value)
-
-
 # ---------- SCHEMAS_DIR 常量深度第九批 ----------
 
 
@@ -594,21 +583,6 @@ def test_module_source_imports_json_batch9():
     assert "import json" in source
 
 
-def test_module_source_imports_path_batch9():
-    source = inspect.getsource(smod)
-    assert "from pathlib import Path" in source
-
-
-def test_module_source_imports_typing_any_batch9():
-    source = inspect.getsource(smod)
-    assert "from typing import Any" in source
-
-
-def test_module_source_imports_js_validation_error_batch9():
-    source = inspect.getsource(smod)
-    assert "from jsonschema.exceptions import ValidationError as JSValidationError" in source
-
-
 def test_module_source_has_schemas_dir_constant_batch9():
     source = inspect.getsource(smod)
     assert "SCHEMAS_DIR = Path(__file__)" in source
@@ -659,18 +633,9 @@ def test_module_source_uses_iter_errors_batch9():
     assert "iter_errors(" in source
 
 
-def test_module_source_no_main_block_batch9():
-    source = inspect.getsource(smod)
-    assert "if __name__" not in source
-
-
 def test_module_source_docstring_present_batch9():
     assert smod.__doc__ is not None
     assert len(smod.__doc__) > 30
-
-
-def test_module_source_docstring_mentions_schema_batch9():
-    assert "Schema" in smod.__doc__ or "schema" in smod.__doc__.lower()
 
 
 def test_module_source_no_hardcoded_paths_in_doc_batch9():
@@ -691,11 +656,6 @@ def test_signature_schema_path_param_annotation_batch9():
     sig = inspect.signature(_schema_path)
     p = list(sig.parameters.values())[0]
     assert p.annotation == "str"
-
-
-def test_signature_schema_path_return_annotation_batch9():
-    sig = inspect.signature(_schema_path)
-    assert sig.return_annotation == "Path"
 
 
 def test_signature_load_schema_param_count_batch9():
@@ -777,11 +737,6 @@ def test_signature_validate_file_no_defaults_batch9():
         assert p.default is inspect.Parameter.empty
 
 
-def test_signature_validate_file_return_annotation_batch9():
-    sig = inspect.signature(validate_file)
-    assert sig.return_annotation == "None"
-
-
 def test_signature_eval_schema_error_init_params_batch9():
     sig = inspect.signature(EvalSchemaError.__init__)
     # self + message + errors = 3 params
@@ -831,10 +786,6 @@ def test_module_all_attribute_value_batch9():
 
 def test_module_all_is_list_batch9():
     assert isinstance(smod.__all__, list)
-
-
-def test_module_all_entries_unique_batch9():
-    assert len(smod.__all__) == len(set(smod.__all__))
 
 
 def test_module_has_dunder_file_batch9():

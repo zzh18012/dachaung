@@ -832,10 +832,6 @@ def test_module_source_docstring_mentions_not_instrumented():
     assert "not_instrumented" in rmod.__doc__ or "not instrumented" in rmod.__doc__.lower()
 
 
-def test_module_source_docstring_mentions_pipeline():
-    assert "pipeline" in rmod.__doc__.lower()
-
-
 def test_module_source_report_version_in_final_report():
     """report_version 字段必须出现在最终 report dict 中。"""
     source = inspect.getsource(rmod)
@@ -916,12 +912,6 @@ def test_signature_load_annotation_param_count():
 def test_signature_load_annotation_param_name_path():
     sig = inspect.signature(_load_annotation)
     assert "path" in sig.parameters
-
-
-def test_signature_load_annotation_param_kind():
-    sig = inspect.signature(_load_annotation)
-    p = list(sig.parameters.values())[0]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_signature_load_annotation_param_annotation():

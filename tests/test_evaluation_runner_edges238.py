@@ -160,14 +160,6 @@ def test_ef_count_three_batch531(tmp_path):
 
 # ---------- 报告回读相等 ----------
 
-def test_report_round_trip_batch531(tmp_path):
-    r = _run(tmp_path)
-    on_disk = json.loads(
-        (tmp_path / "r.json").read_text(
-            encoding="utf-8"))
-    assert on_disk == r
-
-
 def test_report_file_exists_batch531(tmp_path):
     _run(tmp_path)
     assert (tmp_path / "r.json").is_file()

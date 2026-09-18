@@ -640,20 +640,9 @@ def test_module_source_forbidden_tokens_batch23(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch23():
     src = inspect.getsource(climod)
     assert "import socket" not in src
-
-
-def test_module_source_no_requests_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import requests" not in src
 
 
 def test_module_source_no_urllib_import_batch23():
@@ -664,11 +653,6 @@ def test_module_source_no_urllib_import_batch23():
 def test_module_source_no_threading_import_batch23():
     src = inspect.getsource(climod)
     assert "import threading" not in src
-
-
-def test_module_source_no_multiprocessing_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import multiprocessing" not in src
 
 
 def test_module_source_no_asyncio_import_batch23():
@@ -684,36 +668,6 @@ def test_module_source_no_shutil_import_batch23():
 def test_module_source_no_tempfile_import_batch23():
     src = inspect.getsource(climod)
     assert "import tempfile" not in src
-
-
-def test_module_source_no_logging_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import logging" not in src
-
-
-def test_module_source_no_re_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import re" not in src
-
-
-def test_module_source_no_datetime_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import datetime" not in src
-
-
-def test_module_source_no_collections_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import collections" not in src
-
-
-def test_module_source_no_pandas_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import pandas" not in src
-
-
-def test_module_source_no_numpy_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import numpy" not in src
 
 
 # ---------- module source 字符串精确补强第三十五批 ----------
@@ -764,11 +718,6 @@ def test_module_source_has_schema_import_batch23():
     assert "from evaluation.schema import EvalSchemaError, validate_file" in src
 
 
-def test_module_source_has_build_parser_function_batch23():
-    src = inspect.getsource(climod)
-    assert "def _build_parser()" in src
-
-
 # ---------- signatures 第三十五批 ----------
 
 
@@ -776,12 +725,6 @@ def test_signature_build_parser_no_args_batch23():
     sig = inspect.signature(_build_parser)
     params = list(sig.parameters.values())
     assert len(params) == 0
-
-
-def test_signature_main_argv_default_none_batch23():
-    sig = inspect.signature(main)
-    p = sig.parameters["argv"]
-    assert p.default is None
 
 
 def test_signature_main_returns_int_annotation_batch23():

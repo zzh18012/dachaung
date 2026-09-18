@@ -292,11 +292,6 @@ def test_main_no_args_raises_systemexit_batch30():
 # ---------- module source forbidden tokens 第四十八批 ----------
 
 
-def test_module_source_no_subprocess_batch30():
-    src = inspect.getsource(climod)
-    assert "subprocess" not in src
-
-
 def test_module_source_no_os_system_batch30():
     src = inspect.getsource(climod)
     assert "os.system" not in src
@@ -337,11 +332,6 @@ def test_module_source_no_shutil_batch30():
     assert "shutil" not in src
 
 
-def test_module_source_no_unlink_batch30():
-    src = inspect.getsource(climod)
-    assert ".unlink()" not in src
-
-
 def test_module_source_no_open_w_mode_batch30():
     src = inspect.getsource(climod)
     assert "'w'" not in src
@@ -349,11 +339,6 @@ def test_module_source_no_open_w_mode_batch30():
 
 
 # ---------- module source 字符串精确补强第四十四批 ----------
-
-
-def test_module_source_contains_module_docstring_batch30():
-    src = inspect.getsource(climod)
-    assert "评测 CLI" in src
 
 
 def test_module_source_contains_subcommands_doc_batch30():
@@ -370,11 +355,6 @@ def test_module_source_contains_main_func_batch30():
 def test_module_source_contains_argv_default_none_batch30():
     src = inspect.getsource(climod)
     assert "argv: list[str] | None = None" in src
-
-
-def test_module_source_contains_build_parser_batch30():
-    src = inspect.getsource(climod)
-    assert "def _build_parser()" in src
 
 
 def test_module_source_contains_format_metric_batch30():
@@ -492,11 +472,6 @@ def test_module_imports_pathlib_batch30():
 def test_module_main_block_uses_systemexit_batch30():
     src = inspect.getsource(climod)
     assert "raise SystemExit(main())" in src
-
-
-def test_module_no_class_definitions_batch30():
-    src = inspect.getsource(climod)
-    assert "\nclass " not in src
 
 
 # ---------- 端到端集成第四十四批 ----------

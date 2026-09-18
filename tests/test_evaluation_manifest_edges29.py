@@ -51,10 +51,6 @@ def test_is_absolute_like_with_drive_letter_a_lowercase():
     assert _is_absolute_like("a:/x") is True
 
 
-def test_is_absolute_like_with_just_a_colon():
-    assert _is_absolute_like("a:") is False
-
-
 def test_is_absolute_like_with_just_a_slash():
     assert _is_absolute_like("a/") is False
 
@@ -652,11 +648,6 @@ def test_module_source_no_yield():
 def test_module_source_resolve_relative_path_uses_relative_to():
     src = inspect.getsource(_resolve_relative_path)
     assert "relative_to" in src
-
-
-def test_module_source_load_manifest_uses_validate_call():
-    src = inspect.getsource(load_manifest)
-    assert 'validate(data, "manifest.schema.json")' in src
 
 
 def test_module_source_load_manifest_uses_manifest_version_compare():

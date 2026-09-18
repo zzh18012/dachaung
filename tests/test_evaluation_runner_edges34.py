@@ -119,11 +119,6 @@ def test_process_one_source_docstring_mentions_image_output_dir():
     assert "image_output_dir" in src
 
 
-def test_process_one_source_parent_mkdir():
-    src = inspect.getsource(_process_one)
-    assert "out_stub.parent.mkdir(parents=True, exist_ok=True)" in src
-
-
 def test_process_one_source_calls_process_single():
     src = inspect.getsource(_process_one)
     assert "document, errors = process_single(" in src
@@ -184,11 +179,6 @@ def test_process_one_source_return_5_tuple_success():
         "return document.to_dict(), None, elapsed, document.parser_version, image_dir"
         in src
     )
-
-
-def test_process_one_source_no_yield():
-    src = inspect.getsource(_process_one)
-    assert "yield" not in src
 
 
 def test_process_one_source_no_walrus():
@@ -319,11 +309,6 @@ def test_run_evaluation_source_missing_markers_extract():
     assert 'missing_markers_record["value"]' in src
 
 
-def test_run_evaluation_source_expected_failure_results_list_init():
-    src = inspect.getsource(run_evaluation)
-    assert "expected_failure_results: list[dict[str, Any]] = []" in src
-
-
 def test_run_evaluation_source_for_ef_in_manifest_expected_failures():
     src = inspect.getsource(run_evaluation)
     assert "for ef in manifest.expected_failures:" in src
@@ -384,16 +369,6 @@ def test_run_evaluation_source_public_per_doc_keys():
     assert '"wall_time_seconds": r["wall_time_seconds"]' in src
 
 
-def test_run_evaluation_source_report_dict_keys():
-    src = inspect.getsource(run_evaluation)
-    assert '"report_version": REPORT_VERSION' in src
-    assert '"provenance": provenance' in src
-    assert '"devset": devset' in src
-    assert '"summary": summary' in src
-    assert '"per_doc": public_per_doc' in src
-    assert '"expected_failures": expected_failure_results' in src
-
-
 def test_run_evaluation_source_writes_file():
     src = inspect.getsource(run_evaluation)
     assert 'with out_p.open("w", encoding="utf-8") as f:' in src
@@ -403,11 +378,6 @@ def test_run_evaluation_source_writes_file():
 def test_run_evaluation_source_returns_report():
     src = inspect.getsource(run_evaluation)
     assert "return report" in src
-
-
-def test_run_evaluation_source_no_yield():
-    src = inspect.getsource(run_evaluation)
-    assert "yield" not in src
 
 
 def test_run_evaluation_source_no_walrus():
@@ -593,10 +563,6 @@ def test_module_source_docstring_mentions_parse_chunk():
 
 def test_module_source_docstring_mentions_not_instrumented():
     assert "not_instrumented" in rmod.__doc__
-
-
-def test_module_source_docstring_mentions_pipeline():
-    assert "pipeline" in rmod.__doc__.lower()
 
 
 def test_module_source_has_future_annotations():

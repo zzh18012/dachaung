@@ -54,12 +54,6 @@ def test_load_annotation_oserror_batch45(tmp_path):
         assert _load_annotation(p) is None
 
 
-def test_load_annotation_empty_file_batch45(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_empty_object_batch45(tmp_path):
     p = tmp_path / "a.json"
     p.write_text("{}", encoding="utf-8")
@@ -537,11 +531,6 @@ def test_module_source_contains_process_single_import_batch45():
 def test_module_source_contains_metrics_import_batch45():
     src = inspect.getsource(runner_mod)
     assert "from evaluation.metrics import compute_automatic_metrics" in src
-
-
-def test_module_source_contains_per_doc_subdir_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "_per_doc" in src
 
 
 def test_module_source_contains_perf_counter_batch45():

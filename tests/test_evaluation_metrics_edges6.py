@@ -75,15 +75,6 @@ def test_not_evaluated_constant_value():
     assert _NOT_EVALUATED == "not_evaluated"
 
 
-def test_constants_are_tuples():
-    assert isinstance(_TEXT_TYPES, tuple)
-    assert isinstance(_PDF_BBOX_REQUIRED_TYPES, tuple)
-
-
-def test_text_types_no_duplicates():
-    assert len(_TEXT_TYPES) == len(set(_TEXT_TYPES))
-
-
 # =========================================================================
 # _null / _ratio / _bool_metric / _int_metric 返回结构
 # =========================================================================
@@ -274,17 +265,9 @@ def test_is_valid_bbox_valid_int_four():
     assert _is_valid_bbox([1, 2, 3, 4]) is True
 
 
-def test_is_valid_bbox_valid_mixed_int_float():
-    assert _is_valid_bbox([1, 2.5, 3, 4.5]) is True
-
-
 def test_is_valid_bbox_bool_rejected():
     """True/False 是 int 子类，但应被拒绝。"""
     assert _is_valid_bbox([True, 2, 3, 4]) is False
-
-
-def test_is_valid_bbox_inf_rejected():
-    assert _is_valid_bbox([float("inf"), 2, 3, 4]) is False
 
 
 def test_is_valid_bbox_tuple_rejected():
@@ -916,18 +899,6 @@ def test_compute_automatic_metrics_image_base_dir_default_none():
 def test_compute_automatic_metrics_return_annotation_dict():
     sig = inspect.signature(compute_automatic_metrics)
     assert "dict" in str(sig.return_annotation).lower()
-
-
-def test_null_signature_one_param():
-    sig = inspect.signature(_null)
-    assert len(sig.parameters) == 1
-    assert "reason" in sig.parameters
-
-
-def test_ratio_signature_one_param():
-    sig = inspect.signature(_ratio)
-    assert len(sig.parameters) == 1
-    assert "value" in sig.parameters
 
 
 def test_bool_metric_signature_one_param():

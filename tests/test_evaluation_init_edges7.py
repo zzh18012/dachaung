@@ -50,14 +50,6 @@ def test_four_versions_not_same_object_batch48():
     assert EVALUATOR_VERSION == REPORT_VERSION
 
 
-def test_evaluator_annotation_different_batch48():
-    assert EVALUATOR_VERSION != ANNOTATION_VERSION
-
-
-def test_annotation_manifest_same_value_batch48():
-    assert ANNOTATION_VERSION == MANIFEST_VERSION
-
-
 def test_evaluator_version_str_methods_batch48():
     assert EVALUATOR_VERSION.upper() == "1.1"
     assert EVALUATOR_VERSION.lower() == "1.1"
@@ -146,10 +138,6 @@ def test_module_dict_len_at_least_5_batch48():
 
 def test_module_file_endswith_init_py_batch48():
     assert evaluation.__file__.endswith("__init__.py")
-
-
-def test_module_file_exists_batch48():
-    assert Path(evaluation.__file__).is_file()
 
 
 def test_module_file_in_evaluation_dir_batch48():
@@ -331,26 +319,6 @@ def test_docstring_first_line_batch48():
 
 # ---------- module source 补强 ----------
 
-def test_source_contains_EVALUATOR_VERSION_literal_batch48():
-    src = inspect.getsource(evaluation)
-    assert 'EVALUATOR_VERSION = "1.1"' in src
-
-
-def test_source_contains_REPORT_VERSION_literal_batch48():
-    src = inspect.getsource(evaluation)
-    assert 'REPORT_VERSION = "1.1"' in src
-
-
-def test_source_contains_ANNOTATION_VERSION_literal_batch48():
-    src = inspect.getsource(evaluation)
-    assert 'ANNOTATION_VERSION = "1.0"' in src
-
-
-def test_source_contains_MANIFEST_VERSION_literal_batch48():
-    src = inspect.getsource(evaluation)
-    assert 'MANIFEST_VERSION = "1.0"' in src
-
-
 def test_source_contains_no_def_batch48():
     src = inspect.getsource(evaluation)
     assert "\ndef " not in src
@@ -449,46 +417,6 @@ def test_ast_no_import_batch48():
 
 
 # ---------- forbidden tokens 第一百一十三批 ----------
-
-def test_source_no_eval_batch48():
-    src = inspect.getsource(evaluation)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch48():
-    src = inspect.getsource(evaluation)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch48():
-    src = inspect.getsource(evaluation)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch48():
-    src = inspect.getsource(evaluation)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch48():
-    src = inspect.getsource(evaluation)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch48():
-    src = inspect.getsource(evaluation)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch48():
-    src = inspect.getsource(evaluation)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch48():
-    src = inspect.getsource(evaluation)
-    assert "pickle.load(" not in src
-
 
 # ---------- 综合 ----------
 

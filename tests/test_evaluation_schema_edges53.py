@@ -187,11 +187,6 @@ def test_load_schema_missing_raises_filenotfound_batch33():
         load_schema("missing.schema.json")
 
 
-def test_load_schema_manifest_has_schema_field_batch33():
-    s = load_schema("manifest.schema.json")
-    assert "$schema" in s
-
-
 # ---------- validate 第三十三批
 
 
@@ -545,11 +540,6 @@ def test_signature_eval_schema_error_init_return_none_batch33():
     assert sig.return_annotation == "None"
 
 
-def test_signature_eval_schema_error_message_required_batch33():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    assert sig.parameters["message"].default is inspect.Parameter.empty
-
-
 def test_signature_eval_schema_error_errors_optional_batch33():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert sig.parameters["errors"].default is None
@@ -558,11 +548,6 @@ def test_signature_eval_schema_error_errors_optional_batch33():
 def test_signature_schema_path_one_param_batch33():
     sig = inspect.signature(_schema_path)
     assert list(sig.parameters.keys()) == ["name"]
-
-
-def test_signature_schema_path_return_path_batch33():
-    sig = inspect.signature(_schema_path)
-    assert sig.return_annotation == "Path"
 
 
 def test_signature_load_schema_one_param_batch33():
@@ -601,23 +586,6 @@ def test_module_imports_typing_batch33():
 def test_module_imports_jsonschema_batch33():
     src = inspect.getsource(smod)
     assert "from jsonschema import Draft202012Validator" in src
-
-
-def test_module_imports_jsonschema_exceptions_batch33():
-    src = inspect.getsource(smod)
-    assert "from jsonschema.exceptions import ValidationError" in src
-
-
-def test_module_has_load_schema_func_batch33():
-    assert callable(smod.load_schema)
-
-
-def test_module_has_validate_func_batch33():
-    assert callable(smod.validate)
-
-
-def test_module_has_validate_file_func_batch33():
-    assert callable(smod.validate_file)
 
 
 def test_module_all_contains_5_entries_batch33():

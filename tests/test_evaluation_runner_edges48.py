@@ -556,12 +556,6 @@ def test_module_source_forbidden_tokens_batch20(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch20():
-    src = inspect.getsource(rmod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch20():
     src = inspect.getsource(rmod)
     assert "import socket" not in src
@@ -615,16 +609,6 @@ def test_module_source_no_logging_import_batch20():
 def test_module_source_no_re_import_batch20():
     src = inspect.getsource(rmod)
     assert "import re" not in src
-
-
-def test_module_source_no_datetime_import_batch20():
-    src = inspect.getsource(rmod)
-    assert "import datetime" not in src
-
-
-def test_module_source_no_collections_import_batch20():
-    src = inspect.getsource(rmod)
-    assert "import collections" not in src
 
 
 def test_module_source_no_pandas_import_batch20():
@@ -705,11 +689,6 @@ def test_module_source_has_aggregate_summary_in_import_batch20():
     assert "aggregate_summary" in src
 
 
-def test_module_source_has_build_devset_section_in_import_batch20():
-    src = inspect.getsource(rmod)
-    assert "build_devset_section" in src
-
-
 def test_module_source_has_build_provenance_in_import_batch20():
     src = inspect.getsource(rmod)
     assert "build_provenance" in src
@@ -777,12 +756,6 @@ def test_module_does_not_import_evaluation_schema_batch20():
     assert "from evaluation import schema" not in src
 
 
-def test_module_does_not_import_evaluation_manifest_batch20():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.manifest" not in src
-    assert "from evaluation import manifest" not in src
-
-
 def test_module_does_not_import_app_chunkers_batch20():
     src = inspect.getsource(rmod)
     assert "from app.chunkers" not in src
@@ -793,11 +766,6 @@ def test_module_does_not_import_app_parsers_batch20():
     src = inspect.getsource(rmod)
     assert "from app.parsers" not in src
     assert "from app import parsers" not in src
-
-
-def test_module_constants_not_in_all_batch20():
-    for k in ("_load_annotation", "_process_one"):
-        assert k not in rmod.__all__
 
 
 def test_module_no_main_block_batch20():
@@ -832,21 +800,6 @@ def test_e2e_run_evaluation_creates_valid_json_batch20(tmp_path):
     parsed = json.loads(out.read_text(encoding="utf-8"))
     assert isinstance(parsed, dict)
     assert "per_doc" in parsed
-
-
-def test_e2e_run_evaluation_returns_same_as_file_batch20(tmp_path):
-    m = _make_manifest(docs=[])
-    out = tmp_path / "out.json"
-    report = run_evaluation(m, out)
-    parsed = json.loads(out.read_text(encoding="utf-8"))
-    assert parsed == report
-
-
-def test_e2e_run_evaluation_no_docs_summary_struct_batch20(tmp_path):
-    m = _make_manifest(docs=[])
-    report = run_evaluation(m, tmp_path / "out.json")
-    s = report["summary"]
-    assert set(s.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
 
 
 def test_e2e_run_evaluation_per_doc_count_matches_docs_batch20(tmp_path):
@@ -888,18 +841,3 @@ def test_e2e_run_evaluation_full_report_has_six_top_keys_batch20(tmp_path):
         "per_doc",
         "expected_failures",
     }
-
-
-def test_e2e_run_evaluation_public_per_doc_excludes_underscore_fields_batch20(tmp_path):
-    """public per_doc 不含 _ 前缀字段。"""
-    doc = _make_doc()
-    with patch("evaluation.runner.process_single", return_value=(None, [])):
-        with patch("evaluation.runner.image_output_dir_for", return_value=tmp_path):
-            with patch("evaluation.runner.compute_automatic_metrics", return_value={}):
-                with patch("evaluation.runner.figure_caption_prf", return_value={}):
-                    with patch("evaluation.runner.chunk_boundary_prf", return_value={}):
-                        m = _make_manifest(docs=[doc])
-                        report = run_evaluation(m, tmp_path / "out.json")
-    pd = report["per_doc"][0]
-    for k in pd.keys():
-        assert not k.startswith("_")

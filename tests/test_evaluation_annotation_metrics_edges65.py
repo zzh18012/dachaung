@@ -69,15 +69,6 @@ def test_figure_caption_prf_returns_dict_with_3_keys_batch39():
     assert len(out) == 3
 
 
-def test_figure_caption_prf_keys_exact_batch39():
-    out = figure_caption_prf({"x": 1}, {"y": 2})
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_prf_each_value_has_value_field_batch39():
     out = figure_caption_prf({"x": 1}, {"y": 2})
     for v in out.values():
@@ -493,12 +484,6 @@ def test_module_source_contains_parser_const_export_batch39():
 def test_signature_chunk_boundary_prf_tolerance_default_30_batch39():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_signature_chunk_boundary_prf_tolerance_kind_batch39():
-    sig = inspect.signature(chunk_boundary_prf)
-    p = sig.parameters["tolerance_chars"]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
 def test_signature_chunk_boundary_prf_return_dict_batch39():

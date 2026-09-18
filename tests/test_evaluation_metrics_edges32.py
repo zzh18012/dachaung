@@ -255,11 +255,6 @@ def test_is_valid_bbox_source_uses_isinstance_int_float():
     assert "isinstance(v, (int, float))" in src
 
 
-def test_is_valid_bbox_source_uses_math_isfinite():
-    src = inspect.getsource(_is_valid_bbox)
-    assert "math.isfinite(v)" in src
-
-
 # ---------- _image_resource_ratio source level 字符串精确补强第二批 ----------
 
 
@@ -792,11 +787,6 @@ def test_module_source_no_exec():
     assert "exec(" not in src
 
 
-def test_module_source_no_compile():
-    src = inspect.getsource(mmod)
-    assert "compile(" not in src
-
-
 def test_module_source_no_unlink():
     src = inspect.getsource(mmod)
     assert ".unlink(" not in src
@@ -1162,20 +1152,8 @@ def test_e2e_is_valid_bbox_valid():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
 
 
-def test_e2e_is_valid_bbox_with_negative():
-    assert _is_valid_bbox([-10, -10, 100, 100]) is True
-
-
-def test_e2e_is_valid_bbox_with_floats():
-    assert _is_valid_bbox([0.0, 0.0, 1.5, 2.5]) is True
-
-
 def test_e2e_is_valid_bbox_invalid_len():
     assert _is_valid_bbox([0, 0, 100]) is False  # len=3
-
-
-def test_e2e_is_valid_bbox_invalid_type_tuple():
-    assert _is_valid_bbox((0, 0, 100, 100)) is False
 
 
 def test_e2e_is_valid_bbox_with_bool():
@@ -1210,12 +1188,6 @@ def test_e2e_pdf_locator_with_negative_page():
 def test_e2e_docx_locator_no_elements():
     out = _docx_locator_ratio([])
     assert out["reason"] == "no_elements"
-
-
-def test_e2e_docx_locator_with_page_in_loc():
-    elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
 
 
 def test_e2e_chunk_reference_no_chunks():

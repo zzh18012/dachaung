@@ -45,12 +45,6 @@ def test_build_parser_formatter_class_batch11():
     assert p.formatter_class is argparse.RawDescriptionHelpFormatter
 
 
-def test_build_parser_has_subparsers_action_batch11():
-    p = _build_parser()
-    sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
-    assert len(sub_actions) == 1
-
-
 def test_build_parser_subparsers_dest_command_batch11():
     p = _build_parser()
     sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
@@ -381,15 +375,6 @@ def test_run_inspect_doc_prints_file_path_batch11(tmp_path, capsys):
     assert "file:" in out
 
 
-def test_run_inspect_doc_prints_metrics_header_batch11(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "metrics:" in out
-
-
 def test_run_inspect_doc_prints_counts_line_batch11(tmp_path, capsys):
     p = tmp_path / "d.json"
     p.write_text('{"elements": [{"type": "paragraph"}], "chunks": []}', encoding="utf-8")
@@ -587,11 +572,6 @@ def test_cli_source_no_forbidden_token_fourteenth_batch11(token):
     assert token not in source
 
 
-def test_cli_source_no_remove_batch11():
-    source = inspect.getsource(climod)
-    assert ".remove(" not in source
-
-
 def test_cli_source_no_kill_batch11():
     source = inspect.getsource(climod)
     assert ".kill(" not in source
@@ -650,29 +630,9 @@ def test_cli_source_no_logging_module_batch11():
 # ---------- module source 字符串精确补强第九批 ----------
 
 
-def test_module_source_has_future_annotations_batch11():
-    source = inspect.getsource(climod)
-    assert "from __future__ import annotations" in source
-
-
 def test_module_source_imports_argparse_batch11():
     source = inspect.getsource(climod)
     assert "import argparse" in source
-
-
-def test_module_source_imports_json_batch11():
-    source = inspect.getsource(climod)
-    assert "import json" in source
-
-
-def test_module_source_imports_sys_batch11():
-    source = inspect.getsource(climod)
-    assert "import sys" in source
-
-
-def test_module_source_imports_path_batch11():
-    source = inspect.getsource(climod)
-    assert "from pathlib import Path" in source
 
 
 def test_module_source_imports_manifest_load_batch11():
@@ -684,11 +644,6 @@ def test_module_source_imports_manifest_load_batch11():
 def test_module_source_imports_get_git_provenance_batch11():
     source = inspect.getsource(climod)
     assert "get_git_provenance" in source
-
-
-def test_module_source_imports_run_evaluation_batch11():
-    source = inspect.getsource(climod)
-    assert "run_evaluation" in source
 
 
 def test_module_source_imports_validate_file_batch11():

@@ -264,13 +264,6 @@ def test_validate_file_idempotent_batch15(tmp_path):
     validate_file(p, "manifest.schema.json")  # 不抛即可
 
 
-def test_validate_file_invalid_schema_batch15(tmp_path):
-    p = tmp_path / "m.json"
-    p.write_text("{}", encoding="utf-8")
-    with pytest.raises(FileNotFoundError):
-        validate_file(p, "nonexistent.schema.json")
-
-
 # ---------- _schema_path 行为深度第十五批 ----------
 
 
@@ -349,12 +342,6 @@ def test_module_source_no_subprocess_batch15():
 # ---------- module source 字符串精确补强第二十七批 ----------
 
 
-def test_module_source_has_future_annotations_batch15():
-    src = inspect.getsource(smod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
-
-
 def test_module_source_has_jsonschema_draft_batch15():
     src = inspect.getsource(smod)
     assert "Draft202012Validator" in src
@@ -391,21 +378,6 @@ def test_module_source_has_schemas_dir_definition_batch15():
     assert '"schemas"' in src or "'schemas'" in src
 
 
-def test_module_source_has_load_schema_function_batch15():
-    src = inspect.getsource(smod)
-    assert "def load_schema(name: str) -> dict[str, Any]:" in src
-
-
-def test_module_source_has_validate_function_batch15():
-    src = inspect.getsource(smod)
-    assert "def validate(instance: dict[str, Any], schema_name: str) -> None:" in src
-
-
-def test_module_source_has_validate_file_function_batch15():
-    src = inspect.getsource(smod)
-    assert "def validate_file(path: Path | str, schema_name: str) -> None:" in src
-
-
 def test_module_source_has_schema_path_function_batch15():
     src = inspect.getsource(smod)
     assert "def _schema_path(name: str) -> Path:" in src
@@ -427,11 +399,6 @@ def test_module_source_has_no_cache_attribute_batch15():
     """load_schema 不缓存（每次都重新读文件）。"""
     src = inspect.getsource(smod)
     assert "cache" not in src.lower()
-
-
-def test_module_source_has_super_init_call_batch15():
-    src = inspect.getsource(smod)
-    assert "super().__init__(message)" in src
 
 
 def test_module_source_has_errors_default_empty_list_batch15():

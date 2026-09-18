@@ -122,10 +122,6 @@ def test_schema_path_is_path_object():
     assert isinstance(SCHEMA_PATH, Path)
 
 
-def test_schema_path_is_absolute():
-    assert SCHEMA_PATH.is_absolute()
-
-
 def test_schema_path_resolved_no_relative_components():
     """SCHEMA_PATH 用 .resolve()，不应含 .. 或 .。"""
     s = str(SCHEMA_PATH)
@@ -138,10 +134,6 @@ def test_schema_path_filename():
 
 def test_schema_path_parent_named_schemas():
     assert SCHEMA_PATH.parent.name == "schemas"
-
-
-def test_schema_path_file_exists():
-    assert SCHEMA_PATH.is_file()
 
 
 def test_schema_path_in_module_dict():

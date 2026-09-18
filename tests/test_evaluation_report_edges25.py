@@ -1073,10 +1073,6 @@ def test_module_has_report_version_import():
     assert hasattr(rmod, "REPORT_VERSION")
 
 
-def test_module_evaluator_version_value():
-    assert rmod.EVALUATOR_VERSION == EVALUATOR_VERSION
-
-
 def test_module_report_version_value():
     assert rmod.REPORT_VERSION == REPORT_VERSION
 

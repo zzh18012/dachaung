@@ -406,24 +406,12 @@ def test_module_imports_pathlib_batch32():
     assert "from pathlib import Path" in src
 
 
-def test_module_has_build_provenance_func_batch32():
-    assert callable(rmod.build_provenance)
-
-
 def test_module_has_aggregate_summary_func_batch32():
     assert callable(rmod.aggregate_summary)
 
 
 def test_module_has_get_git_provenance_func_batch32():
     assert callable(rmod.get_git_provenance)
-
-
-def test_module_has_get_dependency_versions_func_batch32():
-    assert callable(rmod.get_dependency_versions)
-
-
-def test_module_has_build_devset_section_func_batch32():
-    assert callable(rmod.build_devset_section)
 
 
 # ---------- 端到端集成第四十九批

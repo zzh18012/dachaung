@@ -45,10 +45,6 @@ def test_schemas_dir_is_path_batch43():
     assert isinstance(SCHEMAS_DIR, Path)
 
 
-def test_schemas_dir_exists_batch43():
-    assert SCHEMAS_DIR.exists()
-
-
 def test_schemas_dir_is_dir_batch43():
     assert SCHEMAS_DIR.is_dir()
 
@@ -77,12 +73,6 @@ def test_schemas_dir_resolved_batch43():
 
 
 # ---------- _schema_path 签名 ----------
-
-def test_schema_path_signature_batch43():
-    sig = inspect.signature(_schema_path)
-    params = list(sig.parameters.keys())
-    assert params == ["name"]
-
 
 def test_schema_path_no_default_batch43():
     sig = inspect.signature(_schema_path)
@@ -115,12 +105,6 @@ def test_schema_path_error_contains_path_batch43():
 
 
 # ---------- load_schema 签名 ----------
-
-def test_load_schema_signature_batch43():
-    sig = inspect.signature(load_schema)
-    params = list(sig.parameters.keys())
-    assert params == ["name"]
-
 
 def test_load_schema_return_annotation_batch43():
     sig = inspect.signature(load_schema)
@@ -221,11 +205,6 @@ def test_validate_errors_field_has_keys_batch43():
         assert "path" in e0
         assert "message" in e0
         assert "schema_path" in e0
-
-
-def test_validate_uses_draft202012_batch43():
-    src = inspect.getsource(validate)
-    assert "Draft202012Validator" in src
 
 
 def test_validate_sorts_errors_by_path_batch43():

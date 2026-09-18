@@ -430,11 +430,6 @@ def test_module_source_no_tempfile_import_batch21():
     assert "import tempfile" not in src
 
 
-def test_module_source_no_unlink_call_batch21():
-    src = inspect.getsource(rmod)
-    assert ".unlink(" not in src
-
-
 def test_module_source_no_path_write_text_batch21():
     src = inspect.getsource(rmod)
     assert ".write_text(" not in src

@@ -52,12 +52,6 @@ def test_build_parser_subparsers_required_batch17():
         p.parse_args([])
 
 
-def test_build_parser_run_default_parser_batch17():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert args.parser == "fallback"
-
-
 def test_build_parser_run_default_max_chars_batch17():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
@@ -509,12 +503,6 @@ def test_module_source_no_network_batch17():
 # ---------- module source 字符串精确补强第三十批 ----------
 
 
-def test_module_source_has_future_annotations_batch17():
-    src = inspect.getsource(cmod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
-
-
 def test_module_source_has_docstring_batch17():
     src = inspect.getsource(cmod)
     assert "评测 CLI" in src
@@ -580,16 +568,6 @@ def test_module_source_has_run_inspect_doc_function_batch17():
 def test_module_source_has_run_subparser_batch17():
     src = inspect.getsource(cmod)
     assert 'sub.add_parser("run"' in src
-
-
-def test_module_source_has_validate_report_subparser_batch17():
-    src = inspect.getsource(cmod)
-    assert '"validate-report"' in src
-
-
-def test_module_source_has_inspect_doc_subparser_batch17():
-    src = inspect.getsource(cmod)
-    assert '"inspect-doc"' in src
 
 
 def test_module_source_has_system_exit_in_main_batch17():

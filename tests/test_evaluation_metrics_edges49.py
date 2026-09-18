@@ -483,16 +483,8 @@ def test_is_valid_bbox_list_with_none_batch23():
     assert _is_valid_bbox([None, 0, 0, 0]) is False
 
 
-def test_is_valid_bbox_list_with_str_batch23():
-    assert _is_valid_bbox(["0", 0, 0, 0]) is False
-
-
 def test_is_valid_bbox_empty_list_batch23():
     assert _is_valid_bbox([]) is False
-
-
-def test_is_valid_bbox_too_many_items_batch23():
-    assert _is_valid_bbox([0, 0, 0, 0, 0]) is False
 
 
 def test_is_valid_bbox_returns_bool_batch23():
@@ -922,11 +914,6 @@ def test_module_source_no_tempfile_import_batch23():
     assert "import tempfile" not in src
 
 
-def test_module_source_no_sys_import_batch23():
-    src = inspect.getsource(mmod)
-    assert "import sys" not in src
-
-
 def test_module_source_no_logging_import_batch23():
     src = inspect.getsource(mmod)
     assert "import logging" not in src
@@ -1065,11 +1052,6 @@ def test_module_does_not_import_app_parsers_batch23():
     src = inspect.getsource(mmod)
     assert "from app.parsers" not in src
     assert "from app import parsers" not in src
-
-
-def test_module_does_not_import_evaluation_runner_batch23():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.runner" not in src
 
 
 def test_module_does_not_import_evaluation_cli_batch23():

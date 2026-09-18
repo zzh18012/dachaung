@@ -686,11 +686,6 @@ def test_module_source_no_exec():
     assert "exec(" not in src
 
 
-def test_module_source_no_compile():
-    src = inspect.getsource(smod)
-    assert "compile(" not in src
-
-
 def test_module_source_no_subprocess():
     src = inspect.getsource(smod)
     assert "subprocess" not in src

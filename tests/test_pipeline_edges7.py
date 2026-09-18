@@ -53,36 +53,6 @@ def _write(tmp_path: Path, name: str, content: str | bytes) -> Path:
 # =========================================================================
 
 
-def test_get_parser_fallback_returns_fallback():
-    p = get_parser("fallback")
-    assert isinstance(p, FallbackParser)
-
-
-def test_get_parser_kreuzberg_returns_kreuzberg():
-    p = get_parser("kreuzberg")
-    assert isinstance(p, KreuzbergParser)
-
-
-def test_get_parser_markdown_returns_markdown():
-    p = get_parser("markdown")
-    assert isinstance(p, MarkdownParser)
-
-
-def test_get_parser_html_returns_html():
-    p = get_parser("html")
-    assert isinstance(p, HtmlParser)
-
-
-def test_get_parser_text_returns_text():
-    p = get_parser("text")
-    assert isinstance(p, TextParser)
-
-
-def test_get_parser_ipynb_returns_ipynb():
-    p = get_parser("ipynb")
-    assert isinstance(p, IpynbParser)
-
-
 def test_get_parser_unknown_raises():
     with pytest.raises(ValueError) as exc:
         get_parser("unknown")
@@ -291,11 +261,6 @@ def test_process_single_default_max_chars_800(tmp_path: Path):
     assert sig.parameters["max_chars"].default == 800
 
 
-def test_process_single_default_write_json_true():
-    sig = inspect.signature(process_single)
-    assert sig.parameters["write_json"].default is True
-
-
 def test_process_single_keyword_only_args():
     sig = inspect.signature(process_single)
     for name in ("parser_name", "max_chars", "write_json"):
@@ -355,30 +320,6 @@ def test_module_all_no_duplicates():
     assert len(mod.__all__) == len(set(mod.__all__))
 
 
-def test_module_uses_future_annotations():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_imports_json():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_path():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
 def test_module_imports_structural_chunker():
     import app.pipeline as mod
     src = inspect.getsource(mod)
@@ -411,11 +352,6 @@ def test_module_imports_schema_validate():
     assert "from app.schema import" in src
     assert "SchemaValidationError" in src
     assert "validate" in src
-
-
-def test_module_docstring_present():
-    import app.pipeline as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_invariants():

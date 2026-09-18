@@ -801,11 +801,6 @@ def test_module_source_any_import_top_level_batch11():
     assert "from typing import Any" in head
 
 
-def test_module_source_evaluator_version_used_batch11():
-    source = inspect.getsource(rmod)
-    assert "EVALUATOR_VERSION" in source
-
-
 def test_module_source_report_version_used_batch11():
     source = inspect.getsource(rmod)
     assert "REPORT_VERSION" in source
@@ -890,13 +885,6 @@ def test_build_devset_section_one_param_no_annotation_batch11():
     assert params[0].name == "manifest"
 
 
-def test_aggregate_summary_signature_one_param_batch11():
-    sig = inspect.signature(aggregate_summary)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "per_doc_results"
-
-
 def test_aggregate_summary_return_annotation_batch11():
     sig = inspect.signature(aggregate_summary)
     assert "dict" in str(sig.return_annotation)
@@ -928,14 +916,6 @@ def test_all_public_functions_no_varargs_batch11():
 def test_module_dunder_file_exists_batch11():
     assert hasattr(rmod, "__file__")
     assert rmod.__file__ is not None
-
-
-def test_module_dunder_file_endswith_report_py_batch11():
-    import os
-    sep = os.sep
-    assert rmod.__file__.endswith("evaluation" + sep + "report.py") or rmod.__file__.endswith(
-        "evaluation/report.py"
-    )
 
 
 def test_module_name_is_evaluation_report_batch11():
@@ -980,10 +960,6 @@ def test_module_no_user_classes_batch11():
 def test_module_docstring_present_batch11():
     assert rmod.__doc__ is not None
     assert len(rmod.__doc__) > 30
-
-
-def test_module_evaluator_version_value_batch11():
-    assert rmod.EVALUATOR_VERSION == EVALUATOR_VERSION
 
 
 def test_module_has_report_version_attr_batch11():

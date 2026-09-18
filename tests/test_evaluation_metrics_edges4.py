@@ -104,10 +104,6 @@ def test_pdf_bbox_required_types_is_tuple():
     assert isinstance(_PDF_BBOX_REQUIRED_TYPES, tuple)
 
 
-def test_pdf_bbox_required_types_excludes_table():
-    assert "table" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_pdf_bbox_required_types_excludes_image():
     assert "image" not in _PDF_BBOX_REQUIRED_TYPES
 
@@ -176,10 +172,6 @@ def test_ratio_returns_reason_none():
 
 def test_bool_metric_true():
     assert _bool_metric(True)["value"] is True
-
-
-def test_bool_metric_false():
-    assert _bool_metric(False)["value"] is False
 
 
 def test_bool_metric_int_zero_returns_false():
@@ -263,11 +255,6 @@ def test_strip_unicode_whitespace_nbsp():
     assert _strip_unicode_whitespace("a\xa0b") == "ab"
 
 
-def test_strip_unicode_whitespace_em_space():
-    """U+2003 EM SPACE。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
 def test_strip_unicode_whitespace_line_separator():
     """U+2028 LINE SEPARATOR。"""
     assert _strip_unicode_whitespace("a b") == "ab"
@@ -318,10 +305,6 @@ def test_is_valid_bbox_tuple_rejected():
     assert _is_valid_bbox((1, 2, 3, 4)) is False
 
 
-def test_is_valid_bbox_dict_rejected():
-    assert _is_valid_bbox({"x": 1}) is False
-
-
 def test_is_valid_bbox_string_rejected():
     assert _is_valid_bbox("1234") is False
 
@@ -346,10 +329,6 @@ def test_is_valid_bbox_four_floats_accepted():
     assert _is_valid_bbox([1.5, 2.5, 3.5, 4.5]) is True
 
 
-def test_is_valid_bbox_mixed_int_float_accepted():
-    assert _is_valid_bbox([1, 2.5, 3, 4.5]) is True
-
-
 def test_is_valid_bbox_zero_size_accepted():
     """0,0,0,0 是合法 bbox（虽然无意义）。"""
     assert _is_valid_bbox([0, 0, 0, 0]) is True
@@ -370,10 +349,6 @@ def test_is_valid_bbox_all_bools_rejected():
 
 def test_is_valid_bbox_nan_rejected():
     assert _is_valid_bbox([float("nan"), 2, 3, 4]) is False
-
-
-def test_is_valid_bbox_inf_rejected():
-    assert _is_valid_bbox([float("inf"), 2, 3, 4]) is False
 
 
 def test_is_valid_bbox_negative_inf_rejected():

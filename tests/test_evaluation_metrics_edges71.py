@@ -245,13 +245,6 @@ def test_compute_error_dict_missing_code_raises_keyerror_batch46():
 
 # ---------- _image_resource_ratio 多种 image ----------
 
-def test_image_resource_ratio_no_image_returns_null_batch46():
-    elements = [{"type": "paragraph"}]
-    out = _image_resource_ratio(elements, None)
-    assert out["value"] is None
-    assert out["reason"] == "no_image_elements"
-
-
 def test_image_resource_ratio_image_missing_resource_path_batch46():
     elements = [{"type": "image"}]
     out = _image_resource_ratio(elements, None)
@@ -545,12 +538,6 @@ def test_docx_locator_ratio_run_index_batch46():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_ratio_table_index_batch46():
-    elements = [{"type": "paragraph", "source_locator": {"table_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_row_col_index_batch46():
     elements = [{"type": "paragraph", "source_locator": {"row_index": 0, "col_index": 1}}]
     out = _docx_locator_ratio(elements)
@@ -573,11 +560,6 @@ def test_source_contains_no_modification_note_batch46():
 def test_source_contains_text_preservation_v11_batch46():
     src = inspect.getsource(metrics_mod)
     assert "v1.1" in src
-
-
-def test_source_contains_v1_0_normalize_text_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "v1.0" in src
 
 
 def test_source_contains_no_forgery_note_batch46():
@@ -645,59 +627,14 @@ def test_ast_pdf_locator_ratio_uses_isinstance_batch46():
 
 # ---------- forbidden tokens 第一百零六批 ----------
 
-def test_source_no_eval_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "os.system(" not in src
-
-
 def test_source_no_popen_batch46():
     src = inspect.getsource(metrics_mod)
     assert ".popen(" not in src
 
 
-def test_source_no_yaml_load_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "pickle.load(" not in src
-
-
 def test_source_no_class_batch46():
     src = inspect.getsource(metrics_mod)
     assert "\nclass " not in src
-
-
-def test_source_no_yield_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "yield" not in src
 
 
 def test_source_no_lambda_batch46():

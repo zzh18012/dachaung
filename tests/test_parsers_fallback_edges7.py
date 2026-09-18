@@ -182,10 +182,6 @@ def test_rows_to_markdown_pipe_at_edges():
         assert line.endswith(" |")
 
 
-def test_rows_to_markdown_returns_str():
-    assert isinstance(_rows_to_markdown([["a"]]), str)
-
-
 # =========================================================================
 # _image_filename 格式
 # =========================================================================
@@ -513,11 +509,6 @@ def test_fallback_parser_init_signature():
     params = set(sig.parameters)
     assert "self" in params
     assert "image_output_dir" in params
-
-
-def test_fallback_parser_init_default_none():
-    sig = inspect.signature(FallbackParser.__init__)
-    assert sig.parameters["image_output_dir"].default is None
 
 
 def test_fallback_parser_parse_method_exists():

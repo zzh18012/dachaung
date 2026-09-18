@@ -77,12 +77,6 @@ def test_build_parser_inspect_doc_positional_input_batch14():
     assert positional[0].dest == "input"
 
 
-def test_build_parser_run_default_parser_fallback_batch14():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert args.parser == "fallback"
-
-
 def test_build_parser_run_default_max_chars_800_batch14():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
@@ -424,21 +418,6 @@ def test_module_source_future_annotations_present_batch14():
     source = inspect.getsource(climod)
     head = "\n".join(source.split("\n")[:30])
     assert "from __future__ import annotations" in head
-
-
-def test_module_source_defines_format_metric_batch14():
-    source = inspect.getsource(climod)
-    assert "def _format_metric(" in source
-
-
-def test_module_source_defines_run_inspect_doc_batch14():
-    source = inspect.getsource(climod)
-    assert "def _run_inspect_doc(" in source
-
-
-def test_module_source_has_required_true_batch14():
-    source = inspect.getsource(climod)
-    assert "required=True" in source
 
 
 def test_module_source_has_choices_fallback_kreuzberg_batch14():

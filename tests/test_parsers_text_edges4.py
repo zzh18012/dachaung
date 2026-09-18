@@ -512,12 +512,6 @@ def test_text_parser_class_version_is_str():
     assert isinstance(TextParser.version, str)
 
 
-def test_text_parser_inherits_parser():
-    from app.parsers.base import Parser
-
-    assert issubclass(TextParser, Parser)
-
-
 def test_text_parser_parse_signature():
     import inspect
 

@@ -430,26 +430,6 @@ def test_signature_load_schema_batch28():
     assert sig.return_annotation == "dict[str, Any]"
 
 
-def test_signature_validate_batch28():
-    sig = inspect.signature(validate)
-    assert sig.parameters["instance"].annotation == "dict[str, Any]"
-    assert sig.parameters["schema_name"].annotation == "str"
-    assert sig.return_annotation == "None"
-
-
-def test_signature_validate_file_batch28():
-    sig = inspect.signature(validate_file)
-    assert "Path" in str(sig.parameters["path"].annotation)
-    assert "str" in str(sig.parameters["path"].annotation)
-    assert sig.parameters["schema_name"].annotation == "str"
-    assert sig.return_annotation == "None"
-
-
-def test_signature_eval_schema_error_message_annotation_batch28():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    assert sig.parameters["message"].annotation == "str"
-
-
 def test_signature_eval_schema_error_errors_default_none_batch28():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert sig.parameters["errors"].default is None
@@ -492,49 +472,13 @@ def test_module_schemas_dir_absolute_batch28():
     assert SCHEMAS_DIR.is_absolute()
 
 
-def test_module_no_main_block_batch28():
-    src = inspect.getsource(smod)
-    assert 'if __name__ == "__main__"' not in src
-
-
 # ---------- 端到端集成第四十二批 ----------
-
-
-def test_e2e_validate_full_manifest_roundtrip_batch28(tmp_path):
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "complete",
-        "documents": [
-            {"doc_id": "d1", "path": "x.pdf", "source_type": "pdf", "sha256": "a" * 64}
-        ],
-    }
-    p = tmp_path / "m.json"
-    p.write_text(json.dumps(instance), encoding="utf-8")
-    validate_file(p, "manifest.schema.json")
 
 
 def test_e2e_three_schemas_exist_batch28():
     for name in ["manifest.schema.json", "annotation.schema.json", "evaluation-report.schema.json"]:
         p = _schema_path(name)
         assert p.is_file()
-
-
-def test_e2e_eval_schema_error_caught_batch28():
-    try:
-        validate({}, "manifest.schema.json")
-    except EvalSchemaError as e:
-        assert "manifest.schema.json" in str(e)
-        return
-    pytest.fail("Expected EvalSchemaError")
-
-
-def test_e2e_validate_errors_complete_batch28():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    for err in exc.value.errors:
-        assert isinstance(err["path"], list)
-        assert isinstance(err["schema_path"], list)
-        assert isinstance(err["message"], str)
 
 
 def test_e2e_schemas_dir_in_project_batch28():

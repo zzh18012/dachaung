@@ -206,18 +206,6 @@ def test_format_metric_return_annotation_str_batch41():
     assert "str" in str(sig.return_annotation)
 
 
-def test_format_metric_none_value_with_reason_batch41():
-    out = _format_metric("foo", {"value": None, "reason": "no_data"})
-    assert "null" in out
-    assert "no_data" in out
-
-
-def test_format_metric_true_value_batch41():
-    out = _format_metric("foo", {"value": True, "reason": None})
-    assert "true" in out
-    assert "ok" in out
-
-
 def test_format_metric_int_value_batch41():
     out = _format_metric("foo", {"value": 42, "reason": None})
     assert "42" in out
@@ -501,13 +489,6 @@ def test_main_inspect_doc_missing_rc_2_batch41(tmp_path):
     assert rc == 2
 
 
-def test_main_inspect_doc_invalid_json_rc_1_batch41(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{invalid", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 1
-
-
 def test_main_inspect_doc_empty_dict_rc_0_batch41(tmp_path):
     p = tmp_path / "empty.json"
     p.write_text("{}", encoding="utf-8")
@@ -635,13 +616,6 @@ def test_module_source_contains_run_inspect_doc_function_batch41():
     assert "def _run_inspect_doc(" in src
 
 
-def test_module_source_contains_subcommands_batch41():
-    src = inspect.getsource(cmod)
-    assert '"run"' in src
-    assert '"validate-report"' in src
-    assert '"inspect-doc"' in src
-
-
 def test_module_source_contains_manifest_argument_batch41():
     src = inspect.getsource(cmod)
     assert "--manifest" in src
@@ -751,10 +725,6 @@ def test_module_callable_main_batch41():
 
 def test_module_has_build_parser_attr_batch41():
     assert hasattr(cmod, "_build_parser")
-
-
-def test_module_has_main_attr_batch41():
-    assert hasattr(cmod, "main")
 
 
 def test_module_has_format_metric_attr_batch41():

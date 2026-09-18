@@ -53,13 +53,6 @@ def test_dependency_version_non_str_kept_batch54(monkeypatch):
     assert isinstance(v["pdfplumber"], int)
 
 
-def test_dependency_versions_fresh_dict_batch54():
-    a = get_dependency_versions()
-    b = get_dependency_versions()
-    assert a == b
-    assert a is not b
-
-
 # ---------- provenance 强转 ----------
 
 def test_provenance_empty_parser_version_kept_batch54():

@@ -99,10 +99,6 @@ def test_text_types_all_lowercase_batch41():
         assert t.islower()
 
 
-def test_text_types_no_duplicates_batch41():
-    assert len(_TEXT_TYPES) == len(set(_TEXT_TYPES))
-
-
 def test_text_types_exactly_seven_batch41():
     assert len(_TEXT_TYPES) == 7
 
@@ -184,10 +180,6 @@ def test_is_valid_bbox_with_dict_batch41():
     assert _is_valid_bbox({"x": 0}) is False
 
 
-def test_is_valid_bbox_with_set_batch41():
-    assert _is_valid_bbox({0, 0, 1, 1}) is False  # set 不 ordered
-
-
 def test_is_valid_bbox_empty_tuple_batch41():
     assert _is_valid_bbox(()) is False
 
@@ -254,14 +246,6 @@ def test_pdf_locator_ratio_header_without_bbox_ok_batch41():
     """header 不需要 bbox → 算合法。"""
     elements = [
         {"type": "header", "source_locator": {"page": 1}},  # 无 bbox，但 header 不需要
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
-def test_pdf_locator_ratio_footer_without_bbox_ok_batch41():
-    elements = [
-        {"type": "footer", "source_locator": {"page": 1}},
     ]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 1.0
@@ -952,10 +936,6 @@ def test_module_no_module_level_code_outside_functions_batch41():
     tree = ast.parse(src)
     for node in tree.body:
         assert isinstance(node, (ast.Import, ast.ImportFrom, ast.Assign, ast.FunctionDef, ast.Expr))
-
-
-def test_module_has_compute_automatic_metrics_attr_batch41():
-    assert hasattr(mmod, "compute_automatic_metrics")
 
 
 def test_module_compute_automatic_metrics_callable_batch41():

@@ -87,10 +87,6 @@ def test_atx_heading_re_only_hashes_no_match():
     assert _ATX_HEADING_RE.match("# ") is None
 
 
-def test_thematic_re_dash_three():
-    assert _THEMATIC_RE.match("---") is not None
-
-
 def test_thematic_re_dash_six():
     assert _THEMISTIC_RE_match_safe("------")
 
@@ -99,14 +95,6 @@ def _THEMISTIC_RE_match_safe(s):
     """helper."""
     assert _THEMATIC_RE.match(s) is not None
     return True
-
-
-def test_thematic_re_star_three():
-    assert _THEMATIC_RE.match("***") is not None
-
-
-def test_thematic_re_underscore_three():
-    assert _THEMATIC_RE.match("___") is not None
 
 
 def test_thematic_re_mixed_chars():
@@ -130,12 +118,6 @@ def test_fenced_re_backtick_three():
     assert m is not None
     assert m.group(1) == "```"
     assert m.group(2) == ""
-
-
-def test_fenced_re_backtick_with_lang():
-    m = _FENCED_RE.match("```python")
-    assert m is not None
-    assert m.group(2) == "python"
 
 
 def test_fenced_re_tilde_with_lang():
@@ -185,30 +167,16 @@ def test_ordered_list_re_dot():
     assert m.group(1) == "item"
 
 
-def test_ordered_list_re_no_space_no_match():
-    assert _ORDERED_LIST_RE.match("1.item") is None
-
-
 def test_ordered_list_re_zero_number_matches():
     """0. item 也匹配（正则没限制数字范围）。"""
     m = _ORDERED_LIST_RE.match("0. item")
     assert m is not None
 
 
-def test_blockquote_re_simple():
-    m = _BLOCKQUOTE_RE.match("> text")
-    assert m is not None
-    assert m.group(1) == "text"
-
-
 def test_blockquote_re_no_space():
     m = _BLOCKQUOTE_RE.match(">text")
     assert m is not None
     assert m.group(1) == "text"
-
-
-def test_pipe_table_row_re_basic():
-    assert _PIPE_TABLE_ROW_RE.match("| a | b |") is not None
 
 
 def test_pipe_table_row_re_no_leading_pipe():
@@ -219,10 +187,6 @@ def test_pipe_table_row_re_no_leading_pipe():
 
 def test_pipe_table_row_re_only_pipes():
     assert _PIPE_TABLE_ROW_RE.match("|||") is not None
-
-
-def test_pipe_table_sep_re_basic():
-    assert _PIPE_TABLE_SEP_RE.match("| --- | --- |") is not None
 
 
 def test_pipe_table_sep_re_with_colons():
@@ -581,17 +545,9 @@ def test_parser_metadata_markdown_true(tmp_path):
 # =========================================================================
 
 
-def test_md_extensions_count_two():
-    assert len(_MD_EXTENSIONS) == 2
-
-
 def test_md_extensions_contains_md_and_markdown():
     assert ".md" in _MD_EXTENSIONS
     assert ".markdown" in _MD_EXTENSIONS
-
-
-def test_md_extensions_is_tuple():
-    assert isinstance(_MD_EXTENSIONS, tuple)
 
 
 def test_module_all_only_markdown_parser():

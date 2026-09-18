@@ -565,11 +565,6 @@ def test_source_contains_pathlib_import_batch49():
     assert "from pathlib import Path" in src
 
 
-def test_source_contains_typing_any_import_batch49():
-    src = inspect.getsource(manifest_mod)
-    assert "from typing import Any" in src
-
-
 def test_source_contains_manifest_version_import_batch49():
     src = inspect.getsource(manifest_mod)
     assert "from evaluation import MANIFEST_VERSION" in src
@@ -638,12 +633,6 @@ def test_ast_has_4_class_def_batch49():
     tree = ast.parse(inspect.getsource(manifest_mod))
     classes = [n for n in tree.body if isinstance(n, ast.ClassDef)]
     assert len(classes) == 4
-
-
-def test_ast_module_has_docstring_batch49():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_module_has_7_imports_batch49():

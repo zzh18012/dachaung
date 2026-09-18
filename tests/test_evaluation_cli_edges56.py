@@ -35,12 +35,6 @@ def test_build_parser_prog_value_batch29():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_description_set_batch29():
-    p = _build_parser()
-    assert p.description is not None
-    assert "评测" in p.description
-
-
 def test_build_parser_formatter_class_batch29():
     p = _build_parser()
     assert p.formatter_class is not None
@@ -108,18 +102,6 @@ def test_build_parser_run_tolerance_chars_type_int_batch29():
             break
     assert tc_action is not None
     assert tc_action.type is int
-
-
-def test_build_parser_validate_report_input_positional_batch29():
-    p = _build_parser()
-    ns = p.parse_args(["validate-report", "report.json"])
-    assert ns.input == "report.json"
-
-
-def test_build_parser_inspect_doc_input_positional_batch29():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json"])
-    assert ns.input == "doc.json"
 
 
 def test_build_parser_inspect_doc_tolerance_default_30_batch29():
@@ -376,11 +358,6 @@ def test_main_run_with_invalid_manifest_returns_1_batch29(tmp_path, capsys):
 # ---------- module source forbidden tokens 第四十七批 ----------
 
 
-def test_module_source_no_subprocess_batch29():
-    src = inspect.getsource(climod)
-    assert "subprocess" not in src
-
-
 def test_module_source_no_os_system_batch29():
     src = inspect.getsource(climod)
     assert "os.system" not in src
@@ -426,11 +403,6 @@ def test_module_source_no_requests_batch29():
     assert "requests" not in src
 
 
-def test_module_source_no_unlink_batch29():
-    src = inspect.getsource(climod)
-    assert ".unlink()" not in src
-
-
 def test_module_source_no_open_w_mode_batch29():
     """cli.py 用 input_path.open("r")，不写文件。"""
     src = inspect.getsource(climod)
@@ -439,11 +411,6 @@ def test_module_source_no_open_w_mode_batch29():
 
 
 # ---------- module source 字符串精确补强第四十三批 ----------
-
-
-def test_module_source_contains_module_docstring_batch29():
-    src = inspect.getsource(climod)
-    assert "评测 CLI" in src
 
 
 def test_module_source_contains_build_parser_func_batch29():
@@ -560,11 +527,6 @@ def test_module_imports_sys_batch29():
 def test_module_imports_pathlib_batch29():
     src = inspect.getsource(climod)
     assert "from pathlib import Path" in src
-
-
-def test_module_no_class_definitions_batch29():
-    src = inspect.getsource(climod)
-    assert "\nclass " not in src
 
 
 def test_module_has_main_block_batch29():

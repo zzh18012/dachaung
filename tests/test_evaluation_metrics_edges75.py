@@ -355,10 +355,6 @@ def test_is_valid_bbox_tuple_rejected_batch51():
     assert _is_valid_bbox((0, 0, 1, 1)) is False
 
 
-def test_is_valid_bbox_set_rejected_batch51():
-    assert _is_valid_bbox({0, 0, 1, 1}) is False  # set 只有 3 元素
-
-
 def test_is_valid_bbox_dict_rejected_batch51():
     assert _is_valid_bbox({"x": 0}) is False
 
@@ -437,18 +433,6 @@ def test_image_ratio_no_image_elements_batch51():
     out = _image_resource_ratio([{"type": "paragraph"}], None)
     assert out["value"] is None
     assert out["reason"] == "no_image_elements"
-
-
-def test_image_ratio_resource_path_none_batch51(tmp_path):
-    elements = [{"type": "image", "resource_path": None}]
-    out = _image_resource_ratio(elements, tmp_path)
-    assert out["value"] == 0.0
-
-
-def test_image_ratio_resource_path_empty_string_batch51(tmp_path):
-    elements = [{"type": "image", "resource_path": ""}]
-    out = _image_resource_ratio(elements, tmp_path)
-    assert out["value"] == 0.0
 
 
 def test_image_ratio_resource_path_zero_size_file_batch51(tmp_path):
@@ -708,12 +692,6 @@ def test_source_contains_empty_expected_actual_reason_batch51():
 
 # ---------- AST 结构补强 ----------
 
-def test_ast_has_14_top_level_functions_batch51():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 14
-
-
 def test_ast_function_names_batch51():
     tree = ast.parse(inspect.getsource(metrics_mod))
     names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
@@ -733,11 +711,6 @@ def test_ast_function_names_batch51():
         "_heading_boundary_ratio",
         "_silent_drop_count",
     ]
-
-
-def test_ast_no_class_def_batch51():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
 def test_ast_no_global_statement_batch51():

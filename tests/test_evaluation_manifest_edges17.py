@@ -527,11 +527,6 @@ def test_manifest_error_can_be_raised():
         raise ManifestError("x")
 
 
-def test_manifest_error_caught_as_exception():
-    with pytest.raises(Exception):
-        raise ManifestError("x")
-
-
 def test_manifest_error_str_returns_message():
     e = ManifestError("error message")
     assert str(e) == "error message"

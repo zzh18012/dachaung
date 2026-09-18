@@ -798,16 +798,6 @@ def test_module_source_has_future_annotations_batch10():
     assert "from __future__ import annotations" in source
 
 
-def test_module_source_imports_json_batch10():
-    source = inspect.getsource(rmod)
-    assert "import json" in source
-
-
-def test_module_source_imports_time_batch10():
-    source = inspect.getsource(rmod)
-    assert "import time" in source
-
-
 def test_module_source_imports_path_batch10():
     source = inspect.getsource(rmod)
     assert "from pathlib import Path" in source
@@ -927,10 +917,6 @@ def test_module_source_no_main_block_batch10():
     assert "if __name__" not in source
 
 
-def test_module_source_docstring_mentions_pipeline_batch10():
-    assert "pipeline" in rmod.__doc__.lower()
-
-
 def test_module_source_uses_per_doc_results_var_batch10():
     source = inspect.getsource(rmod)
     assert "per_doc_results" in source
@@ -982,18 +968,6 @@ def test_signature_load_annotation_param_count_batch10():
 def test_signature_load_annotation_param_name_batch10():
     sig = inspect.signature(_load_annotation)
     assert "path" in sig.parameters
-
-
-def test_signature_load_annotation_param_kind_batch10():
-    sig = inspect.signature(_load_annotation)
-    p = list(sig.parameters.values())[0]
-    assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_load_annotation_param_no_default_batch10():
-    sig = inspect.signature(_load_annotation)
-    p = list(sig.parameters.values())[0]
-    assert p.default is inspect.Parameter.empty
 
 
 def test_signature_load_annotation_param_annotation_str_batch10():

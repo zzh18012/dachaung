@@ -175,15 +175,6 @@ def test_build_parser_run_missing_manifest_raises():
         ])
 
 
-def test_build_parser_run_missing_output_raises():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args([
-            "run",
-            "--manifest", "m.json",
-        ])
-
-
 def test_build_parser_run_unknown_arg_raises():
     p = _build_parser()
     with pytest.raises(SystemExit):
@@ -284,16 +275,6 @@ def test_build_parser_description_present():
     p = _build_parser()
     assert p.description is not None
     assert len(p.description) > 10
-
-
-def test_build_parser_has_subparsers():
-    p = _build_parser()
-    # 子命令注册在 _SubParsersAction 上
-    sub_actions = [
-        a for a in p._actions
-        if isinstance(a, argparse._SubParsersAction)
-    ]
-    assert len(sub_actions) == 1
 
 
 def test_build_parser_subparsers_has_3_commands():
@@ -916,11 +897,6 @@ def test_module_source_imports_eval_schema_error():
     assert "EvalSchemaError" in src
 
 
-def test_module_source_imports_validate_file():
-    src = inspect.getsource(cli_mod)
-    assert "validate_file" in src
-
-
 def test_module_source_no_relative_import():
     src = inspect.getsource(cli_mod)
     import_lines = [
@@ -1191,10 +1167,6 @@ def test_module_namespace_has_4_names():
     assert sorted(names) == sorted(expected)
 
 
-def test_module_name():
-    assert cli_mod.__name__ == "evaluation.cli"
-
-
 def test_module_file_endswith_cli_py():
     assert cli_mod.__file__.replace("\\", "/").endswith("evaluation/cli.py")
 
@@ -1203,25 +1175,8 @@ def test_module_docstring_present():
     assert cli_mod.__doc__ is not None and len(cli_mod.__doc__) > 50
 
 
-def test_module_no_all_attribute():
-    # cli.py 没有定义 __all__
-    assert not hasattr(cli_mod, "__all__")
-
-
 def test_module_main_callable():
     assert callable(cli_mod.main)
-
-
-def test_module_build_parser_callable():
-    assert callable(cli_mod._build_parser)
-
-
-def test_module_format_metric_callable():
-    assert callable(cli_mod._format_metric)
-
-
-def test_module_run_inspect_doc_callable():
-    assert callable(cli_mod._run_inspect_doc)
 
 
 def test_module_no_user_classes():

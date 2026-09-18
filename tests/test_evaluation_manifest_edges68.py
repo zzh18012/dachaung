@@ -516,11 +516,6 @@ def test_manifest_equality_batch41():
     assert m1 == m2
 
 
-def test_manifest_repr_batch41():
-    m = _make_manifest()
-    assert "Manifest" in repr(m)
-
-
 # ---------- _detect_project_root 第四十一批
 
 
@@ -825,17 +820,8 @@ def test_manifest_error_can_be_raised_batch41():
         raise ManifestError("x")
 
 
-def test_manifest_error_caught_as_exception_batch41():
-    with pytest.raises(Exception):
-        raise ManifestError("x")
-
-
 def test_manifest_error_module_level_batch41():
     assert hasattr(mmod, "ManifestError")
-
-
-def test_manifest_error_in_all_batch41():
-    assert "ManifestError" in mmod.__all__
 
 
 # ---------- module source 字符串精确 第四十二批
@@ -881,11 +867,6 @@ def test_module_source_contains_manifest_error_class_batch41():
     assert "class ManifestError" in src
 
 
-def test_module_source_contains_document_entry_class_batch41():
-    src = inspect.getsource(mmod)
-    assert "class DocumentEntry" in src
-
-
 def test_module_source_contains_expected_failure_class_batch41():
     src = inspect.getsource(mmod)
     assert "class ExpectedFailure" in src
@@ -925,21 +906,6 @@ def test_module_source_contains_frozen_true_batch41():
     """dataclass(frozen=True)。"""
     src = inspect.getsource(mmod)
     assert "frozen=True" in src
-
-
-def test_module_source_contains_resolve_call_batch41():
-    src = inspect.getsource(mmod)
-    assert ".resolve()" in src
-
-
-def test_module_source_contains_encoding_utf8_batch41():
-    src = inspect.getsource(mmod)
-    assert 'encoding="utf-8"' in src
-
-
-def test_module_source_contains_manifest_version_const_compare_batch41():
-    src = inspect.getsource(mmod)
-    assert "MANIFEST_VERSION" in src
 
 
 def test_module_source_contains_manifest_version_incompat_batch41():
@@ -1039,22 +1005,6 @@ def test_module_all_five_entries_batch41():
     assert len(mmod.__all__) == 5
 
 
-def test_module_all_contains_manifest_error_batch41():
-    assert "ManifestError" in mmod.__all__
-
-
-def test_module_all_contains_manifest_batch41():
-    assert "Manifest" in mmod.__all__
-
-
-def test_module_all_contains_document_entry_batch41():
-    assert "DocumentEntry" in mmod.__all__
-
-
-def test_module_all_contains_expected_failure_batch41():
-    assert "ExpectedFailure" in mmod.__all__
-
-
 def test_module_does_not_export_private_batch41():
     """私有函数不出现在 __all__。"""
     for name in ["_is_absolute_like", "_has_backslash", "_resolve_relative_path", "_detect_project_root"]:
@@ -1079,10 +1029,6 @@ def test_module_has_document_entry_attr_batch41():
 
 def test_module_has_expected_failure_attr_batch41():
     assert hasattr(mmod, "ExpectedFailure")
-
-
-def test_module_has_load_manifest_attr_batch41():
-    assert hasattr(mmod, "load_manifest")
 
 
 def test_module_load_manifest_callable_batch41():

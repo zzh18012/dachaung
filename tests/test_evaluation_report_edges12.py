@@ -631,11 +631,6 @@ def test_module_all_does_not_contain_private_constants():
     assert "_SUCCESS_BOOL_METRICS" not in m.__all__
 
 
-def test_module_all_size_five():
-    import evaluation.report as m
-    assert len(m.__all__) == 5
-
-
 def test_module_uses_future_annotations():
     import evaluation.report as m
     assert hasattr(m, "annotations")  # from __future__ import annotations

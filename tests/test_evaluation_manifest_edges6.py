@@ -161,11 +161,6 @@ def test_manifest_error_empty_message():
     assert str(e) == ""
 
 
-def test_manifest_error_args_length_one():
-    e = ManifestError("msg")
-    assert e.args == ("msg",)
-
-
 def test_manifest_error_docstring_present():
     assert ManifestError.__doc__ is not None
 
@@ -298,11 +293,6 @@ def test_expected_failure_is_frozen():
         ef.doc_id = "other"
 
 
-def test_expected_failure_field_count():
-    fs = fields(ExpectedFailure)
-    assert len(fs) == 5
-
-
 def test_expected_failure_equality_same_values():
     a = _make_expected_failure()
     b = _make_expected_failure()
@@ -342,11 +332,6 @@ def test_manifest_is_frozen():
         m.devset_status = "other"
 
 
-def test_manifest_field_count():
-    fs = fields(Manifest)
-    assert len(fs) == 5
-
-
 def test_manifest_hashable():
     m = _make_manifest()
     h = hash(m)
@@ -367,11 +352,6 @@ def test_manifest_file_count_with_documents():
 def test_manifest_pdf_count_empty():
     m = _make_manifest(documents=())
     assert m.pdf_count == 0
-
-
-def test_manifest_content_group_count_empty():
-    m = _make_manifest(documents=())
-    assert m.content_group_count == 0
 
 
 def test_manifest_content_group_count_all_unpaired():
@@ -441,11 +421,6 @@ def test_categories_covered_empty_tuple_per_doc():
 def test_categories_covered_returns_list_not_tuple():
     m = _make_manifest(documents=(_make_doc_entry(),))
     assert isinstance(m.categories_covered, list)
-
-
-def test_manifest_repr_has_class_name():
-    m = _make_manifest()
-    assert "Manifest" in repr(m)
 
 
 # =========================================================================
@@ -774,21 +749,6 @@ def test_resolve_relative_path_no_defaults():
     sig = inspect.signature(_resolve_relative_path)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_detect_project_root_param_name():
-    sig = inspect.signature(_detect_project_root)
-    assert "start" in sig.parameters
-
-
-def test_is_absolute_like_param_name():
-    sig = inspect.signature(_is_absolute_like)
-    assert "path_str" in sig.parameters
-
-
-def test_has_backslash_param_name():
-    sig = inspect.signature(_has_backslash)
-    assert "path_str" in sig.parameters
 
 
 def test_is_absolute_like_return_annotation_bool():

@@ -111,19 +111,9 @@ def test_bool_metric_false():
     assert m["reason"] is None
 
 
-def test_bool_metric_int_zero_coerced():
-    m = _bool_metric(0)
-    assert m["value"] is False
-
-
 def test_bool_metric_int_one_coerced():
     m = _bool_metric(1)
     assert m["value"] is True
-
-
-def test_bool_metric_empty_string_coerced():
-    m = _bool_metric("")
-    assert m["value"] is False
 
 
 def test_bool_metric_nonempty_string_coerced():
@@ -200,10 +190,6 @@ def test_is_valid_bbox_tuple_not_list():
     assert _is_valid_bbox((0, 0, 100, 100)) is False
 
 
-def test_is_valid_bbox_string_elements():
-    assert _is_valid_bbox(["0", "0", "100", "100"]) is False
-
-
 def test_is_valid_bbox_mixed_types():
     assert _is_valid_bbox([0, "0", 100, 100]) is False
 
@@ -213,10 +199,6 @@ def test_is_valid_bbox_bool_true_rejected():
     assert _is_valid_bbox([True, 0, 100, 100]) is False
 
 
-def test_is_valid_bbox_all_bools():
-    assert _is_valid_bbox([True, False, True, False]) is False
-
-
 def test_is_valid_bbox_none_rejected():
     assert _is_valid_bbox(None) is False
 
@@ -224,12 +206,6 @@ def test_is_valid_bbox_none_rejected():
 # =========================================================================
 # _pdf_locator_ratio 深度
 # =========================================================================
-
-
-def test_pdf_locator_ratio_empty_returns_no_elements_null():
-    result = _pdf_locator_ratio([])
-    assert result["value"] is None
-    assert result["reason"] == "no_elements"
 
 
 def test_pdf_locator_ratio_single_image_with_page_only():
@@ -434,12 +410,6 @@ def test_pdf_locator_ratio_all_invalid_returns_zero():
 # =========================================================================
 # _docx_locator_ratio 深度
 # =========================================================================
-
-
-def test_docx_locator_ratio_empty_returns_no_elements_null():
-    result = _docx_locator_ratio([])
-    assert result["value"] is None
-    assert result["reason"] == "no_elements"
 
 
 def test_docx_locator_ratio_section_valid():
@@ -1529,16 +1499,6 @@ def test_module_all_exports_only_public():
     """__all__ 只导出公开 API。"""
     import evaluation.metrics as m
     assert m.__all__ == ["compute_automatic_metrics"]
-
-
-def test_module_has_math_import():
-    import evaluation.metrics as m
-    assert hasattr(m, "math")
-
-
-def test_module_has_path_import():
-    import evaluation.metrics as m
-    assert hasattr(m, "Path")
 
 
 def test_metrics_constants_are_tuples_not_lists():

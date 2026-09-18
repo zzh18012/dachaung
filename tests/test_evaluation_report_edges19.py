@@ -827,11 +827,6 @@ def test_build_provenance_parser_name_value(tmp_path):
     assert out["parser_name"] == "fallback"
 
 
-def test_build_provenance_parser_version_value(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "1.2.3")
-    assert out["parser_version"] == "1.2.3"
-
-
 def test_build_provenance_max_chars_int_value(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["max_chars"] == 800

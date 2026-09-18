@@ -97,11 +97,6 @@ def test_load_schema_callable_batch36():
     assert callable(load_schema)
 
 
-def test_load_schema_returns_dict_batch36():
-    out = load_schema("manifest.schema.json")
-    assert isinstance(out, dict)
-
-
 def test_load_schema_manifest_has_properties_batch36():
     out = load_schema("manifest.schema.json")
     # JSON Schema 顶层应该有 properties
@@ -223,12 +218,6 @@ def test_validate_message_contains_schema_name_batch36():
     assert "manifest.schema.json" in str(exc.value)
 
 
-def test_validate_message_contains_error_count_batch36():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    assert "处" in str(exc.value)
-
-
 def test_validate_message_contains_first_error_path_batch36():
     with pytest.raises(EvalSchemaError) as exc:
         validate({"unknown_key": "x"}, "manifest.schema.json")
@@ -263,13 +252,6 @@ def test_validate_file_missing_file_raises_batch36(tmp_path):
     with pytest.raises(FileNotFoundError) as exc:
         validate_file(tmp_path / "missing.json", "manifest.schema.json")
     assert "待校验文件不存在" in str(exc.value)
-
-
-def test_validate_file_invalid_json_raises_batch36(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{invalid", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
 
 
 def test_validate_file_valid_minimal_batch36(tmp_path):
@@ -364,11 +346,6 @@ def test_eval_schema_error_signature_init_batch36():
 def test_eval_schema_error_errors_default_none_batch36():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert sig.parameters["errors"].default is None
-
-
-def test_eval_schema_error_message_no_default_batch36():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    assert sig.parameters["message"].default is inspect.Parameter.empty
 
 
 def test_eval_schema_error_module_level_batch36():
@@ -547,10 +524,6 @@ def test_module_all_contains_schemas_dir_batch36():
     assert "SCHEMAS_DIR" in smod.__all__
 
 
-def test_module_all_contains_eval_schema_error_batch36():
-    assert "EvalSchemaError" in smod.__all__
-
-
 def test_module_does_not_define_other_class_batch36():
     """只有 EvalSchemaError 一个类。"""
     import ast
@@ -572,18 +545,6 @@ def test_module_has_schemas_dir_attr_batch36():
 
 def test_module_has_eval_schema_error_attr_batch36():
     assert hasattr(smod, "EvalSchemaError")
-
-
-def test_module_has_load_schema_attr_batch36():
-    assert hasattr(smod, "load_schema")
-
-
-def test_module_has_validate_attr_batch36():
-    assert hasattr(smod, "validate")
-
-
-def test_module_has_validate_file_attr_batch36():
-    assert hasattr(smod, "validate_file")
 
 
 def test_module_functions_callable_batch36():

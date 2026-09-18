@@ -492,11 +492,6 @@ def test_module_source_contains_missing_markers_batch25():
     assert "missing_markers" in source
 
 
-def test_module_source_contains_search_from_batch25():
-    source = inspect.getsource(amod)
-    assert "search_from" in source
-
-
 def test_module_source_contains_normalize_text_call_batch25():
     source = inspect.getsource(amod)
     assert "normalize_text(" in source
@@ -543,10 +538,6 @@ def test_signature_chunk_boundary_prf_tolerance_int_batch25():
 def test_signature_chunk_boundary_prf_return_annotation_batch25():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.return_annotation == "dict[str, dict[str, Any]]"
-
-
-def test_signature_chunk_boundary_prf_docstring_present_batch25():
-    assert chunk_boundary_prf.__doc__ is not None
 
 
 def test_signature_chunk_boundary_prf_no_varargs_batch25():

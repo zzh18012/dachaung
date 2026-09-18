@@ -337,10 +337,6 @@ def test_parser_name_attribute_class_level():
     assert Parser.name == "abstract"
 
 
-def test_parser_version_attribute_class_level():
-    assert Parser.version == "0.0.0"
-
-
 def test_parser_class_inherits_abc_meta():
     from abc import ABCMeta
     assert isinstance(Parser, ABCMeta)

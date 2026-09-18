@@ -775,18 +775,6 @@ def test_module_imports_validate_batch27():
     assert "from evaluation.schema import validate" in src
 
 
-def test_module_all_export_six_entries_batch27():
-    src = inspect.getsource(mmod)
-    for name in [
-        '"ManifestError"',
-        '"Manifest"',
-        '"DocumentEntry"',
-        '"ExpectedFailure"',
-        '"load_manifest"',
-    ]:
-        assert name in src
-
-
 def test_module_manifest_error_inherits_exception_batch27():
     assert issubclass(ManifestError, Exception)
 

@@ -198,13 +198,6 @@ def test_compute_idempotent_batch11():
     assert out1 == out2
 
 
-def test_compute_positional_call_batch11():
-    doc = {"elements": [], "chunks": []}
-    out1 = compute_automatic_metrics(doc, None, "pdf", None)
-    out2 = compute_automatic_metrics(doc, None, "pdf", None)
-    assert out1 == out2
-
-
 def test_compute_element_count_total_int_batch11():
     doc = {"elements": [{"type": "paragraph"}, {"type": "heading"}], "chunks": []}
     out = compute_automatic_metrics(doc, None, "pdf", None)
@@ -334,12 +327,6 @@ def test_docx_locator_empty_elements_null_batch11():
     assert out["value"] is None
 
 
-def test_docx_locator_with_page_not_counts_batch11():
-    elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_docx_locator_with_section_counts_batch11():
     elements = [{"type": "paragraph", "source_locator": {"section": 0}}]
     out = _docx_locator_ratio(elements)
@@ -379,13 +366,6 @@ def test_docx_locator_empty_source_locator_not_counts_batch11():
 
 
 # ---------- image_resource_ratio batch 11 ----------
-
-
-def test_image_resource_ratio_no_images_null_batch11():
-    elements = [{"type": "paragraph"}]
-    out = _image_resource_ratio(elements, None)
-    assert out["value"] is None
-    assert out["reason"] == "no_image_elements"
 
 
 def test_image_resource_ratio_no_resource_path_batch11():
@@ -693,10 +673,6 @@ def test_is_valid_bbox_all_zeros_batch11():
     assert _is_valid_bbox([0, 0, 0, 0]) is True
 
 
-def test_is_valid_bbox_tuple_rejected_batch11():
-    assert _is_valid_bbox((0, 0, 100, 100)) is False
-
-
 def test_is_valid_bbox_string_rejected_batch11():
     assert _is_valid_bbox("0000") is False
 
@@ -715,14 +691,6 @@ def test_is_valid_bbox_too_short_rejected_batch11():
 
 def test_is_valid_bbox_too_long_rejected_batch11():
     assert _is_valid_bbox([0, 0, 100, 100, 100]) is False
-
-
-def test_is_valid_bbox_string_element_rejected_batch11():
-    assert _is_valid_bbox([0, 0, "100", 100]) is False
-
-
-def test_is_valid_bbox_none_element_rejected_batch11():
-    assert _is_valid_bbox([0, 0, None, 100]) is False
 
 
 def test_is_valid_bbox_returns_bool_batch11():
@@ -821,11 +789,6 @@ def test_metrics_source_no_forbidden_token_fourteenth_batch11(token):
     assert token not in source
 
 
-def test_metrics_source_no_unlink_batch11():
-    source = inspect.getsource(mmod)
-    assert "unlink" not in source
-
-
 def test_metrics_source_no_remove_batch11():
     source = inspect.getsource(mmod)
     assert ".remove(" not in source
@@ -911,11 +874,6 @@ def test_module_source_has_compute_automatic_metrics_def_batch11():
     assert "def compute_automatic_metrics(" in source
 
 
-def test_module_source_has_text_preservation_def_batch11():
-    source = inspect.getsource(mmod)
-    assert "def _text_preservation(" in source
-
-
 def test_module_source_no_main_block_batch11():
     source = inspect.getsource(mmod)
     assert "if __name__" not in source
@@ -957,17 +915,6 @@ def test_signature_int_metric_1_param_batch11():
 def test_signature_compute_5_params_batch11():
     sig = inspect.signature(compute_automatic_metrics)
     assert len(sig.parameters) == 5
-
-
-def test_signature_compute_param_names_batch11():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert list(sig.parameters) == [
-        "document",
-        "error",
-        "source_type",
-        "expectations",
-        "image_base_dir",
-    ]
 
 
 def test_signature_compute_image_base_dir_default_none_batch11():

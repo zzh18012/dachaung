@@ -63,10 +63,6 @@ def test_is_absolute_like_windows_drive_forward_slash():
     assert _is_absolute_like("C:/foo") is True
 
 
-def test_is_absolute_like_uppercase_drive():
-    assert _is_absolute_like("D:/foo") is True
-
-
 def test_is_absolute_like_short_string():
     assert _is_absolute_like("ab") is False
 

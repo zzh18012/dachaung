@@ -258,13 +258,6 @@ def test_module_all_first_run_evaluation():
     assert m.__all__[0] == "run_evaluation"
 
 
-def test_module_all_does_not_contain_internal_helpers():
-    """__all__ 不含 _load_annotation / _process_one。"""
-    import evaluation.runner as m
-    assert "_load_annotation" not in m.__all__
-    assert "_process_one" not in m.__all__
-
-
 # =========================================================================
 # 函数 metadata
 # =========================================================================

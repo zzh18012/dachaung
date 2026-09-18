@@ -417,11 +417,6 @@ def test_module_source_contains_per_doc_subdir_batch27():
     assert "_per_doc" in src
 
 
-def test_module_source_contains_compute_automatic_metrics_batch27():
-    src = inspect.getsource(rmod)
-    assert "compute_automatic_metrics" in src
-
-
 def test_module_source_contains_figure_caption_prf_batch27():
     src = inspect.getsource(rmod)
     assert "figure_caption_prf" in src

@@ -108,12 +108,6 @@ def test_load_annotation_returns_dict_for_valid_json_batch13(tmp_path):
     assert out == {"key": "value", "num": 42}
 
 
-def test_load_annotation_returns_none_for_invalid_json_batch13(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not valid json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_returns_none_for_oserror_batch13(tmp_path):
     """模拟 OSError（如权限被拒）。"""
     p = tmp_path / "perm.json"
@@ -799,18 +793,6 @@ def test_runner_source_no_with_open_w_at_top_level_batch13():
 # ---------- module source 字符串精确补强第十五批 ----------
 
 
-def test_module_source_imports_json_top_level_batch13():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import json" in head
-
-
-def test_module_source_imports_time_top_level_batch13():
-    source = inspect.getsource(rmod)
-    head = "\n".join(source.split("\n")[:30])
-    assert "import time" in head
-
-
 def test_module_source_imports_pathlib_path_top_level_batch13():
     source = inspect.getsource(rmod)
     head = "\n".join(source.split("\n")[:30])
@@ -860,11 +842,6 @@ def test_module_source_uses_perf_counter_batch13():
 def test_module_source_uses_json_dump_batch13():
     source = inspect.getsource(rmod)
     assert "json.dump(" in source
-
-
-def test_module_source_uses_ensure_ascii_false_batch13():
-    source = inspect.getsource(rmod)
-    assert "ensure_ascii=False" in source
 
 
 def test_module_source_has_not_instrumented_string_batch13():
@@ -980,15 +957,6 @@ def test_public_function_count_3_batch13():
         if inspect.isfunction(v) and v.__module__ == rmod.__name__
     ]
     assert set(funcs) == {"_load_annotation", "_process_one", "run_evaluation"}
-
-
-def test_run_evaluation_no_varargs_batch13():
-    sig = inspect.signature(run_evaluation)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
 
 
 # ---------- module 合理性第十五批 ----------

@@ -578,11 +578,6 @@ def test_module_source_contains_report_import_batch37():
     assert "from evaluation.report import" in src
 
 
-def test_module_source_contains_json_dump_call_batch37():
-    src = inspect.getsource(rmod)
-    assert "json.dump(report" in src
-
-
 def test_module_source_contains_per_doc_subdir_keyword_batch37():
     src = inspect.getsource(rmod)
     assert "_per_doc" in src

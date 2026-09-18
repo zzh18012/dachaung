@@ -40,14 +40,6 @@ def test_count_metrics_no_duplicates_batch41():
     assert len(_COUNT_METRICS) == len(set(_COUNT_METRICS))
 
 
-def test_success_bool_metrics_no_duplicates_batch41():
-    assert len(_SUCCESS_BOOL_METRICS) == len(set(_SUCCESS_BOOL_METRICS))
-
-
-def test_ratio_metrics_disjoint_from_success_bool_batch41():
-    assert set(_RATIO_METRICS).isdisjoint(set(_SUCCESS_BOOL_METRICS))
-
-
 def test_count_metrics_disjoint_from_success_bool_batch41():
     assert set(_COUNT_METRICS).isdisjoint(set(_SUCCESS_BOOL_METRICS))
 
@@ -527,21 +519,6 @@ def test_aggregate_summary_returns_four_keys_batch41():
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
 
 
-def test_aggregate_summary_counts_one_key_batch41():
-    out = aggregate_summary([])
-    assert set(out["counts"].keys()) == {"element_count_total"}
-
-
-def test_aggregate_summary_success_rates_one_key_batch41():
-    out = aggregate_summary([])
-    assert set(out["success_rates"].keys()) == {"pipeline_success"}
-
-
-def test_aggregate_summary_ratio_macro_keys_match_ratio_metrics_batch41():
-    out = aggregate_summary([])
-    assert set(out["ratio_macro_averages"].keys()) == set(_RATIO_METRICS)
-
-
 def test_aggregate_summary_large_input_batch41():
     """1000 个文档聚合不抛异常。"""
     per_doc = [{"metrics": {"pipeline_success": {"value": True}, "element_count_total": {"value": 1}}}
@@ -757,11 +734,6 @@ def test_module_source_contains_all_export_batch41():
     assert "__all__" in src
 
 
-def test_module_source_contains_success_rate_comment_batch41():
-    src = inspect.getsource(rmod)
-    assert "success_rates" in src
-
-
 def test_module_source_contains_no_mixed_score_comment_batch41():
     src = inspect.getsource(rmod)
     assert "不混合" in src
@@ -830,11 +802,6 @@ def test_signature_aggregate_summary_params_batch41():
     assert list(sig.parameters.keys()) == ["per_doc_results"]
 
 
-def test_signature_build_provenance_parser_version_no_default_batch41():
-    sig = inspect.signature(build_provenance)
-    assert sig.parameters["parser_version"].default is inspect.Parameter.empty
-
-
 def test_signature_build_provenance_max_chars_int_annotation_batch41():
     sig = inspect.signature(build_provenance)
     assert "int" in str(sig.parameters["max_chars"].annotation)
@@ -877,26 +844,6 @@ def test_module_all_is_list_batch41():
 
 def test_module_all_len_five_batch41():
     assert len(rmod.__all__) == 5
-
-
-def test_module_all_contains_build_provenance_batch41():
-    assert "build_provenance" in rmod.__all__
-
-
-def test_module_all_contains_build_devset_section_batch41():
-    assert "build_devset_section" in rmod.__all__
-
-
-def test_module_all_contains_aggregate_summary_batch41():
-    assert "aggregate_summary" in rmod.__all__
-
-
-def test_module_all_contains_get_git_provenance_batch41():
-    assert "get_git_provenance" in rmod.__all__
-
-
-def test_module_all_contains_get_dependency_versions_batch41():
-    assert "get_dependency_versions" in rmod.__all__
 
 
 def test_module_does_not_define_class_batch41():

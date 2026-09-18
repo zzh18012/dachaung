@@ -448,15 +448,6 @@ def test_kreuzberg_parser_name_class_attribute_value():
     assert KreuzbergParser.name == "kreuzberg"
 
 
-def test_kreuzberg_parser_version_class_attribute_is_string():
-    assert isinstance(KreuzbergParser.version, str)
-
-
-def test_kreuzberg_parser_instance_includes_document_structure_default_true():
-    p = KreuzbergParser()
-    assert p._include_document_structure is True
-
-
 def test_kreuzberg_parser_init_keyword_only_no_positional():
     """include_document_structure 必须是 keyword-only。"""
     import inspect
@@ -473,10 +464,6 @@ def test_kreuzberg_parser_two_instances_independent():
     b = KreuzbergParser(include_document_structure=False)
     assert a._include_document_structure is True
     assert b._include_document_structure is False
-
-
-def test_kreuzberg_parser_class_has_parse_method():
-    assert callable(KreuzbergParser.parse)
 
 
 def test_kreuzberg_parser_instance_name_matches_class():
@@ -597,12 +584,6 @@ def test_module_make_locator_callable():
     assert callable(mod._make_locator)
 
 
-def test_module_kreuzberg_parser_inherits_parser():
-    from app.parsers.base import Parser
-
-    assert issubclass(KreuzbergParser, Parser)
-
-
 def test_module_kreuzberg_parser_parse_method_has_docstring():
     """parse 方法不强求 docstring。"""
     # 实际 parse 无 docstring
@@ -705,16 +686,6 @@ def test_classify_line_short_text_with_terminator_no_short_line_meta(
 def test_kreuzberg_parser_init_no_args():
     p = KreuzbergParser()
     assert p is not None
-
-
-def test_kreuzberg_parser_init_with_true_keyword():
-    p = KreuzbergParser(include_document_structure=True)
-    assert p._include_document_structure is True
-
-
-def test_kreuzberg_parser_init_with_false_keyword():
-    p = KreuzbergParser(include_document_structure=False)
-    assert p._include_document_structure is False
 
 
 def test_kreuzberg_parser_init_signature_self_first():

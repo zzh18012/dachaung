@@ -533,21 +533,6 @@ def test_source_contains_counter_import_batch48():
     assert "from collections import Counter" in src
 
 
-def test_source_contains_typing_any_batch48():
-    src = inspect.getsource(am_mod)
-    assert "from typing import Any" in src
-
-
-def test_source_contains_normalize_text_import_batch48():
-    src = inspect.getsource(am_mod)
-    assert "from app.chunkers.structural import normalize_text" in src
-
-
-def test_source_contains_null_ratio_import_batch48():
-    src = inspect.getsource(am_mod)
-    assert "from evaluation.metrics import _null, _ratio" in src
-
-
 def test_source_contains_all_list_batch48():
     src = inspect.getsource(am_mod)
     assert "__all__" in src
@@ -614,12 +599,6 @@ def test_source_contains_docstring_tolerance_batch48():
 
 
 # ---------- AST 结构补强 ----------
-
-def test_ast_top_level_functions_count_batch48():
-    tree = ast.parse(inspect.getsource(am_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 2
-
 
 def test_ast_no_class_def_batch48():
     tree = ast.parse(inspect.getsource(am_mod))

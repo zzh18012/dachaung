@@ -43,24 +43,12 @@ from app.models import Chunk, Document, Element
 # =========================================================================
 
 
-def test_sentence_split_re_is_compiled_pattern():
-    assert isinstance(_SENTENCE_SPLIT_RE, re.Pattern)
-
-
 def test_sentence_split_re_pattern_value():
     """split 在句末标点后的空白处。"""
     pattern_str = _SENTENCE_SPLIT_RE.pattern
     # 应含 lookbehind 与各 break chars
     assert "。！" in pattern_str or "。" in pattern_str
     assert "." in pattern_str
-
-
-def test_whitespace_re_is_compiled_pattern():
-    assert isinstance(_WHITESPACE_RE, re.Pattern)
-
-
-def test_whitespace_re_pattern_value():
-    assert _WHITESPACE_RE.pattern == r"\s+"
 
 
 def test_hard_break_langs_count_is_six():
@@ -94,10 +82,6 @@ def test_part_constants_values():
 # =========================================================================
 
 
-def test_split_piece_is_dataclass():
-    assert is_dataclass(_SplitPiece)
-
-
 def test_split_piece_field_count():
     fs = fields(_SplitPiece)
     assert len(fs) == 4
@@ -126,16 +110,6 @@ def test_split_piece_boundary_after_required():
     assert isinstance(fs["boundary_after"].default, _MISSING_TYPE)
     with pytest.raises(TypeError):
         _SplitPiece(text="x")  # type: ignore[call-arg]
-
-
-def test_split_piece_start_default_zero():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.start == 0
-
-
-def test_split_piece_end_default_zero():
-    p = _SplitPiece(text="x", boundary_after=None)
-    assert p.end == 0
 
 
 def test_split_piece_equality_same_values():
@@ -823,10 +797,6 @@ def test_normalize_text_collapses_newlines():
 
 def test_normalize_text_collapses_tabs():
     assert normalize_text("hello\tworld") == "hello world"
-
-
-def test_normalize_text_strips_leading_trailing():
-    assert normalize_text("  hello  ") == "hello"
 
 
 def test_normalize_text_mixed_whitespace():

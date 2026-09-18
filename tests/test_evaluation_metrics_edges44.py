@@ -54,11 +54,6 @@ from evaluation.metrics import (
 # ---------- _null / _ratio / _bool_metric / _int_metric 边界第十七批 ----------
 
 
-def test_null_returns_dict_with_2_keys_batch17():
-    r = _null("x")
-    assert set(r.keys()) == {"value", "reason"}
-
-
 def test_null_returns_consistent_batch17():
     r1 = _null("x")
     r2 = _null("x")

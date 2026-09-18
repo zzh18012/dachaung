@@ -142,10 +142,6 @@ def test_module_cached_endswith_pyc_batch46():
 
 # ---------- 4 常量 intern ----------
 
-def test_evaluator_version_is_str_batch46():
-    assert isinstance(EVALUATOR_VERSION, str)
-
-
 def test_evaluator_version_id_consistent_batch46():
     """同字符串字面量在 CPython 通常 intern。"""
     a = "1.1"
@@ -247,34 +243,9 @@ def test_source_contains_其他指标语义未变_batch46():
     assert "其它指标语义未变" in src or "其他指标语义未变" in src
 
 
-def test_source_contains_EVALUATOR_VERSION_literal_batch46():
-    src = inspect.getsource(evaluation)
-    assert 'EVALUATOR_VERSION = "1.1"' in src
-
-
-def test_source_contains_REPORT_VERSION_literal_batch46():
-    src = inspect.getsource(evaluation)
-    assert 'REPORT_VERSION = "1.1"' in src
-
-
-def test_source_contains_ANNOTATION_VERSION_literal_batch46():
-    src = inspect.getsource(evaluation)
-    assert 'ANNOTATION_VERSION = "1.0"' in src
-
-
-def test_source_contains_MANIFEST_VERSION_literal_batch46():
-    src = inspect.getsource(evaluation)
-    assert 'MANIFEST_VERSION = "1.0"' in src
-
-
 def test_source_contains_no_return_1_batch46():
     src = inspect.getsource(evaluation)
     assert "不返回 1.0" in src
-
-
-def test_source_contains_no_forgery_batch46():
-    src = inspect.getsource(evaluation)
-    assert "不伪造" in src
 
 
 def test_source_no_extra_functions_batch46():
@@ -405,49 +376,9 @@ def test_ast_no_control_flow_batch46():
 
 # ---------- forbidden tokens 第一百零五批 ----------
 
-def test_source_no_eval_batch46():
-    src = inspect.getsource(evaluation)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch46():
-    src = inspect.getsource(evaluation)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch46():
-    src = inspect.getsource(evaluation)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch46():
-    src = inspect.getsource(evaluation)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch46():
-    src = inspect.getsource(evaluation)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch46():
-    src = inspect.getsource(evaluation)
-    assert "os.system(" not in src
-
-
 def test_source_no_popen_batch46():
     src = inspect.getsource(evaluation)
     assert ".popen(" not in src
-
-
-def test_source_no_yaml_load_batch46():
-    src = inspect.getsource(evaluation)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch46():
-    src = inspect.getsource(evaluation)
-    assert "pickle.load(" not in src
 
 
 def test_source_no_await_batch46():

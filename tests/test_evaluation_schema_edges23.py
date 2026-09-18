@@ -49,11 +49,6 @@ def test_eval_schema_error_with_message_and_empty_errors():
     assert err.errors == []
 
 
-def test_eval_schema_error_with_message_and_none_errors():
-    err = EvalSchemaError("msg", errors=None)
-    assert err.errors == []
-
-
 def test_eval_schema_error_with_message_and_one_error():
     err = EvalSchemaError("msg", errors=[{"path": ["a"], "message": "err"}])
     assert len(err.errors) == 1
@@ -300,13 +295,6 @@ def test_load_schema_title_field():
     ]:
         s = load_schema(name)
         assert "title" in s
-
-
-def test_load_schema_idempotent():
-    a = load_schema("manifest.schema.json")
-    b = load_schema("manifest.schema.json")
-    # 每次新读，但内容相等
-    assert a == b
 
 
 def test_load_schema_returns_independent_dicts():
@@ -1084,18 +1072,6 @@ def test_module_eval_schema_error_is_class():
 
 def test_module_eval_schema_error_subclass_exception():
     assert issubclass(smod.EvalSchemaError, Exception)
-
-
-def test_module_load_schema_callable():
-    assert callable(smod.load_schema)
-
-
-def test_module_validate_callable():
-    assert callable(smod.validate)
-
-
-def test_module_validate_file_callable():
-    assert callable(smod.validate_file)
 
 
 def test_module_no_user_classes_outside_eval_schema_error():

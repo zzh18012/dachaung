@@ -516,15 +516,6 @@ def test_strip_unicode_whitespace_all_whitespace_batch30():
 # ---------- _text_preservation 第三十批 ----------
 
 
-def test_text_preservation_perfect_match_batch30():
-    elements = [{"type": "paragraph", "content": "hello world"}]
-    chunks = [{"text": "hello world"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
-
-
 def test_text_preservation_unicode_batch30():
     elements = [{"type": "paragraph", "content": "你好世界"}]
     chunks = [{"text": "你好世界"}]
@@ -779,16 +770,6 @@ def test_signature_ratio_batch30():
     assert "dict[str, Any]" in str(sig.return_annotation)
 
 
-def test_signature_bool_metric_batch30():
-    sig = inspect.signature(_bool_metric)
-    assert sig.parameters["value"].annotation == "bool"
-
-
-def test_signature_int_metric_batch30():
-    sig = inspect.signature(_int_metric)
-    assert sig.parameters["value"].annotation == "int"
-
-
 def test_signature_compute_automatic_metrics_batch30():
     sig = inspect.signature(compute_automatic_metrics)
     params = list(sig.parameters.keys())
@@ -798,11 +779,6 @@ def test_signature_compute_automatic_metrics_batch30():
 def test_signature_compute_automatic_metrics_image_base_dir_default_batch30():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["image_base_dir"].default is None
-
-
-def test_signature_compute_automatic_metrics_return_annotation_batch30():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert "dict[str, Any]" in str(sig.return_annotation)
 
 
 def test_signature_is_valid_bbox_batch30():

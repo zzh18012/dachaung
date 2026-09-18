@@ -613,14 +613,6 @@ def test_chunk_boundary_prf_return_annotation_dict_batch13():
     assert "dict" in ret_str
 
 
-def test_module_user_function_count_2_batch13():
-    funcs = [
-        n for n, v in vars(amod).items()
-        if inspect.isfunction(v) and v.__module__ == amod.__name__
-    ]
-    assert set(funcs) == {"figure_caption_prf", "chunk_boundary_prf"}
-
-
 def test_module_dunder_all_3_items_batch13():
     assert hasattr(amod, "__all__")
     assert len(amod.__all__) == 3

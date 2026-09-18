@@ -39,10 +39,6 @@ from evaluation.metrics import (
 # ---------- _null / _ratio / _bool_metric / _int_metric 第三十八批
 
 
-def test_null_returns_dict_instance_batch38():
-    assert isinstance(_null("x"), dict)
-
-
 def test_ratio_returns_dict_instance_batch38():
     assert isinstance(_ratio(0.5), dict)
 
@@ -53,10 +49,6 @@ def test_bool_metric_returns_dict_instance_batch38():
 
 def test_int_metric_returns_dict_instance_batch38():
     assert isinstance(_int_metric(5), dict)
-
-
-def test_null_value_field_none_explicit_batch38():
-    assert _null("any")["value"] is None
 
 
 def test_ratio_value_field_float_batch38():
@@ -762,11 +754,6 @@ def test_module_source_contains_pure_function_keyword_batch38():
     assert "纯函数" in src
 
 
-def test_module_source_contains_counter_keyword_batch38():
-    src = inspect.getsource(mmod)
-    assert "Counter" in src
-
-
 def test_module_source_contains_text_preservation_section_batch38():
     src = inspect.getsource(mmod)
     assert "text_preservation 语义" in src
@@ -902,18 +889,6 @@ def test_module_all_only_compute_automatic_metrics_batch38():
 
 def test_module_has_text_types_attribute_batch38():
     assert hasattr(mmod, "_TEXT_TYPES")
-
-
-def test_module_has_pdf_bbox_required_types_attribute_batch38():
-    assert hasattr(mmod, "_PDF_BBOX_REQUIRED_TYPES")
-
-
-def test_module_has_not_evaluated_attribute_batch38():
-    assert hasattr(mmod, "_NOT_EVALUATED")
-
-
-def test_module_has_compute_automatic_metrics_attribute_batch38():
-    assert hasattr(mmod, "compute_automatic_metrics")
 
 
 def test_module_does_not_define_class_batch38():

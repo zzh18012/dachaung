@@ -366,12 +366,6 @@ def test_pdf_locator_ratio_mixed_valid_invalid_batch24():
 # ---------- _docx_locator_ratio 第二十四批 ----------
 
 
-def test_docx_locator_ratio_table_index_valid_batch24():
-    elements = [{"type": "paragraph", "source_locator": {"table_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_section_valid_batch24():
     elements = [{"type": "paragraph", "source_locator": {"section": 1}}]
     out = _docx_locator_ratio(elements)
@@ -453,14 +447,6 @@ def test_is_valid_bbox_all_int_batch24():
 
 def test_is_valid_bbox_all_float_batch24():
     assert _is_valid_bbox([0.0, 0.0, 100.0, 100.0]) is True
-
-
-def test_is_valid_bbox_nan_invalid_batch24():
-    assert _is_valid_bbox([0, 0, float("nan"), 100]) is False
-
-
-def test_is_valid_bbox_inf_invalid_batch24():
-    assert _is_valid_bbox([0, 0, float("inf"), 100]) is False
 
 
 # ---------- _image_resource_ratio 第二十四批 ----------
@@ -600,15 +586,6 @@ def test_text_preservation_empty_both_returns_null_metrics_batch24():
     assert out["equal"]["value"] is True
 
 
-def test_text_preservation_identical_content_batch24():
-    elements = [{"type": "paragraph", "content": "hello world"}]
-    chunks = [{"text": "hello world"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
-
-
 def test_text_preservation_actual_missing_content_batch24():
     """actual 空 + expected 非空 → precision null / recall 0。"""
     elements = [{"type": "paragraph", "content": "abc"}]
@@ -662,26 +639,11 @@ def test_heading_boundary_ratio_no_chunks_batch24():
     assert out["value"] == 0.0
 
 
-def test_heading_boundary_ratio_perfect_match_batch24():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["h1", "p1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 1.0
-
-
 def test_heading_boundary_ratio_partial_match_batch24():
     elements = [{"type": "heading", "element_id": "h1"}, {"type": "heading", "element_id": "h2"}]
     chunks = [{"source_element_ids": ["h1"]}]  # 只有 h1 被匹配
     out = _heading_boundary_ratio(elements, chunks)
     assert out["value"] == 0.5
-
-
-def test_heading_boundary_ratio_heading_no_element_id_batch24():
-    elements = [{"type": "heading"}]  # 无 element_id
-    chunks = [{"source_element_ids": ["h1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    # h.get('element_id') = None → 不在 chunk_first_ids → 0 match
-    assert out["value"] == 0.0
 
 
 def test_heading_boundary_ratio_chunks_missing_first_id_batch24():
@@ -930,34 +892,6 @@ def test_module_source_has_is_valid_bbox_function_batch24():
 # ---------- signatures 第三十五批 ----------
 
 
-def test_signature_null_one_param_batch24():
-    sig = inspect.signature(_null)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "reason"
-
-
-def test_signature_ratio_one_param_batch24():
-    sig = inspect.signature(_ratio)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "value"
-
-
-def test_signature_bool_metric_one_param_batch24():
-    sig = inspect.signature(_bool_metric)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "value"
-
-
-def test_signature_int_metric_one_param_batch24():
-    sig = inspect.signature(_int_metric)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "value"
-
-
 def test_signature_compute_metrics_image_base_dir_default_none_batch24():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["image_base_dir"].default is None
@@ -1006,11 +940,6 @@ def test_module_constants_not_in_all_batch24():
     assert "_null" not in mmod.__all__
     assert "_ratio" not in mmod.__all__
     assert "_TEXT_TYPES" not in mmod.__all__
-
-
-def test_module_no_main_block_batch24():
-    src = inspect.getsource(mmod)
-    assert 'if __name__ ==' not in src
 
 
 def test_module_compute_metrics_is_public_batch24():

@@ -776,11 +776,6 @@ def test_module_source_contains_manifest_error_class_batch38():
     assert "class ManifestError" in src
 
 
-def test_module_source_contains_document_entry_class_batch38():
-    src = inspect.getsource(mmod)
-    assert "class DocumentEntry" in src
-
-
 def test_module_source_contains_expected_failure_class_batch38():
     src = inspect.getsource(mmod)
     assert "class ExpectedFailure" in src
@@ -816,16 +811,6 @@ def test_module_source_contains_detect_project_root_function_batch38():
     assert "def _detect_project_root(" in src
 
 
-def test_module_source_contains_content_group_count_property_batch38():
-    src = inspect.getsource(mmod)
-    assert "def content_group_count" in src
-
-
-def test_module_source_contains_categories_covered_property_batch38():
-    src = inspect.getsource(mmod)
-    assert "def categories_covered" in src
-
-
 def test_module_source_contains_pyproject_toml_keyword_batch38():
     src = inspect.getsource(mmod)
     assert "pyproject.toml" in src
@@ -834,11 +819,6 @@ def test_module_source_contains_pyproject_toml_keyword_batch38():
 def test_module_source_contains_frozen_true_keyword_batch38():
     src = inspect.getsource(mmod)
     assert "@dataclass(frozen=True)" in src
-
-
-def test_module_source_contains_resolve_call_batch38():
-    src = inspect.getsource(mmod)
-    assert ".resolve()" in src
 
 
 # ---------- signatures 第五十八批
@@ -903,10 +883,6 @@ def test_module_has_expected_failure_batch38():
     assert hasattr(mmod, "ExpectedFailure")
 
 
-def test_module_has_load_manifest_batch38():
-    assert hasattr(mmod, "load_manifest")
-
-
 def test_module_has_all_attribute_batch38():
     assert hasattr(mmod, "__all__")
 
@@ -921,10 +897,6 @@ def test_module_all_len_five_batch38():
 
 def test_module_load_manifest_callable_batch38():
     assert callable(mmod.load_manifest)
-
-
-def test_module_manifest_error_subclass_of_exception_batch38():
-    assert issubclass(mmod.ManifestError, Exception)
 
 
 # ---------- 端到端集成 第五十八批

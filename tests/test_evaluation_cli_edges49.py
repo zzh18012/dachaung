@@ -559,20 +559,9 @@ def test_module_source_forbidden_tokens_batch22(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch22():
-    src = inspect.getsource(climod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch22():
     src = inspect.getsource(climod)
     assert "import socket" not in src
-
-
-def test_module_source_no_requests_import_batch22():
-    src = inspect.getsource(climod)
-    assert "import requests" not in src
 
 
 def test_module_source_no_urllib_import_batch22():
@@ -583,11 +572,6 @@ def test_module_source_no_urllib_import_batch22():
 def test_module_source_no_threading_import_batch22():
     src = inspect.getsource(climod)
     assert "import threading" not in src
-
-
-def test_module_source_no_multiprocessing_import_batch22():
-    src = inspect.getsource(climod)
-    assert "import multiprocessing" not in src
 
 
 def test_module_source_no_asyncio_import_batch22():
@@ -611,36 +595,6 @@ def test_module_source_no_sys_stdout_reconfigure_outside_if_batch22():
     # 顶层不应有 sys.stdout.reconfigure() 的直接调用（必须先 hasattr）
     # 检查源里至少有一个 hasattr 守卫
     assert 'hasattr(sys.stdout, "reconfigure")' in src
-
-
-def test_module_source_no_logging_import_batch22():
-    src = inspect.getsource(climod)
-    assert "import logging" not in src
-
-
-def test_module_source_no_re_import_batch22():
-    src = inspect.getsource(climod)
-    assert "import re" not in src
-
-
-def test_module_source_no_datetime_import_batch22():
-    src = inspect.getsource(climod)
-    assert "import datetime" not in src
-
-
-def test_module_source_no_collections_import_batch22():
-    src = inspect.getsource(climod)
-    assert "import collections" not in src
-
-
-def test_module_source_no_pandas_import_batch22():
-    src = inspect.getsource(climod)
-    assert "import pandas" not in src
-
-
-def test_module_source_no_numpy_import_batch22():
-    src = inspect.getsource(climod)
-    assert "import numpy" not in src
 
 
 # ---------- module source 字符串精确补强第三十四批 ----------
@@ -719,12 +673,6 @@ def test_signature_build_parser_no_args_batch22():
     sig = inspect.signature(_build_parser)
     params = list(sig.parameters.values())
     assert len(params) == 0
-
-
-def test_signature_main_argv_default_none_batch22():
-    sig = inspect.signature(main)
-    p = sig.parameters["argv"]
-    assert p.default is None
 
 
 def test_signature_main_returns_int_annotation_batch22():

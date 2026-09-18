@@ -646,11 +646,6 @@ def test_signature_load_manifest_return_manifest_batch35():
     assert sig.return_annotation == "Manifest"
 
 
-def test_signature_detect_project_root_return_path_batch35():
-    sig = inspect.signature(_detect_project_root)
-    assert sig.return_annotation == "Path"
-
-
 # ---------- module 合理性第四十九批
 
 

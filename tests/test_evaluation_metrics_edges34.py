@@ -310,13 +310,6 @@ def test_docx_locator_partial_valid():
 # ---------- _image_resource_ratio 行为深度第七批 ----------
 
 
-def test_image_resource_no_image_elements():
-    elements = [{"type": "paragraph"}]
-    out = _image_resource_ratio(elements, None)
-    assert out["value"] is None
-    assert out["reason"] == "no_image_elements"
-
-
 def test_image_resource_empty_resource_path():
     """image element 但 resource_path 缺失 → invalid。"""
     elements = [{"type": "image"}]
@@ -822,10 +815,6 @@ def test_module_no_user_classes():
         if isinstance(val, type) and val.__module__ == mmod.__name__
     ]
     assert len(classes) == 0
-
-
-def test_module_function_module_eq_mmod():
-    assert compute_automatic_metrics.__module__ == "evaluation.metrics"
 
 
 def test_module_docstring_present():

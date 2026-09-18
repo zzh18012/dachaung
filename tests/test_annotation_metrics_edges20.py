@@ -529,11 +529,6 @@ def test_figure_caption_prf_source_contains_function_def():
     assert "def figure_caption_prf(" in src
 
 
-def test_figure_caption_prf_source_contains_reason_assignment():
-    src = inspect.getsource(figure_caption_prf)
-    assert "reason = PARSER_DOES_NOT_EMIT_RELATIONS" in src
-
-
 def test_figure_caption_prf_source_does_not_contain_algorithm_tokens():
     """figure_caption_prf 是纯固定输出，不含算法 token。"""
     src = inspect.getsource(figure_caption_prf)

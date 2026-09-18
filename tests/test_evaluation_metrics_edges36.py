@@ -244,13 +244,6 @@ def test_compute_metrics_does_not_mutate_error():
     assert json.dumps(err) == snapshot
 
 
-def test_compute_metrics_idempotent():
-    doc = {"elements": [], "chunks": []}
-    out1 = compute_automatic_metrics(doc, None, "pdf", None)
-    out2 = compute_automatic_metrics(doc, None, "pdf", None)
-    assert out1 == out2
-
-
 def test_compute_metrics_minimal_doc_returns_pipeline_success_true():
     doc = {"elements": [], "chunks": []}
     out = compute_automatic_metrics(doc, None, "pdf", None)
@@ -571,10 +564,6 @@ def test_is_valid_bbox_tuple_rejected():
     assert _is_valid_bbox((0, 0, 10, 10)) is False
 
 
-def test_is_valid_bbox_string():
-    assert _is_valid_bbox("0,0,10,10") is False
-
-
 def test_is_valid_bbox_none():
     assert _is_valid_bbox(None) is False
 
@@ -729,11 +718,6 @@ def test_metrics_source_no_walrus():
     assert ":=" not in source
 
 
-def test_metrics_source_no_unlink():
-    source = inspect.getsource(mmod)
-    assert "unlink" not in source
-
-
 def test_metrics_source_no_remove():
     source = inspect.getsource(mmod)
     assert ".remove(" not in source
@@ -743,11 +727,6 @@ def test_metrics_source_no_logging():
     source = inspect.getsource(mmod)
     assert "logging" not in source
     assert "logger" not in source
-
-
-def test_metrics_source_no_sleep():
-    source = inspect.getsource(mmod)
-    assert "time.sleep" not in source
 
 
 def test_metrics_source_no_print():
@@ -874,17 +853,6 @@ def test_signature_compute_automatic_metrics_5_params():
     assert len(sig.parameters) == 5
 
 
-def test_signature_compute_automatic_metrics_param_names():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert list(sig.parameters) == [
-        "document",
-        "error",
-        "source_type",
-        "expectations",
-        "image_base_dir",
-    ]
-
-
 def test_signature_compute_automatic_metrics_param_kinds():
     sig = inspect.signature(compute_automatic_metrics)
     for p in sig.parameters.values():
@@ -913,18 +881,6 @@ def test_signature_compute_automatic_metrics_return_dict():
     sig = inspect.signature(compute_automatic_metrics)
     ra = sig.return_annotation
     assert ra == "dict[str, Any]" or ra == dict[str, any]
-
-
-def test_signature_null_helper():
-    sig = inspect.signature(_null)
-    assert len(sig.parameters) == 1
-    assert "reason" in sig.parameters
-
-
-def test_signature_ratio_helper():
-    sig = inspect.signature(_ratio)
-    assert len(sig.parameters) == 1
-    assert "value" in sig.parameters
 
 
 def test_signature_bool_metric_helper():

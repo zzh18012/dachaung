@@ -77,11 +77,6 @@ def test_ratio_metrics_contains_chunk_boundary_trio_batch24():
     assert "chunk_boundary_f1" in _RATIO_METRICS
 
 
-def test_ratio_metrics_contains_text_char_multiset_pair_batch24():
-    assert "text_char_multiset_precision" in _RATIO_METRICS
-    assert "text_char_multiset_recall" in _RATIO_METRICS
-
-
 def test_ratio_metrics_order_stable_batch24():
     """顺序固定（schema_valid 在前）。"""
     assert _RATIO_METRICS[0] == "schema_valid"
@@ -240,12 +235,6 @@ def test_get_dependency_versions_pypdfium2_str_or_none_batch24():
     assert v is None or isinstance(v, str)
 
 
-def test_get_dependency_versions_consistent_batch24():
-    out1 = get_dependency_versions()
-    out2 = get_dependency_versions()
-    assert out1 == out2
-
-
 def test_get_dependency_versions_package_not_found_returns_none_batch24():
     """mock importlib.metadata 抛 PackageNotFoundError → 返回 None。"""
     import importlib.metadata
@@ -292,11 +281,6 @@ def test_build_provenance_max_chars_int_batch24(tmp_path):
     out = build_provenance(tmp_path, "fallback", 999, None)
     assert out["max_chars"] == 999
     assert isinstance(out["max_chars"], int)
-
-
-def test_build_provenance_parser_name_passed_batch24(tmp_path):
-    out = build_provenance(tmp_path, "kreuzberg", 800, None)
-    assert out["parser_name"] == "kreuzberg"
 
 
 def test_build_provenance_parser_version_none_batch24(tmp_path):
@@ -709,20 +693,6 @@ def test_signature_get_dependency_versions_no_params_batch24():
     assert len(params) == 0
 
 
-def test_signature_build_devset_section_one_param_batch24():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "manifest"
-
-
-def test_signature_aggregate_summary_one_param_batch24():
-    sig = inspect.signature(aggregate_summary)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "per_doc_results"
-
-
 def test_signature_build_provenance_return_annotation_batch24():
     sig = inspect.signature(build_provenance)
     assert "dict" in str(sig.return_annotation)
@@ -761,11 +731,6 @@ def test_module_constants_not_in_all_batch24():
     assert "_RATIO_METRICS" not in rmod.__all__
     assert "_COUNT_METRICS" not in rmod.__all__
     assert "_SUCCESS_BOOL_METRICS" not in rmod.__all__
-
-
-def test_module_has_module_docstring_batch24():
-    assert rmod.__doc__ is not None
-    assert len(rmod.__doc__) > 0
 
 
 def test_module_public_functions_dont_start_with_underscore_batch24():

@@ -49,10 +49,6 @@ from app.parsers.markdown_parser import (
 # =========================================================================
 
 
-def test_md_extensions_is_tuple():
-    assert isinstance(_MD_EXTENSIONS, tuple)
-
-
 def test_md_extensions_lowercase_only():
     """扩展名都是小写（suffix 在比较前会 .lower()）。"""
     for ext in _MD_EXTENSIONS:
@@ -134,18 +130,6 @@ def test_atx_heading_regex_unicode_title():
 # =========================================================================
 
 
-def test_thematic_regex_three_minuses():
-    assert _THEMATIC_RE.match("---") is not None
-
-
-def test_thematic_regex_three_asterisks():
-    assert _THEMATIC_RE.match("***") is not None
-
-
-def test_thematic_regex_three_underscores():
-    assert _THEMATIC_RE.match("___") is not None
-
-
 def test_thematic_regex_mixed_chars_no_match():
     """分隔符必须由同一种字符组成（实际正则允许 mixed，看下文）。"""
     # 实际正则 `(?:[-*_])(?:\s*[-*_]){2,}` 允许混合
@@ -185,12 +169,6 @@ def test_fenced_regex_three_backticks():
     assert m is not None
     assert m.group(1).startswith("`")
     assert len(m.group(1)) == 3
-
-
-def test_fenced_regex_three_backticks_with_lang():
-    m = _FENCED_RE.match("```python")
-    assert m is not None
-    assert m.group(2) == "python"
 
 
 def test_fenced_regex_four_backticks():
@@ -300,10 +278,6 @@ def test_ordered_list_regex_no_marker():
     assert _ORDERED_LIST_RE.match("item") is None
 
 
-def test_ordered_list_regex_no_space_no_match():
-    assert _ORDERED_LIST_RE.match("1.item") is None
-
-
 def test_ordered_list_regex_zero():
     m = _ORDERED_LIST_RE.match("0. item")
     assert m is not None
@@ -318,12 +292,6 @@ def test_ordered_list_regex_no_dot_or_paren():
 # =========================================================================
 # _BLOCKQUOTE_RE 深度
 # =========================================================================
-
-
-def test_blockquote_regex_basic():
-    m = _BLOCKQUOTE_RE.match("> text")
-    assert m is not None
-    assert m.group(1) == "text"
 
 
 def test_blockquote_regex_multiple_markers_only_first_consumed():
@@ -387,10 +355,6 @@ def test_standalone_image_regex_no_alt_brackets_no_match():
 # =========================================================================
 
 
-def test_pipe_table_row_basic():
-    assert _PIPE_TABLE_ROW_RE.match("| a | b |") is not None
-
-
 def test_pipe_table_row_no_leading_pipe():
     r"""regex 要求 `^\s*\|` → 必须有前导 |。"""
     assert _PIPE_TABLE_ROW_RE.match("a | b |") is None
@@ -408,10 +372,6 @@ def test_pipe_table_row_single_pipe():
 
 def test_pipe_table_row_empty_cells():
     assert _PIPE_TABLE_ROW_RE.match("|  |  |") is not None
-
-
-def test_pipe_table_sep_basic():
-    assert _PIPE_TABLE_SEP_RE.match("| --- | --- |") is not None
 
 
 def test_pipe_table_sep_no_pipes():
@@ -535,10 +495,6 @@ def test_rows_to_md_with_unicode_cells():
 # =========================================================================
 # _split_pipe_row 深度
 # =========================================================================
-
-
-def test_split_pipe_row_basic():
-    assert _split_pipe_row("| a | b |") == ["a", "b"]
 
 
 def test_split_pipe_row_no_pipes():

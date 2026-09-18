@@ -93,14 +93,6 @@ def test_is_heading_style_heading_negative_clamped_to_one():
     assert _is_heading_style("Heading -1") == (True, 1)
 
 
-def test_is_heading_style_normal_returns_false():
-    assert _is_heading_style("Normal") == (False, 0)
-
-
-def test_is_heading_style_empty_string_returns_false():
-    assert _is_heading_style("") == (False, 0)
-
-
 def test_is_heading_style_heading_with_extra_whitespace():
     assert _is_heading_style("  Heading  4  ") == (True, 4)
 
@@ -539,10 +531,6 @@ def test_fallback_parser_name_value():
     assert FallbackParser.name == "fallback"
 
 
-def test_fallback_parser_version_is_str():
-    assert isinstance(FallbackParser.version, str)
-
-
 def test_fallback_parser_version_includes_pdfplumber():
     assert "pdfplumber" in FallbackParser.version
 
@@ -565,11 +553,6 @@ def test_fallback_parser_init_empty_string_image_output_dir():
     """空字符串 → falsy → _image_output_dir=None。"""
     parser = FallbackParser(image_output_dir="")
     assert parser._image_output_dir is None
-
-
-def test_fallback_parser_init_default_image_output_dir_is_none():
-    sig = inspect.signature(FallbackParser.__init__)
-    assert sig.parameters["image_output_dir"].default is None
 
 
 def test_fallback_parser_init_signature():

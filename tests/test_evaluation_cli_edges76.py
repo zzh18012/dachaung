@@ -120,18 +120,6 @@ def test_build_parser_inspect_doc_default_tolerance_batch51():
 
 # ---------- _format_metric 多类型 ----------
 
-def test_format_metric_none_value_batch51():
-    out = _format_metric("foo", {"value": None, "reason": "no_data"})
-    assert "null" in out
-    assert "no_data" in out
-
-
-def test_format_metric_bool_true_batch51():
-    out = _format_metric("foo", {"value": True, "reason": None})
-    assert "true" in out
-    assert "ok" in out
-
-
 def test_format_metric_large_int_batch51():
     out = _format_metric("foo", {"value": 9999999, "reason": None})
     assert "9999999" in out
@@ -423,11 +411,6 @@ def test_source_contains_path_import_batch51():
     assert "from pathlib import Path" in src
 
 
-def test_source_imports_manifest_helpers_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.manifest import ManifestError, load_manifest" in src
-
-
 def test_source_imports_get_git_provenance_batch51():
     src = inspect.getsource(cli_mod)
     assert "from evaluation.report import get_git_provenance" in src
@@ -438,30 +421,15 @@ def test_source_imports_run_evaluation_batch51():
     assert "from evaluation.runner import run_evaluation" in src
 
 
-def test_source_imports_schema_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.schema import EvalSchemaError, validate_file" in src
-
-
 def test_source_contains_reconfigure_utf8_batch51():
     src = inspect.getsource(cli_mod)
     assert "reconfigure" in src
     assert "utf-8" in src.lower()
 
 
-def test_source_contains_errors_replace_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "errors=\"replace\"" in src
-
-
 def test_source_contains_ok_marker_batch51():
     src = inspect.getsource(cli_mod)
     assert "[OK]" in src
-
-
-def test_source_contains_return_0_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "return 0" in src
 
 
 def test_source_contains_required_true_batch51():

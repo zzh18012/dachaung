@@ -168,10 +168,6 @@ def test_has_backslash_empty():
     assert _has_backslash("") is False
 
 
-def test_has_backslash_mixed():
-    assert _has_backslash("foo\\bar/baz") is True
-
-
 def test_has_backslash_multiple():
     assert _has_backslash("a\\b\\c") is True
 
@@ -1142,10 +1138,6 @@ def test_module_all_5_entries():
         "ExpectedFailure",
         "load_manifest",
     ]
-
-
-def test_module_all_is_list():
-    assert isinstance(m.__all__, list)
 
 
 def test_module_has_3_dataclasses():

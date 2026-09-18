@@ -74,11 +74,6 @@ def test_bool_metric_with_string_batch35():
     assert m["value"] is True
 
 
-def test_bool_metric_with_empty_string_batch35():
-    m = _bool_metric("")
-    assert m["value"] is False
-
-
 def test_int_metric_with_bool_batch35():
     """int(True) = 1, int(False) = 0。"""
     assert _int_metric(True)["value"] == 1
@@ -561,16 +556,6 @@ def test_module_source_contains_all_only_compute_batch35():
 # ---------- signatures 第四十九批
 
 
-def test_signature_null_returns_dict_batch35():
-    sig = inspect.signature(_null)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
-def test_signature_ratio_returns_dict_batch35():
-    sig = inspect.signature(_ratio)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_signature_strip_unicode_returns_str_batch35():
     sig = inspect.signature(_strip_unicode_whitespace)
     assert sig.return_annotation == "str"
@@ -601,10 +586,6 @@ def test_module_imports_pathlib_batch35():
 
 def test_module_has_text_types_batch35():
     assert hasattr(mmod, "_TEXT_TYPES")
-
-
-def test_module_has_pdf_bbox_required_batch35():
-    assert hasattr(mmod, "_PDF_BBOX_REQUIRED_TYPES")
 
 
 def test_module_has_compute_automatic_metrics_batch35():

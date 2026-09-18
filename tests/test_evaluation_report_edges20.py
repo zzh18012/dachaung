@@ -865,11 +865,6 @@ def test_build_provenance_parser_version_none_passes_through(tmp_path):
     assert out["parser_version"] is None
 
 
-def test_build_provenance_parser_version_string_passes_through(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, "1.2.3")
-    assert out["parser_version"] == "1.2.3"
-
-
 def test_build_provenance_evaluator_version_constant(tmp_path):
     """evaluator_version 来自 evaluation.EVALUATOR_VERSION（不能改）。"""
     out = build_provenance(tmp_path, "fallback", 800, None)

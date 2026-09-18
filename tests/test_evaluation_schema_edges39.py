@@ -48,10 +48,6 @@ def test_schemas_dir_is_absolute_batch19():
     assert SCHEMAS_DIR.is_absolute()
 
 
-def test_schemas_dir_exists_batch19():
-    assert SCHEMAS_DIR.exists()
-
-
 def test_schemas_dir_has_manifest_schema_batch19():
     assert (SCHEMAS_DIR / "manifest.schema.json").is_file()
 
@@ -62,10 +58,6 @@ def test_schemas_dir_has_annotation_schema_batch19():
 
 def test_schemas_dir_has_evaluation_report_schema_batch19():
     assert (SCHEMAS_DIR / "evaluation-report.schema.json").is_file()
-
-
-def test_schemas_dir_has_document_schema_batch19():
-    assert (SCHEMAS_DIR / "document.schema.json").is_file()
 
 
 def test_schemas_dir_parent_contains_evaluation_dir_batch19():
@@ -298,11 +290,6 @@ def test_validate_does_not_return_bool_batch19():
     assert result is None
 
 
-def test_validate_annotation_empty_fails_batch19():
-    with pytest.raises(EvalSchemaError):
-        validate({}, "annotation.schema.json")
-
-
 def test_validate_evaluation_report_empty_fails_batch19():
     with pytest.raises(EvalSchemaError):
         validate({}, "evaluation-report.schema.json")
@@ -413,55 +400,14 @@ def test_module_source_forbidden_tokens_batch19(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch19():
     src = inspect.getsource(smod)
     assert "import socket" not in src
 
 
-def test_module_source_no_requests_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import requests" not in src
-
-
 def test_module_source_no_urllib_import_batch19():
     src = inspect.getsource(smod)
     assert "import urllib" not in src
-
-
-def test_module_source_no_threading_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import threading" not in src
-
-
-def test_module_source_no_asyncio_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import asyncio" not in src
-
-
-def test_module_source_no_shutil_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import shutil" not in src
-
-
-def test_module_source_no_tempfile_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import tempfile" not in src
-
-
-def test_module_source_no_sys_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import sys" not in src
-
-
-def test_module_source_no_logging_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import logging" not in src
 
 
 def test_module_source_no_re_import_batch19():
@@ -492,11 +438,6 @@ def test_module_source_no_numpy_import_batch19():
 def test_module_source_no_path_write_text_batch19():
     src = inspect.getsource(smod)
     assert ".write_text(" not in src
-
-
-def test_module_source_no_path_unlink_batch19():
-    src = inspect.getsource(smod)
-    assert ".unlink(" not in src
 
 
 # ---------- module source 字符串精确补强第三十一批 ----------
@@ -532,11 +473,6 @@ def test_module_source_has_jsonschema_exceptions_import_batch19():
     assert "from jsonschema.exceptions import ValidationError as JSValidationError" in src
 
 
-def test_module_source_has_schemas_dir_assignment_batch19():
-    src = inspect.getsource(smod)
-    assert 'SCHEMAS_DIR = Path(__file__).resolve().parent.parent / "schemas"' in src
-
-
 def test_module_source_has_class_eval_schema_error_batch19():
     src = inspect.getsource(smod)
     assert "class EvalSchemaError(Exception):" in src
@@ -545,21 +481,6 @@ def test_module_source_has_class_eval_schema_error_batch19():
 def test_module_source_has_schema_path_function_batch19():
     src = inspect.getsource(smod)
     assert "def _schema_path(name: str) -> Path:" in src
-
-
-def test_module_source_has_load_schema_function_batch19():
-    src = inspect.getsource(smod)
-    assert "def load_schema(name: str) -> dict[str, Any]:" in src
-
-
-def test_module_source_has_validate_function_batch19():
-    src = inspect.getsource(smod)
-    assert "def validate(instance: dict[str, Any], schema_name: str) -> None:" in src
-
-
-def test_module_source_has_validate_file_function_batch19():
-    src = inspect.getsource(smod)
-    assert "def validate_file(path: Path | str, schema_name: str) -> None:" in src
 
 
 def test_module_source_has_iter_errors_call_batch19():
@@ -637,18 +558,6 @@ def test_module_all_contents_exact_batch19():
         "validate",
         "validate_file",
     }
-
-
-def test_module_does_not_import_evaluation_runner_batch19():
-    src = inspect.getsource(smod)
-    assert "from evaluation.runner" not in src
-    assert "from evaluation import runner" not in src
-
-
-def test_module_does_not_import_evaluation_metrics_batch19():
-    src = inspect.getsource(smod)
-    assert "from evaluation.metrics" not in src
-    assert "from evaluation import metrics" not in src
 
 
 def test_module_does_not_import_evaluation_manifest_batch19():

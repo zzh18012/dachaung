@@ -108,17 +108,9 @@ def test_detect_md_source_type_message_mentions_actual_suffix():
 # =========================================================================
 
 
-def test_md_extensions_is_tuple():
-    assert isinstance(_MD_EXTENSIONS, tuple)
-
-
 def test_md_extensions_starts_with_dot():
     for ext in _MD_EXTENSIONS:
         assert ext.startswith(".")
-
-
-def test_md_extensions_length_two():
-    assert len(_MD_EXTENSIONS) == 2
 
 
 # =========================================================================
@@ -191,10 +183,6 @@ def test_rows_to_md_separator_always_three_dashes():
 def test_split_pipe_row_no_pipes_returns_single_cell():
     """无 | 的行 → 单 cell（strip 后）。"""
     assert _split_pipe_row("hello") == ["hello"]
-
-
-def test_split_pipe_row_two_cells_with_pipes():
-    assert _split_pipe_row("| a | b |") == ["a", "b"]
 
 
 def test_split_pipe_row_three_cells():

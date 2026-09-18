@@ -316,12 +316,6 @@ def test_main_run_manifest_schema_invalid_batch16(tmp_path, capsys):
     assert rc == 1
 
 
-def test_main_inspect_doc_valid_returns_0_batch16(tmp_path):
-    p = _write_valid_doc(tmp_path)
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-
-
 def test_main_returns_int_type_batch16(tmp_path):
     rc = main(["inspect-doc", str(_write_valid_doc(tmp_path))])
     assert isinstance(rc, int)
@@ -468,11 +462,6 @@ def test_module_source_has_choices_tuple_batch16():
 def test_module_source_has_utf8_reconfigure_batch16():
     src = inspect.getsource(cmod)
     assert 'sys.stdout.reconfigure' in src or 'sys.stderr.reconfigure' in src
-
-
-def test_module_source_has_required_true_batch16():
-    src = inspect.getsource(cmod)
-    assert "required=True" in src
 
 
 def test_module_source_has_evaluator_description_batch16():

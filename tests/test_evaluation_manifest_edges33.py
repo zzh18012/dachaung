@@ -61,10 +61,6 @@ def test_is_absolute_like_4_letter_with_colon_pos1():
     assert _is_absolute_like("a:/foo") is True  # len("a:/foo") >= 3
 
 
-def test_is_absolute_like_two_char_input():
-    assert _is_absolute_like("a:") is False  # len < 3
-
-
 def test_is_absolute_like_three_char_with_pos2_pipe():
     assert _is_absolute_like("a:|foo") is False  # pos2 不是 \ 或 /
 
@@ -665,11 +661,6 @@ def test_manifest_source_no_forbidden_token_v2(token):
 
 
 # ---------- module source 字符串精确补强第二批 ----------
-
-
-def test_manifest_source_dataclass_decorator_count():
-    src = inspect.getsource(mmod)
-    assert src.count("@dataclass(frozen=True)") == 3
 
 
 def test_manifest_source_class_count_4():

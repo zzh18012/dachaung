@@ -270,11 +270,6 @@ def _make_expected_failure(
     )
 
 
-def test_expected_failure_fields_count_batch45():
-    fs = fields(ExpectedFailure)
-    assert len(fs) == 5
-
-
 def test_expected_failure_field_names_batch45():
     fs = fields(ExpectedFailure)
     names = [f.name for f in fs]
@@ -319,11 +314,6 @@ def test_manifest_frozen_batch45():
     m = _make_manifest()
     with pytest.raises(FrozenInstanceError):
         m.manifest_version = "9.9"  # type: ignore[misc]
-
-
-def test_manifest_fields_count_batch45():
-    fs = fields(Manifest)
-    assert len(fs) == 5
 
 
 def test_manifest_field_names_batch45():
@@ -874,46 +864,6 @@ def test_ast_load_manifest_has_for_loops_batch45():
 
 
 # ---------- forbidden tokens 第九十九批 ----------
-
-def test_source_no_eval_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "pickle.load(" not in src
-
 
 def test_source_no_async_def_batch45():
     src = inspect.getsource(manifest_mod)

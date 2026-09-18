@@ -444,10 +444,6 @@ def test_silent_drop_count_param_names():
 # =========================================================================
 
 
-def test_compute_automatic_metrics_module_identity():
-    assert compute_automatic_metrics.__module__ == "evaluation.metrics"
-
-
 def test_all_helpers_module_is_evaluation_metrics():
     for fn in [
         _null,
@@ -545,23 +541,11 @@ def test_module_all_is_list():
     assert isinstance(m.__all__, list)
 
 
-def test_module_namespace_contains_math():
-    import evaluation.metrics as m
-
-    assert hasattr(m, "math")
-
-
 def test_module_namespace_contains_counter():
     import evaluation.metrics as m
 
     assert hasattr(m, "Counter")
     assert m.Counter is Counter
-
-
-def test_module_namespace_contains_path():
-    import evaluation.metrics as m
-
-    assert hasattr(m, "Path")
 
 
 def test_module_namespace_contains_any():

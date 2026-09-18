@@ -180,11 +180,6 @@ def test_format_metric_with_int_value_batch39():
     assert "5" in out
 
 
-def test_format_metric_with_float_value_batch39():
-    out = _format_metric("x", {"value": 0.5, "reason": None})
-    assert "0.5000" in out
-
-
 def test_format_metric_with_dict_value_batch39():
     """dict 类型 value。"""
     out = _format_metric("x", {"value": {"a": 1, "b": 2}, "reason": None})
@@ -389,13 +384,6 @@ def test_main_validate_report_invalid_json_returns_1_batch39(tmp_path, capsys):
     assert rc == 1
 
 
-def test_main_inspect_doc_invalid_json_returns_1_batch39(tmp_path, capsys):
-    p = tmp_path / "bad.json"
-    p.write_text("{invalid", encoding="utf-8")
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 1
-
-
 def test_main_callable_batch39():
     assert callable(main)
 
@@ -521,11 +509,6 @@ def test_module_source_contains_subparsers_batch39():
     assert "add_subparsers" in src
 
 
-def test_module_source_contains_required_true_batch39():
-    src = inspect.getsource(cmod)
-    assert "required=True" in src
-
-
 def test_module_source_contains_run_subparser_batch39():
     src = inspect.getsource(cmod)
     assert '"run"' in src or "'run'" in src
@@ -553,10 +536,6 @@ def test_module_source_contains_utf8_reconfigure_batch39():
 
 
 # ---------- module 合理性 第六十二批
-
-
-def test_module_has_main_attribute_batch39():
-    assert hasattr(cmod, "main")
 
 
 def test_module_has_build_parser_attribute_batch39():

@@ -408,16 +408,6 @@ def test_module_source_contains_missing_markers_local_batch30():
 # ---------- signatures 第四十三批 ----------
 
 
-def test_signature_figure_caption_prf_return_dict_batch30():
-    sig = inspect.signature(figure_caption_prf)
-    assert "dict[str, dict[str, Any]]" in str(sig.return_annotation)
-
-
-def test_signature_chunk_boundary_prf_return_dict_batch30():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert "dict[str, dict[str, Any]]" in str(sig.return_annotation)
-
-
 def test_signature_chunk_boundary_prf_tolerance_default_30_batch30():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["tolerance_chars"].default == 30
@@ -493,11 +483,6 @@ def test_module_all_has_three_entries_batch30():
         '"chunk_boundary_prf"',
     ]:
         assert name in src
-
-
-def test_module_no_main_block_batch30():
-    src = inspect.getsource(amod)
-    assert 'if __name__ == "__main__"' not in src
 
 
 # ---------- 端到端集成第四十三批 ----------

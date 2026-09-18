@@ -274,12 +274,6 @@ def test_validate_does_not_modify_instance():
     assert before == after
 
 
-def test_validate_message_includes_schema_name():
-    with pytest.raises(EvalSchemaError) as ei:
-        validate({}, "manifest.schema.json")
-    assert "manifest.schema.json" in str(ei.value)
-
-
 def test_validate_message_includes_count():
     with pytest.raises(EvalSchemaError) as ei:
         validate({}, "manifest.schema.json")

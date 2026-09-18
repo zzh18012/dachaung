@@ -485,16 +485,6 @@ def test_module_source_contains_schema_import_batch37():
     assert "from evaluation.schema import EvalSchemaError, validate_file" in src
 
 
-def test_module_source_contains_validate_report_subparser_batch37():
-    src = inspect.getsource(cmod)
-    assert '"validate-report"' in src
-
-
-def test_module_source_contains_inspect_doc_subparser_batch37():
-    src = inspect.getsource(cmod)
-    assert '"inspect-doc"' in src
-
-
 def test_module_source_contains_required_manifest_batch37():
     src = inspect.getsource(cmod)
     assert '"--manifest"' in src

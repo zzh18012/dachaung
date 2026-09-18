@@ -608,11 +608,6 @@ def test_module_source_no_tempfile_import_batch19():
     assert "import tempfile" not in src
 
 
-def test_module_source_no_unlink_call_batch19():
-    src = inspect.getsource(rmod)
-    assert ".unlink(" not in src
-
-
 def test_module_source_no_path_write_text_batch19():
     """report.py 不写盘（report 装配，写盘由 runner 做）。"""
     src = inspect.getsource(rmod)

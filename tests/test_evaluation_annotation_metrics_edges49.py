@@ -434,54 +434,9 @@ def test_module_source_forbidden_tokens_batch22(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_socket_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import socket" not in src
-
-
-def test_module_source_no_requests_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import requests" not in src
-
-
-def test_module_source_no_urllib_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import urllib" not in src
-
-
-def test_module_source_no_threading_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import threading" not in src
-
-
-def test_module_source_no_asyncio_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import asyncio" not in src
-
-
-def test_module_source_no_shutil_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import shutil" not in src
-
-
-def test_module_source_no_tempfile_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import tempfile" not in src
-
-
 def test_module_source_no_logging_import_batch22():
     src = inspect.getsource(amod)
     assert "import logging" not in src
-
-
-def test_module_source_no_pandas_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import pandas" not in src
-
-
-def test_module_source_no_numpy_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import numpy" not in src
 
 
 # ---------- module source 字符串精确补强第三十三批 ----------
@@ -566,12 +521,6 @@ def test_signature_chunk_boundary_prf_returns_dict_annotation_batch22():
     assert "dict" in str(sig.return_annotation)
 
 
-def test_signature_chunk_boundary_prf_no_var_kwargs_batch22():
-    sig = inspect.signature(chunk_boundary_prf)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 # ---------- module 合理性第三十三批 ----------
 
 
@@ -595,11 +544,6 @@ def test_module_does_not_import_app_parsers_batch22():
     src = inspect.getsource(amod)
     assert "from app.parsers" not in src
     assert "from app import parsers" not in src
-
-
-def test_module_does_not_import_evaluation_runner_batch22():
-    src = inspect.getsource(amod)
-    assert "from evaluation.runner" not in src
 
 
 def test_module_does_not_import_evaluation_cli_batch22():

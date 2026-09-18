@@ -92,12 +92,6 @@ def test_module_docstring_mentions_invariants():
     assert "正斜杠" in doc
 
 
-def test_module_uses_future_annotations():
-    import evaluation.manifest as m
-    sig = inspect.signature(m.load_manifest)
-    assert isinstance(sig.return_annotation, str)
-
-
 def test_module_no_silence_unused():
     import evaluation.manifest as m
     assert not hasattr(m, "_silence_unused_import")
@@ -128,11 +122,6 @@ def test_manifest_error_str_returns_message():
     assert str(e) == "specific error"
 
 
-def test_manifest_error_no_args():
-    e = ManifestError()
-    assert e.args == ()
-
-
 def test_manifest_error_caught_as_exception():
     """ManifestError 是 Exception 子类，可被裸 except/Exception 捕获。"""
     with pytest.raises(Exception):
@@ -141,10 +130,6 @@ def test_manifest_error_caught_as_exception():
 
 def test_manifest_error_not_value_error():
     assert not issubclass(ManifestError, ValueError)
-
-
-def test_manifest_error_not_key_error():
-    assert not issubclass(ManifestError, KeyError)
 
 
 # =========================================================================
@@ -633,11 +618,6 @@ def test_detect_project_root_signature():
     sig = inspect.signature(_detect_project_root)
     params = list(sig.parameters)
     assert params == ["start"]
-
-
-def test_detect_project_root_return_annotation_is_path_str():
-    sig = inspect.signature(_detect_project_root)
-    assert sig.return_annotation == "Path"
 
 
 def test_detect_project_root_callable():

@@ -30,12 +30,6 @@ from evaluation.cli import _build_parser, _format_metric, _run_inspect_doc, main
 # ---------- _build_parser 行为深度第十八批 ----------
 
 
-def test_build_parser_has_subparsers_action_batch18():
-    p = _build_parser()
-    sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
-    assert len(sub_actions) == 1
-
-
 def test_build_parser_run_subparser_help_batch18():
     p = _build_parser()
     sub_action = next(
@@ -104,19 +98,7 @@ def test_build_parser_inspect_doc_tolerance_custom_batch18():
     assert args.tolerance_chars == 60
 
 
-def test_build_parser_run_output_required_batch18():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--manifest", "m.json"])
-
-
 # ---------- argparse Namespace 第十八批 ----------
-
-
-def test_namespace_command_run_batch18():
-    p = _build_parser()
-    args = p.parse_args(["run", "--manifest", "m.json", "--output", "o.json"])
-    assert args.command == "run"
 
 
 def test_namespace_command_validate_report_batch18():
@@ -488,13 +470,6 @@ def test_main_validate_report_path_is_directory_batch18(tmp_path, capsys):
     assert rc == 2
 
 
-def test_main_validate_report_json_decode_error_batch18(tmp_path, capsys):
-    p = tmp_path / "r.json"
-    p.write_text("not json", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
-
-
 def test_main_validate_report_file_not_found_schema_batch18(tmp_path, capsys):
     """validate_file 抛 FileNotFoundError → main 捕获 → 退出 2。"""
     p = tmp_path / "r.json"
@@ -502,11 +477,6 @@ def test_main_validate_report_file_not_found_schema_batch18(tmp_path, capsys):
     with patch("evaluation.cli.validate_file",
                side_effect=FileNotFoundError("schema missing")):
         rc = main(["validate-report", str(p)])
-    assert rc == 2
-
-
-def test_main_inspect_doc_path_not_exist_batch18(tmp_path, capsys):
-    rc = main(["inspect-doc", str(tmp_path / "no.json")])
     assert rc == 2
 
 
@@ -574,12 +544,6 @@ def test_module_source_no_subprocess_batch18():
 
 
 # ---------- module source 字符串精确补强第二十八批 ----------
-
-
-def test_module_source_has_future_annotations_batch18():
-    src = inspect.getsource(cmod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
 
 
 def test_module_source_has_docstring_batch18():

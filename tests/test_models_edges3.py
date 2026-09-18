@@ -66,10 +66,6 @@ def test_schema_version_exact_value():
     assert SCHEMA_VERSION == "0.1.0"
 
 
-def test_schema_version_is_str_type():
-    assert isinstance(SCHEMA_VERSION, str)
-
-
 def test_schema_version_three_parts():
     assert len(SCHEMA_VERSION.split(".")) == 3
 

@@ -273,12 +273,6 @@ def test_d1_plvr_not_pdf_batch522(tmp_path):
         "reason": "not_pdf_document"}
 
 
-def test_ratio_key_count_twelve_batch522(tmp_path):
-    r = _run(tmp_path)
-    assert len(r["summary"][
-        "ratio_macro_averages"]) == 12
-
-
 # ---------- success / 顺序 ----------
 
 def test_success_three_thirds_batch522(tmp_path):

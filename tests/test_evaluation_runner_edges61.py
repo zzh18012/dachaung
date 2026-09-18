@@ -469,16 +469,6 @@ def test_module_source_contains_not_instrumented_batch33():
     assert '"not_instrumented"' in src
 
 
-def test_module_source_contains_per_doc_dir_batch33():
-    src = inspect.getsource(rmod)
-    assert '"_per_doc"' in src
-
-
-def test_module_source_contains_process_single_call_batch33():
-    src = inspect.getsource(rmod)
-    assert "process_single(" in src
-
-
 def test_module_source_contains_all_batch33():
     src = inspect.getsource(rmod)
     assert '__all__ = ["run_evaluation"]' in src

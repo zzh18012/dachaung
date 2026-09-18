@@ -166,14 +166,6 @@ def test_not_evaluated_is_str_batch45():
     assert isinstance(_NOT_EVALUATED, str)
 
 
-def test_text_types_unique_batch45():
-    assert len(set(_TEXT_TYPES)) == len(_TEXT_TYPES)
-
-
-def test_pdf_bbox_required_types_unique_batch45():
-    assert len(set(_PDF_BBOX_REQUIRED_TYPES)) == len(_PDF_BBOX_REQUIRED_TYPES)
-
-
 def test_text_types_contains_paragraph_batch45():
     assert "paragraph" in _TEXT_TYPES
 
@@ -771,46 +763,6 @@ def test_ast_strip_unicode_whitespace_uses_join_batch45():
 
 # ---------- forbidden tokens 第九十八批 ----------
 
-def test_source_no_eval_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "pickle.load(" not in src
-
-
 def test_source_no_subprocess_batch45():
     src = inspect.getsource(metrics_mod)
     assert "subprocess" not in src
@@ -825,11 +777,6 @@ def test_source_no_class_keyword_batch45():
 def test_source_no_async_batch45():
     src = inspect.getsource(metrics_mod)
     assert "async def" not in src
-
-
-def test_source_no_yield_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "yield" not in src
 
 
 def test_source_no_walrus_batch45():

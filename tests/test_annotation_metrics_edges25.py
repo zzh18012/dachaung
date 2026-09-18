@@ -505,12 +505,6 @@ def test_module_source_has_pairs_sort():
     assert "pairs.sort(key=" in src
 
 
-def test_module_source_has_used_pred_used_gt():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "used_pred" in src
-    assert "used_gt" in src
-
-
 def test_module_source_has_num_pred_num_gt():
     src = inspect.getsource(chunk_boundary_prf)
     assert "num_pred" in src

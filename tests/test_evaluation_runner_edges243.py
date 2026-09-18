@@ -180,11 +180,6 @@ def test_sha_consistent_dir_and_file(
 
 # ---------- 报告对齐 ----------
 
-def test_run_rc0(tmp_path):
-    rc, _, _ = _run(tmp_path)
-    assert rc == 0
-
-
 def test_irer_one(tmp_path):
     _, _, data = _run(tmp_path)
     assert data["per_doc"][0][

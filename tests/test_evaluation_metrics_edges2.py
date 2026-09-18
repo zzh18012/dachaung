@@ -101,11 +101,6 @@ def test_ratio_large_value_allowed():
     assert result["value"] == 2.5
 
 
-def test_ratio_dict_has_exactly_two_keys():
-    result = _ratio(0.5)
-    assert set(result.keys()) == {"value", "reason"}
-
-
 def test_bool_metric_returns_bool_value():
     result = _bool_metric(True)
     assert result["value"] is True
@@ -119,11 +114,6 @@ def test_bool_metric_coerces_truthy():
 def test_bool_metric_reason_none():
     result = _bool_metric(True)
     assert result["reason"] is None
-
-
-def test_bool_metric_dict_has_exactly_two_keys():
-    result = _bool_metric(True)
-    assert set(result.keys()) == {"value", "reason"}
 
 
 def test_int_metric_returns_int_value():
@@ -324,12 +314,6 @@ def test_is_valid_bbox_signature_one_param():
 # =========================================================================
 
 
-def test_pdf_locator_ratio_empty_elements_returns_null():
-    result = _pdf_locator_ratio([])
-    assert result["value"] is None
-    assert result["reason"] == "no_elements"
-
-
 def test_pdf_locator_ratio_all_valid_text_with_bbox():
     elements = [
         {"type": "paragraph", "source_locator": {"page": 1, "bbox": [0, 0, 10, 10]}},
@@ -395,12 +379,6 @@ def test_pdf_locator_ratio_bool_page_invalid():
 # =========================================================================
 # 5. _docx_locator_ratio 第二轮
 # =========================================================================
-
-
-def test_docx_locator_ratio_empty_returns_null():
-    result = _docx_locator_ratio([])
-    assert result["value"] is None
-    assert result["reason"] == "no_elements"
 
 
 def test_docx_locator_ratio_section_valid():

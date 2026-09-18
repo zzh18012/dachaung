@@ -1138,14 +1138,6 @@ def test_module_extension_to_parser_keys_exact():
     }
 
 
-def test_module_extension_to_parser_pdf_value():
-    assert _EXTENSION_TO_PARSER[".pdf"] == "fallback"
-
-
-def test_module_extension_to_parser_docx_value():
-    assert _EXTENSION_TO_PARSER[".docx"] == "fallback"
-
-
 def test_module_extension_to_parser_md_and_markdown_same_value():
     assert _EXTENSION_TO_PARSER[".md"] == _EXTENSION_TO_PARSER[".markdown"] == "markdown"
 

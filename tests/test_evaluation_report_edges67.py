@@ -341,11 +341,6 @@ def test_aggregate_ratio_participating_plus_not_evaluated_batch52():
     assert r["participating_docs"] + r["not_evaluated"] == 4
 
 
-def test_aggregate_ratio_all_12_metrics_present_batch52():
-    s = aggregate_summary([])
-    assert set(s["ratio_macro_averages"].keys()) == set(_RATIO_METRICS)
-
-
 def test_aggregate_ratio_zero_value_participates_batch52():
     results = [_doc({"chunk_boundary_f1": {"value": 0.0}})]
     s = aggregate_summary(results)
@@ -372,11 +367,6 @@ def test_aggregate_silent_drop_partial_batch52():
     ]
     s = aggregate_summary(results)
     assert s["silent_drop_total"] == 5
-
-
-def test_aggregate_silent_drop_empty_batch52():
-    s = aggregate_summary([])
-    assert s["silent_drop_total"] is None
 
 
 def test_aggregate_silent_drop_zero_batch52():
@@ -447,16 +437,6 @@ def test_source_path_import_batch52():
     assert "from pathlib import Path" in src
 
 
-def test_source_any_import_batch52():
-    src = inspect.getsource(report_mod)
-    assert "from typing import Any" in src
-
-
-def test_source_versions_import_batch52():
-    src = inspect.getsource(report_mod)
-    assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in src
-
-
 def test_source_ratio_metrics_12_entries_batch52():
     assert len(_RATIO_METRICS) == 12
 
@@ -501,16 +481,6 @@ def test_source_get_dependency_versions_packages_batch52():
     assert '"pdfplumber", "python-docx", "pypdfium2"' in src
 
 
-def test_source_dependency_importlib_note_batch52():
-    src = inspect.getsource(report_mod)
-    assert "importlib.metadata" in src
-
-
-def test_source_aggregate_docstring_no_mixing_batch52():
-    src = inspect.getsource(report_mod)
-    assert "不混合类型" in src
-
-
 def test_source_all_5_entries_batch52():
     src = inspect.getsource(report_mod)
     for name in ("build_provenance", "build_devset_section", "aggregate_summary", "get_git_provenance", "get_dependency_versions"):
@@ -523,21 +493,6 @@ def test_ast_5_functions_batch52():
     tree = ast.parse(inspect.getsource(report_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 5
-
-
-def test_ast_function_names_order_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == [
-        "get_git_provenance", "get_dependency_versions",
-        "build_provenance", "build_devset_section", "aggregate_summary",
-    ]
-
-
-def test_ast_4_module_level_assigns_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    assert len(assigns) == 4  # 3 常量 + __all__
 
 
 def test_ast_ratio_metrics_tuple_12_batch52():

@@ -706,29 +706,9 @@ def test_module_source_no_async_def_batch25():
     assert "async def" not in source
 
 
-def test_module_source_no_global_keyword_batch25():
-    source = inspect.getsource(mmod)
-    assert "global " not in source
-
-
 def test_module_source_no_walrus_batch25():
     source = inspect.getsource(mmod)
     assert ":=" not in source
-
-
-def test_module_source_no_eval_exec_batch25():
-    source = inspect.getsource(mmod)
-    assert "eval(" not in source
-    assert "exec(" not in source
-    assert "compile(" not in source
-
-
-def test_module_source_no_relative_imports_batch25():
-    source_lines = inspect.getsource(mmod).split("\n")
-    for line in source_lines:
-        stripped = line.strip()
-        if stripped.startswith("from .") and "from __future__" not in stripped:
-            pytest.fail(f"relative import: {line}")
 
 
 def test_module_source_no_star_import_batch25():
@@ -763,11 +743,6 @@ def test_module_source_dataclass_used_batch25():
 
 
 # ---------- module source 字符串精确补强第三十七批 ----------
-
-
-def test_module_source_contains_validate_import_batch25():
-    source = inspect.getsource(mmod)
-    assert "from evaluation.schema import validate" in source
 
 
 def test_module_source_contains_json_import_batch25():
@@ -869,24 +844,6 @@ def test_signature_load_manifest_path_annotation_batch25():
     sig = inspect.signature(load_manifest)
     p = sig.parameters["manifest_path"]
     assert p.annotation == "Path | str"
-
-
-def test_signature_resolve_relative_path_no_varargs_batch25():
-    sig = inspect.signature(_resolve_relative_path)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
-def test_signature_load_manifest_no_varargs_batch25():
-    sig = inspect.signature(load_manifest)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
 
 
 # ---------- module 合理性第三十七批 ----------

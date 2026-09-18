@@ -49,10 +49,6 @@ def test_load_annotation_none_batch55(tmp_path):
     assert _load_annotation(None) is None
 
 
-def test_load_annotation_missing_batch55(tmp_path):
-    assert _load_annotation(tmp_path / "nope.json") is None
-
-
 def test_load_annotation_valid_batch55(tmp_path):
     f = tmp_path / "ann.json"
     f.write_text(json.dumps({"chunk_boundary_anchors": [

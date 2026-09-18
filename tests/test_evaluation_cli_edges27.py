@@ -725,14 +725,6 @@ def test_module_source_no_class():
             pytest.fail(f"Found class: {line}")
 
 
-def test_module_source_no_decorators():
-    src = inspect.getsource(m)
-    for line in src.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("@"):
-            pytest.fail(f"Found decorator: {stripped}")
-
-
 def test_module_source_no_lambda_in_main():
     """main 函数体不应有 lambda。"""
     src = inspect.getsource(main)

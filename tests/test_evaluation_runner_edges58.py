@@ -507,11 +507,6 @@ def test_module_source_contains_per_doc_subdir_batch30():
     assert '"_per_doc"' in src
 
 
-def test_module_source_contains_image_dir_local_batch30():
-    src = inspect.getsource(rmod)
-    assert "image_dir" in src
-
-
 def test_module_source_contains_image_output_dir_for_call_batch30():
     src = inspect.getsource(rmod)
     assert "image_output_dir_for(" in src

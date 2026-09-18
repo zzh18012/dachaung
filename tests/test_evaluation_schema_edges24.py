@@ -120,11 +120,6 @@ def test_load_schema_source_returns_dict():
     assert "-> dict[str, Any]" in src or "dict" in src
 
 
-def test_load_schema_source_uses_schema_path():
-    src = inspect.getsource(load_schema)
-    assert "_schema_path(name)" in src
-
-
 def test_load_schema_source_uses_open():
     src = inspect.getsource(load_schema)
     assert ".open(" in src
@@ -167,11 +162,6 @@ def test_validate_source_two_params():
 def test_validate_source_no_return_value():
     src = inspect.getsource(validate)
     assert "-> None" in src or "return" in src
-
-
-def test_validate_source_uses_draft_validator():
-    src = inspect.getsource(validate)
-    assert "Draft202012Validator" in src
 
 
 def test_validate_source_uses_iter_errors():
@@ -304,11 +294,6 @@ def test_schemas_dir_is_module_constant():
 def test_schemas_dir_value_in_source():
     src = inspect.getsource(smod)
     assert "SCHEMAS_DIR = Path(__file__)" in src
-
-
-def test_schemas_dir_uses_resolve():
-    src = inspect.getsource(smod)
-    assert ".resolve()" in src
 
 
 def test_schemas_dir_uses_parent_parent():
@@ -463,11 +448,6 @@ def test_module_source_no_eval():
 def test_module_source_no_exec():
     src = inspect.getsource(smod)
     assert "exec(" not in src
-
-
-def test_module_source_no_compile():
-    src = inspect.getsource(smod)
-    assert "compile(" not in src
 
 
 def test_module_source_no_unlink():

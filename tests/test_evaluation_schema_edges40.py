@@ -425,55 +425,14 @@ def test_module_source_forbidden_tokens_batch20(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_subprocess_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import subprocess" not in src
-    assert "from subprocess" not in src
-
-
 def test_module_source_no_socket_import_batch20():
     src = inspect.getsource(smod)
     assert "import socket" not in src
 
 
-def test_module_source_no_requests_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import requests" not in src
-
-
 def test_module_source_no_urllib_import_batch20():
     src = inspect.getsource(smod)
     assert "import urllib" not in src
-
-
-def test_module_source_no_threading_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import threading" not in src
-
-
-def test_module_source_no_asyncio_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import asyncio" not in src
-
-
-def test_module_source_no_shutil_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import shutil" not in src
-
-
-def test_module_source_no_tempfile_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import tempfile" not in src
-
-
-def test_module_source_no_sys_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import sys" not in src
-
-
-def test_module_source_no_logging_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import logging" not in src
 
 
 # ---------- module source 字符串精确补强第三十二批 ----------
@@ -599,18 +558,6 @@ def test_module_all_contents_exact_batch20():
     }
 
 
-def test_module_does_not_import_evaluation_runner_batch20():
-    src = inspect.getsource(smod)
-    assert "from evaluation.runner" not in src
-    assert "from evaluation import runner" not in src
-
-
-def test_module_does_not_import_evaluation_metrics_batch20():
-    src = inspect.getsource(smod)
-    assert "from evaluation.metrics" not in src
-    assert "from evaluation import metrics" not in src
-
-
 def test_module_constants_eval_schema_error_in_all_batch20():
     """EvalSchemaError 在 __all__ 内。"""
     assert "EvalSchemaError" in smod.__all__
@@ -620,11 +567,6 @@ def test_module_no_main_block_batch20():
     """schema 模块无 __main__ 块（不是 entry point）。"""
     src = inspect.getsource(smod)
     assert 'if __name__ ==' not in src
-
-
-def test_module_has_docstring_batch20():
-    assert smod.__doc__ is not None
-    assert len(smod.__doc__) > 0
 
 
 # ---------- 端到端集成第三十二批 ----------

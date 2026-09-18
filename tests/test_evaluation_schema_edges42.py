@@ -52,11 +52,6 @@ def test_schemas_dir_parent_is_project_root_batch22(tmp_path):
     assert (project_root / "pyproject.toml").is_file()
 
 
-def test_schemas_dir_contains_manifest_schema_batch22():
-    """SCHEMAS_DIR 含 manifest.schema.json。"""
-    assert (SCHEMAS_DIR / "manifest.schema.json").is_file()
-
-
 def test_schemas_dir_str_contains_schemas_batch22():
     """str(SCHEMAS_DIR) 含 'schemas'。"""
     assert "schemas" in str(SCHEMAS_DIR)
@@ -213,12 +208,6 @@ def test_schema_path_evaluation_report_batch22():
 
 
 # ---------- load_schema 第二十二批 ----------
-
-
-def test_load_schema_returns_dict_batch22():
-    """load_schema 返回 dict。"""
-    s = load_schema("manifest.schema.json")
-    assert isinstance(s, dict)
 
 
 def test_load_schema_has_schema_field_batch22():

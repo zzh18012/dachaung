@@ -40,36 +40,6 @@ from app.pipeline import (
 # =========================================================================
 
 
-def test_get_parser_fallback_returns_fallback_parser_instance():
-    p = get_parser("fallback")
-    assert isinstance(p, FallbackParser)
-
-
-def test_get_parser_kreuzberg_returns_kreuzberg_parser_instance():
-    p = get_parser("kreuzberg")
-    assert isinstance(p, KreuzbergParser)
-
-
-def test_get_parser_markdown_returns_markdown_parser_instance():
-    p = get_parser("markdown")
-    assert isinstance(p, MarkdownParser)
-
-
-def test_get_parser_html_returns_html_parser_instance():
-    p = get_parser("html")
-    assert isinstance(p, HtmlParser)
-
-
-def test_get_parser_text_returns_text_parser_instance():
-    p = get_parser("text")
-    assert isinstance(p, TextParser)
-
-
-def test_get_parser_ipynb_returns_ipynb_parser_instance():
-    p = get_parser("ipynb")
-    assert isinstance(p, IpynbParser)
-
-
 def test_get_parser_all_subclass_of_parser():
     for name in ["fallback", "kreuzberg", "markdown", "html", "text", "ipynb"]:
         p = get_parser(name)
@@ -474,24 +444,6 @@ def test_module_all_is_list():
     assert isinstance(mod.__all__, list)
 
 
-def test_module_imports_json():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "import json" in src
-
-
-def test_module_imports_path():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_imports_any():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from typing import Any" in src
-
-
 def test_module_imports_document_error_record():
     import app.pipeline as mod
     src = inspect.getsource(mod)
@@ -520,17 +472,6 @@ def test_module_imports_schema_validate():
     src = inspect.getsource(mod)
     assert "SchemaValidationError" in src
     assert "validate" in src
-
-
-def test_module_uses_future_annotations():
-    import app.pipeline as mod
-    src = inspect.getsource(mod)
-    assert "from __future__ import annotations" in src
-
-
-def test_module_docstring_present():
-    import app.pipeline as mod
-    assert mod.__doc__ is not None
 
 
 def test_module_docstring_mentions_pipeline():
@@ -562,11 +503,6 @@ def test_image_output_dir_for_no_defaults():
     # output_path 必填（无 default）
     assert sig.parameters["output_path"].default is inspect.Parameter.empty
     assert sig.parameters["source_hash"].default is inspect.Parameter.empty
-
-
-def test_process_single_write_json_default_true():
-    sig = inspect.signature(process_single)
-    assert sig.parameters["write_json"].default is True
 
 
 def test_process_single_parser_name_kw_only():

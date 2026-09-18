@@ -335,15 +335,6 @@ def test_aggregate_summary_silent_drop_with_null_skipped_batch48():
     assert out["silent_drop_total"] == 3
 
 
-def test_aggregate_summary_silent_drop_all_null_batch48():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": None}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["silent_drop_total"] is None
-
-
 def test_aggregate_summary_returns_4_top_keys_batch48():
     out = aggregate_summary([])
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
@@ -359,11 +350,6 @@ def test_aggregate_summary_success_only_pipeline_success_batch48():
     """success_rates 只有 pipeline_success。"""
     out = aggregate_summary([])
     assert set(out["success_rates"].keys()) == {"pipeline_success"}
-
-
-def test_aggregate_summary_counts_only_element_count_total_batch48():
-    out = aggregate_summary([])
-    assert set(out["counts"].keys()) == {"element_count_total"}
 
 
 # ---------- 模块常量 ----------
@@ -424,11 +410,6 @@ def test_source_contains_pathlib_import_batch48():
     assert "from pathlib import Path" in src
 
 
-def test_source_contains_typing_any_import_batch48():
-    src = inspect.getsource(report_mod)
-    assert "from typing import Any" in src
-
-
 def test_source_contains_version_imports_batch48():
     src = inspect.getsource(report_mod)
     assert "EVALUATOR_VERSION" in src
@@ -445,16 +426,6 @@ def test_source_contains_git_status_porcelain_batch48():
     src = inspect.getsource(report_mod)
     assert "status" in src
     assert "porcelain" in src
-
-
-def test_source_contains_importlib_metadata_batch48():
-    src = inspect.getsource(report_mod)
-    assert "importlib.metadata" in src
-
-
-def test_source_contains_package_not_found_error_batch48():
-    src = inspect.getsource(report_mod)
-    assert "PackageNotFoundError" in src
 
 
 def test_source_contains_no_mixing_rule_batch48():

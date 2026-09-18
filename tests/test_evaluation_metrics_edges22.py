@@ -1034,11 +1034,6 @@ def test_module_source_no_dataclass_decorator():
     assert "@dataclass" not in src
 
 
-def test_module_source_no_yield():
-    src = inspect.getsource(mmod)
-    assert "yield " not in src
-
-
 def test_module_source_no_async_def():
     src = inspect.getsource(mmod)
     assert "async def" not in src

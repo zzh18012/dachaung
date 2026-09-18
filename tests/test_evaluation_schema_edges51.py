@@ -180,11 +180,6 @@ def test_validate_manifest_empty_dict_fails_batch31():
         validate({}, "manifest.schema.json")
 
 
-def test_validate_annotation_empty_dict_fails_batch31():
-    with pytest.raises(EvalSchemaError):
-        validate({}, "annotation.schema.json")
-
-
 def test_validate_eval_report_empty_dict_fails_batch31():
     with pytest.raises(EvalSchemaError):
         validate({}, "evaluation-report.schema.json")
@@ -266,11 +261,6 @@ def test_validate_file_existing_invalid_batch31(tmp_path):
     p.write_text("{}", encoding="utf-8")
     with pytest.raises(EvalSchemaError):
         validate_file(p, "manifest.schema.json")
-
-
-def test_validate_file_missing_raises_file_not_found_batch31(tmp_path):
-    with pytest.raises(FileNotFoundError):
-        validate_file(tmp_path / "nonexistent.json", "manifest.schema.json")
 
 
 def test_validate_file_str_path_batch31(tmp_path):
@@ -401,11 +391,6 @@ def test_module_source_contains_validate_file_func_batch31():
     assert "def validate_file(" in src
 
 
-def test_module_source_contains_draft_validator_call_batch31():
-    src = inspect.getsource(smod)
-    assert "Draft202012Validator(" in src
-
-
 def test_module_source_contains_absolute_path_batch31():
     src = inspect.getsource(smod)
     assert "absolute_path" in src
@@ -466,11 +451,6 @@ def test_signature_validate_return_none_batch31():
     assert sig.return_annotation == "None"
 
 
-def test_signature_validate_file_return_none_batch31():
-    sig = inspect.signature(validate_file)
-    assert sig.return_annotation == "None"
-
-
 # ---------- module 合理性第四十九批
 
 
@@ -491,18 +471,6 @@ def test_module_has_eval_schema_error_class_batch31():
 
 def test_module_has_schemas_dir_const_batch31():
     assert hasattr(smod, "SCHEMAS_DIR")
-
-
-def test_module_has_load_schema_func_batch31():
-    assert callable(smod.load_schema)
-
-
-def test_module_has_validate_func_batch31():
-    assert callable(smod.validate)
-
-
-def test_module_has_validate_file_func_batch31():
-    assert callable(smod.validate_file)
 
 
 def test_module_has_all_batch31():

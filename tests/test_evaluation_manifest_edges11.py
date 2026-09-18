@@ -672,12 +672,6 @@ def test_module_manifest_project_root_type_annotation():
     assert "Path" in pr_field.type
 
 
-def test_module_uses_future_annotations():
-    import evaluation.manifest as m
-    sig = inspect.signature(m.load_manifest)
-    assert isinstance(sig.return_annotation, str)
-
-
 def test_module_docstring_mentions_path_constraints():
     import evaluation.manifest as m
     doc = m.__doc__

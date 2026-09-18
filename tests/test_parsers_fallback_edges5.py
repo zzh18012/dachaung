@@ -388,10 +388,6 @@ def test_rows_to_markdown_two_body_rows():
     assert len(lines) == 4
 
 
-def test_rows_to_markdown_returns_str_type():
-    assert isinstance(_rows_to_markdown([["a"]]), str)
-
-
 def test_rows_to_markdown_empty_cells_become_empty_string():
     md = _rows_to_markdown([["", "x"]])
     assert "|  | x |" in md
@@ -559,20 +555,12 @@ def test_is_heading_style_heading_with_invalid_level_returns_1():
     assert _is_heading_style("Heading abc") == (True, 1)
 
 
-def test_is_heading_style_normal_returns_false():
-    assert _is_heading_style("Normal") == (False, 0)
-
-
 def test_is_heading_style_list_paragraph_returns_false():
     assert _is_heading_style("List Paragraph") == (False, 0)
 
 
 def test_is_heading_style_quote_returns_false():
     assert _is_heading_style("Quote") == (False, 0)
-
-
-def test_is_heading_style_empty_string_returns_false():
-    assert _is_heading_style("") == (False, 0)
 
 
 def test_is_heading_style_first_element_bool():
@@ -725,10 +713,6 @@ def test_fallback_parser_class_attribute_name():
     assert FallbackParser.name == "fallback"
 
 
-def test_fallback_parser_class_attribute_version_is_str():
-    assert isinstance(FallbackParser.version, str)
-
-
 def test_fallback_parser_class_attribute_version_contains_pdfplumber():
     assert "pdfplumber" in FallbackParser.version
 
@@ -741,19 +725,8 @@ def test_fallback_parser_class_attribute_version_contains_pypdfium2():
     assert "pypdfium2" in FallbackParser.version
 
 
-def test_fallback_parser_class_inherits_parser():
-    from app.parsers.base import Parser
-
-    assert issubclass(FallbackParser, Parser)
-
-
 def test_fallback_parser_has_parse_method():
     assert callable(getattr(FallbackParser, "parse", None))
-
-
-def test_fallback_parser_init_with_path(tmp_path: Path):
-    p = FallbackParser(image_output_dir=tmp_path)
-    assert p._image_output_dir == tmp_path
 
 
 def test_fallback_parser_init_empty_string_treated_as_none():

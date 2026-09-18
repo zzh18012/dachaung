@@ -863,11 +863,6 @@ def test_load_manifest_source_has_json_load():
     assert "json.load(f)" in src
 
 
-def test_load_manifest_source_has_validate_call():
-    src = inspect.getsource(load_manifest)
-    assert 'validate(data, "manifest.schema.json")' in src
-
-
 def test_resolve_relative_path_source_has_4_manifest_error_raises():
     """_resolve_relative_path 含 4 处 raise ManifestError（empty/absolute/backslash/outside-root）。"""
     src = inspect.getsource(_resolve_relative_path)
@@ -906,12 +901,6 @@ def test_load_manifest_signature_project_root_default_none():
     assert sig.parameters["project_root"].default is None
 
 
-def test_load_manifest_signature_no_varargs_varkw():
-    sig = inspect.signature(load_manifest)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
 def test_load_manifest_return_annotation_is_manifest():
     sig = inspect.signature(load_manifest)
     assert "Manifest" in str(sig.return_annotation)
@@ -944,12 +933,6 @@ def test_detect_project_root_signature_1_param_no_default():
     params = list(sig.parameters.values())
     assert len(params) == 1
     assert params[0].default is inspect.Parameter.empty
-
-
-def test_resolve_relative_path_no_varargs_varkw():
-    sig = inspect.signature(_resolve_relative_path)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
 
 
 # =========================================================================
@@ -1069,16 +1052,6 @@ def test_e2e_load_manifest_does_not_modify_input_file(tmp_path):
 # =========================================================================
 # 模块整体合理性
 # =========================================================================
-
-
-def test_module_all_has_5_entries_in_order():
-    assert mmod.__all__ == [
-        "ManifestError",
-        "Manifest",
-        "DocumentEntry",
-        "ExpectedFailure",
-        "load_manifest",
-    ]
 
 
 def test_module_has_1_class_manifest_error():

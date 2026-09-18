@@ -484,11 +484,6 @@ def test_run_evaluation_image_base_dir_none_when_image_dir_none_batch48(tmp_path
 
 # ---------- module source 字符串补强 ----------
 
-def test_source_contains__per_doc_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "_per_doc" in src
-
-
 def test_source_contains_doc_id_batch48():
     src = inspect.getsource(runner_mod)
     assert "doc_id" in src

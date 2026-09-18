@@ -260,11 +260,6 @@ def test_text_parser_version_value():
     assert TextParser.version == "stdlib/0.1.0"
 
 
-def test_text_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(TextParser, Parser)
-
-
 # =========================================================================
 # parse() 错误路径
 # =========================================================================

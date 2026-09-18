@@ -571,21 +571,6 @@ def test_module_source_contains_load_manifest_func_batch31():
     assert "def load_manifest" in src
 
 
-def test_module_source_contains_detect_project_root_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def _detect_project_root" in src
-
-
-def test_module_source_contains_content_group_count_property_batch31():
-    src = inspect.getsource(mmod)
-    assert "def content_group_count" in src
-
-
-def test_module_source_contains_categories_covered_property_batch31():
-    src = inspect.getsource(mmod)
-    assert "def categories_covered" in src
-
-
 # ---------- signatures 第四十四批 ----------
 
 

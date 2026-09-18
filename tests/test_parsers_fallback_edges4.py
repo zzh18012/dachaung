@@ -1284,17 +1284,8 @@ def test_module_imports_make_document_id():
     assert hasattr(fp, "make_document_id")
 
 
-def test_fallback_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(FallbackParser, Parser)
-
-
 def test_fallback_parser_class_name_constant():
     assert FallbackParser.name == "fallback"
-
-
-def test_fallback_parser_class_version_is_str():
-    assert isinstance(FallbackParser.version, str)
 
 
 def test_fallback_parser_class_version_contains_pdfplumber_keyword():

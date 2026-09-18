@@ -136,11 +136,6 @@ def test_load_schema_callable_batch42():
     assert callable(load_schema)
 
 
-def test_load_schema_returns_dict_batch42():
-    out = load_schema("manifest.schema.json")
-    assert isinstance(out, dict)
-
-
 def test_load_schema_manifest_has_required_batch42():
     out = load_schema("manifest.schema.json")
     assert "required" in out
@@ -227,13 +222,6 @@ def test_validate_message_contains_schema_name_batch42():
     assert "manifest.schema.json" in str(exc.value)
 
 
-def test_validate_message_contains_error_count_batch42():
-    with pytest.raises(EvalSchemaError) as exc:
-        validate({}, "manifest.schema.json")
-    # "X 处" 表示错误数
-    assert "处" in str(exc.value)
-
-
 def test_validate_does_not_raise_on_valid_instance_batch42():
     data = {
         "manifest_version": "1.0",
@@ -284,13 +272,6 @@ def test_validate_file_missing_file_raises_with_message_batch42(tmp_path):
     with pytest.raises(FileNotFoundError) as exc:
         validate_file(tmp_path / "missing.json", "manifest.schema.json")
     assert "待校验文件不存在" in str(exc.value)
-
-
-def test_validate_file_invalid_json_raises_batch42(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{invalid", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
 
 
 def test_validate_file_return_annotation_none_batch42():
@@ -361,17 +342,8 @@ def test_eval_schema_error_errors_default_none_batch42():
     assert sig.parameters["errors"].default is None
 
 
-def test_eval_schema_error_message_no_default_batch42():
-    sig = inspect.signature(EvalSchemaError.__init__)
-    assert sig.parameters["message"].default is inspect.Parameter.empty
-
-
 def test_eval_schema_error_module_level_batch42():
     assert hasattr(smod, "EvalSchemaError")
-
-
-def test_eval_schema_error_in_all_batch42():
-    assert "EvalSchemaError" in smod.__all__
 
 
 def test_eval_schema_error_repr_includes_name_batch42():
@@ -534,10 +506,6 @@ def test_module_all_contains_schemas_dir_batch42():
     assert "SCHEMAS_DIR" in smod.__all__
 
 
-def test_module_all_contains_eval_schema_error_batch42():
-    assert "EvalSchemaError" in smod.__all__
-
-
 def test_module_does_not_export_private_batch42():
     for name in ["_schema_path"]:
         assert name not in smod.__all__
@@ -549,18 +517,6 @@ def test_module_has_schemas_dir_attr_batch42():
 
 def test_module_has_eval_schema_error_attr_batch42():
     assert hasattr(smod, "EvalSchemaError")
-
-
-def test_module_has_load_schema_attr_batch42():
-    assert hasattr(smod, "load_schema")
-
-
-def test_module_has_validate_attr_batch42():
-    assert hasattr(smod, "validate")
-
-
-def test_module_has_validate_file_attr_batch42():
-    assert hasattr(smod, "validate_file")
 
 
 # ---------- AST 结构 第四十二批

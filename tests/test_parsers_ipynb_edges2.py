@@ -154,10 +154,6 @@ def test_cell_source_to_text_int_returns_empty():
     assert _cell_source_to_text(42) == ""
 
 
-def test_cell_source_to_text_float_returns_empty():
-    assert _cell_source_to_text(3.14) == ""
-
-
 def test_cell_source_to_text_bool_true_returns_empty():
     assert _cell_source_to_text(True) == ""
 

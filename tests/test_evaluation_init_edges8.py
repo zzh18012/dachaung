@@ -501,10 +501,6 @@ def test_source_no_async_def_batch48():
     assert "async def" not in _src()
 
 
-def test_source_no_await_batch48():
-    assert "await " not in _src()
-
-
 def test_source_no_raise_batch48():
     assert "raise" not in _src()
 

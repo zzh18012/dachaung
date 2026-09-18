@@ -668,12 +668,6 @@ def test_ast_module_has_5_imports_batch51():
     assert len(imports) == 7
 
 
-def test_ast_module_has_docstring_batch51():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
-
-
 def test_ast_no_async_function_def_batch51():
     tree = ast.parse(inspect.getsource(manifest_mod))
     assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))

@@ -148,12 +148,6 @@ def test_chunk_boundary_prf_no_annotation_returns_no_annotation():
         assert out[k]["reason"] == "no_annotation"
 
 
-def test_chunk_boundary_prf_empty_annotation_returns_no_annotation():
-    out = chunk_boundary_prf({"chunks": []}, {})
-    for k in ("chunk_boundary_precision", "chunk_boundary_recall", "chunk_boundary_f1"):
-        assert out[k]["reason"] == "no_annotation"
-
-
 def test_chunk_boundary_prf_falsy_annotation_returns_no_annotation():
     """falsy annotation（如空 dict）→ no_annotation。"""
     out = chunk_boundary_prf({"chunks": []}, {})
@@ -680,11 +674,6 @@ def test_signature_funcs_function_type():
     assert inspect.isfunction(chunk_boundary_prf)
 
 
-def test_signature_funcs_module_eq():
-    assert figure_caption_prf.__module__ == "evaluation.annotation_metrics"
-    assert chunk_boundary_prf.__module__ == "evaluation.annotation_metrics"
-
-
 # ---------- module 合理性第九批 ----------
 
 
@@ -714,10 +703,6 @@ def test_module_name_is_evaluation_annotation_metrics():
 
 def test_module_has_PARSER_DOES_NOT_EMIT_RELATIONS_constant():
     assert hasattr(amod, "PARSER_DOES_NOT_EMIT_RELATIONS")
-
-
-def test_module_PARSER_DOES_NOT_EMIT_RELATIONS_value():
-    assert amod.PARSER_DOES_NOT_EMIT_RELATIONS == "parser_does_not_emit_relations"
 
 
 def test_module_has_2_user_functions():

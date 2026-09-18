@@ -45,10 +45,6 @@ def test_parser_does_not_emit_relations_reference_same_batch31():
     assert m1.PARSER_DOES_NOT_EMIT_RELATIONS is m2.PARSER_DOES_NOT_EMIT_RELATIONS
 
 
-def test_parser_does_not_emit_relations_not_empty_batch31():
-    assert len(PARSER_DOES_NOT_EMIT_RELATIONS) > 0
-
-
 # ---------- figure_caption_prf 第三十一批 ----------
 
 
@@ -385,16 +381,6 @@ def test_module_source_contains_missing_markers_local_batch31():
 # ---------- signatures 第四十四批 ----------
 
 
-def test_signature_figure_caption_prf_return_dict_batch31():
-    sig = inspect.signature(figure_caption_prf)
-    assert "dict[str, dict[str, Any]]" in str(sig.return_annotation)
-
-
-def test_signature_chunk_boundary_prf_return_dict_batch31():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert "dict[str, dict[str, Any]]" in str(sig.return_annotation)
-
-
 def test_signature_figure_caption_prf_document_annotation_batch31():
     sig = inspect.signature(figure_caption_prf)
     for p_name in ("document", "annotation"):
@@ -474,11 +460,6 @@ def test_module_all_has_three_entries_batch31():
         '"chunk_boundary_prf"',
     ]:
         assert name in src
-
-
-def test_module_no_main_block_batch31():
-    src = inspect.getsource(amod)
-    assert 'if __name__ == "__main__"' not in src
 
 
 # ---------- 端到端集成第四十四批 ----------

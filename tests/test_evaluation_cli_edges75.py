@@ -547,11 +547,6 @@ def test_source_contains_path_import_batch49():
     assert "from pathlib import Path" in src
 
 
-def test_source_contains_manifest_imports_batch49():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.manifest import ManifestError, load_manifest" in src
-
-
 def test_source_contains_get_git_provenance_import_batch49():
     src = inspect.getsource(cli_mod)
     assert "from evaluation.report import get_git_provenance" in src
@@ -562,29 +557,14 @@ def test_source_contains_run_evaluation_import_batch49():
     assert "from evaluation.runner import run_evaluation" in src
 
 
-def test_source_contains_validate_file_import_batch49():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.schema import EvalSchemaError, validate_file" in src
-
-
 def test_source_contains_reconfigure_call_batch49():
     src = inspect.getsource(cli_mod)
     assert "sys.stdout.reconfigure" in src
 
 
-def test_source_contains_stderr_reconfigure_batch49():
-    src = inspect.getsource(cli_mod)
-    assert "sys.stderr.reconfigure" in src
-
-
 def test_source_contains_utf8_encoding_batch49():
     src = inspect.getsource(cli_mod)
     assert 'encoding="utf-8"' in src
-
-
-def test_source_contains_errors_replace_batch49():
-    src = inspect.getsource(cli_mod)
-    assert 'errors="replace"' in src
 
 
 def test_source_contains_ok_evaluation_complete_batch49():
@@ -610,11 +590,6 @@ def test_source_contains_manifest_required_batch49():
 def test_source_contains_output_required_batch49():
     src = inspect.getsource(cli_mod)
     assert '"--output", required=True' in src
-
-
-def test_source_contains_return_0_batch49():
-    src = inspect.getsource(cli_mod)
-    assert "return 0" in src
 
 
 def test_source_contains_return_1_batch49():

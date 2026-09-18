@@ -227,12 +227,6 @@ def test_get_dependency_versions_other_exception_batch32():
         assert v is None
 
 
-def test_get_dependency_versions_idempotent_batch32():
-    out1 = get_dependency_versions()
-    out2 = get_dependency_versions()
-    assert out1 == out2
-
-
 # ---------- build_provenance 第三十二批 ----------
 
 
@@ -670,21 +664,6 @@ def test_module_source_contains_package_not_found_batch32():
     assert "PackageNotFoundError" in src
 
 
-def test_module_source_contains_python_docx_batch32():
-    src = inspect.getsource(rmod)
-    assert '"python-docx"' in src
-
-
-def test_module_source_contains_pdfplumber_batch32():
-    src = inspect.getsource(rmod)
-    assert '"pdfplumber"' in src
-
-
-def test_module_source_contains_pypdfium2_batch32():
-    src = inspect.getsource(rmod)
-    assert '"pypdfium2"' in src
-
-
 # ---------- signatures 第四十五批 ----------
 
 
@@ -704,11 +683,6 @@ def test_signature_build_provenance_params_batch32():
     sig = inspect.signature(build_provenance)
     params = list(sig.parameters.keys())
     assert params == ["project_root", "parser_name", "max_chars", "parser_version"]
-
-
-def test_signature_build_provenance_return_dict_batch32():
-    sig = inspect.signature(build_provenance)
-    assert "dict[str, Any]" in str(sig.return_annotation)
 
 
 def test_signature_build_devset_section_param_batch32():

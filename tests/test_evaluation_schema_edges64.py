@@ -340,12 +340,6 @@ def test_ast_has_4_top_level_functions_batch50():
     assert len(funcs) == 4
 
 
-def test_ast_function_names_order_batch50():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["_schema_path", "load_schema", "validate", "validate_file"]
-
-
 def test_ast_eval_schema_error_class_has_init_only_batch50():
     tree = ast.parse(inspect.getsource(schema_mod))
     cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "EvalSchemaError")
@@ -411,13 +405,6 @@ def test_ast_validate_has_return_none_when_no_errors_batch50():
     assert len(returns) >= 1
 
 
-def test_ast_validate_file_has_with_open_batch50():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
-    withs = [n for n in ast.walk(func) if isinstance(n, ast.With)]
-    assert len(withs) == 1
-
-
 def test_ast_validate_file_calls_validate_batch50():
     tree = ast.parse(inspect.getsource(schema_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "validate_file")
@@ -444,13 +431,6 @@ def test_ast_module_has_6_imports_batch50():
     tree = ast.parse(inspect.getsource(schema_mod))
     imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
     assert len(imports) == 6
-
-
-def test_ast_module_has_2_top_level_assigns_batch50():
-    """SCHEMAS_DIR + __all__ = 2。"""
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assigns = [n for n in tree.body if isinstance(n, ast.Assign)]
-    assert len(assigns) == 2
 
 
 def test_ast_no_class_def_other_than_eval_schema_error_batch50():

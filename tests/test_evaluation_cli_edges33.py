@@ -1028,11 +1028,6 @@ def test_cli_source_has_stdout_reconfigure_call():
     assert "sys.stdout.reconfigure" in src
 
 
-def test_cli_source_has_stderr_reconfigure_call():
-    src = inspect.getsource(cli_mod)
-    assert "sys.stderr.reconfigure" in src
-
-
 def test_cli_source_reconfigure_args():
     src = inspect.getsource(cli_mod)
     assert 'encoding="utf-8"' in src
@@ -1097,11 +1092,6 @@ def test_cli_source_no_yield():
     assert "yield" not in src
 
 
-def test_cli_source_no_async_def():
-    src = inspect.getsource(cli_mod)
-    assert "async def" not in src
-
-
 def test_cli_source_no_walrus():
     src = inspect.getsource(cli_mod)
     assert ":=" not in src
@@ -1116,19 +1106,7 @@ def test_cli_source_docstring_mentions_run():
     assert "run" in cli_mod.__doc__.lower()
 
 
-def test_cli_source_no_all_attribute():
-    assert not hasattr(cli_mod, "__all__")
-
-
 # ---------- signatures 精确补强第三批 ----------
-
-
-def test_signature_main_argv_default_none():
-    sig = inspect.signature(main)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "argv"
-    assert params[0].default is None
 
 
 def test_signature_main_return_annotation_int():
@@ -1235,18 +1213,6 @@ def test_module_main_callable():
     assert callable(cli_mod.main)
 
 
-def test_module_build_parser_callable():
-    assert callable(cli_mod._build_parser)
-
-
-def test_module_format_metric_callable():
-    assert callable(cli_mod._format_metric)
-
-
-def test_module_run_inspect_doc_callable():
-    assert callable(cli_mod._run_inspect_doc)
-
-
 def test_module_main_name_eq_main():
     assert cli_mod.main.__name__ == "main"
 
@@ -1261,10 +1227,6 @@ def test_module_format_metric_name():
 
 def test_module_run_inspect_doc_name():
     assert cli_mod._run_inspect_doc.__name__ == "_run_inspect_doc"
-
-
-def test_module_name_is_evaluation_cli():
-    assert cli_mod.__name__ == "evaluation.cli"
 
 
 def test_module_main_signature_no_kwargs():

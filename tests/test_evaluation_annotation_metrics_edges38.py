@@ -511,16 +511,6 @@ def test_module_source_has_future_annotations_batch11():
     assert "from __future__ import annotations" in source
 
 
-def test_module_source_imports_counter_batch11():
-    source = inspect.getsource(amod)
-    assert "from collections import Counter" in source
-
-
-def test_module_source_imports_typing_any_batch11():
-    source = inspect.getsource(amod)
-    assert "from typing import Any" in source
-
-
 def test_module_source_imports_normalize_text_batch11():
     source = inspect.getsource(amod)
     assert "from app.chunkers.structural import normalize_text" in source
@@ -544,11 +534,6 @@ def test_module_source_has_figure_caption_prf_def_batch11():
 def test_module_source_has_chunk_boundary_prf_def_batch11():
     source = inspect.getsource(amod)
     assert "def chunk_boundary_prf(" in source
-
-
-def test_module_source_no_main_block_batch11():
-    source = inspect.getsource(amod)
-    assert "if __name__" not in source
 
 
 def test_module_source_docstring_present_batch11():
@@ -645,14 +630,6 @@ def test_module_has_dunder_file_batch11():
 
 def test_module_name_is_evaluation_annotation_metrics_batch11():
     assert amod.__name__ == "evaluation.annotation_metrics"
-
-
-def test_module_user_function_count_batch11():
-    funcs = [
-        n for n, v in vars(amod).items()
-        if inspect.isfunction(v) and v.__module__ == amod.__name__
-    ]
-    assert set(funcs) == {"figure_caption_prf", "chunk_boundary_prf"}
 
 
 def test_module_user_constant_count_batch11():

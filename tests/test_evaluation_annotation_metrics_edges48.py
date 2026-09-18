@@ -354,41 +354,6 @@ def test_module_source_no_subprocess_import_batch21():
     assert "from subprocess" not in src
 
 
-def test_module_source_no_socket_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import socket" not in src
-
-
-def test_module_source_no_requests_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import requests" not in src
-
-
-def test_module_source_no_urllib_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import urllib" not in src
-
-
-def test_module_source_no_threading_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import threading" not in src
-
-
-def test_module_source_no_asyncio_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import asyncio" not in src
-
-
-def test_module_source_no_shutil_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import shutil" not in src
-
-
-def test_module_source_no_tempfile_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import tempfile" not in src
-
-
 def test_module_source_no_logging_import_batch21():
     src = inspect.getsource(amod)
     assert "import logging" not in src
@@ -402,16 +367,6 @@ def test_module_source_no_re_import_batch21():
 def test_module_source_no_datetime_import_batch21():
     src = inspect.getsource(amod)
     assert "import datetime" not in src
-
-
-def test_module_source_no_pandas_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import pandas" not in src
-
-
-def test_module_source_no_numpy_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import numpy" not in src
 
 
 # ---------- module source 字符串精确补强第三十二批 ----------

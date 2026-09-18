@@ -360,13 +360,6 @@ def test_validate_file_missing_raises_filenotfound_batch12(tmp_path):
         validate_file(tmp_path / "missing.json", "manifest.schema.json")
 
 
-def test_validate_file_invalid_json_raises_jsondecodeerror_batch12(tmp_path):
-    p = tmp_path / "bad.json"
-    p.write_text("{not valid", encoding="utf-8")
-    with pytest.raises(json.JSONDecodeError):
-        validate_file(p, "manifest.schema.json")
-
-
 def test_validate_file_unicode_filename_batch12(tmp_path):
     """Unicode 文件名应被支持。"""
     p = tmp_path / "文件.json"
@@ -520,11 +513,6 @@ def test_schema_source_no_assert_batch12():
     assert "\nassert " not in source
 
 
-def test_schema_source_no_print_batch12():
-    source = inspect.getsource(smod)
-    assert "print(" not in source
-
-
 def test_schema_source_no_class_other_than_eval_schema_error_batch12():
     source = inspect.getsource(smod)
     # 只允许 1 个 class
@@ -565,26 +553,6 @@ def test_module_source_jsonschema_import_top_level_batch12():
     head = "\n".join(source.split("\n")[:30])
     assert "Draft202012Validator" in source
     assert "from jsonschema" in source
-
-
-def test_module_source_has_schema_path_def_batch12():
-    source = inspect.getsource(smod)
-    assert "def _schema_path(" in source
-
-
-def test_module_source_has_load_schema_def_batch12():
-    source = inspect.getsource(smod)
-    assert "def load_schema(" in source
-
-
-def test_module_source_has_validate_def_batch12():
-    source = inspect.getsource(smod)
-    assert "def validate(" in source
-
-
-def test_module_source_has_validate_file_def_batch12():
-    source = inspect.getsource(smod)
-    assert "def validate_file(" in source
 
 
 def test_module_source_has_dunder_all_5_items_batch12():
@@ -686,22 +654,6 @@ def test_module_docstring_mentions_no_reuse_batch12():
     """docstring 应提到不复用 app/schema.py。"""
     assert smod.__doc__ is not None
     assert "app/schema" in smod.__doc__ or "不复用" in smod.__doc__
-
-
-def test_module_user_class_count_1_batch12():
-    classes = [
-        n for n, v in vars(smod).items()
-        if inspect.isclass(v) and v.__module__ == smod.__name__
-    ]
-    assert classes == ["EvalSchemaError"]
-
-
-def test_module_user_function_count_4_batch12():
-    funcs = [
-        n for n, v in vars(smod).items()
-        if inspect.isfunction(v) and v.__module__ == smod.__name__
-    ]
-    assert set(funcs) == {"_schema_path", "load_schema", "validate", "validate_file"}
 
 
 def test_module_top_level_constants_count_1_batch12():

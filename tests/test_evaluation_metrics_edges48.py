@@ -81,12 +81,6 @@ def test_ratio_large_value_preserved_batch22():
     assert r["value"] == 100.0
 
 
-def test_ratio_int_input_converted_to_float_batch22():
-    r = _ratio(1)
-    assert r["value"] == 1.0
-    assert isinstance(r["value"], float)
-
-
 def test_ratio_inf_input_batch22():
     """inf 不被拒（float() 接受 inf）。"""
     import math
@@ -180,10 +174,6 @@ def test_pdf_bbox_required_types_excludes_table_batch22():
 def test_strip_unicode_whitespace_pure_string_batch22():
     """纯字符串无变化。"""
     assert _strip_unicode_whitespace("hello") == "hello"
-
-
-def test_strip_unicode_whitespace_single_char_batch22():
-    assert _strip_unicode_whitespace("a") == "a"
 
 
 def test_strip_unicode_whitespace_digit_batch22():
@@ -464,10 +454,6 @@ def test_is_valid_bbox_empty_list_batch22():
 
 def test_is_valid_bbox_none_batch22():
     assert _is_valid_bbox(None) is False
-
-
-def test_is_valid_bbox_string_batch22():
-    assert _is_valid_bbox("0,0,10,10") is False
 
 
 def test_is_valid_bbox_tuple_batch22():
@@ -773,11 +759,6 @@ def test_module_source_no_shutil_import_batch22():
 def test_module_source_no_tempfile_import_batch22():
     src = inspect.getsource(mmod)
     assert "import tempfile" not in src
-
-
-def test_module_source_no_sys_import_batch22():
-    src = inspect.getsource(mmod)
-    assert "import sys" not in src
 
 
 def test_module_source_no_logging_import_batch22():

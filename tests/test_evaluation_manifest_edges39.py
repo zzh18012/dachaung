@@ -302,22 +302,6 @@ def test_document_entry_field_count_10_batch12():
     assert len(fields(DocumentEntry)) == 10
 
 
-def test_document_entry_field_names_batch12():
-    names = [f.name for f in fields(DocumentEntry)]
-    assert names == [
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "source_type",
-        "sha256",
-        "categories",
-        "paired_with",
-        "annotation_file_str",
-        "annotation_resolved",
-        "expectations",
-    ]
-
-
 def test_document_entry_frozen_cannot_assign_batch12():
     """frozen=True → 赋值抛 FrozenInstanceError。"""
     doc = _make_doc()
@@ -353,17 +337,6 @@ def test_document_entry_categories_default_tuple_batch12():
 
 def test_expected_failure_field_count_5_batch12():
     assert len(fields(ExpectedFailure)) == 5
-
-
-def test_expected_failure_field_names_batch12():
-    names = [f.name for f in fields(ExpectedFailure)]
-    assert names == [
-        "doc_id",
-        "path_str",
-        "resolved_path",
-        "expected_error_code",
-        "source_type",
-    ]
 
 
 def test_manifest_field_count_5_batch12():
@@ -851,16 +824,6 @@ def test_module_source_imports_manifest_version_batch12():
     assert "from evaluation import MANIFEST_VERSION" in source
 
 
-def test_module_source_imports_validate_batch12():
-    source = inspect.getsource(mmod)
-    assert "from evaluation.schema import validate" in source
-
-
-def test_module_source_has_class_manifest_error_batch12():
-    source = inspect.getsource(mmod)
-    assert "class ManifestError(Exception):" in source
-
-
 def test_module_source_has_frozen_property_batch12():
     """Manifest 是 frozen dataclass。"""
     source = inspect.getsource(mmod)
@@ -1006,20 +969,6 @@ def test_all_functions_no_var_kwargs_batch12():
 
 def test_module_name_evaluation_manifest_batch12():
     assert mmod.__name__ == "evaluation.manifest"
-
-
-def test_module_user_function_count_5_batch12():
-    funcs = [
-        n for n, v in vars(mmod).items()
-        if inspect.isfunction(v) and v.__module__ == mmod.__name__
-    ]
-    assert set(funcs) == {
-        "_is_absolute_like",
-        "_has_backslash",
-        "_resolve_relative_path",
-        "load_manifest",
-        "_detect_project_root",
-    }
 
 
 def test_module_user_class_count_4_batch12():

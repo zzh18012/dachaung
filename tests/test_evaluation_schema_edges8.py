@@ -72,11 +72,6 @@ def test_module_jsvalidation_error_in_namespace_identity():
 # =========================================================================
 
 
-def test_schemas_dir_is_absolute_path():
-    """SCHEMAS_DIR 是绝对路径。"""
-    assert SCHEMAS_DIR.is_absolute()
-
-
 def test_schemas_dir_value_matches_resolve():
     """SCHEMAS_DIR == schemas/ 目录的 resolve() 路径。"""
     import evaluation.schema as m
@@ -87,11 +82,6 @@ def test_schemas_dir_value_matches_resolve():
 def test_schemas_dir_exists():
     """SCHEMAS_DIR 目录实际存在。"""
     assert SCHEMAS_DIR.is_dir()
-
-
-def test_schemas_dir_contains_manifest_schema():
-    """SCHEMAS_DIR 含 manifest.schema.json。"""
-    assert (SCHEMAS_DIR / "manifest.schema.json").is_file()
 
 
 # =========================================================================
@@ -343,12 +333,6 @@ def test_schema_path_return_annotation_is_path():
 # =========================================================================
 # load_schema 详细测试
 # =========================================================================
-
-
-def test_load_schema_returns_dict():
-    """load_schema 返回 dict。"""
-    s = load_schema("manifest.schema.json")
-    assert isinstance(s, dict)
 
 
 def test_load_schema_modifying_one_does_not_affect_other():

@@ -332,12 +332,6 @@ def test_main_validate_report_invalid_schema_returns_1_batch15(tmp_path):
     assert rc == 1
 
 
-def test_main_inspect_doc_returns_0_on_valid_batch15(tmp_path):
-    p = _write_valid_doc(tmp_path)
-    rc = main(["inspect-doc", str(p)])
-    assert rc == 0
-
-
 def test_main_returns_int_type_batch15():
     rc = main(["inspect-doc", "/nonexistent/x.json"])
     assert isinstance(rc, int)
@@ -375,16 +369,6 @@ def test_module_source_forbidden_tokens_round21_batch15(token):
 # ---------- module source 字符串精确补强第十八批 ----------
 
 
-def test_module_source_defines_format_metric_batch15():
-    source = inspect.getsource(climod)
-    assert "def _format_metric(" in source
-
-
-def test_module_source_defines_run_inspect_doc_batch15():
-    source = inspect.getsource(climod)
-    assert "def _run_inspect_doc(" in source
-
-
 def test_module_source_has_sys_exit_call_batch15():
     source = inspect.getsource(climod)
     assert "SystemExit" in source or "sys.exit" in source
@@ -398,11 +382,6 @@ def test_module_source_has_validate_report_subcommand_string_batch15():
 def test_module_source_has_inspect_doc_subcommand_string_batch15():
     source = inspect.getsource(climod)
     assert '"inspect-doc"' in source or "'inspect-doc'" in source
-
-
-def test_module_source_has_subparsers_required_batch15():
-    source = inspect.getsource(climod)
-    assert "required=True" in source
 
 
 def test_module_source_no_subprocess_import_batch15():
@@ -421,12 +400,6 @@ def test_module_source_uses_get_git_provenance_batch15():
 def test_build_parser_no_args_batch15():
     sig = inspect.signature(_build_parser)
     assert len(sig.parameters) == 0
-
-
-def test_main_optional_argv_batch15():
-    sig = inspect.signature(main)
-    p = sig.parameters["argv"]
-    assert p.default is None
 
 
 def test_format_metric_two_args_batch15():
@@ -515,10 +488,4 @@ def test_e2e_main_subcommand_routing_inspect_doc_batch15():
 def test_e2e_main_inspect_doc_with_high_tolerance_batch15(tmp_path):
     p = _write_valid_doc(tmp_path)
     rc = main(["inspect-doc", str(p), "--tolerance-chars", "999"])
-    assert rc == 0
-
-
-def test_e2e_main_inspect_doc_returns_0_with_full_doc_batch15(tmp_path):
-    p = _write_valid_doc(tmp_path)
-    rc = main(["inspect-doc", str(p)])
     assert rc == 0

@@ -512,13 +512,6 @@ def test_ast_run_evaluation_for_iter_targets_batch52():
     assert "per_doc_results" in iters
 
 
-def test_ast_run_evaluation_has_with_open_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation")
-    withs = [n for n in ast.walk(func) if isinstance(n, ast.With)]
-    assert len(withs) == 1
-
-
 def test_ast_run_evaluation_assigns_per_doc_results_batch52():
     tree = ast.parse(inspect.getsource(runner_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "run_evaluation")

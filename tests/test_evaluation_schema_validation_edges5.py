@@ -209,10 +209,6 @@ def test_module_all_len_one_batch5():
     assert len(smod.__all__) == 1
 
 
-def test_module_docstring_present_batch5():
-    assert smod.__doc__ is not None
-
-
 def test_module_docstring_mentions_schema_batch5():
     doc = smod.__doc__
     assert "schema" in doc.lower()
@@ -306,11 +302,6 @@ def test_module_does_not_have_module_level_app_schema_batch5():
 
 
 # ---------- 签名深度 第五批
-
-
-def test_signature_one_param_batch5():
-    sig = inspect.signature(document_passes_schema)
-    assert len(sig.parameters) == 1
 
 
 def test_signature_param_annotation_dict_str_any_batch5():

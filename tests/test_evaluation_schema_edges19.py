@@ -574,11 +574,6 @@ def test_validate_no_default_for_schema_name():
     assert sig.parameters["schema_name"].default is inspect.Parameter.empty
 
 
-def test_load_schema_no_default_for_name():
-    sig = inspect.signature(load_schema)
-    assert sig.parameters["name"].default is inspect.Parameter.empty
-
-
 def test_validate_file_no_default_for_path():
     sig = inspect.signature(validate_file)
     assert sig.parameters["path"].default is inspect.Parameter.empty
@@ -610,10 +605,6 @@ def test_namespace_eval_schema_error():
 
 
 # ---------- 模块整体合理性（imports / __all__ 类型） ----------
-
-
-def test_module_all_is_list():
-    assert isinstance(m.__all__, list)
 
 
 def test_module_has_no_main_block():

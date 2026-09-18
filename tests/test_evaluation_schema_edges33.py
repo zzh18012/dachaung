@@ -127,11 +127,6 @@ def test_eval_schema_error_errors_attribute_writable_batch13():
 # ---------- load_schema 行为深度第十三批 ----------
 
 
-def test_load_schema_returns_dict_batch13():
-    out = load_schema("manifest.schema.json")
-    assert isinstance(out, dict)
-
-
 def test_load_schema_uses_context_manager_batch13():
     """load_schema 应该用 with open(...) as f。"""
     source = inspect.getsource(load_schema)
@@ -290,11 +285,6 @@ def test_validate_file_path_input_batch13(tmp_path):
     assert validate_file(p, "manifest.schema.json") is None
 
 
-def test_validate_file_not_exist_raises_filenotfounderror_batch13(tmp_path):
-    with pytest.raises(FileNotFoundError):
-        validate_file(tmp_path / "nonexistent.json", "manifest.schema.json")
-
-
 def test_validate_file_invalid_json_raises_json_decode_error_batch13(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("{not json}", encoding="utf-8")
@@ -330,12 +320,6 @@ def test_validate_file_calls_validate_batch13():
 def test_schema_path_returns_path_batch13():
     out = _schema_path("manifest.schema.json")
     assert isinstance(out, Path)
-
-
-def test_schema_path_not_exist_raises_filenotfounderror_batch13():
-    with pytest.raises(FileNotFoundError) as exc_info:
-        _schema_path("nonexistent.schema.json")
-    assert "nonexistent.schema.json" in str(exc_info.value)
 
 
 def test_schema_path_appends_to_schemas_dir_batch13():
@@ -410,26 +394,6 @@ def test_module_source_imports_jsvalidation_error_batch13():
     source = inspect.getsource(smod)
     head = "\n".join(source.split("\n")[:30])
     assert "from jsonschema.exceptions import ValidationError as JSValidationError" in head
-
-
-def test_module_source_defines_schema_path_batch13():
-    source = inspect.getsource(smod)
-    assert "def _schema_path(" in source
-
-
-def test_module_source_defines_load_schema_batch13():
-    source = inspect.getsource(smod)
-    assert "def load_schema(" in source
-
-
-def test_module_source_defines_validate_batch13():
-    source = inspect.getsource(smod)
-    assert "def validate(" in source
-
-
-def test_module_source_defines_validate_file_batch13():
-    source = inspect.getsource(smod)
-    assert "def validate_file(" in source
 
 
 def test_module_source_has_dunder_all_batch13():
@@ -565,14 +529,6 @@ def test_module_dunder_all_5_items_batch13():
 def test_module_dunder_all_includes_expected_names_batch13():
     expected = {"SCHEMAS_DIR", "EvalSchemaError", "load_schema", "validate", "validate_file"}
     assert set(smod.__all__) == expected
-
-
-def test_module_eval_schema_error_class_count_1_batch13():
-    classes = [
-        n for n, v in vars(smod).items()
-        if inspect.isclass(v) and v.__module__ == smod.__name__
-    ]
-    assert classes == ["EvalSchemaError"]
 
 
 def test_module_constants_count_1_batch13():

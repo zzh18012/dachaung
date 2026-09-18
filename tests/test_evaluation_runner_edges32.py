@@ -314,11 +314,6 @@ def test_run_evaluation_source_pops_missing_markers():
     assert 'pop("_missing_markers"' in src
 
 
-def test_run_evaluation_source_calls_build_provenance():
-    src = inspect.getsource(run_evaluation)
-    assert "build_provenance(" in src
-
-
 def test_run_evaluation_source_calls_build_devset_section():
     src = inspect.getsource(run_evaluation)
     assert "build_devset_section(manifest)" in src
@@ -332,16 +327,6 @@ def test_run_evaluation_source_calls_aggregate_summary():
 def test_run_evaluation_source_builds_public_per_doc():
     src = inspect.getsource(run_evaluation)
     assert "public_per_doc = []" in src
-
-
-def test_run_evaluation_source_creates_report_dict():
-    src = inspect.getsource(run_evaluation)
-    assert '"report_version": REPORT_VERSION' in src
-    assert '"provenance": provenance' in src
-    assert '"devset": devset' in src
-    assert '"summary": summary' in src
-    assert '"per_doc": public_per_doc' in src
-    assert '"expected_failures": expected_failure_results' in src
 
 
 def test_run_evaluation_source_writes_json_with_indent():
@@ -364,19 +349,9 @@ def test_run_evaluation_source_compares_actual_with_expected():
     assert "actual_code == ef.expected_error_code" in src
 
 
-def test_run_evaluation_source_initializes_expected_failure_results():
-    src = inspect.getsource(run_evaluation)
-    assert "expected_failure_results: list[dict[str, Any]] = []" in src
-
-
 def test_run_evaluation_source_appends_to_per_doc_results():
     src = inspect.getsource(run_evaluation)
     assert "per_doc_results.append(" in src
-
-
-def test_run_evaluation_source_track_parser_version_first():
-    src = inspect.getsource(run_evaluation)
-    assert "if parser_version and not parser_version_for_prov:" in src
 
 
 def test_run_evaluation_source_uses_total_seconds_in_wall_time():
@@ -653,12 +628,6 @@ def test_load_annotation_signature_param_name():
     sig = inspect.signature(_load_annotation)
     p = list(sig.parameters.values())[0]
     assert p.name == "path"
-
-
-def test_load_annotation_signature_param_no_default():
-    sig = inspect.signature(_load_annotation)
-    p = list(sig.parameters.values())[0]
-    assert p.default is inspect.Parameter.empty
 
 
 def test_process_one_signature_param_count():

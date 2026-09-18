@@ -81,11 +81,6 @@ def test_eval_schema_error_message_attribute():
     assert err.args[0] == "hello"
 
 
-def test_eval_schema_error_str_method():
-    err = EvalSchemaError("hello")
-    assert str(err) == "hello"
-
-
 def test_eval_schema_error_repr_method():
     err = EvalSchemaError("hello")
     r = repr(err)
@@ -542,15 +537,6 @@ def test_schema_path_signature():
     assert sig.return_annotation == "Path"
 
 
-def test_validate_no_varargs_varkw():
-    sig = inspect.signature(validate)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 def test_namespace_load_schema():
     assert load_schema.__module__ == "evaluation.schema"
 
@@ -572,10 +558,6 @@ def test_namespace_eval_schema_error():
 
 
 # ---------- module 整体合理性 ----------
-
-
-def test_module_all_count_5():
-    assert len(m.__all__) == 5
 
 
 def test_module_all_set_strict():

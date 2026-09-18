@@ -55,23 +55,11 @@ def test_manifest_version_value_batch44():
     assert MANIFEST_VERSION == "1.0"
 
 
-def test_annotation_equals_manifest_batch44():
-    assert ANNOTATION_VERSION == MANIFEST_VERSION
-
-
-def test_evaluator_not_equals_annotation_batch44():
-    assert EVALUATOR_VERSION != ANNOTATION_VERSION
-
-
 def test_two_distinct_versions_batch44():
     assert len({EVALUATOR_VERSION, REPORT_VERSION, ANNOTATION_VERSION, MANIFEST_VERSION}) == 2
 
 
 # ---------- 版本常量精确类型 ----------
-
-def test_evaluator_version_is_str_batch44():
-    assert isinstance(EVALUATOR_VERSION, str)
-
 
 def test_evaluator_version_truthy_batch44():
     assert EVALUATOR_VERSION
@@ -253,10 +241,6 @@ def test_module_package_is_evaluation_batch44():
     assert evaluation.__package__ == "evaluation"
 
 
-def test_module_file_exists_batch44():
-    assert Path(evaluation.__file__).is_file()
-
-
 def test_module_file_size_nonzero_batch44():
     assert Path(evaluation.__file__).stat().st_size > 0
 
@@ -274,31 +258,6 @@ def test_module_docstring_present_batch44():
 
 def test_module_docstring_length_batch44():
     assert len(evaluation.__doc__) > 200
-
-
-def test_module_source_contains_v10_batch44():
-    src = inspect.getsource(evaluation)
-    assert "v1.0" in src
-
-
-def test_module_source_contains_v11_batch44():
-    src = inspect.getsource(evaluation)
-    assert "v1.1" in src
-
-
-def test_module_source_contains_text_preservation_batch44():
-    src = inspect.getsource(evaluation)
-    assert "text_preservation" in src
-
-
-def test_module_source_contains_not_instrumented_batch44():
-    src = inspect.getsource(evaluation)
-    assert "not_instrumented" in src
-
-
-def test_module_source_contains_no_fake_batch44():
-    src = inspect.getsource(evaluation)
-    assert "不伪造" in src
 
 
 def test_module_source_contains_normalize_text_batch44():

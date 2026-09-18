@@ -58,11 +58,6 @@ def test_schemas_dir_contains_only_json_files_batch44():
             assert p.suffix == ".json"
 
 
-def test_schemas_dir_resolved_absolute_batch44():
-    """SCHEMAS_DIR 是绝对路径。"""
-    assert SCHEMAS_DIR.is_absolute()
-
-
 # ---------- _schema_path 详细 ----------
 
 def test_schema_path_error_contains_full_path_batch44():
@@ -323,11 +318,6 @@ def test_eval_schema_error_pickle_roundtrip_batch44():
 
 # ---------- module source ----------
 
-def test_module_source_contains_does_not_reuse_app_schema_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "不与 app/schema.py 复用" in src
-
-
 def test_module_source_contains_business_vs_evaluation_batch44():
     src = inspect.getsource(schema_mod)
     assert "业务输出" in src
@@ -468,12 +458,6 @@ def test_ast_validate_function_raises_eval_schema_error_batch44():
     assert has_raise
 
 
-def test_ast_no_async_in_module_body_batch44():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.AsyncFunctionDef)
-
-
 def test_ast_no_with_in_module_body_batch44():
     tree = ast.parse(inspect.getsource(schema_mod))
     for n in tree.body:
@@ -481,46 +465,6 @@ def test_ast_no_with_in_module_body_batch44():
 
 
 # ---------- forbidden tokens 第九十六批 ----------
-
-def test_source_no_eval_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "pickle.load(" not in src
-
 
 def test_source_uses_json_load_batch44():
     """使用 json.load 而非 pickle/yaml。"""

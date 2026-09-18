@@ -375,11 +375,6 @@ def test_build_provenance_max_chars_huge_int(tmp_path: Path):
     assert out["max_chars"] == big
 
 
-def test_build_provenance_returns_dict_type(tmp_path: Path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert isinstance(out, dict)
-
-
 def test_build_provenance_evaluator_version_value_constant(tmp_path: Path):
     """evaluator_version 必须等于 evaluation.EVALUATOR_VERSION。"""
     from evaluation import EVALUATOR_VERSION

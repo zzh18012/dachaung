@@ -51,11 +51,6 @@ from evaluation.metrics import (
 # ---------- helpers 行为第十批 ----------
 
 
-def test_null_returns_dict_with_value_none_batch10():
-    out = _null("reason_x")
-    assert out == {"value": None, "reason": "reason_x"}
-
-
 def test_null_returns_dict_type_batch10():
     assert isinstance(_null("x"), dict)
 
@@ -161,28 +156,6 @@ def test_compute_metrics_returns_dict_batch10():
     assert isinstance(out, dict)
 
 
-def test_compute_metrics_document_none_returns_14_keys_batch10():
-    out = compute_automatic_metrics(None, None, "pdf", None)
-    # pipeline_success + error_code + schema_valid + 11 个 null 指标
-    expected_keys = {
-        "pipeline_success",
-        "error_code",
-        "schema_valid",
-        "element_count_total",
-        "element_count_by_type",
-        "pdf_locator_valid_ratio",
-        "docx_locator_valid_ratio",
-        "image_resource_exists_ratio",
-        "chunk_reference_intact_ratio",
-        "text_preservation_equal",
-        "text_char_multiset_precision",
-        "text_char_multiset_recall",
-        "heading_boundary_compliance",
-        "silent_drop_count",
-    }
-    assert set(out.keys()) == expected_keys
-
-
 def test_compute_metrics_document_none_pipeline_success_false_batch10():
     out = compute_automatic_metrics(None, None, "pdf", None)
     assert out["pipeline_success"]["value"] is False
@@ -224,13 +197,6 @@ def test_compute_metrics_does_not_mutate_error_batch10():
     snapshot = json.dumps(error, sort_keys=True)
     _ = compute_automatic_metrics(None, error, "pdf", None)
     assert json.dumps(error, sort_keys=True) == snapshot
-
-
-def test_compute_metrics_idempotent_batch10():
-    doc = {"elements": [], "chunks": []}
-    out1 = compute_automatic_metrics(doc, None, "pdf", None)
-    out2 = compute_automatic_metrics(doc, None, "pdf", None)
-    assert out1 == out2
 
 
 def test_compute_metrics_kwargs_batch10():
@@ -617,13 +583,6 @@ def test_heading_boundary_no_chunks_batch10():
     assert out["value"] == 0.0
 
 
-def test_heading_boundary_perfect_match_batch10():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{"source_element_ids": ["h1", "p1"]}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 1.0
-
-
 def test_heading_boundary_no_chunk_starts_with_heading_batch10():
     elements = [{"type": "heading", "element_id": "h1"}]
     chunks = [{"source_element_ids": ["p1", "h1"]}]  # h1 不是 first
@@ -742,10 +701,6 @@ def test_is_valid_bbox_tuple_rejected_batch10():
     assert _is_valid_bbox((0, 0, 100, 100)) is False
 
 
-def test_is_valid_bbox_string_rejected_batch10():
-    assert _is_valid_bbox(["0", "0", "100", "100"]) is False
-
-
 def test_is_valid_bbox_none_rejected_batch10():
     assert _is_valid_bbox(None) is False
 
@@ -762,14 +717,6 @@ def test_is_valid_bbox_too_long_rejected_batch10():
     assert _is_valid_bbox([0, 0, 100, 100, 100]) is False
 
 
-def test_is_valid_bbox_string_element_rejected_batch10():
-    assert _is_valid_bbox([0, 0, "100", 100]) is False
-
-
-def test_is_valid_bbox_none_element_rejected_batch10():
-    assert _is_valid_bbox([0, 0, None, 100]) is False
-
-
 def test_is_valid_bbox_bool_element_rejected_batch10():
     """bool 是 int 的子类，但被显式拒绝。"""
     assert _is_valid_bbox([True, 0, 100, 100]) is False
@@ -781,14 +728,6 @@ def test_is_valid_bbox_set_rejected_batch10():
 
 def test_is_valid_bbox_list_of_tuples_rejected_batch10():
     assert _is_valid_bbox([(0, 0), (100, 100)]) is False
-
-
-def test_is_valid_bbox_nan_rejected_batch10():
-    assert _is_valid_bbox([0, 0, float("nan"), 100]) is False
-
-
-def test_is_valid_bbox_inf_rejected_batch10():
-    assert _is_valid_bbox([0, 0, float("inf"), 100]) is False
 
 
 # ---------- _strip_unicode_whitespace 行为深度第十批 ----------
@@ -888,16 +827,6 @@ def test_metrics_source_no_eval_exec_batch10():
     assert "exec(" not in source
 
 
-def test_metrics_source_no_compile_batch10():
-    source = inspect.getsource(mmod)
-    assert "compile(" not in source
-
-
-def test_metrics_source_no_global_keyword_batch10():
-    source = inspect.getsource(mmod)
-    assert "\nglobal " not in source
-
-
 def test_metrics_source_no_class_def_batch10():
     source = inspect.getsource(mmod)
     assert "\nclass " not in source
@@ -922,11 +851,6 @@ def test_metrics_source_no_logging_batch10():
     source = inspect.getsource(mmod)
     assert "logging" not in source
     assert "logger" not in source
-
-
-def test_metrics_source_no_sleep_batch10():
-    source = inspect.getsource(mmod)
-    assert "time.sleep" not in source
 
 
 # ---------- module source 字符串精确补强第九批 ----------
@@ -1007,11 +931,6 @@ def test_module_source_has_docx_locator_def_batch10():
     assert "def _docx_locator_ratio(" in source
 
 
-def test_module_source_has_is_valid_bbox_def_batch10():
-    source = inspect.getsource(mmod)
-    assert "def _is_valid_bbox(" in source
-
-
 def test_module_source_has_image_resource_def_batch10():
     source = inspect.getsource(mmod)
     assert "def _image_resource_ratio(" in source
@@ -1081,11 +1000,6 @@ def test_signature_null_param_annotation_batch10():
     assert p.annotation == "str"
 
 
-def test_signature_null_return_annotation_batch10():
-    sig = inspect.signature(_null)
-    assert sig.return_annotation == "dict[str, Any]"
-
-
 def test_signature_ratio_param_count_batch10():
     sig = inspect.signature(_ratio)
     assert len(sig.parameters) == 1
@@ -1095,11 +1009,6 @@ def test_signature_ratio_param_annotation_batch10():
     sig = inspect.signature(_ratio)
     p = list(sig.parameters.values())[0]
     assert p.annotation == "float"
-
-
-def test_signature_ratio_return_annotation_batch10():
-    sig = inspect.signature(_ratio)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_signature_bool_metric_param_count_batch10():

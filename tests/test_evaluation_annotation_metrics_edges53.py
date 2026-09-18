@@ -489,11 +489,6 @@ def test_module_source_contains_missing_markers_batch26():
     assert "missing_markers" in source
 
 
-def test_module_source_contains_search_from_batch26():
-    source = inspect.getsource(amod)
-    assert "search_from" in source
-
-
 def test_module_source_contains_normalize_text_call_batch26():
     source = inspect.getsource(amod)
     assert "normalize_text(" in source
@@ -507,11 +502,6 @@ def test_module_source_contains_one_to_one_text_batch26():
 def test_module_source_contains_tolerance_chars_record_batch26():
     source = inspect.getsource(amod)
     assert "_tolerance_chars" in source
-
-
-def test_module_source_contains_chunk_boundary_anchors_key_batch26():
-    source = inspect.getsource(amod)
-    assert "chunk_boundary_anchors" in source
 
 
 def test_module_source_contains_default_tolerance_30_batch26():
@@ -554,10 +544,6 @@ def test_signature_all_annotations_are_strings_batch26():
         for p in sig.parameters.values():
             if p.annotation is not inspect.Parameter.empty:
                 assert isinstance(p.annotation, str), f"{fn.__name__}.{p.name}"
-
-
-def test_signature_chunk_boundary_prf_docstring_present_batch26():
-    assert chunk_boundary_prf.__doc__ is not None
 
 
 # ---------- module 合理性第三十八批 ----------

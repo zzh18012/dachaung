@@ -71,12 +71,6 @@ def test_load_annotation_json_array_passthrough_batch52(tmp_path):
     assert _load_annotation(p) == [1, 2]
 
 
-def test_load_annotation_empty_file_none_batch52(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text("", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_bom_file_none_batch52(tmp_path):
     p = tmp_path / "a.json"
     p.write_text("﻿{}", encoding="utf-8")

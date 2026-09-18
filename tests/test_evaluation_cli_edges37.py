@@ -66,13 +66,6 @@ def test_build_parser_run_subparser_choices_batch10():
     assert ns.parser in ("fallback", "kreuzberg")
 
 
-def test_build_parser_run_parser_kreuzberg_batch10():
-    ns = _build_parser().parse_args(
-        ["run", "--manifest", "a.json", "--output", "b.json", "--parser", "kreuzberg"]
-    )
-    assert ns.parser == "kreuzberg"
-
-
 def test_build_parser_run_required_manifest_batch10(capsys):
     """--manifest required=True。"""
     with pytest.raises(SystemExit):
@@ -116,11 +109,6 @@ def test_build_parser_unknown_arg_exits_nonzero_batch10(capsys):
 
 
 # ---------- argparse Namespace 字段第十批 ----------
-
-
-def test_namespace_run_command_value_batch10():
-    ns = _build_parser().parse_args(["run", "--manifest", "a.json", "--output", "b.json"])
-    assert ns.command == "run"
 
 
 def test_namespace_run_manifest_value_batch10():
@@ -247,15 +235,6 @@ def test_run_inspect_doc_top_level_null_returns_1_batch10(tmp_path):
     assert _run_inspect_doc(args) == 1
 
 
-def test_run_inspect_doc_prints_metrics_header_batch10(tmp_path, capsys):
-    p = tmp_path / "d.json"
-    p.write_text("{}", encoding="utf-8")
-    args = argparse.Namespace(input=str(p), tolerance_chars=30)
-    _run_inspect_doc(args)
-    out = capsys.readouterr().out
-    assert "metrics:" in out
-
-
 def test_run_inspect_doc_chunks_missing_treated_as_empty_batch10(tmp_path, capsys):
     doc = {"elements": []}
     p = tmp_path / "d.json"
@@ -351,13 +330,6 @@ def test_run_inspect_doc_with_chunk_text_batch10(tmp_path, capsys):
 
 
 # ---------- main 路由第十批 ----------
-
-
-def test_main_validate_report_invalid_json_returns_1_batch10(tmp_path, capsys):
-    p = tmp_path / "r.json"
-    p.write_text("not json", encoding="utf-8")
-    rc = main(["validate-report", str(p)])
-    assert rc == 1
 
 
 def test_main_run_with_invalid_manifest_schema_returns_1_batch10(tmp_path, capsys):
@@ -508,37 +480,12 @@ def test_cli_source_no_rmtree_batch10():
     assert ".rmtree(" not in source
 
 
-def test_cli_source_no_remove_batch10():
-    source = inspect.getsource(climod)
-    assert ".remove(" not in source
-
-
 # ---------- module source 字符串精确补强第八批 ----------
-
-
-def test_module_source_has_future_annotations_batch10():
-    source = inspect.getsource(climod)
-    assert "from __future__ import annotations" in source
 
 
 def test_module_source_imports_argparse_batch10():
     source = inspect.getsource(climod)
     assert "import argparse" in source
-
-
-def test_module_source_imports_json_batch10():
-    source = inspect.getsource(climod)
-    assert "import json" in source
-
-
-def test_module_source_imports_sys_batch10():
-    source = inspect.getsource(climod)
-    assert "import sys" in source
-
-
-def test_module_source_imports_path_batch10():
-    source = inspect.getsource(climod)
-    assert "from pathlib import Path" in source
 
 
 def test_module_source_imports_manifest_batch10():
@@ -550,11 +497,6 @@ def test_module_source_imports_manifest_batch10():
 def test_module_source_imports_get_git_provenance_batch10():
     source = inspect.getsource(climod)
     assert "get_git_provenance" in source
-
-
-def test_module_source_imports_run_evaluation_batch10():
-    source = inspect.getsource(climod)
-    assert "run_evaluation" in source
 
 
 def test_module_source_imports_eval_schema_error_batch10():

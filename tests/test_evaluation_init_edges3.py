@@ -371,39 +371,14 @@ def test_module_source_annotation_before_manifest_batch43():
     assert src.index("ANNOTATION_VERSION") < src.index("MANIFEST_VERSION")
 
 
-def test_module_source_contains_v1_0_batch43():
-    src = inspect.getsource(evaluation)
-    assert "v1.0" in src
-
-
-def test_module_source_contains_v1_1_batch43():
-    src = inspect.getsource(evaluation)
-    assert "v1.1" in src
-
-
-def test_module_source_contains_text_preservation_batch43():
-    src = inspect.getsource(evaluation)
-    assert "text_preservation" in src
-
-
 def test_module_source_contains_no_modification_batch43():
     src = inspect.getsource(evaluation)
     assert "不修改" in src
 
 
-def test_module_source_contains_no_fabrication_batch43():
-    src = inspect.getsource(evaluation)
-    assert "不伪造" in src
-
-
 def test_module_source_contains_zero_denominator_batch43():
     src = inspect.getsource(evaluation)
     assert "分母" in src
-
-
-def test_module_source_contains_not_instrumented_batch43():
-    src = inspect.getsource(evaluation)
-    assert "not_instrumented" in src
 
 
 def test_module_source_contains_hard_cut_keyword_batch43():
@@ -543,14 +518,6 @@ def test_reload_preserves_docstring_batch43():
 
 
 # ---------- 版本组合 第四十三批
-
-
-def test_versions_pair_annotation_manifest_equal_batch43():
-    assert ANNOTATION_VERSION == MANIFEST_VERSION
-
-
-def test_versions_pair_evaluator_annotation_differ_batch43():
-    assert EVALUATOR_VERSION != ANNOTATION_VERSION
 
 
 def test_versions_evaluator_report_higher_batch43():

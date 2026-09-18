@@ -379,11 +379,6 @@ def test_module_source_has_tolerance_chars_default_batch14():
     assert "tolerance_chars: int = 30" in source
 
 
-def test_module_source_has_chunk_boundary_anchors_key_batch14():
-    source = inspect.getsource(amod)
-    assert "chunk_boundary_anchors" in source
-
-
 def test_module_source_no_subprocess_import_batch14():
     source = inspect.getsource(amod)
     assert "import subprocess" not in source

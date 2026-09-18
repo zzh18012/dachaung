@@ -91,10 +91,6 @@ def test_bool_metric_true_batch25():
     assert _bool_metric(True)["value"] is True
 
 
-def test_bool_metric_false_batch25():
-    assert _bool_metric(False)["value"] is False
-
-
 def test_bool_metric_falsy_int_zero_batch25():
     """int 0 → bool False。"""
     assert _bool_metric(0)["value"] is False
@@ -821,29 +817,9 @@ def test_module_source_no_async_def_batch25():
     assert "async def" not in source
 
 
-def test_module_source_no_global_keyword_batch25():
-    source = inspect.getsource(mmod)
-    assert "global " not in source
-
-
 def test_module_source_no_walrus_batch25():
     source = inspect.getsource(mmod)
     assert ":=" not in source
-
-
-def test_module_source_no_eval_exec_batch25():
-    source = inspect.getsource(mmod)
-    assert "eval(" not in source
-    assert "exec(" not in source
-    assert "compile(" not in source
-
-
-def test_module_source_no_relative_imports_batch25():
-    source_lines = inspect.getsource(mmod).split("\n")
-    for line in source_lines:
-        stripped = line.strip()
-        if stripped.startswith("from .") and "from __future__" not in stripped:
-            pytest.fail(f"relative import: {line}")
 
 
 def test_module_source_no_star_import_batch25():
@@ -854,11 +830,6 @@ def test_module_source_no_star_import_batch25():
 def test_module_source_no_environ_batch25():
     source = inspect.getsource(mmod)
     assert "os.environ" not in source
-
-
-def test_module_source_no_subprocess_batch25():
-    source = inspect.getsource(mmod)
-    assert "import subprocess" not in source
 
 
 def test_module_source_math_used_batch25():
@@ -944,11 +915,6 @@ def test_module_source_contains_heading_boundary_compliance_batch25():
 def test_module_source_contains_chunk_reference_intact_ratio_batch25():
     source = inspect.getsource(mmod)
     assert "chunk_reference_intact_ratio" in source
-
-
-def test_module_source_contains_math_isfinite_batch25():
-    source = inspect.getsource(mmod)
-    assert "math.isfinite" in source
 
 
 # ---------- signatures 第三十六批 ----------
@@ -1084,11 +1050,6 @@ def test_module_module_level_constants_batch25():
     assert "_TEXT_TYPES" in names
     assert "_PDF_BBOX_REQUIRED_TYPES" in names
     assert "_NOT_EVALUATED" in names
-
-
-def test_module_constants_are_tuples_batch25():
-    assert isinstance(_TEXT_TYPES, tuple)
-    assert isinstance(_PDF_BBOX_REQUIRED_TYPES, tuple)
 
 
 def test_module_not_evaluated_is_str_batch25():

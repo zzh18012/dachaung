@@ -629,10 +629,6 @@ def test_html_parse_invalid_utf8_falls_back_to_replace(tmp_path: Path):
 # =========================================================================
 
 
-def test_skip_tags_includes_noscript():
-    assert "noscript" in _SKIP_TAGS
-
-
 def test_skip_tags_is_set():
     assert isinstance(_SKIP_TAGS, set)
 

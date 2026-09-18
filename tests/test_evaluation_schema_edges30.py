@@ -438,10 +438,6 @@ def test_schemas_dir_contains_evaluation_report_schema_batch10():
     assert (SCHEMAS_DIR / "evaluation-report.schema.json").is_file()
 
 
-def test_schemas_dir_contains_document_schema_batch10():
-    assert (SCHEMAS_DIR / "document.schema.json").is_file()
-
-
 def test_schemas_dir_immutable_attribute_batch10():
     """SCHEMAS_DIR 是 module-level 常量。"""
     # 多次访问返回同一对象
@@ -506,11 +502,6 @@ def test_schema_source_no_top_level_lambda_batch10():
                 raise AssertionError(f"top-level lambda: {line}")
 
 
-def test_schema_source_no_print_batch10():
-    source = inspect.getsource(smod)
-    assert "print(" not in source
-
-
 def test_schema_source_no_socket_batch10():
     source = inspect.getsource(smod)
     assert "socket" not in source
@@ -549,24 +540,9 @@ def test_module_source_imports_json_batch10():
     assert "import json" in source
 
 
-def test_module_source_imports_path_batch10():
-    source = inspect.getsource(smod)
-    assert "from pathlib import Path" in source
-
-
-def test_module_source_imports_typing_any_batch10():
-    source = inspect.getsource(smod)
-    assert "from typing import Any" in source
-
-
 def test_module_source_imports_draft202012_validator_batch10():
     source = inspect.getsource(smod)
     assert "Draft202012Validator" in source
-
-
-def test_module_source_imports_jsonschema_validation_error_batch10():
-    source = inspect.getsource(smod)
-    assert "from jsonschema.exceptions import ValidationError as JSValidationError" in source
 
 
 def test_module_source_has_schemas_dir_constant_batch10():
@@ -597,11 +573,6 @@ def test_module_source_has_validate_def_batch10():
 def test_module_source_has_validate_file_def_batch10():
     source = inspect.getsource(smod)
     assert "def validate_file(" in source
-
-
-def test_module_source_no_main_block_batch10():
-    source = inspect.getsource(smod)
-    assert "if __name__" not in source
 
 
 def test_module_source_docstring_present_batch10():
@@ -640,11 +611,6 @@ def test_signature_schema_path_1_param_batch10():
 def test_signature_load_schema_1_param_batch10():
     sig = inspect.signature(load_schema)
     assert len(sig.parameters) == 1
-
-
-def test_signature_load_schema_param_name_batch10():
-    sig = inspect.signature(load_schema)
-    assert list(sig.parameters) == ["name"]
 
 
 def test_signature_validate_2_params_batch10():
@@ -696,10 +662,6 @@ def test_module_all_is_list_batch10():
     assert isinstance(smod.__all__, list)
 
 
-def test_module_all_entries_unique_batch10():
-    assert len(smod.__all__) == len(set(smod.__all__))
-
-
 def test_module_all_entries_str_batch10():
     for name in smod.__all__:
         assert isinstance(name, str)
@@ -712,14 +674,6 @@ def test_module_has_dunder_file_batch10():
 
 def test_module_name_is_evaluation_schema_batch10():
     assert smod.__name__ == "evaluation.schema"
-
-
-def test_module_user_function_count_batch10():
-    funcs = [
-        n for n, v in vars(smod).items()
-        if inspect.isfunction(v) and v.__module__ == smod.__name__
-    ]
-    assert set(funcs) == {"_schema_path", "load_schema", "validate", "validate_file"}
 
 
 def test_module_user_class_count_batch10():

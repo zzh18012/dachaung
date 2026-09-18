@@ -492,11 +492,6 @@ def test_module_source_contains_reconfigure_call_batch28():
     assert 'sys.stderr.reconfigure' in src
 
 
-def test_module_source_contains_hasattr_check_batch28():
-    src = inspect.getsource(climod)
-    assert 'hasattr(sys.stdout, "reconfigure")' in src
-
-
 def test_module_source_contains_raise_system_exit_batch28():
     src = inspect.getsource(climod)
     assert "raise SystemExit(main())" in src

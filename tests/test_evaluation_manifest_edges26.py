@@ -86,12 +86,6 @@ def test_has_backslash_mixed():
 # ---------- _resolve_relative_path 错误消息精确 ----------
 
 
-def test_resolve_relative_path_message_includes_field_name_for_empty(tmp_path):
-    with pytest.raises(ManifestError) as ei:
-        _resolve_relative_path("", tmp_path, "MY_FIELD")
-    assert "MY_FIELD" in str(ei.value)
-
-
 def test_resolve_relative_path_message_includes_path_for_absolute(tmp_path):
     with pytest.raises(ManifestError) as ei:
         _resolve_relative_path("/etc/passwd", tmp_path, "F")
@@ -577,24 +571,6 @@ def test_module_source_has_no_main_block():
 # ---------- signatures 精确 ----------
 
 
-def test_load_manifest_no_varargs_varkw():
-    sig = inspect.signature(load_manifest)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
-def test_resolve_relative_path_no_varargs_varkw():
-    sig = inspect.signature(_resolve_relative_path)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 def test_namespace_load_manifest():
     assert load_manifest.__module__ == "evaluation.manifest"
 
@@ -632,10 +608,6 @@ def test_namespace_manifest():
 
 
 # ---------- module 整体合理性 ----------
-
-
-def test_module_all_count_5():
-    assert len(m.__all__) == 5
 
 
 def test_module_has_no_main_block():

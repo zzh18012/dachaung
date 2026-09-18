@@ -160,10 +160,6 @@ def test_is_valid_bbox_with_str_batch27():
     assert _is_valid_bbox(["1", 2, 3, 4]) is False
 
 
-def test_is_valid_bbox_with_inf_batch27():
-    assert _is_valid_bbox([float("inf"), 2, 3, 4]) is False
-
-
 def test_is_valid_bbox_len_three_batch27():
     assert _is_valid_bbox([1, 2, 3]) is False
 
@@ -183,10 +179,6 @@ def test_is_valid_bbox_none_batch27():
 def test_is_valid_bbox_tuple_batch27():
     """tuple 不是 list → 无效（实现要求 list）。"""
     assert _is_valid_bbox((1, 2, 3, 4)) is False
-
-
-def test_is_valid_bbox_dict_batch27():
-    assert _is_valid_bbox({"x": 1}) is False
 
 
 def test_is_valid_bbox_string_batch27():
@@ -785,11 +777,6 @@ def test_module_source_no_star_import_batch27():
 def test_module_source_no_environ_batch27():
     source = inspect.getsource(mmod)
     assert "os.environ" not in source
-
-
-def test_module_source_no_subprocess_batch27():
-    source = inspect.getsource(mmod)
-    assert "subprocess" not in source
 
 
 def test_module_source_no_dataclass_batch27():

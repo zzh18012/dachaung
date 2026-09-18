@@ -720,15 +720,6 @@ def test_figure_caption_handles_empty_dict_for_document():
     assert len(out) == 3
 
 
-def test_figure_caption_handles_dict_with_only_chunks_key():
-    out = figure_caption_prf({"chunks": []}, None)
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 # =========================================================================
 # 模块结构
 # =========================================================================

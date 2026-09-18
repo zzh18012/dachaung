@@ -603,11 +603,6 @@ def test_module_source_no_numpy_import_batch22():
     assert "import numpy" not in src
 
 
-def test_module_source_no_unlink_call_batch22():
-    src = inspect.getsource(rmod)
-    assert ".unlink(" not in src
-
-
 # ---------- module source 字符串精确补强第三十四批 ----------
 
 

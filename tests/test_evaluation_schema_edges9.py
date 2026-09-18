@@ -230,11 +230,6 @@ def test_module_jsvalidation_error_is_imported():
 # =========================================================================
 
 
-def test_schemas_dir_is_absolute():
-    """SCHEMAS_DIR 是绝对路径。"""
-    assert SCHEMAS_DIR.is_absolute()
-
-
 def test_schemas_dir_resolved_no_double_dots():
     """SCHEMAS_DIR resolved 后无 '..'。"""
     parts = SCHEMAS_DIR.parts

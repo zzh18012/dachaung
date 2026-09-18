@@ -45,11 +45,6 @@ from evaluation.manifest import (
 
 # ---------- ManifestError 子类化与抛出 ----------
 
-def test_manifest_error_caught_as_exception_batch48():
-    with pytest.raises(Exception):
-        raise ManifestError("x")
-
-
 def test_manifest_error_no_extra_attrs_batch48():
     err = ManifestError("x")
     # 不应有 errors 等字段（不像 EvalSchemaError）
@@ -585,11 +580,6 @@ def test_source_contains_dataclass_batch48():
     assert "@dataclass" in src
 
 
-def test_source_contains_ManifestError_docstring_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "清单加载或校验失败" in src
-
-
 def test_source_contains_no_hardcoded_paths_batch48():
     src = inspect.getsource(manifest_mod)
     assert "C:\\\\Users" not in src
@@ -666,46 +656,6 @@ def test_ast_module_docstring_batch48():
 
 
 # ---------- forbidden tokens 第一百一十五批 ----------
-
-def test_source_no_eval_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "pickle.load(" not in src
-
 
 def test_source_no_yield_batch48():
     src = inspect.getsource(manifest_mod)

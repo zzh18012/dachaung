@@ -42,11 +42,6 @@ _H = "a" * 64
 # =========================================================================
 
 
-def test_caption_re_pattern_object():
-    import re
-    assert isinstance(_CAPTION_RE, re.Pattern)
-
-
 def test_caption_re_ignorecase_flag():
     """正则带 IGNORECASE 标志。"""
     import re
@@ -506,20 +501,10 @@ def test_fallback_parser_version_contains_pypdfium2():
     assert "pypdfium2" in FallbackParser.version
 
 
-def test_fallback_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(FallbackParser, Parser)
-
-
 def test_fallback_parser_init_no_args():
     """__init__ 的 image_output_dir 默认 None。"""
     p = FallbackParser()
     assert p is not None
-
-
-def test_fallback_parser_init_with_image_output_dir(tmp_path: Path):
-    p = FallbackParser(image_output_dir=tmp_path)
-    assert p._image_output_dir == tmp_path
 
 
 def test_fallback_parser_init_image_output_dir_str(tmp_path: Path):
@@ -531,11 +516,6 @@ def test_fallback_parser_init_image_output_dir_str(tmp_path: Path):
 def test_fallback_parser_init_signature():
     sig = inspect.signature(FallbackParser.__init__)
     assert set(sig.parameters) == {"self", "image_output_dir"}
-
-
-def test_fallback_parser_init_default_none():
-    sig = inspect.signature(FallbackParser.__init__)
-    assert sig.parameters["image_output_dir"].default is None
 
 
 def test_fallback_parser_parse_signature():

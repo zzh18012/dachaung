@@ -296,11 +296,6 @@ def test_load_schema_returns_dict():
     assert isinstance(s, dict)
 
 
-def test_load_schema_has_dollar_schema_key():
-    s = load_schema("manifest.schema.json")
-    assert "$schema" in s
-
-
 def test_load_schema_type_is_object():
     s = load_schema("manifest.schema.json")
     assert s.get("type") == "object"
@@ -346,11 +341,6 @@ def test_load_schema_source_has_utf8():
 def test_load_schema_source_has_json_load():
     src = inspect.getsource(load_schema)
     assert "json.load" in src
-
-
-def test_load_schema_source_calls_schema_path():
-    src = inspect.getsource(load_schema)
-    assert "_schema_path(name)" in src
 
 
 def test_load_schema_returns_independent_dict():

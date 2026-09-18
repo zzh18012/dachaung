@@ -610,12 +610,6 @@ def test_chunk_boundary_prf_default_tolerance_30():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_chunk_boundary_prf_no_default_for_document_annotation():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["document"].default is inspect.Parameter.empty
-    assert sig.parameters["annotation"].default is inspect.Parameter.empty
-
-
 def test_chunk_boundary_prf_tolerance_annotation_int():
     sig = inspect.signature(chunk_boundary_prf)
     assert "int" in str(sig.parameters["tolerance_chars"].annotation)
