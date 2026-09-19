@@ -75,10 +75,6 @@ def test_source_type_args_exact():
 # =========================================================================
 
 
-def test_element_is_dataclass():
-    assert is_dataclass(Element)
-
-
 def test_element_field_count_8():
     fs = fields(Element)
     assert len(fs) == 8
@@ -203,10 +199,6 @@ def test_element_to_dict_value_preserved():
 # =========================================================================
 
 
-def test_chunk_is_dataclass():
-    assert is_dataclass(Chunk)
-
-
 def test_chunk_field_names_exact():
     fs = fields(Chunk)
     names = {f.name for f in fs}
@@ -254,10 +246,6 @@ def test_chunk_to_dict_returns_dict():
 # =========================================================================
 
 
-def test_relation_is_dataclass():
-    assert is_dataclass(Relation)
-
-
 def test_relation_field_names_exact():
     fs = fields(Relation)
     names = {f.name for f in fs}
@@ -290,10 +278,6 @@ def test_relation_to_dict_has_all_fields():
 # =========================================================================
 # WarningRecord dataclass
 # =========================================================================
-
-
-def test_warning_record_is_dataclass():
-    assert is_dataclass(WarningRecord)
 
 
 def test_warning_record_field_names_exact():
@@ -338,10 +322,6 @@ def test_warning_record_to_dict_returns_dict():
 # =========================================================================
 
 
-def test_error_record_is_dataclass():
-    assert is_dataclass(ErrorRecord)
-
-
 def test_error_record_field_names_exact():
     fs = fields(ErrorRecord)
     names = {f.name for f in fs}
@@ -376,10 +356,6 @@ def test_error_record_to_dict_with_details():
 # =========================================================================
 # Document dataclass
 # =========================================================================
-
-
-def test_document_is_dataclass():
-    assert is_dataclass(Document)
 
 
 def test_document_field_names_exact():

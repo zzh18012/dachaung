@@ -463,16 +463,6 @@ def test_module_source_forbidden_tokens_batch21(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_socket_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import socket" not in src
-
-
-def test_module_source_no_urllib_import_batch21():
-    src = inspect.getsource(smod)
-    assert "import urllib" not in src
-
-
 # ---------- module source 字符串精确补强第三十三批 ----------
 
 

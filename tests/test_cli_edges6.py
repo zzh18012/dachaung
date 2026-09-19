@@ -551,10 +551,6 @@ def test_infer_parser_name_uppercase_suffix():
 # =========================================================================
 
 
-def test_EXTENSION_TO_PARSER_count():
-    assert len(_EXTENSION_TO_PARSER) == 9
-
-
 def test_EXTENSION_TO_PARSER_keys_exact():
     expected = {".pdf", ".docx", ".md", ".markdown", ".html", ".htm", ".txt", ".text", ".ipynb"}
     assert set(_EXTENSION_TO_PARSER.keys()) == expected

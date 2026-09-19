@@ -90,12 +90,6 @@ def test_eval_schema_error_subclass_exception_batch17():
     assert issubclass(EvalSchemaError, Exception)
 
 
-def test_eval_schema_error_message_stored_batch17():
-    e = EvalSchemaError("hello")
-    # super().__init__(message) stores args[0]
-    assert e.args == ("hello",)
-
-
 def test_eval_schema_error_str_returns_message_batch17():
     e = EvalSchemaError("hello world")
     assert str(e) == "hello world"
@@ -486,11 +480,6 @@ def test_module_source_has_jsonschema_import_batch17():
     assert "from jsonschema import Draft202012Validator" in src
 
 
-def test_module_source_has_schemas_dir_batch17():
-    src = inspect.getsource(smod)
-    assert "SCHEMAS_DIR" in src
-
-
 def test_module_source_has_eval_schema_error_class_batch17():
     src = inspect.getsource(smod)
     assert "class EvalSchemaError" in src
@@ -524,18 +513,6 @@ def test_module_source_no_main_block_batch17():
 # ---------- signatures 第二十八批 ----------
 
 
-def test_signature_validate_batch17():
-    sig = inspect.signature(validate)
-    params = list(sig.parameters.keys())
-    assert params == ["instance", "schema_name"]
-
-
-def test_signature_validate_file_batch17():
-    sig = inspect.signature(validate_file)
-    params = list(sig.parameters.keys())
-    assert params == ["path", "schema_name"]
-
-
 def test_signature_eval_schema_error_init_batch17():
     sig = inspect.signature(EvalSchemaError.__init__)
     params = list(sig.parameters.keys())
@@ -543,11 +520,6 @@ def test_signature_eval_schema_error_init_batch17():
 
 
 # ---------- module 合理性第二十八批 ----------
-
-
-def test_module_has_all_attribute_batch17():
-    assert hasattr(smod, "__all__")
-    assert isinstance(smod.__all__, list)
 
 
 def test_module_all_count_5_batch17():
@@ -563,10 +535,6 @@ def test_module_all_contents_batch17():
 
 def test_module_has_schemas_dir_batch17():
     assert isinstance(SCHEMAS_DIR, Path)
-
-
-def test_module_eval_schema_error_is_class_batch17():
-    assert isinstance(EvalSchemaError, type)
 
 
 def test_module_load_schema_callable_batch17():
@@ -585,11 +553,6 @@ def test_module_does_not_import_app_pipeline_batch17():
     """schema.py 不应反向依赖 app.pipeline。"""
     src = inspect.getsource(smod)
     assert "from app.pipeline" not in src
-
-
-def test_module_no_main_block_batch17():
-    src = inspect.getsource(smod)
-    assert "if __name__" not in src
 
 
 # ---------- 端到端集成第二十八批 ----------

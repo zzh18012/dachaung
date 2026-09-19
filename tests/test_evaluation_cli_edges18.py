@@ -865,30 +865,6 @@ def test_module_source_contains_json_module_top_level():
 # =========================================================================
 
 
-def test_module_namespace_has_argparse():
-    import evaluation.cli as m
-
-    assert hasattr(m, "argparse")
-
-
-def test_module_namespace_has_json():
-    import evaluation.cli as m
-
-    assert hasattr(m, "json")
-
-
-def test_module_namespace_has_sys():
-    import evaluation.cli as m
-
-    assert hasattr(m, "sys")
-
-
-def test_module_namespace_has_path():
-    import evaluation.cli as m
-
-    assert hasattr(m, "Path")
-
-
 def test_module_namespace_has_main():
     """main 是 callable（注意其他测试可能 reload 模块，不能 is 比较）。"""
     import evaluation.cli as m
@@ -972,18 +948,6 @@ def test_main_signature_param_name_argv():
 def test_main_signature_argv_default_none():
     sig = inspect.signature(main)
     assert sig.parameters["argv"].default is None
-
-
-def test_main_signature_no_var_args():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_main_signature_no_var_kwargs():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 def test_build_parser_signature_no_params():

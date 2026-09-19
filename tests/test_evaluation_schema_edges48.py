@@ -336,11 +336,6 @@ def test_module_source_no_requests_batch28():
     assert "requests" not in src
 
 
-def test_module_source_no_unlink_batch28():
-    src = inspect.getsource(smod)
-    assert ".unlink()" not in src
-
-
 # ---------- module source 字符串精确补强第四十二批 ----------
 
 

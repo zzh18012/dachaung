@@ -359,24 +359,9 @@ def test_schemas_dir_parent_is_project_root_batch49():
 
 # ---------- module source 字符串补强 ----------
 
-def test_source_contains_draft202012_validator_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "Draft202012Validator" in src
-
-
 def test_source_contains_json_dot_load_batch49():
     src = inspect.getsource(schema_mod)
     assert "json.load(" in src
-
-
-def test_source_contains_pathlib_import_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_source_contains_typing_any_import_batch49():
-    src = inspect.getsource(schema_mod)
-    assert "from typing import Any" in src
 
 
 def test_source_contains_no_extra_imports_batch49():
@@ -508,12 +493,6 @@ def test_ast_load_schema_uses_schema_path_batch49():
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "load_schema")
     src = ast.unparse(func)
     assert "_schema_path" in src
-
-
-def test_ast_module_has_docstring_batch49():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_module_has_6_imports_batch49():

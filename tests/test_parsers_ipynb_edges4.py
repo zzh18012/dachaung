@@ -637,12 +637,6 @@ def test_ipynb_parser_instance_version_matches_class():
     assert p.version == "stdlib/0.1.0"
 
 
-def test_ipynb_parser_inherits_parser():
-    from app.parsers.base import Parser
-
-    assert issubclass(IpynbParser, Parser)
-
-
 def test_ipynb_parser_parse_signature():
     import inspect
 

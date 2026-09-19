@@ -329,12 +329,6 @@ def test_module_source_no_requests_batch33():
     assert "requests" not in src
 
 
-def test_module_source_no_open_w_mode_batch33():
-    src = inspect.getsource(rmod)
-    assert "'w'" not in src
-    assert '"w"' not in src
-
-
 # ---------- module source 字符串精确补强第四十六批 ----------
 
 
@@ -368,21 +362,6 @@ def test_module_source_contains_versions_import_batch33():
     assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in src
 
 
-def test_module_source_contains_ratio_metrics_const_batch33():
-    src = inspect.getsource(rmod)
-    assert "_RATIO_METRICS" in src
-
-
-def test_module_source_contains_count_metrics_const_batch33():
-    src = inspect.getsource(rmod)
-    assert "_COUNT_METRICS" in src
-
-
-def test_module_source_contains_success_bool_metrics_const_batch33():
-    src = inspect.getsource(rmod)
-    assert "_SUCCESS_BOOL_METRICS" in src
-
-
 def test_module_source_contains_get_git_provenance_func_batch33():
     src = inspect.getsource(rmod)
     assert "def get_git_provenance(" in src
@@ -411,11 +390,6 @@ def test_module_source_contains_aggregate_summary_func_batch33():
 def test_module_source_contains_capture_output_true_batch33():
     src = inspect.getsource(rmod)
     assert "capture_output=True" in src
-
-
-def test_module_source_contains_subprocess_run_call_batch33():
-    src = inspect.getsource(rmod)
-    assert "subprocess.run(" in src
 
 
 def test_module_source_contains_oserror_subprocess_error_batch33():

@@ -526,11 +526,6 @@ def test_get_parser_none_raises_value_error():
         get_parser(None)  # type: ignore[arg-type]
 
 
-def test_get_parser_empty_raises_value_error():
-    with pytest.raises(ValueError):
-        get_parser("")
-
-
 def test_get_parser_int_raises_value_error():
     """int 走 f-string → '42' → ValueError，不是 TypeError。"""
     with pytest.raises(ValueError):

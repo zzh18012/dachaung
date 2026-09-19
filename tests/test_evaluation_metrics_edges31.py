@@ -877,11 +877,6 @@ def test_pdf_locator_ratio_invalid_page():
 # 注意：locator 在 source_locator 子 dict 中
 
 
-def test_docx_locator_ratio_empty_elements():
-    out = _docx_locator_ratio([])
-    assert out["value"] is None
-
-
 def test_docx_locator_ratio_no_paragraph():
     elements = [{"type": "image", "element_id": "i1"}]
     out = _docx_locator_ratio(elements)
@@ -1100,11 +1095,6 @@ def test_module_source_no_yaml_import():
     assert "import yaml" not in src
 
 
-def test_module_source_no_csv_import():
-    src = inspect.getsource(mmod)
-    assert "import csv" not in src
-
-
 def test_module_source_no_logging_import():
     src = inspect.getsource(mmod)
     assert "import logging" not in src
@@ -1227,11 +1217,6 @@ def test_pdf_locator_ratio_signature():
 def test_docx_locator_ratio_signature():
     sig = inspect.signature(_docx_locator_ratio)
     assert len(sig.parameters) == 1
-
-
-def test_image_resource_ratio_signature():
-    sig = inspect.signature(_image_resource_ratio)
-    assert len(sig.parameters) == 2
 
 
 def test_chunk_reference_ratio_signature():

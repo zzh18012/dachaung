@@ -640,11 +640,6 @@ def test_module_source_has_5_property_decorators():
     assert len(decorator_lines) == 5
 
 
-def test_module_source_no_yield():
-    src = inspect.getsource(manifest_mod)
-    assert "yield" not in src
-
-
 def test_module_source_resolve_relative_path_uses_relative_to():
     src = inspect.getsource(_resolve_relative_path)
     assert "relative_to" in src
@@ -681,11 +676,6 @@ def test_resolve_relative_path_3_params_no_default():
     sig = inspect.signature(_resolve_relative_path)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_detect_project_root_1_param():
-    sig = inspect.signature(_detect_project_root)
-    assert list(sig.parameters) == ["start"]
 
 
 def test_is_absolute_like_return_annotation_bool():

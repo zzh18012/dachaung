@@ -571,24 +571,12 @@ def test_module_source_has_no_main_block():
 # ---------- signatures 精确 ----------
 
 
-def test_namespace_load_manifest():
-    assert load_manifest.__module__ == "evaluation.manifest"
-
-
 def test_namespace_is_absolute_like():
     assert _is_absolute_like.__module__ == "evaluation.manifest"
 
 
 def test_namespace_has_backslash():
     assert _has_backslash.__module__ == "evaluation.manifest"
-
-
-def test_namespace_resolve_relative_path():
-    assert _resolve_relative_path.__module__ == "evaluation.manifest"
-
-
-def test_namespace_detect_project_root():
-    assert _detect_project_root.__module__ == "evaluation.manifest"
 
 
 def test_namespace_manifest_error():

@@ -38,18 +38,6 @@ from evaluation import (
 
 # ---------- 模块对象属性 ----------
 
-def test_module_name_batch45():
-    assert evaluation.__name__ == "evaluation"
-
-
-def test_module_package_batch45():
-    assert evaluation.__package__ == "evaluation"
-
-
-def test_module_file_endswith_init_batch45():
-    assert evaluation.__file__.endswith("__init__.py")
-
-
 def test_module_file_absolute_batch45():
     assert Path(evaluation.__file__).is_absolute()
 

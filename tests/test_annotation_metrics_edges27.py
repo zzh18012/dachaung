@@ -387,11 +387,6 @@ def test_module_source_has_from_future():
     assert "from __future__ import annotations" in src
 
 
-def test_module_source_has_counter_import():
-    src = inspect.getsource(m)
-    assert "from collections import Counter" in src
-
-
 def test_module_source_has_typing_any():
     src = inspect.getsource(m)
     assert "from typing import Any" in src
@@ -414,19 +409,9 @@ def test_module_source_has_normalize_text_called_with_default():
     assert 'normalize_text(c.get("text") or "")' in src
 
 
-def test_module_source_has_search_from_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "search_from = 0" in src
-
-
 def test_module_source_has_f1_calc_with_2p1r():
     src = inspect.getsource(chunk_boundary_prf)
     assert "2 * p_val * r_val / denom" in src
-
-
-def test_module_source_has_missing_markers_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "missing_markers: list[str] = []" in src
 
 
 def test_module_source_has_no_main_block():

@@ -79,10 +79,6 @@ def test_count_metrics_only_element_count_total():
     assert _COUNT_METRICS == ("element_count_total",)
 
 
-def test_count_metrics_no_duplicates():
-    assert len(_COUNT_METRICS) == len(set(_COUNT_METRICS))
-
-
 def test_success_bool_metrics_is_tuple():
     assert isinstance(_SUCCESS_BOOL_METRICS, tuple)
 
@@ -110,11 +106,6 @@ def test_evaluator_version_is_1_1():
 # =========================================================================
 # aggregate_summary 深度
 # =========================================================================
-
-
-def test_aggregate_summary_returns_dict():
-    result = aggregate_summary([])
-    assert isinstance(result, dict)
 
 
 def test_aggregate_summary_has_four_top_keys():
@@ -530,21 +521,6 @@ def test_module_all_exact():
         "get_git_provenance", "get_dependency_versions",
     }
     assert set(m.__all__) == expected
-
-
-def test_module_imports_subprocess():
-    import evaluation.report as m
-    assert hasattr(m, "subprocess")
-
-
-def test_module_imports_datetime():
-    import evaluation.report as m
-    assert hasattr(m, "datetime")
-
-
-def test_module_imports_path():
-    import evaluation.report as m
-    assert hasattr(m, "Path")
 
 
 def test_module_imports_any():

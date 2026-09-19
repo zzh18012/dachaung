@@ -36,10 +36,6 @@ from app.parsers.kreuzberg_parser import (
 # =========================================================================
 
 
-def test_heading_re_is_pattern():
-    assert isinstance(_HEADING_RE, re.Pattern)
-
-
 def test_heading_re_pattern_string():
     """正则匹配 markdown 风格的 # heading。"""
     assert _HEADING_RE.match("# Title")

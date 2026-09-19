@@ -258,12 +258,6 @@ def test_manifest_field_count_batch18():
     assert len(fields(Manifest)) == 5
 
 
-def test_manifest_field_names_batch18():
-    names = [f.name for f in fields(Manifest)]
-    assert names == ["manifest_version", "devset_status", "documents",
-                     "expected_failures", "project_root"]
-
-
 # ---------- Manifest properties 第十八批 ----------
 
 
@@ -646,12 +640,6 @@ def test_module_source_forbidden_tokens_batch18(forbidden):
 def test_module_source_no_subprocess_batch18():
     src = inspect.getsource(mmod)
     assert "import subprocess" not in src
-
-
-def test_module_source_no_network_batch18():
-    src = inspect.getsource(mmod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
 
 
 def test_module_source_no_sys_exit_batch18():

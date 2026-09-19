@@ -23,15 +23,6 @@ from evaluation import annotation_metrics as amod
 # ---------- figure_caption_prf 行为深度第二十批 ----------
 
 
-def test_figure_caption_prf_returns_3_metrics_batch20():
-    out = figure_caption_prf({}, {})
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_prf_reason_constant_batch20():
     out = figure_caption_prf({}, {})
     for k, v in out.items():
@@ -493,11 +484,6 @@ def test_module_does_not_import_app_pipeline_batch20():
 def test_module_does_not_import_app_parsers_batch20():
     src = inspect.getsource(amod)
     assert "from app.parsers" not in src
-
-
-def test_module_does_not_import_evaluation_cli_batch20():
-    src = inspect.getsource(amod)
-    assert "from evaluation.cli" not in src
 
 
 def test_module_does_not_import_evaluation_schema_batch20():

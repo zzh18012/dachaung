@@ -80,10 +80,6 @@ def test_pdf_bbox_required_types_is_tuple_batch32():
     assert isinstance(_PDF_BBOX_REQUIRED_TYPES, tuple)
 
 
-def test_pdf_bbox_required_types_contains_caption_batch32():
-    assert "caption" in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_pdf_bbox_required_types_paragraph_index_batch32():
     """paragraph 索引位置。"""
     assert _PDF_BBOX_REQUIRED_TYPES.index("paragraph") == 1
@@ -358,10 +354,6 @@ def test_docx_locator_ratio_locator_none_batch32():
 
 def test_is_valid_bbox_all_false_batch32():
     assert _is_valid_bbox([False, False, False, False]) is False
-
-
-def test_is_valid_bbox_all_strings_batch32():
-    assert _is_valid_bbox(["0", "0", "1", "1"]) is False
 
 
 def test_is_valid_bbox_contains_none_batch32():
@@ -808,11 +800,6 @@ def test_signature_compute_automatic_metrics_image_base_dir_optional_batch32():
 def test_signature_is_valid_bbox_return_bool_batch32():
     sig = inspect.signature(_is_valid_bbox)
     assert sig.return_annotation == "bool"
-
-
-def test_signature_strip_unicode_whitespace_return_str_batch32():
-    sig = inspect.signature(_strip_unicode_whitespace)
-    assert sig.return_annotation == "str"
 
 
 # ---------- module 合理性第四十五批 ----------

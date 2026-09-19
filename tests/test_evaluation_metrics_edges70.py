@@ -124,11 +124,6 @@ def test_int_metric_negative_input_batch45():
     assert out["value"] == -5
 
 
-def test_int_metric_zero_input_batch45():
-    out = _int_metric(0)
-    assert out["value"] == 0
-
-
 def test_ratio_bool_true_batch45():
     """bool True 作为 float(1.0)。"""
     out = _ratio(True)
@@ -198,10 +193,6 @@ def test_is_valid_bbox_int_list_batch45():
 def test_is_valid_bbox_tuple_rejected_batch45():
     """tuple 不接受（isinstance 检查 list）。"""
     assert _is_valid_bbox((1.0, 2.0, 3.0, 4.0)) is False
-
-
-def test_is_valid_bbox_dict_rejected_batch45():
-    assert _is_valid_bbox({"x": 1, "y": 2, "w": 3, "h": 4}) is False
 
 
 def test_is_valid_bbox_empty_list_batch45():
@@ -344,12 +335,6 @@ def test_pdf_locator_ratio_partial_mix_batch45():
 
 def test_docx_locator_ratio_section_batch45():
     elements = [{"type": "paragraph", "source_locator": {"section": 1}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
-def test_docx_locator_ratio_paragraph_index_batch45():
-    elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 5}}]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 1.0
 
@@ -595,24 +580,9 @@ def test_module_docstring_contains_text_preservation_v11_batch45():
     assert "v1.1" in src
 
 
-def test_module_source_contains_math_import_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "import math" in src
-
-
 def test_module_source_contains_counter_import_batch45():
     src = inspect.getsource(metrics_mod)
     assert "from collections import Counter" in src
-
-
-def test_module_source_contains_path_import_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_source_contains_any_import_batch45():
-    src = inspect.getsource(metrics_mod)
-    assert "from typing import Any" in src
 
 
 def test_module_source_contains_text_types_definition_batch45():

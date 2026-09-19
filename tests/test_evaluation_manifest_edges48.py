@@ -115,10 +115,6 @@ def test_has_backslash_trailing_backslash_batch21():
     assert _has_backslash("foo\\") is True
 
 
-def test_has_backslash_only_slashes_batch21():
-    assert _has_backslash("////") is False
-
-
 def test_has_backslash_no_separator_at_all_batch21():
     assert _has_backslash("foo") is False
 
@@ -844,12 +840,6 @@ def test_module_all_contents_batch21():
         "ExpectedFailure",
         "load_manifest",
     }
-
-
-def test_module_does_not_import_app_pipeline_batch21():
-    src = inspect.getsource(mmod)
-    assert "from app" not in src
-    assert "import app" not in src
 
 
 def test_module_does_not_import_evaluation_runner_batch21():

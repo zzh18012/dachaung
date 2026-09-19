@@ -264,11 +264,6 @@ def test_module_source_has_find_in_stream():
     assert "stream.find(txt, pos)" in src
 
 
-def test_module_source_has_search_from_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "search_from = 0" in src
-
-
 def test_module_source_has_marker_default_empty():
     src = inspect.getsource(chunk_boundary_prf)
     assert 'a.get("marker", "")' in src
@@ -288,11 +283,6 @@ def test_module_source_has_used_pred_used_gt_set():
 def test_module_source_has_f1_calc_with_2p1r():
     src = inspect.getsource(chunk_boundary_prf)
     assert "2 * p_val * r_val / denom" in src
-
-
-def test_module_source_has_missing_markers_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "missing_markers: list[str] = []" in src
 
 
 def test_module_source_has_no_main_block():

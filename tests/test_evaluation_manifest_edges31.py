@@ -83,11 +83,6 @@ def test_is_absolute_like_number_drive():
     assert _is_absolute_like("1:/foo") is False
 
 
-def test_is_absolute_like_underscore_drive():
-    # "_:/foo" — 下划线不是 alpha
-    assert _is_absolute_like("_:/foo") is False
-
-
 def test_is_absolute_like_short_path_single_char():
     assert _is_absolute_like("x") is False
 
@@ -137,10 +132,6 @@ def test_has_backslash_single():
     assert _has_backslash("foo\\bar") is True
 
 
-def test_has_backslash_double():
-    assert _has_backslash("foo\\\\bar") is True
-
-
 def test_has_backslash_only_backslash():
     assert _has_backslash("\\") is True
 
@@ -161,10 +152,6 @@ def test_has_backslash_unicode_backslash():
 def test_has_backslash_fullwidth_backslash():
     # U+FF3C FULLWIDTH REVERSE SOLIDUS 不是 ASCII backslash
     assert _has_backslash("foo＼bar") is False
-
-
-def test_has_backslash_multiple():
-    assert _has_backslash("a\\b\\c\\d") is True
 
 
 def test_has_backslash_mixed():

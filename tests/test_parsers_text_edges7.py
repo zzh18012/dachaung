@@ -34,10 +34,6 @@ from app.parsers.text_parser import (
 # =========================================================================
 
 
-def test_text_extensions_exact():
-    assert _TEXT_EXTENSIONS == (".txt", ".text")
-
-
 def test_text_extensions_is_tuple():
     assert isinstance(_TEXT_EXTENSIONS, tuple)
 
@@ -150,10 +146,6 @@ def test_split_paragraphs_line_numbers_1based():
     result = _split_paragraphs("a\n\nb\n\nc")
     starts = [s for s, _ in result]
     assert starts == [1, 3, 5]
-
-
-def test_split_paragraphs_all_blank_returns_empty():
-    assert _split_paragraphs("\n\n\n") == []
 
 
 def test_split_paragraphs_returns_list_of_tuples():

@@ -134,10 +134,6 @@ def test_split_long_text_empty_returns_empty():
     assert _split_long_text("", 100) == []
 
 
-def test_split_long_text_only_whitespace_returns_empty():
-    assert _split_long_text("   \n\t  ", 100) == []
-
-
 def test_split_long_text_within_max_returns_single_piece():
     pieces = _split_long_text("short text", 100)
     assert len(pieces) == 1
@@ -317,22 +313,6 @@ def test_part_end_is_int():
     assert isinstance(_PART_END, int)
 
 
-def test_part_text_value_zero():
-    assert _PART_TEXT == 0
-
-
-def test_part_element_id_value_one():
-    assert _PART_ELEMENT_ID == 1
-
-
-def test_part_start_value_two():
-    assert _PART_START == 2
-
-
-def test_part_end_value_three():
-    assert _PART_END == 3
-
-
 # =========================================================================
 # _SENTENCE_SPLIT_RE / _HARD_BREAK_LANGS / _WHITESPACE_RE 常量
 # =========================================================================
@@ -381,20 +361,10 @@ def test_normalize_text_preserves_unicode():
 # =========================================================================
 
 
-def test_chunker_init_max_chars_below_32_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=31)
-
-
 def test_chunker_init_max_chars_exactly_32():
     """max_chars=32 是允许的最小值。"""
     c = StructuralChunker(max_chars=32)
     assert c.max_chars == 32
-
-
-def test_chunker_init_max_chars_zero_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=0)
 
 
 # =========================================================================

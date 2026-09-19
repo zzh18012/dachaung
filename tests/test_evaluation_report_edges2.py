@@ -385,11 +385,6 @@ def test_build_provenance_parser_name_value(tmp_path: Path):
     assert result["parser_name"] == "kreuzberg"
 
 
-def test_build_provenance_parser_version_none(tmp_path: Path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["parser_version"] is None
-
-
 def test_build_provenance_parser_version_string(tmp_path: Path):
     result = build_provenance(tmp_path, "fallback", 800, "v1.2.3")
     assert result["parser_version"] == "v1.2.3"
@@ -547,11 +542,6 @@ def test_build_devset_section_signature_one_param():
 # =========================================================================
 # 6. aggregate_summary 第二轮
 # =========================================================================
-
-
-def test_aggregate_summary_returns_dict_type():
-    result = aggregate_summary([])
-    assert isinstance(result, dict)
 
 
 def test_aggregate_summary_four_top_level_keys():

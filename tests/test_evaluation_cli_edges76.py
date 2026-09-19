@@ -411,11 +411,6 @@ def test_source_contains_path_import_batch51():
     assert "from pathlib import Path" in src
 
 
-def test_source_imports_get_git_provenance_batch51():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.report import get_git_provenance" in src
-
-
 def test_source_imports_run_evaluation_batch51():
     src = inspect.getsource(cli_mod)
     assert "from evaluation.runner import run_evaluation" in src
@@ -458,12 +453,6 @@ def test_ast_has_4_top_level_functions_batch51():
     assert len(funcs) == 4
 
 
-def test_ast_function_names_order_batch51():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["_build_parser", "main", "_format_metric", "_run_inspect_doc"]
-
-
 def test_ast_no_class_def_batch51():
     tree = ast.parse(inspect.getsource(cli_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
@@ -479,12 +468,6 @@ def test_ast_has_9_imports_batch51():
     tree = ast.parse(inspect.getsource(cli_mod))
     imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
     assert len(imports) == 9
-
-
-def test_ast_module_docstring_batch51():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_module_has_reconfigure_if_batch51():

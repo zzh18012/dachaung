@@ -58,10 +58,6 @@ def test_schema_path_sibling_to_app_directory():
     assert app_dir.is_dir()
 
 
-def test_schema_path_filename_value():
-    assert SCHEMA_PATH.name == "document.schema.json"
-
-
 def test_schema_path_stem_value():
     assert SCHEMA_PATH.stem == "document.schema"
 
@@ -490,11 +486,6 @@ def test_load_schema_return_annotation_dict():
 def test_is_valid_document_no_default():
     sig = inspect.signature(is_valid)
     assert sig.parameters["document"].default is inspect.Parameter.empty
-
-
-def test_validate_file_path_no_default():
-    sig = inspect.signature(validate_file)
-    assert sig.parameters["path"].default is inspect.Parameter.empty
 
 
 # =========================================================================

@@ -695,26 +695,6 @@ def test_run_inspect_doc_default_tolerance_chars_30(tmp_path: Path, capsys):
 # =========================================================================
 
 
-def test_module_imports_argparse():
-    import evaluation.cli as m
-    assert hasattr(m, "argparse")
-
-
-def test_module_imports_json():
-    import evaluation.cli as m
-    assert hasattr(m, "json")
-
-
-def test_module_imports_sys():
-    import evaluation.cli as m
-    assert hasattr(m, "sys")
-
-
-def test_module_imports_path():
-    import evaluation.cli as m
-    assert hasattr(m, "Path")
-
-
 def test_build_parser_signature():
     sig = inspect.signature(_build_parser)
     assert set(sig.parameters) == set()  # 无参数

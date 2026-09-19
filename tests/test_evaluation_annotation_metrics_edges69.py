@@ -110,12 +110,6 @@ def test_figure_caption_prf_does_not_read_annotation_batch43():
     assert all(v["value"] is None for v in out.values())
 
 
-def test_figure_caption_prf_idempotent_batch43():
-    out1 = figure_caption_prf(None, None)
-    out2 = figure_caption_prf(None, None)
-    assert out1 == out2
-
-
 def test_figure_caption_prf_no_internal_markers_batch43():
     out = figure_caption_prf(None, None)
     assert "_tolerance_chars" not in out

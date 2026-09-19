@@ -45,12 +45,6 @@ def test_build_parser_formatter_class_batch11():
     assert p.formatter_class is argparse.RawDescriptionHelpFormatter
 
 
-def test_build_parser_subparsers_dest_command_batch11():
-    p = _build_parser()
-    sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
-    assert sub_actions[0].dest == "command"
-
-
 def test_build_parser_subparsers_required_true_batch11():
     p = _build_parser()
     sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
@@ -582,16 +576,6 @@ def test_cli_source_no_terminate_batch11():
     assert ".terminate(" not in source
 
 
-def test_cli_source_no_async_def_batch11():
-    source = inspect.getsource(climod)
-    assert "async def" not in source
-
-
-def test_cli_source_no_walrus_batch11():
-    source = inspect.getsource(climod)
-    assert ":=" not in source
-
-
 def test_cli_source_no_socket_batch11():
     source = inspect.getsource(climod)
     assert "socket" not in source
@@ -630,20 +614,10 @@ def test_cli_source_no_logging_module_batch11():
 # ---------- module source 字符串精确补强第九批 ----------
 
 
-def test_module_source_imports_argparse_batch11():
-    source = inspect.getsource(climod)
-    assert "import argparse" in source
-
-
 def test_module_source_imports_manifest_load_batch11():
     source = inspect.getsource(climod)
     assert "load_manifest" in source
     assert "ManifestError" in source
-
-
-def test_module_source_imports_get_git_provenance_batch11():
-    source = inspect.getsource(climod)
-    assert "get_git_provenance" in source
 
 
 def test_module_source_imports_validate_file_batch11():
@@ -709,11 +683,6 @@ def test_signature_format_metric_2_params_batch11():
     assert len(sig.parameters) == 2
 
 
-def test_signature_format_metric_param_names_batch11():
-    sig = inspect.signature(_format_metric)
-    assert list(sig.parameters) == ["name", "metric"]
-
-
 def test_signature_run_inspect_doc_1_param_batch11():
     sig = inspect.signature(_run_inspect_doc)
     assert len(sig.parameters) == 1
@@ -735,11 +704,6 @@ def test_signature_funcs_module_eq_batch11():
 def test_module_no_all_attribute_batch11():
     """cli.py 没有 __all__（默认导出全部 public 名）。"""
     assert not hasattr(climod, "__all__") or climod.__all__ is None
-
-
-def test_module_has_dunder_file_batch11():
-    assert hasattr(climod, "__file__")
-    assert climod.__file__ is not None
 
 
 def test_module_name_is_evaluation_cli_batch11():

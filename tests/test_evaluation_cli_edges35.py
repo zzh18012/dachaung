@@ -822,18 +822,6 @@ def test_signature_main_return_annotation_int():
     assert "int" in ra
 
 
-def test_signature_main_no_var_positional():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_main_no_var_keyword():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_signature_main_2_params_count():
     """main(argv=None) 实际上只有 argv 一个参数."""
     sig = inspect.signature(main)

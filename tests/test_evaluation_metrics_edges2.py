@@ -216,10 +216,6 @@ def test_pdf_bbox_required_types_excludes_table():
     assert "table" not in _PDF_BBOX_REQUIRED_TYPES
 
 
-def test_pdf_bbox_required_types_excludes_image():
-    assert "image" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_pdf_bbox_required_types_four_entries():
     assert len(_PDF_BBOX_REQUIRED_TYPES) == 4
 

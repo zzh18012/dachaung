@@ -111,12 +111,6 @@ def test_build_parser_inspect_doc_positional_input_batch26():
     assert ns.command == "inspect-doc"
 
 
-def test_build_parser_inspect_doc_tolerance_chars_default_30_batch26():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json"])
-    assert ns.tolerance_chars == 30
-
-
 def test_build_parser_run_full_args_batch26():
     p = _build_parser()
     ns = p.parse_args([

@@ -762,11 +762,6 @@ def test_module_source_imports_validation_error():
     assert "from jsonschema.exceptions import ValidationError" in src
 
 
-def test_module_source_no_star_import():
-    src = inspect.getsource(smod)
-    assert "import *" not in src
-
-
 def test_module_source_no_main_block():
     src = inspect.getsource(smod)
     assert "__main__" not in src

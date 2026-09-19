@@ -389,11 +389,6 @@ def test_module_source_no_subprocess_import_batch15():
     assert "import subprocess" not in source
 
 
-def test_module_source_uses_get_git_provenance_batch15():
-    source = inspect.getsource(climod)
-    assert "get_git_provenance" in source
-
-
 # ---------- signatures 第十八批 ----------
 
 
@@ -433,11 +428,6 @@ def test_run_inspect_doc_return_int_batch15():
 
 
 # ---------- module 合理性第十八批 ----------
-
-
-def test_module_dunder_file_exists_batch15():
-    assert hasattr(climod, "__file__")
-    assert climod.__file__ is not None
 
 
 def test_module_name_evaluation_cli_batch15():

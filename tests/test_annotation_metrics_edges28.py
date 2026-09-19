@@ -600,11 +600,6 @@ def test_figure_caption_prf_return_annotation_dict():
     assert "dict" in str(sig.return_annotation)
 
 
-def test_chunk_boundary_prf_signature_3_params():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert list(sig.parameters) == ["document", "annotation", "tolerance_chars"]
-
-
 def test_chunk_boundary_prf_default_tolerance_30():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["tolerance_chars"].default == 30

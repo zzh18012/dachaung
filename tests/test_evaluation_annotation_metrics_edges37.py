@@ -64,12 +64,6 @@ def test_figure_caption_prf_with_annotation_still_null_batch10():
         assert v["value"] is None
 
 
-def test_figure_caption_prf_idempotent_batch10():
-    out1 = figure_caption_prf(None, None)
-    out2 = figure_caption_prf(None, None)
-    assert out1 == out2
-
-
 def test_figure_caption_prf_returns_dict_with_value_reason_only_batch10():
     out = figure_caption_prf(None, None)
     for v in out.values():
@@ -584,11 +578,6 @@ def test_module_source_uses_counter_batch10():
     assert "Counter" in source
 
 
-def test_module_source_uses_tolerance_chars_param_batch10():
-    source = inspect.getsource(amod)
-    assert "tolerance_chars" in source
-
-
 def test_module_source_uses_anchor_marker_batch10():
     source = inspect.getsource(amod)
     assert "marker" in source
@@ -603,11 +592,6 @@ def test_module_source_uses_position_before_after_batch10():
 def test_module_source_uses_missing_markers_batch10():
     source = inspect.getsource(amod)
     assert "missing_markers" in source
-
-
-def test_module_source_no_print_batch10():
-    source = inspect.getsource(amod)
-    assert "print(" not in source
 
 
 def test_module_source_uses_pipeline_failed_reason_batch10():
@@ -663,11 +647,6 @@ def test_signature_figure_caption_prf_no_defaults_batch10():
     sig = inspect.signature(figure_caption_prf)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_signature_figure_caption_prf_return_annotation_batch10():
-    sig = inspect.signature(figure_caption_prf)
-    assert sig.return_annotation == "dict[str, dict[str, Any]]"
 
 
 def test_signature_chunk_boundary_prf_param_count_batch10():
@@ -745,15 +724,6 @@ def test_module_all_attribute_value_batch10():
 
 def test_module_all_is_list_batch10():
     assert isinstance(amod.__all__, list)
-
-
-def test_module_all_entries_unique_batch10():
-    assert len(amod.__all__) == len(set(amod.__all__))
-
-
-def test_module_has_dunder_file_batch10():
-    assert hasattr(amod, "__file__")
-    assert amod.__file__ is not None
 
 
 def test_module_dunder_file_endswith_annotation_metrics_py_batch10():

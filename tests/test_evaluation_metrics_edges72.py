@@ -276,12 +276,6 @@ def test_pdf_locator_missing_page_batch48():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_image_no_bbox_needed_batch48():
-    elements = [{"type": "image", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_pdf_locator_negative_page_batch48():
     elements = [{"type": "image", "source_locator": {"page": 0}}]
     out = _pdf_locator_ratio(elements)
@@ -310,18 +304,6 @@ def test_docx_locator_with_page_invalid_batch48():
     assert out["value"] == 0.0
 
 
-def test_docx_locator_with_bbox_invalid_batch48():
-    elements = [{"type": "paragraph", "source_locator": {"bbox": [0, 0, 1, 1], "paragraph_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_docx_locator_paragraph_index_batch48():
-    elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 5}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_table_index_batch48():
     elements = [{"type": "table", "source_locator": {"table_index": 1, "row_index": 2, "col_index": 3}}]
     out = _docx_locator_ratio(elements)
@@ -348,10 +330,6 @@ def test_is_valid_bbox_tuple_batch48():
 
 def test_is_valid_bbox_with_bool_batch48():
     assert _is_valid_bbox([True, 0, 10, 10]) is False
-
-
-def test_is_valid_bbox_with_str_batch48():
-    assert _is_valid_bbox(["0", "0", "10", "10"]) is False
 
 
 def test_is_valid_bbox_none_batch48():
@@ -425,11 +403,6 @@ def test_image_ratio_oserror_swallowed_batch48(tmp_path):
 
 
 # ---------- _chunk_reference_ratio 各种 chunks ----------
-
-def test_chunk_reference_no_chunks_batch48():
-    out = _chunk_reference_ratio([{"element_id": "e1"}], [])
-    assert out["reason"] == "no_chunks"
-
 
 def test_chunk_reference_all_valid_batch48():
     elements = [{"element_id": "e1"}, {"element_id": "e2"}]
@@ -597,11 +570,6 @@ def test_silent_drop_no_element_count_key_batch48():
     assert out["reason"] == "no_expectations_element_count"
 
 
-def test_silent_drop_empty_element_count_batch48():
-    out = _silent_drop_count({"paragraph": 5}, {"element_count_by_type": {}})
-    assert out["reason"] == "no_expectations_element_count"
-
-
 def test_silent_drop_zero_drop_batch48():
     """actual >= expected → drop=0。"""
     out = _silent_drop_count({"paragraph": 10}, {"element_count_by_type": {"paragraph": 5}})
@@ -637,11 +605,6 @@ def test_silent_drop_extra_type_in_actual_ignored_batch48():
 
 
 # ---------- module source 字符串补强 ----------
-
-def test_source_contains_v1_1_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "v1.1" in src
-
 
 def test_source_contains_口径_D_batch48():
     src = inspect.getsource(metrics_mod)

@@ -993,10 +993,6 @@ def test_is_absolute_like_double_dot_relative():
     assert _is_absolute_like("../foo") is False
 
 
-def test_is_absolute_like_returns_bool_type():
-    assert isinstance(_is_absolute_like("foo"), bool)
-
-
 # =========================================================================
 # _has_backslash 字符级
 # =========================================================================
@@ -1008,10 +1004,6 @@ def test_has_backslash_only_forward():
 
 def test_has_backslash_with_backslash():
     assert _has_backslash("a\\b") is True
-
-
-def test_has_backslash_mixed():
-    assert _has_backslash("a\\b/c") is True
 
 
 def test_has_backslash_just_backslash():
@@ -1267,11 +1259,6 @@ def test_module_all_exact_5_entries_in_order():
 def test_module_all_is_list():
     import evaluation.manifest as m
     assert isinstance(m.__all__, list)
-
-
-def test_module_all_length_5():
-    import evaluation.manifest as m
-    assert len(m.__all__) == 5
 
 
 # =========================================================================

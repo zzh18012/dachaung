@@ -297,11 +297,6 @@ def test_load_schema_with_evaluation_report_schema():
     assert "properties" in s
 
 
-def test_load_schema_with_document_schema():
-    s = load_schema("document.schema.json")
-    assert isinstance(s, dict)
-
-
 def test_load_schema_can_be_called_multiple_times():
     for _ in range(10):
         s = load_schema("manifest.schema.json")
@@ -342,16 +337,6 @@ def test_load_schema_does_not_open_file_persistently():
 
 
 # ---------- validate 行为深度第四批 ----------
-
-
-def test_validate_returns_none_for_valid_manifest():
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    assert validate(instance, "manifest.schema.json") is None
 
 
 def test_validate_returns_none_for_valid_annotation():
@@ -774,11 +759,6 @@ def test_module_source_no_subprocess():
     assert "subprocess" not in src
 
 
-def test_module_source_no_async_def():
-    src = inspect.getsource(smod)
-    assert "async def" not in src
-
-
 def test_module_source_no_yield():
     src = inspect.getsource(smod)
     assert "yield" not in src
@@ -1065,11 +1045,6 @@ def test_module_all_has_5_entries():
     assert len(smod.__all__) == 5
 
 
-def test_module_all_entries_are_str():
-    for entry in smod.__all__:
-        assert isinstance(entry, str)
-
-
 def test_module_all_entries_exact():
     assert set(smod.__all__) == {
         "SCHEMAS_DIR",
@@ -1098,10 +1073,6 @@ def test_module_schemas_dir_in_module_namespace():
 
 def test_module_eval_schema_error_in_namespace():
     assert hasattr(smod, "EvalSchemaError")
-
-
-def test_module_eval_schema_error_is_class():
-    assert isinstance(EvalSchemaError, type)
 
 
 def test_module_eval_schema_error_subclass_of_exception():

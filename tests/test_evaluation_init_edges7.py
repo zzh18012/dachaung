@@ -136,10 +136,6 @@ def test_module_dict_len_at_least_5_batch48():
 
 # ---------- 模块 __file__ 路径精确 ----------
 
-def test_module_file_endswith_init_py_batch48():
-    assert evaluation.__file__.endswith("__init__.py")
-
-
 def test_module_file_in_evaluation_dir_batch48():
     p = Path(evaluation.__file__)
     assert p.parent.name == "evaluation"
@@ -152,14 +148,6 @@ def test_module_file_parent_is_dachuang_batch48():
 
 
 # ---------- 模块 __package__ / __name__ ----------
-
-def test_module_package_is_evaluation_batch48():
-    assert evaluation.__package__ == "evaluation"
-
-
-def test_module_name_is_evaluation_batch48():
-    assert evaluation.__name__ == "evaluation"
-
 
 def test_module_package_equals_name_batch48():
     """包的 __package__ 应等于 __name__。"""

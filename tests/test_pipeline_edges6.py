@@ -79,11 +79,6 @@ def test_get_parser_unknown_name_error_message_lists_all_supported():
         assert name in msg
 
 
-def test_get_parser_empty_string_raises():
-    with pytest.raises(ValueError):
-        get_parser("")
-
-
 def test_get_parser_uppercase_name_raises():
     """name 是大小写敏感的。"""
     with pytest.raises(ValueError):

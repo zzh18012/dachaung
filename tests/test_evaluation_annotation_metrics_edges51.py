@@ -527,16 +527,6 @@ def test_module_source_contains_parser_does_not_emit_batch24():
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in source
 
 
-def test_module_source_contains_tolerance_chars_param_batch24():
-    source = inspect.getsource(amod)
-    assert "tolerance_chars" in source
-
-
-def test_module_source_contains_default_30_batch24():
-    source = inspect.getsource(amod)
-    assert "tolerance_chars: int = 30" in source
-
-
 def test_module_source_contains_missing_markers_batch24():
     source = inspect.getsource(amod)
     assert "missing_markers" in source

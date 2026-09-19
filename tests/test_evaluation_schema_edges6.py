@@ -332,11 +332,6 @@ def test_validate_callable():
     assert callable(validate)
 
 
-def test_validate_signature():
-    sig = inspect.signature(validate)
-    assert list(sig.parameters) == ["instance", "schema_name"]
-
-
 def test_validate_no_defaults():
     sig = inspect.signature(validate)
     for p in sig.parameters.values():
@@ -451,11 +446,6 @@ def test_validate_file_returns_none_on_success(tmp_path):
 
 def test_validate_file_callable():
     assert callable(validate_file)
-
-
-def test_validate_file_signature():
-    sig = inspect.signature(validate_file)
-    assert list(sig.parameters) == ["path", "schema_name"]
 
 
 def test_validate_file_no_defaults():

@@ -393,10 +393,6 @@ def test_is_absolute_like_posix_batch44():
     assert _is_absolute_like("/etc/passwd") is True
 
 
-def test_is_absolute_like_windows_batch44():
-    assert _is_absolute_like("C:\\Windows") is True
-
-
 def test_is_absolute_like_empty_batch44():
     assert _is_absolute_like("") is False
 

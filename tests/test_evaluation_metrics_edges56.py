@@ -107,17 +107,9 @@ def test_ratio_reason_is_none_batch30():
     assert _ratio(0.5)["reason"] is None
 
 
-def test_ratio_float_value_batch30():
-    assert isinstance(_ratio(0.5)["value"], float)
-
-
 def test_bool_metric_strong_cast_batch30():
     """bool 强转：1 → True。"""
     assert _bool_metric(1)["value"] is True
-
-
-def test_bool_metric_zero_batch30():
-    assert _bool_metric(0)["value"] is False
 
 
 def test_int_metric_strong_cast_batch30():
@@ -516,13 +508,6 @@ def test_strip_unicode_whitespace_all_whitespace_batch30():
 # ---------- _text_preservation 第三十批 ----------
 
 
-def test_text_preservation_unicode_batch30():
-    elements = [{"type": "paragraph", "content": "你好世界"}]
-    chunks = [{"text": "你好世界"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-
-
 def test_text_preservation_partial_match_batch30():
     """部分匹配：Counter 交集。"""
     elements = [{"type": "paragraph", "content": "aabbcc"}]
@@ -578,16 +563,6 @@ def test_heading_boundary_ratio_all_matched_batch30():
 def test_silent_drop_count_no_expectations_batch30():
     out = _silent_drop_count({}, None)
     assert out["reason"] == "no_expectations"
-
-
-def test_silent_drop_count_empty_expectations_dict_batch30():
-    out = _silent_drop_count({}, {})
-    assert out["reason"] == "no_expectations"
-
-
-def test_silent_drop_count_empty_element_count_by_type_batch30():
-    out = _silent_drop_count({}, {"element_count_by_type": {}})
-    assert out["reason"] == "no_expectations_element_count"
 
 
 def test_silent_drop_count_actual_more_than_expected_batch30():
@@ -678,16 +653,6 @@ def test_module_source_no_unlink_batch30():
 def test_module_source_contains_module_docstring_batch30():
     src = inspect.getsource(mmod)
     assert "自动指标" in src
-
-
-def test_module_source_contains_text_types_constant_batch30():
-    src = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ' in src
-
-
-def test_module_source_contains_pdf_bbox_required_types_batch30():
-    src = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ' in src
 
 
 def test_module_source_contains_not_evaluated_batch30():

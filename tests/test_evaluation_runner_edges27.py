@@ -385,12 +385,6 @@ def test_run_evaluation_source_calls_annotation_metrics():
     assert "tolerance_chars=tolerance_chars" in src
 
 
-def test_run_evaluation_source_has_metrics_update():
-    src = inspect.getsource(run_evaluation)
-    assert "metrics.update(fig_caps)" in src
-    assert "metrics.update(chunk_b)" in src
-
-
 def test_run_evaluation_source_has_per_doc_results_append():
     src = inspect.getsource(run_evaluation)
     assert "per_doc_results.append(" in src
@@ -539,11 +533,6 @@ def test_module_source_no_global():
     assert "\nglobal " not in src
 
 
-def test_module_source_no_async():
-    src = inspect.getsource(m)
-    assert "async def" not in src
-
-
 def test_module_source_no_lambda():
     src = inspect.getsource(m)
     assert "lambda" not in src
@@ -610,15 +599,6 @@ def test_process_one_param_kinds():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_process_one_no_varargs_varkw():
-    sig = inspect.signature(_process_one)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 def test_run_evaluation_signature():
     sig = inspect.signature(run_evaluation)
     params = list(sig.parameters)
@@ -643,10 +623,6 @@ def test_run_evaluation_no_default_for_manifest_output_path():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["manifest"].default is inspect.Parameter.empty
     assert sig.parameters["output_path"].default is inspect.Parameter.empty
-
-
-def test_namespace_run_evaluation():
-    assert run_evaluation.__module__ == "evaluation.runner"
 
 
 # ---------- 模块整体合理性 ----------

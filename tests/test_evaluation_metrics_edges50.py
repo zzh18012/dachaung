@@ -94,19 +94,9 @@ def test_bool_metric_accepts_none_batch24():
     assert out["value"] is False
 
 
-def test_bool_metric_accepts_empty_string_batch24():
-    out = _bool_metric("")
-    assert out["value"] is False
-
-
 def test_int_metric_accepts_negative_batch24():
     out = _int_metric(-5)
     assert out["value"] == -5
-
-
-def test_int_metric_accepts_zero_batch24():
-    out = _int_metric(0)
-    assert out["value"] == 0
 
 
 def test_int_metric_returns_fresh_dict_batch24():
@@ -372,12 +362,6 @@ def test_docx_locator_ratio_section_valid_batch24():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_ratio_paragraph_index_valid_batch24():
-    elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 5}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_locator_none_batch24():
     elements = [{"type": "paragraph", "source_locator": None}]
     out = _docx_locator_ratio(elements)
@@ -393,12 +377,6 @@ def test_docx_locator_ratio_empty_locator_batch24():
 
 def test_docx_locator_ratio_no_locator_key_batch24():
     elements = [{"type": "paragraph"}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_docx_locator_ratio_rejects_bbox_batch24():
-    elements = [{"type": "paragraph", "source_locator": {"bbox": [0, 0, 1, 1], "paragraph_index": 0}}]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -431,10 +409,6 @@ def test_is_valid_bbox_set_batch24():
 def test_is_valid_bbox_tuple_batch24():
     """tuple 不是 list。"""
     assert _is_valid_bbox((0, 0, 1, 1)) is False
-
-
-def test_is_valid_bbox_three_items_batch24():
-    assert _is_valid_bbox([0, 0, 1]) is False
 
 
 def test_is_valid_bbox_bool_inside_batch24():
@@ -499,12 +473,6 @@ def test_image_resource_ratio_mixed_batch24(tmp_path):
     assert out["value"] == pytest.approx(1 / 3)
 
 
-def test_image_resource_ratio_no_image_elements_batch24():
-    elements = [{"type": "paragraph"}]
-    out = _image_resource_ratio(elements, None)
-    assert out["reason"] == "no_image_elements"
-
-
 def test_image_resource_ratio_image_base_dir_with_filename_batch24(tmp_path):
     """resource_path 是裸文件名 → image_base_dir 帮助找到。"""
     img = tmp_path / "only_name.png"
@@ -520,11 +488,6 @@ def test_image_resource_ratio_image_base_dir_with_filename_batch24(tmp_path):
 
 def test_chunk_reference_ratio_no_chunks_batch24():
     out = _chunk_reference_ratio([], [])
-    assert out["reason"] == "no_chunks"
-
-
-def test_chunk_reference_ratio_empty_chunks_list_batch24():
-    out = _chunk_reference_ratio([{"element_id": "e1"}], [])
     assert out["reason"] == "no_chunks"
 
 
@@ -662,18 +625,8 @@ def test_silent_drop_count_no_expectations_batch24():
     assert out["reason"] == "no_expectations"
 
 
-def test_silent_drop_count_empty_expectations_batch24():
-    out = _silent_drop_count({}, {})
-    assert out["reason"] == "no_expectations"
-
-
 def test_silent_drop_count_no_element_count_key_batch24():
     out = _silent_drop_count({}, {"required_markers": ["x"]})
-    assert out["reason"] == "no_expectations_element_count"
-
-
-def test_silent_drop_count_empty_element_count_batch24():
-    out = _silent_drop_count({}, {"element_count_by_type": {}})
     assert out["reason"] == "no_expectations_element_count"
 
 
@@ -806,11 +759,6 @@ def test_module_source_no_numpy_import_batch24():
     assert "import numpy" not in src
 
 
-def test_module_source_no_csv_import_batch24():
-    src = inspect.getsource(mmod)
-    assert "import csv" not in src
-
-
 # ---------- module source 字符串精确补强第三十五批 ----------
 
 
@@ -913,11 +861,6 @@ def test_module_does_not_import_evaluation_runner_batch24():
 def test_module_does_not_import_evaluation_cli_batch24():
     src = inspect.getsource(mmod)
     assert "from evaluation.cli" not in src
-
-
-def test_module_does_not_import_evaluation_annotation_metrics_batch24():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.annotation_metrics" not in src
 
 
 def test_module_does_not_import_app_pipeline_batch24():

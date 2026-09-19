@@ -46,11 +46,6 @@ def test_null_with_empty_string_batch39():
     assert out == {"value": None, "reason": ""}
 
 
-def test_null_with_unicode_reason_batch39():
-    out = _null("中文原因")
-    assert out["reason"] == "中文原因"
-
-
 def test_null_with_long_reason_batch39():
     s = "x" * 200
     out = _null(s)
@@ -79,11 +74,6 @@ def test_bool_metric_with_truthy_string_batch39():
     """bool('x') == True。"""
     out = _bool_metric("x")  # type: ignore[arg-type]
     assert out["value"] is True
-
-
-def test_bool_metric_with_empty_string_batch39():
-    out = _bool_metric("")  # type: ignore[arg-type]
-    assert out["value"] is False
 
 
 def test_bool_metric_with_zero_int_batch39():
@@ -145,10 +135,6 @@ def test_is_valid_bbox_tuple_input_batch39():
     assert _is_valid_bbox((0, 0, 1, 1)) is False
 
 
-def test_is_valid_bbox_with_three_values_batch39():
-    assert _is_valid_bbox([0, 0, 1]) is False
-
-
 def test_is_valid_bbox_with_nan_value_batch39():
     """math.isfinite(nan) == False → False。"""
     assert _is_valid_bbox([0, 0, float("nan"), 1]) is False
@@ -175,10 +161,6 @@ def test_is_valid_bbox_with_none_input_batch39():
 
 def test_strip_whitespace_empty_string_batch39():
     assert _strip_unicode_whitespace("") == ""
-
-
-def test_strip_whitespace_only_whitespace_batch39():
-    assert _strip_unicode_whitespace("   \t\n") == ""
 
 
 def test_strip_whitespace_no_whitespace_batch39():
@@ -478,13 +460,6 @@ def test_text_preservation_text_missing_chars_in_actual_batch39():
     assert out["recall"]["value"] == pytest.approx(2 / 3)
 
 
-def test_text_preservation_unicode_text_batch39():
-    elements = [{"type": "paragraph", "content": "你好世界"}]
-    chunks = [{"text": "你好世界"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-
-
 def test_text_preservation_repeated_chars_batch39():
     """重复字符的多集合行为。"""
     elements = [{"type": "paragraph", "content": "aabb"}]
@@ -739,11 +714,6 @@ def test_module_source_no_forbidden_tokens_batch39(token):
 # ---------- module source 字符串精确补强第五十九批
 
 
-def test_module_source_contains_design_doc_batch39():
-    src = inspect.getsource(mmod)
-    assert "纯函数" in src
-
-
 def test_module_source_contains_text_types_definition_batch39():
     src = inspect.getsource(mmod)
     assert "_TEXT_TYPES" in src
@@ -871,11 +841,6 @@ def test_signature_compute_metrics_five_params_batch39():
 def test_signature_compute_metrics_image_base_dir_optional_batch39():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["image_base_dir"].default is None
-
-
-def test_signature_compute_metrics_returns_dict_batch39():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert "dict" in str(sig.return_annotation)
 
 
 def test_signature_silent_drop_count_two_params_batch39():

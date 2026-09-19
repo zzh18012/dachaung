@@ -399,21 +399,6 @@ def test_aggregate_summary_figure_caption_not_in_ratio_batch49():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_subprocess_import_batch49():
-    src = inspect.getsource(report_mod)
-    assert "import subprocess" in src
-
-
-def test_source_contains_datetime_import_batch49():
-    src = inspect.getsource(report_mod)
-    assert "from datetime import datetime" in src
-
-
-def test_source_contains_pathlib_import_batch49():
-    src = inspect.getsource(report_mod)
-    assert "from pathlib import Path" in src
-
-
 def test_source_docstring_mentions_macro_average_batch49():
     src = inspect.getsource(report_mod)
     assert "macro average" in src.lower() or "macro_average" in src.lower() or "macro average" in src
@@ -486,11 +471,6 @@ def test_ast_has_5_top_level_functions_batch49():
     tree = ast.parse(inspect.getsource(report_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 5
-
-
-def test_ast_no_class_def_batch49():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
 def test_ast_module_has_docstring_batch49():

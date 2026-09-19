@@ -57,15 +57,6 @@ def test_build_parser_subparsers_required_true():
     assert sub_actions[0].required is True
 
 
-def test_build_parser_subparsers_dest_command():
-    p = _build_parser()
-    sub_actions = [
-        a for a in p._actions
-        if isinstance(a, argparse._SubParsersAction)
-    ]
-    assert sub_actions[0].dest == "command"
-
-
 def test_build_parser_has_3_subcommands():
     p = _build_parser()
     sub_actions = [
@@ -204,16 +195,6 @@ def test_format_metric_int_value():
 def test_format_metric_float_value():
     out = _format_metric("x", {"value": 0.5, "reason": None})
     assert "0.5000" in out
-
-
-def test_format_metric_float_zero():
-    out = _format_metric("x", {"value": 0.0, "reason": None})
-    assert "0.0000" in out
-
-
-def test_format_metric_float_one():
-    out = _format_metric("x", {"value": 1.0, "reason": None})
-    assert "1.0000" in out
 
 
 def test_format_metric_dict_value():
@@ -763,15 +744,6 @@ def test_main_signature():
 def test_main_argv_annotation():
     sig = inspect.signature(main)
     assert sig.parameters["argv"].annotation == "list[str] | None"
-
-
-def test_main_no_varargs_varkw():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
 
 
 def test_build_parser_signature():

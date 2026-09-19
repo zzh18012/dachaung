@@ -453,11 +453,6 @@ def test_annotation_metrics_source_no_fstring_interpolation_batch12():
     assert 'f"{' not in source
 
 
-def test_annotation_metrics_source_no_print_batch12():
-    source = inspect.getsource(amod)
-    assert "print(" not in source
-
-
 # ---------- module source 字符串精确补强第十二批 ----------
 
 
@@ -556,11 +551,6 @@ def test_signature_figure_caption_prf_return_dict_batch12():
     annot = sig.return_annotation
     annot_str = annot if isinstance(annot, str) else str(annot)
     assert "dict" in annot_str
-
-
-def test_signature_chunk_boundary_prf_3_params_batch12():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert list(sig.parameters) == ["document", "annotation", "tolerance_chars"]
 
 
 def test_signature_chunk_boundary_prf_tolerance_default_30_batch12():

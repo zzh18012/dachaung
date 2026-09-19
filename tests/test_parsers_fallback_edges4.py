@@ -71,10 +71,6 @@ def test_is_caption_empty_string_returns_false():
     assert _is_caption("") is False
 
 
-def test_is_caption_none_returns_false():
-    assert _is_caption(None) is False  # type: ignore[arg-type]
-
-
 def test_is_caption_caption_returns_true():
     assert _is_caption("Figure 1. Title") is True
 
@@ -1286,18 +1282,6 @@ def test_module_imports_make_document_id():
 
 def test_fallback_parser_class_name_constant():
     assert FallbackParser.name == "fallback"
-
-
-def test_fallback_parser_class_version_contains_pdfplumber_keyword():
-    assert "pdfplumber" in FallbackParser.version
-
-
-def test_fallback_parser_class_version_contains_python_docx_keyword():
-    assert "python-docx" in FallbackParser.version
-
-
-def test_fallback_parser_class_version_contains_pypdfium2_keyword():
-    assert "pypdfium2" in FallbackParser.version
 
 
 def test_fallback_parser_has_parse_callable():

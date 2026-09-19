@@ -157,11 +157,6 @@ def test_build_provenance_run_timestamp_iso_parseable_batch32(tmp_path):
     assert parsed is not None
 
 
-def test_build_provenance_dependencies_three_packages_batch32(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert set(out["dependencies"].keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
-
-
 def test_build_provenance_evaluator_version_value_batch32(tmp_path):
     out = build_provenance(tmp_path, "fallback", 800, None)
     assert out["evaluator_version"] == EVALUATOR_VERSION
@@ -404,14 +399,6 @@ def test_module_imports_datetime_batch32():
 def test_module_imports_pathlib_batch32():
     src = inspect.getsource(rmod)
     assert "from pathlib import Path" in src
-
-
-def test_module_has_aggregate_summary_func_batch32():
-    assert callable(rmod.aggregate_summary)
-
-
-def test_module_has_get_git_provenance_func_batch32():
-    assert callable(rmod.get_git_provenance)
 
 
 # ---------- 端到端集成第四十九批

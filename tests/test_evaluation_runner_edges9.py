@@ -646,26 +646,6 @@ def test_module_all_is_list():
     assert isinstance(m.__all__, list)
 
 
-def test_module_imports_json():
-    import evaluation.runner as m
-    assert hasattr(m, "json")
-
-
-def test_module_imports_time():
-    import evaluation.runner as m
-    assert hasattr(m, "time")
-
-
-def test_module_imports_path():
-    import evaluation.runner as m
-    assert hasattr(m, "Path")
-
-
-def test_module_imports_any():
-    import evaluation.runner as m
-    assert hasattr(m, "Any")
-
-
 def test_module_imports_pipeline():
     import evaluation.runner as m
     assert hasattr(m, "process_single")
@@ -683,11 +663,6 @@ def test_module_imports_annotation_metrics():
     import evaluation.runner as m
     assert hasattr(m, "chunk_boundary_prf")
     assert hasattr(m, "figure_caption_prf")
-
-
-def test_module_imports_metrics():
-    import evaluation.runner as m
-    assert hasattr(m, "compute_automatic_metrics")
 
 
 def test_module_docstring_present():

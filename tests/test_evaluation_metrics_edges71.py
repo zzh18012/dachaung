@@ -424,15 +424,6 @@ def test_heading_boundary_ratio_empty_ids_batch46():
 
 # ---------- _text_preservation Counter 行为 ----------
 
-def test_text_preservation_perfect_match_batch46():
-    elements = [{"type": "paragraph", "content": "hello"}]
-    chunks = [{"text": "hello"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
-
-
 def test_text_preservation_chunked_text_batch46():
     """chunker 把 word 切开 → 加空格 → 删除空白后仍 equal。"""
     elements = [{"type": "paragraph", "content": "helloworld"}]
@@ -555,11 +546,6 @@ def test_docx_locator_ratio_no_structural_key_batch46():
 def test_source_contains_no_modification_note_batch46():
     src = inspect.getsource(metrics_mod)
     assert "不修改 document" in src
-
-
-def test_source_contains_text_preservation_v11_batch46():
-    src = inspect.getsource(metrics_mod)
-    assert "v1.1" in src
 
 
 def test_source_contains_no_forgery_note_batch46():

@@ -104,12 +104,6 @@ def test_build_parser_run_tolerance_chars_type_int_batch29():
     assert tc_action.type is int
 
 
-def test_build_parser_inspect_doc_tolerance_default_30_batch29():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json"])
-    assert ns.tolerance_chars == 30
-
-
 def test_build_parser_no_command_errors_batch29(capsys):
     p = _build_parser()
     with pytest.raises(SystemExit):
@@ -356,46 +350,6 @@ def test_main_run_with_invalid_manifest_returns_1_batch29(tmp_path, capsys):
 
 
 # ---------- module source forbidden tokens 第四十七批 ----------
-
-
-def test_module_source_no_os_system_batch29():
-    src = inspect.getsource(climod)
-    assert "os.system" not in src
-
-
-def test_module_source_no_eval_batch29():
-    src = inspect.getsource(climod)
-    assert "eval(" not in src
-
-
-def test_module_source_no_exec_batch29():
-    src = inspect.getsource(climod)
-    assert "exec(" not in src
-
-
-def test_module_source_no_pickle_batch29():
-    src = inspect.getsource(climod)
-    assert "pickle" not in src
-
-
-def test_module_source_no_yaml_batch29():
-    src = inspect.getsource(climod)
-    assert "yaml" not in src
-
-
-def test_module_source_no_dunder_import_batch29():
-    src = inspect.getsource(climod)
-    assert "__import__" not in src
-
-
-def test_module_source_no_breakpoint_batch29():
-    src = inspect.getsource(climod)
-    assert "breakpoint(" not in src
-
-
-def test_module_source_no_shutil_batch29():
-    src = inspect.getsource(climod)
-    assert "shutil" not in src
 
 
 def test_module_source_no_requests_batch29():

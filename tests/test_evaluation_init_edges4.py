@@ -224,21 +224,9 @@ def test_manifest_version_attr_matches_import_batch44():
 
 # ---------- 模块文件 ----------
 
-def test_module_file_ends_with_init_py_batch44():
-    assert evaluation.__file__.endswith("__init__.py")
-
-
 def test_module_file_parent_is_evaluation_batch44():
     p = Path(evaluation.__file__).parent
     assert p.name == "evaluation"
-
-
-def test_module_name_is_evaluation_batch44():
-    assert evaluation.__name__ == "evaluation"
-
-
-def test_module_package_is_evaluation_batch44():
-    assert evaluation.__package__ == "evaluation"
 
 
 def test_module_file_size_nonzero_batch44():

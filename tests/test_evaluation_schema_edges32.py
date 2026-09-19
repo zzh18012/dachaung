@@ -204,13 +204,6 @@ def test_load_schema_dict_modification_does_not_propagate_batch12():
     assert s2.get("title") == original
 
 
-def test_load_schema_signature_one_param_batch12():
-    sig = inspect.signature(load_schema)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "name"
-
-
 def test_load_schema_param_annotation_str_batch12():
     sig = inspect.signature(load_schema)
     annot = sig.parameters["name"].annotation
@@ -627,11 +620,6 @@ def test_module_dunder_all_exact_set_batch12():
 
 
 # ---------- module 合理性第十二批 ----------
-
-
-def test_module_dunder_file_exists_batch12():
-    assert hasattr(smod, "__file__")
-    assert smod.__file__ is not None
 
 
 def test_module_dunder_file_path_evaluation_schema_batch12():

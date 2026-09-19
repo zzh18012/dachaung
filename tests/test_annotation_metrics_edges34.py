@@ -456,16 +456,6 @@ def test_module_source_no_main_block():
     assert '__main__' not in src
 
 
-def test_module_source_no_yield():
-    src = inspect.getsource(amod)
-    assert "yield" not in src
-
-
-def test_module_source_no_walrus():
-    src = inspect.getsource(amod)
-    assert ":=" not in src
-
-
 def test_module_source_no_eval():
     src = inspect.getsource(amod)
     assert "eval(" not in src
@@ -492,11 +482,6 @@ def test_module_source_no_relative_import_above_app_or_eval():
     src = inspect.getsource(amod)
     # 不应出现 'from .' 或 'from ..'
     assert "from ." not in src
-
-
-def test_module_source_no_star_import():
-    src = inspect.getsource(amod)
-    assert "import *" not in src
 
 
 def test_module_source_no_user_class_definition():

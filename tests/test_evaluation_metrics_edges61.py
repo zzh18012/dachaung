@@ -214,12 +214,6 @@ def test_pdf_locator_page_float_batch35():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_no_source_locator_batch35():
-    elements = [{"type": "image"}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 # ---------- _docx_locator_ratio 第三十五批
 
 
@@ -333,16 +327,6 @@ def test_chunk_ref_all_chunks_valid_batch35():
 
 
 # ---------- _strip_unicode_whitespace 第三十五批
-
-
-def test_strip_unicode_line_separator_batch35():
-    """U+2028 LINE SEPARATOR。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_paragraph_separator_batch35():
-    """U+2029 PARAGRAPH SEPARATOR。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
 
 
 def test_strip_unicode_vertical_tab_batch35():
@@ -532,16 +516,6 @@ def test_module_source_contains_math_import_batch35():
     assert "import math" in src
 
 
-def test_module_source_contains_text_types_definition_batch35():
-    src = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ("heading"' in src
-
-
-def test_module_source_contains_pdf_bbox_definition_batch35():
-    src = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ("heading"' in src
-
-
 def test_module_source_contains_not_evaluated_definition_batch35():
     src = inspect.getsource(mmod)
     assert '_NOT_EVALUATED = "not_evaluated"' in src
@@ -554,11 +528,6 @@ def test_module_source_contains_all_only_compute_batch35():
 
 
 # ---------- signatures 第四十九批
-
-
-def test_signature_strip_unicode_returns_str_batch35():
-    sig = inspect.signature(_strip_unicode_whitespace)
-    assert sig.return_annotation == "str"
 
 
 def test_signature_is_valid_bbox_returns_bool_batch35():

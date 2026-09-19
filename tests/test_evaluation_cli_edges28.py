@@ -623,11 +623,6 @@ def test_module_source_main_has_3_branches():
     assert 'args.command == "inspect-doc"' in src
 
 
-def test_module_source_main_calls_validate_file():
-    src = inspect.getsource(main)
-    assert 'validate_file(output_path, "evaluation-report.schema.json")' in src
-
-
 def test_module_source_format_metric_uses_get_method():
     src = inspect.getsource(_format_metric)
     assert 'metric.get("value")' in src
@@ -682,11 +677,6 @@ def test_build_parser_no_params():
 def test_build_parser_return_annotation():
     sig = inspect.signature(_build_parser)
     assert "ArgumentParser" in str(sig.return_annotation)
-
-
-def test_format_metric_2_params():
-    sig = inspect.signature(_format_metric)
-    assert list(sig.parameters) == ["name", "metric"]
 
 
 def test_format_metric_return_str():

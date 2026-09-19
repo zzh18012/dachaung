@@ -51,17 +51,9 @@ def _write(tmp_path: Path, name: str, content: str) -> Path:
 # =========================================================================
 
 
-def test_html_extensions_is_tuple():
-    assert isinstance(_HTML_EXTENSIONS, tuple)
-
-
 def test_html_extensions_starts_with_dot():
     for ext in _HTML_EXTENSIONS:
         assert ext.startswith(".")
-
-
-def test_heading_levels_is_dict():
-    assert isinstance(_HEADING_LEVELS, dict)
 
 
 def test_heading_levels_values_are_int():
@@ -611,11 +603,6 @@ def test_html_parser_name_value():
 
 def test_html_parser_version_value():
     assert HtmlParser.version == "stdlib/0.1.0"
-
-
-def test_html_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(HtmlParser, Parser)
 
 
 def test_parse_nonexistent_file_raises(tmp_path: Path):

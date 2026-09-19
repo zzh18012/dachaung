@@ -117,10 +117,6 @@ def test_is_absolute_like_japanese_drive_batch48():
 
 # ---------- _has_backslash 多次出现 ----------
 
-def test_has_backslash_multiple_batch48():
-    assert _has_backslash("a\\b\\c\\d") is True
-
-
 def test_has_backslash_only_backslash_batch48():
     assert _has_backslash("\\") is True
 
@@ -139,10 +135,6 @@ def test_has_backslash_no_backslash_batch48():
 
 def test_has_backslash_empty_batch48():
     assert _has_backslash("") is False
-
-
-def test_has_backslash_only_forward_batch48():
-    assert _has_backslash("////") is False
 
 
 # ---------- _resolve_relative_path 复杂场景 ----------
@@ -449,11 +441,6 @@ def test_manifest_file_count_batch48():
     assert m.file_count == 2
 
 
-def test_manifest_file_count_empty_batch48():
-    m = _make_manifest()
-    assert m.file_count == 0
-
-
 def test_manifest_pdf_count_batch48():
     m = _make_manifest(docs=[
         _make_doc(doc_id="d1", source_type="pdf"),
@@ -588,12 +575,6 @@ def test_source_contains_no_hardcoded_paths_batch48():
 
 # ---------- AST 结构补强 ----------
 
-def test_ast_top_level_functions_count_batch48():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 5  # _is_absolute_like / _has_backslash / _resolve_relative_path / load_manifest / _detect_project_root
-
-
 def test_ast_top_level_classes_count_batch48():
     tree = ast.parse(inspect.getsource(manifest_mod))
     classes = [n for n in tree.body if isinstance(n, ast.ClassDef)]
@@ -656,7 +637,3 @@ def test_ast_module_docstring_batch48():
 
 
 # ---------- forbidden tokens 第一百一十五批 ----------
-
-def test_source_no_yield_batch48():
-    src = inspect.getsource(manifest_mod)
-    assert "yield" not in src

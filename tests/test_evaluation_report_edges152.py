@@ -142,14 +142,6 @@ def test_devset_full_dict_batch551(tmp_path):
             "alpha", "中文", "测试"]}
 
 
-def test_success_two_of_two_batch551(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["success_rates"][
-        "pipeline_success"] == {
-        "success_count": 2, "total": 2,
-        "rate": 1.0}
-
-
 def test_ect_sum_two_batch551(tmp_path):
     r = _run(tmp_path)
     assert r["summary"]["counts"][

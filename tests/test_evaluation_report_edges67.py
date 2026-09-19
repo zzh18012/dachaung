@@ -128,17 +128,6 @@ def test_git_provenance_timeout_kwarg_batch52():
 
 # ---------- get_dependency_versions 更深 ----------
 
-def test_dependency_versions_3_keys_batch52():
-    v = get_dependency_versions()
-    assert set(v.keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
-
-
-def test_dependency_versions_values_type_batch52():
-    v = get_dependency_versions()
-    for k, val in v.items():
-        assert val is None or isinstance(val, str)
-
-
 def test_dependency_versions_pdfplumber_installed_batch52():
     v = get_dependency_versions()
     # fallback parser 用 pdfplumber，应已安装
@@ -422,21 +411,6 @@ def test_devset_section_categories_pass_through_batch52():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_subprocess_import_batch52():
-    src = inspect.getsource(report_mod)
-    assert "import subprocess" in src
-
-
-def test_source_datetime_import_batch52():
-    src = inspect.getsource(report_mod)
-    assert "from datetime import datetime" in src
-
-
-def test_source_path_import_batch52():
-    src = inspect.getsource(report_mod)
-    assert "from pathlib import Path" in src
-
-
 def test_source_ratio_metrics_12_entries_batch52():
     assert len(_RATIO_METRICS) == 12
 
@@ -548,11 +522,6 @@ def test_ast_git_provenance_2_subprocess_runs_batch52():
         and isinstance(n.func, ast.Attribute) and n.func.attr == "run"
     ]
     assert len(runs) == 2
-
-
-def test_ast_no_class_def_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
 def test_ast_no_raise_batch52():

@@ -1144,18 +1144,6 @@ def test_signature_run_evaluation_keyword_only_marker():
     assert set(kw_only) == {"parser_name", "max_chars", "tolerance_chars"}
 
 
-def test_signature_run_evaluation_no_var_positional():
-    sig = inspect.signature(run_evaluation)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_run_evaluation_no_var_keyword():
-    sig = inspect.signature(run_evaluation)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 def test_signature_all_3_functions_are_function_type():
     assert isinstance(_load_annotation, types.FunctionType)
     assert isinstance(_process_one, types.FunctionType)

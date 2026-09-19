@@ -1127,10 +1127,6 @@ def test_module_has_no_all():
     assert not hasattr(cli_mod, "__all__") or cli_mod.__all__ is None
 
 
-def test_module_extension_to_parser_count_nine():
-    assert len(_EXTENSION_TO_PARSER) == 9
-
-
 def test_module_extension_to_parser_keys_exact():
     assert set(_EXTENSION_TO_PARSER.keys()) == {
         ".pdf", ".docx", ".md", ".markdown",

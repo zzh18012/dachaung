@@ -87,12 +87,6 @@ def test_build_parser_run_custom_tolerance_chars_batch45():
     assert args.tolerance_chars == 50
 
 
-def test_build_parser_run_required_output_batch45():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--manifest", "x"])
-
-
 def test_build_parser_validate_report_takes_input_batch45():
     p = _build_parser()
     args = p.parse_args(["validate-report", "report.json"])
@@ -359,11 +353,6 @@ def test_main_inspect_doc_success_batch45(capsys, tmp_path):
 
 # ---------- _format_metric 各种 value 类型 ----------
 
-def test_format_metric_bool_false_batch45():
-    out = _format_metric("x", {"value": False, "reason": None})
-    assert "false" in out
-
-
 def test_format_metric_dict_value_sorted_batch45():
     """dict value 按 key 排序。"""
     out = _format_metric("x", {"value": {"z": 1, "a": 2}, "reason": None})
@@ -382,16 +371,6 @@ def test_format_metric_float_with_reason_batch45():
     out = _format_metric("x", {"value": 0.5, "reason": "ok reason"})
     assert "0.5000" in out
     assert "ok reason" in out
-
-
-def test_format_metric_negative_float_batch45():
-    out = _format_metric("x", {"value": -0.5, "reason": None})
-    assert "-0.5000" in out
-
-
-def test_format_metric_zero_float_batch45():
-    out = _format_metric("x", {"value": 0.0, "reason": None})
-    assert "0.0000" in out
 
 
 def test_format_metric_long_name_batch45():
@@ -462,11 +441,6 @@ def test_module_source_contains_manifest_import_batch45():
     assert "from evaluation.manifest import ManifestError, load_manifest" in src
 
 
-def test_module_source_contains_report_import_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.report import get_git_provenance" in src
-
-
 def test_module_source_contains_runner_import_batch45():
     src = inspect.getsource(cli_mod)
     assert "from evaluation.runner import run_evaluation" in src
@@ -519,12 +493,6 @@ def test_ast_top_level_functions_count_batch45():
     tree = ast.parse(inspect.getsource(cli_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 4  # _build_parser, main, _format_metric, _run_inspect_doc
-
-
-def test_ast_top_level_function_names_batch45():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["_build_parser", "main", "_format_metric", "_run_inspect_doc"]
 
 
 def test_ast_main_has_if_at_least_3_batch45():
@@ -601,21 +569,6 @@ def test_ast_has_argparse_add_parser_batch45():
 
 # ---------- forbidden tokens 第一百零三批 ----------
 
-def test_source_no_eval_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch45():
-    src = inspect.getsource(cli_mod)
-    assert "compile(" not in src
-
-
 def test_source_no_popen_batch45():
     src = inspect.getsource(cli_mod)
     assert ".popen(" not in src
@@ -629,8 +582,3 @@ def test_source_no_class_keyword_batch45():
 def test_source_no_yield_batch45():
     src = inspect.getsource(cli_mod)
     assert "yield" not in src
-
-
-def test_source_no_walrus_batch45():
-    src = inspect.getsource(cli_mod)
-    assert ":=" not in src

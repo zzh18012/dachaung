@@ -1167,11 +1167,6 @@ def test_module_source_no_walrus():
     assert ":=" not in src
 
 
-def test_module_source_no_main_block():
-    src = inspect.getsource(mmod)
-    assert 'if __name__' not in src
-
-
 def test_module_source_no_user_class():
     src = inspect.getsource(mmod)
     lines = src.split("\n")
@@ -1324,11 +1319,6 @@ def test_module_all_length_1():
 
 def test_module_all_entries_unique():
     assert len(set(mmod.__all__)) == 1
-
-
-def test_module_all_entries_are_str():
-    for entry in mmod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_all_only_compute_automatic_metrics():

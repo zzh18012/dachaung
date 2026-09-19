@@ -157,12 +157,6 @@ def test_build_parser_main_prog_evaluation_cli_batch13():
     assert p.prog == "evaluation.cli"
 
 
-def test_build_parser_subparsers_dest_command_batch13():
-    p = _build_parser()
-    sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
-    assert sub_actions[0].dest == "command"
-
-
 def test_build_parser_run_positional_action_count_0_batch13():
     """run 子命令没有 positional 参数。"""
     p = _build_parser()
@@ -964,13 +958,6 @@ def test_format_metric_param_kinds_batch13():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_run_inspect_doc_signature_one_param_batch13():
-    sig = inspect.signature(_run_inspect_doc)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "args"
-
-
 def test_run_inspect_doc_return_annotation_int_batch13():
     sig = inspect.signature(_run_inspect_doc)
     ret = sig.return_annotation
@@ -1003,11 +990,6 @@ def test_all_functions_no_varargs_batch13():
 
 
 # ---------- module 合理性第十六批 ----------
-
-
-def test_module_dunder_file_exists_batch13():
-    assert hasattr(climod, "__file__")
-    assert climod.__file__ is not None
 
 
 def test_module_dunder_file_path_evaluation_cli_batch13():

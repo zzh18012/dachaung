@@ -473,11 +473,6 @@ def test_module_source_contains_all_export_batch39():
     assert "__all__" in src
 
 
-def test_module_source_contains_parser_const_export_batch39():
-    src = inspect.getsource(amod)
-    assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-
-
 # ---------- signatures 第五十七批
 
 
@@ -520,22 +515,9 @@ def test_module_all_contains_parser_const_batch39():
     assert "PARSER_DOES_NOT_EMIT_RELATIONS" in amod.__all__
 
 
-def test_module_all_contains_figure_caption_prf_batch39():
-    assert "figure_caption_prf" in amod.__all__
-
-
-def test_module_all_contains_chunk_boundary_prf_batch39():
-    assert "chunk_boundary_prf" in amod.__all__
-
-
 def test_module_callable_attributes_batch39():
     assert callable(amod.figure_caption_prf)
     assert callable(amod.chunk_boundary_prf)
-
-
-def test_module_no_class_definitions_batch39():
-    src = inspect.getsource(amod)
-    assert "\nclass " not in src
 
 
 # ---------- 端到端集成 第五十七批

@@ -81,10 +81,6 @@ def test_is_absolute_like_emoji_alpha_batch17():
     assert _is_absolute_like("🎉:/foo") is False
 
 
-def test_is_absolute_like_drive_uppercase_batch17():
-    assert _is_absolute_like("Z:/foo") is True
-
-
 def test_is_absolute_like_drive_lowercase_batch17():
     assert _is_absolute_like("z:/foo") is True
 
@@ -111,10 +107,6 @@ def test_has_backslash_single_batch17():
 
 def test_has_backslash_double_batch17():
     assert _has_backslash("\\\\") is True
-
-
-def test_has_backslash_mixed_batch17():
-    assert _has_backslash("a\\b/c") is True
 
 
 def test_has_backslash_no_backslash_batch17():
@@ -146,11 +138,6 @@ def test_resolve_relative_path_dot_dot_batch17(tmp_path):
     """含 .. → 解析后位于 project_root 外 → ManifestError。"""
     with pytest.raises(ManifestError, match="项目根目录之外"):
         _resolve_relative_path("../escape.pdf", tmp_path, "test")
-
-
-def test_resolve_relative_path_empty_batch17(tmp_path):
-    with pytest.raises(ManifestError, match="为空"):
-        _resolve_relative_path("", tmp_path, "test")
 
 
 def test_resolve_relative_path_field_name_in_message_batch17(tmp_path):

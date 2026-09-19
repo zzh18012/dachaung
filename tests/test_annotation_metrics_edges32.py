@@ -518,24 +518,9 @@ def test_module_source_no_relative_import_above_app_or_eval():
     assert "from .." not in src
 
 
-def test_module_source_no_star_import():
-    src = inspect.getsource(amod)
-    assert "import *" not in src
-
-
-def test_module_source_no_yield():
-    src = inspect.getsource(amod)
-    assert "yield" not in src
-
-
 def test_module_source_no_async_def():
     src = inspect.getsource(amod)
     assert "async def" not in src
-
-
-def test_module_source_no_walrus():
-    src = inspect.getsource(amod)
-    assert ":=" not in src
 
 
 def test_module_source_no_main_block():
@@ -686,11 +671,6 @@ def test_module_all_length_3():
 
 def test_module_all_entries_unique():
     assert len(set(amod.__all__)) == len(amod.__all__)
-
-
-def test_module_all_entries_are_str():
-    for entry in amod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_all_3_entries_correct():

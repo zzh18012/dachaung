@@ -154,11 +154,6 @@ def test_load_schema_manifest_type_object_batch33():
     assert s.get("type") == "object"
 
 
-def test_load_schema_annotation_type_object_batch33():
-    s = load_schema("annotation.schema.json")
-    assert s.get("type") == "object"
-
-
 def test_load_schema_eval_report_type_object_batch33():
     s = load_schema("evaluation-report.schema.json")
     assert s.get("type") == "object"
@@ -339,12 +334,6 @@ def test_validate_file_returns_none_batch33(tmp_path):
     p = tmp_path / "m.json"
     p.write_text(json.dumps(data), encoding="utf-8")
     assert validate_file(p, "manifest.schema.json") is None
-
-
-def test_validate_file_missing_raises_filenotfound_batch33(tmp_path):
-    with pytest.raises(FileNotFoundError) as exc:
-        validate_file(tmp_path / "missing.json", "manifest.schema.json")
-    assert "待校验文件不存在" in str(exc.value)
 
 
 def test_validate_file_directory_raises_filenotfound_batch33(tmp_path):

@@ -633,35 +633,14 @@ def test_report_source_no_async_def_batch10():
     assert "async def" not in source
 
 
-def test_report_source_no_yield_batch10():
-    source = inspect.getsource(rmod)
-    assert "yield" not in source
-
-
 def test_report_source_no_walrus_batch10():
     source = inspect.getsource(rmod)
     assert ":=" not in source
 
 
-def test_report_source_no_top_level_lambda_batch10():
-    source = inspect.getsource(rmod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
-
-
 def test_report_source_no_print_batch10():
     source = inspect.getsource(rmod)
     assert "print(" not in source
-
-
-def test_report_source_no_logging_batch10():
-    source = inspect.getsource(rmod)
-    assert "logging" not in source
-    assert "logger" not in source
 
 
 def test_report_source_no_open_write_batch10():

@@ -139,11 +139,6 @@ def test_load_schema_returns_dict_evaluation_report_batch9():
     assert isinstance(s, dict)
 
 
-def test_load_schema_returns_dict_document_batch9():
-    s = load_schema("document.schema.json")
-    assert isinstance(s, dict)
-
-
 def test_load_schema_unknown_raises_file_not_found_batch9():
     with pytest.raises(FileNotFoundError):
         load_schema("nonexistent.schema.json")
@@ -182,11 +177,6 @@ def test_load_schema_has_type_object_batch9():
 def test_load_schema_has_properties_batch9():
     s = load_schema("manifest.schema.json")
     assert "properties" in s
-
-
-def test_load_schema_has_required_batch9():
-    s = load_schema("manifest.schema.json")
-    assert "required" in s
 
 
 def test_load_schema_does_not_call_validator_batch9():
@@ -434,12 +424,6 @@ def test_schema_path_resolves_to_schemas_dir_batch9():
     assert p.parent == SCHEMAS_DIR
 
 
-def test_schema_path_idempotent_batch9():
-    p1 = _schema_path("manifest.schema.json")
-    p2 = _schema_path("manifest.schema.json")
-    assert p1 == p2
-
-
 def test_schema_path_does_not_read_file_batch9():
     """_schema_path 仅返回 Path，不读文件。"""
     # 通过返回值类型验证
@@ -542,16 +526,6 @@ def test_smod_source_no_global_keyword_batch9():
     assert "\nglobal " not in source
 
 
-def test_smod_source_no_async_def_batch9():
-    source = inspect.getsource(smod)
-    assert "async def" not in source
-
-
-def test_smod_source_no_walrus_batch9():
-    source = inspect.getsource(smod)
-    assert ":=" not in source
-
-
 def test_smod_source_no_class_def_outside_eval_error_batch9():
     """模块只有 1 个 class（EvalSchemaError）。"""
     source = inspect.getsource(smod)
@@ -576,11 +550,6 @@ def test_smod_source_no_hardcoded_path_batch9():
 def test_module_source_has_future_annotations_batch9():
     source = inspect.getsource(smod)
     assert "from __future__ import annotations" in source
-
-
-def test_module_source_imports_json_batch9():
-    source = inspect.getsource(smod)
-    assert "import json" in source
 
 
 def test_module_source_has_schemas_dir_constant_batch9():
@@ -667,11 +636,6 @@ def test_signature_load_schema_param_annotation_batch9():
     sig = inspect.signature(load_schema)
     p = list(sig.parameters.values())[0]
     assert p.annotation == "str"
-
-
-def test_signature_load_schema_return_annotation_batch9():
-    sig = inspect.signature(load_schema)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_signature_validate_param_count_batch9():
@@ -786,11 +750,6 @@ def test_module_all_attribute_value_batch9():
 
 def test_module_all_is_list_batch9():
     assert isinstance(smod.__all__, list)
-
-
-def test_module_has_dunder_file_batch9():
-    assert hasattr(smod, "__file__")
-    assert smod.__file__ is not None
 
 
 def test_module_dunder_file_endswith_schema_py_batch9():

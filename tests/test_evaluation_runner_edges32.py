@@ -192,11 +192,6 @@ def test_process_one_source_docstring_mentions_output_path():
     assert "output_path" in src or "out_stub" in src
 
 
-def test_process_one_source_calls_process_single():
-    src = inspect.getsource(_process_one)
-    assert "process_single(" in src
-
-
 def test_process_one_source_creates_per_doc_subdir():
     src = inspect.getsource(_process_one)
     assert '"_per_doc"' in src or "'_per_doc'" in src
@@ -211,11 +206,6 @@ def test_process_one_source_handles_errors_truthy():
 def test_process_one_source_handles_document_none():
     src = inspect.getsource(_process_one)
     assert "if document is None:" in src
-
-
-def test_process_one_source_returns_5_tuple_in_success_path():
-    src = inspect.getsource(_process_one)
-    assert "return document.to_dict(), None, elapsed, document.parser_version, image_dir" in src
 
 
 def test_process_one_source_unlinks_out_stub():
@@ -259,11 +249,6 @@ def test_run_evaluation_source_docstring_short():
     assert '"""跑评测主流程，返回报告 dict（同时写到 output_path）。"""' in src
 
 
-def test_run_evaluation_source_creates_output_root():
-    src = inspect.getsource(run_evaluation)
-    assert "output_root = Path(output_path).parent" in src
-
-
 def test_run_evaluation_source_creates_output_root_dirs():
     src = inspect.getsource(run_evaluation)
     assert "output_root.mkdir(parents=True, exist_ok=True)" in src
@@ -299,11 +284,6 @@ def test_run_evaluation_source_loads_annotation():
     assert "_load_annotation(doc.annotation_resolved)" in src
 
 
-def test_run_evaluation_source_calls_figure_caption_prf():
-    src = inspect.getsource(run_evaluation)
-    assert "figure_caption_prf(document, annotation)" in src
-
-
 def test_run_evaluation_source_pops_tolerance_chars():
     src = inspect.getsource(run_evaluation)
     assert 'pop("_tolerance_chars"' in src
@@ -312,16 +292,6 @@ def test_run_evaluation_source_pops_tolerance_chars():
 def test_run_evaluation_source_pops_missing_markers():
     src = inspect.getsource(run_evaluation)
     assert 'pop("_missing_markers"' in src
-
-
-def test_run_evaluation_source_calls_build_devset_section():
-    src = inspect.getsource(run_evaluation)
-    assert "build_devset_section(manifest)" in src
-
-
-def test_run_evaluation_source_calls_aggregate_summary():
-    src = inspect.getsource(run_evaluation)
-    assert "aggregate_summary(per_doc_results)" in src
 
 
 def test_run_evaluation_source_builds_public_per_doc():

@@ -1500,12 +1500,6 @@ def test_module_namespace_contains_manifest_version():
     assert m.MANIFEST_VERSION == MANIFEST_VERSION
 
 
-def test_module_namespace_contains_validate():
-    import evaluation.manifest as m
-
-    assert hasattr(m, "validate")
-
-
 def test_module_all_is_list():
     import evaluation.manifest as m
 

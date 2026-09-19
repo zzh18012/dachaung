@@ -390,21 +390,10 @@ def test_build_provenance_json_serializable():
 # =========================================================================
 
 
-def test_get_dependency_versions_returns_three_keys_exact():
-    v = get_dependency_versions()
-    assert set(v.keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
-
-
 def test_get_dependency_versions_pdfplumber_in_dev_env():
     """开发环境装了 pdfplumber，version 应非 None。"""
     v = get_dependency_versions()
     assert v["pdfplumber"] is not None
-
-
-def test_get_dependency_versions_values_types():
-    v = get_dependency_versions()
-    for k, val in v.items():
-        assert val is None or isinstance(val, str)
 
 
 # =========================================================================

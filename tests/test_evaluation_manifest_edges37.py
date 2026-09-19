@@ -113,10 +113,6 @@ def test_is_absolute_like_just_colon_slash_batch10():
     assert _is_absolute_like(":/foo") is False
 
 
-def test_is_absolute_like_returns_bool_type_batch10():
-    assert isinstance(_is_absolute_like("foo"), bool)
-
-
 def test_is_absolute_like_repeated_calls_batch10():
     """多次调用同一参数结果一致。"""
     for _ in range(5):
@@ -152,20 +148,11 @@ def test_has_backslash_ends_with_backslash_batch10():
     assert _has_backslash("foo\\") is True
 
 
-def test_has_backslash_unicode_with_backslash_batch10():
-    assert _has_backslash("中文\\路径") is True
-
-
 def test_has_backslash_returns_bool_type_batch10():
     assert isinstance(_has_backslash("foo"), bool)
 
 
 # ---------- _resolve_relative_path 行为深度第十批 ----------
-
-
-def test_resolve_relative_path_empty_raises_batch10(tmp_path):
-    with pytest.raises(ManifestError, match="为空"):
-        _resolve_relative_path("", tmp_path, "test")
 
 
 def test_resolve_relative_path_dot_path_resolves_batch10(tmp_path):
@@ -213,11 +200,6 @@ def test_resolve_relative_path_filename_with_dots_batch10(tmp_path):
 
 
 # ---------- _detect_project_root 行为深度第十批 ----------
-
-
-def test_detect_project_root_returns_path_object_batch10(tmp_path):
-    out = _detect_project_root(tmp_path)
-    assert isinstance(out, Path)
 
 
 def test_detect_project_root_no_pyproject_returns_input_batch10(tmp_path):
@@ -312,12 +294,6 @@ def test_document_entry_equality_batch10():
     d1 = _make_doc()
     d2 = _make_doc()
     assert d1 == d2
-
-
-def test_document_entry_inequality_batch10():
-    d1 = _make_doc(doc_id="d1")
-    d2 = _make_doc(doc_id="d2")
-    assert d1 != d2
 
 
 def test_document_entry_in_set_batch10():
@@ -672,12 +648,6 @@ def test_manifest_source_no_unlink_remove_batch10():
     assert ".remove(" not in source
 
 
-def test_manifest_source_no_logging_batch10():
-    source = inspect.getsource(mmod)
-    assert "logging" not in source
-    assert "logger" not in source
-
-
 def test_manifest_source_no_hardcoded_path_batch10():
     source = inspect.getsource(mmod)
     assert "C:\\\\Users" not in source
@@ -942,10 +912,6 @@ def test_module_all_attribute_value_batch10():
 
 def test_module_all_is_list_batch10():
     assert isinstance(mmod.__all__, list)
-
-
-def test_module_all_entries_unique_batch10():
-    assert len(mmod.__all__) == len(set(mmod.__all__))
 
 
 def test_module_has_dunder_file_batch10():

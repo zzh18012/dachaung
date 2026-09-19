@@ -51,18 +51,6 @@ def test_skip_tags_contains_head_title_meta_link():
     assert "link" in _SKIP_TAGS
 
 
-def test_skip_tags_count_seven():
-    assert len(_SKIP_TAGS) == 7
-
-
-def test_html_extensions_is_tuple():
-    assert isinstance(_HTML_EXTENSIONS, tuple)
-
-
-def test_heading_levels_is_dict():
-    assert isinstance(_HEADING_LEVELS, dict)
-
-
 def test_skip_tags_is_set():
     assert isinstance(_SKIP_TAGS, set)
 

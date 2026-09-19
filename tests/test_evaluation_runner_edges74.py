@@ -562,11 +562,6 @@ def test_source_contains_pipeline_import_batch48():
     assert "from app.pipeline import" in src
 
 
-def test_source_contains_image_output_dir_for_import_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "image_output_dir_for" in src
-
-
 def test_source_contains_report_version_import_batch48():
     src = inspect.getsource(runner_mod)
     assert "REPORT_VERSION" in src

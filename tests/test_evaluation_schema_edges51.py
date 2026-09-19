@@ -42,11 +42,6 @@ def test_eval_schema_error_no_args_batch31():
         EvalSchemaError()
 
 
-def test_eval_schema_error_with_empty_errors_list_batch31():
-    e = EvalSchemaError("msg", [])
-    assert e.errors == []
-
-
 def test_eval_schema_error_with_errors_batch31():
     errs = [{"path": [0], "message": "x"}]
     e = EvalSchemaError("msg", errs)
@@ -148,11 +143,6 @@ def test_load_schema_returns_dict_batch31():
 
 def test_load_schema_manifest_has_type_batch31():
     s = load_schema("manifest.schema.json")
-    assert s.get("type") == "object"
-
-
-def test_load_schema_annotation_has_type_batch31():
-    s = load_schema("annotation.schema.json")
     assert s.get("type") == "object"
 
 
@@ -439,11 +429,6 @@ def test_signature_validate_params_batch31():
 def test_signature_validate_file_params_batch31():
     sig = inspect.signature(validate_file)
     assert list(sig.parameters.keys()) == ["path", "schema_name"]
-
-
-def test_signature_load_schema_return_dict_batch31():
-    sig = inspect.signature(load_schema)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_signature_validate_return_none_batch31():

@@ -62,11 +62,6 @@ def test_eval_schema_error_errors_passed_through():
     assert err.errors is errs  # 引用相同
 
 
-def test_eval_schema_error_is_exception():
-    err = EvalSchemaError("x")
-    assert isinstance(err, Exception)
-
-
 def test_eval_schema_error_raises_in_try():
     with pytest.raises(EvalSchemaError) as ei:
         raise EvalSchemaError("msg", [{"a": 1}])
@@ -707,22 +702,6 @@ def test_eval_schema_error_namespace_is_evaluation_schema():
     assert EvalSchemaError.__module__ == "evaluation.schema"
 
 
-def test_load_schema_namespace_is_evaluation_schema():
-    assert load_schema.__module__ == "evaluation.schema"
-
-
-def test_validate_namespace_is_evaluation_schema():
-    assert validate.__module__ == "evaluation.schema"
-
-
-def test_validate_file_namespace_is_evaluation_schema():
-    assert validate_file.__module__ == "evaluation.schema"
-
-
-def test_schema_path_namespace_is_evaluation_schema():
-    assert _schema_path.__module__ == "evaluation.schema"
-
-
 def test_module_namespace_is_evaluation_schema():
     assert m.__name__ == "evaluation.schema"
 
@@ -825,11 +804,6 @@ def test_eval_schema_error_args_attribute():
 def test_eval_schema_error_errors_attribute_is_list():
     err = EvalSchemaError("x")
     assert isinstance(err.errors, list)
-
-
-def test_eval_schema_error_repr_includes_class_name():
-    err = EvalSchemaError("msg")
-    assert "EvalSchemaError" in repr(err)
 
 
 # ---------- 验证 schema 检查顺序 ----------

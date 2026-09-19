@@ -54,13 +54,6 @@ from evaluation.cli import _build_parser, _format_metric, _run_inspect_doc, main
 # =========================================================================
 
 
-def test_build_parser_returns_argument_parser():
-    import argparse
-
-    p = _build_parser()
-    assert isinstance(p, argparse.ArgumentParser)
-
-
 def test_build_parser_has_three_subcommands():
     p = _build_parser()
     # 通过 parse_args 验证 3 个子命令存在

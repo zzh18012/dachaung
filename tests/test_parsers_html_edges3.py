@@ -651,10 +651,6 @@ def test_html_extensions_includes_html():
     assert ".html" in _HTML_EXTENSIONS
 
 
-def test_html_extensions_exact_two():
-    assert len(_HTML_EXTENSIONS) == 2
-
-
 # =========================================================================
 # _HTMLDocParser SAX 深度
 # =========================================================================
@@ -979,11 +975,6 @@ def test_module_imports_parser_error():
 def test_module_imports_make_document_id():
     from app.parsers import html_parser
     assert hasattr(html_parser, "make_document_id")
-
-
-def test_html_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(HtmlParser, Parser)
 
 
 def test_html_parser_name_value():

@@ -253,11 +253,6 @@ def test_source_flat_append_order_batch52():
     assert '"schema_path": list(err.absolute_schema_path),' in src
 
 
-def test_source_init_errors_or_empty_batch52():
-    src = inspect.getsource(schema_mod)
-    assert "self.errors = errors or []" in src
-
-
 def test_source_filenotfound_prefixes_batch52():
     src = inspect.getsource(schema_mod)
     assert src.count("FileNotFoundError(") == 2

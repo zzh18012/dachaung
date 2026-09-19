@@ -170,16 +170,6 @@ def test_load_schema_modification_does_not_affect_next_batch13():
 # ---------- validate 行为深度第十三批 ----------
 
 
-def test_validate_returns_none_on_success_batch13():
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    assert validate(instance, "manifest.schema.json") is None
-
-
 def test_validate_raises_on_failure_batch13():
     with pytest.raises(EvalSchemaError):
         validate({"wrong": "shape"}, "manifest.schema.json")
@@ -506,11 +496,6 @@ def test_eval_schema_error_errors_annotation_optional_list_batch13():
 
 
 # ---------- module 合理性第十五批 ----------
-
-
-def test_module_dunder_file_exists_batch13():
-    assert hasattr(smod, "__file__")
-    assert smod.__file__ is not None
 
 
 def test_module_dunder_file_schema_py_batch13():

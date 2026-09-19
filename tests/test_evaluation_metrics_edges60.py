@@ -301,17 +301,9 @@ def test_is_valid_bbox_floats_batch34():
     assert _is_valid_bbox([0.0, 0.5, 10.2, 99.9]) is True
 
 
-def test_is_valid_bbox_too_short_batch34():
-    assert _is_valid_bbox([0, 0, 10]) is False
-
-
 def test_is_valid_bbox_bool_inside_batch34():
     """bbox 含 bool → 无效（bool 是 int 子类但显式排除）。"""
     assert _is_valid_bbox([True, 0, 0, 0]) is False
-
-
-def test_is_valid_bbox_string_batch34():
-    assert _is_valid_bbox(["0", "0", "10", "10"]) is False
 
 
 def test_is_valid_bbox_none_batch34():
@@ -560,16 +552,6 @@ def test_heading_boundary_partial_batch34():
 def test_silent_drop_no_expectations_batch34():
     out = _silent_drop_count({}, None)
     assert out["reason"] == "no_expectations"
-
-
-def test_silent_drop_empty_expectations_batch34():
-    out = _silent_drop_count({}, {})
-    assert out["reason"] == "no_expectations"
-
-
-def test_silent_drop_empty_expected_counts_batch34():
-    out = _silent_drop_count({}, {"element_count_by_type": {}})
-    assert out["reason"] == "no_expectations_element_count"
 
 
 def test_silent_drop_zero_batch34():

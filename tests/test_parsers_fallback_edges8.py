@@ -511,10 +511,6 @@ def test_save_image_overwrites_existing_file(tmp_path: Path):
 # =========================================================================
 
 
-def test_rows_to_markdown_empty_returns_empty():
-    assert _rows_to_markdown([]) == ""
-
-
 def test_rows_to_markdown_no_body_only_header():
     """单行 → header + sep（无 body）。"""
     result = _rows_to_markdown([["h1", "h2"]])
@@ -529,18 +525,6 @@ def test_rows_to_markdown_no_body_only_header():
 
 def test_fallback_parser_name_value():
     assert FallbackParser.name == "fallback"
-
-
-def test_fallback_parser_version_includes_pdfplumber():
-    assert "pdfplumber" in FallbackParser.version
-
-
-def test_fallback_parser_version_includes_docx():
-    assert "python-docx" in FallbackParser.version
-
-
-def test_fallback_parser_version_includes_pdfium():
-    assert "pypdfium2" in FallbackParser.version
 
 
 def test_fallback_parser_init_str_path(tmp_path: Path):
@@ -870,10 +854,6 @@ def test_caption_re_pattern_has_ignorecase_flag_in_pattern():
 # =========================================================================
 # _is_caption 直接行为
 # =========================================================================
-
-
-def test_is_caption_none_returns_false():
-    assert _is_caption(None) is False
 
 
 def test_is_caption_empty_string_returns_false():

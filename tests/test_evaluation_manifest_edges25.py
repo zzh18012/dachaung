@@ -72,10 +72,6 @@ def test_is_absolute_like_colon_no_slash():
     assert _is_absolute_like("C:foo") is False
 
 
-def test_is_absolute_like_just_drive_letter():
-    assert _is_absolute_like("C") is False
-
-
 def test_is_absolute_like_two_chars():
     assert _is_absolute_like("C:") is False
 
@@ -110,10 +106,6 @@ def test_has_backslash_empty():
 
 def test_has_backslash_no_backslash():
     assert _has_backslash("foo/bar") is False
-
-
-def test_has_backslash_with_backslash():
-    assert _has_backslash("foo\\\\bar") is True
 
 
 def test_has_backslash_only_backslash():
@@ -705,24 +697,12 @@ def test_detect_project_root_signature():
 # ---------- namespace 检查 ----------
 
 
-def test_load_manifest_namespace():
-    assert load_manifest.__module__ == "evaluation.manifest"
-
-
 def test_is_absolute_like_namespace():
     assert _is_absolute_like.__module__ == "evaluation.manifest"
 
 
 def test_has_backslash_namespace():
     assert _has_backslash.__module__ == "evaluation.manifest"
-
-
-def test_resolve_relative_path_namespace():
-    assert _resolve_relative_path.__module__ == "evaluation.manifest"
-
-
-def test_detect_project_root_namespace():
-    assert _detect_project_root.__module__ == "evaluation.manifest"
 
 
 def test_document_entry_namespace():

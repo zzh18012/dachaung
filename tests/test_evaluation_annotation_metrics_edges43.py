@@ -316,12 +316,6 @@ def test_module_source_forbidden_tokens_batch16(forbidden):
 # ---------- module source 字符串精确补强第二十六批 ----------
 
 
-def test_module_source_has_future_annotations_batch16():
-    src = inspect.getsource(amod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
-
-
 def test_module_source_has_counter_import_batch16():
     src = inspect.getsource(amod)
     assert "from collections import Counter" in src
@@ -452,11 +446,6 @@ def test_signature_no_varargs_batch16():
 
 
 # ---------- module 合理性第二十六批 ----------
-
-
-def test_module_has_all_attribute_batch16():
-    assert hasattr(amod, "__all__")
-    assert isinstance(amod.__all__, list)
 
 
 def test_module_all_items_callable_or_str_batch16():

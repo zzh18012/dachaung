@@ -104,10 +104,6 @@ def test_is_absolute_like_single_char_no_colon_false():
     assert _is_absolute_like("a") is False
 
 
-def test_is_absolute_like_returns_bool_type():
-    assert isinstance(_is_absolute_like("foo"), bool)
-
-
 # ---------- _has_backslash 数学边界第九批 ----------
 
 
@@ -148,11 +144,6 @@ def test_has_backslash_unicode_no_backslash_false():
 
 
 # ---------- _resolve_relative_path 行为深度第九批 ----------
-
-
-def test_resolve_relative_path_empty_raises(tmp_path):
-    with pytest.raises(ManifestError, match="为空"):
-        _resolve_relative_path("", tmp_path, "test")
 
 
 def test_resolve_relative_path_absolute_posix_raises(tmp_path):
@@ -229,11 +220,6 @@ def test_resolve_relative_path_returns_path_with_resolve(tmp_path):
 
 
 # ---------- _detect_project_root 行为深度第九批 ----------
-
-
-def test_detect_project_root_returns_path_object(tmp_path):
-    out = _detect_project_root(tmp_path)
-    assert isinstance(out, Path)
 
 
 def test_detect_project_root_finds_pyproject(tmp_path):
@@ -351,12 +337,6 @@ def test_document_entry_equality():
     d1 = _make_doc()
     d2 = _make_doc()
     assert d1 == d2
-
-
-def test_document_entry_inequality():
-    d1 = _make_doc(doc_id="d1")
-    d2 = _make_doc(doc_id="d2")
-    assert d1 != d2
 
 
 def test_document_entry_hash():
@@ -1020,11 +1000,6 @@ def test_signature_has_backslash_return_bool():
 def test_signature_resolve_relative_path_3_params():
     sig = inspect.signature(_resolve_relative_path)
     assert len(sig.parameters) == 3
-
-
-def test_signature_resolve_relative_path_param_names():
-    sig = inspect.signature(_resolve_relative_path)
-    assert list(sig.parameters) == ["path_str", "project_root", "field_name"]
 
 
 def test_signature_resolve_relative_path_no_defaults():

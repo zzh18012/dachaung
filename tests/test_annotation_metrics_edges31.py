@@ -631,11 +631,6 @@ def test_module_source_no_relative_import():
         assert not line.strip().startswith("from .")
 
 
-def test_module_source_no_star_import():
-    src = inspect.getsource(amod)
-    assert "import *" not in src
-
-
 def test_module_source_no_main_block():
     src = inspect.getsource(amod)
     assert "__main__" not in src

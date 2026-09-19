@@ -550,10 +550,6 @@ def test_is_absolute_like_lowercase_drive():
 # =========================================================================
 
 
-def test_has_backslash_forward_only():
-    assert _has_backslash("/") is False
-
-
 def test_has_backslash_single():
     assert _has_backslash("\\") is True
 

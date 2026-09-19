@@ -427,16 +427,6 @@ def test_module_source_contains_chunk_boundary_prf_batch27():
     assert "chunk_boundary_prf" in src
 
 
-def test_module_source_contains_build_provenance_batch27():
-    src = inspect.getsource(rmod)
-    assert "build_provenance" in src
-
-
-def test_module_source_contains_aggregate_summary_batch27():
-    src = inspect.getsource(rmod)
-    assert "aggregate_summary" in src
-
-
 # ---------- signatures 第四十一批 ----------
 
 

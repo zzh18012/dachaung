@@ -63,11 +63,6 @@ def test_null_reason_preserved_batch12():
     assert out["reason"] == "my reason"
 
 
-def test_null_with_unicode_reason_batch12():
-    out = _null("中文原因")
-    assert out["reason"] == "中文原因"
-
-
 def test_null_fresh_dict_each_call_batch12():
     out1 = _null("x")
     out2 = _null("x")
@@ -102,11 +97,6 @@ def test_ratio_with_large_value_batch12():
     assert out["value"] == 2.5
 
 
-def test_bool_metric_truthy_int_batch12():
-    out = _bool_metric(1)
-    assert out["value"] is True
-
-
 def test_bool_metric_falsy_int_batch12():
     out = _bool_metric(0)
     assert out["value"] is False
@@ -116,11 +106,6 @@ def test_bool_metric_truthy_string_batch12():
     """非空字符串 truthy → True。"""
     out = _bool_metric("hello")
     assert out["value"] is True
-
-
-def test_bool_metric_falsy_string_batch12():
-    out = _bool_metric("")
-    assert out["value"] is False
 
 
 def test_bool_metric_returns_python_bool_batch12():
@@ -390,14 +375,6 @@ def test_docx_locator_ratio_with_paragraph_index_batch12():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_ratio_with_section_batch12():
-    elements = [
-        {"type": "paragraph", "source_locator": {"section": 0}},
-    ]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_no_structural_keys_batch12():
     elements = [
         {"type": "paragraph", "source_locator": {"unknown_key": "v"}},
@@ -442,10 +419,6 @@ def test_is_valid_bbox_with_bool_true_batch12():
     assert _is_valid_bbox([True, 0, 10, 10]) is False
 
 
-def test_is_valid_bbox_with_string_value_batch12():
-    assert _is_valid_bbox(["0", "0", "10", "10"]) is False
-
-
 def test_is_valid_bbox_zero_values_batch12():
     """0 是合法值。"""
     assert _is_valid_bbox([0, 0, 0, 0]) is True
@@ -454,10 +427,6 @@ def test_is_valid_bbox_zero_values_batch12():
 def test_is_valid_bbox_negative_values_batch12():
     """负数也合法（坐标系可能允许）。"""
     assert _is_valid_bbox([-10, -10, 10, 10]) is True
-
-
-def test_is_valid_bbox_3_elements_batch12():
-    assert _is_valid_bbox([0, 0, 10]) is False
 
 
 def test_is_valid_bbox_empty_list_batch12():
@@ -689,16 +658,6 @@ def test_metrics_source_no_forbidden_token_sixteenth_batch12(token):
     assert token not in source
 
 
-def test_metrics_source_no_top_level_lambda_batch12():
-    source = inspect.getsource(mmod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
-
-
 def test_metrics_source_no_class_definition_batch12():
     source = inspect.getsource(mmod)
     assert "\nclass " not in source
@@ -734,11 +693,6 @@ def test_module_source_has_future_annotations_batch12():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_imports_math_batch12():
-    source = inspect.getsource(mmod)
-    assert "import math" in source
-
-
 def test_module_source_imports_counter_batch12():
     source = inspect.getsource(mmod)
     assert "from collections import Counter" in source
@@ -754,39 +708,9 @@ def test_module_source_imports_typing_any_batch12():
     assert "from typing import Any" in source
 
 
-def test_module_source_has_not_evaluated_constant_batch12():
-    source = inspect.getsource(mmod)
-    assert '_NOT_EVALUATED = "not_evaluated"' in source
-
-
 def test_module_source_has_compute_automatic_metrics_function_batch12():
     source = inspect.getsource(mmod)
     assert "def compute_automatic_metrics(" in source
-
-
-def test_module_source_has_null_helper_batch12():
-    source = inspect.getsource(mmod)
-    assert "def _null(" in source
-
-
-def test_module_source_has_ratio_helper_batch12():
-    source = inspect.getsource(mmod)
-    assert "def _ratio(" in source
-
-
-def test_module_source_has_bool_metric_helper_batch12():
-    source = inspect.getsource(mmod)
-    assert "def _bool_metric(" in source
-
-
-def test_module_source_has_int_metric_helper_batch12():
-    source = inspect.getsource(mmod)
-    assert "def _int_metric(" in source
-
-
-def test_module_source_has_strip_unicode_whitespace_function_batch12():
-    source = inspect.getsource(mmod)
-    assert "def _strip_unicode_whitespace(" in source
 
 
 def test_module_source_docstring_present_batch12():
@@ -810,12 +734,6 @@ def test_module_source_no_print_batch12():
     assert "print(" not in source
 
 
-def test_module_source_no_logging_batch12():
-    source = inspect.getsource(mmod)
-    assert "logging" not in source
-    assert "logger" not in source
-
-
 # ---------- signatures 第十三批 ----------
 
 
@@ -824,12 +742,6 @@ def test_signature_null_return_dict_batch12():
     annot = sig.return_annotation
     annot_str = annot if isinstance(annot, str) else str(annot)
     assert "dict" in annot_str
-
-
-def test_signature_compute_metrics_image_base_dir_default_none_batch12():
-    sig = inspect.signature(compute_automatic_metrics)
-    p = sig.parameters["image_base_dir"]
-    assert p.default is None
 
 
 def test_signature_compute_metrics_image_base_dir_optional_path_batch12():

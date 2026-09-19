@@ -45,10 +45,6 @@ from evaluation.manifest import (
 
 # ---------- _is_absolute_like 更深 ----------
 
-def test_is_absolute_like_single_char_batch52():
-    assert _is_absolute_like("C") is False
-
-
 def test_is_absolute_like_two_chars_batch52():
     assert _is_absolute_like("C:") is False  # len < 3
 

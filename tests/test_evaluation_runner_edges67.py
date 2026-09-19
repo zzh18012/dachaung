@@ -929,11 +929,6 @@ def test_module_source_contains_matches_field_batch42():
     assert '"matches"' in src
 
 
-def test_module_source_contains_ensure_ascii_false_batch42():
-    src = inspect.getsource(rmod)
-    assert "ensure_ascii=False" in src
-
-
 def test_module_source_contains_per_doc_subdir_batch42():
     src = inspect.getsource(rmod)
     assert "_per_doc" in src

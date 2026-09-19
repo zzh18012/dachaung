@@ -523,21 +523,6 @@ def test_module_source_contains_not_instrumented_batch45():
     assert "not_instrumented" in src
 
 
-def test_module_source_contains_process_single_import_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "from app.pipeline import image_output_dir_for, process_single" in src
-
-
-def test_module_source_contains_metrics_import_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation.metrics import compute_automatic_metrics" in src
-
-
-def test_module_source_contains_perf_counter_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "time.perf_counter" in src
-
-
 def test_module_source_contains_json_dump_batch45():
     src = inspect.getsource(runner_mod)
     assert "json.dump" in src
@@ -580,12 +565,6 @@ def test_all_callable_batch45():
 
 
 # ---------- AST 结构 ----------
-
-def test_ast_top_level_no_class_batch45():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
 
 def test_ast_top_level_function_count_batch45():
     tree = ast.parse(inspect.getsource(runner_mod))
@@ -712,49 +691,9 @@ def test_ast_run_evaluation_has_perf_counter_batch45():
 
 # ---------- forbidden tokens 第一百零一批 ----------
 
-def test_source_no_eval_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "os.system(" not in src
-
-
 def test_source_no_popen_batch45():
     src = inspect.getsource(runner_mod)
     assert ".popen(" not in src
-
-
-def test_source_no_yaml_load_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch45():
-    src = inspect.getsource(runner_mod)
-    assert "pickle.load(" not in src
 
 
 def test_source_no_subprocess_batch45():

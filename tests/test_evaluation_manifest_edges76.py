@@ -121,10 +121,6 @@ def test_has_backslash_at_end_batch51():
     assert _has_backslash("foo\\") is True
 
 
-def test_has_backslash_multiple_batch51():
-    assert _has_backslash("a\\b\\c\\d") is True
-
-
 def test_has_backslash_empty_string_batch51():
     assert _has_backslash("") is False
 
@@ -573,12 +569,6 @@ def test_source_contains_frozenset_call_batch51():
 
 
 # ---------- AST 结构补强 ----------
-
-def test_ast_has_5_top_level_functions_batch51():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 5
-
 
 def test_ast_has_4_class_def_batch51():
     tree = ast.parse(inspect.getsource(manifest_mod))

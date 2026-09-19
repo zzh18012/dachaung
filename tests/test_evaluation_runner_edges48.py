@@ -684,16 +684,6 @@ def test_module_source_has_report_import_batch20():
     assert "from evaluation.report import (" in src
 
 
-def test_module_source_has_aggregate_summary_in_import_batch20():
-    src = inspect.getsource(rmod)
-    assert "aggregate_summary" in src
-
-
-def test_module_source_has_build_provenance_in_import_batch20():
-    src = inspect.getsource(rmod)
-    assert "build_provenance" in src
-
-
 def test_module_source_has_perf_counter_call_batch20():
     src = inspect.getsource(rmod)
     assert "time.perf_counter" in src
@@ -705,13 +695,6 @@ def test_module_source_has_ensure_ascii_false_batch20():
 
 
 # ---------- signatures 第三十二批 ----------
-
-
-def test_signature_load_annotation_batch20():
-    sig = inspect.signature(_load_annotation)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path"
 
 
 def test_signature_run_evaluation_keyword_only_batch20():
@@ -748,12 +731,6 @@ def test_module_does_not_import_evaluation_cli_batch20():
     src = inspect.getsource(rmod)
     assert "from evaluation.cli" not in src
     assert "from evaluation import cli" not in src
-
-
-def test_module_does_not_import_evaluation_schema_batch20():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.schema" not in src
-    assert "from evaluation import schema" not in src
 
 
 def test_module_does_not_import_app_chunkers_batch20():

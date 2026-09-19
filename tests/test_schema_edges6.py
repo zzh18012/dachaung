@@ -47,10 +47,6 @@ def test_schema_path_resolved():
     assert SCHEMA_PATH == SCHEMA_PATH.resolve()
 
 
-def test_schema_path_filename():
-    assert SCHEMA_PATH.name == "document.schema.json"
-
-
 # =========================================================================
 # SchemaValidationError 深度
 # =========================================================================

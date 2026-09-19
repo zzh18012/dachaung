@@ -947,13 +947,6 @@ def test_has_backslash_no_varargs_varkw():
 # =========================================================================
 
 
-def test_detect_project_root_signature_1_param():
-    sig = inspect.signature(_detect_project_root)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "start"
-
-
 def test_detect_project_root_no_varargs_varkw():
     sig = inspect.signature(_detect_project_root)
     for p in sig.parameters.values():

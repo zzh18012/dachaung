@@ -809,16 +809,6 @@ def test_runner_source_no_check_call_batch12():
     assert "subprocess.check_call" not in source
 
 
-def test_runner_source_no_top_level_lambda_batch12():
-    source = inspect.getsource(rmod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
-
-
 # ---------- module source 字符串精确补强第十二批 ----------
 
 
@@ -872,11 +862,6 @@ def test_module_source_has_perf_counter_call_batch12():
     assert "time.perf_counter" in source
     # 至少 2 次（开始 + 结束）
     assert source.count("time.perf_counter") >= 2
-
-
-def test_module_source_has_json_dump_batch12():
-    source = inspect.getsource(rmod)
-    assert "json.dump(" in source
 
 
 def test_module_source_has_json_load_batch12():

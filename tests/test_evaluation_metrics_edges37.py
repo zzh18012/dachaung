@@ -340,12 +340,6 @@ def test_docx_locator_partial_valid_batch10():
 # ---------- image_resource_ratio 行为深度第十批 ----------
 
 
-def test_image_resource_no_images_returns_no_image_elements_batch10():
-    elements = [{"type": "paragraph"}]
-    out = _image_resource_ratio(elements, None)
-    assert out["reason"] == "no_image_elements"
-
-
 def test_image_resource_image_no_resource_path_batch10():
     elements = [{"type": "image"}]
     out = _image_resource_ratio(elements, None)
@@ -491,15 +485,6 @@ def test_text_preservation_empty_both_batch10():
     assert out["recall"]["reason"] == "empty_expected_and_actual"
 
 
-def test_text_preservation_perfect_match_batch10():
-    elements = [{"type": "paragraph", "content": "hello"}]
-    chunks = [{"text": "hello"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
-
-
 def test_text_preservation_image_excluded_batch10():
     """image element 不参与文本对比。"""
     elements = [
@@ -600,13 +585,6 @@ def test_heading_boundary_partial_match_batch10():
     assert out["value"] == 0.5
 
 
-def test_heading_boundary_chunk_no_source_element_ids_batch10():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 0.0
-
-
 def test_heading_boundary_chunk_empty_source_element_ids_batch10():
     elements = [{"type": "heading", "element_id": "h1"}]
     chunks = [{"source_element_ids": []}]
@@ -643,11 +621,6 @@ def test_silent_drop_no_expectations_dict_batch10():
     assert out["reason"] == "no_expectations"
 
 
-def test_silent_drop_empty_element_count_by_type_batch10():
-    out = _silent_drop_count({}, {"element_count_by_type": {}})
-    assert out["reason"] == "no_expectations_element_count"
-
-
 def test_silent_drop_no_drop_batch10():
     by_type = {"paragraph": 5, "heading": 2}
     expectations = {"element_count_by_type": {"paragraph": 5, "heading": 2}}
@@ -682,10 +655,6 @@ def test_silent_drop_mixed_types_batch10():
 
 def test_is_valid_bbox_valid_4_ints_batch10():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
-
-
-def test_is_valid_bbox_valid_4_floats_batch10():
-    assert _is_valid_bbox([0.0, 0.0, 100.5, 100.5]) is True
 
 
 def test_is_valid_bbox_negative_values_batch10():
@@ -757,10 +726,6 @@ def test_strip_unicode_whitespace_nbsp_batch10():
 def test_strip_unicode_whitespace_em_space_batch10():
     """em space（U+2003）→ 删除。"""
     assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_en_space_batch10():
-    assert _strip_unicode_whitespace("a b") == "ab"
 
 
 def test_strip_unicode_whitespace_ideographic_space_batch10():
@@ -847,23 +812,12 @@ def test_metrics_source_no_walrus_batch10():
     assert ":=" not in source
 
 
-def test_metrics_source_no_logging_batch10():
-    source = inspect.getsource(mmod)
-    assert "logging" not in source
-    assert "logger" not in source
-
-
 # ---------- module source 字符串精确补强第九批 ----------
 
 
 def test_module_source_has_future_annotations_batch10():
     source = inspect.getsource(mmod)
     assert "from __future__ import annotations" in source
-
-
-def test_module_source_imports_math_batch10():
-    source = inspect.getsource(mmod)
-    assert "import math" in source
 
 
 def test_module_source_imports_counter_batch10():
@@ -889,11 +843,6 @@ def test_module_source_has_text_types_constant_batch10():
 def test_module_source_has_pdf_bbox_required_types_batch10():
     source = inspect.getsource(mmod)
     assert '_PDF_BBOX_REQUIRED_TYPES = ("heading", "paragraph", "caption", "list_item")' in source
-
-
-def test_module_source_has_not_evaluated_constant_batch10():
-    source = inspect.getsource(mmod)
-    assert '_NOT_EVALUATED = "not_evaluated"' in source
 
 
 def test_module_source_has_null_def_batch10():
@@ -939,11 +888,6 @@ def test_module_source_has_image_resource_def_batch10():
 def test_module_source_has_chunk_reference_def_batch10():
     source = inspect.getsource(mmod)
     assert "def _chunk_reference_ratio(" in source
-
-
-def test_module_source_has_strip_unicode_whitespace_def_batch10():
-    source = inspect.getsource(mmod)
-    assert "def _strip_unicode_whitespace(" in source
 
 
 def test_module_source_has_text_preservation_def_batch10():
@@ -1049,12 +993,6 @@ def test_signature_compute_metrics_param_kinds_batch10():
     params = list(sig.parameters.values())
     # 前 4 个 POSITIONAL_OR_KEYWORD，最后 1 个也 POSITIONAL_OR_KEYWORD
     assert all(p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD for p in params)
-
-
-def test_signature_compute_metrics_image_base_dir_default_none_batch10():
-    sig = inspect.signature(compute_automatic_metrics)
-    p = sig.parameters["image_base_dir"]
-    assert p.default is None
 
 
 def test_signature_compute_metrics_return_annotation_batch10():

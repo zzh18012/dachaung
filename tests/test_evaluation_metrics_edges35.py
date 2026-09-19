@@ -917,10 +917,6 @@ def test_strip_unicode_whitespace_no_whitespace():
     assert _strip_unicode_whitespace("abc") == "abc"
 
 
-def test_strip_unicode_whitespace_all_whitespace():
-    assert _strip_unicode_whitespace("   \t\n") == ""
-
-
 def test_strip_unicode_whitespace_internal_whitespace():
     assert _strip_unicode_whitespace("a b c") == "abc"
 
@@ -1074,16 +1070,6 @@ def test_module_source_imports_any():
     assert "from typing import Any" in src
 
 
-def test_module_source_has_text_types_constant():
-    src = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ("heading", "paragraph", "list_item", "table", "caption", "header", "footer")' in src
-
-
-def test_module_source_has_pdf_bbox_required_types():
-    src = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ("heading", "paragraph", "caption", "list_item")' in src
-
-
 def test_module_source_has_not_evaluated_constant():
     src = inspect.getsource(mmod)
     assert '_NOT_EVALUATED = "not_evaluated"' in src
@@ -1222,11 +1208,6 @@ def test_signature_docx_locator_1_param():
     assert len(sig.parameters) == 1
 
 
-def test_signature_image_resource_2_params():
-    sig = inspect.signature(_image_resource_ratio)
-    assert len(sig.parameters) == 2
-
-
 def test_signature_chunk_reference_2_params():
     sig = inspect.signature(_chunk_reference_ratio)
     assert len(sig.parameters) == 2
@@ -1288,15 +1269,6 @@ def test_module_all_exact_1_item():
 
 def test_module_all_is_list():
     assert isinstance(mmod.__all__, list)
-
-
-def test_module_all_entries_unique():
-    assert len(set(mmod.__all__)) == len(mmod.__all__)
-
-
-def test_module_all_entries_are_str():
-    for entry in mmod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_text_types_exact_entries():

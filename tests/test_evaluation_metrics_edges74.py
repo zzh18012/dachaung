@@ -547,34 +547,14 @@ def test_source_not_evaluated_constant_batch49():
     assert _NOT_EVALUATED == "not_evaluated"
 
 
-def test_source_contains_math_import_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert "import math" in src
-
-
 def test_source_contains_counter_import_batch49():
     src = inspect.getsource(metrics_mod)
     assert "from collections import Counter" in src
 
 
-def test_source_contains_path_import_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_source_contains_typing_any_import_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert "from typing import Any" in src
-
-
 def test_source_contains_future_annotations_batch49():
     src = inspect.getsource(metrics_mod)
     assert "from __future__ import annotations" in src
-
-
-def test_source_docstring_mentions_v1_1_batch49():
-    src = inspect.getsource(metrics_mod)
-    assert "v1.1" in src
 
 
 def test_source_contains_math_isfinite_batch49():
@@ -600,12 +580,6 @@ def test_ast_has_13_top_level_functions_batch49():
     tree = ast.parse(inspect.getsource(metrics_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 14
-
-
-def test_ast_module_has_docstring_batch49():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_module_has_5_imports_batch49():

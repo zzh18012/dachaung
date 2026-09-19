@@ -746,12 +746,6 @@ def test_build_parser_signature_no_params():
     assert len(sig.parameters) == 0
 
 
-def test_main_no_varargs_varkw():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
 # =========================================================================
 # module source level 完整 - main 深度
 # =========================================================================
@@ -776,11 +770,6 @@ def test_main_source_has_2_is_file_calls():
 def test_main_source_has_print_to_stderr():
     src = inspect.getsource(main)
     assert "file=sys.stderr" in src
-
-
-def test_main_source_has_validate_file_for_run():
-    src = inspect.getsource(main)
-    assert 'validate_file(output_path, "evaluation-report.schema.json")' in src
 
 
 def test_main_source_has_run_evaluation_kwargs():
@@ -828,21 +817,6 @@ def test_build_parser_source_has_help_strings():
 # =========================================================================
 # module source level - _format_metric 深度
 # =========================================================================
-
-
-def test_format_metric_source_has_isinstance_bool():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, bool)" in src
-
-
-def test_format_metric_source_has_isinstance_float():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, float)" in src
-
-
-def test_format_metric_source_has_isinstance_dict():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, dict)" in src
 
 
 def test_format_metric_source_has_value_none_branch():

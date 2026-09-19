@@ -46,12 +46,6 @@ def test_build_parser_description_present_batch14():
     assert "评测 CLI" in p.description
 
 
-def test_build_parser_subparser_dest_command_batch14():
-    p = _build_parser()
-    sub_actions = [a for a in p._actions if isinstance(a, argparse._SubParsersAction)]
-    assert sub_actions[0].dest == "command"
-
-
 def test_build_parser_subcommands_count_3_batch14():
     """3 个子命令：run, validate-report, inspect-doc。"""
     p = _build_parser()
@@ -534,11 +528,6 @@ def test_format_metric_metric_annotation_dict_batch14():
 
 
 # ---------- module 合理性第十七批 ----------
-
-
-def test_module_dunder_file_exists_batch14():
-    assert hasattr(climod, "__file__")
-    assert climod.__file__ is not None
 
 
 def test_module_dunder_file_cli_py_batch14():

@@ -652,14 +652,6 @@ def test_module_has_build_parser_callable_batch36():
     assert callable(cmod._build_parser)
 
 
-def test_module_has_format_metric_callable_batch36():
-    assert callable(cmod._format_metric)
-
-
-def test_module_has_run_inspect_doc_callable_batch36():
-    assert callable(cmod._run_inspect_doc)
-
-
 # ---------- 端到端集成第四十九批
 
 

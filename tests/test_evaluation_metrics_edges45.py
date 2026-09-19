@@ -419,10 +419,6 @@ def test_is_valid_bbox_none_batch18():
     assert _is_valid_bbox(None) is False
 
 
-def test_is_valid_bbox_str_batch18():
-    assert _is_valid_bbox("1234") is False
-
-
 def test_is_valid_bbox_with_str_element_batch18():
     assert _is_valid_bbox([1, 2, "3", 4]) is False
 
@@ -751,12 +747,6 @@ def test_module_source_no_subprocess_batch18():
     assert "import subprocess" not in src
 
 
-def test_module_source_no_network_batch18():
-    src = inspect.getsource(mmod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
-
-
 # ---------- module source 字符串精确补强第二十八批 ----------
 
 
@@ -871,11 +861,6 @@ def test_module_compute_metrics_callable_batch18():
 def test_module_does_not_import_evaluation_cli_batch18():
     src = inspect.getsource(mmod)
     assert "from evaluation.cli" not in src
-
-
-def test_module_no_main_block_batch18():
-    src = inspect.getsource(mmod)
-    assert "if __name__" not in src
 
 
 # ---------- 端到端集成第二十八批 ----------

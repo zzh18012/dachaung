@@ -256,11 +256,6 @@ def test_resolve_relative_path_backslash_batch11(tmp_path):
         _resolve_relative_path("a\\b.pdf", tmp_path, "test")
 
 
-def test_resolve_relative_path_empty_batch11(tmp_path):
-    with pytest.raises(ManifestError, match="为空"):
-        _resolve_relative_path("", tmp_path, "test")
-
-
 # ---------- _detect_project_root 行为深度第十一批 ----------
 
 
@@ -327,12 +322,6 @@ def test_document_entry_equality_batch11():
     assert d1 == d2
 
 
-def test_document_entry_inequality_batch11():
-    d1 = _make_doc(doc_id="d1")
-    d2 = _make_doc(doc_id="d2")
-    assert d1 != d2
-
-
 def test_document_entry_repr_batch11():
     d = _make_doc(doc_id="abc")
     assert "DocumentEntry" in repr(d)
@@ -361,17 +350,6 @@ def test_expected_failure_frozen_batch11():
 
 def test_manifest_field_count_batch11():
     assert len(fields(Manifest)) == 5
-
-
-def test_manifest_field_names_batch11():
-    names = [f.name for f in fields(Manifest)]
-    assert names == [
-        "manifest_version",
-        "devset_status",
-        "documents",
-        "expected_failures",
-        "project_root",
-    ]
 
 
 def test_manifest_is_dataclass_batch11():
@@ -713,16 +691,6 @@ def test_manifest_source_no_walrus_batch11():
     assert ":=" not in source
 
 
-def test_manifest_source_no_top_level_lambda_batch11():
-    source = inspect.getsource(mmod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
-
-
 def test_manifest_source_no_print_batch11():
     source = inspect.getsource(mmod)
     assert "print(" not in source
@@ -792,40 +760,15 @@ def test_module_source_imports_validate_batch11():
     assert "from evaluation.schema" in source
 
 
-def test_module_source_has_manifest_error_class_batch11():
-    source = inspect.getsource(mmod)
-    assert "class ManifestError" in source
-
-
 def test_module_source_has_document_entry_class_batch11():
     source = inspect.getsource(mmod)
     assert "class DocumentEntry" in source
     assert "@dataclass(frozen=True)" in source
 
 
-def test_module_source_has_expected_failure_class_batch11():
-    source = inspect.getsource(mmod)
-    assert "class ExpectedFailure" in source
-
-
-def test_module_source_has_manifest_class_batch11():
-    source = inspect.getsource(mmod)
-    assert "class Manifest" in source
-
-
-def test_module_source_has_is_absolute_like_def_batch11():
-    source = inspect.getsource(mmod)
-    assert "def _is_absolute_like(" in source
-
-
 def test_module_source_has_resolve_relative_path_def_batch11():
     source = inspect.getsource(mmod)
     assert "def _resolve_relative_path(" in source
-
-
-def test_module_source_has_load_manifest_def_batch11():
-    source = inspect.getsource(mmod)
-    assert "def load_manifest(" in source
 
 
 def test_module_source_has_detect_project_root_def_batch11():
@@ -861,11 +804,6 @@ def test_signature_resolve_relative_path_3_params_batch11():
     assert len(sig.parameters) == 3
 
 
-def test_signature_resolve_relative_path_param_names_batch11():
-    sig = inspect.signature(_resolve_relative_path)
-    assert list(sig.parameters) == ["path_str", "project_root", "field_name"]
-
-
 def test_signature_load_manifest_2_params_batch11():
     sig = inspect.signature(load_manifest)
     assert len(sig.parameters) == 2
@@ -886,11 +824,6 @@ def test_signature_detect_project_root_1_param_batch11():
     assert len(sig.parameters) == 1
 
 
-def test_signature_detect_project_root_param_name_batch11():
-    sig = inspect.signature(_detect_project_root)
-    assert list(sig.parameters) == ["start"]
-
-
 def test_signature_manifest_error_subclass_of_exception_batch11():
     assert issubclass(ManifestError, Exception)
 
@@ -900,10 +833,6 @@ def test_signature_manifest_error_subclass_of_exception_batch11():
 
 def test_module_all_is_list_batch11():
     assert isinstance(mmod.__all__, list)
-
-
-def test_module_all_entries_unique_batch11():
-    assert len(mmod.__all__) == len(set(mmod.__all__))
 
 
 def test_module_all_entries_str_batch11():

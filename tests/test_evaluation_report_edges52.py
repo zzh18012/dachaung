@@ -280,11 +280,6 @@ def test_build_provenance_dependencies_dict_batch33(tmp_path):
     assert isinstance(out["dependencies"], dict)
 
 
-def test_build_provenance_dependencies_keys_batch33(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert set(out["dependencies"].keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
-
-
 def test_build_provenance_git_commit_value_batch33(tmp_path):
     with patch("evaluation.report.get_git_provenance") as mock_git:
         mock_git.return_value = {"git_commit": "abc123", "git_dirty": False}
@@ -622,14 +617,6 @@ def test_module_imports_typing_any_batch33():
 def test_module_imports_evaluator_version_batch33():
     src = inspect.getsource(rmod)
     assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in src
-
-
-def test_module_has_aggregate_summary_func_batch33():
-    assert callable(rmod.aggregate_summary)
-
-
-def test_module_has_get_git_provenance_func_batch33():
-    assert callable(rmod.get_git_provenance)
 
 
 def test_module_all_count_5_batch33():

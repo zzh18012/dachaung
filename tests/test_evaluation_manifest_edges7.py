@@ -570,10 +570,6 @@ def test_manifest_error_not_value_error():
     assert not issubclass(ManifestError, ValueError)
 
 
-def test_manifest_error_has_docstring():
-    assert ManifestError.__doc__ is not None
-
-
 def test_manifest_error_can_be_raised_and_caught():
     with pytest.raises(ManifestError):
         raise ManifestError("x")

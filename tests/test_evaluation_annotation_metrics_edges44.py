@@ -437,12 +437,6 @@ def test_module_source_no_network_batch17():
 # ---------- module source 字符串精确补强第三十批 ----------
 
 
-def test_module_source_has_future_annotations_batch17():
-    src = inspect.getsource(amod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
-
-
 def test_module_source_has_docstring_batch17():
     src = inspect.getsource(amod)
     assert "人工标注指标" in src
@@ -541,11 +535,6 @@ def test_signature_chunk_boundary_prf_tolerance_default_30_batch17():
 
 
 # ---------- module 合理性第三十批 ----------
-
-
-def test_module_has_all_attribute_batch17():
-    assert hasattr(amod, "__all__")
-    assert isinstance(amod.__all__, list)
 
 
 def test_module_all_count_3_batch17():

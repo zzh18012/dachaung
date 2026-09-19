@@ -336,16 +336,6 @@ def test_module_source_contains_annotation_metrics_import_batch44():
     assert "from evaluation.annotation_metrics import" in src
 
 
-def test_module_source_contains_image_output_dir_for_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "image_output_dir_for" in src
-
-
-def test_module_source_contains_perf_counter_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "time.perf_counter" in src
-
-
 # ---------- __all__ ----------
 
 def test_all_no_duplicates_batch44():
@@ -353,12 +343,6 @@ def test_all_no_duplicates_batch44():
 
 
 # ---------- AST 结构 ----------
-
-def test_ast_top_level_no_class_batch44():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
 
 def test_ast_top_level_function_count_batch44():
     tree = ast.parse(inspect.getsource(runner_mod))
@@ -399,46 +383,6 @@ def test_ast_load_annotation_has_try_in_body_batch44():
 
 
 # ---------- forbidden tokens 第九十三批 ----------
-
-def test_source_no_eval_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch44():
-    src = inspect.getsource(runner_mod)
-    assert "pickle.load(" not in src
-
 
 def test_source_no_open_w_mode_at_module_top_batch44():
     """run_evaluation 内部需要 open('w') 写报告 JSON，但模块顶层不应直接 open。"""

@@ -432,12 +432,6 @@ def test_ast_module_top_level_import_count_batch48():
     assert len(imports) == 9
 
 
-def test_ast_module_docstring_batch48():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
-
-
 def test_ast_main_uses_try_except_batch48():
     """main 用 try/except 处理错误。"""
     tree = ast.parse(inspect.getsource(cli_mod))

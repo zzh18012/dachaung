@@ -33,10 +33,6 @@ from app.parsers.text_parser import (
 # =========================================================================
 
 
-def test_text_extensions_constant_value():
-    assert _TEXT_EXTENSIONS == (".txt", ".text")
-
-
 def test_text_extensions_is_tuple():
     assert isinstance(_TEXT_EXTENSIONS, tuple)
 
@@ -120,10 +116,6 @@ def test_split_paragraphs_leading_blank_lines():
 def test_split_paragraphs_trailing_blank_lines():
     text = "hello\n\n\n"
     assert _split_paragraphs(text) == [(1, "hello")]
-
-
-def test_split_paragraphs_only_blank_lines():
-    assert _split_paragraphs("\n\n\n") == []
 
 
 def test_split_paragraphs_whitespace_only_lines_skipped():

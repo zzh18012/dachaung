@@ -479,21 +479,6 @@ def test_module_source_subprocess_allowed_batch28():
 # ---------- module source 字符串精确补强第四十一批 ----------
 
 
-def test_module_source_contains_ratio_metrics_batch28():
-    src = inspect.getsource(rmod)
-    assert "_RATIO_METRICS" in src
-
-
-def test_module_source_contains_count_metrics_batch28():
-    src = inspect.getsource(rmod)
-    assert "_COUNT_METRICS" in src
-
-
-def test_module_source_contains_success_bool_metrics_batch28():
-    src = inspect.getsource(rmod)
-    assert "_SUCCESS_BOOL_METRICS" in src
-
-
 def test_module_source_contains_build_provenance_batch28():
     src = inspect.getsource(rmod)
     assert "def build_provenance" in src
@@ -542,12 +527,6 @@ def test_module_source_contains_datetime_batch28():
 # ---------- signatures 第四十一批 ----------
 
 
-def test_signature_get_git_provenance_batch28():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters.keys())
-    assert params == ["project_root"]
-
-
 def test_signature_build_provenance_batch28():
     sig = inspect.signature(build_provenance)
     params = list(sig.parameters.keys())
@@ -558,12 +537,6 @@ def test_signature_aggregate_summary_batch28():
     sig = inspect.signature(aggregate_summary)
     params = list(sig.parameters.keys())
     assert params == ["per_doc_results"]
-
-
-def test_signature_build_devset_section_batch28():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters.keys())
-    assert params == ["manifest"]
 
 
 def test_signature_build_provenance_no_default_batch28():

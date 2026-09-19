@@ -89,14 +89,6 @@ def _minimal_doc() -> dict:
 # =========================================================================
 
 
-def test_schema_path_is_path_object():
-    assert isinstance(SCHEMA_PATH, Path)
-
-
-def test_schema_path_name_is_document_schema():
-    assert SCHEMA_PATH.name == "document.schema.json"
-
-
 def test_schema_path_parent_parent_has_pyproject():
     """SCHEMA_PATH/../.. 应是项目根。"""
     assert (SCHEMA_PATH.parent.parent / "pyproject.toml").is_file()

@@ -475,10 +475,6 @@ def test_is_valid_bbox_very_large_batch23():
     assert _is_valid_bbox([10**10, 10**10, 10**10, 10**10]) is True
 
 
-def test_is_valid_bbox_mixed_int_float_batch23():
-    assert _is_valid_bbox([0, 0.5, 1, 1.5]) is True
-
-
 def test_is_valid_bbox_list_with_none_batch23():
     assert _is_valid_bbox([None, 0, 0, 0]) is False
 
@@ -492,12 +488,6 @@ def test_is_valid_bbox_returns_bool_batch23():
 
 
 # ---------- _image_resource_ratio 第二十三批 ----------
-
-
-def test_image_resource_ratio_no_image_elements_batch23():
-    elements = [{"type": "paragraph"}]
-    out = _image_resource_ratio(elements, None)
-    assert out["reason"] == "no_image_elements"
 
 
 def test_image_resource_ratio_empty_resource_path_batch23():
@@ -794,11 +784,6 @@ def test_silent_drop_count_no_expectations_batch23():
     assert out["reason"] == "no_expectations"
 
 
-def test_silent_drop_count_empty_expectations_batch23():
-    out = _silent_drop_count({}, {})
-    assert out["reason"] == "no_expectations"
-
-
 def test_silent_drop_count_perfect_match_batch23():
     by_type = {"paragraph": 3}
     exp = {"element_count_by_type": {"paragraph": 3}}
@@ -1027,12 +1012,6 @@ def test_module_source_has_all_list_batch23():
 # ---------- signatures 第三十四批 ----------
 
 
-def test_signature_compute_automatic_metrics_image_base_dir_default_none_batch23():
-    sig = inspect.signature(compute_automatic_metrics)
-    p = sig.parameters["image_base_dir"]
-    assert p.default is None
-
-
 # ---------- module 合理性第三十四批 ----------
 
 
@@ -1062,11 +1041,6 @@ def test_module_does_not_import_evaluation_cli_batch23():
 def test_module_does_not_import_evaluation_manifest_batch23():
     src = inspect.getsource(mmod)
     assert "from evaluation.manifest" not in src
-
-
-def test_module_does_not_import_evaluation_annotation_metrics_batch23():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.annotation_metrics" not in src
 
 
 def test_module_does_not_import_evaluation_report_batch23():

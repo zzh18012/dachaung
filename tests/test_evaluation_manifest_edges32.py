@@ -1139,13 +1139,6 @@ def test_signature_load_manifest_no_varargs():
     assert "kwargs" not in params
 
 
-def test_signature_detect_project_root():
-    sig = inspect.signature(_detect_project_root)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "start"
-
-
 def test_signature_detect_project_root_no_varargs():
     sig = inspect.signature(_detect_project_root)
     params = sig.parameters
@@ -1222,11 +1215,6 @@ def test_module_all_length():
 
 def test_module_all_entries_unique():
     assert len(set(mmod.__all__)) == len(mmod.__all__)
-
-
-def test_module_all_entries_are_str():
-    for entry in mmod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_namespace_has_5_callables_or_classes():

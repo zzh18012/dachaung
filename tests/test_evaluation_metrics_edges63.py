@@ -144,10 +144,6 @@ def test_strip_whitespace_no_whitespace_batch37():
     assert _strip_unicode_whitespace("abc") == "abc"
 
 
-def test_strip_whitespace_all_whitespace_batch37():
-    assert _strip_unicode_whitespace("   \t\n") == ""
-
-
 def test_strip_whitespace_with_nbsp_batch37():
     """U+00A0 (NBSP) 是 isspace。"""
     assert _strip_unicode_whitespace("a b") == "ab"
@@ -614,21 +610,6 @@ def test_module_source_no_forbidden_tokens_batch37(token):
 # ---------- module source 字符串精确补强第五十二批
 
 
-def test_module_source_contains_design_doc_batch37():
-    src = inspect.getsource(mmod)
-    assert "纯函数" in src
-
-
-def test_module_source_contains_text_types_definition_batch37():
-    src = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ("heading"' in src
-
-
-def test_module_source_contains_pdf_bbox_types_definition_batch37():
-    src = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ("heading"' in src
-
-
 def test_module_source_contains_not_evaluated_const_batch37():
     src = inspect.getsource(mmod)
     assert '_NOT_EVALUATED = "not_evaluated"' in src
@@ -752,10 +733,6 @@ def test_module_not_evaluated_value_batch37():
 
 def test_module_text_types_contains_caption_batch37():
     assert "caption" in _TEXT_TYPES
-
-
-def test_module_pdf_bbox_required_contains_caption_batch37():
-    assert "caption" in _PDF_BBOX_REQUIRED_TYPES
 
 
 # ---------- 端到端集成第五十二批

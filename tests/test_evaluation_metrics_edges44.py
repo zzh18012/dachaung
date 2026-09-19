@@ -238,10 +238,6 @@ def test_is_valid_bbox_large_values_batch17():
     assert _is_valid_bbox([1e10, 1e10, 1e10, 1e10]) is True
 
 
-def test_is_valid_bbox_three_elements_batch17():
-    assert _is_valid_bbox([0, 0, 1]) is False
-
-
 def test_is_valid_bbox_five_elements_batch17():
     assert _is_valid_bbox([0, 0, 1, 1, 2]) is False
 
@@ -614,12 +610,6 @@ def test_module_source_no_subprocess_batch17():
     assert "import subprocess" not in src
 
 
-def test_module_source_no_network_batch17():
-    src = inspect.getsource(mmod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
-
-
 # ---------- module source 字符串精确补强第二十七批 ----------
 
 
@@ -627,16 +617,6 @@ def test_module_source_has_future_annotations_batch17():
     src = inspect.getsource(mmod)
     head = src.split("\n", 30)[:30]
     assert any("from __future__ import annotations" in line for line in head)
-
-
-def test_module_source_has_text_types_definition_batch17():
-    src = inspect.getsource(mmod)
-    assert "_TEXT_TYPES = " in src
-
-
-def test_module_source_has_pdf_bbox_definition_batch17():
-    src = inspect.getsource(mmod)
-    assert "_PDF_BBOX_REQUIRED_TYPES = " in src
 
 
 def test_module_source_has_counter_import_batch17():

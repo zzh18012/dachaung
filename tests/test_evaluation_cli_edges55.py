@@ -400,44 +400,9 @@ def test_main_run_with_extra_positional_batch28(tmp_path):
 # ---------- module source forbidden tokens 第四十六批 ----------
 
 
-def test_module_source_no_os_system_batch28():
-    src = inspect.getsource(climod)
-    assert "os.system" not in src
-
-
-def test_module_source_no_eval_batch28():
-    src = inspect.getsource(climod)
-    assert "eval(" not in src
-
-
-def test_module_source_no_exec_batch28():
-    src = inspect.getsource(climod)
-    assert "exec(" not in src
-
-
 def test_module_source_no_subprocess_batch28():
     src = inspect.getsource(climod)
     assert "subprocess" not in src
-
-
-def test_module_source_no_pickle_batch28():
-    src = inspect.getsource(climod)
-    assert "pickle" not in src
-
-
-def test_module_source_no_yaml_batch28():
-    src = inspect.getsource(climod)
-    assert "yaml" not in src
-
-
-def test_module_source_no_dunder_import_batch28():
-    src = inspect.getsource(climod)
-    assert "__import__" not in src
-
-
-def test_module_source_no_breakpoint_batch28():
-    src = inspect.getsource(climod)
-    assert "breakpoint(" not in src
 
 
 def test_module_source_no_open_w_mode_batch28():
@@ -445,11 +410,6 @@ def test_module_source_no_open_w_mode_batch28():
     src = inspect.getsource(climod)
     assert "'w'" not in src
     assert '"w"' not in src
-
-
-def test_module_source_no_shutil_batch28():
-    src = inspect.getsource(climod)
-    assert "shutil" not in src
 
 
 def test_module_source_no_unlink_batch28():

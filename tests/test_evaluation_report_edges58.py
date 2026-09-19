@@ -146,12 +146,6 @@ def test_count_metrics_no_duplicates_batch43():
 
 # ---------- get_git_provenance 签名 ----------
 
-def test_get_git_provenance_one_param_batch43():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters.keys())
-    assert params == ["project_root"]
-
-
 def test_get_git_provenance_return_annotation_batch43():
     sig = inspect.signature(get_git_provenance)
     assert "dict" in str(sig.return_annotation)
@@ -236,11 +230,6 @@ def test_get_git_provenance_catches_timeout_batch43():
 def test_get_dependency_versions_no_params_batch43():
     sig = inspect.signature(get_dependency_versions)
     assert len(sig.parameters) == 0
-
-
-def test_get_dependency_versions_return_annotation_batch43():
-    sig = inspect.signature(get_dependency_versions)
-    assert "dict" in str(sig.return_annotation)
 
 
 def test_get_dependency_versions_returns_dict_batch43():
@@ -386,12 +375,6 @@ def test_build_provenance_evaluator_version_batch43():
 
 
 # ---------- build_devset_section ----------
-
-def test_build_devset_section_signature_batch43():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters.keys())
-    assert params == ["manifest"]
-
 
 def test_build_devset_section_6_keys_batch43():
     m = MagicMock()
@@ -540,15 +523,6 @@ def test_aggregate_summary_silent_drop_batch43():
     ]
     out = aggregate_summary(per_doc)
     assert out["silent_drop_total"] == 5
-
-
-def test_aggregate_summary_silent_drop_with_none_batch43():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 3}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["silent_drop_total"] == 3
 
 
 def test_aggregate_summary_idempotent_batch43():

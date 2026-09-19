@@ -557,14 +557,6 @@ def test_module_source_contains_metrics_import_batch35():
     assert "from evaluation.metrics import compute_automatic_metrics" in src
 
 
-def test_module_source_contains_report_import_batch35():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.report import (" in src
-    assert "aggregate_summary" in src
-    assert "build_devset_section" in src
-    assert "build_provenance" in src
-
-
 def test_module_source_contains_load_annotation_func_batch35():
     src = inspect.getsource(rmod)
     assert "def _load_annotation(" in src
@@ -588,11 +580,6 @@ def test_module_source_contains_not_instrumented_batch35():
 def test_module_source_contains_perf_counter_call_batch35():
     src = inspect.getsource(rmod)
     assert "time.perf_counter" in src
-
-
-def test_module_source_contains_ensure_ascii_false_batch35():
-    src = inspect.getsource(rmod)
-    assert "ensure_ascii=False" in src
 
 
 def test_module_source_contains_image_output_dir_for_call_batch35():

@@ -425,16 +425,6 @@ def test_module_source_forbidden_tokens_batch20(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_socket_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import socket" not in src
-
-
-def test_module_source_no_urllib_import_batch20():
-    src = inspect.getsource(smod)
-    assert "import urllib" not in src
-
-
 # ---------- module source 字符串精确补强第三十二批 ----------
 
 
@@ -466,11 +456,6 @@ def test_module_source_has_jsonschema_import_batch20():
 def test_module_source_has_jsonschema_exceptions_import_batch20():
     src = inspect.getsource(smod)
     assert "from jsonschema.exceptions import ValidationError as JSValidationError" in src
-
-
-def test_module_source_has_schemas_dir_assignment_batch20():
-    src = inspect.getsource(smod)
-    assert "SCHEMAS_DIR" in src
 
 
 def test_module_source_has_class_eval_schema_error_batch20():

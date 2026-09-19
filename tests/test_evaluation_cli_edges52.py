@@ -734,19 +734,9 @@ def test_module_source_no_class_keyword_batch25():
     assert classes == []
 
 
-def test_module_source_no_async_def_batch25():
-    source = inspect.getsource(climod)
-    assert "async def" not in source
-
-
 def test_module_source_no_global_keyword_batch25():
     source = inspect.getsource(climod)
     assert "global " not in source
-
-
-def test_module_source_no_walrus_batch25():
-    source = inspect.getsource(climod)
-    assert ":=" not in source
 
 
 def test_module_source_no_eval_exec_batch25():
@@ -789,11 +779,6 @@ def test_module_source_no_relative_imports_batch25():
 def test_module_source_no_star_import_batch25():
     source = inspect.getsource(climod)
     assert "import *" not in source
-
-
-def test_module_source_argparse_used_batch25():
-    source = inspect.getsource(climod)
-    assert "import argparse" in source
 
 
 def test_module_source_no_environ_batch25():
@@ -866,25 +851,9 @@ def test_signature_main_return_int_batch25():
     assert sig.return_annotation == "int"
 
 
-def test_signature_run_inspect_doc_one_arg_batch25():
-    sig = inspect.signature(_run_inspect_doc)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "args"
-
-
 def test_signature_run_inspect_doc_return_int_batch25():
     sig = inspect.signature(_run_inspect_doc)
     assert sig.return_annotation == "int"
-
-
-def test_signature_main_no_varargs_batch25():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
 
 
 def test_signature_build_parser_return_argparse_batch25():

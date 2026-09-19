@@ -148,12 +148,6 @@ def test_load_schema_evaluation_report_has_properties_batch15():
     assert "properties" in s
 
 
-def test_load_schema_returns_dict_batch15():
-    for name in ["manifest.schema.json", "annotation.schema.json", "evaluation-report.schema.json"]:
-        s = load_schema(name)
-        assert isinstance(s, dict)
-
-
 def test_load_schema_idempotent_content_batch15():
     """同一 schema 多次加载内容相同。"""
     s1 = load_schema("manifest.schema.json")
@@ -378,11 +372,6 @@ def test_module_source_has_schemas_dir_definition_batch15():
     assert '"schemas"' in src or "'schemas'" in src
 
 
-def test_module_source_has_schema_path_function_batch15():
-    src = inspect.getsource(smod)
-    assert "def _schema_path(name: str) -> Path:" in src
-
-
 def test_module_source_has_iter_errors_call_batch15():
     src = inspect.getsource(smod)
     assert "iter_errors" in src
@@ -446,11 +435,6 @@ def test_signature_load_schema_no_varargs_batch15():
 # ---------- module 合理性第二十七批 ----------
 
 
-def test_module_has_all_attribute_batch15():
-    assert hasattr(smod, "__all__")
-    assert isinstance(smod.__all__, list)
-
-
 def test_module_all_items_in_namespace_batch15():
     for name in smod.__all__:
         assert hasattr(smod, name)
@@ -474,10 +458,6 @@ def test_module_validate_file_callable_batch15():
 
 def test_module_schema_path_callable_batch15():
     assert callable(_schema_path)
-
-
-def test_module_eval_schema_error_is_class_batch15():
-    assert isinstance(EvalSchemaError, type)
 
 
 def test_module_does_not_import_app_pipeline_batch15():

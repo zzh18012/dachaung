@@ -132,10 +132,6 @@ def test_split_paragraphs_trailing_blank_lines_skipped():
     assert result[0] == (1, "hello")
 
 
-def test_split_paragraphs_only_blank_lines():
-    assert _split_paragraphs("\n\n\n") == []
-
-
 def test_split_paragraphs_whitespace_only_lines_skipped():
     """空白行（含 tab/space）视为空行。"""
     result = _split_paragraphs("hello\n   \nworld")

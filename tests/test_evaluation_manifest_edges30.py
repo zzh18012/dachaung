@@ -87,10 +87,6 @@ def test_is_absolute_like_drive_with_lowercase_letter():
     assert _is_absolute_like("a:\\foo") is True
 
 
-def test_is_absolute_like_drive_with_uppercase_letter():
-    assert _is_absolute_like("Z:/foo") is True
-
-
 def test_is_absolute_like_drive_with_digit_invalid():
     """数字不是字母。"""
     assert _is_absolute_like("1:\\foo") is False

@@ -607,18 +607,6 @@ def test_module_all_does_not_contain_any():
     assert "Any" not in m.__all__
 
 
-def test_module_namespace_has_evaluator_version_attribute():
-    import evaluation.report as m
-
-    assert hasattr(m, "EVALUATOR_VERSION")
-
-
-def test_module_namespace_has_report_version_attribute():
-    import evaluation.report as m
-
-    assert hasattr(m, "REPORT_VERSION")
-
-
 def test_module_namespace_has_path_attribute():
     import evaluation.report as m
 

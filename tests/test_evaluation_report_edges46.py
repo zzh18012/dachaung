@@ -394,12 +394,6 @@ def test_module_source_no_breakpoint_batch30():
     assert "breakpoint(" not in src
 
 
-def test_module_source_no_open_w_mode_batch30():
-    src = inspect.getsource(rmod)
-    assert "'w'" not in src
-    assert '"w"' not in src
-
-
 def test_module_source_no_shutil_batch30():
     src = inspect.getsource(rmod)
     assert "shutil" not in src

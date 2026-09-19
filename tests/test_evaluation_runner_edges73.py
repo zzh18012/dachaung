@@ -588,12 +588,6 @@ def test_ast_process_one_return_statements_batch48():
     assert len(returns) >= 3
 
 
-def test_ast_no_class_def_batch48():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_no_async_batch48():
     tree = ast.parse(inspect.getsource(runner_mod))
     for n in ast.walk(tree):
@@ -606,42 +600,3 @@ def test_ast_module_docstring_batch48():
 
 
 # ---------- forbidden tokens 第一百一十七批 ----------
-
-def test_source_no_eval_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch48():
-    src = inspect.getsource(runner_mod)
-    assert "pickle.load(" not in src

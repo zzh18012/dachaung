@@ -510,36 +510,6 @@ def test_ast_no_async_batch48():
 
 # ---------- forbidden tokens 第一百一十六批 ----------
 
-def test_source_no_compile_batch48():
-    src = inspect.getsource(report_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch48():
-    src = inspect.getsource(report_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch48():
-    src = inspect.getsource(report_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch48():
-    src = inspect.getsource(report_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch48():
-    src = inspect.getsource(report_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch48():
-    src = inspect.getsource(report_mod)
-    assert "pickle.load(" not in src
-
-
 def test_source_no_raise_batch48():
     src = inspect.getsource(report_mod)
     assert "raise " not in src

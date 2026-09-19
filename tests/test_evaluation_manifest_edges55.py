@@ -66,10 +66,6 @@ def test_is_absolute_like_just_colon_batch28():
     assert _is_absolute_like(":") is False
 
 
-def test_is_absolute_like_just_drive_letter_batch28():
-    assert _is_absolute_like("C") is False
-
-
 def test_is_absolute_like_drive_letter_colon_only_batch28():
     assert _is_absolute_like("C:") is False
 
@@ -90,10 +86,6 @@ def test_has_backslash_with_tab_batch28():
 
 def test_has_backslash_long_path_batch28():
     assert _has_backslash("a\\b\\c\\d\\e") is True
-
-
-def test_has_backslash_only_spaces_batch28():
-    assert _has_backslash("   ") is False
 
 
 def test_has_backslash_unicode_batch28():
@@ -530,11 +522,6 @@ def test_module_source_contains_manifest_class_batch28():
     assert "class Manifest" in src
 
 
-def test_module_source_contains_load_manifest_function_batch28():
-    src = inspect.getsource(mmod)
-    assert "def load_manifest" in src
-
-
 def test_module_source_contains_detect_project_root_function_batch28():
     src = inspect.getsource(mmod)
     assert "def _detect_project_root" in src
@@ -563,21 +550,6 @@ def test_signature_load_manifest_path_annotation_batch28():
 def test_signature_load_manifest_return_annotation_batch28():
     sig = inspect.signature(load_manifest)
     assert sig.return_annotation == "Manifest"
-
-
-def test_signature_resolve_relative_path_return_batch28():
-    sig = inspect.signature(_resolve_relative_path)
-    assert sig.return_annotation == "Path"
-
-
-def test_signature_is_absolute_like_return_batch28():
-    sig = inspect.signature(_is_absolute_like)
-    assert sig.return_annotation == "bool"
-
-
-def test_signature_has_backslash_return_batch28():
-    sig = inspect.signature(_has_backslash)
-    assert sig.return_annotation == "bool"
 
 
 # ---------- module 合理性第四十一批 ----------

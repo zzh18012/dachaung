@@ -47,15 +47,6 @@ def test_parser_does_not_emit_relations_in_module_all():
 # =========================================================================
 
 
-def test_figure_caption_prf_returns_three_keys():
-    out = figure_caption_prf({}, {})
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_prf_all_values_none():
     out = figure_caption_prf({}, {})
     for k, v in out.items():

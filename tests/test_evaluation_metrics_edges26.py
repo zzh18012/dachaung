@@ -593,15 +593,6 @@ def test_compute_automatic_metrics_param_kinds():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_compute_automatic_metrics_no_varargs_varkw():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 # ---------- signatures 精确（_pdf_locator_ratio 等 helpers） ----------
 
 

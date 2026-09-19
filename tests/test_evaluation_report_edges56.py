@@ -36,10 +36,6 @@ def test_ratio_metrics_no_duplicates_batch41():
     assert len(_RATIO_METRICS) == len(set(_RATIO_METRICS))
 
 
-def test_count_metrics_no_duplicates_batch41():
-    assert len(_COUNT_METRICS) == len(set(_COUNT_METRICS))
-
-
 def test_count_metrics_disjoint_from_success_bool_batch41():
     assert set(_COUNT_METRICS).isdisjoint(set(_SUCCESS_BOOL_METRICS))
 
@@ -278,11 +274,6 @@ def test_get_dependency_versions_callable_batch41():
 def test_get_dependency_versions_no_param_batch41():
     sig = inspect.signature(get_dependency_versions)
     assert list(sig.parameters.keys()) == []
-
-
-def test_get_dependency_versions_return_dict_batch41():
-    sig = inspect.signature(get_dependency_versions)
-    assert "dict" in str(sig.return_annotation)
 
 
 def test_get_dependency_versions_returns_dict_batch41():
@@ -737,11 +728,6 @@ def test_module_source_contains_all_export_batch41():
 def test_module_source_contains_no_mixed_score_comment_batch41():
     src = inspect.getsource(rmod)
     assert "不混合" in src
-
-
-def test_module_source_contains_subprocess_run_call_batch41():
-    src = inspect.getsource(rmod)
-    assert "subprocess.run(" in src
 
 
 def test_module_source_contains_timeout_10_batch41():

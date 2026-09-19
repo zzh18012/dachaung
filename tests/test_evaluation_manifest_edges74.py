@@ -76,10 +76,6 @@ def test_is_absolute_like_digit_drive_batch48():
     assert _is_absolute_like("1:/foo") is False
 
 
-def test_is_absolute_like_underscore_drive_batch48():
-    assert _is_absolute_like("_:/foo") is False
-
-
 def test_is_absolute_like_dot_drive_batch48():
     assert _is_absolute_like(".:/foo") is False
 
@@ -669,12 +665,6 @@ def test_source_contains_isfile_check_batch48():
 
 
 # ---------- AST 结构补强 ----------
-
-def test_ast_top_level_functions_count_batch48():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 5  # _is_absolute_like, _has_backslash, _resolve_relative_path, load_manifest, _detect_project_root
-
 
 def test_ast_top_level_class_count_batch48():
     tree = ast.parse(inspect.getsource(manifest_mod))

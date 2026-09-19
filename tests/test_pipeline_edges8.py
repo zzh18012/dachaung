@@ -85,11 +85,6 @@ def test_get_parser_case_sensitive_ipynb_uppercase_raises():
         get_parser("Ipynb")
 
 
-def test_get_parser_empty_string_raises():
-    with pytest.raises(ValueError):
-        get_parser("")
-
-
 def test_get_parser_whitespace_only_raises():
     with pytest.raises(ValueError):
         get_parser("   ")

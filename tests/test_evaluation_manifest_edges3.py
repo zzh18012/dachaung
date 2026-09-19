@@ -80,10 +80,6 @@ def test_is_absolute_like_lowercase_drive():
     assert _is_absolute_like("c:\\foo") is True
 
 
-def test_is_absolute_like_uppercase_drive():
-    assert _is_absolute_like("Z:/foo") is True
-
-
 def test_is_absolute_like_digit_drive_not_absolute():
     """'1:\\foo' 不是 Windows drive（必须 alpha）。"""
     assert _is_absolute_like("1:\\foo") is False

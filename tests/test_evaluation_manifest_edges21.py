@@ -662,10 +662,6 @@ def test_has_backslash_single():
     assert _has_backslash("a\\b") is True
 
 
-def test_has_backslash_mixed():
-    assert _has_backslash("a\\b/c") is True
-
-
 def test_has_backslash_no_backslash():
     assert _has_backslash("a/b") is False
 

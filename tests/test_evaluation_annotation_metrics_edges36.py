@@ -97,12 +97,6 @@ def test_figure_caption_prf_each_value_is_dict():
         assert "reason" in v
 
 
-def test_figure_caption_prf_idempotent():
-    out1 = figure_caption_prf(None, None)
-    out2 = figure_caption_prf(None, None)
-    assert out1 == out2
-
-
 def test_figure_caption_prf_no_mutate_input_dict():
     doc = {"elements": [{"type": "image"}]}
     snapshot = json.dumps(doc)
@@ -646,11 +640,6 @@ def test_signature_chunk_boundary_prf_3_params():
     assert len(sig.parameters) == 3
 
 
-def test_signature_chunk_boundary_prf_param_names():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert list(sig.parameters) == ["document", "annotation", "tolerance_chars"]
-
-
 def test_signature_chunk_boundary_prf_param_kinds():
     sig = inspect.signature(chunk_boundary_prf)
     for p in sig.parameters.values():
@@ -679,10 +668,6 @@ def test_signature_funcs_function_type():
 
 def test_module_all_is_list():
     assert isinstance(amod.__all__, list)
-
-
-def test_module_all_entries_unique():
-    assert len(amod.__all__) == len(set(amod.__all__))
 
 
 def test_module_has_dunder_file():

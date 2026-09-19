@@ -413,11 +413,6 @@ def test_signature_chunk_boundary_prf_tolerance_default_30_batch30():
     assert sig.parameters["tolerance_chars"].default == 30
 
 
-def test_signature_chunk_boundary_prf_tolerance_annotation_int_batch30():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["tolerance_chars"].annotation == "int"
-
-
 def test_signature_figure_caption_prf_document_annotation_batch30():
     sig = inspect.signature(figure_caption_prf)
     a = sig.parameters["document"].annotation

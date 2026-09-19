@@ -497,10 +497,6 @@ def test_split_long_text_empty_returns_empty_list():
     assert _split_long_text("", 100) == []
 
 
-def test_split_long_text_only_whitespace_returns_empty():
-    assert _split_long_text("   \n\t  ", 100) == []
-
-
 def test_split_long_text_short_returns_single_piece():
     """len(text) ≤ max_chars → 1 piece, boundary_after=None。"""
     pieces = _split_long_text("hello", 100)

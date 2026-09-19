@@ -213,17 +213,6 @@ def test_git_provenance_two_subprocess_calls_batch16(tmp_path):
 # ---------- get_dependency_versions 行为深度第十六批 ----------
 
 
-def test_dependency_versions_three_keys_batch16():
-    v = get_dependency_versions()
-    assert set(v.keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
-
-
-def test_dependency_versions_value_types_batch16():
-    v = get_dependency_versions()
-    for k, val in v.items():
-        assert val is None or isinstance(val, str)
-
-
 def test_dependency_versions_idempotent_batch16():
     v1 = get_dependency_versions()
     v2 = get_dependency_versions()

@@ -318,11 +318,6 @@ def test_eval_schema_error_init_two_args_batch35():
     assert e.errors == [{"x": 1}]
 
 
-def test_eval_schema_error_init_errors_empty_list_batch35():
-    e = EvalSchemaError("msg", [])
-    assert e.errors == []
-
-
 def test_eval_schema_error_init_errors_dict_batch35():
     """传 dict 而不是 list → 当 falsy 时变 []；非 falsy 时直接保存（不强制类型）。"""
     e = EvalSchemaError("msg", {"k": "v"})
@@ -410,11 +405,6 @@ def test_module_source_contains_design_doc_batch35():
 def test_module_source_contains_draft_validator_import_batch35():
     src = inspect.getsource(smod)
     assert "from jsonschema import Draft202012Validator" in src
-
-
-def test_module_source_contains_class_definition_batch35():
-    src = inspect.getsource(smod)
-    assert "class EvalSchemaError" in src
 
 
 def test_module_source_contains_schema_path_function_batch35():

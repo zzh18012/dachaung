@@ -447,10 +447,6 @@ def test_normalize_text_mixed_cjk_whitespace():
     assert normalize_text("  你好\n世界\tend  ") == "你好 世界 end"
 
 
-def test_normalize_text_returns_str_type():
-    assert isinstance(normalize_text("x"), str)
-
-
 def test_normalize_text_idempotent_long_string():
     text = "  hello   world  \n\t  end  "
     once = normalize_text(text)

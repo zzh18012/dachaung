@@ -628,11 +628,6 @@ def test_module_source_has_from_future():
     assert "from __future__ import annotations" in src
 
 
-def test_module_source_has_from_collections_import_counter():
-    src = inspect.getsource(m)
-    assert "from collections import Counter" in src
-
-
 def test_module_source_has_from_pathlib_import_path():
     src = inspect.getsource(m)
     assert "from pathlib import Path" in src

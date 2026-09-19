@@ -364,10 +364,6 @@ def test_is_absolute_like_unix_root_only_batch38():
     assert _is_absolute_like("/") is True
 
 
-def test_is_absolute_like_windows_backslash_batch38():
-    assert _is_absolute_like("C:\\Windows") is True
-
-
 def test_is_absolute_like_windows_forward_batch38():
     assert _is_absolute_like("C:/Windows") is True
 
@@ -455,19 +451,9 @@ def test_resolve_relative_path_outside_root_rejected_batch38(tmp_path):
         _resolve_relative_path("../outside.pdf", tmp_path, "test")
 
 
-def test_resolve_relative_path_absolute_rejected_batch38(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("/etc/passwd", tmp_path, "test")
-
-
 def test_resolve_relative_path_backslash_rejected_batch38(tmp_path):
     with pytest.raises(ManifestError):
         _resolve_relative_path("a\\b.pdf", tmp_path, "test")
-
-
-def test_resolve_relative_path_empty_rejected_batch38(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("", tmp_path, "test")
 
 
 def test_resolve_relative_path_unicode_batch38(tmp_path):
@@ -679,11 +665,6 @@ def test_detect_project_root_fallback_to_cur_batch38(tmp_path):
     """没找到 pyproject.toml → 返回 cur。"""
     # /tmp 下应该没有 pyproject.toml（或可能存在系统级的；这里只验证返回 Path）
     out = _detect_project_root(tmp_path / "anyfile")
-    assert isinstance(out, Path)
-
-
-def test_detect_project_root_returns_path_batch38(tmp_path):
-    out = _detect_project_root(tmp_path)
     assert isinstance(out, Path)
 
 

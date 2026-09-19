@@ -515,16 +515,6 @@ def test_schema_source_no_global_batch11():
     assert " global " not in source
 
 
-def test_schema_source_no_walrus_batch11():
-    source = inspect.getsource(smod)
-    assert ":=" not in source
-
-
-def test_schema_source_no_async_def_batch11():
-    source = inspect.getsource(smod)
-    assert "async def" not in source
-
-
 def test_schema_source_no_while_loop_batch11():
     source = inspect.getsource(smod)
     assert "while " not in source
@@ -548,11 +538,6 @@ def test_module_source_has_future_annotations_batch11():
     source = inspect.getsource(smod)
     head = "\n".join(source.split("\n")[:20])
     assert "from __future__ import annotations" in head
-
-
-def test_module_source_imports_json_batch11():
-    source = inspect.getsource(smod)
-    assert "import json" in source
 
 
 def test_module_source_docstring_present_batch11():
@@ -618,21 +603,11 @@ def test_signature_load_schema_return_dict_batch11():
     assert "dict" in annot_str
 
 
-def test_signature_validate_2_params_batch11():
-    sig = inspect.signature(validate)
-    assert list(sig.parameters) == ["instance", "schema_name"]
-
-
 def test_signature_validate_return_none_batch11():
     sig = inspect.signature(validate)
     annot = sig.return_annotation
     annot_str = annot if isinstance(annot, str) else str(annot)
     assert "None" in annot_str
-
-
-def test_signature_validate_file_2_params_batch11():
-    sig = inspect.signature(validate_file)
-    assert list(sig.parameters) == ["path", "schema_name"]
 
 
 def test_signature_validate_file_path_annotation_batch11():

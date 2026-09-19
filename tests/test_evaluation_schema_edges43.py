@@ -541,19 +541,9 @@ FORBIDDEN_TOKENS = [
 ]
 
 
-def test_module_source_no_async_def_batch23():
-    source = inspect.getsource(smod)
-    assert "async def" not in source
-
-
 def test_module_source_no_global_keyword_batch23():
     source = inspect.getsource(smod)
     assert "global " not in source
-
-
-def test_module_source_no_walrus_batch23():
-    source = inspect.getsource(smod)
-    assert ":=" not in source
 
 
 def test_module_source_no_eval_exec_batch23():
@@ -610,11 +600,6 @@ def test_module_source_no_open_at_module_level_batch23():
             f = node.value.func
             if isinstance(f, _ast.Name) and f.id == "open":
                 pytest.fail("top-level open() call")
-
-
-def test_module_source_json_used_batch23():
-    source = inspect.getsource(smod)
-    assert "import json" in source
 
 
 # ---------- module source 字符串精确补强第三十七批 ----------

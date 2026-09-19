@@ -35,12 +35,6 @@ from evaluation.cli import _build_parser, _format_metric, _run_inspect_doc, main
 
 # ---------- _build_parser 参数精确性 ----------
 
-def test_build_parser_returns_argument_parser_batch47():
-    import argparse
-    p = _build_parser()
-    assert isinstance(p, argparse.ArgumentParser)
-
-
 def test_build_parser_prog_batch47():
     p = _build_parser()
     assert p.prog == "evaluation.cli"
@@ -478,11 +472,6 @@ def test_source_contains_run_command_batch47():
     assert '"run"' in src or "'run'" in src
 
 
-def test_source_contains_validate_report_command_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "validate-report" in src
-
-
 def test_source_contains_inspect_doc_command_batch47():
     src = inspect.getsource(cli_mod)
     assert "inspect-doc" in src
@@ -595,21 +584,6 @@ def test_ast_module_has_if_main_batch47():
 
 # ---------- forbidden tokens 第一百一十一批 ----------
 
-def test_source_no_eval_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch47():
-    src = inspect.getsource(cli_mod)
-    assert "compile(" not in src
-
-
 def test_source_no_subprocess_batch47():
     src = inspect.getsource(cli_mod)
     assert "subprocess" not in src
@@ -618,11 +592,6 @@ def test_source_no_subprocess_batch47():
 def test_source_no_yield_batch47():
     src = inspect.getsource(cli_mod)
     assert "yield" not in src
-
-
-def test_source_no_walrus_batch47():
-    src = inspect.getsource(cli_mod)
-    assert ":=" not in src
 
 
 def test_source_no_await_batch47():

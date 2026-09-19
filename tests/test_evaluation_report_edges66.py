@@ -449,11 +449,6 @@ def test_ast_get_git_provenance_except_catches_oserror_subprocess_error_batch52(
     assert any(a.attr == "SubprocessError" for a in attr_types)
 
 
-def test_ast_no_class_def_batch52():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
 def test_ast_module_has_docstring_batch52():
     tree = ast.parse(inspect.getsource(report_mod))
     assert isinstance(tree.body[0], ast.Expr)

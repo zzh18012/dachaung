@@ -83,11 +83,6 @@ def test_int_metric_with_negative_batch26():
     assert out["value"] == -100
 
 
-def test_int_metric_with_zero_batch26():
-    out = _int_metric(0)
-    assert out["value"] == 0
-
-
 # ---------- _TEXT_TYPES / _PDF_BBOX_REQUIRED_TYPES 第二十六批 ----------
 
 
@@ -673,11 +668,6 @@ def test_module_source_contains_silent_drop_count_def_batch26():
     assert "_silent_drop_count" in source
 
 
-def test_module_source_contains_pdf_bbox_constant_batch26():
-    source = inspect.getsource(mmod)
-    assert "_PDF_BBOX_REQUIRED_TYPES" in source
-
-
 def test_module_source_contains_not_evaluated_batch26():
     source = inspect.getsource(mmod)
     assert "_NOT_EVALUATED" in source
@@ -767,15 +757,6 @@ def test_signature_constructors_no_varargs_batch26():
                 inspect.Parameter.VAR_POSITIONAL,
                 inspect.Parameter.VAR_KEYWORD,
             )
-
-
-def test_signature_compute_metrics_no_varargs_batch26():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
 
 
 # ---------- module 合理性第三十七批 ----------

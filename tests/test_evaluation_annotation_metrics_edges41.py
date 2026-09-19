@@ -374,11 +374,6 @@ def test_module_source_uses_normalize_text_batch14():
     assert "normalize_text(" in source
 
 
-def test_module_source_has_tolerance_chars_default_batch14():
-    source = inspect.getsource(amod)
-    assert "tolerance_chars: int = 30" in source
-
-
 def test_module_source_no_subprocess_import_batch14():
     source = inspect.getsource(amod)
     assert "import subprocess" not in source
@@ -465,11 +460,6 @@ def test_dunder_all_items_callable_batch14():
 
 
 # ---------- module 合理性第十五批 ----------
-
-
-def test_module_dunder_file_exists_batch14():
-    assert hasattr(amod, "__file__")
-    assert amod.__file__ is not None
 
 
 def test_module_dunder_file_annotation_metrics_py_batch14():

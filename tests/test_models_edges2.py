@@ -231,10 +231,6 @@ def test_element_unicode_metadata():
     assert e.to_dict()["metadata"]["中文key"] == "值 🎉"
 
 
-def test_element_is_dataclass():
-    assert is_dataclass(Element)
-
-
 def test_element_to_dict_callable():
     e = Element(element_id="e1", type="paragraph", source_locator={}, content="x")
     assert callable(e.to_dict)
@@ -318,10 +314,6 @@ def test_chunk_unicode_text():
     assert c.to_dict()["text"] == "中文 🎉"
 
 
-def test_chunk_is_dataclass():
-    assert is_dataclass(Chunk)
-
-
 def test_chunk_raises_when_chunk_id_empty():
     with pytest.raises(ValueError):
         Chunk(chunk_id="", text="x", source_element_ids=["e1"])
@@ -384,10 +376,6 @@ def test_relation_unicode_type():
     assert r.type == "父子"
 
 
-def test_relation_is_dataclass():
-    assert is_dataclass(Relation)
-
-
 # ---------- WarningRecord 边角 ----------
 
 
@@ -420,10 +408,6 @@ def test_warning_record_unicode_code_reason():
 def test_warning_record_with_complex_details():
     w = WarningRecord(code="x", reason="y", details={"nested": {"deep": [1, 2, 3]}})
     assert w.to_dict()["details"] == {"nested": {"deep": [1, 2, 3]}}
-
-
-def test_warning_record_is_dataclass():
-    assert is_dataclass(WarningRecord)
 
 
 def test_warning_record_is_mutable():
@@ -465,10 +449,6 @@ def test_error_record_with_complex_details():
         details={"validation_errors": [{"path": [0], "msg": "fail"}]},
     )
     assert er.to_dict()["details"]["validation_errors"][0]["path"] == [0]
-
-
-def test_error_record_is_dataclass():
-    assert is_dataclass(ErrorRecord)
 
 
 def test_error_record_is_mutable():
@@ -639,10 +619,6 @@ def test_document_with_full_nested_structure():
     assert d["warnings"][0]["code"] == "x"
     assert d["errors"][0]["code"] == "z"
     assert d["metadata"] == {"k": "v"}
-
-
-def test_document_is_dataclass():
-    assert is_dataclass(Document)
 
 
 def test_document_is_mutable():

@@ -140,10 +140,6 @@ def test_is_valid_bbox_huge_coords_batch41():
     assert _is_valid_bbox([0, 0, 10**6, 10**6]) is True
 
 
-def test_is_valid_bbox_mixed_int_float_batch41():
-    assert _is_valid_bbox([0, 0.5, 1, 1.5]) is True
-
-
 def test_is_valid_bbox_zero_bbox_batch41():
     """零大小 bbox（xmin==xmax 等）。"""
     assert _is_valid_bbox([0, 0, 0, 0]) is True

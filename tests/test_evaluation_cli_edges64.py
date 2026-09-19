@@ -80,12 +80,6 @@ def test_build_parser_run_missing_manifest_batch37():
         p.parse_args(["run", "--output", "y"])
 
 
-def test_build_parser_run_missing_output_batch37():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--manifest", "x"])
-
-
 # ---------- _format_metric 第三十七批
 
 
@@ -95,30 +89,15 @@ def test_format_metric_int_one_batch37():
     assert "ok" in out
 
 
-def test_format_metric_float_zero_batch37():
-    out = _format_metric("x", {"value": 0.0, "reason": None})
-    assert "0.0000" in out
-
-
 def test_format_metric_float_one_third_batch37():
     out = _format_metric("x", {"value": 1.0 / 3.0, "reason": None})
     assert "0.3333" in out
-
-
-def test_format_metric_float_full_batch37():
-    out = _format_metric("x", {"value": 1.0, "reason": None})
-    assert "1.0000" in out
 
 
 def test_format_metric_bool_true_lowercase_batch37():
     out = _format_metric("x", {"value": True, "reason": None})
     assert "true" in out
     assert "false" not in out
-
-
-def test_format_metric_bool_false_lowercase_batch37():
-    out = _format_metric("x", {"value": False, "reason": None})
-    assert "false" in out
 
 
 def test_format_metric_dict_with_multiple_kv_sorted_batch37():
@@ -564,14 +543,6 @@ def test_module_has_build_parser_attribute_batch37():
 
 def test_module_has_main_attribute_batch37():
     assert callable(cmod.main)
-
-
-def test_module_has_format_metric_attribute_batch37():
-    assert callable(cmod._format_metric)
-
-
-def test_module_has_run_inspect_doc_attribute_batch37():
-    assert callable(cmod._run_inspect_doc)
 
 
 def test_module_main_returns_int_batch37(tmp_path):

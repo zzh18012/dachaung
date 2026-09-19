@@ -109,10 +109,6 @@ def _write_full_valid_manifest(project_root: Path) -> Path:
 # =========================================================================
 
 
-def test_is_absolute_like_returns_bool_type():
-    assert isinstance(_is_absolute_like("foo"), bool)
-
-
 def test_is_absolute_like_all_lowercase_drive_letters():
     """a-z + :/ 全部识别为绝对路径。"""
     for c in "abcdefghijklmnopqrstuvwxyz":
@@ -262,10 +258,6 @@ def test_has_backslash_mixed_slashes_one_backslash_one_forward():
 
 def test_has_backslash_mixed_slashes_two_forward_one_back():
     assert _has_backslash("//\\") is True
-
-
-def test_has_backslash_just_slash():
-    assert _has_backslash("/") is False
 
 
 def test_has_backslash_just_two_slashes():

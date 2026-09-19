@@ -653,11 +653,6 @@ def test_module_source_contains_write_json_false_batch36():
     assert "write_json=False" in src
 
 
-def test_module_source_contains_ensure_ascii_false_batch36():
-    src = inspect.getsource(rmod)
-    assert "ensure_ascii=False" in src
-
-
 def test_module_source_contains_indent_2_batch36():
     src = inspect.getsource(rmod)
     assert "indent=2" in src

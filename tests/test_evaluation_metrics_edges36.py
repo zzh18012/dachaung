@@ -112,11 +112,6 @@ def test_null_empty_reason_string():
     assert out["reason"] == ""
 
 
-def test_null_unicode_reason():
-    out = _null("中文原因")
-    assert out["reason"] == "中文原因"
-
-
 def test_ratio_value_converted_to_float():
     """int 输入会被 float() 转。"""
     out = _ratio(0)
@@ -139,11 +134,6 @@ def test_bool_metric_returns_dict_with_value_reason():
     out = _bool_metric(True)
     assert isinstance(out, dict)
     assert set(out.keys()) == {"value", "reason"}
-
-
-def test_bool_metric_value_is_bool():
-    assert isinstance(_bool_metric(True)["value"], bool)
-    assert isinstance(_bool_metric(False)["value"], bool)
 
 
 def test_bool_metric_converts_int_to_bool():
@@ -572,10 +562,6 @@ def test_is_valid_bbox_empty_list():
     assert _is_valid_bbox([]) is False
 
 
-def test_is_valid_bbox_too_short():
-    assert _is_valid_bbox([0, 0, 10]) is False
-
-
 def test_is_valid_bbox_too_long():
     assert _is_valid_bbox([0, 0, 10, 10, 99]) is False
 
@@ -723,12 +709,6 @@ def test_metrics_source_no_remove():
     assert ".remove(" not in source
 
 
-def test_metrics_source_no_logging():
-    source = inspect.getsource(mmod)
-    assert "logging" not in source
-    assert "logger" not in source
-
-
 def test_metrics_source_no_print():
     source = inspect.getsource(mmod)
     assert "print(" not in source
@@ -851,18 +831,6 @@ def test_module_source_docstring_mentions_v11():
 def test_signature_compute_automatic_metrics_5_params():
     sig = inspect.signature(compute_automatic_metrics)
     assert len(sig.parameters) == 5
-
-
-def test_signature_compute_automatic_metrics_param_kinds():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_signature_compute_automatic_metrics_image_base_dir_default_none():
-    sig = inspect.signature(compute_automatic_metrics)
-    p = sig.parameters["image_base_dir"]
-    assert p.default is None
 
 
 def test_signature_compute_automatic_metrics_no_default_for_document():

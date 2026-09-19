@@ -158,11 +158,6 @@ def test_load_schema_manifest_has_devset_status_enum_batch45():
     assert "incomplete" in ds["enum"]
 
 
-def test_load_schema_annotation_type_batch45():
-    s = load_schema("annotation.schema.json")
-    assert s.get("type") == "object"
-
-
 def test_load_schema_annotation_has_properties_batch45():
     s = load_schema("annotation.schema.json")
     assert "properties" in s
@@ -425,35 +420,10 @@ def test_eval_schema_error_multiple_instances_independent_batch45():
 
 # ---------- 模块源码字符串精确 ----------
 
-def test_module_source_contains_pathlib_import_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_module_source_contains_any_import_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "from typing import Any" in src
-
-
-def test_module_source_contains_jsonschema_import_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "from jsonschema import Draft202012Validator" in src
-
-
 def test_module_source_contains_jsvalidationerror_import_batch45():
     """注意：实现 import 了 JSValidationError 但实际未用。"""
     src = inspect.getsource(schema_mod)
     assert "JSValidationError" in src or "ValidationError" in src
-
-
-def test_module_source_contains_errors_or_empty_list_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "self.errors = errors or []" in src
-
-
-def test_module_source_contains_draft_validator_batch45():
-    src = inspect.getsource(schema_mod)
-    assert "Draft202012Validator" in src
 
 
 def test_module_source_contains_iter_errors_batch45():

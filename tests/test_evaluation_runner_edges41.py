@@ -647,11 +647,6 @@ def test_module_source_uses_not_instrumented_batch14():
     assert "not_instrumented" in source
 
 
-def test_module_source_uses_write_json_false_batch14():
-    source = inspect.getsource(rmod)
-    assert "write_json=False" in source
-
-
 def test_module_source_no_open_with_str_path_batch14():
     """应只用 Path.open()，不用 open()。"""
     source = inspect.getsource(rmod)
@@ -667,21 +662,6 @@ def test_module_source_no_subprocess_import_batch14():
     """runner 不直接调 subprocess（report.py 才调）。"""
     source = inspect.getsource(rmod)
     assert "import subprocess" not in source
-
-
-def test_module_source_uses_json_dump_batch14():
-    source = inspect.getsource(rmod)
-    assert "json.dump(" in source
-
-
-def test_module_source_uses_compute_automatic_metrics_batch14():
-    source = inspect.getsource(rmod)
-    assert "compute_automatic_metrics" in source
-
-
-def test_module_source_uses_aggregate_summary_batch14():
-    source = inspect.getsource(rmod)
-    assert "aggregate_summary" in source
 
 
 # ---------- signatures 第十六批 ----------

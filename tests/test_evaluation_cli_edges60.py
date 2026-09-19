@@ -77,11 +77,6 @@ def test_build_parser_inspect_doc_input_required_batch33():
 # ---------- _format_metric 第三十三批 ----------
 
 
-def test_format_metric_negative_float_batch33():
-    out = _format_metric("x", {"value": -0.5, "reason": None})
-    assert "-0.5000" in out
-
-
 def test_format_metric_one_dict_item_with_negative_value_batch33():
     out = _format_metric("x", {"value": {"a": -1}, "reason": None})
     assert "a=-1" in out

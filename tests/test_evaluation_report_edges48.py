@@ -94,10 +94,6 @@ def test_count_metrics_first_is_element_count_total_batch32():
     assert _COUNT_METRICS[0] == "element_count_total"
 
 
-def test_count_metrics_no_duplicates_batch32():
-    assert len(_COUNT_METRICS) == len(set(_COUNT_METRICS))
-
-
 # ---------- _SUCCESS_BOOL_METRICS 第三十二批 ----------
 
 
@@ -228,12 +224,6 @@ def test_get_dependency_versions_other_exception_batch32():
 
 
 # ---------- build_provenance 第三十二批 ----------
-
-
-def test_build_provenance_max_chars_int_batch32(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert out["max_chars"] == 800
-    assert isinstance(out["max_chars"], int)
 
 
 def test_build_provenance_parser_name_passes_through_batch32(tmp_path):
@@ -545,12 +535,6 @@ def test_module_source_no_requests_batch32():
     assert "requests" not in src
 
 
-def test_module_source_no_open_w_mode_batch32():
-    src = inspect.getsource(rmod)
-    assert "'w'" not in src
-    assert '"w"' not in src
-
-
 # ---------- module source 字符串精确补强第四十五批 ----------
 
 
@@ -582,21 +566,6 @@ def test_module_source_contains_typing_any_import_batch32():
 def test_module_source_contains_versions_import_batch32():
     src = inspect.getsource(rmod)
     assert "from evaluation import EVALUATOR_VERSION, REPORT_VERSION" in src
-
-
-def test_module_source_contains_ratio_metrics_const_batch32():
-    src = inspect.getsource(rmod)
-    assert "_RATIO_METRICS" in src
-
-
-def test_module_source_contains_count_metrics_const_batch32():
-    src = inspect.getsource(rmod)
-    assert "_COUNT_METRICS" in src
-
-
-def test_module_source_contains_success_bool_metrics_const_batch32():
-    src = inspect.getsource(rmod)
-    assert "_SUCCESS_BOOL_METRICS" in src
 
 
 def test_module_source_contains_get_git_provenance_func_batch32():

@@ -196,11 +196,6 @@ def test_get_dependency_versions_returns_dict_with_3_keys_batch19():
     assert len(v) == 3
 
 
-def test_get_dependency_versions_keys_exact_set_batch19():
-    v = get_dependency_versions()
-    assert set(v.keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
-
-
 def test_get_dependency_versions_values_type_optional_str_batch19():
     v = get_dependency_versions()
     for key, val in v.items():

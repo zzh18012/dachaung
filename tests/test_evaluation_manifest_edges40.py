@@ -201,10 +201,6 @@ def test_has_backslash_only_backslash_batch13():
     assert _has_backslash("\\") is True
 
 
-def test_has_backslash_multiple_backslashes_batch13():
-    assert _has_backslash("a\\b\\c\\d") is True
-
-
 def test_has_backslash_at_start_batch13():
     assert _has_backslash("\\abc") is True
 
@@ -903,11 +899,6 @@ def test_module_source_has_frozen_dataclass_batch13():
     assert "@dataclass(frozen=True)" in source
 
 
-def test_module_source_has_is_absolute_like_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _is_absolute_like(" in source
-
-
 def test_module_source_has_resolve_relative_path_def_batch13():
     source = inspect.getsource(mmod)
     assert "def _resolve_relative_path(" in source
@@ -916,11 +907,6 @@ def test_module_source_has_resolve_relative_path_def_batch13():
 def test_module_source_has_detect_project_root_def_batch13():
     source = inspect.getsource(mmod)
     assert "def _detect_project_root(" in source
-
-
-def test_module_source_has_load_manifest_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def load_manifest(" in source
 
 
 def test_module_source_has_path_open_call_batch13():
@@ -997,13 +983,6 @@ def test_load_manifest_return_annotation_manifest_batch13():
     ret = sig.return_annotation
     ret_str = ret if isinstance(ret, str) else str(ret)
     assert "Manifest" in ret_str
-
-
-def test_detect_project_root_signature_one_param_batch13():
-    sig = inspect.signature(_detect_project_root)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "start"
 
 
 def test_detect_project_root_return_annotation_path_batch13():

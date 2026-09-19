@@ -187,10 +187,6 @@ def test_is_valid_bbox_four_floats():
     assert _is_valid_bbox([1.0, 2.5, 3.7, 4.2]) is True
 
 
-def test_is_valid_bbox_mixed_int_float():
-    assert _is_valid_bbox([1, 2.5, 3, 4.0]) is True
-
-
 def test_is_valid_bbox_zero_values():
     assert _is_valid_bbox([0, 0, 0, 0]) is True
 
@@ -222,14 +218,6 @@ def test_is_valid_bbox_long_list_five():
 def test_is_valid_bbox_set():
     s = {1, 2, 3, 4}
     assert _is_valid_bbox(s) is False
-
-
-def test_is_valid_bbox_dict():
-    assert _is_valid_bbox({"x": 1, "y": 2, "w": 3, "h": 4}) is False
-
-
-def test_is_valid_bbox_string():
-    assert _is_valid_bbox("1234") is False
 
 
 def test_is_valid_bbox_with_true_bool():
@@ -686,11 +674,6 @@ def test_strip_unicode_whitespace_signature():
     sig = inspect.signature(_strip_unicode_whitespace)
     params = list(sig.parameters)
     assert params == ["s"]
-
-
-def test_strip_unicode_whitespace_return_annotation_str():
-    sig = inspect.signature(_strip_unicode_whitespace)
-    assert sig.return_annotation == "str"
 
 
 def test_strip_unicode_whitespace_preserves_punctuation():

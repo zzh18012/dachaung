@@ -434,40 +434,10 @@ def test_source_no_exec_batch44():
     assert "exec(" not in src
 
 
-def test_source_no_compile_batch44():
-    src = inspect.getsource(report_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch44():
-    src = inspect.getsource(report_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch44():
-    src = inspect.getsource(report_mod)
-    assert "locals(" not in src
-
-
 def test_source_no_open_write_batch44():
     src = inspect.getsource(report_mod)
     assert "open(\"w\"" not in src
     assert "open('w'" not in src
-
-
-def test_source_no_os_system_batch44():
-    src = inspect.getsource(report_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch44():
-    src = inspect.getsource(report_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch44():
-    src = inspect.getsource(report_mod)
-    assert "pickle.load(" not in src
 
 
 # ---------- 端到端集成 ----------

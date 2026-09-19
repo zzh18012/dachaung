@@ -121,11 +121,6 @@ def test_process_one_source_uses_mkdir_parents():
     assert ".mkdir(parents=True, exist_ok=True)" in src
 
 
-def test_process_one_source_calls_process_single():
-    src = inspect.getsource(_process_one)
-    assert "process_single(" in src
-
-
 def test_process_one_source_passes_parser_name():
     src = inspect.getsource(_process_one)
     assert "parser_name=parser_name" in src
@@ -141,11 +136,6 @@ def test_process_one_source_uses_document_source_hash():
     assert "document.source_hash" in src
 
 
-def test_process_one_source_uses_image_dir_none_default():
-    src = inspect.getsource(_process_one)
-    assert "image_dir: Path | None = None" in src
-
-
 def test_process_one_source_uses_errors_truthy_check():
     src = inspect.getsource(_process_one)
     assert "if errors:" in src
@@ -155,11 +145,6 @@ def test_process_one_source_returns_unknown_error_message():
     src = inspect.getsource(_process_one)
     assert '"unknown"' in src
     assert "process_single returned None without errors" in src
-
-
-def test_process_one_source_returns_5_tuple_in_success():
-    src = inspect.getsource(_process_one)
-    assert "return document.to_dict(), None, elapsed, document.parser_version, image_dir" in src
 
 
 def test_process_one_source_uses_elapsed_calc():
@@ -184,11 +169,6 @@ def test_run_evaluation_source_5_params():
 def test_run_evaluation_source_returns_dict():
     src = inspect.getsource(run_evaluation)
     assert "-> dict[str, Any]" in src
-
-
-def test_run_evaluation_source_uses_output_root():
-    src = inspect.getsource(run_evaluation)
-    assert "output_root = Path(output_path).parent" in src
 
 
 def test_run_evaluation_source_uses_mkdir():
@@ -231,11 +211,6 @@ def test_run_evaluation_source_calls_load_annotation():
     assert "_load_annotation(doc.annotation_resolved)" in src
 
 
-def test_run_evaluation_source_calls_figure_caption_prf():
-    src = inspect.getsource(run_evaluation)
-    assert "figure_caption_prf(document, annotation)" in src
-
-
 def test_run_evaluation_source_pops_tolerance_chars():
     src = inspect.getsource(run_evaluation)
     assert 'chunk_b.pop("_tolerance_chars"' in src
@@ -244,22 +219,6 @@ def test_run_evaluation_source_pops_tolerance_chars():
 def test_run_evaluation_source_pops_missing_markers():
     src = inspect.getsource(run_evaluation)
     assert 'chunk_b.pop("_missing_markers"' in src
-
-
-def test_run_evaluation_source_uses_metrics_update():
-    src = inspect.getsource(run_evaluation)
-    assert "metrics.update(fig_caps)" in src
-    assert "metrics.update(chunk_b)" in src
-
-
-def test_run_evaluation_source_calls_build_devset_section():
-    src = inspect.getsource(run_evaluation)
-    assert "build_devset_section(manifest)" in src
-
-
-def test_run_evaluation_source_calls_aggregate_summary():
-    src = inspect.getsource(run_evaluation)
-    assert "aggregate_summary(per_doc_results)" in src
 
 
 def test_run_evaluation_source_builds_public_per_doc():
@@ -297,11 +256,6 @@ def test_run_evaluation_source_returns_report():
 def test_run_evaluation_source_appends_to_per_doc_results():
     src = inspect.getsource(run_evaluation)
     assert "per_doc_results.append(" in src
-
-
-def test_run_evaluation_source_handles_actual_code():
-    src = inspect.getsource(run_evaluation)
-    assert "actual_code = errors[0].code if errors else None" in src
 
 
 def test_run_evaluation_source_uses_total_seconds_in_wall_time():
@@ -450,14 +404,6 @@ def test_module_source_imports_compute_automatic_metrics():
     assert "from evaluation.metrics import compute_automatic_metrics" in src
 
 
-def test_module_source_imports_report_helpers():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.report import (" in src
-    assert "aggregate_summary" in src
-    assert "build_devset_section" in src
-    assert "build_provenance" in src
-
-
 def test_module_source_no_star_import():
     src = inspect.getsource(rmod)
     assert "import *" not in src
@@ -515,13 +461,6 @@ def test_module_source_no_write_in_load_annotation():
 
 
 # ---------- signatures 精确补强 ----------
-
-
-def test_signature_load_annotation():
-    sig = inspect.signature(_load_annotation)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path"
 
 
 def test_signature_load_annotation_path_no_default():

@@ -548,39 +548,14 @@ def test_module_source_future_annotations_present_batch14():
     assert "from __future__ import annotations" in head
 
 
-def test_module_source_defines_manifest_error_batch14():
-    source = inspect.getsource(mmod)
-    assert "class ManifestError" in source
-
-
 def test_module_source_defines_document_entry_batch14():
     source = inspect.getsource(mmod)
     assert "class DocumentEntry" in source
 
 
-def test_module_source_defines_expected_failure_batch14():
-    source = inspect.getsource(mmod)
-    assert "class ExpectedFailure" in source
-
-
-def test_module_source_defines_manifest_batch14():
-    source = inspect.getsource(mmod)
-    assert "class Manifest" in source
-
-
-def test_module_source_defines_is_absolute_like_batch14():
-    source = inspect.getsource(mmod)
-    assert "def _is_absolute_like(" in source
-
-
 def test_module_source_defines_resolve_relative_path_batch14():
     source = inspect.getsource(mmod)
     assert "def _resolve_relative_path(" in source
-
-
-def test_module_source_defines_load_manifest_batch14():
-    source = inspect.getsource(mmod)
-    assert "def load_manifest(" in source
 
 
 def test_module_source_defines_detect_project_root_batch14():
@@ -711,10 +686,6 @@ def test_module_name_evaluation_manifest_batch14():
 def test_module_dunder_all_includes_5_names_batch14():
     expected = {"ManifestError", "Manifest", "DocumentEntry", "ExpectedFailure", "load_manifest"}
     assert set(mmod.__all__) == expected
-
-
-def test_module_dunder_all_items_unique_batch14():
-    assert len(set(mmod.__all__)) == len(mmod.__all__)
 
 
 def test_module_dataclass_class_count_3_batch14():

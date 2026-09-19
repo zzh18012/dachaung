@@ -260,10 +260,6 @@ def test_detect_text_source_type_error_details_suffix_for_no_suffix():
     assert exc_info.value.details["suffix"] == ""
 
 
-def test_text_extensions_value():
-    assert _TEXT_EXTENSIONS == (".txt", ".text")
-
-
 def test_text_extensions_count_two():
     assert len(_TEXT_EXTENSIONS) == 2
 

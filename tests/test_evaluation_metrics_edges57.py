@@ -90,21 +90,9 @@ def test_null_reason_is_string_batch31():
     assert isinstance(m["reason"], str)
 
 
-def test_ratio_one_batch31():
-    assert _ratio(1.0)["value"] == 1.0
-
-
-def test_ratio_zero_batch31():
-    assert _ratio(0.0)["value"] == 0.0
-
-
 def test_bool_metric_empty_string_batch31():
     """bool 强转：'' → False。"""
     assert _bool_metric("")["value"] is False
-
-
-def test_bool_metric_non_empty_string_batch31():
-    assert _bool_metric("x")["value"] is True
 
 
 def test_int_metric_zero_batch31():
@@ -630,11 +618,6 @@ def test_silent_drop_count_empty_expectations_batch31():
     assert out["reason"] == "no_expectations"
 
 
-def test_silent_drop_count_empty_element_count_batch31():
-    out = _silent_drop_count({"paragraph": 5}, {"element_count_by_type": {}})
-    assert out["reason"] == "no_expectations_element_count"
-
-
 def test_silent_drop_count_returns_int_batch31():
     by_type = {"paragraph": 1}
     expectations = {"element_count_by_type": {"paragraph": 5}}
@@ -712,16 +695,6 @@ def test_module_source_no_unlink_batch31():
 def test_module_source_contains_module_docstring_batch31():
     src = inspect.getsource(mmod)
     assert "自动指标" in src
-
-
-def test_module_source_contains_text_types_constant_batch31():
-    src = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ("heading"' in src
-
-
-def test_module_source_contains_pdf_bbox_required_constant_batch31():
-    src = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ("heading"' in src
 
 
 def test_module_source_contains_not_evaluated_constant_batch31():

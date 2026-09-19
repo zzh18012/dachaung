@@ -323,21 +323,11 @@ def test_run_evaluation_expected_failures_no_errors_actual_none_batch49(tmp_path
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_pipeline_import_batch49():
-    src = inspect.getsource(runner_mod)
-    assert "from app.pipeline import image_output_dir_for, process_single" in src
-
-
 def test_source_contains_annotation_metrics_import_batch49():
     src = inspect.getsource(runner_mod)
     assert "from evaluation.annotation_metrics import" in src
     assert "chunk_boundary_prf" in src
     assert "figure_caption_prf" in src
-
-
-def test_source_contains_metrics_import_batch49():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation.metrics import compute_automatic_metrics" in src
 
 
 def test_source_contains_report_import_batch49():
@@ -366,11 +356,6 @@ def test_source_docstring_mentions_pipeline_failed_batch49():
 def test_source_all_has_1_entry_batch49():
     src = inspect.getsource(runner_mod)
     assert '__all__ = ["run_evaluation"]' in src
-
-
-def test_source_contains_perf_counter_batch49():
-    src = inspect.getsource(runner_mod)
-    assert "time.perf_counter" in src
 
 
 def test_source_contains_write_json_false_batch49():
@@ -416,11 +401,6 @@ def test_ast_function_names_batch49():
     tree = ast.parse(inspect.getsource(runner_mod))
     names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert names == ["_load_annotation", "_process_one", "run_evaluation"]
-
-
-def test_ast_no_class_def_batch49():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
 def test_ast_module_has_docstring_batch49():

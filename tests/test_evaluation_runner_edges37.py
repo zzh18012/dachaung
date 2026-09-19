@@ -758,11 +758,6 @@ def test_runner_source_no_async_def_fifteenth():
     assert "async def" not in source
 
 
-def test_runner_source_no_yield_fifteenth():
-    source = inspect.getsource(rmod)
-    assert "yield" not in source
-
-
 def test_runner_source_no_walrus_fifteenth():
     source = inspect.getsource(rmod)
     assert ":=" not in source
@@ -771,12 +766,6 @@ def test_runner_source_no_walrus_fifteenth():
 def test_runner_source_no_print_fifteenth():
     source = inspect.getsource(rmod)
     assert "print(" not in source
-
-
-def test_runner_source_no_logging_fifteenth():
-    source = inspect.getsource(rmod)
-    assert "logging" not in source
-    assert "logger" not in source
 
 
 def test_runner_source_no_remove_call():
@@ -1079,18 +1068,6 @@ def test_signature_run_evaluation_keyword_only_annotations_batch10():
 def test_signature_run_evaluation_return_annotation_str_batch10():
     sig = inspect.signature(run_evaluation)
     assert sig.return_annotation == "dict[str, Any]"
-
-
-def test_signature_run_evaluation_no_var_positional_batch10():
-    sig = inspect.signature(run_evaluation)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_run_evaluation_no_var_keyword_batch10():
-    sig = inspect.signature(run_evaluation)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 # ---------- module 合理性第十批 ----------

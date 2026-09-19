@@ -344,11 +344,6 @@ def _make_manifest(docs=None, efs=None, **kwargs):
     )
 
 
-def test_manifest_file_count_empty_batch26():
-    m = _make_manifest()
-    assert m.file_count == 0
-
-
 def test_manifest_file_count_three_docs_batch26():
     docs = [_make_doc_entry(doc_id=f"d{i}") for i in range(3)]
     m = _make_manifest(docs=docs)
@@ -861,16 +856,6 @@ def test_module_source_no_module_level_mutables_batch26():
 # ---------- module source 字符串精确补强第三十八批 ----------
 
 
-def test_module_source_contains_manifest_class_batch26():
-    source = inspect.getsource(mmod)
-    assert "class Manifest" in source
-
-
-def test_module_source_contains_expected_failure_class_batch26():
-    source = inspect.getsource(mmod)
-    assert "class ExpectedFailure" in source
-
-
 def test_module_source_contains_is_absolute_like_batch26():
     source = inspect.getsource(mmod)
     assert "_is_absolute_like" in source
@@ -889,11 +874,6 @@ def test_module_source_contains_resolve_relative_path_batch26():
 def test_module_source_contains_detect_project_root_batch26():
     source = inspect.getsource(mmod)
     assert "_detect_project_root" in source
-
-
-def test_module_source_contains_manifest_error_class_batch26():
-    source = inspect.getsource(mmod)
-    assert "class ManifestError" in source
 
 
 def test_module_source_contains_frozen_true_batch26():
@@ -1024,10 +1004,6 @@ def test_module_docstring_mentions_no_absolute_path_batch26():
 def test_module_uses_from_future_annotations_batch26():
     source = inspect.getsource(mmod)
     assert "from __future__ import annotations" in source
-
-
-def test_module_manifest_error_docstring_present_batch26():
-    assert ManifestError.__doc__ is not None
 
 
 def test_module_manifest_error_inherits_exception_batch26():

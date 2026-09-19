@@ -333,12 +333,6 @@ def test_pdf_locator_ratio_no_elements_batch22():
     assert out["reason"] == "no_elements"
 
 
-def test_pdf_locator_ratio_all_valid_page_batch22():
-    elements = [{"type": "image", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_pdf_locator_ratio_page_zero_invalid_batch22():
     elements = [{"type": "image", "source_locator": {"page": 0}}]
     out = _pdf_locator_ratio(elements)
@@ -353,12 +347,6 @@ def test_pdf_locator_ratio_negative_page_invalid_batch22():
 
 def test_pdf_locator_ratio_no_page_key_batch22():
     elements = [{"type": "image", "source_locator": {}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_no_locator_key_batch22():
-    elements = [{"type": "image"}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -414,12 +402,6 @@ def test_docx_locator_ratio_no_locator_invalid_batch22():
     assert out["value"] == 0.0
 
 
-def test_docx_locator_ratio_with_section_batch22():
-    elements = [{"type": "paragraph", "source_locator": {"section": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_mixed_batch22():
     elements = [
         {"type": "paragraph", "source_locator": {"paragraph_index": 0}},
@@ -470,12 +452,6 @@ def test_is_valid_bbox_dict_batch22():
 
 def test_image_resource_ratio_no_elements_batch22():
     out = _image_resource_ratio([], None)
-    assert out["reason"] == "no_image_elements"
-
-
-def test_image_resource_ratio_no_images_batch22():
-    elements = [{"type": "paragraph"}]
-    out = _image_resource_ratio(elements, None)
     assert out["reason"] == "no_image_elements"
 
 

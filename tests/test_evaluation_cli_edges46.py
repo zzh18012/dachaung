@@ -480,26 +480,6 @@ def test_module_source_has_sys_import_batch19():
     assert "import sys" in src
 
 
-def test_module_source_has_manifest_import_batch19():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.manifest import" in src
-
-
-def test_module_source_has_report_import_batch19():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.report import" in src
-
-
-def test_module_source_has_runner_import_batch19():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.runner import" in src
-
-
-def test_module_source_has_schema_import_batch19():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.schema import" in src
-
-
 def test_module_source_has_build_parser_batch19():
     src = inspect.getsource(cmod)
     assert "def _build_parser(" in src

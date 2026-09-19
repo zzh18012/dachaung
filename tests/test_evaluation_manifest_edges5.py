@@ -111,10 +111,6 @@ def test_is_absolute_like_two_char_path():
     assert _is_absolute_like("ab") is False
 
 
-def test_is_absolute_like_three_char_relative():
-    assert _is_absolute_like("abc") is False
-
-
 def test_is_absolute_like_windows_drive_lowercase():
     assert _is_absolute_like("c:\\foo") is True
 
@@ -212,10 +208,6 @@ def test_has_backslash_only_backslash():
 
 def test_has_backslash_empty_string():
     assert _has_backslash("") is False
-
-
-def test_has_backslash_unicode_with_backslash():
-    assert _has_backslash("中文\\路径") is True
 
 
 # =========================================================================

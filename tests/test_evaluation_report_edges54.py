@@ -377,11 +377,6 @@ def test_build_provenance_dependencies_is_dict_batch35(tmp_path):
     assert isinstance(out["dependencies"], dict)
 
 
-def test_build_provenance_dependencies_has_three_keys_batch35(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert set(out["dependencies"].keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
-
-
 def test_build_provenance_idempotent_run_timestamp_differs_batch35(tmp_path):
     """两次调用应返回不同 run_timestamp_iso（时间流逝）。"""
     o1 = build_provenance(tmp_path, "fallback", 800, None)
@@ -509,15 +504,6 @@ def test_aggregate_summary_silent_drop_total_sum_batch35():
     ]
     out = aggregate_summary(per_doc)
     assert out["silent_drop_total"] == 8
-
-
-def test_aggregate_summary_silent_drop_skips_null_batch35():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 3}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["silent_drop_total"] == 3
 
 
 def test_aggregate_summary_silent_drop_all_null_batch35():

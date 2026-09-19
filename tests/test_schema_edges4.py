@@ -37,14 +37,6 @@ from app.schema import (
 # =========================================================================
 
 
-def test_schema_path_is_path():
-    assert isinstance(SCHEMA_PATH, Path)
-
-
-def test_schema_path_points_to_document_schema():
-    assert SCHEMA_PATH.name == "document.schema.json"
-
-
 def test_schema_path_exists():
     """SCHEMA_PATH 指向打包的真实 schema 文件。"""
     assert SCHEMA_PATH.is_file()
@@ -423,11 +415,6 @@ def test_is_valid_schema_default_none():
 def test_validate_file_signature_two_params():
     sig = inspect.signature(validate_file)
     assert len(sig.parameters) == 2
-
-
-def test_validate_file_path_no_default():
-    sig = inspect.signature(validate_file)
-    assert sig.parameters["path"].default is inspect.Parameter.empty
 
 
 def test_validate_file_schema_default_none():

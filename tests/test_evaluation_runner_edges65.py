@@ -645,17 +645,6 @@ def test_signature_process_one_params_no_default_batch37():
         assert p.default is inspect.Parameter.empty
 
 
-def test_signature_run_evaluation_params_batch37():
-    sig = inspect.signature(run_evaluation)
-    assert list(sig.parameters.keys()) == [
-        "manifest",
-        "output_path",
-        "parser_name",
-        "max_chars",
-        "tolerance_chars",
-    ]
-
-
 def test_signature_run_evaluation_manifest_no_default_batch37():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["manifest"].default is inspect.Parameter.empty

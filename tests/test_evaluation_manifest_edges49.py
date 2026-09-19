@@ -808,12 +808,6 @@ def test_module_all_contents_exact_batch22():
     }
 
 
-def test_module_does_not_import_app_pipeline_batch22():
-    src = inspect.getsource(mmod)
-    assert "from app" not in src
-    assert "import app" not in src
-
-
 def test_module_does_not_import_evaluation_runner_batch22():
     src = inspect.getsource(mmod)
     assert "from evaluation.runner" not in src
@@ -824,11 +818,6 @@ def test_module_does_not_import_evaluation_cli_batch22():
     src = inspect.getsource(mmod)
     assert "from evaluation.cli" not in src
     assert "from evaluation import cli" not in src
-
-
-def test_module_does_not_import_evaluation_annotation_metrics_batch22():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.annotation_metrics" not in src
 
 
 def test_module_does_not_import_evaluation_report_batch22():

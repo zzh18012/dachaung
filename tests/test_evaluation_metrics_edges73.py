@@ -193,13 +193,6 @@ def test_pdf_locator_ratio_text_type_with_valid_bbox_batch48():
     assert out["value"] == 1.0
 
 
-def test_pdf_locator_ratio_missing_source_locator_batch48():
-    elements = [{"type": "image"}]  # 缺 source_locator
-    out = _pdf_locator_ratio(elements)
-    # loc = None or {} = {}，page = None → not int → invalid
-    assert out["value"] == 0.0
-
-
 # ---------- _docx_locator_ratio 精度 ----------
 
 def test_docx_locator_ratio_with_page_rejected_batch48():
@@ -255,10 +248,6 @@ def test_is_valid_bbox_length_3_rejected_batch48():
 
 def test_is_valid_bbox_valid_int_batch48():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
-
-
-def test_is_valid_bbox_valid_float_batch48():
-    assert _is_valid_bbox([0.0, 0.0, 100.5, 100.5]) is True
 
 
 def test_is_valid_bbox_none_arg_batch48():
@@ -557,10 +546,6 @@ def test_null_reason_passthrough_batch48():
     assert _null("xyz")["reason"] == "xyz"
 
 
-def test_ratio_value_is_float_batch48():
-    assert isinstance(_ratio(0.5)["value"], float)
-
-
 def test_ratio_int_becomes_float_batch48():
     assert _ratio(1)["value"] == 1.0
     assert isinstance(_ratio(1)["value"], float)
@@ -568,11 +553,6 @@ def test_ratio_int_becomes_float_batch48():
 
 def test_ratio_reason_none_batch48():
     assert _ratio(0.0)["reason"] is None
-
-
-def test_bool_metric_value_is_bool_batch48():
-    assert isinstance(_bool_metric(True)["value"], bool)
-    assert isinstance(_bool_metric(False)["value"], bool)
 
 
 def test_bool_metric_int_to_bool_batch48():
@@ -592,24 +572,9 @@ def test_int_metric_float_to_int_batch48():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_math_import_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "import math" in src
-
-
 def test_source_contains_counter_import_batch48():
     src = inspect.getsource(metrics_mod)
     assert "from collections import Counter" in src
-
-
-def test_source_contains_pathlib_import_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_source_contains_typing_any_import_batch48():
-    src = inspect.getsource(metrics_mod)
-    assert "from typing import Any" in src
 
 
 def test_source_contains_not_evaluated_constant_batch48():
@@ -731,12 +696,6 @@ def test_ast_no_class_def_batch48():
 def test_ast_no_async_function_def_batch48():
     tree = ast.parse(inspect.getsource(metrics_mod))
     assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
-
-
-def test_ast_module_docstring_batch48():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_top_level_assigns_count_batch48():

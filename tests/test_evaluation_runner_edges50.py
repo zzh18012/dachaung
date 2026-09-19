@@ -914,12 +914,6 @@ def test_module_does_not_import_evaluation_cli_batch22():
     assert "from evaluation import cli" not in src
 
 
-def test_module_does_not_import_evaluation_schema_batch22():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.schema" not in src
-    assert "from evaluation import schema" not in src
-
-
 def test_module_no_main_block_batch22():
     src = inspect.getsource(rmod)
     assert 'if __name__ ==' not in src

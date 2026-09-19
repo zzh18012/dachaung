@@ -139,10 +139,6 @@ def test_has_backslash_just_one_backslash_true():
     assert _has_backslash("\\") is True
 
 
-def test_has_backslash_just_one_forward_slash_false():
-    assert _has_backslash("/") is False
-
-
 def test_has_backslash_empty_string_false():
     assert _has_backslash("") is False
 
@@ -897,41 +893,6 @@ def test_module_all_exact_list():
         "ExpectedFailure",
         "load_manifest",
     ]
-
-
-def test_module_all_size_five():
-    import evaluation.manifest as m
-    assert len(m.__all__) == 5
-
-
-def test_module_imports_json():
-    import evaluation.manifest as m
-    assert hasattr(m, "json")
-
-
-def test_module_imports_dataclass():
-    import evaluation.manifest as m
-    assert hasattr(m, "dataclass")
-
-
-def test_module_imports_path():
-    import evaluation.manifest as m
-    assert hasattr(m, "Path")
-
-
-def test_module_imports_any():
-    import evaluation.manifest as m
-    assert hasattr(m, "Any")
-
-
-def test_module_imports_manifest_version():
-    import evaluation.manifest as m
-    assert hasattr(m, "MANIFEST_VERSION")
-
-
-def test_module_imports_validate():
-    import evaluation.manifest as m
-    assert hasattr(m, "validate")
 
 
 def test_module_docstring_present():

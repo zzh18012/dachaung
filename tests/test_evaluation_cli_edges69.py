@@ -509,21 +509,6 @@ def test_ast_from_future_first_batch43():
 
 # ---------- forbidden tokens 第八十七批 ----------
 
-def test_source_no_eval_batch43():
-    src = inspect.getsource(cli_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch43():
-    src = inspect.getsource(cli_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch43():
-    src = inspect.getsource(cli_mod)
-    assert "compile(" not in src
-
-
 def test_source_no_globals_batch43():
     src = inspect.getsource(cli_mod)
     assert "globals(" not in src

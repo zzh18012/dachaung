@@ -663,11 +663,6 @@ def test_module_source_imports_path():
     assert "from pathlib import Path" in src
 
 
-def test_module_source_main_block_uses_systemexit():
-    src = inspect.getsource(cli_mod)
-    assert "raise SystemExit(main())" in src
-
-
 def test_module_source_no_yield():
     src = inspect.getsource(cli_mod)
     assert "yield" not in src
@@ -808,10 +803,6 @@ def test_module_has_1_public_function():
     ]
     assert len(public) == 1
     assert public[0].__name__ == "main"
-
-
-def test_module_callable_main():
-    assert callable(cli_mod.main)
 
 
 # ---------- 端到端集成补强 ----------

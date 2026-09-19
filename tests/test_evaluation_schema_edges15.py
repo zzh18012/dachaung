@@ -100,11 +100,6 @@ from evaluation.schema import (
 # =========================================================================
 
 
-def test_eval_schema_error_default_errors_empty_list():
-    err = EvalSchemaError("msg")
-    assert err.errors == []
-
-
 def test_eval_schema_error_none_errors_becomes_empty():
     err = EvalSchemaError("msg", None)
     assert err.errors == []
@@ -213,16 +208,6 @@ def test_eval_schema_error_subclass_of_exception():
 
 def test_eval_schema_error_not_subclass_of_value_error():
     assert not issubclass(EvalSchemaError, ValueError)
-
-
-def test_eval_schema_error_source_has_super_init():
-    src = inspect.getsource(EvalSchemaError)
-    assert "super().__init__(message)" in src
-
-
-def test_eval_schema_error_source_has_self_errors():
-    src = inspect.getsource(EvalSchemaError)
-    assert "self.errors = errors or []" in src
 
 
 # =========================================================================
@@ -467,11 +452,6 @@ def test_validate_source_has_absolute_path():
 def test_validate_source_has_absolute_schema_path():
     src = inspect.getsource(validate)
     assert "absolute_schema_path" in src
-
-
-def test_validate_source_has_head_eq_errors_0():
-    src = inspect.getsource(validate)
-    assert "head = errors[0]" in src
 
 
 def test_validate_source_has_fstring_with_schema_name():

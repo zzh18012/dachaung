@@ -232,10 +232,6 @@ def test_resolve_relative_path_param_kinds_positional_or_keyword():
         assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_resolve_relative_path_module_identity():
-    assert _resolve_relative_path.__module__ == "evaluation.manifest"
-
-
 # =========================================================================
 # _detect_project_root 边界
 # =========================================================================
@@ -299,10 +295,6 @@ def test_detect_project_root_param_no_default():
 def test_detect_project_root_param_kind_positional_or_keyword():
     sig = inspect.signature(_detect_project_root)
     assert sig.parameters["start"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
-def test_detect_project_root_module_identity():
-    assert _detect_project_root.__module__ == "evaluation.manifest"
 
 
 # =========================================================================
@@ -683,30 +675,6 @@ def test_manifest_categories_covered_returns_new_list_each_call():
 # =========================================================================
 
 
-def test_module_namespace_has_json():
-    import evaluation.manifest as m
-
-    assert hasattr(m, "json")
-
-
-def test_module_namespace_has_dataclass():
-    import evaluation.manifest as m
-
-    assert hasattr(m, "dataclass")
-
-
-def test_module_namespace_has_path():
-    import evaluation.manifest as m
-
-    assert hasattr(m, "Path")
-
-
-def test_module_namespace_has_any():
-    import evaluation.manifest as m
-
-    assert hasattr(m, "Any")
-
-
 def test_module_namespace_has_validate():
     """从 evaluation.schema 导入 validate。"""
     import evaluation.manifest as m
@@ -786,12 +754,6 @@ def test_module_all_exact():
         "ExpectedFailure",
         "load_manifest",
     ]
-
-
-def test_module_all_has_5_entries():
-    import evaluation.manifest as m
-
-    assert len(m.__all__) == 5
 
 
 def test_module_all_does_not_contain_constants():
@@ -960,10 +922,6 @@ def test_module_docstring_mentions_no_absolute_in_manifest():
 # =========================================================================
 # helper metadata 全部
 # =========================================================================
-
-
-def test_load_manifest_module_identity():
-    assert load_manifest.__module__ == "evaluation.manifest"
 
 
 def test_is_absolute_like_module_identity():

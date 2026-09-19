@@ -563,26 +563,6 @@ def test_module_source_contains_pathlib_path_import_batch38():
     assert "from pathlib import Path" in src
 
 
-def test_module_source_contains_manifest_import_batch38():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.manifest import" in src
-
-
-def test_module_source_contains_report_import_batch38():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.report import" in src
-
-
-def test_module_source_contains_runner_import_batch38():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.runner import" in src
-
-
-def test_module_source_contains_schema_import_batch38():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.schema import" in src
-
-
 def test_module_source_contains_build_parser_function_batch38():
     src = inspect.getsource(cmod)
     assert "def _build_parser(" in src
@@ -669,32 +649,12 @@ def test_module_has_main_attribute_batch38():
     assert hasattr(cmod, "main")
 
 
-def test_module_has_build_parser_attribute_batch38():
-    assert hasattr(cmod, "_build_parser")
-
-
-def test_module_has_format_metric_attribute_batch38():
-    assert hasattr(cmod, "_format_metric")
-
-
-def test_module_has_run_inspect_doc_attribute_batch38():
-    assert hasattr(cmod, "_run_inspect_doc")
-
-
 def test_module_main_callable_batch38():
     assert callable(cmod.main)
 
 
 def test_module_build_parser_callable_batch38():
     assert callable(cmod._build_parser)
-
-
-def test_module_format_metric_callable_batch38():
-    assert callable(cmod._format_metric)
-
-
-def test_module_run_inspect_doc_callable_batch38():
-    assert callable(cmod._run_inspect_doc)
 
 
 def test_module_no_all_attribute_batch38():

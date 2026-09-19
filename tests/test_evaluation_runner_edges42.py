@@ -400,11 +400,6 @@ def test_module_source_uses_perf_counter_batch15():
     assert "time.perf_counter" in source
 
 
-def test_module_source_uses_write_json_false_batch15():
-    source = inspect.getsource(rmod)
-    assert "write_json=False" in source
-
-
 def test_module_source_uses_not_instrumented_batch15():
     source = inspect.getsource(rmod)
     assert "not_instrumented" in source
@@ -413,16 +408,6 @@ def test_module_source_uses_not_instrumented_batch15():
 def test_module_source_no_subprocess_import_batch15():
     source = inspect.getsource(rmod)
     assert "import subprocess" not in source
-
-
-def test_module_source_uses_json_dump_batch15():
-    source = inspect.getsource(rmod)
-    assert "json.dump(" in source
-
-
-def test_module_source_uses_aggregate_summary_batch15():
-    source = inspect.getsource(rmod)
-    assert "aggregate_summary" in source
 
 
 # ---------- signatures 第十七批 ----------

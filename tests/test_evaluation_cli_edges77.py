@@ -491,19 +491,9 @@ def test_source_path_import_batch52():
     assert "from pathlib import Path" in src
 
 
-def test_source_report_imports_batch52():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.report import get_git_provenance" in src
-
-
 def test_source_runner_imports_batch52():
     src = inspect.getsource(cli_mod)
     assert "from evaluation.runner import run_evaluation" in src
-
-
-def test_source_sys_stdout_reconfigure_call_batch52():
-    src = inspect.getsource(cli_mod)
-    assert 'sys.stdout.reconfigure' in src
 
 
 def test_source_main_returns_int_batch52():
@@ -572,12 +562,6 @@ def test_ast_has_4_functions_batch52():
     assert len(funcs) == 4  # _build_parser, main, _format_metric, _run_inspect_doc
 
 
-def test_ast_function_names_order_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["_build_parser", "main", "_format_metric", "_run_inspect_doc"]
-
-
 def test_ast_no_class_def_batch52():
     tree = ast.parse(inspect.getsource(cli_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
@@ -588,12 +572,6 @@ def test_ast_2_module_level_if_batch52():
     tree = ast.parse(inspect.getsource(cli_mod))
     ifs = [n for n in tree.body if isinstance(n, ast.If)]
     assert len(ifs) == 2
-
-
-def test_ast_module_docstring_batch52():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_main_has_3_command_if_batch52():

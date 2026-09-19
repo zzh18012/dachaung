@@ -458,20 +458,10 @@ def test_module_source_no_eval_exec_batch27():
     assert "exec(" not in source
 
 
-def test_module_source_no_star_import_batch27():
-    source = inspect.getsource(rmod)
-    assert "import *" not in source
-
-
 def test_module_source_no_unsafe_network_batch27():
     source = inspect.getsource(rmod)
     for tok in ["requests", "urllib.request", "http.client", "socket"]:
         assert tok not in source
-
-
-def test_module_source_no_argparse_batch27():
-    source = inspect.getsource(rmod)
-    assert "argparse" not in source
 
 
 def test_module_source_datetime_allowed_batch27():

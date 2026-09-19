@@ -102,11 +102,6 @@ def test_load_schema_returns_dict_batch30():
     assert isinstance(s, dict)
 
 
-def test_load_schema_manifest_has_required_key_batch30():
-    s = load_schema("manifest.schema.json")
-    assert "required" in s
-
-
 def test_load_schema_evaluation_report_has_required_key_batch30():
     s = load_schema("evaluation-report.schema.json")
     assert "required" in s
@@ -364,11 +359,6 @@ def test_module_source_no_shutil_batch30():
 def test_module_source_no_requests_batch30():
     src = inspect.getsource(smod)
     assert "requests" not in src
-
-
-def test_module_source_no_unlink_batch30():
-    src = inspect.getsource(smod)
-    assert ".unlink()" not in src
 
 
 # ---------- module source 字符串精确补强第四十四批 ----------

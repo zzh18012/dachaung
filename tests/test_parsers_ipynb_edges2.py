@@ -258,10 +258,6 @@ def test_extract_kernel_language_empty_metadata_returns_empty():
     assert _extract_kernel_language({}) == ""
 
 
-def test_extract_kernel_language_kernelspec_empty_dict():
-    assert _extract_kernel_language({"kernelspec": {}}) == ""
-
-
 def test_extract_kernel_language_kernelspec_language_empty_falls_to_name():
     md = {"kernelspec": {"language": "", "name": "fallback_name"}}
     assert _extract_kernel_language(md) == "fallback_name"

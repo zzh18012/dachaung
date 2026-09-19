@@ -43,11 +43,6 @@ def test_parser_does_not_emit_relations_hashable_batch32():
     assert PARSER_DOES_NOT_EMIT_RELATIONS in s
 
 
-def test_parser_does_not_emit_relations_in_all_batch32():
-    src = inspect.getsource(amod)
-    assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-
-
 # ---------- figure_caption_prf 第三十二批 ----------
 
 
@@ -360,16 +355,6 @@ def test_module_source_contains_no_ground_truth_anchors_reason_batch32():
     assert "no_ground_truth_anchors" in src
 
 
-def test_module_source_contains_no_ground_truth_anchors_in_stream_reason_batch32():
-    src = inspect.getsource(amod)
-    assert "no_ground_truth_anchors_in_stream" in src
-
-
-def test_module_source_contains_precision_or_recall_not_evaluated_batch32():
-    src = inspect.getsource(amod)
-    assert "precision_or_recall_not_evaluated" in src
-
-
 def test_module_source_contains_search_from_local_batch32():
     src = inspect.getsource(amod)
     assert "search_from" in src
@@ -391,11 +376,6 @@ def test_module_source_contains_normalize_text_call_batch32():
 def test_signature_chunk_boundary_prf_tolerance_default_30_batch32():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_signature_chunk_boundary_prf_tolerance_annotation_int_batch32():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["tolerance_chars"].annotation == "int"
 
 
 def test_signature_chunk_boundary_prf_params_count_batch32():

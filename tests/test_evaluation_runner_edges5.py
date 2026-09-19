@@ -86,13 +86,6 @@ def test_load_annotation_directory_returns_none(tmp_path: Path):
     assert _load_annotation(d) is None
 
 
-def test_load_annotation_empty_file_returns_none(tmp_path: Path):
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    # 空 file → json.load raises JSONDecodeError → 捕获 → None
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_object_returns_dict(tmp_path: Path):
     p = tmp_path / "obj.json"
     p.write_text('{"k": "v"}', encoding="utf-8")

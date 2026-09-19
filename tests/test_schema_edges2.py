@@ -118,10 +118,6 @@ def _valid_ipynb_document():
 # =============================================================================
 
 
-def test_schema_path_is_path_object():
-    assert isinstance(SCHEMA_PATH, Path)
-
-
 def test_schema_path_resolved_no_relative_components():
     """SCHEMA_PATH 用 .resolve()，不应含 .. 或 .。"""
     s = str(SCHEMA_PATH)

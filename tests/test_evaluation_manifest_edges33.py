@@ -112,10 +112,6 @@ def test_has_backslash_only_one_backslash():
     assert _has_backslash("\\") is True
 
 
-def test_has_backslash_mixed_slashes_only_forward():
-    assert _has_backslash("////") is False
-
-
 # ---------- _resolve_relative_path 行为深度第三批 ----------
 
 
@@ -449,11 +445,6 @@ def test_manifest_categories_covered_with_duplicates_across_docs():
     d2 = _make_doc(categories=("a", "c"))
     m = _make_manifest(documents=(d1, d2))
     assert m.categories_covered == ["a", "b", "c"]
-
-
-def test_manifest_pdf_count_with_zero():
-    m = _make_manifest(documents=())
-    assert m.pdf_count == 0
 
 
 def test_manifest_content_group_count_with_one_unpaired():

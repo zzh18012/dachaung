@@ -36,10 +36,6 @@ from app.parsers.kreuzberg_parser import (
 # =========================================================================
 
 
-def test_heading_re_pattern_object_is_compiled_type():
-    assert isinstance(_HEADING_RE, re.Pattern)
-
-
 def test_heading_re_pattern_source_starts_with_caret():
     """正则必须有 ^ 锚定，避免匹配行中段。"""
     assert _HEADING_RE.pattern.startswith("^")

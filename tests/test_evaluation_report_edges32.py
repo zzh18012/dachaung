@@ -173,12 +173,6 @@ def test_get_dependency_versions_returns_three_keys_batch15():
     assert set(v.keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
 
 
-def test_get_dependency_versions_value_types_batch15():
-    v = get_dependency_versions()
-    for k, val in v.items():
-        assert val is None or isinstance(val, str)
-
-
 def test_get_dependency_versions_serializable_batch15():
     """结果可序列化（用 repr 替代 json，因为可能有 None）。"""
     v = get_dependency_versions()
@@ -524,16 +518,6 @@ def test_module_source_has_evaluator_version_import_batch15():
 def test_module_source_has_ratio_metrics_constant_batch15():
     src = inspect.getsource(rmod)
     assert "_RATIO_METRICS = (" in src
-
-
-def test_module_source_has_count_metrics_constant_batch15():
-    src = inspect.getsource(rmod)
-    assert '_COUNT_METRICS = ("element_count_total",)' in src
-
-
-def test_module_source_has_success_bool_metrics_constant_batch15():
-    src = inspect.getsource(rmod)
-    assert '_SUCCESS_BOOL_METRICS = ("pipeline_success",)' in src
 
 
 def test_module_source_has_get_git_provenance_function_batch15():

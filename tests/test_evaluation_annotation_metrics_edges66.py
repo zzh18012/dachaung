@@ -27,10 +27,6 @@ def test_parser_const_value_exact_batch40():
     assert PARSER_DOES_NOT_EMIT_RELATIONS == "parser_does_not_emit_relations"
 
 
-def test_parser_const_no_spaces_batch40():
-    assert " " not in PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 def test_parser_const_starts_with_parser_batch40():
     assert PARSER_DOES_NOT_EMIT_RELATIONS.startswith("parser_")
 
@@ -590,19 +586,6 @@ def test_module_all_len_three_batch40():
 
 def test_module_all_contains_parser_const_batch40():
     assert "PARSER_DOES_NOT_EMIT_RELATIONS" in amod.__all__
-
-
-def test_module_all_contains_figure_caption_prf_batch40():
-    assert "figure_caption_prf" in amod.__all__
-
-
-def test_module_all_contains_chunk_boundary_prf_batch40():
-    assert "chunk_boundary_prf" in amod.__all__
-
-
-def test_module_does_not_define_class_batch40():
-    src = inspect.getsource(amod)
-    assert "\nclass " not in src
 
 
 def test_module_top_level_no_print_or_assignments_batch40():

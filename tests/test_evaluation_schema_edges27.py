@@ -315,17 +315,6 @@ def test_validate_evaluation_report_extra_field():
         validate(instance, schema_name)
 
 
-def test_validate_returns_none_with_valid_minimal_manifest():
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    # 不抛 = 通过
-    assert validate(instance, "manifest.schema.json") is None
-
-
 def test_validate_error_message_includes_specific_path():
     """错误消息应含具体 path."""
     instance = {"manifest_version": "bad"}
@@ -468,12 +457,6 @@ def test_schema_path_directory_raises(tmp_path):
     """传一个目录名 → 不存在该 file → FileNotFoundError."""
     with pytest.raises(FileNotFoundError):
         _schema_path("subdir")
-
-
-def test_schema_path_idempotent():
-    p1 = _schema_path("manifest.schema.json")
-    p2 = _schema_path("manifest.schema.json")
-    assert p1 == p2
 
 
 def test_schema_path_str_in_error_message():
@@ -647,11 +630,6 @@ def test_module_source_uses_sorted_with_key():
     assert "key=" in src
 
 
-def test_module_source_no_main_block():
-    src = inspect.getsource(smod)
-    assert 'if __name__' not in src
-
-
 def test_module_source_no_yield():
     src = inspect.getsource(smod)
     assert "yield" not in src
@@ -735,11 +713,6 @@ def test_signature_schema_path_name_annotation_str():
     sig = inspect.signature(_schema_path)
     p = sig.parameters["name"]
     assert "str" in str(p.annotation)
-
-
-def test_signature_schema_path_no_default():
-    sig = inspect.signature(_schema_path)
-    assert sig.parameters["name"].default is inspect.Parameter.empty
 
 
 def test_signature_load_schema_1_param():
@@ -827,23 +800,8 @@ def test_signature_all_funcs_module_eq():
 # ---------- module 合理性第七批 ----------
 
 
-def test_module_all_exact_5_items_in_order():
-    assert smod.__all__ == [
-        "SCHEMAS_DIR",
-        "EvalSchemaError",
-        "load_schema",
-        "validate",
-        "validate_file",
-    ]
-
-
 def test_module_all_is_list():
     assert isinstance(smod.__all__, list)
-
-
-def test_module_all_entries_are_str():
-    for entry in smod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_docstring_starts_with_chinese():

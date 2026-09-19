@@ -465,16 +465,6 @@ def test_cli_source_no_class_def_batch10():
     assert "\nclass " not in source
 
 
-def test_cli_source_no_async_def_batch10():
-    source = inspect.getsource(climod)
-    assert "async def" not in source
-
-
-def test_cli_source_no_walrus_batch10():
-    source = inspect.getsource(climod)
-    assert ":=" not in source
-
-
 def test_cli_source_no_rmtree_batch10():
     source = inspect.getsource(climod)
     assert ".rmtree(" not in source
@@ -483,20 +473,10 @@ def test_cli_source_no_rmtree_batch10():
 # ---------- module source 字符串精确补强第八批 ----------
 
 
-def test_module_source_imports_argparse_batch10():
-    source = inspect.getsource(climod)
-    assert "import argparse" in source
-
-
 def test_module_source_imports_manifest_batch10():
     source = inspect.getsource(climod)
     assert "ManifestError" in source
     assert "load_manifest" in source
-
-
-def test_module_source_imports_get_git_provenance_batch10():
-    source = inspect.getsource(climod)
-    assert "get_git_provenance" in source
 
 
 def test_module_source_imports_eval_schema_error_batch10():
@@ -654,18 +634,6 @@ def test_signature_4_funcs_are_function_type_batch10():
 def test_signature_4_funcs_module_eq_batch10():
     for func in (_build_parser, main, _format_metric, _run_inspect_doc):
         assert func.__module__ == "evaluation.cli"
-
-
-def test_signature_main_no_var_positional_batch10():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_signature_main_no_var_keyword_batch10():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
 
 
 # ---------- module 合理性第十批 ----------

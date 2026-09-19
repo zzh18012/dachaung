@@ -111,11 +111,6 @@ def test_bool_metric_with_int_0_returns_false():
     assert out["value"] is False
 
 
-def test_bool_metric_with_int_1_returns_true():
-    out = _bool_metric(1)
-    assert out["value"] is True
-
-
 def test_bool_metric_with_string_returns_true():
     """bool('yes') = True（非空字符串）。"""
     out = _bool_metric("yes")  # type: ignore[arg-type]
@@ -326,14 +321,6 @@ def test_pdf_locator_text_type_with_short_bbox():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_image_does_not_need_bbox():
-    elements = [
-        {"type": "image", "source_locator": {"page": 1}},  # image 不需要 bbox
-    ]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_pdf_locator_no_locator_dict():
     elements = [
         {"type": "paragraph"},  # no source_locator
@@ -392,14 +379,6 @@ def test_docx_locator_with_relationship_id_valid():
     ]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 1.0
-
-
-def test_docx_locator_with_bbox_invalid():
-    elements = [
-        {"type": "paragraph", "source_locator": {"bbox": [0, 0, 1, 1], "paragraph_index": 0}},
-    ]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
 
 
 def test_docx_locator_with_no_structural_keys_invalid():
@@ -664,13 +643,6 @@ def test_heading_boundary_chunk_with_empty_ids():
     assert out["value"] == 0.0
 
 
-def test_heading_boundary_chunk_with_missing_ids_key():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{}]
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 0.0
-
-
 def test_heading_boundary_heading_no_element_id():
     elements = [{"type": "heading"}]  # no element_id
     chunks = [{"source_element_ids": ["anything"]}]
@@ -800,10 +772,6 @@ def test_strip_unicode_whitespace_with_em_space():
     assert _strip_unicode_whitespace("a b") == "ab"
 
 
-def test_strip_unicode_whitespace_with_en_space():
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
 def test_strip_unicode_whitespace_with_ideographic_space():
     assert _strip_unicode_whitespace("a　b") == "ab"
 
@@ -888,10 +856,6 @@ def test_is_valid_bbox_with_string():
 def test_is_valid_bbox_with_bool_in_list():
     """True 是 int 子类但显式拒绝。"""
     assert _is_valid_bbox([True, 0, 0, 0]) is False
-
-
-def test_is_valid_bbox_with_string_in_list():
-    assert _is_valid_bbox(["0", "0", "1", "1"]) is False
 
 
 def test_is_valid_bbox_with_none_in_list():
@@ -1153,12 +1117,6 @@ def test_compute_automatic_metrics_image_base_dir_default_none():
     assert sig.parameters["image_base_dir"].default is None
 
 
-def test_compute_automatic_metrics_param_kinds():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_compute_automatic_metrics_no_varargs_varkw():
     sig = inspect.signature(compute_automatic_metrics)
     kinds = {p.kind for p in sig.parameters.values()}
@@ -1174,11 +1132,6 @@ def test_pdf_locator_ratio_1_param():
 def test_docx_locator_ratio_1_param():
     sig = inspect.signature(_docx_locator_ratio)
     assert len(sig.parameters) == 1
-
-
-def test_image_resource_ratio_2_params():
-    sig = inspect.signature(_image_resource_ratio)
-    assert len(sig.parameters) == 2
 
 
 def test_chunk_reference_ratio_2_params():

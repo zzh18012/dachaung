@@ -693,19 +693,9 @@ def test_module_source_no_class_definitions():
     assert not src.startswith("class ")
 
 
-def test_module_source_no_yield():
-    src = inspect.getsource(amod)
-    assert "yield" not in src
-
-
 def test_module_source_no_async_def():
     src = inspect.getsource(amod)
     assert "async def " not in src
-
-
-def test_module_source_no_walrus():
-    src = inspect.getsource(amod)
-    assert ":=" not in src
 
 
 def test_module_source_no_global_keyword():
@@ -781,11 +771,6 @@ def test_module_source_docstring_mentions_one_to_one():
 def test_module_source_docstring_mentions_tolerance():
     src = inspect.getsource(amod)
     assert "容差" in src[:1200] or "tolerance" in src[:1200].lower()
-
-
-def test_module_source_no_logging():
-    src = inspect.getsource(amod)
-    assert "import logging" not in src
 
 
 def test_module_source_uses_normalize_text_call():
@@ -866,11 +851,6 @@ def test_module_all_exact_3_items_in_order():
 
 def test_module_all_is_list():
     assert isinstance(amod.__all__, list)
-
-
-def test_module_all_entries_are_str():
-    for entry in amod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_has_docstring():

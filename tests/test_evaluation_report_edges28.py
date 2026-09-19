@@ -832,13 +832,6 @@ def test_module_source_has_dict_literal_return_batch11():
 # ---------- signatures 第十一批 ----------
 
 
-def test_get_git_provenance_signature_one_param_batch11():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "project_root"
-
-
 def test_get_git_provenance_return_annotation_batch11():
     sig = inspect.signature(get_git_provenance)
     assert "dict" in str(sig.return_annotation)

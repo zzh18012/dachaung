@@ -44,11 +44,6 @@ def test_eval_schema_error_default_errors_empty_list_batch27():
     assert e.errors == []
 
 
-def test_eval_schema_error_pass_empty_list_batch27():
-    e = EvalSchemaError("msg", [])
-    assert e.errors == []
-
-
 def test_eval_schema_error_pass_truthy_list_batch27():
     e = EvalSchemaError("msg", [{"x": 1}])
     assert bool(e.errors) is True
@@ -126,16 +121,6 @@ def test_schema_path_message_contains_path_batch27():
 
 def test_schema_path_manifest_exists_batch27():
     p = _schema_path("manifest.schema.json")
-    assert p.is_file()
-
-
-def test_schema_path_annotation_exists_batch27():
-    p = _schema_path("annotation.schema.json")
-    assert p.is_file()
-
-
-def test_schema_path_evaluation_report_exists_batch27():
-    p = _schema_path("evaluation-report.schema.json")
     assert p.is_file()
 
 
@@ -382,11 +367,6 @@ def test_module_source_no_shutil_batch27():
 def test_module_source_no_requests_batch27():
     src = inspect.getsource(smod)
     assert "requests" not in src
-
-
-def test_module_source_no_unlink_batch27():
-    src = inspect.getsource(smod)
-    assert ".unlink()" not in src
 
 
 # ---------- module source 字符串精确补强第四十一批 ----------

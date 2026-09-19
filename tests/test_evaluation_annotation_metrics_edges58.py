@@ -358,16 +358,6 @@ def test_module_source_contains_no_ground_truth_anchors_reason_batch31():
     assert "no_ground_truth_anchors" in src
 
 
-def test_module_source_contains_no_ground_truth_anchors_in_stream_reason_batch31():
-    src = inspect.getsource(amod)
-    assert "no_ground_truth_anchors_in_stream" in src
-
-
-def test_module_source_contains_precision_or_recall_not_evaluated_batch31():
-    src = inspect.getsource(amod)
-    assert "precision_or_recall_not_evaluated" in src
-
-
 def test_module_source_contains_search_from_local_batch31():
     src = inspect.getsource(amod)
     assert "search_from" in src
@@ -400,11 +390,6 @@ def test_signature_chunk_boundary_prf_document_annotation_batch31():
 def test_signature_chunk_boundary_prf_tolerance_default_30_batch31():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_signature_chunk_boundary_prf_tolerance_annotation_int_batch31():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["tolerance_chars"].annotation == "int"
 
 
 def test_signature_chunk_boundary_prf_params_count_batch31():

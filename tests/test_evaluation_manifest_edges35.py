@@ -637,11 +637,6 @@ def test_manifest_file_count_multiple():
     assert m.file_count == 5
 
 
-def test_manifest_pdf_count_empty():
-    m = _make_manifest(documents=())
-    assert m.pdf_count == 0
-
-
 def test_manifest_pdf_count_only_docx():
     docs = (_make_doc_entry(doc_id="d1", source_type="docx"),)
     m = _make_manifest(documents=docs)
@@ -1356,10 +1351,6 @@ def test_module_all_attribute_lists_exact_items():
 
 def test_module_all_is_list():
     assert isinstance(mmod.__all__, list)
-
-
-def test_module_all_entries_unique():
-    assert len(set(mmod.__all__)) == len(mmod.__all__)
 
 
 def test_module_has_docstring():

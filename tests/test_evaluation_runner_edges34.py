@@ -149,11 +149,6 @@ def test_process_one_source_passes_write_json_false():
     assert "write_json=False," in src
 
 
-def test_process_one_source_image_dir_init_none():
-    src = inspect.getsource(_process_one)
-    assert "image_dir: Path | None = None" in src
-
-
 def test_process_one_source_image_dir_branch():
     src = inspect.getsource(_process_one)
     assert "if document is not None:" in src
@@ -171,14 +166,6 @@ def test_process_one_source_unlink_try_except_oserror():
     assert "try:" in src
     assert "except OSError:" in src
     assert "pass" in src
-
-
-def test_process_one_source_return_5_tuple_success():
-    src = inspect.getsource(_process_one)
-    assert (
-        "return document.to_dict(), None, elapsed, document.parser_version, image_dir"
-        in src
-    )
 
 
 def test_process_one_source_no_walrus():
@@ -202,11 +189,6 @@ def test_run_evaluation_source_docstring_present():
 def test_run_evaluation_source_docstring_mentions_run():
     src = inspect.getsource(run_evaluation)
     assert "跑评测" in src or "run" in src.lower()
-
-
-def test_run_evaluation_source_uses_output_root_assignment():
-    src = inspect.getsource(run_evaluation)
-    assert "output_root = Path(output_path).parent" in src
 
 
 def test_run_evaluation_source_uses_output_root_mkdir():
@@ -292,11 +274,6 @@ def test_run_evaluation_source_wall_time_seconds_dict():
     assert '"chunk_reason": "not_instrumented"' in src
 
 
-def test_run_evaluation_source_annotation_present_flag():
-    src = inspect.getsource(run_evaluation)
-    assert '"_annotation_present": annotation is not None' in src
-
-
 def test_run_evaluation_source_tolerance_record_extract():
     src = inspect.getsource(run_evaluation)
     assert '"_tolerance_chars": (' in src
@@ -334,11 +311,6 @@ def test_run_evaluation_source_ef_unlink_check():
     src = inspect.getsource(run_evaluation)
     # 两个 unlink check（一个在 _process_one，一个在 expected_failure loop）
     assert src.count("if out_stub.is_file():") >= 1
-
-
-def test_run_evaluation_source_actual_code_extraction():
-    src = inspect.getsource(run_evaluation)
-    assert "actual_code = errors[0].code if errors else None" in src
 
 
 def test_run_evaluation_source_expected_failure_append():
@@ -417,12 +389,6 @@ def test_load_annotation_valid_json(tmp_path):
 def test_load_annotation_invalid_json(tmp_path):
     p = tmp_path / "bad.json"
     p.write_text("not json", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
-def test_load_annotation_empty_file(tmp_path):
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
     assert _load_annotation(p) is None
 
 
@@ -677,13 +643,6 @@ def test_module_source_no_compile():
 # ---------- signatures 精确补强第四批 ----------
 
 
-def test_signature_load_annotation():
-    sig = inspect.signature(_load_annotation)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path"
-
-
 def test_signature_load_annotation_no_default():
     sig = inspect.signature(_load_annotation)
     params = list(sig.parameters.values())
@@ -797,11 +756,6 @@ def test_module_all_length_1():
 
 def test_module_all_entries_unique():
     assert len(set(rmod.__all__)) == 1
-
-
-def test_module_all_entries_are_str():
-    for entry in rmod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_all_only_run_evaluation():

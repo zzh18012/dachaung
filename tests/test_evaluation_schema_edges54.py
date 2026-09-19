@@ -636,11 +636,6 @@ def test_module_source_contains_schemas_subdir_batch34():
     assert '"schemas"' in src
 
 
-def test_module_source_contains_schema_path_func_batch34():
-    src = inspect.getsource(smod)
-    assert "def _schema_path(name: str) -> Path:" in src
-
-
 def test_module_source_contains_load_schema_func_batch34():
     src = inspect.getsource(smod)
     assert "def load_schema(name: str)" in src

@@ -422,12 +422,6 @@ def test_parse_standalone_image(tmp_path: Path):
 # =========================================================================
 
 
-def test_unordered_list_regex_minus():
-    m = _UNORDERED_LIST_RE.match("- item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
 def test_unordered_list_regex_plus():
     m = _UNORDERED_LIST_RE.match("+ item")
     assert m is not None
@@ -446,12 +440,6 @@ def test_unordered_list_regex_no_match_no_space():
 def test_unordered_list_regex_no_match_dash_dash():
     m = _UNORDERED_LIST_RE.match("-- item")
     assert m is None
-
-
-def test_ordered_list_regex_dot():
-    m = _ORDERED_LIST_RE.match("1. item")
-    assert m is not None
-    assert m.group(1) == "item"
 
 
 def test_ordered_list_regex_paren():

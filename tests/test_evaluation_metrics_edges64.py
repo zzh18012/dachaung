@@ -129,10 +129,6 @@ def test_pdf_bbox_required_types_contains_four_kinds_batch38():
     assert len(_PDF_BBOX_REQUIRED_TYPES) == 4
 
 
-def test_pdf_bbox_required_types_does_not_contain_image_batch38():
-    assert "image" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_pdf_bbox_required_types_subset_of_text_types_batch38():
     assert set(_PDF_BBOX_REQUIRED_TYPES).issubset(set(_TEXT_TYPES))
 
@@ -749,11 +745,6 @@ def test_module_source_contains_design_principles_batch38():
     assert "设计原则" in src
 
 
-def test_module_source_contains_pure_function_keyword_batch38():
-    src = inspect.getsource(mmod)
-    assert "纯函数" in src
-
-
 def test_module_source_contains_text_preservation_section_batch38():
     src = inspect.getsource(mmod)
     assert "text_preservation 语义" in src
@@ -799,16 +790,6 @@ def test_module_source_contains_image_base_dir_param_doc_batch38():
     assert "image_base_dir" in src
 
 
-def test_module_source_contains_text_types_tuple_definition_batch38():
-    src = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ("heading"' in src
-
-
-def test_module_source_contains_pdf_bbox_required_types_definition_batch38():
-    src = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ("heading"' in src
-
-
 def test_module_source_contains_not_evaluated_constant_batch38():
     src = inspect.getsource(mmod)
     assert '_NOT_EVALUATED = "not_evaluated"' in src
@@ -835,11 +816,6 @@ def test_signature_compute_metrics_has_five_params_batch38():
 def test_signature_compute_metrics_image_base_dir_default_none_batch38():
     sig = inspect.signature(compute_automatic_metrics)
     assert sig.parameters["image_base_dir"].default is None
-
-
-def test_signature_compute_metrics_return_dict_batch38():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert "dict" in str(sig.return_annotation)
 
 
 def test_signature_strip_unicode_whitespace_one_param_batch38():

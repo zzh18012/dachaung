@@ -189,10 +189,6 @@ def test_run_evaluation_output_path_param_kind():
     assert sig.parameters["output_path"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_run_evaluation_namespace_is_evaluation_runner():
-    assert run_evaluation.__module__ == "evaluation.runner"
-
-
 def test_run_evaluation_is_function():
     assert isinstance(run_evaluation, FunctionType)
 

@@ -177,15 +177,6 @@ def test_process_one_signature_no_default_for_max_chars():
     assert sig.parameters["max_chars"].default is inspect.Parameter.empty
 
 
-def test_process_one_no_varargs_varkw():
-    sig = inspect.signature(_process_one)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 def test_process_one_param_kinds():
     sig = inspect.signature(_process_one)
     for p in sig.parameters.values():

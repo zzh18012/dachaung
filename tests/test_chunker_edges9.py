@@ -109,10 +109,6 @@ def test_normalize_text_preserves_unicode():
     assert normalize_text("中文 文本") == "中文 文本"
 
 
-def test_normalize_text_returns_str_type():
-    assert isinstance(normalize_text("x"), str)
-
-
 def test_normalize_text_signature():
     sig = inspect.signature(normalize_text)
     params = list(sig.parameters)
@@ -408,22 +404,6 @@ def test_split_long_text_mixed_sentences_and_forced():
 # =========================================================================
 
 
-def test_part_text_constant_value():
-    assert _PART_TEXT == 0
-
-
-def test_part_element_id_constant_value():
-    assert _PART_ELEMENT_ID == 1
-
-
-def test_part_start_constant_value():
-    assert _PART_START == 2
-
-
-def test_part_end_constant_value():
-    assert _PART_END == 3
-
-
 def test_part_constants_unique():
     values = {_PART_TEXT, _PART_ELEMENT_ID, _PART_START, _PART_END}
     assert len(values) == 4
@@ -582,16 +562,6 @@ def test_chunk_buffer_init_signature():
 # =========================================================================
 # StructuralChunker.__init__ 深度
 # =========================================================================
-
-
-def test_chunker_init_max_chars_below_32_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=31)
-
-
-def test_chunker_init_max_chars_zero_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=0)
 
 
 def test_chunker_init_signature():

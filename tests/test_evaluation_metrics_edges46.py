@@ -98,10 +98,6 @@ def test_bool_metric_string_truthy_batch19():
     assert _bool_metric("yes")["value"] is True
 
 
-def test_bool_metric_empty_string_falsy_batch19():
-    assert _bool_metric("")["value"] is False
-
-
 def test_int_metric_zero_batch19():
     assert _int_metric(0)["value"] == 0
 
@@ -340,12 +336,6 @@ def test_docx_locator_ratio_with_page_none_batch19():
     elements = [{"type": "paragraph", "source_locator": {"page": None, "section": 0}}]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 0.0
-
-
-def test_docx_locator_ratio_only_section_batch19():
-    elements = [{"type": "paragraph", "source_locator": {"section": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
 
 
 def test_docx_locator_ratio_paragraph_index_zero_batch19():
@@ -713,11 +703,6 @@ def test_module_source_no_write_text_call_batch19():
     assert ".write_bytes(" not in src
 
 
-def test_module_source_no_sys_exit_batch19():
-    src = inspect.getsource(mmod)
-    assert "sys.exit" not in src
-
-
 def test_module_source_no_path_open_write_mode_batch19():
     """不应该有 'w' 写模式 open。"""
     src = inspect.getsource(mmod)
@@ -761,16 +746,6 @@ def test_module_source_has_pathlib_path_import_batch19():
 def test_module_source_has_typing_any_import_batch19():
     src = inspect.getsource(mmod)
     assert "from typing import Any" in src
-
-
-def test_module_source_has_text_types_constant_batch19():
-    src = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ("heading", "paragraph", "list_item", "table", "caption", "header", "footer")' in src
-
-
-def test_module_source_has_pdf_bbox_required_constant_batch19():
-    src = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ("heading", "paragraph", "caption", "list_item")' in src
 
 
 def test_module_source_has_not_evaluated_constant_batch19():
@@ -850,12 +825,6 @@ def test_module_has_all_attribute_batch19():
 
 def test_module_all_only_contains_one_entry_batch19():
     assert len(mmod.__all__) == 1
-
-
-def test_module_does_not_import_app_pipeline_batch19():
-    src = inspect.getsource(mmod)
-    assert "from app" not in src
-    assert "import app" not in src
 
 
 def test_module_does_not_import_evaluation_runner_batch19():

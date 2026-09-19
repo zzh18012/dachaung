@@ -369,12 +369,6 @@ def test_module_source_forbidden_tokens_batch19(forbidden):
 # ---------- module source 字符串精确补强第三十一批 ----------
 
 
-def test_module_source_has_future_annotations_batch19():
-    src = inspect.getsource(amod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
-
-
 def test_module_source_has_docstring_batch19():
     src = inspect.getsource(amod)
     assert "人工标注指标" in src
@@ -443,11 +437,6 @@ def test_signature_chunk_boundary_prf_default_batch19():
 # ---------- module 合理性第二十九批 ----------
 
 
-def test_module_has_all_attribute_batch19():
-    assert hasattr(amod, "__all__")
-    assert isinstance(amod.__all__, list)
-
-
 def test_module_all_count_3_batch19():
     assert len(amod.__all__) == 3
 
@@ -472,11 +461,6 @@ def test_module_does_not_import_unsafe_modules_batch19():
     src = inspect.getsource(amod)
     for unsafe in ["import pickle", "import marshal", "import shelve"]:
         assert unsafe not in src
-
-
-def test_module_does_not_import_evaluation_cli_batch19():
-    src = inspect.getsource(amod)
-    assert "from evaluation.cli" not in src
 
 
 def test_module_constant_is_string_batch19():

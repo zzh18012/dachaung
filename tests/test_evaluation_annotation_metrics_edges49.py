@@ -434,11 +434,6 @@ def test_module_source_forbidden_tokens_batch22(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_logging_import_batch22():
-    src = inspect.getsource(amod)
-    assert "import logging" not in src
-
-
 # ---------- module source 字符串精确补强第三十三批 ----------
 
 
@@ -544,11 +539,6 @@ def test_module_does_not_import_app_parsers_batch22():
     src = inspect.getsource(amod)
     assert "from app.parsers" not in src
     assert "from app import parsers" not in src
-
-
-def test_module_does_not_import_evaluation_cli_batch22():
-    src = inspect.getsource(amod)
-    assert "from evaluation.cli" not in src
 
 
 def test_module_does_not_import_evaluation_manifest_batch22():

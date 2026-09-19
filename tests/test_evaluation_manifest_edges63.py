@@ -897,12 +897,6 @@ def test_signature_load_manifest_manifest_path_no_default_batch36():
     assert sig.parameters["manifest_path"].default is inspect.Parameter.empty
 
 
-def test_signature_is_absolute_like_param_path_str_batch36():
-    sig = inspect.signature(_is_absolute_like)
-    params = list(sig.parameters.keys())
-    assert params == ["path_str"]
-
-
 def test_signature_has_backslash_param_path_str_batch36():
     sig = inspect.signature(_has_backslash)
     params = list(sig.parameters.keys())

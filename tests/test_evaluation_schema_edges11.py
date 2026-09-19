@@ -215,11 +215,6 @@ def test_schema_path_signature_param_name_name():
     assert list(sig.parameters.keys()) == ["name"]
 
 
-def test_schema_path_signature_param_no_default():
-    sig = inspect.signature(_schema_path)
-    assert sig.parameters["name"].default is inspect.Parameter.empty
-
-
 def test_schema_path_param_kind_positional_or_keyword():
     sig = inspect.signature(_schema_path)
     assert sig.parameters["name"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
@@ -235,10 +230,6 @@ def test_schema_path_no_var_kwargs():
     sig = inspect.signature(_schema_path)
     for p in sig.parameters.values():
         assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
-def test_schema_path_module_identity():
-    assert _schema_path.__module__ == "evaluation.schema"
 
 
 # =========================================================================
@@ -304,10 +295,6 @@ def test_load_schema_no_var_kwargs():
     sig = inspect.signature(load_schema)
     for p in sig.parameters.values():
         assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
-def test_load_schema_module_identity():
-    assert load_schema.__module__ == "evaluation.schema"
 
 
 # =========================================================================
@@ -428,10 +415,6 @@ def test_validate_sorted_by_absolute_path():
     assert paths == sorted(paths)
 
 
-def test_validate_module_identity():
-    assert validate.__module__ == "evaluation.schema"
-
-
 # =========================================================================
 # validate_file 详细
 # =========================================================================
@@ -517,10 +500,6 @@ def test_validate_file_error_message_contains_path(tmp_path: Path):
     with pytest.raises(FileNotFoundError) as ei:
         validate_file(nonexistent, "manifest.schema.json")
     assert "no.json" in str(ei.value)
-
-
-def test_validate_file_module_identity():
-    assert validate_file.__module__ == "evaluation.schema"
 
 
 # =========================================================================

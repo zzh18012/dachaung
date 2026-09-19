@@ -353,11 +353,6 @@ def test_module_source_no_requests_batch32():
     assert "requests" not in src
 
 
-def test_module_source_no_subprocess_batch32():
-    src = inspect.getsource(rmod)
-    assert "subprocess" not in src
-
-
 # ---------- module source 字符串精确补强第四十六批 ----------
 
 
@@ -500,11 +495,6 @@ def test_module_imports_typing_any_batch32():
 def test_module_has_all_export_batch32():
     src = inspect.getsource(rmod)
     assert "__all__" in src
-
-
-def test_module_all_has_run_evaluation_batch32():
-    src = inspect.getsource(rmod)
-    assert '"run_evaluation"' in src
 
 
 def test_module_no_main_block_batch32():

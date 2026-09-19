@@ -123,11 +123,6 @@ def test_format_metric_float_renders_4_decimals_exact():
     assert "0.1235" in out
 
 
-def test_format_metric_negative_float_renders_minus_sign():
-    out = _format_metric("x", {"value": -0.5, "reason": None})
-    assert "-0.5000" in out
-
-
 def test_format_metric_dict_value_comma_separated_exact():
     """dict value: 'k=v, k2=v2'（按 key sorted）。"""
     out = _format_metric("x", {"value": {"a": 1, "b": 2}, "reason": None})

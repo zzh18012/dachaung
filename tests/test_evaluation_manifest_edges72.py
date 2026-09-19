@@ -532,11 +532,6 @@ def test_source_no_popen_batch46():
     assert ".popen(" not in src
 
 
-def test_source_no_yield_batch46():
-    src = inspect.getsource(manifest_mod)
-    assert "yield" not in src
-
-
 def test_source_no_await_batch46():
     src = inspect.getsource(manifest_mod)
     assert "await " not in src

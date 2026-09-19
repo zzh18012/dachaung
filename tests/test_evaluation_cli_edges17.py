@@ -520,13 +520,6 @@ def test_all_module_functions_are_function_type():
 # =========================================================================
 
 
-def test_build_parser_returns_argument_parser():
-    import argparse
-
-    p = _build_parser()
-    assert isinstance(p, argparse.ArgumentParser)
-
-
 def test_build_parser_prog_is_evaluation_cli():
     p = _build_parser()
     assert p.prog == "evaluation.cli"

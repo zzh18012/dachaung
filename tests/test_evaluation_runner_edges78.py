@@ -418,21 +418,11 @@ def test_source_future_annotations_batch52():
     assert "from __future__ import annotations" in src
 
 
-def test_source_pipeline_imports_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "from app.pipeline import image_output_dir_for, process_single" in src
-
-
 def test_source_annotation_metrics_imports_batch52():
     src = inspect.getsource(runner_mod)
     assert "from evaluation.annotation_metrics import (" in src
     assert "chunk_boundary_prf," in src
     assert "figure_caption_prf," in src
-
-
-def test_source_metrics_import_batch52():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation.metrics import compute_automatic_metrics" in src
 
 
 def test_source_report_imports_batch52():
@@ -502,11 +492,6 @@ def test_ast_10_imports_batch52():
     tree = ast.parse(inspect.getsource(runner_mod))
     imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
     assert len(imports) == 10
-
-
-def test_ast_no_class_def_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
 def test_ast_module_docstring_batch52():

@@ -29,10 +29,6 @@ def test_parser_does_not_emit_relations_used_by_figure_caption_batch33():
     assert out["figure_caption_precision"]["reason"] == PARSER_DOES_NOT_EMIT_RELATIONS
 
 
-def test_parser_does_not_emit_relations_no_spaces_batch33():
-    assert " " not in PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 def test_parser_does_not_emit_relations_starts_with_parser_batch33():
     assert PARSER_DOES_NOT_EMIT_RELATIONS.startswith("parser_")
 
@@ -48,11 +44,6 @@ def test_figure_caption_prf_signature_batch33():
     sig = inspect.signature(figure_caption_prf)
     params = list(sig.parameters.keys())
     assert params == ["document", "annotation"]
-
-
-def test_figure_caption_prf_return_annotation_batch33():
-    sig = inspect.signature(figure_caption_prf)
-    assert sig.return_annotation == "dict[str, dict[str, Any]]"
 
 
 def test_figure_caption_prf_keys_exact_order_batch33():

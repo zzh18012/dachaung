@@ -72,10 +72,6 @@ def test_is_absolute_like_relative_double_dot_batch45():
     assert _is_absolute_like("../foo") is False
 
 
-def test_is_absolute_like_windows_backslash_batch45():
-    assert _is_absolute_like("C:\\Windows") is True
-
-
 def test_is_absolute_like_lowercase_drive_batch45():
     assert _is_absolute_like("c:\\Windows") is True
 
@@ -83,10 +79,6 @@ def test_is_absolute_like_lowercase_drive_batch45():
 def test_is_absolute_like_drive_no_separator_batch45():
     """C:foo 没有 \\ 或 / → 相对路径（Windows 当前目录）。"""
     assert _is_absolute_like("C:foo") is False
-
-
-def test_is_absolute_like_single_char_batch45():
-    assert _is_absolute_like("C") is False
 
 
 def test_is_absolute_like_colon_only_batch45():
@@ -146,10 +138,6 @@ def test_has_backslash_empty_batch45():
 
 def test_has_backslash_only_batch45():
     assert _has_backslash("\\") is True
-
-
-def test_has_backslash_double_batch45():
-    assert _has_backslash("foo\\\\bar") is True
 
 
 def test_has_backslash_at_end_batch45():
@@ -748,12 +736,6 @@ def test_ast_top_level_class_names_batch45():
     assert names == ["ManifestError", "DocumentEntry", "ExpectedFailure", "Manifest"]
 
 
-def test_ast_top_level_functions_count_batch45():
-    tree = ast.parse(inspect.getsource(manifest_mod))
-    funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert len(funcs) == 5  # _is_absolute_like, _has_backslash, _resolve_relative_path, load_manifest, _detect_project_root
-
-
 def test_ast_top_level_function_names_batch45():
     tree = ast.parse(inspect.getsource(manifest_mod))
     names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
@@ -868,11 +850,6 @@ def test_ast_load_manifest_has_for_loops_batch45():
 def test_source_no_async_def_batch45():
     src = inspect.getsource(manifest_mod)
     assert "async def" not in src
-
-
-def test_source_no_yield_batch45():
-    src = inspect.getsource(manifest_mod)
-    assert "yield" not in src
 
 
 def test_source_no_walrus_batch45():

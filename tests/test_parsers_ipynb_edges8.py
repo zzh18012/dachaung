@@ -181,10 +181,6 @@ def test_extract_kernel_language_none_metadata_raises():
         _extract_kernel_language(None)  # type: ignore[arg-type]
 
 
-def test_extract_kernel_language_kernelspec_empty():
-    assert _extract_kernel_language({"kernelspec": {}}) == ""
-
-
 def test_extract_kernel_language_kernelspec_none():
     assert _extract_kernel_language({"kernelspec": None}) == ""
 

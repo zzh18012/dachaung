@@ -156,13 +156,6 @@ def test_text_preservation_image_excluded_batch13():
     assert out["equal"]["value"] is True
 
 
-def test_text_preservation_unicode_batch13():
-    elements = [{"type": "paragraph", "content": "你好世界"}]
-    chunks = [{"text": "你好世界"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-
-
 def test_text_preservation_whitespace_ignored_batch13():
     """空白字符不参与比较。"""
     elements = [{"type": "paragraph", "content": "a b c"}]
@@ -249,13 +242,6 @@ def test_heading_boundary_partial_match_batch13():
     out = _heading_boundary_ratio(elements, chunks)
     # matched=1, total=2 → 0.5
     assert out["value"] == 0.5
-
-
-def test_heading_boundary_chunk_missing_source_element_ids_batch13():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{}]  # no source_element_ids
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 0.0
 
 
 def test_heading_boundary_chunk_empty_source_element_ids_batch13():
@@ -686,39 +672,9 @@ def test_module_source_has_PDF_BBOX_REQUIRED_TYPES_assignment_batch13():
     assert "_PDF_BBOX_REQUIRED_TYPES = " in source
 
 
-def test_module_source_has_NOT_EVALUATED_const_batch13():
-    source = inspect.getsource(mmod)
-    assert '_NOT_EVALUATED = "not_evaluated"' in source
-
-
 def test_module_source_has_compute_automatic_metrics_def_batch13():
     source = inspect.getsource(mmod)
     assert "def compute_automatic_metrics(" in source
-
-
-def test_module_source_has_null_helper_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _null(" in source
-
-
-def test_module_source_has_ratio_helper_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _ratio(" in source
-
-
-def test_module_source_has_bool_metric_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _bool_metric(" in source
-
-
-def test_module_source_has_int_metric_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _int_metric(" in source
-
-
-def test_module_source_has_strip_unicode_whitespace_def_batch13():
-    source = inspect.getsource(mmod)
-    assert "def _strip_unicode_whitespace(" in source
 
 
 def test_module_source_future_annotations_top_level_batch13():

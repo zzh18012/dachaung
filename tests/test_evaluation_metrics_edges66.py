@@ -501,11 +501,6 @@ def test_compute_metrics_source_type_annotation_str_batch40():
     assert "str" in ann
 
 
-def test_compute_metrics_returns_dict_annotation_batch40():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert "dict" in str(sig.return_annotation)
-
-
 # ---------- module source forbidden tokens 第六十九批
 
 
@@ -534,16 +529,6 @@ def test_module_source_no_forbidden_tokens_batch40(token):
 
 
 # ---------- module source 字符串精确补强第六十五批
-
-
-def test_module_source_contains_text_types_definition_batch40():
-    src = inspect.getsource(mmod)
-    assert "_TEXT_TYPES = " in src
-
-
-def test_module_source_contains_pdf_bbox_required_definition_batch40():
-    src = inspect.getsource(mmod)
-    assert "_PDF_BBOX_REQUIRED_TYPES = " in src
 
 
 def test_module_source_contains_not_evaluated_definition_batch40():
@@ -576,11 +561,6 @@ def test_module_source_contains_counter_intersection_call_batch40():
     """precision/recall 用 Counter 交集。"""
     src = inspect.getsource(mmod)
     assert "c_expected & c_actual" in src
-
-
-def test_module_source_contains_pure_function_comment_batch40():
-    src = inspect.getsource(mmod)
-    assert "纯函数" in src
 
 
 def test_module_source_contains_silent_drop_count_formula_batch40():

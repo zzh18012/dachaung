@@ -48,12 +48,6 @@ def test_figure_caption_prf_each_value_has_value_and_reason_batch11():
         assert "reason" in v
 
 
-def test_figure_caption_prf_idempotent_batch11():
-    out1 = figure_caption_prf(None, None)
-    out2 = figure_caption_prf(None, None)
-    assert out1 == out2
-
-
 def test_figure_caption_prf_with_complex_doc_still_null_batch11():
     """复杂 document 仍然 null（caption relation 是 null）。"""
     doc = {
@@ -468,11 +462,6 @@ def test_annotation_metrics_source_no_top_level_lambda_batch11():
                 raise AssertionError(f"top-level lambda: {line}")
 
 
-def test_annotation_metrics_source_no_print_batch11():
-    source = inspect.getsource(amod)
-    assert "print(" not in source
-
-
 def test_annotation_metrics_source_no_socket_batch11():
     source = inspect.getsource(amod)
     assert "socket" not in source
@@ -591,11 +580,6 @@ def test_signature_chunk_boundary_prf_3_params_batch11():
     assert len(sig.parameters) == 3
 
 
-def test_signature_chunk_boundary_prf_param_names_batch11():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert list(sig.parameters) == ["document", "annotation", "tolerance_chars"]
-
-
 def test_signature_chunk_boundary_prf_param_kinds_batch11():
     sig = inspect.signature(chunk_boundary_prf)
     for p in sig.parameters.values():
@@ -614,18 +598,9 @@ def test_module_all_is_list_batch11():
     assert isinstance(amod.__all__, list)
 
 
-def test_module_all_entries_unique_batch11():
-    assert len(amod.__all__) == len(set(amod.__all__))
-
-
 def test_module_all_entries_str_batch11():
     for name in amod.__all__:
         assert isinstance(name, str)
-
-
-def test_module_has_dunder_file_batch11():
-    assert hasattr(amod, "__file__")
-    assert amod.__file__ is not None
 
 
 def test_module_name_is_evaluation_annotation_metrics_batch11():

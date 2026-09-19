@@ -31,11 +31,6 @@ def test_parser_const_is_str_batch34():
     assert isinstance(PARSER_DOES_NOT_EMIT_RELATIONS, str)
 
 
-def test_parser_const_in_all_batch34():
-    src = inspect.getsource(amod)
-    assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-
-
 # ---------- figure_caption_prf 第三十四批
 
 
@@ -359,11 +354,6 @@ def test_signature_chunk_boundary_prf_default_tolerance_batch34():
 
 def test_signature_chunk_boundary_prf_return_dict_batch34():
     sig = inspect.signature(chunk_boundary_prf)
-    assert sig.return_annotation == "dict[str, dict[str, Any]]"
-
-
-def test_signature_figure_caption_prf_return_dict_batch34():
-    sig = inspect.signature(figure_caption_prf)
     assert sig.return_annotation == "dict[str, dict[str, Any]]"
 
 

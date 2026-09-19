@@ -779,11 +779,6 @@ def test_module_source_no_json_import():
     assert "from json " not in src
 
 
-def test_module_source_no_csv_import():
-    src = inspect.getsource(mmod)
-    assert "import csv" not in src
-
-
 def test_module_source_no_socket_import():
     src = inspect.getsource(mmod)
     assert "import socket" not in src
@@ -868,12 +863,6 @@ def test_compute_metrics_5_params_with_image_base_dir_default_none():
     assert len(params) == 5
     assert params[4].name == "image_base_dir"
     assert params[4].default is None
-
-
-def test_compute_metrics_no_varargs_varkw():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
 
 
 def test_compute_metrics_first_4_params_no_default():

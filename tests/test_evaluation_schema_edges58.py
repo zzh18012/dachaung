@@ -74,11 +74,6 @@ def test_schemas_dir_resolved_batch43():
 
 # ---------- _schema_path 签名 ----------
 
-def test_schema_path_no_default_batch43():
-    sig = inspect.signature(_schema_path)
-    assert sig.parameters["name"].default is inspect.Parameter.empty
-
-
 def test_schema_path_return_annotation_batch43():
     sig = inspect.signature(_schema_path)
     assert "Path" in str(sig.return_annotation)
@@ -136,12 +131,6 @@ def test_load_schema_calls_schema_path_batch43():
 
 
 # ---------- validate 签名 ----------
-
-def test_validate_signature_batch43():
-    sig = inspect.signature(validate)
-    params = list(sig.parameters.keys())
-    assert params == ["instance", "schema_name"]
-
 
 def test_validate_param_kinds_batch43():
     sig = inspect.signature(validate)
@@ -214,12 +203,6 @@ def test_validate_sorts_errors_by_path_batch43():
 
 
 # ---------- validate_file 签名 ----------
-
-def test_validate_file_signature_batch43():
-    sig = inspect.signature(validate_file)
-    params = list(sig.parameters.keys())
-    assert params == ["path", "schema_name"]
-
 
 def test_validate_file_param_kinds_batch43():
     sig = inspect.signature(validate_file)

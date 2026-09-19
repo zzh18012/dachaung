@@ -372,16 +372,6 @@ def test_module_source_contains_no_ground_truth_anchors_batch29():
     assert "no_ground_truth_anchors" in src
 
 
-def test_module_source_contains_no_ground_truth_anchors_in_stream_batch29():
-    src = inspect.getsource(amod)
-    assert "no_ground_truth_anchors_in_stream" in src
-
-
-def test_module_source_contains_precision_or_recall_not_evaluated_batch29():
-    src = inspect.getsource(amod)
-    assert "precision_or_recall_not_evaluated" in src
-
-
 def test_module_source_contains_tolerance_chars_param_batch29():
     src = inspect.getsource(amod)
     assert "tolerance_chars: int = 30" in src
@@ -408,11 +398,6 @@ def test_signature_chunk_boundary_prf_return_annotation_batch29():
 def test_signature_chunk_boundary_prf_tolerance_default_batch29():
     sig = inspect.signature(chunk_boundary_prf)
     assert sig.parameters["tolerance_chars"].default == 30
-
-
-def test_signature_chunk_boundary_prf_tolerance_annotation_batch29():
-    sig = inspect.signature(chunk_boundary_prf)
-    assert sig.parameters["tolerance_chars"].annotation == "int"
 
 
 # ---------- module 合理性第四十二批 ----------
@@ -451,11 +436,6 @@ def test_module_all_export_three_entries_batch29():
         '"chunk_boundary_prf"',
     ]:
         assert name in src
-
-
-def test_module_no_class_definitions_batch29():
-    src = inspect.getsource(amod)
-    assert "\nclass " not in src
 
 
 def test_module_no_main_block_batch29():

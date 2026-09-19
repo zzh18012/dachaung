@@ -261,11 +261,6 @@ def test_manifest_file_count_zero_batch29():
     assert m.file_count == 0
 
 
-def test_manifest_pdf_count_zero_when_no_documents_batch29():
-    m = _make_manifest(documents=())
-    assert m.pdf_count == 0
-
-
 # ---------- _resolve_relative_path 第二十九批 ----------
 
 
@@ -559,11 +554,6 @@ def test_module_source_contains_resolve_relative_path_batch29():
     assert "def _resolve_relative_path" in src
 
 
-def test_module_source_contains_load_manifest_batch29():
-    src = inspect.getsource(mmod)
-    assert "def load_manifest" in src
-
-
 def test_module_source_contains_file_count_property_batch29():
     src = inspect.getsource(mmod)
     assert "def file_count" in src
@@ -598,11 +588,6 @@ def test_signature_resolve_relative_path_batch29():
     sig = inspect.signature(_resolve_relative_path)
     params = list(sig.parameters.keys())
     assert params == ["path_str", "project_root", "field_name"]
-
-
-def test_signature_resolve_relative_path_return_batch29():
-    sig = inspect.signature(_resolve_relative_path)
-    assert sig.return_annotation == "Path"
 
 
 def test_signature_load_manifest_batch29():

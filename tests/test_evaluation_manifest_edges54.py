@@ -107,10 +107,6 @@ def test_has_backslash_single_batch27():
     assert _has_backslash("foo\\bar") is True
 
 
-def test_has_backslash_double_batch27():
-    assert _has_backslash("foo\\\\bar") is True
-
-
 def test_has_backslash_trailing_batch27():
     assert _has_backslash("foo\\") is True
 
@@ -199,12 +195,6 @@ def test_document_entry_equality_batch27():
     d1 = _make_doc()
     d2 = _make_doc()
     assert d1 == d2
-
-
-def test_document_entry_inequality_batch27():
-    d1 = _make_doc(doc_id="d1")
-    d2 = _make_doc(doc_id="d2")
-    assert d1 != d2
 
 
 # ---------- ExpectedFailure 第二十七批 ----------
@@ -339,16 +329,6 @@ def test_manifest_frozen_batch27():
 
 
 # ---------- _resolve_relative_path 第二十七批 ----------
-
-
-def test_resolve_relative_path_empty_batch27(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("", tmp_path, "test")
-
-
-def test_resolve_relative_path_absolute_posix_batch27(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("/etc/passwd", tmp_path, "test")
 
 
 def test_resolve_relative_path_backslash_batch27(tmp_path):
@@ -705,12 +685,6 @@ def test_signature_resolve_relative_path_batch27():
     sig = inspect.signature(_resolve_relative_path)
     params = list(sig.parameters.keys())
     assert params == ["path_str", "project_root", "field_name"]
-
-
-def test_signature_is_absolute_like_batch27():
-    sig = inspect.signature(_is_absolute_like)
-    params = list(sig.parameters.keys())
-    assert params == ["path_str"]
 
 
 def test_signature_has_backslash_batch27():

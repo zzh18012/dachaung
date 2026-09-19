@@ -204,10 +204,6 @@ def test_schema_validation_error_errors_mutable_after_init():
 # =========================================================================
 
 
-def test_schema_path_is_pathlib_path():
-    assert isinstance(SCHEMA_PATH, Path)
-
-
 def test_schema_path_str_form_endswith_schema_json():
     assert str(SCHEMA_PATH).endswith("document.schema.json")
 
@@ -328,12 +324,6 @@ def test_load_schema_message_contains_path(tmp_path):
 def test_load_schema_signature_path_default_is_schema_path():
     sig = inspect.signature(load_schema)
     assert sig.parameters["path"].default is SCHEMA_PATH
-
-
-def test_load_schema_signature_return_annotation():
-    sig = inspect.signature(load_schema)
-    # from __future__ import annotations → return annotation is string
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 # =========================================================================

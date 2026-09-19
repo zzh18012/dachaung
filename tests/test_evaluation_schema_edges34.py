@@ -480,18 +480,6 @@ def test_signature_load_schema_batch14():
     assert params == ["name"]
 
 
-def test_signature_validate_batch14():
-    sig = inspect.signature(validate)
-    params = list(sig.parameters.keys())
-    assert params == ["instance", "schema_name"]
-
-
-def test_signature_validate_file_batch14():
-    sig = inspect.signature(validate_file)
-    params = list(sig.parameters.keys())
-    assert params == ["path", "schema_name"]
-
-
 def test_signature_eval_schema_error_init_batch14():
     sig = inspect.signature(EvalSchemaError.__init__)
     params = list(sig.parameters.keys())
@@ -506,11 +494,6 @@ def test_signature_validate_no_varargs_batch14():
 
 
 # ---------- module 合理性第十六批 ----------
-
-
-def test_module_has_all_attribute_batch14():
-    assert hasattr(smod, "__all__")
-    assert isinstance(smod.__all__, list)
 
 
 def test_module_all_items_exist_as_attributes_batch14():

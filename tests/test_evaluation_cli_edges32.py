@@ -271,21 +271,6 @@ def test_format_metric_source_handles_none():
     assert "if value is None" in src or "value is None" in src
 
 
-def test_format_metric_source_handles_bool():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, bool)" in src
-
-
-def test_format_metric_source_handles_float():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, float)" in src
-
-
-def test_format_metric_source_handles_dict():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, dict)" in src
-
-
 def test_format_metric_source_str_lower_for_bool():
     src = inspect.getsource(_format_metric)
     assert ".lower()" in src or "str(value).lower" in src
@@ -332,11 +317,6 @@ def test_run_inspect_doc_source_lazy_import_annotation():
 def test_run_inspect_doc_source_lazy_import_metrics():
     src = inspect.getsource(_run_inspect_doc)
     assert "from evaluation.metrics import" in src
-
-
-def test_run_inspect_doc_source_imports_figure_caption_prf():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "figure_caption_prf" in src
 
 
 def test_run_inspect_doc_source_uses_path_args_input():
@@ -537,12 +517,6 @@ def test_build_parser_run_max_chars_not_required():
         a for a in run_p._actions if "--max-chars" in (a.option_strings or [])
     )
     assert max_chars_action.required is False
-
-
-def test_build_parser_inspect_doc_default_tolerance_30():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json"])
-    assert ns.tolerance_chars == 30
 
 
 def test_build_parser_inspect_doc_no_parser_param():
@@ -792,20 +766,10 @@ def test_cli_source_no_async_def():
     assert "async def" not in src
 
 
-def test_cli_source_no_walrus():
-    src = inspect.getsource(cli_mod)
-    assert ":=" not in src
-
-
 def test_cli_source_has_main_block():
     src = inspect.getsource(cli_mod)
     assert 'if __name__' in src
     assert "__main__" in src
-
-
-def test_cli_source_main_block_raises_system_exit():
-    src = inspect.getsource(cli_mod)
-    assert "raise SystemExit(main())" in src
 
 
 def test_cli_source_4_functions():
@@ -916,13 +880,6 @@ def test_signature_format_metric_no_defaults():
     sig = inspect.signature(_format_metric)
     for p in sig.parameters.values():
         assert p.default is inspect.Parameter.empty
-
-
-def test_signature_run_inspect_doc():
-    sig = inspect.signature(_run_inspect_doc)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "args"
 
 
 def test_signature_build_parser_no_varargs():

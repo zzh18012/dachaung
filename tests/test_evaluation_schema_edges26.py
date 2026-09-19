@@ -51,11 +51,6 @@ def test_eval_schema_error_str_representation_uses_message():
     assert str(err) == "test message"
 
 
-def test_eval_schema_error_repr_has_class_name():
-    err = EvalSchemaError("msg")
-    assert "EvalSchemaError" in repr(err)
-
-
 def test_eval_schema_error_errors_attribute_writable():
     err = EvalSchemaError("msg", [])
     err.errors = [{"path": ["new"]}]
@@ -121,11 +116,6 @@ def test_load_schema_annotation_returns_dict():
 
 def test_load_schema_evaluation_report_returns_dict():
     s = load_schema("evaluation-report.schema.json")
-    assert isinstance(s, dict)
-
-
-def test_load_schema_document_returns_dict():
-    s = load_schema("document.schema.json")
     assert isinstance(s, dict)
 
 
@@ -666,11 +656,6 @@ def test_module_source_no_yield():
     assert "yield" not in src
 
 
-def test_module_source_no_async_def():
-    src = inspect.getsource(smod)
-    assert "async def" not in src
-
-
 def test_module_source_no_walrus():
     src = inspect.getsource(smod)
     assert ":=" not in src
@@ -689,11 +674,6 @@ def test_module_source_no_exec():
 def test_module_source_no_subprocess():
     src = inspect.getsource(smod)
     assert "subprocess" not in src
-
-
-def test_module_source_no_star_import():
-    src = inspect.getsource(smod)
-    assert "import *" not in src
 
 
 def test_module_source_eval_schema_error_class_definition():

@@ -547,19 +547,9 @@ def test_source_contains_path_import_batch49():
     assert "from pathlib import Path" in src
 
 
-def test_source_contains_get_git_provenance_import_batch49():
-    src = inspect.getsource(cli_mod)
-    assert "from evaluation.report import get_git_provenance" in src
-
-
 def test_source_contains_run_evaluation_import_batch49():
     src = inspect.getsource(cli_mod)
     assert "from evaluation.runner import run_evaluation" in src
-
-
-def test_source_contains_reconfigure_call_batch49():
-    src = inspect.getsource(cli_mod)
-    assert "sys.stdout.reconfigure" in src
 
 
 def test_source_contains_utf8_encoding_batch49():
@@ -616,21 +606,9 @@ def test_ast_has_4_top_level_functions_batch49():
     assert len(funcs) == 4
 
 
-def test_ast_function_names_batch49():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
-    assert names == ["_build_parser", "main", "_format_metric", "_run_inspect_doc"]
-
-
 def test_ast_no_class_def_batch49():
     tree = ast.parse(inspect.getsource(cli_mod))
     assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
-def test_ast_module_has_docstring_batch49():
-    tree = ast.parse(inspect.getsource(cli_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_module_has_top_level_if_reconfigure_batch49():

@@ -64,14 +64,6 @@ def test_ratio_value_is_float_batch25():
     assert isinstance(out["value"], float)
 
 
-def test_ratio_zero_batch25():
-    assert _ratio(0.0)["value"] == 0.0
-
-
-def test_ratio_one_batch25():
-    assert _ratio(1.0)["value"] == 1.0
-
-
 def test_ratio_negative_batch25():
     """负数也允许（不 clamp）。"""
     out = _ratio(-0.5)
@@ -87,21 +79,9 @@ def test_ratio_reason_is_none_batch25():
     assert _ratio(0.5)["reason"] is None
 
 
-def test_bool_metric_true_batch25():
-    assert _bool_metric(True)["value"] is True
-
-
 def test_bool_metric_falsy_int_zero_batch25():
     """int 0 → bool False。"""
     assert _bool_metric(0)["value"] is False
-
-
-def test_bool_metric_falsy_empty_str_batch25():
-    assert _bool_metric("")["value"] is False
-
-
-def test_bool_metric_truthy_nonempty_str_batch25():
-    assert _bool_metric("x")["value"] is True
 
 
 def test_int_metric_value_is_int_batch25():
@@ -832,11 +812,6 @@ def test_module_source_no_environ_batch25():
     assert "os.environ" not in source
 
 
-def test_module_source_math_used_batch25():
-    source = inspect.getsource(mmod)
-    assert "import math" in source
-
-
 def test_module_source_counter_used_batch25():
     source = inspect.getsource(mmod)
     assert "from collections import Counter" in source
@@ -848,36 +823,6 @@ def test_module_source_no_dataclass_batch25():
 
 
 # ---------- module source 字符串精确补强 第三十六批 ----------
-
-
-def test_module_source_contains_pdf_bbox_required_types_batch25():
-    source = inspect.getsource(mmod)
-    assert "_PDF_BBOX_REQUIRED_TYPES" in source
-
-
-def test_module_source_contains_not_evaluated_constant_batch25():
-    source = inspect.getsource(mmod)
-    assert '_NOT_EVALUATED = "not_evaluated"' in source
-
-
-def test_module_source_contains_null_helper_batch25():
-    source = inspect.getsource(mmod)
-    assert "def _null(" in source
-
-
-def test_module_source_contains_ratio_helper_batch25():
-    source = inspect.getsource(mmod)
-    assert "def _ratio(" in source
-
-
-def test_module_source_contains_bool_metric_helper_batch25():
-    source = inspect.getsource(mmod)
-    assert "def _bool_metric(" in source
-
-
-def test_module_source_contains_int_metric_helper_batch25():
-    source = inspect.getsource(mmod)
-    assert "def _int_metric(" in source
 
 
 def test_module_source_contains_compute_automatic_metrics_batch25():

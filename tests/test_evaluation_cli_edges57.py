@@ -292,46 +292,6 @@ def test_main_no_args_raises_systemexit_batch30():
 # ---------- module source forbidden tokens 第四十八批 ----------
 
 
-def test_module_source_no_os_system_batch30():
-    src = inspect.getsource(climod)
-    assert "os.system" not in src
-
-
-def test_module_source_no_eval_batch30():
-    src = inspect.getsource(climod)
-    assert "eval(" not in src
-
-
-def test_module_source_no_exec_batch30():
-    src = inspect.getsource(climod)
-    assert "exec(" not in src
-
-
-def test_module_source_no_pickle_batch30():
-    src = inspect.getsource(climod)
-    assert "pickle" not in src
-
-
-def test_module_source_no_yaml_batch30():
-    src = inspect.getsource(climod)
-    assert "yaml" not in src
-
-
-def test_module_source_no_dunder_import_batch30():
-    src = inspect.getsource(climod)
-    assert "__import__" not in src
-
-
-def test_module_source_no_breakpoint_batch30():
-    src = inspect.getsource(climod)
-    assert "breakpoint(" not in src
-
-
-def test_module_source_no_shutil_batch30():
-    src = inspect.getsource(climod)
-    assert "shutil" not in src
-
-
 def test_module_source_no_open_w_mode_batch30():
     src = inspect.getsource(climod)
     assert "'w'" not in src

@@ -43,13 +43,6 @@ def test_load_annotation_returns_list_value(tmp_path: Path):
     assert result == [1, 2, 3]
 
 
-def test_load_annotation_returns_string_value(tmp_path: Path):
-    p = tmp_path / "a.json"
-    p.write_text('"hello"', encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == "hello"
-
-
 def test_load_annotation_returns_null_value(tmp_path: Path):
     """JSON null → Python None；但函数返回 None 也表示加载失败。需区分。"""
     p = tmp_path / "a.json"
@@ -805,26 +798,6 @@ def test_module_all_exports_run_evaluation():
     assert m.__all__ == ["run_evaluation"]
 
 
-def test_module_imports_json():
-    import evaluation.runner as m
-    assert hasattr(m, "json")
-
-
-def test_module_imports_time():
-    import evaluation.runner as m
-    assert hasattr(m, "time")
-
-
-def test_module_imports_path():
-    import evaluation.runner as m
-    assert hasattr(m, "Path")
-
-
-def test_module_imports_any():
-    import evaluation.runner as m
-    assert hasattr(m, "Any")
-
-
 def test_module_imports_process_single():
     import evaluation.runner as m
     assert hasattr(m, "process_single")
@@ -835,11 +808,6 @@ def test_module_imports_image_output_dir_for():
     import evaluation.runner as m
     assert hasattr(m, "image_output_dir_for")
     assert callable(m.image_output_dir_for)
-
-
-def test_module_imports_compute_automatic_metrics():
-    import evaluation.runner as m
-    assert hasattr(m, "compute_automatic_metrics")
 
 
 def test_run_evaluation_manifest_param_no_default():

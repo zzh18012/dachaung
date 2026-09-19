@@ -384,11 +384,6 @@ def test_validate_signature_2_params():
     assert len(params) == 2
 
 
-def test_validate_source_has_head_eq_errors_0():
-    src = inspect.getsource(validate)
-    assert "head = errors[0]" in src
-
-
 # =========================================================================
 # validate 错误聚合深度补强
 # =========================================================================
@@ -519,16 +514,6 @@ def test_module_source_no_import_jsonschema_as():
 # =========================================================================
 # module __all__ 完整性补强
 # =========================================================================
-
-
-def test_module_all_has_5_entries_in_order():
-    assert smod.__all__ == [
-        "SCHEMAS_DIR",
-        "EvalSchemaError",
-        "load_schema",
-        "validate",
-        "validate_file",
-    ]
 
 
 def test_module_all_entries_in_namespace():
@@ -817,16 +802,6 @@ def test_validate_file_path_annotation_is_path_or_str():
 # =========================================================================
 # module source level 完整补强
 # =========================================================================
-
-
-def test_eval_schema_error_source_has_super_init():
-    src = inspect.getsource(EvalSchemaError)
-    assert "super().__init__(message)" in src
-
-
-def test_eval_schema_error_source_has_self_errors_assignment():
-    src = inspect.getsource(EvalSchemaError)
-    assert "self.errors = errors or []" in src
 
 
 def test_load_schema_source_complete():

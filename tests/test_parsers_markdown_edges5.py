@@ -150,21 +150,9 @@ def test_fenced_re_lang_no_dot():
     assert m is None
 
 
-def test_unordered_list_re_dash():
-    m = _UNORDERED_LIST_RE.match("- item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
 def test_unordered_list_re_no_space_no_match():
     """- item 需空格；-item 不匹配。"""
     assert _UNORDERED_LIST_RE.match("-item") is None
-
-
-def test_ordered_list_re_dot():
-    m = _ORDERED_LIST_RE.match("1. item")
-    assert m is not None
-    assert m.group(1) == "item"
 
 
 def test_ordered_list_re_zero_number_matches():

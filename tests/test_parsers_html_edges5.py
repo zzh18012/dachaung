@@ -37,17 +37,9 @@ from app.parsers.html_parser import (
 # =========================================================================
 
 
-def test_html_extensions_count_two():
-    assert len(_HTML_EXTENSIONS) == 2
-
-
 def test_html_extensions_contains_html_and_htm():
     assert ".html" in _HTML_EXTENSIONS
     assert ".htm" in _HTML_EXTENSIONS
-
-
-def test_html_extensions_is_tuple():
-    assert isinstance(_HTML_EXTENSIONS, tuple)
 
 
 def test_heading_levels_count_six():
@@ -83,14 +75,6 @@ def test_skip_tags_contains_meta_link_noscript():
 
 def test_skip_tags_is_set():
     assert isinstance(_SKIP_TAGS, set)
-
-
-def test_skip_tags_count_seven():
-    assert len(_SKIP_TAGS) == 7
-
-
-def test_heading_levels_is_dict():
-    assert isinstance(_HEADING_LEVELS, dict)
 
 
 # =========================================================================
@@ -203,11 +187,6 @@ def test_html_parser_name_value():
 
 def test_html_parser_version_value():
     assert HtmlParser.version == "stdlib/0.1.0"
-
-
-def test_html_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(HtmlParser, Parser)
 
 
 # =========================================================================

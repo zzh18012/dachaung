@@ -44,34 +44,9 @@ def test_module_all_no_duplicates():
     assert len(set(m.__all__)) == len(m.__all__)
 
 
-def test_module_imports_subprocess():
-    import evaluation.report as m
-    assert hasattr(m, "subprocess")
-
-
-def test_module_imports_datetime():
-    import evaluation.report as m
-    assert hasattr(m, "datetime")
-
-
-def test_module_imports_path():
-    import evaluation.report as m
-    assert hasattr(m, "Path")
-
-
 def test_module_imports_any():
     import evaluation.report as m
     assert hasattr(m, "Any")
-
-
-def test_module_imports_evaluator_version():
-    import evaluation.report as m
-    assert hasattr(m, "EVALUATOR_VERSION")
-
-
-def test_module_imports_report_version():
-    import evaluation.report as m
-    assert hasattr(m, "REPORT_VERSION")
 
 
 def test_module_docstring_mentions_aggregation_rules():
@@ -298,11 +273,6 @@ def test_build_provenance_parser_name_kreuzberg(tmp_path):
     assert result["parser_name"] == "kreuzberg"
 
 
-def test_build_provenance_parser_version_none_ok(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["parser_version"] is None
-
-
 def test_build_provenance_max_chars_int_coercion_from_float(tmp_path):
     result = build_provenance(tmp_path, "fallback", 800.0, None)
     assert result["max_chars"] == 800
@@ -410,11 +380,6 @@ def test_build_devset_section_empty_categories():
 
 def test_aggregate_summary_callable():
     assert callable(aggregate_summary)
-
-
-def test_aggregate_summary_returns_dict():
-    result = aggregate_summary([])
-    assert isinstance(result, dict)
 
 
 def test_aggregate_summary_has_four_top_keys():

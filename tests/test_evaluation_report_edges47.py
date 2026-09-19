@@ -486,12 +486,6 @@ def test_module_source_no_breakpoint_batch31():
     assert "breakpoint(" not in src
 
 
-def test_module_source_no_open_w_mode_batch31():
-    src = inspect.getsource(rmod)
-    assert "'w'" not in src
-    assert '"w"' not in src
-
-
 def test_module_source_no_shutil_batch31():
     src = inspect.getsource(rmod)
     assert "shutil" not in src
@@ -538,16 +532,6 @@ def test_module_source_contains_versions_import_batch31():
 def test_module_source_contains_ratio_metrics_const_batch31():
     src = inspect.getsource(rmod)
     assert "_RATIO_METRICS = (" in src
-
-
-def test_module_source_contains_count_metrics_const_batch31():
-    src = inspect.getsource(rmod)
-    assert '_COUNT_METRICS = ("element_count_total",)' in src
-
-
-def test_module_source_contains_success_bool_metrics_const_batch31():
-    src = inspect.getsource(rmod)
-    assert '_SUCCESS_BOOL_METRICS = ("pipeline_success",)' in src
 
 
 def test_module_source_contains_git_dirty_fallback_true_batch31():

@@ -49,16 +49,6 @@ def test_eval_schema_error_source_has_docstring():
     assert '"""' in src
 
 
-def test_eval_schema_error_source_uses_super_init():
-    src = inspect.getsource(EvalSchemaError)
-    assert "super().__init__(message)" in src
-
-
-def test_eval_schema_error_source_self_message():
-    src = inspect.getsource(EvalSchemaError)
-    assert "self.errors = errors or []" in src
-
-
 def test_eval_schema_error_source_no_eval():
     src = inspect.getsource(EvalSchemaError)
     assert "eval(" not in src
@@ -398,29 +388,14 @@ def test_module_source_no_relative_above_root():
     assert "from .." not in src
 
 
-def test_module_source_no_star_import():
-    src = inspect.getsource(smod)
-    assert "import *" not in src
-
-
 def test_module_source_no_yield():
     src = inspect.getsource(smod)
     assert "yield" not in src
 
 
-def test_module_source_no_async_def():
-    src = inspect.getsource(smod)
-    assert "async def" not in src
-
-
 def test_module_source_no_walrus():
     src = inspect.getsource(smod)
     assert ":=" not in src
-
-
-def test_module_source_no_main_block():
-    src = inspect.getsource(smod)
-    assert 'if __name__' not in src
 
 
 def test_module_source_no_user_class_beyond_eval_schema_error():
@@ -498,13 +473,6 @@ def test_signature_schema_path():
     assert params[0].name == "name"
 
 
-def test_signature_load_schema():
-    sig = inspect.signature(load_schema)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "name"
-
-
 def test_signature_validate():
     sig = inspect.signature(validate)
     params = list(sig.parameters.values())
@@ -559,11 +527,6 @@ def test_module_all_length_5():
 
 def test_module_all_entries_unique():
     assert len(set(smod.__all__)) == len(smod.__all__)
-
-
-def test_module_all_entries_are_str():
-    for entry in smod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_all_5_entries_correct():

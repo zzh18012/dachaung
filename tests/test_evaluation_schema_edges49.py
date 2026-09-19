@@ -133,16 +133,6 @@ def test_schema_path_message_contains_full_path_batch29():
 # ---------- load_schema 第二十九批 ----------
 
 
-def test_load_schema_three_schemas_all_dicts_batch29():
-    for name in [
-        "manifest.schema.json",
-        "annotation.schema.json",
-        "evaluation-report.schema.json",
-    ]:
-        s = load_schema(name)
-        assert isinstance(s, dict)
-
-
 def test_load_schema_idempotent_batch29():
     s1 = load_schema("manifest.schema.json")
     s2 = load_schema("manifest.schema.json")
@@ -357,11 +347,6 @@ def test_module_source_no_shutil_batch29():
 def test_module_source_no_requests_batch29():
     src = inspect.getsource(smod)
     assert "requests" not in src
-
-
-def test_module_source_no_unlink_batch29():
-    src = inspect.getsource(smod)
-    assert ".unlink()" not in src
 
 
 # ---------- module source 字符串精确补强第四十三批 ----------

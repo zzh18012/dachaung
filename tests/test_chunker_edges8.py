@@ -479,22 +479,6 @@ def test_split_piece_repr_includes_text():
 # =========================================================================
 
 
-def test_part_text_value_zero():
-    assert _PART_TEXT == 0
-
-
-def test_part_element_id_value_one():
-    assert _PART_ELEMENT_ID == 1
-
-
-def test_part_start_value_two():
-    assert _PART_START == 2
-
-
-def test_part_end_value_three():
-    assert _PART_END == 3
-
-
 def test_part_constants_used_consistently():
     """length() 用 _PART_TEXT、flush() 用所有常量。"""
     src = inspect.getsource(_ChunkBuffer)

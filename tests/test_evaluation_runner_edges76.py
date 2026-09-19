@@ -428,29 +428,9 @@ def test_run_evaluation_compute_metrics_called_with_correct_args_batch51(tmp_pat
 
 # ---------- 模块源码补强 ----------
 
-def test_source_imports_process_single_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "from app.pipeline import image_output_dir_for, process_single" in src
-
-
-def test_source_imports_metrics_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "from evaluation.metrics import compute_automatic_metrics" in src
-
-
 def test_source_contains_not_instrumented_batch51():
     src = inspect.getsource(runner_mod)
     assert "not_instrumented" in src
-
-
-def test_source_contains_perf_counter_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "time.perf_counter" in src
-
-
-def test_source_contains_image_output_dir_for_batch51():
-    src = inspect.getsource(runner_mod)
-    assert "image_output_dir_for" in src
 
 
 def test_source_contains_unknown_error_code_batch51():
@@ -486,11 +466,6 @@ def test_ast_function_names_order_batch51():
     tree = ast.parse(inspect.getsource(runner_mod))
     names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert names == ["_load_annotation", "_process_one", "run_evaluation"]
-
-
-def test_ast_no_class_def_batch51():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
 def test_ast_no_async_function_def_batch51():

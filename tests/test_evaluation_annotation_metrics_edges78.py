@@ -265,11 +265,6 @@ def test_keys_normal_branch_batch52():
 
 # ---------- figure_caption_prf 输出再校验 ----------
 
-def test_figure_caption_exactly_3_keys_batch52():
-    out = figure_caption_prf({}, {})
-    assert len(out) == 3
-
-
 def test_figure_caption_no_chunk_boundary_keys_batch52():
     out = figure_caption_prf({}, {})
     for k in out:

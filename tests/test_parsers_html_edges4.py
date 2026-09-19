@@ -143,10 +143,6 @@ def test_html_extensions_value():
     assert _HTML_EXTENSIONS == (".html", ".htm")
 
 
-def test_html_extensions_count_two():
-    assert len(_HTML_EXTENSIONS) == 2
-
-
 def test_heading_levels_exact_six_entries():
     assert len(_HEADING_LEVELS) == 6
 
@@ -166,10 +162,6 @@ def test_heading_levels_h6_value_six():
 
 def test_heading_levels_h4_value_four():
     assert _HEADING_LEVELS["h4"] == 4
-
-
-def test_skip_tags_count_seven():
-    assert len(_SKIP_TAGS) == 7
 
 
 # =========================================================================
@@ -968,12 +960,6 @@ def test_html_parser_class_name_is_str():
 
 def test_html_parser_class_version_is_str():
     assert isinstance(HtmlParser.version, str)
-
-
-def test_html_parser_inherits_parser():
-    from app.parsers.base import Parser
-
-    assert issubclass(HtmlParser, Parser)
 
 
 def test_html_parser_parse_signature():

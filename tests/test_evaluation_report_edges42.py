@@ -604,11 +604,6 @@ def test_module_source_no_relative_imports_batch26():
     assert "from ." not in source
 
 
-def test_module_source_no_star_import_batch26():
-    source = inspect.getsource(rmod)
-    assert "import *" not in source
-
-
 def test_module_source_no_environ_batch26():
     source = inspect.getsource(rmod)
     assert "os.environ" not in source
@@ -717,12 +712,6 @@ def test_module_source_contains_silent_drop_total_batch26():
 # ---------- signatures 第三十八批 ----------
 
 
-def test_signature_get_git_provenance_batch26():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters.keys())
-    assert params == ["project_root"]
-
-
 def test_signature_get_git_provenance_annotation_batch26():
     sig = inspect.signature(get_git_provenance)
     p = sig.parameters["project_root"]
@@ -745,12 +734,6 @@ def test_signature_build_provenance_annotations_batch26():
     assert sig.parameters["parser_name"].annotation == "str"
     assert sig.parameters["max_chars"].annotation == "int"
     assert sig.parameters["parser_version"].annotation == "str | None"
-
-
-def test_signature_build_devset_section_batch26():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters.keys())
-    assert params == ["manifest"]
 
 
 def test_signature_aggregate_summary_batch26():

@@ -135,10 +135,6 @@ def test_is_valid_bbox_four_floats_batch27():
     assert _is_valid_bbox([1.0, 2.5, 3.7, 4.1]) is True
 
 
-def test_is_valid_bbox_mixed_int_float_batch27():
-    assert _is_valid_bbox([1, 2.5, 3, 4.0]) is True
-
-
 def test_is_valid_bbox_negative_values_batch27():
     assert _is_valid_bbox([-1, -2, -3, -4]) is True
 
@@ -455,11 +451,6 @@ def test_heading_boundary_heading_without_element_id_batch27():
 
 
 # ---------- _chunk_reference_ratio 第二十七批 ----------
-
-
-def test_chunk_reference_ratio_no_chunks_batch27():
-    out = _chunk_reference_ratio([{"element_id": "e1"}], [])
-    assert out["reason"] == "no_chunks"
 
 
 def test_chunk_reference_ratio_chunks_no_source_ids_batch27():
@@ -824,11 +815,6 @@ def test_module_source_no_module_level_mutables_batch27():
 def test_module_source_contains_compute_automatic_metrics_batch27():
     source = inspect.getsource(mmod)
     assert "def compute_automatic_metrics" in source
-
-
-def test_module_source_contains_pdf_bbox_required_types_batch27():
-    source = inspect.getsource(mmod)
-    assert "_PDF_BBOX_REQUIRED_TYPES" in source
 
 
 def test_module_source_contains_no_elements_batch27():

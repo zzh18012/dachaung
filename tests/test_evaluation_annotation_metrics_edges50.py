@@ -382,11 +382,6 @@ def test_module_source_forbidden_tokens_batch23(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_logging_import_batch23():
-    src = inspect.getsource(amod)
-    assert "import logging" not in src
-
-
 def test_module_source_no_csv_import_batch23():
     src = inspect.getsource(amod)
     assert "import csv" not in src
@@ -501,11 +496,6 @@ def test_module_all_has_three_entries_batch23():
     }
 
 
-def test_module_does_not_import_evaluation_cli_batch23():
-    src = inspect.getsource(amod)
-    assert "from evaluation.cli" not in src
-
-
 def test_module_does_not_import_app_pipeline_batch23():
     src = inspect.getsource(amod)
     assert "from app.pipeline" not in src
@@ -531,15 +521,6 @@ def test_module_has_module_docstring_batch23():
 
 
 # ---------- 端到端集成第三十四批 ----------
-
-
-def test_e2e_figure_caption_prf_minimal_batch23():
-    out = figure_caption_prf({}, {})
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
 
 
 def test_e2e_chunk_boundary_prf_perfect_match_batch23():

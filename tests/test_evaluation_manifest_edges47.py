@@ -827,11 +827,6 @@ def test_module_source_no_path_write_text_batch20():
     assert ".write_text(" not in src
 
 
-def test_module_source_no_sys_exit_batch20():
-    src = inspect.getsource(mmod)
-    assert "sys.exit" not in src
-
-
 def test_module_source_no_re_compile_batch20():
     src = inspect.getsource(mmod)
     assert "re.compile" not in src

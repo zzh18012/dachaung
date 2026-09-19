@@ -831,11 +831,6 @@ def test_module_source_starts_with_docstring():
     assert src.lstrip().startswith(('"""', "'''"))
 
 
-def test_module_source_docstring_mentions_validate_report():
-    src = inspect.getsource(cli_mod)
-    assert "validate-report" in src
-
-
 def test_module_source_docstring_mentions_inspect_doc():
     src = inspect.getsource(cli_mod)
     assert "inspect-doc" in src
@@ -915,11 +910,6 @@ def test_module_source_no_star_import():
 def test_module_source_has_main_block():
     src = inspect.getsource(cli_mod)
     assert "__main__" in src
-
-
-def test_module_source_main_block_calls_main():
-    src = inspect.getsource(cli_mod)
-    assert 'raise SystemExit(main())' in src
 
 
 def test_module_source_no_yield():
@@ -1173,10 +1163,6 @@ def test_module_file_endswith_cli_py():
 
 def test_module_docstring_present():
     assert cli_mod.__doc__ is not None and len(cli_mod.__doc__) > 50
-
-
-def test_module_main_callable():
-    assert callable(cli_mod.main)
 
 
 def test_module_no_user_classes():

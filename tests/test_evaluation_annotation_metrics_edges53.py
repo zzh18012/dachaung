@@ -30,15 +30,6 @@ from evaluation.annotation_metrics import (
 # ---------- figure_caption_prf 第二十六批 ----------
 
 
-def test_figure_caption_prf_empty_doc_empty_annotation_batch26():
-    out = figure_caption_prf({}, {})
-    assert set(out.keys()) == {
-        "figure_caption_precision",
-        "figure_caption_recall",
-        "figure_caption_f1",
-    }
-
-
 def test_figure_caption_prf_doc_none_annotation_dict_batch26():
     out = figure_caption_prf(None, {"any": "thing"})
     for k in ("figure_caption_precision", "figure_caption_recall", "figure_caption_f1"):
@@ -502,11 +493,6 @@ def test_module_source_contains_one_to_one_text_batch26():
 def test_module_source_contains_tolerance_chars_record_batch26():
     source = inspect.getsource(amod)
     assert "_tolerance_chars" in source
-
-
-def test_module_source_contains_default_tolerance_30_batch26():
-    source = inspect.getsource(amod)
-    assert "tolerance_chars: int = 30" in source
 
 
 # ---------- signatures 第三十八批 ----------

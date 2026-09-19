@@ -112,11 +112,6 @@ def test_schema_path_return_annotation_path_batch42():
     assert "Path" in str(sig.return_annotation)
 
 
-def test_schema_path_no_default_for_name_batch42():
-    sig = inspect.signature(_schema_path)
-    assert sig.parameters["name"].default is inspect.Parameter.empty
-
-
 def test_schema_path_empty_name_raises_batch42():
     """空 name 也找不到文件。"""
     with pytest.raises(FileNotFoundError):
@@ -268,12 +263,6 @@ def test_validate_file_signature_two_params_batch42():
     assert list(sig.parameters.keys()) == ["path", "schema_name"]
 
 
-def test_validate_file_missing_file_raises_with_message_batch42(tmp_path):
-    with pytest.raises(FileNotFoundError) as exc:
-        validate_file(tmp_path / "missing.json", "manifest.schema.json")
-    assert "待校验文件不存在" in str(exc.value)
-
-
 def test_validate_file_return_annotation_none_batch42():
     sig = inspect.signature(validate_file)
     assert "None" in str(sig.return_annotation)
@@ -404,11 +393,6 @@ def test_module_source_contains_schemas_dir_definition_batch42():
     assert "SCHEMAS_DIR = " in src
 
 
-def test_module_source_contains_eval_schema_error_class_batch42():
-    src = inspect.getsource(smod)
-    assert "class EvalSchemaError" in src
-
-
 def test_module_source_contains_schema_path_function_batch42():
     src = inspect.getsource(smod)
     assert "def _schema_path(" in src
@@ -480,11 +464,6 @@ def test_signature_load_schema_params_batch42():
 def test_signature_schema_path_params_batch42():
     sig = inspect.signature(_schema_path)
     assert list(sig.parameters.keys()) == ["name"]
-
-
-def test_signature_validate_file_no_default_for_path_batch42():
-    sig = inspect.signature(validate_file)
-    assert sig.parameters["path"].default is inspect.Parameter.empty
 
 
 # ---------- module 合理性 第四十二批

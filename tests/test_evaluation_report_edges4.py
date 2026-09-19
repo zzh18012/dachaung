@@ -273,12 +273,6 @@ def test_build_provenance_parser_version_none(tmp_path):
     assert out["parser_version"] is None
 
 
-def test_build_provenance_max_chars_int(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert out["max_chars"] == 800
-    assert isinstance(out["max_chars"], int)
-
-
 def test_build_provenance_max_chars_str_converted_to_int(tmp_path):
     """max_chars 传入 str(800) → 转 int 800。"""
     out = build_provenance(tmp_path, "fallback", "800", None)

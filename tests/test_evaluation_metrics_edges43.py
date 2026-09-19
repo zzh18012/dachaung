@@ -718,16 +718,6 @@ def test_module_source_has_docstring_batch16():
     assert "自动指标：13 项" in src
 
 
-def test_module_source_has_text_types_constant_batch16():
-    src = inspect.getsource(mmod)
-    assert "_TEXT_TYPES = " in src
-
-
-def test_module_source_has_pdf_bbox_constant_batch16():
-    src = inspect.getsource(mmod)
-    assert "_PDF_BBOX_REQUIRED_TYPES = " in src
-
-
 def test_module_source_has_counter_import_batch16():
     src = inspect.getsource(mmod)
     assert "from collections import Counter" in src

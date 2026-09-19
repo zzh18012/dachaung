@@ -702,11 +702,6 @@ def test_signature_is_valid_bbox_return_bool_batch29():
     assert sig.return_annotation == "bool"
 
 
-def test_signature_strip_unicode_whitespace_return_str_batch29():
-    sig = inspect.signature(_strip_unicode_whitespace)
-    assert sig.return_annotation == "str"
-
-
 # ---------- module 合理性第四十二批 ----------
 
 

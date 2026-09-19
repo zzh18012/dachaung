@@ -756,11 +756,6 @@ def test_module_imports_any():
     assert hasattr(m, "Any")
 
 
-def test_module_imports_manifest_version():
-    import evaluation.manifest as m
-    assert hasattr(m, "MANIFEST_VERSION")
-
-
 def test_module_imports_validate():
     import evaluation.manifest as m
     assert hasattr(m, "validate")

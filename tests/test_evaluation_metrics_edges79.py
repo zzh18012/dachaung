@@ -253,10 +253,6 @@ def test_by_type_explicit_none_key_batch52():
 
 # ---------- helpers 快速补充 ----------
 
-def test_bool_metric_false_batch52():
-    assert _bool_metric(0)["value"] is False
-
-
 def test_int_metric_negative_batch52():
     assert _int_metric(-5) == {"value": -5, "reason": None}
 

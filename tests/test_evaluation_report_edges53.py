@@ -288,11 +288,6 @@ def test_build_provenance_dependencies_dict_batch34(tmp_path):
     assert isinstance(out["dependencies"], dict)
 
 
-def test_build_provenance_dependencies_keys_batch34(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert set(out["dependencies"].keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
-
-
 def test_build_provenance_git_commit_via_mock_batch34(tmp_path):
     """mock git commit → provenance 含相同 commit。"""
     with patch("evaluation.report.subprocess.run") as m:
@@ -577,16 +572,6 @@ def test_module_source_contains_ratio_metrics_definition_batch34():
     assert "_RATIO_METRICS = (" in src
 
 
-def test_module_source_contains_count_metrics_definition_batch34():
-    src = inspect.getsource(rmod)
-    assert '_COUNT_METRICS = ("element_count_total",)' in src
-
-
-def test_module_source_contains_success_bool_definition_batch34():
-    src = inspect.getsource(rmod)
-    assert '_SUCCESS_BOOL_METRICS = ("pipeline_success",)' in src
-
-
 def test_module_source_contains_get_git_provenance_func_batch34():
     src = inspect.getsource(rmod)
     assert "def get_git_provenance(" in src
@@ -701,14 +686,6 @@ def test_signature_aggregate_summary_one_param_batch34():
 
 
 # ---------- module 合理性第五十五批
-
-
-def test_module_has_aggregate_summary_batch34():
-    assert callable(rmod.aggregate_summary)
-
-
-def test_module_has_get_git_provenance_batch34():
-    assert callable(rmod.get_git_provenance)
 
 
 def test_module_has_ratio_metrics_batch34():

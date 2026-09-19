@@ -537,22 +537,6 @@ def test_schema_path_signature():
     assert sig.return_annotation == "Path"
 
 
-def test_namespace_load_schema():
-    assert load_schema.__module__ == "evaluation.schema"
-
-
-def test_namespace_validate():
-    assert validate.__module__ == "evaluation.schema"
-
-
-def test_namespace_validate_file():
-    assert validate_file.__module__ == "evaluation.schema"
-
-
-def test_namespace_schema_path():
-    assert _schema_path.__module__ == "evaluation.schema"
-
-
 def test_namespace_eval_schema_error():
     assert EvalSchemaError.__module__ == "evaluation.schema"
 

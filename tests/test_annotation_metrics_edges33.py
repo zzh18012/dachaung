@@ -136,16 +136,6 @@ def test_chunk_boundary_source_pos_end_plus_one():
     assert "pos = end + 1" in src
 
 
-def test_chunk_boundary_source_missing_markers_list_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "missing_markers: list[str] = []" in src
-
-
-def test_chunk_boundary_source_search_from_init_zero():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "search_from = 0" in src
-
-
 def test_chunk_boundary_source_anchor_loop():
     src = inspect.getsource(chunk_boundary_prf)
     assert "for a in anchors:" in src
@@ -775,21 +765,6 @@ def test_module_source_no_relative_import_above_app_or_eval():
             assert False, f"Found unexpected relative import: {line}"
 
 
-def test_module_source_no_star_import():
-    src = inspect.getsource(amod)
-    assert "import *" not in src
-
-
-def test_module_source_no_yield():
-    src = inspect.getsource(amod)
-    assert "yield" not in src
-
-
-def test_module_source_no_walrus():
-    src = inspect.getsource(amod)
-    assert ":=" not in src
-
-
 def test_module_source_no_main_block():
     src = inspect.getsource(amod)
     assert 'if __name__' not in src
@@ -993,11 +968,6 @@ def test_module_all_length_3():
 
 def test_module_all_entries_unique():
     assert len(set(amod.__all__)) == 3
-
-
-def test_module_all_entries_are_str():
-    for entry in amod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_all_3_entries_correct():

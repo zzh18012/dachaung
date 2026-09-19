@@ -95,11 +95,6 @@ def test_figure_caption_prf_metric_dict_reason_constant_batch13():
         assert v["reason"] == "parser_does_not_emit_relations"
 
 
-def test_figure_caption_prf_with_empty_dict_doc_batch13():
-    out = figure_caption_prf({}, {})
-    assert len(out) == 3
-
-
 def test_figure_caption_prf_with_unicode_keys_batch13():
     """即使 metric 名包含 unicode，输出 dict 保持 ascii key。"""
     out = figure_caption_prf(None, None)
@@ -435,11 +430,6 @@ def test_annotation_metrics_source_no_assert_batch13():
     assert "\nassert " not in source
 
 
-def test_annotation_metrics_source_no_print_batch13():
-    source = inspect.getsource(amod)
-    assert "print(" not in source
-
-
 def test_annotation_metrics_source_no_open_call_at_top_level_batch13():
     source = inspect.getsource(amod)
     lines = source.split("\n")
@@ -493,11 +483,6 @@ def test_module_source_has_chunk_boundary_prf_def_batch13():
 def test_module_source_has_normalize_text_calls_batch13():
     source = inspect.getsource(amod)
     assert "normalize_text(" in source
-
-
-def test_module_source_has_tolerance_chars_param_batch13():
-    source = inspect.getsource(amod)
-    assert "tolerance_chars" in source
 
 
 def test_module_source_has_pairs_sort_lambda_batch13():
@@ -638,11 +623,6 @@ def test_functions_no_varargs_batch13():
 
 
 # ---------- module 合理性第十三批 ----------
-
-
-def test_module_dunder_file_exists_batch13():
-    assert hasattr(amod, "__file__")
-    assert amod.__file__ is not None
 
 
 def test_module_dunder_file_path_evaluation_annotation_metrics_batch13():

@@ -188,12 +188,6 @@ def test_process_one_signature_4_params_no_default():
         assert p.default is inspect.Parameter.empty
 
 
-def test_process_one_no_varargs_varkw():
-    sig = inspect.signature(_process_one)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
 def test_process_one_return_annotation_is_tuple():
     sig = inspect.signature(_process_one)
     # from __future__ → annotation is string
@@ -338,11 +332,6 @@ def test_run_evaluation_source_has_expected_failure_4_keys():
 # =========================================================================
 # annotation 字段处理深度补强
 # =========================================================================
-
-
-def test_run_evaluation_source_has_annotation_present():
-    src = inspect.getsource(run_evaluation)
-    assert '"_annotation_present": annotation is not None' in src
 
 
 def test_run_evaluation_source_has_tolerance_value_extraction():
@@ -685,12 +674,6 @@ def test_run_evaluation_source_has_chunk_boundary_call():
     src = inspect.getsource(run_evaluation)
     assert "chunk_b = chunk_boundary_prf(" in src
     assert "document, annotation, tolerance_chars=tolerance_chars" in src
-
-
-def test_run_evaluation_source_has_metrics_update():
-    src = inspect.getsource(run_evaluation)
-    assert "metrics.update(fig_caps)" in src
-    assert "metrics.update(chunk_b)" in src
 
 
 def test_run_evaluation_source_has_per_doc_results_append():

@@ -610,16 +610,6 @@ def test_module_source_has_report_import_batch21():
     assert "from evaluation.report import (" in src
 
 
-def test_module_source_has_aggregate_summary_in_import_batch21():
-    src = inspect.getsource(rmod)
-    assert "aggregate_summary" in src
-
-
-def test_module_source_has_build_provenance_in_import_batch21():
-    src = inspect.getsource(rmod)
-    assert "build_provenance" in src
-
-
 def test_module_source_has_perf_counter_call_batch21():
     src = inspect.getsource(rmod)
     assert "time.perf_counter" in src
@@ -631,15 +621,6 @@ def test_module_source_has_perf_counter_call_batch21():
 def test_signature_load_annotation_no_varargs_batch21():
     """_load_annotation 无 *args/**kwargs。"""
     sig = inspect.signature(_load_annotation)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
-def test_signature_process_one_no_varargs_batch21():
-    sig = inspect.signature(_process_one)
     for p in sig.parameters.values():
         assert p.kind not in (
             inspect.Parameter.VAR_POSITIONAL,
@@ -683,12 +664,6 @@ def test_module_does_not_import_evaluation_cli_batch21():
     src = inspect.getsource(rmod)
     assert "from evaluation.cli" not in src
     assert "from evaluation import cli" not in src
-
-
-def test_module_does_not_import_evaluation_schema_batch21():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.schema" not in src
-    assert "from evaluation import schema" not in src
 
 
 def test_module_no_main_block_batch21():

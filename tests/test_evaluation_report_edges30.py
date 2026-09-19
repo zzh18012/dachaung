@@ -637,11 +637,6 @@ def test_get_git_provenance_return_annotation_dict_batch13():
     assert "dict" in str(sig.return_annotation)
 
 
-def test_get_dependency_versions_return_annotation_dict_batch13():
-    sig = inspect.signature(get_dependency_versions)
-    assert "dict" in str(sig.return_annotation)
-
-
 def test_build_provenance_return_annotation_dict_batch13():
     sig = inspect.signature(build_provenance)
     assert "dict" in str(sig.return_annotation)

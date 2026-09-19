@@ -613,16 +613,8 @@ def test_is_valid_bbox_negative_numbers():
     assert _is_valid_bbox([-1.0, -2.0, -3.0, -4.0]) is True
 
 
-def test_is_valid_bbox_mixed_int_float():
-    assert _is_valid_bbox([1, 2.5, 3, 4.0]) is True
-
-
 def test_is_valid_bbox_tuple_rejected():
     assert _is_valid_bbox((1.0, 2.0, 3.0, 4.0)) is False
-
-
-def test_is_valid_bbox_string_rejected():
-    assert _is_valid_bbox("1234") is False
 
 
 def test_is_valid_bbox_with_none_element():

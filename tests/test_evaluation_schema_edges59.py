@@ -324,11 +324,6 @@ def test_module_source_contains_business_vs_evaluation_batch44():
     assert "评测元数据" in src
 
 
-def test_module_source_contains_jsonschema_imports_batch44():
-    src = inspect.getsource(schema_mod)
-    assert "from jsonschema import Draft202012Validator" in src
-
-
 def test_module_source_contains_jsvalidationerror_import_batch44():
     """注意：实现 import 了 JSValidationError 但实际没用（删了？）。"""
     src = inspect.getsource(schema_mod)

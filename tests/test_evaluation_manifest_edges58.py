@@ -125,10 +125,6 @@ def test_has_backslash_with_newline_batch31():
     assert _has_backslash("a\nb") is False
 
 
-def test_has_backslash_unicode_path_batch31():
-    assert _has_backslash("中文\\路径") is True
-
-
 def test_has_backslash_only_forward_slashes_batch31():
     assert _has_backslash("/a/b/c") is False
 
@@ -273,11 +269,6 @@ def test_manifest_categories_covered_no_duplicates_batch31():
     )
     m = _make_manifest(documents=docs)
     assert m.categories_covered == ["a", "b"]
-
-
-def test_manifest_file_count_zero_documents_batch31():
-    m = _make_manifest()
-    assert m.file_count == 0
 
 
 # ---------- _resolve_relative_path 第三十一批 ----------
@@ -564,11 +555,6 @@ def test_module_source_contains_expected_failure_class_batch31():
 def test_module_source_contains_manifest_class_batch31():
     src = inspect.getsource(mmod)
     assert "class Manifest:" in src
-
-
-def test_module_source_contains_load_manifest_func_batch31():
-    src = inspect.getsource(mmod)
-    assert "def load_manifest" in src
 
 
 # ---------- signatures 第四十四批 ----------

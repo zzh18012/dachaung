@@ -335,10 +335,6 @@ def test_is_valid_bbox_tuple_batch15():
     assert _is_valid_bbox((0, 0, 1, 1)) is False
 
 
-def test_is_valid_bbox_four_strings_batch15():
-    assert _is_valid_bbox(["0", "0", "1", "1"]) is False
-
-
 def test_is_valid_bbox_nested_lists_batch15():
     assert _is_valid_bbox([[0], [0], [1], [1]]) is False
 
@@ -750,16 +746,6 @@ def test_module_source_has_path_import_batch15():
 def test_module_source_has_any_import_batch15():
     src = inspect.getsource(mmod)
     assert "from typing import Any" in src
-
-
-def test_module_source_has_text_types_constant_batch15():
-    src = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ("heading", "paragraph", "list_item", "table", "caption", "header", "footer")' in src
-
-
-def test_module_source_has_pdf_bbox_required_types_batch15():
-    src = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ("heading", "paragraph", "caption", "list_item")' in src
 
 
 def test_module_source_has_not_evaluated_constant_batch15():

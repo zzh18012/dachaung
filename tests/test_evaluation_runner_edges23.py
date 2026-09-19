@@ -299,11 +299,6 @@ def test_process_one_source_has_perf_counter_2_places():
     assert src.count("perf_counter()") == 2  # t0 + elapsed
 
 
-def test_process_one_source_calls_process_single():
-    src = inspect.getsource(_process_one)
-    assert "process_single(" in src
-
-
 def test_process_one_source_calls_image_output_dir_for():
     src = inspect.getsource(_process_one)
     assert "image_output_dir_for" in src
@@ -437,11 +432,6 @@ def test_run_evaluation_source_calls_load_annotation():
     assert "_load_annotation(doc.annotation_resolved)" in src
 
 
-def test_run_evaluation_source_calls_figure_caption_prf():
-    src = inspect.getsource(run_evaluation)
-    assert "figure_caption_prf(document, annotation)" in src
-
-
 def test_run_evaluation_source_calls_chunk_boundary_prf():
     src = inspect.getsource(run_evaluation)
     assert "chunk_boundary_prf(" in src
@@ -475,21 +465,6 @@ def test_run_evaluation_source_has_per_doc_append_6_keys():
 def test_run_evaluation_source_has_expected_failures_loop():
     src = inspect.getsource(run_evaluation)
     assert "for ef in manifest.expected_failures" in src
-
-
-def test_run_evaluation_source_has_actual_code_logic():
-    src = inspect.getsource(run_evaluation)
-    assert "actual_code = errors[0].code if errors else None" in src
-
-
-def test_run_evaluation_source_calls_build_devset_section():
-    src = inspect.getsource(run_evaluation)
-    assert "build_devset_section(manifest)" in src
-
-
-def test_run_evaluation_source_calls_aggregate_summary():
-    src = inspect.getsource(run_evaluation)
-    assert "aggregate_summary(per_doc_results)" in src
 
 
 def test_run_evaluation_source_has_public_per_doc_4_keys():
@@ -562,11 +537,6 @@ def test_expected_failure_source_calls_process_single():
 # =========================================================================
 # annotation 字段处理深度
 # =========================================================================
-
-
-def test_annotation_field_source_has_annotation_present():
-    src = inspect.getsource(run_evaluation)
-    assert '"_annotation_present": annotation is not None' in src
 
 
 def test_annotation_field_source_has_tolerance_chars_logic():

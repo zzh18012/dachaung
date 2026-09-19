@@ -789,10 +789,6 @@ def test_strip_unicode_whitespace_em_space():
     assert _strip_unicode_whitespace("a b") == "ab"
 
 
-def test_strip_unicode_whitespace_en_space():
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
 def test_strip_unicode_whitespace_thin_space():
     assert _strip_unicode_whitespace("a b") == "ab"
 
@@ -1519,11 +1515,6 @@ def test_compute_automatic_metrics_signature():
     ]
     # image_base_dir 默认值
     assert sig.parameters["image_base_dir"].default is None
-
-
-def test_compute_automatic_metrics_return_annotation():
-    sig = inspect.signature(compute_automatic_metrics)
-    assert "dict" in str(sig.return_annotation)
 
 
 def test_internal_function_signatures():

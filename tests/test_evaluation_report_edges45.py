@@ -74,10 +74,6 @@ def test_ratio_metrics_unique_batch29():
     assert len(_RATIO_METRICS) == len(set(_RATIO_METRICS))
 
 
-def test_count_metrics_unique_batch29():
-    assert len(_COUNT_METRICS) == len(set(_COUNT_METRICS))
-
-
 def test_ratio_metrics_is_tuple_batch29():
     assert isinstance(_RATIO_METRICS, tuple)
 

@@ -141,10 +141,6 @@ def test_is_caption_empty_string():
     assert _is_caption("") is False
 
 
-def test_is_caption_none():
-    assert _is_caption(None) is False  # type: ignore[arg-type]
-
-
 def test_is_caption_normal_text():
     assert _is_caption("hello world") is False
 
@@ -162,10 +158,6 @@ def test_is_caption_returns_bool_for_various_inputs():
 # =========================================================================
 # _rows_to_markdown 深度
 # =========================================================================
-
-
-def test_rows_to_markdown_empty_returns_empty():
-    assert _rows_to_markdown([]) == ""
 
 
 def test_rows_to_markdown_single_row():
@@ -487,18 +479,6 @@ def test_lines_to_para_returns_dict():
 
 def test_fallback_parser_name_value():
     assert FallbackParser.name == "fallback"
-
-
-def test_fallback_parser_version_contains_pdfplumber():
-    assert "pdfplumber" in FallbackParser.version
-
-
-def test_fallback_parser_version_contains_python_docx():
-    assert "python-docx" in FallbackParser.version
-
-
-def test_fallback_parser_version_contains_pypdfium2():
-    assert "pypdfium2" in FallbackParser.version
 
 
 def test_fallback_parser_init_no_args():

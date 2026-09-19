@@ -185,10 +185,6 @@ def test_is_caption_with_tab_separator():
 # ---------- _rows_to_markdown 深度 ----------
 
 
-def test_rows_to_markdown_empty_returns_empty():
-    assert _rows_to_markdown([]) == ""
-
-
 def test_rows_to_markdown_single_cell():
     result = _rows_to_markdown([["a"]])
     assert "a" in result

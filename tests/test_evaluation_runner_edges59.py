@@ -409,14 +409,6 @@ def test_module_source_contains_metrics_import_batch31():
     assert "from evaluation.metrics import compute_automatic_metrics" in src
 
 
-def test_module_source_contains_report_import_batch31():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.report import (" in src
-    assert "aggregate_summary" in src
-    assert "build_devset_section" in src
-    assert "build_provenance" in src
-
-
 def test_module_source_contains_load_annotation_func_batch31():
     src = inspect.getsource(rmod)
     assert "def _load_annotation(" in src
@@ -537,11 +529,6 @@ def test_module_imports_typing_any_batch31():
 def test_module_has_all_export_batch31():
     src = inspect.getsource(rmod)
     assert "__all__" in src
-
-
-def test_module_all_has_run_evaluation_batch31():
-    src = inspect.getsource(rmod)
-    assert '"run_evaluation"' in src
 
 
 def test_module_no_main_block_batch31():

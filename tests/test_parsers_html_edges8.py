@@ -1065,24 +1065,8 @@ def test_heading_levels_values_exact():
     assert set(_HEADING_LEVELS.values()) == {1, 2, 3, 4, 5, 6}
 
 
-def test_heading_levels_is_dict():
-    assert isinstance(_HEADING_LEVELS, dict)
-
-
-def test_skip_tags_count_seven():
-    assert len(_SKIP_TAGS) == 7
-
-
 def test_skip_tags_is_set():
     assert isinstance(_SKIP_TAGS, set)
-
-
-def test_html_extensions_count_two():
-    assert len(_HTML_EXTENSIONS) == 2
-
-
-def test_html_extensions_is_tuple():
-    assert isinstance(_HTML_EXTENSIONS, tuple)
 
 
 # =========================================================================

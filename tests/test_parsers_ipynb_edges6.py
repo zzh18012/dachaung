@@ -256,11 +256,6 @@ def test_ipynb_parser_version_value():
     assert IpynbParser.version == "stdlib/0.1.0"
 
 
-def test_ipynb_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(IpynbParser, Parser)
-
-
 # =========================================================================
 # parse() 错误路径
 # =========================================================================

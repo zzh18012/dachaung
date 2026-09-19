@@ -434,16 +434,6 @@ def test_resolve_relative_path_outside_root_rejected_batch39(tmp_path):
         _resolve_relative_path("../outside.pdf", tmp_path, "test")
 
 
-def test_resolve_relative_path_absolute_rejected_batch39(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("/etc/passwd", tmp_path, "test")
-
-
-def test_resolve_relative_path_empty_rejected_batch39(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("", tmp_path, "test")
-
-
 def test_resolve_relative_path_unicode_filename_batch39(tmp_path):
     out = _resolve_relative_path("中文/文件.pdf", tmp_path, "test")
     assert "中文" in str(out)
@@ -630,11 +620,6 @@ def test_detect_project_root_with_file_input_batch39(tmp_path):
     start_file.write_text("x", encoding="utf-8")
     out = _detect_project_root(start_file)
     assert out == tmp_path.resolve()
-
-
-def test_detect_project_root_returns_path_batch39(tmp_path):
-    out = _detect_project_root(tmp_path)
-    assert isinstance(out, Path)
 
 
 def test_detect_project_root_no_params_raises_typeerror_batch39():

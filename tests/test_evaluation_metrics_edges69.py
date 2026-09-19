@@ -80,11 +80,6 @@ def test_ratio_reason_is_none_batch44():
     assert _ratio(0.5)["reason"] is None
 
 
-def test_bool_metric_value_is_bool_batch44():
-    assert isinstance(_bool_metric(True)["value"], bool)
-    assert isinstance(_bool_metric(False)["value"], bool)
-
-
 def test_bool_metric_truthy_value_batch44():
     """传 truthy 非布尔值 → bool(True)。"""
     assert _bool_metric(1)["value"] is True
@@ -314,11 +309,6 @@ def test_silent_drop_expectations_empty_dict_batch44():
 
 def test_silent_drop_expectations_no_element_count_key_batch44():
     out = _silent_drop_count({"paragraph": 5}, {"other_key": "x"})
-    assert out["reason"] == "no_expectations_element_count"
-
-
-def test_silent_drop_expectations_empty_count_batch44():
-    out = _silent_drop_count({"paragraph": 5}, {"element_count_by_type": {}})
     assert out["reason"] == "no_expectations_element_count"
 
 

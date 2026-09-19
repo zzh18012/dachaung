@@ -145,11 +145,6 @@ def test_process_one_source_has_5_return_paths():
     assert return_count == 3
 
 
-def test_process_one_source_has_image_dir_init_to_none():
-    src = inspect.getsource(_process_one)
-    assert "image_dir: Path | None = None" in src
-
-
 def test_process_one_source_has_unlink_in_try_except_oserror():
     src = inspect.getsource(_process_one)
     assert "try:" in src
@@ -210,17 +205,6 @@ def test_run_evaluation_source_has_compute_automatic_metrics_kwargs():
 def test_run_evaluation_source_has_load_annotation_call():
     src = inspect.getsource(run_evaluation)
     assert "_load_annotation(doc.annotation_resolved)" in src
-
-
-def test_run_evaluation_source_has_figure_caption_prf_call():
-    src = inspect.getsource(run_evaluation)
-    assert "figure_caption_prf(document, annotation)" in src
-
-
-def test_run_evaluation_source_has_metrics_update_twice():
-    src = inspect.getsource(run_evaluation)
-    assert "metrics.update(fig_caps)" in src
-    assert "metrics.update(chunk_b)" in src
 
 
 def test_run_evaluation_source_has_per_doc_results_append():

@@ -128,11 +128,6 @@ def test_get_parser_unknown_name_message_contains_input():
     assert "my-bad-name" in str(ei.value)
 
 
-def test_get_parser_empty_string_raises():
-    with pytest.raises(ValueError):
-        get_parser("")
-
-
 def test_get_parser_case_sensitive():
     """'Fallback' 大小写敏感 → ValueError。"""
     with pytest.raises(ValueError):

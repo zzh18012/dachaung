@@ -349,11 +349,6 @@ def test_build_provenance_parser_version_propagated(tmp_path: Path):
     assert result["parser_version"] == "v_test"
 
 
-def test_build_provenance_parser_version_none(tmp_path: Path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["parser_version"] is None
-
-
 def test_build_provenance_max_chars_int(tmp_path: Path):
     result = build_provenance(tmp_path, "fallback", 800, None)
     assert result["max_chars"] == 800
@@ -677,34 +672,9 @@ def test_aggregate_summary_not_evaluated_count():
 # =========================================================================
 
 
-def test_module_imports_subprocess():
-    import evaluation.report as m
-    assert hasattr(m, "subprocess")
-
-
-def test_module_imports_datetime():
-    import evaluation.report as m
-    assert hasattr(m, "datetime")
-
-
-def test_module_imports_path():
-    import evaluation.report as m
-    assert hasattr(m, "Path")
-
-
 def test_module_imports_any():
     import evaluation.report as m
     assert hasattr(m, "Any")
-
-
-def test_module_imports_evaluator_version():
-    import evaluation.report as m
-    assert hasattr(m, "EVALUATOR_VERSION")
-
-
-def test_module_imports_report_version():
-    import evaluation.report as m
-    assert hasattr(m, "REPORT_VERSION")
 
 
 def test_get_git_provenance_signature():

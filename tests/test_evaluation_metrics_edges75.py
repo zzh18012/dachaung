@@ -182,15 +182,6 @@ def test_text_preservation_expected_empty_actual_nonempty_batch51():
     assert out["precision"]["value"] == 0.0
 
 
-def test_text_preservation_both_nonempty_equal_batch51():
-    elements = [{"type": "paragraph", "content": "hello"}]
-    chunks = [{"text": "hello"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
-
-
 def test_text_preservation_case_sensitive_batch51():
     elements = [{"type": "paragraph", "content": "ABC"}]
     chunks = [{"text": "abc"}]
@@ -293,12 +284,6 @@ def test_silent_drop_count_expectations_none_batch51():
     assert out["reason"] == "no_expectations"
 
 
-def test_silent_drop_count_expectations_empty_dict_batch51():
-    out = _silent_drop_count({"paragraph": 5}, {})
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations"
-
-
 def test_silent_drop_count_element_count_by_type_none_batch51():
     """expectations 含 element_count_by_type=None。"""
     out = _silent_drop_count({"paragraph": 5}, {"element_count_by_type": None})
@@ -359,10 +344,6 @@ def test_is_valid_bbox_dict_rejected_batch51():
     assert _is_valid_bbox({"x": 0}) is False
 
 
-def test_is_valid_bbox_mixed_int_float_batch51():
-    assert _is_valid_bbox([0, 0.5, 1, 1.5]) is True
-
-
 def test_is_valid_bbox_all_zero_batch51():
     assert _is_valid_bbox([0, 0, 0, 0]) is True
 
@@ -387,16 +368,8 @@ def test_is_valid_bbox_bool_true_rejected_batch51():
     assert _is_valid_bbox([True, 0, 1, 2]) is False
 
 
-def test_is_valid_bbox_str_numeric_rejected_batch51():
-    assert _is_valid_bbox(["0", "0", "1", "1"]) is False
-
-
 def test_is_valid_bbox_none_rejected_batch51():
     assert _is_valid_bbox(None) is False
-
-
-def test_is_valid_bbox_3_elements_rejected_batch51():
-    assert _is_valid_bbox([0, 0, 1]) is False
 
 
 # ---------- _chunk_reference_ratio 角 ----------
@@ -481,11 +454,6 @@ def test_ratio_returns_dict_with_float_batch51():
     out = _ratio(0.5)
     assert out == {"value": 0.5, "reason": None}
     assert isinstance(out["value"], float)
-
-
-def test_bool_metric_int_converted_to_bool_batch51():
-    out = _bool_metric(1)
-    assert out["value"] is True
 
 
 def test_int_metric_returns_dict_with_int_batch51():
@@ -729,12 +697,6 @@ def test_ast_no_star_import_batch51():
         if isinstance(n, ast.ImportFrom):
             for alias in n.names:
                 assert alias.name != "*"
-
-
-def test_ast_has_module_docstring_batch51():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_assign_targets_names_batch51():

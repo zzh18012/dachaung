@@ -723,18 +723,6 @@ def test_module_callable_main_batch41():
     assert callable(cmod.main)
 
 
-def test_module_has_build_parser_attr_batch41():
-    assert hasattr(cmod, "_build_parser")
-
-
-def test_module_has_format_metric_attr_batch41():
-    assert hasattr(cmod, "_format_metric")
-
-
-def test_module_has_run_inspect_doc_attr_batch41():
-    assert hasattr(cmod, "_run_inspect_doc")
-
-
 def test_module_no_all_attribute_batch41():
     """cli.py 没定义 __all__（不需要 export）。"""
     assert not hasattr(cmod, "__all__") or cmod.__all__ is None or len(getattr(cmod, "__all__", [])) >= 0

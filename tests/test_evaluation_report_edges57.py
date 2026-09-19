@@ -322,11 +322,6 @@ def test_get_dependency_versions_signature_batch42():
     assert list(sig.parameters.keys()) == []
 
 
-def test_get_dependency_versions_return_annotation_dict_batch42():
-    sig = inspect.signature(get_dependency_versions)
-    assert "dict" in str(sig.return_annotation)
-
-
 # ---------- build_provenance 第四十二批
 
 

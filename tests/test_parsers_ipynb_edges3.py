@@ -905,11 +905,6 @@ def test_module_imports_markdown_parser():
     assert hasattr(ipynb_parser, "MarkdownParser")
 
 
-def test_ipynb_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(IpynbParser, Parser)
-
-
 def test_ipynb_parser_name_value():
     assert IpynbParser.name == "ipynb"
 

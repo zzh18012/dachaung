@@ -467,16 +467,6 @@ def test_module_source_contains_parser_does_not_emit_constant_batch25():
     assert 'PARSER_DOES_NOT_EMIT_RELATIONS = "parser_does_not_emit_relations"' in source
 
 
-def test_module_source_contains_tolerance_chars_param_batch25():
-    source = inspect.getsource(amod)
-    assert "tolerance_chars" in source
-
-
-def test_module_source_contains_default_30_batch25():
-    source = inspect.getsource(amod)
-    assert "tolerance_chars: int = 30" in source
-
-
 def test_module_source_contains_no_ground_truth_anchors_in_stream_batch25():
     source = inspect.getsource(amod)
     assert '"no_ground_truth_anchors_in_stream"' in source

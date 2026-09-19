@@ -713,11 +713,6 @@ def test_module_source_no_global():
     assert "\nglobal " not in src
 
 
-def test_module_source_no_async():
-    src = inspect.getsource(m)
-    assert "async def" not in src
-
-
 def test_module_source_no_class():
     src = inspect.getsource(m)
     for line in src.splitlines():

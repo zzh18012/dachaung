@@ -148,11 +148,6 @@ def test_load_schema_evaluation_report_returns_dict():
     assert isinstance(s, dict)
 
 
-def test_load_schema_document_returns_dict():
-    s = load_schema("document.schema.json")
-    assert isinstance(s, dict)
-
-
 def test_load_schema_unknown_raises_filenotfound():
     with pytest.raises(FileNotFoundError):
         load_schema("nonexistent.schema.json")
@@ -202,11 +197,6 @@ def test_load_schema_does_not_invoke_validator():
 def test_load_schema_returns_dict_with_properties():
     s = load_schema("manifest.schema.json")
     assert "properties" in s
-
-
-def test_load_schema_returns_dict_with_required():
-    s = load_schema("manifest.schema.json")
-    assert "required" in s
 
 
 # ---------- validate 行为深度第八批 ----------
@@ -458,12 +448,6 @@ def test_schema_path_unknown_raises():
 def test_schema_path_returns_absolute_path():
     p = _schema_path("manifest.schema.json")
     assert p.is_absolute()
-
-
-def test_schema_path_idempotent():
-    p1 = _schema_path("manifest.schema.json")
-    p2 = _schema_path("manifest.schema.json")
-    assert p1 == p2
 
 
 def test_schema_path_resolves_to_schemas_dir():
@@ -728,11 +712,6 @@ def test_signature_validate_two_params():
     assert len(sig.parameters) == 2
 
 
-def test_signature_validate_param_names():
-    sig = inspect.signature(validate)
-    assert list(sig.parameters) == ["instance", "schema_name"]
-
-
 def test_signature_validate_param_kinds():
     sig = inspect.signature(validate)
     for p in sig.parameters.values():
@@ -748,11 +727,6 @@ def test_signature_validate_no_defaults():
 def test_signature_validate_file_two_params():
     sig = inspect.signature(validate_file)
     assert len(sig.parameters) == 2
-
-
-def test_signature_validate_file_param_names():
-    sig = inspect.signature(validate_file)
-    assert list(sig.parameters) == ["path", "schema_name"]
 
 
 def test_signature_validate_file_param_kinds():
@@ -787,16 +761,6 @@ def test_signature_funcs_module_eq():
 
 
 # ---------- module 合理性第八批 ----------
-
-
-def test_module_all_attribute_value():
-    assert smod.__all__ == [
-        "SCHEMAS_DIR",
-        "EvalSchemaError",
-        "load_schema",
-        "validate",
-        "validate_file",
-    ]
 
 
 def test_module_all_is_list():

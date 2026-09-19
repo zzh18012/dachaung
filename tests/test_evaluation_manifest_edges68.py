@@ -415,11 +415,6 @@ def _make_manifest(**overrides: Any) -> Manifest:
     return Manifest(**defaults)
 
 
-def test_manifest_file_count_empty_batch41():
-    m = _make_manifest()
-    assert m.file_count == 0
-
-
 def test_manifest_pdf_count_empty_batch41():
     m = _make_manifest()
     assert m.pdf_count == 0
@@ -1009,10 +1004,6 @@ def test_module_does_not_export_private_batch41():
     """私有函数不出现在 __all__。"""
     for name in ["_is_absolute_like", "_has_backslash", "_resolve_relative_path", "_detect_project_root"]:
         assert name not in mmod.__all__
-
-
-def test_module_all_no_duplicates_batch41():
-    assert len(mmod.__all__) == len(set(mmod.__all__))
 
 
 def test_module_has_manifest_error_attr_batch41():

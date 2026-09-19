@@ -36,17 +36,9 @@ def test_is_absolute_like_digit_then_colon_batch34():
     assert _is_absolute_like("1:/foo") is False
 
 
-def test_is_absolute_like_underscore_drive_batch34():
-    assert _is_absolute_like("_:/foo") is False
-
-
 def test_is_absolute_like_three_chars_drive_batch34():
     """3 char path with letter at 0 + colon at 1 + slash at 2 → True。"""
     assert _is_absolute_like("a:/foo") is True
-
-
-def test_is_absolute_like_uppercase_drive_batch34():
-    assert _is_absolute_like("C:\\Windows") is True
 
 
 def test_is_absolute_like_lowercase_z_batch34():
@@ -68,10 +60,6 @@ def test_is_absolute_like_just_colon_batch34():
 
 
 # ---------- _has_backslash 第三十四批
-
-
-def test_has_backslash_slash_batch34():
-    assert _has_backslash("/") is False
 
 
 def test_has_backslash_double_batch34():

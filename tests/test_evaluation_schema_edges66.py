@@ -65,11 +65,6 @@ def test_eval_schema_error_raise_with_from_none_batch52():
         assert e.__suppress_context__ is True
 
 
-def test_eval_schema_error_super_init_stores_args_batch52():
-    e = EvalSchemaError("hello")
-    assert e.args == ("hello",)
-
-
 def test_eval_schema_error_message_contains_count_and_path_batch52():
     """validate 失败时 message 含 schema_name + 错误数 + path。"""
     try:
@@ -173,12 +168,6 @@ def test_load_schema_manifest_has_id_batch52():
 def test_load_schema_manifest_has_type_object_batch52():
     s = load_schema("manifest.schema.json")
     assert s.get("type") == "object"
-
-
-def test_load_schema_returns_dict_batch52():
-    for name in ["manifest.schema.json", "annotation.schema.json", "evaluation-report.schema.json"]:
-        s = load_schema(name)
-        assert isinstance(s, dict)
 
 
 # ---------- validate 错误排序 ----------
@@ -327,21 +316,6 @@ def test_schemas_dir_value_matches_module_level_path_batch52():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_pathlib_path_import_batch52():
-    src = inspect.getsource(schema_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_source_typing_any_import_batch52():
-    src = inspect.getsource(schema_mod)
-    assert "from typing import Any" in src
-
-
-def test_source_jsonschema_draft2020_import_batch52():
-    src = inspect.getsource(schema_mod)
-    assert "from jsonschema import Draft202012Validator" in src
-
-
 def test_source_eval_schema_error_docstring_batch52():
     src = inspect.getsource(schema_mod)
     assert "Schema 校验失败时抛出" in src
@@ -456,12 +430,6 @@ def test_ast_eval_schema_error_init_assigns_self_errors_batch52():
             if isinstance(t, ast.Attribute) and t.attr == "errors":
                 found = True
     assert found
-
-
-def test_ast_module_docstring_batch52():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_schemas_dir_assign_uses_path_join_batch52():

@@ -759,16 +759,6 @@ def test_cli_source_no_global_batch12():
     assert " global " not in source
 
 
-def test_cli_source_no_walrus_batch12():
-    source = inspect.getsource(climod)
-    assert ":=" not in source
-
-
-def test_cli_source_no_async_def_batch12():
-    source = inspect.getsource(climod)
-    assert "async def" not in source
-
-
 def test_cli_source_no_while_loop_batch12():
     source = inspect.getsource(climod)
     assert "while " not in source
@@ -786,16 +776,6 @@ def test_module_source_has_future_annotations_batch12():
     source = inspect.getsource(climod)
     head = "\n".join(source.split("\n")[:25])
     assert "from __future__ import annotations" in head
-
-
-def test_module_source_imports_argparse_batch12():
-    source = inspect.getsource(climod)
-    assert "import argparse" in source
-
-
-def test_module_source_imports_get_git_provenance_batch12():
-    source = inspect.getsource(climod)
-    assert "get_git_provenance" in source
 
 
 def test_module_source_has_subparsers_call_batch12():
@@ -859,11 +839,6 @@ def test_signature_main_argv_annotation_batch12():
     assert "list" in annot_str
     assert "str" in annot_str
     assert "None" in annot_str
-
-
-def test_signature_format_metric_2_params_batch12():
-    sig = inspect.signature(_format_metric)
-    assert list(sig.parameters) == ["name", "metric"]
 
 
 def test_signature_format_metric_return_annotation_str_batch12():

@@ -187,11 +187,6 @@ def test_format_metric_value_list_batch32():
     assert "[1, 2, 3]" in out
 
 
-def test_format_metric_value_one_float_batch32():
-    out = _format_metric("x", {"value": 1.0, "reason": None})
-    assert "1.0000" in out
-
-
 def test_format_metric_value_with_reason_when_not_none_batch32():
     """value 非 None 但 reason 给了 → 用给定 reason（reason or 'ok'）。"""
     out = _format_metric("x", {"value": 0.5, "reason": "weird_reason"})

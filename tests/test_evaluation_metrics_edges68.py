@@ -67,10 +67,6 @@ def test_is_valid_bbox_frozenset_rejected_batch42():
     assert _is_valid_bbox(frozenset([1, 2, 3, 4])) is False
 
 
-def test_is_valid_bbox_dict_rejected_batch42():
-    assert _is_valid_bbox({"x": 1, "y": 2, "w": 3, "h": 4}) is False
-
-
 def test_is_valid_bbox_bytes_rejected_batch42():
     """bytes 不是 list（也不是数值）。"""
     assert _is_valid_bbox(b"\x00\x01\x02\x03") is False
@@ -337,12 +333,6 @@ def test_docx_locator_ratio_section_batch42():
     assert out["value"] == 1.0
 
 
-def test_docx_locator_ratio_paragraph_index_batch42():
-    elements = [{"type": "paragraph", "source_locator": {"paragraph_index": 5}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
-
-
 def test_docx_locator_ratio_run_index_batch42():
     elements = [{"type": "paragraph", "source_locator": {"run_index": 2}}]
     out = _docx_locator_ratio(elements)
@@ -470,14 +460,6 @@ def test_pdf_bbox_required_types_contains_heading_batch42():
 
 def test_pdf_bbox_required_types_contains_paragraph_batch42():
     assert "paragraph" in _PDF_BBOX_REQUIRED_TYPES
-
-
-def test_pdf_bbox_required_types_contains_caption_batch42():
-    assert "caption" in _PDF_BBOX_REQUIRED_TYPES
-
-
-def test_pdf_bbox_required_types_no_image_batch42():
-    assert "image" not in _PDF_BBOX_REQUIRED_TYPES
 
 
 def test_pdf_bbox_required_types_subset_of_text_types_batch42():

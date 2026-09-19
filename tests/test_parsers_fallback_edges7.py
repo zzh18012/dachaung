@@ -121,10 +121,6 @@ def test_is_caption_returns_true_for_caption():
     assert _is_caption("Table 1. Description") is True
 
 
-def test_is_caption_none_returns_false():
-    assert _is_caption(None) is False
-
-
 def test_is_caption_empty_string_returns_false():
     assert _is_caption("") is False
 
@@ -136,10 +132,6 @@ def test_is_caption_returns_bool():
 # =========================================================================
 # _rows_to_markdown 边界
 # =========================================================================
-
-
-def test_rows_to_markdown_empty_returns_empty():
-    assert _rows_to_markdown([]) == ""
 
 
 def test_rows_to_markdown_none_cell_becomes_empty():

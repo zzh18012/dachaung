@@ -221,12 +221,6 @@ def test_fenced_regex_mixed_fence_chars_no_match():
 # =========================================================================
 
 
-def test_unordered_list_regex_minus():
-    m = _UNORDERED_LIST_RE.match("- item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
 def test_unordered_list_regex_no_marker():
     assert _UNORDERED_LIST_RE.match("item") is None
 
@@ -260,12 +254,6 @@ def test_unordered_list_regex_content_with_spaces():
 # =========================================================================
 # _ORDERED_LIST_RE 深度
 # =========================================================================
-
-
-def test_ordered_list_regex_dot():
-    m = _ORDERED_LIST_RE.match("1. item")
-    assert m is not None
-    assert m.group(1) == "item"
 
 
 def test_ordered_list_regex_multi_digit():

@@ -533,30 +533,6 @@ def test_document_field_count_twelve():
 # =========================================================================
 
 
-def test_element_is_dataclass():
-    assert is_dataclass(Element)
-
-
-def test_chunk_is_dataclass():
-    assert is_dataclass(Chunk)
-
-
-def test_relation_is_dataclass():
-    assert is_dataclass(Relation)
-
-
-def test_warning_record_is_dataclass():
-    assert is_dataclass(WarningRecord)
-
-
-def test_error_record_is_dataclass():
-    assert is_dataclass(ErrorRecord)
-
-
-def test_document_is_dataclass():
-    assert is_dataclass(Document)
-
-
 # =========================================================================
 # 模块结构
 # =========================================================================

@@ -1043,10 +1043,6 @@ def test_null_returns_dict_with_2_keys():
     assert set(out.keys()) == {"value", "reason"}
 
 
-def test_ratio_value_is_float():
-    assert isinstance(_ratio(0.5)["value"], float)
-
-
 def test_ratio_reason_is_none():
     assert _ratio(0.5)["reason"] is None
 
@@ -1056,11 +1052,6 @@ def test_ratio_converts_int_to_float():
     out = _ratio(1)  # int 1
     assert out["value"] == 1.0
     assert isinstance(out["value"], float)
-
-
-def test_bool_metric_value_is_bool():
-    assert isinstance(_bool_metric(True)["value"], bool)
-    assert isinstance(_bool_metric(False)["value"], bool)
 
 
 def test_bool_metric_truthy_value_becomes_true():

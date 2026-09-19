@@ -148,12 +148,6 @@ def test_namespace_inspect_doc_command():
     assert ns.input == "doc.json"
 
 
-def test_namespace_inspect_doc_tolerance_default_30():
-    p = _build_parser()
-    ns = p.parse_args(["inspect-doc", "doc.json"])
-    assert ns.tolerance_chars == 30
-
-
 def test_namespace_inspect_doc_no_parser_attribute():
     p = _build_parser()
     ns = p.parse_args(["inspect-doc", "doc.json"])

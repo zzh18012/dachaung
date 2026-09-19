@@ -278,12 +278,6 @@ def test_build_provenance_parser_version_none_batch31(tmp_path):
     assert out["parser_version"] is None
 
 
-def test_build_provenance_max_chars_int_batch31(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert out["max_chars"] == 800
-    assert isinstance(out["max_chars"], int)
-
-
 def test_build_provenance_max_chars_negative_batch31(tmp_path):
     """max_chars 负数也被接受（int(-5) = -5）。"""
     out = build_provenance(tmp_path, "fallback", -5, None)
@@ -573,11 +567,6 @@ def test_module_source_contains_aggregate_summary_func_batch31():
     assert "def aggregate_summary(" in src
 
 
-def test_module_source_contains_subprocess_run_call_batch31():
-    src = inspect.getsource(rmod)
-    assert "subprocess.run(" in src
-
-
 def test_module_source_contains_all_batch31():
     src = inspect.getsource(rmod)
     assert "__all__" in src
@@ -655,10 +644,6 @@ def test_module_imports_subprocess_batch31():
     assert "import subprocess" in src
 
 
-def test_module_has_get_git_provenance_func_batch31():
-    assert callable(rmod.get_git_provenance)
-
-
 def test_module_has_get_dependency_versions_func_batch31():
     assert callable(rmod.get_dependency_versions)
 
@@ -669,10 +654,6 @@ def test_module_has_build_provenance_func_batch31():
 
 def test_module_has_build_devset_section_func_batch31():
     assert callable(rmod.build_devset_section)
-
-
-def test_module_has_aggregate_summary_func_batch31():
-    assert callable(rmod.aggregate_summary)
 
 
 def test_module_has_all_batch31():

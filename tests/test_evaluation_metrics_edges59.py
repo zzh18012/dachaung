@@ -232,11 +232,6 @@ def test_pdf_locator_ratio_image_no_bbox_required_batch33():
 # ---------- _docx_locator_ratio 第三十三批 ----------
 
 
-def test_docx_locator_ratio_no_elements_returns_null_batch33():
-    out = _docx_locator_ratio([])
-    assert out["value"] is None
-
-
 def test_docx_locator_ratio_with_row_col_index_batch33():
     elements = [{"type": "paragraph", "source_locator": {"row_index": 1, "col_index": 2}}]
     out = _docx_locator_ratio(elements)
@@ -262,10 +257,6 @@ def test_is_valid_bbox_with_floats_batch33():
 
 def test_is_valid_bbox_with_ints_batch33():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
-
-
-def test_is_valid_bbox_mixed_int_float_batch33():
-    assert _is_valid_bbox([0, 0.5, 1, 1.5]) is True
 
 
 # ---------- _image_resource_ratio 第三十三批 ----------
@@ -311,10 +302,6 @@ def test_chunk_reference_ratio_returns_dict_batch33():
 
 def test_strip_unicode_whitespace_empty_string_batch33():
     assert _strip_unicode_whitespace("") == ""
-
-
-def test_strip_unicode_whitespace_all_whitespace_batch33():
-    assert _strip_unicode_whitespace("   \t\n") == ""
 
 
 def test_strip_unicode_whitespace_no_whitespace_batch33():

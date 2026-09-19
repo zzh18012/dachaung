@@ -183,11 +183,6 @@ def test_int_metric_with_negative_int():
     assert out["value"] == -5
 
 
-def test_int_metric_with_zero():
-    out = _int_metric(0)
-    assert out["value"] == 0
-
-
 def test_int_metric_with_huge_int():
     out = _int_metric(10**18)
     assert out["value"] == 10**18
@@ -284,10 +279,6 @@ def test_pdf_bbox_required_types_includes_heading():
 
 def test_pdf_bbox_required_types_includes_paragraph():
     assert "paragraph" in _PDF_BBOX_REQUIRED_TYPES
-
-
-def test_pdf_bbox_required_types_includes_caption():
-    assert "caption" in _PDF_BBOX_REQUIRED_TYPES
 
 
 def test_pdf_bbox_required_types_excludes_header():
@@ -1072,15 +1063,6 @@ def test_text_preservation_no_elements_no_chunks():
     assert out["recall"]["reason"] == "empty_expected_and_actual"
 
 
-def test_text_preservation_perfect_match():
-    elements = [{"type": "paragraph", "content": "hello"}]
-    chunks = [{"text": "hello"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-    assert out["precision"]["value"] == 1.0
-    assert out["recall"]["value"] == 1.0
-
-
 def test_text_preservation_chunks_missing_text():
     elements = [{"type": "paragraph", "content": "abc"}]
     chunks = [{}]  # 无 text
@@ -1422,12 +1404,6 @@ def test_compute_automatic_metrics_image_base_dir_default_none():
     assert sig.parameters["image_base_dir"].default is None
 
 
-def test_compute_automatic_metrics_param_kinds():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 def test_null_signature_1_param():
     sig = inspect.signature(_null)
     assert len(sig.parameters) == 1
@@ -1488,11 +1464,6 @@ def test_docx_locator_ratio_signature_1_param():
 def test_is_valid_bbox_signature_1_param():
     sig = inspect.signature(_is_valid_bbox)
     assert len(sig.parameters) == 1
-
-
-def test_image_resource_ratio_signature_2_params():
-    sig = inspect.signature(_image_resource_ratio)
-    assert len(sig.parameters) == 2
 
 
 def test_chunk_reference_ratio_signature_2_params():

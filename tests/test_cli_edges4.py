@@ -635,10 +635,6 @@ def test_infer_parser_name_returns_str():
 # =========================================================================
 
 
-def test_extension_to_parser_count_is_nine():
-    assert len(_EXTENSION_TO_PARSER) == 9
-
-
 def test_extension_to_parser_keys_all_lowercase():
     for k in _EXTENSION_TO_PARSER:
         assert k == k.lower()

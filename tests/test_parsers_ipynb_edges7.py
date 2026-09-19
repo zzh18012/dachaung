@@ -163,10 +163,6 @@ def test_extract_kernel_language_kernelspec_takes_priority_over_language_info():
     assert _extract_kernel_language(metadata) == "python"
 
 
-def test_extract_kernel_language_kernelspec_empty_dict():
-    assert _extract_kernel_language({"kernelspec": {}}) == ""
-
-
 def test_extract_kernel_language_kernelspec_none():
     """kernelspec 显式为 None。"""
     assert _extract_kernel_language({"kernelspec": None}) == ""

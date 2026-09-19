@@ -150,10 +150,6 @@ def test_has_backslash_multiple_backslashes():
     assert _has_backslash("a\\b\\c") is True
 
 
-def test_has_backslash_only_forward():
-    assert _has_backslash("////") is False
-
-
 def test_has_backslash_trailing_backslash():
     assert _has_backslash("abc\\") is True
 
@@ -831,36 +827,6 @@ def test_module_all_exports():
         "ManifestError", "Manifest", "DocumentEntry",
         "ExpectedFailure", "load_manifest",
     ]
-
-
-def test_module_imports_json():
-    import evaluation.manifest as m
-    assert hasattr(m, "json")
-
-
-def test_module_imports_dataclass():
-    import evaluation.manifest as m
-    assert hasattr(m, "dataclass")
-
-
-def test_module_imports_path():
-    import evaluation.manifest as m
-    assert hasattr(m, "Path")
-
-
-def test_module_imports_any():
-    import evaluation.manifest as m
-    assert hasattr(m, "Any")
-
-
-def test_module_imports_manifest_version():
-    import evaluation.manifest as m
-    assert hasattr(m, "MANIFEST_VERSION")
-
-
-def test_module_imports_validate():
-    import evaluation.manifest as m
-    assert hasattr(m, "validate")
 
 
 def test_manifest_error_is_exception():

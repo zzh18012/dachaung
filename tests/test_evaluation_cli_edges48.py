@@ -568,36 +568,6 @@ def test_module_source_forbidden_tokens_batch21(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_socket_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import socket" not in src
-
-
-def test_module_source_no_urllib_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import urllib" not in src
-
-
-def test_module_source_no_threading_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import threading" not in src
-
-
-def test_module_source_no_asyncio_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import asyncio" not in src
-
-
-def test_module_source_no_shutil_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import shutil" not in src
-
-
-def test_module_source_no_tempfile_import_batch21():
-    src = inspect.getsource(climod)
-    assert "import tempfile" not in src
-
-
 # ---------- module source 字符串精确补强第三十三批 ----------
 
 
@@ -634,11 +604,6 @@ def test_module_source_has_manifest_error_in_import_batch21():
 def test_module_source_has_load_manifest_in_import_batch21():
     src = inspect.getsource(climod)
     assert "load_manifest" in src
-
-
-def test_module_source_has_report_import_batch21():
-    src = inspect.getsource(climod)
-    assert "from evaluation.report import get_git_provenance" in src
 
 
 def test_module_source_has_runner_import_batch21():

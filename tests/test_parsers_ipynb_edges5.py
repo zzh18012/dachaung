@@ -168,10 +168,6 @@ def test_extract_kernel_language_none_metadata_raises():
         _extract_kernel_language(None)  # type: ignore[arg-type]
 
 
-def test_extract_kernel_language_kernelspec_empty():
-    assert _extract_kernel_language({"kernelspec": {}}) == ""
-
-
 def test_extract_kernel_language_kernelspec_language_empty_string():
     """language='' → 视为 falsy，回落到 name。"""
     meta = {"kernelspec": {"language": "", "name": "python3"}}
@@ -198,11 +194,6 @@ def test_ipynb_parser_name_value():
 
 def test_ipynb_parser_version_value():
     assert IpynbParser.version == "stdlib/0.1.0"
-
-
-def test_ipynb_parser_inherits_parser():
-    from app.parsers.base import Parser
-    assert issubclass(IpynbParser, Parser)
 
 
 # =========================================================================

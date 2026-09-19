@@ -32,12 +32,6 @@ from evaluation.cli import (
 # =========================================================================
 
 
-def test_build_parser_returns_argument_parser():
-    import argparse
-    p = _build_parser()
-    assert isinstance(p, argparse.ArgumentParser)
-
-
 def test_build_parser_prog_exact_value():
     p = _build_parser()
     assert p.prog == "evaluation.cli"
@@ -76,12 +70,6 @@ def test_build_parser_has_three_subcommands():
             assert set(action.choices.keys()) == {"run", "validate-report", "inspect-doc"}
             return
     pytest.fail("no subparsers found")
-
-
-def test_build_parser_run_output_required_true():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--manifest", "x"])
 
 
 def test_build_parser_run_minimal_args_ok():
@@ -732,26 +720,6 @@ def test_module_has_run_inspect_doc_callable():
 # =========================================================================
 # 模块结构深度
 # =========================================================================
-
-
-def test_module_imports_argparse():
-    import evaluation.cli as m
-    assert hasattr(m, "argparse")
-
-
-def test_module_imports_json():
-    import evaluation.cli as m
-    assert hasattr(m, "json")
-
-
-def test_module_imports_sys():
-    import evaluation.cli as m
-    assert hasattr(m, "sys")
-
-
-def test_module_imports_path():
-    import evaluation.cli as m
-    assert hasattr(m, "Path")
 
 
 def test_module_imports_manifest():

@@ -63,11 +63,6 @@ def test_null_long_reason_batch11():
     assert out["reason"] == long_str
 
 
-def test_null_unicode_reason_batch11():
-    out = _null("中文原因")
-    assert out["reason"] == "中文原因"
-
-
 def test_null_returns_dict_strict_batch11():
     out = _null("x")
     assert type(out) is dict
@@ -105,11 +100,6 @@ def test_bool_metric_truthy_string_batch11():
     """truthy str → True（bool() 转换）。"""
     out = _bool_metric("non-empty")
     assert out["value"] is True
-
-
-def test_bool_metric_falsy_string_batch11():
-    out = _bool_metric("")
-    assert out["value"] is False
 
 
 def test_bool_metric_returns_dict_strict_batch11():
@@ -299,12 +289,6 @@ def test_pdf_locator_page_none_not_counts_batch11():
     assert out["value"] == 0.0
 
 
-def test_pdf_locator_missing_source_locator_not_counts_batch11():
-    elements = [{"type": "image"}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
 def test_pdf_locator_text_without_bbox_not_counts_batch11():
     elements = [{"type": "paragraph", "source_locator": {"page": 1}}]
     out = _pdf_locator_ratio(elements)
@@ -320,17 +304,6 @@ def test_pdf_locator_mixed_partial_batch11():
     out = _pdf_locator_ratio(elements)
     # 2/3
     assert out["value"] == pytest.approx(2 / 3)
-
-
-def test_docx_locator_empty_elements_null_batch11():
-    out = _docx_locator_ratio([])
-    assert out["value"] is None
-
-
-def test_docx_locator_with_section_counts_batch11():
-    elements = [{"type": "paragraph", "source_locator": {"section": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 1.0
 
 
 def test_docx_locator_with_paragraph_index_counts_batch11():
@@ -515,13 +488,6 @@ def test_text_preservation_missing_chars_in_actual_batch11():
     assert out["recall"]["value"] == 0.75  # 3/4
 
 
-def test_text_preservation_unicode_content_batch11():
-    elements = [{"type": "paragraph", "content": "你好世界"}]
-    chunks = [{"text": "你好世界"}]
-    out = _text_preservation(elements, chunks)
-    assert out["equal"]["value"] is True
-
-
 def test_text_preservation_image_excluded_batch11():
     """image 类型不参与 expected（image 的 content 不算）。"""
     elements = [
@@ -656,10 +622,6 @@ def test_is_valid_bbox_4_ints_batch11():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
 
 
-def test_is_valid_bbox_4_floats_batch11():
-    assert _is_valid_bbox([0.0, 0.0, 100.5, 100.5]) is True
-
-
 def test_is_valid_bbox_bool_rejected_batch11():
     assert _is_valid_bbox([True, 0, 0, 0]) is False
 
@@ -723,10 +685,6 @@ def test_strip_unicode_ws_nbsp_batch11():
 
 def test_strip_unicode_ws_em_space_batch11():
     assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_ws_en_space_batch11():
-    assert _strip_unicode_whitespace("a b") == "ab"
 
 
 def test_strip_unicode_ws_ideographic_space_batch11():
@@ -809,16 +767,6 @@ def test_metrics_source_no_walrus_batch11():
     assert ":=" not in source
 
 
-def test_metrics_source_no_top_level_lambda_batch11():
-    source = inspect.getsource(mmod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
-
-
 def test_metrics_source_no_print_batch11():
     source = inspect.getsource(mmod)
     assert "print(" not in source
@@ -830,11 +778,6 @@ def test_metrics_source_no_print_batch11():
 def test_module_source_has_future_annotations_batch11():
     source = inspect.getsource(mmod)
     assert "from __future__ import annotations" in source
-
-
-def test_module_source_imports_math_batch11():
-    source = inspect.getsource(mmod)
-    assert "import math" in source
 
 
 def test_module_source_imports_counter_batch11():
@@ -998,10 +941,6 @@ def test_module_all_value_batch11():
 
 def test_module_all_is_list_batch11():
     assert isinstance(mmod.__all__, list)
-
-
-def test_module_all_entries_unique_batch11():
-    assert len(mmod.__all__) == len(set(mmod.__all__))
 
 
 def test_module_has_dunder_file_batch11():

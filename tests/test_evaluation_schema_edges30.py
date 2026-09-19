@@ -377,12 +377,6 @@ def test_schema_path_directory_form_raises_batch10():
         _schema_path("subdir")
 
 
-def test_schema_path_idempotent_batch10():
-    p1 = _schema_path("manifest.schema.json")
-    p2 = _schema_path("manifest.schema.json")
-    assert p1 == p2
-
-
 def test_schema_path_resolves_to_schemas_dir_batch10():
     p = _schema_path("manifest.schema.json")
     assert p.parent == SCHEMAS_DIR
@@ -482,16 +476,6 @@ def test_schema_source_no_terminate_batch10():
     assert ".terminate(" not in source
 
 
-def test_schema_source_no_async_def_batch10():
-    source = inspect.getsource(smod)
-    assert "async def" not in source
-
-
-def test_schema_source_no_walrus_batch10():
-    source = inspect.getsource(smod)
-    assert ":=" not in source
-
-
 def test_schema_source_no_top_level_lambda_batch10():
     source = inspect.getsource(smod)
     lines = source.split("\n")
@@ -533,11 +517,6 @@ def test_schema_source_no_pickle_module_batch10():
 def test_module_source_has_future_annotations_batch10():
     source = inspect.getsource(smod)
     assert "from __future__ import annotations" in source
-
-
-def test_module_source_imports_json_batch10():
-    source = inspect.getsource(smod)
-    assert "import json" in source
 
 
 def test_module_source_imports_draft202012_validator_batch10():
@@ -618,11 +597,6 @@ def test_signature_validate_2_params_batch10():
     assert len(sig.parameters) == 2
 
 
-def test_signature_validate_param_names_batch10():
-    sig = inspect.signature(validate)
-    assert list(sig.parameters) == ["instance", "schema_name"]
-
-
 def test_signature_validate_param_kinds_batch10():
     sig = inspect.signature(validate)
     for p in sig.parameters.values():
@@ -640,22 +614,7 @@ def test_signature_validate_file_2_params_batch10():
     assert len(sig.parameters) == 2
 
 
-def test_signature_validate_file_param_names_batch10():
-    sig = inspect.signature(validate_file)
-    assert list(sig.parameters) == ["path", "schema_name"]
-
-
 # ---------- module 合理性第十批 ----------
-
-
-def test_module_all_value_batch10():
-    assert smod.__all__ == [
-        "SCHEMAS_DIR",
-        "EvalSchemaError",
-        "load_schema",
-        "validate",
-        "validate_file",
-    ]
 
 
 def test_module_all_is_list_batch10():
@@ -665,11 +624,6 @@ def test_module_all_is_list_batch10():
 def test_module_all_entries_str_batch10():
     for name in smod.__all__:
         assert isinstance(name, str)
-
-
-def test_module_has_dunder_file_batch10():
-    assert hasattr(smod, "__file__")
-    assert smod.__file__ is not None
 
 
 def test_module_name_is_evaluation_schema_batch10():

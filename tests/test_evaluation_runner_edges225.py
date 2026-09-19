@@ -145,12 +145,6 @@ def test_summary_sum_six_batch453(tmp_path):
         "sum": 6, "participating_docs": 2}
 
 
-def test_success_two_of_two_batch453(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["success_rates"]["pipeline_success"] == {
-        "success_count": 2, "total": 2, "rate": 1.0}
-
-
 def test_devset_two_pdfs_batch453(tmp_path):
     r = _run(tmp_path)
     assert r["devset"] == {

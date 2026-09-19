@@ -581,28 +581,8 @@ def test_module_all_contains_const_batch44():
     assert "PARSER_DOES_NOT_EMIT_RELATIONS" in amod.__all__
 
 
-def test_module_all_contains_figure_caption_prf_batch44():
-    assert "figure_caption_prf" in amod.__all__
-
-
-def test_module_all_contains_chunk_boundary_prf_batch44():
-    assert "chunk_boundary_prf" in amod.__all__
-
-
-def test_module_all_no_duplicates_batch44():
-    assert len(amod.__all__) == len(set(amod.__all__))
-
-
 def test_module_has_parser_does_not_emit_relations_attr_batch44():
     assert hasattr(amod, "PARSER_DOES_NOT_EMIT_RELATIONS")
-
-
-def test_module_has_figure_caption_prf_attr_batch44():
-    assert hasattr(amod, "figure_caption_prf")
-
-
-def test_module_has_chunk_boundary_prf_attr_batch44():
-    assert hasattr(amod, "chunk_boundary_prf")
 
 
 # ---------- 端到端集成 第四十四批

@@ -1096,10 +1096,6 @@ def test_parse_disabled_include_document_structure_passed_to_config(tmp_path: Pa
 # =========================================================================
 
 
-def test_module_heading_re_is_compiled_pattern():
-    assert isinstance(_HEADING_RE, re.Pattern)
-
-
 def test_module_short_line_max_equals_80():
     assert _SHORT_LINE_MAX == 80
 

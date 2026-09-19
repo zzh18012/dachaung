@@ -110,11 +110,6 @@ def test_eval_schema_error_pickle_empty_errors_batch47():
 
 # ---------- EvalSchemaError errors 默认 [] ----------
 
-def test_eval_schema_error_errors_default_empty_batch47():
-    err = EvalSchemaError("msg")
-    assert err.errors == []
-
-
 def test_eval_schema_error_errors_explicit_batch47():
     errs = [{"path": ["a"], "message": "bad"}]
     err = EvalSchemaError("msg", errs)
@@ -125,11 +120,6 @@ def test_eval_schema_error_repr_batch47():
     err = EvalSchemaError("hello")
     r = repr(err)
     assert "EvalSchemaError" in r
-
-
-def test_eval_schema_error_is_exception_batch47():
-    err = EvalSchemaError("x")
-    assert isinstance(err, Exception)
 
 
 def test_eval_schema_error_can_be_raised_and_caught_batch47():
@@ -317,11 +307,6 @@ def test_manifest_schema_documents_is_array_batch47():
 
 # ---------- annotation.schema.json 内部字段 ----------
 
-def test_annotation_schema_has_type_object_batch47():
-    s = load_schema("annotation.schema.json")
-    assert s.get("type") == "object"
-
-
 def test_annotation_schema_has_properties_batch47():
     s = load_schema("annotation.schema.json")
     assert "properties" in s
@@ -346,11 +331,6 @@ def test_evaluation_report_schema_has_properties_batch47():
 
 
 # ---------- module source 字符串补强 ----------
-
-def test_source_contains_Draft202012Validator_batch47():
-    src = inspect.getsource(schema_mod)
-    assert "Draft202012Validator" in src
-
 
 def test_source_contains_sorted_with_lambda_batch47():
     src = inspect.getsource(schema_mod)

@@ -458,19 +458,9 @@ def test_module_source_no_os_system_call_batch18():
     assert "os.system(" not in src
 
 
-def test_module_source_no_socket_import_batch18():
-    src = inspect.getsource(smod)
-    assert "import socket" not in src
-
-
 def test_module_source_no_requests_import_batch18():
     src = inspect.getsource(smod)
     assert "import requests" not in src
-
-
-def test_module_source_no_urllib_import_batch18():
-    src = inspect.getsource(smod)
-    assert "import urllib" not in src
 
 
 def test_module_source_no_asyncio_import_batch18():

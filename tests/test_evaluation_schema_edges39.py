@@ -79,19 +79,9 @@ def test_schemas_dir_glob_count_at_least_four_batch19():
 # ---------- EvalSchemaError 行为深度第十九批 ----------
 
 
-def test_eval_schema_error_repr_contains_class_name_batch19():
-    err = EvalSchemaError("msg")
-    assert "EvalSchemaError" in repr(err)
-
-
 def test_eval_schema_error_str_equals_message_batch19():
     err = EvalSchemaError("hello world")
     assert str(err) == "hello world"
-
-
-def test_eval_schema_error_is_exception_subclass_batch19():
-    err = EvalSchemaError("x")
-    assert isinstance(err, Exception)
 
 
 def test_eval_schema_error_default_errors_is_empty_list_batch19():
@@ -400,16 +390,6 @@ def test_module_source_forbidden_tokens_batch19(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_socket_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import socket" not in src
-
-
-def test_module_source_no_urllib_import_batch19():
-    src = inspect.getsource(smod)
-    assert "import urllib" not in src
-
-
 def test_module_source_no_re_import_batch19():
     src = inspect.getsource(smod)
     assert "import re" not in src
@@ -478,11 +458,6 @@ def test_module_source_has_class_eval_schema_error_batch19():
     assert "class EvalSchemaError(Exception):" in src
 
 
-def test_module_source_has_schema_path_function_batch19():
-    src = inspect.getsource(smod)
-    assert "def _schema_path(name: str) -> Path:" in src
-
-
 def test_module_source_has_iter_errors_call_batch19():
     src = inspect.getsource(smod)
     assert "iter_errors" in src
@@ -503,13 +478,6 @@ def test_module_source_has_all_list_batch19():
 
 def test_signature_schema_path_batch19():
     sig = inspect.signature(_schema_path)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "name"
-
-
-def test_signature_load_schema_batch19():
-    sig = inspect.signature(load_schema)
     params = list(sig.parameters.values())
     assert len(params) == 1
     assert params[0].name == "name"

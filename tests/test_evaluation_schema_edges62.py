@@ -56,12 +56,6 @@ def test_eval_schema_error_errors_explicit_list_batch48():
     assert e.errors is errs
 
 
-def test_eval_schema_error_super_init_message_batch48():
-    e = EvalSchemaError("hello")
-    # super().__init__ 把 message 存到 args
-    assert e.args == ("hello",)
-
-
 def test_eval_schema_error_str_contains_message_batch48():
     e = EvalSchemaError("custom message")
     assert "custom message" in str(e)
@@ -96,16 +90,6 @@ def test_eval_schema_error_no_required_errors_arg_batch48():
 
 def test_schema_path_existing_batch48():
     p = _schema_path("manifest.schema.json")
-    assert p.is_file()
-
-
-def test_schema_path_annotation_batch48():
-    p = _schema_path("annotation.schema.json")
-    assert p.is_file()
-
-
-def test_schema_path_evaluation_report_batch48():
-    p = _schema_path("evaluation-report.schema.json")
     assert p.is_file()
 
 
@@ -326,11 +310,6 @@ def test_schemas_dir_contains_evaluation_report_schema_batch48():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_jsonschema_import_batch48():
-    src = inspect.getsource(schema_mod)
-    assert "Draft202012Validator" in src
-
-
 def test_source_contains_jsvalidationerror_import_batch48():
     src = inspect.getsource(schema_mod)
     assert "JSValidationError" in src
@@ -428,12 +407,6 @@ def test_ast_eval_schema_error_init_method_batch48():
 def test_ast_no_async_function_def_batch48():
     tree = ast.parse(inspect.getsource(schema_mod))
     assert not any(isinstance(n, ast.AsyncFunctionDef) for n in tree.body)
-
-
-def test_ast_module_docstring_batch48():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_validate_has_for_loop_batch48():

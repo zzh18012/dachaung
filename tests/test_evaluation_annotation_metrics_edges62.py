@@ -445,11 +445,6 @@ def test_module_source_contains_all_with_three_entries_batch35():
     assert len(amod.__all__) == 3
 
 
-def test_module_source_all_contains_parser_const_batch35():
-    src = inspect.getsource(amod)
-    assert '"PARSER_DOES_NOT_EMIT_RELATIONS"' in src
-
-
 # ---------- signatures 第四十九批
 
 

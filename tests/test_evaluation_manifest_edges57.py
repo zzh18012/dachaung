@@ -634,11 +634,6 @@ def test_module_source_contains_disk_letter_comment_batch30():
     assert "Windows 盘符" in src
 
 
-def test_module_source_contains_load_manifest_func_batch30():
-    src = inspect.getsource(mmod)
-    assert "def load_manifest" in src
-
-
 def test_module_source_contains_pdf_count_property_batch30():
     src = inspect.getsource(mmod)
     assert "def pdf_count" in src
@@ -665,16 +660,6 @@ def test_module_source_contains_pair_ids_local_batch30():
 def test_signature_is_absolute_like_path_str_batch30():
     sig = inspect.signature(_is_absolute_like)
     assert sig.parameters["path_str"].annotation == "str"
-
-
-def test_signature_is_absolute_like_return_bool_batch30():
-    sig = inspect.signature(_is_absolute_like)
-    assert sig.return_annotation == "bool"
-
-
-def test_signature_has_backslash_return_bool_batch30():
-    sig = inspect.signature(_has_backslash)
-    assert sig.return_annotation == "bool"
 
 
 def test_signature_resolve_relative_path_project_root_annotation_batch30():

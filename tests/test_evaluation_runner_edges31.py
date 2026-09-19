@@ -172,21 +172,10 @@ def test_process_one_source_starts_with_def_keyword():
     assert src.lstrip().startswith("def _process_one(")
 
 
-def test_process_one_source_returns_5_tuple():
-    src = inspect.getsource(_process_one)
-    # 多分支返回值结构（5-tuple 形式）
-    assert "return document.to_dict(), None, elapsed, document.parser_version, image_dir" in src
-
-
 def test_process_one_source_image_dir_appears_in_returns():
     src = inspect.getsource(_process_one)
     # image_dir 在至少 3 个 return 分支中出现
     assert src.count("image_dir") >= 3
-
-
-def test_process_one_source_calls_process_single():
-    src = inspect.getsource(_process_one)
-    assert "process_single(" in src
 
 
 def test_process_one_source_uses_out_stub_variable():
@@ -197,11 +186,6 @@ def test_process_one_source_uses_out_stub_variable():
 def test_process_one_source_uses_doc_dot_doc_id():
     src = inspect.getsource(_process_one)
     assert "doc.doc_id" in src
-
-
-def test_process_one_source_initializes_image_dir_to_none():
-    src = inspect.getsource(_process_one)
-    assert "image_dir: Path | None = None" in src
 
 
 def test_process_one_source_returns_5_tuple_in_all_3_branches():
@@ -363,11 +347,6 @@ def test_run_evaluation_source_creates_report_dict():
 def test_run_evaluation_source_returns_report():
     src = inspect.getsource(run_evaluation)
     assert "return report" in src
-
-
-def test_run_evaluation_source_calls_actual_code_extraction():
-    src = inspect.getsource(run_evaluation)
-    assert "actual_code = errors[0].code if errors else None" in src
 
 
 def test_run_evaluation_source_creates_expected_failure_dict_with_4_keys():
@@ -626,17 +605,6 @@ def test_run_evaluation_signature_5_params_confirmed():
     assert len(sig.parameters) == 5
 
 
-def test_run_evaluation_param_names_confirmed():
-    sig = inspect.signature(run_evaluation)
-    assert list(sig.parameters.keys()) == [
-        "manifest",
-        "output_path",
-        "parser_name",
-        "max_chars",
-        "tolerance_chars",
-    ]
-
-
 def test_run_evaluation_manifest_positional_or_keyword():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["manifest"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
@@ -706,11 +674,6 @@ def test_module_all_is_list():
 
 def test_module_all_has_1_entry():
     assert len(rmod.__all__) == 1
-
-
-def test_module_all_entries_are_str():
-    for entry in rmod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_all_only_run_evaluation():

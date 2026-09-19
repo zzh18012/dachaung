@@ -301,10 +301,6 @@ def test_null_reason_keeps_reference_batch52():
     assert d["reason"] == r
 
 
-def test_bool_metric_true_value_batch52():
-    assert _bool_metric(True)["value"] is True
-
-
 def test_int_metric_zero_batch52():
     d = _int_metric(0)
     assert d["value"] == 0

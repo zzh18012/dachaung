@@ -74,13 +74,6 @@ def test_load_annotation_top_level_number_batch28(tmp_path):
     assert result == 42
 
 
-def test_load_annotation_top_level_string_batch28(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text('"hello"', encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == "hello"
-
-
 def test_load_annotation_top_level_array_batch28(tmp_path):
     p = tmp_path / "a.json"
     p.write_text("[1, 2, 3]", encoding="utf-8")
@@ -483,11 +476,6 @@ def test_run_evaluation_expected_failure_no_match_batch28(tmp_path):
 # ---------- module source forbidden tokens 第四十六批 ----------
 
 
-def test_module_source_no_subprocess_batch28():
-    src = inspect.getsource(rmod)
-    assert "subprocess" not in src
-
-
 def test_module_source_no_os_system_batch28():
     src = inspect.getsource(rmod)
     assert "os.system" not in src
@@ -587,11 +575,6 @@ def test_module_source_contains_per_doc_dir_batch28():
 def test_module_source_contains_image_output_dir_for_batch28():
     src = inspect.getsource(rmod)
     assert "image_output_dir_for" in src
-
-
-def test_module_source_contains_aggregate_summary_batch28():
-    src = inspect.getsource(rmod)
-    assert "aggregate_summary" in src
 
 
 # ---------- signatures 第四十二批 ----------

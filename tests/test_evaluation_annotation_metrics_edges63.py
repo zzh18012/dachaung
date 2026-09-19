@@ -23,10 +23,6 @@ from evaluation.annotation_metrics import (
 # ---------- PARSER_DOES_NOT_EMIT_RELATIONS 第三十六批
 
 
-def test_parser_const_no_spaces_batch36():
-    assert " " not in PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 def test_parser_const_no_hyphens_batch36():
     assert "-" not in PARSER_DOES_NOT_EMIT_RELATIONS
 
@@ -62,11 +58,6 @@ def test_figure_caption_prf_with_none_annotation_batch36():
 
 def test_figure_caption_prf_both_none_batch36():
     out = figure_caption_prf(None, None)
-    assert len(out) == 3
-
-
-def test_figure_caption_prf_with_empty_dict_doc_batch36():
-    out = figure_caption_prf({}, {})
     assert len(out) == 3
 
 
@@ -575,14 +566,6 @@ def test_signature_chunk_boundary_prf_is_callable_batch36():
 
 def test_module_has_parser_const_attribute_batch36():
     assert hasattr(amod, "PARSER_DOES_NOT_EMIT_RELATIONS")
-
-
-def test_module_has_figure_caption_prf_attribute_batch36():
-    assert hasattr(amod, "figure_caption_prf")
-
-
-def test_module_has_chunk_boundary_prf_attribute_batch36():
-    assert hasattr(amod, "chunk_boundary_prf")
 
 
 def test_module_has_all_attribute_batch36():

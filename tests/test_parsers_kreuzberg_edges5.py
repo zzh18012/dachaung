@@ -35,10 +35,6 @@ from app.parsers.kreuzberg_parser import (
 # =========================================================================
 
 
-def test_heading_re_pattern_object_type():
-    assert isinstance(_HEADING_RE, re.Pattern)
-
-
 def test_heading_re_pattern_string_value():
     """pattern 应包含 #{1,6} 限定 1-6 个 #。"""
     pat = _HEADING_RE.pattern

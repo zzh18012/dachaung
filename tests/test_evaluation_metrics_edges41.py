@@ -437,10 +437,6 @@ def test_is_valid_bbox_4_ints_batch14():
     assert _is_valid_bbox([0, 0, 100, 100]) is True
 
 
-def test_is_valid_bbox_4_floats_batch14():
-    assert _is_valid_bbox([0.0, 0.0, 100.5, 100.5]) is True
-
-
 def test_is_valid_bbox_string_elements_batch14():
     """字符串元素应失败（非数字）。"""
     assert _is_valid_bbox(["a", "b", "c", "d"]) is False
@@ -492,11 +488,6 @@ def test_docx_locator_ratio_no_paragraphs_batch14():
     out = _docx_locator_ratio(elements)
     # 有 elements 但无 structural_keys → 0/1=0.0
     assert out["value"] == 0.0
-
-
-def test_docx_locator_ratio_missing_elements_key_batch14():
-    out = _docx_locator_ratio([])
-    assert out["value"] is None
 
 
 def test_docx_locator_ratio_all_have_paragraph_index_batch14():
@@ -602,39 +593,9 @@ def test_module_source_defines_text_types_batch14():
     assert "_TEXT_TYPES" in source
 
 
-def test_module_source_defines_pdf_bbox_required_types_batch14():
-    source = inspect.getsource(mmod)
-    assert "_PDF_BBOX_REQUIRED_TYPES" in source
-
-
-def test_module_source_defines_null_helper_batch14():
-    source = inspect.getsource(mmod)
-    assert "def _null(" in source
-
-
-def test_module_source_defines_ratio_helper_batch14():
-    source = inspect.getsource(mmod)
-    assert "def _ratio(" in source
-
-
-def test_module_source_defines_bool_metric_batch14():
-    source = inspect.getsource(mmod)
-    assert "def _bool_metric(" in source
-
-
-def test_module_source_defines_int_metric_batch14():
-    source = inspect.getsource(mmod)
-    assert "def _int_metric(" in source
-
-
 def test_module_source_defines_compute_automatic_metrics_batch14():
     source = inspect.getsource(mmod)
     assert "def compute_automatic_metrics(" in source
-
-
-def test_module_source_defines_strip_unicode_whitespace_batch14():
-    source = inspect.getsource(mmod)
-    assert "def _strip_unicode_whitespace(" in source
 
 
 def test_module_source_no_open_call_batch14():

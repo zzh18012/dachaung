@@ -48,11 +48,6 @@ def test_schemas_dir_parent_name_batch36():
     assert SCHEMAS_DIR.parent.is_dir()
 
 
-def test_schemas_dir_in_source_batch36():
-    src = inspect.getsource(smod)
-    assert "SCHEMAS_DIR" in src
-
-
 def test_schemas_dir_value_writable_in_tests_batch36():
     """模块属性可被读取。"""
     assert smod.SCHEMAS_DIR is SCHEMAS_DIR
@@ -248,12 +243,6 @@ def test_validate_file_signature_two_params_batch36():
     assert list(sig.parameters.keys()) == ["path", "schema_name"]
 
 
-def test_validate_file_missing_file_raises_batch36(tmp_path):
-    with pytest.raises(FileNotFoundError) as exc:
-        validate_file(tmp_path / "missing.json", "manifest.schema.json")
-    assert "待校验文件不存在" in str(exc.value)
-
-
 def test_validate_file_valid_minimal_batch36(tmp_path):
     p = tmp_path / "m.json"
     p.write_text(json.dumps({
@@ -422,11 +411,6 @@ def test_module_source_contains_schemas_dir_definition_batch36():
     assert "SCHEMAS_DIR = " in src
 
 
-def test_module_source_contains_eval_schema_error_class_batch36():
-    src = inspect.getsource(smod)
-    assert "class EvalSchemaError" in src
-
-
 def test_module_source_contains_schema_path_function_batch36():
     src = inspect.getsource(smod)
     assert "def _schema_path(" in src
@@ -498,11 +482,6 @@ def test_signature_load_schema_params_batch36():
 def test_signature_schema_path_params_batch36():
     sig = inspect.signature(_schema_path)
     assert list(sig.parameters.keys()) == ["name"]
-
-
-def test_signature_validate_file_no_default_for_path_batch36():
-    sig = inspect.signature(validate_file)
-    assert sig.parameters["path"].default is inspect.Parameter.empty
 
 
 # ---------- module 合理性 第五十六批

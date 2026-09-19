@@ -736,40 +736,10 @@ def test_ast_build_provenance_calls_get_dep_versions_batch45():
 
 # ---------- forbidden tokens 第一百批 ----------
 
-def test_source_no_compile_batch45():
-    src = inspect.getsource(report_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch45():
-    src = inspect.getsource(report_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch45():
-    src = inspect.getsource(report_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch45():
-    src = inspect.getsource(report_mod)
-    assert "os.system(" not in src
-
-
 def test_source_no_popen_batch45():
     """subprocess.run + capture_output 不算 popen。"""
     src = inspect.getsource(report_mod)
     assert ".popen(" not in src
-
-
-def test_source_no_yaml_load_batch45():
-    src = inspect.getsource(report_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch45():
-    src = inspect.getsource(report_mod)
-    assert "pickle.load(" not in src
 
 
 def test_source_no_class_keyword_batch45():

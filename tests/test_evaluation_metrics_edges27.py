@@ -721,11 +721,6 @@ def test_int_metric_value_is_int_type():
 # ---------- module source 字符串精确补强（math/Counter source level） ----------
 
 
-def test_module_source_has_from_collections_import_counter():
-    src = inspect.getsource(m)
-    assert "from collections import Counter" in src
-
-
 def test_module_source_has_sum_for_common():
     src = inspect.getsource(_text_preservation)
     assert "common = sum((c_expected & c_actual).values())" in src

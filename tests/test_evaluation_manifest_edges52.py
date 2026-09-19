@@ -766,21 +766,6 @@ def test_module_source_contains_frozen_true_batch25():
     assert "@dataclass(frozen=True)" in source
 
 
-def test_module_source_contains_manifest_error_class_batch25():
-    source = inspect.getsource(mmod)
-    assert "class ManifestError" in source
-
-
-def test_module_source_contains_expected_failure_class_batch25():
-    source = inspect.getsource(mmod)
-    assert "class ExpectedFailure" in source
-
-
-def test_module_source_contains_manifest_class_batch25():
-    source = inspect.getsource(mmod)
-    assert "class Manifest" in source
-
-
 def test_module_source_contains_absolute_path_text_batch25():
     source = inspect.getsource(mmod)
     assert "绝对路径" in source
@@ -908,10 +893,6 @@ def test_module_docstring_mentions_path_constraints_batch25():
 def test_module_uses_from_future_annotations_batch25():
     source = inspect.getsource(mmod)
     assert "from __future__ import annotations" in source
-
-
-def test_module_manifest_error_docstring_present_batch25():
-    assert ManifestError.__doc__ is not None
 
 
 def test_module_manifest_docstring_present_batch25():

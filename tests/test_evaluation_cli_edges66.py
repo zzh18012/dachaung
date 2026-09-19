@@ -169,11 +169,6 @@ def test_build_parser_prog_value_batch39():
 # ---------- _format_metric 第三十九批
 
 
-def test_format_metric_with_false_value_batch39():
-    out = _format_metric("x", {"value": False, "reason": None})
-    assert "false" in out
-
-
 def test_format_metric_with_int_value_batch39():
     """int 不是 float，落入 fallback 分支。"""
     out = _format_metric("x", {"value": 5, "reason": None})
@@ -464,26 +459,6 @@ def test_module_source_contains_pathlib_import_batch39():
     assert "from pathlib import Path" in src
 
 
-def test_module_source_contains_manifest_import_batch39():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.manifest import" in src
-
-
-def test_module_source_contains_report_import_batch39():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.report import" in src
-
-
-def test_module_source_contains_runner_import_batch39():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.runner import" in src
-
-
-def test_module_source_contains_schema_import_batch39():
-    src = inspect.getsource(cmod)
-    assert "from evaluation.schema import" in src
-
-
 def test_module_source_contains_build_parser_function_batch39():
     src = inspect.getsource(cmod)
     assert "def _build_parser(" in src
@@ -536,18 +511,6 @@ def test_module_source_contains_utf8_reconfigure_batch39():
 
 
 # ---------- module 合理性 第六十二批
-
-
-def test_module_has_build_parser_attribute_batch39():
-    assert hasattr(cmod, "_build_parser")
-
-
-def test_module_has_format_metric_attribute_batch39():
-    assert hasattr(cmod, "_format_metric")
-
-
-def test_module_has_run_inspect_doc_attribute_batch39():
-    assert hasattr(cmod, "_run_inspect_doc")
 
 
 def test_module_main_callable_batch39():

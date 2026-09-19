@@ -110,11 +110,6 @@ def test_load_schema_manifest_has_properties_batch32():
     assert "properties" in s
 
 
-def test_load_schema_manifest_has_required_batch32():
-    s = load_schema("manifest.schema.json")
-    assert "required" in s
-
-
 def test_load_schema_eval_report_has_required_batch32():
     s = load_schema("evaluation-report.schema.json")
     assert "required" in s
@@ -362,11 +357,6 @@ def test_signature_validate_two_params_batch32():
 def test_signature_validate_file_two_params_batch32():
     sig = inspect.signature(validate_file)
     assert list(sig.parameters.keys()) == ["path", "schema_name"]
-
-
-def test_signature_load_schema_return_annotation_batch32():
-    sig = inspect.signature(load_schema)
-    assert sig.return_annotation == "dict[str, Any]"
 
 
 def test_signature_validate_return_none_batch32():

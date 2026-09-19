@@ -640,36 +640,6 @@ def test_module_source_forbidden_tokens_batch23(forbidden):
     assert forbidden not in src
 
 
-def test_module_source_no_socket_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import socket" not in src
-
-
-def test_module_source_no_urllib_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import urllib" not in src
-
-
-def test_module_source_no_threading_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import threading" not in src
-
-
-def test_module_source_no_asyncio_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import asyncio" not in src
-
-
-def test_module_source_no_shutil_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import shutil" not in src
-
-
-def test_module_source_no_tempfile_import_batch23():
-    src = inspect.getsource(climod)
-    assert "import tempfile" not in src
-
-
 # ---------- module source 字符串精确补强第三十五批 ----------
 
 
@@ -696,16 +666,6 @@ def test_module_source_has_sys_import_batch23():
 def test_module_source_has_pathlib_path_import_batch23():
     src = inspect.getsource(climod)
     assert "from pathlib import Path" in src
-
-
-def test_module_source_has_manifest_import_batch23():
-    src = inspect.getsource(climod)
-    assert "from evaluation.manifest import ManifestError, load_manifest" in src
-
-
-def test_module_source_has_report_import_batch23():
-    src = inspect.getsource(climod)
-    assert "from evaluation.report import get_git_provenance" in src
 
 
 def test_module_source_has_runner_import_batch23():

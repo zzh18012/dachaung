@@ -299,16 +299,6 @@ def test_manifest_content_group_count_one_paired_one_unpaired_batch32():
 # ---------- _resolve_relative_path 第三十二批 ----------
 
 
-def test_resolve_relative_path_empty_raises_batch32(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("", tmp_path, "test")
-
-
-def test_resolve_relative_path_absolute_raises_batch32(tmp_path):
-    with pytest.raises(ManifestError):
-        _resolve_relative_path("/etc/passwd", tmp_path, "test")
-
-
 def test_resolve_relative_path_backslash_raises_batch32(tmp_path):
     with pytest.raises(ManifestError):
         _resolve_relative_path("a\\b", tmp_path, "test")

@@ -99,24 +99,12 @@ def test_null_return_annotation_dict():
     assert "dict" in str(ret).lower()
 
 
-def test_ratio_value_is_float():
-    assert isinstance(_ratio(0.5)["value"], float)
-
-
 def test_ratio_value_preserved():
     assert _ratio(0.7)["value"] == 0.7
 
 
 def test_ratio_reason_is_none():
     assert _ratio(0.5)["reason"] is None
-
-
-def test_ratio_zero_value():
-    assert _ratio(0.0)["value"] == 0.0
-
-
-def test_ratio_one_value():
-    assert _ratio(1.0)["value"] == 1.0
 
 
 def test_ratio_int_input_converted_to_float():
@@ -133,10 +121,6 @@ def test_ratio_signature_one_param():
 
 def test_bool_metric_value_is_bool():
     assert isinstance(_bool_metric(True)["value"], bool)
-
-
-def test_bool_metric_true():
-    assert _bool_metric(True)["value"] is True
 
 
 def test_bool_metric_int_input_converted():
@@ -230,16 +214,6 @@ def test_strip_unicode_whitespace_nbsp():
 def test_strip_unicode_whitespace_ideographic_space():
     """U+3000 IDEOGRAPHIC SPACE（中文全角空格）。"""
     assert _strip_unicode_whitespace("a　b") == "ab"
-
-
-def test_strip_unicode_whitespace_line_separator():
-    """U+2028 LINE SEPARATOR。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_paragraph_separator():
-    """U+2029 PARAGRAPH SEPARATOR。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
 
 
 def test_strip_unicode_whitespace_mixed():

@@ -184,12 +184,6 @@ def test_thematic_longer_asterisks():
 # =========================================================================
 
 
-def test_unordered_list_dash():
-    m = _UNORDERED_LIST_RE.match("- item")
-    assert m is not None
-    assert m.group(1) == "item"
-
-
 def test_unordered_list_asterisk():
     m = _UNORDERED_LIST_RE.match("* item")
     assert m is not None
@@ -209,12 +203,6 @@ def test_unordered_list_no_space_not_match():
 def test_unordered_list_two_dashes_not_match():
     """'-- item' → 前两个 -- 不符合 ^[-*+] 语法。"""
     assert _UNORDERED_LIST_RE.match("-- item") is None
-
-
-def test_ordered_list_dot():
-    m = _ORDERED_LIST_RE.match("1. item")
-    assert m is not None
-    assert m.group(1) == "item"
 
 
 def test_ordered_list_paren():

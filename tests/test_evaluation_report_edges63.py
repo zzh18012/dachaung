@@ -326,15 +326,6 @@ def test_aggregate_summary_silent_drop_sum_batch48():
     assert out["silent_drop_total"] == 8
 
 
-def test_aggregate_summary_silent_drop_with_null_skipped_batch48():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 3}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["silent_drop_total"] == 3
-
-
 def test_aggregate_summary_returns_4_top_keys_batch48():
     out = aggregate_summary([])
     assert set(out.keys()) == {"counts", "success_rates", "ratio_macro_averages", "silent_drop_total"}
@@ -394,21 +385,6 @@ def test_success_bool_metrics_is_pipeline_success_batch48():
 
 
 # ---------- 模块源码补强 ----------
-
-def test_source_contains_subprocess_import_batch48():
-    src = inspect.getsource(report_mod)
-    assert "import subprocess" in src
-
-
-def test_source_contains_datetime_import_batch48():
-    src = inspect.getsource(report_mod)
-    assert "from datetime import datetime" in src
-
-
-def test_source_contains_pathlib_import_batch48():
-    src = inspect.getsource(report_mod)
-    assert "from pathlib import Path" in src
-
 
 def test_source_contains_version_imports_batch48():
     src = inspect.getsource(report_mod)

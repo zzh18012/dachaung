@@ -751,11 +751,6 @@ def test_module_source_no_walrus():
     assert ":=" not in src
 
 
-def test_module_source_no_main_block():
-    src = inspect.getsource(mmod)
-    assert 'if __name__' not in src
-
-
 def test_module_source_11_user_functions():
     funcs = [
         name for name, val in vars(mmod).items()
@@ -900,12 +895,6 @@ def test_signature_compute_image_base_dir_default_none():
     assert sig.parameters["image_base_dir"].default is None
 
 
-def test_signature_compute_no_varargs():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-
-
 # ---------- 模块整体合理性补强 ----------
 
 
@@ -924,15 +913,6 @@ def test_module_all_is_list():
 
 def test_module_all_length_1():
     assert len(mmod.__all__) == 1
-
-
-def test_module_all_entries_unique():
-    assert len(set(mmod.__all__)) == len(mmod.__all__)
-
-
-def test_module_all_entries_are_str():
-    for entry in mmod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_all_only_compute_automatic_metrics():

@@ -215,11 +215,6 @@ def test_manifest_field_count_batch33():
     assert len(fields(Manifest)) == 5
 
 
-def test_manifest_field_names_batch33():
-    names = [f.name for f in fields(Manifest)]
-    assert names == ["manifest_version", "devset_status", "documents", "expected_failures", "project_root"]
-
-
 def test_manifest_frozen_batch33():
     m = Manifest(
         manifest_version="1.0",
@@ -718,12 +713,6 @@ def test_signature_manifest_error_no_params_batch33():
     assert str(e) == "msg"
     e2 = ManifestError()
     assert str(e2) == ""
-
-
-def test_signature_is_absolute_like_one_param_batch33():
-    sig = inspect.signature(_is_absolute_like)
-    params = list(sig.parameters.keys())
-    assert params == ["path_str"]
 
 
 def test_signature_has_backslash_one_param_batch33():

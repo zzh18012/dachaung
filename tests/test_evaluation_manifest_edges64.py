@@ -245,14 +245,6 @@ def test_has_backslash_with_forward_then_back_batch37():
     assert _has_backslash("a/b\\c") is True
 
 
-def test_has_backslash_with_back_then_forward_batch37():
-    assert _has_backslash("a\\b/c") is True
-
-
-def test_has_backslash_with_spaces_only_batch37():
-    assert _has_backslash("   ") is False
-
-
 def test_has_backslash_with_special_chars_batch37():
     assert _has_backslash("a\tb\nc") is False
 

@@ -161,10 +161,6 @@ def test_manifest_error_empty_message():
     assert str(e) == ""
 
 
-def test_manifest_error_docstring_present():
-    assert ManifestError.__doc__ is not None
-
-
 def test_manifest_error_docstring_mentions_loading():
     """docstring 提及 "加载"/"校验失败"。"""
     doc = ManifestError.__doc__
@@ -347,11 +343,6 @@ def test_manifest_file_count_with_documents():
     docs = (_make_doc_entry(doc_id="d1"), _make_doc_entry(doc_id="d2"))
     m = _make_manifest(documents=docs)
     assert m.file_count == 2
-
-
-def test_manifest_pdf_count_empty():
-    m = _make_manifest(documents=())
-    assert m.pdf_count == 0
 
 
 def test_manifest_content_group_count_all_unpaired():

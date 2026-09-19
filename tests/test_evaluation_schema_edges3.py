@@ -209,16 +209,6 @@ def test_schema_path_dotdot_raises_filenotfound():
         _schema_path("../nonexistent.json")
 
 
-def test_schema_path_for_annotation_schema():
-    p = _schema_path("annotation.schema.json")
-    assert p.is_file()
-
-
-def test_schema_path_for_evaluation_report_schema():
-    p = _schema_path("evaluation-report.schema.json")
-    assert p.is_file()
-
-
 # =========================================================================
 # load_schema 深度
 # =========================================================================
@@ -278,16 +268,6 @@ def test_validate_minimal_manifest_passes():
     }
     # 不抛即通过
     validate(instance, "manifest.schema.json")
-
-
-def test_validate_returns_none_on_success():
-    instance = {
-        "manifest_version": "1.0",
-        "devset_status": "incomplete",
-        "documents": [],
-        "expected_failures": [],
-    }
-    assert validate(instance, "manifest.schema.json") is None
 
 
 def test_validate_failure_message_contains_error_count():

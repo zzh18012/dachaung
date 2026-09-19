@@ -38,16 +38,6 @@ from evaluation.schema import (
 # ---------- EvalSchemaError source level 与构造深度 ----------
 
 
-def test_eval_schema_error_source_has_super_init():
-    src = inspect.getsource(EvalSchemaError)
-    assert "super().__init__(message)" in src
-
-
-def test_eval_schema_error_source_has_self_errors_assignment():
-    src = inspect.getsource(EvalSchemaError)
-    assert "self.errors = errors or []" in src
-
-
 def test_eval_schema_error_source_has_no_try_except():
     """构造器无 try/except（最简单）。"""
     src = inspect.getsource(EvalSchemaError)
@@ -260,11 +250,6 @@ def test_validate_source_flat_loop():
     src = inspect.getsource(validate)
     assert "for err in errors:" in src
     assert "flat.append(" in src
-
-
-def test_validate_source_head_zero_for_message():
-    src = inspect.getsource(validate)
-    assert "head = errors[0]" in src
 
 
 def test_validate_source_raise_eval_schema_error_with_two_args():
@@ -496,11 +481,6 @@ def test_module_source_no_global():
     assert "\nglobal " not in src
 
 
-def test_module_source_no_async():
-    src = inspect.getsource(m)
-    assert "async def" not in src
-
-
 def test_module_source_no_class_other_than_eval_schema_error():
     src = inspect.getsource(m)
     for line in src.splitlines():
@@ -582,22 +562,6 @@ def test_validate_file_no_default_for_path():
 def test_validate_file_no_default_for_schema_name():
     sig = inspect.signature(validate_file)
     assert sig.parameters["schema_name"].default is inspect.Parameter.empty
-
-
-def test_namespace_load_schema():
-    assert load_schema.__module__ == "evaluation.schema"
-
-
-def test_namespace_validate():
-    assert validate.__module__ == "evaluation.schema"
-
-
-def test_namespace_validate_file():
-    assert validate_file.__module__ == "evaluation.schema"
-
-
-def test_namespace_schema_path():
-    assert _schema_path.__module__ == "evaluation.schema"
 
 
 def test_namespace_eval_schema_error():

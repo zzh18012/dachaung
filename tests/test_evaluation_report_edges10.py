@@ -394,11 +394,6 @@ def test_build_provenance_parser_version_propagated(tmp_path):
     assert result["parser_version"] == "0.1.0"
 
 
-def test_build_provenance_parser_version_none(tmp_path):
-    result = build_provenance(tmp_path, "fallback", 800, None)
-    assert result["parser_version"] is None
-
-
 def test_build_provenance_dependencies_three_keys(tmp_path):
     result = build_provenance(tmp_path, "fallback", 800, None)
     assert set(result["dependencies"].keys()) == {"pdfplumber", "python-docx", "pypdfium2"}
@@ -506,11 +501,6 @@ def test_build_devset_section_signature_one_param():
 # =========================================================================
 # aggregate_summary 深度
 # =========================================================================
-
-
-def test_aggregate_summary_returns_dict():
-    result = aggregate_summary([])
-    assert isinstance(result, dict)
 
 
 def test_aggregate_summary_four_top_keys():

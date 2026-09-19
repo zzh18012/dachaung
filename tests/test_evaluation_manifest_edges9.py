@@ -49,41 +49,6 @@ def test_module_all_is_list():
     assert isinstance(m.__all__, list)
 
 
-def test_module_all_length_is_five():
-    import evaluation.manifest as m
-    assert len(m.__all__) == 5
-
-
-def test_module_imports_json():
-    import evaluation.manifest as m
-    assert hasattr(m, "json")
-
-
-def test_module_imports_dataclass():
-    import evaluation.manifest as m
-    assert hasattr(m, "dataclass")
-
-
-def test_module_imports_path():
-    import evaluation.manifest as m
-    assert hasattr(m, "Path")
-
-
-def test_module_imports_any():
-    import evaluation.manifest as m
-    assert hasattr(m, "Any")
-
-
-def test_module_imports_manifest_version():
-    import evaluation.manifest as m
-    assert hasattr(m, "MANIFEST_VERSION")
-
-
-def test_module_imports_validate():
-    import evaluation.manifest as m
-    assert hasattr(m, "validate")
-
-
 def test_module_docstring_mentions_invariants():
     import evaluation.manifest as m
     doc = m.__doc__
@@ -407,11 +372,6 @@ def test_is_absolute_like_signature():
     assert params == ["path_str"]
 
 
-def test_is_absolute_like_return_annotation_is_bool_str():
-    sig = inspect.signature(_is_absolute_like)
-    assert sig.return_annotation == "bool"
-
-
 def test_is_absolute_like_callable():
     assert callable(_is_absolute_like)
 
@@ -426,10 +386,6 @@ def test_is_absolute_like_filename_only():
 
 def test_is_absolute_like_two_chars_no_colon():
     assert _is_absolute_like("ab") is False
-
-
-def test_is_absolute_like_three_chars_no_colon():
-    assert _is_absolute_like("abc") is False
 
 
 def test_is_absolute_like_uppercase_drive_with_separator():
@@ -488,11 +444,6 @@ def test_has_backslash_signature():
     assert params == ["path_str"]
 
 
-def test_has_backslash_return_annotation_is_bool_str():
-    sig = inspect.signature(_has_backslash)
-    assert sig.return_annotation == "bool"
-
-
 def test_has_backslash_callable():
     assert callable(_has_backslash)
 
@@ -543,11 +494,6 @@ def test_resolve_relative_path_signature():
     sig = inspect.signature(_resolve_relative_path)
     params = list(sig.parameters)
     assert params == ["path_str", "project_root", "field_name"]
-
-
-def test_resolve_relative_path_return_annotation_is_path_str():
-    sig = inspect.signature(_resolve_relative_path)
-    assert sig.return_annotation == "Path"
 
 
 def test_resolve_relative_path_callable():

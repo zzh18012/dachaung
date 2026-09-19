@@ -41,10 +41,6 @@ from evaluation.manifest import (
 # ---------- _is_absolute_like 数学边界第三批 ----------
 
 
-def test_is_absolute_like_uppercase_z_drive_with_slash():
-    assert _is_absolute_like("Z:/foo") is True
-
-
 def test_is_absolute_like_uppercase_z_drive_backslash():
     assert _is_absolute_like("Z:\\foo") is True
 
@@ -81,10 +77,6 @@ def test_is_absolute_like_just_a():
 
 def test_is_absolute_like_two_chars_letter_colon():
     assert _is_absolute_like("a:") is False
-
-
-def test_is_absolute_like_three_chars_no_drive():
-    assert _is_absolute_like("abc") is False
 
 
 def test_is_absolute_like_three_chars_with_drive_no_slash():
@@ -742,11 +734,6 @@ def test_has_backslash_return_annotation():
     assert "bool" in str(sig.return_annotation)
 
 
-def test_resolve_relative_path_3_params():
-    sig = inspect.signature(_resolve_relative_path)
-    assert list(sig.parameters) == ["path_str", "project_root", "field_name"]
-
-
 def test_resolve_relative_path_no_default():
     sig = inspect.signature(_resolve_relative_path)
     for p in sig.parameters.values():
@@ -756,11 +743,6 @@ def test_resolve_relative_path_no_default():
 def test_resolve_relative_path_return_annotation_path():
     sig = inspect.signature(_resolve_relative_path)
     assert "Path" in str(sig.return_annotation)
-
-
-def test_detect_project_root_1_param():
-    sig = inspect.signature(_detect_project_root)
-    assert list(sig.parameters) == ["start"]
 
 
 def test_detect_project_root_return_annotation_path():

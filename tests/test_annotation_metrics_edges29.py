@@ -610,11 +610,6 @@ def test_chunk_boundary_source_uses_pos_advance_when_not_found():
     assert "pos += len(txt) + 1" in src
 
 
-def test_chunk_boundary_source_uses_search_from_init():
-    src = inspect.getsource(chunk_boundary_prf)
-    assert "search_from = 0" in src
-
-
 def test_chunk_boundary_source_uses_anchor_loop():
     src = inspect.getsource(chunk_boundary_prf)
     assert "for a in anchors" in src

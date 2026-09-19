@@ -839,11 +839,6 @@ def test_module_source_uses_perf_counter_batch13():
     assert "time.perf_counter" in source
 
 
-def test_module_source_uses_json_dump_batch13():
-    source = inspect.getsource(rmod)
-    assert "json.dump(" in source
-
-
 def test_module_source_has_not_instrumented_string_batch13():
     source = inspect.getsource(rmod)
     assert '"not_instrumented"' in source or "'not_instrumented'" in source
@@ -877,13 +872,6 @@ def test_module_source_future_annotations_top_level_batch13():
 
 
 # ---------- signatures 第十五批 ----------
-
-
-def test_load_annotation_signature_one_param_batch13():
-    sig = inspect.signature(_load_annotation)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "path"
 
 
 def test_load_annotation_param_annotation_optional_path_batch13():

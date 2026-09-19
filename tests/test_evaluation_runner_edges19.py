@@ -465,30 +465,6 @@ def test_module_namespace_has_run_evaluation():
     assert hasattr(m, "run_evaluation")
 
 
-def test_module_namespace_has_time_attr():
-    import evaluation.runner as m
-
-    assert hasattr(m, "time")
-
-
-def test_module_namespace_has_json_attr():
-    import evaluation.runner as m
-
-    assert hasattr(m, "json")
-
-
-def test_module_namespace_has_path_attr():
-    import evaluation.runner as m
-
-    assert hasattr(m, "Path")
-
-
-def test_module_namespace_has_any_attr():
-    import evaluation.runner as m
-
-    assert hasattr(m, "Any")
-
-
 def test_module_namespace_does_not_have_subprocess():
     import evaluation.runner as m
 
@@ -592,10 +568,6 @@ def test_run_evaluation_positional_or_keyword_count_2():
     sig = inspect.signature(run_evaluation)
     pos = [p for p in sig.parameters.values() if p.kind == Parameter.POSITIONAL_OR_KEYWORD]
     assert len(pos) == 2
-
-
-def test_run_evaluation_module_name_is_evaluation_runner():
-    assert run_evaluation.__module__ == "evaluation.runner"
 
 
 # =========================================================================

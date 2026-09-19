@@ -369,11 +369,6 @@ def test_image_resource_ratio_mixed_batch28(tmp_path):
 # ---------- _chunk_reference_ratio 第二十八批 ----------
 
 
-def test_chunk_reference_ratio_no_chunks_batch28():
-    out = _chunk_reference_ratio([{"element_id": "e1"}], [])
-    assert out["reason"] == "no_chunks"
-
-
 def test_chunk_reference_ratio_no_match_batch28():
     elements = [{"element_id": "e1"}]
     chunks = [{"source_element_ids": ["eX"]}]
@@ -554,11 +549,6 @@ def test_silent_drop_no_expectations_batch28():
 def test_silent_drop_empty_expectations_batch28():
     out = _silent_drop_count({"paragraph": 5}, {})
     assert out["reason"] == "no_expectations"
-
-
-def test_silent_drop_empty_element_count_by_type_batch28():
-    out = _silent_drop_count({"paragraph": 5}, {"element_count_by_type": {}})
-    assert out["reason"] == "no_expectations_element_count"
 
 
 def test_silent_drop_zero_drop_batch28():

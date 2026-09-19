@@ -119,10 +119,6 @@ def test_has_backslash_with_special_chars_batch23():
     assert _has_backslash("a\\b c") is True
 
 
-def test_has_backslash_only_spaces_batch23():
-    assert _has_backslash("   ") is False
-
-
 # ---------- _resolve_relative_path 第二十三批 ----------
 
 
@@ -768,11 +764,6 @@ def test_module_source_no_numpy_import_batch23():
     assert "import numpy" not in src
 
 
-def test_module_source_no_csv_import_batch23():
-    src = inspect.getsource(mmod)
-    assert "import csv" not in src
-
-
 # ---------- module source 字符串精确补强第三十四批 ----------
 
 
@@ -872,13 +863,6 @@ def test_signature_load_manifest_two_params_with_default_batch23():
     assert params["project_root"].default is None
 
 
-def test_signature_detect_project_root_one_param_batch23():
-    sig = inspect.signature(_detect_project_root)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "start"
-
-
 def test_signature_manifest_init_takes_named_fields_batch23():
     """Manifest.__init__ 接受 5 个具名字段。"""
     sig = inspect.signature(Manifest.__init__)
@@ -914,11 +898,6 @@ def test_module_does_not_import_evaluation_cli_batch23():
     src = inspect.getsource(mmod)
     assert "from evaluation.cli" not in src
     assert "from evaluation import cli" not in src
-
-
-def test_module_does_not_import_evaluation_annotation_metrics_batch23():
-    src = inspect.getsource(mmod)
-    assert "from evaluation.annotation_metrics" not in src
 
 
 def test_module_does_not_import_app_pipeline_batch23():

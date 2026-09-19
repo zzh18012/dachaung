@@ -876,10 +876,6 @@ def test_module_callable_validate_file():
     assert callable(validate_file)
 
 
-def test_module_eval_schema_error_is_class():
-    assert isinstance(EvalSchemaError, type)
-
-
 def test_module_eval_schema_error_subclass_of_exception():
     assert issubclass(EvalSchemaError, Exception)
 

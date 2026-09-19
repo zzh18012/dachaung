@@ -58,10 +58,6 @@ def test_is_absolute_like_mixed_case_drive_batch19():
     assert _is_absolute_like("A:\\B") is True
 
 
-def test_is_absolute_like_three_chars_no_colon_batch19():
-    assert _is_absolute_like("abc") is False
-
-
 def test_is_absolute_like_three_chars_no_separator_batch19():
     """C:foo (3 chars, no \\ or /) → not absolute。"""
     assert _is_absolute_like("C:f") is False
@@ -85,10 +81,6 @@ def test_has_backslash_backslash_then_forward_batch19():
 
 def test_has_backslash_forward_then_backslash_batch19():
     assert _has_backslash("a/\\b") is True
-
-
-def test_has_backslash_only_spaces_batch19():
-    assert _has_backslash("   ") is False
 
 
 # ---------- _resolve_relative_path 行为深度第十九批 ----------
@@ -556,17 +548,6 @@ def test_module_source_no_subprocess_batch19():
     assert "import subprocess" not in src
 
 
-def test_module_source_no_network_batch19():
-    src = inspect.getsource(mmod)
-    assert "urllib.request" not in src
-    assert "import requests" not in src
-
-
-def test_module_source_no_sys_exit_batch19():
-    src = inspect.getsource(mmod)
-    assert "sys.exit" not in src
-
-
 # ---------- module source 字符串精确补强第三十一批 ----------
 
 
@@ -664,12 +645,6 @@ def test_signature_resolve_relative_path_batch19():
     sig = inspect.signature(_resolve_relative_path)
     params = list(sig.parameters.keys())
     assert params == ["path_str", "project_root", "field_name"]
-
-
-def test_signature_is_absolute_like_batch19():
-    sig = inspect.signature(_is_absolute_like)
-    params = list(sig.parameters.keys())
-    assert params == ["path_str"]
 
 
 def test_signature_has_backslash_batch19():

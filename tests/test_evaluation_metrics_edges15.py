@@ -583,10 +583,6 @@ def test_is_valid_bbox_tuple_returns_false():
     assert _is_valid_bbox((1.0, 2.0, 3.0, 4.0)) is False
 
 
-def test_is_valid_bbox_dict_returns_false():
-    assert _is_valid_bbox({"x": 1, "y": 2, "w": 3, "h": 4}) is False
-
-
 def test_is_valid_bbox_string_returns_false():
     assert _is_valid_bbox("1234") is False
 

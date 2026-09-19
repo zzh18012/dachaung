@@ -488,16 +488,6 @@ def test_chunker_init_minimum_max_chars_32():
     assert c.max_chars == 32
 
 
-def test_chunker_init_max_chars_below_minimum_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=31)
-
-
-def test_chunker_init_max_chars_zero_raises():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=0)
-
-
 def test_chunker_init_max_chars_negative_raises():
     with pytest.raises(ValueError):
         StructuralChunker(max_chars=-1)

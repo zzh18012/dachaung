@@ -715,11 +715,6 @@ def test_figure_caption_does_not_mutate_inputs():
     assert ann == ann_before
 
 
-def test_figure_caption_handles_empty_dict_for_document():
-    out = figure_caption_prf({}, {})
-    assert len(out) == 3
-
-
 # =========================================================================
 # 模块结构
 # =========================================================================

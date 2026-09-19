@@ -316,46 +316,6 @@ def test_main_run_invalid_json_manifest_returns_1_batch31(tmp_path):
 # ---------- module source forbidden tokens 第四十九批 ----------
 
 
-def test_module_source_no_os_system_batch31():
-    src = inspect.getsource(climod)
-    assert "os.system" not in src
-
-
-def test_module_source_no_eval_batch31():
-    src = inspect.getsource(climod)
-    assert "eval(" not in src
-
-
-def test_module_source_no_exec_batch31():
-    src = inspect.getsource(climod)
-    assert "exec(" not in src
-
-
-def test_module_source_no_pickle_batch31():
-    src = inspect.getsource(climod)
-    assert "pickle" not in src
-
-
-def test_module_source_no_yaml_batch31():
-    src = inspect.getsource(climod)
-    assert "yaml" not in src
-
-
-def test_module_source_no_dunder_import_batch31():
-    src = inspect.getsource(climod)
-    assert "__import__" not in src
-
-
-def test_module_source_no_breakpoint_batch31():
-    src = inspect.getsource(climod)
-    assert "breakpoint(" not in src
-
-
-def test_module_source_no_shutil_batch31():
-    src = inspect.getsource(climod)
-    assert "shutil" not in src
-
-
 # ---------- module source 字符串精确补强第四十五批 ----------
 
 
@@ -377,11 +337,6 @@ def test_module_source_contains_sys_import_batch31():
 def test_module_source_contains_pathlib_import_batch31():
     src = inspect.getsource(climod)
     assert "from pathlib import Path" in src
-
-
-def test_module_source_contains_manifest_import_batch31():
-    src = inspect.getsource(climod)
-    assert "from evaluation.manifest import ManifestError, load_manifest" in src
 
 
 def test_module_source_contains_runner_import_batch31():

@@ -482,18 +482,6 @@ def test_ast_all_assignment_last_batch43():
 # ---------- 模块文件 第四十三批
 
 
-def test_module_file_ends_with_init_py_batch43():
-    assert evaluation.__file__.endswith("__init__.py")
-
-
-def test_module_name_is_evaluation_batch43():
-    assert evaluation.__name__ == "evaluation"
-
-
-def test_module_package_is_evaluation_batch43():
-    assert evaluation.__package__ == "evaluation"
-
-
 def test_module_file_exists_batch43():
     assert Path(evaluation.__file__).is_file()
 

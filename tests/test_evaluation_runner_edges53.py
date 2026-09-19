@@ -634,16 +634,6 @@ def test_module_source_no_eval_exec_batch25():
     assert "exec(" not in source
 
 
-def test_module_source_no_star_import_batch25():
-    source = inspect.getsource(rmod)
-    assert "import *" not in source
-
-
-def test_module_source_no_argparse_batch25():
-    source = inspect.getsource(rmod)
-    assert "argparse" not in source
-
-
 def test_module_source_time_allowed_batch25():
     """runner.py 允许 import time（perf_counter 用）。"""
     source = inspect.getsource(rmod)
@@ -694,11 +684,6 @@ def test_module_source_contains_process_single_batch25():
     assert "process_single" in source
 
 
-def test_module_source_contains_compute_automatic_metrics_batch25():
-    source = inspect.getsource(rmod)
-    assert "compute_automatic_metrics" in source
-
-
 def test_module_source_contains_figure_caption_prf_batch25():
     source = inspect.getsource(rmod)
     assert "figure_caption_prf" in source
@@ -709,11 +694,6 @@ def test_module_source_contains_chunk_boundary_prf_batch25():
     assert "chunk_boundary_prf" in source
 
 
-def test_module_source_contains_aggregate_summary_batch25():
-    source = inspect.getsource(rmod)
-    assert "aggregate_summary" in source
-
-
 def test_module_source_contains_time_perf_counter_batch25():
     source = inspect.getsource(rmod)
     assert "time.perf_counter" in source
@@ -722,11 +702,6 @@ def test_module_source_contains_time_perf_counter_batch25():
 def test_module_source_contains_not_instrumented_batch25():
     source = inspect.getsource(rmod)
     assert "not_instrumented" in source
-
-
-def test_module_source_contains_write_json_false_batch25():
-    source = inspect.getsource(rmod)
-    assert "write_json=False" in source
 
 
 def test_module_source_contains_per_doc_subdir_batch25():

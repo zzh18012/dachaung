@@ -354,11 +354,6 @@ def test_module_source_no_subprocess_import_batch21():
     assert "from subprocess" not in src
 
 
-def test_module_source_no_logging_import_batch21():
-    src = inspect.getsource(amod)
-    assert "import logging" not in src
-
-
 def test_module_source_no_re_import_batch21():
     src = inspect.getsource(amod)
     assert "import re" not in src

@@ -611,24 +611,9 @@ def test_module_source_contains_all_list_batch35():
 # ---------- signatures 第四十九批
 
 
-def test_signature_is_absolute_like_return_bool_batch35():
-    sig = inspect.signature(_is_absolute_like)
-    assert sig.return_annotation == "bool"
-
-
-def test_signature_has_backslash_return_bool_batch35():
-    sig = inspect.signature(_has_backslash)
-    assert sig.return_annotation == "bool"
-
-
 def test_signature_resolve_relative_path_params_batch35():
     sig = inspect.signature(_resolve_relative_path)
     assert list(sig.parameters.keys()) == ["path_str", "project_root", "field_name"]
-
-
-def test_signature_resolve_relative_path_return_path_batch35():
-    sig = inspect.signature(_resolve_relative_path)
-    assert sig.return_annotation == "Path"
 
 
 def test_signature_load_manifest_two_params_batch35():

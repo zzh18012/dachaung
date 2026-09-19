@@ -343,17 +343,6 @@ def test_manifest_field_count_5_batch12():
     assert len(fields(Manifest)) == 5
 
 
-def test_manifest_field_names_batch12():
-    names = [f.name for f in fields(Manifest)]
-    assert names == [
-        "manifest_version",
-        "devset_status",
-        "documents",
-        "expected_failures",
-        "project_root",
-    ]
-
-
 def test_manifest_is_dataclass_batch12():
     assert is_dataclass(Manifest)
 
@@ -723,16 +712,6 @@ def test_manifest_source_no_forbidden_token_fifteenth_batch12(token):
     assert token not in source
 
 
-def test_manifest_source_no_top_level_lambda_batch12():
-    source = inspect.getsource(mmod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
-
-
 def test_manifest_source_class_count_4_batch12():
     """顶层 4 个 class：ManifestError + 3 个 dataclass。"""
     source = inspect.getsource(mmod)
@@ -830,11 +809,6 @@ def test_module_source_has_frozen_property_batch12():
     assert source.count("@dataclass(frozen=True)") == 3
 
 
-def test_module_source_has_load_manifest_function_batch12():
-    source = inspect.getsource(mmod)
-    assert "def load_manifest(" in source
-
-
 def test_module_source_has_resolve_relative_path_batch12():
     source = inspect.getsource(mmod)
     assert "def _resolve_relative_path(" in source
@@ -895,11 +869,6 @@ def test_signature_has_backslash_return_bool_batch12():
     assert "bool" in annot_str
 
 
-def test_signature_resolve_relative_path_3_params_batch12():
-    sig = inspect.signature(_resolve_relative_path)
-    assert list(sig.parameters) == ["path_str", "project_root", "field_name"]
-
-
 def test_signature_resolve_relative_path_return_path_batch12():
     sig = inspect.signature(_resolve_relative_path)
     annot = sig.return_annotation
@@ -942,11 +911,6 @@ def test_signature_load_manifest_return_manifest_batch12():
     annot = sig.return_annotation
     annot_str = annot if isinstance(annot, str) else str(annot)
     assert "Manifest" in annot_str
-
-
-def test_signature_detect_project_root_1_param_batch12():
-    sig = inspect.signature(_detect_project_root)
-    assert list(sig.parameters) == ["start"]
 
 
 def test_signature_detect_project_root_return_path_batch12():

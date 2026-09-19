@@ -156,11 +156,6 @@ def test_main_source_uses_is_file_check_manifest():
     assert "manifest_path.is_file()" in src
 
 
-def test_main_source_validates_after_run():
-    src = inspect.getsource(main)
-    assert 'validate_file(output_path, "evaluation-report.schema.json")' in src
-
-
 def test_main_source_counts_per_doc():
     src = inspect.getsource(main)
     assert 'report.get("per_doc", [])' in src
@@ -177,21 +172,6 @@ def test_main_source_calls_run_inspect_doc():
 
 
 # ---------- _format_metric source level 字符串精确补强第三批 ----------
-
-
-def test_format_metric_source_isinstance_bool():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, bool)" in src
-
-
-def test_format_metric_source_isinstance_float():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, float)" in src
-
-
-def test_format_metric_source_isinstance_dict():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, dict)" in src
 
 
 def test_format_metric_source_float_format_4f_in_source():
@@ -226,11 +206,6 @@ def test_format_metric_source_no_eval():
 def test_run_inspect_doc_source_lazy_import_chunk_boundary_prf():
     src = inspect.getsource(_run_inspect_doc)
     assert "from evaluation.annotation_metrics import chunk_boundary_prf" in src
-
-
-def test_run_inspect_doc_source_lazy_import_figure_caption_prf():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "figure_caption_prf" in src
 
 
 def test_run_inspect_doc_source_lazy_import_compute_automatic_metrics():
@@ -1023,11 +998,6 @@ def test_cli_source_has_schema_imports():
     assert "validate_file" in src
 
 
-def test_cli_source_has_stdout_reconfigure_call():
-    src = inspect.getsource(cli_mod)
-    assert "sys.stdout.reconfigure" in src
-
-
 def test_cli_source_reconfigure_args():
     src = inspect.getsource(cli_mod)
     assert 'encoding="utf-8"' in src
@@ -1065,11 +1035,6 @@ def test_cli_source_has_run_inspect_doc_function():
     assert "def _run_inspect_doc(" in src
 
 
-def test_cli_source_main_block_raises_system_exit():
-    src = inspect.getsource(cli_mod)
-    assert "raise SystemExit(main())" in src
-
-
 def test_cli_source_no_eval_exec_compile():
     src = inspect.getsource(cli_mod)
     assert "eval(" not in src
@@ -1090,11 +1055,6 @@ def test_cli_source_no_relative_import_above_eval():
 def test_cli_source_no_yield():
     src = inspect.getsource(cli_mod)
     assert "yield" not in src
-
-
-def test_cli_source_no_walrus():
-    src = inspect.getsource(cli_mod)
-    assert ":=" not in src
 
 
 def test_cli_source_docstring_present():
@@ -1142,13 +1102,6 @@ def test_signature_format_metric_no_defaults():
 def test_signature_format_metric_return_annotation_str():
     sig = inspect.signature(_format_metric)
     assert sig.return_annotation == "str"
-
-
-def test_signature_run_inspect_doc_one_param():
-    sig = inspect.signature(_run_inspect_doc)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "args"
 
 
 def test_signature_run_inspect_doc_no_default():
@@ -1207,10 +1160,6 @@ def test_module_no_user_defined_classes():
         if isinstance(obj, type) and obj.__module__ == cli_mod.__name__
     ]
     assert len(classes) == 0
-
-
-def test_module_main_callable():
-    assert callable(cli_mod.main)
 
 
 def test_module_main_name_eq_main():

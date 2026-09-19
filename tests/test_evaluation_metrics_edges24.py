@@ -473,12 +473,6 @@ def test_silent_drop_count_no_expectations_returns_null():
     assert out["reason"] == "no_expectations"
 
 
-def test_silent_drop_count_empty_expectations_returns_null():
-    out = _silent_drop_count({"paragraph": 5}, {})
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations"
-
-
 def test_silent_drop_count_expectations_no_element_count_returns_null():
     out = _silent_drop_count({"paragraph": 5}, {"some_other_field": 1})
     assert out["value"] is None
@@ -820,15 +814,6 @@ def test_compute_metrics_signature_returns_dict_annotation():
     assert sig.return_annotation == "dict[str, Any]"
 
 
-def test_compute_metrics_no_varargs_varkw():
-    sig = inspect.signature(compute_automatic_metrics)
-    for p in sig.parameters.values():
-        assert p.kind not in (
-            inspect.Parameter.VAR_POSITIONAL,
-            inspect.Parameter.VAR_KEYWORD,
-        )
-
-
 def test_compute_metrics_first_5_params_no_default():
     sig = inspect.signature(compute_automatic_metrics)
     names = list(sig.parameters.keys())
@@ -1010,11 +995,6 @@ def test_module_source_has_from_future():
 def test_module_source_has_import_math():
     src = inspect.getsource(m)
     assert "import math" in src
-
-
-def test_module_source_has_from_collections_import_counter():
-    src = inspect.getsource(m)
-    assert "from collections import Counter" in src
 
 
 def test_module_source_has_from_pathlib_import_path():

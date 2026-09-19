@@ -43,11 +43,6 @@ def test_eval_schema_error_default_errors_none_batch24():
     assert e.errors == []
 
 
-def test_eval_schema_error_errors_explicit_empty_batch24():
-    e = EvalSchemaError("msg", [])
-    assert e.errors == []
-
-
 def test_eval_schema_error_errors_non_empty_batch24():
     errs = [{"path": ["a"], "message": "x"}]
     e = EvalSchemaError("msg", errs)

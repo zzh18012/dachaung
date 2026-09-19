@@ -198,11 +198,6 @@ def test_bool_metric_accepts_int_zero():
     assert out["value"] is False
 
 
-def test_bool_metric_accepts_int_one():
-    out = _bool_metric(1)
-    assert out["value"] is True
-
-
 def test_bool_metric_accepts_truthy_dict():
     out = _bool_metric({"a": 1})
     assert out["value"] is True
@@ -1423,11 +1418,6 @@ def test_module_no_class_definitions():
         if obj.__module__ == mmod.__name__
     ]
     assert classes == []
-
-
-def test_module_no_main_block():
-    src = inspect.getsource(mmod)
-    assert 'if __name__' not in src
 
 
 def test_module_has_1_public_function():

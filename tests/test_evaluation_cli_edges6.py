@@ -232,12 +232,6 @@ def test_build_parser_no_command_errors():
         p.parse_args([])
 
 
-def test_build_parser_run_missing_output_errors():
-    p = _build_parser()
-    with pytest.raises(SystemExit):
-        p.parse_args(["run", "--manifest", "x"])
-
-
 def test_build_parser_run_max_chars_type_int():
     p = _build_parser()
     args = p.parse_args(["run", "--manifest", "x", "--output", "y", "--max-chars", "1000"])

@@ -993,13 +993,6 @@ def test_module_source_subprocess_allowed():
 # ---------- signatures 精确补强第三批 ----------
 
 
-def test_signature_get_git_provenance():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "project_root"
-
-
 def test_signature_get_git_provenance_no_default():
     sig = inspect.signature(get_git_provenance)
     params = list(sig.parameters.values())
@@ -1079,11 +1072,6 @@ def test_module_all_length_5():
 
 def test_module_all_entries_unique():
     assert len(set(rmod.__all__)) == 5
-
-
-def test_module_all_entries_are_str():
-    for entry in rmod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_all_5_entries_correct():

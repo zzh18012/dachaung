@@ -481,21 +481,6 @@ def test_ast_has_main_guard_batch44():
 
 # ---------- forbidden tokens 第九十五批 ----------
 
-def test_source_no_eval_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch44():
-    src = inspect.getsource(cli_mod)
-    assert "compile(" not in src
-
-
 def test_source_no_sys_argv_batch44():
     """使用 argparse 而非 sys.argv。"""
     src = inspect.getsource(cli_mod)

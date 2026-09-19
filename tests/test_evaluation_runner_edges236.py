@@ -228,13 +228,6 @@ def test_d1_sdc_image_two_batch519(tmp_path):
                                  "reason": None}
 
 
-def test_success_full_batch519(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["success_rates"][
-        "pipeline_success"] == {
-        "success_count": 2, "total": 2, "rate": 1.0}
-
-
 # ---------- 报告合法性 ----------
 
 def test_report_schema_batch519(tmp_path):

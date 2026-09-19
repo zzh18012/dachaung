@@ -485,16 +485,6 @@ def test_module_source_no_eval_exec_batch26():
     assert "exec(" not in source
 
 
-def test_module_source_no_star_import_batch26():
-    source = inspect.getsource(rmod)
-    assert "import *" not in source
-
-
-def test_module_source_no_argparse_batch26():
-    source = inspect.getsource(rmod)
-    assert "argparse" not in source
-
-
 def test_module_source_no_class_keyword_batch26():
     import ast as _ast
     tree = _ast.parse(inspect.getsource(rmod))
@@ -515,16 +505,6 @@ def test_module_source_uses_from_future_annotations_batch26():
 # ---------- module source 字符串精确补强第三十九批 ----------
 
 
-def test_module_source_contains_compute_automatic_metrics_batch26():
-    source = inspect.getsource(rmod)
-    assert "compute_automatic_metrics" in source
-
-
-def test_module_source_contains_aggregate_summary_batch26():
-    source = inspect.getsource(rmod)
-    assert "aggregate_summary" in source
-
-
 def test_module_source_contains_time_perf_counter_batch26():
     source = inspect.getsource(rmod)
     assert "time.perf_counter" in source
@@ -533,11 +513,6 @@ def test_module_source_contains_time_perf_counter_batch26():
 def test_module_source_contains_not_instrumented_batch26():
     source = inspect.getsource(rmod)
     assert "not_instrumented" in source
-
-
-def test_module_source_contains_write_json_false_batch26():
-    source = inspect.getsource(rmod)
-    assert "write_json=False" in source
 
 
 # ---------- signatures 第三十九批 ----------

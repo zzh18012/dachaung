@@ -193,12 +193,6 @@ def test_get_dependency_versions_handles_generic_exception_batch51():
 
 # ---------- build_provenance ----------
 
-def test_build_provenance_max_chars_is_int_batch51(tmp_path):
-    out = build_provenance(tmp_path, "fallback", 800, None)
-    assert out["max_chars"] == 800
-    assert isinstance(out["max_chars"], int)
-
-
 def test_build_provenance_max_chars_int_conversion_batch51(tmp_path):
     """传 float 会被 int() 转换。"""
     out = build_provenance(tmp_path, "fallback", 800.9, None)
@@ -369,21 +363,6 @@ def test_aggregate_summary_ratio_int_and_float_mix_batch51():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_subprocess_import_batch51():
-    src = inspect.getsource(report_mod)
-    assert "import subprocess" in src
-
-
-def test_source_contains_datetime_import_batch51():
-    src = inspect.getsource(report_mod)
-    assert "from datetime import datetime" in src
-
-
-def test_source_contains_path_import_batch51():
-    src = inspect.getsource(report_mod)
-    assert "from pathlib import Path" in src
-
-
 def test_source_contains_get_git_provenance_docstring_batch51():
     src = inspect.getsource(report_mod)
     assert "读 git commit 与 dirty 状态" in src
@@ -417,11 +396,6 @@ def test_ast_has_5_top_level_functions_batch51():
     tree = ast.parse(inspect.getsource(report_mod))
     funcs = [n for n in tree.body if isinstance(n, ast.FunctionDef)]
     assert len(funcs) == 5
-
-
-def test_ast_no_class_def_batch51():
-    tree = ast.parse(inspect.getsource(report_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
 
 
 def test_ast_no_async_function_def_batch51():

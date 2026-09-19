@@ -573,11 +573,6 @@ def test_source_validate_file_path_conversion_batch52():
     assert "p = Path(path)" in src
 
 
-def test_source_errors_or_empty_default_batch52():
-    src = inspect.getsource(schema_mod)
-    assert "self.errors = errors or []" in src
-
-
 def test_source_schema_path_fstring_batch52():
     src = inspect.getsource(schema_mod)
     assert 'f"Schema 文件不存在: {p}"' in src

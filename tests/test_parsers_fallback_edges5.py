@@ -713,18 +713,6 @@ def test_fallback_parser_class_attribute_name():
     assert FallbackParser.name == "fallback"
 
 
-def test_fallback_parser_class_attribute_version_contains_pdfplumber():
-    assert "pdfplumber" in FallbackParser.version
-
-
-def test_fallback_parser_class_attribute_version_contains_python_docx():
-    assert "python-docx" in FallbackParser.version
-
-
-def test_fallback_parser_class_attribute_version_contains_pypdfium2():
-    assert "pypdfium2" in FallbackParser.version
-
-
 def test_fallback_parser_has_parse_method():
     assert callable(getattr(FallbackParser, "parse", None))
 

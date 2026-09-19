@@ -524,11 +524,6 @@ def test_source_contains_inspect_doc_help_batch48():
     assert "inspect-doc" in src
 
 
-def test_source_contains_validate_report_help_batch48():
-    src = inspect.getsource(cli_mod)
-    assert "validate-report" in src
-
-
 def test_source_contains_module_docstring_batch48():
     src = inspect.getsource(cli_mod)
     # 模块 docstring 应当提到子命令

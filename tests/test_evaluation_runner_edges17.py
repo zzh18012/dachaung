@@ -354,12 +354,6 @@ def test_module_namespace_contains_report_version():
     assert m.REPORT_VERSION == REPORT_VERSION
 
 
-def test_module_namespace_contains_compute_automatic_metrics():
-    import evaluation.runner as m
-
-    assert hasattr(m, "compute_automatic_metrics")
-
-
 def test_module_namespace_does_not_contain_main():
     """模块无 main 函数。"""
     import evaluation.runner as m

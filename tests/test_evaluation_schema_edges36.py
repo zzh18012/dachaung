@@ -95,11 +95,6 @@ def test_eval_schema_error_args_multiple_batch16():
     assert err.args == ("msg",)
 
 
-def test_eval_schema_error_errors_default_empty_batch16():
-    err = EvalSchemaError("msg")
-    assert err.errors == []
-
-
 def test_eval_schema_error_errors_given_batch16():
     errs = [{"path": ["a"]}]
     err = EvalSchemaError("msg", errors=errs)
@@ -124,11 +119,6 @@ def test_eval_schema_error_can_be_raised_and_caught_batch16():
     assert exc_info.value.errors == []
 
 
-def test_eval_schema_error_is_exception_batch16():
-    err = EvalSchemaError("x")
-    assert isinstance(err, Exception)
-
-
 def test_eval_schema_error_errors_independent_batch16():
     """两次实例化的 errors 默认是不同 list 对象。"""
     e1 = EvalSchemaError("a")
@@ -139,13 +129,6 @@ def test_eval_schema_error_errors_independent_batch16():
 
 
 # ---------- load_schema 行为深度第十六批 ----------
-
-
-def test_load_schema_returns_dict_for_all_three_batch16():
-    for name in ["manifest.schema.json", "annotation.schema.json",
-                 "evaluation-report.schema.json"]:
-        s = load_schema(name)
-        assert isinstance(s, dict)
 
 
 def test_load_schema_idempotent_batch16():
@@ -425,11 +408,6 @@ def test_module_source_has_class_eval_schema_error_batch16():
     assert "class EvalSchemaError(Exception):" in src
 
 
-def test_module_source_has_schema_path_function_batch16():
-    src = inspect.getsource(smod)
-    assert "def _schema_path(name: str) -> Path:" in src
-
-
 def test_module_source_has_iter_errors_batch16():
     src = inspect.getsource(smod)
     assert "iter_errors" in src
@@ -466,11 +444,6 @@ def test_signature_schema_path_batch16():
 
 
 # ---------- module 合理性第二十七批 ----------
-
-
-def test_module_has_all_attribute_batch16():
-    assert hasattr(smod, "__all__")
-    assert isinstance(smod.__all__, list)
 
 
 def test_module_all_items_in_namespace_batch16():

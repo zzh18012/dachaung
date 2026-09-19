@@ -569,11 +569,6 @@ def test_module_source_no_unlink_call_batch20():
     assert ".unlink(" not in src
 
 
-def test_module_source_no_sys_exit_batch20():
-    src = inspect.getsource(mmod)
-    assert "sys.exit" not in src
-
-
 def test_module_source_no_pandas_import_batch20():
     src = inspect.getsource(mmod)
     assert "import pandas" not in src
@@ -702,12 +697,6 @@ def test_module_has_all_attribute_batch20():
 
 def test_module_all_only_contains_one_entry_batch20():
     assert len(mmod.__all__) == 1
-
-
-def test_module_does_not_import_app_pipeline_batch20():
-    src = inspect.getsource(mmod)
-    assert "from app" not in src
-    assert "import app" not in src
 
 
 def test_module_does_not_import_evaluation_cli_batch20():

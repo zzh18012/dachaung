@@ -472,12 +472,6 @@ def test_module_source_forbidden_tokens_batch18(forbidden):
 # ---------- module source 字符串精确补强第二十八批 ----------
 
 
-def test_module_source_has_future_annotations_batch18():
-    src = inspect.getsource(amod)
-    head = src.split("\n", 30)[:30]
-    assert any("from __future__ import annotations" in line for line in head)
-
-
 def test_module_source_has_docstring_batch18():
     src = inspect.getsource(amod)
     assert "人工标注指标" in src
@@ -549,11 +543,6 @@ def test_signature_chunk_boundary_prf_default_tolerance_batch18():
 
 
 # ---------- module 合理性第二十八批 ----------
-
-
-def test_module_has_all_attribute_batch18():
-    assert hasattr(amod, "__all__")
-    assert isinstance(amod.__all__, list)
 
 
 def test_module_all_count_3_batch18():

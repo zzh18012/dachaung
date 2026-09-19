@@ -1280,11 +1280,6 @@ def test_eval_schema_error_message_attribute():
     assert str(e) == "hello"
 
 
-def test_eval_schema_error_args_stored():
-    e = EvalSchemaError("hello")
-    assert e.args == ("hello",)
-
-
 def test_eval_schema_error_caught_as_exception():
     try:
         raise EvalSchemaError("msg")

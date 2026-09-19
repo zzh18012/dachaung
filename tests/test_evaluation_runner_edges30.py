@@ -207,11 +207,6 @@ def test_process_one_source_no_global():
 # ---------- run_evaluation source level 字符串精确补强第二批 ----------
 
 
-def test_run_evaluation_source_defines_output_root():
-    src = inspect.getsource(run_evaluation)
-    assert "output_root = Path(output_path).parent" in src
-
-
 def test_run_evaluation_source_creates_output_root_dir():
     src = inspect.getsource(run_evaluation)
     assert "output_root.mkdir(parents=True, exist_ok=True)" in src
@@ -291,11 +286,6 @@ def test_run_evaluation_source_per_doc_dict_has_metrics():
     assert '"metrics": metrics' in src
 
 
-def test_run_evaluation_source_per_doc_dict_has_annotation_present():
-    src = inspect.getsource(run_evaluation)
-    assert '"_annotation_present": annotation is not None' in src
-
-
 def test_run_evaluation_source_loops_over_expected_failures():
     src = inspect.getsource(run_evaluation)
     assert "for ef in manifest.expected_failures:" in src
@@ -330,16 +320,6 @@ def test_run_evaluation_source_calls_build_provenance():
     assert "parser_name=parser_name" in src
     assert "max_chars=max_chars" in src
     assert "parser_version=parser_version_for_prov" in src
-
-
-def test_run_evaluation_source_calls_build_devset_section():
-    src = inspect.getsource(run_evaluation)
-    assert "build_devset_section(manifest)" in src
-
-
-def test_run_evaluation_source_calls_aggregate_summary():
-    src = inspect.getsource(run_evaluation)
-    assert "aggregate_summary(per_doc_results)" in src
 
 
 def test_run_evaluation_source_initializes_public_per_doc():
@@ -517,14 +497,6 @@ def test_module_source_imports_compute_automatic_metrics():
     assert "from evaluation.metrics import compute_automatic_metrics" in src
 
 
-def test_module_source_imports_report_helpers():
-    src = inspect.getsource(rmod)
-    assert "from evaluation.report import (" in src
-    assert "aggregate_summary" in src
-    assert "build_devset_section" in src
-    assert "build_provenance" in src
-
-
 def test_module_source_docstring_mentions_total():
     src = inspect.getsource(rmod)
     assert "total" in src.lower()
@@ -661,17 +633,6 @@ def test_run_evaluation_signature_5_params():
     assert len(sig.parameters) == 5
 
 
-def test_run_evaluation_param_names():
-    sig = inspect.signature(run_evaluation)
-    assert list(sig.parameters.keys()) == [
-        "manifest",
-        "output_path",
-        "parser_name",
-        "max_chars",
-        "tolerance_chars",
-    ]
-
-
 def test_run_evaluation_manifest_no_default():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["manifest"].default is inspect.Parameter.empty
@@ -753,11 +714,6 @@ def test_module_all_has_1_entry():
 
 def test_module_all_only_run_evaluation():
     assert rmod.__all__ == ["run_evaluation"]
-
-
-def test_module_all_entries_str():
-    for entry in rmod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_has_2_private_functions():

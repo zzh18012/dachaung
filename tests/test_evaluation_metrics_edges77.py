@@ -223,10 +223,6 @@ def test_bbox_bool_value_rejected_batch52():
     assert _is_valid_bbox([True, 2, 3, 4]) is False
 
 
-def test_bbox_mixed_int_float_ok_batch52():
-    assert _is_valid_bbox([1, 2.5, 3, 4.0]) is True
-
-
 def test_bbox_large_finite_ok_batch52():
     assert _is_valid_bbox([1e308, 1e308, 0, 100]) is True
 

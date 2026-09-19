@@ -409,11 +409,6 @@ def test_run_evaluation_returns_dict_batch30(tmp_path):
 # ---------- module source forbidden tokens 第四十八批（'"w"' 和 unlink 允许） ----------
 
 
-def test_module_source_no_subprocess_batch30():
-    src = inspect.getsource(rmod)
-    assert "subprocess" not in src
-
-
 def test_module_source_no_os_system_batch30():
     src = inspect.getsource(rmod)
     assert "os.system" not in src
@@ -522,11 +517,6 @@ def test_module_source_contains_json_dump_call_batch30():
     assert "json.dump(report" in src
 
 
-def test_module_source_contains_ensure_ascii_false_batch30():
-    src = inspect.getsource(rmod)
-    assert "ensure_ascii=False" in src
-
-
 def test_module_source_contains_run_timestamp_iso_in_doc_batch30():
     """注释提到 _tolerance_chars。"""
     src = inspect.getsource(rmod)
@@ -620,11 +610,6 @@ def test_module_imports_typing_any_batch30():
 def test_module_has_all_export_batch30():
     src = inspect.getsource(rmod)
     assert "__all__" in src
-
-
-def test_module_all_has_run_evaluation_batch30():
-    src = inspect.getsource(rmod)
-    assert '"run_evaluation"' in src
 
 
 def test_module_no_main_block_batch30():

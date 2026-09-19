@@ -339,12 +339,6 @@ def test_validate_return_annotation_none():
 # =========================================================================
 
 
-def test_validate_file_missing_raises_filenotfound(tmp_path: Path):
-    with pytest.raises(FileNotFoundError) as exc:
-        validate_file(tmp_path / "missing.json", "manifest.schema.json")
-    assert "待校验文件不存在" in str(exc.value)
-
-
 def test_validate_file_invalid_content_raises_eval_error(tmp_path: Path):
     p = tmp_path / "bad.json"
     p.write_text("{}", encoding="utf-8")

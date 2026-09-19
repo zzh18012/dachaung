@@ -218,10 +218,6 @@ def test_split_long_text_empty_returns_empty_list():
     assert _split_long_text("", 100) == []
 
 
-def test_split_long_text_only_whitespace_returns_empty_list():
-    assert _split_long_text("   \n\t  ", 100) == []
-
-
 def test_split_long_text_exactly_max_returns_single():
     pieces = _split_long_text("hello", 5)
     assert len(pieces) == 1
@@ -805,10 +801,6 @@ def test_normalize_text_mixed_whitespace():
 
 def test_normalize_text_only_whitespace_returns_empty():
     assert normalize_text("   \n\t\r  ") == ""
-
-
-def test_normalize_text_returns_str():
-    assert isinstance(normalize_text("x"), str)
 
 
 # =========================================================================

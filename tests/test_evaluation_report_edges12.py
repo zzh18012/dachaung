@@ -582,34 +582,9 @@ def test_aggregate_summary_not_evaluated_all_when_none_participate():
 # =========================================================================
 
 
-def test_module_imports_subprocess():
-    import evaluation.report as m
-    assert hasattr(m, "subprocess")
-
-
-def test_module_imports_datetime():
-    import evaluation.report as m
-    assert hasattr(m, "datetime")
-
-
-def test_module_imports_path():
-    import evaluation.report as m
-    assert hasattr(m, "Path")
-
-
 def test_module_imports_any():
     import evaluation.report as m
     assert hasattr(m, "Any")
-
-
-def test_module_imports_evaluator_version():
-    import evaluation.report as m
-    assert hasattr(m, "EVALUATOR_VERSION")
-
-
-def test_module_imports_report_version():
-    import evaluation.report as m
-    assert hasattr(m, "REPORT_VERSION")
 
 
 def test_module_all_exact():

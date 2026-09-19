@@ -949,11 +949,6 @@ def test_module_source_dataclass_used_batch24():
 # ---------- module source 字符串精确补强 第三十五批 ----------
 
 
-def test_module_source_contains_is_absolute_like_batch24():
-    source = inspect.getsource(mmod)
-    assert "def _is_absolute_like(" in source
-
-
 def test_module_source_contains_resolve_relative_path_batch24():
     source = inspect.getsource(mmod)
     assert "def _resolve_relative_path(" in source

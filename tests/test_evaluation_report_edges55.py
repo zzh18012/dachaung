@@ -548,15 +548,6 @@ def test_aggregate_summary_silent_drop_sum_total_batch36():
     assert out["silent_drop_total"] == 8
 
 
-def test_aggregate_summary_silent_drop_skips_none_batch36():
-    per_doc = [
-        {"metrics": {"silent_drop_count": {"value": 3}}},
-        {"metrics": {"silent_drop_count": {"value": None}}},
-    ]
-    out = aggregate_summary(per_doc)
-    assert out["silent_drop_total"] == 3
-
-
 def test_aggregate_summary_silent_drop_all_none_returns_none_batch36():
     per_doc = [
         {"metrics": {"silent_drop_count": {"value": None}}},
@@ -628,21 +619,6 @@ def test_module_source_contains_design_doc_batch36():
     assert "评测报告装配" in src
 
 
-def test_module_source_contains_ratio_metrics_definition_batch36():
-    src = inspect.getsource(rmod)
-    assert "_RATIO_METRICS" in src
-
-
-def test_module_source_contains_count_metrics_definition_batch36():
-    src = inspect.getsource(rmod)
-    assert "_COUNT_METRICS" in src
-
-
-def test_module_source_contains_success_bool_metrics_definition_batch36():
-    src = inspect.getsource(rmod)
-    assert "_SUCCESS_BOOL_METRICS" in src
-
-
 def test_module_source_contains_get_git_provenance_batch36():
     src = inspect.getsource(rmod)
     assert "def get_git_provenance(" in src
@@ -666,11 +642,6 @@ def test_module_source_contains_build_devset_section_batch36():
 def test_module_source_contains_aggregate_summary_batch36():
     src = inspect.getsource(rmod)
     assert "def aggregate_summary(" in src
-
-
-def test_module_source_contains_subprocess_run_call_batch36():
-    src = inspect.getsource(rmod)
-    assert "subprocess.run(" in src
 
 
 def test_module_source_contains_encoding_utf8_batch36():

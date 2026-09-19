@@ -178,10 +178,6 @@ def test_has_backslash_whitespace_only_no_backslash():
     assert _has_backslash("   ") is False
 
 
-def test_has_backslash_unicode_with_backslash():
-    assert _has_backslash("中文\\路径") is True
-
-
 # =========================================================================
 # Manifest properties 深度
 # =========================================================================

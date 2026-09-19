@@ -113,13 +113,6 @@ def test_load_annotation_json_scalar_int(tmp_path):
     assert result == 42
 
 
-def test_load_annotation_json_scalar_string(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text('"hello"', encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == "hello"
-
-
 def test_load_annotation_json_true(tmp_path):
     p = tmp_path / "a.json"
     p.write_text("true", encoding="utf-8")

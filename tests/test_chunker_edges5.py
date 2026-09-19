@@ -87,22 +87,6 @@ from app.models import Chunk, Document, Element
 # =========================================================================
 
 
-def test_part_text_constant_value_zero():
-    assert _PART_TEXT == 0
-
-
-def test_part_element_id_constant_value_one():
-    assert _PART_ELEMENT_ID == 1
-
-
-def test_part_start_constant_value_two():
-    assert _PART_START == 2
-
-
-def test_part_end_constant_value_three():
-    assert _PART_END == 3
-
-
 def test_part_constants_ordered():
     assert _PART_TEXT < _PART_ELEMENT_ID < _PART_START < _PART_END
 
@@ -283,10 +267,6 @@ def test_normalize_text_idempotent():
     once = normalize_text(text)
     twice = normalize_text(once)
     assert once == twice
-
-
-def test_normalize_text_returns_str_type():
-    assert isinstance(normalize_text("x"), str)
 
 
 def test_normalize_text_preserves_punctuation():
@@ -629,16 +609,6 @@ def test_chunk_buffer_field_names_exact():
 def test_chunker_init_explicit_max_chars():
     c = StructuralChunker(max_chars=200)
     assert c.max_chars == 200
-
-
-def test_chunker_init_max_chars_31_rejected():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=31)
-
-
-def test_chunker_init_max_chars_zero_rejected():
-    with pytest.raises(ValueError):
-        StructuralChunker(max_chars=0)
 
 
 def test_chunker_init_value_error_message_contains_max_chars():

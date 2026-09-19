@@ -790,35 +790,14 @@ def test_runner_source_no_async_def_batch11():
     assert "async def" not in source
 
 
-def test_runner_source_no_yield_batch11():
-    source = inspect.getsource(rmod)
-    assert "yield" not in source
-
-
 def test_runner_source_no_walrus_batch11():
     source = inspect.getsource(rmod)
     assert ":=" not in source
 
 
-def test_runner_source_no_top_level_lambda_batch11():
-    source = inspect.getsource(rmod)
-    lines = source.split("\n")
-    for line in lines:
-        stripped = line.lstrip()
-        if not line.startswith(" ") and "=" in stripped and "lambda" in stripped:
-            if stripped.split("=")[0].strip().isidentifier():
-                raise AssertionError(f"top-level lambda: {line}")
-
-
 def test_runner_source_no_print_batch11():
     source = inspect.getsource(rmod)
     assert "print(" not in source
-
-
-def test_runner_source_no_logging_batch11():
-    source = inspect.getsource(rmod)
-    assert "logging" not in source
-    assert "logger" not in source
 
 
 def test_runner_source_no_pickle_module_batch11():
@@ -848,11 +827,6 @@ def test_module_source_imports_process_single_batch11():
     source = inspect.getsource(rmod)
     assert "process_single" in source
     assert "image_output_dir_for" in source
-
-
-def test_module_source_imports_metrics_batch11():
-    source = inspect.getsource(rmod)
-    assert "compute_automatic_metrics" in source
 
 
 def test_module_source_imports_report_helpers_batch11():

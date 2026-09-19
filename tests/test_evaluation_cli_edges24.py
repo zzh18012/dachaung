@@ -368,11 +368,6 @@ def test_run_inspect_doc_source_has_sorted_call():
     assert "_sort_key" in src
 
 
-def test_run_inspect_doc_source_has_figure_caption_call():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "figure_caption_prf" in src
-
-
 # =========================================================================
 # main run 路径行为深度补强
 # =========================================================================
@@ -775,12 +770,6 @@ def test_main_return_annotation_is_int():
     assert "int" in str(sig.return_annotation)
 
 
-def test_main_no_varargs_varkw():
-    sig = inspect.signature(main)
-    for p in sig.parameters.values():
-        assert p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-
-
 def test_build_parser_signature_0_param():
     sig = inspect.signature(_build_parser)
     params = list(sig.parameters.values())
@@ -845,11 +834,6 @@ def test_main_source_has_run_evaluation_call_with_kwargs():
     assert "parser_name=args.parser" in src
     assert "max_chars=args.max_chars" in src
     assert "tolerance_chars=args.tolerance_chars" in src
-
-
-def test_main_source_has_validate_file_call():
-    src = inspect.getsource(main)
-    assert 'validate_file(output_path, "evaluation-report.schema.json")' in src
 
 
 def test_main_source_has_get_git_provenance_call():

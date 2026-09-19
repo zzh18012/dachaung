@@ -830,11 +830,6 @@ def test_module_source_no_pickle_batch24():
     assert "pickle" not in source
 
 
-def test_module_source_no_argparse_batch24():
-    source = inspect.getsource(rmod)
-    assert "argparse" not in source
-
-
 def test_module_source_no_network_io_batch24():
     source = inspect.getsource(rmod)
     assert "import socket" not in source

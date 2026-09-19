@@ -649,26 +649,6 @@ def test_module_reconfigure_block_has_try_except():
     assert "except" in src
 
 
-def test_module_imports_argparse():
-    import evaluation.cli as m
-    assert hasattr(m, "argparse")
-
-
-def test_module_imports_json():
-    import evaluation.cli as m
-    assert hasattr(m, "json")
-
-
-def test_module_imports_sys():
-    import evaluation.cli as m
-    assert hasattr(m, "sys")
-
-
-def test_module_imports_path():
-    import evaluation.cli as m
-    assert hasattr(m, "Path")
-
-
 def test_module_docstring_present():
     import evaluation.cli as m
     assert m.__doc__ is not None

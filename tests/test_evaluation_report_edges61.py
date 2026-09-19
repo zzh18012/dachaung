@@ -693,39 +693,9 @@ def test_ast_module_has_docstring_batch47():
 
 # ---------- forbidden tokens 第一百零八批 ----------
 
-def test_source_no_compile_batch47():
-    src = inspect.getsource(report_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch47():
-    src = inspect.getsource(report_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch47():
-    src = inspect.getsource(report_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch47():
-    src = inspect.getsource(report_mod)
-    assert "os.system(" not in src
-
-
 def test_source_no_popen_batch47():
     src = inspect.getsource(report_mod)
     assert ".popen(" not in src
-
-
-def test_source_no_yaml_load_batch47():
-    src = inspect.getsource(report_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch47():
-    src = inspect.getsource(report_mod)
-    assert "pickle.load(" not in src
 
 
 def test_source_no_await_batch47():

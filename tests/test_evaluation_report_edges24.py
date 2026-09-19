@@ -684,13 +684,6 @@ def test_module_function_module_eq_rmod():
 # ---------- signatures 第七批 ----------
 
 
-def test_signature_get_git_provenance_one_param():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "project_root"
-
-
 def test_signature_get_git_provenance_no_default():
     sig = inspect.signature(get_git_provenance)
     params = sig.parameters
@@ -804,16 +797,6 @@ def test_module_source_imports_evaluator_version():
 def test_module_source_ratio_metrics_constant():
     src = inspect.getsource(rmod)
     assert "_RATIO_METRICS = (" in src
-
-
-def test_module_source_count_metrics_constant():
-    src = inspect.getsource(rmod)
-    assert '_COUNT_METRICS = ("element_count_total",)' in src
-
-
-def test_module_source_success_bool_metrics_constant():
-    src = inspect.getsource(rmod)
-    assert '_SUCCESS_BOOL_METRICS = ("pipeline_success",)' in src
 
 
 def test_module_source_no_main_block():

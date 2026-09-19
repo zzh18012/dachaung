@@ -188,13 +188,6 @@ def test_hbc_two_participating_batch516(tmp_path):
 
 # ---------- counts / success ----------
 
-def test_success_full_batch516(tmp_path):
-    r = _run(tmp_path)
-    assert r["summary"]["success_rates"][
-        "pipeline_success"] == {
-        "success_count": 2, "total": 2, "rate": 1.0}
-
-
 # ---------- 报告合法性 ----------
 
 def test_report_schema_batch516(tmp_path):

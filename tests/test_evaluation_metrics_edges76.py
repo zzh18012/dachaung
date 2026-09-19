@@ -258,16 +258,8 @@ def test_docx_locator_multiple_structural_keys_batch52():
 
 # ---------- _is_valid_bbox 更深 ----------
 
-def test_is_valid_bbox_length_3_rejected_batch52():
-    assert _is_valid_bbox([0, 0, 10]) is False
-
-
 def test_is_valid_bbox_mixed_int_float_batch52():
     assert _is_valid_bbox([0, 0.0, 100, 200.5]) is True
-
-
-def test_is_valid_bbox_string_rejected_batch52():
-    assert _is_valid_bbox(["0", "0", "10", "10"]) is False
 
 
 def test_is_valid_bbox_nested_list_rejected_batch52():
@@ -628,29 +620,9 @@ def test_source_not_evaluated_value_batch52():
     assert _NOT_EVALUATED == "not_evaluated"
 
 
-def test_source_math_import_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert "import math" in src
-
-
 def test_source_counter_import_batch52():
     src = inspect.getsource(metrics_mod)
     assert "from collections import Counter" in src
-
-
-def test_source_pathlib_path_import_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_source_typing_any_import_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert "from typing import Any" in src
-
-
-def test_source_has_text_preservation_docstring_v11_batch52():
-    src = inspect.getsource(metrics_mod)
-    assert "v1.1" in src
 
 
 def test_source_has_strip_unicode_whitespace_function_batch52():
@@ -688,12 +660,6 @@ def test_source_compute_metrics_uses_lazy_schema_import_batch52():
 def test_ast_no_async_function_def_batch52():
     tree = ast.parse(inspect.getsource(metrics_mod))
     assert not any(isinstance(n, ast.AsyncFunctionDef) for n in ast.walk(tree))
-
-
-def test_ast_module_docstring_batch52():
-    tree = ast.parse(inspect.getsource(metrics_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_all_value_is_list_1_batch52():

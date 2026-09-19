@@ -27,10 +27,6 @@ def test_parser_does_not_emit_relations_exact_value_batch43():
     assert PARSER_DOES_NOT_EMIT_RELATIONS == "parser_does_not_emit_relations"
 
 
-def test_parser_does_not_emit_relations_no_spaces_batch43():
-    assert " " not in PARSER_DOES_NOT_EMIT_RELATIONS
-
-
 def test_parser_does_not_emit_relations_is_str_batch43():
     assert isinstance(PARSER_DOES_NOT_EMIT_RELATIONS, str)
 
@@ -804,16 +800,6 @@ def test_module_source_contains_missing_markers_keyword_batch43():
     assert "missing_markers" in src
 
 
-def test_module_source_contains_precision_or_recall_not_evaluated_batch43():
-    src = inspect.getsource(amod)
-    assert "precision_or_recall_not_evaluated" in src
-
-
-def test_module_source_contains_no_ground_truth_anchors_in_stream_batch43():
-    src = inspect.getsource(amod)
-    assert "no_ground_truth_anchors_in_stream" in src
-
-
 # ---------- signatures 第六十八批
 
 
@@ -877,30 +863,9 @@ def test_module_all_contains_parser_constant_batch43():
     assert "PARSER_DOES_NOT_EMIT_RELATIONS" in amod.__all__
 
 
-def test_module_all_contains_figure_caption_batch43():
-    assert "figure_caption_prf" in amod.__all__
-
-
-def test_module_all_contains_chunk_boundary_batch43():
-    assert "chunk_boundary_prf" in amod.__all__
-
-
-def test_module_does_not_define_class_batch43():
-    src = inspect.getsource(amod)
-    assert "\nclass " not in src
-
-
 def test_module_has_future_annotations_batch43():
     src = inspect.getsource(amod)
     assert "from __future__ import annotations" in src
-
-
-def test_module_has_figure_caption_attr_batch43():
-    assert hasattr(amod, "figure_caption_prf")
-
-
-def test_module_has_chunk_boundary_attr_batch43():
-    assert hasattr(amod, "chunk_boundary_prf")
 
 
 def test_module_has_parser_does_not_emit_relations_attr_batch43():

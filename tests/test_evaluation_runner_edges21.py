@@ -177,12 +177,6 @@ def test_load_annotation_valid_json_returns_dict(tmp_path):
     assert out["doc_id"] == "d1"
 
 
-def test_load_annotation_empty_file_returns_none(tmp_path):
-    p = tmp_path / "empty.json"
-    p.write_text("", encoding="utf-8")
-    assert _load_annotation(p) is None
-
-
 def test_load_annotation_utf8_bom_returns_none(tmp_path):
     """json.load 默认不剥 UTF-8 BOM → JSONDecodeError → 返 None。"""
     p = tmp_path / "bom.json"

@@ -104,10 +104,6 @@ def test_pdf_bbox_required_types_is_tuple():
     assert isinstance(_PDF_BBOX_REQUIRED_TYPES, tuple)
 
 
-def test_pdf_bbox_required_types_excludes_image():
-    assert "image" not in _PDF_BBOX_REQUIRED_TYPES
-
-
 def test_pdf_bbox_required_types_subset_of_text_types():
     assert set(_PDF_BBOX_REQUIRED_TYPES).issubset(set(_TEXT_TYPES))
 
@@ -144,14 +140,6 @@ def test_null_unicode_reason():
     assert out["reason"] == "失败原因"
 
 
-def test_ratio_value_zero():
-    assert _ratio(0.0)["value"] == 0.0
-
-
-def test_ratio_value_one():
-    assert _ratio(1.0)["value"] == 1.0
-
-
 def test_ratio_value_half():
     assert _ratio(0.5)["value"] == 0.5
 
@@ -170,10 +158,6 @@ def test_ratio_returns_reason_none():
     assert _ratio(0.5)["reason"] is None
 
 
-def test_bool_metric_true():
-    assert _bool_metric(True)["value"] is True
-
-
 def test_bool_metric_int_zero_returns_false():
     """int 0 → bool(0) = False。"""
     assert _bool_metric(0)["value"] is False
@@ -182,14 +166,6 @@ def test_bool_metric_int_zero_returns_false():
 def test_bool_metric_int_one_returns_true():
     """int 1 → bool(1) = True。"""
     assert _bool_metric(1)["value"] is True
-
-
-def test_bool_metric_empty_string_returns_false():
-    assert _bool_metric("")["value"] is False
-
-
-def test_bool_metric_non_empty_string_returns_true():
-    assert _bool_metric("x")["value"] is True
 
 
 def test_int_metric_value():
@@ -255,16 +231,6 @@ def test_strip_unicode_whitespace_nbsp():
     assert _strip_unicode_whitespace("a\xa0b") == "ab"
 
 
-def test_strip_unicode_whitespace_line_separator():
-    """U+2028 LINE SEPARATOR。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_paragraph_separator():
-    """U+2029 PARAGRAPH SEPARATOR。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
 def test_strip_unicode_whitespace_hair_space():
     """U+200A HAIR SPACE。"""
     assert _strip_unicode_whitespace("a b") == "ab"
@@ -303,10 +269,6 @@ def test_is_valid_bbox_none_rejected():
 
 def test_is_valid_bbox_tuple_rejected():
     assert _is_valid_bbox((1, 2, 3, 4)) is False
-
-
-def test_is_valid_bbox_string_rejected():
-    assert _is_valid_bbox("1234") is False
 
 
 def test_is_valid_bbox_empty_list_rejected():
@@ -387,12 +349,6 @@ def test_pdf_locator_ratio_table_only_page_missing_returns_invalid():
     elements = [{"type": "table", "source_locator": {}}]
     out = _pdf_locator_ratio(elements)
     assert out["value"] == 0.0
-
-
-def test_pdf_locator_ratio_image_with_valid_page_no_bbox_required():
-    elements = [{"type": "image", "source_locator": {"page": 1}}]
-    out = _pdf_locator_ratio(elements)
-    assert out["value"] == 1.0
 
 
 def test_pdf_locator_ratio_text_type_no_locator():
@@ -744,12 +700,6 @@ def test_heading_boundary_ratio_returns_ratio_dict():
 
 def test_silent_drop_count_no_expectations_returns_null():
     out = _silent_drop_count({"paragraph": 5}, None)
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations"
-
-
-def test_silent_drop_count_empty_expectations_returns_null():
-    out = _silent_drop_count({"paragraph": 5}, {})
     assert out["value"] is None
     assert out["reason"] == "no_expectations"
 

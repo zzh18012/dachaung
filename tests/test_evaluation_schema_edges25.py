@@ -263,11 +263,6 @@ def test_validate_source_uses_schema_path_in_flat():
     assert '"schema_path": list(err.absolute_schema_path)' in src
 
 
-def test_validate_source_uses_head_eq_errors_0():
-    src = inspect.getsource(validate)
-    assert "head = errors[0]" in src
-
-
 def test_validate_source_message_has_count():
     src = inspect.getsource(validate)
     assert "len(errors)" in src
@@ -430,11 +425,6 @@ def test_eval_schema_error_message_and_errors():
     assert err.errors == errs
 
 
-def test_eval_schema_error_errors_default_none():
-    err = EvalSchemaError("msg")
-    assert err.errors == []  # 默认 None → []
-
-
 def test_eval_schema_error_errors_default_is_empty_list():
     """errors 默认是空 list（None → []）."""
     err = EvalSchemaError("msg")
@@ -474,11 +464,6 @@ def test_eval_schema_error_args():
     err = EvalSchemaError("msg", errors=[{"a": 1}])
     # args[0] 是 message
     assert err.args[0] == "msg"
-
-
-def test_eval_schema_error_repr_has_class_name():
-    err = EvalSchemaError("msg")
-    assert "EvalSchemaError" in repr(err)
 
 
 def test_eval_schema_error_errors_attribute_writable():
@@ -876,29 +861,14 @@ def test_module_source_no_relative_above_root():
             assert "evaluation" in stripped or "app" in stripped or "schemas" in stripped
 
 
-def test_module_source_no_star_import():
-    src = inspect.getsource(smod)
-    assert "import *" not in src
-
-
 def test_module_source_no_yield():
     src = inspect.getsource(smod)
     assert "yield" not in src
 
 
-def test_module_source_no_async_def():
-    src = inspect.getsource(smod)
-    assert "async def" not in src
-
-
 def test_module_source_no_walrus():
     src = inspect.getsource(smod)
     assert ":=" not in src
-
-
-def test_module_source_no_main_block():
-    src = inspect.getsource(smod)
-    assert 'if __name__' not in src
 
 
 def test_module_source_no_user_class_beyond_eval_schema_error():
@@ -986,13 +956,6 @@ def test_signature_schema_path_no_default():
 def test_signature_schema_path_return_annotation_path():
     sig = inspect.signature(_schema_path)
     assert "Path" in str(sig.return_annotation)
-
-
-def test_signature_load_schema():
-    sig = inspect.signature(load_schema)
-    params = list(sig.parameters.values())
-    assert len(params) == 1
-    assert params[0].name == "name"
 
 
 def test_signature_load_schema_no_default():
@@ -1088,11 +1051,6 @@ def test_module_all_length_5():
 
 def test_module_all_entries_unique():
     assert len(set(smod.__all__)) == 5
-
-
-def test_module_all_entries_are_str():
-    for entry in smod.__all__:
-        assert isinstance(entry, str)
 
 
 def test_module_all_5_entries_correct():

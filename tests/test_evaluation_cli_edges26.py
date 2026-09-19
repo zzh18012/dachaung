@@ -102,11 +102,6 @@ def test_build_parser_inspect_doc_input_required():
 # ---------- _format_metric 分支精确补强 ----------
 
 
-def test_format_metric_negative_float():
-    out = _format_metric("x", {"value": -0.5, "reason": None})
-    assert "-0.5000" in out
-
-
 def test_format_metric_large_float():
     out = _format_metric("x", {"value": 1.23456789, "reason": None})
     # 截到 4 位

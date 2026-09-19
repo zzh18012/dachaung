@@ -588,12 +588,6 @@ def test_module_source_no_main_block_batch18():
 # ---------- signatures 第二十八批 ----------
 
 
-def test_signature_get_git_provenance_batch18():
-    sig = inspect.signature(get_git_provenance)
-    params = list(sig.parameters.keys())
-    assert params == ["project_root"]
-
-
 def test_signature_get_dependency_versions_batch18():
     sig = inspect.signature(get_dependency_versions)
     params = list(sig.parameters.keys())
@@ -604,12 +598,6 @@ def test_signature_build_provenance_batch18():
     sig = inspect.signature(build_provenance)
     params = list(sig.parameters.keys())
     assert params == ["project_root", "parser_name", "max_chars", "parser_version"]
-
-
-def test_signature_build_devset_section_batch18():
-    sig = inspect.signature(build_devset_section)
-    params = list(sig.parameters.keys())
-    assert params == ["manifest"]
 
 
 def test_signature_aggregate_summary_batch18():

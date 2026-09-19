@@ -153,16 +153,6 @@ def test_schema_path_existing_manifest_batch25():
     assert p.is_file()
 
 
-def test_schema_path_existing_annotation_batch25():
-    p = _schema_path("annotation.schema.json")
-    assert p.is_file()
-
-
-def test_schema_path_existing_evaluation_report_batch25():
-    p = _schema_path("evaluation-report.schema.json")
-    assert p.is_file()
-
-
 def test_schema_path_with_posixpath_batch25():
     """Path 对象作为 name 也接受（Path 操作支持 Path/str 混合）。"""
     p = _schema_path(Path("manifest.schema.json"))
@@ -469,11 +459,6 @@ def test_module_source_no_shutil_batch25():
 # ---------- module source 字符串精确补强第三十九批 ----------
 
 
-def test_module_source_contains_schemas_dir_constant_batch25():
-    src = inspect.getsource(smod)
-    assert "SCHEMAS_DIR" in src
-
-
 def test_module_source_contains_path_parent_batch25():
     """SCHEMAS_DIR 用 parent.parent 推导。"""
     src = inspect.getsource(smod)
@@ -488,11 +473,6 @@ def test_module_source_contains_draft202012_batch25():
 def test_module_source_contains_iter_errors_batch25():
     src = inspect.getsource(smod)
     assert "iter_errors" in src
-
-
-def test_module_source_contains_eval_schema_error_class_batch25():
-    src = inspect.getsource(smod)
-    assert "class EvalSchemaError" in src
 
 
 def test_module_source_contains_errors_default_none_batch25():
@@ -544,18 +524,6 @@ def test_signature_eval_schema_error_init_batch25():
 def test_signature_eval_schema_error_init_errors_default_none_batch25():
     sig = inspect.signature(EvalSchemaError.__init__)
     assert sig.parameters["errors"].default is None
-
-
-def test_signature_validate_batch25():
-    sig = inspect.signature(validate)
-    params = list(sig.parameters.keys())
-    assert params == ["instance", "schema_name"]
-
-
-def test_signature_validate_file_batch25():
-    sig = inspect.signature(validate_file)
-    params = list(sig.parameters.keys())
-    assert params == ["path", "schema_name"]
 
 
 def test_signature_validate_file_path_union_str_batch25():

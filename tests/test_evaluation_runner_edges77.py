@@ -476,11 +476,6 @@ def test_ast_function_names_batch52():
     assert names == ["_load_annotation", "_process_one", "run_evaluation"]
 
 
-def test_ast_no_class_def_batch52():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    assert not any(isinstance(n, ast.ClassDef) for n in tree.body)
-
-
 def test_ast_process_one_has_if_errors_batch52():
     tree = ast.parse(inspect.getsource(runner_mod))
     func = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_process_one")

@@ -65,10 +65,6 @@ def test_ratio_with_string_raises_batch36():
         _ratio("hello")  # type: ignore[arg-type]
 
 
-def test_bool_metric_with_int_zero_batch36():
-    assert _bool_metric(0)["value"] is False
-
-
 def test_bool_metric_with_list_batch36():
     """非空 list → True。"""
     assert _bool_metric([1])["value"] is True
@@ -220,13 +216,6 @@ def test_docx_locator_ratio_with_page_rejected_batch36():
     """带 page 的 locator 被拒绝。"""
     elements = [{"type": "paragraph", "source_locator": {
         "page": 1, "paragraph_index": 0}}]
-    out = _docx_locator_ratio(elements)
-    assert out["value"] == 0.0
-
-
-def test_docx_locator_ratio_with_bbox_rejected_batch36():
-    elements = [{"type": "paragraph", "source_locator": {
-        "bbox": [0, 0, 1, 1], "paragraph_index": 0}}]
     out = _docx_locator_ratio(elements)
     assert out["value"] == 0.0
 
@@ -408,16 +397,6 @@ def test_strip_unicode_whitespace_nbsp_batch36():
     assert _strip_unicode_whitespace("a b") == "ab"
 
 
-def test_strip_unicode_whitespace_line_separator_batch36():
-    """U+2028 LINE SEPARATOR。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
-def test_strip_unicode_whitespace_paragraph_separator_batch36():
-    """U+2029 PARAGRAPH SEPARATOR。"""
-    assert _strip_unicode_whitespace("a b") == "ab"
-
-
 def test_strip_unicode_whitespace_preserves_digits_batch36():
     assert _strip_unicode_whitespace("1 2 3") == "123"
 
@@ -527,13 +506,6 @@ def test_heading_boundary_ratio_no_chunks_batch36():
     assert out["value"] == 0.0
 
 
-def test_heading_boundary_ratio_chunks_no_ids_batch36():
-    elements = [{"type": "heading", "element_id": "h1"}]
-    chunks = [{}]  # no source_element_ids
-    out = _heading_boundary_ratio(elements, chunks)
-    assert out["value"] == 0.0
-
-
 def test_heading_boundary_ratio_chunks_empty_ids_batch36():
     elements = [{"type": "heading", "element_id": "h1"}]
     chunks = [{"source_element_ids": []}]
@@ -564,12 +536,6 @@ def test_heading_boundary_ratio_multiple_headings_partial_batch36():
 
 def test_silent_drop_count_no_expectations_batch36():
     out = _silent_drop_count({"paragraph": 5}, None)
-    assert out["value"] is None
-    assert out["reason"] == "no_expectations"
-
-
-def test_silent_drop_count_empty_expectations_batch36():
-    out = _silent_drop_count({"paragraph": 5}, {})
     assert out["value"] is None
     assert out["reason"] == "no_expectations"
 
@@ -744,16 +710,6 @@ def test_module_source_contains_counter_import_batch36():
 def test_module_source_contains_pathlib_import_batch36():
     src = inspect.getsource(mmod)
     assert "from pathlib import Path" in src
-
-
-def test_module_source_contains_text_types_const_batch36():
-    src = inspect.getsource(mmod)
-    assert '_TEXT_TYPES = ("heading", "paragraph", "list_item", "table", "caption", "header", "footer")' in src
-
-
-def test_module_source_contains_pdf_bbox_const_batch36():
-    src = inspect.getsource(mmod)
-    assert '_PDF_BBOX_REQUIRED_TYPES = ("heading", "paragraph", "caption", "list_item")' in src
 
 
 def test_module_source_contains_not_evaluated_const_batch36():

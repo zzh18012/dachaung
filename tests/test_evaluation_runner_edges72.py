@@ -594,11 +594,6 @@ def test_source_contains_not_instrumented_batch47():
     assert "not_instrumented" in src
 
 
-def test_source_contains_image_output_dir_for_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "image_output_dir_for" in src
-
-
 def test_source_contains_figure_caption_prf_batch47():
     src = inspect.getsource(runner_mod)
     assert "figure_caption_prf" in src
@@ -696,12 +691,6 @@ def test_ast_run_evaluation_returns_dict_batch47():
     assert returns[0].value.id == "report"
 
 
-def test_ast_no_class_def_batch47():
-    tree = ast.parse(inspect.getsource(runner_mod))
-    for n in tree.body:
-        assert not isinstance(n, ast.ClassDef)
-
-
 def test_ast_module_docstring_present_batch47():
     tree = ast.parse(inspect.getsource(runner_mod))
     assert isinstance(tree.body[0], ast.Expr)
@@ -717,46 +706,6 @@ def test_ast_process_one_return_statements_batch47():
 
 
 # ---------- forbidden tokens 第一百零九批 ----------
-
-def test_source_no_eval_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "eval(" not in src
-
-
-def test_source_no_exec_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "exec(" not in src
-
-
-def test_source_no_compile_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "compile(" not in src
-
-
-def test_source_no_globals_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "globals(" not in src
-
-
-def test_source_no_locals_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "locals(" not in src
-
-
-def test_source_no_os_system_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "os.system(" not in src
-
-
-def test_source_no_yaml_load_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "yaml.load(" not in src
-
-
-def test_source_no_pickle_load_batch47():
-    src = inspect.getsource(runner_mod)
-    assert "pickle.load(" not in src
-
 
 def test_source_no_await_batch47():
     src = inspect.getsource(runner_mod)

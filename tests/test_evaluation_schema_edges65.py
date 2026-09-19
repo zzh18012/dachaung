@@ -365,21 +365,6 @@ def test_schemas_dir_only_json_files_batch51():
 
 # ---------- 模块源码补强 ----------
 
-def test_source_contains_path_import_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "from pathlib import Path" in src
-
-
-def test_source_contains_any_import_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "from typing import Any" in src
-
-
-def test_source_imports_draft202012_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "from jsonschema import Draft202012Validator" in src
-
-
 def test_source_contains_schemas_dir_definition_batch51():
     src = inspect.getsource(schema_mod)
     assert "SCHEMAS_DIR = Path(__file__).resolve().parent.parent / \"schemas\"" in src
@@ -388,11 +373,6 @@ def test_source_contains_schemas_dir_definition_batch51():
 def test_source_contains_super_init_message_batch51():
     src = inspect.getsource(schema_mod)
     assert "super().__init__(message)" in src
-
-
-def test_source_contains_self_errors_assign_batch51():
-    src = inspect.getsource(schema_mod)
-    assert "self.errors = errors or []" in src
 
 
 def test_source_contains_with_open_batch51():
@@ -431,12 +411,6 @@ def test_ast_has_6_imports_batch51():
     tree = ast.parse(inspect.getsource(schema_mod))
     imports = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
     assert len(imports) == 6
-
-
-def test_ast_module_docstring_batch51():
-    tree = ast.parse(inspect.getsource(schema_mod))
-    assert isinstance(tree.body[0], ast.Expr)
-    assert isinstance(tree.body[0].value, ast.Constant)
 
 
 def test_ast_schemas_dir_target_name_batch51():

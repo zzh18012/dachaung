@@ -169,17 +169,6 @@ def test_run_evaluation_signature_param_count_4():
     assert len(sig.parameters) == 5
 
 
-def test_run_evaluation_signature_param_names():
-    sig = inspect.signature(run_evaluation)
-    assert list(sig.parameters.keys()) == [
-        "manifest",
-        "output_path",
-        "parser_name",
-        "max_chars",
-        "tolerance_chars",
-    ]
-
-
 def test_run_evaluation_manifest_no_default():
     sig = inspect.signature(run_evaluation)
     assert sig.parameters["manifest"].default is inspect.Parameter.empty
@@ -223,60 +212,14 @@ def test_run_evaluation_output_path_is_positional_or_keyword():
     assert sig.parameters["output_path"].kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
 
 
-def test_run_evaluation_no_var_args():
-    sig = inspect.signature(run_evaluation)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_POSITIONAL
-
-
-def test_run_evaluation_no_var_kwargs():
-    sig = inspect.signature(run_evaluation)
-    for p in sig.parameters.values():
-        assert p.kind != inspect.Parameter.VAR_KEYWORD
-
-
 # =========================================================================
 # helper metadata
 # =========================================================================
 
 
-def test_run_evaluation_module_identity():
-    assert run_evaluation.__module__ == "evaluation.runner"
-
-
 # =========================================================================
 # 模块 namespace 完整性
 # =========================================================================
-
-
-def test_module_namespace_has_json():
-    import evaluation.runner as m
-
-    assert hasattr(m, "json")
-
-
-def test_module_namespace_has_time():
-    import evaluation.runner as m
-
-    assert hasattr(m, "time")
-
-
-def test_module_namespace_has_path():
-    import evaluation.runner as m
-
-    assert hasattr(m, "Path")
-
-
-def test_module_namespace_has_any():
-    import evaluation.runner as m
-
-    assert hasattr(m, "Any")
-
-
-def test_module_namespace_has_compute_automatic_metrics():
-    import evaluation.runner as m
-
-    assert hasattr(m, "compute_automatic_metrics")
 
 
 def test_module_all_is_list():

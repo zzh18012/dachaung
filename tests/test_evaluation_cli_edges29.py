@@ -351,21 +351,6 @@ def test_format_metric_source_uses_get_method():
     assert ".get(" in src
 
 
-def test_format_metric_source_uses_isinstance_bool():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, bool)" in src
-
-
-def test_format_metric_source_uses_isinstance_float():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, float)" in src
-
-
-def test_format_metric_source_uses_isinstance_dict():
-    src = inspect.getsource(_format_metric)
-    assert "isinstance(value, dict)" in src
-
-
 def test_format_metric_source_uses_str_lower_for_bool():
     src = inspect.getsource(_format_metric)
     assert "str(value).lower()" in src
@@ -441,11 +426,6 @@ def test_run_inspect_doc_source_imports_chunk_boundary_prf():
     src = inspect.getsource(_run_inspect_doc)
     assert "chunk_boundary_prf" in src
     assert "from evaluation.annotation_metrics" in src
-
-
-def test_run_inspect_doc_source_imports_figure_caption_prf():
-    src = inspect.getsource(_run_inspect_doc)
-    assert "figure_caption_prf" in src
 
 
 def test_run_inspect_doc_source_imports_compute_automatic_metrics():
@@ -779,11 +759,6 @@ def test_module_source_imports_validate_file():
     assert "validate_file" in src
 
 
-def test_module_source_has_sys_stdout_reconfigure():
-    src = inspect.getsource(cli_mod)
-    assert 'sys.stdout.reconfigure' in src
-
-
 def test_module_source_has_hasattr_check():
     src = inspect.getsource(cli_mod)
     assert 'hasattr(sys.stdout, "reconfigure")' in src
@@ -811,11 +786,6 @@ def test_module_source_no_class_definition():
     lines = [l for l in src.splitlines() if not l.strip().startswith(("#", '"', "'"))]
     body = "\n".join(lines)
     assert "\nclass " not in body
-
-
-def test_module_source_docstring_mentions_validate_report():
-    src = inspect.getsource(cli_mod)
-    assert "validate-report" in src
 
 
 def test_module_source_docstring_mentions_inspect_doc():
@@ -1019,10 +989,6 @@ def test_module_no_class_definition():
 def test_module_has_main_block():
     src = inspect.getsource(cli_mod)
     assert 'if __name__ == "__main__":' in src
-
-
-def test_module_namespace_main_callable():
-    assert callable(cli_mod.main)
 
 
 def test_module_namespace_build_parser_callable():

@@ -688,11 +688,6 @@ def test_module_source_contains_aggregate_summary_import_batch43():
     assert "aggregate_summary" in src
 
 
-def test_module_source_contains_build_provenance_import_batch43():
-    src = inspect.getsource(rmod)
-    assert "build_provenance" in src
-
-
 def test_module_source_contains_load_annotation_function_batch43():
     src = inspect.getsource(rmod)
     assert "def _load_annotation(" in src

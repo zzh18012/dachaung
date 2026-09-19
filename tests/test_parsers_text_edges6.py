@@ -45,10 +45,6 @@ def _write(tmp_path: Path, name: str, content: str) -> Path:
 # =========================================================================
 
 
-def test_text_extensions_exact():
-    assert _TEXT_EXTENSIONS == (".txt", ".text")
-
-
 def test_text_extensions_is_tuple():
     assert isinstance(_TEXT_EXTENSIONS, tuple)
 
@@ -179,10 +175,6 @@ def test_split_paragraphs_whitespace_only_lines_ignored():
 
 def test_split_paragraphs_only_whitespace_returns_empty():
     assert _split_paragraphs("   \n\t\n   ") == []
-
-
-def test_split_paragraphs_only_newlines_returns_empty():
-    assert _split_paragraphs("\n\n\n") == []
 
 
 def test_split_paragraphs_consecutive_non_blank_lines_kept_together():

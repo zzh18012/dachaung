@@ -30,13 +30,6 @@ from evaluation.runner import _load_annotation, _process_one, run_evaluation
 # ---------- _load_annotation 第二十九批 ----------
 
 
-def test_load_annotation_returns_string_batch29(tmp_path):
-    p = tmp_path / "a.json"
-    p.write_text('"hello"', encoding="utf-8")
-    result = _load_annotation(p)
-    assert result == "hello"
-
-
 def test_load_annotation_dict_with_nested_dict_batch29(tmp_path):
     p = tmp_path / "a.json"
     p.write_text('{"a": {"b": {"c": 1}}}', encoding="utf-8")
@@ -348,11 +341,6 @@ def test_run_evaluation_no_documents_batch29(tmp_path):
 # ---------- module source forbidden tokens 第四十七批 ----------
 
 
-def test_module_source_no_subprocess_batch29():
-    src = inspect.getsource(rmod)
-    assert "subprocess" not in src
-
-
 def test_module_source_no_os_system_batch29():
     src = inspect.getsource(rmod)
     assert "os.system" not in src
@@ -519,11 +507,6 @@ def test_module_no_class_definitions_batch29():
 def test_module_no_main_block_batch29():
     src = inspect.getsource(rmod)
     assert 'if __name__ == "__main__"' not in src
-
-
-def test_module_all_contains_run_evaluation_batch29():
-    src = inspect.getsource(rmod)
-    assert '"run_evaluation"' in src
 
 
 # ---------- 端到端集成第四十三批 ----------

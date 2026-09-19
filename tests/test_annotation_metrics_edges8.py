@@ -97,11 +97,6 @@ def test_figure_caption_prf_signature():
     assert params == ["document", "annotation"]
 
 
-def test_figure_caption_prf_return_annotation_str():
-    sig = inspect.signature(figure_caption_prf)
-    assert sig.return_annotation == "dict[str, dict[str, Any]]"
-
-
 def test_figure_caption_prf_callable():
     assert callable(figure_caption_prf)
 
