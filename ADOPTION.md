@@ -7140,3 +7140,40 @@ timeout，简报降级用 collect-only 锚 + 分批定向回归证据并显式�
 
 执行分派：自跑线 R2064 起（≤5 首批，4-file 优先）；裁定原文
 随 reply 文件供 agent 直读。
+
+## §一百四十三（2026-09-20）r58：R2064/65 追认（G03 收官维持）+ Stage-10-Batch-1-C2 指定（DOCX 表单域 heading 假阳性）+ push 授权边界钉死
+
+来源：用户中转 r58 裁决（outputs/gpt_brief_autotrack_r58_reply.txt，
+对 r58 简报〔R2064 首批回执 + adoption push 回执 + Stage 10 批次
+指定请求〕的回复）。
+
+**① Stage 10 下一批 = C2 授权**（real-02 DOCX 表单域标签误判
+heading，BACKLOG §2）。固定参数：分支
+`integration/stage10-batch1-docx-form-heading`，基点 34ab70a；范围
+仅限 DOCX 表单域/表单控件导致的 heading 假阳性；优先"负向语义
+信号"局部抑制而非重写 heading 算法；合成夹具至少覆盖"表单标签
+不得判 heading"+"正常 heading 不受影响"；real-02 仅按既有授权
+只读验证、不把真实样本内容硬编码进测试；不顺手处理 PDF/
+frontmatter/plugin timeout 等 backlog 项；若修复需显著改写通用
+heading 打分框架则停在设计/证据阶段不扩大批次。验收增量：单独
+记录"heading 总量/误判数变化"，防修掉表单误判同时压低正常标题
+召回。C3 继续后置（待独立设计轮）；C5 后续低风险补强批次。
+
+**② R2064 追认 + R2065 自动续批确认**：R2064 证据满足 r57（完整
+团原子/仅 4-file 层/1956<2000/collect 精确/扩大回归并集/三熔断
+未触发）；R2065（已于 2026-09-19 执行完毕，402 团/1608 当量，
+锚 92365 精确，eligible=0）与本裁决一致闭环——**G03 ≤5 约束层
+正式收官维持，不外推 ≤6/≤7**；190 条 parametrize deferred 原状。
+
+**③ push 授权边界钉死**：2026-09-18 网络中断不影响当时授权，但
+边界 = 已授权的 25 commits / tip 8b4a529；实际重试 push 恰为该批
+（4c77631..8b4a529）合规。**此后 adoption 分支新增 commit（含本
+条台账）不默认纳入旧授权，随下次实质 push 申请逐笔列明。**
+
+**④ 时间戳澄清**：本方台账/简报日期均为 Asia/Shanghai（UTC+8）
+本地执行日期；r58 简报标 2026-09-18 为实际执行日（GPT 会话时区
+America/Los_Angeles 显示 09-17 属时区差，非提前标注；先例：§139
+日期校准）。台账不回改。
+
+执行分派：C2 批次于 dachuang-stage10 worktree 即日启动；首报随
+P13' push 申请（实现 commit + 台账搭车）。
