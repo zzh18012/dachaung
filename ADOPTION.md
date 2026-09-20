@@ -7348,3 +7348,75 @@ docs/stage10-batch8-page-furniture-design.md（分支内）；BACKLOG §2a
 完全同形，无低误伤通用信号，建议划出范围；推荐架构 = _parse_pdf
 文档级后置过滤（_classify_pdf_paragraph 接口与通用框架零改动，不
 触发 r61 架构门槛停链条款）。实现授权与否随 r62 简报裁决。
+
+## §一百四十七（2026-09-20）r62：批次 8 设计追认 + Batch 9（页面家具后置过滤）实现授权 + P15' A/B 执行回执 + Stage-10-Batch-8-Closed
+
+来源：用户中转 r62 裁决（outputs/gpt_brief_batch26_r62_reply.txt，
+对 r62 简报〔批次 8 设计/证据轮报告 + P15' push 申请〕的回复）。
+
+**① 批次 8 设计结论追认**：2.1–2.4 主要结论全部追认——A/C 类可由
+底带结构信号分离；B 类封面日期现有信息面不可分；纯文本局部规则
+不足；_classify_pdf_paragraph 不扩签；采用 _parse_pdf 文档级后置
+过滤优于改通用 heading 框架；本轮不引入字体/字号采集、不改
+extract_words 生产调用。批次 8 设计目标视为完成。
+
+**② Batch 9 实现授权：批准路 1，限定 D1 ∪ D2**（分支
+integration/stage10-batch9-pdf-page-furniture-impl，基点严格
+940c665；**授权不含 Batch 9 push 权**）：
+- **D1 底带页码**：仅对已判 heading 候选生效；bbox 下边缘 / 页高
+  ≥ 0.93 且全文本匹配通用 Page+数字 形态（可做大小写/首尾空白等
+  无语义 normalization）；**不得要求显示页码==物理页码**；不扩展
+  到裸数字/日期/罗马数字/文件名等其他模式；
+- **D2 底带跨页重复**：同样仅处理已判 heading 且 ≥93% 底带候选；
+  重复定义钉死 = 在 ≥2 个不同物理页出现 + **两个实例自身都必须在
+  该底带** + normalization 仅允许保守的首尾空白清理与连续空白折叠；
+  **禁止**数字掩码/标点删除/模糊匹配/编辑距离/token 相似度/模板
+  正则推断（本批 D2 是"底带 heading 的近乎逐字跨页重复"，不是
+  通用模板检测器——比简报原始表述更窄，防实现阶段泛化）；
+- **实现结构约束**：允许 fallback_parser.py 内私有 helper/临时
+  文档级聚合状态；不改 _classify_pdf_paragraph 公开/既有调用签名；
+  不改通用 short_line heading 规则；不改 DOCX 路径；不新增公共
+  文档模型字段/API 契约；不改文本/locator/bbox/page/元素顺序；
+  命中仅 heading 改 paragraph + metadata.heading_suppressed=
+  page_furniture_* 可审计原因；批次 6 form_label_* 语义不变；
+  **停链条款**：实现若须把跨页状态传入通用 classifier/修改公共
+  模型/改元素生成顺序 → 立即停链报裁。
+
+**③ B 类封面日期划出范围批准**：该 ×1 日期保留 heading 列 known
+residual；禁止裸日期规则/月份词典/年份范围/封面特判/字号特判/
+real-02 内容特判。验收目标不是"家具 FP 清零"，是安全消除结构可
+识别的 A+C 共 14 条。
+
+**④ 93% + bottom-band-only v1 批准（冻结）**：工程阈值非全局语义
+定义；按 bbox bottom / physical page height ≥ 0.93 计算；**不得据
+real-02 结果调成 92%/90%/95% 追数字**，未来跨语料证据另批报裁；
+页首 running header 不进 v1。
+
+**⑤ F1–F4 夹具矩阵批准 + 两项实现级守护**：D2 重复实例自身均须
+在底带（同一文本"一处底带、一处页中"不得仅因跨页重复压掉页中
+heading）；D2 normalization 不越 whitespace-only 边界（加近似但
+不完全相同文本组，证明数字变化/标点差异不被错误合并）。
+
+**real-02 验收预期钉死**：PDF heading 30→16、抑制 14（A12+C2）、
+B 日期残留 1、DOCX 镜像合法 10/10 保持、原表单标签残留 3 保持、
+语义合法但镜像差异 2 保持；**若实际构成不一致，不得继续加规则修
+到 16，先分析并报裁**。
+
+**⑥ P15' A 执行回执**：远端新分支
+integration/stage10-batch8-pdf-page-furniture-design 已创建并推送
+至 **940c665**（非 force）。推送前核验 940c665^ = cae6ef5 精确、
+rev-list cae6ef5..940c665 恰 1 commit；推送后 ls-remote 核对
+940c665 精确一致。
+
+**⑦ P15' B 执行回执**：integration/stage9-batch26-corpus-annotation
+纯 FF 更新 **c03e346..942aadc**，新增集合恰 {ce4c882, 942aadc}
+（恰 2，rev-list 逐一核对），ls-remote 核对 942aadc 精确一致。
+推送跨一次 GitHub 443 中断窗口（09-20，同日第二窗），恢复后一次
+成功，全程无 force/merge/rebase。
+
+**⑧ Stage-10-Batch-8-Closed**：P15' A/B 两项核验条件精确满足，
+批次 8 自动关闭生效；按 r49 纯确认不另开裁决轮。
+
+**⑨ 边界**：本条（§147）在 942aadc 之后新增，不在 P15' B 授权
+集合内（裁决明示不得混入 r62 裁决登记），按钉死规则排队待下次
+授权；Batch 9 实施提交同样无自动 push 权。
