@@ -421,14 +421,52 @@ def _lines_to_para(lines: list[list[dict]]) -> dict[str, Any]:
     return {"text": text, "bbox": bbox}
 
 
+# ---------- PDF 表单域标签负向语义信号（Stage 10 批次 6 / C2，r59） ----------
+# 仅对 short_line heading 候选做局部抑制，不改通用打分框架；命中的行
+# 归 paragraph，metadata.heading_suppressed 记信号名。页面家具类
+# （页码/封面日期/宣传语）不得被这些信号命中（r59 ③，回归守护见
+# tests/test_pdf_form_heading_suppression.py）。
+_FORM_LABEL_TOKEN_MAX = 4  # 短冒号标签的 token 上限；5 token 冒号结尾行
+# （如 "This report was prepared by:" 句式）仍判 heading
+_FORM_INSTRUCTION_RE = re.compile(
+    r"\([^()]*\b(?:please|tick)\b[^()]*\)", re.IGNORECASE
+)
+_FORM_OPTION_SUFFIX_RE = re.compile(r"\byes\s+no\s+n/a$", re.IGNORECASE)
+
+
+def _form_label_signal(t: str) -> str | None:
+    """表单域标签负向语义信号；命中返回信号名，否则 None。
+
+    四类局部信号：多冒号标签簇 / 短冒号结尾名词标签 / 括注填写指令 /
+    选项行尾（Yes No N/A）。冒号半角/全角均计。
+    """
+    if t.count(":") + t.count("：") >= 2:
+        return "form_label_multi_colon"
+    tokens = t.split()
+    if tokens and t.endswith((":", "：")) and len(tokens) <= _FORM_LABEL_TOKEN_MAX:
+        return "form_label_short_colon"
+    if _FORM_INSTRUCTION_RE.search(t):
+        return "form_label_instruction"
+    if _FORM_OPTION_SUFFIX_RE.search(t):
+        return "form_label_option_suffix"
+    return None
+
+
 def _classify_pdf_paragraph(text: str) -> tuple[str, dict[str, Any]]:
-    """PDF 段落启发式分类：caption > heading > paragraph。"""
+    """PDF 段落启发式分类：caption > heading > paragraph。
+
+    short_line heading 候选先过表单域标签负向语义信号（Stage 10 批次
+    6，r59）：命中 → paragraph + heading_suppressed 信号名。
+    """
     t = text.strip()
     if not t:
         return "paragraph", {}
     if _is_caption(t):
         return "caption", {"heuristic": "caption_regex"}
     if len(t) <= 80 and not t.endswith(("。", ".", "!", "?", "！", "？")):
+        signal = _form_label_signal(t)
+        if signal is not None:
+            return "paragraph", {"heading_suppressed": signal}
         return "heading", {"level": 0, "heuristic": "short_line"}
     return "paragraph", {}
 

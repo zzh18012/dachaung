@@ -15,7 +15,43 @@
 - 影响文档：real-02 PDF 侧，devset 1/10
 - 现象：表单域标签（空表格单元格旁的短标签行）被误判为 heading，heading 计数 +246%
 - 根因方向：表单页缺少"表单域标签"语义信号，短行+无正文字体特征的启发式误触发
-- 状态：backlog（Stage 8 不动）
+- 状态：**已处理（Stage 10 批次 6，2026-09-20，r59 授权；范围经 r59 偏差
+  重裁自 DOCX 改判 PDF 侧，见 ADOPTION §144）**——`_classify_pdf_paragraph`
+  的 short_line heading 候选先过 `_form_label_signal` 局部负向语义信号
+  （多冒号标签簇 / ≤4 token 冒号结尾短标签 / 括注 please/tick 填写指令 /
+  'Yes No N/A' 选项行尾；半角/全角冒号均计），命中 → paragraph +
+  `metadata.heading_suppressed` 信号名；通用框架/全局阈值/DOCX 路径零改动
+- real-02 PDF 验收（只读对照）：heading 45→30，表单标签 FP 18→3，
+  DOCX 合法标题镜像匹配 10→10 零损失；页面家具 15 条全部保留（r59 ③）
+- 已知残留（3 条，局部信号安全边界内不追，列已知限制）：纯选项行
+  （'Consigner Carrier Consignee' 一类：无冒号/括注/行尾信号，与合法
+  短标题不可局部区分）；>4 token 冒号结尾标签（token 上限为保
+  'This report was prepared by:' 一类 5 token 句式 heading 不受损）；
+  含 (CEO equivalent) 类括注但无 please/tick 的长标签行
+- 测试：tests/test_pdf_form_heading_suppression.py（30 个：表单标签
+  抑制 12 + 正常 heading 不受影响 7 + 家具守护 3 + 既有行为不变 +
+  手写最小 PDF 端到端 + 管线 schema；全合成夹具，零真实语料）
+
+## 2a. real-02 PDF 页面家具类 heading 假阳性（r59 ③ 另立，未立项）
+
+- 现象：PDF 侧页脚页码（'Page 01'–'Page 12'）、封面日期、宣传语等
+  页面家具短行被 short_line 启发式判为 heading，real-02 PDF 共 15 条
+- 与 §2 表单标签类属**不同负向语义类别**（r59 ③ 明确排除出批次 6）：
+  即使共享 short_line 触发路径，也不得经表单标签规则顺带压制；
+  tests/test_pdf_form_heading_suppression.py Group C 为其回归守护
+  （三条家具形态合成行必须仍判 heading）
+- 根因方向：页脚/封面文字缺少位置（页底边距带/页眉页脚区）与模板
+  重复性（同文式跨页复现）信号
+- 状态：已确认独立 heading FP / 已知限制（2026-09-20 批次 6 取证并
+  验收核验 15 条仍在），后续候选待裁
+
+## 2b. DOCX 空段落被赋 heading 样式（r59 ⑥，已知现象，不动）
+
+- 现象：real-02 DOCX 2 个空段落自身被文档赋予 heading 样式，样式驱动
+  解析如实产出空内容 heading 元素（content 为既有"(空段落)"占位）
+- 性质：源文档样式赋值现象，非解析缺陷；r59 ⑥ 明确不进入批次 6，
+  实现保持不动
+- 状态：独立已知现象（2026-09-20 取证）
 
 ## 3. 候选 D：001-PDF 跨页表格拆分
 

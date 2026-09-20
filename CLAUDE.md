@@ -141,6 +141,14 @@
 - 测试：tests/test_plugin_path_loading.py（27 个：绝对/相对/cwd 裸名/反斜杠成功、not_found/invalid×3、语法错误/注册冲突沿用既有码、同 stem 冲突、stdlib shadow、双拼写幂等、重复 spec 首增量、sys.path 恢复（成功+三类失败）、dotted 边界锁定、provenance 冻结、CLI parse/auto/list/inspect/explain、批量 fail-fast/顺序/并行 spawn 重放 JSONL、混合 fail-fast；全合成夹具）；附带卫生修复：tests/test_plugin_loader.py 的 plugin_env fixture 补 `_capabilities` 副本隔离（此前插件能力快照泄漏到后续套件）
 - 范围披露：serve 入口在 Stage 11 分支谱系（eba2fae，共享 load_plugins 库代码），本分支无法覆盖 serve 专属测试；两谱系合流时路径支持经共享 loader 自动到达 serve，届时补 serve 侧断言
 
+## PDF 表单域标签 heading 抑制（Stage 10 批次 6）
+
+- BACKLOG §2 处理（r59 授权；范围经偏差重裁 DOCX→PDF，ADOPTION §144）：`_classify_pdf_paragraph`（app/parsers/fallback_parser.py）的 short_line heading 候选先过 `_form_label_signal` 局部负向语义信号，命中 → `paragraph` + `metadata.heading_suppressed=<信号名>`；caption 优先级、heading 的长度/句末门条件、DOCX 样式路径全部零变化（不重写通用打分框架、不动全局阈值）
+- 四类信号（顺序短路）：`form_label_multi_colon`（≥2 冒号，半/全角均计）；`form_label_short_colon`（行尾冒号 且 ≤4 token——上限 4 为保 5 token 句式冒号结尾行如 "This report was prepared by:" 仍判 heading）；`form_label_instruction`（括注含 please/tick，大小写不敏感）；`form_label_option_suffix`（行尾 'Yes No N/A'）
+- 页面家具类（页码/封面日期/宣传语）**不在信号面内**（r59 ③）：BACKLOG §2a 另立为独立已知 FP，测试 Group C 守护其仍判 heading（不得被表单标签规则顺带压掉）
+- real-02 验收（只读、不硬编码）：PDF heading 45→30、表单标签 FP 18→3（残留 3 条 = BACKLOG §2 已知残留）、DOCX 合法标题镜像匹配 10→10 零损失、家具 15 条全在
+- 测试：tests/test_pdf_form_heading_suppression.py（30 个，全合成夹具：抑制 12 / 正常 heading 不受影响 7 / 家具守护 3 / 既有行为不变 / 手写最小 PDF 端到端 + 管线 schema）
+
 ## 容器交付与可复现构建（Stage 8 批次 25）
 
 - **制品交付 ≠ 部署**：CI artifact（tar.gz + .sha256 边车）是交付物；加载并经 `container_verify --artifact` 验证通过才构成已验证部署（runbook 见 README §3.6）
