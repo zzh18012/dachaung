@@ -7503,3 +7503,21 @@ structural_index paragraph_index=0/1，与此前 C2 证据一致）；批次 9
 **⑥ 边界**：本条（§148）在 d757873 之后新增，不在 P16' B 授权
 集合内，按钉死规则排队待下次授权；Batch 10 提交同样无自动
 push 权。
+
+**§148 执行情况补记（2026-09-20，commit d91d3dd）**：Batch 10
+设计/证据轮当日完成（分支 integration/stage10-batch10-borderless-
+table-design @ f02f49a + d91d3dd，恰 1 commit，**零生产代码改动**，
+全量回归 5617 passed 与批次 9 基线逐项一致）。产出：取证件
+outputs/c3a_borderless_table_shadow_analysis.txt（15 真表对账 +
+丢失层定位 + 失败三分类 + pdfplumber text 策略全页误报实证 +
+原型 6 合成夹具与 real-02 全文档审计 + 两方案证伪）；设计文档
+docs/stage10-batch10-borderless-table-design.md（分支内）；BACKLOG
+§3a 状态更新。核心结论：丢失 5 + 结构性不可见 1（空 1×1）；F-A
+KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
+14 页中 13 页整页误报；原型实验证伪两方案（稀疏真表与两行负例
+同参数轴不可兼得；编号列表/双栏正文与双列表几何同构、分离只能
+靠文本语义 = r63 禁止）；可靠实现须并行 word 通路 + 元素去重
+替换 = 新全局 table reconstruction framework 且与 §1 耦合 →
+停链命中，只报设计结论。处置（维持挂起或 KV-GAP 子类单独授权）
+随 r64 简报裁决。首报随 r64 简报（含 P17' push 申请：批次 10
+分支 d91d3dd + 本台账 {d9bc17a, <本补记 commit>}）。
