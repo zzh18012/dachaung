@@ -121,6 +121,18 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2067 — 1b/f 增量：main 侧模块级测试引用映射（第九审计维度；运行时代码引用全覆盖闭合 + scripts/ 舰队 18/19 零测试引用盘点，纯分析零测试改动）
+
+- 任务：R2066 建议 f/b 常规项轮换，选 1b/f 增量角度（非重扫——main-target 基线 @6c6d398 未变）。新开**第九审计维度**：main 源码模块 → tests/ 引用映射，三口径 = AST import（`import app.x` / `from app.x import y` / `from app import x` 子模块展开）+ dotted 字符串引用（monkeypatch.setattr 目标等）+ CLI 通道子串（app.cli / evaluation.cli / container_verify），回答"哪些 main 模块没有任何测试直接引用"，为后续 1b/b/a 投向提供系统化路由依据。main `6c6d398ca9c91b5b1f297e889301e776b261bfb2` 只读（扫描器内置 rev-parse + status 前后核验均 clean；本轮未在 main 跑任何 pytest/CLI 子进程——纯文件读取 + AST，零写入边界最严格形态）。
+- 扫描器与产物（均未入库，outputs/autonomous/）：`main_modmap_r2067.py`（stdlib AST，sha256 ffa6025b…0c18f9）+ `main_modmap_r2067.json`（sort_keys/ensure_ascii=False，bb1ec3cd…e8ffaf）+ `main_modmap_r2067.out`（561d4dae…dac51）。范围：app/ + evaluation/ + scripts/ 两层级 **52 源码模块 × tests/ 133 文件**，test 侧 0 parse 错误。
+- **结论 ①（运行时代码引用全覆盖闭合）**：app/ + evaluation/ 运行时模块**全部有直接测试引用**，唯一例外 `evaluation.schema_validation` 经人工核验为 15 行 lazy-import 垫片（单函数 `document_passes_schema`，被 evaluation/metrics.py:91 函数内延迟 import 消费 → 间接覆盖成立；`app.parsers.plugins` 包 init 为空文件，两者均非缺陷非候选）。thin（恰 1 直接引用者）4 模块：app.jsonlog（另有 batch-parse 日志通道间接）/ app.parsers.table_linearize / app.source_types / evaluation.cli——与 R2047 faces-closed 矩阵互证：R2046"b 队列 main 面临界耗尽"判定在模块映射维度获得独立结构证据。CLI 通道计数：app.cli 14 测试文件 / evaluation.cli 1 / container_verify 4。
+- **结论 ②（scripts/ 舰队盘点 → 指示线候选，不自跑线实施）**：除 container_verify（4 测试文件含 e2e）外 19 个脚本中 **18 个零测试引用**（dotted + 路径形态全名子串双口径复核；唯一修正：benchmark_stage8_closure 实为 tests/test_stage8_closure.py 以**路径形态**引用——扫描器 dotted 正则漏配路径形态，经补充全名 grep 修正，局限如实记录）；docs/.github/README/CLAUDE.md 引用仅 2（holdout_table_caption_first_run←docs/BACKLOG.md、verify_batch17_log_completeness←README §3.6），其余 **16 个全仓零引用**（verify_batchN_attribution ×9 批次 6–17 历史证据脚本、holdout/generate 夹具生成器 ×6、compare_batch13_smoke）→ **指示线候选：scripts/ 存档/治理裁决**（历史证据脚本 vs 活性 runbook 脚本分层，或补 docs 索引）；holdout 系脚本涉私有 gold 域（自跑线禁读约束维持，本轮仅记文件名元数据未读内容）。
+- 与既有维度正交性：R1906 重复组 / R1907 运行时+归属+无断言 / R1915 flaky / R1917 全局状态 / R1918 断言强度 / R2045 私路径 / R2049 函数级收集对账——模块×测试引用方向此前未做；R2042 盘点件与 R2047 基准件均不含此切面（已复核）。
+- 计数影响：0（纯分析轮；收官锚 92365 不变，自跑 tests/ 零变化，无预测锚漂移）。
+- 下次建议：R2068 维持 f/b 常规项轮换至 09-28 窗口——① 09-28 周期简报轮按 R57-② 执行一次性 ≤60 分钟全量实跑（固定 HEAD、单次、禁自动重试，直接引用 R2066 投影与本轮映射结论）；② main 前进（≠6c6d398）触发 R2047 重探优先；③ 若需轻量轮：thin 模块间接通道密度核验（低价值可跳）或回读 R2042 盘点件候选池核对状态。G03/G04/G05 冻结维持；R2066 记录的 6 文件 SyntaxWarning 维持指示线候选不自跑线修。
+
+---
+
 ## Round 2066 — f/e 队列轻量健康轮（零删除、零测试改动）：收官锚 92365 稳定性复核精确命中 + tests/ 语料健康扫描全绿（零死文件残留/零重名/零 parse 失败）+ 09-28 全量实跑投影更新（完成概率高 >90%）
 
 - 性质：G03 收官（R2065）后至 2026-09-28 简报窗口之间的常规健康轮；f/e 队列（本 commit 仅 STATE.md，tests/ 零变化，outputs/autonomous/ 材料不入库）。main HEAD 检查：`6c6d398` **未前进** ✓（R2047 重探策略不触发）。
