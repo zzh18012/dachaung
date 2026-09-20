@@ -155,6 +155,14 @@
 - 确定性机制：monkeypatch `app.batch.PLUGIN_INIT_REPORT_TIMEOUT`（父进程运行时读全局；默认 120.0 由守护测试钉死；子进程不消费该值）+ sentinel 门控插件（hang_on.txt 落盘前父进程导入成功、落盘后 worker 重放导入 `time.sleep(30)` 挂起）——父进程补丁超时（1.0s）确定性先到，worker sleep 随池 terminate 被杀，无真实长等待
 - 契约断言：rc 1 + errors[0]{code=plugin_init_report_timeout, plugin, error_type=Empty, message 含固定上限补丁值}；JSONL plugin_load_failed{expected_workers, received_reports=0}；零 file_complete/batch_complete（批次 19 契约：回报收取先于文件派发）；无 summary；结构化 JSON 无 traceback
 
+## PDF 页面家具 heading 后置过滤（Stage 10 批次 9）
+
+- BACKLOG §2a 处理（r62 授权，批次 8 设计轮结论落地）：`_parse_pdf` 文档级后置过滤 `_suppress_page_furniture_headings`（app/parsers/fallback_parser.py，私有 helper + 页高聚合 `page_heights`），在跨页表格合并后、relation 匹配前执行；`_classify_pdf_paragraph` 接口/short_line 规则/DOCX 路径/公共模型字段/元素顺序与批次 6 form_label 语义零改动（停链条款：不得把跨页状态传入通用 classifier）
+- 仅对**已判 heading** 且位于**底带**（bbox 下边缘/物理页高 ≥ 0.93，r62④ 冻结工程阈值，禁调）的候选生效：**D1** `page_furniture_page_number` = 全文本匹配通用 Page+数字（大小写不敏感；不要求显示页码==物理页；不扩展裸数字/日期/罗马数字/文件名）；**D2** `page_furniture_band_repeat` = 规范化文本（仅首尾空白清理+连续空白折叠，大小写敏感；禁数字掩码/标点删除/模糊匹配）在 ≥2 个不同物理页的底带逐字出现（两实例自身均须在底带，页中重复不参与聚合）；命中 heading→paragraph + `metadata.heading_suppressed=page_furniture_*`，其余字段（文本/locator/bbox/页号/id/置信度）不动
+- 页首 running header 不进 v1；B 类封面日期划出范围列已知限制（r62③：禁裸日期规则/月份词典/年份范围/封面特判/字号特判/real-02 内容特判）
+- real-02 只读验收（构成精确命中 r62⑤ 钉死预期）：PDF heading 30→16，抑制 14（A 页码 12 走 D1 + C 宣传语 2 走 D2），B 日期残留 1 + 批次 6 表单残留 3 + 镜像合法 10 + 语义合法 2 全保持，DOCX 镜像 10/10
+- 测试：tests/test_pdf_page_furniture_suppression.py（19 个全合成：F1 抑制 3 / F2 存活 5 / F3 阈值 2（93.0% 抑制 vs 92.9% 存活，标定 bbox[3]=792−y+2.07）/ r62⑤ 守护 3（双实例均须底带 + 近似文本不合并 + 空白折叠正控制）/ 单元级 4 / F4 端到端 2）
+
 ## 容器交付与可复现构建（Stage 8 批次 25）
 
 - **制品交付 ≠ 部署**：CI artifact（tar.gz + .sha256 边车）是交付物；加载并经 `container_verify --artifact` 验证通过才构成已验证部署（runbook 见 README §3.6）

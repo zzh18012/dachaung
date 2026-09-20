@@ -756,6 +756,74 @@ def _apply_cross_page_merges(
     return [e for e in elements if e.element_id not in remove_ids]
 
 
+# ---------- PDF 页面家具 heading 后置过滤（Stage 10 批次 9，r62 授权）----------
+
+# r62④ 冻结的 v1 工程阈值：paragraph bbox 下边缘 / 物理页高 ≥ 0.93 判为底带
+_PAGE_FURNITURE_BAND_RATIO = 0.93
+# D1 底带页码形态：全文本匹配通用 Page + 数字（大小写不敏感；
+# 不要求显示页码 == 物理页，不扩展到裸数字/日期/罗马数字/文件名）
+_PAGE_FURNITURE_PAGE_NUMBER_RE = re.compile(r"page\s*\d+", re.IGNORECASE)
+
+
+def _band_heading_key(
+    element: Element, page_heights: dict[int, float]
+) -> tuple[str, int] | None:
+    """heading 元素若位于底带，返回 (规范化文本, 物理页号)；否则 None。
+
+    规范化仅做首尾空白清理 + 连续空白折叠（r62② D2 钉死的保守边界，
+    不做数字掩码/标点删除/模糊匹配）。bbox 缺失或页高未知时不在底带。
+    """
+    locator = element.source_locator or {}
+    page = locator.get("page")
+    bbox = locator.get("bbox")
+    if (
+        not isinstance(page, int)
+        or not isinstance(bbox, (list, tuple))
+        or len(bbox) != 4
+    ):
+        return None
+    height = page_heights.get(page)
+    if not height or bbox[3] / height < _PAGE_FURNITURE_BAND_RATIO:
+        return None
+    return " ".join((element.content or "").split()), page
+
+
+def _suppress_page_furniture_headings(
+    elements: list[Element], page_heights: dict[int, float]
+) -> list[Element]:
+    """文档级后置过滤：底带 heading 的页面家具抑制（D1 ∪ D2，就地改写）。
+
+    D1 = 底带 heading 全文本匹配 Page+数字 形态；
+    D2 = 底带 heading 的规范化文本在 ≥2 个不同物理页的底带出现
+    （两个实例自身均须在底带，页中重复不参与聚合）。
+    命中 → type 改 paragraph + metadata.heading_suppressed=page_furniture_*；
+    文本/locator/bbox/页号/element_id/顺序/置信度与批次 6 form_label_* 语义不动。
+    """
+    band_pages_by_text: dict[str, set[int]] = {}
+    for el in elements:
+        if el.type != "heading":
+            continue
+        key = _band_heading_key(el, page_heights)
+        if key is not None:
+            band_pages_by_text.setdefault(key[0], set()).add(key[1])
+    for el in elements:
+        if el.type != "heading":
+            continue
+        key = _band_heading_key(el, page_heights)
+        if key is None:
+            continue
+        norm_text, _page = key
+        if _PAGE_FURNITURE_PAGE_NUMBER_RE.fullmatch(norm_text):
+            reason = "page_furniture_page_number"
+        elif len(band_pages_by_text.get(norm_text, ())) >= 2:
+            reason = "page_furniture_band_repeat"
+        else:
+            continue
+        el.type = "paragraph"
+        el.metadata["heading_suppressed"] = reason
+    return elements
+
+
 def _parse_pdf(
     path: Path,
     source_hash: str,
@@ -771,9 +839,11 @@ def _parse_pdf(
     warnings: list[WarningRecord] = []
     image_counter = 0
     pdf_table_records: list[dict] = []  # 跨页合并分析输入（Stage 10 批次 4）
+    page_heights: dict[int, float] = {}  # 底带判定输入（Stage 10 批次 9）
     try:
         with pdfplumber.open(str(path)) as pdf:
             for page_idx, page in enumerate(pdf.pages, start=1):
+                page_heights[page_idx] = float(page.height)
                 # 文本段落
                 try:
                     words = page.extract_words(keep_blank_chars=False, use_text_flow=False)
@@ -999,6 +1069,9 @@ def _parse_pdf(
     # 跨页表格保守合并（Stage 10 批次 4）：在 relation 匹配前完成，
     # 使题注/引用关系针对合并后的表格计算
     elements = _apply_cross_page_merges(elements, pdf_table_records)
+    # 底带页面家具抑制（Stage 10 批次 9）：同样在 relation 匹配前完成；
+    # 只改 heading→paragraph，与表格合并输入不相交
+    elements = _suppress_page_furniture_headings(elements, page_heights)
     return elements, warnings
 
 
