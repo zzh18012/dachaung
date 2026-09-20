@@ -178,4 +178,10 @@
 - 影响范围：Stage 8 批次 19 批量并行受控通道（app/batch.py）
 - 现象：worker 初始化回报超时（120s）走受控失败，但该路径需真实超时
   注入，未覆盖自动化测试；worker 失败/成功路径已有跨进程真实测试
-- 状态：已知限制（本批不测）
+- 状态：**已处理（Stage 10 批次 7，2026-09-20，r60 授权，纯测试债务
+  批，生产代码零改动）**——tests/test_batch_plugin_init_timeout.py
+  三测：默认值 120.0 钉死守护 / 正常插件默认超时并行零超时事件 /
+  超时路径真实跨进程（monkeypatch `PLUGIN_INIT_REPORT_TIMEOUT`=1.0 +
+  sentinel 门控 worker 导入挂起 → 父进程 queue.Empty → 受控
+  plugin_init_report_timeout，error_type=Empty、expected/received=2/0、
+  零文件派发、无 summary、结构化 JSON 无 traceback）

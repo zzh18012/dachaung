@@ -149,6 +149,12 @@
 - real-02 验收（只读、不硬编码）：PDF heading 45→30、表单标签 FP 18→3（残留 3 条 = BACKLOG §2 已知残留）、DOCX 合法标题镜像匹配 10→10 零损失、家具 15 条全在
 - 测试：tests/test_pdf_form_heading_suppression.py（30 个，全合成夹具：抑制 12 / 正常 heading 不受影响 7 / 家具守护 3 / 既有行为不变 / 手写最小 PDF 端到端 + 管线 schema）
 
+## plugin timeout 测试补齐（Stage 10 批次 7）
+
+- BACKLOG §9 处理（r60 授权，**纯测试债务批，生产代码零改动**）：tests/test_batch_plugin_init_timeout.py 补齐 plugin_init_report_timeout 路径自动化覆盖
+- 确定性机制：monkeypatch `app.batch.PLUGIN_INIT_REPORT_TIMEOUT`（父进程运行时读全局；默认 120.0 由守护测试钉死；子进程不消费该值）+ sentinel 门控插件（hang_on.txt 落盘前父进程导入成功、落盘后 worker 重放导入 `time.sleep(30)` 挂起）——父进程补丁超时（1.0s）确定性先到，worker sleep 随池 terminate 被杀，无真实长等待
+- 契约断言：rc 1 + errors[0]{code=plugin_init_report_timeout, plugin, error_type=Empty, message 含固定上限补丁值}；JSONL plugin_load_failed{expected_workers, received_reports=0}；零 file_complete/batch_complete（批次 19 契约：回报收取先于文件派发）；无 summary；结构化 JSON 无 traceback
+
 ## 容器交付与可复现构建（Stage 8 批次 25）
 
 - **制品交付 ≠ 部署**：CI artifact（tar.gz + .sha256 边车）是交付物；加载并经 `container_verify --artifact` 验证通过才构成已验证部署（runbook 见 README §3.6）
