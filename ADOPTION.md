@@ -7443,3 +7443,63 @@ outputs/c2_page_furniture_acceptance_r62.txt。BACKLOG §2a 转已处理
 （B 类残留列已知限制）+ CLAUDE.md 批次 9 节。首报随 r63 简报
 （含 P16' push 申请：批次 9 分支 f02f49a + 本台账 {0381fbe,
 <本补记 commit>}）。
+
+## §一百四十八（2026-09-20）r63：批次 9 追认 + P16' A/B 执行回执 + Stage-10-Batch-9-Closed + DOCX 15↔14 口径校正 + Batch 10（§3a 设计/证据轮）授权
+
+来源：用户中转 r63 裁决（outputs/gpt_brief_batch26_r63_reply.txt，
+对 r63 简报〔批次 9 首报 + P16' push 申请〕的回复）。f02f49a 实现
+与验收追认（授权边界逐项核验未扩张、real-02 精确命中冻结构成）。
+
+**① P16' A 执行回执**：远端新分支
+integration/stage10-batch9-pdf-page-furniture-impl 已创建并推送至
+**f02f49a**（非 force）。推送前核验 f02f49a^ = 940c665 精确、
+rev-list 940c665..f02f49a 恰 1 commit；推送后 ls-remote 核对
+f02f49ab76ea...12e5eb 精确一致。单窗口一次成功。
+
+**② P16' B 执行回执**：integration/stage9-batch26-corpus-annotation
+纯 FF 更新 **942aadc..d757873**，新增集合恰 {0381fbe, d757873}
+（恰 2，rev-list 逐一核对，链 942aadc → 0381fbe → d757873 与申报
+一致），ls-remote 核对 d757873 精确一致。全程无 force/merge/rebase。
+
+**③ Stage-10-Batch-9-Closed**：两项核验条件精确满足，批次 9 自动
+关闭生效；按 r49 纯确认不另开裁决轮。
+
+**④ 账务校正（r63③ 命令，2026-09-20 只读复核）**：real-02 DOCX
+heading "15 ↔ 14" 差异定性 = **统计口径变化**（r63③ 首选项），
+非行为变化/输入差异/笔误：元素计数 15（含 2 个 '(空段落)' heading，
+structural_index paragraph_index=0/1，与此前 C2 证据一致）；批次 9
+验收脚本误用 set(content.strip()) 唯一文本集合口径，将 2 个同文本
+空段落去重为 1 → 14。DOCX 路径零改动（批次 9 仅动 _parse_pdf），
+本轮 15 元素与历史 15 精确一致。**冻结基线仍以元素计数 15 为准，
+"DOCX heading 总量 14"不升格为新基线**；本条为纯账务澄清，不含
+任何 DOCX 行为变更授权。
+
+**⑤ Batch 10 = §3a 无线框表格欠检测设计/证据轮授权**（暂不授权
+实现）：分支 integration/stage10-batch10-borderless-table-design，
+基点 f02f49a（P16' A 核验后成立）。范围与边界：
+- 仅设计/取证/只读 shadow analysis/合成实验，**不授权生产解析
+  行为变化**；
+- 至少回答：无线框表格在哪一层丢失（word grouping / line-block
+  grouping / table detector / 统一模型转换 / 后处理）；失败样本按
+  **形态分类**（非只给漏表总数）；现有管线可见结构信号盘点
+  （x 对齐/列间空白/重复列位置/行间距/字号/bbox/页宽/文本密度/
+  跨行一致性）及哪些信号在进入 table detection 前已丢失；
+- 与六类反例的区分：普通对齐正文 / key-value 表单 / 项目符号
+  编号列表 / 双栏正文 / 多栏题注 caption / 仅两行偶然对齐文本；
+- 至少对比两条方案路线：局部几何行级规则（单页坐标列对齐候选
+  生成）vs 区域级/文档级结构规则（多行持续列结构后确认）；
+  **不得仅凭两个明显空格/固定字符间距类文本启发式直接实现**；
+- **停链门槛**：可靠方案若要求大幅重构 PDF grouping / 修改统一
+  模型 schema / 引入新全局 table reconstruction framework / 与
+  §1 多栏题注耦合修改 → 只报告设计结论不实现；
+- 合成验证矩阵须同时备：真 borderless 正例 + 对齐正文负例 +
+  key/value 表单负例 + 多栏正文负例 + 稀疏两行对齐负例 + 既有
+  边框表格回归守护；真实语料按既有授权只读取证，不硬编码真实
+  内容、不以单一文档坐标阈值成规则；
+- 授权不含生产实现权，不含其后 push 权。2026-09-28 G04/G01 +
+  execution baseline 豁免轮维持 autonomous-track 既定里程碑，
+  不并入本批、边界不变。
+
+**⑥ 边界**：本条（§148）在 d757873 之后新增，不在 P16' B 授权
+集合内，按钉死规则排队待下次授权；Batch 10 提交同样无自动
+push 权。
