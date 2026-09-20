@@ -7177,3 +7177,47 @@ America/Los_Angeles 显示 09-17 属时区差，非提前标注；先例：§139
 
 执行分派：C2 批次于 dachuang-stage10 worktree 即日启动；首报随
 P13' push 申请（实现 commit + 台账搭车）。
+
+## §一百四十四（2026-09-20）r59：C2 范围改判 PDF 侧（方案 A）+ 分支更名 + 页面家具排除
+
+来源：用户中转 r59 裁决（对 r59 偏差声明简报
+〔outputs/gpt_brief_batch26_r59_c2_scope_deviation.txt〕的回复；
+新开 GPT 会话自包含提示词 outputs/gpt_newchat_prompt_r59.txt）。
+
+**① 范围改判（方案 A 通过）**：r58 的"DOCX 侧"与"不处理 PDF"两
+项限定系简报转述错误（r58 简报把 BACKLOG §2 的"PDF 侧"误写为
+"DOCX"，裁决随之钉错范围），本裁决显式覆盖之；零实现状态下触发
+停链上报的处置符合治理规则。C2 正式范围 = **PDF short_line
+heading 启发式中的"表单域/表单标签类假阳性"**；允许局部负向语义
+信号/局部抑制，**不得借机重写通用 heading 评分框架**；若实现需
+显著改变通用框架/全局阈值/其他解析路径 → 立即停链重新报裁。
+
+**② 分支更名**：`integration/stage10-batch1-docx-form-heading`
+→ `integration/stage10-batch1-pdf-form-heading`（自 34ab70a 建立
+且零代码改动，更名成本最低，避免台账/review/commit history 长期
+保留错误语义）；基点仍 34ab70a，不另起基点。**已于本日执行**
+（worktree 内 `git branch -m`，HEAD=34ab70a 零改动）。
+
+**③ 页面家具类 FP 本批不纳入**：Page 0X 页脚/封面日期/宣传语与
+"表单标签"属不同负向语义类别，即使共享 short_line 触发路径也不
+得在本批一起修；登记为已确认的独立 heading FP/已知限制或后续候
+选项，**不得通过为表单标签设计的规则顺带压掉**（验收时须核验页
+面家具 FP 仍在）。
+
+**④ r58 其余验收条件全部沿用**：合成夹具至少同时证明"表单标签
+不得判 heading"+"正常 heading 不受影响"；real-02 仅既有授权只读
+验证、不硬编码真实文档字符串；不处理 frontmatter/plugin timeout/
+页面家具或其他 backlog；验收单独记录 real-02 PDF 的 heading 总
+量、表单标签误判数及前后变化；建议保留合法 heading 数/镜像匹配
+情况作为回归证据，不扩大验收目标。
+
+**⑤ 授权边界**：本裁决即构成重新定义后 C2 批次的**实现授权**
+（非仅继续调查），授权只覆盖 PDF 表单标签 FP 范围。**本轮无
+push 授权**；§143/f000788 仍按钉死规则排队，不因本裁决自动获得
+push 权限；本裁决及后续实施结果登记 ADOPTION.md §144。
+
+**⑥ DOCX 空段落现象不进 C2**：DOCX 侧 2 个"空段落自身被赋
+heading 样式"现象实现上保持不动，作为独立已知现象记录。
+
+执行分派：即日于 dachuang-stage10 worktree 按 §144① 范围实现；
+实施结果随首报（P13' push 申请 + 台账搭车）补记本条。
