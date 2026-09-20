@@ -7221,3 +7221,22 @@ heading 样式"现象实现上保持不动，作为独立已知现象记录。
 
 执行分派：即日于 dachuang-stage10 worktree 按 §144① 范围实现；
 实施结果随首报（P13' push 申请 + 台账搭车）补记本条。
+
+**§144 实施结果补记（2026-09-20，commit 252b917）**：分支更名已
+执行（零代码改动状态下 `git branch -m`）。实现 = `_classify_pdf_
+paragraph` short_line heading 候选先过 `_form_label_signal` 四类局部
+负向语义信号（multi_colon ≥2 冒号 / short_colon 行尾冒号且 ≤4 token
+/ instruction 括注 please|tick / option_suffix 行尾 Yes No N/A；半全角
+冒号均计），命中 → paragraph + `metadata.heading_suppressed`；通用框
+架/全局阈值/DOCX 路径/caption 优先级零改动。合成夹具 30 测试全绿
+（tests/test_pdf_form_heading_suppression.py：抑制 12 + 不受影响 7 +
+家具守护 3 + 既有行为 + 手写最小 PDF 端到端/schema；零真实语料，夹
+具字符串全部等义合成、不硬编码 real-02）。real-02 只读验收：PDF
+heading 45→30、表单标签 FP 18→3（残留 3 条列 BACKLOG §2 已知残留：
+纯选项行 / >4 token 冒号标签 / 无 please-tick 长括注行）、合法镜像
+10→10 零损失、页面家具 15 条全在（r59③ 核验）。全量回归 5595
+passed + 26 skipped（129.64s）零失败。文档：BACKLOG §2 转已处理 +
+新增 §2a（页面家具独立 FP，未立项）+ §2b（DOCX 空段落样式现象，
+不动）；CLAUDE.md 增批次 6 节。证据件
+outputs/c2_form_heading_acceptance_r59.txt。批次关闭与否随 r60 首报
+裁决。
