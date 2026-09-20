@@ -7333,3 +7333,18 @@ furniture-design，基点 cae6ef5（P14' A 核验后成立）。边界：
 
 **⑤ 边界**：本条（§146）在 c03e346 之后新增，不在 P14' B 授权集
 合内，按钉死规则排队待下次授权。
+
+**§146 执行情况补记（2026-09-20，commit 940c665）**：Batch 8 设计/
+证据轮当日完成（分支 integration/stage10-batch8-pdf-page-furniture-
+design @ cae6ef5 + 940c665，**零生产代码改动**，全量回归 5598
+passed 与批次 7 基线逐项一致）。产出：取证件
+outputs/c2_page_furniture_shadow_analysis.txt（30 条 heading 的页号/
+bbox 百分比/跨页逐字重复/字号全景 + 管线信息存在-丢失审计 + L/D
+两方案对比与误伤反例 + 拟议夹具矩阵）；设计文档
+docs/stage10-batch8-page-furniture-design.md（分支内）；BACKLOG §2a
+状态更新。核心结论：A 页码×12 + C 宣传语×2 可用"bot≥93% 底带 ×
+（页码模板 ∪ 跨页逐字重复）"文档级合取信号零合法误伤解决（实测
+间隔 83.2% vs 95.2% 充裕）；B 封面日期×1 结构信号与合法期间标题
+完全同形，无低误伤通用信号，建议划出范围；推荐架构 = _parse_pdf
+文档级后置过滤（_classify_pdf_paragraph 接口与通用框架零改动，不
+触发 r61 架构门槛停链条款）。实现授权与否随 r62 简报裁决。
