@@ -7240,3 +7240,53 @@ passed + 26 skipped（129.64s）零失败。文档：BACKLOG §2 转已处理 +
 不动）；CLAUDE.md 增批次 6 节。证据件
 outputs/c2_form_heading_acceptance_r59.txt。批次关闭与否随 r60 首报
 裁决。
+
+## §一百四十五（2026-09-20）r60：P13' A/B 执行回执 + Stage-10-Batch-6-Closed + Batch 7（C5）指定与授权
+
+来源：用户中转 r60 裁决（outputs/gpt_brief_batch26_r60_reply.txt，
+对 r60 首报〔批次 6 首报 + P13' push 申请〕的回复）。
+
+**① P13' A 执行回执**：远端新分支
+integration/stage10-batch1-pdf-form-heading 已创建并推送至
+**252b917**（非 force）。推送前核验：252b917^ = 34ab70a 精确、
+rev-list 34ab70a..252b917 恰 1 commit；推送后 ls-remote 核对
+252b9174a35620f22f000d80197ae6f4004638c4 精确一致。2026-09-20
+上午网络两度中断（GitHub 443，同 09-18 故障模式），A 于恢复窗口
+一次成功。
+
+**② P13' B 执行回执**：integration/stage9-batch26-corpus-annotation
+FF 更新 **8b4a529..47ee181**，本次新增集合恰 3 commits
+{f000788, 0217911, 47ee181}（rev-list 逐一核对），推送后 ls-remote
+核对 47ee181318f6a01165624e0093427ebe15869de3 精确一致。裁决关于
+A..B 区间语义不含端点 A 的澄清已领会并采纳：后续 push 申请一律
+以显式 SHA 集合 + 最终 tip 表述。B 推送跨 3 次网络重试 + 恢复窗口
+成功，全程无 force/merge/rebase。
+
+**③ Stage-10-Batch-6-Closed**：r60③ 两项核验条件均精确满足
+（A ref = 252b917；B ref = 47ee181 且新增恰 3），批次 6 自动关闭
+生效；按 r49 纯确认不另开裁决轮。
+
+**④ Batch 7 = C5 指定与授权**（plugin timeout 测试补齐，BACKLOG
+§9）：分支 integration/stage10-batch7-plugin-timeout-tests，基点
+252b917。边界：纯测试债务批，不改默认 timeout 值/公开 API/插件
+发现加载语义/retry 策略/错误分类契约；确定性机制（可控
+timeout/stub/fake，不依赖真实长 sleep）；至少覆盖"正常插件不受
+影响"+"超时路径按既有契约"两面；测试揭示实现-契约不一致且修复需
+生产行为变更 → 停在证据/设计阶段报裁，不得顺手修；全量回归照旧
++ targeted timeout tests 单列；不顺手处理 C3/§2a/§2b 或其他
+backlog。授权不含其后 push 授权。
+
+**⑤ Batch 7 执行情况**：已于授权当日实现完毕（commit cae6ef5 @
+252b917，生产代码零改动）：tests/test_batch_plugin_init_timeout.py
+三测——默认值 120.0 钉死守护 / 正常插件默认超时并行零超时事件 /
+超时路径真实跨进程（monkeypatch PLUGIN_INIT_REPORT_TIMEOUT=1.0
+父进程运行时读全局 + sentinel 门控 worker 导入挂起 → queue.Empty
+受控 plugin_init_report_timeout，error_type=Empty、
+expected/received=2/0、零文件派发、无 summary、结构化 JSON 无
+traceback）；定向 3 连跑确定性全绿，全量回归 5598 passed + 26
+skipped 零失败；BACKLOG §9 转已处理 + CLAUDE.md 批次 7 节。首报
+随 r61 简报（含 P14' push 申请：批次 7 分支 cae6ef5 + 本台账条目
+搭车）。
+
+**⑥ 边界**：本条（§145）在 47ee181 之后新增，不在 P13' B 授权集
+合内，按钉死规则排队待下次授权。
