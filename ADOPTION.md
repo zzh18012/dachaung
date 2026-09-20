@@ -7420,3 +7420,26 @@ rev-list cae6ef5..940c665 恰 1 commit；推送后 ls-remote 核对
 **⑨ 边界**：本条（§147）在 942aadc 之后新增，不在 P15' B 授权
 集合内（裁决明示不得混入 r62 裁决登记），按钉死规则排队待下次
 授权；Batch 9 实施提交同样无自动 push 权。
+
+**§147 执行情况补记（2026-09-20，commit f02f49a）**：Batch 9 当日
+实现完毕（分支 integration/stage10-batch9-pdf-page-furniture-impl
+@ 940c665 + f02f49a，恰 1 commit）。实现 = `_parse_pdf` 文档级后置
+过滤 `_suppress_page_furniture_headings` + 私有 helper
+`_band_heading_key` + 页循环内 `page_heights` 聚合，在跨页表格合并
+后、relation 匹配前执行；D1/D2 全部按收窄边界落地（D2 仅空白折叠、
+双实例均须底带、大小写敏感），93% 冻结，页首带不处理，B 类划出；
+停链条款未触发（未把跨页状态传入 classifier、未改公共模型/元素
+顺序）。测试 tests/test_pdf_page_furniture_suppression.py 19 个
+（F1 抑制 3 + F2 存活 5 + F3 阈值 2 + r62⑤ 实现级守护 3 + 单元级
+结构约束 4 + F4 端到端 2；全合成手写最小 PDF，零真实语料；阈值
+夹具标定 bbox[3] = 792 − y + 2.07，93.0% 抑制 vs 92.9% 存活）。
+定向 49 连跑（含批次 6 全部 30）全绿；全量回归 5617 passed +
+26 skipped 零失败（5598 基线 + 19 新增）。real-02 只读验收构成
+精确命中 r62⑤ 钉死预期：PDF heading 30→16、抑制 14（A12 走 D1 +
+C2 走 D2）、B 日期残留 1、批次 6 表单残留 3、镜像合法 10 + 语义
+合法 2 全保持、DOCX 镜像 10/10（DOCX 路径零改动，两处文本差异为
+格式间大小写/拼写变体，语义对应成立）；取证件
+outputs/c2_page_furniture_acceptance_r62.txt。BACKLOG §2a 转已处理
+（B 类残留列已知限制）+ CLAUDE.md 批次 9 节。首报随 r63 简报
+（含 P16' push 申请：批次 9 分支 f02f49a + 本台账 {0381fbe,
+<本补记 commit>}）。
