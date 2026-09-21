@@ -8,7 +8,12 @@
 - 影响文档：real-04（仅 PDF，多栏布局），devset 1/10
 - 现象：多栏布局下题注文字被切碎，caption 对齐计数偏差（caption GT=3）
 - 根因方向：多栏栏目坐标聚类后未按栏重组阅读顺序
-- 状态：backlog（Stage 8 不动）
+- 状态：**共享架构设计轮完成（Stage 10 批次 11，2026-09-21，r64/r65
+  授权，零实现）**——方案 A"保守区域底座"（投影剖面全高空白河 +
+  数据驱动下限 + 行级支持判据 + 质量守卫，纯函数插入词分组前）在
+  shadow 原型上对本例精确分裂（real-04 p002 → 左右两区，真实语料
+  零单栏回归）；实施授权与门控发布待 r66 裁决。设计文档
+  docs/stage10-batch11-pdf-layout-architecture-design.md
 
 ## 2. 候选 C：002-PDF 表单域标签误判 heading
 
@@ -112,6 +117,13 @@
   病理耦合 → 命中 r63 停链条款，只报设计结论。设计文档
   docs/stage10-batch10-borderless-table-design.md；处置（维持挂起
   或限定 KV-GAP 子类授权实施轮）待 r64 裁决
+- 批次 11 增补（2026-09-21）：r64 改判 §3a = deferred / blocked on
+  PDF layout-reconstruction architecture（ADOPTION §150③）。共享
+  架构设计轮完成（r64/r65 授权，零实现）：方案 A 的 Tier-2 候选
+  车道把表格性判定与分栏判定解耦——N4 双栏正文成为区域形成的正确
+  输出而非表格误报；F-A 候选须 ≥2 确认轴 + 结构锚 + 逐候选与既有
+  paragraph 去重替换（该替换点单独待裁）。实施授权待 r66；
+  设计文档 docs/stage10-batch11-pdf-layout-architecture-design.md
 
 ## 4. w:tc 内 sdt（表格单元格内嵌套内容控件）
 
