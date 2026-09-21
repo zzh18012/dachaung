@@ -7950,3 +7950,62 @@ KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
    implementation = D-safe 18 条应答碎片抑制；区头 1 条及其他非表单
    residual 均不再阻塞关闭。§3a 继续 deferred；G⑤ 冻结与
    2026-09-28 autonomous-track 里程碑边界不变。
+
+## 一百五十七、Batch 12 D-safe 实施与验收执行记录（r68 授权）
+
+日期：2026-09-21。实施 worktree：dachuang-stage10（基点 0f5d23b，
+P21' A 已核验后）。执行记录：
+
+1. **生产实现**（stage10 commit `aaff3df`，4 文件 +480/−11）：
+   - `app/parsers/fallback_parser.py`：新增
+     `_suppress_form_option_repeat_headings` 页级 heading post-filter
+     + `_option_heading_key`（heading + 规范化全文 ∈ 冻结词集
+     {yes, no, n/a, no n/a, yes no n/a} → (文本, 页号, x 区间)；
+     规范化恰三步 trim/空白折叠/casefold）+ 常量
+     `_FORM_OPTION_VOCAB` / `_FORM_OPTION_REPEAT_MIN=3`。调用点：
+     `_parse_pdf` 末端、批次 9 家具抑制之后、relation 匹配之前。
+     聚类 = 同页同规范化文本分组内 x 区间排序 + 重叠合并（含边界
+     相接，与 shadow 脚本已验证思路一致）；簇内计数 ≥3 才抑制，
+     不跨簇合并。**未动**批次 6 `_form_label_signal`、批次 9
+     D1/D2、short_line 评分、Tier-1 分区器、DOCX 路径。
+   - `tests/test_pdf_form_option_repeat_suppression.py`（16 个）：
+     r68 八项必备（≥3 Yes 抑制 / ≥3 No N/A 抑制 / 单个 Yes 存活 /
+     'Yes.' 存活 / ≥3 同名非 option 存活 / 恰 2 存活 / 2+2 分列不
+     整体压制 / 3+2 分列簇内局部抑制）+ 词集精确边界（19 入选/
+     10 不入选形态）+ 页内不跨页聚合 + 边界相接聚类 + 缺 bbox 不
+     参与 + 结构保持（仅 type+metadata 键变化）+ 2 个手写最小
+     PDF 端到端（含 process_single schema 全链）。全部合成夹具，
+     零真实语料、零 real-02 坐标。
+   - `docs/BACKLOG.md` §1 与设计文档补记 r68 改判（D-safe ∧ 而非
+     D-min ∨；落点改判不进批次 6 通道）。
+2. **验收**（outputs/batch12i_accept_report.txt，对照基线 =
+   batch12_after = Tier-1 生产行为）：**12/12 条件全过**——
+   - real-02 heading 35→17；
+   - `form_option_repeat` 抑制恰 18：Yes×9 + No N/A×9，全部
+     real-02 p5（4+4）与 p6（5+5）；
+   - 区头 "Brief description and outcome" 仍 heading，登记
+     known residual（未加任何区头规则）；
+   - 其余 5 文档 heading/elements/warnings/relations 零变化、
+     零抑制；全语料逐元素零未解释漂移（identity/content/
+     locator/confidence 全等，唯一变化 = 18 条 heading→paragraph
+     + 单 metadata 键）；
+   - chunk 漂移定性（real-02 限定）：62→44 chunk = 9+11 个
+     base chunk 合并为 2（被抑制 heading 不再起 chunk，顺序
+     chunker 把其与 16 个邻接段落元素并入 p5/p6 窗口）；
+     **全 chunk 拼接文本 23932 字符逐字守恒、chunk→element id
+     多重集守恒、两合并窗之外逐字节不变**——性质 = r67 已接受
+     的 intentional downstream semantic correction；
+   - 全量回归 5654 passed / 26 skipped / 0 failed（批次 6/9/12
+     既有守护全保持；Tier-1 词守恒与单栏退化护栏在套内通过）。
+3. **push 申请 P22'**（任一前置不符则停链报裁，非 force）：
+   - **A**：integration/stage10-batch12-pdf-column-regionizer-impl
+     从远端已核验 0f5d23b 纯 FF 至 `aaff3df`；新增集合严格
+     {aaff3df}，要求 aaff3df^ = 0f5d23b。
+   - **B**：integration/stage9-batch26-corpus-annotation 从远端
+     已核验 7722677 纯 FF 至本条 commit（§156+§157 台账）；精确
+     SHA 集合在 r69 简报钉死。
+4. **请求裁决（r69）**：(a) P22' A/B push 授权；(b) push 精确
+   核验通过后确认 **Stage-10-Batch-12-Closed**（r68 既定路径：
+   验收已过，仅剩 push 核验一步）；(c) 批次 12 关闭后的下一批
+   方向征询（§3a 维持 deferred；非表单 residual 家族是否立项
+   待积累）。
