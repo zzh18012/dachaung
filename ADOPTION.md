@@ -7728,3 +7728,55 @@ KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
 8. **边界**：本条在 e176b4b 之后新增，不在 P19' B 授权集合
    {e176b4b} 内，排队待下次授权（r67 简报附 push 申请）；
    Batch 12 分支无 push 权。
+
+## 一百五十三、Batch 12 Tier-1 执行记录（r66 授权下实施，验收待 r67）
+
+1. **实施**：分支 `integration/stage10-batch12-pdf-column-regionizer-impl`
+   （基点 8f11da0），恰 1 commit **68a36a7**（4 文件：
+   app/parsers/fallback_parser.py +161 行 / tests/test_pdf_column_regionizer.py
+   新增 21 测 / docs/BACKLOG.md §1 状态 / CLAUDE.md 批次节）。生产改动
+   唯一文件 fallback_parser.py：`_parse_pdf` 段落泳道调用点
+   `_group_words_to_paragraphs(words)` → `_page_paragraphs(words)`
+   （全库唯一调用点）；单区退化把原 words 对象直通既有分组
+   （monkeypatch spy 测试钉死"恰一次调用、同一 list 对象"）；
+   7 常量冻结（15pt/2.5/2.0/2%/20pt/depth 3/8 词）；守卫链
+   数据驱动下限→最宽全高河→非空双岸→严格行级支持→质量守卫→
+   宽度守卫，任一失败整体不分裂。r66 禁止清单逐项未越界：无
+   Tier-2 候选特征、无元素去重替换、无 caption 配对门控、无
+   schema/locator/extract_words 参数变化；find_tables 泳道、
+   caption 匹配器、DOCX 路径代码零改动。
+2. **移植忠实度**：生产分区器 vs 批次 11 shadow 原型——夹具 8/8 +
+   真实语料 37 页**逐词分区 0 失配**（outputs/batch12_crosscheck.txt）。
+   r66 复核清单命中：real-04 p002 = 2 区、acad-03 p002 = 2 区、
+   tech-08 p012 = 1 区（CJK 已知保守 miss 保持）、acad-03 p004 =
+   1 区（窄槽已知保守 miss 保持）、单栏采样页全 1 区。
+3. **回归**：5638 passed, 26 skipped（= 批次 11 基线 5617 + 新增 21；
+   26 为本 worktree samples/private 缺席的既有跳过，与基线一致）。
+4. **语料对照**（6 文档 baseline@8f11da0 → after，归一化仅剔
+   metadata.image_output_dir）：**17 个变化页全部经区域取证为物理
+   多区页**——real-04 p002 / acad-03 p002（双栏正文）；prod-01
+   p077/p105/p165/p167（教程双栏对照示例页 + INDEX 双栏索引）；
+   tech-08 p008/018/062/066/076/080（横向章节分隔页，右缘
+   x≈963-995 三词 TOC 侧栏碎片 '1 前言 |' 此前粘进页眉段）；
+   tech-03 p002 1→4 区、p003 1→3 区（2-up 封面跨页：内容栏+
+   左右页脚分离）；real-02 p004/005/006（表单问题栏 [~51-347]
+   与 Yes/No/N/A 应答栏 [~363-544] 物理分离）。**词守恒（文本
+   元素 token 多重集 base vs after）17/17 EXACT**；单栏页逐元素
+   零差异。r66 停链五项逐项未命中（证据：
+   outputs/batch12_diff_report.txt、batch12_page_probe.txt、
+   batch12_acceptance_report.txt）。
+5. **登记的下游后果（验收裁量点，提交 r67）**：
+   ① real-04 p002 +2 relations（has_caption pdf_geometry_below +
+   references explicit_reference_unique）——caption 匹配器零改动、
+   输入几何修正后的自然结果（§1 题注对齐计数偏差的修复方向）；
+   ② 类型混合漂移（分类器零改动、文本重切分的下游）：acad-03
+   p002 heading 0→5（数学字形碎片独立短行）、tech-03 p002 0→3、
+   p003 2→1、prod-01 各页 ±；
+   ③ **real-02 表单页**：问题行失去 'Yes No N/A' 行尾——该行尾
+   在旧交错文本中同时是批次 6 form_label_option_suffix 抑制触发
+   器与句尾终止符——p004 heading 0→1、p005 1→9、p006 1→11；
+   批次 6/9 机制代码零改动；若需处理须独立批次（本批未追加任何
+   规则）。
+6. **台账边界**：本条在 53e8ffb 之后新增（53e8ffb 亦未推送）；
+   两者均排队待 r67 授权（push 申请 P20' 见 r67 简报）。Batch 12
+   分支本身无 push 权，push 申请同简报。
