@@ -7828,3 +7828,65 @@ KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
 6. **§3a**：维持 deferred（r67 (d)）。G⑤ 冻结不变。
 7. **台账边界**：本条在 9cd35fb 之后本地新增，不在 P20' B 授权
    集合 {53e8ffb, 9cd35fb} 内，排队待下次授权。
+
+## 一百五十五、Batch 12 验收补轮执行记录（r67 (3) 授权，零生产改动）
+
+1. **实施**：分支 integration/stage10-batch12-pdf-column-regionizer-impl
+   新增恰 1 commit **0f5d23b**（68a36a7 之上）：设计文档
+   docs/stage10-batch12h-form-fp-signal-design.md 新增 + BACKLOG
+   §1 状态更新（Acceptance-Pending + 补轮证据）。**生产代码零
+   改动**（fallback_parser.py 未触碰）。证据（gitignored）：
+   outputs/batch12h_type_audit.{py,txt}（17 页自动清点）、
+   batch12h_audit_report.txt（(a)+(b) 终判）、
+   batch12h_signal_shadow.{py,txt}（三信号 shadow 扫描）。
+2. **(a) 17 页类型漂移审计**：全文档 heading 计数 real-02 16→35
+   （+19）/ acad-03 4→9（+5）/ tech-03 1295→1297（净+2）/
+   prod-01 423→427（+4）/ tech-08 307→307 / real-04 3→3。终判：
+   正确恢复 8 页（real-04 §1 本体 + tech-08 六页侧栏分离 +
+   tech-03 p003 净消除 1 个交错 heading FP）；**明确 FP 26**
+   （real-02 19 + acad-03 图内标签 5 + tech-03 封面"年"1 +
+   prod-01 '(continuedfrompreviouspage)' 1）；既有 FP 拆分显形 3
+   （prod-01 页码 71/99/161，base 已判 heading）；不可验证 2
+   （tech-03 封面标题块/联系方式）；无漂移 1 页（prod-01 p165）。
+   acad-03/tech-03/prod-01 各 FP 在 base 侧同为错误形态（交错
+   垃圾/粘连），无语义回归。
+3. **(b) 机制更正（诚实登记）**：§153⑤③ 表述"部分问题行失去
+   行尾被 short_line 判 heading"不准确——实证**问题行本身仍是
+   paragraph**（p5 段落 5→5、p6 9→9），新增 heading 是**应答栏
+   碎片自身**独立成短行：选项碎片 18（"Yes"×9 + "No N/A"×9，
+   x≈377 与 x≈442 两列、y 与问题行一一对应）+ 应答栏区头 1
+   （"Brief description and outcome"，x[363-536] 右区顶端）。
+   p004 的合并行 "Yes No N/A"（3 token）仍为 paragraph 未触发。
+4. **(c) 信号设计（两类方案 + 反例矩阵，零生产改动）**：
+   - S1a（文本局部，批次 6 血统）：heading 候选整行规范化文本 ∈
+     封闭选项词集 {yes, no, n/a, no n/a, yes no n/a}（r59 已授权
+     行尾信号同词域的整行扩展）→ shadow：18/19 命中，全语料
+     0 误伤。
+   - S2a（页级重复结构，批次 9 血统）：同页 ≥3 个 heading 同文
+     且 x 区间重叠（同列堆叠模板性）→ shadow：18/19，0 误伤
+     （x 分组须容差，round 边界会拆组）。
+   - S2b（窄侧列短 token 簇，几何）：19/19 含区头，但 prod-01
+     **7 处误伤**（稀疏页窄簇伪迹，误中 COPYRIGHT/APPENDIX D/
+     INDEX 等）→ 不推荐。
+   - **推荐 D-min = S1a ∨ S2a**：18/19、零误伤、双正交；区头
+     残余 1 FP（性质同批次 9 B 类已知边界）；落点=批次 6 通道
+     第五信号 + 批次 9 通道页级 post-filter，均既有模式，零
+     schema/契约变化，**不需要公共 region-id**；反例矩阵 7 条
+     （等宽双栏真节标题/非对称窄栏真标题/FAQ 裸 'Yes' 与
+     'Yes.'/问题行 'Details:'/同名堆叠小节/页脚 paragraph）钉死。
+   - r67 停链三项自查：需 region-id/schema、需重写 heading 框架、
+     需文档级表单重构——**逐项未命中**。
+5. **push 申请 P21'**（任一前置不符则停链报裁，非 force）：
+   - **A**：integration/stage10-batch12-pdf-column-regionizer-impl
+     从远端已核验 68a36a7 纯 FF 至 0f5d23b；新增集合严格
+     {0f5d23b}，要求 0f5d23b^ = 68a36a7。
+   - **B**：integration/stage9-batch26-corpus-annotation 从远端
+     已核验 9cd35fb 纯 FF 至 44dc0b6；新增集合严格 {44dc0b6}，
+     要求 44dc0b6^ = 9cd35fb。
+6. **请求裁决（r68）**：(a) D-min / D-full / 维持残余分类——
+   实施则授权窄幅 heading 加固批（批次 6+9 通道，反例矩阵为
+   必备夹具）；(b) Batch 12 封口路径——若 D-min 实施批通过
+   验收后封口，还是本轮即封口（残余登记）；(c) 非表单家族 FP
+   处置（acad-03 图内标签 5 / tech-03 封面 3 / prod-01 continued
+   1 + 页码拆分显形 3）——登记已知限制 or 独立批次；
+   (d) P21' A/B push 授权。§3a 维持 deferred；G⑤ 冻结不变。
