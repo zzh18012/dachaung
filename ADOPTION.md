@@ -7521,3 +7521,112 @@ KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
 停链命中，只报设计结论。处置（维持挂起或 KV-GAP 子类单独授权）
 随 r64 简报裁决。首报随 r64 简报（含 P17' push 申请：批次 10
 分支 d91d3dd + 本台账 {d9bc17a, <本补记 commit>}）。
+
+## §一百四十九（2026-09-21）G⑤ 第二标注人范围调整改判：代表页口径 r3 完整自含包（用户决定 + 预填 EXCLUDE + 冒烟验证；随 r65 简报披露追认）
+
+1. **范围决定（用户 2026-09-20/21，负责人口径，取代同日"前 15
+   页"暂行口径）**：acad-03 已全篇交回并闭环（§九十六，
+   annotator=MVP）；剩余三篇 tech-08 / prod-01 / tech-03 由"全文
+   标注"（估 6~11 天，合 ~37000 注册行）收窄为**每篇只标负责人
+   选定的代表性页**（可跳跃、不连续，按形态特征有意挑选）：tech-08
+   14 页（p003/005/008/009/011/014/022/030/050/071/075/078/082/
+   083，范围内 820 行）、prod-01 11 页（p001/003/007/009/017/020/
+   027/029/041/057/167，范围内 883 行）、tech-03 14 页（p001/002/
+   004/006/009/015/017/023/029/069/141/173/247/248，范围内 827
+   行）；三篇合计 2530 行，约 1~1.5 天。形态覆盖：封面/目录点线/
+   章节隔页/双栏正文/表格页/图表密集页/列表与术语页/附表/机构
+   名单/版权页/索引页/代码页/Tip 框/轻页。
+2. **交付物改判（r3 完整自含单包，用户 2026-09-21 指示"和之前的
+   一样，一个压缩包的内容就够了"）**：outputs/第二标注人任务包
+   -r3.zip（sha256 e6978d8475591d4c621c92bff60eb6c884f38cc347f8
+   bfa207669748fa6795ec，26 条目 = 25 文件 + 1 目录项，testzip
+   无损坏）。**作废** outputs/第二标注人任务包-r2-范围补充-前
+   15页.zip 与"前 15 页"口径（从未交付标注人）。P3' 绑定：r3 包
+   内工具/规则原文/两版指南/PDF/dump/manifest 全部与 r2 绑定值
+   逐文件 sha256 一致（20 件复核），注册表指纹不变（见冒烟）；
+   现行第四重绑定 = r3 包哈希（上值），r2 包哈希转历史记录。
+   r3 新制件哈希：blocks_tech-08.py 3737c8d1…686d2、blocks_
+   prod-01.py 72e823f0…18a42、blocks_tech-03.py 298f96bb…231ab、
+   范围说明-代表页.md fbc7815b…05ac、交回说明.txt 1a3ac88e…
+   1db2（全表见制备证据/绑定清单.txt）。
+3. **机制（零封口件改动）**：模板 EXCLUDE_BASE 机器预填"所选页
+   之外全部页"的 L/R/C 全区间并集（工具语义：EXCLUDE 含未知键
+   即 SystemExit → 必须精确；C 键排除不自动带掉半行 → 逐页三栏
+   整段排除）；标注人只填 ANNOTATOR/NOTES/SEGMENTS/BLOCKS，
+   只标所选页，座位号追加在 EXCLUDE = EXCLUDE_BASE | set(...)。
+4. **对账与冒烟（2026-09-21，制备证据/smoke_r3.py）**：三篇恒等式
+   精确成立——注册表 = 范围内 + 预填排除（5218=820+4398；
+   13917=883+13034；15067=827+14240）；EXCLUDE 零未知键；指纹
+   2c75ab91…/4d099d38…/d4fe244f… 与 r2 绑定清单逐一相符；校验
+   0 失败；冒烟临时产物清理，包内无 .pyc。
+5. **测量口径变更（披露项）**：G⑤ agreement 对三篇按**同页集
+   对齐**——第二标注人按代表页集，第一标注人（Claude 草案）
+   units 按同页集过滤后对比；acad-03 维持全篇。最终报告须如实
+   声明口径为"所选代表页"。过滤实现于 G⑤ 正式测量步骤进行
+   （stage9_agreement.py 若需页集参数，届时按 maintenance fix
+   程序单独登记）。G⑥ frozen candidate totals（§九十五）基于
+   第一标注人全量标注，不受影响。
+6. **纪律不变**：四条纪律原文有效；确认书按"代表页口径"完工
+   勾选；ANNOTATOR 代号与 acad-03 一致。
+
+## §一百五十（2026-09-21）r64：DOCX 15↔14 追认 + Batch 10 设计追认与 §3a 精确状态登记 + P17' A/B 执行回执 + Stage-10-Batch-10-Closed + Batch 11（共享布局架构设计轮）指定
+
+1. **DOCX 15↔14 账务追认**：r63③ 定性（统计口径变化，非解析
+   行为变化）成立，§148④ 处理追认；冻结口径继续用 15 个
+   heading 元素，14 不构成新基线。
+2. **Batch 10 设计结论追认 + 停链正确**：现有证据足以否决"在
+   现有信息面上直接靠阈值补无线框表格"路线（P1 真表漏报与
+   N3/N4 结构性误报并存 → 非寻找更优 gap/持续行数阈值问题）；
+   可靠方案须 raw-word 区域消费 + 候选区域重建 + 与既有
+   paragraph/table 去重替换 = 命中 r63 停链条件，停链正确。
+3. **§3a 处置（方案 a：维持挂起，不授权 KV-GAP 子类实现）+
+   状态精确登记**：F-A（KV-GAP）= **deferred / blocked on PDF
+   layout-reconstruction architecture**（DT00/DT01/DT12 证明
+   可恢复信息存在，但当前无低误报、可独立落地 detector；不得
+   写"已处理"）；F-B（单列散文/签名区）= 当前文本/几何信息面
+   下已知限制；F-C（空 1×1）= 输入层结构性不可见已知限制；
+   **不得为 F-A 覆盖率接受 N3 编号列表或 N4 双栏正文级已知
+   误报**。
+4. **P17' A 执行回执（2026-09-21）**：前置核验——stage10 HEAD
+   = d91d3ddf9aa08694cb8a5e1940d7a2aafe31ea74，d91d3dd^ =
+   f02f49ab…12e5eb，本地分支名已为规范名 integration/stage10-
+   batch10-borderless-table-design（无需 rename，无额外
+   commit），d91d3dd 不被任何远端分支包含（新增集严格
+   {d91d3dd}），远端无同名/别名分支。执行：git push -u origin
+   integration/stage10-batch10-borderless-table-design（新分支
+   创建，非 force）。推后核验：fetch + ls-remote 远端精确指向
+   d91d3dd…ea74；非规范名（无 table）远端分支不存在，无两个
+   远端别名。
+5. **P17' B 执行回执（2026-09-21）**：前置核验——adoption HEAD
+   = d99a0dfd…84e6e，远端 tip = d757873f…e5cc，rev-list
+   d757873..d99a0df 恰 = {d9bc17a8…27e70, d99a0dfd…84e6e}，
+   merge-base FF 成立，工作树干净。执行：git push origin
+   d99a0df:refs/heads/integration/stage9-batch26-corpus-
+   annotation（远端 d757873..d99a0df 纯 FF，非 force）。推后
+   核验：fetch + ls-remote 远端精确指向 d99a0df…84e6e。
+   （过程注记：当日 github.com 机器级不可达约一轮，schannel
+   已配非证书问题，网络恢复后执行；不影响 commit 验收。）
+6. **Stage-10-Batch-10-Closed 自动生效**：两条件（A 精确
+   d91d3dd、B 精确 d99a0df 且新增集合与授权一致）均核验满足；
+   成功后纯确认按 r49 不另开裁决轮。
+7. **Batch 11 指定：§1/§3a 共享 PDF 布局重建架构可行性设计轮**
+   （不开 §3a 实现）：分支 integration/stage10-batch11-pdf-
+   layout-architecture-design，基点 d91d3dd（P17' A 核验后已
+   建立，仅本地）。**只有设计/取证/shadow prototype 权，无
+   生产行为修改权、无 push 权**。核心问题：能否在 raw words
+   与最终 paragraph/table/caption 发射之间建立受控区域级
+   layout substrate，同时解决 §1 多栏污染与 §3a 无线框表格
+   候选，而不推翻现有解析器；至少两种架构方案（如"独立区域
+   候选层后交既有解析逻辑" vs "重构 paragraph grouping 为共享
+   layout segmentation"）并明确对元素顺序/locator/relation/
+   table merge/既有有框表格/caption 的影响面；设计证据须证明
+   如何避免已确认同构冲突（双栏正文/编号列表/KV 表单/无线框
+   真表不能只靠单一 x-gap/列持续性区分；明确还有什么非硬
+   编码、可泛化结构信息可进入判别）；若结论仍须大规模全局
+   layout framework/公共 schema 变化/高风险元素重排，可以
+   "不可安全局部实现"再次收口而非被迫实现。2026-09-28
+   autonomous-track 周期简报与 execution baseline 豁免轮维持
+   独立里程碑，不并入本批。
+8. **边界**：§一百四十九与本条在 d99a0df 之后新增，不在 P17'
+   B 授权集合 {d9bc17a, d99a0df} 内，按钉死规则排队待下次
+   授权（r65 简报附 push 申请）；Batch 11 分支无自动 push 权。
