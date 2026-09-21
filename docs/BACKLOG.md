@@ -16,11 +16,18 @@
   17 个变化页全部为物理多区页、词守恒 17/17 EXACT、单栏页零差异；
   全量回归 5638 passed。r66 冻结的已知保守 miss 保持：tech-08 p012
   CJK、acad-03 p004 窄槽。设计文档
-  docs/stage10-batch11-pdf-layout-architecture-design.md；验收待 r67。
-  诚实登记的下游后果：real-02 表单页问题栏与 Yes/No/N/A 应答栏
-  物理分离后，部分问题行失去选项行尾（批次 6 抑制触发器兼句尾
-  终止符）被 short_line 判 heading（p5 1→9、p6 1→11）——分类器
-  零改动，处置待 r67 裁量
+  docs/stage10-batch11-pdf-layout-architecture-design.md。
+- 状态（r67，2026-09-21）：**Stage-10-Batch-12-Acceptance-Pending**——
+  实施结构性追认，① real-04 +2 relations 接受（intentional
+  downstream semantic correction）；real-02 表单页 heading 漂移为
+  封口 BLOCKER（不接受已知限制吞掉）。验收补轮（零生产改动）完成：
+  17 页类型审计（正确恢复 8 页 / 明确 FP 26 / 既有类拆分显形 3 /
+  不可验证 2；outputs/batch12h_audit_report.txt）+ 机制更正——
+  新增 heading 非问题行本身（问题行仍 paragraph），而是应答栏
+  碎片独立成短行（"Yes"/"No N/A" ×18 + 区头 ×1）；信号设计
+  docs/stage10-batch12h-form-fp-signal-design.md（S1a 选项词集 ∨
+  S2a 同文同列堆叠 = D-min，18/19 覆盖、全语料零误伤，推荐待
+  r68 裁决；S2b 窄列簇 19/19 但 prod-01 7 误伤不推荐）
 
 ## 2. 候选 C：002-PDF 表单域标签误判 heading
 
