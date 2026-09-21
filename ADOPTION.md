@@ -7890,3 +7890,63 @@ KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
    处置（acad-03 图内标签 5 / tech-03 封面 3 / prod-01 continued
    1 + 页码拆分显形 3）——登记已知限制 or 独立批次；
    (d) P21' A/B push 授权。§3a 维持 deferred；G⑤ 冻结不变。
+
+## 一百五十六、r68 裁决回执：D-safe（S1a∧S2a）授权 + P21' A/B push 回执
+
+日期：2026-09-21。裁决全文由用户转交（GPT-5.6 Sol，r68）。执行记录：
+
+1. **补轮结论追认**：机制修正（18 应答碎片 + 1 区头，问题行本身
+   未漂移）被裁决采纳为继续窄幅 hardening 的依据。
+2. **(a) 表单应答栏 FP 处置 = 授权实施，但改判 D-safe = S1a ∧ S2a**
+   （不批准原提案 S1a ∨ S2a，也不批准 D-full/S2b。理由：OR 把两个
+   理论误伤面取并集；当前 18 个目标 FP 同时满足两信号，无必要扩大）。
+   生产规则钉死：**仅当**元素已是 heading，且规范化全文 ∈ 冻结
+   option set {yes, no, n/a, no n/a, yes no n/a}，**并且**同一物理页上
+   同一规范化文本至少出现 3 个 heading、其 bbox x 区间属于同一重叠
+   列簇，才抑制为 paragraph。规范化仅允许 trim / 连续 whitespace
+   折叠 / 大小写归一——**不得**删标点、模糊匹配、同义词扩展、token
+   编辑距离或增加其他 option 文本（'Yes.' 必须存活）。
+3. **实现落点（重要改判）**：只走**页级 heading post-filter**
+   （信号名 `form_option_repeat`，语义 = S1a∧S2a 一次性判定），
+   **不得**把 S1a 单独加入批次 6 `_form_label_signal` 作第五全局
+   局部信号（避免合法单个 Yes 仅凭文本被压制）。禁越界清单：
+   公共 region-id/schema、real-02 绝对 x 坐标、重拼问题栏/应答栏、
+   改 short_line 通用评分、进 Tier-2/F-A、S2b 窄侧栏规则。
+4. **归属**：仍为 Batch 12 acceptance-hardening，不开新批。实施基点
+   `0f5d23b`（前提 = P21' A 成功并精确核验，已满足，见第 6 条）。
+   本裁决授权生产实现 + 测试，**不含后续 push 权**。
+5. **必备测试（r68 八项，除反例矩阵外钉死）**：同页同列 ≥3 Yes →
+   suppress；≥3 No N/A → suppress；单独合法 Yes heading 存活；
+   'Yes.' 存活；≥3 重复合法非 option heading 存活；option 文本重复
+   但不足 3 次存活；option 文本 ≥3 次但分属不同 x 列簇 → 不因错误
+   聚类整体压制；批次 6 form-label / 批次 9 page-furniture / 批次 12
+   regionizer 既有测试全保持。x 聚类沿用已验证的区间重叠思路，
+   禁绝对 x rounding 或 real-02 坐标阈值。
+6. **(d) P21' push 回执（双双批准并执行完毕）**：
+   - **A**：预核验（HEAD=0f5d23b、0f5d23b^=68a36a7、rev-list
+     68a36a7..0f5d23b 集合严格 {0f5d23b}、远端 tip=68a36a7、树干净）
+     → push `68a36a7..0f5d23b` 纯 FF → 复核验 fetch+ls-remote：远端
+     tip = 0f5d23b 精确，分支同步。非 force。
+   - **B**：预核验（链严格 9cd35fb → 44dc0b6 → 4485282 → 7722677、
+     rev-list 9cd35fb..7722677 集合严格 {44dc0b6, 4485282, 7722677}、
+     远端 tip=9cd35fb、树干净）→ push `9cd35fb..7722677` 纯 FF →
+     复核验：远端 tip = 7722677 精确，分支同步。非 force。
+7. **(b) Batch 12 封口条件（批准，非"实现一绿即关"）**：实现验收
+   须满足——real-02 heading 35→17；新抑制恰 18（Yes×9 + No N/A×9）；
+   区头 "Brief description and outcome" 1 条**继续保留 heading** 并
+   登记 known residual；不新增其他语料 suppression；17 个 changed
+   pages 无新的未解释 type drift；全量回归零失败；Tier-1 词守恒与
+   单栏退化护栏继续成立。**禁止**为把 17 压回 16 而增加区头规则。
+   验收通过后仍须单独申请下一笔 push；精确 push 核验后再自动进入
+   Stage-10-Batch-12-Closed。
+8. **(c) 非表单家族 FP = 本批不处理，登记
+   `post-regionization downstream classification residuals`**：
+   acad-03 图内标签 5 / tech-03 封面碎片 3（含 2 不可验证）/
+   prod-01 continued 标记 1 / prod-01 页码 FP 拆分显形 3。理由：
+   这些页 baseline 侧本就是交错垃圾/粘连/已有 FP，Tier-1 只改变
+   错误表现形态，无同一窄规则安全解决的证据。未来某类积累出
+   跨语料稳定模式再独立立项。不得混入本次 form-option hardening。
+9. **状态钉死**：Batch 12 继续 Acceptance-Pending——唯一 blocking
+   implementation = D-safe 18 条应答碎片抑制；区头 1 条及其他非表单
+   residual 均不再阻塞关闭。§3a 继续 deferred；G⑤ 冻结与
+   2026-09-28 autonomous-track 里程碑边界不变。
