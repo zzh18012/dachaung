@@ -163,6 +163,14 @@
 - real-02 只读验收（构成精确命中 r62⑤ 钉死预期）：PDF heading 30→16，抑制 14（A 页码 12 走 D1 + C 宣传语 2 走 D2），B 日期残留 1 + 批次 6 表单残留 3 + 镜像合法 10 + 语义合法 2 全保持，DOCX 镜像 10/10
 - 测试：tests/test_pdf_page_furniture_suppression.py（19 个全合成：F1 抑制 3 / F2 存活 5 / F3 阈值 2（93.0% 抑制 vs 92.9% 存活，标定 bbox[3]=792−y+2.07）/ r62⑤ 守护 3（双实例均须底带 + 近似文本不合并 + 空白折叠正控制）/ 单元级 4 / F4 端到端 2）
 
+## PDF Tier-1 保守栏分区器（Stage 10 批次 12）
+
+- BACKLOG §1 处理（r66 授权，批次 11 设计轮方案 A Tier-1 落地）：`_parse_pdf` 段落泳道唯一调用点改 `_page_paragraphs`（app/parsers/fallback_parser.py）；单区退化路径把原 words 对象直通既有 `_group_words_to_paragraphs`（不重排不重建，单栏页序列化零差异），多区按区左→区右独立分组拼接
+- 算法（7 常量冻结，与批次 11 shadow 原型逐词分区一致，证据 outputs/batch12_crosscheck.txt 0 失配）：投影剖面全高空白河递归切分；数据驱动河宽下限 max(15pt, 2.5×行内相邻词距中位数)；严格行级支持（每个双岸行自身空档 ≥ max(下限, 2×该行中位字高)，大字号通栏标题拒绝开口）；质量守卫（两侧各 ≥2% 字符质量）；宽度 ≥20pt / 深度 ≤3 / ≥8 词；任一守卫失败整体不分裂（保守失败 = 维持现状）
+- r66 禁止清单遵守：无 Tier-2 候选特征、无元素去重替换、无 caption 配对门控、无 schema/locator/extract_words 参数变化；find_tables 泳道、caption 匹配器、DOCX 路径代码零改动
+- 语料验收（6 文档 baseline/after 全量对照，outputs/batch12_*）：17 个变化页全部为物理多区页（real-04 p002 / acad-03 p002 双栏正文、prod-01 p77/105/165/167 双栏示例与 INDEX、tech-08 六个章节分隔页侧栏、tech-03 p2/p3 2-up 封面跨页、real-02 p4/5/6 表单问题栏+应答栏），词守恒 17/17 EXACT，单栏页零差异；real-04 p002 +2 relations（caption 匹配器零改动下输入几何修正的自然结果）；已知保守 miss 保持（tech-08 p012 CJK、acad-03 p004 窄槽）；real-02 表单页问题行失去 'Yes No N/A' 行尾（批次 6 抑制触发器兼句尾终止符）后部分转 heading——分类下游后果，处置待 r67
+- 测试：tests/test_pdf_column_regionizer.py（21 个全合成：A 夹具矩阵区域数钉死 + 常量冻结 + 双区不相交/词数守恒；B 不跨栏合并 + 与逐栏分组恒等 + 左右顺序 + 单区退化同一 words 对象恰一次直通（spy）+ 行级支持拒绝隔离；C 多栏 table/caption 邻域守护（r66 必备夹具）；D 手写最小 PDF 端到端双栏/单栏）；全量回归 5638 passed
+
 ## 容器交付与可复现构建（Stage 8 批次 25）
 
 - **制品交付 ≠ 部署**：CI artifact（tar.gz + .sha256 边车）是交付物；加载并经 `container_verify --artifact` 验证通过才构成已验证部署（runbook 见 README §3.6）

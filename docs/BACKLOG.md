@@ -8,12 +8,19 @@
 - 影响文档：real-04（仅 PDF，多栏布局），devset 1/10
 - 现象：多栏布局下题注文字被切碎，caption 对齐计数偏差（caption GT=3）
 - 根因方向：多栏栏目坐标聚类后未按栏重组阅读顺序
-- 状态：**共享架构设计轮完成（Stage 10 批次 11，2026-09-21，r64/r65
-  授权，零实现）**——方案 A"保守区域底座"（投影剖面全高空白河 +
-  数据驱动下限 + 行级支持判据 + 质量守卫，纯函数插入词分组前）在
-  shadow 原型上对本例精确分裂（real-04 p002 → 左右两区，真实语料
-  零单栏回归）；实施授权与门控发布待 r66 裁决。设计文档
-  docs/stage10-batch11-pdf-layout-architecture-design.md
+- 状态：**Tier-1 已实施（Stage 10 批次 12，2026-09-21，r66 授权）**——
+  `_page_paragraphs`/`_split_words_into_column_regions` 落地
+  （app/parsers/fallback_parser.py，方案 A Tier-1：投影剖面全高空白河 +
+  数据驱动下限 + 行级支持判据 + 质量守卫，单区退化直通既有分组）。
+  real-04 p002 精确分裂为左右两区（§1 修复本体）；6 文档语料对照
+  17 个变化页全部为物理多区页、词守恒 17/17 EXACT、单栏页零差异；
+  全量回归 5638 passed。r66 冻结的已知保守 miss 保持：tech-08 p012
+  CJK、acad-03 p004 窄槽。设计文档
+  docs/stage10-batch11-pdf-layout-architecture-design.md；验收待 r67。
+  诚实登记的下游后果：real-02 表单页问题栏与 Yes/No/N/A 应答栏
+  物理分离后，部分问题行失去选项行尾（批次 6 抑制触发器兼句尾
+  终止符）被 short_line 判 heading（p5 1→9、p6 1→11）——分类器
+  零改动，处置待 r67 裁量
 
 ## 2. 候选 C：002-PDF 表单域标签误判 heading
 

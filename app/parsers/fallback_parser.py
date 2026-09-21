@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import re
+import statistics
 from pathlib import Path
 from typing import Any
 
@@ -419,6 +420,164 @@ def _lines_to_para(lines: list[list[dict]]) -> dict[str, Any]:
         max(float(w.get("bottom", 0.0)) for w in all_words),
     ]
     return {"text": text, "bbox": bbox}
+
+
+# ---------- PDF Tier-1 保守栏分区器（Stage 10 批次 12，r66） ----------
+# 投影剖面"全高空白河"递归切分：某 x 带在当前词集的所有词上均为空白。
+# 设计与 shadow 证据见 docs/stage10-batch11-pdf-layout-architecture-design.md
+# （方案 A Tier-1）。保守失败 = 不分裂（单区退化 = 维持既有行为）。
+# r66 禁止清单不越界：无 Tier-2 候选特征、无元素去重替换、无 caption
+# 配对门控、无 schema/locator/extract_words 参数变化。
+_COLUMN_MIN_RIVER_FLOOR_PT = 15.0  # 全高空白河绝对下限
+_COLUMN_RIVER_GAP_FACTOR = 2.5  # 河宽下限 = max(地板, 因子×行内相邻词距中位数)
+_COLUMN_LINE_SUPPORT_HEIGHT_FACTOR = 2.0  # 双岸行空档须 ≥ max(下限, 因子×该行中位字高)
+_COLUMN_MIN_REGION_MASS_RATIO = 0.02  # 两侧各须 ≥2% 字符质量（裸编号列不成区）
+_COLUMN_MIN_REGION_WIDTH_PT = 20.0
+_COLUMN_MAX_SPLIT_DEPTH = 3
+_COLUMN_MIN_WORDS = 8
+
+
+def _column_lines(words: list[dict], tol: float = 3.0) -> list[list[dict]]:
+    """y 中点 running-mean 聚类成行（与 _group_words_to_paragraphs 同参数；
+    独立实现供分区器消费，不改动既有分组函数）。"""
+    items = sorted(
+        words,
+        key=lambda w: ((float(w.get("top", 0.0)) + float(w.get("bottom", 0.0))) / 2.0, w["x0"]),
+    )
+    lines: list[list[dict]] = []
+    yc_run: float | None = None
+    for w in items:
+        yc = (float(w.get("top", 0.0)) + float(w.get("bottom", 0.0))) / 2.0
+        if lines and yc_run is not None and abs(yc - yc_run) <= tol:
+            lines[-1].append(w)
+            yc_run = (yc_run + yc) / 2.0
+        else:
+            lines.append([w])
+            yc_run = yc
+    return lines
+
+
+def _column_rivers(
+    words: list[dict], x_min: float, x_max: float, min_river_pt: float,
+    resolution: float = 1.0,
+) -> list[tuple[float, float, float]]:
+    """投影剖面谷：在所有词上均空白的 x 带（全高河），返回 (x0, x1, 宽)。"""
+    n = int((x_max - x_min) / resolution) + 2
+    occ = bytearray(n)
+    for w in words:
+        a = max(0, int((float(w["x0"]) - x_min) / resolution))
+        b = min(n - 1, int((float(w["x1"]) - x_min) / resolution))
+        for i in range(a, b + 1):
+            occ[i] = 1
+    rivers: list[tuple[float, float, float]] = []
+    i = 0
+    while i < n:
+        if not occ[i]:
+            j = i
+            while j + 1 < n and not occ[j + 1]:
+                j += 1
+            width = (j - i + 1) * resolution
+            if width >= min_river_pt:
+                rivers.append((x_min + i * resolution, x_min + (j + 1) * resolution, width))
+            i = j + 1
+        else:
+            i += 1
+    return rivers
+
+
+def _column_intra_line_gaps(words: list[dict]) -> list[float]:
+    """全部行内相邻词距样本（供数据驱动河宽下限校准）。"""
+    gaps: list[float] = []
+    for line in _column_lines(words):
+        ws = sorted(line, key=lambda w: w["x0"])
+        for i in range(len(ws) - 1):
+            gaps.append(float(ws[i + 1]["x0"]) - float(ws[i]["x1"]))
+    return gaps
+
+
+def _column_line_supports_river(
+    ws: list[dict], river_x0: float, river_x1: float, need_pt: float,
+) -> bool:
+    """该行"开口"河：存在相邻词对空档覆盖整条河且宽度 ≥ need_pt。"""
+    for i in range(len(ws) - 1):
+        if float(ws[i]["x1"]) <= river_x0 and float(ws[i + 1]["x0"]) >= river_x1:
+            if float(ws[i + 1]["x0"]) - float(ws[i]["x1"]) >= need_pt:
+                return True
+    return False
+
+
+def _column_mass(words: list[dict]) -> int:
+    return sum(len(w.get("text", "")) for w in words)
+
+
+def _split_words_into_column_regions(
+    words: list[dict], depth: int = 0,
+) -> list[list[dict]]:
+    """Tier-1 保守栏分区（r66 授权范围）。
+
+    顺序：数据驱动下限 → 最宽全高河 → 非空双岸 → 严格行级支持 →
+    质量守卫 → 宽度守卫 → 递归左右。任一守卫失败即整体不分裂
+    （返回单个原词集）。区域顺序确定性：左在右前。
+    """
+    if depth >= _COLUMN_MAX_SPLIT_DEPTH or len(words) < _COLUMN_MIN_WORDS:
+        return [words]
+    gaps = _column_intra_line_gaps(words)
+    med_gap = statistics.median(gaps) if gaps else 0.0
+    min_river_pt = max(
+        _COLUMN_MIN_RIVER_FLOOR_PT, _COLUMN_RIVER_GAP_FACTOR * med_gap,
+    )
+    x_min = min(float(w["x0"]) for w in words)
+    x_max = max(float(w["x1"]) for w in words)
+    rivers = _column_rivers(words, x_min, x_max, min_river_pt)
+    if not rivers:
+        return [words]
+    r_x0, r_x1, _width = max(rivers, key=lambda r: r[2])
+    left = [w for w in words if float(w["x1"]) <= r_x0 + 0.5]
+    right = [w for w in words if float(w["x0"]) >= r_x1 - 0.5]
+    if not left or not right:
+        return [words]
+    # 严格行级支持：每个双岸行自身必须以本行字号尺度开口该河
+    # （大字号通栏标题拒绝开口 → 整体不分裂）。
+    for line in _column_lines(words):
+        has_l = any(float(w["x1"]) <= r_x0 + 0.5 for w in line)
+        has_r = any(float(w["x0"]) >= r_x1 - 0.5 for w in line)
+        if has_l and has_r:
+            med_h = statistics.median(
+                float(w["bottom"]) - float(w["top"]) for w in line
+            )
+            need = max(min_river_pt, _COLUMN_LINE_SUPPORT_HEIGHT_FACTOR * med_h)
+            ws = sorted(line, key=lambda w: w["x0"])
+            if not _column_line_supports_river(ws, r_x0, r_x1, need):
+                return [words]
+    total_mass = _column_mass(words)
+    if (
+        min(_column_mass(left), _column_mass(right)) / max(1, total_mass)
+        < _COLUMN_MIN_REGION_MASS_RATIO
+    ):
+        return [words]
+    if (r_x0 - x_min) < _COLUMN_MIN_REGION_WIDTH_PT or (
+        x_max - r_x1
+    ) < _COLUMN_MIN_REGION_WIDTH_PT:
+        return [words]
+    return _split_words_into_column_regions(
+        left, depth + 1,
+    ) + _split_words_into_column_regions(right, depth + 1)
+
+
+def _page_paragraphs(words: list[dict]) -> list[dict[str, Any]]:
+    """Tier-1 分区入口（_parse_pdf 段落泳道唯一调用点）。
+
+    单区退化路径：把原 words 直接交给既有 _group_words_to_paragraphs，
+    不重排、不重建（r66 护栏：单栏页序列化零差异目标）。
+    多区路径：按区左→区右依次独立分组后拼接。
+    """
+    regions = _split_words_into_column_regions(words)
+    if len(regions) <= 1:
+        return _group_words_to_paragraphs(words)
+    paragraphs: list[dict[str, Any]] = []
+    for region in regions:
+        paragraphs.extend(_group_words_to_paragraphs(region))
+    return paragraphs
 
 
 # ---------- PDF 表单域标签负向语义信号（Stage 10 批次 6 / C2，r59） ----------
@@ -856,7 +1015,7 @@ def _parse_pdf(
                         )
                     )
                     words = []
-                for para in _group_words_to_paragraphs(words):
+                for para in _page_paragraphs(words):
                     text = para["text"].strip()
                     if not text:
                         continue
