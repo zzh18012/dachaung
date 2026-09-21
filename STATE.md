@@ -121,6 +121,17 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2068 — R2042 候选池回读核对（主表 22 条全开放实证 + 治理 5 条状态判定 + thin 模块方向关闭；纯只读校准轮零测试改动）
+
+- 任务：R2067 建议③轻量 f 轮——① 回读 R2042 盘点件（`outputs/autonomous/candidates_inventory_r2042.md`）核对候选池现状；② thin 模块间接通道密度核验（R2067 标注低价值）。main HEAD 检查 `6c6d398ca9c91b5b1f297e889301e776b261bfb2` **未前进** ✓ 工作树 clean（R2047 重探不触发）；本轮纯文件 grep/read，未在 main 跑任何 pytest/CLI 子进程——零写入边界最严形态；核对材料 `outputs/autonomous/candidates_recheck_r2068.md`（未入库）。
+- **①候选池结论（主表 22 条）**：C01–C16 逐条在 main 实读核验**全部仍开放、0 条已被指示线实现**（C01 help 无钳制声明 / C02 glob-目录不对称未声明 / C03 docs 零 family 分工陈述 / C04 manifest.py:149 仍含 ".git" / C05 EXIT_RUN=6 仍在 / C06 public_per_doc 恰五键且 CLAUDE.md:195 仍承诺落盘 / C07 docstring 无跨进程丢行 / C11 plugin_loader.py:97 仅 except Exception / C12 setup_logger 无早期校验 / C13 _RESERVED 缺三键 / C14 mode truthiness 判定 / C15 runner.py:63-70 静默吞 / C16 无 doc_id 交叉核对）；D01–D05 维持存档；D06 annotation.schema.json 仍零代码引用。**盘点件勘误 2 处（定位级，不改有效性）**：C08 实际文件 `fallback_parser.py` 且裸 ValueError raise 点在 **app/models.py:46-48**（盘点写 fallback.py）；C09/C10 的 rglob 过滤实际在 **app/cli.py:576**（盘点写 batch.py）。
+- **②治理另表 5 条**：G03 **已执行收官**（9 批，锚 102091→92365，≤3 断供 R2062→4-file R2064−1956→5-file R2065−1608 按 r57①递进，eligible=0 不外推；执行范围=l1_redundant 删冗余子集，候选 A parametrize 压缩不在内）；G04 未执行维持另裁，**R2035"可零损失删除 32,002"口径已被 G03 执行部分消耗（L1 冗余子集删毕），引用需重算剩余口径**；G01 待裁（v3.1 明列不做）/ G02 信息性 / G05 存档不动。
+- **③thin 模块间接密度（4/4 非候选，方向关闭）**：jsonlog 间接经 test_plugin_loader 三处真实 CLI `--log-file` 子进程；source_types 经 registry 契约面被 **12+ 测试文件**间接行使（thin 为单定义点 import 伪象）；table_linearize 经 fallback_parser:17 import 被全部 w:tbl 表格测试间接行使；evaluation.cli 单文件即 7 条双子命令真实 e2e。R2067"低价值可跳"预判获实证确认。
+- 计数影响：0（纯分析轮；收官锚 92365 不变，自跑 tests/ 零变化）。G03/G04/G05 冻结维持；R2066 记录的 6 文件 SyntaxWarning 维持指示线候选不自跑线修。
+- 下次建议：R2069 维持 f/b 常规项轮换或空闲至 **09-28 周期简报轮**（R57-② 一次性 ≤60 分钟全量实跑：固定 HEAD、单次、禁自动重试，锚 92365，引用 R2066 投影 + 本轮候选池状态结论 + R2067 scripts/ 舰队盘点）；main 前进（≠6c6d398）触发 R2047 重探优先。
+
+---
+
 ## Round 2067 — 1b/f 增量：main 侧模块级测试引用映射（第九审计维度；运行时代码引用全覆盖闭合 + scripts/ 舰队 18/19 零测试引用盘点，纯分析零测试改动）
 
 - 任务：R2066 建议 f/b 常规项轮换，选 1b/f 增量角度（非重扫——main-target 基线 @6c6d398 未变）。新开**第九审计维度**：main 源码模块 → tests/ 引用映射，三口径 = AST import（`import app.x` / `from app.x import y` / `from app import x` 子模块展开）+ dotted 字符串引用（monkeypatch.setattr 目标等）+ CLI 通道子串（app.cli / evaluation.cli / container_verify），回答"哪些 main 模块没有任何测试直接引用"，为后续 1b/b/a 投向提供系统化路由依据。main `6c6d398ca9c91b5b1f297e889301e776b261bfb2` 只读（扫描器内置 rev-parse + status 前后核验均 clean；本轮未在 main 跑任何 pytest/CLI 子进程——纯文件读取 + AST，零写入边界最严格形态）。
