@@ -7780,3 +7780,51 @@ KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
 6. **台账边界**：本条在 53e8ffb 之后新增（53e8ffb 亦未推送）；
    两者均排队待 r67 授权（push 申请 P20' 见 r67 简报）。Batch 12
    分支本身无 push 权，push 申请同简报。
+
+## 一百五十四、r67 回执：Batch 12 判 Acceptance-Pending + P20' A/B 推送完成 + 验收补轮立项
+
+1. **Batch 12 裁决**：实施结构性追认（单区直通、左→右、17 个
+   物理多区页、词守恒 17/17、单栏零差异、CJK/窄槽保守 miss、
+   禁区逐项未动）——不撤回、不返工；状态定为
+   **Stage-10-Batch-12-Acceptance-Pending**（非 Closed；§153 标题
+   "验收待 r67" 与此一致，定性以本条为准）。
+2. **下游裁量点裁决**：① real-04 p002 +2 relations **接受**，台账
+   口径 = intentional downstream semantic correction（几何修正后的
+   有意下游语义修正，不记作 "zero relation diff"）；② 一般类型
+   漂移**不得**以已知限制吞掉——17 个变化页有限类型审计为封口
+   前置（新增/消失 heading、paragraph↔heading 翻转，逐条判
+   正确恢复 / 明确 FP / 不可验证）；③ real-02 p005 +8 / p006 +10
+   **不接受**方案 (i)（已知限制），定为 **Batch 12 封口 BLOCKER**；
+   旧 'Yes No N/A' 行尾是跨栏粘连文本，曾兼任批次 6
+   form_label_option_suffix 触发器与句尾终止符，Tier-1 正确去除
+   粘连后暴露潜在 heading FP——**禁止把应答栏重新拼回问题文本**
+   （会回退 §1 修复）。
+3. **验收补轮立项（Batch 12 acceptance-hardening，在 68a36a7
+   基础上，零生产行为改动）**：(a) 17 页类型漂移有限审计；
+   (b) real-02 p004–p006 新增 heading 逐条清点；(c) 表单问题行/
+   标签 FP 通用信号设计——至少两类方案对比（文本局部信号；
+   区域/页面重复结构或邻接应答栏结构信号），**必须包含合法短标题
+   反例**（防误伤）；shadow 分析/合成原型允许。红线：不得修改
+   生产代码、不得 real-02 原文硬编码、不得重新跨栏拼接、不得进
+   Tier-2 表格检测；停链：需公共 region-id/schema、需重写 heading
+   框架、需文档级表单重构。补轮结论后再裁窄幅 heading 加固 vs
+   残余分类；无 Batch 13。
+4. **P20' A 执行回执（2026-09-21）**：前置——HEAD =
+   68a36a733315e54af5c0ee9b8035f9dfc1e3ab9a，68a36a7^ = 8f11da0
+   精确，rev-list 8f11da0..HEAD 恰 {68a36a7}，远端原无该分支，
+   工作树干净。执行：git push -u origin
+   integration/stage10-batch12-pdf-column-regionizer-impl（新远端
+   分支创建，非 force）。推后核验：fetch + ls-remote 精确
+   68a36a7…c1e3ab9a。**push = 实施检查点，非封口**；该分支后续
+   补轮 commit 无自动 push 权。
+5. **P20' B 执行回执（2026-09-21）**：前置——HEAD = 9cd35fb，
+   9cd35fb^ = 53e8ffb 精确、53e8ffb^ = e176b4b 精确，rev-list
+   e176b4b..HEAD 恰 {53e8ffb, 9cd35fb}，远端 tip = e176b4b，
+   工作树干净。执行：git push origin
+   9cd35fb:refs/heads/integration/stage9-batch26-corpus-annotation
+   （远端 e176b4b..9cd35fb 纯 FF，非 force）。推后核验：fetch +
+   ls-remote 精确 9cd35fb…ab5730。§153 按"Batch 12 执行完成 /
+   验收 pending"口径生效（本条第 1 条补足定性）。
+6. **§3a**：维持 deferred（r67 (d)）。G⑤ 冻结不变。
+7. **台账边界**：本条在 9cd35fb 之后本地新增，不在 P20' B 授权
+   集合 {53e8ffb, 9cd35fb} 内，排队待下次授权。
