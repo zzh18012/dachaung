@@ -7675,3 +7675,56 @@ KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
 7. **边界**：本条在 63f9462 之后新增，不在 P18' A 授权集合
    {63f9462} 内，按钉死规则排队待下次授权（r66 简报附
    push 申请）；Batch 11 分支维持无自动 push 权。
+
+## §一百五十二（2026-09-21）r66：Batch 11 设计追认 + Batch 12（Tier-1 保守分区底座）实现授权 + P19' A/B 执行回执 + Stage-10-Batch-11-Closed
+
+1. **Batch 11 设计结论追认**：§1 与 §3a 共同布局信息缺失根因；
+   方案 B 不进近期实施；方案 A Tier-1 具备独立落地条件；N4
+   双栏正文"先分区、后沿用既有 grouping"自然消除同构误报为
+   有效架构证据；CJK 与窄槽保守失败接受为**未覆盖**（非首批
+   必解）；F-A 候选发射与 paragraph 去重替换**未自动获权**。
+2. **Batch 12 授权（Tier-1 收窄实现）**：分支
+   integration/stage10-batch12-pdf-column-regionizer-impl，基点
+   8f11da0（P19' A 核验后建立），无 push 权。允许：保守 PDF
+   page-level column regionizer → 每区复用现有
+   _group_words_to_paragraphs；v1 核心（全高空白河/投影分区、
+   数据驱动 gap 下限、行级双岸支持、大字号通栏拒绝、两侧最小
+   字符质量守卫、确定性区域顺序）；多栏页由跨栏交错变为区域化
+   输出。**禁止**：Tier-2 F-A 候选发射、候选去重/替换、caption
+   region-id 门控、§3a 状态改 implemented、schema/locator 变化、
+   全局 table reconstruction、方案 B。
+3. **font/size 与 CJK 校准不为本批前提**：禁止顺带引入
+   extract_words 参数或 tokenization 行为变更；tech-08 p12 CJK
+   漏分与 acad-03 p004 窄槽漏分保留 known conservative miss；
+   page.chars 只读 shadow calibration 可继续取证但不得改变本批
+   生产分区判定。
+4. **Batch 12 验收护栏（登记）**：单区退化路径直接沿用现有
+   word sequence → grouping（不得重排/重建 words；单栏页序列化
+   零差异为目标）；双栏正例证不再跨栏同-y 合并 + 稳定左→右
+   顺序；通栏标题/宽词距/编号列表不误切；有框表格检测发射不
+   变；≥1 个"多栏页含既有 table/caption 邻域"守护夹具；真实
+   语料只读复核 real-04 p002 / acad-03 p002 / CJK known miss /
+   窄槽 known miss / 既有单栏采样集；**验收报告须列出全部输出
+   变化页及变化类型**。停链：单栏页非预期 diff / 需改公共模型
+   或 locator 契约 / 需改 table/caption 发射 / 需 font/size/
+   tokenization 改动 / 实现必须同时加 Tier-2。
+5. **P19' A 执行回执（2026-09-21）**：前置——HEAD =
+   8f11da0a168e3206e030bd56b6e85fa90aeb1f0d，8f11da0^ = d91d3dd
+   精确，rev-list d91d3dd..HEAD 恰 {8f11da0}，远端原无该分支，
+   工作树干净。执行：git push -u origin（新分支创建，非 force）。
+   推后核验：ls-remote 精确 8f11da0…eb1f0d。
+6. **P19' B 执行回执（2026-09-21）**：前置——HEAD =
+   e176b4bcacbf99e6a153d17bfd3a5899e83c7288，e176b4b^ = 63f9462
+   精确，rev-list 63f9462..HEAD 恰 {e176b4b}，远端 tip =
+   63f9462，工作树干净。执行：git push origin
+   e176b4b:refs/heads/integration/stage9-batch26-corpus-annotation
+   （远端 63f9462..e176b4b 纯 FF，非 force）。推后核验：ls-remote
+   精确 e176b4b…7c288。
+7. **Stage-10-Batch-11-Closed 自动生效**；Batch 12 Tier-1 授权
+   即刻生效（无 push 权）；§3a 维持 deferred / blocked on
+   layout-reconstruction architecture——Batch 12 成功亦只表明
+   共享布局底座开始落地，不得宣称无线框表格问题已解决；
+   Tier-2/F-A 去重替换仍须单独报裁。
+8. **边界**：本条在 e176b4b 之后新增，不在 P19' B 授权集合
+   {e176b4b} 内，排队待下次授权（r67 简报附 push 申请）；
+   Batch 12 分支无 push 权。
