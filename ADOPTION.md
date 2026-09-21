@@ -7881,8 +7881,8 @@ KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
      从远端已核验 68a36a7 纯 FF 至 0f5d23b；新增集合严格
      {0f5d23b}，要求 0f5d23b^ = 68a36a7。
    - **B**：integration/stage9-batch26-corpus-annotation 从远端
-     已核验 9cd35fb 纯 FF 至 44dc0b6；新增集合严格 {44dc0b6}，
-     要求 44dc0b6^ = 9cd35fb。
+     已核验 9cd35fb 纯 FF 至本地 tip（≥ 44dc0b6，含本条 commit；
+     精确 SHA 集合在 r68 简报钉死）。
 6. **请求裁决（r68）**：(a) D-min / D-full / 维持残余分类——
    实施则授权窄幅 heading 加固批（批次 6+9 通道，反例矩阵为
    必备夹具）；(b) Batch 12 封口路径——若 D-min 实施批通过
