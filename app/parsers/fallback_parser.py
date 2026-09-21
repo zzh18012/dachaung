@@ -983,6 +983,74 @@ def _suppress_page_furniture_headings(
     return elements
 
 
+# ---------- PDF 表单选项同列堆叠 heading 后置过滤（Stage 10 批次 12 hardening，r68 D-safe） ----------
+
+# r68 冻结的封闭选项词集（规范化后整行精确匹配；不扩展词表、不模糊匹配、
+# 不删标点——'Yes.' 不在词集内必须存活）
+_FORM_OPTION_VOCAB = frozenset({"yes", "no", "n/a", "no n/a", "yes no n/a"})
+# r68 冻结的同列堆叠阈值：同页同规范化文本 ≥3 个 heading 才构成模板性
+_FORM_OPTION_REPEAT_MIN = 3
+
+
+def _option_heading_key(element: Element) -> tuple[str, int, tuple[float, float]] | None:
+    """heading 元素若规范化全文 ∈ 封闭选项词集，返回 (规范化文本, 物理页号, x 区间)。
+
+    规范化仅 trim + 连续空白折叠 + 大小写归一（r68 钉死的三步，其余一律
+    不做）。bbox 缺失或 page 非法的元素不参与聚类。
+    """
+    locator = element.source_locator or {}
+    page = locator.get("page")
+    bbox = locator.get("bbox")
+    if (
+        not isinstance(page, int)
+        or not isinstance(bbox, (list, tuple))
+        or len(bbox) != 4
+    ):
+        return None
+    norm = " ".join((element.content or "").casefold().split())
+    if norm not in _FORM_OPTION_VOCAB:
+        return None
+    return norm, page, (float(bbox[0]), float(bbox[2]))
+
+
+def _suppress_form_option_repeat_headings(elements: list[Element]) -> list[Element]:
+    """页级后置过滤：表单选项同列堆叠重复抑制（r68 D-safe = S1a ∧ S2a，就地改写）。
+
+    仅当元素已是 heading、规范化全文 ∈ 封闭选项词集（S1a），且同一物理页上
+    同一规范化文本 ≥3 个 heading 的 bbox x 区间经重叠聚类属于同一列簇（S2a），
+    才抑制为 paragraph + metadata.heading_suppressed=form_option_repeat。
+    分属不同 x 列簇的实例各自计数，不跨簇合并；x 聚类为区间重叠（含边界
+    相接），非绝对坐标 rounding，无针对具体文档的坐标阈值。
+    """
+
+    groups: dict[tuple[str, int], list[tuple[tuple[float, float], Element]]] = {}
+    for el in elements:
+        key = _option_heading_key(el)
+        if key is not None:
+            groups.setdefault((key[0], key[1]), []).append((key[2], el))
+    to_suppress: list[Element] = []
+    for members in groups.values():
+        if len(members) < _FORM_OPTION_REPEAT_MIN:
+            continue
+        spans = sorted(members, key=lambda m: (m[0][0], m[0][1]))
+        clusters: list[list[Element]] = []
+        cluster_max_x1: float | None = None
+        for (x0, x1), el in spans:
+            if cluster_max_x1 is not None and x0 <= cluster_max_x1:
+                clusters[-1].append(el)
+                cluster_max_x1 = max(cluster_max_x1, x1)
+            else:
+                clusters.append([el])
+                cluster_max_x1 = x1
+        for cluster in clusters:
+            if len(cluster) >= _FORM_OPTION_REPEAT_MIN:
+                to_suppress.extend(cluster)
+    for el in to_suppress:
+        el.type = "paragraph"
+        el.metadata["heading_suppressed"] = "form_option_repeat"
+    return elements
+
+
 def _parse_pdf(
     path: Path,
     source_hash: str,
@@ -1231,6 +1299,9 @@ def _parse_pdf(
     # 底带页面家具抑制（Stage 10 批次 9）：同样在 relation 匹配前完成；
     # 只改 heading→paragraph，与表格合并输入不相交
     elements = _suppress_page_furniture_headings(elements, page_heights)
+    # 表单选项同列堆叠抑制（Stage 10 批次 12 hardening，r68 D-safe）：
+    # 家具抑制之后、relation 匹配之前；同样只改 heading→paragraph
+    elements = _suppress_form_option_repeat_headings(elements)
     return elements, warnings
 
 

@@ -114,3 +114,16 @@ dangerous goods'、'Checklist'、'Risk rating' 等）三信号均零命中；
   标记 1、页码拆分显形 3——非表单应答栏家族，登记在审计报告，
   不在本信号面内，留待后续独立裁量。
 - S2b 的稀疏页守卫细化（D-full 若被裁决再设计）。
+
+## 7. r68 裁决结果（补记，2026-09-21）
+
+r68 **未采纳本文件推荐的 D-min（S1a ∨ S2a）**，改判授权更窄的
+**D-safe = S1a ∧ S2a**：OR 把两个理论误伤面（FAQ 裸 'Yes' × 同名
+堆叠小节）取并集，而 18 个目标 FP 同时满足两信号，无必要扩大。
+落点改判：**不得**把 S1a 单独加入批次 6 `_form_label_signal`
+（避免合法单个 Yes 仅凭文本被压制），实现为独立页级 post-filter
+`form_option_repeat`（S1a∧S2a 一次性判定）。规范化钉死仅
+trim/空白折叠/大小写三步（'Yes.' 存活）。区头 1 FP 与非表单家族
+登记 `post-regionization downstream classification residuals`，
+不再阻塞 Batch 12 关闭。实施与验收记录见 BACKLOG §1（r68 段）
+与 outputs/batch12i_accept_report.txt。
