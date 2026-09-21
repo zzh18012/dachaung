@@ -7630,3 +7630,48 @@ KV-GAP / F-B 单列散文 / F-C 空单元三分类；pdfplumber text 策略
 8. **边界**：§一百四十九与本条在 d99a0df 之后新增，不在 P17'
    B 授权集合 {d9bc17a, d99a0df} 内，按钉死规则排队待下次
    授权（r65 简报附 push 申请）；Batch 11 分支无自动 push 权。
+
+## §一百五十一（2026-09-21）r65：G⑤ 代表页口径追认与冻结 + 报告分层统计边界 + G⑥ 凭证双列约束 + P18' A 执行回执 + Batch 11 启动确认
+
+1. **纯确认（r49）**：P17' A/B 回执与 Stage-10-Batch-10-Closed
+   成立；DOCX 15 元素冻结口径、§3a deferred 状态继续有效。
+2. **G⑤ 口径变更追认并冻结为"代表页子集 agreement"**：冻结
+   对象 = 交付包 outputs/第二标注人任务包-r3.zip（sha256
+   e6978d8475591d4c621c92bff60eb6c884f38cc347f8bfa207669748f
+   a6795ec）+ 包内注册的具体页集合 + 范围外页固定 EXCLUDE_BASE。
+   "前 15 页"方案作废且从未交付，不具任何测量效力。**此后不得
+   依据第二标注人实际标签、agreement 高低或 disagreement 分布
+   再调整代表页集合；改页集须重新报裁。**
+3. **G⑤ 报告分层规范（禁止外推）**：三篇缩范围文档产出的是
+   "预选代表页子集上的双标注一致性"，非全文 agreement。最终
+   G⑤/G⑥ 材料必须：acad-03 明示 full-document agreement，
+   其余三篇明示 selected-page / representative-page-subset
+   agreement；第一/第二标注人在完全相同页集、相同 unit
+   universe 上比较；每篇同时报告选中页数/总页数及参与
+   agreement 的 unit 或行数分母；跨文档 aggregate 必须注明
+   是对实际已双标 unit 的 aggregate，禁写"四篇全文
+   agreement"；禁把形态覆盖式人工选页描述成概率抽样、禁据此
+   对未标页面做一致性统计推断；统计表述用 selected
+   representative pages（"代表页"仅作工程名）。
+4. **G⑥ 凭证双列约束**：frozen candidate totals 继续基于第
+   一标注人全量（数值总量不随缩页变化）；但 G⑤ 验证强度相应
+   改变——三篇只验证被选页，范围外第一标注人标注不构成双人
+   复核证据。后续组装 G⑥ gold-freeze 凭证时并列保留 full
+   first-annotator totals + sampled second-annotator agreement
+   coverage，二者不得合并表述成"全量均经双标"。
+5. **P18' A 执行回执（2026-09-21）**：前置核验——HEAD =
+   63f946245f1f998d6cdf1fa016e9f890b5b5f79d，远端 tip =
+   d99a0df…84e6e，63f9462^ = d99a0df 精确，rev-list
+   d99a0df..HEAD 恰 = {63f9462}（无 §151/r65 登记或 Batch 11
+   内容夹带），FF 成立，工作树干净。执行：git push origin
+   63f9462:refs/heads/integration/stage9-batch26-corpus-
+   annotation（远端 d99a0df..63f9462 纯 FF，非 force）。推后
+   核验：fetch + ls-remote 精确指向 63f9462…5f79d。
+6. **Batch 11 启动确认**：integration/stage10-batch11-pdf-
+   layout-architecture-design 基于 d91d3dd 建立且无新增
+   commit，符合 r64。权限维持：设计/取证/shadow prototype/
+   合成实验；无生产解析行为修改权、无 push 权。完成后 r66
+   提交架构结论。
+7. **边界**：本条在 63f9462 之后新增，不在 P18' A 授权集合
+   {63f9462} 内，按钉死规则排队待下次授权（r66 简报附
+   push 申请）；Batch 11 分支维持无自动 push 权。
