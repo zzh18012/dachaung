@@ -8009,3 +8009,53 @@ P21' A 已核验后）。执行记录：
    验收已过，仅剩 push 核验一步）；(c) 批次 12 关闭后的下一批
    方向征询（§3a 维持 deferred；非表单 residual 家族是否立项
    待积累）。
+
+## 一百五十八、r69 裁决回执：Batch 12 封口生效 + Batch 13 立项
+
+日期：2026-09-22。裁决全文由用户转交（GPT-5.6 Sol，r69）。执行记录：
+
+1. **追认**：aaff3df D-safe 实现与申报边界闭合——35→17 恰由
+   18 条 form_option_repeat 解释、其余 5 篇零变化、全元素
+   identity/content/locator/confidence 守恒、chunk 变化为
+   heading 语义修正后的确定性合并（非文本/element-id 丢失）。
+2. **P22' A push 回执**：预核验（HEAD=aaff3df、aaff3df^=
+   0f5d23b、rev-list 集合严格 {aaff3df}、远端 tip=0f5d23b、
+   树干净）→ push 0f5d23b..aaff3df 纯 FF → 复核验 ls-remote：
+   远端 tip = aaff3df 精确。非 force。
+3. **P22' B push 回执**：预核验（链严格 7722677 → d116462 →
+   a9d338d、集合严格 {d116462, a9d338d}、远端 tip=7722677、
+   树干净）→ push 7722677..a9d338d 纯 FF → 复核验：远端
+   tip = a9d338d 精确。非 force。
+4. **Stage-10-Batch-12-Closed 自动生效**（r69 ③ 四条件逐项
+   核验：Batch 12 远端 ref = aaff3df ✓、adoption 远端 ref =
+   a9d338d ✓、两边新增集合严格等于授权集合 ✓、全程非 force ✓）。
+   按 r49 先例本封口为纯确认，无需下一轮重新申请关闭。
+   **冻结验收基线**：real-02 heading = 17；本批
+   form_option_repeat = 18；合法/保留构成 = 10（DOCX 镜像合法）
+   + 2（语义合法）+ 1（批次 9 B 类封面日期 known residual）
+   + 3（批次 6 表单残留）+ 1（应答区头 known residual）= 17；
+   其余 5 篇本批元素级零漂移；full regression = 5654 passed /
+   26 skipped / 0 failed。**区头 residual 1 维持 known
+   residual——不得因距清零只差一条而扩词集或补区头特判**。
+5. **下一方向裁定**：暂不立新 residual 修复实现批（acad-03
+   图内标签 ×5 / tech-03 封面 ×3 / prod-01 continued ×1 /
+   prod-01 页码显形 ×3 均跨入不同视觉/版面语义家族，未形成
+   跨语料稳定、局部可解释、低误伤模式；逐类追数值会回到单文档
+   heuristic accumulation）。
+6. **Stage 10 Batch 13 立项 = closeout / residual-baseline audit**
+   （分支 integration/stage10-batch13-closeout-audit，基点
+   aaff3df，仅 P22' A 精确核验后建立——已满足）。授权范围 =
+   **只读验收与文档收口批，零生产解析行为变化**。目标产出：
+   ①冻结 Batch 12 后六篇语料 heading/element/chunk 基线；
+   ②剩余误判按稳定 family 登记（不逐条修）；③逐项分类
+   processed / known residual / deferred / blocked；④§3a
+   维持 deferred / blocked on PDF layout-reconstruction
+   architecture 不变；⑤核对批次 6/9/12 suppression metadata
+   原因集合与计数（不得出现未登记新 reason）；⑥核对全量回归
+   与关键 guard suites；⑦给出 Stage 10 是否具备整体 closeout
+   条件的结论 + 未关闭风险表。audit 中若发现某 residual 家族
+   有 ≥2 篇/独立版面实例的同一结构信号 → 可记为下一阶段候选
+   证据，本批不得实施。**Batch 13 不含 push 权**。
+7. **边界不变**：G⑤ 代表页冻结口径不变；第二标注人进行中工作
+   不因收口审计改变；2026-09-28 autonomous-track 周期简报与
+   execution-baseline 豁免轮保持独立，不并入 Batch 13。
