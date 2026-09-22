@@ -8481,3 +8481,67 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
     （r71 排序：Batch 15 Tier-2 候选特征为第二优先，需先
     设计轮；其余 dedup 替换 / CJK 校准 / metadata 外显均
     另批）。
+
+## 一百六十七、r73 回执：Batch 14 验收追认 + P26' A 执行 + P26' B 停链（申报侧链错述）+ P26' B' 修正申请
+
+日期：2026-09-22。
+
+1. **Batch 14 验收追认（r73 (1)）**：A-E 通过；追认结论与冻结
+   状态登记——_annotate_words_with_attrs 落地、extract_words 后
+   接线成立、word identity/geometry/text 序列零变化、element/
+   chunk/relation/warning/metadata 零变化、font 属性仅停留 word
+   层内部不进 element metadata、DOCX/heading/table/suppression/
+   §3a 均未受影响。批次状态 Acceptance-Pending → Closed
+   （**待 P26' push 精确核验后正式生效**；P26' B 侧因本条
+   第 4 款停链，Close 挂起待 P26' B' 核验）。首轮验收误报
+   （resource_path 运行位置前缀）处理闭环获认可。
+2. **Batch 14 后续状态钉死登记**：word 层 fontname/font_size
+   成为未来 Tier-2 candidate 可观测输入；以下保持冻结——
+   Tier-2 候选生成 ❌ / heading、font 影响 ❌ / table 影响 ❌ /
+   CJK 列校准 ❌ / metadata 外显 ❌ / dedup 替换 ❌。mixed
+   比例报告只是观察面，不是质量信号阈值，不得据此直接推规则。
+3. **P26' A 执行回执**：预核验（HEAD=6ef9362、6ef9362^=
+   62f219e、rev-list 62f219e..HEAD 集合严格 {6ef9362}、远端
+   tip=62f219e、树干净）→ push 纯 FF 62f219e..6ef9362 →
+   复核验 ls-remote：远端 tip = 6ef9362 精确。非 force。内容
+   = Batch 14 实施代码 + 测试，不含 Batch 15 提交。
+4. **P26' B 停链（故障如实登记，申报侧错述）**：预核验发现
+   授权链与实际不符——授权要求 9483025^=615a66c、集合严格
+   {9483025}；实际 9483025^=f897095、615a66c..HEAD = {f897095,
+   9483025} 两个 commit。根因：§165（commit f897095）当时仅
+   commit 本地、未随 P25' B push；§166 第 9 条与 r73 简报
+   P26' B 款把链错写为 615a66c→9483025 直连，漏列未推送的
+   中间 commit。**性质 = push 申报的链描述与仓库实态不符
+   （申报侧错述），非执行侧**：预核验停链在执行前拦截，
+   push 从未运行，远端 tip 保持 615a66c，零远端污染。§166
+   第 9 条的链描述以本条为准作废。
+5. **教训登记（入长期治理）**：push 申请中的链与集合必须
+   引用起草时实际的 `git rev-list <远端tip>..<本地tip>` 输出
+   逐字生成，不得凭"远端 tip + 本地 tip"两点记忆直连推断；
+   中间存在未推送 commit 时必须全部枚举。本例与 §160 同源
+   （以记忆/摘要替代实际命令输出），但被预核验在执行前
+   拦截（§160 是执行后才发现）——两道闸门（申请起草引用
+   实际输出 + 执行前预核验）缺一不可。
+6. **P26' B' 修正申请**：integration/stage9-batch26-corpus-
+   annotation 从远端已核验 615a66c 纯 FF 至 **9483025**。
+   链精确 615a66c → f897095（§165）→ 9483025（§166），
+   新增集合严格 {f897095, 9483025}，要求 f897095^ = 615a66c、
+   9483025^ = f897095。非 force。内容 = 两条纯台账 commit，
+   不混入 G⑤ 或 Batch 15 登记。
+7. **Batch 15 设计轮立项登记（r73 (6)）**：Stage 11 Batch 15
+   = Tier-2 font/layout candidate design，仅设计轮授权——
+   shadow analysis / candidate feature 统计 / synthetic
+   fixtures / false-positive analysis / architecture design；
+   禁止生产分类逻辑修改、heading/table/caption 消费 font、
+   metadata 输出、element replacement、dedup、CJK 校准。必答
+   三问：①font 信号是否提供新增判别力（residual family 可分
+   性 + 反例不可分清单 + 与 bbox/position/repetition 组合）；
+   ②candidate 范围观察（页面家具 residual / heading residual /
+   表单残留 / caption、figure 邻接），不自动修复；③"不消费
+   也成立"验证（候选分析关闭后 elements/chunks/relations 全
+   零漂移）。分支 integration/stage11-batch15-tier2-font-
+   feature-design，基点 6ef9362，P26' A 精确核验后建立（已
+   满足）。实现权未授权。
+8. **请求裁决（r74）**：(a) **P26' B' push 授权**（修正链）；
+   (b) P26' B 停链处置追认（§166 第 9 条作废 + 教训入治理）；
+   (c) Batch 15 设计轮成果裁决（届时随设计简报提交）。
