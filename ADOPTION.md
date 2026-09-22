@@ -8864,3 +8864,60 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
    Tier-2 实现仍暂缓（D3 = 候选消费点，未立项）；§3a
    deferred；顶带不立批；G⑤ 冻结；2026-09-28
    autonomous-track 周期简报独立。
+
+## §173（2026-09-22）r76 回执：P29' A/B 执行 + Batch 17 通过 + D3 立项 + Batch 18 实施授权
+
+1. **P29' A 执行回执**：预核验（HEAD=80e817b、80e817b^=
+   9d88abf、rev-list 9d88abf..80e817b 集合严格 {80e817b}、
+   远端无同名分支、树干净）→ push 远端新建
+   integration/stage11-batch17-page-number-boundary-reopen-design
+   → 复核验：远端 tip = 80e817b 精确。非 force。内容 = 仅
+   设计文档。
+2. **P29' B 执行回执**：预核验（db3e3c5^=a80e7cd、0f756b5^=
+   db3e3c5、430c1a2^=0f756b5 链精确、rev-list 集合严格
+   {db3e3c5, 0f756b5, 430c1a2}、远端 tip=a80e7cd、树干净；
+   本地 c2eb21a〔§172〕不推）→ push 纯 FF a80e7cd..430c1a2 →
+   复核验：远端 tip = 430c1a2 精确。非 force。
+3. **Batch 17 设计通过（r76 (3)）**：七项结论批准。D3 冻结
+   定义：独立候选 reason code
+   **page_furniture_digit_page_number**——不是 D1 扩展、不是
+   通用 digit detector、不是 font classifier；属"D1 页码家具
+   族在新增 font evidence 后的窄化消费"。
+4. **D3 立项冻结边界（r76 (4)）**：
+   - ①消费点：仅 _suppress_page_furniture_headings 或等价
+     后置过滤层；禁 _classify_pdf_paragraph / short_line /
+     Tier-1 heading score / DOCX / table detector。
+   - ②fontOut = 必要合取（466/466、100%、零漏检）；禁单独
+     使用 fontOut⇒furniture。
+   - ③size-cap（r≤1.2 候选值）实现前必须重新冻结四项：r 的
+     定义 / 计算基准 / 缺 font_size 行为 / 多字体词行为；
+     候选值不自动成为生产阈值。
+   - ④top-3 font 参数：实现时钉死——top-3 如何计算 / 空属性
+     退化 / 单页 vs 文档级 / 标题族污染风险；不得隐式引入
+     新的文档级学习过程。
+5. **Batch 18 实施授权（r76 (5)）**：Stage 11 Batch 18 =
+   D3 implementation。分支 integration/stage11-batch18-
+   page-number-font-consumption，基点 80e817b（P29' A 核验后，
+   已满足）。允许：实现 D3 / synthetic fixtures / real-02 +
+   六语料只读验收 / 新 reason code。**不允许**：修改 D1/D2 /
+   扩展顶带 / 处理 continued / 处理图内标签 / 修改 §3a /
+   新增 font residual 家族。
+6. **Batch 18 预冻结验收指标（r76 (6)）**：
+   - real-02：heading 数减少仅来自 D3（预期 D3 命中 0 =
+     heading 17 不变）；原 Batch 12/9 reason count 不变；
+     form_label / form_option_repeat 不变；chunk/text/id 守恒。
+   - 其他语料：证明 zero unintended drift；变化恰等于 D3
+     预期命中（prod-01 33、tech-03 233）；不因 font 属性接入
+     改变现有结果。
+   - 消融：至少"去 fontOut 条件"与"去 size-cap 条件"两组，
+     展示两者对 FP 风险的影响——目的是证明两条件为什么
+     存在，不是优化数字。
+7. **下一方向预告（r76 (7)）**：Batch 18 成功后**不继续扩
+   font family**；优先 G⑤/G⑥ 收口与 Stage 11 closeout 评估
+   （word 属性层 + Tier-2 首消费点 + residual 分类框架已成型，
+   继续 residual 修复易入无限启发式循环）。顶带/caption/图内
+   标签保持候选；§3a deferred。
+8. **状态**：P29' A/B 完成核验；Batch 17 Closed；D3 立项；
+   Batch 18 实施授权（本轮新增 = D3 单点消费授权，不是 font
+   能力全面进入解析器）；font 通用规则未授权；§3a deferred；
+   顶带 deferred；G⑤ 冻结。
