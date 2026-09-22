@@ -8682,7 +8682,7 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
 2. **四项检查结论**（详证见
    docs/stage11-batch16-tier2-stability-audit.md）：
    - ①digit+font_out：非 prod-01 特例——页码语义子家族
-     （prod-01 33 + tech-03 233，均 ~100% fontOut、底带
+     （prod-01 33/33 + tech-03 237 中 233，均 fontOut、底带
      0.953 同构）结构+语义双稳定；tech-08 19 条反向证明
      fontOut 是承重分量。**但该形态正是 r62① 当年刻意排除
      边界（裸数字/日期），消费 = 边界显式重开裁决，非
@@ -8691,7 +8691,8 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
      反向（1.17>1.00）、tech-03 零信号。**Batch 15 该项
      正向结论下调**为篇内观察面证据，不得成候选。
    - ③顶带同文重复页眉：结构 ≥3 篇成立（prod-01 140 +
-     tech-03 118 + tech-08 6），但消费三重前置：带定义
+     tech-03 215〔主页眉 110 + 7 组章节页眉 105〕+ tech-08
+     6 = 361），但消费三重前置：带定义
      扩展（D2 现仅底带）+ 内容/家具判别（tech-03 章节页眉
      与真标题逐字相同）+ r62 边界重开 → **layout
      architecture 级事项，本批不实施**。
@@ -8702,14 +8703,20 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
 3. **Batch 15 结论修订登记**：digit∧fontOut 升级（跨篇
    语义稳定成立，但消费撞 r62① 边界）；图内尺寸比降级
    （风格依赖）。
-4. **P28' A push 申请（stage10 线，batch16 审计分支）**：
+4. **P28' A push 申请（stage10 线，batch16 审计分支；修订版）**：
    integration/stage11-batch16-tier2-stability-audit 远端
-   新建，基点 = 已核验 4accf61，tip = **11dd86c**。当次实际
-   输出：11dd86c^ = 4accf614bc8858801909cdd676e057f9fb15e844；
-   `git rev-list --ancestry-path 4accf61..11dd86c` =
-   {11dd86c5451dd4be149a5fe4aa39f5c5617c91be}（严格单元素）；
-   ls-remote 同名分支为空（远端不存在）；树干净。集合严格
-   {11dd86c}。非 force。内容 = 纯审计文档。
+   新建，基点 = 已核验 4accf61，tip = **9d88abf**。首版申请
+   （tip 11dd86c）因审计文档实例数口径错误作废：tech-03
+   digit n 应为 237（fontOut 233）、章节页眉 7 组 105 页
+   （顶带合计 361）——修正 commit 9d88abf 后按下述实际输出
+   重新生成。9d88abf^ =
+   11dd86c5451dd4be149a5fe4aa39f5c5617c91be；
+   `git rev-list --ancestry-path 4accf61..9d88abf` =
+   {9d88abf3f9904d99756a179910c22a33cc4dc682,
+   11dd86c5451dd4be149a5fe4aa39f5c5617c91be}（两元素，均
+   纯文档）；ls-remote 同名分支为空（远端不存在）；树干净。
+   集合严格 {11dd86c, 9d88abf}。非 force。内容 = 审计文档
+   + 口径修正。
 5. **P28' B push 申请（adoption 线台账）**：
    integration/stage9-batch26-corpus-annotation 从远端已
    核验 054c19c 纯 FF 至 **a80e7cd**（§169 本地台账）。
