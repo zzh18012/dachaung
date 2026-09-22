@@ -17,24 +17,15 @@
   全量回归 5638 passed。r66 冻结的已知保守 miss 保持：tech-08 p012
   CJK、acad-03 p004 窄槽。设计文档
   docs/stage10-batch11-pdf-layout-architecture-design.md。
-- 状态（r68，2026-09-21）：**D-safe 实施完成，验收条件全过，待 push
-  授权后封口**——r68 改判授权 **D-safe = S1a ∧ S2a**（不批准 D-min
-  的 OR：两理论误伤面取并集无必要；18 个目标 FP 同时满足两信号）。
-  落地 `_suppress_form_option_repeat_headings` 页级 heading post-filter
-  （`app/parsers/fallback_parser.py`）：heading + 规范化全文 ∈ 冻结
-  词集 {yes, no, n/a, no n/a, yes no n/a} + 同页同文 ≥3 且 x 区间
-  重叠同列簇 → paragraph + `heading_suppressed=form_option_repeat`；
-  规范化仅 trim/空白折叠/大小写（'Yes.' 存活）；**不进批次 6
-  `_form_label_signal`**（r68 明令：S1a 单独作全局局部信号会误伤
-  合法单个 Yes）。x 聚类=区间重叠（含边界相接），非 rounding。
-  验收（outputs/batch12i_accept_report.txt）：real-02 heading 35→17、
-  抑制恰 18（Yes×9 + No N/A×9，全 p5/p6）、区头 "Brief description
-  and outcome" 保留 heading 列 known residual（**禁加区头规则压
-  17→16**）、其余 5 文档零变化、chunk 漂移定性为 p5/p6 窗口内下游
-  重组（文本 23932 字符逐字守恒、id 多重集守恒、窗外逐字节不变）、
-  全量回归 5654 passed（含 r68 八项必备测试，16 个新测试）。
-  封口条件：验收已过，待单独 push 申请 → 精确核验后自动进入
-  Stage-10-Batch-12-Closed
+- 状态（r69，2026-09-22）：**Stage-10-Batch-12-Closed**——P22' A
+  push 0f5d23b→aaff3df 纯 FF + ls-remote 精确核验通过，封口自动
+  生效（r49 先例纯确认）。冻结验收基线：real-02 heading = 17
+  （构成 10+2+1+3+1）、本批 form_option_repeat = 18、其余 5 篇
+  元素级零漂移、full regression 5654/26/0。区头 residual 1 维持
+  known residual，禁扩词集/补区头特判。收口审计见 Batch 13
+  （docs/stage10-batch13-closeout-audit.md：六篇基线冻结表、
+  suppression reason 普查 76 条零未登记、residual 家族四分类
+  登记、closeout 结论 + 风险表）
 
 ## 2. 候选 C：002-PDF 表单域标签误判 heading
 
