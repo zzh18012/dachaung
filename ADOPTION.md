@@ -8788,3 +8788,79 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
    采纳）；Tier-2 实现暂缓；digit+fontOut=候选待 r62① 重开；
    图内尺寸比降级；顶带=架构级候选；Batch 17 设计轮授权；
    §3a deferred；G⑤ 冻结；本轮零新增生产实现授权。
+
+## §172（2026-09-22）Batch 17 设计轮完成 + P29' push 申请
+
+1. **执行概述（r75 (5)，零实现）**：分支
+   integration/stage11-batch17-page-number-boundary-reopen-design
+   （基点 9d88abf = P28' A 已核验），commit **80e817b**（纯文档
+   +190）。证据：outputs/batch17i_reopen.py +
+   batch17i_reopen_report.txt（gitignored 只读探针）。零生产
+   改动结构证明：`git diff 9d88abf -- app tests schemas
+   evaluation scripts` 为空；全量回归 5666 passed / 26
+   skipped / 0 failed（51.46s）；guards 111 passed（0.67s）。
+   本会话实际输出。
+2. **七问必答结论**（详证见
+   docs/stage11-batch17-page-number-boundary-reopen-design.md）：
+   - ①r62① 原始理由复现：排除时 real-02 零裸数字实例 +
+     当时无 font 通道（r62① 明示"本轮不引入字体/字号采集"）
+     = 信息面缺失下的保守范围冻结，非逐类反例分析。理由已
+     被 Batch 14/15/16 消解；**仅裸数字一项具备重开条件**，
+     日期/罗马数字/文件名维持冻结。
+   - ②fontOut 必要性：家族内 466/466（100%）；已观察负例
+     band 已独立防护，fontOut 价值 = 对未观察开放风险类
+     （T3 列表号 / T4 底带非页码数字）的纵深，其中 T4 的
+     唯一区分信号。建议作必要合取（零漏代价 + r74(4) 组合
+     证据原则）；是否采纳留裁决。
+   - ③五类负例防护矩阵：正文编号/列表编号语料零实例；图表
+     编号 17 条（tech-08×13+tech-03×4）全页中+正文族 →
+     band∧fontOut；章节数字标题 tech-08 Impact ×6（bot=0.72,
+     r=60.76）→ band∧size-cap；页中数字标题 4 条 → band。
+   - ④FP taxonomy T1–T5：T4（底带非页码数字，零实例）为
+     真正开放风险类 → 保留候选可回滚 + 独立 reason code，
+     不允许单规则自动化。
+   - ⑤合成夹具：位置轴 3/3 命中、页中/顶带负例存活；font
+     轴合成面不可演示（极简 PDF 第二字体 unknown，Batch 15
+     已知限制），由真实语料 466/466 承担举证。
+   - ⑥与 D1/D2 关系：D1 冻结、D2 正交（页码文本逐页互异）；
+     建议独立规则 D3（reason code
+     page_furniture_digit_page_number）。**架构意义：D3 若
+     实施 = 第一个消费词级 font 属性的生产规则（Tier-2
+     第一消费点）**；消费位置在文档级后置过滤，不触碰
+     _classify_pdf_paragraph；新增文档级 top-3 字体分布依赖。
+   - ⑦furniture taxonomy：增列不重构——证据轴从 {文本形态,
+     跨页重复} 增列 {digit∧fontOut∧size-cap}，语义边界不变。
+3. **核心语料证据**：466/466 底带裸数字序列拟合 100%
+   （prod-01 偏移 −6、tech-03 偏移 0；显示≠物理的反例证明
+   数值匹配禁令正确）；band 内 fontOut=False 为 0；P1
+   （digit∧band∧heading）当前语料零 FP；建议 D3 = P3
+   （digit∧band∧heading∧fontOut∧r≤1.2）。
+4. **验收/回滚预案预填**（r74(5) 四项）：目标 family = 底带
+   裸数字页码（prod-01 33 + tech-03 233）；消费位置 =
+   _suppress_page_furniture_headings D3 分支；影响面 = 仅
+   heading→paragraph + reason code，prod-01 heading 427→394、
+   tech-03 1297→1064、其余四篇零变化、DOCX 零改动；回滚 =
+   D3 分支单点关闭。
+5. **P29' A push 申请（stage10 线，batch17 设计分支）**：
+   integration/stage11-batch17-page-number-boundary-reopen-design
+   远端新建，基点 = 已核验 9d88abf，tip = **80e817b**。当次
+   实际输出：80e817b^ =
+   9d88abf3f9904d99756a179910c22a33cc4dc682；
+   `git rev-list --ancestry-path 9d88abf..80e817b` =
+   {80e817b3324ac9e5cbc589559ab2b201736cc9a9}（严格单元素）；
+   ls-remote 同名分支为空；树干净。集合严格 {80e817b}。非
+   force。内容 = 纯设计文档。
+6. **P29' B push 申请（adoption 线台账，合并版）**：
+   integration/stage9-batch26-corpus-annotation 从远端已核验
+   a80e7cd 纯 FF 至 **430c1a2**。当次实际输出：HEAD =
+   430c1a2c4b3b5e9e0406e144f5d4ea9cd545ebdc；430c1a2^ =
+   0f756b5；`git rev-list --ancestry-path a80e7cd..430c1a2`
+   = {430c1a2, 0f756b5, db3e3c5}（三元素，链 a80e7cd→
+   db3e3c5→0f756b5→430c1a2，均纯台账：§170 → §170 修订 →
+   §171）；ls-remote 远端 tip = a80e7cd 精确；树干净。集合
+   严格 {db3e3c5, 0f756b5, 430c1a2}。非 force。不含 §172
+   （本条目自身），§172 留待下一笔。
+7. **状态**：Batch 17 设计轮完成待裁决；P29' A/B 待裁；
+   Tier-2 实现仍暂缓（D3 = 候选消费点，未立项）；§3a
+   deferred；顶带不立批；G⑤ 冻结；2026-09-28
+   autonomous-track 周期简报独立。
