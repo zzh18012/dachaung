@@ -8666,3 +8666,61 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
 8. **状态**：P26' A 完成；P26' B 原申请作废；P27' B 合并版
    完成；Batch 14 Closed；Batch 15 设计追认 + 分支已推；
    Tier-2 实现暂缓；§3a deferred；G⑤ 冻结不变。
+
+## §170（2026-09-22）Batch 16 稳定性审计轮完成 + P28' push 申请
+
+1. **执行概述（r74 (7) 四项检查，零实现）**：分支
+   integration/stage11-batch16-tier2-stability-audit（基点
+   4accf61 = P27' A 已核验），commit **11dd86c**（纯文档
+   +126）。证据：outputs/batch16i_stability.py +
+   batch16i_stability_report.txt（gitignored，只读探针，
+   生产函数只读 import，不碰写路径）。零生产改动结构证明：
+   `git diff 4accf61 -- app tests schemas evaluation scripts`
+   为空，tracked 新增仅审计文档。全量回归 5666 passed /
+   26 skipped / 0 failed（51.34s）；guards 111 passed
+   （0.68s）。本会话实际输出。
+2. **四项检查结论**（详证见
+   docs/stage11-batch16-tier2-stability-audit.md）：
+   - ①digit+font_out：非 prod-01 特例——页码语义子家族
+     （prod-01 33 + tech-03 233，均 ~100% fontOut、底带
+     0.953 同构）结构+语义双稳定；tech-08 19 条反向证明
+     fontOut 是承重分量。**但该形态正是 r62① 当年刻意排除
+     边界（裸数字/日期），消费 = 边界显式重开裁决，非
+     Tier-2 自主权。**
+   - ②图内标签尺寸比：文档风格依赖——4/6 成立、real-02
+     反向（1.17>1.00）、tech-03 零信号。**Batch 15 该项
+     正向结论下调**为篇内观察面证据，不得成候选。
+   - ③顶带同文重复页眉：结构 ≥3 篇成立（prod-01 140 +
+     tech-03 118 + tech-08 6），但消费三重前置：带定义
+     扩展（D2 现仅底带）+ 内容/家具判别（tech-03 章节页眉
+     与真标题逐字相同）+ r62 边界重开 → **layout
+     architecture 级事项，本批不实施**。
+   - ④font×§3a：real-02 KV-GAP 真表列字体对称（0/13 字号
+     差）vs real-04 真双栏更不对称（22/32）——不对称规则
+     方向恰好指反，font 仅解释能力。§3a 维持 deferred。
+   - **总登记：当前零候选可进入生产消费。**
+3. **Batch 15 结论修订登记**：digit∧fontOut 升级（跨篇
+   语义稳定成立，但消费撞 r62① 边界）；图内尺寸比降级
+   （风格依赖）。
+4. **P28' A push 申请（stage10 线，batch16 审计分支）**：
+   integration/stage11-batch16-tier2-stability-audit 远端
+   新建，基点 = 已核验 4accf61，tip = **11dd86c**。当次实际
+   输出：11dd86c^ = 4accf614bc8858801909cdd676e057f9fb15e844；
+   `git rev-list --ancestry-path 4accf61..11dd86c` =
+   {11dd86c5451dd4be149a5fe4aa39f5c5617c91be}（严格单元素）；
+   ls-remote 同名分支为空（远端不存在）；树干净。集合严格
+   {11dd86c}。非 force。内容 = 纯审计文档。
+5. **P28' B push 申请（adoption 线台账）**：
+   integration/stage9-batch26-corpus-annotation 从远端已
+   核验 054c19c 纯 FF 至 **a80e7cd**（§169 本地台账）。
+   当次实际输出：HEAD = a80e7cd9cea54b9bf9ff00467ef5a0526ee1d8a3；
+   `git rev-list --ancestry-path 054c19c..HEAD` =
+   {a80e7cd9cea54b9bf9ff00467ef5a0526ee1d8a3}（严格单元素）；
+   ls-remote 远端 tip = 054c19c 精确；树干净。集合严格
+   {a80e7cd}。非 force。内容 = §169 台账（r74 回执 +
+   Batch 14 Closed 生效 + Batch 16 指定登记）。不含 §170
+   （本条目自身），§170 留待下一笔。
+6. **状态**：Batch 16 审计轮完成待裁决；P28' A/B 待裁；
+   Batch 15 修订结论待追认；Tier-2 实现仍暂缓（零候选可
+   消费）；§3a deferred；G⑤ 冻结不变；2026-09-28
+   autonomous-track 周期简报独立。
