@@ -8422,3 +8422,62 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
 6. **状态**：Batch 15 暂不启动；下一步允许动作 = Batch 14
    实施 → 验收报告 → 单独申请 push。本条 commit 留存本地
    待裁（无 push 权）。
+
+## 一百六十六、Batch 14 实施回执：属性加富落地 + 验收 A-E 全绿 + P26' push 申请
+
+日期：2026-09-22。
+
+1. **实施 commit**：integration/stage11-batch14-fontsize-
+   enrichment-design 基点 62f219e → **6ef9362**（本地，未 push）。
+   变更面：`app/parsers/fallback_parser.py` +55 行（import
+   bisect；纯函数 `_annotate_words_with_attrs(words, chars)`；
+   `_parse_pdf` 内 extract_words 之后一行接线——extract_words
+   调用逐字节不动）+ 新增 `tests/test_pdf_word_attr_annotation.py`
+   （12 测试）。零其他文件改动。r72 禁止清单逐项核查：无
+   Tier-2 / 无 CJK 校准 / 无分类变化 / 无 suppression reason
+   新增 / 无 metadata 外显 / 无 region-id / 无 §3a 触碰 /
+   DOCX 路径零改动。
+2. **验收 A（零行为漂移）**：六篇对冻结基线 outputs/
+   batch12i_after 全量 deep equal（elements/chunks/relations/
+   warnings/metadata）——elements 110/18/71/1308/979/4258 全
+   ZERO DIFF，chunks 44/24/97/892/545/1547 全 ZERO DIFF。
+   口径登记：resource_path 按文件名比较（与 batch12i 验收
+   el_identity 同口径——该字段含每次运行的输出目录前缀，
+   属运行位置信息非解析行为）。**故障如实登记**：首轮验收
+   曾误报 "elements drift ×6"，诊断结论 = 唯一差异字段即
+   resource_path 目录前缀（batch12i_after/ 与 batch14i_after/
+   images 目录），六篇逐一复核其余全字段恒等；脚本口径修正
+   后复跑全绿。证据：outputs/batch14i_accept_report.txt。
+3. **验收 B（词守恒）**：六篇全篇 (text,x0,x1,top,bottom)
+   身份元组序列加富前后 EXACT 恒等，conserved=YES ×6。
+4. **验收 C（覆盖报告，逐篇不平均化）**：no_attr=0（覆盖率
+   100%）×6；mixed 比例 real-02 1.6%（26/1670）、real-04
+   4.5%（95/2106）、acad-03 10.9%（235/2150）、prod-01 5.1%
+   （1710/33346）、tech-08 25.9%（973/3764）、tech-03 17.5%
+   （1845/10531）。与设计轮探针结论一致（mixed 即 Tier-2
+   候选特征信息面，本批零消费）。
+5. **验收 D（连接纯度）**：12 测试全绿——单 font 词 / mixed
+   font 最大跨度胜 / 平局取最左 / CJK 连续字符 / 相邻不同
+   字号无串扰 / 相邻行忽略 / 无 chars 命中→None / 确定性 /
+   词身份保持且原 dict 不变异 / 空词流 / 接线 spy（2 页
+   call_count=2）/ e2e schema 守卫（属性键零外显）。全合成
+   夹具，零真实语料。
+6. **验收 E（全量回归）**：5666 passed / 26 skipped / 0
+   failed（49.19s）；guards 111 passed（0.71s）。本会话实际
+   命令输出。
+7. **异常登记（非行为）**：本次验收 tech-03 parse 挂钟
+   3313.3s（常态约数十秒量级），机器负载因素；其输出 ZERO
+   DIFF 排除行为变化。仅登记不处置。
+8. **P26' A push 申请**：integration/stage11-batch14-
+   fontsize-enrichment-design 从远端已核验 62f219e 纯 FF
+   至 **6ef9362**。新增集合严格 {6ef9362}，要求
+   6ef9362^ = 62f219e。非 force。内容 = 实施代码 + 测试。
+9. **P26' B push 申请**：integration/stage9-batch26-corpus-
+   annotation 从远端已核验 615a66c 纯 FF 至本条 commit
+   （§166 台账）。链 615a66c→本条，新增集合严格 {本条
+   SHA 见 r73 简报钉死}。
+10. **请求裁决（r73）**：(a) P26' A/B push 授权；(b) Batch 14
+    验收 A-E 是否通过、批次可否 Closed；(c) 下一候选批建议
+    （r71 排序：Batch 15 Tier-2 候选特征为第二优先，需先
+    设计轮；其余 dedup 替换 / CJK 校准 / metadata 外显均
+    另批）。
