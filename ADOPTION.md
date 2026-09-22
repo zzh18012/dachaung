@@ -8318,3 +8318,57 @@ a9d338d ≠ 授权基点 a2aacc7 → 停链条款触发 → 全量远端审计
     deferred；G⑤ tech-08 首件异常登记待补交；下一正式候选 =
     Stage 11 Batch 14（font/size 属性加富设计轮，待立项简报）。
     本条 commit 留存本地待裁（无 push 权）。
+
+## 一百六十四、Stage 11 Batch 14（font/size 属性加富）设计轮执行记录 + P25' 申请
+
+日期：2026-09-22。分支：integration/stage11-batch14-fontsize-
+enrichment-design（基点 7a96b55 = Stage 11-A 冻结远端 tip）。
+commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
+实现**（app/ 零触碰；取证脚本 outputs/batch14_fontsize_shadow.py
+与报告留存 outputs/，可复现）。
+
+1. **取证一（naive 方案否决，r71 前提偏差披露）**：生产调用
+   直接加 `extra_attrs=["fontname","size"]` 会改变词边界——
+   六篇抽样 41 页实测净漂移 real-02 +99 / real-04 **−240** /
+   acad-03 +56 / prod-01 +143 / tech-08 **+211** / tech-03
+   +62，文本序列变化 26/41 页；机制实证：pdfplumber 把
+   extra_attrs 计入词分组判据（词内字体/字号变化即断词
+   '106'→'10','6'；Symbol 私有区字符；CJK 4-7 字符块；净漂移
+   双向含合并）。**破坏词守恒 → 六篇冻结基线必然漂移**。r71
+   "风险最低、不改变输出"前提在 naive 实现下不成立，设计改用
+   方案 2。
+2. **取证二（方案 2 可行）**：生产 extract_words 逐字节不动，
+   从同页 page.chars（原生带属性，零二次解析）按几何包含事后
+   连接。六篇形态页探针：属性覆盖 **100%**（无属性词=0 全页）；
+   混合属性词普遍（real-04 p002 68/1428、acad-03 p004 66/329、
+   tech-08 p012 **23/51** CJK、prod-01 p077 0/52）→ 词级属性
+   取"覆盖 x 跨度最大 char"规则（平局取最左，确定性），mixed
+   率本身为 Tier-2 候选特征。词边界零触碰 → 词守恒与冻结
+   基线结构性保持。
+3. **设计要点**：新增纯函数 `_annotate_words_with_attrs(words,
+   chars)`（词 dict 追加 fontname/font_size 两键，身份顺序
+   不变；top 行带分桶 O(W+C)；本批零消费——既有分组/分区/
+   分类按键取值不迭代键集，追加键惰性；属性不外显进
+   Element.metadata，Tier-2 需要时另批）；CJK char 级间距
+   数据顺带可得（批次 11 校准缺口的正解信息面，校准本身
+   独立批）。
+4. **验收标准（复用 11-A 冻结仪器）**：六篇冻结基线逐字节
+   零漂移 + 词守恒 EXACT + 全量回归/guards 全绿 + 属性覆盖
+   100% 报告（六篇全篇，mixed 比率逐篇登记）+ 连接纯度守护
+   测试。影响面 = fallback_parser.py 一个纯函数 + _parse_pdf
+   一处调用；不做 Tier-2/去重替换/CJK 阈值/metadata 外显/
+   DOCX 路径。
+5. **push 申请 P25'（任一前置不符则停链报裁，非 force）**：
+   - **A**：integration/stage11-batch14-fontsize-enrichment-
+     design 远端新建，基点 = 已核验 7a96b55，tip = `62f219e`。
+     新增集合严格 {62f219e}，要求 62f219e^ = 7a96b55。
+   - **B**：integration/stage9-batch26-corpus-annotation 从
+     远端已核验 2b10cd4 纯 FF 至本条 commit（§163+§164 台账）。
+     链 2b10cd4→2d31677→本条，新增集合严格 {2d31677, 本条
+     SHA 见 r72 简报钉死}。
+6. **请求裁决（r72）**：(a) P25' A/B push 授权；(b) §163 追认
+   （含 §160 回执更正与故障登记的处置确认）；(c) **Batch 14
+   立项裁决**——设计采纳与否（方案 2 事后连接 + 验收标准 +
+   影响面四项：目标/影响面/验收/push）；(d) G⑤ tech-08 补交
+   清单已按 r71 方案 A 口径反馈标注人（补 6 页 + 恢复
+   EXCLUDE_BASE + 修 p9 entries；越界 21 页作废不入测量）。
