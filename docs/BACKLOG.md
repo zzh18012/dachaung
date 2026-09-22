@@ -136,6 +136,16 @@
   输出而非表格误报；F-A 候选须 ≥2 确认轴 + 结构锚 + 逐候选与既有
   paragraph 去重替换（该替换点单独待裁）。实施授权待 r66；
   设计文档 docs/stage10-batch11-pdf-layout-architecture-design.md
+- Stage 11-A 增补（2026-09-22，r70 授权，零实现）：**布局重构
+  架构裁决冻结**——raw words 定为长期一等输入（演进轴=属性加富
+  font/size，chars 仅校准侧信道）；区域层维持页内 ephemeral
+  车道前分区器（批次 12 已在产），候选层冻结为观察侧信道零发射
+  权（去重替换点单独裁决）；五保护面（顺序/locator/relation/
+  caption 优先级/有框表）逐面钉死机制；回退=commit 级 revert
+  不设运行时开关；11-B 三门（schema 可控/回归可测/无隐式重写）
+  架构层面成立，但各实施批仍须逐批立项。§3a 维持 deferred，
+  解除阻塞的架构前提已冻结。设计文档
+  docs/stage11a-layout-architecture-freeze.md
 
 ## 4. w:tc 内 sdt（表格单元格内嵌套内容控件）
 
