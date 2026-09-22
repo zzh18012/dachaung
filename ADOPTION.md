@@ -8611,3 +8611,58 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
    设计轮成果裁决（采纳/修订/驳回）；(d) 下一候选批方向
    （若设计采纳：Tier-2 实施批立项与否及四项授权；或转向
    其他优先项）。
+
+## 一百六十九、r74 回执：停链处置追认（治理补强）+ P27' A/B 执行 + Stage-11-Batch-14-Closed 生效 + Batch 15 追认与 Tier-2 暂缓 + Batch 16 指定
+
+日期：2026-09-22。
+
+1. **§167 停链处置追认（r74 (1)）**：定性确认——push 申请侧
+   链描述错误（非执行错误）、未产生远端污染、预核验成功阻止
+   越界 push、原 P26' B 描述作废。长期治理补强规则入册：push
+   授权必须以申请生成时实际 `git rev-list` / ancestry 输出为
+   依据，不得按"已知远端 tip + 本地目标 tip"推断中间链；本
+   规则作为 r58/r60/r63 SHA 集合治理的补强。处理方式（发现→
+   停止执行→保留远端状态→重新生成授权候选）获认可。
+2. **P27' B 执行回执（合并版，选项二）**：预核验（HEAD=
+   054c19c、ancestry-path 615a66c..HEAD 集合严格 {f897095,
+   9483025, 4b81de8, 054c19c}、逐级父链 054c19c^=4b81de8^=
+   9483025^=f897095^=615a66c、远端 tip=615a66c、树干净）→
+   push 纯 FF 615a66c..054c19c → 复核验 ls-remote：远端
+   tip = 054c19c 精确。非 force。P26' B'（至 9483025）不再
+   单独执行；本笔授权不延及后续任何台账提交。
+3. **Stage-11-Batch-14-Closed 生效**：r74 (3) 条件核验——
+   adoption ref = 054c19c ✓、新增集合恰为授权四 SHA ✓、纯
+   FF ✓、无 force ✓；叠加 P26' A（stage11 batch14 分支
+   = 6ef9362 已核验）→ **Closed 正式生效**。冻结内容登记：
+   font attribute enrichment 可用；word 层消费前不改变；
+   输出零漂移基线保持；Tier-2 尚未实施。
+4. **P27' A 执行回执**：预核验（HEAD=4accf61、4accf61^=
+   6ef9362、rev-list 集合严格 {4accf61}、远端无同名分支、
+   树干净）→ push 新建远端 integration/stage11-batch15-
+   tier2-font-feature-design → 复核验：远端 tip = 4accf61
+   精确。非 force。内容 = 纯设计文档 + gitignored candidate
+   analysis，零生产代码。
+5. **Batch 15 设计轮追认（r74 (4)）**：结论通过。原则钉死：
+   font 属性 = 组合证据源（supporting evidence），不是单独
+   分类器。批准继续观察四项：digit+font_out / 图内标签尺寸
+   比 / font 与既有位置、重复结构组合 /（以上组合的可复现
+   统计）。禁止直接推导四项：fontOut⇒FP、大字号⇒heading、
+   小字号⇒furniture、特殊字体⇒residual。依据 = Batch 15
+   结构性反例（heading 本身高度样式化，字体差异是合法标题
+   常态）。
+6. **Tier-2 实施暂缓（r74 (5)）**：属性采集可靠、candidate
+   evidence 有价值，但跨文档稳定性 / 组合不复制 heuristic
+   扩张 / 消费点位置三问未证——Design accepted /
+   Implementation deferred。后续立项必须重新提交四项：目标
+   family、消费位置、影响面、验收与回滚标准。**禁止把
+   candidate script 逻辑直接搬入 _classify_pdf_paragraph。**
+7. **Batch 16 指定（r74 (7)）**：Stage 11 Batch 16 =
+   Tier-2 candidate stability audit（设计/验证轮，非实现轮）。
+   四项检查：①digit+font_out 是否只是 prod-01 特例；②图内
+   标签尺寸比是否依赖 acad-03 文档风格；③顶带页眉 D2 扩展
+   是否需要重新进入 layout architecture（不可顺手修）；④
+   font 是否真正改善 §3a 或仅提供解释能力。分支建议基点
+   4accf61。本裁决无 Batch 16 push 权，无生产实现授权。
+8. **状态**：P26' A 完成；P26' B 原申请作废；P27' B 合并版
+   完成；Batch 14 Closed；Batch 15 设计追认 + 分支已推；
+   Tier-2 实现暂缓；§3a deferred；G⑤ 冻结不变。
