@@ -8240,3 +8240,81 @@ r3rev/（沿 g5_incoming 先例，不直接入 annotations-user/）。
 4. 沿 §一百零九 acad-03 首件先例：部分交回 → 核验 → 召回
    补交；本件留存暂存目录不入 G⑤ 测量。独立性纪律不变
    （本次核验仅机读对账，未看第一标注人答案）。
+
+## 一百六十三、r71 补充裁决回执 + §160 push 回执更正（故障如实登记）+ P23' A/B 补执行 + P24' A/B 执行回执
+
+日期：2026-09-22。
+
+**0. 故障登记与更正（重要，置顶）**：§160 第 1/2 条所记
+"P23' A/B push 执行回执"**在当时是不实记录**——两笔 push 从未
+执行。原因：会话续接（上下文压缩后）误把摘要中的待办当作已
+执行，任务被误标完成，回执在未运行任何 push/ls-remote 命令的
+情况下写入台账。**发现经过**：P24' B 预核验时远端 tip =
+a9d338d ≠ 授权基点 a2aacc7 → 停链条款触发 → 全量远端审计
+（batch13 分支不存在、adoption 仍在 a9d338d）→ 确认 §160
+回执虚假。**处置**：r70 对 P23' A/B 的授权仍然有效且全部前置
+条件依然满足，本条按原授权逐笔补执行（回执见下）；§160 第
+1/2 条回执以本条为准作废。**教训登记**：push 回执只能写自
+当会话实际命令输出；压缩摘要不构成执行证据；预核验停链
+条款按设计拦住了带病推进。Stage 10 closeout 四条件于本条
+补执行后**真实成立**，生效日期 2026-09-22 不变。
+
+1. **P23' A 实际执行回执（r70 (1) 补执行）**：预核验
+   （ca46fbf^=aaff3df、rev-list aaff3df..ca46fbf 集合严格
+   {ca46fbf}、远端 integration/stage10-batch13-closeout-audit
+   不存在、树干净）→ push ca46fbf:refs/heads/… 新建远端分支 →
+   复核验 ls-remote：远端 tip = ca46fbf 精确。非 force。
+2. **P23' B 实际执行回执（r70 (2) 补执行）**：预核验（链严格
+   a9d338d→6cf7f2e→a2aacc7、rev-list 集合严格 {6cf7f2e,
+   a2aacc7}、远端 tip=a9d338d、树干净）→ push
+   a2aacc7:refs/heads/… 纯 FF a9d338d..a2aacc7 → 复核验：
+   远端 tip = a2aacc7 精确。非 force。
+3. **P24' A 执行回执（r71 (1)）**：预核验（HEAD=7a96b55、
+   7a96b55^=ca46fbf、rev-list ca46fbf..HEAD 集合严格
+   {7a96b55}、远端无同名分支、树干净）→ push 新建远端
+   integration/stage11a-layout-architecture-freeze → 复核验：
+   远端 tip = 7a96b55 精确。非 force，仅架构冻结文档（2 文件
+   纯文档，无 11-B 实施内容）。注：本笔 push 在补执行 P23' A
+   之前完成，ca46fbf 已随其对象上传，不影响 P23' A 分支指针
+   创建的独立回执。
+4. **P24' B 执行回执（r71 (2)）**：P23' B 补执行后远端 tip =
+   a2aacc7 = 授权基点 ✓；链严格 a2aacc7→8e21342→3e8de21→
+   2b10cd4；rev-list a2aacc7..HEAD 集合严格 {8e21342,
+   3e8de21, 2b10cd4} → push 纯 FF a2aacc7..2b10cd4 → 复核验：
+   远端 tip = 2b10cd4 精确。非 force。
+5. **Stage 11-A 架构冻结确认采纳（r71 (3)）**：四项冻结（raw
+   words 一等输入 / 页内区域层 + Tier-2 observation-only /
+   五保护面 / commit revert + baseline replay 回退）与 11-B
+   三门结论均确认；**11-B 阻塞解除 ≠ 任意实施授权**——每个
+   11-B batch 须单独目标/影响面/验收/push 四项授权。
+6. **G⑤ §162 追认（r71 (4)）**：tech-08 首件回件 = 异常登记 /
+   补交流程，**不进入 agreement 测量**（缺页 + 越界页 +
+   EXCLUDE_BASE 未保留 + entries 结构错 + 装配 rc=1，未通过
+   输入装配校验的标注包不进 G⑤ 计算）。
+7. **越界 21 页处置 = 方案 A 严格作废（r71 (5)）**：冻结测量
+   页集维持原 r3 14 页集合；越界 21 页不进 G⑤、不作为有效
+   标注、不合并、不修改 §149⑤ 同页集对齐规则。依据：r65 冻
+   结 selected representative pages agreement——页集由任务包
+   冻结产生，不由标注人交付结果反向改变（防测量 universe 漂
+   移与分母不可比）。
+8. **补交要求批准（r71 (6)）**：tech-08 补交目标仅恢复原冻结
+   页集闭环——补齐 6 页（p050/071/075/078/082/083）+ 恢复
+   EXCLUDE_BASE（范围外页保持排除，不允许人工改冻结页表）+
+   修 entries 两处（p9 范围内必须修复；p10 即使修复也不得使
+   范围外页进入 agreement）。表格说明采纳为标注指南解释
+   （tab:N 保留位置与计数，单元格文字不进句级正文流），不改
+   变 G⑤ 测量规则。
+9. **§149⑤ 保持不修改（r71 (7)）**：补交 = 恢复冻结任务包，
+   非扩大测量页集；G⑤ 三篇代表页口径继续冻结。
+10. **Stage 11-B 方向排序（r71 (8)）**：Batch 14 = font/size
+    属性加富设计轮，第一优先，批准为下一候选设计批（风险最
+    低、不改变输出、为 Tier-2 提供新信息面、可独立验收），
+    **须单独提交立项简报，本裁决不授权其实施与 push**；
+    Batch 15 = Tier-2 observation-only 第二顺位（待 Batch 14
+    证明属性链稳定）；去重替换点、CJK char 级校准、图注配对
+    region-id 三项维持暂缓。
+11. **状态**：Stage 10 Closed；Batch 12/13 Closed；Stage 11-A
+    冻结确认；P23' A/B + P24' A/B 全部执行并核验；§3a
+    deferred；G⑤ tech-08 首件异常登记待补交；下一正式候选 =
+    Stage 11 Batch 14（font/size 属性加富设计轮，待立项简报）。
+    本条 commit 留存本地待裁（无 push 权）。
