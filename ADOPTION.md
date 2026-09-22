@@ -8372,3 +8372,53 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
    影响面四项：目标/影响面/验收/push）；(d) G⑤ tech-08 补交
    清单已按 r71 方案 A 口径反馈标注人（补 6 页 + 恢复
    EXCLUDE_BASE + 修 p9 entries；越界 21 页作废不入测量）。
+
+## 一百六十五、r72 回执：P25' A/B 执行 + §163 处置追认（教训进长期治理）+ Batch 14 实施立项登记
+
+日期：2026-09-22。
+
+1. **P25' A 执行回执**：预核验（HEAD=62f219e、62f219e^=
+   7a96b55、rev-list 7a96b55..HEAD 集合严格 {62f219e}、远端无
+   同名分支、树干净）→ push 新建远端 integration/stage11-
+   batch14-fontsize-enrichment-design → 复核验 ls-remote：
+   远端 tip = 62f219e 精确。非 force，仅设计文档（无实施代码）。
+2. **P25' B 执行回执**：预核验（链严格 2b10cd4→2d31677→
+   615a66c、rev-list 2b10cd4..HEAD 集合严格 {2d31677, 615a66c}、
+   远端 tip=2b10cd4、树干净）→ push 纯 FF 2b10cd4..615a66c →
+   复核验：远端 tip = 615a66c 精确。非 force。
+3. **§163 处置追认（r72 (3)）**：§160 原回执冻结标记 =
+   **invalid execution record / 作废**，性质 = 执行事实未发生
+   而台账提前记录（非 Git 状态错误/push 失败/权限失效）；Stage
+   10 closeout 与 Stage 11-A push 状态以补执行记录（§163 1-4）
+   为准。**教训进长期治理**：压缩摘要、历史状态、人工记忆均
+   不能作为 Git 执行证据；只有当次会话实际命令输出 + 随后
+   ref 校验才能形成 push 回执。预核验停链机制确认有效。
+4. **Batch 14 实施立项批准登记（r72 (4)-(8)）**：
+   - 目标：PDF word 属性加富（font/size），不改变现有 word
+     segmentation 结果；
+   - 方案：**方案 2（事后连接）批准**——words + 原生 chars
+     几何连接追加属性；extract_words(extra_attrs=...) 与任何
+     改词边界路径**永久排除**（除非未来重新修改架构冻结）；
+   - 授权范围：新增纯函数 `_annotate_words_with_attrs(words,
+     chars)`（输出追加 fontname/font_size 两键；word 顺序/
+     id/text/bbox/locator 不变）；连接规则冻结 = 几何包含 +
+     覆盖最大跨度 char + 平局取最左 + deterministic；禁止
+     模糊匹配/文本匹配/近邻猜测/font 聚类/size 阈值判断；
+   - 禁止清单：Tier-2 候选生成 / CJK 列河校准 / heading 与
+     table 分类变化 / suppression reason 增加 / metadata 外显 /
+     region-id / §3a 修复 / DOCX 路径修改；钉死：**本批是
+     信息面建设批，不是分类器升级**；
+   - 验收 A-E：A 六篇零漂移（text/element identity/locator/
+     chunk 全 zero diff 对 outputs/batch12i_after）；B 词守恒
+     EXACT；C 覆盖报告（六篇全篇覆盖率 + mixed 比例 + 无属性
+     数，可解释不平均化）；D 连接纯度合成夹具（单 font 词 /
+     mixed font 词 / CJK 连续字符 / 相邻不同字号 / 无 chars
+     命中；同输入同输出）；E 全量回归 + guards；
+   - push：**本裁决不含实施批 push 权**，实施完成验收通过后
+     另行申请。
+5. **G⑤ 状态确认（r72 (9)）**：tech-08 补交中（补 6 页 +
+   恢复 EXCLUDE_BASE + 修 p9 entries；越界 21 页作废）；r3
+   页集 / §149⑤ / agreement denominator 均不修改。
+6. **状态**：Batch 15 暂不启动；下一步允许动作 = Batch 14
+   实施 → 验收报告 → 单独申请 push。本条 commit 留存本地
+   待裁（无 push 权）。
