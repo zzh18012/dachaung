@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import bisect
 import re
 import statistics
 from pathlib import Path
@@ -580,6 +581,59 @@ def _page_paragraphs(words: list[dict]) -> list[dict[str, Any]]:
     return paragraphs
 
 
+# ---------- PDF word 属性加富（Stage 11 Batch 14 / r72 方案 2） ----------
+# 信息面建设批：从 page.chars 几何连接 font/size 到既有词流，
+# 词边界零触碰（extract_words 调用逐字节不动）。本批零消费：
+# 既有分组/分区/分类按键取值，追加键惰性存在；属性不外显进
+# 元数据/schema。连接规则（r72 冻结）：char 中心落词 bbox
+#（±0.5pt 容差）计包含；取覆盖 x 跨度最大 char 的属性；平局
+# 取最左（cx 最小）；再平局取 chars 序列先者。禁止模糊匹配/
+# 文本匹配/近邻猜测/font 聚类/size 阈值判断。无包含 char →
+# 两键 None（不告警、不改输出）。
+
+
+def _annotate_words_with_attrs(
+    words: list[dict], chars: list[dict],
+) -> list[dict]:
+    """事后连接 font/size（Batch 14）。返回浅拷贝新列表，原词
+    dict 不被修改；顺序/text/bbox 恒等。"""
+    if not words:
+        return []
+    entries = [
+        (
+            (float(c["x0"]) + float(c["x1"])) / 2.0,
+            (float(c["top"]) + float(c["bottom"])) / 2.0,
+            float(c["x1"]) - float(c["x0"]),
+            i,
+            c,
+        )
+        for i, c in enumerate(chars)
+    ]
+    entries.sort(key=lambda e: (e[0], e[3]))
+    centers = [e[0] for e in entries]
+    out: list[dict] = []
+    for w in words:
+        lo = bisect.bisect_left(centers, float(w["x0"]) - 0.5)
+        hi = bisect.bisect_right(centers, float(w["x1"]) + 0.5)
+        top = float(w["top"]) - 0.5
+        bottom = float(w["bottom"]) + 0.5
+        best: tuple | None = None
+        for cx, cy, span, idx, c in entries[lo:hi]:
+            if top <= cy <= bottom:
+                key = (-span, cx, idx)
+                if best is None or key < best[0]:
+                    best = (key, c)
+        nw = dict(w)
+        if best is None:
+            nw["fontname"] = None
+            nw["font_size"] = None
+        else:
+            nw["fontname"] = best[1].get("fontname")
+            nw["font_size"] = best[1].get("size")
+        out.append(nw)
+    return out
+
+
 # ---------- PDF 表单域标签负向语义信号（Stage 10 批次 6 / C2，r59） ----------
 # 仅对 short_line heading 候选做局部抑制，不改通用打分框架；命中的行
 # 归 paragraph，metadata.heading_suppressed 记信号名。页面家具类
@@ -1083,6 +1137,7 @@ def _parse_pdf(
                         )
                     )
                     words = []
+                words = _annotate_words_with_attrs(words, page.chars)
                 for para in _page_paragraphs(words):
                     text = para["text"].strip()
                     if not text:
