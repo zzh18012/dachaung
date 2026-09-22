@@ -8731,3 +8731,60 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
    Batch 15 修订结论待追认；Tier-2 实现仍暂缓（零候选可
    消费）；§3a deferred；G⑤ 冻结不变；2026-09-28
    autonomous-track 周期简报独立。
+
+## §171（2026-09-22）r75 回执：P28' A/B 执行 + Batch 16 审计采纳 + Batch 17 指定
+
+1. **P28' A 执行回执**：预核验（HEAD=9d88abf、9d88abf^=
+   11dd86c、11dd86c^=4accf61、rev-list 4accf61..9d88abf 集合
+   严格 {11dd86c, 9d88abf}、ls-remote 同名分支为空、树干净）
+   → push 远端新建 integration/stage11-batch16-tier2-
+   stability-audit → 复核验：远端 tip = 9d88abf 精确。非
+   force。内容 = 审计文档 + 口径修正（修订版 tip 为准，
+   11dd86c 不单独推送）。
+2. **P28' B 执行回执**：预核验（a80e7cd^=054c19c、rev-list
+   054c19c..a80e7cd 集合严格 {a80e7cd}、远端 tip=054c19c、
+   树干净；本地 HEAD=0f756b5 不推）→ push 纯 FF
+   054c19c..a80e7cd → 复核验：远端 tip = a80e7cd 精确。非
+   force。内容 = §169 台账（r74 回执 + Batch 14 Closed 生效
+   + Batch 16 指定登记）；不含 §170。
+3. **Batch 16 审计通过（r75 (3)）**——四类结论采纳：
+   - A. digit+font_out：升级为"候选家族，但不是自动消费"。
+     底带裸数字页码 family = 跨文档结构稳定候选（prod-01 +
+     tech-03 多实例复现，fontOut 辅助信号）；**落在 r62①
+     明确排除范围（"不扩展到裸数字/日期/罗马数字/文件名"），
+     不允许 Batch 15/16 自行消费**。状态：candidate=stable
+     observation；implementation=blocked by r62 boundary
+     reopening。未来立项必须重新打开 r62①。
+   - B. 图内标签尺寸比：降级为文档风格相关观察信号
+     （4/6 成立、real-02 反向、tech-03 无信号、自适应阈值
+     = heuristic 累积）。状态 not a candidate，不得进入后续
+     实现设计。
+   - C. 顶带重复页眉：结构稳定但属 layout architecture
+     （三前置：D2 定义扩展、内容/家具判别、真章节标题冲突
+     处理；同文重复 ≠ 家具，不能沿用底带 D2 思路）。状态
+     architecture-level candidate，不进 font Tier-2，回到
+     layout architecture 与 §3a 同级。
+   - D. font×§3a：证伪——真表不对称 ≠ 表格信号，双栏正文
+     可能更符合该模式。font feature = explanatory only，
+     不作 §3a detector 输入。
+4. **Tier-2 实现状态**：Design accepted / Implementation
+   deferred 维持。当前零候选可直接消费。不立 Batch 17
+   implementation。
+5. **Batch 17 指定（r75 (5)，方向 c1）**：Stage 11 Batch 17
+   = r62① bottom-digit-page-number reopening **设计轮**（非
+   实现）。分支 integration/stage11-batch17-page-number-
+   boundary-reopen-design，基点 9d88abf（P28' A 核验后，已
+   满足）。权限仅设计/证据/shadow analysis；不含 page-number
+   suppression、D1 扩展、production code。必答：①为什么裸
+   数字页码不能直接并入 D1；②fontOut 是辅助还是必要条件；
+   ③如何避免正文编号/图表编号/列表编号/章节数字标题/页中
+   数字标题五类负例；④false positive taxonomy；⑤synthetic
+   fixtures；⑥与现有 D1/D2 的关系；⑦是否需要重新定义
+   furniture taxonomy。
+6. **顶带页眉（r75 (6)）**：暂不立 c2——属更大 layout
+   architecture 问题（与 §1 多栏、§3a 无线框表格、页面区域
+   模型共同底层），不同时重开多方向。
+7. **状态**：P28' A/B 完成核验；Batch 16 Closed（审计通过
+   采纳）；Tier-2 实现暂缓；digit+fontOut=候选待 r62① 重开；
+   图内尺寸比降级；顶带=架构级候选；Batch 17 设计轮授权；
+   §3a deferred；G⑤ 冻结；本轮零新增生产实现授权。
