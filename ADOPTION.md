@@ -8545,3 +8545,69 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
 8. **请求裁决（r74）**：(a) **P26' B' push 授权**（修正链）；
    (b) P26' B 停链处置追认（§166 第 9 条作废 + 教训入治理）；
    (c) Batch 15 设计轮成果裁决（届时随设计简报提交）。
+
+## 一百六十八、Batch 15 设计轮回执：Tier-2 font/layout candidate design + P27' push 申请
+
+日期：2026-09-22。
+
+1. **设计轮完成**：分支 integration/stage11-batch15-tier2-font-feature-
+   design，基点 6ef9362（P26' A 精确核验后建立，r73 前提满足）。
+   commit **4accf61**（本地，未 push；纯文档 1 文件 +189，零生产
+   改动——`git diff 6ef9362` 空，证据脚本 gitignored 于 outputs/）。
+   设计文档 docs/stage11-batch15-tier2-font-feature-design.md。
+2. **Q1 判别力证据（r73 必答一）**：
+   - 可分家族：①prod-01 纯数字页码家族——35 实例（审计登记 TOC
+     行尾 ×3 为其子集）全部 digit-only、33/35 圈外字体
+     （FreeSansBold）、r≤1.11 同构；F4(digit∧fontOut)=33/35，
+     prod-01 legit-392 FP=0。②acad-03 图内标签——尺寸比
+     0.74~0.90 vs 本篇合法 heading ≥1.04 篇内干净沟（跨篇 F1
+     FP=prod-01 legit ×7，阈值窗紧，按 r73(5) 不构成规则）。
+   - 结构性反例（钉死）：**圈外字体是合法 heading 常态**——
+     prod-01 legit 83%、tech-03 section 87%、tech-08 28% 圈外；
+     机理 = heading 本来就是样式化文本。推论：font 只能做组合
+     证据（文本形态∧几何∧重复性∧font），永不单独定案。
+   - font 惰性反例清单：real-02 表单残留 4/5 与应答区头（正文字
+     体 r=1.0）、prod-01 continued 家族（观察 6 条，审计登记 ×1；
+     正文字体 r=0.89~1.0）、tech-03 caption-miss ×227（fontOut=0、
+     r=1.0，其修复族是 caption 正则文本形态）、封面日期（弱信号
+     LTPro+r=1.33，r62③ 禁字号特判边界不变）。
+   - 佐证形态：real-02 已抑制页码 r=0.67 ×12 一致（佐证 D1）；
+     tech-08/03 已抑制 band_repeat 75%/100% 圈外（佐证 D2）。
+   - 跨语料检查（r69 标准）：digit∧fontOut 结构信号三篇复现
+     （prod-01 35 / tech-03 233 子集 / tech-08 6），但语义目标
+     不同（扉页页码/图表标签/装饰横幅）——结构成立、语义不
+     合一，Tier-2 候选必须"结构×篇内语义证据"组合。
+3. **Q2 候选范围登记（r73 必答二，不自动修复）**：页面家具
+   residual（prod-01 数字家族 35；tech-03 顶带页眉 110——注意
+   这是"D2 扩展到顶带"的规则变化方向，须单独批次裁决；tech-08
+   Impact 装饰横幅 '5' ×6 无 GT 两可）；heading residual
+   （acad-03 尺寸沟×图邻接组合）；表单残留 font 惰性无候选；
+   caption 无独立 font 签名（r=1.16~1.33 正文族），配对规则
+   不受影响维持。
+4. **Q3 不消费也成立（r73 必答三）**：结构证明 git diff 6ef9362
+   空；全量回归 5666 passed/26 skipped/0 failed（55.77s）；
+   guards 111 passed；候选分析为独立脚本不 import 生产管线
+   写路径，关闭=不运行，输出零漂移结构性成立。
+5. **合成夹具**：两字体×两字号同构布局，font/size 集均按预期
+   2 值分离，重复运行逐项相等；已知局限如实登记——极简手写
+   PDF 第二字体解析为 unknown（真实语料 no_attr=0 零 unknown）。
+6. **Tier-2 架构草案（11-A 冻结框架内）**：观察面旁路零发射权，
+   候选对象 (element_id, family_hypothesis, evidence_tuple)，
+   永不修改 type/metadata；本批不设消费点；去重替换与候选→
+   抑制转换均需单独裁决；若立实施批需四项授权 + "候选通道
+   关闭=零漂移"结构性测试。
+7. **P27' A push 申请**：integration/stage11-batch15-tier2-font-
+   feature-design 远端新建，基点 = 已核验 6ef9362，tip =
+   **4accf61**。新增集合严格 {4accf61}，要求 4accf61^ =
+   6ef9362。非 force。内容 = 纯设计文档。
+8. **P27' B push 申请**：integration/stage9-batch26-corpus-
+   annotation 从远端已核验 615a66c 纯 FF 至本条 commit。链与
+   集合以 r74 简报引用的当次 `git rev-list` 实际输出钉死
+   （含 §167=4b81de8 与本条，全部为纯台账 commit）。
+9. **请求裁决（r74）**：(a) **P26' B' push 授权**（§167 第 6 条
+   修正链 615a66c→f897095→9483025，集合 {f897095, 9483025}；
+   或按 r74 简报 P27' B 合并版一次推进，二选一）；(b) §167
+   停链处置追认（§166 第 9 条作废 + 教训入治理）；(c) Batch 15
+   设计轮成果裁决（采纳/修订/驳回）；(d) 下一候选批方向
+   （若设计采纳：Tier-2 实施批立项与否及四项授权；或转向
+   其他优先项）。
