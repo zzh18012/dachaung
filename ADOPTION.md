@@ -8059,3 +8059,47 @@ P21' A 已核验后）。执行记录：
 7. **边界不变**：G⑤ 代表页冻结口径不变；第二标注人进行中工作
    不因收口审计改变；2026-09-28 autonomous-track 周期简报与
    execution-baseline 豁免轮保持独立，不并入 Batch 13。
+
+## 一百五十九、Batch 13 closeout/residual-baseline audit 执行记录（r69 授权）
+
+日期：2026-09-22。分支：integration/stage10-batch13-closeout-audit
+（基点 aaff3df，P22' A 核验后建立）。commit `ca46fbf`（2 文件
++155/−18，纯文档：docs/stage10-batch13-closeout-audit.md 新建 +
+BACKLOG §1 更新为 Closed）。执行记录：
+
+1. **r69 ⑥ 七项目标逐项完成**（证据：审计文档 + outputs/
+   batch13_reason_census.{py,txt}）：
+   - ①冻结基线：六篇 heading/element/chunk 计数表 @aaff3df
+     （real-02 110/17/44 等，见文档 §①）；
+   - ②③residual 家族登记 + 四分类：processed 11 项 / known
+     residual 9 家族（区头 1 + 批次 6 残留 3 + 批次 9 封面日期 1
+     + acad-03 图内标签 5 + tech-03 封面 3 + prod-01 continued 1
+     + prod-01 页码显形 3 + r40 假阳性表 4 + r66 保守 miss 2）/
+     deferred §3a 1 项——**零未分类项**；
+   - ④§3a 维持 deferred / blocked on PDF layout-reconstruction
+     architecture 不变；
+   - ⑤suppression reason 普查：全语料 76 条，7 个注册 reason
+     （批次 6×4：15/12/1/2；批次 9×2：12/16；批次 12×1：18），
+     **未注册 reason = 0**；
+   - ⑥全量回归 @ 本分支重跑 **5654 passed / 26 skipped / 0
+     failed**；guard suites 五文件（批次 6/9/12×2/4）重跑
+     **99 passed**；
+   - ⑦closeout 结论：**Stage 10 具备整体 closeout 条件（条件式
+     成立）**+ 六项未关闭风险表（§3a 遗留 / 基线与冻结语料绑定 /
+     第二标注人独立线 / 家族扩证须重立 / tech-03 两可 2 条 /
+     单文档 heuristic 回潮治理风险）。
+2. **跨语料候选信号检查（r69 约束）**：逐家族核查——页码类
+   real-02 底带 vs prod-01 TOC 行尾**信号不同构**（位置带 vs
+   行尾内联），其余家族均单篇——**当前零满足 ≥2 篇同结构信号的
+   家族，零候选登记、零实施**。
+3. **push 申请 P23'**（任一前置不符则停链报裁，非 force）：
+   - **A**：integration/stage10-batch13-closeout-audit 远端新建，
+     基点 = 已核验 aaff3df，tip = `ca46fbf`；新增集合严格
+     {ca46fbf}，要求 ca46fbf^ = aaff3df。
+   - **B**：integration/stage9-batch26-corpus-annotation 从远端
+     已核验 a9d338d 纯 FF 至本条 commit（§158+§159 台账）；精确
+     SHA 集合在 r70 简报钉死。
+4. **请求裁决（r70）**：(a) P23' A/B push 授权；(b) Stage 10
+   整体 closeout 确认（Batch 13 审计结论采纳与否）；(c) Stage 10
+   收口后的 Stage 11 方向征询（§3a Tier-2 实施授权与否 / 其他
+   方向由您指定）。
