@@ -8150,3 +8150,57 @@ BACKLOG §1 更新为 Closed）。执行记录：
    Closed**；§3a deferred 不变；G⑤ 冻结不变；第二标注人独立线
    不变；2026-09-28 autonomous-track 里程碑独立不变。本条
    commit 留存本地分支待裁（无 push 权）。
+
+## 一百六十一、Stage 11-A 布局重构架构裁决执行记录（r70 ⑤ 授权）+ P24' 申请
+
+日期：2026-09-22。分支：integration/stage11a-layout-architecture-
+freeze（基点 ca46fbf = 已核验 Batch 13 远端 tip，P23' A 核验后
+建立）。commit `7a96b55`（2 文件 +154：架构裁决文档新建 +
+BACKLOG §3a Stage 11-A 增补）。**零生产实现**（app/ 零触碰）。
+
+r70 ⑤ 四问逐项裁决（docs/stage11a-layout-architecture-freeze.md）：
+
+1. **raw words = 长期一等输入**：证据链已在其上闭合（批次 11
+   原型同形态消费 + 批次 12 词守恒不变量）；替代载体逐一排除
+   （chars 直消费仅作校准侧信道 / pdfplumber 内置 layout 非受控
+   / OCR 范围外）；sanctioned 演进轴 = 属性加富（extra_attrs
+   font/size + char 级间距校准），不换载体。
+2. **区域/候选层位置**：区域层 = 页内 ephemeral 车道前分区器
+   （批次 12 已在产，单区退化直通是结构性保证）；候选层 = 观察
+   侧信道零发射权（唯一发射口 = 逐候选去重替换，单独裁决条款
+   隔离）；方案 B（共享 segmentation 重构）维持目标态参考不
+   授权；文档级 layout 对象模型明确不做。
+3. **五保护面逐面钉死**：element 顺序（单栏零差异结构性保证 +
+   六篇冻结基线闸门）/ locator（family 不动，region 身份只走
+   metadata）/ relation 与配对（现行匹配器零改动，门控另批）/
+   caption 优先级（前缀集零改动）/ 有框表（泳道零改动，候选
+   与有框表 bbox 去重后才能进发射裁决）。验收仪器冻结为标准
+   套件：词守恒 EXACT + 六篇基线 diff 逐页归因 + guard suites
+   + 全量回归。
+4. **回退路径**：commit 级 revert + 基线重放，**不设运行时开关**
+   （flag 制造双生产行为，与单一冻结基线纪律冲突）；架构级
+   回退点 = :575-576 单区退化路径（prose 侧恢复批次 12 前语义）
+   + Tier-2 观察-only 关停零变化；outputs/batch12i_after +
+   批次 13 基线表 = 永久 pre-state 参照。
+
+**11-B 三门结论（r70 ⑥）**：schema 影响可控 ✓ / 回归面可测 ✓ /
+无隐式 parser 重写 ✓——架构层面 11-B 阻塞解除；但各实施批
+（CJK 校准 / font-size 加富 / Tier-2 候选车道 / 去重替换 /
+配对门控）须逐批立项逐批裁决，本裁决不构成任何一批的实施授权。
+
+**push 申请 P24'（任一前置不符则停链报裁，非 force）**：
+
+- **A**：integration/stage11a-layout-architecture-freeze 远端
+  新建，基点 = 已核验 ca46fbf，tip = `7a96b55`。新增集合严格
+  {7a96b55}，要求 7a96b55^ = ca46fbf。（r70 未含 11-A push 权，
+  本申请即补足。）
+- **B**：integration/stage9-batch26-corpus-annotation 从远端
+  已核验 a2aacc7 纯 FF 至本条 commit（§160+§161 台账）。链
+  a2aacc7→8e21342→本条，新增集合严格 {8e21342, 本条 SHA 见
+  r71 简报钉死}。
+
+**请求裁决（r71）**：(a) P24' A/B push 授权；(b) Stage 11-A
+架构裁决冻结确认（四问结论 + 三门结论采纳与否）；(c) Stage 11-B
+方向征询：首批候选（CJK char 级校准 / font-size 属性加富 /
+Tier-2 候选车道观察-only / 去重替换点裁决 / 图注配对 region-id
+门控）是否立项、何者优先，或暂缓由您指定其他方向。
