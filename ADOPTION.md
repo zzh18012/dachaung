@@ -8103,3 +8103,50 @@ BACKLOG §1 更新为 Closed）。执行记录：
    整体 closeout 确认（Batch 13 审计结论采纳与否）；(c) Stage 10
    收口后的 Stage 11 方向征询（§3a Tier-2 实施授权与否 / 其他
    方向由您指定）。
+
+## 一百六十、r70 裁决回执：P23' A/B 执行 + Stage 10 整体 closeout 生效 + Final Baseline 冻结 + Stage 11-A 立项
+
+日期：2026-09-22。r70 裁决收到并执行完毕。
+
+1. **P23' A 执行回执**：预核验（本分支 HEAD=ca46fbf、
+   ca46fbf^=aaff3df、rev-list aaff3df..HEAD 集合严格 {ca46fbf}、
+   远端 integration/stage10-batch13-closeout-audit 尚不存在、树干净）
+   → push 创建远端新分支 → 复核验 ls-remote：远端 tip = ca46fbf
+   精确，远端父 = aaff3df。非 force，仅创建新分支。
+2. **P23' B 执行回执**：预核验（链严格 a9d338d→6cf7f2e→a2aacc7、
+   rev-list a9d338d..HEAD 集合严格 {6cf7f2e, a2aacc7}、远端
+   tip=a9d338d、树干净）→ push 纯 FF → 复核验：远端 tip =
+   a2aacc7 精确。非 force。
+3. **Stage 10 整体 closeout 生效（r70 ③）**：P23' A/B 四条件
+   （Batch 13 远端 ref=ca46fbf ✓ / adoption 远端 ref=a2aacc7 ✓ /
+   两边新增集合严格等于授权集合 ✓ / 全程非 force ✓）逐项满足，
+   **Stage 10 整体 closeout 自本条生效，Batch 13 Closed**。
+   **Final Baseline 冻结登记**（ADOPTION 台账口径，与
+   docs/stage10-batch13-closeout-audit.md §① 一致）：
+   - 批次 1–12 全部落地并各有验收证据；
+   - 六篇冻结基线 @aaff3df：real-02 110 元素/17 heading/44 chunk、
+     real-04 18/3/24、acad-03 71/9/97、prod-01 1308/427/892、
+     tech-08 979/307/545、tech-03 4258/1297/1547（real-02
+     heading=17 构成 10+2+1+3+1，form_option_repeat=18）；
+   - 残差四分类：processed 11 / known residual 9 家族 /
+     deferred §3a 1 / 未分类 0；
+   - suppression reason 注册集闭合：7 reason 全覆盖 76 条，
+     未注册 = 0；
+   - 全量回归 5654 passed / 26 skipped / 0 failed；guard
+     suites 99 passed；
+   - 未关闭风险表六项按审计文档 §⑦ 登记。
+4. **§3a 维持 deferred（r70 ④）**：不授权 Tier-2 实施、不做
+   KV-GAP 检测器、不做无线框表格修补、不做逐条 residual 消除。
+   known residual 九家族维持登记不修。
+5. **Stage 11-A 立项（r70 ⑤，设计冻结轮，零实现）**：PDF
+   layout 重构架构裁决轮。必须回答四问：(1) raw words 是否
+   长期一等输入；(2) 区域/候选层放哪（与既有 element 流水关系）；
+   (3) 如何不破坏 element 顺序 / locator / relation / caption
+   优先级 / framed-table 行为；(4) 回退路径。共享底座服务
+   §1 多栏、§3a 无线框表格、未来 layout 级分类。
+6. **Stage 11-B 实施不授权**：待 11-A 证明 schema 影响可控 +
+   回归面可测 + 无隐式 parser 重写后再裁。
+7. **状态**：Batch 12 Closed、Batch 13 Closed、**Stage 10
+   Closed**；§3a deferred 不变；G⑤ 冻结不变；第二标注人独立线
+   不变；2026-09-28 autonomous-track 里程碑独立不变。本条
+   commit 留存本地分支待裁（无 push 权）。
