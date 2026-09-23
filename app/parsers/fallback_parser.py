@@ -11,6 +11,7 @@ from __future__ import annotations
 import bisect
 import re
 import statistics
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -977,6 +978,75 @@ _PAGE_FURNITURE_BAND_RATIO = 0.93
 # 不要求显示页码 == 物理页，不扩展到裸数字/日期/罗马数字/文件名）
 _PAGE_FURNITURE_PAGE_NUMBER_RE = re.compile(r"page\s*\d+", re.IGNORECASE)
 
+# D3 底带裸数字页码（Stage 11 批次 18，r76 授权；r62① 边界仅对裸数字重开）
+_PAGE_FURNITURE_DIGIT_RE = re.compile(r"\d{1,4}")
+# r76④ 冻结：size-cap = 元素内最大词字号 / 全文档字号众数 ≤ 1.2。
+# 语料依据（Batch 17）：页码族实测 r ≤ 1.11（prod-01）/ 1.00（tech-03），
+# 章节装饰数字实测 r = 60.76；1.2 = 观察上界 1.11 + 8% 余量。
+_PAGE_FURNITURE_DIGIT_SIZE_CAP = 1.2
+
+
+def _doc_font_stats(
+    words_by_page: dict[int, list[dict]],
+) -> tuple[set, float | None]:
+    """D3 文档级字体统计（r76④ 钉死口径）。
+
+    - top3：全文档词级 fontname（仅非 None）按词计数前 3；Counter 并列
+      先插入者胜，词序由页序+行序决定 → 确定性。
+    - body_mode：全文档词级 font_size（round 到 0.1，仅非 None）众数。
+    文档级而非页级：页码字体跨页一致，页级统计在短页/图页会退化；
+    观察面全部证据（Batch 15/16/17）基于文档级口径。
+    """
+    font_counter: Counter = Counter()
+    sizes: list[float] = []
+    for words in words_by_page.values():
+        for w in words:
+            fn = w.get("fontname")
+            if fn is not None:
+                font_counter[fn] += 1
+            fs = w.get("font_size")
+            if fs is not None:
+                sizes.append(round(float(fs), 1))
+    top3 = {f for f, _ in font_counter.most_common(3)}
+    body_mode = statistics.mode(sizes) if sizes else None
+    return top3, body_mode
+
+
+def _element_font_features(
+    element: Element, words_by_page: dict[int, list[dict]], top3: set,
+) -> tuple[str | None, bool, float | None]:
+    """元素 bbox（词中心 ±0.5pt）内词的字体特征（D3 合取证据）。
+
+    返回 (主导字体, 是否圈外, 最大字号)。主导字体 = 元素内非 None
+    fontname 的众数（多字体词取计数最大者，并列先出现者胜）；
+    字号取元素内最大（与观察面 ratio 同口径——混排元素以最显眼
+    字号为准，章节装饰大字因此被 size-cap 排除）。
+    元素内无任何非 None fontname → 主导字体 None（保守：不命中 D3）。
+    """
+    loc = element.source_locator or {}
+    page = loc.get("page")
+    bbox = loc.get("bbox")
+    if (not isinstance(page, int) or not isinstance(bbox, (list, tuple))
+            or len(bbox) != 4):
+        return None, False, None
+    x0, top, x1, bottom = bbox
+    fonts: Counter = Counter()
+    sizes: list[float] = []
+    for w in words_by_page.get(page, []):
+        cx = (w["x0"] + w["x1"]) / 2
+        cy = (w["top"] + w["bottom"]) / 2
+        if x0 - 0.5 <= cx <= x1 + 0.5 and top - 0.5 <= cy <= bottom + 0.5:
+            fn = w.get("fontname")
+            if fn is not None:
+                fonts[fn] += 1
+            fs = w.get("font_size")
+            if fs is not None:
+                sizes.append(float(fs))
+    if not fonts:
+        return None, False, (max(sizes) if sizes else None)
+    dom, _ = fonts.most_common(1)[0]
+    return dom, dom not in top3, (max(sizes) if sizes else None)
+
 
 def _band_heading_key(
     element: Element, page_heights: dict[int, float]
@@ -1002,13 +1072,18 @@ def _band_heading_key(
 
 
 def _suppress_page_furniture_headings(
-    elements: list[Element], page_heights: dict[int, float]
+    elements: list[Element], page_heights: dict[int, float],
+    words_by_page: dict[int, list[dict]] | None = None,
 ) -> list[Element]:
-    """文档级后置过滤：底带 heading 的页面家具抑制（D1 ∪ D2，就地改写）。
+    """文档级后置过滤：底带 heading 的页面家具抑制（D1 ∪ D2 ∪ D3，就地改写）。
 
     D1 = 底带 heading 全文本匹配 Page+数字 形态；
     D2 = 底带 heading 的规范化文本在 ≥2 个不同物理页的底带出现
-    （两个实例自身均须在底带，页中重复不参与聚合）。
+    （两个实例自身均须在底带，页中重复不参与聚合）；
+    D3 = 底带 heading 全文本匹配 1-4 位裸数字 ∧ 元素主导字体圈外
+    （∉ 文档级 top-3）∧ 元素最大字号 / 文档字号众数 ≤ 1.2
+    （Stage 11 批次 18，r76 授权；词级属性缺失/统计不可得 → 保守不命中）。
+    判定顺序 D1 → D2 → D3（D1/D2 行为零变化；重复裸数字仍归 D2）。
     命中 → type 改 paragraph + metadata.heading_suppressed=page_furniture_*；
     文本/locator/bbox/页号/element_id/顺序/置信度与批次 6 form_label_* 语义不动。
     """
@@ -1019,6 +1094,9 @@ def _suppress_page_furniture_headings(
         key = _band_heading_key(el, page_heights)
         if key is not None:
             band_pages_by_text.setdefault(key[0], set()).add(key[1])
+    font_stats: tuple[set, float | None] | None = None
+    if words_by_page is not None:
+        font_stats = _doc_font_stats(words_by_page)
     for el in elements:
         if el.type != "heading":
             continue
@@ -1030,6 +1108,22 @@ def _suppress_page_furniture_headings(
             reason = "page_furniture_page_number"
         elif len(band_pages_by_text.get(norm_text, ())) >= 2:
             reason = "page_furniture_band_repeat"
+        elif (
+            font_stats is not None
+            and font_stats[1] is not None
+            and _PAGE_FURNITURE_DIGIT_RE.fullmatch(norm_text)
+        ):
+            top3, body_mode = font_stats
+            _dom, is_outside, max_size = _element_font_features(
+                el, words_by_page, top3)
+            if (
+                is_outside
+                and max_size is not None
+                and max_size / body_mode <= _PAGE_FURNITURE_DIGIT_SIZE_CAP
+            ):
+                reason = "page_furniture_digit_page_number"
+            else:
+                continue
         else:
             continue
         el.type = "paragraph"
@@ -1121,6 +1215,7 @@ def _parse_pdf(
     image_counter = 0
     pdf_table_records: list[dict] = []  # 跨页合并分析输入（Stage 10 批次 4）
     page_heights: dict[int, float] = {}  # 底带判定输入（Stage 10 批次 9）
+    words_by_page: dict[int, list[dict]] = {}  # D3 font 通道（Stage 11 批次 18）
     try:
         with pdfplumber.open(str(path)) as pdf:
             for page_idx, page in enumerate(pdf.pages, start=1):
@@ -1138,6 +1233,7 @@ def _parse_pdf(
                     )
                     words = []
                 words = _annotate_words_with_attrs(words, page.chars)
+                words_by_page[page_idx] = words
                 for para in _page_paragraphs(words):
                     text = para["text"].strip()
                     if not text:
@@ -1351,9 +1447,10 @@ def _parse_pdf(
     # 跨页表格保守合并（Stage 10 批次 4）：在 relation 匹配前完成，
     # 使题注/引用关系针对合并后的表格计算
     elements = _apply_cross_page_merges(elements, pdf_table_records)
-    # 底带页面家具抑制（Stage 10 批次 9）：同样在 relation 匹配前完成；
-    # 只改 heading→paragraph，与表格合并输入不相交
-    elements = _suppress_page_furniture_headings(elements, page_heights)
+    # 底带页面家具抑制（Stage 10 批次 9 + 批次 18 D3）：同样在 relation
+    # 匹配前完成；只改 heading→paragraph，与表格合并输入不相交
+    elements = _suppress_page_furniture_headings(
+        elements, page_heights, words_by_page)
     # 表单选项同列堆叠抑制（Stage 10 批次 12 hardening，r68 D-safe）：
     # 家具抑制之后、relation 匹配之前；同样只改 heading→paragraph
     elements = _suppress_form_option_repeat_headings(elements)
