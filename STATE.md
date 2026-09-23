@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2069 — f 轻量轮：main 测试文本 I/O 编码卫生审计（第十一审计维度，干净收口）+ 收官锚 92365 第三连复核（零测试改动）
+
+- 任务：R2068 建议 f/b 常规项轮换轻量轮。开**第十一审计维度**——main tests/ 文本 I/O 调用级 encoding 显式性 + 写入目标纪律。正交性对照（既有十维度逐一核验）：R1915 flaky F1–F8 无编码轴、R1917 全局状态六类不含文件 I/O、R2045 是静态路径串泄漏非运行时 I/O 语义、R2047 基准件无调用级 I/O、其余六维度（重复组/运行时归属断言/断言强度/候选盘点/私路径/函数级收集对账/模块映射）主题均不同——非机械重复。动机：本仓库工具链自身两度踩 Windows cp936/GBK 坑（R2049 P1 重定向 GBK 伪差、R2064 precoll 0xc8 字节）。main 只读 @ `6c6d398`（前后 rev-parse + status clean 核验；本轮未在 main 跑任何 pytest/CLI 子进程——纯文件读取 + AST，零写入最严形态）。
+- 扫描器与产物（均未入库 outputs/autonomous/）：`fs_io_scan_r2069.py`（stdlib AST，0.41s）+ `fs_io_scan_r2069.json`（sha256 3f879957f3b3a948…6ca56a1a35）+ `fs_io_scan_r2069_summary.json`。范围 main tests/ 133 文件全扫，覆盖 open / io·codecs·Path.open 族 / read_text / write_text / read_bytes / write_bytes 调用点，parse 失败 0。
+- **结论①（编码卫生干净，无指示线候选）**：784 I/O 调用点 = 文本 720（**712 显式 encoding 占 98.9%** + 8 缺失）+ bytes 64（零 encoding 异常 kw）。8 处缺失**全部**为 `.write_text()` 写侧、零读侧：test_parsers.py:154 / test_parsers_html.py:267 / test_parsers_ipynb.py:220 / test_parsers_ipynb_edges3.py:732 / test_parsers_markdown_edges3.py:778 / test_parsers_text.py:202 / test_parsers_text_edges3.py:269 / test_pipeline_integration.py:255——数据参数经 ast.unparse 证明为**纯 ASCII 字面量完整表达式**（'hello'/'hi'/'<p>x</p>'），任何 locale 默认编码（cp936/UTF-8/latin-1）下写出字节恒同，零行为风险；文本读取缺 encoding 0 处、open 族文本模式缺 encoding 0 处。
+- **结论②（写入目标纪律 + 扫描器局限如实记录）**：open 族 write-like 全套件仅 2 处且均为 `gzip.open(..., 'wb')` 二进制（test_container_verify_e2e.py:119 / test_container_verify_logic.py:261，编码中性）；其余写侧全走 `.write_text`（目标为 Path 对象，以 tmp_path 派生为主）——**本扫描器对方法形态取不到目标表达式**（首位置参数是数据非目标），summary 的"512 literal write targets"计数对 .write_text 形态无效、不采信（局限记录在案，不基于它做任何结论）；tracked-tree 弄脏面已由 R2047 全量实跑前后 status clean 经验性闭合。写入目标维度无可行动项。
+- **①b collect-only 锚复核**：**92365 tests collected 精确命中**（PYTHONUTF8=1，22.36s，rc 0，err 文件 0 字节）——R2065 收官锚第三次连续确认（R2065 批后 / R2066 / 本轮），零漂移；期间 R2067–R2068 均纯分析轮零语料改动，与本轮一致。证据 `collect_recheck_r2069.out` / `.err`。
+- 审计维度谱系现 11 个：R1906 重复组 / R1907 运行时+归属+断言 / R1915 flaky / R1917 全局状态 / R1918 断言强度 / R2042 候选盘点 / R2045 私路径 / R2047 基准面 / R2049 函数级收集对账 / R2067 模块×测试引用映射 / **R2069 文本 I/O 编码卫生**。
+- 计数影响：0（纯审计 + 健康复核轮；tests/ 零变化，收官锚 92365 不变）。G03 删除面冻结维持、G04/G05 不动；R2066 记录的 6 文件 SyntaxWarning 维持指示线候选不自跑线修。
+- 下次建议：R2070 维持 f/b 常规项轮换或轻量健康轮至 **09-28 周期简报轮**（R57-② 一次性 ≤60 分钟全量实跑：固定 HEAD、单次、禁自动重试，锚 92365；引用 R2066 投影 + R2068 候选池结论 + R2067 映射与本轮第十一维度收口）；main 前进（≠6c6d398）触发 R2047 重探优先。
+
+---
+
 ## Round 2068 — R2042 候选池回读核对（主表 22 条全开放实证 + 治理 5 条状态判定 + thin 模块方向关闭；纯只读校准轮零测试改动）
 
 - 任务：R2067 建议③轻量 f 轮——① 回读 R2042 盘点件（`outputs/autonomous/candidates_inventory_r2042.md`）核对候选池现状；② thin 模块间接通道密度核验（R2067 标注低价值）。main HEAD 检查 `6c6d398ca9c91b5b1f297e889301e776b261bfb2` **未前进** ✓ 工作树 clean（R2047 重探不触发）；本轮纯文件 grep/read，未在 main 跑任何 pytest/CLI 子进程——零写入边界最严形态；核对材料 `outputs/autonomous/candidates_recheck_r2068.md`（未入库）。
