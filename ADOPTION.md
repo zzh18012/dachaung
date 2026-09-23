@@ -8984,3 +8984,39 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
 8. **请求裁决**：(a) P30' A/B push 授权；(b) Batch 18 验收裁决
    （通过/驳回/补充）；(c) 下一方向（r76 (7) 预告：G⑤/G⑥ 收口 +
    Stage 11 closeout 评估，不继续扩 font family）。
+
+## §175. r77 回执：P30' A/B 已执行核验，Batch 18 Closed，Stage 11 转收口评估
+
+日期：2026-09-23。
+
+1. **P30' A 执行回执（真实核验）**：执行时点预核验（HEAD=
+   8dc6ec8、8dc6ec8^=80e817b、ancestry-path 80e817b..HEAD
+   集合严格 {8dc6ec8}、远端无同名分支、树干净）→ push 远端
+   新建 integration/stage11-batch18-page-number-font-consumption
+   → 复核验 ls-remote：远端 tip = 8dc6ec8 精确。非 force。
+   内容 = D3 实现 + 测试 + 实施文档（3 文件，+592/−6）。
+2. **P30' B 执行回执（真实核验）**：执行时点预核验（HEAD=
+   4fba870、ancestry-path 430c1a2..HEAD 集合严格 {c2eb21a,
+   10b98da, 4fba870}、远端 tip=430c1a2、树干净）→ push 纯 FF
+   430c1a2..4fba870 → 复核验：远端 tip = 4fba870 精确。非
+   force。内容 = §172 → §173 → §174。
+3. **Batch 18 验收通过（r77 (3)-(5)）**：授权边界检查过
+   （消费点唯一 + 禁区全未触碰，r76 冻结符合）；D3 规则冻结
+   确认——fontOut 与 size-cap 均冻结为**必要条件**（语料
+   466/466 + 合成 T4/T2 反例 = 存在必要性证明完成）；验收
+   指标全过（real-02 守恒 / prod-01 恰 33 / tech-03 恰 233 /
+   其余零漂移）；消融接受（证明条件存在，非调优）。
+4. **Stage-11-Batch-18-Closed 生效**（r77 (6) 生效条件满足：
+   A tip = 8dc6ec8、B tip = 4fba870、ancestry 与授权一致）。
+   验证闭环完成：word attribute layer → Tier-2 first
+   consumer → D3 page number furniture。
+5. **后续方向（r77 (7)）**：Tier-2 font **暂停扩展**（本轮
+   无新增生产规则授权，仅确认 D3 单点消费闭环完成）；下一
+   阶段优先 **Stage 11 closeout + G⑤/G⑥ 收口评估**——G⑤
+   第二标注人回收、G⑥ gold freeze 条件检查、residual
+   inventory 清理、Stage 11 信息层总结。维持：§3a deferred、
+   顶带不立批、caption 不扩展、图内标签不扩展、continued
+   不扩展。
+6. **状态**：Stage 10 Closed；Stage 11 Batch 14/16/17/18
+   Closed（Batch 15 设计追认+修订追认）；Tier-2 扩展暂停；
+   下一批 = Stage 11 closeout 评估（待立项申请）。
