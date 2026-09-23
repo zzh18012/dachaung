@@ -9130,3 +9130,32 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
    gold_revision 禁止）。本轮不新增实现授权。
 8. **P32' B push 申请预告**：本条目（§177）commit 留待下笔
    push 申请（adoption 线纯 FF，集合 = {§177 commit}）。
+
+## §178. r80 回执：P32' B 已执行核验，台账同步，待命期治理边界入档
+
+日期：2026-09-23。
+
+1. **P32' B 执行回执（真实核验）**：执行时点预核验（HEAD=
+   8669d9e、8669d9e^=d2f5395、ancestry-path d2f5395..HEAD
+   集合严格 {8669d9e}、远端 tip=d2f5395 精确、4fba870 链
+   FF 可行、树干净）→ push 纯 FF d2f5395..8669d9e → 复核验
+   ls-remote：远端 tip = 8669d9e 精确。非 force。adoption 本地
+   与远端同步（Stage-11-CLOSED 全链上推完成：8dc6ec8(批次 18)
+   → df19048(closeout) / 4fba870 → c9b760d → d2f5395 →
+   8669d9e）。
+2. **r80 其余裁决入档**：
+   - Stage-11-CLOSED 状态确认维持生效；
+   - 待命 / 低频轮换允许活动限定 = G⑤ 外部标注回收、
+     decision/agreement 汇总、G⑥ readiness 检查——仅收集 /
+     核验 / 纯确认，不扩大生产修改权限；
+   - 继续冻结：新 parser rule batch / font family 扩展 /
+     residual 修复批 / §3a 重启 / 顶带·caption·图内标签·
+     continued 立项；
+   - G⑥ 维持 NOT READY，不得因 Stage 11 关闭提前 freeze——
+     需 G⑤ 四篇约定口径材料齐备 + agreement/凭证条件核验；
+   - 2026-09-28 autonomous-track 周期简报 + execution-baseline
+     豁免轮独立治理，不因本授权覆盖。
+3. **本条目 push 预告**：§178 commit 留待下笔 push 申请
+   （adoption 线纯 FF，集合 = {§178 commit}）——拟与下一
+   实质事件（G⑤ 回收 / 09-28 周期简报 / G⑥ readiness 检查）
+   合并申请。
