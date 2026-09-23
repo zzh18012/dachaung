@@ -9020,3 +9020,68 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
 6. **状态**：Stage 10 Closed；Stage 11 Batch 14/16/17/18
    Closed（Batch 15 设计追认+修订追认）；Tier-2 扩展暂停；
    下一批 = Stage 11 closeout 评估（待立项申请）。
+
+## §176. r78 回执：Stage 11 closeout 审计批执行完成，tech-08 越界 21 页严格口径作废登记，P31' A/B push 申请
+
+日期：2026-09-23。
+
+1. **r78 回执**：closeout 审计批立项批准（integration/
+   stage11-closeout-audit，基点 8dc6ec8，性质 = 纯文档 + 只读证据
+   + 状态审计）；tech-08 越界 21 页 = **严格口径作废**（越界页
+   改变采样框架而非补充信息：不进标注统计、不进 agreement、
+   不进 gold candidate、不改 pair-map）；G⑤ 1/4 与 G⑥ NOT
+   READY 确认；closeout 后进入待命 / 低频轮换，不启动新解析
+   规则批；P31' 未预授权，需单独申请（显式 SHA / ancestry /
+   rev-list / FF only）。
+2. **closeout 执行记录（零生产改动）**：分支 integration/
+   stage11-closeout-audit 自 8dc6ec8 新建，commit **df19048**
+   （仅 docs/stage11-closeout-audit.md +114）。文档七节：
+   ① 批次台账（11a 布局架构冻结 + Batch 14–18 全 Closed）；
+   ② Tier-2 演进链（word 属性层 → 候选设计/稳定性 → r62① 重开
+   → D3 首消费点；fontOut/size-cap 必要性证明登记）；③ Final
+   Baseline 冻结表（Stage 11 口径，六语料 vs @aaff3df：prod-01
+   1308/394/869（D3=33）、tech-03 4258/1064/1351（D3=233）、
+   其余四篇零变化；reason 注册集 7+1=8，覆盖 76+266）；④ 残差
+   taxonomy 终局登记（已消费 / 降级 / 架构级不立批 / 不扩展 /
+   deferred / 形态冻结 / T4 开放风险类零实例）；⑤ G⑤/G⑥ 状态
+   表（只读）；⑥ 关闭后路线（待命 / 低频轮换）；⑦ 零漂移结构
+   证明。
+3. **验收（r78 预冻结逐项全过）**：`git diff 8dc6ec8 -- app
+   tests schemas evaluation scripts` = 空；tracked 新增仅
+   closeout 文档；全量回归 **5684 passed / 26 skipped / 0
+   failed**（65.23s，与 Batch 18 记录同值）；guards 95 passed +
+   72 passed / 4 skipped（与 Batch 18 记录一致）；六语料引用
+   数字与 batch18i_accept_report.txt 逐项一致（探针与证据全在
+   gitignored outputs/，本批不 import 生产管线写路径）。
+4. **tech-08 补交要求最终版（r78 (4) 钉死）**：(a) 补缺失 6 页
+   （p050/071/075/078/082/083）；(b) 恢复 EXCLUDE_BASE | 座位号
+   结构；(c) 修复 entries 块第 5 元素 ×2。不允许：并入越界 21
+   页结果 / 扩大页集 / 修改代表页设计。
+5. **P31' A push 申请（stage10 线，closeout 分支，远端新建）**：
+   integration/stage11-closeout-audit，tip = **df19048**，基点 =
+   已核验 8dc6ec8。起草时实际命令输出（逐字）：
+     git rev-parse HEAD
+       → df1904865f769e9434a95a7983fc84561b4e30e0
+     git rev-parse HEAD^
+       → 8dc6ec8f0d6d8c0402e5047383a080c970ec73d8
+     git rev-list --ancestry-path 8dc6ec8..HEAD
+       → df1904865f769e9434a95a7983fc84561b4e30e0
+     git ls-remote origin integration/stage11-closeout-audit
+       → （空，远端无同名分支）
+     git status --short
+       → （空，树干净）
+     git diff --stat 8dc6ec8..HEAD
+       → docs/stage11-closeout-audit.md | 114 +++++…
+         1 file changed, 114 insertions(+)
+   集合严格 {df19048}。非 force。内容 = closeout 审计文档单文件。
+6. **P31' B push 申请（adoption 线台账）**：integration/
+   stage9-batch26-corpus-annotation 从远端已核验 4fba870 纯 FF
+   至本条目 commit（链 4fba870 → c9b760d(§175) → 本条目
+   §176）。集合 = {c9b760d, §176 commit}；逐字命令输出见 r79
+   简报。非 force。
+7. **请求裁决**：(a) P31' A/B push 授权（集合如上钉死）；
+   (b) **Stage-11-CLOSED 生效裁决**（生效条件拟 = P31' A push
+   完成核验 df19048 精确 + P31' B push 完成核验 §176 commit
+   精确 + ancestry 一致）；(c) 待命期安排确认（下一主动事件 =
+   G⑤ 三篇回收 → 四篇 decision/agreement 汇总 → G⑥ freeze
+   条件检查；期间低频轮换）。
