@@ -8921,3 +8921,66 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
    Batch 18 实施授权（本轮新增 = D3 单点消费授权，不是 font
    能力全面进入解析器）；font 通用规则未授权；§3a deferred；
    顶带 deferred；G⑤ 冻结。
+
+## §174. Batch 18 执行回执：D3 实施完成（r76 (5) 授权范围内）+ P30' push 申请
+
+日期：2026-09-23。
+
+1. **实现回执**（stage10 分支 integration/stage11-batch18-
+   page-number-font-consumption，基点 80e817b，commit 8dc6ec8，
+   纯 D3 单点：app/parsers/fallback_parser.py +109 / 新测试文件
+   382 / 实施文档 107，共 3 文件）：
+   - 消费点唯一：_suppress_page_furniture_headings 新增可选第三参
+     words_by_page（None = D3 不激活；批次 9 既有两参调用零变化）；
+     判定顺序 D1 → D2 → D3。_classify_pdf_paragraph / short_line /
+     DOCX / 表格检测零触碰（r76①）。
+   - D3 谓词：底带(≥0.93) ∧ heading ∧ \d{1,4} ∧ fontOut（元素主导
+     字体 ∉ 文档级词计数 top-3）∧ max_size/body_mode ≤ 1.2（r76④
+     钉死：top-3 文档级、body_mode 全文档众数、元素字号取最大）。
+   - 保守退化（r76③④）：词属性缺失 / 文档统计不可得 → 不命中存活。
+2. **验收回执**（outputs/batch18i_accept.py，r76 (6) 预冻结指标
+   逐项全过，报告 batch18i_accept_report.txt）：
+   - real-02：D3=0，heading 17→17，D1=12 / D2=2 / form_label_*（16）
+     / form_option_repeat（18）全不变；elements / relations /
+     warnings / chunks 深比较恒等。
+   - prod-01：D3 恰 33（heading 427→394）；tech-03：恰 233（1297→
+     1064）；chunks 892→869 / 1547→1351 = heading 硬边界移除的确定
+     性下游，覆盖剖面（dup/missing/extra）与基线恒等。
+   - real-04 / acad-03 / tech-08：全字段零漂移；全语料 relations /
+     warnings 恒等、id/顺序/计数恒等、唯一差异 = D3 改型。
+3. **消融回执**（r76 (6)：证明条件为什么存在）：
+   - 语料侧：P1=P2=P3=prod-01 33 / tech-03 233 / 其余 0；去 fontOut
+     与去 size-cap 变体同数——当前语料两条件零增量（防护零实例
+     开放风险类）。
+   - 合成面：T4 底带正文族数字（fontOut=False）生产存活、去 fontOut
+     变体误杀；T2 章节装饰数字（24pt, r=2.4）生产存活、去 size-cap
+     变体误杀——两条件各有唯一防护对象。
+4. **回归**：全量 5684 passed / 26 skipped / 0 failed（53.42s；基线
+   5666 + 本批 18，零回归）；guards（批次 4/6/9/12 + Batch 14 属性 +
+   本批 D3）95 + 72 passed / 4 skipped（题注契约三文件的 skip =
+   samples/private 本机资产缺失，既有行为）。
+5. **过程诚实登记**：探针首版 chunk 守恒不变量写错（"每 id 恰一
+   chunk"不成立于长段句切分既有行为），修正为覆盖剖面对比后重跑，
+   两轮生产数字恒等；测试首版两处夹具/预期错（底带双元素 11.7pt
+   间距被行聚类并段；"2026" 实为 4 位数字应命中），修正后 18/18。
+   生产代码无返工。
+6. **P30' A push 申请**（stage10 线，batch18 分支，远端新建）：
+   integration/stage11-batch18-page-number-font-consumption，tip =
+   **8dc6ec8**，基点 = 已核验 80e817b。起草时实际命令输出（逐字）：
+     git rev-parse HEAD
+       → 8dc6ec8f0d6d8c0402e5047383a080c970ec73d8
+     git rev-parse HEAD^
+       → 80e817b3324ac9e5cbc589559ab2b201736cc9a9
+     git rev-list --ancestry-path 80e817b..HEAD
+       → 8dc6ec8f0d6d8c0402e5047383a080c970ec73d8
+     git ls-remote origin integration/stage11-batch18-page-number-font-consumption
+       → （空，远端无同名分支）
+   集合严格 {8dc6ec8}。非 force。内容 = D3 单点实现 + 测试 + 文档。
+7. **P30' B push 申请**（adoption 线台账）：integration/
+   stage9-batch26-corpus-annotation 从远端已核验 430c1a2 纯 FF 至
+   本条目 commit（链 430c1a2 → 10b98da(§173) → 本条目 §174）。
+   集合 = {10b98da, §174 commit}；逐字命令输出见 r77 简报四节。
+   非 force。
+8. **请求裁决**：(a) P30' A/B push 授权；(b) Batch 18 验收裁决
+   （通过/驳回/补充）；(c) 下一方向（r76 (7) 预告：G⑤/G⑥ 收口 +
+   Stage 11 closeout 评估，不继续扩 font family）。
