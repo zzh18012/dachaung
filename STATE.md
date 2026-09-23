@@ -121,6 +121,21 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2072 — 周期简报轮（提前执行）：R57-② 一次性全量实跑 0:22:43 墙内完成，锚 92365 精确，2 失败均钉死为代跑环境归属 → 新 execution baseline（零测试改动）
+
+- **提前执行披露**：本窗口原定 2026-09-28；2026-09-23 用户指示提前执行周期简报轮。R57-② 一次性豁免就此消耗（与日期无关）；后续无人值守轮常规 ≤30 分钟纪律不变。简报送 GPT 追认提前执行与新 baseline。
+- **执行（R57-② 纪律全遵守）**：固定 HEAD **c9268f9**（R2071 tip，运行前后 rev-parse 一致）；**单次运行、零自动重试**（全量恰跑一次；后续仅对 2 个失败测试做单测级定向诊断，非全量重试）；60 分钟硬墙 = coreutils `timeout 3600`。执行环境：dachuang-code worktree detached @ c9268f9 + 该 worktree `.venv`（与 R2070/R2071 collect 锚复核同环境；分支本体被 dachuang-autonomous worktree 持有）。命令：`PYTHONDONTWRITEBYTECODE=1 timeout 3600 .venv/Scripts/python.exe -X utf8 -m pytest -q --tb=no -p no:cacheprovider`。证据：`outputs/autonomous/fullrun_cycle_2026-09-23.out`。
+- **结果**：**2 failed, 92311 passed, 52 skipped, 17 warnings, 1363.59s（0:22:43）**。计数守恒精确：92311 + 2 + 52 = **92365 = 收官锚第五连值**（collect 锚五次精确 + 本次执行计数同值）。墙 22.7 min << 60 min 硬墙（R2066 六锚投影区间 16.6–47.4 min，实测落在中段偏快；体感速率 92365/1363.59s ≈ **67.7 条/s**，介于 R2065 态 60.0 与历史快窗 77.8 之间——投影模型再验证成立）。
+- **2 失败归因（全部环境归属，零语料缺陷，双点验证）**：
+  - `test_schema_edges7.py::test_schema_path_parent_parent_name`：断言 `SCHEMA_PATH.parent.parent.name == "dachuang-autonomous"`——本执行环境目录名 = dachuang-code，确定性目录名断言不匹配；**母环境（dachuang-autonomous，同 tip c9268f9 + 自有 .venv）定向复跑 PASSED**。
+  - `test_pipeline_integration.py::test_real_unsupported_txt`：skip 守卫设计前提 = 母环境无 `samples/private/unsupported.txt`（该 worktree 无私有样例）；dachuang-code 存在该文件 → 走执行分支且该环境下 .txt 解析 rc==0；**母环境定向复跑 SKIPPED（守卫按设计触发）**。
+  - **母环境等价全量计数：92312 passed / 53 skipped / 0 failed = 92365**（2 失败在母环境分别 → 1 pass + 1 skip）。
+- **新 execution baseline（待简报追认）**：**92365 @ c9268f9，全量实跑 0:22:43**；代跑环境注记 = dachuang-code detached + main venv（2 环境归属失败已归档）；旧 collect-only 锚 92365（R2065–R2071 五连）与执行计数同值——锚记账升级为「collect 92365 + execution 92365」双轨同值。旧全量实跑锚 102091（R2053 第 7 次命中）退役转历史。
+- 计数影响：0（零测试改动；本 commit 仅 STATE.md）。G03 删除面冻结、G04/G05 不动维持；指示线候选（R2042/R2068 盘点 + R2066 SyntaxWarning 6 文件 + R2071 fixture 候选三项）维持登记不实施（指示线 r80 待命冻结）。
+- 下次建议：周期简报（r59）随用户中转送 GPT（追认提前执行 + baseline + 候选池处置 + 下一周期窗口拟 2026-10-05）；下一轮起回 f/b 常规轮换或轻量健康轮；main 前进（≠6c6d398）触发 R2047 重探优先。
+
+---
+
 ## Round 2071 — 1b/f 轻量轮：main 测试 fixture 生命周期面审计（第十三审计维度，干净收口）+ 收官锚 92365 第五连复核（零测试改动）
 
 - 任务：R2070 建议 f/b 常规项轮换或轻量健康轮至 09-28 周期简报轮。开**第十三审计维度**——main tests/ fixture 生命周期面审计：定义（conftest/文件内）、scope、autouse、params 参数化、yield teardown、fixture→fixture 依赖、显式消费（函数参数 / usefixtures / getfixturevalue）、孤儿（定义后零消费，按 pytest 可见性规则：非 conftest 文件内 fixture 只算文件内引用、conftest fixture 保守全局算）、内置 fixture 使用分布、同名遮蔽。正交性对照（既有十二维度逐一核验）：R1906 重复组按规范化哈希只测测试函数——fixture 非收集节点，fresh_registry ×13 跨文件克隆形态对该轴不可见；R2049 函数级收集对账按构造排除 fixture；R1917 全局状态六类只引 plugin_env teardown 为"教科书级缓解"上下文、无定义/scope/孤儿盘点；R2045 私路径只记 samples_private_dir 消费方 skip 守卫、不审 fixture 生命周期；R1915 flaky F1–F8 无 fixture 轴；其余维度（运行时归属断言/断言强度/候选盘点/基准面/模块映射/编码卫生/import 来源）主题均不同——非机械重复。main 只读 @ `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（轮前轮后 rev-parse 一致 + git archive 自 main ref 提取到系统临时目录，用后即删，未在任何 worktree 写入）。执行环境说明：本轮在 dachuang-code worktree 以 detached HEAD @ 7589340 执行（分支被 dachuang-autonomous worktree 持有，该 worktree 未触碰），证据产物在 outputs/autonomous/。
