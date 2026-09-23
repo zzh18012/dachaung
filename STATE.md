@@ -121,6 +121,19 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2070 — 1b/f 轻量轮：main 测试第三方 import 来源审计（第十二审计维度，干净收口）+ 收官锚 92365 第四连复核（零测试改动）
+
+- 任务：R2069 建议 f/b 常规项轮换轻量轮。开**第十二审计维度**——main tests/ 第三方 import 来源对账：每个 import 根模块归类 stdlib / 仓库内部 / 第三方，第三方进一步对 pyproject 声明（declared）与 uv.lock（transitive 泄漏）判归属。正交性对照（既有十一维度逐一核验）：R2067 是 main 模块→测试引用映射（仓库内部方向），本轮是反向的测试→发行版声明来源轴；R2047 记录环境版本快照不做逐 import 声明对账；R1915 flaky F1–F8 与 R1917 全局状态六类均无依赖声明轴；其余维度（重复组/运行时归属断言/断言强度/候选盘点/私路径/函数级收集对账/编码卫生）主题均不同——非机械重复。动机：main pyproject 声明面极小（运行时恰 4 + dev 恰 1），测试若直接 import 传递依赖（pdfplumber 的 pypdfium2、python-docx 的 lxml 等）即构成"今日可跑、依赖图一变即断"的隐性泄漏面。main 只读 @ `6c6d398ca9c91b5b1f297e889301e776b261bfb2`（轮前轮后 rev-parse 一致 + git archive 自 main ref 提取，未在任何 worktree 写入——纯文件读取 + AST 零写入最严形态）。执行环境说明：本轮在 dachuang-code worktree 以 detached HEAD @ 90cdca6 执行（分支被 dachuang-autonomous worktree 持有，该 worktree 未触碰），证据产物在 outputs/autonomous/。
+- 扫描器与产物（均未入库 outputs/autonomous/）：`import_prov_scan_r2070.py`（stdlib AST，0.34s）+ `import_prov_scan_r2070.json`（sha256 78980fe2738ccec2a6f7e48feb3ebba0f2bb79edb78af535883107be054c709b）+ `import_prov_scan_r2070_summary.json`（sha256 3af3c0ae3688cb8dc5443248cb9d6898bbf1438c12f6d6b98f5464ee136ddfc0）。范围 main tests/ 133 文件全扫（含 conftest），1367 import 点、25 根模块、parse 失败 0；发行版→模块别名表显式内置（python-docx→docx、pillow→PIL、pdfminer-six→pdfminer、pyyaml→yaml、beautifulsoup4→bs4）。
+- **结论①（声明卫生干净，无指示线候选）**：第三方根模块**恰 2 个且全部显式声明**——pytest（83 点 / 83 文件，dev 声明）+ docx（3 点 / 2 文件 test_docx_sdt_nested.py 与 test_table_linearization_contract.py，python-docx 运行时声明）；**lock 传递泄漏 0、未解析 0**。其余 23 根全为 stdlib（21）与内部（app 813 点 / 117 文件、evaluation 32 点 / 17 文件）。**main tests/ 全语料零直接 import pdfplumber / lxml / PIL / pypdfium2 / kreuzberg**——全部第三方触达经 app 代码中介（与 R2052 合成 PDF"纯标准库 zlib"路线、R2050 依赖敏感面盘点相互印证：版本敏感面锁在 app 层测试而非测试层直接耦合，是分层正确的形态）。
+- **结论②（try 守卫与动态通道如实记录）**：try 块内 import 恰 4 点、全部是同一处可用性守卫 test_container_verify_logic.py:240-243（app.parsers.fallback_parser / app.hash / app.parsers.base / pathlib，skip-guard 模式良性）。扫描器局限（AST import 语句面）经 grep 双路复核：动态通道仅 2 文件——test_container_verify_logic.py:24 spec_from_file_location 加载仓库内部 scripts/container_verify.py；test_parser_provenance.py:214 importlib.import_module 合成插件名 "prov_pre_plug"——均非发行版依赖通道，局限在本语料无实质影响。
+- **①b collect-only 锚复核**：**92365 tests collected 精确命中**（PYTHONUTF8=1 + PYTHONDONTWRITEBYTECODE=1 + -p no:cacheprovider，85.98s，rc 0，err 文件 0 字节）——R2065 收官锚第四次连续确认（R2065 批后 / R2066 / R2069 / 本轮），零漂移；用时较 R2069 的 22.36s 慢为本 worktree venv 冷 import（PYTHONDONTWRITEBYTECODE 下无字节码缓存）+ 机器状态差异，计数是判据、耗时不判漂移。证据 `collect_recheck_r2070.out` / `.err`。
+- 审计维度谱系现 12 个：R1906 重复组 / R1907 运行时+归属+断言 / R1915 flaky / R1917 全局状态 / R1918 断言强度 / R2042 候选盘点 / R2045 私路径 / R2047 基准面 / R2049 函数级收集对账 / R2067 模块×测试引用映射 / R2069 文本 I/O 编码卫生 / **R2070 第三方 import 来源对账**。
+- 计数影响：0（纯审计 + 健康复核轮；tests/ 零变化，收官锚 92365 不变）。G03 删除面冻结维持、G04/G05 不动；R2066 记录的 6 文件 SyntaxWarning 维持指示线候选不自跑线修。
+- 下次建议：R2071 维持 f/b 常规项轮换或轻量健康轮至 **09-28 周期简报轮**（R57-② 一次性 ≤60 分钟全量实跑：固定 HEAD、单次、禁自动重试，锚 92365；引用 R2066 投影 + R2068 候选池结论 + R2067 映射 + R2069 编码卫生与本轮 import 来源收口）；main 前进（≠6c6d398）触发 R2047 重探优先。
+
+---
+
 ## Round 2069 — f 轻量轮：main 测试文本 I/O 编码卫生审计（第十一审计维度，干净收口）+ 收官锚 92365 第三连复核（零测试改动）
 
 - 任务：R2068 建议 f/b 常规项轮换轻量轮。开**第十一审计维度**——main tests/ 文本 I/O 调用级 encoding 显式性 + 写入目标纪律。正交性对照（既有十维度逐一核验）：R1915 flaky F1–F8 无编码轴、R1917 全局状态六类不含文件 I/O、R2045 是静态路径串泄漏非运行时 I/O 语义、R2047 基准件无调用级 I/O、其余六维度（重复组/运行时归属断言/断言强度/候选盘点/私路径/函数级收集对账/模块映射）主题均不同——非机械重复。动机：本仓库工具链自身两度踩 Windows cp936/GBK 坑（R2049 P1 重定向 GBK 伪差、R2064 precoll 0xc8 字节）。main 只读 @ `6c6d398`（前后 rev-parse + status clean 核验；本轮未在 main 跑任何 pytest/CLI 子进程——纯文件读取 + AST，零写入最严形态）。
