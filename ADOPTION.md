@@ -9085,3 +9085,48 @@ commit `62f219e`（纯文档 1 文件 +110：设计文档）。**零生产
    精确 + ancestry 一致）；(c) 待命期安排确认（下一主动事件 =
    G⑤ 三篇回收 → 四篇 decision/agreement 汇总 → G⑥ freeze
    条件检查；期间低频轮换）。
+
+## §177. r79 回执：P31' A/B 已执行核验，Stage-11-CLOSED 生效，进入待命 / 低频轮换
+
+日期：2026-09-23。
+
+1. **P31' A 执行回执（真实核验）**：执行时点预核验（HEAD=
+   df19048、df19048^=8dc6ec8、ancestry-path 8dc6ec8..HEAD
+   集合严格 {df19048}、远端无同名分支、树干净）→ push 远端
+   新建 integration/stage11-closeout-audit → 复核验
+   ls-remote：远端 tip = df19048 精确。非 force。内容 =
+   closeout 审计文档单文件（docs/stage11-closeout-audit.md
+   +114，零生产代码）。
+2. **P31' B 执行回执（真实核验）**：执行时点预核验（HEAD=
+   d2f5395、ancestry-path 4fba870..HEAD 集合严格 {c9b760d,
+   d2f5395}、远端 tip=4fba870、4fba870 为 HEAD 祖先、树干净）
+   → push 纯 FF 4fba870..d2f5395 → 复核验：远端 tip =
+   d2f5395 精确。非 force。内容 = §175 → §176。
+3. **Stage-11-CLOSED 生效（r79 (3) 三条件全部满足）**：
+   (A) closeout 远端 tip = df19048 且 df19048^ = 8dc6ec8；
+   (B) adoption 远端 tip = d2f5395 且 rev-list 4fba870..d2f5395
+   = {c9b760d, d2f5395}；(C) 全程无 merge / rebase / force
+   push。Stage 11（11a 布局架构冻结 + Batch 14–18 + closeout
+   审计）全部关闭。
+4. **closeout 文档验收通过（r79 (4))**：生产边界（app/tests/
+   schemas/evaluation/scripts 零改动）通过；内容冻结（11a +
+   Batch 14–18 + D3 完整演进链）通过；Final Baseline 接受
+   （六语料唯一行为变化 = page_furniture_digit_page_number，
+   prod-01 −33 / tech-03 −233，其余零漂移）。
+5. **tech-08 越界 21 页继续冻结（r79 (5)）**：discarded——
+   不进标注统计 / agreement / gold candidate / pair-map；
+   补交要求维持（补 6 页 p050/071/075/078/082/083 + 恢复
+   EXCLUDE_BASE + 修复 entries 第 5 元素 ×2）；禁止扩页集 /
+   合并越界结果 / 修改代表页设计。
+6. **待命期安排（r79 (6)(8)）**：允许 = G⑤ 补交跟进 /
+   decision·agreement 收集 / G⑥ 条件检查；禁止 = 新 parser
+   rule batch / font family 扩展 / residual 修复批 / §3a
+   重启。下一主动事件顺序：tech-08 补交 → prod-01/tech-03
+   回收 → 四篇 decision/agreement 汇总 → G⑥ freeze 条件
+   复核。
+7. **G⑤/G⑥ 状态保持（r79 (7)）**：G⑤ 1/4（acad-03 完成 /
+   tech-08 补交 / prod-01 等回收 / tech-03 等回收）；G⑥
+   NOT READY（gold freeze / gold digest / 24-core
+   gold_revision 禁止）。本轮不新增实现授权。
+8. **P32' B push 申请预告**：本条目（§177）commit 留待下笔
+   push 申请（adoption 线纯 FF，集合 = {§177 commit}）。
