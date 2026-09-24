@@ -121,6 +121,17 @@
 - 下次预测：101660 + 3xN（N = 后续加测轮次）；下次全量按变化触发或 ≤7 天（不晚于 2026-09-21，与周期简报同窗）
 ---
 
+## Round 2088 — 1b/f 轻量健康轮（语料健康扫描变体复跑）：语料清单/测试完整性/venv/产物体量四项检查全过（R2086 对账零漂移 + 证据文件实际位置勘误登记）+ 收官锚 92365 第二十连复核（零测试改动）
+
+- 任务：R2087 建议继续轻量健康轮或 f/b 常规轮换至 2026-10-05 周期简报或变化触发；本轮定位为语料健康扫描变体复跑（R2086 先例的可重复健康面，R2087 做了记账自洽变体后回到本面）。开工核验：dachuang-code 干净 HEAD = main 6c6d398、origin/main = 6c6d398 未前进（R2047 重探不触发，健康轮不让位）；dachuang-autonomous 干净 HEAD = 73c500c 与远端 claude/autonomous-track 一致。全程只读 + 锚复认，零测试改动、零 fixture 清理、零 warning 修复、零 main 修改。
+- 四项检查（产物 corpus_health_r2088.json 于 dachuang-autonomous outputs/autonomous/，sha256 以 1629bb73 开头）：(a) 语料清单——samples/ 递归统计共 23 文件 16571 字节（samples/devset 2 文件 1524 字节、samples/private 20 文件 12960 字节、README.md 1 文件 2087 字节；仅元数据清点计数与字节数，未读取任何私有文件内容）；R2086 条目无 samples 清单记录（其语料扫描为 tests/ 侧），本行为该子检查首基线。(b) 测试完整性——git ls-files tests/ 计 2001，与 R2086 扫描 2001 精确一致；tests/ 最后改动仍为 2d4aef8（R2065 批次 9），冻结延续零漂移；三抽样 sha256 首记（tests/conftest.py 以 0cc45ddc 开头、tests/g03_parametrize_guard.py 以 a862490d 开头、tests/test_harness_health.py 以 0993a24c 开头；R2086 STATE 无逐文件哈希记录，只记当前值）。(c) venv 健康——dachuang-autonomous 的 .venv 解释器 import pytest/pdfplumber/docx 全过，pytest 8.4.2。(d) 产物体量——dachuang-autonomous outputs/autonomous/ 为 274M（du）共 453 文件 285241286 字节，与 R2086 记录 453 文件 285241286 字节精确一致零漂移（目录 mtime 停在 09-23 08:35，R2069 之后无增删）；只记录不删除（清理归指示线裁决，v3.3 零新增授权）。
+- **证据文件实际位置勘误（重要登记，文件非缺失）**：R2086/R2087 条目所述 outputs/autonomous/ 证据（collect_recheck_r20xx.out 等）实际位于 dachuang-code 侧 outputs/autonomous/（现 86 文件 129792084 字节，较 R2086 记录 81 文件 114018017 字节增 5 文件，增量完全可归因：r2086 collect 证据对 + r2087 collect 证据对 + state_check_r2086.py）；本轮实地核验 collect_recheck_r2086.out sha256 以 f9706056 开头、collect_recheck_r2087.out sha256 以 f5318b04 开头，均与各自 STATE 记账精确一致——文件真实完好，仅既往条目表述未注明 worktree 侧属歧义非缺件；本轮证据按任务指令明确写入 dachuang-autonomous 侧，后续轮次沿用此明确化写法。
+- 锚复核：collect-only 在 dachuang-code detached @ 73c500c（自跑分支 tip 语料，跑后恢复 main 且树干净）——**92365 tests collected 精确命中**（墙钟 125s，pytest 计时 120.16s，rc 0，err 文件 0 字节），R2065 收官锚**第二十次连续确认**（R2065 批后 / R2066 / R2069 / R2070 / R2071 / R2073 / R2075 / R2076 / R2077 / R2078 / R2079 / R2080 / R2081 / R2082 / R2083 / R2084 / R2085 / R2086 / R2087 / 本轮；R2072 全量实跑执行计数同值 92311+2+52），零漂移；耗时 125s 为连续第四轮高于历史区间 54.39s-91.16s 上界（R2085 116.79 / R2086 117 / R2087 121 / 本轮 125 单调缓升）——语料零变化、计数精确，判定为机器负载窗口延续（同锚同命令同语料；计数是判据、耗时不判漂移），如实记录备查。证据 collect_recheck_r2088.out（92400 行）sha256 以 7db569ad 开头、collect_recheck_r2088.err 0 字节，均在 dachuang-autonomous outputs/autonomous/（未入库）。
+- 计数影响：0（纯健康扫描轮；tests/ 零变化，收官锚 92365 不变）。G03 删除面冻结维持、G04/G05 不动；指示线候选池维持冻结登记零实施（本轮零新增候选）；审计维度谱系维持 25 个（健康轮不开新维度）。
+- 下次建议：f/b 常规轮换或轻量健康轮至**下周期简报（2026-10-05）或变化触发**（main 前进不等于 6c6d398 时 R2047 重探优先；新裁决到件优先执行）。
+
+---
+
 ## Round 2087 — 1b/f 轻量健康轮变体：STATE.md 记账自洽（编号连续/反斜杠扫描/近代条目结构/体量趋势四项全过）+ 仓库完整性 fsck 零 error + 收官锚 92365 第十九连复核（零测试改动）
 
 - 任务：R2086 建议继续轻量健康轮或 f/b 常规轮换（避免单一模式）；本轮定位为轻量健康轮变体——审计对象从语料健康转向**台账自身健康**（STATE.md 记账自洽）+ 仓库完整性 + 收官锚复核。开工核验：dachuang-code 干净 HEAD = main 6c6d398、origin/main = 6c6d398 未前进（R2047 重探不触发，健康轮不让位）；dachuang-autonomous 干净 HEAD = 64dc18b 与远端 claude/autonomous-track 一致。
