@@ -9227,3 +9227,55 @@ outputs/gpt_brief_autotrack_r59_cycle_early.txt，含 09-24 R2073
    起共 3 commits"不预先冻结为未来授权链。
 3. **本条目 push 预告**：§180 纯台账，随下一实质事件搭车
    申请；申请时按第 2 点纪律现场重新生成集合。
+
+## §181. G⑤ tech-03 + prod-01 双件回收：核验全绿通过，晋级 annotations-user，G⑤ 3/4；push 申请（搭车 §178/§180 挂账）
+
+日期：2026-09-30。
+
+1. **交回件与隔离暂存**：用户微信/文件渠道收回两 zip——
+   `tech-03.zip`（sha256 前 16 `1cab1c2ea3a8e15b`，内
+   blocks_tech-03.py 24314B `40e48a7c5da0738c` + 附送
+   tech-03-cncert-annual2020.json 75125B）与
+   `blocks_prod-01.zip`（`153ee7a7a22fa6e6`，内
+   blocks_prod-01.py 17856B `d45dae5e4492db9b`）。标注人
+   均为 MVP（与 acad-03 同自选代号，r3 模板 2026-09-21 口径）。
+   隔离暂存 `outputs/g5_incoming_tech03_r3rev/` 与
+   `outputs/g5_incoming_prod01_r3rev/`（沿 §162 先例，原件
+   zip 一并存证）。包级瑕疵登记：prod-01 包内误带 tech-03
+   的 JSON（两包该件逐字节同 a12d9d77…），不影响标注本体，
+   未入 prod01 暂存。
+2. **核验（§162 五维同款，全部通过）**：
+   - 指纹核对一致：tech-03 `d4fe244fcc0c05c0…`、
+     prod-01 `4d099d389a5c14e3…`（对 r2/r3 绑定 dump）；
+   - 口径覆盖：代表页 **14/14**（tech-03）与 **11/11**
+     （prod-01），零缺页（对照 tech-08 首件缺 6 页）；
+   - 越界标注：**零**（对照 tech-08 越界 21 页）；
+   - 结构：零重复引用、零未知行 ID、EXCLUDE_BASE 保留
+     （显式排除 14524/13055 与预填量级吻合）；
+   - 装配 rc=0 + validate_annotation 零失败，全注册表闭环
+     **未处理 0**（tech-03：已用 546=显式 258+半行 288 /
+     注册表 15067；prod-01：已用 863=显式 407+半行 456 /
+     注册表 13917）。产物 units：tech-03 120（stream 7938
+     字符 / segments 6）、prod-01 186（stream 20156 /
+     segments 2），均 text-only、hard 0。
+3. **确定性再证**：tech-03 附送 JSON 与本线独立装配
+   reassembled.json **逐字节一致**（75125B，
+   sha256 前 16 `a12d9d7762a89615`）——零判断机械同源
+   builder 的跨端复现（标注人侧工具与本线工具产出同字节）。
+4. **晋级**：两 reassembled.json →
+   `samples/private/stage9-corpus/annotations-user/
+   tech-03-cncert-annual2020.json`（`a12d9d77…`）与
+   `prod-01-python-tutorial.json`（96196B `a9ae93cf…`），
+   沿 acad-03 通过件通道（§一百零九 → v2 晋级先例）；
+   samples/private gitignored 不入 git。独立性纪律维持：
+   全程机读对账，未读第一标注人答案。
+5. **G⑤ 状态 1/4 → 3/4**：acad-03 ✓ / tech-03 ✓（本条）/
+   prod-01 ✓（本条）/ tech-08 补交待回（缺 6 页 p050/071/
+   075/078/082/083 + EXCLUDE_BASE 恢复 + entries ×2 修复，
+   §163 r71 (6) 要求不变）。本条属待命期允许活动（r79 (6)(8)
+   / r80：G⑤ 外部标注回收 = 收集/核验/纯确认）；**G⑤ 回收
+   不自动构成实施授权**；四篇 decision/agreement 汇总仍待
+   tech-08 补交齐备；G⑥ 维持 NOT READY。
+6. **push 申请（P33'）**：§178/§180 预告的搭车申请于本条
+   生效——待推集合按 §180 纪律**以申请时点 rev-list 现场
+   生成**（见执行记录），待用户批准后执行；批准前不 push。
