@@ -9279,3 +9279,302 @@ outputs/gpt_brief_autotrack_r59_cycle_early.txt，含 09-24 R2073
 6. **push 申请（P33'）**：§178/§180 预告的搭车申请于本条
    生效——待推集合按 §180 纪律**以申请时点 rev-list 现场
    生成**（见执行记录），待用户批准后执行；批准前不 push。
+
+## §182. G⑤ tech-08 收口完成（4/4）：协调者装配契约修复后入库 + 修复/责任边界钉死 + r81 裁决全盘采纳（agreement 执行序 + G⑥ WAITING）
+
+日期：2026-10-07。
+
+1. **交回件与缺陷诊断（协调者诊断，对照物非第一标注人答案）**：
+   标注人（Mr.Z，与 acad-03 同自选代号）交来最终反馈截图——
+   三次 assemble 运行统计行均打印，但每次都报 "entries 块缺
+   第 5 元素（条目边界判断：re.Pattern 或显式起点行号）"。
+   协调者对照 r3 任务包装配器源码 + 行注册表 dump 诊断出三项：
+   (a) **致命**：blocks 第 123 行 entries 块缺第 5 元素——装配
+   器在统计行打印之后、写盘之前 SystemExit，即标注人三次运行
+   **从未写出成品 JSON**（r71 (6) 要求的"修 p9 entries"在
+   标注人侧实际未完成）；(b) **静默丢内容**：p9 半行 L012
+   『为2077万个。』是 C011 条目（.CN 域名）后半句、无 ≈C
+   配对不会被自动消费，被追加区整排半行排除吞掉，统计不可见；
+   (c) **页脚混流**：p75 para 块 P(75,"C",11,13) 含 C13 运行
+   页脚（EXCLUDE 不能抵消块引用）。
+2. **修复项（修复件 C:\Users\zzhn2\Desktop\blocks_tech-08.py，
+   非语义改标）**：① p9 entries 块补第 5 元素
+   `re.compile(r"^◇")`（12 条目全部以 ◇ 起、续行均不以 ◇ 起）；
+   ② L012『为2077万个。』按阅读序显式接入条目块
+   （P(9,"C",1,11)+((9,"L",12),)+P(9,"C",12,23)），排除区改
+   0-11/13-26 让出 L012；③ p75 para 块改 P(75,"C",11,12)，
+   C13 留排除区隔离页脚；④ NOTES 占位符填实（处理口径 +
+   两疑点 rationale：p83 版权/联系方式整页排除 = administrative
+   metadata page, no annotation target（r81 Q6a）；p11 表注
+   1/2 排除 = annotation target = table body only（r81 Q6b））；
+   ⑤ 头部注释页码乱序修正。
+3. **修复/责任边界（r81 Q1 裁准钉死，防误解为标注人原始提交
+   完美通过）**：本轮修复不是语义改标，而是**装配契约修复 +
+   源派生物一致性修复**（blocks schema 不满足 assembler
+   contract / entry boundary 漏洞 / exclude-para 块边界错误）；
+   修复依据 = r3 任务包 + 行注册表 dump（源 PDF 派生物）+
+   装配器源码，**不是根据第一标注人答案反推**。标注人知情并
+   口头指示协调者代跑 assemble（"你自己跑不就是了吗"）——
+   正式库执行由协调者完成。重新要求标注人完整重跑 assemble
+   裁定为非必须（流程留痕价值 > 质量门槛价值），以本条修复
+   确认记录替代。
+4. **核验与入库（2026-10-07）**：指纹核对一致
+   `2c75ab91d410500d…`（与标注人截图同值）；已用行 440
+   （显式 156 + C 自动消费半行 284）/ 注册表 5218 / 显式排除
+   5062 / **未处理 0**（全注册表闭环）；stream 6832 chars /
+   units 189（text 110 + nontext 79）/ segments 9 / hard 17，
+   validate_annotation 零失败。输出流复核：域名条目含
+   『为2077万个』✓、g08 无页脚残留（末 unit『◇ 数据说明…
+   近似值。』）✓、g03 12 entries / 21 units ✓。r71 (6) 清单
+   对照：补 6 页 ✓（r3 代表页集 14 页含全部 6 页）、
+   EXCLUDE_BASE 恢复 ✓（机器预填未动）、修 p9 entries ✓
+   （本轮补第 5 元素后才真正生效）、越界 21 页作废 ✓（r3
+   范围重定后不存在越界问题）。入库
+   `samples/private/stage9-corpus/annotations-user/
+   tech-08-cnnic57.json`：**85035B，sha256 前 16
+   `577ea3fd8868c13d`**（NOTES rationale 补录后终态）。
+   四篇终态：acad-03 `3b2a3fcfae529621`/113647B、tech-03
+   `a12d9d7762a89615`/75125B、prod-01 `a9ae93cf0b882083`/
+   96196B、tech-08 `577ea3fd8868c13d`/85035B。
+5. **r81 裁决到件并全盘采纳（GPT，2026-10-07，回执存
+   outputs/gpt_brief_r81_g5_complete_next_steps_reply.txt）**：
+   - **G⑤ = COMPLETE（4/4）**；agreement = READY TO RUN；
+     **G⑥ = NOT READY → WAITING AGREEMENT + FREEZE
+     PACKAGE**（freeze 未获裁准不执行）。
+   - **agreement 执行序（Q2）**：Step 0 冻结四篇输入快照
+     （annotation hash + identity_view 输出 hash + pair-map
+     hash + tool version）；Step 1 identity resolution
+     （stage9_identity_view.py，只解决"是否在比较同一对象"，
+     不评价一致率）；Step 2 逐篇 stage9_agreement.py --a
+     --b --pair-map --json；Step 3 四篇汇总报告
+     G⑤-agreement-report-v1（七节：corpus coverage /
+     identity resolution summary / per-document agreement /
+     category breakdown / disagreement taxonomy / known
+     exclusions / open issues）。必备聚合量：exact agreement
+     rate、resolved agreement rate、disagreement count、
+     disagreement category distribution、excluded/non-
+     comparable count；**nontext ambiguity / excluded pages /
+     deliberate exclusions 不混入一致率**。
+   - **R-A..R-I 前置核验（Q3）**：作为 agreement 前置
+     checklist（R-checklist-v1.json，存
+     samples/private/stage9-corpus/review/），不混入
+     agreement 结果；分工：技术口径项→协调者核对、标注协议
+     项→标注负责人确认、agreement 输出项→agreement runner
+     确认。
+   - **G⑥ freeze gate（Q4，本条仅登记不执行）**：A 输入
+     完整性（四篇完成 + hash 固定 + identity map 固定 +
+     exclude policy 固定）；B agreement 条件（不设单一阈值；
+     必过：identity resolution 无 unresolved critical group、
+     pipeline 可重复、disagreement taxonomy 完整；观察：
+     overall/category agreement %、high-risk category）；
+     C gold_credential_v1.json 制式（corpus_version/
+     documents/annotation_hash/identity_hash/agreement_hash/
+     freeze_time/freeze_owner）；D freeze 包
+     （manifest.json + hashes.sha256 + gold_credential.json
+     + agreement_report.json + identity_map.json +
+     annotations/）。freeze 后队列：Phase 1 gold
+     evaluation baseline（跑 gold benchmark、固定 metric、
+     固定错误分类）→ Phase 2 holdout discipline 延续
+     （holdout 不进调参、只做 blind evaluation、新规则进
+     下一版本）。
+   - **P33'（Q5）**：push 纪律维持"用户批准后一次性推"；
+     tech-08 新增件是否并入待推集合以现场 rev-list 生成
+     manifest 后由用户批准判定（内部验证产物不自动搭车）。
+   - **两疑点（Q6）**：p83 / p11 当前处理接受、rationale 已
+     按裁准写入 NOTES（见第 2 点 ④）；表注口径跨篇一致性
+     若发现某篇把表注当 entries，升级为 agreement policy
+     issue（agreement 运行时核对）。
+6. **下一队列（r81 裁准序，本条不直接 freeze）**：R-checklist
+   -v1 建立 → Step 0 快照冻结 → 四篇 identity/agreement →
+   G⑤-agreement-report-v1 → G⑥ readiness checklist。本条
+   属待命期允许活动（G⑤ 外部标注回收 + decision/agreement
+   汇总 + G⑥ readiness 检查，r79 (6)(8)）；**G⑤ 回收不
+   自动构成实施授权**；独立性纪律维持：修复与核验全程机读
+   对账，未读第一标注人答案。
+
+## §183. r81 裁决执行回执：G⑤ agreement 四篇落地（report-v1）+ R-checklist-v1 + G⑥ readiness checklist（G⑥ 维持 NOT READY）
+
+日期：2026-10-08。§182 下一队列全项执行完毕，本条为执行
+回执。产物全部落
+`samples/private/stage9-corpus/agreement/` 与 `review/`
+（gitignored，不入 git）。
+
+1. **R-checklist-v1（review/R-checklist-v1.json，9 项）**：
+   R-A fixed/agreement-precondition（owner=agreement-runner）、
+   R-B protocol-ready（§138）、R-C/R-D/R-E/R-F fixed（§135/
+   §134/§136/§137）、R-G pending（G⑥ gate）、R-H pending、
+   R-I standing；每项带 agreement_duty（本轮测量须遵守的
+   边界），清单只核验口径、不混入结果（r81 Q3）。
+2. **Step 0 输入冻结（agreement/step0_input_freeze.json）**：
+   8 标注件（4 参考标注 + 4 第二标注）sha256 前 16 + 字节 +
+   工具 3 件（stage9_agreement / _audit / identity_view）
+   哈希 + repo HEAD（ff048ec）+ porcelain 态；执行后追加
+   step1_step2_appended 段（派生输入 A_scoped×3 + 切片脚本 +
+   identity/agreement/audit 产物哈希），冻结字段未改。
+3. **同页集切片（§149⑤，slice_a_scoped.py）**：a 侧 units
+   按代表页集过滤，stream/segments 零改动、unit 序保持
+   （=outputs/_agr_scope 先例同法）。tech-03 2256→137、
+   prod-01 3274→175、tech-08 906→128；代表页集内 a 侧无
+   units 的页如实登记：tech-03 p009、prod-01 p003、
+   tech-08 p005/p008。acad-03 不切片（全篇口径）。
+4. **identity resolution（Step 1）**：四篇 plan 全部
+   open_group_count=0 → pair map 不适用；tech-08 工具内
+   歧义组 6 组（tab:11、img:14/22/30/50/71 页族，涉 47
+   units）全部零贡献区间（contribution_lower=upper），非
+   critical、不混入一致率。r81 gate B-1 满足。
+5. **四篇 agreement（Step 2，冻结算法零改动）+ R-A 双口径
+   审计**（agreement/<doc>.json + audit_<doc>.json，rc=1
+   =below_threshold 语义非故障）：
+   - acad-03（全篇）249/164，matched 97，agree 80，union
+     316，**exact 0.2532**／分区辅助 0.0918；分解
+     label_only 7 / partition_only 58 / both 10——与 §133
+     及旧 scoped 报告逐数复现（可重复性证据）；
+   - tech-03（scoped）137/120，matched 71，agree 9，union
+     186，**exact 0.0484**／0.0753（label 14/9/42）——与
+     outputs/_agr_scope 旧报告逐数一致；
+   - prod-01（scoped）175/186，matched 16，agree 2，union
+     345，**exact 0.0058**／0.0000（label 0/2/11）；
+   - tech-08（scoped）128/189，matched 63，agree 11，union
+     254，**exact 0.0433**／0.2126（label 49/6/3——编号
+     伪分歧主导，a 侧 g07/g08 连续编号 vs b 侧 SEGMENTS
+     表重编号）。
+   聚合：pooled exact = 102/1101 = **0.0926**；macro =
+   **0.0877**；resolved = exact（零可消解组）。四篇全部
+   below_threshold（0.85）。kind diff 四篇合计 0；hard
+   boundary diff 合计 10（acad-03 9 + prod-01 1）。
+6. **G5-agreement-report-v1（md+json，七节制式）**：corpus
+   coverage / identity resolution summary / per-document
+   agreement / category breakdown / disagreement taxonomy /
+   known exclusions / open issues 全部按 r81 Q2 结构；必备
+   聚合量齐（exact、resolved、disagreement count、category
+   distribution、excluded/non-comparable count）；nontext
+   歧义、协议排除、代表页外页全部隔离在一致率外披露（第
+   6 节）；R-F 措辞纪律（参考标注/非正确率）全文执行。
+   低分主因判定：unit 粒度与测量面差（presence 天花板
+   0.307/0.382/0.046/0.248；only_a+only_b 占 union 大头；
+   b 侧协议性排除页眉/页脚/页码/表格文字而 a 侧无此排除），
+   与 R-B 同根、§133 acad-03 结论一致。
+7. **Q6b 跨篇表注口径核对**：四篇 b 侧零 entries 型 units、
+   无表注入流证据（acad-03 NOTES 明示表格单元格字入
+   EXCLUDE；tech-08 NOTES 明示表注排除 + r81 Q6b rationale；
+   tech-03/prod-01 units 全 sentence/heading）——**无篇把
+   表注当 entries，口径一致，不升级 policy issue**。
+   记录缺口如实登记：tech-03/prod-01 NOTES『处理口径…』
+   为占位符未填（open issue 1，建议随 G⑥ 凭证补标注人
+   确认，不阻塞测量）。
+8. **G6-readiness-checklist-v1（agreement/ 目录）**：r81
+   Q4 四门对照——A 输入完整性 4 项全 PASS（1 项带 note：
+   两篇 NOTES 占位）；B agreement 三项必过全 PASS（identity
+   ✓、可重复 ✓、taxonomy ✓）+ 两观察项 DISCLOSED；C
+   credential 制式 DEFINED-NOT-GENERATED；D freeze 包
+   NOT-ASSEMBLED + 裁准 PENDING。**G⑥ = NOT READY（WAITING
+   freeze 包组装 + gold_credential 生成 + freeze 裁准）**，
+   本轮未执行任何 freeze 动作。
+9. **边界**：待命期允许活动（r79 (6)(8) agreement 汇总 +
+   G⑥ readiness 检查）；冻结算法与全部冻结件零改动（分区
+   口径为辅助审计读数，不替换原始口径）；产物仅入
+   samples/private（gitignored）；独立性纪律维持：本轮
+   仅机读对账（工具输出 + 计数），未读第一标注人语义
+   内容。push 队列不变（P33' 待用户批准，§182 第 5 点）。
+
+## §184. r82 裁决执行回执：受控仲裁 v1 + agreement v2（exploratory）+ NOTES 确认件 + 抽查双记录 + gold credential 签发 + G⑥ freeze 包组装（FROZEN_PENDING_CREDENTIAL_VALIDATION，final freeze 待裁）
+
+日期：2026-10-08。r82 裁决（GPT，回执存
+outputs/gpt_brief_r82_g5_agreement_done_g6_freeze_reply.txt）
+六项全盘采纳，本条为执行回执。产物全部落
+samples/private/stage9-corpus/（gitignored，不入 git）。
+
+1. **受控仲裁（Q3 缩小版）**：review/R-D-arbitration-v1.json，
+   34 案 = hard boundary diff 10 全量（P1）+ both 双口径真分歧
+   66 分层抽样 24（P2，逐篇排序对 idx 0,3,6,… step 3、每篇
+   下限 2 → 4/14/4/2）。归因六类：GRANULARITY 16 /
+   RULE_NON_APPLICATION 10 / PLAN_DEFICIENCY 5 / RENUMBERING 1
+   / NAMING_NON_COMPARABLE 1 / BORDER_JUDGMENT 1；四篇全
+   resolved、gold 零缺陷；未出现 taxonomy 新类别 → 按 Q3 P2
+   规则不扩展抽样。acad-03 双侧输入哈希（gold 391ed5f6… /
+   b 3b2a3fcf…）与 r29 已批准仲裁记录逐位一致 → 原裁定沿用，
+   另补 both 案例的 matched-pair 案级裁决。观察项如实登记：
+   b 侧 linked 通道空、b 侧首单元 hard_boundary 恒 true 违例。
+2. **agreement v2（Q2(b) exploratory）**：agreement/v2_spec.md
+   （四视图定义 + 先验参数：页码 ≤8 字符、跨页重复 ≥3 页且
+   ≤40 字符，未按结果回调）+ v2_runs/v2_runs_r1.json +
+   v2_dev_disclosure.json（dev 试验 1 次——首跑变量名笔误崩溃
+   零产出、修复后单次成功；used_for_decisions=false）。数字：
+   V1 matched-only 0.8247/0.1268/0.1250/0.1746；V3 排除项代理
+   剔除量 0/0/1/0（页码/页眉页脚代理面贡献≈0；表格单元格文字
+   无结构标记不可机械识别 → 该面不可判定，PROXY 局限先验
+   声明）；V4 boundary-strict 0.2247/0.0484/0.0029/0.0433。
+   纪律兑现：v1 exact 冻结主记录未替换、freeze credential
+   未改、G⑤ 结论未改；v2 三件按设计排除在 freeze 包外。
+3. **NOTES 书面确认件（Q4）**：annotations-user/
+   annotation_notes_confirmation.md 建立并置 **PENDING**——
+   tech-03/prod-01 两篇四必填项（页眉页脚页码 / 表格文字 /
+   表题表注 / entries 判定规则确认）+ 机械对账附录（两篇零
+   entries 型 units、零 nontext units，仅供参照不可替代确认）
+   + 填写人签认区。本轮未补填亦未登记
+   NOTES_CONFIRMATION_UNAVAILABLE（须标注人动作，协调者不得
+   代填）；已列入 freeze manifest 的 pending_before_final_
+   freeze，不得静默关闭。
+4. **抽查双记录（credential 门槛件，§133 执行序）**：
+   review/rec-acad-03-layoutlmv3.json（positive：20 条
+   relation 边全量核对，题注锚 10 + 显式引用锚 10；u0129 因
+   stream 空格折叠正则假阴性，人工读全文确认『In Table 3 we
+   study』为显式——如实在 basis 披露）+ review/rec-tech-06-
+   enisa-etl2025.json（negative：45 个 anchorless 按指南 ref
+   升序取 10=min(10,45)，机械核对 gold linked_nontext 零入边
+   + 规范化字符流零提及）。双记录均 PASS；reviewer 身份如实
+   登记 = coordinator-claude（r82 Q1 + §133 执行序授权，非
+   标注人本人）。四篇双标注篇 anchorless=0 → negative 样本从
+   24 核心 docs 全扫描选出 tech-06（45 个）。
+5. **gold credential 签发（Q1 授权，scripts/
+   stage9_gold_credential.py）**：dry-run 全门 PASS 后正式
+   签发。gold_revision stage9-b26-gold-r1；gold_digest
+   8b0c2a8c114962c05fd2ac467caa128e053e97ee79fb01772669220
+   eaa3f0d3d；credential_sha256 435262815541d4124b540b151b11
+   8dcd241d3ac6b048e401a2389f02cf0737b7（manifest 外部登记，
+   非自指）。门槛链全过：manifest sha 51d3d400… 冻结核对、
+   24 核心 docs dev/comparison/holdout 分组、validator 终跑
+   （commit 74c76bb）、四篇双标注 below_threshold +
+   --arbitration resolved、抽查覆盖门（≥2 领域、positive
+   全边、negative 下限）。core_link_stats：linked_pairs
+   1532 / linked_objects 913 / anchorless 55 / nontext 968。
+   measurement_record 按 Q2(a) 编目：四篇 below_threshold
+   （0.2532/0.0484/0.0058/0.0433，pooled 0.0926）+ 结构诊断
+   + presence 天花板 + b 侧协议排除披露，below_threshold 不
+   隐藏；0.85 记协议阈值未达。immutable：已存在即拒，重签须
+   新裁决。
+6. **G⑥ freeze 包组装 + hash 校验（review/
+   _r82_freeze_build.py）**：package stage9-g6-freeze-r1，
+   17 文件 = manifest.json + hashes.sha256 + gold_credential.
+   json + agreement_report.json + identity_map.json（四篇
+   identity plan 全内容内嵌自包含）+ annotations/gold ×4 +
+   annotations/secondary ×4 + agreement_per_doc ×4 +
+   arbitration/R-D-arbitration-v1.json。全包逐文件 sha256
+   复验 **17/17 recomputed equal**；credential sha 与
+   gold_digest 编目进 manifest。excluded_by_design 如实编目：
+   v2 三件（exploratory 不入包）+ agreement 过程件（credential
+   已含产物哈希链）。**G⑥ 状态机推进（Q1）：NOT READY →
+   READY_FOR_ASSEMBLY → FROZEN_PENDING_CREDENTIAL_VALIDATION**
+   （credential 已生成 + hash 已校验）；**final freeze
+   （FROZEN 终态）维持待裁**（r82 "Final freeze: WAITING"），
+   待裁项 = NOTES 补填或 NOTES_CONFIRMATION_UNAVAILABLE 登记
+   + 终冻授权。
+7. **§182/§183 更正披露（r82 简报失准）**：r82 简报称
+   §182/§183 已是"本地新增 commit"；git 核验实际 HEAD=
+   ff048ec（§181），ADOPTION.md 为未提交工作树改动——两节
+   是工作树变更非 commit。本条 §184 连同 §182/§183 以一个
+   ledger commit 入库，入库后进入 P33' 待推集合（申请时现场
+   rev-list 生成，§180 纪律；Q5：不作 FF 自动搭车）。
+8. **新增执行序状态（r82，替代 r81 未展开部分）**：1 编号
+   不变性审计 ✓（§133 前）→ 2 四篇真人标注 ✓（§182）→
+   3 agreement exact ✓（§183）→ 4 structural diagnosis ✓
+   （§183 第 6 点）→ 5 受控仲裁 ✓（本条第 1 点）→
+   6 credential generation ✓（本条第 5 点）→ 7 freeze
+   validation ✓（本条第 6 点）→ 8 G⑥ final freeze **待裁**。
+9. **边界**：待命期允许活动（r79 (6)(8) + r81 G⑥ readiness
+   + r82 Q1 明确授权面）；冻结算法零改动（v2 四视图全部
+   复用冻结 compute_agreement）；独立性纪律维持——协调者
+   制备/核验通道（G⑤ dump/装配器/标注件）+ 仲裁阶段读取
+   范围 = 34 案分歧底稿 + 双侧段表定义（r82 已披露），
+   credential/freeze 阶段全程机读。P33' 不变：待用户批准后
+   一次性 push；自跑线（claude/autonomous-track）零涉及。
