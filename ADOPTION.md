@@ -9578,3 +9578,71 @@ samples/private/stage9-corpus/（gitignored，不入 git）。
    范围 = 34 案分歧底稿 + 双侧段表定义（r82 已披露），
    credential/freeze 阶段全程机读。P33' 不变：待用户批准后
    一次性 push；自跑线（claude/autonomous-track）零涉及。
+
+## §185. r83 裁决执行回执：G⑥ final freeze FROZEN 终态 + immutable credential 后置 errata 机制（notes_register）+ Phase 1 gold evaluation baseline 授权
+
+日期：2026-10-08。r83 裁决（GPT，回执存
+outputs/gpt_brief_r83_final_freeze_phase1_reply.txt）五项全盘
+采纳，本条为执行回执。执行脚本
+samples/private/stage9-corpus/review/_r83_final_freeze.py
+（产物 gitignored 不入 git）。
+
+1. **Q1 G⑥ FROZEN 终态**：r82 七项技术条件全 PASS 已核
+   （manifest/hash、credential、17/17 recompute、validator、
+   agreement v1 冻结、arbitration 门槛、抽查覆盖门）；
+   NOTES_CONFIRMATION 裁定为 provenance completeness / process
+   disclosure，非 gold 内容正确性 / digest integrity /
+   evaluation validity → 不阻塞。manifest 落地字段制式：
+   status=FROZEN、freeze_revision=stage9-g6-freeze-r1、
+   frozen_at=2026-10-08T11:42:07+00:00、pending_items=
+   [NOTES_CONFIRMATION]、pending_items_non_blocking=true；
+   旧 pending_before_final_freeze 字段退役（终冻项已裁）。
+2. **Q2 append-only errata 机制**：freeze/notes_register.json
+   建立（register_revision=notes-r1，related_credential=
+   stage9-b26-gold-r1）。**credential 四不改兑现**：
+   gold_credential.json / gold_digest / credential_sha256 /
+   gold_revision 全部保持，脚本内置 sha 双钉守卫
+   （435262815541d4124b540b151b118dcd241d3ac6b048e401a2389
+   f02cf0737b 写前后各验一次 + manifest 编目值三验）——
+   避免重签导致 digest 链变化 / revision 虚增 / baseline
+   漂移。补填路径：PENDING → CONFIRMED（追加
+   confirmation_file / signed_by / confirmed_at，同机制复用）；
+   不重签 credential。
+3. **Q3 NOTES 时间窗**：T+14——2026-10-08 起算，截止
+   **2026-10-22T23:59:59Z**（已写入 register entry window）。
+   超窗仅置 NOTES_CONFIRMATION_UNAVAILABLE（status/blocking=
+   false/reason 三字段），不解除 freeze。当前 PENDING。
+4. **终冻复验**：hashes.sha256 重生成（新增 notes_register +
+   manifest 变更后），全包 **18 文件 18/18 recomputed equal**
+   （17→18：+notes_register.json）；credential_untouched=true。
+5. **Q4 Phase 1 gold evaluation baseline = AUTHORIZED（直接
+   执行无需再裁）**，固定规格登记：runner=evaluation.cli，
+   24 核心 docs 全量分层（dev 允许调参 / comparison 禁调参 /
+   holdout 盲评禁看反馈，不进任何 parser/threshold/error-driven
+   调整）；parser = baseline-default 必跑 + 注册表全部
+   registered stable（禁临时实验 parser，新增 parser 进下一
+   evaluation revision）；metric 两层（A extraction 沿用
+   metrics.py 族；B gold alignment 新增：unit alignment
+   accuracy / relation edge precision-recall / anchor
+   classification accuracy / boundary error rate——与 agreement
+   冻结算法不混算：前者测系统性能、后者测标注一致性）；
+   error taxonomy 两层（gold 六类 + 系统三类 PARSER_FAILURE /
+   LINKING_FAILURE / NORMALIZATION_FAILURE，不混入同一统计
+   字段）；产出独立目录 evaluation/stage9-eval-baseline-r1/
+   （manifest/config/metrics/per_doc_results/error_registry/
+   report.md，不进 freeze 包）；每输出绑定 gold_revision +
+   evaluation_revision + parser_revision。执行回执另登后续
+   台账条目。
+6. **Q5 P33' 顺序钉死**：G⑥ final freeze ✓ → 本条 §185 ✓ →
+   用户批准 → 现场 `git rev-list <remote>/<branch>..HEAD`
+   重生成唯一 push manifest → 单次 push。不允许：freeze 完成
+   自动 push、搭车 gitignored 产物、使用旧待推列表。
+7. **最终状态块（r83 制式）**：G6 FROZEN（stage9-g6-freeze-
+   r1）；credential ISSUED（stage9-b26-gold-r1）；agreement
+   v1=frozen_primary / v2=exploratory_only；arbitration
+   completed；NOTES pending_non_blocking（deadline
+   2026-10-22T23:59:59Z）；Phase1_gold_evaluation authorized；
+   P33_push waiting_user_approval。
+8. **边界**：待命期允许活动（r79 (6)(8) + r82 Q1 + r83 Q1/Q4
+   授权面）；冻结件除 manifest/hashes/notes_register 三件
+   终冻动作外零改动；独立性纪律维持；两线隔离不变。
