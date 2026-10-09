@@ -9646,3 +9646,51 @@ samples/private/stage9-corpus/review/_r83_final_freeze.py
 8. **边界**：待命期允许活动（r79 (6)(8) + r82 Q1 + r83 Q1/Q4
    授权面）；冻结件除 manifest/hashes/notes_register 三件
    终冻动作外零改动；独立性纪律维持；两线隔离不变。
+
+## §186. Phase 1 gold evaluation baseline 执行回执：stage9-eval-baseline-r1 双层指标全 24 篇落地（fallback 24/24 成功 / kreuzberg 11 篇 schema 失败量化）
+
+日期：2026-10-09。r83 Q4 授权直接执行；脚本
+scripts/stage9_eval_baseline.py（本条随台账入库）；产物
+samples/private/stage9-corpus/evaluation/stage9-eval-baseline-r1/
+（gitignored，不进 freeze 包，六件制式 + report.md + 审计件）。
+
+1. **Layer A（evaluation.cli 冻结 runner）**：fallback + kreuzberg
+   双 parser run rc 0 + validate-report rc 0（layerA_audit.json 留痕）。
+   fallback pipeline success 24/24、schema_valid macro 1.0、
+   pdf_locator_valid_ratio 1.0（20 pdf）、element 总数 21552。
+2. **Layer B（gold alignment，分立实现不混算）**：fallback overall =
+   unit_alignment_accuracy 0.6573 / extraction_coverage 0.7438 /
+   nontext_detection 0.8260 / boundary_error_rate 0.6162；分层
+   dev 0.5912/0.6776/0.8759/0.6124、comparison 0.7356/0.7543/
+   0.7004/0.7378、holdout 0.7263/0.8913/0.7583/0.5440（holdout 面
+   四指标反而最优——首测基线现象，零调参零反馈消费）。kreuzberg：
+   11/24 文档级 schema_validation_failed（PARSER_FAILURE 全列），
+   成功 13 篇宏平均 acc 0.5549 / cov 0.6262 / nontext 0.1471 /
+   ber 0.5223（小样本伪高如实标注）。
+3. **锚面范围限定**：gold a 侧链接通道 24 篇全零（运行前清点实证）
+   → relation edge / anchor classification 金标准 = credential 绑定
+   抽查记录（acad-03 20 边）。fallback 在 acad-03
+   predicted_caption_edges = 0 → edge P null / R 0.0 /
+   LINKING_FAILURE 登记；anchor_classification_accuracy 0.55 =
+   零题注边下显式多数基线（11/20），非系统能力体现。
+4. **error_registry**：PARSER_FAILURE 11 + NORMALIZATION_FAILURE 35
+   + LINKING_FAILURE 1（系统三类），gold 六类仅引用 freeze 包仲裁件，
+   分层不混字段。
+5. **抽查记录勘误披露（不静默）**：rec-acad-03 basis 文本称"题注锚
+   10 + 显式引用锚 10"，edge_classifications 实际 = 题注 9 + 显式 11
+   （20 边总数无误）。JSON 元组为权威，prose 计数笔误；credential
+   其余件与判定链不受影响，冻结件不回改。
+6. **结构性披露**：粒度天花板（gold sentence 级 vs 预测块级，4 篇
+   aligned_pairs=0 → acc null）；coverage 低值集中 acad PDF 组
+   （0.32-0.40 面差）；tech-03 fallback 解析 2178.6s 单篇主导时长；
+   kreuzberg"给不出结构"定性结论就此量化（11/24 失败 + nontext
+   0.15）。
+7. **revisions 绑定（r83 Q4-6）**：每输出带 gold_revision
+   stage9-b26-gold-r1 + freeze_revision stage9-g6-freeze-r1 +
+   evaluation_revision stage9-eval-baseline-r1 + parser_revision
+   （fallback pdfplumber=0.11.10,python-docx=1.2.0 / kreuzberg 4.10.2）。
+8. **边界**：冻结 runner 与 app/parsers、chunkers、pipeline 零改动
+   （评测只调用）；Layer A 可诚实派生标注仅 chunk_boundary 锚（817
+   硬边界，marker=单元规范化文本前 40 字符），caption pairs /
+   heading_order 不强造（gold 无直接表示，派生即启发式）；holdout
+   盲评纪律全程遵守；产物不入 git 不入 freeze 包。
