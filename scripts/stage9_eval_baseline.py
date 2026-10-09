@@ -41,6 +41,13 @@ TOLERANCE = 30
 MARKER_MAX = 40
 SPOTCHECK_POS = CORPUS / "review" / "rec-acad-03-layoutlmv3.json"
 ANCHOR_DOC = "acad-03-layoutlmv3"
+R1_METRICS = CORPUS / "evaluation" / "stage9-eval-baseline-r1" / "metrics.json"
+GATE_REL_DROP = 0.05  # comparison 回归门阈值：相对下降 >5% 判 regression
+PARSER_CODE_REVS = {
+    "stage9-eval-baseline-r1": "main 6c6d398（pre-W1）",
+    "stage9-eval-baseline-r2": ("main ee80799（W1 caption delimiter fix；"
+                                "adoption cherry-pick 0e5f1d4）"),
+}
 
 sys.path.insert(0, str(BASE))
 from app.chunkers.structural import normalize_text  # noqa: E402
@@ -135,8 +142,8 @@ def cmd_prepare():
             "sha256": d["sha256"],
             "categories": [d["domain"], d["split"], d["format"]],
             "annotation_file": ("samples/private/stage9-corpus/evaluation/"
-                                "stage9-eval-baseline-r1/derived_annotations/"
-                                "%s.json" % doc_id),
+                                "%s/derived_annotations/%s.json"
+                                % (EVAL_REV, doc_id)),
         })
     write_json(OUT / "manifest.json", {
         "manifest_version": mv,
@@ -338,54 +345,95 @@ def layerb_metrics(doc_id, gold, document):
             "boundary_error_rate": null_metric("no_predicted_chunks"),
         }
 
-    # -- relation edges + anchor classification（仅 acad-03）--
+    # -- relation edges（Layer C graph layer）+ anchor classification
+    #    （仅 acad-03；r85 Q3：edge P/R/F1 与结构层 unit_alignment 分立）--
     if doc_id == ANCHOR_DOC:
         rec = json.loads(SPOTCHECK_POS.read_text(encoding="utf-8"))
         edges = rec["edge_classifications"]
-        cap_els = []
+        by_id = {e.get("element_id"): e for e in els}
+        cap_els = []   # has_caption / table_has_caption（from=图/表 → to=题注）
+        ref_els = []   # references_figure / references_table（from=文本 → to=图/表）
         for rel in relations:
-            if rel.get("type") not in ("has_caption", "table_has_caption"):
+            t = rel.get("type")
+            if t not in ("has_caption", "table_has_caption",
+                         "references_figure", "references_table"):
                 continue
-            by_id = {e.get("element_id"): e for e in els}
             src = by_id.get(rel.get("from_id"))
             dst = by_id.get(rel.get("to_id"))
             if src is None or dst is None:
                 continue
-            cap_els.append((src, dst))
-        matched_edges = 0
-        used_e = set()
+            (cap_els if t in ("has_caption", "table_has_caption")
+             else ref_els).append((src, dst))
+        matched_caption = 0
+        matched_reference = 0
+        used_c = set()
+        used_r = set()
         anchor_hits = []
-        for gi, ed in enumerate(edges):
+        for ed in edges:
             mk = unit_marker(gold, next(
                 u for u in units if u["unit_id"] == ed["unit_id"]))
             fam = "image" if ed["nontext_ref"].startswith("img") else "table"
+            is_cap = ed["anchor_kind"] == "caption"
+            # caption 边：from 侧图/表家族 + gold 题注单元 marker ⊂ to.content
+            # explicit 边：to 侧图/表家族 + gold 引用句 marker ⊂ from.content
+            pool, used = (cap_els, used_c) if is_cap else (ref_els, used_r)
             hit = None
-            for pi, (src, dst) in enumerate(cap_els):
-                if pi in used_e:
+            for pi, (src, dst) in enumerate(pool):
+                if pi in used:
                     continue
-                if src.get("type") != fam:
-                    continue
-                if mk and mk in norm(dst.get("content") or ""):
-                    hit = pi
-                    break
+                if is_cap:
+                    if src.get("type") != fam:
+                        continue
+                    if mk and mk in norm(dst.get("content") or ""):
+                        hit = pi
+                        break
+                else:
+                    if dst.get("type") != fam:
+                        continue
+                    if mk and mk in norm(src.get("content") or ""):
+                        hit = pi
+                        break
             if hit is not None:
-                used_e.add(hit)
-                matched_edges += 1
-                anchor_hits.append(
-                    (ed["anchor_kind"] == "caption"))
+                used.add(hit)
+                if is_cap:
+                    matched_caption += 1
+                else:
+                    matched_reference += 1
+                anchor_hits.append(True)
             else:
                 anchor_hits.append(None)
+        matched_edges = matched_caption + matched_reference
+        pred_total = len(cap_els) + len(ref_els)
+        p_val = (matched_edges / pred_total) if pred_total else None
+        r_val = (matched_edges / len(edges)) if edges else None
+        f_val = (2 * p_val * r_val / (p_val + r_val)
+                 if p_val is not None and r_val is not None and
+                 (p_val + r_val) > 0 else None)
+        gold_caps = sum(1 for e in edges if e["anchor_kind"] == "caption")
+        gold_refs = len(edges) - gold_caps
         m["relation_edges"] = {
+            "layer": "C（graph layer；r85 Q3 与结构层分立报告）",
             "scope": ("仅 acad-03：gold a 侧链接通道 24 篇全零，金标准 = "
-                      "credential 绑定抽查记录 20 边（题注 10 + 显式引用 10）"),
-            "gold_edges": len(edges),
+                      "credential 绑定抽查记录 20 边（题注 %d + 显式引用 %d；"
+                      "勘误后权威计数，errata REC_ACAD03_BASIS_COUNT_ERRATA）"
+                      % (gold_caps, gold_refs)),
+            "gold_edges_caption": gold_caps,
+            "gold_edges_reference": gold_refs,
             "predicted_caption_edges": len(cap_els),
-            "matched": matched_edges,
-            "edge_precision": (
-                ratio(matched_edges / len(cap_els)) if cap_els else
+            "predicted_reference_edges": len(ref_els),
+            "matched_caption": matched_caption,
+            "matched_reference": matched_reference,
+            "match_rule": ("caption：from∈{image,table} 家族 + marker⊂to"
+                           "(题注).content；explicit：to∈{image,table} 家族"
+                           " + marker⊂from(文本).content；各自一对一贪心"),
+            "relation_edge_precision": (
+                ratio(p_val) if pred_total else
                 null_metric("no_predicted_relations")),
-            "edge_recall": ratio(matched_edges / len(edges)) if edges else
-            null_metric("no_gold_edges"),
+            "relation_edge_recall": (
+                ratio(r_val) if edges else null_metric("no_gold_edges")),
+            "relation_edge_F1": (
+                ratio(f_val) if f_val is not None else
+                null_metric("zero_precision_recall_sum")),
         }
         pred_caption_flags = []
         for ed, hit in zip(edges, anchor_hits):
@@ -509,23 +557,32 @@ def cmd_aggregate():
                     for d in sel if "boundary_error_rate" in d]),
             }
         anchor_docs = [d for d in docs if "relation_edges" in d]
-        per_split["anchor_scope_acad03"] = {
-            "edge_precision": macro([
-                dig(d, "relation_edges", "edge_precision")
+        per_split["layerC_relation_evaluation"] = {
+            "layer": "C（graph layer，与结构层 unit_alignment 分立报告，"
+                     "r85 Q3）",
+            "scope": "仅 acad-03（credential 抽查 20 边；gold 链接通道全零）",
+            "relation_edge_precision": macro([
+                dig(d, "relation_edges", "relation_edge_precision")
                 for d in anchor_docs]),
-            "edge_recall": macro([
-                dig(d, "relation_edges", "edge_recall")
+            "relation_edge_recall": macro([
+                dig(d, "relation_edges", "relation_edge_recall")
+                for d in anchor_docs]),
+            "relation_edge_F1": macro([
+                dig(d, "relation_edges", "relation_edge_F1")
                 for d in anchor_docs]),
             "anchor_classification_accuracy": macro([
                 dig(d, "anchor_classification", "accuracy")
                 for d in anchor_docs]),
         }
+        if p == "kreuzberg":
+            per_split["comparison_only"] = True  # r84 Q4
         agg[p] = per_split
     write_json(OUT / "metrics.json", {
         "evaluation_revision": EVAL_REV,
         "gold_revision": GOLD_REV,
         "freeze_revision": FREEZE_REV,
         "parser_revisions": raw["parser_versions"],
+        "parser_code_revision": PARSER_CODE_REVS.get(EVAL_REV),
         "generated_at": now_utc(),
         "layerB": agg,
     })
@@ -588,29 +645,102 @@ def cmd_aggregate():
         "evaluation_revision": EVAL_REV,
         "gold_revision": GOLD_REV,
         "freeze_revision": FREEZE_REV,
-        "ruling_source": "r83 Q4（AUTHORIZED 直接执行）",
-        "runner": "evaluation.cli（Layer A 冻结 runner）+ 本脚本 Layer B",
+        "ruling_source": ("r83 Q4（r1 首测）；r85 Q4（r2 = W1 merge 触发"
+                          "全量重测）" if EVAL_REV.endswith("r2") else
+                          "r83 Q4（AUTHORIZED 直接执行）"),
+        "runner": "evaluation.cli（Layer A 冻结 runner）+ 本脚本 Layer B/C",
         "parsers": PARSERS,
         "max_chars": MAX_CHARS,
         "tolerance_chars": TOLERANCE,
         "marker_max_chars": MARKER_MAX,
-        "splits": {"dev": "允许调参", "comparison": "禁止调参",
-                   "holdout": "盲评，禁止查看反馈（本 baseline 为首测记"
-                              "录，全程零调参）"},
+        "splits": {"dev": "允许调参", "comparison": "禁止调参（回归门）",
+                   "holdout": "盲评，禁止查看反馈（r2 为 W1 后重测，"
+                              "盲评纪律不变，不得用于 W1/W2 调参）"},
         "parser_revisions": raw["parser_versions"],
+        "parser_code_revision": PARSER_CODE_REVS.get(EVAL_REV),
+        "kreuzberg_role": "registered stable comparator（comparison_only，"
+                          "r84 Q4）",
         "generated_at": now_utc(),
     })
     print(json.dumps({"step": "aggregate", "parsers": PARSERS,
                       "system_errors": len(system_errors)}))
 
 
+# ---------------- comparison regression gate（r84 Q1 首战，r85 Q4）--
+
+def cmd_gate():
+    r1 = json.loads(R1_METRICS.read_text(encoding="utf-8"))
+    r2 = json.loads((OUT / "metrics.json").read_text(encoding="utf-8"))
+    keys = ["unit_alignment_accuracy", "extraction_coverage",
+            "nontext_detection_ratio", "boundary_error_rate"]
+    rows = []
+    regressions = 0
+    for sp in ("comparison", "overall", "holdout"):
+        for k in keys:
+            v1 = r1["layerB"]["fallback"][sp][k]["value"]
+            v2 = r2["layerB"]["fallback"][sp][k]["value"]
+            if v1 is None or v2 is None:
+                rows.append({"split": sp, "metric": k, "r1": v1, "r2": v2,
+                             "delta": None, "relative_delta": None,
+                             "verdict": "n/a_null_metric"})
+                continue
+            rel = (v2 - v1) / v1 if v1 else None
+            # boundary_error_rate 越低越好
+            lower_better = k == "boundary_error_rate"
+            reg = (rel < -GATE_REL_DROP if not lower_better
+                   else rel > GATE_REL_DROP)
+            verdict = ("regression" if reg else
+                       "improved" if (rel > 0) != lower_better else "ok")
+            if reg and sp == "comparison":
+                regressions += 1
+            rows.append({"split": sp, "metric": k, "r1": v1, "r2": v2,
+                         "delta": round(v2 - v1, 4),
+                         "relative_delta": (
+                             round(rel, 4) if rel is not None else None),
+                         "verdict": verdict, "gated": sp == "comparison"})
+    layer_c = []
+    for k in ("relation_edge_precision", "relation_edge_recall",
+              "relation_edge_F1"):
+        v1 = (r1["layerB"]["fallback"]
+              .get("anchor_scope_acad03", {}).get(
+                  {"relation_edge_precision": "edge_precision",
+                   "relation_edge_recall": "edge_recall"}.get(k, k), {})
+              or {}).get("value") if k != "relation_edge_F1" else None
+        v2 = (r2["layerB"]["fallback"]["layerC_relation_evaluation"]
+              .get(k, {}) or {}).get("value")
+        layer_c.append({"metric": k, "r1": v1, "r2": v2})
+    write_json(OUT / "comparison_gate.json", {
+        "gate": "comparison 回归门（r84 Q1 (a)；r85 Q4 首次实战）",
+        "baseline": r1["evaluation_revision"],
+        "candidate": r2["evaluation_revision"],
+        "threshold": ("核心指标相对劣化 >%d%% 判 regression（沿 r84 revision"
+                      " 升版条件 B 的 5% 精度；数值阈值为 coordinator 选择，"
+                      "裁决未见明文，如实披露）" % round(GATE_REL_DROP * 100)),
+        "gated_split": "comparison",
+        "informational_splits": ["overall", "holdout（盲评，不入门）"],
+        "overall_verdict": "PASS" if regressions == 0 else "FAIL",
+        "regression_count": regressions,
+        "metrics": rows,
+        "layerC_informational": layer_c,
+        "generated_at": now_utc(),
+    })
+    print(json.dumps({"step": "gate", "verdict":
+                      "PASS" if regressions == 0 else "FAIL",
+                      "regressions": regressions}))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--step", required=True,
-                    choices=["prepare", "layera", "layerb", "aggregate"])
+                    choices=["prepare", "layera", "layerb", "aggregate",
+                             "gate"])
+    ap.add_argument("--revision", default="stage9-eval-baseline-r1")
     a = ap.parse_args()
-    {"prepare": cmd_prepare, "layera": cmd_layera,
-     "layerb": cmd_layerb, "aggregate": cmd_aggregate}[a.step]()
+    g = globals()
+    g["EVAL_REV"] = a.revision
+    g["OUT"] = CORPUS / "evaluation" / a.revision
+    {"prepare": cmd_prepare, "layera": cmd_layera, "layerb": cmd_layerb,
+     "aggregate": cmd_aggregate, "gate": cmd_gate}[a.step]()
 
 
 if __name__ == "__main__":

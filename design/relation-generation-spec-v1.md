@@ -100,3 +100,37 @@
 2. W2 是否计入 Phase 2 首批（gold 11/20 边在锚面，但需求真实性仅凭
    credential 抽查记录）
 3. W1 是否单独先行（最小改动、可独立验收）
+
+## 10. r85 裁决落定与执行回执（2026-10-09 追记）
+
+§9 三问全部裁掉：Q2(a) 方向 = references_figure / references_table
+（text → object，provenance 优先）；Q2(b) W2 入首批不等 W1；
+Q2(c) ordinal document-order 映射接受为 v1 语义（确定性红线）。
+
+执行结果（均当日，main 侧）：
+
+- **W1 实施**：commit ee80799（三正则分隔符类 + 契约 §1a + 表契约
+  镜像 + 37 用例 + 全量 5522 通过；验收 acad-03 caption 元素 0→5、
+  has_caption 0→1）。adoption 传播 cherry-pick 0e5f1d4。
+- **W2 design freeze**：docs/explicit-reference-relation-contract.md
+  v1（提及正则、两层解析、metadata 常量、排除面、验收标准）。
+  设计要点偏离裁决文本处如实披露：拉丁词边界环视被撤——glued 无
+  空格形 "wordFigure3" 是主目标形（acad-03 正文实测 10 处 vs 分隔形
+  4 处），环视会挡掉主目标；"turntable 5" 词内噪声为已知代价。
+- **W2 实施**：commit 516c728（match_reference_relations 纯函数 +
+  pdf/docx 双装配 + 12 用例 + devset 契约基线升级；全量 5534 通过）。
+  **验收（ruling v1 标准）**：gold 11 条显式边 Layer C 规则命中
+  8/11（P=0.8 / R=0.40 / F1=0.533；r1 为 P=null / R=0.0）；负向句例
+  全过。
+- **W3**：Layer C 指标（edge P/R/F1 分立报告）已进
+  scripts/stage9_eval_baseline.py（caption 边 + 引用边双分支匹配器，
+  勘误后 9+11 权威计数）。
+
+## 11. 遗留测量面缺口（下一裁决候补，非实现缺陷）
+
+题注边匹配受文本形制差阻断：gold 题注单元有空格（"Figure 3: The
+architecture…"）vs pdfplumber 预测题注文本无空格（"Figure3:The…"）
+→ marker 子串匹配系统性失败（acad-03 W1 后 matched_caption=0/9，
+单条预测题注边在但无法对上金边）。显式引用面不受此影响（正文抽取
+有空格，8/11 命中）。可选处置 = Layer C marker 匹配加空白不敏感
+变体——属评测方法学变更，不热改，r86 面裁。
