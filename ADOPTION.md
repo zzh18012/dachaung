@@ -9765,3 +9765,63 @@ samples/private/stage9-corpus/evaluation/stage9-eval-baseline-r1/
 10. **边界**：本回执零代码改动（app/parsers、chunkers、pipeline、
     evaluation runner 全部未动）；design 件为规格非实现；本地 commit
     待批推送（P34'）。
+
+## §188. r85 裁决执行回执：确认 relation 非空白面；W1 caption delimiter 最小修复当日实施合入 main（ee80799）验收达标；W2 explicit reference 通道入首批（方向契约已定）；W3 并入 evaluation r2；W1 合入即触发 r2
+
+日期：2026-10-09。简报 outputs/gpt_brief_r85_p1_relation_request.txt；
+裁决原文 outputs/gpt_brief_r85_p1_relation_reply.txt。
+
+1. **Q1 W1（已实施，main commit ee80799）**：三正则分隔符类
+   [\.、\s] → [\.、:：\s]（半角+全角冒号），fallback_parser.py
+   :50/:62/:156 三处同步；契约更新 docs/caption-relation-contract.md
+   新增 §1a 修正案（accepted forms 表：Figure 3. / Figure 3: /
+   Figure 3：/ Figure 3+title）+ docs/table-caption-relation-contract.md
+   §2 镜像注。不加 OCR/fuzzy/probabilistic。句首风险保留不扩大：
+   test_sentence_start_reference_typing_retained 钉现状；负向回归
+   sentence_start_figure_reference（句首引用形无题注几何不生成
+   relation）落 tests/test_w1_caption_delimiter_recall.py（37 用例）。
+2. **W1 测试与验收**：专项 37 通过；全量 5522 通过 + 4 跳过
+   （docker e2e 本地 daemon 不可达常规跳过，CI 为准，D-E）。裁决
+   验收标准达成：acad-03 caption 元素 0→**5**、has_caption 关系
+   0→**1**（pdf_geometry_below，gap 12.73pt，e0045→e0030）；
+   "caption relations > 0" 必过项满足；24/24 无回归与
+   LINKING_FAILURE 归因留 r2 全量重测正式核验（ruling：不设硬
+   recall 指标，W1 只解决 delimiter class）。
+3. **Q2 W2（方向契约已定，实施序启动）**：边类型 = references_figure
+   （from=text_element → to=figure_element）/ references_table
+   （from=text_element → to=table_element）；语义方向 source
+   mention → target object（provenance 优先于查询友好）。入 Phase 2
+   首批不等 W1；实施序 W1 实现完成（今日）→ W2 design freeze →
+   W2 实现。编号映射 v1 语义 = document-order + same label number +
+   deterministic only；edge resolution 记录
+   {"resolution_method":"ordinal_document_order","confidence":
+   "deterministic"}；禁 OCR/embedding/nearest/probabilistic。契约
+   "Explicit reference relation" 章节随 design freeze 落。
+4. **Q3 W3（并入 r2，无单独裁决面）**：r2 新增 Layer C: Relation
+   Evaluation——relation_edge_precision / relation_edge_recall /
+   relation_edge_F1，与 unit_alignment_accuracy（结构层）分开报告
+   （relation 是 graph layer）。
+5. **Q4 r2 触发（已就绪待执行）**：trigger = W1 merge = main
+   ee80799（2026-10-09）。r2 scope：fallback 全量 24 + kreuzberg
+   comparison-only 重跑（r1→r2 delta）+ holdout 盲评（规则不变，
+   不得用于 W1/W2 调参）+ comparison 首次实战 regression gate。
+   revision binding：gold stage9-b26-gold-r1 / freeze
+   stage9-g6-freeze-r1 / evaluation stage9-eval-baseline-r2 /
+   parser_revision 取 ee80799 后 fallback（版本串 + 代码 rev）。
+   **执行前置两件**：(a) Layer C 指标进 eval 脚本（adoption 侧，
+   W3）；(b) W1 自 main 传播至 adoption 分支（cherry-pick/merge 按
+   搬运协议），r2 跑在传播后的 adoption 工作区。
+6. **验收标准登记**：W2 v1 = explicit reference extraction
+   implemented + gold sampled explicit references 验证 + negative
+   sentence cases；W1 24/24 无回归 + LINKING_FAILURE 归因（若存）
+   在 r2 报告正式闭环。
+7. **状态块（r85）**：Phase2 ACTIVE；W1_caption_recall
+   AUTHORIZED_IMPLEMENTATION → IMPLEMENTED(main ee80799)；W2
+   AUTHORIZED_IMPLEMENTATION（下一步 design freeze）；W3
+   BUNDLED_WITH_R2；evaluation_r2 trigger W1_merge 已 armed；
+   freeze unchanged；P34' waiting_user_approval（积压 2 笔：
+   6d51e82 + 本条）。
+8. **下一步队列**：Layer C 进 eval 脚本 → W1 传播 main→adoption →
+   r2 全量评测跑批（含 holdout 盲评 + comparison gate 首战）→
+   W2 design freeze（契约章节 + spec v1 增补）→ W2 实现 →
+   W2 验收（gold 抽样显式引用 + 负向句例）。
