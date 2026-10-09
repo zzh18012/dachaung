@@ -690,7 +690,8 @@ def cmd_gate():
             reg = (rel < -GATE_REL_DROP if not lower_better
                    else rel > GATE_REL_DROP)
             verdict = ("regression" if reg else
-                       "improved" if (rel > 0) != lower_better else "ok")
+                       "improved" if rel and (rel > 0) != lower_better
+                       else "ok")
             if reg and sp == "comparison":
                 regressions += 1
             rows.append({"split": sp, "metric": k, "r1": v1, "r2": v2,
@@ -713,9 +714,9 @@ def cmd_gate():
         "gate": "comparison 回归门（r84 Q1 (a)；r85 Q4 首次实战）",
         "baseline": r1["evaluation_revision"],
         "candidate": r2["evaluation_revision"],
-        "threshold": ("核心指标相对劣化 >%d%% 判 regression（沿 r84 revision"
-                      " 升版条件 B 的 5% 精度；数值阈值为 coordinator 选择，"
-                      "裁决未见明文，如实披露）" % round(GATE_REL_DROP * 100)),
+        "threshold": (f"核心指标相对劣化 >{round(GATE_REL_DROP * 100)}% 判 regression"
+                      "（沿 r84 revision 升版条件 B 的 5% 精度；数值阈值为 "
+                      "coordinator 选择，裁决未见明文，如实披露）"),
         "gated_split": "comparison",
         "informational_splits": ["overall", "holdout（盲评，不入门）"],
         "overall_verdict": "PASS" if regressions == 0 else "FAIL",
