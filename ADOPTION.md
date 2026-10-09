@@ -9825,3 +9825,66 @@ samples/private/stage9-corpus/evaluation/stage9-eval-baseline-r1/
    r2 全量评测跑批（含 holdout 盲评 + comparison gate 首战）→
    W2 design freeze（契约章节 + spec v1 增补）→ W2 实现 →
    W2 验收（gold 抽样显式引用 + 负向句例）。
+
+## §189. r2 全量评测执行回执：comparison 回归门首战 PASS、Layer C 首测、W2 传播完成（2026-10-09）
+
+授权：r85 Q4（r2 trigger = W1 merge 立即触发；本条为执行回执 +
+W2 传播收口）。r2 定义：parser = main ee80799（W1）→ adoption
+cherry-pick 0e5f1d4，W2 不在本 revision（其度量 r3 承载）。
+
+1. **r2 全量跑批**（layera → layerb → aggregate → gate 四步链，
+   fallback 24 篇 + kreuzberg comparison-only）：
+   - Layer A：fallback 24/24 success、schema_valid 1.0、
+     element_count_total 21552（= r1，W1 重定型不改计数）
+   - Layer B fallback（r1→r2）：dev unit_alignment 0.5912→**0.6935**、
+     holdout 0.7263→**0.8487**、overall 0.6573→**0.7459**
+     （+13.48%，**r84 升版条件 B 达成**）；comparison 四指标
+     **字节级不变**（4 篇 comparison 文档无冒号形题注，结构性
+     零效应）；coverage/nontext/ber 全 split 不变（重定型不改
+     文本/图片/块边界）
+   - W1 变化面逐篇（恰 3 篇）：acad-02 [dev] 0.0→1.0；prod-02
+     [holdout] 0.2552→0.9896（kind_correct 49→190，冒号题注
+     主战场）；tech-01 [dev] 0.375→0.5
+   - kreuzberg 全 split 与 r1 完全一致（comparator 零漂移实证）
+   - holdout 盲评纪律：W1 授权于跑批前，数字仅记录无调参回路
+2. **comparison 回归门首战：PASS（0 regression）**。阈值 = 核心
+   指标相对劣化 >5%（沿 r84 条件 B 精度；数值为 coordinator
+   选择，裁决未见明文数值，如实披露）；overall/holdout 仅
+   informational（both improved）。执行事故披露：gate 首跑因
+   threshold 字符串 % 格式化崩溃（54a9bb5 引入的 TypeError），
+   f-string 修复 + verdict 三元式 rel=0 误标 "improved" 一并修
+   （commit b750ab1）；仅 gate 步重跑，前三步产物未动
+3. **Layer C 首测**（acad-03 锚面 20 金边）：predicted=1（W1
+   验收同一条几何边）、matched=1 → P=**1.0** / R=**0.05**（1/20）/
+   F1=**0.0952**；anchor_classification_accuracy 0.55→0.6；显式
+   引用面 0/11（r2 parser 无 W2 通道，定义如此；8/11 命中属 W2
+   验收，r3 承载端到端）
+4. **error_registry 46（= r1 47 − 1）**：PARSER_FAILURE 11 +
+   NORMALIZATION_FAILURE 35 均与 r1 逐条相同；**LINKING_FAILURE
+   1→0**（W1 后 gold 题注边可连接——r85 W1 验收条件三以消失
+   收场，24/24 无回归正式闭环）
+5. **spec §11 勘误**："spaced gold vs spaceless prediction 系统性
+   失败"出自 main 侧 ad-hoc 探针，对 shipped Layer C 匹配器
+   不成立（r2 实测 matched 1/1）；真实瓶颈 = 预测边数量（5
+   caption 元素仅配出 1 条几何边）。r86 裁决问题改写为
+   "caption 几何召回扩展（1→N 边）是否立案"（spec §11 勘误块
+   已落）
+6. **W2 传播完成**：cherry-pick 516c728 → adoption **2d7c674**
+   （r2 结束后执行，parser_code_revision 定义不受污染）；4 文件
+   +419/−4；全量 **5803 passed / 4 skipped / 0 failed**。环境
+   披露：19 例 stage9 CLI 子进程测试在 GBK codepage 下因 UTF-8
+   读线程崩溃失败（cherry-pick 前同挂，PYTHONIOENCODING=utf-8
+   全消解——Windows codepage 面，非代码回归，临时 worktree
+   b750ab1 对照实证）
+7. **performance_watch r2 条目**：median 3.57s / 2x=7.14s /
+   8 篇超阈值（r1 9 篇）；tech-03 2178.62→1453.84s（−33%，
+   同篇同代码路径机器负载波动，仍 >2x median，r84 Q5 RFC 触发
+   条件持续在案，行动未批准）
+8. **状态块（§189）**：evaluation_r2 EXECUTED_AND_RECEIVED
+   （gate PASS）；W2_propagation DONE（2d7c674）；LayerC
+   FIRST_MEASURED（P=1.0/R=0.05/F1=0.0952）；r86 候补 =
+   caption 几何召回扩展立案 + r3（W2 度量承载）触发安排；
+   freeze unchanged；P34' waiting_user_approval（积压 4 笔：
+   6d51e82 + f31574f + 54a9bb5 + 本条）
+9. **下一步队列**：r86 简报（r2 回执 + gate 结果 + Layer C 数字
+   + r86 裁决问题 + r3 触发安排）→ 用户审阅 → 按裁决推进。

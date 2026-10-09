@@ -134,3 +134,13 @@ architecture…"）vs pdfplumber 预测题注文本无空格（"Figure3:The…"�
 单条预测题注边在但无法对上金边）。显式引用面不受此影响（正文抽取
 有空格，8/11 命中）。可选处置 = Layer C marker 匹配加空白不敏感
 变体——属评测方法学变更，不热改，r86 面裁。
+
+**§11 勘误（r2 实测，2026-10-09）**：上述"系统性失败"结论出自
+main 侧 ad-hoc 探针，对 shipped Layer C 匹配器不成立——r2 全量
+（stage9-eval-baseline-r2）实测 acad-03 单条预测题注边 **matched
+1/1**（P=1.0 / R=0.05 / F1=0.0952）。真实瓶颈 = 预测边数量：
+5 个 caption 元素在几何贪心唯一配对下仅配出 1 条 has_caption 边。
+r86 裁决问题相应改写：不是"marker 空白不敏感变体"，而是
+"caption 几何召回扩展（1→N 边）是否立案"。W2 传播回执：
+adoption cherry-pick 2d7c674（r2 结束后执行，r2 的
+parser_code_revision 定义不受污染），全量 5803 通过。
