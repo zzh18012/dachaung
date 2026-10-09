@@ -238,6 +238,96 @@ def match_table_caption_relations_pdf(
     return _sort_relations(rels)
 
 
+# ---------- W2 显式引用通道（r85 Q2；契约
+# docs/explicit-reference-relation-contract.md design freeze v1）----------
+
+# 提及检测（句中任意位置；全角数字捕获后归一；数字后不要求分隔符。
+# 不设拉丁词边界环视：acad PDF 无空格抽取的 glued 形
+# "…wordFigure3…"（实测 10 处 vs 分隔形 4 处）是主目标形，
+# "turntable 5" 类词内噪声为已知代价，契约 §3 披露）
+_FIGURE_REF_RE = re.compile(
+    r"(?:Figure|Fig\.?|图)\s*([0-9０-９]+)",
+    re.IGNORECASE,
+)
+_TABLE_REF_RE = re.compile(
+    r"(?:Table|表格|表)\s*([0-9０-９]+)",
+    re.IGNORECASE,
+)
+_FW_DIGITS = str.maketrans("０１２３４５６７８９", "0123456789")
+_REF_TEXT_TYPES = ("paragraph", "heading", "list_item")
+
+
+def _ref_label_num(raw: str) -> int:
+    return int(raw.translate(_FW_DIGITS))
+
+
+def match_reference_relations(
+    elements: list[Element],
+    caption_relations: list[Relation],
+) -> list[Relation]:
+    """契约 §4：两层确定性解析（caption-label 优先，ordinal-fallback
+    兜底，端点缺失不生成）。caption_relations = 已计算的
+    has_caption / table_has_caption 边集合（题注附着→标签来源）。"""
+    by_id = {e.element_id: e for e in elements}
+    obj_of_cap: dict[str, str] = {}
+    for r in caption_relations:
+        obj_of_cap[r.to_id] = r.from_id
+    labeled: dict[tuple[str, int], str] = {}
+    for e in elements:
+        if e.type != "caption" or e.element_id not in obj_of_cap:
+            continue
+        obj_id = obj_of_cap[e.element_id]
+        obj = by_id.get(obj_id)
+        if obj is None:
+            continue
+        fam = "figure" if obj.type == "image" else (
+            "table" if obj.type == "table" else None)
+        if fam is None:
+            continue
+        for rx, rfam in ((_FIGURE_REF_RE, "figure"),
+                         (_TABLE_REF_RE, "table")):
+            m = rx.match(e.content or "")
+            if m and rfam == fam:
+                labeled.setdefault((fam, _ref_label_num(m.group(1))),
+                                   obj_id)
+                break
+    images = [e for e in elements if e.type == "image"]
+    tables = [e for e in elements if e.type == "table"]
+    rels: list[Relation] = []
+    for e in elements:
+        if e.type not in _REF_TEXT_TYPES:
+            continue
+        content = e.content or ""
+        for rx, fam, tname, pool in (
+            (_FIGURE_REF_RE, "figure", "references_figure", images),
+            (_TABLE_REF_RE, "table", "references_table", tables),
+        ):
+            seen: set[int] = set()
+            for m in rx.finditer(content):
+                n = _ref_label_num(m.group(1))
+                if n in seen:
+                    continue
+                seen.add(n)
+                target, source = labeled.get((fam, n)), "caption_label"
+                if target is None and 1 <= n <= len(pool):
+                    target = pool[n - 1].element_id
+                    source = "ordinal_fallback"
+                if target is None:
+                    continue
+                rels.append(Relation(
+                    type=tname,
+                    from_id=e.element_id,
+                    to_id=target,
+                    metadata={
+                        "resolution_method": "ordinal_document_order",
+                        "confidence": "deterministic",
+                        "label_source": source,
+                        "label": m.group(0),
+                    },
+                ))
+    return _sort_relations(rels)
+
+
 def _rows_to_markdown(rows: list[list[Any]]) -> str:
     """把表格行渲染为 canonical markdown（批次 5 契约，共享实现）。"""
     return linearize_table(rows)
@@ -970,17 +1060,22 @@ class FallbackParser(Parser):
         document_id = make_document_id(source_hash)
         if source_type == "pdf":
             elements, warnings = _parse_pdf(p, source_hash, document_id, self._image_output_dir)
-            # 契约 §4：两类 relation 合并后按 (type, from_id, to_id) 排序
-            relations = _sort_relations(
+            # 契约 §4：relation 合并后按 (type, from_id, to_id) 排序
+            # （批次 4/7 题注附着 + W2 显式引用，r85 Q2）
+            cap_rels = (
                 match_caption_relations_pdf(elements)
                 + match_table_caption_relations_pdf(elements)
             )
+            relations = _sort_relations(
+                cap_rels + match_reference_relations(elements, cap_rels))
         else:
             elements, warnings = _parse_docx(p, source_hash, document_id, self._image_output_dir)
-            relations = _sort_relations(
+            cap_rels = (
                 match_caption_relations_docx(elements)
                 + match_table_caption_relations_docx(elements)
             )
+            relations = _sort_relations(
+                cap_rels + match_reference_relations(elements, cap_rels))
         return Document(
             document_id=document_id,
             source_path=str(p),
