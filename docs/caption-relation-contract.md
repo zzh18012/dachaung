@@ -36,6 +36,40 @@ caption 正常进 chunk；版本升 0.4.0；契约冻结 relation schema、缺�
   `_CAPTION_RE`（含全角数字 `[0-9０-９]`）本批不改——两口径分工：
   分类归 `_CAPTION_RE`，关联归前缀集。
 
+## §1a W1 分隔符修正案（r85 Q1，2026-10-09）
+
+背景：stage9-eval-baseline-r1 锚面 acad-03 零题注边根因——
+pdfplumber 无空格抽取 + 冒号分隔（"Figure3:The…"）不在分隔符类内，
+题注定型 paragraph → 匹配器 caption 侧为空（三层根因链详见
+adoption 线 design/relation-generation-spec-v1.md §3）。
+
+授权：r85 Q1 采用 (a)，最小改动三处同步（本契约前缀集与分类层
+`_CAPTION_RE`）：
+
+- `_CAPTION_RE`（分类层，含全角数字）：`[\.、\s]` → `[\.、:：\s]`
+- `_FIGURE_CAPTION_RE`（本契约 §1 前缀集）：`[\.、\s]` → `[\.、:：\s]`
+- `_TABLE_CAPTION_RE`（表题注契约 §2 前缀集，镜像同步）：
+  `[\.、\s]` → `[\.、:：\s]`
+
+caption prefix accepted forms（本契约口径）：
+
+| 形式 | 支持 |
+|---|---|
+| `Figure 3.` | YES（原有） |
+| `Figure 3:` | YES（W1 新增） |
+| `Figure 3：` | YES（W1 新增，全角冒号） |
+| `Figure 3 Figure title`（空白分隔） | YES（原有） |
+
+明确不增加：OCR、fuzzy match、probabilistic matching。
+
+既有风险保留（不因 W1 扩大）：句首正文引用 "Figure 3 shows the
+architecture…"（数字后空白 ∈ 分隔符类）修复前后均定型 caption——
+现状钉住于 tests/test_w1_caption_delimiter_recall.py::
+test_sentence_start_reference_typing_retained，未来收紧须改契约
+过裁决。负向回归 sentence_start_figure_reference：句首引用形即使
+被定型 caption，无题注几何（上方 / 超距 / 不邻接）不得自动生成
+relation（同文件）。
+
 ## §2 relation 形状冻结
 
 - `type = "has_caption"`；`from_id` = image element_id；`to_id` =

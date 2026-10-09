@@ -38,10 +38,15 @@ minor）。**Claude 选定 Option A（升 0.5.0）**，理由：与 0.2.0→0.4.
 
 ## §2 表题注前缀集（冻结）
 
-`^(?:Table|表格|表)\s*[0-9]+[\.、\s]`（ASCII 数字；大小写语义沿现状；
-`表格` 在 alternation 中先于 `表`，longest-first）。`Figure|Fig|图`
+`^(?:Table|表格|表)\s*[0-9]+[\.、:：\s]`（ASCII 数字；大小写语义沿
+现状；`表格` 在 alternation 中先于 `表`，longest-first）。`Figure|Fig|图`
 前缀的 caption 不是表题注（反之亦然）。与批次 4 图题注前缀集构成
 互斥划分。
+
+W1 修正案（r85 Q1，2026-10-09）：分隔符类 `[\.、\s]` → `[\.、:：\s]`
+（半角/全角冒号），与图题注契约 §1a 同步——根因 acad-03
+"Table1:Comparison…" 形制。详见 docs/caption-relation-contract.md
+§1a。
 
 ## §3 判定规则（确定性；端点缺失/歧义一律不生成）
 

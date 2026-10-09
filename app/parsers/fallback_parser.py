@@ -46,9 +46,11 @@ except ImportError as _e:  # pragma: no cover
 
 # ---------- 通用 ----------
 
-# 题注：以 "Table 1." / "Figure 1." / "表 1" / "图 1" 开头的段落
+# 题注：以 "Table 1." / "Figure 1:" / "表 1、" / "图 1：" 开头的段落。
+# 分隔符类 [\.、:：\s]：句点、顿号、半角/全角冒号、空白（W1 召回修复，
+# r85 Q1——pdfplumber 无空格抽取形如 "Figure3:The…"）
 _CAPTION_RE = re.compile(
-    r"^\s*(?:Table|Figure|Fig\.?|表|图)\s*[0-9０-９]+[\.、\s]",
+    r"^\s*(?:Table|Figure|Fig\.?|表|图)\s*[0-9０-９]+[\.、:：\s]",
     re.IGNORECASE,
 )
 
@@ -60,7 +62,7 @@ def _is_caption(text: str) -> bool:
 # 批次 4 契约（docs/caption-relation-contract.md §1）：图题注前缀集，
 # 数字限 ASCII；与元素分类用的 _CAPTION_RE（含全角）分工。
 _FIGURE_CAPTION_RE = re.compile(
-    r"^(?:Figure|Fig\.?|图)\s*[0-9]+[\.、\s]",
+    r"^(?:Figure|Fig\.?|图)\s*[0-9]+[\.、:：\s]",
     re.IGNORECASE,
 )
 
@@ -154,7 +156,7 @@ def match_caption_relations_pdf(elements: list[Element]) -> list[Relation]:
 # 批次 7 契约（docs/table-caption-relation-contract.md §2）：表题注前缀
 # 集，与图题注前缀集互斥；数字限 ASCII。
 _TABLE_CAPTION_RE = re.compile(
-    r"^(?:Table|表格|表)\s*[0-9]+[\.、\s]",
+    r"^(?:Table|表格|表)\s*[0-9]+[\.、:：\s]",
     re.IGNORECASE,
 )
 
