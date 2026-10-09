@@ -9694,3 +9694,74 @@ samples/private/stage9-corpus/evaluation/stage9-eval-baseline-r1/
    硬边界，marker=单元规范化文本前 40 字符），caption pairs /
    heading_order 不强造（gold 无直接表示，派生即启发式）；holdout
    盲评纪律全程遵守；产物不入 git 不入 freeze 包。
+
+## §187. r84 裁决执行回执：Phase 2 三层评估纪律批准（dev 迭代 / comparison 回归门 / holdout 盲测）+ 改进队列 P1-P4 + baseline 勘误入 notes_register + kreuzberg 保留对照 + 性能观察门建立
+
+日期：2026-10-09。简报 outputs/gpt_brief_r84_phase1_baseline_receipt.txt；
+裁决原文 outputs/gpt_brief_r84_phase1_baseline_receipt_reply.txt。
+
+1. **Q1 Phase 2 纪律**：裁 (a) 采纳——dev 允许迭代调参 / comparison
+   仅回归门（不用于调参）/ holdout 仅盲评（禁止反馈驱动优化）；
+   首测 holdout 最优不构成放宽理由（样本有限 / 首测零调参 / 盲评-
+   revision 对比-可信度链条）。evaluation revision 升版三条件任一：
+   A 功能变化（parser/chunking/relation 生成新增/normalization 规则）；
+   B 任一核心指标变化 ≥5% 或 error_registry 新增一级类别；C 周期性
+   最多每 4 周一次（可生成 r2 作趋势记录）。
+2. **Q2 改进队列（裁排序）**：P1 relation/题注通道——授权调查+规格
+   设计不立即实现，产出 main 侧设计件 design/relation-generation-spec-v1.md
+   （本条随台账入库）；P2 acad PDF coverage 0.32-0.40 进诊断
+   （coverage_loss_analysis 按 block missing / table missing / ordering
+   failure / metadata pollution 拆解，不直接修）；P3 boundary_error_rate
+   0.616 居后——gold heading/sentence vs 预测块级元素粒度 mismatch 在，
+   先解决 alignment contract，否则优化 chunker = 优化错误目标；P4 自跑线
+   候选池保持隔离（autonomous-track ≠ adoption evaluation；R2042 缺陷池
+   可作 main engineering input，不作 Phase 2 baseline evidence）。
+   **main/adoption 边界钉死**：parser/chunker/pipeline 修改全进 main，
+   adoption 只消费新 revision。
+3. **Q3 勘误处置（已执行）**：notes_register.json 追加
+   REC_ACAD03_BASIS_COUNT_ERRATA（type=errata / severity=non_blocking /
+   status=disclosed / authority=json_tuple_over_prose + 登记簿制式
+   provenance：record/detail/disclosed_in/entered_at/ruling_source）；
+   append-only（条目 1→2 只增不改），hashes.sha256 随之重生成
+   （notes_register 行 05d23adf→a075ede，其余 17 行字节不变），manifest
+   与 credential 双钉零触碰，18/18 复验 equal（执行脚本
+   review/_r84_errata_register.py 在 samples/private 机器本地，与 r83
+   冻结脚本同位，不入 git）。record integrity issue 非 gold integrity
+   issue，冻结件不回改。
+4. **Q4 kreuzberg 地位**：保留 registered stable comparator 不降级
+   （11/24 失败本身是评估结果，删除即选择偏差）；不是 production
+   candidate；下一 evaluation revision 仍运行，报告标注 comparison_only。
+5. **Q5 性能观察门（已建立）**：evaluation/performance_watch.json
+   （perf-watch-r1，四字段制式 doc/wall_time/memory/status；seed =
+   baseline r1 fallback 24 篇；median 3.72s、2x median 7.44s、9/24 超
+   2x median 如实记录、tech-03 2178.62s status=watch；memory 未插桩
+   全 null）。timeout / 分段 / 并行解析 / pipeline rewrite 未批准
+   （行为变化需单独 main engineering proposal）；RFC 触发 = 后续
+   revision 出现 single_doc > 2x median 或 batch timeout 风险。
+6. **Q6 NOTES 窗口**至 2026-10-22T23:59:59Z 知会（值守 cron 既有覆盖；
+   超窗仅登记 NOTES_CONFIRMATION_UNAVAILABLE，不解冻不重签）。
+7. **P1 调查第一步结论（随本回执落档，详见 design 件）**：relation
+   生成面**不是空白面**——fallback 四匹配器存在且 6/24 篇实测产出
+   78 边（has_caption 68 + table_has_caption 10）；acad-03 零边根因链
+   三层实证：抽取无空格+冒号分隔（"Figure3:The…"）→ _CAPTION_RE
+   分隔符类 [\.、\s] 不含冒号 → 定型 paragraph（cap=0）→ 匹配器同
+   分隔符类双重失守；from 侧不缺（img 28/tab 9）。第二缺口：gold
+   11/20 显式引用边（正文 "Figure N" 引用）确无任何实现=真功能新增。
+   r84 简报"零 has_caption"表述修正为"锚面单篇零边，通道全局部分
+   命中"。
+8. **状态块（r84）**：Phase1 COMPLETE / Phase2 AUTHORIZED；
+   evaluation_discipline: dev=iteration, comparison=regression_gate,
+   holdout=blind；priority_queue: P1 relation_generation_design,
+   P2 pdf_coverage_diagnosis, P3 boundary_contract,
+   P4 external_candidate_pool_only；freeze unchanged + errata
+   notes_register_append_only；kreuzberg stable_comparator；
+   performance observation_only。
+9. **执行序（r84 批准）**：baseline r1 freeze（已完成）→ dev
+   diagnostics（P1 第一步已入档；P2 coverage_loss_analysis 待做）→
+   relation/extraction/boundary specs（P1 规格件 v1 已落）→ main
+   implementation proposals（W1 召回修复 / W2 引用通道，各自再裁）→
+   evaluation revision r2 → comparison regression gate → holdout
+   blind evaluation。
+10. **边界**：本回执零代码改动（app/parsers、chunkers、pipeline、
+    evaluation runner 全部未动）；design 件为规格非实现；本地 commit
+    待批推送（P34'）。
