@@ -319,6 +319,17 @@ def test_devset_docx_figure_relation():
             "metadata": {"rule": "docx_adjacent_paragraph"},
         },
         {
+            "type": "references_table",
+            "from_id": doc.document_id + "::e0020",
+            "to_id": doc.document_id + "::e0013",
+            "metadata": {
+                "resolution_method": "ordinal_document_order",
+                "confidence": "deterministic",
+                "label_source": "caption_label",
+                "label": "Table 1",
+            },
+        },
+        {
             "type": "table_has_caption",
             "from_id": doc.document_id + "::e0013",
             "to_id": doc.document_id + "::e0012",
@@ -337,11 +348,19 @@ def test_devset_pdf_figure_relation():
     from app.parsers.fallback_parser import FallbackParser
     doc = FallbackParser().parse(entry.resolved_path, source_hash="a" * 64)
     rels = _rels(doc.relations)
-    assert len(rels) == 1
+    # W2（r85 Q2）后集合含显式引用边：正文 e0004 提及 "Table 1"，
+    # ordinal-fallback 解析到文档序第 1 个 table e0006
+    assert len(rels) == 2
     r = rels[0]
     assert r["type"] == "has_caption"
     assert r["from_id"] == doc.document_id + "::e0011"
     assert r["to_id"] == doc.document_id + "::e0009"
     assert r["metadata"]["rule"] == "pdf_geometry_below"
     assert r["metadata"]["gap_pt"] == pytest.approx(342.025 - 330.5, abs=0.1)
+    r2 = rels[1]
+    assert r2["type"] == "references_table"
+    assert r2["from_id"] == doc.document_id + "::e0004"
+    assert r2["to_id"] == doc.document_id + "::e0006"
+    assert r2["metadata"]["label_source"] == "ordinal_fallback"
+    assert r2["metadata"]["label"] == "Table 1"
     validate_udm(doc.to_dict())
