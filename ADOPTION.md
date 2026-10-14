@@ -9888,3 +9888,73 @@ cherry-pick 0e5f1d4，W2 不在本 revision（其度量 r3 承载）。
    6d51e82 + f31574f + 54a9bb5 + 本条）
 9. **下一步队列**：r86 简报（r2 回执 + gate 结果 + Layer C 数字
    + r86 裁决问题 + r3 触发安排）→ 用户审阅 → 按裁决推进。
+
+## §190. r86 裁决执行回执：r2 接受、§11 勘误登记、caption 几何召回不立案（(d)）、r3 授权（2026-10-09 裁决，2026-10-14 执行）
+
+裁决原文存档：outputs/gpt_brief_r86_r2_receipt_reply.txt（用户中转
+GPT 5.6 回执）。总裁决：接受 r2 结果与 §11 勘误；caption 几何召回
+扩展不单独立案；确认 r3 因 W2 触发。
+
+1. **r86-Q1 裁决：采用 (d)，当前不立案**。接受 W1 caption relation
+   v1 召回契约，正式结论 caption_relation_v1: status=accepted,
+   known_limitations=[geometry_recall_boundary]；优先 W2 显式引用
+   通道；几何扩展列为后续观察项不进 r3。分项：
+   - (a) 一图多题注/一题注多图：**拒绝立案**（语义契约变化，涉
+     relation cardinality / graph interpretation / gold expectation，
+     需独立 RFC）
+   - (b) gap 50pt 校准：**暂缓**。前置证据要求登记：失败边三分归因
+     ——gap 导致 / 无真实视觉邻接 / 装饰性 image 污染候选集，未回答
+     前调阈值可能只是扩大错误边
+   - (c) 图题注上方规则：**暂缓**，允许进入后续诊断。前置 =
+     caption_geometry_failure_analysis（统计 below-caption /
+     above-caption / no-neighbor / decorative-image-conflict 四类
+     数量）；**没有该分析不进入实现**（此为 (c) 复活的唯一通道，
+     登记为观察项）
+2. **r86-Q2 裁决：r3 AUTHORIZED**。触发依据 r84 条件 A（W2
+   relation capability 变化）。revision 定义：evaluation_revision
+   = stage9-eval-baseline-r3；parser_revision = main 516c728（W1+W2）
+   / adoption 2d7c674。scope：Layer A fallback 24 docs full rerun；
+   Layer B 四指标重测（验证 W2 只增 relation 不改 structural layer，
+   预期零漂移以实测为准）；comparison gate **必须执行**（预期四指标
+   零漂移）；kreuzberg comparison-only 重跑（comparator continuity）；
+   holdout blind rerun（W2 是能力新增不是调参）；**Layer C Explicit
+   reference evaluation**——acad-03 显式引用 11 gold edges，P/R/F1
+   与 caption relation 分开报告
+3. **Q1/Q2 不合并**（裁决明文）：r3 = W2 revision，不含 W1'/
+   geometry policy changes——同时加入 explicit reference + geometry
+   recall 将使 Layer C 变化无法分解（gain = W2? geometry?
+   interaction?），破坏 evaluation interpretability
+4. **§11 勘误正式登记**：id=SPEC_SECTION11_MATCHING_ERRATA /
+   status=accepted / severity=non_blocking。正式结论：旧描述
+   "marker matching causes systematic failure" 修正为 "shipped
+   matcher can resolve normalized caption markers; observed
+   limitation is upstream geometric edge generation recall"。不影响
+   freeze / credential / r2 validity / r3 eligibility。**登记位置
+   披露（coordinator 判断）**：勘误已内联于 spec §11 勘误块 +
+   本条台账落档；不进 freeze notes_register（该 register 限 freeze
+   包内冻结件的 errata，relation-generation-spec 非冻结件）
+5. **eval 脚本 r3 支持落地（本次 commit，r86 Q2 授权面）**：
+   scripts/stage9_eval_baseline.py 四处——(i) PARSER_CODE_REVS 加
+   r3 条目；(ii) per-doc Layer C 分立计算（caption vs explicit
+   reference 各自 P/R/F1，合并口径保留供跨 revision 连续对照）；
+   (iii) aggregate layerC_relation_evaluation 追加 6 个分立 macro
+   键；(iv) cmd_gate 基线参数化——--baseline 参数 + 前驱映射
+   BASELINE_PRED（r2→r1，r3→r2），R1_METRICS 硬编码退役；gate
+   行键 r1/r2 改名 baseline/candidate；layerC informational 扩至
+   9 键（合并 3 + 分立 6），基线 r1 旧键名映射（anchor_scope_acad03/
+   edge_*）保留兼容。r2 已产出物未动（r2 gate JSON 维持原键名存档）
+6. **r3 执行序（裁决批准）**：W2 merge（已完成 2d7c674）→
+   stage9-eval-baseline-r3 五步链（prepare/layera/layerb/aggregate/
+   gate，gate --revision r3 默认对照 r2）。跑批期间 adoption app/
+   冻结（parser revision 定义保护）
+7. **状态块（§190）**：evaluation_r2 ACCEPTED（regression_gate
+   PASS / condition_B ACHIEVED）；W1 CLOSED；W2 ACTIVE_REVISION；
+   caption_geometry_extension DEFERRED（(c) 前置 =
+   caption_geometry_failure_analysis 未启动）；evaluation_r3
+   AUTHORIZED；r3_scope include=[W2, LayerC explicit references] /
+   exclude=[caption geometry expansion]；freeze unchanged；P34'
+   waiting_user_push_approval（积压 7 笔）
+8. **下一步队列**：r3 全量跑批（后台，tech-03 ~24 分钟主导）→
+   四步输出检查 + gate 裁决（预期 comparison 零漂移）→ r3
+   report.md + performance_watch r3 条目 + §191 台账 → r87 简报
+   （r3 回执 + caption_geometry_failure_analysis 是否启动请裁）。

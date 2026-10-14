@@ -41,12 +41,17 @@ TOLERANCE = 30
 MARKER_MAX = 40
 SPOTCHECK_POS = CORPUS / "review" / "rec-acad-03-layoutlmv3.json"
 ANCHOR_DOC = "acad-03-layoutlmv3"
-R1_METRICS = CORPUS / "evaluation" / "stage9-eval-baseline-r1" / "metrics.json"
+BASELINE_PRED = {  # gate 基线 = 前一 accepted revision（r86 Q2：r3 对照 r2）
+    "stage9-eval-baseline-r2": "stage9-eval-baseline-r1",
+    "stage9-eval-baseline-r3": "stage9-eval-baseline-r2",
+}
 GATE_REL_DROP = 0.05  # comparison 回归门阈值：相对下降 >5% 判 regression
 PARSER_CODE_REVS = {
     "stage9-eval-baseline-r1": "main 6c6d398（pre-W1）",
     "stage9-eval-baseline-r2": ("main ee80799（W1 caption delimiter fix；"
                                 "adoption cherry-pick 0e5f1d4）"),
+    "stage9-eval-baseline-r3": ("main 516c728（W1+W2 explicit reference；"
+                                "adoption cherry-pick 2d7c674；r86 Q2 授权）"),
 }
 
 sys.path.insert(0, str(BASE))
@@ -411,6 +416,18 @@ def layerb_metrics(doc_id, gold, document):
                  (p_val + r_val) > 0 else None)
         gold_caps = sum(1 for e in edges if e["anchor_kind"] == "caption")
         gold_refs = len(edges) - gold_caps
+        # r86 Q2：caption 与 explicit reference 分立报告（合并口径保留
+        # 供跨 revision 连续对照）
+        p_cap = (matched_caption / len(cap_els)) if cap_els else None
+        r_cap = (matched_caption / gold_caps) if gold_caps else None
+        f_cap = (2 * p_cap * r_cap / (p_cap + r_cap)
+                 if p_cap is not None and r_cap is not None and
+                 (p_cap + r_cap) > 0 else None)
+        p_ref = (matched_reference / len(ref_els)) if ref_els else None
+        r_ref = (matched_reference / gold_refs) if gold_refs else None
+        f_ref = (2 * p_ref * r_ref / (p_ref + r_ref)
+                 if p_ref is not None and r_ref is not None and
+                 (p_ref + r_ref) > 0 else None)
         m["relation_edges"] = {
             "layer": "C（graph layer；r85 Q3 与结构层分立报告）",
             "scope": ("仅 acad-03：gold a 侧链接通道 24 篇全零，金标准 = "
@@ -433,6 +450,24 @@ def layerb_metrics(doc_id, gold, document):
                 ratio(r_val) if edges else null_metric("no_gold_edges")),
             "relation_edge_F1": (
                 ratio(f_val) if f_val is not None else
+                null_metric("zero_precision_recall_sum")),
+            "caption_edge_precision": (
+                ratio(p_cap) if cap_els else
+                null_metric("no_predicted_caption_relations")),
+            "caption_edge_recall": (
+                ratio(r_cap) if gold_caps else
+                null_metric("no_gold_caption_edges")),
+            "caption_edge_F1": (
+                ratio(f_cap) if f_cap is not None else
+                null_metric("zero_precision_recall_sum")),
+            "reference_edge_precision": (
+                ratio(p_ref) if ref_els else
+                null_metric("no_predicted_reference_relations")),
+            "reference_edge_recall": (
+                ratio(r_ref) if gold_refs else
+                null_metric("no_gold_reference_edges")),
+            "reference_edge_F1": (
+                ratio(f_ref) if f_ref is not None else
                 null_metric("zero_precision_recall_sum")),
         }
         pred_caption_flags = []
@@ -570,6 +605,24 @@ def cmd_aggregate():
             "relation_edge_F1": macro([
                 dig(d, "relation_edges", "relation_edge_F1")
                 for d in anchor_docs]),
+            "caption_edge_precision": macro([
+                dig(d, "relation_edges", "caption_edge_precision")
+                for d in anchor_docs]),
+            "caption_edge_recall": macro([
+                dig(d, "relation_edges", "caption_edge_recall")
+                for d in anchor_docs]),
+            "caption_edge_F1": macro([
+                dig(d, "relation_edges", "caption_edge_F1")
+                for d in anchor_docs]),
+            "reference_edge_precision": macro([
+                dig(d, "relation_edges", "reference_edge_precision")
+                for d in anchor_docs]),
+            "reference_edge_recall": macro([
+                dig(d, "relation_edges", "reference_edge_recall")
+                for d in anchor_docs]),
+            "reference_edge_F1": macro([
+                dig(d, "relation_edges", "reference_edge_F1")
+                for d in anchor_docs]),
             "anchor_classification_accuracy": macro([
                 dig(d, "anchor_classification", "accuracy")
                 for d in anchor_docs]),
@@ -669,19 +722,22 @@ def cmd_aggregate():
 # ---------------- comparison regression gate（r84 Q1 首战，r85 Q4）--
 
 def cmd_gate():
-    r1 = json.loads(R1_METRICS.read_text(encoding="utf-8"))
-    r2 = json.loads((OUT / "metrics.json").read_text(encoding="utf-8"))
+    base_rev = globals().get("BASELINE_REV", "stage9-eval-baseline-r1")
+    base = json.loads((CORPUS / "evaluation" / base_rev /
+                       "metrics.json").read_text(encoding="utf-8"))
+    cand = json.loads((OUT / "metrics.json").read_text(encoding="utf-8"))
     keys = ["unit_alignment_accuracy", "extraction_coverage",
             "nontext_detection_ratio", "boundary_error_rate"]
     rows = []
     regressions = 0
     for sp in ("comparison", "overall", "holdout"):
         for k in keys:
-            v1 = r1["layerB"]["fallback"][sp][k]["value"]
-            v2 = r2["layerB"]["fallback"][sp][k]["value"]
+            v1 = base["layerB"]["fallback"][sp][k]["value"]
+            v2 = cand["layerB"]["fallback"][sp][k]["value"]
             if v1 is None or v2 is None:
-                rows.append({"split": sp, "metric": k, "r1": v1, "r2": v2,
-                             "delta": None, "relative_delta": None,
+                rows.append({"split": sp, "metric": k, "baseline": v1,
+                             "candidate": v2, "delta": None,
+                             "relative_delta": None,
                              "verdict": "n/a_null_metric"})
                 continue
             rel = (v2 - v1) / v1 if v1 else None
@@ -694,26 +750,39 @@ def cmd_gate():
                        else "ok")
             if reg and sp == "comparison":
                 regressions += 1
-            rows.append({"split": sp, "metric": k, "r1": v1, "r2": v2,
-                         "delta": round(v2 - v1, 4),
+            rows.append({"split": sp, "metric": k, "baseline": v1,
+                         "candidate": v2, "delta": round(v2 - v1, 4),
                          "relative_delta": (
                              round(rel, 4) if rel is not None else None),
                          "verdict": verdict, "gated": sp == "comparison"})
     layer_c = []
-    for k in ("relation_edge_precision", "relation_edge_recall",
-              "relation_edge_F1"):
-        v1 = (r1["layerB"]["fallback"]
-              .get("anchor_scope_acad03", {}).get(
-                  {"relation_edge_precision": "edge_precision",
-                   "relation_edge_recall": "edge_recall"}.get(k, k), {})
-              or {}).get("value") if k != "relation_edge_F1" else None
-        v2 = (r2["layerB"]["fallback"]["layerC_relation_evaluation"]
-              .get(k, {}) or {}).get("value")
-        layer_c.append({"metric": k, "r1": v1, "r2": v2})
+    # 基线 r1 是旧键名（anchor_scope_acad03/edge_*），r2+ 直读
+    # layerC_relation_evaluation；r3 起加 caption/reference 分立键
+    # （r86 Q2：explicit reference 与 caption relation 分开报告）
+    layerc_keys = ("relation_edge_precision", "relation_edge_recall",
+                   "relation_edge_F1", "caption_edge_precision",
+                   "caption_edge_recall", "caption_edge_F1",
+                   "reference_edge_precision", "reference_edge_recall",
+                   "reference_edge_F1")
+    for k in layerc_keys:
+        if base_rev == "stage9-eval-baseline-r1":
+            old_k = {"relation_edge_precision": "edge_precision",
+                     "relation_edge_recall": "edge_recall"}.get(k, k)
+            v1 = ((base["layerB"]["fallback"]
+                   .get("anchor_scope_acad03", {}).get(old_k)) or {}
+                  ).get("value")
+        else:
+            v1 = ((base["layerB"]["fallback"]
+                   .get("layerC_relation_evaluation", {}).get(k)) or {}
+                  ).get("value")
+        v2 = (cand["layerB"]["fallback"].get(
+            "layerC_relation_evaluation", {}).get(k, {}) or {}).get("value")
+        layer_c.append({"metric": k, "baseline": v1, "candidate": v2})
     write_json(OUT / "comparison_gate.json", {
-        "gate": "comparison 回归门（r84 Q1 (a)；r85 Q4 首次实战）",
-        "baseline": r1["evaluation_revision"],
-        "candidate": r2["evaluation_revision"],
+        "gate": "comparison 回归门（r84 Q1 (a)；r85 Q4 首战；"
+                "r86 Q2：candidate 对照前驱 accepted revision）",
+        "baseline": base_rev,
+        "candidate": cand["evaluation_revision"],
         "threshold": (f"核心指标相对劣化 >{round(GATE_REL_DROP * 100)}% 判 regression"
                       "（沿 r84 revision 升版条件 B 的 5% 精度；数值阈值为 "
                       "coordinator 选择，裁决未见明文，如实披露）"),
@@ -736,10 +805,15 @@ def main():
                     choices=["prepare", "layera", "layerb", "aggregate",
                              "gate"])
     ap.add_argument("--revision", default="stage9-eval-baseline-r1")
+    ap.add_argument("--baseline", default=None,
+                    help="gate 基线 revision；默认按前驱映射"
+                         "（r2→r1，r3→r2）")
     a = ap.parse_args()
     g = globals()
     g["EVAL_REV"] = a.revision
     g["OUT"] = CORPUS / "evaluation" / a.revision
+    g["BASELINE_REV"] = (a.baseline or BASELINE_PRED.get(
+        a.revision, "stage9-eval-baseline-r1"))
     {"prepare": cmd_prepare, "layera": cmd_layera, "layerb": cmd_layerb,
      "aggregate": cmd_aggregate, "gate": cmd_gate}[a.step]()
 
