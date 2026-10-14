@@ -9958,3 +9958,63 @@ GPT 5.6 回执）。总裁决：接受 r2 结果与 §11 勘误；caption 几何
    四步输出检查 + gate 裁决（预期 comparison 零漂移）→ r3
    report.md + performance_watch r3 条目 + §191 台账 → r87 简报
    （r3 回执 + caption_geometry_failure_analysis 是否启动请裁）。
+
+## §191. r3 全量评测执行回执：comparison gate PASS（r2→r3 零漂移）、Layer C 显式引用分立首测 8/11、anchor_classification 定义陈旧披露（2026-10-14）
+
+授权：r86 Q2（r3 AUTHORIZED）。revision 定义：parser = main 516c728
+（W1+W2）→ adoption 2d7c674；本条为执行回执。跑批场地 @3b1014b
+（app/ 自 2d7c674 零改动，冻结纪律保持；脚本 r3 支持同 commit
+先行落地）。
+
+1. **r3 五步链**（prepare → layera → layerb → aggregate → gate，
+   2026-10-14，console log outputs/r3_run_console.log）：
+   - Layer A：fallback 24/24 success + kreuzberg comparison-only，
+     双 parser rc 0
+   - Layer B fallback（r2→r3）：**全 split 四指标零漂移**
+     （dev 0.6935 / comparison 0.7356 / holdout 0.8487 / overall
+     0.7459 及 coverage/nontext/ber 全部不变）；**逐篇 24/24
+     JSON 级递归相等**（机器比对）——r86 预期"W2 只增 relations
+     不改 structural layer"实测成立
+   - kreuzberg 全 split 全指标与 r2 完全一致（comparator
+     continuity 第三连：r1→r2→r3 零漂移）
+   - holdout 盲评纪律：授权于跑批前，数字仅记录无调参回路
+2. **comparison 回归门（r2→r3）：PASS（0 regression）**。comparison
+   四指标字节级相同；本次 gate 首走 --baseline 前驱参数化
+   （BASELINE_PRED，§190 落地件）；r2 已存档 gate JSON 未动
+3. **Layer C 分立首测（r86 Q2 新增面，acad-03 20 金边）**：
+   - 显式引用：**P=0.8889 / R=0.7273（8/11）/ F1=0.8**（预测
+     references_* 9 条命中 8；r2 为 0/11——W2 通道端到端首通）
+   - 题注：P=1.0 / R=0.1111（1/9）/ F1=0.2（与 r2 同一条几何边；
+     r86 Q1 (d) 已接受 known_limitations=[geometry_recall_boundary]，
+     W2 不触碰该面）
+   - 合并（连续对照）：P=0.9 / R=0.45（9/20）/ F1=0.6（r2 为
+     1.0/0.05/0.0952）
+   - W2 验收对照：r85 验收 8/11 命中（合并口径 P=0.8/R=0.40/
+     F1=0.533）与 r3 端到端命中数一致（8），差异纯为分母口径
+     （r3 分立按 11 gold 引用边）——**W2 验收正式闭环**
+4. **anchor_classification 0.6→0.2 = 指标定义陈旧（非能力下降）**：
+   该 r1 时代指标把任何命中 gold 边一律计"系统 caption 判断"
+   （前提"系统只可能经 has_caption 表达题注判断"已因 W2 失效），
+   8 条正确 typed 的显式边被计为假分歧。事后诊断口径（仅披露非
+   shipped）：按匹配器分桶取判断类型则一致数 12/20=0.6 与 r2
+   持平。处置：不热改指标（数字已见后修改 = 禁止回路），r3 如实
+   记录 0.2 + 归因；**指标方法学升级列 r87 裁决候补**
+5. **error_registry 46（与 r2 逐条相同）**：NORMALIZATION 35 +
+   PARSER 11；LINKING_FAILURE 维持 0
+6. **performance_watch r3 条目**：median 3.75s / 2x=7.5s / 8 篇
+   超阈值；tech-03 1540.44s（+5.98% vs r2，负载波动，仍 >2x
+   median，RFC 触发条件在案行动未批准）；r3 无编码事故
+   （PYTHONIOENCODING=utf-8）
+7. **产物**：samples/private/stage9-corpus/evaluation/
+   stage9-eval-baseline-r3/（13 项 + report.md；gitignored 不进
+   freeze 包）
+8. **状态块（§191）**：evaluation_r3 EXECUTED_AND_GATE_PASS；
+   W2 CLOSED（能力上线 + 端到端验收 + 无回归三件齐）；caption_
+   geometry_extension DEFERRED 不变；anchor_classification_
+   methodology: STALE_POST_W2（r87 候补）；freeze unchanged；
+   P34' waiting_user_push_approval（积压 8 笔：§189 前 3 + b750ab1
+   + 2d7c674 + 646c69f + 3b1014b + 本条）
+9. **下一步队列**：r87 简报（r3 回执 + 两裁决请求：anchor_
+   classification 指标方法学升级立案与否；caption_geometry_
+   failure_analysis 启动与否（r86 (c) 前置 + (b) 三分归因共用））
+   → 用户审阅 → 按裁决推进。
