@@ -10073,3 +10073,72 @@ GPT 5.6 回执）。
    诊断，产出到 samples/private/stage9-corpus/evaluation/ 或
    design/ 候补诊断件）；(iii) 诊断报告 + (b)/(c) 复活裁决简报
    （r88 面）。
+
+## §193. caption_geometry_failure_analysis 执行回执（r87-Q2 授权，只读诊断完成；结论 = 边界在 typing 输入集不在几何阈值）（2026-10-15）
+
+授权边界遵守声明：零 app/ 改动、零阈值/规则改动、零 git 写操作、
+零参数搜索；仅读取 4 个输入文件（预测 JSON / gold / credential 抽查
+记录 / 源 PDF，sha256 前 16 已在产物内登记）+ 对源 PDF 的只读
+pdfplumber 重放测量。产出 2 个文件（samples/private 私有面，
+gitignored）：
+- `samples/private/stage9-corpus/evaluation/caption_geometry_failure_analysis_r87q2.md`
+- `samples/private/stage9-corpus/evaluation/caption_geometry_failure_analysis_r87q2.json`
+  （结构化版，per_edge 含 same_page_candidates_all 逐条候选）
+
+锚文档：acad-03-layoutlmv3（fallback/pdfplumber，r3 baseline）。gold
+caption 边 9、eval 命中 1（u0044，below-caption 成功对照组，gap
+12.73pt）、MISS 8。定位方法披露：4 条 gold 题注预测侧无 caption 元素，
+行级几何来自源 PDF 只读重放测量；4 条 table 边表体为 paragraph，
+gap 为 paragraph-proxy 反事实值（产物内明确标注）。
+
+1. **四类 primary classification 闭合到 8**：below-caption **3**
+   （u0015/u0020/u0121——题注确在图下方且真实 gap 12.73/12.73/
+   42.02pt 全在 50pt 内，失败主因 = 题注文本被吸收进整页 paragraph
+   e0000/e0003/e0055，未产生 caption 类型元素，几何规则输入集为空）；
+   above-caption **0**；no-neighbor **5**（u0038 跨页页 2↔页 3 +
+   u0077/u0093/u0117/u0155 四表页 5/6/7/9 同页零 table 元素）；
+   decorative-image-conflict **0**（32 个图内小对象 29 个打装饰旗，
+   页 3 greedy 中全部不敌真图 12.73pt，从未胜出/占用——全部记
+   secondary）。次级现象不掩盖主因，四类恰闭合 3+0+5+0=8 ✓
+2. **(b) 三分归因映射**：gap 导致 **0**；无真实视觉邻接 **1**
+   （u0038 跨页）；decorative-image pollution **0**；**taxonomy 外
+   残余 = 元素层缺失 7**（3 题注未 typing + 4 表体未 typing）——
+   三分法未覆盖的实测主因，如实披露不硬分派
+3. **"仅放宽 gap（其他不变）"可恢复事实：0/8**。反事实重放（gap
+   上限→∞，保留 0<gap、同页、x 相交>0、greedy 唯一）：图规则边集
+   不变、表规则零候选不变——**没有任何 failure 边的失败条件与 50pt
+   阈值绑定**（只记事实，未做任何参数扫描）
+4. **typing 反事实对照（非实现提案）**：不改阈值、仅假设元素 typing
+   正确（3 题注各自成 caption 元素、4 表体成 table 元素），现行
+   50pt 规则可直接成边 **7 条**（gap 12.73–42.02pt 全部命中）；仅
+   u0038 跨页不可恢复
+5. **surprising 发现（6 条，全文见产物）**：(i) 8 条 failure 中
+   **0 条约束是 50pt 阈值**——r86 geometry_recall_boundary 定性应
+   细化为"边界在几何规则的输入集（typed elements），不在几何阈值
+   本身"；(ii) 全部 9 个预测 table 元素都是图内图示碎片（页 2 的 6
+   个 + 页 3 的 3 个全落 fig-2/fig-3 主图 raster bbox 内），论文
+   4 张真实表格（Table 1–4，页 5/6/7/9）一个也没有被检测为 table；
+   (iii) 12.73pt 出现 3 次 = 同一排版模板题注间距，唯一命中边 gap
+   恰为 12.73pt；(iv) **credential 异常：u0038**（'Figure 3 gives
+   an overview…' 页 2 叙述句无冒号）记 caption 锚，而 review basis
+   自述题注锚判据 = 'Figure/Table N: 开头'；若按 explicit 计，caption
+   recall 分母为 8 而非 9（按 r82 freeze 零改动仅记录，候 r88 裁
+   决面）；(v) fig-3 绑 2 条 gold caption 锚（u0038+u0044）而预测
+   侧 1 图 1 题注——一对一语义下该图 caption 召回天花板 1/2；
+   (vi) fig-1 双 panel（预测 2 image 元素 vs gold 1 对象）greedy
+   平局按 (gap,image_id) 取 e0001，e0002 永远空置（不影响命中）
+6. **对 (b)/(c) 的含义（提交裁决面，非本回执自决）**：(b) gap 50pt
+   校准——三分归因实测 gap 导致 = 0、放宽反事实 0/8 可恢复，无校准
+   空间的事实依据已在案；(c) 上方题注规则——above-caption 实测
+   0 例，无对象面的事实依据已在案。两项均已具备回 r88 裁决面条件；
+   本诊断不构成任何实现授权
+7. **状态块（§193）**：caption_geometry_failure_analysis =
+   EXECUTED_AND_COMPLETE（产物 2 件落 samples/private/stage9-corpus/
+   evaluation/，gitignored）；caption_geometry_extension = 维持
+   DEFERRED_PENDING_ANALYSIS（复活与否归 r88）；freeze unchanged；
+   gold_revision unchanged（stage9-b26-gold-r1）；adoption 本地
+   ahead 2（174c8d4 §192 + 57fea0b v2）+ 本 §193 = 新积压 3 笔
+   待批 push
+8. **下一步**：r88 简报（自包含全上下文）——(b)/(c) 各自收口裁决
+   请求 + typing-layer 边界新发现立案与否 + u0038 credential
+   errata 候补（分母 9→8 问题）+ fig-3 一对一语义天花板备注。
