@@ -10018,3 +10018,58 @@ GPT 5.6 回执）。总裁决：接受 r2 结果与 §11 勘误；caption 几何
    classification 指标方法学升级立案与否；caption_geometry_
    failure_analysis 启动与否（r86 (c) 前置 + (b) 三分归因共用））
    → 用户审阅 → 按裁决推进。
+
+## §192. r87 裁决执行回执：r3 ACCEPTED、anchor_classification v2 批准（下次 revision 生效）、caption_geometry_failure_analysis 启动批准、P34' 双线 push 完成（2026-10-15）
+
+裁决原文存档：outputs/gpt_brief_r87_r3_receipt_reply.txt（用户中转
+GPT 5.6 回执）。
+
+1. **r3：ACCEPTED / EXECUTED_AND_GATE_PASS**。r86 Q2 六项 scope 逐项
+   认可；W2 = CLOSED（端到端 8/11 与 r85 验收一致）；W1 维持
+   CLOSED；caption_relation_v1 的 geometry_recall_boundary 维持
+   accepted known limitation 不自动复活；tech-03 +5.96% 维持 watch
+   不形成 RFC（performance observation_only 延续）
+2. **r87-Q1：APPROVE = anchor_classification_methodology_v2**。
+   生效规则：has_caption → caption judgment；references_figure/
+   references_table → reference judgment；未匹配预测维持既有 binary
+   语义；gold/parser/Layer C 匹配口径零变化。**12/20=0.6 仅作 r3
+   retrospective diagnostic，不得回填**——r3 正式记录冻结为 v1=0.2
+   + stale-post-W2 归因。revision 纪律：不单独触发新 revision；下
+   一次正常 revision 条件触发的全量评测首次生效 + 报告显式标注
+   methodology version change（v1/v2 不作同一连续序列比较）；不触
+   freeze/gold；零 parser 授权
+3. **r87-Q2：APPROVE = caption_geometry_failure_analysis 启动**。
+   授权边界 = adoption 侧只读诊断（非 parser RFC 非实现授权）。产
+   出要求：全 9 条 caption gold、重点 8 条 failure 逐条记录
+   identity/bbox + 候选对象 bbox + vertical gap + x-overlap +
+   greedy 配对序与冲突对象 + 0<gap≤50pt 是否唯一失败条件；四类
+   primary classification 闭合到 8（次级现象 secondary flags 不
+   掩盖主因）；(b) 三分归因映射同步给出。禁止：改 50pt / 上方
+   规则 / 一图多题注 / greedy pairing / parser patch / 事后参数
+   搜索（可记录"仅放宽当前条件是否可恢复"事实，参数选择另行
+   RFC）；acad-03 属 dev split，诊断结论仍不构成调参依据。完成
+   诊断 ≠ 自动批准实现，(b)/(c) 完成后各自回裁决面
+4. **P34'：APPROVED → PUSHED**（FF/non-force，执行时远端 tip 未
+   动，双线资格预核 ahead/behind = 9/0 与 2/0）：
+   - adoption integration/stage9-batch26-corpus-annotation：
+     6142bdb → **b6d6c57**（9 笔：§188-§191 台账与执行件 + W2
+     cherry-pick 2d7c674 + gate 修复 b750ab1 + r3 脚本支持
+     3b1014b + §191 b6d6c57）
+   - dachuang-code main：6c6d398 → **516c728**（2 笔：W1 ee80799
+     + W2 516c728——**main 侧 W1/W2 正式公开**）
+   - 无 force、无 history rewrite、无夹带（本 §192 条目为 push 后
+     新本地 commit，起点新积压）
+5. **状态块（§192）**：evaluation_r3 ACCEPTED；W2 CLOSED；W1
+   CLOSED；anchor_classification_methodology = APPROVED_FOR_V2 /
+   EFFECTIVE_NEXT_EVALUATION_REVISION（实现随 adoption 侧脚本，
+   生效待下一 revision）；caption_geometry_failure_analysis =
+   APPROVED_TO_START；caption_geometry_extension =
+   DEFERRED_PENDING_ANALYSIS；performance_watch OBSERVATION_ONLY；
+   freeze unchanged；gold_revision unchanged（stage9-b26-gold-r1）；
+   P34' PUSHED（remote tips b6d6c57 / 516c728 已登记）
+6. **下一步队列**：(i) anchor_classification v2 落地 eval 脚本
+   （type 分桶 + 输出标注 methodology version，生效面 = 下一
+   revision）；(ii) caption_geometry_failure_analysis 执行（只读
+   诊断，产出到 samples/private/stage9-corpus/evaluation/ 或
+   design/ 候补诊断件）；(iii) 诊断报告 + (b)/(c) 复活裁决简报
+   （r88 面）。
