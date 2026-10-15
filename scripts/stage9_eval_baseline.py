@@ -470,24 +470,30 @@ def layerb_metrics(doc_id, gold, document):
                 ratio(f_ref) if f_ref is not None else
                 null_metric("zero_precision_recall_sum")),
         }
-        pred_caption_flags = []
-        for ed, hit in zip(edges, anchor_hits):
-            if hit is None:
-                pred_caption_flags.append(None)
-            else:
-                pred_caption_flags.append(True)
-        # 未被任何预测边覆盖的 gold 单元：系统未给出题注判断 -> False
-        pred_caption_flags = [
-            (f if f is not None else False)
-            for f in pred_caption_flags]
         gold_caption_flags = [
             ed["anchor_kind"] == "caption" for ed in edges]
+        # r87-Q1 methodology v2：命中边的判断类型按匹配器分桶——
+        # caption 匹配器命中 = caption 判（True）；reference 匹配器
+        # 命中 = reference 判（False，与 gold kind=reference 一致）；
+        # 未命中维持既有 binary 语义（False = 系统未给题注判断）。
+        # 匹配器按 gold anchor_kind 路由，命中边的匹配器类型恒等于
+        # gold kind。v1（任意命中一律计 caption 判）记录止于 r3，
+        # v1/v2 不可作连续序列比较；v2 首次生效 = 下一次 evaluation
+        # revision
+        pred_caption_flags = [
+            (hit is not None and g)
+            for hit, g in zip(anchor_hits, gold_caption_flags)]
         correct = sum(1 for p, g in zip(pred_caption_flags,
                                         gold_caption_flags) if p == g)
         m["anchor_classification"] = {
-            "scope": "仅 acad-03（20 分类锚；显式引用无对应预测 relation "
-                     "类型——系统只可能经 has_caption 表达题注判断，recall "
-                     "天花板结构性受限，此处报分类一致率）",
+            "methodology": (
+                "v2（r87-Q1）：命中边按匹配器分桶取判断类型（caption 匹配"
+                "→caption 判；references_* 匹配→reference 判）；未命中维"
+                "持 binary False。v1 记录止于 r3（r3 正式值 0.2 不回填），"
+                "v1/v2 不可直接比较"),
+            "scope": "仅 acad-03（20 分类锚；W2 后系统经 has_caption 与 "
+                     "references_* 双类型表达判断，此处按 v2 分桶报分类"
+                     "一致率）",
             "units": len(edges),
             "correct": correct,
             "accuracy": ratio(correct / len(edges)) if edges else
@@ -626,6 +632,9 @@ def cmd_aggregate():
             "anchor_classification_accuracy": macro([
                 dig(d, "anchor_classification", "accuracy")
                 for d in anchor_docs]),
+            "anchor_classification_methodology": (
+                "v2（r87-Q1 批准；首次生效于下一次 evaluation revision，"
+                "与 v1（止于 r3）不可直接比较）"),
         }
         if p == "kreuzberg":
             per_split["comparison_only"] = True  # r84 Q4
