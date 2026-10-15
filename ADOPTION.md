@@ -10142,3 +10142,84 @@ gap 为 paragraph-proxy 反事实值（产物内明确标注）。
 8. **下一步**：r88 简报（自包含全上下文）——(b)/(c) 各自收口裁决
    请求 + typing-layer 边界新发现立案与否 + u0038 credential
    errata 候补（分母 9→8 问题）+ fig-3 一对一语义天花板备注。
+
+## §194. r88 裁决执行回执：诊断接受、(b)(c) 收口、W4/W5 分立立案（调查+规格面）、u0038 勘误登记完成、P34'' 网络暂挂（2026-10-15）
+
+裁决原文存档：outputs/gpt_brief_r88_geometry_receipt_reply.txt（用户中转
+GPT 5.6 回执）。
+
+1. **诊断：ACCEPTED / EXECUTED_AND_COMPLETE**。r88 认可 §193 回执全部
+   数字（四类 3/0/5/0 闭合 8、三分 0/1/0+typing 残余 7、反事实 0/8
+   与 7/8）。历史字段 known_limitations=[geometry_recall_boundary]
+   **保留不回写不改名**；允许追加解释性细化：
+   geometry_recall_boundary.refined_by_r88 =
+   typed_element_input_availability; gap_threshold_not_implicated_
+   current_anchor（本条即该细化的台账登记）
+2. **r88-Q1：(b) 收口** = gap_50pt_calibration =
+   CLOSED_NO_CALIBRATION_EVIDENCE_CURRENT_ANCHOR（不调 50pt、不
+   sweep、不建参数工作项、不触发 revision；复活条件 = gold
+   revision 扩锚面 / 新 dev 证据失败唯一落在 gap threshold /
+   typing 能力改变后新失败群体）
+3. **r88-Q2：(c) 收口** = image_above_caption_rule =
+   CLOSED_NO_TARGET_POPULATION_CURRENT_ANCHOR（above-caption=0 无
+   目标人群；4 条 table 边题注在表上方属表方向语义允许，失败因
+   table 元素未产生非方向错误）；总状态 caption_geometry_extension
+   = CLOSED_NO_ACTIONABLE_GEOMETRY_CHANGE_CURRENT_ANCHOR。r86 Q1
+   (b)/(c) 两候补至此全部完成前置诊断并正式收口
+4. **r88-Q3：typing-layer 立案，W4/W5 分立**（仅 investigation +
+   spec，不授权 parser 实现、不改 app/、不 cherry-pick、不触发
+   r4）：W4_caption_typing = APPROVED_FOR_INVESTIGATION_AND_SPEC
+   （规格件落 main/design/；设计面四项冻结 = 输入单位边界（禁止
+   模糊语义推断）/ 确定性 caption grammar（Figure N:/Table N: 格式、
+   半全角分隔符、line-start 条件）/ 正负样本（正向必覆盖
+   u0015/u0020/u0121，**u0038 必须为明确 negative case**）/ 验收
+   仅 dev split AcadPDF + 新增 caption candidate 计数与 FP audit，
+   comparison/holdout 不参与规则选择）；W5_table_element_detection
+   = APPROVED_FOR_INVESTIGATION_AND_SPEC（单独规格件；必答五项 =
+   真 table bbox 识别 / 图内网格伪 table 排除 / image bbox 重叠
+   裁决 / paragraph 所有权 / Layer B nontext+coverage 影响面；
+   pdfplumber find_tables/TableFinder lines/lines_strict 属调查
+   候选技术，优先确定性几何路径，文字对齐推导边界须另行解释
+   "无布局模型"红线边界）。二者独立批准/拒绝/落地，防低风险
+   caption fix 与高风险 table detection 绑成不可归因 revision；
+   未来任一实现落地才触发条件 A（预期即 r4，届时
+   anchor_classification v2 首次正式生效）
+5. **r88-Q4：u0038 勘误已执行**（option (i)，r84 Q3 先例通道）：
+   notes_register.json 追加 REC_ACAD03_U0038_ANCHOR_CLASS_ERRATA
+   （type=errata / severity=non_blocking / **status=accepted** /
+   authority=r88_q4_ruling / record=u0038 /
+   observed_classification=caption /
+   diagnostic_expected_classification=explicit_reference /
+   scope=record_integrity / metric_effect=none_until_separately_
+   authorized_gold_revision；条目 2→3 append-only）；执行脚本
+   samples/private/stage9-corpus/review/_r88_u0038_errata_register.py
+   （机器本地不入 git，与 _r84_errata_register.py 同位同制式）；
+   前置守卫全过（credential 双钉 43526281… + manifest 9257e462…
+   冻结态断言），manifest 零变化，hashes.sha256 重生成
+   （notes_register 行 a075ede1 → 15a3ed74，其余 17 行字节不变），
+   18/18 逐行重算 equal。**明确禁止已遵守**：frozen credential 与
+   stage9-b26-gold-r1 未回改、r1/r2/r3 未回算、r3 caption recall
+   正式记录维持 1/9、r4 gold partition 9/11 未动；后续纪律登记：
+   若未来授权 gold revision 移 u0038 → explicit，必须重跑 Layer C
+   matching（type 改变改变 TP/FP 归属），禁止机械换分母
+6. **P34''：APPROVED → 网络暂挂**。批准范围 = 174c8d4（§192）+
+   57fea0b（v2 脚本）+ b73aea7（§193）3 笔 FF/non-force。执行时
+   机器级 github 443 中断：fetch（timeout 180 掐除）+ push 两次
+   单次尝试均连接失败（rc 128，约 21s 即拒），非远端分叉非授权
+   问题；本地 ahead 3 / behind 0（remote-tracking b6d6c57）未变。
+   按裁决纪律不以任何方式绕过；网络恢复后原授权范围内重试，
+   成功后 remote tip 登记于下一条目
+7. **状态块（§194）**：evaluation r3 CURRENT（本轮零 parser 变化
+   不产生 r4）；freeze UNCHANGED；gold_revision UNCHANGED
+   （stage9-b26-gold-r1）；anchor_classification_methodology =
+   V2_IMPLEMENTED / EFFECTIVE_NEXT_NORMAL_EVALUATION_REVISION；
+   performance_watch OBSERVATION_ONLY；caption_geometry_extension
+   CLOSED_NO_ACTIONABLE_GEOMETRY_CHANGE_CURRENT_ANCHOR；
+   W4/W5 = APPROVED_FOR_INVESTIGATION_AND_SPEC（main 侧规格件
+   待产）；u0038_credential_errata = APPENDED（15a3ed74）；P34'' =
+   APPROVED_NETWORK_SUSPENDED（3 笔待重试）+ 本 §194 与勘误执行
+   件构成新积压
+8. **下一步队列**：(i) 网络恢复后 P34'' push 重试 + remote tip
+   登记；(ii) W4/W5 规格件起草（main 侧 design/，各自独立、dev
+   split AcadPDF 证据面，产出后各自回裁决面请求实现授权）；
+   (iii) NOTES_CONFIRMATION 窗口 2026-10-22 到期处置面预警。
