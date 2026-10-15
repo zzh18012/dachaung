@@ -10223,3 +10223,24 @@ GPT 5.6 回执）。
    登记；(ii) W4/W5 规格件起草（main 侧 design/，各自独立、dev
    split AcadPDF 证据面，产出后各自回裁决面请求实现授权）；
    (iii) NOTES_CONFIRMATION 窗口 2026-10-22 到期处置面预警。
+
+## §195. P34'' push 完成登记：网络恢复后重试成功，remote tip = b73aea7（2026-10-15 21:43 重试窗）
+
+- **执行链**：首次尝试 ×3 失败（2026-10-15 20:4x–20:5x，github
+  443 机器级中断：2×rc128 拒连 + 1×rc124 挂死重置，均 timeout 180
+  单次尝试）；定时重试（21:43 窗）**成功**：
+  `git push origin b73aea7:integration/stage9-batch26-corpus-annotation`
+  → `b6d6c57..b73aea7` FF，无 force/无 +refspec/无夹带（严格 3 笔
+  批准提交 174c8d4 + 57fea0b + b73aea7；§194 1bb072c 留本地）
+- **remote tip 核验**：`git ls-remote` =
+  `b73aea771f9f5ec2ffbec3c987be8b1cf7e2c543`，与预期逐字符一致
+- **P34'' = PUSH_APPROVED → PUSHED**（remote tip 已登记）
+- 新积压：1bb072c（§194）+ 本 §195 = ahead 2，待下一批 push 批准
+- 附记：W4/W5 规格调查已启动（r88-Q3 授权面），调查 agent 于
+  21:15-21:16 因 API 配额 5 小时上限 429 中断；W4 草稿部分产物
+  已落 outputs/w4_caption_typing_spec_draft.md（18KB，完整性待
+  核），W5 仅探针脚本未跑；配额 2026-10-16 01:06 重置后重开。
+  产物均 gitignored 零 git 影响；自跑线 R2167 同因 429 中断于
+  锚跑进场前（dachuang-code 终态核验 main @ 516c728 干净，
+  dachuang-autonomous tip de20053 无新提交），随配额重置一并
+  respawn。
