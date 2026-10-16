@@ -10244,3 +10244,83 @@ GPT 5.6 回执）。
   锚跑进场前（dachuang-code 终态核验 main @ 516c728 干净，
   dachuang-autonomous tip de20053 无新提交），随配额重置一并
   respawn。
+
+## §196. r89 裁决执行回执：W4 有条件批准（四子项裁决 + W1 \s 审计门）、W5 几何版批准（守恒不变量 A-E）、text-based 红线裁定（允许调查）、acad-03 盲性披露登记、P34''' push 完成（2026-10-16）
+
+- **裁决存档**：outputs/gpt_brief_r89_w4w5_spec_reply.txt（r89，
+  2026-10-16；请求件 = outputs/gpt_brief_r89_w4w5_spec_request.txt，
+  自包含 11 节）
+- **r89-Q1 / W4 caption typing**：
+  **IMPLEMENTATION_APPROVED_WITH_PREMERGE_GATES**——行级 typing 主体
+  设计获准（行聚类后、段落融合前；移出非复制；同页+bbox 包含+同标签
+  去重；验收须报 new captions / duplicates suppressed / false
+  positives / paragraph text conservation；parser 修改仅进 main，
+  PDF fallback 路径，DOCX 零改动；acad-03 不作 pass/fail 条件）。
+  四子项：(i) 行宽护栏 DEFERRED（单一 dev 样本驱动 magic number
+  过拟合风险，Table6. FP 28.2pt 如实保留进 acceptance evidence）；
+  (ii) in-other-caption 二次切分 DEFERRED（1 dev 例，改变既有
+  caption content/element identity，须独立立案）；(iii) W1
+  `_CAPTION_RE` 的 `\s` 删减 = CONDITIONALLY_APPROVED，**合入前必须
+  通过 dev-14 穷举审计门**（枚举全部"旧 W1 匹配、删 \s 后不匹配"
+  文本，全量 TP/FP 分类，comparison/holdout 禁参；TP=0 → 自动满足
+  可同步收紧；TP>0 → W1 改动停止、W4 暂不 merge、冲突样本重新
+  呈报）；(iv) 跨栏子行首增强 DEFERRED（收益 1/19，风险面高）
+- **r89-Q2 / W5 几何版**：APPROVED_FOR_IMPLEMENTATION，命名
+  **W5_GEOMETRIC_PRECISION_AND_DEDUP_V1**（定位 = 几何候选精确率
+  治理 + accepted-table 词级吸收去重，非 booktabs recall 方案——
+  lines/lines_strict 天花板 1/16 实测）。批准两 filter：
+  `max(in_raster_frac, in_vecfig_frac) >= 0.5` 弃 +
+  `words_inside < 4 OR rows < 2` 弃；`cols >= 2` 不入（误杀唯一
+  真表）；find_tables 维持默认 strategy 零变更。词级吸收固定顺序
+  （candidates → filters → 仅 accepted 取 word ownership → 词中心
+  判据移除 → paragraph grouping → 输出）+ 守恒不变量 A-E（no
+  duplication / no loss / rejected candidate isolation / caption
+  preservation / page-level conservation audit）
+- **r89-Q3 / text-based**：红线裁定 =
+  **ALLOWED_DETERMINISTIC_LAYOUT_HEURISTIC**（pdfplumber "text"
+  strategy 属可审计坐标规则域，非 ML layout model；允许/禁止清单
+  见裁决 §七，OCR/ML/学习型权重/按结果拟合参数等仍禁）；
+  W5_TEXT_BASED_V2 = APPROVED_FOR_DEV_INVESTIGATION_AND_SPEC_ONLY
+  （10 项报告义务，dev split 允许选固定 tolerance，完毕须再呈报，
+  不得凭 r89 直接实现）
+- **acad-03 split 更正**：接受披露（r87 裁决文本笔误，非纪律
+  违反），但方法学影响非零——
+  `acad03_holdout_blindness = COMPROMISED_BY_PRIOR_AUTHORIZED_EXPOSURE`
+  （W1 验收/W2 评测/r87-88 诊断/u0038 讨论构成既往暴露）。自 r89
+  起 acad-03 不得用于 W4/W5 参数选择与 acceptance gate；Layer C
+  = 固定 anchor evaluation（非独立 blind 估计）；holdout aggregate
+  标记 holdout_with_known_anchor_exposure；r1-r3 不回算不作废；
+  freeze/gold 零变化
+- **盲性披露登记（已执行）**：notes_register.json 条目 3→4，
+  `ACAD03_HOLDOUT_BLINDNESS_DISCLOSURE`（type=disclosure /
+  non_blocking / accepted / scope=record_integrity），登记脚本
+  review/_r89_acad03_blindness_register.py（credential
+  43526281… + manifest 9257e462… 双钉前置断言；幂等拒绝）；
+  notes_register sha256 `15a3ed74bf08561e → 4a89a07f1815d132`；
+  hashes.sha256 重生成后 18/18 逐行复验通过；manifest 字节零变化；
+  credential 二次钉死复验通过
+- **P34''' = PUSHED**（双线恰 2+1，FF/non-force）：
+  - adoption：`git push origin
+    2c4567c:integration/stage9-batch26-corpus-annotation` →
+    `b73aea7..2c4567c`，ls-remote 核验 =
+    `2c4567c0b6f5f14f6566ddd82a262a3d9a399a2b`（恰 1bb072c +
+    2c4567c，无夹带）
+  - main：`516c728..e519f6c`，ls-remote 核验 =
+    `e519f6c6454e738979e47c9afdeb99d5c7cc5b0c`（恰 W4/W5 规格件
+    design/ 两文件）
+- **W4/W5 落地顺序（coordinator 决定，裁决 §六 免再请裁）**：
+  选 **路径 A**——W4 先落地（过 W4-C 审计门后）→ r4 全量评测
+  （anchor_classification v2 首次正式生效 revision）→ W5 在合并后
+  main 上最小兼容性复验（insertion point / paragraph ownership /
+  table-caption typing assumptions / dev acceptance evidence 四面
+  不失效）→ merge → r5。理由：W4 dev 证据面完整可先行；W4 先行
+  使 caption 成 typed element，W5 词级吸收的 caption preservation
+  不变量（D）获得更干净的输入面
+- **下一步队列**：(i) W4-C 审计门执行（W1 `\s` dev-14 穷举审计，
+  只读，comparison/holdout 零读取；TP=0 → W4 直接进实现，TP>0 →
+  暂停重新呈报）；(ii) W4 实现（main，等审计门 + 自跑线 R2169
+  让出 dachuang-code 锚场地后进场）；(iii) W5 text-based v2 dev
+  调查（只读，可与 (i) 并行）；(iv) 新积压 = 本 §196 + 披露登记
+  侧产物，待下一批 push 批准；NOTES_CONFIRMATION 窗口 2026-10-22
+  到期处置面预警（超窗 → NOTES_CONFIRMATION_UNAVAILABLE，不解除
+  freeze）
