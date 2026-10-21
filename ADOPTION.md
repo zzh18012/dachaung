@@ -10324,3 +10324,91 @@ GPT 5.6 回执）。
   侧产物，待下一批 push 批准；NOTES_CONFIRMATION 窗口 2026-10-22
   到期处置面预警（超窗 → NOTES_CONFIRMATION_UNAVAILABLE，不解除
   freeze）
+
+## §197 r89 W4 执行链收口：W4-C 审计门通过 + W4 main 实现 + dev-14 验收四面 + W5 text-based v2 调查完成
+
+- **W4-C 审计门 = TP=0 → auto-satisfied（W1 `\s` 收紧条件性批准生效）**：
+  - dev-14 穷举面：`_is_caption` 全部调用点（PDF L443 + DOCX
+    L885 两个应用点）共 **13,457** 条文本测试；old（`\s` 可作
+    分隔符）命中 49 / new（收紧后，数字后必须可见分隔符
+    `[.、:：]`）命中 48；**flip 恰 1 条且为 FP**：
+    tech-06-enisa-etl2025 p57
+    doc-379cba3629efda98::e0625 'Figure 42 represents a clustered
+    visualisation of common TTPs based on ENISA's dataset.'
+    （叙事句型 FP，收紧后不再命中 = 正向修正）→ 无任何 TP 损失
+  - 产物：`review/_r89_w1_whitespace_audit.py` +
+    `outputs/w1_whitespace_audit_r89_w4c.{md,json}`
+- **代码同一性核验（审计门绑定 main 的依据）**：审计 agent 实际
+  跑的是 adoption 副本 @ 8110228；协调者 diff
+  `main e519f6c` vs `adoption 8110228` 的
+  `app/parsers/fallback_parser.py` → **唯一差异 = r55 C08
+  docx-table-warnings 块（43 行，L962 起）**，W1/W4 相关表面
+  （`_CAPTION_RE` / `_classify_pdf_paragraph` / 行聚类 / PDF 主
+  解析路径）字节相同 → 审计结论对 main 有效
+- **场地冲突教训（记入流程）**：审计窗口恰逢 R2170 锚轮 detach
+  dachuang-code 于自跑线分支尖（其 parser 为旧形态），只读调查
+  agent 若读工作树会拿错代码面。规则固化：**锚窗内只读调查一律
+  `git show <sha>:<path>`（object DB），不读工作树**；本次 agent
+  已自行纠偏改 import adoption 副本，结论未受污染
+- **W4 实现 = main `ce082f9` 落地**（两段式第一段）：
+  - `app/parsers/fallback_parser.py`：`_CAPTION_RE` 收紧（r89
+    W4-C 同 grammar）；新增 `_caption_label_key` / `_line_bbox`
+    / `_split_caption_lines`（行级切出：**移出非复制**，宿主
+    content 收缩；去重护栏 = 同页 + 行 bbox ⊂ 既有 caption bbox
+    + 同 label → 跳过发射且行自宿主移除，杜绝双栖）；非题注段
+    逐行扫描在行聚类（y 中心 ±3.0pt）之后、并段之前；段首命中
+    仍走 W1 整段 caption 分支（11 条 DUP 结构性不重发）；退化
+    bbox（零宽/零高）放弃切分；缺 lines 键直通
+  - 新测试 `tests/test_w4_line_caption_typing.py`（11 用例）+
+    `test_w1_caption_delimiter_recall.py` 翻转
+    （`test_sentence_start_reference_no_longer_typed`）+
+    relation 侧 regex 不变护栏（figure/table relation 保留
+    `\s`，分层面分治）
+  - devset 2 个冻结期望测试按新行为更新（先 dump 实际输出核实
+    再改）：pdf figure relation
+    has_caption e0012→e0010（gap 11.525）+ **新增**
+    table_has_caption e0007→e0004（pdf_geometry_above，W4 切出
+    'Table 1. Module status matrix' 后表-题注关联首次成环）；
+    旧 ordinal references_table 自引随题注行移出而消失
+  - 全量测试 **5541 passed / 4 skipped**（skip 均为真样本缺失）
+- **W4 搬运至 adoption（两段式第二段，本 commit）**：212 行 diff
+  `git diff e519f6c ce082f9 -- app/parsers/fallback_parser.py`
+  干净套用
+- **dev-14 实现验收四面（r89 纪律 §6，探针
+  `review/_r89_w4_acceptance.py`）**：
+  1. **new captions**：24（r3）→ **60**（W4 解析）；其中
+     w4_line_caption **37** / caption_regex（收紧后）23；W1 收紧
+     移除恰 1 条 = 已审计的 tech-06 e0625 叙事 FP（守恒：24-1+37=60）
+  2. **duplicates suppressed**：去重护栏触发 **0 次**（dev-14 面
+     无 bbox 包含+同标签重复形态；护栏由 11 用例单测钉住）
+  3. **false positives**：37 条 verbatim 全列表 → 人工分类
+     （`review/_r89_w4_fp_classify.py` +
+     `outputs/w4_fp_classification_r89.{md,json}`）：**TP 28 /
+     FP 9**——FP 构成：lof_entry 8（tech-01 p9 List-of-Figures
+     导航行，点线+页码；上下文探针核实 p9 元素序列：e0030
+     heading → 8 导航行 → e0041 heading 'vii'）+ bare_stub 1
+     （acad-06 'Table6.'，r89 裁决点名 dev FP 如实保留）；
+     LoF 点线+页码守卫超出 r89 授权面，**未修**，留待后续裁决；
+     另 4 条 TP 含同视觉行正文轻微溢出（整行移出，守恒不受影响）
+  4. **paragraph text conservation**：页级 token 多重集守恒
+     （{paragraph,caption,heading} 归一化 token 多重集 旧==新）
+     违例 **0 页**
+- **W5 text-based v2 dev 调查完成（10/10 项，只读）**：产物
+  `review/_r89_w5_text_v2_probe.py` +
+  `outputs/w5_text_based_v2_investigation.{md,json}`（18,055B /
+  476KB）。核心结论：tl_xtr1_5（vertical=text + horizontal=lines
+  + text_x_tolerance=1.5）**recall 14/16、precision 0.6875、
+  booktabs 13/15** = 当前最佳可用形态；tt_default 名义 16/16 但
+  whole-page grid（precision 0.31）不可用；geometric lines
+  1/16、booktabs 0/15（W5 已批几何路径的证据面印证）；2 miss
+  归因：gate2 kills acad-02 tab:3（rows=1 碎片）、gate1 kills
+  acad-06 tab:6（vecfig 0.647 overlap）。**实现前须重新呈报**，
+  3 个待裁点：(a) x_tolerance 敏感性与泛化；(b) 堆叠表
+  merge/split；(c) gate1 边界冲突
+- **下一步队列**：(i) r4 全量评测（W4 落地 = revision 条件 A 已
+  满足；anchor_classification v2 首次正式生效 revision；
+  comparison gate vs r3 四指标 >5% 阈值；Layer C；
+  PARSER_CODE_REVS 登记）；(ii) W5 几何实现（r4 后，合并后
+  main 最小兼容复验）；(iii) W5 text-based v2 重新呈报（含 3
+  待裁点）；(iv) push 积压 = 8110228 + 本 §197 + W4 搬运 commit，
+  待批；NOTES_CONFIRMATION 窗口 2026-10-22 到期处置面预警不变
