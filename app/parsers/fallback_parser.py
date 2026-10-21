@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -47,16 +48,37 @@ except ImportError as _e:  # pragma: no cover
 # ---------- 通用 ----------
 
 # 题注：以 "Table 1." / "Figure 1:" / "表 1、" / "图 1：" 开头的段落。
-# 分隔符类 [\.、:：\s]：句点、顿号、半角/全角冒号、空白（W1 召回修复，
-# r85 Q1——pdfplumber 无空格抽取形如 "Figure3:The…"）
+# 分隔符类 [\.、:：]：句点、顿号、半角/全角冒号。r85 Q1 曾扩入 \s
+# （W1 召回修复，pdfplumber 无空格抽取形如 "Figure3:The…"）；r89 W4-C
+# 删去空白——数字后必须可见分隔符，排除 "Figure 3 gives…" 类句首
+# 叙述句。dev-14 穷举审计（13,457 被测文本，flip=1 全 FP、TP=0）
+# 门通过后收紧，见 outputs/w1_whitespace_audit_r89_w4c.md（adoption）。
 _CAPTION_RE = re.compile(
-    r"^\s*(?:Table|Figure|Fig\.?|表|图)\s*[0-9０-９]+[\.、:：\s]",
+    r"^\s*(?:Table|Figure|Fig\.?|表|图)\s*[0-9０-９]+[\.、:：]",
     re.IGNORECASE,
 )
 
 
 def _is_caption(text: str) -> bool:
     return bool(_CAPTION_RE.match(text or ""))
+
+
+# W4 去重键（r89-Q1 验收纪律 §5：same page + bbox 包含 + same label）：
+# 从行/段首提取 (figure|table, 序号)；全角数字 NFKC 归一到 ASCII。
+_CAPTION_LABEL_RE = re.compile(
+    r"^\s*(?:(?P<fig>Figure|Fig\.?|图)|(?P<tbl>Table|表格|表))\s*"
+    r"(?P<num>[0-9０-９]+)",
+    re.IGNORECASE,
+)
+
+
+def _caption_label_key(text: str) -> str | None:
+    m = _CAPTION_LABEL_RE.match(text or "")
+    if not m:
+        return None
+    family = "figure" if m.group("fig") else "table"
+    num = unicodedata.normalize("NFKC", m.group("num"))
+    return f"{family}:{num}"
 
 
 # 批次 4 契约（docs/caption-relation-contract.md §1）：图题注前缀集，
@@ -418,10 +440,12 @@ def _group_words_to_paragraphs(words: list[dict]) -> list[dict[str, Any]]:
 
 
 def _lines_to_para(lines: list[list[dict]]) -> dict[str, Any]:
-    """把若干行 word 数组融合成 {text, bbox}。bbox 格式 [x0, top, x1, bottom]。"""
+    """把若干行 word 数组融合成 {text, bbox, lines}。bbox 格式 [x0, top, x1, bottom]。
+
+    lines 原样随附（W4 行级题注切分需要行界信息，r89-Q1）。"""
     all_words = [w for line in lines for w in line]
     if not all_words:
-        return {"text": "", "bbox": None}
+        return {"text": "", "bbox": None, "lines": []}
     text = " ".join(
         " ".join(w["text"] for w in sorted(line, key=lambda x: x["x0"]))
         for line in lines
@@ -432,7 +456,62 @@ def _lines_to_para(lines: list[list[dict]]) -> dict[str, Any]:
         max(float(w["x1"]) for w in all_words),
         max(float(w.get("bottom", 0.0)) for w in all_words),
     ]
-    return {"text": text, "bbox": bbox}
+    return {"text": text, "bbox": bbox, "lines": lines}
+
+
+def _line_bbox(line: list[dict]) -> list[float] | None:
+    """单行 bbox [x0, top, x1, bottom]；退化行（空/零宽高）返回 None。"""
+    if not line:
+        return None
+    bbox = [
+        min(float(w["x0"]) for w in line),
+        min(float(w.get("top", 0.0)) for w in line),
+        max(float(w["x1"]) for w in line),
+        max(float(w.get("bottom", 0.0)) for w in line),
+    ]
+    if bbox[2] <= bbox[0] or bbox[3] <= bbox[1]:
+        return None
+    return bbox
+
+
+def _split_caption_lines(
+    para: dict[str, Any],
+    page_captions: list[tuple[list[float] | None, str | None]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """W4 行级题注切分（r89-Q1）：非题注段落内命中 grammar 的行提升为
+    题注候选（移出宿主段落，非复制）。
+
+    去重（r89 验收纪律 §5）：same page + 候选行 bbox 被既有 caption
+    bbox 包含 + same label → 跳过发射（行仍自宿主移除——该文本已在
+    既有 caption 元素内，保留即违反"同一文本不得双栖"）。
+    返回 (提升的 caption 字典列表, 由剩余行重建的宿主段落)。"""
+    lines = para.get("lines")
+    if not lines:
+        return [], para
+    kept: list[list[dict]] = []
+    promoted: list[dict[str, Any]] = []
+    for line in lines:
+        line_text = " ".join(
+            w["text"] for w in sorted(line, key=lambda x: x["x0"])
+        ).strip()
+        bbox = _line_bbox(line)
+        key = _caption_label_key(line_text)
+        if not (_is_caption(line_text) and bbox is not None and key is not None):
+            kept.append(line)
+            continue
+        dup = any(
+            cap_key == key
+            and cap_bbox is not None
+            and cap_bbox[0] <= bbox[0]
+            and cap_bbox[1] <= bbox[1]
+            and cap_bbox[2] >= bbox[2]
+            and cap_bbox[3] >= bbox[3]
+            for cap_bbox, cap_key in page_captions
+        )
+        if dup:
+            continue
+        promoted.append({"text": line_text, "bbox": bbox, "label_key": key})
+    return promoted, _lines_to_para(kept)
 
 
 def _classify_pdf_paragraph(text: str) -> tuple[str, dict[str, Any]]:
@@ -597,6 +676,7 @@ def _parse_pdf(
                         )
                     )
                     words = []
+                page_captions: list[tuple[list[float] | None, str | None]] = []
                 for para in _group_words_to_paragraphs(words):
                     text = para["text"].strip()
                     if not text:
@@ -605,17 +685,60 @@ def _parse_pdf(
                     locator: dict[str, Any] = {"family": "page_geometry", "page": page_idx}
                     if para["bbox"] is not None:
                         locator["bbox"] = para["bbox"]
-                    elements.append(
-                        Element(
-                            element_id=f"{document_id}::e{len(elements):04d}",
-                            type=etype,
-                            content=text,
-                            parent_id=None,
-                            source_locator=locator,
-                            confidence=0.85,
-                            metadata=meta,
+                    if etype == "caption":
+                        elements.append(
+                            Element(
+                                element_id=f"{document_id}::e{len(elements):04d}",
+                                type=etype,
+                                content=text,
+                                parent_id=None,
+                                source_locator=locator,
+                                confidence=0.85,
+                                metadata=meta,
+                            )
                         )
-                    )
+                        page_captions.append((para["bbox"], _caption_label_key(text)))
+                        continue
+                    # W4（r89-Q1）：段中部题注行提升为 caption（移出非复制）
+                    promoted, host = _split_caption_lines(para, page_captions)
+                    for cap in promoted:
+                        cap_locator: dict[str, Any] = {
+                            "family": "page_geometry",
+                            "page": page_idx,
+                            "bbox": cap["bbox"],
+                        }
+                        elements.append(
+                            Element(
+                                element_id=f"{document_id}::e{len(elements):04d}",
+                                type="caption",
+                                content=cap["text"],
+                                parent_id=None,
+                                source_locator=cap_locator,
+                                confidence=0.85,
+                                metadata={"heuristic": "w4_line_caption"},
+                            )
+                        )
+                        page_captions.append((cap["bbox"], cap["label_key"]))
+                    host_text = host["text"].strip()
+                    if host_text:
+                        host_etype, host_meta = _classify_pdf_paragraph(host_text)
+                        host_locator: dict[str, Any] = {
+                            "family": "page_geometry",
+                            "page": page_idx,
+                        }
+                        if host["bbox"] is not None:
+                            host_locator["bbox"] = host["bbox"]
+                        elements.append(
+                            Element(
+                                element_id=f"{document_id}::e{len(elements):04d}",
+                                type=host_etype,
+                                content=host_text,
+                                parent_id=None,
+                                source_locator=host_locator,
+                                confidence=0.85,
+                                metadata=host_meta,
+                            )
+                        )
                 # 表格
                 try:
                     tbls = page.find_tables() or []

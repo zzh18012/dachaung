@@ -456,12 +456,23 @@ def test_devset_docx_table_relation():
     validate_udm(d)
 
 
-def test_devset_pdf_zero_table_relations():
-    """期望冻结于批次 7 §0 盘点：PDF 表题注文本被 pdfplumber 融合进
-    前一段落（e0004 以 "2. Structured elements" 开头），无独立 caption
-    element → devset 上 pdf 表关联为 0 条。"""
+def test_devset_pdf_table_relation_w4():
+    """期望冻结于 W4（r89-Q1 行级题注切分）：批次 7 §0 盘点的"表题注被
+    pdfplumber 融合进前一段落 → 0 条表关联"根因消除——融合的
+    "Table 1. Module status matrix" 行被切出为 caption e0004
+    （heuristic=w4_line_caption），table e0007 上方紧邻
+    → e0007 --table_has_caption--> e0004。"""
     doc = _devset_doc("pdf")
-    assert all(r.type != "table_has_caption" for r in doc.relations)
+    rels = _rels(
+        r for r in doc.relations if r.type == "table_has_caption"
+    )
+    assert rels == [{
+        "type": "table_has_caption",
+        "from_id": doc.document_id + "::e0007",
+        "to_id": doc.document_id + "::e0004",
+        "metadata": {"rule": "pdf_geometry_above",
+                     "gap_pt": pytest.approx(7.0194, abs=0.01)},
+    }]
     d = doc.to_dict()
     assert d["schema_version"] == "0.6.0"
     validate_udm(d)

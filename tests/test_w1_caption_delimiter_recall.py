@@ -1,22 +1,21 @@
-r"""W1 题注分隔符召回修复测试（r85 Q1 授权）。
+r"""W1 题注分隔符测试（r85 Q1 扩展 + r89 W4-C 收紧）。
 
-背景：stage9-eval-baseline-r1 锚面 acad-03 零题注边根因 =
-pdfplumber 无空格抽取 + 冒号分隔（"Figure3:The…"）不在
-_CAPTION_RE / _FIGURE_CAPTION_RE / _TABLE_CAPTION_RE 的分隔符类
-[\.、\s] 内 → 题注定型 paragraph → 匹配器 caption 侧为空。
-
-修复：三处同步扩为 [\.、:：\s]（半角+全角冒号）。
+历史：r85 Q1 把分隔符类扩为 [\.、:：\s]（修 pdfplumber 无空格抽取
+"Figure3:The…" 零题注边）。r89 W4-C 删去 `_CAPTION_RE`（typing 通道）
+的 `\s`——数字后必须可见分隔符，排除 "Figure 3 gives…" 句首叙述句；
+dev-14 穷举审计门通过（flip=1 全 FP、TP=0，13,457 被测文本）后生效。
+`_FIGURE_CAPTION_RE` / `_TABLE_CAPTION_RE` 是关系侧消费者（r89 未点
+名、未审计），分隔符类保持 [\.、:：\s] 不变。
 
 契约：docs/caption-relation-contract.md §1（W1 修正案，含 accepted
-forms 表）。
+forms 表；r89 收紧为 W1 修正案的后续裁决）。
 
-裁决约束（r85 Q1）：
-- 仅三正则，不加 OCR/fuzzy/probabilistic；
-- 句首 "Figure 3 shows…" 误定型 caption 为既有风险，W1 保留不扩大
-  ——本文件以 test_sentence_start_reference_typing_retained 钉住
-  现状（未来任何收紧/放宽都须有意为之）；
-- 负向回归 sentence_start_figure_reference：句首引用形即使被定型
-  caption，无题注几何（上方/超距）不得自动生成 relation。
+裁决约束：
+- r85 Q1：不加 OCR/fuzzy/probabilistic；
+- r89 W4-C：typing 通道收紧，"Figure 3 shows…" 不再定型 caption
+  （test_sentence_start_reference_no_longer_typed）；
+- 负向回归 sentence_start_figure_reference：句首引用形无题注几何
+  （上方/超距）不得自动生成 relation。
 """
 
 from __future__ import annotations
@@ -66,30 +65,47 @@ def test_non_caption_forms_not_typed_caption(text):
     assert etype != "caption"
 
 
-def test_sentence_start_reference_typing_retained():
-    # 既有风险钉住（r85：保留不扩大）：句首 "Figure 3 shows…" 数字后
-    # 为空白 ∈ [\.、:：\s]，修复前后均定型 caption。此断言固化现状，
-    # 非认可为正确行为；未来收紧须改契约并过裁决。
+def test_sentence_start_reference_no_longer_typed():
+    # r89 W4-C 收紧（原 r85 钉住测试翻转）："Figure 3 shows…" 数字后
+    # 为纯空白，不再定型 caption——dev-14 穷举审计 TP=0（唯一 flip
+    # = tech-06 "Figure 42 represents…"，FP）。
     etype, _ = _classify_pdf_paragraph(
         "Figure 3 shows the architecture of the system.")
-    assert etype == "caption"
+    assert etype != "caption"
 
 
-# ---------- 正则层：三处同步 + 口径分工 ----------
+# ---------- 正则层：typing 收紧 + 关系侧不变 ----------
 
-@pytest.mark.parametrize("rx", [_CAPTION_RE, _FIGURE_CAPTION_RE])
+@pytest.mark.parametrize("sep", [".", ":", "：", "、"])
+def test_typing_regex_accepts_visible_separators(sep):
+    assert _CAPTION_RE.match(f"Figure 3{sep}title")
+    assert _CAPTION_RE.match(f"图 3{sep}标题")
+    assert _CAPTION_RE.match(f"Table 1{sep}title")
+
+
+@pytest.mark.parametrize("sep", [" "])
+def test_typing_regex_rejects_whitespace_delimiter(sep):
+    # r89 W4-C：`\s` 自 typing 通道删除（u0038 "Figure 3 gives…" 类）
+    assert not _CAPTION_RE.match(f"Figure 3{sep}title")
+    assert not _CAPTION_RE.match(f"表 1{sep}标题")
+
+
+@pytest.mark.parametrize("rx", [_FIGURE_CAPTION_RE])
 @pytest.mark.parametrize("sep", [".", ":", "：", "、", " "])
-def test_figure_regex_accepts_all_separators(rx, sep):
+def test_figure_relation_regex_unchanged(rx, sep):
+    # 关系侧消费者未被 r89 点名：分隔符类保持 [\.、:：\s]
     assert rx.match(f"Figure 3{sep}title")
     assert rx.match(f"图 3{sep}标题")
 
 
-@pytest.mark.parametrize("rx", [_CAPTION_RE, _TABLE_CAPTION_RE])
+@pytest.mark.parametrize("rx", [_TABLE_CAPTION_RE])
 @pytest.mark.parametrize("sep", [".", ":", "：", "、", " "])
-def test_table_regex_accepts_all_separators(rx, sep):
+def test_table_relation_regex_unchanged(rx, sep):
     assert rx.match(f"Table 1{sep}title")
     assert rx.match(f"表 1{sep}标题")
 
+
+# ---------- 口径分工 ----------
 
 def test_prefix_disambiguation_unchanged():
     assert not _FIGURE_CAPTION_RE.match("Table 1: matrix")
