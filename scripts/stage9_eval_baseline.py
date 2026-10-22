@@ -45,6 +45,7 @@ BASELINE_PRED = {  # gate 基线 = 前一 accepted revision（r86 Q2：r3 对照
     "stage9-eval-baseline-r2": "stage9-eval-baseline-r1",
     "stage9-eval-baseline-r3": "stage9-eval-baseline-r2",
     "stage9-eval-baseline-r4": "stage9-eval-baseline-r3",
+    "stage9-eval-baseline-r5": "stage9-eval-baseline-r4",
 }
 GATE_REL_DROP = 0.05  # comparison 回归门阈值：相对下降 >5% 判 regression
 PARSER_CODE_REVS = {
@@ -56,6 +57,10 @@ PARSER_CODE_REVS = {
     "stage9-eval-baseline-r4": ("main ce082f9（W4 line-level caption "
                                 "typing + W1 收紧；adoption port 8fc8585；"
                                 "r89 Path A revision 条件 A）"),
+    "stage9-eval-baseline-r5": ("main 70a1ad8（W5 几何表格门 + 词级吸收 + "
+                                "题注保护；adoption port 本轮；r89 Path A "
+                                "step 2，四面兼容复验 "
+                                "outputs/w5_compat_reverify_path_a.md）"),
 }
 
 sys.path.insert(0, str(BASE))
