@@ -44,6 +44,7 @@ ANCHOR_DOC = "acad-03-layoutlmv3"
 BASELINE_PRED = {  # gate 基线 = 前一 accepted revision（r86 Q2：r3 对照 r2）
     "stage9-eval-baseline-r2": "stage9-eval-baseline-r1",
     "stage9-eval-baseline-r3": "stage9-eval-baseline-r2",
+    "stage9-eval-baseline-r4": "stage9-eval-baseline-r3",
 }
 GATE_REL_DROP = 0.05  # comparison 回归门阈值：相对下降 >5% 判 regression
 PARSER_CODE_REVS = {
@@ -52,6 +53,9 @@ PARSER_CODE_REVS = {
                                 "adoption cherry-pick 0e5f1d4）"),
     "stage9-eval-baseline-r3": ("main 516c728（W1+W2 explicit reference；"
                                 "adoption cherry-pick 2d7c674；r86 Q2 授权）"),
+    "stage9-eval-baseline-r4": ("main ce082f9（W4 line-level caption "
+                                "typing + W1 收紧；adoption port 8fc8585；"
+                                "r89 Path A revision 条件 A）"),
 }
 
 sys.path.insert(0, str(BASE))
@@ -633,7 +637,7 @@ def cmd_aggregate():
                 dig(d, "anchor_classification", "accuracy")
                 for d in anchor_docs]),
             "anchor_classification_methodology": (
-                "v2（r87-Q1 批准；首次生效于下一次 evaluation revision，"
+                "v2（r87-Q1 批准；首次生效于 r4，"
                 "与 v1（止于 r3）不可直接比较）"),
         }
         if p == "kreuzberg":

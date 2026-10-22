@@ -10412,3 +10412,65 @@ GPT 5.6 回执）。
   main 最小兼容复验）；(iii) W5 text-based v2 重新呈报（含 3
   待裁点）；(iv) push 积压 = 8110228 + 本 §197 + W4 搬运 commit，
   待批；NOTES_CONFIRMATION 窗口 2026-10-22 到期处置面预警不变
+
+## §198 r4 全量评测回执：gate PASS 零劣化，anchor_classification v2 首效 0.7，r4 成为新 accepted baseline
+
+- **触发**：r89 路径 A 第一步——W4 落地（main ce082f9 / adoption
+  port 8fc8585）满足 r84 revision 条件 A（parser 行为变化），全量
+  重测新 revision stage9-eval-baseline-r4。
+- **runner 登记**（`scripts/stage9_eval_baseline.py` 本 commit）：
+  BASELINE_PRED 增 r4→r3 映射；PARSER_CODE_REVS 增
+  `"stage9-eval-baseline-r4": "main ce082f9（W4 line-level caption
+  typing + W1 收紧；adoption port 8fc8585；r89 Path A revision
+  条件 A）"`；anchor_classification_methodology 串更正为"首次生效
+  于 r4"。
+- **五步全跑**（2026-10-21 19:38–20:31）：prepare 24 docs / 817
+  hard boundaries；Layer A 双 parser rc 0 + validate 过；Layer B
+  48 跑——fallback 24/24 全成（tech-03 大 PDF 单篇 1581.26s），
+  kreuzberg 11 篇 schema_validation_failed **与 r3 逐篇一致**
+  （既有已知行为，comparison_only 角色，无变化）；aggregate 46
+  system errors；gate。
+- **comparison 回归门（gated）PASS，regression 0**：
+  - unit_alignment 0.7356 → **0.8297（+12.8%，improved）**
+  - extraction_coverage 0.7543 → 0.754（持平）
+  - nontext_detection_ratio 0.7004 → 0.7004（持平）
+  - boundary_error_rate 0.7378 → 0.7378（持平）
+- **informational 面**：overall 0.7459 → 0.8087（+8.4%），其余
+  三项持平（0.7438 / 0.826 / 0.6162→0.6155）；holdout（盲评不
+  入门）0.8487 → 0.8539，其余持平。
+- **归因**：alignment 增益来自 W4——被并段的题注行切出为独立
+  caption 元素后，gold 短单元（题注行/单句）严格 normalize 相等
+  一对一贪心对齐的命中面扩大；coverage/nontext/boundary 面不受
+  W4 影响（token 守恒已在验收四面证明）。
+- **Layer C（acad-03，20 金边）**：
+  - caption_edge **P=1.0 持平 / R=0.1111→0.3333 / F1=0.2→0.5**
+    （W4 新 caption 元素扩可配对池，precision 不掉——dev 验收
+    FP 面 9/37 未在该锚面形成假边）
+  - reference_edge P=0.8889→**1.0** / R=0.7273 持平 /
+    F1=0.8→0.8421
+  - relation 整体 P=1.0 / R=0.55 / F1=0.7097（r3 等价合并值
+    P=0.9 / R=0.45 / F1=0.6）
+  - **anchor_classification v2 首次正式生效 = 0.7**（v1 止于 r3
+    = 0.2；r87-Q1 方法论分桶，v1/v2 不可直接比较，方向一致向好）
+- **r4 = 新 accepted baseline revision**（下一 revision 的 gate
+  基线 = r4）。产物 samples/private/stage9-corpus/evaluation/
+  stage9-eval-baseline-r4/（gitignored，不进 freeze 包）。
+- **r90 简报数字勘误（发布前完成，零外泄）**：本协调者起草 r90
+  简报时 §2 的 r3 基线数字曾误写（overall 0.6733/0.9723/0.625/
+  0.0282 与 Layer C P=0.375 等——源自会话压缩摘要的错误回填，
+  非任何落盘文件）；发送前对 r3 metrics.json 逐项核正为实值
+  （0.7459/0.7438/0.826/0.6162；caption P=1.0 R=0.1111 F1=0.2；
+  reference P=0.8889 R=0.7273 F1=0.8）并把 r4 实测并入。简报
+  未中转，读者拿到的是核正版；教训：**简报内数字一律从落盘
+  metrics 文件现读，不引用记忆/摘要值**。
+- **push 积压**：adoption 3 笔（8110228 §196 / 8fc8585 W4 搬运
+  +§197 / 本 §198）+ main 1 笔（ce082f9）待批（r90 简报 §7-6
+  已含请求）。
+- **自跑线背景**：R2171（锚 103，f 侧）+ R2172（锚 104，e 侧，
+  g2 归因通道武装未触发——ce082f9 恰 5 文件全不在 25 探针面，
+  零失配）完成；两轮 push 网络窗断积压 ahead 2；R2173（f 侧，
+  锚 105）配额窗后已 spawn。
+- **NOTES_CONFIRMATION 窗口今日 23:59:59Z 到期**：尚无补填；
+  到期处置 = 转 NOTES_CONFIRMATION_UNAVAILABLE（一次性提醒已排
+  10-23 09:47，状态机按 register 条目 1 执行，不解除 freeze、
+  不动 credential）。
