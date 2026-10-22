@@ -90,6 +90,12 @@ _FIGURE_CAPTION_RE = re.compile(
 
 CAPTION_MAX_GAP_PT = 50.0
 
+# W5 几何表格门（r89 Path A 第二步；design/w5-table-detection-spec-v1.md
+# §3.1/§8.7——常数在 dev 上零反例，测试守护见 tests/test_w5_table_gates.py）
+TABLE_FIGURE_OVERLAP_DROP_FRAC = 0.5
+TABLE_MIN_WORDS = 4
+TABLE_MIN_ROWS = 2
+
 
 def _is_figure_caption(el: Element) -> bool:
     return el.type == "caption" and bool(
@@ -583,6 +589,112 @@ _VECTOR_FIGURE_MIN_W = 100.0
 _VECTOR_FIGURE_MIN_H = 100.0
 
 
+# ---------- W5 几何表格门（r89 Path A 第二步；规格
+# design/w5-table-detection-spec-v1.md §3.1 排除 + §5.2 归属）----------
+
+def _bbox_intersection_area(a: list[float], b: list[float]) -> float:
+    """两 bbox [x0, top, x1, bottom] 交集面积（不相交为 0）。"""
+    w = min(a[2], b[2]) - max(a[0], b[0])
+    h = min(a[3], b[3]) - max(a[1], b[1])
+    return w * h if (w > 0 and h > 0) else 0.0
+
+
+def _max_overlap_frac(
+    bbox: list[float], boxes: list[list[float]]
+) -> tuple[float, int]:
+    """bbox 与 boxes 的最大交集面积 / bbox 自面积；返回 (frac, 命中
+    索引，无命中 -1)。只做几何对照，不消费 boxes 的分类语义（§8.3
+    解耦约束）。"""
+    area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
+    if area <= 0:
+        return 0.0, -1
+    best_frac, best_idx = 0.0, -1
+    for i, ob in enumerate(boxes):
+        frac = _bbox_intersection_area(bbox, ob) / area
+        if frac > best_frac:
+            best_frac, best_idx = frac, i
+    return best_frac, best_idx
+
+
+def _gate_pdf_table(
+    bbox: list[float],
+    rows_count: int,
+    cols_count: int,
+    words_inside: int,
+    raster_bboxes: list[list[float]],
+    vecfig_bboxes: list[list[float]],
+) -> tuple[bool, dict[str, Any] | None, bool]:
+    """两道确定性门 + 部分相交披露（规格 §3.1/§4）。
+
+    返回 (accepted, partial_overlap_warning_details|None,
+    partial_coverage)。规则序：图重叠 ≥ TABLE_FIGURE_OVERLAP_DROP_FRAC
+    弃 → 最小实体性（words_inside < TABLE_MIN_WORDS 或
+    rows < TABLE_MIN_ROWS）弃 → 0 < frac < 阈值 保留并披露部分相交 →
+    partial_coverage = words_inside < rows×cols（贫富对照，仅披露）。
+    无 cols≥2 约束——dev 唯一真表为 3×1（多行合并单元格线性化）。"""
+    frac_r, _ = _max_overlap_frac(bbox, raster_bboxes)
+    frac_v, _ = _max_overlap_frac(bbox, vecfig_bboxes)
+    if frac_r >= frac_v:
+        frac, family = frac_r, "raster"
+    else:
+        frac, family = frac_v, "vector"
+    if frac >= TABLE_FIGURE_OVERLAP_DROP_FRAC:
+        return False, None, False
+    if words_inside < TABLE_MIN_WORDS or rows_count < TABLE_MIN_ROWS:
+        return False, None, False
+    warn = None
+    if frac > 0:
+        warn = {"frac": frac, "family": family}
+    partial_coverage = words_inside < rows_count * cols_count
+    return True, warn, partial_coverage
+
+
+def _word_center_in_bbox(w: dict, bbox: list[float]) -> bool:
+    xc = (float(w["x0"]) + float(w["x1"])) / 2
+    yc = (float(w.get("top", 0.0)) + float(w.get("bottom", 0.0))) / 2
+    return bbox[0] <= xc <= bbox[2] and bbox[1] <= yc <= bbox[3]
+
+
+def _caption_protected_indices(words: list[dict]) -> set[int]:
+    """题注词保护（规格 §5.2(3)：题注不吸收）。
+
+    与 _group_words_to_paragraphs 同款行聚类（按 (y 中心, x0) 排序，
+    |Δy 中心| ≤ 3.0 逐次均值合并），行文本命中 _is_caption → 该行
+    全部词（按原列表下标）免于表格吸收。保护集 ⊇ W4 行级切分会提升
+    的行——被保护行词从不出池，后续重聚类的行切分测试同一正则。
+    多行题注的续行（单独不过 _is_caption）不在保护集，为已披露边界
+    （dev 语料无题注行落入表 bbox 的形态）。"""
+    def y_center(i: int) -> float:
+        w = words[i]
+        return (float(w.get("top", 0.0)) + float(w.get("bottom", 0.0))) / 2
+
+    order = sorted(range(len(words)), key=lambda i: (y_center(i), words[i]["x0"]))
+    protected: set[int] = set()
+    line: list[int] = []
+    cur_y: float | None = None
+
+    def flush() -> None:
+        if not line:
+            return
+        text = " ".join(
+            words[i]["text"] for i in sorted(line, key=lambda i: words[i]["x0"])
+        ).strip()
+        if _is_caption(text):
+            protected.update(line)
+
+    for i in order:
+        yc = y_center(i)
+        if cur_y is None or abs(yc - cur_y) <= 3.0:
+            line.append(i)
+            cur_y = yc if cur_y is None else (cur_y + yc) / 2
+        else:
+            flush()
+            line = [i]
+            cur_y = yc
+    flush()
+    return protected
+
+
 def _vector_figure_clusters(page) -> list[list[float]]:
     """识别页面上的矢量图形簇（批次 15，Option A 裁决）。
 
@@ -676,6 +788,102 @@ def _parse_pdf(
                         )
                     )
                     words = []
+                # W5（r89 Path A 第二步）：几何表格检测提前于段落分组
+                # （规格 §5.2(1)）——接受表 bbox 从词池吸收表体词（词
+                # 中心入 bbox 且非题注保护词），剩余词再进段落分组，
+                # 消除表体文本双轨重复（§5.1）。元素发射次序不变
+                # （段落/题注 → 表 → 图）。
+                try:
+                    vector_bboxes = _vector_figure_clusters(page)
+                except Exception as e:
+                    vector_bboxes = []
+                    warnings.append(
+                        WarningRecord(
+                            code="pdf_vector_cluster_failed",
+                            reason=f"page {page_idx} 矢量图聚类失败: {e}",
+                            details={"page": page_idx},
+                        )
+                    )
+                try:
+                    raster_bboxes = [
+                        [
+                            float(im["x0"]),
+                            float(im["top"]),
+                            float(im["x1"]),
+                            float(im["bottom"]),
+                        ]
+                        for im in (page.images or [])
+                        if float(im.get("x1", 0)) > float(im.get("x0", 0))
+                        and float(im.get("bottom", 0)) > float(im.get("top", 0))
+                    ]
+                except Exception:
+                    raster_bboxes = []
+                accepted_tables: list[
+                    tuple[list[Any], int, int, list[float] | None, bool]
+                ] = []
+                if words:
+                    protected = _caption_protected_indices(words)
+                    try:
+                        tbls = page.find_tables() or []
+                    except Exception:
+                        tbls = []
+                    absorbed: set[int] = set()
+                    for tbl in tbls:
+                        try:
+                            rows = tbl.extract() or []
+                        except Exception:
+                            rows = []
+                        if not rows:
+                            continue
+                        tbl_bbox = getattr(tbl, "bbox", None)
+                        if not tbl_bbox:
+                            continue
+                        tbl_bbox = list(tbl_bbox)
+                        inside = [
+                            i
+                            for i in range(len(words))
+                            if i not in protected
+                            and i not in absorbed
+                            and _word_center_in_bbox(words[i], tbl_bbox)
+                        ]
+                        accepted, po_warn, partial_cov = _gate_pdf_table(
+                            tbl_bbox,
+                            len(rows),
+                            max((len(r) for r in rows), default=0),
+                            len(inside),
+                            raster_bboxes,
+                            vector_bboxes,
+                        )
+                        if not accepted:
+                            continue
+                        absorbed.update(inside)
+                        accepted_tables.append(
+                            (rows, len(rows),
+                             max((len(r) for r in rows), default=0),
+                             tbl_bbox, partial_cov)
+                        )
+                        if po_warn is not None:
+                            warnings.append(
+                                WarningRecord(
+                                    code="table_figure_partial_overlap",
+                                    reason=(
+                                        f"page {page_idx} 表格与"
+                                        f"{'栅格图' if po_warn['family'] == 'raster' else '矢量图'}"
+                                        f"部分相交 frac={po_warn['frac']:.3f}"
+                                        "（保留，不截 bbox）"
+                                    ),
+                                    details={
+                                        "page": page_idx,
+                                        "frac": po_warn["frac"],
+                                        "family": po_warn["family"],
+                                        "bbox": tbl_bbox,
+                                    },
+                                )
+                            )
+                    if absorbed:
+                        words = [
+                            w for i, w in enumerate(words) if i not in absorbed
+                        ]
                 page_captions: list[tuple[list[float] | None, str | None]] = []
                 for para in _group_words_to_paragraphs(words):
                     text = para["text"].strip()
@@ -739,23 +947,20 @@ def _parse_pdf(
                                 metadata=host_meta,
                             )
                         )
-                # 表格
-                try:
-                    tbls = page.find_tables() or []
-                except Exception:
-                    tbls = []
-                for tbl in tbls:
-                    try:
-                        rows = tbl.extract() or []
-                    except Exception:
-                        rows = []
-                    if not rows:
-                        continue
+                # 表格（W5：发射已过门的接受表——检测/吸收已在段落
+                # 分组前完成，此处仅产出元素，次序不变）
+                for rows, row_count, col_count, tbl_bbox, partial_cov in accepted_tables:
                     md = _rows_to_markdown(rows)
-                    tbl_bbox = getattr(tbl, "bbox", None)
                     tbl_locator: dict[str, Any] = {"family": "page_geometry", "page": page_idx}
                     if tbl_bbox:
                         tbl_locator["bbox"] = list(tbl_bbox)
+                    tbl_meta: dict[str, Any] = {
+                        "row_count": row_count,
+                        "col_count": col_count,
+                        "source": "pdfplumber",
+                    }
+                    if partial_cov:
+                        tbl_meta["partial_coverage"] = True
                     elements.append(
                         Element(
                             element_id=f"{document_id}::e{len(elements):04d}",
@@ -764,11 +969,7 @@ def _parse_pdf(
                             parent_id=None,
                             source_locator=tbl_locator,
                             confidence=0.7,
-                            metadata={
-                                "row_count": len(rows),
-                                "col_count": max((len(r) for r in rows), default=0),
-                                "source": "pdfplumber",
-                            },
+                            metadata=tbl_meta,
                         )
                     )
                 # 图片
@@ -840,17 +1041,7 @@ def _parse_pdf(
                         )
                     )
                 # 矢量图形（批次 15）：曲线聚类检测，镜像栅格发射路径
-                try:
-                    vector_bboxes = _vector_figure_clusters(page)
-                except Exception as e:
-                    vector_bboxes = []
-                    warnings.append(
-                        WarningRecord(
-                            code="pdf_vector_cluster_failed",
-                            reason=f"page {page_idx} 矢量图聚类失败: {e}",
-                            details={"page": page_idx},
-                        )
-                    )
+                #（W5：聚类已在页首上提计算（表格门需要），此处复用）
                 for vb in vector_bboxes:
                     vec_element_id = f"{document_id}::e{len(elements):04d}"
                     vec_locator: dict[str, Any] = {
