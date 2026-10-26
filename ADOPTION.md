@@ -10669,3 +10669,86 @@ GPT 5.6 回执）。
 - **自跑线**：R2173 第三次尝试运行中（f 侧记账轮，锚 105，
   push 将携带 R2171/R2172 ahead-2 积压；前两次中断零残留已
   核查，见 §199）。
+
+## §201 r91 裁决执行回执：r5 = EXECUTED_AND_GATE_PASS / 晋级暂挂双 blocker、push 8 笔全部完成、三项 errata 登记、provenance audit 启动、v2b 启动批准（2026-10-26）
+
+- **裁决到件**：r91 裁决回执（2026-10-26）。逐项执行如下。
+- **r5 定位**：`r5 = EXECUTED_AND_GATE_PASS`（gate PASS 零劣化结论
+  有效）；**baseline 晋级暂挂**（`BASELINE_PROMOTION_HELD_PENDING_
+  ACCEPTANCE_CLOSURE`），现行 accepted baseline 维持 **r4**。双
+  blocker：① r89 不变量 B 的 274-token residual 未闭合；② split
+  cardinality 文书冲突——**②本回执已闭合**（见 errata 项），①
+  audit 在途（见下）。
+- **R-2(a) 不变量 B**：不降格为 known limitation——批准
+  `W5_B_PROVENANCE_AUDIT = APPROVED_DEV_ONLY`（21 residual 页，
+  char 级 provenance：absorbed word 源 chars 是否 100% 进入
+  accepted table 输出语义；禁 fuzzy/编辑距离/人工容差）。自动
+  裁决分支：全覆盖 → `KNOWN_EXTRACTION_CHANNEL_DIVERGENCE =
+  ACCEPTED` + `W5_invariant_B = SATISFIED_BY_SOURCE_PROVENANCE`
+  → r5 晋级 blocker 自动解除；有真实缺失 →
+  `W5_WORD_OWNERSHIP_DATA_LOSS` → parser fix 走新 revision
+  （编号按实际顺序，geometry fix 可能占 r6、text 顺延）。
+- **R-2(b) Layer C 收缩**：登记 `W5_GEOMETRY_RELATION_RECALL_
+  CONTRACTION = ACCEPTED_KNOWN_TRADEOFF`；ROOT_CAUSE =
+  `TABLE_TARGET_AVAILABILITY_AFTER_FALSE_TABLE_CLEANUP`（TP
+  11/20→7/20，−4 全部在 reference 面 8/11→4/11；caption 面
+  3/9 不变；precision 全守 1.0）；**不授权 relation/caption
+  补链**（table-detection recall debt 不得藏进 relation
+  heuristic，真实表恢复优先由 text-based 路线解决——与
+  r90/r91 分层归因一致）。
+- **R-3 真表损失**：登记 `KNOWN_TRUE_TABLE_GATE_DROP`（tech-01
+  comparison 0.7553→0.7189 ≈ −4.82%；prod-02 holdout 0.999→
+  0.9789 ≈ −2.01%；不推翻 comparison aggregate gate）；
+  批准 `W5_GATE_FALSE_NEGATIVE_EQUIVALENT_DEV_STUDY`（严格
+  dev-only：仅用 dev 既有 gold/accepted/rejected/gate
+  diagnostics；**禁**开 tech-01 p55 / prod-02 28 表做归因、
+  禁据 protected 版式设计规则；r91 评测通道暴露的损失只作
+  问题存在性证据）。结果分支：dev 有等价 population → 起草
+  RFC 再请裁；无 → `NO_DEV_EVIDENCE_FOR_GATE_CHANGE` 接受。
+  gate1 = 0.5 继续冻结。
+- **authority chronology 修正（§六）**：r5 执行授权 = **r89**
+  （`authority_at_execution = r89`）；r90 = 后续确认 + 范围保持
+  （`subsequent_confirmation_and_scope_preservation`）——§199/
+  §200 中"r90 §十二 路径"表述以此为准修正，无未来裁决倒灌。
+- **三项 record-integrity errata（§7）**：notes_register 第 5
+  条 `RECORD_INTEGRITY_ERRATA_R91`（accepted per r91 §6/§7）：
+  (a) split cardinality——manifest 实测（sha256 51d3d4…与
+  credential pin 一致）= **dev 14 / comparison 4 / holdout 6**
+  （另 3 条目无 split 字段不进评测：manifest 27 条 vs 评测 24
+  篇）；r91 简报 §1 的 14/6/4 为 prose erratum；r5 per_doc
+  split 计数 14/4/6 与 manifest 全等——评测消费即冻结 split，
+  r5 有效性无碍；(b) revision chain 更正 = r1 pre-W1 → r2 W1
+  → r3 W1+W2 → r4 W4 → r5 W5 geometry；(c) authority
+  chronology（上述）。register re-pin 478c8c83→**399c0dd9**
+  b5d9c947c1a8b401ea8bcb06ec5d287f20ec5a61c97e1913da86c634；
+  credential 435262… / manifest 9257e4… 双 pin 核验未动；
+  全 18 行哈希重验 OK。**r5 晋级 blocker ②就此闭合**。
+- **R-4 push 完成（§十/§十一/§十二）**：r91 §十一 计数勘误
+  接受（"6 笔同批"算术错 → 正确 = **adoption 6 + main 2 = 8
+  commits**）。网络窗重开后一次性 FF 完成：adoption
+  `2c4567c..9de068c`（8110228/8fc8585/3b343e1/d887aa2/
+  27b6af6/9de068c 六笔）；main `e519f6c..70a1ad8`（ce082f9/
+  70a1ad8 两笔）。**R90_PUSH = COMPLETE_BY_ANCESTRY**（3b343e1
+  是 adoption final tip 9de068c 的祖先；ce082f9 是 main final
+  tip 70a1ad8 的祖先——§十二 ancestry 判据达成，无需两段
+  push）；R91_PUSH = COMPLETE。两 remote tip 登记：adoption =
+  9de068c、main = 70a1ad8。21:43 重试 cron 已删（无必要）。
+- **R-6 v2b 启动批准**：`W5_TEXT_V2B = DEV_INVESTIGATION_AND_
+  SPEC_IN_PROGRESS`——11 项授权面（one-to-one matcher /
+  tie-break 看结果前冻结 / coverage 与 object P/R 分栏 /
+  stacked 处置（优先方案 B ambiguity reject）/ caption
+  swallow=0 / 7 页 fragmentation 逐页归因 / A–E / gate1 原样 /
+  tolerance 1.5 冻结 / runtime / FP taxonomy）；严格 dev-only、
+  无 parser implementation 授权、不触发 r6、完成后再呈报。
+- **r5 自动晋级判据（§八）登记**：audit 无真实 data loss +
+  cardinality 修正完成（✓）→ 自动登记 `r5 = ACCEPTED /
+  CURRENT_BASELINE`，无需重跑、无需再请裁。
+- **NOTES_CONFIRMATION 回执接受（§九）**：transitioned_at
+  （2026-10-26 执行日）与 deadline（2026-10-22T23:59:59Z 截止
+  事实）分立不混写——register 条目已按此登记；迟到确认未来
+  仅作历史材料附加。
+- **自跑线**：R2174（e 侧，锚 106 连）完成——fetch 网络窗重开
+  rc 0、collect 两跑 92365、e 侧三组电池全 PASS（g1a 分支样本
+  零漂移 / g2 探针 24/24 / g3 清点 1306→1312 精确闭包三跑三
+  同）、**push 成功 7aabfbf..97a5b7b 携 5 提交积压清零**；
+  超时 65 分钟连续第二轮披露（下轮模板预生成建议在案）。
