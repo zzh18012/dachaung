@@ -10591,3 +10591,81 @@ GPT 5.6 回执）。
   已过）——残留核查完成：autonomous tip 仍 1cbf878（R2172），
   main 场地 reflog 自恢复至 70a1ad8 干净，树内 Temp/ 为 9-30
   D52/D53 旧草稿非本轮产物；本轮末重 spawn（锚 105，f 侧）。
+
+## §200 r90 裁决执行回执：W4 SATISFIED / r4 ACCEPTED、text v2 退回 v2b（十项清单）、tolerance 1.5 冻结、gate1 不动、NOTES_CONFIRMATION 超窗转换执行、push 批准暂挂网络窗（2026-10-26）
+
+- **裁决到件**：r90 裁决回执（2026-10-25，基于 r4 时点 r90 简报）。
+  逐项执行登记如下；裁决全文要旨与 §196（r89）衔接一致。
+- **W4 正式收口**：W4-C pre-merge gate 数字复核无矛盾（dev-14 审计
+  13,457 条、old match 49 / new 48 / flip 1〔已确认 narrative FP〕
+  / TP loss 0）→ `W1_WHITESPACE_DELIMITER_TIGHTENING =
+  SATISFIED_AND_IMPLEMENTED`；W4 ce082f9 实现范围符合授权。
+- **r4 = ACCEPTED / CURRENT_BASELINE**：UAA comparison
+  0.7356→0.8297（+12.79%）/ overall 0.7459→0.8087（+8.42%）/
+  gate 0 regression PASS；caption edge P=1.0 R=3/9 F1=0.5、
+  reference edge P=1.0 R=8/11 F1=0.8421、relation P=1.0 R=11/20
+  F1=0.7097 与 §198 记录一致；`anchor_classification_
+  methodology_v2 = FORMALLY_EFFECTIVE_FROM_R4`（v1 0.2 与 v2 0.7
+  禁止同方法时序比较——维持）。
+- **W4 residual LoF**：`W4_LOF_FALSE_POSITIVE = KNOWN_RESIDUAL`
+  （TP 28 / FP 9 / FP rate 9/37=24.32%，8/9 为 List-of-Figures
+  导航项）；`W4_LOF_GUARD = NOT_AUTHORIZED_IN_R90`——不得借
+  W5 实施顺带改 caption grammar；未来可独立立案。
+- **r90-Q1 text v2 = RETURNED_FOR_V2B**：调查 ACCEPTED_
+  COMPLETE、实现暂不批准；阻断点 = table object identity /
+  ownership 语义未闭合——现 matcher 允许 candidate→gold 一对多
+  （tl_xtr1_5：11 matched candidates 覆盖 14 gold anchors；tt_
+  default：12 candidates 覆盖 16 anchors），14/16 只能称
+  `nominal_gold_anchor_coverage` 非 `table_instance_recall`。
+  v2b 十项最小清单（§十三）：① one-to-one object TP/FP/FN
+  ② object recall 与 nominal coverage 分栏 ③ 11→14 对应关系
+  ④ stacked 处置规则 ⑤ caption swallow=0 ⑥ 7 页 fragmentation
+  逐页归因 ⑦ A–E 全过 ⑧ gate1 原样 ⑨ tolerance 1.5 原样
+  ⑩ FP taxonomy 更新；dev-only、comparison/holdout 零读取。
+- **r90-Q2**：`text_x_tolerance = 1.5PT_DEV_SELECTED_FROZEN_
+  CANDIDATE`；文案修正为"1.5pt = 50% of the 3pt default /
+  50% reduction"；冻结后不再 sweep（1.4/1.6/1.8 禁）；若后续
+  改词生成机制须另行呈报不得静默重调。
+- **r90-Q3**：`stacked_table_merge = IMPLEMENTATION_BLOCKER`；
+  两案：A deterministic split（须证不制新 FP）/ B ambiguity
+  reject（跨多 caption/anchor 区 → ambiguous_stacked_table，
+  不发射、不取 ownership、不吞 caption、不贡献多 TP）——GPT
+  倾向 B（语义安全优先于追回两张 dev 表）。
+- **r90-Q4**：`gate1 = UNCHANGED`（≥0.5 reject 原样；无
+  text-specific bypass / header-pattern exception / 阈值调整）；
+  `acad06_tab6 = KNOWN_GATE1_FALSE_NEGATIVE`（in_vecfig_frac=
+  0.647 误杀，登记不改门——7 个 vector-figure internal 候选
+  被拦 vs 1 个 dev FN，收益/风险不成立）。
+- **r90-Q5**：revision 分序确认 `geometry→r5 / text-if-
+  approved→r6`，禁止合并 revision、禁止 text patch 混入 r5。
+  **时序说明**：裁决基于 r4 时点简报起草，而 W5 geometry→r5
+  已于裁决日期前（2026-10-22）按 r89 授权 + §十二 minimal
+  compatibility verification 路径完成（四面复验超出 minimal
+  要求：插入点/两门/A–E/W4 假设全核），r5 gate PASS 零劣化
+  （§199 已记账）——与 §十二"无需再次申请 geometry 实现授权"
+  自洽；r5 全数字于 r91 简报向 GPT 补报。
+- **合并方向（§十一）**：未来 text 获批走 geometry-first /
+  text-fallback-per-page（否决 union+overlap dedup）——仅
+  architecture direction，本轮无实现授权。
+- **NOTES_CONFIRMATION 超窗转换执行（本回执，r90 §十五）**：
+  截止 2026-10-22T23:59:59Z 无补填（确认书仍为未填模板，占位
+  省略号 + 空签名；此前一次性提醒随旧会话消亡未触发）——按
+  r83 Q3 状态机正式转换：notes_register.json entry 1
+  status → `NOTES_CONFIRMATION_UNAVAILABLE`（unavailable_
+  reason/transitioned_at/transition_authority/freeze_effect
+  写入）；hashes.sha256 第 18 行 re-pin 4a89a07f→**478c8c83**
+  c4d5c6ffcf3625084807e037304cffd093d3451223c8acca4bc7ada8；
+  gold_credential.json 435262… 与 manifest.json 9257e4… 双 pin
+  逐一核验未动；其余 16 个 freeze 文件哈希重验 NONE mismatch；
+  不解除 freeze、不触发 gold/evaluation revision。确认书
+  填写区原样保留（未来补填仅作历史材料，超窗事实不回改）。
+- **push（r90 §十四批准 3+1）**：adoption 8110228/8fc8585/
+  3b343e1（remote tip 目标 3b343e1）+ main ce082f9——执行时
+  两侧 443 网络窗断（Connection reset / connect fail 各
+  ~21s），**暂挂**；重试排程 session cron 8869883a（今晚
+  21:43，P34'' 成功窗先例）；显式 SHA refspec、FF only、
+  绝不 force；**不夹带** r90 未列的 d887aa2/27b6af6
+  （adoption）与 70a1ad8（main）——该三笔留 r91 简报请求。
+- **自跑线**：R2173 第三次尝试运行中（f 侧记账轮，锚 105，
+  push 将携带 R2171/R2172 ahead-2 积压；前两次中断零残留已
+  核查，见 §199）。
