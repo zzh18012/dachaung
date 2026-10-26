@@ -10789,3 +10789,69 @@ GPT 5.6 回执）。
   回归段落轨（文本保持可见，无双轨——表输出本不含它们）。
   预期面变化：吸收词数下降 → 段落轨保留更多 → 需 dev-14 验收
   四面 + r6 全量复验。
+
+## §203 r92 裁决执行回执：DATA_LOSS 正式 CONFIRMED、cell-semantic 谓词获批（word-center 版否决）、A–F 硬验收门 + r6 自动授权（gate=r4/归因=r5 双层）、push 2 笔批准暂挂网络（2026-10-26）
+
+- **裁决到件**：r92 裁决回执（2026-10-26，全文存档 outputs/
+  gpt_brief_r92_ruling_reply.txt）。逐项执行如下。
+- **audit 与定性确认**：`W5_B_PROVENANCE_AUDIT = COMPLETE`、
+  `W5_WORD_OWNERSHIP_DATA_LOSS = CONFIRMED`（1867/10570=17.7%
+  复算无误）；根因表述升级 = **ownership domain > emitted cell
+  domain**（paragraph 删除了没有任何 table cell 接管的字符）；
+  §199 旧解释已被 §202 覆盖，处理被接受。
+- **r5 最终历史定位（R-4）**：`r5 = EXECUTED_AND_GATE_PASS /
+  HISTORICAL_NON_BASELINE`；`r5_baseline_promotion =
+  CLOSED_FAILED_ACCEPTANCE_CONTRACT`（非 DEFERRED 非 WAITING_FIX
+  ——修的是新 revision 不回改 r5）；r5 的 gate/Layer B/C 数字、
+  cleanup 归因、DATA_LOSS 发现全部保留有效不回算。**current
+  accepted baseline 维持 r4**。
+- **R-1 fix 实现批准（谓词修改版）**：word-center-in-cell 版
+  **否决**（NeverSend. 尾字符反例——word center 在 cell 而
+  尾 char midpoint 在 cell 外，整词删除则 cell 输出缺尾字符，
+  invariant B 仍不为 0）。获批谓词：
+  `absorb(word, table) iff ∀ char ∈ source_chars(word),
+  ∃ cell ∈ table.cells : char_midpoint ∈ cell`
+  —— 与 Table.extract() 同语义（char 级 midpoint 判定）；
+  边界半开区间 `x>=x0, x<x1, y>=top, y<bottom`（与 pdfplumber
+  一致，禁闭区间/epsilon）；实现可复用 word source-char
+  provenance 或证明等价的确定性实现；**禁止 fallback 到
+  word-center 近似**（拿不到可靠 provenance 即停 merge 重报）。
+  状态机：`W5_CELL_SEMANTIC_WORD_OWNERSHIP_FIX =
+  IMPLEMENTATION_APPROVED`。
+- **§八 partial-cell 诊断新增强制项**：`PARTIAL_CELL_WORD_
+  RETENTION`（词部分 chars 在 cell 内而整词保留段落——partial
+  duplication 非 data loss）：至少报 count/page/doc/word/
+  covered char count/uncovered char count；非自动 blocker 但
+  不得隐藏；系统性大量则进 r6 前暂停重报。原则：**loss
+  avoidance > aggressive deduplication**。
+- **§九 dev acceptance 硬门 A–F**：A 无 owned-word duplication；
+  B zero ownership data loss（source-char deficit **硬 0**，
+  不接受"只剩 1 字符/比例小/punctuation/低于阈值"）；C
+  rejected isolation；D caption preservation；E conservation
+  确定性分解 table-owned + paragraph-owned 无无主内容；F
+  partial-cell 诊断披露。A–F 全过 → **r6 五步自动授权**
+  （无需再请裁）。
+- **r6 comparator 双层**：正式 gate = **r6 vs r4**（comparison
+  regression gate + baseline promotion 判定）；归因 = **r6 vs
+  r5**（cell-semantic fix 相对 broken geometry 改变了什么）。
+  r6 promotion 路径：A–F + Layer A + gate PASS + 无新 blocking
+  → 呈报 `ACCEPTED_BASELINE_CANDIDATE`，r6 回执裁定正式晋级；
+  不得因"修 bug"跳过 full evaluation。
+- **R-2 排序批准**：`geometry ownership fix → dev acceptance →
+  r6 → gate-FN equivalent study → text v2b`（fix 是 baseline
+  blocker 优先；v2b 依赖 A–E，先修 ownership contract 归因更
+  干净）。revision 编号：fix → r6；text v2 若获批且中间无其他
+  revision → r7（不人为保留）。
+- **R-3 push 批准（adoption 2 笔 be44ace/2b78d60，FF/非强推）**：
+  执行时网络窗断（443 connect fail ~21s）→ `APPROVED_WAITING_
+  NETWORK`（授权不撤销不违规）；重试排程 session cron 14:07；
+  若本地 tip 届时已超 2b78d60，按"不夹带裁决后新 commit"用
+  显式 SHA refspec 推进到 2b78d60。
+- **不授权清单（r92 明示）**：word-center-only patch、任何非零
+  source-char deficit 作 invariant-B 通过、gate1 调整、
+  comparison/holdout 参数诊断、relation 补链、text-v2 parser
+  implementation、LoF guard、gold/freeze revision。
+- **执行排程**：本回执后立即开始 main 侧 fix 实现（谓词修改版
+  + 单测），目标 R2175 自跑锚窗（13:43 spawn）前完成提交保持
+  main 干净；随后 dev acceptance A–F 探针 → r6 五步 → r93
+  简报呈报 baseline candidate。
