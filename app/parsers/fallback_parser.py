@@ -655,6 +655,30 @@ def _word_center_in_bbox(w: dict, bbox: list[float]) -> bool:
     return bbox[0] <= xc <= bbox[2] and bbox[1] <= yc <= bbox[3]
 
 
+def _char_midpoint_in_cell(char: dict, cell: list[float]) -> bool:
+    """与 pdfplumber Table.extract 的 char_in_bbox 同源判据（r92 §六）：
+    字符自身 bbox 中点，半开区间 [x0,x1)×[top,bottom)。"""
+    h_mid = (float(char["x0"]) + float(char["x1"])) / 2
+    v_mid = (float(char["top"]) + float(char["bottom"])) / 2
+    return cell[0] <= h_mid < cell[2] and cell[1] <= v_mid < cell[3]
+
+
+def _word_chars_in_table_cells(w: dict, cells: list[list[float]]) -> bool:
+    """cell-semantic 吸收判据（r92 获批谓词）：词的全部 source chars
+    逐字符 midpoint-in-cell（该表任一真实 cell）才允许整词移出段落
+    池。word["chars"] 来自 extract_words(return_chars=True)——官方
+    word→chars provenance，与 Table.extract 的 cell 装配同源，保证
+    absorbed source-char domain ⊆ emitted cell domain。缺 provenance
+    的词保守不吸收（r92 §六禁 fallback 到词中心近似）。"""
+    chars = w.get("chars")
+    if not chars:
+        return False
+    return all(
+        any(_char_midpoint_in_cell(c, cell) for cell in cells)
+        for c in chars
+    )
+
+
 def _caption_protected_indices(words: list[dict]) -> set[int]:
     """题注词保护（规格 §5.2(3)：题注不吸收）。
 
@@ -778,7 +802,9 @@ def _parse_pdf(
             for page_idx, page in enumerate(pdf.pages, start=1):
                 # 文本段落
                 try:
-                    words = page.extract_words(keep_blank_chars=False, use_text_flow=False)
+                    words = page.extract_words(
+                        keep_blank_chars=False, use_text_flow=False,
+                        return_chars=True)
                 except Exception as e:
                     warnings.append(
                         WarningRecord(
@@ -839,12 +865,16 @@ def _parse_pdf(
                         if not tbl_bbox:
                             continue
                         tbl_bbox = list(tbl_bbox)
+                        tbl_cells = [
+                            list(c) for c in (getattr(tbl, "cells", None) or [])
+                        ]
                         inside = [
                             i
                             for i in range(len(words))
                             if i not in protected
                             and i not in absorbed
                             and _word_center_in_bbox(words[i], tbl_bbox)
+                            and _word_chars_in_table_cells(words[i], tbl_cells)
                         ]
                         accepted, po_warn, partial_cov = _gate_pdf_table(
                             tbl_bbox,

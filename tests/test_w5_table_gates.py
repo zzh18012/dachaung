@@ -14,8 +14,10 @@ from app.parsers.fallback_parser import (
     TABLE_MIN_WORDS,
     _bbox_intersection_area,
     _caption_protected_indices,
+    _char_midpoint_in_cell,
     _gate_pdf_table,
     _word_center_in_bbox,
+    _word_chars_in_table_cells,
 )
 
 BBOX = [0.0, 0.0, 100.0, 100.0]
@@ -180,3 +182,69 @@ def test_word_center_in_bbox():
     assert not _word_center_in_bbox(_w("out", 110, 120, 10, 20), bbox)
     # 词中心恰在边界上 → 含入（闭区间）
     assert _word_center_in_bbox(_w("edge", 90, 110, 40, 60), bbox)
+
+
+# ---------- cell-semantic 吸收判据（r92 获批谓词） ----------
+
+def _c(x0: float, x1: float, top: float, bottom: float) -> dict:
+    return {"text": "x", "x0": x0, "x1": x1, "top": top, "bottom": bottom}
+
+
+def test_char_midpoint_half_open_boundaries():
+    cell = [0.0, 0.0, 100.0, 50.0]
+    # 中点恰在 x0/top → 含（>=）；恰在 x1/bottom → 不含（<）
+    assert _char_midpoint_in_cell(_c(-10.0, 10.0, 20.0, 30.0), cell)
+    assert _char_midpoint_in_cell(_c(88.0, 108.0, 20.0, 30.0), cell)
+    assert not _char_midpoint_in_cell(_c(100.0, 120.0, 20.0, 30.0), cell)
+    assert _char_midpoint_in_cell(_c(40.0, 60.0, -10.0, 10.0), cell)
+    assert not _char_midpoint_in_cell(_c(40.0, 60.0, 50.0, 70.0), cell)
+
+
+def test_word_chars_all_in_single_cell():
+    word = {
+        "text": "abc", "x0": 0, "x1": 30, "top": 0, "bottom": 10,
+        "chars": [_c(0, 10, 0, 10), _c(10, 20, 0, 10), _c(20, 30, 0, 10)],
+    }
+    assert _word_chars_in_table_cells(word, [[0, 0, 100, 50]])
+
+
+def test_word_chars_tail_outside_rejected():
+    # NeverSend. 反例形态：词中心与主体字符在 cell，尾字符中点在
+    # cell 外 → 整词不吸收（loss avoidance > aggressive dedup）
+    word = {
+        "text": "word.", "x0": 0, "x1": 52, "top": 0, "bottom": 10,
+        "chars": [
+            _c(0, 10, 0, 10), _c(10, 40, 0, 10),
+            _c(40, 52, 0, 10),   # 中点 46 在 cell x1=50 外？46<50——
+        ],
+    }
+    tail_out = {
+        "text": "word.", "x0": 0, "x1": 110, "top": 0, "bottom": 10,
+        "chars": [_c(0, 40, 0, 10), _c(90, 110, 0, 10)],  # 尾字符中点 100 ≥ 50
+    }
+    assert _word_chars_in_table_cells(word, [[0, 0, 50, 50]])
+    assert not _word_chars_in_table_cells(tail_out, [[0, 0, 50, 50]])
+
+
+def test_word_chars_spanning_two_cells_accepted():
+    # 词跨同一表的两个 cell：每字符各自有 cell 接管 → 整词吸收
+    word = {
+        "text": "ab", "x0": 0, "x1": 30, "top": 0, "bottom": 10,
+        "chars": [_c(0, 10, 0, 10), _c(25, 30, 0, 10)],
+    }
+    assert _word_chars_in_table_cells(word, [[0, 0, 15, 50], [20, 0, 40, 50]])
+
+
+def test_word_chars_no_provenance_rejected():
+    # 缺 chars provenance → 保守不吸收（r92 §六禁 fallback 近似）
+    bare = {"text": "x", "x0": 0, "x1": 10, "top": 0, "bottom": 10}
+    assert not _word_chars_in_table_cells(bare, [[0, 0, 100, 100]])
+    assert not _word_chars_in_table_cells({**bare, "chars": []}, [[0, 0, 100, 100]])
+
+
+def test_word_chars_empty_cells_rejected():
+    word = {
+        "text": "a", "x0": 0, "x1": 10, "top": 0, "bottom": 10,
+        "chars": [_c(0, 10, 0, 10)],
+    }
+    assert not _word_chars_in_table_cells(word, [])
