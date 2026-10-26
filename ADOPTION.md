@@ -10752,3 +10752,40 @@ GPT 5.6 回执）。
   零漂移 / g2 探针 24/24 / g3 清点 1306→1312 精确闭包三跑三
   同）、**push 成功 7aabfbf..97a5b7b 携 5 提交积压清零**；
   超时 65 分钟连续第二轮披露（下轮模板预生成建议在案）。
+
+## §202 W5-B provenance audit 回执：分支 B 成立——W5_WORD_OWNERSHIP_DATA_LOSS 实证（cell 网格缺口机制），r5 自动晋级路径失效，fix 方向 r92 呈报（2026-10-26）
+
+- **audit 执行**（r91 R-2(a) 授权；探针 samples/private/stage9-corpus/
+  review/_r91_b_provenance_audit.py；产物 outputs/w5_b_provenance_
+  audit_r91.{json,md}）：21 residual dev 页复现 W5 中间态（与
+  parser 同源调用形态 + 同常数 gate + 同吸收顺序），确定性字符
+  多重集包含性核验（absorbed 词字符 vs accepted 表 cell 文本
+  字符；零 fuzzy/编辑距离/容差）。
+- **判定：W5_WORD_OWNERSHIP_DATA_LOSS（r91 §三分支 B）**——
+  absorbed 10,570 字符中 deficit **1,867（17.7%）**，surplus 全
+  0；分布：tech-03 全部 19 页（24~443/页），tech-07 p3 deficit
+  1（'NeverSend.' 尾点，词跨 cell 边界截断），prod-06 p7 完整
+  网格表零 deficit（absorbed 122 = cell 122 全等）。
+- **机制（tech-03 p131 解剖实证）**：不完整网格表（斑马纹横线）
+  → pdfplumber cells 只覆盖有横线行段（11×3 表仅 n_cells=23）→
+  extract() 对缺失 cell 位置输出 None（偶数行序号/数量 '2',
+  '66,992','4','7,133'… 全为 None）→ W5 吸收判定用 table bbox
+  （覆盖全表区域）吸收了 cell 未覆盖区域的词 → 从段落池移除且
+  未进表输出。**absorbed 面（bbox 级）与输出面（cell 级）覆盖
+  缺口 = 真实静默丢弃**。
+- **§199 定性更正**：§199 曾将该 residual 定性为"双提取通道
+  口径差、非静默丢弃"——本审计证伪其'非静默丢弃'部分（表示
+  差异或仍占一部分，但存在真实丢弃主体）。token 级 residual
+  274 与字符级 deficit 1,867 的口径差 = token backstop 已匹配
+  部分 + 多重集计入全部 None 行内容。
+- **r5 晋级状态**：自动晋级路径失效（r91 §八前提①不满足）；
+  r5 维持 `EXECUTED_AND_GATE_PASS` 非 accepted baseline，
+  **r4 继续 CURRENT**。修复走 parser fix + 新 revision（条件 A；
+  编号按实际顺序——geometry fix 若先行占 r6，text v2 顺延）。
+- **fix 方向（r92 呈报请求实现授权，本轮不实施）**：吸收条件
+  从"词中心入 table bbox"收紧为"词中心入该表某个 cell bbox"
+  （cell 级吸收：吸收面 ⊆ 输出面，不变量 B 语义直接闭合）；
+  完整网格表零影响（prod-06 p7 全等证据）；不完整网格缺口词
+  回归段落轨（文本保持可见，无双轨——表输出本不含它们）。
+  预期面变化：吸收词数下降 → 段落轨保留更多 → 需 dev-14 验收
+  四面 + r6 全量复验。
