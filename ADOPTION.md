@@ -10474,3 +10474,120 @@ GPT 5.6 回执）。
   到期处置 = 转 NOTES_CONFIRMATION_UNAVAILABLE（一次性提醒已排
   10-23 09:47，状态机按 register 条目 1 执行，不解除 freeze、
   不动 credential）。
+
+## §199 r89 Path A 第二步收口：W5 几何表格门 main 实现 + adoption 搬运 + dev-14 验收四面 + r5 全量评测 gate PASS 零劣化（r5 = 新 accepted baseline）
+
+- **触发**：r89 裁决 §六 路径 A 第二步——W5 几何版在 W4/r4 之后
+  落地。r89 裁决回执（2026-10-16）本轮由用户全文转发复核，内容
+  与 §196 登记件逐项一致（W5 两过滤器措辞、无 cols≥2、缺省保
+  留、词级吸收 + 不变量 A-E、路径 A 排序、acad-03 = COMPROMISED_
+  BY_PRIOR_AUTHORIZED_EXPOSURE 固定锚不进 W4/W5 参数、P34''' 已
+  完成于 §196 波次）——无新增裁决项，执行链不变。
+- **四面兼容复验（main 场地占用期间以对象库读完成）**：产物
+  outputs/w5_compat_reverify_path_a.md——面1 插入点与元素序计划
+  COMPATIBLE；面2 题注保护强制规则 COMPATIBLE（保护集 ⊇ W4 提升
+  集，W4 收益不受吸收侵蚀）；面3 方向 COMPATIBLE；面4（dev 实收
+  面）需实现后重收——即本回执验收面。
+- **W5 main 实现（dachuang-code 70a1ad8，r89 Path A step 2）**：
+  - 常数（spec §8.7 守护，dev 零反例）：TABLE_FIGURE_OVERLAP_
+    DROP_FRAC=0.5 / TABLE_MIN_WORDS=4 / TABLE_MIN_ROWS=2；
+    test_w5_table_gates.py 18 例锁边界（含 3×1+16 词保留 = 无
+    cols 约束）。
+  - 纯函数面（无 PDF fixture 可单测）：_bbox_intersection_area /
+    _max_overlap_frac（纯几何，§8.3 解耦）/ _gate_pdf_table（顺
+    序：frac≥0.5 弃 → words<4 或 rows<2 弃 → 0<frac 部分相交
+    披露 {frac,family} → partial_coverage=words<rows*cols）/
+    _word_center_in_bbox（闭区间）/ _caption_protected_indices
+    （与 _group_words_to_paragraphs 同款行聚类，y 中心差 ≤3.0 滚
+    动均值，整行过 _is_caption 免吸收）。
+  - 主循环（_parse_pdf，find_tables → 过滤 → 仅 accepted 取词
+    所有权 → 中心入 bbox 移除 → 被拒表零吸收〔不变量 C〕→ 分组
+    → 输出，即 r89 §六 排序原文）：accepted_tables 缓冲（rows/
+    行列数/bbox/partial_cov），absorbed 集防跨表重复计词
+    〔不变量 A〕，题注行保护〔不变量 D〕，检测 gated behind
+    `if words:`（无词页等价最小实质门），元素序每页不变
+    （段落/题注 → 表 → 图 → 矢量图），_vector_figure_clusters 每
+    页一次提升复用；partial_coverage 仅触发时写 metadata。
+  - 测试全绿：5559 通过 / 4 跳过（含新增 18 例）。
+- **adoption 搬运（d887aa2）**：`git diff ce082f9 70a1ad8 --
+  app/parsers/fallback_parser.py` 干净 apply；唯一前存差异 r55
+  C08 docx 表 try/except 块保留；runner 登记 r5（BASELINE_PRED
+  r5→r4；PARSER_CODE_REVS r5 = main 70a1ad8 W5 几何门 + 词级吸收
+  + 题注保护）。
+- **dev-14 验收（探针 samples/private/stage9-corpus/review/
+  _r89_w5_acceptance.py；产物 outputs/w5_implementation_
+  acceptance_r89.{json,md}）**：
+  - **table 面：334 → 53（删 281 / 增 0）**；acad-4 假表面
+    12→1 与 spec §7 预言逐篇吻合（acad-04 5→0、acad-06 7→1）；
+    清理面点名：tech-06 130 个 TLP:CLEAR 横幅全灭（predicted_
+    tables 130→0）、tech-08 100→2、tech-03 349→310、tech-07 6
+    （TLP 横幅/base64 哈希团/代理描述混合）、prod-06 3、prod-01
+    cid 伪迹 1、prod-05 注记表 1。
+  - **acad-06 p6 双轨修复达成**：新 p6 含 'Configuration' 表
+    元素（'| Configuration |\n| --- |\n| Text Image DMAP |\n|
+    ✓ ✓ ✗<br>… |'），文本轨不再含表体词。
+  - **W4 稳定**：caption 60 持平；W1 收紧移除 0（对 r4 基线语
+    义正确）；去重护栏触发 0。
+  - **守恒（吸收感知版，不变量 E）**：<br> 单元格连接符剥离修
+    正后残差 **21 页 / 274 token**（tech-03 19 页 + tech-07 p3
+    1 + prod-06 p7 6）；根因 = pdfplumber Table.extract() 单元格
+    文本与 extract_words 在单元格边界/CJK 连跑处分叉（p71 字符
+    级核验 −416 字符；p213–217 每页 −90~−140/+30~+80）——
+    **不变量 B 部分偏离，量化披露**：吸收词并非逐词可在表输出
+    追溯，差异为两提取通道系统性口径差，非静默丢弃。
+  - **元素序**：38 页非 table 段序差异全部为吸收后段落重数
+    （heading↔paragraph 翻转、拆并），spec §6.2 机制内。
+  - **partial_overlap warning：0**（dev 无 0<frac<0.5 案例）；
+    **partial_coverage 释义性偏离披露**：spec §5.2(4) 点名
+    acad-06 p6 带状案例，但 rows×cols vs words 无法判定带状覆
+    盖（16 词 ≥ 3 格必不触发稀疏规则）——选用稀疏规则（确定性、
+    零新常数），偏离以 dual_track_check 面覆盖，留 r90 带去。
+- **r5 全量评测（五步，2026-10-22）**：prepare 24 docs / 817
+  hard boundaries；Layer A 双 parser rc 0；Layer B fallback
+  24/24（tech-03 大 PDF 1548.58s），kreuzberg 11 篇 schema_
+  validation_failed 与 r3/r4 逐篇一致；aggregate 46 system
+  errors。
+- **comparison 回归门（gated）PASS，regression 0**：
+  - unit_alignment 0.8297 → 0.8297（持平）
+  - extraction_coverage 0.754 → **0.7635（+1.26%，improved）**
+  - nontext_detection_ratio 0.7004 → 0.7004（持平）
+  - boundary_error_rate 0.7378 → 0.7378（持平）
+- **informational 面**：overall alignment 0.8087→0.81
+  （improved）/ coverage 0.7437→0.7427（−0.13%）/ nontext
+  0.826→0.8004（−3.10%）/ boundary 0.6155→0.6128（improved，
+  误差降）；holdout alignment 0.8539→0.8543 / coverage
+  0.8913→0.8879 / nontext 0.7583→0.7306（−3.65%）/ boundary
+  0.544 持平。
+- **归因（per_doc_results 现读）**：
+  - coverage 增益（comparison）= 吸收带来的单元对齐：acad-01
+    0.3262→0.3641（+16 单元）。
+  - nontext 检出降 = 页巧合配对消失（右轨同页任一预测表即计
+    命中的假配对）：tech-06 57→49（130 横幅灭）、holdout
+    tech-08 63→56、acad-04 7→6、prod-06 254→253、tech-03
+    241→240——均为假配对清理，非真表丢失（tech-06/08 表面
+    130→0/100→2 为伪表全灭）。
+  - 真覆盖损失（informational，入门内零违例）：tech-01
+    0.7553→0.7189（p55 两张真内容表被 gate 弃：'Areas needing
+    more research' 与 'How will threats evolve…ZTA?'）；holdout
+    prod-02 0.999→0.9789（28 表弃，LibreOffice Writer 76 手册
+    排版表）。**候选后续裁决项**：gate 阈值调优 vs 接受损失
+    （r5 已 PASS，非阻塞），留 r91 简报。
+  - Layer C（acad-03，固定锚 informational）：relation P=1.0
+    持平 / R 0.55→**0.35** / F1 0.7097→0.5185；reference P=1.0
+    持平 / R 0.7273→0.3636 / F1 0.8421→0.5333；caption P/R/F1
+    持平（1.0/0.3333/0.5）。机制 = 9 伪表弃 → table_has_
+    caption 挂靠断 → 题注失标签源 → 引用解析失边——precision
+    全守，损失集中于伪表挂靠的假配对池收缩面。
+- **r5 = 新 accepted baseline revision**（下一 revision gate
+  基线 = r5）。产物 samples/private/stage9-corpus/evaluation/
+  stage9-eval-baseline-r5/（gitignored，不进 freeze 包）。
+- **r90 简报状态**：W5 text v2 调查呈送件（outputs/gpt_brief_
+  r90_w5_text_v2_request.txt）待用户中转；其 §7-6 push 请求
+  数字基于 r4 时点（adoption 3 + main 1），现积压已变为
+  **adoption 4（8110228/8fc8585/3b343e1/d887aa2）+ main 2
+  （ce082f9/70a1ad8）**——r91 简报携带更新值，FF 非强推。
+- **自跑线**：R2173 两次中断（FailedToOpenSocket 24 工具/6.75h
+  零残留；redo 429 配额 43 工具/35min，重置 2026-10-22 21:09:29
+  已过）——残留核查完成：autonomous tip 仍 1cbf878（R2172），
+  main 场地 reflog 自恢复至 70a1ad8 干净，树内 Temp/ 为 9-30
+  D52/D53 旧草稿非本轮产物；本轮末重 spawn（锚 105，f 侧）。
