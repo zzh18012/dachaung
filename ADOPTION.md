@@ -10855,3 +10855,78 @@ GPT 5.6 回执）。
   + 单测），目标 R2175 自跑锚窗（13:43 spawn）前完成提交保持
   main 干净；随后 dev acceptance A–F 探针 → r6 五步 → r93
   简报呈报 baseline candidate。
+
+## §204 r6 执行回执：cell-semantic ownership fix 实现完成、dev acceptance A–F 全过、r6 五步 gate PASS（vs r4）+ 归因 delta（vs r5）≈0、R-3 push COMPLETE（2026-10-27）
+
+**数字来源纪律：全部现读落盘文件（evaluation/stage9-eval-baseline-r6/ 五步产物、outputs/w5_cell_fix_af_acceptance_r92.{json,md}、两仓库 git log），零记忆值。**
+
+- **fix 实现（r92 §六获批谓词，MODIFIED 版）**：
+  - **main e3b6a45**：新增 `_char_midpoint_in_cell`（半开区间
+    `x>=x0, x<x1, y>=top, y<bottom`——pdfplumber `Table.extract`
+    的 `char_in_bbox` 同源判据）+ `_word_chars_in_table_cells`
+    （全部 source chars 逐字符 midpoint-in-cell 才允许整词吸收；
+    `extract_words(return_chars=True)` 官方 word→chars
+    provenance；缺 provenance 保守不吸收——§六禁 fallback 遵守）；
+    词中心入 bbox 保留为粗过滤（cells ⊆ bbox 的可证必要条件，
+    不构成独立判据）。单测 +6（test_w5_table_gates.py 24 过，
+    含 NeverSend. 反例形态/半开边界/跨两 cell/无 provenance）；
+    **main 全量 5565 passed / 4 skipped**（5559 基线 + 6 新增）。
+  - **adoption port 7b2fb3f**：parser LF 归一 code-identity 与
+    main 全等（唯一差异 = r55 C08 docx 块，既有）；runner 注册
+    r6（BASELINE_PRED r6→r4 + PARSER_CODE_REVS r6 = main e3b6a45，
+    双对照 gate=r4/归因=r5）。**adoption 套件 24 failed / 5779
+    passed 与移植前（stash 对照）失败集合逐 ID 全等**——24 项
+    全部为 011bc2b 既有（w1 空分隔符期望 3 + stage9 面 20 +
+    caption 契约 2），非本移植引入（r93 简报披露，不静默吸收）。
+- **dev acceptance A–F（r92 §九硬门）全过**（探针
+  review/_r92_af_acceptance.py；dev-14 = 12 PDF 全测 + 2 DOCX
+  skipped 不触及；产物 outputs/w5_cell_fix_af_acceptance_r92）：
+  - A no owned-word duplication：PASS（0 违例页；页级 token
+    多重集全等校验同时钉死 reproduction 与 parser 实际行为一致）
+  - B zero ownership data loss **硬 0**：PASS——deficit 字符
+    **0**（修复前 1867/10570 = 17.7%）；42 吸收页 / 2623
+    absorbed 词全量核验
+  - C rejected isolation：PASS（拒表 281 零发射；would-be 词
+    14719 全数留段落轨）
+  - D caption preservation：PASS（protected ∩ absorbed = ∅
+    逐页零违例；caption 总数 60 = W4 面稳定）
+  - E conservation：PASS（absorbed ∪ remaining = 全词池、两两
+    不相交、protected ⊆ remaining，逐页硬校验）
+  - F PARTIAL_CELL_WORD_RETENTION：**恰 1 词**——tech-07
+    p3 `NeverSend.`（covered 9 / uncovered 1 = 尾点）；fully-
+    covered-not-absorbed = 0。r92 §八"类似 tech-07 极小边界
+    案例"量级 → representation/ownership residual 评估，非
+    暂停条件；全量披露不隐藏。
+  - → **r6 五步按 r92 §十自动授权**（未再请裁）。
+- **r6 五步完成**（evaluation/stage9-eval-baseline-r6/）：
+  prepare 24 docs / 817 hard boundaries；layerA fallback +
+  kreuzberg rc 0/0；layerB 24×2（kreuzberg 11 failures = 既有
+  schema_validation_failed 同款，error_registry 46 与 r5 同构
+  无新错误类）；aggregate + gate：**PASS / 0 regressions**。
+  - 正式 gate（**vs r4**，comparison split，GATED）：
+    unit_alignment 0.8297→0.8297（0）；extraction_coverage
+    0.754→**0.7635（+1.26% improved）**；nontext 0.7004→0.7004
+    （0）；boundary_error 0.7378→0.7378（0）。informational：
+    overall 全 ok/improved；holdout nontext −3.65% ok（盲评
+    不入门）。
+  - 归因 delta（**r6 vs r5**，fallback 全 split）：dev
+    unit_alignment +0.0001、其余 15 项全 +0.0000；Layer C
+    relation 全同（P 1.0 / R 0.35 / F1 0.5185）。结论：fix
+    效果在 evaluation metric 面 ≈ 零、在 ownership contract
+    面 = DATA_LOSS 消除（1867→0）；r5 的 coverage 增益**全
+    保留**（r92 简报 §3.4 曾预告可能回吐——实测未回吐，如实
+    更正）。
+  - 计时异常披露：tech-03 fallback wall=70323.53s——评测机
+    2026-10-26 夜间休眠冻结进程（CPU 实际 ~33 分钟量级），恢复
+    后链正常完成、五步 rc 0、指标不受影响。
+- **r6 = ACCEPTED_BASELINE_CANDIDATE 呈报**（r92 §十一四条件
+  全满足：A–F 过 ✓ / Layer A 完成 ✓ / gate PASS ✓ / 无新
+  blocking contract violation ✓）——正式晋级裁定请 r93。
+- **R-3 push COMPLETE**：remote tip 9de068c → **2b78d60**
+  （2026-10-27 网络窗重开；FF/非强推；显式 SHA refspec
+  `2b78d60:integration/...`；恰批准 2 笔 be44ace + 2b78d60，
+  零夹带——011bc2b/7b2fb3f/本台账 commit 均本地待批）。
+- **待裁（r93 简报）**：① r6 是否正式 = CURRENT_ACCEPTED_
+  BASELINE；② push 批准（adoption 011bc2b + 7b2fb3f + §204
+  台账 commit；main e3b6a45）；③ 队列推进（gate-FN dev study
+  → text v2b）。
