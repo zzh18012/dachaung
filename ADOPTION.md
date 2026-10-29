@@ -11063,3 +11063,53 @@ GPT 5.6 回执）。
 7. **状态**：r7 未跑（merge 暂停）；text v2b 维持 PAUSED；gate1
    0.5 与判据 1.0 未动。r95 简报 = Gate E 分支重新呈报（本裁决
    §十 Gate E 预设路径），非 CANDIDATE 呈报。
+
+---
+
+## §208 r95 裁决执行：Gate E 判 FAIL/BLOCKING，R-1b 裁定，O-A′ 双 revert，O-B′ 立案（dev-only）
+
+**日期：2026-10-29｜裁决存档：outputs/gpt_brief_r95_ruling_reply.txt（9423 字符，18 节完整）**
+
+1. **总裁决回执**：r94 执行回执 ACCEPTED_COMPLETE；Gate E 正式
+   FAIL/BLOCKING（43 = 6 签名 + 24 Tax A + 10 Tax B + 2 Tax C +
+   1 Tax D；13/43 = 30.23% 确认/疑似错误发射）；**R-1b 裁定**——
+   e0541f4 不得以当前形态 merge/发布/进 r7；R-1a（事后降级
+   residual）REJECTED（post-outcome acceptance relaxation 禁忌）；
+   R-1c（gold-stream/Tax 名单作 parser 判据）REJECTED（gold 是
+   评测证据非生产输入；taxonomy 是事后解释非一般规则）。
+2. **O-A′ 定性**：W5_GATE1_OVERSIZE_VECTOR_CLUSTER_EXCLUSION_V1 =
+   **EXPERIMENTAL_IMPLEMENTATION_FAILED_ACCEPTANCE**。证据价值保留
+   （证明 oversize-cluster veto 造成真表 FN——恢复 30 张 dev 真表；
+   同时暴露该 veto 原本压住标签盒/callout/整页拼版——"一次性取消
+   整簇 veto"规则本身过粗）。
+3. **双 revert 执行（§十六，append-only，无 reset/rebase/amend/
+   force/squash）**：
+   - main：`git revert --no-edit e0541f4` → **a0fe6d8**（2 文件，
+     -102 行：parser 3 处 + 7 单测）；全量测试回基线 **5565
+     passed / 4 skipped**；
+   - adoption：`git revert --no-edit e14fcc5` → **d12641f**
+     （-30 行）；LF 归一 code-identity 与 main 全等（唯一差异 =
+     既有 r55 C08 docx 块）；冒烟过（模块加载 + r6 形态 +
+     gate1=0.5 确认）。
+   - 历史链：approved experiment → failed Gate E → normal revert，
+     实验证据不删除。最终 local tips：main = **a0fe6d8**（remote
+     e3b6a45）、adoption = **d12641f**（remote c56376e）。
+   - **PUSH = HELD_PENDING_EXACT_REVERT_SHAS**：本台账即披露
+     a0fe6d8 / d12641f，r96 简报重请 FF push（非强推）。
+4. **O-B′ 立案**：W5_GATE1_SHADOW_VECTOR_DECOMPOSITION =
+   APPROVED_FOR_DEV_INVESTIGATION_AND_SPEC_ONLY（仅 gate1 专用
+   vector-component/cluster decomposition 调查；figure emission /
+   gate2 / 0.5 / raster / caption relation 全不动；本轮不授权
+   实现）。12 项最低输出（§十）+ Hard 1–5 冻结验收（§十一：30/30
+   真表仍可恢复、Tax C 2/2 重新被 veto、confirmed newly accepted
+   FP = 0、伪表面无系统性回归、ownership deficit 硬 0）+ 参数纪律
+   （§十二：deterministic/可解释/参数全披露/comparison-holdout
+   零读取/禁 doc-page-ID、gold membership、Tax label、learned
+   classifier 作 runtime feature）。
+5. **状态**：r7 = NOT_STARTED（编号可复用于下一次获批 gate fix）；
+   baseline 维持 r6 CURRENT_ACCEPTED_BASELINE；text v2b 维持
+   PAUSED（顺序：O-B′ investigation/spec → gate implementation
+   ruling → 实现 → dev acceptance → r7 → baseline closure →
+   text v2b）；freeze/gold/credential/manifest 不变。
+6. **自跑线**：R2177 f 侧完成（4 组 PASS；锚 109 连 92365@83.66s；
+   tip 05300b4，push 网络失败待排窗重试）。R2178 未启。
