@@ -95,12 +95,6 @@ CAPTION_MAX_GAP_PT = 50.0
 TABLE_FIGURE_OVERLAP_DROP_FRAC = 0.5
 TABLE_MIN_WORDS = 4
 TABLE_MIN_ROWS = 2
-# W5 gate1 oversize vector-cluster 排除（r94 O-A′，
-# W5_GATE1_OVERSIZE_VECTOR_CLUSTER_EXCLUSION_V1）：矢量簇 bbox 面积
-# 严格大于 1.0 × page_area → 该簇不参与 gate1 figure-overlap 判定
-#（越界装饰元素被聚类过组为页面级巨簇，非"表在图内"证据）。
-# 仅作用于 gate1 输入；figure 发射/聚类/raster/gate2 全部不变。
-VECTOR_CLUSTER_PAGE_AREA_EXCLUSION_RATIO = 1.0
 
 
 def _is_figure_caption(el: Element) -> bool:
@@ -622,23 +616,6 @@ def _max_overlap_frac(
     return best_frac, best_idx
 
 
-def _gate1_vector_bboxes(
-    vector_bboxes: list[list[float]], page_area: float
-) -> list[list[float]]:
-    """gate1 专用 vector 输入集（r94 O-A′，scope =
-    GATE1_VECTOR_INPUT_ONLY）：剔除 bbox 面积严格大于
-    VECTOR_CLUSTER_PAGE_AREA_EXCLUSION_RATIO × page_area 的越界
-    过组巨簇；相等（ratio == 1.0）保留。其他消费方（figure 发射
-    等）仍用原 vector_bboxes，不受此过滤影响。"""
-    if page_area <= 0:
-        return vector_bboxes
-    limit = VECTOR_CLUSTER_PAGE_AREA_EXCLUSION_RATIO * page_area
-    return [
-        b for b in vector_bboxes
-        if (b[2] - b[0]) * (b[3] - b[1]) <= limit
-    ]
-
-
 def _gate_pdf_table(
     bbox: list[float],
     rows_count: int,
@@ -867,12 +844,6 @@ def _parse_pdf(
                     ]
                 except Exception:
                     raster_bboxes = []
-                page_area = (
-                    (float(page.bbox[2]) - float(page.bbox[0]))
-                    * (float(page.bbox[3]) - float(page.bbox[1]))
-                )
-                gate1_vector_bboxes = _gate1_vector_bboxes(
-                    vector_bboxes, page_area)
                 accepted_tables: list[
                     tuple[list[Any], int, int, list[float] | None, bool]
                 ] = []
@@ -911,7 +882,7 @@ def _parse_pdf(
                             max((len(r) for r in rows), default=0),
                             len(inside),
                             raster_bboxes,
-                            gate1_vector_bboxes,
+                            vector_bboxes,
                         )
                         if not accepted:
                             continue
