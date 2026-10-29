@@ -10930,3 +10930,46 @@ GPT 5.6 回执）。
   BASELINE；② push 批准（adoption 011bc2b + 7b2fb3f + §204
   台账 commit；main e3b6a45）；③ 队列推进（gate-FN dev study
   → text v2b）。
+
+## §205 r93 裁决执行回执：r6 = CURRENT_ACCEPTED_BASELINE 正式晋级、R-2 push 4 笔完成、holdout 用语修正登记、gate-FN dev study 启动授权（2026-10-29）
+
+**数字来源纪律：push tips 现读 git ls-remote；裁决原文 outputs/gpt_brief_r93_ruling_reply.txt（2026-10-28 裁决，8952+ 字符全文存档）。**
+
+- **R-1 r6 晋级执行**：`r6 = ACCEPTED / CURRENT_BASELINE`；
+  `r4 = SUPERSEDED_ACCEPTED_BASELINE`；r5 维持
+  EXECUTED_AND_GATE_PASS / HISTORICAL_NON_BASELINE（无追溯
+  晋级）。**后续新 parser revision 的正式 comparison baseline
+  = r6**（BASELINE_PRED 后续条目按此映射）。
+- **R-2 push COMPLETE（2026-10-29）**：
+  - main：`70a1ad8 → e3b6a45`（FF/非强推/显式 SHA refspec）
+  - adoption：`2b78d60 → 0d7a153`（恰批准 3 笔 011bc2b +
+    7b2fb3f + 0d7a153，零夹带）
+  - remote tips 登记实测：main = e3b6a45e01933942ec9501ed36d
+    94660c43fd55c；integration = 0d7a153b91fc02d22790c1cb71d2
+    723605262c4
+- **holdout 用语修正（§六）登记**：后续报告措辞 =
+  `holdout informational / holdout_with_known_anchor_exposure`
+  （known-exposed fixed anchor acad-03 披露，不作 strict-blind
+  generalization estimate）；历史数字不回改。
+- **adoption_test_debt_24 = KNOWN_PREEXISTING / NON_BLOCKING
+  登记**（§十）：不标 fixed、不静默；未来整理须独立立案，本
+  裁决不授权顺带修复。
+- **tech-03 wall 计时标注（§十一）**：70323.53s RAW_RETAINED +
+  `timing_validity = HOST_SUSPEND_CONTAMINATED`；不作 parser
+  performance regression 证据、不触发 performance RFC、不与
+  正常连续运行样本混同解释。
+- **R92_EXPECTED_COVERAGE_ROLLBACK = NOT_OBSERVED**（§八）正式
+  登记；PARTIAL_CELL_WORD_RETENTION = 1 WORD /
+  DISCLOSED_NON_BLOCKER；W5_source_char_deficit = 0 /
+  CONTRACT_CLOSED。
+- **R-3 队列（§十三/§十四）**：NEXT =
+  W5_GATE_FALSE_NEGATIVE_EQUIVALENT_DEV_STUDY（dev-only；
+  tech-01 comparison / prod-02 holdout 不重开；gate1 仍 0.5；
+  protected-split 数字仅存在性披露）。分支 A（无 dev 证据）→
+  登记收口 → W5_TEXT_V2B（baseline = r6）；分支 B（dev 独立
+  等价 population 成立）→ **暂停 v2b**，走 dev evidence →
+  gate RFC/裁决 → 实现新 revision → baseline 收口 → v2b。
+  v2b 纪律：text_x_tolerance 1.5pt 冻结 / one-to-one matcher /
+  stacked blocker / caption swallow = 0 / ownership 用
+  cell-semantic contract。
+- **下一步**：执行 gate-FN dev study（已获批先行）。
