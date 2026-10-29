@@ -11009,3 +11009,57 @@ GPT 5.6 回执）。
    GPT）。
 7. **产物**：`outputs/w5_gate_fn_dev_study_r93.{json,md}`（md 含协调者
    补记：机制 + 范围表 + 候选方向，仅列举不裁决）。r94 简报随后呈报。
+
+### §207 r94 裁决执行回执（O-A′ 实现 + dev gates A–G：E 门分支暂停 merge）
+
+**日期：2026-10-29｜性质：r94 裁决执行回执（部分收口：Gate E 分支）｜commit：本条目自身**
+
+1. **裁决存档**：outputs/gpt_brief_r94_ruling_reply.txt（9488 字符
+   全文；1 处转写走样"FN 專尚"→"FN 尚"已修）。
+2. **R-2 push COMPLETE**：adoption remote tip 0d7a153 → **c56376e**
+   （5d6a88d + c56376e 两笔，显式 SHA refspec，FF/非强推，ls-remote
+   实测登记）。main 侧无待推（e3b6a45 已在 r93 批准集内）。
+3. **§三勘误登记**：TECH06_RULE1_DROP_COUNT_WORDING_ERRATUM 追加
+   至 outputs/w5_gate_fn_dev_study_r93.md（130 = 6 signature +
+   124 non-signature；dev 面 149 = 7 + 142）。
+4. **§四复核执行**（ACAD06_FULLPAGE_CLUSTER_RECORD_RECONCILIATION）：
+   探针 _r94_acad06_reconciliation.py → outputs/w5_acad06_fullpage_
+   cluster_reconciliation_r94.{json,md}。**tab6 盖簇 bbox=[324.0,
+   417.8,552.2,545.3]、面积 29089.7、簇/页比 0.06**（局部真实图内
+   含表，gate1 设计意图情形）；全文档最大簇/页比 0.2994；全部 6 个
+   rule-1 弃例盖簇比 0.06–0.2048。判定 **ACAD06_REMAINS_KNOWN_GATE1_
+   FALSE_NEGATIVE**（不入 O-A′ 恢复集；阈值 1.0 未动）。记录间不
+   一致归因：扫描表"其余 dev 文档 <=0.30"正确；addendum A"已知例
+   同款全页簇"对 acad-06 不成立（该短语仅适用 tech-06 6 例）——
+   已作为勘误登记于 study md。
+5. **O-A′ 实现**（W5_GATE1_OVERSIZE_VECTOR_CLUSTER_EXCLUSION_V1，
+   scope = GATE1_VECTOR_INPUT_ONLY）：main **e0541f4**（常量
+   VECTOR_CLUSTER_PAGE_AREA_EXCLUSION_RATIO=1.0 + _gate1_vector_
+   bboxes 过滤 + 调用点 3 处；figure 发射线 1075 消费未过滤集不动；
+   单测 +7，test_w5_table_gates 31 过，全量 5572/4）；adoption
+   port **e14fcc5**（code-identity 与 main 全等，唯一差异 = 既有
+   r55 C08 docx 块；均未 push，待批）。
+6. **dev gates A–G 执行**（探针 _r94_oaprime_dev_gates.py +
+   _r94_g_gate_af_acceptance.py → outputs/w5_oaprime_dev_gates_r94.
+   {json,md} + outputs/w5_oaprime_af_acceptance_r94.{json,md}）：
+   - A 谓词同一性 PASS（常数 1.0；==1.0 保留 / >1.0 剔除数值复验）；
+   - B 范围隔离 PASS（聚类/栅格/figure 发射不因 patch 改变——发射
+     序列 old/new 全等 + code-identity）；
+   - C 目标恢复 PASS：**6/6** tech-06 签名例恢复；acad-06 新发射 0
+     （维持已知 FN，与 §四复核一致）；
+   - D changed census：**130 例**（恰 = tech-06 全部 rule-1 弃；
+     tech-03/acad-04/acad-06/tech-07 零改变）100% 枚举落 json；
+   - **E 新发射 FP：REVIEW_REQUIRED**——新发射 43 = 6 签名真表 +
+     24 非签名大型真表（Tax A，含 p83/84/85 = 127/147/143×7 CVE
+     续表 words 1839–2323）+ **13 FP 嫌疑**（Tax B 图内标签盒 10 +
+     Tax C 单列 callout 2 + Tax D 整页拼版伪表 1）→
+     newly_accepted_false_positive >= 1。**按裁决 §十 Gate E：
+     暂停 merge / 暂停 r7，重新呈报；未追加第三道启发式**；
+   - F 页眉微表拦截 PASS：124 非签名中 87 例 gate2 正确拒（含
+     46×9pt 页眉微条）；37 例发射即 E 面主体；
+   - G ownership A–F 复验 **A_F_ALL_PASS**（deficit 硬 0；F 残余
+     = 既有 tech-07 'NeverSend.' 1 词不变；吸收面 71 页/16679 词/
+     86 接受表 vs 拒 248；caption 60 稳定）。
+7. **状态**：r7 未跑（merge 暂停）；text v2b 维持 PAUSED；gate1
+   0.5 与判据 1.0 未动。r95 简报 = Gate E 分支重新呈报（本裁决
+   §十 Gate E 预设路径），非 CANDIDATE 呈报。
