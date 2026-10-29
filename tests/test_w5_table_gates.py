@@ -248,3 +248,75 @@ def test_word_chars_empty_cells_rejected():
         "chars": [_c(0, 10, 0, 10)],
     }
     assert not _word_chars_in_table_cells(word, [])
+
+
+# ---------- gate1 oversize vector-cluster 排除（r94 O-A′） ----------
+
+def test_gate1_vector_bboxes_oversize_excluded():
+    # 簇面积 1.5 × page_area → 剔除（严格大于判据）
+    from app.parsers.fallback_parser import (
+        VECTOR_CLUSTER_PAGE_AREA_EXCLUSION_RATIO,
+        _gate1_vector_bboxes,
+    )
+    assert VECTOR_CLUSTER_PAGE_AREA_EXCLUSION_RATIO == 1.0
+    oversize = [0.0, 0.0, 150.0, 100.0]     # 15000 vs page 10000
+    normal = [10.0, 10.0, 60.0, 60.0]
+    kept = _gate1_vector_bboxes([oversize, normal], page_area=10000.0)
+    assert kept == [normal]
+
+
+def test_gate1_vector_bboxes_exact_page_area_kept():
+    # ratio == 1.0（恰好整页大小）→ 保留（严格 >，非 >=）
+    from app.parsers.fallback_parser import _gate1_vector_bboxes
+    exact = [0.0, 0.0, 100.0, 100.0]
+    assert _gate1_vector_bboxes([exact], page_area=10000.0) == [exact]
+
+
+def test_gate1_vector_bboxes_just_under_kept():
+    from app.parsers.fallback_parser import _gate1_vector_bboxes
+    near = [0.0, 0.0, 99.0, 100.0]          # 0.99 × page
+    assert _gate1_vector_bboxes([near], page_area=10000.0) == [near]
+
+
+def test_gate1_vector_bboxes_zero_page_area_passthrough():
+    from app.parsers.fallback_parser import _gate1_vector_bboxes
+    bboxes = [[0.0, 0.0, 150.0, 100.0]]
+    assert _gate1_vector_bboxes(bboxes, page_area=0.0) == bboxes
+
+
+def test_gate1_oversize_cluster_no_longer_vetoes_table():
+    # O-A′ 端到端语义：表 ⊆ oversize 簇 → 簇被剔除 → gate1 放行
+    # （gate2 实体性另判；此处 words/rows 足量）
+    from app.parsers.fallback_parser import _gate1_vector_bboxes
+    tbl = [10.0, 10.0, 90.0, 90.0]
+    oversize = [0.0, 0.0, 150.0, 100.0]
+    gated = _gate1_vector_bboxes([oversize], page_area=10000.0)
+    accepted, warn, _ = _gate_pdf_table(
+        tbl, 3, 3, 16, raster_bboxes=[], vecfig_bboxes=gated)
+    assert accepted
+    assert warn is None
+
+
+def test_gate1_normal_cluster_still_vetoes_table():
+    # 对照：局部正常簇（0.5 × page，全含表）仍触发 rule-1 弃
+    from app.parsers.fallback_parser import _gate1_vector_bboxes
+    tbl = [10.0, 10.0, 90.0, 90.0]
+    normal_full = [0.0, 0.0, 100.0, 50.0]   # 5000 = 0.5 × page
+    gated = _gate1_vector_bboxes([normal_full], page_area=10000.0)
+    assert gated == [normal_full]
+    accepted, _, _ = _gate_pdf_table(
+        tbl, 3, 3, 16, raster_bboxes=[], vecfig_bboxes=gated)
+    assert not accepted
+
+
+def test_gate1_raster_not_subject_to_exclusion():
+    # scope 隔离：oversize 判据只作用于 vector 簇；raster bbox
+    # 即使超页面积也不剔除（r94 §六 raster 行为不变）
+    from app.parsers.fallback_parser import _gate1_vector_bboxes
+    tbl = [10.0, 10.0, 90.0, 90.0]
+    oversize_raster = [0.0, 0.0, 150.0, 100.0]
+    gated_vec = _gate1_vector_bboxes([], page_area=10000.0)
+    accepted, _, _ = _gate_pdf_table(
+        tbl, 3, 3, 16, raster_bboxes=[oversize_raster],
+        vecfig_bboxes=gated_vec)
+    assert not accepted
