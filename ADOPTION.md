@@ -10973,3 +10973,39 @@ GPT 5.6 回执）。
   stacked blocker / caption swallow = 0 / ownership 用
   cell-semantic contract。
 - **下一步**：执行 gate-FN dev study（已获批先行）。
+
+### §206 r93 §十三 gate-FN dev study 执行回执（分支 B：DEV_EQUIVALENT_POPULATION_FOUND）
+
+**日期：2026-10-27（落盘 2026-10-29）｜性质：r93 §十三 R-3 第一项执行回执｜commit：本条目自身**
+
+1. **探针**：`samples/private/stage9-corpus/review/_r93_gate_fn_dev_study.py`
+   （dev-only，gitignored 磁盘留存）。manifest split==dev 断言（14）通过；
+   tech-01 comparison / prod-02 holdout 零读取；gate1=0.5 未动；签名判据
+   确定性（rows>=2 ∧ cols>=2 ∧ text_cells>=4 ∧ n_cells/(rows*cols)>=0.5，
+   非评分）；parser 面 = adoption port 7b2fb3f（fix 后吸收谓词；门输入 =
+   cells 判定前 inside 集合，与 r92 探针同口径）。
+2. **探针修正记录**：首版误读 `_gate_pdf_table` warn 语义（拒绝一律
+   warn=None；warn 仅"保留+部分相交"非空），得 rule1_drops=0 假象 →
+   改为同源 `_max_overlap_frac` 自行分类拒因后重跑。首版结论作废。
+3. **结果**：dev 面 rule-1（重叠 frac>=0.5）拒绝候选 149；其中签名成立
+   7（含已知 acad-06_tab6 = KNOWN_GATE1_FALSE_NEGATIVE，r90）；
+   **独立等价 population = 6 → 判定 DEV_EQUIVALENT_POPULATION_FOUND
+   （分支 B）**。
+4. **6 例全量 verbatim 披露**（outputs/w5_gate_fn_dev_study_r93.md）：
+   全部 tech-06-enisa-etl2025 p60/75/82/86/87/88，全部 frac=1.0、
+   family=vector。最大例 p86：119×7 CVE 表、n_cells=422、cov=0.507、
+   text_cells=339、words_inside=2223。
+5. **机制（page-wide 扫描）**：6 例所在页全部恰有一个"整页装饰框"
+   vector 簇（bbox≈[12.9,17.0,628.9,869.1]，簇面积/页面积比 1.7–1.99，
+   **超出页边界**——簇由多个不相连页面装饰元素聚合过组而成）；
+   tech-06 全 89/89 页存在此类簇（max 1.99）；tech-03 2/248 页（1.66）；
+   其余 dev 文档簇/页比 ≤0.51。gate1"表在图内"在这些页退化为
+   "装饰页上的任何表都被拒"。非 parser 逻辑回归（r4/r5/r6 行为一致）。
+6. **分支 B 处置（r93 §十三）**：**W5_TEXT_V2B 暂停**。下一链 =
+   dev evidence（本回执）→ gate RFC/裁决 →（若获批）gate
+   implementation + new revision → baseline 收口 → text v2b。
+   本回执不修改 gate1、不实现任何候选方向（候选方向仅在产物补记中
+   列举：簇/页面积比背景判定、簇拆分、重叠度量改造等，裁决权在
+   GPT）。
+7. **产物**：`outputs/w5_gate_fn_dev_study_r93.{json,md}`（md 含协调者
+   补记：机制 + 范围表 + 候选方向，仅列举不裁决）。r94 简报随后呈报。
