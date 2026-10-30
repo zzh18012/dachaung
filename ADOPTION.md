@@ -11148,3 +11148,36 @@ GPT 5.6 回执）。
    §十六口径 FF push 重请 + R-1 方向请求）。
 6. **自跑线**：R2177 完成（tip 05300b4，push-pending 网络）；
    R2178（e 侧锚 110）运行中。
+## §210 r96 裁决执行①：存档 + R-2 双 push 转 APPROVED_WAITING_NETWORK + R-1d override 调查立案（2026-10-30）
+
+**日期：2026-10-30｜裁决存档 outputs/gpt_brief_r96_ruling_reply.txt（9690 字符，18 节完整性核验）**
+
+1. **总裁决登记**：r95 执行回执 ACCEPTED；O-B′ 认定完成且不进入实现
+   （STRUCTURALLY_UNSATISFIABLE_WITHIN_S1_S4）；figure-side gate
+   repair 正式收口（CLOSED_CURRENT_EVIDENCE，不立 O-B″）；R-1a 暂不
+   采用（30 FN 不立即永久接受）；R-1c 不按内容语义原义开放。
+2. **R-1d 立案**：W5_GATE1_INTRINSIC_TABLE_EVIDENCE_OVERRIDE_STUDY
+   = APPROVED_FOR_DEV_INVESTIGATION_AND_SPEC_ONLY。§八 runtime 语义
+   （override 仅作用于病理性越界 >1.0xpage 簇 veto 权威；raster 与
+   正常局部 vector veto 全效；acad-06 不自动入域）；§九候选侧结构特征
+   白名单 + 禁止清单（lexical/语义/ID/gold/Tax/学习模型全禁）；§十
+   Hard A-G 冻结（30/30、TaxC 2/2、TaxD 1/1、TaxB 10/10=
+   RFC_SPECIFIC_REVIEWED_NON_TABLE_NEGATIVES、全 dev FP=0、r6 行为
+   无损、ownership deficit=0）；§十一参数纪律（预列特征族、全参数
+   报告、敏感性、无 comparison/holdout）；§十二无规则即收口
+   （CLOSED_KNOWN_LIMITATION + text v2b RESUME_ON_R6）；§十三成功
+   须另呈完整实现 spec 再裁。
+3. **R-2 push**：APPROVED（main e3b6a45→a0fe6d8 两笔 FF；adoption
+   c56376e→882cfd4 五笔 FF；非强推、不夹带）。执行时网络 443 连接
+   重置（ls-remote 双仓均 fail，与 R2178 收口同窗）→ 按 §十五转
+   APPROVED_WAITING_NETWORK：同 refspec 单次重试免再裁，会话内定时
+   窗口自动探网重试；remote tip 非 e3b6a45/c56376e 即暂停重核。
+4. **状态**：r7 = NOT_STARTED（无 revert revision）；text v2b =
+   PAUSED_PENDING_FINAL_GATE_STUDY；r6 = baseline 不变；gate1=0.5、
+   聚类、gate2、raster、caption relation、freeze/gold/manifest 全程
+   未动；不授权清单（O-B′ 实现/vector-raster 再扫参/lexical
+   classifier/gold-stream runtime/Tax 名单/candidate override parser
+   patch/r7/text-v2 实现）全程遵守。
+5. **自跑线**：R2178 收口（e 侧锚 110 连 92365@87.42s、电池三组
+   PASS、tip 401e27c、push-pending 积压 05300b4+401e27c）；R2179
+   （f 侧锚 111）已链式启动。
