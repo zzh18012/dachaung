@@ -96,6 +96,13 @@ TABLE_FIGURE_OVERLAP_DROP_FRAC = 0.5
 TABLE_MIN_WORDS = 4
 TABLE_MIN_ROWS = 2
 
+# r97 W5_GATE1_PATHOLOGICAL_OVERSIZE_INTRINSIC_OVERRIDE_V1 冻结参数
+# （COLS_6 = OVERRIDE_EVIDENCE_ONLY：仅存在于 override 分支，基础
+# acceptance contract 无 cols 约束）。oversize 判据 = 簇面积严格
+# > 1.0×page_area；参数冻结后不得再扫描（r97 §十四）。
+TABLE_PATHO_OVERSIZE_MIN_COLS = 6
+TABLE_PATHO_OVERSIZE_PAGE_RATIO = 1.0
+
 
 def _is_figure_caption(el: Element) -> bool:
     return el.type == "caption" and bool(
@@ -649,6 +656,80 @@ def _gate_pdf_table(
     return True, warn, partial_coverage
 
 
+def _gate1_pathological_oversize_scope(
+    bbox: list[float],
+    raster_bboxes: list[list[float]],
+    vecfig_bboxes: list[list[float]],
+    page_area: float,
+) -> bool:
+    """r97 §六 normalized pathological-only veto scope。
+
+    唯一有效 veto family 是 oversized vector clusters（簇 bbox 面积
+    严格 > TABLE_PATHO_OVERSIZE_PAGE_RATIO × page_area）；raster 与
+    local-vector（面积比 ≤ 1.0）任一 ≥ 0.5 即 scope false（不可覆盖）。
+    三类各取最大 overlap frac，空集 max = 0。fail closed：page_area
+    ≤ 0 或几何异常 → False，不 fallback guess（r97 §九）。"""
+    try:
+        if page_area <= 0:
+            return False
+        oversize: list[list[float]] = []
+        local: list[list[float]] = []
+        for cb in vecfig_bboxes:
+            area = (cb[2] - cb[0]) * (cb[3] - cb[1])
+            if area > TABLE_PATHO_OVERSIZE_PAGE_RATIO * page_area:
+                oversize.append(cb)
+            else:
+                local.append(cb)
+        ov, _ = _max_overlap_frac(bbox, oversize)
+        ra, _ = _max_overlap_frac(bbox, raster_bboxes)
+        lo, _ = _max_overlap_frac(bbox, local)
+        return (
+            ov >= TABLE_FIGURE_OVERLAP_DROP_FRAC
+            and ra < TABLE_FIGURE_OVERLAP_DROP_FRAC
+            and lo < TABLE_FIGURE_OVERLAP_DROP_FRAC
+        )
+    except Exception:
+        return False
+
+
+def _gate_pdf_table_with_override(
+    bbox: list[float],
+    rows_count: int,
+    cols_count: int,
+    words_inside: int,
+    raster_bboxes: list[list[float]],
+    vecfig_bboxes: list[list[float]],
+    page_area: float,
+) -> tuple[bool, dict[str, Any] | None, bool]:
+    """现行 _gate_pdf_table 外包 r97 override（§九固定行为序）。
+
+    gate1 未拒 → 行为完全不变；被拒 → 判 normalized scope（false 保持
+    拒）→ cols < 6 保持拒 → cols ≥ 6 解除该次 rule1 拒并重走现行
+    gate2（words/rows 门槛仍全效）。override 成立的接受按现行 r6 口径
+    重算 partial-overlap 披露与 partial_coverage（scope 保证 vector
+    frac ≥ 0.5 > 0，披露必在）。非 scope 候选逐值等于 r6。"""
+    accepted, warn, partial_coverage = _gate_pdf_table(
+        bbox, rows_count, cols_count, words_inside,
+        raster_bboxes, vecfig_bboxes,
+    )
+    if accepted:
+        return accepted, warn, partial_coverage
+    if not _gate1_pathological_oversize_scope(
+            bbox, raster_bboxes, vecfig_bboxes, page_area):
+        return False, None, False
+    if cols_count < TABLE_PATHO_OVERSIZE_MIN_COLS:
+        return False, None, False
+    if words_inside < TABLE_MIN_WORDS or rows_count < TABLE_MIN_ROWS:
+        return False, None, False
+    frac_r, _ = _max_overlap_frac(bbox, raster_bboxes)
+    frac_v, _ = _max_overlap_frac(bbox, vecfig_bboxes)
+    if frac_r >= frac_v:
+        warn = {"frac": frac_r, "family": "raster"}
+    else:
+        warn = {"frac": frac_v, "family": "vector"}
+    return True, warn, words_inside < rows_count * cols_count
+
+
 def _word_center_in_bbox(w: dict, bbox: list[float]) -> bool:
     xc = (float(w["x0"]) + float(w["x1"])) / 2
     yc = (float(w.get("top", 0.0)) + float(w.get("bottom", 0.0))) / 2
@@ -844,6 +925,13 @@ def _parse_pdf(
                     ]
                 except Exception:
                     raster_bboxes = []
+                try:
+                    page_area = (
+                        float(page.bbox[2] - page.bbox[0])
+                        * float(page.bbox[3] - page.bbox[1])
+                    )
+                except Exception:
+                    page_area = 0.0
                 accepted_tables: list[
                     tuple[list[Any], int, int, list[float] | None, bool]
                 ] = []
@@ -876,13 +964,16 @@ def _parse_pdf(
                             and _word_center_in_bbox(words[i], tbl_bbox)
                             and _word_chars_in_table_cells(words[i], tbl_cells)
                         ]
-                        accepted, po_warn, partial_cov = _gate_pdf_table(
-                            tbl_bbox,
-                            len(rows),
-                            max((len(r) for r in rows), default=0),
-                            len(inside),
-                            raster_bboxes,
-                            vector_bboxes,
+                        accepted, po_warn, partial_cov = (
+                            _gate_pdf_table_with_override(
+                                tbl_bbox,
+                                len(rows),
+                                max((len(r) for r in rows), default=0),
+                                len(inside),
+                                raster_bboxes,
+                                vector_bboxes,
+                                page_area,
+                            )
                         )
                         if not accepted:
                             continue
