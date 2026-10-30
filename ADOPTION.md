@@ -11257,3 +11257,47 @@ GPT 5.6 回执）。
    text v2b = PAUSED；freeze/gold/credential/manifest 不变；不授权
    清单（全局 min-col/n_cells fallback/五赢家切换/再扫参/gold-Tax
    runtime/text-v2 实现）全程遵守。
+
+## §214 r97 执行②：实现链四条件全过（scope-equiv/main tests/code-identity/parser A–G）→ r7 自动授权生效（2026-10-30）
+
+1. **scope-equivalence 硬门（§八）**：探针
+   `samples/private/stage9-corpus/review/_r97_scope_equivalence.py` →
+   `outputs/w7_scope_equivalence_r97.{json,md}`：normalized 三类
+   max-frac scope vs study scope **130/130 双向差 0 = PASS**；边界披露
+   簇面积比 ∈[0.99,1.01] 计 0、候选 frac 恰=0.5 计 0（无 tie 面）。
+2. **main 实现**（dachuang-code `b872347`）：新常量
+   TABLE_PATHO_OVERSIZE_MIN_COLS=6 / TABLE_PATHO_OVERSIZE_PAGE_RATIO=1.0；
+   `_gate1_pathological_oversize_scope`（§六 normalized 谓词，fail
+   closed）+ `_gate_pdf_table_with_override`（§九固定行为序外包，
+   `_gate_pdf_table` 纯函数签名不变）；表循环调用侧换 wrapper +
+   page_area 预计算。14 项单测
+   `tests/test_w5_pathological_oversize_override.py`（§十一清单逐条 +
+   参数守护 + §六参考实现等价 fixture）；全量 **5595 passed / 4
+   skipped**（基线 5565/4，+30 全为新测试，零新增失败）。
+3. **adoption port**（`16d9d0f`）：同三处编辑搬运；code-identity
+   （LF 归一 diff）唯一残余 = r55 C08 DOCX 块（既有披露不变）；
+   adoption 套件 5779/24/4 与 port 前 HEAD 4ce0033 **逐数相同**
+   （24 个失败为既有状态，零新增）。
+4. **parser-level dev Hard A–G（§十三）**：探针
+   `review/_r97_parser_hard_ag.py` →
+   `outputs/w8_parser_hard_ag_r97.{json,md}`（r6 快照 = git show
+   4ce0033 独立加载 vs 当前树，真实 parser 输出）：
+   **PARSER_HARD_A_TO_G_ALL_PASS**（18 门全过）——A 30/30 真表
+   恢复；B/C/D TaxC 2、TaxD 1、TaxB 10 全不发射；E 新接受面精确
+   = frozen-30（new_eq_frozen30=True）、r6 53 零丢失、总数 53→83；
+   F r6 53 content 全等、非 tech-06 13 doc 元素序列逐值全等、
+   tech-06 image 面 141=141 / caption 面 0=0 全等（text 面
+   paragraph 516→317、heading 397→285 = 13784 词吸收的必然后果，
+   披露）；G 发射 = _rows_to_markdown 逐值、无重复吸收、
+   **deficit 硬 0 字符**、rejected 隔离（935 词）、题注保护、守恒
+   划分 0 违例、partial-cell 残余 1 词 = 既有 tech-07 NeverSend
+   （covered 9/uncovered 1，与 r6 一致）。吸收词总 16407 = study
+   mirror 预测逐数命中。
+5. **r7 自动授权生效（§十五四条件全过）**：
+   `evaluation_revision = r7`，comparator = r6（CURRENT_ACCEPTED_
+   BASELINE 至正式晋级不变）；执行 prepare→layerA→layerB→
+   aggregate→gate，comparison/holdout 经授权 runner 首读；§十六
+   纪律（看 protected 后不改 6/1.0/0.5，不补例外，不回 dev 重选）。
+6. **状态**：实现接受面完整；不授权清单（§十）全程零触碰；
+   freeze/gold/credential/manifest 不变；text v2b PAUSED（gate
+   chain 收口后按 §十九处理）。
