@@ -11113,3 +11113,38 @@ GPT 5.6 回执）。
    text v2b）；freeze/gold/credential/manifest 不变。
 6. **自跑线**：R2177 f 侧完成（4 组 PASS；锚 109 连 92365@83.66s；
    tip 05300b4，push 网络失败待排窗重试）。R2178 未启。
+
+---
+
+## §209 r95 执行②：O-B′ dev 调查 12 项收口（Hard 1–3 全网格不可满足，不提交实现请求）+ r96 简报
+
+**日期：2026-10-30｜探针 _r95_obprime_shadow_decomposition.py + _r95_obprime_shadow_af_acceptance.py → outputs/w5_obprime_shadow_decomposition_r95.{json,md}（含协调者结论 addendum）+ w5_obprime_shadow_af_acceptance_r95.{json,md}**
+
+1. **shadow 构造（S1–S4，gate1-only，deterministic）**：primitive
+   同源收集；背景排除（单 primitive > BG×page 不参与不桥接）；同
+   谓词传递闭包（gap 可参）；veto 判据与生产全同（curve_w>=1 且
+   >=100x100）。主参数 G15/X0.5；敏感性 15 格点全扫。同源校验与
+   精化不变量违例均 0；runtime 增量 -0.191ms/页（排除后更小）。
+2. **Hard 判定**：主参数 Hard1 23/30（7 例 Tax A 全高矩阵被 G15
+   模板重链 veto）、Hard2 0/2、Hard3 FP=3 → FAIL；G<=10 全格
+   Hard1 30/30 但 C/D/B 零重 veto 且发射面与 O-A′ 精确全同（43，
+   43 外 0）；**无格点同时满足 Hard 1–3**。Hard4 无回归（gate2 拒
+   87 例拦截面不变）；Hard5 mirror 面 MIRROR_A_TO_F_ALL_PASS
+   （deficit 硬 0；shadow 79 表/14928 词/65 页 vs r6 53 表；F 残余
+   = tech-07 NeverSend 1 词不变）。
+3. **结构性定论**（坐标级实测）：tech-06 89 页全有越界巨簇，主体
+   = 0.936xpage 页框曲线模板链；Tax C 两页内容区 curve = 0（Hard 2
+   在 curve 锚定族内结构性不可满足）；Tax D 字母行距 >15pt（G<=15
+   分量恒 <100pt 高，frac 0.0047）；X 轴退化（primitive 双峰）；
+   raster 层同证无信号（O-A′ 轮 Tax C/D 被发射 ⟹ raster frac
+   <0.5）。**vector+raster 图层不存在分离真表与 FP 的局部信号**；
+   acad-06 6/6 全格点维持 veto（shadow 对真局部图语义正常）。
+4. **处置**：不提交实现请求（§八本轮不授权实现 + Hard 未达）；
+   parser 维持 r6 形态；r7 维持 NOT_STARTED；text v2b 维持 PAUSED。
+   方向选项（收口 known limitation / O-B″ 新信息源 / 候选侧路径
+   需新授权）呈 r96 R-1 裁决。
+5. **r96 简报** = outputs/gpt_brief_r96_oaprime_closure_and_push.txt
+   （r95 回执 + revert SHA a0fe6d8/d12641f + final tips +
+   §十六口径 FF push 重请 + R-1 方向请求）。
+6. **自跑线**：R2177 完成（tip 05300b4，push-pending 网络）；
+   R2178（e 侧锚 110）运行中。
