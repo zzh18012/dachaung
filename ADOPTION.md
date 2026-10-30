@@ -11301,3 +11301,17 @@ GPT 5.6 回执）。
 6. **状态**：实现接受面完整；不授权清单（§十）全程零触碰；
    freeze/gold/credential/manifest 不变；text v2b PAUSED（gate
    chain 收口后按 §十九处理）。
+
+## §215 r97 R-2 push 完成：adoption 882cfd4→5f2f653（FF 非强推，显式 SHA refspec）（2026-10-31）
+
+1. 网络窗重开（r7 evaluation layerA 后台运行期间探得 443 通畅），
+   按 §二十 APPROVED_WAITING_NETWORK 同 refspec 免再裁执行：
+   `git push origin 5f2f653:refs/heads/integration/stage9-batch26-corpus-annotation`
+   → `882cfd4..5f2f653` **FF 成功**。批准面（§210 3d32574 + §211
+   59ea86e + §212 5f2f653 三笔纯台账 docs）完整兑现；无 --force /
+   --force-with-lease / +refspec / history rewrite / 夹带（r97 实现链
+   commits 16d9d0f/cdb368e 不在批准面内，未被本 refspec 推送——
+   待 r98 简报另请）。
+2. 会话重试窗 cron 已删除（8a797df8）。
+3. main 仓 remote 仍 = a0fe6d8（r96 已批面）；main b872347
+   （r97 实现）同样待 r98 另请。
