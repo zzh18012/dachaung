@@ -11233,3 +11233,27 @@ GPT 5.6 回执）。
    （dachuang-code main@a0fe6d8 porcelain 干净、自跑仓 tip 7f3b796
    仅 ?? Temp/）、零 git 残留、零产物件。整轮重生于限额重置后
    排程（协调者一次性任务），锚序不变（第 112 连）。
+## §213 r97 裁决执行①：存档 + R-2 push 转 APPROVED_WAITING_NETWORK + 实现链开跑（2026-10-30）
+
+1. **裁决存档**：outputs/gpt_brief_r97_ruling_reply.txt（10825 字符，
+   21 节完整性核验）。
+2. **总裁决登记**：r96 执行 ACCEPTED；R-1d = COMPLETE_SUCCESS；
+   **R-1 实现批准** = W5_GATE1_PATHOLOGICAL_OVERSIZE_INTRINSIC_
+   OVERRIDE_V1（cols>=6 冻结 = OVERRIDE_EVIDENCE_ONLY，不进基础
+   contract；scope 规范化 = raster/local/oversize 三类 max-frac，
+   弃 argmax 概念；参数全冻结 6/1.0/0.5，禁再扫参）；scope
+   equivalence 130/130 = 实现前硬门；14 项单测 + 全量 5565/4 不回退；
+   两段式 main→port；parser-level Hard A–G（E = accepted 集精确
+   53+30=83，无第 31 个）；四条件过 → **r7 自动授权**（comparator
+   r6；comparison/holdout 经授权 runner 首读）；失败 → gate repair
+   收口 + text v2b RESUME_ON_R6（无 n_cells 第二次机会）。
+3. **R-2 push**：APPROVED（882cfd4→5f2f653 三笔纯台账）；执行时
+   ls-remote 443 超时（网络窗再关）→ §二十 APPROVED_WAITING_
+   NETWORK，会话定时窗（每小时两探）重试，同 refspec 免再裁。
+4. **执行链**：scope-equivalence 预检 → main 实现 + 单测 → adoption
+   port + code-identity → parser-level Hard A–G → r7 evaluation
+   （自动授权）→ §214 台账 + r98 晋级简报。
+5. **状态**：r6 = CURRENT_ACCEPTED_BASELINE（r7 晋级前不变）；
+   text v2b = PAUSED；freeze/gold/credential/manifest 不变；不授权
+   清单（全局 min-col/n_cells fallback/五赢家切换/再扫参/gold-Tax
+   runtime/text-v2 实现）全程遵守。
