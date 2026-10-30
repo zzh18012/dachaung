@@ -11181,3 +11181,40 @@ GPT 5.6 回执）。
 5. **自跑线**：R2178 收口（e 侧锚 110 连 92365@87.42s、电池三组
    PASS、tip 401e27c、push-pending 积压 05300b4+401e27c）；R2179
    （f 侧锚 111）已链式启动。
+## §211 r96 执行②：R-1d intrinsic override 调查收口（存在满足 Hard A–G 的规则：cols>=6 等 6 条；只呈报不实现）+ r97 简报（2026-10-30）
+
+**日期：2026-10-30｜探针 _r96_intrinsic_override_study.py → outputs/w5_intrinsic_override_study_r96.{json,md}（含协调者结论 addendum）**
+
+1. **scope 结构核验**：现算 in-scope 130 例与 O-A′ changed face 全等
+   （双差 0）；全部在 tech-06；acad-06 0 例（r96 §八"不自动入域"
+   结构性成立——其 rule-1 弃表权威簇为局部真实图）；43 ⊆ scope；
+   scope∧gate2 = 43 = 30 真表 + 13 FP。
+2. **扫描面（§十一全参数报告）**：单特征双向全阈值 1130 条（通过
+   6 条）+ 组合四分位网格 120 条（通过 0 条=网格粒度伪影，单调
+   合取逻辑必过区间未采样，addendum 披露）。通过规则：独立型
+   cols>=6 / n_cells>=18 / rows_cols>=18 / text_cells>=6（fired=
+   emitted=30，不依赖 gate2）；gate2 耦合型 row_fill_min<=0.3333 /
+   mean_col_w<=78.36（fired 117、靠 gate2 拦 87，不推荐实现）。
+3. **primary = cols >= 6**（override scope 内；margin：13 FP cols
+   ∈[1,2] vs 30 真表 ∈[6,18]，安全区间 (2,6]）：Hard A 30/30、
+   B 0/2、C 0/1、D 0/10、E confirmed FP=0——**A–E 全 PASS**；
+   §十一 column-rule 限定条款满足（基础 acceptance contract 无
+   cols 约束零改动，cols 仅在 pathological-oversize override 分支）。
+4. **Hard F**：mirror r6 接受面 53 == 真实 parser 53（非 scope 零
+   触碰构造证明）；翻转恰 30；mirror 总接受 83；raster/gate2/
+   caption/figure 聚类面零改动。**Hard G**：MIRROR_A_TO_F_ALL_PASS
+   （B deficit 硬 0；C/D/E 违例 0；F 残余 1 词 = 既有 tech-07
+   NeverSend，与 r6 一致非本次引入）。
+5. **runtime**：特征提取仅 130 次（r6 拒绝∧in-scope 候选），均值
+   265us/候选 max 2.2ms；无额外 I/O。
+6. **处置（§十二/§十三）**：存在可行规则 → §十二失败分支不触发、
+   不自动收口 known limitation；§十三适用——**不构成实现授权**，
+   完整 spec + 全参数扫描 + A–G + census + runtime + expected
+   metric surface 呈 r97 简报另裁；r7 维持 NOT_STARTED；text v2b
+   维持 PAUSED_PENDING_FINAL_GATE_STUDY；parser 零修改（r6 形态）。
+7. **r97 简报** = outputs/gpt_brief_r97_intrinsic_override_success.txt
+   （调查结果 + §十三口径实现请求 + push 状态更新）。
+8. **自跑线**：R2178/R2179 收口（锚 110/111 连 92365，电池全 PASS，
+   tip 401e27c/7f3b796，push-pending 积压 3 笔 05300b4+401e27c+
+   7f3b796）；R2180（e 侧锚 112）运行中。网络 443 全日上午波动
+   （fetch 过窗/push 拒），main/adoption 已批准 push 仍待窗。
