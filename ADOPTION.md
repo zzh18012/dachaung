@@ -11448,3 +11448,16 @@ GPT 5.6 回执）。
   实现须另行呈报（若获批按真实顺序占下一 revision 号，r98 不预留）；
   本轮零 parser 改动、零 gold/freeze 读取修改。
 
+
+## §220 r99 简报发出：text v2b 调查完成回执 + v2b 调查验收/text 实现授权裁决请求 + adoption push 请求（2026-10-31）
+
+- 简报落盘：`outputs/gpt_brief_r99_text_v2b_report.txt`（自包含，
+  零前情可读；数字全部现读落盘文件）。
+- 内容：r98 执行收口回执（§218）+ v2b 十一项调查结果（§219 全数字
+  对象面：text 8/16 / combined 9/16 / precision 0.6154 / A–E 全过
+  deficit 0 / swallow 0 / 吸收 5.2%）。
+- 请求项：R-1 v2b 调查验收；R-2 text v2 实现授权与否（若准按真实
+  顺序成下一 revision，r98 不预留编号；若不准 text 路线归档）；
+  R-3 adoption push（ebae779→本简报台账 tip，2 笔，FF/非强推）。
+- 知悉项：自跑线 R2181 完成（锚 113，电池 4 组 PASS，push 443 断
+  积压 5 自理）、R2182（e 侧锚 114）在途；与裁决面无涉。
