@@ -11346,3 +11346,16 @@ GPT 5.6 回执）。
    简报）；晋级前 r6 仍为 CURRENT_ACCEPTED_BASELINE。
 6. **text v2b**：按 §十九，若晋级成功以 r7 为背景恢复；本台账
    不自行恢复。freeze/gold/credential/manifest 不变。
+
+## §217 r98 简报发出：r7 = ACCEPTED_BASELINE_CANDIDATE 正式晋级请求 + 双仓 push 请求（2026-10-31）
+
+1. 简报存档：`outputs/gpt_brief_r98_r7_promotion_request.txt`
+   （零前情可读；数字全部现读落盘文件）。
+2. 内容：r97 执行全回执（§213–§216）；R-1 = r7 正式晋级
+   CURRENT_ACCEPTED_BASELINE + text v2b RESUME_ON_R7；R-2 = 双仓
+   push（main a0fe6d8→b872347 单笔实现；adoption 5f2f653→f32251a
+   五笔 = port/§214/§215/runner 注册/§216），FF 非强推显式 SHA。
+3. 证据链闭合：w7/w8 探针产物 + stage9-eval-baseline-r7/ 五步链
+   全产物 + §213–§216 台账 + r97 裁决存档。
+4. 待裁决面：r7 晋级与否；r6 在晋级前维持 CURRENT_ACCEPTED_
+   BASELINE。
