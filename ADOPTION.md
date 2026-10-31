@@ -11359,3 +11359,42 @@ GPT 5.6 回执）。
    全产物 + §213–§216 台账 + r97 裁决存档。
 4. 待裁决面：r7 晋级与否；r6 在晋级前维持 CURRENT_ACCEPTED_
    BASELINE。
+
+## §218 r98 裁决：r7 正式晋级 CURRENT_ACCEPTED_BASELINE + 双 push 执行完毕 + text v2b RESUME_ON_R7（2026-10-31）
+
+1. **裁决存档**：outputs/gpt_brief_r98_ruling_reply.txt（21 节）。
+2. **baseline chain 更新（§十六）**：`r7 = CURRENT_ACCEPTED_BASELINE`；
+   `r6 = SUPERSEDED_ACCEPTED_BASELINE`；`r5 =
+   HISTORICAL_NON_BASELINE`；未来 parser revision 正式 comparator
+   = r7。
+3. **契约面（§一/§十七）**：
+   W5_GATE1_PATHOLOGICAL_OVERSIZE_INTRINSIC_OVERRIDE_V1 正式成为
+   accepted parser contract（冻结参数 6 / strictly>1.0 / 0.5 不变）；
+   PATHOLOGICAL_OVERSIZE_GATE_REPAIR = CLOSED_IMPLEMENTED_ACCEPTED；
+   acad-06 局部真实 figure 内 table FN = KNOWN_GATE1_FALSE_NEGATIVE
+   / UNCHANGED（≠ all gate1 FN resolved）。
+4. **text v2b（§十八）**：W5_TEXT_V2B = RESUME_ON_R7，范围严格 =
+   此前批准的 dev investigation / spec v2b（r90/r91 冻结约束全效：
+   one-to-one matcher、anchor coverage 与 P/R 分开、stacked-table、
+   caption swallow=0、fragmentation attribution、ownership A–E、
+   gate1 用 r7 行为、text_x_tolerance=1.5pt 冻结、protected split
+   不参与选参）；production implementation 不授权，实现另裁；
+   revision 编号按真实顺序递增不预占。
+5. **文书细化两项（§十一/§十三/§十四，append-only，不阻断）**：
+   - holdout 表述 = INFORMATIONAL / WITH_KNOWN_ANCHOR_EXPOSURE
+     （acad-03 历史 exposure 不可因零变化恢复 strict blind；可写
+     "r7 vs r6 holdout informational metrics 全部零变化"）；
+   - 登记 R98_GOLD_READ_WORDING_CLARIFICATION = PROSE_ONLY /
+     NON_BLOCKING：此前简报"gold 零读取"正确语义 = 无人工/探针/
+     调参/越权读取或修改 comparison/holdout gold；冻结 gold 仅由
+     已授权 evaluation runner 按既定流程消费。后续简报照此表述。
+6. **R-2 双 push 执行完毕**：remote 前提核验（main = a0fe6d8、
+   adoption = 5f2f653）→ `git push origin b872347:refs/heads/main`
+   = **a0fe6d8..b872347 FF 成功**；
+   `git push origin ebae779:refs/heads/…corpus-annotation` =
+   **5f2f653..ebae779 FF 成功**。显式 SHA refspec、非强推、无
+   夹带；两仓 remote = local tip。
+7. **不授权清单（§尾）**：全局 min-col、其他五 winner、重扫
+   intrinsic rule、gate1 0.5 / oversize 1.0 / 聚类修改、acad-06
+   特判、text-v2 production、relation patch、gold/freeze revision
+   —— 全程遵守。
