@@ -48,6 +48,8 @@ BASELINE_PRED = {  # gate 基线 = 前一 accepted revision（r86 Q2：r3 对照
     "stage9-eval-baseline-r5": "stage9-eval-baseline-r4",
     # r92 §十：gate 正式对照 = r4（r5 非 baseline）；归因对照 = r5
     "stage9-eval-baseline-r6": "stage9-eval-baseline-r4",
+    # r97 §十五/§十六：r7 正式 comparator = r6（CURRENT_ACCEPTED_BASELINE）
+    "stage9-eval-baseline-r7": "stage9-eval-baseline-r6",
 }
 GATE_REL_DROP = 0.05  # comparison 回归门阈值：相对下降 >5% 判 regression
 PARSER_CODE_REVS = {
@@ -69,6 +71,10 @@ PARSER_CODE_REVS = {
                                 "return_chars=True) provenance；adoption "
                                 "port 本轮；r92 R-1 获批谓词，双对照 "
                                 "gate=r4 / 归因=r5）"),
+    "stage9-eval-baseline-r7": ("main b872347（W5_GATE1_PATHOLOGICAL_"
+                                "OVERSIZE_INTRINSIC_OVERRIDE_V1：cols>=6 "
+                                "仅 override 分支；adoption port 16d9d0f；"
+                                "r97 R-1 获批，parser Hard A–G ALL PASS）"),
 }
 
 sys.path.insert(0, str(BASE))
