@@ -11315,3 +11315,34 @@ GPT 5.6 回执）。
 2. 会话重试窗 cron 已删除（8a797df8）。
 3. main 仓 remote 仍 = a0fe6d8（r96 已批面）；main b872347
    （r97 实现）同样待 r98 另请。
+
+## §216 r97 执行③：r7 evaluation 五步链完成（comparison gate PASS 0 回归）→ r7 = ACCEPTED_BASELINE_CANDIDATE（2026-10-31）
+
+1. **授权依据**：r97 §十五（四条件全过自动授权，§214 已登记）+
+   §十六纪律（comparator = r6；comparison/holdout 经授权 runner
+   首读；看后零改参——6/1.0/0.5 冻结未动）。
+2. **执行**：runner 注册（仅 registry 两条：r7→r6 对照映射 +
+   parser_code_revision，零算法改动，commit 见本笔前序）；五步链
+   prepare（24 docs / 817 hard boundaries）→ layerA（fallback +
+   kreuzberg 双 run_rc 0 + validate_rc 0）→ layerB（版本
+   pdfplumber=0.11.10 / kreuzberg=4.10.2）→ aggregate → gate。
+3. **gate 结果**：comparison（gated）四指标 r6 vs r7 **全等 0.0
+   delta**（unit_alignment 0.8297 / coverage 0.7635 / nontext
+   0.7004 / boundary_err 0.7378）→ **PASS，0 regressions**；
+   overall（informational）nontext 0.8004→**0.8074（improved，
+   +0.87%）**，其余三指标全等；holdout（informational 盲评）四
+   指标全等零变化。
+4. **变更隔离证明**：per_doc_results 逐字段 diff（剔除计时字段）
+   ——**唯一 metric 变化 = tech-06**：table 0→30、heading 397→285、
+   paragraph 516→317、nontext detected 49→57（ratio 0.8596→
+   **1.0**，tech-06 全部 gold nontext 对象命中）、chunk_boundary
+   precision 0.0182→0.0230 / F1 0.0357→0.0450（正向）；其余
+   23 doc 零 metric 差异。system_errors 46 条与 r6 逐条同集
+   （既有 LINKING 类）；LayerC relation 指标 9 项全等 r6。
+5. **§十七晋级五条件**：①dev A–G ALL PASS（w8）②Layer A 完成
+   ③comparison gate PASS ④ownership 无 blocker（deficit 硬 0 +
+   LayerC 无回归）⑤无新确认 parser-contract violation →
+   **r7 = ACCEPTED_BASELINE_CANDIDATE**；正式晋级回裁决面（r98
+   简报）；晋级前 r6 仍为 CURRENT_ACCEPTED_BASELINE。
+6. **text v2b**：按 §十九，若晋级成功以 r7 为背景恢复；本台账
+   不自行恢复。freeze/gold/credential/manifest 不变。
