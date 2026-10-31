@@ -11398,3 +11398,53 @@ GPT 5.6 回执）。
    intrinsic rule、gate1 0.5 / oversize 1.0 / 聚类修改、acad-06
    特判、text-v2 production、relation patch、gold/freeze revision
    —— 全程遵守。
+
+## §219 text v2b dev investigation 完成（r98 §十八恢复后首件）：one-to-one+option B 对象面闭合，A–E 全过 deficit 0，十一项授权面全产出（2026-10-31）
+
+- **执行依据**：r98 §十八 `W5_TEXT_V2B = RESUME_ON_R7`（范围 = r91
+  R-6 十一项授权面，dev investigation/spec only，无 implementation
+  授权）；背景 = r7。
+- **探针/产物**：`samples/private/stage9-corpus/review/
+  _r98_w5_text_v2b_probe.py`（只读）→
+  `outputs/w5_text_v2b_investigation_r98.{json,md}`。规则冻结先于
+  结果（matcher one-to-one + tie-break 四序 + stacked option B +
+  唯一配置 tl_xtr1_5 零扫描，全部写死在探针头部与 JSON frozen 字段）。
+- **面**：dev-4 AcadPDF（acad-02/04/05/06）39 页 16 金标；
+  comparison/holdout 零读取；geometry-first/text-fallback-per-page
+  架构（dev 上 geometry-owned 页 = 1：acad-06 p6 tab:3）。
+- **v2 连续性核验**：候选 24 / 过门 16 / 名义 14/16 与 r89 v2 JSON
+  逐数相等（确定性 + r7 门在 dev AcadPDF 与 spec-v1 门一致，override
+  惰性）。
+- **核心数字（对象面）**：TP 9（geometry 1 + text 8）/ FP 5 / FN 7；
+  **object recall text 8/16、combined 9/16**；nominal 分栏 v2-
+  continuity 14 vs architecture 8；text object precision 8/13 =
+  0.6154；booktabs 8/15。tie-break 事件 0（序保留为规格件）。
+- **③ 11→14 解剖**：v2 名义覆盖的 3 例双覆盖 = acad-02 p6（t1+t2）、
+  p8（t4+t5）、acad-06 p6（t2+t3 诊断面）合并框——14/16 中 6 锚的
+  "召回"来自跨对象合并，r90 blocker 实体闭合。
+- **FN 7 条 reason 全枚举**：stacked_ambiguity_reject 4（acad-02
+  t1/t2/t4/t5，option B 已裁代价）、gate2 1（acad-02 t3，rows=1）、
+  architecture_geometry_page_suppressed 1（acad-06 t2）、gate1 1
+  （acad-06 t6，KNOWN_GATE1_FALSE_NEGATIVE 原样）。
+- **ownership A–E（r92 生产谓词原函数）全过**：double 0 / **source-char
+  deficit 0（逐表逐页硬门）** / 拒收隔离（拒收+stacked 若 bbox 级
+  会吸 995 词，谓词全部留在段落轨）/ caption swallow 0（两层 39 页，
+  v2 的 3 例吞并全消失）/ 守恒 39/39。吸收 518/9,981 = **5.2%**
+  （v2 bbox 级 34%）。
+- **fragmentation**：v2 的 7 页 → 4 页（acad-04 p5 +5 / p7 +3 /
+  acad-05 p8 +1 / acad-06 p12 +4；2 页 TP 归因、2 页 FP 归因）；
+  碎裂处置（表跨行不切断/后合并）维持实现期决策。
+- **FP taxonomy 对象级**：local_text_align_other 3（参考文献列 ×2 +
+  伪代码 ×1）+ body_text_page_grid 2（prompt 长窄栏 ×2），与 v2 组成
+  一致，无新类别。
+- **runtime**：0.629 s/39 页（均值 16.1 ms、峰值 70.6 ms），不构成
+  障碍。
+- **披露**：生产 words-inside 面在 text 表按 r92 谓词计数，12/16 过门
+  候选低于 bbox 计数（例 acad-05 p7 t3 95→43），dev 零 gate2 翻转，
+  口径差随实现呈报。首跑曾用词中心近似致 deficit 594 假象，改用生产
+  谓词原函数后归零——探针吸收面与生产同构，非数字修饰（两跑 JSON 以
+  终跑落盘为准）。
+- **状态**：`W5_TEXT_V2B_INVESTIGATION = COMPLETE_PENDING_RULING`；
+  实现须另行呈报（若获批按真实顺序占下一 revision 号，r98 不预留）；
+  本轮零 parser 改动、零 gold/freeze 读取修改。
+
