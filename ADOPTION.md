@@ -11461,3 +11461,42 @@ GPT 5.6 回执）。
   R-3 adoption push（ebae779→本简报台账 tip，2 笔，FF/非强推）。
 - 知悉项：自跑线 R2181 完成（锚 113，电池 4 组 PASS，push 443 断
   积压 5 自理）、R2182（e 侧锚 114）在途；与裁决面无涉。
+
+## §221 r99 裁决执行回执：v2b 调查 ACCEPTED_COMPLETE、text v2 实现获批（EVALUATION_CANDIDATE 性质）、r8 自动授权链、adoption push 完成（2026-11-01）
+
+- **裁决到件**：r99 裁决回执（2026-11-01，全文存档
+  outputs/gpt_brief_r99_ruling_reply.txt）。
+- **R-1**：`W5_TEXT_V2B_INVESTIGATION = ACCEPTED_COMPLETE`；
+  nominal 14/16 = CONTINUITY_DIAGNOSTIC_ONLY；正式诊断口径改用
+  对象面（text P 0.6154 / R 0.5000 / F1 0.5517；combined P 0.6429 /
+  R 0.5625 / F1 0.6000；booktabs 8/15）；probe predicate drift 勘误
+  接受（R99_PROBE_PREDICATE_DRIFT_DISCLOSED / SELF_CORRECTED）。
+- **R-2 实现获批**：`TEXT_V2 = IMPLEMENTATION_APPROVED_FOR_
+  EVALUATION_CANDIDATE`。冻结面：geometry-first / text-fallback-
+  per-page（§八 11 步序）；唯一配置 tl_xtr1_5 完整 settings mapping
+  冻结进 production code/test（§九）；stacked option B =
+  ACCEPTED_CONTRACT_FOR_TEXT_V2；gate words-inside 口径裁定 =
+  cell-semantic emittable-word count（chars provenance + r92 谓词
+  + 非题注保护集；仅 text candidate，geometry gate 语义不变；§十）；
+  fragmentation 本批零修复（TEXT_V2_KNOWN_DEV_FRAGMENTATION_SURFACE
+  = 4 PAGES 登记不修；§十一）；DEV_KNOWN_TEXT_FALSE_POSITIVES = 5
+  冻结呈报不得隐去（§六）。
+- **实现链授权**：main 15 项单测（§十二）→ 全量零新败 → 两段式
+  port（§十三，r55 C08 单独保留）→ dev Gate A–G（§十四：A v2b
+  复现 TP8/FP5/combined9/stacked3/swallow0；B known FP 全披露；
+  C dev-14 新增枚举 NEW_REVIEWED_DEV_TEXT_FP=0，第 6 个确认 FP →
+  暂停回裁；D ownership deficit 0；E stacked 隔离；F geometry
+  保持；G paragraph blast-radius census 无数值阈值但内容丢失/
+  跨区误并 = blocker）→ 全过则 **r8 自动授权**（comparator = r7，
+  五步链，无需再请示；§十五）；protected-split 零调参纪律（§十六）；
+  **r8 不自动晋级**——仅 ACCEPTED_BASELINE_CANDIDATE，promotion
+  另裁且须重呈 5 FP 终态等六面（§十七）。
+- **R-3 push 完成**：adoption `ebae779..130b59b` FF 成功
+  （cdc08f1 §219 + 130b59b §220；显式 SHA refspec、非强推、无
+  夹带；remote = local tip = 130b59b）。main 无待推。
+- **不授权清单（§尾）**：新 text config 扫描、1.5pt 调整、
+  reference/pseudocode/prompt 特判、lexical classifier、stacked
+  例外发射、bbox ownership、geometry gate 语义修改、paragraph
+  stitching、text-v2 baseline 自动晋级、gold/freeze revision
+  —— 全程遵守。
+- **下一步**：main 实现（r99 §八 11 步序 + §九/§十/§十一冻结）。
