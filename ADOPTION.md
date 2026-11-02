@@ -11500,3 +11500,75 @@ GPT 5.6 回执）。
   stitching、text-v2 baseline 自动晋级、gold/freeze revision
   —— 全程遵守。
 - **下一步**：main 实现（r99 §八 11 步序 + §九/§十/§十一冻结）。
+
+## §222 text v2 实现完成 + dev Gates A–G 实测：A/B/D/E/F/G PASS，**Gate C PAUSE 面（162 个非学术新 text 表、0 金标命中）**——按 §十四/§十八 不跑 r8，text track 返回裁决面（2026-11-02）
+
+- **main 实现**（59d78b3）：fallback_parser 按 r99 冻结面落地——
+  `TABLE_TEXT_SETTINGS` 完整 mapping 冻结（vertical=text /
+  horizontal=lines / text_x_tolerance=1.5）；`if not accepted_tables:`
+  才跑 text 路径（geometry-first / text-fallback-per-page，非 union）；
+  text 候选过 `_gate_pdf_table_with_override` 同一门链；
+  `_table_caption_anchors`（v2b 冻结语义：top±2pt 行聚类、
+  `^\s*table\s*([0-9]+)\s*[:.]`，命名避开 W4 `_TABLE_CAPTION_RE`）+
+  `_is_stacked_ambiguous_table`（水平重叠>0 ∧ 双向 ≤60pt，≥2 锚拒）；
+  吸收复用 r92 谓词 + 题注保护（gate words-inside = 可归属词计数，
+  §十）；geometry 表 6 元组 origin=None，metadata 无 detection 键 =
+  r7 结构逐字节一致。新测试 tests/test_w5_text_v2_fallback.py 18 项
+  覆盖 §十二 15 项（纯函数面 + monkeypatch pdfplumber.open/TableFinder
+  stub 全路径面）。全量 **5613 passed / 4 skipped**（基线 5595+18，
+  零新增失败）。
+- **adoption port**（dae726c）：git apply 干净命中；**code-identity**
+  = 移植后 diff 面恰为 r55 C08 历史差异（43 行内容不变仅行号平移）；
+  adoption 全量 **5816 passed / 5 failed / 4 skipped**——5 个失败经
+  stash 双向核验为 HEAD 既有（devset 依赖 ×2 + W1 空格分隔符 ×3），
+  零新增；按 §十三 不在 adoption 加 hotfix。
+- **Gates A–G 探针**（samples/private/stage9-corpus/review/
+  _r100_dev_parser_gates_ag.py → outputs/dev_parser_gates_ag_r100.
+  {json,md}）：真实 parser 双跑（新 = dae726c 工作树；r7 参照 =
+  git show 1ed777e blob 运行期独立加载），dev-14 全量（12 PDF +
+  2 DOCX），comparison/holdout 零读取。
+  - **A PASS**：text TP 8 / known FP 5 / combined TP 9 / stacked
+    diagnostic 3 / caption swallow 0 / FN 7——v2b 冻结对象面逐数复现。
+  - **B PASS**：FP (doc,page) 多重集 == frozen five。
+  - **C PAUSE**：acad dev-4 之外 **162 新表 / 0 金标命中**（金标页全
+    geometry-owned 与 text 表页零交集）：prod-01 121（正文碎格）、
+    tech-06 29（全页框 ~503×754pt）、tech-03 9、tech-07 2、tech-01 1；
+    prod-05/06/03 + 2 DOCX 零新表。**override 交互新披露**：161/162
+    bbox 复核 base gate，132 base 即过、**29（全 tech-06）为
+    override-only**（oversized 矢量簇 + cols≥6 放行全页 text 网格；
+    base gate1 本会拒）。按 §十四 Gate C（第 6 个确认 FP → 暂停）
+    + §十八：**不跑 r8，返回裁决面**。
+  - **D PASS**：171 text 表页；吸收 32,692 词、duplication 0、
+    **source-char deficit 0**、题注事件 0、守恒 171/171；拒绝/stacked
+    谓词级反事实吸收 0。`prod_regroup_join_match` 118/171 False 为
+    信息项（W4 行级题注提升 split 所致元素数差，非内容差异）。
+  - **E PASS**：gate-passed stacked emitted 0 / ownership 0。
+  - **F PASS**：全 dev-14 geometry 面逐字节保持；2 DOCX 元素序列
+    identity（prod-07 7690 元素 / tech-05 332 元素）。
+  - **G 无内容丢失**：字符级内容丢失 0/171 页（word/cell 分词无关
+    口径）；fragmentation（生产类型级 parΔ>0）3 页：acad-04 p5 +1、
+    acad-06 p12 +3、tech-01 p37 +3（与 v2b 组级 4 页口径不同，均披露）。
+  - 探针过程披露：内容丢失检查首版 token 级比对（168 假事件）+
+    md 装饰剥离过宽（44 假丢失）两轮修正为字符级子集比对，终跑 0；
+    JSON 为终跑。
+- **纪律**：本轮零 tolerance/规则/filter 改动（§十六/§十八遵守）；
+  未跑任何 revision；main 59d78b3 / adoption 1ed777e+dae726c 待推
+  （随 r100 简报请求）。
+- **下一步**：r100 简报（Gates 回执 + Gate C 处置裁决请求 + push 请求）。
+
+## §223 r100 简报发出：text v2 实现 + Gates A–G 回执（Gate C PAUSE 162 FP）+ 处置裁决 / 双仓 push 请求（2026-11-02）
+
+- 简报文件：`outputs/gpt_brief_r100_gates_pause_report.txt`（绝对路径
+  `C:\Users\zzhn2\Desktop\dachuang-adoption\outputs\gpt_brief_r100_gates_pause_report.txt`）。
+- **R-1（Gate A–G 验收 + Gate C 处置裁决）**：A/B/D/E/F PASS、G 无内容
+  丢失（fragmentation 3 页披露）的验收；Gate C 触发 §十四 暂停条款
+  （162 新 text 表 / 0 金标命中；29 个 override-only 新交互）→ 处置
+  选项面 O-a 关闭 / O-b 修订架构再裁（新规则须另授权 + Gate C 重跑）/
+  O-c 接受现状 / O-d 其他；并请显式裁定 r8 是否跑 / comparator。
+- **R-2（双仓 push，FF 非强推）**：adoption remote 130b59b → 本地 tip
+  （§221+§222+§223 台账 commit，实际 2–3 笔以推时 tip 为准）；
+  main b872347 → 59d78b3（1 笔）。显式 SHA refspec、remote tip 变化
+  不能 FF → 暂停重核；443 失败 → APPROVED_WAITING_NETWORK 同 refspec
+  重试免再裁。
+- **等待裁决期间不跑任何 revision、不改任何 tolerance/filter/规则/
+  override 适用面**（§十八）；comparison/holdout 保持零读取。
