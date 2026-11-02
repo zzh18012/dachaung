@@ -2,9 +2,113 @@
 
 面向 KVFS 的复合文档解析与结构-语义分块原型。
 
-**当前阶段（最小闭环）**：PDF/DOCX → 统一文档模型 → 基础结构分块 → JSON Schema 校验 → JSON 输出。
+**当前状态（2026-11 结题收口）**：PDF/DOCX → 统一文档模型 → 基础结构分块 → 关系抽取 → JSON Schema 校验 → JSON 输出。
 
-> 本阶段明确**不做**：Web UI、真实 KVFS 接入、向量化 / Sentence-BERT、OCR、cpp-chunker、内核代码、流式处理。
+> 演示页：`docs/demo.md`（静态链路演示 + 结题指标表）。
+
+---
+
+## 0. 结题状态（finalization，2026-11）
+
+### 0.1 Pipeline 与 baseline
+
+```
+parse → elements → chunks → relations → schema validation → JSON
+```
+
+- **final accepted baseline：`r7`**（accepted parser code = main `b872347`）
+- 评测金标：24 篇核心语料人工标注（dev/comparison/holdout = 14/4/6），
+  G⑥ 冻结（gold_revision=`stage9-b26-gold-r1`，credential digest
+  `8b0c2a8c…f0d3d`）；评测台账与裁决链在独立仓 `dachuang-adoption`
+  （ADOPTION.md，append-only）
+
+### 0.2 确定性规则边界
+
+系统全程确定性规则（deterministic rules only）：
+
+- no OCR
+- no probabilistic matching
+- no learned layout model
+
+### 0.3 最终关键指标摘要（r7，24 core docs，fallback parser）
+
+| 指标（comparison split = 回归门面） | 值 |
+|---|---|
+| unit_alignment_accuracy | 0.8297 |
+| extraction_coverage | 0.7635 |
+| nontext_detection_ratio | 0.7004 |
+| boundary_error_rate（容差 30 chars） | 0.7378 |
+| 解析成功率 / schema 校验通过率 | 24/24 / 1.0 |
+
+（holdout 面数字为 INFORMATIONAL / WITH_KNOWN_ANCHOR_EXPOSURE——
+acad-03 历史锚暴露不可逆，不作 strict-blind 宣称。）
+
+### 0.4 ARI（与人工标注一致性；dev 14 篇，冻结金标，预注册面零调参）
+
+| 项 | 值 |
+|---|---|
+| 项目目标 | ≥0.75 |
+| 本系统（max_chars=1200） | **0.3345** |
+| 基线 B1（固定长度 N*=2000） | 0.2658 |
+| 基线 B2（fold-ws v1） | 0.2621 |
+| oracle 合规上界（max_chars≤2000 契约） | 0.4159 |
+| 目标达成 | **NOT MET（结构性）** |
+
+系统显著优于两条固定长度基线（+25.9% / +27.6%），达自身结构天花板的
+**80.4%**。目标未达成的主体归因 = 金标段长（中位 5607 / 均值 9828 字符）
+与 `max_chars≤2000` 冻结分块契约的**粒度失配**（granularity contract
+mismatch，非实现缺陷）：在该契约下 0.75 结构性不可达（oracle 上界
+0.4159）。扩展 N 粒度诊断（0.75 交叉 ≈N10679）为 diagnostic 插值，
+**非生产建议**，只记录于评测台账附录。
+
+### 0.5 图表-题注关系（Layer C，fixed-anchor relation evaluation）
+
+范围限定：仅 acad-03（credential 抽查 20 gold edges）——**不宣称
+24 篇 corpus-wide**。
+
+| 指标 | 值 |
+|---|---|
+| relation_edge P / R / F1 | 1.0 / 0.35 / **0.5185** |
+| caption_edge F1 | 0.5 |
+| reference_edge F1 | 0.5333 |
+| anchor_classification_accuracy（v2） | 0.7 |
+
+### 0.6 Known limitations
+
+- **ARI granularity mismatch**（见 0.4，冻结契约下结构性）
+- **relation recall 0.35**（gold 边界发现面缺口；关系工程已为结题关闭，
+  列未来工作）
+- **booktabs text track closed**（W5 文本面在 dev 非 acad 语料泛化失败：
+  162 FP / precision 0.0457 → 正常 revert 关闭；booktabs 文本检测缺口 =
+  KNOWN_LIMITATION）
+- **acad-06 local-figure table FN**（图内小表漏检）
+- 24-core 关系锚句绑定 NOT_EXECUTED / DEFERRED_POST_FINAL（结题限制/
+  未来工作）
+
+### 0.7 复现与评测入口
+
+```bash
+# 单文档解析（parse → schema 校验 → JSON）
+.venv/Scripts/python.exe -m app.cli parse input.pdf -o out.json
+
+# 仅校验已生成 JSON
+.venv/Scripts/python.exe -m app.cli validate out.json
+
+# 全量测试
+.venv/Scripts/python.exe -m pytest
+
+# Stage 2 评测面（清单驱动）
+.venv/Scripts/python.exe -m evaluation.cli run \
+  --manifest samples/private/devset/manifest.json --output outputs/eval.json
+```
+
+终测复现件 `stage9-eval-terminal-reval-r1`（FINAL_LOCKED_R7_
+REVALIDATION：六要素冻结后重跑五步链 24 docs，comparator = r7 稳定
+字段逐项相等）见 adoption 仓 ADOPTION.md §228。
+
+> 主线明确**不做**：真实 KVFS 接入、向量化 / Sentence-BERT、OCR、
+> cpp-chunker、内核代码、流式处理。（Stage 11 的演示页面不属于主线
+> 范围，仅随集成分支交付。）
 
 ---
 
@@ -595,8 +699,9 @@ dachaung-code/
 
 ## 11. Stage 2：评测方法（pilot baseline / incomplete devset）
 
-> 当前开发集仅 1 对 DOCX+PDF，**数字仅反映这对样例上 fallback parser 的表现，
-> 不代表项目总体准确率**。完整评测方法见 `docs/evaluation.md`。
+> 本节为 Stage 2 历史方法文档：当时开发集仅 1 对 DOCX+PDF，**数字仅反映该对
+> 样例上 fallback parser 的表现，不代表项目总体准确率**。结题最终指标见 §0；
+> 完整评测方法见 `docs/evaluation.md`。
 
 ### 11.1 跑评测
 
