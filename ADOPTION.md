@@ -11626,3 +11626,35 @@ GPT 5.6 回执）。
 6. **状态块（§224）**：r100 EXECUTED；W5_TEXT_TRACK CLOSED；
    r8 NOT_STARTED；r7 = CURRENT_ACCEPTED_BASELINE；
    freeze/gold/credential/manifest UNCHANGED。
+
+## §225 r101 裁决执行回执：双 revert ACCEPTED_COMPLETE + R-2′ 双仓 push 完成（封闭 7 笔 FF 非强推）+ 本条不随本轮授权（2026-11-02）
+
+1. **裁决收到（r101，2026-11-02 用户中转）**：main revert `ebc8dd2` =
+   ACCEPTED_COMPLETE（tree==r7 b872347 + 5595/4）；adoption revert
+   `22936d7` = ACCEPTED_COMPLETE（r7 + HISTORICAL r55 C08 + 5798/5/4，
+   5 既存零新增）；19 个 stage9 假失败登记
+   `R101_RUN_ENV_ENCODING_ARTIFACT = DISCLOSED_NON_BLOCKING`（终跑为
+   正式回执口径）；失败实验 append-only 审计链（实现→Gate C 失败→
+   正常 revert）认可公开到 canonical remote；R-2′ 批准（封闭集合
+   main {59d78b3, ebc8dd2} + adoption {1ed777e, dae726c, 8f62a4f,
+   22936d7, 1db8a2d} = 7 笔；FF/非强推；本条 §225 及其后任何 commit
+   不在本授权内）。
+2. **push 执行（2026-11-02）**：执行瞬间 ls-remote 重核——main =
+   b872347、adoption = 130b59b（均未变，FF 前提成立）→
+   - main：`git push origin ebc8dd2:refs/heads/main` →
+     **b872347..ebc8dd2**，exit 0；事后 ls-remote = ebc8dd2 ✓
+   - adoption：`git push origin 1db8a2d:refs/heads/integration/
+     stage9-batch26-corpus-annotation` → **130b59b..1db8a2d**，
+     exit 0；事后 ls-remote = 1db8a2d ✓
+   - 零 force/零 +refspec/零夹带；恰 7 笔（2+5），逐笔与授权集合
+     相符。
+3. **本简报/台账登记**：本条（§225）兼作 r101 简报发出登记（简报
+   `outputs/gpt_brief_r101_revert_push_request.txt` 于裁决前发出），
+   按 r101 §十 不属本轮 push 授权，留本地待下轮 push 随批。
+4. **状态块（§225）**：MAIN_PUSH = COMPLETE（b872347→ebc8dd2）；
+   ADOPTION_PUSH = COMPLETE（130b59b→1db8a2d）；r7 =
+   CURRENT_ACCEPTED_BASELINE；r8 = NOT_STARTED；W5_TEXT_TRACK =
+   CLOSED_AS_IMPLEMENTATION_FAILED_DEV_GENERALIZATION；
+   booktabs_text_detection_gap = KNOWN_LIMITATION；r97 override =
+   ACCEPTED/UNCHANGED；freeze/gold/credential/manifest UNCHANGED。
+   **无待决请求项**；comparison/holdout 零读取保持。
