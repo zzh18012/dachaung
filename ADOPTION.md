@@ -11720,3 +11720,61 @@ GPT 5.6 回执）。
    公开差距收口 / O-b 扩网格新 RFC / O-c gold 粒度修订（须极强
    理由）/ O-d 其他 + 终测批次设计 + R-H 演示页/README 授权 +
    push 搭车）。
+
+## §227. r102 裁决回执：ARI 面收口 O-a 生效 + FINALIZATION_MODE 启动 + R-4 push 执行回执（2026-11-02）
+
+1. **裁决收到**（GPT 5.6，2026-11-02，对应简报
+   outputs/gpt_brief_r102_ari_face_closeout.txt）：
+   - **R-1 = O-a**：ARI_TARGET_075 = **NOT_MET**——按预注册纪律
+     公开差距与粒度归因收口，结题口径 = 系统 0.3345 > 基线
+     0.2658/0.2621 + oracle 天花板 0.4159 + 系统达天花板 80.4%
+     + PRIMARY_ARI_GAP_ATTRIBUTION = GRANULARITY_CONTRACT_MISMATCH
+     （gold 段长中位 5607/均值 9828 vs max_chars≤2000 冻结契约，
+     非实现缺陷）；O-b（扩网格新 RFC）/O-c（gold 粒度修订）不批；
+     extended-N（0.75 交叉 ≈N10679）仅 DIAGNOSTIC_ONLY 附录，
+     写明 diagnostic interpolation / approximate crossing。
+   - **R-2 = 方案 A**：r7 = FINALIZATION_BASELINE（不创建 r8）；
+     **FINAL_TERMINAL_R7_REVALIDATION APPROVED**——恰一次 final
+     locked terminal run，五步链 prepare → Layer A → Layer B →
+     aggregate → gate 覆盖 24 core docs（comparison + holdout
+     protected split **仅此一次读取授权**，经授权 runner，看后
+     零改参纪律）；正式 parser identity 钉 **b872347**，终测须在
+     clean detached worktree / equivalent immutable checkout 运行；
+     执行前冻结六要素（parser SHA / runner 代码 / manifest /
+     gold revision+digest / 依赖版本 / 指标定义），执行后不得据
+     结果改 parser/阈值/metric/gold；comparator = r7 accepted
+     metrics（稳定字段预期一致，允许差异仅 wall-clock/timestamps/
+     machine metadata）；意外差异 → **FINALIZATION_PAUSE_
+     REPRODUCIBILITY_INVESTIGATION**（只许查复现性，不得直接接受
+     新数字覆盖 r7）；holdout 表述 = **INFORMATIONAL /
+     WITH_KNOWN_ANCHOR_EXPOSURE**（acad-03 历史 exposure 不可逆，
+     不写 untouched strict-blind）；ARI G⑦ 报告接线 = 仅
+     identity/hash 核验 + 渲染 + 一致性检查（不重选 N 不重跑搜索）。
+   - **R-3 APPROVED**：main README 更新（含 r102 §十八 8 项最低集）
+     + 最小静态演示页（convergence 分支 docs/readme-stage-status
+     7a0378c 基础）；docs-only，不做 Web UI；演示数据用
+     synthetic/dev/专门 fixture，**不用 comparison/holdout 样本**；
+     README 不得把 extended-N 诊断写成生产建议；Layer C 只能称
+     "fixed-anchor relation evaluation"（acad-03/20 gold edges），
+     不得宣称 24-doc corpus-wide。
+   - **R-4 APPROVED**：adoption 2 笔 push（§5 封闭集）。
+   - **FINALIZATION_MODE 生效**：结题前 main 仓只允许 docs/README/
+     report/demo 与不改语义的复现性修复；任何 parser/metric/gold
+     行为变更须重新立案且默认不进本届。
+   - 状态登记：24_CORE_RELATION_ANCHOR_BINDING =
+     **NOT_EXECUTED / DEFERRED_POST_FINAL**（9 月遗留项裁决：图表
+     关联结题数字 = Layer C relation_edge 三联 P 1.0/R 0.35/
+     F1 0.5185 + 分类型 caption 0.5/reference 0.5333 + anchor_
+     classification 0.7；24-core 锚句绑定列为结题限制/未来工作，
+     不假装完成）；relation recall 0.35 = KNOWN_LIMITATION，
+     RELATION_ENGINEERING = CLOSED_FOR_FINALIZATION（不再开修复批）。
+2. **R-4 push 执行回执**：`git push origin f9f559f:refs/heads/
+   integration/stage9-batch26-corpus-annotation` → **成功
+   1db8a2d..f9f559f（FF，恰 2 笔：764d6d8 + f9f559f，零夹带）**；
+   事后 ls-remote 核对 remote tip = f9f559f ✓。main 仓无待推
+   （r101 已推至 ebc8dd2）。
+3. **执行排程（本条即启动）**：①终测 FINAL_LOCKED_R7_
+   REVALIDATION（五步链 24 docs，冻结六要素，comparator=r7）→
+   ②README + 演示页（main docs-only，避开自跑线锚窗）→ ③§228/§229
+   回执 → ④r103 简报（终测回执 + docs commits push 另集请求）。
+   本条 commit 不在已批 push 集内，随 r103 另请。
