@@ -11658,3 +11658,65 @@ GPT 5.6 回执）。
    booktabs_text_detection_gap = KNOWN_LIMITATION；r97 override =
    ACCEPTED/UNCHANGED；freeze/gold/credential/manifest UNCHANGED。
    **无待决请求项**；comparison/holdout 零读取保持。
+
+## §226 ARI 面三件真实 run：granularity 天花板 + baseline 14 篇全网格 N* 重跑 + system 选优（G⑥ 冻结金标 dev 14 篇，全预注册面）（2026-11-02）
+
+1. **授权链（全部预注册件，G⑥ FROZEN 解锁）**：① granularity
+   真实 run = 外部评审 R-B（§132）→ §138 协议件 +
+   stage9/granularity_preregistration.json（"真实 run 仅 G⑥ 后
+   dev 14 篇；永不修改 ARI 分母；ARI<0.75 公开差距与粒度归因"）；
+   ② baseline 14 篇全网格重跑 = N* 冻结硬门槛登记（"N* 冻结须最终
+   14 篇 dev 全网格重跑……若仍 2000 记为 re-confirmed"）；③ system
+   选优 = 裁决 C 预注册（stage9/system_select_preregistration.json，
+   --gold-revision/--gold-digest 运行时绑定强制，gold_revision 只能
+   由 G⑥ 冻结产生）。G⑥ FROZEN（freeze_revision=
+   stage9-g6-freeze-r1，credential gold_revision=stage9-b26-gold-r1，
+   §185）。**本轮零调参、零金标写入、零 protected split 读取**
+   （manifest split==dev 过滤）；产物全 gitignored。
+2. **granularity 天花板**（探针 samples/private/stage9-corpus/
+   review/_r102_granularity_real_run.py → outputs/
+   stage9-granularity-dev14-frozen-r1.json）：14 篇 234 段，
+   段长 median-of-medians 5607 / mean-of-means 9828 /
+   max-of-max 123102 字符。**macro ari_bound（oracle 合规切块
+   上界，分母不变）**：N=200→0.1016、500→0.2045、800→0.2664、
+   1200→0.3280、**2000→0.4159**。逐篇 @2000：prod-05/tech-05
+   =1.0（段全部 ≤2000）、prod-06 0.8643、tech-03 0.5111、
+   acad-04 0.4675……tech-01 0.1622、tech-06 0.1466、
+   prod-01 0.1012、**prod-03 0.0534、prod-07 0.0308**（段中位
+   20509/18175 字符）。**结论：冻结 max_chars≤2000 契约下
+   ARI≥0.75 结构性不可达（网格上限处 oracle 天花板 0.4159）**。
+3. **扩展 N 诊断（非冻结网格，仅裁决支持，单独落盘
+   outputs/stage9-granularity-dev14-extendedN-diagnostic.json）**：
+   N=4000→0.5476、8000→0.7205、16000→0.8086、32000→0.8898、
+   64000→0.9518、128000→1.0；**0.75 交叉点 ≈ N 10679（插值）**
+   ——量化"若动契约需多大 N"。
+4. **baseline 14 篇全网格重跑**（scripts/stage9_baseline_select.py
+   → outputs/stage9-baseline-select-dev14-frozen-r1.json）：
+   **B1 N*=2000 macro=0.2658（re-confirmed）**；**B2-foldws-v1
+   N*=2000 macro=0.2621**；逐篇 unmatched/uncovered=0（首格
+   N=200 披露面）。与冻结前 debug 值（0.2593/0.2557，2026-09-07
+   dev14-debug）同量级小幅上移（金标终冻 A/B 补采所致，非口径变）。
+5. **system 选优（r7 parser，真实管线 14×5=70 解析）**
+   （scripts/stage9_system_select.py --gold-revision
+   stage9-b26-gold-r1 --gold-digest 8b0c…f0d3d（运行时重算比对
+   通过）→ outputs/stage9-system-select-dev14-frozen-r1.json）：
+   macro-ARI：200→0.1122、500→0.2498、800→0.2470、
+   **1200→0.3345（pick，预注册平局取最小规则）**、2000→0.2832；
+   N/A 分布 {}（14/14 全评分）。**系统 0.3345 > B1 0.2658 >
+   B2 0.2621（与固定长度基线对比目标在 dev 面成立）；系统达
+   自身结构天花板的 80.4%（0.3345/0.4159）**——差距主体是
+   结构性粒度，非实现缺陷。unmatched_chunks/uncovered_units
+   逐篇披露在报告内（如 acad-02 @200 unmatched 246——折叠
+   空格后定位失败面，@选优 N 显著更低）。
+6. **图表关联面现值（r7 评测 Layer C，随 §216 已在案，此处引
+   用供收口）**：relation_edge P=1.0 / R=0.35 / **F1=0.5185**；
+   caption_edge F1=0.5；reference_edge F1=0.5333；
+   anchor_classification_accuracy=0.7。
+7. **纪律**：三面均按各自预注册规则原样执行（网格 [200,500,
+   800,1200,2000] 镜像、macro 规则、平局取最小、ARI 分母零
+   改动）；扩展 N 件明确标注非冻结网格、不进任何正式报告分母。
+   comparison/holdout 零读取保持。
+8. **下一步**：r102 简报（ARI 差距处置裁决请求 O-a 按预注册纪律
+   公开差距收口 / O-b 扩网格新 RFC / O-c gold 粒度修订（须极强
+   理由）/ O-d 其他 + 终测批次设计 + R-H 演示页/README 授权 +
+   push 搭车）。
