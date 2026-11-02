@@ -20,9 +20,11 @@ from app.parsers.table_linearize import linearize_table
 # 这些库都是计划内依赖，且只在这个文件里 import（业务代码看不见）
 try:
     import pdfplumber  # type: ignore[import-not-found]
+    from pdfplumber.table import TableFinder  # type: ignore[import-not-found]
     _PDFPLUMBER_VERSION = getattr(pdfplumber, "__version__", "unknown")
 except ImportError as _e:  # pragma: no cover
     pdfplumber = None  # type: ignore[assignment]
+    TableFinder = None  # type: ignore[assignment]
     _PDFPLUMBER_VERSION = None
     _PDFPLUMBER_IMPORT_ERROR = str(_e)
 
@@ -102,6 +104,22 @@ TABLE_MIN_ROWS = 2
 # > 1.0×page_area；参数冻结后不得再扫描（r97 §十四）。
 TABLE_PATHO_OVERSIZE_MIN_COLS = 6
 TABLE_PATHO_OVERSIZE_PAGE_RATIO = 1.0
+
+# r99 §九：text v2 唯一冻结 table_settings（完整 mapping 显式写死，
+# 不依赖 pdfplumber 未来默认值漂移）。禁止实现期再扫描任何变体
+# （1.0/2.0/3.0、text-text、lines-text 等）。
+TABLE_TEXT_SETTINGS: dict[str, Any] = {
+    "vertical_strategy": "text",
+    "horizontal_strategy": "lines",
+    "text_x_tolerance": 1.5,
+}
+# r99 stacked option B：text 候选关联 >=2 个题注锚（"Table N:" 行）→
+# ambiguous_stacked_table，拒发射、不取 ownership、不吞题注、不计 TP。
+# 关联规则与 v2b 探针冻结面逐字一致（水平重叠>0 ∧ 双向垂直间距<=60pt）。
+# 命名避开 W4 表题注前缀模式 _TABLE_CAPTION_RE（见下方批次 7 契约）。
+_TABLE_ANCHOR_LINE_RE = re.compile(r"^\s*table\s*([0-9]+)\s*[:.]", re.IGNORECASE)
+_TABLE_ANCHOR_VWIN = 60.0
+_TABLE_LINE_GROUP_TOL = 2.0
 
 
 def _is_figure_caption(el: Element) -> bool:
@@ -760,6 +778,55 @@ def _word_chars_in_table_cells(w: dict, cells: list[list[float]]) -> bool:
     )
 
 
+def _table_caption_anchors(words: list[dict]) -> list[list[float]]:
+    r"""text v2 stacked 检测用题注锚行（v2b 探针冻结语义）。
+
+    行聚类按 top ±2pt（行锚 = 首词 top，不均值）；行文本以 "Table N:"
+    / "Table N." 开头（无空格 mega-word 兼容，\s* 不用 \s+）即锚行。
+    返回锚行 bbox 列表。"""
+    lines: list[list] = []
+    for w in sorted(words, key=lambda w: (round(float(w["top"]), 1), float(w["x0"]))):
+        placed = False
+        for ln in lines:
+            if abs(float(w["top"]) - ln[0]) <= _TABLE_LINE_GROUP_TOL:
+                ln[1].append(w)
+                placed = True
+                break
+        if not placed:
+            lines.append([float(w["top"]), [w]])
+    anchors: list[list[float]] = []
+    for _, ws in lines:
+        ws_sorted = sorted(ws, key=lambda w: float(w["x0"]))
+        text_line = " ".join(str(w["text"]) for w in ws_sorted)
+        if _TABLE_ANCHOR_LINE_RE.match(text_line):
+            anchors.append([
+                min(float(w["x0"]) for w in ws_sorted),
+                min(float(w["top"]) for w in ws_sorted),
+                max(float(w["x1"]) for w in ws_sorted),
+                max(float(w["bottom"]) for w in ws_sorted),
+            ])
+    return anchors
+
+
+def _is_stacked_ambiguous_table(
+    bbox: list[float], anchors: list[list[float]]
+) -> bool:
+    """r99 stacked option B 判据：text 候选关联 >=2 题注锚。
+
+    关联 = 水平重叠 > 0 且双向垂直间距（bbox.top - anchor.bottom 与
+    anchor.top - bbox.bottom）均 <= 60pt。"""
+    n = 0
+    for ax0, atop, ax1, abot in anchors:
+        hov = (bbox[0] < ax1) and (ax0 < bbox[2])
+        below = bbox[1] - abot
+        above = atop - bbox[3]
+        if hov and below <= _TABLE_ANCHOR_VWIN and above <= _TABLE_ANCHOR_VWIN:
+            n += 1
+            if n >= 2:
+                return True
+    return False
+
+
 def _caption_protected_indices(words: list[dict]) -> set[int]:
     """题注词保护（规格 §5.2(3)：题注不吸收）。
 
@@ -933,7 +1000,8 @@ def _parse_pdf(
                 except Exception:
                     page_area = 0.0
                 accepted_tables: list[
-                    tuple[list[Any], int, int, list[float] | None, bool]
+                    tuple[list[Any], int, int, list[float] | None, bool,
+                          str | None]
                 ] = []
                 if words:
                     protected = _caption_protected_indices(words)
@@ -981,7 +1049,7 @@ def _parse_pdf(
                         accepted_tables.append(
                             (rows, len(rows),
                              max((len(r) for r in rows), default=0),
-                             tbl_bbox, partial_cov)
+                             tbl_bbox, partial_cov, None)
                         )
                         if po_warn is not None:
                             warnings.append(
@@ -1001,6 +1069,84 @@ def _parse_pdf(
                                     },
                                 )
                             )
+                    # r99 §八：text v2 fallback——仅当该页无任何 accepted
+                    # geometry 表时运行（geometry-first / text-fallback-
+                    # per-page，不采用 union）。text 候选走同一 r7 门链
+                    # （含 pathological-oversize override），stacked option
+                    # B 拒发射且不取 ownership；吸收沿用 r92 cell-semantic
+                    # 谓词与题注保护集（gate words-inside 同口径 = 可归属
+                    # 词计数，r99 §十）。
+                    if not accepted_tables:
+                        try:
+                            text_tbls = (
+                                TableFinder(page, dict(TABLE_TEXT_SETTINGS)).tables
+                                or []
+                            )
+                        except Exception:
+                            text_tbls = []
+                        anchors = _table_caption_anchors(words)
+                        for tbl in text_tbls:
+                            try:
+                                rows = tbl.extract() or []
+                            except Exception:
+                                rows = []
+                            if not rows:
+                                continue
+                            tbl_bbox = getattr(tbl, "bbox", None)
+                            if not tbl_bbox:
+                                continue
+                            tbl_bbox = list(tbl_bbox)
+                            tbl_cells = [
+                                list(c)
+                                for c in (getattr(tbl, "cells", None) or [])
+                            ]
+                            inside = [
+                                i
+                                for i in range(len(words))
+                                if i not in protected
+                                and i not in absorbed
+                                and _word_center_in_bbox(words[i], tbl_bbox)
+                                and _word_chars_in_table_cells(words[i], tbl_cells)
+                            ]
+                            accepted, po_warn, partial_cov = (
+                                _gate_pdf_table_with_override(
+                                    tbl_bbox,
+                                    len(rows),
+                                    max((len(r) for r in rows), default=0),
+                                    len(inside),
+                                    raster_bboxes,
+                                    vector_bboxes,
+                                    page_area,
+                                )
+                            )
+                            if not accepted:
+                                continue
+                            if _is_stacked_ambiguous_table(tbl_bbox, anchors):
+                                continue
+                            absorbed.update(inside)
+                            accepted_tables.append(
+                                (rows, len(rows),
+                                 max((len(r) for r in rows), default=0),
+                                 tbl_bbox, partial_cov, "text_fallback")
+                            )
+                            if po_warn is not None:
+                                warnings.append(
+                                    WarningRecord(
+                                        code="table_figure_partial_overlap",
+                                        reason=(
+                                            f"page {page_idx} 表格与"
+                                            f"{'栅格图' if po_warn['family'] == 'raster' else '矢量图'}"
+                                            f"部分相交 frac={po_warn['frac']:.3f}"
+                                            "（保留，不截 bbox）"
+                                        ),
+                                        details={
+                                            "page": page_idx,
+                                            "frac": po_warn["frac"],
+                                            "family": po_warn["family"],
+                                            "bbox": tbl_bbox,
+                                        },
+                                    )
+                                )
                     if absorbed:
                         words = [
                             w for i, w in enumerate(words) if i not in absorbed
@@ -1069,8 +1215,12 @@ def _parse_pdf(
                             )
                         )
                 # 表格（W5：发射已过门的接受表——检测/吸收已在段落
-                # 分组前完成，此处仅产出元素，次序不变）
-                for rows, row_count, col_count, tbl_bbox, partial_cov in accepted_tables:
+                # 分组前完成，此处仅产出元素，次序不变；origin 仅
+                # text_fallback 表携带 detection 标记，geometry 表
+                # metadata 与 r7 面逐字节一致）
+                for rows, row_count, col_count, tbl_bbox, partial_cov, origin in (
+                    accepted_tables
+                ):
                     md = _rows_to_markdown(rows)
                     tbl_locator: dict[str, Any] = {"family": "page_geometry", "page": page_idx}
                     if tbl_bbox:
@@ -1082,6 +1232,8 @@ def _parse_pdf(
                     }
                     if partial_cov:
                         tbl_meta["partial_coverage"] = True
+                    if origin is not None:
+                        tbl_meta["detection"] = origin
                     elements.append(
                         Element(
                             element_id=f"{document_id}::e{len(elements):04d}",
