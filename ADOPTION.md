@@ -11572,3 +11572,57 @@ GPT 5.6 回执）。
   重试免再裁。
 - **等待裁决期间不跑任何 revision、不改任何 tolerance/filter/规则/
   override 适用面**（§十八）；comparison/holdout 保持零读取。
+
+## §224 r100 裁决执行回执：O-a 关闭 W5 text track + 双仓 normal revert 完成 + 验证全过（2026-11-02）
+
+1. **裁决收到（r100，2026-11-02 用户中转）**：R-1 = O-a——
+   `W5_TEXT_TRACK = CLOSED_AS_IMPLEMENTATION_FAILED_DEV_GENERALIZATION`
+   （v2b 调查保持 `ACCEPTED_COMPLETE`，两者不矛盾）；O-b/O-c 均不批
+   （禁止 document/domain allowlist、reference/pseudocode/TOC/prompt
+   filter、新 threshold/tolerance、text-candidate override 特判、
+   region heuristic——未来重开须新 RFC + 新独立信息源，
+   `CLOSED_CURRENT_ARCHITECTURE_AND_EVIDENCE`）；`Gate_C =
+   FAIL_BLOCKING`；`r8 = NOT_STARTED`（不创建"失败 r8/revert r8"）；
+   **r7 = CURRENT_ACCEPTED_BASELINE 保持**；r97 override =
+   ACCEPTED/UNCHANGED（29 例交互登记
+   `TEXT_V2_X_R97_OVERRIDE_INTERACTION = DISCLOSED`）；
+   `booktabs_text_detection_gap = KNOWN_LIMITATION`；探针自纠接受
+   （`PROBE_SELF_CORRECTION != PARSER_DEFECT`，终跑 JSON 为准）；
+   Gates A/B/D/E/F/G 正式接受为 PASS；实现纪律与
+   IMPLEMENTATION_CORRECTNESS 接受（acceptance ≠ correctness）。
+2. **main normal revert**：`git revert --no-edit 59d78b3` →
+   **ebc8dd2**（普通 revert commit，2 files changed，4 insertions /
+   644 deletions，含删除 tests/test_w5_text_v2_fallback.py；零
+   reset/rebase/amend/squash/force）。验证：`git diff b872347 HEAD`
+   **空输出**（parser tree 与 r7 `b872347` 逐字节一致 = r97 override
+   保持 + text-v2 production 符号/测试全撤）；全量 pytest
+   **5595 passed / 4 skipped**（恰恢复 r7 accepted baseline 测试态）。
+3. **adoption normal revert**：`git revert --no-edit dae726c` →
+   **22936d7**（同上纪律；§222/§223 台账与 dev-gate outputs/
+   dev_parser_gates_ag_r100.{json,md} 全保留）。验证：adoption
+   parser vs main `b872347` 版 diff = **恰 43 行 = r55 C08 历史差异**
+   （docx_table_extract_failed try/except，内容逐字不变）；
+   全量 pytest（PYTHONIOENCODING=utf-8）**5798 passed / 5 failed /
+   4 skipped**——5 个失败与既存集合逐一相符（caption_relation
+   devset 依赖 ×2：test_devset_pdf_figure_relation +
+   test_table_caption_relation_contract::test_devset_pdf_zero_table_
+   relations；W1 分隔符 ×3），**零新增**。
+4. **执行过程披露（run-environment artifact，非代码回归）**：
+   adoption revert 后首跑全量未设 PYTHONIOENCODING=utf-8 → 19 个
+   stage9_* 子进程类测试假失败（子进程 GBK 输出 0xd3 字节在
+   reader 线程 UTF-8 解码炸裂 → stdout None → TypeError）。设
+   PYTHONIOENCODING=utf-8 复跑即恢复 5798/5/4 与 §222 记录的
+   dae726c 前提态完全一致。与 r100 §二十同类：环境面假事件，
+   终跑（正确环境）为回执口径；main 侧不受影响（无该类子进程
+   测试）。
+5. **R-2 状态**：HELD 执行完毕（未推任何 ref）。remote 实测
+   （2026-11-02 ls-remote）：main = b872347、adoption =
+   130b59b（两仓 FF 前提均成立）。按 r100 §十九以**封闭 SHA 集**
+   随 r101 简报重请：main `b872347 → ebc8dd2`（2 笔：59d78b3 +
+   ebc8dd2）；adoption `130b59b → 本条台账 commit（§224）`（5 笔：
+   1ed777e + dae726c + 8f62a4f + 22936d7 + 本条）。**简报发出不再
+   新增独立 commit；"简报发出"登记（§225）并入 r101 裁决执行回执**
+   （属下一轮授权面），以保持本 push 授权集合封闭。
+6. **状态块（§224）**：r100 EXECUTED；W5_TEXT_TRACK CLOSED；
+   r8 NOT_STARTED；r7 = CURRENT_ACCEPTED_BASELINE；
+   freeze/gold/credential/manifest UNCHANGED。
