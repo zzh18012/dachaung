@@ -11778,3 +11778,60 @@ GPT 5.6 回执）。
    ②README + 演示页（main docs-only，避开自跑线锚窗）→ ③§228/§229
    回执 → ④r103 简报（终测回执 + docs commits push 另集请求）。
    本条 commit 不在已批 push 集内，随 r103 另请。
+
+## S228（2026-11-03）r102 终测 FINAL_LOCKED_R7_REVALIDATION 执行回执 — REPRODUCED_IDENTICAL
+
+1. **执行域**：revision = `stage9-eval-terminal-reval-r1`（独立目录，不覆盖
+   r7）；执行树 = adoption 主 checkout @ ac9d0c5（clean；等价不可变检出：
+   corpus/gold/r7 产物 gitignored 仅存主 checkout，detached worktree 不可
+   携带——六要素逐文件 sha256 落盘替代）。
+2. **六要素冻结**（freeze_record.json，frozen_at 2026-11-02T12:59:46Z，
+   执行前落盘）：①parser 身份 = main b872347；adoption vs b872347
+   fallback diff 40 变更行（difflib n=0）= 恰 r55 C08 历史差异，即 r7
+   实跑树自身状态（r101 §1.2① 同源；43 行为 GNU diff 总行数口径差）。
+   ②runner = scripts/stage9_eval_baseline.py sha256 f85320bd…（4af1578
+   后零改动 = r7 实跑版）+ evaluation 包逐文件 sha。③manifest sha256
+   51d3d400…（24 core docs 逐篇 sha）。④gold = stage9-b26-gold-r1，
+   digest 运行时重算 8b0c2a8c… == credential **MATCH**（canonical
+   compute_gold_digest over core 24）。⑤deps：python 3.12.10 /
+   pdfplumber 0.11.10 / python-docx 1.2.0 / kreuzberg 4.10.2 /
+   jsonschema 4.26.0 / uv.lock c773984a…。⑥指标定义：max_chars=800、
+   tolerance_chars=30、marker_max_chars=40、parsers=fallback+kreuzberg、
+   macro per split、layerC 仅 acad-03 fixed-anchor（20 gold edges）。
+3. **五步链**：prepare（817 硬边界派生 anchors）→ layerA（fallback/
+   kreuzberg 双 rc 0）→ layerB（48 process_single，rc 0）→ aggregate
+   （system_errors 46）→ gate 对 r7：**PASS，regressions=0**。
+4. **权威比对**（review/_r102_terminal_compare.py →
+   terminal_comparison.json）：**fields=136，mismatches=0 →
+   REPRODUCED_IDENTICAL**。比对面：A layerB 聚合（2 parser × 4 splits ×
+   doc_count+4 核心指标 + layerC 10 keys）/ B parser_versions / C 逐篇
+   稳定计数（ua/ec/nt/be/rel/ac，排除 wall-clock）/ D error_registry
+   system_errors / E config 稳定参数。允许差异域（wall-clock/timestamps/
+   machine metadata）已在比对面排除。
+5. **授权消耗与结论**：comparison/holdout 恰一次终测读取授权已随本 run
+   消耗，此后恢复 protected 状态。r7 数字经终测确认为稳定可复现结题数字
+   （comparison gate 0.8297/0.7635/0.7004/0.7378、24/24 schema valid、
+   Layer C fixed-anchor P 1.0/R 0.35/F1 0.5185）；ARI 面（§226/§227
+   已登记 0.3345@1200 vs B1 0.2658/B2 0.2621/oracle 0.4159）不在终测
+   复现域、维持 r102 裁决归因。无 FINALIZATION_PAUSE 触发；
+   FINALIZATION_MODE 继续。
+
+## S229（2026-11-03）README + 演示页执行回执（r102 R-3）
+
+1. **main docs-only commit = fecff0e**（ebc8dd2 之上恰 1 笔）：README
+   头部"最小闭环"→"2026-11 结题收口" + §0 七小节（0.1 pipeline/
+   baseline r7、0.2 确定性边界、0.3 指标摘要 + holdout 口径
+   INFORMATIONAL/WITH_KNOWN_ANCHOR_EXPOSURE、0.4 ARI 表 + 粒度归因 +
+   extended-N 诊断非生产建议、0.5 Layer C fixed-anchor 范围限定、
+   0.6 known limitations、0.7 复现入口 + 终测件指向 §228）+ 演示页
+   链接 docs/demo.md。
+2. **docs/demo.md 静态演示页**：示例 A = PDF prod-05、示例 B = DOCX
+   tech-05（均 dev split，真实命令 + 真实产物摘录：53 elements/31
+   chunks/relation e0033→e0030 ordinal_fallback"表 1"；332 elements/
+   190 chunks/19 relations）；未使用 comparison/holdout 样本。
+3. **纪律核查**：README 8 项最低集全覆盖✓；Layer C 只称 fixed-anchor
+   relation evaluation（acad-03/20 edges）✓；extended-N 未写成生产
+   建议✓；演示数据 dev 样本✓；tests/test_batch25_closure.py README
+   断言面 9 passed 不受影响✓。
+4. **push 状态**：fecff0e（main）与本 §227/§228/§229 笔（adoption）均
+   不在已批 push 集内，随 r103 封闭集另请。
