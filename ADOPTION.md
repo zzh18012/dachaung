@@ -11928,3 +11928,63 @@ GPT 5.6 回执）。
    frozen terminal outputs，符合 r103 §六"允许"边界）。
 4. **push 状态**：main `0535904`/`e276313` 与本 §231 笔（adoption）均不在
    已批 push 集内，随下次裁决按封闭 SHA 集另请。
+
+## S232（2026-11-04）r104 裁决登记 + R-1/R-2 push 执行回执
+
+1. **总裁决收到**（裁决落款 2026-11-04）：r103 执行回执接受
+   （`R103_PUSH_EXECUTION = CLOSED_SUCCESS`，3/3 授权提交零 force 零重试
+   零夹带）；`FINAL_EVAL_EVIDENCE_PACKAGE = ACCEPTED_COMPLETE`（0535904，
+   六件登记、最低四件全覆盖、后两件合理超集）；`FINAL_REPORT_AND_
+   DELIVERABLES = ACCEPTED_COMPLETE`（e276313，`FINAL_REPORT_MASTER =
+   docs/final-report.md` 母稿地位确立）；`PUBLIC_EVIDENCE_BOUNDARY =
+   PASS`（公开仓只记 role/revision/SHA-256/timestamp，私有语料金标保留
+   adoption private/gitignored 域）。
+2. **报告四项表述全 PASS**：`FINAL_REPORT_ARI_DISCLOSURE`（target 0.75
+   NOT MET + 0.3345/B1 0.2658/B2 0.2621/oracle 0.4159/80.43% + 粒度归因 +
+   extended-N = DIAGNOSTIC_ONLY，无事后改目标/改分母/oracle 替代）；
+   `FINAL_REPORT_RELATION_SCOPE`（P 1.0/R 0.35/F1 0.5185 与 fixed-anchor
+   acad-03/20 edges 同现，禁 corpus-wide 表述、禁只报 P 隐 R）；
+   `FINAL_REPORT_HOLDOUT_DISCLOSURE`（INFORMATIONAL/
+   WITH_KNOWN_ANCHOR_EXPOSURE 维持，未包装 strict blind）；
+   `FINAL_REPORT_PARSER_IDENTITY`（canonical = main b872347 与 evaluation
+   execution implementation = adoption r7 port + r55 C08 delta 双身份区分，
+   未误写 byte-for-byte 等同）。
+3. **FINAL_FROZEN 纪律确认**：两笔 main commit 均 DOCS_ONLY，
+   `REVISION_TRIGGER = NONE`；r7 = FINAL_FROZEN_BASELINE、r8 =
+   NOT_STARTED/NOT_NEEDED、protected splits 保持 PROTECTED 不再读取、
+   freeze/gold/metric/parser 全冻结。
+4. **R-1 main docs push 执行回执**：批准 refspec
+   `e276313:refs/heads/main`（封闭集恰 2 commits：0535904 + e276313，
+   DOCS/EVIDENCE METADATA ONLY）。执行 `git push origin
+   e276313:refs/heads/main` → **rc 0，FF 成功 `fecff0e..e276313`**；
+   ls-remote 复核远程 main = e276313 ✓。
+5. **R-2 adoption ledger push 执行回执**：批准 refspec
+   `373fcd1:refs/heads/integration/stage9-batch26-corpus-annotation`
+   （封闭集恰 2 commits：856012f §230 + 373fcd1 §231，LEDGER ONLY）。
+   执行同 refspec push → **rc 0，FF 成功 `74e7bae..373fcd1`**；ls-remote
+   复核远程 = 373fcd1 ✓。
+6. **收口**：本轮总授权 4 commits（2+2）全部执行完毕，零
+   APPROVED_WAITING_NETWORK。本 §232 笔及后续 institutional formatting /
+   defense materials commits 均不自动包含在本次授权内，按封闭 SHA 集
+   随下次裁决另请（r104 §十八）。
+7. **两项新批准登记**：①`SCHOOL_TEMPLATE_FINAL_MATERIALS =
+   APPROVED_TO_PROCEED`——基于 docs/final-report.md 的 REPORT
+   TRANSFORMATION/FORMATTING（结题报告/项目总结/成果简介/技术路线/创新点/
+   指标完成情况/未完成目标与原因/后续工作）；数字纪律：所有指标必须来自
+   frozen final report / terminal evidence，不得重算新指标/ARI 改达标/
+   Layer C 扩 corpus-wide/holdout 改 strict blind；学校模板纯格式字段
+   （学院/编号/导师/成员/签字/字数）属用户补给面，不改变项目证据。
+   ②`FINAL_DEFENSE_MATERIALS = APPROVED_TO_PROCEED`——PPT/讲稿/演示流程/
+   架构图/指标对比图/limitations 页/Q&A 备答；答辩主线 13 节冻结（问题→
+   确定性约束→架构→文档模型→管线→评测设计→r7 结果→baseline 对比→ARI
+   未达标结构原因→relation recall limitation→reproducibility→demo→future
+   work）；纪律：不得省略 ARI NOT MET/只报 P 1.0/隐 scope/把 extended-N
+   当实际结果；可以强调"相对冻结 baseline 有提升 + 未达成部分经 oracle/
+   粒度分析定位到结构约束"。两项均属 FINALIZATION ARTIFACTS，不触发
+   r8/不重开 protected split。
+8. **结题阶段状态收束**（r104 §二十）：TECHNICAL_IMPLEMENTATION =
+   COMPLETE、EVALUATION = COMPLETE、REPRODUCIBILITY = COMPLETE、
+   FINAL_REPORT_MASTER = COMPLETE、EVIDENCE_MANIFEST = COMPLETE、
+   README = COMPLETE、MINIMAL_DEMO = COMPLETE；剩余主工作 =
+   INSTITUTIONAL_FORMATTING + DEFENSE MATERIALS + SUBMISSION PACKAGING
+   （非新研发阶段）。
