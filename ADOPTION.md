@@ -11896,3 +11896,35 @@ GPT 5.6 回执）。
    APPROVED_WAITING_NETWORK。本 §230 笔及后续 final-report/
    evidence manifest/presentation commits 均不在本次 push 授权内，
    按实际封闭 SHA 集随下次裁决另请。
+
+## S231（2026-11-04）r103 批准两项落地回执：证据包 manifest + 结题报告
+
+1. **FINAL_EVAL_EVIDENCE_PACKAGE 落地**（r103 §十四）：main commit
+   `0535904`（fecff0e 之上），新增 `docs/evidence-manifest.md`——登记
+   6 件终测证据（freeze_record 243c1701… / metrics f087a315… /
+   comparison_gate e0c69e1f… / terminal_comparison 6f4b3b83… /
+   error_registry 149596c4… / layerB_per_doc_raw d596a73d…），各带
+   SHA-256 / role / originating revision（stage9-eval-terminal-reval-r1）/
+   generated timestamp；裁决四件最低集全覆盖，后两件为超集登记。原始
+   corpus/gold/证据文件保持 adoption 私有 gitignored 域，未复制进公开仓
+   （digest+revision+role 登记制）。
+2. **FINAL_REPORT_AND_DELIVERABLES 落地**（r103 §十三）：main commit
+   `e276313`，新增 `docs/final-report.md`——13 节冻结结构完整成稿
+   （objective/scope、deterministic architecture、unified document model、
+   pipeline、eval methodology、r7 final metrics、baseline chain、ARI
+   structural-gap、Layer C、final reproducibility run、limitations、demo/
+   usage、future work）。三项特别表述要求落实：①ARI 同时出现 target
+   0.75/NOT MET + 系统 0.3345/B1 0.2658/B2 0.2621/oracle 0.4159（+
+   80.43% 与粒度归因、extended-N 诊断件限定）；②relation 同时出现
+   P 1.0/R 0.35/F1 0.5185 与 fixed-anchor scope（acad-03/20 gold edges，
+   明示不得称 corpus-wide）；③holdout 保持 INFORMATIONAL /
+   WITH_KNOWN_ANCHOR_EXPOSURE。parser 双身份写法（r103 §五）已落实于
+   第 7/10 节。r7 四 gate 指标（0.8297/0.7635/0.7004/0.7378、24/24
+   schema valid）与终测 REPRODUCED_IDENTICAL 面与 §228/§230 登记值逐字
+   一致。
+3. **纪律核查**：两笔均 DOCUMENTATION ONLY，属 FINAL_FROZEN 模式允许域
+   （report/evidence packaging）；零 parser/chunker/relation/metric/gold/
+   freeze/scope/threshold 改动；未读取 protected split（仅引用已产生的
+   frozen terminal outputs，符合 r103 §六"允许"边界）。
+4. **push 状态**：main `0535904`/`e276313` 与本 §231 笔（adoption）均不在
+   已批 push 集内，随下次裁决按封闭 SHA 集另请。
