@@ -11835,3 +11835,64 @@ GPT 5.6 回执）。
    断言面 9 passed 不受影响✓。
 4. **push 状态**：fecff0e（main）与本 §227/§228/§229 笔（adoption）均
    不在已批 push 集内，随 r103 封闭集另请。
+
+## S230（2026-11-04）r103 裁决登记 + R-1/R-2 push 执行回执
+
+1. **总裁决收到**（裁决落款 2026-11-03，2026-11-04 执行）：
+   终测 `stage9-eval-terminal-reval-r1` **ACCEPTED /
+   REPRODUCED_IDENTICAL**（稳定字段 136/136 exact、mismatches=0；
+   comparison gate PASS / regressions=0；六要素冻结 ACCEPTED，gold
+   runtime digest 8b0c2a8c… == credential MATCH）。protected
+   comparison/holdout 恰一次终测读取授权确认消耗完毕，两者恢复
+   PROTECTED（holdout 口径 INFORMATIONAL_WITH_KNOWN_ANCHOR_EXPOSURE）；
+   不得为结题写作重新执行评测产生另一套结果，仅可引用已产生的
+   frozen terminal outputs。
+2. **baseline 链终态**：`r7 = FINAL_FROZEN_BASELINE`；r6 =
+   SUPERSEDED_ACCEPTED_BASELINE；r5 = HISTORICAL_NON_BASELINE；r8 =
+   NOT_STARTED 且结题不再需要。parser/evaluation 进入
+   `FINAL_FROZEN`；FINALIZATION_MODE 升级为 FINAL_FROZEN（至
+   2026-12-13 结题提交前默认只允许 report/README/docs/presentation/
+   evidence packaging/typo/不改语义的复现性修复；parser
+   behavior/chunk/relation 算法/metric/gold/freeze/scope/threshold 默认
+   全冻结，blocking defect 须另行裁决）。ARI（NOT_MET、粒度归因）与
+   Layer C（fixed-anchor acad-03/20 gold edges）状态沿 r102 不变；
+   终测产物不得重新解释为新 revision（terminal-reval-r1 =
+   FINAL REPRODUCIBILITY SNAPSHOT，非 r8）。
+3. **parser 身份文书细化**（record-precision，不影响 acceptance）：
+   终测材料须同时保留两个概念——canonical accepted parser
+   revision = `main b872347`；evaluation execution implementation =
+   `adoption r7 port with previously disclosed r55 C08 delta`；不得
+   简写 "terminal execution bytes = b872347"。§228 表述与此一致，
+   后续结题报告采用该双身份写法。
+4. **README + demo 终态**：main `fecff0e` ACCEPTED 为 docs-only
+   finalization commit；docs/demo.md ACCEPTED（dev 样本 prod-05/
+   tech-05），`R-H_MINIMAL_DEMO = COMPLETE`，不需要再开发 Web UI。
+5. **三项下一步裁定**：①`FINAL_REPORT_AND_DELIVERABLES =
+   APPROVED_TO_START`（报告结构冻结 13 节；特别要求：ARI 必须同时
+   出现 target 0.75/NOT MET + 系统/baselines/oracle，relation 必须
+   同时出现 P/R/F1 与 fixed-anchor scope，holdout 保持
+   INFORMATIONAL/WITH_KNOWN_ANCHOR_EXPOSURE 不得包装成 strict
+   blind）；②`FINAL_EVAL_EVIDENCE_PACKAGE = APPROVED`（至少归档
+   freeze_record/terminal_comparison/gate/comparison_gate 四件 +
+   小型 evidence_manifest 记 filename/SHA256/role/originating
+   revision/timestamp；原始 corpus/gold 属 private/gitignored，不为
+   结题方便复制进公开仓，归档 digest+revision ID+evidence outputs
+   即可）；③`SELF_RUN_LINE = INDEPENDENT_CONTINUE`（不自动获得
+   merge into main/adoption、修改 final metrics、修改 README final
+   numbers 的权限；算法改动要进结题版本必须重新走裁决链）。
+6. **R-1 main docs push 执行回执**：批准 refspec
+   `fecff0e:refs/heads/main`（封闭集恰 1 commit，DOCS_ONLY）。执行
+   `git push origin fecff0e:refs/heads/main` → **rc 0，FF 成功
+   `ebc8dd2..fecff0e`**；ls-remote 复核远程 main = fecff0e ✓。无
+   网络重试、无 force、无夹带。
+7. **R-2 adoption terminal-ledger push 执行回执**：批准 refspec
+   `74e7bae:refs/heads/integration/stage9-batch26-corpus-annotation`
+   （封闭集恰 2 commits：ac9d0c5 §227 + 74e7bae §228/§229，纯台账）。
+   执行 `git push origin 74e7bae:refs/heads/integration/
+   stage9-batch26-corpus-annotation` → **rc 0，FF 成功
+   `f9f559f..74e7bae`**；ls-remote 复核远程 = 74e7bae ✓。无网络
+   重试、无 force、无夹带。
+8. **收口**：本轮总授权 3 commits（1+2）全部执行完毕，零
+   APPROVED_WAITING_NETWORK。本 §230 笔及后续 final-report/
+   evidence manifest/presentation commits 均不在本次 push 授权内，
+   按实际封闭 SHA 集随下次裁决另请。
