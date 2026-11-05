@@ -11988,3 +11988,34 @@ GPT 5.6 回执）。
    README = COMPLETE、MINIMAL_DEMO = COMPLETE；剩余主工作 =
    INSTITUTIONAL_FORMATTING + DEFENSE MATERIALS + SUBMISSION PACKAGING
    （非新研发阶段）。
+
+## S233（2026-11-05）r104 批准三项落地回执：答辩底稿 + 学校材料底稿 + 提交打包立案
+
+1. **FINAL_DEFENSE_MATERIALS 部分落地**（r104 §十七）：main commit
+   `70a6c1d`，新增 `docs/defense/outline.md`——13 节冻结主线讲稿
+   （r104 §十七逐节对齐）+ 6 条 Q&A 备答（ARI 归因 / relation 双指标 /
+   holdout 口径 / 复现性 / parser 选型 / 范围裁决）+ PPTX 制片清单
+   15 页。五条口径硬纪律写入页首：不省略 ARI NOT MET、relation P/R/F1
+   同报、fixed-anchor scope 出示、extended-N 仅诊断、holdout 口径
+   INFORMATIONAL；正面框架采用 r104 授权表述（"相对冻结 baseline 有
+   提升 + 未达成部分经 oracle/粒度分析定位到结构约束"）。
+2. **SCHOOL_TEMPLATE_FINAL_MATERIALS 部分落地**（r104 §十六）：main
+   commit `dcc7ad5`，新增 `docs/school-materials-draft.md` 模板无关
+   内容底稿——成果简介（可直接作项目总结）/ 技术路线六步 / 创新点四项
+   （含确定性约束优先与结构性差距分析方法）/ 指标完成情况表（ARI
+   NOT MET 与粒度归因同表如实列出）/ 未完成目标与原因五项 / 后续工作
+   五项 / 待用户补格式字段清单（学院/编号/导师/成员/签字/字数）。
+   数字纪律合规：全部数字取自 frozen final report 登记值零重算；
+   学校模板正式版待用户提供模板后改写（PENDING_USER_TEMPLATE）。
+3. **SUBMISSION_PACKAGING 立案**（r104 §二十剩余主工作第三项）：main
+   commit `a04df40`，新增 `docs/submission/manifest.md`——提交包 9 项
+   内容物清单（7 READY / 2 PENDING：学校正式报告待模板、答辩 PPT 待
+   制片）、五源材料数字一致性声明（final-report / evidence-manifest /
+   README / defense-outline / school-draft 同源已核）、口径纪律终检
+   checklist 六项、提交前待办时序（至 2026-12-13 截止）。属
+   FINALIZATION ARTIFACTS，不触发 r8 / 不重开 protected split / 不改
+   任何冻结面。
+4. **push 状态**：main 待推集 = `e276313..a04df40` 恰 3 笔
+   （70a6c1d + dcc7ad5 + a04df40，均 docs-only）；adoption 待推集 =
+   `373fcd1..本 §233 笔`（§232 + §233 台账）。均随 r105 简报按封闭
+   SHA 集请批。
